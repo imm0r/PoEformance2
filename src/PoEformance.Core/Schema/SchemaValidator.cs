@@ -140,9 +140,32 @@ public sealed class SchemaValidator
                 }
 
                 double length = Math.Sqrt((double)v[0] * v[0] + (double)v[1] * v[1] + (double)v[2] * v[2]);
-                return Math.Abs(length - 1.0) <= 0.05
-                    ? Result(CheckOutcome.Pass, $"length {length:F3}")
-                    : Result(CheckOutcome.Fail, $"length {length:G4}, expected ~1.0");
+                if (Math.Abs(length - 1.0) > 0.05)
+                {
+                    return Result(CheckOutcome.Fail, $"length {length:G4}, expected ~1.0");
+                }
+
+                if (unit.Expect is null)
+                {
+                    return Result(CheckOutcome.Pass, $"length {length:F3}");
+                }
+
+                // Direction check: cosine between the read vector and the expected one. This
+                // is what makes a PASS meaningful rather than "something unit-length is here".
+                double[] e = unit.Expect;
+                double expectLength = Math.Sqrt((e[0] * e[0]) + (e[1] * e[1]) + (e[2] * e[2]));
+                if (expectLength <= 0)
+                {
+                    return Result(CheckOutcome.Fail, "expected direction is a zero vector");
+                }
+
+                double dot = (((double)v[0] * e[0]) + ((double)v[1] * e[1]) + ((double)v[2] * e[2]))
+                    / (length * expectLength);
+
+                return dot >= 0.99
+                    ? Result(CheckOutcome.Pass, $"points ({v[0]:F3}, {v[1]:F3}, {v[2]:F3}) as expected")
+                    : Result(CheckOutcome.Fail,
+                        $"unit-length but points ({v[0]:F3}, {v[1]:F3}, {v[2]:F3}), expected ({e[0]:F3}, {e[1]:F3}, {e[2]:F3})");
             }
 
             case Invariant.VectorSane sane:

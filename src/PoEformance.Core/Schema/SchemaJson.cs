@@ -112,7 +112,10 @@ public static class SchemaJson
         "plausibleptr" => new Invariant.PlausiblePtr(),
         "nonnullptr" => new Invariant.NonNullPtr(),
         "unitvector3" => new Invariant.UnitVector3(
-            dto.At is null ? 0 : checked((int)ParseNumber(dto.At, where, "at"))),
+            dto.At is null ? 0 : checked((int)ParseNumber(dto.At, where, "at")),
+            dto.Expect is null ? null
+                : dto.Expect.Length == 3 ? dto.Expect
+                : throw new InvalidDataException($"{where}: unitVector3 'expect' needs exactly 3 numbers.")),
         "vectorsane" => new Invariant.VectorSane(
             checked((int)(dto.ElementSize ?? throw new InvalidDataException($"{where}: vectorSane needs 'elementSize'."))),
             (long)(dto.MaxCount ?? throw new InvalidDataException($"{where}: vectorSane needs 'maxCount'."))),
@@ -239,6 +242,9 @@ public sealed class InvariantDto
 
     [JsonPropertyName("stringAt")]
     public string? StringAt { get; set; }
+
+    [JsonPropertyName("expect")]
+    public double[]? Expect { get; set; }
 }
 
 /// <summary>Source-generated serializer context - required for Native AOT.</summary>

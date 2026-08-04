@@ -145,19 +145,36 @@ public static class MatrixScan
                 + (double)v[(row * 4) + 1] * v[(row * 4) + 1]
                 + (double)v[(row * 4) + 2] * v[(row * 4) + 2]);
 
-        bool allRowsUnit = true;
-        for (int row = 0; row < 3; row++)
+        // A zero row disqualifies outright: real transforms have none. The first live dump
+        // showed two candidates that were plainly not matrices (zero rows, last column
+        // 0,0,1,0) yet were being called "projection-like" - hence this check comes first.
+        for (int row = 0; row < 4; row++)
         {
-            if (Math.Abs(RowLength(m, row) - 1.0) > 0.05)
+            if (RowLength(m, row) < 1e-6)
             {
-                allRowsUnit = false;
-                break;
+                return "contains a zero row - not a matrix, misaligned read";
             }
         }
 
-        double translation = Math.Abs(m[12]) + Math.Abs(m[13]) + Math.Abs(m[14]);
-        return allRowsUnit && translation < 1.0
-            ? "pure rotation (all rows unit, no translation) - probably NOT the projection"
-            : "has scale/translation - projection-like";
+        // The real discriminator is the last COLUMN: a camera transform carries world-scale
+        // translation there (thousands of units), while a stray basis block has small values.
+        double translation = Math.Abs(m[3]) + Math.Abs(m[7]) + Math.Abs(m[11]) + Math.Abs(m[15]);
+        if (translation < 10.0)
+        {
+            return "last column is not world-scale translation - probably a basis block, not a camera";
+        }
+
+        int unitRows = 0;
+        for (int row = 0; row < 4; row++)
+        {
+            if (Math.Abs(RowLength(m, row) - 1.0) <= 0.05)
+            {
+                unitRows++;
+            }
+        }
+
+        return unitRows == 4
+            ? "4 unit rows + world-scale translation - a rigid camera transform, this is the one"
+            : $"{unitRows}/4 unit rows + world-scale translation - projection-like";
     }
 }

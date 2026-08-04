@@ -124,6 +124,43 @@ public class ValidatorTests
     }
 
     [Fact]
+    public void UnitVector_WithExpectedDirection_RejectsTheWrongUnitVector()
+    {
+        // The lesson from the 2026-08 matrix hunt: length alone cannot verify an offset,
+        // because memory is full of unit vectors - a wrong pick would go GREEN. PoE2's camera
+        // is fixed, so pinning the direction turns the check into a real verification.
+        const ulong baseAddr = 0x90000;
+        double[] cameraForward = [0.466531, 0.466531, 0.751464];
+        var invariant = new Invariant.UnitVector3(0x30, cameraForward);
+        StructDef def = SingleField("WorldData", "W2SMatrix", 0x11C, FieldType.Mat4x4, invariant);
+
+        // The real camera: unit length AND the expected direction.
+        var right = new FakeMemoryReader();
+        right.Place<float>(baseAddr + 0x11C + 0x30, 0.466531f);
+        right.Place<float>(baseAddr + 0x11C + 0x34, 0.466531f);
+        right.Place<float>(baseAddr + 0x11C + 0x38, 0.751464f);
+        Assert.Equal(CheckOutcome.Pass, new SchemaValidator(right).ValidateStruct(def, baseAddr)[0].Outcome);
+
+        // A different perfectly-unit vector (the 0x270 candidate from the live dump) must NOT
+        // pass just because it is unit length.
+        var decoy = new FakeMemoryReader();
+        decoy.Place<float>(baseAddr + 0x11C + 0x30, 0.707107f);
+        decoy.Place<float>(baseAddr + 0x11C + 0x34, 0.531365f);
+        decoy.Place<float>(baseAddr + 0x11C + 0x38, 0.466531f);
+        List<FieldCheck> decoyResult = new SchemaValidator(decoy).ValidateStruct(def, baseAddr);
+        Assert.Equal(CheckOutcome.Fail, decoyResult[0].Outcome);
+        Assert.Contains("expected", decoyResult[0].Detail);
+
+        // The NEGATED forward (the paired inverse transform one row later) is also rejected -
+        // same axis, opposite direction, different matrix.
+        var negated = new FakeMemoryReader();
+        negated.Place<float>(baseAddr + 0x11C + 0x30, -0.466531f);
+        negated.Place<float>(baseAddr + 0x11C + 0x34, -0.466531f);
+        negated.Place<float>(baseAddr + 0x11C + 0x38, -0.751464f);
+        Assert.Equal(CheckOutcome.Fail, new SchemaValidator(negated).ValidateStruct(def, baseAddr)[0].Outcome);
+    }
+
+    [Fact]
     public void RangeInvariant_CatchesOutOfBandValues()
     {
         const ulong baseAddr = 0x80000;

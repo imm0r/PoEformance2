@@ -35,7 +35,8 @@ public class SchemaTests
         // owner-verified 2026-08 +0x08 AreaInstance wave (PlayerInfo 0x598 -> 0x5A0,
         // AwakeEntities 0x6D8 -> 0x6E0, Terrain 0x8B8 -> 0x8C0).
         Assert.Equal(0x290, schema.Structs["InGameState"].OffsetOf("AreaInstanceData"));
-        Assert.Equal(0x1A0, schema.Structs["WorldData"].OffsetOf("W2SMatrix"));
+        // W2SMatrix: 0x1A8 -> 0x1A0 -> 0x11C, located 2026-08 by the drift scanner.
+        Assert.Equal(0x11C, schema.Structs["WorldData"].OffsetOf("W2SMatrix"));
         Assert.Equal(0x5A0, schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
         Assert.Equal(0x6E0, schema.Structs["AreaInstance"].OffsetOf("AwakeEntities"));
         Assert.Equal(0x8C0, schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
@@ -46,7 +47,11 @@ public class SchemaTests
         Assert.Equal(4, schema.Structs["GameState"].Constants["InGameStateIndex"]);
 
         // The drift-alarm invariants that motivated the whole schema design.
-        Assert.IsType<Invariant.UnitVector3>(schema.Structs["WorldData"].Field("W2SMatrix")!.Invariant);
+        // The matrix invariant pins the DIRECTION, not just the length: PoE2's camera angle is
+        // fixed, so a mere unit-length check would let a wrong offset pass as green.
+        var matrixInvariant = Assert.IsType<Invariant.UnitVector3>(schema.Structs["WorldData"].Field("W2SMatrix")!.Invariant);
+        Assert.NotNull(matrixInvariant.Expect);
+        Assert.Equal(0.751464, matrixInvariant.Expect![2], precision: 5);
         Assert.IsType<Invariant.Range>(schema.Structs["Actor"].Field("AnimationId")!.Invariant);
     }
 

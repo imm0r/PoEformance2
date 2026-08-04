@@ -41,15 +41,28 @@ public abstract class Invariant
     }
 
     /// <summary>
-    /// Three consecutive floats starting <see cref="At"/> bytes into the field must
-    /// form a unit-length vector (within tolerance). Catches misaligned matrix reads.
+    /// Three consecutive floats starting <see cref="At"/> bytes into the field must form a
+    /// unit-length vector, and - when <see cref="Expect"/> is set - must point that way.
     /// </summary>
-    public sealed class UnitVector3(int at) : Invariant
+    /// <remarks>
+    /// The direction check is what gives this invariant real proving power. Length alone is
+    /// a weak signal: memory is full of unit vectors, so a drift hunt can "confirm" a wrong
+    /// offset simply because something unit-length lives there. But PoE2's camera angle is
+    /// FIXED - it never rotates - so the camera forward is a constant across every session
+    /// and machine. Pinning the expected direction turns "some unit vector is here" into
+    /// "the camera is here", which is the difference between a guess and a verification.
+    /// </remarks>
+    public sealed class UnitVector3(int at, double[]? expect = null) : Invariant
     {
         /// <summary>Byte offset of the vector inside the field.</summary>
         public int At { get; } = at;
 
-        public override string Describe() => $"unit vector at +0x{At:X}";
+        /// <summary>Expected direction (need not be normalised), or null to check length only.</summary>
+        public double[]? Expect { get; } = expect;
+
+        public override string Describe() => Expect is null
+            ? $"unit vector at +0x{At:X}"
+            : $"unit vector at +0x{At:X} pointing ({Expect[0]:F3}, {Expect[1]:F3}, {Expect[2]:F3})";
     }
 
     /// <summary>

@@ -113,6 +113,40 @@ public class MatrixScanTests
     }
 
     [Fact]
+    public void Describe_SeparatesTheRealCameraFromTheLiveDumpsDecoys()
+    {
+        // The real block found at WorldData+0x11C: four unit rows, world-scale translation.
+        float[] camera =
+        [
+            0.847062f, -0.344035f, 0.405125f, -56.5975f,
+            -0.392513f, -0.392513f, 0.831786f, 7588.6f,
+            0.634007f, 0.634007f, -0.442799f, -10806.6f,
+            0.466531f, 0.466531f, 0.751464f, -6291.75f,
+        ];
+        Assert.Contains("this is the one", MatrixScan.Describe(camera));
+
+        // The 0x270 hit: a basis block, last column 0,0,1,0 - no world-scale translation.
+        float[] basisBlock =
+        [
+            0f, 1f, 0f, 0f,
+            0f, 0f, 1f, 0f,
+            0f, 0f, 0f, 1f,
+            0.707107f, 0.531365f, 0.466531f, 0f,
+        ];
+        Assert.Contains("not a matrix", MatrixScan.Describe(basisBlock)); // zero row disqualifies
+
+        // The 0x328 hit: two zero rows - plainly a misaligned read.
+        float[] zeroRows =
+        [
+            0f, 0f, 0f, 0f,
+            0f, 0f, 0f, 0f,
+            0.707107f, 0.531365f, 0.466531f, 0f,
+            -0.707107f, 0.531365f, 0.466531f, 0f,
+        ];
+        Assert.Contains("zero row", MatrixScan.Describe(zeroRows));
+    }
+
+    [Fact]
     public void Scan_ReturnsEmptyWhenNoMatrixIsPresent()
     {
         var fake = new FakeMemoryReader();
