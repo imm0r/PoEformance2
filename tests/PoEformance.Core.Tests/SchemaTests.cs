@@ -31,10 +31,14 @@ public class SchemaTests
         Assert.Contains("GameStates", schema.Statics.Keys);
         Assert.Contains("GameCullSize", schema.Statics.Keys);
 
-        // Spot-check ported offsets against PoE2Offsets.ahk ground truth.
+        // Spot-check offsets against current ground truth: the AHK-tool port plus the
+        // owner-verified 2026-08 +0x08 AreaInstance wave (PlayerInfo 0x598 -> 0x5A0,
+        // AwakeEntities 0x6D8 -> 0x6E0, Terrain 0x8B8 -> 0x8C0).
         Assert.Equal(0x290, schema.Structs["InGameState"].OffsetOf("AreaInstanceData"));
         Assert.Equal(0x1A0, schema.Structs["WorldData"].OffsetOf("W2SMatrix"));
-        Assert.Equal(0x598, schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
+        Assert.Equal(0x5A0, schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
+        Assert.Equal(0x6E0, schema.Structs["AreaInstance"].OffsetOf("AwakeEntities"));
+        Assert.Equal(0x8C0, schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
         Assert.Equal(0x8B0, schema.Structs["Actor"].OffsetOf("AnimationId"));
         Assert.Equal(0x69, schema.Structs["Targetable"].OffsetOf("IsTargetable"));
         Assert.Equal(0x21E0, schema.Structs["ServerDataStructure"].OffsetOf("League"));

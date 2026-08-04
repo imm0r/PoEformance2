@@ -16,7 +16,7 @@
   //                    | vectorSane | stringContains | changes
 
   "version": 1,
-  "gameVersion": "0.5.x (last verified 2026-07, AHK tool v0.45.13.298)",
+  "gameVersion": "0.5.x (AreaInstance tail re-verified 2026-08 by owner: +0x08 wave; base port: AHK tool v0.45.13.298, 2026-07)",
 
   "statics": {
     "GameStates": {
@@ -63,7 +63,7 @@
         "AreaInstanceData": {
           "offset": "0x290", "type": "ptr",
           "invariant": { "kind": "nonNullPtr" },
-          "comment": "Null while not in an area; nonNullPtr is only meaningful in-game."
+          "comment": "Null while not in an area; nonNullPtr is only meaningful in-game. Re-confirmed 0x290 in the 2026-08 check (an older external baseline had 0x288)."
         },
         "UiRootStructPtr": { "offset": "0x2F0", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "KB/M UI manager (UserInterface_MouseAndKeyboard)." },
         "GamepadUiRootStructPtr": { "offset": "0x318", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "Controller UI manager." },
@@ -101,7 +101,7 @@
     },
 
     "AreaInstance": {
-      "comment": "DRIFT HISTORY: PlayerInfo and TerrainMetadata both shifted +0x18 with a game patch (0x580->0x598, 0x8A0->0x8B8). When one +0x18 drift shows up here, check the others.",
+      "comment": "DRIFT HISTORY, two waves so far: (1) +0x18 - PlayerInfo 0x580->0x598, TerrainMetadata 0x8A0->0x8B8; (2) 2026-08, owner-verified: +0x08 across the tail - PlayerInfo 0x598->0x5A0, AwakeEntities 0x6D8->0x6E0, SleepingEntities 0x6E8->0x6F0, TerrainMetadata 0x8B8->0x8C0 (a new 8-byte field was inserted below ~0x5A0). When ONE field here drifts, assume the whole tail moved by the same delta and check them all. Low fields (CurrentAreaLevel 0xC4, CurrentAreaHash 0x11C) did not move in either wave.",
       "fields": {
         "CurrentAreaLevel": {
           "offset": "0xC4", "type": "i32",
@@ -109,21 +109,21 @@
           "comment": "Monster level of the current area."
         },
         "CurrentAreaHash": { "offset": "0x11C", "type": "u32", "comment": "Instance hash - changes on every area transition; used as the per-area reset signal all over the tool." },
-        "Environments": { "offset": "0x4C0", "type": "ptr" },
+        "Environments": { "offset": "0x4C0", "type": "ptr", "comment": "UNVERIFIED since the 2026-08 +0x08 wave - sits between the stable low fields and the shifted tail; if the insertion point is below 0x4C0 this is 0x4C8 now. Confirm via the drift report before use." },
         "PlayerInfo": {
-          "offset": "0x598", "type": "ptr",
+          "offset": "0x5A0", "type": "ptr",
           "invariant": { "kind": "nonNullPtr" },
-          "comment": "LocalPlayerStruct base (was 0x580, +0x18 drift). ServerDataPtr = +0x00, LocalPlayerPtr = +0x20 within it."
+          "comment": "LocalPlayerStruct base (was 0x580, then 0x598, now 0x5A0 - 2026-08 +0x08 wave). ServerDataPtr = +0x00 (abs 0x5A0), LocalPlayerPtr = +0x20 (abs 0x5C0) within it."
         },
         "AwakeEntities": {
-          "offset": "0x6D8", "type": "ptr",
+          "offset": "0x6E0", "type": "ptr",
           "invariant": { "kind": "nonNullPtr" },
-          "comment": "EntityListStruct: AwakeEntities std::map head is its first field (+0x00)."
+          "comment": "EntityListStruct: AwakeEntities std::map head is its first field (+0x00). Was 0x6D8 (2026-08 +0x08 wave)."
         },
-        "SleepingEntities": { "offset": "0x6E8", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
+        "SleepingEntities": { "offset": "0x6F0", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "Was 0x6E8 (2026-08 +0x08 wave)." },
         "TerrainMetadata": {
-          "offset": "0x8B8", "type": "ptr",
-          "comment": "TerrainStruct (was 0x8A0, +0x18 drift). Source: GameHelper2 AreaInstanceOffsets.cs. NOTE: unlike most ptr fields this is an inline struct base in some builds - treat as base address, not pointer, when reading TerrainMetadata fields."
+          "offset": "0x8C0", "type": "ptr",
+          "comment": "TerrainStruct (was 0x8A0, then 0x8B8, now 0x8C0 - 2026-08 +0x08 wave). Source: GameHelper2 AreaInstanceOffsets.cs. NOTE: unlike most ptr fields this is an inline struct base in some builds - treat as base address, not pointer, when reading TerrainMetadata fields."
         }
       }
     },
