@@ -70,7 +70,7 @@ public static class DriftReport
         var checks = new List<FieldCheck>();
         int passed = 0, failed = 0, skipped = 0;
 
-        void Report(string label, ulong baseAddress)
+        void Report(string label, ulong baseAddress, ulong parentAddress = 0, int parentFieldOffset = -1)
         {
             if (!schema.Structs.TryGetValue(label, out StructDef? def))
             {
@@ -101,7 +101,7 @@ public static class DriftReport
                         output.WriteLine($"  FAIL  {Row(check)}");
                         if (def.Field(check.FieldName)?.Invariant is Invariant.UnitVector3)
                         {
-                            RunMatrixScan(reader, output, def, check, baseAddress);
+                            RunMatrixScan(reader, output, def, check, baseAddress, parentAddress, parentFieldOffset);
                         }
 
                         break;
@@ -126,40 +126,85 @@ public static class DriftReport
     private static string Row(FieldCheck c) => $"{c.StructName}.{c.FieldName} (+0x{c.Offset:X}): {c.Detail}";
 
     /// <summary>
-    /// When a matrix invariant fails, immediately hunt for where the matrix went: sweep
-    /// a window around the stale offset in the same struct, and - because the last two
-    /// drifts were "the camera struct's internal layout moved" - also sweep behind the
-    /// struct's CameraStructure pointer when it has one. Prints the candidates so the
-    /// fix is an edit of one number in the schema (then --watch confirms it).
+    /// When a matrix invariant fails, hunt for the cause in the two places it can hide:
+    /// the matrix moved WITHIN this struct, or the POINTER that led to this struct drifted
+    /// so the whole struct is being read at the wrong base.
     /// </summary>
-    private static void RunMatrixScan(IMemoryReader reader, TextWriter output, StructDef def, FieldCheck check, ulong baseAddress)
+    /// <remarks>
+    /// Only diagonal unit vectors count as camera candidates. The first live run returned
+    /// four perfect unit vectors that were all axis-aligned ((0,1,0), (1,0,0), ...) - rows
+    /// of identity matrices, which memory is full of. Reporting those as answers would send
+    /// the reader chasing noise, so they are labelled and ranked last.
+    ///
+    /// When no camera-like candidate exists in the struct, the far more likely explanation
+    /// is the parent-pointer drift (see <see cref="PointerDriftScan"/>), so we sweep the
+    /// neighbouring pointer slots of the parent and report any that yield a struct
+    /// containing a real camera matrix at the schema's offset.
+    /// </remarks>
+    private static void RunMatrixScan(
+        IMemoryReader reader,
+        TextWriter output,
+        StructDef def,
+        FieldCheck check,
+        ulong baseAddress,
+        ulong parentAddress,
+        int parentFieldOffset)
     {
-        int start = Math.Max(0, check.Offset - 0x180);
-        int end = check.Offset + 0x180;
-        List<MatrixCandidate> direct = MatrixScan.Scan(reader, baseAddress, start, end);
+        // 1. Did the matrix move inside this struct? Sweep generously - the struct is small
+        //    and the scan is a handful of reads.
+        List<MatrixCandidate> inStruct = MatrixScan.Scan(reader, baseAddress, 0, 0x600);
+        PrintCandidates(output, "in struct", inStruct);
 
-        foreach (MatrixCandidate c in direct.Take(4))
+        // 2. Did the POINTER to this struct drift? This is the +0x08-wave signature: a base
+        //    that is a few bytes off makes every field inside read misaligned, which is
+        //    exactly how a huge value lands in the matrix's direction row.
+        if (parentAddress != 0 && parentFieldOffset >= 0)
         {
-            string marker = c.Offset == check.Offset ? " (current)" : "";
-            output.WriteLine($"        scan: unit w-row at +0x{c.Offset:X}{marker}  len {c.Length:F3}  dir ({c.X:F3}, {c.Y:F3}, {c.Z:F3})");
-        }
+            int matrixOffset = check.Offset;
+            List<PointerCandidate> bases = PointerDriftScan.Scan(
+                reader, parentAddress, parentFieldOffset, radius: 0x40,
+                probe: candidateBase => MatrixScan.HasCameraLike(
+                    MatrixScan.Scan(reader, candidateBase, matrixOffset, matrixOffset + 4)));
 
-        FieldDef? camera = def.Field("CameraStructure");
-        if (camera is not null)
-        {
-            ulong cameraPtr = reader.ReadPointer(baseAddress + (ulong)camera.Offset);
-            if (cameraPtr != 0)
+            foreach (PointerCandidate candidate in bases.Take(3))
             {
-                foreach (MatrixCandidate c in MatrixScan.Scan(reader, cameraPtr, 0, 0x280).Take(4))
-                {
-                    output.WriteLine($"        scan: unit w-row at CameraStructure+0x{c.Offset:X}  len {c.Length:F3}  dir ({c.X:F3}, {c.Y:F3}, {c.Z:F3})");
-                }
+                MatrixCandidate best = MatrixScan
+                    .Scan(reader, candidate.Target, matrixOffset, matrixOffset + 4)
+                    .First(c => !c.IsAxisAligned);
+                string delta = candidate.Delta >= 0 ? $"+0x{candidate.Delta:X}" : $"-0x{-candidate.Delta:X}";
+                output.WriteLine(
+                    $"        parent: reading this struct from +0x{candidate.FieldOffset:X} ({delta}) gives a REAL camera "
+                    + $"matrix at +0x{matrixOffset:X}  dir ({best.X:F3}, {best.Y:F3}, {best.Z:F3})");
+                output.WriteLine(
+                    $"                -> the parent pointer drifted; fix that offset, not this one.");
+            }
+
+            if (bases.Count == 0 && !MatrixScan.HasCameraLike(inStruct))
+            {
+                output.WriteLine("        parent: no neighbouring pointer slot yields a camera matrix either.");
             }
         }
 
-        if (direct.Count == 0)
+        if (!MatrixScan.HasCameraLike(inStruct))
         {
-            output.WriteLine("        scan: no unit w-row within +/-0x180 - the matrix moved further, or the game is not rendering a 3D scene right now.");
+            output.WriteLine(
+                "        note: no DIAGONAL unit vector found in this struct - the axis-aligned hits above are "
+                + "identity/basis rows, not a camera. Make sure the game is rendering a 3D scene (in an area, not a menu).");
+        }
+    }
+
+    /// <summary>Prints the best few scan hits, marking axis-aligned ones as probable noise.</summary>
+    private static void PrintCandidates(TextWriter output, string where, List<MatrixCandidate> candidates)
+    {
+        foreach (MatrixCandidate c in candidates.Where(c => !c.IsAxisAligned).Take(4))
+        {
+            output.WriteLine($"        {where}: CAMERA-LIKE at +0x{c.Offset:X}  dir ({c.X:F3}, {c.Y:F3}, {c.Z:F3})  len {c.Length:F3}");
+        }
+
+        int axisAligned = candidates.Count(c => c.IsAxisAligned);
+        if (axisAligned > 0)
+        {
+            output.WriteLine($"        {where}: {axisAligned} axis-aligned unit rows ignored (identity/basis matrices, not cameras)");
         }
     }
 
@@ -169,10 +214,10 @@ public static class DriftReport
     /// resolved base address (0 when a pointer on the way was null - the game may not be
     /// in an area, which the caller surfaces honestly rather than hiding).
     /// </summary>
-    private static void WalkChain(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, Action<string, ulong> report)
+    private static void WalkChain(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, Action<string, ulong, ulong, int> report)
     {
         ulong gameState = reader.ReadPointer(gameStatesStatic);
-        report("GameState", gameState);
+        report("GameState", gameState, 0, -1);
         if (gameState == 0)
         {
             return;
@@ -181,17 +226,22 @@ public static class DriftReport
         StructDef gs = schema.Structs["GameState"];
         ulong statesBase = gameState + (ulong)gs.OffsetOf("States");
         ulong inGameState = reader.ReadPointer(statesBase + (ulong)(gs.Constants["InGameStateIndex"] * gs.Constants["StateEntrySize"]));
-        report("InGameState", inGameState);
+        report("InGameState", inGameState, 0, -1);
         if (inGameState == 0)
         {
             return;
         }
 
         StructDef igs = schema.Structs["InGameState"];
-        ulong areaInstance = reader.ReadPointer(inGameState + (ulong)igs.OffsetOf("AreaInstanceData"));
-        ulong worldData = reader.ReadPointer(inGameState + (ulong)igs.OffsetOf("WorldData"));
-        report("AreaInstance", areaInstance);
-        report("WorldData", worldData);
+        int areaOffset = igs.OffsetOf("AreaInstanceData");
+        int worldOffset = igs.OffsetOf("WorldData");
+        ulong areaInstance = reader.ReadPointer(inGameState + (ulong)areaOffset);
+        ulong worldData = reader.ReadPointer(inGameState + (ulong)worldOffset);
+
+        // Pass the origin (parent + field offset) so a failing check can ask the far more
+        // useful question: did the POINTER that led here drift, rather than the fields inside?
+        report("AreaInstance", areaInstance, inGameState, areaOffset);
+        report("WorldData", worldData, inGameState, worldOffset);
 
         if (areaInstance != 0)
         {
@@ -201,7 +251,7 @@ public static class DriftReport
             // struct base is the ADDRESS AreaInstance+PlayerInfo, not the value there.
             StructDef ai = schema.Structs["AreaInstance"];
             ulong playerInfo = areaInstance + (ulong)ai.OffsetOf("PlayerInfo");
-            report("LocalPlayerStruct", playerInfo);
+            report("LocalPlayerStruct", playerInfo, 0, -1);
         }
     }
 }

@@ -67,7 +67,7 @@
         },
         "UiRootStructPtr": { "offset": "0x2F0", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "KB/M UI manager (UserInterface_MouseAndKeyboard)." },
         "GamepadUiRootStructPtr": { "offset": "0x318", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "Controller UI manager." },
-        "WorldData": { "offset": "0x368", "type": "ptr", "invariant": { "kind": "nonNullPtr" } }
+        "WorldData": { "offset": "0x368", "type": "ptr", "invariant": { "kind": "nonNullPtr" }, "comment": "SUSPECT since 2026-08: AreaInstanceData moved 0x288 -> 0x290 (+0x08) in the same wave, so this very likely moved to 0x370. nonNullPtr passes either way (both slots hold plausible pointers), which is why the W2SMatrix failure - not this row - is the signal. Try 0x370 first when the matrix reads garbage." }
       }
     },
 
@@ -91,11 +91,11 @@
     "WorldData": {
       "fields": {
         "WorldAreaDetailsPtr": { "offset": "0x98", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
-        "CameraStructure": { "offset": "0xA0", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+        "CameraStructure": { "offset": "0xA0", "type": "ptr", "comment": "INLINE camera struct base - do NOT dereference. The AHK source computes W2SMatrix as CameraStructure(0xA0) + 0x100 = WorldData+0x1A0, i.e. relative to WorldData, so this is a struct base and not a pointer. The old nonNullPtr invariant here was meaningless (it validated whatever float data sits at +0xA0) and was removed." },
         "W2SMatrix": {
           "offset": "0x1A0", "type": "mat4x4",
           "invariant": { "kind": "unitVector3", "at": "0x30" },
-          "comment": "World-to-screen matrix (CameraStructure 0xA0 + 0x100). DRIFT HISTORY: was 0x1A8 - a game patch shifted the matrix -8 bytes (issue #158); the misaligned read put -24951 into the w-row z-slot and every projection collapsed onto screen centre. DRIFTED AGAIN per the first live run 2026-08 (length 2.169E+04 at 0x1A0) - the report now auto-scans +/-0x180 and behind CameraStructure and prints unit-w-row candidates; pick the candidate, edit this offset, --watch confirms. The invariant: the w-row direction (row 3, +0x30) must be a unit vector - the real camera forward reads like (0.467, 0.467, 0.751)."
+          "comment": "World-to-screen matrix (CameraStructure 0xA0 + 0x100). DRIFT HISTORY: was 0x1A8 - a game patch shifted the matrix -8 bytes (issue #158); the misaligned read put -24951 into the w-row z-slot and every projection collapsed onto screen centre. DRIFTED AGAIN per the first live run 2026-08 (length 2.169E+04 at 0x1A0). Scan round 1 returned ONLY axis-aligned unit rows ((0,1,0), (1,0,0), ...) inside WorldData - identity/basis matrices, NOT a camera, so the matrix is not simply a few bytes away here. Prime suspect is therefore the PARENT pointer: InGameState.AreaInstanceData moved 0x288 -> 0x290 in the same 2026-08 wave, so InGameState.WorldData (0x368) has probably moved +0x08 to 0x370 - a base that is 8 bytes off makes every field inside read misaligned, which is exactly how a huge value lands in the direction row. The report now sweeps neighbouring parent pointer slots and says so explicitly. The invariant: the w-row direction (row 3, +0x30) must be a unit vector - the real camera forward reads like (0.467, 0.467, 0.751)."
         }
       }
     },

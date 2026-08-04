@@ -5,29 +5,43 @@ namespace PoEformance.Core.Diagnostics;
 
 /// <summary>One candidate location for a drifted world-to-screen matrix.</summary>
 /// <param name="Offset">Byte offset from the scanned base where the matrix would start.</param>
-/// <param name="Length">Length of the w-row direction vector found at Offset+0x30 (~1.0 = real camera forward).</param>
-/// <param name="X">w-row direction components, for eyeballing plausibility.</param>
-public sealed record MatrixCandidate(int Offset, double Length, float X, float Y, float Z);
+/// <param name="Length">Length of the direction vector found at Offset+0x30 (~1.0 = a real basis row).</param>
+/// <param name="X">Direction components, for eyeballing plausibility.</param>
+/// <param name="Diagonality">
+/// Smallest absolute component. A real camera forward points diagonally into the scene, so all
+/// three components are meaningfully non-zero; an identity/basis row has a zero here.
+/// </param>
+public sealed record MatrixCandidate(int Offset, double Length, float X, float Y, float Z, double Diagonality)
+{
+    /// <summary>
+    /// True when the vector is (near) axis-aligned - almost certainly a row of an identity or
+    /// basis matrix rather than a camera. Memory is full of these, so they must not be offered
+    /// as answers.
+    /// </summary>
+    public bool IsAxisAligned => Diagonality < AxisAlignedThreshold;
+
+    /// <summary>Below this smallest-component value we treat a unit vector as axis-aligned.</summary>
+    public const double AxisAlignedThreshold = 0.1;
+}
 
 /// <summary>
-/// The drift scanner for the world-to-screen matrix: sweeps a byte window for offsets
-/// where the three floats at +0x30 form a unit-length vector - the signature of a real
-/// camera matrix's w-row direction (the camera forward axis).
+/// The drift scanner for the world-to-screen matrix: sweeps a byte window for offsets whose
+/// row at +0x30 is a unit vector, then ranks them by how camera-like that vector is.
 /// </summary>
 /// <remarks>
-/// This automates the exact hunt that recovered the matrix after its last drift: back
-/// then a hand-written scan swept WorldData and found the new location because the
-/// w-row direction at the true offset is a unit vector ((0.467, 0.467, 0.751) in-game)
-/// while every misaligned read puts a huge translation value into one of the slots.
-/// A duplicate candidate a few slots away is normal (the game keeps several copies);
-/// any of them projects correctly.
+/// Automates the hunt that recovered the matrix after its previous drift, where the true
+/// offset was identified because its w-row direction is the camera forward axis - in PoE2's
+/// isometric view roughly (0.467, 0.467, 0.751).
 ///
-/// The scan reads the window in chunks (tolerating unreadable pages) and tests every
-/// 4-byte-aligned offset, so one call costs a handful of reads, not thousands.
+/// The first live run taught the crucial lesson: "unit vector" alone is far too weak a
+/// signal. Memory contains many identity and basis matrices whose rows are perfect unit
+/// vectors like (0,1,0). Those are ranked last and marked, because a camera forward is
+/// DIAGONAL - every component non-zero. A scan that returns only axis-aligned hits means
+/// "not found here", not "found it".
 /// </remarks>
 public static class MatrixScan
 {
-    /// <summary>Byte offset of the w-row direction inside a row-major 4x4 float matrix.</summary>
+    /// <summary>Byte offset of the direction row inside a row-major 4x4 float matrix.</summary>
     private const int WRowOffset = 0x30;
 
     /// <summary>How close to 1.0 the vector length must be to count as a candidate.</summary>
@@ -35,7 +49,8 @@ public static class MatrixScan
 
     /// <summary>
     /// Scans <paramref name="baseAddress"/> + [<paramref name="start"/>..<paramref name="end"/>)
-    /// and returns every offset whose w-row is unit-length, ordered by closeness to 1.0.
+    /// and returns every offset whose row at +0x30 is unit-length. Camera-like (diagonal)
+    /// candidates come first; axis-aligned ones are kept but ranked last and flagged.
     /// </summary>
     public static List<MatrixCandidate> Scan(IMemoryReader reader, ulong baseAddress, int start, int end)
     {
@@ -46,8 +61,8 @@ public static class MatrixScan
             return candidates;
         }
 
-        // One buffer over the whole window; unreadable chunks stay zero (length 0 - no
-        // false candidates, a zero vector is never unit-length).
+        // One buffer over the whole window; unreadable chunks stay zero (length 0 - never a
+        // false candidate, since a zero vector is not unit-length).
         int size = end - start + WRowOffset + 12;
         var buffer = new byte[size];
         const int chunk = 0x100;
@@ -68,13 +83,24 @@ public static class MatrixScan
 
             float x = floats[index], y = floats[index + 1], z = floats[index + 2];
             double length = Math.Sqrt((double)x * x + (double)y * y + (double)z * z);
-            if (Math.Abs(length - 1.0) <= Tolerance)
+            if (Math.Abs(length - 1.0) > Tolerance)
             {
-                candidates.Add(new MatrixCandidate(start + offset, length, x, y, z));
+                continue;
             }
+
+            double diagonality = Math.Min(Math.Abs(x), Math.Min(Math.Abs(y), Math.Abs(z)));
+            candidates.Add(new MatrixCandidate(start + offset, length, x, y, z, diagonality));
         }
 
-        candidates.Sort((a, b) => Math.Abs(a.Length - 1.0).CompareTo(Math.Abs(b.Length - 1.0)));
+        // Camera-like first (most diagonal), identity/basis rows last.
+        candidates.Sort((a, b) => b.Diagonality.CompareTo(a.Diagonality));
         return candidates;
     }
+
+    /// <summary>
+    /// True when <paramref name="candidates"/> contains at least one plausible camera - i.e.
+    /// a diagonal unit vector rather than only identity/basis rows.
+    /// </summary>
+    public static bool HasCameraLike(IEnumerable<MatrixCandidate> candidates)
+        => candidates.Any(c => !c.IsAxisAligned);
 }
