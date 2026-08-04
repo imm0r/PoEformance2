@@ -153,7 +153,7 @@ public static class DriftReport
         // 1. Did the matrix move inside this struct? Sweep generously - the struct is small
         //    and the scan is a handful of reads.
         List<MatrixCandidate> inStruct = MatrixScan.Scan(reader, baseAddress, 0, 0x600);
-        PrintCandidates(output, "in struct", inStruct);
+        PrintCandidates(output, "in struct", inStruct, reader, baseAddress, check.Offset);
 
         // 2. Did the POINTER to this struct drift? This is the +0x08-wave signature: a base
         //    that is a few bytes off makes every field inside read misaligned, which is
@@ -193,12 +193,33 @@ public static class DriftReport
         }
     }
 
-    /// <summary>Prints the best few scan hits, marking axis-aligned ones as probable noise.</summary>
-    private static void PrintCandidates(TextWriter output, string where, List<MatrixCandidate> candidates)
+    /// <summary>
+    /// Prints the best few scan hits with their FULL matrix, marking axis-aligned ones as
+    /// probable noise.
+    /// </summary>
+    /// <remarks>
+    /// The full matrix is printed because the unit-direction test cannot, on its own, tell a
+    /// projection from a rotation - and a wrong pick would still make the invariant go green,
+    /// which is worse than a visible failure. Seeing scale and translation makes the choice
+    /// evidence-based instead of a guess.
+    /// </remarks>
+    private static void PrintCandidates(TextWriter output, string where, List<MatrixCandidate> candidates, IMemoryReader reader, ulong baseAddress, int currentOffset)
     {
         foreach (MatrixCandidate c in candidates.Where(c => !c.IsAxisAligned).Take(4))
         {
-            output.WriteLine($"        {where}: CAMERA-LIKE at +0x{c.Offset:X}  dir ({c.X:F3}, {c.Y:F3}, {c.Z:F3})  len {c.Length:F3}");
+            int delta = c.Offset - currentOffset;
+            string deltaText = delta >= 0 ? $"+0x{delta:X}" : $"-0x{-delta:X}";
+            output.WriteLine($"        {where}: CAMERA-LIKE at +0x{c.Offset:X} ({deltaText})  dir ({c.X:F3}, {c.Y:F3}, {c.Z:F3})");
+
+            float[]? m = MatrixScan.ReadMatrix(reader, baseAddress, c.Offset);
+            if (m is not null)
+            {
+                output.WriteLine($"                {MatrixScan.Describe(m)}");
+                for (int row = 0; row < 4; row++)
+                {
+                    output.WriteLine($"                [{m[row * 4],12:G6} {m[(row * 4) + 1],12:G6} {m[(row * 4) + 2],12:G6} {m[(row * 4) + 3],12:G6} ]");
+                }
+            }
         }
 
         int axisAligned = candidates.Count(c => c.IsAxisAligned);

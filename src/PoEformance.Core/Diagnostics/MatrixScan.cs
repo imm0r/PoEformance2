@@ -103,4 +103,61 @@ public static class MatrixScan
     /// </summary>
     public static bool HasCameraLike(IEnumerable<MatrixCandidate> candidates)
         => candidates.Any(c => !c.IsAxisAligned);
+
+    /// <summary>
+    /// Reads the full 4x4 float matrix at <paramref name="baseAddress"/> +
+    /// <paramref name="offset"/>, or null when unreadable.
+    /// </summary>
+    /// <remarks>
+    /// A unit direction row proves only that SOMETHING structured lives there - a rotation
+    /// matrix has one too. The full matrix distinguishes the cases: a world-to-screen matrix
+    /// carries a translation row and non-unit scaling, while a pure rotation has four
+    /// unit-length, mutually orthogonal rows and no translation. That difference is what
+    /// picks the right candidate when several look camera-like.
+    /// </remarks>
+    public static float[]? ReadMatrix(IMemoryReader reader, ulong baseAddress, int offset)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+        var bytes = new byte[64];
+        if (!reader.TryRead(baseAddress + (ulong)offset, bytes))
+        {
+            return null;
+        }
+
+        return MemoryMarshal.Cast<byte, float>(bytes).ToArray();
+    }
+
+    /// <summary>
+    /// Classifies a 4x4 matrix for the report: a pure rotation (all rows unit length, no
+    /// translation) is almost never the matrix we want; a projection carries scale and
+    /// translation.
+    /// </summary>
+    public static string Describe(float[] m)
+    {
+        ArgumentNullException.ThrowIfNull(m);
+        if (m.Length < 16)
+        {
+            return "too short";
+        }
+
+        static double RowLength(float[] v, int row)
+            => Math.Sqrt((double)v[row * 4] * v[row * 4]
+                + (double)v[(row * 4) + 1] * v[(row * 4) + 1]
+                + (double)v[(row * 4) + 2] * v[(row * 4) + 2]);
+
+        bool allRowsUnit = true;
+        for (int row = 0; row < 3; row++)
+        {
+            if (Math.Abs(RowLength(m, row) - 1.0) > 0.05)
+            {
+                allRowsUnit = false;
+                break;
+            }
+        }
+
+        double translation = Math.Abs(m[12]) + Math.Abs(m[13]) + Math.Abs(m[14]);
+        return allRowsUnit && translation < 1.0
+            ? "pure rotation (all rows unit, no translation) - probably NOT the projection"
+            : "has scale/translation - projection-like";
+    }
 }
