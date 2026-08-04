@@ -99,6 +99,11 @@ public static class DriftReport
                     case CheckOutcome.Fail:
                         failed++;
                         output.WriteLine($"  FAIL  {Row(check)}");
+                        if (def.Field(check.FieldName)?.Invariant is Invariant.UnitVector3)
+                        {
+                            RunMatrixScan(reader, output, def, check, baseAddress);
+                        }
+
                         break;
                     default:
                         skipped++;
@@ -119,6 +124,44 @@ public static class DriftReport
     }
 
     private static string Row(FieldCheck c) => $"{c.StructName}.{c.FieldName} (+0x{c.Offset:X}): {c.Detail}";
+
+    /// <summary>
+    /// When a matrix invariant fails, immediately hunt for where the matrix went: sweep
+    /// a window around the stale offset in the same struct, and - because the last two
+    /// drifts were "the camera struct's internal layout moved" - also sweep behind the
+    /// struct's CameraStructure pointer when it has one. Prints the candidates so the
+    /// fix is an edit of one number in the schema (then --watch confirms it).
+    /// </summary>
+    private static void RunMatrixScan(IMemoryReader reader, TextWriter output, StructDef def, FieldCheck check, ulong baseAddress)
+    {
+        int start = Math.Max(0, check.Offset - 0x180);
+        int end = check.Offset + 0x180;
+        List<MatrixCandidate> direct = MatrixScan.Scan(reader, baseAddress, start, end);
+
+        foreach (MatrixCandidate c in direct.Take(4))
+        {
+            string marker = c.Offset == check.Offset ? " (current)" : "";
+            output.WriteLine($"        scan: unit w-row at +0x{c.Offset:X}{marker}  len {c.Length:F3}  dir ({c.X:F3}, {c.Y:F3}, {c.Z:F3})");
+        }
+
+        FieldDef? camera = def.Field("CameraStructure");
+        if (camera is not null)
+        {
+            ulong cameraPtr = reader.ReadPointer(baseAddress + (ulong)camera.Offset);
+            if (cameraPtr != 0)
+            {
+                foreach (MatrixCandidate c in MatrixScan.Scan(reader, cameraPtr, 0, 0x280).Take(4))
+                {
+                    output.WriteLine($"        scan: unit w-row at CameraStructure+0x{c.Offset:X}  len {c.Length:F3}  dir ({c.X:F3}, {c.Y:F3}, {c.Z:F3})");
+                }
+            }
+        }
+
+        if (direct.Count == 0)
+        {
+            output.WriteLine("        scan: no unit w-row within +/-0x180 - the matrix moved further, or the game is not rendering a 3D scene right now.");
+        }
+    }
 
     /// <summary>
     /// Walks static GameStates -> GameState -> InGameState -> AreaInstance / WorldData ->
@@ -152,8 +195,12 @@ public static class DriftReport
 
         if (areaInstance != 0)
         {
+            // LocalPlayerStruct is INLINE in AreaInstance (proven by the first live run:
+            // the value AT PlayerInfo is already ServerDataPtr, so dereferencing here
+            // validated ServerData as a struct base and the player chain "broke"). The
+            // struct base is the ADDRESS AreaInstance+PlayerInfo, not the value there.
             StructDef ai = schema.Structs["AreaInstance"];
-            ulong playerInfo = reader.ReadPointer(areaInstance + (ulong)ai.OffsetOf("PlayerInfo"));
+            ulong playerInfo = areaInstance + (ulong)ai.OffsetOf("PlayerInfo");
             report("LocalPlayerStruct", playerInfo);
         }
     }

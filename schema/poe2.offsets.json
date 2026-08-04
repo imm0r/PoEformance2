@@ -95,7 +95,7 @@
         "W2SMatrix": {
           "offset": "0x1A0", "type": "mat4x4",
           "invariant": { "kind": "unitVector3", "at": "0x30" },
-          "comment": "World-to-screen matrix (CameraStructure 0xA0 + 0x100). DRIFT HISTORY: was 0x1A8 - a game patch shifted the matrix -8 bytes (issue #158). The misaligned read put -24951 into the w-row z-slot, w blew up to ~1.8M and every projection collapsed onto screen centre. The invariant checks exactly that: the w-row direction (row 3, +0x30) must be a unit vector - the real camera forward reads (0.467, 0.467, 0.751)."
+          "comment": "World-to-screen matrix (CameraStructure 0xA0 + 0x100). DRIFT HISTORY: was 0x1A8 - a game patch shifted the matrix -8 bytes (issue #158); the misaligned read put -24951 into the w-row z-slot and every projection collapsed onto screen centre. DRIFTED AGAIN per the first live run 2026-08 (length 2.169E+04 at 0x1A0) - the report now auto-scans +/-0x180 and behind CameraStructure and prints unit-w-row candidates; pick the candidate, edit this offset, --watch confirms. The invariant: the w-row direction (row 3, +0x30) must be a unit vector - the real camera forward reads like (0.467, 0.467, 0.751)."
         }
       }
     },
@@ -112,8 +112,7 @@
         "Environments": { "offset": "0x4C0", "type": "ptr", "comment": "UNVERIFIED since the 2026-08 +0x08 wave - sits between the stable low fields and the shifted tail; if the insertion point is below 0x4C0 this is 0x4C8 now. Confirm via the drift report before use." },
         "PlayerInfo": {
           "offset": "0x5A0", "type": "ptr",
-          "invariant": { "kind": "nonNullPtr" },
-          "comment": "LocalPlayerStruct base (was 0x580, then 0x598, now 0x5A0 - 2026-08 +0x08 wave). ServerDataPtr = +0x00 (abs 0x5A0), LocalPlayerPtr = +0x20 (abs 0x5C0) within it."
+          "comment": "INLINE LocalPlayerStruct base - do NOT dereference: the value AT this address is already ServerDataPtr (+0x00); LocalPlayerPtr is +0x20 (abs 0x5C0). Proven by the first live run 2026-08: dereferencing here validated ServerData as a struct base and the player chain 'broke'. Drift history: 0x580 -> 0x598 -> 0x5A0 (+0x08 wave). The invariants live on the LocalPlayerStruct rows."
         },
         "AwakeEntities": {
           "offset": "0x6E0", "type": "ptr",

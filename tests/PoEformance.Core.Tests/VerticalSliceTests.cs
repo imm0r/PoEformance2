@@ -68,14 +68,17 @@ public class VerticalSliceTests
         StructDef ai = schema.Structs["AreaInstance"];
         fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("CurrentAreaLevel"), 68);
         fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("CurrentAreaHash"), 0xDEAD1234u);
-        fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("PlayerInfo"), PlayerInfoAddr);
+        // LocalPlayerStruct is INLINE at AreaInstance+PlayerInfo: the fields live right
+        // there (ServerDataPtr at +0x00, LocalPlayerPtr at +0x20) - there is no
+        // separate PlayerInfo allocation to point at.
         fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("AwakeEntities"), 0x48_0000UL);
         fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("SleepingEntities"), 0UL);
 
         // PlayerInfo -> player entity -> details -> a Characters path.
         StructDef lp = schema.Structs["LocalPlayerStruct"];
-        fake.Place(PlayerInfoAddr + (ulong)lp.OffsetOf("ServerDataPtr"), 0x55_0000UL);
-        fake.Place(PlayerInfoAddr + (ulong)lp.OffsetOf("LocalPlayerPtr"), PlayerEntityAddr);
+        ulong playerBase = AreaInstanceAddr + (ulong)ai.OffsetOf("PlayerInfo");
+        fake.Place(playerBase + (ulong)lp.OffsetOf("ServerDataPtr"), 0x55_0000UL);
+        fake.Place(playerBase + (ulong)lp.OffsetOf("LocalPlayerPtr"), PlayerEntityAddr);
         fake.Place(PlayerEntityAddr + 0x08, EntityDetailsAddr);
         fake.PlaceStdWString(EntityDetailsAddr + 0x08, "Metadata/Characters/Int/IntFour", 0x71_0000);
 
@@ -116,7 +119,7 @@ public class VerticalSliceTests
                      ("GameState", gameState),
                      ("InGameState", inGameState),
                      ("AreaInstance", areaInstance),
-                     ("LocalPlayerStruct", fake.ReadPointer(areaInstance + (ulong)schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"))),
+                     ("LocalPlayerStruct", areaInstance + (ulong)schema.Structs["AreaInstance"].OffsetOf("PlayerInfo")),
                  })
         {
             foreach (FieldCheck check in validator.ValidateStruct(schema.Structs[name], addr))

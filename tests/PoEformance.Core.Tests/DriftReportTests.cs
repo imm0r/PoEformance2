@@ -71,14 +71,17 @@ public class DriftReportTests
         StructDef ai = schema.Structs["AreaInstance"];
         fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("CurrentAreaLevel"), 68);
         fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("CurrentAreaHash"), 0xDEAD1234u);
-        fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("PlayerInfo"), PlayerInfoAddr);
+        // LocalPlayerStruct is INLINE at AreaInstance+PlayerInfo: the fields live right
+        // there (ServerDataPtr at +0x00, LocalPlayerPtr at +0x20) - there is no
+        // separate PlayerInfo allocation to point at.
         fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("AwakeEntities"), 0x48_0000UL);
         fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("SleepingEntities"), 0UL);
         fake.Place(AreaInstanceAddr + (ulong)ai.OffsetOf("Environments"), 0x49_0000UL);
 
         StructDef lp = schema.Structs["LocalPlayerStruct"];
-        fake.Place(PlayerInfoAddr + (ulong)lp.OffsetOf("ServerDataPtr"), 0x55_0000UL);
-        fake.Place(PlayerInfoAddr + (ulong)lp.OffsetOf("LocalPlayerPtr"), PlayerEntityAddr);
+        ulong playerBase = AreaInstanceAddr + (ulong)ai.OffsetOf("PlayerInfo");
+        fake.Place(playerBase + (ulong)lp.OffsetOf("ServerDataPtr"), 0x55_0000UL);
+        fake.Place(playerBase + (ulong)lp.OffsetOf("LocalPlayerPtr"), PlayerEntityAddr);
         fake.Place(PlayerEntityAddr + 0x08, EntityDetailsAddr);
         fake.PlaceStdWString(EntityDetailsAddr + 0x08, "Metadata/Characters/Int/IntFour", 0x71_0000);
 
@@ -121,13 +124,13 @@ public class DriftReportTests
         Assert.True(result.GameStatesResolved); // statics unaffected
         Assert.True(result.Failed > 0);
 
-        // The alarm fires on EXACTLY the drifted fields: PlayerInfo (0x598 -> 0x5A0) and
-        // AwakeEntities (0x6D8 -> 0x6E0) read nothing valid at their stale offsets. The
-        // walk then honestly reports LocalPlayerStruct as unreachable instead of
-        // validating garbage - the failure surfaces at its true source, one level up.
-        Assert.Contains(result.Failures, f => f.StructName == "AreaInstance" && f.FieldName == "PlayerInfo");
+        // The alarm fires on EXACTLY the drifted fields. AwakeEntities (0x6D8 -> 0x6E0)
+        // reads nothing valid at its stale offset. PlayerInfo is an INLINE base, so a
+        // stale PlayerInfo offset points the walk at the wrong bytes and the
+        // LocalPlayerStruct rows fail directly (the string check can't find the player
+        // path) - the alarm lands right on the player fields.
         Assert.Contains(result.Failures, f => f.StructName == "AreaInstance" && f.FieldName == "AwakeEntities");
-        Assert.Contains("LocalPlayerStruct not reachable", writer.ToString());
+        Assert.Contains(result.Failures, f => f.StructName == "LocalPlayerStruct" && f.FieldName == "LocalPlayerPtr");
 
         // But the low, un-drifted fields still pass - this is a targeted alarm, not noise.
         Assert.Contains(result.Checks, c =>
