@@ -1,0 +1,51 @@
+name: Publish win-x64
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write # needed to maintain the rolling "latest-dev" release
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      # Self-contained single file: runs on any Windows without a .NET install.
+      # (AOT off here for speed; the AOT publish gets its own verification pass later.)
+      - run: >
+          dotnet publish src/PoEformance.App -c Release -r win-x64
+          --self-contained
+          -p:PublishSingleFile=true
+          -p:PublishAot=false
+
+      - name: Zip the publish output
+        shell: pwsh
+        run: Compress-Archive -Path src/PoEformance.App/bin/Release/net10.0-windows/win-x64/publish/* -DestinationPath PoEformance-win-x64.zip
+
+      # Kept as a per-commit artifact too (useful to fetch the build of an older commit).
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PoEformance-win-x64
+          path: PoEformance-win-x64.zip
+
+      # Rolling release: one stable download URL that always carries the newest build.
+      # First run creates it; every later run replaces the asset and refreshes the notes.
+      - name: Update the latest-dev release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $notes = "Automatic build of ``${{ github.sha }}`` ($(Get-Date -Format 'yyyy-MM-dd HH:mm') UTC).`n`nUnzip anywhere and run ``PoEformance.App.exe`` from an elevated terminal. ``schema\poe2.offsets.json`` sits next to the exe and stays hot-editable (``--watch``). No .NET install required."
+          gh release view latest-dev 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create latest-dev PoEformance-win-x64.zip --prerelease --title "Latest build (auto)" --notes $notes
+          } else {
+            gh release upload latest-dev PoEformance-win-x64.zip --clobber
+            gh release edit latest-dev --notes $notes
+          }

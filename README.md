@@ -46,14 +46,28 @@ docs/architecture.md          why it is built this way
 
 ## Build & run
 
+Windows quick start (full guide: [`docs/setup-windows.md`](docs/setup-windows.md)):
+
+```powershell
+# one-time: install the .NET 10 SDK, then
+git clone https://github.com/imm0r/PoEformance2.git
+
+# daily, from an elevated PowerShell in the repo:
+.\scripts\run.ps1            # pull + incremental build + attach + drift report
+.\scripts\run.ps1 -Watch     # stay attached; re-validate on every schema save
+```
+
+Offset changes never need a build: edit `schema/poe2.offsets.json` while `-Watch`
+runs and the report refreshes against the still-attached game. No SDK at all? Every
+push to `main` auto-compiles on GitHub and updates the rolling release
+[`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
+ready-to-run, self-contained exe.
+
 ```bash
 dotnet build        # any OS
 dotnet test         # any OS
-
-# Windows, game running, elevated shell:
-PoEformance.App                          # attach + drift report
-PoEformance.App --record session.rec     # capture the session
-PoEformance.App --replay session.rec     # develop against it, game closed
+PoEformance.App --record session.rec     # capture a session (Windows)
+PoEformance.App --replay session.rec     # develop against it, game closed (any use)
 ```
 
 ## License

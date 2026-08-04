@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
+using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Scanning;
 using PoEformance.Core.Schema;
@@ -14,63 +15,60 @@ namespace PoEformance.App;
 /// program, read this file top to bottom.
 /// </summary>
 /// <remarks>
-/// Current milestone: the vertical slice (attach -> scan -> validate -> report).
-/// It proves the whole Core stack against the real game. The overlay and the config
-/// window dock onto the same objects in the next milestone - see docs/architecture.md.
+/// This is a THIN shell. The one thing it does that only works on Windows is attach to
+/// the game process; the actual drift-report engine lives in
+/// <see cref="DriftReport"/> in Core, so it runs against a live attach, a replay, or a
+/// synthetic test process, on any OS.
+///
+/// The attach + module scan happen ONCE; the report re-runs cheaply. So <c>--watch</c>
+/// keeps the tool attached and re-validates whenever the schema file changes on disk -
+/// edit an offset, save, see the new report, no rebuild and no re-attach. That is the
+/// whole point of "offsets are data".
 /// </remarks>
 internal static class Program
 {
     private static int Main(string[] args)
     {
-        Console.WriteLine("PoEformance (C# port) - vertical slice");
-        Console.WriteLine();
+        var options = CliOptions.Parse(args);
+        Console.WriteLine("PoEformance (C# port) - drift report");
 
-        // ── 1. Load the offset schema ────────────────────────────────────────
-        // The schema ships next to the executable; a repo-relative fallback makes
-        // `dotnet run` from the source tree work too.
-        string schemaPath = FindSchemaFile();
-        OffsetSchema schema = SchemaJson.Load(schemaPath);
+        string schemaPath = options.SchemaPath ?? FindSchemaFile();
         Console.WriteLine($"schema  {schemaPath}");
-        Console.WriteLine($"        {schema.Structs.Count} structs, {schema.Statics.Count} statics, game version \"{schema.GameVersion}\"");
         Console.WriteLine();
 
-        // ── 2. Attach (or replay) ────────────────────────────────────────────
-        // `--replay <file>` runs the identical pipeline against a recorded session,
-        // which is how the tool is developed without the game running.
+        // ── Attach (or replay) - the only Windows-specific step ──────────────
         IMemoryReader reader;
         RecordingMemoryReader? recorder = null;
-        string? replayPath = ArgValue(args, "--replay");
 
-        if (replayPath is not null)
+        if (options.ReplayPath is not null)
         {
-            reader = ReplayMemoryReader.Load(File.OpenRead(replayPath));
-            Console.WriteLine($"replay  {replayPath} ({((ReplayMemoryReader)reader).FrameCount} frames)");
+            reader = ReplayMemoryReader.Load(File.OpenRead(options.ReplayPath));
+            Console.WriteLine($"replay  {options.ReplayPath} ({((ReplayMemoryReader)reader).FrameCount} frames)");
         }
         else
         {
             Process? game = FindGameProcess();
             if (game is null)
             {
-                Console.Error.WriteLine("PathOfExile process not found. Start the game (or pass --replay <file>).");
+                Console.Error.WriteLine("PathOfExile process not found. Start the game, or pass --replay <file>.");
                 return 1;
             }
 
             LiveMemoryReader? live = LiveMemoryReader.TryAttach(game);
             if (live is null)
             {
-                Console.Error.WriteLine($"Found PoE2 (pid {game.Id}) but could not open it for reading - run elevated.");
+                Console.Error.WriteLine($"Found PoE2 (pid {game.Id}) but could not open it for reading.");
+                Console.Error.WriteLine("Run the terminal as Administrator.");
                 return 1;
             }
 
             Console.WriteLine($"attach  pid {live.ProcessId}, module 0x{live.ModuleBase:X} ({live.ModuleSize / (1024 * 1024)} MB)");
 
-            // `--record <file>` captures the session for later replay.
-            string? recordPath = ArgValue(args, "--record");
-            if (recordPath is not null)
+            if (options.RecordPath is not null)
             {
-                recorder = new RecordingMemoryReader(live, File.Create(recordPath));
+                recorder = new RecordingMemoryReader(live, File.Create(options.RecordPath));
                 reader = recorder;
-                Console.WriteLine($"record  {recordPath}");
+                Console.WriteLine($"record  {options.RecordPath}");
             }
             else
             {
@@ -80,112 +78,113 @@ internal static class Program
 
         using IMemoryReader _ = reader;
 
-        // ── 3. Resolve static anchors ────────────────────────────────────────
+        // The scanner copies the module image once and caches it, so re-running the
+        // report (in --watch) re-resolves statics against the cached image cheaply.
         var scanner = new PatternScanner(reader);
-        var resolver = new StaticResolver(scanner);
-        Console.WriteLine();
-        Console.WriteLine("statics");
-        var resolved = new Dictionary<string, ulong>();
-        foreach (ResolvedStatic result in resolver.ResolveAll(schema))
+
+        DriftReportResult result = RunReportOnce(reader, scanner, schemaPath, recorder, options.Verbose);
+
+        if (options.Watch && options.ReplayPath is null)
         {
-            Console.WriteLine($"  {(result.Found ? "ok  " : "MISS")}  {result.Name,-26} {(result.Found ? $"0x{result.Address:X}" : result.Detail)}");
-            if (result.Found)
-            {
-                resolved[result.Name] = result.Address;
-            }
+            WatchSchema(reader, scanner, schemaPath, recorder, options.Verbose);
         }
 
-        recorder?.MarkFrame();
-
-        // ── 4. Walk to the structs the schema can validate and run the report ─
-        if (resolved.TryGetValue("GameStates", out ulong gameStatesStatic))
-        {
-            RunDriftReport(reader, schema, gameStatesStatic);
-        }
-        else
-        {
-            Console.Error.WriteLine();
-            Console.Error.WriteLine("GameStates did not resolve - no drift report possible.");
-            return 2;
-        }
-
-        recorder?.MarkFrame();
-        return 0;
+        return result.GameStatesResolved ? 0 : 2;
     }
 
     /// <summary>
-    /// The attach-time drift report: resolves the pointer chain to the structs whose
-    /// base addresses we can derive, validates each against its schema invariants,
-    /// and prints the failures plus a summary line.
+    /// Loads the schema fresh from disk (so <c>--watch</c> picks up edits) and runs one
+    /// report to the console via the Core engine.
     /// </summary>
-    private static void RunDriftReport(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic)
+    private static DriftReportResult RunReportOnce(IMemoryReader reader, PatternScanner scanner, string schemaPath, RecordingMemoryReader? recorder, bool verbose)
     {
+        OffsetSchema schema = SchemaJson.Load(schemaPath);
+        Console.WriteLine($"{schema.Structs.Count} structs, {schema.Statics.Count} statics, game version \"{schema.GameVersion}\"");
         Console.WriteLine();
-        Console.WriteLine("drift report");
+        recorder?.MarkFrame();
 
-        var validator = new SchemaValidator(reader);
-        int passed = 0, failed = 0, skipped = 0;
+        DriftReportResult result = DriftReport.Run(reader, scanner, schema, Console.Out, verbose);
 
-        void Report(string structName, ulong baseAddress)
+        recorder?.MarkFrame();
+        return result;
+    }
+
+    /// <summary>
+    /// Keeps the process attached and re-runs the report whenever the schema file changes.
+    /// This is the hot-reload dev loop: edit an offset in the JSON, save, and the new
+    /// report appears - no rebuild, no re-attach.
+    /// </summary>
+    private static void WatchSchema(IMemoryReader reader, PatternScanner scanner, string schemaPath, RecordingMemoryReader? recorder, bool verbose)
+    {
+        string fullPath = Path.GetFullPath(schemaPath);
+        string directory = Path.GetDirectoryName(fullPath) ?? ".";
+        string fileName = Path.GetFileName(fullPath);
+
+        Console.WriteLine();
+        Console.WriteLine($"watching {fileName} - edit + save to re-run, Ctrl+C to quit");
+
+        using var watcher = new FileSystemWatcher(directory, fileName)
         {
-            if (baseAddress == 0 || !schema.Structs.TryGetValue(structName, out StructDef? def))
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Size,
+        };
+
+        // Editors save in several ways (write-in-place, or write-temp-then-rename) and
+        // often fire two events per save. A short debounce collapses that into one re-run.
+        using var pending = new ManualResetEventSlim(false);
+        long lastFireTicks = 0;
+
+        void OnChanged(object? sender, FileSystemEventArgs e)
+        {
+            long now = Environment.TickCount64;
+            if (now - Interlocked.Read(ref lastFireTicks) < 150)
             {
                 return;
             }
 
-            foreach (FieldCheck check in validator.ValidateStruct(def, baseAddress))
+            Interlocked.Exchange(ref lastFireTicks, now);
+            pending.Set();
+        }
+
+        watcher.Changed += OnChanged;
+        watcher.Created += OnChanged;
+        watcher.Renamed += OnChanged;
+        watcher.EnableRaisingEvents = true;
+
+        using var quit = new ManualResetEventSlim(false);
+        Console.CancelKeyPress += (_, e) =>
+        {
+            e.Cancel = true;
+            quit.Set();
+            pending.Set();
+        };
+
+        while (!quit.IsSet)
+        {
+            pending.Wait();
+            pending.Reset();
+            if (quit.IsSet)
             {
-                switch (check.Outcome)
-                {
-                    case CheckOutcome.Pass:
-                        passed++;
-                        break;
-                    case CheckOutcome.Fail:
-                        failed++;
-                        Console.WriteLine($"  FAIL  {check.StructName}.{check.FieldName} (+0x{check.Offset:X}): {check.Detail}");
-                        break;
-                    default:
-                        skipped++;
-                        break;
-                }
+                break;
+            }
+
+            // Give the editor a moment to finish writing before we read the file.
+            Thread.Sleep(80);
+
+            Console.WriteLine();
+            Console.WriteLine($"── re-run {DateTime.Now:HH:mm:ss} ─────────────────────────────");
+            try
+            {
+                RunReportOnce(reader, scanner, schemaPath, recorder, verbose);
+            }
+            catch (Exception ex)
+            {
+                // A malformed edit must not kill the watch session - report and wait for the fix.
+                Console.Error.WriteLine($"  schema error: {ex.Message}");
             }
         }
 
-        // GameStates static -> GameState struct.
-        ulong gameState = reader.ReadPointer(gameStatesStatic);
-        Report("GameState", gameState);
-
-        // GameState -> InGameState (well-known index into the state array).
-        ulong inGameState = 0;
-        if (gameState != 0)
-        {
-            StructDef gs = schema.Structs["GameState"];
-            long entrySize = gs.Constants["StateEntrySize"];
-            long index = gs.Constants["InGameStateIndex"];
-            ulong statesBase = gameState + (ulong)gs.OffsetOf("States");
-            inGameState = reader.ReadPointer(statesBase + (ulong)(index * entrySize));
-            Report("InGameState", inGameState);
-        }
-
-        // InGameState -> AreaInstance / WorldData (null while not in an area - the
-        // validator reports that honestly rather than pretending).
-        if (inGameState != 0)
-        {
-            StructDef igs = schema.Structs["InGameState"];
-            ulong areaInstance = reader.ReadPointer(inGameState + (ulong)igs.OffsetOf("AreaInstanceData"));
-            ulong worldData = reader.ReadPointer(inGameState + (ulong)igs.OffsetOf("WorldData"));
-            Report("AreaInstance", areaInstance);
-            Report("WorldData", worldData);
-
-            if (areaInstance != 0)
-            {
-                StructDef ai = schema.Structs["AreaInstance"];
-                ulong playerInfo = reader.ReadPointer(areaInstance + (ulong)ai.OffsetOf("PlayerInfo"));
-                Report("LocalPlayerStruct", playerInfo);
-            }
-        }
-
-        Console.WriteLine($"  {passed} pass, {failed} FAIL, {skipped} skipped (no invariant / needs samples)");
+        Console.WriteLine();
+        Console.WriteLine("stopped.");
     }
 
     private static Process? FindGameProcess()
@@ -226,16 +225,42 @@ internal static class Program
         throw new FileNotFoundException("schema/poe2.offsets.json not found next to the executable or in any parent directory.");
     }
 
-    private static string? ArgValue(string[] args, string name)
+    /// <summary>Parsed command line. Kept tiny and explicit - no arg-parsing library.</summary>
+    private sealed record CliOptions(
+        string? SchemaPath,
+        string? ReplayPath,
+        string? RecordPath,
+        bool Watch,
+        bool Verbose)
     {
-        for (int i = 0; i < args.Length - 1; i++)
+        public static CliOptions Parse(string[] args)
         {
-            if (args[i] == name)
-            {
-                return args[i + 1];
-            }
-        }
+            string? schema = null, replay = null, record = null;
+            bool watch = false, verbose = false;
 
-        return null;
+            for (int i = 0; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--schema" when i + 1 < args.Length:
+                        schema = args[++i];
+                        break;
+                    case "--replay" when i + 1 < args.Length:
+                        replay = args[++i];
+                        break;
+                    case "--record" when i + 1 < args.Length:
+                        record = args[++i];
+                        break;
+                    case "--watch":
+                        watch = true;
+                        break;
+                    case "-v" or "--verbose":
+                        verbose = true;
+                        break;
+                }
+            }
+
+            return new CliOptions(schema, replay, record, watch, verbose);
+        }
     }
 }
