@@ -1,0 +1,20 @@
+# Build output
+bin/
+obj/
+artifacts/
+*.user
+*.suo
+
+# Runtime output
+logs/
+recordings/
+config/*.local.json
+
+# IDE
+.vs/
+.idea/
+*.DotSettings.user
+
+# OS
+Thumbs.db
+.DS_Store

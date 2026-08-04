@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Layer 3 - what the tool actually does with a snapshot: radar data, loot, alerts,
+    automation decisions. Produces plain data; draws no pixels and opens no windows.
+    That separation is what makes features testable against a recording.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PoEformance.Game\PoEformance.Game.csproj" />
+  </ItemGroup>
+</Project>

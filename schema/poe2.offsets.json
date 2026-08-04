@@ -1,0 +1,483 @@
+{
+  // PoEformance offset schema for Path of Exile 2.
+  //
+  // This file IS the reverse-engineering knowledge of the project. Offsets are data,
+  // not code: edit here, hot-reload in the tool, no rebuild. Every field may declare
+  // an "invariant" describing what a correct value looks like - the validator runs
+  // them at attach time and turns silent offset drift into a red row in the report.
+  //
+  // Ported from the AHK tool's PoE2Offsets.ahk + StaticOffsetsPatterns.ahk, including
+  // the drift history comments (they are the hard-won part).
+  //
+  // Conventions:
+  //   offsets/consts   hex strings ("0x1A0") or decimal
+  //   pattern          hex bytes, "??" wildcard, "^" marks the RIP disp32 position
+  //   invariant kinds  range | plausiblePtr | nonNullPtr | unitVector3
+  //                    | vectorSane | stringContains | changes
+
+  "version": 1,
+  "gameVersion": "0.5.x (last verified 2026-07, AHK tool v0.45.13.298)",
+
+  "statics": {
+    "GameStates": {
+      "pattern": "48 39 2D ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 40 01 00 00",
+      "comment": "Root of everything: the game-state array."
+    },
+    "FileRoot": {
+      "pattern": "48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 05 ^ ?? ?? ?? ?? 48 83 C4 28",
+      "comment": "Loaded-files root (GGPK file records)."
+    },
+    "AreaChangeCounter": {
+      "pattern": "49 89 46 ?? F0 FF 05 ^ ?? ?? ?? ?? 48 8B CD E8",
+      "comment": "The `lock inc [counter]` in the instance-load function. The shorter FF 05 form matched mid-instruction byte runs elsewhere (2 hits = ambiguous = miss); anchoring on the surrounding mov/lock inc/mov/call makes it unique."
+    },
+    "TerrainRotatorHelper": {
+      "pattern": "48 83 EC 38 41 0F B6 C0 4C 8B D1 4C 8B CA 48 8D 0D ?? ?? ?? ?? 44 0F B6 04 08 B8 08 00 00 00 8B 0A 44 3B C0 89 4C 24 24 BA 16 00 00 00 44 0F 47 C0 48 8D 05 ^ ?? ?? ?? ??",
+      "comment": "Resolves the larger terrain-rotation array."
+    },
+    "TerrainRotationSelector": {
+      "pattern": "48 83 EC 38 41 0F B6 C0 4C 8B D1 4C 8B CA 48 8D 0D ^ ?? ?? ?? ?? 44 0F B6 04 08 B8 08 00 00 00 8B 0A 44 3B C0 89 4C 24 24 BA 16 00 00 00 44 0F 47 C0 48 8D 05 ?? ?? ?? ??",
+      "comment": "Rotation lookup table (00 03 02 01 04 ...). Same function as the helper, ^ on the FIRST lea. Upstream's 17-byte prologue-only form matches other functions too; the longer tail makes it unique."
+    },
+    "GameCullSize": {
+      "pattern": "2B 0D ?? ?? ?? ?? 8B 05 ?? ?? ?? ?? 2B 05 ^ ?? ?? ?? ?? 0F 57 FF",
+      "comment": "Letterbox bar width for UI-space -> screen conversion. A garbage value here silently poisons every width-scaled UI rect - clamp on use."
+    }
+  },
+
+  "structs": {
+    "GameState": {
+      "comment": "The static GameStates pointer dereferences to this.",
+      "fields": {
+        "CurrentStateVecLast": { "offset": "0x10", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
+        "States": { "offset": "0x48", "type": "ptr", "comment": "Array of 12 state entries, StateEntrySize apart." }
+      },
+      "consts": {
+        "StateEntrySize": "0x10",
+        "InGameStateIndex": "4"
+      }
+    },
+
+    "InGameState": {
+      "fields": {
+        "AreaInstanceData": {
+          "offset": "0x290", "type": "ptr",
+          "invariant": { "kind": "nonNullPtr" },
+          "comment": "Null while not in an area; nonNullPtr is only meaningful in-game."
+        },
+        "UiRootStructPtr": { "offset": "0x2F0", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "KB/M UI manager (UserInterface_MouseAndKeyboard)." },
+        "GamepadUiRootStructPtr": { "offset": "0x318", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "Controller UI manager." },
+        "WorldData": { "offset": "0x368", "type": "ptr", "invariant": { "kind": "nonNullPtr" } }
+      }
+    },
+
+    "AreaLoadingState": {
+      "comment": "Fields of the AreaLoadingState game state (index 1).",
+      "fields": {
+        "IsLoading": { "offset": "0x770", "type": "i32", "comment": "Non-zero while an area is loading." },
+        "TotalLoadingScreenTimeMs": { "offset": "0xEC0", "type": "u32", "comment": "Cumulative loading-screen time; increases on area change." },
+        "CurrentAreaDetailsPtr": { "offset": "0xF40", "type": "ptr", "invariant": { "kind": "plausiblePtr" } }
+      }
+    },
+
+    "UiRootStruct": {
+      "fields": {
+        "UiRootPtr": { "offset": "0x340", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+        "GameUiPtr": { "offset": "0xBE0", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
+        "GameUiControllerPtr": { "offset": "0xBE8", "type": "ptr", "invariant": { "kind": "plausiblePtr" } }
+      }
+    },
+
+    "WorldData": {
+      "fields": {
+        "WorldAreaDetailsPtr": { "offset": "0x98", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+        "CameraStructure": { "offset": "0xA0", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+        "W2SMatrix": {
+          "offset": "0x1A0", "type": "mat4x4",
+          "invariant": { "kind": "unitVector3", "at": "0x30" },
+          "comment": "World-to-screen matrix (CameraStructure 0xA0 + 0x100). DRIFT HISTORY: was 0x1A8 - a game patch shifted the matrix -8 bytes (issue #158). The misaligned read put -24951 into the w-row z-slot, w blew up to ~1.8M and every projection collapsed onto screen centre. The invariant checks exactly that: the w-row direction (row 3, +0x30) must be a unit vector - the real camera forward reads (0.467, 0.467, 0.751)."
+        }
+      }
+    },
+
+    "AreaInstance": {
+      "comment": "DRIFT HISTORY: PlayerInfo and TerrainMetadata both shifted +0x18 with a game patch (0x580->0x598, 0x8A0->0x8B8). When one +0x18 drift shows up here, check the others.",
+      "fields": {
+        "CurrentAreaLevel": {
+          "offset": "0xC4", "type": "i32",
+          "invariant": { "kind": "range", "min": 0, "max": 100 },
+          "comment": "Monster level of the current area."
+        },
+        "CurrentAreaHash": { "offset": "0x11C", "type": "u32", "comment": "Instance hash - changes on every area transition; used as the per-area reset signal all over the tool." },
+        "Environments": { "offset": "0x4C0", "type": "ptr" },
+        "PlayerInfo": {
+          "offset": "0x598", "type": "ptr",
+          "invariant": { "kind": "nonNullPtr" },
+          "comment": "LocalPlayerStruct base (was 0x580, +0x18 drift). ServerDataPtr = +0x00, LocalPlayerPtr = +0x20 within it."
+        },
+        "AwakeEntities": {
+          "offset": "0x6D8", "type": "ptr",
+          "invariant": { "kind": "nonNullPtr" },
+          "comment": "EntityListStruct: AwakeEntities std::map head is its first field (+0x00)."
+        },
+        "SleepingEntities": { "offset": "0x6E8", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
+        "TerrainMetadata": {
+          "offset": "0x8B8", "type": "ptr",
+          "comment": "TerrainStruct (was 0x8A0, +0x18 drift). Source: GameHelper2 AreaInstanceOffsets.cs. NOTE: unlike most ptr fields this is an inline struct base in some builds - treat as base address, not pointer, when reading TerrainMetadata fields."
+        }
+      }
+    },
+
+    "LocalPlayerStruct": {
+      "fields": {
+        "ServerDataPtr": { "offset": "0x00", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+        "LocalPlayerPtr": {
+          "offset": "0x20", "type": "ptr",
+          "invariant": { "kind": "stringContains", "needle": "Metadata/Characters", "hops": ["0x00", "0x08"], "stringAt": "0x08" },
+          "comment": "The local player entity. Invariant follows Entity->EntityDetails(+0x08)->Path(+0x08) and expects a Metadata/Characters/... path - the strongest possible 'this is really the player' check."
+        }
+      }
+    },
+
+    "TerrainMetadata": {
+      "comment": "Base = AreaInstance + TerrainMetadata offset. Walkable grid: each byte holds 2 cells (even x = low nibble, odd x = high nibble); nibble != 0 means walkable. GridLandscapeData / Layer3 / Layer4 were probed for a fog-of-war grid and are STATIC terrain-type data - the explored state is GPU-side and NOT readable (hunt closed 2026-07-06, do not reopen without new evidence).",
+      "fields": {
+        "TotalTilesX": { "offset": "0x18", "type": "i64", "invariant": { "kind": "range", "min": 1, "max": 4096 } },
+        "TotalTilesY": { "offset": "0x20", "type": "i64", "invariant": { "kind": "range", "min": 1, "max": 4096 } },
+        "TileDetailsPtr": {
+          "offset": "0x28", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 56, "maxCount": 16777216 },
+          "comment": "StdVector<TileStructure>, each 0x38 bytes."
+        },
+        "GridWalkableData": { "offset": "0xD0", "type": "stdVector", "invariant": { "kind": "vectorSane", "elementSize": 1, "maxCount": 67108864 } },
+        "GridLandscapeData": { "offset": "0xE8", "type": "stdVector", "comment": "Static terrain-type nibbles 0-5. NOT fog-of-war." },
+        "BytesPerRow": { "offset": "0x130", "type": "i32", "invariant": { "kind": "range", "min": 1, "max": 16384 } },
+        "TileHeightMultiplier": { "offset": "0x134", "type": "i16" }
+      }
+    },
+
+    "TileStruct": {
+      "comment": "0x38 bytes each, inside TileDetailsPtr. WARNING from the AHK port: the tile ARRAY index and the TileIdX sub-cell byte are different things - a case-insensitive variable collision between them once placed every landmark at the map origin.",
+      "fields": {
+        "SubTileDetailsPtr": { "offset": "0x00", "type": "ptr" },
+        "TgtFilePtr": { "offset": "0x08", "type": "ptr" },
+        "TileHeight": { "offset": "0x30", "type": "i16" },
+        "TileIdX": { "offset": "0x34", "type": "u8" },
+        "TileIdY": { "offset": "0x35", "type": "u8" },
+        "RotationSelector": { "offset": "0x36", "type": "u8" }
+      }
+    },
+
+    "TgtFile": {
+      "fields": {
+        "TgtPath": { "offset": "0x08", "type": "stdWString", "comment": "The tile path, e.g. Art/Models/Terrain/..." }
+      }
+    },
+
+    "StdMapNode": {
+      "comment": "MSVC std::map red-black tree node. Entities live in one keyed by entity id.",
+      "fields": {
+        "Left": { "offset": "0x00", "type": "ptr" },
+        "Parent": { "offset": "0x08", "type": "ptr" },
+        "Right": { "offset": "0x10", "type": "ptr" },
+        "IsNil": { "offset": "0x19", "type": "u8" },
+        "KeyId": { "offset": "0x20", "type": "u32" },
+        "ValueEntityPtr": { "offset": "0x28", "type": "ptr" }
+      }
+    },
+
+    "Entity": {
+      "fields": {
+        "EntityDetailsPtr": { "offset": "0x08", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+        "ComponentsVec": {
+          "offset": "0x10", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 256 },
+          "comment": "Vector of component pointers, indexed by ComponentLookup."
+        },
+        "Id": { "offset": "0x88", "type": "u32" },
+        "Flags": {
+          "offset": "0x8C", "type": "u8",
+          "comment": "Bit 0 clear = entity valid (GameHelper2 EntityOffsets.cs; was 0x84). NEEDS IN-GAME VERIFY on the 0.5 client - revert to 0x84 if validity regresses."
+        }
+      }
+    },
+
+    "EntityDetails": {
+      "fields": {
+        "Path": {
+          "offset": "0x08", "type": "stdWString",
+          "comment": "The metadata path, e.g. Metadata/Monsters/... Everything classifies entities by this string."
+        },
+        "ComponentLookupPtr": { "offset": "0x28", "type": "ptr", "invariant": { "kind": "nonNullPtr" } }
+      }
+    },
+
+    "ComponentLookup": {
+      "fields": {
+        "Bucket": { "offset": "0x28", "type": "ptr", "comment": "Hash buckets of (namePtr, index) entries mapping component name -> ComponentsVec index." }
+      }
+    },
+
+    "ComponentLookupEntry": {
+      "fields": {
+        "NamePtr": { "offset": "0x00", "type": "ptr" },
+        "Index": { "offset": "0x08", "type": "i64" }
+      }
+    },
+
+    "Render": {
+      "comment": "Component: world position + model bounds.",
+      "fields": {
+        "CurrentWorldPosition": {
+          "offset": "0x138", "type": "f32",
+          "comment": "x; y at +0x13C, z at +0x140."
+        },
+        "CharacterModelBounds": { "offset": "0x144", "type": "f32" },
+        "TerrainHeight": { "offset": "0x1B0", "type": "f32" }
+      }
+    },
+
+    "Life": {
+      "comment": "Component. DRIFT HISTORY: vital bases shifted in 4.5.x (Health 0x1A8->0x1B0, Mana 0x1F8->0x208, ES 0x230->0x248); confirmed in-game via component probe. Matches GameHelper2 Life.cs. Each vital is a Vital sub-struct.",
+      "fields": {
+        "Health": { "offset": "0x1B0", "type": "ptr", "comment": "Vital sub-struct base, not a pointer - read Vital fields relative to this offset." },
+        "Mana": { "offset": "0x208", "type": "ptr" },
+        "EnergyShield": { "offset": "0x248", "type": "ptr" }
+      }
+    },
+
+    "Vital": {
+      "comment": "Sub-struct of Life (per vital).",
+      "fields": {
+        "ReservedFlat": { "offset": "0x10", "type": "i32" },
+        "ReservedFraction": { "offset": "0x14", "type": "i32" },
+        "Regen": { "offset": "0x28", "type": "f32" },
+        "Max": { "offset": "0x2C", "type": "i32" },
+        "Current": { "offset": "0x30", "type": "i32" }
+      }
+    },
+
+    "Positioned": {
+      "fields": {
+        "Reaction": {
+          "offset": "0x1E0", "type": "u8",
+          "comment": "(reaction & 0x7F) == 1 means friendly. Feeds isFriendly everywhere."
+        }
+      }
+    },
+
+    "Targetable": {
+      "comment": "Component. Offsets located via the chest closed-vs-opened diff probe (v4.5.1.1.4).",
+      "fields": {
+        "IsTargetable": {
+          "offset": "0x69", "type": "u8",
+          "invariant": { "kind": "range", "min": 0, "max": 1 },
+          "comment": "The ONLY byte that flips closed(1)/opened(0) across 20+2 chests; also 1 for living monsters, 0 for corpses. Drives highlighting, corpse detection and the kill counter."
+        },
+        "IsTargetedByPlayer": { "offset": "0x6B", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 }, "comment": "Hover-diff confirmed: only the attacked monster's byte flipped 0->1." },
+        "HiddenFromPlayer": { "offset": "0x59", "type": "u8" }
+      }
+    },
+
+    "Actor": {
+      "comment": "Component: animation + skills + cooldowns.",
+      "fields": {
+        "AnimationId": {
+          "offset": "0x8B0", "type": "i32",
+          "invariant": { "kind": "range", "min": 0, "max": 8192 },
+          "comment": "DRIFT HISTORY: was 0x8A0, shifted +0x10. The old offset FROZE at 0 while acting - the 'changes' symptom. Confirmed via ActorProbe: 0x8B0 cycles Idle(0)/FixedRun(195)/DodgeRoll(268) and skill CastTypes. (0x380 is a locomotion-LAYER field, not this.) Vector offsets below did NOT move with it."
+        },
+        "ActiveSkills": {
+          "offset": "0xB08", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 16, "maxCount": 512 },
+          "comment": "Full granted-skill table (42 entries for a 9-gem char is CORRECT - it includes non-equipped granted effects)."
+        },
+        "Cooldowns": {
+          "offset": "0xB20", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 256 },
+          "comment": "Count stays at the number of cooldown-capable skills; live timers are inside each entry's cdList, not the list size."
+        },
+        "DeployedEntities": { "offset": "0xC18", "type": "stdVector", "comment": "Empty (begin=end) with no minions/totems out - that is not a drift." }
+      }
+    },
+
+    "Chest": {
+      "fields": {
+        "ChestDataPtr": { "offset": "0x160", "type": "ptr" },
+        "IsOpened": { "offset": "0x168", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 } }
+      }
+    },
+
+    "ChestData": {
+      "fields": {
+        "IsLabelVisible": { "offset": "0x21", "type": "u8" },
+        "StrongboxDatPtr": { "offset": "0x50", "type": "ptr" }
+      }
+    },
+
+    "Monster": {
+      "fields": {
+        "IsBoss": { "offset": "0x27", "type": "u8", "comment": "HYPOTHESIS from Sikaka/POE2Radar - VERIFY in-game against a known boss before relying on it." }
+      }
+    },
+
+    "Buffs": {
+      "fields": {
+        "StatusEffectPtr": {
+          "offset": "0x160", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 80, "maxCount": 512 },
+          "comment": "Vector of StatusEffect entries, 0x50 apart."
+        }
+      },
+      "consts": { "StatusEffectStructSize": "0x50" }
+    },
+
+    "StatusEffect": {
+      "fields": {
+        "BuffDefinitionPtr": { "offset": "0x08", "type": "ptr" },
+        "TotalTime": { "offset": "0x18", "type": "f32" },
+        "TimeLeft": { "offset": "0x1C", "type": "f32" },
+        "SourceEntityId": { "offset": "0x28", "type": "u32" },
+        "Charges": { "offset": "0x40", "type": "u16" },
+        "FlaskSlot": { "offset": "0x42", "type": "u8" },
+        "Effectiveness": { "offset": "0x48", "type": "u16" }
+      }
+    },
+
+    "BuffDefinition": {
+      "fields": {
+        "Name": { "offset": "0x00", "type": "utf16Ptr" },
+        "BuffType": { "offset": "0x67", "type": "u8" }
+      }
+    },
+
+    "Stats": {
+      "fields": {
+        "StatsInternalStatsVector": {
+          "offset": "0xF8", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 8192 },
+          "comment": "Vector of (key u32, value i32) stat pairs."
+        }
+      }
+    },
+
+    "Mods": {
+      "comment": "Component on items and rare/magic monsters.",
+      "fields": {
+        "Identified": { "offset": "0x90", "type": "u8" },
+        "Rarity": { "offset": "0x94", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 10 } },
+        "AllMods": { "offset": "0xA0", "type": "stdVector" }
+      }
+    },
+
+    "ObjectMagicProperties": {
+      "comment": "Monster-side rarity component. Ground drops: currency/fragments carry NO rarity component at all - classify those by path (contains /Currency/), not by a rarity read of -1.",
+      "fields": {
+        "Rarity": { "offset": "0x144", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 10 } },
+        "AllMods": { "offset": "0x150", "type": "stdVector" }
+      }
+    },
+
+    "WorldItemComponent": {
+      "comment": "On a ground-drop WRAPPER entity (Metadata/MiscellaneousObjects/WorldItem). The wrapper has no rarity/art of its own.",
+      "fields": {
+        "InnerItem": {
+          "offset": "0x28", "type": "ptr",
+          "invariant": { "kind": "stringContains", "needle": "Metadata/", "hops": ["0x00", "0x08"], "stringAt": "0x08" },
+          "comment": "The real ITEM entity (path/rarity/Mods/RenderItem). Confirmed in-game 2026-06-23; keep a 0x08..0xA0 sweep as the patch-shift fallback."
+        }
+      }
+    },
+
+    "Stack": {
+      "fields": {
+        "StackSizeDataPtr": { "offset": "0x10", "type": "ptr", "comment": "Shared per-base-type StackSizeData descriptor (two Wisdom stacks resolve to the same pointer)." },
+        "Count": { "offset": "0x18", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 100000 } }
+      }
+    },
+
+    "StackSizeData": {
+      "comment": "Per-context stack caps, verified in-game 2026-07-04. The container-type signal is NOT in the inventory struct's first bytes - display logic picks the smallest cap that still fits the current count.",
+      "fields": {
+        "MaxStackTab": { "offset": "0x20", "type": "i32", "comment": "Currency stash tab cap (Wisdom = 5000)." },
+        "MaxStack": { "offset": "0x28", "type": "i32", "comment": "Normal cap: backpack AND normal stash tabs (Wisdom = 40)." }
+      }
+    },
+
+    "RenderItemComponent": {
+      "fields": {
+        "ResourcePath": { "offset": "0x28", "type": "stdWString", "comment": "2D inventory-art .dds path; the basename doubles as a price-lookup key." }
+      }
+    },
+
+    "ItemBaseComponent": {
+      "fields": {
+        "UniqueIviRow": { "offset": "0x30", "type": "ptr", "comment": "ItemVisualIdentity dat row for uniques (0 for non-uniques); its +0x00 points to the IVI Id wide string." }
+      }
+    },
+
+    "Player": {
+      "fields": {
+        "Name": { "offset": "0x1B0", "type": "stdWString" },
+        "Xp": { "offset": "0x1D8", "type": "u64" },
+        "Level": { "offset": "0x204", "type": "i32", "invariant": { "kind": "range", "min": 1, "max": 100 } }
+      }
+    },
+
+    "ServerDataStructure": {
+      "fields": {
+        "PlayerInventories": {
+          "offset": "0x320", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 24, "maxCount": 1024 }
+        },
+        "League": {
+          "offset": "0x21E0", "type": "stdWString",
+          "comment": "Active league name, EXACTLY poe.ninja/poe2scout's value (\"Standard\", \"HC Runes of Aldur\"). Drives price-league auto-detection. Live-verified 2026-06-22."
+        }
+      }
+    },
+
+    "InventoryArray": {
+      "consts": { "EntrySize": "0x18" },
+      "fields": {
+        "InventoryId": { "offset": "0x00", "type": "i32" },
+        "InventoryPtr0": { "offset": "0x08", "type": "ptr" }
+      }
+    },
+
+    "Inventory": {
+      "fields": {
+        "TotalBoxes": { "offset": "0x150", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 256 } },
+        "TotalBoxesY": { "offset": "0x154", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 256 } },
+        "ItemList": { "offset": "0x170", "type": "stdVector" },
+        "ServerRequestCounter": { "offset": "0x1E8", "type": "i32" }
+      }
+    },
+
+    "InventoryItem": {
+      "fields": {
+        "Item": { "offset": "0x00", "type": "ptr" },
+        "SlotStart": { "offset": "0x08", "type": "i32" },
+        "SlotStartY": { "offset": "0x0C", "type": "i32" },
+        "SlotEnd": { "offset": "0x10", "type": "i32" },
+        "SlotEndY": { "offset": "0x14", "type": "i32" }
+      }
+    },
+
+    "UiElement": {
+      "comment": "Game UI tree node. Scale conversion is per-element: v1 = (clientW - 2*cull)/2560, v2 = clientH/1600; ScaleIndex picks the pair, times LocalScaleMultiplier. Sanity-clamp everything - a mis-resolved GameCullSize or drifted ScaleIndex silently poisons every rect.",
+      "fields": {
+        "Self": { "offset": "0x08", "type": "ptr" },
+        "Children": { "offset": "0x10", "type": "stdVector" },
+        "StringId": { "offset": "0x98", "type": "stdWString", "comment": "Was 0x140 in the 0.4 layout - the 0.5 client moved it." },
+        "LocalScaleMultiplier": { "offset": "0x130", "type": "f32", "comment": "Sanitize: accept 0.2..5.0, else treat as 1.0." },
+        "Flags": { "offset": "0x180", "type": "u32", "comment": "Visibility bit lives here." },
+        "ScaleIndex": { "offset": "0x18A", "type": "u8", "comment": "0.4-era offset; may have drifted in 0.5 - unknown index falls back to uniform scale." },
+        "ItemPtr": {
+          "offset": "0x4F8", "type": "ptr",
+          "comment": "Item-slot elements: direct pointer to the item ENTITY. Source: coussiraty/CoreExile2 InventoryAdapters.cs (ItemPointerOffset = 0x4F8); verified live on a hovered Rare. Powers price-on-hover and ritual badges."
+        }
+      }
+    }
+  }
+}

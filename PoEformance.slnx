@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PoEformance.App/PoEformance.App.csproj" />
+    <Project Path="src/PoEformance.Config/PoEformance.Config.csproj" />
+    <Project Path="src/PoEformance.Core/PoEformance.Core.csproj" />
+    <Project Path="src/PoEformance.Features/PoEformance.Features.csproj" />
+    <Project Path="src/PoEformance.Game/PoEformance.Game.csproj" />
+    <Project Path="src/PoEformance.Overlay/PoEformance.Overlay.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PoEformance.Core.Tests/PoEformance.Core.Tests.csproj" />
+  </Folder>
+</Solution>

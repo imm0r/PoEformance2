@@ -1,0 +1,24 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.{cs,csproj,props,targets}]
+indent_size = 4
+
+[*.{json,js,html,css,yml,yaml,md}]
+indent_size = 2
+
+[*.cs]
+# Readability rules. This project optimises for "a newcomer can follow the code",
+# not for terseness. These are enforced as warnings so they show up in the build.
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = true:warning
+dotnet_style_qualification_for_field = false:suggestion
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+dotnet_diagnostic.CA1707.severity = none

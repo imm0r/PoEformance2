@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Layer 1 - knows nothing about Path of Exile and nothing about UI.
+    Process attach, memory reads, pattern scanning, the offset schema, record/replay.
+    Deliberately targets plain net10.0 (not net10.0-windows) so the whole layer stays
+    unit-testable on any OS. The P/Invoke declarations compile everywhere; only calling
+    them requires Windows.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+</Project>

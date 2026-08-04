@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Layer 4a - the in-game overlay (ImGui / ClickableTransparentOverlay). Windows only. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PoEformance.Features\PoEformance.Features.csproj" />
+  </ItemGroup>
+</Project>

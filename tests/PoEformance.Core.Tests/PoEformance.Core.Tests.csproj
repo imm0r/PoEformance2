@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Runs without Path of Exile and without Windows. Every test here works against
+    either a synthetic in-memory process or a recorded session, which is the whole
+    point of the IMemoryReader abstraction.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsAotCompatible>false</IsAotCompatible>
+    <!-- xunit analyzers ship guidance-level warnings; tests must not fail the build on them. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PoEformance.Core\PoEformance.Core.csproj" />
+    <ProjectReference Include="..\..\src\PoEformance.Game\PoEformance.Game.csproj" />
+  </ItemGroup>
+</Project>

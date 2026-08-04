@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Layer 2 - everything that knows what Path of Exile 2 is: struct readers, entities,
+    player, terrain, the UI tree. Turns raw memory into typed snapshots.
+    No rendering, no features, no windows.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PoEformance.Core\PoEformance.Core.csproj" />
+  </ItemGroup>
+</Project>

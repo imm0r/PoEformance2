@@ -1,0 +1,99 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+
+namespace PoEformance.Core.Memory;
+
+/// <summary>
+/// Reads memory from a running process via ReadProcessMemory.
+/// </summary>
+/// <remarks>
+/// Attaching is read-only: we ask for PROCESS_VM_READ and nothing else, and we never
+/// write to the target. A failed read is reported as <c>false</c>, never as an exception,
+/// because bad pointers are routine when reverse engineering and the reader thread must
+/// not unwind on every one of them.
+/// </remarks>
+[SupportedOSPlatform("windows")]
+public sealed class LiveMemoryReader : IMemoryReader
+{
+    private nint _handle;
+
+    private LiveMemoryReader(nint handle, int processId, ulong moduleBase, uint moduleSize)
+    {
+        _handle = handle;
+        ProcessId = processId;
+        ModuleBase = moduleBase;
+        ModuleSize = moduleSize;
+    }
+
+    public bool IsAttached => _handle != 0;
+
+    public int ProcessId { get; }
+
+    public ulong ModuleBase { get; }
+
+    public uint ModuleSize { get; }
+
+    /// <summary>
+    /// Opens the given process for reading. Returns null when the process is gone or the
+    /// handle cannot be opened - typically a missing elevation, which is the single most
+    /// common first-run problem, so callers should say so in their error message.
+    /// </summary>
+    public static LiveMemoryReader? TryAttach(Process process)
+    {
+        ArgumentNullException.ThrowIfNull(process);
+
+        nint handle = NativeMethods.OpenProcess(NativeMethods.ProcessReadAccess, false, (uint)process.Id);
+        if (handle == 0)
+        {
+            return null;
+        }
+
+        ulong moduleBase = 0;
+        uint moduleSize = 0;
+        try
+        {
+            ProcessModule? main = process.MainModule;
+            if (main is not null)
+            {
+                moduleBase = (ulong)main.BaseAddress.ToInt64();
+                moduleSize = (uint)main.ModuleMemorySize;
+            }
+        }
+        catch (Exception)
+        {
+            // MainModule throws for a process that exited between the two calls, and for
+            // a bitness mismatch. Neither is fatal: an attached reader with a zero module
+            // base still serves absolute-address reads, and the pattern scanner reports
+            // the missing module itself.
+        }
+
+        return new LiveMemoryReader(handle, process.Id, moduleBase, moduleSize);
+    }
+
+    public bool TryRead(ulong address, Span<byte> destination)
+    {
+        if (_handle == 0 || destination.IsEmpty)
+        {
+            return false;
+        }
+
+        bool ok = NativeMethods.ReadProcessMemory(
+            _handle,
+            (nuint)address,
+            ref MemoryMarshal.GetReference(destination),
+            (nuint)destination.Length,
+            out nuint bytesRead);
+
+        return ok && bytesRead == (nuint)destination.Length;
+    }
+
+    public void Dispose()
+    {
+        if (_handle != 0)
+        {
+            NativeMethods.CloseHandle(_handle);
+            _handle = 0;
+        }
+    }
+}

@@ -1,0 +1,26 @@
+<Project>
+
+  <!--
+    Shared settings for every project in the solution. Change something here and it
+    applies everywhere - there is deliberately no per-project duplication of these.
+  -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <InvariantGlobalization>true</InvariantGlobalization>
+
+    <!-- Lets the Windows-only projects build on a Linux CI / dev container. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <!-- Native AOT needs trim-safe code; surfacing the analyzers now avoids a
+         painful retrofit later. See docs/architecture.md "Deployment". -->
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
+  </PropertyGroup>
+
+</Project>
