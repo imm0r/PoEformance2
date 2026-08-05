@@ -113,6 +113,31 @@
       }
     },
 
+    "UiElementBase": {
+      "comment": "Fields every UiElement has. Offsets are the PoE2 0.5.x set verified by the AHK tool; they agree with GameHelper2's UiElementBaseOffset.cs everywhere except StringIdPtr, which drifted 0x140 -> 0x098 in PoE2 and would read the text/font-style field at the old offset. Base UI resolution is 2560x1600: every position and size here is in THAT space and must be scaled to the window (see UiScale).",
+      "fields": {
+        "Self": { "offset": "0x008", "type": "ptr", "comment": "Points at the element ITSELF - *(this+0x08) == this is a cheap validity check before trusting any other field." },
+        "ChildrenFirst": { "offset": "0x010", "type": "ptr", "comment": "StdVector begin: array of child UiElement pointers." },
+        "ChildrenLast": { "offset": "0x018", "type": "ptr", "comment": "StdVector end; child count = (Last - First) / 8." },
+        "StringIdPtr": { "offset": "0x098", "type": "ptr", "comment": "StdWString - the element's identifier (\"life_orb\", \"InventoryPanel\"). PoE2 0.5.x; 0x140 is the stale 0.4.x layout and 0x0F8 is the text style." },
+        "ParentPtr": { "offset": "0x0B8", "type": "ptr", "comment": "Parent element - the chain walked to turn a relative position into an absolute one." },
+        "PositionModifier": { "offset": "0x0F0", "type": "f32", "comment": "StdTuple2D<float>, y at +0x0F4. Added to the PARENT position, but only when the CHILD's ShouldModifyPos flag is set." },
+        "RelativePosition": { "offset": "0x118", "type": "f32", "comment": "StdTuple2D<float>, y at +0x11C. Position relative to the parent, in the 2560x1600 UI space." },
+        "LocalScaleMultiplier": { "offset": "0x130", "type": "f32", "comment": "Extra scale this element applies. When it differs from the parent's, the accumulated position must be CONVERTED between the two scale spaces." },
+        "Flags": { "offset": "0x180", "type": "u32", "comment": "Bit 10 = ShouldModifyPos, bit 11 = IsVisible. Visibility is only meaningful with the whole parent chain visible too." },
+        "ScaleIndex": { "offset": "0x18A", "type": "u8", "comment": "Selects which scale pair applies: 1 -> (v1,v1), 2 -> (v2,v2), 3 -> (v1,v2), anything else -> unscaled." },
+        "UnscaledSize": { "offset": "0x288", "type": "f32", "comment": "StdTuple2D<float>, y at +0x28C. Size in UI space, scaled the same way as the position." },
+        "ItemPtr": { "offset": "0x4F8", "type": "ptr", "comment": "The item entity held by an inventory/stash slot element, 0 elsewhere." }
+      },
+      "consts": {
+        "BaseResolutionX": "2560",
+        "BaseResolutionY": "1600",
+        "FlagShouldModifyPos": "0x400",
+        "FlagIsVisible": "0x800",
+        "MaxParentChainDepth": "16"
+      }
+    },
+
     "MapParentStruct": {
       "comment": "Children of MapParentPtr, read from the cache location inside the struct.",
       "fields": {
