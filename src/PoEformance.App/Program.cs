@@ -129,7 +129,22 @@ internal static class Program
                 cull = 0; // a mis-resolved pattern would poison every width-scaled rect
             }
 
-            RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull);
+            PoEformance.Features.AutoFlask? autoFlask = options.AutoFlask
+                ? new PoEformance.Features.AutoFlask(PoEformance.Features.AutoFlask.DefaultRules, enabled: true)
+                : null;
+
+            if (autoFlask is not null)
+            {
+                Console.WriteLine();
+                Console.WriteLine("auto-flask ARMED - it presses keys only while the GAME window has focus:");
+                foreach (PoEformance.Features.FlaskRule rule in autoFlask.Rules)
+                {
+                    Console.WriteLine($"  {rule.Name,-12} {rule.Vital} at or below {rule.ThresholdPercent}%"
+                        + $", key 0x{rule.Key:X2}, {rule.CooldownMs} ms cooldown");
+                }
+            }
+
+            RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask);
         }
 
         if (options.ShowConfig)
@@ -248,7 +263,8 @@ internal static class Program
     /// renderer itself never touches game memory.
     /// </summary>
     private static void RunOverlay(
-        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull)
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
+        PoEformance.Features.AutoFlask? autoFlask)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
         Console.WriteLine();
@@ -259,8 +275,30 @@ internal static class Program
         // Reads happen on their own thread at their own rate; the renderer only ever picks
         // up the newest finished snapshot. 30 Hz because entities move at the game's tick
         // rate - reading once per drawn frame bought nothing and cost the frame rate.
+        //
+        // Auto-flask runs HERE, inside the read, for two reasons: it needs the freshest
+        // vitals rather than whatever the last drawn frame saw, and reacting at the read
+        // rate rather than the frame rate keeps it working when the overlay is hidden.
         using var feed = new PoEformance.Features.SnapshotFeed(
-            scale => world.Read(gameStatesStatic, scale: scale),
+            scale =>
+            {
+                PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
+
+                if (autoFlask is not null)
+                {
+                    PoEformance.Features.FlaskTick tick = autoFlask.Evaluate(
+                        snapshot.PlayerVitals,
+                        FlaskKeySender.IsForeground(gameWindow),
+                        Environment.TickCount64);
+
+                    foreach (PoEformance.Features.FlaskUse use in tick.Used)
+                    {
+                        FlaskKeySender.Press(use.Rule.Key);
+                    }
+                }
+
+                return snapshot;
+            },
             TimeSpan.FromMilliseconds(33));
 
         using var overlay = new PoEformance.Overlay.EntityOverlay(
@@ -272,6 +310,7 @@ internal static class Program
             gameWindow,
             cull);
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
+        overlay.FlaskStatus = autoFlask is null ? null : () => autoFlask.LastTick.Reason;
         overlay.Start().GetAwaiter().GetResult();
     }
 
@@ -439,12 +478,13 @@ internal static class Program
         bool Watch,
         bool Verbose,
         bool ShowOverlay,
-        bool ShowConfig)
+        bool ShowConfig,
+        bool AutoFlask)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
-            bool watch = false, verbose = false, overlay = false, config = false;
+            bool watch = false, verbose = false, overlay = false, config = false, autoFlask = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -468,13 +508,16 @@ internal static class Program
                     case "--config":
                         config = true;
                         break;
+                    case "--autoflask":
+                        autoFlask = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
                 }
             }
 
-            return new CliOptions(schema, replay, record, watch, verbose, overlay, config);
+            return new CliOptions(schema, replay, record, watch, verbose, overlay, config, autoFlask);
         }
     }
 }

@@ -339,12 +339,12 @@
     },
 
     "Vital": {
-      "comment": "Sub-struct of Life (per vital).",
+      "comment": "Sub-struct of Life (per vital). THE PERCENTAGE IS AGAINST THE UNRESERVED POOL, not against Max - GameHelper2's VitalStruct: reservedTotal = ceil(ReservedPercent / 10000 * Max) + ReservedFlat, then percent = round(100 * Current / (Max - reservedTotal)). Getting that wrong is not subtle: with half of mana reserved by auras, a FULL mana globe reads 50% against Max, so anything thresholded on it fires forever.",
       "fields": {
-        "ReservedFlat": { "offset": "0x10", "type": "i32" },
-        "ReservedFraction": { "offset": "0x14", "type": "i32" },
+        "ReservedFlat": { "offset": "0x10", "type": "i32", "comment": "Flat amount reserved, subtracted from Max directly." },
+        "ReservedPercent": { "offset": "0x14", "type": "i32", "comment": "Reserved share in HUNDREDTHS OF A PERCENT: divide by 10000 to get a fraction (5000 = 50%). Named ReservedFraction here before it was read; the reference name and scale now match." },
         "Regen": { "offset": "0x28", "type": "f32" },
-        "Max": { "offset": "0x2C", "type": "i32" },
+        "Max": { "offset": "0x2C", "type": "i32", "comment": "GameHelper2 calls this Total." },
         "Current": { "offset": "0x30", "type": "i32" }
       }
     },

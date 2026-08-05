@@ -82,7 +82,8 @@ public sealed record WorldSnapshot(
     IReadOnlyList<WorldEntity> Entities,
     float[] Matrix,
     MapView? LargeMap = null,
-    MapView? MiniMap = null)
+    MapView? MiniMap = null,
+    Vitals? PlayerVitals = null)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -108,6 +109,7 @@ public sealed class WorldReader
     private readonly MapRadarReader _mapRadar;
     private readonly EntityReader _entities;
     private readonly RenderReader _render;
+    private readonly LifeReader _life;
     private readonly int _awakeEntities;
     private readonly int _w2sMatrix;
 
@@ -121,6 +123,7 @@ public sealed class WorldReader
         _mapRadar = new MapRadarReader(reader, schema);
         _entities = new EntityReader(reader, schema);
         _render = new RenderReader(reader, schema);
+        _life = new LifeReader(reader, schema);
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
         _w2sMatrix = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
     }
@@ -202,6 +205,16 @@ public sealed class WorldReader
             }
         }
 
+        // The player's pools ride along in the snapshot, so the reader thread reads them
+        // once per tick and every consumer - overlay, auto-flask, config page - works from
+        // the same instant rather than each issuing its own reads.
+        Vitals? playerVitals = null;
+        ulong lifeAddress = _entities.Read(chain.PlayerEntity)?.Component("Life") ?? 0;
+        if (lifeAddress != 0)
+        {
+            playerVitals = _life.Read(lifeAddress);
+        }
+
         MapView? largeMap = null;
         MapView? miniMap = null;
         if (scale is UiScale viewport && chain.UiRoot != 0)
@@ -212,7 +225,7 @@ public sealed class WorldReader
             largeMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: true);
         }
 
-        return new WorldSnapshot(true, player, entities, matrix, largeMap, miniMap);
+        return new WorldSnapshot(true, player, entities, matrix, largeMap, miniMap, playerVitals);
     }
 
     /// <summary>

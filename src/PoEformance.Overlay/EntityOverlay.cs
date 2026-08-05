@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.Versioning;
 using ClickableTransparentOverlay;
 using ImGuiNET;
+using PoEformance.Game.Components;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
@@ -84,6 +85,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// both numbers is what makes a regression obvious instead of felt.
     /// </remarks>
     public Func<(double Milliseconds, long Reads, long Failures)>? ReadStats { get; set; }
+
+    /// <summary>Optional: what auto-flask did, or why it did nothing.</summary>
+    /// <remarks>
+    /// Shown because "why did nothing happen" is the question actually asked of an
+    /// automation feature, and a silent no-op cannot answer it.
+    /// </remarks>
+    public Func<string>? FlaskStatus { get; set; }
 
     protected override Task PostInitialized()
     {
@@ -302,6 +310,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     }
                 }
 
+                if (_snapshot.PlayerVitals is Vitals vitals)
+                {
+                    ImGui.Text($"vitals:   life {Show(vitals.Life)}   mana {Show(vitals.Mana)}   es {Show(vitals.EnergyShield)}");
+                }
+
+                if (FlaskStatus is not null)
+                {
+                    ImGui.TextColored(new Vector4(0.8f, 0.7f, 0.4f, 1f), $"flask:    {FlaskStatus()}");
+                }
+
                 foreach (IGrouping<EntityKind, WorldEntity> group in _snapshot.Entities.GroupBy(e => e.Kind).OrderBy(g => g.Key.ToString()))
                 {
                     ImGui.Text($"  {group.Key,-10} {group.Count()}");
@@ -466,6 +484,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         return maxX < minX ? 0 : Math.Max(maxX - minX, maxY - minY);
     }
+
+    /// <summary>
+    /// A vital as "current/usable (percent)" - the usable pool, not the raw maximum.
+    /// </summary>
+    private static string Show(Vital vital)
+        => vital.Percent < 0 ? "-" : $"{vital.Current}/{vital.Unreserved} ({vital.Percent}%)";
 
     /// <summary>White outline so dots stay readable over any background.</summary>
     private static uint OutlineColour => ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0f, 0f, 0.8f));
