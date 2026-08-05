@@ -22,10 +22,17 @@ public sealed class TerrainGrid
     /// <summary>Grid cells per terrain tile - a tile is 250 world units, a cell is 250/23.</summary>
     public const int CellsPerTile = 23;
 
-    public TerrainGrid(byte[] cells, int bytesPerRow, int rows, long totalTilesX = 0, long totalTilesY = 0)
+    private readonly float[] _tileHeights;
+
+    public TerrainGrid(
+        byte[] cells, int bytesPerRow, int rows,
+        long totalTilesX = 0, long totalTilesY = 0, float[]? tileHeights = null)
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
+        TilesX = (int)Math.Max(0, totalTilesX);
+        TilesY = (int)Math.Max(0, totalTilesY);
+        _tileHeights = tileHeights ?? [];
         _bytesPerRow = bytesPerRow;
         StoredWidth = bytesPerRow * 2;
         StoredHeight = rows;
@@ -50,6 +57,39 @@ public sealed class TerrainGrid
 
     /// <summary>Rows the buffer holds, padding included.</summary>
     public int StoredHeight { get; }
+
+    /// <summary>Terrain tiles across and down. A tile is CellsPerTile cells each way.</summary>
+    public int TilesX { get; }
+
+    public int TilesY { get; }
+
+    /// <summary>True when per-tile heights were read - without them the map is drawn flat.</summary>
+    public bool HasHeights => _tileHeights.Length > 0;
+
+    /// <summary>
+    /// Ground height at a grid cell, in the same world units entities report.
+    /// </summary>
+    /// <remarks>
+    /// Per TILE, not per cell. The finer sub-tile heights exist behind another pointer and
+    /// describe variation WITHIN a tile - detail a pathfinder wants and a map outline does
+    /// not, since a tile is 250 world units and that is the scale a hill or a staircase
+    /// spans anyway.
+    ///
+    /// Returns 0 when heights are unavailable, which draws the map flat: exactly what it did
+    /// before heights existed, so a failed read costs the correction and nothing else.
+    /// </remarks>
+    public float HeightAt(int cellX, int cellY)
+    {
+        if (_tileHeights.Length == 0 || TilesX <= 0)
+        {
+            return 0f;
+        }
+
+        int tx = Math.Clamp(cellX / CellsPerTile, 0, TilesX - 1);
+        int ty = Math.Clamp(cellY / CellsPerTile, 0, TilesY - 1);
+        int index = (ty * TilesX) + tx;
+        return (uint)index < (uint)_tileHeights.Length ? _tileHeights[index] : 0f;
+    }
 
     /// <summary>Describes the grid and any padding found, so a mismatch is visible.</summary>
     public string Describe()
@@ -139,12 +179,24 @@ public sealed class TerrainReader
     private const long MinDataSize = 64;
     private const long MaxDataSize = 32 * 1024 * 1024;
 
+    /// <summary>Bytes per TileStruct entry in the tile-details vector.</summary>
+    private const int TileEntrySize = 0x38;
+
+    /// <summary>
+    /// Turns the raw tile height into world units. GameHelper2's constant, sign included -
+    /// the game counts height downward and entity Z counts it up.
+    /// </summary>
+    private const float HeightScale = -7.8125f;
+
     private readonly IMemoryReader _reader;
     private readonly int _terrainMetadata;
     private readonly int _walkableData;
     private readonly int _bytesPerRow;
     private readonly int _totalTilesX;
     private readonly int _totalTilesY;
+    private readonly int _tileDetails;
+    private readonly int _heightMultiplier;
+    private readonly int _tileHeight;
     private readonly int _areaHash;
 
     private TerrainGrid? _grid;
@@ -169,6 +221,9 @@ public sealed class TerrainReader
         _bytesPerRow = terrain.OffsetOf("BytesPerRow");
         _totalTilesX = terrain.OffsetOf("TotalTilesX");
         _totalTilesY = terrain.OffsetOf("TotalTilesY");
+        _tileDetails = terrain.OffsetOf("TileDetailsPtr");
+        _heightMultiplier = terrain.OffsetOf("TileHeightMultiplier");
+        _tileHeight = schema.Structs["TileStruct"].OffsetOf("TileHeight");
     }
 
     /// <summary>
@@ -257,6 +312,62 @@ public sealed class TerrainReader
         if (tilesY is < 1 or > 4096) { tilesY = 0; }
 
         LastError = string.Empty;
-        return new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY);
+        return new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY, ReadTileHeights(terrainBase, tilesX, tilesY));
+    }
+
+    /// <summary>
+    /// Reads one ground height per terrain tile, in the world units entities report.
+    /// </summary>
+    /// <remarks>
+    /// GameHelper2's formula, minus the sub-tile term:
+    ///     height = (TileHeight * TileHeightMultiplier + subTileHeight) * 7.8125 * -1
+    /// The sub-tile part describes variation WITHIN a tile and costs a good deal more to
+    /// read: a pointer per tile to a per-template vector, a rotation lookup through two more
+    /// scanned statics, and a run-length decode whose format is inferred from the array's
+    /// length. The tile-level term is the one that moves a hill, which spans many tiles; what
+    /// is left out is the slope inside a single one, which is what a staircase is.
+    ///
+    /// So this is the cheap 90% and it is not the whole correction. The two ground figures in
+    /// the overlay's terrain readout measure what remains.
+    ///
+    /// Returns an empty array on any problem, which leaves the map drawn flat - what it did
+    /// before heights existed. The correction is worth having and not worth failing over.
+    /// </remarks>
+    private float[] ReadTileHeights(ulong terrainBase, long tilesX, long tilesY)
+    {
+        if (tilesX <= 0 || tilesY <= 0)
+        {
+            return [];
+        }
+
+        ulong first = _reader.ReadPointer(terrainBase + (ulong)_tileDetails);
+        ulong last = _reader.ReadPointer(terrainBase + (ulong)_tileDetails + 8);
+        if (first == 0 || last <= first)
+        {
+            return [];
+        }
+
+        long count = tilesX * tilesY;
+        long available = (long)(last - first) / TileEntrySize;
+        if (available < count || count > 4_000_000)
+        {
+            return [];
+        }
+
+        short multiplier = _reader.Read<short>(terrainBase + (ulong)_heightMultiplier);
+        var tiles = new byte[count * TileEntrySize];
+        if (!_reader.TryRead(first, tiles))
+        {
+            return [];
+        }
+
+        var heights = new float[count];
+        for (long i = 0; i < count; i++)
+        {
+            short raw = BitConverter.ToInt16(tiles, (int)((i * TileEntrySize) + _tileHeight));
+            heights[i] = raw * multiplier * HeightScale;
+        }
+
+        return heights;
     }
 }

@@ -169,9 +169,42 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _terrain.Thickness = thickness;
     }
 
-    /// <summary>What the terrain layer holds, for the config page and the status window.</summary>
+    /// <summary>
+    /// What the terrain layer holds, for the config page and the status window.
+    /// </summary>
+    /// <remarks>
+    /// The height state is in here because it is the difference between an outline that
+    /// stays put on a staircase and one that slides, and nothing on screen distinguishes
+    /// "read the heights" from "drew it flat" other than walking up a hill.
+    ///
+    /// The two ground figures are the measurement for the part that is NOT done. Tile height
+    /// is the whole tile's; the game's own is that plus a sub-tile term this does not read.
+    /// On flat ground they should agree, and how far apart they drift on a staircase is
+    /// exactly how much the missing term is worth - a number to read off rather than a guess
+    /// about whether the rest of the port is worth doing.
+    /// </remarks>
     public string DescribeTerrain()
-        => _snapshot.Terrain is null ? "loading" : _terrain.Describe();
+    {
+        if (_snapshot.Terrain is not TerrainGrid grid)
+        {
+            return "loading";
+        }
+
+        string heights = "flat - no tile heights";
+        if (grid.HasHeights)
+        {
+            heights = $"{grid.TilesX}x{grid.TilesY} tiles with heights";
+            if (_snapshot.Player is WorldEntity player)
+            {
+                float tile = grid.HeightAt(
+                    (int)(player.WorldX / MapView.WorldToGrid),
+                    (int)(player.WorldY / MapView.WorldToGrid));
+                heights += $" (ground here {player.TerrainHeight:F0}, tile {tile:F0})";
+            }
+        }
+
+        return $"{grid.Describe()}, {heights}, texture {_terrain.Describe()}";
+    }
 
     /// <summary>Releases the terrain texture along with the renderer that holds it.</summary>
     protected override void Dispose(bool disposing)

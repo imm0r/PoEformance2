@@ -12,13 +12,19 @@ namespace PoEformance.Overlay;
 /// Draws the area's layout on the game's own map - the walls the map has not revealed yet.
 /// </summary>
 /// <remarks>
-/// ONE TEXTURED QUAD, and that is the whole trick. The map transform is
+/// A TEXTURED MESH, and the shape of it follows from the map transform:
 ///     screen = centre + ((dx - dy) * cos, (dz - (dx + dy)) * sin)
-/// which, with the height term held at the player's own, is LINEAR in the grid deltas -
-/// an affine map. So the grid's four corners projected through it define the image exactly,
-/// and the GPU interpolates everything between them. The terrain becomes one draw call at
-/// any zoom, on any map, and the projection stays the single one used for markers rather
-/// than a second copy that can disagree with it.
+/// At a FIXED height this is linear in the grid deltas, so any patch of ground is an affine
+/// image and four projected corners define it exactly - the GPU interpolates the rest. That
+/// made the whole area one quad, until the ground stopped being flat: dz is measured against
+/// the PLAYER, so a single height draws every wall at the player's own elevation and the
+/// outline slides whenever they walk up a staircase.
+///
+/// So the surface is a grid of patches, each still affine and still one textured quad, with
+/// its corners at their own ground heights. They share one texture and batch into a single
+/// draw call; what the mesh costs is projecting the corner grid, not drawing it. The
+/// projection stays the same one the markers use rather than a second copy that can
+/// disagree with it.
 ///
 /// This is deliberately NOT how the AHK tool does it. That one composites GDI bitmaps with
 /// rotated blits and a scroll cache, an effort that took its frame cost from 55 ms to 8 ms -
@@ -46,6 +52,16 @@ public sealed class TerrainLayer : IDisposable
     /// </remarks>
     private const int MaxTextureEdge = 2048;
 
+    /// <summary>
+    /// Largest number of mesh patches along either axis.
+    /// </summary>
+    /// <remarks>
+    /// A cap rather than one patch per tile: a big area is over a hundred tiles across, and
+    /// past this the extra patches move the outline by less than a pixel while multiplying
+    /// the corner projections that build them.
+    /// </remarks>
+    private const int MaxPatches = 96;
+
     private readonly Func<string, Image<Rgba32>, bool, IntPtr> _upload;
     private readonly Action<string> _release;
 
@@ -53,11 +69,21 @@ public sealed class TerrainLayer : IDisposable
     private IntPtr _texture;
     private int _textureWidth;
     private int _textureHeight;
+
+    // How much of the grid the texture actually covers. Thinning floors the pixel count, so
+    // on a large area this is a cell or two short of the grid - and stretching the image over
+    // the full width instead would shift it by that much.
+    private int _coverX = 1;
+    private int _coverY = 1;
     private uint _colour = 0xFF64C8FF;
     private int _thickness = 1;
 
     // Set once the layer has given up, so a failure is reported once rather than every frame.
     private string? _failure;
+
+    // Reused between frames: the mesh's corner grid, rebuilt each frame because the
+    // projection follows the player, but never reallocated.
+    private Vector2[] _corners = [];
 
     /// <param name="upload">Hands an image to the renderer and returns its handle.</param>
     /// <param name="release">Drops a previously uploaded image.</param>
@@ -142,20 +168,6 @@ public sealed class TerrainLayer : IDisposable
             return;
         }
 
-        // The grid's four corners, in the same world units the markers use.
-        Vector2 topLeft = Project(map, 0, 0, player);
-        Vector2 topRight = Project(map, grid.Width, 0, player);
-        Vector2 bottomRight = Project(map, grid.Width, grid.Height, player);
-        Vector2 bottomLeft = Project(map, 0, grid.Height, player);
-
-        // Off the map entirely - every corner outside it and the player not inside either.
-        if (!map.Contains(topLeft) && !map.Contains(topRight)
-            && !map.Contains(bottomRight) && !map.Contains(bottomLeft)
-            && !map.Contains(map.Centre))
-        {
-            return;
-        }
-
         // Clipped to the map's own rectangle, so a grid larger than the minimap does not
         // spill the level layout across the whole screen.
         draw.PushClipRect(
@@ -163,25 +175,108 @@ public sealed class TerrainLayer : IDisposable
             new Vector2(map.Left + map.Width, map.Top + map.Height),
             intersect_with_current_clip_rect: true);
 
-        draw.AddImageQuad(
-            _texture,
-            topLeft, topRight, bottomRight, bottomLeft,
-            new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1),
-            _colour);
+        DrawMesh(draw, map, grid, player);
 
         draw.PopClipRect();
     }
 
-    /// <summary>A grid cell projected onto the map, at the player's own height.</summary>
+    /// <summary>
+    /// Draws the layout as a mesh of tile-sized quads, one ground height each.
+    /// </summary>
     /// <remarks>
-    /// The height delta is held at zero on purpose. It is what keeps the transform affine,
-    /// and therefore what lets four corners stand in for the whole grid; per-cell height
-    /// would need a mesh instead of a quad, to reposition a wall by a few pixels.
+    /// A SINGLE quad would be the affine ideal, and it was - right up until the ground stops
+    /// being flat. The map transform is
+    ///     screen = centre + ((dx - dy) * cos, (dz - (dx + dy)) * sin)
+    /// and dz is the height difference between a point and the PLAYER. Holding it at zero
+    /// draws every wall as if it stood at the player's own elevation, so the outline slides
+    /// against the game's map whenever the player walks up a staircase or a hill - reported
+    /// exactly that way, and the height was the cause.
+    ///
+    /// So the corners get their own heights and the surface becomes a grid. Each patch is
+    /// still affine and still one textured quad; the mesh only lets the height vary between
+    /// them. At tile granularity that is a few thousand quads sharing one texture, which
+    /// batches into a single draw call - the cost is building the corner grid, not drawing it.
+    ///
+    /// Which patches exist and where their edges land is <see cref="TerrainMesh"/>, kept out
+    /// of here so it can be tested without a GPU. This part is projection and quads.
     /// </remarks>
-    private static Vector2 Project(MapView map, int gridX, int gridY, Vector3 player)
-        => map.Project(
-            gridX * MapView.WorldToGrid, gridY * MapView.WorldToGrid, player.Z,
-            player.X, player.Y, player.Z);
+    private void DrawMesh(ImDrawListPtr draw, MapView map, TerrainGrid grid, Vector3 player)
+    {
+        TerrainMesh mesh = TerrainMesh.For(grid, MaxPatches, _coverX, _coverY);
+
+        // Measured against the player's OWN TILE, not the render component's terrain height.
+        // Both describe the same ground, but by different arithmetic from different fields,
+        // and taking both ends of the difference from one source makes any constant
+        // disagreement between them cancel. The alternative reference is exact where these
+        // two happen to agree and shifts the ENTIRE outline where they do not - including on
+        // the flat maps that are correct today, which is not a trade worth making blind.
+        //
+        // What it costs is the player's own sub-tile height, the term this does not read (see
+        // TerrainReader.ReadTileHeights): the outline stays put around the player and the far
+        // side of the map moves by that much while they stand on a staircase. DescribeTerrain
+        // reports both figures so the size of it can be read off rather than guessed at.
+        float reference = grid.HasHeights
+            ? grid.HeightAt(
+                (int)(player.X / MapView.WorldToGrid),
+                (int)(player.Y / MapView.WorldToGrid))
+            : player.Z;
+
+        // The corner grid, built once per frame: every patch shares its edges with its
+        // neighbours, so projecting per patch would do the same work four times over and
+        // let rounding open seams between them.
+        int cornersX = mesh.CornersX;
+        int cornersY = mesh.CornersY;
+        if (_corners.Length < cornersX * cornersY)
+        {
+            _corners = new Vector2[cornersX * cornersY];
+        }
+
+        for (int cy = 0; cy < cornersY; cy++)
+        {
+            int gy = mesh.EdgeY(cy);
+            for (int cx = 0; cx < cornersX; cx++)
+            {
+                int gx = mesh.EdgeX(cx);
+
+                // The reference height itself when there is none to read: that makes the
+                // height term zero everywhere, which is exactly the flat drawing this
+                // replaced. A literal 0 would offset the map by the player's own elevation.
+                float height = grid.HasHeights ? grid.HeightAt(gx, gy) : reference;
+                _corners[(cy * cornersX) + cx] = map.Project(
+                    gx * MapView.WorldToGrid, gy * MapView.WorldToGrid, height,
+                    player.X, player.Y, reference);
+            }
+        }
+
+        for (int py = 0; py < mesh.PatchesY; py++)
+        {
+            float v0 = mesh.V(py);
+            float v1 = mesh.V(py + 1);
+
+            for (int px = 0; px < mesh.PatchesX; px++)
+            {
+                Vector2 a = _corners[(py * cornersX) + px];
+                Vector2 b = _corners[(py * cornersX) + px + 1];
+                Vector2 c = _corners[((py + 1) * cornersX) + px + 1];
+                Vector2 d = _corners[((py + 1) * cornersX) + px];
+
+                // Off the map: skipping here is what keeps a large area cheap, since most
+                // of its patches are outside a minimap at any moment.
+                if (!map.Contains(a) && !map.Contains(b) && !map.Contains(c) && !map.Contains(d))
+                {
+                    continue;
+                }
+
+                float u0 = mesh.U(px);
+                float u1 = mesh.U(px + 1);
+
+                draw.AddImageQuad(
+                    _texture, a, b, c, d,
+                    new Vector2(u0, v0), new Vector2(u1, v0), new Vector2(u1, v1), new Vector2(u0, v1),
+                    _colour);
+            }
+        }
+    }
 
     /// <summary>Turns the walkable grid into an outline texture, once per area.</summary>
     private void Build(TerrainGrid grid)
@@ -228,6 +323,8 @@ public sealed class TerrainLayer : IDisposable
         _texture = _upload(TextureKey, image, false);
         _textureWidth = mask.Width;
         _textureHeight = mask.Height;
+        _coverX = Math.Min(grid.Width, mask.Width * mask.Step);
+        _coverY = Math.Min(grid.Height, mask.Height * mask.Step);
     }
 
     /// <summary>The texture's size, or why there is none - for the readouts.</summary>
