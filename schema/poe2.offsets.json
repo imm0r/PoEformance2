@@ -191,8 +191,9 @@
         "ComponentsVec": {
           "offset": "0x10", "type": "stdVector",
           "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 256 },
-          "comment": "Vector of component pointers, indexed by ComponentLookup."
+          "comment": "Vector of component pointers, indexed by ComponentLookup. begin = +0x10, end = +0x18."
         },
+        "ComponentsVecLast": { "offset": "0x18", "type": "ptr", "comment": "End pointer of ComponentsVec (component count = (end - begin) / 8)." },
         "Id": { "offset": "0x88", "type": "u32" },
         "Flags": {
           "offset": "0x8C", "type": "u8",
@@ -218,9 +219,20 @@
     },
 
     "ComponentLookupEntry": {
+      "comment": "One hash-bucket entry: a component name pointer and the index of that component in the entity's ComponentsVec.",
+      "consts": { "Size": "0x10" },
       "fields": {
         "NamePtr": { "offset": "0x00", "type": "ptr" },
         "Index": { "offset": "0x08", "type": "i64" }
+      }
+    },
+
+    "StdBucket": {
+      "comment": "MSVC hash-bucket array behind ComponentLookup.Bucket. Data/DataLast bracket an array of ComponentLookupEntry; Capacity is the bucket count. Ported from the AHK tool's PoE2Offsets.StdBucket.",
+      "fields": {
+        "Data": { "offset": "0x00", "type": "ptr" },
+        "DataLast": { "offset": "0x08", "type": "ptr" },
+        "Capacity": { "offset": "0x20", "type": "i32" }
       }
     },
 

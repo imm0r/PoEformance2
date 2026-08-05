@@ -43,6 +43,15 @@ public sealed class FakeMemoryReader : IMemoryReader
         return Place(address, bytes);
     }
 
+    /// <summary>Places a NUL-terminated UTF-8/ASCII string at an absolute address.</summary>
+    public FakeMemoryReader PlaceUtf8(ulong address, string text)
+    {
+        byte[] utf8 = System.Text.Encoding.UTF8.GetBytes(text);
+        var bytes = new byte[utf8.Length + 1];
+        utf8.CopyTo(bytes, 0);
+        return Place(address, bytes);
+    }
+
     /// <summary>
     /// Places an MSVC std::wstring (header + out-of-line character data) so schema
     /// string invariants can be exercised. <paramref name="dataAddress"/> is where the

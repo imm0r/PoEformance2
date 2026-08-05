@@ -84,6 +84,18 @@ internal static class Program
 
         DriftReportResult result = RunReportOnce(reader, scanner, schemaPath, recorder, options.Verbose);
 
+        // Probe the player and project its position - the end-to-end proof of the whole
+        // read chain. Running it here also means a --record session captures the component
+        // reads, so the projection can be verified offline from the recording.
+        if (result.Statics.FirstOrDefault(s => s.Name == "GameStates")?.Found == true)
+        {
+            OffsetSchema probeSchema = SchemaJson.Load(schemaPath);
+            ulong gameStates = result.Statics.First(s => s.Name == "GameStates").Address;
+            recorder?.MarkFrame();
+            new PoEformance.Game.Diagnostics.PlayerProbe(reader, probeSchema).ProbeAndReport(gameStates, Console.Out);
+            recorder?.MarkFrame();
+        }
+
         if (options.Watch && options.ReplayPath is null)
         {
             WatchSchema(reader, scanner, schemaPath, recorder, options.Verbose);
