@@ -88,6 +88,19 @@ internal static class Program
 
         DriftReportResult result = RunReportOnce(reader, scanner, schemaPath, recorder, options.Verbose);
 
+        // Store the resolved statics IMMEDIATELY, not at exit. Finding them needs the game's
+        // whole module image, which is far too large to record, so a replay depends entirely
+        // on these six notes - and a session that is closed with Ctrl+C, or that ends in the
+        // overlay, never reaches an exit-time write. An uploaded recording with no statics
+        // cannot be replayed at all, which is exactly what happened to the first one.
+        if (recorder is not null)
+        {
+            foreach (ResolvedStatic resolved in result.Statics.Where(s => s.Found))
+            {
+                recorder.NoteStatic(resolved.Name, resolved.Address);
+            }
+        }
+
         // Probe the player and project its position - the end-to-end proof of the whole
         // read chain. Running it here also means a --record session captures the component
         // reads, so the projection can be verified offline from the recording.
@@ -166,13 +179,6 @@ internal static class Program
 
         if (recorder is not null && options.RecordPath is not null)
         {
-            // Store the resolved statics so the replay never needs the module image - the
-            // one read big enough to dominate the file size.
-            foreach (ResolvedStatic s in result.Statics.Where(s => s.Found))
-            {
-                recorder.NoteStatic(s.Name, s.Address);
-            }
-
             recorder.Dispose(); // flush before measuring
             long bytes = new FileInfo(options.RecordPath).Length;
             Console.WriteLine();

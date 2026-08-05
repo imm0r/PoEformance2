@@ -12,6 +12,17 @@ namespace PoEformance.Game.Components;
 public readonly record struct EquippedFlask(int Slot, string Path, int Charges, int ChargesPerUse)
 {
     /// <summary>
+    /// True for a charm rather than a flask.
+    /// </summary>
+    /// <remarks>
+    /// Charms sit in the same belt inventory and under the same Flasks/ metadata path, so
+    /// they arrive here looking like flasks - but the GAME triggers them itself on their own
+    /// conditions. There is no key to press, so a rule targeting a charm slot would send
+    /// keystrokes that can never do anything.
+    /// </remarks>
+    public bool IsCharm => Path.Contains("Charm", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
     /// Whether pressing this flask's key would actually do anything.
     /// </summary>
     /// <remarks>
@@ -278,9 +289,20 @@ public sealed class FlaskBeltReader
 
     private FlaskBelt ReadBelt(ulong inventory)
     {
+        // DEDUPE BY ITEM ENTITY. The list holds one entry per occupied GRID CELL, so an item
+        // spanning two cells appears twice - which showed up live as five "flasks" for three
+        // items, with slots 1 and 2 listed twice each. The entity pointer is the identity
+        // that survives that.
         var flasks = new List<EquippedFlask>(5);
+        var seen = new HashSet<ulong>();
+
         foreach ((ulong itemStruct, ulong itemEntity) in EnumerateItems(inventory, MaxItemsScored))
         {
+            if (!seen.Add(itemEntity))
+            {
+                continue;
+            }
+
             string path = PathOf(itemEntity);
             if (!IsFlask(path))
             {
@@ -349,7 +371,14 @@ public sealed class FlaskBeltReader
 
     private string PathOf(ulong itemEntity) => _entities.Read(itemEntity)?.Path ?? string.Empty;
 
-    /// <summary>True for a flask item, by metadata path.</summary>
+    /// <summary>
+    /// True for anything living in the flask belt, charms included.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately broad: charms share the Flasks/ path and the same inventory, and knowing
+    /// their charges is useful. Whether something is PRESSABLE is a separate question, and
+    /// EquippedFlask.IsCharm answers it.
+    /// </remarks>
     public static bool IsFlask(string path)
         => path.Contains("/Flask", StringComparison.OrdinalIgnoreCase);
 }

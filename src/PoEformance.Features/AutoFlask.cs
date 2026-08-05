@@ -203,10 +203,21 @@ public sealed class AutoFlask
             // and this rule would then sit out its cooldown. If the charges come back
             // during that window, the flask stays unused for no reason. Skipping without
             // stamping means the very next tick after a refill can fire.
-            if (rule.Slot > 0 && belt.InSlot(rule.Slot) is EquippedFlask flask && !flask.CanUse)
+            if (rule.Slot > 0 && belt.InSlot(rule.Slot) is EquippedFlask flask)
             {
-                blocked.Add($"{rule.Name}: {flask.Charges}/{flask.ChargesPerUse} charges");
-                continue;
+                // Charms trigger themselves; there is no key that uses one, so a rule aimed
+                // at a charm slot would send keystrokes that can never have an effect.
+                if (flask.IsCharm)
+                {
+                    blocked.Add($"{rule.Name}: slot {rule.Slot} holds a charm (self-triggering)");
+                    continue;
+                }
+
+                if (!flask.CanUse)
+                {
+                    blocked.Add($"{rule.Name}: {flask.Charges}/{flask.ChargesPerUse} charges");
+                    continue;
+                }
             }
 
             if (_lastUsed.TryGetValue(rule.Name, out long last) && nowMs - last < rule.CooldownMs)

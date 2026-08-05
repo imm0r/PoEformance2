@@ -283,4 +283,30 @@ public class AutoFlaskTests
         Assert.True(FlaskBeltReader.IsFlask("Metadata/Items/Flasks/FlaskLife1"));
         Assert.False(FlaskBeltReader.IsFlask("Metadata/Items/Weapons/Bow"));
     }
+
+    [Fact]
+    public void CharmSlot_IsNeverPressed()
+    {
+        // Charms live in the same belt inventory and under the same Flasks/ path, so they
+        // arrive looking like flasks - but the game triggers them itself. A rule aimed at
+        // one would emit keystrokes that can never have an effect. Seen live: slot 3 held
+        // "Flasks/FourCharm6".
+        AutoFlask engine = Engine(new FlaskRule("charm", VitalKind.Life, 65, Key: 0x33) { Slot = 3 });
+        FlaskBelt belt = Belt(new EquippedFlask(3, "Metadata/Items/Flasks/FourCharm6", 60, 20));
+
+        FlaskTick tick = engine.Evaluate(Pools(life: 20), true, 1000, belt: belt);
+
+        Assert.Empty(tick.Used);
+        Assert.Contains("charm", tick.Reason, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void CharmDetection_SeparatesCharmsFromFlasks()
+    {
+        Assert.True(new EquippedFlask(3, "Metadata/Items/Flasks/FourCharm6", 60, 20).IsCharm);
+        Assert.False(new EquippedFlask(1, "Metadata/Items/Flasks/FourFlaskLife9", 75, 10).IsCharm);
+
+        // Both still count as belt contents - their charges are worth knowing either way.
+        Assert.True(FlaskBeltReader.IsFlask("Metadata/Items/Flasks/FourCharm6"));
+    }
 }
