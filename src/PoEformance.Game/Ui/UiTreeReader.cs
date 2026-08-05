@@ -113,9 +113,55 @@ public sealed class UiTreeReader
         _maxDepth = (int)ui.Constants["MaxParentChainDepth"];
     }
 
+    /// <summary>How deep a hit test descends. Not the parent chain's limit - see HitTest.</summary>
+    private const int MaxDescent = 48;
+
     /// <summary>What a parent hands its children: everything they need to place themselves.</summary>
     private readonly record struct Frame(
         Vector2 UnscaledPosition, byte ScaleIndex, float Multiplier, bool Visible, int Depth);
+
+    /// <summary>
+    /// Where an element is, without the parts that cost a string read.
+    /// </summary>
+    /// <remarks>
+    /// Hit-testing looks at far more elements than it reports - every branch that could
+    /// contain the point - and needs none of their names to do it. Reading the id and the
+    /// caption for each is two string reads per element thrown away, on a search that runs
+    /// every tick while following the cursor.
+    /// </remarks>
+    private readonly record struct Geometry(
+        ulong Address,
+        Vector2 Unscaled,
+        Vector2 Relative,
+        Vector2 Position,
+        Vector2 Size,
+        uint Flags,
+        byte ScaleIndex,
+        float Multiplier,
+        bool Visible)
+    {
+        public bool HasArea => Size.X > 0 && Size.Y > 0;
+
+        public bool Contains(Vector2 point)
+            => point.X >= Position.X && point.X <= Position.X + Size.X
+               && point.Y >= Position.Y && point.Y <= Position.Y + Size.Y;
+    }
+
+    /// <summary>The running state of one hit test: where to look, how much is left, best so far.</summary>
+    private sealed class HitSearch(Vector2 point, UiScale scale, int budget)
+    {
+        public Vector2 Point { get; } = point;
+
+        public UiScale Scale { get; } = scale;
+
+        public int Remaining { get; set; } = budget;
+
+        /// <summary>The current branch being walked.</summary>
+        public List<ulong> Path { get; } = [];
+
+        /// <summary>The deepest branch that ended on something under the point.</summary>
+        public List<ulong> Best { get; } = [];
+    }
 
     /// <summary>
     /// Reads the root plus the children of every expanded node.
@@ -196,62 +242,101 @@ public sealed class UiTreeReader
     }
 
     /// <summary>
-    /// The element under a screen point, as the chain from the root down to it.
+    /// The DEEPEST element under a screen point, as the chain from the root down to it.
     /// </summary>
     /// <remarks>
-    /// The chain rather than just the leaf, because the browser has to OPEN the tree to show
-    /// what was picked - and because the path is usually more interesting than the endpoint
+    /// Every branch that could contain the point is walked, and the one that reaches deepest
+    /// wins. The obvious cheaper walk - at each level take the topmost child containing the
+    /// point and descend into that one - gets this wrong in exactly the case that matters:
+    /// the interface has full-screen transparent layers (a notification host, a tooltip
+    /// surface) that contain EVERY point and are drawn last, so the descent commits to one,
+    /// finds nothing under the cursor inside it, and reports that layer as the answer while
+    /// the panel actually being pointed at sits in an earlier sibling. Committing early to
+    /// the topmost branch is a guess about which branch goes deeper, and it is wrong whenever
+    /// something is drawn over the thing being asked about.
+    ///
+    /// Among branches that reach equally deep the LATER sibling wins, which is the game's own
+    /// draw order - later siblings paint on top, so that is the one actually visible there.
+    ///
+    /// An element with NO SIZE is passed through rather than skipped: it has no rectangle to
+    /// be under a cursor, but it does hold children that have. Real containers are built this
+    /// way - the large map element reads size 0 - so refusing to descend into them would hide
+    /// their whole subtree from a pick.
+    ///
+    /// The chain rather than just the leaf, because the browser has to OPEN the tree down to
+    /// what was picked, and because the path is usually more interesting than the endpoint
     /// when the question is "what is this thing part of".
-    ///
-    /// At each level the LAST matching child wins, which is the game's own draw order: later
-    /// siblings are drawn on top, so the last one containing the point is the one visible
-    /// there. Only visible children are considered.
-    ///
-    /// Known limitation, inherited from how the interface is built: a full-screen transparent
-    /// layer (the notification host, for one) contains every point, so the descent can stop
-    /// inside it and never reach the panel underneath. That is a real element genuinely under
-    /// the cursor, not a bug in the walk - when it happens, the tree is the way in.
     /// </remarks>
-    public List<ulong> HitTest(ulong root, Vector2 point, UiScale scale)
+    /// <param name="budget">
+    /// Elements this may look at, and a real bound rather than a formality. Following the
+    /// cursor re-runs the walk on every read tick, and while a sized branch away from the
+    /// point is skipped outright, the pass-through rule above means a container with no size
+    /// and a large subtree is walked in full. A pruned walk normally visits tens of elements;
+    /// this is what keeps the pathological one inside a tick.
+    /// </param>
+    public List<ulong> HitTest(ulong root, Vector2 point, UiScale scale, int budget = 1500)
     {
-        var chain = new List<ulong>();
         if (!IsElement(root))
         {
-            return chain;
+            return [];
         }
 
-        UiNode? current = ReadOne(root, scale);
-        if (current is null)
+        // Only the root is resolved by climbing; everything below inherits from its parent.
+        var start = new Frame(
+            _elements.UnscaledPosition(root, scale),
+            _reader.Read<byte>(root + (ulong)_scaleIndex),
+            _reader.Read<float>(root + (ulong)_localScaleMultiplier),
+            _elements.IsVisible(root),
+            0);
+
+        var search = new HitSearch(point, scale, budget);
+        Descend(ReadGeometry(root, _reader.ReadPointer(root + (ulong)_parent), start, scale), search);
+
+        // Nothing under the point still answers with the root: the browser opened on a pick,
+        // and an empty chain would leave it showing nothing at all.
+        return search.Best.Count > 0 ? search.Best : [root];
+    }
+
+    /// <summary>Walks one branch, recording it when it ends deeper than the best so far.</summary>
+    private void Descend(Geometry node, HitSearch search)
+    {
+        search.Path.Add(node.Address);
+
+        bool contains = node.Contains(search.Point);
+
+        // ">=" rather than ">": children are walked in order, so an equally deep branch found
+        // later is the one drawn on top.
+        if (node.HasArea && contains && search.Path.Count >= search.Best.Count)
         {
-            return chain;
+            search.Best.Clear();
+            search.Best.AddRange(search.Path);
         }
 
-        chain.Add(root);
-
-        for (int depth = 0; depth < _maxDepth && current is not null; depth++)
+        // A sized element that does not contain the point cannot have children that do - the
+        // game lays children out inside their parent - so that branch is finished. One with no
+        // size makes no such promise, and is walked.
+        if ((contains || !node.HasArea) && search.Path.Count < MaxDescent)
         {
-            Frame frame = ChildFrame(current);
-            UiNode? best = null;
+            var frame = new Frame(
+                node.Unscaled, node.ScaleIndex, node.Multiplier, node.Visible, search.Path.Count);
 
-            for (int i = 0; i < current.Children.Count; i++)
+            foreach (ulong address in Children(node.Address))
             {
-                UiNode child = Build(current.Children[i], current.Address, i, frame, scale);
-                if (child.Visible && child.Size.X > 0 && child.Size.Y > 0 && child.Contains(point))
+                if (search.Remaining <= 0)
                 {
-                    best = child; // later siblings draw on top, so the last match wins
+                    break;
+                }
+
+                search.Remaining--;
+                Geometry child = ReadGeometry(address, node.Address, frame, search.Scale);
+                if (child.Visible)
+                {
+                    Descend(child, search);
                 }
             }
-
-            if (best is null)
-            {
-                break;
-            }
-
-            chain.Add(best.Address);
-            current = best;
         }
 
-        return chain;
+        search.Path.RemoveAt(search.Path.Count - 1);
     }
 
     /// <summary>
@@ -355,7 +440,14 @@ public sealed class UiTreeReader
     private Frame ChildFrame(UiNode node)
         => new(node.UnscaledPosition, node.ScaleIndex, node.LocalMultiplier, node.Visible, node.Depth + 1);
 
-    private UiNode Build(ulong address, ulong parent, int index, Frame frame, UiScale scale)
+    /// <summary>
+    /// Reads where an element sits, and nothing that costs a string read.
+    /// </summary>
+    /// <remarks>
+    /// The one place the position rules live, shared by the browser's tree and by hit-testing
+    /// - which is what stops the two from drifting into disagreeing about where an element is.
+    /// </remarks>
+    private Geometry ReadGeometry(ulong address, ulong parent, Frame frame, UiScale scale)
     {
         uint flags = _reader.Read<uint>(address + (ulong)_flags);
         byte scaleIndex = _reader.Read<byte>(address + (ulong)_scaleIndex);
@@ -370,23 +462,38 @@ public sealed class UiTreeReader
 
         (float scaleW, float scaleH) = scale.For(scaleIndex, multiplier);
         Vector2 size = ReadVector2(address + (ulong)_unscaledSize);
-        bool selfVisible = (flags & _flagIsVisible) != 0;
+
+        return new Geometry(
+            address,
+            unscaled,
+            relative,
+            new Vector2((unscaled.X * scaleW) + scale.Cull, unscaled.Y * scaleH),
+            new Vector2(size.X * scaleW, size.Y * scaleH),
+            flags,
+            scaleIndex,
+            multiplier,
+            frame.Visible && (flags & _flagIsVisible) != 0);
+    }
+
+    private UiNode Build(ulong address, ulong parent, int index, Frame frame, UiScale scale)
+    {
+        Geometry geometry = ReadGeometry(address, parent, frame, scale);
 
         return new UiNode(
             address,
             parent,
             _reader.ReadStdWString(address + (ulong)_stringId),
             _reader.ReadStdWString(address + (ulong)_text),
-            frame.Visible && selfVisible,
-            selfVisible,
+            geometry.Visible,
+            (geometry.Flags & _flagIsVisible) != 0,
             ChildCount(address),
-            new Vector2((unscaled.X * scaleW) + scale.Cull, unscaled.Y * scaleH),
-            new Vector2(size.X * scaleW, size.Y * scaleH),
-            unscaled,
-            relative,
-            flags,
-            scaleIndex,
-            multiplier,
+            geometry.Position,
+            geometry.Size,
+            geometry.Unscaled,
+            geometry.Relative,
+            geometry.Flags,
+            geometry.ScaleIndex,
+            geometry.Multiplier,
             _reader.ReadPointer(address + (ulong)_itemPtr),
             frame.Depth,
             index,

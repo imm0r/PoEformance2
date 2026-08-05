@@ -243,6 +243,107 @@ public class UiTreeReaderTests
     }
 
     [Fact]
+    public void ATopmostFullScreenLayerDoesNotSwallowThePick()
+    {
+        // The reported fault, and the reason the walk is no longer greedy. The interface has
+        // full-screen transparent layers - a notification host, a tooltip surface - that
+        // contain EVERY point and are drawn last. Taking the topmost match at each level and
+        // descending into it commits to that layer, finds nothing under the cursor inside it,
+        // and reports the layer while the panel actually being pointed at sits in an earlier
+        // sibling. Which branch goes deeper cannot be known without walking both.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, stringId: "GameUi", size: new Vector2(2560, 1600), children: [1, 5])
+            .Add(1, parent: 0, stringId: "panel", size: new Vector2(600, 400), children: [2])
+            .Add(2, parent: 1, stringId: "row", size: new Vector2(600, 60), children: [3])
+            .Add(3, parent: 2, stringId: "slot", size: new Vector2(50, 50), children: [4])
+            .Add(4, parent: 3, stringId: "icon", size: new Vector2(40, 40))
+            // Drawn LAST and covering everything, with nothing under the cursor inside it.
+            .Add(5, parent: 0, stringId: "notification_display", size: new Vector2(2560, 1600));
+
+        List<ulong> chain = new UiTreeReader(tree.Reader, schema)
+            .HitTest(At(0), new Vector2(20, 20), Window());
+
+        Assert.Equal(At(4), chain[^1]);
+        Assert.Equal([At(0), At(1), At(2), At(3), At(4)], chain);
+    }
+
+    [Fact]
+    public void AContainerWithNoSizeIsWalkedThrough()
+    {
+        // Real containers report no size at all - the large map element is one - so a walk
+        // that requires the parent's rectangle to contain the point never reaches their
+        // children, and everything inside them is unpickable.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, size: new Vector2(2560, 1600), children: [1])
+            .Add(1, parent: 0, stringId: "group", size: Vector2.Zero, children: [2])
+            .Add(2, parent: 1, stringId: "button", relative: new Vector2(300, 200), size: new Vector2(80, 30));
+
+        List<ulong> chain = new UiTreeReader(tree.Reader, schema)
+            .HitTest(At(0), new Vector2(320, 210), Window());
+
+        Assert.Equal(At(2), chain[^1]);
+    }
+
+    [Fact]
+    public void ASizedElementAwayFromThePointIsNotWalked()
+    {
+        // The other half of that rule. A panel that does not contain the point cannot have
+        // children that do, so its subtree is skipped - which is what keeps the walk from
+        // being a scan of the whole interface on every pick.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, size: new Vector2(2560, 1600), children: [1])
+            .Add(1, parent: 0, stringId: "elsewhere", relative: new Vector2(1000, 1000),
+                size: new Vector2(200, 200), children: [2])
+            .Add(2, parent: 1, stringId: "inside", size: new Vector2(50, 50));
+
+        List<ulong> chain = new UiTreeReader(tree.Reader, schema)
+            .HitTest(At(0), new Vector2(20, 20), Window());
+
+        Assert.Equal([At(0)], chain);
+    }
+
+    [Fact]
+    public void EqualDepthStillGoesToTheOneDrawnOnTop()
+    {
+        // Deepest first, draw order as the tiebreak - so the rule that was right before is
+        // still right where it applies.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, size: new Vector2(2560, 1600), children: [1, 3])
+            .Add(1, parent: 0, stringId: "below", size: new Vector2(500, 500), children: [2])
+            .Add(2, parent: 1, stringId: "below-leaf", size: new Vector2(100, 100))
+            .Add(3, parent: 0, stringId: "above", size: new Vector2(500, 500), children: [4])
+            .Add(4, parent: 3, stringId: "above-leaf", size: new Vector2(100, 100));
+
+        List<ulong> chain = new UiTreeReader(tree.Reader, schema)
+            .HitTest(At(0), new Vector2(50, 50), Window());
+
+        Assert.Equal(At(4), chain[^1]);
+    }
+
+    [Fact]
+    public void TheBudgetBoundsTheWalk()
+    {
+        // Following the cursor re-runs this every tick, and a pass-through container with a
+        // large subtree would otherwise walk all of it. Running out returns the best found so
+        // far rather than nothing.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, size: new Vector2(2560, 1600), children: [1, 2, 3])
+            .Add(1, parent: 0, size: new Vector2(500, 500))
+            .Add(2, parent: 0, size: new Vector2(500, 500))
+            .Add(3, parent: 0, size: new Vector2(500, 500));
+
+        List<ulong> chain = new UiTreeReader(tree.Reader, schema)
+            .HitTest(At(0), new Vector2(50, 50), Window(), budget: 1);
+
+        Assert.Equal(At(1), chain[^1]);   // only the first child was affordable
+    }
+
+    [Fact]
     public void HiddenElementsAreNotPicked()
     {
         // A closed panel still has its rectangle. Picking it would report an element that is
