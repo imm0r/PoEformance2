@@ -149,4 +149,83 @@ public class TerrainGridTests
 
         Assert.Equal(expectedWidth, width);
     }
+
+    [Fact]
+    public void TheHeightShiftMovesACellInThePicture_AndOnlyWhenAskedFor()
+    {
+        // The overlay draws the outline as one FLAT quad and gets the heights from the
+        // picture, where each cell has been moved diagonally by half its height. The config
+        // page draws the same outline from directly above, where a height means nothing and
+        // the same shift would only skew the map - so it is a choice, not a property.
+        int cells = TerrainGrid.CellsPerTile;
+        int width = 2 * cells;
+        int stride = (width + 1) / 2;
+
+        var packed = new byte[stride * width];
+        Array.Fill(packed, (byte)0x11);   // all walkable, so the border is the outline
+
+        // One tile raised, the rest at ground level.
+        var heights = new float[] { -242f, 0f, 0f, 0f };
+        var grid = new TerrainGrid(packed, stride, width, 2, 2, heights);
+
+        int shift = grid.IsoHeightShift(0, 0);
+        Assert.True(shift < 0);
+
+        OutlineMask flatDrawn = TerrainOutline.Build(grid, maxEdge: 4096, thickness: 1);
+        OutlineMask shifted = TerrainOutline.Build(grid, maxEdge: 4096, thickness: 1, isoHeightShift: true);
+
+        // The corner cell is on the boundary. Without the shift it is drawn where it is;
+        // with it, exactly its own height away, on both axes.
+        Assert.True(flatDrawn.IsSet(0, 0));
+        Assert.False(shifted.IsSet(0, 0));
+        Assert.True(shifted.IsSet(-shift, -shift));
+
+        // ...and a cell on flat ground does not move either way.
+        int far = width - 1;
+        Assert.True(flatDrawn.IsSet(far, far));
+        Assert.True(shifted.IsSet(far, far));
+    }
+
+    [Theory]
+    [InlineData(1, 0f)]     // odd widths sit ON the boundary
+    [InlineData(3, 0f)]
+    [InlineData(5, 0f)]
+    [InlineData(2, 0.5f)]   // even ones cannot, and lean by half a pixel
+    [InlineData(4, 0.5f)]
+    public void AnEvenWidthLeansOffTheBoundaryAndSaysBySoMuch(int thickness, float expectedLeanPixels)
+    {
+        // A line of even width has to take one more pixel on one side than the other, so its
+        // centre lands half a pixel off the boundary it describes - in a FIXED direction,
+        // everywhere on the map, whatever the distance from the player. That is a real
+        // displacement of the drawn line rather than a rounding detail: at a thinning step of
+        // two it is a whole grid cell, and it reads as the outline sitting beside the game's
+        // own line rather than on it.
+        //
+        // Measured as the marked band's centre of mass, which is what an eye comparing it to
+        // a thin line actually sees, against the single column the outline occupies.
+        var rows = new string[21];
+        for (int y = 0; y < rows.Length; y++)
+        {
+            rows[y] = new string('#', 10) + "." + new string('#', 10);
+        }
+
+        OutlineMask mask = TerrainOutline.Build(Grid(rows), maxEdge: 64, thickness);
+
+        double sum = 0;
+        int count = 0;
+        for (int x = 0; x < mask.Width; x++)
+        {
+            if (mask.IsSet(x, 10))
+            {
+                sum += x;
+                count++;
+            }
+        }
+
+        Assert.True(count > 0);
+        Assert.Equal(10 + expectedLeanPixels, sum / count, 3);
+
+        // ...and it is reported in GRID CELLS, because that is what the drawing works in.
+        Assert.Equal(expectedLeanPixels * mask.Step, mask.LeanCells, 3);
+    }
 }

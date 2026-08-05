@@ -5,13 +5,12 @@ using PoEformance.Game.World;
 namespace PoEformance.Core.Tests;
 
 /// <summary>
-/// Ground height per terrain tile, and the patch mesh that exists to make use of it.
+/// Ground height: reading it, and the displacement that draws it without bending anything.
 /// </summary>
 /// <remarks>
-/// The reported fault this answers: the outline sat a little off at the map's edges, and it
-/// moved whenever the player walked up a staircase or a hill. The map transform measures
-/// height against the player, so drawing the whole area at one height is only right while the
-/// ground is flat.
+/// The reported fault this answers: the outline sat a little off, and it moved whenever the
+/// player walked up a staircase or a hill. The map transform measures height against the
+/// player, so drawing the whole area at one height is only right while the ground is flat.
 /// </remarks>
 public class TerrainHeightTests
 {
@@ -37,11 +36,6 @@ public class TerrainHeightTests
 
         Assert.False(grid.HasHeights);
         Assert.Equal(0f, grid.HeightAt(10, 10));
-
-        // ...which is what makes the mesh collapse back to the single quad it used to be.
-        TerrainMesh mesh = TerrainMesh.For(grid, maxPatches: 96, grid.Width, grid.Height);
-        Assert.Equal(1, mesh.PatchesX);
-        Assert.Equal(1, mesh.PatchesY);
     }
 
     [Fact]
@@ -90,64 +84,6 @@ public class TerrainHeightTests
         Assert.Equal(1f, grid.HeightAt(-50, -50));
         Assert.Equal(4f, grid.HeightAt(grid.Width, grid.Height));
         Assert.Equal(4f, grid.HeightAt(100_000, 100_000));
-    }
-
-    [Fact]
-    public void TheMeshSpansTheWholeArea()
-    {
-        // The one that matters. Stepping by a rounded-down patch width leaves the right and
-        // bottom of the area undrawn - up to a whole patch of it - which is invisible in the
-        // middle of a map and lands exactly where the edges are, the place the outline is
-        // being compared against the game's own.
-        TerrainGrid grid = Ground(7, 5, new float[35]);
-        TerrainMesh mesh = TerrainMesh.For(grid, maxPatches: 96, grid.Width, grid.Height);
-
-        Assert.Equal(0, mesh.EdgeX(0));
-        Assert.Equal(0, mesh.EdgeY(0));
-        Assert.Equal(grid.Width, mesh.EdgeX(mesh.PatchesX));
-        Assert.Equal(grid.Height, mesh.EdgeY(mesh.PatchesY));
-
-        // ...and the texture is stretched over exactly that span, corner to corner.
-        Assert.Equal(0f, mesh.U(0));
-        Assert.Equal(1f, mesh.U(mesh.PatchesX));
-        Assert.Equal(1f, mesh.V(mesh.PatchesY));
-    }
-
-    [Fact]
-    public void PatchEdgesNeverGoBackwards()
-    {
-        // A patch whose right edge is left of its left edge is a quad turned inside out, and
-        // it draws as a torn triangle rather than as nothing at all.
-        TerrainGrid grid = Ground(37, 11, new float[37 * 11]);
-        TerrainMesh mesh = TerrainMesh.For(grid, maxPatches: 96, grid.Width, grid.Height);
-
-        for (int i = 0; i < mesh.PatchesX; i++)
-        {
-            Assert.True(mesh.EdgeX(i) < mesh.EdgeX(i + 1), $"patch {i} is empty or reversed");
-        }
-
-        for (int i = 0; i < mesh.PatchesY; i++)
-        {
-            Assert.True(mesh.EdgeY(i) < mesh.EdgeY(i + 1), $"row {i} is empty or reversed");
-        }
-    }
-
-    [Fact]
-    public void OnePatchPerTile_UntilTheCap()
-    {
-        // Tile granularity is the point: that is the resolution the heights arrive at.
-        TerrainGrid small = Ground(9, 4, new float[36]);
-        TerrainMesh mesh = TerrainMesh.For(small, maxPatches: 96, small.Width, small.Height);
-        Assert.Equal(9, mesh.PatchesX);
-        Assert.Equal(4, mesh.PatchesY);
-
-        // A large area would otherwise cost tens of thousands of quads for a correction
-        // measured in pixels, so the count is capped - and the span still reaches the edge.
-        TerrainGrid huge = Ground(300, 200, new float[60_000]);
-        TerrainMesh capped = TerrainMesh.For(huge, maxPatches: 96, huge.Width, huge.Height);
-        Assert.Equal(96, capped.PatchesX);
-        Assert.Equal(96, capped.PatchesY);
-        Assert.Equal(huge.Width, capped.EdgeX(capped.PatchesX));
     }
 
     /// <summary>The map as it is drawn on: a fixed view, so only the heights vary.</summary>
@@ -210,19 +146,59 @@ public class TerrainHeightTests
         Assert.Equal(wallB.Y, wallBSame.Y, 3);     // its neighbour did not
     }
 
-    [Fact]
-    public void TheMeshSpansWhatTheTextureCovers_NotTheGrid()
+    [Theory]
+    [InlineData(0f)]
+    [InlineData(-242f)]    // the top of the hill the owner measured
+    [InlineData(-110f)]
+    [InlineData(87f)]      // ground BELOW the player, to pin the sign
+    public void MovingACellDiagonallyIsTheSameAsGivingItAHeight(float groundHeight)
     {
-        // Thinning floors the pixel count, so a big grid's texture stops a cell or two short
-        // of it. Spanning the grid's full width instead stretches the image over ground it
-        // has no pixels for, which slides the outline by that difference.
-        TerrainGrid grid = Ground(200, 200, new float[40_000]);
-        OutlineMask mask = TerrainOutline.Build(grid, maxEdge: 2048);
+        // The identity the whole drawing rests on, and the reason the map needs no mesh.
+        //
+        //     screen = ((dx - dy) * cos,  (dz - (dx + dy)) * sin)
+        //
+        // Move a point the same distance along BOTH grid axes and the x term cancels while
+        // the y term counts it twice - so a height is exactly a displacement of half that
+        // height along the diagonal. Bake it into the picture and the picture can be drawn
+        // perfectly flat, exact for every cell rather than for a mesh's corners.
+        MapView map = Map();
 
-        int coverX = Math.Min(grid.Width, mask.Width * mask.Step);
-        Assert.True(coverX < grid.Width, "fixture is too small to exercise thinning");
+        const float playerX = 5000f;
+        const float playerY = 4000f;
+        const float playerGround = -110f;
+        const float worldX = 7000f;
+        const float worldY = 3000f;
 
-        TerrainMesh mesh = TerrainMesh.For(grid, maxPatches: 96, coverX, coverX);
-        Assert.Equal(coverX, mesh.EdgeX(mesh.PatchesX));
+        // What the game does: the point at its real height.
+        Vector2 withHeight = map.Project(worldX, worldY, groundHeight, playerX, playerY, playerGround);
+
+        // What this does: the point moved by half its height along the diagonal, drawn flat
+        // against the player's own ground.
+        float shift = groundHeight / (2f * MapView.HeightToGrid);
+        Vector2 displaced = map.Project(
+            worldX - (shift * MapView.WorldToGrid),
+            worldY - (shift * MapView.WorldToGrid),
+            0f, playerX, playerY, playerGround);
+
+        Assert.Equal(withHeight.X, displaced.X, 2);
+        Assert.Equal(withHeight.Y, displaced.Y, 2);
+    }
+
+    [Fact]
+    public void TheDisplacementIsWholeCellsAndCarriesTheGamesSign()
+    {
+        // Whole cells because the picture has no finer resolution to put it at, and the sign
+        // matters: this game counts ground height DOWNWARD, so higher ground is a more
+        // negative number - which has to end up drawn HIGHER on the map, not lower.
+        TerrainGrid uphill = Ground(2, 2, [-242f, -242f, -242f, -242f]);
+        TerrainGrid flat = Ground(2, 2, [0f, 0f, 0f, 0f]);
+
+        int shift = uphill.IsoHeightShift(5, 5);
+        Assert.Equal((int)(-242f / (2f * MapView.HeightToGrid)), shift);
+        Assert.True(shift < 0, "raised ground displaces the other way");
+        Assert.Equal(0, flat.IsoHeightShift(5, 5));
+
+        // ...and with no heights at all, nothing moves.
+        Assert.Equal(0, Ground(2, 2).IsoHeightShift(5, 5));
     }
 }

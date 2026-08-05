@@ -5,7 +5,19 @@ namespace PoEformance.Game.World;
 /// </summary>
 /// <param name="Cells">One byte per pixel: 1 on the boundary, 0 elsewhere.</param>
 /// <param name="Step">How many grid cells each pixel covers.</param>
-public sealed record OutlineMask(byte[] Cells, int Width, int Height, int Step)
+/// <param name="LeanCells">
+/// How far the drawn line sits from the boundary it describes, in grid cells.
+/// </param>
+/// <remarks>
+/// The lean exists because an EVEN number of pixels cannot be centred on one: the widened
+/// line has to take one more pixel on one side than the other, so its centre lands half a
+/// pixel off the boundary - and at a thinning step of two, half a pixel is a whole grid cell,
+/// in a fixed direction, everywhere on the map.
+///
+/// Reported rather than hidden so whoever DRAWS it can put it back, which is the only place
+/// the correction can be made without changing what the pixels mean.
+/// </remarks>
+public sealed record OutlineMask(byte[] Cells, int Width, int Height, int Step, float LeanCells = 0f)
 {
     /// <summary>True when this pixel is on the boundary.</summary>
     public bool IsSet(int x, int y)
@@ -36,7 +48,15 @@ public static class TerrainOutline
     /// on screen whatever the area's size - thickening before would be scaled away again on
     /// a large map and doubled on a small one.
     /// </param>
-    public static OutlineMask Build(TerrainGrid grid, int maxEdge, int thickness = 1)
+    /// <param name="isoHeightShift">
+    /// Bakes each cell's ground height into the picture as a diagonal displacement, so a
+    /// perfectly FLAT drawing of it shows every wall at its real elevation - see
+    /// <see cref="TerrainGrid.IsoHeightShift"/>. For the isometric overlay only: the config
+    /// page draws the same outline from directly above, where a height means nothing and this
+    /// would only skew it.
+    /// </param>
+    public static OutlineMask Build(
+        TerrainGrid grid, int maxEdge, int thickness = 1, bool isoHeightShift = false)
     {
         ArgumentNullException.ThrowIfNull(grid);
         ArgumentOutOfRangeException.ThrowIfLessThan(maxEdge, 1);
@@ -52,16 +72,39 @@ public static class TerrainOutline
         byte[] full = grid.BuildOutline();
         var cells = new byte[width * height];
 
-        for (int y = 0; y < height; y++)
+        // Scattered from the cells rather than gathered per block, because a height shift
+        // MOVES a cell: where it ends up cannot be known from the block it started in. With
+        // no shift the two are the same thing - a block is marked when any of its cells is on
+        // the boundary, which is what keeps a one-cell line from thinning into dashes.
+        for (int y = 0; y < grid.Height; y++)
         {
-            int row = y * width;
-            for (int x = 0; x < width; x++)
+            int row = y * grid.Width;
+            for (int x = 0; x < grid.Width; x++)
             {
-                cells[row + x] = (byte)(BlockHasBoundary(full, grid.Width, grid.Height, x * step, y * step, step) ? 1 : 0);
+                if (full[row + x] == 0)
+                {
+                    continue;
+                }
+
+                int shift = isoHeightShift ? grid.IsoHeightShift(x, y) : 0;
+                int bx = (x - shift) / step;
+                int by = (y - shift) / step;
+
+                // Off the picture: a wall high enough to displace past the edge is dropped
+                // rather than wrapped, which would draw it somewhere it is not.
+                if (x - shift >= 0 && y - shift >= 0 && bx < width && by < height)
+                {
+                    cells[(by * width) + bx] = 1;
+                }
             }
         }
 
-        return new OutlineMask(Widen(cells, width, height, thickness), width, height, step);
+        // An even width cannot be centred on a pixel, so the widened line leans by half of
+        // one - which at a thinning step of two is a whole grid cell, in a fixed direction,
+        // everywhere. Reported so the drawing can put it back.
+        float lean = Math.Clamp(thickness, 1, 8) % 2 == 0 ? 0.5f * step : 0f;
+
+        return new OutlineMask(Widen(cells, width, height, thickness), width, height, step, lean);
     }
 
     /// <summary>

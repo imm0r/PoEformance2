@@ -107,6 +107,27 @@ public sealed class TerrainGrid
     /// </remarks>
     public float HeightAt(int cellX, int cellY) => _heights?.HeightAt(cellX, cellY) ?? 0f;
 
+    /// <summary>
+    /// How far to move a cell, in cells, so a FLAT drawing shows it at its real height.
+    /// </summary>
+    /// <remarks>
+    /// GameHelper2's trick, and it is exact rather than an approximation. The map transform
+    ///     screen = ((dx - dy) * cos, (dz - (dx + dy)) * sin)
+    /// is unchanged in x by moving a point the same distance along BOTH grid axes - the two
+    /// cancel - while in y the shift counts twice. So a height can be expressed as a
+    /// displacement of 'height / 2' grid units along the diagonal, baked into the picture
+    /// once, and the picture then drawn perfectly flat.
+    ///
+    /// The alternative is a mesh whose corners carry heights, which is what this replaced:
+    /// it costs a projection per corner every frame, and it is only exact AT the corners -
+    /// between them the height is interpolated, so a cliff edge between two corners is drawn
+    /// as a ramp. Displacing each cell is per-CELL exact and costs nothing per frame.
+    ///
+    /// Whole cells, because the picture has no finer resolution to put it at.
+    /// </remarks>
+    public int IsoHeightShift(int cellX, int cellY)
+        => _heights is null ? 0 : (int)(_heights.HeightAt(cellX, cellY) / (2f * Ui.MapView.HeightToGrid));
+
     /// <summary>Describes the grid and any padding found, so a mismatch is visible.</summary>
     public string Describe()
         => Width == StoredWidth && Height == StoredHeight
