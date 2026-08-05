@@ -10,6 +10,16 @@
     <RootNamespace>PoEformance.App</RootNamespace>
     <PublishAot>true</PublishAot>
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+
+    <!-- IL2104/IL3053 are ILC's PER-ASSEMBLY ROLLUPS: "assembly X produced trim/AOT
+         warnings", raised for EXTERNAL assemblies we cannot edit (first offender:
+         DirectN.Extensions, whose author nonetheless ships working AOT builds of the same
+         stack). With TreatWarningsAsErrors they killed an otherwise clean publish - the
+         first AOT CI run failed on exactly these two lines while every assembly compiled.
+         Exempting ONLY the rollups keeps every individually-coded IL2xxx/IL3xxx warning in
+         OUR projects a hard error; what it accepts is that a dependency's reflective
+         corners are proven at runtime (the config-window smoke run) instead of at build time. -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);IL2104;IL3053</WarningsNotAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoEformance.Overlay\PoEformance.Overlay.csproj" />
