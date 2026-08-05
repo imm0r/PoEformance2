@@ -8,7 +8,7 @@ using PoEformance.Game.World;
 namespace PoEformance.Overlay;
 
 /// <summary>
-/// Marks the places worth walking to on the game's map, and draws the way to one of them.
+/// Marks the places worth walking to on the game's map, and draws the way to several of them.
 /// </summary>
 /// <remarks>
 /// Separate from the entity dots because these are not the same thing being drawn for the
@@ -16,8 +16,13 @@ namespace PoEformance.Overlay;
 /// an exit is a landmark that wants a name and stays put for the whole map. Mixing them left
 /// the exits indistinguishable among forty dots, which is the state this exists to fix.
 ///
-/// The route is found on the reader thread by <see cref="RoutePlanner"/>. Here it is only
-/// projected and drawn - each corner at its own ground height, so the line follows the floor
+/// Several routes at once, each in its OWN colour, and the colour is what makes that useful
+/// rather than a tangle: a route is only readable if you can tell which end it belongs to, so
+/// the destination's marker and label take the route's colour as well. Two exits drawn in one
+/// colour would be two lines and a guess.
+///
+/// The routes are found on the reader thread by <see cref="RoutePlanner"/>. Here they are only
+/// projected and drawn - each corner at its own ground height, so a line follows the floor
 /// over a hill rather than cutting through it.
 /// </remarks>
 [SupportedOSPlatform("windows")]
@@ -25,7 +30,28 @@ public sealed class PoiLayer
 {
     private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
 
+    /// <summary>
+    /// One colour per route, chosen to stay apart on a dark, busy map.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately not a hue sweep: half of one lands on the game's own map colours or on the
+    /// terrain outline, and a route the same colour as a wall is worse than no route.
+    /// </remarks>
+    private static readonly uint[] RouteColours =
+    [
+        Pack(0.35f, 1f, 0.75f),    // mint
+        Pack(1f, 0.55f, 0.85f),    // pink
+        Pack(1f, 0.75f, 0.3f),     // amber
+        Pack(0.55f, 0.8f, 1f),     // sky
+        Pack(0.8f, 1f, 0.4f),      // lime
+    ];
+
     private readonly RoutePlanner _planner;
+
+    // Which colour each destination holds. Kept BY ADDRESS rather than by position, so
+    // removing one route leaves the others' colours alone - a colour that moved when a
+    // neighbour was dropped would make the map lie about which line goes where.
+    private readonly Dictionary<ulong, int> _slots = [];
 
     /// <summary>Which kinds are marked. Everything that is a destination rather than a thing.</summary>
     public HashSet<PoiKind> DrawnKinds { get; } =
@@ -38,8 +64,11 @@ public sealed class PoiLayer
     /// <summary>Draw a name next to each marker.</summary>
     public bool ShowLabels { get; set; } = true;
 
-    /// <summary>Draw the walkable route to the chosen point.</summary>
-    public bool ShowRoute { get; set; } = true;
+    /// <summary>Draw the walkable routes to the chosen places.</summary>
+    public bool ShowRoutes { get; set; } = true;
+
+    /// <summary>Draw chevrons along each route, pointing the way it runs.</summary>
+    public bool ShowArrows { get; set; } = true;
 
     /// <summary>Whether the picker window is on screen.</summary>
     public bool ShowPicker { get; set; }
@@ -65,18 +94,60 @@ public sealed class PoiLayer
         _ => Pack(0.8f, 0.8f, 0.8f),
     };
 
-    /// <summary>Draws the markers and the route onto whichever map is open.</summary>
+    /// <summary>
+    /// The colour a destination's route is drawn in, held for as long as it is a destination.
+    /// </summary>
+    /// <remarks>
+    /// Assigned to the lowest FREE slot rather than by position in the list, so dropping one
+    /// route does not recolour the rest.
+    /// </remarks>
+    private uint RouteColour(ulong address)
+    {
+        if (!_slots.TryGetValue(address, out int slot))
+        {
+            slot = 0;
+            while (slot < RouteColours.Length && _slots.ContainsValue(slot))
+            {
+                slot++;
+            }
+
+            _slots[address] = slot % RouteColours.Length;
+            slot = _slots[address];
+        }
+
+        return RouteColours[slot];
+    }
+
+    /// <summary>Drops colour slots for places no longer routed to, so they can be reused.</summary>
+    private void ReleaseUnused()
+    {
+        if (_slots.Count == 0)
+        {
+            return;
+        }
+
+        foreach (ulong address in _slots.Keys.Where(a => !_planner.IsTarget(a)).ToList())
+        {
+            _slots.Remove(address);
+        }
+    }
+
+    /// <summary>Draws the markers and the routes onto whichever map is open.</summary>
     public void DrawOnMap(ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(player);
 
-        if (ShowRoute)
+        ReleaseUnused();
+
+        if (ShowRoutes)
         {
-            DrawRoute(draw, map, snapshot, player);
+            foreach (RouteView route in _planner.Routes)
+            {
+                DrawRoute(draw, map, snapshot, player, route, RouteColour(route.Target));
+            }
         }
 
-        ulong target = _planner.Target;
         float radius = map.IsLargeMap ? 5f : 3.5f;
 
         foreach (WorldEntity poi in snapshot.Entities)
@@ -95,14 +166,16 @@ public sealed class PoiLayer
                 continue;
             }
 
-            uint colour = ColourFor(poi.Poi);
-            bool chosen = poi.Address == target;
+            // A destination takes its ROUTE's colour, which is the whole reason several
+            // routes can be read at once: the line and the end it leads to match.
+            bool routed = _planner.IsTarget(poi.Address);
+            uint colour = routed ? RouteColour(poi.Address) : ColourFor(poi.Poi);
 
             // A diamond, not a circle: the entity dots are circles, and the difference has to
             // survive being three pixels across on a minimap.
             Diamond(draw, at, radius, colour);
 
-            if (chosen)
+            if (routed)
             {
                 draw.AddCircle(at, radius + 4f, colour, 16, 2f);
             }
@@ -115,23 +188,23 @@ public sealed class PoiLayer
     }
 
     /// <summary>
-    /// Draws the route as a line that follows the ground.
+    /// Draws one route as a line that follows the ground, with chevrons along it.
     /// </summary>
     /// <remarks>
     /// Each corner is projected at ITS OWN ground height rather than the player's. The route
     /// crosses hills, and a line drawn at one height cuts through them - which on a map that
     /// otherwise lines up would read as the route going through a wall.
     /// </remarks>
-    private void DrawRoute(ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player)
+    private void DrawRoute(
+        ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player,
+        RouteView route, uint colour)
     {
-        RouteView route = _planner.View;
         if (route.Cells.Count < 2)
         {
             return;
         }
 
         TerrainGrid? grid = snapshot.Terrain;
-        uint colour = Pack(0.35f, 1f, 0.75f, 0.9f);
 
         Vector2 Project((int X, int Y) cell)
         {
@@ -141,15 +214,67 @@ public sealed class PoiLayer
                 player.WorldX, player.WorldY, player.TerrainHeight);
         }
 
+        float thickness = map.IsLargeMap ? 2.5f : 1.5f;
+        float sinceArrow = ArrowSpacing * 0.4f;   // one early, so a short route gets one at all
+
         Vector2 previous = Project(route.Cells[0]);
         for (int i = 1; i < route.Cells.Count; i++)
         {
             Vector2 next = Project(route.Cells[i]);
-            draw.AddLine(previous, next, colour, map.IsLargeMap ? 2.5f : 1.5f);
+            draw.AddLine(previous, next, colour, thickness);
+
+            if (ShowArrows && map.IsLargeMap)
+            {
+                sinceArrow = DrawArrows(draw, previous, next, colour, sinceArrow);
+            }
+
             previous = next;
         }
 
         draw.AddCircleFilled(previous, map.IsLargeMap ? 4f : 3f, colour);
+    }
+
+    /// <summary>Screen pixels between direction chevrons.</summary>
+    private const float ArrowSpacing = 90f;
+
+    /// <summary>
+    /// Places chevrons along one segment, and returns how far past the last one it ended.
+    /// </summary>
+    /// <remarks>
+    /// Spaced by SCREEN distance, carried across segments. Spacing them by path points instead
+    /// puts none on a long straight run - which is exactly where the direction is least
+    /// obvious - and a cluster at every corner, where it is already clear.
+    /// </remarks>
+    private static float DrawArrows(ImDrawListPtr draw, Vector2 from, Vector2 to, uint colour, float since)
+    {
+        Vector2 along = to - from;
+        float length = along.Length();
+        if (length < 0.01f)
+        {
+            return since;
+        }
+
+        Vector2 direction = along / length;
+
+        for (float at = ArrowSpacing - since; at < length; at += ArrowSpacing)
+        {
+            Arrow(draw, from + (direction * at), direction, colour);
+            since = 0f;
+        }
+
+        return since + (length % ArrowSpacing);
+    }
+
+    /// <summary>A chevron pointing the way the route runs.</summary>
+    private static void Arrow(ImDrawListPtr draw, Vector2 at, Vector2 direction, uint colour)
+    {
+        const float size = 6f;
+        var side = new Vector2(-direction.Y, direction.X);
+        Vector2 tip = at + (direction * size);
+        Vector2 left = at - (direction * size * 0.5f) + (side * size * 0.7f);
+        Vector2 right = at - (direction * size * 0.5f) - (side * size * 0.7f);
+
+        draw.AddTriangleFilled(tip, left, right, colour);
     }
 
     /// <summary>
@@ -167,7 +292,7 @@ public sealed class PoiLayer
             return;
         }
 
-        ImGui.SetNextWindowSize(new Vector2(340, 320), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSize(new Vector2(360, 340), ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowPos(new Vector2(40, 320), ImGuiCond.FirstUseEver);
 
         bool open = ShowPicker;
@@ -189,25 +314,27 @@ public sealed class PoiLayer
 
     private void DrawPickerBody(WorldSnapshot snapshot, WorldEntity player)
     {
-        RouteView route = _planner.View;
-        ulong target = _planner.Target;
+        IReadOnlyList<RouteTarget> targets = _planner.Targets;
 
-        if (target != 0)
+        if (targets.Count > 0)
         {
-            string distance = route.Cells.Count >= 2
-                ? $"{route.LengthWorld / MapView.WorldToGrid:F0} cells to walk"
-                : route.Status.Length > 0 ? route.Status : "finding a way...";
-
-            ImGui.TextColored(new Vector4(0.35f, 1f, 0.75f, 1f), $"routing: {distance}");
+            ImGui.TextColored(DimText, $"{targets.Count} of {RoutePlanner.MaxRoutes} routes");
             ImGui.SameLine();
-            if (ImGui.SmallButton("clear"))
+            if (ImGui.SmallButton("clear all"))
             {
                 _planner.Clear();
+            }
+
+            bool arrows = ShowArrows;
+            ImGui.SameLine();
+            if (ImGui.Checkbox("arrows", ref arrows))
+            {
+                ShowArrows = arrows;
             }
         }
         else
         {
-            ImGui.TextColored(DimText, "click a place to draw the way there");
+            ImGui.TextColored(DimText, "click places to draw the way there - several at once");
         }
 
         ImGui.Separator();
@@ -224,21 +351,31 @@ public sealed class PoiLayer
 
         foreach (WorldEntity place in places)
         {
-            float away = Distance(place, player) / MapView.WorldToGrid;
-            ImGui.PushStyleColor(ImGuiCol.Text, ImGui.ColorConvertU32ToFloat4(ColourFor(place.Poi)));
+            bool routed = _planner.IsTarget(place.Address);
+            RouteView? route = routed ? _planner.For(place.Address) : null;
 
-            // ### rather than ##: the label is built from a game path and everything after a
-            // ## would be read as the identity, so two places could collapse into one row.
-            bool clicked = ImGui.Selectable(
-                $"{place.PoiName}  -  {away:F0}###{place.Address:X}", place.Address == target);
+            // The WALK when it is known, the straight line otherwise. Different numbers, and
+            // the difference is the point - a wall between here and there is exactly what a
+            // straight line cannot show.
+            string away = route is { Cells.Count: >= 2 }
+                ? $"{route.LengthCells:F0} walk"
+                : route is not null && route.Status.Length > 0
+                    ? route.Status
+                    : $"{Distance(place, player) / MapView.WorldToGrid:F0} direct";
+
+            ImGui.PushStyleColor(
+                ImGuiCol.Text,
+                ImGui.ColorConvertU32ToFloat4(routed ? RouteColour(place.Address) : ColourFor(place.Poi)));
+
+            // ### rather than ##: the label is built from game data and everything after a ##
+            // would be read as the identity, so two places could collapse into one row.
+            bool clicked = ImGui.Selectable($"{place.PoiName}  -  {away}###{place.Address:X}", routed);
 
             ImGui.PopStyleColor();
 
             if (clicked)
             {
-                _planner.Request(place.Address == target
-                    ? RouteRequest.None
-                    : new RouteRequest(place.Address, place.WorldX, place.WorldY));
+                _planner.Toggle(place.Address, place.WorldX, place.WorldY);
             }
         }
     }

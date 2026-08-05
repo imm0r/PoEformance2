@@ -41,8 +41,8 @@ public class RoutePlannerTests
         return new WorldSnapshot(true, player, [player], new float[16], Terrain: grid, AreaHash: area);
     }
 
-    private static RouteRequest To(int cellX, int cellY)
-        => new(Target, cellX * MapView.WorldToGrid, cellY * MapView.WorldToGrid);
+    private static RouteRequest To(int cellX, int cellY, ulong target = Target)
+        => new([new RouteTarget(target, cellX * MapView.WorldToGrid, cellY * MapView.WorldToGrid)]);
 
     [Fact]
     public void WithNoDestinationThereIsNoRoute()
@@ -50,8 +50,8 @@ public class RoutePlannerTests
         var planner = new RoutePlanner();
         planner.Service(Snapshot(Grid("....", "...."), 0, 0), 1000);
 
-        Assert.Empty(planner.View.Cells);
-        Assert.Equal(0UL, planner.Target);
+        Assert.Empty(planner.Routes);
+        Assert.Empty(planner.Targets);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class RoutePlannerTests
         planner.Request(To(9, 2));
         planner.Service(Snapshot(grid, 0, 0), 1000);
 
-        RouteView route = planner.View;
+        RouteView route = Assert.Single(planner.Routes);
         Assert.Equal(Target, route.Target);
         Assert.Equal((0, 0), route.Cells[0]);
         Assert.Equal((9, 2), route.Cells[^1]);
@@ -90,8 +90,9 @@ public class RoutePlannerTests
         planner.Request(To(9, 2));
         planner.Service(Snapshot(grid, 0, 0), 1000);
 
-        Assert.Empty(planner.View.Cells);
-        Assert.Equal("no way there", planner.View.Status);
+        RouteView route = Assert.Single(planner.Routes);
+        Assert.Empty(route.Cells);
+        Assert.Equal("no way there", route.Status);
     }
 
     [Fact]
@@ -106,10 +107,10 @@ public class RoutePlannerTests
         planner.Request(To(9, 2));
         planner.Service(Snapshot(grid, 0, 0), 1000);
 
-        RouteView first = planner.View;
+        IReadOnlyList<RouteView> first = planner.Routes;
         planner.Service(Snapshot(grid, 0, 0), 2000);
 
-        Assert.Same(first, planner.View);
+        Assert.Same(first, planner.Routes);
     }
 
     [Fact]
@@ -123,10 +124,10 @@ public class RoutePlannerTests
         var planner = new RoutePlanner();
         planner.Request(To(9, 2));
         planner.Service(Snapshot(grid, 0, 0), 1000);
-        Assert.Equal((0, 0), planner.View.Cells[0]);
+        Assert.Equal((0, 0), planner.Routes[0].Cells[0]);
 
         planner.Service(Snapshot(grid, 8, 0), 2000);
-        Assert.Equal((8, 0), planner.View.Cells[0]);
+        Assert.Equal((8, 0), planner.Routes[0].Cells[0]);
     }
 
     [Fact]
@@ -137,11 +138,82 @@ public class RoutePlannerTests
         var planner = new RoutePlanner();
         planner.Request(To(3, 1));
         planner.Service(Snapshot(grid, 0, 0), 1000);
-        Assert.NotEmpty(planner.View.Cells);
+        Assert.NotEmpty(planner.Routes);
 
         planner.Clear();
-        Assert.Empty(planner.View.Cells);
-        Assert.Equal(0UL, planner.Target);
+        Assert.Empty(planner.Routes);
+        Assert.Empty(planner.Targets);
+    }
+
+    [Fact]
+    public void SeveralPlacesAreRoutedToAtOnce()
+    {
+        // The reason for having more than one: which exit is actually closer THROUGH the
+        // walls is a question a straight line cannot answer, and two drawn routes answer at
+        // a glance.
+        TerrainGrid grid = Grid(
+            "..........",
+            ".########.",
+            "..........");
+
+        var planner = new RoutePlanner();
+        planner.Toggle(0xAAAA, 9 * MapView.WorldToGrid, 0);
+        planner.Toggle(0xBBBB, 9 * MapView.WorldToGrid, 2 * MapView.WorldToGrid);
+        planner.Service(Snapshot(grid, 0, 0), 1000);
+
+        Assert.Equal(2, planner.Routes.Count);
+        Assert.Equal((9, 0), planner.For(0xAAAA)!.Cells[^1]);
+        Assert.Equal((9, 2), planner.For(0xBBBB)!.Cells[^1]);
+
+        // The one that has to go around the wall is the longer walk, though the straight-line
+        // distance is nearly the same - which is the whole point of drawing it.
+        Assert.True(planner.For(0xBBBB)!.LengthCells > planner.For(0xAAAA)!.LengthCells);
+    }
+
+    [Fact]
+    public void ChoosingAPlaceAgainDropsIt()
+    {
+        TerrainGrid grid = Grid("....", "....");
+        var planner = new RoutePlanner();
+
+        planner.Toggle(0xAAAA, 3 * MapView.WorldToGrid, 0);
+        Assert.True(planner.IsTarget(0xAAAA));
+
+        planner.Toggle(0xAAAA, 3 * MapView.WorldToGrid, 0);
+        Assert.False(planner.IsTarget(0xAAAA));
+    }
+
+    [Fact]
+    public void PastTheLimitTheOldestGivesWay()
+    {
+        // Every route is its own search, re-run whenever the player moves, so the count is a
+        // bound on WORK and not just on clutter. Dropping the oldest keeps a click doing
+        // something rather than silently refusing.
+        var planner = new RoutePlanner();
+        for (int i = 0; i < RoutePlanner.MaxRoutes + 2; i++)
+        {
+            planner.Toggle((ulong)(0x1000 + i), i * MapView.WorldToGrid, 0);
+        }
+
+        Assert.Equal(RoutePlanner.MaxRoutes, planner.Targets.Count);
+        Assert.False(planner.IsTarget(0x1000));                       // the first one went
+        Assert.True(planner.IsTarget((ulong)(0x1000 + RoutePlanner.MaxRoutes + 1)));
+    }
+
+    [Fact]
+    public void ChoosingAnotherPlaceLeavesTheOthersInOrder()
+    {
+        // Order is what the colours are assigned from, so a new route must not renumber the
+        // existing ones - a line that changed colour when a neighbour was added would make
+        // the map lie about which route leads where.
+        var planner = new RoutePlanner();
+        planner.Toggle(0xAAAA, 0, 0);
+        planner.Toggle(0xBBBB, 0, 0);
+        planner.Toggle(0xCCCC, 0, 0);
+
+        planner.Toggle(0xBBBB, 0, 0);   // drop the middle one
+
+        Assert.Equal([0xAAAA, 0xCCCC], planner.Targets.Select(t => t.Target));
     }
 
     [Fact]
@@ -155,7 +227,6 @@ public class RoutePlannerTests
         var player = new WorldEntity(0, 0x1000, "Metadata/Characters/Int/IntFourb", EntityKind.Player, 0, 0, 0);
         planner.Service(new WorldSnapshot(true, player, [player], new float[16]), 1000);
 
-        Assert.Empty(planner.View.Cells);
-        Assert.Equal("no terrain yet", planner.View.Status);
+        Assert.Equal("no terrain yet", Assert.Single(planner.Routes).Status);
     }
 }
