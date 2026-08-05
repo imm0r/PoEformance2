@@ -114,4 +114,39 @@ public class TerrainGridTests
         byte[] outline = Grid("####", "####").BuildOutline();
         Assert.All(outline, cell => Assert.Equal(0, cell));
     }
+
+    [Theory]
+    [InlineData(1, 1)]
+    [InlineData(2, 2)]
+    [InlineData(3, 3)]
+    [InlineData(4, 4)]
+    [InlineData(5, 5)]
+    public void ThicknessIsTheLineWidthInPixels(int thickness, int expectedWidth)
+    {
+        // The setting says 1 to 6, so it had better mean 1 to 6. Grown as a RADIUS around
+        // each pixel it can only make odd widths - 1, 3, 5 - and the scale then skips the
+        // value most people actually want, which is exactly how it was reported: one too
+        // thin and two already too thick, with nothing in between because there was nothing.
+        //
+        // A single walkable column in a solid field: its outline is that one column, so the
+        // widened line's width is measurable directly.
+        var rows = new string[21];
+        for (int y = 0; y < rows.Length; y++)
+        {
+            rows[y] = new string('#', 10) + "." + new string('#', 10);
+        }
+
+        OutlineMask mask = TerrainOutline.Build(Grid(rows), maxEdge: 64, thickness);
+
+        int width = 0;
+        for (int x = 0; x < mask.Width; x++)
+        {
+            if (mask.IsSet(x, 10))
+            {
+                width++;
+            }
+        }
+
+        Assert.Equal(expectedWidth, width);
+    }
 }

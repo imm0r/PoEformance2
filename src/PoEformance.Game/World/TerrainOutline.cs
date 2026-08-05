@@ -64,14 +64,26 @@ public static class TerrainOutline
         return new OutlineMask(Widen(cells, width, height, thickness), width, height, step);
     }
 
-    /// <summary>Grows the line to the requested width, leaving it centred on the boundary.</summary>
+    /// <summary>
+    /// Grows the line to exactly <paramref name="thickness"/> pixels.
+    /// </summary>
+    /// <remarks>
+    /// The window is thickness wide, NOT a radius around each pixel. A radius grows the line
+    /// in both directions, so it can only ever produce odd widths - 1, 3, 5 - and a setting
+    /// labelled 1 to 6 that actually steps 1, 3, 5, 7 skips exactly the value most people
+    /// want. Even widths cannot be centred on a pixel, so they lean by half a pixel; that is
+    /// what makes 2 available at all.
+    /// </remarks>
     private static byte[] Widen(byte[] cells, int width, int height, int thickness)
     {
-        int radius = Math.Clamp(thickness, 1, 8) - 1;
-        if (radius <= 0)
+        int span = Math.Clamp(thickness, 1, 8);
+        if (span <= 1)
         {
             return cells;
         }
+
+        int from = -((span - 1) / 2);
+        int to = from + span - 1;
 
         var widened = new byte[cells.Length];
         for (int y = 0; y < height; y++)
@@ -83,7 +95,7 @@ public static class TerrainOutline
                     continue;
                 }
 
-                for (int dy = -radius; dy <= radius; dy++)
+                for (int dy = from; dy <= to; dy++)
                 {
                     int ny = y + dy;
                     if (ny < 0 || ny >= height)
@@ -91,7 +103,7 @@ public static class TerrainOutline
                         continue;
                     }
 
-                    for (int dx = -radius; dx <= radius; dx++)
+                    for (int dx = from; dx <= to; dx++)
                     {
                         int nx = x + dx;
                         if (nx >= 0 && nx < width)

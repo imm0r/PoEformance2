@@ -24,12 +24,17 @@ function renderState(s) {
 
   if (s.autoFlask) renderFlasks(s.autoFlask);
   if (s.overlay) {
-    $("ov-loot").value = s.overlay.minLootRarity;
-    $("ov-terrain").checked = s.overlay.showTerrain;
+    // Live text always; the CONTROLS only while they are not being used. A colour picker
+    // holds its value until the dialog is committed, so a poll landing in between would
+    // put the old colour back - which is what "the swatch reverts after a second" was.
     $("ov-terrain-state").textContent = s.overlay.terrain;
-    $("ov-terrain-colour").value = s.overlay.terrainColour;
-    $("ov-terrain-thickness").value = s.overlay.terrainThickness;
-    $("ov-terrain-thickness-value").textContent = s.overlay.terrainThickness;
+    if (Date.now() >= overlayEditingUntil) {
+      $("ov-loot").value = s.overlay.minLootRarity;
+      $("ov-terrain").checked = s.overlay.showTerrain;
+      $("ov-terrain-colour").value = s.overlay.terrainColour;
+      $("ov-terrain-thickness").value = s.overlay.terrainThickness;
+      $("ov-terrain-thickness-value").textContent = s.overlay.terrainThickness;
+    }
   }
 
   if (s.map) {
@@ -78,8 +83,14 @@ for (const button of document.querySelectorAll(".tab")) {
   button.addEventListener("click", () => showTab(button.dataset.tab));
 }
 
+// Set while a control here is in use, so an incoming state does not overwrite it. A
+// timestamp rather than a focus check: a native colour dialog is a separate window, and
+// which element counts as focused while it is open is not something to rely on.
+let overlayEditingUntil = 0;
+
 /** Posts the whole overlay block, so one control cannot clear another's value. */
 function sendOverlay() {
+  overlayEditingUntil = Date.now() + 1500;
   bridge.send({
     type: "setOverlaySettings",
     payload: {
@@ -89,6 +100,12 @@ function sendOverlay() {
       terrainThickness: Number($("ov-terrain-thickness").value),
     },
   });
+}
+
+for (const id of ["ov-loot", "ov-terrain", "ov-terrain-colour", "ov-terrain-thickness"]) {
+  // Touching a control claims it, even before anything is sent: dragging a colour picker
+  // fires "input" for a while before the "change" that commits it.
+  $(id).addEventListener("input", () => (overlayEditingUntil = Date.now() + 1500));
 }
 
 $("ov-loot").addEventListener("change", sendOverlay);

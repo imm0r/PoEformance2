@@ -57,6 +57,11 @@ header h1 {
 
 /* ── Map ────────────────────────────────────────────────────────────────── */
 
+/* An author display rule BEATS the hidden attribute - the UA stylesheet's [hidden] is the
+   weakest rule there is. Without this the panel stays on screen with hidden set, which
+   reads as "the tabs do nothing" and stacks both pages on top of each other. */
+[hidden] { display: none !important; }
+
 #tab-map {
   display: flex;
   flex-direction: column;
