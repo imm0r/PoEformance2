@@ -101,8 +101,15 @@
     //     deltaZ comes from Render.TerrainHeight, dx/dy are GRID deltas from the player
     // This is why markers projected with W2SMatrix do not line up with the game's own map
     // markers: the map is zoomable and this transform accounts for it, the matrix cannot.
-    // Implementing it needs the UI element tree (parent-chain position + scaling), which
-    // the port does not have yet.
+    // IMPLEMENTED and confirmed in-game 2026-08 (see PoEformance.Game/Ui/MapRadar.cs).
+    // Three PoE2 deviations from the reference, each verified against this game:
+    //   - the LARGE map's accumulated position is already its CENTRE (the minimap's is its
+    //     top-left, so only that one adds half its size);
+    //   - the large map's UnscaledSize reads 0, so its diagonal is borrowed from the minimap
+    //     (window diagonal as fallback);
+    //   - with the minimap diagonal borrowed, the zoom takes NO correction factor - the one
+    //     upstream applies exists to scale the WINDOW diagonal down, so it would shrink
+    //     everything twice.
     "ImportantUiElements": {
       "comment": "Relative to the KB/M UiRootStructPtr (= ReadPtr(InGameState + 0x2F0)). Controller mode uses a different layout.",
       "fields": {
@@ -114,7 +121,7 @@
     },
 
     "UiElementBase": {
-      "comment": "Fields every UiElement has. Offsets are the PoE2 0.5.x set verified by the AHK tool; they agree with GameHelper2's UiElementBaseOffset.cs everywhere except StringIdPtr, which drifted 0x140 -> 0x098 in PoE2 and would read the text/font-style field at the old offset. Base UI resolution is 2560x1600: every position and size here is in THAT space and must be scaled to the window (see UiScale).",
+      "comment": "CONFIRMED IN-GAME 2026-08: the map radar built on this walk places dots exactly where the owner's production AHK tool does, which exercises the parent chain, both scale factors and the visibility rule end to end. Fields every UiElement has. Offsets are the PoE2 0.5.x set verified by the AHK tool; they agree with GameHelper2's UiElementBaseOffset.cs everywhere except StringIdPtr, which drifted 0x140 -> 0x098 in PoE2 and would read the text/font-style field at the old offset. Base UI resolution is 2560x1600: every position and size here is in THAT space and must be scaled to the window (see UiScale).",
       "fields": {
         "Self": { "offset": "0x008", "type": "ptr", "comment": "Points at the element ITSELF - *(this+0x08) == this is a cheap validity check before trusting any other field." },
         "ChildrenFirst": { "offset": "0x010", "type": "ptr", "comment": "StdVector begin: array of child UiElement pointers." },
@@ -147,7 +154,7 @@
     },
 
     "MapUiElement": {
-      "comment": "A map-type UiElement: UiElementBase at 0x000, then its own fields. Matches GameHelper2 MapUiElement.cs. PoE2 4.5.x shifted all three by -0x38 when UiElementBase shrank (the old Zoom at 0x3E0 read 0.000).",
+      "comment": "CONFIRMED IN-GAME 2026-08 via the map radar - dots track the map at every zoom level. A map-type UiElement: UiElementBase at 0x000, then its own fields. Matches GameHelper2 MapUiElement.cs. PoE2 4.5.x shifted all three by -0x38 when UiElementBase shrank (the old Zoom at 0x3E0 read 0.000).",
       "fields": {
         "Shift": { "offset": "0x368", "type": "f32", "comment": "StdTuple2D<float> - how far the user/game has shifted the map centre; y at +0x36C." },
         "DefaultShift": { "offset": "0x370", "type": "f32", "comment": "StdTuple2D<float> - resting offset, (0, -20) in PoE2; y at +0x374." },

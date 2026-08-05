@@ -160,6 +160,44 @@ dotnet test                                    # Core tests, any OS
 
 # Windows, game running (elevated):
 PoEformance.App                                # attach + drift report
+PoEformance.App --overlay                      # the in-game overlay
 PoEformance.App --record session.rec           # same, capturing everything
 PoEformance.App --replay session.rec           # rerun against the capture, no game needed
 ```
+
+## Status
+
+**The vertical slice is complete** (confirmed in-game, 2026-08): attach, pattern-scanned
+statics, the pointer chain to the player, the entity map, components, both projections, and
+entity dots on screen — placing markers exactly where the author's production AHK tool does.
+
+What that exercised, and what is therefore trustworthy: the pattern scanner, the drift
+report and its invariants, record/replay, the component lookup, the world-to-screen matrix
+at `WorldData+0x1A0`, the UI element tree with its parent-chain accumulation and two-axis
+scaling, and the map's own isometric transform.
+
+### What the slice cost, and what it taught
+
+Four findings were only visible in real memory, and each is written down where it will be
+found again — the schema for offsets, `CLAUDE.md` for the working rules:
+
+- `LocalPlayerStruct` is inline, not a pointer.
+- `ComponentLookupEntry.Index` is 32-bit; reading 8 bytes merged it with the next field and
+  dropped most of every entity's components.
+- The camera matrix moved, and the invariant meant to catch that **rejected the correct
+  offset and accepted a decoy** — a block of unit-length rows that satisfied the byte
+  pattern perfectly while collapsing the whole scene onto one pixel.
+- The check meant to catch *that* — "does the player land at screen centre?" — passes
+  trivially for any matrix that inflates `w`, because everything lands at the centre.
+
+The lesson generalises past this project: **a check a wrong value passes is worse than no
+check**, and structural fingerprints (a unit vector, a plausible pointer) are weak evidence.
+The tests that hold now are ones the game itself settles — project an entity's health-bar
+height and see whether it lands on the bar the game drew; require the scene to spread, not
+just the player to centre.
+
+### Next
+
+- Features on top of the slice: what to draw, and configuring it.
+- WebView2 config window — its AOT interop is still the open deployment risk.
+- Threading: the reader is currently synchronous with the renderer.
