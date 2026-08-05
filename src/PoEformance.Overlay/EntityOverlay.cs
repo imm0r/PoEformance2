@@ -188,6 +188,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         uint groundColour = Pack(0.4f, 1f, 0.4f);
         uint healthbarColour = Pack(1f, 0.4f, 1f);
 
+        DrawHealthbarReferences(draw, width, height);
+
         draw.AddLine(groundPoint, healthbarPoint, Pack(1f, 1f, 1f), 1f);
         draw.AddCircle(groundPoint, DotRadius + 6, groundColour, 20, 2f);
         draw.AddText(groundPoint + new Vector2(DotRadius + 9, 2), groundColour, "ground (TerrainHeight)");
@@ -272,6 +274,38 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         ImGui.End();
+    }
+
+    /// <summary>
+    /// Marks where each monster's floating health bar should be, if the projection is right.
+    /// </summary>
+    /// <remarks>
+    /// This is the one check that needs no judgement about where a character's feet are. The
+    /// game draws a monster's health bar at that monster's Render z - the exact value we feed
+    /// the projection - so the bracket must land ON the bar the game itself drew. It is a
+    /// pixel-accurate reference point supplied by the game, for free, on every monster on
+    /// screen. If the brackets sit on the bars, the matrix and the height interpretation are
+    /// both confirmed, and any remaining gap to the feet is simply the character's height.
+    /// </remarks>
+    private void DrawHealthbarReferences(ImDrawListPtr draw, int width, int height)
+    {
+        uint colour = Pack(1f, 0.4f, 1f);
+        foreach (WorldEntity monster in _snapshot.Entities.Where(e => e.Kind == EntityKind.Monster))
+        {
+            ScreenPoint bar = WorldToScreen.Project(
+                _snapshot.Matrix, monster.WorldX, monster.WorldY, monster.WorldZ, width, height);
+            if (!bar.OnScreen)
+            {
+                continue;
+            }
+
+            // A bracket rather than a dot: it frames the game's bar instead of hiding it.
+            var at = new Vector2(bar.X, bar.Y);
+            draw.AddLine(at - new Vector2(18, 0), at - new Vector2(6, 0), colour, 2f);
+            draw.AddLine(at + new Vector2(6, 0), at + new Vector2(18, 0), colour, 2f);
+            draw.AddLine(at - new Vector2(18, 4), at - new Vector2(18, -4), colour, 2f);
+            draw.AddLine(at + new Vector2(18, 4), at + new Vector2(18, -4), colour, 2f);
+        }
     }
 
     /// <summary>
