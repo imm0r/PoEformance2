@@ -1,5 +1,6 @@
 using System.Runtime.Versioning;
 using System.Text.Json;
+using DirectN;
 using DirectN.Extensions.Utilities;
 
 namespace PoEformance.Config;
@@ -24,6 +25,11 @@ public static class ConfigWindowHost
     /// Called for every other request. Returns true when it handled one, which makes the
     /// host answer with a fresh state.
     /// </param>
+    /// <param name="alwaysOnTop">
+    /// Keep the window above everything else. Needed when the game is running: it is
+    /// normally fullscreen, and an ordinary window opened behind it is invisible and
+    /// effectively unreachable - which reads as "the config window did not open".
+    /// </param>
     /// <returns>The window's thread - join it to wait for the window to close.</returns>
     /// <remarks>
     /// Not joining is what lets the config window run WHILE the overlay does, which is the
@@ -34,11 +40,15 @@ public static class ConfigWindowHost
     /// the reader. The engine takes its configuration as one atomic reference swap for
     /// exactly this reason.
     /// </remarks>
-    public static Thread Start(string title, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply = null)
+    public static Thread Start(
+        string title,
+        Func<ConfigState> stateSource,
+        Func<ConfigRequest, bool>? apply = null,
+        bool alwaysOnTop = false)
     {
         ArgumentNullException.ThrowIfNull(stateSource);
 
-        var thread = new Thread(() => RunOnThisThread(title, stateSource, apply))
+        var thread = new Thread(() => RunOnThisThread(title, stateSource, apply, alwaysOnTop))
         {
             Name = "config-window",
             IsBackground = false,
@@ -49,8 +59,12 @@ public static class ConfigWindowHost
     }
 
     /// <summary>Opens the window and blocks until it closes.</summary>
-    public static void Run(string title, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply = null)
-        => Start(title, stateSource, apply).Join();
+    public static void Run(
+        string title,
+        Func<ConfigState> stateSource,
+        Func<ConfigRequest, bool>? apply = null,
+        bool alwaysOnTop = false)
+        => Start(title, stateSource, apply, alwaysOnTop).Join();
 
     /// <summary>
     /// Runs the window, and contains any failure to this thread.
@@ -62,7 +76,8 @@ public static class ConfigWindowHost
     /// auxiliary view; it has no business ending the process, so its failures stop here and
     /// are reported instead.
     /// </remarks>
-    private static void RunOnThisThread(string title, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply)
+    private static void RunOnThisThread(
+        string title, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply, bool alwaysOnTop)
     {
         try
         {
@@ -71,6 +86,19 @@ public static class ConfigWindowHost
             window.ResizeClient(1100, 780);
             window.Center();
             window.Show();
+
+            if (alwaysOnTop)
+            {
+                // SetForeground alone is not enough against a fullscreen game: Windows
+                // refuses foreground changes from a process the user is not interacting
+                // with, so the window ends up behind the game and looks like it never
+                // opened. Topmost is the only placement the game cannot end up in front of.
+                window.SetWindowPos(
+                    HWND.TOPMOST, 0, 0, 0, 0,
+                    SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE
+                        | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
+            }
+
             window.SetForeground();
             application.Run();
         }

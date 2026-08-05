@@ -3,13 +3,23 @@ using System.Text.RegularExpressions;
 namespace PoEformance.Features;
 
 /// <summary>Where the flask keys came from, so a wrong key is diagnosable.</summary>
+/// <remarks>
+/// The two fallbacks are separated because they mean opposite things. An EMPTY or missing
+/// config means the game has no saved bindings either, so it is running its own 1-5 defaults
+/// and matching them is correct. Content that could not be interpreted means something is
+/// in there and this failed to read it - the only case worth a warning, because it is the
+/// one where the tool might be pressing the wrong key.
+/// </remarks>
 public enum KeyBindingSource
 {
     /// <summary>Read from the game's own config file.</summary>
     GameConfig,
 
-    /// <summary>The game's config was not found or held no flask bindings.</summary>
-    Defaults,
+    /// <summary>The config is missing or empty, so the game's own defaults apply.</summary>
+    GameDefaults,
+
+    /// <summary>The config has content, but no flask binding could be read from it.</summary>
+    Unmatched,
 }
 
 /// <summary>The key each flask slot is bound to, and where that came from.</summary>
@@ -79,18 +89,18 @@ public static partial class FlaskKeyBindings
         {
             if (!File.Exists(path))
             {
-                return new FlaskKeys(Defaults, KeyBindingSource.Defaults, $"not found: {path}");
+                return new FlaskKeys(Defaults, KeyBindingSource.GameDefaults, $"no config at {path}");
             }
 
             lines = File.ReadAllLines(path);
         }
         catch (IOException error)
         {
-            return new FlaskKeys(Defaults, KeyBindingSource.Defaults, error.Message);
+            return new FlaskKeys(Defaults, KeyBindingSource.Unmatched, error.Message);
         }
         catch (UnauthorizedAccessException error)
         {
-            return new FlaskKeys(Defaults, KeyBindingSource.Defaults, error.Message);
+            return new FlaskKeys(Defaults, KeyBindingSource.Unmatched, error.Message);
         }
 
         return Parse(lines, path);
@@ -103,14 +113,19 @@ public static partial class FlaskKeyBindings
 
         var bound = new Dictionary<int, ushort>(Defaults);
         int found = 0;
+        int content = 0;
 
         foreach (string line in lines)
         {
-            string trimmed = line.Trim();
+            // The byte-order mark counts as a character but not as content, so a file
+            // holding nothing but a BOM must still read as empty.
+            string trimmed = line.Trim().TrimStart('﻿').Trim();
             if (trimmed.Length == 0 || trimmed[0] == ';')
             {
                 continue;
             }
+
+            content++;
 
             if (!TryParseLine(trimmed, out int slot, out ushort key))
             {
@@ -125,9 +140,18 @@ public static partial class FlaskKeyBindings
             found++;
         }
 
-        return found > 0
-            ? new FlaskKeys(bound, KeyBindingSource.GameConfig, $"{found} bindings from {source}")
-            : new FlaskKeys(Defaults, KeyBindingSource.Defaults, $"no flask bindings in {source}");
+        if (found > 0)
+        {
+            return new FlaskKeys(bound, KeyBindingSource.GameConfig, $"{found} bindings from {source}");
+        }
+
+        // An empty config is not a failure. The game saves this file when a setting is
+        // CHANGED, so a player who never rebound anything has nothing in it - and the game
+        // is then running the same 1-5 defaults this falls back to. Reporting that as a
+        // parse failure sends the reader looking for a bug that is not there.
+        return content == 0
+            ? new FlaskKeys(Defaults, KeyBindingSource.GameDefaults, $"{source} is empty")
+            : new FlaskKeys(Defaults, KeyBindingSource.Unmatched, $"{content} lines in {source}, no flask binding among them");
     }
 
     /// <summary>

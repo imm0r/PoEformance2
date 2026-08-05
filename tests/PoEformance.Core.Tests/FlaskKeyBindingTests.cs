@@ -33,16 +33,33 @@ public class FlaskKeyBindingTests
     }
 
     [Fact]
-    public void SaysWhenItFellBackToTheDefaultLayout()
+    public void ContentThatDoesNotParse_IsTheOneWorthWarningAbout()
     {
-        // The difference that matters: "read from the game" and "assumed" produce the same
-        // keys on a default setup and completely different behaviour on a rebound one. The
-        // source is what lets the tool report which of the two it is looking at.
+        // Something IS in the file and none of it was understood. That is the case where
+        // the tool might be pressing a key the player rebound, so it must be told apart
+        // from an empty file - where the same 1-5 fallback is simply correct.
         FlaskKeys keys = FlaskKeyBindings.Parse(["[Sound]", "volume=50"], source: "test.ini");
 
-        Assert.Equal(KeyBindingSource.Defaults, keys.Source);
+        Assert.Equal(KeyBindingSource.Unmatched, keys.Source);
         Assert.Equal(FlaskKeyBindings.Defaults, keys.BySlot);
         Assert.Contains("test.ini", keys.Detail, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("")]                    // truly empty
+    [InlineData("﻿")]              // a byte-order mark and nothing else - the real case
+    [InlineData("; just a comment")]
+    public void EmptyConfig_IsReportedAsTheGameUsingItsOwnDefaults(string line)
+    {
+        // A real player's config came back as three bytes: a UTF-8 BOM. The game writes
+        // this file when a binding is CHANGED, so someone who never rebound a flask has
+        // nothing in it - and is running the same 1-5 layout the fallback assumes. Calling
+        // that a parse failure sends the reader hunting a bug that does not exist.
+        FlaskKeys keys = FlaskKeyBindings.Parse([line], source: "test.ini");
+
+        Assert.Equal(KeyBindingSource.GameDefaults, keys.Source);
+        Assert.Equal(FlaskKeyBindings.Defaults, keys.BySlot);
+        Assert.Contains("empty", keys.Detail, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -95,8 +112,54 @@ public class FlaskKeyBindingTests
         // useful next step - "is that where my config actually is?" - unanswerable.
         FlaskKeys keys = FlaskKeyBindings.Load(Path.Combine(Path.GetTempPath(), "poeformance-no-such-config.ini"));
 
-        Assert.Equal(KeyBindingSource.Defaults, keys.Source);
+        Assert.Equal(KeyBindingSource.GameDefaults, keys.Source);
         Assert.Contains("poeformance-no-such-config.ini", keys.Detail, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Probe_SaysEmptyRatherThanLeavingItToGuesswork()
+    {
+        // The diagnostic that would have answered this in one run instead of a round trip.
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-cfg-{Guid.NewGuid():N}.ini");
+        try
+        {
+            File.WriteAllBytes(path, [0xEF, 0xBB, 0xBF]);   // exactly what the real file held
+
+            var text = new StringWriter();
+            KeyBindingProbe.Report(text, path);
+
+            Assert.Contains("3 bytes", text.ToString(), StringComparison.Ordinal);
+            Assert.Contains("EMPTY", text.ToString(), StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void Probe_ShowsWhatEachLineReadsAsWhenNothingParsed()
+    {
+        // The case that needs the dump: content is there, no flask binding was found. What
+        // the reader needs is the key NAMES the game used, and how each value decodes.
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-cfg-{Guid.NewGuid():N}.ini");
+        try
+        {
+            File.WriteAllLines(path, ["[ACTION_KEYS]", "use_bound_skill4=81 2", "user_input_mode=wasd"]);
+
+            var text = new StringWriter();
+            KeyBindingProbe.Report(text, path);
+            string report = text.ToString();
+
+            Assert.Contains("[ACTION_KEYS]", report, StringComparison.Ordinal);
+            Assert.Contains("use_bound_skill4", report, StringComparison.Ordinal);
+            Assert.Contains("-> Q", report, StringComparison.Ordinal);      // 81, weapon-set suffix dropped
+            Assert.Contains("Unmatched", report, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     [Fact]

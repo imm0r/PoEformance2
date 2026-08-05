@@ -163,6 +163,14 @@ public sealed class AutoFlask
             return new FlaskTick([], "game not focused");
         }
 
+        // Armed with nothing to do. Worth its own reason: the readout would otherwise show
+        // the pools being "watched" by a configuration that can never fire, which looks
+        // exactly like a working tool right up until you notice it never acts.
+        if (!AnyRuleEnabled())
+        {
+            return new FlaskTick([], "no slot enabled");
+        }
+
         if (vitals is not Vitals pools)
         {
             return new FlaskTick([], "vitals unreadable");
@@ -261,6 +269,20 @@ public sealed class AutoFlask
         }
 
         return new FlaskTick([], blocked.Count > 0 ? string.Join(", ", blocked) : Describe(pools));
+    }
+
+    /// <summary>True when at least one rule could fire at all.</summary>
+    public bool AnyRuleEnabled()
+    {
+        foreach (FlaskRule rule in _rules)
+        {
+            if (rule.Enabled)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>The idle readout: the numbers being watched, so "nothing happened" is legible.</summary>

@@ -146,6 +146,24 @@ public class AutoFlaskSettingsTests
     }
 
     [Fact]
+    public void ArmedWithNoSlotEnabled_SaysSoInsteadOfLookingBusy()
+    {
+        // Exactly what a live run showed: master switch on, every slot off, and the status
+        // read "watching (life 100, mana 21...)" - which is what a WORKING tool says. It
+        // could never fire, and nothing in the readout admitted it.
+        var engine = new AutoFlask(
+            [new FlaskRule("Slot 1", VitalKind.Life, 65, Key: 0x31) { Enabled = false }],
+            enabled: true);
+
+        FlaskTick tick = engine.Evaluate(
+            new Vitals(new Vital(10, 100, 0, 0), default, default), gameFocused: true, nowMs: 1000);
+
+        Assert.Empty(tick.Used);
+        Assert.Equal("no slot enabled", tick.Reason);
+        Assert.False(engine.AnyRuleEnabled());
+    }
+
+    [Fact]
     public void Configure_CanArmAndDisarmWhileRunning()
     {
         var engine = new AutoFlask([new FlaskRule("Slot 1", VitalKind.Life, 65, Key: 0x31)], enabled: false);

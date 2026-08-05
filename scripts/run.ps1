@@ -25,13 +25,28 @@
 .EXAMPLE
   .\scripts\run.ps1 -Replay session.rec
       Re-run against a recording with the game closed (implies -NoPull).
+
+.EXAMPLE
+  .\scripts\run.ps1 -Overlay -Config
+      In-game overlay plus the settings window, both live. This is where auto
+      flask is switched on - it is off until you do, per belt slot.
+
+.EXAMPLE
+  .\scripts\run.ps1 -Keys
+      Print what the game's own config file says about the flask keys, and what
+      this reads out of it. Run this when a flask key does not behave.
 #>
 param(
     [switch]$Watch,
     [string]$Record,
     [string]$Replay,
     [switch]$Verbose,
-    [switch]$NoPull
+    [switch]$NoPull,
+    [switch]$Overlay,
+    [switch]$Config,
+    [switch]$AutoFlask,
+    [switch]$Keys,
+    [switch]$Flasks
 )
 
 $ErrorActionPreference = 'Stop'
@@ -44,10 +59,15 @@ try {
     }
 
     $appArgs = @()
-    if ($Watch)   { $appArgs += '--watch' }
-    if ($Verbose) { $appArgs += '--verbose' }
-    if ($Record)  { $appArgs += '--record'; $appArgs += $Record }
-    if ($Replay)  { $appArgs += '--replay'; $appArgs += $Replay }
+    if ($Watch)     { $appArgs += '--watch' }
+    if ($Verbose)   { $appArgs += '--verbose' }
+    if ($Record)    { $appArgs += '--record'; $appArgs += $Record }
+    if ($Replay)    { $appArgs += '--replay'; $appArgs += $Replay }
+    if ($Overlay)   { $appArgs += '--overlay' }
+    if ($Config)    { $appArgs += '--config' }
+    if ($AutoFlask) { $appArgs += '--autoflask' }
+    if ($Keys)      { $appArgs += '--keys' }
+    if ($Flasks)    { $appArgs += '--flasks' }
 
     dotnet run --project src/PoEformance.App -c Release -- @appArgs
 }

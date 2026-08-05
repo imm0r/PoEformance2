@@ -35,6 +35,15 @@ internal static class Program
 
         string schemaPath = options.SchemaPath ?? FindSchemaFile();
         Console.WriteLine($"schema  {schemaPath}");
+
+        // Before the attach on purpose: this reads a FILE, so it must still answer when the
+        // game is not running - which is exactly when someone sits down to check why a
+        // flask key did not work.
+        if (options.ProbeKeys)
+        {
+            PoEformance.Features.KeyBindingProbe.Report(Console.Out);
+        }
+
         Console.WriteLine();
 
         // ── Attach (or replay) - the only Windows-specific step ──────────────
@@ -151,13 +160,23 @@ internal static class Program
         if (options.ShowOverlay || options.ShowConfig || options.AutoFlask)
         {
             ReportAutoFlask(autoFlask, flaskKeys, flaskSettings, forcedOn: options.AutoFlask);
+
+            if (!options.ShowConfig)
+            {
+                Console.WriteLine("           (pass --config for the settings window - that is where slots");
+                Console.WriteLine("           are switched on; it can stay open while the overlay runs)");
+            }
         }
 
         // The config window runs on its own thread so it can be open WHILE the overlay is,
         // which is what makes its switches worth having: a setting that needs a restart is
         // a settings file with extra steps.
+        // Topmost only when the overlay is up, i.e. when a fullscreen game would otherwise
+        // hide it. On its own it is an ordinary window and should behave like one.
         Thread? configWindow = options.ShowConfig
-            ? StartConfigWindow(reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings)
+            ? StartConfigWindow(
+                reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings,
+                alwaysOnTop: options.ShowOverlay)
             : null;
 
         if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
@@ -355,20 +374,44 @@ internal static class Program
         bool forcedOn)
     {
         Console.WriteLine();
-        Console.WriteLine(engine.Enabled
-            ? "auto-flask ARMED - it presses keys only while the GAME window has focus"
-            : "auto-flask off - turn it on in the config window (--config), or with --autoflask");
+        if (!engine.Enabled)
+        {
+            Console.WriteLine("auto-flask off - turn it on in the config window (--config), or with --autoflask");
+        }
+        else if (engine.AnyRuleEnabled())
+        {
+            Console.WriteLine("auto-flask ARMED - it presses keys only while the GAME window has focus");
+        }
+        else
+        {
+            // The exact state that looks armed and does nothing. Say it plainly: the master
+            // switch is on, every slot is off, so no key can ever be pressed.
+            Console.WriteLine("auto-flask ON, but NO SLOT IS ENABLED - nothing will be pressed.");
+            Console.WriteLine($"           Enable a slot in the config window (--config), or in");
+            Console.WriteLine($"           {PoEformance.Features.AutoFlaskSettingsStore.DefaultPath}");
+        }
 
         if (forcedOn && !settings.Enabled)
         {
-            Console.WriteLine("           (forced on by --autoflask; the saved setting is off)");
+            Console.WriteLine("           (--autoflask flips the master switch only; the saved setting is off)");
         }
 
-        Console.WriteLine($"  keys     {keys.Source} - {keys.Detail}");
-        if (keys.Source == PoEformance.Features.KeyBindingSource.Defaults)
+        Console.WriteLine($"  keys     {keys.Detail}");
+        switch (keys.Source)
         {
-            Console.WriteLine("           assuming the default 1-5 layout. If a flask key is rebound in");
-            Console.WriteLine("           game, the tool would press the wrong one - check the list below.");
+            case PoEformance.Features.KeyBindingSource.GameDefaults:
+                // Not a problem: the game writes this file when a binding is CHANGED, so
+                // an empty one means the game is on the same 1-5 defaults used below.
+                Console.WriteLine("           The game has no saved bindings, so it is using its own 1-5");
+                Console.WriteLine("           defaults - which is what the slots below match. Rebind a flask");
+                Console.WriteLine("           in game and the file appears; this reads it from then on.");
+                break;
+
+            case PoEformance.Features.KeyBindingSource.Unmatched:
+                Console.WriteLine("           The config HAS content but no flask binding was found in it, so");
+                Console.WriteLine("           the 1-5 defaults are assumed. If a flask key is rebound, the tool");
+                Console.WriteLine("           would press the wrong one - run --keys to dump what is in there.");
+                break;
         }
 
         foreach (PoEformance.Features.FlaskRule rule in engine.Rules)
@@ -407,10 +450,12 @@ internal static class Program
         ulong gameStatesAddress,
         PoEformance.Features.AutoFlask autoFlask,
         PoEformance.Features.FlaskKeys flaskKeys,
-        PoEformance.Features.AutoFlaskSettings flaskSettings)
+        PoEformance.Features.AutoFlaskSettings flaskSettings,
+        bool alwaysOnTop)
     {
         Console.WriteLine();
-        Console.WriteLine("config window open - the tool exits once it (and the overlay) are closed");
+        Console.WriteLine("config window open" + (alwaysOnTop ? " (kept on top, so the game cannot bury it)" : "")
+            + " - the tool exits once it (and the overlay) are closed");
 
         // The live settings. Only the window's thread touches this: it reads it to build a
         // state and replaces it when the page saves.
@@ -466,7 +511,7 @@ internal static class Program
             return true;
         }
 
-        return PoEformance.Config.ConfigWindowHost.Start("PoEformance", BuildState, Apply);
+        return PoEformance.Config.ConfigWindowHost.Start("PoEformance", BuildState, Apply, alwaysOnTop);
     }
 
     /// <summary>Says so when settings could not be written, instead of losing them quietly.</summary>
@@ -651,13 +696,14 @@ internal static class Program
         bool ShowOverlay,
         bool ShowConfig,
         bool AutoFlask,
-        bool ProbeFlasks)
+        bool ProbeFlasks,
+        bool ProbeKeys)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
             bool watch = false, verbose = false, overlay = false, config = false;
-            bool autoFlask = false, probeFlasks = false;
+            bool autoFlask = false, probeFlasks = false, probeKeys = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -687,13 +733,16 @@ internal static class Program
                     case "--flasks":
                         probeFlasks = true;
                         break;
+                    case "--keys":
+                        probeKeys = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
                 }
             }
 
-            return new CliOptions(schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks);
+            return new CliOptions(schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys);
         }
     }
 }
