@@ -315,10 +315,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     ImGui.Text($"vitals:   life {Show(vitals.Life)}   mana {Show(vitals.Mana)}   es {Show(vitals.EnergyShield)}");
                 }
 
+                // Always shown, including when it failed: an omitted row looks like a
+                // feature that is not running, when it actually means a read gave up.
                 if (_snapshot.FlaskBelt is FlaskBelt belt && !belt.IsUnknown)
                 {
                     ImGui.Text("belt:     " + string.Join("   ", belt.Flasks.Select(f =>
                         $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}{(f.CanUse ? string.Empty : " (empty)")}")));
+                }
+                else
+                {
+                    ImGui.TextColored(new Vector4(1f, 0.5f, 0.4f, 1f),
+                        "belt:     not read - run with --flasks for the chain");
                 }
 
                 if (FlaskStatus is not null)

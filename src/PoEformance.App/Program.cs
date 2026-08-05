@@ -115,6 +115,13 @@ internal static class Program
             // re-run offline against the recording.
             RunMatrixHunt(reader, worldSchema, gameStatesAddress, snapshot);
             recorder?.MarkFrame();
+
+            if (options.ProbeFlasks)
+            {
+                new PoEformance.Game.Diagnostics.FlaskProbe(reader, worldSchema)
+                    .Report(gameStatesAddress, Console.Out);
+                recorder?.MarkFrame();
+            }
         }
 
         if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
@@ -481,12 +488,14 @@ internal static class Program
         bool Verbose,
         bool ShowOverlay,
         bool ShowConfig,
-        bool AutoFlask)
+        bool AutoFlask,
+        bool ProbeFlasks)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
-            bool watch = false, verbose = false, overlay = false, config = false, autoFlask = false;
+            bool watch = false, verbose = false, overlay = false, config = false;
+            bool autoFlask = false, probeFlasks = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -513,13 +522,16 @@ internal static class Program
                     case "--autoflask":
                         autoFlask = true;
                         break;
+                    case "--flasks":
+                        probeFlasks = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
                 }
             }
 
-            return new CliOptions(schema, replay, record, watch, verbose, overlay, config, autoFlask);
+            return new CliOptions(schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks);
         }
     }
 }
