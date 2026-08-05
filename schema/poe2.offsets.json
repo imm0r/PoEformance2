@@ -173,6 +173,14 @@
       }
     },
 
+    "StdMap": {
+      "comment": "MSVC std::map header, laid out INLINE where it appears (AreaInstance.AwakeEntities is such a struct, not a pointer to one: reading a ptr at its offset yields Head because Head is its first field). Size is the element count. AwakeEntities and SleepingEntities sit 0x10 apart, matching this 16-byte layout.",
+      "fields": {
+        "Head": { "offset": "0x00", "type": "ptr", "comment": "Sentinel node. Its Parent (+0x08) is the tree root; the sentinel itself is never an element." },
+        "Size": { "offset": "0x08", "type": "i64", "comment": "Element count - the sanity bound for a traversal." }
+      }
+    },
+
     "StdMapNode": {
       "comment": "MSVC std::map red-black tree node. Entities live in one keyed by entity id.",
       "fields": {

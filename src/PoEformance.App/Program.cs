@@ -96,6 +96,21 @@ internal static class Program
             recorder?.MarkFrame();
         }
 
+        // Scan the whole entity map once. Besides the readout, this is what puts the map
+        // traversal into a --record session so it can be replayed and tested offline.
+        ulong gameStatesAddress = result.Statics.FirstOrDefault(s => s.Name == "GameStates")?.Address ?? 0;
+        if (gameStatesAddress != 0)
+        {
+            recorder?.MarkFrame();
+            ReportWorldScan(reader, SchemaJson.Load(schemaPath), gameStatesAddress);
+            recorder?.MarkFrame();
+        }
+
+        if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
+        {
+            RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress);
+        }
+
         if (options.Watch && options.ReplayPath is null)
         {
             WatchSchema(reader, scanner, schemaPath, recorder, options.Verbose);
@@ -140,6 +155,53 @@ internal static class Program
 
         recorder?.MarkFrame();
         return result;
+    }
+
+    /// <summary>
+    /// Reads the whole entity map once and prints a breakdown, so the entity layer can be
+    /// sanity-checked from the console before any pixels are drawn.
+    /// </summary>
+    private static void ReportWorldScan(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic)
+    {
+        var world = new PoEformance.Game.World.WorldReader(reader, schema);
+        PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic);
+
+        Console.WriteLine();
+        Console.WriteLine("world scan");
+        if (!snapshot.InGame)
+        {
+            Console.WriteLine("  --    not in an area.");
+            return;
+        }
+
+        Console.WriteLine($"  entities with a position: {snapshot.Entities.Count}");
+        foreach (IGrouping<PoEformance.Game.World.EntityKind, PoEformance.Game.World.WorldEntity> group
+                 in snapshot.Entities.GroupBy(e => e.Kind).OrderByDescending(g => g.Count()))
+        {
+            Console.WriteLine($"    {group.Key,-10} {group.Count()}");
+        }
+
+        // A couple of concrete monsters make it obvious at a glance that real entities were
+        // read, not just counted.
+        foreach (PoEformance.Game.World.WorldEntity monster
+                 in snapshot.Entities.Where(e => e.Kind == PoEformance.Game.World.EntityKind.Monster).Take(5))
+        {
+            Console.WriteLine($"    monster  {monster.ShortName} @ ({monster.WorldX:F0}, {monster.WorldY:F0})");
+        }
+    }
+
+    /// <summary>
+    /// Runs the ImGui overlay until it is closed. The snapshot is re-read per frame; the
+    /// renderer itself never touches game memory.
+    /// </summary>
+    private static void RunOverlay(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic)
+    {
+        var world = new PoEformance.Game.World.WorldReader(reader, schema);
+        Console.WriteLine();
+        Console.WriteLine("overlay running - close the overlay window (or Ctrl+C) to quit");
+
+        using var overlay = new PoEformance.Overlay.EntityOverlay(() => world.Read(gameStatesStatic));
+        overlay.Start().GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -264,12 +326,13 @@ internal static class Program
         string? ReplayPath,
         string? RecordPath,
         bool Watch,
-        bool Verbose)
+        bool Verbose,
+        bool ShowOverlay)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
-            bool watch = false, verbose = false;
+            bool watch = false, verbose = false, overlay = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -287,13 +350,16 @@ internal static class Program
                     case "--watch":
                         watch = true;
                         break;
+                    case "--overlay":
+                        overlay = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
                 }
             }
 
-            return new CliOptions(schema, replay, record, watch, verbose);
+            return new CliOptions(schema, replay, record, watch, verbose, overlay);
         }
     }
 }

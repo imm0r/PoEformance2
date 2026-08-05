@@ -2,7 +2,20 @@
   <!-- Layer 4a - the in-game overlay (ImGui / ClickableTransparentOverlay). Windows only. -->
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- The overlay drags in native ImGui/Veldrid assets that the AOT analyzer cannot see
+         through; it is loaded dynamically at runtime, so exclude it from AOT analysis
+         rather than silencing individual warnings. -->
+    <IsAotCompatible>false</IsAotCompatible>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ClickableTransparentOverlay" Version="11.1.0" />
+    <!-- Pinned explicitly: the version ClickableTransparentOverlay pulls in transitively
+         (3.1.6) carries known high-severity advisories. A direct reference wins over the
+         transitive one, so this keeps the restore clean of NU1903/NU1902. -->
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoEformance.Features\PoEformance.Features.csproj" />
   </ItemGroup>
