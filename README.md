@@ -72,12 +72,14 @@ PoEformance.App --overlay --config       # in-game overlay + config window, side
 PoEformance.App --overlay --debug        # plus the projection diagnostics and calibration aids
 ```
 
-The overlay draws living monsters, chests, drops and NPCs, and only while the game is the
-window in front — it is always-on-top, so anything it painted after an alt-tab would land
-on whatever you switched to. Corpses are filtered out, and drops below magic rarity with
-them (currency is never hidden); the threshold is in the config window. `--debug` brings
-back the RE instruments — the projection measurements, the calibration markers, and
-per-kind filters including terrain and effects.
+The overlay marks living monsters, chests, drops and NPCs **on the game's own map** — the
+large one when it is open, the minimap otherwise, clipped to whichever is on screen. It
+draws only while the game is the window in front (it is always-on-top, so anything painted
+after an alt-tab would land on whatever you switched to) and only in a hostile area, not in
+town or a hideout. Corpses are filtered out, and drops below magic rarity with them
+(currency is never hidden); the threshold is in the config window. `--debug` brings back the
+RE instruments — dots out in the 3D world, the projection measurements, the calibration
+markers, and per-kind filters including terrain and effects.
 
 The config window stays open while the overlay runs and its settings apply immediately —
 no restart. Auto flask is off until switched on there, per belt slot; the key each flask

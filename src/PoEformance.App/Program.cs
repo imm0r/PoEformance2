@@ -384,6 +384,7 @@ internal static class Program
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
         overlay.ShowDiagnostics = debug;
         overlay.ShowCalibration = debug;
+        overlay.ShowWorldDots = debug;
         overlay.MinimumLootRarity = settings.MinLootRarity;
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();

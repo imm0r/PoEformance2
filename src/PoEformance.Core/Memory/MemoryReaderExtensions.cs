@@ -192,6 +192,40 @@ public static class MemoryReaderExtensions
     }
 
     /// <summary>
+    /// Reads a plain null-terminated UTF-16 string AT the given address.
+    /// </summary>
+    /// <remarks>
+    /// Not every wide string in the game is a std::wstring. The .dat tables store raw
+    /// pointers into a string block with no size or capacity header, and reading one of
+    /// those through <see cref="ReadStdWString"/> interprets the text itself as a length
+    /// and rejects it. This is the reader for that case.
+    /// </remarks>
+    public static string ReadUnicodeString(this IMemoryReader reader, ulong address, int maxChars = 256)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+        if (!IsPlausiblePointer(address) || maxChars <= 0)
+        {
+            return string.Empty;
+        }
+
+        var buffer = new byte[maxChars * 2];
+        int have = buffer.Length;
+        while (have >= 2 && !reader.TryRead(address, buffer.AsSpan(0, have)))
+        {
+            have /= 2; // a string near the end of a page: ask for less rather than nothing
+        }
+
+        if (have < 2)
+        {
+            return string.Empty;
+        }
+
+        ReadOnlySpan<char> text = MemoryMarshal.Cast<byte, char>(buffer.AsSpan(0, have));
+        int end = text.IndexOf('\0');
+        return new string(end >= 0 ? text[..end] : text);
+    }
+
+    /// <summary>
     /// Reads an MSVC <c>std::wstring</c> at <paramref name="address"/>, handling the
     /// small-string optimisation: capacity &lt; 8 means the characters live inline in
     /// the first 16 bytes, otherwise the first 8 bytes are a pointer to them.

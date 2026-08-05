@@ -10,8 +10,40 @@ namespace PoEformance.Game.Ui;
 /// <param name="Centre">Where the player sits on this map, in window pixels.</param>
 /// <param name="Diagonal">The map's diagonal in pixels - the projection's length scale.</param>
 /// <param name="Zoom">The map's own zoom. This is what the camera matrix cannot know about.</param>
-public readonly record struct MapView(Vector2 Centre, float Diagonal, float Zoom, bool IsLargeMap)
+/// <param name="Visible">
+/// Whether the game is actually showing this map. The two swap: opening the large one hides
+/// the minimap, and both UI elements exist either way, so projecting markers without asking
+/// paints them onto a map that is not on screen.
+/// </param>
+/// <param name="Left">Left edge of the rectangle this map occupies, for clipping.</param>
+/// <param name="Top">Top edge of that rectangle.</param>
+/// <param name="Width">Width of that rectangle.</param>
+/// <param name="Height">Height of that rectangle.</param>
+public readonly record struct MapView(
+    Vector2 Centre,
+    float Diagonal,
+    float Zoom,
+    bool IsLargeMap,
+    bool Visible = true,
+    float Left = 0f,
+    float Top = 0f,
+    float Width = 0f,
+    float Height = 0f)
 {
+    /// <summary>
+    /// True when a projected point falls on this map.
+    /// </summary>
+    /// <remarks>
+    /// Markers are placed by projecting a world delta, which happily lands hundreds of
+    /// pixels outside a minimap the size of a postage stamp - and a marker outside the map
+    /// it belongs to is just a dot floating in the middle of the game. A map with no
+    /// measured rectangle accepts everything rather than rejecting everything.
+    /// </remarks>
+    public bool Contains(Vector2 point)
+        => Width <= 0 || Height <= 0
+           || (point.X >= Left && point.X <= Left + Width
+               && point.Y >= Top && point.Y <= Top + Height);
+
     /// <summary>The map's fixed viewing angle. Not the 3D camera's - the map has its own.</summary>
     public const double CameraAngle = 38.7 * Math.PI / 180.0;
 
@@ -153,7 +185,9 @@ public sealed class MapRadarReader
 
         // Top-left position, so the centre is half a size further in, plus the shifts.
         Vector2 centre = element.Position + (element.Size / 2f) + ReadShifts(address);
-        return new MapView(centre, diagonal, ReadZoom(address), IsLargeMap: false);
+        return new MapView(
+            centre, diagonal, ReadZoom(address), IsLargeMap: false, Visible: element.Visible,
+            element.Left, element.Top, element.Size.X, element.Size.Y);
     }
 
     private MapView? BuildLargeMap(ulong address, UiScale scale)
@@ -173,7 +207,11 @@ public sealed class MapRadarReader
             : MathF.Sqrt((float)((scale.WindowWidth * (double)scale.WindowWidth)
                                  + (scale.WindowHeight * (double)scale.WindowHeight)));
 
-        return new MapView(centre, diagonal, ReadZoom(address), IsLargeMap: true);
+        // The large map's own UnscaledSize reads 0, so there is no rectangle to clip to -
+        // it covers the window, which is the honest bound for it anyway.
+        return new MapView(
+            centre, diagonal, ReadZoom(address), IsLargeMap: true, Visible: element.Visible,
+            0f, 0f, scale.WindowWidth, scale.WindowHeight);
     }
 
     private Vector2 ReadShifts(ulong address)

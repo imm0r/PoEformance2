@@ -173,6 +173,24 @@
       }
     },
 
+    "WorldAreaDetails": {
+      "comment": "Reached through WorldData.WorldAreaDetailsPtr (0x98). TWO hops, not one: WorldData -> WorldAreaDetails -> the WorldAreas.dat ROW. Ported from the AHK tool, which uses exactly this chain in game.",
+      "fields": {
+        "RowPtr": { "offset": "0xA0", "type": "ptr", "invariant": { "kind": "nonNullPtr" }, "comment": "The WorldAreas.dat row for the area currently loaded." }
+      }
+    },
+
+    "WorldAreaDat": {
+      "comment": "A row of WorldAreas.dat: what KIND of area this is. There is no IsHideout field - the reference derives it from the Id containing 'hideout' but not 'map', because hideout areas are named that way and map areas are not.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr", "comment": "Wide string, e.g. G1_2, MapRiverhold, HideoutFelled." },
+        "NamePtr": { "offset": "0x08", "type": "ptr", "comment": "Wide string, the display name." },
+        "Act": { "offset": "0x10", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 20 } },
+        "IsTown": { "offset": "0x14", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 } },
+        "HasWaypoint": { "offset": "0x15", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 } }
+      }
+    },
+
     "AreaInstance": {
       "comment": "DRIFT HISTORY, two waves so far: (1) +0x18 - PlayerInfo 0x580->0x598, TerrainMetadata 0x8A0->0x8B8; (2) 2026-08, owner-verified: +0x08 across the tail - PlayerInfo 0x598->0x5A0, AwakeEntities 0x6D8->0x6E0, SleepingEntities 0x6E8->0x6F0, TerrainMetadata 0x8B8->0x8C0 (a new 8-byte field was inserted below ~0x5A0). When ONE field here drifts, assume the whole tail moved by the same delta and check them all. Low fields (CurrentAreaLevel 0xC4, CurrentAreaHash 0x11C) did not move in either wave.",
       "fields": {

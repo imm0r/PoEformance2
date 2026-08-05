@@ -111,8 +111,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _cull = cull;
     }
 
-    /// <summary>Draw entity dots on the game's own map, using the map's projection.</summary>
-    public bool ShowMapDots { get; set; } = true;
+    /// <summary>
+    /// Also draw a dot on each entity out in the 3D world.
+    /// </summary>
+    /// <remarks>
+    /// OFF by default. It is the world-to-screen projection's showcase, and as a playing
+    /// aid it is the opposite of one: the markers land between the player and the thing
+    /// they are fighting. The map is where a radar belongs.
+    /// </remarks>
+    public bool ShowWorldDots { get; set; }
 
     /// <summary>
     /// Optional: read cost, completed reads and failures from the reader thread.
@@ -159,12 +166,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        if (_snapshot.InGame && width > 0 && height > 0)
+        // Nothing to mark in a town or a hideout, and a screen full of markers over the
+        // stash is worse than no overlay. An area that did not resolve counts as hostile,
+        // so a failed read never silently switches the tool off.
+        if (_snapshot.InGame && width > 0 && height > 0 && _snapshot.Area.IsHostile)
         {
-            DrawEntities(width, height);
-            if (ShowMapDots)
+            // Markers go ON THE MAP, not over the 3D scene. Scattering dots across the game
+            // world puts them between the player and what they are fighting; the map is
+            // where a radar belongs, and it is where the game already draws its own.
+            DrawMapDots();
+
+            if (ShowWorldDots)
             {
-                DrawMapDots();
+                DrawEntities(width, height);
             }
         }
 
@@ -325,6 +339,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
             else
             {
+                // Named even when nothing is hidden. An overlay that goes blank in town
+                // otherwise looks broken, and this is the line that says it is not - it
+                // also reports the area id, which is what pins down any further rule about
+                // WHERE the overlay should be active.
+                AreaInfo area = _snapshot.Area;
+                ImGui.TextColored(
+                    area.IsHostile ? new Vector4(0.7f, 0.75f, 0.8f, 1f) : new Vector4(1f, 0.6f, 0.2f, 1f),
+                    $"area:     {area.Describe()}{(area.IsHostile ? string.Empty : " - markers hidden")}");
+
                 ImGui.Text($"entities: {_snapshot.Entities.Count}");
                 if (ReadStats is not null)
                 {
@@ -493,9 +516,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// the moment the map is zoomed, which is what made a correct world projection look
     /// broken.
     ///
-    /// The large map is preferred when it is open and the minimap otherwise. Which one is
-    /// "open" cannot be told apart by a flag alone here, so the choice falls back to whether
-    /// the projection lands anywhere sensible on screen.
+    /// The large map wins when it is OPEN - the two swap, so both elements exist at all
+    /// times and only their visibility says which one the player is looking at. Everything
+    /// is clipped to the chosen map's rectangle: the projection places a marker by world
+    /// distance, which lands far outside a minimap for anything further away than its edge,
+    /// and a marker outside its map is just a dot in the middle of the game.
     /// </remarks>
     private void DrawMapDots()
     {
@@ -504,16 +529,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        MapView? chosen = _snapshot.LargeMap is MapView large && large.IsUsable ? large
-            : _snapshot.MiniMap is MapView mini && mini.IsUsable ? mini
+        MapView? chosen = _snapshot.LargeMap is MapView large && large.IsUsable && large.Visible ? large
+            : _snapshot.MiniMap is MapView mini && mini.IsUsable && mini.Visible ? mini
             : null;
 
         if (chosen is not MapView map)
         {
-            return;
+            return; // neither map on screen - the player hid them, so hide with them
         }
 
         ImDrawListPtr draw = ImGui.GetBackgroundDrawList();
+        float radius = map.IsLargeMap ? 3.5f : 2.5f;
 
         foreach (WorldEntity entity in _snapshot.Entities)
         {
@@ -526,8 +552,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 entity.WorldX, entity.WorldY, entity.TerrainHeight,
                 player.WorldX, player.WorldY, player.TerrainHeight);
 
-            draw.AddCircleFilled(at, 3.5f, ColourFor(entity));
-            draw.AddCircle(at, 3.5f, OutlineColour, 10, 1f);
+            if (!map.Contains(at))
+            {
+                continue;
+            }
+
+            draw.AddCircleFilled(at, radius, ColourFor(entity));
+            draw.AddCircle(at, radius, OutlineColour, 10, 1f);
         }
 
         if (ShowCalibration)
