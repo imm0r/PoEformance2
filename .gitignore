@@ -21,3 +21,8 @@ Thumbs.db
 
 # Memory-session recordings can be huge - never commit them by accident.
 *.rec
+
+# Runtime recordings are ignored, but committed test fixtures are kept.
+recordings/
+*.rec
+!tests/fixtures/*.rec
