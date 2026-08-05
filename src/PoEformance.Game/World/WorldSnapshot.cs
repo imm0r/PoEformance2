@@ -31,6 +31,11 @@ public enum EntityKind
 /// world-to-screen projection - the game keeps two separate systems (see the type remarks).
 /// </param>
 /// <param name="ModelBoundsZ">Model height; WorldZ minus this is where the health bar floats.</param>
+/// <param name="Rarity">
+/// For a ground drop, how good it is - resolved through the wrapper entity, since the thing
+/// in the entity map carries no rarity of its own. <see cref="ItemRarity.Unknown"/> for
+/// everything that is not an item, and for a drop whose inner entity has not resolved yet.
+/// </param>
 public sealed record WorldEntity(
     uint Id,
     ulong Address,
@@ -40,7 +45,8 @@ public sealed record WorldEntity(
     float WorldY,
     float WorldZ,
     float TerrainHeight = 0f,
-    float ModelBoundsZ = 0f)
+    float ModelBoundsZ = 0f,
+    ItemRarity Rarity = ItemRarity.Unknown)
 {
     /// <summary>Where the game floats this entity's health bar: the top of its model.</summary>
     public float HealthBarZ => WorldZ - ModelBoundsZ;
@@ -115,6 +121,7 @@ public sealed class WorldReader
     private readonly BuffsReader _buffs;
     private readonly FlaskBeltReader _flasks;
     private readonly CorpseFilter _corpses = new();
+    private readonly GroundItemReader _groundItems;
     private readonly int _playerInfo;
     private readonly int _serverData;
     private readonly int _awakeEntities;
@@ -137,6 +144,7 @@ public sealed class WorldReader
         _life = new LifeReader(reader, schema);
         _buffs = new BuffsReader(reader, schema);
         _flasks = new FlaskBeltReader(reader, schema);
+        _groundItems = new GroundItemReader(reader, schema);
         _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
@@ -253,10 +261,18 @@ public sealed class WorldReader
                 continue;
             }
 
+            // Resolved here rather than filtered here: how good a drop is, is a fact about
+            // the world, while "is it worth drawing" is a preference. The snapshot carries
+            // the fact so the overlay - and a future loot tracker, which wants everything -
+            // can each decide for themselves.
+            ItemRarity rarity = kind == EntityKind.WorldItem
+                ? _groundItems.RarityOf(entity, nowMs)
+                : ItemRarity.Unknown;
+
             var world = new WorldEntity(
                 id, address, entity.Path, kind,
                 position.Value.X, position.Value.Y, position.Value.Z,
-                position.Value.TerrainHeight, position.Value.ModelBoundsZ);
+                position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

@@ -22,7 +22,11 @@ function renderState(s) {
   $("s-schema").textContent = s.gameVersion;
 
   if (s.autoFlask) renderFlasks(s.autoFlask);
+  if (s.overlay) $("ov-loot").value = s.overlay.minLootRarity;
 }
+
+$("ov-loot").addEventListener("change", () =>
+  bridge.send({ type: "setOverlaySettings", payload: { minLootRarity: $("ov-loot").value } }));
 
 // ── Auto flask ─────────────────────────────────────────────────────────────
 
@@ -185,6 +189,7 @@ if (bridge.connected) {
     entityCount: 0,
     staticsFound: 0,
     staticsTotal: 6,
+    overlay: { minLootRarity: "Magic" },
     autoFlask: {
       enabled: false,
       keySource: "Defaults - no host",

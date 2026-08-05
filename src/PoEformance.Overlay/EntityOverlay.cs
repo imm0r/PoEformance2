@@ -48,6 +48,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public HashSet<EntityKind> DrawnKinds { get; } =
         [EntityKind.Monster, EntityKind.Chest, EntityKind.WorldItem, EntityKind.Npc];
 
+    /// <summary>
+    /// The worst drop still worth a marker. Currency is always shown.
+    /// </summary>
+    /// <remarks>
+    /// Magic by default because Path of Exile 2 carpets the floor in normal-rarity items,
+    /// and an overlay that marks every one of them is harder to read than no overlay at
+    /// all - it turns the useful drops into three more dots among forty.
+    ///
+    /// Currency ignores this deliberately. It carries no rarity component, so it is
+    /// classified by path, and it is the class of drop nobody wants filtered.
+    /// </remarks>
+    public ItemRarity MinimumLootRarity { get; set; } = ItemRarity.Magic;
+
     /// <summary>Draw name labels next to dots.</summary>
     public bool ShowLabels { get; set; }
 
@@ -190,9 +203,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         foreach (WorldEntity entity in _snapshot.Entities)
         {
-            if (!DrawnKinds.Contains(entity.Kind))
+            if (!DrawnKinds.Contains(entity.Kind) || !WorthDrawing(entity))
             {
-                continue; // terrain, effects and the unclassified rest - noise while playing
+                continue;
             }
 
             ScreenPoint point = ProjectGround(entity, width, height);
@@ -202,7 +215,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 continue; // behind the camera or outside the viewport
             }
 
-            uint colour = ColourFor(entity.Kind);
+            uint colour = ColourFor(entity);
             var position = new Vector2(point.X, point.Y);
 
             draw.AddCircleFilled(position, DotRadius, colour);
@@ -504,7 +517,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         foreach (WorldEntity entity in _snapshot.Entities)
         {
-            if (!DrawnKinds.Contains(entity.Kind))
+            if (!DrawnKinds.Contains(entity.Kind) || !WorthDrawing(entity))
             {
                 continue;
             }
@@ -513,7 +526,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 entity.WorldX, entity.WorldY, entity.TerrainHeight,
                 player.WorldX, player.WorldY, player.TerrainHeight);
 
-            draw.AddCircleFilled(at, 3.5f, ColourFor(entity.Kind));
+            draw.AddCircleFilled(at, 3.5f, ColourFor(entity));
             draw.AddCircle(at, 3.5f, OutlineColour, 10, 1f);
         }
 
@@ -587,8 +600,50 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private static string Show(Vital vital)
         => vital.Percent < 0 ? "-" : $"{vital.Current}/{vital.Unreserved} ({vital.Percent}%)";
 
+    /// <summary>
+    /// Whether an entity passes the loot filter. Everything that is not a drop passes.
+    /// </summary>
+    /// <remarks>
+    /// A drop whose rarity has not resolved yet is DRAWN. It is one frame old at most, and
+    /// showing a drop that turns out to be junk costs a moment of attention, while hiding
+    /// one that turns out to be a unique costs the drop.
+    /// </remarks>
+    private bool WorthDrawing(WorldEntity entity)
+    {
+        if (entity.Kind != EntityKind.WorldItem)
+        {
+            return true;
+        }
+
+        return entity.Rarity switch
+        {
+            ItemRarity.Currency => true,
+            ItemRarity.Unknown => true,
+            _ => entity.Rarity >= MinimumLootRarity,
+        };
+    }
+
     /// <summary>White outline so dots stay readable over any background.</summary>
     private static uint OutlineColour => ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0f, 0f, 0.8f));
+
+    /// <summary>
+    /// Colour for one entity: drops take their rarity's colour, everything else its kind's.
+    /// </summary>
+    /// <remarks>
+    /// The game's own item-label colours, because that is the association already learned -
+    /// a yellow dot means the same thing on the floor and on the overlay, with nothing to
+    /// translate.
+    /// </remarks>
+    private static uint ColourFor(WorldEntity entity) => entity.Kind == EntityKind.WorldItem
+        ? entity.Rarity switch
+        {
+            ItemRarity.Magic => Pack(0.45f, 0.55f, 1f),
+            ItemRarity.Rare => Pack(1f, 0.95f, 0.35f),
+            ItemRarity.Unique => Pack(1f, 0.55f, 0.2f),
+            ItemRarity.Currency => Pack(0.9f, 0.75f, 0.55f),
+            _ => Pack(0.85f, 0.85f, 0.85f),
+        }
+        : ColourFor(entity.Kind);
 
     /// <summary>Colour per entity kind. ImGui packs colours as ABGR.</summary>
     private static uint ColourFor(EntityKind kind) => kind switch

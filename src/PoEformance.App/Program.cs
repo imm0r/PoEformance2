@@ -171,12 +171,18 @@ internal static class Program
         // The config window runs on its own thread so it can be open WHILE the overlay is,
         // which is what makes its switches worth having: a setting that needs a restart is
         // a settings file with extra steps.
+        // The overlay does not exist yet - the config window starts first so it is already
+        // up while the overlay runs - so the two are joined by a handle the config thread
+        // fills in later rather than by a reference that cannot be taken yet.
+        var overlayHandle = new OverlayHandle();
+        var overlaySettings = PoEformance.Features.OverlaySettingsStore.Load();
+
         // Topmost only when the overlay is up, i.e. when a fullscreen game would otherwise
         // hide it. On its own it is an ordinary window and should behave like one.
         Thread? configWindow = options.ShowConfig
             ? StartConfigWindow(
                 reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings,
-                alwaysOnTop: options.ShowOverlay)
+                overlaySettings, overlayHandle, alwaysOnTop: options.ShowOverlay)
             : null;
 
         if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
@@ -193,7 +199,7 @@ internal static class Program
 
             RunOverlay(
                 reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
-                debug: options.Debug);
+                debug: options.Debug, settings: overlaySettings, handle: overlayHandle);
         }
 
         configWindow?.Join();
@@ -306,9 +312,24 @@ internal static class Program
     /// Runs the ImGui overlay until it is closed. The snapshot is re-read per frame; the
     /// renderer itself never touches game memory.
     /// </summary>
+    /// <summary>
+    /// Holds the running overlay so the config window can reach it.
+    /// </summary>
+    /// <remarks>
+    /// The config window is started BEFORE the overlay - it should be usable while the
+    /// overlay runs, which means it cannot be handed a reference that does not exist yet.
+    /// A field the overlay fills in on start is the whole mechanism; the config thread only
+    /// ever assigns an enum through it, and an enum write is atomic.
+    /// </remarks>
+    private sealed class OverlayHandle
+    {
+        public PoEformance.Overlay.EntityOverlay? Overlay { get; set; }
+    }
+
     private static void RunOverlay(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
-        PoEformance.Features.AutoFlask autoFlask, bool debug)
+        PoEformance.Features.AutoFlask autoFlask, bool debug,
+        PoEformance.Features.OverlaySettings settings, OverlayHandle handle)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
         Console.WriteLine();
@@ -363,6 +384,8 @@ internal static class Program
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
         overlay.ShowDiagnostics = debug;
         overlay.ShowCalibration = debug;
+        overlay.MinimumLootRarity = settings.MinLootRarity;
+        handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();
     }
 
@@ -459,15 +482,18 @@ internal static class Program
         PoEformance.Features.AutoFlask autoFlask,
         PoEformance.Features.FlaskKeys flaskKeys,
         PoEformance.Features.AutoFlaskSettings flaskSettings,
+        PoEformance.Features.OverlaySettings overlaySettings,
+        OverlayHandle overlayHandle,
         bool alwaysOnTop)
     {
         Console.WriteLine();
         Console.WriteLine("config window open" + (alwaysOnTop ? " (kept on top, so the game cannot bury it)" : "")
             + " - the tool exits once it (and the overlay) are closed");
 
-        // The live settings. Only the window's thread touches this: it reads it to build a
-        // state and replaces it when the page saves.
+        // The live settings. Only the window's thread touches these: it reads them to build
+        // a state and replaces them when the page saves.
         PoEformance.Features.AutoFlaskSettings settings = flaskSettings;
+        PoEformance.Features.OverlaySettings overlay = overlaySettings;
 
         PoEformance.Config.ConfigState BuildState()
         {
@@ -494,42 +520,74 @@ internal static class Program
                 StaticsTotal: report.Statics.Count,
                 InGame: inGame,
                 EntityCount: entityCount,
-                AutoFlask: BuildAutoFlaskView(settings, flaskKeys, autoFlask, belt));
+                AutoFlask: BuildAutoFlaskView(settings, flaskKeys, autoFlask, belt),
+                Overlay: new PoEformance.Config.OverlayView(overlay.MinLootRarity.ToString()));
         }
 
         bool Apply(PoEformance.Config.ConfigRequest request)
         {
-            if (request.Type != "setFlaskSettings" || request.Payload.ValueKind != JsonValueKind.Object)
+            if (request.Payload.ValueKind != JsonValueKind.Object)
             {
                 return false;
             }
 
-            PoEformance.Features.AutoFlaskSettings? sent = request.Payload.Deserialize(
-                PoEformance.Config.ConfigJsonContext.Default.AutoFlaskSettings);
-            if (sent is null)
+            switch (request.Type)
             {
-                return false;
-            }
+                case "setFlaskSettings":
+                    PoEformance.Features.AutoFlaskSettings? flasks = request.Payload.Deserialize(
+                        PoEformance.Config.ConfigJsonContext.Default.AutoFlaskSettings);
+                    if (flasks is null)
+                    {
+                        return false;
+                    }
 
-            // Normalise BEFORE anything else sees it: the page is editable on disk and the
-            // file is hand-editable, so this is where a value becomes trustworthy.
-            settings = sent.Normalised();
-            autoFlask.Configure(settings.ToRules(flaskKeys), settings.Enabled);
-            AutoFlaskSettingsSaveWarning(PoEformance.Features.AutoFlaskSettingsStore.Save(settings));
-            return true;
+                    // Normalise BEFORE anything else sees it: the page is editable on disk
+                    // and the file is hand-editable, so this is where a value becomes
+                    // trustworthy.
+                    settings = flasks.Normalised();
+                    autoFlask.Configure(settings.ToRules(flaskKeys), settings.Enabled);
+                    SaveWarning(
+                        PoEformance.Features.AutoFlaskSettingsStore.Save(settings),
+                        PoEformance.Features.AutoFlaskSettingsStore.DefaultPath);
+                    return true;
+
+                case "setOverlaySettings":
+                    PoEformance.Features.OverlaySettings? sent = request.Payload.Deserialize(
+                        PoEformance.Config.ConfigJsonContext.Default.OverlaySettings);
+                    if (sent is null)
+                    {
+                        return false;
+                    }
+
+                    overlay = sent.Normalised();
+
+                    // Null until the overlay actually starts, which is the normal state for
+                    // a --config run without --overlay: the setting is still saved, it just
+                    // has nothing to apply to yet.
+                    if (overlayHandle.Overlay is PoEformance.Overlay.EntityOverlay live)
+                    {
+                        live.MinimumLootRarity = overlay.MinLootRarity;
+                    }
+
+                    SaveWarning(
+                        PoEformance.Features.OverlaySettingsStore.Save(overlay),
+                        PoEformance.Features.OverlaySettingsStore.DefaultPath);
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         return PoEformance.Config.ConfigWindowHost.Start("PoEformance", BuildState, Apply, alwaysOnTop);
     }
 
     /// <summary>Says so when settings could not be written, instead of losing them quietly.</summary>
-    private static void AutoFlaskSettingsSaveWarning(bool saved)
+    private static void SaveWarning(bool saved, string path)
     {
         if (!saved)
         {
-            Console.Error.WriteLine(
-                $"could not write {PoEformance.Features.AutoFlaskSettingsStore.DefaultPath} - "
-                + "the change applies to this session only.");
+            Console.Error.WriteLine($"could not write {path} - the change applies to this session only.");
         }
     }
 

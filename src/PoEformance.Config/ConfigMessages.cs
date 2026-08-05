@@ -43,6 +43,14 @@ public sealed record AutoFlaskView(
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("slots")] IReadOnlyList<FlaskSlotView> Slots);
 
+/// <summary>The overlay panel: what is drawn over the game.</summary>
+/// <param name="MinLootRarity">
+/// The worst drop still marked, by name. Currency is never filtered - it has no rarity to
+/// compare against and is the last thing anyone wants hidden.
+/// </param>
+public sealed record OverlayView(
+    [property: JsonPropertyName("minLootRarity")] string MinLootRarity);
+
 /// <summary>The host's state push: everything the config page shows.</summary>
 /// <remarks>
 /// One flat record on purpose. The page re-renders from whole states rather than patching
@@ -58,7 +66,8 @@ public sealed record ConfigState(
     [property: JsonPropertyName("staticsTotal")] int StaticsTotal,
     [property: JsonPropertyName("inGame")] bool InGame,
     [property: JsonPropertyName("entityCount")] int EntityCount,
-    [property: JsonPropertyName("autoFlask")] AutoFlaskView? AutoFlask = null);
+    [property: JsonPropertyName("autoFlask")] AutoFlaskView? AutoFlask = null,
+    [property: JsonPropertyName("overlay")] OverlayView? Overlay = null);
 
 /// <summary>
 /// Source-generated JSON for the bridge.
@@ -76,4 +85,5 @@ public sealed record ConfigState(
 [JsonSerializable(typeof(ConfigRequest))]
 [JsonSerializable(typeof(ConfigState))]
 [JsonSerializable(typeof(AutoFlaskSettings))]
+[JsonSerializable(typeof(OverlaySettings))]
 public sealed partial class ConfigJsonContext : JsonSerializerContext;
