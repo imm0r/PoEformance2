@@ -100,7 +100,7 @@ Things deliberately absent (each one is a lesson from reading GameHelper2): plug
 system, launcher/updater, DI container, interfaces with a single implementation,
 inheritance-based feature classes.
 
-## Threading model (planned shape)
+## Threading model
 
 One **reader thread** produces immutable snapshots at its own pace; publishing a
 snapshot is a single atomic reference swap. The **render thread** (ImGui) reads
@@ -110,8 +110,16 @@ and publish results the same way.
 
 No shared mutable state, no locks in the hot path, no async in the read loop. The
 AHK tool needed two extra *processes*, shared memory and a seqlock protocol to
-escape its single thread; here the same headroom is a `Thread` and an
-`Interlocked.Exchange`.
+escape its single thread; here the same headroom is a `Thread` and a field.
+
+**Implemented** as `Features/SnapshotFeed`. The renderer previously called the reader
+directly, so every drawn frame walked the entity map — the frame rate was bounded by
+memory reads, and worst with a screen full of monsters. Now the reader runs at 30 Hz
+(entities move at the game's tick rate; reading per frame bought nothing) and the
+renderer picks up whichever snapshot is newest. The atomicity is a consequence of
+`WorldSnapshot` being an immutable record: publishing is one reference assignment, so
+a torn read is not something the code has to prevent. The overlay shows read time next
+to frame time, which is what makes a regression visible rather than felt.
 
 ## Reverse-engineering first
 
@@ -198,6 +206,14 @@ just the player to centre.
 
 ### Next
 
-- Features on top of the slice: what to draw, and configuring it.
-- WebView2 config window — its AOT interop is still the open deployment risk.
-- Threading: the reader is currently synchronous with the renderer.
+Two of the three follow-ups are now closed:
+
+- **WebView2 + Native AOT — RESOLVED.** The official binding is built-in COM and cannot
+  AOT; `smourier/WebView2Aot` (source-generated COM, no UI framework) can, and the
+  official package is kept only for its native loader DLL. CI publishes the whole graph
+  with `PublishAot=true` on every push, and an AOT-built window was confirmed running
+  in-game. The bridge is JSON over web messages with source-generated serialisation —
+  reflection-based JSON is exactly what dies silently under AOT.
+- **Threading — RESOLVED.** See the threading model above.
+
+Remaining: features on top of the slice — what to draw, and configuring it.

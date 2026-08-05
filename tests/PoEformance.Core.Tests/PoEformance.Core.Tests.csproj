@@ -22,5 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\PoEformance.Core\PoEformance.Core.csproj" />
     <ProjectReference Include="..\..\src\PoEformance.Game\PoEformance.Game.csproj" />
+    <ProjectReference Include="..\..\src\PoEformance.Features\PoEformance.Features.csproj" />
   </ItemGroup>
 </Project>

@@ -256,8 +256,22 @@ internal static class Program
             ? "overlay running - it follows the game window; close it (or Ctrl+C) to quit"
             : "overlay running - no game window found, using a default size; Ctrl+C to quit");
 
+        // Reads happen on their own thread at their own rate; the renderer only ever picks
+        // up the newest finished snapshot. 30 Hz because entities move at the game's tick
+        // rate - reading once per drawn frame bought nothing and cost the frame rate.
+        using var feed = new PoEformance.Features.SnapshotFeed(
+            scale => world.Read(gameStatesStatic, scale: scale),
+            TimeSpan.FromMilliseconds(33));
+
         using var overlay = new PoEformance.Overlay.EntityOverlay(
-            scale => world.Read(gameStatesStatic, scale: scale), gameWindow, cull);
+            scale =>
+            {
+                feed.SetViewport(scale);
+                return feed.Latest;
+            },
+            gameWindow,
+            cull);
+        overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
         overlay.Start().GetAwaiter().GetResult();
     }
 

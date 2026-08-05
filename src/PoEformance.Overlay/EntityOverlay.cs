@@ -75,6 +75,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>Draw entity dots on the game's own map, using the map's projection.</summary>
     public bool ShowMapDots { get; set; } = true;
 
+    /// <summary>
+    /// Optional: read cost, completed reads and failures from the reader thread.
+    /// </summary>
+    /// <remarks>
+    /// Shown next to the frame rate so the two are directly comparable. That comparison IS
+    /// the point of the reader thread: read time no longer bounds frame time, and seeing
+    /// both numbers is what makes a regression obvious instead of felt.
+    /// </remarks>
+    public Func<(double Milliseconds, long Reads, long Failures)>? ReadStats { get; set; }
+
     protected override Task PostInitialized()
     {
         VSync = true;
@@ -246,6 +256,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             else
             {
                 ImGui.Text($"entities: {_snapshot.Entities.Count}");
+                if (ReadStats is not null)
+                {
+                    (double ms, long reads, long failures) = ReadStats();
+                    ImGui.Text($"read:     {ms:F1} ms on its own thread   frame: {1000f / ImGui.GetIO().Framerate:F1} ms"
+                        + $"   ({reads} reads{(failures > 0 ? $", {failures} failed" : string.Empty)})");
+                }
                 ImGui.Text(_tracked.IsValid
                     ? $"viewport: {width} x {height}  (game {_tracked.Width} x {_tracked.Height} @ {_tracked.X},{_tracked.Y})"
                     : $"viewport: {width} x {height}  (game window not tracked)");
