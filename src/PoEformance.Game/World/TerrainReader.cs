@@ -26,13 +26,15 @@ public sealed class TerrainGrid
 
     public TerrainGrid(
         byte[] cells, int bytesPerRow, int rows,
-        long totalTilesX = 0, long totalTilesY = 0, float[]? tileHeights = null)
+        long totalTilesX = 0, long totalTilesY = 0, float[]? tileHeights = null,
+        string heightNote = "")
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
         TilesX = (int)Math.Max(0, totalTilesX);
         TilesY = (int)Math.Max(0, totalTilesY);
         _tileHeights = tileHeights ?? [];
+        HeightNote = heightNote;
         _bytesPerRow = bytesPerRow;
         StoredWidth = bytesPerRow * 2;
         StoredHeight = rows;
@@ -65,6 +67,17 @@ public sealed class TerrainGrid
 
     /// <summary>True when per-tile heights were read - without them the map is drawn flat.</summary>
     public bool HasHeights => _tileHeights.Length > 0;
+
+    /// <summary>
+    /// Why the heights are, or are not, here.
+    /// </summary>
+    /// <remarks>
+    /// Carried on the grid rather than left in the reader because "no improvement" and
+    /// "improved, still not right" need completely different fixes, and without this the two
+    /// are indistinguishable from the screen: a height read that quietly returned nothing
+    /// draws exactly the flat map it drew before.
+    /// </remarks>
+    public string HeightNote { get; }
 
     /// <summary>
     /// Ground height at a grid cell, in the same world units entities report.
@@ -312,8 +325,12 @@ public sealed class TerrainReader
         if (tilesY is < 1 or > 4096) { tilesY = 0; }
 
         LastError = string.Empty;
-        return new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY, ReadTileHeights(terrainBase, tilesX, tilesY));
+        float[] heights = ReadTileHeights(terrainBase, tilesX, tilesY);
+        return new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote);
     }
+
+    /// <summary>Why the last height read produced what it did. See TerrainGrid.HeightNote.</summary>
+    private string _heightNote = string.Empty;
 
     /// <summary>
     /// Reads one ground height per terrain tile, in the world units entities report.
@@ -337,6 +354,7 @@ public sealed class TerrainReader
     {
         if (tilesX <= 0 || tilesY <= 0)
         {
+            _heightNote = "no tile count";
             return [];
         }
 
@@ -344,6 +362,7 @@ public sealed class TerrainReader
         ulong last = _reader.ReadPointer(terrainBase + (ulong)_tileDetails + 8);
         if (first == 0 || last <= first)
         {
+            _heightNote = "tile vector empty";
             return [];
         }
 
@@ -351,6 +370,7 @@ public sealed class TerrainReader
         long available = (long)(last - first) / TileEntrySize;
         if (available < count || count > 4_000_000)
         {
+            _heightNote = $"tile vector holds {available}, needs {count}";
             return [];
         }
 
@@ -358,6 +378,7 @@ public sealed class TerrainReader
         var tiles = new byte[count * TileEntrySize];
         if (!_reader.TryRead(first, tiles))
         {
+            _heightNote = $"tile read failed ({count * TileEntrySize} bytes)";
             return [];
         }
 
@@ -368,6 +389,7 @@ public sealed class TerrainReader
             heights[i] = raw * multiplier * HeightScale;
         }
 
+        _heightNote = $"{tilesX}x{tilesY} tiles, multiplier {multiplier}";
         return heights;
     }
 }

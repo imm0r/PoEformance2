@@ -1,3 +1,5 @@
+using System.Numerics;
+using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
 namespace PoEformance.Core.Tests;
@@ -146,6 +148,66 @@ public class TerrainHeightTests
         Assert.Equal(96, capped.PatchesX);
         Assert.Equal(96, capped.PatchesY);
         Assert.Equal(huge.Width, capped.EdgeX(capped.PatchesX));
+    }
+
+    /// <summary>The map as it is drawn on: a fixed view, so only the heights vary.</summary>
+    private static MapView Map()
+        => new(new Vector2(700, 450), 900f, 0.5f, IsLargeMap: true, Visible: true, 0, 0, 1400, 900);
+
+    [Fact]
+    public void AWrongReferenceHeightMovesTHE_WHOLE_OutlineTogether()
+    {
+        // Half of the rule a recording of the map was read with, and worth keeping because
+        // the next height fault will be read the same way.
+        //
+        // The reference is what EVERY point is measured against, so getting it wrong shifts
+        // all of them by the same amount - and since it is the PLAYER's height, that shift
+        // changes as they walk. A recording showing a uniform offset that grew from nothing
+        // on the flat to sixteen pixels on a hill is therefore a statement about the
+        // reference, not about the terrain.
+        MapView map = Map();
+        float[] groundHeights = [0f, 120f, -260f, 45f];
+
+        const float trueReference = 300f;
+        const float wrongReference = 300f - 82f;   // the player's sub-tile term, unaccounted
+
+        var shifts = new List<float>();
+        for (int i = 0; i < groundHeights.Length; i++)
+        {
+            float worldX = 1000f + (i * 700f);
+            float worldY = 800f - (i * 400f);
+
+            Vector2 right = map.Project(worldX, worldY, groundHeights[i], 500f, 500f, trueReference);
+            Vector2 wrong = map.Project(worldX, worldY, groundHeights[i], 500f, 500f, wrongReference);
+
+            Assert.Equal(right.X, wrong.X, 3);   // height never moves a point sideways
+            shifts.Add(wrong.Y - right.Y);
+        }
+
+        // Every point moved by the SAME amount - which is what "uniform across the frame"
+        // in the measurement means, and why it points at the reference.
+        Assert.All(shifts, shift => Assert.Equal(shifts[0], shift, 3));
+        Assert.NotEqual(0f, shifts[0]);
+    }
+
+    [Fact]
+    public void AWrongGroundHeightMovesOnlyTheWallThatHasIt()
+    {
+        // The other half. An error in the per-wall heights - the sub-tile term this does not
+        // read - varies from wall to wall by construction, so it shows up as parts of the map
+        // disagreeing with each other rather than as a shift of all of it. That is what
+        // separates "the reference is wrong" from "the terrain heights are wrong" in a
+        // screenshot, without needing to know either value.
+        MapView map = Map();
+
+        Vector2 wallA = map.Project(1000f, 800f, 0f, 500f, 500f, 300f);
+        Vector2 wallB = map.Project(2000f, 400f, 0f, 500f, 500f, 300f);
+
+        Vector2 wallAOff = map.Project(1000f, 800f, 60f, 500f, 500f, 300f);
+        Vector2 wallBSame = map.Project(2000f, 400f, 0f, 500f, 500f, 300f);
+
+        Assert.NotEqual(wallA.Y, wallAOff.Y, 3);   // the wall with the wrong height moved
+        Assert.Equal(wallB.Y, wallBSame.Y, 3);     // its neighbour did not
     }
 
     [Fact]

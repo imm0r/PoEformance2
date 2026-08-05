@@ -204,22 +204,27 @@ public sealed class TerrainLayer : IDisposable
     {
         TerrainMesh mesh = TerrainMesh.For(grid, MaxPatches, _coverX, _coverY);
 
-        // Measured against the player's OWN TILE, not the render component's terrain height.
-        // Both describe the same ground, but by different arithmetic from different fields,
-        // and taking both ends of the difference from one source makes any constant
-        // disagreement between them cancel. The alternative reference is exact where these
-        // two happen to agree and shifts the ENTIRE outline where they do not - including on
-        // the flat maps that are correct today, which is not a trade worth making blind.
+        // The player's REAL ground height, from the render component - not the height of the
+        // tile they stand on.
         //
-        // What it costs is the player's own sub-tile height, the term this does not read (see
-        // TerrainReader.ReadTileHeights): the outline stays put around the player and the far
-        // side of the map moves by that much while they stand on a staircase. DescribeTerrain
-        // reports both figures so the size of it can be read off rather than guessed at.
-        float reference = grid.HasHeights
-            ? grid.HeightAt(
-                (int)(player.X / MapView.WorldToGrid),
-                (int)(player.Y / MapView.WorldToGrid))
-            : player.Z;
+        // This was the other way round, and a recording of the map settled it. The offset was
+        // measured to be uniform across the whole outline within a frame (11, 10, 10, 11, 11
+        // pixels top to bottom and left to right) and to CHANGE as the player walked, from
+        // nothing on the flat to sixteen pixels on a hill. Only the reference can do that:
+        // an error in the per-wall heights varies from wall to wall by construction, while
+        // the term every wall is measured against moves all of them together.
+        //
+        // The tile height was chosen originally because taking both ends of the difference
+        // from one source makes any constant disagreement between the two cancel. That is
+        // true, and the price is the player's own SUB-TILE height - the within-tile part this
+        // does not read - shifting the entire map. On a staircase that price is the whole
+        // error, which is what the recording shows.
+        //
+        // What remains is each wall's own sub-tile term, which does not move with the player
+        // and shows up as variation between parts of the map rather than a shift of all of
+        // it. DescribeTerrain reports both figures at the player so that residual can be read
+        // off rather than argued about.
+        float reference = player.Z;
 
         // The corner grid, built once per frame: every patch shares its edges with its
         // neighbours, so projecting per patch would do the same work four times over and

@@ -206,20 +206,41 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return "loading";
         }
 
-        string heights = "flat - no tile heights";
-        if (grid.HasHeights)
+        return $"{grid.Describe()}, {DescribeHeights(grid)}, texture {_terrain.Describe()}";
+    }
+
+    /// <summary>
+    /// The height state, and the one number that says how much is still missing.
+    /// </summary>
+    /// <remarks>
+    /// "ground" is the player's real ground height; "tile" is the height of the whole tile
+    /// they stand on. Their difference IS the sub-tile term - the within-tile slope that is
+    /// not read - measured live at the one place both figures are available. On flat ground
+    /// they should agree; how far they part on a staircase is what the remaining error is
+    /// worth, and it decides whether reading the rest is worth doing at all.
+    ///
+    /// A difference that persists on FLAT ground would mean something else: the two are not
+    /// the same quantity, and the outline would be shifted by that much everywhere.
+    /// </remarks>
+    private string DescribeHeights(TerrainGrid grid)
+    {
+        if (!grid.HasHeights)
         {
-            heights = $"{grid.TilesX}x{grid.TilesY} tiles with heights";
-            if (_snapshot.Player is WorldEntity player)
-            {
-                float tile = grid.HeightAt(
-                    (int)(player.WorldX / MapView.WorldToGrid),
-                    (int)(player.WorldY / MapView.WorldToGrid));
-                heights += $" (ground here {player.TerrainHeight:F0}, tile {tile:F0})";
-            }
+            return $"FLAT - heights unavailable: {grid.HeightNote}";
         }
 
-        return $"{grid.Describe()}, {heights}, texture {_terrain.Describe()}";
+        string state = grid.HeightNote;
+        if (_snapshot.Player is not WorldEntity player)
+        {
+            return state;
+        }
+
+        float tile = grid.HeightAt(
+            (int)(player.WorldX / MapView.WorldToGrid),
+            (int)(player.WorldY / MapView.WorldToGrid));
+
+        return $"{state}; here ground {player.TerrainHeight:F0} vs tile {tile:F0}"
+               + $" (sub-tile {player.TerrainHeight - tile:F0})";
     }
 
     /// <summary>Releases the terrain texture along with the renderer that holds it.</summary>
@@ -546,6 +567,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 if (FlaskStatus is not null)
                 {
                     ImGui.TextColored(new Vector4(0.8f, 0.7f, 0.4f, 1f), $"flask:    {FlaskStatus()}");
+                }
+
+                // In the overlay rather than only in the config window, because this is read
+                // while standing on the hill that shows the problem - a readout that needs a
+                // second window open is a readout nobody is looking at in that moment.
+                if (ShowTerrain)
+                {
+                    ImGui.TextColored(new Vector4(0.65f, 0.7f, 0.78f, 1f), $"terrain:  {DescribeTerrain()}");
                 }
 
                 // Not behind --debug. The UI browser is a working tool rather than a

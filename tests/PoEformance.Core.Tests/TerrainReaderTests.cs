@@ -120,6 +120,36 @@ public class TerrainReaderTests
     }
 
     [Fact]
+    public void EveryHeightOutcomeSaysWhatItWas()
+    {
+        // A height read that quietly returns nothing draws exactly the flat map it drew
+        // before, so "no improvement" and "improved, still not right" look identical on
+        // screen - and they need completely different fixes. The note is what separates
+        // them, which makes it load-bearing rather than decoration.
+        OffsetSchema schema = RealSessionTests.Schema();
+
+        (FakeMemoryReader ok, _, _, _) = Area(heightMultiplier: 3, [1, 2, 3, 4, 5, 6]);
+        TerrainGrid? read = new TerrainReader(ok, schema).Read(AreaInstance, nowMs: 0);
+        Assert.Contains("3x2 tiles", read!.HeightNote);
+        Assert.Contains("multiplier 3", read.HeightNote);
+
+        (FakeMemoryReader none, _, _, _) = Area(withTileDetails: false);
+        Assert.Equal("tile vector empty", new TerrainReader(none, schema).Read(AreaInstance, 0)!.HeightNote);
+
+        // Short vector: the note names both numbers, so a wrong tile count and a wrong
+        // pointer are told apart without another session.
+        (FakeMemoryReader shortVec, _, _, _) = Area(rawHeights: [1, 2, 3, 4, 5, 6]);
+        ulong details = AreaInstance
+            + (ulong)schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata")
+            + (ulong)schema.Structs["TerrainMetadata"].OffsetOf("TileDetailsPtr");
+        shortVec.Place<ulong>(details + 8, TileData + (2 * 0x38));
+
+        string note = new TerrainReader(shortVec, schema).Read(AreaInstance, 0)!.HeightNote;
+        Assert.Contains("holds 2", note);
+        Assert.Contains("needs 6", note);
+    }
+
+    [Fact]
     public void ATileVectorTooShortForTheAreaIsRefused()
     {
         // A drifted offset can land on a vector that reads perfectly well and describes
