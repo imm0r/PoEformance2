@@ -315,6 +315,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     ImGui.Text($"vitals:   life {Show(vitals.Life)}   mana {Show(vitals.Mana)}   es {Show(vitals.EnergyShield)}");
                 }
 
+                if (_snapshot.FlaskBelt is FlaskBelt belt && !belt.IsUnknown)
+                {
+                    ImGui.Text("belt:     " + string.Join("   ", belt.Flasks.Select(f =>
+                        $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}{(f.CanUse ? string.Empty : " (empty)")}")));
+                }
+
                 if (FlaskStatus is not null)
                 {
                     ImGui.TextColored(new Vector4(0.8f, 0.7f, 0.4f, 1f), $"flask:    {FlaskStatus()}");

@@ -289,7 +289,9 @@ internal static class Program
                     PoEformance.Features.FlaskTick tick = autoFlask.Evaluate(
                         snapshot.PlayerVitals,
                         FlaskKeySender.IsForeground(gameWindow),
-                        Environment.TickCount64);
+                        Environment.TickCount64,
+                        snapshot.PlayerBuffs,
+                        snapshot.FlaskBelt);
 
                     foreach (PoEformance.Features.FlaskUse use in tick.Used)
                     {

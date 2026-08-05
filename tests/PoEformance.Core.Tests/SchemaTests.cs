@@ -100,4 +100,45 @@ public class SchemaTests
             }
         }
     }
+
+    [Fact]
+    public void DuplicateStructName_FailsLoud()
+    {
+        // A second definition of the same name silently replaces the first when JSON is
+        // deserialised into a dictionary - taking any fields or constants only the first
+        // declared with it. That really happened here, and only a test three layers away
+        // caught it, so the loader now refuses it outright.
+        const string json = """
+        {
+          "version": 1,
+          "structs": {
+            "Thing": { "fields": { "A": { "offset": "0x10", "type": "i32" } }, "consts": { "K": "1" } },
+            "Thing": { "fields": { "A": { "offset": "0x10", "type": "i32" } } }
+          }
+        }
+        """;
+
+        var error = Assert.Throws<InvalidDataException>(
+            () => SchemaJson.Load(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(json))));
+
+        Assert.Contains("Thing", error.Message, StringComparison.Ordinal);
+        Assert.Contains("twice", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DuplicateStaticName_FailsLoud()
+    {
+        const string json = """
+        {
+          "version": 1,
+          "statics": {
+            "Anchor": { "pattern": "48 8B ^ ?? ?? ?? ??" },
+            "Anchor": { "pattern": "48 8B ^ ?? ?? ?? ??" }
+          }
+        }
+        """;
+
+        Assert.Throws<InvalidDataException>(
+            () => SchemaJson.Load(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(json))));
+    }
 }

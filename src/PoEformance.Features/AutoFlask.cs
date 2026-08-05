@@ -12,7 +12,10 @@ public enum VitalKind
 
 /// <summary>One flask: what it watches, when it fires, and which key uses it.</summary>
 /// <param name="Key">Virtual-key code of the flask's hotkey.</param>
-/// <param name="ThresholdPercent">Fires at or below this fill level of the USABLE pool.</param>
+/// <param name="ThresholdPercent">
+/// Fires at or below this fill level of the USABLE pool. Ignored when the rule triggers on
+/// a buff instead (<see cref="TriggerBuff"/>).
+/// </param>
 /// <param name="CooldownMs">
 /// Minimum gap between uses of THIS flask. Not a cosmetic limit: recovery is not
 /// instantaneous, so without it the pool is still low on the next tick and the whole flask
@@ -26,6 +29,37 @@ public sealed record FlaskRule(
     int CooldownMs = 1500)
 {
     public bool Enabled { get; init; } = true;
+
+    /// <summary>
+    /// Belt slot 1-5, so the flask's own buff can be recognised. 0 disables that check.
+    /// </summary>
+    /// <remarks>
+    /// Worth configuring even though the key already identifies the flask: the game reports
+    /// an active flask buff by SLOT, not by key, so without this the engine cannot tell
+    /// whether this particular flask is already doing its job.
+    /// </remarks>
+    public int Slot { get; init; }
+
+    /// <summary>
+    /// Don't re-use while this flask's own effect is still running.
+    /// </summary>
+    /// <remarks>
+    /// The real charge saver. A cooldown is a guess at the duration; the buff is the fact,
+    /// and duration varies with the flask's modifiers. Only meaningful with a
+    /// <see cref="Slot"/>.
+    /// </remarks>
+    public bool SkipWhileActive { get; init; } = true;
+
+    /// <summary>
+    /// Fire when a buff or debuff whose name contains this is present, instead of on a
+    /// vital threshold. Empty means threshold-triggered.
+    /// </summary>
+    /// <remarks>
+    /// This is what makes utility flasks work: bleed and freeze removal are not low-life
+    /// events, they are "this specific thing is on me right now" events, and a life
+    /// threshold either fires far too late or not at all.
+    /// </remarks>
+    public string TriggerBuff { get; init; } = string.Empty;
 }
 
 /// <summary>A flask the engine decided to use, and the reading that triggered it.</summary>
@@ -80,14 +114,19 @@ public sealed class AutoFlask
     /// <param name="vitals">The player's pools, or null when they could not be read.</param>
     /// <param name="gameFocused">Whether the GAME window has focus - see the class remarks.</param>
     /// <param name="nowMs">A monotonic clock, e.g. Environment.TickCount64.</param>
-    public FlaskTick Evaluate(Vitals? vitals, bool gameFocused, long nowMs)
+    /// <param name="belt">
+    /// The equipped flasks. Optional: when unknown, charge checking is skipped rather than
+    /// blocking every rule - a belt that could not be read must not disable the feature.
+    /// </param>
+    public FlaskTick Evaluate(
+        Vitals? vitals, bool gameFocused, long nowMs, ActiveBuffs? buffs = null, FlaskBelt? belt = null)
     {
-        FlaskTick tick = Decide(vitals, gameFocused, nowMs);
+        FlaskTick tick = Decide(vitals, gameFocused, nowMs, buffs ?? ActiveBuffs.None, belt ?? FlaskBelt.Empty);
         LastTick = tick;
         return tick;
     }
 
-    private FlaskTick Decide(Vitals? vitals, bool gameFocused, long nowMs)
+    private FlaskTick Decide(Vitals? vitals, bool gameFocused, long nowMs, ActiveBuffs buffs, FlaskBelt belt)
     {
         if (!Enabled)
         {
@@ -122,17 +161,48 @@ public sealed class AutoFlask
                 continue;
             }
 
-            Vital vital = Select(pools, rule.Vital);
-            int percent = vital.Percent;
-            if (percent < 0)
+            int percent;
+            if (rule.TriggerBuff.Length > 0)
             {
-                blocked.Add($"{rule.Name}: no {rule.Vital.ToString().ToLowerInvariant()} pool");
+                // Buff-triggered: the vital is irrelevant, the debuff being present is the
+                // whole condition.
+                if (!buffs.Has(rule.TriggerBuff))
+                {
+                    continue;
+                }
+
+                percent = -1;
+            }
+            else
+            {
+                Vital vital = Select(pools, rule.Vital);
+                percent = vital.Percent;
+                if (percent < 0)
+                {
+                    blocked.Add($"{rule.Name}: no {rule.Vital.ToString().ToLowerInvariant()} pool");
+                    continue;
+                }
+
+                if (percent > rule.ThresholdPercent)
+                {
+                    continue; // above threshold is the normal case, not worth reporting
+                }
+            }
+
+            // The flask is already doing its job - a charge spent here buys nothing.
+            if (rule.SkipWhileActive && rule.Slot > 0 && buffs.IsFlaskActive(rule.Slot))
+            {
+                blocked.Add($"{rule.Name}: already active");
                 continue;
             }
 
-            if (percent > rule.ThresholdPercent)
+            // Not enough charges to use. Checked BEFORE the cooldown is stamped, because
+            // pressing an empty flask does nothing in game while still starting the
+            // cooldown here - which would leave the slot suppressed for no reason.
+            if (rule.Slot > 0 && belt.InSlot(rule.Slot) is EquippedFlask flask && !flask.CanUse)
             {
-                continue; // above threshold is the normal case, not worth reporting
+                blocked.Add($"{rule.Name}: {flask.Charges}/{flask.ChargesPerUse} charges");
+                continue;
             }
 
             if (_lastUsed.TryGetValue(rule.Name, out long last) && nowMs - last < rule.CooldownMs)
@@ -147,7 +217,8 @@ public sealed class AutoFlask
 
         if (used.Count > 0)
         {
-            return new FlaskTick(used, string.Join(", ", used.Select(u => $"{u.Rule.Name} at {u.Percent}%")));
+            return new FlaskTick(used, string.Join(", ", used.Select(u =>
+                u.Percent < 0 ? $"{u.Rule.Name} (buff)" : $"{u.Rule.Name} at {u.Percent}%")));
         }
 
         return new FlaskTick([], blocked.Count > 0 ? string.Join(", ", blocked) : Describe(pools));
@@ -175,7 +246,7 @@ public sealed class AutoFlask
     /// </remarks>
     public static IReadOnlyList<FlaskRule> DefaultRules { get; } =
     [
-        new FlaskRule("Life flask", VitalKind.Life, ThresholdPercent: 65, Key: 0x31),  // '1'
-        new FlaskRule("Mana flask", VitalKind.Mana, ThresholdPercent: 30, Key: 0x32),  // '2'
+        new FlaskRule("Life flask", VitalKind.Life, ThresholdPercent: 65, Key: 0x31) { Slot = 1 },
+        new FlaskRule("Mana flask", VitalKind.Mana, ThresholdPercent: 30, Key: 0x32) { Slot = 2 },
     ];
 }

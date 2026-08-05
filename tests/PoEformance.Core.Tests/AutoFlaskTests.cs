@@ -174,4 +174,111 @@ public class AutoFlaskTests
         Assert.Empty(engine.Evaluate(Pools(life: 1), gameFocused: true, 1000).Used);
         Assert.Equal(2, AutoFlask.DefaultRules.Count);
     }
+
+    // ── charges and active effects ───────────────────────────────────────────────
+
+    private static FlaskBelt Belt(params EquippedFlask[] flasks) => new(flasks);
+
+    private static ActiveBuffs FlaskBuff(int slot, float timeLeft = 4f)
+        => new([new ActiveBuff("flask_effect_life", timeLeft, 5f, 0, slot, IsFlask: true)]);
+
+    [Fact]
+    public void DoesNotFire_WhenTheFlaskHasTooFewCharges()
+    {
+        // Pressing an empty flask does nothing in game but WOULD start the cooldown here,
+        // so an empty flask would quietly suppress its own slot. Hence the check comes
+        // before the cooldown is stamped.
+        AutoFlask engine = Engine(new FlaskRule("life", VitalKind.Life, 65, Key: 0x31) { Slot = 1 });
+        FlaskBelt empty = Belt(new EquippedFlask(1, "Metadata/Items/Flasks/X", Charges: 5, ChargesPerUse: 20));
+
+        FlaskTick tick = engine.Evaluate(Pools(life: 20), true, 1000, belt: empty);
+
+        Assert.Empty(tick.Used);
+        Assert.Contains("charges", tick.Reason, StringComparison.OrdinalIgnoreCase);
+
+        // And the slot is NOT suppressed afterwards: once refilled it fires immediately.
+        FlaskBelt refilled = Belt(new EquippedFlask(1, "Metadata/Items/Flasks/X", 40, 20));
+        Assert.Single(engine.Evaluate(Pools(life: 20), true, 1100, belt: refilled).Used);
+    }
+
+    [Fact]
+    public void Fires_WhenChargesExactlyCoverOneUse()
+    {
+        AutoFlask engine = Engine(new FlaskRule("life", VitalKind.Life, 65, Key: 0x31) { Slot = 1 });
+        FlaskBelt exact = Belt(new EquippedFlask(1, "Metadata/Items/Flasks/X", Charges: 20, ChargesPerUse: 20));
+
+        Assert.Single(engine.Evaluate(Pools(life: 20), true, 1000, belt: exact).Used);
+    }
+
+    [Fact]
+    public void UnknownBelt_DoesNotBlockTheFeature()
+    {
+        // A belt that could not be read is not evidence of an empty flask. Blocking on it
+        // would turn one failed read into a silently disabled feature.
+        AutoFlask engine = Engine(new FlaskRule("life", VitalKind.Life, 65, Key: 0x31) { Slot = 1 });
+        Assert.Single(engine.Evaluate(Pools(life: 20), true, 1000, belt: FlaskBelt.Empty).Used);
+    }
+
+    [Fact]
+    public void DoesNotReuse_WhileTheFlasksOwnEffectIsStillRunning()
+    {
+        // The real charge saver, and the reason buffs are read at all: a cooldown only
+        // GUESSES the duration, while the game reports the remaining time as fact.
+        AutoFlask engine = Engine(
+            new FlaskRule("life", VitalKind.Life, 65, Key: 0x31, CooldownMs: 0) { Slot = 1 });
+
+        FlaskTick blockedTick = engine.Evaluate(Pools(life: 20), true, 1000, FlaskBuff(slot: 1));
+        Assert.Empty(blockedTick.Used);
+        Assert.Contains("active", blockedTick.Reason, StringComparison.OrdinalIgnoreCase);
+
+        // Another slot's flask being active is irrelevant to this one.
+        Assert.Single(engine.Evaluate(Pools(life: 20), true, 1100, FlaskBuff(slot: 3)).Used);
+    }
+
+    [Fact]
+    public void ExpiredFlaskBuff_DoesNotBlock()
+    {
+        AutoFlask engine = Engine(
+            new FlaskRule("life", VitalKind.Life, 65, Key: 0x31, CooldownMs: 0) { Slot = 1 });
+
+        Assert.Single(engine.Evaluate(Pools(life: 20), true, 1000, FlaskBuff(slot: 1, timeLeft: 0f)).Used);
+    }
+
+    [Fact]
+    public void BuffTriggeredFlask_FiresOnTheDebuffRegardlessOfLife()
+    {
+        // Utility flasks are not low-life events. A bleed at full life must still trigger
+        // the removal flask, which a threshold rule would never do.
+        AutoFlask engine = Engine(
+            new FlaskRule("bleed", VitalKind.Life, ThresholdPercent: 0, Key: 0x33)
+            {
+                Slot = 3,
+                TriggerBuff = "bleeding",
+            });
+
+        var bleeding = new ActiveBuffs([new ActiveBuff("bleeding", 5f, 5f, 0, 0, IsFlask: false)]);
+
+        Assert.Empty(engine.Evaluate(Pools(life: 100), true, 1000).Used);
+        Assert.Single(engine.Evaluate(Pools(life: 100), true, 2000, bleeding).Used);
+    }
+
+    [Fact]
+    public void BuffLookup_IsForgivingAboutExactNames()
+    {
+        // The internal names are game identifiers; a person configuring a bleed flask
+        // should not have to know the exact one.
+        var buffs = new ActiveBuffs([new ActiveBuff("player_bleeding_dot", 3f, 5f, 0, 0, false)]);
+
+        Assert.True(buffs.Has("BLEEDING"));
+        Assert.True(buffs.Has("bleed"));
+        Assert.False(buffs.Has("frozen"));
+        Assert.False(buffs.Has(" "));
+    }
+
+    [Fact]
+    public void FlaskDetection_MatchesFlaskPaths()
+    {
+        Assert.True(FlaskBeltReader.IsFlask("Metadata/Items/Flasks/FlaskLife1"));
+        Assert.False(FlaskBeltReader.IsFlask("Metadata/Items/Weapons/Bow"));
+    }
 }

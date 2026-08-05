@@ -414,32 +414,34 @@
     },
 
     "Buffs": {
+      "comment": "Component: every buff and debuff currently on the entity. NOTE A DELIBERATE DIVERGENCE FROM GameHelper2: it reads this vector as StdVector<IntPtr> and dereferences each element, whereas in PoE2 the entries are stored INLINE, 0x50 apart, which is how the AHK tool reads them in production. Where the two references disagree, the PoE2-specific one wins - dereferencing an inline struct here yields garbage.",
       "fields": {
-        "StatusEffectPtr": {
-          "offset": "0x160", "type": "stdVector",
-          "invariant": { "kind": "vectorSane", "elementSize": 80, "maxCount": 512 },
-          "comment": "Vector of StatusEffect entries, 0x50 apart."
-        }
+        "StatusEffectFirst": { "offset": "0x160", "type": "ptr", "comment": "StdVector begin: first inline StatusEffect." },
+        "StatusEffectLast": { "offset": "0x168", "type": "ptr", "comment": "StdVector end; count = (Last - First) / StatusEffectStructSize." }
       },
       "consts": { "StatusEffectStructSize": "0x50" }
     },
 
-    "StatusEffect": {
+    "BuffDefinition": {
+      "comment": "The static description a StatusEffect points at. BuffType 0x04 marks a FLASK buff, which is what makes 'is this flask still active' answerable without name matching.",
       "fields": {
-        "BuffDefinitionPtr": { "offset": "0x08", "type": "ptr" },
-        "TotalTime": { "offset": "0x18", "type": "f32" },
-        "TimeLeft": { "offset": "0x1C", "type": "f32" },
-        "SourceEntityId": { "offset": "0x28", "type": "u32" },
-        "Charges": { "offset": "0x40", "type": "u16" },
-        "FlaskSlot": { "offset": "0x42", "type": "u8" },
-        "Effectiveness": { "offset": "0x48", "type": "u16" }
-      }
+        "Name": { "offset": "0x00", "type": "utf16Ptr", "comment": "-> raw UTF-16 string, NOT a StdWString, e.g. \"flask_effect_life\"." },
+        "BuffVisualsKey": { "offset": "0x55", "type": "ptr" },
+        "BuffType": { "offset": "0x67", "type": "u8", "comment": "0x04 = flask buff." }
+      },
+      "consts": { "BuffTypeFlask": "0x04" }
     },
 
-    "BuffDefinition": {
+    "StatusEffect": {
+      "comment": "One active buff or debuff, INLINE in the Buffs vector at 0x50 stride.",
       "fields": {
-        "Name": { "offset": "0x00", "type": "utf16Ptr" },
-        "BuffType": { "offset": "0x67", "type": "u8" }
+        "BuffDefinitionPtr": { "offset": "0x08", "type": "ptr", "comment": "-> BuffDefinition, which carries the name and the type." },
+        "TotalTime": { "offset": "0x18", "type": "f32" },
+        "TimeLeft": { "offset": "0x1C", "type": "f32", "comment": "Seconds remaining. The signal for 'this flask is still doing its job'." },
+        "SourceEntityId": { "offset": "0x28", "type": "u32" },
+        "Charges": { "offset": "0x40", "type": "i16", "comment": "SIGNED - the reference reads a short." },
+        "FlaskSlot": { "offset": "0x42", "type": "i16", "comment": "RAW slot 0-4 for a flask buff, i.e. belt slot 1-5; anything outside that range means this buff did not come from a flask. Signed short, not a byte." },
+        "Effectiveness": { "offset": "0x48", "type": "i16", "comment": "Percentage delta: the effective value is 100 + this." }
       }
     },
 
@@ -541,8 +543,24 @@
       "fields": {
         "TotalBoxes": { "offset": "0x150", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 256 } },
         "TotalBoxesY": { "offset": "0x154", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 256 } },
-        "ItemList": { "offset": "0x170", "type": "stdVector" },
+        "ItemList": { "offset": "0x170", "type": "stdVector", "comment": "Vector of POINTERS to InventoryItem structs." },
+        "ItemListLast": { "offset": "0x178", "type": "ptr", "comment": "Vector end; count = (Last - First) / 8." },
         "ServerRequestCounter": { "offset": "0x1E8", "type": "i32" }
+      }
+    },
+
+    "ChargesComponent": {
+      "comment": "Component on a flask item: how many charges it holds and what a use costs. Together they answer the only question that matters before pressing the key - is this flask usable AT ALL. Confirmed identically by GameHelper2's ChargesOffsets and the AHK tool.",
+      "fields": {
+        "ChargesInternalPtr": { "offset": "0x10", "type": "ptr", "comment": "-> ChargesInternal, which holds the per-use cost." },
+        "Current": { "offset": "0x18", "type": "i32", "comment": "Charges the flask currently holds." }
+      }
+    },
+
+    "ChargesInternal": {
+      "comment": "The shared per-base-type descriptor a Charges component points at.",
+      "fields": {
+        "PerUseCharges": { "offset": "0x18", "type": "i32", "comment": "Cost of one use. A flask with fewer charges than this cannot be used." }
       }
     },
 

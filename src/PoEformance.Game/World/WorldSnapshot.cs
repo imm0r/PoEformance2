@@ -83,7 +83,9 @@ public sealed record WorldSnapshot(
     float[] Matrix,
     MapView? LargeMap = null,
     MapView? MiniMap = null,
-    Vitals? PlayerVitals = null)
+    Vitals? PlayerVitals = null,
+    ActiveBuffs? PlayerBuffs = null,
+    FlaskBelt? FlaskBelt = null)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -110,6 +112,10 @@ public sealed class WorldReader
     private readonly EntityReader _entities;
     private readonly RenderReader _render;
     private readonly LifeReader _life;
+    private readonly BuffsReader _buffs;
+    private readonly FlaskBeltReader _flasks;
+    private readonly int _playerInfo;
+    private readonly int _serverData;
     private readonly int _awakeEntities;
     private readonly int _w2sMatrix;
 
@@ -124,6 +130,10 @@ public sealed class WorldReader
         _entities = new EntityReader(reader, schema);
         _render = new RenderReader(reader, schema);
         _life = new LifeReader(reader, schema);
+        _buffs = new BuffsReader(reader, schema);
+        _flasks = new FlaskBeltReader(reader, schema);
+        _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
+        _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
         _w2sMatrix = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
     }
@@ -209,10 +219,28 @@ public sealed class WorldReader
         // once per tick and every consumer - overlay, auto-flask, config page - works from
         // the same instant rather than each issuing its own reads.
         Vitals? playerVitals = null;
-        ulong lifeAddress = _entities.Read(chain.PlayerEntity)?.Component("Life") ?? 0;
+        ActiveBuffs? playerBuffs = null;
+        Entity? localPlayer = _entities.Read(chain.PlayerEntity);
+
+        ulong lifeAddress = localPlayer?.Component("Life") ?? 0;
         if (lifeAddress != 0)
         {
             playerVitals = _life.Read(lifeAddress);
+        }
+
+        ulong buffsAddress = localPlayer?.Component("Buffs") ?? 0;
+        if (buffsAddress != 0)
+        {
+            playerBuffs = _buffs.Read(buffsAddress);
+        }
+
+        // The flask belt hangs off ServerData, which is the INLINE LocalPlayerStruct's
+        // first field - the same struct the player pointer comes from.
+        FlaskBelt? flaskBelt = null;
+        ulong serverData = _reader.ReadPointer(chain.AreaInstance + (ulong)_playerInfo + (ulong)_serverData);
+        if (MemoryReaderExtensions.IsPlausiblePointer(serverData))
+        {
+            flaskBelt = _flasks.Read(serverData);
         }
 
         MapView? largeMap = null;
@@ -225,7 +253,8 @@ public sealed class WorldReader
             largeMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: true);
         }
 
-        return new WorldSnapshot(true, player, entities, matrix, largeMap, miniMap, playerVitals);
+        return new WorldSnapshot(
+            true, player, entities, matrix, largeMap, miniMap, playerVitals, playerBuffs, flaskBelt);
     }
 
     /// <summary>

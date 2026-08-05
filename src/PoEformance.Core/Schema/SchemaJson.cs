@@ -26,7 +26,15 @@ public static class SchemaJson
 
     public static OffsetSchema Load(Stream json)
     {
-        SchemaDto dto = JsonSerializer.Deserialize(json, SchemaJsonContext.Default.SchemaDto)
+        // Read once into memory: the duplicate-name check needs a second pass, and the
+        // schema is a few tens of kilobytes.
+        using var buffer = new MemoryStream();
+        json.CopyTo(buffer);
+
+        RejectDuplicateNames(buffer.ToArray());
+
+        buffer.Position = 0;
+        SchemaDto dto = JsonSerializer.Deserialize(buffer, SchemaJsonContext.Default.SchemaDto)
                         ?? throw new InvalidDataException("Schema file is empty.");
 
         var statics = new Dictionary<string, StaticAnchor>();
@@ -66,6 +74,49 @@ public static class SchemaJson
         }
 
         return new OffsetSchema(dto.Version, dto.GameVersion ?? "unknown", statics, structs);
+    }
+
+    /// <summary>
+    /// Fails on a struct or static defined twice.
+    /// </summary>
+    /// <remarks>
+    /// JSON deserialisation into a dictionary takes the LAST of two identical keys and says
+    /// nothing, so a second definition silently replaces the first - and since both usually
+    /// look plausible, the loss only surfaces much later as a missing field or a wrong
+    /// offset. That happened: a second "BuffDefinition" block dropped the constants the
+    /// first one declared, and only a unit test three layers away noticed.
+    ///
+    /// JsonDocument preserves duplicate property names when enumerating, which is what
+    /// makes detecting this possible at all.
+    /// </remarks>
+    private static void RejectDuplicateNames(byte[] json)
+    {
+        using JsonDocument document = JsonDocument.Parse(json, new JsonDocumentOptions
+        {
+            CommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+        });
+
+        foreach (string section in (string[])["structs", "statics"])
+        {
+            if (!document.RootElement.TryGetProperty(section, out JsonElement element)
+                || element.ValueKind != JsonValueKind.Object)
+            {
+                continue;
+            }
+
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (JsonProperty property in element.EnumerateObject())
+            {
+                if (!seen.Add(property.Name))
+                {
+                    throw new InvalidDataException(
+                        $"Schema defines '{property.Name}' twice in \"{section}\". The second "
+                        + "definition would silently replace the first, including any fields or "
+                        + "constants it declares - merge them into one.");
+                }
+            }
+        }
     }
 
     private static FieldDef ParseField(string structName, string fieldName, FieldDto f)
