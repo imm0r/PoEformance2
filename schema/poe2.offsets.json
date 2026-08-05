@@ -49,12 +49,16 @@
     "GameState": {
       "comment": "The static GameStates pointer dereferences to this.",
       "fields": {
-        "CurrentStateVecLast": { "offset": "0x10", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
-        "States": { "offset": "0x48", "type": "ptr", "comment": "Array of 12 state entries, StateEntrySize apart." }
+        "CurrentStateVecLast": {
+          "offset": "0x10", "type": "ptr", "invariant": { "kind": "plausiblePtr" },
+          "comment": "End pointer of the state STACK. The state in force is the SECOND-last entry (end - 0x10), not the last - GameHelper2 reads it that way and the last slot is not the active one."
+        },
+        "States": { "offset": "0x48", "type": "ptr", "comment": "Array of TotalStates entries, StateEntrySize apart; each entry starts with the state object's pointer. Index InGameStateIndex is the one the overlay may draw over." }
       },
       "consts": {
         "StateEntrySize": "0x10",
-        "InGameStateIndex": "4"
+        "InGameStateIndex": "4",
+        "TotalStates": "13"
       }
     },
 

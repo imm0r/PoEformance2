@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.Versioning;
 using ClickableTransparentOverlay;
 using ImGuiNET;
+using PoEformance.Core.Diagnostics;
 using PoEformance.Features;
 using PoEformance.Game.Components;
 using PoEformance.Game.Ui;
@@ -499,7 +500,23 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             if (!_snapshot.InGame)
             {
-                ImGui.TextColored(new Vector4(1f, 0.6f, 0.2f, 1f), "not in an area");
+                // WHICH state, not just "no". A loading screen, the login screen and a
+                // character select all draw nothing, and they are different situations -
+                // saying "not in an area" over a loading screen reads as a broken read.
+                string where = _snapshot.State switch
+                {
+                    GameStateKind.AreaLoading or GameStateKind.Loading => "loading",
+                    GameStateKind.Login or GameStateKind.PreGame => "at the login screen",
+                    GameStateKind.SelectCharacter or GameStateKind.CreateCharacter
+                        or GameStateKind.DeleteCharacter => "at character select",
+                    GameStateKind.Escape => "in the escape menu",
+                    GameStateKind.InGame => "in game, but the area has not resolved",
+                    GameStateKind.NotLoaded => "game not loaded",
+                    GameStateKind.Unreadable => "state unreadable - falling back to the player pointer",
+                    _ => $"in {_snapshot.State}",
+                };
+
+                ImGui.TextColored(new Vector4(1f, 0.6f, 0.2f, 1f), $"idle:     {where}");
             }
             else
             {

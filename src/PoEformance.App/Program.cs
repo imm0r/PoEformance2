@@ -381,7 +381,8 @@ internal static class Program
                     FlaskKeySender.IsForeground(gameWindow),
                     Environment.TickCount64,
                     snapshot.PlayerBuffs,
-                    snapshot.FlaskBelt);
+                    snapshot.FlaskBelt,
+                    snapshot.State == PoEformance.Core.Diagnostics.GameStateKind.InGame);
 
                 foreach (PoEformance.Features.FlaskUse use in tick.Used)
                 {

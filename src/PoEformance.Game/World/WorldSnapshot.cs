@@ -104,7 +104,8 @@ public sealed record WorldSnapshot(
     FlaskBelt? FlaskBelt = null,
     AreaInfo Area = default,
     TerrainGrid? Terrain = null,
-    uint AreaHash = 0)
+    uint AreaHash = 0,
+    GameStateKind State = GameStateKind.NotLoaded)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -234,9 +235,18 @@ public sealed class WorldReader
     public WorldSnapshot Read(ulong gameStatesStatic, int maxEntities = 512, UiScale? scale = null)
     {
         GameChainAddresses chain = GameChain.Resolve(_reader, _schema, gameStatesStatic);
+
+        // ONE gate, at the source. The game runs a stack of states and only one of them is
+        // the world; outside it the pointers below are stale or being rebuilt, so reading
+        // them produces a plausible picture of the area that was just left. Refusing here
+        // means every consumer - the overlay, the route, the flasks - is off without any of
+        // them having to know the rule, and it saves the read as well.
+        //
+        // The state travels on the empty snapshot so the status line can say WHICH state,
+        // rather than reporting "not in an area" over a loading screen.
         if (!chain.InGame)
         {
-            return WorldSnapshot.Empty;
+            return WorldSnapshot.Empty with { State = chain.State };
         }
 
         var matrix = new float[16];
@@ -364,7 +374,8 @@ public sealed class WorldReader
             true, player, entities, matrix, largeMap, miniMap, playerVitals, playerBuffs, flaskBelt,
             _areas.Read(chain.WorldData),
             _terrain.Read(chain.AreaInstance, nowMs),
-            _reader.Read<uint>(chain.AreaInstance + (ulong)_areaHash));
+            _reader.Read<uint>(chain.AreaInstance + (ulong)_areaHash),
+            chain.State);
     }
 
     /// <summary>

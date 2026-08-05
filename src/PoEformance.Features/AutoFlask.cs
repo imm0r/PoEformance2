@@ -142,19 +142,35 @@ public sealed class AutoFlask
     /// The equipped flasks. Optional: when unknown, charge checking is skipped rather than
     /// blocking every rule - a belt that could not be read must not disable the feature.
     /// </param>
+    /// <param name="inGame">
+    /// Whether the game is in the world rather than on a loading screen or in a menu. Passed
+    /// in rather than inferred from the pools, because "no pools" and "not playing" are
+    /// different answers to the only question this readout exists to answer, and reporting
+    /// the wrong one sends someone looking for a broken read that is not there.
+    /// </param>
     public FlaskTick Evaluate(
-        Vitals? vitals, bool gameFocused, long nowMs, ActiveBuffs? buffs = null, FlaskBelt? belt = null)
+        Vitals? vitals, bool gameFocused, long nowMs, ActiveBuffs? buffs = null, FlaskBelt? belt = null,
+        bool inGame = true)
     {
-        FlaskTick tick = Decide(vitals, gameFocused, nowMs, buffs ?? ActiveBuffs.None, belt ?? FlaskBelt.Empty);
+        FlaskTick tick = Decide(
+            vitals, gameFocused, nowMs, buffs ?? ActiveBuffs.None, belt ?? FlaskBelt.Empty, inGame);
         LastTick = tick;
         return tick;
     }
 
-    private FlaskTick Decide(Vitals? vitals, bool gameFocused, long nowMs, ActiveBuffs buffs, FlaskBelt belt)
+    private FlaskTick Decide(
+        Vitals? vitals, bool gameFocused, long nowMs, ActiveBuffs buffs, FlaskBelt belt, bool inGame)
     {
         if (!Enabled)
         {
             return new FlaskTick([], "disabled");
+        }
+
+        // Before everything else, including focus: a key pressed during a loading screen or
+        // in a menu goes somewhere, and none of the places it could go are the belt.
+        if (!inGame)
+        {
+            return new FlaskTick([], "not in game");
         }
 
         if (!gameFocused)
