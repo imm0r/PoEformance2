@@ -51,14 +51,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>Draw name labels next to dots.</summary>
     public bool ShowLabels { get; set; }
 
+    /// <summary>Draw the small status window: what is being read, and what auto-flask is doing.</summary>
+    public bool ShowStatus { get; set; } = true;
+
     /// <summary>
-    /// Draw the diagnostic window with counts, the player position and the projection checks.
+    /// Add the projection measurements and the per-kind filters to the status window.
     /// </summary>
     /// <remarks>
-    /// OFF by default, and that is a correction rather than a preference. Every instrument
-    /// in this class was built to prove the projection, and once proven they are clutter
-    /// over the game - which is exactly what the first person to actually play with it
-    /// said. They earn their place behind --debug, not on screen by default.
+    /// OFF by default, and that split is a correction rather than a preference. Everything
+    /// in here was built to PROVE the projection - off-centre fractions, scene spread,
+    /// marker deltas, the probe height - and once proven it is arithmetic nobody reads
+    /// while playing. What stays visible is the part that answers a question during a
+    /// session: is it reading, what are the pools, and why did the flask not fire.
     /// </remarks>
     public bool ShowDiagnostics { get; set; }
 
@@ -151,9 +155,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
-        if (ShowDiagnostics)
+        if (ShowStatus)
         {
-            DrawDebugWindow(width, height);
+            DrawStatusWindow(width, height);
         }
     }
 
@@ -286,8 +290,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         draw.AddText(healthbarPoint + new Vector2(DotRadius + 7, -14), healthbarColour, "health bar (z - ModelBounds)");
     }
 
-    /// <summary>A small always-visible readout, so a blank overlay is never ambiguous.</summary>
-    private void DrawDebugWindow(int width, int height)
+    /// <summary>
+    /// The live readout: what is being read, the pools, and what auto-flask is doing.
+    /// </summary>
+    /// <remarks>
+    /// Stays visible during play, because a blank overlay is otherwise ambiguous - "nothing
+    /// nearby" and "the read chain broke" look identical - and because "why did the flask
+    /// not fire" is a question asked mid-session, not during a debugging pass. The
+    /// projection measurements below it are the debugging pass, and hide behind --debug.
+    /// </remarks>
+    private void DrawStatusWindow(int width, int height)
     {
         ImGui.SetNextWindowPos(new Vector2(20, 20), ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowBgAlpha(0.7f);
@@ -307,11 +319,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     ImGui.Text($"read:     {ms:F1} ms on its own thread   frame: {1000f / ImGui.GetIO().Framerate:F1} ms"
                         + $"   ({reads} reads{(failures > 0 ? $", {failures} failed" : string.Empty)})");
                 }
-                ImGui.Text(_tracked.IsValid
-                    ? $"viewport: {width} x {height}  (game {_tracked.Width} x {_tracked.Height} @ {_tracked.X},{_tracked.Y})"
-                    : $"viewport: {width} x {height}  (game window not tracked)");
+                if (ShowDiagnostics)
+                {
+                    ImGui.Text(_tracked.IsValid
+                        ? $"viewport: {width} x {height}  (game {_tracked.Width} x {_tracked.Height} @ {_tracked.X},{_tracked.Y})"
+                        : $"viewport: {width} x {height}  (game window not tracked)");
+                }
 
-                if (_snapshot.Player is WorldEntity player)
+                if (ShowDiagnostics && _snapshot.Player is WorldEntity player)
                 {
                     ImGui.Text($"player:   ({player.WorldX:F0}, {player.WorldY:F0}, {player.WorldZ:F0})");
 
@@ -376,21 +391,30 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 // suffix: ImGui derives a control's identity from its label, so a label
                 // carrying a live count would be a NEW control every frame and the click
                 // would never register.
-                foreach (IGrouping<EntityKind, WorldEntity> group in _snapshot.Entities.GroupBy(e => e.Kind).OrderBy(g => g.Key.ToString()))
+                if (ShowDiagnostics)
                 {
-                    bool drawn = DrawnKinds.Contains(group.Key);
-                    if (ImGui.Checkbox($"{group.Key,-10} {group.Count()}##kind{group.Key}", ref drawn))
+                    foreach (IGrouping<EntityKind, WorldEntity> group in _snapshot.Entities.GroupBy(e => e.Kind).OrderBy(g => g.Key.ToString()))
                     {
-                        if (drawn)
+                        bool drawn = DrawnKinds.Contains(group.Key);
+                        if (ImGui.Checkbox($"{group.Key,-10} {group.Count()}##kind{group.Key}", ref drawn))
                         {
-                            DrawnKinds.Add(group.Key);
-                        }
-                        else
-                        {
-                            DrawnKinds.Remove(group.Key);
+                            if (drawn)
+                            {
+                                DrawnKinds.Add(group.Key);
+                            }
+                            else
+                            {
+                                DrawnKinds.Remove(group.Key);
+                            }
                         }
                     }
                 }
+            }
+
+            if (!ShowDiagnostics)
+            {
+                ImGui.End();
+                return;
             }
 
             ImGui.Separator();

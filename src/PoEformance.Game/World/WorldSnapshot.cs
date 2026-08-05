@@ -114,10 +114,15 @@ public sealed class WorldReader
     private readonly LifeReader _life;
     private readonly BuffsReader _buffs;
     private readonly FlaskBeltReader _flasks;
+    private readonly CorpseFilter _corpses = new();
     private readonly int _playerInfo;
     private readonly int _serverData;
     private readonly int _awakeEntities;
     private readonly int _w2sMatrix;
+    private readonly int _lifeHealth;
+    private readonly int _vitalCurrent;
+    private readonly int _isTargetable;
+    private readonly int _monsterRarity;
 
     public WorldReader(IMemoryReader reader, OffsetSchema schema)
     {
@@ -136,6 +141,55 @@ public sealed class WorldReader
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
         _w2sMatrix = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+
+        // Read straight from the schema rather than through LifeReader: a corpse check
+        // needs one int per monster, and building the full three-pool Vitals for every
+        // monster on screen every frame would be most of a read budget spent on two
+        // numbers that are thrown away.
+        _lifeHealth = schema.Structs["Life"].OffsetOf("Health");
+        _vitalCurrent = schema.Structs["Vital"].OffsetOf("Current");
+        _isTargetable = schema.Structs["Targetable"].OffsetOf("IsTargetable");
+        _monsterRarity = schema.Structs["ObjectMagicProperties"].OffsetOf("Rarity");
+    }
+
+    /// <summary>
+    /// Reads the three signals that say whether a monster is still alive.
+    /// </summary>
+    /// <remarks>
+    /// Both "the component is not there" and "the read failed" yield null, never a default,
+    /// and that carries the whole safety of the filter. Read&lt;T&gt; returns 0 on failure,
+    /// so reading health through it would turn every unreadable monster into a zero-health
+    /// corpse and empty the overlay - which is exactly what the replay tests caught the
+    /// moment this was written the convenient way. TryRead is the only correct call here.
+    /// </remarks>
+    private MonsterSigns ReadMonsterSigns(Entity entity)
+    {
+        int? health = null;
+        ulong life = entity.Component("Life");
+        if (life != 0 && _reader.TryRead(life + (ulong)_lifeHealth + (ulong)_vitalCurrent, out int current))
+        {
+            health = current;
+        }
+
+        bool? targetable = null;
+        ulong targetableComponent = entity.Component("Targetable");
+        if (targetableComponent != 0
+            && _reader.TryRead(targetableComponent + (ulong)_isTargetable, out byte flag))
+        {
+            targetable = flag != 0;
+        }
+
+        // Rarity 3 and above is Unique/Boss. This is only needed to spare bosses the
+        // targetable rule, so an unreadable rarity simply means "not a boss" - the worst
+        // case is a boss dot blinking during a phase, never a live monster hidden.
+        bool isBoss = false;
+        ulong properties = entity.Component("ObjectMagicProperties");
+        if (properties != 0 && _reader.TryRead(properties + (ulong)_monsterRarity, out int rarity))
+        {
+            isBoss = rarity >= 3;
+        }
+
+        return new MonsterSigns(health, targetable, isBoss);
     }
 
     /// <summary>Reads one frame's worth of world state.</summary>
@@ -166,6 +220,7 @@ public sealed class WorldReader
 
         var entities = new List<WorldEntity>(pointers.Count);
         WorldEntity? player = null;
+        long nowMs = Environment.TickCount64;
 
         foreach ((uint id, ulong address) in pointers)
         {
@@ -187,8 +242,19 @@ public sealed class WorldReader
                 continue;
             }
 
+            EntityKind kind = ClassifyPath(entity.Path);
+
+            // Corpses stay in the entity map long after the fight, so without this the
+            // overlay marks a cleared screen full of dead monsters. Only monsters are
+            // checked: the same targetable byte also goes to 0 on an OPENED chest, which
+            // is a different question and not this one.
+            if (kind == EntityKind.Monster && _corpses.IsCorpse(address, ReadMonsterSigns(entity), nowMs))
+            {
+                continue;
+            }
+
             var world = new WorldEntity(
-                id, address, entity.Path, ClassifyPath(entity.Path),
+                id, address, entity.Path, kind,
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ);
 

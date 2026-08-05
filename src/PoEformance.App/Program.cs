@@ -316,9 +316,9 @@ internal static class Program
             ? "overlay running - it follows the game window and hides while the game is not in front"
             : "overlay running - no game window found, using a default size; Ctrl+C to quit");
         Console.WriteLine(debug
-            ? "        --debug: diagnostics and calibration aids are ON"
-            : "        drawing monsters, chests, items and NPCs. --debug adds the projection"
-              + " diagnostics and the entity-kind filter.");
+            ? "        --debug: projection measurements and calibration aids are ON"
+            : "        drawing living monsters, chests, items and NPCs. --debug adds the"
+              + " projection measurements and the entity-kind filter.");
 
         // Reads happen on their own thread at their own rate; the renderer only ever picks
         // up the newest finished snapshot. 30 Hz because entities move at the game's tick
