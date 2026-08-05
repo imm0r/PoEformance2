@@ -38,6 +38,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>Draw the diagnostic window with counts and the player position.</summary>
     public bool ShowDebugWindow { get; set; } = true;
 
+    /// <summary>Draw the alignment aids: screen centre and both candidate player heights.</summary>
+    public bool ShowCalibration { get; set; } = true;
+
     /// <summary>
     /// Creates the overlay. <paramref name="snapshotSource"/> is called once per frame and
     /// must be cheap and non-blocking - it is the render thread.
@@ -139,7 +142,57 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 draw.AddCircleFilled(position, DotRadius + 2, ColourFor(EntityKind.Player));
                 draw.AddCircle(position, DotRadius + 2, OutlineColour, 16, 2f);
             }
+
+            if (ShowCalibration)
+            {
+                DrawCalibration(draw, player, width, height);
+            }
         }
+    }
+
+    /// <summary>
+    /// Draws the alignment aids: screen centre, and the player at both candidate heights.
+    /// </summary>
+    /// <remarks>
+    /// A residual offset between a marker and the character can come from several places -
+    /// the height fed into the projection, the overlay not covering the client area, or the
+    /// camera simply not centring the player. Guessing between them from a screenshot is
+    /// hopeless, so this draws the competing answers AT THE SAME TIME and lets the picture
+    /// decide: whichever marker sits on the feet is the correct height, and the crosshair
+    /// shows how far off centre the character really is. The line between the two markers
+    /// is the character's own height in screen pixels, which is the scale for judging any
+    /// leftover error.
+    /// </remarks>
+    private void DrawCalibration(ImDrawListPtr draw, WorldEntity player, int width, int height)
+    {
+        ScreenPoint ground = WorldToScreen.Project(
+            _snapshot.Matrix, player.WorldX, player.WorldY, player.TerrainHeight, width, height);
+        ScreenPoint healthbar = WorldToScreen.Project(
+            _snapshot.Matrix, player.WorldX, player.WorldY, player.WorldZ, width, height);
+
+        // Screen centre: where the camera claims the player is.
+        var centre = new Vector2(width / 2f, height / 2f);
+        uint centreColour = Pack(0.3f, 0.9f, 1f);
+        draw.AddLine(centre - new Vector2(24, 0), centre + new Vector2(24, 0), centreColour, 1.5f);
+        draw.AddLine(centre - new Vector2(0, 24), centre + new Vector2(0, 24), centreColour, 1.5f);
+        draw.AddText(centre + new Vector2(28, -7), centreColour, "screen centre");
+
+        if (!ground.OnScreen || !healthbar.OnScreen)
+        {
+            return;
+        }
+
+        var groundPoint = new Vector2(ground.X, ground.Y);
+        var healthbarPoint = new Vector2(healthbar.X, healthbar.Y);
+
+        uint groundColour = Pack(0.4f, 1f, 0.4f);
+        uint healthbarColour = Pack(1f, 0.4f, 1f);
+
+        draw.AddLine(groundPoint, healthbarPoint, Pack(1f, 1f, 1f), 1f);
+        draw.AddCircle(groundPoint, DotRadius + 6, groundColour, 20, 2f);
+        draw.AddText(groundPoint + new Vector2(DotRadius + 9, 2), groundColour, "ground (TerrainHeight)");
+        draw.AddCircle(healthbarPoint, DotRadius + 4, healthbarColour, 20, 2f);
+        draw.AddText(healthbarPoint + new Vector2(DotRadius + 7, -14), healthbarColour, "healthbar (Render z)");
     }
 
     /// <summary>A small always-visible readout, so a blank overlay is never ambiguous.</summary>
@@ -181,6 +234,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                         ? new Vector4(0.4f, 1f, 0.4f, 1f)
                         : new Vector4(1f, 0.4f, 0.4f, 1f);
                     ImGui.TextColored(colour, $"player off-centre: {offCentre:F3}   scene spread: {spread:F0} px");
+
+                    // The same thing in pixels, which is what a screenshot can be measured
+                    // against: how far the marker sits from the screen centre, and how tall
+                    // the character is on screen, so the two are directly comparable.
+                    ScreenPoint hb = WorldToScreen.Project(
+                        _snapshot.Matrix, player.WorldX, player.WorldY, player.WorldZ, width, height);
+                    ImGui.Text($"marker:   ({p.X:F0}, {p.Y:F0})   centre ({width / 2}, {height / 2})"
+                        + $"   delta ({p.X - (width / 2f):F0}, {p.Y - (height / 2f):F0}) px");
+                    ImGui.Text($"character on screen: {Math.Abs(hb.Y - p.Y):F0} px tall"
+                        + $"   (world z {player.WorldZ:F0} vs ground {player.TerrainHeight:F0})");
                     if (!healthy && spread <= width * 0.05)
                     {
                         ImGui.TextColored(colour, "  scene collapsed - the matrix offset is wrong.");
@@ -198,6 +261,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (ImGui.Checkbox("labels", ref labels))
             {
                 ShowLabels = labels;
+            }
+
+            ImGui.SameLine();
+            bool calibration = ShowCalibration;
+            if (ImGui.Checkbox("calibration", ref calibration))
+            {
+                ShowCalibration = calibration;
             }
         }
 
