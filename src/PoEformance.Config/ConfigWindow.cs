@@ -44,6 +44,17 @@ public sealed class ConfigWindow : Window
     private CoreWebView2WebMessageReceivedEventHandler? _messageHandler;
     private EventRegistrationToken _messageToken;
 
+    /// <summary>The virtual origin the ui/ folder is served under.</summary>
+    /// <remarks>
+    /// NOT file://, and that is load-bearing: the page uses ES modules, and Chromium
+    /// treats file:// as an opaque origin whose module fetches fail CORS - the page
+    /// renders its markup and CSS but never executes a line of script, which presents as
+    /// a dead window with no data and a button that does nothing (the exact first-run
+    /// symptom). Mapping the folder to a private virtual host gives the page a real
+    /// origin; the files stay on disk and stay hot-editable.
+    /// </remarks>
+    private const string VirtualHost = "poeformance.ui";
+
     /// <summary>
     /// Creates the window and starts the async WebView2 initialisation.
     /// </summary>
@@ -102,6 +113,18 @@ public sealed class ConfigWindow : Window
         controller.get_CoreWebView2(out ICoreWebView2 webView).ThrowOnError();
         _webView = new ComObject<ICoreWebView2>(webView);
 
+        // Serve ui/ under the virtual origin (see VirtualHost for why file:// cannot work).
+        // DENY is the most restrictive access kind that still serves same-origin module
+        // loads; nothing here needs cross-origin anything.
+        string uiDirectory = Path.Combine(AppContext.BaseDirectory, "ui");
+        using (IComObject<ICoreWebView2_3>? webView3 = _webView.As<ICoreWebView2_3>(throwOnError: false))
+        {
+            webView3?.Object.SetVirtualHostNameToFolderMapping(
+                PWSTR.From(VirtualHost),
+                PWSTR.From(uiDirectory),
+                COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND.COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_DENY).ThrowOnError();
+        }
+
         _messageHandler = new CoreWebView2WebMessageReceivedEventHandler((_, args) =>
         {
             // WebMessageAsJson works for any posted value; the string variant only for
@@ -120,7 +143,8 @@ public sealed class ConfigWindow : Window
     }
 
     /// <summary>
-    /// The page to load: ui/index.html next to the executable, hot-editable like the schema.
+    /// The page to load: ui/index.html next to the executable, served via the virtual
+    /// host so its modules run - hot-editable like the schema.
     /// </summary>
     private static string PageUrl()
     {
@@ -133,7 +157,7 @@ public sealed class ConfigWindow : Window
                 + $"<h3>ui/index.html not found</h3><p>expected at {Uri.EscapeDataString(path)}</p></body>";
         }
 
-        return new Uri(path).AbsoluteUri;
+        return $"https://{VirtualHost}/index.html";
     }
 
     protected override bool OnFocusChanged(bool setOrKill)

@@ -38,6 +38,14 @@
     </section>
   </main>
 
+  <script>
+    // Before the modules: any script error lands in the log panel instead of an invisible
+    // devtools console - a dead page must explain itself.
+    window.addEventListener("error", (e) => {
+      const log = document.getElementById("log");
+      if (log) log.textContent = `SCRIPT ERROR  ${e.message} (${e.filename}:${e.lineno})\n` + log.textContent;
+    });
+  </script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
