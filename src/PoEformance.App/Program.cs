@@ -362,11 +362,16 @@ internal static class Program
         // still pure waste while nobody is looking at it.
         var uiTree = new PoEformance.Features.UiTreeInspector(reader, schema, gameStatesStatic);
 
+        // Finding a way across the area is a search over thousands of cells, so it runs where
+        // the reading already happens and the renderer only draws what came back.
+        var route = new PoEformance.Features.RoutePlanner();
+
         using var feed = new PoEformance.Features.SnapshotFeed(
             scale =>
             {
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
                 uiTree.Service(scale);
+                route.Service(snapshot, Environment.TickCount64);
 
                 // Evaluated even when the feature is off: it costs a bool check, and its
                 // reason string is what the overlay's status line shows - including the
@@ -406,6 +411,7 @@ internal static class Program
             PoEformance.Features.OverlaySettings.ParseColour(settings.TerrainColour),
             settings.TerrainThickness);
         overlay.AttachUiBrowser(uiTree, uiBrowser);
+        overlay.AttachPointsOfInterest(route);
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();
     }

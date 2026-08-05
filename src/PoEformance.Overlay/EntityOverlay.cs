@@ -34,6 +34,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private ClientRect _tracked;
     private readonly TerrainLayer _terrain;
     private UiBrowserWindow? _uiBrowser;
+    private PoiLayer? _poi;
 
     /// <summary>Radius in pixels of an entity dot.</summary>
     private const float DotRadius = 5f;
@@ -166,6 +167,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         ArgumentNullException.ThrowIfNull(inspector);
         _uiBrowser = new UiBrowserWindow(inspector) { Visible = visible };
+    }
+
+    /// <summary>
+    /// Adds the map's points of interest and the route to a chosen one.
+    /// </summary>
+    /// <remarks>
+    /// Attached like the browser: the overlay draws the world, and finding a way across it is
+    /// somebody else's job - here it only projects what the planner produced.
+    /// </remarks>
+    public void AttachPointsOfInterest(RoutePlanner planner)
+    {
+        ArgumentNullException.ThrowIfNull(planner);
+        _poi = new PoiLayer(planner);
     }
 
     protected override Task PostInitialized()
@@ -330,6 +344,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Outside the "in an area" gate: an element can be inspected on a login screen or in
         // a hideout, and the browser reports for itself when there is no tree to read.
         _uiBrowser?.Render(_tracked);
+        _poi?.DrawPicker(_snapshot, _snapshot.Player);
 
         if (ShowStatus)
         {
@@ -582,6 +597,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 // Not behind --debug. The UI browser is a working tool rather than a
                 // measurement, and its whole point is being reachable in the moment a panel
                 // is open - which is not a moment anyone restarts the tool for.
+                if (_poi is not null)
+                {
+                    bool picking = _poi.ShowPicker;
+                    if (ImGui.Checkbox("Points of interest", ref picking))
+                    {
+                        _poi.ShowPicker = picking;
+                    }
+                }
+
                 if (_uiBrowser is not null)
                 {
                     bool browsing = _uiBrowser.Visible;
@@ -736,6 +760,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             draw.AddCircleFilled(at, radius, ColourFor(entity));
             draw.AddCircle(at, radius, OutlineColour, 10, 1f);
         }
+
+        // Over the entity dots: a landmark is what the map is being consulted for, so it wins
+        // when the two land on the same pixel.
+        _poi?.DrawOnMap(draw, map, _snapshot, player);
 
         if (ShowCalibration)
         {

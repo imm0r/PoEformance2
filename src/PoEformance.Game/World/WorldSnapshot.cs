@@ -36,6 +36,12 @@ public enum EntityKind
 /// in the entity map carries no rarity of its own. <see cref="ItemRarity.Unknown"/> for
 /// everything that is not an item, and for a drop whose inner entity has not resolved yet.
 /// </param>
+/// <param name="Poi">
+/// Whether this entity marks a PLACE worth walking to - an exit, a waypoint, an encounter.
+/// Separate from <paramref name="Kind"/> because the two answer different questions: a
+/// strongbox is a Chest and also a landmark, and a terrain piece is scenery unless it happens
+/// to be the way out.
+/// </param>
 public sealed record WorldEntity(
     uint Id,
     ulong Address,
@@ -46,8 +52,12 @@ public sealed record WorldEntity(
     float WorldZ,
     float TerrainHeight = 0f,
     float ModelBoundsZ = 0f,
-    ItemRarity Rarity = ItemRarity.Unknown)
+    ItemRarity Rarity = ItemRarity.Unknown,
+    PoiKind Poi = PoiKind.None)
 {
+    /// <summary>A readable label for a point of interest.</summary>
+    public string PoiName => PointsOfInterest.Name(Path, Poi);
+
     /// <summary>Where the game floats this entity's health bar: the top of its model.</summary>
     public float HealthBarZ => WorldZ - ModelBoundsZ;
 
@@ -286,7 +296,8 @@ public sealed class WorldReader
             var world = new WorldEntity(
                 id, address, entity.Path, kind,
                 position.Value.X, position.Value.Y, position.Value.Z,
-                position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity);
+                position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
+                PointsOfInterest.Classify(entity.Path));
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
