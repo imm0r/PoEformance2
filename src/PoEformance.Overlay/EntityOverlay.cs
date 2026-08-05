@@ -173,7 +173,34 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         base.Dispose(disposing);
     }
 
+    /// <summary>
+    /// One frame. Nothing that happens in here may end the process.
+    /// </summary>
+    /// <remarks>
+    /// The render loop runs on a thread-pool thread, so an escaping exception terminates
+    /// the tool - with the game still running and the player mid-map. That is exactly how a
+    /// texture upload failure in a cosmetic terrain layer turned into a crash on entering an
+    /// area. A frame that cannot be drawn is worth reporting and skipping; it is not worth
+    /// the session.
+    ///
+    /// Reported once per distinct message rather than every frame, because sixty identical
+    /// lines a second is a way of hiding an error, not surfacing it.
+    /// </remarks>
     protected override void Render()
+    {
+        try
+        {
+            RenderFrame();
+        }
+        catch (Exception exception) when (_reported.Add(exception.Message))
+        {
+            Console.Error.WriteLine($"overlay frame failed: {exception}");
+        }
+    }
+
+    private readonly HashSet<string> _reported = [];
+
+    private void RenderFrame()
     {
         TrackGameWindow();
 

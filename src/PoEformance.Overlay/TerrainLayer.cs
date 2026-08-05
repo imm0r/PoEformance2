@@ -36,10 +36,15 @@ public sealed class TerrainLayer : IDisposable
     private const string TextureKey = "poeformance.terrain";
 
     /// <summary>
-    /// Largest texture edge. A big area's grid can exceed what a GPU will accept, and the
-    /// outline stays legible when thinned - it is drawn a few hundred pixels wide either way.
+    /// Largest texture edge.
     /// </summary>
-    private const int MaxTextureEdge = 4096;
+    /// <remarks>
+    /// 2048 rather than a GPU's limit, for two reasons. The map it is drawn on is a few
+    /// hundred pixels across, so the detail above this cannot be seen; and the image has to
+    /// be allocated CONTIGUOUSLY (see Build), which at 4096 means a single 64 MB block for
+    /// a picture nobody can tell apart from this one.
+    /// </remarks>
+    private const int MaxTextureEdge = 2048;
 
     private readonly Func<string, Image<Rgba32>, bool, IntPtr> _upload;
     private readonly Action<string> _release;
@@ -49,6 +54,9 @@ public sealed class TerrainLayer : IDisposable
     private int _textureWidth;
     private int _textureHeight;
     private uint _colour = 0xFF64C8FF;
+
+    // Set once the layer has given up, so a failure is reported once rather than every frame.
+    private string? _failure;
 
     /// <param name="upload">Hands an image to the renderer and returns its handle.</param>
     /// <param name="release">Drops a previously uploaded image.</param>
@@ -78,9 +86,30 @@ public sealed class TerrainLayer : IDisposable
     {
         ArgumentNullException.ThrowIfNull(grid);
 
+        if (_failure is not null)
+        {
+            return;
+        }
+
         if (!ReferenceEquals(_built, grid))
         {
-            Build(grid);
+            // Building uploads a texture through the renderer, which is the one thing here
+            // that can fail for reasons this code does not control - a driver, an allocator,
+            // an image too large for something downstream. This runs on the RENDER thread,
+            // where an escaping exception ends the process: that is how a split image buffer
+            // turned a cosmetic layer into a crash on entering a map. A failed layer turns
+            // itself off and says so; the overlay keeps drawing everything else.
+            try
+            {
+                Build(grid);
+            }
+            catch (Exception exception)
+            {
+                _failure = exception.Message;
+                _built = grid;
+                _texture = IntPtr.Zero;
+                Console.Error.WriteLine($"terrain layer disabled: {exception.Message}");
+            }
         }
 
         if (_texture == IntPtr.Zero)
@@ -142,7 +171,20 @@ public sealed class TerrainLayer : IDisposable
         // Thin rather than refuse: a grid wider than a GPU will take still has a layout
         // worth seeing, and it is drawn a few hundred pixels across regardless.
         OutlineMask mask = TerrainOutline.Build(grid, MaxTextureEdge);
-        using var image = new Image<Rgba32>(mask.Width, mask.Height);
+
+        // CONTIGUOUS on purpose, and this is not a preference. ImageSharp splits anything
+        // past a few megabytes across several buffers, and the renderer uploads a texture
+        // by taking the image's SINGLE pixel span - which simply does not exist for a split
+        // image. It reports that as "Make sure to initialize MemoryAllocator.Default!",
+        // which names neither the cause nor the fix, and it took the whole tool down on the
+        // first area whose terrain was large enough to split.
+        //
+        // A cloned configuration rather than the global default: the renderer loads its own
+        // images through that, and this is not the place to change how they are allocated.
+        Configuration configuration = Configuration.Default.Clone();
+        configuration.PreferContiguousImageBuffers = true;
+
+        using var image = new Image<Rgba32>(configuration, mask.Width, mask.Height);
 
         // White where the boundary is, transparent everywhere else. The colour comes from
         // the tint at draw time, so changing it costs nothing and rebuilds nothing.
@@ -163,9 +205,11 @@ public sealed class TerrainLayer : IDisposable
         _textureHeight = mask.Height;
     }
 
-    /// <summary>The texture's size, for the diagnostic readout.</summary>
+    /// <summary>The texture's size, or why there is none - for the readouts.</summary>
     public string Describe()
-        => _texture == IntPtr.Zero ? "none" : $"{_textureWidth}x{_textureHeight}";
+        => _failure is not null ? $"failed: {_failure}"
+            : _texture == IntPtr.Zero ? "none"
+            : $"{_textureWidth}x{_textureHeight}";
 
     public void Dispose()
     {
