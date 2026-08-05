@@ -21,14 +21,15 @@ public enum EntityKind
 
 /// <summary>One entity as the overlay needs it: what it is, where it is, and its address.</summary>
 /// <param name="WorldZ">
-/// The Render component's own z, which is where the game floats the HEALTHBAR - roughly a
-/// character's height off the floor, not the feet.
+/// The entity's BASE height - its feet. This is what the world-to-screen projection wants:
+/// GameHelper2's HealthBars plugin starts here and subtracts the model height to reach the
+/// health bar, so this end is the bottom.
 /// </param>
 /// <param name="TerrainHeight">
-/// The GROUND z under the entity. This is where a marker belongs: projecting the healthbar z
-/// instead lifts every dot about 88 world units, which measurably shifts the player off the
-/// screen centre (0.18 NDC against 0.07 at ground level on the recorded scene).
+/// Ground height in the MAP's coordinate space. Belongs to the map radar, NOT to the
+/// world-to-screen projection - the game keeps two separate systems (see the type remarks).
 /// </param>
+/// <param name="ModelBoundsZ">Model height; WorldZ minus this is where the health bar floats.</param>
 public sealed record WorldEntity(
     uint Id,
     ulong Address,
@@ -37,8 +38,12 @@ public sealed record WorldEntity(
     float WorldX,
     float WorldY,
     float WorldZ,
-    float TerrainHeight = 0f)
+    float TerrainHeight = 0f,
+    float ModelBoundsZ = 0f)
 {
+    /// <summary>Where the game floats this entity's health bar: the top of its model.</summary>
+    public float HealthBarZ => WorldZ - ModelBoundsZ;
+
     /// <summary>Short display name: the last segment of the metadata path.</summary>
     public string ShortName
     {
@@ -51,6 +56,25 @@ public sealed record WorldEntity(
 }
 
 /// <summary>Everything a frame needs: the player, the entities around it, and the camera matrix.</summary>
+/// <remarks>
+/// THE GAME HAS TWO SCREEN-SPACE SYSTEMS, and they are not interchangeable:
+///
+/// 1. THE 3D WORLD - the world-to-screen matrix, used to draw over what is actually
+///    rendered. GameHelper2's WorldToScreen takes (x, y, height) and its HealthBars plugin
+///    feeds it Render.WorldPosition with the model height subtracted. That is this snapshot.
+///
+/// 2. THE IN-GAME MAP - a fixed 38.7-degree isometric projection with NO matrix at all,
+///    driven by the map UI element's own zoom and shift:
+///        deltaZ /= 10.86957
+///        screen = mapCentre + ((dx - dy) * cos, (deltaZ - (dx + dy)) * sin)
+///    where dx/dy are GRID deltas from the player, deltaZ comes from TerrainHeight, and
+///    cos/sin fold in the map's diagonal and zoom (large map x0.187812, minimap x0.748).
+///
+/// Markers projected through (1) therefore will NOT line up with the markers the game draws
+/// on its own map, because the map is zoomable and (2) accounts for that while (1) cannot.
+/// Comparing the two is what makes a correct projection look broken. The map radar is a
+/// separate feature and needs the UI element tree; it does not exist yet.
+/// </remarks>
 public sealed record WorldSnapshot(
     bool InGame,
     WorldEntity? Player,
@@ -142,7 +166,8 @@ public sealed class WorldReader
 
             var world = new WorldEntity(
                 id, address, entity.Path, ClassifyPath(entity.Path),
-                position.Value.X, position.Value.Y, position.Value.Z, position.Value.TerrainHeight);
+                position.Value.X, position.Value.Y, position.Value.Z,
+                position.Value.TerrainHeight, position.Value.ModelBoundsZ);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
@@ -162,7 +187,8 @@ public sealed class WorldReader
             {
                 player = new WorldEntity(
                     0, chain.PlayerEntity, playerEntity.Path, EntityKind.Player,
-                    position.Value.X, position.Value.Y, position.Value.Z, position.Value.TerrainHeight);
+                    position.Value.X, position.Value.Y, position.Value.Z,
+                    position.Value.TerrainHeight, position.Value.ModelBoundsZ);
             }
         }
 

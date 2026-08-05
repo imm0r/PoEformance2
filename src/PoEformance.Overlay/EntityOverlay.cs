@@ -42,6 +42,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public bool ShowCalibration { get; set; } = true;
 
     /// <summary>
+    /// World height added to every marker before projecting, adjustable live.
+    /// </summary>
+    /// <remarks>
+    /// A MEASURING instrument, not a fudge factor. The game's own map draws an X at the
+    /// player's position, which is an exact reference; dragging this until the marker sits
+    /// on that X reads off the residual as a NUMBER instead of an estimate from a
+    /// screenshot. Deliberately in WORLD units rather than pixels, because that is what
+    /// distinguishes the possible causes: if the value that aligns it is a round height
+    /// (a character's 88, say, or its half) the height fed in is wrong, whereas a value
+    /// that shifts when the camera moves means the error is in screen space instead.
+    /// </remarks>
+    public float ProbeHeight { get; set; }
+
+    /// <summary>
     /// Creates the overlay. <paramref name="snapshotSource"/> is called once per frame and
     /// must be cheap and non-blocking - it is the render thread.
     /// <paramref name="gameWindow"/> is the game's window handle, which the overlay resizes
@@ -109,10 +123,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         foreach (WorldEntity entity in _snapshot.Entities)
         {
-            // Ground height, not the position's own z: that one is where the healthbar
-            // floats, and drawing there puts every marker a character's height too high.
-            ScreenPoint point = WorldToScreen.Project(
-                _snapshot.Matrix, entity.WorldX, entity.WorldY, entity.TerrainHeight, width, height);
+            ScreenPoint point = ProjectGround(entity, width, height);
 
             if (!point.OnScreen)
             {
@@ -134,8 +145,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // The player last, so it is never hidden under another dot.
         if (_snapshot.Player is WorldEntity player)
         {
-            ScreenPoint point = WorldToScreen.Project(
-                _snapshot.Matrix, player.WorldX, player.WorldY, player.TerrainHeight, width, height);
+            ScreenPoint point = ProjectGround(player, width, height);
             if (point.OnScreen)
             {
                 var position = new Vector2(point.X, point.Y);
@@ -149,6 +159,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
     }
+
+    /// <summary>
+    /// Projects an entity at ground level, plus the live probe height.
+    /// </summary>
+    /// <remarks>
+    /// The entity's OWN base height, which is what GameHelper2 projects - not TerrainHeight.
+    /// TerrainHeight belongs to the map radar's separate projection, and feeding it here was
+    /// mixing the two systems up.
+    /// </remarks>
+    private ScreenPoint ProjectGround(WorldEntity entity, int width, int height)
+        => WorldToScreen.Project(
+            _snapshot.Matrix, entity.WorldX, entity.WorldY, entity.WorldZ + ProbeHeight, width, height);
 
     /// <summary>
     /// Draws the alignment aids: screen centre, and the player at both candidate heights.
@@ -165,10 +187,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     private void DrawCalibration(ImDrawListPtr draw, WorldEntity player, int width, int height)
     {
-        ScreenPoint ground = WorldToScreen.Project(
-            _snapshot.Matrix, player.WorldX, player.WorldY, player.TerrainHeight, width, height);
+        ScreenPoint ground = ProjectGround(player, width, height);
         ScreenPoint healthbar = WorldToScreen.Project(
-            _snapshot.Matrix, player.WorldX, player.WorldY, player.WorldZ, width, height);
+            _snapshot.Matrix, player.WorldX, player.WorldY, player.HealthBarZ, width, height);
 
         // Screen centre: where the camera claims the player is.
         var centre = new Vector2(width / 2f, height / 2f);
@@ -192,9 +213,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         draw.AddLine(groundPoint, healthbarPoint, Pack(1f, 1f, 1f), 1f);
         draw.AddCircle(groundPoint, DotRadius + 6, groundColour, 20, 2f);
-        draw.AddText(groundPoint + new Vector2(DotRadius + 9, 2), groundColour, "ground (TerrainHeight)");
+        draw.AddText(groundPoint + new Vector2(DotRadius + 9, 2), groundColour, "base (Render z)");
         draw.AddCircle(healthbarPoint, DotRadius + 4, healthbarColour, 20, 2f);
-        draw.AddText(healthbarPoint + new Vector2(DotRadius + 7, -14), healthbarColour, "healthbar (Render z)");
+        draw.AddText(healthbarPoint + new Vector2(DotRadius + 7, -14), healthbarColour, "health bar (z - ModelBounds)");
     }
 
     /// <summary>A small always-visible readout, so a blank overlay is never ambiguous.</summary>
@@ -271,6 +292,42 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 ShowCalibration = calibration;
             }
+
+            if (ShowCalibration && _snapshot.Player is WorldEntity subject)
+            {
+                // Drag until the marker sits on the X the game's own map draws at the
+                // player's position, then read the number off. Reported in BOTH units
+                // because that is what separates the possible causes: a round world height
+                // means the wrong height is being fed in, while a value that only makes
+                // sense in pixels means the error is in screen space.
+                ImGui.SetNextItemWidth(180);
+                float probe = ProbeHeight;
+                if (ImGui.DragFloat("probe height", ref probe, 0.5f, -200f, 200f, "%.0f world units"))
+                {
+                    ProbeHeight = probe;
+                }
+
+                ImGui.SameLine();
+                if (ImGui.SmallButton("reset"))
+                {
+                    ProbeHeight = 0;
+                }
+
+                // The character's own height calibrates world units against pixels: the two
+                // rings are exactly its Render z above the ground.
+                float characterUnits = Math.Abs(subject.ModelBoundsZ);
+                ScreenPoint top = WorldToScreen.Project(
+                    _snapshot.Matrix, subject.WorldX, subject.WorldY, subject.HealthBarZ, width, height);
+                ScreenPoint bottom = ProjectGround(subject, width, height);
+                float pixelsPerUnit = characterUnits > 0.01f
+                    ? Math.Abs(top.Y - bottom.Y) / characterUnits
+                    : 0f;
+
+                ImGui.Text(pixelsPerUnit > 0.0001f
+                    ? $"probe:    {ProbeHeight:F0} world units = {ProbeHeight * pixelsPerUnit:F0} px"
+                      + $"   (scale {pixelsPerUnit:F2} px per world unit)"
+                    : "probe:    scale unavailable - no character height to calibrate against");
+            }
         }
 
         ImGui.End();
@@ -293,7 +350,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         foreach (WorldEntity monster in _snapshot.Entities.Where(e => e.Kind == EntityKind.Monster))
         {
             ScreenPoint bar = WorldToScreen.Project(
-                _snapshot.Matrix, monster.WorldX, monster.WorldY, monster.WorldZ, width, height);
+                _snapshot.Matrix, monster.WorldX, monster.WorldY, monster.HealthBarZ, width, height);
             if (!bar.OnScreen)
             {
                 continue;
