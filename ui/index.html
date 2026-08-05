@@ -1,0 +1,43 @@
+<!doctype html>
+<!--
+  The config page. Lives on disk next to the executable and is loaded as a file - edit,
+  reload the window, no rebuild (the same rule as the offsets schema).
+
+  Structure over convenience: markup here, styling in css/, behaviour in js/ as modules.
+  The predecessor tool grew a single 20k-line index.html; the split is the guard rail.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PoEformance</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header>
+    <h1>PoEformance</h1>
+    <span id="tool-version" class="dim"></span>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Session</h2>
+      <dl id="session">
+        <dt>Game</dt><dd id="s-attached">–</dd>
+        <dt>In game</dt><dd id="s-ingame">–</dd>
+        <dt>Entities</dt><dd id="s-entities">–</dd>
+        <dt>Statics</dt><dd id="s-statics">–</dd>
+        <dt>Schema</dt><dd id="s-schema">–</dd>
+      </dl>
+      <button id="refresh">Refresh</button>
+    </section>
+
+    <section class="card">
+      <h2>Bridge</h2>
+      <p class="dim">Raw traffic, newest first — the debugging view while the protocol grows.</p>
+      <pre id="log"></pre>
+    </section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

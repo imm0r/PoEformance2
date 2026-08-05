@@ -18,5 +18,7 @@
   <ItemGroup>
     <!-- The offset schema ships next to the exe so it stays hot-editable after deploy. -->
     <None Include="..\..\schema\poe2.offsets.json" Link="schema\poe2.offsets.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The config page ships the same way, for the same reason: edit, reload, no rebuild. -->
+    <None Include="..\..\ui\**" Link="ui\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

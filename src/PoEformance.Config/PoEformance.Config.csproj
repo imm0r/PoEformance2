@@ -2,7 +2,23 @@
   <!-- Layer 4b - the WebView2 configuration window and its JS bridge. Windows only. -->
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- AOT-compatible WebView2 bindings (source-generated COM, no UI framework).
+         The official Microsoft binding is built-in-COM and dies under Native AOT;
+         see the ConfigWindow remarks for the full reasoning. -->
+    <PackageReference Include="WebView2Aot" Version="1.5.0" />
+
+    <!-- The official package is referenced ONLY for its native WebView2Loader.dll
+         (runtimes/win-x64/native), which the AOT bindings load at runtime. Its managed,
+         non-AOT assemblies are deliberately excluded. -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4129.50">
+      <IncludeAssets>native</IncludeAssets>
+      <ExcludeAssets>compile; build; buildTransitive</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoEformance.Features\PoEformance.Features.csproj" />
   </ItemGroup>

@@ -1,0 +1,92 @@
+/* Base look for the config window. Dark, quiet, readable - the tool sits next to a game. */
+
+:root {
+  --bg: #16181d;
+  --card: #1e2129;
+  --text: #d6d8de;
+  --dim: #8a8f9c;
+  --accent: #c8a85a;
+  --ok: #6fbf73;
+  --bad: #d4645c;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, "Segoe UI", sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #000;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid #00000066;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+}
+
+dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  margin: 0 0 12px;
+}
+
+dt { color: var(--dim); }
+dd { margin: 0; }
+
+.dim { color: var(--dim); }
+.ok { color: var(--ok); }
+.bad { color: var(--bad); }
+
+button {
+  background: #2a2e38;
+  color: var(--text);
+  border: 1px solid #00000088;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+button:hover { border-color: var(--accent); }
+
+pre#log {
+  margin: 0;
+  max-height: 420px;
+  overflow: auto;
+  font: 12px/1.5 ui-monospace, Consolas, monospace;
+  color: var(--dim);
+  white-space: pre-wrap;
+  word-break: break-all;
+}

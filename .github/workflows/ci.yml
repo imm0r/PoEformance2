@@ -16,3 +16,25 @@ jobs:
       # projects compile here too, so the whole solution is checked on every push.
       - run: dotnet build --nologo
       - run: dotnet test --nologo --no-build
+
+  # THE Native AOT gate - the deployment risk this project carries, measured on every
+  # push instead of discovered at ship time. Publishing with PublishAot compiles the
+  # whole dependency graph through ILC: the overlay stack (ClickableTransparentOverlay,
+  # ImGui.NET, Vortice), the WebView2 config window (source-generated COM), and our own
+  # code. A failure here is real information about exactly which dependency breaks AOT;
+  # green here means the ONLY remaining AOT question is runtime behaviour, which needs a
+  # live Windows run. Cross-OS AOT publishing is unsupported, hence the Windows runner.
+  aot-publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - run: dotnet publish src/PoEformance.App -c Release -r win-x64 -p:PublishAot=true
+      - name: Show what AOT produced
+        shell: pwsh
+        run: |
+          $out = "src/PoEformance.App/bin/Release/net10.0-windows/win-x64/publish"
+          Get-ChildItem $out -Recurse -File | Select-Object @{n='file';e={$_.FullName.Substring($out.Length+1)}}, @{n='KB';e={[math]::Round($_.Length/1KB)}} | Format-Table -AutoSize
+          if (-not (Test-Path "$out/PoEformance.App.exe")) { throw "no exe produced" }

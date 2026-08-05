@@ -132,6 +132,11 @@ internal static class Program
             RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull);
         }
 
+        if (options.ShowConfig)
+        {
+            RunConfigWindow(reader, schemaPath, result, gameStatesAddress);
+        }
+
         if (options.Watch && options.ReplayPath is null)
         {
             WatchSchema(reader, scanner, schemaPath, recorder, options.Verbose);
@@ -257,6 +262,46 @@ internal static class Program
     }
 
     /// <summary>
+    /// Opens the WebView2 configuration window and blocks until it closes.
+    /// </summary>
+    /// <remarks>
+    /// Every "getState" from the page re-reads the world FRESH - the page's refresh button
+    /// is therefore also a liveness check of the whole read chain, not a cached echo. This
+    /// window is the Native AOT risk probe: it must keep working in the AOT-published build,
+    /// which the CI publish job verifies at compile level and a live run verifies fully.
+    /// </remarks>
+    private static void RunConfigWindow(IMemoryReader reader, string schemaPath, DriftReportResult report, ulong gameStatesAddress)
+    {
+        Console.WriteLine();
+        Console.WriteLine("config window open - close it to continue");
+
+        PoEformance.Config.ConfigWindowHost.Run("PoEformance", () =>
+        {
+            OffsetSchema schema = SchemaJson.Load(schemaPath);
+            int entityCount = 0;
+            bool inGame = false;
+            if (gameStatesAddress != 0)
+            {
+                PoEformance.Game.World.WorldSnapshot snapshot =
+                    new PoEformance.Game.World.WorldReader(reader, schema).Read(gameStatesAddress);
+                inGame = snapshot.InGame;
+                entityCount = snapshot.Entities.Count;
+            }
+
+            return new PoEformance.Config.ConfigState(
+                Type: "state",
+                ToolVersion: typeof(Program).Assembly.GetName().Version?.ToString() ?? "dev",
+                GameVersion: schema.GameVersion,
+                Attached: reader.IsAttached,
+                ProcessId: reader.ProcessId,
+                StaticsFound: report.Statics.Count(s => s.Found),
+                StaticsTotal: report.Statics.Count,
+                InGame: inGame,
+                EntityCount: entityCount);
+        });
+    }
+
+    /// <summary>
     /// Keeps the process attached and re-runs the report whenever the schema file changes.
     /// This is the hot-reload dev loop: edit an offset in the JSON, save, and the new
     /// report appears - no rebuild, no re-attach.
@@ -379,12 +424,13 @@ internal static class Program
         string? RecordPath,
         bool Watch,
         bool Verbose,
-        bool ShowOverlay)
+        bool ShowOverlay,
+        bool ShowConfig)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
-            bool watch = false, verbose = false, overlay = false;
+            bool watch = false, verbose = false, overlay = false, config = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -405,13 +451,16 @@ internal static class Program
                     case "--overlay":
                         overlay = true;
                         break;
+                    case "--config":
+                        config = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
                 }
             }
 
-            return new CliOptions(schema, replay, record, watch, verbose, overlay);
+            return new CliOptions(schema, replay, record, watch, verbose, overlay, config);
         }
     }
 }
