@@ -123,10 +123,17 @@ public sealed class TerrainGrid
     /// between them the height is interpolated, so a cliff edge between two corners is drawn
     /// as a ramp. Displacing each cell is per-CELL exact and costs nothing per frame.
     ///
-    /// Whole cells, because the picture has no finer resolution to put it at.
+    /// Whole cells, because the picture has no finer resolution to put it at - but ROUNDED to
+    /// the nearest rather than truncated, which is where this parts company with the
+    /// reference. Truncation moves every value toward zero, and this game writes raised
+    /// ground as a NEGATIVE height, so on real terrain it is not a rounding choice but a
+    /// consistent under-shift: the whole map drawn slightly too low. Rounding costs nothing
+    /// and halves the average error.
     /// </remarks>
     public int IsoHeightShift(int cellX, int cellY)
-        => _heights is null ? 0 : (int)(_heights.HeightAt(cellX, cellY) / (2f * Ui.MapView.HeightToGrid));
+        => _heights is null
+            ? 0
+            : (int)MathF.Round(_heights.HeightAt(cellX, cellY) / (2f * Ui.MapView.HeightToGrid));
 
     /// <summary>Describes the grid and any padding found, so a mismatch is visible.</summary>
     public string Describe()

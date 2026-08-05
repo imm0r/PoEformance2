@@ -185,6 +185,56 @@ public class TerrainHeightTests
     }
 
     [Fact]
+    public void TheDisplacementRoundsInsteadOfTruncating()
+    {
+        // Truncation moves every value TOWARD ZERO, which on a symmetric spread would cancel
+        // out and look harmless. Real terrain is not symmetric: this game writes raised
+        // ground as a negative height, so ground is at or below zero nearly everywhere and
+        // truncating is a consistent under-shift - the whole map drawn slightly too low, by
+        // up to a cell. Rounding removes the bias and halves the average error.
+        //
+        // Written as the property rather than as one value, because "it rounds" is a
+        // statement about the whole distribution and a single case cannot show it.
+        var heights = new float[64];
+        for (int i = 0; i < heights.Length; i++)
+        {
+            heights[i] = -7f * i;   // 0 down to -441, the range a real hill covers
+        }
+
+        TerrainGrid grid = Ground(8, 8, heights);
+        int cells = TerrainGrid.CellsPerTile;
+
+        double rounded = 0;
+        double truncated = 0;
+        for (int i = 0; i < heights.Length; i++)
+        {
+            float exact = heights[i] / (2f * MapView.HeightToGrid);
+            int used = grid.IsoHeightShift((i % 8) * cells, (i / 8) * cells);
+
+            rounded += used - exact;
+            truncated += (int)exact - exact;
+        }
+
+        rounded /= heights.Length;
+        truncated /= heights.Length;
+
+        // The old behaviour leans one way; the new one does not.
+        Assert.True(truncated > 0.3, $"truncation should lean toward zero, leaned {truncated:F3}");
+        Assert.True(Math.Abs(rounded) < 0.1, $"rounding should not lean, leaned {rounded:F3}");
+    }
+
+    [Theory]
+    [InlineData(-260f, -12)]   // -11.96: truncation would say -11
+    [InlineData(-240f, -11)]   // -11.04: both agree
+    [InlineData(-22f, -1)]     //  -1.01
+    [InlineData(-10f, 0)]      //  -0.46, rounds away entirely
+    public void TheRoundedDisplacementIsTheNearestWholeCell(float height, int expected)
+    {
+        TerrainGrid grid = Ground(1, 1, [height]);
+        Assert.Equal(expected, grid.IsoHeightShift(5, 5));
+    }
+
+    [Fact]
     public void TheDisplacementIsWholeCellsAndCarriesTheGamesSign()
     {
         // Whole cells because the picture has no finer resolution to put it at, and the sign
