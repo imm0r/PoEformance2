@@ -119,7 +119,17 @@ internal static class Program
 
         if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
         {
-            RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow);
+            // The letterbox bar width. UI positions are scaled by the window MINUS these
+            // bars and then shifted by one, so a missing cull misplaces every UI-derived
+            // coordinate on anything that is not 16:10.
+            ResolvedStatic? cullStatic = result.Statics.FirstOrDefault(s => s.Name == "GameCullSize" && s.Found);
+            int cull = cullStatic is { Address: not 0 } found ? reader.Read<int>(found.Address) : 0;
+            if (cull is < 0 or > 2000)
+            {
+                cull = 0; // a mis-resolved pattern would poison every width-scaled rect
+            }
+
+            RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull);
         }
 
         if (options.Watch && options.ReplayPath is null)
@@ -232,7 +242,8 @@ internal static class Program
     /// Runs the ImGui overlay until it is closed. The snapshot is re-read per frame; the
     /// renderer itself never touches game memory.
     /// </summary>
-    private static void RunOverlay(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow)
+    private static void RunOverlay(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
         Console.WriteLine();
@@ -240,7 +251,8 @@ internal static class Program
             ? "overlay running - it follows the game window; close it (or Ctrl+C) to quit"
             : "overlay running - no game window found, using a default size; Ctrl+C to quit");
 
-        using var overlay = new PoEformance.Overlay.EntityOverlay(() => world.Read(gameStatesStatic), gameWindow);
+        using var overlay = new PoEformance.Overlay.EntityOverlay(
+            scale => world.Read(gameStatesStatic, scale: scale), gameWindow, cull);
         overlay.Start().GetAwaiter().GetResult();
     }
 

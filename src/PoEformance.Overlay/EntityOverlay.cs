@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.Versioning;
 using ClickableTransparentOverlay;
 using ImGuiNET;
+using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
 namespace PoEformance.Overlay;
@@ -24,8 +25,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     // Fully qualified: this project's own namespace is PoEformance.Overlay, which would
     // otherwise shadow the library's Overlay type.
 
-    private readonly Func<WorldSnapshot> _snapshotSource;
+    private readonly Func<UiScale, WorldSnapshot> _snapshotSource;
     private readonly IntPtr _gameWindow;
+    private readonly int _cull;
     private WorldSnapshot _snapshot = WorldSnapshot.Empty;
     private ClientRect _tracked;
 
@@ -61,13 +63,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <paramref name="gameWindow"/> is the game's window handle, which the overlay resizes
     /// itself to match.
     /// </summary>
-    public EntityOverlay(Func<WorldSnapshot> snapshotSource, IntPtr gameWindow)
+    public EntityOverlay(Func<UiScale, WorldSnapshot> snapshotSource, IntPtr gameWindow, int cull = 0)
         : base("PoEformance", true)
     {
         ArgumentNullException.ThrowIfNull(snapshotSource);
         _snapshotSource = snapshotSource;
         _gameWindow = gameWindow;
+        _cull = cull;
     }
+
+    /// <summary>Draw entity dots on the game's own map, using the map's projection.</summary>
+    public bool ShowMapDots { get; set; } = true;
 
     protected override Task PostInitialized()
     {
@@ -77,15 +83,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     protected override void Render()
     {
-        _snapshot = _snapshotSource();
         TrackGameWindow();
 
         int width = (int)ImGui.GetIO().DisplaySize.X;
         int height = (int)ImGui.GetIO().DisplaySize.Y;
 
+        // The renderer knows the viewport, so it hands it to the reader rather than the
+        // reader guessing at a window it cannot see.
+        _snapshot = _snapshotSource(new UiScale(width, height, _cull));
+
         if (_snapshot.InGame && width > 0 && height > 0)
         {
             DrawEntities(width, height);
+            if (ShowMapDots)
+            {
+                DrawMapDots();
+            }
         }
 
         if (ShowDebugWindow)
@@ -331,6 +344,60 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         ImGui.End();
+    }
+
+    /// <summary>
+    /// Draws entity dots on the game's own map, through the map's projection.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately NOT the camera matrix. The map is zoomable and this transform accounts
+    /// for it; markers projected with the matrix drift away from the game's own map markers
+    /// the moment the map is zoomed, which is what made a correct world projection look
+    /// broken.
+    ///
+    /// The large map is preferred when it is open and the minimap otherwise. Which one is
+    /// "open" cannot be told apart by a flag alone here, so the choice falls back to whether
+    /// the projection lands anywhere sensible on screen.
+    /// </remarks>
+    private void DrawMapDots()
+    {
+        if (_snapshot.Player is not WorldEntity player)
+        {
+            return;
+        }
+
+        MapView? chosen = _snapshot.LargeMap is MapView large && large.IsUsable ? large
+            : _snapshot.MiniMap is MapView mini && mini.IsUsable ? mini
+            : null;
+
+        if (chosen is not MapView map)
+        {
+            return;
+        }
+
+        ImDrawListPtr draw = ImGui.GetBackgroundDrawList();
+
+        foreach (WorldEntity entity in _snapshot.Entities)
+        {
+            Vector2 at = map.Project(
+                entity.WorldX, entity.WorldY, entity.TerrainHeight,
+                player.WorldX, player.WorldY, player.TerrainHeight);
+
+            draw.AddCircleFilled(at, 3.5f, ColourFor(entity.Kind));
+            draw.AddCircle(at, 3.5f, OutlineColour, 10, 1f);
+        }
+
+        if (ShowCalibration)
+        {
+            // The self-check for this projection: the player is the map's origin BY
+            // CONSTRUCTION, so this ring must sit exactly on the marker the game draws for
+            // the player on its own map. Nothing to eyeball and nothing to compare across
+            // screenshots - the game supplies the reference every frame.
+            uint colour = Pack(0.3f, 0.9f, 1f);
+            draw.AddCircle(map.Centre, 9f, colour, 20, 2f);
+            draw.AddText(map.Centre + new Vector2(12, -7), colour,
+                $"map centre - the game's player marker belongs here (zoom {map.Zoom:F2})");
+        }
     }
 
     /// <summary>

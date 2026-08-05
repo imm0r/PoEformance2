@@ -13,7 +13,8 @@ public readonly record struct GameChainAddresses(
     ulong InGameState,
     ulong AreaInstance,
     ulong WorldData,
-    ulong PlayerEntity)
+    ulong PlayerEntity,
+    ulong UiRoot = 0)
 {
     /// <summary>True when the chain reached a player entity - i.e. we are in an area.</summary>
     public bool InGame => PlayerEntity != 0;
@@ -55,9 +56,14 @@ public static class GameChain
         StructDef igs = schema.Structs["InGameState"];
         ulong areaInstance = reader.ReadPointer(inGameState + (ulong)igs.OffsetOf("AreaInstanceData"));
         ulong worldData = reader.ReadPointer(inGameState + (ulong)igs.OffsetOf("WorldData"));
+
+        // The UI manager, which owns the map elements. Resolved here so the one walk serves
+        // both halves of the tool - the world overlay and anything reading the interface.
+        ulong uiRoot = reader.ReadPointer(inGameState + (ulong)igs.OffsetOf("UiRootStructPtr"));
+
         if (areaInstance == 0)
         {
-            return new GameChainAddresses(gameState, inGameState, 0, worldData, 0);
+            return new GameChainAddresses(gameState, inGameState, 0, worldData, 0, uiRoot);
         }
 
         // LocalPlayerStruct is inline: its base is the address of AreaInstance+PlayerInfo,
@@ -67,6 +73,6 @@ public static class GameChain
         ulong playerBase = areaInstance + (ulong)ai.OffsetOf("PlayerInfo");
         ulong playerEntity = reader.ReadPointer(playerBase + (ulong)lp.OffsetOf("LocalPlayerPtr"));
 
-        return new GameChainAddresses(gameState, inGameState, areaInstance, worldData, playerEntity);
+        return new GameChainAddresses(gameState, inGameState, areaInstance, worldData, playerEntity, uiRoot);
     }
 }

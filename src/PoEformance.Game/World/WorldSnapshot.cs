@@ -3,6 +3,7 @@ using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Game.Components;
 using PoEformance.Game.Entities;
+using PoEformance.Game.Ui;
 
 namespace PoEformance.Game.World;
 
@@ -79,7 +80,9 @@ public sealed record WorldSnapshot(
     bool InGame,
     WorldEntity? Player,
     IReadOnlyList<WorldEntity> Entities,
-    float[] Matrix)
+    float[] Matrix,
+    MapView? LargeMap = null,
+    MapView? MiniMap = null)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -102,6 +105,7 @@ public sealed class WorldReader
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
     private readonly EntityMapReader _map;
+    private readonly MapRadarReader _mapRadar;
     private readonly EntityReader _entities;
     private readonly RenderReader _render;
     private readonly int _awakeEntities;
@@ -114,6 +118,7 @@ public sealed class WorldReader
         _reader = reader;
         _schema = schema;
         _map = new EntityMapReader(reader, schema);
+        _mapRadar = new MapRadarReader(reader, schema);
         _entities = new EntityReader(reader, schema);
         _render = new RenderReader(reader, schema);
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
@@ -122,7 +127,12 @@ public sealed class WorldReader
 
     /// <summary>Reads one frame's worth of world state.</summary>
     /// <param name="maxEntities">Cap on entities read, to bound a frame's cost.</param>
-    public WorldSnapshot Read(ulong gameStatesStatic, int maxEntities = 512)
+    /// <param name="scale">
+    /// The viewport being drawn into. Supplied by the renderer because only it knows where
+    /// the pixels are going; passing it lets the game's own maps be resolved in the same
+    /// pass, so the renderer still never touches memory itself.
+    /// </param>
+    public WorldSnapshot Read(ulong gameStatesStatic, int maxEntities = 512, UiScale? scale = null)
     {
         GameChainAddresses chain = GameChain.Resolve(_reader, _schema, gameStatesStatic);
         if (!chain.InGame)
@@ -192,7 +202,17 @@ public sealed class WorldReader
             }
         }
 
-        return new WorldSnapshot(true, player, entities, matrix);
+        MapView? largeMap = null;
+        MapView? miniMap = null;
+        if (scale is UiScale viewport && chain.UiRoot != 0)
+        {
+            // Order matters: reading the minimap first is what leaves its diagonal cached
+            // for the large map, which cannot supply its own.
+            miniMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: false);
+            largeMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: true);
+        }
+
+        return new WorldSnapshot(true, player, entities, matrix, largeMap, miniMap);
     }
 
     /// <summary>
