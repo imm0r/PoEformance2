@@ -158,7 +158,9 @@ public sealed class EntityReader
         {
             ulong entryAddress = dataFirst + (ulong)(i * _entrySize);
             ulong namePtr = _reader.ReadPointer(entryAddress + (ulong)_entryNamePtr);
-            long index = _reader.Read<long>(entryAddress + (ulong)_entryIndex);
+            // Index is a 32-bit int; reading 8 bytes here merges it with the next field
+            // and rejects most components (see the schema comment on ComponentLookupEntry).
+            int index = _reader.Read<int>(entryAddress + (ulong)_entryIndex);
 
             // Empty hash slots carry an out-of-range index; skip them.
             if (index < 0 || index >= componentCount || namePtr == 0)

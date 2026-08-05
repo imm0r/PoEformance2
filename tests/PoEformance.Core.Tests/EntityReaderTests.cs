@@ -74,7 +74,11 @@ public class EntityReaderTests
             ulong entryAddr = bucketDataAddr + (ulong)(i * entrySize);
             ulong namePtr = nameHeap + (ulong)(i * 0x40);
             fake.Place(entryAddr + (ulong)entryDef.OffsetOf("NamePtr"), namePtr);
-            fake.Place<long>(entryAddr + (ulong)entryDef.OffsetOf("Index"), i);
+            fake.Place<int>(entryAddr + (ulong)entryDef.OffsetOf("Index"), i);
+            // Non-zero bytes right after the 32-bit index (a real bucket has a hash/other
+            // field there). Reading the index as 64-bit would merge these in and reject the
+            // component - the exact 2026-08 bug this guards against.
+            fake.Place<int>(entryAddr + (ulong)entryDef.OffsetOf("Index") + 4, unchecked((int)0x3AC00000));
             fake.PlaceUtf8(namePtr, components[i].Name);
         }
 
@@ -124,7 +128,7 @@ public class EntityReaderTests
         StructDef lDef = schema.Structs["ComponentLookup"];
         StructDef entryDef = schema.Structs["ComponentLookupEntry"];
         ulong bucketData = fake.ReadPointer(0x30_0000 + (ulong)lDef.OffsetOf("Bucket") + (ulong)bDef.OffsetOf("Data"));
-        fake.Place<long>(bucketData + (ulong)entryDef.OffsetOf("Index"), -1);
+        fake.Place<int>(bucketData + (ulong)entryDef.OffsetOf("Index"), -1);
 
         var reader = new EntityReader(fake, schema);
         Entity? entity = reader.Read(entityAddr);

@@ -219,11 +219,11 @@
     },
 
     "ComponentLookupEntry": {
-      "comment": "One hash-bucket entry: a component name pointer and the index of that component in the entity's ComponentsVec.",
+      "comment": "One hash-bucket entry (0x10 bytes): a component name pointer and the index of that component in the entity's ComponentsVec. Index is a 32-BIT int at +0x08 (the AHK reference reads it as \"Int\"); reading it as 64-bit combines it with the next field and yields garbage for every entry whose following 4 bytes are non-zero - which drops most components (found 2026-08 by tracing a real recording: only entries whose high dword happened to be 0 decoded).",
       "consts": { "Size": "0x10" },
       "fields": {
         "NamePtr": { "offset": "0x00", "type": "ptr" },
-        "Index": { "offset": "0x08", "type": "i64" }
+        "Index": { "offset": "0x08", "type": "i32" }
       }
     },
 
