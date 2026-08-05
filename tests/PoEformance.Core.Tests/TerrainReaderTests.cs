@@ -119,6 +119,73 @@ public class TerrainReaderTests
         Assert.True(grid.IsWalkable(5, 5));
     }
 
+    private const ulong SubTile = 0x0000_0200_0300_0000;
+    private const ulong SubData = 0x0000_0200_0400_0000;
+    private const ulong SelectorTable = 0x0000_0200_0500_0000;
+    private const ulong HelperTable = 0x0000_0200_0500_1000;
+
+    [Fact]
+    public void TheWithinTileSlopeIsReadWhenEverythingItNeedsIsThere()
+    {
+        // The whole chain, because every link of it can fail quietly and leave the map on
+        // tile-level heights - which draws almost the same picture, so nothing on screen
+        // says which one is in use.
+        OffsetSchema schema = RealSessionTests.Schema();
+        (FakeMemoryReader fake, _, _, _) = Area(heightMultiplier: 1, [0, 0, 0, 0, 0, 0]);
+
+        StructDef tileStruct = schema.Structs["TileStruct"];
+        ulong details = AreaInstance
+            + (ulong)schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata")
+            + (ulong)schema.Structs["TerrainMetadata"].OffsetOf("TileDetailsPtr");
+        ulong tiles = TileData;
+
+        // Every tile shares ONE template, which is the normal case and the reason the
+        // arrays are read per distinct pointer rather than per tile.
+        for (int i = 0; i < TilesX * TilesY; i++)
+        {
+            fake.Place<ulong>(tiles + (ulong)((i * 0x38) + tileStruct.OffsetOf("SubTileDetailsPtr")), SubTile);
+            fake.Place(tiles + (ulong)((i * 0x38) + tileStruct.OffsetOf("RotationSelector")), (byte)0);
+        }
+
+        // The template's own height array: a plain signed byte per cell.
+        var slope = new byte[600];
+        slope[(3 * TerrainGrid.CellsPerTile) + 6] = 8;
+        fake.Place(SubData, slope)
+            .Place<ulong>(SubTile, SubData)
+            .Place<ulong>(SubTile + 8, SubData + (ulong)slope.Length);
+
+        // The identity placement, as the two engine tables would describe it.
+        var helper = new byte[32];
+        helper[1] = 1;
+        helper[2] = 1;
+        fake.Place(SelectorTable, new byte[] { 0, 3, 2, 1, 4, 5, 6, 7, 8 }).Place(HelperTable, helper);
+
+        var rotation = new TerrainRotationTables(SelectorTable, HelperTable);
+        TerrainGrid? grid = new TerrainReader(fake, schema, rotation).Read(AreaInstance, nowMs: 0);
+
+        Assert.NotNull(grid);
+        Assert.True(grid!.HasSubTileHeights, grid.HeightNote);
+        Assert.Contains("sub-tile from 1/1", grid.HeightNote);
+        Assert.Equal(8 * TerrainHeightField.HeightScale, grid.HeightAt(6, 3), 3);
+    }
+
+    [Fact]
+    public void WithoutTheRotationTablesItFallsBackToTileLevelAndSaysSo()
+    {
+        // The fallback is correct behaviour, not a failure - but it has to be visible, since
+        // a silently coarser map is what sent the last two rounds of this chasing the wrong
+        // term.
+        OffsetSchema schema = RealSessionTests.Schema();
+        (FakeMemoryReader fake, _, _, _) = Area(rawHeights: [1, 2, 3, 4, 5, 6]);
+
+        TerrainGrid? grid = new TerrainReader(fake, schema).Read(AreaInstance, nowMs: 0);
+
+        Assert.NotNull(grid);
+        Assert.True(grid!.HasHeights);
+        Assert.False(grid.HasSubTileHeights);
+        Assert.Contains("rotation tables not resolved", grid.HeightNote);
+    }
+
     [Fact]
     public void EveryHeightOutcomeSaysWhatItWas()
     {

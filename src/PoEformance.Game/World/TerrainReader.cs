@@ -22,18 +22,30 @@ public sealed class TerrainGrid
     /// <summary>Grid cells per terrain tile - a tile is 250 world units, a cell is 250/23.</summary>
     public const int CellsPerTile = 23;
 
-    private readonly float[] _tileHeights;
+    private readonly TerrainHeightField? _heights;
 
     public TerrainGrid(
         byte[] cells, int bytesPerRow, int rows,
         long totalTilesX = 0, long totalTilesY = 0, float[]? tileHeights = null,
         string heightNote = "")
+        : this(
+            cells, bytesPerRow, rows, totalTilesX, totalTilesY,
+            tileHeights is { Length: > 0 }
+                ? TerrainHeightField.Tiles(tileHeights, (int)totalTilesX, (int)totalTilesY)
+                : null,
+            heightNote)
+    {
+    }
+
+    public TerrainGrid(
+        byte[] cells, int bytesPerRow, int rows,
+        long totalTilesX, long totalTilesY, TerrainHeightField? heights, string heightNote = "")
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
         TilesX = (int)Math.Max(0, totalTilesX);
         TilesY = (int)Math.Max(0, totalTilesY);
-        _tileHeights = tileHeights ?? [];
+        _heights = heights;
         HeightNote = heightNote;
         _bytesPerRow = bytesPerRow;
         StoredWidth = bytesPerRow * 2;
@@ -65,8 +77,11 @@ public sealed class TerrainGrid
 
     public int TilesY { get; }
 
-    /// <summary>True when per-tile heights were read - without them the map is drawn flat.</summary>
-    public bool HasHeights => _tileHeights.Length > 0;
+    /// <summary>True when heights were read - without them the map is drawn flat.</summary>
+    public bool HasHeights => _heights is not null;
+
+    /// <summary>True when the slope INSIDE each tile is included, not just the tile's level.</summary>
+    public bool HasSubTileHeights => _heights?.HasSubTile ?? false;
 
     /// <summary>
     /// Why the heights are, or are not, here.
@@ -83,26 +98,14 @@ public sealed class TerrainGrid
     /// Ground height at a grid cell, in the same world units entities report.
     /// </summary>
     /// <remarks>
-    /// Per TILE, not per cell. The finer sub-tile heights exist behind another pointer and
-    /// describe variation WITHIN a tile - detail a pathfinder wants and a map outline does
-    /// not, since a tile is 250 world units and that is the scale a hill or a staircase
-    /// spans anyway.
+    /// Per CELL when the sub-tile arrays were readable, per TILE otherwise - see
+    /// <see cref="TerrainHeightField"/> for why the difference matters more than a tile's
+    /// 250 units suggests.
     ///
     /// Returns 0 when heights are unavailable, which draws the map flat: exactly what it did
     /// before heights existed, so a failed read costs the correction and nothing else.
     /// </remarks>
-    public float HeightAt(int cellX, int cellY)
-    {
-        if (_tileHeights.Length == 0 || TilesX <= 0)
-        {
-            return 0f;
-        }
-
-        int tx = Math.Clamp(cellX / CellsPerTile, 0, TilesX - 1);
-        int ty = Math.Clamp(cellY / CellsPerTile, 0, TilesY - 1);
-        int index = (ty * TilesX) + tx;
-        return (uint)index < (uint)_tileHeights.Length ? _tileHeights[index] : 0f;
-    }
+    public float HeightAt(int cellX, int cellY) => _heights?.HeightAt(cellX, cellY) ?? 0f;
 
     /// <summary>Describes the grid and any padding found, so a mismatch is visible.</summary>
     public string Describe()
@@ -195,11 +198,11 @@ public sealed class TerrainReader
     /// <summary>Bytes per TileStruct entry in the tile-details vector.</summary>
     private const int TileEntrySize = 0x38;
 
-    /// <summary>
-    /// Turns the raw tile height into world units. GameHelper2's constant, sign included -
-    /// the game counts height downward and entity Z counts it up.
-    /// </summary>
-    private const float HeightScale = -7.8125f;
+    /// <summary>Largest sub-tile height array worth believing. A tile is 23x23 = 529 cells.</summary>
+    private const int MaxSubHeightBytes = 2048;
+
+    /// <summary>Distinct tile templates read per area, as a guard rather than a real bound.</summary>
+    private const int MaxSubTemplates = 4096;
 
     private readonly IMemoryReader _reader;
     private readonly int _terrainMetadata;
@@ -210,7 +213,10 @@ public sealed class TerrainReader
     private readonly int _tileDetails;
     private readonly int _heightMultiplier;
     private readonly int _tileHeight;
+    private readonly int _subTileDetails;
+    private readonly int _rotationSelector;
     private readonly int _areaHash;
+    private readonly TerrainRotationTables _rotation;
 
     private TerrainGrid? _grid;
     private uint _gridArea;
@@ -219,11 +225,18 @@ public sealed class TerrainReader
     /// <summary>Why the last attempt produced nothing, for the status readout.</summary>
     public string LastError { get; private set; } = string.Empty;
 
-    public TerrainReader(IMemoryReader reader, OffsetSchema schema)
+    /// <param name="rotation">
+    /// Addresses of the two engine tables that say how a tile was placed. Without them the
+    /// field stays tile-only: the sub-tile heights are stored per tile TEMPLATE, so reading
+    /// one without knowing its orientation returns a real height belonging to the wrong
+    /// corner - worse than not reading it.
+    /// </param>
+    public TerrainReader(IMemoryReader reader, OffsetSchema schema, TerrainRotationTables rotation = default)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
         _reader = reader;
+        _rotation = rotation;
 
         StructDef area = schema.Structs["AreaInstance"];
         _terrainMetadata = area.OffsetOf("TerrainMetadata");
@@ -236,7 +249,10 @@ public sealed class TerrainReader
         _totalTilesY = terrain.OffsetOf("TotalTilesY");
         _tileDetails = terrain.OffsetOf("TileDetailsPtr");
         _heightMultiplier = terrain.OffsetOf("TileHeightMultiplier");
-        _tileHeight = schema.Structs["TileStruct"].OffsetOf("TileHeight");
+        StructDef tile = schema.Structs["TileStruct"];
+        _tileHeight = tile.OffsetOf("TileHeight");
+        _subTileDetails = tile.OffsetOf("SubTileDetailsPtr");
+        _rotationSelector = tile.OffsetOf("RotationSelector");
     }
 
     /// <summary>
@@ -325,7 +341,7 @@ public sealed class TerrainReader
         if (tilesY is < 1 or > 4096) { tilesY = 0; }
 
         LastError = string.Empty;
-        float[] heights = ReadTileHeights(terrainBase, tilesX, tilesY);
+        TerrainHeightField? heights = ReadTileHeights(terrainBase, tilesX, tilesY);
         return new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote);
     }
 
@@ -350,12 +366,12 @@ public sealed class TerrainReader
     /// Returns an empty array on any problem, which leaves the map drawn flat - what it did
     /// before heights existed. The correction is worth having and not worth failing over.
     /// </remarks>
-    private float[] ReadTileHeights(ulong terrainBase, long tilesX, long tilesY)
+    private TerrainHeightField? ReadTileHeights(ulong terrainBase, long tilesX, long tilesY)
     {
         if (tilesX <= 0 || tilesY <= 0)
         {
             _heightNote = "no tile count";
-            return [];
+            return null;
         }
 
         ulong first = _reader.ReadPointer(terrainBase + (ulong)_tileDetails);
@@ -363,7 +379,7 @@ public sealed class TerrainReader
         if (first == 0 || last <= first)
         {
             _heightNote = "tile vector empty";
-            return [];
+            return null;
         }
 
         long count = tilesX * tilesY;
@@ -371,7 +387,7 @@ public sealed class TerrainReader
         if (available < count || count > 4_000_000)
         {
             _heightNote = $"tile vector holds {available}, needs {count}";
-            return [];
+            return null;
         }
 
         short multiplier = _reader.Read<short>(terrainBase + (ulong)_heightMultiplier);
@@ -379,17 +395,121 @@ public sealed class TerrainReader
         if (!_reader.TryRead(first, tiles))
         {
             _heightNote = $"tile read failed ({count * TileEntrySize} bytes)";
-            return [];
+            return null;
         }
 
         var heights = new float[count];
         for (long i = 0; i < count; i++)
         {
             short raw = BitConverter.ToInt16(tiles, (int)((i * TileEntrySize) + _tileHeight));
-            heights[i] = raw * multiplier * HeightScale;
+            heights[i] = raw * multiplier * TerrainHeightField.HeightScale;
         }
 
-        _heightNote = $"{tilesX}x{tilesY} tiles, multiplier {multiplier}";
-        return heights;
+        string tileNote = $"{tilesX}x{tilesY} tiles, multiplier {multiplier}";
+
+        TerrainHeightField? full = ReadSubTileHeights(tiles, count, heights, (int)tilesX, (int)tilesY, tileNote);
+        if (full is not null)
+        {
+            return full;
+        }
+
+        return TerrainHeightField.Tiles(heights, (int)tilesX, (int)tilesY);
+    }
+
+    /// <summary>
+    /// Adds the slope inside each tile, or returns null and leaves the field tile-only.
+    /// </summary>
+    /// <remarks>
+    /// Three reads deep and every one of them optional: the two engine tables that describe
+    /// how a tile was placed come from a pattern scan that can legitimately fail, and each
+    /// tile points at a per-TEMPLATE height array that may not be there. Missing any of it
+    /// costs the within-tile detail and nothing else.
+    ///
+    /// The arrays are read once per distinct template rather than once per tile - an area is
+    /// thousands of tiles built from a few hundred templates, so this is the difference
+    /// between a few hundred small reads and a few thousand.
+    /// </remarks>
+    private TerrainHeightField? ReadSubTileHeights(
+        byte[] tiles, long count, float[] heights, int tilesX, int tilesY, string tileNote)
+    {
+        if (!_rotation.IsResolved)
+        {
+            _heightNote = $"{tileNote}; tile-level only (rotation tables not resolved)";
+            return null;
+        }
+
+        var selectorTable = new byte[9];
+        var helperTable = new byte[32];
+        if (!_reader.TryRead(_rotation.Selector, selectorTable) || !_reader.TryRead(_rotation.Helper, helperTable))
+        {
+            _heightNote = $"{tileNote}; tile-level only (rotation tables unreadable)";
+            return null;
+        }
+
+        var rotation = new byte[count];
+        var subIndex = new int[count];
+        var arrays = new List<byte[]>();
+        var byPointer = new Dictionary<ulong, int>();
+
+        for (long i = 0; i < count; i++)
+        {
+            int at = (int)(i * TileEntrySize);
+            rotation[i] = tiles[at + _rotationSelector];
+            subIndex[i] = -1;
+
+            ulong pointer = BitConverter.ToUInt64(tiles, at + _subTileDetails);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(pointer))
+            {
+                continue;
+            }
+
+            if (byPointer.TryGetValue(pointer, out int known))
+            {
+                subIndex[i] = known;
+                continue;
+            }
+
+            if (arrays.Count >= MaxSubTemplates)
+            {
+                continue;
+            }
+
+            byte[] array = ReadSubHeightArray(pointer);
+            int index = arrays.Count;
+            arrays.Add(array);
+            byPointer[pointer] = index;
+            subIndex[i] = index;
+        }
+
+        int withHeights = arrays.Count(a => a.Length > 0);
+        if (withHeights == 0)
+        {
+            _heightNote = $"{tileNote}; tile-level only (no sub-tile arrays in {arrays.Count} templates)";
+            return null;
+        }
+
+        _heightNote = $"{tileNote}, sub-tile from {withHeights}/{arrays.Count} templates";
+        return TerrainHeightField.WithSubTile(
+            heights, tilesX, tilesY, rotation, subIndex, [.. arrays], selectorTable, helperTable);
+    }
+
+    /// <summary>Reads one template's height array - an StdVector of bytes at its start.</summary>
+    private byte[] ReadSubHeightArray(ulong subTile)
+    {
+        ulong begin = _reader.ReadPointer(subTile);
+        ulong end = _reader.ReadPointer(subTile + 8);
+        if (begin == 0 || end <= begin)
+        {
+            return [];
+        }
+
+        long length = (long)(end - begin);
+        if (length > MaxSubHeightBytes)
+        {
+            return [];
+        }
+
+        var bytes = new byte[length];
+        return _reader.TryRead(begin, bytes) ? bytes : [];
     }
 }

@@ -137,7 +137,12 @@ public sealed class WorldReader
     private readonly int _isTargetable;
     private readonly int _monsterRarity;
 
-    public WorldReader(IMemoryReader reader, OffsetSchema schema)
+    /// <param name="rotation">
+    /// Where the terrain rotation tables live, for the within-tile heights. Optional: without
+    /// them the map is drawn from tile-level heights, which is a coarser correction rather
+    /// than none.
+    /// </param>
+    public WorldReader(IMemoryReader reader, OffsetSchema schema, TerrainRotationTables rotation = default)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
@@ -152,7 +157,7 @@ public sealed class WorldReader
         _flasks = new FlaskBeltReader(reader, schema);
         _groundItems = new GroundItemReader(reader, schema);
         _areas = new WorldAreaReader(reader, schema);
-        _terrain = new TerrainReader(reader, schema);
+        _terrain = new TerrainReader(reader, schema, rotation);
         _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");

@@ -197,8 +197,15 @@ internal static class Program
                 cull = 0; // a mis-resolved pattern would poison every width-scaled rect
             }
 
+            // The within-tile terrain heights need these two engine tables. A scan that
+            // comes up empty leaves the map on tile-level heights, so this is read
+            // permissively rather than checked.
+            var rotation = new PoEformance.Game.World.TerrainRotationTables(
+                result.Statics.FirstOrDefault(s => s.Name == "TerrainRotationSelector" && s.Found)?.Address ?? 0,
+                result.Statics.FirstOrDefault(s => s.Name == "TerrainRotatorHelper" && s.Found)?.Address ?? 0);
+
             RunOverlay(
-                reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
+                reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask, rotation,
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
                 uiBrowser: options.ShowUiBrowser);
         }
@@ -329,10 +336,11 @@ internal static class Program
 
     private static void RunOverlay(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
-        PoEformance.Features.AutoFlask autoFlask, bool debug,
+        PoEformance.Features.AutoFlask autoFlask,
+        PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser)
     {
-        var world = new PoEformance.Game.World.WorldReader(reader, schema);
+        var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation);
         Console.WriteLine();
         Console.WriteLine(gameWindow != IntPtr.Zero
             ? "overlay running - it follows the game window and hides while the game is not in front"

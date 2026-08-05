@@ -229,18 +229,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return $"FLAT - heights unavailable: {grid.HeightNote}";
         }
 
-        string state = grid.HeightNote;
         if (_snapshot.Player is not WorldEntity player)
         {
-            return state;
+            return grid.HeightNote;
         }
 
-        float tile = grid.HeightAt(
+        // The residual, measured live at the one place both figures exist: the game's own
+        // ground height under the player, against what this computes for the same spot. Zero
+        // means the height model agrees with the game; anything else is drawn into the map.
+        float here = grid.HeightAt(
             (int)(player.WorldX / MapView.WorldToGrid),
             (int)(player.WorldY / MapView.WorldToGrid));
 
-        return $"{state}; here ground {player.TerrainHeight:F0} vs tile {tile:F0}"
-               + $" (sub-tile {player.TerrainHeight - tile:F0})";
+        return $"{grid.HeightNote}; here ground {player.TerrainHeight:F0} vs computed {here:F0}"
+               + $" (off by {player.TerrainHeight - here:F0})";
     }
 
     /// <summary>Releases the terrain texture along with the renderer that holds it.</summary>
