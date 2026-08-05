@@ -53,10 +53,20 @@ public sealed record WorldEntity(
     float TerrainHeight = 0f,
     float ModelBoundsZ = 0f,
     ItemRarity Rarity = ItemRarity.Unknown,
-    PoiKind Poi = PoiKind.None)
+    PoiKind Poi = PoiKind.None,
+    string MapIcon = "")
 {
-    /// <summary>A readable label for a point of interest.</summary>
-    public string PoiName => PointsOfInterest.Name(Path, Poi);
+    /// <summary>
+    /// A readable label for a point of interest.
+    /// </summary>
+    /// <remarks>
+    /// The game's own icon name when it has one, because that is what the game calls the
+    /// thing rather than what its file is called - and for a quest objective the difference
+    /// is "Quest Object" against "Brazier Lever 03".
+    /// </remarks>
+    public string PoiName => MapIcon.Length > 0
+        ? PointsOfInterest.Readable(MapIcon)
+        : PointsOfInterest.Name(Path, Poi);
 
     /// <summary>Where the game floats this entity's health bar: the top of its model.</summary>
     public float HealthBarZ => WorldZ - ModelBoundsZ;
@@ -136,6 +146,7 @@ public sealed class WorldReader
     private readonly FlaskBeltReader _flasks;
     private readonly CorpseFilter _corpses = new();
     private readonly GroundItemReader _groundItems;
+    private readonly MinimapIconReader _mapIcons;
     private readonly WorldAreaReader _areas;
     private readonly TerrainReader _terrain;
     private readonly int _playerInfo;
@@ -167,6 +178,7 @@ public sealed class WorldReader
         _buffs = new BuffsReader(reader, schema);
         _flasks = new FlaskBeltReader(reader, schema);
         _groundItems = new GroundItemReader(reader, schema);
+        _mapIcons = new MinimapIconReader(reader, schema);
         _areas = new WorldAreaReader(reader, schema);
         _terrain = new TerrainReader(reader, schema, rotation);
         _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
@@ -303,11 +315,16 @@ public sealed class WorldReader
                 ? _groundItems.RarityOf(entity, nowMs)
                 : ItemRarity.Unknown;
 
+            // The game's own map marking, when it has one. Only read for entities that carry
+            // the component, so it costs nothing on the monsters and drops that never do.
+            ulong iconComponent = entity.Component("MinimapIcon");
+            string mapIcon = iconComponent != 0 ? _mapIcons.Read(iconComponent) : string.Empty;
+
             var world = new WorldEntity(
                 id, address, entity.Path, kind,
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
-                PointsOfInterest.Classify(entity.Path));
+                PointsOfInterest.Classify(entity.Path, mapIcon), mapIcon);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

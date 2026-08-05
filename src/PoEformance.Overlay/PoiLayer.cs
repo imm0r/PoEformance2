@@ -32,6 +32,7 @@ public sealed class PoiLayer
     [
         PoiKind.AreaTransition, PoiKind.Waypoint, PoiKind.Checkpoint,
         PoiKind.Mechanic, PoiKind.Shrine, PoiKind.Npc,
+        PoiKind.Quest, PoiKind.Marked,
     ];
 
     /// <summary>Draw a name next to each marker.</summary>
@@ -59,6 +60,8 @@ public sealed class PoiLayer
         PoiKind.Mechanic => Pack(0.95f, 0.55f, 1f),
         PoiKind.Shrine => Pack(0.5f, 1f, 0.8f),
         PoiKind.Npc => Pack(1f, 0.95f, 0.7f),
+        PoiKind.Quest => Pack(1f, 0.8f, 0.25f),   // what the game wants next, and it shows
+        PoiKind.Marked => Pack(0.85f, 0.85f, 0.95f),
         _ => Pack(0.8f, 0.8f, 0.8f),
     };
 

@@ -253,6 +253,20 @@
       }
     },
 
+    "MinimapIcon": {
+      "comment": "The component an entity carries when the GAME ITSELF marks it on the map - which makes it the authoritative answer to 'is this a point of interest', including quest targets. Source: GameHelper2 RemoteObjects/Components/MinimapIcon.cs.",
+      "fields": {
+        "IconRowPtr": { "offset": "0x20", "type": "ptr", "comment": "Row in MinimapIcons.dat. Its first field is the icon's name." }
+      }
+    },
+
+    "MinimapIconRow": {
+      "comment": "A row of MinimapIcons.dat. The name is the game's own category for the marker (\"Waypoint\", \"QuestObject\", \"RewardChestExpedition\").",
+      "fields": {
+        "NamePtr": { "offset": "0x00", "type": "ptr" }
+      }
+    },
+
     "TileStruct": {
       "comment": "0x38 bytes each, inside TileDetailsPtr. WARNING from the AHK port: the tile ARRAY index and the TileIdX sub-cell byte are different things - a case-insensitive variable collision between them once placed every landmark at the map origin.",
       "fields": {

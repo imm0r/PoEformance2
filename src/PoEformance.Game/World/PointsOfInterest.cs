@@ -29,15 +29,34 @@ public enum PoiKind
     /// A named character standing somewhere - which in a campaign zone is usually the goal.
     /// </summary>
     Npc,
+
+    /// <summary>What a quest wants, as the game's own map marking says so.</summary>
+    Quest,
+
+    /// <summary>
+    /// The game marks it, but with an icon this does not recognise.
+    /// </summary>
+    /// <remarks>
+    /// Kept rather than discarded: the icon names run to dozens and change every league, so
+    /// an unrecognised one means "not classified", never "not important". The icon's own name
+    /// becomes the label, which is usually more informative than a kind would be anyway.
+    /// </remarks>
+    Marked,
 }
 
 /// <summary>
-/// Recognises points of interest from an entity's metadata path.
+/// Recognises points of interest - from the game's own map marking where there is one.
 /// </summary>
 /// <remarks>
-/// By PATH, because that is how the game itself distinguishes these and it survives patches
-/// far better than a component set or an id. Every keyword below is taken from a source that
-/// has been checked against the running game rather than guessed:
+/// THE GAME ALREADY KNOWS. An entity it puts on its own minimap carries a MinimapIcon
+/// component naming the icon it uses ("Waypoint", "QuestObject", "RewardChestExpedition"),
+/// which is the authoritative answer to "is this worth marking" and comes with the game's own
+/// category attached. Quest objectives in particular are impossible to recognise from a path -
+/// a lever is a lever - and trivial from this.
+///
+/// The path rules below are the FALLBACK, for the things the game does not icon. They are
+/// still worth having, and every keyword is taken from a source checked against the running
+/// game rather than guessed:
 ///
 /// - "transition" is the AHK tool's rule, deliberately BROADER than "areatransition". Exits
 ///   are not all under an AreaTransitions folder - Lightless Passage's real exit is
@@ -68,7 +87,80 @@ public static class PointsOfInterest
         "/Ultimatum",
     ];
 
-    /// <summary>Classifies a path, or <see cref="PoiKind.None"/> when it marks nothing.</summary>
+    /// <summary>
+    /// Classifies an entity, preferring the game's own map icon over its path.
+    /// </summary>
+    /// <param name="mapIcon">
+    /// The icon name from the entity's MinimapIcon component, empty when it has none. When
+    /// present it decides, because it is the game saying so rather than this guessing.
+    /// </param>
+    public static PoiKind Classify(string path, string mapIcon)
+    {
+        ArgumentNullException.ThrowIfNull(mapIcon);
+
+        if (mapIcon.Length > 0)
+        {
+            PoiKind fromIcon = FromIcon(mapIcon);
+            if (fromIcon != PoiKind.None)
+            {
+                return fromIcon;
+            }
+        }
+
+        return Classify(path);
+    }
+
+    /// <summary>
+    /// Reads the game's own icon name as a kind.
+    /// </summary>
+    /// <remarks>
+    /// Matched loosely on purpose. The names come from MinimapIcons.dat and there are dozens
+    /// of them, most naming a specific encounter's reward chest; enumerating them would be a
+    /// list that goes stale every league. What matters is the handful of BEHAVIOURS a marker
+    /// can have, and an unrecognised icon still counts as a place - the game marked it, so
+    /// there is something there - which is what the Marked kind is for.
+    /// </remarks>
+    private static PoiKind FromIcon(string icon)
+    {
+        if (Has(icon, "waypoint"))
+        {
+            return PoiKind.Waypoint;
+        }
+
+        if (Has(icon, "checkpoint"))
+        {
+            return PoiKind.Checkpoint;
+        }
+
+        if (Has(icon, "transition") || Has(icon, "portal") || Has(icon, "entrance") || Has(icon, "exit"))
+        {
+            return PoiKind.AreaTransition;
+        }
+
+        if (Has(icon, "quest") || Has(icon, "objective"))
+        {
+            return PoiKind.Quest;
+        }
+
+        if (Has(icon, "npc") || Has(icon, "vendor") || Has(icon, "master"))
+        {
+            return PoiKind.Npc;
+        }
+
+        if (Has(icon, "shrine"))
+        {
+            return PoiKind.Shrine;
+        }
+
+        if (Has(icon, "chest") || Has(icon, "strongbox"))
+        {
+            return PoiKind.Chest;
+        }
+
+        return PoiKind.Marked;
+    }
+
+    /// <summary>Classifies by path alone, for entities the game does not mark itself.</summary>
     public static PoiKind Classify(string path)
     {
         ArgumentNullException.ThrowIfNull(path);
@@ -164,6 +256,18 @@ public static class PointsOfInterest
         return spaced.Length == 0 ? Describe(kind) : spaced;
     }
 
+    /// <summary>Turns the game's own icon name into something readable.</summary>
+    /// <remarks>
+    /// The names are joined words, as everything in the game's data is. Nothing else is done
+    /// to them: this is what the GAME calls the marker, and rewording it would be replacing
+    /// information with an opinion.
+    /// </remarks>
+    public static string Readable(string iconName)
+    {
+        ArgumentNullException.ThrowIfNull(iconName);
+        return Space(iconName);
+    }
+
     /// <summary>The plain name of a kind, for a label with nothing better to say.</summary>
     public static string Describe(PoiKind kind) => kind switch
     {
@@ -174,6 +278,8 @@ public static class PointsOfInterest
         PoiKind.Mechanic => "Encounter",
         PoiKind.Shrine => "Shrine",
         PoiKind.Npc => "NPC",
+        PoiKind.Quest => "Quest",
+        PoiKind.Marked => "Marked",
         _ => "Point",
     };
 

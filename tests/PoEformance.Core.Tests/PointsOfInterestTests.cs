@@ -57,6 +57,50 @@ public class PointsOfInterestTests
     public void TheNameIsReadableRatherThanThePath(string path, string expected)
         => Assert.Equal(expected, PointsOfInterest.Name(path, PointsOfInterest.Classify(path)));
 
+    [Theory]
+    // The game's own names, from MinimapIcons.dat. This is the game answering the question
+    // rather than this guessing at it, so it decides.
+    [InlineData("Waypoint", PoiKind.Waypoint)]
+    [InlineData("QuestObject", PoiKind.Quest)]
+    [InlineData("AreaTransition", PoiKind.AreaTransition)]
+    [InlineData("RewardChestExpedition", PoiKind.Chest)]
+    [InlineData("NPCMaster", PoiKind.Npc)]
+    // Unrecognised is NOT unimportant: the game marked it, so there is something there. The
+    // names run to dozens and change every league, so anything else would go stale.
+    [InlineData("SomeIconNobodyHasSeenYet", PoiKind.Marked)]
+    public void TheGamesOwnMapIconDecides(string icon, PoiKind expected)
+        => Assert.Equal(expected, PointsOfInterest.Classify("Metadata/Terrain/Whatever/Thing", icon));
+
+    [Fact]
+    public void AQuestObjectiveIsUnrecognisableFromItsPathAndObviousFromTheIcon()
+    {
+        // The case the icon exists for. Nothing in "Brazier_03" says a quest wants it, and no
+        // list of path keywords could - it is a brazier. The game marking it says everything.
+        const string path = "Metadata/Terrain/Act1/Objects/Brazier_03";
+
+        Assert.Equal(PoiKind.None, PointsOfInterest.Classify(path));
+        Assert.Equal(PoiKind.Quest, PointsOfInterest.Classify(path, "QuestObject"));
+    }
+
+    [Fact]
+    public void WithoutAnIconThePathRulesStillApply()
+    {
+        // The fallback has to keep working: the game does not mark everything worth walking
+        // to, and an exit it does not icon is still an exit.
+        Assert.Equal(
+            PoiKind.AreaTransition,
+            PointsOfInterest.Classify("Metadata/Terrain/Gallows/Act2/2_5/Objects/LightlessPassageTransition", ""));
+    }
+
+    [Fact]
+    public void TheIconsOwnNameIsTheLabel()
+    {
+        // What the GAME calls the marker, only spaced out. Rewording it would be replacing
+        // information with an opinion.
+        Assert.Equal("Quest Object", PointsOfInterest.Readable("QuestObject"));
+        Assert.Equal("Reward Chest Expedition", PointsOfInterest.Readable("RewardChestExpedition"));
+    }
+
     [Fact]
     public void ANameThatWouldSayNothingFallsBackToTheKind()
     {
