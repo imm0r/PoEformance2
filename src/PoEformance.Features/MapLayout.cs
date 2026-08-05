@@ -44,10 +44,10 @@ public sealed record MapLayout(
     /// pixels wide, and sending more detail than can be shown costs a bigger message for a
     /// picture nobody can see the difference in.
     /// </param>
-    public static MapLayout From(TerrainGrid grid, int maxEdge = 768)
+    public static MapLayout From(TerrainGrid grid, int maxEdge = 768, int thickness = 1)
     {
         ArgumentNullException.ThrowIfNull(grid);
-        OutlineMask mask = TerrainOutline.Build(grid, maxEdge);
+        OutlineMask mask = TerrainOutline.Build(grid, maxEdge, thickness);
 
         var runs = new List<int>();
         byte current = 0; // runs always start with empty, so a leading 0 may be emitted

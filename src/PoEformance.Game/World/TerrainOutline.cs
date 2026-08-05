@@ -31,7 +31,12 @@ public static class TerrainOutline
     /// thing point-sampling loses - and a dashed outline reads as a damaged map rather than
     /// a smaller one.
     /// </remarks>
-    public static OutlineMask Build(TerrainGrid grid, int maxEdge)
+    /// <param name="thickness">
+    /// How many pixels wide the line is drawn. Applied AFTER thinning, so it means the same
+    /// on screen whatever the area's size - thickening before would be scaled away again on
+    /// a large map and doubled on a small one.
+    /// </param>
+    public static OutlineMask Build(TerrainGrid grid, int maxEdge, int thickness = 1)
     {
         ArgumentNullException.ThrowIfNull(grid);
         ArgumentOutOfRangeException.ThrowIfLessThan(maxEdge, 1);
@@ -56,7 +61,49 @@ public static class TerrainOutline
             }
         }
 
-        return new OutlineMask(cells, width, height, step);
+        return new OutlineMask(Widen(cells, width, height, thickness), width, height, step);
+    }
+
+    /// <summary>Grows the line to the requested width, leaving it centred on the boundary.</summary>
+    private static byte[] Widen(byte[] cells, int width, int height, int thickness)
+    {
+        int radius = Math.Clamp(thickness, 1, 8) - 1;
+        if (radius <= 0)
+        {
+            return cells;
+        }
+
+        var widened = new byte[cells.Length];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (cells[(y * width) + x] == 0)
+                {
+                    continue;
+                }
+
+                for (int dy = -radius; dy <= radius; dy++)
+                {
+                    int ny = y + dy;
+                    if (ny < 0 || ny >= height)
+                    {
+                        continue;
+                    }
+
+                    for (int dx = -radius; dx <= radius; dx++)
+                    {
+                        int nx = x + dx;
+                        if (nx >= 0 && nx < width)
+                        {
+                            widened[(ny * width) + nx] = 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        return widened;
     }
 
     private static bool BlockHasBoundary(byte[] full, int gridWidth, int gridHeight, int x0, int y0, int step)

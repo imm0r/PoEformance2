@@ -80,6 +80,13 @@
       <div class="cfg-row">
         <label><input type="checkbox" id="ov-terrain"> Show the area layout on the map</label>
       </div>
+      <div class="cfg-row">
+        <label for="ov-terrain-colour">Outline colour</label>
+        <input type="color" id="ov-terrain-colour" value="#96C8FF">
+        <label for="ov-terrain-thickness">Thickness</label>
+        <input type="range" id="ov-terrain-thickness" min="1" max="6" step="1" value="1">
+        <span id="ov-terrain-thickness-value" class="dim">1</span>
+      </div>
       <p class="dim">Terrain: <span id="ov-terrain-state">–</span> — it loads well after the
         area does, so "loading" right after a portal is normal.</p>
     </section>

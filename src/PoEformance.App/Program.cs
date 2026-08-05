@@ -387,6 +387,9 @@ internal static class Program
         overlay.ShowWorldDots = debug;
         overlay.MinimumLootRarity = settings.MinLootRarity;
         overlay.ShowTerrain = settings.ShowTerrain;
+        overlay.ApplyTerrainStyle(
+            PoEformance.Features.OverlaySettings.ParseColour(settings.TerrainColour),
+            settings.TerrainThickness);
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();
     }
@@ -527,6 +530,8 @@ internal static class Program
                 Overlay: new PoEformance.Config.OverlayView(
                     overlay.MinLootRarity.ToString(),
                     overlay.ShowTerrain,
+                    overlay.TerrainColour,
+                    overlay.TerrainThickness,
                     DescribeTerrain(overlayHandle)),
                 Map: BuildMapView(snapshot, overlay.MinLootRarity));
         }
@@ -603,6 +608,9 @@ internal static class Program
                     {
                         live.MinimumLootRarity = overlay.MinLootRarity;
                         live.ShowTerrain = overlay.ShowTerrain;
+                        live.ApplyTerrainStyle(
+                            PoEformance.Features.OverlaySettings.ParseColour(overlay.TerrainColour),
+                            overlay.TerrainThickness);
                     }
 
                     SaveWarning(

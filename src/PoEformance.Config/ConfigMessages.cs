@@ -51,6 +51,8 @@ public sealed record AutoFlaskView(
 public sealed record OverlayView(
     [property: JsonPropertyName("minLootRarity")] string MinLootRarity,
     [property: JsonPropertyName("showTerrain")] bool ShowTerrain,
+    [property: JsonPropertyName("terrainColour")] string TerrainColour,
+    [property: JsonPropertyName("terrainThickness")] int TerrainThickness,
     [property: JsonPropertyName("terrain")] string Terrain);
 
 /// <summary>One marker on the page's map, in outline-pixel coordinates.</summary>

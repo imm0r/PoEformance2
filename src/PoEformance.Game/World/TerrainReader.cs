@@ -19,20 +19,50 @@ public sealed class TerrainGrid
     private readonly byte[] _cells;
     private readonly int _bytesPerRow;
 
-    public TerrainGrid(byte[] cells, int bytesPerRow, int height)
+    /// <summary>Grid cells per terrain tile - a tile is 250 world units, a cell is 250/23.</summary>
+    public const int CellsPerTile = 23;
+
+    public TerrainGrid(byte[] cells, int bytesPerRow, int rows, long totalTilesX = 0, long totalTilesY = 0)
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
         _bytesPerRow = bytesPerRow;
-        Width = bytesPerRow * 2;
-        Height = height;
+        StoredWidth = bytesPerRow * 2;
+        StoredHeight = rows;
+
+        // The stored buffer can be WIDER than the area. Row stride is a byte count and the
+        // game is free to round it up, which leaves a strip of padding cells at the right
+        // edge and below - and drawing the buffer's full extent then stretches the whole
+        // outline by that strip, an error that is invisible in the middle and grows toward
+        // the edges. The tile count is the area's real size, so it wins when it is smaller.
+        Width = Fit(StoredWidth, totalTilesX);
+        Height = Fit(StoredHeight, totalTilesY);
     }
 
-    /// <summary>Grid cells across. Two per byte of the row stride.</summary>
+    /// <summary>Grid cells across, excluding row padding.</summary>
     public int Width { get; }
 
-    /// <summary>Grid cells down - one per row of the packed data.</summary>
+    /// <summary>Grid cells down, excluding trailing padding rows.</summary>
     public int Height { get; }
+
+    /// <summary>What the buffer holds, padding included - for the diagnostic readout.</summary>
+    public int StoredWidth { get; }
+
+    /// <summary>Rows the buffer holds, padding included.</summary>
+    public int StoredHeight { get; }
+
+    /// <summary>Describes the grid and any padding found, so a mismatch is visible.</summary>
+    public string Describe()
+        => Width == StoredWidth && Height == StoredHeight
+            ? $"{Width}x{Height}"
+            : $"{Width}x{Height} (buffer {StoredWidth}x{StoredHeight})";
+
+    /// <summary>Takes the tile-derived size when it is smaller and plausible.</summary>
+    private static int Fit(int stored, long tiles)
+    {
+        long fromTiles = tiles * CellsPerTile;
+        return fromTiles > 0 && fromTiles < stored ? (int)fromTiles : stored;
+    }
 
     /// <summary>True when this cell can be walked on. Outside the grid counts as solid.</summary>
     public bool IsWalkable(int x, int y)
@@ -113,6 +143,8 @@ public sealed class TerrainReader
     private readonly int _terrainMetadata;
     private readonly int _walkableData;
     private readonly int _bytesPerRow;
+    private readonly int _totalTilesX;
+    private readonly int _totalTilesY;
     private readonly int _areaHash;
 
     private TerrainGrid? _grid;
@@ -135,6 +167,8 @@ public sealed class TerrainReader
         StructDef terrain = schema.Structs["TerrainMetadata"];
         _walkableData = terrain.OffsetOf("GridWalkableData");
         _bytesPerRow = terrain.OffsetOf("BytesPerRow");
+        _totalTilesX = terrain.OffsetOf("TotalTilesX");
+        _totalTilesY = terrain.OffsetOf("TotalTilesY");
     }
 
     /// <summary>
@@ -214,7 +248,15 @@ public sealed class TerrainReader
             return null;
         }
 
+        // Sanity-checked rather than trusted: a wrong tile count would CROP the map, which
+        // looks like a smaller area rather than a bad read. Zero means "no opinion", and
+        // the buffer's own size stands.
+        long tilesX = _reader.Read<long>(terrainBase + (ulong)_totalTilesX);
+        long tilesY = _reader.Read<long>(terrainBase + (ulong)_totalTilesY);
+        if (tilesX is < 1 or > 4096) { tilesX = 0; }
+        if (tilesY is < 1 or > 4096) { tilesY = 0; }
+
         LastError = string.Empty;
-        return new TerrainGrid(cells, stride, (int)rows);
+        return new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY);
     }
 }

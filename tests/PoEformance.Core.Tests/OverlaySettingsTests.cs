@@ -47,6 +47,38 @@ public class OverlaySettingsTests
         }
     }
 
+    [Theory]
+    [InlineData("#96C8FF", 0xFFFFC896)]   // ImGui packs ABGR, the reverse of the page's RGB
+    [InlineData("96c8ff", 0xFFFFC896)]    // the leading hash is optional
+    [InlineData("#FF0000", 0xFF0000FF)]   // red: the byte order is not symmetric, so this catches a swap
+    [InlineData("#00FF00", 0xFF00FF00)]
+    public void ColourIsPackedTheWayImGuiReadsIt(string text, uint expected)
+        => Assert.Equal(expected, OverlaySettings.ParseColour(text));
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("nope")]
+    [InlineData("#12345")]
+    [InlineData("#GGGGGG")]
+    public void AnUnparseableColourIsRejectedRatherThanDrawnInvisibly(string text)
+    {
+        // 0 means "no colour", which the caller reads as "keep what you had". Returning a
+        // transparent black instead would draw the outline as nothing at all, which looks
+        // exactly like the feature being broken.
+        Assert.Equal(0u, OverlaySettings.ParseColour(text));
+        Assert.Equal(OverlaySettings.Default.TerrainColour,
+            new OverlaySettings(ItemRarity.Magic, TerrainColour: text).Normalised().TerrainColour);
+    }
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(1, 1)]
+    [InlineData(4, 4)]
+    [InlineData(99, 6)]
+    public void ThicknessIsClampedToWhatStillReadsAsAnOutline(int written, int expected)
+        => Assert.Equal(expected, new OverlaySettings(ItemRarity.Magic, TerrainThickness: written)
+            .Normalised().TerrainThickness);
+
     [Fact]
     public void CorruptFile_FallsBackToTheDefault()
     {

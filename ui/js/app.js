@@ -27,6 +27,9 @@ function renderState(s) {
     $("ov-loot").value = s.overlay.minLootRarity;
     $("ov-terrain").checked = s.overlay.showTerrain;
     $("ov-terrain-state").textContent = s.overlay.terrain;
+    $("ov-terrain-colour").value = s.overlay.terrainColour;
+    $("ov-terrain-thickness").value = s.overlay.terrainThickness;
+    $("ov-terrain-thickness-value").textContent = s.overlay.terrainThickness;
   }
 
   if (s.map) {
@@ -82,12 +85,21 @@ function sendOverlay() {
     payload: {
       minLootRarity: $("ov-loot").value,
       showTerrain: $("ov-terrain").checked,
+      terrainColour: $("ov-terrain-colour").value,
+      terrainThickness: Number($("ov-terrain-thickness").value),
     },
   });
 }
 
 $("ov-loot").addEventListener("change", sendOverlay);
 $("ov-terrain").addEventListener("change", sendOverlay);
+$("ov-terrain-colour").addEventListener("change", sendOverlay);
+
+// On "change", not "input": dragging a slider fires continuously, and each thickness step
+// rebuilds the terrain texture on the render thread.
+$("ov-terrain-thickness").addEventListener("input", () =>
+  ($("ov-terrain-thickness-value").textContent = $("ov-terrain-thickness").value));
+$("ov-terrain-thickness").addEventListener("change", sendOverlay);
 
 // ── Auto flask ─────────────────────────────────────────────────────────────
 
@@ -250,7 +262,7 @@ if (bridge.connected) {
     entityCount: 0,
     staticsFound: 0,
     staticsTotal: 6,
-    overlay: { minLootRarity: "Magic", showTerrain: true, terrain: "browser preview" },
+    overlay: { minLootRarity: "Magic", showTerrain: true, terrainColour: "#96c8ff", terrainThickness: 1, terrain: "browser preview" },
     autoFlask: {
       enabled: false,
       keySource: "Defaults - no host",

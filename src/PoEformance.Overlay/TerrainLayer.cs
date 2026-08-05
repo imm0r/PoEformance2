@@ -54,6 +54,7 @@ public sealed class TerrainLayer : IDisposable
     private int _textureWidth;
     private int _textureHeight;
     private uint _colour = 0xFF64C8FF;
+    private int _thickness = 1;
 
     // Set once the layer has given up, so a failure is reported once rather than every frame.
     private string? _failure;
@@ -68,11 +69,35 @@ public sealed class TerrainLayer : IDisposable
         _release = release;
     }
 
-    /// <summary>Outline colour, ABGR as ImGui packs it.</summary>
+    /// <summary>
+    /// Outline colour, ABGR as ImGui packs it.
+    /// </summary>
+    /// <remarks>
+    /// A TINT applied at draw time, not baked into the texture: the image is white and the
+    /// quad is drawn through this, so changing the colour costs nothing and rebuilds
+    /// nothing. Thickness cannot work that way - it changes the pixels - so that one does
+    /// force a rebuild.
+    /// </remarks>
     public uint Colour
     {
         get => _colour;
         set => _colour = value;
+    }
+
+    /// <summary>Line width in texture pixels. Changing it rebuilds the texture.</summary>
+    public int Thickness
+    {
+        get => _thickness;
+        set
+        {
+            int clamped = Math.Clamp(value, 1, 8);
+            if (clamped != _thickness)
+            {
+                _thickness = clamped;
+                _built = null;   // the pixels change, so the texture has to be made again
+                _failure = null; // and a previous failure deserves a fresh attempt
+            }
+        }
     }
 
     /// <summary>
@@ -170,7 +195,7 @@ public sealed class TerrainLayer : IDisposable
 
         // Thin rather than refuse: a grid wider than a GPU will take still has a layout
         // worth seeing, and it is drawn a few hundred pixels across regardless.
-        OutlineMask mask = TerrainOutline.Build(grid, MaxTextureEdge);
+        OutlineMask mask = TerrainOutline.Build(grid, MaxTextureEdge, _thickness);
 
         // CONTIGUOUS on purpose, and this is not a preference. ImageSharp splits anything
         // past a few megabytes across several buffers, and the renderer uploads a texture

@@ -158,6 +158,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         return Task.CompletedTask;
     }
 
+    /// <summary>Sets the layout's colour and line width. A colour of 0 keeps the current one.</summary>
+    public void ApplyTerrainStyle(uint colour, int thickness)
+    {
+        if (colour != 0)
+        {
+            _terrain.Colour = colour;
+        }
+
+        _terrain.Thickness = thickness;
+    }
+
     /// <summary>What the terrain layer holds, for the config page and the status window.</summary>
     public string DescribeTerrain()
         => _snapshot.Terrain is null ? "loading" : _terrain.Describe();

@@ -12,7 +12,9 @@ namespace PoEformance.Features;
 /// </remarks>
 public sealed record OverlaySettings(
     [property: JsonPropertyName("minLootRarity")] ItemRarity MinLootRarity,
-    [property: JsonPropertyName("showTerrain")] bool ShowTerrain = true)
+    [property: JsonPropertyName("showTerrain")] bool ShowTerrain = true,
+    [property: JsonPropertyName("terrainColour")] string TerrainColour = "#96C8FF",
+    [property: JsonPropertyName("terrainThickness")] int TerrainThickness = 1)
 {
     /// <summary>
     /// Magic and above, and the layout shown. Path of Exile 2 drops normal-rarity items
@@ -27,11 +29,51 @@ public sealed record OverlaySettings(
     /// at all, and it is always shown. Allowing it to be SELECTED as the minimum would read
     /// as "currency only" while actually meaning "rarity 5 and above", which is nothing.
     /// </remarks>
-    public OverlaySettings Normalised() => MinLootRarity switch
+    public OverlaySettings Normalised()
     {
-        ItemRarity.Normal or ItemRarity.Magic or ItemRarity.Rare or ItemRarity.Unique => this,
-        _ => this with { MinLootRarity = Default.MinLootRarity },
-    };
+        ItemRarity rarity = MinLootRarity is ItemRarity.Normal or ItemRarity.Magic
+            or ItemRarity.Rare or ItemRarity.Unique
+            ? MinLootRarity
+            : Default.MinLootRarity;
+
+        return this with
+        {
+            MinLootRarity = rarity,
+            TerrainColour = ParseColour(TerrainColour) == 0 ? Default.TerrainColour : TerrainColour,
+
+            // Capped low: this thickens the line in TEXTURE pixels, and past a few the
+            // outline stops being a boundary and becomes a filled shape.
+            TerrainThickness = Math.Clamp(TerrainThickness, 1, 6),
+        };
+    }
+
+    /// <summary>
+    /// The outline colour as ImGui packs it - ABGR, alpha first in the high byte.
+    /// </summary>
+    /// <remarks>
+    /// Returns 0 for anything unparseable, which the caller treats as "use the default"
+    /// rather than drawing an invisible line. ImGui's byte order is the reverse of the
+    /// #RRGGBB the page sends, and getting that backwards produces a colour that looks
+    /// deliberate and is wrong.
+    /// </remarks>
+    public static uint ParseColour(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0;
+        }
+
+        ReadOnlySpan<char> text = value.AsSpan().Trim().TrimStart('#');
+        if (text.Length != 6 || !uint.TryParse(text, System.Globalization.NumberStyles.HexNumber, null, out uint rgb))
+        {
+            return 0;
+        }
+
+        uint r = (rgb >> 16) & 0xFF;
+        uint g = (rgb >> 8) & 0xFF;
+        uint b = rgb & 0xFF;
+        return 0xFF000000u | (b << 16) | (g << 8) | r;
+    }
 }
 
 /// <summary>Loads and saves the overlay settings next to the executable.</summary>
