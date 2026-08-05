@@ -13,13 +13,36 @@ public readonly record struct AreaInfo(string Id, string Name, int Act, bool IsT
 
     /// <summary>True when there is something here to fight.</summary>
     /// <remarks>
-    /// Town and hideout only. Both are read from the game's own data - IsTown is a field,
-    /// IsHideout is the reference's id test - so this cannot drift into hiding an overlay
-    /// somewhere it is wanted. An area that did not resolve counts as hostile: the failure
-    /// mode of a read that went wrong should be "the overlay is still there", not "the
-    /// overlay silently stopped working".
+    /// Town and hideout only. Both come from the game's own data - IsTown is a field,
+    /// IsHideout is the reference's id test.
     /// </remarks>
     public bool IsHostile => !IsTown && !IsHideout;
+
+    /// <summary>
+    /// True for campaign content: an act zone rather than an endgame map.
+    /// </summary>
+    /// <remarks>
+    /// TWO clauses, and the second is a safety net rather than a refinement. The act number
+    /// is the real signal - a campaign area belongs to an act, e.g. Abyss_Hub reports act 2
+    /// - but what an endgame MAP reports has not been observed yet. If it also carries a
+    /// non-zero act, the act test alone would hide the overlay exactly where it is wanted,
+    /// so map ids are excluded outright as well.
+    ///
+    /// Either clause on its own would be a guess; together they are wrong only for an
+    /// endgame area that both belongs to an act AND is not named Map*. Collapse this to the
+    /// act alone once a real map has been seen to report act 0.
+    /// </remarks>
+    public bool IsCampaign => Act >= 1 && !Id.StartsWith("Map", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Whether the overlay should mark anything here.
+    /// </summary>
+    /// <remarks>
+    /// An area that did not resolve wants markers: the failure mode of a read that went
+    /// wrong should be "the overlay is still there", not "the overlay silently stopped
+    /// working and you find out during a fight".
+    /// </remarks>
+    public bool WantsMarkers => IsHostile && !IsCampaign;
 
     /// <summary>A short description for the status readout.</summary>
     public string Describe()
@@ -29,7 +52,11 @@ public readonly record struct AreaInfo(string Id, string Name, int Act, bool IsT
             return "unknown";
         }
 
-        string kind = IsHideout ? "hideout" : IsTown ? "town" : "hostile";
+        string kind = IsHideout ? "hideout"
+            : IsTown ? "town"
+            : IsCampaign ? "campaign"
+            : "map";
+
         return $"{Name} [{Id}] act {Act}, {kind}";
     }
 }

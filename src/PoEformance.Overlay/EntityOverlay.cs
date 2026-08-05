@@ -175,7 +175,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Nothing to mark in a town or a hideout, and a screen full of markers over the
         // stash is worse than no overlay. An area that did not resolve counts as hostile,
         // so a failed read never silently switches the tool off.
-        if (_snapshot.InGame && width > 0 && height > 0 && _snapshot.Area.IsHostile)
+        if (_snapshot.InGame && width > 0 && height > 0 && _snapshot.Area.WantsMarkers)
         {
             // Markers go ON THE MAP, not over the 3D scene. Scattering dots across the game
             // world puts them between the player and what they are fighting; the map is
@@ -351,8 +351,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 // WHERE the overlay should be active.
                 AreaInfo area = _snapshot.Area;
                 ImGui.TextColored(
-                    area.IsHostile ? new Vector4(0.7f, 0.75f, 0.8f, 1f) : new Vector4(1f, 0.6f, 0.2f, 1f),
-                    $"area:     {area.Describe()}{(area.IsHostile ? string.Empty : " - markers hidden")}");
+                    area.WantsMarkers ? new Vector4(0.7f, 0.75f, 0.8f, 1f) : new Vector4(1f, 0.6f, 0.2f, 1f),
+                    $"area:     {area.Describe()}{(area.WantsMarkers ? string.Empty : " - markers hidden")}");
 
                 ImGui.Text($"entities: {_snapshot.Entities.Count}");
                 if (ReadStats is not null)

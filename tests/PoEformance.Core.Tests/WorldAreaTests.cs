@@ -10,22 +10,35 @@ namespace PoEformance.Core.Tests;
 public class WorldAreaTests
 {
     [Theory]
-    [InlineData("MapRiverhold", false, true)]
-    [InlineData("G1_2", false, true)]
-    [InlineData("G1_town", true, false)]
-    [InlineData("HideoutFelled", false, false)]
-    public void HostileMeansThereIsSomethingToFight(string id, bool isTown, bool hostile)
+    // id,                 act, town,  hideout, markers wanted
+    [InlineData("MapRiverhold", 0, false, false, true)]   // endgame, the case this exists for
+    [InlineData("MapBluff", 2, false, false, true)]       // a map that DOES report an act still counts
+    [InlineData("Abyss_Hub", 2, false, false, false)]     // a real campaign area, reported by the owner
+    [InlineData("G1_2", 1, false, false, false)]          // act zone
+    [InlineData("G1_town", 1, true, false, false)]        // town
+    [InlineData("HideoutFelled", 1, false, true, false)]  // hideout
+    public void MarkersAreWantedInEndgameAreasOnly(string id, int act, bool town, bool hideout, bool wanted)
     {
-        bool isHideout = id.Contains("hideout", StringComparison.OrdinalIgnoreCase);
-        Assert.Equal(hostile, new AreaInfo(id, id, 1, isTown, isHideout).IsHostile);
+        Assert.Equal(wanted, new AreaInfo(id, id, act, town, hideout).WantsMarkers);
     }
 
     [Fact]
-    public void UnresolvedArea_CountsAsHostile()
+    public void AMapKeepsItsMarkersEvenIfItReportsAnAct()
+    {
+        // The act number is the real signal for campaign content, but what an endgame map
+        // reports has not been observed. Excluding map ids outright is the safety net: if
+        // maps do carry an act, the act test alone would hide the overlay exactly where it
+        // is wanted, which is the one outcome worse than showing it too often.
+        Assert.False(new AreaInfo("MapRiverhold", "Riverhold", 2, false, false).IsCampaign);
+        Assert.True(new AreaInfo("Abyss_Hub", "The Well of Souls", 2, false, false).IsCampaign);
+    }
+
+    [Fact]
+    public void UnresolvedArea_StillWantsMarkers()
     {
         // The failure mode of a read that went wrong must be "the overlay is still there",
         // not "the overlay silently stopped working and you find out during a fight".
-        Assert.True(AreaInfo.Unknown.IsHostile);
+        Assert.True(AreaInfo.Unknown.WantsMarkers);
         Assert.Equal("unknown", AreaInfo.Unknown.Describe());
     }
 
@@ -34,7 +47,9 @@ public class WorldAreaTests
     {
         Assert.Contains("hideout", new AreaInfo("HideoutFelled", "Felled", 1, false, true).Describe(),
             StringComparison.Ordinal);
-        Assert.Contains("hostile", new AreaInfo("MapRiverhold", "Riverhold", 0, false, false).Describe(),
+        Assert.Contains("campaign", new AreaInfo("Abyss_Hub", "The Well of Souls", 2, false, false).Describe(),
+            StringComparison.Ordinal);
+        Assert.Contains("map", new AreaInfo("MapRiverhold", "Riverhold", 0, false, false).Describe(),
             StringComparison.Ordinal);
     }
 
