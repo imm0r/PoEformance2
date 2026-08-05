@@ -69,7 +69,13 @@ dotnet test         # any OS
 PoEformance.App --record session.rec     # capture a session (Windows)
 PoEformance.App --replay session.rec     # develop against it, game closed (any use)
 PoEformance.App --overlay --config       # in-game overlay + config window, side by side
+PoEformance.App --overlay --debug        # plus the projection diagnostics and calibration aids
 ```
+
+The overlay draws monsters, chests, items and NPCs, and only while the game is the
+window in front — it is always-on-top, so anything it painted after an alt-tab would land
+on whatever you switched to. `--debug` brings back the RE instruments (the diagnostic
+readout, the calibration markers, and per-kind filters including terrain and effects).
 
 The config window stays open while the overlay runs and its settings apply immediately —
 no restart. Auto flask is off until switched on there, per belt slot; the key each flask

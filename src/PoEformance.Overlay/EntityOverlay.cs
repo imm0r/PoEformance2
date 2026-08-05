@@ -35,14 +35,35 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>Radius in pixels of an entity dot.</summary>
     private const float DotRadius = 5f;
 
-    /// <summary>Draw name labels next to dots.</summary>
-    public bool ShowLabels { get; set; } = true;
+    /// <summary>
+    /// The entity kinds worth a dot.
+    /// </summary>
+    /// <remarks>
+    /// A filter rather than "draw everything", because most of the entity map is not worth
+    /// looking at while playing: terrain pieces, visual effects and the unclassified
+    /// remainder are things the RE work needs to SEE, and things a player needs gone. They
+    /// stay reachable through the diagnostic window, which is where inspecting the entity
+    /// map belongs.
+    /// </remarks>
+    public HashSet<EntityKind> DrawnKinds { get; } =
+        [EntityKind.Monster, EntityKind.Chest, EntityKind.WorldItem, EntityKind.Npc];
 
-    /// <summary>Draw the diagnostic window with counts and the player position.</summary>
-    public bool ShowDebugWindow { get; set; } = true;
+    /// <summary>Draw name labels next to dots.</summary>
+    public bool ShowLabels { get; set; }
+
+    /// <summary>
+    /// Draw the diagnostic window with counts, the player position and the projection checks.
+    /// </summary>
+    /// <remarks>
+    /// OFF by default, and that is a correction rather than a preference. Every instrument
+    /// in this class was built to prove the projection, and once proven they are clutter
+    /// over the game - which is exactly what the first person to actually play with it
+    /// said. They earn their place behind --debug, not on screen by default.
+    /// </remarks>
+    public bool ShowDiagnostics { get; set; }
 
     /// <summary>Draw the alignment aids: screen centre and both candidate player heights.</summary>
-    public bool ShowCalibration { get; set; } = true;
+    public bool ShowCalibration { get; set; }
 
     /// <summary>
     /// World height added to every marker before projecting, adjustable live.
@@ -107,8 +128,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         int height = (int)ImGui.GetIO().DisplaySize.Y;
 
         // The renderer knows the viewport, so it hands it to the reader rather than the
-        // reader guessing at a window it cannot see.
+        // reader guessing at a window it cannot see. Kept ahead of the foreground gate so
+        // the viewport stays current while hidden - the game can be resized from a
+        // borderless-window setting change without ever giving up focus.
         _snapshot = _snapshotSource(new UiScale(width, height, _cull));
+
+        // Nothing is drawn unless the game is the window in front. This is not tidiness:
+        // the overlay is always-on-top and covers the game's whole client area, so every
+        // dot it paints while the user has alt-tabbed away lands on top of the browser or
+        // editor they switched to.
+        if (!GameWindowTracker.IsForeground(_gameWindow))
+        {
+            return;
+        }
 
         if (_snapshot.InGame && width > 0 && height > 0)
         {
@@ -119,7 +151,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
-        if (ShowDebugWindow)
+        if (ShowDiagnostics)
         {
             DrawDebugWindow(width, height);
         }
@@ -154,6 +186,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         foreach (WorldEntity entity in _snapshot.Entities)
         {
+            if (!DrawnKinds.Contains(entity.Kind))
+            {
+                continue; // terrain, effects and the unclassified rest - noise while playing
+            }
+
             ScreenPoint point = ProjectGround(entity, width, height);
 
             if (!point.OnScreen)
@@ -334,9 +371,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     ImGui.TextColored(new Vector4(0.8f, 0.7f, 0.4f, 1f), $"flask:    {FlaskStatus()}");
                 }
 
+                // The kind breakdown doubles as the filter, since "what is out there" and
+                // "what do I want drawn" are the same question asked twice. Note the ##id
+                // suffix: ImGui derives a control's identity from its label, so a label
+                // carrying a live count would be a NEW control every frame and the click
+                // would never register.
                 foreach (IGrouping<EntityKind, WorldEntity> group in _snapshot.Entities.GroupBy(e => e.Kind).OrderBy(g => g.Key.ToString()))
                 {
-                    ImGui.Text($"  {group.Key,-10} {group.Count()}");
+                    bool drawn = DrawnKinds.Contains(group.Key);
+                    if (ImGui.Checkbox($"{group.Key,-10} {group.Count()}##kind{group.Key}", ref drawn))
+                    {
+                        if (drawn)
+                        {
+                            DrawnKinds.Add(group.Key);
+                        }
+                        else
+                        {
+                            DrawnKinds.Remove(group.Key);
+                        }
+                    }
                 }
             }
 
@@ -427,6 +480,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         foreach (WorldEntity entity in _snapshot.Entities)
         {
+            if (!DrawnKinds.Contains(entity.Kind))
+            {
+                continue;
+            }
+
             Vector2 at = map.Project(
                 entity.WorldX, entity.WorldY, entity.TerrainHeight,
                 player.WorldX, player.WorldY, player.TerrainHeight);

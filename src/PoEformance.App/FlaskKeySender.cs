@@ -46,14 +46,16 @@ public static partial class FlaskKeySender
     private static partial uint SendInput(uint count, [In] Input[] inputs, int size);
 
     [LibraryImport("user32.dll")]
-    private static partial IntPtr GetForegroundWindow();
-
-    [LibraryImport("user32.dll")]
     private static partial uint MapVirtualKeyW(uint code, uint mapType);
 
     /// <summary>True when the given window is the one receiving keystrokes right now.</summary>
+    /// <remarks>
+    /// Deferred to the window tracker rather than asking Windows again here. The overlay
+    /// needs the same answer to decide whether to draw at all, and two copies of "is the
+    /// game in front" is exactly the sort of thing that drifts apart.
+    /// </remarks>
     public static bool IsForeground(IntPtr window)
-        => window != IntPtr.Zero && GetForegroundWindow() == window;
+        => PoEformance.Overlay.GameWindowTracker.IsForeground(window);
 
     /// <summary>
     /// Sends one key press and release.

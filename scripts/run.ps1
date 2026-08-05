@@ -46,7 +46,8 @@ param(
     [switch]$Config,
     [switch]$AutoFlask,
     [switch]$Keys,
-    [switch]$Flasks
+    [switch]$Flasks,
+    [switch]$Debug
 )
 
 $ErrorActionPreference = 'Stop'
@@ -68,6 +69,7 @@ try {
     if ($AutoFlask) { $appArgs += '--autoflask' }
     if ($Keys)      { $appArgs += '--keys' }
     if ($Flasks)    { $appArgs += '--flasks' }
+    if ($Debug)     { $appArgs += '--debug' }
 
     dotnet run --project src/PoEformance.App -c Release -- @appArgs
 }

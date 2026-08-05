@@ -191,7 +191,9 @@ internal static class Program
                 cull = 0; // a mis-resolved pattern would poison every width-scaled rect
             }
 
-            RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask);
+            RunOverlay(
+                reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
+                debug: options.Debug);
         }
 
         configWindow?.Join();
@@ -306,13 +308,17 @@ internal static class Program
     /// </summary>
     private static void RunOverlay(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
-        PoEformance.Features.AutoFlask autoFlask)
+        PoEformance.Features.AutoFlask autoFlask, bool debug)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
         Console.WriteLine();
         Console.WriteLine(gameWindow != IntPtr.Zero
-            ? "overlay running - it follows the game window; close it (or Ctrl+C) to quit"
+            ? "overlay running - it follows the game window and hides while the game is not in front"
             : "overlay running - no game window found, using a default size; Ctrl+C to quit");
+        Console.WriteLine(debug
+            ? "        --debug: diagnostics and calibration aids are ON"
+            : "        drawing monsters, chests, items and NPCs. --debug adds the projection"
+              + " diagnostics and the entity-kind filter.");
 
         // Reads happen on their own thread at their own rate; the renderer only ever picks
         // up the newest finished snapshot. 30 Hz because entities move at the game's tick
@@ -355,6 +361,8 @@ internal static class Program
             cull);
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
+        overlay.ShowDiagnostics = debug;
+        overlay.ShowCalibration = debug;
         overlay.Start().GetAwaiter().GetResult();
     }
 
@@ -697,13 +705,14 @@ internal static class Program
         bool ShowConfig,
         bool AutoFlask,
         bool ProbeFlasks,
-        bool ProbeKeys)
+        bool ProbeKeys,
+        bool Debug)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
             bool watch = false, verbose = false, overlay = false, config = false;
-            bool autoFlask = false, probeFlasks = false, probeKeys = false;
+            bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -736,13 +745,17 @@ internal static class Program
                     case "--keys":
                         probeKeys = true;
                         break;
+                    case "--debug":
+                        debug = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
                 }
             }
 
-            return new CliOptions(schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys);
+            return new CliOptions(
+                schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys, debug);
         }
     }
 }

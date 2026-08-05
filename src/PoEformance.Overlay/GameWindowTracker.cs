@@ -51,6 +51,20 @@ public static partial class GameWindowTracker
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool IsWindow(IntPtr hWnd);
 
+    [LibraryImport("user32.dll")]
+    private static partial IntPtr GetForegroundWindow();
+
+    /// <summary>True when the game is the window the user is actually looking at.</summary>
+    /// <remarks>
+    /// Two features hang off this for the same reason. The overlay is always-on-top, so
+    /// anything it draws while the user has alt-tabbed away is painted over whatever they
+    /// switched to; and a synthesised keystroke lands wherever focus IS, not where it was
+    /// aimed. Both reduce to "only act on the game while the game is in front", so both
+    /// ask the same function rather than each carrying its own copy.
+    /// </remarks>
+    public static bool IsForeground(IntPtr windowHandle)
+        => windowHandle != IntPtr.Zero && GetForegroundWindow() == windowHandle;
+
     /// <summary>
     /// Reads the game window's client area in screen coordinates, or an invalid rect when
     /// the window is gone or minimised.
