@@ -102,6 +102,57 @@ public class MatrixHuntTests
     }
 
     [Fact]
+    public void RealScene_TheHuntPicksTheDocumentedMatrixOffset()
+    {
+        // The decisive test, against real memory: with 123 entities in view the hunt must
+        // land on 0x1A0 - the offset GameHelper2's CameraStructure(0x98)+0x108 and the AHK
+        // tool both give. Two things corroborate it in the same run: 0x1E0 scores
+        // identically, because the game stores the matrix twice back to back exactly as the
+        // reference notes, and no decoy comes close on linearity.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(RealSessionTests.SceneFixturePath));
+        OffsetSchema schema = RealSessionTests.Schema();
+        var chain = PoEformance.Core.Diagnostics.GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
+        WorldSnapshot snapshot = new WorldReader(replay, schema).Read(replay.ResolvedStatics["GameStates"]);
+
+        List<ProjectionCandidate> found = MatrixHunt.Find(replay, chain.WorldData, snapshot);
+
+        Assert.NotEmpty(found);
+        ProjectionCandidate best = found[0];
+        Assert.Equal(0x1A0, best.Offset);
+        Assert.False(best.Transposed);
+        Assert.Equal(0x1A0, schema.Structs["WorldData"].OffsetOf("W2SMatrix"));
+
+        // The duplicate right after it, and a clear margin over everything else.
+        Assert.Contains(found, c => c.Offset == 0x1E0 && Math.Abs(c.Linearity - best.Linearity) < 0.001);
+        Assert.True(best.Linearity > 0.9, $"linearity {best.Linearity:F4}");
+        Assert.True(
+            found.Where(c => c.Offset is not (0x1A0 or 0x1E0)).All(c => c.Linearity < best.Linearity - 0.15),
+            "a decoy scored within 0.15 linearity of the real matrix");
+
+        // And it is a real 3D projection: height must move the result.
+        Assert.True(best.DepthResponse > 0.01, $"depth response {best.DepthResponse:F4}");
+    }
+
+    [Fact]
+    public void RealScene_TheFlatTransformAt0x150_IgnoresHeight()
+    {
+        // 0x150 spreads the scene WIDER than the real matrix and centres the player better,
+        // so a spread-led ranking preferred it - this is why the scoring changed. It is not
+        // a world-to-screen matrix at all: moving a point vertically does not shift it by a
+        // single pixel, which is the signature of a flat 2D transform.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(RealSessionTests.SceneFixturePath));
+        OffsetSchema schema = RealSessionTests.Schema();
+        var chain = PoEformance.Core.Diagnostics.GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
+        WorldSnapshot snapshot = new WorldReader(replay, schema).Read(replay.ResolvedStatics["GameStates"]);
+
+        ProjectionCandidate flat = Assert.Single(
+            MatrixHunt.Find(replay, chain.WorldData, snapshot), c => c.Offset == 0x150 && !c.Transposed);
+
+        Assert.True(flat.Spread > 4.0, $"spread {flat.Spread:F3}");     // it really does spread
+        Assert.Equal(0, flat.DepthResponse, 4);                          // but height does nothing
+    }
+
+    [Fact]
     public void RealScene_ShowsTheDecoyAt0x11C_CollapsesEverything()
     {
         // Against the real recorded scene: the block at 0x11C satisfies every structural

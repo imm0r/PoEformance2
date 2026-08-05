@@ -20,6 +20,15 @@ public enum EntityKind
 }
 
 /// <summary>One entity as the overlay needs it: what it is, where it is, and its address.</summary>
+/// <param name="WorldZ">
+/// The Render component's own z, which is where the game floats the HEALTHBAR - roughly a
+/// character's height off the floor, not the feet.
+/// </param>
+/// <param name="TerrainHeight">
+/// The GROUND z under the entity. This is where a marker belongs: projecting the healthbar z
+/// instead lifts every dot about 88 world units, which measurably shifts the player off the
+/// screen centre (0.18 NDC against 0.07 at ground level on the recorded scene).
+/// </param>
 public sealed record WorldEntity(
     uint Id,
     ulong Address,
@@ -27,7 +36,8 @@ public sealed record WorldEntity(
     EntityKind Kind,
     float WorldX,
     float WorldY,
-    float WorldZ)
+    float WorldZ,
+    float TerrainHeight = 0f)
 {
     /// <summary>Short display name: the last segment of the metadata path.</summary>
     public string ShortName
@@ -132,7 +142,7 @@ public sealed class WorldReader
 
             var world = new WorldEntity(
                 id, address, entity.Path, ClassifyPath(entity.Path),
-                position.Value.X, position.Value.Y, position.Value.Z);
+                position.Value.X, position.Value.Y, position.Value.Z, position.Value.TerrainHeight);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
@@ -152,7 +162,7 @@ public sealed class WorldReader
             {
                 player = new WorldEntity(
                     0, chain.PlayerEntity, playerEntity.Path, EntityKind.Player,
-                    position.Value.X, position.Value.Y, position.Value.Z);
+                    position.Value.X, position.Value.Y, position.Value.Z, position.Value.TerrainHeight);
             }
         }
 

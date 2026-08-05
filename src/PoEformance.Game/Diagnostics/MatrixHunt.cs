@@ -10,19 +10,37 @@ namespace PoEformance.Game.Diagnostics;
 /// <param name="Spread">NDC extent the rest of the scene occupies - the anti-collapse test.</param>
 /// <param name="PlayerW">The player's clip w: the camera distance, for plausibility.</param>
 /// <param name="OnScreenFraction">Fraction of entities landing inside the viewport.</param>
+/// <param name="Linearity">
+/// How well the projected scene fits a plane through world x and y (worst of the two screen
+/// axes, 0..1). PoE's camera is a FIXED isometric angle over near-flat ground, so the real
+/// matrix maps the world almost perfectly linearly; unrelated blocks do not.
+/// </param>
+/// <param name="DepthResponse">
+/// How much the projection moves when world z changes. A real 3D projection must respond to
+/// height; a flat 2D transform (a minimap, say) ignores it entirely.
+/// </param>
 public sealed record ProjectionCandidate(
     int Offset,
     bool Transposed,
     double PlayerOffCentre,
     double Spread,
     double PlayerW,
-    double OnScreenFraction)
+    double OnScreenFraction,
+    double Linearity,
+    double DepthResponse)
 {
     /// <summary>
-    /// Ranking score. Spread is what a wrong matrix cannot fake, so it leads; being centred
-    /// and having most of the scene on screen refine the order.
+    /// Ranking score, led by <see cref="Linearity"/>.
     /// </summary>
-    public double Score => (Math.Min(Spread, 4.0) * (1.0 - Math.Min(PlayerOffCentre, 1.0))) + OnScreenFraction;
+    /// <remarks>
+    /// Spread used to lead this, and that was wrong: it rewards a matrix for scattering
+    /// points, which several unrelated blocks do better than the real one. Against a live
+    /// scene the fixed-camera linearity separated them cleanly where spread did not - the
+    /// true matrix fitted at 0.94 while the best-spreading decoy managed 0.73 and another
+    /// that centred the player perfectly scored 0.00, because its screen x was constant.
+    /// Spread and w are kept as hard admission tests, not as ranking.
+    /// </remarks>
+    public double Score => Linearity + (0.25 * (1.0 - Math.Min(PlayerOffCentre, 1.0))) + (0.1 * OnScreenFraction);
 }
 
 /// <summary>
@@ -126,7 +144,11 @@ public static class MatrixHunt
 
         double minX = double.MaxValue, maxX = double.MinValue;
         double minY = double.MaxValue, maxY = double.MinValue;
-        int onScreen = 0, projected = 0;
+        int onScreen = 0;
+        var worldX = new List<double>(entities.Count);
+        var worldY = new List<double>(entities.Count);
+        var screenX = new List<double>(entities.Count);
+        var screenY = new List<double>(entities.Count);
 
         foreach (WorldEntity entity in entities)
         {
@@ -137,7 +159,8 @@ public static class MatrixHunt
             }
 
             double nx = ex / ew, ny = ey / ew;
-            projected++;
+            worldX.Add(entity.WorldX); worldY.Add(entity.WorldY);
+            screenX.Add(nx); screenY.Add(ny);
             minX = Math.Min(minX, nx); maxX = Math.Max(maxX, nx);
             minY = Math.Min(minY, ny); maxY = Math.Max(maxY, ny);
             if (Math.Abs(nx) <= 1 && Math.Abs(ny) <= 1)
@@ -146,15 +169,80 @@ public static class MatrixHunt
             }
         }
 
+        int projected = screenX.Count;
         if (projected < 2)
         {
             return null;
         }
 
         double spread = Math.Max(maxX - minX, maxY - minY);
-        return spread < MinSpread
-            ? null
-            : new ProjectionCandidate(offset, transposed, offCentre, spread, pw, onScreen / (double)projected);
+        if (spread < MinSpread)
+        {
+            return null;
+        }
+
+        // A projection must respond to height. Re-project the player a character's height up
+        // and see whether anything moves - a flat 2D transform will not budge.
+        (double hx, double hy, double hw) = Clip(matrix, transposed, player.WorldX, player.WorldY, player.WorldZ + 100f);
+        double depthResponse = hw > MinW
+            ? Math.Abs((hx / hw) - playerX) + Math.Abs((hy / hw) - playerY)
+            : 0;
+
+        double linearity = projected >= 8
+            ? Math.Min(FitQuality(worldX, worldY, screenX), FitQuality(worldX, worldY, screenY))
+            : 0;
+
+        return new ProjectionCandidate(
+            offset, transposed, offCentre, spread, pw, onScreen / (double)projected, linearity, depthResponse);
+    }
+
+    /// <summary>
+    /// R-squared of a least-squares plane fitting one screen axis to world x and y.
+    /// </summary>
+    /// <remarks>
+    /// This is the discriminator that actually works on real data, and it comes straight
+    /// from how the game's camera behaves: the angle is FIXED and the ground is near-flat,
+    /// so world x/y map onto the screen almost linearly. A decoy block reaches ~0.7 at best,
+    /// and one whose screen x is constant scores 0 - which is exactly how it managed to
+    /// "centre" the player. Taking the worse of the two axes is what catches that case,
+    /// since a block can easily be linear in one axis and meaningless in the other.
+    /// </remarks>
+    private static double FitQuality(List<double> x1, List<double> x2, List<double> y)
+    {
+        int n = y.Count;
+        double sx1 = 0, sx2 = 0, sy = 0;
+        for (int i = 0; i < n; i++)
+        {
+            sx1 += x1[i]; sx2 += x2[i]; sy += y[i];
+        }
+
+        double mx1 = sx1 / n, mx2 = sx2 / n, my = sy / n;
+
+        double s11 = 0, s22 = 0, s12 = 0, s1y = 0, s2y = 0, syy = 0;
+        for (int i = 0; i < n; i++)
+        {
+            double d1 = x1[i] - mx1, d2 = x2[i] - mx2, dy = y[i] - my;
+            s11 += d1 * d1; s22 += d2 * d2; s12 += d1 * d2;
+            s1y += d1 * dy; s2y += d2 * dy; syy += dy * dy;
+        }
+
+        double determinant = (s11 * s22) - (s12 * s12);
+        if (Math.Abs(determinant) < 1e-12 || syy < 1e-12)
+        {
+            return 0; // degenerate: the screen axis does not vary at all
+        }
+
+        double a = ((s22 * s1y) - (s12 * s2y)) / determinant;
+        double b = ((s11 * s2y) - (s12 * s1y)) / determinant;
+
+        double residual = 0;
+        for (int i = 0; i < n; i++)
+        {
+            double predicted = my + (a * (x1[i] - mx1)) + (b * (x2[i] - mx2));
+            residual += (y[i] - predicted) * (y[i] - predicted);
+        }
+
+        return Math.Max(0, 1.0 - (residual / syy));
     }
 
     /// <summary>
@@ -194,12 +282,13 @@ public static class MatrixHunt
             return;
         }
 
-        output.WriteLine("  offset  layout      w    off-centre   spread  on-screen");
+        output.WriteLine("  offset  layout      w    off-centre   spread  on-screen  linearity  depth");
         foreach (ProjectionCandidate c in candidates.Take(8))
         {
             output.WriteLine(
                 $"  +0x{c.Offset:X3}  {(c.Transposed ? "transposed" : "direct    ")} "
                 + $"{c.PlayerW,8:F1}  {c.PlayerOffCentre,8:F4} {c.Spread,8:F3}  {c.OnScreenFraction,7:P0}"
+                + $"  {c.Linearity,9:F4}  {c.DepthResponse,5:F3}"
                 + (c.Offset == currentOffset ? "   <- schema" : string.Empty));
         }
 

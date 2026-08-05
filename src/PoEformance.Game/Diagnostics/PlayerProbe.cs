@@ -98,7 +98,11 @@ public sealed class PlayerProbe
         bool projected = false;
         if (haveMatrix)
         {
-            ScreenPoint point = WorldToScreen.Project(matrix, render.Value.X, render.Value.Y, render.Value.Z, 2, 2);
+            // TerrainHeight, not the position's own z: the latter is where the game floats
+            // the healthbar, about a character's height up, and projecting it puts the
+            // player 0.18 off centre where the ground position gives 0.07.
+            ScreenPoint point = WorldToScreen.Project(
+                matrix, render.Value.X, render.Value.Y, render.Value.TerrainHeight, 2, 2);
             ndc = WorldToScreen.OffCentreFraction(point, 2, 2);
             projected = point.OnScreen;
         }

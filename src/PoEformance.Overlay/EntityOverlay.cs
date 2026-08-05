@@ -106,8 +106,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         foreach (WorldEntity entity in _snapshot.Entities)
         {
+            // Ground height, not the position's own z: that one is where the healthbar
+            // floats, and drawing there puts every marker a character's height too high.
             ScreenPoint point = WorldToScreen.Project(
-                _snapshot.Matrix, entity.WorldX, entity.WorldY, entity.WorldZ, width, height);
+                _snapshot.Matrix, entity.WorldX, entity.WorldY, entity.TerrainHeight, width, height);
 
             if (!point.OnScreen)
             {
@@ -130,7 +132,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (_snapshot.Player is WorldEntity player)
         {
             ScreenPoint point = WorldToScreen.Project(
-                _snapshot.Matrix, player.WorldX, player.WorldY, player.WorldZ, width, height);
+                _snapshot.Matrix, player.WorldX, player.WorldY, player.TerrainHeight, width, height);
             if (point.OnScreen)
             {
                 var position = new Vector2(point.X, point.Y);
@@ -166,7 +168,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     // The live projection sanity check: the camera follows the player, so this
                     // must sit at the screen centre. If it drifts, the matrix is wrong.
                     ScreenPoint p = WorldToScreen.Project(
-                        _snapshot.Matrix, player.WorldX, player.WorldY, player.WorldZ, width, height);
+                        _snapshot.Matrix, player.WorldX, player.WorldY, player.TerrainHeight, width, height);
                     double offCentre = WorldToScreen.OffCentreFraction(p, width, height);
 
                     // Centred ALONE is not proof: a matrix that blows w up collapses the whole
@@ -213,7 +215,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         foreach (WorldEntity entity in _snapshot.Entities)
         {
             ScreenPoint point = WorldToScreen.Project(
-                _snapshot.Matrix, entity.WorldX, entity.WorldY, entity.WorldZ, width, height);
+                _snapshot.Matrix, entity.WorldX, entity.WorldY, entity.TerrainHeight, width, height);
             minX = Math.Min(minX, point.X); maxX = Math.Max(maxX, point.X);
             minY = Math.Min(minY, point.Y); maxY = Math.Max(maxY, point.Y);
         }
