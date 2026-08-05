@@ -54,16 +54,41 @@ public static partial class GameWindowTracker
     [LibraryImport("user32.dll")]
     private static partial IntPtr GetForegroundWindow();
 
+    [LibraryImport("user32.dll")]
+    private static partial uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
     /// <summary>True when the game is the window the user is actually looking at.</summary>
     /// <remarks>
-    /// Two features hang off this for the same reason. The overlay is always-on-top, so
-    /// anything it draws while the user has alt-tabbed away is painted over whatever they
-    /// switched to; and a synthesised keystroke lands wherever focus IS, not where it was
-    /// aimed. Both reduce to "only act on the game while the game is in front", so both
-    /// ask the same function rather than each carrying its own copy.
+    /// This is the KEYSTROKE test, and it is deliberately strict: synthesised input lands
+    /// wherever focus is, not where it was aimed, so anything but the game itself in front
+    /// means the keystroke would be typed into something else. Drawing asks a wider
+    /// question - see <see cref="IsOwnProcessForeground"/>.
     /// </remarks>
     public static bool IsForeground(IntPtr windowHandle)
         => windowHandle != IntPtr.Zero && GetForegroundWindow() == windowHandle;
+
+    /// <summary>True when a window of THIS process is in front.</summary>
+    /// <remarks>
+    /// The drawing test needs this alongside the game's own window, and leaving it out
+    /// makes the overlay's own controls impossible to use: clicking one gives the overlay
+    /// window focus, at which point the game is no longer foreground, so the next frame
+    /// draws nothing, so there is nothing left to click. The window vanishes under the
+    /// cursor and neither dragging nor a button ever registers.
+    ///
+    /// It also keeps the overlay up while the config window has focus, which is what makes
+    /// a setting visibly take effect as it is changed.
+    /// </remarks>
+    public static bool IsOwnProcessForeground()
+    {
+        IntPtr foreground = GetForegroundWindow();
+        if (foreground == IntPtr.Zero)
+        {
+            return false;
+        }
+
+        GetWindowThreadProcessId(foreground, out uint processId);
+        return processId == (uint)Environment.ProcessId;
+    }
 
     /// <summary>
     /// Reads the game window's client area in screen coordinates, or an invalid rect when

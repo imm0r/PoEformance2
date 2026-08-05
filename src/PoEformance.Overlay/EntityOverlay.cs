@@ -157,11 +157,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // borderless-window setting change without ever giving up focus.
         _snapshot = _snapshotSource(new UiScale(width, height, _cull));
 
-        // Nothing is drawn unless the game is the window in front. This is not tidiness:
-        // the overlay is always-on-top and covers the game's whole client area, so every
-        // dot it paints while the user has alt-tabbed away lands on top of the browser or
+        // Nothing is drawn unless the game - or one of OUR windows - is in front. Not
+        // tidiness: the overlay is always-on-top and covers the game's whole client area,
+        // so every dot painted while the user has alt-tabbed away lands on the browser or
         // editor they switched to.
-        if (!GameWindowTracker.IsForeground(_gameWindow))
+        //
+        // Our own windows have to count, and leaving them out is not a subtle bug. Clicking
+        // this overlay's own controls gives IT focus, so the game stops being foreground,
+        // so the next frame draws nothing, so there is nothing left to click: the window
+        // disappears under the cursor and neither dragging nor a button ever registers.
+        // Keystrokes are a different question and stay strict - see FlaskKeySender.
+        if (!GameWindowTracker.IsForeground(_gameWindow) && !GameWindowTracker.IsOwnProcessForeground())
         {
             return;
         }
