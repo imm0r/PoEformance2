@@ -63,10 +63,24 @@ public sealed class FlaskProbe
             return;
         }
 
+        // Is this really ServerData? The league name is a known field on the same base, so
+        // a sane string here separates "wrong struct" from "right struct, drifted field" -
+        // two failures that otherwise look identical.
+        int leagueOffset = _schema.Structs["ServerDataStructure"].OffsetOf("League");
+        string league = _reader.ReadStdWString(serverData + (ulong)leagueOffset);
+        output.WriteLine($"  league            \"{league}\"  (ServerData+0x{leagueOffset:X})"
+            + (league.Length is > 0 and < 40 ? "  -> ServerData confirmed" : "  -> SUSPECT"));
+
+        // There are two server-data structs; the inventories live on the inner one.
+        var belts = new FlaskBeltReader(_reader, _schema);
+        ulong inner = belts.ResolveServerDataStructure(serverData);
+        output.WriteLine($"  serverDataStruct  0x{inner:X}"
+            + (inner == serverData ? "  (direct)" : $"  (via +0x{_schema.Structs["ServerDataOffsets"].OffsetOf("PlayerServerData"):X} hop)"));
+
         int inventoriesOffset = _schema.Structs["ServerDataStructure"].OffsetOf("PlayerInventories");
-        ulong first = _reader.ReadPointer(serverData + (ulong)inventoriesOffset);
-        ulong last = _reader.ReadPointer(serverData + (ulong)inventoriesOffset + 8);
-        output.WriteLine($"  inventories vec   0x{first:X} .. 0x{last:X}  (ServerData+0x{inventoriesOffset:X})");
+        ulong first = _reader.ReadPointer(inner + (ulong)inventoriesOffset);
+        ulong last = _reader.ReadPointer(inner + (ulong)inventoriesOffset + 8);
+        output.WriteLine($"  inventories vec   0x{first:X} .. 0x{last:X}  (+0x{inventoriesOffset:X})");
 
         StructDef array = _schema.Structs["InventoryArray"];
         int entrySize = (int)array.Constants["EntrySize"];
@@ -75,7 +89,9 @@ public sealed class FlaskProbe
 
         if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
         {
-            output.WriteLine("  FAIL  the inventory vector is empty or implausible.");
+            output.WriteLine("  FAIL  the inventory vector is empty or implausible at that offset.");
+            ScanForInventoryArray(serverData, output);
+            ScanForInventoryArray(inner, output);
             return;
         }
 
@@ -142,7 +158,7 @@ public sealed class FlaskProbe
         }
 
         output.WriteLine();
-        FlaskBelt belt = new FlaskBeltReader(_reader, _schema).Read(serverData);
+        FlaskBelt belt = belts.Read(serverData);
         if (belt.IsUnknown)
         {
             output.WriteLine("  RESULT  no flasks found.");
@@ -157,6 +173,92 @@ public sealed class FlaskProbe
             output.WriteLine($"    slot {flask.Slot}  {flask.Charges,4}/{flask.ChargesPerUse,-4} charges"
                 + $"  {(flask.CanUse ? "usable" : "NOT usable")}  {Shorten(flask.Path)}");
         }
+    }
+
+
+    /// <summary>
+    /// Hunts the inventory array by SHAPE when the declared offset comes up empty.
+    /// </summary>
+    /// <remarks>
+    /// Same approach that found the camera matrix: describe what the thing IS and search
+    /// for it, rather than trusting where it was last patch. An inventory array is a vector
+    /// of 0x18-byte entries whose second qword points at a struct that itself holds a
+    /// plausible item-list vector - specific enough that a false positive is unlikely, and
+    /// it reports the offset ready to paste into the schema.
+    /// </remarks>
+    private void ScanForInventoryArray(ulong serverData, TextWriter output)
+    {
+        StructDef array = _schema.Structs["InventoryArray"];
+        int entrySize = (int)array.Constants["EntrySize"];
+        int idOffset = array.OffsetOf("InventoryId");
+        int ptrOffset = array.OffsetOf("InventoryPtr0");
+        StructDef inventory = _schema.Structs["Inventory"];
+        int itemList = inventory.OffsetOf("ItemList");
+        int itemListLast = inventory.OffsetOf("ItemListLast");
+
+        output.WriteLine();
+        output.WriteLine("  scanning ServerData for an inventory-shaped vector...");
+        output.WriteLine("  offset   entries  withItems  sample ids");
+
+        int hits = 0;
+        for (int offset = 0; offset <= 0x2000 && hits < 12; offset += 8)
+        {
+            ulong first = _reader.ReadPointer(serverData + (ulong)offset);
+            ulong last = _reader.ReadPointer(serverData + (ulong)offset + 8);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
+            {
+                continue;
+            }
+
+            ulong span = last - first;
+            if (span % (ulong)entrySize != 0 || span > 0x4000)
+            {
+                continue;
+            }
+
+            long entries = (long)span / entrySize;
+            if (entries is < 2 or > 256)
+            {
+                continue;
+            }
+
+            // Confirm by CONTENT: entries must point at structs holding real item lists.
+            int withItems = 0;
+            var ids = new List<int>();
+            for (long i = 0; i < Math.Min(entries, 24); i++)
+            {
+                ulong entry = first + (ulong)(i * entrySize);
+                ulong target = _reader.ReadPointer(entry + (ulong)ptrOffset);
+                if (!MemoryReaderExtensions.IsPlausiblePointer(target))
+                {
+                    continue;
+                }
+
+                ulong itemsFirst = _reader.ReadPointer(target + (ulong)itemList);
+                ulong itemsLast = _reader.ReadPointer(target + (ulong)itemListLast);
+                if (MemoryReaderExtensions.IsPlausiblePointer(itemsFirst)
+                    && itemsLast > itemsFirst
+                    && (itemsLast - itemsFirst) % 8 == 0
+                    && itemsLast - itemsFirst < 0x8000)
+                {
+                    withItems++;
+                    if (ids.Count < 8)
+                    {
+                        ids.Add(_reader.Read<int>(entry + (ulong)idOffset));
+                    }
+                }
+            }
+
+            if (withItems >= 2)
+            {
+                output.WriteLine($"  +0x{offset:X4}  {entries,7}  {withItems,9}  {string.Join(", ", ids)}");
+                hits++;
+            }
+        }
+
+        output.WriteLine(hits == 0
+            ? "  nothing inventory-shaped found - ServerData itself is the suspect."
+            : "  -> set ServerDataStructure.PlayerInventories to the best offset above.");
     }
 
     /// <summary>Trims the common metadata prefix so a row stays readable.</summary>

@@ -178,6 +178,11 @@ internal static class Program
             Console.WriteLine();
             Console.WriteLine($"recorded {bytes / 1024.0:F0} KB to {options.RecordPath} "
                 + $"({recorder.SkippedLargeReads} oversized reads skipped - the module image is not needed for replay)");
+            if (recorder.ReachedSizeLimit)
+            {
+                Console.WriteLine("        the size cap stopped recording partway - the file still holds the "
+                    + "startup chain and diagnostics, which is what replays.");
+            }
         }
 
         return result.GameStatesResolved ? 0 : 2;

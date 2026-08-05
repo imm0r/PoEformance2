@@ -518,7 +518,15 @@
       }
     },
 
+    "ServerDataOffsets": {
+      "comment": "What LocalPlayerStruct.ServerDataPtr actually points at. It is NOT the struct holding PlayerInventories - that one is reached through the vector below. Missing this hop reads PlayerInventories off the wrong base, where it is simply zero, which looks exactly like a drifted offset. Source: GameHelper2 ServerDataOffsets.",
+      "fields": {
+        "PlayerServerData": { "offset": "0x48", "type": "stdVector", "comment": "StdVector of pointers to ServerDataStructure; the first entry is the local player's." }
+      }
+    },
+
     "ServerDataStructure": {
+      "comment": "Reached via ServerDataOffsets.PlayerServerData, not directly from ServerDataPtr.",
       "fields": {
         "PlayerInventories": {
           "offset": "0x320", "type": "stdVector",

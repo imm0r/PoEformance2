@@ -80,6 +80,7 @@ public sealed class FlaskBeltReader
 
     private readonly IMemoryReader _reader;
     private readonly EntityReader _entities;
+    private readonly int _playerServerData;
     private readonly int _playerInventories;
     private readonly int _entrySize;
     private readonly int _inventoryId;
@@ -92,6 +93,12 @@ public sealed class FlaskBeltReader
     private readonly int _chargesCurrent;
     private readonly int _perUseCharges;
 
+    // The inventory scan is expensive - up to 128 inventories, each costing a full entity
+    // read per item - while the answer almost never changes. Charges change constantly, the
+    // belt's LOCATION does not, so the search is remembered and only the contents re-read.
+    // Without this the scan ran at the reader's full rate and dominated every tick.
+    private ulong _cachedInventory;
+
     public FlaskBeltReader(IMemoryReader reader, OffsetSchema schema)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -99,6 +106,7 @@ public sealed class FlaskBeltReader
         _reader = reader;
         _entities = new EntityReader(reader, schema);
 
+        _playerServerData = schema.Structs["ServerDataOffsets"].OffsetOf("PlayerServerData");
         _playerInventories = schema.Structs["ServerDataStructure"].OffsetOf("PlayerInventories");
 
         StructDef array = schema.Structs["InventoryArray"];
@@ -121,10 +129,83 @@ public sealed class FlaskBeltReader
     }
 
     /// <summary>Reads the flask belt from the ServerData address.</summary>
+    /// <remarks>
+    /// The located inventory is cached and revalidated cheaply on each call; the full search
+    /// only re-runs when that check fails, which is what makes this affordable at the
+    /// reader's rate.
+    /// </remarks>
     public FlaskBelt Read(ulong serverData)
     {
-        ulong belt = FindFlaskInventory(serverData);
-        return belt == 0 ? FlaskBelt.Empty : ReadBelt(belt);
+        if (_cachedInventory != 0 && HasItems(_cachedInventory))
+        {
+            FlaskBelt cached = ReadBelt(_cachedInventory);
+            if (!cached.IsUnknown)
+            {
+                return cached;
+            }
+        }
+
+        _cachedInventory = FindFlaskInventory(ResolveServerDataStructure(serverData));
+        return _cachedInventory == 0 ? FlaskBelt.Empty : ReadBelt(_cachedInventory);
+    }
+
+    /// <summary>Cheap liveness check on a remembered inventory: does it still hold items?</summary>
+    private bool HasItems(ulong inventory)
+    {
+        ulong first = _reader.ReadPointer(inventory + (ulong)_itemList);
+        ulong last = _reader.ReadPointer(inventory + (ulong)_itemListLast);
+        return MemoryReaderExtensions.IsPlausiblePointer(first) && last > first;
+    }
+
+    /// <summary>
+    /// Follows ServerDataPtr to the struct that actually holds the inventories.
+    /// </summary>
+    /// <remarks>
+    /// There are TWO server-data structs, and skipping the hop between them is a silent
+    /// failure rather than a loud one: PlayerInventories read off the outer struct is just
+    /// zero, which is indistinguishable from a drifted offset. The outer struct holds a
+    /// vector of pointers to the inner one; the first entry is the local player's.
+    ///
+    /// The direct interpretation is kept as a fallback because a build that lays these out
+    /// flat would otherwise stop working for no reason - whichever base yields a usable
+    /// inventory vector wins.
+    /// </remarks>
+    public ulong ResolveServerDataStructure(ulong serverData)
+    {
+        if (!MemoryReaderExtensions.IsPlausiblePointer(serverData))
+        {
+            return 0;
+        }
+
+        if (HasInventoryVector(serverData))
+        {
+            return serverData;
+        }
+
+        ulong vector = _reader.ReadPointer(serverData + (ulong)_playerServerData);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(vector))
+        {
+            return serverData;
+        }
+
+        ulong inner = _reader.ReadPointer(vector);
+        return HasInventoryVector(inner) ? inner : serverData;
+    }
+
+    /// <summary>True when this base holds a usable inventory vector - the deciding test.</summary>
+    private bool HasInventoryVector(ulong candidate)
+    {
+        if (!MemoryReaderExtensions.IsPlausiblePointer(candidate))
+        {
+            return false;
+        }
+
+        ulong first = _reader.ReadPointer(candidate + (ulong)_playerInventories);
+        ulong last = _reader.ReadPointer(candidate + (ulong)_playerInventories + 8);
+        return MemoryReaderExtensions.IsPlausiblePointer(first)
+               && last > first
+               && (last - first) % (ulong)_entrySize == 0
+               && last - first <= 0x4000;
     }
 
     /// <summary>

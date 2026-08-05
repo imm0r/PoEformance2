@@ -35,6 +35,22 @@ public sealed class RecordingMemoryReader : IMemoryReader
     /// <summary>Reads skipped because they exceeded <see cref="MaxRecordedReadBytes"/>.</summary>
     public int SkippedLargeReads { get; private set; }
 
+    /// <summary>
+    /// Stop recording once the file reaches this size. Reading continues unaffected.
+    /// </summary>
+    /// <remarks>
+    /// A recording is only useful if it can be SHARED, and without a cap the size depends
+    /// on how long the session ran: a one-shot diagnostic produces a couple of hundred
+    /// kilobytes, while the same flag next to a live overlay grows without limit at thirty
+    /// reads a second. Capping turns an unusable multi-hundred-megabyte file into a bounded
+    /// one that still contains the beginning - which is the part that carries the startup
+    /// chain and the diagnostics worth replaying.
+    /// </remarks>
+    public long MaxTotalBytes { get; set; } = 16 * 1024 * 1024;
+
+    /// <summary>True once the cap stopped further recording.</summary>
+    public bool ReachedSizeLimit { get; private set; }
+
     public RecordingMemoryReader(IMemoryReader inner, Stream output)
     {
         ArgumentNullException.ThrowIfNull(inner);
@@ -105,6 +121,14 @@ public sealed class RecordingMemoryReader : IMemoryReader
         if (destination.Length > MaxRecordedReadBytes)
         {
             SkippedLargeReads++;
+            return true;
+        }
+
+        if (RecordedBytes >= MaxTotalBytes)
+        {
+            // Keep serving reads; just stop growing the file. The early part is the part
+            // worth replaying.
+            ReachedSizeLimit = true;
             return true;
         }
 
