@@ -166,13 +166,15 @@ public class AutoFlaskTests
     }
 
     [Fact]
-    public void Defaults_AreOffAndSensible()
+    public void OffByDefault_HoweverAlarmingTheReading()
     {
-        // A tool that starts pressing keys on first run is not one anybody can trust.
-        var engine = new AutoFlask(AutoFlask.DefaultRules);
+        // A tool that starts pressing keys on first run is not one anybody can trust. The
+        // shipped defaults themselves live in AutoFlaskSettings (see AutoFlaskSettingsTests
+        // - there is deliberately only one set of them); this pins the engine's half.
+        var engine = new AutoFlask([new FlaskRule("life", VitalKind.Life, 65, Key: 0x31)]);
+
         Assert.False(engine.Enabled);
         Assert.Empty(engine.Evaluate(Pools(life: 1), gameFocused: true, 1000).Used);
-        Assert.Equal(2, AutoFlask.DefaultRules.Count);
     }
 
     // ── charges and active effects ───────────────────────────────────────────────

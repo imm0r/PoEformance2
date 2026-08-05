@@ -92,11 +92,22 @@ public sealed class AutoFlask
 {
     private readonly Dictionary<string, long> _lastUsed = [];
 
+    // Volatile because the config window changes these from ITS thread while the reader
+    // thread is evaluating. Replacing the whole rule list in one reference assignment
+    // means a tick sees either the old set or the new one, never a half-applied mix - no
+    // lock on the evaluation path.
+    private volatile IReadOnlyList<FlaskRule> _rules;
+    private volatile bool _enabled;
+
     /// <summary>The configured flasks.</summary>
-    public IReadOnlyList<FlaskRule> Rules { get; }
+    public IReadOnlyList<FlaskRule> Rules => _rules;
 
     /// <summary>Master switch, so the feature can be off without unloading it.</summary>
-    public bool Enabled { get; set; }
+    public bool Enabled
+    {
+        get => _enabled;
+        set => _enabled = value;
+    }
 
     /// <summary>The last tick's outcome, for display.</summary>
     public FlaskTick LastTick { get; private set; } = new([], "not started");
@@ -104,8 +115,21 @@ public sealed class AutoFlask
     public AutoFlask(IReadOnlyList<FlaskRule> rules, bool enabled = false)
     {
         ArgumentNullException.ThrowIfNull(rules);
-        Rules = rules;
-        Enabled = enabled;
+        _rules = rules;
+        _enabled = enabled;
+    }
+
+    /// <summary>Swaps in a new configuration while running.</summary>
+    /// <remarks>
+    /// Deliberately does NOT clear the cooldown history: the rules are keyed by name, so a
+    /// flask that just fired keeps its cooldown across an edit. Otherwise every keystroke
+    /// typed into a threshold field would hand the belt a free re-fire.
+    /// </remarks>
+    public void Configure(IReadOnlyList<FlaskRule> rules, bool enabled)
+    {
+        ArgumentNullException.ThrowIfNull(rules);
+        _rules = rules;
+        _enabled = enabled;
     }
 
     /// <summary>
@@ -253,15 +277,7 @@ public sealed class AutoFlask
         _ => default,
     };
 
-    /// <summary>The defaults: a life flask on 1 and a mana flask on 2.</summary>
-    /// <remarks>
-    /// Thresholds sit where a flask still helps rather than where it is already too late,
-    /// and OFF by default - a tool that starts pressing keys the first time it runs is not
-    /// one anybody can trust.
-    /// </remarks>
-    public static IReadOnlyList<FlaskRule> DefaultRules { get; } =
-    [
-        new FlaskRule("Life flask", VitalKind.Life, ThresholdPercent: 65, Key: 0x31) { Slot = 1 },
-        new FlaskRule("Mana flask", VitalKind.Mana, ThresholdPercent: 30, Key: 0x32) { Slot = 2 },
-    ];
+    // There is deliberately no DefaultRules here. The defaults live in AutoFlaskSettings,
+    // which is what the user edits and what gets written to disk; a second set of defaults
+    // in the engine would be a second source of truth that quietly disagrees with the file.
 }

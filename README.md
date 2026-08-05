@@ -68,7 +68,13 @@ dotnet build        # any OS
 dotnet test         # any OS
 PoEformance.App --record session.rec     # capture a session (Windows)
 PoEformance.App --replay session.rec     # develop against it, game closed (any use)
+PoEformance.App --overlay --config       # in-game overlay + config window, side by side
 ```
+
+The config window stays open while the overlay runs and its settings apply immediately —
+no restart. Auto flask is off until switched on there, per belt slot; the key each flask
+uses is **read from the game's own config**, never assumed, and shown read-only beside the
+slot it belongs to.
 
 ## License
 

@@ -17,22 +17,40 @@ namespace PoEformance.Config;
 public static class ConfigWindowHost
 {
     /// <summary>
-    /// Opens the window and runs it to close. <paramref name="stateSource"/> is called
-    /// whenever the page asks for the current state.
+    /// Opens the window on its own thread and returns immediately.
     /// </summary>
-    public static void Run(string title, Func<ConfigState> stateSource)
+    /// <param name="stateSource">Called whenever the page asks for the current state.</param>
+    /// <param name="apply">
+    /// Called for every other request. Returns true when it handled one, which makes the
+    /// host answer with a fresh state.
+    /// </param>
+    /// <returns>The window's thread - join it to wait for the window to close.</returns>
+    /// <remarks>
+    /// Not joining is what lets the config window run WHILE the overlay does, which is the
+    /// difference between a settings page and a settings file: a switch that only takes
+    /// effect after a restart is not a switch anyone reaches for mid-fight.
+    ///
+    /// Both callbacks run on the window's thread, so whatever they touch is shared with
+    /// the reader. The engine takes its configuration as one atomic reference swap for
+    /// exactly this reason.
+    /// </remarks>
+    public static Thread Start(string title, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply = null)
     {
         ArgumentNullException.ThrowIfNull(stateSource);
 
-        var thread = new Thread(() => RunOnThisThread(title, stateSource))
+        var thread = new Thread(() => RunOnThisThread(title, stateSource, apply))
         {
             Name = "config-window",
             IsBackground = false,
         };
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
-        thread.Join();
+        return thread;
     }
+
+    /// <summary>Opens the window and blocks until it closes.</summary>
+    public static void Run(string title, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply = null)
+        => Start(title, stateSource, apply).Join();
 
     /// <summary>
     /// Runs the window, and contains any failure to this thread.
@@ -44,12 +62,12 @@ public static class ConfigWindowHost
     /// auxiliary view; it has no business ending the process, so its failures stop here and
     /// are reported instead.
     /// </remarks>
-    private static void RunOnThisThread(string title, Func<ConfigState> stateSource)
+    private static void RunOnThisThread(string title, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply)
     {
         try
         {
             using var application = new Application();
-            using var window = new ConfigWindow(title, json => Handle(json, stateSource));
+            using var window = new ConfigWindow(title, json => Handle(json, stateSource, apply));
             window.ResizeClient(1100, 780);
             window.Center();
             window.Show();
@@ -70,7 +88,7 @@ public static class ConfigWindowHost
     /// A malformed message answers with nothing rather than throwing - the page is editable
     /// on disk, so a typo during UI work must cost a dead button, never a crashed host.
     /// </remarks>
-    private static string? Handle(string json, Func<ConfigState> stateSource)
+    private static string? Handle(string json, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply)
     {
         ConfigRequest? request;
         try
@@ -82,13 +100,33 @@ public static class ConfigWindowHost
             return null;
         }
 
-        return request?.Type switch
+        if (request is null)
         {
-            // "hello" is the page's load signal; both greet with the full state, because
-            // the page renders whole states rather than patching fields.
-            "hello" or "getState" =>
-                JsonSerializer.Serialize(stateSource(), ConfigJsonContext.Default.ConfigState),
-            _ => null,
-        };
+            return null;
+        }
+
+        // "hello" is the page's load signal; both greet with the full state, because the
+        // page renders whole states rather than patching fields.
+        if (request.Type is "hello" or "getState")
+        {
+            return State(stateSource);
+        }
+
+        // Anything else is a command. A handled one answers with the WHOLE state rather
+        // than an acknowledgement, so what the page displays is always what the host
+        // actually holds - a rejected or clamped value shows up as itself, not as the
+        // value that was sent.
+        try
+        {
+            return apply is not null && apply(request) ? State(stateSource) : null;
+        }
+        catch (JsonException)
+        {
+            // A malformed payload is a page-side typo, and the page is editable on disk.
+            return null;
+        }
     }
+
+    private static string State(Func<ConfigState> stateSource)
+        => JsonSerializer.Serialize(stateSource(), ConfigJsonContext.Default.ConfigState);
 }

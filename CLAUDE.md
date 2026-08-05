@@ -26,9 +26,16 @@ already cost real time on this project.
 
 What guessing produced, for the record: a matrix invariant that rejected the correct offset
 and accepted a decoy; a projection "proven" by a check that a wrong matrix passes trivially;
-a 52-pixel offset explained by an invented theory about HUD framing; and markers moved onto
-`TerrainHeight`, which belongs to a different coordinate system entirely. Each was a
-one-minute lookup away.
+a 52-pixel offset explained by an invented theory about HUD framing; markers moved onto
+`TerrainHeight`, which belongs to a different coordinate system entirely; and a hand-written
+parser for the game's key bindings that missed both the `Input_flask_4_primary` spelling and
+the fact that a numeric value is a decimal VIRTUAL-KEY CODE (`81` is Q, not the 8 and 1
+keys). Each was a one-minute lookup away.
+
+The game's own files are reference material too, not just the two projects above. The flask
+keys live in `poe2_production_Config.ini`, so the tool reads them rather than assuming the
+default 1-5 layout — the assumption looks correct until someone rebinds, and then the only
+symptom is that nothing happens.
 
 ## The two screen-space systems
 

@@ -37,8 +37,18 @@ header h1 {
 main {
   display: grid;
   grid-template-columns: 320px 1fr;
+  align-items: start;
   gap: 16px;
   padding: 16px 20px;
+}
+
+/* The right-hand stack. Explicit rather than letting cards flow into grid cells, so
+   adding one does not silently rearrange the others. */
+.column {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  min-width: 0;
 }
 
 .card {
@@ -80,6 +90,62 @@ button {
 }
 
 button:hover { border-color: var(--accent); }
+
+/* ── Auto flask ─────────────────────────────────────────────────────────── */
+
+.master {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+#af-slots {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0 4px;
+}
+
+#af-slots th {
+  text-align: left;
+  font-weight: normal;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  padding: 0 8px 4px 0;
+  border-bottom: 1px solid #00000066;
+}
+
+#af-slots td {
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid #ffffff0d;
+  vertical-align: middle;
+}
+
+#af-slots select,
+#af-slots input[type="number"] {
+  background: #2a2e38;
+  color: var(--text);
+  border: 1px solid #00000088;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font: inherit;
+}
+
+#af-slots input[type="number"] { width: 64px; }
+
+/* Read-only, and it should look it: the key is the game's setting, not ours. */
+.af-key {
+  font: 12px/1.5 ui-monospace, Consolas, monospace;
+  color: var(--accent);
+}
+
+.af-item { color: var(--text); }
+.af-empty { color: var(--dim); font-style: italic; }
+
+/* A charm slot has no key to press at all, so its row is greyed and its toggle locked. */
+tr.af-charm td { color: var(--dim); }
 
 pre#log {
   margin: 0;

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
+using System.Text.Json;
 using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Scanning;
@@ -137,6 +138,28 @@ internal static class Program
             }
         }
 
+        // ── Auto-flask ───────────────────────────────────────────────────────
+        // Two sources, deliberately kept apart: WHAT to do comes from our settings file,
+        // WHICH KEY uses a flask comes from the GAME's own config. Assuming the key would
+        // work perfectly until someone rebinds one, and then fail with no symptom beyond
+        // "nothing happens" - see FlaskKeyBindings.
+        var flaskKeys = PoEformance.Features.FlaskKeyBindings.Load();
+        var flaskSettings = PoEformance.Features.AutoFlaskSettingsStore.Load();
+        var autoFlask = new PoEformance.Features.AutoFlask(
+            flaskSettings.ToRules(flaskKeys),
+            enabled: flaskSettings.Enabled || options.AutoFlask);
+        if (options.ShowOverlay || options.ShowConfig || options.AutoFlask)
+        {
+            ReportAutoFlask(autoFlask, flaskKeys, flaskSettings, forcedOn: options.AutoFlask);
+        }
+
+        // The config window runs on its own thread so it can be open WHILE the overlay is,
+        // which is what makes its switches worth having: a setting that needs a restart is
+        // a settings file with extra steps.
+        Thread? configWindow = options.ShowConfig
+            ? StartConfigWindow(reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings)
+            : null;
+
         if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
         {
             // The letterbox bar width. UI positions are scaled by the window MINUS these
@@ -149,28 +172,10 @@ internal static class Program
                 cull = 0; // a mis-resolved pattern would poison every width-scaled rect
             }
 
-            PoEformance.Features.AutoFlask? autoFlask = options.AutoFlask
-                ? new PoEformance.Features.AutoFlask(PoEformance.Features.AutoFlask.DefaultRules, enabled: true)
-                : null;
-
-            if (autoFlask is not null)
-            {
-                Console.WriteLine();
-                Console.WriteLine("auto-flask ARMED - it presses keys only while the GAME window has focus:");
-                foreach (PoEformance.Features.FlaskRule rule in autoFlask.Rules)
-                {
-                    Console.WriteLine($"  {rule.Name,-12} {rule.Vital} at or below {rule.ThresholdPercent}%"
-                        + $", key 0x{rule.Key:X2}, {rule.CooldownMs} ms cooldown");
-                }
-            }
-
             RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask);
         }
 
-        if (options.ShowConfig)
-        {
-            RunConfigWindow(reader, schemaPath, result, gameStatesAddress);
-        }
+        configWindow?.Join();
 
         if (options.Watch && options.ReplayPath is null)
         {
@@ -282,7 +287,7 @@ internal static class Program
     /// </summary>
     private static void RunOverlay(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
-        PoEformance.Features.AutoFlask? autoFlask)
+        PoEformance.Features.AutoFlask autoFlask)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
         Console.WriteLine();
@@ -302,19 +307,19 @@ internal static class Program
             {
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
 
-                if (autoFlask is not null)
-                {
-                    PoEformance.Features.FlaskTick tick = autoFlask.Evaluate(
-                        snapshot.PlayerVitals,
-                        FlaskKeySender.IsForeground(gameWindow),
-                        Environment.TickCount64,
-                        snapshot.PlayerBuffs,
-                        snapshot.FlaskBelt);
+                // Evaluated even when the feature is off: it costs a bool check, and its
+                // reason string is what the overlay's status line shows - including the
+                // word "disabled", which is the answer to the question actually asked.
+                PoEformance.Features.FlaskTick tick = autoFlask.Evaluate(
+                    snapshot.PlayerVitals,
+                    FlaskKeySender.IsForeground(gameWindow),
+                    Environment.TickCount64,
+                    snapshot.PlayerBuffs,
+                    snapshot.FlaskBelt);
 
-                    foreach (PoEformance.Features.FlaskUse use in tick.Used)
-                    {
-                        FlaskKeySender.Press(use.Rule.Key);
-                    }
+                foreach (PoEformance.Features.FlaskUse use in tick.Used)
+                {
+                    FlaskKeySender.Press(use.Rule.Key);
                 }
 
                 return snapshot;
@@ -330,35 +335,100 @@ internal static class Program
             gameWindow,
             cull);
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
-        overlay.FlaskStatus = autoFlask is null ? null : () => autoFlask.LastTick.Reason;
+        overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
         overlay.Start().GetAwaiter().GetResult();
     }
 
     /// <summary>
-    /// Opens the WebView2 configuration window and blocks until it closes.
+    /// Prints how auto-flask is configured, one line per belt slot.
+    /// </summary>
+    /// <remarks>
+    /// The key column is the point of this. Bindings read from the game's config and
+    /// bindings assumed from the default 1-5 layout produce an identical-looking tool right
+    /// up until a flask has been rebound, at which point the only symptom is that nothing
+    /// happens. Printing WHERE the keys came from turns a silent failure into a visible one.
+    /// </remarks>
+    private static void ReportAutoFlask(
+        PoEformance.Features.AutoFlask engine,
+        PoEformance.Features.FlaskKeys keys,
+        PoEformance.Features.AutoFlaskSettings settings,
+        bool forcedOn)
+    {
+        Console.WriteLine();
+        Console.WriteLine(engine.Enabled
+            ? "auto-flask ARMED - it presses keys only while the GAME window has focus"
+            : "auto-flask off - turn it on in the config window (--config), or with --autoflask");
+
+        if (forcedOn && !settings.Enabled)
+        {
+            Console.WriteLine("           (forced on by --autoflask; the saved setting is off)");
+        }
+
+        Console.WriteLine($"  keys     {keys.Source} - {keys.Detail}");
+        if (keys.Source == PoEformance.Features.KeyBindingSource.Defaults)
+        {
+            Console.WriteLine("           assuming the default 1-5 layout. If a flask key is rebound in");
+            Console.WriteLine("           game, the tool would press the wrong one - check the list below.");
+        }
+
+        foreach (PoEformance.Features.FlaskRule rule in engine.Rules)
+        {
+            string trigger = rule.TriggerBuff.Length > 0
+                ? $"on \"{rule.TriggerBuff}\""
+                : $"{rule.Vital,-12} at or below {rule.ThresholdPercent,3}%";
+
+            keys.BySlot.TryGetValue(rule.Slot, out ushort key);
+            string keyName = key == 0
+                ? "no usable key - this slot can never fire"
+                : $"key {PoEformance.Features.FlaskKeyBindings.Describe(key)}";
+
+            Console.WriteLine($"  slot {rule.Slot}   {(rule.Enabled ? "ON " : "off")}  {trigger}   {keyName}");
+        }
+    }
+
+    /// <summary>
+    /// Opens the WebView2 configuration window on its own thread and returns it.
     /// </summary>
     /// <remarks>
     /// Every "getState" from the page re-reads the world FRESH - the page's refresh button
     /// is therefore also a liveness check of the whole read chain, not a cached echo. This
     /// window is the Native AOT risk probe: it must keep working in the AOT-published build,
     /// which the CI publish job verifies at compile level and a live run verifies fully.
+    ///
+    /// Both callbacks run on the window's own thread. The state read is fine there (reads
+    /// are thread-safe and each call builds its own reader stack); the change applies to the
+    /// engine in a single atomic swap, so a reader tick sees the old configuration or the
+    /// new one but never half of each.
     /// </remarks>
-    private static void RunConfigWindow(IMemoryReader reader, string schemaPath, DriftReportResult report, ulong gameStatesAddress)
+    private static Thread StartConfigWindow(
+        IMemoryReader reader,
+        string schemaPath,
+        DriftReportResult report,
+        ulong gameStatesAddress,
+        PoEformance.Features.AutoFlask autoFlask,
+        PoEformance.Features.FlaskKeys flaskKeys,
+        PoEformance.Features.AutoFlaskSettings flaskSettings)
     {
         Console.WriteLine();
-        Console.WriteLine("config window open - close it to continue");
+        Console.WriteLine("config window open - the tool exits once it (and the overlay) are closed");
 
-        PoEformance.Config.ConfigWindowHost.Run("PoEformance", () =>
+        // The live settings. Only the window's thread touches this: it reads it to build a
+        // state and replaces it when the page saves.
+        PoEformance.Features.AutoFlaskSettings settings = flaskSettings;
+
+        PoEformance.Config.ConfigState BuildState()
         {
             OffsetSchema schema = SchemaJson.Load(schemaPath);
             int entityCount = 0;
             bool inGame = false;
+            PoEformance.Game.Components.FlaskBelt? belt = null;
             if (gameStatesAddress != 0)
             {
                 PoEformance.Game.World.WorldSnapshot snapshot =
                     new PoEformance.Game.World.WorldReader(reader, schema).Read(gameStatesAddress);
                 inGame = snapshot.InGame;
                 entityCount = snapshot.Entities.Count;
+                belt = snapshot.FlaskBelt;
             }
 
             return new PoEformance.Config.ConfigState(
@@ -370,8 +440,89 @@ internal static class Program
                 StaticsFound: report.Statics.Count(s => s.Found),
                 StaticsTotal: report.Statics.Count,
                 InGame: inGame,
-                EntityCount: entityCount);
-        });
+                EntityCount: entityCount,
+                AutoFlask: BuildAutoFlaskView(settings, flaskKeys, autoFlask, belt));
+        }
+
+        bool Apply(PoEformance.Config.ConfigRequest request)
+        {
+            if (request.Type != "setFlaskSettings" || request.Payload.ValueKind != JsonValueKind.Object)
+            {
+                return false;
+            }
+
+            PoEformance.Features.AutoFlaskSettings? sent = request.Payload.Deserialize(
+                PoEformance.Config.ConfigJsonContext.Default.AutoFlaskSettings);
+            if (sent is null)
+            {
+                return false;
+            }
+
+            // Normalise BEFORE anything else sees it: the page is editable on disk and the
+            // file is hand-editable, so this is where a value becomes trustworthy.
+            settings = sent.Normalised();
+            autoFlask.Configure(settings.ToRules(flaskKeys), settings.Enabled);
+            AutoFlaskSettingsSaveWarning(PoEformance.Features.AutoFlaskSettingsStore.Save(settings));
+            return true;
+        }
+
+        return PoEformance.Config.ConfigWindowHost.Start("PoEformance", BuildState, Apply);
+    }
+
+    /// <summary>Says so when settings could not be written, instead of losing them quietly.</summary>
+    private static void AutoFlaskSettingsSaveWarning(bool saved)
+    {
+        if (!saved)
+        {
+            Console.Error.WriteLine(
+                $"could not write {PoEformance.Features.AutoFlaskSettingsStore.DefaultPath} - "
+                + "the change applies to this session only.");
+        }
+    }
+
+    /// <summary>
+    /// Builds the auto-flask panel: what is configured, next to what is actually equipped.
+    /// </summary>
+    /// <remarks>
+    /// Showing the equipped flask beside each row is what makes the choice concrete. "Slot
+    /// 2" means nothing on its own; "Slot 2 - Ultimate Mana Flask, 42/12 charges" is the
+    /// question the setting is actually answering.
+    /// </remarks>
+    private static PoEformance.Config.AutoFlaskView BuildAutoFlaskView(
+        PoEformance.Features.AutoFlaskSettings settings,
+        PoEformance.Features.FlaskKeys keys,
+        PoEformance.Features.AutoFlask engine,
+        PoEformance.Game.Components.FlaskBelt? belt)
+    {
+        var slots = new List<PoEformance.Config.FlaskSlotView>(settings.Slots.Count);
+        foreach (PoEformance.Features.FlaskSlotSettings slot in settings.Slots)
+        {
+            keys.BySlot.TryGetValue(slot.Slot, out ushort key);
+            PoEformance.Game.Components.EquippedFlask? equipped = belt?.InSlot(slot.Slot);
+
+            slots.Add(new PoEformance.Config.FlaskSlotView(
+                Slot: slot.Slot,
+                Enabled: slot.Enabled,
+                Vital: slot.Vital.ToString(),
+                ThresholdPercent: slot.ThresholdPercent,
+                Key: PoEformance.Features.FlaskKeyBindings.Describe(key),
+                Item: equipped is { } item ? ShortItemName(item.Path) : string.Empty,
+                Charges: equipped is { } charges ? $"{charges.Charges}/{charges.ChargesPerUse}" : string.Empty,
+                IsCharm: equipped?.IsCharm ?? false));
+        }
+
+        return new PoEformance.Config.AutoFlaskView(
+            Enabled: settings.Enabled,
+            KeySource: $"{keys.Source} - {keys.Detail}",
+            Status: engine.LastTick.Reason,
+            Slots: slots);
+    }
+
+    /// <summary>The last segment of a metadata path - the readable half of an item name.</summary>
+    private static string ShortItemName(string path)
+    {
+        int slash = path.LastIndexOf('/');
+        return slash >= 0 && slash < path.Length - 1 ? path[(slash + 1)..] : path;
     }
 
     /// <summary>

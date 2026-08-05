@@ -19,6 +19,13 @@ public sealed class RecordingMemoryReader : IMemoryReader
     private readonly IMemoryReader _inner;
     private readonly BinaryWriter _writer;
     private readonly long _startTimestamp;
+
+    // Reads themselves are thread-safe - ReadProcessMemory fills the CALLER's buffer - but
+    // the file, the counters and the frame index are shared state. Two threads now read
+    // through the same reader (the overlay's feed and the config window), so the writing
+    // half is serialised. Only the write is inside the lock; the read is not, so the
+    // expensive part still runs concurrently.
+    private readonly Lock _writeLock = new();
     private uint _frameIndex;
     private bool _disposed;
 
@@ -92,11 +99,19 @@ public sealed class RecordingMemoryReader : IMemoryReader
             throw new ArgumentException("Note key/value too long.", nameof(key));
         }
 
-        _writer.Write(RecordingFormat.TagNote);
-        _writer.Write((ushort)keyBytes.Length);
-        _writer.Write(keyBytes);
-        _writer.Write((ushort)valueBytes.Length);
-        _writer.Write(valueBytes);
+        lock (_writeLock)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _writer.Write(RecordingFormat.TagNote);
+            _writer.Write((ushort)keyBytes.Length);
+            _writer.Write(keyBytes);
+            _writer.Write((ushort)valueBytes.Length);
+            _writer.Write(valueBytes);
+        }
     }
 
     /// <summary>Stores a resolved static address as a note.</summary>
@@ -106,39 +121,58 @@ public sealed class RecordingMemoryReader : IMemoryReader
     /// <summary>Writes a frame boundary. Call once per reader tick.</summary>
     public void MarkFrame()
     {
-        _writer.Write(RecordingFormat.TagFrame);
-        _writer.Write(_frameIndex++);
-        _writer.Write((uint)(Environment.TickCount64 - _startTimestamp));
+        lock (_writeLock)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _writer.Write(RecordingFormat.TagFrame);
+            _writer.Write(_frameIndex++);
+            _writer.Write((uint)(Environment.TickCount64 - _startTimestamp));
+        }
     }
 
     public bool TryRead(ulong address, Span<byte> destination)
     {
+        // Outside the lock: this is the expensive part, and it touches nothing shared.
         if (!_inner.TryRead(address, destination))
         {
             return false;
         }
 
-        if (destination.Length > MaxRecordedReadBytes)
+        lock (_writeLock)
         {
-            SkippedLargeReads++;
-            return true;
-        }
+            if (_disposed)
+            {
+                // The file was closed while this read was in flight. Serving the read is
+                // still correct; there is just nowhere left to record it.
+                return true;
+            }
 
-        if (RecordedBytes >= MaxTotalBytes)
-        {
-            // Keep serving reads; just stop growing the file. The early part is the part
-            // worth replaying.
-            ReachedSizeLimit = true;
-            return true;
-        }
+            if (destination.Length > MaxRecordedReadBytes)
+            {
+                SkippedLargeReads++;
+                return true;
+            }
 
-        if (destination.Length <= RecordingFormat.MaxReadLength)
-        {
-            _writer.Write(RecordingFormat.TagRead);
-            _writer.Write(address);
-            _writer.Write((uint)destination.Length);
-            _writer.Write(destination);
-            RecordedBytes += destination.Length;
+            if (RecordedBytes >= MaxTotalBytes)
+            {
+                // Keep serving reads; just stop growing the file. The early part is the part
+                // worth replaying.
+                ReachedSizeLimit = true;
+                return true;
+            }
+
+            if (destination.Length <= RecordingFormat.MaxReadLength)
+            {
+                _writer.Write(RecordingFormat.TagRead);
+                _writer.Write(address);
+                _writer.Write((uint)destination.Length);
+                _writer.Write(destination);
+                RecordedBytes += destination.Length;
+            }
         }
 
         return true;
@@ -146,14 +180,18 @@ public sealed class RecordingMemoryReader : IMemoryReader
 
     public void Dispose()
     {
-        if (_disposed)
+        lock (_writeLock)
         {
-            return;
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            _writer.Flush();
+            _writer.Dispose();
         }
 
-        _disposed = true;
-        _writer.Flush();
-        _writer.Dispose();
         _inner.Dispose();
     }
 }

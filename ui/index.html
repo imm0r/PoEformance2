@@ -31,11 +31,39 @@
       <button id="refresh">Refresh</button>
     </section>
 
+    <div class="column">
+    <section class="card" id="autoflask">
+      <h2>Auto flask</h2>
+
+      <label class="master">
+        <input type="checkbox" id="af-enabled">
+        <span>Use flasks automatically</span>
+      </label>
+      <p class="dim" id="af-status">–</p>
+
+      <!--
+        One row per belt slot, built by JS from the state. The KEY column is read-only on
+        purpose: which key uses a flask is the game's setting, read from its own config -
+        editing it here would create a second source of truth that silently disagrees.
+      -->
+      <table id="af-slots">
+        <thead>
+          <tr>
+            <th>On</th><th>Slot</th><th>Equipped</th><th>Watches</th><th>Below</th><th>Key</th>
+          </tr>
+        </thead>
+        <tbody id="af-rows"></tbody>
+      </table>
+
+      <p class="dim" id="af-keysource">–</p>
+    </section>
+
     <section class="card">
       <h2>Bridge</h2>
       <p class="dim">Raw traffic, newest first — the debugging view while the protocol grows.</p>
       <pre id="log"></pre>
     </section>
+    </div>
   </main>
 
   <script>
