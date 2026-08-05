@@ -27,9 +27,12 @@ public sealed class PoiLayer
 
     private readonly RoutePlanner _planner;
 
-    /// <summary>Which kinds are drawn. Exits and waypoints by default - the rest is noise.</summary>
+    /// <summary>Which kinds are marked. Everything that is a destination rather than a thing.</summary>
     public HashSet<PoiKind> DrawnKinds { get; } =
-        [PoiKind.AreaTransition, PoiKind.Waypoint, PoiKind.Checkpoint, PoiKind.Mechanic, PoiKind.Shrine];
+    [
+        PoiKind.AreaTransition, PoiKind.Waypoint, PoiKind.Checkpoint,
+        PoiKind.Mechanic, PoiKind.Shrine, PoiKind.Npc,
+    ];
 
     /// <summary>Draw a name next to each marker.</summary>
     public bool ShowLabels { get; set; } = true;
@@ -55,6 +58,7 @@ public sealed class PoiLayer
         PoiKind.Chest => Pack(1f, 0.85f, 0.4f),
         PoiKind.Mechanic => Pack(0.95f, 0.55f, 1f),
         PoiKind.Shrine => Pack(0.5f, 1f, 0.8f),
+        PoiKind.Npc => Pack(1f, 0.95f, 0.7f),
         _ => Pack(0.8f, 0.8f, 0.8f),
     };
 

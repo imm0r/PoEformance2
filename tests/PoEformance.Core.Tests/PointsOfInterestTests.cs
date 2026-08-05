@@ -20,6 +20,9 @@ public class PointsOfInterestTests
     [InlineData("Metadata/Chests/StrongBoxes/Arcanist", PoiKind.Chest)]
     [InlineData("Metadata/MiscellaneousObjects/Expedition/ExpeditionMarker", PoiKind.Mechanic)]
     [InlineData("Metadata/Terrain/Leagues/Ritual/RitualRuneObject", PoiKind.Mechanic)]
+    // A person is a destination too, and in campaign content usually THE destination: what a
+    // quest wants is most often an exit or somebody to talk to.
+    [InlineData("Metadata/NPC/Act1/Renly", PoiKind.Npc)]
     public void ThePathSaysWhatAPlaceIs(string path, PoiKind expected)
         => Assert.Equal(expected, PointsOfInterest.Classify(path));
 

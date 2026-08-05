@@ -24,6 +24,11 @@ public enum PoiKind
 
     /// <summary>A shrine.</summary>
     Shrine,
+
+    /// <summary>
+    /// A named character standing somewhere - which in a campaign zone is usually the goal.
+    /// </summary>
+    Npc,
 }
 
 /// <summary>
@@ -100,6 +105,14 @@ public static class PointsOfInterest
             return PoiKind.Shrine;
         }
 
+        // A place to walk to, and in campaign content usually THE place: what a quest wants
+        // is most often an exit or a person. Towns are full of them, which would drown the
+        // list - but the overlay is off in towns, so the ones left are the ones that matter.
+        if (path.StartsWith("Metadata/NPC", StringComparison.Ordinal))
+        {
+            return PoiKind.Npc;
+        }
+
         if (path.StartsWith("Metadata/Chests/", StringComparison.Ordinal))
         {
             // Chests are thousands per map; only the ones with their own name are landmarks.
@@ -160,6 +173,7 @@ public static class PointsOfInterest
         PoiKind.Chest => "Chest",
         PoiKind.Mechanic => "Encounter",
         PoiKind.Shrine => "Shrine",
+        PoiKind.Npc => "NPC",
         _ => "Point",
     };
 

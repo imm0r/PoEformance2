@@ -30,9 +30,9 @@ public readonly record struct AreaInfo(string Id, string Name, int Act, bool IsT
     /// The id test stays alongside it because one map is one sample. Either signal alone
     /// would be a guess; together they only have to be right about the same area once.
     ///
-    /// The bias is deliberate and asymmetric. Hiding the overlay in endgame content is the
-    /// failure that brought this feature about; showing it in a campaign zone is a mild
-    /// annoyance. So anything that is not clearly campaign keeps its markers.
+    /// Kept as a FACT about the area, and no longer a reason to hide anything - see
+    /// <see cref="WantsMarkers"/>. It still names the area in the readout, and a feature that
+    /// genuinely only makes sense in endgame content can still ask.
     /// </remarks>
     public bool IsCampaign
         => Act is >= 1 and < EndgameAct && !Id.StartsWith("Map", StringComparison.OrdinalIgnoreCase);
@@ -44,11 +44,23 @@ public readonly record struct AreaInfo(string Id, string Name, int Act, bool IsT
     /// Whether the overlay should mark anything here.
     /// </summary>
     /// <remarks>
-    /// An area that did not resolve wants markers: the failure mode of a read that went
+    /// Anywhere with something to fight, which now INCLUDES campaign zones. They were
+    /// excluded originally, and the reason was sound at the time: the overlay marked monsters
+    /// and drops, and an act zone is walked through once with the route already known.
+    ///
+    /// Points of interest changed what the overlay is for. In a campaign zone the question is
+    /// "where is the thing this quest wants", which is exactly what a marked exit and a drawn
+    /// route answer - so the content the overlay was least useful in is now the content it
+    /// helps most in.
+    ///
+    /// Towns and hideouts stay out. There is nothing to find in them and the panels are open
+    /// half the time, which is the case the rule was really about.
+    ///
+    /// An area that did not resolve still wants markers: the failure mode of a read that went
     /// wrong should be "the overlay is still there", not "the overlay silently stopped
     /// working and you find out during a fight".
     /// </remarks>
-    public bool WantsMarkers => IsHostile && !IsCampaign;
+    public bool WantsMarkers => IsHostile;
 
     /// <summary>A short description for the status readout.</summary>
     public string Describe()
