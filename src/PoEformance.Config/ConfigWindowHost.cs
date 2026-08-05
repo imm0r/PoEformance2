@@ -34,15 +34,33 @@ public static class ConfigWindowHost
         thread.Join();
     }
 
+    /// <summary>
+    /// Runs the window, and contains any failure to this thread.
+    /// </summary>
+    /// <remarks>
+    /// An exception escaping a thread's entry point terminates the PROCESS - there is no
+    /// enclosing catch on a thread start. That is how a teardown slip in the config window
+    /// took the whole tool down with it, overlay session included. The config window is an
+    /// auxiliary view; it has no business ending the process, so its failures stop here and
+    /// are reported instead.
+    /// </remarks>
     private static void RunOnThisThread(string title, Func<ConfigState> stateSource)
     {
-        using var application = new Application();
-        using var window = new ConfigWindow(title, json => Handle(json, stateSource));
-        window.ResizeClient(1100, 780);
-        window.Center();
-        window.Show();
-        window.SetForeground();
-        application.Run();
+        try
+        {
+            using var application = new Application();
+            using var window = new ConfigWindow(title, json => Handle(json, stateSource));
+            window.ResizeClient(1100, 780);
+            window.Center();
+            window.Show();
+            window.SetForeground();
+            application.Run();
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine($"config window failed: {exception.Message}");
+            Console.Error.WriteLine(exception.StackTrace);
+        }
     }
 
     /// <summary>

@@ -11,6 +11,12 @@
     <PublishAot>true</PublishAot>
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
 
+    <!-- Required, not cosmetic: without a comctl32 v6 dependency the process gets v5,
+         which has no TaskDialogIndirect export, so the UI library's own error reporting
+         fails with "Entry point was not found" instead of showing the actual error.
+         Also declares per-monitor DPI, which the overlay's pixel coordinates depend on. -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
     <!-- IL2104/IL3053 are ILC's PER-ASSEMBLY ROLLUPS: "assembly X produced trim/AOT
          warnings", raised for EXTERNAL assemblies we cannot edit (first offender:
          DirectN.Extensions, whose author nonetheless ships working AOT builds of the same

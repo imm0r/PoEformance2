@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using DirectN;
 using DirectN.Extensions.Com;
@@ -36,7 +37,7 @@ public sealed class ConfigWindow : Window
     private readonly Func<string, string?> _handleMessage;
 
     private ComObject<ICoreWebView2Controller>? _controller;
-    private IComObject<ICoreWebView2>? _webView;
+    private ComObject<ICoreWebView2>? _webView;
 
     // The persistent COM callback. Kept in a field on purpose: the browser holds a native
     // reference, and nothing on the managed side would otherwise keep the wrapper alive -
@@ -173,22 +174,54 @@ public sealed class ConfigWindow : Window
 
     protected override bool OnResized(WindowResizedType type, SIZE size)
     {
-        _controller?.Object.put_Bounds(ClientRect);
+        if (_controller is { IsDisposed: false } controller)
+        {
+            controller.Object.put_Bounds(ClientRect);
+        }
+
         return base.OnResized(type, size);
     }
 
+    /// <summary>
+    /// Tears the bridge down. Every step is optional and none of them may throw.
+    /// </summary>
+    /// <remarks>
+    /// This runs AFTER the window has been destroyed and the message loop has ended, by
+    /// which point the COM wrappers may already have been released - so reaching through
+    /// one is an ObjectDisposedException, not a mistake to assert on.
+    ///
+    /// What made that fatal rather than untidy: nothing is left to catch an exception
+    /// here. It unwinds out of Dispose, through the window's own Dispose, into the thread
+    /// start, and terminates the process - so closing the config window took the whole
+    /// tool down with it. A cleanup path is the one place where "already cleaned up" must
+    /// be an ordinary outcome.
+    /// </remarks>
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
-            if (_webView is not null && _messageHandler is not null)
+            try
             {
-                _webView.Object.remove_WebMessageReceived(_messageToken);
+                if (_webView is { IsDisposed: false } webView && _messageHandler is not null)
+                {
+                    webView.Object.remove_WebMessageReceived(_messageToken);
+                }
+
+                if (_controller is { IsDisposed: false } controller)
+                {
+                    controller.Object.Close();
+                }
+            }
+            catch (Exception exception) when (exception is ObjectDisposedException or InvalidOperationException or COMException)
+            {
+                // The browser tore itself down first. Nothing left to release cleanly, and
+                // nothing worth failing over on the way out.
             }
 
-            _controller?.Object.Close();
             _webView?.Dispose();
             _controller?.Dispose();
+            _webView = null;
+            _controller = null;
         }
 
         base.Dispose(disposing);
