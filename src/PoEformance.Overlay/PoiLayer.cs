@@ -58,7 +58,7 @@ public sealed class PoiLayer
     [
         PoiKind.AreaTransition, PoiKind.Waypoint, PoiKind.Checkpoint,
         PoiKind.Mechanic, PoiKind.Shrine, PoiKind.Npc,
-        PoiKind.Quest, PoiKind.Marked,
+        PoiKind.Quest, PoiKind.Marked, PoiKind.BossArena,
     ];
 
     /// <summary>Draw a name next to each marker.</summary>
@@ -90,6 +90,7 @@ public sealed class PoiLayer
         PoiKind.Shrine => Pack(0.5f, 1f, 0.8f),
         PoiKind.Npc => Pack(1f, 0.95f, 0.7f),
         PoiKind.Quest => Pack(1f, 0.8f, 0.25f),   // what the game wants next, and it shows
+        PoiKind.BossArena => Pack(1f, 0.4f, 0.35f),
         PoiKind.Marked => Pack(0.85f, 0.85f, 0.95f),
         _ => Pack(0.8f, 0.8f, 0.8f),
     };
@@ -132,6 +133,52 @@ public sealed class PoiLayer
         }
     }
 
+    /// <summary>
+    /// One place worth walking to, whatever it was found in.
+    /// </summary>
+    /// <remarks>
+    /// Entities and terrain landmarks are drawn, listed and routed to identically, so the
+    /// difference between "an exit stands there" and "the ground is shaped like an arena" ends
+    /// at the reader. It has to: a boss arena is known from the moment the area loads, long
+    /// before anything is standing in it.
+    /// </remarks>
+    private readonly record struct Place(
+        ulong Id, string Name, PoiKind Kind, float WorldX, float WorldY, float Height);
+
+    /// <summary>Everything markable in the area, from both sources.</summary>
+    private List<Place> PlacesIn(WorldSnapshot snapshot)
+    {
+        var places = new List<Place>();
+
+        foreach (WorldEntity entity in snapshot.Entities)
+        {
+            if (entity.Poi != PoiKind.None && DrawnKinds.Contains(entity.Poi))
+            {
+                places.Add(new Place(
+                    entity.Address, entity.PoiName, entity.Poi,
+                    entity.WorldX, entity.WorldY, entity.TerrainHeight));
+            }
+        }
+
+        if (snapshot.Terrain is TerrainGrid terrain)
+        {
+            foreach (TerrainLandmark landmark in terrain.Landmarks)
+            {
+                if (!DrawnKinds.Contains(landmark.Kind))
+                {
+                    continue;
+                }
+
+                places.Add(new Place(
+                    landmark.Id, landmark.Name, landmark.Kind,
+                    landmark.GridX * MapView.WorldToGrid, landmark.GridY * MapView.WorldToGrid,
+                    terrain.HeightAt(landmark.GridX, landmark.GridY)));
+            }
+        }
+
+        return places;
+    }
+
     /// <summary>Draws the markers and the routes onto whichever map is open.</summary>
     public void DrawOnMap(ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player)
     {
@@ -150,15 +197,10 @@ public sealed class PoiLayer
 
         float radius = map.IsLargeMap ? 5f : 3.5f;
 
-        foreach (WorldEntity poi in snapshot.Entities)
+        foreach (Place place in PlacesIn(snapshot))
         {
-            if (poi.Poi == PoiKind.None || !DrawnKinds.Contains(poi.Poi))
-            {
-                continue;
-            }
-
             Vector2 at = map.Project(
-                poi.WorldX, poi.WorldY, poi.TerrainHeight,
+                place.WorldX, place.WorldY, place.Height,
                 player.WorldX, player.WorldY, player.TerrainHeight);
 
             if (!map.Contains(at))
@@ -168,8 +210,8 @@ public sealed class PoiLayer
 
             // A destination takes its ROUTE's colour, which is the whole reason several
             // routes can be read at once: the line and the end it leads to match.
-            bool routed = _planner.IsTarget(poi.Address);
-            uint colour = routed ? RouteColour(poi.Address) : ColourFor(poi.Poi);
+            bool routed = _planner.IsTarget(place.Id);
+            uint colour = routed ? RouteColour(place.Id) : ColourFor(place.Kind);
 
             // A diamond, not a circle: the entity dots are circles, and the difference has to
             // survive being three pixels across on a minimap.
@@ -182,7 +224,7 @@ public sealed class PoiLayer
 
             if (ShowLabels && map.IsLargeMap)
             {
-                draw.AddText(at + new Vector2(radius + 3f, -7f), colour, poi.PoiName);
+                draw.AddText(at + new Vector2(radius + 3f, -7f), colour, place.Name);
             }
         }
     }
@@ -339,9 +381,7 @@ public sealed class PoiLayer
 
         ImGui.Separator();
 
-        List<WorldEntity> places = [.. snapshot.Entities
-            .Where(e => e.Poi != PoiKind.None && DrawnKinds.Contains(e.Poi))
-            .OrderBy(e => Distance(e, player))];
+        List<Place> places = [.. PlacesIn(snapshot).OrderBy(p => Distance(p, player))];
 
         if (places.Count == 0)
         {
@@ -349,10 +389,10 @@ public sealed class PoiLayer
             return;
         }
 
-        foreach (WorldEntity place in places)
+        foreach (Place place in places)
         {
-            bool routed = _planner.IsTarget(place.Address);
-            RouteView? route = routed ? _planner.For(place.Address) : null;
+            bool routed = _planner.IsTarget(place.Id);
+            RouteView? route = routed ? _planner.For(place.Id) : null;
 
             // The WALK when it is known, the straight line otherwise. Different numbers, and
             // the difference is the point - a wall between here and there is exactly what a
@@ -365,25 +405,25 @@ public sealed class PoiLayer
 
             ImGui.PushStyleColor(
                 ImGuiCol.Text,
-                ImGui.ColorConvertU32ToFloat4(routed ? RouteColour(place.Address) : ColourFor(place.Poi)));
+                ImGui.ColorConvertU32ToFloat4(routed ? RouteColour(place.Id) : ColourFor(place.Kind)));
 
             // ### rather than ##: the label is built from game data and everything after a ##
             // would be read as the identity, so two places could collapse into one row.
-            bool clicked = ImGui.Selectable($"{place.PoiName}  -  {away}###{place.Address:X}", routed);
+            bool clicked = ImGui.Selectable($"{place.Name}  -  {away}###{place.Id:X}", routed);
 
             ImGui.PopStyleColor();
 
             if (clicked)
             {
-                _planner.Toggle(place.Address, place.WorldX, place.WorldY);
+                _planner.Toggle(place.Id, place.WorldX, place.WorldY);
             }
         }
     }
 
-    private static float Distance(WorldEntity entity, WorldEntity player)
+    private static float Distance(Place place, WorldEntity player)
     {
-        float dx = entity.WorldX - player.WorldX;
-        float dy = entity.WorldY - player.WorldY;
+        float dx = place.WorldX - player.WorldX;
+        float dy = place.WorldY - player.WorldY;
         return MathF.Sqrt((dx * dx) + (dy * dy));
     }
 

@@ -23,6 +23,7 @@ public sealed class TerrainGrid
     public const int CellsPerTile = 23;
 
     private readonly TerrainHeightField? _heights;
+    private readonly IReadOnlyList<TerrainLandmark> _landmarks;
 
     public TerrainGrid(
         byte[] cells, int bytesPerRow, int rows,
@@ -39,10 +40,12 @@ public sealed class TerrainGrid
 
     public TerrainGrid(
         byte[] cells, int bytesPerRow, int rows,
-        long totalTilesX, long totalTilesY, TerrainHeightField? heights, string heightNote = "")
+        long totalTilesX, long totalTilesY, TerrainHeightField? heights, string heightNote = "",
+        IReadOnlyList<TerrainLandmark>? landmarks = null)
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
+        _landmarks = landmarks ?? [];
         TilesX = (int)Math.Max(0, totalTilesX);
         TilesY = (int)Math.Max(0, totalTilesY);
         _heights = heights;
@@ -82,6 +85,16 @@ public sealed class TerrainGrid
 
     /// <summary>True when the slope INSIDE each tile is included, not just the tile's level.</summary>
     public bool HasSubTileHeights => _heights?.HasSubTile ?? false;
+
+    /// <summary>
+    /// Places found in the SHAPE of the ground - boss arenas above all.
+    /// </summary>
+    /// <remarks>
+    /// On the grid because that is where they come from and when: the terrain is read once per
+    /// area, and these are known from that moment - long before the boss they belong to
+    /// exists as an entity.
+    /// </remarks>
+    public IReadOnlyList<TerrainLandmark> Landmarks => _landmarks;
 
     /// <summary>
     /// Why the heights are, or are not, here.
@@ -243,6 +256,10 @@ public sealed class TerrainReader
     private readonly int _tileHeight;
     private readonly int _subTileDetails;
     private readonly int _rotationSelector;
+    private readonly int _tgtFile;
+    private readonly int _tgtPath;
+    private readonly int _tileIdX;
+    private readonly int _tileIdY;
     private readonly int _areaHash;
     private readonly TerrainRotationTables _rotation;
 
@@ -281,7 +298,14 @@ public sealed class TerrainReader
         _tileHeight = tile.OffsetOf("TileHeight");
         _subTileDetails = tile.OffsetOf("SubTileDetailsPtr");
         _rotationSelector = tile.OffsetOf("RotationSelector");
+        _tgtFile = tile.OffsetOf("TgtFilePtr");
+        _tileIdX = tile.OffsetOf("TileIdX");
+        _tileIdY = tile.OffsetOf("TileIdY");
+        _tgtPath = schema.Structs["TgtFile"].OffsetOf("TgtPath");
     }
+
+    /// <summary>Tile-file paths are static game data; cache them by their pointer.</summary>
+    private readonly Dictionary<ulong, string> _tgtPaths = [];
 
     /// <summary>
     /// The current area's grid, or null while it is still loading.
@@ -370,11 +394,84 @@ public sealed class TerrainReader
 
         LastError = string.Empty;
         TerrainHeightField? heights = ReadTileHeights(terrainBase, tilesX, tilesY);
-        return new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote);
+
+        return new TerrainGrid(
+            cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks);
     }
 
     /// <summary>Why the last height read produced what it did. See TerrainGrid.HeightNote.</summary>
     private string _heightNote = string.Empty;
+
+    /// <summary>What the last tile read found in the shape of the ground.</summary>
+    private IReadOnlyList<TerrainLandmark> _landmarks = [];
+
+    /// <summary>
+    /// Names for particular tiles of the current area, keyed as the reference writes them.
+    /// </summary>
+    /// <remarks>
+    /// Supplied from outside because it is DATA, not code - the same principle the offsets
+    /// follow. Whoever knows which area this is sets it before the terrain is read.
+    /// </remarks>
+    public IReadOnlyDictionary<string, string>? CuratedLandmarks { get; set; }
+
+    /// <summary>
+    /// Reads every tile's file path and finds the places among them.
+    /// </summary>
+    /// <remarks>
+    /// The tile buffer is already in hand from the heights, so the tile records themselves
+    /// cost nothing here. What could cost is the PATHS: an area is tens of thousands of tiles
+    /// and reading a string for each would be a read per tile. They are deduplicated by the
+    /// file pointer instead - an area is built from a few hundred distinct tiles, each used
+    /// hundreds of times - which turns that into a few hundred reads, once per area.
+    /// </remarks>
+    private void ReadLandmarks(byte[] tiles, long count, long tilesX)
+    {
+        if (tilesX <= 0)
+        {
+            _landmarks = [];
+            return;
+        }
+
+        var found = new List<TerrainTile>();
+
+        for (long i = 0; i < count; i++)
+        {
+            int at = (int)(i * TileEntrySize);
+            ulong file = BitConverter.ToUInt64(tiles, at + _tgtFile);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(file))
+            {
+                continue;
+            }
+
+            if (!_tgtPaths.TryGetValue(file, out string? path))
+            {
+                path = _reader.ReadStdWString(file + (ulong)_tgtPath, 128);
+                _tgtPaths[file] = path;
+            }
+
+            if (path.Length == 0)
+            {
+                continue;
+            }
+
+            // Only the tiles that could BE something are kept as records. A curated key needs
+            // its sub-ids, so the filter has to let anything curated through as well.
+            if (!TerrainLandmarks.LooksLikeArena(path) && CuratedLandmarks is null)
+            {
+                continue;
+            }
+
+            found.Add(new TerrainTile(
+                path,
+                (int)(i % tilesX),
+                (int)(i / tilesX),
+                tiles[at + _tileIdX],
+                tiles[at + _tileIdY],
+                tiles[at + _rotationSelector]));
+        }
+
+        _landmarks = TerrainLandmarks.Find(found, CuratedLandmarks);
+    }
 
     /// <summary>
     /// Reads one ground height per terrain tile, in the world units entities report.
@@ -396,6 +493,8 @@ public sealed class TerrainReader
     /// </remarks>
     private TerrainHeightField? ReadTileHeights(ulong terrainBase, long tilesX, long tilesY)
     {
+        _landmarks = [];
+
         if (tilesX <= 0 || tilesY <= 0)
         {
             _heightNote = "no tile count";
@@ -425,6 +524,10 @@ public sealed class TerrainReader
             _heightNote = $"tile read failed ({count * TileEntrySize} bytes)";
             return null;
         }
+
+        // The same buffer answers both questions, so the places in the ground cost one pass
+        // over memory that has already been read.
+        ReadLandmarks(tiles, count, tilesX);
 
         var heights = new float[count];
         for (long i = 0; i < count; i++)

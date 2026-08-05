@@ -340,7 +340,12 @@ internal static class Program
         PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser)
     {
-        var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation);
+        var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation)
+        {
+            // Names for tiles somebody has described. Missing is fine: the boss arenas are
+            // found from the shape of the ground either way, this only names them.
+            LandmarkNames = PoEformance.Game.World.LandmarkNames.Load(FindDataFile("landmarks.json")),
+        };
         Console.WriteLine();
         Console.WriteLine(gameWindow != IntPtr.Zero
             ? "overlay running - it follows the game window and hides while the game is not in front"
@@ -874,6 +879,29 @@ internal static class Program
         }
 
         throw new FileNotFoundException("schema/poe2.offsets.json not found next to the executable or in any parent directory.");
+    }
+
+    /// <summary>Finds a shipped data file next to the executable, or in a parent directory.</summary>
+    /// <remarks>
+    /// The same walk the schema uses, so running from a build output and running from the
+    /// repository both work - and a missing file is a path, not an exception, because every
+    /// caller of this treats absence as "do without".
+    /// </remarks>
+    private static string FindDataFile(string name)
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            string candidate = Path.Combine(directory.FullName, "data", name);
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            directory = directory.Parent;
+        }
+
+        return Path.Combine(AppContext.BaseDirectory, "data", name);
     }
 
     /// <summary>Parsed command line. Kept tiny and explicit - no arg-parsing library.</summary>

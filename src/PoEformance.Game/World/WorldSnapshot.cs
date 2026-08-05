@@ -147,6 +147,7 @@ public sealed class WorldReader
     private readonly CorpseFilter _corpses = new();
     private readonly GroundItemReader _groundItems;
     private readonly MinimapIconReader _mapIcons;
+    private LandmarkNames _landmarkNames = LandmarkNames.Empty;
     private readonly WorldAreaReader _areas;
     private readonly TerrainReader _terrain;
     private readonly int _playerInfo;
@@ -235,6 +236,19 @@ public sealed class WorldReader
         }
 
         return new MonsterSigns(health, targetable, isBoss);
+    }
+
+    /// <summary>
+    /// Names for particular terrain tiles, used when an area is one somebody described.
+    /// </summary>
+    /// <remarks>
+    /// Optional, and the boss arenas are found without it - this only puts a real name on
+    /// them where one is known. Set once at startup.
+    /// </remarks>
+    public LandmarkNames LandmarkNames
+    {
+        get => _landmarkNames;
+        set => _landmarkNames = value ?? LandmarkNames.Empty;
     }
 
     /// <summary>Reads one frame's worth of world state.</summary>
@@ -387,9 +401,14 @@ public sealed class WorldReader
             largeMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: true);
         }
 
+        // Read BEFORE the terrain: which area this is decides which names apply to its tiles,
+        // and the terrain read is where the tiles are looked at.
+        AreaInfo area = _areas.Read(chain.WorldData);
+        _terrain.CuratedLandmarks = _landmarkNames.For(area.Id);
+
         return new WorldSnapshot(
             true, player, entities, matrix, largeMap, miniMap, playerVitals, playerBuffs, flaskBelt,
-            _areas.Read(chain.WorldData),
+            area,
             _terrain.Read(chain.AreaInstance, nowMs),
             _reader.Read<uint>(chain.AreaInstance + (ulong)_areaHash),
             chain.State);

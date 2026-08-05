@@ -34,6 +34,14 @@ public enum PoiKind
     Quest,
 
     /// <summary>
+    /// A boss arena, found in the SHAPE of the ground rather than among the entities.
+    /// </summary>
+    /// <remarks>
+    /// An endgame map is generated at random; the boss room is not. See TerrainLandmarks.
+    /// </remarks>
+    BossArena,
+
+    /// <summary>
     /// The game marks it, but with an icon this does not recognise.
     /// </summary>
     /// <remarks>
@@ -279,6 +287,7 @@ public static class PointsOfInterest
         PoiKind.Shrine => "Shrine",
         PoiKind.Npc => "NPC",
         PoiKind.Quest => "Quest",
+        PoiKind.BossArena => "Boss Arena",
         PoiKind.Marked => "Marked",
         _ => "Point",
     };
