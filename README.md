@@ -72,8 +72,9 @@ PoEformance.App --overlay --config       # in-game overlay + config window, side
 PoEformance.App --overlay --debug        # plus the projection diagnostics and calibration aids
 ```
 
-The overlay marks living monsters, chests, drops and NPCs **on the game's own map** — the
-large one when it is open, the minimap otherwise, clipped to whichever is on screen. It
+The overlay draws the area's layout **on the game's own map** — including the parts not
+explored yet — and marks living monsters, chests, drops and NPCs on it. The large map when
+it is open, the minimap otherwise, clipped to whichever is on screen. It
 draws only while the game is the window in front (it is always-on-top, so anything painted
 after an alt-tab would land on whatever you switched to) and only in endgame areas — not in
 town, a hideout, or a campaign zone. Corpses are filtered out, and drops below magic rarity with them

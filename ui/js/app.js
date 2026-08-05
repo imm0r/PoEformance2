@@ -22,11 +22,26 @@ function renderState(s) {
   $("s-schema").textContent = s.gameVersion;
 
   if (s.autoFlask) renderFlasks(s.autoFlask);
-  if (s.overlay) $("ov-loot").value = s.overlay.minLootRarity;
+  if (s.overlay) {
+    $("ov-loot").value = s.overlay.minLootRarity;
+    $("ov-terrain").checked = s.overlay.showTerrain;
+    $("ov-terrain-state").textContent = s.overlay.terrain;
+  }
 }
 
-$("ov-loot").addEventListener("change", () =>
-  bridge.send({ type: "setOverlaySettings", payload: { minLootRarity: $("ov-loot").value } }));
+/** Posts the whole overlay block, so one control cannot clear another's value. */
+function sendOverlay() {
+  bridge.send({
+    type: "setOverlaySettings",
+    payload: {
+      minLootRarity: $("ov-loot").value,
+      showTerrain: $("ov-terrain").checked,
+    },
+  });
+}
+
+$("ov-loot").addEventListener("change", sendOverlay);
+$("ov-terrain").addEventListener("change", sendOverlay);
 
 // ── Auto flask ─────────────────────────────────────────────────────────────
 
@@ -189,7 +204,7 @@ if (bridge.connected) {
     entityCount: 0,
     staticsFound: 0,
     staticsTotal: 6,
-    overlay: { minLootRarity: "Magic" },
+    overlay: { minLootRarity: "Magic", showTerrain: true, terrain: "browser preview" },
     autoFlask: {
       enabled: false,
       keySource: "Defaults - no host",

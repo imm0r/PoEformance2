@@ -386,6 +386,7 @@ internal static class Program
         overlay.ShowCalibration = debug;
         overlay.ShowWorldDots = debug;
         overlay.MinimumLootRarity = settings.MinLootRarity;
+        overlay.ShowTerrain = settings.ShowTerrain;
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();
     }
@@ -522,7 +523,10 @@ internal static class Program
                 InGame: inGame,
                 EntityCount: entityCount,
                 AutoFlask: BuildAutoFlaskView(settings, flaskKeys, autoFlask, belt),
-                Overlay: new PoEformance.Config.OverlayView(overlay.MinLootRarity.ToString()));
+                Overlay: new PoEformance.Config.OverlayView(
+                    overlay.MinLootRarity.ToString(),
+                    overlay.ShowTerrain,
+                    DescribeTerrain(overlayHandle)));
         }
 
         bool Apply(PoEformance.Config.ConfigRequest request)
@@ -568,6 +572,7 @@ internal static class Program
                     if (overlayHandle.Overlay is PoEformance.Overlay.EntityOverlay live)
                     {
                         live.MinimumLootRarity = overlay.MinLootRarity;
+                        live.ShowTerrain = overlay.ShowTerrain;
                     }
 
                     SaveWarning(
@@ -629,6 +634,14 @@ internal static class Program
             Status: engine.LastTick.Reason,
             Slots: slots);
     }
+
+    /// <summary>What the terrain layer currently holds, for the config page.</summary>
+    /// <remarks>
+    /// Terrain populates well after an area loads - a minute or more on a large map - so
+    /// "nothing yet" is a normal state that needs saying rather than an empty box.
+    /// </remarks>
+    private static string DescribeTerrain(OverlayHandle handle)
+        => handle.Overlay is null ? "overlay not running" : handle.Overlay.DescribeTerrain();
 
     /// <summary>The last segment of a metadata path - the readable half of an item name.</summary>
     private static string ShortItemName(string path)

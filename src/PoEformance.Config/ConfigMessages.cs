@@ -49,7 +49,9 @@ public sealed record AutoFlaskView(
 /// compare against and is the last thing anyone wants hidden.
 /// </param>
 public sealed record OverlayView(
-    [property: JsonPropertyName("minLootRarity")] string MinLootRarity);
+    [property: JsonPropertyName("minLootRarity")] string MinLootRarity,
+    [property: JsonPropertyName("showTerrain")] bool ShowTerrain,
+    [property: JsonPropertyName("terrain")] string Terrain);
 
 /// <summary>The host's state push: everything the config page shows.</summary>
 /// <remarks>

@@ -92,7 +92,8 @@ public sealed record WorldSnapshot(
     Vitals? PlayerVitals = null,
     ActiveBuffs? PlayerBuffs = null,
     FlaskBelt? FlaskBelt = null,
-    AreaInfo Area = default)
+    AreaInfo Area = default,
+    TerrainGrid? Terrain = null)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -124,6 +125,7 @@ public sealed class WorldReader
     private readonly CorpseFilter _corpses = new();
     private readonly GroundItemReader _groundItems;
     private readonly WorldAreaReader _areas;
+    private readonly TerrainReader _terrain;
     private readonly int _playerInfo;
     private readonly int _serverData;
     private readonly int _awakeEntities;
@@ -148,6 +150,7 @@ public sealed class WorldReader
         _flasks = new FlaskBeltReader(reader, schema);
         _groundItems = new GroundItemReader(reader, schema);
         _areas = new WorldAreaReader(reader, schema);
+        _terrain = new TerrainReader(reader, schema);
         _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
@@ -340,7 +343,8 @@ public sealed class WorldReader
 
         return new WorldSnapshot(
             true, player, entities, matrix, largeMap, miniMap, playerVitals, playerBuffs, flaskBelt,
-            _areas.Read(chain.WorldData));
+            _areas.Read(chain.WorldData),
+            _terrain.Read(chain.AreaInstance, nowMs));
     }
 
     /// <summary>

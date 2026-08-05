@@ -31,6 +31,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly int _cull;
     private WorldSnapshot _snapshot = WorldSnapshot.Empty;
     private ClientRect _tracked;
+    private readonly TerrainLayer _terrain;
 
     /// <summary>Radius in pixels of an entity dot.</summary>
     private const float DotRadius = 5f;
@@ -60,6 +61,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// classified by path, and it is the class of drop nobody wants filtered.
     /// </remarks>
     public ItemRarity MinimumLootRarity { get; set; } = ItemRarity.Magic;
+
+    /// <summary>Draw the area's layout on the map, including the parts not explored yet.</summary>
+    public bool ShowTerrain { get; set; } = true;
 
     /// <summary>Draw name labels next to dots.</summary>
     public bool ShowLabels { get; set; }
@@ -109,6 +113,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _snapshotSource = snapshotSource;
         _gameWindow = gameWindow;
         _cull = cull;
+
+        // The layer never touches the renderer directly - it is handed the two operations
+        // it needs, which is what keeps its projection maths testable away from a GPU.
+        _terrain = new TerrainLayer(
+            (key, image, srgb) =>
+            {
+                AddOrGetImagePointer(key, image, srgb, out IntPtr handle);
+                return handle;
+            },
+            key => RemoveImage(key));
     }
 
     /// <summary>
@@ -142,6 +156,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         VSync = true;
         return Task.CompletedTask;
+    }
+
+    /// <summary>What the terrain layer holds, for the config page and the status window.</summary>
+    public string DescribeTerrain()
+        => _snapshot.Terrain is null ? "loading" : _terrain.Describe();
+
+    /// <summary>Releases the terrain texture along with the renderer that holds it.</summary>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _terrain.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 
     protected override void Render()
@@ -545,6 +574,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         ImDrawListPtr draw = ImGui.GetBackgroundDrawList();
+
+        // Under the markers: the layout is context, not the thing being looked for.
+        if (ShowTerrain && _snapshot.Terrain is TerrainGrid terrain)
+        {
+            _terrain.Draw(draw, map, terrain, new Vector3(player.WorldX, player.WorldY, player.TerrainHeight));
+        }
+
         float radius = map.IsLargeMap ? 3.5f : 2.5f;
 
         foreach (WorldEntity entity in _snapshot.Entities)

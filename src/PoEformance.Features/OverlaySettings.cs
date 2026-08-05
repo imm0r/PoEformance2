@@ -11,11 +11,13 @@ namespace PoEformance.Features;
 /// being that as soon as it has two features in it.
 /// </remarks>
 public sealed record OverlaySettings(
-    [property: JsonPropertyName("minLootRarity")] ItemRarity MinLootRarity)
+    [property: JsonPropertyName("minLootRarity")] ItemRarity MinLootRarity,
+    [property: JsonPropertyName("showTerrain")] bool ShowTerrain = true)
 {
     /// <summary>
-    /// Magic and above. Path of Exile 2 drops normal-rarity items faster than they can be
-    /// read, so marking all of them buries the drops worth walking to.
+    /// Magic and above, and the layout shown. Path of Exile 2 drops normal-rarity items
+    /// faster than they can be read, so marking all of them buries the drops worth walking
+    /// to; the layout is the reason to look at the map at all.
     /// </summary>
     public static OverlaySettings Default { get; } = new(ItemRarity.Magic);
 
@@ -28,7 +30,7 @@ public sealed record OverlaySettings(
     public OverlaySettings Normalised() => MinLootRarity switch
     {
         ItemRarity.Normal or ItemRarity.Magic or ItemRarity.Rare or ItemRarity.Unique => this,
-        _ => Default,
+        _ => this with { MinLootRarity = Default.MinLootRarity },
     };
 }
 

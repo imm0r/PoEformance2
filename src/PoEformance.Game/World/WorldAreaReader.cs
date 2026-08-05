@@ -22,17 +22,23 @@ public readonly record struct AreaInfo(string Id, string Name, int Act, bool IsT
     /// True for campaign content: an act zone rather than an endgame map.
     /// </summary>
     /// <remarks>
-    /// TWO clauses, and the second is a safety net rather than a refinement. The act number
-    /// is the real signal - a campaign area belongs to an act, e.g. Abyss_Hub reports act 2
-    /// - but what an endgame MAP reports has not been observed yet. If it also carries a
-    /// non-zero act, the act test alone would hide the overlay exactly where it is wanted,
-    /// so map ids are excluded outright as well.
+    /// Two observations, and they are what this is built on rather than a guess: a campaign
+    /// area reports its own act (Abyss_Hub, act 2), and an endgame map reports act 10
+    /// (MapOvergrown, a T6). Act 10 is evidently the endgame bucket, not an act anybody
+    /// plays through - so campaign content is the range BETWEEN, and both ends are excluded.
     ///
-    /// Either clause on its own would be a guess; together they are wrong only for an
-    /// endgame area that both belongs to an act AND is not named Map*. Collapse this to the
-    /// act alone once a real map has been seen to report act 0.
+    /// The id test stays alongside it because one map is one sample. Either signal alone
+    /// would be a guess; together they only have to be right about the same area once.
+    ///
+    /// The bias is deliberate and asymmetric. Hiding the overlay in endgame content is the
+    /// failure that brought this feature about; showing it in a campaign zone is a mild
+    /// annoyance. So anything that is not clearly campaign keeps its markers.
     /// </remarks>
-    public bool IsCampaign => Act >= 1 && !Id.StartsWith("Map", StringComparison.OrdinalIgnoreCase);
+    public bool IsCampaign
+        => Act is >= 1 and < EndgameAct && !Id.StartsWith("Map", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>The act number endgame areas report - observed on a T6 map, not an act played.</summary>
+    private const int EndgameAct = 10;
 
     /// <summary>
     /// Whether the overlay should mark anything here.

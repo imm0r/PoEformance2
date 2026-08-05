@@ -1,0 +1,220 @@
+using PoEformance.Core.Memory;
+using PoEformance.Core.Schema;
+
+namespace PoEformance.Game.World;
+
+/// <summary>
+/// The area's walkability, one bit of information per half-metre of ground.
+/// </summary>
+/// <remarks>
+/// Two cells per byte: even x in the low nibble, odd x in the high one, and a non-zero
+/// nibble means walkable. That packing is why <see cref="Width"/> is twice the row stride
+/// and why nothing here indexes the raw array directly.
+///
+/// Immutable once built. An area's terrain does not change while it is loaded, so this is
+/// read once and then shared across threads without a lock.
+/// </remarks>
+public sealed class TerrainGrid
+{
+    private readonly byte[] _cells;
+    private readonly int _bytesPerRow;
+
+    public TerrainGrid(byte[] cells, int bytesPerRow, int height)
+    {
+        ArgumentNullException.ThrowIfNull(cells);
+        _cells = cells;
+        _bytesPerRow = bytesPerRow;
+        Width = bytesPerRow * 2;
+        Height = height;
+    }
+
+    /// <summary>Grid cells across. Two per byte of the row stride.</summary>
+    public int Width { get; }
+
+    /// <summary>Grid cells down - one per row of the packed data.</summary>
+    public int Height { get; }
+
+    /// <summary>True when this cell can be walked on. Outside the grid counts as solid.</summary>
+    public bool IsWalkable(int x, int y)
+    {
+        if ((uint)x >= (uint)Width || (uint)y >= (uint)Height)
+        {
+            return false;
+        }
+
+        int index = (y * _bytesPerRow) + (x >> 1);
+        if ((uint)index >= (uint)_cells.Length)
+        {
+            return false;
+        }
+
+        byte packed = _cells[index];
+        return ((x & 1) == 0 ? packed & 0x0F : packed >> 4) != 0;
+    }
+
+    /// <summary>
+    /// Marks the boundary between walkable ground and everything else.
+    /// </summary>
+    /// <remarks>
+    /// An OUTLINE rather than a filled area, because the result is drawn on top of the
+    /// game's own map: filling every walkable cell would cover the map with a solid sheet
+    /// and hide what it is drawn over. The boundary is the useful part anyway - it is the
+    /// shape of the level, which is the thing a map is being consulted for.
+    ///
+    /// A cell is on the boundary when it is walkable and at least one of its four
+    /// neighbours is not, so the line lands just INSIDE the walkable area and the drawn
+    /// shape is the floor rather than the wall.
+    /// </remarks>
+    public byte[] BuildOutline()
+    {
+        var mask = new byte[Width * Height];
+        for (int y = 0; y < Height; y++)
+        {
+            int row = y * Width;
+            for (int x = 0; x < Width; x++)
+            {
+                if (IsWalkable(x, y)
+                    && (!IsWalkable(x - 1, y) || !IsWalkable(x + 1, y)
+                        || !IsWalkable(x, y - 1) || !IsWalkable(x, y + 1)))
+                {
+                    mask[row + x] = 1;
+                }
+            }
+        }
+
+        return mask;
+    }
+}
+
+/// <summary>
+/// Reads the area's walkable grid, once per area.
+/// </summary>
+/// <remarks>
+/// The grid is megabytes, so it is read on an area change and then reused - the alternative
+/// is a multi-megabyte copy per frame for data that cannot change.
+///
+/// It is also NOT there immediately. Terrain populates after the area loads, and on a large
+/// map that can take a minute or more; both vector pointers reading null is the normal
+/// "still loading" state rather than a failure, so it retries quietly instead of reporting
+/// an error nobody can act on.
+///
+/// The metadata is an INLINE struct at AreaInstance + TerrainMetadata, not a pointer to
+/// follow - dereferencing it lands somewhere unrelated and reads plausible nonsense.
+/// </remarks>
+public sealed class TerrainReader
+{
+    /// <summary>How long to wait before trying again while terrain is still loading.</summary>
+    private const int RetryMs = 1500;
+
+    private const long MinDataSize = 64;
+    private const long MaxDataSize = 32 * 1024 * 1024;
+
+    private readonly IMemoryReader _reader;
+    private readonly int _terrainMetadata;
+    private readonly int _walkableData;
+    private readonly int _bytesPerRow;
+    private readonly int _areaHash;
+
+    private TerrainGrid? _grid;
+    private uint _gridArea;
+    private long _nextAttempt;
+
+    /// <summary>Why the last attempt produced nothing, for the status readout.</summary>
+    public string LastError { get; private set; } = string.Empty;
+
+    public TerrainReader(IMemoryReader reader, OffsetSchema schema)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+        ArgumentNullException.ThrowIfNull(schema);
+        _reader = reader;
+
+        StructDef area = schema.Structs["AreaInstance"];
+        _terrainMetadata = area.OffsetOf("TerrainMetadata");
+        _areaHash = area.OffsetOf("CurrentAreaHash");
+
+        StructDef terrain = schema.Structs["TerrainMetadata"];
+        _walkableData = terrain.OffsetOf("GridWalkableData");
+        _bytesPerRow = terrain.OffsetOf("BytesPerRow");
+    }
+
+    /// <summary>
+    /// The current area's grid, or null while it is still loading.
+    /// </summary>
+    /// <param name="nowMs">A monotonic clock, so the retry pause is testable.</param>
+    public TerrainGrid? Read(ulong areaInstance, long nowMs)
+    {
+        if (!MemoryReaderExtensions.IsPlausiblePointer(areaInstance))
+        {
+            return null;
+        }
+
+        uint area = _reader.Read<uint>(areaInstance + (ulong)_areaHash);
+        if (_grid is not null && area == _gridArea)
+        {
+            return _grid;
+        }
+
+        if (nowMs < _nextAttempt)
+        {
+            return null;
+        }
+
+        _nextAttempt = nowMs + RetryMs;
+        TerrainGrid? grid = Load(areaInstance + (ulong)_terrainMetadata);
+        if (grid is null)
+        {
+            return null;
+        }
+
+        _grid = grid;
+        _gridArea = area;
+        return grid;
+    }
+
+    private TerrainGrid? Load(ulong terrainBase)
+    {
+        ulong first = _reader.ReadPointer(terrainBase + (ulong)_walkableData);
+        ulong last = _reader.ReadPointer(terrainBase + (ulong)_walkableData + 8);
+        if (first == 0 || last <= first)
+        {
+            // The ordinary state right after a zone change, not a fault.
+            LastError = "loading";
+            return null;
+        }
+
+        long dataSize = (long)(last - first);
+        if (dataSize is < MinDataSize or > MaxDataSize)
+        {
+            LastError = $"implausible size {dataSize}";
+            return null;
+        }
+
+        // The row stride has to DIVIDE the data and leave a sane number of rows. Checking
+        // that rather than trusting the field is what turns a drifted offset into a clear
+        // "no" instead of a grid with the right area and the wrong shape - which would draw
+        // a convincing, completely wrong map.
+        int stride = _reader.Read<int>(terrainBase + (ulong)_bytesPerRow);
+        if (stride is <= 1 or > 16384 || dataSize % stride != 0)
+        {
+            LastError = $"bad row stride {stride} for {dataSize} bytes";
+            return null;
+        }
+
+        long rows = dataSize / stride;
+        if (rows is < 16 or > 32768)
+        {
+            LastError = $"implausible row count {rows}";
+            return null;
+        }
+
+        var cells = new byte[dataSize];
+        if (!_reader.TryRead(first, cells))
+        {
+            LastError = "grid read failed";
+            return null;
+        }
+
+        LastError = string.Empty;
+        return new TerrainGrid(cells, stride, (int)rows);
+    }
+}

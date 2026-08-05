@@ -11,8 +11,10 @@ public class WorldAreaTests
 {
     [Theory]
     // id,                 act, town,  hideout, markers wanted
+    [InlineData("MapOvergrown", 10, false, false, true)]  // a real T6, reported by the owner
     [InlineData("MapRiverhold", 0, false, false, true)]   // endgame, the case this exists for
     [InlineData("MapBluff", 2, false, false, true)]       // a map that DOES report an act still counts
+    [InlineData("Trial_Sekhema", 10, false, false, true)] // endgame that is not named Map*
     [InlineData("Abyss_Hub", 2, false, false, false)]     // a real campaign area, reported by the owner
     [InlineData("G1_2", 1, false, false, false)]          // act zone
     [InlineData("G1_town", 1, true, false, false)]        // town
@@ -23,14 +25,24 @@ public class WorldAreaTests
     }
 
     [Fact]
-    public void AMapKeepsItsMarkersEvenIfItReportsAnAct()
+    public void AnEndgameMapReportsActTen_NotActZero()
     {
-        // The act number is the real signal for campaign content, but what an endgame map
-        // reports has not been observed. Excluding map ids outright is the safety net: if
-        // maps do carry an act, the act test alone would hide the overlay exactly where it
-        // is wanted, which is the one outcome worse than showing it too often.
-        Assert.False(new AreaInfo("MapRiverhold", "Riverhold", 2, false, false).IsCampaign);
+        // The observation that decided the rule. A T6 came back as MapOvergrown, act 10 -
+        // so "belongs to an act" does NOT separate campaign from endgame, and a rule built
+        // on the act alone would have hidden the overlay in exactly the content it is for.
+        Assert.False(new AreaInfo("MapOvergrown", "Overgrown", 10, false, false).IsCampaign);
         Assert.True(new AreaInfo("Abyss_Hub", "The Well of Souls", 2, false, false).IsCampaign);
+    }
+
+    [Fact]
+    public void BothSignalsHaveToAgreeBeforeAnythingIsHidden()
+    {
+        // Asymmetric on purpose: hiding the overlay in endgame content is the failure this
+        // feature exists to avoid, while showing it in a campaign zone is a mild annoyance.
+        // So either signal saying "endgame" is enough to keep the markers.
+        Assert.False(new AreaInfo("MapBluff", "Bluff", 2, false, false).IsCampaign);        // id says map
+        Assert.False(new AreaInfo("Trial_Sekhema", "Trial", 10, false, false).IsCampaign);  // act says endgame
+        Assert.True(new AreaInfo("G1_2", "Clearfell", 1, false, false).IsCampaign);         // neither does
     }
 
     [Fact]
