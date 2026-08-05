@@ -183,11 +183,13 @@ public class AutoFlaskTests
         => new([new ActiveBuff("flask_effect_life", timeLeft, 5f, 0, slot, IsFlask: true)]);
 
     [Fact]
-    public void DoesNotFire_WhenTheFlaskHasTooFewCharges()
+    public void EmptyFlask_IsSkippedWithoutBurningItsCooldown()
     {
-        // Pressing an empty flask does nothing in game but WOULD start the cooldown here,
-        // so an empty flask would quietly suppress its own slot. Hence the check comes
-        // before the cooldown is stamped.
+        // The game ignores a press with too few charges outright - nothing triggers and no
+        // in-game cooldown starts. What must not happen is OUR side recording a use that
+        // never occurred: the rule would then sit out its own cooldown, and a refill during
+        // that window would go unused. Skipping without stamping is what the second half of
+        // this test checks.
         AutoFlask engine = Engine(new FlaskRule("life", VitalKind.Life, 65, Key: 0x31) { Slot = 1 });
         FlaskBelt empty = Belt(new EquippedFlask(1, "Metadata/Items/Flasks/X", Charges: 5, ChargesPerUse: 20));
 

@@ -196,9 +196,13 @@ public sealed class AutoFlask
                 continue;
             }
 
-            // Not enough charges to use. Checked BEFORE the cooldown is stamped, because
-            // pressing an empty flask does nothing in game while still starting the
-            // cooldown here - which would leave the slot suppressed for no reason.
+            // Not enough charges. The GAME would simply ignore the press - nothing
+            // triggers, no charge is spent, no in-game cooldown starts - so this gate is
+            // not about protecting the game from us. It protects OUR OWN state: firing
+            // anyway would stamp _lastUsed below and record a use that never happened,
+            // and this rule would then sit out its cooldown. If the charges come back
+            // during that window, the flask stays unused for no reason. Skipping without
+            // stamping means the very next tick after a refill can fire.
             if (rule.Slot > 0 && belt.InSlot(rule.Slot) is EquippedFlask flask && !flask.CanUse)
             {
                 blocked.Add($"{rule.Name}: {flask.Charges}/{flask.ChargesPerUse} charges");

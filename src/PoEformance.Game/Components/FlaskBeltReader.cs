@@ -15,10 +15,10 @@ public readonly record struct EquippedFlask(int Slot, string Path, int Charges, 
     /// Whether pressing this flask's key would actually do anything.
     /// </summary>
     /// <remarks>
-    /// The question worth asking before every press. Without it the engine "uses" an empty
-    /// flask: the key goes out, the game ignores it, and the cooldown then suppresses the
-    /// flask that COULD have fired - so an empty utility flask quietly disables its own
-    /// slot for as long as it stays empty.
+    /// The GAME is forgiving here: too few charges means the flask simply does not trigger.
+    /// No charge is spent and no in-game cooldown starts, so hammering the key costs
+    /// nothing. The reason to check anyway is OUR OWN bookkeeping - see the charge gate in
+    /// AutoFlask, which must not record a use that never happened.
     /// </remarks>
     public bool CanUse => ChargesPerUse > 0 && Charges >= ChargesPerUse;
 }
