@@ -131,6 +131,49 @@ public class AutoFlaskTests
     }
 
     [Fact]
+    public void OneLifeBuild_IsAliveAndStillFlasksOffMana()
+    {
+        // A real user's character: Chaos Inoculation pins maximum life at 1, and Eldritch
+        // Battery folds energy shield into mana, so the readout is "life 1/1 (100), es -"
+        // and every hit comes off MANA. That looked broken enough that it was reported as a
+        // bug, so it is pinned here as the correct reading it is.
+        //
+        // The trap is the dead guard. It exists because zero life reads as the most urgent
+        // emergency possible, and it must key off life being GONE, not life being low -
+        // one maximum life is a permanent state for this build, not a dying character.
+        var oneLife = new Vitals(
+            Life: new Vital(1, 1, 0, 0),
+            Mana: new Vital(1127, 5415, 0, 0),
+            EnergyShield: new Vital(0, 0, 0, 0));
+
+        Assert.False(oneLife.IsDeadOrUnloaded);
+        Assert.Equal(100, oneLife.Life.Percent);
+        Assert.Equal(-1, oneLife.EnergyShield.Percent);   // no pool, not an empty one
+
+        AutoFlask engine = Engine(new FlaskRule("mana", VitalKind.Mana, 30, Key: 0x32) { Slot = 2 });
+        FlaskUse use = Assert.Single(engine.Evaluate(oneLife, gameFocused: true, 1000).Used);
+        Assert.Equal(21, use.Percent);   // the same 21% the overlay showed on that character
+
+        // Dying still stops it - the guard is intact, it just is not tripped by CI.
+        Assert.True(new Vitals(new Vital(0, 1, 0, 0), oneLife.Mana, default).IsDeadOrUnloaded);
+    }
+
+    [Fact]
+    public void EnergyShieldRule_OnABuildWithNoShield_ReportsThePoolRatherThanFiring()
+    {
+        // The other half of that build: a rule pointed at a pool that does not exist must
+        // say so, not read the empty pool as 0% and empty the belt into it.
+        AutoFlask engine = Engine(new FlaskRule("es", VitalKind.EnergyShield, 50, Key: 0x33));
+
+        FlaskTick tick = engine.Evaluate(
+            new Vitals(new Vital(1, 1, 0, 0), new Vital(100, 100, 0, 0), new Vital(0, 0, 0, 0)),
+            gameFocused: true, nowMs: 1000);
+
+        Assert.Empty(tick.Used);
+        Assert.Contains("no energyshield pool", tick.Reason, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void ManaFlask_RespectsReservation()
     {
         // The end-to-end version of the arithmetic test: with 50% of mana reserved and the
