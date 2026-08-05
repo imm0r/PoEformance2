@@ -320,7 +320,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 if (_snapshot.FlaskBelt is FlaskBelt belt && !belt.IsUnknown)
                 {
                     ImGui.Text("belt:     " + string.Join("   ", belt.Flasks.Select(f =>
-                        $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}{(f.CanUse ? string.Empty : " (empty)")}")));
+                        $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}"
+                        + (f.IsCharm ? " (charm)" : f.CanUse ? string.Empty : " (empty)"))));
                 }
                 else
                 {

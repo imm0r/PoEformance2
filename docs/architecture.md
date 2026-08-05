@@ -216,4 +216,22 @@ Two of the three follow-ups are now closed:
   reflection-based JSON is exactly what dies silently under AOT.
 - **Threading — RESOLVED.** See the threading model above.
 
-Remaining: features on top of the slice — what to draw, and configuring it.
+**Auto-flask — the first feature on the slice**, and a useful record of what "read a
+value and press a key" actually involves. The threshold is the easy part; what took the
+work was everything around it:
+
+- the percentage is measured against the UNRESERVED pool, not the maximum. With half of
+  mana reserved by auras a full globe reads 50% against the max, so any threshold below
+  that fires forever.
+- flasks are found by CONTENT, not by inventory id — the id moves between patches, "the
+  inventory full of flasks" does not.
+- the item list holds one entry per occupied grid cell, so items must be deduped by
+  entity pointer or a two-cell flask appears twice.
+- charms share the belt and the `Flasks/` path but the game triggers them itself, so
+  they are belt contents without being pressable.
+- an active flask buff carries its belt SLOT, which answers "is this flask still doing
+  its job" as fact where a cooldown only guesses.
+- input is gated on the game having focus, in the DECISION rather than in the code that
+  presses keys, so no future caller can bypass it.
+
+Remaining: more features on top of the slice, and configuring them from the page.

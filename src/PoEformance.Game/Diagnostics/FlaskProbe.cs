@@ -170,8 +170,14 @@ public sealed class FlaskProbe
         output.WriteLine($"  RESULT  {belt.Flasks.Count} flasks");
         foreach (EquippedFlask flask in belt.Flasks)
         {
+            // "usable" means a keypress would do something, so a charm is never usable
+            // however full it is - the game triggers those itself.
+            string usability = flask.IsCharm
+                ? "charm (self-triggering)"
+                : flask.CanUse ? "usable" : "NOT usable";
+
             output.WriteLine($"    slot {flask.Slot}  {flask.Charges,4}/{flask.ChargesPerUse,-4} charges"
-                + $"  {(flask.CanUse ? "usable" : "NOT usable")}  {Shorten(flask.Path)}");
+                + $"  {usability,-24}  {Shorten(flask.Path)}");
         }
     }
 
