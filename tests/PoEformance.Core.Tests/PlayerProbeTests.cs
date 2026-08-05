@@ -136,7 +136,7 @@ public class PlayerProbeTests
         // real proof guards against.
         OffsetSchema schema = LoadSchema();
         float[] wrong = (float[])Identity.Clone();
-        wrong[3] = 0.9f; // large x translation in clip space -> off to the side
+        wrong[12] = 0.9f; // column-major x-translation -> shifts the player off to the side
         FakeMemoryReader fake = BuildInGameWorld(schema, 0, 0, 0, wrong);
 
         PlayerProbeResult r = new PlayerProbe(fake, schema).Probe(GameStatesStatic);

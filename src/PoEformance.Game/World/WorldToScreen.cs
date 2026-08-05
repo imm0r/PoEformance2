@@ -26,9 +26,16 @@ public static class WorldToScreen
 {
     /// <summary>
     /// Projects (<paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>) through
-    /// the 16-float row-major <paramref name="matrix"/> onto a
+    /// the 16-float <paramref name="matrix"/> onto a
     /// <paramref name="width"/> x <paramref name="height"/> viewport.
     /// </summary>
+    /// <remarks>
+    /// The matrix is stored COLUMN-MAJOR in memory (proven 2026-08 by projecting the real
+    /// player position: only the column convention put it at screen centre, NDC (0,0), where
+    /// the camera-following-player guarantees it must be; the row-major reading was 0.64 off).
+    /// So a clip component is a DOT WITH A COLUMN of the flat array:
+    /// element indices {0,4,8,12} for x, {1,5,9,13} for y, {3,7,11,15} for w.
+    /// </remarks>
     public static ScreenPoint Project(ReadOnlySpan<float> matrix, float x, float y, float z, int width, int height)
     {
         if (matrix.Length < 16)
@@ -36,10 +43,10 @@ public static class WorldToScreen
             return new ScreenPoint(0, 0, false);
         }
 
-        // Row-major M * (x, y, z, 1).
-        double cx = ((double)matrix[0] * x) + ((double)matrix[1] * y) + ((double)matrix[2] * z) + matrix[3];
-        double cy = ((double)matrix[4] * x) + ((double)matrix[5] * y) + ((double)matrix[6] * z) + matrix[7];
-        double cw = ((double)matrix[12] * x) + ((double)matrix[13] * y) + ((double)matrix[14] * z) + matrix[15];
+        // Column-major: clip.i = matrix[column i] . (x, y, z, 1).
+        double cx = ((double)matrix[0] * x) + ((double)matrix[4] * y) + ((double)matrix[8] * z) + matrix[12];
+        double cy = ((double)matrix[1] * x) + ((double)matrix[5] * y) + ((double)matrix[9] * z) + matrix[13];
+        double cw = ((double)matrix[3] * x) + ((double)matrix[7] * y) + ((double)matrix[11] * z) + matrix[15];
 
         if (cw <= 1e-6)
         {

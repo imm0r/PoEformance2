@@ -128,4 +128,57 @@ public class RealSessionTests
         Assert.Equal(0.466531f, replay.Read<float>(wRow), 4);      // real captured value
         Assert.Equal(0.751464f, replay.Read<float>(wRow + 8), 4);
     }
+
+    /// <summary>The richer session that captured the player's components + Render position.</summary>
+    private static string PlayerFixturePath
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+            {
+                dir = dir.Parent;
+            }
+
+            return Path.Combine(dir!.FullName, "tests", "fixtures", "session-2026-08-player.rec");
+        }
+    }
+
+    [Fact]
+    public void RealPlayer_HasEveryExpectedComponent()
+    {
+        // The int32-index fix: a real player carries a dozen-plus components, not the 3
+        // that survived the int64 mis-read.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(PlayerFixturePath));
+        OffsetSchema schema = LoadSchema();
+        var chain = GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
+
+        PoEformance.Game.Entities.Entity? player = new PoEformance.Game.Entities.EntityReader(replay, schema).Read(chain.PlayerEntity);
+        Assert.NotNull(player);
+        Assert.True(player!.Components.Count >= 12, $"only {player.Components.Count} components");
+        foreach (string expected in (string[])["Render", "Life", "Positioned", "Actor", "Player", "Stats"])
+        {
+            Assert.True(player.Has(expected), $"player missing {expected} component");
+        }
+    }
+
+    [Fact]
+    public void RealPlayer_ProjectsToScreenCentre_TheMatrixProof()
+    {
+        // The decisive, end-to-end proof against real memory: resolve the player, read its
+        // Render position, project through the column-major matrix - the camera follows the
+        // player, so it MUST land at screen centre (NDC ~0). This is what "MATRIX PROVEN"
+        // means, pinned as a regression.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(PlayerFixturePath));
+        OffsetSchema schema = LoadSchema();
+
+        PoEformance.Game.Diagnostics.PlayerProbeResult r =
+            new PoEformance.Game.Diagnostics.PlayerProbe(replay, schema).Probe(replay.ResolvedStatics["GameStates"]);
+
+        Assert.True(r.InGame);
+        Assert.True(r.HasRender);
+        Assert.True(r.Projected);
+        Assert.True(r.ProjectsToCentre, $"NDC magnitude was {r.NdcMagnitude:F3}, expected ~0");
+        Assert.True(r.NdcMagnitude < 0.02, $"NDC magnitude {r.NdcMagnitude:F4}");
+    }
 }
