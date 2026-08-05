@@ -134,7 +134,10 @@
         "Flags": { "offset": "0x180", "type": "u32", "comment": "Bit 10 = ShouldModifyPos, bit 11 = IsVisible. Visibility is only meaningful with the whole parent chain visible too." },
         "ScaleIndex": { "offset": "0x18A", "type": "u8", "comment": "Selects which scale pair applies: 1 -> (v1,v1), 2 -> (v2,v2), 3 -> (v1,v2), anything else -> unscaled." },
         "UnscaledSize": { "offset": "0x288", "type": "f32", "comment": "StdTuple2D<float>, y at +0x28C. Size in UI space, scaled the same way as the position." },
-        "ItemPtr": { "offset": "0x4F8", "type": "ptr", "comment": "The item entity held by an inventory/stash slot element, 0 elsewhere." }
+        "ItemPtr": { "offset": "0x4F8", "type": "ptr", "comment": "The item entity held by an inventory/stash slot element, 0 elsewhere." },
+        "TextPtr": { "offset": "0x390", "type": "ptr", "comment": "StdWString - the text the element DISPLAYS. The identifying field for every widget whose StringId is empty (skill-bar slots, loot labels, dialogue rows), which is most of them: a UI browser without it shows a tree of blanks. AHK-verified live 2026-06-14." },
+        "TextStylePtr": { "offset": "0x0F8", "type": "ptr", "comment": "StdWString - font style descriptor (\"Normal\", \"PathOfExile.Panel.Title\"). Named here because 0x0F8 is where StringIdPtr sat in 0.4.x, so a browser reading the old layout shows these as ids - the mistake this field makes obvious instead of puzzling." },
+        "FontNamePtr": { "offset": "0x0C8", "type": "ptr", "comment": "StdWString - font family (\"Fontin\", \"Fontin Smallcaps\")." }
       },
       "consts": {
         "BaseResolutionX": "2560",

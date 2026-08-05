@@ -1,0 +1,381 @@
+using System.Numerics;
+using PoEformance.Core.Schema;
+using PoEformance.Game.Ui;
+
+namespace PoEformance.Core.Tests;
+
+/// <summary>
+/// Browsing the interface tree: positions, visibility, hit-testing, search and paths.
+/// </summary>
+/// <remarks>
+/// Built against the SHIPPED schema, so an offset that drifts fails here rather than showing
+/// a browser full of plausible nonsense - which is the failure mode that matters for a
+/// reverse-engineering tool, since its whole job is to be believed.
+/// </remarks>
+public class UiTreeReaderTests
+{
+    private const ulong Base = 0x0000_0300_0000_0000;
+    private const ulong Strings = 0x0000_0300_1000_0000;
+    private const ulong Arrays = 0x0000_0300_2000_0000;
+
+    private const uint FlagVisible = 0x800;
+    private const uint FlagModifyPos = 0x400;
+
+    /// <summary>Element n lives here - spaced far enough apart to hold a whole struct.</summary>
+    private static ulong At(int index) => Base + ((ulong)index * 0x1000);
+
+    /// <summary>
+    /// Lays one UiElement into fake memory, at every offset the schema names.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately built through the schema rather than with hand-written constants: a
+    /// fixture with its own copy of the offsets would keep passing after the real ones move,
+    /// which is the one thing these tests exist to catch.
+    /// </remarks>
+    private sealed class Tree
+    {
+        private readonly FakeMemoryReader _fake = new();
+        private readonly StructDef _ui;
+        private ulong _stringCursor = Strings;
+        private ulong _arrayCursor = Arrays;
+
+        public Tree(OffsetSchema schema) => _ui = schema.Structs["UiElementBase"];
+
+        public FakeMemoryReader Reader => _fake;
+
+        public Tree Add(
+            int index,
+            int parent = -1,
+            string stringId = "",
+            string text = "",
+            bool visible = true,
+            bool modifiesPosition = false,
+            Vector2 relative = default,
+            Vector2 size = default,
+            byte scaleIndex = 2,
+            float multiplier = 1f,
+            Vector2 positionModifier = default,
+            params int[] children)
+        {
+            ulong address = At(index);
+
+            _fake.Place<ulong>(address + (ulong)_ui.OffsetOf("Self"), address);
+            _fake.Place<ulong>(address + (ulong)_ui.OffsetOf("ParentPtr"), parent >= 0 ? At(parent) : 0UL);
+            _fake.Place<uint>(
+                address + (ulong)_ui.OffsetOf("Flags"),
+                (visible ? FlagVisible : 0u) | (modifiesPosition ? FlagModifyPos : 0u));
+            _fake.Place(address + (ulong)_ui.OffsetOf("ScaleIndex"), scaleIndex);
+            _fake.Place(address + (ulong)_ui.OffsetOf("LocalScaleMultiplier"), multiplier);
+            PlaceVector(address + (ulong)_ui.OffsetOf("RelativePosition"), relative);
+            PlaceVector(address + (ulong)_ui.OffsetOf("UnscaledSize"), size);
+            PlaceVector(address + (ulong)_ui.OffsetOf("PositionModifier"), positionModifier);
+            PlaceString(address + (ulong)_ui.OffsetOf("StringIdPtr"), stringId);
+            PlaceString(address + (ulong)_ui.OffsetOf("TextPtr"), text);
+
+            if (children.Length > 0)
+            {
+                ulong array = _arrayCursor;
+                _arrayCursor += (ulong)(children.Length * 8) + 64;
+
+                for (int i = 0; i < children.Length; i++)
+                {
+                    _fake.Place<ulong>(array + (ulong)(i * 8), At(children[i]));
+                }
+
+                _fake.Place<ulong>(address + (ulong)_ui.OffsetOf("ChildrenFirst"), array);
+                _fake.Place<ulong>(address + (ulong)_ui.OffsetOf("ChildrenLast"), array + (ulong)(children.Length * 8));
+            }
+
+            return this;
+        }
+
+        private void PlaceVector(ulong address, Vector2 value)
+        {
+            _fake.Place(address, value.X);
+            _fake.Place(address + 4, value.Y);
+        }
+
+        private void PlaceString(ulong address, string text)
+        {
+            if (text.Length == 0)
+            {
+                _fake.Place(address, new byte[32]); // an empty, valid header
+                return;
+            }
+
+            _fake.PlaceStdWString(address, text, _stringCursor);
+            _stringCursor += 1024;
+        }
+    }
+
+    private static OffsetSchema Schema() => RealSessionTests.Schema();
+
+    /// <summary>A 16:10 window, where both scale factors are 1 - so positions read directly.</summary>
+    private static UiScale Window() => new(2560, 1600, 0);
+
+    [Theory]
+    // 16:10 with no letterbox, where BOTH scale factors are 1. A test that only ran this
+    // would pass with the scale-space conversion deleted, because at this aspect ratio there
+    // is nothing to convert - the exact shape of bug that only appears on someone else's
+    // monitor.
+    [InlineData(2560, 1600, 0)]
+    // 16:9: width factor 1, height factor 0.9. Now the two spaces genuinely differ.
+    [InlineData(2560, 1440, 0)]
+    // Ultrawide with real letterbox bars, so the cull shift is in play as well.
+    [InlineData(3440, 1440, 128)]
+    public void DescendingAgreesWithClimbing(int width, int height, int cull)
+    {
+        // THE invariant. UiElementReader resolves one element by walking UP its parents;
+        // the browser walks DOWN so each node costs a fixed handful of reads instead of
+        // re-reading every ancestor. Two implementations of the same accumulation is exactly
+        // the arrangement that drifts apart, and a browser whose rectangles disagree with the
+        // map's is worse than no browser - it would be believed.
+        //
+        // The chain exercises every rule that is easy to drop: a child that opts into its
+        // parent's position modifier, a child with a different multiplier, and a child on
+        // scale index 3, which takes one factor per axis.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, relative: new Vector2(100, 50), positionModifier: new Vector2(7, 3), children: [1])
+            .Add(1, parent: 0, relative: new Vector2(20, 10), modifiesPosition: true, children: [2])
+            .Add(2, parent: 1, relative: new Vector2(5, 5), scaleIndex: 1, multiplier: 2f, children: [3])
+            .Add(3, parent: 2, relative: new Vector2(9, 4), scaleIndex: 3);
+
+        var elements = new UiElementReader(tree.Reader, schema);
+        var browser = new UiTreeReader(tree.Reader, schema);
+        var scale = new UiScale(width, height, cull);
+
+        Dictionary<ulong, UiNode> nodes = browser.ReadTree(
+            At(0), scale, new HashSet<ulong> { At(0), At(1), At(2) });
+
+        Assert.Equal(4, nodes.Count);
+        foreach ((ulong address, UiNode node) in nodes)
+        {
+            UiElement? climbed = elements.Read(address, scale);
+            Assert.NotNull(climbed);
+            Assert.Equal(climbed!.Position.X, node.Position.X, 3);
+            Assert.Equal(climbed.Position.Y, node.Position.Y, 3);
+        }
+
+        // ...and the deepest element really is somewhere non-trivial, so the agreement above
+        // is not two implementations agreeing on zero.
+        Assert.NotEqual(0f, nodes[At(3)].Position.X);
+        Assert.NotEqual(0f, nodes[At(3)].Position.Y);
+    }
+
+    [Fact]
+    public void OnlyExpandedNodesAreRead()
+    {
+        // The tree IS the request: what gets read follows what the user opened, not the size
+        // of the interface. The game's root has over a hundred children, each with their own,
+        // so reading eagerly would read the whole game's UI to show one collapsed row.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, stringId: "root", children: [1, 2])
+            .Add(1, parent: 0, stringId: "open", children: [3])
+            .Add(2, parent: 0, stringId: "closed", children: [4])
+            .Add(3, parent: 1, stringId: "under-open")
+            .Add(4, parent: 2, stringId: "under-closed");
+
+        Dictionary<ulong, UiNode> nodes = new UiTreeReader(tree.Reader, schema)
+            .ReadTree(At(0), Window(), new HashSet<ulong> { At(0), At(1) });
+
+        Assert.Contains(At(3), nodes.Keys);       // under the opened node
+        Assert.DoesNotContain(At(4), nodes.Keys); // under the closed one
+
+        // ...and the closed node still advertises that there is something inside it, or the
+        // tree would show it as a leaf and there would be no way in.
+        Assert.Equal(1, nodes[At(2)].ChildCount);
+    }
+
+    [Fact]
+    public void AHiddenAncestorHidesTheChild()
+    {
+        // The two halves are reported separately on purpose: which of them is false is the
+        // answer to "why is this not on screen", and a single boolean cannot say.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, children: [1])
+            .Add(1, parent: 0, visible: false, children: [2])
+            .Add(2, parent: 1, visible: true);
+
+        Dictionary<ulong, UiNode> nodes = new UiTreeReader(tree.Reader, schema)
+            .ReadTree(At(0), Window(), new HashSet<ulong> { At(0), At(1) });
+
+        Assert.False(nodes[At(2)].Visible);
+        Assert.True(nodes[At(2)].SelfVisible);
+    }
+
+    [Fact]
+    public void HitTestReturnsTheChainToTheDeepestElement()
+    {
+        // The chain rather than the leaf, because the browser has to open the tree down to
+        // what was picked - and because the path is usually the interesting part.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, stringId: "root", size: new Vector2(2560, 1600), children: [1])
+            .Add(1, parent: 0, stringId: "panel", relative: new Vector2(100, 100),
+                size: new Vector2(400, 300), children: [2])
+            .Add(2, parent: 1, stringId: "slot", relative: new Vector2(20, 20), size: new Vector2(50, 50));
+
+        List<ulong> chain = new UiTreeReader(tree.Reader, schema)
+            .HitTest(At(0), new Vector2(130, 130), Window());
+
+        Assert.Equal([At(0), At(1), At(2)], chain);
+    }
+
+    [Fact]
+    public void OverlappingSiblings_TheLastOneWins()
+    {
+        // The game's own draw order: later siblings are painted on top, so the last one
+        // containing the point is the one actually visible there. Taking the first match
+        // would report whatever happens to be underneath.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, size: new Vector2(2560, 1600), children: [1, 2])
+            .Add(1, parent: 0, stringId: "below", size: new Vector2(500, 500))
+            .Add(2, parent: 0, stringId: "above", size: new Vector2(500, 500));
+
+        List<ulong> chain = new UiTreeReader(tree.Reader, schema)
+            .HitTest(At(0), new Vector2(50, 50), Window());
+
+        Assert.Equal(At(2), chain[^1]);
+    }
+
+    [Fact]
+    public void HiddenElementsAreNotPicked()
+    {
+        // A closed panel still has its rectangle. Picking it would report an element that is
+        // not on screen as the thing under the cursor.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, size: new Vector2(2560, 1600), children: [1, 2])
+            .Add(1, parent: 0, stringId: "shown", size: new Vector2(500, 500))
+            .Add(2, parent: 0, stringId: "hidden", visible: false, size: new Vector2(500, 500));
+
+        List<ulong> chain = new UiTreeReader(tree.Reader, schema)
+            .HitTest(At(0), new Vector2(50, 50), Window());
+
+        Assert.Equal(At(1), chain[^1]);
+    }
+
+    [Fact]
+    public void SearchMatchesTheIdAndTheDisplayedText()
+    {
+        // Text as well as id, because most of the tree is anonymous: the C++-built widgets
+        // carry no StringId at all, so the label the game puts on screen is the only thing
+        // anyone could type to find them.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, stringId: "GameUi", children: [1, 2, 3])
+            .Add(1, parent: 0, stringId: "life_orb")
+            .Add(2, parent: 0, text: "Identify Items")
+            .Add(3, parent: 0, stringId: "mana_orb");
+
+        var reader = new UiTreeReader(tree.Reader, schema);
+        UiScale scale = Window();
+
+        Assert.Equal([At(1)], reader.Search(At(0), "life", scale).Select(n => n.Address));
+        Assert.Equal([At(2)], reader.Search(At(0), "identify", scale).Select(n => n.Address));   // case-insensitive
+        Assert.Equal(2, reader.Search(At(0), "_orb", scale).Count);
+        Assert.Empty(reader.Search(At(0), "nothing here", scale));
+    }
+
+    [Fact]
+    public void SearchIsNotConfusedByABlankQuery()
+    {
+        // "" contains "" for every element, so a query nobody typed would return the entire
+        // interface - a browser that fills its result list the moment it is opened.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema).Add(0, stringId: "root", children: [1]).Add(1, parent: 0);
+
+        Assert.Empty(new UiTreeReader(tree.Reader, schema).Search(At(0), "  ", Window()));
+    }
+
+    [Fact]
+    public void IndexPathIsTheChildIndicesFromTheRoot()
+    {
+        // The form a UI path is written down in, and pasted back into code as. Without it the
+        // browser identifies an element by an address that is different next session.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, children: [1, 2])
+            .Add(1, parent: 0)
+            .Add(2, parent: 0, children: [3, 4, 5])
+            .Add(3, parent: 2)
+            .Add(4, parent: 2)
+            .Add(5, parent: 2);
+
+        var reader = new UiTreeReader(tree.Reader, schema);
+
+        Assert.Equal([1, 2], reader.IndexPath(At(0), At(5)));
+        Assert.Equal([0], reader.IndexPath(At(0), At(1)));
+        Assert.Empty(reader.IndexPath(At(0), At(0)));   // the root is its own empty path
+    }
+
+    [Fact]
+    public void IndexPathRefusesAnElementOutsideTheRoot()
+    {
+        // Better an empty path than a plausible one: a path that does not lead where it says
+        // is worse than admitting the element is somewhere else entirely.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, children: [1])
+            .Add(1, parent: 0)
+            .Add(9);   // its own root, unrelated to element 0
+
+        Assert.Empty(new UiTreeReader(tree.Reader, schema).IndexPath(At(0), At(9)));
+    }
+
+    [Fact]
+    public void TheLabelFallsBackFromIdToTextToAddress()
+    {
+        // Most of the tree has no id, so a browser that only shows ids shows a column of
+        // blanks and identifies nothing.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, children: [1, 2, 3])
+            .Add(1, parent: 0, stringId: "life_orb", text: "ignored")
+            .Add(2, parent: 0, text: "Identify Items")
+            .Add(3, parent: 0);
+
+        Dictionary<ulong, UiNode> nodes = new UiTreeReader(tree.Reader, schema)
+            .ReadTree(At(0), Window(), new HashSet<ulong> { At(0) });
+
+        Assert.Equal("life_orb", nodes[At(1)].Label);
+        Assert.Equal("\"Identify Items\"", nodes[At(2)].Label);
+        Assert.Equal($"0x{At(3):X}", nodes[At(3)].Label);
+    }
+
+    [Fact]
+    public void ACycleDoesNotHang()
+    {
+        // Not hypothetical: pointers are read from a live process mid-mutation, and a child
+        // list caught during a resize can point back up the tree. An infinite descent here
+        // would wedge the thread that also feeds the overlay.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema)
+            .Add(0, children: [1])
+            .Add(1, parent: 0, children: [0]);
+
+        Dictionary<ulong, UiNode> nodes = new UiTreeReader(tree.Reader, schema)
+            .ReadTree(At(0), Window(), new HashSet<ulong> { At(0), At(1) });
+
+        Assert.Equal(2, nodes.Count);
+    }
+
+    [Fact]
+    public void ANonElementAddressReadsNothing()
+    {
+        // Every element points at itself, so a stale or wrong address is caught before any
+        // of its other fields are believed.
+        OffsetSchema schema = Schema();
+        var tree = new Tree(schema).Add(0);
+        var reader = new UiTreeReader(tree.Reader, schema);
+
+        Assert.Empty(reader.ReadTree(At(7), Window(), new HashSet<ulong>()));
+        Assert.Null(reader.ReadOne(At(7), Window()));
+        Assert.False(reader.IsElement(At(7)));
+        Assert.True(reader.IsElement(At(0)));
+    }
+}

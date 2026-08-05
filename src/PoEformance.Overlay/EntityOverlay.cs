@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.Versioning;
 using ClickableTransparentOverlay;
 using ImGuiNET;
+using PoEformance.Features;
 using PoEformance.Game.Components;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
@@ -32,6 +33,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private WorldSnapshot _snapshot = WorldSnapshot.Empty;
     private ClientRect _tracked;
     private readonly TerrainLayer _terrain;
+    private UiBrowserWindow? _uiBrowser;
 
     /// <summary>Radius in pixels of an entity dot.</summary>
     private const float DotRadius = 5f;
@@ -151,6 +153,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// automation feature, and a silent no-op cannot answer it.
     /// </remarks>
     public Func<string>? FlaskStatus { get; set; }
+
+    /// <summary>
+    /// Adds the interface browser, served by an inspector on the reader thread.
+    /// </summary>
+    /// <remarks>
+    /// Optional, and the overlay works without it - which is why it is attached rather than
+    /// constructed here. The browser exists to reverse-engineer the interface; the overlay
+    /// exists to draw the world, and it has no business owning a tree reader.
+    /// </remarks>
+    public void AttachUiBrowser(UiTreeInspector inspector, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(inspector);
+        _uiBrowser = new UiBrowserWindow(inspector) { Visible = visible };
+    }
 
     protected override Task PostInitialized()
     {
@@ -287,6 +303,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 DrawEntities(width, height);
             }
         }
+
+        // Outside the "in an area" gate: an element can be inspected on a login screen or in
+        // a hideout, and the browser reports for itself when there is no tree to read.
+        _uiBrowser?.Render(_tracked);
 
         if (ShowStatus)
         {
@@ -526,6 +546,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 if (FlaskStatus is not null)
                 {
                     ImGui.TextColored(new Vector4(0.8f, 0.7f, 0.4f, 1f), $"flask:    {FlaskStatus()}");
+                }
+
+                // Not behind --debug. The UI browser is a working tool rather than a
+                // measurement, and its whole point is being reachable in the moment a panel
+                // is open - which is not a moment anyone restarts the tool for.
+                if (_uiBrowser is not null)
+                {
+                    bool browsing = _uiBrowser.Visible;
+                    if (ImGui.Checkbox("UI browser  (F8 picks what is under the cursor)", ref browsing))
+                    {
+                        _uiBrowser.Visible = browsing;
+                    }
                 }
 
                 // The kind breakdown doubles as the filter, since "what is out there" and

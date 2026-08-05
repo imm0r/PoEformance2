@@ -199,7 +199,8 @@ internal static class Program
 
             RunOverlay(
                 reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
-                debug: options.Debug, settings: overlaySettings, handle: overlayHandle);
+                debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
+                uiBrowser: options.ShowUiBrowser);
         }
 
         configWindow?.Join();
@@ -329,7 +330,7 @@ internal static class Program
     private static void RunOverlay(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
         PoEformance.Features.AutoFlask autoFlask, bool debug,
-        PoEformance.Features.OverlaySettings settings, OverlayHandle handle)
+        PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
         Console.WriteLine();
@@ -348,10 +349,16 @@ internal static class Program
         // Auto-flask runs HERE, inside the read, for two reasons: it needs the freshest
         // vitals rather than whatever the last drawn frame saw, and reacting at the read
         // rate rather than the frame rate keeps it working when the overlay is hidden.
+        // Served from the reader thread alongside the world read, and idle until the browser
+        // is opened: an interface tree read per tick is cheap next to the entity map, and
+        // still pure waste while nobody is looking at it.
+        var uiTree = new PoEformance.Features.UiTreeInspector(reader, schema, gameStatesStatic);
+
         using var feed = new PoEformance.Features.SnapshotFeed(
             scale =>
             {
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
+                uiTree.Service(scale);
 
                 // Evaluated even when the feature is off: it costs a bool check, and its
                 // reason string is what the overlay's status line shows - including the
@@ -390,6 +397,7 @@ internal static class Program
         overlay.ApplyTerrainStyle(
             PoEformance.Features.OverlaySettings.ParseColour(settings.TerrainColour),
             settings.TerrainThickness);
+        overlay.AttachUiBrowser(uiTree, uiBrowser);
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();
     }
@@ -865,13 +873,15 @@ internal static class Program
         bool AutoFlask,
         bool ProbeFlasks,
         bool ProbeKeys,
-        bool Debug)
+        bool Debug,
+        bool ShowUiBrowser)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
+            bool uiBrowser = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -907,6 +917,9 @@ internal static class Program
                     case "--debug":
                         debug = true;
                         break;
+                    case "--uibrowser":
+                        uiBrowser = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
@@ -914,7 +927,8 @@ internal static class Program
             }
 
             return new CliOptions(
-                schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys, debug);
+                schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
+                debug, uiBrowser);
         }
     }
 }
