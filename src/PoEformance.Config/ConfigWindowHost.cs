@@ -22,8 +22,8 @@ public static class ConfigWindowHost
     /// </summary>
     /// <param name="stateSource">Called whenever the page asks for the current state.</param>
     /// <param name="apply">
-    /// Called for every other request. Returns true when it handled one, which makes the
-    /// host answer with a fresh state.
+    /// Called for every other request. Returns null when it does not handle one, an empty
+    /// string to have the host answer with a fresh state, or its own JSON reply.
     /// </param>
     /// <param name="alwaysOnTop">
     /// Keep the window above everything else. Needed when the game is running: it is
@@ -43,7 +43,7 @@ public static class ConfigWindowHost
     public static Thread Start(
         string title,
         Func<ConfigState> stateSource,
-        Func<ConfigRequest, bool>? apply = null,
+        Func<ConfigRequest, string?>? apply = null,
         bool alwaysOnTop = false)
     {
         ArgumentNullException.ThrowIfNull(stateSource);
@@ -62,7 +62,7 @@ public static class ConfigWindowHost
     public static void Run(
         string title,
         Func<ConfigState> stateSource,
-        Func<ConfigRequest, bool>? apply = null,
+        Func<ConfigRequest, string?>? apply = null,
         bool alwaysOnTop = false)
         => Start(title, stateSource, apply, alwaysOnTop).Join();
 
@@ -77,7 +77,7 @@ public static class ConfigWindowHost
     /// are reported instead.
     /// </remarks>
     private static void RunOnThisThread(
-        string title, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply, bool alwaysOnTop)
+        string title, Func<ConfigState> stateSource, Func<ConfigRequest, string?>? apply, bool alwaysOnTop)
     {
         try
         {
@@ -116,7 +116,7 @@ public static class ConfigWindowHost
     /// A malformed message answers with nothing rather than throwing - the page is editable
     /// on disk, so a typo during UI work must cost a dead button, never a crashed host.
     /// </remarks>
-    private static string? Handle(string json, Func<ConfigState> stateSource, Func<ConfigRequest, bool>? apply)
+    private static string? Handle(string json, Func<ConfigState> stateSource, Func<ConfigRequest, string?>? apply)
     {
         ConfigRequest? request;
         try
@@ -146,7 +146,11 @@ public static class ConfigWindowHost
         // value that was sent.
         try
         {
-            return apply is not null && apply(request) ? State(stateSource) : null;
+            // A handler answers with its own JSON when it has one - the map layout is far
+            // too big to ride along with every state - and with an empty string to mean
+            // "handled, send the state". Null is "not mine".
+            string? reply = apply?.Invoke(request);
+            return reply is null ? null : reply.Length == 0 ? State(stateSource) : reply;
         }
         catch (JsonException)
         {

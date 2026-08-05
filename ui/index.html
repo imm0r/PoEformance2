@@ -18,7 +18,12 @@
     <span id="tool-version" class="dim"></span>
   </header>
 
-  <main>
+  <nav id="tabs">
+    <button class="tab active" data-tab="setup">Setup</button>
+    <button class="tab" data-tab="map">Map</button>
+  </nav>
+
+  <main id="tab-setup">
     <section class="card">
       <h2>Session</h2>
       <dl id="session">
@@ -86,6 +91,21 @@
     </section>
     </div>
   </main>
+
+  <!--
+    The map tab. One canvas: the layout is painted once per area onto an offscreen buffer
+    and blitted, so the per-second marker update never re-walks the outline.
+  -->
+  <section id="tab-map" hidden>
+    <div class="map-bar">
+      <span id="map-status" class="dim">–</span>
+      <label class="map-follow"><input type="checkbox" id="map-follow" checked> Follow the player</label>
+      <label class="map-zoom">Zoom <input type="range" id="map-zoom" min="1" max="6" step="0.5" value="1"></label>
+    </div>
+    <div class="map-frame">
+      <canvas id="map-canvas"></canvas>
+    </div>
+  </section>
 
   <script>
     // Before the modules: any script error lands in the log panel instead of an invisible

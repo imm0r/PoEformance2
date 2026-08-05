@@ -93,7 +93,8 @@ public sealed record WorldSnapshot(
     ActiveBuffs? PlayerBuffs = null,
     FlaskBelt? FlaskBelt = null,
     AreaInfo Area = default,
-    TerrainGrid? Terrain = null)
+    TerrainGrid? Terrain = null,
+    uint AreaHash = 0)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -130,6 +131,7 @@ public sealed class WorldReader
     private readonly int _serverData;
     private readonly int _awakeEntities;
     private readonly int _w2sMatrix;
+    private readonly int _areaHash;
     private readonly int _lifeHealth;
     private readonly int _vitalCurrent;
     private readonly int _isTargetable;
@@ -155,6 +157,7 @@ public sealed class WorldReader
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
         _w2sMatrix = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+        _areaHash = schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash");
 
         // Read straight from the schema rather than through LifeReader: a corpse check
         // needs one int per monster, and building the full three-pool Vitals for every
@@ -344,7 +347,8 @@ public sealed class WorldReader
         return new WorldSnapshot(
             true, player, entities, matrix, largeMap, miniMap, playerVitals, playerBuffs, flaskBelt,
             _areas.Read(chain.WorldData),
-            _terrain.Read(chain.AreaInstance, nowMs));
+            _terrain.Read(chain.AreaInstance, nowMs),
+            _reader.Read<uint>(chain.AreaInstance + (ulong)_areaHash));
     }
 
     /// <summary>

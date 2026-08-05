@@ -497,20 +497,21 @@ internal static class Program
         PoEformance.Features.AutoFlaskSettings settings = flaskSettings;
         PoEformance.Features.OverlaySettings overlay = overlaySettings;
 
+        // One reader for the window's whole life. The terrain grid is cached inside it, so
+        // building a fresh one per request would re-read megabytes on every poll.
+        var worldReader = new PoEformance.Game.World.WorldReader(reader, SchemaJson.Load(schemaPath));
+        PoEformance.Game.World.WorldSnapshot ReadSnapshot()
+            => gameStatesAddress == 0
+                ? PoEformance.Game.World.WorldSnapshot.Empty
+                : worldReader.Read(gameStatesAddress);
+
         PoEformance.Config.ConfigState BuildState()
         {
             OffsetSchema schema = SchemaJson.Load(schemaPath);
-            int entityCount = 0;
-            bool inGame = false;
-            PoEformance.Game.Components.FlaskBelt? belt = null;
-            if (gameStatesAddress != 0)
-            {
-                PoEformance.Game.World.WorldSnapshot snapshot =
-                    new PoEformance.Game.World.WorldReader(reader, schema).Read(gameStatesAddress);
-                inGame = snapshot.InGame;
-                entityCount = snapshot.Entities.Count;
-                belt = snapshot.FlaskBelt;
-            }
+            PoEformance.Game.World.WorldSnapshot snapshot = ReadSnapshot();
+            bool inGame = snapshot.InGame;
+            int entityCount = snapshot.Entities.Count;
+            PoEformance.Game.Components.FlaskBelt? belt = snapshot.FlaskBelt;
 
             return new PoEformance.Config.ConfigState(
                 Type: "state",
@@ -526,14 +527,43 @@ internal static class Program
                 Overlay: new PoEformance.Config.OverlayView(
                     overlay.MinLootRarity.ToString(),
                     overlay.ShowTerrain,
-                    DescribeTerrain(overlayHandle)));
+                    DescribeTerrain(overlayHandle)),
+                Map: BuildMapView(snapshot, overlay.MinLootRarity));
         }
 
-        bool Apply(PoEformance.Config.ConfigRequest request)
+        // Rebuilding the outline is a pass over megabytes, so it is done once per area and
+        // handed out from here - the page only asks on an area change, but a page bug must
+        // not be able to turn that into a per-second cost.
+        uint layoutArea = 0;
+        PoEformance.Features.MapLayout layout = PoEformance.Features.MapLayout.Empty;
+
+        string? Apply(PoEformance.Config.ConfigRequest request)
         {
+            if (request.Type == "getMapLayout")
+            {
+                PoEformance.Game.World.WorldSnapshot snapshot = ReadSnapshot();
+                if (snapshot.Terrain is PoEformance.Game.World.TerrainGrid grid)
+                {
+                    if (layoutArea != snapshot.AreaHash || layout.Width == 0)
+                    {
+                        layout = PoEformance.Features.MapLayout.From(grid);
+                        layoutArea = snapshot.AreaHash;
+                    }
+                }
+                else
+                {
+                    layout = PoEformance.Features.MapLayout.Empty;
+                    layoutArea = snapshot.AreaHash;
+                }
+
+                return JsonSerializer.Serialize(
+                    new PoEformance.Config.MapLayoutMessage("mapLayout", layoutArea, layout),
+                    PoEformance.Config.ConfigJsonContext.Default.MapLayoutMessage);
+            }
+
             if (request.Payload.ValueKind != JsonValueKind.Object)
             {
-                return false;
+                return null;
             }
 
             switch (request.Type)
@@ -543,7 +573,7 @@ internal static class Program
                         PoEformance.Config.ConfigJsonContext.Default.AutoFlaskSettings);
                     if (flasks is null)
                     {
-                        return false;
+                        return null;
                     }
 
                     // Normalise BEFORE anything else sees it: the page is editable on disk
@@ -554,14 +584,14 @@ internal static class Program
                     SaveWarning(
                         PoEformance.Features.AutoFlaskSettingsStore.Save(settings),
                         PoEformance.Features.AutoFlaskSettingsStore.DefaultPath);
-                    return true;
+                    return string.Empty;
 
                 case "setOverlaySettings":
                     PoEformance.Features.OverlaySettings? sent = request.Payload.Deserialize(
                         PoEformance.Config.ConfigJsonContext.Default.OverlaySettings);
                     if (sent is null)
                     {
-                        return false;
+                        return null;
                     }
 
                     overlay = sent.Normalised();
@@ -578,10 +608,10 @@ internal static class Program
                     SaveWarning(
                         PoEformance.Features.OverlaySettingsStore.Save(overlay),
                         PoEformance.Features.OverlaySettingsStore.DefaultPath);
-                    return true;
+                    return string.Empty;
 
                 default:
-                    return false;
+                    return null;
             }
         }
 
@@ -634,6 +664,55 @@ internal static class Program
             Status: engine.LastTick.Reason,
             Slots: slots);
     }
+
+    /// <summary>
+    /// Builds the map panel's per-frame half: where the player is, and what is around them.
+    /// </summary>
+    /// <remarks>
+    /// Positions are in GRID CELLS, not in the outline's pixels. The page divides by the
+    /// layout's step, which means a marker stays correct even if the layout is later rebuilt
+    /// at a different thinning - the two messages travel separately and can be one apart.
+    /// </remarks>
+    private static PoEformance.Config.MapStateView BuildMapView(
+        PoEformance.Game.World.WorldSnapshot snapshot, PoEformance.Game.Components.ItemRarity minLoot)
+    {
+        var markers = new List<PoEformance.Config.MapMarker>();
+        foreach (PoEformance.Game.World.WorldEntity entity in snapshot.Entities)
+        {
+            string? kind = entity.Kind switch
+            {
+                PoEformance.Game.World.EntityKind.Monster => "monster",
+                PoEformance.Game.World.EntityKind.Chest => "chest",
+                PoEformance.Game.World.EntityKind.Npc => "npc",
+                PoEformance.Game.World.EntityKind.WorldItem when Worth(entity.Rarity, minLoot) => "loot",
+                _ => null,
+            };
+
+            if (kind is not null)
+            {
+                markers.Add(new PoEformance.Config.MapMarker(
+                    entity.WorldX / PoEformance.Game.Ui.MapView.WorldToGrid,
+                    entity.WorldY / PoEformance.Game.Ui.MapView.WorldToGrid,
+                    kind));
+            }
+        }
+
+        PoEformance.Game.World.WorldEntity? player = snapshot.Player;
+        return new PoEformance.Config.MapStateView(
+            Area: snapshot.AreaHash,
+            HasLayout: snapshot.Terrain is not null,
+            Status: snapshot.Terrain is null ? "terrain loading" : snapshot.Area.Describe(),
+            PlayerX: (player?.WorldX ?? 0) / PoEformance.Game.Ui.MapView.WorldToGrid,
+            PlayerY: (player?.WorldY ?? 0) / PoEformance.Game.Ui.MapView.WorldToGrid,
+            Markers: markers);
+    }
+
+    /// <summary>The same loot rule the overlay uses - currency always, unknown until it resolves.</summary>
+    private static bool Worth(
+        PoEformance.Game.Components.ItemRarity rarity, PoEformance.Game.Components.ItemRarity minimum)
+        => rarity is PoEformance.Game.Components.ItemRarity.Currency
+            or PoEformance.Game.Components.ItemRarity.Unknown
+            || rarity >= minimum;
 
     /// <summary>What the terrain layer currently holds, for the config page.</summary>
     /// <remarks>

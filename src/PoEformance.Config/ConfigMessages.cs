@@ -53,6 +53,39 @@ public sealed record OverlayView(
     [property: JsonPropertyName("showTerrain")] bool ShowTerrain,
     [property: JsonPropertyName("terrain")] string Terrain);
 
+/// <summary>One marker on the page's map, in outline-pixel coordinates.</summary>
+public sealed record MapMarker(
+    [property: JsonPropertyName("x")] float X,
+    [property: JsonPropertyName("y")] float Y,
+    [property: JsonPropertyName("kind")] string Kind);
+
+/// <summary>
+/// The map panel: where things are, but NOT the layout itself.
+/// </summary>
+/// <remarks>
+/// The layout is thousands of numbers and changes only on an area change, so it travels
+/// separately and on request. This block rides every state push, which is what keeps the
+/// per-second message small enough to send at that rate.
+/// </remarks>
+/// <param name="Area">
+/// The area's instance hash. The page compares it against the layout it is holding and
+/// asks for a new one when they differ - so a portal refreshes the map without the host
+/// having to track what the page knows.
+/// </param>
+public sealed record MapStateView(
+    [property: JsonPropertyName("area")] uint Area,
+    [property: JsonPropertyName("hasLayout")] bool HasLayout,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("playerX")] float PlayerX,
+    [property: JsonPropertyName("playerY")] float PlayerY,
+    [property: JsonPropertyName("markers")] IReadOnlyList<MapMarker> Markers);
+
+/// <summary>The layout itself, sent once per area in reply to a request.</summary>
+public sealed record MapLayoutMessage(
+    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("area")] uint Area,
+    [property: JsonPropertyName("layout")] MapLayout Layout);
+
 /// <summary>The host's state push: everything the config page shows.</summary>
 /// <remarks>
 /// One flat record on purpose. The page re-renders from whole states rather than patching
@@ -69,7 +102,8 @@ public sealed record ConfigState(
     [property: JsonPropertyName("inGame")] bool InGame,
     [property: JsonPropertyName("entityCount")] int EntityCount,
     [property: JsonPropertyName("autoFlask")] AutoFlaskView? AutoFlask = null,
-    [property: JsonPropertyName("overlay")] OverlayView? Overlay = null);
+    [property: JsonPropertyName("overlay")] OverlayView? Overlay = null,
+    [property: JsonPropertyName("map")] MapStateView? Map = null);
 
 /// <summary>
 /// Source-generated JSON for the bridge.
@@ -88,4 +122,5 @@ public sealed record ConfigState(
 [JsonSerializable(typeof(ConfigState))]
 [JsonSerializable(typeof(AutoFlaskSettings))]
 [JsonSerializable(typeof(OverlaySettings))]
+[JsonSerializable(typeof(MapLayoutMessage))]
 public sealed partial class ConfigJsonContext : JsonSerializerContext;

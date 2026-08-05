@@ -3,6 +3,7 @@
 // can never drift out of sync with a missed delta.
 
 import { bridge } from "./bridge.js";
+import { MapPanel } from "./map.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -27,6 +28,51 @@ function renderState(s) {
     $("ov-terrain").checked = s.overlay.showTerrain;
     $("ov-terrain-state").textContent = s.overlay.terrain;
   }
+
+  if (s.map) {
+    $("map-status").textContent = s.map.status;
+    map.setState(s.map);
+    // Asking on an area CHANGE rather than on a timer: the layout is the expensive half
+    // of this panel and it cannot change while the area does not.
+    if (map.needsLayout(s.map.area)) bridge.send({ type: "getMapLayout" });
+  }
+}
+
+// ── Map tab ────────────────────────────────────────────────────────────────
+
+const map = new MapPanel($("map-canvas"), document.querySelector(".map-frame"));
+
+bridge.on("mapLayout", (m) => map.setLayout(m.area, m.layout));
+
+$("map-follow").addEventListener("change", (e) => {
+  map.follow = e.target.checked;
+  map.draw();
+});
+
+$("map-zoom").addEventListener("input", (e) => {
+  map.zoom = Number(e.target.value);
+  map.draw();
+});
+
+window.addEventListener("resize", () => map.draw());
+
+function showTab(name) {
+  for (const button of document.querySelectorAll(".tab")) {
+    button.classList.toggle("active", button.dataset.tab === name);
+  }
+
+  $("tab-setup").hidden = name !== "setup";
+  $("tab-map").hidden = name !== "map";
+  map.show(name === "map");
+
+  // The layout is only fetched while the tab is open, so opening it is when to ask.
+  if (name === "map" && map.needsLayout(map.state?.area ?? 0)) {
+    bridge.send({ type: "getMapLayout" });
+  }
+}
+
+for (const button of document.querySelectorAll(".tab")) {
+  button.addEventListener("click", () => showTab(button.dataset.tab));
 }
 
 /** Posts the whole overlay block, so one control cannot clear another's value. */

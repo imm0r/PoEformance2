@@ -141,57 +141,26 @@ public sealed class TerrainLayer : IDisposable
 
         // Thin rather than refuse: a grid wider than a GPU will take still has a layout
         // worth seeing, and it is drawn a few hundred pixels across regardless.
-        int step = 1;
-        while (grid.Width / step > MaxTextureEdge || grid.Height / step > MaxTextureEdge)
-        {
-            step++;
-        }
-
-        int width = grid.Width / step;
-        int height = grid.Height / step;
-        if (width <= 0 || height <= 0)
-        {
-            return;
-        }
-
-        byte[] outline = grid.BuildOutline();
-        using var image = new Image<Rgba32>(width, height);
+        OutlineMask mask = TerrainOutline.Build(grid, MaxTextureEdge);
+        using var image = new Image<Rgba32>(mask.Width, mask.Height);
 
         // White where the boundary is, transparent everywhere else. The colour comes from
         // the tint at draw time, so changing it costs nothing and rebuilds nothing.
         image.ProcessPixelRows(rows =>
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < mask.Height; y++)
             {
                 Span<Rgba32> row = rows.GetRowSpan(y);
-                int source = y * step * grid.Width;
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < mask.Width; x++)
                 {
-                    // Any marked cell in the thinned block keeps the line connected;
-                    // sampling one cell in N would leave the outline full of gaps.
-                    bool mark = false;
-                    for (int dy = 0; dy < step && !mark; dy++)
-                    {
-                        int line = source + (dy * grid.Width);
-                        for (int dx = 0; dx < step; dx++)
-                        {
-                            int index = line + (x * step) + dx;
-                            if (index < outline.Length && outline[index] != 0)
-                            {
-                                mark = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    row[x] = mark ? new Rgba32(255, 255, 255, 255) : new Rgba32(0, 0, 0, 0);
+                    row[x] = mask.IsSet(x, y) ? new Rgba32(255, 255, 255, 255) : new Rgba32(0, 0, 0, 0);
                 }
             }
         });
 
         _texture = _upload(TextureKey, image, false);
-        _textureWidth = width;
-        _textureHeight = height;
+        _textureWidth = mask.Width;
+        _textureHeight = mask.Height;
     }
 
     /// <summary>The texture's size, for the diagnostic readout.</summary>

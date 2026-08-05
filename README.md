@@ -82,8 +82,9 @@ town, a hideout, or a campaign zone. Corpses are filtered out, and drops below m
 RE instruments — dots out in the 3D world, the projection measurements, the calibration
 markers, and per-kind filters including terrain and effects.
 
-The config window stays open while the overlay runs and its settings apply immediately —
-no restart. Auto flask is off until switched on there, per belt slot; the key each flask
+The config window has a **Map** tab showing the same layout at a readable size, with the
+player and nearby markers on it. It stays open while the overlay runs and its settings apply
+immediately — no restart. Auto flask is off until switched on there, per belt slot; the key each flask
 uses is **read from the game's own config**, never assumed, and shown read-only beside the
 slot it belongs to.
 

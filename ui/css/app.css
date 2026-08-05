@@ -34,6 +34,58 @@ header h1 {
   letter-spacing: 0.04em;
 }
 
+/* ── Tabs ───────────────────────────────────────────────────────────────── */
+
+#tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 20px;
+  border-bottom: 1px solid #000;
+}
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 8px 14px;
+  color: var(--dim);
+}
+
+.tab:hover { color: var(--text); border-color: #00000000; }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── Map ────────────────────────────────────────────────────────────────── */
+
+#tab-map {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px;
+  height: calc(100vh - 110px);
+}
+
+.map-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.map-bar label { display: flex; align-items: center; gap: 6px; }
+
+/* The canvas is sized to this box in JS, so the layout decides the pixels rather than
+   the other way round - a fixed canvas would letterbox or crop on a resize. */
+.map-frame {
+  flex: 1;
+  min-height: 0;
+  background: #0e1013;
+  border: 1px solid #00000088;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+#map-canvas { display: block; }
+
 main {
   display: grid;
   grid-template-columns: 320px 1fr;
