@@ -15,10 +15,11 @@ public readonly record struct EquippedFlask(int Slot, string Path, int Charges, 
     /// Whether pressing this flask's key would actually do anything.
     /// </summary>
     /// <remarks>
-    /// The GAME is forgiving here: too few charges means the flask simply does not trigger.
-    /// No charge is spent and no in-game cooldown starts, so hammering the key costs
-    /// nothing. The reason to check anyway is OUR OWN bookkeeping - see the charge gate in
-    /// AutoFlask, which must not record a use that never happened.
+    /// Too few charges means the flask does not trigger: no charge is spent and no in-game
+    /// cooldown starts. So the check is not about protecting the game from us - it is about
+    /// not emitting input that cannot do anything. Sending a keystroke thirty times a
+    /// second to no effect is work the tool should not be doing, and it would make the
+    /// status readout claim uses that never happened. See the gate in AutoFlask.
     /// </remarks>
     public bool CanUse => ChargesPerUse > 0 && Charges >= ChargesPerUse;
 }
