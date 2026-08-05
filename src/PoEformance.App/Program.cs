@@ -89,6 +89,22 @@ internal static class Program
             WatchSchema(reader, scanner, schemaPath, recorder, options.Verbose);
         }
 
+        if (recorder is not null && options.RecordPath is not null)
+        {
+            // Store the resolved statics so the replay never needs the module image - the
+            // one read big enough to dominate the file size.
+            foreach (ResolvedStatic s in result.Statics.Where(s => s.Found))
+            {
+                recorder.NoteStatic(s.Name, s.Address);
+            }
+
+            recorder.Dispose(); // flush before measuring
+            long bytes = new FileInfo(options.RecordPath).Length;
+            Console.WriteLine();
+            Console.WriteLine($"recorded {bytes / 1024.0:F0} KB to {options.RecordPath} "
+                + $"({recorder.SkippedLargeReads} oversized reads skipped - the module image is not needed for replay)");
+        }
+
         return result.GameStatesResolved ? 0 : 2;
     }
 
@@ -103,7 +119,12 @@ internal static class Program
         Console.WriteLine();
         recorder?.MarkFrame();
 
-        DriftReportResult result = DriftReport.Run(reader, scanner, schema, Console.Out, verbose);
+        IReadOnlyDictionary<string, ulong>? knownStatics =
+            reader is ReplayMemoryReader replay && replay.ResolvedStatics.Count > 0
+                ? replay.ResolvedStatics
+                : null;
+
+        DriftReportResult result = DriftReport.Run(reader, scanner, schema, Console.Out, verbose, knownStatics);
 
         recorder?.MarkFrame();
         return result;

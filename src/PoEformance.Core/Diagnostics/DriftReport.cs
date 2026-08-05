@@ -34,7 +34,8 @@ public static class DriftReport
         PatternScanner scanner,
         OffsetSchema schema,
         TextWriter output,
-        bool verbose = false)
+        bool verbose = false,
+        IReadOnlyDictionary<string, ulong>? knownStatics = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(scanner);
@@ -42,8 +43,14 @@ public static class DriftReport
         ArgumentNullException.ThrowIfNull(output);
 
         // ── Resolve static anchors ───────────────────────────────────────────
-        var resolver = new StaticResolver(scanner);
-        List<ResolvedStatic> statics = resolver.ResolveAll(schema);
+        // A replay supplies them from the recording: the module image they were scanned
+        // from is intentionally not recorded, so re-scanning would find nothing.
+        List<ResolvedStatic> statics = knownStatics is not null
+            ? [.. schema.Statics.Keys.Select(name => knownStatics.TryGetValue(name, out ulong a)
+                ? new ResolvedStatic(name, a, "from recording")
+                : new ResolvedStatic(name, 0, "not in recording"))]
+            : new StaticResolver(scanner).ResolveAll(schema);
+
         var resolved = new Dictionary<string, ulong>();
 
         output.WriteLine("statics");

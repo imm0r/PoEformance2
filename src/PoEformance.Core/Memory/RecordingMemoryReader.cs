@@ -22,6 +22,19 @@ public sealed class RecordingMemoryReader : IMemoryReader
     private uint _frameIndex;
     private bool _disposed;
 
+    /// <summary>
+    /// Reads bigger than this are served normally but left out of the file. Defaults to
+    /// <see cref="RecordingFormat.DefaultMaxRecordedReadBytes"/>, which excludes the module
+    /// image copy - the difference between a 77 MB recording and a few hundred KB.
+    /// </summary>
+    public int MaxRecordedReadBytes { get; set; } = RecordingFormat.DefaultMaxRecordedReadBytes;
+
+    /// <summary>Bytes actually written to the recording, for reporting.</summary>
+    public long RecordedBytes { get; private set; }
+
+    /// <summary>Reads skipped because they exceeded <see cref="MaxRecordedReadBytes"/>.</summary>
+    public int SkippedLargeReads { get; private set; }
+
     public RecordingMemoryReader(IMemoryReader inner, Stream output)
     {
         ArgumentNullException.ThrowIfNull(inner);
@@ -47,6 +60,33 @@ public sealed class RecordingMemoryReader : IMemoryReader
 
     public uint ModuleSize => _inner.ModuleSize;
 
+    /// <summary>
+    /// Stores a derived fact in the recording, so a replay can use it instead of
+    /// recomputing it from data that was too large to record.
+    /// </summary>
+    public void Note(string key, string value)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(key);
+        ArgumentNullException.ThrowIfNull(value);
+
+        byte[] keyBytes = System.Text.Encoding.UTF8.GetBytes(key);
+        byte[] valueBytes = System.Text.Encoding.UTF8.GetBytes(value);
+        if (keyBytes.Length > ushort.MaxValue || valueBytes.Length > ushort.MaxValue)
+        {
+            throw new ArgumentException("Note key/value too long.", nameof(key));
+        }
+
+        _writer.Write(RecordingFormat.TagNote);
+        _writer.Write((ushort)keyBytes.Length);
+        _writer.Write(keyBytes);
+        _writer.Write((ushort)valueBytes.Length);
+        _writer.Write(valueBytes);
+    }
+
+    /// <summary>Stores a resolved static address as a note.</summary>
+    public void NoteStatic(string name, ulong address)
+        => Note(RecordingFormat.StaticNotePrefix + name, address.ToString("X", System.Globalization.CultureInfo.InvariantCulture));
+
     /// <summary>Writes a frame boundary. Call once per reader tick.</summary>
     public void MarkFrame()
     {
@@ -62,12 +102,19 @@ public sealed class RecordingMemoryReader : IMemoryReader
             return false;
         }
 
+        if (destination.Length > MaxRecordedReadBytes)
+        {
+            SkippedLargeReads++;
+            return true;
+        }
+
         if (destination.Length <= RecordingFormat.MaxReadLength)
         {
             _writer.Write(RecordingFormat.TagRead);
             _writer.Write(address);
             _writer.Write((uint)destination.Length);
             _writer.Write(destination);
+            RecordedBytes += destination.Length;
         }
 
         return true;

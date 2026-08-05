@@ -24,6 +24,9 @@ public sealed class ReplayMemoryReader : IMemoryReader
     /// <summary>Frame index -> elapsed ms since session start, for time scrubbing UIs.</summary>
     private readonly List<uint> _frameTimes = [];
 
+    /// <summary>Derived facts stored alongside the reads (see RecordingFormat notes).</summary>
+    private readonly Dictionary<string, string> _notes = [];
+
     private uint _currentFrame = uint.MaxValue;
 
     private ReplayMemoryReader(int processId, ulong moduleBase, uint moduleSize, DateTime createdUtc)
@@ -47,6 +50,32 @@ public sealed class ReplayMemoryReader : IMemoryReader
 
     /// <summary>Number of frame markers in the recording.</summary>
     public int FrameCount => _frameTimes.Count;
+
+    /// <summary>Derived key/value facts stored in the recording.</summary>
+    public IReadOnlyDictionary<string, string> Notes => _notes;
+
+    /// <summary>
+    /// Static addresses that were resolved when the session was recorded. A replay uses
+    /// these instead of pattern-scanning, because the module image they came from is
+    /// deliberately not recorded (it would dwarf the useful data).
+    /// </summary>
+    public IReadOnlyDictionary<string, ulong> ResolvedStatics
+    {
+        get
+        {
+            var result = new Dictionary<string, ulong>();
+            foreach ((string key, string value) in _notes)
+            {
+                if (key.StartsWith(RecordingFormat.StaticNotePrefix, StringComparison.Ordinal)
+                    && ulong.TryParse(value, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out ulong address))
+                {
+                    result[key[RecordingFormat.StaticNotePrefix.Length..]] = address;
+                }
+            }
+
+            return result;
+        }
+    }
 
     /// <summary>
     /// Frame the replay is positioned at. Reads serve the newest block at or before
@@ -113,6 +142,20 @@ public sealed class ReplayMemoryReader : IMemoryReader
                     }
 
                     replay._blocks.Add(new Block(frame, address, bytes));
+                }
+                else if (tag == RecordingFormat.TagNote)
+                {
+                    int keyLength = reader.ReadUInt16();
+                    byte[] keyBytes = reader.ReadBytes(keyLength);
+                    int valueLength = reader.ReadUInt16();
+                    byte[] valueBytes = reader.ReadBytes(valueLength);
+                    if (keyBytes.Length != keyLength || valueBytes.Length != valueLength)
+                    {
+                        break; // truncated tail
+                    }
+
+                    replay._notes[System.Text.Encoding.UTF8.GetString(keyBytes)] =
+                        System.Text.Encoding.UTF8.GetString(valueBytes);
                 }
                 else
                 {
