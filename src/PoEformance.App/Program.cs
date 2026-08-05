@@ -39,6 +39,7 @@ internal static class Program
         // ── Attach (or replay) - the only Windows-specific step ──────────────
         IMemoryReader reader;
         RecordingMemoryReader? recorder = null;
+        IntPtr gameWindow = IntPtr.Zero;
 
         if (options.ReplayPath is not null)
         {
@@ -63,6 +64,9 @@ internal static class Program
             }
 
             Console.WriteLine($"attach  pid {live.ProcessId}, module 0x{live.ModuleBase:X} ({live.ModuleSize / (1024 * 1024)} MB)");
+
+            // The overlay sizes itself to this window, so a wrong viewport is impossible.
+            gameWindow = game.MainWindowHandle;
 
             if (options.RecordPath is not null)
             {
@@ -102,13 +106,20 @@ internal static class Program
         if (gameStatesAddress != 0)
         {
             recorder?.MarkFrame();
-            ReportWorldScan(reader, SchemaJson.Load(schemaPath), gameStatesAddress);
+            OffsetSchema worldSchema = SchemaJson.Load(schemaPath);
+            PoEformance.Game.World.WorldSnapshot snapshot = ReportWorldScan(reader, worldSchema, gameStatesAddress);
+            recorder?.MarkFrame();
+
+            // Verify the matrix against the whole scene, not just the player. Reading the
+            // scan window also puts it into a --record session, so the same hunt can be
+            // re-run offline against the recording.
+            RunMatrixHunt(reader, worldSchema, gameStatesAddress, snapshot);
             recorder?.MarkFrame();
         }
 
         if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
         {
-            RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress);
+            RunOverlay(reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow);
         }
 
         if (options.Watch && options.ReplayPath is null)
@@ -161,7 +172,7 @@ internal static class Program
     /// Reads the whole entity map once and prints a breakdown, so the entity layer can be
     /// sanity-checked from the console before any pixels are drawn.
     /// </summary>
-    private static void ReportWorldScan(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic)
+    private static PoEformance.Game.World.WorldSnapshot ReportWorldScan(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
         PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic);
@@ -171,7 +182,7 @@ internal static class Program
         if (!snapshot.InGame)
         {
             Console.WriteLine("  --    not in an area.");
-            return;
+            return snapshot;
         }
 
         Console.WriteLine($"  entities with a position: {snapshot.Entities.Count}");
@@ -188,19 +199,48 @@ internal static class Program
         {
             Console.WriteLine($"    monster  {monster.ShortName} @ ({monster.WorldX:F0}, {monster.WorldY:F0})");
         }
+
+        return snapshot;
+    }
+
+    /// <summary>
+    /// Scores every candidate matrix offset against the scene and prints the ranking.
+    /// </summary>
+    /// <remarks>
+    /// The single-point check ("is the player centred?") cannot be trusted on its own: a
+    /// matrix that inflates w collapses EVERY point onto the centre, so the player looks
+    /// perfect while the scene is unusable. Requiring the other entities to spread out is
+    /// what makes the answer decisive.
+    /// </remarks>
+    private static void RunMatrixHunt(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, PoEformance.Game.World.WorldSnapshot snapshot)
+    {
+        if (!snapshot.InGame)
+        {
+            return;
+        }
+
+        GameChainAddresses chain = GameChain.Resolve(reader, schema, gameStatesStatic);
+        int current = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+        List<PoEformance.Game.Diagnostics.ProjectionCandidate> candidates =
+            PoEformance.Game.Diagnostics.MatrixHunt.Find(reader, chain.WorldData, snapshot);
+
+        PoEformance.Game.Diagnostics.MatrixHunt.Report(candidates, current, Console.Out);
     }
 
     /// <summary>
     /// Runs the ImGui overlay until it is closed. The snapshot is re-read per frame; the
     /// renderer itself never touches game memory.
     /// </summary>
-    private static void RunOverlay(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic)
+    private static void RunOverlay(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
         Console.WriteLine();
-        Console.WriteLine("overlay running - close the overlay window (or Ctrl+C) to quit");
+        Console.WriteLine(gameWindow != IntPtr.Zero
+            ? "overlay running - it follows the game window; close it (or Ctrl+C) to quit"
+            : "overlay running - no game window found, using a default size; Ctrl+C to quit");
 
-        using var overlay = new PoEformance.Overlay.EntityOverlay(() => world.Read(gameStatesStatic));
+        using var overlay = new PoEformance.Overlay.EntityOverlay(() => world.Read(gameStatesStatic), gameWindow);
         overlay.Start().GetAwaiter().GetResult();
     }
 

@@ -16,8 +16,8 @@ namespace PoEformance.Core.Tests;
 /// change that stops matching reality - on any machine, in CI, with no game installed.
 ///
 /// The fixture is the session that resolved the 2026-08 drift: the AreaInstance +0x08
-/// wave, the inline LocalPlayerStruct, and the world-to-screen matrix relocated to
-/// WorldData+0x11C. If a future change breaks one of those, this test says so.
+/// wave and the inline LocalPlayerStruct. If a future change breaks one of those, this
+/// test says so.
 /// </remarks>
 public class RealSessionTests
 {
@@ -35,6 +35,25 @@ public class RealSessionTests
             return Path.Combine(dir.FullName, "tests", "fixtures", "session-2026-08.rec");
         }
     }
+
+    /// <summary>A richer session: a full area with 76 entities, for scene-wide checks.</summary>
+    internal static string SceneFixturePath
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+            {
+                dir = dir.Parent;
+            }
+
+            Assert.NotNull(dir);
+            return Path.Combine(dir.FullName, "tests", "fixtures", "session-2026-08-scene.rec");
+        }
+    }
+
+    /// <summary>The shipped schema, for tests in sibling classes.</summary>
+    internal static OffsetSchema Schema() => LoadSchema();
 
     private static OffsetSchema LoadSchema()
     {
@@ -82,7 +101,7 @@ public class RealSessionTests
 
         Assert.True(result.AllGood, writer.ToString());
         Assert.Equal(0, result.Failed);
-        Assert.Equal(12, result.Passed);
+        Assert.Equal(11, result.Passed);
     }
 
     [Fact]
@@ -122,11 +141,9 @@ public class RealSessionTests
         string path = replay.ReadStdWString(details + (ulong)schema.Structs["EntityDetails"].OffsetOf("Path"));
         Assert.StartsWith("Metadata/Characters/", path, StringComparison.Ordinal);
 
-        // The matrix at its recovered home, pointing the way PoE2's fixed camera does.
-        StructDef wd = schema.Structs["WorldData"];
-        ulong wRow = worldData + (ulong)wd.OffsetOf("W2SMatrix") + 0x30;
-        Assert.Equal(0.466531f, replay.Read<float>(wRow), 4);      // real captured value
-        Assert.Equal(0.751464f, replay.Read<float>(wRow + 8), 4);
+        // No matrix assertion here on purpose. This session predates locating the matrix,
+        // and the value that USED to be asserted (a unit camera-forward row at +0x30) was
+        // the fingerprint of the wrong block - see MatrixHuntTests for what replaced it.
     }
 
     /// <summary>The richer session that captured the player's components + Render position.</summary>
@@ -163,22 +180,24 @@ public class RealSessionTests
     }
 
     [Fact]
-    public void RealPlayer_ProjectsToScreenCentre_TheMatrixProof()
+    public void RealScene_ReadsAWholeAreaOfEntities()
     {
-        // The decisive, end-to-end proof against real memory: resolve the player, read its
-        // Render position, project through the column-major matrix - the camera follows the
-        // player, so it MUST land at screen centre (NDC ~0). This is what "MATRIX PROVEN"
-        // means, pinned as a regression.
-        var replay = ReplayMemoryReader.Load(File.OpenRead(PlayerFixturePath));
+        // The entity map walked against real memory: a populated area, with the player
+        // among the entities and monsters carrying real metadata paths and positions.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(SceneFixturePath));
         OffsetSchema schema = LoadSchema();
 
-        PoEformance.Game.Diagnostics.PlayerProbeResult r =
-            new PoEformance.Game.Diagnostics.PlayerProbe(replay, schema).Probe(replay.ResolvedStatics["GameStates"]);
+        PoEformance.Game.World.WorldSnapshot snapshot =
+            new PoEformance.Game.World.WorldReader(replay, schema).Read(replay.ResolvedStatics["GameStates"]);
 
-        Assert.True(r.InGame);
-        Assert.True(r.HasRender);
-        Assert.True(r.Projected);
-        Assert.True(r.ProjectsToCentre, $"NDC magnitude was {r.NdcMagnitude:F3}, expected ~0");
-        Assert.True(r.NdcMagnitude < 0.02, $"NDC magnitude {r.NdcMagnitude:F4}");
+        Assert.True(snapshot.InGame);
+        Assert.True(snapshot.Entities.Count > 50, $"only {snapshot.Entities.Count} entities");
+        Assert.NotNull(snapshot.Player);
+        Assert.StartsWith("Metadata/Characters/", snapshot.Player!.Path, StringComparison.Ordinal);
+        Assert.Contains(snapshot.Entities, e => e.Kind == PoEformance.Game.World.EntityKind.Monster);
+
+        // Positions must be real world coordinates spread over the area, not a cluster of
+        // zeroes from a failed read.
+        Assert.True(snapshot.Entities.Max(e => e.WorldX) - snapshot.Entities.Min(e => e.WorldX) > 500);
     }
 }

@@ -171,11 +171,11 @@ public class VerticalSliceTests
 
         Assert.Equal(liveArea, replayArea);
 
-        // And the drifted-matrix alarm still fires against the replay: the recorded
-        // session has no valid matrix at the W2S offset, so unitVector3 must FAIL
-        // (unreadable), not silently pass.
+        // And an unreadable field still raises the alarm against the replay instead of
+        // silently passing: nothing was recorded at this WorldData address, so the
+        // non-null pointer check must FAIL.
         List<FieldCheck> checks = new SchemaValidator(replay)
             .ValidateStruct(schema.Structs["WorldData"], 0x45_0000UL);
-        Assert.Contains(checks, c => c.FieldName == "W2SMatrix" && c.Outcome == CheckOutcome.Fail);
+        Assert.Contains(checks, c => c.FieldName == "WorldAreaDetailsPtr" && c.Outcome == CheckOutcome.Fail);
     }
 }

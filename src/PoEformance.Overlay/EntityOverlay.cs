@@ -25,7 +25,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     // otherwise shadow the library's Overlay type.
 
     private readonly Func<WorldSnapshot> _snapshotSource;
+    private readonly IntPtr _gameWindow;
     private WorldSnapshot _snapshot = WorldSnapshot.Empty;
+    private ClientRect _tracked;
 
     /// <summary>Radius in pixels of an entity dot.</summary>
     private const float DotRadius = 5f;
@@ -39,12 +41,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>
     /// Creates the overlay. <paramref name="snapshotSource"/> is called once per frame and
     /// must be cheap and non-blocking - it is the render thread.
+    /// <paramref name="gameWindow"/> is the game's window handle, which the overlay resizes
+    /// itself to match.
     /// </summary>
-    public EntityOverlay(Func<WorldSnapshot> snapshotSource)
+    public EntityOverlay(Func<WorldSnapshot> snapshotSource, IntPtr gameWindow)
         : base("PoEformance", true)
     {
         ArgumentNullException.ThrowIfNull(snapshotSource);
         _snapshotSource = snapshotSource;
+        _gameWindow = gameWindow;
     }
 
     protected override Task PostInitialized()
@@ -56,6 +61,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     protected override void Render()
     {
         _snapshot = _snapshotSource();
+        TrackGameWindow();
 
         int width = (int)ImGui.GetIO().DisplaySize.X;
         int height = (int)ImGui.GetIO().DisplaySize.Y;
@@ -69,6 +75,28 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             DrawDebugWindow(width, height);
         }
+    }
+
+    /// <summary>
+    /// Matches the overlay to the game's client area, so a projected pixel means the same
+    /// thing in both windows.
+    /// </summary>
+    /// <remarks>
+    /// Only applied on a CHANGE: assigning position and size re-creates swap-chain resources,
+    /// so doing it every frame would cost far more than the comparison saves - and it also
+    /// keeps the window movable by the user when no game window is being tracked.
+    /// </remarks>
+    private void TrackGameWindow()
+    {
+        ClientRect rect = GameWindowTracker.TryGet(_gameWindow);
+        if (!rect.IsValid || rect == _tracked)
+        {
+            return;
+        }
+
+        _tracked = rect;
+        Position = new System.Drawing.Point(rect.X, rect.Y);
+        Size = new System.Drawing.Size(rect.Width, rect.Height);
     }
 
     /// <summary>Projects every entity and paints it on the background draw list.</summary>
@@ -127,7 +155,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             else
             {
                 ImGui.Text($"entities: {_snapshot.Entities.Count}");
-                ImGui.Text($"viewport: {width} x {height}");
+                ImGui.Text(_tracked.IsValid
+                    ? $"viewport: {width} x {height}  (game {_tracked.Width} x {_tracked.Height} @ {_tracked.X},{_tracked.Y})"
+                    : $"viewport: {width} x {height}  (game window not tracked)");
 
                 if (_snapshot.Player is WorldEntity player)
                 {
@@ -138,10 +168,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     ScreenPoint p = WorldToScreen.Project(
                         _snapshot.Matrix, player.WorldX, player.WorldY, player.WorldZ, width, height);
                     double offCentre = WorldToScreen.OffCentreFraction(p, width, height);
-                    Vector4 colour = offCentre < 0.15
+
+                    // Centred ALONE is not proof: a matrix that blows w up collapses the whole
+                    // scene onto the centre, so the player looks perfect while nothing else is
+                    // drawable. Showing the scene's pixel spread next to it makes that failure
+                    // visible instead of reassuring.
+                    double spread = ScreenSpread(width, height);
+                    bool healthy = offCentre < 0.15 && spread > width * 0.05;
+                    Vector4 colour = healthy
                         ? new Vector4(0.4f, 1f, 0.4f, 1f)
                         : new Vector4(1f, 0.4f, 0.4f, 1f);
-                    ImGui.TextColored(colour, $"player off-centre: {offCentre:F3}");
+                    ImGui.TextColored(colour, $"player off-centre: {offCentre:F3}   scene spread: {spread:F0} px");
+                    if (!healthy && spread <= width * 0.05)
+                    {
+                        ImGui.TextColored(colour, "  scene collapsed - the matrix offset is wrong.");
+                    }
                 }
 
                 foreach (IGrouping<EntityKind, WorldEntity> group in _snapshot.Entities.GroupBy(e => e.Kind).OrderBy(g => g.Key.ToString()))
@@ -159,6 +200,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         ImGui.End();
+    }
+
+    /// <summary>
+    /// Widest pixel gap between any two projected entities - near zero when a bad matrix has
+    /// collapsed the scene onto one point.
+    /// </summary>
+    private double ScreenSpread(int width, int height)
+    {
+        double minX = double.MaxValue, maxX = double.MinValue;
+        double minY = double.MaxValue, maxY = double.MinValue;
+        foreach (WorldEntity entity in _snapshot.Entities)
+        {
+            ScreenPoint point = WorldToScreen.Project(
+                _snapshot.Matrix, entity.WorldX, entity.WorldY, entity.WorldZ, width, height);
+            minX = Math.Min(minX, point.X); maxX = Math.Max(maxX, point.X);
+            minY = Math.Min(minY, point.Y); maxY = Math.Max(maxY, point.Y);
+        }
+
+        return maxX < minX ? 0 : Math.Max(maxX - minX, maxY - minY);
     }
 
     /// <summary>White outline so dots stay readable over any background.</summary>

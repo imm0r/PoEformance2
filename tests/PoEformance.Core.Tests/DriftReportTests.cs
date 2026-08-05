@@ -104,7 +104,9 @@ public class DriftReportTests
 
         string text = writer.ToString();
         Assert.Contains("ok    LocalPlayerStruct.LocalPlayerPtr", text);
-        Assert.Contains("ok    WorldData.W2SMatrix", text);
+        // W2SMatrix deliberately carries no structural invariant - a byte pattern cannot
+        // tell the real matrix from a decoy, so it is verified by MatrixHunt instead.
+        Assert.DoesNotContain("FAIL  WorldData.W2SMatrix", text);
     }
 
     [Fact]

@@ -20,11 +20,17 @@ public sealed record PlayerProbeResult(
     double NdcMagnitude)
 {
     /// <summary>
-    /// The decisive matrix proof: the camera follows the player, so the player's own
-    /// world position must project to (near) the centre of the view - NDC magnitude ~0.
-    /// A small value here confirms BOTH the matrix and the position read are correct;
-    /// a large one means one of them is wrong.
+    /// The camera follows the player, so the player's own position must project near the
+    /// centre of the view.
     /// </summary>
+    /// <remarks>
+    /// NECESSARY BUT NOT SUFFICIENT, and that distinction cost a wrong conclusion once: a
+    /// matrix that inflates w to millions drives every numerator to ~0, so the player lands
+    /// dead centre while the entire scene collapses onto the same pixel. This check alone
+    /// called that "MATRIX PROVEN". The conclusive test needs the OTHER entities to spread
+    /// out too and lives in <c>MatrixHunt</c>; here the w plausibility band is the cheap
+    /// guard that catches the collapsed case with only one point available.
+    /// </remarks>
     public bool ProjectsToCentre => Projected && NdcMagnitude < 0.15;
 }
 
