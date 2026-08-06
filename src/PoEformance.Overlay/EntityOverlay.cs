@@ -178,6 +178,24 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private AlertWindow? _alertWindow;
+    private PreloadWindow? _preloadWindow;
+    private PreloadWatch? _preload;
+
+    /// <summary>
+    /// Adds the "what is in this area" list.
+    /// </summary>
+    /// <remarks>
+    /// The walk that fills it belongs to whoever owns the reading - it is far too expensive
+    /// for a tick and runs once per area on its own thread. This only shows the answer, and
+    /// offers the button that forces another look.
+    /// </remarks>
+    public void AttachPreload(PreloadWatch watch, Action lookAgain, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(watch);
+        ArgumentNullException.ThrowIfNull(lookAgain);
+        _preload = watch;
+        _preloadWindow = new PreloadWindow(watch, lookAgain) { Visible = visible };
+    }
 
     /// <summary>Called when an alert setting was changed, so it can be written down.</summary>
     /// <remarks>
@@ -627,6 +645,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _poi?.DrawPicker(_snapshot, _snapshot.Player);
         _styleWindow?.Render();
         _alertWindow?.Render();
+        _preloadWindow?.Render();
 
         if (ShowStatus)
         {
@@ -1006,6 +1025,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 {
                     _healthBars.OnlyWhenHurt = hurtOnly;
                     SettingsChanged?.Invoke();
+                }
+
+                if (_preload is not null && _preloadWindow is not null)
+                {
+                    // The summary next to the switch, so the common case needs no window at
+                    // all: the answer is one line and it is already on screen.
+                    string here = _preload.Summary();
+                    bool showing = _preloadWindow.Visible;
+                    if (ImGui.Checkbox(
+                            here.Length > 0
+                                ? $"In this area: {here}###preload"
+                                : $"In this area  ({_preload.All.Count} files)###preload",
+                            ref showing))
+                    {
+                        _preloadWindow.Visible = showing;
+                    }
                 }
 
                 if (_alerts is not null && _alertWindow is not null)

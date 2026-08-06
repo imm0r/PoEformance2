@@ -432,6 +432,40 @@
       }
     },
 
+    "LoadedFilesRoot": {
+      "comment": "What the FileRoot static points at: an ARRAY of BucketCount buckets, each BucketSize apart. GameHelper2's LoadedFilesRootObject, whose TotalCount is 0x10. The name says hash map and the layout says otherwise - each bucket is a plain vector with a capacity beside it, so walking one needs no hashing.",
+      "fields": {},
+      "consts": {
+        "BucketCount": "0x10",
+        "BucketSize": "0x38"
+      }
+    },
+
+    "LoadedFilesBucket": {
+      "comment": "One bucket. Data is a StdVector of FileRecordSlot; Capacity is one LESS than the real capacity, and is only read as a sanity gate - the vector's own first/last say how many there are.",
+      "fields": {
+        "Data": { "offset": "0x00", "type": "stdVector" },
+        "Capacity": { "offset": "0x18", "type": "i32" }
+      }
+    },
+
+    "FileRecordSlot": {
+      "comment": "One slot in a bucket's vector. Three pointers; only the middle one leads anywhere. An EMPTY slot is ordinary - a hash table is mostly empty - so a null or unreadable record here is not an error.",
+      "fields": {
+        "Record": { "offset": "0x08", "type": "ptr" }
+      },
+      "consts": { "Size": "0x18" }
+    },
+
+    "FileRecord": {
+      "comment": "One loaded file. AreaChangeCount is the value the area-change counter held when the game loaded it, which is what makes this feature possible: the files whose count EQUALS the counter now are the ones this area brought in. GameHelper2 skips counts below 3, because the first couple of areas of a session load the whole menu with them.",
+      "fields": {
+        "Name": { "offset": "0x08", "type": "stdWString" },
+        "AreaChangeCount": { "offset": "0x40", "type": "i32" }
+      },
+      "consts": { "IgnoreFirstAreas": "2" }
+    },
+
     "Chest": {
       "fields": {
         "ChestDataPtr": { "offset": "0x160", "type": "ptr" },

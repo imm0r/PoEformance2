@@ -214,7 +214,9 @@ internal static class Program
             RunOverlay(
                 reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask, rotation,
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
-                uiBrowser: options.ShowUiBrowser);
+                uiBrowser: options.ShowUiBrowser,
+                fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
+                areaCounter: result.Statics.FirstOrDefault(s => s.Name == "AreaChangeCounter" && s.Found)?.Address ?? 0);
         }
 
         configWindow?.Join();
@@ -345,7 +347,8 @@ internal static class Program
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
         PoEformance.Features.AutoFlask autoFlask,
         PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
-        PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser)
+        PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
+        ulong fileRoot, ulong areaCounter)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation)
         {
@@ -400,6 +403,43 @@ internal static class Program
         // overlay was hidden behind an inventory screen.
         var coverage = new PoEformance.Features.MapCoverage();
 
+        // What the area LOADED, which names the encounters in it before anybody has walked
+        // there. The walk is thousands of pointers and a string each - far too much for a
+        // tick - so it runs once when the area changes, on a thread of its own.
+        var preload = new PoEformance.Features.PreloadWatch();
+        var preloadReader = new PoEformance.Game.World.PreloadReader(reader, schema);
+        uint preloadArea = 0;
+        int preloadBusy = 0;
+
+        void LookAtWhatLoaded(uint area)
+        {
+            // One at a time, and never twice for the same area. Two walks at once would be
+            // two thousand reads competing with the one the renderer is waiting for.
+            if (fileRoot == 0 || areaCounter == 0
+                || System.Threading.Interlocked.CompareExchange(ref preloadBusy, 1, 0) != 0)
+            {
+                return;
+            }
+
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    int counter = preloadReader.AreaChangeCount(areaCounter);
+                    HashSet<string> files = preloadReader.Read(fileRoot, counter);
+                    preload.Took(area, files, preloadReader.LastError);
+                }
+                catch (Exception exception)
+                {
+                    preload.Took(area, [], exception.Message);
+                }
+                finally
+                {
+                    System.Threading.Volatile.Write(ref preloadBusy, 0);
+                }
+            });
+        }
+
         using var feed = new PoEformance.Features.SnapshotFeed(
             scale =>
             {
@@ -410,6 +450,15 @@ internal static class Program
                 route.Service(snapshot, Environment.TickCount64);
                 costs.Add(snapshot.Cost, snapshot.AreaHash, Environment.TickCount64);
                 coverage.Look(snapshot);
+
+                // On the area CHANGE rather than on a timer. The list cannot change while
+                // you stand in a zone, so looking again would be thousands of reads to
+                // confirm what is already on screen.
+                if (snapshot.InGame && snapshot.AreaHash != 0 && snapshot.AreaHash != preloadArea)
+                {
+                    preloadArea = snapshot.AreaHash;
+                    LookAtWhatLoaded(snapshot.AreaHash);
+                }
 
                 // Evaluated even when the feature is off: it costs a bool check, and its
                 // reason string is what the overlay's status line shows - including the
@@ -448,6 +497,7 @@ internal static class Program
         overlay.Noise = world.Noise;
         overlay.Costs = costs;
         overlay.Coverage = coverage;
+        overlay.AttachPreload(preload, () => LookAtWhatLoaded(preloadArea));
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);
