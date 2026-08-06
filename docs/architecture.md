@@ -257,6 +257,15 @@ interesting part was not the feature:
   deal of ground nobody can reach, so the figure is measured against a flood fill from where
   the player came in; against every walkable cell a finished map reads as a few per cent.
 
+- **Health bars, and looted chests.** Both came out of reads that were already happening or
+  already described: the corpse check read a monster's current health and threw the maximum
+  away, and the Chest offsets sat in the schema unread. The interesting part is how they FAIL
+  - an absent component is not "dead" and not "opened", and getting that backwards makes a
+  whole feature disappear the moment an offset drifts, with no error to trace.
+- **Routes that stay on one storey.** The walkable grid is flat: a bridge and the ground under
+  it are the same cells and both walkable, so a two-dimensional search draws a route through
+  the floor. Only the height separates them.
+
 ### Remaining
 
 More features on the slice, and configuring them from the page.

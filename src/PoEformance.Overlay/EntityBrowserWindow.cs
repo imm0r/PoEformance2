@@ -149,6 +149,33 @@ public sealed class EntityBrowserWindow
         ImGui.TextColored(DimText, view.Status);
     }
 
+    /// <summary>
+    /// The reads that only some entities carry, written out where they can be watched.
+    /// </summary>
+    /// <remarks>
+    /// An empty string for anything that has none, rather than a placeholder - a list where
+    /// most rows carry "-  -  -" is harder to scan than one where the facts stand out.
+    /// </remarks>
+    private static string Facts(WorldEntity entity)
+    {
+        string life = entity.Life.IsValid
+            ? $"  {entity.Life.Current}/{entity.Life.Max}"
+            : string.Empty;
+
+        string shield = entity.EnergyShield.IsValid && entity.EnergyShield.Max > 0
+            ? $"  es {entity.EnergyShield.Current}/{entity.EnergyShield.Max}"
+            : string.Empty;
+
+        string chest = entity.Opened switch
+        {
+            true => "  opened",
+            false => "  closed",
+            _ => string.Empty,
+        };
+
+        return life + shield + chest;
+    }
+
     private void DrawList(List<WorldEntity> listed, WorldEntity? player)
     {
         // BeginChild is paired with EndChild whatever it returns, and the finally is there
@@ -163,10 +190,17 @@ public sealed class EntityBrowserWindow
                     ? string.Empty
                     : $"  {Distance(entity, player) / MapView.WorldToGrid:F0}";
 
+                // What the newest reads say about this entity, where they say anything. This
+                // is how they get CHECKED against the game: stand next to a monster and watch
+                // the pool move as you hit it, open a chest and watch the flag turn over.
+                // Without somewhere to see them, a read that quietly returns nonsense looks
+                // exactly like a read that works.
+                string facts = Facts(entity);
+
                 // ###address, not ##: the label carries a live distance, and ImGui derives a
                 // control's identity from its label - so without this the row would be a new
                 // control every frame and the click would never land.
-                if (ImGui.Selectable($"{entity.Kind}  {entity.ShortName}{away}###{entity.Address:X}",
+                if (ImGui.Selectable($"{entity.Kind}  {entity.ShortName}{away}{facts}###{entity.Address:X}",
                         entity.Address == _selected))
                 {
                     _selected = entity.Address;
