@@ -36,15 +36,19 @@ public sealed class PreloadWindow
 
     private readonly PreloadWatch _watch;
     private readonly Action _lookAgain;
+    private readonly Action _sweep;
     private string _search = string.Empty;
 
     /// <param name="lookAgain">Runs the walk again, for when it needs forcing.</param>
-    public PreloadWindow(PreloadWatch watch, Action lookAgain)
+    /// <param name="sweep">Looks for the count field instead of assuming one - see below.</param>
+    public PreloadWindow(PreloadWatch watch, Action lookAgain, Action sweep)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(lookAgain);
+        ArgumentNullException.ThrowIfNull(sweep);
         _watch = watch;
         _lookAgain = lookAgain;
+        _sweep = sweep;
     }
 
     /// <summary>Whether the window is on screen.</summary>
@@ -109,6 +113,24 @@ public sealed class PreloadWindow
         if (_watch.Note.Length > 0)
         {
             ImGui.TextColored(WarnText, _watch.Note);
+        }
+
+        // Offered exactly when it is the question. "It walked thousands of slots and matched
+        // nothing" has several causes wanting opposite fixes, and the sweep is what tells
+        // them apart - so it appears when that has happened and stays out of the way when it
+        // has not.
+        if (all.Count == 0 && _watch.Looked)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("find the count field"))
+            {
+                _sweep();
+            }
+        }
+
+        foreach (string line in _watch.Sweep)
+        {
+            ImGui.TextColored(DimText, line);
         }
 
         ImGui.Separator();

@@ -103,6 +103,25 @@ public sealed class PreloadWatch
     /// <summary>What went wrong, when nothing came back.</summary>
     public string Note { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// What a sweep of the records found, when one was asked for.
+    /// </summary>
+    /// <remarks>
+    /// Plain lines rather than a structure, because nothing reads this - a person does, once,
+    /// on the day the walk comes back empty and the question is which of four things moved.
+    /// </remarks>
+    public IReadOnlyList<string> Sweep { get; private set; } = [];
+
+    /// <summary>Records what a sweep found, for whoever is looking at an empty list.</summary>
+    public void Swept(IEnumerable<string> lines)
+    {
+        ArgumentNullException.ThrowIfNull(lines);
+        lock (_gate)
+        {
+            Sweep = [.. lines];
+        }
+    }
+
     /// <summary>What this area contains that is worth a line.</summary>
     public IReadOnlyList<PreloadFinding> Findings
     {

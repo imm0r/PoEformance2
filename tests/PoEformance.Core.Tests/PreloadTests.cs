@@ -313,3 +313,157 @@ public class PreloadWatchTests
         }
     }
 }
+
+/// <summary>
+/// Finding the count field instead of assuming one.
+/// </summary>
+/// <remarks>
+/// Written the moment the walk came back "13948 slots and matched nothing at count 188". That
+/// sentence has several causes wanting opposite fixes - the record struct moved, the count
+/// sits elsewhere, or the game counts areas differently from how the comparison assumes - and
+/// one number cannot tell them apart.
+///
+/// So the sweep asks two questions of the same read: do the NAMES come back as paths, which
+/// says whether the record base is right at all, and which offsets hold the counter's value.
+/// Between them there is no case left that reads as "nothing".
+/// </remarks>
+public class PreloadSweepTests
+{
+    private const ulong RootStatic = 0x10_0000;
+    private const ulong Root = 0x20_0000;
+
+    private static OffsetSchema Schema() => RealSessionTests.Schema();
+
+    /// <summary>A table whose count sits at a CHOSEN offset rather than the expected one.</summary>
+    private static FakeMemoryReader TableWithCountAt(int countOffset, int count, int records)
+    {
+        var memory = new FakeMemoryReader();
+        OffsetSchema schema = Schema();
+        int bucketSize = (int)schema.Structs["LoadedFilesRoot"].Constants["BucketSize"];
+        int slotSize = (int)schema.Structs["FileRecordSlot"].Constants["Size"];
+        int slotRecord = schema.Structs["FileRecordSlot"].OffsetOf("Record");
+        int name = schema.Structs["FileRecord"].OffsetOf("Name");
+
+        memory.Place(RootStatic, Root);
+
+        ulong next = 0x100_0000;
+        ulong Take(int bytes)
+        {
+            ulong at = next;
+            next += (ulong)((bytes + 0xFF) & ~0xFF);
+            return at;
+        }
+
+        ulong slots = Take(slotSize * records);
+        memory.Place(Root, slots);
+        memory.Place(Root + 8, slots + (ulong)(slotSize * records));
+        memory.Place(Root + (ulong)schema.Structs["LoadedFilesBucket"].OffsetOf("Capacity"), records);
+
+        for (int i = 0; i < records; i++)
+        {
+            ulong record = Take(0x200);
+            memory.Place(record, new byte[0x200]);   // a whole mapped record, as the game has
+            memory.Place(slots + (ulong)(i * slotSize) + (ulong)slotRecord, record);
+            memory.Place(record + (ulong)countOffset, count);
+            memory.PlaceStdWString(record + (ulong)name, $"Metadata/Terrain/Thing{i}", Take(512));
+        }
+
+        for (int b = 1; b < 16; b++)
+        {
+            memory.Place(
+                Root + (ulong)(b * bucketSize)
+                    + (ulong)schema.Structs["LoadedFilesBucket"].OffsetOf("Capacity"),
+                0);
+        }
+
+        return memory;
+    }
+
+    [Fact]
+    public void ItNamesTheOffsetTheWHOLETableAgreesOn()
+    {
+        // The answer, when there is one. A field a thousand records share is the field; a
+        // stray match is one record.
+        FakeMemoryReader memory = TableWithCountAt(countOffset: 0x58, count: 188, records: 300);
+        var reader = new PreloadReader(memory, Schema());
+
+        PreloadReader.PreloadSweep swept = reader.Sweep(RootStatic, 188);
+
+        Assert.Equal(0x58, swept.CountAt[0].Offset);
+        Assert.Equal(300, swept.CountAt[0].Agreeing);
+    }
+
+    [Fact]
+    public void ReadableNamesSayTheRECORDIsRight()
+    {
+        // The half that separates "the count moved" from "we are not looking at records at
+        // all" - and the two want completely different work.
+        FakeMemoryReader memory = TableWithCountAt(countOffset: 0x58, count: 188, records: 50);
+        var reader = new PreloadReader(memory, Schema());
+
+        PreloadReader.PreloadSweep swept = reader.Sweep(RootStatic, 188);
+
+        Assert.Equal(50, swept.Records);
+        Assert.Equal(50, swept.Named);
+        Assert.NotEmpty(swept.Samples);
+        Assert.StartsWith("Metadata/", swept.Samples[0], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AndGIBBERISHNamesSayItIsNot()
+    {
+        // Records that are not records. Without this the sweep would report "no offset holds
+        // the counter" and send somebody hunting a field in a struct that was never there.
+        var memory = new FakeMemoryReader();
+        OffsetSchema schema = Schema();
+        int slotSize = (int)schema.Structs["FileRecordSlot"].Constants["Size"];
+
+        memory.Place(RootStatic, Root);
+        memory.Place(Root, 0x100_0000UL);
+        memory.Place(Root + 8, 0x100_0000UL + (ulong)(slotSize * 10));
+        memory.Place(Root + (ulong)schema.Structs["LoadedFilesBucket"].OffsetOf("Capacity"), 10);
+
+        for (int i = 0; i < 10; i++)
+        {
+            ulong garbage = 0x200_0000UL + (ulong)(i * 0x200);
+            memory.Place(garbage, new byte[0x200]);
+            memory.Place(
+                0x100_0000UL + (ulong)(i * slotSize)
+                    + (ulong)schema.Structs["FileRecordSlot"].OffsetOf("Record"),
+                garbage);
+        }
+
+        var reader = new PreloadReader(memory, Schema());
+        PreloadReader.PreloadSweep swept = reader.Sweep(RootStatic, 188);
+
+        Assert.True(swept.Records > 0, "the slots still led somewhere readable");
+        Assert.Equal(0, swept.Named);
+    }
+
+    [Fact]
+    public void ItAlsoSaysWhatTheOffsetInUseHOLDS()
+    {
+        // The case that is not a drifted offset at all: the records agree on a number NEAR
+        // the counter, because the game counts areas differently from how the comparison
+        // assumes. Reported separately, because the fix is a comparison rather than an offset.
+        int inUse = Schema().Structs["FileRecord"].OffsetOf("AreaChangeCount");
+        FakeMemoryReader memory = TableWithCountAt(countOffset: inUse, count: 187, records: 120);
+        var reader = new PreloadReader(memory, Schema());
+
+        PreloadReader.PreloadSweep swept = reader.Sweep(RootStatic, 188);
+
+        Assert.Empty(swept.CountAt);
+        Assert.Equal(187, swept.NearbyValues[0].Value);
+        Assert.Equal(120, swept.NearbyValues[0].Records);
+    }
+
+    [Fact]
+    public void APathIsToldFromGibberish()
+    {
+        Assert.True(PreloadReader.LooksLikeAPath("Metadata/Terrain/Thing"));
+        Assert.True(PreloadReader.LooksLikeAPath("Art/Models/Ground"));
+        Assert.False(PreloadReader.LooksLikeAPath("nope"));
+        Assert.False(PreloadReader.LooksLikeAPath(string.Empty));
+        Assert.False(PreloadReader.LooksLikeAPath("a/"));
+    }
+}

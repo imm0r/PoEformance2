@@ -185,6 +185,175 @@ public sealed class PreloadReader
         }
     }
 
+    /// <summary>How far into a record the sweep looks for the count field.</summary>
+    public const int SweepBytes = 0x100;
+
+    /// <summary>What a sweep of the records found.</summary>
+    /// <param name="Records">Slots that led to something readable.</param>
+    /// <param name="Named">Records whose name read as a plausible path - the struct's own check.</param>
+    /// <param name="Samples">A few names, so "plausible" can be judged rather than trusted.</param>
+    /// <param name="CountAt">
+    /// Offsets that hold the counter's value, and how many records agree. The answer, when
+    /// there is one: a field the whole table agrees on is the field.
+    /// </param>
+    /// <param name="NearbyValues">
+    /// What the current <see cref="Chosen"/> offset actually holds, most common first. This is
+    /// what says whether the offset is wrong or the COMPARISON is - a table where nearly every
+    /// record reads 187 against a counter of 188 is not a drifted offset.
+    /// </param>
+    public readonly record struct PreloadSweep(
+        int Slots,
+        int Records,
+        int Named,
+        IReadOnlyList<string> Samples,
+        IReadOnlyList<(int Offset, int Agreeing)> CountAt,
+        IReadOnlyList<(int Value, int Records)> NearbyValues,
+        int Chosen);
+
+    /// <summary>
+    /// Looks for the field that holds the area-change count, instead of assuming one.
+    /// </summary>
+    /// <remarks>
+    /// THE ANSWER TO "IT WALKED THOUSANDS OF SLOTS AND MATCHED NOTHING". That sentence has
+    /// several causes and they want opposite fixes: the record struct could have moved, the
+    /// count could sit at a different offset, or the game could increment its counter more
+    /// than once per area so that the files carry a number NEAR the counter rather than equal
+    /// to it. Guessing between them from one number is hopeless.
+    ///
+    /// So this reads a window of each record ONCE and asks two questions of it: does the name
+    /// read as a path - which says whether the struct base is right at all - and which offsets
+    /// in the window hold the counter's value. An offset the whole table agrees on is the
+    /// field, found rather than guessed; and the values at the CURRENT offset say whether the
+    /// problem was ever an offset in the first place.
+    ///
+    /// This is the drift scanner the architecture promises, in the one place it was needed
+    /// first. Slow and deliberate - it exists to be pressed once.
+    /// </remarks>
+    public PreloadSweep Sweep(ulong fileRootStatic, int areaChangeCount, int mostRecords = 4_000)
+    {
+        var samples = new List<string>();
+        var agreeing = new Dictionary<int, int>();
+        var atChosen = new Dictionary<int, int>();
+        int slots = 0;
+        int records = 0;
+        int named = 0;
+
+        ulong root = _reader.ReadPointer(fileRootStatic);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(root))
+        {
+            return new PreloadSweep(0, 0, 0, [], [], [], _recordCount);
+        }
+
+        Span<byte> window = stackalloc byte[SweepBytes];
+
+        for (int b = 0; b < _bucketCount && records < mostRecords; b++)
+        {
+            foreach (ulong record in RecordsIn(root + (ulong)(b * _bucketSize)))
+            {
+                slots++;
+                if (records >= mostRecords)
+                {
+                    break;
+                }
+
+                // Shrinking on failure rather than demanding the whole window. A record near
+                // the end of a mapped page cannot supply 0x100 bytes, and ReadProcessMemory
+                // refuses the WHOLE range when any of it is unmapped - so asking for one size
+                // and giving up would skip exactly the records at page ends.
+                int have = SweepBytes;
+                while (have >= sizeof(int) && !_reader.TryRead(record, window[..have]))
+                {
+                    have /= 2;
+                }
+
+                if (have < sizeof(int))
+                {
+                    continue;
+                }
+
+                records++;
+
+                string path = _reader.ReadStdWString(record + (ulong)_recordName, LongestPath);
+                if (LooksLikeAPath(path))
+                {
+                    named++;
+                    if (samples.Count < 5)
+                    {
+                        samples.Add(path);
+                    }
+                }
+
+                // Every four-byte slot in the window that happens to hold the counter. The
+                // real field is the one thousands of records agree on; a stray match is one.
+                for (int at = 0; at + sizeof(int) <= have; at += sizeof(int))
+                {
+                    if (BitConverter.ToInt32(window[at..]) == areaChangeCount)
+                    {
+                        agreeing[at] = agreeing.GetValueOrDefault(at) + 1;
+                    }
+                }
+
+                if (_recordCount + sizeof(int) <= have)
+                {
+                    int here = BitConverter.ToInt32(window[_recordCount..]);
+                    atChosen[here] = atChosen.GetValueOrDefault(here) + 1;
+                }
+            }
+        }
+
+        return new PreloadSweep(
+            slots,
+            records,
+            named,
+            samples,
+            [.. agreeing.OrderByDescending(e => e.Value).Take(6).Select(e => (e.Key, e.Value))],
+            [.. atChosen.OrderByDescending(e => e.Value).Take(6).Select(e => (e.Key, e.Value))],
+            _recordCount);
+    }
+
+    /// <summary>Every record a bucket points at, however many that turns out to be.</summary>
+    private IEnumerable<ulong> RecordsIn(ulong bucket)
+    {
+        if (!_reader.TryRead(bucket + (ulong)_bucketCapacity, out int capacity) || capacity <= 0)
+        {
+            yield break;
+        }
+
+        ulong first = _reader.ReadPointer(bucket);
+        ulong last = _reader.ReadPointer(bucket + sizeof(ulong));
+        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
+        {
+            yield break;
+        }
+
+        long slots = (long)(last - first) / _slotSize;
+        if (slots <= 0 || slots > MostSlotsPerBucket)
+        {
+            yield break;
+        }
+
+        for (long i = 0; i < slots; i++)
+        {
+            ulong record = _reader.ReadPointer(first + (ulong)(i * _slotSize) + (ulong)_slotRecord);
+            if (MemoryReaderExtensions.IsPlausiblePointer(record))
+            {
+                yield return record;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Whether a string reads as one of the game's file paths.
+    /// </summary>
+    /// <remarks>
+    /// The check that says whether the RECORD is right, separately from the count. A table
+    /// full of readable paths with no matching counts is a count-offset problem; a table of
+    /// gibberish is a struct problem, and the two want completely different work.
+    /// </remarks>
+    public static bool LooksLikeAPath(string text)
+        => text.Length >= 4 && text.Contains('/', StringComparison.Ordinal)
+            && !text.Any(char.IsControl);
+
     /// <summary>
     /// The path as it should be remembered.
     /// </summary>

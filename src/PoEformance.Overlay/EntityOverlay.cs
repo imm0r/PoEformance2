@@ -189,12 +189,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// for a tick and runs once per area on its own thread. This only shows the answer, and
     /// offers the button that forces another look.
     /// </remarks>
-    public void AttachPreload(PreloadWatch watch, Action lookAgain, bool visible = false)
+    public void AttachPreload(PreloadWatch watch, Action lookAgain, Action sweep, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(lookAgain);
+        ArgumentNullException.ThrowIfNull(sweep);
         _preload = watch;
-        _preloadWindow = new PreloadWindow(watch, lookAgain) { Visible = visible };
+        _preloadWindow = new PreloadWindow(watch, lookAgain, sweep) { Visible = visible };
     }
 
     /// <summary>Called when an alert setting was changed, so it can be written down.</summary>

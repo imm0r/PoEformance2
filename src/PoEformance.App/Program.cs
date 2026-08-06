@@ -411,6 +411,48 @@ internal static class Program
         uint preloadArea = 0;
         int preloadBusy = 0;
 
+        void SweepForTheCountField()
+        {
+            if (fileRoot == 0 || areaCounter == 0)
+            {
+                preload.Swept(["the file root or the counter did not resolve - nothing to sweep"]);
+                return;
+            }
+
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    int counter = preloadReader.AreaChangeCount(areaCounter);
+                    PoEformance.Game.World.PreloadReader.PreloadSweep swept =
+                        preloadReader.Sweep(fileRoot, counter);
+
+                    var lines = new List<string>
+                    {
+                        $"counter reads {counter}",
+                        $"{swept.Records} records read, {swept.Named} with a readable path"
+                            + (swept.Named == 0 ? "  <- the RECORD is wrong, not the count" : string.Empty),
+                    };
+
+                    lines.AddRange(swept.Samples.Select(sample => $"    {sample}"));
+
+                    lines.Add($"at the offset in use (+0x{swept.Chosen:X}) the records hold:");
+                    lines.AddRange(swept.NearbyValues.Select(v => $"    {v.Value}  in {v.Records} records"));
+
+                    lines.Add("offsets holding the counter's value:");
+                    lines.AddRange(swept.CountAt.Count > 0
+                        ? swept.CountAt.Select(c => $"    +0x{c.Offset:X}  in {c.Agreeing} records")
+                        : ["    none - no field in the first 0x100 bytes holds it"]);
+
+                    preload.Swept(lines);
+                }
+                catch (Exception exception)
+                {
+                    preload.Swept([exception.Message]);
+                }
+            });
+        }
+
         void LookAtWhatLoaded(uint area)
         {
             // One at a time, and never twice for the same area. Two walks at once would be
@@ -497,7 +539,7 @@ internal static class Program
         overlay.Noise = world.Noise;
         overlay.Costs = costs;
         overlay.Coverage = coverage;
-        overlay.AttachPreload(preload, () => LookAtWhatLoaded(preloadArea));
+        overlay.AttachPreload(preload, () => LookAtWhatLoaded(preloadArea), SweepForTheCountField);
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);
