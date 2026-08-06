@@ -29,7 +29,7 @@
     },
     "AreaChangeCounter": {
       "pattern": "49 89 46 ?? F0 FF 05 ^ ?? ?? ?? ?? 48 8B CD E8",
-      "comment": "The `lock inc [counter]` in the instance-load function. The shorter FF 05 form matched mid-instruction byte runs elsewhere (2 hits = ambiguous = miss); anchoring on the surrounding mov/lock inc/mov/call makes it unique."
+      "comment": "NOT CONFIRMED to be the area-change counter, and nothing depends on it - see FileRecord. This anchors a LOCKED increment (F0 FF 05) while the reference anchors a PLAIN one (FF 05 ?? ?? ?? ?? 4D 8B 06), so the two are different instructions at different sites and almost certainly different variables. The reference form was reported ambiguous here (2 hits), and switching instruction is not how that gets resolved - lengthening the reference pattern AT ITS OWN SITE is. Read live this resolves to something that counted 188 while the file table's newest stamp was far smaller, which is what put the doubt on it. Left in because the drift report still checks it and because the disagreement is worth seeing; fix it by re-deriving the reference site rather than by trusting this."
     },
     "TerrainRotatorHelper": {
       "pattern": "48 83 EC 38 41 0F B6 C0 4C 8B D1 4C 8B CA 48 8D 0D ?? ?? ?? ?? 44 0F B6 04 08 B8 08 00 00 00 8B 0A 44 3B C0 89 4C 24 24 BA 16 00 00 00 44 0F 47 C0 48 8D 05 ^ ?? ?? ?? ??",
