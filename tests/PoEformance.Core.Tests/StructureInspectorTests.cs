@@ -353,6 +353,85 @@ public class StructureInspectorTests
     }
 
     [Fact]
+    public void AShortStringShowsWithoutAnyExtraReading()
+    {
+        // It lives in the row, so the window read already has it. Anything more would be
+        // paying for something already in hand.
+        var reader = new CountingReader();
+        reader.Place(Somewhere, new byte[512]);
+        reader.Place(Somewhere, Inline("Chest"));
+
+        StructureView view = Look(Inspector(reader), At(Somewhere, 64));
+
+        Assert.Equal("Chest", view.Text[0]);
+        Assert.Equal(1, reader.Reads);
+    }
+
+    [Fact]
+    public void ALongStringIsFetchedFromWhereItsCharactersLive()
+    {
+        // The case that matters most: every metadata path in this game is one of these, and
+        // without it a name reads as a pointer and two meaningless numbers over four rows.
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+        reader.Place(Somewhere, HeapHeader("Metadata/Monsters/MudGolem", Elsewhere));
+        reader.Place(Elsewhere, new byte[512]);
+        reader.PlaceUtf16(Elsewhere, "Metadata/Monsters/MudGolem");
+
+        StructureView view = Look(Inspector(reader), At(Somewhere, 64));
+
+        Assert.Equal("Metadata/Monsters/MudGolem", view.Text[0]);
+    }
+
+    [Fact]
+    public void AStringIsOnlyFetchedONCE()
+    {
+        var reader = new CountingReader();
+        reader.Place(Somewhere, new byte[512]);
+        reader.Place(Somewhere, HeapHeader("Metadata/Monsters/MudGolem", Elsewhere));
+        reader.Place(Elsewhere, new byte[512]);
+        reader.PlaceUtf16(Elsewhere, "Metadata/Monsters/MudGolem");
+
+        StructureInspector inspector = Inspector(reader);
+        Look(inspector, At(Somewhere, 64));
+        int afterFirst = reader.Reads;
+        StructureView again = Look(inspector, At(Somewhere, 64));
+
+        // One read for the window, and nothing more for a string already fetched.
+        Assert.Equal(afterFirst + 1, reader.Reads);
+        Assert.Equal("Metadata/Monsters/MudGolem", again.Text[0]);
+    }
+
+    [Fact]
+    public void RowsThatAreNotTextSayNothing()
+    {
+        // Silence is the right answer, and the important one: a name invented over ordinary
+        // numbers sends someone looking for something that is not there.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 100, 0, 50, 0, 7, 0, 1, 0);
+
+        Assert.Empty(Look(Inspector(reader), At(Somewhere, 64)).Text);
+    }
+
+    private static byte[] Inline(string text)
+    {
+        var bytes = new byte[32];
+        System.Text.Encoding.Unicode.GetBytes(text, bytes.AsSpan(0, 16));
+        BitConverter.GetBytes((long)text.Length).CopyTo(bytes, 16);
+        BitConverter.GetBytes(7L).CopyTo(bytes, 24);
+        return bytes;
+    }
+
+    private static byte[] HeapHeader(string text, ulong data)
+    {
+        var bytes = new byte[32];
+        BitConverter.GetBytes(data).CopyTo(bytes, 0);
+        BitConverter.GetBytes((long)text.Length).CopyTo(bytes, 16);
+        BitConverter.GetBytes((long)text.Length).CopyTo(bytes, 24);
+        return bytes;
+    }
+
+    [Fact]
     public void TheKnownStructuresAreOfferedInAStableOrder()
     {
         // They fill a dropdown, and a list that reshuffles between frames cannot be clicked.
@@ -386,6 +465,8 @@ internal sealed class CountingReader : PoEformance.Core.Memory.IMemoryReader
 
     public void Place<T>(ulong address, T value)
         where T : unmanaged => _inner.Place(address, value);
+
+    public void PlaceUtf16(ulong address, string text) => _inner.PlaceUtf16(address, text);
 
     public bool TryRead(ulong address, Span<byte> destination)
     {

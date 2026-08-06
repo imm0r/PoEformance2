@@ -51,12 +51,18 @@ public sealed record StructureRequest(
 /// Rows that differ from the last baseline taken. The discovery workflow: take one, do
 /// something in the game, and this is the answer to "which part of this was that".
 /// </param>
+/// <param name="Text">
+/// The text a row holds, where it holds any - whether stored in the row itself or behind a
+/// pointer. Most of this game's structures are half strings, and without this they read as a
+/// pointer and two meaningless numbers.
+/// </param>
 public sealed record StructureView(
     ulong Address,
     IReadOnlyList<StructureSlot> Slots,
     IReadOnlySet<int> Live,
     IReadOnlySet<int> SinceBaseline,
     IReadOnlyDictionary<int, string> FieldNames,
+    IReadOnlyDictionary<int, string> Text,
     PeekResult? Peek,
     int PeekOffset,
     bool HasBaseline,
@@ -64,7 +70,7 @@ public sealed record StructureView(
 {
     public static StructureView Empty { get; } = new(
         0, [], new HashSet<int>(), new HashSet<int>(), new Dictionary<int, string>(),
-        null, -1, false, "nothing to look at yet");
+        new Dictionary<int, string>(), null, -1, false, "nothing to look at yet");
 }
 
 /// <summary>
@@ -100,8 +106,14 @@ public sealed class StructureInspector
 
     private readonly IMemoryReader _reader;
 
+    /// <summary>Longest string shown. A path is the longest this game holds.</summary>
+    private const int MaxTextChars = 200;
+
     /// <summary>Which addresses have something behind them. See <see cref="Verify"/>.</summary>
     private readonly Dictionary<ulong, bool> _readable = [];
+
+    /// <summary>The text at an address, or empty when there is none. See <see cref="TextIn"/>.</summary>
+    private readonly Dictionary<ulong, string> _textAt = [];
     private readonly OffsetSchema _schema;
     private readonly ulong _gameStatesStatic;
 
@@ -241,6 +253,7 @@ public sealed class StructureInspector
             live,
             sinceBaseline,
             NamesFor(request.StructName, stride),
+            TextIn(window, slots),
             _lastPeek,
             _lastPeekOffset,
             haveBaseline,
@@ -307,6 +320,92 @@ public sealed class StructureInspector
         }
 
         return slots;
+    }
+
+    /// <summary>
+    /// The text each row holds, wherever it is stored.
+    /// </summary>
+    /// <remarks>
+    /// Three ways a row can carry text, and they cost different amounts:
+    ///
+    /// - a SHORT string lives in the row, so showing it costs nothing at all;
+    /// - a LONG one leaves a header in the row and its characters elsewhere, so it costs one
+    ///   read - cached, because a string's contents rarely change and the same rows are
+    ///   re-read every tick while the window is open;
+    /// - a bare POINTER to characters, with no header, which is how the data tables store
+    ///   their names. Only a read can tell, and it shares the same cache.
+    /// </remarks>
+    private IReadOnlyDictionary<int, string> TextIn(byte[] window, List<StructureSlot> slots)
+    {
+        var found = new Dictionary<int, string>();
+        int fetched = 0;
+
+        foreach (StructureSlot slot in slots)
+        {
+            TextCandidate candidate = TextProbe.At(window, slot.Offset);
+
+            if (candidate.Shape == TextShape.Inline)
+            {
+                found[slot.Offset] = candidate.Text;
+                continue;
+            }
+
+            // A header and a bare pointer are the same job from here: characters at an
+            // address, fetched once and remembered.
+            ulong at = candidate.Shape == TextShape.Heap ? candidate.Address
+                : slot.Guess == SlotGuess.Pointer ? slot.Raw
+                : 0;
+
+            if (at == 0)
+            {
+                continue;
+            }
+
+            if (!_textAt.TryGetValue(at, out string? text))
+            {
+                if (fetched >= MaxChecksPerTick)
+                {
+                    continue;   // the next tick finishes the rest
+                }
+
+                fetched++;
+                text = Fetch(at, candidate.Shape == TextShape.Heap ? candidate.Length : 0);
+
+                if (_textAt.Count >= MaxRemembered)
+                {
+                    _textAt.Clear();
+                }
+
+                _textAt[at] = text;
+            }
+
+            if (text.Length > 0)
+            {
+                found[slot.Offset] = text;
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>Reads characters at an address, wide first - which is how this game stores them.</summary>
+    private string Fetch(ulong address, int length)
+    {
+        string wide = _reader.ReadUnicodeString(address, length > 0 ? Math.Min(length, MaxTextChars) : MaxTextChars);
+        if (TextProbe.LooksLikeText(wide))
+        {
+            return wide;
+        }
+
+        // Only worth trying when there was no header saying how long it is: a std::wstring is
+        // wide by definition, so plain bytes there would mean the header was misread.
+        if (length > 0)
+        {
+            return string.Empty;
+        }
+
+        string plain = _reader.ReadUtf8(address, MaxTextChars);
+        return TextProbe.LooksLikeText(plain) ? plain : string.Empty;
     }
 
     /// <summary>

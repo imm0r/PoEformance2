@@ -43,6 +43,7 @@ public sealed class DissectorWindow
     private static readonly Vector4 PointerText = new(0.55f, 0.78f, 1f, 1f);
     private static readonly Vector4 FloatText = new(0.65f, 0.9f, 0.65f, 1f);
     private static readonly Vector4 BaselineText = new(1f, 0.55f, 0.35f, 1f);
+    private static readonly Vector4 TextFound = new(0.75f, 0.95f, 0.75f, 1f);
 
     private readonly StructureInspector _inspector;
 
@@ -286,7 +287,7 @@ public sealed class DissectorWindow
             ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.Resizable
             | ImGuiTableFlags.ScrollY | ImGuiTableFlags.SizingFixedFit;
 
-        if (!ImGui.BeginTable("rows", 7, Flags))
+        if (!ImGui.BeginTable("rows", 8, Flags))
         {
             return;
         }
@@ -310,6 +311,7 @@ public sealed class DissectorWindow
         ImGui.TableSetupColumn("hex", ImGuiTableColumnFlags.WidthFixed, 150f);
         ImGui.TableSetupColumn("whole", ImGuiTableColumnFlags.WidthFixed, 130f);
         ImGui.TableSetupColumn("decimal", ImGuiTableColumnFlags.WidthFixed, 140f);
+        ImGui.TableSetupColumn("text", ImGuiTableColumnFlags.WidthFixed, 230f);
         ImGui.TableSetupColumn("follow", ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableHeadersRow();
 
@@ -350,6 +352,18 @@ public sealed class DissectorWindow
                 _strideIndex == 0
                     ? $"{Short(slot.FloatLow)}  {Short(slot.FloatHigh)}"
                     : Short(slot.FloatLow));
+
+            // Before "follow" on purpose: when a row turns out to be a name, that is the
+            // answer, and the address it came from stops being the interesting part.
+            ImGui.TableNextColumn();
+            if (view.Text.TryGetValue(slot.Offset, out string? text))
+            {
+                ImGui.TextColored(TextFound, text);
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(text);
+                }
+            }
 
             ImGui.TableNextColumn();
             if (slot.Followable)
