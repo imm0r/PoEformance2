@@ -47,7 +47,7 @@ public class RoutePlannerTests
     [Fact]
     public void WithNoDestinationThereIsNoRoute()
     {
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         planner.Service(Snapshot(Grid("....", "...."), 0, 0), 1000);
 
         Assert.Empty(planner.Routes);
@@ -62,7 +62,7 @@ public class RoutePlannerTests
             ".########.",
             "..........");
 
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         planner.Request(To(9, 2));
         planner.Service(Snapshot(grid, 0, 0), 1000);
 
@@ -86,7 +86,7 @@ public class RoutePlannerTests
             "##########",
             "..........");
 
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         planner.Request(To(9, 2));
         planner.Service(Snapshot(grid, 0, 0), 1000);
 
@@ -103,7 +103,7 @@ public class RoutePlannerTests
         // shares a thread with the world read.
         TerrainGrid grid = Grid("..........", "..........", "..........");
 
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         planner.Request(To(9, 2));
         planner.Service(Snapshot(grid, 0, 0), 1000);
 
@@ -121,7 +121,7 @@ public class RoutePlannerTests
             "..........",
             "..........");
 
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         planner.Request(To(9, 2));
         planner.Service(Snapshot(grid, 0, 0), 1000);
         Assert.Equal((0, 0), planner.Routes[0].Cells[0]);
@@ -135,7 +135,7 @@ public class RoutePlannerTests
     {
         TerrainGrid grid = Grid("....", "....");
 
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         planner.Request(To(3, 1));
         planner.Service(Snapshot(grid, 0, 0), 1000);
         Assert.NotEmpty(planner.Routes);
@@ -156,7 +156,7 @@ public class RoutePlannerTests
             ".########.",
             "..........");
 
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         planner.Toggle(0xAAAA, 9 * MapView.WorldToGrid, 0);
         planner.Toggle(0xBBBB, 9 * MapView.WorldToGrid, 2 * MapView.WorldToGrid);
         planner.Service(Snapshot(grid, 0, 0), 1000);
@@ -174,7 +174,7 @@ public class RoutePlannerTests
     public void ChoosingAPlaceAgainDropsIt()
     {
         TerrainGrid grid = Grid("....", "....");
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
 
         planner.Toggle(0xAAAA, 3 * MapView.WorldToGrid, 0);
         Assert.True(planner.IsTarget(0xAAAA));
@@ -189,7 +189,7 @@ public class RoutePlannerTests
         // Every route is its own search, re-run whenever the player moves, so the count is a
         // bound on WORK and not just on clutter. Dropping the oldest keeps a click doing
         // something rather than silently refusing.
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         for (int i = 0; i < RoutePlanner.MaxRoutes + 2; i++)
         {
             planner.Toggle((ulong)(0x1000 + i), i * MapView.WorldToGrid, 0);
@@ -206,7 +206,7 @@ public class RoutePlannerTests
         // Order is what the colours are assigned from, so a new route must not renumber the
         // existing ones - a line that changed colour when a neighbour was added would make
         // the map lie about which route leads where.
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         planner.Toggle(0xAAAA, 0, 0);
         planner.Toggle(0xBBBB, 0, 0);
         planner.Toggle(0xCCCC, 0, 0);
@@ -221,7 +221,7 @@ public class RoutePlannerTests
     {
         // Terrain arrives well after an area does, and a route drawn before it lands would be
         // a straight line through whatever is in the way.
-        var planner = new RoutePlanner();
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
         planner.Request(To(5, 5));
 
         var player = new WorldEntity(0, 0x1000, "Metadata/Characters/Int/IntFourb", EntityKind.Player, 0, 0, 0);

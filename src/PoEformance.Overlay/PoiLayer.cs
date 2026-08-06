@@ -397,11 +397,17 @@ public sealed class PoiLayer
             // The WALK when it is known, the straight line otherwise. Different numbers, and
             // the difference is the point - a wall between here and there is exactly what a
             // straight line cannot show.
+            //
+            // A chosen place with no answer yet is one still being searched for, and saying so
+            // matters now that a route right across a map takes a second or two: the direct
+            // distance sitting there unchanged reads as nothing having happened.
             string away = route is { Cells.Count: >= 2 }
                 ? $"{route.LengthCells:F0} walk"
                 : route is not null && route.Status.Length > 0
                     ? route.Status
-                    : $"{Distance(place, player) / MapView.WorldToGrid:F0} direct";
+                    : routed
+                        ? "looking for a way..."
+                        : $"{Distance(place, player) / MapView.WorldToGrid:F0} direct";
 
             ImGui.PushStyleColor(
                 ImGuiCol.Text,

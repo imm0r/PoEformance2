@@ -56,11 +56,20 @@ public sealed class RoutePlanner
     /// </remarks>
     public const int MaxRoutes = 5;
 
+    /// <summary>Searches on the thread pool, off whatever asked for them. What the tool uses.</summary>
+    public static Action<Action> Background { get; } = work => _ = Task.Run(work);
+
+    /// <summary>Searches where they were asked for, so the answer is there on return.</summary>
+    /// <remarks>For tests, which should not be made to wait and guess how long.</remarks>
+    public static Action<Action> Immediate { get; } = work => work();
+
     /// <summary>How far the player may drift before the routes are worth finding again.</summary>
     private const float RefreshAfterCells = 6f;
 
     /// <summary>A floor on how often the search runs, for a player moving continuously.</summary>
     private const long MinimumIntervalMs = 250;
+
+    private readonly Action<Action> _schedule;
 
     private RouteRequest _request = RouteRequest.None;
     private IReadOnlyList<RouteView> _routes = [];
@@ -69,6 +78,18 @@ public sealed class RoutePlanner
     private Vector2 _plannedFrom;
     private long _plannedAt;
     private uint _plannedArea;
+
+    /// <summary>1 while a search is running, so only one is ever in flight.</summary>
+    private int _searching;
+
+    /// <summary>The area the reader last saw, for throwing away an answer about an old one.</summary>
+    private uint _currentArea;
+
+    /// <param name="schedule">
+    /// Where a search runs. <see cref="Background"/> by default, which is what keeps a long
+    /// one off the thread that reads the game.
+    /// </param>
+    public RoutePlanner(Action<Action>? schedule = null) => _schedule = schedule ?? Background;
 
     /// <summary>The newest routes. Never blocks, never null, never partially built.</summary>
     public IReadOnlyList<RouteView> Routes => Volatile.Read(ref _routes);
@@ -119,6 +140,7 @@ public sealed class RoutePlanner
     public void Service(WorldSnapshot snapshot, long nowMs)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
+        Volatile.Write(ref _currentArea, snapshot.AreaHash);
 
         RouteRequest request = Volatile.Read(ref _request);
         if (request.Targets.Count == 0)
@@ -154,24 +176,66 @@ public sealed class RoutePlanner
             return;
         }
 
+        // One search at a time. A route that is still being looked for is not a reason to
+        // start looking for it again, and dropping the request while one is in flight is what
+        // keeps a player walking continuously from queueing up searches faster than they finish.
+        if (Interlocked.CompareExchange(ref _searching, 1, 0) != 0)
+        {
+            return;
+        }
+
         _plannedFor = signature;
         _plannedFrom = from;
         _plannedAt = nowMs;
         _plannedArea = snapshot.AreaHash;
 
         var start = Cell(player.WorldX, player.WorldY);
-        var found = new List<RouteView>(request.Targets.Count);
+        List<RouteTarget> targets = [.. request.Targets.Take(MaxRoutes)];
+        uint area = snapshot.AreaHash;
 
-        foreach (RouteTarget target in request.Targets.Take(MaxRoutes))
+        // OFF this thread, and that is not an optimisation. Measured on a 2415x2829 map: a
+        // route right across it takes about 1.8 seconds, and one to somewhere unreachable
+        // fourteen. This is called from the read loop, which also drives auto-flask - so a
+        // search done here would not merely freeze the drawing, it would stop the flasks from
+        // being watched for as long as it ran.
+        _schedule(() =>
         {
-            List<(int X, int Y)> cells = TerrainPathfinder.FindPath(grid, start, Cell(target.WorldX, target.WorldY));
-            found.Add(cells.Count == 0
-                ? new RouteView(target.Target, [], 0f, "no way there")
-                : new RouteView(target.Target, cells, Length(cells), string.Empty));
-        }
+            try
+            {
+                var found = new List<RouteView>(targets.Count);
+                foreach (RouteTarget target in targets)
+                {
+                    List<(int X, int Y)> cells = TerrainPathfinder.FindPath(
+                        grid, start, Cell(target.WorldX, target.WorldY), out RouteOutcome outcome);
 
-        Volatile.Write(ref _routes, found);
+                    found.Add(cells.Count == 0
+                        ? new RouteView(target.Target, [], 0f, Explain(outcome))
+                        : new RouteView(target.Target, cells, Length(cells), string.Empty));
+                }
+
+                // A search that finished after the player left carries an answer about a map
+                // they are no longer standing in, so it is dropped rather than drawn.
+                if (Volatile.Read(ref _currentArea) == area)
+                {
+                    Volatile.Write(ref _routes, found);
+                }
+            }
+            finally
+            {
+                Volatile.Write(ref _searching, 0);
+            }
+        });
     }
+
+    /// <summary>What to tell the user when no route came back.</summary>
+    private static string Explain(RouteOutcome outcome) => outcome switch
+    {
+        RouteOutcome.NoGroundNearEnd => "nothing to stand on there",
+        RouteOutcome.NoGroundNearStart => "cannot tell where you are standing",
+        RouteOutcome.TooFar => "too far to search",
+        RouteOutcome.GaveUp => "gave up looking - too big a search",
+        _ => "no way there",
+    };
 
     /// <summary>The route to one place, or null when there is none.</summary>
     public RouteView? For(ulong address) => Routes.FirstOrDefault(r => r.Target == address);

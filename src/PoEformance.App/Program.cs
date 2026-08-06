@@ -367,8 +367,10 @@ internal static class Program
         // still pure waste while nobody is looking at it.
         var uiTree = new PoEformance.Features.UiTreeInspector(reader, schema, gameStatesStatic);
 
-        // Finding a way across the area is a search over thousands of cells, so it runs where
-        // the reading already happens and the renderer only draws what came back.
+        // Finding a way across the area is a search over millions of cells - measured at about
+        // 1.8 seconds right across a real map - so it runs on the thread pool and the renderer
+        // draws whatever has come back. Asking for one from the read loop costs nothing, which
+        // matters because that loop also drives auto-flask.
         var route = new PoEformance.Features.RoutePlanner();
 
         using var feed = new PoEformance.Features.SnapshotFeed(

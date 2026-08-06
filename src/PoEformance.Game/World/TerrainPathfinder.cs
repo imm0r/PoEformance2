@@ -1,5 +1,32 @@
 namespace PoEformance.Game.World;
 
+/// <summary>What came of asking for a route.</summary>
+/// <remarks>
+/// Only <see cref="Unreachable"/> says the place cannot be walked to. The others say the
+/// question was refused, and each for a reason the user can act on - which is the difference
+/// between "the tool cannot do this" and "the game will not let you".
+/// </remarks>
+public enum RouteOutcome
+{
+    /// <summary>A route was found.</summary>
+    Found,
+
+    /// <summary>The player is not on walkable ground and none is near - normally a loading area.</summary>
+    NoGroundNearStart,
+
+    /// <summary>Nothing walkable near the destination. The marker is on scenery, not on floor.</summary>
+    NoGroundNearEnd,
+
+    /// <summary>Further apart than any search will attempt.</summary>
+    TooFar,
+
+    /// <summary>The search ran out of time or steps. Says nothing about whether a way exists.</summary>
+    GaveUp,
+
+    /// <summary>Everything reachable was searched. There is genuinely no way there.</summary>
+    Unreachable,
+}
+
 /// <summary>
 /// The shortest walkable route between two points of an area, in grid cells.
 /// </summary>
@@ -20,17 +47,32 @@ namespace PoEformance.Game.World;
 public static class TerrainPathfinder
 {
     /// <summary>Nodes expanded before giving up - a disconnected target would search forever.</summary>
-    public const int DefaultMaxIterations = 400_000;
+    public const int DefaultMaxIterations = 20_000_000;
+
+    /// <summary>
+    /// How long one search may run before it gives up.
+    /// </summary>
+    /// <remarks>
+    /// The real guard, and it replaces a cap on iterations as the thing that actually bounds
+    /// the work. Measured on a 2415x2829 map: a route right across it takes about 1.8 seconds,
+    /// and a target that CANNOT be reached takes fourteen - because saying "there is no way"
+    /// means exhausting everything reachable first. A count of nodes does not express that
+    /// difference in any units anybody cares about; a clock does.
+    /// </remarks>
+    public const int DefaultMaxMilliseconds = 4_000;
 
     /// <summary>
     /// Straight-line cells beyond which no search is attempted.
     /// </summary>
     /// <remarks>
-    /// A cap on the QUESTION rather than on the answer: a target on the far side of a big map
-    /// is a search over most of it, and the route to something that far away is not the thing
-    /// anybody is looking at.
+    /// Only a guard against an absurd question, and deliberately larger than any real map's
+    /// diagonal. It used to be 2500 with the reasoning that a route that long is not what
+    /// anybody is looking at - which turned out to be exactly wrong. A map's boss arena sits
+    /// at the far end of it, and that is the one destination people most want a line to.
+    /// Bounding the TIME does the job this was doing, and does it without a view about which
+    /// destinations are worth having.
     /// </remarks>
-    public const int DefaultMaxDistance = 2500;
+    public const int DefaultMaxDistance = 8_000;
 
     private static readonly (int Dx, int Dy, float Cost)[] Neighbours =
     [
@@ -47,23 +89,49 @@ public static class TerrainPathfinder
     /// <summary>
     /// Finds a route from start to end, or an empty list when there is none.
     /// </summary>
-    /// <remarks>
-    /// Both ends are snapped to walkable ground first. That is not a nicety: the player stands
-    /// against walls constantly, and a point of interest is frequently placed ON a terrain
-    /// boundary rather than beside it, so a search that refused a blocked endpoint would
-    /// refuse most of the routes actually asked for.
-    /// </remarks>
     public static List<(int X, int Y)> FindPath(
         TerrainGrid grid,
         (int X, int Y) start,
         (int X, int Y) end,
         int maxIterations = DefaultMaxIterations,
         int maxDistance = DefaultMaxDistance)
+        => FindPath(grid, start, end, out _, maxIterations, maxDistance);
+
+    /// <summary>
+    /// Finds a route from start to end, and says what happened when there is none.
+    /// </summary>
+    /// <remarks>
+    /// Both ends are snapped to walkable ground first. That is not a nicety: the player stands
+    /// against walls constantly, and a point of interest is frequently placed ON a terrain
+    /// boundary rather than beside it, so a search that refused a blocked endpoint would
+    /// refuse most of the routes actually asked for.
+    ///
+    /// The OUTCOME is reported because "no route" has several causes that want completely
+    /// different responses, and one message for all of them tells the user nothing. "It is
+    /// further than this will search", "there is nowhere to stand at that end" and "everything
+    /// reachable was searched and it is not among it" are three different facts, and only the
+    /// last one means the place cannot be walked to.
+    /// </remarks>
+    public static List<(int X, int Y)> FindPath(
+        TerrainGrid grid,
+        (int X, int Y) start,
+        (int X, int Y) end,
+        out RouteOutcome outcome,
+        int maxIterations = DefaultMaxIterations,
+        int maxDistance = DefaultMaxDistance,
+        int maxMilliseconds = DefaultMaxMilliseconds)
     {
         ArgumentNullException.ThrowIfNull(grid);
 
-        if (!TryWalkableNear(grid, start, out start) || !TryWalkableNear(grid, end, out end))
+        if (!TryWalkableNear(grid, start, out start))
         {
+            outcome = RouteOutcome.NoGroundNearStart;
+            return [];
+        }
+
+        if (!TryWalkableNear(grid, end, out end))
+        {
+            outcome = RouteOutcome.NoGroundNearEnd;
             return [];
         }
 
@@ -71,9 +139,11 @@ public static class TerrainPathfinder
         long dy = end.Y - start.Y;
         if ((dx * dx) + (dy * dy) > (long)maxDistance * maxDistance)
         {
+            outcome = RouteOutcome.TooFar;
             return [];
         }
 
+        outcome = RouteOutcome.Found;
         if (start == end)
         {
             return [start];
@@ -85,8 +155,19 @@ public static class TerrainPathfinder
 
         open.Enqueue(start, Heuristic(start, end));
 
+        // Checked in batches rather than every node: reading the clock is not free, and a few
+        // thousand nodes is far below the budget being enforced.
+        long deadline = System.Diagnostics.Stopwatch.GetTimestamp()
+            + (long)(maxMilliseconds * 0.001 * System.Diagnostics.Stopwatch.Frequency);
+
         for (int step = 0; step < maxIterations && open.Count > 0; step++)
         {
+            if ((step & 0xFFF) == 0xFFF && System.Diagnostics.Stopwatch.GetTimestamp() > deadline)
+            {
+                outcome = RouteOutcome.GaveUp;
+                return [];
+            }
+
             (int X, int Y) current = open.Dequeue();
             if (current == end)
             {
@@ -124,6 +205,10 @@ public static class TerrainPathfinder
             }
         }
 
+        // Two ways out of that loop, and they mean opposite things. An empty queue is an
+        // ANSWER - everything reachable was looked at and the target was not among it. Running
+        // out of steps is not an answer at all.
+        outcome = open.Count == 0 ? RouteOutcome.Unreachable : RouteOutcome.GaveUp;
         return [];
     }
 
