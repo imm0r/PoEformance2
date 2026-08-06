@@ -850,8 +850,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 continue;
             }
 
-            draw.AddCircleFilled(at, radius, ColourFor(entity));
-            draw.AddCircle(at, radius, OutlineColour, 10, 1f);
+            float size = radius * SizeFor(entity);
+            draw.AddCircleFilled(at, size, ColourFor(entity));
+            draw.AddCircle(at, size, OutlineColour, 10, 1f);
         }
 
         // Over the entity dots: a landmark is what the map is being consulted for, so it wins
@@ -962,16 +963,48 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// a yellow dot means the same thing on the floor and on the overlay, with nothing to
     /// translate.
     /// </remarks>
-    private static uint ColourFor(WorldEntity entity) => entity.Kind == EntityKind.WorldItem
-        ? entity.Rarity switch
+    private static uint ColourFor(WorldEntity entity) => entity.Kind switch
+    {
+        EntityKind.WorldItem => entity.Rarity switch
         {
             ItemRarity.Magic => Pack(0.45f, 0.55f, 1f),
             ItemRarity.Rare => Pack(1f, 0.95f, 0.35f),
             ItemRarity.Unique => Pack(1f, 0.55f, 0.2f),
             ItemRarity.Currency => Pack(0.9f, 0.75f, 0.55f),
             _ => Pack(0.85f, 0.85f, 0.85f),
+        },
+
+        // A monster's rarity in the game's own colours as well. Which of forty dots is the
+        // rare pack leader is the question a monster radar is being consulted for, and
+        // answering it with the item palette means there is nothing new to learn.
+        EntityKind.Monster => entity.Rarity switch
+        {
+            ItemRarity.Magic => Pack(0.55f, 0.65f, 1f),
+            ItemRarity.Rare => Pack(1f, 0.95f, 0.35f),
+            ItemRarity.Unique => Pack(1f, 0.5f, 0.15f),
+            _ => Pack(1f, 0.25f, 0.25f),
+        },
+
+        _ => ColourFor(entity.Kind),
+    };
+
+    /// <summary>
+    /// How much bigger a dot is than the ordinary one.
+    /// </summary>
+    /// <remarks>
+    /// Colour alone is not enough for the thing that matters most here. A rare pack leader
+    /// among forty red dots has to be findable in the corner of an eye, and on a busy map at
+    /// three pixels a hue is the first thing lost - size survives where colour does not.
+    /// </remarks>
+    public static float SizeFor(WorldEntity entity) => entity.Kind == EntityKind.Monster
+        ? entity.Rarity switch
+        {
+            ItemRarity.Unique => 1.9f,
+            ItemRarity.Rare => 1.5f,
+            ItemRarity.Magic => 1.2f,
+            _ => 1f,
         }
-        : ColourFor(entity.Kind);
+        : 1f;
 
     /// <summary>Colour per entity kind. ImGui packs colours as ABGR.</summary>
     private static uint ColourFor(EntityKind kind) => kind switch

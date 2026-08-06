@@ -1,3 +1,5 @@
+using PoEformance.Game.Components;
+
 namespace PoEformance.Game.World;
 
 /// <summary>What one monster's memory says about whether it is still alive.</summary>
@@ -11,7 +13,13 @@ namespace PoEformance.Game.World;
 /// Unique or boss rarity. Exempt from the targetable rule: bosses have legitimate
 /// multi-second untargetable phases, and hiding one mid-fight is worse than showing a corpse.
 /// </param>
-public readonly record struct MonsterSigns(int? Health, bool? Targetable, bool IsBoss);
+/// <param name="Rarity">
+/// How rare the monster is, on the same 0-3 scale items use. <see cref="ItemRarity.Unknown"/>
+/// when it could not be read, which is not the same as Normal - "no answer" and "an ordinary
+/// monster" want different treatment on a radar.
+/// </param>
+public readonly record struct MonsterSigns(
+    int? Health, bool? Targetable, bool IsBoss, ItemRarity Rarity = ItemRarity.Unknown);
 
 /// <summary>
 /// Decides which monsters are corpses, so the overlay stops marking them.

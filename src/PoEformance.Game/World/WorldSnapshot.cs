@@ -236,17 +236,21 @@ public sealed class WorldReader
             targetable = flag != 0;
         }
 
-        // Rarity 3 and above is Unique/Boss. This is only needed to spare bosses the
-        // targetable rule, so an unreadable rarity simply means "not a boss" - the worst
-        // case is a boss dot blinking during a phase, never a live monster hidden.
-        bool isBoss = false;
+        // Rarity 3 and above is Unique/Boss, which spares bosses the targetable rule - an
+        // unreadable rarity simply means "not a boss" there, and the worst case is a boss dot
+        // blinking during a phase rather than a live monster hidden.
+        //
+        // The VALUE is carried out as well, and it is the most useful thing a monster radar
+        // can say. Which of forty dots is the rare pack leader decides whether you walk in;
+        // the read was already happening and the answer was being thrown away.
+        ItemRarity monsterRarity = ItemRarity.Unknown;
         ulong properties = entity.Component("ObjectMagicProperties");
         if (properties != 0 && _reader.TryRead(properties + (ulong)_monsterRarity, out int rarity))
         {
-            isBoss = rarity >= 3;
+            monsterRarity = Rarities.FromRaw(rarity);
         }
 
-        return new MonsterSigns(health, targetable, isBoss);
+        return new MonsterSigns(health, targetable, monsterRarity >= ItemRarity.Unique, monsterRarity);
     }
 
     /// <summary>
@@ -337,7 +341,8 @@ public sealed class WorldReader
             // overlay marks a cleared screen full of dead monsters. Only monsters are
             // checked: the same targetable byte also goes to 0 on an OPENED chest, which
             // is a different question and not this one.
-            if (kind == EntityKind.Monster && _corpses.IsCorpse(address, ReadMonsterSigns(entity), nowMs))
+            MonsterSigns signs = kind == EntityKind.Monster ? ReadMonsterSigns(entity) : default;
+            if (kind == EntityKind.Monster && _corpses.IsCorpse(address, signs, nowMs))
             {
                 continue;
             }
@@ -346,9 +351,15 @@ public sealed class WorldReader
             // the world, while "is it worth drawing" is a preference. The snapshot carries
             // the fact so the overlay - and a future loot tracker, which wants everything -
             // can each decide for themselves.
-            ItemRarity rarity = kind == EntityKind.WorldItem
-                ? _groundItems.RarityOf(entity, nowMs)
-                : ItemRarity.Unknown;
+            // One field for one question - how rare is this thing - answered from whichever
+            // component knows: the wrapper's inner item for a drop, ObjectMagicProperties for
+            // a monster. The scale is the same 0-3 in both cases because the game uses one.
+            ItemRarity rarity = kind switch
+            {
+                EntityKind.WorldItem => _groundItems.RarityOf(entity, nowMs),
+                EntityKind.Monster => signs.Rarity,
+                _ => ItemRarity.Unknown,
+            };
 
             // The game's own map marking, when it has one. Only read for entities that carry
             // the component, so it costs nothing on the monsters and drops that never do.

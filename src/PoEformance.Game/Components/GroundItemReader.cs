@@ -21,6 +21,22 @@ public enum ItemRarity
     Currency = 5,
 }
 
+/// <summary>Turning the game's own rarity number into one of the above.</summary>
+public static class Rarities
+{
+    /// <summary>
+    /// Reads a raw rarity, refusing anything outside the scale.
+    /// </summary>
+    /// <remarks>
+    /// Out of range means the read landed on some other field that happens to be an integer,
+    /// and <see cref="ItemRarity.Unknown"/> says so. Clamping instead would turn a failed read
+    /// into a confident "Normal", which is the worse answer: it draws an ordinary dot over a
+    /// monster nobody has actually identified.
+    /// </remarks>
+    public static ItemRarity FromRaw(int raw)
+        => raw is >= 0 and <= 3 ? (ItemRarity)raw : ItemRarity.Unknown;
+}
+
 /// <summary>
 /// Resolves what a ground drop actually IS, through the wrapper entity it arrives as.
 /// </summary>
