@@ -358,10 +358,21 @@ public sealed class DissectorWindow
             ImGui.TableNextColumn();
             if (view.Text.TryGetValue(slot.Offset, out string? text))
             {
-                ImGui.TextColored(TextFound, text);
+                // Click to copy. Every string that surfaces here is one somebody is about to
+                // paste somewhere else - a metadata path into the noise filter, a file path
+                // into the preload meanings, a name into a search - and the column is too
+                // narrow to read the long ones, let alone transcribe one by hand.
+                ImGui.PushStyleColor(ImGuiCol.Text, TextFound);
+                if (ImGui.Selectable($"{text}###text{slot.Offset}"))
+                {
+                    ImGui.SetClipboardText(text);
+                }
+
+                ImGui.PopStyleColor();
+
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(text);
+                    ImGui.SetTooltip($"{text}\n\nclick to copy");
                 }
             }
 
