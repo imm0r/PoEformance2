@@ -395,6 +395,11 @@ internal static class Program
         // thin out exactly when the reads got slow.
         var costs = new PoEformance.Features.CostHistory();
 
+        // On the reader thread too, and for the same reason: it marks where the player has
+        // BEEN, so sampling it only on drawn frames would lose ground walked while the
+        // overlay was hidden behind an inventory screen.
+        var coverage = new PoEformance.Features.MapCoverage();
+
         using var feed = new PoEformance.Features.SnapshotFeed(
             scale =>
             {
@@ -404,6 +409,7 @@ internal static class Program
                 entityParts.Service();
                 route.Service(snapshot, Environment.TickCount64);
                 costs.Add(snapshot.Cost, snapshot.AreaHash, Environment.TickCount64);
+                coverage.Look(snapshot);
 
                 // Evaluated even when the feature is off: it costs a bool check, and its
                 // reason string is what the overlay's status line shows - including the
@@ -441,6 +447,7 @@ internal static class Program
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.Noise = world.Noise;
         overlay.Costs = costs;
+        overlay.Coverage = coverage;
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);

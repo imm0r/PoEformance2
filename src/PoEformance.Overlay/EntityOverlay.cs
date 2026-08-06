@@ -142,6 +142,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>What every read cost, kept so a whole map can be looked at afterwards.</summary>
     public CostHistory? Costs { get; set; }
 
+    /// <summary>How much of the area has been walked, if it is being measured.</summary>
+    public MapCoverage? Coverage { get; set; }
+
     private CostWindow? _costWindow;
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
@@ -818,6 +821,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     $"area:     {area.Describe()}{(area.WantsMarkers ? string.Empty : " - markers hidden")}");
 
                 ImGui.Text($"entities: {_snapshot.Entities.Count}");
+
+                // The question a map is actually being looked at for near the end of a run:
+                // is there any of it left. Measured against what can be REACHED rather than
+                // every walkable cell, which is why it is worth showing at all - the same
+                // figure against the whole grid reads as a few per cent on a finished map.
+                if (Coverage is MapCoverage walked && walked.Measuring)
+                {
+                    ImGui.TextColored(
+                        new Vector4(0.65f, 0.75f, 0.68f, 1f),
+                        $"walked:   {walked.Percent:F0}%   ({walked.SeenCells} of {walked.ReachableCells})"
+                        + (walked.RegionKnown ? string.Empty : "  - still working out what is reachable"));
+                }
                 if (ReadStats is not null)
                 {
                     (double ms, long reads, long failures) = ReadStats();
