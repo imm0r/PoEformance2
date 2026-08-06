@@ -313,6 +313,97 @@ public class PreloadWatchTests
             Assert.False(string.IsNullOrWhiteSpace(known.Path));
         }
     }
+
+    // ---- What the first live run taught. It reported EIGHT league mechanics in one map,
+    // ---- which no map has, and every wrong one had the same shape: a single file that
+    // ---- mentions a mechanic rather than a set of files that IS one.
+
+    [Fact]
+    public void HOWMANYFilesMatchedIsKept()
+    {
+        // The signal that separates a mechanic from a mention. Deduplicating by name was
+        // right; throwing away the number was not.
+        var watch = new PreloadWatch();
+        watch.Took(1, [
+            "Art/Leagues/Breach/A",
+            "Art/Leagues/Breach/B",
+            "Art/Leagues/Breach/C",
+            "Metadata/Items/Currency/Ritual/RitualPinnacleKey",
+        ]);
+
+        Assert.Equal(3, watch.Findings.Single(f => f.Name == "Breach").Files);
+        Assert.Equal(1, watch.Findings.Single(f => f.Name == "Ritual").Files);
+    }
+
+    [Fact]
+    public void ASINGLEFileIsFlaggedRatherThanTrusted()
+    {
+        // ...and rather than dropped. One file is usually a passing reference, but "usually"
+        // is not "always", and a summary that silently deletes the marginal case cannot be
+        // checked by anybody. Marking it keeps both properties.
+        var watch = new PreloadWatch();
+        watch.Took(1, [
+            "Art/Leagues/Breach/A",
+            "Art/Leagues/Breach/B",
+            "Metadata/Items/Ultimatum/TrialmasterKey1",
+        ]);
+
+        Assert.Equal("Breach, Ultimatum?", watch.Summary());
+    }
+
+    [Fact]
+    public void THESTRONGESTFindingLeadsWithinAWeight()
+    {
+        var watch = new PreloadWatch();
+        watch.Took(1, [
+            "Metadata/Items/Currency/Ritual/RitualPinnacleKey",
+            "Art/Leagues/Breach/A",
+            "Art/Leagues/Breach/B",
+        ]);
+
+        Assert.Equal("Breach", watch.Findings[0].Name);
+    }
+
+    [Fact]
+    public void ANATLASMapPinIsNotEvidenceOfAnything()
+    {
+        // The one path class that is wrong by construction rather than merely weak. A pin is
+        // the icon drawn on the world map SCREEN for some other map; its league folder says
+        // nothing about the ground under your feet, and it is loaded in every area forever.
+        Assert.Null(PreloadMeanings.Meaning(
+            "Metadata/Terrain/WorldMaps/Maps/Doodads/Pins/Leagues/Delirium/Delirium01.ao"));
+
+        // The same mechanic still reports when something real carries it.
+        Assert.Equal("Delirium", PreloadMeanings.Meaning("Art/Models/Leagues/Delirium/Fog")?.Name);
+    }
+
+    [Fact]
+    public void ANITEMIsNotQUOTEDAsTheReasonWhenSomethingRealMatched()
+    {
+        // An item definition says the thing CAN exist - a pinnacle key is defined whether or
+        // not the mechanic is in this map - so quoting one as the evidence points the person
+        // reading it at entirely the wrong thing.
+        var watch = new PreloadWatch();
+        watch.Took(1, [
+            "Metadata/Items/Currency/Ritual/RitualPinnacleKey",
+            "Metadata/Terrain/Leagues/Ritual/RitualAltar",
+        ]);
+
+        Assert.Equal("Metadata/Terrain/Leagues/Ritual/RitualAltar", watch.Findings[0].Path);
+    }
+
+    [Fact]
+    public void ANDISQuotedWhenItIsAllThereIs()
+    {
+        // No pretending. If the only thing that matched is an item, that is what gets shown,
+        // and the count beside it says how much weight to give it.
+        var watch = new PreloadWatch();
+        watch.Took(1, ["Metadata/Items/Currency/Ritual/RitualPinnacleKey"]);
+
+        PreloadFinding only = watch.Findings.Single();
+        Assert.Equal("Metadata/Items/Currency/Ritual/RitualPinnacleKey", only.Path);
+        Assert.Equal(1, only.Files);
+    }
 }
 
 /// <summary>

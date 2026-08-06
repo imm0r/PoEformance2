@@ -147,6 +147,15 @@ public sealed class PreloadWindow
         {
             ImGui.TextColored(ByWeight[(int)finding.Weight], finding.Name);
             ImGui.SameLine();
+
+            // The count, before the path. One file is a mention somewhere; forty is the thing
+            // being here, and reading that next to the name is what stops a stray reference
+            // being taken for an encounter. Marked when it is weak rather than hidden.
+            ImGui.TextColored(
+                finding.Files <= 1 ? WarnText : DimText,
+                finding.Files == 1 ? "1 file" : $"{finding.Files} files");
+
+            ImGui.SameLine();
             ImGui.TextColored(DimText, finding.Path);
         }
 

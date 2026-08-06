@@ -14,7 +14,18 @@ public enum PreloadWeight
 }
 
 /// <summary>One thing an area turned out to contain.</summary>
-public sealed record PreloadFinding(string Name, PreloadWeight Weight, string Path);
+/// <param name="Path">A file that matched - the evidence, so a wrong line can be traced.</param>
+/// <param name="Files">
+/// How many files matched. THE signal for whether a finding is real.
+/// </param>
+/// <remarks>
+/// The count is here because the first live run listed eight league mechanics in one map,
+/// which no map has. Something genuinely in an area drags its whole art set in with it -
+/// dozens of files - while a stray reference is one file and looks identical without a count
+/// beside it. Rather than curate an ever-growing list of paths to distrust, the number says
+/// how much there is to distrust: "Breach 40" and "Delirium 1" need no further explanation.
+/// </remarks>
+public sealed record PreloadFinding(string Name, PreloadWeight Weight, string Path, int Files = 0);
 
 /// <summary>
 /// What a loaded-file path means, for the handful of paths that mean something.
@@ -61,10 +72,36 @@ public static class PreloadMeanings
         new("Beyond demon", PreloadWeight.Dangerous, "/BeyondDemons/"),
     ];
 
+    /// <summary>
+    /// Paths that cannot testify about the area you are standing in, whatever they contain.
+    /// </summary>
+    /// <remarks>
+    /// Kept deliberately short. A finding's file COUNT is the general defence against noise;
+    /// this list is only for paths that are wrong by construction rather than merely weak, so
+    /// that it does not quietly grow into a place where real findings go to be lost.
+    ///
+    /// So far there is one: an Atlas map pin is the icon drawn on the world map SCREEN for
+    /// some other map, so its league folder says nothing whatsoever about the ground under
+    /// your feet. It is loaded once the Atlas exists and would otherwise report the same
+    /// mechanic in every area, forever - which is exactly what the first live run did.
+    /// </remarks>
+    public static IReadOnlyList<string> CannotBeEvidence { get; } =
+    [
+        "/WorldMaps/Maps/Doodads/Pins/",
+    ];
+
     /// <summary>What a path means, or null when it is one of the thousands that mean nothing.</summary>
     public static PreloadFinding? Meaning(string path)
     {
         ArgumentNullException.ThrowIfNull(path);
+
+        foreach (string blind in CannotBeEvidence)
+        {
+            if (path.Contains(blind, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+        }
 
         foreach (PreloadFinding known in Known)
         {
@@ -155,18 +192,42 @@ public sealed class PreloadWatch
         all.Sort(StringComparer.Ordinal);
 
         // Deduplicated by NAME rather than by path: an area loads a dozen files for one
-        // breach, and "Breach" thirteen times is not a summary of anything.
+        // breach, and "Breach" thirteen times is not a summary of anything. The dozen is not
+        // thrown away though - it is counted, because how MANY files a mechanic dragged in is
+        // the difference between it being here and it being mentioned somewhere.
         var findings = new List<PreloadFinding>();
-        var named = new HashSet<string>(StringComparer.Ordinal);
+        var byName = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (string path in all)
         {
-            if (PreloadMeanings.Meaning(path) is PreloadFinding finding && named.Add(finding.Name))
+            if (PreloadMeanings.Meaning(path) is not PreloadFinding finding)
             {
-                findings.Add(finding);
+                continue;
             }
+
+            if (byName.TryGetValue(finding.Name, out int at))
+            {
+                PreloadFinding seen = findings[at];
+
+                // Prefer evidence that is not an item definition. An item says the thing CAN
+                // exist - a pinnacle key is defined whether or not the mechanic is in this
+                // map - so quoting one as the reason a finding appeared points at the wrong
+                // thing. When every match is an item the count stays low and says so.
+                findings[at] = seen with
+                {
+                    Path = IsItemDefinition(seen.Path) && !IsItemDefinition(path) ? path : seen.Path,
+                    Files = seen.Files + 1,
+                };
+                continue;
+            }
+
+            byName[finding.Name] = findings.Count;
+            findings.Add(finding with { Files = 1 });
         }
 
-        findings.Sort((a, b) => b.Weight.CompareTo(a.Weight));
+        // Strongest first within a weight, so the line that is actually worth reading leads.
+        findings.Sort((a, b) => a.Weight != b.Weight
+            ? b.Weight.CompareTo(a.Weight)
+            : b.Files.CompareTo(a.Files));
 
         lock (_gate)
         {
@@ -177,6 +238,10 @@ public sealed class PreloadWatch
             _findings = findings;
         }
     }
+
+    /// <summary>Whether a path defines an item rather than showing something in the world.</summary>
+    private static bool IsItemDefinition(string path)
+        => path.Contains("Metadata/Items/", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Forgets the area, so a fresh one is looked at again.</summary>
     public void Forget()
@@ -192,9 +257,17 @@ public sealed class PreloadWatch
     }
 
     /// <summary>One line naming what is here, or an empty string when nothing is.</summary>
+    /// <remarks>
+    /// Weak findings are marked rather than dropped. A single matching file is usually a
+    /// passing reference and not the mechanic being here, but "usually" is not "always", and
+    /// a summary that silently deletes the marginal case is worse than one that flags it -
+    /// the whole point of the raw list is that somebody can go and look.
+    /// </remarks>
     public string Summary()
     {
         IReadOnlyList<PreloadFinding> findings = Findings;
-        return findings.Count == 0 ? string.Empty : string.Join(", ", findings.Select(f => f.Name));
+        return findings.Count == 0
+            ? string.Empty
+            : string.Join(", ", findings.Select(f => f.Files <= 1 ? f.Name + "?" : f.Name));
     }
 }
