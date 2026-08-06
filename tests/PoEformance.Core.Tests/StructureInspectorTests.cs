@@ -1,0 +1,299 @@
+using PoEformance.Core.Diagnostics;
+using PoEformance.Core.Schema;
+using PoEformance.Features;
+
+namespace PoEformance.Core.Tests;
+
+/// <summary>
+/// Serving the dissector: reading a window, and remembering what it used to say.
+/// </summary>
+/// <remarks>
+/// The remembering is the point. A window of bytes on its own is nearly useless - the whole
+/// method is to note what it says, do something in the game, and look at what moved. So most
+/// of what is worth testing here is about WHEN a comparison is meaningful and when it would
+/// be noise dressed up as a finding.
+/// </remarks>
+public class StructureInspectorTests
+{
+    private const ulong Somewhere = 0x2000_0000_0000;
+    private const ulong Elsewhere = 0x3000_0000_0000;
+
+    private static OffsetSchema Schema()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "schema", "poe2.offsets.json")))
+        {
+            dir = dir.Parent;
+        }
+
+        Assert.NotNull(dir);
+        return SchemaJson.Load(Path.Combine(dir.FullName, "schema", "poe2.offsets.json"));
+    }
+
+    private static StructureInspector Inspector(FakeMemoryReader reader)
+        => new(reader, Schema(), gameStatesStatic: 0);
+
+    private static byte[] Bytes(params int[] values)
+    {
+        var bytes = new List<byte>();
+        foreach (int value in values)
+        {
+            bytes.AddRange(BitConverter.GetBytes(value));
+        }
+
+        return [.. bytes];
+    }
+
+    /// <summary>
+    /// Places values inside a region big enough to read a whole window out of.
+    /// </summary>
+    /// <remarks>
+    /// The padding is not decoration. A read only succeeds when EVERY byte asked for is
+    /// there, so a region cut off at the last interesting value fails the read entirely and
+    /// the test then proves nothing - which is a test artefact, since a real structure sits
+    /// inside a much larger allocation.
+    /// </remarks>
+    private static void Fill(FakeMemoryReader reader, ulong address, params int[] values)
+    {
+        reader.Place(address, new byte[512]);
+        reader.Place(address, Bytes(values));
+    }
+
+    /// <summary>Asks for one window and returns what came back.</summary>
+    private static StructureView Look(StructureInspector inspector, StructureRequest request)
+    {
+        inspector.Request(request);
+        inspector.Service();
+        return inspector.View;
+    }
+
+    private static StructureRequest At(ulong address, int size = 32)
+        => new(Enabled: true, Root: StructureRoot.Custom, Address: address, Size: size);
+
+    [Fact]
+    public void NothingIsReadUntilTheWindowIsOpen()
+    {
+        // A dissector nobody is looking at must cost the reader nothing - it shares its thread
+        // with the world read and with auto-flask.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 1, 2, 3, 4);
+
+        StructureInspector inspector = Inspector(reader);
+        StructureView view = Look(inspector, At(Somewhere) with { Enabled = false });
+
+        Assert.Empty(view.Slots);
+    }
+
+    [Fact]
+    public void AWindowIsReadIntoRowsThatKnowWhereTheyLive()
+    {
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 7, 0, 9, 0, 11, 0, 13, 0);
+
+        StructureView view = Look(Inspector(reader), At(Somewhere));
+
+        Assert.Equal(Somewhere, view.Address);
+        Assert.Equal(4, view.Slots.Count);
+        Assert.Equal(7, view.Slots[0].Low);
+        Assert.Equal(Somewhere + 8, view.Slots[1].Address);
+    }
+
+    [Fact]
+    public void AnAddressWithNothingBehindItIsReportedRatherThanThrown()
+    {
+        // Pointing this at nonsense is an ORDINARY thing to do - every address in the tool is
+        // one the user typed or followed, and a wrong turn must cost a message, not the run.
+        StructureView view = Look(Inspector(new FakeMemoryReader()), At(Somewhere));
+
+        Assert.Empty(view.Slots);
+        Assert.Contains("nothing readable", view.Status, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MarkingThenChangingSomethingShowsWHICHPartChanged()
+    {
+        // The whole method, in one test. Mark, act, and the answer is the rows that moved.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 100, 0, 50, 0, 7, 0, 1, 0);
+
+        StructureInspector inspector = Inspector(reader);
+        Look(inspector, At(Somewhere) with { SnapshotSequence = 1 });
+
+        reader.Place(Somewhere + 8, Bytes(42));            // the second row, and only it
+        StructureView after = Look(inspector, At(Somewhere) with { SnapshotSequence = 1 });
+
+        Assert.True(after.HasBaseline);
+        Assert.Equal([8], after.SinceBaseline.Order());
+    }
+
+    [Fact]
+    public void TheMarkIsTakenONCERatherThanEveryTick()
+    {
+        // Served every tick it would re-mark continuously, nothing would ever look changed,
+        // and the tool would quietly do the exact opposite of its job.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 1, 0, 2, 0);
+
+        StructureInspector inspector = Inspector(reader);
+        Look(inspector, At(Somewhere) with { SnapshotSequence = 1 });
+
+        reader.Place(Somewhere + 8, Bytes(99));
+        Look(inspector, At(Somewhere) with { SnapshotSequence = 1 });
+        StructureView third = Look(inspector, At(Somewhere) with { SnapshotSequence = 1 });
+
+        Assert.Equal([8], third.SinceBaseline.Order());
+    }
+
+    [Fact]
+    public void MarkingAgainForgetsTheOldMark()
+    {
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 1, 0, 2, 0);
+
+        StructureInspector inspector = Inspector(reader);
+        Look(inspector, At(Somewhere) with { SnapshotSequence = 1 });
+
+        reader.Place(Somewhere + 8, Bytes(99));
+        StructureView after = Look(inspector, At(Somewhere) with { SnapshotSequence = 2 });
+
+        Assert.Empty(after.SinceBaseline);
+    }
+
+    [Fact]
+    public void AMarkTakenSomewhereElseIsNotComparedAgainstTHISPlace()
+    {
+        // The comparison that would be pure noise. After following a pointer, every row
+        // differs from the previous place's bytes - so an address-blind diff would light the
+        // whole screen and read as a discovery.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 1, 0, 2, 0);
+        Fill(reader, Elsewhere, 9, 0, 8, 0);
+
+        StructureInspector inspector = Inspector(reader);
+        Look(inspector, At(Somewhere) with { SnapshotSequence = 1 });
+        StructureView moved = Look(inspector, At(Elsewhere) with { SnapshotSequence = 1 });
+
+        Assert.False(moved.HasBaseline);
+        Assert.Empty(moved.SinceBaseline);
+
+        // And the same for the tick-to-tick comparison, which has the identical problem: the
+        // previous window belongs to the previous PLACE. Both windows are the same size, so
+        // nothing but an address check stops them being compared - and the result would be
+        // every differing row lit on arrival, which reads as a discovery and is not one.
+        Assert.Empty(moved.Live);
+    }
+
+    [Fact]
+    public void WhatMovedSinceTheLastTickIsReportedSeparately()
+    {
+        // A different question from the mark, and both are worth asking: this one says what is
+        // live AT ALL, which is how a timer or a position announces itself without any action.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 1, 0, 2, 0);
+
+        StructureInspector inspector = Inspector(reader);
+        Look(inspector, At(Somewhere));
+
+        reader.Place(Somewhere, Bytes(5));
+        StructureView after = Look(inspector, At(Somewhere));
+
+        Assert.Equal([0], after.Live.Order());
+    }
+
+    [Fact]
+    public void TheFirstLookAtAPlaceReportsNothingAsMoving()
+    {
+        // There is nothing to compare against yet, and inventing a comparison would mark
+        // every row on arrival - the one moment the marks certainly mean nothing.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 1, 0, 2, 0);
+
+        Assert.Empty(Look(Inspector(reader), At(Somewhere)).Live);
+    }
+
+    [Fact]
+    public void AKnownLayoutPutsTheSchemasOwnNamesOnTheRows()
+    {
+        // Which is also how a MISALIGNED read announces itself: every row gets a name and none
+        // of them make sense.
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+
+        StructureView view = Look(
+            Inspector(reader),
+            At(Somewhere, 512) with { StructName = "TileStruct" });
+
+        // From the schema: SubTileDetailsPtr at +0x00 and TgtFilePtr at +0x08.
+        Assert.Equal("SubTileDetailsPtr", view.FieldNames[0]);
+        Assert.Equal("TgtFilePtr", view.FieldNames[8]);
+    }
+
+    [Fact]
+    public void FieldsSharingARowAreBOTHNamed()
+    {
+        // TileIdX at +0x34 and TileIdY at +0x35 are single bytes. On eight-byte rows they
+        // share a line with TileHeight, and showing only one of them would hide the others -
+        // the offsets get carried so it stays clear which is which.
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+
+        StructureView view = Look(
+            Inspector(reader),
+            At(Somewhere, 512) with { StructName = "TileStruct" });
+
+        string row = view.FieldNames[0x30];
+        Assert.Contains("TileHeight", row, StringComparison.Ordinal);
+        Assert.Contains("TileIdX(+0x4)", row, StringComparison.Ordinal);
+        Assert.Contains("TileIdY(+0x5)", row, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AnUnknownLayoutNamesNothingRatherThanFailing()
+    {
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 1, 2);
+
+        Assert.Empty(Look(Inspector(reader), At(Somewhere) with { StructName = "NoSuchStruct" }).FieldNames);
+    }
+
+    [Fact]
+    public void FollowingAPointerSaysWhatIsOnTheOtherEnd()
+    {
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+        reader.Place(Somewhere, BitConverter.GetBytes(Elsewhere));
+        reader.Place(Elsewhere, new byte[256]);
+        reader.PlaceUtf16(Elsewhere, "MapFortress");
+
+        StructureView view = Look(
+            Inspector(reader),
+            At(Somewhere) with { PeekOffset = 0, PeekSequence = 1 });
+
+        Assert.NotNull(view.Peek);
+        Assert.Equal(TargetKind.WideText, view.Peek.Kind);
+        Assert.Equal(0, view.PeekOffset);
+    }
+
+    [Fact]
+    public void AnAbsurdWindowSizeIsBroughtBackToSomethingSensible()
+    {
+        // Not about speed - a few kilobytes is nothing. It bounds how WRONG one request can
+        // be: an address typed a digit out asks for a window over unmapped memory.
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[StructureInspector.MaxSize * 2]);
+
+        StructureView view = Look(Inspector(reader), At(Somewhere, size: 1_000_000));
+
+        Assert.Equal(StructureInspector.MaxSize / 8, view.Slots.Count);
+    }
+
+    [Fact]
+    public void TheKnownStructuresAreOfferedInAStableOrder()
+    {
+        // They fill a dropdown, and a list that reshuffles between frames cannot be clicked.
+        List<string> names = [.. Inspector(new FakeMemoryReader()).KnownStructures];
+
+        Assert.Contains("AreaInstance", names);
+        Assert.Equal([.. names.Order(StringComparer.Ordinal)], names);
+    }
+}

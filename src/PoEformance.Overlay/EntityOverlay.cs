@@ -35,6 +35,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private ClientRect _tracked;
     private readonly TerrainLayer _terrain;
     private UiBrowserWindow? _uiBrowser;
+    private DissectorWindow? _dissector;
     private PoiLayer? _poi;
 
     /// <summary>Radius in pixels of an entity dot.</summary>
@@ -168,6 +169,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         ArgumentNullException.ThrowIfNull(inspector);
         _uiBrowser = new UiBrowserWindow(inspector) { Visible = visible };
+    }
+
+    /// <summary>
+    /// Adds the raw-memory dissector.
+    /// </summary>
+    /// <remarks>
+    /// Over the game for the same reason the interface browser is: what is being watched is
+    /// the game reacting, and a window somewhere else cannot be looked at and acted in at the
+    /// same time. Finding a field means doing something and seeing what moved, which only
+    /// works if both are in front of you.
+    /// </remarks>
+    public void AttachDissector(StructureInspector inspector, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(inspector);
+        _dissector = new DissectorWindow(inspector) { Visible = visible };
     }
 
     /// <summary>
@@ -345,6 +361,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Outside the "in an area" gate: an element can be inspected on a login screen or in
         // a hideout, and the browser reports for itself when there is no tree to read.
         _uiBrowser?.Render(_tracked);
+        _dissector?.Render();
         _poi?.DrawPicker(_snapshot, _snapshot.Player);
 
         if (ShowStatus)
@@ -629,6 +646,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     if (ImGui.Checkbox("UI browser  (F8 picks what is under the cursor)", ref browsing))
                     {
                         _uiBrowser.Visible = browsing;
+                    }
+                }
+
+                if (_dissector is not null)
+                {
+                    bool dissecting = _dissector.Visible;
+                    if (ImGui.Checkbox("Memory dissector  (raw structures, and what moves in them)", ref dissecting))
+                    {
+                        _dissector.Visible = dissecting;
                     }
                 }
 

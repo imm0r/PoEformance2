@@ -367,6 +367,11 @@ internal static class Program
         // still pure waste while nobody is looking at it.
         var uiTree = new PoEformance.Features.UiTreeInspector(reader, schema, gameStatesStatic);
 
+        // The same arrangement for raw memory: the window says where to look, this looks. Idle
+        // until it is opened, and one window of a few kilobytes when it is - nothing next to
+        // the entity map.
+        var structures = new PoEformance.Features.StructureInspector(reader, schema, gameStatesStatic);
+
         // Finding a way across the area is a search over millions of cells - measured at about
         // 1.8 seconds right across a real map - so it runs on the thread pool and the renderer
         // draws whatever has come back. Asking for one from the read loop costs nothing, which
@@ -378,6 +383,7 @@ internal static class Program
             {
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
                 uiTree.Service(scale);
+                structures.Service();
                 route.Service(snapshot, Environment.TickCount64);
 
                 // Evaluated even when the feature is off: it costs a bool check, and its
@@ -419,6 +425,7 @@ internal static class Program
             PoEformance.Features.OverlaySettings.ParseColour(settings.TerrainColour),
             settings.TerrainThickness);
         overlay.AttachUiBrowser(uiTree, uiBrowser);
+        overlay.AttachDissector(structures);
         overlay.AttachPointsOfInterest(route);
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();
