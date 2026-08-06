@@ -59,6 +59,18 @@ public readonly record struct MapView(
     public bool IsUsable => Diagonal > 0 && Zoom > 0;
 
     /// <summary>
+    /// How many pixels one grid cell measures across this map, along its wider axis.
+    /// </summary>
+    /// <remarks>
+    /// The horizontal half of the transform below, on its own. What it is for is choosing how
+    /// finely to sample something drawn ACROSS the map rather than at one point: a step
+    /// measured in grid cells means nothing on screen until it is multiplied by this, and a
+    /// fixed step packs into a solid block at one zoom and leaves gaps at another.
+    /// </remarks>
+    public float PixelsPerGridCell
+        => Zoom > 0 ? (float)(Diagonal * Math.Cos(CameraAngle) * Zoom / ScaleBase) : 0f;
+
+    /// <summary>
     /// Projects a world position onto this map, relative to the player.
     /// </summary>
     /// <remarks>

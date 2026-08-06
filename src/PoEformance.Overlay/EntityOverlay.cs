@@ -76,6 +76,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
 
             _banner.Style = value;
+            _unwalked.Style = value;
         }
     }
 
@@ -153,6 +154,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private StyleWindow? _styleWindow;
     private AlertWatcher? _alerts;
     private readonly AlertBanner _banner = new();
+    private readonly UnwalkedLayer _unwalked = new();
 
     /// <summary>
     /// Adds the alert watcher, which says when something worth knowing about turned up.
@@ -1143,6 +1145,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _terrain.Thickness = (int)outline.WidthOr(_terrainThickness);
 
             _terrain.Draw(draw, map, terrain, new Vector3(player.WorldX, player.WorldY, player.TerrainHeight));
+        }
+
+        // Over the layout and under the markers: it is context for where to go next, and a
+        // monster dot must never be lost behind it.
+        if (Coverage is MapCoverage walked)
+        {
+            _unwalked.Draw(draw, map, walked, player);
         }
 
         float radius = map.IsLargeMap ? 3.5f : 2.5f;

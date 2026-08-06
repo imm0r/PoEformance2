@@ -468,3 +468,109 @@ public class MapCoverageCostTests
         Assert.True(watch.ElapsedMilliseconds < 2_000, $"the flood took {watch.ElapsedMilliseconds} ms");
     }
 }
+
+/// <summary>Where there is still ground to cover, as the map layer asks for it.</summary>
+/// <remarks>
+/// The drawing itself needs a GPU and is not testable here. What IS testable is the answer it
+/// draws from, and the two ways it can be wrong are both silent: marking ground that cannot be
+/// reached sends somebody across a map for nothing, and marking ground already walked never
+/// stops.
+/// </remarks>
+public class StillToWalkTests
+{
+    private static TerrainGrid Everything(int width, int height)
+    {
+        int bytesPerRow = (width + 1) / 2;
+        var cells = new byte[bytesPerRow * height];
+        Array.Fill(cells, (byte)0x11);
+        return new TerrainGrid(cells, bytesPerRow, height, width / TerrainGrid.CellsPerTile, height / TerrainGrid.CellsPerTile);
+    }
+
+    private static WorldSnapshot At(TerrainGrid grid, int cellX, int cellY, uint area = 1)
+    {
+        var player = new WorldEntity(
+            1, 0x100, "Metadata/Characters/Player", EntityKind.Player,
+            cellX * MapView.WorldToGrid, cellY * MapView.WorldToGrid, 0f);
+
+        return new WorldSnapshot(
+            true, player, [], new float[16],
+            Area: new AreaInfo("MapRiverhold", "Riverhold", 10, false, false),
+            Terrain: grid, AreaHash: area);
+    }
+
+    [Fact]
+    public void GroundWalkedPastStopsBeingMarked()
+    {
+        var coverage = new MapCoverage(MapCoverage.Immediate);
+        TerrainGrid grid = Everything(400, 200);
+
+        coverage.Look(At(grid, 200, 100));
+
+        // The cell underfoot: reached, and definitely seen.
+        Assert.False(coverage.StillToWalk(200 / MapCoverage.CoarseStep, 100 / MapCoverage.CoarseStep));
+
+        // Far across the area, well outside the sight disc: reached, and not seen.
+        Assert.True(coverage.StillToWalk(20, 10));
+    }
+
+    [Fact]
+    public void NothingIsMarkedBeforeTheRegionIsKnown()
+    {
+        // While the denominator is still the whole grid, the marks would cover ground nobody
+        // can get to - which is worse than no marks at all, because it is advice.
+        var coverage = new MapCoverage(_ => { });
+        coverage.Look(At(Everything(400, 200), 200, 100));
+
+        Assert.False(coverage.RegionKnown);
+        for (int y = 0; y < coverage.CoarseHeight; y += 5)
+        {
+            for (int x = 0; x < coverage.CoarseWidth; x += 5)
+            {
+                Assert.False(coverage.StillToWalk(x, y));
+            }
+        }
+    }
+
+    [Fact]
+    public void GroundThatCannotBeReachedIsNeverMarked()
+    {
+        // The mark says "go there". Ground behind a wall is the one place it must not.
+        var coverage = new MapCoverage(MapCoverage.Immediate);
+        int bytesPerRow = 200;
+        var cells = new byte[bytesPerRow * 200];
+        for (int y = 0; y < 200; y++)
+        {
+            for (int x = 0; x < 400; x++)
+            {
+                if (x is >= 10 and < 190 || x is >= 210 and < 390)
+                {
+                    cells[(y * bytesPerRow) + (x >> 1)] |= (byte)((x & 1) == 0 ? 0x01 : 0x10);
+                }
+            }
+        }
+
+        var grid = new TerrainGrid(cells, bytesPerRow, 200, 400 / TerrainGrid.CellsPerTile, 200 / TerrainGrid.CellsPerTile);
+        coverage.Look(At(grid, 100, 100));
+
+        Assert.True(coverage.RegionKnown);
+        for (int y = 0; y < coverage.CoarseHeight; y++)
+        {
+            for (int x = 210 / MapCoverage.CoarseStep; x < coverage.CoarseWidth; x++)
+            {
+                Assert.False(coverage.StillToWalk(x, y), $"the far room at ({x},{y}) was marked as somewhere to go");
+            }
+        }
+    }
+
+    [Fact]
+    public void AskingOutsideTheGridIsNotAnError()
+    {
+        var coverage = new MapCoverage(MapCoverage.Immediate);
+        coverage.Look(At(Everything(200, 200), 100, 100));
+
+        Assert.False(coverage.StillToWalk(-1, 5));
+        Assert.False(coverage.StillToWalk(5, -1));
+        Assert.False(coverage.StillToWalk(int.MaxValue, 5));
+        Assert.False(coverage.StillToWalk(5, int.MaxValue));
+    }
+}

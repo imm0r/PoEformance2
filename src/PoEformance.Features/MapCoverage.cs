@@ -72,6 +72,27 @@ public sealed class MapCoverage
     /// <summary>How many coarse cells can be reached at all. The denominator.</summary>
     public int ReachableCells => _here?.Reachable ?? 0;
 
+    /// <summary>Coarse cells across the area being measured.</summary>
+    public int CoarseWidth => _here?.Width ?? 0;
+
+    /// <summary>Coarse cells down the area being measured.</summary>
+    public int CoarseHeight => _here?.Height ?? 0;
+
+    /// <summary>
+    /// Whether a coarse cell can be reached and has not been walked past yet.
+    /// </summary>
+    /// <remarks>
+    /// For drawing where there is still ground to cover, which is the useful half of this -
+    /// "forty per cent left" and "left is over THERE" are different amounts of help.
+    ///
+    /// Read from whichever thread is drawing while the reader marks cells. Nothing needs
+    /// locking: a bool write cannot tear, so the worst case is a cell that shows as unwalked
+    /// for one more frame than it should. False until the region is known, so nothing is drawn
+    /// while the answer would be against the whole grid - marks covering ground nobody can get
+    /// to would be exactly the wrong advice.
+    /// </remarks>
+    public bool StillToWalk(int coarseX, int coarseY) => _here?.StillToWalk(coarseX, coarseY) ?? false;
+
     /// <summary>Whether the reachable region has been worked out yet.</summary>
     /// <remarks>
     /// Worth saying out loud, because the percentage means something different before and
@@ -196,6 +217,23 @@ public sealed class MapCoverage
         internal uint Hash { get; }
 
         internal bool[]? Region => _region;
+
+        internal int Width => _width;
+
+        internal int Height => _height;
+
+        /// <summary>Reachable, and not walked past yet.</summary>
+        internal bool StillToWalk(int x, int y)
+        {
+            bool[]? region = _region;
+            if (region is null || (uint)x >= (uint)_width || (uint)y >= (uint)_height)
+            {
+                return false;
+            }
+
+            int index = (y * _width) + x;
+            return region[index] && !_seen[index];
+        }
 
         /// <summary>Whether this belongs to the grid on offer - a size change means a new area.</summary>
         internal bool Fits(TerrainGrid grid)

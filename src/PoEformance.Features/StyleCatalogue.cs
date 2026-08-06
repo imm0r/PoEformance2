@@ -88,6 +88,7 @@ public static class StyleCatalogue
 
         // ── The map itself ──────────────────────────────────────────────────
         new("terrain.outline", "Map", "Area layout", Line, Rgb(150, 200, 255)),
+        new("map.unwalked", "Map", "Still to walk", StyleTraits.Colour | StyleTraits.Scale, Rgb(120, 150, 190, 140)),
 
         // ── Alerts ──────────────────────────────────────────────────────────
         new("alert.banner", "Alerts", "Alert line", StyleTraits.Colour, Rgb(255, 235, 179, 255)),
@@ -124,6 +125,7 @@ public static class StyleCatalogue
         public const string PlaceLabel = "poi.label";
         public const string RouteArrow = "route.arrow";
         public const string Terrain = "terrain.outline";
+        public const string Unwalked = "map.unwalked";
         public const string Banner = "alert.banner";
         public const string BannerBack = "alert.banner.back";
         public const string AidCentre = "aid.centre";
@@ -136,7 +138,7 @@ public static class StyleCatalogue
         /// <summary>All of them, for the test that keeps them honest.</summary>
         public static IReadOnlyList<string> All { get; } =
         [
-            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Banner, BannerBack,
+            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Banner, BannerBack,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];
     }
