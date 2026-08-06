@@ -458,10 +458,10 @@
     },
 
     "FileRecord": {
-      "comment": "One loaded file. AreaChangeCount is the STAMP the game put on it when it loaded, and nothing re-stamps it - so the files carrying the newest stamp in the table are the ones the current area brought in. VERIFIED LIVE (PoE2): the records read as real paths and their stamps read 2 for the core data files, which is what startup files carry. The stamp is trusted; the AreaChangeCounter STATIC is not - it read 188 against a table whose newest stamp was far smaller, so the reader finds the newest stamp itself rather than comparing against that static. GameHelper2 compares against the static and skips stamps below 3, because the first couple of areas of a session load the whole menu with them.",
+      "comment": "One loaded file. AreaChangeCount is the STAMP the game put on it when it loaded, and nothing re-stamps it - so the files carrying the newest stamp in the table are the ones the current area brought in. MEASURED LIVE (2026-08), and it disagrees with the reference: GameHelper2 puts the stamp at 0x40 and has 0x38 commented out as an UnknownConstant, and here it is the other way round. With the counter static reading 13, a sweep of 3999 records found 13 at +0x38 in 465 of them and NOWHERE at +0x40, where all 3999 held a flat 2. 465 records carrying the current area's stamp is what a freshly loaded map looks like; a field reading the same number in every record is a constant, not a stamp. GameHelper2 skips stamps below 3 because the first couple of areas of a session load the whole menu with them, and that is kept.",
       "fields": {
         "Name": { "offset": "0x08", "type": "stdWString" },
-        "AreaChangeCount": { "offset": "0x40", "type": "i32" }
+        "AreaChangeCount": { "offset": "0x38", "type": "i32" }
       },
       "consts": { "IgnoreFirstAreas": "2" }
     },

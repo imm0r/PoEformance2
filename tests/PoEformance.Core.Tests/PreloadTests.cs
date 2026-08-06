@@ -611,4 +611,46 @@ public class PreloadNewestStampTests
 
         Assert.Contains("drifted", reader.LastError, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void ASTAMPFieldThatMovedIsNotReportedAsAYoungSession()
+    {
+        // The second live failure, and the nastier one. Once the counter static was fixed it
+        // read 13, but the stamp was still being read one field past where it lives, so every
+        // record looked like a 2 and the walk reported "only 2 areas loaded so far - the list
+        // is still the whole game". That is a real state with a real message, it just was not
+        // THIS state, and the wording sent the search in the wrong direction entirely.
+        //
+        // The counter is the witness. It knows the session is thirteen areas old, so a table
+        // claiming two is not a young session, it is a table being read in the wrong place.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 2),
+            ("Data/Balance/FlavourText.dat", 2));
+
+        var reader = new PreloadReader(memory, Schema());
+        HashSet<string> found = reader.Read(RootStatic, 13);
+
+        Assert.Empty(found);
+        Assert.Contains("moved", reader.LastError, StringComparison.Ordinal);
+        Assert.Contains("13", reader.LastError, StringComparison.Ordinal);
+        Assert.DoesNotContain("whole game", reader.LastError, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ARealYoungSessionStillSaysSo()
+    {
+        // The other side of it. When the counter AGREES that barely anything has loaded, the
+        // early-session message is the right one and must survive - a warning about a moved
+        // field every time somebody starts the tool at the login screen would be noise, and
+        // noise is how a real warning stops being read.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 2),
+            ("Data/Balance/FlavourText.dat", 2));
+
+        var reader = new PreloadReader(memory, Schema());
+        reader.Read(RootStatic, 2);
+
+        Assert.Contains("whole game", reader.LastError, StringComparison.Ordinal);
+        Assert.DoesNotContain("moved", reader.LastError, StringComparison.Ordinal);
+    }
 }

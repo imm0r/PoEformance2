@@ -19,15 +19,23 @@ namespace PoEformance.Game.World;
 /// the zones before this one.
 ///
 /// The newest stamp is found in the table rather than read from the game's area-change
-/// counter, and that is not a preference. It started as a rescue: the counter static resolved
-/// to the wrong variable and reported 188 while every record held a number two orders of
-/// magnitude smaller - and the records were right, because the paths they hand back are real
-/// game files anybody can check. The static has since been corrected, but the table stayed the
-/// source, because something that stamps its own generation does not need to be told what
-/// generation it is, and one fewer byte pattern to keep alive across a game patch is worth
-/// having. The counter is still read and still reported beside the stamp, for exactly the
-/// reason it was caught: a disagreement between the two is the first sign one of them has
-/// drifted again.
+/// counter, and BOTH are read anyway. That combination was arrived at the hard way, twice, in
+/// opposite directions.
+///
+/// First the counter was wrong: the static resolved to another variable and reported 188 while
+/// every record held a number two orders of magnitude smaller. The records won, because the
+/// paths they hand back are real game files anybody can check, and taking the newest stamp from
+/// the table made the feature independent of the static altogether.
+///
+/// Then, once the static was fixed and read 13, the table was wrong: no record admitted to more
+/// than 2, because the stamp was being read one field past where it lives. So "the table cannot
+/// be wrong" was too strong - the table is only as right as the offset it is read at, and that
+/// offset is exactly as patchable as a byte pattern.
+///
+/// Neither number is trustworthy alone, and that is the point of keeping both. The stamp still
+/// decides, because it is what the records are actually filtered by; the counter is carried
+/// beside it as the only independent witness to how many areas there have really been. Every
+/// time one of them has drifted, the disagreement is what showed it.
 ///
 /// Stamps below three are skipped: the first areas of a session drag the whole game in with
 /// them, so everything in memory would match.
@@ -126,11 +134,10 @@ public sealed class PreloadReader
 
         // THE TABLE KNOWS ITS OWN GENERATION. Files are stamped with the area-change count
         // that loaded them and nothing ever re-stamps them, so the newest stamp in the table
-        // IS the current area - which makes the separate counter unnecessary, and that turned
-        // out to matter: a mis-derived static reported 188 while every record in the table held
-        // a number two orders of magnitude smaller. One of the two was wrong and the table is
-        // the one that cannot be, because the paths it hands back are checkable. The static was
-        // fixed afterwards; this stayed, because it does not depend on it either way.
+        // IS the current area - which means the walk needs no counter to tell it which area it
+        // is in, and that turned out to matter: a mis-derived static once reported 188 against
+        // a table holding numbers two orders of magnitude smaller. The counter is read all the
+        // same, one field below, because the reverse has happened too - see the type comment.
         //
         // Cheaper as well. The old shape read a name for every record whose count matched a
         // guess; this reads counts first - one int each - and only fetches strings for the
@@ -146,7 +153,18 @@ public sealed class PreloadReader
             // arrives here with a newest of zero, and "no areas loaded yet" would bury it.
             if (LastError.Length == 0)
             {
-                LastError = $"only {Newest} areas loaded so far - the list is still the whole game";
+                // ...and only when it is TRUE. The counter is the one thing here that knows
+                // how many areas there have really been, and if it says a dozen while no
+                // record admits to more than two, then the records are not being read where
+                // the stamp lives. That is what happened: a counter of 13 against a newest of
+                // 2, and a sweep found 13 sitting one field earlier. The early-session wording
+                // fits that state perfectly and explains it completely wrongly, which is worse
+                // than saying nothing - so it only gets used when the counter agrees that the
+                // session really is that young.
+                LastError = Counter > _ignoreFirstAreas + 1
+                    ? $"the newest stamp in the table is {Newest} but the counter says {Counter} - "
+                        + "the stamp field has probably moved; try 'find the count field'"
+                    : $"only {Newest} areas loaded so far - the list is still the whole game";
             }
 
             return found;
@@ -172,9 +190,10 @@ public sealed class PreloadReader
     /// What the area-change counter static read, kept only as a cross-check.
     /// </summary>
     /// <remarks>
-    /// Not used to decide anything. It agreed with the table in the reference tool and does
-    /// not here, so it is worth SEEING - a static that disagrees with the data it is supposed
-    /// to describe is a finding, whichever of the two is wrong.
+    /// Never decides which files come back - it only ever gets compared against
+    /// <see cref="Newest"/>. Kept because a static that disagrees with the data it is supposed
+    /// to describe is a finding, whichever of the two turns out to be wrong, and both of them
+    /// have been. Shown next to the stamp in the window for that reason.
     /// </remarks>
     public int Counter { get; private set; }
 
