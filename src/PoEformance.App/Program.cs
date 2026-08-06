@@ -429,7 +429,7 @@ internal static class Program
 
                     var lines = new List<string>
                     {
-                        $"counter reads {counter}",
+                        $"counter static reads {counter}",
                         $"{swept.Records} records read, {swept.Named} with a readable path"
                             + (swept.Named == 0 ? "  <- the RECORD is wrong, not the count" : string.Empty),
                     };
@@ -469,7 +469,17 @@ internal static class Program
                 {
                     int counter = preloadReader.AreaChangeCount(areaCounter);
                     HashSet<string> files = preloadReader.Read(fileRoot, counter);
-                    preload.Took(area, files, preloadReader.LastError);
+
+                    // The two numbers side by side when they disagree, because that IS the
+                    // finding - the table stamps its own generation and the static is only a
+                    // cross-check, so a mismatch says the static is reading something else.
+                    string note = preloadReader.LastError;
+                    if (files.Count > 0 && preloadReader.Newest != counter)
+                    {
+                        note = $"area {preloadReader.Newest} by the table, {counter} by the counter static";
+                    }
+
+                    preload.Took(area, files, note);
                 }
                 catch (Exception exception)
                 {

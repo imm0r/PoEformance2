@@ -13,11 +13,19 @@ namespace PoEformance.Game.World;
 /// entrance. Nothing else in the tool can answer that: entities exist only within the awake
 /// radius, so a radar cannot see the far half of a map at all.
 ///
-/// The trick is one field. Every loaded file records the value the area-change counter held
-/// when it was loaded, so the files whose count EQUALS the counter now are exactly the ones
-/// THIS area brought in - everything else is the menu, the character, the last three zones.
-/// Counts below three are skipped because the first areas of a session drag the whole game in
-/// with them.
+/// The trick is one field. Every loaded file is STAMPED with the area-change count that loaded
+/// it, and nothing ever re-stamps it - so the files carrying the NEWEST stamp in the table are
+/// exactly the ones this area brought in, and everything older is the menu, the character and
+/// the zones before this one.
+///
+/// The newest stamp is found in the table rather than read from the game's area-change
+/// counter, and that is not a preference. Read live, the counter static reported 188 while
+/// every record held a number two orders of magnitude smaller - and the records were right,
+/// because the paths they hand back are real game files anybody can check. A table that stamps
+/// its own generation does not need to be told what generation it is.
+///
+/// Stamps below three are skipped: the first areas of a session drag the whole game in with
+/// them, so everything in memory would match.
 ///
 /// EXPENSIVE, AND ONCE. Sixteen buckets of a few thousand slots, a pointer to follow and a
 /// string to read for each. That is a whole read budget and then some, which is why it runs on
@@ -104,14 +112,6 @@ public sealed class PreloadReader
         SlotsWalked = 0;
         LastError = string.Empty;
 
-        if (areaChangeCount <= _ignoreFirstAreas)
-        {
-            // The first areas of a session load the whole game with them, so every file in
-            // memory would match. Saying so beats returning three thousand paths.
-            LastError = $"only {areaChangeCount} areas loaded so far - the list is still the whole game";
-            return found;
-        }
-
         ulong root = _reader.ReadPointer(fileRootStatic);
         if (!MemoryReaderExtensions.IsPlausiblePointer(root))
         {
@@ -119,18 +119,87 @@ public sealed class PreloadReader
             return found;
         }
 
+        // THE TABLE KNOWS ITS OWN GENERATION. Files are stamped with the area-change count
+        // that loaded them and nothing ever re-stamps them, so the newest stamp in the table
+        // IS the current area - which makes the separate counter unnecessary, and that turned
+        // out to matter: read live, the static reported 188 while every record in the table
+        // held a number two orders of magnitude smaller. One of the two was wrong and the
+        // table is the one that cannot be, because the paths it hands back are checkable.
+        //
+        // Cheaper as well. The old shape read a name for every record whose count matched a
+        // guess; this reads counts first - one int each - and only fetches strings for the
+        // records that turned out to be the newest.
+        Newest = HighestCount(root);
+        Counter = areaChangeCount;
+
+        if (Newest <= _ignoreFirstAreas)
+        {
+            // The first areas of a session load the whole game with them, so every file in
+            // memory would match. Saying so beats returning three thousand paths - but only
+            // when nothing worse has already been said: a table that could not be walked also
+            // arrives here with a newest of zero, and "no areas loaded yet" would bury it.
+            if (LastError.Length == 0)
+            {
+                LastError = $"only {Newest} areas loaded so far - the list is still the whole game";
+            }
+
+            return found;
+        }
+
         for (int i = 0; i < _bucketCount; i++)
         {
-            WalkBucket(root + (ulong)(i * _bucketSize), areaChangeCount, found);
+            WalkBucket(root + (ulong)(i * _bucketSize), Newest, found);
         }
 
         if (found.Count == 0 && LastError.Length == 0)
         {
-            LastError = $"walked {SlotsWalked} slots and matched nothing at count {areaChangeCount}";
+            LastError = $"walked {SlotsWalked} slots and matched nothing at count {Newest}";
         }
 
         return found;
     }
+
+    /// <summary>The newest area-change stamp anywhere in the table - the current area's.</summary>
+    public int Newest { get; private set; }
+
+    /// <summary>
+    /// What the area-change counter static read, kept only as a cross-check.
+    /// </summary>
+    /// <remarks>
+    /// Not used to decide anything. It agreed with the table in the reference tool and does
+    /// not here, so it is worth SEEING - a static that disagrees with the data it is supposed
+    /// to describe is a finding, whichever of the two is wrong.
+    /// </remarks>
+    public int Counter { get; private set; }
+
+    /// <summary>Reads every record's stamp and returns the newest.</summary>
+    private int HighestCount(ulong root)
+    {
+        int newest = 0;
+        for (int b = 0; b < _bucketCount; b++)
+        {
+            foreach (ulong record in RecordsIn(root + (ulong)(b * _bucketSize)))
+            {
+                if (_reader.TryRead(record + (ulong)_recordCount, out int loadedAt)
+                    && loadedAt > newest && loadedAt < MostPlausibleCount)
+                {
+                    newest = loadedAt;
+                }
+            }
+        }
+
+        return newest;
+    }
+
+    /// <summary>
+    /// Beyond this, a stamp is a bad read rather than an area count.
+    /// </summary>
+    /// <remarks>
+    /// The newest stamp decides which files are shown, so ONE garbage record with a huge
+    /// value would take the whole list with it - every real file would be older than it and
+    /// nothing would match. A session does not reach a hundred thousand areas.
+    /// </remarks>
+    public const int MostPlausibleCount = 100_000;
 
     /// <summary>Walks one bucket's vector, adding whatever belongs to this area.</summary>
     private void WalkBucket(ulong bucket, int areaChangeCount, HashSet<string> into)
@@ -246,15 +315,24 @@ public sealed class PreloadReader
 
         Span<byte> window = stackalloc byte[SweepBytes];
 
-        for (int b = 0; b < _bucketCount && records < mostRecords; b++)
+        // Evenly across the buckets rather than filling from the first. Bucket zero holds
+        // the game's core data files - loaded at startup, all stamped with the same early
+        // count - so a sample taken in order reports one value and misses every area file
+        // there is. That is exactly what it did the first time it ran.
+        int perBucket = Math.Max(1, mostRecords / _bucketCount);
+
+        for (int b = 0; b < _bucketCount; b++)
         {
+            int fromThisBucket = 0;
             foreach (ulong record in RecordsIn(root + (ulong)(b * _bucketSize)))
             {
                 slots++;
-                if (records >= mostRecords)
+                if (fromThisBucket >= perBucket)
                 {
                     break;
                 }
+
+                fromThisBucket++;
 
                 // Shrinking on failure rather than demanding the whole window. A record near
                 // the end of a mapped page cannot supply 0x100 bytes, and ReadProcessMemory
@@ -327,8 +405,17 @@ public sealed class PreloadReader
         }
 
         long slots = (long)(last - first) / _slotSize;
-        if (slots <= 0 || slots > MostSlotsPerBucket)
+        if (slots <= 0)
         {
+            yield break;
+        }
+
+        if (slots > MostSlotsPerBucket)
+        {
+            // Reported HERE because this walk now runs first - the newest stamp is found
+            // before anything is collected, so a bucket that never yields would otherwise
+            // fail as "only 0 areas loaded so far", which points at the wrong thing entirely.
+            LastError = $"a bucket claimed {slots} slots - the layout has drifted";
             yield break;
         }
 

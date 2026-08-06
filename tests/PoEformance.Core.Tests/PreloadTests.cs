@@ -194,6 +194,7 @@ public class PreloadReaderTests
 
         Assert.Empty(found);
         Assert.Contains("areas loaded so far", reader.LastError, StringComparison.Ordinal);
+        Assert.Equal(1, reader.Newest);
     }
 
     [Fact]
@@ -384,13 +385,15 @@ public class PreloadSweepTests
     {
         // The answer, when there is one. A field a thousand records share is the field; a
         // stray match is one record.
-        FakeMemoryReader memory = TableWithCountAt(countOffset: 0x58, count: 188, records: 300);
+        // Under the per-bucket share, so every planted record is sampled. The sweep spreads
+        // its budget across the buckets rather than filling from the first - see the reader.
+        FakeMemoryReader memory = TableWithCountAt(countOffset: 0x58, count: 188, records: 200);
         var reader = new PreloadReader(memory, Schema());
 
         PreloadReader.PreloadSweep swept = reader.Sweep(RootStatic, 188);
 
         Assert.Equal(0x58, swept.CountAt[0].Offset);
-        Assert.Equal(300, swept.CountAt[0].Agreeing);
+        Assert.Equal(200, swept.CountAt[0].Agreeing);
     }
 
     [Fact]
@@ -465,5 +468,147 @@ public class PreloadSweepTests
         Assert.False(PreloadReader.LooksLikeAPath("nope"));
         Assert.False(PreloadReader.LooksLikeAPath(string.Empty));
         Assert.False(PreloadReader.LooksLikeAPath("a/"));
+    }
+}
+
+/// <summary>
+/// The table decides which area is current, not a separate counter.
+/// </summary>
+/// <remarks>
+/// Written after the live run settled it. The counter static read 188 while every record in
+/// the table held a number two orders of magnitude smaller, and the paths those records handed
+/// back were real game files - so the table was right and the static was reading something
+/// else. Files are stamped when they load and nothing re-stamps them, which makes the NEWEST
+/// stamp in the table the current area by construction.
+/// </remarks>
+public class PreloadNewestStampTests
+{
+    private const ulong RootStatic = 0x10_0000;
+    private const ulong Root = 0x20_0000;
+
+    private static OffsetSchema Schema() => RealSessionTests.Schema();
+
+    /// <summary>A table where each bucket's records carry a stamp of their own.</summary>
+    private static FakeMemoryReader TableWith(params (string Path, int LoadedAt)[] records)
+    {
+        var memory = new FakeMemoryReader();
+        OffsetSchema schema = Schema();
+        int bucketSize = (int)schema.Structs["LoadedFilesRoot"].Constants["BucketSize"];
+        int slotSize = (int)schema.Structs["FileRecordSlot"].Constants["Size"];
+
+        memory.Place(RootStatic, Root);
+
+        ulong next = 0x100_0000;
+        ulong Take(int bytes)
+        {
+            ulong at = next;
+            next += (ulong)((bytes + 0xFF) & ~0xFF);
+            return at;
+        }
+
+        ulong slots = Take(slotSize * records.Length);
+        memory.Place(Root, slots);
+        memory.Place(Root + 8, slots + (ulong)(slotSize * records.Length));
+        memory.Place(Root + (ulong)schema.Structs["LoadedFilesBucket"].OffsetOf("Capacity"), records.Length);
+
+        for (int i = 0; i < records.Length; i++)
+        {
+            ulong record = Take(0x200);
+            memory.Place(record, new byte[0x200]);
+            memory.Place(
+                slots + (ulong)(i * slotSize) + (ulong)schema.Structs["FileRecordSlot"].OffsetOf("Record"),
+                record);
+            memory.Place(
+                record + (ulong)schema.Structs["FileRecord"].OffsetOf("AreaChangeCount"), records[i].LoadedAt);
+            memory.PlaceStdWString(
+                record + (ulong)schema.Structs["FileRecord"].OffsetOf("Name"), records[i].Path, Take(512));
+        }
+
+        for (int b = 1; b < 16; b++)
+        {
+            memory.Place(
+                Root + (ulong)(b * bucketSize)
+                    + (ulong)schema.Structs["LoadedFilesBucket"].OffsetOf("Capacity"),
+                0);
+        }
+
+        return memory;
+    }
+
+    [Fact]
+    public void TheNEWESTStampIsTheCurrentArea()
+    {
+        // No counter involved. Startup files carry an early stamp forever, the area you are
+        // standing in carries the latest one, and nothing in between needs asking.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 2),
+            ("Data/Balance/FlavourText.dat", 2),
+            ("Metadata/Terrain/Leagues/Breach/BreachObject", 9),
+            ("Metadata/Terrain/Maps/Riverhold", 9),
+            ("Metadata/Terrain/LastArea/Thing", 8));
+
+        var reader = new PreloadReader(memory, Schema());
+        HashSet<string> found = reader.Read(RootStatic, 0);
+
+        Assert.Equal(9, reader.Newest);
+        Assert.Equal(2, found.Count);
+        Assert.Contains("Metadata/Terrain/Leagues/Breach/BreachObject", found);
+        Assert.DoesNotContain("Data/Balance/BaseItemTypes.dat", found);
+        Assert.DoesNotContain("Metadata/Terrain/LastArea/Thing", found);
+    }
+
+    [Fact]
+    public void AWRONGCounterCannotBreakIt()
+    {
+        // The live failure, exactly: a counter reading 188 against a table whose newest stamp
+        // is 9. The old shape compared against the counter and found nothing at all.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 2),
+            ("Metadata/Terrain/Maps/Riverhold", 9));
+
+        var reader = new PreloadReader(memory, Schema());
+        HashSet<string> found = reader.Read(RootStatic, 188);
+
+        Assert.Single(found);
+        Assert.Equal(9, reader.Newest);
+        Assert.Equal(188, reader.Counter);
+    }
+
+    [Fact]
+    public void ONEGarbageRecordCannotTakeTheListWithIt()
+    {
+        // The newest stamp decides everything, so a single record reading a huge number would
+        // make every real file older than it and the list empty. A session does not reach a
+        // hundred thousand areas.
+        FakeMemoryReader memory = TableWith(
+            ("Metadata/Terrain/Maps/Riverhold", 9),
+            ("Metadata/Terrain/Maps/Other", 9),
+            ("Metadata/Garbage", 900_000));
+
+        var reader = new PreloadReader(memory, Schema());
+        HashSet<string> found = reader.Read(RootStatic, 0);
+
+        Assert.Equal(9, reader.Newest);
+        Assert.Equal(2, found.Count);
+    }
+
+    [Fact]
+    public void ATableThatCannotBeWalkedSaysSORatherThanNoAreasYet()
+    {
+        // Both arrive with a newest stamp of zero, and they are completely different problems.
+        // "No areas loaded yet" over a drifted layout points at the wrong thing entirely.
+        var memory = new FakeMemoryReader();
+        OffsetSchema schema = Schema();
+        int slotSize = (int)schema.Structs["FileRecordSlot"].Constants["Size"];
+
+        memory.Place(RootStatic, Root);
+        memory.Place(Root, 0x100_0000UL);
+        memory.Place(Root + 8, 0x100_0000UL + (ulong)(slotSize * 5_000_000L));
+        memory.Place(Root + (ulong)schema.Structs["LoadedFilesBucket"].OffsetOf("Capacity"), 10);
+
+        var reader = new PreloadReader(memory, Schema());
+        reader.Read(RootStatic, 0);
+
+        Assert.Contains("drifted", reader.LastError, StringComparison.Ordinal);
     }
 }
