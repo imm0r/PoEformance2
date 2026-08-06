@@ -338,6 +338,21 @@ public class StructureInspectorTests
     }
 
     [Fact]
+    public void EveryComponentHasTwoNamedRowsEvenWhenNothingElseIsKnownAboutIt()
+    {
+        // The entity browser opens an undescribed component under this layout, by NAME - so a
+        // rename in the schema would silently produce a window with no names at all, on
+        // exactly the components where names are worth the most.
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+
+        StructureView view = Look(Inspector(reader), At(Somewhere, 512) with { StructName = "Component" });
+
+        Assert.Equal("StaticPtr", view.FieldNames[0]);
+        Assert.Equal("OwnerEntity", view.FieldNames[8]);
+    }
+
+    [Fact]
     public void TheKnownStructuresAreOfferedInAStableOrder()
     {
         // They fill a dropdown, and a list that reshuffles between frames cannot be clicked.

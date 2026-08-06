@@ -452,6 +452,17 @@
       }
     },
 
+    "Component": {
+      "comment": "The two fields EVERY component starts with, whatever it is. Worth having as a layout of its own because it is what orients you in one nobody has decoded: the first row says WHICH TYPE this is and the second says whose it is, so a window of unknown bytes already has two rows that mean something. Confirmed live on a DemonicApparitionPortal's Transitionable, where OwnerEntity held exactly the entity address the browser was showing. Named ComponentHeader in the AHK tool.",
+      "fields": {
+        "StaticPtr": {
+          "offset": "0x00", "type": "ptr",
+          "comment": "The component's TYPE descriptor - identical across every instance of the same component, so it fingerprints the type. Two rows sharing this value are the same kind of thing."
+        },
+        "OwnerEntity": { "offset": "0x08", "type": "ptr", "comment": "The entity this component belongs to." }
+      }
+    },
+
     "Transitionable": {
       "comment": "Component: the open/closed/activated state of a thing that changes - doors, levers, shrines, barricades. Both references agree on this offset (the AHK tool reads it as a short, GameHelper2 as an int), which is as close to certain as an offset gets here.",
       "fields": {

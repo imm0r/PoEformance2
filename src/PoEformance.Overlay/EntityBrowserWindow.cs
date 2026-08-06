@@ -220,10 +220,11 @@ public sealed class EntityBrowserWindow
         {
             if (ImGui.SmallButton($"dissect##{component.Address:X}"))
             {
-                // The schema's layout when there is one, so a known component names its own
-                // rows - and nothing when there is not, which is the whole reason to be here.
+                // The component's own layout when the schema has one. When it does not - the
+                // whole reason to be here - the generic one still names the two rows every
+                // component shares, so an unknown structure is never opened completely blind.
                 _dissect(component.Address, $"{Short(view.Path)}.{component.Name}",
-                    component.Described ? component.Name : string.Empty);
+                    component.Described ? component.Name : "Component");
             }
 
             ImGui.SameLine();
