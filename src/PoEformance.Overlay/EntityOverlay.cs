@@ -1323,6 +1323,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     private bool WorthDrawing(WorldEntity entity)
     {
+        // An emptied chest is scenery. It was already excluded from the points of interest
+        // and not from the dots, so a looted map still showed every container on it.
+        if (entity.IsSpent)
+        {
+            return false;
+        }
+
         if (entity.Kind != EntityKind.WorldItem)
         {
             return true;

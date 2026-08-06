@@ -99,7 +99,8 @@ public sealed record WorldEntity(
     string MapIcon = "",
     Vital Life = default,
     Vital EnergyShield = default,
-    bool? Opened = null)
+    bool? Opened = null,
+    bool IsFriendly = false)
 {
     /// <summary>Whether this is a chest somebody has already been through.</summary>
     public bool IsSpent => Opened == true;
@@ -224,6 +225,7 @@ public sealed class WorldReader
     private readonly int _isTargetable;
     private readonly int _monsterRarity;
     private readonly int _chestOpened;
+    private readonly int _reaction;
 
     /// <param name="rotation">
     /// Where the terrain rotation tables live, for the within-tile heights. Optional: without
@@ -271,6 +273,7 @@ public sealed class WorldReader
         _isTargetable = schema.Structs["Targetable"].OffsetOf("IsTargetable");
         _monsterRarity = schema.Structs["ObjectMagicProperties"].OffsetOf("Rarity");
         _chestOpened = schema.Structs["Chest"].OffsetOf("IsOpened");
+        _reaction = schema.Structs["Positioned"].OffsetOf("Reaction");
     }
 
     /// <summary>
@@ -327,8 +330,23 @@ public sealed class WorldReader
             monsterRarity = Rarities.FromRaw(rarity);
         }
 
+        // Whose side it is on. One byte, and the thing that decides whether a dot is a
+        // threat or your own summon - which nothing here was asking, so every minion, totem
+        // and cast effect has been drawn as an enemy.
+        bool friendly = false;
+        ulong positioned = entity.Component("Positioned");
+        if (positioned != 0 && _reader.TryRead(positioned + (ulong)_reaction, out byte reaction))
+        {
+            friendly = (reaction & 0x7F) == 0x01;
+        }
+
+        // Whether it expires on its own. Presence of the component is the whole answer, so
+        // this costs a lookup and no read at all.
+        bool temporary = entity.Component("DiesAfterTime") != 0;
+
         return new MonsterSigns(
-            health, targetable, monsterRarity >= ItemRarity.Unique, monsterRarity, pool, shield);
+            health, targetable, monsterRarity >= ItemRarity.Unique, monsterRarity, pool, shield,
+            friendly, temporary);
     }
 
     /// <summary>Pulls one vital sub-struct out of a span read from the Life component.</summary>
@@ -442,6 +460,20 @@ public sealed class WorldReader
                 continue;
             }
 
+            // A hostile thing that expires on its own and cannot be targeted is not a
+            // monster - it is a ground effect wearing a monster's components. Flame walls,
+            // ice crystals, damaging ground: they carry Life, so they were drawn as enemies
+            // and given health bars, which is what a screen full of unexplained dots was.
+            //
+            // Straight from the reference, including the targetable let-out: some real
+            // summoned monsters expire too, and those ARE worth drawing. Friendly ones are
+            // never dropped here, because whether to show your own minions is a preference
+            // and this is a question of fact.
+            if (kind == EntityKind.Monster && signs.IsPassingEffect)
+            {
+                continue;
+            }
+
             // Resolved here rather than filtered here: how good a drop is, is a fact about
             // the world, while "is it worth drawing" is a preference. The snapshot carries
             // the fact so the overlay - and a future loot tracker, which wants everything -
@@ -476,7 +508,7 @@ public sealed class WorldReader
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
                 PointsOfInterest.Classify(entity.Path, mapIcon), mapIcon,
-                signs.Life, signs.EnergyShield, opened);
+                signs.Life, signs.EnergyShield, opened, signs.Friendly);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

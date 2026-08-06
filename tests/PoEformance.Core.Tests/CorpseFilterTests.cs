@@ -1,3 +1,4 @@
+using PoEformance.Game.Components;
 using PoEformance.Game.World;
 
 namespace PoEformance.Core.Tests;
@@ -125,5 +126,59 @@ public class CorpseFilterTests
         // Nothing seen since; well past the forget window.
         filter.IsCorpse(0x9000, corpse, 60_000);
         Assert.Equal(1, filter.Tracking);
+    }
+}
+
+/// <summary>
+/// Telling a ground effect apart from a monster.
+/// </summary>
+/// <remarks>
+/// Written from a live report: a screen carrying far too many dots, the player's own flame
+/// wall drawn as an enemy, and every one of those effects wearing a health bar. All three are
+/// the same thing - an effect is built from the same components a monster is, so deciding
+/// "monster" from the metadata path alone cannot tell them apart.
+/// </remarks>
+public class PassingEffectTests
+{
+    private static MonsterSigns Signs(bool friendly, bool temporary, bool? targetable)
+        => new(100, targetable, false, ItemRarity.Normal, default, default, friendly, temporary);
+
+    [Fact]
+    public void AHOSTILEThingThatExpiresAndCannotBeTargetedIsAnEffect()
+    {
+        // The flame wall. It has Life, so it was a monster to everything downstream.
+        Assert.True(Signs(friendly: false, temporary: true, targetable: false).IsPassingEffect);
+    }
+
+    [Fact]
+    public void ANDSoIsOneThatOffersNoTargetableComponentAtAll()
+    {
+        // No component is not evidence of being fightable. Falls the same way as untargetable
+        // - the reference reads a missing component and an untargetable one identically here.
+        Assert.True(Signs(friendly: false, temporary: true, targetable: null).IsPassingEffect);
+    }
+
+    [Fact]
+    public void BUTATargetableOneIsAMonsterThatHappensToExpire()
+    {
+        // The let-out that keeps this from hiding real summons. Plenty of genuine monsters
+        // expire on their own, and those are worth every bit of the drawing.
+        Assert.False(Signs(friendly: false, temporary: true, targetable: true).IsPassingEffect);
+    }
+
+    [Fact]
+    public void ANDAFriendlyOneIsNeverDiscardedHere()
+    {
+        // Whether to draw your own minions is a preference and belongs to the overlay. This
+        // answers a question of fact, so it does not get to make that call.
+        Assert.False(Signs(friendly: true, temporary: true, targetable: false).IsPassingEffect);
+    }
+
+    [Fact]
+    public void ANDANOrdinaryMonsterIsUntouched()
+    {
+        // The case that must not regress: a permanent hostile monster, which is most of them.
+        Assert.False(Signs(friendly: false, temporary: false, targetable: true).IsPassingEffect);
+        Assert.False(Signs(friendly: false, temporary: false, targetable: null).IsPassingEffect);
     }
 }

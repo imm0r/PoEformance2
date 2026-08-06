@@ -30,7 +30,30 @@ public readonly record struct MonsterSigns(
     bool IsBoss,
     ItemRarity Rarity = ItemRarity.Unknown,
     Vital Life = default,
-    Vital EnergyShield = default);
+    Vital EnergyShield = default,
+    bool Friendly = false,
+    bool Temporary = false)
+{
+    /// <summary>
+    /// Whether this is a passing effect rather than a monster.
+    /// </summary>
+    /// <remarks>
+    /// Ground effects are built out of the same components a monster is - they carry Life,
+    /// they sit in the entity map, they have a position - so anything that decides "monster"
+    /// from the path alone draws a flame wall as an enemy and puts a health bar over it.
+    /// That is what a screen full of unexplained dots turned out to be.
+    ///
+    /// The rule is the reference's, including the let-out: a hostile thing that expires on
+    /// its own is only discarded when it cannot be TARGETED, because some genuinely summoned
+    /// monsters expire too and those are worth seeing. An entity with no targetable
+    /// component at all falls the same way as an untargetable one, which is deliberate - it
+    /// has offered no evidence that it is something you can fight.
+    ///
+    /// Friendly things are never discarded here. Whether to draw your own minions is a
+    /// preference, and this answers a question of fact.
+    /// </remarks>
+    public bool IsPassingEffect => !Friendly && Temporary && Targetable != true;
+}
 
 /// <summary>
 /// Decides which monsters are corpses, so the overlay stops marking them.

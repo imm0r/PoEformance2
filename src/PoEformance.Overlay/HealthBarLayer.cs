@@ -69,7 +69,10 @@ public sealed class HealthBarLayer
 
         foreach (WorldEntity monster in snapshot.Entities)
         {
-            if (monster.Kind != EntityKind.Monster || !monster.Life.IsValid)
+            // Friendly excluded: the bar answers "how close is this to dying", which is a
+            // question about a threat. Your own minions and totems are numerous and would
+            // bury the monsters the bars exist for.
+            if (monster.Kind != EntityKind.Monster || monster.IsFriendly || !monster.Life.IsValid)
             {
                 continue;
             }
