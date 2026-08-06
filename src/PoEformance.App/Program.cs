@@ -126,11 +126,18 @@ internal static class Program
         // Scan the whole entity map once. Besides the readout, this is what puts the map
         // traversal into a --record session so it can be replayed and tested offline.
         ulong gameStatesAddress = result.Statics.FirstOrDefault(s => s.Name == "GameStates")?.Address ?? 0;
+
+        // Kept out of the block below so the auto-flask report can see the BELT. Without it
+        // that report cannot tell an unbound flask from a charm, and the two mean opposite
+        // things - see ReportAutoFlask.
+        PoEformance.Game.Components.FlaskBelt? belt = null;
+
         if (gameStatesAddress != 0)
         {
             recorder?.MarkFrame();
             OffsetSchema worldSchema = SchemaJson.Load(schemaPath);
             PoEformance.Game.World.WorldSnapshot snapshot = ReportWorldScan(reader, worldSchema, gameStatesAddress);
+            belt = snapshot.FlaskBelt;
             recorder?.MarkFrame();
 
             // Verify the matrix against the whole scene, not just the player. Reading the
@@ -159,7 +166,7 @@ internal static class Program
             enabled: flaskSettings.Enabled || options.AutoFlask);
         if (options.ShowOverlay || options.ShowConfig || options.AutoFlask)
         {
-            ReportAutoFlask(autoFlask, flaskKeys, flaskSettings, forcedOn: options.AutoFlask);
+            ReportAutoFlask(autoFlask, flaskKeys, flaskSettings, belt, forcedOn: options.AutoFlask);
 
             if (!options.ShowConfig)
             {
@@ -451,6 +458,7 @@ internal static class Program
         PoEformance.Features.AutoFlask engine,
         PoEformance.Features.FlaskKeys keys,
         PoEformance.Features.AutoFlaskSettings settings,
+        PoEformance.Game.Components.FlaskBelt? belt,
         bool forcedOn)
     {
         Console.WriteLine();
@@ -501,9 +509,18 @@ internal static class Program
                 : $"{rule.Vital,-12} at or below {rule.ThresholdPercent,3}%";
 
             keys.BySlot.TryGetValue(rule.Slot, out ushort key);
-            string keyName = key == 0
-                ? "no usable key - this slot can never fire"
-                : $"key {PoEformance.Features.FlaskKeyBindings.Describe(key)}";
+
+            // A charm slot has no key BY DESIGN - the game fires it on its own condition, so
+            // there is nothing to bind and nothing wrong. Saying "this slot can never fire"
+            // there would report the normal state as a fault, and send someone looking for a
+            // binding that is not supposed to exist.
+            bool charm = belt?.InSlot(rule.Slot)?.IsCharm ?? false;
+
+            string keyName = charm
+                ? "charm - the game triggers it, no key needed"
+                : key == 0
+                    ? "no usable key - this slot can never fire"
+                    : $"key {PoEformance.Features.FlaskKeyBindings.Describe(key)}";
 
             Console.WriteLine($"  slot {rule.Slot}   {(rule.Enabled ? "ON " : "off")}  {trigger}   {keyName}");
         }
