@@ -92,7 +92,16 @@ public sealed class StructureInspector
     /// </remarks>
     public const int MaxSize = 8192;
 
+    /// <summary>Pointer candidates checked per tick, so a fresh window cannot burst.</summary>
+    private const int MaxChecksPerTick = 128;
+
+    /// <summary>Largest number of verdicts kept before starting over.</summary>
+    private const int MaxRemembered = 8192;
+
     private readonly IMemoryReader _reader;
+
+    /// <summary>Which addresses have something behind them. See <see cref="Verify"/>.</summary>
+    private readonly Dictionary<ulong, bool> _readable = [];
     private readonly OffsetSchema _schema;
     private readonly ulong _gameStatesStatic;
 
@@ -223,8 +232,8 @@ public sealed class StructureInspector
 
         _previous = window;
 
-        List<StructureSlot> slots = StructureProbe.Describe(
-            window, address, stride, _reader.ModuleBase, _reader.ModuleSize);
+        List<StructureSlot> slots = Verify(StructureProbe.Describe(
+            window, address, stride, _reader.ModuleBase, _reader.ModuleSize));
 
         return new StructureView(
             address,
@@ -236,6 +245,68 @@ public sealed class StructureInspector
             _lastPeekOffset,
             haveBaseline,
             $"{slots.Count} rows at 0x{address:X}");
+    }
+
+    /// <summary>
+    /// Demotes pointer-shaped values that do not actually point anywhere.
+    /// </summary>
+    /// <remarks>
+    /// The shape of a value can only ever say "this COULD be an address", and in a real
+    /// structure that is wrong often enough to matter: two small integers sharing a row make
+    /// one. Seen live at a row reading 4 and 531 - a perfectly ordinary pair of fields, and
+    /// together a number above four gigabytes, which is all the shape test can ask.
+    ///
+    /// Guessing harder does not fix it, because the two are genuinely indistinguishable by
+    /// their bytes. Reading does: an address either has something behind it or it does not.
+    /// That is the whole difference between a "go" button that leads somewhere and one that
+    /// leads to "nothing readable", which is what makes the descent worth trusting.
+    ///
+    /// Cached by target, since whether an address is mapped almost never changes, and capped
+    /// per tick so a screen full of new candidates cannot turn into a burst of reads on the
+    /// thread that also drives auto-flask.
+    /// </remarks>
+    private List<StructureSlot> Verify(List<StructureSlot> slots)
+    {
+        Span<byte> probe = stackalloc byte[8];
+        int fresh = 0;
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            if (slots[i].Guess != SlotGuess.Pointer)
+            {
+                continue;
+            }
+
+            ulong target = slots[i].Raw;
+            if (!_readable.TryGetValue(target, out bool leadsSomewhere))
+            {
+                if (fresh >= MaxChecksPerTick)
+                {
+                    continue;   // left as a candidate; the next tick finishes the job
+                }
+
+                fresh++;
+                leadsSomewhere = _reader.TryRead(target, probe);
+
+                // Wholesale rather than evicting one at a time: the verdicts are cheap to
+                // rebuild, and an area change invalidates every address here at once anyway.
+                if (_readable.Count >= MaxRemembered)
+                {
+                    _readable.Clear();
+                }
+
+                _readable[target] = leadsSomewhere;
+            }
+
+            if (!leadsSomewhere)
+            {
+                // "Bytes" rather than anything more definite: what it really is remains
+                // unknown, and only the claim that it is an address has been withdrawn.
+                slots[i] = slots[i] with { Guess = SlotGuess.Bytes };
+            }
+        }
+
+        return slots;
     }
 
     /// <summary>

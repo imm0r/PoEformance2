@@ -452,6 +452,74 @@
       }
     },
 
+    "Transitionable": {
+      "comment": "Component: the open/closed/activated state of a thing that changes - doors, levers, shrines, barricades. Both references agree on this offset (the AHK tool reads it as a short, GameHelper2 as an int), which is as close to certain as an offset gets here.",
+      "fields": {
+        "CurrentState": { "offset": "0x120", "type": "i16" }
+      }
+    },
+
+    "StateMachine": {
+      "comment": "Component: an entity's named states, and which one it is in. From the AHK tool's decoder. The names are not stored with the values: StatesPtr leads to an array of StdString at StateNamesBase, each StateNameSize apart, indexed by the state's number.",
+      "fields": {
+        "CurrentState": { "offset": "0x120", "type": "i16", "comment": "Same offset as Transitionable.CurrentState - the AHK decoder reads it through that constant." },
+        "StatesPtr": { "offset": "0x158", "type": "ptr" },
+        "StatesValuesFirst": { "offset": "0x160", "type": "ptr", "comment": "StdVector begin." },
+        "StatesValuesLast": { "offset": "0x168", "type": "ptr", "comment": "StdVector end." }
+      },
+      "consts": { "StateNamesBase": "0x10", "StateNameSize": "0xC0" }
+    },
+
+    "Animated": {
+      "comment": "Component: the model an entity actually loaded. Worth having because it tells apart entities that SHARE a metadata path but look different - the ExpeditionMarker flag variants were the case that needed it. The path is two hops away: ModelInfoPtr -> AnimatedModelInfo.ModelFileRecordPtr -> FileInfoValue.Name. Both references agree.",
+      "fields": {
+        "AnimatedEntityPtr": { "offset": "0x280", "type": "ptr" },
+        "ModelInfoPtr": { "offset": "0x358", "type": "ptr" }
+      }
+    },
+
+    "AnimatedModelInfo": {
+      "comment": "Behind Animated.ModelInfoPtr. Leads to the file record of the loaded .ao model.",
+      "fields": {
+        "ModelFileRecordPtr": { "offset": "0x18", "type": "ptr" }
+      }
+    },
+
+    "FileInfoValue": {
+      "comment": "A GGPK file record. Name is the file's path - here, the .ao model.",
+      "fields": {
+        "Name": { "offset": "0x08", "type": "stdWString" }
+      }
+    },
+
+    "Pathfinding": {
+      "comment": "Component: how a monster moves. From the AHK tool, which probed it in-game.",
+      "fields": {
+        "Flying": { "offset": "0xE5", "type": "u8", "comment": "Non-zero on flying entities - they ignore the walkable grid, so a route to one means nothing." },
+        "BaseSpeed": { "offset": "0xEC", "type": "i32" }
+      }
+    },
+
+    "AreaTransition": {
+      "comment": "Component on portals and zone exits. HYPOTHESIS from Sikaka/POE2Radar, carried over UNVERIFIED by the AHK tool - and neither field says where the transition LEADS, which is the thing actually worth having. Treat as a starting point, not as known.",
+      "fields": {
+        "GracePeriod": { "offset": "0x18", "type": "i32" },
+        "TeleportDelay": { "offset": "0x1C", "type": "i32" }
+      }
+    },
+
+    "BaseEvents": {
+      "comment": "NOT WORTH DECODING, and that is the finding rather than a gap. The AHK tool dumped this in-game and found engine dispatch plumbing: vtables in the module's own range and intrusive linked-list nodes, with no named-field data. A decoder could only ever surface handler counts. The one useful signal is the ENTITY POINTERS it embeds - an NPC's BaseEvents references other entities - so look at those in the dissector rather than writing a reader for this."
+    },
+
+    "Functions": {
+      "comment": "NOT WORTH DECODING - engine dispatch plumbing, same finding as BaseEvents. Proven in-game by the AHK tool, not assumed."
+    },
+
+    "InteractionAction": {
+      "comment": "NOT WORTH DECODING - engine dispatch plumbing, same finding as BaseEvents. Proven in-game by the AHK tool, not assumed."
+    },
+
     "Buffs": {
       "comment": "Component: every buff and debuff currently on the entity. NOTE A DELIBERATE DIVERGENCE FROM GameHelper2: it reads this vector as StdVector<IntPtr> and dereferences each element, whereas in PoE2 the entries are stored INLINE, 0x50 apart, which is how the AHK tool reads them in production. Where the two references disagree, the PoE2-specific one wins - dereferencing an inline struct here yields garbage.",
       "fields": {

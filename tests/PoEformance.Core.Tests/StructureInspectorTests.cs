@@ -30,7 +30,7 @@ public class StructureInspectorTests
         return SchemaJson.Load(Path.Combine(dir.FullName, "schema", "poe2.offsets.json"));
     }
 
-    private static StructureInspector Inspector(FakeMemoryReader reader)
+    private static StructureInspector Inspector(PoEformance.Core.Memory.IMemoryReader reader)
         => new(reader, Schema(), gameStatesStatic: 0);
 
     private static byte[] Bytes(params int[] values)
@@ -288,6 +288,56 @@ public class StructureInspectorTests
     }
 
     [Fact]
+    public void SomethingPointerSHAPEDThatLeadsNowhereIsNotOfferedAsAPointer()
+    {
+        // Seen live, and it is not exotic: a row holding the two ordinary integers 4 and 531
+        // is, read as one number, over four gigabytes - which is all the SHAPE of a value can
+        // ever be asked. The bytes genuinely cannot tell the two apart. Reading can.
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+        reader.Place(Somewhere, 0x0000_0004_0000_0213UL);
+
+        StructureView view = Look(Inspector(reader), At(Somewhere));
+
+        Assert.NotEqual(SlotGuess.Pointer, view.Slots[0].Guess);
+        Assert.False(view.Slots[0].Followable);
+    }
+
+    [Fact]
+    public void APointerThatLeadsSomewhereRealSTAYSAPointer()
+    {
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+        reader.Place(Somewhere, Elsewhere);
+        reader.Place(Elsewhere, new byte[64]);
+
+        StructureView view = Look(Inspector(reader), At(Somewhere));
+
+        Assert.Equal(SlotGuess.Pointer, view.Slots[0].Guess);
+        Assert.True(view.Slots[0].Followable);
+    }
+
+    [Fact]
+    public void AnAddressIsOnlyCheckedONCE()
+    {
+        // The window is re-read every tick while the dissector is open, so checking every
+        // candidate every time would multiply the reads on the thread that also drives
+        // auto-flask. Whether an address is mapped does not change from one tick to the next.
+        var reader = new CountingReader();
+        reader.Place(Somewhere, new byte[512]);
+        reader.Place(Somewhere, 0x0000_0004_0000_0213UL);
+
+        StructureInspector inspector = Inspector(reader);
+        Look(inspector, At(Somewhere));
+        int afterFirst = reader.Reads;
+        Look(inspector, At(Somewhere));
+
+        // One read for the window itself, and nothing more for the candidate it already knows.
+        Assert.Equal(1, afterFirst - 1);
+        Assert.Equal(afterFirst + 1, reader.Reads);
+    }
+
+    [Fact]
     public void TheKnownStructuresAreOfferedInAStableOrder()
     {
         // They fill a dropdown, and a list that reshuffles between frames cannot be clicked.
@@ -296,4 +346,37 @@ public class StructureInspectorTests
         Assert.Contains("AreaInstance", names);
         Assert.Equal([.. names.Order(StringComparer.Ordinal)], names);
     }
+}
+
+/// <summary>A fake reader that counts how many reads it was asked for.</summary>
+/// <remarks>
+/// Exists for one question: is a check being repeated that should have been remembered? That
+/// cannot be seen from the answers - only from how many times the process was asked.
+/// </remarks>
+internal sealed class CountingReader : PoEformance.Core.Memory.IMemoryReader
+{
+    private readonly FakeMemoryReader _inner = new();
+
+    public int Reads { get; private set; }
+
+    public bool IsAttached => _inner.IsAttached;
+
+    public int ProcessId => _inner.ProcessId;
+
+    public ulong ModuleBase => _inner.ModuleBase;
+
+    public uint ModuleSize => _inner.ModuleSize;
+
+    public void Place(ulong address, params byte[] bytes) => _inner.Place(address, bytes);
+
+    public void Place<T>(ulong address, T value)
+        where T : unmanaged => _inner.Place(address, value);
+
+    public bool TryRead(ulong address, Span<byte> destination)
+    {
+        Reads++;
+        return _inner.TryRead(address, destination);
+    }
+
+    public void Dispose() => _inner.Dispose();
 }
