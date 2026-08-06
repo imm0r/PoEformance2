@@ -73,10 +73,26 @@ public class FlaskKeyBindingTests
         Assert.Equal(0x74, FlaskKeyBindings.ToVirtualKey("116"));   // F5
         Assert.Equal(0x62, FlaskKeyBindings.ToVirtualKey("98"));    // Numpad 2
 
-        // A lone digit is the exception: "UseFlask3=3" means the 3 key. Read as a code it
-        // would be VK 3, which is not something that can be pressed for a flask.
-        Assert.Equal(0x33, FlaskKeyBindings.ToVirtualKey("3"));
-        Assert.Equal(0x31, FlaskKeyBindings.ToVirtualKey("1"));
+        // Single digits are codes too, and a real config is what settled it: the same file
+        // holds use_flask_in_slot1=49 and use_bound_skill1=1, and the second is the primary
+        // skill on LEFT MOUSE. So "1" is a mouse button - unusable, and reported as such -
+        // rather than the 1 key.
+        Assert.Equal(0, FlaskKeyBindings.ToVirtualKey("1"));
+        Assert.Equal(0, FlaskKeyBindings.ToVirtualKey("2"));
+    }
+
+    [Fact]
+    public void AnUnboundSlotIsUnboundAndNotTheZeroKey()
+    {
+        // Found by running the parser over a real config: three flask slots the player had
+        // never bound came back as the ZERO KEY, so the tool would have pressed something
+        // they never chose. That is the exact failure this class exists to prevent, arrived
+        // at through the code meant to prevent it.
+        Assert.Equal(0, FlaskKeyBindings.ToVirtualKey("0"));
+
+        FlaskKeys keys = FlaskKeyBindings.Parse(["use_flask_in_slot3=0"]);
+        Assert.Equal(0, keys.BySlot[3]);
+        Assert.Equal("unbound", FlaskKeyBindings.Describe(keys.BySlot[3]));
     }
 
     [Fact]
@@ -102,7 +118,11 @@ public class FlaskKeyBindingTests
     public void ValueIsReadUpToTheFirstAlternateOrComment()
     {
         Assert.Equal(0x31, FlaskKeyBindings.ToVirtualKey("DIK_1, DIK_NUMPAD1"));
-        Assert.Equal(0x31, FlaskKeyBindings.ToVirtualKey("\"1\" ; primary"));
+
+        // A letter, not a digit: what this is about is where the value ENDS, and a bare
+        // quoted digit is separately ambiguous - it could be a name or a code - so leaning on
+        // it here would make this test fail for a reason that has nothing to do with it.
+        Assert.Equal(0x51, FlaskKeyBindings.ToVirtualKey("\"Q\" ; primary"));
     }
 
     [Fact]
@@ -169,5 +189,131 @@ public class FlaskKeyBindingTests
         Assert.Equal("Numpad 4", FlaskKeyBindings.Describe(0x64));
         Assert.Equal("F5", FlaskKeyBindings.Describe(0x74));
         Assert.Equal("unbound", FlaskKeyBindings.Describe(0));
+    }
+}
+
+/// <summary>
+/// Reading the binding set the game is ACTUALLY using, and finding the file at all.
+/// </summary>
+/// <remarks>
+/// Both of these came out of one real config. The file holds two complete sets of key
+/// bindings and only one is live; and it was not where the tool looked, because OneDrive had
+/// moved Documents and renamed it into the user's own language. Either one on its own is a
+/// silent failure - the tool presses the game's default keys and nothing says why.
+/// </remarks>
+public class FlaskKeyBindingSectionTests
+{
+    /// <summary>
+    /// The shape of a real config: an input mode, then two sets of bindings that DISAGREE.
+    /// </summary>
+    /// <remarks>
+    /// Written out rather than shipped as a fixture, because a real one carries the player's
+    /// account name. The values are made to differ on purpose - in the config that prompted
+    /// this they happened to agree about flasks, which is exactly why choosing the wrong
+    /// section could go unnoticed.
+    /// </remarks>
+    private static string[] Config(string inputMode) =>
+    [
+        "[GENERAL]",
+        $"user_input_mode={inputMode}",
+        "[WASD_ACTION_KEYS]",
+        "use_flask_in_slot1=81",          // Q
+        "use_flask_in_slot2=69",          // E
+        "[LANGUAGE]",
+        "chat_language=de",
+        "[ACTION_KEYS]",
+        "use_flask_in_slot1=49",          // 1
+        "use_flask_in_slot2=50",          // 2
+    ];
+
+    [Fact]
+    public void AWasdPlayerGetsTheWasdBindings()
+    {
+        FlaskKeys keys = FlaskKeyBindings.Parse(Config("wasd"));
+
+        Assert.Equal(0x51, keys.BySlot[1]);
+        Assert.Equal(0x45, keys.BySlot[2]);
+        Assert.Contains("WASD_ACTION_KEYS", keys.Detail, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void EverybodyElseGetsTheOrdinaryOnes()
+    {
+        // And this is the case that would have passed either way if the sections agreed -
+        // which is why the fixture makes them disagree.
+        FlaskKeys keys = FlaskKeyBindings.Parse(Config("mouse"));
+
+        Assert.Equal(0x31, keys.BySlot[1]);
+        Assert.Equal(0x32, keys.BySlot[2]);
+    }
+
+    [Fact]
+    public void ASectionOrderThatPutsTheLIVEOneFirstStillWorks()
+    {
+        // The old reading took whichever came last, so it happened to be right for one mode
+        // and wrong for the other purely by where the game writes the sections.
+        string[] reversed =
+        [
+            "[GENERAL]",
+            "user_input_mode=wasd",
+            "[ACTION_KEYS]",
+            "use_flask_in_slot1=49",
+            "[WASD_ACTION_KEYS]",
+            "use_flask_in_slot1=81",
+        ];
+
+        Assert.Equal(0x51, FlaskKeyBindings.Parse(reversed).BySlot[1]);
+    }
+
+    [Fact]
+    public void AnUnknownInputModeStillUsesWhatIsThere()
+    {
+        // A future mode must not turn into "no bindings at all" - the ordinary section is
+        // still far closer to right than the built-in defaults.
+        FlaskKeys keys = FlaskKeyBindings.Parse(Config("something_new"));
+
+        Assert.Equal(KeyBindingSource.GameConfig, keys.Source);
+        Assert.Equal(0x31, keys.BySlot[1]);
+    }
+
+    [Fact]
+    public void AConfigWithNoSectionsAtAllIsStillRead()
+    {
+        // Older files, and every test written before sections existed.
+        FlaskKeys keys = FlaskKeyBindings.Parse(["use_flask_in_slot1=81"]);
+
+        Assert.Equal(KeyBindingSource.GameConfig, keys.Source);
+        Assert.Equal(0x51, keys.BySlot[1]);
+    }
+
+    [Fact]
+    public void SlotsTheConfigDoesNotMentionKeepTheGamesOwnDefault()
+    {
+        FlaskKeys keys = FlaskKeyBindings.Parse(Config("wasd"));
+
+        Assert.Equal(0x33, keys.BySlot[3]);
+    }
+
+    [Fact]
+    public void TheConfigIsLookedForUnderTheDocumentsFolderGivenToIt()
+    {
+        // The path the game uses, built from whichever Documents folder is handed in - which
+        // is what lets a redirected, renamed one be tried without knowing its name.
+        string path = FlaskKeyBindings.ConfigUnder(Path.Combine("C:", "Users", "x", "OneDrive", "Dokumente"));
+
+        Assert.EndsWith(Path.Combine("My Games", "Path of Exile 2", "poe2_production_Config.ini"), path, StringComparison.Ordinal);
+        Assert.Contains("Dokumente", path, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheSearchOffersMoreThanTheOnePlaceWindowsReports()
+    {
+        // The whole fix in one assertion: looking only where Windows says Documents is was
+        // what missed a config sitting in OneDrive under a translated name.
+        List<string> candidates = [.. FlaskKeyBindings.CandidateConfigPaths()];
+
+        Assert.Contains(FlaskKeyBindings.DefaultConfigPath, candidates);
+        Assert.True(candidates.Count > 1, "one path is what caused the problem");
+        Assert.All(candidates, path => Assert.EndsWith("poe2_production_Config.ini", path, StringComparison.Ordinal));
     }
 }

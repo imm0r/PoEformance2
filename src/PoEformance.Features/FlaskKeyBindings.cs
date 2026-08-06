@@ -48,12 +48,18 @@ public sealed record FlaskKeys(
 ///   - A NUMERIC value is a decimal VIRTUAL-KEY CODE, not a digit. "use_bound_skill4=81" is
 ///     Q, not the 8 and 1 keys.
 ///
-/// One deliberate divergence from the reference: a SINGLE digit is read as the digit key,
-/// never as a code. The reference resolves "1" to VK 1, the left mouse button. Both
-/// readings are defensible for an ambiguous file, but only one of them can be acted on -
-/// there is no keystroke that stands in for a mouse button - and the game writes 49 when it
-/// means a code for the 1 key. So the reading that can actually be pressed wins, and
-/// "UseFlask3=3" keeps meaning the 3 key.
+/// This port once diverged from the reference on ONE point, reading a single digit as the
+/// digit key rather than as a code - on the argument that a code there would be a mouse
+/// button, which cannot use a flask anyway. A real config settled it against that reading:
+/// the same file holds <c>use_flask_in_slot1=49</c> and <c>use_bound_skill1=1</c>, and the
+/// second is the primary skill on LEFT MOUSE. The game writes decimal codes throughout,
+/// single digits included, and 0 is how it writes "not bound at all".
+///
+/// The divergence was not merely wrong, it was wrong in the direction this class exists to
+/// prevent. An unbound flask slot reads 0, which it turned into the ZERO KEY - so the tool
+/// would press a key the player never bound, silently. Reading numbers as codes gives the
+/// safe answer instead: a mouse button and an unbound slot both come back unusable, which is
+/// visible and does nothing.
 /// </remarks>
 public static partial class FlaskKeyBindings
 {
@@ -74,15 +80,93 @@ public static partial class FlaskKeyBindings
     [GeneratedRegex(@"^([^=]*flask[^=]*?([1-5])[^=]*)=\s*(.+)$", RegexOptions.IgnoreCase)]
     private static partial Regex FlaskBindingLoose();
 
-    /// <summary>The game's config file, in the user's Documents folder.</summary>
-    public static string DefaultConfigPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-        "My Games", "Path of Exile 2", "poe2_production_Config.ini");
+    /// <summary>The game's config file, under a given Documents folder.</summary>
+    public static string ConfigUnder(string documents)
+    {
+        ArgumentNullException.ThrowIfNull(documents);
+        return Path.Combine(documents, "My Games", "Path of Exile 2", "poe2_production_Config.ini");
+    }
+
+    /// <summary>Where the config would be if Documents is where Windows reports it.</summary>
+    public static string DefaultConfigPath
+        => ConfigUnder(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+
+    /// <summary>
+    /// Everywhere the config is worth looking, best guess first.
+    /// </summary>
+    /// <remarks>
+    /// One path was not enough, and the case that proved it is ordinary rather than exotic:
+    /// with OneDrive backing up Documents the game writes to
+    /// <c>OneDrive\Dokumente\My Games\...</c> - redirected, AND named in the user's own
+    /// language - while the folder Windows reports can still be the plain English one. The
+    /// tool then quietly used the game's default flask keys with nothing on screen to say why.
+    ///
+    /// So the Documents folder is not guessed at by name. Every immediate child of each
+    /// likely root is tried, which finds Dokumente, Documenti and Documentos without this
+    /// having to know any of them. Enumerating can fail on a folder we may not read, and that
+    /// is no reason to stop looking elsewhere.
+    /// </remarks>
+    public static IEnumerable<string> CandidateConfigPaths()
+    {
+        yield return DefaultConfigPath;
+
+        foreach (string root in Roots())
+        {
+            yield return ConfigUnder(root);
+
+            IEnumerable<string> children;
+            try
+            {
+                children = Directory.EnumerateDirectories(root);
+            }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            {
+                continue;
+            }
+
+            foreach (string child in children)
+            {
+                yield return ConfigUnder(child);
+            }
+        }
+
+        static IEnumerable<string> Roots()
+        {
+            foreach (string variable in (string[])["OneDrive", "OneDriveConsumer", "OneDriveCommercial"])
+            {
+                string value = Environment.GetEnvironmentVariable(variable) ?? string.Empty;
+                if (value.Length > 0 && Directory.Exists(value))
+                {
+                    yield return value;
+                }
+            }
+
+            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (home.Length > 0 && Directory.Exists(home))
+            {
+                yield return home;
+            }
+        }
+    }
+
+    /// <summary>The first candidate that exists, or the default path when none does.</summary>
+    public static string FindConfigPath()
+    {
+        foreach (string candidate in CandidateConfigPaths())
+        {
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return DefaultConfigPath;
+    }
 
     /// <summary>Loads the bindings, falling back to the defaults with a reason.</summary>
     public static FlaskKeys Load(string? configPath = null)
     {
-        string path = configPath ?? DefaultConfigPath;
+        string path = configPath ?? FindConfigPath();
 
         string[] lines;
         try
@@ -106,12 +190,24 @@ public static partial class FlaskKeyBindings
         return Parse(lines, path);
     }
 
-    /// <summary>Parses config lines into slot-to-key bindings.</summary>
+    /// <summary>
+    /// Parses config lines into slot-to-key bindings.
+    /// </summary>
+    /// <remarks>
+    /// The file holds MORE THAN ONE set of key bindings and only one of them is live. A
+    /// player using WASD movement is bound by <c>[WASD_ACTION_KEYS]</c>; everyone else by
+    /// <c>[ACTION_KEYS]</c>, and the game says which in <c>user_input_mode</c>. The two
+    /// genuinely differ - in the config that turned this up they disagree about the character
+    /// panel and half the skill keys - so reading whichever comes last is a coin toss, and
+    /// exactly the silent wrong-key failure this class exists to remove.
+    /// </remarks>
     public static FlaskKeys Parse(IEnumerable<string> lines, string source = "config")
     {
         ArgumentNullException.ThrowIfNull(lines);
 
-        var bound = new Dictionary<int, ushort>(Defaults);
+        var bySection = new Dictionary<string, Dictionary<int, ushort>>(StringComparer.OrdinalIgnoreCase);
+        string section = string.Empty;
+        string inputMode = string.Empty;
         int found = 0;
         int content = 0;
 
@@ -127,6 +223,18 @@ public static partial class FlaskKeyBindings
 
             content++;
 
+            if (trimmed[0] == '[' && trimmed[^1] == ']')
+            {
+                section = trimmed[1..^1];
+                continue;
+            }
+
+            if (trimmed.StartsWith("user_input_mode=", StringComparison.OrdinalIgnoreCase))
+            {
+                inputMode = trimmed["user_input_mode=".Length..].Trim();
+                continue;
+            }
+
             if (!TryParseLine(trimmed, out int slot, out ushort key))
             {
                 continue;
@@ -136,13 +244,27 @@ public static partial class FlaskKeyBindings
             // this CANNOT use, and saying so beats leaving the default number key in place
             // and pressing something the player never bound. A slot with no line at all
             // keeps its default, which is correct: that is what the game is using too.
-            bound[slot] = key;
+            if (!bySection.TryGetValue(section, out Dictionary<int, ushort>? keys))
+            {
+                keys = [];
+                bySection[section] = keys;
+            }
+
+            keys[slot] = key;
             found++;
         }
 
         if (found > 0)
         {
-            return new FlaskKeys(bound, KeyBindingSource.GameConfig, $"{found} bindings from {source}");
+            (string chosen, Dictionary<int, ushort> live) = Choose(bySection, inputMode);
+            var bound = new Dictionary<int, ushort>(Defaults);
+            foreach ((int slot, ushort key) in live)
+            {
+                bound[slot] = key;
+            }
+
+            string where = chosen.Length > 0 ? $"{source} [{chosen}]" : source;
+            return new FlaskKeys(bound, KeyBindingSource.GameConfig, $"{live.Count} bindings from {where}");
         }
 
         // An empty config is not a failure. The game saves this file when a setting is
@@ -152,6 +274,39 @@ public static partial class FlaskKeyBindings
         return content == 0
             ? new FlaskKeys(Defaults, KeyBindingSource.GameDefaults, $"{source} is empty")
             : new FlaskKeys(Defaults, KeyBindingSource.Unmatched, $"{content} lines in {source}, no flask binding among them");
+    }
+
+    /// <summary>
+    /// Picks the binding set the game is actually using.
+    /// </summary>
+    /// <remarks>
+    /// The mode decides, and the fallbacks matter as much as the rule: an unfamiliar mode, a
+    /// file with no sections at all, or a section that names no flask must still yield the
+    /// bindings that ARE there rather than nothing.
+    /// </remarks>
+    private static (string Section, Dictionary<int, ushort> Keys) Choose(
+        Dictionary<string, Dictionary<int, ushort>> bySection, string inputMode)
+    {
+        string wanted = inputMode.Equals("wasd", StringComparison.OrdinalIgnoreCase)
+            ? "WASD_ACTION_KEYS"
+            : "ACTION_KEYS";
+
+        if (bySection.TryGetValue(wanted, out Dictionary<int, ushort>? keys) && keys.Count > 0)
+        {
+            return (wanted, keys);
+        }
+
+        // Whatever is there. A config written by an older game version, or lines outside any
+        // section, still say more than the defaults do.
+        foreach ((string section, Dictionary<int, ushort> other) in bySection)
+        {
+            if (other.Count > 0)
+            {
+                return (section, other);
+            }
+        }
+
+        return (string.Empty, []);
     }
 
     /// <summary>
@@ -200,19 +355,21 @@ public static partial class FlaskKeyBindings
         // The value can carry an alternate binding or a comment: "DIK_1, DIK_NUMPAD1".
         // Take the first token, THEN strip quotes - the other order leaves a stray quote
         // glued to the key name.
-        string value = FirstToken(rawValue).Trim('"').Trim();
-        value = StripInputPrefix(value).ToUpperInvariant();
+        string token = FirstToken(rawValue).Trim('"').Trim();
+        string value = StripInputPrefix(token).ToUpperInvariant();
         if (value.Length == 0)
         {
             return 0;
         }
 
+        // A prefix makes it a NAME, and DIK_1 names the 1 key. Without one it is a number,
+        // and a number is a virtual-key code even when it is a single digit - see the class
+        // remarks for the real config that settled that, and for what the old reading cost.
+        bool named = value.Length != token.Length;
+
         if (IsAllDigits(value) && int.TryParse(value, out int code))
         {
-            // A lone digit is the digit KEY ("UseFlask3=3"). Read as a code it would be a
-            // mouse button or a control key, neither of which can use a flask - see the
-            // class remarks for why this one case diverges from the reference.
-            return value.Length == 1 ? (ushort)value[0] : FromVirtualKeyCode(code);
+            return named && value.Length == 1 ? value[0] : FromVirtualKeyCode(code);
         }
 
         // Single digits and letters are their own virtual-key codes.
