@@ -84,6 +84,13 @@ public readonly record struct ReadCost(
 /// Whether a chest has already been opened. Null for anything that is not a chest, and for a
 /// chest whose component did not resolve.
 /// </param>
+/// <param name="IsEffect">
+/// Whether this is a passing effect - a flame wall, a patch of burning ground - rather than
+/// something that can be fought. True here always means a FRIENDLY one: hostile effects never
+/// reach a snapshot, the reader drops them. It is carried instead of dropped because "is this
+/// an effect" is a fact and "should it be drawn" is not, and the two are answered in different
+/// places.
+/// </param>
 public sealed record WorldEntity(
     uint Id,
     ulong Address,
@@ -100,7 +107,8 @@ public sealed record WorldEntity(
     Vital Life = default,
     Vital EnergyShield = default,
     bool? Opened = null,
-    bool IsFriendly = false)
+    bool IsFriendly = false,
+    bool IsEffect = false)
 {
     /// <summary>Whether this is a chest somebody has already been through.</summary>
     public bool IsSpent => Opened == true;
@@ -468,8 +476,8 @@ public sealed class WorldReader
             // Straight from the reference, including the targetable let-out: some real
             // summoned monsters expire too, and those ARE worth drawing. Friendly ones are
             // never dropped here, because whether to show your own minions is a preference
-            // and this is a question of fact.
-            if (kind == EntityKind.Monster && signs.IsPassingEffect)
+            // and this is a question of fact - they travel on with IsEffect set instead.
+            if (kind == EntityKind.Monster && signs.IsHostileEffect)
             {
                 continue;
             }
@@ -508,7 +516,7 @@ public sealed class WorldReader
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
                 PointsOfInterest.Classify(entity.Path, mapIcon), mapIcon,
-                signs.Life, signs.EnergyShield, opened, signs.Friendly);
+                signs.Life, signs.EnergyShield, opened, signs.Friendly, signs.IsEffect);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

@@ -1314,9 +1314,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         => vital.Percent < 0 ? "-" : $"{vital.Current}/{vital.Unreserved} ({vital.Percent}%)";
 
     /// <summary>
-    /// Whether an entity passes the loot filter. Everything that is not a drop passes.
+    /// Whether an entity is worth a marker: the loot filter, and the things that are still in
+    /// the world while no longer being worth pointing at.
     /// </summary>
     /// <remarks>
+    /// Both draw loops pass through here, which is the point of it - the dots on the screen
+    /// and the dots on the game's map answer the same question and had drifted apart before.
+    ///
     /// A drop whose rarity has not resolved yet is DRAWN. It is one frame old at most, and
     /// showing a drop that turns out to be junk costs a moment of attention, while hiding
     /// one that turns out to be a unique costs the drop.
@@ -1326,6 +1330,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // An emptied chest is scenery. It was already excluded from the points of interest
         // and not from the dots, so a looted map still showed every container on it.
         if (entity.IsSpent)
+        {
+            return false;
+        }
+
+        // Your own flame wall is not a dot. Only FRIENDLY effects get this far - the reader
+        // drops the hostile ones - and it keeps them deliberately, because whose side a thing
+        // is on is a fact while whether to draw it is a preference. This is where that
+        // preference lives, and it is the half that was missing: the health bars stopped and
+        // the dots did not, so one cast still covered the map in markers.
+        //
+        // Effects only, not friendly things in general. A minion or a totem is targetable, so
+        // it is not an effect and stays drawn - which is what the targetable clause is for.
+        if (entity.IsEffect)
         {
             return false;
         }

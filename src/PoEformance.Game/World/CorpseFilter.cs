@@ -35,7 +35,7 @@ public readonly record struct MonsterSigns(
     bool Temporary = false)
 {
     /// <summary>
-    /// Whether this is a passing effect rather than a monster.
+    /// Whether this is a passing effect rather than a monster - whichever side it is on.
     /// </summary>
     /// <remarks>
     /// Ground effects are built out of the same components a monster is - they carry Life,
@@ -43,16 +43,28 @@ public readonly record struct MonsterSigns(
     /// from the path alone draws a flame wall as an enemy and puts a health bar over it.
     /// That is what a screen full of unexplained dots turned out to be.
     ///
-    /// The rule is the reference's, including the let-out: a hostile thing that expires on
-    /// its own is only discarded when it cannot be TARGETED, because some genuinely summoned
+    /// The rule is the reference's, including the let-out: a thing that expires on its own
+    /// counts as an effect only when it cannot be TARGETED, because some genuinely summoned
     /// monsters expire too and those are worth seeing. An entity with no targetable
     /// component at all falls the same way as an untargetable one, which is deliberate - it
     /// has offered no evidence that it is something you can fight.
-    ///
-    /// Friendly things are never discarded here. Whether to draw your own minions is a
-    /// preference, and this answers a question of fact.
     /// </remarks>
-    public bool IsPassingEffect => !Friendly && Temporary && Targetable != true;
+    public bool IsEffect => Temporary && Targetable != true;
+
+    /// <summary>
+    /// Whether the reader should drop it outright rather than hand it on.
+    /// </summary>
+    /// <remarks>
+    /// Only the hostile ones. A friendly effect is still an effect, but discarding it is a
+    /// choice about what to DRAW, and that belongs to whoever is drawing - so it travels on
+    /// the entity as <see cref="IsEffect"/> instead of being decided here.
+    ///
+    /// Keeping the two apart is not decoration: dropping friendly effects from the snapshot
+    /// would take your own minions' totems and the inspector's view of them with it, and
+    /// leaving the distinction unnamed is what let the flame wall lose its health bar and
+    /// keep its dot.
+    /// </remarks>
+    public bool IsHostileEffect => !Friendly && IsEffect;
 }
 
 /// <summary>

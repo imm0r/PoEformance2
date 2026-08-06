@@ -137,6 +137,11 @@ public class CorpseFilterTests
 /// wall drawn as an enemy, and every one of those effects wearing a health bar. All three are
 /// the same thing - an effect is built from the same components a monster is, so deciding
 /// "monster" from the metadata path alone cannot tell them apart.
+///
+/// TWO RULES, and the difference between them is what the first fix got half right. Being an
+/// effect is a fact and takes no view of sides; being dropped by the reader is what happens to
+/// the HOSTILE ones. Collapsing the two left friendly effects with no health bar and a dot,
+/// which is the second report from the same player.
 /// </remarks>
 public class PassingEffectTests
 {
@@ -144,10 +149,10 @@ public class PassingEffectTests
         => new(100, targetable, false, ItemRarity.Normal, default, default, friendly, temporary);
 
     [Fact]
-    public void AHOSTILEThingThatExpiresAndCannotBeTargetedIsAnEffect()
+    public void AThingThatExpiresAndCannotBeTargetedIsAnEffect()
     {
         // The flame wall. It has Life, so it was a monster to everything downstream.
-        Assert.True(Signs(friendly: false, temporary: true, targetable: false).IsPassingEffect);
+        Assert.True(Signs(friendly: false, temporary: true, targetable: false).IsEffect);
     }
 
     [Fact]
@@ -155,30 +160,51 @@ public class PassingEffectTests
     {
         // No component is not evidence of being fightable. Falls the same way as untargetable
         // - the reference reads a missing component and an untargetable one identically here.
-        Assert.True(Signs(friendly: false, temporary: true, targetable: null).IsPassingEffect);
+        Assert.True(Signs(friendly: false, temporary: true, targetable: null).IsEffect);
+    }
+
+    [Fact]
+    public void ANDBeingYOURSDoesNotMakeItAMonster()
+    {
+        // The bug this rule was split for. Your own flame wall is an effect on exactly the
+        // same evidence as an enemy's, and reading it as a monster is what left it on the map
+        // after the health bars had correctly given up on it.
+        Assert.True(Signs(friendly: true, temporary: true, targetable: false).IsEffect);
     }
 
     [Fact]
     public void BUTATargetableOneIsAMonsterThatHappensToExpire()
     {
         // The let-out that keeps this from hiding real summons. Plenty of genuine monsters
-        // expire on their own, and those are worth every bit of the drawing.
-        Assert.False(Signs(friendly: false, temporary: true, targetable: true).IsPassingEffect);
-    }
-
-    [Fact]
-    public void ANDAFriendlyOneIsNeverDiscardedHere()
-    {
-        // Whether to draw your own minions is a preference and belongs to the overlay. This
-        // answers a question of fact, so it does not get to make that call.
-        Assert.False(Signs(friendly: true, temporary: true, targetable: false).IsPassingEffect);
+        // expire on their own, and those are worth every bit of the drawing. It holds for
+        // your own side too: a minion or a totem is targetable, so it is never an effect.
+        Assert.False(Signs(friendly: false, temporary: true, targetable: true).IsEffect);
+        Assert.False(Signs(friendly: true, temporary: true, targetable: true).IsEffect);
     }
 
     [Fact]
     public void ANDANOrdinaryMonsterIsUntouched()
     {
         // The case that must not regress: a permanent hostile monster, which is most of them.
-        Assert.False(Signs(friendly: false, temporary: false, targetable: true).IsPassingEffect);
-        Assert.False(Signs(friendly: false, temporary: false, targetable: null).IsPassingEffect);
+        Assert.False(Signs(friendly: false, temporary: false, targetable: true).IsEffect);
+        Assert.False(Signs(friendly: false, temporary: false, targetable: null).IsEffect);
+    }
+
+    [Fact]
+    public void ONLYTheHostileOnesAreDroppedByTheReader()
+    {
+        // What the snapshot may throw away. A hostile effect is nobody's business downstream;
+        // a friendly one is carried, because "do not draw it" is a decision the overlay makes
+        // and the inspector does not.
+        Assert.True(Signs(friendly: false, temporary: true, targetable: false).IsHostileEffect);
+        Assert.False(Signs(friendly: true, temporary: true, targetable: false).IsHostileEffect);
+    }
+
+    [Fact]
+    public void ANDNothingThatIsNotAnEffectIsDropped()
+    {
+        // The clause that stops the discard rule from widening into "friendly things go".
+        Assert.False(Signs(friendly: false, temporary: false, targetable: true).IsHostileEffect);
+        Assert.False(Signs(friendly: false, temporary: true, targetable: true).IsHostileEffect);
     }
 }
