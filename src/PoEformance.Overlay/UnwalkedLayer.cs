@@ -39,10 +39,14 @@ public sealed class UnwalkedLayer
     /// </remarks>
     private const int MostMarks = 6_000;
 
-    /// <summary>Whether the marks are drawn at all.</summary>
-    public bool Enabled { get; set; } = true;
-
-    /// <summary>How every drawn thing looks. Shared with the overlay.</summary>
+    /// <summary>
+    /// How every drawn thing looks. Shared with the overlay.
+    /// </summary>
+    /// <remarks>
+    /// Also where these are switched off, rather than a flag of their own. Two switches for
+    /// one thing is how a setting ends up not doing what it says - and the style's one is
+    /// already persisted and already in the editor.
+    /// </remarks>
     public OverlayStyle Style { get; set; } = new();
 
     /// <summary>Draws a mark on each sampled patch of ground still to be walked.</summary>
@@ -51,8 +55,7 @@ public sealed class UnwalkedLayer
         ArgumentNullException.ThrowIfNull(coverage);
         ArgumentNullException.ThrowIfNull(player);
 
-        if (!Enabled || !map.IsLargeMap || !coverage.RegionKnown
-            || !Style.Visible(StyleCatalogue.Keys.Unwalked))
+        if (!map.IsLargeMap || !coverage.RegionKnown || !Style.Visible(StyleCatalogue.Keys.Unwalked))
         {
             return;
         }

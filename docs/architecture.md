@@ -234,4 +234,33 @@ work was everything around it:
 - input is gated on the game having focus, in the DECISION rather than in the code that
   presses keys, so no future caller can bypass it.
 
-Remaining: more features on top of the slice, and configuring them from the page.
+### Features on the slice, and what each one turned out to be about
+
+Every one of these reads a finished `WorldSnapshot` and touches no memory, which is why they
+are testable against a recording and why none of them can slow a read down. In each case the
+interesting part was not the feature:
+
+- **Read cost over time.** A live number answers "is it slow now", which you can already see.
+  The useful questions need the shape over a whole map, per phase — one graph for the total
+  says a frame was expensive and nothing about why.
+- **Complete overlay configurability.** A catalogue of every drawn thing, with the editor
+  GENERATED from it, because a hand-written settings page is how a tool ends up with fourteen
+  configurable things and three that are not. The promise it makes — everything painted over
+  the game is in the catalogue — is only true if adding to the overlay is not finished until
+  it has an entry, so the catalogue is the boundary and the boundary is written down.
+- **Alerts.** The failure mode is SPAM, not a missed alert: a radar that interrupts constantly
+  gets switched off within a map, at which point it also misses everything. Once per entity,
+  one banner per moment, a gap between banners, nothing in town — and identity is the game's
+  entity id rather than its address, because addresses get recycled inside an area and a
+  recycled one reads as "already mentioned".
+- **Map coverage.** The denominator is the whole difficulty. The walkable grid holds a great
+  deal of ground nobody can reach, so the figure is measured against a flood fill from where
+  the player came in; against every walkable cell a finished map reads as a few per cent.
+
+### Remaining
+
+More features on the slice, and configuring them from the page.
+
+Two whole areas of the reference tool are still absent, and both are blocked on the same
+missing piece — an inventory reader: loot tracking with prices, and moving items into a
+container. Neither can be built without the game running to verify the reads against.
