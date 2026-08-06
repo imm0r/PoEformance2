@@ -36,6 +36,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly TerrainLayer _terrain;
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
+    private EntityBrowserWindow? _entityBrowser;
     private PoiLayer? _poi;
 
     /// <summary>Radius in pixels of an entity dot.</summary>
@@ -184,6 +185,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         ArgumentNullException.ThrowIfNull(inspector);
         _dissector = new DissectorWindow(inspector) { Visible = visible };
+    }
+
+    /// <summary>
+    /// Adds the entity browser, which takes an entity apart into its components.
+    /// </summary>
+    /// <remarks>
+    /// Wired to the dissector so a component can be opened where it can be read. Attach that
+    /// first: without it the browser still lists everything, but the click that matters -
+    /// "show me the one nothing describes" - has nowhere to go.
+    /// </remarks>
+    public void AttachEntityBrowser(EntityInspector inspector, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(inspector);
+        _entityBrowser = new EntityBrowserWindow(
+            inspector,
+            (address, label, layout) => _dissector?.Show(address, label, layout))
+        {
+            Visible = visible,
+        };
     }
 
     /// <summary>
@@ -361,6 +381,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Outside the "in an area" gate: an element can be inspected on a login screen or in
         // a hideout, and the browser reports for itself when there is no tree to read.
         _uiBrowser?.Render(_tracked);
+        _entityBrowser?.Render(_snapshot, _snapshot.Player);
         _dissector?.Render();
         _poi?.DrawPicker(_snapshot, _snapshot.Player);
 
@@ -646,6 +667,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     if (ImGui.Checkbox("UI browser  (F8 picks what is under the cursor)", ref browsing))
                     {
                         _uiBrowser.Visible = browsing;
+                    }
+                }
+
+                if (_entityBrowser is not null)
+                {
+                    bool browsing = _entityBrowser.Visible;
+                    if (ImGui.Checkbox("Entity browser  (components, including the undescribed ones)", ref browsing))
+                    {
+                        _entityBrowser.Visible = browsing;
                     }
                 }
 

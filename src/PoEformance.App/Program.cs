@@ -372,6 +372,11 @@ internal static class Program
         // the entity map.
         var structures = new PoEformance.Features.StructureInspector(reader, schema, gameStatesStatic);
 
+        // And the entity browser, which is the shortest route to something not yet
+        // understood: the game names every component an entity carries, and most of them
+        // still have nothing reading them.
+        var entityParts = new PoEformance.Features.EntityInspector(reader, schema);
+
         // Finding a way across the area is a search over millions of cells - measured at about
         // 1.8 seconds right across a real map - so it runs on the thread pool and the renderer
         // draws whatever has come back. Asking for one from the read loop costs nothing, which
@@ -384,6 +389,7 @@ internal static class Program
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
                 uiTree.Service(scale);
                 structures.Service();
+                entityParts.Service();
                 route.Service(snapshot, Environment.TickCount64);
 
                 // Evaluated even when the feature is off: it costs a bool check, and its
@@ -426,6 +432,7 @@ internal static class Program
             settings.TerrainThickness);
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.AttachDissector(structures);
+        overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();

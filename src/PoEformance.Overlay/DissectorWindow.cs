@@ -49,11 +49,11 @@ public sealed class DissectorWindow
     /// <summary>Where we came from, so following a pointer can be undone.</summary>
     /// <remarks>
     /// Descending through pointers is the whole way an unknown structure gets explored, and
-    /// without a way back every wrong turn means typing the address again from memory. The
-    /// trail also IS the finding: "AreaInstance then +0x598 then +0x20" is what gets written
-    /// down, not the address it happens to land on today.
+    /// without a way back every wrong turn means typing the address again from memory. What
+    /// the trail SAYS is the finding - see PointerTrail, which owns that because it is logic
+    /// and got it wrong three ways while it lived in here.
     /// </remarks>
-    private readonly List<(ulong Address, int Offset)> _trail = [];
+    private readonly PointerTrail _trail = new();
 
     /// <summary>When each row last changed, for fading the highlight out.</summary>
     private readonly Dictionary<int, long> _litAt = [];
@@ -70,6 +70,9 @@ public sealed class DissectorWindow
     private int _peekOffset = -1;
     private bool _onlyChanged;
 
+    /// <summary>What sent us here, when something did. Shown so the address has a meaning.</summary>
+    private string _cameFrom = string.Empty;
+
     public DissectorWindow(StructureInspector inspector)
     {
         ArgumentNullException.ThrowIfNull(inspector);
@@ -78,6 +81,41 @@ public sealed class DissectorWindow
 
     /// <summary>Whether the window is on screen. Nothing is read while it is not.</summary>
     public bool Visible { get; set; }
+
+    /// <summary>
+    /// Points the dissector at an address, from somewhere else in the tool.
+    /// </summary>
+    /// <remarks>
+    /// What makes the entity browser worth having: it can say a component is at an address
+    /// and nothing describes it, and this is the step from knowing that to looking at it.
+    /// Typing the address across by hand would be the whole friction of the thing.
+    /// </remarks>
+    /// <param name="knownLayout">A schema structure to name the rows by, when one applies.</param>
+    public void Show(ulong address, string label = "", string knownLayout = "")
+    {
+        if (address == 0)
+        {
+            return;
+        }
+
+        Visible = true;
+        GoTo(address, -1, keepTrail: false);
+        _cameFrom = label;
+
+        if (knownLayout.Length > 0)
+        {
+            // Names() rather than the field: this can be called before the window has ever
+            // drawn, and a layout that silently failed to apply is worse than none.
+            int at = Array.IndexOf(Names(), knownLayout);
+            if (at > 0)
+            {
+                _structIndex = at;
+            }
+        }
+    }
+
+    /// <summary>The schema's structure names, with "no names" first. Built once.</summary>
+    private string[] Names() => _structNames ??= ["(no names)", .. _inspector.KnownStructures];
 
     /// <summary>Draws the window and publishes what it wants read next.</summary>
     public void Render()
@@ -95,17 +133,29 @@ public sealed class DissectorWindow
         ImGui.SetNextWindowPos(new Vector2(60f, 60f), ImGuiCond.FirstUseEver);
 
         bool open = Visible;
-        if (ImGui.Begin("Memory dissector", ref open, ImGuiWindowFlags.NoFocusOnAppearing))
-        {
-            DrawControls(view);
-            ImGui.Separator();
-            DrawTrail();
-            DrawPeek(view);
-            ImGui.Separator();
-            DrawRows(view);
-        }
+        bool expanded = ImGui.Begin("Memory dissector", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
 
-        ImGui.End();
+        // End() in a finally, and this is not defensive habit - it is the difference between
+        // a reported frame and a dead process. The overlay catches an escaping exception and
+        // skips the frame, but an exception thrown between Begin and End leaves ImGui's
+        // window stack unbalanced, and ImGui then asserts and takes the process down anyway.
+        // Catching the exception was never enough on its own.
+        try
+        {
+            if (expanded)
+            {
+                DrawControls(view);
+                ImGui.Separator();
+                DrawTrail();
+                DrawPeek(view);
+                ImGui.Separator();
+                DrawRows(view);
+            }
+        }
+        finally
+        {
+            ImGui.End();
+        }
         Visible = open;
 
         _inspector.Request(new StructureRequest(
@@ -129,7 +179,8 @@ public sealed class DissectorWindow
         if (ImGui.Combo("start", ref rootIndex, roots, roots.Length))
         {
             _root = (StructureRoot)rootIndex;
-            _trail.Clear();
+            _trail.Restart(_root.ToString());
+            _cameFrom = string.Empty;
             _litAt.Clear();
         }
 
@@ -155,9 +206,9 @@ public sealed class DissectorWindow
 
         // The schema's own names, laid over the rows. This is also how a MISALIGNED read
         // announces itself: every row gets a name and none of them make sense.
-        _structNames ??= ["(no names)", .. _inspector.KnownStructures];
+        string[] names = Names();
         ImGui.SetNextItemWidth(220f);
-        ImGui.Combo("known layout", ref _structIndex, _structNames, _structNames.Length);
+        ImGui.Combo("known layout", ref _structIndex, names, names.Length);
 
         ImGui.SameLine();
         if (ImGui.Button(view.HasBaseline ? "re-mark" : "mark"))
@@ -176,49 +227,40 @@ public sealed class DissectorWindow
         ImGui.Checkbox("only what moved", ref _onlyChanged);
 
         ImGui.TextColored(DimText, view.Status);
+
+        if (_cameFrom.Length > 0)
+        {
+            ImGui.SameLine();
+            ImGui.TextColored(NameText, $"- {_cameFrom}");
+        }
     }
 
     private void DrawTrail()
     {
-        if (_trail.Count == 0)
+        if (_trail.IsEmpty)
         {
             return;
         }
 
-        if (ImGui.SmallButton("back"))
+        if (ImGui.SmallButton("back") && _trail.TryStepBack(out ulong address))
         {
-            (ulong address, int _) = _trail[^1];
-            _trail.RemoveAt(_trail.Count - 1);
             _address = address;
             _root = StructureRoot.Custom;
             _litAt.Clear();
+
+            // The trail just changed under us, and stepping back off the last hop empties it.
+            // Drawing the rest of this row would describe a route that no longer exists.
+            return;
         }
 
+        string route = _trail.Describe();
         ImGui.SameLine();
-        ImGui.TextColored(NameText, Path());
+        ImGui.TextColored(NameText, route);
         ImGui.SameLine();
         if (ImGui.SmallButton("copy"))
         {
-            ImGui.SetClipboardText(Path());
+            ImGui.SetClipboardText(route);
         }
-    }
-
-    /// <summary>The way here, written the way it would be written down.</summary>
-    private string Path()
-    {
-        string route = _trail[0].Offset < 0 && _root != StructureRoot.Custom
-            ? _root.ToString()
-            : $"0x{_trail[0].Address:X}";
-
-        foreach ((ulong _, int offset) in _trail.Skip(1).Append((0UL, _peekOffset)))
-        {
-            if (offset >= 0)
-            {
-                route += $" -> +0x{offset:X}";
-            }
-        }
-
-        return route;
     }
 
     private void DrawPeek(StructureView view)
@@ -249,6 +291,18 @@ public sealed class DissectorWindow
             return;
         }
 
+        try
+        {
+            DrawRowsInto(view);
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
+    }
+
+    private void DrawRowsInto(StructureView view)
+    {
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableSetupColumn("offset", ImGuiTableColumnFlags.WidthFixed, 66f);
         ImGui.TableSetupColumn("name", ImGuiTableColumnFlags.WidthFixed, 150f);
@@ -319,8 +373,6 @@ public sealed class DissectorWindow
                 ImGui.TextColored(PointerText, $"0x{slot.Raw:X}");
             }
         }
-
-        ImGui.EndTable();
     }
 
     /// <summary>Lights a row that moved, and lets it fade.</summary>
@@ -373,11 +425,20 @@ public sealed class DissectorWindow
     {
         if (keepTrail)
         {
-            _trail.Add((_address, viaOffset));
+            // Name the start before the line below turns it into a plain address - by the
+            // second hop there is nothing left to name it from.
+            if (_trail.IsEmpty)
+            {
+                _trail.Restart(_root != StructureRoot.Custom ? _root.ToString()
+                    : _cameFrom.Length > 0 ? _cameFrom
+                    : $"0x{_address:X}");
+            }
+
+            _trail.Follow(_address, viaOffset);
         }
         else
         {
-            _trail.Clear();
+            _trail.Restart(string.Empty);
         }
 
         _address = address;
@@ -385,6 +446,7 @@ public sealed class DissectorWindow
         _typedAddress = address.ToString("X", CultureInfo.InvariantCulture);
         _peekOffset = -1;
         _litAt.Clear();
+        _cameFrom = string.Empty;
 
         // Names belong to the structure they were chosen for. Carrying them onto whatever a
         // pointer led to would label the new place with the old one's fields.
