@@ -103,6 +103,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         };
     }
 
+    /// <summary>What every read cost, kept so a whole map can be looked at afterwards.</summary>
+    public CostHistory? Costs { get; set; }
+
+    private CostWindow? _costWindow;
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
     private EntityBrowserWindow? _entityBrowser;
@@ -449,6 +453,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // Outside the "in an area" gate: an element can be inspected on a login screen or in
         // a hideout, and the browser reports for itself when there is no tree to read.
+        if (Costs is not null)
+        {
+            _costWindow ??= new CostWindow(Costs);
+            _costWindow.CurrentArea = _snapshot.AreaHash;
+            _costWindow.Render();
+        }
+
         _uiBrowser?.Render(_tracked);
         _entityBrowser?.Render(_snapshot, _snapshot.Player);
         _dissector?.Render();
@@ -755,6 +766,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     {
                         Noise.Enabled = filtering;
                         SettingsChanged?.Invoke();
+                    }
+                }
+
+                if (_costWindow is not null)
+                {
+                    bool costs = _costWindow.Visible;
+                    if (ImGui.Checkbox("Read cost over time  (per phase, over a whole map)", ref costs))
+                    {
+                        _costWindow.Visible = costs;
                     }
                 }
 

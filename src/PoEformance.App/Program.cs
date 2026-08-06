@@ -390,6 +390,11 @@ internal static class Program
         // matters because that loop also drives auto-flask.
         var route = new PoEformance.Features.RoutePlanner();
 
+        // Recorded on the READER thread, so a read is sampled whether or not a frame was
+        // drawn for it - a graph that only holds what the renderer happened to see would
+        // thin out exactly when the reads got slow.
+        var costs = new PoEformance.Features.CostHistory();
+
         using var feed = new PoEformance.Features.SnapshotFeed(
             scale =>
             {
@@ -398,6 +403,7 @@ internal static class Program
                 structures.Service();
                 entityParts.Service();
                 route.Service(snapshot, Environment.TickCount64);
+                costs.Add(snapshot.Cost, snapshot.AreaHash, Environment.TickCount64);
 
                 // Evaluated even when the feature is off: it costs a bool check, and its
                 // reason string is what the overlay's status line shows - including the
@@ -434,6 +440,7 @@ internal static class Program
         overlay.ShowWorldDots = debug;
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.Noise = world.Noise;
+        overlay.Costs = costs;
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);
