@@ -69,6 +69,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 _poi.Style = value;
             }
+
+            if (_uiBrowser is not null)
+            {
+                _uiBrowser.Style = value;
+            }
         }
     }
 
@@ -288,7 +293,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachUiBrowser(UiTreeInspector inspector, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(inspector);
-        _uiBrowser = new UiBrowserWindow(inspector) { Visible = visible };
+        _uiBrowser = new UiBrowserWindow(inspector) { Visible = visible, Style = _style };
     }
 
     /// <summary>
@@ -620,7 +625,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (!DrawIcon(draw, key, position, size))
             {
                 draw.AddCircleFilled(position, size, colour);
-                draw.AddCircle(position, size, OutlineColour, 12, Style.Width("entity.outline", 1.5f));
+                draw.AddCircle(position, size, OutlineColour, 12, Style.Width(StyleCatalogue.Keys.DotOutline, 1.5f));
             }
 
             if (ShowLabels && entity.Kind is EntityKind.Monster or EntityKind.Chest or EntityKind.WorldItem)
@@ -630,7 +635,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 // rather than something to configure your way back to.
                 draw.AddText(
                     position + new Vector2(size + 3, -7),
-                    Style["entity.label"].ColourOr(colour),
+                    Style[StyleCatalogue.Keys.DotLabel].ColourOr(colour),
                     entity.ShortName);
             }
         }
@@ -639,14 +644,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (_snapshot.Player is WorldEntity player)
         {
             ScreenPoint point = ProjectGround(player, width, height);
-            if (point.OnScreen && Style.Visible("entity.player"))
+            if (point.OnScreen && Style.Visible(StyleCatalogue.Keys.Player))
             {
                 var position = new Vector2(point.X, point.Y);
-                float size = Style.Sized("entity.player", DotRadius + 2);
-                if (!DrawIcon(draw, "entity.player", position, size))
+                float size = Style.Sized(StyleCatalogue.Keys.Player, DotRadius + 2);
+                if (!DrawIcon(draw, StyleCatalogue.Keys.Player, position, size))
                 {
-                    draw.AddCircleFilled(position, size, Style.Colour("entity.player"));
-                    draw.AddCircle(position, size, OutlineColour, 16, Style.Width("entity.outline", 2f));
+                    draw.AddCircleFilled(position, size, Style.Colour(StyleCatalogue.Keys.Player));
+                    draw.AddCircle(position, size, OutlineColour, 16, Style.Width(StyleCatalogue.Keys.DotOutline, 2f));
                 }
             }
 
@@ -690,9 +695,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // Screen centre: where the camera claims the player is.
         var centre = new Vector2(width / 2f, height / 2f);
-        uint centreColour = Pack(0.3f, 0.9f, 1f);
-        draw.AddLine(centre - new Vector2(24, 0), centre + new Vector2(24, 0), centreColour, 1.5f);
-        draw.AddLine(centre - new Vector2(0, 24), centre + new Vector2(0, 24), centreColour, 1.5f);
+        uint centreColour = Style.Colour(StyleCatalogue.Keys.AidCentre);
+        float centreWidth = Style.Width(StyleCatalogue.Keys.AidCentre, 1.5f);
+        draw.AddLine(centre - new Vector2(24, 0), centre + new Vector2(24, 0), centreColour, centreWidth);
+        draw.AddLine(centre - new Vector2(0, 24), centre + new Vector2(0, 24), centreColour, centreWidth);
         draw.AddText(centre + new Vector2(28, -7), centreColour, "screen centre");
 
         if (!ground.OnScreen || !healthbar.OnScreen)
@@ -703,15 +709,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         var groundPoint = new Vector2(ground.X, ground.Y);
         var healthbarPoint = new Vector2(healthbar.X, healthbar.Y);
 
-        uint groundColour = Pack(0.4f, 1f, 0.4f);
-        uint healthbarColour = Pack(1f, 0.4f, 1f);
+        uint groundColour = Style.Colour(StyleCatalogue.Keys.AidGround);
+        uint healthbarColour = Style.Colour(StyleCatalogue.Keys.AidHealthbar);
 
         DrawHealthbarReferences(draw, width, height);
 
-        draw.AddLine(groundPoint, healthbarPoint, Pack(1f, 1f, 1f), 1f);
-        draw.AddCircle(groundPoint, DotRadius + 6, groundColour, 20, 2f);
+        draw.AddLine(groundPoint, healthbarPoint, Style.Colour(StyleCatalogue.Keys.AidLink), Style.Width(StyleCatalogue.Keys.AidLink, 1f));
+        draw.AddCircle(groundPoint, DotRadius + 6, groundColour, 20, Style.Width(StyleCatalogue.Keys.AidGround, 2f));
         draw.AddText(groundPoint + new Vector2(DotRadius + 9, 2), groundColour, "base (Render z)");
-        draw.AddCircle(healthbarPoint, DotRadius + 4, healthbarColour, 20, 2f);
+        draw.AddCircle(healthbarPoint, DotRadius + 4, healthbarColour, 20, Style.Width(StyleCatalogue.Keys.AidHealthbar, 2f));
         draw.AddText(healthbarPoint + new Vector2(DotRadius + 7, -14), healthbarColour, "health bar (z - ModelBounds)");
     }
 
@@ -1048,13 +1054,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ImDrawListPtr draw = ImGui.GetBackgroundDrawList();
 
         // Under the markers: the layout is context, not the thing being looked for.
-        if (ShowTerrain && Style.Visible("terrain.outline") && _snapshot.Terrain is TerrainGrid terrain)
+        if (ShowTerrain && Style.Visible(StyleCatalogue.Keys.Terrain) && _snapshot.Terrain is TerrainGrid terrain)
         {
             // The style wins where it says anything, and the settings page's colour and
             // thickness stand where it does not. Two places can set this and only one of them
             // was chosen deliberately, so the deliberate one goes on top rather than the two
             // fighting over a field.
-            LayerStyle outline = Style["terrain.outline"];
+            LayerStyle outline = Style[StyleCatalogue.Keys.Terrain];
             _terrain.Colour = outline.ColourOr(_terrainColour);
             _terrain.Thickness = (int)outline.WidthOr(_terrainThickness);
 
@@ -1089,7 +1095,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (!DrawIcon(draw, key, at, size))
             {
                 draw.AddCircleFilled(at, size, Style.Colour(key));
-                draw.AddCircle(at, size, OutlineColour, 10, Style.Width("entity.outline", 1f));
+                draw.AddCircle(at, size, OutlineColour, 10, Style.Width(StyleCatalogue.Keys.DotOutline, 1f));
             }
         }
 
@@ -1103,8 +1109,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // CONSTRUCTION, so this ring must sit exactly on the marker the game draws for
             // the player on its own map. Nothing to eyeball and nothing to compare across
             // screenshots - the game supplies the reference every frame.
-            uint colour = Pack(0.3f, 0.9f, 1f);
-            draw.AddCircle(map.Centre, 9f, colour, 20, 2f);
+            uint colour = Style.Colour(StyleCatalogue.Keys.AidCentre);
+            draw.AddCircle(map.Centre, 9f, colour, 20, Style.Width(StyleCatalogue.Keys.AidCentre, 2f));
             draw.AddText(map.Centre + new Vector2(12, -7), colour,
                 $"map centre - the game's player marker belongs here (zoom {map.Zoom:F2})");
         }
@@ -1123,7 +1129,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     private void DrawHealthbarReferences(ImDrawListPtr draw, int width, int height)
     {
-        uint colour = Pack(1f, 0.4f, 1f);
+        uint colour = Style.Colour(StyleCatalogue.Keys.AidHealthbar);
+        float line = Style.Width(StyleCatalogue.Keys.AidHealthbar, 2f);
         foreach (WorldEntity monster in _snapshot.Entities.Where(e => e.Kind == EntityKind.Monster))
         {
             ScreenPoint bar = WorldToScreen.Project(
@@ -1135,10 +1142,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             // A bracket rather than a dot: it frames the game's bar instead of hiding it.
             var at = new Vector2(bar.X, bar.Y);
-            draw.AddLine(at - new Vector2(18, 0), at - new Vector2(6, 0), colour, 2f);
-            draw.AddLine(at + new Vector2(6, 0), at + new Vector2(18, 0), colour, 2f);
-            draw.AddLine(at - new Vector2(18, 4), at - new Vector2(18, -4), colour, 2f);
-            draw.AddLine(at + new Vector2(18, 4), at + new Vector2(18, -4), colour, 2f);
+            draw.AddLine(at - new Vector2(18, 0), at - new Vector2(6, 0), colour, line);
+            draw.AddLine(at + new Vector2(6, 0), at + new Vector2(18, 0), colour, line);
+            draw.AddLine(at - new Vector2(18, 4), at - new Vector2(18, -4), colour, line);
+            draw.AddLine(at + new Vector2(18, 4), at + new Vector2(18, -4), colour, line);
         }
     }
 
@@ -1191,7 +1198,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>Dark outline so dots stay readable over any background.</summary>
-    private uint OutlineColour => Style.Colour("entity.outline");
+    private uint OutlineColour => Style.Colour(StyleCatalogue.Keys.DotOutline);
 
     /// <summary>
     /// Which style entry an entity is drawn from: drops and monsters by rarity, the rest by

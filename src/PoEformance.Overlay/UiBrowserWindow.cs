@@ -34,8 +34,6 @@ public sealed class UiBrowserWindow
     /// <summary>Longest label a tree row shows before it is cut short.</summary>
     private const int MaxRowLabel = 56;
 
-    private static readonly uint SelectedColour = Pack(1f, 0.25f, 0.25f);
-    private static readonly uint HoverColour = Pack(0.35f, 0.7f, 1f);
     private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
     private static readonly Vector4 IdText = new(0.85f, 0.78f, 0.45f, 1f);
     private static readonly Vector4 HiddenText = new(0.55f, 0.45f, 0.45f, 1f);
@@ -69,6 +67,15 @@ public sealed class UiBrowserWindow
         ArgumentNullException.ThrowIfNull(inspector);
         _inspector = inspector;
     }
+
+    /// <summary>
+    /// How the highlight rectangles look. Shared with the overlay, so one editor covers them.
+    /// </summary>
+    /// <remarks>
+    /// Worth changing rather than a formality: these two exist to be TOLD APART from the
+    /// panel they are drawn on, and a red box on a red panel identifies nothing.
+    /// </remarks>
+    public OverlayStyle Style { get; set; } = new();
 
     /// <summary>Whether the window is on screen. Nothing is read while it is not.</summary>
     public bool Visible { get; set; }
@@ -446,12 +453,15 @@ public sealed class UiBrowserWindow
 
         ImDrawListPtr draw = ImGui.GetForegroundDrawList();
 
-        if (_hovered != 0 && _hovered != _selected)
+        if (_hovered != 0 && _hovered != _selected && Style.Visible(StyleCatalogue.Keys.AidHovered))
         {
-            Outline(draw, Find(view, _hovered), HoverColour, 1.5f);
+            Outline(draw, Find(view, _hovered), Style.Colour(StyleCatalogue.Keys.AidHovered), Style.Width(StyleCatalogue.Keys.AidHovered, 1.5f));
         }
 
-        Outline(draw, view.Selected, SelectedColour, 2f);
+        if (Style.Visible(StyleCatalogue.Keys.AidSelected))
+        {
+            Outline(draw, view.Selected, Style.Colour(StyleCatalogue.Keys.AidSelected), Style.Width(StyleCatalogue.Keys.AidSelected, 2f));
+        }
     }
 
     private static UiNode? Find(UiTreeView view, ulong address)
@@ -547,6 +557,4 @@ public sealed class UiBrowserWindow
         }
     }
 
-    private static uint Pack(float r, float g, float b, float a = 1f)
-        => ((uint)(a * 255) << 24) | ((uint)(b * 255) << 16) | ((uint)(g * 255) << 8) | (uint)(r * 255);
 }

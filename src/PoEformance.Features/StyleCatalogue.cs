@@ -4,10 +4,16 @@ namespace PoEformance.Features;
 /// Every drawn thing the overlay has, with what can be changed about each.
 /// </summary>
 /// <remarks>
-/// THE PROMISE THIS FILE MAKES: what is not listed here is not configurable. So the editor is
-/// generated from this rather than written by hand, and adding something to the overlay is not
-/// finished until it has an entry - which is the only arrangement where "all of it can be
-/// changed" stays true rather than becoming true once and drifting.
+/// THE PROMISE THIS FILE MAKES: everything painted over the game is in here, and what is not
+/// in here is not configurable. So the editor is generated from this rather than written by
+/// hand, and drawing something new is not finished until it has an entry - which is the only
+/// arrangement where "all of it can be changed" stays true rather than becoming true once and
+/// then drifting as things get added.
+///
+/// The boundary is what is drawn ON THE GAME: markers, routes, the layout, the measuring aids.
+/// The tool's own windows are not in it - their text has no icon and no line width, and they
+/// take the interface theme like every other window. That is a real line rather than a
+/// convenient one, and it is drawn here so it can be argued with.
 ///
 /// The keys are stored in the user's style file, so they are permanent. Renaming one silently
 /// discards whatever was set for it, which is the kind of loss nobody notices until they go
@@ -82,7 +88,52 @@ public static class StyleCatalogue
 
         // ── The map itself ──────────────────────────────────────────────────
         new("terrain.outline", "Map", "Area layout", Line, Rgb(150, 200, 255)),
+
+        // ── Measuring aids ──────────────────────────────────────────────────
+        // Switched on with the calibration and browser tools rather than during play, but
+        // they are drawn over the game like everything above, so leaving them out would make
+        // this file's promise false. They are also the entries most worth changing: their job
+        // is to be TOLD APART from what they are measured against, and what that takes
+        // depends on the map somebody is standing on.
+        new("aid.centre", "Measuring aids", "Screen centre", Line, Rgb(77, 230, 255)),
+        new("aid.ground", "Measuring aids", "Ground marker", Line, Rgb(102, 255, 102)),
+        new("aid.healthbar", "Measuring aids", "Health-bar marker", Line, Rgb(255, 102, 255)),
+        new("aid.link", "Measuring aids", "Line between the two", Line, Rgb(255, 255, 255)),
+        new("aid.selected", "Measuring aids", "Selected interface element", Line, Rgb(255, 64, 64)),
+        new("aid.hovered", "Measuring aids", "Interface element under the cursor", Line, Rgb(89, 179, 255)),
     ];
+
+    /// <summary>
+    /// The keys the drawing code names directly, rather than builds.
+    /// </summary>
+    /// <remarks>
+    /// Named so a mistyped one is a compile error. Spelled out at the point of use it would
+    /// be a key the catalogue does not have, which draws WHITE - visible, but only in the
+    /// game, and only to somebody who wonders why one marker looks wrong. There is a test
+    /// that every one of these is a real entry, so the failure moves to the build.
+    /// </remarks>
+    public static class Keys
+    {
+        public const string DotOutline = "entity.outline";
+        public const string DotLabel = "entity.label";
+        public const string Player = "entity.player";
+        public const string PlaceLabel = "poi.label";
+        public const string RouteArrow = "route.arrow";
+        public const string Terrain = "terrain.outline";
+        public const string AidCentre = "aid.centre";
+        public const string AidGround = "aid.ground";
+        public const string AidHealthbar = "aid.healthbar";
+        public const string AidLink = "aid.link";
+        public const string AidSelected = "aid.selected";
+        public const string AidHovered = "aid.hovered";
+
+        /// <summary>All of them, for the test that keeps them honest.</summary>
+        public static IReadOnlyList<string> All { get; } =
+        [
+            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain,
+            AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
+        ];
+    }
 
     /// <summary>The entries, grouped the way an editor shows them.</summary>
     public static IEnumerable<IGrouping<string, StyleEntry>> Grouped()

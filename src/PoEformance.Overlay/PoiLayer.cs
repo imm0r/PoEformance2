@@ -259,7 +259,7 @@ public sealed class PoiLayer
 
             if (ShowLabels && map.IsLargeMap)
             {
-                draw.AddText(at + new Vector2(size + 3f, -7f), Style["poi.label"].ColourOr(colour), place.Name);
+                draw.AddText(at + new Vector2(size + 3f, -7f), Style[StyleCatalogue.Keys.PlaceLabel].ColourOr(colour), place.Name);
             }
         }
     }
@@ -292,7 +292,7 @@ public sealed class PoiLayer
         }
 
         float thickness = chosenWidth > 0f ? chosenWidth : map.IsLargeMap ? 2.5f : 1.5f;
-        float arrowSize = Style.Sized("route.arrow", 6f);
+        float arrowSize = Style.Sized(StyleCatalogue.Keys.RouteArrow, 6f);
         float sinceArrow = ArrowSpacing * 0.4f;   // one early, so a short route gets one at all
 
         Vector2 previous = Project(route.Cells[0]);
@@ -301,7 +301,7 @@ public sealed class PoiLayer
             Vector2 next = Project(route.Cells[i]);
             draw.AddLine(previous, next, colour, thickness);
 
-            if (ShowArrows && map.IsLargeMap && Style.Visible("route.arrow"))
+            if (ShowArrows && map.IsLargeMap && Style.Visible(StyleCatalogue.Keys.RouteArrow))
             {
                 sinceArrow = DrawArrows(draw, previous, next, colour, sinceArrow, arrowSize);
             }

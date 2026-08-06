@@ -228,6 +228,19 @@ public class StyleCatalogueTests
     }
 
     [Fact]
+    public void EveryKeyTheDrawingCodeNamesIsAReadEntry()
+    {
+        // These are the ones spelled out at the point of use rather than built. A typo would
+        // otherwise be a key the catalogue does not have, which draws WHITE - visible, but
+        // only in the game, and only to whoever wonders why one marker looks wrong. This is
+        // what moves that to the build.
+        foreach (string key in StyleCatalogue.Keys.All)
+        {
+            Assert.True(StyleCatalogue.Find(key) is not null, $"the drawing code names {key}, the catalogue does not have it");
+        }
+    }
+
+    [Fact]
     public void EveryKindOfEntityTheOverlayCanDrawHasAnEntry()
     {
         // Including the ones switched off by default. They are reachable from the kind
