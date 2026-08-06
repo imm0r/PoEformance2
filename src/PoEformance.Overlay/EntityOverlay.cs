@@ -77,6 +77,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             _banner.Style = value;
             _unwalked.Style = value;
+            _healthBars.Style = value;
         }
     }
 
@@ -101,6 +102,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         MinimumLootRarity = settings.MinLootRarity;
         ShowTerrain = settings.ShowTerrain;
         ShowLabels = settings.DotLabels;
+        _healthBars.OnlyWhenHurt = settings.HealthBarsOnlyWhenHurt;
 
         if (Noise is not null)
         {
@@ -132,6 +134,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             MinLootRarity = MinimumLootRarity,
             ShowTerrain = ShowTerrain,
             DotLabels = ShowLabels,
+            HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
             ShowPoi = _poi?.ShowPicker ?? basis.ShowPoi,
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
@@ -155,6 +158,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private AlertWatcher? _alerts;
     private readonly AlertBanner _banner = new();
     private readonly UnwalkedLayer _unwalked = new();
+    private readonly HealthBarLayer _healthBars = new();
 
     /// <summary>
     /// Adds the alert watcher, which says when something worth knowing about turned up.
@@ -597,6 +601,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // where a radar belongs, and it is where the game already draws its own.
             DrawMapDots();
 
+            // Over the monsters themselves rather than on the map, and separate from the
+            // world dots for that reason: a dot in the world lands between the player and
+            // what they are fighting, while a health bar goes where the eye already is.
+            _healthBars.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+
             if (ShowWorldDots)
             {
                 DrawEntities(width, height);
@@ -990,6 +999,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     {
                         _styleWindow.Visible = styling;
                     }
+                }
+
+                bool hurtOnly = _healthBars.OnlyWhenHurt;
+                if (ImGui.Checkbox("Health bars only once hurt  (off shows every monster's)", ref hurtOnly))
+                {
+                    _healthBars.OnlyWhenHurt = hurtOnly;
+                    SettingsChanged?.Invoke();
                 }
 
                 if (_alerts is not null && _alertWindow is not null)

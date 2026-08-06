@@ -74,6 +74,16 @@ public readonly record struct ReadCost(
 /// strongbox is a Chest and also a landmark, and a terrain piece is scenery unless it happens
 /// to be the way out.
 /// </param>
+/// <param name="Life">
+/// A monster's health pool. Default - and <see cref="Vital.IsValid"/> false - for everything
+/// that has none, and for a monster whose Life component could not be read. Those are the
+/// same answer on purpose: neither is a monster at zero health.
+/// </param>
+/// <param name="EnergyShield">A monster's shield pool, on the same terms.</param>
+/// <param name="Opened">
+/// Whether a chest has already been opened. Null for anything that is not a chest, and for a
+/// chest whose component did not resolve.
+/// </param>
 public sealed record WorldEntity(
     uint Id,
     ulong Address,
@@ -86,8 +96,13 @@ public sealed record WorldEntity(
     float ModelBoundsZ = 0f,
     ItemRarity Rarity = ItemRarity.Unknown,
     PoiKind Poi = PoiKind.None,
-    string MapIcon = "")
+    string MapIcon = "",
+    Vital Life = default,
+    Vital EnergyShield = default,
+    bool? Opened = null)
 {
+    /// <summary>Whether this is a chest somebody has already been through.</summary>
+    public bool IsSpent => Opened == true;
     /// <summary>
     /// A readable label for a point of interest.
     /// </summary>
@@ -200,9 +215,15 @@ public sealed class WorldReader
     private readonly int _w2sMatrix;
     private readonly int _areaHash;
     private readonly int _lifeHealth;
+    private readonly int _lifeEnergyShield;
     private readonly int _vitalCurrent;
+    private readonly int _vitalMax;
+    private readonly int _vitalReservedFlat;
+    private readonly int _vitalReservedPercent;
+    private readonly int _lifeSpan;
     private readonly int _isTargetable;
     private readonly int _monsterRarity;
+    private readonly int _chestOpened;
 
     /// <param name="rotation">
     /// Where the terrain rotation tables live, for the within-tile heights. Optional: without
@@ -232,14 +253,24 @@ public sealed class WorldReader
         _w2sMatrix = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
         _areaHash = schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash");
 
-        // Read straight from the schema rather than through LifeReader: a corpse check
-        // needs one int per monster, and building the full three-pool Vitals for every
-        // monster on screen every frame would be most of a read budget spent on two
-        // numbers that are thrown away.
+        // Read straight from the schema rather than through LifeReader, which would follow
+        // three pools through twelve separate reads for every monster on screen. Life and
+        // energy shield come out of ONE span read covering both sub-structs - the same
+        // number of calls the corpse check used to make for a single number, and the reason
+        // health bars cost nothing to add.
+        //
+        // Mana is deliberately outside the span: no monster's mana is worth drawing, and
+        // including it would widen the read for nothing.
         _lifeHealth = schema.Structs["Life"].OffsetOf("Health");
+        _lifeEnergyShield = schema.Structs["Life"].OffsetOf("EnergyShield");
         _vitalCurrent = schema.Structs["Vital"].OffsetOf("Current");
+        _vitalMax = schema.Structs["Vital"].OffsetOf("Max");
+        _vitalReservedFlat = schema.Structs["Vital"].OffsetOf("ReservedFlat");
+        _vitalReservedPercent = schema.Structs["Vital"].OffsetOf("ReservedPercent");
+        _lifeSpan = _lifeEnergyShield - _lifeHealth + _vitalCurrent + sizeof(int);
         _isTargetable = schema.Structs["Targetable"].OffsetOf("IsTargetable");
         _monsterRarity = schema.Structs["ObjectMagicProperties"].OffsetOf("Rarity");
+        _chestOpened = schema.Structs["Chest"].OffsetOf("IsOpened");
     }
 
     /// <summary>
@@ -255,10 +286,23 @@ public sealed class WorldReader
     private MonsterSigns ReadMonsterSigns(Entity entity)
     {
         int? health = null;
+        Vital pool = default;
+        Vital shield = default;
+
         ulong life = entity.Component("Life");
-        if (life != 0 && _reader.TryRead(life + (ulong)_lifeHealth + (ulong)_vitalCurrent, out int current))
+        if (life != 0)
         {
-            health = current;
+            // ONE read covering both sub-structs rather than one per number. The corpse check
+            // needs current health; the maximum sits four bytes from it and the shield a
+            // little further on, so taking the span costs the same single call and yields a
+            // health bar as well.
+            Span<byte> span = stackalloc byte[_lifeSpan];
+            if (_reader.TryRead(life + (ulong)_lifeHealth, span))
+            {
+                pool = VitalIn(span, 0);
+                shield = VitalIn(span, _lifeEnergyShield - _lifeHealth);
+                health = pool.Current;
+            }
         }
 
         bool? targetable = null;
@@ -283,8 +327,22 @@ public sealed class WorldReader
             monsterRarity = Rarities.FromRaw(rarity);
         }
 
-        return new MonsterSigns(health, targetable, monsterRarity >= ItemRarity.Unique, monsterRarity);
+        return new MonsterSigns(
+            health, targetable, monsterRarity >= ItemRarity.Unique, monsterRarity, pool, shield);
     }
+
+    /// <summary>Pulls one vital sub-struct out of a span read from the Life component.</summary>
+    /// <remarks>
+    /// A bad read leaves the span zeroed, which reads back as a pool with no maximum -
+    /// <see cref="Vital.IsValid"/> is false for that, so nothing downstream mistakes it for a
+    /// monster at zero health. The distinction matters here for the same reason it does in
+    /// the corpse check: "no answer" and "dead" are not the same claim.
+    /// </remarks>
+    private Vital VitalIn(ReadOnlySpan<byte> span, int at) => new(
+        BitConverter.ToInt32(span[(at + _vitalCurrent)..]),
+        BitConverter.ToInt32(span[(at + _vitalMax)..]),
+        BitConverter.ToInt32(span[(at + _vitalReservedFlat)..]),
+        BitConverter.ToInt32(span[(at + _vitalReservedPercent)..]));
 
     /// <summary>
     /// Names for particular terrain tiles, used when an area is one somebody described.
@@ -403,11 +461,22 @@ public sealed class WorldReader
             ulong iconComponent = entity.Component("MinimapIcon");
             string mapIcon = iconComponent != 0 ? _mapIcons.Read(iconComponent) : string.Empty;
 
+            // Whether a chest has already been looted. One byte, and only on entities that
+            // carry the component - so it costs nothing on the monsters and drops that do
+            // not, and it answers the thing a marked chest is most often lying about.
+            bool? opened = null;
+            ulong chest = entity.Component("Chest");
+            if (chest != 0 && _reader.TryRead(chest + (ulong)_chestOpened, out byte openFlag))
+            {
+                opened = openFlag != 0;
+            }
+
             var world = new WorldEntity(
                 id, address, entity.Path, kind,
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
-                PointsOfInterest.Classify(entity.Path, mapIcon), mapIcon);
+                PointsOfInterest.Classify(entity.Path, mapIcon), mapIcon,
+                signs.Life, signs.EnergyShield, opened);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

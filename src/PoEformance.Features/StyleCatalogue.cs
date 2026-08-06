@@ -90,6 +90,14 @@ public static class StyleCatalogue
         new("terrain.outline", "Map", "Area layout", Line, Rgb(150, 200, 255)),
         new("map.unwalked", "Map", "Still to walk", StyleTraits.Colour | StyleTraits.Scale, Rgb(120, 150, 190, 140)),
 
+        // ── Health bars ─────────────────────────────────────────────────────
+        // The BAR takes its colour from the monster's rarity entry above, so that one choice
+        // covers the dot and the bar together. What is here is everything the rarity cannot
+        // say: the empty part, and the shield.
+        new("healthbar", "Health bars", "Monster health bar", StyleTraits.Scale, Rgb(255, 64, 64)),
+        new("healthbar.back", "Health bars", "Empty part", StyleTraits.Colour, Rgb(28, 18, 18, 200)),
+        new("healthbar.shield", "Health bars", "Energy shield", StyleTraits.Colour, Rgb(140, 200, 255)),
+
         // ── Alerts ──────────────────────────────────────────────────────────
         new("alert.banner", "Alerts", "Alert line", StyleTraits.Colour, Rgb(255, 235, 179, 255)),
         new("alert.banner.back", "Alerts", "Alert backing", StyleTraits.Colour, Rgb(20, 18, 14, 215)),
@@ -126,6 +134,9 @@ public static class StyleCatalogue
         public const string RouteArrow = "route.arrow";
         public const string Terrain = "terrain.outline";
         public const string Unwalked = "map.unwalked";
+        public const string HealthBar = "healthbar";
+        public const string HealthBarBack = "healthbar.back";
+        public const string HealthBarShield = "healthbar.shield";
         public const string Banner = "alert.banner";
         public const string BannerBack = "alert.banner.back";
         public const string AidCentre = "aid.centre";
@@ -139,6 +150,7 @@ public static class StyleCatalogue
         public static IReadOnlyList<string> All { get; } =
         [
             DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Banner, BannerBack,
+            HealthBar, HealthBarBack, HealthBarShield,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];
     }

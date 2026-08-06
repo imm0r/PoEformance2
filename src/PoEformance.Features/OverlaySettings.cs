@@ -20,7 +20,8 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("poiLabels")] bool PoiLabels = true,
     [property: JsonPropertyName("poiRoutes")] bool PoiRoutes = true,
     [property: JsonPropertyName("poiArrows")] bool PoiArrows = true,
-    [property: JsonPropertyName("dotLabels")] bool DotLabels = false)
+    [property: JsonPropertyName("dotLabels")] bool DotLabels = false,
+    [property: JsonPropertyName("healthBarsOnlyWhenHurt")] bool HealthBarsOnlyWhenHurt = false)
 {
     /// <summary>
     /// Magic and above, and the layout shown. Path of Exile 2 drops normal-rarity items

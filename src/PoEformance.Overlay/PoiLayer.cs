@@ -72,6 +72,17 @@ public sealed class PoiLayer
     /// <summary>Whether the picker window is on screen.</summary>
     public bool ShowPicker { get; set; }
 
+    /// <summary>
+    /// Keep marking chests that have already been opened.
+    /// </summary>
+    /// <remarks>
+    /// Off, because an opened chest is the one marker that actively misleads: it says "there
+    /// is something over here" about a place already visited, and a map full of them is a map
+    /// full of wasted walks. It stays available because the same fact answers a different
+    /// question in a party - "did somebody already do that side".
+    /// </remarks>
+    public bool ShowSpent { get; set; }
+
     public PoiLayer(RoutePlanner planner)
     {
         ArgumentNullException.ThrowIfNull(planner);
@@ -147,7 +158,8 @@ public sealed class PoiLayer
     /// the two markers most worth telling apart on sight.
     /// </param>
     private readonly record struct Place(
-        ulong Id, string Name, PoiKind Kind, float WorldX, float WorldY, float Height, string Icon);
+        ulong Id, string Name, PoiKind Kind, float WorldX, float WorldY, float Height, string Icon,
+        bool Spent = false);
 
     /// <summary>Everything markable in the area, from both sources.</summary>
     private List<Place> PlacesIn(WorldSnapshot snapshot)
@@ -160,7 +172,8 @@ public sealed class PoiLayer
             {
                 places.Add(new Place(
                     entity.Address, entity.PoiName, entity.Poi,
-                    entity.WorldX, entity.WorldY, entity.TerrainHeight, entity.MapIcon));
+                    entity.WorldX, entity.WorldY, entity.TerrainHeight, entity.MapIcon,
+                    entity.IsSpent));
             }
         }
 
@@ -225,6 +238,15 @@ public sealed class PoiLayer
             string key = StyleCatalogue.ForGlyph(glyph);
 
             if (!Style.Visible(key))
+            {
+                continue;
+            }
+
+            // A chest already opened is the one marker that is actively MISLEADING - it says
+            // "there is something over here" about a place somebody has already been. Hidden
+            // by default; kept behind a switch because on a map run with a party it also
+            // answers "did we do this side already".
+            if (place.Spent && !ShowSpent)
             {
                 continue;
             }
@@ -437,6 +459,7 @@ public sealed class PoiLayer
             // A chosen place with no answer yet is one still being searched for, and saying so
             // matters now that a route right across a map takes a second or two: the direct
             // distance sitting there unchanged reads as nothing having happened.
+            string spent = place.Spent ? "  (opened)" : string.Empty;
             string away = route is { Cells.Count: >= 2 }
                 ? $"{route.LengthCells:F0} walk"
                 : route is not null && route.Status.Length > 0
@@ -453,7 +476,7 @@ public sealed class PoiLayer
 
             // ### rather than ##: the label is built from game data and everything after a ##
             // would be read as the identity, so two places could collapse into one row.
-            bool clicked = ImGui.Selectable($"{place.Name}  -  {away}###{place.Id:X}", routed);
+            bool clicked = ImGui.Selectable($"{place.Name}{spent}  -  {away}###{place.Id:X}", routed);
 
             ImGui.PopStyleColor();
 

@@ -18,8 +18,19 @@ namespace PoEformance.Game.World;
 /// when it could not be read, which is not the same as Normal - "no answer" and "an ordinary
 /// monster" want different treatment on a radar.
 /// </param>
+/// <param name="Life">
+/// The whole health pool, not just the current value. Carried because it comes out of the
+/// SAME read - the corpse check needs current health, and the span that holds it holds the
+/// maximum beside it, so a health bar costs nothing that was not already being paid for.
+/// </param>
+/// <param name="EnergyShield">The shield pool, which sits in the same span.</param>
 public readonly record struct MonsterSigns(
-    int? Health, bool? Targetable, bool IsBoss, ItemRarity Rarity = ItemRarity.Unknown);
+    int? Health,
+    bool? Targetable,
+    bool IsBoss,
+    ItemRarity Rarity = ItemRarity.Unknown,
+    Vital Life = default,
+    Vital EnergyShield = default);
 
 /// <summary>
 /// Decides which monsters are corpses, so the overlay stops marking them.
