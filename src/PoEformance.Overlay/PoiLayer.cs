@@ -30,23 +30,22 @@ public sealed class PoiLayer
 {
     private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
 
+    private readonly RoutePlanner _planner;
+
     /// <summary>
-    /// One colour per route, chosen to stay apart on a dark, busy map.
+    /// How every drawn thing looks. Shared with the overlay, so one editor covers both.
+    /// </summary>
+    public OverlayStyle Style { get; set; } = new();
+
+    /// <summary>
+    /// Finds the texture for a chosen picture, or zero when the shape should be drawn.
     /// </summary>
     /// <remarks>
-    /// Deliberately not a hue sweep: half of one lands on the game's own map colours or on the
-    /// terrain outline, and a route the same colour as a wall is worse than no route.
+    /// Handed in rather than owned, for the same reason the terrain layer's upload is: this
+    /// class projects and draws, and it has no business holding a texture cache. Unset by
+    /// default, which draws the shapes - so nothing here depends on a renderer existing.
     /// </remarks>
-    private static readonly uint[] RouteColours =
-    [
-        Pack(0.35f, 1f, 0.75f),    // mint
-        Pack(1f, 0.55f, 0.85f),    // pink
-        Pack(1f, 0.75f, 0.3f),     // amber
-        Pack(0.55f, 0.8f, 1f),     // sky
-        Pack(0.8f, 1f, 0.4f),      // lime
-    ];
-
-    private readonly RoutePlanner _planner;
+    public Func<string, IntPtr>? IconFor { get; set; }
 
     // Which colour each destination holds. Kept BY ADDRESS rather than by position, so
     // removing one route leaves the others' colours alone - a colour that moved when a
@@ -79,44 +78,44 @@ public sealed class PoiLayer
         _planner = planner;
     }
 
-    /// <summary>Colour per kind, so a glance at the map is enough to tell them apart.</summary>
-    private static uint ColourFor(PoiKind kind) => kind switch
-    {
-        PoiKind.AreaTransition => Pack(0.45f, 0.95f, 1f),   // the way out, and the brightest
-        PoiKind.Waypoint => Pack(0.55f, 0.75f, 1f),
-        PoiKind.Checkpoint => Pack(0.6f, 0.85f, 0.6f),
-        PoiKind.Chest => Pack(1f, 0.85f, 0.4f),
-        PoiKind.Mechanic => Pack(0.95f, 0.55f, 1f),
-        PoiKind.Shrine => Pack(0.5f, 1f, 0.8f),
-        PoiKind.Npc => Pack(1f, 0.95f, 0.7f),
-        PoiKind.Quest => Pack(1f, 0.8f, 0.25f),   // what the game wants next, and it shows
-        PoiKind.BossArena => Pack(1f, 0.4f, 0.35f),
-        PoiKind.Marked => Pack(0.85f, 0.85f, 0.95f),
-        _ => Pack(0.8f, 0.8f, 0.8f),
-    };
+    /// <summary>
+    /// The colour a place is drawn in, taken from its SHAPE rather than its kind.
+    /// </summary>
+    /// <remarks>
+    /// The shape is the finer distinction of the two, and it is the one worth colouring by: a
+    /// breach and a ritual are both "a mechanic is here" and would share a colour, while being
+    /// the two markers most worth telling apart at a glance.
+    /// </remarks>
+    private uint ColourFor(PoiGlyph glyph) => Style.Colour(StyleCatalogue.ForGlyph(glyph));
 
     /// <summary>
     /// The colour a destination's route is drawn in, held for as long as it is a destination.
     /// </summary>
     /// <remarks>
     /// Assigned to the lowest FREE slot rather than by position in the list, so dropping one
-    /// route does not recolour the rest.
+    /// route does not recolour the rest. The colours are chosen to stay apart on a dark, busy
+    /// map and are deliberately not a hue sweep: half of one lands on the game's own map
+    /// colours or on the terrain outline, and a route the same colour as a wall is worse than
+    /// no route.
     /// </remarks>
-    private uint RouteColour(ulong address)
+    private uint RouteColour(ulong address) => Style.Colour(StyleCatalogue.ForRoute(RouteSlot(address)));
+
+    /// <summary>Which route slot a destination holds, assigning one if it has none.</summary>
+    private int RouteSlot(ulong address)
     {
         if (!_slots.TryGetValue(address, out int slot))
         {
             slot = 0;
-            while (slot < RouteColours.Length && _slots.ContainsValue(slot))
+            while (slot < RoutePlanner.MaxRoutes && _slots.ContainsValue(slot))
             {
                 slot++;
             }
 
-            _slots[address] = slot % RouteColours.Length;
-            slot = _slots[address];
+            slot %= RoutePlanner.MaxRoutes;
+            _slots[address] = slot;
         }
 
-        return RouteColours[slot];
+        return slot;
     }
 
     /// <summary>Drops colour slots for places no longer routed to, so they can be reused.</summary>
@@ -198,7 +197,11 @@ public sealed class PoiLayer
         {
             foreach (RouteView route in _planner.Routes)
             {
-                DrawRoute(draw, map, snapshot, player, route, RouteColour(route.Target));
+                string key = StyleCatalogue.ForRoute(RouteSlot(route.Target));
+                if (Style.Visible(key))
+                {
+                    DrawRoute(draw, map, snapshot, player, route, Style.Colour(key), Style.Width(key, 0f));
+                }
             }
         }
 
@@ -215,24 +218,48 @@ public sealed class PoiLayer
                 continue;
             }
 
-            // A destination takes its ROUTE's colour, which is the whole reason several
-            // routes can be read at once: the line and the end it leads to match.
-            bool routed = _planner.IsTarget(place.Id);
-            uint colour = routed ? RouteColour(place.Id) : ColourFor(place.Kind);
-
             // A shape per kind of place, because at this size the silhouette is what carries
             // the meaning - the entity dots are circles, and a marker has to be told apart
             // from those and from each other while three pixels across.
-            PoiGlyphPainter.Draw(draw, at, radius, colour, PoiGlyphs.For(place.Icon, place.Kind));
+            PoiGlyph glyph = PoiGlyphs.For(place.Icon, place.Kind);
+            string key = StyleCatalogue.ForGlyph(glyph);
+
+            if (!Style.Visible(key))
+            {
+                continue;
+            }
+
+            // A destination takes its ROUTE's colour, which is the whole reason several
+            // routes can be read at once: the line and the end it leads to match.
+            bool routed = _planner.IsTarget(place.Id);
+            uint colour = routed ? RouteColour(place.Id) : ColourFor(glyph);
+            float size = Style.Sized(key, radius);
+
+            // A chosen picture instead of the shape, and the SHAPE when there is none or it
+            // could not be loaded - a marker that vanished because a file moved would read as
+            // there being nothing there.
+            IntPtr icon = IconFor?.Invoke(Style[key].Icon) ?? IntPtr.Zero;
+            if (icon != IntPtr.Zero)
+            {
+                // Untinted unless a colour was chosen: somebody supplying a picture supplied
+                // its colours, and multiplying it by this glyph's default would look broken.
+                draw.AddImage(
+                    icon, at - new Vector2(size, size), at + new Vector2(size, size),
+                    Vector2.Zero, Vector2.One, Style[key].ColourOr(0xFFFFFFFF));
+            }
+            else
+            {
+                PoiGlyphPainter.Draw(draw, at, size, colour, glyph, Style.Width(key, 0f));
+            }
 
             if (routed)
             {
-                draw.AddCircle(at, radius + 4f, colour, 16, 2f);
+                draw.AddCircle(at, size + 4f, colour, 16, 2f);
             }
 
             if (ShowLabels && map.IsLargeMap)
             {
-                draw.AddText(at + new Vector2(radius + 3f, -7f), colour, place.Name);
+                draw.AddText(at + new Vector2(size + 3f, -7f), Style["poi.label"].ColourOr(colour), place.Name);
             }
         }
     }
@@ -247,7 +274,7 @@ public sealed class PoiLayer
     /// </remarks>
     private void DrawRoute(
         ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player,
-        RouteView route, uint colour)
+        RouteView route, uint colour, float chosenWidth)
     {
         if (route.Cells.Count < 2)
         {
@@ -264,7 +291,8 @@ public sealed class PoiLayer
                 player.WorldX, player.WorldY, player.TerrainHeight);
         }
 
-        float thickness = map.IsLargeMap ? 2.5f : 1.5f;
+        float thickness = chosenWidth > 0f ? chosenWidth : map.IsLargeMap ? 2.5f : 1.5f;
+        float arrowSize = Style.Sized("route.arrow", 6f);
         float sinceArrow = ArrowSpacing * 0.4f;   // one early, so a short route gets one at all
 
         Vector2 previous = Project(route.Cells[0]);
@@ -273,9 +301,9 @@ public sealed class PoiLayer
             Vector2 next = Project(route.Cells[i]);
             draw.AddLine(previous, next, colour, thickness);
 
-            if (ShowArrows && map.IsLargeMap)
+            if (ShowArrows && map.IsLargeMap && Style.Visible("route.arrow"))
             {
-                sinceArrow = DrawArrows(draw, previous, next, colour, sinceArrow);
+                sinceArrow = DrawArrows(draw, previous, next, colour, sinceArrow, arrowSize);
             }
 
             previous = next;
@@ -295,7 +323,8 @@ public sealed class PoiLayer
     /// puts none on a long straight run - which is exactly where the direction is least
     /// obvious - and a cluster at every corner, where it is already clear.
     /// </remarks>
-    private static float DrawArrows(ImDrawListPtr draw, Vector2 from, Vector2 to, uint colour, float since)
+    private static float DrawArrows(
+        ImDrawListPtr draw, Vector2 from, Vector2 to, uint colour, float since, float size)
     {
         Vector2 along = to - from;
         float length = along.Length();
@@ -308,7 +337,7 @@ public sealed class PoiLayer
 
         for (float at = ArrowSpacing - since; at < length; at += ArrowSpacing)
         {
-            Arrow(draw, from + (direction * at), direction, colour);
+            Arrow(draw, from + (direction * at), direction, colour, size);
             since = 0f;
         }
 
@@ -316,9 +345,8 @@ public sealed class PoiLayer
     }
 
     /// <summary>A chevron pointing the way the route runs.</summary>
-    private static void Arrow(ImDrawListPtr draw, Vector2 at, Vector2 direction, uint colour)
+    private static void Arrow(ImDrawListPtr draw, Vector2 at, Vector2 direction, uint colour, float size)
     {
-        const float size = 6f;
         var side = new Vector2(-direction.Y, direction.X);
         Vector2 tip = at + (direction * size);
         Vector2 left = at - (direction * size * 0.5f) + (side * size * 0.7f);
@@ -419,7 +447,9 @@ public sealed class PoiLayer
 
             ImGui.PushStyleColor(
                 ImGuiCol.Text,
-                ImGui.ColorConvertU32ToFloat4(routed ? RouteColour(place.Id) : ColourFor(place.Kind)));
+                ImGui.ColorConvertU32ToFloat4(routed
+                    ? RouteColour(place.Id)
+                    : ColourFor(PoiGlyphs.For(place.Icon, place.Kind))));
 
             // ### rather than ##: the label is built from game data and everything after a ##
             // would be read as the identity, so two places could collapse into one row.
@@ -441,16 +471,4 @@ public sealed class PoiLayer
         return MathF.Sqrt((dx * dx) + (dy * dy));
     }
 
-    private static void Diamond(ImDrawListPtr draw, Vector2 at, float radius, uint colour)
-    {
-        draw.AddQuadFilled(
-            at + new Vector2(0, -radius), at + new Vector2(radius, 0),
-            at + new Vector2(0, radius), at + new Vector2(-radius, 0), colour);
-        draw.AddQuad(
-            at + new Vector2(0, -radius), at + new Vector2(radius, 0),
-            at + new Vector2(0, radius), at + new Vector2(-radius, 0), 0xFF000000, 1f);
-    }
-
-    private static uint Pack(float r, float g, float b, float a = 1f)
-        => ((uint)(a * 255) << 24) | ((uint)(b * 255) << 16) | ((uint)(g * 255) << 8) | (uint)(r * 255);
 }

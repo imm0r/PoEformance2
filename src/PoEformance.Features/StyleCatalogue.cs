@@ -43,7 +43,15 @@ public static class StyleCatalogue
         new("entity.chest", "Other entities", "Chest", Marker, Rgb(255, 217, 51)),
         new("entity.npc", "Other entities", "NPC", Marker, Rgb(153, 230, 153)),
         new("entity.player", "Other entities", "Player", Marker, Rgb(77, 255, 77)),
-        new("entity.outline", "Other entities", "Dot outline", Line, Rgb(0, 0, 0, 160)),
+
+        // Off by default in the overlay, but reachable from the kind filter - so they are
+        // drawn, so they belong here. An entry for something switched off is cheap; a drawn
+        // thing with no entry is the promise this file makes being false.
+        new("entity.effect", "Other entities", "Effect", Marker, Rgb(179, 128, 255)),
+        new("entity.terrain", "Other entities", "Terrain piece", Marker, Rgb(153, 153, 153)),
+        new("entity.other", "Other entities", "Anything else", Marker, Rgb(204, 204, 204)),
+
+        new("entity.outline", "Other entities", "Dot outline", Line, Rgb(0, 0, 0, 204)),
         new("entity.label", "Other entities", "Dot label", StyleTraits.Colour, Rgb(217, 217, 217)),
 
         // ── Places ──────────────────────────────────────────────────────────
@@ -97,16 +105,46 @@ public static class StyleCatalogue
 
     /// <summary>The key for a monster or drop of a given rarity.</summary>
     /// <remarks>
-    /// Built rather than looked up, so a rarity that gains a value does not silently fall back
-    /// to one colour for everything - it produces a key the catalogue does not have, which is
-    /// visible.
+    /// A rarity that is not one of the four ranks takes the ordinary one, which is what the
+    /// overlay drew before any of this existed: an unresolved drop is one frame old at most,
+    /// and it is shown rather than hidden because missing a unique costs more than glancing
+    /// at a white one. Currency is a rank here even though it is a classification elsewhere,
+    /// because it has a colour of its own that people know.
+    ///
+    /// Folding the rest in rather than building a key for them is deliberate: an unmapped key
+    /// draws WHITE to make a forgotten catalogue entry visible, and a rarity nobody chose is
+    /// not a forgotten entry.
     /// </remarks>
     public static string ForRarity(string prefix, PoEformance.Game.Components.ItemRarity rarity)
-        => $"{prefix}.{rarity.ToString().ToLowerInvariant()}";
+    {
+        string rank = rarity switch
+        {
+            PoEformance.Game.Components.ItemRarity.Magic => "magic",
+            PoEformance.Game.Components.ItemRarity.Rare => "rare",
+            PoEformance.Game.Components.ItemRarity.Unique => "unique",
+            PoEformance.Game.Components.ItemRarity.Currency => "currency",
+            _ => "normal",
+        };
+
+        return $"{prefix}.{rank}";
+    }
 
     /// <summary>The key for a place's shape.</summary>
     public static string ForGlyph(PoEformance.Game.World.PoiGlyph glyph)
         => $"poi.{glyph.ToString().ToLowerInvariant()}";
+
+    /// <summary>The key for an entity that is not a monster or a drop.</summary>
+    public static string ForKind(PoEformance.Game.World.EntityKind kind) => kind switch
+    {
+        PoEformance.Game.World.EntityKind.Player => "entity.player",
+        PoEformance.Game.World.EntityKind.Monster => "entity.monster.normal",
+        PoEformance.Game.World.EntityKind.Chest => "entity.chest",
+        PoEformance.Game.World.EntityKind.WorldItem => "entity.item.normal",
+        PoEformance.Game.World.EntityKind.Npc => "entity.npc",
+        PoEformance.Game.World.EntityKind.Effect => "entity.effect",
+        PoEformance.Game.World.EntityKind.Terrain => "entity.terrain",
+        _ => "entity.other",
+    };
 
     /// <summary>The key for the nth route, counted from zero.</summary>
     public static string ForRoute(int slot) => $"route.{slot + 1}";

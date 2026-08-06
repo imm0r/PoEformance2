@@ -228,6 +228,28 @@ public class StyleCatalogueTests
     }
 
     [Fact]
+    public void EveryKindOfEntityTheOverlayCanDrawHasAnEntry()
+    {
+        // Including the ones switched off by default. They are reachable from the kind
+        // filter, so they get drawn, so a missing entry here is a white dot and a puzzle.
+        foreach (EntityKind kind in Enum.GetValues<EntityKind>())
+        {
+            string key = StyleCatalogue.ForKind(kind);
+            Assert.True(StyleCatalogue.Find(key) is not null, $"no catalogue entry for {kind} (expected {key})");
+        }
+    }
+
+    [Fact]
+    public void ARarityNobodyChoseDrawsTheORDINARYWayRatherThanWhite()
+    {
+        // A drop one frame old has not resolved its rarity yet, and it is SHOWN - missing a
+        // unique costs more than glancing at a white one. That is a real case rather than a
+        // forgotten catalogue entry, so it must not take the glaring unknown-key colour.
+        Assert.Equal("entity.item.normal", StyleCatalogue.ForRarity("entity.item", ItemRarity.Unknown));
+        Assert.Equal("entity.monster.normal", StyleCatalogue.ForRarity("entity.monster", (ItemRarity)77));
+    }
+
+    [Fact]
     public void EveryRouteTheOverlayWillDrawHasAColour()
     {
         for (int slot = 0; slot < RoutePlanner.MaxRoutes; slot++)

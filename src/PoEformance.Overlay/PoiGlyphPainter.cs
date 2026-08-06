@@ -33,9 +33,15 @@ public static class PoiGlyphPainter
     private const float Stroke = 1.6f;
 
     /// <summary>Draws one marker, centred, sized to roughly <paramref name="radius"/>.</summary>
-    public static void Draw(ImDrawListPtr draw, Vector2 at, float radius, uint colour, PoiGlyph glyph)
+    /// <param name="width">
+    /// Line thickness for the outlined shapes. 0 scales it with the marker, which is what it
+    /// should do - a chosen width is a fixed number of pixels, and a marker that grows without
+    /// its lines growing turns into a faint outline of itself.
+    /// </param>
+    public static void Draw(
+        ImDrawListPtr draw, Vector2 at, float radius, uint colour, PoiGlyph glyph, float width = 0f)
     {
-        float line = Math.Max(1f, radius * Stroke / 5f);
+        float line = width > 0f ? width : Math.Max(1f, radius * Stroke / 5f);
 
         switch (glyph)
         {

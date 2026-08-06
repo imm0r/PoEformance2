@@ -445,6 +445,11 @@ internal static class Program
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);
 
+        // Before the editor, which is handed this exact instance - and before the layers read
+        // it, which they do every frame. The setter passes it on to whatever is attached.
+        overlay.Style = PoEformance.Features.OverlayStyleStore.Load();
+        overlay.AttachStyleEditor(() => PoEformance.Features.OverlayStyleStore.Save(overlay.Style));
+
         // AFTER the parts it configures are attached, or half of it would be applied to
         // things that do not exist yet - and silently, since every one of them is optional.
         overlay.Apply(settings);

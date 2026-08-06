@@ -34,6 +34,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private WorldSnapshot _snapshot = WorldSnapshot.Empty;
     private ClientRect _tracked;
     private readonly TerrainLayer _terrain;
+    private readonly IconCache _icons;
     /// <summary>
     /// The reader's noise filter, so it can be switched from the overlay.
     /// </summary>
@@ -44,6 +45,34 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// a restart would be no switch at all.
     /// </remarks>
     public NoiseFilter? Noise { get; set; }
+
+    /// <summary>
+    /// How every drawn thing looks - colours, sizes, line widths, and whether it is drawn.
+    /// </summary>
+    /// <remarks>
+    /// Read on the render thread every frame rather than copied into fields on a change, so a
+    /// colour picked in the editor lands on the next frame. Nothing else would do: choosing a
+    /// colour is a thing you do by looking at it, and a value that needs a restart to take
+    /// effect cannot be chosen that way at all.
+    ///
+    /// Handed on to the layers that draw their own things, so there is ONE of these rather
+    /// than one per layer - the editor writes to it, and everything drawn reads from it.
+    /// </remarks>
+    public OverlayStyle Style
+    {
+        get => _style;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _style = value;
+            if (_poi is not null)
+            {
+                _poi.Style = value;
+            }
+        }
+    }
+
+    private OverlayStyle _style = new();
 
     /// <summary>
     /// Called when a setting the user can see was changed, so it can be written down.
@@ -111,6 +140,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private DissectorWindow? _dissector;
     private EntityBrowserWindow? _entityBrowser;
     private PoiLayer? _poi;
+    private StyleWindow? _styleWindow;
+
+    /// <summary>
+    /// Adds the appearance editor, and says where its choices should be written down.
+    /// </summary>
+    /// <remarks>
+    /// The saving is somebody else's, like every other setting here: the overlay draws, and
+    /// where a file lives is not its business. Attaching this is also what makes the editor
+    /// reachable at all - without it the style still applies, it just cannot be changed from
+    /// in the game.
+    /// </remarks>
+    public void AttachStyleEditor(Action saved, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(saved);
+        _styleWindow = new StyleWindow(Style, saved) { Visible = visible };
+    }
 
     /// <summary>Radius in pixels of an entity dot.</summary>
     private const float DotRadius = 5f;
@@ -195,13 +240,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // The layer never touches the renderer directly - it is handed the two operations
         // it needs, which is what keeps its projection maths testable away from a GPU.
-        _terrain = new TerrainLayer(
-            (key, image, srgb) =>
-            {
-                AddOrGetImagePointer(key, image, srgb, out IntPtr handle);
-                return handle;
-            },
-            key => RemoveImage(key));
+        _terrain = new TerrainLayer(Upload, key => RemoveImage(key));
+        _icons = new IconCache(Upload, key => RemoveImage(key));
+    }
+
+    private IntPtr Upload(string key, SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image, bool srgb)
+    {
+        AddOrGetImagePointer(key, image, srgb, out IntPtr handle);
+        return handle;
     }
 
     /// <summary>
@@ -289,7 +335,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachPointsOfInterest(RoutePlanner planner)
     {
         ArgumentNullException.ThrowIfNull(planner);
-        _poi = new PoiLayer(planner);
+
+        // Takes the style as it stands, and the setter hands it on if it is replaced later -
+        // so the order these two are done in does not matter. It otherwise would, and the
+        // symptom of getting it wrong is a whole layer that ignores the editor.
+        _poi = new PoiLayer(planner)
+        {
+            Style = _style,
+            IconFor = _icons.TextureFor,
+        };
     }
 
     protected override Task PostInitialized()
@@ -298,14 +352,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         return Task.CompletedTask;
     }
 
+    // What the settings page asked for, kept so the style can override it per frame without
+    // either of them losing the other's value.
+    private uint _terrainColour = 0xFF64C8FF;
+    private int _terrainThickness = 1;
+
     /// <summary>Sets the layout's colour and line width. A colour of 0 keeps the current one.</summary>
     public void ApplyTerrainStyle(uint colour, int thickness)
     {
         if (colour != 0)
         {
+            _terrainColour = colour;
             _terrain.Colour = colour;
         }
 
+        _terrainThickness = thickness;
         _terrain.Thickness = thickness;
     }
 
@@ -369,15 +430,48 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                + $" (off by {player.TerrainHeight - here:F0})";
     }
 
-    /// <summary>Releases the terrain texture along with the renderer that holds it.</summary>
+    /// <summary>Releases the textures along with the renderer that holds them.</summary>
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
             _terrain.Dispose();
+            _icons.Dispose();
         }
 
         base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Draws a marker's own picture where one was chosen, and says whether it did.
+    /// </summary>
+    /// <remarks>
+    /// False means "draw it the ordinary way", which covers both no icon and an icon that
+    /// could not be loaded. Those are deliberately the same answer: a marker whose file went
+    /// missing has to still be a marker, because its absence reads as nothing being there.
+    /// </remarks>
+    private bool DrawIcon(ImDrawListPtr draw, string key, Vector2 at, float radius)
+    {
+        LayerStyle style = Style[key];
+        IntPtr texture = _icons.TextureFor(style.Icon);
+        if (texture == IntPtr.Zero)
+        {
+            return false;
+        }
+
+        // Untinted unless a colour was CHOSEN, rather than tinted with the catalogue's
+        // default. Somebody supplying their own picture supplied its colours too, and
+        // multiplying a finished icon by the red that ordinary monsters happen to default to
+        // would make every custom icon look broken. Choosing a colour still tints - which is
+        // what makes one white shape serve every rarity.
+        draw.AddImage(
+            texture,
+            at - new Vector2(radius, radius),
+            at + new Vector2(radius, radius),
+            Vector2.Zero,
+            Vector2.One,
+            style.ColourOr(0xFFFFFFFF));
+        return true;
     }
 
     /// <summary>
@@ -464,6 +558,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _entityBrowser?.Render(_snapshot, _snapshot.Player);
         _dissector?.Render();
         _poi?.DrawPicker(_snapshot, _snapshot.Player);
+        _styleWindow?.Render();
 
         if (ShowStatus)
         {
@@ -505,6 +600,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 continue;
             }
 
+            string key = KeyFor(entity);
+            if (!Style.Visible(key))
+            {
+                continue;
+            }
+
             ScreenPoint point = ProjectGround(entity, width, height);
 
             if (!point.OnScreen)
@@ -512,15 +613,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 continue; // behind the camera or outside the viewport
             }
 
-            uint colour = ColourFor(entity);
+            uint colour = Style.Colour(key);
             var position = new Vector2(point.X, point.Y);
+            float size = Style.Sized(key, DotRadius);
 
-            draw.AddCircleFilled(position, DotRadius, colour);
-            draw.AddCircle(position, DotRadius, OutlineColour, 12, 1.5f);
+            if (!DrawIcon(draw, key, position, size))
+            {
+                draw.AddCircleFilled(position, size, colour);
+                draw.AddCircle(position, size, OutlineColour, 12, Style.Width("entity.outline", 1.5f));
+            }
 
             if (ShowLabels && entity.Kind is EntityKind.Monster or EntityKind.Chest or EntityKind.WorldItem)
             {
-                draw.AddText(position + new Vector2(DotRadius + 3, -7), colour, entity.ShortName);
+                // The dot's own colour unless a label colour was chosen. Matching the dot is
+                // what makes a label readable among forty of them, so it is the default
+                // rather than something to configure your way back to.
+                draw.AddText(
+                    position + new Vector2(size + 3, -7),
+                    Style["entity.label"].ColourOr(colour),
+                    entity.ShortName);
             }
         }
 
@@ -528,11 +639,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (_snapshot.Player is WorldEntity player)
         {
             ScreenPoint point = ProjectGround(player, width, height);
-            if (point.OnScreen)
+            if (point.OnScreen && Style.Visible("entity.player"))
             {
                 var position = new Vector2(point.X, point.Y);
-                draw.AddCircleFilled(position, DotRadius + 2, ColourFor(EntityKind.Player));
-                draw.AddCircle(position, DotRadius + 2, OutlineColour, 16, 2f);
+                float size = Style.Sized("entity.player", DotRadius + 2);
+                if (!DrawIcon(draw, "entity.player", position, size))
+                {
+                    draw.AddCircleFilled(position, size, Style.Colour("entity.player"));
+                    draw.AddCircle(position, size, OutlineColour, 16, Style.Width("entity.outline", 2f));
+                }
             }
 
             if (ShowCalibration)
@@ -796,6 +911,23 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     }
                 }
 
+                if (_styleWindow is not null)
+                {
+                    bool styling = _styleWindow.Visible;
+                    if (ImGui.Checkbox("Appearance  (colour, size and icon of everything drawn)", ref styling))
+                    {
+                        _styleWindow.Visible = styling;
+                    }
+                }
+
+                // Only when there is one. A path that does not work otherwise shows up as a
+                // marker drawn its ordinary way, which is exactly what not setting an icon
+                // looks like - so the setting appears to do nothing at all.
+                foreach (string problem in _icons.Files.Problems)
+                {
+                    ImGui.TextColored(new Vector4(1f, 0.55f, 0.4f, 1f), $"icon:     {problem}");
+                }
+
                 // The kind breakdown doubles as the filter, since "what is out there" and
                 // "what do I want drawn" are the same question asked twice. Note the ##id
                 // suffix: ImGui derives a control's identity from its label, so a label
@@ -916,8 +1048,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ImDrawListPtr draw = ImGui.GetBackgroundDrawList();
 
         // Under the markers: the layout is context, not the thing being looked for.
-        if (ShowTerrain && _snapshot.Terrain is TerrainGrid terrain)
+        if (ShowTerrain && Style.Visible("terrain.outline") && _snapshot.Terrain is TerrainGrid terrain)
         {
+            // The style wins where it says anything, and the settings page's colour and
+            // thickness stand where it does not. Two places can set this and only one of them
+            // was chosen deliberately, so the deliberate one goes on top rather than the two
+            // fighting over a field.
+            LayerStyle outline = Style["terrain.outline"];
+            _terrain.Colour = outline.ColourOr(_terrainColour);
+            _terrain.Thickness = (int)outline.WidthOr(_terrainThickness);
+
             _terrain.Draw(draw, map, terrain, new Vector3(player.WorldX, player.WorldY, player.TerrainHeight));
         }
 
@@ -926,6 +1066,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         foreach (WorldEntity entity in _snapshot.Entities)
         {
             if (!DrawnKinds.Contains(entity.Kind) || !WorthDrawing(entity))
+            {
+                continue;
+            }
+
+            string key = KeyFor(entity);
+            if (!Style.Visible(key))
             {
                 continue;
             }
@@ -939,9 +1085,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 continue;
             }
 
-            float size = radius * SizeFor(entity);
-            draw.AddCircleFilled(at, size, ColourFor(entity));
-            draw.AddCircle(at, size, OutlineColour, 10, 1f);
+            float size = Style.Sized(key, radius * SizeFor(entity));
+            if (!DrawIcon(draw, key, at, size))
+            {
+                draw.AddCircleFilled(at, size, Style.Colour(key));
+                draw.AddCircle(at, size, OutlineColour, 10, Style.Width("entity.outline", 1f));
+            }
         }
 
         // Over the entity dots: a landmark is what the map is being consulted for, so it wins
@@ -1041,44 +1190,29 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         };
     }
 
-    /// <summary>White outline so dots stay readable over any background.</summary>
-    private static uint OutlineColour => ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0f, 0f, 0.8f));
+    /// <summary>Dark outline so dots stay readable over any background.</summary>
+    private uint OutlineColour => Style.Colour("entity.outline");
 
     /// <summary>
-    /// Colour for one entity: drops take their rarity's colour, everything else its kind's.
+    /// Which style entry an entity is drawn from: drops and monsters by rarity, the rest by
+    /// kind.
     /// </summary>
     /// <remarks>
-    /// The game's own item-label colours, because that is the association already learned -
-    /// a yellow dot means the same thing on the floor and on the overlay, with nothing to
-    /// translate.
+    /// The game's own item-label colours are the DEFAULTS behind these keys, because that is
+    /// the association already learned - a yellow dot means the same thing on the floor and on
+    /// the overlay, with nothing to translate. A monster's rarity is drawn from the same
+    /// palette for the same reason: which of forty dots is the rare pack leader is the
+    /// question a monster radar is being consulted for.
     /// </remarks>
-    private static uint ColourFor(WorldEntity entity) => entity.Kind switch
+    private static string KeyFor(WorldEntity entity) => entity.Kind switch
     {
-        EntityKind.WorldItem => entity.Rarity switch
-        {
-            ItemRarity.Magic => Pack(0.45f, 0.55f, 1f),
-            ItemRarity.Rare => Pack(1f, 0.95f, 0.35f),
-            ItemRarity.Unique => Pack(1f, 0.55f, 0.2f),
-            ItemRarity.Currency => Pack(0.9f, 0.75f, 0.55f),
-            _ => Pack(0.85f, 0.85f, 0.85f),
-        },
-
-        // A monster's rarity in the game's own colours as well. Which of forty dots is the
-        // rare pack leader is the question a monster radar is being consulted for, and
-        // answering it with the item palette means there is nothing new to learn.
-        EntityKind.Monster => entity.Rarity switch
-        {
-            ItemRarity.Magic => Pack(0.55f, 0.65f, 1f),
-            ItemRarity.Rare => Pack(1f, 0.95f, 0.35f),
-            ItemRarity.Unique => Pack(1f, 0.5f, 0.15f),
-            _ => Pack(1f, 0.25f, 0.25f),
-        },
-
-        _ => ColourFor(entity.Kind),
+        EntityKind.WorldItem => StyleCatalogue.ForRarity("entity.item", entity.Rarity),
+        EntityKind.Monster => StyleCatalogue.ForRarity("entity.monster", entity.Rarity),
+        _ => StyleCatalogue.ForKind(entity.Kind),
     };
 
     /// <summary>
-    /// How much bigger a dot is than the ordinary one.
+    /// How much bigger a dot is than the ordinary one, before the chosen scale.
     /// </summary>
     /// <remarks>
     /// Colour alone is not enough for the thing that matters most here. A rare pack leader
@@ -1094,19 +1228,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _ => 1f,
         }
         : 1f;
-
-    /// <summary>Colour per entity kind. ImGui packs colours as ABGR.</summary>
-    private static uint ColourFor(EntityKind kind) => kind switch
-    {
-        EntityKind.Player => Pack(0.3f, 1f, 0.3f),
-        EntityKind.Monster => Pack(1f, 0.25f, 0.25f),
-        EntityKind.Chest => Pack(1f, 0.85f, 0.2f),
-        EntityKind.WorldItem => Pack(0.4f, 0.8f, 1f),
-        EntityKind.Npc => Pack(0.6f, 0.9f, 0.6f),
-        EntityKind.Effect => Pack(0.7f, 0.5f, 1f),
-        EntityKind.Terrain => Pack(0.6f, 0.6f, 0.6f),
-        _ => Pack(0.8f, 0.8f, 0.8f),
-    };
 
     private static uint Pack(float r, float g, float b)
         => ImGui.ColorConvertFloat4ToU32(new Vector4(r, g, b, 0.9f));
