@@ -24,7 +24,18 @@ jobs:
   # code. A failure here is real information about exactly which dependency breaks AOT;
   # green here means the ONLY remaining AOT question is runtime behaviour, which needs a
   # live Windows run. Cross-OS AOT publishing is unsupported, hence the Windows runner.
+  #
+  # Waits for test, which is what the question needs anyway: "does this compile through
+  # ILC" is not worth asking about code that does not compile through Roslyn, and a broken
+  # build otherwise fails here too and reports it as an AOT problem. Starting after test
+  # also stops the two jobs racing each other through GitHub's action-resolution service,
+  # which is where CI #95 and #96 both died - "Failed to resolve action download info,
+  # Service Unavailable", before checkout, while the ubuntu job resolved the same two
+  # actions in the same minute. That is GitHub's infrastructure and not something a
+  # workflow can fix, so this is not offered as the cure; it just removes one way to
+  # collide, and it is the right shape regardless.
   aot-publish:
+    needs: test
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
