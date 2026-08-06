@@ -94,3 +94,86 @@ public class OverlaySettingsTests
         }
     }
 }
+
+/// <summary>
+/// The choices that have to survive a restart.
+/// </summary>
+/// <remarks>
+/// Every one of these is decided once and expected to hold. Losing them on each launch is
+/// small and constant, which is the kind of friction nobody reports and nobody stops paying -
+/// so the round trip is worth a test, and so is the fact that an OLD settings file still
+/// loads. A tool that forgets its configuration when it gains an option is worse than one
+/// that never had the option.
+/// </remarks>
+public class OverlaySettingsRoundTripTests
+{
+    private static string TempPath() => Path.Combine(Path.GetTempPath(), $"poeformance-overlay-{Guid.NewGuid():N}.json");
+
+    [Fact]
+    public void EverythingTheUserCanChangeComesBack()
+    {
+        var wanted = new PoEformance.Features.OverlaySettings(
+            PoEformance.Game.Components.ItemRarity.Rare,
+            ShowTerrain: false,
+            TerrainColour: "#112233",
+            TerrainThickness: 3,
+            HideNoise: false,
+            ShowPoi: false,
+            PoiLabels: false,
+            PoiRoutes: false,
+            PoiArrows: false,
+            DotLabels: true);
+
+        string path = TempPath();
+        try
+        {
+            Assert.True(PoEformance.Features.OverlaySettingsStore.Save(wanted, path));
+            Assert.Equal(wanted, PoEformance.Features.OverlaySettingsStore.Load(path));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ASettingsFileWrittenBEFORETheseOptionsExistedStillLoads()
+    {
+        // The upgrade case, and the one that would be found by a user rather than by a test:
+        // a file from the previous version has none of these keys, and the defaults have to
+        // fill in rather than the load failing back to everything-default.
+        string path = TempPath();
+        File.WriteAllText(path, """{"minLootRarity":2,"showTerrain":false,"terrainColour":"#ABCDEF","terrainThickness":2}""");
+
+        try
+        {
+            PoEformance.Features.OverlaySettings loaded = PoEformance.Features.OverlaySettingsStore.Load(path);
+
+            Assert.Equal(PoEformance.Game.Components.ItemRarity.Rare, loaded.MinLootRarity);
+            Assert.Equal("#ABCDEF", loaded.TerrainColour);
+            Assert.False(loaded.ShowTerrain);
+
+            // The new ones take their defaults, which are what the tool did before they existed.
+            Assert.True(loaded.HideNoise);
+            Assert.True(loaded.ShowPoi);
+            Assert.False(loaded.DotLabels);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void TheDefaultsAreWhatTheToolDidBefore()
+    {
+        // A new option that changes behaviour on upgrade is a surprise, and surprises get
+        // blamed on the wrong thing.
+        PoEformance.Features.OverlaySettings fresh = PoEformance.Features.OverlaySettings.Default;
+
+        Assert.True(fresh.HideNoise);
+        Assert.True(fresh.ShowPoi);
+        Assert.True(fresh.PoiRoutes);
+        Assert.False(fresh.DotLabels);
+    }
+}

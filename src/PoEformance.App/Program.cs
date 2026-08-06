@@ -432,16 +432,17 @@ internal static class Program
         overlay.ShowDiagnostics = debug;
         overlay.ShowCalibration = debug;
         overlay.ShowWorldDots = debug;
-        overlay.MinimumLootRarity = settings.MinLootRarity;
-        overlay.ShowTerrain = settings.ShowTerrain;
-        overlay.ApplyTerrainStyle(
-            PoEformance.Features.OverlaySettings.ParseColour(settings.TerrainColour),
-            settings.TerrainThickness);
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.Noise = world.Noise;
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);
+
+        // AFTER the parts it configures are attached, or half of it would be applied to
+        // things that do not exist yet - and silently, since every one of them is optional.
+        overlay.Apply(settings);
+        overlay.SettingsChanged = () =>
+            PoEformance.Features.OverlaySettingsStore.Save(overlay.CurrentSettings(settings));
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();
     }

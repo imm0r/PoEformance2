@@ -14,7 +14,13 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("minLootRarity")] ItemRarity MinLootRarity,
     [property: JsonPropertyName("showTerrain")] bool ShowTerrain = true,
     [property: JsonPropertyName("terrainColour")] string TerrainColour = "#96C8FF",
-    [property: JsonPropertyName("terrainThickness")] int TerrainThickness = 1)
+    [property: JsonPropertyName("terrainThickness")] int TerrainThickness = 1,
+    [property: JsonPropertyName("hideNoise")] bool HideNoise = true,
+    [property: JsonPropertyName("showPoi")] bool ShowPoi = true,
+    [property: JsonPropertyName("poiLabels")] bool PoiLabels = true,
+    [property: JsonPropertyName("poiRoutes")] bool PoiRoutes = true,
+    [property: JsonPropertyName("poiArrows")] bool PoiArrows = true,
+    [property: JsonPropertyName("dotLabels")] bool DotLabels = false)
 {
     /// <summary>
     /// Magic and above, and the layout shown. Path of Exile 2 drops normal-rarity items

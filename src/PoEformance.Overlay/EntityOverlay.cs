@@ -45,6 +45,64 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public NoiseFilter? Noise { get; set; }
 
+    /// <summary>
+    /// Called when a setting the user can see was changed, so it can be written down.
+    /// </summary>
+    /// <remarks>
+    /// Every one of these is a choice made once and expected to hold. Losing them on each
+    /// launch is small and constant, which is the kind of friction that never gets reported
+    /// and never stops - so the toggles say when they moved and somebody else decides where
+    /// that is kept.
+    /// </remarks>
+    public Action? SettingsChanged { get; set; }
+
+    /// <summary>Applies the settings that persist, and remembers them for the next save.</summary>
+    public void Apply(OverlaySettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+
+        MinimumLootRarity = settings.MinLootRarity;
+        ShowTerrain = settings.ShowTerrain;
+        ShowLabels = settings.DotLabels;
+
+        if (Noise is not null)
+        {
+            Noise.Enabled = settings.HideNoise;
+        }
+
+        if (_poi is not null)
+        {
+            _poi.ShowPicker = settings.ShowPoi;
+            _poi.ShowLabels = settings.PoiLabels;
+            _poi.ShowRoutes = settings.PoiRoutes;
+            _poi.ShowArrows = settings.PoiArrows;
+        }
+
+        ApplyTerrainStyle(OverlaySettings.ParseColour(settings.TerrainColour), settings.TerrainThickness);
+    }
+
+    /// <summary>The settings as they stand now, for writing down.</summary>
+    /// <remarks>
+    /// Built from the LIVE state rather than from a copy kept alongside it. Two records of the
+    /// same thing drift, and the one that would be saved is the one nobody is looking at.
+    /// </remarks>
+    public OverlaySettings CurrentSettings(OverlaySettings basis)
+    {
+        ArgumentNullException.ThrowIfNull(basis);
+
+        return basis with
+        {
+            MinLootRarity = MinimumLootRarity,
+            ShowTerrain = ShowTerrain,
+            DotLabels = ShowLabels,
+            HideNoise = Noise?.Enabled ?? basis.HideNoise,
+            ShowPoi = _poi?.ShowPicker ?? basis.ShowPoi,
+            PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
+            PoiRoutes = _poi?.ShowRoutes ?? basis.PoiRoutes,
+            PoiArrows = _poi?.ShowArrows ?? basis.PoiArrows,
+        };
+    }
+
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
     private EntityBrowserWindow? _entityBrowser;
@@ -669,6 +727,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     if (ImGui.Checkbox("Points of interest", ref picking))
                     {
                         _poi.ShowPicker = picking;
+                        SettingsChanged?.Invoke();
                     }
                 }
 
@@ -687,6 +746,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     if (ImGui.Checkbox("Hide noise  (effects, pets, daemons - off to see everything)", ref filtering))
                     {
                         Noise.Enabled = filtering;
+                        SettingsChanged?.Invoke();
                     }
                 }
 
@@ -744,6 +804,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (ImGui.Checkbox("labels", ref labels))
             {
                 ShowLabels = labels;
+                SettingsChanged?.Invoke();
             }
 
             ImGui.SameLine();
