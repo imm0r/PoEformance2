@@ -458,7 +458,7 @@
     },
 
     "FileRecord": {
-      "comment": "One loaded file. AreaChangeCount is the value the area-change counter held when the game loaded it, which is what makes this feature possible: the files whose count EQUALS the counter now are the ones this area brought in. GameHelper2 skips counts below 3, because the first couple of areas of a session load the whole menu with them.",
+      "comment": "One loaded file. AreaChangeCount is the STAMP the game put on it when it loaded, and nothing re-stamps it - so the files carrying the newest stamp in the table are the ones the current area brought in. VERIFIED LIVE (PoE2): the records read as real paths and their stamps read 2 for the core data files, which is what startup files carry. The stamp is trusted; the AreaChangeCounter STATIC is not - it read 188 against a table whose newest stamp was far smaller, so the reader finds the newest stamp itself rather than comparing against that static. GameHelper2 compares against the static and skips stamps below 3, because the first couple of areas of a session load the whole menu with them.",
       "fields": {
         "Name": { "offset": "0x08", "type": "stdWString" },
         "AreaChangeCount": { "offset": "0x40", "type": "i32" }

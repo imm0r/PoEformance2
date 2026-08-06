@@ -506,7 +506,12 @@ internal static class Program
                 // On the area CHANGE rather than on a timer. The list cannot change while
                 // you stand in a zone, so looking again would be thousands of reads to
                 // confirm what is already on screen.
-                if (snapshot.InGame && snapshot.AreaHash != 0 && snapshot.AreaHash != preloadArea)
+                // Not in town, and only on a change of INSTANCE. Both come from the
+                // reference, which learned them: the walk is thousands of reads and a town
+                // has nothing worth listing, while the hash is what distinguishes a new map
+                // from a portal back into the one you were already in.
+                if (snapshot.InGame && snapshot.AreaHash != 0 && snapshot.AreaHash != preloadArea
+                    && snapshot.Area.IsHostile)
                 {
                     preloadArea = snapshot.AreaHash;
                     LookAtWhatLoaded(snapshot.AreaHash);
