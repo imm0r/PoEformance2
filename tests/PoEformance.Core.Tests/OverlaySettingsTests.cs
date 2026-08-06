@@ -177,3 +177,58 @@ public class OverlaySettingsRoundTripTests
         Assert.False(fresh.DotLabels);
     }
 }
+
+/// <summary>
+/// Two things write the settings file and only one of them knows every field.
+/// </summary>
+/// <remarks>
+/// The configuration page shows four settings; the overlay has switches of its own. Sending
+/// the page's four as a whole record gives the rest their DEFAULTS, and saving that resets
+/// every choice made on the overlay - silently, because the page did what it was asked, the
+/// file is valid, and the switches are simply back where they started the next time anybody
+/// looks. This was live for exactly as long as it took to notice.
+/// </remarks>
+public class OverlaySettingsMergeTests
+{
+    private static PoEformance.Features.OverlaySettings Chosen() =>
+        PoEformance.Features.OverlaySettings.Default with
+        {
+            HideNoise = false,
+            ShowPoi = false,
+            PoiRoutes = false,
+            DotLabels = true,
+        };
+
+    [Fact]
+    public void ThePageChangesWhatItSHOWS()
+    {
+        var sent = PoEformance.Features.OverlaySettings.Default with
+        {
+            MinLootRarity = PoEformance.Game.Components.ItemRarity.Rare,
+            TerrainColour = "#010203",
+            TerrainThickness = 4,
+            ShowTerrain = false,
+        };
+
+        PoEformance.Features.OverlaySettings merged = Chosen().MergeFromPage(sent);
+
+        Assert.Equal(PoEformance.Game.Components.ItemRarity.Rare, merged.MinLootRarity);
+        Assert.Equal("#010203", merged.TerrainColour);
+        Assert.Equal(4, merged.TerrainThickness);
+        Assert.False(merged.ShowTerrain);
+    }
+
+    [Fact]
+    public void AndLeavesEVERYTHINGElseAlone()
+    {
+        // The whole point. A record arriving from the page carries defaults for the fields it
+        // does not show, and those defaults are the opposite of what this user chose.
+        PoEformance.Features.OverlaySettings merged =
+            Chosen().MergeFromPage(PoEformance.Features.OverlaySettings.Default);
+
+        Assert.False(merged.HideNoise);
+        Assert.False(merged.ShowPoi);
+        Assert.False(merged.PoiRoutes);
+        Assert.True(merged.DotLabels);
+    }
+}

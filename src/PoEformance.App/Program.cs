@@ -662,7 +662,10 @@ internal static class Program
                         return null;
                     }
 
-                    overlay = sent.Normalised();
+                    // Merged, not replaced: the page sends only the settings it shows, and
+                    // swapping the whole record in would reset the overlay's own switches to
+                    // their defaults - silently, and only noticed later.
+                    overlay = overlay.MergeFromPage(sent).Normalised();
 
                     // Null until the overlay actually starts, which is the normal state for
                     // a --config run without --overlay: the setting is still saved, it just

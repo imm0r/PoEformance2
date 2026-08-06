@@ -29,6 +29,32 @@ public sealed record OverlaySettings(
     /// </summary>
     public static OverlaySettings Default { get; } = new(ItemRarity.Magic);
 
+    /// <summary>
+    /// Takes the fields the configuration page owns, and keeps the rest.
+    /// </summary>
+    /// <remarks>
+    /// TWO THINGS WRITE THIS FILE and only one of them knows every field. The page sends the
+    /// four settings it shows; deserialising that into a whole record gives the others their
+    /// DEFAULTS, and saving it then quietly resets every switch made on the overlay itself.
+    /// Nothing about that failure is visible - the page did what it was asked, the file is
+    /// valid, and the user's choices are simply gone the next time they look.
+    ///
+    /// So the page's values are merged in rather than swapped for. Anything it does not show
+    /// is not its to overwrite.
+    /// </remarks>
+    public OverlaySettings MergeFromPage(OverlaySettings sent)
+    {
+        ArgumentNullException.ThrowIfNull(sent);
+
+        return this with
+        {
+            MinLootRarity = sent.MinLootRarity,
+            ShowTerrain = sent.ShowTerrain,
+            TerrainColour = sent.TerrainColour,
+            TerrainThickness = sent.TerrainThickness,
+        };
+    }
+
     /// <summary>Keeps the value inside the range the overlay understands.</summary>
     /// <remarks>
     /// Currency is not a threshold - it is a classification for drops that carry no rarity
