@@ -76,6 +76,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
 
             _banner.Style = value;
+            _preloadPanel.Style = value;
             _unwalked.Style = value;
             _healthBars.Style = value;
         }
@@ -175,11 +176,43 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _alerts = watcher;
         _alertWindow = new AlertWindow(watcher, saved) { Visible = visible };
         AlertsChanged = saved;
+
+        // The preload list is edited in this window, and it may have been attached first -
+        // both orders happen, so neither attach assumes it went second.
+        if (_preload is not null && PreloadRulesChanged is not null)
+        {
+            _alertWindow.AttachPreload(_preload, _preloadSettings, TookPreload);
+        }
+    }
+
+    /// <summary>Called when the preload alerts changed, so they can be written down.</summary>
+    /// <remarks>
+    /// Their own callback rather than <see cref="AlertsChanged"/>: they are a different list
+    /// in a different file, and one save that wrote both would make deleting an entity rule
+    /// rewrite the preload rules too.
+    /// </remarks>
+    public Action<PreloadSettings>? PreloadRulesChanged { get; set; }
+
+    /// <summary>Takes a change from either editor and passes it on.</summary>
+    private void TookPreload(PreloadSettings changed)
+    {
+        _preloadSettings = changed;
+        _preloadPanel.Enabled = changed.List;
+        PreloadRulesChanged?.Invoke(changed);
     }
 
     private AlertWindow? _alertWindow;
     private PreloadWindow? _preloadWindow;
     private PreloadWatch? _preload;
+    private PreloadSettings _preloadSettings = PreloadSettings.Default;
+    private readonly PreloadPanel _preloadPanel = new();
+
+    /// <summary>The area whose findings have already been said out loud.</summary>
+    /// <remarks>
+    /// Kept so the banner fires ONCE per area rather than on every frame that finds a
+    /// finding. Zero is not an area, so it also covers the state before anything was read.
+    /// </remarks>
+    private uint _announced;
 
     /// <summary>
     /// Adds the "what is in this area" list.
@@ -189,13 +222,77 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// for a tick and runs once per area on its own thread. This only shows the answer, and
     /// offers the button that forces another look.
     /// </remarks>
-    public void AttachPreload(PreloadWatch watch, Action lookAgain, Action sweep, bool visible = false)
+    /// <param name="settings">What the preload alerts do - the banner, the list, the gate.</param>
+    /// <param name="rulesChanged">
+    /// Writes the rules down. Called from the raw-list window as well as the editor, because
+    /// a rule added by pressing "+ watch" on a path is exactly as permanent as a typed one.
+    /// </param>
+    public void AttachPreload(
+        PreloadWatch watch,
+        Action lookAgain,
+        Action sweep,
+        PreloadSettings settings,
+        Action<PreloadSettings> rulesChanged,
+        bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(lookAgain);
         ArgumentNullException.ThrowIfNull(sweep);
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(rulesChanged);
         _preload = watch;
-        _preloadWindow = new PreloadWindow(watch, lookAgain, sweep) { Visible = visible };
+        _preloadSettings = settings;
+        _preloadPanel.Enabled = settings.List;
+        PreloadRulesChanged = rulesChanged;
+        _preloadWindow = new PreloadWindow(
+            watch,
+            lookAgain,
+            sweep,
+            () => TookPreload(_preloadSettings with { Rules = watch.Rules }))
+        {
+            Visible = visible,
+        };
+
+        // The editor for these lives in the alerts window, which may already be attached -
+        // both orders happen depending on how the app is wired, so neither is assumed.
+        _alertWindow?.AttachPreload(watch, settings, TookPreload);
+    }
+
+    /// <summary>
+    /// Says what this area loaded, once, on the way in.
+    /// </summary>
+    /// <remarks>
+    /// Fired from the AREA the findings belong to rather than from a flag the reader sets,
+    /// because the walk finishes on its own thread some moments after the zone changed - so
+    /// "has it been said for this area" is the only question that has a stable answer here.
+    ///
+    /// The area is marked as said even when there was nothing to say. Otherwise every frame
+    /// in a quiet map re-asks a question already answered, and worse, a rule added mid-map
+    /// would announce an area you have been standing in for ten minutes.
+    /// </remarks>
+    private void AnnounceWhatLoaded(long nowMs)
+    {
+        if (_preload is not { Looked: true } watch || !_preloadSettings.Banner)
+        {
+            return;
+        }
+
+        uint area = watch.Area;
+        if (area == 0 || area == _announced)
+        {
+            return;
+        }
+
+        _announced = area;
+
+        string what = watch.Announcement(_preloadSettings.MinFiles);
+        if (what.Length > 0)
+        {
+            _banner.Show(
+                new Alert("In this area", what, 0, 0f, nowMs),
+                StyleCatalogue.Keys.PreloadBanner,
+                StyleCatalogue.Keys.PreloadBannerBack);
+        }
     }
 
     /// <summary>Called when an alert setting was changed, so it can be written down.</summary>
@@ -596,10 +693,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // Before the marker gate, and outside it: the watcher decides for itself where it is
         // quiet, and its own rule is towns rather than "wherever markers are drawn".
-        if (_alerts is not null && _snapshot.InGame)
+        if (_snapshot.InGame)
         {
             long now = Environment.TickCount64;
-            if (_alerts.Look(_snapshot, now) is Alert raised)
+
+            // What the area loaded goes first, so that when both have something to say in the
+            // same frame the live one wins the banner: an entity alert is about something
+            // happening now, and this is about the area, which will still be true in a second.
+            AnnounceWhatLoaded(now);
+
+            if (_alerts is not null && _alerts.Look(_snapshot, now) is Alert raised)
             {
                 _banner.Show(raised);
             }
@@ -607,6 +710,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (width > 0 && height > 0)
             {
                 _banner.Draw(ImGui.GetForegroundDrawList(), width, height, now);
+
+                // Only where the findings are about the ground under your feet. The walk
+                // never runs in a town, so what is held there is the last MAP's list, and
+                // showing that beside the stash would be a straight lie.
+                if (_preload is not null && _snapshot.Area.WantsMarkers)
+                {
+                    _preloadPanel.Draw(
+                        ImGui.GetForegroundDrawList(), width, height, _preload.Findings);
+                }
             }
         }
 

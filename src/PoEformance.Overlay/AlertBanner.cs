@@ -33,17 +33,32 @@ public sealed class AlertBanner
     private const float FromTop = 0.13f;
 
     private Alert? _showing;
+    private string _textKey = StyleCatalogue.Keys.Banner;
+    private string _backKey = StyleCatalogue.Keys.BannerBack;
 
     /// <summary>How every drawn thing looks. Shared with the overlay.</summary>
     public OverlayStyle Style { get; set; } = new();
 
     /// <summary>Takes a new alert to show, replacing whatever was up.</summary>
+    /// <param name="alert">The line to say.</param>
+    /// <param name="textKey">Which catalogue entry it is coloured from. Null for the usual.</param>
+    /// <param name="backKey">And its backing plate.</param>
     /// <remarks>
     /// Replaces rather than queues. A queue would show something that happened five seconds
     /// ago in the middle of what is happening now, and the watcher has already decided this
     /// one is the most important thing it has to say.
+    ///
+    /// The colours travel WITH the line rather than being a setting on the banner, because two
+    /// callers share this one place on the screen and are meant to look unlike each other -
+    /// what an area loaded is not the same kind of news as a unique appearing beside you.
+    /// Setting them on the banner would colour whichever line happened to be up at the time.
     /// </remarks>
-    public void Show(Alert alert) => _showing = alert;
+    public void Show(Alert alert, string? textKey = null, string? backKey = null)
+    {
+        _showing = alert;
+        _textKey = textKey ?? StyleCatalogue.Keys.Banner;
+        _backKey = backKey ?? StyleCatalogue.Keys.BannerBack;
+    }
 
     /// <summary>Clears whatever is up.</summary>
     public void Clear() => _showing = null;
@@ -51,7 +66,7 @@ public sealed class AlertBanner
     /// <summary>Draws the line, if there is one and it has not faded out.</summary>
     public void Draw(ImDrawListPtr draw, int width, int height, long nowMs)
     {
-        if (_showing is not Alert alert || !Style.Visible(StyleCatalogue.Keys.Banner))
+        if (_showing is not Alert alert || !Style.Visible(_textKey))
         {
             return;
         }
@@ -84,10 +99,10 @@ public sealed class AlertBanner
         draw.AddRectFilled(
             at - new Vector2(14f, 8f),
             at + size + new Vector2(14f, 8f),
-            Fade(Style.Colour(StyleCatalogue.Keys.BannerBack), alpha),
+            Fade(Style.Colour(_backKey), alpha),
             5f);
 
-        draw.AddText(at, Fade(Style.Colour(StyleCatalogue.Keys.Banner), alpha), line);
+        draw.AddText(at, Fade(Style.Colour(_textKey), alpha), line);
 
         // How far away, under the line and quieter. It answers the question the line
         // provokes - "where" - without competing with what the thing actually is.
@@ -96,7 +111,7 @@ public sealed class AlertBanner
             Vector2 awaySize = ImGui.CalcTextSize(away);
             draw.AddText(
                 new Vector2((width - awaySize.X) / 2f, at.Y + size.Y + 3f),
-                Fade(Style.Colour(StyleCatalogue.Keys.Banner), alpha * 0.65f),
+                Fade(Style.Colour(_textKey), alpha * 0.65f),
                 away);
         }
     }

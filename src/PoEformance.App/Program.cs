@@ -411,6 +411,12 @@ internal static class Program
         uint preloadArea = 0;
         int preloadBusy = 0;
 
+        // What a loaded path MEANS is the user's list rather than this file's. It grows every
+        // league, from whoever is reading the raw paths on the day the tool has nothing to say
+        // about a new thing - so it is read from disk here and added to from that same window.
+        PoEformance.Features.PreloadSettings preloadSettings = PoEformance.Features.PreloadStore.Load();
+        preload.UseRules(preloadSettings.Watching);
+
         void SweepForTheCountField()
         {
             if (fileRoot == 0 || areaCounter == 0)
@@ -554,7 +560,12 @@ internal static class Program
         overlay.Noise = world.Noise;
         overlay.Costs = costs;
         overlay.Coverage = coverage;
-        overlay.AttachPreload(preload, () => LookAtWhatLoaded(preloadArea), SweepForTheCountField);
+        overlay.AttachPreload(
+            preload,
+            () => LookAtWhatLoaded(preloadArea),
+            SweepForTheCountField,
+            preloadSettings,
+            changed => PoEformance.Features.PreloadStore.Save(changed));
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);

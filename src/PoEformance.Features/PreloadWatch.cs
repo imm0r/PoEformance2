@@ -25,53 +25,23 @@ public enum PreloadWeight
 /// beside it. Rather than curate an ever-growing list of paths to distrust, the number says
 /// how much there is to distrust: "Breach 40" and "Delirium 1" need no further explanation.
 /// </remarks>
-public sealed record PreloadFinding(string Name, PreloadWeight Weight, string Path, int Files = 0);
+/// <param name="Alert">
+/// Whether the rule behind it asked to be announced, as opposed to only listed. Copied onto
+/// the finding so that whoever draws the banner needs the findings and nothing else.
+/// </param>
+public sealed record PreloadFinding(
+    string Name, PreloadWeight Weight, string Path, int Files = 0, bool Alert = false);
 
 /// <summary>
 /// What a loaded-file path means, for the handful of paths that mean something.
 /// </summary>
 /// <remarks>
-/// The file list runs to a few thousand paths and almost all of it is scenery. What makes the
-/// feature useful is the short list of paths that ARE worth a line, and that list is data
-/// rather than code: it grows every league, from whoever is looking at the raw list when
-/// something new turns up.
-///
-/// MATCHED LOOSELY, on a fragment of the path. The full paths carry variant suffixes and
-/// league-specific folders that change between patches, while the fragment that names the
-/// thing - "Breach", "Expedition", "Ritual" - does not. A fragment that stops matching is a
-/// line missing from a list; a full path that stops matching is the same, with more work to
-/// find out why.
+/// The rules themselves live in <see cref="PreloadRule"/> and belong to whoever is playing.
+/// What stays here is the one judgement that is not a preference: which paths cannot testify
+/// about the area at all.
 /// </remarks>
 public static class PreloadMeanings
 {
-    /// <summary>
-    /// What to look for, longest fragment first.
-    /// </summary>
-    /// <remarks>
-    /// Order matters where one fragment contains another - the first match wins, so anything
-    /// more specific has to come before the thing it is a kind of.
-    /// </remarks>
-    public static IReadOnlyList<PreloadFinding> Known { get; } =
-    [
-        // League mechanics. The reason to look at this before entering an area at all.
-        new("Breach", PreloadWeight.Valuable, "/Breach/"),
-        new("Expedition", PreloadWeight.Valuable, "/Expedition/"),
-        new("Ritual", PreloadWeight.Valuable, "/Ritual/"),
-        new("Delirium", PreloadWeight.Valuable, "/Delirium/"),
-        new("Essence", PreloadWeight.Valuable, "/Essence/"),
-        new("Ultimatum", PreloadWeight.Valuable, "/Ultimatum/"),
-        new("Legion", PreloadWeight.Valuable, "/Legion/"),
-        new("Abyss", PreloadWeight.Valuable, "/Abyss/"),
-        new("Harvest", PreloadWeight.Valuable, "/Harvest/"),
-        new("Strongbox", PreloadWeight.Notable, "StrongBoxes/"),
-        new("Shrine", PreloadWeight.Notable, "/Shrines/"),
-
-        // Things that make a map harder rather than richer. Worth knowing at the entrance
-        // rather than at the moment one lands on you.
-        new("Rogue exile", PreloadWeight.Dangerous, "/ExileLeague"),
-        new("Beyond demon", PreloadWeight.Dangerous, "/BeyondDemons/"),
-    ];
-
     /// <summary>
     /// Paths that cannot testify about the area you are standing in, whatever they contain.
     /// </summary>
@@ -90,8 +60,35 @@ public static class PreloadMeanings
         "/WorldMaps/Maps/Doodads/Pins/",
     ];
 
-    /// <summary>What a path means, or null when it is one of the thousands that mean nothing.</summary>
-    public static PreloadFinding? Meaning(string path)
+    /// <summary>
+    /// The part of a path worth watching for: the folder the file sits in.
+    /// </summary>
+    /// <remarks>
+    /// What "+ watch" on a row of the raw list turns that row into. A whole path is too
+    /// specific to be a rule: the game renames and re-versions individual files between
+    /// patches while the folder that names the thing - Ritual, Breach, StrongBoxes - stays
+    /// put, which is why every shipped rule is a folder rather than a file.
+    ///
+    /// Slashes on both sides, so "/Abyss/" cannot match an AbyssalCrystal sitting in some
+    /// other folder. A path with no folder falls back to itself: there is nothing better to
+    /// use, and a rule somebody can see and delete beats refusing to add one.
+    /// </remarks>
+    public static string WatchableFragment(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        int file = path.LastIndexOf('/');
+        if (file <= 0)
+        {
+            return path;
+        }
+
+        int folder = path.LastIndexOf('/', file - 1);
+        return folder < 0 ? path[..(file + 1)] : path[folder..(file + 1)];
+    }
+
+    /// <summary>Whether a path is one that says nothing about where you are standing.</summary>
+    public static bool CannotTestify(string path)
     {
         ArgumentNullException.ThrowIfNull(path);
 
@@ -99,15 +96,37 @@ public static class PreloadMeanings
         {
             if (path.Contains(blind, StringComparison.OrdinalIgnoreCase))
             {
-                return null;
+                return true;
             }
         }
 
-        foreach (PreloadFinding known in Known)
+        return false;
+    }
+
+    /// <summary>
+    /// What a path means under a set of rules, or null when it means nothing.
+    /// </summary>
+    /// <remarks>
+    /// The FIRST matching rule wins, so a list can put something specific above the thing it
+    /// is a kind of. Everything else about the order is the user's, including the ways it can
+    /// be got wrong - a rule matching "/Maps/" above everything else will happily report every
+    /// area as one finding, and that is visible in the window rather than silently prevented.
+    /// </remarks>
+    public static PreloadFinding? Meaning(string path, IReadOnlyList<PreloadRule> rules)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(rules);
+
+        if (CannotTestify(path))
         {
-            if (path.Contains(known.Path, StringComparison.OrdinalIgnoreCase))
+            return null;
+        }
+
+        foreach (PreloadRule rule in rules)
+        {
+            if (rule.Matches(path))
             {
-                return known with { Path = path };
+                return new PreloadFinding(rule.Name, rule.Weight, path, 0, rule.Alert);
             }
         }
 
@@ -130,6 +149,7 @@ public sealed class PreloadWatch
     private readonly object _gate = new();
     private IReadOnlyList<PreloadFinding> _findings = [];
     private IReadOnlyList<string> _all = [];
+    private IReadOnlyList<PreloadRule> _rules = DefaultPreloadRules.Rules;
 
     /// <summary>The area these belong to.</summary>
     public uint Area { get; private set; }
@@ -183,6 +203,71 @@ public sealed class PreloadWatch
         }
     }
 
+    /// <summary>What a path has to contain to be worth a line. Replaceable while running.</summary>
+    public IReadOnlyList<PreloadRule> Rules
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _rules;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Takes a new set of rules and re-reads the area under them.
+    /// </summary>
+    /// <remarks>
+    /// Re-read from the paths already in hand rather than by walking memory again. The walk
+    /// costs a whole read budget and the raw list cannot change while you stand in an area -
+    /// so adding a rule shows its finding immediately, which is the difference between an
+    /// editor somebody trusts and one they have to reload an area to test.
+    /// </remarks>
+    public void UseRules(IEnumerable<PreloadRule> rules)
+    {
+        ArgumentNullException.ThrowIfNull(rules);
+
+        lock (_gate)
+        {
+            _rules = [.. rules];
+            _findings = Read(_all, _rules);
+        }
+    }
+
+    /// <summary>
+    /// Adds one rule, unless an indistinguishable one is already there.
+    /// </summary>
+    /// <returns>Whether it was added, so a caller can say why nothing happened.</returns>
+    /// <remarks>
+    /// Adding is a two-click operation from a list of thousands of paths, so the same thing
+    /// gets added twice. Matched on the FRAGMENT rather than the name: two rules with the same
+    /// fragment produce one finding whatever they are called, and the second is dead weight
+    /// that only shows up as a line the delete button appears not to remove.
+    /// </remarks>
+    public bool AddRule(PreloadRule rule)
+    {
+        ArgumentNullException.ThrowIfNull(rule);
+
+        if (rule.SaysNothing)
+        {
+            return false;
+        }
+
+        lock (_gate)
+        {
+            if (_rules.Any(known =>
+                    known.PathContains.Equals(rule.PathContains, StringComparison.OrdinalIgnoreCase)))
+            {
+                return false;
+            }
+
+            _rules = [.. _rules, rule];
+            _findings = Read(_all, _rules);
+            return true;
+        }
+    }
+
     /// <summary>Takes a fresh file list and works out what it means.</summary>
     public void Took(uint area, IEnumerable<string> paths, string note = "")
     {
@@ -191,6 +276,20 @@ public sealed class PreloadWatch
         List<string> all = [.. paths];
         all.Sort(StringComparer.Ordinal);
 
+        lock (_gate)
+        {
+            Area = area;
+            Looked = true;
+            Note = note;
+            _all = all;
+            _findings = Read(all, _rules);
+        }
+    }
+
+    /// <summary>What a list of loaded paths turns out to contain, under a set of rules.</summary>
+    private static IReadOnlyList<PreloadFinding> Read(
+        IReadOnlyList<string> all, IReadOnlyList<PreloadRule> rules)
+    {
         // Deduplicated by NAME rather than by path: an area loads a dozen files for one
         // breach, and "Breach" thirteen times is not a summary of anything. The dozen is not
         // thrown away though - it is counted, because how MANY files a mechanic dragged in is
@@ -199,7 +298,7 @@ public sealed class PreloadWatch
         var byName = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (string path in all)
         {
-            if (PreloadMeanings.Meaning(path) is not PreloadFinding finding)
+            if (PreloadMeanings.Meaning(path, rules) is not PreloadFinding finding)
             {
                 continue;
             }
@@ -229,14 +328,7 @@ public sealed class PreloadWatch
             ? b.Weight.CompareTo(a.Weight)
             : b.Files.CompareTo(a.Files));
 
-        lock (_gate)
-        {
-            Area = area;
-            Looked = true;
-            Note = note;
-            _all = all;
-            _findings = findings;
-        }
+        return findings;
     }
 
     /// <summary>Whether a path defines an item rather than showing something in the world.</summary>
@@ -269,5 +361,30 @@ public sealed class PreloadWatch
         return findings.Count == 0
             ? string.Empty
             : string.Join(", ", findings.Select(f => f.Files <= 1 ? f.Name + "?" : f.Name));
+    }
+
+    /// <summary>
+    /// The findings worth saying out loud on the way in.
+    /// </summary>
+    /// <remarks>
+    /// Two gates, and they answer different questions. The rule's own flag is "do I care about
+    /// this at all" - strongboxes are in most areas, so a banner naming them teaches the eye to
+    /// skip the line that also says Ultimatum. The file count is "is it really here": a single
+    /// matching file is usually a mention somewhere, and a banner is the one place where the
+    /// marginal case should stay quiet, because unlike the window it cannot be gone back to.
+    /// </remarks>
+    public IReadOnlyList<PreloadFinding> Announceable(int minFiles)
+        => [.. Findings.Where(finding => finding.Alert && finding.Files >= Math.Max(1, minFiles))];
+
+    /// <summary>The one line a banner says, or empty when there is nothing worth one.</summary>
+    /// <remarks>
+    /// The file counts are left out here and kept in the list. A banner is read in the moment
+    /// you walk in, with the fight already starting; "Breach, Ritual" is that sentence, and
+    /// "Breach 43 files, Ritual 12 files" is a table being read aloud.
+    /// </remarks>
+    public string Announcement(int minFiles)
+    {
+        IReadOnlyList<PreloadFinding> worth = Announceable(minFiles);
+        return worth.Count == 0 ? string.Empty : string.Join(", ", worth.Select(finding => finding.Name));
     }
 }

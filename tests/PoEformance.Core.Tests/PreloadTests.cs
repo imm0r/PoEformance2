@@ -238,8 +238,8 @@ public class PreloadWatchTests
     [Fact]
     public void AMechanicIsRecognisedFromItsFolder()
     {
-        Assert.Equal("Breach", PreloadMeanings.Meaning("Metadata/Terrain/Leagues/Breach/Thing")?.Name);
-        Assert.Equal("Ritual", PreloadMeanings.Meaning("Art/Textures/Leagues/Ritual/Altar")?.Name);
+        Assert.Equal("Breach", PreloadMeanings.Meaning("Metadata/Terrain/Leagues/Breach/Thing", DefaultPreloadRules.Rules)?.Name);
+        Assert.Equal("Ritual", PreloadMeanings.Meaning("Art/Textures/Leagues/Ritual/Altar", DefaultPreloadRules.Rules)?.Name);
     }
 
     [Fact]
@@ -247,8 +247,8 @@ public class PreloadWatchTests
     {
         // Almost everything in the list is this, which is the reason the meanings are a short
         // curated list rather than an attempt to parse a path.
-        Assert.Null(PreloadMeanings.Meaning("Metadata/Terrain/Dungeon/Rocks/Rock_01"));
-        Assert.Null(PreloadMeanings.Meaning("Art/Models/Ground/Grass"));
+        Assert.Null(PreloadMeanings.Meaning("Metadata/Terrain/Dungeon/Rocks/Rock_01", DefaultPreloadRules.Rules));
+        Assert.Null(PreloadMeanings.Meaning("Art/Models/Ground/Grass", DefaultPreloadRules.Rules));
     }
 
     [Fact]
@@ -304,13 +304,12 @@ public class PreloadWatchTests
     [Fact]
     public void EveryMeaningIsUsableAndDistinct()
     {
-        string[] names = [.. PreloadMeanings.Known.Select(k => k.Name)];
+        string[] names = [.. DefaultPreloadRules.Rules.Select(rule => rule.Name)];
         Assert.Equal(names.Length, names.Distinct(StringComparer.Ordinal).Count());
 
-        foreach (PreloadFinding known in PreloadMeanings.Known)
+        foreach (PreloadRule rule in DefaultPreloadRules.Rules)
         {
-            Assert.False(string.IsNullOrWhiteSpace(known.Name));
-            Assert.False(string.IsNullOrWhiteSpace(known.Path));
+            Assert.False(rule.SaysNothing, $"{rule.Name} looks for nothing");
         }
     }
 
@@ -371,10 +370,11 @@ public class PreloadWatchTests
         // the icon drawn on the world map SCREEN for some other map; its league folder says
         // nothing about the ground under your feet, and it is loaded in every area forever.
         Assert.Null(PreloadMeanings.Meaning(
-            "Metadata/Terrain/WorldMaps/Maps/Doodads/Pins/Leagues/Delirium/Delirium01.ao"));
+            "Metadata/Terrain/WorldMaps/Maps/Doodads/Pins/Leagues/Delirium/Delirium01.ao",
+            DefaultPreloadRules.Rules));
 
         // The same mechanic still reports when something real carries it.
-        Assert.Equal("Delirium", PreloadMeanings.Meaning("Art/Models/Leagues/Delirium/Fog")?.Name);
+        Assert.Equal("Delirium", PreloadMeanings.Meaning("Art/Models/Leagues/Delirium/Fog", DefaultPreloadRules.Rules)?.Name);
     }
 
     [Fact]
@@ -743,5 +743,259 @@ public class PreloadNewestStampTests
 
         Assert.Contains("whole game", reader.LastError, StringComparison.Ordinal);
         Assert.DoesNotContain("moved", reader.LastError, StringComparison.Ordinal);
+    }
+}
+
+/// <summary>
+/// The rules that say what a loaded path means, now that they belong to whoever is playing.
+/// </summary>
+/// <remarks>
+/// Written from the request that produced them: being able to search the raw list for the path
+/// you care about and watch for it, instead of waiting for a release to add it. Everything here
+/// is about the ways that can go wrong - a rule that matches everything, the same rule added
+/// twice, and a banner that fires on a single stray file.
+/// </remarks>
+public class PreloadRuleTests
+{
+    [Fact]
+    public void ARuleWithNoFragmentLooksForNOTHING()
+    {
+        // The one thing this feature must never do. An empty fragment is contained by every
+        // string, so a rule carrying one would report the whole file table as one finding -
+        // and an add box somebody hit return in is exactly where such a rule comes from.
+        Assert.True(new PreloadRule("Everything", string.Empty).SaysNothing);
+        Assert.True(new PreloadRule("Everything", "   ").SaysNothing);
+        Assert.False(new PreloadRule("Everything", "   ").Matches("Metadata/Whatever"));
+    }
+
+    [Fact]
+    public void ARuleMatchesWhateverTheCaseItWasTypedIn()
+    {
+        // Nobody types the game's capitalisation, and the paths in the table are not
+        // consistent about it either.
+        Assert.True(new PreloadRule("Ritual", "/ritual/").Matches("Art/Leagues/Ritual/Altar"));
+        Assert.False(new PreloadRule("Ritual", "/ritual/").Matches("Art/Leagues/Breach/Hand"));
+    }
+
+    [Fact]
+    public void ADisabledRuleIsKeptAndNotActedOn()
+    {
+        // The difference between switching a rule off and deleting it. Both have to exist:
+        // one is "not this map", the other is "never again".
+        Assert.False(new PreloadRule("Ritual", "/Ritual/", Enabled: false).Matches("Leagues/Ritual/A"));
+    }
+
+    [Fact]
+    public void THEFragmentAddedFromAPathIsTheFolderRatherThanTheFile()
+    {
+        // The file is renamed and re-versioned between patches; the folder that names the
+        // thing does not move. Slashes both sides, so it cannot match a similarly-named file
+        // somewhere else entirely.
+        Assert.Equal("/Ritual/", PreloadMeanings.WatchableFragment("Art/Leagues/Ritual/Altar_02.ao"));
+        Assert.Equal("/Breach/", PreloadMeanings.WatchableFragment("Metadata/Terrain/Leagues/Breach/Hand.ao"));
+    }
+
+    [Fact]
+    public void ANDAPathWithNoFolderFallsBackToItself()
+    {
+        // Nothing better to use. A rule somebody can see and delete beats refusing to add one
+        // and leaving them wondering which of the two buttons they got wrong.
+        Assert.Equal("Rock_01", PreloadMeanings.WatchableFragment("Rock_01"));
+        Assert.Equal("Art/", PreloadMeanings.WatchableFragment("Art/Grass"));
+    }
+}
+
+/// <summary>Adding to the list while the tool is running, and what that changes.</summary>
+public class PreloadEditingTests
+{
+    private static readonly string[] Loaded =
+    [
+        "Art/Leagues/Ritual/Altar_01.ao",
+        "Art/Leagues/Ritual/Altar_02.ao",
+        "Metadata/Terrain/Dungeon/Rocks/Rock_01.ao",
+    ];
+
+    [Fact]
+    public void ANEWRuleReReadsTheAreaAlreadyInHand()
+    {
+        // The point of adding from the window that shows the paths: the finding appears at
+        // once. Walking the file table again costs a whole read budget, and the list cannot
+        // have changed while you stand there - so the answer comes from the paths in hand.
+        var watch = new PreloadWatch();
+        watch.UseRules([]);
+        watch.Took(1, Loaded);
+        Assert.Empty(watch.Findings);
+
+        Assert.True(watch.AddRule(new PreloadRule("Ritual", "/Ritual/", PreloadWeight.Valuable)));
+
+        PreloadFinding found = Assert.Single(watch.Findings);
+        Assert.Equal("Ritual", found.Name);
+        Assert.Equal(2, found.Files);
+    }
+
+    [Fact]
+    public void THESameFragmentIsNotAddedTwice()
+    {
+        // Adding is two clicks from a list of thousands, so the same thing gets added twice.
+        // Matched on the FRAGMENT, not the name: two rules with one fragment produce a single
+        // finding whatever they are called, and the second is a line the delete button appears
+        // not to remove.
+        var watch = new PreloadWatch();
+        watch.UseRules([]);
+
+        Assert.True(watch.AddRule(new PreloadRule("Ritual", "/Ritual/")));
+        Assert.False(watch.AddRule(new PreloadRule("Rituals, again", "/ritual/")));
+        Assert.Single(watch.Rules);
+    }
+
+    [Fact]
+    public void ARuleThatLooksForNothingIsRefused()
+    {
+        var watch = new PreloadWatch();
+        watch.UseRules([]);
+
+        Assert.False(watch.AddRule(new PreloadRule("Everything", string.Empty)));
+        Assert.Empty(watch.Rules);
+    }
+
+    [Fact]
+    public void REMOVINGARuleTakesItsFindingWithIt()
+    {
+        var watch = new PreloadWatch();
+        watch.UseRules([new PreloadRule("Ritual", "/Ritual/")]);
+        watch.Took(1, Loaded);
+        Assert.Single(watch.Findings);
+
+        watch.UseRules([]);
+        Assert.Empty(watch.Findings);
+    }
+}
+
+/// <summary>What gets said out loud on the way in, as opposed to merely listed.</summary>
+public class PreloadAnnouncementTests
+{
+    private static PreloadWatch Watching(params string[] paths)
+    {
+        var watch = new PreloadWatch();
+        watch.UseRules(
+        [
+            new PreloadRule("Ritual", "/Ritual/", PreloadWeight.Valuable),
+            new PreloadRule("Strongbox", "/StrongBoxes/", PreloadWeight.Notable, Alert: false),
+        ]);
+
+        watch.Took(1, paths);
+        return watch;
+    }
+
+    [Fact]
+    public void ASingleStrayFileDoesNotInterruptAnybody()
+    {
+        // One matching file is a mention somewhere - a pinnacle key is defined whether or not
+        // the mechanic is in this map. The window still shows it, marked; the banner is the
+        // one place the marginal case has to stay quiet, because it cannot be gone back to.
+        PreloadWatch watch = Watching("Art/Leagues/Ritual/Altar_01.ao");
+
+        Assert.Single(watch.Findings);
+        Assert.Empty(watch.Announceable(PreloadSettings.DefaultMinFiles));
+        Assert.Equal(string.Empty, watch.Announcement(PreloadSettings.DefaultMinFiles));
+    }
+
+    [Fact]
+    public void ANDAWholeArtSetDoes()
+    {
+        PreloadWatch watch = Watching(
+            "Art/Leagues/Ritual/Altar_01.ao",
+            "Art/Leagues/Ritual/Altar_02.ao",
+            "Art/Leagues/Ritual/Rune.ao");
+
+        Assert.Equal("Ritual", watch.Announcement(PreloadSettings.DefaultMinFiles));
+    }
+
+    [Fact]
+    public void ARuleThatAsksNotToBeAnnouncedIsStillListed()
+    {
+        // Strongboxes are in most areas. Announcing them teaches the eye to skip the line
+        // that also says Ultimatum, which is the failure this whole feature is one step from.
+        PreloadWatch watch = Watching(
+            "Metadata/Chests/StrongBoxes/Arcanist.ao",
+            "Metadata/Chests/StrongBoxes/Armoury.ao",
+            "Metadata/Chests/StrongBoxes/Ornate.ao");
+
+        Assert.Single(watch.Findings);
+        Assert.Equal(string.Empty, watch.Announcement(PreloadSettings.DefaultMinFiles));
+    }
+
+    [Fact]
+    public void AGateOfZeroStillNeedsOneFile()
+    {
+        // A slider dragged to nothing, or a hand-edited file. Zero would make every rule fire
+        // on an area that contains none of it, since a finding with no files does not exist.
+        PreloadWatch watch = Watching("Art/Leagues/Ritual/Altar_01.ao");
+        Assert.Equal("Ritual", watch.Announcement(0));
+    }
+}
+
+/// <summary>Keeping the list between sessions.</summary>
+public class PreloadStoreTests
+{
+    [Fact]
+    public void WhatWasAddedSurvivesARestart()
+    {
+        string file = Path.Combine(Path.GetTempPath(), $"preload-{Guid.NewGuid():N}.json");
+        try
+        {
+            var settings = new PreloadSettings(
+                Banner: false,
+                List: true,
+                MinFiles: 5,
+                Rules: [new PreloadRule("Ritual", "/Ritual/", PreloadWeight.Dangerous, Alert: false)]);
+
+            Assert.True(PreloadStore.Save(settings, file));
+
+            PreloadSettings back = PreloadStore.Load(file);
+            Assert.False(back.Banner);
+            Assert.Equal(5, back.MinFiles);
+
+            PreloadRule rule = Assert.Single(back.Watching);
+            Assert.Equal("Ritual", rule.Name);
+            Assert.Equal("/Ritual/", rule.PathContains);
+            Assert.Equal(PreloadWeight.Dangerous, rule.Weight);
+            Assert.False(rule.Alert);
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
+    [Fact]
+    public void AHandEditedRuleThatMatchesEverythingIsDroppedOnTheWayIn()
+    {
+        string file = Path.Combine(Path.GetTempPath(), $"preload-{Guid.NewGuid():N}.json");
+        try
+        {
+            File.WriteAllText(
+                file,
+                """{"banner":true,"list":true,"minFiles":2,"rules":[{"name":"Oops","pathContains":""}]}""");
+
+            // Empty rather than the shipped defaults: the file DID choose, and it chose one
+            // unusable rule. Handing back the defaults would quietly re-add things somebody
+            // had deleted.
+            Assert.Empty(PreloadStore.Load(file).Watching);
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
+    [Fact]
+    public void ANDAMissingFileTakesTheShippedList()
+    {
+        PreloadSettings fresh = PreloadStore.Load(
+            Path.Combine(Path.GetTempPath(), $"preload-{Guid.NewGuid():N}.json"));
+
+        Assert.NotEmpty(fresh.Watching);
+        Assert.True(fresh.Banner);
     }
 }

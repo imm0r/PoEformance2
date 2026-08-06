@@ -37,18 +37,23 @@ public sealed class PreloadWindow
     private readonly PreloadWatch _watch;
     private readonly Action _lookAgain;
     private readonly Action _sweep;
+    private readonly Action _rulesChanged;
     private string _search = string.Empty;
+    private string _said = string.Empty;
 
     /// <param name="lookAgain">Runs the walk again, for when it needs forcing.</param>
     /// <param name="sweep">Looks for the count field instead of assuming one - see below.</param>
-    public PreloadWindow(PreloadWatch watch, Action lookAgain, Action sweep)
+    /// <param name="rulesChanged">Writes down a rule somebody added from the raw list.</param>
+    public PreloadWindow(PreloadWatch watch, Action lookAgain, Action sweep, Action rulesChanged)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(lookAgain);
         ArgumentNullException.ThrowIfNull(sweep);
+        ArgumentNullException.ThrowIfNull(rulesChanged);
         _watch = watch;
         _lookAgain = lookAgain;
         _sweep = sweep;
+        _rulesChanged = rulesChanged;
     }
 
     /// <summary>Whether the window is on screen.</summary>
@@ -160,10 +165,7 @@ public sealed class PreloadWindow
         }
 
         ImGui.Separator();
-        ImGui.SetNextItemWidth(240f);
-        ImGui.InputText("search the raw list", ref _search, 96);
-        ImGui.SameLine();
-        ImGui.TextColored(DimText, "click a path to copy it");
+        DrawSearch();
 
         if (!ImGui.BeginChild("preload-raw", Vector2.Zero, ImGuiChildFlags.Borders))
         {
@@ -181,13 +183,27 @@ public sealed class PreloadWindow
                     continue;
                 }
 
-                // Copying is the point of the list: a path worth a line goes into the
-                // meanings, and typing one of these out by hand is not something anybody
-                // would do twice.
-                if (ImGui.Selectable($"{path}###preload{shown}"))
+                ImGui.PushID(shown);
+
+                // The whole point of the raw list, and the reason it is searchable: a path
+                // that turns out to mean something becomes a rule from here, without anybody
+                // having to type it or wait for a release. What is WATCHED for is the folder
+                // rather than this exact file - see Fragment.
+                if (ImGui.SmallButton("+ watch"))
+                {
+                    Add(PreloadMeanings.WatchableFragment(path));
+                }
+
+                ImGui.SameLine();
+
+                // Copying still, because a path is also the thing you paste to somebody else
+                // when it needs looking at rather than watching for.
+                if (ImGui.Selectable(path))
                 {
                     ImGui.SetClipboardText(path);
                 }
+
+                ImGui.PopID();
 
                 if (++shown >= 400)
                 {
@@ -200,5 +216,51 @@ public sealed class PreloadWindow
         {
             ImGui.EndChild();
         }
+    }
+
+    private void DrawSearch()
+    {
+        ImGui.SetNextItemWidth(240f);
+        bool entered = ImGui.InputText(
+            "###preload-search", ref _search, 96, ImGuiInputTextFlags.EnterReturnsTrue);
+
+        ImGui.SameLine();
+
+        // Adding what was TYPED, not what was clicked. Somebody searching "ritual" has
+        // already said what they care about, and it is a better rule than any single path
+        // the search turned up - shorter, so it survives the file being renamed next league.
+        string term = _search.Trim();
+        bool add = ImGui.Button("watch for this") || entered;
+        if (add && term.Length > 0)
+        {
+            Add(term);
+        }
+
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, _said.Length > 0 ? _said : "search, then watch for it - or + on a row");
+    }
+
+    /// <summary>Adds a rule for a fragment, and says what happened.</summary>
+    /// <remarks>
+    /// The answer is shown rather than assumed, because the two ordinary outcomes look
+    /// identical from the outside: a rule that was added appears in the findings above only if
+    /// THIS area contains it, so "nothing happened" is the correct display for both a
+    /// successful add and a duplicate. Saying which is what stops the second click.
+    /// </remarks>
+    private void Add(string fragment)
+    {
+        var rule = new PreloadRule(Pretty(fragment), fragment, PreloadWeight.Valuable);
+        _said = _watch.AddRule(rule)
+            ? $"watching for \"{fragment}\""
+            : $"already watching for \"{fragment}\"";
+
+        _rulesChanged();
+    }
+
+    /// <summary>A name for a fragment: its words, with a capital.</summary>
+    private static string Pretty(string fragment)
+    {
+        string trimmed = fragment.Trim().Trim('/');
+        return trimmed.Length == 0 ? fragment : char.ToUpperInvariant(trimmed[0]) + trimmed[1..];
     }
 }

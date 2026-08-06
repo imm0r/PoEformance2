@@ -42,6 +42,10 @@ public sealed class AlertWindow
     private int _template;
     private bool _unsaved;
 
+    private PreloadWatch? _preload;
+    private PreloadSettings _preloadSettings = PreloadSettings.Default;
+    private Action<PreloadSettings>? _savePreload;
+
     public AlertWindow(AlertWatcher watcher, Action save)
     {
         ArgumentNullException.ThrowIfNull(watcher);
@@ -54,6 +58,28 @@ public sealed class AlertWindow
         // are shared, so editing that in place would edit them for everybody.
         _rules = [.. watcher.Rules];
         _watcher.Rules = _rules;
+    }
+
+    /// <summary>
+    /// Adds the other kind of alert to this window: what the AREA loaded.
+    /// </summary>
+    /// <remarks>
+    /// One window, two lists, because "what am I told about" is one question however many
+    /// mechanisms answer it - somebody who wants to stop being told about strongboxes should
+    /// not have to know whether that is decided by an entity in front of them or by a file the
+    /// game loaded on the way in.
+    ///
+    /// The lists themselves stay apart. Their rules share no fields: one asks about rarity and
+    /// distance, the other about a fragment of a path in a table read once per area.
+    /// </remarks>
+    public void AttachPreload(PreloadWatch watch, PreloadSettings settings, Action<PreloadSettings> save)
+    {
+        ArgumentNullException.ThrowIfNull(watch);
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(save);
+        _preload = watch;
+        _preloadSettings = settings;
+        _savePreload = save;
     }
 
     /// <summary>Whether the window is on screen.</summary>
@@ -128,6 +154,122 @@ public sealed class AlertWindow
 
         ImGui.Separator();
         DrawAdd();
+
+        if (_preload is not null)
+        {
+            ImGui.Spacing();
+            ImGui.Separator();
+            DrawPreload(_preload);
+        }
+    }
+
+    /// <summary>The second list: what the area loaded, read once on the way in.</summary>
+    private void DrawPreload(PreloadWatch preload)
+    {
+        ImGui.TextColored(DimText, "What the area loaded");
+
+        bool banner = _preloadSettings.Banner;
+        if (ImGui.Checkbox("say it on the way in", ref banner))
+        {
+            PreloadChanged(_preloadSettings with { Banner = banner });
+        }
+
+        ImGui.SameLine();
+        bool list = _preloadSettings.List;
+        if (ImGui.Checkbox("keep it in the corner", ref list))
+        {
+            PreloadChanged(_preloadSettings with { List = list });
+        }
+
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(160f);
+        int minFiles = _preloadSettings.MinFiles;
+
+        // The gate that decides whether the line on the way in is trustworthy. One matching
+        // file is a mention somewhere - a pinnacle key exists whether or not the mechanic is
+        // in this map - so the banner needs more than that before it interrupts anybody.
+        if (ImGui.SliderInt("###preload-minfiles", ref minFiles, 1, 20, "at least %d files"))
+        {
+            PreloadChanged(_preloadSettings with { MinFiles = minFiles });
+        }
+
+        foreach (PreloadRule rule in preload.Rules)
+        {
+            DrawPreloadRule(preload, rule);
+        }
+
+        ImGui.TextColored(
+            DimText,
+            preload.Rules.Count == 0
+                ? "nothing looked for - add one from \"What is in this area\""
+                : "add more from \"What is in this area\": search a path, then watch for it");
+    }
+
+    private void DrawPreloadRule(PreloadWatch preload, PreloadRule rule)
+    {
+        ImGui.PushID($"preload-{rule.PathContains}");
+
+        bool on = rule.Enabled;
+        if (ImGui.Checkbox("###on", ref on))
+        {
+            ReplacePreload(preload, rule, rule with { Enabled = on });
+        }
+
+        ImGui.SameLine();
+        ImGui.TextColored(on ? new Vector4(1f, 1f, 1f, 1f) : OffText, rule.Name);
+
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, $"path has \"{rule.PathContains}\"");
+
+        ImGui.SameLine(ImGui.GetContentRegionAvail().X - 230f);
+
+        ImGui.SetNextItemWidth(110f);
+        if (ImGui.BeginCombo("###weight", rule.Weight.ToString().ToLowerInvariant()))
+        {
+            foreach (PreloadWeight weight in Enum.GetValues<PreloadWeight>())
+            {
+                if (ImGui.Selectable(weight.ToString().ToLowerInvariant(), weight == rule.Weight))
+                {
+                    ReplacePreload(preload, rule, rule with { Weight = weight });
+                }
+            }
+
+            ImGui.EndCombo();
+        }
+
+        ImGui.SameLine();
+        bool alert = rule.Alert;
+        if (ImGui.Checkbox("banner", ref alert))
+        {
+            ReplacePreload(preload, rule, rule with { Alert = alert });
+        }
+
+        ImGui.SameLine();
+        if (ImGui.SmallButton("x"))
+        {
+            preload.UseRules(preload.Rules.Where(known => known != rule));
+            PreloadChanged(_preloadSettings);
+        }
+
+        ImGui.PopID();
+    }
+
+    private void ReplacePreload(PreloadWatch preload, PreloadRule was, PreloadRule now)
+    {
+        preload.UseRules(preload.Rules.Select(rule => rule == was ? now : rule));
+        PreloadChanged(_preloadSettings);
+    }
+
+    /// <summary>Takes a change to the preload settings, and remembers to write it down.</summary>
+    /// <remarks>
+    /// The rules are read back off the watch rather than tracked here: it owns them, the other
+    /// window adds to them, and a copy kept in this editor would be stale the moment somebody
+    /// pressed "+ watch" on a path.
+    /// </remarks>
+    private void PreloadChanged(PreloadSettings settings)
+    {
+        _preloadSettings = settings;
+        _unsaved = true;
     }
 
     private void DrawRule(AlertRule rule)
@@ -278,5 +420,10 @@ public sealed class AlertWindow
 
         _unsaved = false;
         _save();
+
+        if (_preload is not null && _savePreload is not null)
+        {
+            _savePreload(_preloadSettings with { Rules = _preload.Rules });
+        }
     }
 }
