@@ -159,10 +159,17 @@ public sealed class MapCoverage
         private readonly int _walkable;
 
         private int _seenCount;
+        private int _seenInRegion;
 
-        // Written once by the flood and then only read. A reference assignment is atomic, so
-        // the reading side sees either no region or a finished one - never a half-built one,
-        // which would report a percentage against a denominator that is still growing.
+        // The flood hands its result over HERE, and the reader thread picks it up on its next
+        // look. Everything that mutates then happens on that one thread, so the running count
+        // below needs no locking and cannot be raced into disagreeing with the array it counts.
+        private volatile bool[]? _handover;
+        private int _handoverSize;
+
+        // Adopted from the handover, and read by whoever is drawing. A reference assignment is
+        // atomic, so a reader sees no region or a finished one - never a half-built one, which
+        // would report against a denominator that is still growing.
         private volatile bool[]? _region;
         private int _regionSize;
 
@@ -194,15 +201,16 @@ public sealed class MapCoverage
         internal bool Fits(TerrainGrid grid)
             => grid.Width / CoarseStep == _width && grid.Height / CoarseStep == _height;
 
-        /// <summary>Cells of the region that have been seen.</summary>
-        internal int Seen
-        {
-            get
-            {
-                bool[]? region = _region;
-                return region is null ? _seenCount : CountSeenInRegion(region);
-            }
-        }
+        /// <summary>
+        /// Cells of the region that have been seen.
+        /// </summary>
+        /// <remarks>
+        /// A running count rather than a walk of the grid. Whoever is drawing asks for this
+        /// several times a frame, and a coarse grid on a large map runs to a hundred thousand
+        /// cells - counting them on each ask is millions of iterations a second on the thread
+        /// that can least afford them.
+        /// </remarks>
+        internal int Seen => _region is null ? _seenCount : _seenInRegion;
 
         /// <summary>Cells that can be reached - the whole grid until the flood has run.</summary>
         internal int Reachable => _region is null ? _walkable : _regionSize;
@@ -219,6 +227,10 @@ public sealed class MapCoverage
         /// <summary>Marks everything within sight of a coarse cell.</summary>
         internal void Saw((int X, int Y) at)
         {
+            TakeTheRegionIfItIsReady();
+
+            bool[]? region = _region;
+
             for (int dy = -SeeRadius; dy <= SeeRadius; dy++)
             {
                 for (int dx = -SeeRadius; dx <= SeeRadius; dx++)
@@ -240,9 +252,36 @@ public sealed class MapCoverage
                     {
                         _seen[index] = true;
                         _seenCount++;
+
+                        if (region is not null && region[index])
+                        {
+                            _seenInRegion++;
+                        }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Adopts a finished flood, counting what was already seen inside it.
+        /// </summary>
+        /// <remarks>
+        /// On the reader's thread, which is the point: the flood runs elsewhere and only hands
+        /// its array over, so every change to the running count happens on ONE thread and the
+        /// count cannot drift away from the array it is counting.
+        /// </remarks>
+        private void TakeTheRegionIfItIsReady()
+        {
+            bool[]? arrived = _handover;
+            if (arrived is null)
+            {
+                return;
+            }
+
+            _handover = null;
+            _regionSize = _handoverSize;
+            _seenInRegion = CountSeenInRegion(arrived);
+            _region = arrived;
         }
 
         /// <summary>
@@ -291,8 +330,10 @@ public sealed class MapCoverage
                 }
             }
 
-            _regionSize = count;
-            _region = reached;
+            // Handed over rather than installed. The reader thread adopts it on its next look
+            // and counts what was seen while the flood was running - see TakeTheRegionIfItIsReady.
+            _handoverSize = count;
+            _handover = reached;
         }
 
         private static readonly (int X, int Y)[] Steps = [(1, 0), (-1, 0), (0, 1), (0, -1)];

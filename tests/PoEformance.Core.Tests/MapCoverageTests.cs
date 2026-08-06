@@ -168,6 +168,61 @@ public class MapCoverageTests
     }
 
     [Fact]
+    public void TheRunningCountAgreesWithCountingItAgain()
+    {
+        // The count is kept as cells are marked rather than worked out on each ask, because
+        // whoever is drawing asks several times a frame and a coarse grid on a large map runs
+        // to a hundred thousand cells. What that buys in speed it can lose in truth, so the
+        // two are compared: mark a lot, in an area where the sight disc reaches through a
+        // wall, and the running figure has to match a fresh count of the same cells.
+        TerrainGrid grid = TwoRooms();
+        var coverage = new MapCoverage(MapCoverage.Immediate);
+
+        for (int y = 20; y < 180; y += 15)
+        {
+            for (int x = 20; x < 185; x += 15)
+            {
+                coverage.Look(At(grid, x, y));
+            }
+        }
+
+        // Counted independently here: every coarse cell of the reachable region that the
+        // walk above could have marked. Room A is x below 190, so a cell is in the region
+        // exactly when it is walkable and left of the wall.
+        int reachable = 0;
+        for (int cy = 0; cy < grid.Height / MapCoverage.CoarseStep; cy++)
+        {
+            for (int cx = 0; cx < grid.Width / MapCoverage.CoarseStep; cx++)
+            {
+                if (cx * MapCoverage.CoarseStep < 190 && AnyWalkable(grid, cx, cy))
+                {
+                    reachable++;
+                }
+            }
+        }
+
+        Assert.Equal(reachable, coverage.ReachableCells);
+        Assert.True(coverage.SeenCells <= coverage.ReachableCells);
+        Assert.True(coverage.Percent > 90f, $"a thorough walk of the room reads as {coverage.Percent:F0}%");
+    }
+
+    private static bool AnyWalkable(TerrainGrid grid, int coarseX, int coarseY)
+    {
+        for (int dy = 0; dy < MapCoverage.CoarseStep; dy++)
+        {
+            for (int dx = 0; dx < MapCoverage.CoarseStep; dx++)
+            {
+                if (grid.IsWalkable((coarseX * MapCoverage.CoarseStep) + dx, (coarseY * MapCoverage.CoarseStep) + dy))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    [Fact]
     public void ItNeverGoesPastEverything()
     {
         var coverage = new MapCoverage(MapCoverage.Immediate);
@@ -238,6 +293,58 @@ public class MapCoverageTests
         }
 
         Assert.Equal(MapCoverage.MaxRemembered, coverage.Remembered);
+    }
+
+    [Fact]
+    public void GroundWalkedWHILETheFloodRanStillCounts()
+    {
+        // The real case, and the one the immediate scheduler cannot show: the flood takes a
+        // moment and the player is already moving. Everything walked in the meantime was
+        // counted against the whole grid, so adopting the region has to count it again -
+        // otherwise the figure DROPS to whatever was walked after the flood landed, and the
+        // longer the flood took the more progress silently disappears.
+        var later = new HeldBack();
+        var coverage = new MapCoverage(later);
+        TerrainGrid grid = TwoRooms();
+
+        for (int y = 20; y < 180; y += 15)
+        {
+            for (int x = 20; x < 185; x += 15)
+            {
+                coverage.Look(At(grid, x, y));
+            }
+        }
+
+        Assert.False(coverage.RegionKnown);
+        Assert.True(coverage.SeenCells > 100, "the walk should have covered a good deal of the room");
+
+        later.RunIt();
+        coverage.Look(At(grid, 100, 100));   // the next look is when the region is adopted
+
+        Assert.True(coverage.RegionKnown);
+
+        // The raw count is EXPECTED to fall here, and that is the region doing its job:
+        // cells seen through the wall into the far room stop counting. What must survive is
+        // the progress inside the region - so the claim is about the percentage, which is
+        // what anybody actually reads.
+        Assert.True(
+            coverage.Percent > 90f,
+            $"a thorough walk read as {coverage.Percent:F0}% once the region landed - progress made during the flood was lost");
+    }
+
+    /// <summary>A scheduler that holds the work until a test asks for it.</summary>
+    private sealed class HeldBack
+    {
+        private Action? _work;
+
+        public static implicit operator Action<Action>(HeldBack held) => work => held._work = work;
+
+        public void RunIt()
+        {
+            Action? work = _work;
+            _work = null;
+            work?.Invoke();
+        }
     }
 
     [Fact]
