@@ -29,19 +29,45 @@ public sealed class StyleWindow
     private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
 
     private readonly OverlayStyle _style;
-    private readonly Action _changed;
+    private readonly Action _save;
 
     /// <summary>Which key's icon box is open. Only one at a time, to keep the rows short.</summary>
     private string _editingIcon = string.Empty;
     private string _iconPath = string.Empty;
 
-    /// <param name="changed">Called when something was changed, so it can be written down.</param>
-    public StyleWindow(OverlayStyle style, Action changed)
+    // Something changed and has not been written down yet - see Settle.
+    private bool _unsaved;
+
+    /// <param name="save">Writes the style down. Called when a change has SETTLED, not per frame.</param>
+    public StyleWindow(OverlayStyle style, Action save)
     {
         ArgumentNullException.ThrowIfNull(style);
-        ArgumentNullException.ThrowIfNull(changed);
+        ArgumentNullException.ThrowIfNull(save);
         _style = style;
-        _changed = changed;
+        _save = save;
+    }
+
+    /// <summary>Records a change, to be written down once the user has stopped making it.</summary>
+    /// <remarks>
+    /// The change itself lands immediately - the overlay reads the style every frame, which is
+    /// the whole reason a colour can be chosen by looking at it. Only the SAVE waits.
+    ///
+    /// It has to. A slider drag or a colour wheel reports a new value on every frame it is
+    /// held, so writing on each one is sixty file writes a second for one adjustment: a disk
+    /// hammered for nothing, and a window in which the file is open when something goes wrong.
+    /// </remarks>
+    private void Changed() => _unsaved = true;
+
+    /// <summary>Writes down a change once nothing is being dragged any more.</summary>
+    private void Settle()
+    {
+        if (!_unsaved || ImGui.IsAnyItemActive())
+        {
+            return;
+        }
+
+        _unsaved = false;
+        _save();
     }
 
     /// <summary>Whether the window is on screen.</summary>
@@ -52,6 +78,11 @@ public sealed class StyleWindow
     {
         if (!Visible)
         {
+            // Still settles: the window can be closed - from its own corner, or from the
+            // checkbox that opened it - with a change made and not yet written down, and
+            // "the last thing I did before closing it was the thing that got lost" is the
+            // worst way for a settings window to behave.
+            Settle();
             return;
         }
 
@@ -75,6 +106,10 @@ public sealed class StyleWindow
             ImGui.End();
         }
 
+        // After the window, so a drag that ended this frame is written down now rather than
+        // waiting for whatever happens next - including the window being closed.
+        Settle();
+
         Visible = open;
     }
 
@@ -91,7 +126,7 @@ public sealed class StyleWindow
         if (ImGui.SmallButton("reset all") && changed > 0)
         {
             _style.ResetAll();
-            _changed();
+            Changed();
         }
 
         ImGui.Separator();
@@ -162,7 +197,7 @@ public sealed class StyleWindow
             if (ImGui.SmallButton("reset"))
             {
                 _style.Reset(entry.Key);
-                _changed();
+                Changed();
                 ImGui.PopID();
                 return;
             }
@@ -173,7 +208,7 @@ public sealed class StyleWindow
         if (wanted != style)
         {
             _style.Set(entry.Key, wanted);
-            _changed();
+            Changed();
         }
 
         ImGui.PopID();
