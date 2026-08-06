@@ -142,8 +142,13 @@ public sealed class PoiLayer
     /// at the reader. It has to: a boss arena is known from the moment the area loads, long
     /// before anything is standing in it.
     /// </remarks>
+    /// <param name="Icon">
+    /// The game's own name for the marker, where it has one. Carried because it is a FINER
+    /// distinction than the kind: a breach and a ritual are both "a mechanic", and they are
+    /// the two markers most worth telling apart on sight.
+    /// </param>
     private readonly record struct Place(
-        ulong Id, string Name, PoiKind Kind, float WorldX, float WorldY, float Height);
+        ulong Id, string Name, PoiKind Kind, float WorldX, float WorldY, float Height, string Icon);
 
     /// <summary>Everything markable in the area, from both sources.</summary>
     private List<Place> PlacesIn(WorldSnapshot snapshot)
@@ -156,7 +161,7 @@ public sealed class PoiLayer
             {
                 places.Add(new Place(
                     entity.Address, entity.PoiName, entity.Poi,
-                    entity.WorldX, entity.WorldY, entity.TerrainHeight));
+                    entity.WorldX, entity.WorldY, entity.TerrainHeight, entity.MapIcon));
             }
         }
 
@@ -169,10 +174,12 @@ public sealed class PoiLayer
                     continue;
                 }
 
+                // No icon: a landmark is found in the shape of the ground, long before the
+                // game has anything there to mark. Its kind picks the shape instead.
                 places.Add(new Place(
                     landmark.Id, landmark.Name, landmark.Kind,
                     landmark.GridX * MapView.WorldToGrid, landmark.GridY * MapView.WorldToGrid,
-                    terrain.HeightAt(landmark.GridX, landmark.GridY)));
+                    terrain.HeightAt(landmark.GridX, landmark.GridY), string.Empty));
             }
         }
 
@@ -213,9 +220,10 @@ public sealed class PoiLayer
             bool routed = _planner.IsTarget(place.Id);
             uint colour = routed ? RouteColour(place.Id) : ColourFor(place.Kind);
 
-            // A diamond, not a circle: the entity dots are circles, and the difference has to
-            // survive being three pixels across on a minimap.
-            Diamond(draw, at, radius, colour);
+            // A shape per kind of place, because at this size the silhouette is what carries
+            // the meaning - the entity dots are circles, and a marker has to be told apart
+            // from those and from each other while three pixels across.
+            PoiGlyphPainter.Draw(draw, at, radius, colour, PoiGlyphs.For(place.Icon, place.Kind));
 
             if (routed)
             {
