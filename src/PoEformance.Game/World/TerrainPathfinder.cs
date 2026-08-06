@@ -74,6 +74,26 @@ public static class TerrainPathfinder
     /// </remarks>
     public const int DefaultMaxDistance = 8_000;
 
+    /// <summary>
+    /// How far a route may climb or drop between two neighbouring cells, in world height.
+    /// </summary>
+    /// <remarks>
+    /// THE MULTI-LEVEL PROBLEM. The walkable grid is FLAT: a bridge and the ground beneath it
+    /// occupy the same cells and both read as walkable, so a two-dimensional search steps
+    /// happily between storeys and draws a route that walks through the floor. Nothing in the
+    /// walkable data can say otherwise - the only thing separating the two is their height.
+    ///
+    /// Thirty units per cell, taken from the AutoHotkey tool where it is in daily use rather
+    /// than reasoned out here. Wide enough that a staircase, a ramp and ordinary uneven ground
+    /// all pass; narrow enough that a storey seam does not. Diagonals get the same allowance
+    /// rather than a scaled one, which errs toward permitting - being too strict costs a route
+    /// that does exist, and that is the worse failure of the two.
+    ///
+    /// Only applied where the area HAS heights. Without them every cell reads as zero, every
+    /// step passes, and the search behaves exactly as it did before this existed.
+    /// </remarks>
+    public const float MaxClimbPerCell = 30f;
+
     private static readonly (int Dx, int Dy, float Cost)[] Neighbours =
     [
         (0, -1, 1f),
@@ -149,6 +169,11 @@ public static class TerrainPathfinder
             return [start];
         }
 
+        // Only where the area supplies them. Without heights every cell reads as zero, so the
+        // rule would pass every step anyway - the flag is here to make that explicit rather
+        // than accidental, and to skip the lookups.
+        bool climbs = grid.HasHeights;
+
         var open = new PriorityQueue<(int X, int Y), float>();
         var cameFrom = new Dictionary<(int X, int Y), (int X, int Y)>();
         var cost = new Dictionary<(int X, int Y), float> { [start] = 0f };
@@ -175,11 +200,20 @@ public static class TerrainPathfinder
             }
 
             float here = cost[current];
+            float standing = climbs ? grid.HeightAt(current.X, current.Y) : 0f;
 
             foreach ((int nx, int ny, float move) in Neighbours)
             {
                 var next = (X: current.X + nx, Y: current.Y + ny);
                 if (!grid.IsWalkable(next.X, next.Y))
+                {
+                    continue;
+                }
+
+                // The same walkable cell can belong to two storeys - see MaxClimbPerCell.
+                // Without this the route steps between them and is drawn through a floor,
+                // which is the one kind of wrong route that looks entirely plausible.
+                if (climbs && Math.Abs(grid.HeightAt(next.X, next.Y) - standing) > MaxClimbPerCell)
                 {
                     continue;
                 }

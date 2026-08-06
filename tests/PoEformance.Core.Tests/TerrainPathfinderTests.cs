@@ -218,3 +218,105 @@ public class TerrainPathfinderTests
         Assert.Equal([(2, 1)], TerrainPathfinder.FindPath(grid, (2, 1), (2, 1)));
     }
 }
+
+/// <summary>
+/// Routes must not step between storeys.
+/// </summary>
+/// <remarks>
+/// THE WALKABLE GRID IS FLAT. A bridge and the ground beneath it occupy the same cells and
+/// both read as walkable, so a two-dimensional search steps between them and draws a route
+/// that walks through a floor - which is the one kind of wrong route that looks entirely
+/// plausible on screen. Height is the only thing that separates the two.
+///
+/// The allowance is thirty units a cell, taken from the AutoHotkey tool where it is in daily
+/// use. What is checked here is what that number has to buy: ramps and uneven ground pass, a
+/// storey seam does not, and an area with no heights behaves exactly as it did before.
+/// </remarks>
+public class RoutesAcrossStoreysTests
+{
+    /// <summary>Open ground, whole tiles, with a height per tile.</summary>
+    private static TerrainGrid Ground(int tilesX, int tilesY, float[]? heights = null)
+    {
+        int width = tilesX * TerrainGrid.CellsPerTile;
+        int height = tilesY * TerrainGrid.CellsPerTile;
+        int stride = (width + 1) / 2;
+
+        var cells = new byte[stride * height];
+        Array.Fill(cells, (byte)0x11);
+
+        return new TerrainGrid(cells, stride, height, tilesX, tilesY, heights);
+    }
+
+    /// <summary>Five tiles in a row, the middle one lifted by the given amount.</summary>
+    private static TerrainGrid WithMiddleAt(float lifted)
+        => Ground(5, 1, [0f, 0f, lifted, 0f, 0f]);
+
+    private const int Left = 5;
+    private static readonly int Right = (5 * TerrainGrid.CellsPerTile) - 6;
+
+    [Fact]
+    public void ARampIsWalkedUp()
+    {
+        // Ordinary uneven ground, a staircase, a slope. All of it has to stay passable, and
+        // being too strict here is the worse failure of the two: a route that does exist and
+        // is refused sends somebody looking for a way that is already under their feet.
+        List<(int X, int Y)> path = TerrainPathfinder.FindPath(
+            WithMiddleAt(20f), (Left, 11), (Right, 11), out RouteOutcome outcome);
+
+        Assert.Equal(RouteOutcome.Found, outcome);
+        Assert.NotEmpty(path);
+    }
+
+    [Fact]
+    public void ASTOREYSeamIsNot()
+    {
+        // The same walkable cells, four hundred units apart. Nothing about the walkable data
+        // distinguishes this from the ramp above - only the height does.
+        TerrainPathfinder.FindPath(WithMiddleAt(400f), (Left, 11), (Right, 11), out RouteOutcome outcome);
+
+        Assert.Equal(RouteOutcome.Unreachable, outcome);
+    }
+
+    [Fact]
+    public void AnAreaWithNoHeightsBehavesExactlyAsBefore()
+    {
+        // The read is allowed to fail - a missing pointer, a drifted offset - and when it does
+        // every cell reads as zero. The rule would pass every step anyway; what matters is
+        // that routing does not quietly change character depending on whether a read worked.
+        TerrainGrid flat = Ground(5, 1);
+
+        Assert.False(flat.HasHeights);
+        TerrainPathfinder.FindPath(flat, (Left, 11), (Right, 11), out RouteOutcome outcome);
+
+        Assert.Equal(RouteOutcome.Found, outcome);
+    }
+
+    [Fact]
+    public void TheAllowanceIsTheONEThatSeparatesThoseTwo()
+    {
+        // Pinning the number rather than trusting the two cases above to have straddled it.
+        // Just under passes, just over does not - so a change to it is a decision somebody
+        // makes rather than something that drifts.
+        TerrainPathfinder.FindPath(
+            WithMiddleAt(TerrainPathfinder.MaxClimbPerCell - 1f), (Left, 11), (Right, 11), out RouteOutcome under);
+        TerrainPathfinder.FindPath(
+            WithMiddleAt(TerrainPathfinder.MaxClimbPerCell + 1f), (Left, 11), (Right, 11), out RouteOutcome over);
+
+        Assert.Equal(RouteOutcome.Found, under);
+        Assert.Equal(RouteOutcome.Unreachable, over);
+    }
+
+    [Fact]
+    public void AndAStepDOWNIsRefusedToo()
+    {
+        // Symmetric on purpose, and it has to be shown by a route that ONLY falls. A shape
+        // that drops and then climbs back is caught by a climb-only rule as well, so it
+        // proves nothing - and a route allowed to step OFF a storey but not onto one is
+        // still drawn through a floor, just in one direction.
+        TerrainGrid grid = Ground(5, 1, [400f, 400f, 400f, 0f, 0f]);
+
+        TerrainPathfinder.FindPath(grid, (Left, 11), (Right, 11), out RouteOutcome outcome);
+
+        Assert.Equal(RouteOutcome.Unreachable, outcome);
+    }
+}
