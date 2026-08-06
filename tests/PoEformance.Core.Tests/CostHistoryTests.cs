@@ -153,7 +153,7 @@ public class CostHistoryTests
     }
 
     [Fact]
-    public void WritingAndReadingAtOnceDoesNotTearIt()
+    public async Task WritingAndReadingAtOnceDoesNotTearIt()
     {
         // The reader thread adds while the renderer plots. A torn read here would be a graph
         // that occasionally shows nonsense, which is the kind of fault that gets blamed on the
@@ -177,7 +177,7 @@ public class CostHistoryTests
             Assert.All(series, value => Assert.InRange(value, 1f, 50f));
         }
 
-        writer.GetAwaiter().GetResult();
+        await writer;
         Assert.True(history.Count > 0);
     }
 }

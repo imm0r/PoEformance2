@@ -80,13 +80,17 @@ public sealed record OverlaySettings(
     }
 
     /// <summary>
-    /// The outline colour as ImGui packs it - ABGR, alpha first in the high byte.
+    /// A colour as ImGui packs it - ABGR, alpha first in the high byte.
     /// </summary>
     /// <remarks>
-    /// Returns 0 for anything unparseable, which the caller treats as "use the default"
-    /// rather than drawing an invisible line. ImGui's byte order is the reverse of the
-    /// #RRGGBB the page sends, and getting that backwards produces a colour that looks
-    /// deliberate and is wrong.
+    /// Takes <c>#RRGGBB</c> (opaque) or <c>#AARRGGBB</c>. Returns 0 for anything
+    /// unparseable, which the caller treats as "use the default" rather than drawing an
+    /// invisible line. ImGui's byte order is the reverse of the #RRGGBB a page sends, and
+    /// getting that backwards produces a colour that looks deliberate and is wrong.
+    ///
+    /// A fully transparent colour parses to 0 as well, so it reads as "not chosen" rather
+    /// than as a request to draw nothing. Drawing nothing is what the visibility switch is
+    /// for, and it says so where somebody looking for a missing marker would look.
     /// </remarks>
     public static uint ParseColour(string value)
     {
@@ -96,15 +100,32 @@ public sealed record OverlaySettings(
         }
 
         ReadOnlySpan<char> text = value.AsSpan().Trim().TrimStart('#');
-        if (text.Length != 6 || !uint.TryParse(text, System.Globalization.NumberStyles.HexNumber, null, out uint rgb))
+        if (text.Length is not (6 or 8)
+            || !uint.TryParse(text, System.Globalization.NumberStyles.HexNumber, null, out uint argb))
         {
             return 0;
         }
 
-        uint r = (rgb >> 16) & 0xFF;
-        uint g = (rgb >> 8) & 0xFF;
-        uint b = rgb & 0xFF;
-        return 0xFF000000u | (b << 16) | (g << 8) | r;
+        uint a = text.Length == 8 ? (argb >> 24) & 0xFF : 0xFF;
+        uint r = (argb >> 16) & 0xFF;
+        uint g = (argb >> 8) & 0xFF;
+        uint b = argb & 0xFF;
+        return (a << 24) | (b << 16) | (g << 8) | r;
+    }
+
+    /// <summary>Writes an ImGui colour back out as <c>#AARRGGBB</c>.</summary>
+    /// <remarks>
+    /// The other direction, for whatever a colour picker produced. Always eight digits: a
+    /// picker that can set alpha needs somewhere to put it, and a file where some entries
+    /// carry alpha and some do not is harder to read than one where they all do.
+    /// </remarks>
+    public static string FormatColour(uint packed)
+    {
+        uint a = (packed >> 24) & 0xFF;
+        uint b = (packed >> 16) & 0xFF;
+        uint g = (packed >> 8) & 0xFF;
+        uint r = packed & 0xFF;
+        return $"#{a:X2}{r:X2}{g:X2}{b:X2}";
     }
 }
 
