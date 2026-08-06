@@ -642,6 +642,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     (double ms, long reads, long failures) = ReadStats();
                     ImGui.Text($"read:     {ms:F1} ms on its own thread   frame: {1000f / ImGui.GetIO().Framerate:F1} ms"
                         + $"   ({reads} reads{(failures > 0 ? $", {failures} failed" : string.Empty)})");
+
+                    // WHERE the time went, not just how much. One number says a frame was
+                    // expensive and nothing about why, and an expensive phase is usually a
+                    // redundancy rather than a fundamental cost - which only a breakdown shows.
+                    if (_snapshot.Cost.TotalMs > 0)
+                    {
+                        ImGui.TextDisabled($"          {_snapshot.Cost}");
+                    }
                 }
                 if (ShowDiagnostics)
                 {

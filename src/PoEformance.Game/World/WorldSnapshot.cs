@@ -20,6 +20,38 @@ public enum EntityKind
     Terrain,
 }
 
+/// <summary>
+/// Where a read's time went.
+/// </summary>
+/// <remarks>
+/// One number for a whole read says a frame was expensive and nothing about why, and the
+/// lesson the AHK tool wrote down after chasing this twice is that an expensive phase is
+/// usually a REDUNDANCY rather than a fundamental cost - a stats component read twice, a scan
+/// running every tick that need not. Neither was findable without a breakdown, and both were
+/// cheap to fix once seen.
+///
+/// Measured per PHASE rather than per entity: a timestamp around each stage costs nothing at
+/// a handful per read, while one inside the entity loop would be measuring itself.
+/// </remarks>
+/// <param name="Skipped">Entities the noise filter refused before their components were read.</param>
+public readonly record struct ReadCost(
+    double TotalMs,
+    double EntitiesMs,
+    double PlayerMs,
+    double TerrainMs,
+    double MapsMs,
+    int Entities,
+    int Skipped)
+{
+    /// <summary>Everything not attributed to a phase: the chain, the matrix, the area.</summary>
+    public double OtherMs => Math.Max(0, TotalMs - EntitiesMs - PlayerMs - TerrainMs - MapsMs);
+
+    /// <summary>A one-line summary for a status readout.</summary>
+    public override string ToString()
+        => $"{TotalMs:F1} ms = ent {EntitiesMs:F1} ({Entities}, {Skipped} skipped)"
+           + $"  player {PlayerMs:F1}  terrain {TerrainMs:F1}  maps {MapsMs:F1}  other {OtherMs:F1}";
+}
+
 /// <summary>One entity as the overlay needs it: what it is, where it is, and its address.</summary>
 /// <param name="WorldZ">
 /// The entity's BASE height - its feet. This is what the world-to-screen projection wants:
@@ -115,7 +147,8 @@ public sealed record WorldSnapshot(
     AreaInfo Area = default,
     TerrainGrid? Terrain = null,
     uint AreaHash = 0,
-    GameStateKind State = GameStateKind.NotLoaded)
+    GameStateKind State = GameStateKind.NotLoaded,
+    ReadCost Cost = default)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -275,6 +308,7 @@ public sealed class WorldReader
     /// </param>
     public WorldSnapshot Read(ulong gameStatesStatic, int maxEntities = 512, UiScale? scale = null)
     {
+        long started = System.Diagnostics.Stopwatch.GetTimestamp();
         GameChainAddresses chain = GameChain.Resolve(_reader, _schema, gameStatesStatic);
 
         // ONE gate, at the source. The game runs a stack of states and only one of them is
@@ -299,7 +333,9 @@ public sealed class WorldReader
         // from it (its first field is the head, which is why reading it as a pointer works
         // for the drift report but is not what the traversal needs).
         ulong mapStruct = chain.AreaInstance + (ulong)_awakeEntities;
+        long entitiesFrom = System.Diagnostics.Stopwatch.GetTimestamp();
         Dictionary<uint, ulong> pointers = _map.ReadEntityPointers(mapStruct, maxEntities);
+        int skipped = 0;
 
         var entities = new List<WorldEntity>(pointers.Count);
         WorldEntity? player = null;
@@ -318,6 +354,7 @@ public sealed class WorldReader
 
             if (Noise.IsNoise(identity.Path))
             {
+                skipped++;
                 continue;
             }
 
@@ -379,6 +416,9 @@ public sealed class WorldReader
             }
         }
 
+        double entitiesMs = Since(entitiesFrom);
+        long playerFrom = System.Diagnostics.Stopwatch.GetTimestamp();
+
         // The player is in the map too, but resolve it directly as a fallback so a frame
         // that missed it (mid-mutation) still knows where the camera is centred.
         if (player is null)
@@ -423,6 +463,9 @@ public sealed class WorldReader
             flaskBelt = _flasks.Read(serverData);
         }
 
+        double playerMs = Since(playerFrom);
+        long mapsFrom = System.Diagnostics.Stopwatch.GetTimestamp();
+
         MapView? largeMap = null;
         MapView? miniMap = null;
         if (scale is UiScale viewport && chain.UiRoot != 0)
@@ -433,18 +476,29 @@ public sealed class WorldReader
             largeMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: true);
         }
 
+        double mapsMs = Since(mapsFrom);
+
         // Read BEFORE the terrain: which area this is decides which names apply to its tiles,
         // and the terrain read is where the tiles are looked at.
         AreaInfo area = _areas.Read(chain.WorldData);
         _terrain.CuratedLandmarks = _landmarkNames.For(area.Id);
 
+        long terrainFrom = System.Diagnostics.Stopwatch.GetTimestamp();
+        TerrainGrid? terrain = _terrain.Read(chain.AreaInstance, nowMs);
+        double terrainMs = Since(terrainFrom);
+
         return new WorldSnapshot(
             true, player, entities, matrix, largeMap, miniMap, playerVitals, playerBuffs, flaskBelt,
             area,
-            _terrain.Read(chain.AreaInstance, nowMs),
+            terrain,
             _reader.Read<uint>(chain.AreaInstance + (ulong)_areaHash),
-            chain.State);
+            chain.State,
+            new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, entities.Count, skipped));
     }
+
+    /// <summary>Milliseconds since a timestamp.</summary>
+    private static double Since(long from)
+        => (System.Diagnostics.Stopwatch.GetTimestamp() - from) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
 
     /// <summary>
     /// Classifies an entity by its metadata path. Path prefixes are how the game itself
