@@ -74,6 +74,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 _uiBrowser.Style = value;
             }
+
+            _banner.Style = value;
         }
     }
 
@@ -146,6 +148,36 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private EntityBrowserWindow? _entityBrowser;
     private PoiLayer? _poi;
     private StyleWindow? _styleWindow;
+    private AlertWatcher? _alerts;
+    private readonly AlertBanner _banner = new();
+
+    /// <summary>
+    /// Adds the alert watcher, which says when something worth knowing about turned up.
+    /// </summary>
+    /// <remarks>
+    /// Looked at on the RENDER thread rather than the reader's, and that is deliberate: it
+    /// reads a finished snapshot and touches no memory, so putting it here costs the read
+    /// nothing and keeps the reader free of anything that produces user-facing output.
+    /// </remarks>
+    public void AttachAlerts(AlertWatcher watcher, Action saved, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(watcher);
+        ArgumentNullException.ThrowIfNull(saved);
+        _alerts = watcher;
+        _alertWindow = new AlertWindow(watcher, saved) { Visible = visible };
+        AlertsChanged = saved;
+    }
+
+    private AlertWindow? _alertWindow;
+
+    /// <summary>Called when an alert setting was changed, so it can be written down.</summary>
+    /// <remarks>
+    /// Separate from <see cref="SettingsChanged"/> because the two live in different files:
+    /// the alerts carry their RULES, which is a list rather than a switch, and mixing a list
+    /// somebody curates into the overlay's settings would put half a person's configuration
+    /// in each of two places.
+    /// </remarks>
+    public Action? AlertsChanged { get; set; }
 
     /// <summary>
     /// Adds the appearance editor, and says where its choices should be written down.
@@ -534,6 +566,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
+        // Before the marker gate, and outside it: the watcher decides for itself where it is
+        // quiet, and its own rule is towns rather than "wherever markers are drawn".
+        if (_alerts is not null && _snapshot.InGame)
+        {
+            long now = Environment.TickCount64;
+            if (_alerts.Look(_snapshot, now) is Alert raised)
+            {
+                _banner.Show(raised);
+            }
+
+            if (width > 0 && height > 0)
+            {
+                _banner.Draw(ImGui.GetForegroundDrawList(), width, height, now);
+            }
+        }
+
         // Nothing to mark in a town or a hideout, and a screen full of markers over the
         // stash is worse than no overlay. An area that did not resolve counts as hostile,
         // so a failed read never silently switches the tool off.
@@ -564,6 +612,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _dissector?.Render();
         _poi?.DrawPicker(_snapshot, _snapshot.Player);
         _styleWindow?.Render();
+        _alertWindow?.Render();
 
         if (ShowStatus)
         {
@@ -923,6 +972,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     if (ImGui.Checkbox("Appearance  (colour, size and icon of everything drawn)", ref styling))
                     {
                         _styleWindow.Visible = styling;
+                    }
+                }
+
+                if (_alerts is not null && _alertWindow is not null)
+                {
+                    // The count is here rather than only in the window because "it has not
+                    // said anything" and "it is not running" look identical, and this is a
+                    // feature whose correct behaviour is mostly silence.
+                    bool alerting = _alertWindow.Visible;
+                    if (ImGui.Checkbox(
+                            $"Alerts  ({_alerts.Rules.Count(rule => rule.Enabled)} watched for, {_alerts.Raised} raised)",
+                            ref alerting))
+                    {
+                        _alertWindow.Visible = alerting;
                     }
                 }
 

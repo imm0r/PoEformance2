@@ -89,6 +89,10 @@ public static class StyleCatalogue
         // ── The map itself ──────────────────────────────────────────────────
         new("terrain.outline", "Map", "Area layout", Line, Rgb(150, 200, 255)),
 
+        // ── Alerts ──────────────────────────────────────────────────────────
+        new("alert.banner", "Alerts", "Alert line", StyleTraits.Colour, Rgb(255, 235, 179, 255)),
+        new("alert.banner.back", "Alerts", "Alert backing", StyleTraits.Colour, Rgb(20, 18, 14, 215)),
+
         // ── Measuring aids ──────────────────────────────────────────────────
         // Switched on with the calibration and browser tools rather than during play, but
         // they are drawn over the game like everything above, so leaving them out would make
@@ -120,6 +124,8 @@ public static class StyleCatalogue
         public const string PlaceLabel = "poi.label";
         public const string RouteArrow = "route.arrow";
         public const string Terrain = "terrain.outline";
+        public const string Banner = "alert.banner";
+        public const string BannerBack = "alert.banner.back";
         public const string AidCentre = "aid.centre";
         public const string AidGround = "aid.ground";
         public const string AidHealthbar = "aid.healthbar";
@@ -130,7 +136,7 @@ public static class StyleCatalogue
         /// <summary>All of them, for the test that keeps them honest.</summary>
         public static IReadOnlyList<string> All { get; } =
         [
-            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain,
+            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Banner, BannerBack,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];
     }
