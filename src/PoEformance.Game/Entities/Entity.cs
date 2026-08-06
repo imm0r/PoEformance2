@@ -39,3 +39,15 @@ public sealed class Entity
     /// <summary>Address of the named component, or 0 when absent.</summary>
     public ulong Component(string name) => Components.TryGetValue(name, out ulong address) ? address : 0;
 }
+
+/// <summary>
+/// What an entity is, before the cost of finding out what it can do.
+/// </summary>
+/// <remarks>
+/// Exists so the two halves of reading an entity can be separated. The path arrives from one
+/// string read; the components are a hash-bucket walk and several reads more. Since the path
+/// is what says whether an entity is worth having at all, reading it first turns the expensive
+/// half into something only the entities that matter pay for.
+/// </remarks>
+/// <param name="Details">The details struct, carried so the component walk need not find it again.</param>
+public readonly record struct EntityIdentity(ulong Address, ulong Details, uint Id, string Path);

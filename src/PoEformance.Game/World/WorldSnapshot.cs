@@ -145,6 +145,17 @@ public sealed class WorldReader
     private readonly BuffsReader _buffs;
     private readonly FlaskBeltReader _flasks;
     private readonly CorpseFilter _corpses = new();
+
+    /// <summary>
+    /// Which entities are not worth reading. On by default; turn it off to see everything.
+    /// </summary>
+    /// <remarks>
+    /// Applied at the READ rather than at the drawing, which is the whole point - the entities
+    /// nobody wants to see are the ones nobody should pay to read. The cost of that is real
+    /// and worth stating: a filtered entity is absent from the snapshot entirely, so the
+    /// reverse-engineering tools cannot see it either. That is what the switch is for.
+    /// </remarks>
+    public NoiseFilter Noise { get; } = new();
     private readonly GroundItemReader _groundItems;
     private readonly MinimapIconReader _mapIcons;
     private LandmarkNames _landmarkNames = LandmarkNames.Empty;
@@ -292,11 +303,21 @@ public sealed class WorldReader
 
         foreach ((uint id, ulong address) in pointers)
         {
-            Entity? entity = _entities.Read(address);
-            if (entity is null || entity.Path.Length == 0)
+            // The PATH first, and the components only if the path earns them: walking an
+            // effect node's component table costs the same as walking a monster's, and there
+            // is no reason to pay for an entity that is about to be thrown away.
+            EntityIdentity? found = _entities.ReadIdentity(address);
+            if (found is not { } identity || identity.Path.Length == 0)
             {
                 continue;
             }
+
+            if (Noise.IsNoise(identity.Path))
+            {
+                continue;
+            }
+
+            Entity entity = _entities.Read(identity);
 
             ulong renderAddress = entity.Component("Render");
             if (renderAddress == 0)

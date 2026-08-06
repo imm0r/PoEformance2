@@ -86,6 +86,21 @@ public sealed class EntityReader
     /// </summary>
     public Entity? Read(ulong address)
     {
+        EntityIdentity? identity = ReadIdentity(address);
+        return identity is { } known ? Read(known) : null;
+    }
+
+    /// <summary>
+    /// Reads only what an entity IS - its id and metadata path - without walking its components.
+    /// </summary>
+    /// <remarks>
+    /// The cheap half, split out because it is the half that decides whether the expensive half
+    /// is worth doing at all. Much of a busy area is effect nodes and invisible daemons that
+    /// nothing will ever draw, and the PATH says which before a single component has been read
+    /// - see <see cref="World.NoiseFilter"/>.
+    /// </remarks>
+    public EntityIdentity? ReadIdentity(ulong address)
+    {
         if (!MemoryReaderExtensions.IsPlausiblePointer(address))
         {
             return null;
@@ -98,11 +113,12 @@ public sealed class EntityReader
         }
 
         uint id = _reader.Read<uint>(address + (ulong)_entityId);
-        string path = _reader.ReadStdWString(details + (ulong)_detailsPath);
-        IReadOnlyDictionary<string, ulong> components = ReadComponents(address, details);
-
-        return new Entity(address, id, path, components);
+        return new EntityIdentity(address, details, id, _reader.ReadStdWString(details + (ulong)_detailsPath));
     }
+
+    /// <summary>Finishes an entity whose identity has already been read.</summary>
+    public Entity Read(EntityIdentity identity)
+        => new(identity.Address, identity.Id, identity.Path, ReadComponents(identity.Address, identity.Details));
 
     /// <summary>
     /// Reads just the component name -> address map for an entity, given its address and

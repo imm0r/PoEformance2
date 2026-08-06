@@ -438,6 +438,7 @@ internal static class Program
             PoEformance.Features.OverlaySettings.ParseColour(settings.TerrainColour),
             settings.TerrainThickness);
         overlay.AttachUiBrowser(uiTree, uiBrowser);
+        overlay.Noise = world.Noise;
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);

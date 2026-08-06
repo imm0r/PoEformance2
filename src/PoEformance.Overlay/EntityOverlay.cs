@@ -34,6 +34,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private WorldSnapshot _snapshot = WorldSnapshot.Empty;
     private ClientRect _tracked;
     private readonly TerrainLayer _terrain;
+    /// <summary>
+    /// The reader's noise filter, so it can be switched from the overlay.
+    /// </summary>
+    /// <remarks>
+    /// Here rather than in a settings file because of WHEN it is wanted: a filtered entity is
+    /// absent from the snapshot entirely, so the moment somebody needs it is the moment they
+    /// are looking at the entity browser wondering where something went. A switch that needs
+    /// a restart would be no switch at all.
+    /// </remarks>
+    public NoiseFilter? Noise { get; set; }
+
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
     private EntityBrowserWindow? _entityBrowser;
@@ -667,6 +678,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     if (ImGui.Checkbox("UI browser  (F8 picks what is under the cursor)", ref browsing))
                     {
                         _uiBrowser.Visible = browsing;
+                    }
+                }
+
+                if (Noise is not null)
+                {
+                    bool filtering = Noise.Enabled;
+                    if (ImGui.Checkbox("Hide noise  (effects, pets, daemons - off to see everything)", ref filtering))
+                    {
+                        Noise.Enabled = filtering;
                     }
                 }
 
