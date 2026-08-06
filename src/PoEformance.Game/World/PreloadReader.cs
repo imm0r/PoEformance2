@@ -19,10 +19,15 @@ namespace PoEformance.Game.World;
 /// the zones before this one.
 ///
 /// The newest stamp is found in the table rather than read from the game's area-change
-/// counter, and that is not a preference. Read live, the counter static reported 188 while
-/// every record held a number two orders of magnitude smaller - and the records were right,
-/// because the paths they hand back are real game files anybody can check. A table that stamps
-/// its own generation does not need to be told what generation it is.
+/// counter, and that is not a preference. It started as a rescue: the counter static resolved
+/// to the wrong variable and reported 188 while every record held a number two orders of
+/// magnitude smaller - and the records were right, because the paths they hand back are real
+/// game files anybody can check. The static has since been corrected, but the table stayed the
+/// source, because something that stamps its own generation does not need to be told what
+/// generation it is, and one fewer byte pattern to keep alive across a game patch is worth
+/// having. The counter is still read and still reported beside the stamp, for exactly the
+/// reason it was caught: a disagreement between the two is the first sign one of them has
+/// drifted again.
 ///
 /// Stamps below three are skipped: the first areas of a session drag the whole game in with
 /// them, so everything in memory would match.
@@ -122,9 +127,10 @@ public sealed class PreloadReader
         // THE TABLE KNOWS ITS OWN GENERATION. Files are stamped with the area-change count
         // that loaded them and nothing ever re-stamps them, so the newest stamp in the table
         // IS the current area - which makes the separate counter unnecessary, and that turned
-        // out to matter: read live, the static reported 188 while every record in the table
-        // held a number two orders of magnitude smaller. One of the two was wrong and the
-        // table is the one that cannot be, because the paths it hands back are checkable.
+        // out to matter: a mis-derived static reported 188 while every record in the table held
+        // a number two orders of magnitude smaller. One of the two was wrong and the table is
+        // the one that cannot be, because the paths it hands back are checkable. The static was
+        // fixed afterwards; this stayed, because it does not depend on it either way.
         //
         // Cheaper as well. The old shape read a name for every record whose count matched a
         // guess; this reads counts first - one int each - and only fetches strings for the
