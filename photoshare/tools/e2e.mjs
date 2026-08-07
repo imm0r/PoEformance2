@@ -63,6 +63,7 @@ function makeRepo() {
   return {
     tree: new Map(),      // path -> {sha, bytes}
     puts: [],
+    deletes: [],
     blobHits: 0,
     add(p, bytes) { this.tree.set(p, { sha: `sha-${this.tree.size}-${p.length}`, bytes }); }
   };
@@ -98,6 +99,16 @@ async function stubGitHub(page, repo, { writable = true, noBranch = false, noRep
       if (!entry) return json(404, { message: 'no blob' });
       repo.blobHits++;
       return route.fulfill({ status: 200, headers: { 'Content-Type': 'image/jpeg' }, body: Buffer.from(entry.bytes) });
+    }
+    if (request.method() === 'DELETE' && url.pathname.includes('/contents/')) {
+      if (!writable) return json(403, { message: 'read only' });
+      const filePath = decodeURIComponent(url.pathname.split('/contents/')[1]);
+      const entry = repo.tree.get(filePath);
+      if (!entry) return json(404, { message: 'no such file' });
+      if (JSON.parse(request.postData()).sha !== entry.sha) return json(409, { message: 'sha mismatch' });
+      repo.deletes.push(filePath);
+      repo.tree.delete(filePath);
+      return json(200, { commit: {} });
     }
     if (request.method() === 'PUT' && url.pathname.includes('/contents/')) {
       if (!writable) return json(403, { message: 'read only' });
@@ -371,6 +382,87 @@ const LINK = (page, extra = '') =>
   await page.waitForSelector('.drop');
   check('desktop: camera button stays hidden', !(await page.isVisible('.btn--camera')));
   check('desktop: the gallery button is still there', await page.isVisible('.btn--big:not(.btn--camera)'));
+  await page.context().close();
+}
+
+// --- 3d. deleting your own photo ------------------------------------------
+{
+  const page = await newPage();
+  const repo = makeRepo();
+  await stubGitHub(page, repo);
+  const jpeg = await makeJpeg(400, 300, 40);
+  for (const [who, id] of [['Jonas', 'aaaaaaaa'], ['Oma-Lotte', 'bbbbbbbb']]) {
+    const name = `2026-08-07/12000${id === 'aaaaaaaa' ? 1 : 2}__${who}__${id}.jpg`;
+    repo.add(`photos/${name}`, jpeg);
+    repo.add(`thumbs/${name}`, jpeg);
+  }
+
+  await page.goto(LINK('upload.html'));
+  await page.waitForSelector('.drop');
+  await page.fill('.field', 'Jonas');           // this browser belongs to Jonas
+  await page.click('.btn--ghost');              // "Zum Album"
+  await page.waitForSelector('.tile.is-loaded');
+
+  // Oma Lotte's photo is first (later timestamp): no delete button on it.
+  await page.locator('.tile').first().click();
+  await page.waitForSelector('.lightbox:not(.is-hidden)');
+  check('delete: not offered on someone else\'s photo',
+    !(await page.isVisible('.btn--danger')),
+    await page.textContent('.lightbox__caption'));
+
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(250);
+  check('delete: offered on your own photo', await page.isVisible('.btn--danger'),
+    await page.textContent('.lightbox__caption'));
+
+  await page.click('.btn--danger');
+  await page.waitForSelector('.confirm:not(.is-hidden)');
+  check('delete: asks first, and says the repository keeps a copy',
+    (await page.textContent('.confirm__text')).includes('Versionsgeschichte'));
+
+  await page.keyboard.press('Escape');
+  check('delete: escape backs out of the confirmation, not the photo',
+    await page.locator('.confirm.is-hidden').count() === 1 &&
+    await page.locator('.lightbox:not(.is-hidden)').count() === 1);
+  check('delete: backing out deletes nothing', repo.deletes.length === 0);
+
+  await page.click('.btn--danger');
+  await page.click('.confirm .btn--danger');
+  // waitForSelector waits for visibility, and .is-hidden never becomes visible.
+  await page.waitForFunction(() => document.querySelector('.lightbox').classList.contains('is-hidden'));
+
+  check('delete: removes thumbnail first, then the photo',
+    repo.deletes.length === 2 &&
+    repo.deletes[0].startsWith('thumbs/') && repo.deletes[1].startsWith('photos/'),
+    JSON.stringify(repo.deletes));
+  check('delete: only Jonas\'s photo went', repo.deletes.every((p) => p.includes('__Jonas__')),
+    JSON.stringify(repo.deletes));
+  check('delete: the tile disappears at once', (await page.locator('.tile').count()) === 1);
+  check('delete: no page errors', page._errors.length === 0, page._errors.join('\n'));
+  await page.context().close();
+}
+
+// --- 3e. a read-only code cannot delete -----------------------------------
+{
+  const page = await newPage();
+  const repo = makeRepo();
+  await stubGitHub(page, repo, { writable: false });
+  const jpeg = await makeJpeg(400, 300, 40);
+  repo.add('photos/2026-08-07/120000__Jonas__cccccccc.jpg', jpeg);
+  repo.add('thumbs/2026-08-07/120000__Jonas__cccccccc.jpg', jpeg);
+
+  await page.goto(LINK('index.html'));
+  await page.evaluate(() => localStorage.setItem('ps:name', 'Jonas'));
+  await page.reload();
+  await page.waitForSelector('.tile.is-loaded');
+  await page.locator('.tile').first().click();
+  await page.click('.btn--danger');
+  await page.click('.confirm .btn--danger');
+  await page.waitForSelector('.toast--error');
+  check('delete: a view-only code is told what it needs',
+    (await page.textContent('.toast--error')).includes('Upload-Link'),
+    await page.textContent('.toast--error'));
+  check('delete: nothing was removed', repo.deletes.length === 0 && repo.tree.size === 2);
   await page.context().close();
 }
 

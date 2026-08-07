@@ -120,6 +120,15 @@ img { display: block; max-width: 100%; }
   .btn__narrow { display: inline; }
 }
 .btn--small { padding: 6px 10px; font-size: 13px; }
+
+.btn--danger { color: var(--danger); border-color: transparent; }
+.btn--danger:hover { background: #33201b; }
+.confirm .btn--danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #2a120c;
+  font-weight: 600;
+}
 .btn--big { padding: 14px 24px; font-size: 16px; }
 
 /* --- gate ---------------------------------------------------------------- */
@@ -342,6 +351,34 @@ img { display: block; max-width: 100%; }
 @media (hover: none) {
   .lightbox__nav { opacity: 0.25; }
 }
+
+/* The confirmation sits above the lightbox: deleting is the one thing in this
+   app that cannot be undone from inside it, so it gets a real stop. */
+.confirm {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--pad);
+  background: rgba(7, 7, 7, 0.82);
+  backdrop-filter: blur(3px);
+}
+
+.confirm__box {
+  width: 100%;
+  max-width: 380px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.confirm__title { margin: 0 0 10px; font-family: var(--display); font-size: 20px; }
+.confirm__text { margin: 0 0 18px; font-size: 14px; line-height: 1.6; color: var(--ink-dim); }
+.confirm__actions { display: flex; gap: 10px; }
+.confirm__actions .btn { flex: 1; }
 
 /* --- panels, upload, share ----------------------------------------------- */
 
