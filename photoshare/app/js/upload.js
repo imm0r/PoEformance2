@@ -41,10 +41,10 @@
     } catch (error) {
       nodes.status.textContent = PS.escapeError(error);
       nodes.status.classList.add('is-error');
-      nodes.pick.disabled = true;
       return;
     }
 
+    nodes.shoot.disabled = false;
     nodes.pick.disabled = false;
   }
 
@@ -65,19 +65,40 @@
       updatePickState();
     });
 
+    // Two file inputs, because they open different things. Without `capture`
+    // the phone shows its picker (gallery, and camera somewhere in there);
+    // with it, the camera opens straight away. At a party the second one is
+    // what people actually want, so it gets to be the big button — and the
+    // photo is in the album seconds after the shutter.
     nodes.input = el('input', { type: 'file', accept: 'image/*', multiple: 'multiple', class: 'visually-hidden' });
-    nodes.input.addEventListener('change', function () {
-      accept(Array.from(nodes.input.files || []));
-      nodes.input.value = '';
+    nodes.camera = el('input', { type: 'file', accept: 'image/*', capture: 'environment', class: 'visually-hidden' });
+
+    [nodes.input, nodes.camera].forEach(function (input) {
+      input.addEventListener('change', function () {
+        accept(Array.from(input.files || []));
+        input.value = ''; // so the same file can be picked twice in a row
+      });
     });
+
+    function opens(input) {
+      return function () {
+        if (!requireName()) return;
+        input.click();
+      };
+    }
+
+    // Hidden on anything with a mouse: a desktop has no camera worth using,
+    // and the button would open a webcam nobody pointed at the cake.
+    nodes.shoot = el('button', {
+      class: 'btn btn--primary btn--big btn--camera',
+      disabled: 'disabled',
+      onclick: opens(nodes.camera)
+    }, ['📷 Foto aufnehmen']);
 
     nodes.pick = el('button', {
       class: 'btn btn--primary btn--big',
       disabled: 'disabled',
-      onclick: function () {
-        if (!requireName()) return;
-        nodes.input.click();
-      }
+      onclick: opens(nodes.input)
     }, ['Fotos auswählen']);
 
     nodes.status = el('p', { class: 'hint', text: 'Verbinde mit dem Album …' });
@@ -86,7 +107,7 @@
 
     var drop = el('div', { class: 'drop' }, [
       el('div', { class: 'drop__emoji', text: '📸' }),
-      nodes.pick,
+      el('div', { class: 'drop__buttons' }, [nodes.shoot, nodes.pick]),
       el('p', { class: 'drop__hint', text: 'oder Fotos einfach hierher ziehen' })
     ]);
     ['dragenter', 'dragover'].forEach(function (type) {
@@ -114,6 +135,7 @@
       drop,
       nodes.status,
       nodes.input,
+      nodes.camera,
       nodes.summary,
       nodes.list
     ]));
@@ -122,7 +144,9 @@
   }
 
   function updatePickState() {
-    nodes.pick.classList.toggle('is-waiting', !PS.name());
+    var waiting = !PS.name();
+    nodes.pick.classList.toggle('is-waiting', waiting);
+    nodes.shoot.classList.toggle('is-waiting', waiting);
   }
 
   function requireName() {
