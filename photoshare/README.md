@@ -155,6 +155,12 @@ browser.
 - **Anyone with the upload link can also delete**, because GitHub's Contents
   permission is not separable that way. Hand it out accordingly, and prefer the
   view link.
+- **One access code per browser.** Opening the view link replaces whatever was
+  stored, so a phone that could upload a minute ago is read-only afterwards.
+  Opening the upload link again restores it. The app notices which of the two
+  it is holding — it learns from what its writes actually do, because GitHub's
+  `permissions` field is not documented to reflect a fine-grained token's
+  access — and hides the delete button rather than offering one that refuses.
 - **Deleting is a courtesy, not a permission.** The gallery offers a delete
   button only on photos this browser uploaded, but everyone shares one token
   and the name is self-declared, so the restriction lives in the UI and nowhere

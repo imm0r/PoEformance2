@@ -310,7 +310,9 @@
     // up other people's photos by accident, and nothing more.
     var me = PS.name();
     var mine = me && PS.album.slug(me) === PS.album.slug(item.uploader);
-    nodes.lbDelete.classList.toggle('is-hidden', !mine);
+    // ...and only while the code in this browser might actually be allowed to.
+    // A button that answers "you may not" is worse than no button.
+    nodes.lbDelete.classList.toggle('is-hidden', !mine || !PS.mayWrite());
     hideConfirm();
 
     // Show the thumbnail immediately so there is never a blank stage.
@@ -377,6 +379,7 @@
     } catch (error) {
       hideConfirm();
       PS.toast(PS.escapeError(error), 'error');
+      if (!PS.mayWrite()) nodes.lbDelete.classList.add('is-hidden');
       return;
     }
 

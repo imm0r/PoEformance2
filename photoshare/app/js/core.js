@@ -83,6 +83,41 @@
     config = null;
   };
 
+  /*
+   * What the current access code is allowed to do.
+   *
+   * There is no way to ask GitHub outright: the repository endpoint carries a
+   * `permissions` object, but the docs do not say whether it reflects the
+   * token's access or the account's, and a wrong guess here shows a Löschen
+   * button that cannot work. So the app learns from what actually happened —
+   * a write that succeeded proves "write", a 403 proves "read" — and shows the
+   * button only when it has no evidence against it.
+   *
+   * Keyed by the token, so switching links starts the question over.
+   */
+  function abilityKey() {
+    var token = read('token');
+    if (!token) return '';
+    var hash = 0x811c9dc5;
+    for (var i = 0; i < token.length; i++) {
+      hash ^= token.charCodeAt(i);
+      hash = Math.imul(hash, 0x01000193) >>> 0;
+    }
+    return 'can:' + hash.toString(16);
+  }
+
+  PS.ability = function (value) {
+    var key = abilityKey();
+    if (!key) return 'unknown';
+    if (value === undefined) return read(key) || 'unknown';
+    write(key, value);
+    return value;
+  };
+
+  PS.mayWrite = function () {
+    return PS.ability() !== 'read';
+  };
+
   PS.name = function (value) {
     if (value === undefined) return read('name');
     write('name', value);

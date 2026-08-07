@@ -463,6 +463,36 @@ const LINK = (page, extra = '') =>
     (await page.textContent('.toast--error')).includes('Upload-Link'),
     await page.textContent('.toast--error'));
   check('delete: nothing was removed', repo.deletes.length === 0 && repo.tree.size === 2);
+
+  // The refusal is evidence. A button that has already answered "you may not"
+  // must not keep offering itself.
+  check('delete: the button withdraws after being refused',
+    !(await page.isVisible('.btn--danger')));
+  await page.reload();
+  await page.waitForSelector('.tile.is-loaded');
+  await page.locator('.tile').first().click();
+  await page.waitForSelector('.lightbox:not(.is-hidden)');
+  check('delete: and stays away after a reload',
+    !(await page.isVisible('.btn--danger')));
+  await page.context().close();
+}
+
+// --- 3f. a writable code keeps the button after switching links -----------
+{
+  const page = await newPage();
+  const repo = makeRepo();
+  await stubGitHub(page, repo);
+  const jpeg = await makeJpeg(300, 300, 90);
+  repo.add('photos/2026-08-07/120000__Jonas__dddddddd.jpg', jpeg);
+  repo.add('thumbs/2026-08-07/120000__Jonas__dddddddd.jpg', jpeg);
+
+  await page.goto(LINK('index.html'));
+  await page.evaluate(() => localStorage.setItem('ps:name', 'Jonas'));
+  await page.reload();
+  await page.waitForSelector('.tile.is-loaded');
+  await page.locator('.tile').first().click();
+  check('delete: offered while nothing is known against the code',
+    await page.isVisible('.btn--danger'));
   await page.context().close();
 }
 
