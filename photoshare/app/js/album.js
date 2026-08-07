@@ -18,7 +18,23 @@
 
   var PHOTO_DIR = 'photos';
   var THUMB_DIR = 'thumbs';
+  var COMMENT_DIR = 'comments';
   var PATTERN = /^(\d{4}-\d{2}-\d{2})\/(\d{6})__(.+?)__([0-9a-f]{8})\.jpg$/;
+
+  /*
+   * Comments follow the photos: one file each, never rewritten.
+   *
+   *   comments/a1b2c3d4/20260807T235900__Jonas__4f2a.txt
+   *            ^^^^^^^^ ^^^^^^^^^^^^^^^ ^^^^^ ^^^^
+   *            photo    when            who   collision guard
+   *
+   * A shared comments.json would need read-modify-write, and two relatives
+   * typing at the same moment would silently lose one of the two. Separate
+   * files cannot collide, and the tree listing the gallery already fetches
+   * carries every author and timestamp for free — only the text itself costs
+   * a request, and only once a photo is actually open.
+   */
+  var COMMENT_PATTERN = /^([0-9a-f]{8})\/(\d{8}T\d{6})__(.+?)__([0-9a-f]{4})\.txt$/;
 
   /**
    * Reduce a display name to something safe in a path while keeping it
@@ -41,6 +57,39 @@
     THUMB_DIR: THUMB_DIR,
     slug: slug,
     unslug: unslug,
+
+    COMMENT_DIR: COMMENT_DIR,
+
+    /** Path of a comment file, relative to the repo root. */
+    commentPath: function (photoId, when, author, nonce) {
+      var stamp = [
+        when.getFullYear(),
+        String(when.getMonth() + 1).padStart(2, '0'),
+        String(when.getDate()).padStart(2, '0'),
+        'T',
+        String(when.getHours()).padStart(2, '0'),
+        String(when.getMinutes()).padStart(2, '0'),
+        String(when.getSeconds()).padStart(2, '0')
+      ].join('');
+      return COMMENT_DIR + '/' + photoId + '/' + stamp + '__' + slug(author) + '__' + nonce + '.txt';
+    },
+
+    /** Turn a `comments/...` tree entry into a comment, or null. */
+    parseComment: function (entry) {
+      if (entry.path.slice(0, COMMENT_DIR.length + 1) !== COMMENT_DIR + '/') return null;
+      var match = COMMENT_PATTERN.exec(entry.path.slice(COMMENT_DIR.length + 1));
+      if (!match) return null;
+      var t = match[2];
+      return {
+        photoId: match[1],
+        at: new Date(+t.slice(0, 4), +t.slice(4, 6) - 1, +t.slice(6, 8),
+          +t.slice(9, 11), +t.slice(11, 13), +t.slice(13, 15)),
+        stamp: t,
+        author: unslug(match[3]),
+        path: entry.path,
+        sha: entry.sha
+      };
+    },
 
     /** Path of a photo, relative to the repo root. */
     path: function (dir, day, time, uploader, hash) {
@@ -79,6 +128,19 @@
         }
       });
 
+      // Comments arrive in the same listing, so grouping them here costs
+      // nothing and spares the gallery a request per photo.
+      var comments = new Map();
+      entries.forEach(function (entry) {
+        var comment = album.parseComment(entry);
+        if (!comment) return;
+        if (!comments.has(comment.photoId)) comments.set(comment.photoId, []);
+        comments.get(comment.photoId).push(comment);
+      });
+      comments.forEach(function (list) {
+        list.sort(function (a, b) { return a.stamp < b.stamp ? -1 : 1; });
+      });
+
       var items = [];
       entries.forEach(function (entry) {
         var item = album.parse(entry);
@@ -86,6 +148,7 @@
         var sha = photoShas.get(item.photoPath);
         if (!sha) return;
         item.photoSha = sha;
+        item.comments = comments.get(item.id) || [];
         items.push(item);
       });
 

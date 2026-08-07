@@ -159,6 +159,21 @@
     return url;
   };
 
+  /**
+   * Fetch a blob as text. Comments are tiny and content-addressed like
+   * everything else, so once read they never need reading again.
+   */
+  var texts = new Map();
+  gh.blobText = async function (cfg, sha) {
+    if (texts.has(sha)) return texts.get(sha);
+    var response = await request(cfg,
+      '/repos/' + cfg.owner + '/' + cfg.name + '/git/blobs/' + sha,
+      { accept: 'application/vnd.github.raw' });
+    var text = await response.text();
+    texts.set(sha, text);
+    return text;
+  };
+
   gh.forgetBlob = function (sha) {
     var url = objectUrls.get(sha);
     if (!url) return;

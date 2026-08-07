@@ -196,6 +196,9 @@
       class: 'tile',
       onclick: function () { openLightbox(state.visible.indexOf(item)); }
     }, [img, el('span', { class: 'tile__by', text: item.uploader })]);
+    if (commentCount(item)) {
+      tile.appendChild(el('span', { class: 'tile__talk', text: '💬 ' + commentCount(item) }));
+    }
     tile._item = item;
     tile._img = img;
     observer.observe(tile);
@@ -223,6 +226,10 @@
     nodes.lbCaption = el('div', { class: 'lightbox__caption' });
     nodes.lbDownload = el('a', { class: 'btn btn--ghost', download: '' }, ['Speichern']);
     nodes.lbSpinner = el('div', { class: 'spinner spinner--light' });
+    nodes.lbComments = el('button', {
+      class: 'btn btn--ghost lightbox__comments-toggle',
+      onclick: toggleComments
+    }, ['💬']);
     nodes.lbDelete = el('button', {
       class: 'btn btn--ghost btn--danger is-hidden',
       onclick: askToDelete
@@ -233,6 +240,7 @@
       el('div', { class: 'lightbox__bar' }, [
         nodes.lbCaption,
         el('div', { class: 'lightbox__tools' }, [
+          nodes.lbComments,
           nodes.lbDelete,
           nodes.lbDownload,
           el('button', { class: 'btn btn--ghost', onclick: closeLightbox }, ['✕'])
@@ -244,6 +252,7 @@
         el('button', { class: 'lightbox__nav lightbox__nav--prev', onclick: function () { step(-1); } }, ['‹']),
         el('button', { class: 'lightbox__nav lightbox__nav--next', onclick: function () { step(1); } }, ['›'])
       ]),
+      buildComments(),
       nodes.confirm
     ]);
     app.appendChild(nodes.lightbox);
@@ -252,6 +261,7 @@
       if (state.lightbox < 0) return;
       if (event.key === 'Escape') {
         if (!nodes.confirm.classList.contains('is-hidden')) hideConfirm();
+        else if (!nodes.comments.classList.contains('is-hidden')) toggleComments();
         else closeLightbox();
       }
       if (event.key === 'ArrowLeft') step(-1);
@@ -280,6 +290,7 @@
     var item = state.visible[state.lightbox];
     state.lightbox = -1;
     nodes.lightbox.classList.add('is-hidden');
+    nodes.comments.classList.add('is-hidden');
     document.body.classList.remove('is-locked');
     nodes.lbImage.removeAttribute('src');
     // Full-size photos are megabytes each; hand them back rather than letting a
@@ -314,6 +325,8 @@
     // A button that answers "you may not" is worse than no button.
     nodes.lbDelete.classList.toggle('is-hidden', !mine || !PS.mayWrite());
     hideConfirm();
+    updateCommentButton(item);
+    if (!nodes.comments.classList.contains('is-hidden')) renderComments();
 
     // Show the thumbnail immediately so there is never a blank stage.
     try {
@@ -331,6 +344,161 @@
       nodes.lbImage.classList.remove('is-loading');
       nodes.lbSpinner.classList.add('is-hidden');
     }
+  }
+
+  function buildComments() {
+    nodes.commentList = el('div', { class: 'comments__list' });
+    nodes.commentName = el('input', {
+      class: 'field field--slim', type: 'text', maxlength: '24',
+      placeholder: 'Dein Name', autocomplete: 'name'
+    });
+    nodes.commentName.addEventListener('input', function () {
+      PS.name(nodes.commentName.value.trim());
+    });
+    nodes.commentText = el('textarea', {
+      class: 'field field--slim comments__input', rows: '2', maxlength: '500',
+      placeholder: 'Etwas dazu schreiben …'
+    });
+    nodes.commentSend = el('button', { class: 'btn btn--primary', onclick: postComment }, ['Senden']);
+    nodes.commentForm = el('div', { class: 'comments__form' }, [
+      nodes.commentName, nodes.commentText, nodes.commentSend
+    ]);
+    nodes.commentNote = el('p', { class: 'comments__note is-hidden' });
+
+    nodes.comments = el('div', { class: 'comments is-hidden' }, [
+      el('div', { class: 'comments__bar' }, [
+        el('strong', { text: 'Kommentare' }),
+        el('button', { class: 'btn btn--ghost btn--small', onclick: toggleComments }, ['Schließen'])
+      ]),
+      nodes.commentList,
+      nodes.commentNote,
+      nodes.commentForm
+    ]);
+    return nodes.comments;
+  }
+
+  function toggleComments() {
+    var open = nodes.comments.classList.toggle('is-hidden');
+    if (!open) renderComments();
+  }
+
+  function commentCount(item) {
+    return item.comments ? item.comments.length : 0;
+  }
+
+  /**
+   * Render the thread. Author and time come from the file name, so the list
+   * appears instantly; only the text needs fetching, and each one is filled in
+   * as it arrives rather than holding up the whole thread.
+   */
+  function renderComments() {
+    var item = state.visible[state.lightbox];
+    if (!item) return;
+
+    nodes.commentList.innerHTML = '';
+    if (!commentCount(item)) {
+      nodes.commentList.appendChild(el('p', { class: 'comments__empty', text: 'Noch nichts geschrieben.' }));
+    }
+
+    var me = PS.name();
+    item.comments.forEach(function (comment) {
+      var body = el('p', { class: 'comment__text', text: '…' });
+      var row = el('div', { class: 'comment' }, [
+        el('div', { class: 'comment__head' }, [
+          el('span', { class: 'comment__who', text: comment.author }),
+          el('span', { class: 'comment__when', text: PS.formatWhen(comment.at) })
+        ]),
+        body
+      ]);
+      if (me && PS.album.slug(me) === PS.album.slug(comment.author) && PS.mayWrite()) {
+        row.appendChild(el('button', {
+          class: 'comment__remove',
+          title: 'Kommentar löschen',
+          onclick: function () { removeComment(item, comment); }
+        }, ['×']));
+      }
+      nodes.commentList.appendChild(row);
+
+      // A comment posted a moment ago has its text in hand and no sha yet;
+      // asking GitHub for blob "null" is both pointless and a 404.
+      if (comment.text !== undefined) {
+        body.textContent = comment.text;
+      } else {
+        PS.gh.blobText(state.cfg, comment.sha).then(function (text) {
+          body.textContent = text;
+        }).catch(function () {
+          body.textContent = '(Text konnte nicht geladen werden)';
+          body.classList.add('is-error');
+        });
+      }
+    });
+
+    nodes.commentName.value = PS.name();
+    nodes.commentName.classList.toggle('is-hidden', !!PS.name());
+    nodes.commentForm.classList.toggle('is-hidden', !PS.mayWrite());
+    nodes.commentNote.classList.toggle('is-hidden', PS.mayWrite());
+    nodes.commentNote.textContent = PS.mayWrite() ? ''
+      : 'Zum Mitschreiben brauchst du den Upload-Link.';
+  }
+
+  async function postComment() {
+    var item = state.visible[state.lightbox];
+    var text = nodes.commentText.value.trim();
+    if (!item || !text) return;
+    if (!PS.name()) {
+      nodes.commentName.classList.remove('is-hidden');
+      nodes.commentName.focus();
+      PS.toast('Bitte trag deinen Namen ein.');
+      return;
+    }
+
+    nodes.commentSend.disabled = true;
+    nodes.commentSend.textContent = 'Sendet …';
+    var when = new Date();
+    var nonce = Math.floor(Math.random() * 0x10000).toString(16).padStart(4, '0');
+    var path = PS.album.commentPath(item.id, when, PS.name(), nonce);
+
+    try {
+      var encoded = await PS.toBase64(new Blob([text], { type: 'text/plain' }));
+      await PS.gh.putFile(state.cfg, path, encoded, 'Kommentar von ' + PS.name());
+    } catch (error) {
+      PS.toast(PS.escapeError(error), 'error');
+      nodes.commentSend.disabled = false;
+      nodes.commentSend.textContent = 'Senden';
+      renderComments();
+      return;
+    }
+
+    // The next poll would bring it too, but a comment that does not appear the
+    // moment you send it reads as lost. Show it now; the sha arrives later.
+    item.comments.push({
+      photoId: item.id, at: when, stamp: '', author: PS.name(), path: path, sha: null, text: text
+    });
+    nodes.commentText.value = '';
+    nodes.commentSend.disabled = false;
+    nodes.commentSend.textContent = 'Senden';
+    renderComments();
+    updateCommentButton(item);
+    render();
+  }
+
+  async function removeComment(item, comment) {
+    if (!comment.sha) return; // just posted; it will be removable after the next refresh
+    try {
+      await PS.gh.deleteFile(state.cfg, comment.path, comment.sha, 'Kommentar entfernt');
+    } catch (error) {
+      PS.toast(PS.escapeError(error), 'error');
+      return;
+    }
+    item.comments = item.comments.filter(function (other) { return other.path !== comment.path; });
+    renderComments();
+    updateCommentButton(item);
+    render();
+  }
+
+  function updateCommentButton(item) {
+    var count = commentCount(item);
+    nodes.lbComments.textContent = count ? '💬 ' + count : '💬';
   }
 
   function buildConfirm() {
@@ -376,6 +544,11 @@
       // a tile that opens into nothing.
       await PS.gh.deleteFile(state.cfg, item.thumbPath, item.thumbSha, 'Foto entfernt (' + item.uploader + ')');
       await PS.gh.deleteFile(state.cfg, item.photoPath, item.photoSha, 'Foto entfernt (' + item.uploader + ')');
+      // Otherwise the thread outlives the photo it belonged to.
+      for (var c = 0; c < (item.comments || []).length; c++) {
+        var comment = item.comments[c];
+        if (comment.sha) await PS.gh.deleteFile(state.cfg, comment.path, comment.sha, 'Kommentar entfernt');
+      }
     } catch (error) {
       hideConfirm();
       PS.toast(PS.escapeError(error), 'error');

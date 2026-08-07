@@ -65,7 +65,9 @@ function makeRepo() {
     puts: [],
     deletes: [],
     blobHits: 0,
-    add(p, bytes) { this.tree.set(p, { sha: `sha-${this.tree.size}-${p.length}`, bytes }); }
+    add(p, bytes) {
+      this.tree.set(p, { sha: `sha-${this.tree.size}-${p.length}`, bytes, isText: p.endsWith('.txt') });
+    }
   };
 }
 
@@ -98,7 +100,12 @@ async function stubGitHub(page, repo, { writable = true, noBranch = false, noRep
       const entry = [...repo.tree.values()].find((v) => v.sha === sha);
       if (!entry) return json(404, { message: 'no blob' });
       repo.blobHits++;
-      return route.fulfill({ status: 200, headers: { 'Content-Type': 'image/jpeg' }, body: Buffer.from(entry.bytes) });
+      const text = request.headers()['accept'] === 'application/vnd.github.raw' && entry.isText;
+      return route.fulfill({
+        status: 200,
+        headers: { 'Content-Type': text ? 'text/plain; charset=utf-8' : 'image/jpeg' },
+        body: Buffer.from(entry.bytes)
+      });
     }
     if (request.method() === 'DELETE' && url.pathname.includes('/contents/')) {
       if (!writable) return json(403, { message: 'read only' });
@@ -114,7 +121,11 @@ async function stubGitHub(page, repo, { writable = true, noBranch = false, noRep
       if (!writable) return json(403, { message: 'read only' });
       const body = JSON.parse(request.postData());
       const filePath = decodeURIComponent(url.pathname.split('/contents/')[1]);
-      repo.puts.push({ path: filePath, size: Buffer.from(body.content, 'base64').length });
+      repo.puts.push({
+        path: filePath,
+        size: Buffer.from(body.content, 'base64').length,
+        text: Buffer.from(body.content, 'base64').toString('utf8')
+      });
       repo.add(filePath, Buffer.from(body.content, 'base64'));
       return json(201, { content: { path: filePath } });
     }
@@ -493,6 +504,90 @@ const LINK = (page, extra = '') =>
   await page.locator('.tile').first().click();
   check('delete: offered while nothing is known against the code',
     await page.isVisible('.btn--danger'));
+  await page.context().close();
+}
+
+// --- 3g. comments ---------------------------------------------------------
+{
+  const page = await newPage();
+  const repo = makeRepo();
+  await stubGitHub(page, repo);
+  const jpeg = await makeJpeg(400, 400, 150);
+  repo.add('photos/2026-08-07/120000__Maria__eeeeeeee.jpg', jpeg);
+  repo.add('thumbs/2026-08-07/120000__Maria__eeeeeeee.jpg', jpeg);
+  repo.add('comments/eeeeeeee/20260807T120500__Oma-Lotte__1a2b.txt',
+    Buffer.from('Schönes Bild! Grüße von der Omä.', 'utf8'));
+
+  await page.goto(LINK('index.html'));
+  await page.waitForSelector('.tile.is-loaded');
+  check('comments: the tile shows a thread exists',
+    (await page.textContent('.tile__talk')).includes('1'));
+
+  await page.locator('.tile').first().click();
+  await page.waitForSelector('.lightbox:not(.is-hidden)');
+  check('comments: the count is on the button',
+    (await page.textContent('.lightbox__comments-toggle')).includes('1'));
+
+  await page.click('.lightbox__comments-toggle');
+  await page.waitForSelector('.comments:not(.is-hidden)');
+  check('comments: author and time come from the file name, no fetch needed',
+    (await page.textContent('.comment__who')) === 'Oma Lotte');
+  await page.waitForFunction(() => {
+    const t = document.querySelector('.comment__text');
+    return t && t.textContent !== '…';
+  });
+  check('comments: umlauts survive the round trip',
+    (await page.textContent('.comment__text')) === 'Schönes Bild! Grüße von der Omä.',
+    await page.textContent('.comment__text'));
+
+  await page.fill('.comments .field[type=text]', 'Jonas');
+  await page.fill('.comments__input', 'Das war ein schöner Tag ☀️');
+  await page.click('.comments__form .btn--primary');
+  await page.waitForFunction(() => document.querySelectorAll('.comment').length === 2);
+
+  const posted = repo.puts.find((p) => p.path.startsWith('comments/'));
+  check('comments: written as its own file under the photo id',
+    /^comments\/eeeeeeee\/\d{8}T\d{6}__Jonas__[0-9a-f]{4}\.txt$/.test(posted.path), posted.path);
+  check('comments: the text goes up as written', posted.text === 'Das war ein schöner Tag ☀️', posted.text);
+  check('comments: it appears without waiting for a refresh',
+    (await page.locator('.comment').count()) === 2);
+
+  // Two people typing at the same second must both survive - the reason
+  // comments are separate files rather than one shared JSON.
+  await page.fill('.comments__input', 'Ich auch!');
+  await page.click('.comments__form .btn--primary');
+  await page.waitForFunction(() => document.querySelectorAll('.comment').length === 3);
+  const written = repo.puts.filter((p) => p.path.startsWith('comments/'));
+  check('comments: a second one in the same second gets its own path',
+    written.length === 2 && written[0].path !== written[1].path,
+    JSON.stringify(written.map((p) => p.path)));
+
+  check('comments: no page errors', page._errors.length === 0, page._errors.join('\n'));
+  await page.context().close();
+}
+
+// --- 3h. comments are read-only without the upload code -------------------
+{
+  const page = await newPage();
+  const repo = makeRepo();
+  await stubGitHub(page, repo, { writable: false });
+  const jpeg = await makeJpeg(300, 300, 20);
+  repo.add('photos/2026-08-07/120000__Maria__ffffffff.jpg', jpeg);
+  repo.add('thumbs/2026-08-07/120000__Maria__ffffffff.jpg', jpeg);
+  repo.add('comments/ffffffff/20260807T120500__Maria__9c3d.txt', Buffer.from('Da waren alle da.', 'utf8'));
+
+  await page.goto(LINK('index.html'));
+  await page.waitForSelector('.tile.is-loaded');
+  await page.locator('.tile').first().click();
+  await page.click('.lightbox__comments-toggle');
+  await page.waitForSelector('.comments:not(.is-hidden)');
+  check('comments: a view-only code can still read the thread',
+    (await page.locator('.comment').count()) === 1);
+  await page.waitForFunction(() => {
+    const t = document.querySelector('.comment__text');
+    return t && t.textContent !== '…';
+  });
+  check('comments: and sees the text', (await page.textContent('.comment__text')) === 'Da waren alle da.');
   await page.context().close();
 }
 

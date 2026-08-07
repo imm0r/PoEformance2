@@ -93,18 +93,6 @@
     });
   };
 
-  PS.toBase64 = function (blob) {
-    return new Promise(function (resolve, reject) {
-      var reader = new FileReader();
-      reader.onload = function () {
-        var text = String(reader.result);
-        resolve(text.slice(text.indexOf(',') + 1));
-      };
-      reader.onerror = function () { reject(new Error('Datei konnte nicht gelesen werden.')); };
-      reader.readAsDataURL(blob);
-    });
-  };
-
   /**
    * Short content fingerprint, used as the photo's identity so re-uploading
    * the same file is a no-op.
