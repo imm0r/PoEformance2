@@ -40,6 +40,14 @@ uploading at the same moment cannot collide, because they only ever create new
 paths. And re-uploading the same photo produces the same name, so a duplicate is
 a no-op instead of a second copy.
 
+**Comments are files too.** A comment lands at
+`comments/<photo-id>/20260807T235900__Jonas__4f2a.txt`. A shared `comments.json`
+would need read-modify-write, and two relatives typing at the same moment would
+silently lose one of the two — separate files cannot collide. The tree listing
+the gallery already fetches carries every author and timestamp, so the thread
+count on a tile costs nothing; only the text itself is a request, and only once
+a photo is open.
+
 **Two links, not one.** Almost everyone only wants to look. A read-only link
 cannot overwrite or delete anything, even if it ends up in the wrong group chat.
 

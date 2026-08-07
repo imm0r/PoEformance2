@@ -144,6 +144,24 @@
     return false;
   };
 
+  /**
+   * Blob -> base64, which is the only shape the GitHub Contents API accepts.
+   *
+   * Lives here rather than next to the image code because the gallery needs it
+   * too: posting a comment is a file write like any other.
+   */
+  PS.toBase64 = function (blob) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var text = String(reader.result);
+        resolve(text.slice(text.indexOf(',') + 1));
+      };
+      reader.onerror = function () { reject(new Error('Datei konnte nicht gelesen werden.')); };
+      reader.readAsDataURL(blob);
+    });
+  };
+
   // --- DOM helpers -------------------------------------------------------
 
   PS.el = function (tag, attrs, children) {
@@ -252,6 +270,28 @@
       if (event.key === 'Enter') submit();
     });
     input.focus();
+  };
+
+  /** "vor 5 Minuten", "gestern, 21:03" — a timestamp people read without doing sums. */
+  PS.formatWhen = function (date) {
+    var seconds = Math.round((Date.now() - date.getTime()) / 1000);
+    if (seconds < 60) return 'gerade eben';
+    if (seconds < 3600) return 'vor ' + PS.plural(Math.round(seconds / 60), 'Minute', 'Minuten');
+    if (seconds < 21600) return 'vor ' + PS.plural(Math.round(seconds / 3600), 'Stunde', 'Stunden');
+
+    var time = String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
+    var today = new Date();
+    var sameDay = function (a, b) {
+      return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    };
+    if (sameDay(date, today)) return time + ' Uhr';
+    var yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+    if (sameDay(date, yesterday)) return 'gestern, ' + time;
+    return PS.formatDayShort([
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0')
+    ].join('-')) + ', ' + time;
   };
 
   PS.escapeError = function (error) {
