@@ -230,3 +230,105 @@ public class RoutePlannerTests
         Assert.Equal("no terrain yet", Assert.Single(planner.Routes).Status);
     }
 }
+
+/// <summary>
+/// Destinations belong to the map they were chosen in.
+/// </summary>
+/// <remarks>
+/// Written from a live report: points of interest turning up from a map already left, and only
+/// on the ones that had been given an arrow. Nothing but the "clear all" button ever emptied
+/// the list, so a destination survived every zone - as an address the game had since handed
+/// out to something else, and a position somewhere in a map no longer loaded.
+/// </remarks>
+public class RouteAreaTests
+{
+    private static TerrainGrid Ground()
+    {
+        var cells = new byte[8 * 8];
+        Array.Fill(cells, (byte)0x11);
+        return new TerrainGrid(cells, 8, 8);
+    }
+
+    private static WorldSnapshot In(uint area)
+    {
+        var player = new WorldEntity(
+            0, 0x1000, "Metadata/Characters/Int/IntFourb", EntityKind.Player, 0f, 0f, 0f);
+
+        return new WorldSnapshot(true, player, [player], new float[16], Terrain: Ground(), AreaHash: area);
+    }
+
+    private static RoutePlanner Routed(uint area)
+    {
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
+        planner.Service(In(area), 1000);
+        planner.Request(new RouteRequest([new RouteTarget(0xABCD, 32f, 32f)]));
+        planner.Service(In(area), 1100);
+
+        Assert.Single(planner.Targets);
+        return planner;
+    }
+
+    [Fact]
+    public void LEAVINGTheAreaForgetsWhatWasChosenInIt()
+    {
+        RoutePlanner planner = Routed(1);
+
+        planner.Service(In(2), 2000);
+
+        Assert.Empty(planner.Targets);
+        Assert.Empty(planner.Routes);
+    }
+
+    [Fact]
+    public void STAYINGKeepsThem()
+    {
+        // The case that must not regress: this runs on every read, and clearing on a tick
+        // would make choosing a place impossible rather than merely wrong.
+        RoutePlanner planner = Routed(1);
+
+        planner.Service(In(1), 2000);
+        planner.Service(In(1), 3000);
+
+        Assert.Single(planner.Targets);
+    }
+
+    [Fact]
+    public void ALoadingScreenIsNotANewArea()
+    {
+        // The hash reads 0 between zones. Treating that as an area would wipe the destinations
+        // of the map being loaded into, on the frame before it finished loading.
+        RoutePlanner planner = Routed(1);
+
+        planner.Service(In(0), 2000);
+
+        Assert.Single(planner.Targets);
+    }
+
+    [Fact]
+    public void ANDTheChangeIsSeenEvenAcrossOne()
+    {
+        // Two real areas are rarely next to each other in the readings - there is a loading
+        // screen between them - so the comparison has to skip the zeroes rather than use the
+        // last value seen.
+        RoutePlanner planner = Routed(1);
+
+        planner.Service(In(0), 2000);
+        planner.Service(In(2), 3000);
+
+        Assert.Empty(planner.Targets);
+    }
+
+    [Fact]
+    public void COMINGBackToTheSameInstanceForgetsThemToo()
+    {
+        // Its hash is unchanged, but leaving reloaded the area: the addresses that were chosen
+        // no longer point at what was chosen. Keeping the arrows would be the same bug wearing
+        // the same hash.
+        RoutePlanner planner = Routed(1);
+
+        planner.Service(In(2), 2000);   // town
+        planner.Service(In(1), 3000);   // back through the portal
+
+        Assert.Empty(planner.Targets);
+    }
+}

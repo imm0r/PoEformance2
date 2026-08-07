@@ -85,6 +85,18 @@ public sealed class RoutePlanner
     /// <summary>The area the reader last saw, for throwing away an answer about an old one.</summary>
     private uint _currentArea;
 
+    /// <summary>
+    /// The last real area the destinations belong to.
+    /// </summary>
+    /// <remarks>
+    /// Kept apart from <see cref="_currentArea"/> because it must ignore the zeroes. The area
+    /// hash reads 0 between zones, so comparing against the last value seen would either treat
+    /// a loading screen as a new area - wiping the destinations of the map being loaded INTO -
+    /// or, guarded the other way, miss the change entirely because the two real areas were
+    /// never next to each other.
+    /// </remarks>
+    private uint _targetsArea;
+
     /// <param name="schedule">
     /// Where a search runs. <see cref="Background"/> by default, which is what keeps a long
     /// one off the thread that reads the game.
@@ -141,6 +153,7 @@ public sealed class RoutePlanner
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         Volatile.Write(ref _currentArea, snapshot.AreaHash);
+        ForgetOnLeaving(snapshot.AreaHash);
 
         RouteRequest request = Volatile.Read(ref _request);
         if (request.Targets.Count == 0)
@@ -239,6 +252,41 @@ public sealed class RoutePlanner
 
     /// <summary>The route to one place, or null when there is none.</summary>
     public RouteView? For(ulong address) => Routes.FirstOrDefault(r => r.Target == address);
+
+    /// <summary>
+    /// Drops the destinations when the area they belong to is left.
+    /// </summary>
+    /// <remarks>
+    /// A destination is an ENTITY ADDRESS and a position in one map. Neither means anything in
+    /// the next one - the address is freed and handed out again, the position is somewhere
+    /// else entirely - so keeping them produced arrows to places that are not there, a route
+    /// counter that never emptied, and, when an address happened to be reused, an unrelated
+    /// place in the new map marked as chosen. That was reported from a live run, and nothing
+    /// but the "clear all" button ever emptied the list.
+    ///
+    /// Returning to the same map instance clears them too, even though its hash is unchanged
+    /// on the way back: leaving reloads the area, so the addresses that were chosen no longer
+    /// point at what was chosen. Losing the arrows is the honest answer there; keeping them
+    /// would be the same bug wearing the same hash.
+    /// </remarks>
+    private void ForgetOnLeaving(uint area)
+    {
+        if (area == 0 || area == _targetsArea)
+        {
+            return;   // between zones, or still in the one the destinations belong to
+        }
+
+        // The FIRST area is not a change - there is nothing to have left. Treating it as one
+        // wipes any destination chosen before the first read came back, which is a real
+        // ordering on a fresh start and was caught by the tests that already existed.
+        bool left = _targetsArea != 0;
+        _targetsArea = area;
+
+        if (left && Targets.Count > 0)
+        {
+            Clear();
+        }
+    }
 
     /// <summary>Forgets every route, so the next area starts clean.</summary>
     public void Clear()
