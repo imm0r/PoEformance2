@@ -44,6 +44,11 @@ tests/                        runs against synthetic memory / recordings (any OS
 docs/architecture.md          why it is built this way
 ```
 
+`photoshare/` is an unrelated little side project that happens to live in this
+repository: a private, GitHub-hosted photo album for a family gathering. It
+shares nothing with the C# tool — no build, no dependencies, its own
+[README](photoshare/README.md).
+
 ## Build & run
 
 Windows quick start (full guide: [`docs/setup-windows.md`](docs/setup-windows.md)):
