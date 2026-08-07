@@ -84,6 +84,11 @@ public readonly record struct ReadCost(
 /// Whether a chest has already been opened. Null for anything that is not a chest, and for a
 /// chest whose component did not resolve.
 /// </param>
+/// <param name="Name">
+/// What the game calls this - "Elder Madox" rather than "ElderMadoxMapIntro". Empty for
+/// everything that carries no name, which is most of a map: scenery, effects, ground items.
+/// Read from the Render component once per entity and remembered, because it never changes.
+/// </param>
 /// <param name="IsEffect">
 /// Whether this is a passing effect - a flame wall, a patch of burning ground - rather than
 /// something that can be fought. True here always means a FRIENDLY one: hostile effects never
@@ -108,7 +113,8 @@ public sealed record WorldEntity(
     Vital EnergyShield = default,
     bool? Opened = null,
     bool IsFriendly = false,
-    bool IsEffect = false)
+    bool IsEffect = false,
+    string Name = "")
 {
     /// <summary>Whether this is a chest somebody has already been through.</summary>
     public bool IsSpent => Opened == true;
@@ -120,15 +126,29 @@ public sealed record WorldEntity(
     /// thing rather than what its file is called - and for a quest objective the difference
     /// is "Quest Object" against "Brazier Lever 03".
     /// </remarks>
-    public string PoiName => MapIcon.Length > 0
-        ? PointsOfInterest.Readable(MapIcon)
-        : PointsOfInterest.Name(Path, Poi);
+    public string PoiName => Name.Length > 0
+        ? Name
+        : MapIcon.Length > 0
+            ? PointsOfInterest.Readable(MapIcon)
+            : PointsOfInterest.Name(Path, Poi);
 
     /// <summary>Where the game floats this entity's health bar: the top of its model.</summary>
     public float HealthBarZ => WorldZ - ModelBoundsZ;
 
-    /// <summary>Short display name: the last segment of the metadata path.</summary>
-    public string ShortName
+    /// <summary>
+    /// What to call this on screen: the game's own name, else the last part of its path.
+    /// </summary>
+    /// <remarks>
+    /// The name first, because it is the one somebody recognises - "Zar Wali, the Bone
+    /// Tyrant" is what the game says and "MonsterBossZarWali01" is what the file is called.
+    /// The path stays as the fallback rather than as a second choice nobody sees: most
+    /// entities have no name at all, and a label that vanished for them would be worse than
+    /// an ugly one.
+    /// </remarks>
+    public string ShortName => Name.Length > 0 ? Name : FileName;
+
+    /// <summary>The last segment of the metadata path.</summary>
+    public string FileName
     {
         get
         {
@@ -234,6 +254,19 @@ public sealed class WorldReader
     private readonly int _monsterRarity;
     private readonly int _chestOpened;
     private readonly int _reaction;
+
+    /// <summary>Names already read, by entity address.</summary>
+    /// <remarks>
+    /// A name never changes while an entity exists, and reading one is a header plus a heap
+    /// read - so paying for it on every snapshot would buy the same answer sixty times a
+    /// second. EMPTY answers are remembered too, and that is most of the value: scenery and
+    /// effects have no name, they are the bulk of the map, and without this they would be
+    /// asked again every frame forever.
+    /// </remarks>
+    private readonly Dictionary<ulong, string> _names = [];
+
+    /// <summary>The area those names belong to. Addresses are handed out again in the next one.</summary>
+    private uint _namesArea;
 
     /// <param name="rotation">
     /// Where the terrain rotation tables live, for the within-tile heights. Optional: without
@@ -416,6 +449,16 @@ public sealed class WorldReader
         // The map struct sits INLINE in AreaInstance: pass its address, not a pointer read
         // from it (its first field is the head, which is why reading it as a pointer works
         // for the drift report but is not what the traversal needs).
+        // Read before the entities rather than with the rest of the snapshot: the names
+        // remembered below belong to one area, and an address freed in one is handed out to
+        // something else in the next.
+        uint areaHash = _reader.Read<uint>(chain.AreaInstance + (ulong)_areaHash);
+        if (areaHash != _namesArea)
+        {
+            _namesArea = areaHash;
+            _names.Clear();
+        }
+
         ulong mapStruct = chain.AreaInstance + (ulong)_awakeEntities;
         long entitiesFrom = System.Diagnostics.Stopwatch.GetTimestamp();
         Dictionary<uint, ulong> pointers = _map.ReadEntityPointers(mapStruct, maxEntities);
@@ -516,7 +559,8 @@ public sealed class WorldReader
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
                 PointsOfInterest.Classify(entity.Path, mapIcon), mapIcon,
-                signs.Life, signs.EnergyShield, opened, signs.Friendly, signs.IsEffect);
+                signs.Life, signs.EnergyShield, opened, signs.Friendly, signs.IsEffect,
+                NameOf(address, renderAddress));
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
@@ -600,9 +644,35 @@ public sealed class WorldReader
             true, player, entities, matrix, largeMap, miniMap, playerVitals, playerBuffs, flaskBelt,
             area,
             terrain,
-            _reader.Read<uint>(chain.AreaInstance + (ulong)_areaHash),
+            areaHash,
             chain.State,
             new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, entities.Count, skipped));
+    }
+
+    /// <summary>How many names are worth remembering before starting over.</summary>
+    /// <remarks>
+    /// A bound on a dictionary filled from game memory, not a view about how many entities an
+    /// area has. Monsters die and spawn all map long, each with an address of its own, so
+    /// without this a long map grows it without limit.
+    /// </remarks>
+    private const int MostNamesRemembered = 4096;
+
+    /// <summary>The name this entity shows, read once and remembered.</summary>
+    private string NameOf(ulong entity, ulong render)
+    {
+        if (_names.TryGetValue(entity, out string? known))
+        {
+            return known;
+        }
+
+        if (_names.Count >= MostNamesRemembered)
+        {
+            _names.Clear();
+        }
+
+        string name = _render.ReadName(render);
+        _names[entity] = name;
+        return name;
     }
 
     /// <summary>Milliseconds since a timestamp.</summary>

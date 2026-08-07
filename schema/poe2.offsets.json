@@ -357,8 +357,12 @@
     },
 
     "Render": {
-      "comment": "Component: world position + model bounds.",
+      "comment": "Component: world position + model bounds + the name the game shows.",
       "fields": {
+        "Name": {
+          "offset": "0xA0", "type": "stdWString",
+          "comment": "The readable name - 'Elder Madox' on Metadata/NPC/League/Affliction/ElderMadoxMapIntro. FOUND LIVE (2026-08, owner, in the dissector) and confirmed by its own shape: a pointer at 0xA0, size 11 at 0xB0 which is exactly the length of the text it points at, capacity 15 at 0xB8. That is a std::wstring and it is the layout ReadStdWString already expects (size at +0x10, capacity at +0x18). GameHelper2 carries the SAME offset as a commented-out 'ClassName' in RenderOffsets - same address, same type, disabled there rather than wrong. Not everything has one: scenery and effects read empty, which is why every consumer falls back to the metadata path."
+        },
         "CurrentWorldPosition": {
           "offset": "0x138", "type": "f32",
           "comment": "x; y at +0x13C, z at +0x140."

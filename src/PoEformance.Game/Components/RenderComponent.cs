@@ -33,10 +33,14 @@ public readonly record struct RenderComponent(float X, float Y, float Z, float T
 /// <summary>Reads the Render component (world position). Offsets come from the schema.</summary>
 public sealed class RenderReader
 {
+    /// <summary>Longest name taken seriously. Anything longer is a bad read, not a name.</summary>
+    public const int LongestName = 128;
+
     private readonly IMemoryReader _reader;
     private readonly int _worldPos;
     private readonly int _terrainHeight;
     private readonly int _modelBounds;
+    private readonly int _name;
 
     public RenderReader(IMemoryReader reader, OffsetSchema schema)
     {
@@ -48,7 +52,22 @@ public sealed class RenderReader
         _worldPos = render.OffsetOf("CurrentWorldPosition"); // x; y at +4, z at +8
         _terrainHeight = render.OffsetOf("TerrainHeight");
         _modelBounds = render.OffsetOf("CharacterModelBounds"); // x; y at +4, z at +8
+        _name = render.OffsetOf("Name");
     }
+
+    /// <summary>
+    /// The name the game shows for this entity, or empty when it has none.
+    /// </summary>
+    /// <remarks>
+    /// SEPARATE FROM <see cref="Read"/> on purpose. A position is read for every entity on
+    /// every snapshot; a name never changes while an entity exists, so reading it in the same
+    /// call would pay for a string thousands of times to learn what it said the first time.
+    /// Whoever calls this is expected to remember the answer.
+    /// </remarks>
+    public string ReadName(ulong componentAddress)
+        => MemoryReaderExtensions.IsPlausiblePointer(componentAddress)
+            ? _reader.ReadStdWString(componentAddress + (ulong)_name, LongestName)
+            : string.Empty;
 
     /// <summary>Reads the world position from a Render component address, or null on failure.</summary>
     public RenderComponent? Read(ulong componentAddress)

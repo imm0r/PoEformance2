@@ -197,10 +197,18 @@ public sealed class EntityBrowserWindow
                 // exactly like a read that works.
                 string facts = Facts(entity);
 
+                // BOTH names, where there are two. This window is where somebody finds out
+                // which entities carry a name at all, and showing only the winner would hide
+                // exactly that: "Elder Madox (ElderMadoxMapIntro)" answers the question, while
+                // "Elder Madox" alone leaves you unsure which of the two you are reading.
+                string called = entity.Name.Length > 0
+                    ? $"{entity.Name}  ({entity.FileName})"
+                    : entity.FileName;
+
                 // ###address, not ##: the label carries a live distance, and ImGui derives a
                 // control's identity from its label - so without this the row would be a new
                 // control every frame and the click would never land.
-                if (ImGui.Selectable($"{entity.Kind}  {entity.ShortName}{away}{facts}###{entity.Address:X}",
+                if (ImGui.Selectable($"{entity.Kind}  {called}{away}{facts}###{entity.Address:X}",
                         entity.Address == _selected))
                 {
                     _selected = entity.Address;
