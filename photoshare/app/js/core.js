@@ -172,6 +172,9 @@
    */
   PS.requireAccess = function (mount, onReady) {
     var cfg = PS.config();
+    // Name the tab before anything else. Someone who has three albums open, or
+    // who bookmarked the bare URL, should not be looking at "Fotoalbum".
+    if (cfg.title) document.title = cfg.title;
     if (cfg.repo && cfg.token) { onReady(cfg); return; }
 
     var input = PS.el('input', {
