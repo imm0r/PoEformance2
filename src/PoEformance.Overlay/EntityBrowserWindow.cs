@@ -342,8 +342,14 @@ public sealed class EntityBrowserWindow
 
         if (_filter.Length > 0)
         {
+            // The NAME as well as the path, because the rows show both and a filter that only
+            // knew one of them would be searching for something other than what is on screen.
+            // It matters more the moment the name stops being English: the path is the same
+            // text on every client, the name is whatever this one calls it, and somebody
+            // typing what they can see should find it either way.
             entities = entities.Where(entity =>
-                entity.Path.Contains(_filter, StringComparison.OrdinalIgnoreCase));
+                entity.Path.Contains(_filter, StringComparison.OrdinalIgnoreCase)
+                || entity.Name.Contains(_filter, StringComparison.OrdinalIgnoreCase));
         }
 
         return player is null
