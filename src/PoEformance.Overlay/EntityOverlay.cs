@@ -77,6 +77,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             _banner.Style = value;
             _preloadPanel.Style = value;
+            _preloadEntry.Style = value;
             _unwalked.Style = value;
             _healthBars.Style = value;
         }
@@ -206,6 +207,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private PreloadWatch? _preload;
     private PreloadSettings _preloadSettings = PreloadSettings.Default;
     private readonly PreloadPanel _preloadPanel = new();
+    private readonly PreloadEntryBanner _preloadEntry = new();
 
     /// <summary>The area whose findings have already been said out loud.</summary>
     /// <remarks>
@@ -285,13 +287,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         _announced = area;
 
-        string what = watch.Announcement(_preloadSettings.MinFiles);
-        if (what.Length > 0)
+        IReadOnlyList<(PreloadWeight Weight, string Names)> saying =
+            watch.AnnounceableByWeight(_preloadSettings.MinFiles);
+
+        if (saying.Count > 0)
         {
-            _banner.Show(
-                new Alert("In this area", what, 0, 0f, nowMs),
-                StyleCatalogue.Keys.PreloadBanner,
-                StyleCatalogue.Keys.PreloadBannerBack);
+            _preloadEntry.Announce(saying, nowMs);
         }
     }
 
@@ -404,6 +405,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // it needs, which is what keeps its projection maths testable away from a GPU.
         _terrain = new TerrainLayer(Upload, key => RemoveImage(key));
         _icons = new IconCache(Upload, key => RemoveImage(key));
+
+        // The entry card takes its plates from the same cache the markers use, so a picture
+        // that cannot be loaded is reported in one place and given up on once.
+        _preloadEntry.Icons = _icons;
     }
 
     private IntPtr Upload(string key, SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image, bool srgb)
@@ -710,15 +715,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (width > 0 && height > 0)
             {
                 _banner.Draw(ImGui.GetForegroundDrawList(), width, height, now);
-
-                // Only where the findings are about the ground under your feet. The walk
-                // never runs in a town, so what is held there is the last MAP's list, and
-                // showing that beside the stash would be a straight lie.
-                if (_preload is not null && _snapshot.Area.WantsMarkers)
-                {
-                    _preloadPanel.Draw(
-                        ImGui.GetForegroundDrawList(), width, height, _preload.Findings);
-                }
+                _preloadEntry.Draw(ImGui.GetForegroundDrawList(), width, height, now);
             }
         }
 
@@ -759,6 +756,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _styleWindow?.Render();
         _alertWindow?.Render();
         _preloadWindow?.Render();
+
+        // A window rather than something painted, so it can be closed and moved - which means
+        // it belongs here with the windows and not in the drawing pass. Only where the
+        // findings are about the ground under your feet: the walk never runs in a town, so
+        // what is held there is the last MAP's list, and showing that beside the stash would
+        // be a straight lie.
+        if (_preload is not null && _snapshot.InGame && _snapshot.Area.WantsMarkers)
+        {
+            _preloadPanel.Draw(_snapshot.AreaHash, _preload.Findings);
+        }
 
         if (ShowStatus)
         {

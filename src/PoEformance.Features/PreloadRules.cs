@@ -125,6 +125,53 @@ public sealed record PreloadSettings(
     public IReadOnlyList<PreloadRule> Watching => Rules ?? DefaultPreloadRules.Rules;
 }
 
+/// <summary>
+/// How long the card on the way in stays, and how it arrives and leaves.
+/// </summary>
+/// <remarks>
+/// Here rather than in the drawing, because it is the part with edges: a clock that went
+/// backwards, the exact moment the fade starts, the frame after it ended. Drawing code cannot
+/// be reached by a test in this project - the overlay is Windows-only and the tests are not -
+/// so timing that matters lives where it can be checked.
+///
+/// Both ends fade. Something that appears instantly over a fight reads as a glitch, and
+/// something that vanishes instantly is one you are never sure you read.
+/// </remarks>
+public static class PreloadCard
+{
+    /// <summary>How long the whole card is on screen.</summary>
+    public const long ShownMs = 5_000;
+
+    /// <summary>How long it takes to arrive.</summary>
+    public const long FadeInMs = 400;
+
+    /// <summary>And to leave, at the end of its time.</summary>
+    public const long FadeOutMs = 800;
+
+    /// <summary>
+    /// How readable the card is at a given age, from 0 to 1.
+    /// </summary>
+    /// <remarks>
+    /// A negative age means the clock went backwards - a restart, or a caller passing
+    /// something else - and reads as gone rather than as an exception in a render loop.
+    /// </remarks>
+    public static float Readability(long ageMs)
+    {
+        if (ageMs < 0 || ageMs >= ShownMs)
+        {
+            return 0f;
+        }
+
+        if (ageMs < FadeInMs)
+        {
+            return ageMs / (float)FadeInMs;
+        }
+
+        long leaving = ShownMs - FadeOutMs;
+        return ageMs <= leaving ? 1f : (ShownMs - ageMs) / (float)FadeOutMs;
+    }
+}
+
 /// <summary>Loads and saves the preload alerts next to the executable.</summary>
 /// <remarks>
 /// A file of its own rather than a section of the alert settings. The two answer questions

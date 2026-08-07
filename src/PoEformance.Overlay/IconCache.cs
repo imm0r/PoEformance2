@@ -31,9 +31,34 @@ public sealed class IconCache : IDisposable
     /// </remarks>
     public const int MaxEdge = 128;
 
+    /// <summary>
+    /// Largest edge for something drawn big, like a banner across the screen.
+    /// </summary>
+    /// <remarks>
+    /// A marker is eight pixels and a banner is most of the screen's width, so one limit
+    /// cannot serve both: at 128 an ornate plate arrives as a 21-pixel-tall smear. The cap
+    /// still exists, because the 4000-pixel photograph is still out there.
+    /// </remarks>
+    public const int MaxWideEdge = 1024;
+
+    /// <summary>A loaded picture, and the shape it came in.</summary>
+    /// <remarks>
+    /// The SIZE is the reason this exists. A banner is drawn to a width and has to keep its
+    /// proportions, and a caller that cannot ask how tall the picture is can only guess -
+    /// which shows up as every custom banner being subtly squashed.
+    /// </remarks>
+    public readonly record struct Picture(IntPtr Texture, int Width, int Height)
+    {
+        /// <summary>Whether there is anything to draw.</summary>
+        public bool Ready => Texture != IntPtr.Zero && Width > 0 && Height > 0;
+
+        /// <summary>How tall this is when drawn at a given width.</summary>
+        public float HeightAt(float width) => Ready ? width * Height / Width : 0f;
+    }
+
     private readonly Func<string, Image<Rgba32>, bool, IntPtr> _upload;
     private readonly Action<string> _release;
-    private readonly Dictionary<string, IntPtr> _textures = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, Picture> _textures = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _keys = new(StringComparer.OrdinalIgnoreCase);
 
     public IconCache(Func<string, Image<Rgba32>, bool, IntPtr> upload, Action<string> release)
@@ -50,14 +75,26 @@ public sealed class IconCache : IDisposable
     /// <summary>
     /// The texture for a path, or <see cref="IntPtr.Zero"/> when there is none to draw.
     /// </summary>
-    public IntPtr TextureFor(string? path)
+    public IntPtr TextureFor(string? path) => PictureFor(path, MaxEdge).Texture;
+
+    /// <summary>
+    /// The picture for a path at a given size limit, or an empty one when there is none.
+    /// </summary>
+    /// <remarks>
+    /// The limit is part of the KEY, not just of the load. The same file is a marker in one
+    /// place and a banner in another, and without it in the key whichever asked first decides
+    /// how detailed the other one gets - which is a bug that only appears when somebody
+    /// happens to point two settings at one file.
+    /// </remarks>
+    public Picture PictureFor(string? path, int maxEdge)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
-            return IntPtr.Zero;
+            return default;
         }
 
-        if (_textures.TryGetValue(path, out IntPtr known))
+        string cached = $"{maxEdge}|{path}";
+        if (_textures.TryGetValue(cached, out Picture known))
         {
             return known;
         }
@@ -65,44 +102,44 @@ public sealed class IconCache : IDisposable
         string file = Files.NextToTry(path);
         if (file.Length == 0)
         {
-            return IntPtr.Zero;   // never chosen, or already given up on
+            return default;   // never chosen, or already given up on
         }
 
-        IntPtr texture = Load(path, file);
-        if (texture != IntPtr.Zero)
+        Picture picture = Load(path, file, maxEdge);
+        if (picture.Ready)
         {
-            _textures[path] = texture;
+            _textures[cached] = picture;
         }
 
-        return texture;
+        return picture;
     }
 
-    private IntPtr Load(string path, string file)
+    private Picture Load(string path, string file, int maxEdge)
     {
         try
         {
             if (!File.Exists(file))
             {
                 Files.Failed(path, "not found");
-                return IntPtr.Zero;
+                return default;
             }
 
             using Image<Rgba32> image = Image.Load<Rgba32>(file);
 
-            if (image.Width > MaxEdge || image.Height > MaxEdge)
+            if (image.Width > maxEdge || image.Height > maxEdge)
             {
                 // Fits INSIDE the box rather than filling it, so a wide picture is not
                 // squashed into a square - a squashed icon is a different picture.
                 image.Mutate(context => context.Resize(new ResizeOptions
                 {
-                    Size = new Size(MaxEdge, MaxEdge),
+                    Size = new Size(maxEdge, maxEdge),
                     Mode = ResizeMode.Max,
                 }));
             }
 
-            string key = $"poeformance.icon.{_keys.Count}";
-            _keys[path] = key;
-            return _upload(key, image, true);
+            string key = $"poeformance.icon.{_keys.Count}.{maxEdge}";
+            _keys[$"{maxEdge}|{path}"] = key;
+            return new Picture(_upload(key, image, true), image.Width, image.Height);
         }
         catch (Exception exception) when (
             exception is IOException or UnknownImageFormatException or InvalidImageContentException
@@ -112,7 +149,7 @@ public sealed class IconCache : IDisposable
             // worth a frame - let alone the session, which is what an escaping exception on
             // the render thread costs.
             Files.Failed(path, exception.Message);
-            return IntPtr.Zero;
+            return default;
         }
     }
 

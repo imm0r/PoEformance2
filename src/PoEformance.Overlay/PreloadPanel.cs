@@ -9,63 +9,60 @@ namespace PoEformance.Overlay;
 /// What this area contains, kept in the corner for as long as you are in it.
 /// </summary>
 /// <remarks>
-/// THE BANNER IS NOT ENOUGH, and the reason is what preload findings ARE. An entity alert is
-/// an event - something appeared, you look, it is over. What an area loaded is a property of
-/// the place: it was true before you walked in and stays true until you leave, and the moment
-/// you most want it is not the moment you entered but the one where you are deciding whether
-/// to clear the far half. A line that faded out four minutes ago cannot answer that.
+/// THE CARD ON THE WAY IN IS NOT ENOUGH, and the reason is what preload findings ARE. An
+/// entity alert is an event: something appeared, you look, it is over. What an area loaded is
+/// a property of the place - true before you walked in, true until you leave - and the moment
+/// you most want it is not the entrance but the one where you are deciding whether to clear
+/// the far half. A card that faded four minutes ago cannot answer that.
 ///
-/// So the banner says it once, loudly, and this says it quietly for as long as it is true.
-/// Both are switchable on their own, because which of the two somebody wants is taste rather
-/// than a fact about the feature.
-///
-/// Drawn rather than put in a window, for the same reason the banner is: a window has a title
-/// bar, takes focus, and would have to be dragged out of the way of the fight.
+/// A REAL WINDOW rather than something painted on, and that is the one deliberate cost here.
+/// Painted pixels cannot be clicked - this overlay only takes the mouse where ImGui has
+/// something under it - so "close it when it is in the way" is impossible without a window.
+/// The price is a small dead spot where the game will not receive clicks, which is also why it
+/// is draggable: put it somewhere you do not click, and it stops mattering.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class PreloadPanel
 {
-    /// <summary>Where the list starts, as a fraction of the screen.</summary>
-    /// <remarks>
-    /// Left edge and a fifth of the way down: clear of the banner above it, clear of the
-    /// game's own flask and life furniture at the bottom, and on the side the in-game map is
-    /// not on. It is not adjustable yet - if it lands badly on an ultrawide, that is the first
-    /// thing to make a setting.
-    /// </remarks>
-    private const float FromLeft = 0.015f;
-    private const float FromTop = 0.22f;
+    private const ImGuiWindowFlags Flags =
+        ImGuiWindowFlags.NoTitleBar
+        | ImGuiWindowFlags.AlwaysAutoResize
+        | ImGuiWindowFlags.NoFocusOnAppearing
+        | ImGuiWindowFlags.NoNav
+        | ImGuiWindowFlags.NoScrollbar
+        | ImGuiWindowFlags.NoCollapse;
 
-    private const float RowHeight = 18f;
-    private const float PadX = 10f;
-    private const float PadY = 7f;
+    private uint _closed;
 
     /// <summary>How every drawn thing looks. Shared with the overlay.</summary>
     public OverlayStyle Style { get; set; } = new();
 
-    /// <summary>Whether the list is wanted at all - the user's switch, not a style.</summary>
+    /// <summary>Whether the list is wanted at all - the user's setting, not a style.</summary>
     public bool Enabled { get; set; } = true;
 
     /// <summary>
-    /// Draws the list, when there is something in it.
+    /// Draws the list for an area, when there is something in it.
     /// </summary>
-    /// <param name="findings">What the area turned out to contain, strongest first.</param>
+    /// <param name="area">
+    /// Which area these belong to. Closing is remembered against it, so dismissing the list
+    /// here does not dismiss it for the next map - "in the way right now" and "I never want
+    /// this" are different requests, and the second one is the setting.
+    /// </param>
     /// <remarks>
-    /// Everything found goes in, including the one-file findings the banner leaves out. The
-    /// count is beside each name and is the whole story: "Breach 43" is the mechanic being
-    /// here and "Delirium 1" is a mention somewhere, and a reader can tell those apart at a
-    /// glance without the list having to decide for them.
+    /// Everything found goes in, including the one-file findings the entry card leaves out.
+    /// The count beside each name is the whole story: "Breach 43" is the mechanic being here
+    /// and "Delirium 1" is a mention somewhere, and a reader tells those apart at a glance
+    /// without the list having to decide for them.
     /// </remarks>
-    public void Draw(ImDrawListPtr draw, int width, int height, IReadOnlyList<PreloadFinding> findings)
+    public void Draw(uint area, IReadOnlyList<PreloadFinding> findings)
     {
         ArgumentNullException.ThrowIfNull(findings);
 
-        if (!Enabled || findings.Count == 0)
+        if (!Enabled || findings.Count == 0 || (area != 0 && area == _closed))
         {
             return;
         }
 
-        // Hidden entries are dropped before anything is measured, so the backing plate fits
-        // what is actually drawn rather than leaving a gap where a hidden weight would be.
         List<PreloadFinding> shown =
             [.. findings.Where(finding => Style.Visible(StyleCatalogue.ForWeight(finding.Weight)))];
 
@@ -74,46 +71,52 @@ public sealed class PreloadPanel
             return;
         }
 
-        var at = new Vector2(width * FromLeft, height * FromTop);
+        Vector2 screen = ImGui.GetIO().DisplaySize;
+        ImGui.SetNextWindowPos(new Vector2(screen.X * 0.015f, screen.Y * 0.22f), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowBgAlpha(Alpha());
 
-        // Measured with the same scale the drawing uses, and summed the same way it advances.
-        // A plate sized from the row COUNT is right until somebody scales a weight up, and
-        // then it clips the thing they made bigger precisely because it mattered.
-        float widest = 0f;
-        float rows = 0f;
-        foreach (PreloadFinding finding in shown)
+        if (!ImGui.Begin("What loaded###preload-corner", Flags))
         {
-            float scale = Style.Sized(StyleCatalogue.ForWeight(finding.Weight), 1f);
-            widest = Math.Max(widest, ImGui.CalcTextSize(Line(finding)).X * scale);
-            rows += RowHeight * scale;
+            ImGui.End();
+            return;
         }
 
-        draw.AddRectFilled(
-            at - new Vector2(PadX, PadY),
-            at + new Vector2(widest + PadX, rows + PadY),
-            Style.Colour(StyleCatalogue.Keys.PreloadListBack),
-            4f);
-
-        float y = at.Y;
-        foreach (PreloadFinding finding in shown)
+        // End in a finally: an exception between Begin and End leaves ImGui's stack unbalanced
+        // and the assert that follows takes the process down.
+        try
         {
-            string key = StyleCatalogue.ForWeight(finding.Weight);
-            float scale = Style.Sized(key, 1f);
+            foreach (PreloadFinding finding in shown)
+            {
+                string key = StyleCatalogue.ForWeight(finding.Weight);
+                ImGui.TextColored(Unpack(Style.Colour(key)), $"{finding.Name}  {finding.Files}");
+            }
 
-            // The scaling overload rather than the plain one: the whole reason the weights
-            // carry a Scale trait is that "dangerous" should be able to be BIGGER, and a list
-            // that only changes colour cannot say that on a busy screen.
-            draw.AddText(
-                ImGui.GetFont(),
-                ImGui.GetFontSize() * scale,
-                new Vector2(at.X, y),
-                Style.Colour(key),
-                Line(finding));
-
-            y += RowHeight * scale;
+            // Under the list rather than in a corner of it: the window sizes itself to its
+            // contents, so a button pinned to the right edge would move with the longest
+            // name and be somewhere different in every area.
+            if (ImGui.SmallButton("close for this map"))
+            {
+                _closed = area;
+            }
+        }
+        finally
+        {
+            ImGui.End();
         }
     }
 
-    /// <summary>One row: what it is, and how much of it there was.</summary>
-    private static string Line(PreloadFinding finding) => $"{finding.Name}  {finding.Files}";
+    /// <summary>How solid the window's backing is, from the style entry for it.</summary>
+    /// <remarks>
+    /// ImGui wants the background as an alpha on the window rather than as a colour in the
+    /// draw list, so the catalogue entry's alpha is what is used and its hue is ignored. It is
+    /// still one entry to change, which is what matters for it being findable.
+    /// </remarks>
+    private float Alpha()
+    {
+        uint back = Style.Colour(StyleCatalogue.Keys.PreloadListBack);
+        return ((back >> 24) & 0xFF) / 255f;
+    }
+
+    /// <summary>An ImGui colour from a packed one.</summary>
+    private static Vector4 Unpack(uint colour) => ImGui.ColorConvertU32ToFloat4(colour);
 }

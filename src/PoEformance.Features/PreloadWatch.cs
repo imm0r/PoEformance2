@@ -376,15 +376,26 @@ public sealed class PreloadWatch
     public IReadOnlyList<PreloadFinding> Announceable(int minFiles)
         => [.. Findings.Where(finding => finding.Alert && finding.Files >= Math.Max(1, minFiles))];
 
-    /// <summary>The one line a banner says, or empty when there is nothing worth one.</summary>
+    /// <summary>
+    /// What to say on the way in, gathered under the weight that says it - strongest first.
+    /// </summary>
     /// <remarks>
-    /// The file counts are left out here and kept in the list. A banner is read in the moment
-    /// you walk in, with the fight already starting; "Breach, Ritual" is that sentence, and
+    /// Grouped rather than ranked, because the entry display shows one plate PER weight and
+    /// each plate names what belongs to it. An area holding a breach and a rogue exile has two
+    /// things to say and they are not the same kind of thing: ranking them would put the exile
+    /// under a banner about loot, or drop it entirely.
+    ///
+    /// The file counts stay out of it and live in the corner list. This is read in the moment
+    /// of walking in, with the fight already starting - "Breach, Ritual" is that sentence, and
     /// "Breach 43 files, Ritual 12 files" is a table being read aloud.
     /// </remarks>
+    public IReadOnlyList<(PreloadWeight Weight, string Names)> AnnounceableByWeight(int minFiles)
+        => [.. Announceable(minFiles)
+            .GroupBy(finding => finding.Weight)
+            .OrderByDescending(group => group.Key)
+            .Select(group => (group.Key, string.Join(", ", group.Select(finding => finding.Name))))];
+
+    /// <summary>All of it as one line, for anywhere that has room for only one.</summary>
     public string Announcement(int minFiles)
-    {
-        IReadOnlyList<PreloadFinding> worth = Announceable(minFiles);
-        return worth.Count == 0 ? string.Empty : string.Join(", ", worth.Select(finding => finding.Name));
-    }
+        => string.Join(", ", AnnounceableByWeight(minFiles).Select(said => said.Names));
 }

@@ -999,3 +999,92 @@ public class PreloadStoreTests
         Assert.True(fresh.Banner);
     }
 }
+
+/// <summary>The card on the way in: what it says, and how it arrives and leaves.</summary>
+public class PreloadCardTests
+{
+    private static PreloadWatch Watching(params string[] paths)
+    {
+        var watch = new PreloadWatch();
+        watch.UseRules(
+        [
+            new PreloadRule("Ritual", "/Ritual/", PreloadWeight.Valuable),
+            new PreloadRule("Breach", "/Breach/", PreloadWeight.Valuable),
+            new PreloadRule("Rogue exile", "/ExileLeague", PreloadWeight.Dangerous),
+            new PreloadRule("Strongbox", "/StrongBoxes/", PreloadWeight.Notable, Alert: false),
+        ]);
+
+        watch.Took(1, paths);
+        return watch;
+    }
+
+    [Fact]
+    public void EachWeightGetsItsOwnPlateAndItsOwnNames()
+    {
+        // The reason it is grouped rather than ranked: an area holding a breach AND a rogue
+        // exile has two things to say, and they are not the same kind of news. Ranking them
+        // would put the exile under a heading about loot, or lose it.
+        PreloadWatch watch = Watching(
+            "Art/Leagues/Ritual/A", "Art/Leagues/Ritual/B",
+            "Art/Leagues/Breach/A", "Art/Leagues/Breach/B",
+            "Metadata/Monsters/ExileLeague/Exile01", "Metadata/Monsters/ExileLeague/Exile02");
+
+        IReadOnlyList<(PreloadWeight Weight, string Names)> said =
+            watch.AnnounceableByWeight(PreloadSettings.DefaultMinFiles);
+
+        Assert.Equal(2, said.Count);
+
+        // Strongest first, so the plate that matters most is the one at the top.
+        Assert.Equal(PreloadWeight.Dangerous, said[0].Weight);
+        Assert.Equal("Rogue exile", said[0].Names);
+
+        Assert.Equal(PreloadWeight.Valuable, said[1].Weight);
+        Assert.Contains("Ritual", said[1].Names, StringComparison.Ordinal);
+        Assert.Contains("Breach", said[1].Names, StringComparison.Ordinal);
+        Assert.Contains(", ", said[1].Names, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AWeightWithNothingToSayGetsNoPlate()
+    {
+        // No empty plates: a card that shows three headings and one name reads as two things
+        // having failed to load.
+        PreloadWatch watch = Watching("Art/Leagues/Ritual/A", "Art/Leagues/Ritual/B");
+
+        (PreloadWeight weight, string names) = Assert.Single(watch.AnnounceableByWeight(2));
+        Assert.Equal(PreloadWeight.Valuable, weight);
+        Assert.Equal("Ritual", names);
+    }
+
+    [Fact]
+    public void ANDAnAreaWithNothingWorthSayingGetsNoCard()
+    {
+        PreloadWatch watch = Watching("Metadata/Chests/StrongBoxes/Ornate", "Metadata/Terrain/Rocks/Rock");
+        Assert.Empty(watch.AnnounceableByWeight(1));
+    }
+
+    [Fact]
+    public void ITFadesInThenHoldsThenFadesOut()
+    {
+        Assert.Equal(0f, PreloadCard.Readability(0));
+        Assert.Equal(0.5f, PreloadCard.Readability(PreloadCard.FadeInMs / 2), 3);
+        Assert.Equal(1f, PreloadCard.Readability(PreloadCard.FadeInMs), 3);
+
+        // Solid through the middle, and still solid at the last moment before it starts to go.
+        Assert.Equal(1f, PreloadCard.Readability(PreloadCard.ShownMs / 2), 3);
+        Assert.Equal(1f, PreloadCard.Readability(PreloadCard.ShownMs - PreloadCard.FadeOutMs), 3);
+
+        Assert.Equal(0.5f, PreloadCard.Readability(PreloadCard.ShownMs - (PreloadCard.FadeOutMs / 2)), 3);
+        Assert.Equal(0f, PreloadCard.Readability(PreloadCard.ShownMs));
+        Assert.Equal(0f, PreloadCard.Readability(PreloadCard.ShownMs + 1_000));
+    }
+
+    [Fact]
+    public void ANDAClockThatWentBackwardsIsGoneRatherThanAnException()
+    {
+        // A restart, or a caller passing something that is not this clock. A render loop is
+        // the worst place to find out, so it reads as "not shown" and nothing else happens.
+        Assert.Equal(0f, PreloadCard.Readability(-1));
+        Assert.Equal(0f, PreloadCard.Readability(-100_000));
+    }
+}

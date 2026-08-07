@@ -108,12 +108,14 @@ public static class StyleCatalogue
         // these say what the area IS and sit there while you decide whether to walk in. They
         // are also the pair most likely to be moved out of the way, so the list has its own
         // switch here - hiding it does not hide the banner.
-        new("preload.banner", "What the area loaded", "Entry line", StyleTraits.Colour, Rgb(191, 230, 255, 255)),
+        // The three weights carry an ICON, which is what the entry card draws as its plate:
+        // point one at a picture and the card wears it, leave it empty and the weight's name
+        // is written instead. Scale is the plate's width, so one weight can be made to shout.
         new("preload.banner.back", "What the area loaded", "Entry line backing", StyleTraits.Colour, Rgb(14, 20, 28, 215)),
         new("preload.list.back", "What the area loaded", "List backing", StyleTraits.Colour, Rgb(14, 20, 28, 170)),
-        new("preload.notable", "What the area loaded", "Notable", StyleTraits.Colour | StyleTraits.Scale, Rgb(191, 204, 224)),
-        new("preload.valuable", "What the area loaded", "Valuable", StyleTraits.Colour | StyleTraits.Scale, Rgb(255, 217, 102)),
-        new("preload.dangerous", "What the area loaded", "Dangerous", StyleTraits.Colour | StyleTraits.Scale, Rgb(255, 115, 102)),
+        new("preload.notable", "What the area loaded", "Notable", Marker, Rgb(191, 204, 224)),
+        new("preload.valuable", "What the area loaded", "Valuable", Marker, Rgb(255, 217, 102)),
+        new("preload.dangerous", "What the area loaded", "Dangerous", Marker, Rgb(255, 115, 102)),
 
         // ── Measuring aids ──────────────────────────────────────────────────
         // Switched on with the calibration and browser tools rather than during play, but
@@ -152,7 +154,6 @@ public static class StyleCatalogue
         public const string HealthBarShield = "healthbar.shield";
         public const string Banner = "alert.banner";
         public const string BannerBack = "alert.banner.back";
-        public const string PreloadBanner = "preload.banner";
         public const string PreloadBannerBack = "preload.banner.back";
         public const string PreloadListBack = "preload.list.back";
         public const string AidCentre = "aid.centre";
@@ -166,7 +167,7 @@ public static class StyleCatalogue
         public static IReadOnlyList<string> All { get; } =
         [
             DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Banner, BannerBack,
-            PreloadBanner, PreloadBannerBack, PreloadListBack,
+            PreloadBannerBack, PreloadListBack,
             HealthBar, HealthBarBack, HealthBarShield,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];
