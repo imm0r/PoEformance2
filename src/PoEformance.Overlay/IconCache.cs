@@ -60,6 +60,7 @@ public sealed class IconCache : IDisposable
     private readonly Action<string> _release;
     private readonly Dictionary<string, Picture> _textures = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _keys = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _missingBuiltIn = new(StringComparer.OrdinalIgnoreCase);
 
     public IconCache(Func<string, Image<Rgba32>, bool, IntPtr> upload, Action<string> release)
     {
@@ -114,6 +115,87 @@ public sealed class IconCache : IDisposable
         return picture;
     }
 
+    /// <summary>
+    /// A picture that ships INSIDE the assembly, by the tail of its resource name.
+    /// </summary>
+    /// <remarks>
+    /// For the things the tool draws by default and does not want to have to install. A file
+    /// beside the executable can be deleted, missed by a copy, or lost when somebody unzips a
+    /// new build over an old folder - and the failure looks like the feature not working. A
+    /// manifest resource cannot be separated from the code that draws it, survives
+    /// single-file publishing and AOT alike, and needs no path for anybody to type.
+    ///
+    /// It does NOT replace the file path. A shipped plate is the default; the style entry's
+    /// icon still wins when it is set, which is what keeps "all of it can be changed" true.
+    ///
+    /// Matched on the END of the resource name, because the full one is built from the root
+    /// namespace and folder and would have to be repeated - and silently rewritten - every
+    /// time either moved.
+    /// </remarks>
+    public Picture BuiltIn(string name, int maxEdge)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+        string cached = $"{maxEdge}|resource:{name}";
+        if (_textures.TryGetValue(cached, out Picture known))
+        {
+            return known;
+        }
+
+        if (_missingBuiltIn.Contains(cached))
+        {
+            return default;   // asked once, not there - do not go looking sixty times a second
+        }
+
+        Picture picture = LoadBuiltIn(cached, name, maxEdge);
+        if (picture.Ready)
+        {
+            _textures[cached] = picture;
+        }
+        else
+        {
+            // Its own list rather than the file problems: a resource that is not there is a
+            // build mistake, and putting it among the paths the USER typed would send them
+            // looking for a file they never chose.
+            _missingBuiltIn.Add(cached);
+        }
+
+        return picture;
+    }
+
+    private Picture LoadBuiltIn(string cached, string name, int maxEdge)
+    {
+        try
+        {
+            System.Reflection.Assembly assembly = typeof(IconCache).Assembly;
+            string? resource = Array.Find(
+                assembly.GetManifestResourceNames(),
+                candidate => candidate.EndsWith(name, StringComparison.OrdinalIgnoreCase));
+
+            if (resource is null)
+            {
+                return default;
+            }
+
+            using Stream? stream = assembly.GetManifestResourceStream(resource);
+            if (stream is null)
+            {
+                return default;
+            }
+
+            using Image<Rgba32> image = Image.Load<Rgba32>(stream);
+            return Upload(cached, image, maxEdge);
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnknownImageFormatException or InvalidImageContentException
+                or NotSupportedException or ArgumentException)
+        {
+            // A picture that shipped broken is a build mistake, not something to end a session
+            // over. The caller draws its text form, exactly as it does for a missing file.
+            return default;
+        }
+    }
+
     private Picture Load(string path, string file, int maxEdge)
     {
         try
@@ -125,21 +207,7 @@ public sealed class IconCache : IDisposable
             }
 
             using Image<Rgba32> image = Image.Load<Rgba32>(file);
-
-            if (image.Width > maxEdge || image.Height > maxEdge)
-            {
-                // Fits INSIDE the box rather than filling it, so a wide picture is not
-                // squashed into a square - a squashed icon is a different picture.
-                image.Mutate(context => context.Resize(new ResizeOptions
-                {
-                    Size = new Size(maxEdge, maxEdge),
-                    Mode = ResizeMode.Max,
-                }));
-            }
-
-            string key = $"poeformance.icon.{_keys.Count}.{maxEdge}";
-            _keys[$"{maxEdge}|{path}"] = key;
-            return new Picture(_upload(key, image, true), image.Width, image.Height);
+            return Upload($"{maxEdge}|{path}", image, maxEdge);
         }
         catch (Exception exception) when (
             exception is IOException or UnknownImageFormatException or InvalidImageContentException
@@ -153,12 +221,32 @@ public sealed class IconCache : IDisposable
         }
     }
 
+    /// <summary>Shrinks a loaded picture to the limit and hands it to the renderer.</summary>
+    private Picture Upload(string cached, Image<Rgba32> image, int maxEdge)
+    {
+        if (image.Width > maxEdge || image.Height > maxEdge)
+        {
+            // Fits INSIDE the box rather than filling it, so a wide picture is not squashed
+            // into a square - a squashed icon is a different picture.
+            image.Mutate(context => context.Resize(new ResizeOptions
+            {
+                Size = new Size(maxEdge, maxEdge),
+                Mode = ResizeMode.Max,
+            }));
+        }
+
+        string key = $"poeformance.icon.{_keys.Count}.{maxEdge}";
+        _keys[cached] = key;
+        return new Picture(_upload(key, image, true), image.Width, image.Height);
+    }
+
     /// <summary>Drops everything, so changed files are picked up on the next ask.</summary>
     public void Forget()
     {
         Release();
         _textures.Clear();
         _keys.Clear();
+        _missingBuiltIn.Clear();
         Files.Forget();
     }
 

@@ -100,7 +100,7 @@ public sealed class PreloadEntryBanner
         float centre = width / 2f;
         float y = top;
 
-        IconCache.Picture picture = Icons?.PictureFor(style.Icon, IconCache.MaxWideEdge) ?? default;
+        IconCache.Picture picture = PlateFor(weight, style.Icon);
         if (picture.Ready)
         {
             float tall = picture.HeightAt(plate);
@@ -142,6 +142,27 @@ public sealed class PreloadEntryBanner
 
         draw.AddText(at, colour, names);
         return at.Y + line.Y + TextPadY;
+    }
+
+    /// <summary>
+    /// The plate for a weight: the chosen file, else the one that shipped, else nothing.
+    /// </summary>
+    /// <remarks>
+    /// That order and not the other one. A shipped plate means the card looks right the
+    /// moment the tool is installed, with no path to type and no file to keep hold of; a
+    /// chosen file has to beat it, or setting one would appear to do nothing.
+    /// </remarks>
+    private IconCache.Picture PlateFor(PreloadWeight weight, string? chosen)
+    {
+        if (Icons is not IconCache icons)
+        {
+            return default;
+        }
+
+        IconCache.Picture own = icons.PictureFor(chosen, IconCache.MaxWideEdge);
+        return own.Ready
+            ? own
+            : icons.BuiltIn($"preload-{weight.ToString().ToLowerInvariant()}.png", IconCache.MaxWideEdge);
     }
 
     /// <summary>Scales a packed colour's alpha, leaving its colour alone.</summary>

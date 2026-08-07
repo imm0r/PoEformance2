@@ -19,4 +19,13 @@
   <ItemGroup>
     <ProjectReference Include="..\PoEformance.Features\PoEformance.Features.csproj" />
   </ItemGroup>
+  <!-- Pictures the tool draws by default, INSIDE the assembly rather than beside the
+       executable. A loose file can be deleted, missed by a copy, or lost when a new build is
+       unzipped over an old folder, and the failure looks like the feature being broken; a
+       manifest resource cannot be separated from the code that draws it and survives
+       single-file publishing. The glob matching nothing is not an error, so the mechanism
+       ships before the art does and degrades to text until it lands. -->
+  <ItemGroup>
+    <EmbeddedResource Include="assets\*.png" />
+  </ItemGroup>
 </Project>
