@@ -9,10 +9,15 @@ namespace PoEformance.Core.Tests;
 /// The name the game shows for an entity, off the Render component.
 /// </summary>
 /// <remarks>
-/// Found live in the dissector on an Affliction NPC: a pointer at Render+0xA0 with size 11 at
-/// +0xB0 - exactly the length of "Elder Madox" - and capacity 15 at +0xB8. That is a
-/// std::wstring, and it is the layout the reader already expects. GameHelper2 carries the same
-/// offset commented out as "ClassName".
+/// Found live in the dissector on an Affliction NPC: a pointer with size 11 one qword on -
+/// exactly the length of "Elder Madox" - and capacity 15 after that. A std::wstring, and the
+/// layout the reader already expects.
+///
+/// The ADDRESS took two goes. The dissector numbers its rows from wherever the view starts,
+/// not from the component, so reading a row number as an offset put the field 0xC0 too low -
+/// and it landed on the offset GameHelper2 has commented out for the same field, which made a
+/// wrong answer look confirmed. What settled it was the view's own contents: a row holding the
+/// world position, which is at a known offset, says where the view began.
 ///
 /// WHAT THESE DO NOT CHECK IS THE OFFSET. The fixture puts its string wherever the schema says
 /// the field is, so it follows the schema anywhere: moving Name to 0xA8 leaves every test here
