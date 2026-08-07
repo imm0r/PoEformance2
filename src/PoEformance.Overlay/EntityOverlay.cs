@@ -538,7 +538,71 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     protected override Task PostInitialized()
     {
         VSync = true;
+        WearASerif();
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Faces to try for the interface, best first.
+    /// </summary>
+    /// <remarks>
+    /// FONTS WINDOWS ALREADY HAS, rather than one shipped with the tool. A face that can be
+    /// redistributed is a licence somebody has to read and a file that has to travel; these
+    /// are on every Windows since Vista and cost nothing but the attempt.
+    ///
+    /// Serifs, because the thing being drawn over is a game whose own lettering is carved and
+    /// gilded, and the default here is a 13-pixel bitmap face designed for debug output. On a
+    /// painted banner that reads as a placeholder - which, in fairness, is what it was.
+    /// </remarks>
+    private static readonly string[] Serifs =
+    [
+        "constan.ttf",   // Constantia - warm, and the closest of these to the game's own
+        "georgia.ttf",   // Georgia - the most legible at a small size
+        "pala.ttf",      // Palatino Linotype - the last resort that is still a serif
+    ];
+
+    /// <summary>The size the interface is drawn at, when a face was found for it.</summary>
+    /// <remarks>
+    /// Bigger than the default 13, because a real face at 13 is thinner than a bitmap one and
+    /// this is read over a moving game rather than on a desk.
+    /// </remarks>
+    private const int SerifSize = 16;
+
+    /// <summary>
+    /// Puts the interface in a face that suits what it is drawn over, if one can be found.
+    /// </summary>
+    /// <remarks>
+    /// Every step is allowed to fail into the one after it, ending with the built-in font,
+    /// because none of this is worth a tool that does not start: a missing Windows font, a
+    /// locked file, a face ImGui refuses. ReplaceFont says whether it worked, so the answer is
+    /// checked rather than assumed.
+    /// </remarks>
+    private void WearASerif()
+    {
+        string fonts = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
+        if (fonts.Length == 0)
+        {
+            return;
+        }
+
+        foreach (string face in Serifs)
+        {
+            string file = Path.Combine(fonts, face);
+
+            try
+            {
+                if (File.Exists(file)
+                    && ReplaceFont(file, SerifSize, ClickableTransparentOverlay.FontGlyphRangeType.English))
+                {
+                    return;
+                }
+            }
+            catch (Exception exception) when (
+                exception is IOException or UnauthorizedAccessException or ArgumentException)
+            {
+                // Try the next one. A font is decoration, and the built-in face is waiting.
+            }
+        }
     }
 
     // What the settings page asked for, kept so the style can override it per frame without
