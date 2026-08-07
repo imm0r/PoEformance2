@@ -1080,6 +1080,22 @@ public class PreloadCardTests
     }
 
     [Fact]
+    public void ACardIsSTILLTHEREOnTheFrameItWasAnnounced()
+    {
+        // THE BUG THIS EXISTS FOR. Announcing and drawing happen in the same frame off the
+        // same clock, so a card's first age is exactly zero - which is also where the fade in
+        // starts, so its readability is zero. Deciding "gone" from THAT threw every card away
+        // on its own first frame, and nothing was ever seen. Being invisible and being over
+        // are different states.
+        Assert.True(PreloadCard.Showing(0));
+        Assert.Equal(0f, PreloadCard.Readability(0));
+
+        Assert.True(PreloadCard.Showing(PreloadCard.ShownMs - 1));
+        Assert.False(PreloadCard.Showing(PreloadCard.ShownMs));
+        Assert.False(PreloadCard.Showing(-1));
+    }
+
+    [Fact]
     public void ANDAClockThatWentBackwardsIsGoneRatherThanAnException()
     {
         // A restart, or a caller passing something that is not this clock. A render loop is

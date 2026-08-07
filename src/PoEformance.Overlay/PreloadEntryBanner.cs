@@ -88,12 +88,18 @@ public sealed class PreloadEntryBanner
             return;
         }
 
-        float alpha = PreloadCard.Readability(nowMs - _atMs);
-        if (alpha <= 0f)
+        // Whether it is OVER, which only the clock can say. Asking whether it is READABLE and
+        // dropping it when the answer is zero throws the card away at age zero - where the
+        // fade in begins - and announcing happens in the same frame as drawing, so that
+        // destroyed every card on its own first frame.
+        long age = nowMs - _atMs;
+        if (!PreloadCard.Showing(age))
         {
             _saying = [];
             return;
         }
+
+        float alpha = PreloadCard.Readability(age);
 
         float y = height * FromTop;
         foreach ((PreloadWeight weight, string names) in _saying)

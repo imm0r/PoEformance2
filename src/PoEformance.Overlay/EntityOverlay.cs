@@ -182,7 +182,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // both orders happen, so neither attach assumes it went second.
         if (_preload is not null && PreloadRulesChanged is not null)
         {
-            _alertWindow.AttachPreload(_preload, _preloadSettings, TookPreload);
+            _alertWindow.AttachPreload(_preload, _preloadSettings, TookPreload, SayItNow);
         }
     }
 
@@ -257,7 +257,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // The editor for these lives in the alerts window, which may already be attached -
         // both orders happen depending on how the app is wired, so neither is assumed.
-        _alertWindow?.AttachPreload(watch, settings, TookPreload);
+        _alertWindow?.AttachPreload(watch, settings, TookPreload, SayItNow);
     }
 
     /// <summary>
@@ -293,6 +293,28 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (saying.Count > 0)
         {
             _preloadEntry.Announce(saying, nowMs);
+        }
+    }
+
+    /// <summary>Says the card again for the area already being stood in.</summary>
+    /// <remarks>
+    /// Bypasses the once-per-area guard on purpose - this is somebody asking to see it, which
+    /// is a different question from whether it has already been said. It goes through the same
+    /// gates otherwise, so a card with nothing in it stays a card with nothing in it.
+    /// </remarks>
+    private void SayItNow()
+    {
+        if (_preload is not { Looked: true } watch)
+        {
+            return;
+        }
+
+        IReadOnlyList<(PreloadWeight Weight, string Names)> saying =
+            watch.AnnounceableByWeight(_preloadSettings.MinFiles);
+
+        if (saying.Count > 0)
+        {
+            _preloadEntry.Announce(saying, Environment.TickCount64);
         }
     }
 

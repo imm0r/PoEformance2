@@ -45,6 +45,7 @@ public sealed class AlertWindow
     private PreloadWatch? _preload;
     private PreloadSettings _preloadSettings = PreloadSettings.Default;
     private Action<PreloadSettings>? _savePreload;
+    private Action? _showPreloadNow;
 
     public AlertWindow(AlertWatcher watcher, Action save)
     {
@@ -72,14 +73,22 @@ public sealed class AlertWindow
     /// The lists themselves stay apart. Their rules share no fields: one asks about rarity and
     /// distance, the other about a fragment of a path in a table read once per area.
     /// </remarks>
-    public void AttachPreload(PreloadWatch watch, PreloadSettings settings, Action<PreloadSettings> save)
+    /// <param name="showNow">
+    /// Says the card again for the area you are standing in. It is said once per area, so
+    /// without this the only way to see a change to it is to take a portal - which is a long
+    /// way to go to find out whether a colour is right.
+    /// </param>
+    public void AttachPreload(
+        PreloadWatch watch, PreloadSettings settings, Action<PreloadSettings> save, Action showNow)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(save);
+        ArgumentNullException.ThrowIfNull(showNow);
         _preload = watch;
         _preloadSettings = settings;
         _savePreload = save;
+        _showPreloadNow = showNow;
     }
 
     /// <summary>Whether the window is on screen.</summary>
@@ -191,6 +200,17 @@ public sealed class AlertWindow
         if (ImGui.SliderInt("###preload-minfiles", ref minFiles, 1, 20, "at least %d files"))
         {
             PreloadChanged(_preloadSettings with { MinFiles = minFiles });
+        }
+
+        // The card is said once per area, so seeing a change to it otherwise means taking a
+        // portal - a long way to go to find out whether a colour works.
+        if (_showPreloadNow is not null)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("show it now"))
+            {
+                _showPreloadNow();
+            }
         }
 
         foreach (PreloadRule rule in preload.Rules)

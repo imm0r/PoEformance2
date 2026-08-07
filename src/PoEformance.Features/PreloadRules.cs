@@ -149,9 +149,26 @@ public static class PreloadCard
     public const long FadeOutMs = 800;
 
     /// <summary>
+    /// Whether a card of this age is still on screen at all.
+    /// </summary>
+    /// <remarks>
+    /// SEPARATE FROM <see cref="Readability"/>, and the separation is the whole point. The
+    /// first version asked "is it readable" and threw the card away when the answer was zero -
+    /// which is the answer at age ZERO, because that is where the fade in starts. Announcing
+    /// and drawing happen in the same frame off the same clock, so every card was destroyed on
+    /// its own first frame and none was ever seen.
+    ///
+    /// Being invisible and being over are different states, and only time can say which.
+    /// </remarks>
+    public static bool Showing(long ageMs) => ageMs >= 0 && ageMs < ShownMs;
+
+    /// <summary>
     /// How readable the card is at a given age, from 0 to 1.
     /// </summary>
     /// <remarks>
+    /// Zero at both ends. That is the fade, not a verdict on whether the card still exists -
+    /// see <see cref="Showing"/>, which is what a caller must ask before deciding to drop it.
+    ///
     /// A negative age means the clock went backwards - a restart, or a caller passing
     /// something else - and reads as gone rather than as an exception in a render loop.
     /// </remarks>
