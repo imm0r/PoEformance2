@@ -13,10 +13,21 @@ namespace PoEformance.Game.World;
 /// entrance. Nothing else in the tool can answer that: entities exist only within the awake
 /// radius, so a radar cannot see the far half of a map at all.
 ///
-/// The trick is one field. Every loaded file is STAMPED with the area-change count that loaded
-/// it, and nothing ever re-stamps it - so the files carrying the NEWEST stamp in the table are
-/// exactly the ones this area brought in, and everything older is the menu, the character and
-/// the zones before this one.
+/// The trick is one field. Every loaded file is STAMPED with an area-change count, so the files
+/// carrying the NEWEST stamp are the ones this area is using, and everything older belongs to
+/// the menu, the character and the zones before this one.
+///
+/// "The count that LOADED it, never re-stamped" is how that was first written down here, and a
+/// recorded session says otherwise. In one capture the counter stood at 115; most records read
+/// 1 or 2 - the whole game, dragged in at startup - but Stats.dat, Mods.dat, BaseItemTypes.dat,
+/// Languages.dat and Acts.dat all read 115, and none of those was loaded by the map being stood
+/// in. So the stamp is closer to "the area that last wanted this file": area-specific art gets
+/// it on the way in, and the core tables get it because every area touches them.
+///
+/// The feature is unharmed and the reason is worth knowing. Nothing acts on the file COUNT; what
+/// acts is a short list of paths that mean something, and no rule matches a balance table. But
+/// the raw list is bigger than "what this area brought in" suggests, and anybody reading it - or
+/// counting it - should expect the game's own furniture in there.
 ///
 /// The newest stamp is found in the table rather than read from the game's area-change
 /// counter, and BOTH are read anyway. That combination was arrived at the hard way, twice, in
@@ -132,10 +143,10 @@ public sealed class PreloadReader
             return found;
         }
 
-        // THE TABLE KNOWS ITS OWN GENERATION. Files are stamped with the area-change count
-        // that loaded them and nothing ever re-stamps them, so the newest stamp in the table
-        // IS the current area - which means the walk needs no counter to tell it which area it
-        // is in, and that turned out to matter: a mis-derived static once reported 188 against
+        // THE TABLE KNOWS ITS OWN GENERATION. Files carry the area-change count of the area
+        // that wanted them, so the newest stamp in the table IS the current area - which means
+        // the walk needs no counter to tell it which area it is in, and that turned out to
+        // matter: a mis-derived static once reported 188 against
         // a table holding numbers two orders of magnitude smaller. The counter is read all the
         // same, one field below, because the reverse has happened too - see the type comment.
         //
