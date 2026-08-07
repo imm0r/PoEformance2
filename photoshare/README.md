@@ -45,6 +45,27 @@ cannot overwrite or delete anything, even if it ends up in the wrong group chat.
 
 ## Setup
 
+### The short way
+
+```
+./photoshare/tools/setup.sh evas-treff evas-treff-app "Eva's Treff"
+```
+
+Needs the [GitHub CLI](https://cli.github.com) and `gh auth login`. It creates
+the private photo repository and a public one for the app, points the app at
+the photos, publishes it to GitHub Pages (switching Pages on by itself), and
+prints the URL. Safe to re-run.
+
+Two repositories, because Pages needs a paid plan to publish from a private
+one. The split is the right shape anyway: the public repo holds only HTML and
+JavaScript — no photos, no tokens.
+
+Then create the two tokens by hand (step 2 below) — **GitHub has no API for
+minting personal access tokens**, deliberately, since a token that could create
+tokens would be a master key. The script prints the exact click path.
+
+### The long way
+
 Roughly ten minutes, once.
 
 ### 1. Create the album repository
