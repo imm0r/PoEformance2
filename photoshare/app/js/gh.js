@@ -34,7 +34,7 @@
     };
   }
 
-  async function explain(response) {
+  async function explain(response, cfg) {
     if (response.status === 401) {
       return new Error('Der Zugangscode wird nicht mehr akzeptiert. Wahrscheinlich ist er abgelaufen — frag nach einem neuen Link.');
     }
@@ -47,7 +47,15 @@
       return new Error('Der Zugangscode darf das nicht. Zum Hochladen braucht es den Upload-Link, nicht den Ansehen-Link.');
     }
     if (response.status === 404) {
-      return new Error('Das Album gibt es nicht (oder der Code hat keinen Zugriff darauf).');
+      // GitHub hides private repositories a token cannot see behind a 404
+      // rather than a 403, so "does not exist" and "no access" are the same
+      // answer. In practice it is almost always the token: the repository
+      // access field defaults to "Public repositories", which can never see a
+      // private album. Say that, instead of leaving someone to guess.
+      var album = cfg ? cfg.owner + '/' + cfg.name : 'das Album';
+      return new Error('Kein Zugriff auf ' + album + '. Wenn der Name stimmt, liegt es am Zugangscode: ' +
+        'Beim Erstellen des Tokens muss unter "Repository access" ausdrücklich dieses Repository ' +
+        'ausgewählt sein — die Voreinstellung "Public repositories" kann ein privates Album nicht sehen.');
     }
     var detail = '';
     try { detail = (await response.json()).message || ''; } catch (e) { /* body was not JSON */ }
@@ -55,8 +63,8 @@
   }
 
   /** Wrap explain() so callers can still branch on the raw status. */
-  async function failure(response) {
-    var error = await explain(response);
+  async function failure(response, cfg) {
+    var error = await explain(response, cfg);
     error.status = response.status;
     return error;
   }
@@ -66,7 +74,7 @@
     options.headers = Object.assign(headers(cfg, options.accept), options.headers || {});
     delete options.accept;
     var response = await fetch(API + path, options);
-    if (!response.ok) throw await failure(response);
+    if (!response.ok) throw await failure(response, cfg);
     return response;
   }
 
@@ -188,7 +196,7 @@
         await new Promise(function (r) { setTimeout(r, 400 * Math.pow(2, attempt) + Math.random() * 300); });
         continue;
       }
-      throw await failure(response);
+      throw await failure(response, cfg);
     }
   };
 

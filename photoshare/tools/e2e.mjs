@@ -349,8 +349,8 @@ const LINK = (page, extra = '') =>
   await page.goto(LINK('index.html'));
   await page.waitForSelector('.status', { timeout: 10000 });
   const text = await page.textContent('.status');
-  check('empty album: says it is empty, not that it does not exist',
-    text.includes('Noch keine Fotos') && !text.includes('gibt es nicht'), text.trim());
+  check('empty album: says it is empty, not that access is missing',
+    text.includes('Noch keine Fotos') && !text.includes('Kein Zugriff'), text.trim());
   await page.context().close();
 }
 
@@ -360,9 +360,9 @@ const LINK = (page, extra = '') =>
   await stubGitHub(page, makeRepo(), { noRepo: true });
   await page.goto(LINK('index.html'));
   await page.waitForSelector('.status--error', { timeout: 10000 });
-  check('missing album: still reported as missing',
-    (await page.textContent('.status--error')).includes('gibt es nicht'),
-    await page.textContent('.status--error'));
+  const denied = await page.textContent('.status--error');
+  check('unreachable album: names the album and the likely cause',
+    denied.includes('fam/album') && denied.includes('Repository access'), denied.trim());
   await page.context().close();
 }
 
