@@ -375,8 +375,22 @@ img { display: block; max-width: 100%; }
 .drop__emoji { font-size: 30px; margin-bottom: 12px; }
 .drop__hint { margin: 12px 0 0; font-size: 13px; color: var(--ink-dim); }
 
+.drop__buttons { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.drop__buttons .btn { width: 100%; max-width: 280px; }
+
+/* The camera button is for phones only; the gallery button steps back to
+   secondary there, because taking a photo is the common case at a party. */
+.btn--camera { display: none; }
+
 @media (hover: none) {
   .drop__hint { display: none; }
+  .btn--camera { display: inline-flex; }
+  .drop__buttons .btn--camera ~ .btn--primary {
+    background: transparent;
+    border-color: var(--line);
+    color: var(--ink);
+    font-weight: 400;
+  }
 }
 
 .summary {

@@ -278,7 +278,7 @@ const LINK = (page, extra = '') =>
   const big = await makeJpeg(4000, 3000, 120);
   check('upload: fixture is a phone-sized photo', big.length > 1_000_000, `${big.length} bytes`);
 
-  await page.click('.btn--big');
+  await page.click('.btn--big:not(.btn--camera)');
   check('upload: refuses to start without a name', (await page.locator('.toast').count()) === 1);
 
   await page.fill('.field', 'Oma Lotte');
@@ -323,6 +323,54 @@ const LINK = (page, extra = '') =>
   check('upload: the same photo twice is a no-op', repo.puts.length === 2, JSON.stringify(repo.puts.map(p => p.path)));
 
   check('upload: no page errors', page._errors.length === 0, page._errors.join('\n'));
+  await page.context().close();
+}
+
+// --- 3b. taking a photo goes straight into the album ----------------------
+{
+  // A phone context, so the (hover: none) rules that show the camera button apply.
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true
+  });
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  page._errors = errors;
+
+  const repo = makeRepo();
+  await stubGitHub(page, repo);
+  await page.goto(LINK('upload.html'));
+  await page.waitForSelector('.drop');
+
+  const camera = page.locator('input[capture]');
+  check('camera: the button is offered on a phone', await page.isVisible('.btn--camera'));
+  check('camera: opens the rear camera, not the picker',
+    await camera.getAttribute('capture') === 'environment' &&
+    await camera.getAttribute('accept') === 'image/*');
+  check('camera: shoots one photo at a time', await camera.getAttribute('multiple') === null);
+
+  await page.fill('.field', 'Jonas');
+  // setInputFiles on the capture input is exactly what the camera hands back.
+  await camera.setInputFiles([{ name: 'image.jpg', mimeType: 'image/jpeg', buffer: await makeJpeg(3000, 4000, 200) }]);
+  await page.waitForSelector('.job--done', { timeout: 30000 });
+  check('camera: a shot lands in the album like any other photo',
+    repo.puts.length === 2 && repo.puts[0].path.startsWith('photos/'),
+    JSON.stringify(repo.puts.map((p) => p.path)));
+  check('camera: portrait orientation survives',
+    (() => { const d = jpegSize(repo.tree.get(repo.puts[0].path).bytes); return d.height > d.width; })(),
+    JSON.stringify(jpegSize(repo.tree.get(repo.puts[0].path).bytes)));
+  check('camera: no page errors', errors.length === 0, errors.join('\n'));
+  await context.close();
+}
+
+// --- 3c. no camera button where there is a mouse --------------------------
+{
+  const page = await newPage();
+  await stubGitHub(page, makeRepo());
+  await page.goto(LINK('upload.html'));
+  await page.waitForSelector('.drop');
+  check('desktop: camera button stays hidden', !(await page.isVisible('.btn--camera')));
+  check('desktop: the gallery button is still there', await page.isVisible('.btn--big:not(.btn--camera)'));
   await page.context().close();
 }
 
