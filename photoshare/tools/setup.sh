@@ -108,11 +108,10 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      # enablement: true switches Pages on by itself, so nobody has to find the
-      # setting in the repository options first.
+      # Pages is switched on by setup.sh, using your own credentials. It cannot
+      # be done from here: creating a Pages site needs admin rights on the
+      # repository, and a workflow's GITHUB_TOKEN never has those.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
@@ -130,6 +129,19 @@ den Link mit Zugangscode zeigt die Seite nichts an.
 
 Quelle und Anleitung: [photoshare](https://github.com/$OWNER/PoEformance2/tree/main/photoshare)
 EOF
+
+# Switch Pages on before the first push, so the deploy has somewhere to land.
+# This runs under your gh login, which has the admin rights the workflow token
+# structurally cannot have.
+say "GitHub Pages"
+if gh api "repos/$OWNER/$APP_REPO/pages" >/dev/null 2>&1; then
+  echo "  already enabled"
+elif gh api -X POST "repos/$OWNER/$APP_REPO/pages" -f build_type=workflow >/dev/null 2>&1; then
+  echo "  enabled (source: GitHub Actions)"
+else
+  echo "  could not enable it automatically. Switch it on by hand:"
+  echo "  https://github.com/$OWNER/$APP_REPO/settings/pages -> Source: GitHub Actions"
+fi
 
 say "Publishing the app"
 git -C "$WORK/app" add -A
