@@ -44,7 +44,8 @@
       return new Error('GitHub bremst gerade. In etwa ' + minutes + ' Minuten geht es weiter.');
     }
     if (response.status === 403) {
-      return new Error('Dieser Zugangscode darf nur ansehen. Zum Hochladen und Löschen braucht es den Upload-Link.');
+      return new Error('Dieser Zugangscode darf nur ansehen. Öffne einmal den Upload-Link auf diesem Gerät, ' +
+        'dann kannst du hochladen und löschen.');
     }
     if (response.status === 404) {
       // GitHub hides private repositories a token cannot see behind a 404
@@ -190,8 +191,9 @@
         headers: Object.assign(headers(cfg), { 'Content-Type': 'application/json' }),
         body: body
       });
-      if (response.ok) return 'created';
-      if (response.status === 422) return 'exists';
+      if (response.ok) { PS.ability('write'); return 'created'; }
+      if (response.status === 422) { PS.ability('write'); return 'exists'; }
+      if (response.status === 403) PS.ability('read');
       if ((response.status === 409 || response.status >= 500) && attempt < 5) {
         await new Promise(function (r) { setTimeout(r, 400 * Math.pow(2, attempt) + Math.random() * 300); });
         continue;
@@ -218,7 +220,9 @@
         headers: Object.assign(headers(cfg), { 'Content-Type': 'application/json' }),
         body: body
       });
-      if (response.ok || response.status === 404) return;
+      if (response.ok) { PS.ability('write'); return; }
+      if (response.status === 404) return; // already gone; says nothing about the token
+      if (response.status === 403) PS.ability('read');
       if ((response.status === 409 || response.status >= 500) && attempt < 5) {
         await new Promise(function (r) { setTimeout(r, 400 * Math.pow(2, attempt) + Math.random() * 300); });
         continue;
