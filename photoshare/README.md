@@ -155,9 +155,12 @@ browser.
 - **Anyone with the upload link can also delete**, because GitHub's Contents
   permission is not separable that way. Hand it out accordingly, and prefer the
   view link.
-- **Nothing is deleted from the app.** Removing a photo means deleting the file
-  in the repository — deliberately, so a mis-tap at a party cannot lose someone
-  else's photos.
+- **Deleting is a courtesy, not a permission.** The gallery offers a delete
+  button only on photos this browser uploaded, but everyone shares one token
+  and the name is self-declared, so the restriction lives in the UI and nowhere
+  else. Anyone holding the upload link can remove anything through the API.
+  Deleted photos stay in the repository's history and can be restored with git —
+  just not from inside the app.
 - **From `file://`** the gallery works, but `crypto.subtle` and the Cache API
   need a secure context: uploads fall back to a non-cryptographic content
   fingerprint (fine for naming, still deduplicates) and nothing is cached

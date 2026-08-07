@@ -44,7 +44,7 @@
       return new Error('GitHub bremst gerade. In etwa ' + minutes + ' Minuten geht es weiter.');
     }
     if (response.status === 403) {
-      return new Error('Der Zugangscode darf das nicht. Zum Hochladen braucht es den Upload-Link, nicht den Ansehen-Link.');
+      return new Error('Dieser Zugangscode darf nur ansehen. Zum Hochladen und Löschen braucht es den Upload-Link.');
     }
     if (response.status === 404) {
       // GitHub hides private repositories a token cannot see behind a 404
@@ -192,6 +192,33 @@
       });
       if (response.ok) return 'created';
       if (response.status === 422) return 'exists';
+      if ((response.status === 409 || response.status >= 500) && attempt < 5) {
+        await new Promise(function (r) { setTimeout(r, 400 * Math.pow(2, attempt) + Math.random() * 300); });
+        continue;
+      }
+      throw await failure(response, cfg);
+    }
+  };
+
+  /**
+   * Delete a file. `sha` is the blob hash, which the tree listing already
+   * carries — so no extra lookup is needed to remove something.
+   *
+   * A 404 counts as done: the file is gone, which is the point. Same 409
+   * retry as writing, for the same reason.
+   */
+  gh.deleteFile = async function (cfg, path, sha, message) {
+    var body = JSON.stringify({ message: message, sha: sha, branch: cfg.branch });
+    var url = '/repos/' + cfg.owner + '/' + cfg.name + '/contents/' +
+      path.split('/').map(encodeURIComponent).join('/');
+
+    for (var attempt = 0; ; attempt++) {
+      var response = await fetch(API + url, {
+        method: 'DELETE',
+        headers: Object.assign(headers(cfg), { 'Content-Type': 'application/json' }),
+        body: body
+      });
+      if (response.ok || response.status === 404) return;
       if ((response.status === 409 || response.status >= 500) && attempt < 5) {
         await new Promise(function (r) { setTimeout(r, 400 * Math.pow(2, attempt) + Math.random() * 300); });
         continue;

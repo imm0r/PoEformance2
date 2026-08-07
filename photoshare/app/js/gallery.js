@@ -223,11 +223,17 @@
     nodes.lbCaption = el('div', { class: 'lightbox__caption' });
     nodes.lbDownload = el('a', { class: 'btn btn--ghost', download: '' }, ['Speichern']);
     nodes.lbSpinner = el('div', { class: 'spinner spinner--light' });
+    nodes.lbDelete = el('button', {
+      class: 'btn btn--ghost btn--danger is-hidden',
+      onclick: askToDelete
+    }, ['Löschen']);
+    nodes.confirm = buildConfirm();
 
     nodes.lightbox = el('div', { class: 'lightbox is-hidden' }, [
       el('div', { class: 'lightbox__bar' }, [
         nodes.lbCaption,
         el('div', { class: 'lightbox__tools' }, [
+          nodes.lbDelete,
           nodes.lbDownload,
           el('button', { class: 'btn btn--ghost', onclick: closeLightbox }, ['✕'])
         ])
@@ -237,13 +243,17 @@
         nodes.lbImage,
         el('button', { class: 'lightbox__nav lightbox__nav--prev', onclick: function () { step(-1); } }, ['‹']),
         el('button', { class: 'lightbox__nav lightbox__nav--next', onclick: function () { step(1); } }, ['›'])
-      ])
+      ]),
+      nodes.confirm
     ]);
     app.appendChild(nodes.lightbox);
 
     document.addEventListener('keydown', function (event) {
       if (state.lightbox < 0) return;
-      if (event.key === 'Escape') closeLightbox();
+      if (event.key === 'Escape') {
+        if (!nodes.confirm.classList.contains('is-hidden')) hideConfirm();
+        else closeLightbox();
+      }
       if (event.key === 'ArrowLeft') step(-1);
       if (event.key === 'ArrowRight') step(1);
     });
@@ -295,6 +305,14 @@
       ', ' + PS.formatTime(item.time) + ' Uhr';
     nodes.lbDownload.setAttribute('download', item.day + '_' + item.time + '_' + item.uploader + '.jpg');
 
+    // Only offer deletion on photos this browser uploaded. Everyone shares one
+    // token, so this is a courtesy, not a permission: it stops someone tidying
+    // up other people's photos by accident, and nothing more.
+    var me = PS.name();
+    var mine = me && PS.album.slug(me) === PS.album.slug(item.uploader);
+    nodes.lbDelete.classList.toggle('is-hidden', !mine);
+    hideConfirm();
+
     // Show the thumbnail immediately so there is never a blank stage.
     try {
       nodes.lbImage.src = await PS.gh.blobUrl(state.cfg, item.thumbSha);
@@ -311,6 +329,64 @@
       nodes.lbImage.classList.remove('is-loading');
       nodes.lbSpinner.classList.add('is-hidden');
     }
+  }
+
+  function buildConfirm() {
+    nodes.confirmText = el('p', { class: 'confirm__text' });
+    nodes.confirmGo = el('button', { class: 'btn btn--danger', onclick: doDelete }, ['Endgültig löschen']);
+    return el('div', { class: 'confirm is-hidden' }, [
+      el('div', { class: 'confirm__box' }, [
+        el('h2', { class: 'confirm__title', text: 'Dieses Foto löschen?' }),
+        nodes.confirmText,
+        el('div', { class: 'confirm__actions' }, [
+          el('button', { class: 'btn', onclick: hideConfirm }, ['Abbrechen']),
+          nodes.confirmGo
+        ])
+      ])
+    ]);
+  }
+
+  function askToDelete() {
+    var item = state.visible[state.lightbox];
+    if (!item) return;
+    nodes.confirmText.textContent = 'Es verschwindet sofort aus dem Album. ' +
+      'In der Versionsgeschichte des Repositories bleibt es erhalten — von dort ' +
+      'kann man es zurückholen, aber nicht aus dieser App heraus.';
+    nodes.confirm.classList.remove('is-hidden');
+  }
+
+  function hideConfirm() {
+    nodes.confirm.classList.add('is-hidden');
+    nodes.confirmGo.disabled = false;
+    nodes.confirmGo.textContent = 'Endgültig löschen';
+  }
+
+  async function doDelete() {
+    var item = state.visible[state.lightbox];
+    if (!item) return;
+    nodes.confirmGo.disabled = true;
+    nodes.confirmGo.textContent = 'Wird gelöscht …';
+
+    try {
+      // Thumbnail first, mirroring the upload order. The gallery lists
+      // thumbnails, so it disappears the moment the first call lands; if the
+      // second one fails, what is left over is an invisible photo rather than
+      // a tile that opens into nothing.
+      await PS.gh.deleteFile(state.cfg, item.thumbPath, item.thumbSha, 'Foto entfernt (' + item.uploader + ')');
+      await PS.gh.deleteFile(state.cfg, item.photoPath, item.photoSha, 'Foto entfernt (' + item.uploader + ')');
+    } catch (error) {
+      hideConfirm();
+      PS.toast(PS.escapeError(error), 'error');
+      return;
+    }
+
+    PS.gh.forgetBlob(item.thumbSha);
+    PS.gh.forgetBlob(item.photoSha);
+    state.items = state.items.filter(function (other) { return other.id !== item.id; });
+    hideConfirm();
+    closeLightbox();
+    render();
+    PS.toast('Foto gelöscht.');
   }
 
   PS.requireAccess(document.getElementById('app'), boot);
