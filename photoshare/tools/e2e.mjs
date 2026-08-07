@@ -68,7 +68,7 @@ function makeRepo() {
   };
 }
 
-async function stubGitHub(page, repo, { writable = true } = {}) {
+async function stubGitHub(page, repo, { writable = true, noBranch = false, noRepo = false } = {}) {
   await page.route('https://api.github.com/**', async (route) => {
     const request = route.request();
     const url = new URL(request.url());
@@ -79,9 +79,12 @@ async function stubGitHub(page, repo, { writable = true } = {}) {
     if (!request.headers()['authorization']) return json(401, { message: 'no token' });
 
     if (/\/repos\/[^/]+\/[^/]+$/.test(url.pathname)) {
+      if (noRepo) return json(404, { message: 'Not Found' });
       return json(200, { full_name: 'fam/album', private: true });
     }
     if (url.pathname.includes('/git/trees/')) {
+      // A repository with no commits has no branch for the tree endpoint to list.
+      if (noBranch || noRepo) return json(404, { message: 'Not Found' });
       return json(200, {
         sha: 'tree', truncated: false,
         tree: [...repo.tree.entries()].map(([p, v]) => ({
@@ -336,6 +339,30 @@ const LINK = (page, extra = '') =>
   check('upload: read-only code gets a usable explanation',
     (await page.textContent('.job__state')).includes('Upload-Link'),
     await page.textContent('.job__state'));
+  await page.context().close();
+}
+
+// --- 4b. a brand new, still empty album -----------------------------------
+{
+  const page = await newPage();
+  await stubGitHub(page, makeRepo(), { noBranch: true });
+  await page.goto(LINK('index.html'));
+  await page.waitForSelector('.status', { timeout: 10000 });
+  const text = await page.textContent('.status');
+  check('empty album: says it is empty, not that it does not exist',
+    text.includes('Noch keine Fotos') && !text.includes('gibt es nicht'), text.trim());
+  await page.context().close();
+}
+
+// --- 4c. a repository the code cannot reach -------------------------------
+{
+  const page = await newPage();
+  await stubGitHub(page, makeRepo(), { noRepo: true });
+  await page.goto(LINK('index.html'));
+  await page.waitForSelector('.status--error', { timeout: 10000 });
+  check('missing album: still reported as missing',
+    (await page.textContent('.status--error')).includes('gibt es nicht'),
+    await page.textContent('.status--error'));
   await page.context().close();
 }
 

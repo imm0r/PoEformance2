@@ -54,12 +54,19 @@
     return new Error('GitHub antwortet mit ' + response.status + (detail ? ': ' + detail : ''));
   }
 
+  /** Wrap explain() so callers can still branch on the raw status. */
+  async function failure(response) {
+    var error = await explain(response);
+    error.status = response.status;
+    return error;
+  }
+
   async function request(cfg, path, init) {
     var options = Object.assign({ method: 'GET' }, init);
     options.headers = Object.assign(headers(cfg, options.accept), options.headers || {});
     delete options.accept;
     var response = await fetch(API + path, options);
-    if (!response.ok) throw await explain(response);
+    if (!response.ok) throw await failure(response);
     return response;
   }
 
@@ -87,9 +94,26 @@
 
   /** The complete file list of the album branch, in one request. */
   gh.tree = async function (cfg) {
-    var response = await request(cfg,
-      '/repos/' + cfg.owner + '/' + cfg.name + '/git/trees/' +
-      encodeURIComponent(cfg.branch) + '?recursive=1&cachebust=' + Date.now());
+    var response;
+    try {
+      response = await request(cfg,
+        '/repos/' + cfg.owner + '/' + cfg.name + '/git/trees/' +
+        encodeURIComponent(cfg.branch) + '?recursive=1&cachebust=' + Date.now());
+    } catch (error) {
+      // A repository with no commits has no branch to list, and the tree
+      // endpoint 404s exactly like a repository the code cannot reach. Ask the
+      // repository itself which of the two it is: "the album is empty" and
+      // "there is no album" send you looking in completely different places.
+      if (error.status === 404) {
+        try {
+          await gh.verify(cfg);
+          return { truncated: false, entries: [] };
+        } catch (inner) {
+          throw error;
+        }
+      }
+      throw error;
+    }
     var body = await response.json();
     return {
       truncated: !!body.truncated,
@@ -164,7 +188,7 @@
         await new Promise(function (r) { setTimeout(r, 400 * Math.pow(2, attempt) + Math.random() * 300); });
         continue;
       }
-      throw await explain(response);
+      throw await failure(response);
     }
   };
 
