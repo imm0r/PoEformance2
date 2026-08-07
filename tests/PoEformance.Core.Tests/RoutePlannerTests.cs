@@ -116,13 +116,16 @@ public class RoutePlannerTests
     [Fact]
     public void MovingFarEnoughSearchesAgain()
     {
+        // Twenty wide so that the destination stays a destination: the player walks to cell
+        // 8 here, and anything within four cells of the end would be reached rather than
+        // re-planned - a different behaviour, tested next door.
         TerrainGrid grid = Grid(
-            "..........",
-            "..........",
-            "..........");
+            "....................",
+            "....................",
+            "....................");
 
         var planner = new RoutePlanner(RoutePlanner.Immediate);
-        planner.Request(To(9, 2));
+        planner.Request(To(19, 2));
         planner.Service(Snapshot(grid, 0, 0), 1000);
         Assert.Equal((0, 0), planner.Routes[0].Cells[0]);
 
@@ -133,10 +136,10 @@ public class RoutePlannerTests
     [Fact]
     public void ClearingForgetsTheRoute()
     {
-        TerrainGrid grid = Grid("....", "....");
+        TerrainGrid grid = Grid("..........", "..........");
 
         var planner = new RoutePlanner(RoutePlanner.Immediate);
-        planner.Request(To(3, 1));
+        planner.Request(To(9, 1));
         planner.Service(Snapshot(grid, 0, 0), 1000);
         Assert.NotEmpty(planner.Routes);
 
@@ -330,5 +333,139 @@ public class RouteAreaTests
         planner.Service(In(1), 3000);   // back through the portal
 
         Assert.Empty(planner.Targets);
+    }
+}
+
+/// <summary>
+/// Getting there is what finishes a destination.
+/// </summary>
+/// <remarks>
+/// Asked for after the area-change fix, and it closes the same hole from the other side:
+/// without it the arrows only ever accumulate until somebody clears them by hand, and by then
+/// they point at places already visited.
+/// </remarks>
+public class RouteArrivalTests
+{
+    private static TerrainGrid Ground(int size = 40)
+    {
+        int stride = (size + 1) / 2;
+        var cells = new byte[stride * size];
+        Array.Fill(cells, (byte)0x11);
+        return new TerrainGrid(cells, stride, size);
+    }
+
+    private static WorldSnapshot At(int cellX, int cellY)
+    {
+        var player = new WorldEntity(
+            0, 0x1000, "Metadata/Characters/Int/IntFourb", EntityKind.Player,
+            cellX * MapView.WorldToGrid, cellY * MapView.WorldToGrid, 0f);
+
+        return new WorldSnapshot(true, player, [player], new float[16], Terrain: Ground(), AreaHash: 1);
+    }
+
+    private static RouteTarget To(ulong id, int cellX, int cellY)
+        => new(id, cellX * MapView.WorldToGrid, cellY * MapView.WorldToGrid);
+
+    private static RoutePlanner Walking(params RouteTarget[] targets)
+    {
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
+        planner.Service(At(0, 0), 1000);
+        planner.Request(new RouteRequest([.. targets]));
+        planner.Service(At(0, 0), 1100);
+        return planner;
+    }
+
+    [Fact]
+    public void STANDINGAtAPlaceTakesItOffTheList()
+    {
+        RoutePlanner planner = Walking(To(0xAA, 30, 0));
+        Assert.Single(planner.Targets);
+
+        planner.Service(At(30, 0), 2000);
+
+        Assert.Empty(planner.Targets);
+        Assert.Empty(planner.Routes);
+    }
+
+    [Fact]
+    public void NEARENOUGHCounts()
+    {
+        // A destination is a marker's position, and chests and portals are reached from beside
+        // them rather than from on top of them. An arrow that will not go away until you stand
+        // on an exact point is worse than one that goes slightly early.
+        RoutePlanner planner = Walking(To(0xAA, 30, 0));
+
+        planner.Service(At(30 - (int)RoutePlanner.ArrivedWithinCells + 1, 0), 2000);
+
+        Assert.Empty(planner.Targets);
+    }
+
+    [Fact]
+    public void BUTWalkingPastAtADistanceDoesNot()
+    {
+        RoutePlanner planner = Walking(To(0xAA, 30, 0));
+
+        planner.Service(At(30 - (int)RoutePlanner.ArrivedWithinCells - 2, 0), 2000);
+
+        Assert.Single(planner.Targets);
+    }
+
+    [Fact]
+    public void ONLYTheOneReachedIsDropped()
+    {
+        // The radius has to be small enough that arriving at one place does not tick off its
+        // neighbour, which is the failure that would be hardest to notice: the arrow to the
+        // thing you have NOT been to disappears.
+        RoutePlanner planner = Walking(To(0xAA, 30, 0), To(0xBB, 0, 30), To(0xCC, 30, 30));
+        Assert.Equal(3, planner.Targets.Count);
+
+        planner.Service(At(30, 0), 2000);
+
+        Assert.Equal(2, planner.Targets.Count);
+        Assert.DoesNotContain(planner.Targets, target => target.Target == 0xAA);
+        Assert.Contains(planner.Targets, target => target.Target == 0xBB);
+        Assert.Contains(planner.Targets, target => target.Target == 0xCC);
+    }
+
+    [Fact]
+    public void ANDTheRouteToItGoesWithIt()
+    {
+        // Not just the list. A route left behind would keep drawing a line to somewhere the
+        // player is standing until the next plan happened to overwrite it.
+        RoutePlanner planner = Walking(To(0xAA, 30, 0), To(0xBB, 0, 30));
+        Assert.NotNull(planner.For(0xAA));
+
+        planner.Service(At(30, 0), 2000);
+
+        Assert.Null(planner.For(0xAA));
+        Assert.NotNull(planner.For(0xBB));
+    }
+
+    [Fact]
+    public void EVENBeforeTheNextSearchHasFinished()
+    {
+        // The version of the test above that can actually fail. Everywhere else here runs the
+        // search inline, so the re-plan overwrites the routes in the same call and hides
+        // whether arriving removed anything; in the game the search is on another thread and
+        // takes up to seconds, and the line would be drawn across the screen for all of it.
+        //
+        // A scheduler that never runs the work is what that looks like from the outside.
+        var searches = new List<Action>();
+        var planner = new RoutePlanner(searches.Add);
+
+        planner.Service(At(0, 0), 1000);
+        planner.Request(new RouteRequest([To(0xAA, 30, 0), To(0xBB, 0, 30)]));
+        planner.Service(At(0, 0), 1100);
+
+        Assert.Single(searches);
+        searches[0]();          // the one search that did finish, before the player set off
+        searches.Clear();
+
+        Assert.NotNull(planner.For(0xAA));
+
+        planner.Service(At(30, 0), 2000);
+
+        Assert.Null(planner.For(0xAA));
+        Assert.NotNull(planner.For(0xBB));
     }
 }

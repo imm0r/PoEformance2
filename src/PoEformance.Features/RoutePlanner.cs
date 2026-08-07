@@ -66,6 +66,22 @@ public sealed class RoutePlanner
     /// <summary>How far the player may drift before the routes are worth finding again.</summary>
     private const float RefreshAfterCells = 6f;
 
+    /// <summary>
+    /// How close counts as having got there.
+    /// </summary>
+    /// <remarks>
+    /// Four cells, which is about 43 world units - a step or two, near enough to interact with
+    /// whatever was chosen. It is deliberately not tighter: a destination is a marker's
+    /// position, chests and portals are reached from beside them rather than on top of them,
+    /// and an arrow that will not go away until you stand on an exact point is worse than one
+    /// that goes away slightly early.
+    ///
+    /// It is also deliberately not looser. Two places in one room are commonly six or eight
+    /// cells apart, and a radius that swallows the neighbour would tick off the thing you have
+    /// not been to yet.
+    /// </remarks>
+    public const float ArrivedWithinCells = 4f;
+
     /// <summary>A floor on how often the search runs, for a player moving continuously.</summary>
     private const long MinimumIntervalMs = 250;
 
@@ -174,6 +190,31 @@ public sealed class RoutePlanner
         }
 
         var from = new Vector2(player.WorldX, player.WorldY);
+
+        // Before anything decides the routes are up to date: a destination reached is one the
+        // player is standing at, and the check has to happen on the tick that becomes true
+        // rather than on whichever later tick something else asks for a re-plan.
+        if (Reached(request, from) is RouteRequest left)
+        {
+            Request(left);
+            request = left;
+
+            // The drawn route goes NOW, not when the next search finishes. A search runs in
+            // the background and can take seconds on a real map, and until it landed the line
+            // to the place just reached would keep being drawn across the screen. A test would
+            // not catch that on its own: a test runs the search inline, so the overwrite that
+            // hides the problem happens before anything can look.
+            Volatile.Write(
+                ref _routes,
+                [.. Routes.Where(route => left.Targets.Any(target => target.Target == route.Target))]);
+
+            if (request.Targets.Count == 0)
+            {
+                _plannedFor = string.Empty;
+                return;
+            }
+        }
+
         string signature = Signature(request.Targets);
         bool same = _plannedFor == signature && _plannedArea == snapshot.AreaHash;
 
@@ -252,6 +293,32 @@ public sealed class RoutePlanner
 
     /// <summary>The route to one place, or null when there is none.</summary>
     public RouteView? For(ulong address) => Routes.FirstOrDefault(r => r.Target == address);
+
+    /// <summary>
+    /// The destinations still worth having, or null when the player has reached none.
+    /// </summary>
+    /// <remarks>
+    /// Arriving is what finishes a destination, so it takes itself off the list. The
+    /// alternative is a set of arrows that only ever grows until somebody remembers to clear
+    /// them, and by then they are pointing at places already visited - which is the same
+    /// "arrow to nothing" the area change produced, arrived at from the other direction.
+    ///
+    /// Null rather than an unchanged list, so the ordinary tick - which is every tick, and
+    /// nearly always finds nothing - writes nothing and invalidates nothing.
+    ///
+    /// A place chosen while ALREADY standing at it goes immediately, which looks like the
+    /// click doing nothing. It is the honest answer: there is no way to draw, because there is
+    /// nowhere to go. The radius is small enough that this only happens when it is true.
+    /// </remarks>
+    private static RouteRequest? Reached(RouteRequest request, Vector2 player)
+    {
+        float within = ArrivedWithinCells * MapView.WorldToGrid;
+
+        List<RouteTarget> left = [.. request.Targets.Where(target =>
+            Vector2.Distance(player, new Vector2(target.WorldX, target.WorldY)) > within)];
+
+        return left.Count == request.Targets.Count ? null : new RouteRequest(left);
+    }
 
     /// <summary>
     /// Drops the destinations when the area they belong to is left.

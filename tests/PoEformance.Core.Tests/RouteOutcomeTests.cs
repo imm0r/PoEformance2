@@ -174,8 +174,8 @@ public class RouteOutcomeTests
             work();
         });
 
-        TerrainGrid grid = Grid("....", "....");
-        planner.Request(new RouteRequest([new RouteTarget(1, 3f * MapView.WorldToGrid, MapView.WorldToGrid)]));
+        TerrainGrid grid = Grid("..........", "..........");
+        planner.Request(new RouteRequest([new RouteTarget(1, 9f * MapView.WorldToGrid, MapView.WorldToGrid)]));
 
         var player = new WorldEntity(0, 0x1000, "Metadata/Characters/Int/IntFourb", EntityKind.Player, 0f, 0f, 0f);
         planner.Service(
