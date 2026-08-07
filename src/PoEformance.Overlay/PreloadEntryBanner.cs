@@ -42,6 +42,24 @@ public sealed class PreloadEntryBanner
     private const float TextPadY = 5f;
     private const float BlockGap = 10f;
 
+    /// <summary>
+    /// Where a plate's writing goes, as fractions of the picture it is written on.
+    /// </summary>
+    /// <remarks>
+    /// The shipped plates are built the same way and any replacement should be: an emblem on
+    /// the LEFT - a book, a gem, a skull - and open cloth to the right of it. So the names sit
+    /// in that cloth rather than centred on the whole plate, which would put them through the
+    /// emblem, and rather than under the plate, which would leave a painted banner deliberately
+    /// empty with its text floating below it.
+    ///
+    /// Numbers, not a measurement of the picture. Finding the clear area by looking at the
+    /// pixels is guesswork that fails differently on every image; a stated safe area is
+    /// something a plate can be DRAWN to, and it is written down beside the pictures.
+    /// </remarks>
+    private const float TextLeft = 0.42f;
+    private const float TextRight = 0.94f;
+    private const float TextMiddle = 0.45f;
+
     private IReadOnlyList<(PreloadWeight Weight, string Names)> _saying = [];
     private long _atMs;
 
@@ -101,9 +119,12 @@ public sealed class PreloadEntryBanner
         float y = top;
 
         IconCache.Picture picture = PlateFor(weight, style.Icon);
+        Vector2 line = ImGui.CalcTextSize(names);
+
         if (picture.Ready)
         {
             float tall = picture.HeightAt(plate);
+            float left = centre - (plate / 2f);
 
             // White, faded - NOT the weight's colour. Somebody supplying a painted plate
             // supplied its colours too, and multiplying it by the red that "dangerous"
@@ -111,27 +132,32 @@ public sealed class PreloadEntryBanner
             // reasoning as the markers, where it was learned.
             draw.AddImage(
                 picture.Texture,
-                new Vector2(centre - (plate / 2f), y),
+                new Vector2(left, y),
                 new Vector2(centre + (plate / 2f), y + tall),
                 Vector2.Zero,
                 Vector2.One,
                 Fade(0xFFFFFFFF, alpha));
 
-            y += tall;
-        }
-        else
-        {
-            // No picture chosen, or it could not be loaded. The weight's own name in its own
-            // colour, which is the whole point of the plate said in the plainest way there is.
-            string word = weight.ToString().ToUpperInvariant();
-            Vector2 size = ImGui.CalcTextSize(word);
-            draw.AddText(new Vector2(centre - (size.X / 2f), y), colour, word);
-            y += size.Y + 2f;
+            // In the open cloth to the right of the emblem, centred there rather than on the
+            // plate. Clamped so a long list runs into the free space instead of over the
+            // emblem, and cannot leave the cloth at either end.
+            float from = left + (plate * TextLeft);
+            float to = left + (plate * TextRight);
+            float x = Math.Clamp(
+                ((from + to) / 2f) - (line.X / 2f), from, Math.Max(from, to - line.X));
+
+            Written(draw, new Vector2(x, y + (tall * TextMiddle) - (line.Y / 2f)), names, colour, alpha);
+            return y + tall;
         }
 
-        // The names always, whether or not there was a picture. A plate says what KIND of
-        // thing is here; the line is the thing itself, and it is the half somebody acts on.
-        Vector2 line = ImGui.CalcTextSize(names);
+        // No picture chosen, or it could not be loaded. The weight's own name over a plain
+        // backing, which is the whole point of the plate said in the plainest way there is -
+        // and the names below it, since there is no cloth to write them on.
+        string word = weight.ToString().ToUpperInvariant();
+        Vector2 size = ImGui.CalcTextSize(word);
+        draw.AddText(new Vector2(centre - (size.X / 2f), y), colour, word);
+        y += size.Y + 2f;
+
         var at = new Vector2(centre - (line.X / 2f), y + TextPadY);
 
         draw.AddRectFilled(
@@ -142,6 +168,23 @@ public sealed class PreloadEntryBanner
 
         draw.AddText(at, colour, names);
         return at.Y + line.Y + TextPadY;
+    }
+
+    /// <summary>Writes a line with a dark edge under it, so any cloth can be read off.</summary>
+    /// <remarks>
+    /// The colours are the user's and the cloth is the artist's, and nothing checks that the
+    /// two go together - red names on the red banner is a perfectly reachable combination. A
+    /// one-pixel shadow costs four extra draws and makes every pairing legible, which beats
+    /// telling somebody their colour choice was wrong.
+    /// </remarks>
+    private static void Written(ImDrawListPtr draw, Vector2 at, string text, uint colour, float alpha)
+    {
+        uint edge = Fade(0xFF000000, alpha * 0.85f);
+        draw.AddText(at + new Vector2(1f, 0f), edge, text);
+        draw.AddText(at + new Vector2(-1f, 0f), edge, text);
+        draw.AddText(at + new Vector2(0f, 1f), edge, text);
+        draw.AddText(at + new Vector2(0f, -1f), edge, text);
+        draw.AddText(at, colour, text);
     }
 
     /// <summary>
