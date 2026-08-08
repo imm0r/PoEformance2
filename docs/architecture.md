@@ -340,10 +340,41 @@ offsets are worse still — they hang off that same panel, so a wrong panel path
 of them read rubbish. Check that the atlas draws at all before believing anything the ritual
 window says.
 
+### The stash listing — every tab, every item, every stat
+
+The inventory reader the two missing areas were blocked on. What it turned out to be about:
+
+- **A stash tab IS an inventory**, in the same vector as the backpack and the worn gear. The
+  tabs are not a separate structure to be found, which is the whole reason listing them is
+  possible — and it is not obvious from the game, where a tab looks like a window.
+- **The item list is one entry per occupied CELL.** A piece of body armour appears six times.
+  Counted as they come, a tab of large items reports several times what is in it, and every
+  number built on that count is wrong by a factor that looks entirely plausible.
+- **Two components for one job.** An item's mods live on either `Mods` or
+  `ObjectMagicProperties` — flasks and gems carry the second — with the same three fields at
+  different offsets, and which one an item has cannot be told from its path. Both are read and
+  the better answer wins. (Both projects independently reached 0x144/0x150 for it, which is
+  about as close to confirmation as an offset gets without the game.)
+- **The stats are the game's own answer**, read off the item, not recomputed from its mods.
+  Adding the rolls up would need each mod's dat row to say which stat each roll feeds — not
+  available — and would be a reimplementation of the game's arithmetic besides.
+- **The stat key is a ROW INDEX**, not an id, so the shipped table has to cover all 27,000 rows;
+  a reader cannot know in advance which an item will use. That file is 2.7 MB and is what turns
+  `1043: 79` into `+79 to maximum Life`.
+- **The wordings carry a format in their placeholders** — `{0:+d}` — and that is where the plus
+  in `+79 to maximum Life` comes from. Filling only the bare `{0}` leaves a thousand of the
+  game's own lines untouched, reading as though the table had no wording for them.
+
+It runs **on demand**, not per tick: a full read is thousands of entities, orders of magnitude
+past anything else here, answering a question nobody asks sixty times a second.
+
+Still open, and only the game can answer it: whether a tab the client has never opened is in the
+vector at all. Until that is known the count is "what this client has loaded", and the window
+says so rather than leaving it to be assumed.
+
 ### Remaining
 
 More features on the slice, and configuring them from the page.
 
-Two whole areas of the reference tool are still absent, and both are blocked on the same
-missing piece — an inventory reader: loot tracking with prices, and moving items into a
-container. Neither can be built without the game running to verify the reads against.
+Loot tracking with prices and moving items into a container both now have the reader they were
+blocked on; what they still need is the game running to verify it against.
