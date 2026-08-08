@@ -70,6 +70,75 @@ public class UiElementReaderTests
         Assert.Equal((height, height), scale.For(2, float.NaN));
     }
 
+    [Theory]
+    [InlineData(2, 1f, 0u)]                          // the ordinary case
+    [InlineData(2, 1f, ShouldModifyPos)]             // the parent's modifier applies
+    [InlineData(3, 1f, 0u)]                          // a different scale space from the parent
+    [InlineData(3, 1f, ShouldModifyPos)]             // both at once
+    [InlineData(2, 2f, ShouldModifyPos)]             // a different multiplier, same index
+    [InlineData(9, 1f, 0u)]                          // an index nothing knows
+    public void Siblings_AreWhereReadingThemOneAtATimeSaysTheyAre(
+        byte childScale, float childMultiplier, uint extraFlags)
+    {
+        // The hoisted read exists for speed, so the ONLY thing that matters about it is that
+        // it agrees with the slow one it replaces - on every branch of the position rule,
+        // which is why this is a theory rather than one happy case.
+        OffsetSchema schema = Schema();
+        var fake = new FakeMemoryReader();
+        var scale = new UiScale(3440, 1440, Cull: 100);
+
+        PlaceElement(fake, schema, Root, relX: 100, relY: 50);
+        PlaceElement(fake, schema, Panel, parent: Root, relX: 30, relY: 20, modX: 11, modY: 13);
+
+        ulong[] children = [Leaf, Leaf + 0x1000, Leaf + 0x2000];
+        for (int i = 0; i < children.Length; i++)
+        {
+            PlaceElement(
+                fake, schema, children[i], parent: Panel,
+                relX: 5 + i, relY: 7 + i,
+                flags: IsVisible | extraFlags,
+                scaleIndex: childScale, multiplier: childMultiplier,
+                sizeX: 200 + i, sizeY: 100 + i);
+        }
+
+        var reader = new UiElementReader(fake, schema);
+        Dictionary<ulong, (Vector2 Position, Vector2 Size)> together =
+            reader.ReadSiblings(Panel, children, scale);
+
+        Assert.Equal(children.Length, together.Count);
+
+        foreach (ulong child in children)
+        {
+            UiElement one = reader.Read(child, scale, withStringId: false)!;
+            Assert.Equal(one.Position, together[child].Position);
+            Assert.Equal(one.Size, together[child].Size);
+        }
+    }
+
+    [Fact]
+    public void ANDSomethingThatIsNotAnElementIsLeftOutRatherThanPlacedAtZero()
+    {
+        // A stale child pointer is ordinary - the list is read while the game rebuilds it.
+        // Placed at the origin it would be a marker in the corner of the screen; left out,
+        // whoever asked keeps whatever they knew before.
+        OffsetSchema schema = Schema();
+        var fake = new FakeMemoryReader();
+        PlaceElement(fake, schema, Root, relX: 100, relY: 50);
+        PlaceElement(fake, schema, Panel, parent: Root, relX: 30, relY: 20);
+        PlaceElement(fake, schema, Leaf, parent: Panel, relX: 5, relY: 7);
+
+        var reader = new UiElementReader(fake, schema);
+        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed =
+            reader.ReadSiblings(Panel, [Leaf, 0xDEAD_BEEF], new UiScale(2560, 1600, 0));
+
+        Assert.Single(placed);
+        Assert.True(placed.ContainsKey(Leaf));
+
+        // And a parent that is not an element places nothing at all, rather than everything
+        // relative to a garbage origin.
+        Assert.Empty(reader.ReadSiblings(0xDEAD_BEEF, [Leaf], new UiScale(2560, 1600, 0)));
+    }
+
     [Fact]
     public void Position_AccumulatesUpTheParentChain_AndScalesToTheWindow()
     {

@@ -180,9 +180,16 @@ public sealed class AtlasReader
         }
 
         List<ulong> children = _elements.Children(panel, MostNodes);
+
+        // Every node is a child of the one panel, so where they are drawn is read for all of
+        // them at once - the chain above the panel is identical for each and re-walking it per
+        // node is most of what reading an atlas would otherwise cost.
+        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed =
+            _elements.ReadSiblings(panel, children, scale);
+
         for (int i = 0; i < children.Count; i++)
         {
-            if (Node(i, children[i], scale) is AtlasNode node)
+            if (Node(i, children[i], placed) is AtlasNode node)
             {
                 found.Add(node);
             }
@@ -191,8 +198,28 @@ public sealed class AtlasReader
         return found;
     }
 
+    /// <summary>
+    /// Where each map is drawn NOW, and nothing else.
+    /// </summary>
+    /// <remarks>
+    /// The fast half of reading an atlas. What a node IS cannot change while somebody looks at
+    /// it, but WHERE it is changes every frame they drag the panel about - so this is what a
+    /// caller repeats, and <see cref="Read"/> is what it repeats rarely.
+    ///
+    /// Keyed by the node's own address, which is what makes the two halves fit together: the
+    /// slow half's nodes carry theirs, so a position found here belongs to a known map without
+    /// anything having to match them up by order.
+    /// </remarks>
+    public Dictionary<ulong, (Vector2 Position, Vector2 Size)> Where(ulong uiRoot, UiScale scale)
+    {
+        ulong panel = Panel(uiRoot);
+        return panel == 0
+            ? []
+            : _elements.ReadSiblings(panel, _elements.Children(panel, MostNodes), scale);
+    }
+
     /// <summary>One child of the panel, when it turns out to be a map.</summary>
-    private AtlasNode? Node(int index, ulong element, UiScale scale)
+    private AtlasNode? Node(int index, ulong element, Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed)
     {
         if (!MemoryReaderExtensions.IsPlausiblePointer(element) || !IsMapNode(element))
         {
@@ -222,7 +249,7 @@ public sealed class AtlasReader
         int gridX = _reader.Read<int>(element + (ulong)_grid);
         int gridY = _reader.Read<int>(element + (ulong)_grid + 4);
 
-        UiElement? drawn = _elements.Read(element, scale, withStringId: false);
+        placed.TryGetValue(element, out (Vector2 Position, Vector2 Size) drawn);
 
         return new AtlasNode(
             index,
@@ -232,8 +259,8 @@ public sealed class AtlasReader
             StateOf(status),
             biome,
             Connections(element),
-            drawn?.Position ?? Vector2.Zero,
-            drawn?.Size ?? Vector2.Zero,
+            drawn.Position,
+            drawn.Size,
             Badges(element),
             Tokens(element));
     }

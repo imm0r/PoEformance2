@@ -64,8 +64,14 @@ public sealed record AtlasView(
 ///
 /// TWO RATES, because the atlas has two kinds of fact. What a node IS - its id, its contents,
 /// what it connects to - cannot change while somebody looks at it, so it is read on an interval.
-/// WHERE it is changes every time the atlas is dragged, so that is read every tick. Reading the
-/// first at the second's rate is what makes a naive port cost more than it is worth.
+/// WHERE it is changes every time the atlas is dragged, so that is read every tick.
+///
+/// The difference is not small, and the first version of this got it wrong by re-reading
+/// everything each tick while a comment claimed otherwise. The slow half is an id string down
+/// three pointers, a connection list and two content vectors PER NODE, against a few hundred
+/// nodes; the fast half is five reads each, sharing one walk of the chain above the panel
+/// (<c>UiElementReader.ReadSiblings</c>). At thirty ticks a second that is the difference
+/// between an atlas that can be read live and one that cannot.
 ///
 /// IDLE UNLESS THE PANEL IS OPEN. Finding that out costs three child reads, which is nothing
 /// next to the entity map - and the atlas is closed for almost all of a session.
@@ -99,6 +105,7 @@ public sealed class AtlasWatch
     private AtlasView _view = AtlasView.Closed;
 
     // The slow half's answers, kept between reads: what each node IS, and how to get to it.
+    private IReadOnlyList<AtlasNode> _studied = [];
     private AtlasRoutes _routes = AtlasRoutes.None;
     private readonly Dictionary<(int X, int Y), IReadOnlyList<string>> _said = [];
     private long _studiedAt;
@@ -217,19 +224,38 @@ public sealed class AtlasWatch
             return AtlasView.Closed with { Status = chain.InGame ? "UI root did not resolve" : "not in an area" };
         }
 
-        List<AtlasNode> live = _atlas.Read(chain.UiRoot, scale);
-        if (live.Count == 0)
+        // WHERE the maps are, every tick, because that is the half that changes while somebody
+        // drags the atlas about. Reading it says whether the panel is open at all, so nothing
+        // more expensive happens while it is shut.
+        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed = _atlas.Where(chain.UiRoot, scale);
+        if (placed.Count == 0)
         {
             Forget();
             return AtlasView.Closed;
         }
 
-        // The slow half: what each node is, and every route across the atlas. Redone on the
-        // interval, and immediately when the atlas has a different number of nodes than it
-        // had - which is what a region being opened looks like from here.
-        if (live.Count != _studiedCount || nowMs - _studiedAt >= RestudyMs || nowMs < _studiedAt)
+        // WHAT they are, on the interval - and at once when the count of drawn elements
+        // changes, which is what opening a region looks like from here. This is the expensive
+        // half: an id string, a connection list and two content vectors per node.
+        if (placed.Count != _studiedCount || nowMs - _studiedAt >= RestudyMs || nowMs < _studiedAt)
         {
-            Study(live, nowMs);
+            Study(_atlas.Read(chain.UiRoot, scale), placed.Count, nowMs);
+        }
+
+        if (_studied.Count == 0)
+        {
+            return AtlasView.Closed;
+        }
+
+        // The studied nodes, moved to where they are now. A node the panel has since dropped
+        // keeps the position it was last seen at for up to one interval, which is invisible
+        // next to re-reading every id thirty times a second to avoid it.
+        var live = new List<AtlasNode>(_studied.Count);
+        foreach (AtlasNode node in _studied)
+        {
+            live.Add(placed.TryGetValue(node.Address, out (Vector2 Position, Vector2 Size) now)
+                ? node with { Screen = now.Position, Size = now.Size }
+                : node);
         }
 
         return Compose(live, settings, Volatile.Read(ref _grouping), _routes, _said);
@@ -364,9 +390,10 @@ public sealed class AtlasWatch
     /// this half's whole point - the words for a node change when the node does, which is
     /// never while somebody is looking at it.
     /// </remarks>
-    private void Study(List<AtlasNode> live, long nowMs)
+    private void Study(List<AtlasNode> live, int elements, long nowMs)
     {
-        _studiedCount = live.Count;
+        _studied = live;
+        _studiedCount = elements;
         _studiedAt = nowMs;
         _routes = AtlasRoutes.From(live);
 
@@ -379,6 +406,7 @@ public sealed class AtlasWatch
 
     private void Forget()
     {
+        _studied = [];
         _studiedCount = -1;
         _routes = AtlasRoutes.None;
         _said.Clear();

@@ -140,6 +140,76 @@ public sealed class UiElementReader
         => MemoryReaderExtensions.IsPlausiblePointer(address)
            && _reader.ReadPointer(address + (ulong)_self) == address;
 
+    /// <summary>
+    /// Where a set of one parent's children are drawn, without re-walking the chain per child.
+    /// </summary>
+    /// <remarks>
+    /// The same answer as <see cref="Read"/> for each of them, arrived at once instead of
+    /// hundreds of times. Every child of one parent shares the ENTIRE chain above that parent,
+    /// and <see cref="UnscaledPosition"/> re-walks it from scratch every call - so reading five
+    /// hundred siblings costs five hundred walks of the same ten elements, all returning the
+    /// same number.
+    ///
+    /// That is the difference between a panel that can be read every tick and one that cannot.
+    /// The atlas is the case that made it worth having: several hundred nodes under one panel,
+    /// re-read as somebody drags it about.
+    ///
+    /// Everything constant across the siblings - the parent's accumulated position, its
+    /// modifier, its scale space - is read once here. What remains per child is its own
+    /// relative position, flags, scale and size.
+    /// </remarks>
+    /// <returns>Position and size in window pixels, by child address. Missing for a bad one.</returns>
+    public Dictionary<ulong, (Vector2 Position, Vector2 Size)> ReadSiblings(
+        ulong parent, IReadOnlyList<ulong> children, UiScale scale)
+    {
+        ArgumentNullException.ThrowIfNull(children);
+
+        var placed = new Dictionary<ulong, (Vector2, Vector2)>(children.Count);
+        if (!IsUiElement(parent))
+        {
+            return placed;
+        }
+
+        Vector2 parentPosition = UnscaledPosition(parent, scale);
+        Vector2 modifier = ReadVector2(parent + (ulong)_positionModifier);
+        byte parentIndex = _reader.Read<byte>(parent + (ulong)_scaleIndex);
+        float parentMultiplier = _reader.Read<float>(parent + (ulong)_localScaleMultiplier);
+        (float parentW, float parentH) = scale.For(parentIndex, parentMultiplier);
+
+        foreach (ulong child in children)
+        {
+            if (!IsUiElement(child))
+            {
+                continue;
+            }
+
+            Vector2 relative = ReadVector2(child + (ulong)_relativePosition);
+
+            // The modifier belongs to the parent but is applied only when the CHILD opts in,
+            // so it is read once above and chosen per child here.
+            uint flags = _reader.Read<uint>(child + (ulong)_flags);
+            Vector2 above = (flags & _flagShouldModifyPos) != 0 ? parentPosition + modifier : parentPosition;
+
+            byte index = _reader.Read<byte>(child + (ulong)_scaleIndex);
+            float multiplier = _reader.Read<float>(child + (ulong)_localScaleMultiplier);
+            (float childW, float childH) = scale.For(index, multiplier);
+
+            Vector2 unscaled = index == parentIndex && multiplier.Equals(parentMultiplier)
+                ? above + relative
+                : new Vector2(
+                    childW != 0 ? (above.X * parentW / childW) + relative.X : relative.X,
+                    childH != 0 ? (above.Y * parentH / childH) + relative.Y : relative.Y);
+
+            Vector2 size = ReadVector2(child + (ulong)_unscaledSize);
+
+            placed[child] = (
+                new Vector2((unscaled.X * childW) + scale.Cull, unscaled.Y * childH),
+                new Vector2(size.X * childW, size.Y * childH));
+        }
+
+        return placed;
+    }
+
     /// <summary>Reads one element resolved to window pixels, or null if it is not one.</summary>
     public UiElement? Read(ulong address, UiScale scale, bool withStringId = true)
     {
