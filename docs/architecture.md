@@ -266,6 +266,35 @@ interesting part was not the feature:
   it are the same cells and both walkable, so a two-dimensional search draws a route through
   the floor. Only the height separates them.
 
+### The atlas — the one feature that is INTERFACE rather than world
+
+Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it reads
+`UiElement`s at a fixed child path instead of a `WorldSnapshot`, so it has its own read
+(`AtlasWatch`) rather than riding the world one. What it taught:
+
+- **Two rates, because the atlas has two kinds of fact.** What a node IS — its id, contents,
+  connections — cannot change while somebody is looking at it, so it is read on an interval.
+  WHERE it is changes every time the atlas is dragged. Reading the first at the second's rate
+  is what makes a naive port cost more than it is worth.
+- **Match maps by internal id, never by displayed name.** The reference groups by "The Copper
+  Citadel", which is the one string the game translates — on a German client every one of its
+  groups matches nothing.
+- **The game's own tags do not say what players mean.** The maps people call towers are Bluff,
+  Mesa, Sinking Spire, Alpine Ridge and Lost Towers; only the last carries the `tower` tag,
+  and that tag also covers the six Precursor Towers, which are a different thing. So a group
+  matches by tag OR by an outright list of ids, and the shipped ones use whichever is faithful.
+- **Hide AFTER asking about routes.** A map worth routing to is one nobody has reached, so
+  culling the unreachable first hides exactly the routes somebody turned on — while every
+  setting still reads correct. The reference records learning this; it is a test here.
+- **The composition is a pure function.** Everything that can be got wrong is a decision rather
+  than an address, and none of it is reachable through a live read.
+
+**None of the atlas offsets are confirmed.** They were ported from the reference with the game
+unavailable, so `schema/poe2.offsets.json` marks the three `Atlas*` blocks UNVERIFIED and the
+window's **check the read** button reports what each step of the walk found — the panel's child
+path, the flag fingerprints seen, how many children read as maps, and the first few decoded. It
+is the first thing to press when the atlas is open and nothing is drawn on it.
+
 ### Remaining
 
 More features on the slice, and configuring them from the page.
