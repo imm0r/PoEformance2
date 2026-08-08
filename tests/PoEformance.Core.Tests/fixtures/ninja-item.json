@@ -1,0 +1,58 @@
+{
+ "core": {
+  "rates": {
+   "exalted": 371.7,
+   "chaos": 7.72
+  }
+ },
+ "lines": [
+  {
+   "name": "Redbeak",
+   "baseType": "Shortsword",
+   "primaryValue": 4225,
+   "listingCount": 9,
+   "variant": null,
+   "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9PbmVIYW5kV2VhcG9ucy9PbmVIYW5kU3dvcmRzL1VuaXF1ZXMvUmVkYmVhayIsInciOjIsImgiOjMsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/33c430b8b4/Redbeak.png"
+  },
+  {
+   "name": "Winter's Bite",
+   "baseType": "Glass Shank",
+   "primaryValue": 1400,
+   "listingCount": 16,
+   "variant": null,
+   "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9PbmVIYW5kV2VhcG9ucy9EYWdnZXJzL1VuaXF1ZXMvTmV2ZXJtZWx0IiwidyI6MSwiaCI6Mywic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/a5a4d70a8e/Nevermelt.png"
+  },
+  {
+   "name": "The Dancing Dervish",
+   "baseType": "Scimitar",
+   "primaryValue": 1360,
+   "listingCount": 9,
+   "variant": null,
+   "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9PbmVIYW5kV2VhcG9ucy9PbmVIYW5kU3dvcmRzL0Jhc2V0eXBlcy8xSFN3b3JkMDQiLCJ3IjoyLCJoIjozLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/b15a3c6a0f/1HSword04.png"
+  },
+  {
+   "name": "The Ordained",
+   "baseType": "Grand Spear",
+   "primaryValue": 3.0,
+   "listingCount": 5504,
+   "variant": null,
+   "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9PbmVIYW5kV2VhcG9ucy9PbmVIYW5kU3BlYXJzL1VuaXF1ZXMvVGhlT3JkYWluZWQiLCJ3IjoxLCJoIjo0LCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/6c52dd93b7/TheOrdained.png"
+  },
+  {
+   "name": "Guiding Palm of the Mind",
+   "baseType": "Shrine Sceptre",
+   "primaryValue": 1.34,
+   "listingCount": 1690,
+   "variant": null,
+   "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9PbmVIYW5kV2VhcG9ucy9TY2VwdGVycy9VbmlxdWVzL0d1aWRpbmdQYWxtTGlnaHRuaW5nIiwidyI6MiwiaCI6Mywic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/4a37445a92/GuidingPalmLightning.png"
+  },
+  {
+   "name": "Guiding Palm of the Eye",
+   "baseType": "Shrine Sceptre",
+   "primaryValue": 1.34,
+   "listingCount": 1747,
+   "variant": null,
+   "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9PbmVIYW5kV2VhcG9ucy9TY2VwdGVycy9VbmlxdWVzL0d1aWRpbmdQYWxtQ29sZCIsInciOjIsImgiOjMsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/3fa1d19d68/GuidingPalmCold.png"
+  }
+ ]
+}
