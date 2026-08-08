@@ -201,4 +201,43 @@ public class StashReaderTests
         Assert.Empty(reader.Read(0xDEAD_BEEF));
         Assert.Equal(0ul, reader.Resolve(0));
     }
+
+    /// <summary>
+    /// Which league the character is in - the one thing here that is not an item.
+    /// </summary>
+    /// <remarks>
+    /// It rides the same two-struct hop the inventories do, and it exists for prices: the value
+    /// is spelled exactly as poe.ninja spells it, hardcore prefix and all, so it can be asked
+    /// for as it comes. Typed in by hand instead it goes stale at every league start, silently,
+    /// and stale prices look exactly like real ones.
+    /// </remarks>
+    [Theory]
+    [InlineData("Standard")]
+    [InlineData("HC Runes of Aldur")]
+    [InlineData("Rise of the Abyssal")]
+    public void THELeagueIsReadOffTheSameStructTheInventoriesAreOn(string league)
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader fake = Stash(schema, id: 1, cells: []);
+        fake.PlaceStdWString(Inner + (ulong)schema.Structs["ServerDataStructure"].OffsetOf("League"), league, 0x18_0000);
+
+        Assert.Equal(league, new StashReader(fake, schema).League(ServerData));
+    }
+
+    [Fact]
+    public void ANDNothingReadableIsNoLeagueRatherThanRubbish()
+    {
+        // A drifted offset reads whatever follows the string. Handing that on as a league name
+        // asks a price server about a league nobody has heard of, and the failure shows up as
+        // "no prices" rather than as the offset problem it is.
+        OffsetSchema schema = Schema();
+        int at = schema.Structs["ServerDataStructure"].OffsetOf("League");
+
+        Assert.Equal(string.Empty, new StashReader(Stash(schema, 1, []), schema).League(ServerData));
+        Assert.Equal(string.Empty, new StashReader(new FakeMemoryReader(), schema).League(ServerData));
+
+        FakeMemoryReader control = Stash(schema, 1, []);
+        control.PlaceStdWString(Inner + (ulong)at, "Bad\u0001League", 0x18_0000);
+        Assert.Equal(string.Empty, new StashReader(control, schema).League(ServerData));
+    }
 }
