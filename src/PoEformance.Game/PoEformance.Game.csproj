@@ -10,4 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PoEformance.Core\PoEformance.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="OozSharp" Version="3.0.1" />
+  </ItemGroup>
 </Project>
