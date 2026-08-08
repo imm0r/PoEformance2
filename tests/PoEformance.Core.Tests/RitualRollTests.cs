@@ -44,14 +44,48 @@ public class RitualRollTests
         return dir!.FullName;
     }
 
+    /// <summary>
+    /// Reads the fixture by hand rather than by reflection.
+    /// </summary>
+    /// <remarks>
+    /// Deserialising into records needs reflection, which the AOT analyzers warn about - and
+    /// this project keeps the build at zero warnings, in the test assembly as well, because a
+    /// tolerated warning is how a real one goes unnoticed.
+    /// </remarks>
     private static Vectors Reference()
     {
         string path = Path.Combine(Root(), "tests", "fixtures", "ritual-roll-vectors.json");
-        using FileStream stream = File.OpenRead(path);
-        return JsonSerializer.Deserialize<Vectors>(stream, new JsonSerializerOptions
+        using JsonDocument document = JsonDocument.Parse(File.ReadAllBytes(path));
+        JsonElement root = document.RootElement;
+
+        var seeds = new List<SeedCase>();
+        foreach (JsonElement one in root.GetProperty("seeds").EnumerateArray())
         {
-            PropertyNameCaseInsensitive = true,
-        })!;
+            seeds.Add(new SeedCase(
+                one.GetProperty("w0").GetUInt32(),
+                one.GetProperty("w1").GetUInt32(),
+                one.GetProperty("w2").GetUInt32(),
+                one.GetProperty("w3").GetUInt32(),
+                [.. one.GetProperty("draws").EnumerateArray().Select(value => value.GetUInt32())],
+                [.. one.GetProperty("below").EnumerateArray().Select(value => value.GetUInt32())]));
+        }
+
+        var picks = new List<PickCase>();
+        foreach (JsonElement one in root.GetProperty("picks").EnumerateArray())
+        {
+            picks.Add(new PickCase(
+                one.GetProperty("line").GetUInt32(),
+                one.GetProperty("cc").GetUInt32(),
+                one.GetProperty("ci").GetUInt32(),
+                one.GetProperty("mc").GetUInt32(),
+                one.GetProperty("granted").GetInt32(),
+                one.GetProperty("pick").GetInt32()));
+        }
+
+        return new Vectors(
+            seeds,
+            picks,
+            [.. root.GetProperty("poolRows").EnumerateArray().Select(value => value.GetInt32())]);
     }
 
     private static RitualMods Pool()
