@@ -99,6 +99,21 @@ public class GameArtTests
     /// <summary>One pixel, in the blue-first order a DDS stores.</summary>
     private static byte[] Pixel(byte r, byte g, byte b, byte a) => [b, g, r, a];
 
+    /// <summary>
+    /// Packs a texture the way the game's compressed ones are: its size, then Brotli.
+    /// </summary>
+    /// <remarks>
+    /// Unlike Oodle this one CAN be built here - Brotli ships with the framework - so the
+    /// compressed shape is checked against real compressed bytes rather than a stand-in.
+    /// </remarks>
+    private static byte[] Squeezed(byte[] dds)
+    {
+        var into = new byte[dds.Length + 1024];
+        Assert.True(System.IO.Compression.BrotliEncoder.TryCompress(dds, into, out int written));
+
+        return [.. BitConverter.GetBytes((uint)dds.Length), .. into[..written]];
+    }
+
     [Fact]
     public void APICTUREComesOutOfTheInstall()
     {
@@ -127,12 +142,12 @@ public class GameArtTests
     }
 
     [Fact]
-    public void ASPLITTextureIsFoundUnderItsHeaderName()
+    public void ACOMPRESSEDTextureIsUnpackedFirst()
     {
-        // The plain name is often not in the index at all - the picture is under the header one,
-        // behind a prefix. Looking only for what the item named finds nothing.
+        // Most of them are: Brotli, behind four bytes that are its decompressed size and not
+        // part of it. Handed to the decoder as it comes off the disk, it is not a picture at all.
         byte[] picture = Dds(1, 1, Pixel(200, 100, 50, 255));
-        GameFiles files = Install(("Art/2DItems/Weapons/Bow.dds.header", [.. new byte[16], .. picture]));
+        GameFiles files = Install(("Art/2DItems/Weapons/Bow.dds", Squeezed(picture)));
 
         GamePicture? read = GameArt.Read(files, "Art/2DItems/Weapons/Bow.dds");
 
@@ -141,15 +156,40 @@ public class GameArtTests
     }
 
     [Fact]
-    public void ANDThePrefixIsLongerWhenTheFileStartsWithAThree()
+    public void ANDASIZEThatBeginsWithAStarIsStillASizeAndNotASignpost()
     {
-        byte[] picture = Dds(1, 1, Pixel(9, 8, 7, 255));
-        byte[] prefix = new byte[28];
-        prefix[0] = 3;
+        // The sharp edge of telling the three apart by their content: a signpost starts with a
+        // star, and one decompressed size in every 256 starts with the same byte. Deciding on
+        // that byte alone reads a picture as a path to nowhere - and only for some textures,
+        // which is the worst way for it to be wrong.
+        byte[] picture = Dds(1, 1, Pixel(11, 22, 33, 255));
 
-        GameFiles files = Install(("Art/Thing.dds.header", [.. prefix, .. picture]));
+        // DDS readers ignore what is past the picture, so it is padded to a length whose low
+        // byte is a star. Sizes are a multiple of four plus the header, so no real 1x1 hits it.
+        int wanted = (picture.Length & ~0xFF) + '*';
+        while (wanted <= picture.Length)
+        {
+            wanted += 256;
+        }
 
-        Assert.Equal<byte[]>([9, 8, 7, 255], GameArt.Read(files, "Art/Thing.dds")!.Value.Rgba);
+        byte[] padded = [.. picture, .. new byte[wanted - picture.Length]];
+        Assert.Equal((byte)'*', BitConverter.GetBytes((uint)padded.Length)[0]);
+
+        GameFiles files = Install(("Art/Thing.dds", Squeezed(padded)));
+
+        Assert.Equal<byte[]>([11, 22, 33, 255], GameArt.Read(files, "Art/Thing.dds")!.Value.Rgba);
+    }
+
+    [Fact]
+    public void ANDANUncompressedOneIsTakenAsItIs()
+    {
+        // The third shape, and the one that needs nothing done to it. Told apart by starting
+        // with what a DDS starts with.
+        byte[] picture = Dds(1, 1, Pixel(5, 6, 7, 255));
+        Assert.Equal(picture, GameArt.Unpack(picture));
+
+        GameFiles files = Install(("Art/Plain.dds", picture));
+        Assert.Equal<byte[]>([5, 6, 7, 255], GameArt.Read(files, "Art/Plain.dds")!.Value.Rgba);
     }
 
     [Fact]
@@ -177,6 +217,33 @@ public class GameArtTests
             ("Art/C.dds", picture));
 
         Assert.NotNull(GameArt.Read(files, "Art/A.dds"));
+    }
+
+    [Fact]
+    public void ANDWhatASignpostPointsAtMayItselfBeCompressed()
+    {
+        // The one it points at is a file like any other, so it is whichever of the three shapes
+        // it happens to be - working out what it is has to happen again at every hop.
+        byte[] picture = Dds(1, 1, Pixel(60, 70, 80, 255));
+
+        GameFiles files = Install(
+            ("Art/2DItems/Variant.dds", [.. "*Art/2DItems/Real.dds"u8]),
+            ("Art/2DItems/Real.dds", Squeezed(picture)));
+
+        Assert.Equal<byte[]>([60, 70, 80, 255], GameArt.Read(files, "Art/2DItems/Variant.dds")!.Value.Rgba);
+    }
+
+    [Fact]
+    public void ANDASTARFollowedByRubbishIsNotASignpost()
+    {
+        Assert.Null(GameArt.Signpost([.. "*"u8, 0x01, 0x02, 0xFF]));
+        Assert.Null(GameArt.Signpost([.. "*no-full-stop-so-not-a-file"u8]));
+        Assert.Null(GameArt.Signpost([.. "*"u8]));
+        Assert.Null(GameArt.Signpost(null));
+        Assert.Null(GameArt.Signpost([.. "Art/Thing.dds"u8]));
+
+        Assert.Equal("Art/Thing.dds", GameArt.Signpost([.. "*Art/Thing.dds"u8]));
+        Assert.Equal("Art/Thing.dds", GameArt.Signpost([.. "*Art/Thing.dds"u8, 0]));
     }
 
     [Fact]

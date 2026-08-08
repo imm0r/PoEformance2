@@ -410,18 +410,26 @@ any of it:
   reference reads the array as a raw span of a struct the runtime pads to its alignment — and
   writes it back the same way, so the padding is really in the file. Nothing here reads past the
   first record, so it does not bite today.
-- **A texture may not be a texture.** `x.dds` is often not in the index at all and
-  `x.dds.header` is, behind a prefix of 28 bytes when the file starts with a 3 and 16 otherwise.
-  And a file whose content starts with `*` is a SIGNPOST: the rest of it is the path of the file
-  that really holds the picture, which may point somewhere else again. That is how variants
-  share one texture without storing it twice.
+- **A texture may not be a texture.** What comes out of the bundle for a `.dds` path is one of
+  three things (owner, from a PoE2 install — neither reference covers it, LibGGPK3 being a
+  PoE1-era tool and GameHelper2 not decoding textures at all): a **signpost**, whose content is
+  `*` and then the path of the file that really holds the picture, which may point somewhere
+  else again; **Brotli**, behind four bytes that are its decompressed size and not part of it;
+  or **just a DDS**. All three are named `.dds`, so which one it is has to come from the
+  content, and it has to be worked out again at every hop.
+
+  The sharp edge there: a signpost starts with `*`, and one decompressed size in every 256
+  starts with that same byte. Deciding on the byte alone reads a picture as a path to nowhere,
+  for some textures and not others — so the check is that what follows is a plausible path, and
+  a real compressed texture whose size begins with `*` is a test.
 
 Everything except the Oodle call is tested against data the tests build themselves — a GGPK, a
 bundle and an index written from the reference's description, so a disagreement between the two
 fails rather than passes. The hashes are pinned to values from a second implementation written
 differently, because a round trip through one implementation agrees with itself however wrong it
-is. The decompression cannot be: there is no compressor to make a fixture with, so it is handed
-in and proving it needs real bundles.
+is. The textures' Brotli ships with the framework, so those tests compress real bytes rather
+than standing in for it. Oodle cannot: there is no compressor to make a fixture with, so it is
+handed in and proving it needs real bundles.
 
 **Where the install is** is asked of the game itself — the tool is already attached to it, and a
 running process knows where its own executable is. The usual folders are only a fallback for

@@ -14,20 +14,23 @@ public readonly record struct GamePicture(int Width, int Height, byte[] Rgba)
 /// </summary>
 /// <remarks>
 /// An item in memory names its art - <c>Art/2DItems/Weapons/Bows/Bow1.dds</c> - and that file is
-/// in the game's own bundles. Getting from the name to pixels is three steps, and only the last
-/// one is what anybody would guess.
+/// in the game's own bundles. What comes out of the bundle is one of THREE things, and only the
+/// last is what anybody would guess (owner, who reverse-engineered a PoE2 install; neither
+/// LibGGPK3 nor GameHelper2 covers this - the first is a PoE1-era tool and the second does not
+/// decode textures at all).
 ///
-/// FIRST, THE FILE MAY BE A HEADER. Textures are stored split: <c>x.dds</c> may not be there at
-/// all, and <c>x.dds.header</c> is, with a short prefix before the picture. The prefix is 28
-/// bytes when the file starts with a 3 and 16 otherwise.
+/// A SIGNPOST. A file whose content starts with <c>*</c> is not a picture: the rest of it is the
+/// path of the file that actually holds one, and THAT one may be compressed or not, or point
+/// somewhere else again. It is how variants share one texture without storing it twice.
 ///
-/// SECOND, IT MAY BE A SIGNPOST. A file whose content starts with <c>*</c> is not a picture: the
-/// rest of it is the path of the file that actually holds one, and that one may point somewhere
-/// else again. Following it is how variants share one texture without storing it twice.
+/// BROTLI, behind four bytes that are not part of it - the decompressed size, which is both the
+/// buffer to allocate and the check that this really was one.
 ///
-/// THIRD, IT IS A DDS, in whichever block format that texture was compressed with - BC1 through
-/// BC7 all turn up. Pfim decodes all of them, and is what the reference tool uses on exactly
-/// this data.
+/// OR JUST A DDS, openable as it is.
+///
+/// Which of the three is worked out from the CONTENT rather than the name, because the name is
+/// <c>.dds</c> in all three cases. Then it is a DDS in whichever block format that texture used
+/// - BC1 through BC7 all turn up, and Pfim decodes all of them.
 /// </remarks>
 public static class GameArt
 {
@@ -40,6 +43,16 @@ public static class GameArt
 
     /// <summary>How big a picture may be, so a wrong read cannot ask for a gigabyte.</summary>
     public const int WidestPicture = 8192;
+
+    /// <summary>The largest a texture may say it decompresses to.</summary>
+    /// <remarks>
+    /// The size is four bytes off the front of the file, so a file that is not one at all is a
+    /// buffer of whatever number happened to be there.
+    /// </remarks>
+    public const int BiggestTexture = 64 * 1024 * 1024;
+
+    /// <summary>What a DDS starts with.</summary>
+    private static ReadOnlySpan<byte> DdsMagic => "DDS "u8;
 
     /// <summary>
     /// Reads an art path out of an install and decodes it, or returns null when it will not.
@@ -67,55 +80,93 @@ public static class GameArt
 
         for (int hop = 0; hop < MostHops; hop++)
         {
-            // The header first, because for a split texture the plain name is often not in the
-            // index at all - and when both are there the header is the one with the prefix this
-            // knows how to strip.
-            bool header = true;
-            byte[]? found = files.Read(path + ".header");
-
-            if (found is null)
-            {
-                header = path.EndsWith(".header", StringComparison.OrdinalIgnoreCase);
-                found = files.Read(path);
-            }
-
+            byte[]? found = files.Read(path);
             if (found is null)
             {
                 return null;
             }
 
-            ReadOnlySpan<byte> content = found;
-            if (header)
+            if (Signpost(found) is not { } pointsAt)
             {
-                int prefix = content.Length > 0 && content[0] == 3 ? 28 : 16;
-                if (content.Length <= prefix)
-                {
-                    return null;
-                }
-
-                content = content[prefix..];
+                // Not a signpost, so this is the picture - compressed or not.
+                return Unpack(found);
             }
 
-            if (content.Length == 0 || content[0] != (byte)'*')
-            {
-                return content.ToArray();
-            }
+            path = pointsAt;
+        }
 
-            // A signpost. What follows the star is where the picture really is.
-            ReadOnlySpan<byte> pointsAt = content[1..];
-            if (pointsAt.Length is 0 or > LongestPath)
-            {
-                return null;
-            }
+        return null;
+    }
 
-            path = Encoding.UTF8.GetString(pointsAt).TrimEnd('\0').Trim();
-            if (path.Length == 0)
+    /// <summary>
+    /// Where a file points, or null when it is a picture rather than a signpost.
+    /// </summary>
+    /// <remarks>
+    /// A star and then a path. Checked for being a PLAUSIBLE path rather than just for the star,
+    /// because a compressed texture begins with its size and one size in every 256 begins with
+    /// the same byte - and reading a picture as a path finds nothing at all.
+    /// </remarks>
+    public static string? Signpost(byte[]? content)
+    {
+        if (content is not { Length: > 1 } || content[0] != (byte)'*')
+        {
+            return null;
+        }
+
+        ReadOnlySpan<byte> rest = content.AsSpan(1);
+        if (rest.Length > LongestPath)
+        {
+            return null;
+        }
+
+        foreach (byte one in rest)
+        {
+            // Printable, and nothing a path does not contain. A size read as text is almost
+            // always out of this range at the first or second byte.
+            if (one is (< 0x20 or > 0x7E) and not 0)
             {
                 return null;
             }
         }
 
-        return null;
+        string where = Encoding.UTF8.GetString(rest).TrimEnd('\0').Trim();
+        return where.Length > 0 && where.Contains('.') ? where : null;
+    }
+
+    /// <summary>
+    /// Gets the DDS out of a file, decompressing it when it is compressed.
+    /// </summary>
+    /// <remarks>
+    /// The compressed ones are Brotli behind four bytes that are not part of it: the size it
+    /// comes out at. Taken as the buffer to allocate AND as the check - a decompression that
+    /// does not fill it exactly was not this.
+    /// </remarks>
+    public static byte[]? Unpack(byte[]? content)
+    {
+        if (content is not { Length: > 4 })
+        {
+            return null;
+        }
+
+        if (content.AsSpan().StartsWith(DdsMagic))
+        {
+            return content;
+        }
+
+        uint size = BitConverter.ToUInt32(content, 0);
+        if (size is 0 or > BiggestTexture)
+        {
+            // Not a size, so not the compressed shape. Handed on as it is rather than refused -
+            // Pfim may still know what it is, and refusing here would be this deciding that a
+            // texture it does not recognise cannot be one.
+            return content;
+        }
+
+        var plain = new byte[size];
+        return System.IO.Compression.BrotliDecoder.TryDecompress(content.AsSpan(4), plain, out int written)
+               && written == plain.Length
+            ? plain
+            : content;
     }
 
     /// <summary>
