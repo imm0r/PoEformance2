@@ -304,6 +304,13 @@ window's **check the read** button reports what each step of the walk found — 
 path, the flag fingerprints seen, how many children read as maps, and the first few decoded. It
 is the first thing to press when the atlas is open and nothing is drawn on it.
 
+When the path finds nothing, it goes further and **hunts for the panel by shape**: hundreds of
+children mostly sharing one flags word is what a grid of map nodes is and what almost nothing
+else in the interface is. It prints the matching child paths, marks the one whose fingerprint it
+recognises, and the answer is pasted into the schema — which hot-reloads, so a drift that would
+otherwise be a debugging session is an edit. This is the `drift scanner` idea from the build
+order above, applied to the one feature whose offsets are entirely unverified.
+
 ### Remaining
 
 More features on the slice, and configuring them from the page.
