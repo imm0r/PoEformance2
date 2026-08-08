@@ -572,7 +572,7 @@ internal static class Program
         overlay.ShowCalibration = debug;
         overlay.ShowWorldDots = debug;
         overlay.AttachUiBrowser(uiTree, uiBrowser);
-        overlay.AttachAtlas(atlas);
+        overlay.AttachAtlas(atlas, changed => PoEformance.Features.AtlasStore.Save(changed));
         overlay.Noise = world.Noise;
         overlay.Costs = costs;
         overlay.Coverage = coverage;

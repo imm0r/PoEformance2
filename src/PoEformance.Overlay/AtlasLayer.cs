@@ -39,6 +39,16 @@ public sealed class AtlasLayer
     /// </remarks>
     public OverlayStyle Style { get; set; } = new();
 
+    /// <summary>
+    /// Write each map's name on it.
+    /// </summary>
+    /// <remarks>
+    /// Off still draws the contents and the routes, which is the point of having it: the
+    /// names are the busiest thing on the atlas, and somebody who only wants to see WHERE the
+    /// breaches are does not want two hundred labels as well.
+    /// </remarks>
+    public bool ShowNames { get; set; } = true;
+
     /// <summary>Where the label sits relative to the node it names.</summary>
     /// <remarks>
     /// Nudged UP, off the node's own art. The game draws an icon in the middle of each node,
@@ -131,12 +141,43 @@ public sealed class AtlasLayer
         uint text = ColourOf(mark, alpha);
         uint plate = OverlaySettings.Fade(Style.Colour(StyleCatalogue.Keys.AtlasPlate), alpha);
 
-        // How far away it is, on the LABEL rather than beside the line. A route crosses other
-        // maps, so a number floating on it belongs to whichever one it happens to be over.
-        string title = mark.Hops > 0 ? $"{mark.Name} ({mark.Hops})" : mark.Name;
+        // With the names off, the contents start where the name would have been - otherwise
+        // they hang below a gap nothing is in.
+        Vector2 at = mark.Where + Nudge;
+        float below = at.Y;
 
+        if (ShowNames)
+        {
+            // How far away it is, on the LABEL rather than beside the line. A route crosses
+            // other maps, so a number floating on it belongs to whichever one it is over.
+            string title = mark.Hops > 0 ? $"{mark.Name} ({mark.Hops})" : mark.Name;
+            below = DrawName(draw, mark, title, at, text, plate, alpha);
+        }
+
+        if (mark.Contents.Count == 0 || !Style.Visible(StyleCatalogue.Keys.AtlasContent))
+        {
+            return;
+        }
+
+        uint said = OverlaySettings.Fade(Style.Colour(StyleCatalogue.Keys.AtlasContent), alpha);
+
+        foreach (string line in mark.Contents)
+        {
+            Vector2 wide = ImGui.CalcTextSize(line);
+            var where = new Vector2(mark.Where.X + Nudge.X - (wide.X * 0.5f), below);
+
+            draw.AddRectFilled(where - new Vector2(3f, 1f), where + wide + new Vector2(3f, 1f), plate, 3f);
+            draw.AddText(where, said, line);
+            below += wide.Y + 2f;
+        }
+    }
+
+    /// <summary>Draws the name plate, and says where the next line down starts.</summary>
+    private float DrawName(
+        ImDrawListPtr draw, AtlasMark mark, string title, Vector2 middle, uint text, uint plate, float alpha)
+    {
         Vector2 size = ImGui.CalcTextSize(title);
-        Vector2 at = mark.Where + Nudge - (size * 0.5f);
+        Vector2 at = middle - (size * 0.5f);
         var pad = new Vector2(5f, 2f);
 
         draw.AddRectFilled(at - pad, at + size + pad, plate, 3f);
@@ -154,24 +195,7 @@ public sealed class AtlasLayer
         }
 
         draw.AddText(at, text, title);
-
-        if (mark.Contents.Count == 0 || !Style.Visible(StyleCatalogue.Keys.AtlasContent))
-        {
-            return;
-        }
-
-        uint said = OverlaySettings.Fade(Style.Colour(StyleCatalogue.Keys.AtlasContent), alpha);
-        float below = at.Y + size.Y + 3f;
-
-        foreach (string line in mark.Contents)
-        {
-            Vector2 wide = ImGui.CalcTextSize(line);
-            var where = new Vector2(mark.Where.X + Nudge.X - (wide.X * 0.5f), below);
-
-            draw.AddRectFilled(where - new Vector2(3f, 1f), where + wide + new Vector2(3f, 1f), plate, 3f);
-            draw.AddText(where, said, line);
-            below += wide.Y + 2f;
-        }
+        return at.Y + size.Y + 3f;
     }
 
     /// <summary>A map's colour: its group's, or the plain label colour when it has no group.</summary>

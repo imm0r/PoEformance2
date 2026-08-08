@@ -164,6 +164,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly HealthBarLayer _healthBars = new();
     private readonly AtlasLayer _atlas = new();
     private AtlasWatch? _atlasWatch;
+    private AtlasWindow? _atlasWindow;
 
     /// <summary>
     /// Adds the alert watcher, which says when something worth knowing about turned up.
@@ -490,10 +491,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Attached rather than constructed here for the same reason as the browser: this class
     /// draws, and the atlas is read by something else. What it hands over is a finished view.
     /// </remarks>
-    public void AttachAtlas(AtlasWatch watch)
+    public void AttachAtlas(AtlasWatch watch, Action<AtlasSettings> saved, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(watch);
+        ArgumentNullException.ThrowIfNull(saved);
         _atlasWatch = watch;
+        _atlasWindow = new AtlasWindow(watch, saved) { Visible = visible };
         _atlas.Style = _style;
     }
 
@@ -850,6 +853,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // nothing at all while the panel is closed, which is what the view reports.
         if (_atlasWatch is not null)
         {
+            // Read once, both from the same settings: the window can change them between
+            // frames, and a layer told to hide names by one half of a stale pair is worse
+            // than either answer.
+            _atlas.ShowNames = _atlasWatch.Settings.Names;
             _atlas.Draw(ImGui.GetBackgroundDrawList(), _atlasWatch.View);
         }
 
@@ -869,6 +876,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _styleWindow?.Render();
         _alertWindow?.Render();
         _preloadWindow?.Render();
+        _atlasWindow?.Render();
 
         // A window rather than something painted, so it can be closed and moved - which means
         // it belongs here with the windows and not in the drawing pass. Only where the
@@ -1273,6 +1281,23 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                             ref showing))
                     {
                         _preloadWindow.Visible = showing;
+                    }
+                }
+
+                if (_atlasWatch is not null && _atlasWindow is not null)
+                {
+                    // The count beside the switch, because an atlas overlay that draws
+                    // nothing looks the same whether the panel is shut or the read failed -
+                    // and one of those is worth opening the window for.
+                    AtlasView atlas = _atlasWatch.View;
+                    bool showing = _atlasWindow.Visible;
+                    if (ImGui.Checkbox(
+                            atlas.Total > 0
+                                ? $"The atlas  ({atlas.Total} maps, {atlas.Open} you can enter now)###atlas"
+                                : $"The atlas  ({atlas.Status})###atlas",
+                            ref showing))
+                    {
+                        _atlasWindow.Visible = showing;
                     }
                 }
 
