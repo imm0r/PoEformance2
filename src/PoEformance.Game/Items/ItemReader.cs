@@ -40,6 +40,10 @@ public sealed record ItemStat(int Key, string Id, int Value, string Said);
 /// <param name="Identified">Whether it has been identified. Null when the question does not apply.</param>
 /// <param name="Stack">How many are in the stack. 0 for anything that does not stack.</param>
 /// <param name="StackMax">The most that fit in one, in an ordinary container.</param>
+/// <param name="Art">
+/// The path of its 2D picture - what the game draws in the grid. The art itself is inside the
+/// game's packed archive, so this is the key to it rather than the thing.
+/// </param>
 /// <param name="Mods">The mods on it.</param>
 /// <param name="Stats">
 /// What those mods add up to, as the game resolved them. This is the ORIGINAL: not recomputed
@@ -53,12 +57,13 @@ public sealed record InspectedItem(
     bool? Identified,
     int Stack,
     int StackMax,
+    string Art,
     IReadOnlyList<ItemMod> Mods,
     IReadOnlyList<ItemStat> Stats)
 {
     /// <summary>Nothing readable - what a stale pointer leaves.</summary>
     public static InspectedItem Unreadable { get; } =
-        new(0, string.Empty, string.Empty, -1, null, 0, 0, [], []);
+        new(0, string.Empty, string.Empty, -1, null, 0, 0, string.Empty, [], []);
 
     /// <summary>What to call it in a list.</summary>
     public string Called => Base.Length > 0 ? Base : Path;
@@ -128,6 +133,7 @@ public sealed class ItemReader
     private readonly int _magicAll;
     private readonly int _magicStats;
 
+    private readonly int _art;
     private readonly int _stackCount;
     private readonly int _stackData;
     private readonly int _stackMax;
@@ -164,6 +170,7 @@ public sealed class ItemReader
         _magicAll = magic.OffsetOf("AllMods");
         _magicStats = magic.OffsetOf("StatsFromMods");
 
+        _art = schema.Structs["RenderItemComponent"].OffsetOf("ResourcePath");
         _stackCount = schema.Structs["Stack"].OffsetOf("Count");
         _stackData = schema.Structs["Stack"].OffsetOf("StackSizeDataPtr");
         _stackMax = schema.Structs["StackSizeData"].OffsetOf("MaxStack");
@@ -193,6 +200,7 @@ public sealed class ItemReader
             identified,
             stack,
             stackMax,
+            Art(components),
             mods,
             stats);
     }
@@ -365,6 +373,24 @@ public sealed class ItemReader
         }
 
         return found;
+    }
+
+    /// <summary>Where the item's own picture lives.</summary>
+    /// <remarks>
+    /// Empty for anything without a RenderItem component, which is not a failure - the caller
+    /// draws the name instead, which is what it would have done anyway before the picture
+    /// arrived.
+    /// </remarks>
+    private string Art(IReadOnlyDictionary<string, ulong> components)
+    {
+        if (!components.TryGetValue("RenderItem", out ulong render)
+            || !MemoryReaderExtensions.IsPlausiblePointer(render))
+        {
+            return string.Empty;
+        }
+
+        string path = _reader.ReadStdWString(render + (ulong)_art, 260);
+        return path.Length is > 0 and <= 260 ? path : string.Empty;
     }
 
     /// <summary>How many are in the stack, and how many fit.</summary>

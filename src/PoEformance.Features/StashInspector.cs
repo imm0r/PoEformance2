@@ -5,11 +5,23 @@ using PoEformance.Game.Items;
 
 namespace PoEformance.Features;
 
+/// <summary>One item, where it sits and everything it is.</summary>
+/// <param name="At">Its rectangle in the grid - which is how a stash is drawn as a stash.</param>
+public sealed record StashSlot(StashedItem At, InspectedItem Item);
+
 /// <summary>One inventory with its items already read.</summary>
 /// <param name="Id">The game's own id for it.</param>
 /// <param name="Kind">Backpack, worn, or a stash tab.</param>
+/// <param name="Columns">How wide its grid is.</param>
+/// <param name="Rows">And how deep.</param>
 /// <param name="Items">What is in it, each read down to its stats.</param>
-public sealed record StashPage(int Id, InventoryKind Kind, string Called, IReadOnlyList<InspectedItem> Items);
+public sealed record StashPage(
+    int Id,
+    InventoryKind Kind,
+    string Called,
+    int Columns,
+    int Rows,
+    IReadOnlyList<StashSlot> Items);
 
 /// <summary>What the inspector found. Immutable, published whole, drawn as-is.</summary>
 /// <param name="Pages">Every inventory, in the order the game holds them.</param>
@@ -151,17 +163,19 @@ public sealed class StashInspector
         var pages = new List<StashPage>(inventories.Count);
         foreach (StashInventory inventory in inventories)
         {
-            var read = new List<InspectedItem>(inventory.Items.Count);
+            var read = new List<StashSlot>(inventory.Items.Count);
             foreach (StashedItem item in inventory.Items)
             {
                 InspectedItem inspected = _items.Read(item.Entity);
                 if (inspected.Path.Length > 0)
                 {
-                    read.Add(inspected);
+                    read.Add(new StashSlot(item, inspected));
                 }
             }
 
-            pages.Add(new StashPage(inventory.Id, inventory.Kind, inventory.Called, read));
+            pages.Add(new StashPage(
+                inventory.Id, inventory.Kind, inventory.Called,
+                inventory.Columns, inventory.Rows, read));
         }
 
         int tabs = pages.Count(page => page.Kind == InventoryKind.Stash);

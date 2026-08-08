@@ -385,6 +385,11 @@ internal static class Program
         // Every stash tab and everything in it. ON DEMAND rather than per tick: a full read is
         // thousands of entities taken down to their stats, which is orders of magnitude past
         // anything else here and answers a question nobody asks sixty times a second.
+        // Each item's own picture. The art is not in what this tool reads - it lives in the
+        // game's packed archive - so it comes from poe2db, keyed by the path the item carries.
+        // OFF until somebody turns it on: nothing else here talks to the network while playing.
+        using var itemArt = new PoEformance.Features.ItemArtStore();
+
         var stash = new PoEformance.Features.StashInspector(
             reader,
             schema,
@@ -595,7 +600,7 @@ internal static class Program
         overlay.ShowWorldDots = debug;
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.AttachAtlas(atlas, changed => PoEformance.Features.AtlasStore.Save(changed));
-        overlay.AttachStash(stash);
+        overlay.AttachStash(stash, itemArt);
         overlay.AttachRitual(
             ritual,
             () => atlas.RitualWorth,

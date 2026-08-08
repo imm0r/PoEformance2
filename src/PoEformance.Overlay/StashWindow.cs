@@ -44,15 +44,28 @@ public sealed class StashWindow
     ];
 
     private readonly StashInspector _inspector;
+    private readonly ItemArtStore _art;
+    private readonly Func<string, IntPtr> _picture;
 
     private string _search = string.Empty;
     private int _page = -1;
+    private float _cell = 44f;
     private readonly HashSet<ulong> _open = [];
+    private ulong _hovered;
 
-    public StashWindow(StashInspector inspector)
+    /// <param name="art">Where each item's own picture comes from.</param>
+    /// <param name="picture">
+    /// Turns a file on disk into something drawable. Handed in because uploading a texture
+    /// belongs to whoever owns the renderer, not to a window.
+    /// </param>
+    public StashWindow(StashInspector inspector, ItemArtStore art, Func<string, IntPtr> picture)
     {
         ArgumentNullException.ThrowIfNull(inspector);
+        ArgumentNullException.ThrowIfNull(art);
+        ArgumentNullException.ThrowIfNull(picture);
         _inspector = inspector;
+        _art = art;
+        _picture = picture;
     }
 
     /// <summary>Whether the window is on screen.</summary>
@@ -125,6 +138,33 @@ public sealed class StashWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, "searches the stats too");
 
+        bool pictures = _art.Enabled;
+        if (ImGui.Checkbox("item pictures", ref pictures))
+        {
+            _art.Enabled = pictures;
+        }
+
+        ImGui.SameLine();
+
+        if (pictures)
+        {
+            // What it is doing and where the pictures come from, next to the switch rather
+            // than in a manual: this is the one thing here that talks to the outside world.
+            (int fetched, int missing) = _art.Tally;
+            ImGui.TextColored(
+                DimText,
+                $"from poe2db, kept on disk - {fetched} fetched, {missing} not there"
+                + (_art.Pending > 0 ? $", {_art.Pending} on the way" : string.Empty));
+        }
+        else
+        {
+            ImGui.TextColored(DimText, "off - the art is not in the game files this tool reads, it comes from poe2db");
+        }
+
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(120f);
+        ImGui.SliderFloat("cell", ref _cell, 24f, 96f, "%.0f px");
+
         ImGui.Separator();
 
         if (view.Pages.Count == 0)
@@ -134,7 +174,17 @@ public sealed class StashWindow
 
         Tabs(view);
         ImGui.SameLine();
-        Items(view);
+
+        if (_page >= 0 && _page < view.Pages.Count && _search.Trim().Length == 0)
+        {
+            Grid(view.Pages[_page]);
+        }
+        else
+        {
+            // A search runs across every tab, and a grid can only show one - so looking for
+            // something falls back to the list rather than pretending the other tabs are empty.
+            Items(view);
+        }
     }
 
     /// <summary>The tabs down the left, with how much is in each.</summary>
@@ -192,9 +242,9 @@ public sealed class StashWindow
                 }
 
                 StashPage page = view.Pages[i];
-                foreach (InspectedItem item in page.Items)
+                foreach (StashSlot slot in page.Items)
                 {
-                    if (!Matches(item))
+                    if (!Matches(slot.Item))
                     {
                         continue;
                     }
@@ -206,7 +256,7 @@ public sealed class StashWindow
                     }
 
                     shown++;
-                    One(item, _page < 0 ? page.Called : string.Empty);
+                    One(slot.Item, _page < 0 ? page.Called : string.Empty);
                 }
             }
 
@@ -229,6 +279,162 @@ public sealed class StashWindow
         {
             ImGui.EndChild();
         }
+    }
+
+    /// <summary>
+    /// One tab drawn as the game draws it: a grid, with each item in its own rectangle.
+    /// </summary>
+    /// <remarks>
+    /// A LIST IS THE WRONG SHAPE for a stash and always was. What somebody knows about their
+    /// own tabs is where things are - the currency in the corner, the maps down the left - and
+    /// a list throws exactly that away, then asks them to read four hundred names instead.
+    ///
+    /// The rectangles come from the game: each item carries its own, which is why a two-by-three
+    /// piece of armour takes six cells here without anything having to know what it is.
+    /// </remarks>
+    private void Grid(StashPage page)
+    {
+        if (!ImGui.BeginChild("stash-grid", Vector2.Zero, ImGuiChildFlags.Borders))
+        {
+            ImGui.EndChild();
+            return;
+        }
+
+        try
+        {
+            if (page.Items.Count == 0)
+            {
+                ImGui.TextColored(DimText, "empty - or not opened in game yet, which looks the same from here");
+                return;
+            }
+
+            ImDrawListPtr draw = ImGui.GetWindowDrawList();
+            Vector2 origin = ImGui.GetCursorScreenPos();
+            float cell = _cell;
+
+            // The empty grid first, so a tab with three things in it still reads as a tab.
+            uint line = ImGui.GetColorU32(new Vector4(1f, 1f, 1f, 0.10f));
+            for (int x = 0; x <= page.Columns; x++)
+            {
+                draw.AddLine(
+                    origin + new Vector2(x * cell, 0f),
+                    origin + new Vector2(x * cell, page.Rows * cell),
+                    line);
+            }
+
+            for (int y = 0; y <= page.Rows; y++)
+            {
+                draw.AddLine(
+                    origin + new Vector2(0f, y * cell),
+                    origin + new Vector2(page.Columns * cell, y * cell),
+                    line);
+            }
+
+            ulong under = 0;
+            foreach (StashSlot slot in page.Items)
+            {
+                if (Cell(draw, origin, cell, slot))
+                {
+                    under = slot.Item.Entity;
+                }
+            }
+
+            _hovered = under;
+
+            // The window has to be told how much room the drawing took, or it scrolls to
+            // nothing and the grid is drawn over whatever comes next.
+            ImGui.Dummy(new Vector2(page.Columns * cell, page.Rows * cell));
+
+            if (under != 0)
+            {
+                StashSlot found = page.Items.First(slot => slot.Item.Entity == under);
+                ImGui.BeginTooltip();
+                try
+                {
+                    Detail(found.Item);
+                }
+                finally
+                {
+                    ImGui.EndTooltip();
+                }
+            }
+        }
+        finally
+        {
+            ImGui.EndChild();
+        }
+    }
+
+    /// <summary>One item in its rectangle. True when the cursor is over it.</summary>
+    private bool Cell(ImDrawListPtr draw, Vector2 origin, float cell, StashSlot slot)
+    {
+        var from = new Vector2(origin.X + (slot.At.Left * cell), origin.Y + (slot.At.Top * cell));
+        var to = new Vector2(from.X + (slot.At.Width * cell), from.Y + (slot.At.Height * cell));
+
+        int rarity = slot.Item.Rarity >= 0 && slot.Item.Rarity < ByRarity.Length ? slot.Item.Rarity : 0;
+        Vector4 colour = ByRarity[rarity];
+
+        // The rarity as a tinted backing and a border, which is how the game says it - and it
+        // keeps saying it while a picture is still on its way.
+        draw.AddRectFilled(from, to, ImGui.GetColorU32(colour with { W = 0.14f }));
+        draw.AddRect(from, to, ImGui.GetColorU32(colour with { W = 0.65f }));
+
+        IntPtr texture = _art.Enabled ? _picture(_art.Local(slot.Item.Art)) : IntPtr.Zero;
+        if (texture != IntPtr.Zero)
+        {
+            // Inset a little, so the border stays visible and neighbouring items do not touch.
+            var pad = new Vector2(2f, 2f);
+            draw.AddImage(texture, from + pad, to - pad);
+        }
+        else
+        {
+            // The name, cut to what fits. Not a placeholder for the picture - it is what the
+            // window showed before pictures existed, and it is still true.
+            string name = slot.Item.Called;
+            float room = (to.X - from.X) - 4f;
+            string shown = Fitting(name, room);
+            Vector2 size = ImGui.CalcTextSize(shown);
+            draw.AddText(
+                new Vector2(from.X + ((to.X - from.X - size.X) * 0.5f), from.Y + ((to.Y - from.Y - size.Y) * 0.5f)),
+                ImGui.GetColorU32(colour),
+                shown);
+        }
+
+        if (slot.Item.Stack > 1)
+        {
+            string count = slot.Item.Stack.ToString();
+            Vector2 size = ImGui.CalcTextSize(count);
+            var at = new Vector2(to.X - size.X - 3f, to.Y - size.Y - 2f);
+            draw.AddRectFilled(at - new Vector2(2f, 1f), at + size + new Vector2(2f, 1f), 0xC0000000);
+            draw.AddText(at, 0xFFFFFFFF, count);
+        }
+
+        if (slot.Item.Identified == false)
+        {
+            draw.AddText(from + new Vector2(3f, 1f), ImGui.GetColorU32(WarnText), "?");
+        }
+
+        return ImGui.IsMouseHoveringRect(from, to);
+    }
+
+    /// <summary>As much of a name as fits across a cell.</summary>
+    private static string Fitting(string name, float room)
+    {
+        if (room <= 0f || ImGui.CalcTextSize(name).X <= room)
+        {
+            return name;
+        }
+
+        for (int keep = name.Length - 1; keep > 1; keep--)
+        {
+            string shorter = name[..keep];
+            if (ImGui.CalcTextSize(shorter).X <= room)
+            {
+                return shorter;
+            }
+        }
+
+        return name[..1];
     }
 
     /// <summary>One item: a line, and its stats when it is opened.</summary>
