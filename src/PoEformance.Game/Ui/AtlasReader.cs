@@ -430,6 +430,7 @@ public sealed class AtlasReader
 
         if (panel == 0)
         {
+            said.AddRange(Hunt(uiRoot));
             return said;
         }
 
@@ -467,6 +468,109 @@ public sealed class AtlasReader
                 + $"{node.BadgeIds.Count} badges  {node.ContentTokens.Count} tokens");
         }
 
+        // Even with the path right, the fingerprints can be the thing that is wrong - and then
+        // the panel is found and nothing in it reads as a map. Say where else it could be.
+        if (nodes.Count == 0)
+        {
+            said.AddRange(Hunt(uiRoot));
+        }
+
+        return said;
+    }
+
+    /// <summary>
+    /// Looks for what the atlas panel would have to look like, when the path does not find it.
+    /// </summary>
+    /// <remarks>
+    /// A CHILD PATH IS A TERRIBLE THING TO HARD-CODE and this is the answer to that rather than
+    /// an apology for it. "22, 0, 6" is a position in a list somebody else's client built; a
+    /// patch that inserts one panel above it moves every atlas offset in the schema, and the
+    /// only symptom is an overlay that draws nothing.
+    ///
+    /// So instead of asking somebody to hunt through the interface browser, this describes the
+    /// panel by its SHAPE - hundreds of children that mostly share one flags word, which is
+    /// what a grid of map nodes is and what almost nothing else in the interface is - and
+    /// reports the paths that match. The answer goes straight into the schema, which is
+    /// hot-reloadable, so correcting the drift is an edit rather than a build.
+    ///
+    /// Bounded on purpose: the tree is deep and this walks it blind.
+    /// </remarks>
+    public IReadOnlyList<string> Hunt(ulong uiRoot)
+    {
+        const int mostVisited = 20_000;
+        const int deepest = 8;
+        const int enoughChildren = 30;
+
+        var said = new List<string>();
+        var found = new List<(string Path, int Children, uint Kind, int Share)>();
+        var queue = new Queue<(ulong Element, string Path, int Depth)>();
+        queue.Enqueue((uiRoot, string.Empty, 0));
+
+        int visited = 0;
+        while (queue.Count > 0 && visited < mostVisited)
+        {
+            (ulong element, string path, int depth) = queue.Dequeue();
+            visited++;
+
+            List<ulong> children = _elements.Children(element, MostNodes);
+            if (children.Count == 0)
+            {
+                continue;
+            }
+
+            if (children.Count >= enoughChildren)
+            {
+                var kinds = new Dictionary<uint, int>();
+                foreach (ulong child in children)
+                {
+                    if (_reader.TryRead(child + (ulong)_flags, out uint flags))
+                    {
+                        uint kind = flags & ~_visibleMask;
+                        kinds[kind] = kinds.GetValueOrDefault(kind) + 1;
+                    }
+                }
+
+                if (kinds.Count > 0)
+                {
+                    (uint kind, int share) = kinds.MaxBy(entry => entry.Value);
+
+                    // Most of one kind, not merely a plurality: a list of assorted buttons has
+                    // a most-common flags word too, and it is not this.
+                    if (share * 2 >= children.Count)
+                    {
+                        found.Add((path, children.Count, kind, share));
+                    }
+                }
+            }
+
+            if (depth < deepest)
+            {
+                for (int i = 0; i < children.Count; i++)
+                {
+                    queue.Enqueue((children[i], path.Length == 0 ? $"{i}" : $"{path}, {i}", depth + 1));
+                }
+            }
+        }
+
+        if (found.Count == 0)
+        {
+            said.Add($"nothing in the interface looks like a grid of map nodes ({visited} elements looked at)");
+            said.Add("    if the atlas is open, the UiElement offsets themselves are what to check");
+            return said;
+        }
+
+        said.Add("elements that look like a grid of map nodes, biggest first:");
+        foreach ((string path, int children, uint kind, int share) in
+                 found.OrderByDescending(entry => entry.Children).Take(6))
+        {
+            string known = kind == (_mapNodeFp & ~_visibleMask) ? "  <- the map-node fingerprint"
+                : kind == (_mistNodeFp & ~_visibleMask) ? "  <- the mist-node fingerprint"
+                : string.Empty;
+            said.Add($"    child path {path}  -  {children} children, {share} of them 0x{kind:X}{known}");
+        }
+
+        said.Add("    put the best one in AtlasPanel.PathFromUiRoot0..2, and its flags word in");
+        said.Add("    MapNodeFingerprint if none of them is marked above - the schema reloads without a rebuild");
         return said;
     }
 }

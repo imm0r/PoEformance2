@@ -90,6 +90,114 @@ public class AtlasReaderTests
     private static uint MapNodeFlags(OffsetSchema schema)
         => (uint)(int)schema.Structs["AtlasPanel"].Constants["MapNodeFingerprint"];
 
+
+    /// <summary>
+    /// A tree with a node grid somewhere OTHER than the schema's path, for the hunt.
+    /// </summary>
+    /// <remarks>
+    /// Which is the situation the hunt exists for: the path is a position in a list, and a
+    /// patch that inserts one panel above the atlas moves it without changing anything else.
+    /// </remarks>
+    private static (FakeMemoryReader Fake, OffsetSchema Schema) Misplaced(int nodes, uint flags)
+    {
+        OffsetSchema schema = LoadSchema();
+        int children = schema.Structs["UiElement"].OffsetOf("Children");
+        int self = schema.Structs["UiElement"].OffsetOf("Self");
+        int flagsAt = schema.Structs["UiElementBase"].OffsetOf("Flags");
+        var fake = new FakeMemoryReader();
+
+        void Element(ulong address) => fake.Place(address + (ulong)self, address);
+        void Give(ulong parent, ulong[] kids)
+        {
+            ulong array = parent + 0x800;
+            fake.Place(parent + (ulong)children, array);
+            fake.Place(parent + (ulong)children + 8, array + (8 * (ulong)kids.Length));
+            for (int i = 0; i < kids.Length; i++)
+            {
+                fake.Place(array + (8 * (ulong)i), kids[i]);
+            }
+        }
+
+        // Root -> [decoy, panel]. The decoy has a few children of assorted kinds; the panel
+        // has the grid. Neither is at the schema's path, so Panel() finds nothing.
+        const ulong root = 0x10_0000;
+        const ulong decoy = 0x11_0000;
+        const ulong panel = 0x12_0000;
+
+        Element(root);
+        Element(decoy);
+        Element(panel);
+        Give(root, [decoy, panel]);
+
+        var assorted = new ulong[40];
+        for (int i = 0; i < assorted.Length; i++)
+        {
+            assorted[i] = 0x20_0000 + ((ulong)i * 0x1000);
+            Element(assorted[i]);
+            fake.Place(assorted[i] + (ulong)flagsAt, (uint)(0x1000 + i));   // all different
+        }
+
+        Give(decoy, assorted);
+
+        var grid = new ulong[nodes];
+        for (int i = 0; i < grid.Length; i++)
+        {
+            grid[i] = 0x30_0000 + ((ulong)i * 0x1000);
+            Element(grid[i]);
+            fake.Place(grid[i] + (ulong)flagsAt, flags);
+        }
+
+        Give(panel, grid);
+        return (fake, schema);
+    }
+
+    [Fact]
+    public void WHENThePathIsWrongItSaysWhereTheNodesActuallyAre()
+    {
+        // The whole point: a child path is a position in somebody else's list, so a patch that
+        // inserts one panel above the atlas breaks every atlas offset at once, and the only
+        // symptom is an overlay that draws nothing. Hunting for the SHAPE turns that from a
+        // trawl through the interface browser into a line to paste into the schema.
+        OffsetSchema schema = LoadSchema();
+        (FakeMemoryReader fake, _) = Misplaced(nodes: 120, MapNodeFlags(schema));
+
+        IReadOnlyList<string> said = ReaderFor(fake, schema).Describe(UiRoot, new UiScale(2560, 1600, 0));
+        string all = string.Join("\n", said);
+
+        Assert.Contains("did not resolve", all);
+        Assert.Contains("look like a grid of map nodes", all);
+        Assert.Contains("child path 1", all);              // root -> child 1 is the panel
+        Assert.Contains("120 children", all);
+        Assert.Contains("the map-node fingerprint", all);  // and this one is even recognised
+    }
+
+    [Fact]
+    public void ANDItPrefersTheGridToAListOfAssortedThings()
+    {
+        // The decoy has forty children, which is plenty - but they are forty different kinds,
+        // and a grid of map nodes is not. Without that rule the hunt names whichever list is
+        // biggest, which on a real interface is never the atlas.
+        OffsetSchema schema = LoadSchema();
+        (FakeMemoryReader fake, _) = Misplaced(nodes: 35, MapNodeFlags(schema));
+
+        string all = string.Join("\n", ReaderFor(fake, schema).Hunt(UiRoot));
+
+        Assert.Contains("child path 1", all);
+        Assert.DoesNotContain("child path 0", all);
+    }
+
+    [Fact]
+    public void ANDItSaysSoWhenThereIsNothingLikeAnAtlasAtAll()
+    {
+        // The answer when the atlas is simply shut, which is most of the time - and it must
+        // not read like a failure, because it is not one.
+        OffsetSchema schema = LoadSchema();
+        (FakeMemoryReader fake, _) = Misplaced(nodes: 3, MapNodeFlags(schema));
+
+        string all = string.Join("\n", ReaderFor(fake, schema).Hunt(UiRoot));
+        Assert.Contains("nothing in the interface looks like a grid of map nodes", all);
+    }
+
     [Fact]
     public void AMapNodeIsReadWithItsPlaceAndItsProgress()
     {
