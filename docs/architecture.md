@@ -376,9 +376,73 @@ status names how many tabs came back empty, and an empty page says both things i
 listing that quietly called its total "your stash" would be wrong for every player who has not
 just clicked through the whole thing.
 
+### The art — reading the game's own packed files
+
+An item carries the **path** of its picture, not the picture. The stash is drawn as a stash
+rather than a list, so those paths have to become pixels, and the file they name is in the
+game's own bundles. Reading it there is preferred over asking a website: nothing leaves the
+machine, nothing can be out of date, and it works offline. poe2db stays as the fallback for
+whatever the install will not give up, and that half stays off until somebody turns it on.
+
+Four formats stacked on each other, each taken from LibGGPK3/LibBundle3 rather than from
+memory:
+
+- **The archive**, in whichever shape an install has — a loose `Bundles2` folder, or one
+  `Content.ggpk` holding the same folder inside it. Same contents, two packings, so it is an
+  interface with two small implementations rather than two features.
+- **The bundles**, compressed in independent 256 KB chunks with a table of their compressed
+  sizes at the front. That table is the whole point: one icon out of a 200 MB bundle costs one
+  chunk, and nothing here ever holds a whole bundle.
+- **The index**, which files everything under a 64-bit hash of its path and keeps the
+  spelled-out paths in a separate compressed blob. Finding a path means hashing it, so that
+  blob is never unpacked at all.
+- **Oodle**, via OozSharp — a managed decoder, so there is no licensed library to ship.
+
+Three things that fail **silently** rather than loudly, and are worth knowing before touching
+any of it:
+
+- **Which hash is in the file.** GGG changed it in 3.21.2, from FNV-1a to Murmur2-64A, and
+  picking the wrong one finds nothing at all — it reads as an empty install. It does not have to
+  be guessed: the first directory record is the ROOT, whose path is empty, so its stored hash is
+  whichever function's value for the empty string, and those are two different constants. The
+  file says which hashed it.
+- **A directory record is 24 bytes, not the 20 its four fields add up to**, because the
+  reference reads the array as a raw span of a struct the runtime pads to its alignment — and
+  writes it back the same way, so the padding is really in the file. Nothing here reads past the
+  first record, so it does not bite today.
+- **A texture may not be a texture.** What comes out of the bundle for a `.dds` path is one of
+  three things (owner, from a PoE2 install — neither reference covers it, LibGGPK3 being a
+  PoE1-era tool and GameHelper2 not decoding textures at all): a **signpost**, whose content is
+  `*` and then the path of the file that really holds the picture, which may point somewhere
+  else again; **Brotli**, behind four bytes that are its decompressed size and not part of it;
+  or **just a DDS**. All three are named `.dds`, so which one it is has to come from the
+  content, and it has to be worked out again at every hop.
+
+  The sharp edge there: a signpost starts with `*`, and one decompressed size in every 256
+  starts with that same byte. Deciding on the byte alone reads a picture as a path to nowhere,
+  for some textures and not others — so the check is that what follows is a plausible path, and
+  a real compressed texture whose size begins with `*` is a test.
+
+Everything except the Oodle call is tested against data the tests build themselves — a GGPK, a
+bundle and an index written from the reference's description, so a disagreement between the two
+fails rather than passes. The hashes are pinned to values from a second implementation written
+differently, because a round trip through one implementation agrees with itself however wrong it
+is. The textures' Brotli ships with the framework, so those tests compress real bytes rather
+than standing in for it. Oodle cannot: there is no compressor to make a fixture with, so it is
+handed in and proving it needs real bundles.
+
+**Where the install is** is asked of the game itself — the tool is already attached to it, and a
+running process knows where its own executable is. The usual folders are only a fallback for
+reading with the game shut, and a folder counts because the files are in it, never because of
+its name.
+
 ### Remaining
 
 More features on the slice, and configuring them from the page.
 
 Loot tracking with prices and moving items into a container both now have the reader they were
 blocked on; what they still need is the game running to verify it against.
+
+The packed-file reader needs the same: the formats are pinned against built fixtures, but
+whether PoE2's own bundles decompress, and what its textures are actually block-compressed
+with, only a real install can answer.

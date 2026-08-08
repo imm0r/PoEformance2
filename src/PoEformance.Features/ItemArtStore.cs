@@ -9,19 +9,26 @@ namespace PoEformance.Features;
 /// </summary>
 /// <remarks>
 /// An item carries the path of its 2D art - <c>Art/2DItems/Weapons/Bow.dds</c> - and not the
-/// art itself: that lives inside the game's packed archive, which this tool does not open. The
-/// same paths are served as images by poe2db, so the path becomes a URL. That is how the AHK
-/// tool does it, and it is why a stash can be drawn as a stash rather than as a list.
+/// art itself. It is why a stash can be drawn as a stash rather than as a list.
 ///
-/// IT GOES OUT TO THE NETWORK, which nothing else in this tool does while playing, so it is
-/// OFF until somebody turns it on. What is sent is the art path of an item and nothing else -
-/// no account, no character, no stash - but "this tool talks to a website" is a thing somebody
-/// should decide rather than discover.
+/// TWO PLACES IT CAN COME FROM, and they are not equal.
 ///
-/// FETCHED ONCE, EVER. Each picture is written next to the settings and read from there
-/// afterwards, so a stash of two thousand items costs its icons once and nothing on every run
-/// after. A path that comes back missing is remembered as missing too - otherwise every draw
-/// of a shipped-this-league item re-asks a server that has already said no.
+/// THE INSTALL, which is where it actually is. The path names a file in the game's own bundles,
+/// so a copy of the game is a complete set of the art: nothing leaves the machine, nothing can
+/// be out of date, and it works offline. This is preferred whenever the install can be read,
+/// and it needs no permission - reading a file the player already has is not somebody else's
+/// business.
+///
+/// THE WEB, as the fallback, from poe2db - which is how the AHK tool does it, and what is left
+/// when the install cannot be found or a texture will not decode. THAT one is OFF until
+/// somebody turns it on: what is sent is an art path and nothing else, no account, no
+/// character, no stash, but "this tool talks to a website" should be a decision rather than
+/// something to discover.
+///
+/// FETCHED ONCE, EVER, either way. Each picture is written next to the settings and read from
+/// there afterwards, so a stash of two thousand items costs its icons once and nothing on every
+/// run after. A path that comes back missing is remembered as missing too - otherwise every
+/// draw of a shipped-this-league item re-asks a server that has already said no.
 /// </remarks>
 public sealed class ItemArtStore : IDisposable
 {
@@ -39,6 +46,8 @@ public sealed class ItemArtStore : IDisposable
     private readonly SemaphoreSlim _limit = new(AtOnce, AtOnce);
     private readonly CancellationTokenSource _closing = new();
 
+    private Func<string, byte[]?>? _install;
+
     // Everything asked for so far: the path, and where it ended up. An empty value is a path
     // that came back with nothing, which is remembered so it is not asked for again.
     private readonly Dictionary<string, string> _known = new(StringComparer.OrdinalIgnoreCase);
@@ -48,6 +57,7 @@ public sealed class ItemArtStore : IDisposable
     private HttpClient? _http;
     private int _fetched;
     private int _missing;
+    private int _unpacked;
 
     /// <param name="fetch">
     /// How to get one. Handed in so this can be tested without a network, and so the one place
@@ -59,17 +69,36 @@ public sealed class ItemArtStore : IDisposable
         _fetch = fetch ?? Download;
     }
 
-    /// <summary>Whether to fetch anything at all. Off until somebody says otherwise.</summary>
+    /// <summary>Whether to ask the WEB for pictures. Off until somebody says otherwise.</summary>
+    /// <remarks>Reading them out of the install is not gated on this - see the class remarks.</remarks>
     public bool Enabled { get; set; }
 
-    /// <summary>How many pictures have been fetched this session, and how many came back missing.</summary>
-    public (int Fetched, int Missing) Tally
+    /// <summary>
+    /// Where to get a picture out of the installed game, if it can be read.
+    /// </summary>
+    /// <remarks>
+    /// Takes an art path and gives back an encoded image, or null when the install has no such
+    /// texture. Handed in rather than opened here so the decoding - which is somebody else's
+    /// format all the way down - stays where the other image handling is, and so all of this
+    /// can be tested without a copy of the game.
+    /// </remarks>
+    public Func<string, byte[]?>? Install
+    {
+        get { lock (_gate) { return _install; } }
+        set { lock (_gate) { _install = value; } }
+    }
+
+    /// <summary>Whether pictures can be had at all, from either place.</summary>
+    public bool Working => Enabled || Install is not null;
+
+    /// <summary>Where this session's pictures came from, and how many were nowhere.</summary>
+    public (int Unpacked, int Fetched, int Missing) Tally
     {
         get
         {
             lock (_gate)
             {
-                return (_fetched, _missing);
+                return (_unpacked, _fetched, _missing);
             }
         }
     }
@@ -122,21 +151,30 @@ public sealed class ItemArtStore : IDisposable
             return file;
         }
 
-        Ask(key, file);
+        // BOTH SPELLINGS go down. The key is the path with its extension off, which is how the
+        // picture server spells it and how the cache is keyed; the install wants the path as the
+        // item wrote it, extension and all, because that is what is in its index.
+        Ask(key, file, artPath);
         return string.Empty;
     }
 
-    /// <summary>Starts a fetch, unless one is already running for this path.</summary>
-    private void Ask(string key, string file)
+    /// <summary>Starts a look for one, unless one is already running for this path.</summary>
+    /// <remarks>
+    /// ON A BACKGROUND THREAD even for the install, which is a local file and might look like
+    /// something to just do. Unpacking one is a bundle chunk decompressed and a block-compressed
+    /// texture decoded, which is small but not free - and a stash opening asks for hundreds at
+    /// once, on the thread that is drawing them.
+    /// </remarks>
+    private void Ask(string key, string file, string artPath)
     {
-        if (!Enabled)
+        if (!Working)
         {
             return;
         }
 
         lock (_gate)
         {
-            if (_fetched + _missing >= MostPerRun || !_asking.Add(key))
+            if (_unpacked + _fetched + _missing >= MostPerRun || !_asking.Add(key))
             {
                 return;
             }
@@ -149,7 +187,17 @@ public sealed class ItemArtStore : IDisposable
                 await _limit.WaitAsync(_closing.Token).ConfigureAwait(false);
                 try
                 {
-                    byte[]? bytes = await _fetch(key, _closing.Token).ConfigureAwait(false);
+                    // The install first: it is the real source, it is not somebody else's
+                    // server, and it cannot be out of date.
+                    Func<string, byte[]?>? install = Install;
+                    byte[]? bytes = install?.Invoke(artPath);
+                    bool local = bytes is { Length: > 0 };
+
+                    if (!local && Enabled)
+                    {
+                        bytes = await _fetch(key, _closing.Token).ConfigureAwait(false);
+                    }
+
                     if (bytes is { Length: > 0 })
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(file)!);
@@ -158,7 +206,14 @@ public sealed class ItemArtStore : IDisposable
                         lock (_gate)
                         {
                             _known[key] = file;
-                            _fetched++;
+                            if (local)
+                            {
+                                _unpacked++;
+                            }
+                            else
+                            {
+                                _fetched++;
+                            }
                         }
 
                         return;
@@ -229,11 +284,16 @@ public sealed class ItemArtStore : IDisposable
     /// Named by a HASH of the path rather than the path itself. The paths are deep, contain
     /// characters a file name may not, and run past the length Windows accepts - all of which
     /// turn into a picture that silently never caches.
+    ///
+    /// And named for no PARTICULAR kind of picture, because there are now two sources and they
+    /// do not agree on one - the install's textures are unpacked to one format and poe2db
+    /// serves another. What reads these works the kind out from the content, so calling them
+    /// all one thing would only be a file extension that lies.
     /// </remarks>
     public string FileFor(string key)
     {
         byte[] digest = SHA256.HashData(Encoding.UTF8.GetBytes(key));
-        return Path.Combine(_folder, $"{Convert.ToHexString(digest)[..24]}.webp");
+        return Path.Combine(_folder, $"{Convert.ToHexString(digest)[..24]}.img");
     }
 
     public void Dispose()

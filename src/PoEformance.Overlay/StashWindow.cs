@@ -138,28 +138,29 @@ public sealed class StashWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, "searches the stats too");
 
-        bool pictures = _art.Enabled;
-        if (ImGui.Checkbox("item pictures", ref pictures))
+        // The switch is for the WEB only. Pictures out of the install need no permission - they
+        // are files the player already has - so what is offered here is the fallback, and the
+        // label says which of the two is being turned on.
+        bool installed = _art.Install is not null;
+
+        bool web = _art.Enabled;
+        if (ImGui.Checkbox(installed ? "also ask poe2db" : "item pictures from poe2db", ref web))
         {
-            _art.Enabled = pictures;
+            _art.Enabled = web;
         }
 
         ImGui.SameLine();
 
-        if (pictures)
+        (int unpacked, int fetched, int missing) = _art.Tally;
+        string coming = _art.Pending > 0 ? $", {_art.Pending} on the way" : string.Empty;
+
+        ImGui.TextColored(DimText, (installed, web) switch
         {
-            // What it is doing and where the pictures come from, next to the switch rather
-            // than in a manual: this is the one thing here that talks to the outside world.
-            (int fetched, int missing) = _art.Tally;
-            ImGui.TextColored(
-                DimText,
-                $"from poe2db, kept on disk - {fetched} fetched, {missing} not there"
-                + (_art.Pending > 0 ? $", {_art.Pending} on the way" : string.Empty));
-        }
-        else
-        {
-            ImGui.TextColored(DimText, "off - the art is not in the game files this tool reads, it comes from poe2db");
-        }
+            (true, true) => $"{unpacked} out of your install, {fetched} from poe2db, {missing} nowhere{coming}",
+            (true, false) => $"{unpacked} out of your install, {missing} not in it{coming}",
+            (false, true) => $"from poe2db, kept on disk - {fetched} fetched, {missing} not there{coming}",
+            (false, false) => "off - and the game folder was not found, so there is nowhere else to get them",
+        });
 
         ImGui.SameLine();
         ImGui.SetNextItemWidth(120f);

@@ -61,7 +61,7 @@ public class ItemArtStoreTests
             }
 
             Assert.Equal(1, asked);
-            Assert.Equal((1, 0), store.Tally);
+            Assert.Equal((0, 1, 0), store.Tally);
         }
         finally
         {
@@ -100,7 +100,7 @@ public class ItemArtStoreTests
             }
 
             Assert.Equal(1, asked);
-            Assert.Equal((0, 1), store.Tally);
+            Assert.Equal((0, 0, 1), store.Tally);
         }
         finally
         {
@@ -109,6 +109,127 @@ public class ItemArtStoreTests
                 Directory.Delete(folder, recursive: true);
             }
         }
+    }
+
+    [Fact]
+    public void THEINSTALLIsAskedFirstAndTheWebIsNotAskedAtAll()
+    {
+        // The install is where the art actually is - local, complete, and not somebody else's
+        // server. Going to the web for something already on the disk is the bug this prevents.
+        string folder = Somewhere();
+        int asked = 0;
+        var unpacked = new List<string>();
+
+        try
+        {
+            using var store = new ItemArtStore(folder, (path, token) =>
+            {
+                Interlocked.Increment(ref asked);
+                return Task.FromResult<byte[]?>([9, 9, 9]);
+            })
+            {
+                Enabled = true,
+                Install = path =>
+                {
+                    unpacked.Add(path);
+                    return [1, 2, 3];
+                },
+            };
+
+            store.Local("Art/2DItems/Weapons/Bow.dds");
+            Settle(store);
+
+            string file = store.Local("Art/2DItems/Weapons/Bow.dds");
+            Assert.Equal(new byte[] { 1, 2, 3 }, File.ReadAllBytes(file));
+            Assert.Equal(0, asked);
+            Assert.Equal((1, 0, 0), store.Tally);
+
+            // And it is handed the path SPELLED AS THE ITEM SPELLS IT. The cache and the picture
+            // server both want the extension off, and the install's index does not know that
+            // name - dropping it here finds nothing and falls back to the web for everything.
+            Assert.Equal(["Art/2DItems/Weapons/Bow.dds"], unpacked);
+        }
+        finally
+        {
+            if (Directory.Exists(folder))
+            {
+                Directory.Delete(folder, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public void ANDPicturesComeOutOfItWithoutAnybodyTurningAnythingOn()
+    {
+        // Reading a file the player already has is not a decision to put to them. The switch is
+        // for the web, so leaving it off must not mean no pictures when the game is right there.
+        string folder = Somewhere();
+
+        try
+        {
+            using var store = new ItemArtStore(folder, (path, token) => Task.FromResult<byte[]?>([9]))
+            {
+                Install = path => [4, 5, 6],
+            };
+
+            Assert.False(store.Enabled);
+            Assert.True(store.Working);
+
+            store.Local("Art/2DItems/Weapons/Bow.dds");
+            Settle(store);
+
+            Assert.NotEqual(string.Empty, store.Local("Art/2DItems/Weapons/Bow.dds"));
+            Assert.Equal((1, 0, 0), store.Tally);
+        }
+        finally
+        {
+            if (Directory.Exists(folder))
+            {
+                Directory.Delete(folder, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public void ANDTheWebPicksUpWhatTheInstallDoesNotHave()
+    {
+        // A texture the install will not give up - a format that will not decode, or a file that
+        // is not there - still has a picture on poe2db, so one source failing is not the end of it.
+        string folder = Somewhere();
+
+        try
+        {
+            using var store = new ItemArtStore(folder, (path, token) => Task.FromResult<byte[]?>([7, 7]))
+            {
+                Enabled = true,
+                Install = path => path.Contains("Bow", StringComparison.Ordinal) ? [1] : null,
+            };
+
+            store.Local("Art/2DItems/Weapons/Bow.dds");
+            store.Local("Art/2DItems/Rings/Ring1.dds");
+            Settle(store);
+
+            Assert.Equal(new byte[] { 1 }, File.ReadAllBytes(store.Local("Art/2DItems/Weapons/Bow.dds")));
+            Assert.Equal(new byte[] { 7, 7 }, File.ReadAllBytes(store.Local("Art/2DItems/Rings/Ring1.dds")));
+            Assert.Equal((1, 1, 0), store.Tally);
+        }
+        finally
+        {
+            if (Directory.Exists(folder))
+            {
+                Directory.Delete(folder, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public void ANDWithNeitherOneNothingIsAskedOfAnybody()
+    {
+        using var store = new ItemArtStore(Somewhere(), (path, token) => Task.FromResult<byte[]?>([1]));
+
+        Assert.False(store.Working);
+        Assert.Equal(string.Empty, store.Local("Art/2DItems/Weapons/Bow.dds"));
+        Assert.Equal(0, store.Pending);
     }
 
     [Fact]
