@@ -29,6 +29,9 @@ public sealed class AtlasWindow
     private readonly AtlasWatch _watch;
     private readonly Action<AtlasSettings> _save;
 
+    // Something was changed and not yet written down. See where it is written, below.
+    private bool _unsaved;
+
     /// <param name="save">Writes the settings down, so a change survives a restart.</param>
     public AtlasWindow(AtlasWatch watch, Action<AtlasSettings> save)
     {
@@ -157,8 +160,18 @@ public sealed class AtlasWindow
 
         if (!ReferenceEquals(changed, settings))
         {
+            // Applied at once, so the atlas follows a colour as it is dragged.
             _watch.Settings = changed;
-            _save(changed);
+            _unsaved = true;
+        }
+
+        // WRITTEN only once nothing is being dragged or typed in. Applied and saved together,
+        // a colour picker held down writes the settings file on every frame of the drag, and
+        // a search box writes it on every keystroke.
+        if (_unsaved && !ImGui.IsAnyItemActive())
+        {
+            _unsaved = false;
+            _save(_watch.Settings);
         }
     }
 
