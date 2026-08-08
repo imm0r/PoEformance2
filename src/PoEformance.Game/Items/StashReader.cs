@@ -61,10 +61,14 @@ public sealed record StashInventory(
 /// it documents: there are TWO server-data structs and reading the inventory vector off the
 /// outer one silently yields nothing, which looks exactly like a drifted offset.
 ///
-/// WHAT IS ACTUALLY THERE is a question only the game can answer. A tab the client has never
-/// opened may simply not be in this vector - the server sends what it sends - so a count from
-/// here is "what the client knows about", not "what the account owns". Worth saying out loud
-/// wherever the count is shown.
+/// A TAB HOLDS NOTHING UNTIL IT HAS BEEN OPENED IN GAME. Confirmed by the owner, 2026-08: a tab
+/// the player has never opened this session shows no items here, and starts showing them - with
+/// their stats - the moment it is opened once. The server sends a tab's contents when the client
+/// asks for them, and nothing here can make it ask.
+///
+/// So an empty tab and an unopened one look IDENTICAL from this side, and a count is "what has
+/// been opened", never "what the account owns". Anything that reports a total has to say so, or
+/// it is quietly wrong for every player who has not just clicked through their whole stash.
 /// </remarks>
 public sealed class StashReader
 {

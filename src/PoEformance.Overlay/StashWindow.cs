@@ -17,6 +17,10 @@ namespace PoEformance.Overlay;
 /// THE STATS ARE THE ITEM'S OWN, as the game resolved them - so what a row says is what the
 /// item says, not a recomputation that could drift from it. Unworded stats keep their id, which
 /// is what makes this useful for reverse-engineering as well as for sorting through loot.
+///
+/// IT CANNOT SHOW A TAB NOBODY HAS OPENED. The client asks the server for a tab's contents when
+/// it is opened and not before, so an unopened tab reads as an empty one - which is why nothing
+/// here calls a total "your stash", and why an empty page says both things it might be.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class StashWindow
@@ -208,7 +212,11 @@ public sealed class StashWindow
 
             if (matched == 0)
             {
-                ImGui.TextColored(DimText, _search.Trim().Length > 0 ? "nothing matches" : "this one is empty");
+                // "Empty" is not the whole truth: a tab that has never been opened in game
+                // holds nothing here either, and the two are indistinguishable from this side.
+                ImGui.TextColored(DimText, _search.Trim().Length > 0
+                    ? "nothing matches"
+                    : "empty - or not opened in game yet, which looks the same from here");
             }
             else if (matched > shown)
             {

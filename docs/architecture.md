@@ -368,9 +368,13 @@ The inventory reader the two missing areas were blocked on. What it turned out t
 It runs **on demand**, not per tick: a full read is thousands of entities, orders of magnitude
 past anything else here, answering a question nobody asks sixty times a second.
 
-Still open, and only the game can answer it: whether a tab the client has never opened is in the
-vector at all. Until that is known the count is "what this client has loaded", and the window
-says so rather than leaving it to be assumed.
+**A tab holds nothing until it has been opened in game** (confirmed by the owner, 2026-08). The
+client asks the server for a tab's contents when it is opened and not before, so a tab never
+opened this session reads as an empty one, and the two are indistinguishable from this side.
+Every count is therefore "what has been opened" rather than "what the account owns" — so the
+status names how many tabs came back empty, and an empty page says both things it might be. A
+listing that quietly called its total "your stash" would be wrong for every player who has not
+just clicked through the whole thing.
 
 ### Remaining
 

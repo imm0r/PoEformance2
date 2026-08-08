@@ -47,9 +47,10 @@ public sealed record StashView(IReadOnlyList<StashPage> Pages, string Status)
 /// sixty times a second. So it runs when somebody presses a button, on the reader thread, and
 /// publishes what it found.
 ///
-/// WHAT IS THERE is up to the game. A tab the client has never opened may not be in the vector
-/// at all, so the count is "what the client knows about" rather than "what the account owns" -
-/// which is why the status says how many pages were read rather than leaving it to be assumed.
+/// A TAB HOLDS NOTHING UNTIL IT HAS BEEN OPENED IN GAME - confirmed by the owner, 2026-08. The
+/// client asks the server for a tab's contents when it is opened and not before, so an empty tab
+/// and one never opened are the same thing from here. Every count this publishes is therefore
+/// "what has been opened", and the window says so rather than leaving it to be assumed.
 /// </remarks>
 public sealed class StashInspector
 {
@@ -164,9 +165,16 @@ public sealed class StashInspector
         }
 
         int tabs = pages.Count(page => page.Kind == InventoryKind.Stash);
-        return new StashView(
-            pages,
-            $"{pages.Count} inventories, {tabs} of them stash tabs - only what this client has loaded");
+        int empty = pages.Count(page => page.Kind == InventoryKind.Stash && page.Items.Count == 0);
+
+        // The empty count is the useful half. An empty tab and one that has never been opened
+        // in game read the same here, so naming the number is what stops it being taken for a
+        // complete picture of the stash.
+        string caveat = empty > 0
+            ? $" - {empty} of them empty, which is also what a tab you have not opened in game looks like"
+            : " - tabs hold nothing here until they have been opened in game at least once";
+
+        return new StashView(pages, $"{pages.Count} inventories, {tabs} stash tabs{caveat}");
     }
 
     /// <summary>Where the inventories hang off.</summary>
