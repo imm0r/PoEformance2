@@ -587,14 +587,13 @@ internal static class Program
         overlay.AttachRitual(
             ritual,
             () => atlas.RitualWorth,
+            worth => atlas.RitualWorth = worth,
             worth =>
             {
-                // Applied to the read at once so the routes re-sort, and written down so the
-                // weighting survives a restart. Both from the settings the atlas already holds,
-                // so the two cannot drift apart.
+                // Kept on the settings the atlas already holds, so the two cannot drift apart -
+                // and written only once the typing has stopped.
                 PoEformance.Features.AtlasSettings kept = atlas.Settings with { RitualWorth = worth };
                 atlas.Settings = kept;
-                atlas.RitualWorth = worth;
                 PoEformance.Features.AtlasStore.Save(kept);
             });
         overlay.Noise = world.Noise;

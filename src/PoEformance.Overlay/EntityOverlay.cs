@@ -514,12 +514,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachRitual(
         RitualWatch watch,
         Func<IReadOnlyDictionary<string, int>> worth,
-        Action<IReadOnlyDictionary<string, int>> reweigh,
+        Action<IReadOnlyDictionary<string, int>> apply,
+        Action<IReadOnlyDictionary<string, int>> save,
         bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(watch);
         _ritualWatch = watch;
-        _ritualWindow = new RitualWindow(watch, worth, reweigh) { Visible = visible };
+        _ritualWindow = new RitualWindow(watch, worth, apply, save) { Visible = visible };
     }
 
     /// <summary>

@@ -32,24 +32,34 @@ public sealed class RitualWindow
 
     private readonly RitualWatch _watch;
     private readonly Func<IReadOnlyDictionary<string, int>> _worth;
-    private readonly Action<IReadOnlyDictionary<string, int>> _reweigh;
+    private readonly Action<IReadOnlyDictionary<string, int>> _apply;
+    private readonly Action<IReadOnlyDictionary<string, int>> _save;
 
     private string _filter = string.Empty;
     private bool _unsaved;
 
     /// <param name="worth">What each reward is worth now.</param>
-    /// <param name="reweigh">Writes a changed weighting down, so it survives a restart.</param>
+    /// <param name="apply">
+    /// Takes a changed weighting into use at once, so the routes re-sort while somebody types.
+    /// </param>
+    /// <param name="save">
+    /// Writes it down. SEPARATE from applying, because a weight is typed a digit at a time and
+    /// one callback doing both writes the settings file for each of them.
+    /// </param>
     public RitualWindow(
         RitualWatch watch,
         Func<IReadOnlyDictionary<string, int>> worth,
-        Action<IReadOnlyDictionary<string, int>> reweigh)
+        Action<IReadOnlyDictionary<string, int>> apply,
+        Action<IReadOnlyDictionary<string, int>> save)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(worth);
-        ArgumentNullException.ThrowIfNull(reweigh);
+        ArgumentNullException.ThrowIfNull(apply);
+        ArgumentNullException.ThrowIfNull(save);
         _watch = watch;
         _worth = worth;
-        _reweigh = reweigh;
+        _apply = apply;
+        _save = save;
     }
 
     /// <summary>Whether the window is on screen.</summary>
@@ -270,16 +280,17 @@ public sealed class RitualWindow
 
             if (changed is not null)
             {
-                _reweigh(changed);
+                // Applied at once, so the list re-sorts as a weight is typed.
+                _apply(changed);
                 _unsaved = true;
             }
 
-            // Written once nothing is being typed in. Saving on every keystroke would write the
-            // settings file for each digit of a number.
+            // Written once nothing is being typed in any more. A weight is entered a digit at a
+            // time, so applying and saving together writes the settings file for each digit.
             if (_unsaved && !ImGui.IsAnyItemActive())
             {
                 _unsaved = false;
-                _reweigh(_worth());
+                _save(_worth());
             }
         }
         finally
