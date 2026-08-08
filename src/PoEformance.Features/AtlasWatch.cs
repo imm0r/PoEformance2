@@ -118,6 +118,8 @@ public sealed class AtlasWatch
     private int _checkServed;
     private IReadOnlyList<string> _checked = [];
 
+    private IReadOnlyDictionary<string, int> _ritualWorth = new Dictionary<string, int>();
+
     public AtlasWatch(
         IMemoryReader reader,
         OffsetSchema schema,
@@ -138,6 +140,27 @@ public sealed class AtlasWatch
 
     /// <summary>The map names in force, kept so settings can be replaced without them.</summary>
     public AtlasMapNames Names { get; }
+
+    /// <summary>
+    /// The ritual line, when one is being drawn. Null unless somebody attached it.
+    /// </summary>
+    /// <remarks>
+    /// Rides this read rather than taking its own: the panel address, the interface root and
+    /// the studied nodes are all here already, and resolving them a second time each tick would
+    /// be pure duplication for a feature that is idle almost always.
+    /// </remarks>
+    public RitualWatch? Ritual { get; set; }
+
+    /// <summary>What each ritual reward is worth to this player. Read on the reader thread.</summary>
+    public IReadOnlyDictionary<string, int> RitualWorth
+    {
+        get => Volatile.Read(ref _ritualWorth);
+        set
+        {
+            Volatile.Write(ref _ritualWorth, value ?? new Dictionary<string, int>());
+            Ritual?.Reconsider();
+        }
+    }
 
     /// <summary>The newest answer. Never blocks, never null, never partially built.</summary>
     public AtlasView View => Volatile.Read(ref _view);
@@ -221,16 +244,23 @@ public sealed class AtlasWatch
         if (chain.UiRoot == 0)
         {
             Forget();
+            Ritual?.Service(0, 0, [], RitualWorth);
             return AtlasView.Closed with { Status = chain.InGame ? "UI root did not resolve" : "not in an area" };
         }
+
+        // Resolved ONCE and passed on: the ritual line hangs off the same element, and walking
+        // three children twice a tick to arrive at the same address is nothing but duplication.
+        ulong panel = _atlas.Panel(chain.UiRoot);
 
         // WHERE the maps are, every tick, because that is the half that changes while somebody
         // drags the atlas about. Reading it says whether the panel is open at all, so nothing
         // more expensive happens while it is shut.
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed = _atlas.Where(chain.UiRoot, scale);
+        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed = _atlas.Where(panel, scale);
+
         if (placed.Count == 0)
         {
             Forget();
+            Ritual?.Service(0, 0, [], RitualWorth);
             return AtlasView.Closed;
         }
 
@@ -244,6 +274,8 @@ public sealed class AtlasWatch
 
         if (_studied.Count == 0)
         {
+            Ritual?.Service(0, 0, [], RitualWorth);
+
             // NOT "atlas closed", which is what this used to say. The panel is open and has
             // things in it; none of them read as a map. That is what a wrong fingerprint looks
             // like, and it is the one state where saying the ordinary thing sends somebody
@@ -266,6 +298,10 @@ public sealed class AtlasWatch
                 ? node with { Screen = now.Position, Size = now.Size }
                 : node);
         }
+
+        // The ritual line, off the same panel and with the same live positions. Its own first
+        // read is one byte, so this costs nothing while no line is being drawn.
+        Ritual?.Service(panel, chain.UiRoot, live, RitualWorth);
 
         return Compose(live, settings, Volatile.Read(ref _grouping), _routes, _said);
     }

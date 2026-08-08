@@ -165,6 +165,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly AtlasLayer _atlas = new();
     private AtlasWatch? _atlasWatch;
     private AtlasWindow? _atlasWindow;
+    private readonly RitualLayer _ritual = new();
+    private RitualWatch? _ritualWatch;
+    private RitualWindow? _ritualWindow;
 
     /// <summary>
     /// Adds the alert watcher, which says when something worth knowing about turned up.
@@ -498,6 +501,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _atlasWatch = watch;
         _atlasWindow = new AtlasWindow(watch, saved) { Visible = visible };
         _atlas.Style = _style;
+    }
+
+    /// <summary>
+    /// Adds the ritual-line planner, which rides the atlas read.
+    /// </summary>
+    /// <remarks>
+    /// Separate from the atlas even though it shares its read: it answers a different question,
+    /// it is idle unless a line is being drawn, and its window is a list somebody works through
+    /// rather than a set of switches.
+    /// </remarks>
+    public void AttachRitual(
+        RitualWatch watch,
+        Func<IReadOnlyDictionary<string, int>> worth,
+        Action<IReadOnlyDictionary<string, int>> reweigh,
+        bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(watch);
+        _ritualWatch = watch;
+        _ritualWindow = new RitualWindow(watch, worth, reweigh) { Visible = visible };
     }
 
     /// <summary>
@@ -860,6 +882,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _atlas.ShowNames = drawing.Names;
             _atlas.TextScale = drawing.Writing;
             _atlas.Draw(ImGui.GetBackgroundDrawList(), _atlasWatch.View);
+
+            // After the atlas, so a route runs OVER the map labels it passes rather than under
+            // them - it is the thing being looked at while it is on screen.
+            if (_ritualWatch is not null && _ritualWindow is not null)
+            {
+                _ritual.TextScale = drawing.Writing;
+                _ritual.Draw(ImGui.GetBackgroundDrawList(), _ritualWatch.View, _ritualWindow.Picked);
+            }
         }
 
         // Outside the "in an area" gate: an element can be inspected on a login screen or in
@@ -879,6 +909,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _alertWindow?.Render();
         _preloadWindow?.Render();
         _atlasWindow?.Render();
+        _ritualWindow?.Render();
 
         // A window rather than something painted, so it can be closed and moved - which means
         // it belongs here with the windows and not in the drawing pass. Only where the
@@ -1300,6 +1331,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                             ref showing))
                     {
                         _atlasWindow.Visible = showing;
+                    }
+                }
+
+                if (_ritualWatch is not null && _ritualWindow is not null)
+                {
+                    // Only offered while a line is being drawn, which is the only time it has
+                    // anything to say - a permanent switch for a few seconds a session is
+                    // clutter, and its absence is itself the answer to "why is it empty".
+                    RitualView ritual = _ritualWatch.View;
+                    if (ritual.Drawing)
+                    {
+                        bool planning = _ritualWindow.Visible;
+                        if (ImGui.Checkbox($"Ritual line  ({ritual.Chains.Count} routes)###ritual", ref planning))
+                        {
+                            _ritualWindow.Visible = planning;
+                        }
                     }
                 }
 

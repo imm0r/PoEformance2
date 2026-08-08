@@ -386,6 +386,15 @@ internal static class Program
         // while the panel is closed, which is almost all of a session. Its two data files are
         // what turn a node's raw id and content numbers into a name and a list of what is in
         // it - both optional, and missing either only costs the words.
+        // The ritual line rides the atlas read. Its own first read is one byte - the mode
+        // flag - so having it switched on costs nothing while no line is being drawn, which is
+        // all but a few seconds of a session.
+        var ritual = new PoEformance.Features.RitualWatch(
+            new PoEformance.Game.Ui.RitualLineReader(
+                reader, schema, new PoEformance.Game.Ui.UiElementReader(reader, schema)),
+            PoEformance.Game.World.RitualMods.Load(FindDataFile("ritual-mods.json")),
+            PoEformance.Game.World.AtlasMapNames.Load(FindDataFile("atlas-maps.json")));
+
         var atlas = new PoEformance.Features.AtlasWatch(
             reader,
             schema,
@@ -394,7 +403,9 @@ internal static class Program
             PoEformance.Game.World.AtlasMapNames.Load(FindDataFile("atlas-maps.json")))
         {
             Settings = PoEformance.Features.AtlasStore.Load(),
+            Ritual = ritual,
         };
+        atlas.RitualWorth = atlas.Settings.Worth;
 
         // And the entity browser, which is the shortest route to something not yet
         // understood: the game names every component an entity carries, and most of them
@@ -573,6 +584,19 @@ internal static class Program
         overlay.ShowWorldDots = debug;
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.AttachAtlas(atlas, changed => PoEformance.Features.AtlasStore.Save(changed));
+        overlay.AttachRitual(
+            ritual,
+            () => atlas.RitualWorth,
+            worth =>
+            {
+                // Applied to the read at once so the routes re-sort, and written down so the
+                // weighting survives a restart. Both from the settings the atlas already holds,
+                // so the two cannot drift apart.
+                PoEformance.Features.AtlasSettings kept = atlas.Settings with { RitualWorth = worth };
+                atlas.Settings = kept;
+                atlas.RitualWorth = worth;
+                PoEformance.Features.AtlasStore.Save(kept);
+            });
         overlay.Noise = world.Noise;
         overlay.Costs = costs;
         overlay.Coverage = coverage;

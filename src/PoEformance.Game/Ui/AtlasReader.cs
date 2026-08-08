@@ -209,14 +209,15 @@ public sealed class AtlasReader
     /// Keyed by the node's own address, which is what makes the two halves fit together: the
     /// slow half's nodes carry theirs, so a position found here belongs to a known map without
     /// anything having to match them up by order.
+    ///
+    /// Takes the PANEL rather than the interface root, unlike <see cref="Read"/>: this runs every
+    /// tick and the caller has the panel already, so resolving it again here would be three
+    /// child reads a tick to arrive at an address that was passed over.
     /// </remarks>
-    public Dictionary<ulong, (Vector2 Position, Vector2 Size)> Where(ulong uiRoot, UiScale scale)
-    {
-        ulong panel = Panel(uiRoot);
-        return panel == 0
+    public Dictionary<ulong, (Vector2 Position, Vector2 Size)> Where(ulong panel, UiScale scale)
+        => panel == 0
             ? []
             : _elements.ReadSiblings(panel, _elements.Children(panel, MostNodes), scale);
-    }
 
     /// <summary>One child of the panel, when it turns out to be a map.</summary>
     private AtlasNode? Node(int index, ulong element, Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed)

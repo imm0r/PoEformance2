@@ -217,6 +217,10 @@ public sealed class AtlasGrouping
 /// <param name="TextScale">
 /// How big the writing on the atlas is, against the interface's own size. 1 is that size.
 /// </param>
+/// <param name="RitualWorth">
+/// What each ritual reward is worth to this player, which is what orders the planned routes.
+/// Only the ones somebody actually set are kept.
+/// </param>
 /// <param name="Groups">
 /// ABSENT means "never chosen" and takes the shipped list; EMPTY means "group nothing" and is
 /// honoured - the same rule the preload rules follow, for the same reason.
@@ -230,6 +234,7 @@ public sealed record AtlasSettings(
     [property: JsonPropertyName("web")] bool Web = false,
     [property: JsonPropertyName("search")] string Search = "",
     [property: JsonPropertyName("textScale")] float TextScale = 0f,
+    [property: JsonPropertyName("ritualWorth")] IReadOnlyDictionary<string, int>? RitualWorth = null,
     [property: JsonPropertyName("groups")] IReadOnlyList<AtlasGroup>? Groups = null)
 {
     /// <summary>The smallest and largest writing worth allowing.</summary>
@@ -258,6 +263,17 @@ public sealed record AtlasSettings(
 
     /// <summary>The groups in force - the shipped ones when the file said nothing.</summary>
     public IReadOnlyList<AtlasGroup> Sorting => Groups ?? DefaultAtlasGroups.Groups;
+
+    /// <summary>
+    /// What the ritual rewards are worth. Empty until somebody says otherwise.
+    /// </summary>
+    /// <remarks>
+    /// No shipped defaults, unlike the groups: what a reward is worth depends entirely on what
+    /// this player needs, and a shipped opinion would sort everybody's routes by mine.
+    /// </remarks>
+    public IReadOnlyDictionary<string, int> Worth => RitualWorth ?? NothingInParticular;
+
+    private static readonly Dictionary<string, int> NothingInParticular = [];
 }
 
 /// <summary>Loads and saves the atlas settings next to the executable.</summary>
