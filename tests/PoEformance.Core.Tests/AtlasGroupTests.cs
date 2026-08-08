@@ -199,6 +199,21 @@ public class AtlasGroupTests
     }
 
     [Fact]
+    public void THESizeOfTheWritingTreatsZeroAsUnsetRatherThanAsInvisible()
+    {
+        // Zero arrives from a record's default, a missing JSON key and a hand-edited file
+        // alike, none of which go through a constructor. Taken literally it is an atlas with
+        // no writing on it, which reads as the feature being broken.
+        Assert.Equal(1f, AtlasSettings.Default.Writing);
+        Assert.Equal(1f, new AtlasSettings(TextScale: 0f).Writing);
+        Assert.Equal(1.5f, new AtlasSettings(TextScale: 1.5f).Writing);
+
+        // And a number from outside the range is brought back into it rather than obeyed.
+        Assert.Equal(AtlasSettings.SmallestText, new AtlasSettings(TextScale: 0.01f).Writing);
+        Assert.Equal(AtlasSettings.LargestText, new AtlasSettings(TextScale: 100f).Writing);
+    }
+
+    [Fact]
     public void SETTINGSSurviveBeingWrittenAndReadBack()
     {
         string path = Path.Combine(Path.GetTempPath(), $"atlas-{Guid.NewGuid():N}.json");

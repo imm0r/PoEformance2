@@ -155,6 +155,16 @@ public sealed class AtlasWindow
             changed = changed with { Search = search };
         }
 
+        // Whether the default reads at a real resolution is not something that could be
+        // decided while writing it, so it is here to be turned up rather than guessed at.
+        float writing = settings.Writing;
+        if (ImGui.SliderFloat(
+                "size of the writing", ref writing,
+                AtlasSettings.SmallestText, AtlasSettings.LargestText, "%.2fx"))
+        {
+            changed = changed with { TextScale = writing };
+        }
+
         ImGui.Separator();
         changed = Groups(changed);
 

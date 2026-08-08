@@ -49,6 +49,16 @@ public sealed class AtlasLayer
     /// </remarks>
     public bool ShowNames { get; set; } = true;
 
+    /// <summary>
+    /// How big the writing is, against the interface's own size.
+    /// </summary>
+    /// <remarks>
+    /// The atlas is a screen full of small text and a 4K monitor makes it smaller. Whether the
+    /// default reads at a real resolution is not something that can be decided from here, so it
+    /// is a number somebody can turn up rather than one to be guessed right.
+    /// </remarks>
+    public float TextScale { get; set; } = 1f;
+
     /// <summary>Where the label sits relative to the node it names.</summary>
     /// <remarks>
     /// Nudged UP, off the node's own art. The game draws an icon in the middle of each node,
@@ -161,13 +171,14 @@ public sealed class AtlasLayer
 
         uint said = OverlaySettings.Fade(Style.Colour(StyleCatalogue.Keys.AtlasContent), alpha);
 
+        float font = Font;
         foreach (string line in mark.Contents)
         {
-            Vector2 wide = ImGui.CalcTextSize(line);
+            Vector2 wide = Measure(line, font);
             var where = new Vector2(mark.Where.X + Nudge.X - (wide.X * 0.5f), below);
 
             draw.AddRectFilled(where - new Vector2(3f, 1f), where + wide + new Vector2(3f, 1f), plate, 3f);
-            draw.AddText(where, said, line);
+            draw.AddText(ImGui.GetFont(), font, where, said, line);
             below += wide.Y + 2f;
         }
     }
@@ -176,7 +187,8 @@ public sealed class AtlasLayer
     private float DrawName(
         ImDrawListPtr draw, AtlasMark mark, string title, Vector2 middle, uint text, uint plate, float alpha)
     {
-        Vector2 size = ImGui.CalcTextSize(title);
+        float font = Font;
+        Vector2 size = Measure(title, font);
         Vector2 at = middle - (size * 0.5f);
         var pad = new Vector2(5f, 2f);
 
@@ -194,9 +206,20 @@ public sealed class AtlasLayer
             }
         }
 
-        draw.AddText(at, text, title);
+        draw.AddText(ImGui.GetFont(), font, at, text, title);
         return at.Y + size.Y + 3f;
     }
+
+    /// <summary>The size to write at, from the interface's own and the chosen scale.</summary>
+    private float Font => ImGui.GetFontSize() * (TextScale > 0f ? TextScale : 1f);
+
+    /// <summary>How big a line is at a size other than the interface's own.</summary>
+    /// <remarks>
+    /// Scaled from a measurement at the current size, which is what ImGui offers - measuring
+    /// at an arbitrary size would mean pushing a font, and a bitmap font scales linearly.
+    /// </remarks>
+    private static Vector2 Measure(string text, float font)
+        => ImGui.CalcTextSize(text) * (font / ImGui.GetFontSize());
 
     /// <summary>A map's colour: its group's, or the plain label colour when it has no group.</summary>
     private uint ColourOf(AtlasMark mark, float alpha)

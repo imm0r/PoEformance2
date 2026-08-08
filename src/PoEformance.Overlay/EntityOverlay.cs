@@ -856,7 +856,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // Read once, both from the same settings: the window can change them between
             // frames, and a layer told to hide names by one half of a stale pair is worse
             // than either answer.
-            _atlas.ShowNames = _atlasWatch.Settings.Names;
+            AtlasSettings drawing = _atlasWatch.Settings;
+            _atlas.ShowNames = drawing.Names;
+            _atlas.TextScale = drawing.Writing;
             _atlas.Draw(ImGui.GetBackgroundDrawList(), _atlasWatch.View);
         }
 

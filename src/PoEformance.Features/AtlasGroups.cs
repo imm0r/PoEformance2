@@ -214,6 +214,9 @@ public sealed class AtlasGrouping
 /// </param>
 /// <param name="Web">Draw every connection, not just the routes. Honest and very busy.</param>
 /// <param name="Search">Show only the maps whose name contains this. Empty shows all of them.</param>
+/// <param name="TextScale">
+/// How big the writing on the atlas is, against the interface's own size. 1 is that size.
+/// </param>
 /// <param name="Groups">
 /// ABSENT means "never chosen" and takes the shipped list; EMPTY means "group nothing" and is
 /// honoured - the same rule the preload rules follow, for the same reason.
@@ -226,9 +229,32 @@ public sealed record AtlasSettings(
     [property: JsonPropertyName("hideUnreachable")] bool HideUnreachable = false,
     [property: JsonPropertyName("web")] bool Web = false,
     [property: JsonPropertyName("search")] string Search = "",
+    [property: JsonPropertyName("textScale")] float TextScale = 0f,
     [property: JsonPropertyName("groups")] IReadOnlyList<AtlasGroup>? Groups = null)
 {
+    /// <summary>The smallest and largest writing worth allowing.</summary>
+    /// <remarks>
+    /// A range rather than a free number because this reaches drawing code through a settings
+    /// file: zero would draw nothing at all and look like a broken atlas, and a hundred would
+    /// fill the screen with one map's name and leave nowhere to put it back.
+    /// </remarks>
+    public const float SmallestText = 0.5f;
+
+    public const float LargestText = 4f;
+
     public static AtlasSettings Default { get; } = new();
+
+    /// <summary>
+    /// How big to write, with zero meaning "as the interface does".
+    /// </summary>
+    /// <remarks>
+    /// ZERO is the unset value, not a size, for the reason every zero in these settings is:
+    /// a record's default, a missing JSON key and a hand-edited file all arrive as zero without
+    /// going through a constructor, and a zero taken literally is an atlas with no writing on
+    /// it. The atlas is a whole screen of small text and a 4K monitor makes it smaller, so this
+    /// exists to be turned up without waiting for a build.
+    /// </remarks>
+    public float Writing => TextScale <= 0f ? 1f : Math.Clamp(TextScale, SmallestText, LargestText);
 
     /// <summary>The groups in force - the shipped ones when the file said nothing.</summary>
     public IReadOnlyList<AtlasGroup> Sorting => Groups ?? DefaultAtlasGroups.Groups;
