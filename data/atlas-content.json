@@ -1,0 +1,566 @@
+{
+  "badges": {
+    "0x0064": {
+      "description": "Area contains a Powerful Map Boss",
+      "icon": "AtlasIconContentMapBoss",
+      "name": "Powerful Map Boss"
+    },
+    "0x0065": {
+      "description": "Area contains an Otherworldly Breach",
+      "icon": "AtlasIconContentBreach",
+      "name": "Breach"
+    },
+    "0x0066": {
+      "description": "Area contains a Kalguuran Expedition",
+      "icon": "AtlasIconContentExpedition",
+      "name": "Expedition"
+    },
+    "0x0067": {
+      "description": "Area contains a Delirium Mirror",
+      "icon": "AtlasIconContentDelirium",
+      "name": "Delirium"
+    },
+    "0x0068": {
+      "description": "Area contains Ritual Altars",
+      "icon": "AtlasIconContentRitual",
+      "name": "Ritual"
+    },
+    "0x0069": {
+      "description": "Area has +1 to Monster Level",
+      "icon": "AtlasIconContentIrradiated",
+      "name": "Irradiated"
+    },
+    "0x006a": {
+      "description": "Area contains many extra Abysses",
+      "icon": "AtlasIconContentAbyssOverrun",
+      "name": "Overrun by the Abyssal"
+    },
+    "0x006b": {
+      "description": "Area contains Vaal Beacons",
+      "icon": "AtlasIconContentIncursion",
+      "name": "Vaal Beacons"
+    },
+    "0x006c": {
+      "description": "Area contains Abysses",
+      "icon": "AtlasIconContentAbyss",
+      "name": "Abyss"
+    },
+    "0x006d": {
+      "description": "Area contains an important objective",
+      "icon": "AtlasMasteryBiome",
+      "name": "Notable Location"
+    },
+    "0x006e": {
+      "description": "DNT No visual identity = not shown",
+      "icon": "",
+      "name": "[DNT] Breach City - Not Shown to Players"
+    },
+    "0x006f": {
+      "description": "Slay the Great Beast to earn Hilda's Favour",
+      "icon": "CompanionsNotable1",
+      "name": "Great Beast"
+    },
+    "0x0070": {
+      "description": "All Rare monsters are Essence monsters",
+      "icon": "AtlasIconContentEssence",
+      "name": "Essence Trove"
+    },
+    "0x0071": {
+      "description": "Contains many extra Strongboxes with monsters waiting in ambush",
+      "icon": "AtlasIconContentStrongBox",
+      "name": "Monstrous Treasure"
+    },
+    "0x0072": {
+      "description": "Contains an Azmeri Spirit that will be released when Possessed Monsters are slain",
+      "icon": "AtlasIconContentAzmeriSpirit",
+      "name": "Spirit Guide"
+    },
+    "0x0073": {
+      "description": "All Monsters are at least Magic",
+      "icon": "ItemQuantityandRarity",
+      "name": "Arcane Hordes"
+    },
+    "0x0074": {
+      "description": "Contains 2 additional Rogue Exiles and 5 additional Rare Beasts",
+      "icon": "Hunter",
+      "name": "Hunting Grounds"
+    },
+    "0x0075": {
+      "description": "Shrines release an Azmeri Spirit when activated",
+      "icon": "HybridShrineAzmeriSpirit",
+      "name": "Nature Shrines"
+    },
+    "0x0076": {
+      "description": "Contains 3 additional Essence Packs Essence Packs have an additional Rare Monster",
+      "icon": "EssenceNotable1",
+      "name": "Crystalised Twinning"
+    },
+    "0x0077": {
+      "description": "Essences transfer to a random Unique Monster on death",
+      "icon": "EssenceNotable2",
+      "name": "Indomitable Essence"
+    },
+    "0x0078": {
+      "description": "Contains 2 additional Azmeri Spirits Azmeri Spirits have 1000% increased maximum Empowerment",
+      "icon": "MoreWildWisps",
+      "name": "Azmeri Energisation"
+    },
+    "0x0079": {
+      "description": "An Azmeri Spirit moves to a nearby map on completion, eventually ascending to a Sacred Spirit",
+      "icon": "VividPrimalWildWisps",
+      "name": "Spirit Migration"
+    },
+    "0x007a": {
+      "description": "The Azmeri Spirit has ascended to a Sacred Spirit",
+      "icon": "MoreSacredWisps",
+      "name": "Sacred Spirit"
+    },
+    "0x007b": {
+      "description": "Contains a Unique Strongbox",
+      "icon": "StrongboxNotable2",
+      "name": "Ancient Trove"
+    },
+    "0x007c": {
+      "description": "Contains 3 additional Strongboxes Strongboxes are openable twice",
+      "icon": "StrongboxNotable1",
+      "name": "Twice-Locked Boxes"
+    },
+    "0x007d": {
+      "description": "Contains 3 additional Shrines",
+      "icon": "Shrines",
+      "name": "Power of Faith"
+    },
+    "0x007e": {
+      "description": "Contains 3 additional Shrines Shrines have 2 additional packs of Worshippers",
+      "icon": "ShrinesNode",
+      "name": "Large Congregation"
+    },
+    "0x007f": {
+      "description": "Elemental Shrines do not appear in area",
+      "icon": "BossNotableSpawnAdditionalShrine",
+      "name": "Zealous Reverence"
+    },
+    "0x0080": {
+      "description": "Shrine Buffs are reapplied when entering the Map Boss Arena",
+      "icon": "GreedShrinenoteble",
+      "name": "Persistent Devotion"
+    },
+    "0x0081": {
+      "description": "Contains 2 additional Shrines Shrines are Worshipped by a Rogue Exile",
+      "icon": "Anarchy5",
+      "name": "Rites of the Rogues"
+    },
+    "0x0082": {
+      "description": "Contains 2 additional Rogue Exiles Rogue Exiles appear in Pairs",
+      "icon": "AnarchyNode1",
+      "name": "Surprising Alliances"
+    },
+    "0x0083": {
+      "description": "Contains an additional Rogue Exile and 2 additional Azmeri Spirits Rogue Exiles are Possessed when a Possessed Monster is killed in Area",
+      "icon": "Anarchy4",
+      "name": "Azmeri Bloodline"
+    },
+    "0x0084": {
+      "description": "Summoning Circles always summon an additional Boss",
+      "icon": "StoneCircles",
+      "name": "Twinned Terrors"
+    },
+    "0x0085": {
+      "description": "Contains 3 additional Summoning Circles",
+      "icon": "StoneCirclesNode",
+      "name": "Scattered Stones"
+    },
+    "0x0086": {
+      "description": "World Area has been manipulated and cannot be manipulated again",
+      "icon": "Mapnode",
+      "name": "Map Area Modified"
+    },
+    "0x0087": {
+      "description": "",
+      "icon": "AnarchyNotable2",
+      "name": "Fleeing Exile"
+    },
+    "0x0088": {
+      "description": "Contains a Breach Hive",
+      "icon": "BreachNotable4",
+      "name": "Breach Hive"
+    },
+    "0x0089": {
+      "description": "Contains a manifestation of Delirium",
+      "icon": "DeliriumNotable7",
+      "name": "Simulacrum"
+    },
+    "0x008a": {
+      "description": "Contains an extra of each type of content",
+      "icon": "ElderShaperNotable1",
+      "name": "Chaotic Cacophony"
+    },
+    "0x008b": {
+      "description": "50% increased Rarity of items found in area",
+      "icon": "BossMapDrops",
+      "name": "Affluent Armies"
+    },
+    "0x008c": {
+      "description": "Contains many extra Strongboxes with monsters waiting in ambush",
+      "icon": "AtlasIconContentStrongBox",
+      "name": "Monstrous Treasure"
+    },
+    "0x008d": {
+      "description": "Map Boss drops an Inscribed Ultimatum",
+      "icon": "VaalNotable1",
+      "name": "Trialmaster's Trainee"
+    },
+    "0x008e": {
+      "description": "Map Boss drops a Djinn Barya",
+      "icon": "SorceressSandDjinnCorpseBeetles",
+      "name": "Sekhema's Student"
+    },
+    "0x008f": {
+      "description": "Map Boss is Possessed",
+      "icon": "BossNotableAzmeriSpirit",
+      "name": "Azmeri Champion"
+    },
+    "0x0090": {
+      "description": "Monsters are Gigantic, have 50% reduced pack size and drop 50% increased items",
+      "icon": "MinionsandManaNotable",
+      "name": "Gigantic Uprising"
+    },
+    "0x0091": {
+      "description": "Currency found is replaced with rarer varieties",
+      "icon": "CurrencyNode",
+      "name": "Glimmering Mutation"
+    },
+    "0x0092": {
+      "description": "Contains an additional Summoning Circle Summoning Circle Bosses have increased difficulty and reward per power of enemy slain",
+      "icon": "ScorchTheEarth",
+      "name": "Stolen Power"
+    },
+    "0x0093": {
+      "description": "When Players Kill a Rare Monster they will gain 1 of its Modifiers for 20 seconds",
+      "icon": "skullcracking",
+      "name": "Headhunters"
+    },
+    "0x0094": {
+      "description": "Contains 5 additional Azmeri Spirits",
+      "icon": "EnduranceFrenzyPowerChargeNode",
+      "name": "Swarming Spirits"
+    },
+    "0x0095": {
+      "description": "Contains 3 additional Map Bosses throughout the area",
+      "icon": "BossNotableSpawnBeyondMonsters",
+      "name": "Power Struggle"
+    },
+    "0x0096": {
+      "description": "Area has 2 additional random Waystone Modifiers",
+      "icon": "CorruptedDefences",
+      "name": "Corrupted Mirage"
+    },
+    "0x0097": {
+      "description": "Doubles Effect of Tablets used on Area",
+      "icon": "CaptivatedInterestKeystone",
+      "name": "Energized Ley Lines"
+    },
+    "0x0098": {
+      "description": "1000% increased Exceptional Items found in Area Monster may drop anyExceptional Items",
+      "icon": "ExceptionalItemsBodyArmour",
+      "name": "Exceptional Find"
+    },
+    "0x0099": {
+      "description": "Also counts as a Water Area",
+      "icon": "WaterBiome",
+      "name": "Water Influence"
+    },
+    "0x009a": {
+      "description": "Also counts as a Mountain Area",
+      "icon": "MountainBiome",
+      "name": "Mountain Influence"
+    },
+    "0x009b": {
+      "description": "Also counts as a Grass Area",
+      "icon": "GrassBiome",
+      "name": "Grass Influence"
+    },
+    "0x009c": {
+      "description": "Also counts as a Forest Area",
+      "icon": "ForestBiome",
+      "name": "Forest Influence"
+    },
+    "0x009d": {
+      "description": "Also counts as a Swamp Area",
+      "icon": "SwampBiome",
+      "name": "Swamp Influence"
+    },
+    "0x009e": {
+      "description": "Also counts as a Desert Area",
+      "icon": "DesertBiome",
+      "name": "Desert Influence"
+    },
+    "0x009f": {
+      "description": "Doryani has spotted The Immured Fury in this Area",
+      "icon": "AtlasIconContentSanctificationBoss",
+      "name": "Immured Fury"
+    },
+    "0x00a0": {
+      "description": "Equipment dropped by monsters is replaced with other items",
+      "icon": "Currency2",
+      "name": "Mirage of Riches"
+    },
+    "0x00a1": {
+      "description": "Monsters grant 100% increased Experience",
+      "icon": "BossNotableGrantMoreExperience",
+      "name": "Wisdom's Teachings"
+    },
+    "0x00a2": {
+      "description": "Gold dropped by monsters is replaced with other items",
+      "icon": "BossNotableDropMoreItems",
+      "name": "Tight Pockets"
+    },
+    "0x00a3": {
+      "description": "Players have unlimited Revivals in area Monsters have 100% increased Effectiveness",
+      "icon": "IncreaseMinionLifeNode",
+      "name": "Fragment of Immortality"
+    },
+    "0x00a4": {
+      "description": "100% increased Rarity of items found in area",
+      "icon": "ItemQuantity",
+      "name": "Prosperous Populous"
+    },
+    "0x00a5": {
+      "description": "5 Rare Monsters are Duplicated",
+      "icon": "GenericMinionNotable",
+      "name": "Echoes of Power"
+    },
+    "0x00a6": {
+      "description": "Area contains a Grand Expedition",
+      "icon": "ExpeditionNode1",
+      "name": "Grand Expedition"
+    },
+    "0x03e8": {
+      "description": "This map is Corrupted",
+      "icon": "AtlasIconContentCorruption",
+      "name": "Corruption"
+    },
+    "0x6157": {
+      "description": "Contains a reflection of the Map Boss",
+      "icon": "AtlasIconContentGigaMirror",
+      "name": "Grand Mirror"
+    }
+  },
+  "effects": {
+    "0x04d8": {
+      "description": "{0}% increased Rarity of items found in area",
+      "icon": "BossMapDrops"
+    },
+    "0x0963": {
+      "description": "Contains {0} additional Shrines",
+      "icon": "Shrines"
+    },
+    "0x0a8c": {
+      "description": "Contains {0} additional Azmeri Spirits",
+      "icon": "AtlasIconContentAzmeriSpirit"
+    },
+    "0x1247": {
+      "description": "Contains {0} additional Essence",
+      "icon": "AtlasIconContentEssence"
+    },
+    "0x127b": {
+      "description": "Map Boss drops a Unique item",
+      "icon": ""
+    },
+    "0x1282": {
+      "description": "Area has {0} additional random Waystone Modifiers",
+      "icon": "CorruptedDefences"
+    },
+    "0x320f": {
+      "description": "All Monsters are at least Magic",
+      "icon": "ItemQuantityandRarity"
+    },
+    "0x3897": {
+      "description": "Map Boss is Possessed",
+      "icon": "BossNotableAzmeriSpirit"
+    },
+    "0x3a5d": {
+      "description": "Hive Fortress",
+      "icon": "AtlasIconContentBreach"
+    },
+    "0x3a5e": {
+      "description": "Breach Hive Fortress",
+      "icon": "AtlasIconContentBreach"
+    },
+    "0x3e16": {
+      "description": "Shrine Duration increased by {0}%",
+      "icon": "BossNotableSpawnAdditionalShrine"
+    },
+    "0x4c58": {
+      "description": "Powerful Map Boss",
+      "icon": "AtlasIconContentMapBoss"
+    },
+    "0x4c59": {
+      "description": "Powerful Map Boss",
+      "icon": "AtlasIconContentMapBoss"
+    },
+    "0x4e88": {
+      "description": "Doubles Effect of Tablets used on Area",
+      "icon": "CaptivatedInterestKeystone"
+    },
+    "0x5e28": {
+      "description": "Contains {0} additional Summoning Circles",
+      "icon": "StoneCirclesNode"
+    },
+    "0x60c1": {
+      "description": "Breach Stronghold",
+      "icon": "AtlasIconContentBreach"
+    },
+    "0x60c4": {
+      "description": "Breach Stronghold",
+      "icon": "AtlasIconContentBreach"
+    },
+    "0x6157": {
+      "description": "Contains a reflection of the Map Boss",
+      "icon": "AtlasIconContentGigaMirror"
+    },
+    "0x615a": {
+      "description": "Grand Mirror",
+      "icon": "AtlasIconContentGigaMirror"
+    },
+    "0x61c7": {
+      "description": "Summoning Circles always summon an additional Boss",
+      "icon": "StoneCircles"
+    },
+    "0x6244": {
+      "description": "Shrines release an Azmeri Spirit when activated",
+      "icon": "HybridShrineAzmeriSpirit"
+    },
+    "0x6290": {
+      "description": "Simulacrum",
+      "icon": "DeliriumNotable7"
+    },
+    "0x634a": {
+      "description": "Contains {0} additional Map Bosses throughout the area",
+      "icon": "BossNotableSpawnBeyondMonsters"
+    },
+    "0x634d": {
+      "description": "Essences transfer to a random Unique Monster on death",
+      "icon": "EssenceNotable2"
+    },
+    "0x6502": {
+      "description": "Also counts as a Mountain Area",
+      "icon": "MountainBiome"
+    },
+    "0x6503": {
+      "description": "Also counts as a Grass Area",
+      "icon": "GrassBiome"
+    },
+    "0x6504": {
+      "description": "Also counts as a Forest Area",
+      "icon": "ForestBiome"
+    },
+    "0x6505": {
+      "description": "Also counts as a Swamp Area",
+      "icon": "SwampBiome"
+    },
+    "0x6506": {
+      "description": "Also counts as a Desert Area",
+      "icon": "DesertBiome"
+    },
+    "0x65f4": {
+      "description": "{0} Atlas Point",
+      "icon": ""
+    },
+    "0x6638": {
+      "description": "Elemental Shrines do not appear in area",
+      "icon": "BossNotableSpawnAdditionalShrine"
+    },
+    "0x6714": {
+      "description": "Use the Grand Mirror to access",
+      "icon": "AtlasIconContentGigaMirror"
+    },
+    "0x6760": {
+      "description": "Map Boss drops a Djinn Barya",
+      "icon": "SorceressSandDjinnCorpseBeetles"
+    },
+    "0x6762": {
+      "description": "Currency found is replaced with rarer varieties",
+      "icon": "CurrencyNode"
+    },
+    "0x685a": {
+      "description": "{0}% Delirious",
+      "icon": "AtlasIconContentDelirium"
+    },
+    "0x686e": {
+      "description": "Delirium",
+      "icon": "AtlasIconContentDelirium"
+    },
+    "0x686f": {
+      "description": "Abysses",
+      "icon": "AtlasIconContentAbyss"
+    },
+    "0x6870": {
+      "description": "Ritual Altars",
+      "icon": "AtlasIconContentRitual"
+    },
+    "0x6871": {
+      "description": "Area contains a Mirror of Delirium",
+      "icon": "AtlasIconContentDelirium"
+    },
+    "0x6872": {
+      "description": "Area contains Abysses",
+      "icon": "AtlasIconContentAbyss"
+    },
+    "0x6873": {
+      "description": "Ritual Altars",
+      "icon": "AtlasIconContentRitual"
+    },
+    "0x6874": {
+      "description": "Vaal Beacons",
+      "icon": "AtlasIconContentIncursion"
+    },
+    "0x6875": {
+      "description": "Area contains Breaches",
+      "icon": "AtlasIconContentBreach"
+    }
+  },
+  "legacyTokens": {
+    "0x04d8": "{0}% increased Rarity of items found in area",
+    "0x0963": "Contains {0} additional Shrines",
+    "0x0a8c": "Contains {0} additional Azmeri Spirits",
+    "0x1247": "Contains {0} additional Essence",
+    "0x127b": "Map Boss drops a Unique item",
+    "0x1282": "Area has {0} additional random Waystone Modifiers",
+    "0x320f": "All Monsters are at least Magic",
+    "0x3897": "Map Boss is Possessed",
+    "0x3a5d": "Hive Fortress",
+    "0x3a5e": "Breach Hive Fortress",
+    "0x3e16": "Shrine Duration increased by {0}%",
+    "0x4c58": "Powerful Map Boss",
+    "0x4c59": "Powerful Map Boss",
+    "0x4e88": "Doubles Effect of Tablets used on Area",
+    "0x5e28": "Contains {0} additional Summoning Circles",
+    "0x60c1": "Breach Stronghold",
+    "0x60c4": "Breach Stronghold",
+    "0x6157": "Contains a reflection of the Map Boss",
+    "0x615a": "Grand Mirror",
+    "0x61c7": "Summoning Circles always summon an additional Boss",
+    "0x6244": "Shrines release an Azmeri Spirit when activated",
+    "0x634a": "Contains {0} additional Map Bosses throughout the area",
+    "0x634d": "Essences transfer to a random Unique Monster on death",
+    "0x6502": "Also counts as a Mountain Area",
+    "0x6503": "Also counts as a Grass Area",
+    "0x6504": "Also counts as a Forest Area",
+    "0x6505": "Also counts as a Swamp Area",
+    "0x6506": "Also counts as a Desert Area",
+    "0x65f4": "{0} Atlas Point",
+    "0x6638": "Elemental Shrines do not appear in area",
+    "0x6714": "Use the Grand Mirror to access",
+    "0x6760": "Map Boss drops a Djinn Barya",
+    "0x6762": "Currency found is replaced with rarer varieties",
+    "0x686e": "Delirium",
+    "0x686f": "Abysses",
+    "0x6870": "Ritual Altars",
+    "0x6871": "Area contains a Mirror of Delirium",
+    "0x6872": "Area contains Abysses",
+    "0x6873": "Ritual Altars",
+    "0x6874": "Vaal Beacons",
+    "0x6875": "Area contains Breaches"
+  }
+}

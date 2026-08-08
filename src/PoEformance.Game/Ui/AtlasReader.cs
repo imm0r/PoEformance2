@@ -28,6 +28,15 @@ public enum AtlasNodeState
 /// <param name="Connections">The grid positions this node has a line to.</param>
 /// <param name="Biome">Which biome it belongs to, as the game numbers them.</param>
 /// <param name="Screen">Where it is drawn, for putting anything on top of it.</param>
+/// <param name="BadgeIds">
+/// The contents hanging off the node as objects, RAW - the low half identifies the content and
+/// the high half is how much of it there is. See <see cref="World.AtlasContentNames"/>.
+/// </param>
+/// <param name="ContentTokens">
+/// The contents that arrive as bare numbers instead. Only a node the game has actually drawn
+/// has them, so an atlas scrolled far away reports none - which is not the same as a map with
+/// nothing in it.
+/// </param>
 public sealed record AtlasNode(
     int Index,
     ulong Address,
@@ -37,7 +46,9 @@ public sealed record AtlasNode(
     byte Biome,
     IReadOnlyList<(int X, int Y)> Connections,
     Vector2 Screen,
-    Vector2 Size);
+    Vector2 Size,
+    IReadOnlyList<uint> BadgeIds,
+    IReadOnlyList<uint> ContentTokens);
 
 /// <summary>
 /// Reads the endgame atlas out of the game's interface.
@@ -67,6 +78,9 @@ public sealed class AtlasReader
     /// <summary>Most connections taken from one node, for the same reason.</summary>
     public const int MostConnections = 32;
 
+    /// <summary>And most contents, which is the same guard on a different length.</summary>
+    public const int MostContents = 64;
+
     private readonly IMemoryReader _reader;
     private readonly UiElementReader _elements;
 
@@ -78,6 +92,10 @@ public sealed class AtlasReader
 
     private readonly int _grid;
     private readonly int _connections;
+    private readonly int _contentVector;
+    private readonly int _badgeBegin;
+    private readonly int _badgeEnd;
+    private readonly int _badgeContentId;
     private readonly int _dataStorage;
     private readonly int _data;
     private readonly int _completedBit;
@@ -113,6 +131,10 @@ public sealed class AtlasReader
 
         _grid = node.OffsetOf("GridPosition");
         _connections = node.OffsetOf("ConnectionsVector");
+        _contentVector = node.OffsetOf("ContentVector");
+        _badgeBegin = node.OffsetOf("BadgeVectorBegin");
+        _badgeEnd = node.OffsetOf("BadgeVectorEnd");
+        _badgeContentId = (int)node.Constants["BadgeContentId"];
         _dataStorage = (int)node.Constants["DataStoragePtr"];
         _data = (int)node.Constants["DataPtr"];
         _completedBit = (int)node.Constants["CompletedBit"];
@@ -211,7 +233,9 @@ public sealed class AtlasReader
             biome,
             Connections(element),
             drawn?.Position ?? Vector2.Zero,
-            drawn?.Size ?? Vector2.Zero);
+            drawn?.Size ?? Vector2.Zero,
+            Badges(element),
+            Tokens(element));
     }
 
     /// <summary>Whether a panel child is a map rather than a marker or a region button.</summary>
@@ -294,6 +318,74 @@ public sealed class AtlasReader
     }
 
     /// <summary>
+    /// The contents that hang off the node as objects, by their raw id.
+    /// </summary>
+    /// <remarks>
+    /// A vector of POINTERS, each to a badge whose id sits at a fixed offset - so this is two
+    /// levels rather than one, and a badge that does not resolve is skipped rather than
+    /// recorded as content nought.
+    /// </remarks>
+    private List<uint> Badges(ulong element)
+    {
+        var ids = new List<uint>();
+
+        ulong first = _reader.ReadPointer(element + (ulong)_badgeBegin);
+        ulong last = _reader.ReadPointer(element + (ulong)_badgeEnd);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
+        {
+            return ids;
+        }
+
+        long count = (long)(last - first) / 8;
+        if (count <= 0 || count > MostContents)
+        {
+            return ids;
+        }
+
+        for (long i = 0; i < count; i++)
+        {
+            ulong badge = _reader.ReadPointer(first + (ulong)(i * 8));
+            if (MemoryReaderExtensions.IsPlausiblePointer(badge)
+                && _reader.TryRead(badge + (ulong)_badgeContentId, out uint id)
+                && id != 0)
+            {
+                ids.Add(id);
+            }
+        }
+
+        return ids;
+    }
+
+    /// <summary>The contents that are just numbers in a vector.</summary>
+    private List<uint> Tokens(ulong element)
+    {
+        var tokens = new List<uint>();
+
+        ulong first = _reader.ReadPointer(element + (ulong)_contentVector);
+        ulong last = _reader.ReadPointer(element + (ulong)_contentVector + 8);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
+        {
+            return tokens;
+        }
+
+        long count = (long)(last - first) / 4;
+        if (count <= 0 || count > MostContents)
+        {
+            return tokens;
+        }
+
+        for (long i = 0; i < count; i++)
+        {
+            if (_reader.TryRead(first + (ulong)(i * 4), out uint token) && token != 0)
+            {
+                tokens.Add(token);
+            }
+        }
+
+        return tokens;
+    }
+
+    /// <summary>
     /// What each step of the walk found, for the run where it comes back empty.
     /// </summary>
     /// <remarks>
@@ -344,7 +436,8 @@ public sealed class AtlasReader
             said.Add(
                 $"    [{node.Index}] {(node.MapId.Length > 0 ? node.MapId : "(no id)")} "
                 + $"at {node.Grid.X},{node.Grid.Y}  {node.State}  biome {node.Biome}  "
-                + $"{node.Connections.Count} connections");
+                + $"{node.Connections.Count} connections  "
+                + $"{node.BadgeIds.Count} badges  {node.ContentTokens.Count} tokens");
         }
 
         return said;
