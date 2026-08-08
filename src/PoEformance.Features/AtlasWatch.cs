@@ -244,7 +244,16 @@ public sealed class AtlasWatch
 
         if (_studied.Count == 0)
         {
-            return AtlasView.Closed;
+            // NOT "atlas closed", which is what this used to say. The panel is open and has
+            // things in it; none of them read as a map. That is what a wrong fingerprint looks
+            // like, and it is the one state where saying the ordinary thing sends somebody
+            // looking in the wrong place entirely.
+            return AtlasView.Closed with
+            {
+                Total = placed.Count,
+                Status = $"the panel is open with {placed.Count} things in it, and none of them read as a map"
+                         + " - press \"check the read\"",
+            };
         }
 
         // The studied nodes, moved to where they are now. A node the panel has since dropped
