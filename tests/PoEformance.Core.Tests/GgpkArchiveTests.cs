@@ -134,6 +134,65 @@ public class GgpkArchiveTests
     }
 
     [Fact]
+    public void APARTOfAFileComesBackWithoutTheRestOfIt()
+    {
+        // What a bundle is read through: it runs to a couple of hundred megabytes and a wanted
+        // chunk of it is a few hundred kilobytes.
+        var content = new byte[500];
+        for (int i = 0; i < content.Length; i++)
+        {
+            content[i] = (byte)(i % 251);
+        }
+
+        string path = Build("data.bundle.bin", content);
+
+        try
+        {
+            GgpkArchive? archive = GgpkArchive.Open(path);
+            Assert.NotNull(archive);
+
+            foreach ((int at, int length) in new[] { (0, 60), (60, 4), (100, 200), (499, 1), (0, 500) })
+            {
+                Assert.Equal(content[at..(at + length)], archive!.Read("data.bundle.bin", at, length));
+            }
+
+            // Asked for repeatedly, as reading a file out of a bundle chunk by chunk does. The
+            // walk to it is remembered between these, so this is also what says the remembering
+            // hands back the same place rather than a stale one.
+            for (int i = 0; i < 20; i++)
+            {
+                Assert.Equal(content[64..96], archive!.Read("data.bundle.bin", 64, 32));
+                Assert.Equal(content, archive.Read("data.bundle.bin"));
+            }
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ANDARangeThatIsNotInsideTheFileIsRefused()
+    {
+        string path = Build("_.index.bin", [1, 2, 3, 4, 5, 6, 7, 8]);
+
+        try
+        {
+            GgpkArchive? archive = GgpkArchive.Open(path);
+
+            Assert.Null(archive!.Read("_.index.bin", 0, 9));
+            Assert.Null(archive.Read("_.index.bin", 8, 1));
+            Assert.Null(archive.Read("_.index.bin", -1, 2));
+            Assert.Null(archive.Read("_.index.bin", 2, -2));
+            Assert.Null(archive.Read("nothing.bin", 0, 1));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void ANDAFileThatIsNotThereIsNotThereRatherThanAnException()
     {
         string path = Build("_.index.bin", [1]);

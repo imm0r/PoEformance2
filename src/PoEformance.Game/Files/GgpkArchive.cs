@@ -126,9 +126,28 @@ public sealed class GgpkArchive : IGameArchive
     /// <summary>And how many children one folder may have.</summary>
     public const int MostEntries = 100_000;
 
+    /// <summary>How many looked-up files are remembered.</summary>
+    /// <remarks>
+    /// One entry is a path and two numbers. What it saves is the WALK - see <see cref="_found"/>.
+    /// </remarks>
+    public const int Remembered = 512;
+
     private readonly string _path;
     private readonly long _root;
     private readonly uint _version;
+
+    /// <summary>
+    /// Where a path's bytes were last found, so the walk to it happens once.
+    /// </summary>
+    /// <remarks>
+    /// NOT a nicety. A bundle is read in chunks, so one icon is several reads of the same file,
+    /// and a folder here is walked by comparing the NAME of each child in turn - which for the
+    /// few hundred bundles under Bundles2 is a few hundred seeks EVERY time. A stash of two
+    /// thousand items turns that into millions of them; with this it is one walk per file.
+    /// </remarks>
+    private readonly Dictionary<string, (long From, long Size)> _found = new(StringComparer.OrdinalIgnoreCase);
+
+    private readonly Lock _gate = new();
 
     private GgpkArchive(string path, long root, uint version)
     {
@@ -186,20 +205,7 @@ public sealed class GgpkArchive : IGameArchive
             using FileStream stream = File.OpenRead(_path);
             using var reader = new BinaryReader(stream);
 
-            // Everything this wants is under Bundles2, so the walk starts by stepping into it -
-            // named here rather than by the caller, because a path relative to Bundles2 is what
-            // the loose archive takes too, and the two have to agree.
-            long record = _root;
-            foreach (string step in Steps(path))
-            {
-                record = Into(reader, record, step);
-                if (record < 0)
-                {
-                    return null;
-                }
-            }
-
-            if (Where(reader, record) is not var (from, size))
+            if (Locate(reader, path) is not var (from, size))
             {
                 return null;
             }
@@ -218,6 +224,49 @@ public sealed class GgpkArchive : IGameArchive
         {
             return null;
         }
+    }
+
+    /// <summary>Walks to a path's bytes, or remembers where they were the last time.</summary>
+    private (long From, long Size)? Locate(BinaryReader reader, string path)
+    {
+        lock (_gate)
+        {
+            if (_found.TryGetValue(path, out (long From, long Size) already))
+            {
+                return already;
+            }
+        }
+
+        // Everything this wants is under Bundles2, so the walk starts by stepping into it -
+        // named here rather than by the caller, because a path relative to Bundles2 is what the
+        // loose archive takes too, and the two have to agree.
+        long record = _root;
+        foreach (string step in Steps(path))
+        {
+            record = Into(reader, record, step);
+            if (record < 0)
+            {
+                return null;
+            }
+        }
+
+        if (Where(reader, record) is not var (from, size))
+        {
+            return null;
+        }
+
+        lock (_gate)
+        {
+            // Only what fits. A GGPK is read-only while this is open, so an entry cannot go
+            // stale - but a session that reads its way through the whole archive should not end
+            // up holding a note about every file in it.
+            if (_found.Count < Remembered)
+            {
+                _found[path] = (from, size);
+            }
+        }
+
+        return (from, size);
     }
 
     /// <summary>The path split into steps, under Bundles2.</summary>
