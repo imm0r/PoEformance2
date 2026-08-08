@@ -265,6 +265,103 @@ public sealed class PriceBook
         return (dot > 0 ? name[..dot] : name).ToLowerInvariant();
     }
 
+    /// <summary>What was kept from a previous session, and when.</summary>
+    public readonly record struct Kept(PriceBook Book, DateTimeOffset When);
+
+    /// <summary>
+    /// Writes the book down, so the next session opens with prices rather than without.
+    /// </summary>
+    /// <remarks>
+    /// The PRICES rather than the answers they came out of. The answers are megabytes and this
+    /// is what was actually learned from them - and a book that has been through the gates
+    /// cannot quietly un-gate itself when the thresholds change, because what was dropped is
+    /// simply not in here.
+    /// </remarks>
+    public string Saved(string league)
+    {
+        var writing = new System.Text.Json.Nodes.JsonObject
+        {
+            ["league"] = league,
+            ["when"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            ["rate"] = Rate,
+        };
+
+        var art = new System.Text.Json.Nodes.JsonObject();
+        foreach ((string key, double worth) in _byArt)
+        {
+            art[key] = worth;
+        }
+
+        var named = new System.Text.Json.Nodes.JsonObject();
+        foreach ((string key, double worth) in _byName)
+        {
+            named[key] = worth;
+        }
+
+        writing["art"] = art;
+        writing["name"] = named;
+        return writing.ToJsonString();
+    }
+
+    /// <summary>
+    /// Reads one back, when it is for the league being played.
+    /// </summary>
+    /// <returns>Null when it is for somewhere else, or is not one.</returns>
+    /// <remarks>
+    /// The league is checked HERE rather than by the caller, because prices from another league
+    /// are not old - they are a different economy, and shown next to the right ones they look
+    /// exactly as trustworthy.
+    /// </remarks>
+    public static Kept? Reopen(string? json, string league)
+    {
+        if (string.IsNullOrWhiteSpace(json) || string.IsNullOrWhiteSpace(league))
+        {
+            return null;
+        }
+
+        try
+        {
+            using JsonDocument saved = JsonDocument.Parse(json);
+            JsonElement root = saved.RootElement;
+
+            if (root.ValueKind != JsonValueKind.Object
+                || !string.Equals(Text(root, "league"), league, StringComparison.OrdinalIgnoreCase)
+                || Number(root, "rate") is not { } rate
+                || rate <= 0)
+            {
+                return null;
+            }
+
+            var book = new PriceBook();
+            book.Rate = rate;   // reachable here: same type, and this is where a saved book is rebuilt
+            Pour(root, "art", book._byArt);
+            Pour(root, "name", book._byName);
+
+            long when = Number(root, "when") is { } stamp ? (long)stamp : 0;
+            return book.Ready ? new Kept(book, DateTimeOffset.FromUnixTimeSeconds(when)) : null;
+        }
+        catch (Exception exception) when (exception is JsonException or ArgumentOutOfRangeException)
+        {
+            return null;
+        }
+    }
+
+    private static void Pour(JsonElement root, string named, Dictionary<string, double> into)
+    {
+        if (!root.TryGetProperty(named, out JsonElement found) || found.ValueKind != JsonValueKind.Object)
+        {
+            return;
+        }
+
+        foreach (JsonProperty one in found.EnumerateObject())
+        {
+            if (one.Value.ValueKind == JsonValueKind.Number && one.Value.TryGetDouble(out double worth) && worth > 0)
+            {
+                into[one.Name] = worth;
+            }
+        }
+    }
+
     /// <summary>A name in the one spelling both sides can agree on.</summary>
     private static string Tidy(string name)
     {
