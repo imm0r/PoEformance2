@@ -26,6 +26,3 @@ Thumbs.db
 recordings/
 *.rec
 !tests/fixtures/*.rec
-
-# The photoshare tests pull in playwright; the app itself has no dependencies.
-photoshare/node_modules/
