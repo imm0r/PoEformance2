@@ -36,5 +36,12 @@
     <None Include="..\..\schema\poe2.offsets.json" Link="schema\poe2.offsets.json" CopyToOutputDirectory="PreserveNewest" />
     <!-- The config page ships the same way, for the same reason: edit, reload, no rebuild. -->
     <None Include="..\..\ui\**" Link="ui\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!--
+      The game-knowledge files: landmark names, atlas contents, atlas map names. They were
+      NOT here, and the release zip is the publish output, so every download so far has run
+      without them - silently, because each one degrades to "nothing known" by design and the
+      lookup walks up to the repository from a dev build, where it always found them.
+    -->
+    <None Include="..\..\data\*.json" Link="data\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

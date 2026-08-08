@@ -70,6 +70,30 @@ public class OverlaySettingsTests
             new OverlaySettings(ItemRarity.Magic, TerrainColour: text).Normalised().TerrainColour);
     }
 
+    [Fact]
+    public void FadingTakesTheAlphaAndLeavesTheColourAlone()
+    {
+        // Red at full alpha, half faded. If the shift is wrong this comes back a different
+        // COLOUR rather than a fainter one - which looks deliberate and is not.
+        uint red = OverlaySettings.ParseColour("#FF0000");
+
+        // 0x7F rather than 0x80: the alpha is truncated, not rounded, which is what the
+        // three drawing classes this was collapsed out of already did.
+        Assert.Equal(0x7F00_00FFu, OverlaySettings.Fade(red, 0.5f));
+        Assert.Equal(red, OverlaySettings.Fade(red, 1f));
+        Assert.Equal(red, OverlaySettings.Fade(red, 2f));       // never brighter than it was
+        Assert.Equal(0x0000_00FFu, OverlaySettings.Fade(red, 0f));
+    }
+
+    [Fact]
+    public void ANDItMultipliesSoAChosenTransparencySurvives()
+    {
+        // Somebody set this backing to be half transparent on purpose. A fade that SET the
+        // alpha would make it opaque halfway through a banner's fade-out.
+        uint half = OverlaySettings.ParseColour("#80FFFFFF");
+        Assert.Equal(0x40FF_FFFFu, OverlaySettings.Fade(half, 0.5f));
+    }
+
     [Theory]
     [InlineData(0, 1)]
     [InlineData(1, 1)]

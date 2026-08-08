@@ -80,6 +80,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _preloadEntry.Style = value;
             _unwalked.Style = value;
             _healthBars.Style = value;
+            _atlas.Style = value;
         }
     }
 
@@ -161,6 +162,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly AlertBanner _banner = new();
     private readonly UnwalkedLayer _unwalked = new();
     private readonly HealthBarLayer _healthBars = new();
+    private readonly AtlasLayer _atlas = new();
+    private AtlasWatch? _atlasWatch;
 
     /// <summary>
     /// Adds the alert watcher, which says when something worth knowing about turned up.
@@ -478,6 +481,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         ArgumentNullException.ThrowIfNull(inspector);
         _uiBrowser = new UiBrowserWindow(inspector) { Visible = visible, Style = _style };
+    }
+
+    /// <summary>
+    /// Adds the atlas overlay, served by a watch on the reader thread.
+    /// </summary>
+    /// <remarks>
+    /// Attached rather than constructed here for the same reason as the browser: this class
+    /// draws, and the atlas is read by something else. What it hands over is a finished view.
+    /// </remarks>
+    public void AttachAtlas(AtlasWatch watch)
+    {
+        ArgumentNullException.ThrowIfNull(watch);
+        _atlasWatch = watch;
+        _atlas.Style = _style;
     }
 
     /// <summary>
@@ -824,6 +841,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 DrawEntities(width, height);
             }
+        }
+
+        // OUTSIDE the marker gate above, which only lets things through in a hostile area.
+        // The atlas is opened from a hideout at least as often as from a map, and it draws
+        // over the game's own panel rather than over the world - so the reasons that gate
+        // exists (dots between the player and the fight) do not apply to it. It draws
+        // nothing at all while the panel is closed, which is what the view reports.
+        if (_atlasWatch is not null)
+        {
+            _atlas.Draw(ImGui.GetBackgroundDrawList(), _atlasWatch.View);
         }
 
         // Outside the "in an area" gate: an element can be inspected on a login screen or in

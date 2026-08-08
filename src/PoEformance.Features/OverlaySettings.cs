@@ -114,6 +114,29 @@ public sealed record OverlaySettings(
         return (a << 24) | (b << 16) | (g << 8) | r;
     }
 
+    /// <summary>
+    /// The same colour with less of it: scales the alpha and leaves the colour alone.
+    /// </summary>
+    /// <remarks>
+    /// HERE rather than in each drawing class, which is where it started - three private
+    /// copies of the same bit-shifting, each having to get the byte order right on its own.
+    /// It is also the half of a fade a test can reach: the overlay is Windows-only and the
+    /// tests are not, so a copy living beside the drawing is a copy nothing checks.
+    ///
+    /// MULTIPLIES rather than sets, so a colour somebody deliberately made half transparent
+    /// stays relatively that way while a banner fades the whole thing out.
+    /// </remarks>
+    public static uint Fade(uint colour, float by)
+    {
+        if (by >= 1f)
+        {
+            return colour;
+        }
+
+        uint alpha = (uint)Math.Clamp(((colour >> 24) & 0xFF) * by, 0f, 255f);
+        return (colour & 0x00FF_FFFF) | (alpha << 24);
+    }
+
     /// <summary>Writes an ImGui colour back out as <c>#AARRGGBB</c>.</summary>
     /// <remarks>
     /// The other direction, for whatever a colour picker produced. Always eight digits: a

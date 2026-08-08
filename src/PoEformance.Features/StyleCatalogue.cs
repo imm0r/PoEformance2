@@ -117,6 +117,18 @@ public static class StyleCatalogue
         new("preload.valuable", "What the area loaded", "Valuable", Marker, Rgb(255, 217, 102)),
         new("preload.dangerous", "What the area loaded", "Dangerous", Marker, Rgb(255, 115, 102)),
 
+        // ── The atlas ───────────────────────────────────────────────────────
+        // A map's own colour comes from the GROUP it is in, and that is set beside the group
+        // rather than here: there is one per group and they are somebody's list, not this
+        // file's. What is here is what a map with NO group uses, plus the parts no group can
+        // colour - the plate, the connections, and the dot on the near end of a route.
+        new("atlas.label", "The atlas", "Map name", StyleTraits.Colour, Rgb(220, 225, 235, 255)),
+        new("atlas.plate", "The atlas", "Label backing", StyleTraits.Colour, Rgb(0, 0, 0, 204)),
+        new("atlas.content", "The atlas", "What is in a map", StyleTraits.Colour, Rgb(184, 194, 214, 255)),
+        new("atlas.web", "The atlas", "Connections", Line, Rgb(255, 255, 255, 56)),
+        new("atlas.route", "The atlas", "Route", Line, Rgb(255, 255, 255, 140)),
+        new("atlas.entry", "The atlas", "Where a route starts", Marker, Rgb(51, 255, 51, 255)),
+
         // ── Measuring aids ──────────────────────────────────────────────────
         // Switched on with the calibration and browser tools rather than during play, but
         // they are drawn over the game like everything above, so leaving them out would make
@@ -156,6 +168,12 @@ public static class StyleCatalogue
         public const string BannerBack = "alert.banner.back";
         public const string PreloadBannerBack = "preload.banner.back";
         public const string PreloadListBack = "preload.list.back";
+        public const string AtlasLabel = "atlas.label";
+        public const string AtlasPlate = "atlas.plate";
+        public const string AtlasContent = "atlas.content";
+        public const string AtlasWeb = "atlas.web";
+        public const string AtlasRoute = "atlas.route";
+        public const string AtlasEntry = "atlas.entry";
         public const string AidCentre = "aid.centre";
         public const string AidGround = "aid.ground";
         public const string AidHealthbar = "aid.healthbar";
@@ -168,6 +186,7 @@ public static class StyleCatalogue
         [
             DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Banner, BannerBack,
             PreloadBannerBack, PreloadListBack,
+            AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];

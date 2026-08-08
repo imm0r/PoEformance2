@@ -155,7 +155,7 @@ public sealed class PreloadEntryBanner
         float alpha)
     {
         LayerStyle style = Style[key];
-        uint colour = Fade(Style.Colour(key), alpha);
+        uint colour = OverlaySettings.Fade(Style.Colour(key), alpha);
         float centre = width / 2f;
 
         IconCache.Picture picture = PlateFor(weight, style.Icon);
@@ -179,7 +179,7 @@ public sealed class PreloadEntryBanner
                 new Vector2(centre + (wide / 2f), top + tall),
                 Vector2.Zero,
                 Vector2.One,
-                Fade(0xFFFFFFFF, alpha));
+                OverlaySettings.Fade(0xFFFFFFFF, alpha));
 
             // In the open cloth to the right of the emblem, written at a size the cloth
             // decides - a line sized for a window is lost on a painted banner.
@@ -216,7 +216,7 @@ public sealed class PreloadEntryBanner
         draw.AddRectFilled(
             at - new Vector2(TextPadX, TextPadY),
             at + plain + new Vector2(TextPadX, TextPadY),
-            Fade(Style.Colour(StyleCatalogue.Keys.PreloadBannerBack), alpha),
+            OverlaySettings.Fade(Style.Colour(StyleCatalogue.Keys.PreloadBannerBack), alpha),
             4f);
 
         draw.AddText(at, colour, names);
@@ -304,7 +304,7 @@ public sealed class PreloadEntryBanner
         ImDrawListPtr draw, Vector2 at, string text, float font, uint colour, float alpha)
     {
         ImFontPtr face = ImGui.GetFont();
-        uint edge = Fade(0xFF000000, alpha * 0.85f);
+        uint edge = OverlaySettings.Fade(0xFF000000, alpha * 0.85f);
         float step = Math.Max(1f, font / 14f);
 
         draw.AddText(face, font, at + new Vector2(step, 0f), edge, text);
@@ -333,12 +333,5 @@ public sealed class PreloadEntryBanner
         return own.Ready
             ? own
             : icons.BuiltIn($"preload-{weight.ToString().ToLowerInvariant()}.png", IconCache.MaxWideEdge);
-    }
-
-    /// <summary>Scales a packed colour's alpha, leaving its colour alone.</summary>
-    private static uint Fade(uint colour, float by)
-    {
-        uint alpha = (uint)Math.Clamp(((colour >> 24) & 0xFF) * by, 0f, 255f);
-        return (colour & 0x00FFFFFF) | (alpha << 24);
     }
 }

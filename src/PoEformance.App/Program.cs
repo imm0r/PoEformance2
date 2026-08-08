@@ -382,6 +382,20 @@ internal static class Program
         // the entity map.
         var structures = new PoEformance.Features.StructureInspector(reader, schema, gameStatesStatic);
 
+        // The endgame atlas, which is INTERFACE rather than world: it reads nothing at all
+        // while the panel is closed, which is almost all of a session. Its two data files are
+        // what turn a node's raw id and content numbers into a name and a list of what is in
+        // it - both optional, and missing either only costs the words.
+        var atlas = new PoEformance.Features.AtlasWatch(
+            reader,
+            schema,
+            gameStatesStatic,
+            PoEformance.Game.World.AtlasContentNames.Load(FindDataFile("atlas-content.json")),
+            PoEformance.Game.World.AtlasMapNames.Load(FindDataFile("atlas-maps.json")))
+        {
+            Settings = PoEformance.Features.AtlasStore.Load(),
+        };
+
         // And the entity browser, which is the shortest route to something not yet
         // understood: the game names every component an entity carries, and most of them
         // still have nothing reading them.
@@ -505,6 +519,7 @@ internal static class Program
                 uiTree.Service(scale);
                 structures.Service();
                 entityParts.Service();
+                atlas.Service(scale, Environment.TickCount64);
                 route.Service(snapshot, Environment.TickCount64);
                 costs.Add(snapshot.Cost, snapshot.AreaHash, Environment.TickCount64);
                 coverage.Look(snapshot);
@@ -557,6 +572,7 @@ internal static class Program
         overlay.ShowCalibration = debug;
         overlay.ShowWorldDots = debug;
         overlay.AttachUiBrowser(uiTree, uiBrowser);
+        overlay.AttachAtlas(atlas);
         overlay.Noise = world.Noise;
         overlay.Costs = costs;
         overlay.Coverage = coverage;

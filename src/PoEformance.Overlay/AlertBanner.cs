@@ -84,10 +84,10 @@ public sealed class AlertBanner
         draw.AddRectFilled(
             at - new Vector2(14f, 8f),
             at + size + new Vector2(14f, 8f),
-            Fade(Style.Colour(StyleCatalogue.Keys.BannerBack), alpha),
+            OverlaySettings.Fade(Style.Colour(StyleCatalogue.Keys.BannerBack), alpha),
             5f);
 
-        draw.AddText(at, Fade(Style.Colour(StyleCatalogue.Keys.Banner), alpha), line);
+        draw.AddText(at, OverlaySettings.Fade(Style.Colour(StyleCatalogue.Keys.Banner), alpha), line);
 
         // How far away, under the line and quieter. It answers the question the line
         // provokes - "where" - without competing with what the thing actually is.
@@ -96,15 +96,8 @@ public sealed class AlertBanner
             Vector2 awaySize = ImGui.CalcTextSize(away);
             draw.AddText(
                 new Vector2((width - awaySize.X) / 2f, at.Y + size.Y + 3f),
-                Fade(Style.Colour(StyleCatalogue.Keys.Banner), alpha * 0.65f),
+                OverlaySettings.Fade(Style.Colour(StyleCatalogue.Keys.Banner), alpha * 0.65f),
                 away);
         }
-    }
-
-    /// <summary>Scales a packed colour's alpha, leaving its colour alone.</summary>
-    private static uint Fade(uint colour, float by)
-    {
-        uint alpha = (uint)Math.Clamp(((colour >> 24) & 0xFF) * by, 0f, 255f);
-        return (colour & 0x00FFFFFF) | (alpha << 24);
     }
 }
