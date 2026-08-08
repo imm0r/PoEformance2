@@ -298,6 +298,32 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
 - **The composition is a pure function.** Everything that can be got wrong is a decision rather
   than an address, and none of it is reachable through a live read.
 
+#### The ritual line — the one place this tool contains a game's RNG
+
+The atlas's ritual line ("Head of the King") is drawn across several maps and each map it takes
+rolls a reward. The rolls are **client-side and deterministic**, so every route the line could
+take can be priced before a single map is picked — which is the feature: not "what did I get"
+but "which way is worth going".
+
+- **`RitualRandom`** is TinyMT32 as the PoE2 binary implements it, which is *not* as reference
+  TinyMT does — the state transition shifts the opposite way and the seeding starts from
+  constants with the pre-step applied. The textbook version is a perfectly good generator that
+  agrees with the game on nothing.
+- **`RitualMods`** rolls by weighted **reservoir** sampling: a draw per row against a running
+  total, not one draw against a cumulative table. The pool's ORDER is therefore part of the
+  answer, and the data file keeps the game's own row numbers.
+- **Checked against the authority, not against a second reading of it.** The reference's
+  `TinyMt32` and `PredictModPass` were lifted verbatim into a throwaway console program and run
+  over 400 seeds and 576 reservoir picks; the output is committed as
+  `tests/fixtures/ritual-roll-vectors.json`. That cannot prove the reference matches PoE2 — only
+  a live roll can — but it proves the port matches the reference, which is the half that was
+  mine to get wrong. Four mutations of the generator fail it.
+- **Two rules that look like bugs and are not**, both pinned by tests: a blocked map still
+  occupies its RANK among the candidates (dropping it shifts every later candidate and predicts
+  the wrong reward for all of them), and a route that cannot reach full length is not offered at
+  all (the game refuses a click that would strand the line, so a shorter branch is not a worse
+  route — it is one nobody can walk).
+
 **None of the atlas offsets are confirmed.** They were ported from the reference with the game
 unavailable, so `schema/poe2.offsets.json` marks the three `Atlas*` blocks UNVERIFIED and the
 window's **check the read** button reports what each step of the walk found — the panel's child
@@ -309,7 +335,10 @@ children mostly sharing one flags word is what a grid of map nodes is and what a
 else in the interface is. It prints the matching child paths, marks the one whose fingerprint it
 recognises, and the answer is pasted into the schema — which hot-reloads, so a drift that would
 otherwise be a debugging session is an edit. This is the `drift scanner` idea from the build
-order above, applied to the one feature whose offsets are entirely unverified.
+order above, applied to the one feature whose offsets are entirely unverified. The ritual
+offsets are worse still — they hang off that same panel, so a wrong panel path makes every one
+of them read rubbish. Check that the atlas draws at all before believing anything the ritual
+window says.
 
 ### Remaining
 
