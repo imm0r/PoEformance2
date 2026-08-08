@@ -64,6 +64,15 @@ One discipline follows: reads must behave identically live and replayed. String 
 shrink adaptively on failure instead of demanding exact block sizes, so a replay that
 captured 54 bytes serves a 512-byte request gracefully.
 
+**And one limit, which is easy to forget when a recording is being treated as evidence: a
+replay only serves reads that actually happened.** A feature that was switched off while
+recording leaves no trace, and walking its pointers against that file fails for want of data
+rather than because the offsets are wrong — an inconclusive result that looks exactly like a
+negative one. (Checked, on the session recorded 2026-08-07: the UI root's own `Self` pointer
+is in there, because resolving the chain reads it, but `root+Children` never was — so nothing
+in that file can say anything about the atlas.) To record something that can answer questions
+about a feature offline, **that feature has to be running while the recording is made**.
+
 ### 3. Layers the compiler enforces
 
 Six projects; references point strictly downward. Getting this wrong is a build
