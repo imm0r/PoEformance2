@@ -385,10 +385,15 @@ internal static class Program
         // Every stash tab and everything in it. ON DEMAND rather than per tick: a full read is
         // thousands of entities taken down to their stats, which is orders of magnitude past
         // anything else here and answers a question nobody asks sixty times a second.
-        // Each item's own picture. The art is not in what this tool reads - it lives in the
-        // game's packed archive - so it comes from poe2db, keyed by the path the item carries.
-        // OFF until somebody turns it on: nothing else here talks to the network while playing.
-        using var itemArt = new PoEformance.Features.ItemArtStore();
+        // Each item's own picture. The item carries the PATH of its art, and that file is in
+        // the game's own packed bundles - so the install is read for it, which needs nobody's
+        // permission and works offline. poe2db is the fallback for whatever that cannot give
+        // up, and THAT stays off until somebody turns it on: nothing else here talks to the
+        // network while playing.
+        using var itemArt = new PoEformance.Features.ItemArtStore
+        {
+            Install = PoEformance.Overlay.InstalledArt.Source(describe: Console.WriteLine),
+        };
 
         var stash = new PoEformance.Features.StashInspector(
             reader,
@@ -1088,7 +1093,9 @@ internal static class Program
 
     private static Process? FindGameProcess()
     {
-        foreach (string name in (string[])["PathOfExileSteam", "PathOfExile", "PathOfExile_x64", "PathOfExile_x64Steam"])
+        // The same list that finding the game's FILES uses - it is one question, and two copies
+        // of the answer drift the moment a launcher adds a name.
+        foreach (string name in PoEformance.Game.Files.GameInstall.Names)
         {
             Process[] found = Process.GetProcessesByName(name);
             if (found.Length > 0)
