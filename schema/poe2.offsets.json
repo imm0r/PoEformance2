@@ -688,6 +688,7 @@
       "fields": {
         "Identified": { "offset": "0x90", "type": "u8" },
         "Rarity": { "offset": "0x94", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 10 } },
+        "StatsFromMods": { "offset": "0x148", "type": "stdVector", "comment": "The item's RESOLVED stats as (stat id, value) pairs - what the game shows on the item, already summed across its mods. The per-mod vectors say which mods are on it; this says what they add up to." },
         "AllMods": { "offset": "0xA0", "type": "stdVector" }
       }
     },
@@ -723,6 +724,38 @@
       "fields": {
         "MaxStackTab": { "offset": "0x20", "type": "i32", "comment": "Currency stash tab cap (Wisdom = 5000)." },
         "MaxStack": { "offset": "0x28", "type": "i32", "comment": "Normal cap: backpack AND normal stash tabs (Wisdom = 40)." }
+      }
+    },
+
+    "ObjectMagicProperties": {
+      "comment": "The other half of the pair the game uses for an item's mods: flasks, gems and some magic items carry this instead of a Mods component, with the same three fields at different offsets. Which of the two an item has is not knowable from its path, so a reader tries both and keeps whichever decodes better. From the AHK tool (imm0r/PoEformance), which is battle-tested against PoE2 specifically.",
+      "fields": {
+        "Rarity": { "offset": "0x144", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 5 } },
+        "AllMods": { "offset": "0x150", "type": "stdVector", "comment": "Five vectors in a row - implicit, explicit, enchant, and two league ones - each 0x18 bytes." },
+        "StatsFromMods": { "offset": "0x1F8", "type": "stdVector" }
+      }
+    },
+
+    "ModArray": {
+      "comment": "One entry of a mod vector. The ROLLS live here and the stat ids do not: the mod's dat row says which stats it grants, and this holds only the numbers rolled for them - so a '+Life and +Mana' mod has two values and nothing here says which is which.",
+      "fields": {
+        "Values": { "offset": "0x00", "type": "stdVector", "comment": "The rolled values, 4 bytes each." },
+        "Value0": { "offset": "0x18", "type": "i32", "comment": "A single roll, for the entries whose Values vector is empty." },
+        "ModsPtr": { "offset": "0x28", "type": "ptr", "comment": "-> the Mods.dat row, whose first field is a pointer to the mod's id string." }
+      },
+      "consts": {
+        "EntrySize": "0x40"
+      }
+    },
+
+    "StatPair": {
+      "comment": "A resolved stat: which one, and how much of it. The key is a ROW INDEX into Stats.dat rather than a name, so turning it into words needs the shipped stat table.",
+      "fields": {
+        "Key": { "offset": "0x00", "type": "i32" },
+        "Value": { "offset": "0x04", "type": "i32" }
+      },
+      "consts": {
+        "EntrySize": "0x08"
       }
     },
 

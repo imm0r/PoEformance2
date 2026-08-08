@@ -43,5 +43,10 @@
       lookup walks up to the repository from a dev build, where it always found them.
     -->
     <None Include="..\..\data\*.json" Link="data\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!--
+      item-stats.json is the big one - 27,000 stat rows, because what memory holds is a ROW
+      INDEX into the game's stat table and a reader cannot know in advance which rows an item
+      will use. It is what turns "1043: 79" into "+79 to maximum Life".
+    -->
   </ItemGroup>
 </Project>
