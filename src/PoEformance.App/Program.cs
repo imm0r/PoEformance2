@@ -382,6 +382,16 @@ internal static class Program
         // the entity map.
         var structures = new PoEformance.Features.StructureInspector(reader, schema, gameStatesStatic);
 
+        // Every stash tab and everything in it. ON DEMAND rather than per tick: a full read is
+        // thousands of entities taken down to their stats, which is orders of magnitude past
+        // anything else here and answers a question nobody asks sixty times a second.
+        var stash = new PoEformance.Features.StashInspector(
+            reader,
+            schema,
+            gameStatesStatic,
+            PoEformance.Game.Items.ItemNames.Load(
+                FindDataFile("item-stats.json"), FindDataFile("item-names.json")));
+
         // The endgame atlas, which is INTERFACE rather than world: it reads nothing at all
         // while the panel is closed, which is almost all of a session. Its two data files are
         // what turn a node's raw id and content numbers into a name and a list of what is in
@@ -531,6 +541,7 @@ internal static class Program
                 structures.Service();
                 entityParts.Service();
                 atlas.Service(scale, Environment.TickCount64);
+                stash.Service();
                 route.Service(snapshot, Environment.TickCount64);
                 costs.Add(snapshot.Cost, snapshot.AreaHash, Environment.TickCount64);
                 coverage.Look(snapshot);
@@ -584,6 +595,7 @@ internal static class Program
         overlay.ShowWorldDots = debug;
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.AttachAtlas(atlas, changed => PoEformance.Features.AtlasStore.Save(changed));
+        overlay.AttachStash(stash);
         overlay.AttachRitual(
             ritual,
             () => atlas.RitualWorth,

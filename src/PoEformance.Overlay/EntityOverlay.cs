@@ -165,6 +165,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly AtlasLayer _atlas = new();
     private AtlasWatch? _atlasWatch;
     private AtlasWindow? _atlasWindow;
+    private StashWindow? _stashWindow;
     private readonly RitualLayer _ritual = new();
     private RitualWatch? _ritualWatch;
     private RitualWindow? _ritualWindow;
@@ -501,6 +502,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _atlasWatch = watch;
         _atlasWindow = new AtlasWindow(watch, saved) { Visible = visible };
         _atlas.Style = _style;
+    }
+
+    /// <summary>
+    /// Adds the stash listing.
+    /// </summary>
+    /// <remarks>
+    /// A window and nothing else: it draws nothing over the game, because what it answers -
+    /// what have I got, and where - is not a question anybody asks mid-fight.
+    /// </remarks>
+    public void AttachStash(StashInspector inspector, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(inspector);
+        _stashWindow = new StashWindow(inspector) { Visible = visible };
     }
 
     /// <summary>
@@ -911,6 +925,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _preloadWindow?.Render();
         _atlasWindow?.Render();
         _ritualWindow?.Render();
+        _stashWindow?.Render();
 
         // A window rather than something painted, so it can be closed and moved - which means
         // it belongs here with the windows and not in the drawing pass. Only where the
@@ -1332,6 +1347,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                             ref showing))
                     {
                         _atlasWindow.Visible = showing;
+                    }
+                }
+
+                if (_stashWindow is not null)
+                {
+                    bool listing = _stashWindow.Visible;
+                    if (ImGui.Checkbox("Stash  (every tab, with each item's stats)", ref listing))
+                    {
+                        _stashWindow.Visible = listing;
                     }
                 }
 
