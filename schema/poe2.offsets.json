@@ -694,10 +694,11 @@
     },
 
     "ObjectMagicProperties": {
-      "comment": "Monster-side rarity component. Ground drops: currency/fragments carry NO rarity component at all - classify those by path (contains /Currency/), not by a rarity read of -1.",
+      "comment": "Rarity and mods, for the things that carry this INSTEAD of a Mods component - monsters, and on the item side flasks, gems and some magic items. Which of the two an item has cannot be told from its path, so a reader tries both and keeps whichever decodes better. The rarity range stays 0-10 because monsters use more of it than items do. Ground drops: currency and fragments carry no rarity component at all - classify those by path (contains /Currency/), not by a rarity read of -1. The two offsets below were reached separately by the AHK tool (imm0r/PoEformance) and by this project, which is as close to confirmation as an offset gets without the game.",
       "fields": {
         "Rarity": { "offset": "0x144", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 10 } },
-        "AllMods": { "offset": "0x150", "type": "stdVector" }
+        "AllMods": { "offset": "0x150", "type": "stdVector", "comment": "Five vectors in a row - implicit, explicit, enchant, and two league ones - each 0x18 bytes." },
+        "StatsFromMods": { "offset": "0x1F8", "type": "stdVector", "comment": "The resolved (stat id, value) pairs, as the Mods component has at 0x148." }
       }
     },
 
@@ -727,14 +728,6 @@
       }
     },
 
-    "ObjectMagicProperties": {
-      "comment": "The other half of the pair the game uses for an item's mods: flasks, gems and some magic items carry this instead of a Mods component, with the same three fields at different offsets. Which of the two an item has is not knowable from its path, so a reader tries both and keeps whichever decodes better. From the AHK tool (imm0r/PoEformance), which is battle-tested against PoE2 specifically.",
-      "fields": {
-        "Rarity": { "offset": "0x144", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 5 } },
-        "AllMods": { "offset": "0x150", "type": "stdVector", "comment": "Five vectors in a row - implicit, explicit, enchant, and two league ones - each 0x18 bytes." },
-        "StatsFromMods": { "offset": "0x1F8", "type": "stdVector" }
-      }
-    },
 
     "ModArray": {
       "comment": "One entry of a mod vector. The ROLLS live here and the stat ids do not: the mod's dat row says which stats it grants, and this holds only the numbers rolled for them - so a '+Life and +Mana' mod has two values and nothing here says which is which.",
