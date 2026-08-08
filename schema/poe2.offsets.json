@@ -497,6 +497,7 @@
       "consts": {
         "DataStoragePtr": "0x10",
         "DataPtr": "0x20",
+        "RitualModsChild": "0x3B8",
         "BadgeContentId": "0x188",
         "CompletedBit": "0x02",
         "AccessibleBit": "0x01"

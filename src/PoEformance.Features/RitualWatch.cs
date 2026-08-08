@@ -69,6 +69,16 @@ public sealed class RitualWatch
     public IReadOnlyList<string> Rewards => RitualRewards.Everything(_mods);
 
     /// <summary>
+    /// Checks the predictions against what the game rolls. Off by default.
+    /// </summary>
+    /// <remarks>
+    /// The only thing that can say whether any of this is right for this client, which is why
+    /// it exists at all - and why it is a switch rather than always on: it reads the mod text
+    /// off every map on the line, through yet another unverified offset.
+    /// </remarks>
+    public RitualProof Proof { get; } = new();
+
+    /// <summary>
     /// Reads the line and plans it, or publishes nothing when none is being drawn.
     /// </summary>
     /// <param name="panel">The atlas panel, or 0 when it is shut.</param>
@@ -126,6 +136,13 @@ public sealed class RitualWatch
                 _mods.Available(line.Stats),
                 length,
                 worth);
+        }
+
+        // Only for maps ALREADY taken: those are the ones the game has rolled, and they are
+        // what a prediction can be checked against.
+        if (Proof.Enabled && line.Committed.Count > 0)
+        {
+            Proof.Look(state, _mods.Available(line.Stats), Rolled(line.Committed, nodes));
         }
 
         Volatile.Write(ref _view, new RitualView(
@@ -219,6 +236,28 @@ public sealed class RitualWatch
         }
 
         return starts;
+    }
+
+    /// <summary>What the game has rolled onto each map of the line, in order.</summary>
+    /// <remarks>
+    /// A map the atlas is not currently drawing has no element to read, and reads as nothing -
+    /// which the check treats as "cannot say" rather than as a disagreement.
+    /// </remarks>
+    private List<string> Rolled(IReadOnlyList<(int X, int Y)> line, IReadOnlyList<AtlasNode> nodes)
+    {
+        var byGrid = new Dictionary<(int X, int Y), ulong>(nodes.Count);
+        foreach (AtlasNode node in nodes)
+        {
+            byGrid[node.Grid] = node.Address;
+        }
+
+        var rolled = new List<string>(line.Count);
+        foreach ((int X, int Y) at in line)
+        {
+            rolled.Add(byGrid.TryGetValue(at, out ulong node) ? _reader.RolledOn(node) : string.Empty);
+        }
+
+        return rolled;
     }
 
     /// <summary>Where each map is on screen, so a route can be drawn over the atlas.</summary>

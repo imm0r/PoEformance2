@@ -136,6 +136,27 @@ public sealed class RitualWindow
             Picked.Clear();
         }
 
+        // NONE OF THIS IS CONFIRMED against the game, so the thing that can confirm it is on
+        // the front of the window rather than buried: draw one line with this on, and every map
+        // reports what was predicted, what was rolled, and whether they agree.
+        bool checking = _watch.Proof.Enabled;
+        if (ImGui.Checkbox("check the predictions against what the game rolls", ref checking))
+        {
+            _watch.Proof.Enabled = checking;
+        }
+
+        if (_watch.Proof.Recorded > 0)
+        {
+            (int held, int differed) = _watch.Proof.Tally;
+            ImGui.TextColored(
+                differed == 0 ? GoodText : WarnText,
+                $"    {held} agreed, {differed} did not - written to {RitualProof.DefaultPath}");
+        }
+        else if (checking)
+        {
+            ImGui.TextColored(DimText, "    nothing to check yet - it needs a map already picked");
+        }
+
         ImGui.Separator();
         Routes(view);
         ImGui.Separator();

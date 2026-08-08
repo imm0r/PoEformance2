@@ -103,6 +103,7 @@ public sealed class RitualLineReader
     private readonly int _statsStride;
     private readonly int _statsValue;
 
+    private readonly int _modsChild;
     private readonly int[] _counterPath;
     private readonly uint _counterFingerprint;
     private readonly uint _visibleMask;
@@ -141,6 +142,8 @@ public sealed class RitualLineReader
         _statsEnd = (int)ritual.Constants["StatsEnd"];
         _statsStride = (int)ritual.Constants["StatsStride"];
         _statsValue = (int)ritual.Constants["StatsValueOffset"];
+
+        _modsChild = (int)schema.Structs["AtlasNode"].Constants["RitualModsChild"];
 
         _counterPath =
         [
@@ -347,6 +350,29 @@ public sealed class RitualLineReader
         }
 
         return stats;
+    }
+
+    /// <summary>
+    /// What the game has actually rolled onto a map, or empty when it has rolled nothing.
+    /// </summary>
+    /// <remarks>
+    /// THE GROUND TRUTH, and the only thing that can say whether the whole prediction model is
+    /// right for this client. The node element points at a text element that already holds the
+    /// game's own wording - translated, and both mods of a two-reward map together in one block.
+    ///
+    /// Read for the maps on a drawn line only, which is a handful, so the cost does not matter.
+    /// </remarks>
+    public string RolledOn(ulong node)
+    {
+        if (node == 0)
+        {
+            return string.Empty;
+        }
+
+        ulong text = _reader.ReadPointer(node + (ulong)_modsChild);
+        return MemoryReaderExtensions.IsPlausiblePointer(text)
+            ? _reader.ReadStdWString(text + (ulong)_text)
+            : string.Empty;
     }
 
     /// <summary>
