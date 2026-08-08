@@ -104,6 +104,13 @@ public sealed class AtlasWatch
     private long _studiedAt;
     private int _studiedCount = -1;
 
+    // The one-shot check, as a sequence number rather than a queued command - the same trick
+    // the interface browser uses. A flag would be re-served every tick; a queue would need
+    // draining, ordering and a lifetime for one button.
+    private int _checkWanted;
+    private int _checkServed;
+    private IReadOnlyList<string> _checked = [];
+
     public AtlasWatch(
         IMemoryReader reader,
         OffsetSchema schema,
@@ -127,6 +134,21 @@ public sealed class AtlasWatch
 
     /// <summary>The newest answer. Never blocks, never null, never partially built.</summary>
     public AtlasView View => Volatile.Read(ref _view);
+
+    /// <summary>What the last check made of each step of the walk. Empty until one is asked for.</summary>
+    public IReadOnlyList<string> Checked => Volatile.Read(ref _checked);
+
+    /// <summary>
+    /// Asks for one account of the read, served on the next tick.
+    /// </summary>
+    /// <remarks>
+    /// EVERY ATLAS OFFSET IS UNCONFIRMED - ported from the reference with the game
+    /// unavailable - so "nothing came back" has at least four causes: the panel's child path,
+    /// the flag fingerprints, the two-hop chain to a node's data, and the fields at the end of
+    /// it. This is what turns that into a reading instead of a hunt, and it is the first thing
+    /// to press when the atlas is open and the overlay is blank.
+    /// </remarks>
+    public void CheckTheRead() => Interlocked.Increment(ref _checkWanted);
 
     /// <summary>What to draw and how to sort it. Replaced whole, from whichever thread saved it.</summary>
     public AtlasSettings Settings
@@ -153,6 +175,7 @@ public sealed class AtlasWatch
         {
             Forget();
             Volatile.Write(ref _view, AtlasView.Closed with { Status = "atlas overlay off" });
+            Asked(scale);
             return;
         }
 
@@ -166,6 +189,22 @@ public sealed class AtlasWatch
             // panel that can be closed between two reads, so this is an ordinary event.
             Forget();
             Volatile.Write(ref _view, AtlasView.Closed with { Status = $"read failed: {exception.Message}" });
+        }
+
+        // OUTSIDE the try, and reached even with the overlay switched off. Both are the point:
+        // the moment somebody wants an account of the walk is the moment the walk is failing,
+        // and a check that only runs when the read already worked reports on nothing.
+        Asked(scale);
+    }
+
+    /// <summary>Serves the one-shot check, if one has been asked for since the last.</summary>
+    private void Asked(UiScale scale)
+    {
+        int wanted = Volatile.Read(ref _checkWanted);
+        if (wanted != _checkServed)
+        {
+            _checkServed = wanted;
+            Volatile.Write(ref _checked, Check(scale));
         }
     }
 
@@ -291,6 +330,30 @@ public sealed class AtlasWatch
             routes.Open,
             routes.Reachable,
             string.Empty);
+    }
+
+    /// <summary>One account of the walk, from wherever the chain currently reaches.</summary>
+    /// <remarks>
+    /// Resolves the chain again rather than reusing the one <see cref="Build"/> just had,
+    /// because the interesting case is the one where that failed - and a check that only runs
+    /// when the read already worked reports on the wrong thing entirely.
+    /// </remarks>
+    private IReadOnlyList<string> Check(UiScale scale)
+    {
+        try
+        {
+            GameChainAddresses chain = GameChain.Resolve(_reader, _schema, _gameStatesStatic);
+            if (chain.UiRoot == 0)
+            {
+                return [chain.InGame ? "the UI root did not resolve" : "not in an area - the atlas is read from the interface"];
+            }
+
+            return _atlas.Describe(chain.UiRoot, scale);
+        }
+        catch (Exception exception)
+        {
+            return [$"the check itself failed: {exception.Message}"];
+        }
     }
 
     /// <summary>

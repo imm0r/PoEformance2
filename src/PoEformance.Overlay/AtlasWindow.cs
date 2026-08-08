@@ -78,6 +78,23 @@ public sealed class AtlasWindow
         AtlasView view = _watch.View;
 
         Account(view);
+
+        // EVERY ATLAS OFFSET IS UNCONFIRMED - they were ported from the reference with the
+        // game unavailable - so this button is not a diagnostic tucked away for later, it is
+        // the first thing to press when the atlas is open and nothing is drawn on it.
+        if (ImGui.Button("check the read"))
+        {
+            _watch.CheckTheRead();
+        }
+
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, "open the atlas first - it reads nothing while the panel is shut");
+
+        foreach (string line in _watch.Checked)
+        {
+            ImGui.TextColored(DimText, line);
+        }
+
         ImGui.Separator();
 
         AtlasSettings changed = settings;
