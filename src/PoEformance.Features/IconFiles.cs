@@ -62,13 +62,76 @@ public sealed class IconFiles
         ArgumentNullException.ThrowIfNull(reason);
 
         _givenUp.Add(path);
+        Noted(path, reason);
+    }
 
-        string problem = $"{Path.GetFileName(path)}: {reason}";
+    /// <summary>
+    /// Records that a path could not be read THIS TIME, without giving up on it.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE ANSWER THAT CHANGES BY ITSELF, which is why it is not a verdict. Everything else
+    /// this class remembers is settled - a file that is not there, or is not a picture, will
+    /// say the same tomorrow - and remembering it is what stops the render thread asking sixty
+    /// times a second.
+    ///
+    /// A file that is open in something else is different in kind: it is being written, right
+    /// now, most often by this very tool fetching the icon that is about to be drawn. Treated
+    /// as a verdict, the picture that lost that race by a millisecond is gone until the tool is
+    /// restarted - and it is the pictures being fetched while the stash is first drawn that
+    /// lose it, which on a first run is all of them.
+    ///
+    /// So it is reported and not remembered. The next look is a frame away.
+    /// </remarks>
+    public void Busy(string path, string reason)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(reason);
+
+        Noted(path, reason);
+    }
+
+    /// <summary>Says a path worked, which retires whatever was last said about it.</summary>
+    /// <remarks>
+    /// Otherwise a busy moment leaves a complaint on screen about a picture that is now being
+    /// drawn perfectly well, and the list only ever grows.
+    /// </remarks>
+    public void Worked(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+        _problems.RemoveAll(problem => problem.StartsWith(Named(path), StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// Whether a read failed because somebody has the file open, rather than because it cannot
+    /// be read at all.
+    /// </summary>
+    /// <remarks>
+    /// THE DECISION THIS CLASS EXISTS FOR, in its smallest form: a verdict, or a moment.
+    ///
+    /// Windows reports both as an IOException and words this one as "used by another process",
+    /// which misleads on its own account - here it is usually the SAME process, writing the
+    /// icon that is about to be drawn. The codes are what tell them apart: 0x20 is a sharing
+    /// violation and 0x21 a lock one. Everything else keeps the settled answer, which is to
+    /// give up on the path rather than ask the disk sixty times a second.
+    /// </remarks>
+    public static bool Momentary(IOException failure)
+    {
+        ArgumentNullException.ThrowIfNull(failure);
+
+        // The low word of the HRESULT is the Win32 code; the rest says it came from Win32.
+        return (failure.HResult & 0xFFFF) is 0x20 or 0x21;
+    }
+
+    private void Noted(string path, string reason)
+    {
+        string problem = Named(path) + reason;
         if (!_problems.Contains(problem, StringComparer.Ordinal))
         {
             _problems.Add(problem);
         }
     }
+
+    private static string Named(string path) => $"{Path.GetFileName(path)}: ";
 
     /// <summary>Whether a path has been given up on.</summary>
     public bool GaveUpOn(string path) => _givenUp.Contains(path);

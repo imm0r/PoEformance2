@@ -97,6 +97,43 @@ public class IconFileTests
     }
 
     [Fact]
+    public void AFileSomebodyElseHasOpenIsAMomentRatherThanAVerdict()
+    {
+        // The one answer that changes by itself, and the reason it must not be remembered:
+        // for the item art the "somebody else" is this very tool, writing the icon that is
+        // about to be drawn. Remembered as a failure, a picture that lost that race by a
+        // millisecond is gone until the next run - and on a first look at a stash, every
+        // picture is being fetched while it is first drawn.
+        var files = Under("/tools");
+        files.Busy("icon.png", "used by another process");
+
+        Assert.False(files.GaveUpOn("icon.png"));
+        Assert.NotEqual(string.Empty, files.NextToTry("icon.png"));
+
+        // Still said out loud, because a file that is stuck open forever shows no picture and
+        // no reason either.
+        Assert.Contains(files.Problems, problem => problem.Contains("icon.png", StringComparison.Ordinal));
+
+        // And retired the moment it works, or the complaint outlives the problem.
+        files.Worked("icon.png");
+        Assert.Empty(files.Problems);
+    }
+
+    [Theory]
+    [InlineData(unchecked((int)0x80070020), true)]    // sharing violation - being written now
+    [InlineData(unchecked((int)0x80070021), true)]    // lock violation
+    [InlineData(unchecked((int)0x80070002), false)]   // file not found - settled
+    [InlineData(unchecked((int)0x80070005), false)]   // access denied - settled
+    [InlineData(0, false)]
+    public void ANDWhichKindItIsComesFromTheCodeRatherThanTheWording(int hresult, bool momentary)
+    {
+        // Windows words a sharing violation as "used by another process", which is both the
+        // most common case here and the most misleading - it is usually the same process.
+        // The wording is not the test; the code is.
+        Assert.Equal(momentary, IconFiles.Momentary(new IOException("whatever it says") { HResult = hresult }));
+    }
+
+    [Fact]
     public void AskingAgainIsPossibleAfterFixingIt()
     {
         // Which is what lets a failure be remembered for good: there IS a way to retry, it is
