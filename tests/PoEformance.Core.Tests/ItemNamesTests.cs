@@ -25,16 +25,41 @@ public class ItemNamesTests
     }
 
     private static ItemNames Loaded()
-        => ItemNames.Load(DataFile("item-stats.json"), DataFile("item-names.json"));
+        => ItemNames.Load(
+            DataFile("item-stats.json"), DataFile("item-names.json"), DataFile("unique_ivi_name_map.tsv"));
 
     [Fact]
     public void THEShippedTablesCoverWhatAnItemCanCarry()
     {
-        (int stats, int mods, int bases) = Loaded().Counts;
+        (int stats, int mods, int bases, int uniques) = Loaded().Counts;
 
         Assert.Equal(27_000, stats);
         Assert.True(mods > 6_000, $"only {mods} mods");
         Assert.True(bases > 5_000, $"only {bases} base types");
+        Assert.True(uniques > 400, $"only {uniques} uniques");
+    }
+
+    [Fact]
+    public void AUNIQUEIsNamedFromTheIdRatherThanFromItsPath()
+    {
+        ItemNames names = Loaded();
+
+        // The id is what memory holds, and it stays English on a localised client where the
+        // painted name does not - which is the whole reason this table is keyed by it.
+        Assert.Equal("Astramentis", names.Unique("FourUniqueAmulet15"));
+        Assert.Equal("Tabula Rasa", names.Unique("FourUniqueBodyStrDexInt1"));
+        Assert.Equal("Morior Invictus", names.Unique("FourUniquePinnacle1"));
+        Assert.Equal(string.Empty, names.Unique("SomethingAddedThisLeague"));
+        Assert.Equal(string.Empty, names.Unique(null));
+    }
+
+    [Fact]
+    public void ANDTheCommentedHeaderOfTheUniqueTableIsNotAUnique()
+    {
+        // The file opens with "#" lines describing where it came from, and the last of them is
+        // "# columns: ivi_id<tab>unique_name" - which splits into a perfectly well-formed row.
+        // Read as data it is a unique called "unique_name".
+        Assert.Equal(string.Empty, Loaded().Unique("# columns: ivi_id"));
     }
 
     [Fact]
@@ -160,9 +185,10 @@ public class ItemNamesTests
     {
         // Without them the items still list - with raw paths, mod ids and stat numbers, which
         // is worse to read and just as true.
-        ItemNames none = ItemNames.Load(null, null);
+        ItemNames none = ItemNames.Load(null, null, null);
 
-        Assert.Equal((0, 0, 0), none.Counts);
+        Assert.Equal((0, 0, 0, 0), none.Counts);
         Assert.Equal("Boots", none.Base("Metadata/Items/Armours/Boots"));
+        Assert.Equal(string.Empty, none.Unique("FourUniqueAmulet15"));
     }
 }

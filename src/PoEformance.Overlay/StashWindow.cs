@@ -500,6 +500,14 @@ public sealed class StashWindow
         {
             ImGui.TextColored(DimText, item.Path);
 
+            if (item.Unique.Length > 0)
+            {
+                // Once the unique's own name is the title, its BASE is not visible anywhere -
+                // and half of what a unique is is what it is built on. The id beside it because
+                // that is what anything else has to match on, the same rule as the mods.
+                ImGui.TextColored(DimText, item.Base.Length > 0 ? $"{item.Base}  ({item.Ivi})" : item.Ivi);
+            }
+
             if (item.RarityName.Length > 0)
             {
                 ImGui.TextColored(DimText, item.StackMax > 0
@@ -547,7 +555,10 @@ public sealed class StashWindow
             return true;
         }
 
+        // The BASE as well as what it is called: a unique shows its own name, so looking for
+        // "Stellar Amulet" would otherwise miss every unique built on one.
         if (item.Called.Contains(looking, StringComparison.OrdinalIgnoreCase)
+            || item.Base.Contains(looking, StringComparison.OrdinalIgnoreCase)
             || item.Path.Contains(looking, StringComparison.OrdinalIgnoreCase))
         {
             return true;

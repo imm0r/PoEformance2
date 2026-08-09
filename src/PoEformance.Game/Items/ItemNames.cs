@@ -67,25 +67,30 @@ public sealed class ItemNames
     private readonly IReadOnlyDictionary<int, StatMeaning> _stats;
     private readonly IReadOnlyDictionary<string, ModMeaning> _mods;
     private readonly IReadOnlyDictionary<string, string> _bases;
+    private readonly IReadOnlyDictionary<string, string> _uniques;
 
     private ItemNames(
         IReadOnlyDictionary<int, StatMeaning> stats,
         IReadOnlyDictionary<string, ModMeaning> mods,
-        IReadOnlyDictionary<string, string> bases)
+        IReadOnlyDictionary<string, string> bases,
+        IReadOnlyDictionary<string, string> uniques)
     {
         _stats = stats;
         _mods = mods;
         _bases = bases;
+        _uniques = uniques;
     }
 
     /// <summary>Nothing known, which is what a missing file leaves.</summary>
     public static ItemNames Empty { get; } = new(
         new Dictionary<int, StatMeaning>(),
         new Dictionary<string, ModMeaning>(StringComparer.OrdinalIgnoreCase),
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
+        new Dictionary<string, string>(StringComparer.Ordinal));
 
-    /// <summary>How many stats, mods and base types are described.</summary>
-    public (int Stats, int Mods, int Bases) Counts => (_stats.Count, _mods.Count, _bases.Count);
+    /// <summary>How many stats, mods, base types and uniques are described.</summary>
+    public (int Stats, int Mods, int Bases, int Uniques) Counts
+        => (_stats.Count, _mods.Count, _bases.Count, _uniques.Count);
 
     /// <summary>What a stat row means. Unknown rows keep their number.</summary>
     public StatMeaning Stat(int key)
@@ -119,17 +124,36 @@ public sealed class ItemNames
     }
 
     /// <summary>
-    /// Loads both files, or returns <see cref="Empty"/> when they are missing or unreadable.
+    /// What a unique is called, from the ItemVisualIdentity id the item carries.
+    /// </summary>
+    /// <remarks>
+    /// THE ID RATHER THAN THE DISPLAYED NAME, and that is the whole point of going this way.
+    /// The id - <c>FourUniquePinnacle1</c> - is an engine identifier and stays English on a
+    /// localised client, where the name the game paints does not; and price sites only know the
+    /// English one. So a German client prices its uniques correctly.
+    ///
+    /// It also tells apart uniques that SHARE a base type, which the metadata path cannot:
+    /// Morior Invictus and Tabula Rasa are both <c>FourBodyStrDexInt1</c> to a path lookup.
+    ///
+    /// Empty for an id the table has not heard of, which is a unique added since it was
+    /// extracted - the item keeps its base name rather than acquiring a wrong one.
+    /// </remarks>
+    public string Unique(string? iviId)
+        => iviId is { Length: > 0 } && _uniques.TryGetValue(iviId, out string? known) ? known : string.Empty;
+
+    /// <summary>
+    /// Loads the tables, or returns <see cref="Empty"/> when they are missing or unreadable.
     /// </summary>
     /// <remarks>
     /// Never throws. Without them the items still list - with raw paths, mod ids and stat
     /// numbers - which is worse to read and just as true.
     /// </remarks>
-    public static ItemNames Load(string? statsPath, string? namesPath)
+    public static ItemNames Load(string? statsPath, string? namesPath, string? uniquesPath = null)
     {
         var stats = new Dictionary<int, StatMeaning>();
         var mods = new Dictionary<string, ModMeaning>(StringComparer.OrdinalIgnoreCase);
         var bases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var uniques = new Dictionary<string, string>(StringComparer.Ordinal);
 
         try
         {
@@ -160,13 +184,33 @@ public sealed class ItemNames
                     bases[path] = name;
                 }
             }
+
+            if (uniquesPath is { Length: > 0 } && File.Exists(uniquesPath))
+            {
+                // Tab-separated rather than JSON because that is how the AHK tool's extractor
+                // writes it, and a second format for two columns would only be a second thing
+                // to regenerate every league.
+                foreach (string line in File.ReadLines(uniquesPath))
+                {
+                    if (line.Length == 0 || line[0] == '#')
+                    {
+                        continue;
+                    }
+
+                    int tab = line.IndexOf('\t', StringComparison.Ordinal);
+                    if (tab > 0 && tab + 1 < line.Length)
+                    {
+                        uniques[line[..tab]] = line[(tab + 1)..].TrimEnd();
+                    }
+                }
+            }
         }
         catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
         {
             return Empty;
         }
 
-        return new ItemNames(stats, mods, bases);
+        return new ItemNames(stats, mods, bases, uniques);
     }
 }
 

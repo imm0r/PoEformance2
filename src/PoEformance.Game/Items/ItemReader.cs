@@ -36,6 +36,15 @@ public sealed record ItemStat(int Key, string Id, int Value, string Said);
 /// <param name="Entity">Where it is, for anything that wants to read more.</param>
 /// <param name="Path">Its metadata path - always readable, and the thing to match on.</param>
 /// <param name="Base">What its base type is called.</param>
+/// <param name="Unique">
+/// What a unique is called - "Astramentis". Empty for everything else, and for a unique the
+/// shipped table has not heard of.
+/// </param>
+/// <param name="Ivi">
+/// The ItemVisualIdentity id a unique carries - <c>FourUniquePinnacle1</c>. Empty for everything
+/// else. Kept beside the name because it is the ROBUST key: it stays English on a localised
+/// client, and it is all there is for a unique nobody has written down yet.
+/// </param>
 /// <param name="Rarity">0 normal, 1 magic, 2 rare, 3 unique, and up. -1 when it has no mods block.</param>
 /// <param name="Identified">Whether it has been identified. Null when the question does not apply.</param>
 /// <param name="Stack">How many are in the stack. 0 for anything that does not stack.</param>
@@ -53,6 +62,8 @@ public sealed record InspectedItem(
     ulong Entity,
     string Path,
     string Base,
+    string Unique,
+    string Ivi,
     int Rarity,
     bool? Identified,
     int Stack,
@@ -63,10 +74,14 @@ public sealed record InspectedItem(
 {
     /// <summary>Nothing readable - what a stale pointer leaves.</summary>
     public static InspectedItem Unreadable { get; } =
-        new(0, string.Empty, string.Empty, -1, null, 0, 0, string.Empty, [], []);
+        new(0, string.Empty, string.Empty, string.Empty, string.Empty, -1, null, 0, 0, string.Empty, [], []);
 
     /// <summary>What to call it in a list.</summary>
-    public string Called => Base.Length > 0 ? Base : Path;
+    /// <remarks>
+    /// The unique's own name wins over its base type, because "Astramentis" is what somebody is
+    /// looking for and "Stellar Amulet" is what fifty other things are also called.
+    /// </remarks>
+    public string Called => Unique.Length > 0 ? Unique : Base.Length > 0 ? Base : Path;
 
     /// <summary>What the rarity number means.</summary>
     public string RarityName => Rarity switch
@@ -138,6 +153,9 @@ public sealed class ItemReader
     private readonly int _stackData;
     private readonly int _stackMax;
 
+    private readonly int _uniqueIviRow;
+    private readonly int _iviId;
+
     public ItemReader(IMemoryReader reader, OffsetSchema schema, ItemNames? names = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -174,6 +192,9 @@ public sealed class ItemReader
         _stackCount = schema.Structs["Stack"].OffsetOf("Count");
         _stackData = schema.Structs["Stack"].OffsetOf("StackSizeDataPtr");
         _stackMax = schema.Structs["StackSizeData"].OffsetOf("MaxStack");
+
+        _uniqueIviRow = schema.Structs["ItemBaseComponent"].OffsetOf("UniqueIviRow");
+        _iviId = schema.Structs["ItemVisualIdentityRow"].OffsetOf("IdPtr");
     }
 
     /// <summary>Reads one item, or <see cref="InspectedItem.Unreadable"/> when it is not there.</summary>
@@ -192,10 +213,14 @@ public sealed class ItemReader
 
         (int stack, int stackMax) = Stacked(components);
 
+        string ivi = Ivi(components);
+
         return new InspectedItem(
             entity,
             identity.Path,
             _names.Base(identity.Path),
+            _names.Unique(ivi),
+            ivi,
             rarity,
             identified,
             stack,
@@ -391,6 +416,46 @@ public sealed class ItemReader
 
         string path = _reader.ReadStdWString(render + (ulong)_art, 260);
         return path.Length is > 0 and <= 260 ? path : string.Empty;
+    }
+
+    /// <summary>
+    /// The ItemVisualIdentity id a unique carries, or empty for anything else.
+    /// </summary>
+    /// <remarks>
+    /// Base + 0x30 is the IVI dat row, and its first field points at the id as a wide string.
+    /// The row is null for everything that is not unique, so an empty answer here is the normal
+    /// case rather than a failure.
+    ///
+    /// WHY NOT THE METADATA PATH: uniques share base types. Morior Invictus and Tabula Rasa are
+    /// the same path, and a path lookup has to pick one of them - which is wrong half the time,
+    /// silently, on the two items in the game most worth telling apart.
+    ///
+    /// Chain and offsets from the AHK tool, live-verified there 2026-06-24.
+    /// </remarks>
+    private string Ivi(IReadOnlyDictionary<string, ulong> components)
+    {
+        if (!components.TryGetValue("Base", out ulong itemBase)
+            || !MemoryReaderExtensions.IsPlausiblePointer(itemBase))
+        {
+            return string.Empty;
+        }
+
+        ulong row = _reader.ReadPointer(itemBase + (ulong)_uniqueIviRow);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(row))
+        {
+            return string.Empty;
+        }
+
+        ulong text = _reader.ReadPointer(row + (ulong)_iviId);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(text))
+        {
+            return string.Empty;
+        }
+
+        // Read SHORT. An id is one word; a long read past a drifted offset comes back as
+        // something that looks like an id nobody has heard of rather than as nothing.
+        string id = _reader.ReadUnicodeString(text, 128);
+        return id.Length is > 0 and <= 128 ? id : string.Empty;
     }
 
     /// <summary>How many are in the stack, and how many fit.</summary>

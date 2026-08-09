@@ -400,7 +400,9 @@ internal static class Program
             schema,
             gameStatesStatic,
             PoEformance.Game.Items.ItemNames.Load(
-                FindDataFile("item-stats.json"), FindDataFile("item-names.json")));
+                FindDataFile("item-stats.json"),
+                FindDataFile("item-names.json"),
+                FindDataFile("unique_ivi_name_map.tsv")));
 
         // The endgame atlas, which is INTERFACE rather than world: it reads nothing at all
         // while the panel is closed, which is almost all of a session. Its two data files are
