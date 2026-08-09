@@ -436,6 +436,97 @@ running process knows where its own executable is. The usual folders are only a 
 reading with the game shut, and a folder counts because the files are in it, never because of
 its name.
 
+### Prices — what the stash is worth
+
+The stash listing says what is in every tab; this says what it is worth. Everything is in
+**Exalted Orbs**, because the API quotes in Divine and one number has to be the unit.
+
+- **Two keys, and choosing between them is the whole join.** Anything fungible is found by its
+  **art**: every exchange line carries the file name of its icon and an item in memory carries
+  the path of the same icon, so currency matches without either side knowing what it is called
+  — which works on a client running in any language, with no name table to ship. Uniques have
+  no such handle (every Astramentis draws its base's picture) and go by **name**.
+- **A unique's name comes from its ItemVisualIdentity id**, not from what the game painted and
+  not from its metadata path. The id is an engine identifier: it stays English on a localised
+  client, and it is per-unique where the path is not — Morior Invictus and Tabula Rasa share
+  one. `data/unique_ivi_name_map.tsv` turns it into the English name price sites know.
+- **Only uniques are asked for by name.** The listed half also holds tablets, which would be
+  found by their base type's name — and so would any ordinary item whose base is spelled like a
+  listed line, which would then wear that line's price. Tablets going unpriced is the cost, and
+  it is the cheaper one: an item with no price shows none, an item with a wrong price is
+  believed.
+- **The gates are measured, not chosen.** poe.ninja's raw API carries price-fixed lines its own
+  website hides; on a young league the two populations barely overlap. A gate of 100 listings
+  and 1 Divine of traded volume is where the cliff is on real data. Both fail OPEN when the
+  field is missing, so a schema change costs the gate rather than every price.
+- **The rate comes only from an answer that had prices in it.** Every response carries one,
+  including the empty ones, and those are stale — measured live, 581 against 932.9 on the same
+  league in the same minute.
+- **Which league is asked of the game**, on the same two-hop resolve the inventories use, and
+  spelled exactly as poe.ninja spells it (`HC Runes of Aldur`). Typed in as a setting instead it
+  goes stale at every league start, silently, and stale prices look exactly like real ones.
+- **A change of league throws the book away rather than ageing it.** Those prices are not old,
+  they are a different economy, and shown next to the right ones they look just as trustworthy.
+  The same check guards the file the last session left.
+- **A bad answer never replaces a good book.** "The numbers vanished" is a worse failure than
+  "the numbers are twenty minutes old", so a refresh that comes back empty leaves the previous
+  prices alone, and one failing kind costs that kind rather than the other twenty.
+
+It is **off until somebody turns it on** — more firmly than the item art, because there is no
+local copy of a price to prefer: they exist only on somebody else's server. What goes out is a
+league name and nothing else. The refresh runs in the background and a drawn frame reads
+whichever book is finished, so asking what something is worth never waits for anything.
+
+Every total is shown with **how many items it could not price**, because a total on its own
+reads as "what this stash is worth" and a book covering a fifth of it would answer that with a
+number nobody can see is wrong.
+
+### The trade site — the uniques poe.ninja has nothing on
+
+poe.ninja has no unique prices on Standard at all, and on every league the listing gate drops
+the uniques with few listings — which is most of the interesting ones. The gap is filled from
+the game's own trade site, for uniques only, and only for the ones the book could not price.
+
+**It cannot be asked over plain HTTP, and that is not something to work around.** The `trade2`
+endpoints are Cloudflare-gated: a session cookie on its own gets a 403, and passing the check
+wants the browser's cookies, its User-Agent *and* its TLS fingerprint together. Any HTTP client
+that gets through is imitating a browser, which is the thing the check exists to catch.
+
+So the request is made **by** a browser. A WebView2 window opens on the trade search page, the
+player signs in once, and an injected helper runs the two-step query — `POST
+/api/trade2/search/poe2/<league>`, then `GET /api/trade2/fetch/<ids>?query=<id>&realm=poe2` — as
+a **same-origin fetch with `credentials: 'include'`**. Cloudflare is satisfied because nothing
+is being impersonated, and **no secret ever reaches this side**: the sign-in lives in that
+window's own browser profile, and what crosses back is asking prices. The cookie-manager route
+was available and deliberately not taken. Contract and transport both from the AHK tool, which
+has been running them since 2026-06.
+
+- **A single listing is not a price.** "Median of the cheapest few" over one listing *is* that
+  listing, which is how a starter unique ends up quoted at four thousand Divine — the same
+  illiquidity the poe.ninja gates exist for, arriving by a different door. Below three
+  convertible listings the answer is "unpriced".
+- **The cheapest is not the price either**, so it is the median of the cheapest eight: the
+  cheapest listing is as often a mispriced item or a seller logged off as it is the market.
+- **A listing in a currency the book cannot convert is dropped**, never guessed at. Exalted is
+  one by definition and Divine comes from the rate; everything else has to be a line in the
+  book under the id poe.ninja gave it. The two vocabularies look like the same short slugs, but
+  that is a join rather than an assumption — a miss costs the listing, not a wrong price.
+- **Every answer is written down, the empty ones included.** A unique nobody is selling answers
+  with nothing, and forgetting that means asking again on every stash read, forever, at three
+  and a half seconds a query.
+- **One query in flight, spaced apart, and five minutes of silence after a sign-in wall.** 401
+  and 403 mean the browser is signed out, and asking again in fifteen seconds only gets refused
+  again at somebody else's front door.
+
+It has **its own switch**, separate from poe.ninja's, because they are different things to
+agree to: one is an anonymous request for a league's prices, the other opens a browser and asks
+somebody to sign in to their own account.
+
+The transport is **handed in** — the price layer takes a "name and league in, listings out"
+delegate — so all of the deciding is testable without a browser or a network, and the one place
+that talks to the trade site is visible from the constructor. It is also what keeps the layering
+honest: the queue lives in Features and the browser in Config, which Features cannot see.
+
 ### Remaining
 
 More features on the slice, and configuring them from the page.

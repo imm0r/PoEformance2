@@ -63,6 +63,7 @@ public sealed class PriceBook
 
     private readonly Dictionary<string, double> _byArt = new(StringComparer.Ordinal);
     private readonly Dictionary<string, double> _byName = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, double> _byId = new(StringComparer.Ordinal);
 
     /// <summary>How many Exalted one Divine is worth.</summary>
     /// <remarks>
@@ -74,7 +75,13 @@ public sealed class PriceBook
     /// </remarks>
     public double Rate { get; private set; }
 
-    /// <summary>How many prices are in here.</summary>
+    /// <summary>
+    /// How many prices are in here.
+    /// </summary>
+    /// <remarks>
+    /// The currency ids are NOT counted: they are the same exchange lines under a second key,
+    /// and counting them would report twice as many prices as were learned.
+    /// </remarks>
     public int Count => _byArt.Count + _byName.Count;
 
     /// <summary>How many lines were dropped for being too thin to believe.</summary>
@@ -162,7 +169,6 @@ public sealed class PriceBook
         foreach (JsonElement line in lines.EnumerateArray())
         {
             if (Text(line, "id") is not { Length: > 0 } id
-                || !art.TryGetValue(id, out string? picture)
                 || Number(line, "primaryValue") is not { } divine
                 || divine <= 0)
             {
@@ -177,8 +183,20 @@ public sealed class PriceBook
                 continue;
             }
 
-            _byArt[picture] = divine * Rate;
-            added++;
+            double worth = divine * Rate;
+
+            // The line's own id as well as its picture. It is the same price under a second
+            // key, for the one caller that has a currency's NAME in the site's spelling and no
+            // item to look at - see Quoted.
+            _byId[id] = worth;
+
+            // The picture is what an item can be matched against, and a line without one in the
+            // table is a price nothing here can ever ask for.
+            if (art.TryGetValue(id, out string? picture))
+            {
+                _byArt[picture] = worth;
+                added++;
+            }
         }
 
         return added;
@@ -229,6 +247,40 @@ public sealed class PriceBook
         }
 
         return name is { Length: > 0 } && _byName.TryGetValue(Tidy(name), out double byName) ? byName : null;
+    }
+
+    /// <summary>
+    /// What one of the currency an asking price is quoted in is worth, in Exalted.
+    /// </summary>
+    /// <param name="currency">The trade site's own id for it - <c>divine</c>, <c>chaos</c>.</param>
+    /// <remarks>
+    /// FOR PRICES THAT ARRIVE AS TEXT rather than as an item: a trade listing says "3 divine",
+    /// and there is no picture to join on.
+    ///
+    /// EXALTED IS ONE BY DEFINITION - it is the unit everything here is in - and Divine comes
+    /// from the rate, so the two currencies that carry nearly every listing convert even when
+    /// the exchange half of a refresh came back thin.
+    ///
+    /// Everything else has to BE in the book, under the id poe.ninja gave its exchange line.
+    /// The two vocabularies look like the same short slugs - "divine", "chaos", "whetstone" -
+    /// but that is a join rather than an assumption: an id with no line behind it answers null,
+    /// and the caller drops that listing. The cost of being wrong is a listing ignored, never a
+    /// price invented.
+    /// </remarks>
+    public double? Quoted(string? currency)
+    {
+        if (string.IsNullOrWhiteSpace(currency))
+        {
+            return null;
+        }
+
+        string id = currency.Trim().ToLowerInvariant();
+        return id switch
+        {
+            "exalted" or "exalt" or "ex" => 1.0,
+            "divine" or "div" => Rate > 0 ? Rate : null,
+            _ => _byId.TryGetValue(id, out double worth) ? worth : null,
+        };
     }
 
     /// <summary>
@@ -298,8 +350,15 @@ public sealed class PriceBook
             named[key] = worth;
         }
 
+        var currency = new System.Text.Json.Nodes.JsonObject();
+        foreach ((string key, double worth) in _byId)
+        {
+            currency[key] = worth;
+        }
+
         writing["art"] = art;
         writing["name"] = named;
+        writing["currency"] = currency;
         return writing.ToJsonString();
     }
 
@@ -336,6 +395,10 @@ public sealed class PriceBook
             book.Rate = rate;   // reachable here: same type, and this is where a saved book is rebuilt
             Pour(root, "art", book._byArt);
             Pour(root, "name", book._byName);
+
+            // Absent in a file written before this key existed, which costs the trade layer a
+            // few currencies it can convert and nothing else - Pour simply finds nothing.
+            Pour(root, "currency", book._byId);
 
             long when = Number(root, "when") is { } stamp ? (long)stamp : 0;
             return book.Ready ? new Kept(book, DateTimeOffset.FromUnixTimeSeconds(when)) : null;

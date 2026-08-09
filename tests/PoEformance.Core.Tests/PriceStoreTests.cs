@@ -211,6 +211,92 @@ public class PriceStoreTests
         }
     }
 
+    [Fact]
+    public void SWITCHINGPricesOnOpensTheBookTheLastSessionLeftRatherThanAskingAgain()
+    {
+        string file = Somewhere();
+
+        try
+        {
+            using (var first = new PriceStore(file, (kind, query, token) =>
+                       Task.FromResult<string?>(kind == "exchange" ? Exchange : null)) { Enabled = true })
+            {
+                first.Playing("Standard");
+                Settle(first);
+                Assert.True(first.Book.Ready);
+            }
+
+            var asked = 0;
+            using var next = new PriceStore(file, (kind, query, token) =>
+            {
+                Interlocked.Increment(ref asked);
+                return Task.FromResult<string?>(kind == "exchange" ? Exchange : null);
+            });
+
+            // Switched off, every tick: the league is noted so a window can name it, and
+            // nothing else happens at all.
+            next.Watching("Standard");
+            next.Watching("Standard");
+            Settle(next);
+
+            Assert.False(next.Book.Ready);
+            Assert.Equal(0, asked);
+            Assert.Equal("Standard", next.League);
+
+            next.Enabled = true;
+            next.Watching("Standard");
+            Settle(next);
+
+            // The saved book was still fresh, so it is used and NOTHING is asked for. Opened
+            // after the refresh decision instead, every start of the tool would refetch a book
+            // it already had - twenty requests to be told what is on disk.
+            Assert.True(next.Book.Ready);
+            Assert.Equal(0, asked);
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
+    [Fact]
+    public void ANDAWatchedLeagueChangeDoesNotOpenTheOtherLeaguesBook()
+    {
+        string file = Somewhere();
+
+        try
+        {
+            using (var first = new PriceStore(file, (kind, query, token) =>
+                       Task.FromResult<string?>(kind == "exchange" ? Exchange : null)) { Enabled = true })
+            {
+                first.Playing("Standard");
+                Settle(first);
+            }
+
+            var asked = 0;
+            using var next = new PriceStore(file, (kind, query, token) =>
+            {
+                Interlocked.Increment(ref asked);
+                return Task.FromResult<string?>(null);
+            })
+            {
+                Enabled = true,
+            };
+
+            next.Watching("HC Runes of Aldur");
+            Settle(next);
+
+            // The file on disk is for Standard, and Standard's prices are not old here - they
+            // are a different economy. So nothing is picked up and the answer is asked for.
+            Assert.False(next.Book.Ready);
+            Assert.True(asked > 0);
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
     [Theory]
     [InlineData("Standard", "Standard")]
     [InlineData("HC Runes of Aldur", "HC+Runes+of+Aldur")]

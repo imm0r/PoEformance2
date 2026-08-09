@@ -62,6 +62,7 @@ public sealed class PriceStore : IDisposable
     private PriceBook _book = new();
     private string _league = string.Empty;
     private string _asked = string.Empty;
+    private string _opened = string.Empty;
     private DateTimeOffset _fetched;
     private bool _busy;
 
@@ -99,6 +100,49 @@ public sealed class PriceStore : IDisposable
 
     /// <summary>What the last refresh did, for a window to show.</summary>
     public string Status { get; private set; } = "not asked yet";
+
+    /// <summary>
+    /// The one call the reader thread makes: this is the league, keep up.
+    /// </summary>
+    /// <remarks>
+    /// NEVER WAITS and never throws. Safe to call on every tick - almost all of them are a
+    /// string comparison and nothing else.
+    ///
+    /// The file the last session left is opened ONCE per league, and only after somebody has
+    /// switched prices on. Once, because it is the same answer every tick; only when switched
+    /// on, because a session that never asks for prices should not quietly acquire a set - and
+    /// because the switch is what makes the first refresh happen, so the reopen has to still be
+    /// ahead of it rather than behind.
+    ///
+    /// The league is remembered either way, so a window can say which one was detected while
+    /// the feature is still off.
+    /// </remarks>
+    public void Watching(string? league)
+    {
+        if (string.IsNullOrWhiteSpace(league))
+        {
+            return;
+        }
+
+        bool first;
+        lock (_gate)
+        {
+            first = Enabled && !string.Equals(_opened, league, StringComparison.OrdinalIgnoreCase);
+            if (first)
+            {
+                _opened = league;
+            }
+        }
+
+        if (first)
+        {
+            // Before Playing, so a book that is still fresh is in place when it decides whether
+            // to ask again - otherwise every start of the tool refetches what it already had.
+            Reopen(league);
+        }
+
+        Playing(league);
+    }
 
     /// <summary>
     /// Says which league is being played, and refreshes when that is news.
