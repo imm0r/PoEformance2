@@ -32,13 +32,17 @@ public class TradePricesTests
 
     private static string Somewhere() => Path.Combine(Path.GetTempPath(), $"trade-{Guid.NewGuid():N}.json");
 
+    /// <summary>
+    /// Waits for the query that is out, if there is one.
+    /// </summary>
+    /// <remarks>
+    /// The QUERY rather than a spin on "is it busy yet". A spin turns every check below into a
+    /// race with the thread pool: it passed on a quiet machine and failed on a loaded CI runner,
+    /// which is the worst kind of check - one that reports on the machine rather than on the
+    /// code. Waiting on the task itself is the same question with a definite answer.
+    /// </remarks>
     private static void Settle(TradePrices trade)
-    {
-        for (int i = 0; i < 300 && trade.Busy; i++)
-        {
-            Thread.Sleep(10);
-        }
-    }
+        => Assert.True(trade.Sending.Wait(TimeSpan.FromSeconds(30)), "the query never finished");
 
     private static TradeAnswer Answered(params (double Amount, string Currency)[] listings)
         => new(true, 200, [.. listings.Select(one => new TradeListing(one.Amount, one.Currency))], string.Empty);

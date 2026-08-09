@@ -97,6 +97,7 @@ public sealed class TradePrices : IDisposable
     private DateTimeOffset _sent;
     private DateTimeOffset _quietUntil;
     private bool _busy;
+    private Task _sending = Task.CompletedTask;
 
     /// <param name="ask">
     /// How to run one query - the unique's name and the league in, the listings out. Null means
@@ -145,6 +146,20 @@ public sealed class TradePrices : IDisposable
     public bool Busy
     {
         get { lock (_gate) { return _busy; } }
+    }
+
+    /// <summary>
+    /// The query that is out, finished when there is not one.
+    /// </summary>
+    /// <remarks>
+    /// NOTHING IN THE TOOL WAITS FOR IT - a drawn frame reads what is already known and moves
+    /// on. It is here so that something CAN: a check on what this decides should be about the
+    /// decisions and not about how quickly a loaded thread pool got round to the work, which is
+    /// the difference between a check and a coin toss.
+    /// </remarks>
+    public Task Sending
+    {
+        get { lock (_gate) { return _sending; } }
     }
 
     /// <summary>Which league the answers are for.</summary>
@@ -275,9 +290,6 @@ public sealed class TradePrices : IDisposable
     /// </remarks>
     public void Service()
     {
-        string name;
-        string league;
-
         lock (_gate)
         {
             DateTimeOffset now = _clock();
@@ -295,13 +307,16 @@ public sealed class TradePrices : IDisposable
 
             string key = _queue[0];
             _queue.RemoveAt(0);
-            name = _spelt.TryGetValue(key, out string? spelt) ? spelt : key;
-            league = _league;
+            string name = _spelt.TryGetValue(key, out string? spelt) ? spelt : key;
+            string league = _league;
             _sent = now;
             _busy = true;
-        }
 
-        _ = Task.Run(() => Send(name, league));
+            // Started while the lock is held, so that a caller reading Sending straight after
+            // this returns gets THIS query rather than the last one. The task's own first act
+            // is to wait for this lock, which costs it nothing.
+            _sending = Task.Run(() => Send(name, league));
+        }
     }
 
     private async Task Send(string name, string league)
@@ -327,42 +342,53 @@ public sealed class TradePrices : IDisposable
         string key = Tidy(name)!;
         var write = false;
 
-        lock (_gate)
+        try
         {
-            _busy = false;
-
-            if (!answer.Ok)
+            lock (_gate)
             {
-                // The name goes back, at the FRONT: it is the one somebody is looking at.
-                if (!_queue.Contains(key) && _queue.Count < MostQueued)
+                if (!answer.Ok)
                 {
-                    _queue.Insert(0, key);
+                    // The name goes back, at the FRONT: it is the one somebody is looking at.
+                    if (!_queue.Contains(key) && _queue.Count < MostQueued)
+                    {
+                        _queue.Insert(0, key);
+                    }
+
+                    // A wall is different in kind from a hiccup. 401 and 403 mean the browser
+                    // is no longer signed in, and asking again in fifteen seconds only gets
+                    // refused again, four times a minute, at somebody else's front door.
+                    bool wall = answer.Status is 401 or 403;
+                    _quietUntil = _clock() + (wall ? AfterAWall : AfterATrip);
+                    Status = wall
+                        ? $"signed out - sign in again in the trade window ({answer.Status})"
+                        : answer.Error.Length > 0 ? answer.Error : $"the query failed ({answer.Status})";
+                    return;
                 }
 
-                // A wall is different in kind from a hiccup. 401 and 403 mean the browser is no
-                // longer signed in, and asking again in fifteen seconds only gets refused
-                // again, forty times a minute, at somebody else's front door.
-                bool wall = answer.Status is 401 or 403;
-                _quietUntil = _clock() + (wall ? AfterAWall : AfterATrip);
-                Status = wall
-                    ? $"signed out - sign in again in the trade window ({answer.Status})"
-                    : answer.Error.Length > 0 ? answer.Error : $"the query failed ({answer.Status})";
-                return;
+                double worth = Robust(answer.Listings, Book) ?? 0;
+                _known[key] = new Answer(worth, _clock());
+                _spelt.Remove(key);
+                write = true;
+
+                Status = worth > 0
+                    ? $"{name}: {StashWorth.Money(worth)} ex from {answer.Listings.Count} listings"
+                    : $"{name}: no market - {answer.Listings.Count} listings, which is not enough to believe";
             }
 
-            double worth = Robust(answer.Listings, Book) ?? 0;
-            _known[key] = new Answer(worth, _clock());
-            _spelt.Remove(key);
-            write = true;
-
-            Status = worth > 0
-                ? $"{name}: {StashWorth.Money(worth)} ex from {answer.Listings.Count} listings"
-                : $"{name}: no market - {answer.Listings.Count} listings, which is not enough to believe";
+            if (write)
+            {
+                Write();
+            }
         }
-
-        if (write)
+        finally
         {
-            Write();
+            // LAST, after the answer is on disk. Cleared before the write instead, the next
+            // query can start while this one is still being written down - and "not busy" then
+            // means "the answer is somewhere, possibly not yet where the next session looks".
+            lock (_gate)
+            {
+                _busy = false;
+            }
         }
     }
 
