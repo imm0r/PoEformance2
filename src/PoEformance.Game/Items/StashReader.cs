@@ -85,6 +85,7 @@ public sealed class StashReader
 
     private readonly int _playerServerData;
     private readonly int _inventories;
+    private readonly int _league;
     private readonly int _entrySize;
     private readonly int _inventoryId;
     private readonly int _inventoryPtr;
@@ -108,6 +109,7 @@ public sealed class StashReader
 
         _playerServerData = schema.Structs["ServerDataOffsets"].OffsetOf("PlayerServerData");
         _inventories = schema.Structs["ServerDataStructure"].OffsetOf("PlayerInventories");
+        _league = schema.Structs["ServerDataStructure"].OffsetOf("League");
 
         StructDef array = schema.Structs["InventoryArray"];
         _entrySize = (int)array.Constants["EntrySize"];
@@ -262,6 +264,35 @@ public sealed class StashReader
         }
 
         return items;
+    }
+
+    /// <summary>
+    /// Which league this character is in, or empty when it cannot be read.
+    /// </summary>
+    /// <remarks>
+    /// HERE because it sits on the same struct the inventories do, reached by the same two-hop
+    /// resolve below - and that hop is fiddly enough that a second copy of it would be a second
+    /// thing to get wrong. It is not an item, but it is server data, and this is the reader for
+    /// that.
+    ///
+    /// WHAT IT IS FOR: prices. The value is exactly what poe.ninja spells - "Standard",
+    /// "HC Runes of Aldur" - so it can be asked for as it comes, with the hardcore prefix
+    /// already telling the two economies apart. Typed in by hand instead, it goes stale at
+    /// every league start, silently, and stale prices look exactly like real ones.
+    /// </remarks>
+    public string League(ulong serverData)
+    {
+        ulong holder = Resolve(serverData);
+        if (holder == 0)
+        {
+            return string.Empty;
+        }
+
+        // Read SHORT: a league name is a few words. A long read wanders into whatever follows
+        // the string once the offset has drifted, and comes back as something that looks like a
+        // league nobody has heard of rather than as nothing.
+        string named = _reader.ReadStdWString(holder + (ulong)_league, 64).Trim();
+        return named.Length is > 0 and <= 64 && !named.Any(char.IsControl) ? named : string.Empty;
     }
 
     /// <summary>

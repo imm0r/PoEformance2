@@ -1,0 +1,167 @@
+{
+ "core": {
+  "items": [
+   {
+    "id": "divine",
+    "name": "Divine Orb",
+    "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lNb2RWYWx1ZXMiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/2986e220b3/CurrencyModValues.png",
+    "category": "Currency",
+    "detailsId": "divine-orb"
+   },
+   {
+    "id": "exalted",
+    "name": "Exalted Orb",
+    "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ad7c366789/CurrencyAddModToRare.png",
+    "category": "Currency",
+    "detailsId": "exalted-orb"
+   },
+   {
+    "id": "chaos",
+    "name": "Chaos Orb",
+    "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c0ca392a78/CurrencyRerollRare.png",
+    "category": "Currency",
+    "detailsId": "chaos-orb"
+   }
+  ],
+  "rates": {
+   "exalted": 581.0,
+   "chaos": 4.39
+  },
+  "primary": "divine",
+  "secondary": "chaos"
+ },
+ "items": [
+  {
+   "id": "whetstone",
+   "name": "Blacksmith's Whetstone",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lXZWFwb25RdWFsaXR5Iiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/18715ea7be/CurrencyWeaponQuality.png",
+   "category": "Currency",
+   "detailsId": "blacksmiths-whetstone"
+  },
+  {
+   "id": "exalted",
+   "name": "Exalted Orb",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lBZGRNb2RUb1JhcmUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/ad7c366789/CurrencyAddModToRare.png",
+   "category": "Currency",
+   "detailsId": "exalted-orb"
+  },
+  {
+   "id": "etcher",
+   "name": "Arcanist's Etcher",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lXZWFwb25NYWdpY1F1YWxpdHkiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/516e8f1131/CurrencyWeaponMagicQuality.png",
+   "category": "Currency",
+   "detailsId": "arcanists-etcher"
+  },
+  {
+   "id": "divine",
+   "name": "Divine Orb",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lNb2RWYWx1ZXMiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/2986e220b3/CurrencyModValues.png",
+   "category": "Currency",
+   "detailsId": "divine-orb"
+  },
+  {
+   "id": "chaos",
+   "name": "Chaos Orb",
+   "image": "/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lSZXJvbGxSYXJlIiwic2NhbGUiOjEsInJlYWxtIjoicG9lMiJ9XQ/c0ca392a78/CurrencyRerollRare.png",
+   "category": "Currency",
+   "detailsId": "chaos-orb"
+  }
+ ],
+ "lines": [
+  {
+   "id": "whetstone",
+   "primaryValue": 0.001735,
+   "volumePrimaryValue": 0.07143,
+   "maxVolumeCurrency": "exalted",
+   "maxVolumeRate": 0.992,
+   "sparkline": {
+    "totalChange": -32.46,
+    "data": [
+     -40.76,
+     -36.45,
+     -3.69,
+     14.31,
+     -23.66,
+     -21.05,
+     -32.46
+    ]
+   }
+  },
+  {
+   "id": "exalted",
+   "primaryValue": 0.001721,
+   "volumePrimaryValue": 26.0,
+   "maxVolumeCurrency": "divine",
+   "maxVolumeRate": 581.0,
+   "sparkline": {
+    "totalChange": -43.36,
+    "data": [
+     0.29,
+     0.01,
+     -7.93,
+     6.29,
+     2.46,
+     -16.84,
+     -43.36
+    ]
+   }
+  },
+  {
+   "id": "etcher",
+   "primaryValue": 0.1369,
+   "volumePrimaryValue": 17.0,
+   "maxVolumeCurrency": "divine",
+   "maxVolumeRate": 7.3,
+   "sparkline": {
+    "totalChange": 18.32,
+    "data": [
+     -14.71,
+     -62.91,
+     -7.27,
+     -42.5,
+     18.19,
+     26.86,
+     18.32
+    ]
+   }
+  },
+  {
+   "id": "divine",
+   "primaryValue": 1,
+   "volumePrimaryValue": 761.8,
+   "maxVolumeCurrency": "chaos",
+   "maxVolumeRate": 0.2279,
+   "sparkline": {
+    "totalChange": -0.53,
+    "data": [
+     2.07,
+     -3.56,
+     -3.69,
+     -3.55,
+     -6.06,
+     -2.4,
+     -0.53
+    ]
+   }
+  },
+  {
+   "id": "chaos",
+   "primaryValue": 0.2279,
+   "volumePrimaryValue": 761.8,
+   "maxVolumeCurrency": "divine",
+   "maxVolumeRate": 4.39,
+   "sparkline": {
+    "totalChange": 0.53,
+    "data": [
+     -1.94,
+     3.72,
+     3.85,
+     3.75,
+     6.52,
+     2.54,
+     0.53
+    ]
+   }
+  }
+ ]
+}
