@@ -28,12 +28,14 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path src/PoEformance.App/bin/Release/net10.0-windows/win-x64/publish/* -DestinationPath PoEformance-win-x64.zip
 
-      # Kept as a per-commit artifact too (useful to fetch the build of an older commit).
-      - uses: actions/upload-artifact@v4
-        with:
-          name: PoEformance-win-x64
-          path: PoEformance-win-x64.zip
-
+      # THE RELEASE FIRST, and that ordering is the whole point of this arrangement. It is
+      # what anybody actually downloads; the artifact below is a convenience. With the
+      # artifact first, one failure there aborts the job before the release is touched -
+      # which is exactly what happened when the artifact storage quota filled up: the build
+      # was fine, the zip was fine, and the download URL quietly kept serving the previous
+      # commit, crash and all. A rolling release that silently stops rolling is worse than
+      # no rolling release.
+      #
       # Rolling release: one stable download URL that always carries the newest build.
       # First run creates it; every later run replaces the asset and refreshes the notes.
       - name: Update the latest-dev release
@@ -49,3 +51,21 @@ jobs:
             gh release upload latest-dev PoEformance-win-x64.zip --clobber
             gh release edit latest-dev --notes $notes
           }
+
+      # And a per-commit copy, which is useful for fetching the build of an older commit -
+      # the release only ever holds the newest.
+      #
+      # ALLOWED TO FAIL, because it is the optional half and it has one failure mode that has
+      # nothing to do with this build: the artifact storage quota, which one of these fills at
+      # a hundred-odd megabytes a push. A red publish run should mean "the release did not go
+      # out", and that stays true only if this cannot turn it red.
+      #
+      # A week's retention rather than the ninety-day default for the same reason: the reason
+      # to reach for one of these is "the build from a commit this week", and unbounded copies
+      # of a self-contained runtime are what filled the quota in the first place.
+      - uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: PoEformance-win-x64
+          path: PoEformance-win-x64.zip
+          retention-days: 7
