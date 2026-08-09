@@ -81,7 +81,7 @@ public static class ConfigWindowHost
     {
         try
         {
-            using var application = new Application();
+            using var application = WindowThread.Started();
             using var window = new ConfigWindow(title, json => Handle(json, stateSource, apply));
             window.ResizeClient(1100, 780);
             window.Center();

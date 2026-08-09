@@ -207,7 +207,16 @@ public sealed class IconCache : IDisposable
             }
 
             using Image<Rgba32> image = Image.Load<Rgba32>(file);
+            Files.Worked(path);
             return Upload($"{maxEdge}|{path}", image, maxEdge);
+        }
+        catch (IOException busy) when (IconFiles.Momentary(busy))
+        {
+            // NOT a verdict. Somebody else has the file open, which for the item art is this
+            // tool itself finishing the download of the very icon being drawn - and remembered
+            // as a failure, that picture is gone until the next run. The next frame asks again.
+            Files.Busy(path, busy.Message);
+            return default;
         }
         catch (Exception exception) when (
             exception is IOException or UnknownImageFormatException or InvalidImageContentException

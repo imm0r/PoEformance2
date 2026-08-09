@@ -43,6 +43,7 @@ public sealed class TradeSession : IDisposable
 
     private TradeSessionWindow? _window;
     private bool _starting;
+    private string _failed = string.Empty;
     private int _next;
 
     public TradeSession(string? profile = null) => _profile = profile ?? DefaultProfile;
@@ -113,16 +114,24 @@ public sealed class TradeSession : IDisposable
         ArgumentNullException.ThrowIfNull(name);
 
         TradeSessionWindow? window;
+        string failed;
         lock (_gate)
         {
             window = _window;
+            failed = _failed;
         }
 
         if (window is null)
         {
             Show(league);
-            return Task.FromResult(TradeAnswer.Not(
-                "opening the trade site - sign in to pathofexile.com once in that window"));
+
+            // WHY THE LAST FAILURE IS CARRIED BACK: a window that cannot be created at all
+            // leaves this answering "sign in once" about a browser that is never going to
+            // appear, forever, while the real reason sits in a console nobody is looking at.
+            // Still tries again, because the next reason might not be the last one.
+            return Task.FromResult(TradeAnswer.Not(failed.Length > 0
+                ? failed
+                : "opening the trade site - sign in to pathofexile.com once in that window"));
         }
 
         if (!window.Ready)
@@ -218,7 +227,7 @@ public sealed class TradeSession : IDisposable
     {
         try
         {
-            using var application = new Application();
+            using var application = WindowThread.Started();
             using var window = new TradeSessionWindow(
                 "PoEformance - PoE trade (sign in once)",
                 $"https://www.pathofexile.com/trade2/search/poe2/{Uri.EscapeDataString(league)}",
@@ -234,12 +243,18 @@ public sealed class TradeSession : IDisposable
             {
                 _window = window;
                 _starting = false;
+                _failed = string.Empty;
             }
 
             application.Run();
         }
         catch (Exception exception)
         {
+            lock (_gate)
+            {
+                _failed = $"the trade window could not be opened: {exception.Message}";
+            }
+
             Console.Error.WriteLine($"trade window failed: {exception.Message}");
         }
         finally

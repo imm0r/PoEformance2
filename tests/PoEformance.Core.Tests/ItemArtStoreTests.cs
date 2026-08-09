@@ -29,6 +29,74 @@ public class ItemArtStoreTests
     }
 
     [Fact]
+    public void APICTUREAppearsUnderItsOwnNameOnlyOnceItIsWhole()
+    {
+        // WHO THE READER IS decides this: the thread that draws, asking for the file the
+        // instant it exists. File.Exists is true from the moment a write begins, so writing
+        // straight to the name hands the renderer a file still open for writing - or half a
+        // picture - and the renderer remembers an icon it could not read as one it never can.
+        // So the bytes go to a name nothing looks for and are renamed into place.
+        string folder = Somewhere();
+
+        try
+        {
+            using var store = new ItemArtStore(folder, (path, token) => Task.FromResult<byte[]?>([1, 2, 3, 4]))
+            {
+                Enabled = true,
+            };
+
+            // A leftover from a run that died mid-write. It has to be gone afterwards, which is
+            // what says the bytes really did go through it rather than straight to the name.
+            string destination = store.FileFor(ItemArtStore.Normalise("Art/2DItems/Currency/Thing.dds"));
+            Directory.CreateDirectory(folder);
+            File.WriteAllBytes(destination + ItemArtStore.WhileWriting, [9, 9]);
+
+            store.Local("Art/2DItems/Currency/Thing.dds");
+            Settle(store);
+
+            string file = store.Local("Art/2DItems/Currency/Thing.dds");
+
+            Assert.NotEqual(string.Empty, file);
+            Assert.Equal<byte[]>([1, 2, 3, 4], File.ReadAllBytes(file));
+
+            // And nothing half-written is left lying about under either name.
+            Assert.Empty(Directory.GetFiles(folder, "*" + ItemArtStore.WhileWriting));
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ANDAPictureThatCannotBePutInPlaceLeavesNothingBehind()
+    {
+        // The half-written file is named so that nothing looks for it, which means nothing
+        // would ever clean it up either - it would just sit there being wondered about.
+        string folder = Somewhere();
+
+        try
+        {
+            using var store = new ItemArtStore(folder, (path, token) => Task.FromResult<byte[]?>([1, 2, 3, 4]))
+            {
+                Enabled = true,
+            };
+
+            // A directory where the picture wants to be: the write succeeds, the rename cannot.
+            Directory.CreateDirectory(store.FileFor(ItemArtStore.Normalise("Art/2DItems/Currency/Thing.dds")));
+
+            store.Local("Art/2DItems/Currency/Thing.dds");
+            Settle(store);
+
+            Assert.Empty(Directory.GetFiles(folder, "*" + ItemArtStore.WhileWriting));
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
+        }
+    }
+
+    [Fact]
     public void APICTUREIsFetchedOnceAndReadFromDiskAfterwards()
     {
         string folder = Somewhere();

@@ -201,7 +201,7 @@ public sealed class ItemArtStore : IDisposable
                     if (bytes is { Length: > 0 })
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(file)!);
-                        await File.WriteAllBytesAsync(file, bytes, _closing.Token).ConfigureAwait(false);
+                        await Published(file, bytes).ConfigureAwait(false);
 
                         lock (_gate)
                         {
@@ -246,6 +246,53 @@ public sealed class ItemArtStore : IDisposable
                 }
             }
         });
+    }
+
+    /// <summary>What a half-written picture is called while it is being written.</summary>
+    public const string WhileWriting = ".part";
+
+    /// <summary>
+    /// Puts a finished picture where the renderer will look, in one step.
+    /// </summary>
+    /// <remarks>
+    /// WRITTEN BESIDE ITS NAME AND RENAMED INTO IT, never straight to the name itself, and the
+    /// reason is who the reader is: the thread that DRAWS, asking for the file the instant it
+    /// exists. <see cref="File.Exists"/> is true from the moment a write begins, so writing in
+    /// place hands the renderer either a file still open for writing - a sharing violation,
+    /// which Windows words as "used by another process" - or half a picture, which is not a
+    /// picture at all.
+    ///
+    /// Neither is a passing annoyance, because of what the renderer does with the answer: an
+    /// icon that cannot be read is remembered as one that never will be, so the picture is
+    /// gone for the rest of the session. It hits exactly the icons that were being fetched
+    /// while the stash was first drawn, which is all of them on a first run.
+    ///
+    /// A rename is atomic: the name either does not exist or names a finished, closed file.
+    /// </remarks>
+    private static async Task Published(string file, byte[] bytes)
+    {
+        string writing = file + WhileWriting;
+
+        try
+        {
+            await File.WriteAllBytesAsync(writing, bytes).ConfigureAwait(false);
+            File.Move(writing, file, overwrite: true);
+        }
+        catch
+        {
+            // A part-file left behind would be picked up by nothing - it is not the name
+            // anything looks for - but it would sit there until somebody wondered what it was.
+            try
+            {
+                File.Delete(writing);
+            }
+            catch (Exception sweeping) when (sweeping is IOException or UnauthorizedAccessException)
+            {
+                // Tidying is not worth an exception of its own.
+            }
+
+            throw;
+        }
     }
 
     /// <summary>The one place that talks to the outside world.</summary>
