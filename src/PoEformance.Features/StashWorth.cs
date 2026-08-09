@@ -38,21 +38,30 @@ public readonly record struct Valued(double Exalted, int Priced, int Unpriced)
 /// </remarks>
 public static class StashWorth
 {
-    /// <summary>What ONE of an item is worth, or null when nothing is known about it.</summary>
-    public static double? Unit(this PriceBook book, InspectedItem item)
+    /// <summary>
+    /// What ONE of an item is worth, or null when nothing is known about it.
+    /// </summary>
+    /// <param name="trade">
+    /// Asked only for what the book had nothing on, and only about uniques. In that order on
+    /// purpose: the book is a whole market averaged and gated, and a trade answer is ten
+    /// listings at one moment - a good answer to a question the book could not answer at all,
+    /// and a worse one to a question it could.
+    /// </param>
+    public static double? Unit(this PriceBook book, InspectedItem item, TradePrices? trade = null)
     {
         ArgumentNullException.ThrowIfNull(book);
         ArgumentNullException.ThrowIfNull(item);
 
-        return book.Worth(item.Art, item.Unique.Length > 0 ? item.Unique : null);
+        string? unique = item.Unique.Length > 0 ? item.Unique : null;
+        return book.Worth(item.Art, unique) ?? (unique is not null ? trade?.Worth(unique) : null);
     }
 
     /// <summary>What the item is worth as it sits - the stack included.</summary>
-    public static double? Of(this PriceBook book, InspectedItem item)
-        => Unit(book, item) is { } unit ? unit * Math.Max(1, item.Stack) : null;
+    public static double? Of(this PriceBook book, InspectedItem item, TradePrices? trade = null)
+        => Unit(book, item, trade) is { } unit ? unit * Math.Max(1, item.Stack) : null;
 
     /// <summary>What a list of items comes to.</summary>
-    public static Valued Across(this PriceBook book, IEnumerable<StashSlot> items)
+    public static Valued Across(this PriceBook book, IEnumerable<StashSlot> items, TradePrices? trade = null)
     {
         ArgumentNullException.ThrowIfNull(book);
         ArgumentNullException.ThrowIfNull(items);
@@ -63,7 +72,7 @@ public static class StashWorth
 
         foreach (StashSlot slot in items)
         {
-            if (Of(book, slot.Item) is { } worth)
+            if (Of(book, slot.Item, trade) is { } worth)
             {
                 total += worth;
                 priced++;
@@ -78,14 +87,14 @@ public static class StashWorth
     }
 
     /// <summary>And what a set of pages comes to.</summary>
-    public static Valued Across(this PriceBook book, IEnumerable<StashPage> pages)
+    public static Valued Across(this PriceBook book, IEnumerable<StashPage> pages, TradePrices? trade = null)
     {
         ArgumentNullException.ThrowIfNull(pages);
 
         Valued all = Valued.Nothing;
         foreach (StashPage page in pages)
         {
-            Valued one = Across(book, page.Items);
+            Valued one = Across(book, page.Items, trade);
             all = new Valued(all.Exalted + one.Exalted, all.Priced + one.Priced, all.Unpriced + one.Unpriced);
         }
 

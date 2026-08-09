@@ -57,6 +57,8 @@ public sealed class StashWindow
     private readonly StashInspector _inspector;
     private readonly ItemArtStore _art;
     private readonly PriceStore _prices;
+    private readonly TradePrices _trade;
+    private readonly Action _signIn;
     private readonly Func<string, IntPtr> _picture;
 
     private string _search = string.Empty;
@@ -70,24 +72,40 @@ public sealed class StashWindow
     // be the entire book walked sixty times a second to label a dozen rows.
     private StashView? _tallied;
     private PriceBook? _talliedWith;
+    private int _talliedAfter = -1;
     private Valued[] _perPage = [];
     private Valued _total;
 
     /// <param name="art">Where each item's own picture comes from.</param>
     /// <param name="prices">What things are worth. Off until somebody switches it on here.</param>
+    /// <param name="trade">
+    /// What uniques the book could not price are being listed for. Off separately, because it
+    /// wants a signed-in browser and poe.ninja wants nothing.
+    /// </param>
+    /// <param name="signIn">Opens the trade window, which lives in a layer this one cannot see.</param>
     /// <param name="picture">
     /// Turns a file on disk into something drawable. Handed in because uploading a texture
     /// belongs to whoever owns the renderer, not to a window.
     /// </param>
-    public StashWindow(StashInspector inspector, ItemArtStore art, PriceStore prices, Func<string, IntPtr> picture)
+    public StashWindow(
+        StashInspector inspector,
+        ItemArtStore art,
+        PriceStore prices,
+        TradePrices trade,
+        Action signIn,
+        Func<string, IntPtr> picture)
     {
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(art);
         ArgumentNullException.ThrowIfNull(prices);
+        ArgumentNullException.ThrowIfNull(trade);
+        ArgumentNullException.ThrowIfNull(signIn);
         ArgumentNullException.ThrowIfNull(picture);
         _inspector = inspector;
         _art = art;
         _prices = prices;
+        _trade = trade;
+        _signIn = signIn;
         _picture = picture;
     }
 
@@ -245,6 +263,7 @@ public sealed class StashWindow
         if (league.Length == 0)
         {
             ImGui.TextColored(DimText, "no league read yet - the game has to be in an area");
+            Trade();
             return;
         }
 
@@ -264,19 +283,59 @@ public sealed class StashWindow
             ImGui.TextColored(DimText, asking ? _prices.Status : "off");
         }
 
-        if (!book.Ready || _total.Items == 0)
+        if (_total.Priced > 0)
         {
+            ImGui.SameLine();
+
+            // Both halves, always. The total on its own reads as "what this stash is worth",
+            // and a book that could price a fifth of it would answer that with a number nobody
+            // can see is wrong.
+            ImGui.TextColored(
+                MoneyText,
+                $"{StashWorth.Money(_total.Exalted)} ex across {_total.Priced} of {_total.Items} items");
+        }
+
+        Trade();
+    }
+
+    /// <summary>
+    /// The trade half: what uniques poe.ninja could not price are actually being listed for.
+    /// </summary>
+    /// <remarks>
+    /// ITS OWN SWITCH, separate from poe.ninja's, and not because more switches are better.
+    /// poe.ninja is one anonymous request for a league's prices. This opens a browser, asks
+    /// somebody to sign in to their own account, and then asks the game's own trade site one
+    /// question at a time. Those are different things to agree to.
+    ///
+    /// The sign-in never comes near this tool: it lives in that browser's profile, and what
+    /// crosses back is asking prices.
+    /// </remarks>
+    private void Trade()
+    {
+        bool asking = _trade.Enabled;
+        if (ImGui.Checkbox("ask the trade site about the uniques poe.ninja missed", ref asking))
+        {
+            _trade.Enabled = asking;
+        }
+
+        if (!asking)
+        {
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, "off - it opens a browser you sign in to once");
             return;
         }
 
         ImGui.SameLine();
 
-        // Both halves, always. The total on its own reads as "what this stash is worth", and a
-        // book that could price a fifth of it would answer that with a number nobody can see
-        // is wrong.
-        ImGui.TextColored(
-            MoneyText,
-            $"{StashWorth.Money(_total.Exalted)} ex across {_total.Priced} of {_total.Items} items");
+        if (ImGui.SmallButton("open the trade window"))
+        {
+            _signIn();
+        }
+
+        ImGui.SameLine();
+
+        string waiting = _trade.Waiting > 0 ? $", {_trade.Waiting} waiting" : string.Empty;
+        ImGui.TextColored(DimText, $"{_trade.Known} asked{waiting} - {_trade.Status}");
     }
 
     /// <summary>
@@ -288,19 +347,23 @@ public sealed class StashWindow
     /// </remarks>
     private void Tally(StashView view, PriceBook book)
     {
-        if (ReferenceEquals(_tallied, view) && ReferenceEquals(_talliedWith, book))
+        // The trade answers arrive one at a time and long after they were asked for, so the
+        // count of them is the third thing the totals depend on.
+        int answers = _trade.Known;
+        if (ReferenceEquals(_tallied, view) && ReferenceEquals(_talliedWith, book) && _talliedAfter == answers)
         {
             return;
         }
 
         _tallied = view;
         _talliedWith = book;
+        _talliedAfter = answers;
         _perPage = new Valued[view.Pages.Count];
         _total = Valued.Nothing;
 
         for (var i = 0; i < view.Pages.Count; i++)
         {
-            _perPage[i] = book.Across(view.Pages[i].Items);
+            _perPage[i] = book.Across(view.Pages[i].Items, _trade);
             _total = new Valued(
                 _total.Exalted + _perPage[i].Exalted,
                 _total.Priced + _perPage[i].Priced,
@@ -479,7 +542,7 @@ public sealed class StashWindow
                 ImGui.BeginTooltip();
                 try
                 {
-                    Detail(found.Item, book);
+                    Detail(found.Item, book, _trade);
                 }
                 finally
                 {
@@ -544,7 +607,7 @@ public sealed class StashWindow
 
         // Bottom left, opposite the stack count, and only for what is worth walking over to -
         // see WorthSaying.
-        if (book.Of(slot.Item) is { } exalted && exalted >= WorthSaying)
+        if (book.Of(slot.Item, _trade) is { } exalted && exalted >= WorthSaying)
         {
             string worth = StashWorth.Money(exalted);
             Vector2 size = ImGui.CalcTextSize(worth);
@@ -608,7 +671,7 @@ public sealed class StashWindow
 
             // Every price it knows, unlike the grid: a list is read a row at a time, so a tenth
             // of an Exalted here is a fact rather than clutter.
-            if (book.Of(item) is { } exalted)
+            if (book.Of(item, _trade) is { } exalted)
             {
                 ImGui.SameLine();
                 ImGui.TextColored(MoneyText, $"{StashWorth.Money(exalted)} ex");
@@ -628,7 +691,7 @@ public sealed class StashWindow
 
             if (open)
             {
-                Detail(item, book);
+                Detail(item, book, _trade);
             }
         }
         finally
@@ -638,7 +701,7 @@ public sealed class StashWindow
     }
 
     /// <summary>Everything the item says about itself.</summary>
-    private static void Detail(InspectedItem item, PriceBook book)
+    private static void Detail(InspectedItem item, PriceBook book, TradePrices trade)
     {
         ImGui.Indent();
 
@@ -648,13 +711,17 @@ public sealed class StashWindow
 
             // The unit price as well as the stack's, because they are different questions -
             // "what is this pile worth" and "what is one of them going for".
-            if (book.Of(item) is { } exalted)
+            if (book.Of(item, trade) is { } exalted)
             {
+                // WHERE the price came from, because the two are different kinds of answer: a
+                // league's trade averaged and gated, or ten listings on the site right now.
+                string from = book.Unit(item) is null ? "  -  from the trade site" : string.Empty;
+
                 ImGui.TextColored(
                     MoneyText,
                     item.Stack > 1
-                        ? $"{StashWorth.Money(exalted)} ex  -  {StashWorth.Money(exalted / item.Stack)} ex each"
-                        : $"{StashWorth.Money(exalted)} ex");
+                        ? $"{StashWorth.Money(exalted)} ex  -  {StashWorth.Money(exalted / item.Stack)} ex each{from}"
+                        : $"{StashWorth.Money(exalted)} ex{from}");
             }
 
             if (item.Unique.Length > 0)

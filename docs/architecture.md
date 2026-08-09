@@ -481,6 +481,52 @@ Every total is shown with **how many items it could not price**, because a total
 reads as "what this stash is worth" and a book covering a fifth of it would answer that with a
 number nobody can see is wrong.
 
+### The trade site — the uniques poe.ninja has nothing on
+
+poe.ninja has no unique prices on Standard at all, and on every league the listing gate drops
+the uniques with few listings — which is most of the interesting ones. The gap is filled from
+the game's own trade site, for uniques only, and only for the ones the book could not price.
+
+**It cannot be asked over plain HTTP, and that is not something to work around.** The `trade2`
+endpoints are Cloudflare-gated: a session cookie on its own gets a 403, and passing the check
+wants the browser's cookies, its User-Agent *and* its TLS fingerprint together. Any HTTP client
+that gets through is imitating a browser, which is the thing the check exists to catch.
+
+So the request is made **by** a browser. A WebView2 window opens on the trade search page, the
+player signs in once, and an injected helper runs the two-step query — `POST
+/api/trade2/search/poe2/<league>`, then `GET /api/trade2/fetch/<ids>?query=<id>&realm=poe2` — as
+a **same-origin fetch with `credentials: 'include'`**. Cloudflare is satisfied because nothing
+is being impersonated, and **no secret ever reaches this side**: the sign-in lives in that
+window's own browser profile, and what crosses back is asking prices. The cookie-manager route
+was available and deliberately not taken. Contract and transport both from the AHK tool, which
+has been running them since 2026-06.
+
+- **A single listing is not a price.** "Median of the cheapest few" over one listing *is* that
+  listing, which is how a starter unique ends up quoted at four thousand Divine — the same
+  illiquidity the poe.ninja gates exist for, arriving by a different door. Below three
+  convertible listings the answer is "unpriced".
+- **The cheapest is not the price either**, so it is the median of the cheapest eight: the
+  cheapest listing is as often a mispriced item or a seller logged off as it is the market.
+- **A listing in a currency the book cannot convert is dropped**, never guessed at. Exalted is
+  one by definition and Divine comes from the rate; everything else has to be a line in the
+  book under the id poe.ninja gave it. The two vocabularies look like the same short slugs, but
+  that is a join rather than an assumption — a miss costs the listing, not a wrong price.
+- **Every answer is written down, the empty ones included.** A unique nobody is selling answers
+  with nothing, and forgetting that means asking again on every stash read, forever, at three
+  and a half seconds a query.
+- **One query in flight, spaced apart, and five minutes of silence after a sign-in wall.** 401
+  and 403 mean the browser is signed out, and asking again in fifteen seconds only gets refused
+  again at somebody else's front door.
+
+It has **its own switch**, separate from poe.ninja's, because they are different things to
+agree to: one is an anonymous request for a league's prices, the other opens a browser and asks
+somebody to sign in to their own account.
+
+The transport is **handed in** — the price layer takes a "name and league in, listings out"
+delegate — so all of the deciding is testable without a browser or a network, and the one place
+that talks to the trade site is visible from the constructor. It is also what keeps the layering
+honest: the queue lives in Features and the browser in Config, which Features cannot see.
+
 ### Remaining
 
 More features on the slice, and configuring them from the page.
