@@ -764,6 +764,13 @@
       }
     },
 
+    "ItemVisualIdentityRow": {
+      "comment": "The dat row ItemBaseComponent.UniqueIviRow points at. Its Id - \"FourUniquePinnacle1\" - is the ROBUST key for a unique: it is an engine identifier and stays English on a localised client, where the displayed name does not. data/unique_ivi_name_map.tsv turns it into the name price sites use. Chain and offsets from the AHK tool, live-verified there 2026-06-24.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr", "comment": "Points at the Id as a wide string." }
+      }
+    },
+
     "Player": {
       "fields": {
         "Name": { "offset": "0x1B0", "type": "stdWString" },

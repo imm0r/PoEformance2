@@ -43,6 +43,9 @@
       lookup walks up to the repository from a dev build, where it always found them.
     -->
     <None Include="..\..\data\*.json" Link="data\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!-- .tsv too: the unique-name table is not JSON, and a glob that misses it ships a
+         release where every unique is nameless - the same way data\ was missed once before. -->
+    <None Include="..\..\data\*.tsv" Link="data\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <!--
       item-stats.json is the big one - 27,000 stat rows, because what memory holds is a ROW
       INDEX into the game's stat table and a reader cannot know in advance which rows an item
