@@ -28,9 +28,20 @@ public sealed class StashWindow
     /// <summary>How many items are listed at once. The rest are counted, not drawn.</summary>
     public const int MostRows = 400;
 
+    /// <summary>
+    /// What an item has to be worth before the grid says so.
+    /// </summary>
+    /// <remarks>
+    /// A stash is mostly things worth a tenth of an Exalted, and a number on every one of two
+    /// hundred cells is a wall of noise that hides the three that matter. The list shows every
+    /// price it knows; the grid shows the ones worth walking over to.
+    /// </remarks>
+    public const double WorthSaying = 1.0;
+
     private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
     private static readonly Vector4 GoodText = new(0.55f, 0.9f, 0.65f, 1f);
     private static readonly Vector4 WarnText = new(1f, 0.6f, 0.35f, 1f);
+    private static readonly Vector4 MoneyText = new(1f, 0.83f, 0.42f, 1f);
 
     /// <summary>What each rarity looks like, in the game's own colours.</summary>
     private static readonly Vector4[] ByRarity =
@@ -45,6 +56,7 @@ public sealed class StashWindow
 
     private readonly StashInspector _inspector;
     private readonly ItemArtStore _art;
+    private readonly PriceStore _prices;
     private readonly Func<string, IntPtr> _picture;
 
     private string _search = string.Empty;
@@ -53,18 +65,29 @@ public sealed class StashWindow
     private readonly HashSet<ulong> _open = [];
     private ulong _hovered;
 
+    // What the last read came to, per page and in total. Kept rather than recomputed because
+    // it is a lookup per item and a frame draws the tab list for the WHOLE stash - which would
+    // be the entire book walked sixty times a second to label a dozen rows.
+    private StashView? _tallied;
+    private PriceBook? _talliedWith;
+    private Valued[] _perPage = [];
+    private Valued _total;
+
     /// <param name="art">Where each item's own picture comes from.</param>
+    /// <param name="prices">What things are worth. Off until somebody switches it on here.</param>
     /// <param name="picture">
     /// Turns a file on disk into something drawable. Handed in because uploading a texture
     /// belongs to whoever owns the renderer, not to a window.
     /// </param>
-    public StashWindow(StashInspector inspector, ItemArtStore art, Func<string, IntPtr> picture)
+    public StashWindow(StashInspector inspector, ItemArtStore art, PriceStore prices, Func<string, IntPtr> picture)
     {
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(art);
+        ArgumentNullException.ThrowIfNull(prices);
         ArgumentNullException.ThrowIfNull(picture);
         _inspector = inspector;
         _art = art;
+        _prices = prices;
         _picture = picture;
     }
 
@@ -105,6 +128,11 @@ public sealed class StashWindow
     private void Draw()
     {
         StashView view = _inspector.View;
+
+        // ONE book for the whole frame. Read per item instead, a refresh landing mid-draw
+        // would show half a tab priced by the old economy and half by the new one.
+        PriceBook book = _prices.Book;
+        Tally(view, book);
 
         if (ImGui.Button("read the stash"))
         {
@@ -166,6 +194,8 @@ public sealed class StashWindow
         ImGui.SetNextItemWidth(120f);
         ImGui.SliderFloat("cell", ref _cell, 24f, 96f, "%.0f px");
 
+        Prices(book);
+
         ImGui.Separator();
 
         if (view.Pages.Count == 0)
@@ -173,23 +203,113 @@ public sealed class StashWindow
             return;
         }
 
-        Tabs(view);
+        Tabs(view, book);
         ImGui.SameLine();
 
         if (_page >= 0 && _page < view.Pages.Count && _search.Trim().Length == 0)
         {
-            Grid(view.Pages[_page]);
+            Grid(view.Pages[_page], book);
         }
         else
         {
             // A search runs across every tab, and a grid can only show one - so looking for
             // something falls back to the list rather than pretending the other tabs are empty.
-            Items(view);
+            Items(view, book);
+        }
+    }
+
+    /// <summary>
+    /// The price switch, and what asking for them got.
+    /// </summary>
+    /// <remarks>
+    /// OFF UNTIL SOMEBODY TURNS IT ON, like the pictures - but for a stronger reason. There is
+    /// no local copy of a price to prefer: they only exist on somebody else's server, so the
+    /// switch is the difference between a tool that reads memory and a tool that talks to the
+    /// internet. What goes out is a league name and nothing else.
+    ///
+    /// The league is shown whether or not it is on, because it is the answer to "prices for
+    /// what" - and because seeing the wrong one there is how somebody finds out the tool is
+    /// pricing their softcore stash against the hardcore economy.
+    /// </remarks>
+    private void Prices(PriceBook book)
+    {
+        bool asking = _prices.Enabled;
+        if (ImGui.Checkbox("prices from poe.ninja", ref asking))
+        {
+            _prices.Enabled = asking;
+        }
+
+        ImGui.SameLine();
+
+        string league = _inspector.League;
+        if (league.Length == 0)
+        {
+            ImGui.TextColored(DimText, "no league read yet - the game has to be in an area");
+            return;
+        }
+
+        ImGui.TextColored(DimText, $"{league} -");
+        ImGui.SameLine();
+
+        if (_prices.Busy)
+        {
+            ImGui.TextColored(WarnText, "asking...");
+        }
+        else if (book.Ready)
+        {
+            ImGui.TextColored(GoodText, _prices.Status);
+        }
+        else
+        {
+            ImGui.TextColored(DimText, asking ? _prices.Status : "off");
+        }
+
+        if (!book.Ready || _total.Items == 0)
+        {
+            return;
+        }
+
+        ImGui.SameLine();
+
+        // Both halves, always. The total on its own reads as "what this stash is worth", and a
+        // book that could price a fifth of it would answer that with a number nobody can see
+        // is wrong.
+        ImGui.TextColored(
+            MoneyText,
+            $"{StashWorth.Money(_total.Exalted)} ex across {_total.Priced} of {_total.Items} items");
+    }
+
+    /// <summary>
+    /// Adds up what the read came to, when the read or the book has changed.
+    /// </summary>
+    /// <remarks>
+    /// Both are published as whole immutable objects, so "has it changed" is a reference
+    /// comparison and the totals are exactly as old as the two things they came out of.
+    /// </remarks>
+    private void Tally(StashView view, PriceBook book)
+    {
+        if (ReferenceEquals(_tallied, view) && ReferenceEquals(_talliedWith, book))
+        {
+            return;
+        }
+
+        _tallied = view;
+        _talliedWith = book;
+        _perPage = new Valued[view.Pages.Count];
+        _total = Valued.Nothing;
+
+        for (var i = 0; i < view.Pages.Count; i++)
+        {
+            _perPage[i] = book.Across(view.Pages[i].Items);
+            _total = new Valued(
+                _total.Exalted + _perPage[i].Exalted,
+                _total.Priced + _perPage[i].Priced,
+                _total.Unpriced + _perPage[i].Unpriced);
         }
     }
 
     /// <summary>The tabs down the left, with how much is in each.</summary>
-    private void Tabs(StashView view)
+    private void Tabs(StashView view, PriceBook book)
     {
         if (!ImGui.BeginChild("stash-tabs", new Vector2(220f, 0f), ImGuiChildFlags.Borders))
         {
@@ -200,8 +320,9 @@ public sealed class StashWindow
         try
         {
             // "Everything" first, because searching across the whole stash is the thing this
-            // does that the game cannot.
-            if (ImGui.Selectable($"Everything ({view.Items})", _page < 0))
+            // does that the game cannot. The trailing "###" is its identity: without one, a
+            // tab whose total changes is a DIFFERENT widget to ImGui and loses its selection.
+            if (ImGui.Selectable($"Everything ({view.Items}){Money(book, _total)}###everything", _page < 0))
             {
                 _page = -1;
             }
@@ -209,7 +330,9 @@ public sealed class StashWindow
             for (int i = 0; i < view.Pages.Count; i++)
             {
                 StashPage page = view.Pages[i];
-                if (ImGui.Selectable($"{page.Called} ({page.Items.Count})###page{i}", _page == i))
+                string worth = i < _perPage.Length ? Money(book, _perPage[i]) : string.Empty;
+
+                if (ImGui.Selectable($"{page.Called} ({page.Items.Count}){worth}###page{i}", _page == i))
                 {
                     _page = i;
                 }
@@ -221,8 +344,12 @@ public sealed class StashWindow
         }
     }
 
+    /// <summary>What a pile came to, as it goes in a label. Empty when nothing is known.</summary>
+    private static string Money(PriceBook book, Valued valued)
+        => book.Ready && valued.Priced > 0 ? $"  -  {StashWorth.Money(valued.Exalted)} ex" : string.Empty;
+
     /// <summary>The items, each opening to its full stats.</summary>
-    private void Items(StashView view)
+    private void Items(StashView view, PriceBook book)
     {
         if (!ImGui.BeginChild("stash-items", Vector2.Zero, ImGuiChildFlags.Borders))
         {
@@ -257,7 +384,7 @@ public sealed class StashWindow
                     }
 
                     shown++;
-                    One(slot.Item, _page < 0 ? page.Called : string.Empty);
+                    One(slot.Item, _page < 0 ? page.Called : string.Empty, book);
                 }
             }
 
@@ -293,7 +420,7 @@ public sealed class StashWindow
     /// The rectangles come from the game: each item carries its own, which is why a two-by-three
     /// piece of armour takes six cells here without anything having to know what it is.
     /// </remarks>
-    private void Grid(StashPage page)
+    private void Grid(StashPage page, PriceBook book)
     {
         if (!ImGui.BeginChild("stash-grid", Vector2.Zero, ImGuiChildFlags.Borders))
         {
@@ -334,7 +461,7 @@ public sealed class StashWindow
             ulong under = 0;
             foreach (StashSlot slot in page.Items)
             {
-                if (Cell(draw, origin, cell, slot))
+                if (Cell(draw, origin, cell, slot, book))
                 {
                     under = slot.Item.Entity;
                 }
@@ -352,7 +479,7 @@ public sealed class StashWindow
                 ImGui.BeginTooltip();
                 try
                 {
-                    Detail(found.Item);
+                    Detail(found.Item, book);
                 }
                 finally
                 {
@@ -367,7 +494,7 @@ public sealed class StashWindow
     }
 
     /// <summary>One item in its rectangle. True when the cursor is over it.</summary>
-    private bool Cell(ImDrawListPtr draw, Vector2 origin, float cell, StashSlot slot)
+    private bool Cell(ImDrawListPtr draw, Vector2 origin, float cell, StashSlot slot, PriceBook book)
     {
         var from = new Vector2(origin.X + (slot.At.Left * cell), origin.Y + (slot.At.Top * cell));
         var to = new Vector2(from.X + (slot.At.Width * cell), from.Y + (slot.At.Height * cell));
@@ -415,6 +542,17 @@ public sealed class StashWindow
             draw.AddText(from + new Vector2(3f, 1f), ImGui.GetColorU32(WarnText), "?");
         }
 
+        // Bottom left, opposite the stack count, and only for what is worth walking over to -
+        // see WorthSaying.
+        if (book.Of(slot.Item) is { } exalted && exalted >= WorthSaying)
+        {
+            string worth = StashWorth.Money(exalted);
+            Vector2 size = ImGui.CalcTextSize(worth);
+            var at = new Vector2(from.X + 3f, to.Y - size.Y - 2f);
+            draw.AddRectFilled(at - new Vector2(2f, 1f), at + size + new Vector2(2f, 1f), 0xC0000000);
+            draw.AddText(at, ImGui.GetColorU32(MoneyText), worth);
+        }
+
         return ImGui.IsMouseHoveringRect(from, to);
     }
 
@@ -439,7 +577,7 @@ public sealed class StashWindow
     }
 
     /// <summary>One item: a line, and its stats when it is opened.</summary>
-    private void One(InspectedItem item, string where)
+    private void One(InspectedItem item, string where, PriceBook book)
     {
         ImGui.PushID((int)(item.Entity & 0x7FFF_FFFF));
 
@@ -468,6 +606,14 @@ public sealed class StashWindow
             ImGui.SameLine();
             ImGui.TextColored(colour, $"{item.Called}{stack}");
 
+            // Every price it knows, unlike the grid: a list is read a row at a time, so a tenth
+            // of an Exalted here is a fact rather than clutter.
+            if (book.Of(item) is { } exalted)
+            {
+                ImGui.SameLine();
+                ImGui.TextColored(MoneyText, $"{StashWorth.Money(exalted)} ex");
+            }
+
             if (where.Length > 0)
             {
                 ImGui.SameLine();
@@ -482,7 +628,7 @@ public sealed class StashWindow
 
             if (open)
             {
-                Detail(item);
+                Detail(item, book);
             }
         }
         finally
@@ -492,13 +638,24 @@ public sealed class StashWindow
     }
 
     /// <summary>Everything the item says about itself.</summary>
-    private static void Detail(InspectedItem item)
+    private static void Detail(InspectedItem item, PriceBook book)
     {
         ImGui.Indent();
 
         try
         {
             ImGui.TextColored(DimText, item.Path);
+
+            // The unit price as well as the stack's, because they are different questions -
+            // "what is this pile worth" and "what is one of them going for".
+            if (book.Of(item) is { } exalted)
+            {
+                ImGui.TextColored(
+                    MoneyText,
+                    item.Stack > 1
+                        ? $"{StashWorth.Money(exalted)} ex  -  {StashWorth.Money(exalted / item.Stack)} ex each"
+                        : $"{StashWorth.Money(exalted)} ex");
+            }
 
             if (item.Unique.Length > 0)
             {

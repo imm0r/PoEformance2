@@ -66,6 +66,16 @@ public sealed record StashView(IReadOnlyList<StashPage> Pages, string Status)
 /// </remarks>
 public sealed class StashInspector
 {
+    /// <summary>
+    /// How often the league is looked at.
+    /// </summary>
+    /// <remarks>
+    /// It can only change by going out to character selection and back, so this is about not
+    /// making the answer wait for somebody to press "read the stash" - it is a handful of
+    /// pointer reads and a short string, next to a full read of thousands of entities.
+    /// </remarks>
+    public static readonly TimeSpan LeagueEvery = TimeSpan.FromSeconds(5);
+
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
     private readonly ulong _gameStatesStatic;
@@ -75,6 +85,8 @@ public sealed class StashInspector
     private readonly int _serverData;
 
     private StashView _view = StashView.Nothing;
+    private string _league = string.Empty;
+    private long _leagueAt;
     private int _wanted;
     private int _served;
     private int _busy;
@@ -112,9 +124,24 @@ public sealed class StashInspector
     /// </remarks>
     public void ReadAgain() => Interlocked.Increment(ref _wanted);
 
-    /// <summary>Serves a requested read. Called on the reader thread.</summary>
-    public void Service()
+    /// <summary>
+    /// Which league this character is in, or empty until it has been read once.
+    /// </summary>
+    /// <remarks>
+    /// HERE rather than on a reader of its own because it is server data reached by the same
+    /// two-hop resolve the inventories are, and that hop is fiddly enough to be worth having
+    /// once. What wants it is prices: it is spelled exactly as poe.ninja spells it.
+    ///
+    /// The last known league SURVIVES leaving the game. Cleared instead, every loading screen
+    /// would look like "no league" and throw away the book for the league being played.
+    /// </remarks>
+    public string League => Volatile.Read(ref _league);
+
+    /// <summary>Serves a requested read, and keeps the league current. Called on the reader thread.</summary>
+    public void Service(long now)
     {
+        Leagued(now);
+
         int wanted = Volatile.Read(ref _wanted);
         if (wanted == _served)
         {
@@ -137,6 +164,41 @@ public sealed class StashInspector
         finally
         {
             Volatile.Write(ref _busy, 0);
+        }
+    }
+
+    /// <summary>Reads the league, at most every <see cref="LeagueEvery"/>.</summary>
+    /// <remarks>
+    /// Failures are silent and cost nothing: not being in an area is the ordinary state at
+    /// character selection, and a league that cannot be read yet is simply not known yet.
+    /// </remarks>
+    private void Leagued(long now)
+    {
+        if (_leagueAt > 0 && now - _leagueAt < (long)LeagueEvery.TotalMilliseconds)
+        {
+            return;
+        }
+
+        _leagueAt = now;
+
+        try
+        {
+            GameChainAddresses chain = GameChain.Resolve(_reader, _schema, _gameStatesStatic);
+            if (chain.AreaInstance == 0)
+            {
+                return;
+            }
+
+            ulong serverData = ServerData(chain);
+            if (serverData != 0 && _stash.League(serverData) is { Length: > 0 } league)
+            {
+                Volatile.Write(ref _league, league);
+            }
+        }
+        catch (Exception exception) when (exception is not OutOfMemoryException)
+        {
+            // A stale league beats a dead reader thread, and this runs beside a read the game
+            // can invalidate between two pointers.
         }
     }
 

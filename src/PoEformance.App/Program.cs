@@ -404,6 +404,12 @@ internal static class Program
                 FindDataFile("item-names.json"),
                 FindDataFile("unique_ivi_name_map.tsv")));
 
+        // What things are worth. OFF until somebody switches it on in the stash window - and
+        // more firmly than the pictures, because there is no local copy of a price to prefer:
+        // they exist only on somebody else's server. Which league to ask about comes from the
+        // game rather than from a setting, so it cannot go stale at a league start.
+        using var prices = new PoEformance.Features.PriceStore();
+
         // The endgame atlas, which is INTERFACE rather than world: it reads nothing at all
         // while the panel is closed, which is almost all of a session. Its two data files are
         // what turn a node's raw id and content numbers into a name and a list of what is in
@@ -553,7 +559,12 @@ internal static class Program
                 structures.Service();
                 entityParts.Service();
                 atlas.Service(scale, Environment.TickCount64);
-                stash.Service();
+                stash.Service(Environment.TickCount64);
+
+                // On the READER thread, and never waiting: the league is read here every few
+                // seconds, and this only starts a fetch when it is news or the book has aged.
+                prices.Watching(stash.League);
+
                 route.Service(snapshot, Environment.TickCount64);
                 costs.Add(snapshot.Cost, snapshot.AreaHash, Environment.TickCount64);
                 coverage.Look(snapshot);
@@ -607,7 +618,7 @@ internal static class Program
         overlay.ShowWorldDots = debug;
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.AttachAtlas(atlas, changed => PoEformance.Features.AtlasStore.Save(changed));
-        overlay.AttachStash(stash, itemArt);
+        overlay.AttachStash(stash, itemArt, prices);
         overlay.AttachRitual(
             ritual,
             () => atlas.RitualWorth,

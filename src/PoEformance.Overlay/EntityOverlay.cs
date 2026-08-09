@@ -511,15 +511,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// A window and nothing else: it draws nothing over the game, because what it answers -
     /// what have I got, and where - is not a question anybody asks mid-fight.
     /// </remarks>
-    public void AttachStash(StashInspector inspector, ItemArtStore art, bool visible = false)
+    public void AttachStash(StashInspector inspector, ItemArtStore art, PriceStore prices, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(art);
+        ArgumentNullException.ThrowIfNull(prices);
 
         // The icon cache is the overlay's, because uploading a texture needs the renderer -
         // so the window is handed a way to turn a file into something drawable rather than
         // being given the renderer itself.
-        _stashWindow = new StashWindow(inspector, art, file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture)
+        _stashWindow = new StashWindow(
+            inspector, art, prices, file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture)
         {
             Visible = visible,
         };
