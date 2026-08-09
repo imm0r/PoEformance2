@@ -729,6 +729,13 @@
     },
 
 
+    "StdVector": {
+      "comment": "Not a game struct - the SIZE of a std::vector, which is three pointers: begin, end, and the end of the allocation. Needed because an item's five mod lists sit one after another in memory, so walking from one to the next is a stride of this. 0x18 is what the AHK tool strides by (AllMods + 0x18 * n across implicit/explicit/enchant/hellscape/crucible) and what GameHelper2's StdVector declares. DRIFT: nothing here can drift - it is the compiler's layout, not the game's - but it was MISSING from this file entirely, and the item reader asks for it in its constructor. That threw at start-up and took the whole tool down before the overlay ever appeared, from the commit that first read an item's mods until 2026-08-09.",
+      "consts": {
+        "StructSize": "0x18"
+      }
+    },
+
     "ModArray": {
       "comment": "One entry of a mod vector. The ROLLS live here and the stat ids do not: the mod's dat row says which stats it grants, and this holds only the numbers rolled for them - so a '+Life and +Mana' mod has two values and nothing here says which is which.",
       "fields": {
