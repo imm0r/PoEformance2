@@ -80,18 +80,25 @@ public sealed class GameFiles
             return new OpenedFiles(null, "no game folder to look in");
         }
 
+        // THE INSTALL'S OWN OODLE, when it has one. The game cannot run without that library,
+        // so it is always beside the bundles it packed - and a decoder that came with the data
+        // decodes it by construction, where a reimplementation only usually does.
+        Oodle.Unpacker unpacker = Oodle.For(gameFolder);
+        Func<ReadOnlyMemory<byte>, int, byte[]?> undo = decompress ?? unpacker.Decompress;
+        string decoder = decompress is null ? unpacker.Which : "a decoder handed in";
+
         // The loose folder first, because checking for it is one call and it is what a Steam
         // install has. Only a standalone install has the container.
         var loose = new LooseArchive(gameFolder);
         if (loose.Ready)
         {
-            return OpenOrSay(loose, decompress);
+            return Said(OpenOrSay(loose, undo), decoder);
         }
 
         string container = Path.Combine(gameFolder, "Content.ggpk");
         if (GgpkArchive.Open(container) is { } ggpk)
         {
-            return OpenOrSay(ggpk, decompress);
+            return Said(OpenOrSay(ggpk, undo), decoder);
         }
 
         return new OpenedFiles(
@@ -100,6 +107,10 @@ public sealed class GameFiles
                 ? $"{container} is there but did not open as a GGPK - a version this does not understand"
                 : $@"no Bundles2\_.index.bin and no Content.ggpk in {gameFolder}");
     }
+
+    /// <summary>Adds which decoder was used to whatever the open came to.</summary>
+    private static OpenedFiles Said(OpenedFiles opened, string decoder)
+        => opened with { Why = $"{opened.Why} [{decoder}]" };
 
     /// <summary>Opens one from an archive that is already sorted out.</summary>
     public static GameFiles? Open(IGameArchive? archive, Func<ReadOnlyMemory<byte>, int, byte[]?>? decompress = null)
@@ -142,7 +153,7 @@ public sealed class GameFiles
                 null,
                 $"{where}: _.index.bin will not decompress - {packed.Chunks} chunks, "
                 + $"{packed.Compressed} bytes in, {packed.Uncompressed} expected out. "
-                + "That is the Oodle decoder refusing this install's bundles.");
+                + $"The decoder said: {(Oodle.LastRefusal.Length > 0 ? Oodle.LastRefusal : "nothing")}");
         }
 
         BundleIndex? index = BundleIndex.Parse(content);

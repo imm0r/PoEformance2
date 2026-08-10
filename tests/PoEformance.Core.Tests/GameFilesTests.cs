@@ -78,12 +78,13 @@ public class GameFilesTests
 
         // A real bundle whose chunks the decoder refuses - the ONE layer nothing here can test
         // against real data, because there is no Oodle compressor to build a fixture with. So
-        // this message is the first news that the shipped decoder cannot read an install.
+        // this message is the first news that a decoder cannot read an install.
         var refused = new Fake();
         refused.Add("_.index.bin", Packed.Bundle(Packed.Index(["a.bundle"], [])));
         string oodle = GameFiles.OpenOrSay(refused, (packed, size) => null).Why;
         Assert.Contains("will not decompress", oodle, StringComparison.Ordinal);
-        Assert.Contains("Oodle decoder", oodle, StringComparison.Ordinal);
+        Assert.Contains("chunks", oodle, StringComparison.Ordinal);
+        Assert.Contains("The decoder said", oodle, StringComparison.Ordinal);
 
         // And one that unpacks into something that is not an index.
         var notAnIndex = new Fake();
