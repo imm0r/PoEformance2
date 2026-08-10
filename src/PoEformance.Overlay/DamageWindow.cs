@@ -143,29 +143,41 @@ public sealed class DamageWindow
         }
 
         float screens = _meter.FurthestVanish / DamageMeter.ScreenWorldUnits;
+        float gate = _meter.CreditWithin / DamageMeter.ScreenWorldUnits;
 
-        // One screen is the line worth drawing it at: nothing is killed a whole screen away,
-        // so anything beyond that is a disappearance the assumption cannot explain.
-        bool inRange = screens <= 1f;
+        // ONE LINE WHILE NOTHING HAS BEEN REFUSED, because then the two figures are the same
+        // event and printing them as two rows invites them to disagree about it - which they
+        // did: 1.45 screens was called "beyond killing range" on one row and "clear of the
+        // limit" on the next, because the first was judged against a screen and the second
+        // against the limit. Two references for one number is how a readout contradicts
+        // itself, and a reader who has to work out which row to believe has been given less
+        // than one row would have been.
+        if (_meter.WithheldCount == 0)
+        {
+            ImGui.TextColored(
+                DimText,
+                $"  furthest disappearance: {screens:0.00} screens - every one counted, none refused"
+                + (gate > 0f && screens < gate
+                    ? $"; the {gate:0.0}-screen limit is above all of them and is doing nothing"
+                    : string.Empty));
 
+            return;
+        }
+
+        // Both, once the limit has actually refused something - now they are different
+        // events and the gap between them is the finding. The limit's job is to sit in that
+        // gap: the counted figure well below it means it separates two populations, and the
+        // two pressed together means it is cutting through the middle of one.
         ImGui.TextColored(
-            inRange ? DimText : SoftText,
-            $"  furthest disappearance: {screens:0.00} screens"
-            + (inRange
-                ? "  - all within fighting range, so they were kills"
-                : "  - beyond killing range, so the game does drop distant monsters"));
+            SoftText,
+            $"  furthest disappearance: {screens:0.00} screens - refused, so beyond the limit");
 
         if (_meter.FurthestCounted < 0f)
         {
             return;
         }
 
-        // The pair is the point, not either number alone: one says how far the
-        // disappearances reach, the other how far the ones being BELIEVED reach, and the
-        // gate's job is to sit in the gap between them. Pressed together means there is no
-        // gap and the threshold is cutting through one population rather than between two.
         float counted = _meter.FurthestCounted / DamageMeter.ScreenWorldUnits;
-        float gate = _meter.CreditWithin / DamageMeter.ScreenWorldUnits;
         bool roomy = gate <= 0f || counted <= gate * 0.75f;
 
         ImGui.TextColored(
