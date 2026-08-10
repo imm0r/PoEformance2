@@ -249,9 +249,6 @@ public sealed class EntityInspector
     /// </remarks>
     private (List<EntityStat> Stats, string Note) ReadStats(Entity entity)
     {
-        const int MaxStats = 256;
-        const int PairSize = 8;
-
         var stats = new List<EntityStat>();
         ulong component = entity.Component("Stats");
         if (component == 0)
@@ -259,48 +256,85 @@ public sealed class EntityInspector
             return (stats, string.Empty);
         }
 
+        // THE COMPONENT HOLDS NO PAIRS. It holds pointers to StatsInternal structures, and
+        // the pairs are in those - which is worth stating because the first version of this
+        // read the vector straight off the component, got a zeroed field on every entity, and
+        // reported "nothing readable in it" for a flame wall that has stats like anything
+        // else. Verified against the recording: Stats+0xF8 and Stats+0x100 both read 0x0.
         StructDef layout = _schema.Structs["Stats"];
-        int at = layout.OffsetOf("StatsInternalStatsVector");
-        if (!_reader.TryRead(component + (ulong)at, out ulong first)
-            || !_reader.TryRead(component + (ulong)(at + 8), out ulong last))
+        var notes = new List<string>();
+
+        foreach (string source in new[] { "StatsByBuffAndActions", "StatsByItems" })
         {
-            return (stats, "carries Stats, and it could not be read");
+            if (!_reader.TryRead(component + (ulong)layout.OffsetOf(source), out ulong internals))
+            {
+                notes.Add($"{source} could not be read");
+                continue;
+            }
+
+            if (!MemoryReaderExtensions.IsPlausiblePointer(internals))
+            {
+                notes.Add($"no {source}");
+                continue;
+            }
+
+            (int taken, string note) = ReadPairs(internals, stats);
+            notes.Add($"{taken} from {source}{note}");
+        }
+
+        return (stats, $"carries Stats: {string.Join(", ", notes)}");
+    }
+
+    /// <summary>Pulls the (id, value) pairs out of one StatsInternal, into <paramref name="into"/>.</summary>
+    /// <remarks>
+    /// Capped, and the cap is REPORTED: a list that stops at 256 while looking complete is how
+    /// somebody concludes a stat is absent when it is merely off the end. An empty vector is
+    /// begin == end == null and means the entity has no stats from that source, which is not
+    /// the same as a vector nobody could read - the two used to print the same sentence.
+    /// </remarks>
+    private (int Taken, string Note) ReadPairs(ulong internals, List<EntityStat> into)
+    {
+        const int MaxStats = 256;
+        const int PairSize = 8;
+
+        StructDef layout = _schema.Structs["StatsInternal"];
+        if (!_reader.TryRead(internals + (ulong)layout.OffsetOf("StatsVector"), out ulong first)
+            || !_reader.TryRead(internals + (ulong)layout.OffsetOf("StatsVectorLast"), out ulong last))
+        {
+            return (0, " (unreadable)");
+        }
+
+        if (first == 0 && last == 0)
+        {
+            return (0, " (empty)");
         }
 
         if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last < first)
         {
-            return (stats, "carries Stats, with nothing readable in it");
+            return (0, " (not a vector)");
         }
 
         long count = (long)(last - first) / PairSize;
         if (count is < 0 or > 65536)
         {
-            return (stats, $"carries Stats, and its vector reads as {count} pairs - not believable");
-        }
-
-        if (count == 0)
-        {
-            return (stats, "carries Stats, with no numbers in it");
+            return (0, $" ({count} pairs - not believable)");
         }
 
         int wanted = (int)Math.Min(count, MaxStats);
         byte[] block = new byte[wanted * PairSize];
-        if (!_reader.TryRead(first, block))
+        if (wanted > 0 && !_reader.TryRead(first, block))
         {
-            return (stats, "carries Stats, and its vector could not be read");
+            return (0, " (vector unreadable)");
         }
 
         for (int i = 0; i < wanted; i++)
         {
-            stats.Add(new EntityStat(
+            into.Add(new EntityStat(
                 BitConverter.ToUInt32(block, i * PairSize),
                 BitConverter.ToInt32(block, (i * PairSize) + 4)));
         }
 
-        string note = count > wanted
-            ? $"{count} stats, showing the first {wanted}:"
-            : $"{count} stats:";
-        return (stats, note);
+        return (wanted, count > wanted ? $" (of {count})" : string.Empty);
     }
 
     /// <summary>Counts every component name across a set of entities.</summary>

@@ -674,12 +674,24 @@
     },
 
     "Stats": {
+      "comment": "The component. It holds no stat pairs itself - it holds POINTERS to StatsInternal sub-structures, and the pairs live in those. Written down because the layout invited exactly one wrong reading and got it: StatsInternalStatsVector was declared here as though 0xF8 were an offset into the component, and reading it that way returns a zeroed field on every entity, which then looks like 'this entity has no stats'. Verified against a flame wall in a recorded session: Stats+0xF8 and Stats+0x100 both read 0x0, while the AHK tool reaches the same data through StatsByItems and StatsByBuffAndActions. Offsets from that tool, which is battle-tested against PoE2.",
       "fields": {
-        "StatsInternalStatsVector": {
+        "StatsByItems": { "offset": "0x160", "type": "ptr", "comment": "-> StatsInternal: what the entity's gear gives it." },
+        "CurrentWeaponIndex": { "offset": "0x168", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 8 } },
+        "ShapeshiftPtr": { "offset": "0x170", "type": "ptr", "comment": "Non-null while shapeshifted." },
+        "StatsByBuffAndActions": { "offset": "0x1C8", "type": "ptr", "comment": "-> StatsInternal: what buffs and actions give it. The one a skill's own numbers would be in." }
+      }
+    },
+
+    "StatsInternal": {
+      "comment": "A bag of (stat id, value) pairs, pointed at by the Stats component. The ids are the game's own, out of its Stats table - 347 is base_skill_effect_duration, 351 is skill_effect_duration.",
+      "fields": {
+        "StatsVector": {
           "offset": "0xF8", "type": "stdVector",
           "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 8192 },
-          "comment": "Vector of (key u32, value i32) stat pairs."
-        }
+          "comment": "Vector of (key u32, value i32) pairs, inline at an 8-byte stride."
+        },
+        "StatsVectorLast": { "offset": "0x100", "type": "ptr", "comment": "End of the vector; count = (Last - First) / 8." }
       }
     },
 
