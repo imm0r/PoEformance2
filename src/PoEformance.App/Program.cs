@@ -216,7 +216,8 @@ internal static class Program
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
                 uiBrowser: options.ShowUiBrowser,
                 fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
-                areaCounter: result.Statics.FirstOrDefault(s => s.Name == "AreaChangeCounter" && s.Found)?.Address ?? 0);
+                areaCounter: result.Statics.FirstOrDefault(s => s.Name == "AreaChangeCounter" && s.Found)?.Address ?? 0,
+                recorder: recorder);
         }
 
         configWindow?.Join();
@@ -350,7 +351,7 @@ internal static class Program
         PoEformance.Features.AutoFlask autoFlask,
         PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
-        ulong fileRoot, ulong areaCounter)
+        ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation)
         {
@@ -571,6 +572,14 @@ internal static class Program
         using var feed = new PoEformance.Features.SnapshotFeed(
             scale =>
             {
+                // The recording's clock, and its only one once the startup report is over.
+                // Without this every read the overlay ever makes lands in the same frame:
+                // a recording of a whole map clear replayed as one instant, with no way to
+                // ask what memory held at second forty - which is the entire reason for
+                // recording a map clear. It is also where the file is flushed, so a session
+                // that ends by being killed still ends somewhere.
+                recorder?.MarkFrame();
+
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
                 uiTree.Service(scale);
                 structures.Service();
