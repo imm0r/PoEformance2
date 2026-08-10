@@ -141,14 +141,38 @@ public sealed class DamageMeter
     /// stopped keeping it. Those are the ones that were last seen a long way off, so distance
     /// separates them from kills without needing to know why the game drops entities.
     ///
-    /// Two screens by default: wide enough that no real kill is near it - nothing is killed
-    /// two screens away - and narrow enough to exclude a pack abandoned across the map. It is
-    /// deliberately generous, because the cost of the two mistakes is not symmetric: refusing
-    /// a real kill loses damage that was definitely dealt, while accepting a stray costs a
-    /// monster's pool. <see cref="Withheld"/> reports what it refused, so the setting can be
-    /// judged against a real map rather than argued about.
+    /// It was two screens, chosen to be generous because the cost of the two mistakes is not
+    /// symmetric. Then a whole map was recorded and the setting was judged against it rather
+    /// than argued about, which is what <see cref="Withheld"/> exists for - and two screens
+    /// turned out to refuse NOTHING while letting through four times more credit than the
+    /// damage anybody watched fall.
+    ///
+    /// Sorted by how far away each vanishing was, on 321 seconds of one map:
+    ///
+    /// <code>
+    ///   world units    grid       hurt then vanished     vanished untouched
+    ///      0 -  250    0 -  23     7      58,318          6         78,898
+    ///    250 -  500   23 -  46    17     215,933         10        205,434
+    ///    500 - 1000   46 -  92    37     363,367         21        409,830
+    ///   1000 - 1500   92 - 138     8      84,619          5         80,605
+    ///   1500 - 2000  138 - 184     1       4,211         36      1,176,856
+    ///   2000 - 2500  184 - 230     2      60,894         93      6,410,017
+    ///   2500 - 3000  230 - 276     -           -         45      2,878,998
+    ///   3000 - 4000  276 - 368     -           -          8        322,567
+    /// </code>
+    ///
+    /// Two populations, and they barely overlap. Monsters that were HURT and then went are
+    /// almost all inside 1500 units - 69 of 72 - which is what killing something looks like.
+    /// Monsters that went having never lost a point cluster at 1500 to 3000, which is where
+    /// the game stops keeping entities: 182 of 224 of them, carrying 10.8 million of pool.
+    /// The most common one by name was VaalTrainingDummyIncursion, thirty-four times, which
+    /// nobody killed at all.
+    ///
+    /// So the gate sits in the gap between them. At 0.8 screens it keeps 92% of the credit
+    /// for monsters that were actually damaged and refuses 93% of the credit for monsters
+    /// that never were.
     /// </remarks>
-    public float CreditWithin { get; set; } = 2f * ScreenWorldUnits;
+    public float CreditWithin { get; set; } = 0.8f * ScreenWorldUnits;
 
     /// <summary>Damage per second, smoothed - the headline figure.</summary>
     public float Dps => _overall;
