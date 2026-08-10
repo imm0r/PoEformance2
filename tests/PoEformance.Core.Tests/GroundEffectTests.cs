@@ -73,6 +73,50 @@ public class GroundEffectTests
             $"only {realMonsters.Count} monster names survived: {string.Join(", ", realMonsters.Order())}");
     }
 
+    /// <summary>Your own flame wall is an effect, so the overlay stops drawing it.</summary>
+    /// <remarks>
+    /// The overlay already refuses to draw friendly effects, and its comment already said
+    /// what one is - "a minion or a totem is targetable, so it is not an effect and stays
+    /// drawn". What it was reading that off was the EXPIRING rule, and a flame wall does not
+    /// expire by any signal the reader can see: over this map it carries Life 1/1, no
+    /// DiesAfterTime, and no Targetable component at all. 9,313 sightings, every one a dot.
+    ///
+    /// Firewall is the only friendly name in this recording, so this pins the half that can
+    /// be checked. The other half - that a minion or a totem, which enemies can target, keeps
+    /// its dot - is in <see cref="AnUnreadableEntityIsNotAnEffect"/> against a built entity,
+    /// because there was no minion in the map to check it against.
+    /// </remarks>
+    [Fact]
+    public void NothingFriendlyIsLeftForTheOverlayToDrawAsAMonster()
+    {
+        var replay = ReplayMemoryReader.Load(File.OpenRead(RealSessionTests.MapFixturePath));
+        var world = new WorldReader(replay, RealSessionTests.Schema());
+        ulong gameStates = replay.ResolvedStatics["GameStates"];
+
+        var drawn = new HashSet<string>();
+        int friendlySightings = 0;
+
+        for (int frame = 0; frame <= 6878; frame += 7)
+        {
+            replay.Seek((uint)frame);
+            foreach (WorldEntity monster in world.Read(gameStates).Entities
+                .Where(e => e.Kind == EntityKind.Monster && e.IsFriendly))
+            {
+                friendlySightings++;
+                if (!monster.IsEffect)
+                {
+                    drawn.Add(monster.FileName);
+                }
+            }
+        }
+
+        Assert.Empty(drawn);
+
+        // The map really is full of them, so the assertion above is about something.
+        Assert.True(friendlySightings > 1000,
+            $"only {friendlySightings} friendly sightings, so this proves nothing");
+    }
+
     /// <summary>An entity nobody could read is not declared an effect.</summary>
     /// <remarks>
     /// The dangerous direction. "No Life component" and "no component list" look identical
@@ -101,6 +145,29 @@ public class GroundEffectTests
         var summoned = new MonsterSigns(
             Health: 100, Targetable: true, IsBoss: false, Temporary: true, HasLife: true);
         Assert.False(summoned.IsEffect);
+
+        // Your own minion or totem: friendly, and enemies can target it, so it keeps its dot.
+        // The half of the friendly rule the recording could not check, because the map held
+        // no minion - built here instead of left to be found out in a fight.
+        var minion = new MonsterSigns(
+            Health: 900, Targetable: true, IsBoss: false,
+            Friendly: true, HasLife: true, HasTargetable: true);
+        Assert.False(minion.IsEffect);
+
+        // Your own flame wall: friendly, and nothing can target it.
+        var wall = new MonsterSigns(
+            Health: 1, Targetable: null, IsBoss: false,
+            Friendly: true, HasLife: true, HasTargetable: false);
+        Assert.True(wall.IsEffect);
+        Assert.False(wall.IsHostileEffect); // kept in the snapshot; only the drawing stops
+
+        // A HOSTILE thing nothing can target is NOT called an effect on that basis alone.
+        // Thin evidence, and hiding a live monster is the expensive mistake - so the rule is
+        // deliberately one-sided.
+        var stranger = new MonsterSigns(
+            Health: 900, Targetable: null, IsBoss: false,
+            Friendly: false, HasLife: true, HasTargetable: false);
+        Assert.False(stranger.IsEffect);
     }
 
     /// <summary>The corpse readout counts what the corpse rule is a question about.</summary>
