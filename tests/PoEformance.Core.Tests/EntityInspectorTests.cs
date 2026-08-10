@@ -148,6 +148,86 @@ public class EntityInspectorTests
         Assert.Equal("SomethingNobodyHasRead", view.Components[0].Name);
     }
 
+    /// <summary>What is on an entity with a clock running, and what has no clock at all.</summary>
+    /// <remarks>
+    /// The question this exists to answer: a flame wall obviously has a duration - the game
+    /// prints it in the tooltip - and it carries no DiesAfterTime component whatsoever, so the
+    /// classification cannot see it expire. If the duration is anywhere on the entity it is
+    /// here, on the Buffs component, which is where the reference reads every other duration
+    /// from. Reading it for the SELECTED entity only is what makes the vector walk affordable.
+    ///
+    /// The permanent case is the one worth building: a buff that never ends does not report a
+    /// duration of zero, it reports INFINITY, and formatted naively that reads as a number
+    /// somebody could act on. The reference's buff bar tells the two apart by exactly this
+    /// test, and so does the browser.
+    /// </remarks>
+    [Fact]
+    public void TimedEffectsOnAnEntityAreReadWithTheirClocks()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Firewall", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Buffs");
+
+        StructDef buffs = schema.Structs["Buffs"];
+        StructDef effect = schema.Structs["StatusEffect"];
+        StructDef definition = schema.Structs["BuffDefinition"];
+        int stride = (int)buffs.Constants["StatusEffectStructSize"];
+
+        // The Buffs component the entity builder placed, and a two-entry vector after it.
+        EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        ulong component = placed.Components.Single(c => c.Name == "Buffs").Address;
+
+        const ulong VectorAt = 0x3000_0000_0000;
+        const ulong TimedDefAt = 0x3000_0001_0000;
+        const ulong ForeverDefAt = 0x3000_0002_0000;
+        const ulong TimedNameAt = 0x3000_0003_0000;
+        const ulong ForeverNameAt = 0x3000_0004_0000;
+
+        reader.Place(component + (ulong)buffs.OffsetOf("StatusEffectFirst"), VectorAt);
+        reader.Place(component + (ulong)buffs.OffsetOf("StatusEffectLast"), VectorAt + (ulong)(2 * stride));
+
+        reader.Place(VectorAt + (ulong)effect.OffsetOf("BuffDefinitionPtr"), TimedDefAt);
+        reader.Place(VectorAt + (ulong)effect.OffsetOf("TimeLeft"), 4.5f);
+        reader.Place(VectorAt + (ulong)effect.OffsetOf("TotalTime"), 10.3f);
+        reader.Place(TimedDefAt + (ulong)definition.OffsetOf("Name"), TimedNameAt);
+        reader.PlaceUtf16(TimedNameAt, "wall_of_fire");
+
+        ulong second = VectorAt + (ulong)stride;
+        reader.Place(second + (ulong)effect.OffsetOf("BuffDefinitionPtr"), ForeverDefAt);
+        reader.Place(second + (ulong)effect.OffsetOf("TimeLeft"), float.PositiveInfinity);
+        reader.Place(second + (ulong)effect.OffsetOf("TotalTime"), float.PositiveInfinity);
+        reader.Place(ForeverDefAt + (ulong)definition.OffsetOf("Name"), ForeverNameAt);
+        reader.PlaceUtf16(ForeverNameAt, "something_permanent");
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Equal(2, view.Timed.Count);
+
+        TimedEffect timed = view.Timed.Single(e => e.Name == "wall_of_fire");
+        Assert.Equal(4.5f, timed.TimeLeft, 3);
+        Assert.Equal(10.3f, timed.TotalTime, 3);
+
+        // Infinity, not zero. A duration of zero would read as "about to expire", which is
+        // the opposite of what a permanent effect means.
+        TimedEffect forever = view.Timed.Single(e => e.Name == "something_permanent");
+        Assert.False(float.IsFinite(forever.TimeLeft));
+    }
+
+    /// <summary>An entity with no Buffs component reports no effects rather than null.</summary>
+    [Fact]
+    public void AnEntityWithoutBuffsHasNoEffectsAndDoesNotThrow()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Skeleton", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Life");
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Empty(view.Timed);
+    }
+
     [Fact]
     public void AnAddressThatIsNotAnEntityIsReportedRatherThanThrown()
     {

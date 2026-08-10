@@ -265,6 +265,32 @@ public sealed class EntityBrowserWindow
 
         ImGui.Separator();
 
+        // What is on this entity with a clock running. Here rather than in the world read
+        // because it is a vector walk per entity - affordable for the one under the cursor,
+        // not for all of them - and here rather than nowhere because it answers a question
+        // the component list cannot: whether a thing expires, and when. A flame wall carries
+        // no DiesAfterTime component at all, so this is the only place its duration could
+        // show up, and the only way to find out is to look at one.
+        if (view.Timed.Count > 0)
+        {
+            ImGui.TextColored(PathText, $"{view.Timed.Count} on this entity:");
+            foreach (TimedEffect effect in view.Timed)
+            {
+                // A permanent effect is not a duration of zero, it is a duration of INFINITY -
+                // or of NaN. Straight from the reference's buff bar, which tells the two apart
+                // exactly this way; formatted naively it reads "8 of 8s" and looks like a
+                // number somebody could act on.
+                bool finite = float.IsFinite(effect.TimeLeft) && float.IsFinite(effect.TotalTime);
+                string clock = finite && effect.TimeLeft > 0f
+                    ? $"{effect.TimeLeft:F1} of {effect.TotalTime:F1}s left"
+                    : "permanent";
+                string charges = effect.Charges > 0 ? $"  x{effect.Charges}" : string.Empty;
+                ImGui.TextColored(DimText, $"    {ImGuiText.Escape(effect.Name)}  {clock}{charges}");
+            }
+
+            ImGui.Separator();
+        }
+
         if (view.Undescribed > 0)
         {
             ImGui.TextColored(UnknownText, $"{view.Undescribed} of {view.Components.Count} not described");
