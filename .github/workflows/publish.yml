@@ -9,7 +9,20 @@ permissions:
 
 jobs:
   publish:
-    runs-on: windows-latest
+    # UBUNTU, for a Windows build, and that is a billing decision rather than a preference.
+    # Private-repository Actions minutes are metered with a multiplier: Linux counts 1x and
+    # Windows 2x, so this job cost twice what it needed to. When the account's quota ran out
+    # this was the workflow that had to survive - it is the one that produces the thing
+    # people download - so it moved to the cheaper runner.
+    #
+    # It is only sound because this publish is NOT AOT. A non-AOT self-contained publish is
+    # a cross-compile the SDK supports: it restores the win-x64 runtime pack and lays it out,
+    # rather than invoking a native toolchain. Verified rather than assumed - publishing this
+    # exact command on Linux produces "PE32+ executable (console) x86-64, for MS Windows"
+    # plus every native dependency (cimgui.dll, WebView2Loader.dll, oo2core.dll) and the
+    # schema, data and ui folders. AOT is the case that genuinely cannot cross-compile, and
+    # its gate in ci.yml is still on windows-latest for exactly that reason.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -24,9 +37,22 @@ jobs:
           -p:PublishSingleFile=true
           -p:PublishAot=false
 
+      # Fails loudly if the layout is not what a Windows user needs. On a cross-compile this
+      # is worth asserting rather than trusting: the failure mode of a wrong RID is a publish
+      # folder that looks plausible and holds no exe, and the release would go out empty.
+      - name: Check the publish produced a Windows build
+        run: |
+          out="src/PoEformance.App/bin/Release/net10.0-windows/win-x64/publish"
+          test -f "$out/PoEformance.App.exe" || { echo "no exe produced"; exit 1; }
+          file "$out/PoEformance.App.exe" | grep -q "MS Windows" || {
+            echo "not a Windows binary:"; file "$out/PoEformance.App.exe"; exit 1; }
+          test -f "$out/schema/poe2.offsets.json" || { echo "no schema beside the exe"; exit 1; }
+          ls -la "$out"
+
       - name: Zip the publish output
-        shell: pwsh
-        run: Compress-Archive -Path src/PoEformance.App/bin/Release/net10.0-windows/win-x64/publish/* -DestinationPath PoEformance-win-x64.zip
+        run: |
+          cd src/PoEformance.App/bin/Release/net10.0-windows/win-x64/publish
+          zip -qr "$GITHUB_WORKSPACE/PoEformance-win-x64.zip" .
 
       # THE RELEASE FIRST, and that ordering is the whole point of this arrangement. It is
       # what anybody actually downloads; the artifact below is a convenience. With the
@@ -39,18 +65,27 @@ jobs:
       # Rolling release: one stable download URL that always carries the newest build.
       # First run creates it; every later run replaces the asset and refreshes the notes.
       - name: Update the latest-dev release
-        shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $notes = "Automatic build of ``${{ github.sha }}`` ($(Get-Date -Format 'yyyy-MM-dd HH:mm') UTC).`n`nUnzip anywhere and run ``PoEformance.App.exe`` from an elevated terminal. ``schema\poe2.offsets.json`` sits next to the exe and stays hot-editable (``--watch``). No .NET install required."
-          gh release view latest-dev 2>$null
-          if ($LASTEXITCODE -ne 0) {
-            gh release create latest-dev PoEformance-win-x64.zip --prerelease --title "Latest build (auto)" --notes $notes
-          } else {
+          # Written to a file rather than passed inline: the notes are full of backticks,
+          # and every layer that would otherwise have to be escaped through is one more
+          # place for the release notes to come out mangled.
+          cat > notes.md <<EOF
+          Automatic build of \`${{ github.sha }}\` ($(date -u '+%Y-%m-%d %H:%M') UTC).
+
+          Unzip anywhere and run \`PoEformance.App.exe\` from an elevated terminal.
+          \`schema\poe2.offsets.json\` sits next to the exe and stays hot-editable
+          (\`--watch\`). No .NET install required.
+          EOF
+
+          if gh release view latest-dev >/dev/null 2>&1; then
             gh release upload latest-dev PoEformance-win-x64.zip --clobber
-            gh release edit latest-dev --notes $notes
-          }
+            gh release edit latest-dev --notes-file notes.md
+          else
+            gh release create latest-dev PoEformance-win-x64.zip \
+              --prerelease --title "Latest build (auto)" --notes-file notes.md
+          fi
 
       # And a per-commit copy, which is useful for fetching the build of an older commit -
       # the release only ever holds the newest.
