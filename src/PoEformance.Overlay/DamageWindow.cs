@@ -67,8 +67,9 @@ public sealed class DamageWindow
         // merely walked off would land in.
         ImGui.TextColored(
             SoftText,
-            $"  untouched: {Number(_meter.CreditedUntouched)}  vanished without a scratch seen"
-            + $"   ({Share(_meter.CreditedUntouched, _meter.Total)} of the total)");
+            ImGuiText.Escape(
+                $"  untouched: {Number(_meter.CreditedUntouched)}  vanished without a scratch seen"
+                + $"   ({Share(_meter.CreditedUntouched, _meter.Total)} of the total)"));
 
         if (_meter.WithheldCount > 0)
         {
@@ -153,10 +154,13 @@ public sealed class DamageWindow
                 ImGui.TableNextRow();
 
                 ImGui.TableNextColumn();
-                ImGui.TextColored(Tint(target.Rarity), target.Name);
+                // Escaped, because this one is not a line somebody wrote - it is the
+                // monster's own name out of the game, and a mod called "100% Increased"
+                // would be read as a format specifier.
+                ImGui.TextColored(Tint(target.Rarity), ImGuiText.Escape(target.Name));
 
                 ImGui.TableNextColumn();
-                ImGui.TextColored(DimText, target.Percent >= 0 ? $"{target.Percent}%" : "-");
+                ImGui.TextColored(DimText, target.Percent >= 0 ? $"{target.Percent}%%" : "-");
 
                 ImGui.TableNextColumn();
                 ImGui.TextColored(DpsText, Number(target.Dps));

@@ -1265,8 +1265,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 {
                     ImGui.TextColored(
                         new Vector4(0.65f, 0.75f, 0.68f, 1f),
-                        $"walked:   {walked.Percent:F0}%   ({walked.SeenCells} of {walked.ReachableCells})"
-                        + (walked.RegionKnown ? string.Empty : "  - still working out what is reachable"));
+                        ImGuiText.Escape(
+                            $"walked:   {walked.Percent:F0}%   ({walked.SeenCells} of {walked.ReachableCells})"
+                            + (walked.RegionKnown ? string.Empty : "  - still working out what is reachable")));
                 }
                 if (ReadStats is not null)
                 {
