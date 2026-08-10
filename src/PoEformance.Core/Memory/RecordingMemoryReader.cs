@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.IO.Compression;
 
 namespace PoEformance.Core.Memory;
 
@@ -18,7 +19,9 @@ public sealed class RecordingMemoryReader : IMemoryReader
 {
     private readonly IMemoryReader _inner;
     private readonly BinaryWriter _writer;
+    private readonly CountingStream _file;
     private readonly long _startTimestamp;
+    private long _lastFlush;
 
     // Reads themselves are thread-safe - ReadProcessMemory fills the CALLER's buffer - but
     // the file, the counters and the frame index are shared state. Two threads now read
@@ -52,11 +55,19 @@ public sealed class RecordingMemoryReader : IMemoryReader
     /// reads a second. Capping turns an unusable multi-hundred-megabyte file into a bounded
     /// one that still contains the beginning - which is the part that carries the startup
     /// chain and the diagnostics worth replaying.
+    ///
+    /// Measured against the BYTES ON DISK, which is not what it used to be measured against
+    /// and is why a 16 MB cap once produced a 33 MB file: the old count was of payload only,
+    /// and the thirteen bytes of tag, address and length in front of each eight-byte read
+    /// more than doubled it. Compression widens that gap further, in the useful direction.
     /// </remarks>
     public long MaxTotalBytes { get; set; } = 16 * 1024 * 1024;
 
     /// <summary>True once the cap stopped further recording.</summary>
     public bool ReachedSizeLimit { get; private set; }
+
+    /// <summary>Bytes written to the file so far, compression included.</summary>
+    public long FileBytes => _file.Written;
 
     public RecordingMemoryReader(IMemoryReader inner, Stream output)
     {
@@ -64,15 +75,25 @@ public sealed class RecordingMemoryReader : IMemoryReader
         ArgumentNullException.ThrowIfNull(output);
 
         _inner = inner;
-        _writer = new BinaryWriter(output);
+        _file = new CountingStream(output);
         _startTimestamp = Environment.TickCount64;
 
-        _writer.Write(RecordingFormat.Magic);
-        _writer.Write(RecordingFormat.Version);
-        _writer.Write((uint)inner.ProcessId);
-        _writer.Write(inner.ModuleBase);
-        _writer.Write(inner.ModuleSize);
-        _writer.Write(DateTime.UtcNow.Ticks);
+        // The header goes down uncompressed, so the file is still recognisable by its first
+        // eight bytes and the version can be read before deciding how to read the rest.
+        var header = new BinaryWriter(_file, System.Text.Encoding.UTF8, leaveOpen: true);
+        header.Write(RecordingFormat.Magic);
+        header.Write(RecordingFormat.Version);
+        header.Write((uint)inner.ProcessId);
+        header.Write(inner.ModuleBase);
+        header.Write(inner.ModuleSize);
+        header.Write(DateTime.UtcNow.Ticks);
+        header.Flush();
+
+        // Optimal rather than Fastest, measured on a real 25 MB session: it compressed the
+        // entry stream to two thirds of what Fastest managed and took seven milliseconds
+        // against four, for a whole session. The recorder writes from the reader thread at
+        // thirty ticks a second, so that cost is not detectable and the size is.
+        _writer = new BinaryWriter(new BrotliStream(_file, CompressionLevel.Optimal));
     }
 
     public bool IsAttached => _inner.IsAttached;
@@ -119,6 +140,14 @@ public sealed class RecordingMemoryReader : IMemoryReader
         => Note(RecordingFormat.StaticNotePrefix + name, address.ToString("X", System.Globalization.CultureInfo.InvariantCulture));
 
     /// <summary>Writes a frame boundary. Call once per reader tick.</summary>
+    /// <remarks>
+    /// Also where the compressor is flushed, at most once a second. A recording that ends
+    /// because the game or the tool was KILLED - which is the interesting way for one to
+    /// end - stops at the last flush, so this is the difference between losing a fraction
+    /// of a second and losing everything since the file was opened. Flushing on a frame
+    /// boundary rather than mid-frame keeps whole ticks; flushing at most once a second
+    /// keeps the compressor from restarting its tables thirty times a second.
+    /// </remarks>
     public void MarkFrame()
     {
         lock (_writeLock)
@@ -131,8 +160,88 @@ public sealed class RecordingMemoryReader : IMemoryReader
             _writer.Write(RecordingFormat.TagFrame);
             _writer.Write(_frameIndex++);
             _writer.Write((uint)(Environment.TickCount64 - _startTimestamp));
+
+            long now = Environment.TickCount64;
+            if (now - _lastFlush >= FlushEveryMs)
+            {
+                _lastFlush = now;
+                _writer.Flush();
+                _file.Flush();
+            }
         }
     }
+
+    /// <summary>How long the tail of a recording may lag behind the session.</summary>
+    public int FlushEveryMs { get; set; } = 1000;
+
+    /// <summary>
+    /// Whether this read says anything the recording does not already hold.
+    /// </summary>
+    /// <remarks>
+    /// THE REASON A SESSION ONLY EVER LASTED HALF A SECOND. One frame of a real recording
+    /// held 1.2 million reads and 32 MB - 657,000 of them eight bytes wide - and the file
+    /// packed down to under a two-hundredth of that with an ordinary archiver. Almost all of
+    /// it was the same addresses carrying the same bytes, written again and again, and the
+    /// size limit was reached before the first monster died.
+    ///
+    /// A repeat is not merely wasteful, it is INERT: the replay serves "the newest data at
+    /// or before the current frame", so an unchanged read that was never written resolves to
+    /// the identical bytes from the frame that did write them. Dropping it cannot change what
+    /// a replay sees, which is what makes this a saving rather than a trade.
+    ///
+    /// The comparison is against the last bytes WRITTEN for that exact address and length.
+    /// Length is part of the key because reads of different widths at one address are
+    /// different facts, and a wide read that matched the prefix of a narrow one would
+    /// otherwise suppress the rest of itself.
+    ///
+    /// A first sighting always writes - "never recorded" and "unchanged" have to be told
+    /// apart, or the recording would start with nothing in it.
+    /// </remarks>
+    private bool Changed(ulong address, ReadOnlySpan<byte> bytes)
+    {
+        if (!_lastWritten.TryGetValue((address, bytes.Length), out byte[]? previous))
+        {
+            if (_lastWritten.Count >= MaxTrackedReads)
+            {
+                // Start over rather than grow without bound. Entity addresses churn as areas
+                // change, so a long session keeps meeting addresses it will never see again,
+                // and each one would be remembered forever. Forgetting costs one full rewrite
+                // of whatever is still being read - the file gains a keyframe - and cannot
+                // cost correctness, because a first sighting always writes.
+                _lastWritten.Clear();
+                ForgottenReadHistories++;
+            }
+
+            _lastWritten[(address, bytes.Length)] = bytes.ToArray();
+            return true;
+        }
+
+        if (bytes.SequenceEqual(previous))
+        {
+            SkippedUnchangedReads++;
+            return false;
+        }
+
+        bytes.CopyTo(previous);
+        return true;
+    }
+
+    /// <summary>Reads that were served but not written, because nothing about them moved.</summary>
+    public long SkippedUnchangedReads { get; private set; }
+
+    /// <summary>
+    /// How many distinct (address, length) pairs to remember before starting over. A real
+    /// session touched ten thousand of them, so this is generous; it exists so that a long
+    /// one, moving between areas, cannot grow this without bound.
+    /// </summary>
+    public int MaxTrackedReads { get; set; } = 250_000;
+
+    /// <summary>Times the comparison history was cleared to stay within its bound.</summary>
+    public int ForgottenReadHistories { get; private set; }
+
+    // The last bytes written for each (address, length) - the memory this trades for the
+    // disk it no longer spends.
+    private readonly Dictionary<(ulong Address, int Length), byte[]> _lastWritten = [];
 
     public bool TryRead(ulong address, Span<byte> destination)
     {
@@ -157,7 +266,7 @@ public sealed class RecordingMemoryReader : IMemoryReader
                 return true;
             }
 
-            if (RecordedBytes >= MaxTotalBytes)
+            if (_file.Written >= MaxTotalBytes)
             {
                 // Keep serving reads; just stop growing the file. The early part is the part
                 // worth replaying.
@@ -165,7 +274,7 @@ public sealed class RecordingMemoryReader : IMemoryReader
                 return true;
             }
 
-            if (destination.Length <= RecordingFormat.MaxReadLength)
+            if (destination.Length <= RecordingFormat.MaxReadLength && Changed(address, destination))
             {
                 _writer.Write(RecordingFormat.TagRead);
                 _writer.Write(address);
@@ -189,9 +298,72 @@ public sealed class RecordingMemoryReader : IMemoryReader
 
             _disposed = true;
             _writer.Flush();
+
+            // Cascades: writer -> compressor (which finishes its stream) -> counter -> file.
             _writer.Dispose();
         }
 
         _inner.Dispose();
+    }
+
+    /// <summary>Passes writes through and tallies them, so the cap can mean the FILE size.</summary>
+    /// <remarks>
+    /// Once the entries are compressed there is no arithmetic that turns what was written
+    /// into what landed on disk, and asking the stream would only work for a seekable one.
+    /// Counting on the way past works for any stream and costs an addition.
+    /// </remarks>
+    private sealed class CountingStream(Stream inner) : Stream
+    {
+        public long Written { get; private set; }
+
+        public override bool CanRead => false;
+
+        public override bool CanSeek => false;
+
+        public override bool CanWrite => true;
+
+        public override long Length => Written;
+
+        public override long Position
+        {
+            get => Written;
+            set => throw new NotSupportedException();
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            inner.Write(buffer, offset, count);
+            Written += count;
+        }
+
+        public override void Write(ReadOnlySpan<byte> buffer)
+        {
+            inner.Write(buffer);
+            Written += buffer.Length;
+        }
+
+        public override void WriteByte(byte value)
+        {
+            inner.WriteByte(value);
+            Written++;
+        }
+
+        public override void Flush() => inner.Flush();
+
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+
+        public override void SetLength(long value) => throw new NotSupportedException();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                inner.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }

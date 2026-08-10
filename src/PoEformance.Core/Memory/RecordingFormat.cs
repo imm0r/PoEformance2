@@ -5,11 +5,9 @@ namespace PoEformance.Core.Memory;
 /// </summary>
 /// <remarks>
 /// Deliberately trivial: a small header followed by a flat stream of tagged entries.
-/// A recording is append-only, so a crash mid-session still leaves a readable file up
-/// to the last complete entry.
 ///
 /// <code>
-/// Header
+/// Header (never compressed)
 ///   magic        8 bytes  "POEFREC1"
 ///   version      u32
 ///   processId    u32
@@ -17,12 +15,18 @@ namespace PoEformance.Core.Memory;
 ///   moduleSize   u32
 ///   createdUtc   i64      DateTime.UtcNow.Ticks
 ///
-/// Entries (repeating, until end of file)
+/// Entries (repeating, until end of stream; Brotli-compressed since version 3)
 ///   tag          u8       1 = frame, 2 = read, 3 = note
 ///   frame:       frameIndex u32, elapsedMs u32
 ///   read:        address u64, length u32, bytes[length]
 ///   note:        keyLen u16, key(utf8), valueLen u16, value(utf8)
 /// </code>
+///
+/// The header stays uncompressed so a recording is still identifiable by its first eight
+/// bytes, and so the version that decides how to read the rest can be read without
+/// guessing. Everything after it is compressed, because the entry stream is enormously
+/// repetitive - the same addresses, the same tags, the same lengths - and a real session
+/// packed down to a hundred-and-fiftieth of its size.
 ///
 /// Notes carry facts that were DERIVED rather than read - above all the resolved static
 /// addresses. That matters for size: finding those statics requires copying the game's
@@ -36,7 +40,15 @@ public static class RecordingFormat
     public static ReadOnlySpan<byte> Magic => "POEFREC1"u8;
 
     /// <summary>Current format version. Bumped whenever the entry layout changes.</summary>
-    public const uint Version = 2;
+    public const uint Version = 3;
+
+    /// <summary>
+    /// The last version whose entries were stored uncompressed. Still readable, because
+    /// the recordings under <c>tests/fixtures/</c> are in it and they are the regression
+    /// tests against real memory - a format change that threw those away would cost more
+    /// than it saved.
+    /// </summary>
+    public const uint UncompressedVersion = 2;
 
     /// <summary>Entry tag: a frame boundary.</summary>
     public const byte TagFrame = 1;

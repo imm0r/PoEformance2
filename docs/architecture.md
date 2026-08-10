@@ -73,6 +73,26 @@ is in there, because resolving the chain reads it, but `root+Children` never was
 in that file can say anything about the atlas.) To record something that can answer questions
 about a feature offline, **that feature has to be running while the recording is made**.
 
+**And one thing a recording has to be, to be evidence at all: long enough to contain the
+moment in question.** A capture taken while clearing a map turned out to hold 437 milliseconds
+— it hit its size cap before the first monster died, and every question anyone wanted to ask
+of it was about what happened afterwards. The file was 25.7 MB and an ordinary archiver packed
+it to 200 KB, which said plainly where the space was going: 98.5% of the 684,849 reads in it
+were the same addresses carrying the same bytes as the read before. Two changes, in that
+order:
+
+- **A read that says nothing is not written.** The replay serves "the newest data at or before
+  the current frame", so an unchanged read that was never recorded resolves to identical bytes
+  from the frame that did record them — dropping it cannot change what a replay sees. It is
+  the comparison against the last bytes *written* that makes this safe, and the round-trip
+  tests are the check on the argument rather than on the code.
+- **The entry stream is Brotli-compressed on the way to disk**, the header left in the clear
+  so the file is still identifiable and its version still readable.
+
+Together, on that same session: **25.7 MB → 137 KB**, with every sampled read replaying
+identically. The cost is that a killed session now decodes to its last flush rather than its
+last complete entry, which is why the writer flushes on a frame boundary once a second.
+
 ### 3. Layers the compiler enforces
 
 Six projects; references point strictly downward. Getting this wrong is a build

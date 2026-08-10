@@ -233,6 +233,8 @@ internal static class Program
             Console.WriteLine();
             Console.WriteLine($"recorded {bytes / 1024.0:F0} KB to {options.RecordPath} "
                 + $"({recorder.SkippedLargeReads} oversized reads skipped - the module image is not needed for replay)");
+            Console.WriteLine($"        {recorder.RecordedBytes / 1024.0:F0} KB of reads written, "
+                + $"{recorder.SkippedUnchangedReads:N0} reads left out because nothing about them had moved");
             if (recorder.ReachedSizeLimit)
             {
                 Console.WriteLine("        the size cap stopped recording partway - the file still holds the "
