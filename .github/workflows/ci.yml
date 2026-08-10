@@ -1,42 +1,20 @@
 name: CI
 
-# ON ICE - manual only, until the Actions quota is back.
-#
-# This repository is private, so Actions minutes are metered, and the account ran out of
-# them. The symptom is worth writing down because it looks nothing like a billing problem:
-# jobs fail in about three seconds with `runner_id: 0`, no runner name, and NO STEP LIST AT
-# ALL - the job is never dispatched to a machine, so nothing is checked out and nothing is
-# built. It is indistinguishable at a glance from a transient Actions outage, and the only
-# way to tell them apart is that an outage recovers and this does not.
-#
-# What that costs is the whole reason for parking it here rather than trimming it. The
-# triggers below used to be `push: ["**"]` plus `pull_request`, which is TWO runs of
-# everything for every push to a branch with a PR open - and `aot-publish` runs on
-# windows-latest, billed at 2x. One push therefore spent a double-digit number of billed
-# minutes. Publishing the thing people download is worth minutes; re-proving a green build
-# twice per push is not, when the two compete for the same empty budget.
-#
-# TO BRING IT BACK once the quota resets, restore the two trigger lines:
-#
-#     on:
-#       push:
-#         branches: ["**"]
-#       pull_request:
-#       workflow_dispatch:
-#
-# and consider leaving `pull_request` off - `push: ["**"]` alone already covers every branch
-# and halves the bill, at the cost of not running on PRs from forks.
-#
-# UNTIL THEN THE TESTS STILL RUN, just not here: `dotnet build --nologo` and
-# `dotnet test --nologo --no-build` are exactly what this job does, and they cost nothing
-# locally. Run them before pushing, because nothing else is going to.
+# Back on automatic triggers. This was briefly manual-only: the repository was private, so
+# Actions minutes were metered, and the account ran out of them - which is worth recording
+# because the symptom looks nothing like a billing problem. Jobs fail in about three seconds
+# with `runner_id: 0`, no runner name and NO STEP LIST AT ALL: never dispatched to a machine,
+# so nothing is checked out and nothing is built. That is indistinguishable at a glance from
+# a transient Actions outage, and the only thing that tells them apart is that an outage
+# recovers on its own. Making the repository public settled it - public repositories run on
+# GitHub-hosted runners for free, with no minute metering and no Windows multiplier.
 on:
+  push:
+    branches: ["**"]
+  pull_request:
+  # Kept from the parked version: useful for re-running a suspected-flaky job without
+  # pushing an empty commit.
   workflow_dispatch:
-    inputs:
-      aot:
-        description: "Also run the Native AOT gate (windows-latest, billed at 2x)"
-        type: boolean
-        default: false
 
 jobs:
   test:
@@ -68,15 +46,8 @@ jobs:
   # actions in the same minute. That is GitHub's infrastructure and not something a
   # workflow can fix, so this is not offered as the cure; it just removes one way to
   # collide, and it is the right shape regardless.
-  #
-  # OPT-IN while the budget is short. It is the most expensive thing in this repository -
-  # windows-latest at 2x, several minutes of ILC - and it answers a question that only
-  # changes when a DEPENDENCY does, not on every run. Someone dispatching this workflow to
-  # check that the tests still pass should not spend five times the test job's minutes to
-  # find out; tick the box on the run that changes a package reference.
   aot-publish:
     needs: test
-    if: ${{ inputs.aot }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
