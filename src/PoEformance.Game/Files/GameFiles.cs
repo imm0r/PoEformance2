@@ -49,42 +49,107 @@ public sealed class GameFiles
     public string Describe => $"{_archive.Describe} - {Index.Count} files, {Index.Bundles.Count} bundles, {Index.Hashing}";
 
     /// <summary>
+    /// What opening an install came to - and when it did not, how far it got.
+    /// </summary>
+    /// <param name="Files">The opened install, or null.</param>
+    /// <param name="Why">What happened, in words, whether or not it worked.</param>
+    /// <remarks>
+    /// FOUR STACKED FORMATS FAIL IN FOUR DIFFERENT WAYS and used to be reported as one sentence:
+    /// "found the game but could not read its packed files". That is true of a folder with no
+    /// bundles in it, of an archive version this does not understand, of an index that will not
+    /// decompress, and of one that decompresses into something that is not an index - and there
+    /// is nothing anybody can do with it, including the person who wrote it. Which layer it was
+    /// is the whole of the diagnosis, and it is free to say.
+    /// </remarks>
+    public readonly record struct OpenedFiles(GameFiles? Files, string Why);
+
+    /// <summary>
     /// Opens an install, or returns null when that folder does not hold one.
     /// </summary>
     /// <param name="gameFolder">The folder holding <c>Bundles2</c> or <c>Content.ggpk</c>.</param>
     /// <param name="decompress">How to undo Oodle. Defaults to the one that ships with this.</param>
     public static GameFiles? Open(string? gameFolder, Func<ReadOnlyMemory<byte>, int, byte[]?>? decompress = null)
+        => OpenOrSay(gameFolder, decompress).Files;
+
+    /// <summary>The same, and says which layer gave up when one did.</summary>
+    public static OpenedFiles OpenOrSay(
+        string? gameFolder, Func<ReadOnlyMemory<byte>, int, byte[]?>? decompress = null)
     {
         if (string.IsNullOrWhiteSpace(gameFolder))
         {
-            return null;
+            return new OpenedFiles(null, "no game folder to look in");
         }
 
         // The loose folder first, because checking for it is one call and it is what a Steam
         // install has. Only a standalone install has the container.
-        IGameArchive? archive = new LooseArchive(gameFolder) is { Ready: true } loose
-            ? loose
-            : GgpkArchive.Open(Path.Combine(gameFolder, "Content.ggpk"));
+        var loose = new LooseArchive(gameFolder);
+        if (loose.Ready)
+        {
+            return OpenOrSay(loose, decompress);
+        }
 
-        return archive is null ? null : Open(archive, decompress);
+        string container = Path.Combine(gameFolder, "Content.ggpk");
+        if (GgpkArchive.Open(container) is { } ggpk)
+        {
+            return OpenOrSay(ggpk, decompress);
+        }
+
+        return new OpenedFiles(
+            null,
+            File.Exists(container)
+                ? $"{container} is there but did not open as a GGPK - a version this does not understand"
+                : $@"no Bundles2\_.index.bin and no Content.ggpk in {gameFolder}");
     }
 
     /// <summary>Opens one from an archive that is already sorted out.</summary>
     public static GameFiles? Open(IGameArchive? archive, Func<ReadOnlyMemory<byte>, int, byte[]?>? decompress = null)
+        => OpenOrSay(archive, decompress).Files;
+
+    /// <summary>The same, and says which layer gave up when one did.</summary>
+    public static OpenedFiles OpenOrSay(
+        IGameArchive? archive, Func<ReadOnlyMemory<byte>, int, byte[]?>? decompress = null)
     {
         if (archive is not { Ready: true })
         {
-            return null;
+            return new OpenedFiles(null, "the archive did not open");
         }
 
         Func<ReadOnlyMemory<byte>, int, byte[]?> undo = decompress ?? Oodle.Decompress;
+        string where = archive.Describe;
+
+        byte[]? raw = archive.Read("_.index.bin");
+        if (raw is not { Length: > 0 })
+        {
+            return new OpenedFiles(null, $"{where}: _.index.bin is not in there");
+        }
 
         // The index is itself a bundle, so it is unpacked the same way as everything else -
         // read whole, because it is one file and every lookup wants all of it.
-        BundleFile? packed = BundleFile.Open(archive.Read("_.index.bin"));
-        BundleIndex? index = packed is null ? null : BundleIndex.Parse(packed.Read(undo));
+        BundleFile? packed = BundleFile.Open(raw);
+        if (packed is null)
+        {
+            return new OpenedFiles(
+                null, $"{where}: _.index.bin is {raw.Length} bytes but its bundle header did not read");
+        }
 
-        return index is null ? null : new GameFiles(archive, index, undo);
+        byte[]? content = packed.Read(undo);
+        if (content is null)
+        {
+            // THE ONE LAYER NOTHING HERE CAN TEST without a real install: there is no Oodle
+            // compressor to build a fixture with. So this message is the first news that the
+            // shipped decoder does not handle what this install packs with.
+            return new OpenedFiles(
+                null,
+                $"{where}: _.index.bin will not decompress - {packed.Chunks} chunks, "
+                + $"{packed.Compressed} bytes in, {packed.Uncompressed} expected out. "
+                + "That is the Oodle decoder refusing this install's bundles.");
+        }
+
+        BundleIndex? index = BundleIndex.Parse(content);
+        return index is null
+            ? new OpenedFiles(null, $"{where}: the index decompressed to {content.Length} bytes but is not an index")
+            : new OpenedFiles(new GameFiles(archive, index, undo), $"{archive.Describe} - {index.Count} files, "
+                + $"{index.Bundles.Count} bundles, {index.Hashing}");
     }
 
     /// <summary>
