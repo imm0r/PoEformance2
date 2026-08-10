@@ -94,6 +94,21 @@ public readonly record struct MonsterSigns(
     /// wrong is a dot you wanted. NOT VERIFIED against a minion or a totem: the recording
     /// this comes from has exactly one friendly name in it.
     ///
+    /// AND THE DURATION IS NOT ON THE ENTITY, which was worth an evening to establish and is
+    /// written down so nobody spends a second one. The game prints a flame wall's duration in
+    /// its own tooltip - 10.30 seconds - so "it obviously expires, read that" is the natural
+    /// next thought. It is not there to read. Looked at through the entity inspector, on a
+    /// wall selected while recording:
+    ///
+    ///   - no DiesAfterTime component, over 9,313 sightings;
+    ///   - a Buffs component carrying nothing at all;
+    ///   - a Stats component whose two StatsInternal pointers are the SAME pointer, holding
+    ///     exactly one pair: id 13189, value 1. Not a duration, and not a number that changes.
+    ///
+    /// So the duration belongs to the skill on the player, not to the thing the skill spawns,
+    /// and targetability is the only signal on the entity that answers "is this something
+    /// anybody fights". Which is what this rule already uses.
+    ///
     /// Null means the component list could not be read, and that makes no claim either way:
     /// classifying an unreadable entity as an effect would drop live monsters off the overlay
     /// exactly when the reading is going badly.
