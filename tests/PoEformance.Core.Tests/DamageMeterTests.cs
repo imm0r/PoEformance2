@@ -1,0 +1,307 @@
+using PoEformance.Features;
+using PoEformance.Game.Components;
+using PoEformance.Game.World;
+
+namespace PoEformance.Core.Tests;
+
+/// <summary>
+/// How much damage is being done, measured by watching monster health fall.
+/// </summary>
+/// <remarks>
+/// The estimator comes from AuraTracker's DpsTracker. What these tests are mostly about is
+/// the part that could not be ported as it stood: a dead monster is dropped from the snapshot
+/// rather than lingering at zero health, so the last and largest chunk of every kill is
+/// invisible to the estimator, and a monster deleted from full health between two reads is
+/// invisible entirely. A port that missed that would report a figure that falls as the build
+/// gets better, which is the failure that looks most like success.
+/// </remarks>
+public class DamageMeterTests
+{
+    /// <summary>A monster with a life pool, and optionally a shield.</summary>
+    private static WorldEntity Monster(uint id, int life, int max = 1000, int shield = 0, int shieldMax = 0)
+        => new(
+            Id: id,
+            Address: 0x1000 + id,
+            Path: $"Metadata/Monsters/Test{id}",
+            Kind: EntityKind.Monster,
+            WorldX: 0f,
+            WorldY: 0f,
+            WorldZ: 0f,
+            Life: new Vital(life, max, 0, 0),
+            EnergyShield: new Vital(shield, shieldMax, 0, 0),
+            Name: $"Test {id}");
+
+    private static WorldSnapshot Area(uint hash, params WorldEntity[] entities)
+        => new(true, null, entities, new float[16], AreaHash: hash);
+
+    /// <summary>
+    /// A pool that falls by a known amount over a known time reads as that rate.
+    /// </summary>
+    /// <remarks>
+    /// The average needs several readings to climb, so this drives a steady 1000-per-second
+    /// for long enough to converge rather than asserting on the first sample - an exponential
+    /// average is defined by where it settles, not by where it starts.
+    /// </remarks>
+    [Fact]
+    public void SteadyDamageConvergesOnTheRate()
+    {
+        var meter = new DamageMeter();
+        int life = 100_000;
+
+        meter.Look(Area(1, Monster(1, life, max: 100_000)), 0);
+
+        for (long now = 100; now <= 5_000; now += 100)
+        {
+            life -= 100; // 100 per 100ms = 1000 per second
+            meter.Look(Area(1, Monster(1, life, max: 100_000)), now);
+        }
+
+        Assert.InRange(meter.Dps, 950f, 1050f);
+        Assert.Equal(5_000, meter.Observed);
+    }
+
+    /// <summary>Nothing is counted from the first snapshot - there is nothing to compare it to.</summary>
+    [Fact]
+    public void TheFirstReadingOnlyEstablishesThePools()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Area(1, Monster(1, 500)), 0);
+
+        Assert.Equal(0, meter.Total);
+        Assert.Equal(0f, meter.Dps);
+        Assert.False(meter.Measuring);
+    }
+
+    /// <summary>A monster that vanishes has its remaining pool counted as the killing blow.</summary>
+    /// <remarks>
+    /// The case the reference cannot see at all: a monster deleted from full health between
+    /// two reads never shows a single falling reading, so an estimator watching only for
+    /// falls reports zero for it.
+    /// </remarks>
+    [Fact]
+    public void AMonsterDeletedFromFullHealthIsStillCounted()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Area(1, Monster(1, 4_000, max: 4_000)), 0);
+        meter.Look(Area(1), 100);
+
+        Assert.Equal(4_000, meter.Credited);
+        Assert.Equal(0, meter.Observed);
+        Assert.Equal(4_000, meter.Total);
+        Assert.Equal(1, meter.Vanished);
+        Assert.True(meter.Dps > 0f);
+    }
+
+    /// <summary>Both halves of a kill are counted: what was watched, and what was left.</summary>
+    [Fact]
+    public void TheWatchedFallAndTheRemainderAreBothCounted()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Area(1, Monster(1, 1_000)), 0);
+        meter.Look(Area(1, Monster(1, 600)), 100);   // 400 watched off
+        meter.Look(Area(1), 200);                     // 600 left when it vanished
+
+        Assert.Equal(400, meter.Observed);
+        Assert.Equal(600, meter.Credited);
+        Assert.Equal(1_000, meter.Total);
+    }
+
+    /// <summary>Turning the judgement off leaves only what was actually watched.</summary>
+    [Fact]
+    public void KillCreditCanBeTurnedOff()
+    {
+        var meter = new DamageMeter { CountKills = false };
+
+        meter.Look(Area(1, Monster(1, 1_000)), 0);
+        meter.Look(Area(1, Monster(1, 600)), 100);
+        meter.Look(Area(1), 200);
+
+        Assert.Equal(400, meter.Observed);
+        Assert.Equal(0, meter.Credited);
+        Assert.Equal(1, meter.Vanished); // still noticed, just not counted
+    }
+
+    /// <summary>Shield and life are one pool - damage through a shield counts.</summary>
+    [Fact]
+    public void ShieldCountsTowardsThePool()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Area(1, Monster(1, 500, shield: 300, shieldMax: 300)), 0);
+        meter.Look(Area(1, Monster(1, 500, shield: 100, shieldMax: 300)), 100);
+
+        Assert.Equal(200, meter.Observed);
+    }
+
+    /// <summary>A monster that heals is not negative damage.</summary>
+    /// <remarks>
+    /// And the pool follows it up, so the next real hit is measured from where the monster
+    /// actually is - measuring from a high-water mark would count the healed amount twice.
+    /// </remarks>
+    [Fact]
+    public void HealingCountsAsNothingAndMovesTheBaseline()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Area(1, Monster(1, 500)), 0);
+        meter.Look(Area(1, Monster(1, 900)), 100);
+        meter.Look(Area(1, Monster(1, 800)), 200);
+
+        Assert.Equal(100, meter.Observed);
+    }
+
+    /// <summary>
+    /// Changing area forgets everything, rather than crediting the whole zone as kills.
+    /// </summary>
+    /// <remarks>
+    /// The one way this could produce a number that is not merely wrong but absurd: every
+    /// monster in the old area is missing from the first snapshot of the new one.
+    /// </remarks>
+    [Fact]
+    public void ChangingAreaCountsNoKills()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Area(1, Monster(1, 5_000), Monster(2, 5_000), Monster(3, 5_000)), 0);
+        meter.Look(Area(2), 100);
+
+        Assert.Equal(0, meter.Total);
+        Assert.Equal(0, meter.Vanished);
+        Assert.Equal(0f, meter.Dps);
+    }
+
+    /// <summary>A loading screen is not a lull - the average resumes rather than decaying.</summary>
+    [Fact]
+    public void TimeOutOfTheAreaDoesNotDecayTheAverage()
+    {
+        var meter = new DamageMeter();
+        int life = 100_000;
+
+        meter.Look(Area(1, Monster(1, life, max: 100_000)), 0);
+        for (long now = 100; now <= 3_000; now += 100)
+        {
+            life -= 100;
+            meter.Look(Area(1, Monster(1, life, max: 100_000)), now);
+        }
+
+        float before = meter.Dps;
+
+        // Ten seconds of not being in an area, same area hash on the way back.
+        for (long now = 3_100; now <= 13_000; now += 100)
+        {
+            meter.Look(new WorldSnapshot(false, null, [], new float[16], AreaHash: 1), now);
+        }
+
+        Assert.Equal(before, meter.Dps);
+    }
+
+    /// <summary>Friendly things and effects are not targets - their health falling is not our damage.</summary>
+    [Fact]
+    public void FriendlyThingsAndEffectsAreIgnored()
+    {
+        var meter = new DamageMeter();
+
+        WorldEntity minion = Monster(1, 1_000) with { IsFriendly = true };
+        WorldEntity flameWall = Monster(2, 1_000) with { IsEffect = true };
+
+        meter.Look(Area(1, minion, flameWall), 0);
+        meter.Look(Area(1, minion with { Life = new Vital(200, 1_000, 0, 0) }, flameWall), 100);
+        meter.Look(Area(1), 200);
+
+        Assert.Equal(0, meter.Total);
+    }
+
+    /// <summary>A pool that could not be read is not a monster deleted from full health.</summary>
+    [Fact]
+    public void AnUnreadablePoolIsNotAKill()
+    {
+        var meter = new DamageMeter();
+
+        WorldEntity unreadable = Monster(1, 0, max: 0);
+
+        meter.Look(Area(1, unreadable), 0);
+        meter.Look(Area(1), 100);
+
+        Assert.Equal(0, meter.Total);
+        Assert.Equal(0, meter.Vanished);
+    }
+
+    /// <summary>The per-target list holds what has been hit, hardest first.</summary>
+    [Fact]
+    public void TargetsAreListedHardestFirst()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Area(1, Monster(1, 10_000, max: 10_000), Monster(2, 10_000, max: 10_000)), 0);
+        meter.Look(
+            Area(1, Monster(1, 9_900, max: 10_000), Monster(2, 9_000, max: 10_000)),
+            100);
+
+        IReadOnlyList<DamageTarget> targets = meter.Targets(100);
+
+        Assert.Equal(2, targets.Count);
+        Assert.Equal("Test 2", targets[0].Name);   // took 1000, not 100
+        Assert.True(targets[0].Dps > targets[1].Dps);
+    }
+
+    /// <summary>A monster nobody has hit is not a target, however long it stands there.</summary>
+    [Fact]
+    public void UnhurtMonstersAreNotTargets()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Area(1, Monster(1, 1_000), Monster(2, 1_000)), 0);
+        meter.Look(Area(1, Monster(1, 900), Monster(2, 1_000)), 100);
+
+        Assert.Single(meter.Targets(100));
+    }
+
+    /// <summary>The peak is the highest the average reached, and it survives the fight ending.</summary>
+    [Fact]
+    public void ThePeakOutlivesTheFight()
+    {
+        var meter = new DamageMeter();
+        int life = 100_000;
+
+        meter.Look(Area(1, Monster(1, life, max: 100_000)), 0);
+        for (long now = 100; now <= 3_000; now += 100)
+        {
+            life -= 100;
+            meter.Look(Area(1, Monster(1, life, max: 100_000)), now);
+        }
+
+        float peak = meter.Peak;
+        Assert.True(peak > 0f);
+
+        // Nothing happening for a while: the rate decays, the peak does not.
+        for (long now = 3_100; now <= 8_000; now += 100)
+        {
+            meter.Look(Area(1, Monster(1, life, max: 100_000)), now);
+        }
+
+        Assert.True(meter.Dps < peak / 10f);
+        Assert.Equal(peak, meter.Peak);
+    }
+
+    /// <summary>Two readings inside the same millisecond lose no damage.</summary>
+    /// <remarks>
+    /// The reader is paced, not guaranteed - and a difference divided by a zero interval is
+    /// the one arithmetic here that has no answer. The damage has to land on the next
+    /// reading rather than be dropped.
+    /// </remarks>
+    [Fact]
+    public void TwoReadingsInOneMillisecondLoseNothing()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Area(1, Monster(1, 1_000)), 0);
+        meter.Look(Area(1, Monster(1, 900)), 100);
+        meter.Look(Area(1, Monster(1, 800)), 100); // same millisecond - skipped
+        meter.Look(Area(1, Monster(1, 800)), 200); // ...and picked up here
+
+        Assert.Equal(200, meter.Observed);
+    }
+}

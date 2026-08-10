@@ -53,6 +53,8 @@ public sealed class ToolTabs
     /// whatever sequence the app wires features up in - a fact about the code, not a
     /// decision about the interface. The play-time tools sit left of the reverse-engineering
     /// ones, and that should survive any refactor of the wiring.
+    ///
+    /// Spaced in tens, so a tab can be put between two others without renumbering them.
     /// </remarks>
     /// <param name="draw">The tab's content, drawn while it is the one in front.</param>
     /// <param name="idle">

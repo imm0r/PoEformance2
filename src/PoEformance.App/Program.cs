@@ -463,6 +463,11 @@ internal static class Program
         // overlay was hidden behind an inventory screen.
         var coverage = new PoEformance.Features.MapCoverage();
 
+        // On the reader thread for a stricter version of the same reason - see where it is
+        // fed. It watches monster health fall, so it needs one sample per READ; a sample per
+        // drawn frame would mostly be the same snapshot again, reporting no damage.
+        var damage = new PoEformance.Features.DamageMeter();
+
         // What the area LOADED, which names the encounters in it before anybody has walked
         // there. The walk is thousands of pointers and a string each - far too much for a
         // tick - so it runs once when the area changes, on a thread of its own.
@@ -592,6 +597,13 @@ internal static class Program
                 costs.Add(snapshot.Cost, snapshot.AreaHash, Environment.TickCount64);
                 coverage.Look(snapshot);
 
+                // HERE rather than in the overlay, and that is the whole difference between a
+                // damage figure and a wrong one: the renderer redraws at VSync while these
+                // snapshots arrive at about 30Hz, so sampling there would read the same
+                // unchanged snapshot twice and count the second as a moment in which no
+                // damage happened. One sample per read is one sample per thing that changed.
+                damage.Look(snapshot, Environment.TickCount64);
+
                 // On the area CHANGE rather than on a timer. The list cannot change while
                 // you stand in a zone, so looking again would be thousands of reads to
                 // confirm what is already on screen.
@@ -657,6 +669,7 @@ internal static class Program
         overlay.Noise = world.Noise;
         overlay.Costs = costs;
         overlay.Coverage = coverage;
+        overlay.Damage = damage;
         overlay.AttachPreload(
             preload,
             () => LookAtWhatLoaded(preloadArea),
