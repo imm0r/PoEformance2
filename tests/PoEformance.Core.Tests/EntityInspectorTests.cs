@@ -259,33 +259,36 @@ public class EntityInspectorTests
         Assert.Contains("nothing on it", view.EffectsNote, StringComparison.Ordinal);
     }
 
-    /// <summary>The entity's own stat pairs are read, and a truncated list says it is one.</summary>
+    /// <summary>The pairs come from the StatsInternal the component points at, not the component.</summary>
     /// <remarks>
-    /// The Stats component is where the game keeps what it believes about an entity, as a
-    /// flat vector of (id, value). It is the remaining place a flame wall's ten-second
-    /// duration could be sitting, now that its Buffs turned out to be empty - and it is worth
-    /// reading for its own sake, because those ids are the game's own and can be looked up.
+    /// The layout invited exactly one wrong reading and got it. The Stats COMPONENT holds no
+    /// pairs; it holds pointers to StatsInternal structures, and the vector is inside those.
+    /// Read straight off the component, 0xF8 is a zeroed field on every entity, which reads
+    /// back as "this thing has no stats" - checked against a recorded flame wall, where
+    /// Stats+0xF8 and Stats+0x100 are both 0x0 while the entity plainly has stats.
     ///
-    /// The cap is reported rather than applied silently: a list that stops at 256 while
-    /// claiming to be everything is how somebody concludes a stat is absent when it is merely
-    /// off the end.
+    /// So this builds the two levels the way the game does, and would fail against a reader
+    /// that skipped one of them.
     /// </remarks>
     [Fact]
-    public void TheEntitysOwnStatPairsAreRead()
+    public void TheStatPairsAreReadThroughTheStatsInternalPointers()
     {
         OffsetSchema schema = Schema();
         FakeMemoryReader reader = Entity(
             schema, "Metadata/Monsters/Anomalies/Firewall", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
             "Render", "Stats");
 
-        StructDef layout = schema.Structs["Stats"];
+        StructDef component = schema.Structs["Stats"];
+        StructDef internals = schema.Structs["StatsInternal"];
         EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
-        ulong component = placed.Components.Single(c => c.Name == "Stats").Address;
+        ulong stats = placed.Components.Single(c => c.Name == "Stats").Address;
 
-        const ulong PairsAt = 0x3200_0000_0000;
-        int at = layout.OffsetOf("StatsInternalStatsVector");
-        reader.Place(component + (ulong)at, PairsAt);
-        reader.Place(component + (ulong)(at + 8), PairsAt + 16);      // two pairs
+        const ulong InternalAt = 0x3200_0000_0000;
+        const ulong PairsAt = 0x3200_0001_0000;
+
+        reader.Place(stats + (ulong)component.OffsetOf("StatsByBuffAndActions"), InternalAt);
+        reader.Place(InternalAt + (ulong)internals.OffsetOf("StatsVector"), PairsAt);
+        reader.Place(InternalAt + (ulong)internals.OffsetOf("StatsVectorLast"), PairsAt + 16);
 
         var block = new byte[16];
         BitConverter.TryWriteBytes(block.AsSpan(0, 4), 351u);          // skill_effect_duration
@@ -298,22 +301,39 @@ public class EntityInspectorTests
 
         Assert.Equal(2, view.Numbers.Count);
         Assert.Equal(10300, view.Numbers.Single(s => s.Id == 351).Value);
-        Assert.Contains("2 stats", view.StatsNote, StringComparison.Ordinal);
+        Assert.Contains("2 from StatsByBuffAndActions", view.StatsNote, StringComparison.Ordinal);
     }
 
-    /// <summary>A Stats component nobody could read says THAT, rather than "no numbers".</summary>
+    /// <summary>An empty stat vector is not reported as an unreadable one.</summary>
+    /// <remarks>
+    /// begin == end == null is what an entity with no stats from that source looks like, and
+    /// it is a different claim from "nobody could read this". Both used to print the same
+    /// sentence, which is how a zeroed field got reported as a reading failure.
+    /// </remarks>
     [Fact]
-    public void AStatsComponentThatCannotBeReadIsNotReportedAsEmpty()
+    public void AnEmptyStatVectorSaysEmptyAndAMissingOneSaysMissing()
     {
         OffsetSchema schema = Schema();
         FakeMemoryReader reader = Entity(
             schema, "Metadata/Monsters/Anomalies/Firewall", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
             "Render", "Stats");
 
+        StructDef component = schema.Structs["Stats"];
+        StructDef internals = schema.Structs["StatsInternal"];
+        EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        ulong stats = placed.Components.Single(c => c.Name == "Stats").Address;
+
+        const ulong InternalAt = 0x3300_0000_0000;
+        reader.Place(stats + (ulong)component.OffsetOf("StatsByBuffAndActions"), InternalAt);
+        reader.Place(InternalAt + (ulong)internals.OffsetOf("StatsVector"), 0UL);
+        reader.Place(InternalAt + (ulong)internals.OffsetOf("StatsVectorLast"), 0UL);
+
+        // StatsByItems is left unplaced, so its pointer read fails outright.
         EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
 
         Assert.Empty(view.Numbers);
-        Assert.Contains("could not be read", view.StatsNote, StringComparison.Ordinal);
+        Assert.Contains("(empty)", view.StatsNote, StringComparison.Ordinal);
+        Assert.Contains("StatsByItems could not be read", view.StatsNote, StringComparison.Ordinal);
     }
 
     /// <summary>A Buffs component nobody could read says THAT, rather than "nothing on it".</summary>
