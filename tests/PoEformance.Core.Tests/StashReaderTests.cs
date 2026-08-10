@@ -97,6 +97,72 @@ public class StashReaderTests
         Assert.Equal("Stash tab 143", tab.Called);
     }
 
+    [Fact]
+    public void WHENTheLeagueIsNotWhereTheSchemaSaysTheStructIsSweptForIt()
+    {
+        // The read that answers "where did it go". A drifted string cannot be guessed at, and
+        // it cannot be found in an old recording either - a replay only holds the reads the
+        // running build made, so a field nobody read is simply absent. This is the read that
+        // puts the answer in the NEXT one.
+        OffsetSchema schema = Schema();
+        FakeMemoryReader fake = Stash(schema, id: 1, [(0, 0, 1, 1, 0)]);
+
+        // The struct's own bytes, from just past the inventory vector - a read that crosses
+        // an unmapped page fails WHOLE, so the sweep has to survive a window that is only
+        // partly there, and a fixture of nothing but headers would never show that.
+        fake.Place(Inner + 0x330, new byte[0x2CD0]);
+
+        // The league, moved. Eight characters is already too many for the inline buffer -
+        // it holds seven and a terminator - so even "Standard" is kept elsewhere.
+        fake.PlaceStdWString(Inner + 0x2210, "Standard", 0x18_8000);
+
+        // And a short one, which the header carries itself.
+        fake.PlaceStdWString(Inner + 0x2300, "Abyss", 0);
+
+        // And a longer one kept elsewhere, as a hardcore league name would be.
+        fake.PlaceStdWString(Inner + 0x2400, "HC Runes of Aldur", 0x18_0000);
+
+        IReadOnlyList<StashReader.FoundText> found =
+            new StashReader(fake, schema).StringsIn(Inner, 0x300, 0x3000);
+
+        Assert.Contains(found, one => one.Offset == 0x2210 && one.Text == "Standard");
+        Assert.Contains(found, one => one.Offset == 0x2300 && one.Text == "Abyss");
+        Assert.Contains(found, one => one.Offset == 0x2400 && one.Text == "HC Runes of Aldur");
+
+        // And nothing at the league's own offset, which is the shape of the finding this was
+        // written for: the field is not on this struct at all.
+        Assert.DoesNotContain(found, one => one.Offset == schema.Structs["ServerDataOffsets"].OffsetOf("League"));
+    }
+
+    [Fact]
+    public void ANDTheSweepIsBoundedRatherThanLedAroundByWhatItReads()
+    {
+        // Every row of a struct is offered to the string test, so a window full of numbers that
+        // happen to look like lengths must not become thousands of reads on the read thread.
+        OffsetSchema schema = Schema();
+        FakeMemoryReader fake = Stash(schema, id: 1, [(0, 0, 1, 1, 0)]);
+        fake.Place(Inner + 0x330, new byte[0x2CD0]);
+
+        for (var i = 0; i < 200; i++)
+        {
+            fake.PlaceStdWString(Inner + 0x1000 + ((ulong)i * 0x20), $"string number {i}", 0x19_0000 + ((ulong)i * 0x80));
+        }
+
+        int found = new StashReader(fake, schema).StringsIn(Inner, 0x300, 0x3000).Count;
+
+        Assert.Equal(StashReader.MostStrings, found);
+    }
+
+    [Fact]
+    public void ANDASweepOfSomethingThatIsNotTheStructFindsNothingRatherThanGuessing()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader fake = Stash(schema, id: 1, [(0, 0, 1, 1, 0)]);
+
+        Assert.Empty(new StashReader(fake, schema).StringsIn(0, 0x300, 0x3000));
+        Assert.Empty(new StashReader(fake, schema).StringsIn(Inner, 0x3000, 0x300));
+    }
+
     [Theory]
     [InlineData(1, InventoryKind.Backpack)]
     [InlineData(2, InventoryKind.Equipped)]
@@ -215,13 +281,31 @@ public class StashReaderTests
     [InlineData("Standard")]
     [InlineData("HC Runes of Aldur")]
     [InlineData("Rise of the Abyssal")]
-    public void THELeagueIsReadOffTheSameStructTheInventoriesAreOn(string league)
+    public void THELeagueIsReadOffTheOUTERStructRatherThanTheInventoriesOne(string league)
     {
+        // The two server-data structs are different things, and this is the one that cost the
+        // whole price feature: the league is on the OUTER struct - what ServerDataPtr points at
+        // - while the inventories are on the inner one the outer's vector leads to. Read off
+        // the inner one it comes back empty, which reads as "not in the game yet".
         OffsetSchema schema = Schema();
         FakeMemoryReader fake = Stash(schema, id: 1, cells: []);
-        fake.PlaceStdWString(Inner + (ulong)schema.Structs["ServerDataStructure"].OffsetOf("League"), league, 0x18_0000);
+        fake.PlaceStdWString(
+            ServerData + (ulong)schema.Structs["ServerDataOffsets"].OffsetOf("League"), league, 0x18_0000);
 
         Assert.Equal(league, new StashReader(fake, schema).League(ServerData));
+    }
+
+    [Fact]
+    public void ANDTheInnerStructIsStillTriedForTheLayoutWhereBothAreOne()
+    {
+        // A build that laid these out flat would put the league on the only struct there is.
+        // One read that almost always fails, against working on a layout this cannot see.
+        OffsetSchema schema = Schema();
+        FakeMemoryReader fake = Stash(schema, id: 1, cells: []);
+        fake.PlaceStdWString(
+            Inner + (ulong)schema.Structs["ServerDataOffsets"].OffsetOf("League"), "Standard", 0x18_0000);
+
+        Assert.Equal("Standard", new StashReader(fake, schema).League(ServerData));
     }
 
     [Fact]
@@ -231,13 +315,13 @@ public class StashReaderTests
         // asks a price server about a league nobody has heard of, and the failure shows up as
         // "no prices" rather than as the offset problem it is.
         OffsetSchema schema = Schema();
-        int at = schema.Structs["ServerDataStructure"].OffsetOf("League");
+        int at = schema.Structs["ServerDataOffsets"].OffsetOf("League");
 
         Assert.Equal(string.Empty, new StashReader(Stash(schema, 1, []), schema).League(ServerData));
         Assert.Equal(string.Empty, new StashReader(new FakeMemoryReader(), schema).League(ServerData));
 
         FakeMemoryReader control = Stash(schema, 1, []);
-        control.PlaceStdWString(Inner + (ulong)at, "Bad\u0001League", 0x18_0000);
+        control.PlaceStdWString(ServerData + (ulong)at, "Bad\u0001League", 0x18_0000);
         Assert.Equal(string.Empty, new StashReader(control, schema).League(ServerData));
     }
 }

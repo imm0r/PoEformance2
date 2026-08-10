@@ -1,3 +1,4 @@
+using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Game.Entities;
@@ -109,7 +110,7 @@ public sealed class StashReader
 
         _playerServerData = schema.Structs["ServerDataOffsets"].OffsetOf("PlayerServerData");
         _inventories = schema.Structs["ServerDataStructure"].OffsetOf("PlayerInventories");
-        _league = schema.Structs["ServerDataStructure"].OffsetOf("League");
+        _league = schema.Structs["ServerDataOffsets"].OffsetOf("League");
 
         StructDef array = schema.Structs["InventoryArray"];
         _entrySize = (int)array.Constants["EntrySize"];
@@ -270,10 +271,22 @@ public sealed class StashReader
     /// Which league this character is in, or empty when it cannot be read.
     /// </summary>
     /// <remarks>
-    /// HERE because it sits on the same struct the inventories do, reached by the same two-hop
-    /// resolve below - and that hop is fiddly enough that a second copy of it would be a second
-    /// thing to get wrong. It is not an item, but it is server data, and this is the reader for
-    /// that.
+    /// NOT ON THE STRUCT THE INVENTORIES ARE ON, and getting that wrong is why this read came
+    /// back empty and the whole price feature never started. The two server-data structs are
+    /// different things: the OUTER one is what ServerDataPtr points at and is where the league
+    /// lives; the inner one is reached through the outer's vector and is where the inventories
+    /// live. The AHK tool says so in the shape of its own resolve - the pointer it reads the
+    /// league from is the one whose +0x48 is a plausible vector, which is the outer by
+    /// definition, while it reads inventories from what that vector points AT.
+    ///
+    /// Confirmed from the other side in a recording, 2026-08-09: on the inner struct this
+    /// offset holds two heap pointers interleaved with two pointers into the module image - a
+    /// pair of vtables, not a std::wstring - in the same frames where the inner struct's
+    /// inventory vector reads 118 inventories perfectly.
+    ///
+    /// The resolved struct is still tried afterwards, for the layout where both are the same
+    /// one. It costs a read that almost always fails, and it is the difference between working
+    /// everywhere and working here.
     ///
     /// WHAT IT IS FOR: prices. The value is exactly what poe.ninja spells - "Standard",
     /// "HC Runes of Aldur" - so it can be asked for as it comes, with the hardcore prefix
@@ -282,17 +295,125 @@ public sealed class StashReader
     /// </remarks>
     public string League(ulong serverData)
     {
+        if (Named(serverData) is { Length: > 0 } outer)
+        {
+            return outer;
+        }
+
         ulong holder = Resolve(serverData);
-        if (holder == 0)
+        return holder == 0 || holder == serverData ? string.Empty : Named(holder);
+    }
+
+    /// <summary>The league name at one candidate base, or empty when it is not one.</summary>
+    /// <remarks>
+    /// Read SHORT: a league name is a few words. A long read wanders into whatever follows the
+    /// string when the base is wrong, and comes back looking like a league nobody has heard of
+    /// rather than as nothing - which is the difference between "no prices" and "prices for
+    /// somewhere that does not exist".
+    /// </remarks>
+    private string Named(ulong at)
+    {
+        if (!MemoryReaderExtensions.IsPlausiblePointer(at))
         {
             return string.Empty;
         }
 
-        // Read SHORT: a league name is a few words. A long read wanders into whatever follows
-        // the string once the offset has drifted, and comes back as something that looks like a
-        // league nobody has heard of rather than as nothing.
-        string named = _reader.ReadStdWString(holder + (ulong)_league, 64).Trim();
+        string named = _reader.ReadStdWString(at + (ulong)_league, 64).Trim();
         return named.Length is > 0 and <= 64 && !named.Any(char.IsControl) ? named : string.Empty;
+    }
+
+    /// <summary>Where in the struct a string turned out to be, and what it says.</summary>
+    /// <param name="Offset">Its offset from the struct's base - what a schema entry would hold.</param>
+    /// <param name="Text">The characters, cut to something a report can show.</param>
+    public readonly record struct FoundText(int Offset, string Text);
+
+    /// <summary>How many strings a sweep will fetch the characters of.</summary>
+    public const int MostStrings = 64;
+
+    /// <summary>
+    /// How much of the window is read at a time.
+    /// </summary>
+    /// <remarks>
+    /// IN PIECES, NOT IN ONE GO, and this is the part that would have made the sweep useless
+    /// exactly when it was needed. A read that spans an unmapped page fails ENTIRELY - it does
+    /// not return the part that was there - so one read of the whole window comes back with
+    /// nothing whenever the struct's tail is not mapped, and a sweep that finds nothing is
+    /// indistinguishable from a struct that holds nothing.
+    ///
+    /// Each piece is read with a header's worth of overlap, so a string starting near the end
+    /// of one is still whole in the bytes it is judged from.
+    /// </remarks>
+    public const int SweepChunk = 0x200;
+
+    /// <summary>
+    /// Every string in a window of the struct - for when the league is not where it was.
+    /// </summary>
+    /// <remarks>
+    /// THE ANSWER TO A DRIFTED STRING CANNOT BE GUESSED, and it cannot be found in a recording
+    /// either: a replay only holds the reads the running build actually made, so a field nobody
+    /// read is simply absent. This is the read that puts the answer IN the next recording.
+    ///
+    /// It is a sweep rather than a search for a known name, because the name is what is being
+    /// looked for - and because "Standard" or "Rise of the Abyssal" is obvious in a list of the
+    /// half-dozen strings a struct holds, while a search for one spelling finds nothing on a
+    /// league nobody thought of.
+    ///
+    /// ONE READ of the whole window and then no memory access at all for the rows that are not
+    /// strings - the header is already in the bytes. Only a string kept somewhere else costs a
+    /// second read, and at most <see cref="MostStrings"/> of those, so a window full of numbers
+    /// that happen to look like lengths cannot turn into thousands of reads.
+    /// </remarks>
+    public IReadOnlyList<FoundText> StringsIn(ulong at, int from, int to)
+    {
+        var found = new List<FoundText>();
+
+        // The base is handed in rather than resolved here, because WHICH server-data struct is
+        // meant is the caller's question - and it is the question this sweep exists to settle.
+        if (!MemoryReaderExtensions.IsPlausiblePointer(at) || to <= from || from < 0)
+        {
+            return found;
+        }
+
+        var window = new byte[SweepChunk + TextProbe.HeaderSize];
+
+        for (int start = from; start < to; start += SweepChunk)
+        {
+            // The overlap first, so a header near the end of a piece is judged whole. Without
+            // it, and short of it, the read is retried at the plain size - which is what the
+            // last mapped page of the struct looks like.
+            int wanted = Math.Min(window.Length, to + TextProbe.HeaderSize - start);
+            Span<byte> piece = window.AsSpan(0, wanted);
+
+            if (!_reader.TryRead(at + (ulong)start, piece))
+            {
+                piece = window.AsSpan(0, Math.Min(SweepChunk, to - start));
+                if (!_reader.TryRead(at + (ulong)start, piece))
+                {
+                    continue;   // not mapped, which is ordinary at the end of a struct
+                }
+            }
+
+            int last = Math.Min(SweepChunk, piece.Length - TextProbe.HeaderSize);
+            for (var row = 0; row <= last; row += 8)
+            {
+                TextCandidate candidate = TextProbe.At(piece, row);
+
+                string text = candidate.Shape switch
+                {
+                    TextShape.Inline => candidate.Text,
+                    TextShape.Heap when found.Count < MostStrings =>
+                        _reader.ReadUnicodeString(candidate.Address, Math.Min(candidate.Length, 128)),
+                    _ => string.Empty,
+                };
+
+                if (text.Length > 0 && TextProbe.LooksLikeText(text))
+                {
+                    found.Add(new FoundText(start + row, text));
+                }
+            }
+        }
+
+        return found;
     }
 
     /// <summary>

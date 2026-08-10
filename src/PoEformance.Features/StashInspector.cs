@@ -84,9 +84,22 @@ public sealed class StashInspector
     private readonly int _playerInfo;
     private readonly int _serverData;
 
+    /// <summary>How much of the struct is swept when the league is not where the schema says.</summary>
+    /// <remarks>
+    /// Generously either side of where it was. A field that moves usually moves by a wave of
+    /// 0x08, but the cost of looking further is one read of a few kilobytes, once - and the
+    /// cost of looking too narrowly is another round trip to somebody with the game running.
+    /// </remarks>
+    public const int SweepFrom = 0x300;
+
+    /// <summary>And to here.</summary>
+    public const int SweepTo = 0x3000;
+
     private StashView _view = StashView.Nothing;
     private string _league = string.Empty;
+    private string _leagueNote = string.Empty;
     private long _leagueAt;
+    private bool _swept;
     private int _wanted;
     private int _served;
     private int _busy;
@@ -136,6 +149,17 @@ public sealed class StashInspector
     /// would look like "no league" and throw away the book for the league being played.
     /// </remarks>
     public string League => Volatile.Read(ref _league);
+
+    /// <summary>
+    /// Why there is no league, when there is none - and where it looks like it went.
+    /// </summary>
+    /// <remarks>
+    /// Empty while everything is fine. A silent "no league" is indistinguishable from not being
+    /// in the game yet, and it costs the whole price feature: nothing can be asked for without
+    /// one. So the moment the read comes back empty from a struct that DID resolve, the strings
+    /// in that struct are listed - and the league name is obvious among them.
+    /// </remarks>
+    public string LeagueNote => Volatile.Read(ref _leagueNote);
 
     /// <summary>Serves a requested read, and keeps the league current. Called on the reader thread.</summary>
     public void Service(long now)
@@ -190,9 +214,24 @@ public sealed class StashInspector
             }
 
             ulong serverData = ServerData(chain);
-            if (serverData != 0 && _stash.League(serverData) is { Length: > 0 } league)
+            if (serverData == 0)
+            {
+                return;
+            }
+
+            if (_stash.League(serverData) is { Length: > 0 } league)
             {
                 Volatile.Write(ref _league, league);
+                return;
+            }
+
+            // Nothing there. If the struct itself resolved, that is not "not in the game yet" -
+            // it is the field having moved, which costs every price in the tool and says so
+            // nowhere. Swept ONCE, because the answer cannot change while the game runs.
+            if (!_swept && _stash.Resolve(serverData) != 0)
+            {
+                _swept = true;
+                Sweep(serverData);
             }
         }
         catch (Exception exception) when (exception is not OutOfMemoryException)
@@ -200,6 +239,43 @@ public sealed class StashInspector
             // A stale league beats a dead reader thread, and this runs beside a read the game
             // can invalidate between two pointers.
         }
+    }
+
+    /// <summary>
+    /// Lists the strings in the struct the league should be in, and says where it is not.
+    /// </summary>
+    /// <remarks>
+    /// The note is written for somebody who will paste it back: it names the offset the schema
+    /// is using, so a reply that says "it is at +0x2210 now" is one edit to a data file and no
+    /// rebuild. And because this runs against live memory, the read is in the recording too -
+    /// which is the only way the question can be answered without the game.
+    /// </remarks>
+    private void Sweep(ulong serverData)
+    {
+        int was = _schema.Structs["ServerDataOffsets"].OffsetOf("League");
+
+        // BOTH structs, because "which one" is the question this exists to settle - reading the
+        // league off the inner one instead of the outer is exactly how it came back empty in
+        // the first place, and a sweep of only the struct already believed in cannot say so.
+        var lines = new List<string>();
+        foreach ((string which, ulong at) in new[]
+                 { ("outer", serverData), ("inner", _stash.Resolve(serverData)) })
+        {
+            if (at == 0 || (which == "inner" && at == serverData))
+            {
+                continue;
+            }
+
+            IReadOnlyList<StashReader.FoundText> found = _stash.StringsIn(at, SweepFrom, SweepTo);
+            lines.Add(found.Count == 0
+                ? $"{which}: no strings at all"
+                : $"{which}: " + string.Join(", ", found.Select(one => $"+0x{one.Offset:X}=\"{one.Text}\"")));
+        }
+
+        Volatile.Write(
+            ref _leagueNote,
+            $"no league at +0x{was:X}. Strings in the server-data structs - "
+            + string.Join("  |  ", lines));
     }
 
     private StashView Build()

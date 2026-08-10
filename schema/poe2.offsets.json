@@ -789,7 +789,8 @@
     "ServerDataOffsets": {
       "comment": "What LocalPlayerStruct.ServerDataPtr actually points at. It is NOT the struct holding PlayerInventories - that one is reached through the vector below. Missing this hop reads PlayerInventories off the wrong base, where it is simply zero, which looks exactly like a drifted offset. Source: GameHelper2 ServerDataOffsets.",
       "fields": {
-        "PlayerServerData": { "offset": "0x48", "type": "stdVector", "comment": "StdVector of pointers to ServerDataStructure; the first entry is the local player's." }
+        "PlayerServerData": { "offset": "0x48", "type": "stdVector", "comment": "StdVector of pointers to ServerDataStructure; the first entry is the local player's." },
+        "League": { "offset": "0x21E0", "type": "stdWString", "comment": "Active league name, EXACTLY poe.ninja/poe2scout's value (\"Standard\", \"HC Runes of Aldur\") - it drives price-league detection, so a wrong one silently prices a stash against another economy. ON THE OUTER STRUCT, not on the inner one the inventories are on, and that is the whole trap: it was read off the inner struct first and came back empty, which reads as 'not in the game yet' and cost every price in the tool. The AHK tool says which struct in the shape of its own resolve - the pointer it reads the league from is whichever one's +0x48 is a plausible vector, which is the OUTER by definition, while it reads inventories from what that vector points at. Confirmed from the other side in a recording, 2026-08-09: at this offset on the INNER struct sit two heap pointers interleaved with two into the module image - a pair of vtables - in the same frames where that struct's inventory vector reads 118 inventories perfectly. Value live-verified by the owner 2026-06-22 (AHK tool)." }
       }
     },
 
@@ -799,10 +800,6 @@
         "PlayerInventories": {
           "offset": "0x320", "type": "stdVector",
           "invariant": { "kind": "vectorSane", "elementSize": 24, "maxCount": 1024 }
-        },
-        "League": {
-          "offset": "0x21E0", "type": "stdWString",
-          "comment": "Active league name, EXACTLY poe.ninja/poe2scout's value (\"Standard\", \"HC Runes of Aldur\"). Drives price-league auto-detection. Live-verified 2026-06-22."
         }
       }
     },
