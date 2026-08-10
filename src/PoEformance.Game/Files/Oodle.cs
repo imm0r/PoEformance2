@@ -96,29 +96,33 @@ public static class Oodle
     /// <param name="gameFolder">Where the game is. Null or missing falls straight back.</param>
     public static Unpacker For(string? gameFolder)
     {
-        // BESIDE THE TOOL AS WELL AS BESIDE THE GAME. Path of Exile 2 ships no Oodle library at
-        // all, so the game folder is often a dead end - but anybody who has Path of Exile 1, or
-        // another game that ships one, already has the file. Dropping it here is then the whole
-        // of the setup: no flag, no setting, no rebuild.
+        // BESIDE THE TOOL AS WELL AS BESIDE THE GAME, and in its data folder. Path of Exile 2
+        // ships no Oodle library at all, so the game folder is often a dead end - but anybody
+        // who has Path of Exile 1, or another game that ships one, already has the file, and
+        // putting it in either of the other two is then the whole of the setup.
+        //
+        // EACH PLACE IS NAMED IN THE REPORT. Written without the names first, every line said
+        // "the game folder" about all three, including the two that are not it - which is a
+        // message that does not know what it is talking about, and worse than none.
+        (string Where, string? Folder)[] places =
+        [
+            ("the game folder", gameFolder),
+            ("beside the tool", AppContext.BaseDirectory),
+            ("the tool's data folder", Path.Combine(AppContext.BaseDirectory, "data")),
+        ];
+
         var looked = new List<string>();
-        foreach (string? folder in new[] { gameFolder, AppContext.BaseDirectory })
+        foreach ((string where, string? folder) in places)
         {
             if (Native.Load(folder) is { } native)
             {
-                return new Unpacker(native.Decompress, $"{native.Called} from {Path.GetDirectoryName(native.Where)}");
+                return new Unpacker(native.Decompress, $"{native.Called} {where}");
             }
 
-            if (Native.LastProblem.Length > 0)
-            {
-                looked.Add(Native.LastProblem);
-            }
+            looked.Add($"{where}: {Native.LastProblem}");
         }
 
-        return new Unpacker(
-            Decompress,
-            looked.Count == 0
-                ? "the shipped managed decoder"
-                : $"the shipped managed decoder ({string.Join("; ", looked)})");
+        return new Unpacker(Decompress, $"the shipped managed decoder ({string.Join("; ", looked)})");
     }
 
     /// <summary>
@@ -232,14 +236,14 @@ public static class Oodle
         /// <summary>Why there is no native decoder, when there is none.</summary>
         public static string LastProblem => _problem;
 
-        /// <summary>Finds and loads it, or returns null and says why.</summary>
-        public static Native? Load(string? gameFolder)
+        /// <summary>Finds and loads it from one folder, or returns null and says why.</summary>
+        public static Native? Load(string? folder)
         {
             _problem = string.Empty;
 
-            if (string.IsNullOrWhiteSpace(gameFolder) || !Directory.Exists(gameFolder))
+            if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
             {
-                _problem = "no game folder to take one from";
+                _problem = "not there";
                 return null;
             }
 
@@ -251,12 +255,12 @@ public static class Oodle
                 string[] candidates =
                 [
                     .. LibraryPatterns.SelectMany(pattern =>
-                        Directory.EnumerateFiles(gameFolder, pattern).Order(StringComparer.Ordinal).Reverse()),
+                        Directory.EnumerateFiles(folder, pattern).Order(StringComparer.Ordinal).Reverse()),
                 ];
 
                 if (candidates.Length == 0)
                 {
-                    _problem = $"none of {string.Join(", ", LibraryPatterns)} in the game folder";
+                    _problem = $"no {string.Join(" or ", LibraryPatterns)}";
                     return null;
                 }
 

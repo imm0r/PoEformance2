@@ -27,7 +27,13 @@ public class OodleTests
         Oodle.Unpacker none = Oodle.For(null);
 
         Assert.Contains("managed", none.Which, StringComparison.Ordinal);
-        Assert.Contains("no game folder", none.Which, StringComparison.Ordinal);
+
+        // EVERY PLACE IT LOOKED, NAMED. Written without the names, each line said "the game
+        // folder" about all three - including the two that are not it, which is a message that
+        // does not know what it is talking about.
+        Assert.Contains("the game folder:", none.Which, StringComparison.Ordinal);
+        Assert.Contains("beside the tool:", none.Which, StringComparison.Ordinal);
+        Assert.Contains("the tool's data folder:", none.Which, StringComparison.Ordinal);
     }
 
     [Fact]
