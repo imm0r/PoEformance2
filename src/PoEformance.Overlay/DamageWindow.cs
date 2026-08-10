@@ -168,16 +168,34 @@ public sealed class DamageWindow
                     $"  seen out to: {seen:0} grid  - the reach of the entity list, so the"
                     + " furthest anything can be and still be watched"));
 
-            // The one comparison that settles what the disappearances are. Crowding the edge
-            // is what leaving the bubble looks like; well inside it, the only thing that
-            // removes a monster is dying.
+            // Reported WITHOUT a verdict, because it cannot carry one. Both figures are
+            // maxima, and maxima coincide for free: the monster seen furthest away leaves
+            // the list eventually, and if the player walked away from it its last sighting
+            // is at that same distance. A ratio of 1 says only that something once left at
+            // the edge - which happens all map long - and nothing about where the damage
+            // was booked. The line below is the one that answers that.
             ImGui.TextColored(
-                edge >= 0.9f ? SoftText : DimText,
+                DimText,
                 ImGuiText.Escape(
-                    $"  gone at:     {furthest:0} grid  = {edge * 100:0}% of that"
-                    + (edge >= 0.9f
-                        ? "  - right at the edge, so these are monsters leaving, not dying"
-                        : "  - well inside the edge, so they went missing where things die")));
+                    $"  gone at:     {furthest:0} grid  = {edge * 100:0}% of that, at the furthest"));
+
+            // THE FIGURE THAT DECIDES. Weighted by pool rather than counted per vanish,
+            // because the question is about the damage and not the population: one boss
+            // credited at arm's length outweighs a hundred trash monsters that drifted off
+            // the edge, and a plain average would report the opposite.
+            if (_meter.CreditedMeanDistance >= 0f)
+            {
+                float mean = _meter.CreditedMeanDistance / MapView.WorldToGrid;
+                bool close = mean <= seen * 0.5f;
+
+                ImGui.TextColored(
+                    close ? DimText : SoftText,
+                    ImGuiText.Escape(
+                        $"  credit from: {mean:0} grid out on average, weighted by pool"
+                        + (close
+                            ? "  - well inside the reach, so it is coming from things that died"
+                            : "  - out near the reach, so it is coming from things that walked away")));
+            }
         }
 
         // NOTHING REFUSED: one line about the limit, not a second copy of the figure above.

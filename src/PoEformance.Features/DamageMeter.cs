@@ -265,6 +265,35 @@ public sealed class DamageMeter
         ? FurthestVanish / FurthestSeen
         : -1f;
 
+    /// <summary>
+    /// Where the credited damage actually comes from: the pool-weighted mean distance of the
+    /// vanishes it was credited for, in world units. -1 when nothing has been credited.
+    /// </summary>
+    /// <remarks>
+    /// THE FIGURE THAT DECIDES, and the one the two "furthest" numbers above cannot give.
+    /// Those compare two MAXIMA, and maxima coincide for free: the monster seen furthest away
+    /// leaves the list eventually, and if the player walked away from it its last sighting is
+    /// at that same distance. A ratio of 1 therefore only says something once left at the
+    /// edge, which happens constantly while walking a map, and says nothing at all about
+    /// where the damage was booked.
+    ///
+    /// Weighted by POOL rather than counted per vanish, because the question is about the
+    /// figure and not about the population: one boss credited at arm's length outweighs a
+    /// hundred trash monsters that drifted off the edge, and a plain average would report the
+    /// opposite.
+    ///
+    /// Read against <see cref="FurthestSeen"/>: a mean well inside the reach means the credit
+    /// is coming from monsters that died in front of the player, and a mean crowding the
+    /// reach means it is coming from monsters that walked out of the list alive.
+    /// </remarks>
+    public float CreditedMeanDistance => _creditedPoolWithDistance > 0
+        ? (float)(_creditedDistanceByPool / _creditedPoolWithDistance)
+        : -1f;
+
+    // Sum of (pool * distance) and of pool, over credited vanishes whose distance was known.
+    private double _creditedDistanceByPool;
+    private long _creditedPoolWithDistance;
+
     /// <summary>Everything counted in this area, however it was counted.</summary>
     public long Total => Observed + Credited;
 
@@ -314,6 +343,8 @@ public sealed class DamageMeter
         FurthestVanish = -1f;
         FurthestCounted = -1f;
         FurthestSeen = -1f;
+        _creditedDistanceByPool = 0;
+        _creditedPoolWithDistance = 0;
     }
 
     /// <summary>Takes one snapshot and moves the figures on.</summary>
@@ -494,6 +525,14 @@ public sealed class DamageMeter
             if (target.Distance > FurthestCounted)
             {
                 FurthestCounted = target.Distance;
+            }
+
+            // Only where the distance is known; an unmeasured one would otherwise pull the
+            // mean toward zero and make the credit look closer than it was.
+            if (target.Distance >= 0f)
+            {
+                _creditedDistanceByPool += (double)target.Pool * target.Distance;
+                _creditedPoolWithDistance += target.Pool;
             }
 
             if (target.Hurt)
