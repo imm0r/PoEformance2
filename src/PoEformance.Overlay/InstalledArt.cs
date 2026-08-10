@@ -36,17 +36,12 @@ public static class InstalledArt
             return null;
         }
 
-        GameFiles? files = GameFiles.Open(folder);
-        if (files is null)
-        {
-            // The folder is there and the files in it are not readable - a version whose
-            // bundles this does not understand, or a partly-downloaded patch.
-            describe?.Invoke($"item art: found {folder} but could not read its packed files");
-            return null;
-        }
+        // The reason comes back with the answer, because "could not read its packed files" is
+        // four different failures wearing one sentence and none of them can be acted on.
+        GameFiles.OpenedFiles opened = GameFiles.OpenOrSay(folder);
+        describe?.Invoke($"item art: {opened.Why}");
 
-        describe?.Invoke($"item art: {files.Describe}");
-        return path => Encode(GameArt.Read(files, path));
+        return opened.Files is { } files ? path => Encode(GameArt.Read(files, path)) : null;
     }
 
     /// <summary>Turns decoded pixels into a picture file, or null when there were none.</summary>

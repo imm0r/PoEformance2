@@ -56,6 +56,76 @@ public class GameFilesTests
         public long Moved => Reads.Sum(read => (long)read.Length);
     }
 
+    [Fact]
+    public void WHENAnInstallWillNotOpenItSaysWHICHOfTheFourLayersGaveUp()
+    {
+        // The whole of the diagnosis. "found the game but could not read its packed files" is
+        // true of a folder with no bundles, of an archive version this does not understand, of
+        // an index that will not decompress, and of one that decompresses into something else -
+        // and there is nothing anybody can do with it, including whoever wrote it.
+        var empty = new Fake();
+        Assert.Contains(
+            "_.index.bin is not in there",
+            GameFiles.OpenOrSay(empty, Packed.AsIs).Why,
+            StringComparison.Ordinal);
+
+        var rubbish = new Fake();
+        rubbish.Add("_.index.bin", Counting(200));
+        Assert.Contains(
+            "bundle header did not read",
+            GameFiles.OpenOrSay(rubbish, Packed.AsIs).Why,
+            StringComparison.Ordinal);
+
+        // A real bundle whose chunks the decoder refuses - the ONE layer nothing here can test
+        // against real data, because there is no Oodle compressor to build a fixture with. So
+        // this message is the first news that the shipped decoder cannot read an install.
+        var refused = new Fake();
+        refused.Add("_.index.bin", Packed.Bundle(Packed.Index(["a.bundle"], [])));
+        string oodle = GameFiles.OpenOrSay(refused, (packed, size) => null).Why;
+        Assert.Contains("will not decompress", oodle, StringComparison.Ordinal);
+        Assert.Contains("Oodle decoder", oodle, StringComparison.Ordinal);
+
+        // And one that unpacks into something that is not an index.
+        var notAnIndex = new Fake();
+        notAnIndex.Add("_.index.bin", Packed.Bundle(Counting(64)));
+        Assert.Contains(
+            "is not an index",
+            GameFiles.OpenOrSay(notAnIndex, Packed.AsIs).Why,
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANDAFolderThatHoldsNoInstallSaysThatRatherThanBlamingTheFormats()
+    {
+        Assert.Contains("no game folder", GameFiles.OpenOrSay((string?)null).Why, StringComparison.Ordinal);
+
+        string nowhere = Path.Combine(Path.GetTempPath(), $"no-install-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(nowhere);
+
+        try
+        {
+            string why = GameFiles.OpenOrSay(nowhere).Why;
+            Assert.Contains("no Bundles2", why, StringComparison.Ordinal);
+            Assert.Contains(nowhere, why, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(nowhere);
+        }
+    }
+
+    [Fact]
+    public void ANDWhenItOpensItSaysWhatItOpened()
+    {
+        var fake = new Fake();
+        fake.Add("_.index.bin", Packed.Bundle(Packed.Index(["a.bundle"], [])));
+
+        GameFiles.OpenedFiles opened = GameFiles.OpenOrSay(fake, Packed.AsIs);
+
+        Assert.NotNull(opened.Files);
+        Assert.Equal(opened.Files!.Describe, opened.Why);
+    }
+
     private static byte[] Counting(int length, byte from = 0)
     {
         var bytes = new byte[length];
