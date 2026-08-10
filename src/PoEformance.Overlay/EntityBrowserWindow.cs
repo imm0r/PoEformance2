@@ -121,7 +121,18 @@ public sealed class EntityBrowserWindow
         }
 
         ImGui.TextColored(DimText, view.Status);
+
+        // WHY THIS IS HERE AND NOT BEHIND A BUTTON: it answers "am I looking at twelve
+        // monsters or at four of them three times", and that question arrives while looking
+        // at the list, not before. It costs one pass over the snapshot's monsters on the
+        // frames this tab is in front, which is nothing beside the tree the pane draws.
+        EntityDuplicates duplicates = EntityDuplicates.Of(snapshot.Entities);
+        ImGui.TextColored(
+            duplicates.Any ? WarnText : DimText,
+            ImGuiText.Escape(duplicates.Describe()));
     }
+
+    private static readonly Vector4 WarnText = new(1f, 0.72f, 0.42f, 1f);
 
     /// <summary>
     /// The reads that only some entities carry, written out where they can be watched.
