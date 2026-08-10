@@ -41,11 +41,42 @@ public class OodleTests
             Oodle.Unpacker fallback = Oodle.For(folder);
 
             Assert.Contains("managed", fallback.Which, StringComparison.Ordinal);
-            Assert.Contains(Oodle.LibraryPattern, fallback.Which, StringComparison.Ordinal);
+
+            // Naming what it looked for, so "no Oodle here" can be told apart from "did not look".
+            Assert.All(
+                Oodle.LibraryPatterns,
+                pattern => Assert.Contains(pattern, fallback.Which, StringComparison.Ordinal));
         }
         finally
         {
             Directory.Delete(folder);
+        }
+    }
+
+    [Fact]
+    public void EVERYCandidateIsAskedAndTheOnesThatCannotAnswerAreNamed()
+    {
+        // The list is candidates, not beliefs: Path of Exile 2 ships no oo2core at all, and
+        // whether the Bink library beside it carries Oodle's exports is a question for the
+        // library rather than for whoever wrote this. One that cannot answer is let go of and
+        // said out loud, so "no Oodle here" never looks like "did not look".
+        string folder = Path.Combine(Path.GetTempPath(), $"fake-oodle-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(folder);
+
+        try
+        {
+            File.WriteAllBytes(Path.Combine(folder, "oo2core_9_win64.dll"), [0x4D, 0x5A, 0x00, 0x00]);
+            File.WriteAllBytes(Path.Combine(folder, "bink2w64.dll"), [0x4D, 0x5A, 0x00, 0x00]);
+
+            Oodle.Unpacker fallback = Oodle.For(folder);
+
+            Assert.Contains("managed", fallback.Which, StringComparison.Ordinal);
+            Assert.Contains("oo2core_9_win64.dll", fallback.Which, StringComparison.Ordinal);
+            Assert.Contains("bink2w64.dll", fallback.Which, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
         }
     }
 
