@@ -195,6 +195,23 @@ public sealed class DamageMeter
     /// <summary>Monsters that vanished after being tracked - kills, as far as this can tell.</summary>
     public int Vanished { get; private set; }
 
+    /// <summary>
+    /// The greatest distance at which anything has gone missing, in world units. -1 for none.
+    /// </summary>
+    /// <remarks>
+    /// THE MEASUREMENT THAT SETTLES WHETHER THE GATE IS NEEDED AT ALL. Crediting a vanished
+    /// monster assumes it died, and the one way that fails is a monster leaving the entity
+    /// list without dying - which would show up here as something going missing a long way
+    /// off. If this stays small, every disappearance happened in fighting range, and there
+    /// is nothing for the gate to catch; if it runs to several screens, the game does drop
+    /// distant monsters and the gate is load-bearing.
+    ///
+    /// Recorded for EVERY vanish, before the gate and regardless of whether kills are being
+    /// counted, because it is evidence rather than part of the figure - a diagnostic that
+    /// only reported what the current settings already accepted could never contradict them.
+    /// </remarks>
+    public float FurthestVanish { get; private set; } = -1f;
+
     /// <summary>Everything counted in this area, however it was counted.</summary>
     public long Total => Observed + Credited;
 
@@ -241,6 +258,7 @@ public sealed class DamageMeter
         WithheldCount = 0;
         Hurt = 0;
         Vanished = 0;
+        FurthestVanish = -1f;
     }
 
     /// <summary>Takes one snapshot and moves the figures on.</summary>
@@ -386,6 +404,13 @@ public sealed class DamageMeter
             Tracked target = _tracked[id];
             _tracked.Remove(id);
             Vanished++;
+
+            // Before every other decision below, so the evidence is not filtered by the
+            // settings it exists to judge.
+            if (target.Distance > FurthestVanish)
+            {
+                FurthestVanish = target.Distance;
+            }
 
             if (!CountKills || target.Pool <= 0)
             {

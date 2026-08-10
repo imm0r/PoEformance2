@@ -79,6 +79,8 @@ public sealed class DamageWindow
                 + " too far away to have been killed");
         }
 
+        DrawFurthest();
+
         bool counting = _meter.CountKills;
         if (ImGui.Checkbox("count what vanished  (off leaves only health seen to fall)", ref counting))
         {
@@ -121,6 +123,37 @@ public sealed class DamageWindow
 
         ImGui.Separator();
         DrawTargets();
+    }
+
+    /// <summary>
+    /// How far away the furthest disappearance was - the check on the whole assumption.
+    /// </summary>
+    /// <remarks>
+    /// Says what the number MEANS rather than just printing it, because it is read once to
+    /// settle a question and then never again: a figure that stays inside fighting range is
+    /// evidence that everything which went missing died, and one that runs to several
+    /// screens is evidence that the game drops distant monsters and the gate is doing real
+    /// work. Left unexplained it is just another row nobody knows what to do with.
+    /// </remarks>
+    private void DrawFurthest()
+    {
+        if (_meter.Vanished <= 0 || _meter.FurthestVanish < 0f)
+        {
+            return;
+        }
+
+        float screens = _meter.FurthestVanish / DamageMeter.ScreenWorldUnits;
+
+        // One screen is the line worth drawing it at: nothing is killed a whole screen away,
+        // so anything beyond that is a disappearance the assumption cannot explain.
+        bool inRange = screens <= 1f;
+
+        ImGui.TextColored(
+            inRange ? DimText : SoftText,
+            $"  furthest disappearance: {screens:0.00} screens"
+            + (inRange
+                ? "  - all within fighting range, so they were kills"
+                : "  - further than anything is killed; the game is dropping distant monsters"));
     }
 
     private void DrawTargets()

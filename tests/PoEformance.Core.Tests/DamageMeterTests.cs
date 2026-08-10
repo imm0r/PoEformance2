@@ -416,6 +416,64 @@ public class DamageMeterTests
         Assert.Equal(0, meter.Withheld);
     }
 
+    /// <summary>The furthest disappearance is the largest one, not the latest.</summary>
+    [Fact]
+    public void TheFurthestDisappearanceKeepsTheLargest()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Seen(1, Monster(1, 500, away: 900f), Monster(2, 500, away: 300f)), 0);
+        meter.Look(Seen(1, Monster(2, 500, away: 300f)), 100); // the far one goes
+        meter.Look(Seen(1), 200);                              // then the near one
+
+        Assert.Equal(900f, meter.FurthestVanish);
+    }
+
+    /// <summary>
+    /// It is recorded even for a vanish the gate refused, and with kills not counted at all.
+    /// </summary>
+    /// <remarks>
+    /// It is evidence about whether the settings are right, so it cannot be filtered by
+    /// them - a diagnostic that only reported what the current settings already accepted
+    /// could never contradict them.
+    /// </remarks>
+    [Fact]
+    public void TheFurthestDisappearanceIgnoresTheGateAndTheSwitch()
+    {
+        float far = (4f * DamageMeter.ScreenWorldUnits) + 1f;
+
+        var gated = new DamageMeter();
+        gated.Look(Seen(1, Monster(1, 500, away: far)), 0);
+        gated.Look(Seen(1), 100);
+
+        Assert.Equal(0, gated.Credited);          // refused, as it should be
+        Assert.Equal(far, gated.FurthestVanish);  // but still measured
+
+        var off = new DamageMeter { CountKills = false };
+        off.Look(Seen(1, Monster(1, 500, away: far)), 0);
+        off.Look(Seen(1), 100);
+
+        Assert.Equal(far, off.FurthestVanish);
+    }
+
+    /// <summary>With nothing gone missing yet there is no figure, rather than a zero.</summary>
+    /// <remarks>
+    /// Zero would read as "everything vanished right on top of you", which is the strongest
+    /// possible evidence for the assumption - and it would be showing before any evidence
+    /// existed at all.
+    /// </remarks>
+    [Fact]
+    public void TheFurthestDisappearanceIsAbsentUntilSomethingVanishes()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Seen(1, Monster(1, 500, away: 400f)), 0);
+        meter.Look(Seen(1, Monster(1, 400, away: 400f)), 100);
+
+        Assert.Equal(0, meter.Vanished);
+        Assert.True(meter.FurthestVanish < 0f);
+    }
+
     /// <summary>Two readings inside the same millisecond lose no damage.</summary>
     /// <remarks>
     /// The reader is paced, not guaranteed - and a difference divided by a zero interval is
