@@ -136,6 +136,16 @@ public sealed class EntityBrowserWindow
             duplicates.Any ? WarnText : DimText,
             ImGuiText.Escape(duplicates.Describe()));
 
+        // What the corpse check saw. Here because dots left on cleared ground are noticed
+        // while looking at this list, and because the three ways it can fail look identical
+        // on the map and want completely different fixes - see CorpseSigns.
+        if (snapshot.Corpses.Seen > 0)
+        {
+            ImGui.TextColored(
+                snapshot.Corpses.Unreadable > 0 ? WarnText : DimText,
+                ImGuiText.Escape("corpses: " + snapshot.Corpses.Describe()));
+        }
+
         if (snapshot.Collapsed > 0)
         {
             // Says the MECHANISM, not the symptom. "On the same spot" was true but described

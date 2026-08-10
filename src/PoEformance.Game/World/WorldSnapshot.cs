@@ -204,7 +204,8 @@ public sealed record WorldSnapshot(
     uint AreaHash = 0,
     GameStateKind State = GameStateKind.NotLoaded,
     ReadCost Cost = default,
-    int Collapsed = 0)
+    int Collapsed = 0,
+    CorpseSigns Corpses = default)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -485,6 +486,10 @@ public sealed class WorldReader
         var rendered = new HashSet<ulong>();
         int collapsed = 0;
 
+        // What the corpse check saw, so a screen full of dots on cleared ground can be
+        // explained instead of guessed at. See CorpseSigns for the three shapes.
+        int targetable = 0, untargetable = 0, unreadableTargetable = 0;
+
         foreach ((uint id, ulong address) in pointers)
         {
             // The PATH first, and the components only if the path earns them: walking an
@@ -563,6 +568,17 @@ public sealed class WorldReader
             // being recognised: a cleared screen keeps its dots. Keyed on the object, the
             // clock belongs to the monster and does not care which of its entities was seen.
             MonsterSigns signs = kind == EntityKind.Monster ? ReadMonsterSigns(entity) : default;
+
+            if (kind == EntityKind.Monster)
+            {
+                switch (signs.Targetable)
+                {
+                    case true: targetable++; break;
+                    case false: untargetable++; break;
+                    default: unreadableTargetable++; break;
+                }
+            }
+
             if (kind == EntityKind.Monster && _corpses.IsCorpse(renderAddress, signs, nowMs))
             {
                 continue;
@@ -704,7 +720,8 @@ public sealed class WorldReader
             areaHash,
             chain.State,
             new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, entities.Count, skipped),
-            collapsed);
+            collapsed,
+            new CorpseSigns(targetable, untargetable, unreadableTargetable, _corpses.Tracking));
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>

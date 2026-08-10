@@ -68,6 +68,49 @@ public readonly record struct MonsterSigns(
 }
 
 /// <summary>
+/// What the corpse check SAW this read, so a screen full of dots can be explained.
+/// </summary>
+/// <remarks>
+/// The whole rule hangs on one byte, and there are exactly three ways it can leave dots on
+/// cleared ground - which look identical on screen and want completely different fixes:
+///
+///   - <paramref name="Targetable"/> high while the ground is clear: the byte says those
+///     monsters are alive. Either its offset has drifted or it no longer means what it did,
+///     and no amount of timing will help.
+///   - <paramref name="Unreadable"/> high: the component is not being found at all, so the
+///     filter is being asked to decide with no evidence and correctly refuses to.
+///   - <paramref name="Untargetable"/> high while dots remain: the byte is right and the
+///     clock is not running out - which is a fault in the timing, not in the reading.
+///
+/// Counted rather than reasoned about because the first two were each guessed wrong once.
+/// </remarks>
+/// <param name="Tracking">Monsters whose untargetable clock is currently running.</param>
+public readonly record struct CorpseSigns(int Targetable, int Untargetable, int Unreadable, int Tracking)
+{
+    /// <summary>Monsters the check looked at this read.</summary>
+    public int Seen => Targetable + Untargetable + Unreadable;
+
+    /// <summary>The finding in one line, said as what it would mean.</summary>
+    public string Describe()
+    {
+        if (Seen == 0)
+        {
+            return "no monsters to judge";
+        }
+
+        string counts = $"{Seen} judged: {Targetable} targetable, {Untargetable} not, {Unreadable} unreadable"
+                        + $"; {Tracking} on the clock";
+
+        if (Unreadable > Targetable + Untargetable)
+        {
+            return $"{counts}  -  the Targetable component is mostly NOT BEING FOUND";
+        }
+
+        return counts;
+    }
+}
+
+/// <summary>
 /// Decides which monsters are corpses, so the overlay stops marking them.
 /// </summary>
 /// <remarks>
