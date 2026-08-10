@@ -38,17 +38,25 @@ namespace PoEformance.Features;
 public readonly record struct EntityDuplicates(int Entries, int Addresses, int Places)
 {
     /// <summary>Entries that were another entry's object all along.</summary>
-    public int SharedAddress => Math.Max(0, Entries - Addresses);
+    public int SharedObject => Math.Max(0, Entries - Addresses);
 
-    /// <summary>Entries standing on a place another entry already occupied.</summary>
+    /// <summary>Entries standing where another entry already stood.</summary>
     /// <remarks>
-    /// Includes the shared-address ones, since the same object is trivially in the same
-    /// place. The interesting figure is the difference between the two.
+    /// Informational, NOT a fault on its own - which the recorded session proves: it holds
+    /// pairs of Firewall anomalies on one tile, separate objects that the game stacks
+    /// because that is what a wall of fire is. They classify as monsters by their path, so
+    /// a rule keyed on position would quietly delete half of every overlapping effect.
     /// </remarks>
     public int SharedPlace => Math.Max(0, Entries - Places);
 
-    /// <summary>Whether the list is saying anything twice at all.</summary>
-    public bool Any => SharedPlace > 0;
+    /// <summary>
+    /// Whether the list is really saying the same thing twice.
+    /// </summary>
+    /// <remarks>
+    /// On the OBJECT alone. Sharing a place is what stacked effects do on purpose; sharing a
+    /// Render component is one thing wearing two entities, which is the fault.
+    /// </remarks>
+    public bool Any => SharedObject > 0;
 
     /// <summary>Counts the monsters in a snapshot, and how much of it is repetition.</summary>
     /// <remarks>
@@ -72,7 +80,11 @@ public readonly record struct EntityDuplicates(int Entries, int Addresses, int P
             }
 
             entries++;
-            addresses.Add(entity.Address);
+
+            // The RENDER component, not the entity address. The entity address is not an
+            // identity here - the game hands one monster several entity objects - so
+            // counting those would report every real monster as unique and find nothing.
+            addresses.Add(entity.Render);
 
             // The reference's key: the exact BITS of the position rather than the value.
             // Two monsters standing on coordinates that agree to the last bit of three
@@ -96,15 +108,18 @@ public readonly record struct EntityDuplicates(int Entries, int Addresses, int P
             return "no monsters here to count";
         }
 
+        string counts = $"{Entries} monsters, {Addresses} objects, {Places} places";
+
         if (!Any)
         {
-            return $"{Entries} monsters, {Addresses} objects, {Places} places - nothing repeated";
+            // Said out loud rather than left blank, because a place shared by separate
+            // objects is the ordinary state of a stacked ground effect and somebody
+            // comparing this row against the entity list should not read it as a finding.
+            return SharedPlace > 0
+                ? $"{counts} - nothing repeated ({SharedPlace} stacked on a shared spot, which is normal)"
+                : $"{counts} - nothing repeated";
         }
 
-        string shape = SharedAddress > 0
-            ? $"{SharedAddress} share an object - the same monster listed more than once"
-            : $"{SharedPlace} share a place but not an object - separate objects, identical position";
-
-        return $"{Entries} monsters, {Addresses} objects, {Places} places  -  {shape}";
+        return $"{counts}  -  {SharedObject} share an object: one monster wearing several entities";
     }
 }

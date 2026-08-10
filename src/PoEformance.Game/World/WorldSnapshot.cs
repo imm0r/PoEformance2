@@ -96,6 +96,16 @@ public readonly record struct ReadCost(
 /// an effect" is a fact and "should it be drawn" is not, and the two are answered in different
 /// places.
 /// </param>
+/// <param name="Render">
+/// The Render component's address - what actually IDENTIFIES the thing in the world.
+/// </param>
+/// <remarks>
+/// Carried because the game hands one monster several entity objects over a single set of
+/// components, so an entity address is not an identity: three entities with three addresses
+/// and three ids can share one Render, one Life and one Monster component, differing only in
+/// Positioned. Two entities sharing this are one object with one position and one model, and
+/// that is a proof rather than the coincidence a matching position would be.
+/// </remarks>
 public sealed record WorldEntity(
     uint Id,
     ulong Address,
@@ -114,7 +124,8 @@ public sealed record WorldEntity(
     bool? Opened = null,
     bool IsFriendly = false,
     bool IsEffect = false,
-    string Name = "")
+    string Name = "",
+    ulong Render = 0)
 {
     /// <summary>Whether this is a chest somebody has already been through.</summary>
     public bool IsSpent => Opened == true;
@@ -192,7 +203,8 @@ public sealed record WorldSnapshot(
     TerrainGrid? Terrain = null,
     uint AreaHash = 0,
     GameStateKind State = GameStateKind.NotLoaded,
-    ReadCost Cost = default)
+    ReadCost Cost = default,
+    int Collapsed = 0)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -468,6 +480,11 @@ public sealed class WorldReader
         WorldEntity? player = null;
         long nowMs = Environment.TickCount64;
 
+        // Which rendered objects a monster has already been taken for this read, and how
+        // many repeat entities were dropped because of it. See where they are used, below.
+        var rendered = new HashSet<ulong>();
+        int collapsed = 0;
+
         foreach ((uint id, ulong address) in pointers)
         {
             // The PATH first, and the components only if the path earns them: walking an
@@ -493,13 +510,45 @@ public sealed class WorldReader
                 continue; // no position - nothing to draw
             }
 
+            EntityKind kind = ClassifyPath(entity.Path);
+
+            // ONE MONSTER PER RENDERED OBJECT. Measured, not assumed: an area listed twelve
+            // monster entities of one kind - twelve addresses, twelve ids, from twelve
+            // separate nodes - while the game's own counter and the four map dots both said
+            // four. Taking three of them apart in the dissector settled what they were:
+            // ids 229, 230 and 231 shared EVERY component address, Life and Render included,
+            // and differed only in Positioned. Id 269 next to them shared none of it.
+            //
+            // So the game gives one monster several entity objects over one set of
+            // components, and every consumer counted each. The damage meter is where that
+            // was expensive: it credits a monster's remaining pool when its entity goes
+            // away, so a monster represented three times was paid for three times - into
+            // the least certain bucket of the figure, where it was hardest to notice.
+            //
+            // KEYED ON THE COMPONENT, NOT ON THE POSITION, and the difference is between a
+            // proof and a coincidence. Two entities sharing one Render component ARE one
+            // object - there is a single position and a single model behind them. Two
+            // entities merely STANDING on identical coordinates might be a pack still
+            // stacked on its spawn point, and collapsing those would take a live monster off
+            // the overlay. The first test cannot be wrong in that way.
+            //
+            // Render rather than Life because every entity that gets this far has one - it
+            // is the component just read above - so the key costs nothing and needs no
+            // fallback for the entities that carry no health.
+            //
+            // Monsters only. Ground effects legitimately repeat, and nothing here has been
+            // measured about how the game represents those.
+            if (kind == EntityKind.Monster && !rendered.Add(renderAddress))
+            {
+                collapsed++;
+                continue;
+            }
+
             RenderComponent? position = _render.Read(renderAddress);
             if (position is null)
             {
                 continue;
             }
-
-            EntityKind kind = ClassifyPath(entity.Path);
 
             // Corpses stay in the entity map long after the fight, so without this the
             // overlay marks a cleared screen full of dead monsters. Only monsters are
@@ -560,7 +609,7 @@ public sealed class WorldReader
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
                 PointsOfInterest.Classify(entity.Path, mapIcon), mapIcon,
                 signs.Life, signs.EnergyShield, opened, signs.Friendly, signs.IsEffect,
-                NameOf(address, renderAddress));
+                NameOf(address, renderAddress), renderAddress);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
@@ -646,7 +695,8 @@ public sealed class WorldReader
             terrain,
             areaHash,
             chain.State,
-            new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, entities.Count, skipped));
+            new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, entities.Count, skipped),
+            collapsed);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>
