@@ -41,6 +41,32 @@ public sealed class IconCache : IDisposable
     /// </remarks>
     public const int MaxWideEdge = 1024;
 
+    /// <summary>
+    /// Whether a picture is handed to the renderer as an sRGB texture. It is not, and the
+    /// reason is the RENDER TARGET rather than the picture.
+    /// </summary>
+    /// <remarks>
+    /// WHY EVERY ICON CAME OUT DARK. Asking for sRGB picks
+    /// <c>R8G8B8A8_UNorm_SRgb</c>, which makes the sampler decode each texel from sRGB into
+    /// linear light on the way in - 0.5 arrives at the shader as 0.214. That is correct in a
+    /// pipeline that encodes back on the way out, and the overlay's swap chain is plain
+    /// <c>R8G8B8A8_UNorm</c> (ClickableTransparentOverlay's <c>Overlay</c> constructor), so
+    /// nothing ever does. The decoded value is written to the screen as if it were already
+    /// sRGB, and every midtone lands roughly a stop and a half down: item art that is
+    /// visibly duller than the same art in the game, most of it in the mid greys and browns
+    /// that PoE's icons are made of. Highlights and pure black are unaffected, which is why
+    /// it reads as "wrong somehow" rather than as an obvious blackout.
+    ///
+    /// It was never about where the picture came from - poe2db's PNGs were darkened by
+    /// exactly the same conversion as the install's own textures, which is the clue that
+    /// pointed here rather than at the DDS decode.
+    ///
+    /// The reference agrees: GameHelper2 draws over the same overlay and passes false at all
+    /// six of its call sites (<c>Radar</c>, <c>HealthBars</c>, <c>Atlas2</c>,
+    /// <c>PlayerBuffBar</c>), and <see cref="TerrainLayer"/> here already did.
+    /// </remarks>
+    public const bool Srgb = false;
+
     /// <summary>A loaded picture, and the shape it came in.</summary>
     /// <remarks>
     /// The SIZE is the reason this exists. A banner is drawn to a width and has to keep its
@@ -246,7 +272,7 @@ public sealed class IconCache : IDisposable
 
         string key = $"poeformance.icon.{_keys.Count}.{maxEdge}";
         _keys[cached] = key;
-        return new Picture(_upload(key, image, true), image.Width, image.Height);
+        return new Picture(_upload(key, image, Srgb), image.Width, image.Height);
     }
 
     /// <summary>Drops everything, so changed files are picked up on the next ask.</summary>
