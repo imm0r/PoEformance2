@@ -153,7 +153,27 @@ public sealed class DamageWindow
             $"  furthest disappearance: {screens:0.00} screens"
             + (inRange
                 ? "  - all within fighting range, so they were kills"
-                : "  - further than anything is killed; the game is dropping distant monsters"));
+                : "  - beyond killing range, so the game does drop distant monsters"));
+
+        if (_meter.FurthestCounted < 0f)
+        {
+            return;
+        }
+
+        // The pair is the point, not either number alone: one says how far the
+        // disappearances reach, the other how far the ones being BELIEVED reach, and the
+        // gate's job is to sit in the gap between them. Pressed together means there is no
+        // gap and the threshold is cutting through one population rather than between two.
+        float counted = _meter.FurthestCounted / DamageMeter.ScreenWorldUnits;
+        float gate = _meter.CreditWithin / DamageMeter.ScreenWorldUnits;
+        bool roomy = gate <= 0f || counted <= gate * 0.75f;
+
+        ImGui.TextColored(
+            roomy ? DimText : SoftText,
+            $"  furthest one counted:   {counted:0.00} screens"
+            + (roomy
+                ? "  - clear of the limit, so it is not cutting into kills"
+                : "  - close to the limit; it may be refusing real kills, so try widening it"));
     }
 
     private void DrawTargets()
