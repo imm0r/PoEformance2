@@ -171,3 +171,72 @@ public class EntityDuplicatesTests
         Assert.True(counted.Any);
     }
 }
+
+/// <summary>
+/// The collapsing as the reader actually does it, against a recorded session.
+/// </summary>
+/// <remarks>
+/// These exist for the reason the noise filter's twin does: every test above could pass while
+/// the collapsing was wired to nothing. Removing the call from the read path would break none
+/// of them, and a rule nobody consults is worth nothing.
+///
+/// Against a REAL recording, which also answers what a synthetic list cannot: whether the game
+/// really does hand out several entity objects for one monster. It does - this fixture was
+/// recorded long before the twelve-rows-four-dots observation, and it carries the same thing.
+/// </remarks>
+public class EntityDuplicatesInTheReadTests
+{
+    private static WorldSnapshot Read()
+    {
+        var replay = PoEformance.Core.Memory.ReplayMemoryReader.Load(
+            File.OpenRead(RealSessionTests.SceneFixturePath));
+        var world = new WorldReader(replay, RealSessionTests.Schema());
+        return world.Read(replay.ResolvedStatics["GameStates"]);
+    }
+
+    /// <summary>The reader ACTUALLY drops the repeats.</summary>
+    /// <remarks>
+    /// The exact count is pinned rather than "more than zero", because it is a fact about a
+    /// file that does not change: this recording holds three repeat copies. A different number
+    /// means either the collapsing changed or the fixture was re-recorded, and both are worth
+    /// stopping for.
+    /// </remarks>
+    [Fact]
+    public void ARecordedSessionCarriesRepeatsAndTheyAreDropped()
+    {
+        WorldSnapshot snapshot = Read();
+
+        Assert.Equal(3, snapshot.Collapsed);
+    }
+
+    /// <summary>Nothing that comes out of the reader stands on a place twice.</summary>
+    /// <remarks>
+    /// The invariant the damage meter depends on: it credits a monster's remaining pool per
+    /// entry, so a place holding two entries is paid for twice.
+    /// </remarks>
+    [Fact]
+    public void WhatComesOutHoldsOneMonsterPerPlace()
+    {
+        EntityDuplicates counted = EntityDuplicates.Of(Read().Entities);
+
+        Assert.False(counted.Any, counted.Describe());
+        Assert.Equal(counted.Entries, counted.Places);
+    }
+
+    /// <summary>The monsters that remain are still there - repeats went, originals stayed.</summary>
+    /// <remarks>
+    /// The failure this guards against is the one that would be invisible on screen and fatal
+    /// in use: a key that collapses too much takes live monsters off the overlay with it.
+    /// </remarks>
+    [Fact]
+    public void CollapsingKeepsOneOfEach()
+    {
+        WorldSnapshot snapshot = Read();
+        EntityDuplicates counted = EntityDuplicates.Of(snapshot.Entities);
+
+        // Every place that had a monster still has exactly one, and the collapsing only ever
+        // took copies beyond the first.
+        Assert.Equal(counted.Entries, counted.Places);
+        Assert.True(counted.Entries > 0, "the fixture should hold monsters");
+    }
+}

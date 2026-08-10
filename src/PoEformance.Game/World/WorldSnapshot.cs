@@ -192,7 +192,8 @@ public sealed record WorldSnapshot(
     TerrainGrid? Terrain = null,
     uint AreaHash = 0,
     GameStateKind State = GameStateKind.NotLoaded,
-    ReadCost Cost = default)
+    ReadCost Cost = default,
+    int Collapsed = 0)
 {
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -468,6 +469,11 @@ public sealed class WorldReader
         WorldEntity? player = null;
         long nowMs = Environment.TickCount64;
 
+        // Which monster places have already been taken this read, and how many repeat
+        // copies were dropped because of it. See where they are used, below.
+        var places = new HashSet<(string Path, int X, int Y, int Z)>();
+        int collapsed = 0;
+
         foreach ((uint id, ulong address) in pointers)
         {
             // The PATH first, and the components only if the path earns them: walking an
@@ -522,6 +528,40 @@ public sealed class WorldReader
             // and this is a question of fact - they travel on with IsEffect set instead.
             if (kind == EntityKind.Monster && signs.IsHostileEffect)
             {
+                continue;
+            }
+
+            // ONE MONSTER PER PLACE. Measured rather than assumed: an area showed twelve
+            // entity objects of one kind - twelve addresses, twelve ids, from twelve
+            // separate nodes of the map - standing on FOUR byte-identical positions, while
+            // the game's own counter and the four map dots both said four. So the game
+            // hands out several entity objects for one monster, and every consumer counted
+            // each of them.
+            //
+            // The damage meter is where that hurt: it credits a monster's remaining pool
+            // when the entity goes away, so a monster represented three times was paid for
+            // three times, in the least certain bucket of the figure.
+            //
+            // THIS HIDES NOTHING, which is what makes it safe to do at the read. It drops
+            // repeat copies, never the last one - every place that had a monster still has
+            // exactly one. The only way to lose something real is two DIFFERENT monsters on
+            // coordinates agreeing to the last bit of three floats, and those would have
+            // been drawn on the same pixel anyway.
+            //
+            // Exact bits rather than a tolerance, and the path in the key, both from the
+            // reference (AuraTracker's MonsterCollector): a tolerance would swallow monsters
+            // genuinely standing a hair apart, and a position-only key would merge a spider
+            // standing where a hyena stands.
+            //
+            // Monsters only. Ground effects legitimately stack - several instances of one
+            // spell on one tile is what a spell looks like.
+            if (kind == EntityKind.Monster && !places.Add((
+                    entity.Path,
+                    BitConverter.SingleToInt32Bits(position.Value.X),
+                    BitConverter.SingleToInt32Bits(position.Value.Y),
+                    BitConverter.SingleToInt32Bits(position.Value.Z))))
+            {
+                collapsed++;
                 continue;
             }
 
@@ -646,7 +686,8 @@ public sealed class WorldReader
             terrain,
             areaHash,
             chain.State,
-            new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, entities.Count, skipped));
+            new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, entities.Count, skipped),
+            collapsed);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>

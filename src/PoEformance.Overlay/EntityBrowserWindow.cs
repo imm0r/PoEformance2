@@ -126,10 +126,23 @@ public sealed class EntityBrowserWindow
         // monsters or at four of them three times", and that question arrives while looking
         // at the list, not before. It costs one pass over the snapshot's monsters on the
         // frames this tab is in front, which is nothing beside the tree the pane draws.
+        //
+        // It runs on the list AFTER the reader has collapsed repeats, so it should now find
+        // nothing - and that is the point of leaving it in. It is the check on the collapsing
+        // rather than a leftover: anything it still reports is a repeat the position key does
+        // not catch, which is exactly what nobody would notice otherwise.
         EntityDuplicates duplicates = EntityDuplicates.Of(snapshot.Entities);
         ImGui.TextColored(
             duplicates.Any ? WarnText : DimText,
             ImGuiText.Escape(duplicates.Describe()));
+
+        if (snapshot.Collapsed > 0)
+        {
+            ImGui.TextColored(
+                DimText,
+                $"{snapshot.Collapsed} repeat copies dropped this read - the game lists some monsters"
+                + " more than once, on the same spot");
+        }
     }
 
     private static readonly Vector4 WarnText = new(1f, 0.72f, 0.42f, 1f);
