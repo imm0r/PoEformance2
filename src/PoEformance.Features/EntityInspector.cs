@@ -52,7 +52,8 @@ public sealed record EntityView(
     IReadOnlyList<ComponentTally> Survey,
     int SurveyedEntities,
     string Status,
-    IReadOnlyList<TimedEffect>? Effects = null)
+    IReadOnlyList<TimedEffect>? Effects = null,
+    string EffectsNote = "")
 {
     public static EntityView Empty { get; } = new(0, 0, string.Empty, [], [], 0, "nothing selected");
 
@@ -90,6 +91,7 @@ public sealed class EntityInspector
     /// </remarks>
     public const int MaxSurvey = 1024;
 
+    private readonly IMemoryReader _reader;
     private readonly EntityReader _entities;
     private readonly PoEformance.Game.Components.BuffsReader _buffs;
     private readonly OffsetSchema _schema;
@@ -105,6 +107,7 @@ public sealed class EntityInspector
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
+        _reader = reader;
         _schema = schema;
         _entities = new EntityReader(reader, schema);
         _buffs = new PoEformance.Game.Components.BuffsReader(reader, schema);
@@ -174,14 +177,30 @@ public sealed class EntityInspector
         ];
 
         // One entity, on demand, so the vector walk is affordable here in a way it is not in
-        // the world read. A failed read is ordinary - the entity can stop existing mid-walk -
-        // and comes back as no effects rather than as an error.
+        // the world read. A failed read is ordinary - the entity can stop existing mid-walk.
+        //
+        // THREE OUTCOMES, KEPT APART, because the first version of this drew nothing at all
+        // when there was nothing to draw: "this entity carries no Buffs component", "it does
+        // and there is nothing on it" and "it does and nobody could read it" then looked
+        // identical on screen, and so did "you are running a build without this feature". A
+        // screenshot of that answers no question, which was the whole point of adding it.
         List<TimedEffect> effects = [];
+        string note = string.Empty;
         ulong buffs = entity.Component("Buffs");
         if (buffs != 0)
         {
+            StructDef layout = _schema.Structs["Buffs"];
+            bool readable = _reader.TryRead(buffs + (ulong)layout.OffsetOf("StatusEffectFirst"), out ulong _)
+                            && _reader.TryRead(buffs + (ulong)layout.OffsetOf("StatusEffectLast"), out ulong _);
+
             effects.AddRange(_buffs.Read(buffs).All
                 .Select(buff => new TimedEffect(buff.Name, buff.TimeLeft, buff.TotalTime, buff.Charges)));
+
+            note = !readable
+                ? "carries Buffs, and it could not be read"
+                : effects.Count > 0
+                    ? $"{effects.Count} on this entity:"
+                    : "carries Buffs, with nothing on it";
         }
 
         return new EntityView(
@@ -193,7 +212,8 @@ public sealed class EntityInspector
             _lastSurveyed,
             $"{components.Count} components, {components.Count(c => !c.Described)} not described"
                 + (effects.Count > 0 ? $", {effects.Count} timed" : string.Empty),
-            effects);
+            effects,
+            note);
     }
 
     /// <summary>Counts every component name across a set of entities.</summary>
