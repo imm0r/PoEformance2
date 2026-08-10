@@ -561,6 +561,65 @@ public class DamageMeterTests
         Assert.True(meter.VanishedAtEdge < 0f);
     }
 
+    /// <summary>
+    /// The credited distance is weighted by POOL, not counted per vanish.
+    /// </summary>
+    /// <remarks>
+    /// The question is about the damage, not the population. One large monster credited at
+    /// arm's length outweighs many small ones that drifted off the edge, and a plain average
+    /// over vanishes would report the opposite - which is the difference between "the credit
+    /// comes from kills" and "the credit comes from monsters walking away".
+    /// </remarks>
+    [Fact]
+    public void TheCreditedDistanceIsWeightedByPoolNotByHeadcount()
+    {
+        var meter = new DamageMeter { CreditWithin = 0f };
+
+        // One big pool close by, three small ones far away. By headcount the mean sits far
+        // out; by pool it sits close, which is where the damage actually came from.
+        meter.Look(
+            Seen(1,
+                Monster(1, 9_000, max: 9_000, away: 100f),
+                Monster(2, 100, max: 100, away: 2_000f),
+                Monster(3, 100, max: 100, away: 2_000f),
+                Monster(4, 100, max: 100, away: 2_000f)),
+            0);
+        meter.Look(Seen(1), 100);
+
+        Assert.Equal(9_300, meter.Credited);
+
+        // Pool-weighted: (9000*100 + 300*2000) / 9300 ~= 161. A headcount mean would be 1525.
+        Assert.InRange(meter.CreditedMeanDistance, 150f, 175f);
+    }
+
+    /// <summary>What the gate refused is not part of where the credit came from.</summary>
+    [Fact]
+    public void RefusedVanishesDoNotMoveTheCreditedDistance()
+    {
+        var meter = new DamageMeter { CreditWithin = 500f };
+
+        meter.Look(
+            Seen(1, Monster(1, 1_000, away: 100f), Monster(2, 1_000, away: 5_000f)),
+            0);
+        meter.Look(Seen(1), 100);
+
+        Assert.Equal(1_000, meter.Credited);
+        Assert.Equal(1_000, meter.Withheld);
+        Assert.Equal(100f, meter.CreditedMeanDistance);  // the refused one is not in it
+    }
+
+    /// <summary>With nothing credited there is no figure, rather than a zero.</summary>
+    [Fact]
+    public void TheCreditedDistanceIsAbsentUntilSomethingIsCredited()
+    {
+        var meter = new DamageMeter { CountKills = false };
+
+        meter.Look(Seen(1, Monster(1, 500, away: 300f)), 0);
+        meter.Look(Seen(1), 100);
+
+        Assert.True(meter.CreditedMeanDistance < 0f);
+    }
+
     /// <summary>Two readings inside the same millisecond lose no damage.</summary>
     /// <remarks>
     /// The reader is paced, not guaranteed - and a difference divided by a zero interval is
