@@ -25,6 +25,10 @@ public sealed class DamageWindow
     private static readonly Vector4 DpsText = new(1f, 1f, 0.6f, 1f);
     private static readonly Vector4 JudgedText = new(0.85f, 0.75f, 0.5f, 1f);
 
+    // Dimmer than the confident credit, on purpose: this row is the least-known part of the
+    // figure, and it should not read as loudly as the part that was watched.
+    private static readonly Vector4 SoftText = new(0.78f, 0.62f, 0.42f, 1f);
+
     private readonly DamageMeter _meter;
     private readonly Func<long> _clock;
 
@@ -48,14 +52,31 @@ public sealed class DamageWindow
 
         ImGui.Separator();
 
-        // WHERE the figure came from. The credited half is the judgement the meter makes -
-        // that a monster which left the snapshot was killed rather than merely gone - and a
-        // damage number that does not say how much of itself is inferred is a number nobody
-        // can check.
-        ImGui.TextColored(DimText, $"watched:  {Number(_meter.Observed)}  off {_meter.Hurt} monsters' health");
+        // WHERE the figure came from, split three ways by how much each part is really
+        // KNOWN. A damage number that does not say how much of itself is inferred is a
+        // number nobody can check, and on a build that one-shots packs the inferred part is
+        // the majority - so the split is the difference between a figure and a claim.
+        ImGui.TextColored(DimText, $"watched:   {Number(_meter.Observed)}  off {_meter.Hurt} monsters' health");
+
+        // Nearly certain: something was hurting it, and then it was gone.
         ImGui.TextColored(
             JudgedText,
-            $"credited: {Number(_meter.Credited)}  from {_meter.Vanished} that vanished - taken as kills");
+            $"credited:  {Number(_meter.CreditedHurt)}  from ones we were already hurting");
+
+        // The half that rests entirely on the assumption - and the half a monster that
+        // merely walked off would land in.
+        ImGui.TextColored(
+            SoftText,
+            $"  untouched: {Number(_meter.CreditedUntouched)}  vanished without a scratch seen"
+            + $"   ({Share(_meter.CreditedUntouched, _meter.Total)} of the total)");
+
+        if (_meter.WithheldCount > 0)
+        {
+            ImGui.TextColored(
+                DimText,
+                $"  refused:   {Number(_meter.Withheld)}  from {_meter.WithheldCount} that vanished"
+                + " too far away to have been killed");
+        }
 
         bool counting = _meter.CountKills;
         if (ImGui.Checkbox("count what vanished  (off leaves only health seen to fall)", ref counting))
@@ -72,6 +93,22 @@ public sealed class DamageWindow
                 DimText,
                 "    with this off the figure is only what was watched, which under-reports"
                 + " by the whole of every killing blow.");
+        }
+        else
+        {
+            // In SCREENS rather than world units, because that is the unit the judgement is
+            // made in - "nothing is killed two screens away" is a statement somebody can
+            // agree or disagree with, and "nothing is killed 3826 units away" is not.
+            ImGui.SetNextItemWidth(220f);
+            float screens = _meter.CreditWithin / DamageMeter.ScreenWorldUnits;
+            if (ImGui.SliderFloat("only within", ref screens, 0f, 6f,
+                    screens <= 0f ? "any distance" : "%.1f screens"))
+            {
+                _meter.CreditWithin = screens * DamageMeter.ScreenWorldUnits;
+            }
+
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, "of where it was last seen");
         }
 
         ImGui.SetNextItemWidth(220f);
@@ -139,6 +176,10 @@ public sealed class DamageWindow
         ItemRarity.Magic => new Vector4(0.53f, 0.53f, 1f, 1f),
         _ => new Vector4(0.85f, 0.85f, 0.85f, 1f),
     };
+
+    /// <summary>What share one part is of the whole, for reading the split at a glance.</summary>
+    private static string Share(long part, long whole)
+        => whole <= 0 ? "-" : $"{100d * part / whole:0}%";
 
     /// <summary>
     /// A damage figure short enough to read at a glance.

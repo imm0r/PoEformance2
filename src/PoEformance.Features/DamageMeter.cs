@@ -1,4 +1,5 @@
 using PoEformance.Game.Components;
+using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
 namespace PoEformance.Features;
@@ -57,6 +58,26 @@ public sealed class DamageMeter
     /// </remarks>
     private const long KeepTargetMs = 6_000;
 
+    /// <summary>
+    /// World units across one screen.
+    /// </summary>
+    /// <remarks>
+    /// Derived from <see cref="MapCoverage.SeeRadius"/>, which is 22 coarse cells of 4 grid
+    /// cells at <see cref="MapView.WorldToGrid"/> units each - about 957 units, and its own
+    /// comment calls that "roughly what fits on screen". Doubled here because that figure is
+    /// a radius and this is a width.
+    ///
+    /// THIS IS APPROXIMATE, and the codebase does not agree with itself about it: the default
+    /// "Rare monster" alert uses 120 units and calls that "within a screen", which is eight
+    /// times smaller and would be about a character and a half. The coverage figure is the
+    /// one trusted here because it is load-bearing - it sizes the sight disc behind a walked
+    /// percentage that would be visibly wrong if the radius were eight times off, whereas the
+    /// alert distance was tuned by feel and its comment is loose. Anything resting on this
+    /// number should be adjustable and should show its effect, which is what the gate below
+    /// does.
+    /// </remarks>
+    public const float ScreenWorldUnits = 2f * MapCoverage.SeeRadius * MapCoverage.CoarseStep * MapView.WorldToGrid;
+
     private sealed class Tracked
     {
         public int Pool;
@@ -67,6 +88,14 @@ public sealed class DamageMeter
         public int Percent = -1;
         public ItemRarity Rarity = ItemRarity.Unknown;
         public bool Hurt;
+
+        // How far from the player this was the last time it was SEEN, or -1 when there was no
+        // player to measure against. At the last sighting rather than at the moment it went
+        // missing, because the moment it went missing is the moment there is nothing left to
+        // measure - and it is the right question anyway: a monster killed in front of you was
+        // last seen close, one that dropped off the entity list because you left was last
+        // seen far.
+        public float Distance = -1f;
     }
 
     private readonly Dictionary<uint, Tracked> _tracked = [];
@@ -102,6 +131,25 @@ public sealed class DamageMeter
     /// </remarks>
     public bool CountKills { get; set; } = true;
 
+    /// <summary>
+    /// Only credit a vanished monster if it was last seen this close. 0 credits any distance.
+    /// </summary>
+    /// <remarks>
+    /// The gate on the one way this can be badly wrong. Crediting a vanished monster assumes
+    /// it died, and the assumption fails for a monster that left the entity list without
+    /// dying - walked away from, or dropped because the player went far enough that the game
+    /// stopped keeping it. Those are the ones that were last seen a long way off, so distance
+    /// separates them from kills without needing to know why the game drops entities.
+    ///
+    /// Two screens by default: wide enough that no real kill is near it - nothing is killed
+    /// two screens away - and narrow enough to exclude a pack abandoned across the map. It is
+    /// deliberately generous, because the cost of the two mistakes is not symmetric: refusing
+    /// a real kill loses damage that was definitely dealt, while accepting a stray costs a
+    /// monster's pool. <see cref="Withheld"/> reports what it refused, so the setting can be
+    /// judged against a real map rather than argued about.
+    /// </remarks>
+    public float CreditWithin { get; set; } = 2f * ScreenWorldUnits;
+
     /// <summary>Damage per second, smoothed - the headline figure.</summary>
     public float Dps => _overall;
 
@@ -111,8 +159,35 @@ public sealed class DamageMeter
     /// <summary>Total damage watched fall off monster health in this area.</summary>
     public long Observed { get; private set; }
 
+    /// <summary>
+    /// Credit from monsters that vanished AFTER being seen to take damage.
+    /// </summary>
+    /// <remarks>
+    /// The confident half of the judgement: something was hitting it, and then it was gone.
+    /// Kept apart from <see cref="CreditedUntouched"/> because the two are different claims
+    /// wearing the same number, and only one of them is really in doubt.
+    /// </remarks>
+    public long CreditedHurt { get; private set; }
+
+    /// <summary>
+    /// Credit from monsters that vanished without ever being seen to take damage.
+    /// </summary>
+    /// <remarks>
+    /// The half that rests entirely on the assumption. It is NOT noise to be discarded - a
+    /// monster deleted from full health between two reads lands here, and on a build that
+    /// one-shots packs that is most of the damage done. But it is also where a monster that
+    /// simply left would land, which is why it is counted separately and gated by distance.
+    /// </remarks>
+    public long CreditedUntouched { get; private set; }
+
     /// <summary>Total damage credited from monsters that vanished. The judged part.</summary>
-    public long Credited { get; private set; }
+    public long Credited => CreditedHurt + CreditedUntouched;
+
+    /// <summary>Pool the distance gate refused to credit, so the gate can be judged.</summary>
+    public long Withheld { get; private set; }
+
+    /// <summary>Monsters the distance gate refused.</summary>
+    public int WithheldCount { get; private set; }
 
     /// <summary>Monsters whose pool has been seen to fall in this area.</summary>
     public int Hurt { get; private set; }
@@ -160,7 +235,10 @@ public sealed class DamageMeter
         _overall = 0f;
         Peak = 0f;
         Observed = 0;
-        Credited = 0;
+        CreditedHurt = 0;
+        CreditedUntouched = 0;
+        Withheld = 0;
+        WithheldCount = 0;
         Hurt = 0;
         Vanished = 0;
     }
@@ -223,7 +301,7 @@ public sealed class DamageMeter
         {
             if (Worth(monster))
             {
-                Remember(monster, nowMs);
+                Remember(monster, snapshot.Player, nowMs);
             }
         }
     }
@@ -254,7 +332,7 @@ public sealed class DamageMeter
 
             if (!_tracked.TryGetValue(monster.Id, out Tracked? target))
             {
-                Remember(monster, nowMs);
+                Remember(monster, snapshot.Player, nowMs);
                 continue;
             }
 
@@ -269,6 +347,7 @@ public sealed class DamageMeter
             // in this snapshot, which is how a kill is noticed. A timestamp rather than a
             // bool, so nothing has to be cleared in a pass of its own.
             target.StampMs = nowMs;
+            target.Distance = Away(monster, snapshot.Player);
 
             if (fell > 0)
             {
@@ -286,11 +365,11 @@ public sealed class DamageMeter
             target.Ema += alpha * ((fell > 0 ? fell / dt : 0f) - target.Ema);
         }
 
-        return dealt + Reap(snapshot, nowMs);
+        return dealt + Reap(nowMs);
     }
 
     /// <summary>Credits the pool of everything that was being tracked and is now gone.</summary>
-    private long Reap(WorldSnapshot snapshot, long nowMs)
+    private long Reap(long nowMs)
     {
         _gone.Clear();
         foreach ((uint id, Tracked target) in _tracked)
@@ -308,10 +387,30 @@ public sealed class DamageMeter
             _tracked.Remove(id);
             Vanished++;
 
-            if (CountKills && target.Pool > 0)
+            if (!CountKills || target.Pool <= 0)
             {
-                credited += target.Pool;
-                Credited += target.Pool;
+                continue;
+            }
+
+            // A distance of -1 means there was no player to measure against, so the gate has
+            // nothing to judge on. It lets the credit through rather than refusing it: the
+            // gate exists to exclude a specific, identifiable mistake, and "unknown" is not
+            // that mistake - refusing here would silently drop damage that was really dealt.
+            if (CreditWithin > 0f && target.Distance >= 0f && target.Distance > CreditWithin)
+            {
+                Withheld += target.Pool;
+                WithheldCount++;
+                continue;
+            }
+
+            credited += target.Pool;
+            if (target.Hurt)
+            {
+                CreditedHurt += target.Pool;
+            }
+            else
+            {
+                CreditedUntouched += target.Pool;
             }
         }
 
@@ -332,7 +431,7 @@ public sealed class DamageMeter
         }
     }
 
-    private void Remember(WorldEntity monster, long nowMs)
+    private void Remember(WorldEntity monster, WorldEntity? player, long nowMs)
     {
         _tracked[monster.Id] = new Tracked
         {
@@ -341,7 +440,29 @@ public sealed class DamageMeter
             Name = monster.ShortName,
             Percent = monster.Life.Percent,
             Rarity = monster.Rarity,
+            Distance = Away(monster, player),
         };
+    }
+
+    /// <summary>
+    /// How far a monster is from the player on the ground, or -1 with no player to measure to.
+    /// </summary>
+    /// <remarks>
+    /// Flat, ignoring height, because the question is "is this near me" and a monster on the
+    /// gantry above counts as near. That is also what every other distance in this tool
+    /// measures - the alert rules and the entity browser both take it in the XY plane - and a
+    /// distance that meant something different here would be the more surprising choice.
+    /// </remarks>
+    private static float Away(WorldEntity monster, WorldEntity? player)
+    {
+        if (player is not WorldEntity at)
+        {
+            return -1f;
+        }
+
+        float dx = monster.WorldX - at.WorldX;
+        float dy = monster.WorldY - at.WorldY;
+        return MathF.Sqrt((dx * dx) + (dy * dy));
     }
 
     /// <summary>
