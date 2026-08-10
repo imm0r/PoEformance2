@@ -110,14 +110,25 @@ public sealed class CorpseFilter
     public int Tracking => _untargetable.Count;
 
     /// <summary>True when this monster should be treated as a corpse.</summary>
-    public bool IsCorpse(ulong address, MonsterSigns signs, long nowMs)
+    /// <param name="identity">
+    /// What identifies the MONSTER across readings - its Render component, not an entity
+    /// address.
+    /// </param>
+    /// <remarks>
+    /// The distinction is load-bearing, and getting it wrong looks exactly like this filter
+    /// not working. The game wears several entities on one monster and the reader keeps only
+    /// one of them, chosen by whichever the entity-map walk reaches first - which shifts as
+    /// the tree rebalances. Timed against an entity, a flip in that choice restarts the clock
+    /// below, it never reaches <see cref="UntargetableMs"/>, and the screen keeps its dots.
+    /// </remarks>
+    public bool IsCorpse(ulong identity, MonsterSigns signs, long nowMs)
     {
         Prune(nowMs);
 
         // Dead outright. Nothing to time, and the tracking entry can go.
         if (signs.Health is int health && health <= 0)
         {
-            _untargetable.Remove(address);
+            _untargetable.Remove(identity);
             return true;
         }
 
@@ -128,7 +139,7 @@ public sealed class CorpseFilter
 
         if (targetable)
         {
-            _untargetable.Remove(address);
+            _untargetable.Remove(identity);
             return false;
         }
 
@@ -137,16 +148,16 @@ public sealed class CorpseFilter
             return false; // untargetable phases are part of the fight
         }
 
-        if (!_untargetable.TryGetValue(address, out (long Since, long Seen) tracked))
+        if (!_untargetable.TryGetValue(identity, out (long Since, long Seen) tracked))
         {
             // First untargetable reading. Start the clock rather than deciding now: the
             // byte dips during the death animation, and a monster that is merely mid-blink
             // would otherwise flicker off the overlay.
-            _untargetable[address] = (nowMs, nowMs);
+            _untargetable[identity] = (nowMs, nowMs);
             return false;
         }
 
-        _untargetable[address] = (tracked.Since, nowMs);
+        _untargetable[identity] = (tracked.Since, nowMs);
         return nowMs - tracked.Since >= UntargetableMs;
     }
 

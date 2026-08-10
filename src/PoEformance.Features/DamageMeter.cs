@@ -232,6 +232,39 @@ public sealed class DamageMeter
     /// </remarks>
     public float FurthestCounted { get; private set; } = -1f;
 
+    /// <summary>
+    /// The greatest distance any monster has been SEEN at, in world units. -1 for none.
+    /// </summary>
+    /// <remarks>
+    /// THE BUBBLE, MEASURED HERE RATHER THAN QUOTED. The game only replicates entities within
+    /// some radius of the player - GameHelper2 calls it the network bubble and puts it near
+    /// 200 grid units, measured by watching when entities leave, with a note that it differs
+    /// by entity type. Everything that vanishes at that edge is alive and walking home; only
+    /// what vanishes well inside it can have died.
+    ///
+    /// Which makes this the denominator the vanish distance was missing. On its own,
+    /// "the furthest thing to go missing was 255 grid away" says nothing - it is far only in
+    /// relation to how far the list reaches at all. Next to this, it becomes the one
+    /// comparison that matters: vanishes crowding the edge are exits, vanishes well inside it
+    /// are deaths.
+    ///
+    /// Taken from every sighting rather than from vanishes, so it fills in from ordinary play
+    /// and does not need anything to die.
+    /// </remarks>
+    public float FurthestSeen { get; private set; } = -1f;
+
+    /// <summary>
+    /// How close to the edge of the list the furthest disappearance was, 0 to 1. -1 unknown.
+    /// </summary>
+    /// <remarks>
+    /// Near 1 means things go missing where the list ends, which is what leaving the bubble
+    /// looks like. Well under 1 means they go missing in the middle of it, where the only
+    /// thing that removes a monster is dying.
+    /// </remarks>
+    public float VanishedAtEdge => FurthestSeen > 0f && FurthestVanish >= 0f
+        ? FurthestVanish / FurthestSeen
+        : -1f;
+
     /// <summary>Everything counted in this area, however it was counted.</summary>
     public long Total => Observed + Credited;
 
@@ -280,6 +313,7 @@ public sealed class DamageMeter
         Vanished = 0;
         FurthestVanish = -1f;
         FurthestCounted = -1f;
+        FurthestSeen = -1f;
     }
 
     /// <summary>Takes one snapshot and moves the figures on.</summary>
@@ -387,6 +421,13 @@ public sealed class DamageMeter
             // bool, so nothing has to be cleared in a pass of its own.
             target.StampMs = nowMs;
             target.Distance = Away(monster, snapshot.Player);
+
+            // Every sighting, not just the ones that end in something going missing - this is
+            // how far the entity list reaches, and it fills in from walking around.
+            if (target.Distance > FurthestSeen)
+            {
+                FurthestSeen = target.Distance;
+            }
 
             if (fell > 0)
             {

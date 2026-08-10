@@ -554,8 +554,16 @@ public sealed class WorldReader
             // overlay marks a cleared screen full of dead monsters. Only monsters are
             // checked: the same targetable byte also goes to 0 on an OPENED chest, which
             // is a different question and not this one.
+            // Timed against the RENDER component rather than the entity address, because the
+            // entity address is not the monster. One monster wears several entities, only one
+            // of them survives the collapsing above, and WHICH one depends on the order the
+            // entity map is walked in - which shifts as the tree rebalances around things
+            // dying and spawning. Keyed on the entity, a flip in that choice restarts the
+            // untargetable clock from zero, it never reaches its threshold, and corpses stop
+            // being recognised: a cleared screen keeps its dots. Keyed on the object, the
+            // clock belongs to the monster and does not care which of its entities was seen.
             MonsterSigns signs = kind == EntityKind.Monster ? ReadMonsterSigns(entity) : default;
-            if (kind == EntityKind.Monster && _corpses.IsCorpse(address, signs, nowMs))
+            if (kind == EntityKind.Monster && _corpses.IsCorpse(renderAddress, signs, nowMs))
             {
                 continue;
             }

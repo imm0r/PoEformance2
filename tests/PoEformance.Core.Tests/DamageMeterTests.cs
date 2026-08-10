@@ -507,6 +507,60 @@ public class DamageMeterTests
         Assert.True(meter.FurthestVanish < 0f);
     }
 
+    /// <summary>
+    /// How far the list reaches is measured from sightings, not from things going missing.
+    /// </summary>
+    /// <remarks>
+    /// It is the denominator the vanish distance was missing: "the furthest thing to go
+    /// missing was 255 grid away" says nothing until it is set against how far anything can
+    /// be seen at all.
+    /// </remarks>
+    [Fact]
+    public void TheReachOfTheListIsMeasuredFromEverySighting()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Seen(1, Monster(1, 500, away: 400f), Monster(2, 500, away: 1_800f)), 0);
+        meter.Look(Seen(1, Monster(1, 500, away: 400f), Monster(2, 500, away: 1_800f)), 100);
+
+        Assert.Equal(1_800f, meter.FurthestSeen);
+        Assert.Equal(0, meter.Vanished);  // nothing had to die for this
+    }
+
+    /// <summary>
+    /// A vanish at the edge of the list reads as one, and a vanish well inside does not.
+    /// </summary>
+    /// <remarks>
+    /// The comparison that settles what the disappearances ARE. The game only replicates
+    /// entities within a radius of the player, so anything leaving at that radius is alive and
+    /// walking home; well inside it, the only thing that removes a monster is dying.
+    /// </remarks>
+    [Fact]
+    public void AVanishAtTheEdgeIsToldApartFromOneInTheMiddle()
+    {
+        var atEdge = new DamageMeter { CreditWithin = 0f };
+        atEdge.Look(Seen(1, Monster(1, 500, away: 2_000f), Monster(2, 500, away: 1_990f)), 0);
+        atEdge.Look(Seen(1, Monster(1, 500, away: 2_000f)), 100);   // the far one goes
+
+        Assert.True(atEdge.VanishedAtEdge > 0.9f, $"got {atEdge.VanishedAtEdge}");
+
+        var inside = new DamageMeter { CreditWithin = 0f };
+        inside.Look(Seen(1, Monster(1, 500, away: 2_000f), Monster(2, 500, away: 200f)), 0);
+        inside.Look(Seen(1, Monster(1, 500, away: 2_000f)), 100);   // the NEAR one goes
+
+        Assert.True(inside.VanishedAtEdge < 0.2f, $"got {inside.VanishedAtEdge}");
+    }
+
+    /// <summary>With nothing seen there is no reach, rather than a zero.</summary>
+    [Fact]
+    public void TheReachIsAbsentUntilSomethingIsSeen()
+    {
+        var meter = new DamageMeter();
+
+        Assert.True(meter.FurthestSeen < 0f);
+        Assert.True(meter.VanishedAtEdge < 0f);
+    }
+
     /// <summary>Two readings inside the same millisecond lose no damage.</summary>
     /// <remarks>
     /// The reader is paced, not guaranteed - and a difference divided by a zero interval is
