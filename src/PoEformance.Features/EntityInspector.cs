@@ -14,6 +14,21 @@ public readonly record struct ComponentEntry(string Name, ulong Address, bool De
 /// <summary>How often a component turns up across a whole area, and whether it is described.</summary>
 public readonly record struct ComponentTally(string Name, int Count, bool Described);
 
+/// <summary>One timed effect sitting on the inspected entity.</summary>
+/// <remarks>
+/// Read for the SELECTED entity only, which is what makes it affordable: the Buffs component
+/// is a vector walk and several reads per effect, fine once on demand and not fine for every
+/// entity every tick. The player's buffs are read every tick for the flask rules; this is the
+/// same reader pointed at whatever is under the cursor.
+///
+/// Why it is worth having at all: a thing that expires says so here, with a clock on it. The
+/// entity classification asks whether something is temporary by looking for a DiesAfterTime
+/// COMPONENT, and a flame wall does not carry one - measured, over 9,313 sightings - which
+/// left "it obviously has a duration, the game shows it in the tooltip" and "we cannot see a
+/// duration" both plausible and neither checked. This is what checks it.
+/// </remarks>
+public readonly record struct TimedEffect(string Name, float TimeLeft, float TotalTime, int Charges);
+
 /// <summary>What the entity browser wants to see.</summary>
 /// <param name="Survey">
 /// Entities to count components across, for the one-shot survey. Supplied by the window
@@ -36,9 +51,13 @@ public sealed record EntityView(
     IReadOnlyList<ComponentEntry> Components,
     IReadOnlyList<ComponentTally> Survey,
     int SurveyedEntities,
-    string Status)
+    string Status,
+    IReadOnlyList<TimedEffect>? Effects = null)
 {
     public static EntityView Empty { get; } = new(0, 0, string.Empty, [], [], 0, "nothing selected");
+
+    /// <summary>What is currently on this entity, with its clock. Empty when it carries no Buffs.</summary>
+    public IReadOnlyList<TimedEffect> Timed => Effects ?? [];
 
     /// <summary>How many of this entity's components nobody has described.</summary>
     public int Undescribed => Components.Count(component => !component.Described);
@@ -72,6 +91,7 @@ public sealed class EntityInspector
     public const int MaxSurvey = 1024;
 
     private readonly EntityReader _entities;
+    private readonly PoEformance.Game.Components.BuffsReader _buffs;
     private readonly OffsetSchema _schema;
 
     private EntityRequest _request = EntityRequest.Idle;
@@ -87,6 +107,7 @@ public sealed class EntityInspector
         ArgumentNullException.ThrowIfNull(schema);
         _schema = schema;
         _entities = new EntityReader(reader, schema);
+        _buffs = new PoEformance.Game.Components.BuffsReader(reader, schema);
     }
 
     /// <summary>The newest reading. Never blocks, never null, never partially built.</summary>
@@ -152,6 +173,17 @@ public sealed class EntityInspector
                 .ThenBy(component => component.Name, StringComparer.Ordinal),
         ];
 
+        // One entity, on demand, so the vector walk is affordable here in a way it is not in
+        // the world read. A failed read is ordinary - the entity can stop existing mid-walk -
+        // and comes back as no effects rather than as an error.
+        List<TimedEffect> effects = [];
+        ulong buffs = entity.Component("Buffs");
+        if (buffs != 0)
+        {
+            effects.AddRange(_buffs.Read(buffs).All
+                .Select(buff => new TimedEffect(buff.Name, buff.TimeLeft, buff.TotalTime, buff.Charges)));
+        }
+
         return new EntityView(
             entity.Address,
             entity.Id,
@@ -159,7 +191,9 @@ public sealed class EntityInspector
             components,
             _lastSurvey,
             _lastSurveyed,
-            $"{components.Count} components, {components.Count(c => !c.Described)} not described");
+            $"{components.Count} components, {components.Count(c => !c.Described)} not described"
+                + (effects.Count > 0 ? $", {effects.Count} timed" : string.Empty),
+            effects);
     }
 
     /// <summary>Counts every component name across a set of entities.</summary>
