@@ -179,4 +179,84 @@ public class BundleIndexTests
         Assert.Equal(0, index!.Count);
         Assert.Null(index.Find("Art/Thing.dds"));
     }
+
+    [Fact]
+    public void ANINDEXBiggerThanAnyNumberSomebodyPickedIsStillAnIndex()
+    {
+        // What this was: a ceiling of two million files, written when that was a lot, and the
+        // game outgrew it. Every count past it was refused as "not an index" - so an install
+        // that had simply grown looked exactly like a corrupt one, and the only symptom was
+        // that the item pictures came from a website instead.
+        //
+        // The bound is the FILE now: a count needing more bytes than are left cannot be right,
+        // which is as strict against a wrong offset and cannot go stale.
+        const int many = 2_000_000 + 1;
+
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        write.Write(0);            // no bundles
+        write.Write(many);         // and more files than the old ceiling allowed
+        for (var i = 0; i < many; i++)
+        {
+            write.Write((ulong)i);
+            write.Write(0);        // bundle 0, which does not exist - the records are skipped
+            write.Write(0);
+            write.Write(0);
+        }
+
+        write.Write(1);
+        write.Write(BundleIndex.MurmurMarker);
+        write.Write(0L);
+        write.Write(0L);
+
+        BundleIndex.Parsed read = BundleIndex.Read(stream.ToArray());
+
+        Assert.NotNull(read.Index);
+        Assert.Contains("Murmur2-64A", read.Why, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANDACountThatWillNotFitInTheFileIsStillRefused()
+    {
+        // The bound that replaced the ceiling has to be a real one: a wrong offset lands on a
+        // number that says "four billion files", and allocating from it is the failure the
+        // ceiling was there to prevent.
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        write.Write(0);
+        write.Write(int.MaxValue);
+        write.Write(0L);
+
+        BundleIndex.Parsed read = BundleIndex.Read(stream.ToArray());
+
+        Assert.Null(read.Index);
+        Assert.Contains("2147483647 files", read.Why, StringComparison.Ordinal);
+        Assert.Contains("needs", read.Why, StringComparison.Ordinal);
+        Assert.Contains("left", read.Why, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANDAHashItDoesNotKnowSaysWhichHashRatherThanNothing()
+    {
+        // Not "is not an index". The root's hash IS the index saying how it was built, so an
+        // unknown one is news - it would mean the game changed its hashing again, the way it
+        // did at 3.21.2 - and the value is what somebody would go looking for.
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        write.Write(0);
+        write.Write(0);
+        write.Write(1);
+        write.Write(0xDEADBEEFDEADBEEFul);
+        write.Write(0L);
+        write.Write(0L);
+
+        BundleIndex.Parsed read = BundleIndex.Read(stream.ToArray());
+
+        Assert.Null(read.Index);
+        Assert.Contains("DEADBEEFDEADBEEF", read.Why, StringComparison.Ordinal);
+        Assert.Contains("neither Murmur2-64A nor FNV-1a", read.Why, StringComparison.Ordinal);
+    }
 }

@@ -156,11 +156,10 @@ public sealed class GameFiles
                 + $"The decoder said: {(Oodle.LastRefusal.Length > 0 ? Oodle.LastRefusal : "nothing")}");
         }
 
-        BundleIndex? index = BundleIndex.Parse(content);
-        return index is null
-            ? new OpenedFiles(null, $"{where}: the index decompressed to {content.Length} bytes but is not an index")
-            : new OpenedFiles(new GameFiles(archive, index, undo), $"{archive.Describe} - {index.Count} files, "
-                + $"{index.Bundles.Count} bundles, {index.Hashing}");
+        BundleIndex.Parsed read = BundleIndex.Read(content);
+        return read.Index is null
+            ? new OpenedFiles(null, $"{where}: the index decompressed to {content.Length} bytes, and then: {read.Why}")
+            : new OpenedFiles(new GameFiles(archive, read.Index, undo), $"{archive.Describe} - {read.Why}");
     }
 
     /// <summary>

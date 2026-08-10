@@ -86,13 +86,14 @@ public class GameFilesTests
         Assert.Contains("chunks", oodle, StringComparison.Ordinal);
         Assert.Contains("The decoder said", oodle, StringComparison.Ordinal);
 
-        // And one that unpacks into something that is not an index.
+        // And one that unpacks into something that is not an index - which the index reader
+        // itself is asked about, so the line says WHICH of its own checks refused rather than
+        // "not an index" for all eight of them.
         var notAnIndex = new Fake();
         notAnIndex.Add("_.index.bin", Packed.Bundle(Counting(64)));
-        Assert.Contains(
-            "is not an index",
-            GameFiles.OpenOrSay(notAnIndex, Packed.AsIs).Why,
-            StringComparison.Ordinal);
+        string parse = GameFiles.OpenOrSay(notAnIndex, Packed.AsIs).Why;
+        Assert.Contains("the index decompressed to 64 bytes, and then:", parse, StringComparison.Ordinal);
+        Assert.Contains("will not fit", parse, StringComparison.Ordinal);
     }
 
     [Fact]

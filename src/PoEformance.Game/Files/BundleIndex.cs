@@ -32,8 +32,15 @@ public sealed class BundleIndex
     /// <summary>And what it hashes to under FNV-1a, used before it.</summary>
     public const ulong FnvMarker = 0x07E47507B4A92E53;
 
-    /// <summary>A bound on the counts, so a wrong offset is refused rather than allocated from.</summary>
-    public const int MostFiles = 2_000_000;
+    /// <summary>How many bytes one file record takes: hash, bundle, offset, size.</summary>
+    /// <remarks>
+    /// THE BOUND ON EVERY COUNT IS THE FILE ITSELF, and it used to be a number instead - two
+    /// million, which the game outgrew. A count that claims more records than there are bytes
+    /// left to hold them is refused, which is exactly as strict against a wrong offset and
+    /// cannot go stale: a magic ceiling can only ever become wrong as the game grows, and this
+    /// one did, silently, reported as "not an index".
+    /// </remarks>
+    public const int FileRecord = 20;
 
     private readonly Dictionary<ulong, FileSpot> _files;
     private readonly bool _murmur;
@@ -58,20 +65,35 @@ public sealed class BundleIndex
     /// Reads the index out of the decompressed content of <c>_.index.bin</c>.
     /// </summary>
     /// <returns>Null when the bytes are not an index, or use a hash this does not know.</returns>
-    public static BundleIndex? Parse(byte[]? content)
+    public static BundleIndex? Parse(byte[]? content) => Read(content).Index;
+
+    /// <summary>What reading it came to, and - when it came to nothing - which check refused.</summary>
+    /// <param name="Index">The index, or null.</param>
+    /// <param name="Why">What happened, in words, whether or not it worked.</param>
+    /// <remarks>
+    /// EIGHT WAYS TO FAIL AND ONE SENTENCE FOR ALL OF THEM was how this read before, and the
+    /// sentence it produced - "the index decompressed to 147897312 bytes but is not an index" -
+    /// is true of a count that overran a bound, of a name length out of range, and of a root
+    /// hash this does not recognise. Three different problems, three different cures, and
+    /// nothing in it to tell them apart.
+    /// </remarks>
+    public readonly record struct Parsed(BundleIndex? Index, string Why);
+
+    /// <summary>Reads the index, and says which check refused it when one does.</summary>
+    public static Parsed Read(byte[]? content)
     {
         if (content is null || content.Length < 12)
         {
-            return null;
+            return new Parsed(null, $"only {content?.Length ?? 0} bytes - too short to be one");
         }
 
         try
         {
             var at = 0;
             int bundleCount = Int(content, ref at);
-            if (bundleCount is < 0 or > MostFiles)
+            if (bundleCount < 0 || (long)bundleCount * 8 > content.Length)
             {
-                return null;
+                return new Parsed(null, $"claims {bundleCount} bundles, which will not fit in {content.Length} bytes");
             }
 
             var bundles = new string[bundleCount];
@@ -80,7 +102,7 @@ public sealed class BundleIndex
                 int nameLength = Int(content, ref at);
                 if (nameLength is < 0 or > 4096 || at + nameLength + 4 > content.Length)
                 {
-                    return null;
+                    return new Parsed(null, $"bundle {i} of {bundleCount} has a name {nameLength} bytes long");
                 }
 
                 bundles[i] = System.Text.Encoding.UTF8.GetString(content, at, nameLength);
@@ -89,9 +111,12 @@ public sealed class BundleIndex
             }
 
             int fileCount = Int(content, ref at);
-            if (fileCount is < 0 or > MostFiles || at + ((long)fileCount * 20) > content.Length)
+            if (fileCount < 0 || at + ((long)fileCount * FileRecord) > content.Length)
             {
-                return null;
+                return new Parsed(
+                    null,
+                    $"claims {fileCount} files after {bundleCount} bundles, which needs "
+                    + $"{(long)fileCount * FileRecord} bytes and has {content.Length - at} left");
             }
 
             var files = new Dictionary<ulong, FileSpot>(fileCount);
@@ -101,7 +126,7 @@ public sealed class BundleIndex
                 int bundle = BitConverter.ToInt32(content, at + 8);
                 int spot = BitConverter.ToInt32(content, at + 12);
                 int size = BitConverter.ToInt32(content, at + 16);
-                at += 20;
+                at += FileRecord;
 
                 if ((uint)bundle < (uint)bundleCount && spot >= 0 && size >= 0)
                 {
@@ -112,7 +137,8 @@ public sealed class BundleIndex
             int directoryCount = Int(content, ref at);
             if (directoryCount <= 0 || at + 8 > content.Length)
             {
-                return null;
+                return new Parsed(
+                    null, $"claims {directoryCount} directories with {content.Length - at} bytes left");
             }
 
             // The root's own hash, which is what says how everything else was hashed. Only the
@@ -127,9 +153,13 @@ public sealed class BundleIndex
             ulong root = BitConverter.ToUInt64(content, at);
             return root switch
             {
-                MurmurMarker => new BundleIndex(bundles, files, murmur: true),
-                FnvMarker => new BundleIndex(bundles, files, murmur: false),
-                _ => null,
+                MurmurMarker => Held(new BundleIndex(bundles, files, murmur: true)),
+                FnvMarker => Held(new BundleIndex(bundles, files, murmur: false)),
+                _ => new Parsed(
+                    null,
+                    $"{bundleCount} bundles and {files.Count} files read, but the root directory "
+                    + $"hashes to 0x{root:X16}, which is neither Murmur2-64A nor FNV-1a - a hash "
+                    + "this does not know"),
             };
         }
         catch (ArgumentException)
@@ -138,9 +168,12 @@ public sealed class BundleIndex
             // BitConverter throws ArgumentException rather than the out-of-range one for a read
             // that runs off the end, so catching only that one lets a damaged install throw out
             // of here - at startup, where there is nothing to catch it.
-            return null;
+            return new Parsed(null, "it runs off its own end - a patch that did not finish");
         }
     }
+
+    private static Parsed Held(BundleIndex index)
+        => new(index, $"{index.Count} files, {index.Bundles.Count} bundles, {index.Hashing}");
 
     /// <summary>Where a path's file is, or null when the index has no such path.</summary>
     /// <param name="path">Forward slashes, from the top - <c>art/2ditems/weapons/bow.dds</c>.</param>
