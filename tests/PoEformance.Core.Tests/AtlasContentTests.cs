@@ -30,10 +30,42 @@ public class AtlasContentTests
     {
         // The number on a node is not the number in the table. "3 additional Shrines" is one
         // id with a 3 above it, so looking the whole word up finds nothing at all.
-        Assert.Equal(0x0963u, AtlasContentNames.IdOf(0x00030963u));
-        Assert.Equal(3u, AtlasContentNames.MagnitudeOf(0x00030963u));
+        Assert.Equal(0x0963u, AtlasContentNames.IdOf(0x00C00963u));
+        Assert.Equal(3u, AtlasContentNames.MagnitudeOf(0x00C00963u));
 
         Assert.Equal(0u, AtlasContentNames.MagnitudeOf(0x0065u));
+    }
+
+    [Fact]
+    public void ANDItCountsInSIXTYFOURTHSRatherThanInOnes()
+    {
+        // The one that put "x64" on every content on the atlas: a plain effect - one of the
+        // thing - carries 64, not 1, so a high half taken literally reads as sixty-four of it.
+        Assert.Equal(1u, AtlasContentNames.MagnitudeOf(0x00400963u));
+
+        // And a binary effect ("always", "doubles") carries a hundred of them.
+        Assert.Equal(100u, AtlasContentNames.MagnitudeOf(0x190061C7u));
+    }
+
+    [Fact]
+    public void EXCEPTOnTheOneTokenWhoseHighHalfIsNotAllMagnitude()
+    {
+        // Delirious keeps two flags in the top of its high half. Left unmasked the same token
+        // reads as tens of thousands of per cent, which is the sort of number nobody questions
+        // on an atlas because nobody reads it twice.
+        Assert.Equal(20u, AtlasContentNames.MagnitudeOf(0x8500685Au));
+        Assert.Equal(20u, AtlasContentNames.MagnitudeOf(0x0500685Au));
+    }
+
+    [Fact]
+    public void AWORDINGWithNoRoomForANumberIsNotGivenOne()
+    {
+        // "Area contains Abysses" says how many nowhere, so there is nothing to substitute -
+        // and appending the magnitude anyway is what produced "Area contains Abysses x64".
+        AtlasContentNames names = Loaded();
+
+        Assert.Equal("Area contains Abysses", Assert.NotNull(names.Effect(0x00406872u)).Say(0x00406872u));
+        Assert.Equal("Contains 3 additional Shrines", Assert.NotNull(names.Effect(0x00C00963u)).Say(0x00C00963u));
     }
 
     [Fact]

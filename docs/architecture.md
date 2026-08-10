@@ -331,6 +331,19 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
 - **Hide AFTER asking about routes.** A map worth routing to is one nobody has reached, so
   culling the unreachable first hides exactly the routes somebody turned on — while every
   setting still reads correct. The reference records learning this; it is a test here.
+- **The lines belong to the PANEL, not to the nodes.** One flat vector of edges — an unknown
+  word, then the grid position at each end — and no node has a neighbour list of its own. Read
+  at that offset on each node instead, the two words are whatever that node's bytes happen to
+  be: most nodes report no connections and the occasional one reports invented ones. The
+  symptom is not an empty atlas, which is why it survived a while — it is a route drawn to the
+  right map along a way nobody can walk, i.e. exactly what a pathfinder that picked the long
+  way round would look like.
+- **A magnitude is in sixty-fourths, and it goes INSIDE the wording.** The high half of a
+  content token counts in 64ths, so a plain effect — one of the thing — arrives as 64. The
+  low half selects a template and a `{0}` in it is where the number goes; a wording with no
+  `{0}` gets no number at all. Appending it instead put "Area contains Abysses **x64**" on
+  every node of the atlas. Badges are not this: their high half is a category tag, and a badge
+  never carries a count.
 - **The composition is a pure function.** Everything that can be got wrong is a decision rather
   than an address, and none of it is reachable through a live read.
 
@@ -363,8 +376,10 @@ but "which way is worth going".
 **None of the atlas offsets are confirmed.** They were ported from the reference with the game
 unavailable, so `schema/poe2.offsets.json` marks the three `Atlas*` blocks UNVERIFIED and the
 window's **check the read** button reports what each step of the walk found — the panel's child
-path, the flag fingerprints seen, how many children read as maps, and the first few decoded. It
-is the first thing to press when the atlas is open and nothing is drawn on it.
+path, the flag fingerprints seen, how many lines the panel's edge table holds, how many children
+read as maps, and the first few decoded. It is the first thing to press when the atlas is open
+and nothing is drawn on it, and the line count is what to look at when the maps read fine and no
+route appears: nought there means nothing can be routed to, however well the nodes decode.
 
 When the path finds nothing, it goes further and **hunts for the panel by shape**: hundreds of
 children mostly sharing one flags word is what a grid of map nodes is and what almost nothing

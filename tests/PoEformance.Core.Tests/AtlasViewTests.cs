@@ -215,18 +215,38 @@ public class AtlasViewTests
     }
 
     [Fact]
-    public void ANDHowManyOfThemIsKeptRatherThanFoldedAway()
+    public void ANDHowManyOfThemGoesWHEREITHEGAMEPUTSIT()
     {
-        // "Ritual x3" is a different map from "Ritual", so the de-duplication has to be on the
-        // finished words - on the id alone it would throw the count away.
+        // The number belongs INSIDE the wording, in the gap the game left for it, and only in
+        // the wordings that left one. Appended to everything instead, a plain effect's
+        // magnitude of one - which the game writes as 64 - turned every line on the atlas into
+        // "Area contains Abysses x64", which is what sent somebody looking at this.
         AtlasContentNames contents = LoadedContents();
 
-        AtlasNode node = Node(0, 0, badges: [0x0068, 0x0003_0068]);
+        AtlasNode node = Node(0, 0, tokens: [0x00C0_0963, 0x0040_6872]);
         IReadOnlyList<string> said = AtlasWatch.Words(node, contents);
 
-        Assert.Equal(2, said.Count);
-        Assert.Contains("Ritual", said);
-        Assert.Contains("Ritual x3", said);
+        Assert.Equal(["Contains 3 additional Shrines", "Area contains Abysses"], said);
+    }
+
+    [Fact]
+    public void ANDTheSameEffectAtTwoStrengthsStaysTwoLines()
+    {
+        // Which is why the de-duplication is on the finished words: on the id alone, the
+        // second of these would be dropped as a repeat of the first.
+        AtlasNode node = Node(0, 0, tokens: [0x0040_0963, 0x00C0_0963]);
+        IReadOnlyList<string> said = AtlasWatch.Words(node, LoadedContents());
+
+        Assert.Equal(["Contains 1 additional Shrines", "Contains 3 additional Shrines"], said);
+    }
+
+    [Fact]
+    public void ABADGEIsANameAndNeverACount()
+    {
+        // A badge's high half is a category tag, not a magnitude - the same content id with the
+        // tag on it is the same content, and reading the tag as a number would say so twice.
+        AtlasNode node = Node(0, 0, badges: [0x0068, 0x0002_0068]);
+        Assert.Equal(["Ritual"], AtlasWatch.Words(node, LoadedContents()));
     }
 
     [Fact]
