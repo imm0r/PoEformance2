@@ -29,6 +29,11 @@ namespace PoEformance.Game.World;
 /// not be read - which is not the same as "absent", and the difference decides whether a
 /// live monster stays on the overlay.
 /// </param>
+/// <param name="HasTargetable">
+/// Whether the entity carries a Targetable component at all, on the same terms: null means
+/// nobody could look. Different from <paramref name="Targetable"/>, which is what the
+/// component SAYS - a boss mid-phase is untargetable and still has one.
+/// </param>
 public readonly record struct MonsterSigns(
     int? Health,
     bool? Targetable,
@@ -38,7 +43,8 @@ public readonly record struct MonsterSigns(
     Vital EnergyShield = default,
     bool Friendly = false,
     bool Temporary = false,
-    bool? HasLife = null)
+    bool? HasLife = null,
+    bool? HasTargetable = null)
 {
     /// <summary>
     /// Whether this is a passing effect rather than a monster - whichever side it is on.
@@ -74,11 +80,27 @@ public readonly record struct MonsterSigns(
     /// Life and no Targetable - which the friendly rule already handles. Keying on the
     /// GroundEffect component instead would have caught only the first of the four.
     ///
+    /// The third is that a FRIENDLY thing nothing can target is one of your own effects
+    /// rather than one of your own minions. The overlay already said as much in its own words
+    /// - "a minion or a totem is targetable, so it is not an effect and stays drawn" - but it
+    /// was reading that off the expiring rule, and a flame wall does not expire by any signal
+    /// this can see. Over the recorded map it carries Life 1/1, no DiesAfterTime and no
+    /// Targetable component at all, 9,313 sightings of it, and every one was drawn as a dot.
+    ///
+    /// Only for the friendly ones, and the asymmetry is the argument. For something hostile,
+    /// "nothing can target it" is thin evidence and hiding a live monster is the expensive
+    /// mistake. For something of your own, it is the difference between a minion - which
+    /// enemies target, so it has the component - and a cast effect, and the cost of being
+    /// wrong is a dot you wanted. NOT VERIFIED against a minion or a totem: the recording
+    /// this comes from has exactly one friendly name in it.
+    ///
     /// Null means the component list could not be read, and that makes no claim either way:
     /// classifying an unreadable entity as an effect would drop live monsters off the overlay
     /// exactly when the reading is going badly.
     /// </remarks>
-    public bool IsEffect => HasLife == false || (Temporary && Targetable != true);
+    public bool IsEffect => HasLife == false
+                            || (Friendly && HasTargetable == false)
+                            || (Temporary && Targetable != true);
 
     /// <summary>
     /// Whether the reader should drop it outright rather than hand it on.

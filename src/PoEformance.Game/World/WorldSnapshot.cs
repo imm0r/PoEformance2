@@ -404,9 +404,13 @@ public sealed class WorldReader
         // walk told us nothing, which is a different answer from "it has none".
         bool? hasLife = entity.Components.Count > 0 ? life != 0 : null;
 
+        // And whether anything can target it at all, which is not the same question as what
+        // the component says: a boss mid-phase reads untargetable and still has one.
+        bool? hasTargetable = entity.Components.Count > 0 ? targetableComponent != 0 : null;
+
         return new MonsterSigns(
             health, targetable, monsterRarity >= ItemRarity.Unique, monsterRarity, pool, shield,
-            friendly, temporary, hasLife);
+            friendly, temporary, hasLife, hasTargetable);
     }
 
     /// <summary>Pulls one vital sub-struct out of a span read from the Life component.</summary>
