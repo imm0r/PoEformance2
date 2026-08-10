@@ -226,6 +226,54 @@ public class EntityInspectorTests
         EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
 
         Assert.Empty(view.Timed);
+        Assert.Equal(string.Empty, view.EffectsNote);
+    }
+
+    /// <summary>Carrying Buffs with nothing on it does not look like carrying no Buffs.</summary>
+    /// <remarks>
+    /// The first version of this drew nothing at all when there was nothing to draw, and a
+    /// screenshot of that answered no question: "no Buffs component", "nothing on it", "could
+    /// not be read" and "you are running a build without the feature" were one blank space.
+    /// The whole reason the read was added was to settle a question by looking.
+    /// </remarks>
+    [Fact]
+    public void CarryingBuffsWithNothingOnItSaysSo()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Anomalies/Firewall", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Buffs");
+
+        StructDef buffs = schema.Structs["Buffs"];
+        EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        ulong component = placed.Components.Single(c => c.Name == "Buffs").Address;
+
+        // An empty vector: both ends readable, and equal.
+        const ulong VectorAt = 0x3100_0000_0000;
+        reader.Place(component + (ulong)buffs.OffsetOf("StatusEffectFirst"), VectorAt);
+        reader.Place(component + (ulong)buffs.OffsetOf("StatusEffectLast"), VectorAt);
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Empty(view.Timed);
+        Assert.Contains("nothing on it", view.EffectsNote, StringComparison.Ordinal);
+    }
+
+    /// <summary>A Buffs component nobody could read says THAT, rather than "nothing on it".</summary>
+    [Fact]
+    public void ABuffsComponentThatCannotBeReadIsNotReportedAsEmpty()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Anomalies/Firewall", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Buffs");
+
+        // Nothing placed at the component's vector at all, which is what a replay of a
+        // session that never read it looks like.
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Empty(view.Timed);
+        Assert.Contains("could not be read", view.EffectsNote, StringComparison.Ordinal);
     }
 
     [Fact]

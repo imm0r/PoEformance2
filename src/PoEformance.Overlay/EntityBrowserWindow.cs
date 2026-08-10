@@ -271,9 +271,9 @@ public sealed class EntityBrowserWindow
         // the component list cannot: whether a thing expires, and when. A flame wall carries
         // no DiesAfterTime component at all, so this is the only place its duration could
         // show up, and the only way to find out is to look at one.
-        if (view.Timed.Count > 0)
+        if (view.EffectsNote.Length > 0)
         {
-            ImGui.TextColored(PathText, $"{view.Timed.Count} on this entity:");
+            ImGui.TextColored(view.Timed.Count > 0 ? PathText : DimText, ImGuiText.Escape(view.EffectsNote));
             foreach (TimedEffect effect in view.Timed)
             {
                 // A permanent effect is not a duration of zero, it is a duration of INFINITY -
