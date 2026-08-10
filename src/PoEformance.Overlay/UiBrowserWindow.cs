@@ -521,7 +521,8 @@ public sealed class UiBrowserWindow
     /// TextUnformatted is used wherever a value can be shown as-is; this is for the calls
     /// where there is no such variant.
     /// </remarks>
-    private static string Escape(string text) => text.Replace("%", "%%", StringComparison.Ordinal);
+    /// <summary>See <see cref="ImGuiText"/> for why anything printed has to go through this.</summary>
+    private static string Escape(string text) => ImGuiText.Escape(text);
 
     private static Vector4 TextColour(UiNode node)
         => node.StringId.Length > 0 ? IdText : new Vector4(0.86f, 0.88f, 0.92f, 1f);
