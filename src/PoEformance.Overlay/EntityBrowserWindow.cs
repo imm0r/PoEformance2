@@ -300,9 +300,32 @@ public sealed class EntityBrowserWindow
         {
             ImGui.TextColored(view.Numbers.Count > 0 ? PathText : DimText, ImGuiText.Escape(view.StatsNote));
 
+            // Named where the game's own table has a name, three across when it does not -
+            // a hundred unnamed ids is a wall of numbers and a hundred named ones is a list
+            // worth reading, so the two want different shapes.
+            bool named = view.Numbers.Any(stat => stat.Name.Length > 0);
             int column = 0;
+            string bag = string.Empty;
             foreach (EntityStat stat in view.Numbers)
             {
+                // Grouped by which bag it came from, because the same stat is in both with
+                // different values - the sheet's mana is in one and a smaller number is in
+                // the other, and a list that runs them together makes every row ambiguous.
+                if (stat.Source != bag)
+                {
+                    bag = stat.Source;
+                    column = 0;
+                    ImGui.TextColored(PathText, $"  from {ImGuiText.Escape(bag)}:");
+                }
+
+                if (named)
+                {
+                    ImGui.TextColored(DimText, stat.Name.Length > 0
+                        ? $"  {ImGuiText.Escape(stat.Name)} = {stat.Value}"
+                        : $"  {stat.Id} = {stat.Value}   (no name for this id)");
+                    continue;
+                }
+
                 if (column % 3 != 0)
                 {
                     ImGui.SameLine();

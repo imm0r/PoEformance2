@@ -40,7 +40,14 @@ public readonly record struct TimedEffect(string Name, float TimeLeft, float Tot
 ///
 /// Read for the SELECTED entity only, same as the buffs beside it, and for the same reason.
 /// </remarks>
-public readonly record struct EntityStat(uint Id, int Value);
+/// <param name="Source">
+/// Which of the entity's two StatsInternal bags this came from. Load-bearing: the same stat
+/// appears in both with DIFFERENT values, so a list that concatenates them and drops the
+/// label is a list in which every number is ambiguous. Read off the merged list, this
+/// character's mana was 4,580 and their fire resistance 55%; their character sheet says 5,415
+/// and 73%, and both of those are in the other bag.
+/// </param>
+public readonly record struct EntityStat(uint Id, int Value, string Name = "", string Source = "");
 
 /// <summary>What the entity browser wants to see.</summary>
 /// <param name="Survey">
@@ -112,6 +119,7 @@ public sealed class EntityInspector
     private readonly IMemoryReader _reader;
     private readonly EntityReader _entities;
     private readonly PoEformance.Game.Components.BuffsReader _buffs;
+    private readonly PoEformance.Game.Components.StatNames _statNames;
     private readonly OffsetSchema _schema;
 
     private EntityRequest _request = EntityRequest.Idle;
@@ -121,10 +129,14 @@ public sealed class EntityInspector
     private IReadOnlyList<ComponentTally> _lastSurvey = [];
     private int _lastSurveyed;
 
-    public EntityInspector(IMemoryReader reader, OffsetSchema schema)
+    public EntityInspector(
+        IMemoryReader reader,
+        OffsetSchema schema,
+        PoEformance.Game.Components.StatNames? statNames = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
+        _statNames = statNames ?? PoEformance.Game.Components.StatNames.Empty;
         _reader = reader;
         _schema = schema;
         _entities = new EntityReader(reader, schema);
@@ -278,7 +290,7 @@ public sealed class EntityInspector
                 continue;
             }
 
-            (int taken, string note) = ReadPairs(internals, stats);
+            (int taken, string note) = ReadPairs(internals, stats, source);
             notes.Add($"{taken} from {source}{note}");
         }
 
@@ -292,7 +304,7 @@ public sealed class EntityInspector
     /// begin == end == null and means the entity has no stats from that source, which is not
     /// the same as a vector nobody could read - the two used to print the same sentence.
     /// </remarks>
-    private (int Taken, string Note) ReadPairs(ulong internals, List<EntityStat> into)
+    private (int Taken, string Note) ReadPairs(ulong internals, List<EntityStat> into, string source)
     {
         const int MaxStats = 256;
         const int PairSize = 8;
@@ -329,9 +341,12 @@ public sealed class EntityInspector
 
         for (int i = 0; i < wanted; i++)
         {
+            uint id = BitConverter.ToUInt32(block, i * PairSize);
             into.Add(new EntityStat(
-                BitConverter.ToUInt32(block, i * PairSize),
-                BitConverter.ToInt32(block, (i * PairSize) + 4)));
+                id,
+                BitConverter.ToInt32(block, (i * PairSize) + 4),
+                _statNames.Of(id) ?? string.Empty,
+                source));
         }
 
         return (wanted, count > wanted ? $" (of {count})" : string.Empty);
