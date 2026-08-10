@@ -291,6 +291,30 @@ public sealed class EntityBrowserWindow
             ImGui.Separator();
         }
 
+        // The entity's own numbers, as the game keeps them: a flat vector of (stat id, value).
+        // Raw ids rather than names, because the names come from the game's Stats table and
+        // that is 27,000 rows nobody needs in this repo to answer one question - 347 is
+        // base_skill_effect_duration and 351 is skill_effect_duration, and a wall that carries
+        // its own duration says so with a value in milliseconds against one of those.
+        if (view.StatsNote.Length > 0)
+        {
+            ImGui.TextColored(view.Numbers.Count > 0 ? PathText : DimText, ImGuiText.Escape(view.StatsNote));
+
+            int column = 0;
+            foreach (EntityStat stat in view.Numbers)
+            {
+                if (column % 3 != 0)
+                {
+                    ImGui.SameLine();
+                }
+
+                ImGui.TextColored(DimText, $"  {stat.Id,6} = {stat.Value,-11}");
+                column++;
+            }
+
+            ImGui.Separator();
+        }
+
         if (view.Undescribed > 0)
         {
             ImGui.TextColored(UnknownText, $"{view.Undescribed} of {view.Components.Count} not described");
