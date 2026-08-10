@@ -262,7 +262,14 @@ public sealed class StashWindow
         string league = _inspector.League;
         if (league.Length == 0)
         {
-            ImGui.TextColored(DimText, "no league read yet - the game has to be in an area");
+            // The note over the guess. "Not in an area" is only one of the two reasons, and the
+            // other one - the field has moved - is the one nobody would work out from a switch
+            // that quietly does nothing.
+            string note = _inspector.LeagueNote;
+            ImGui.TextColored(
+                note.Length > 0 ? WarnText : DimText,
+                note.Length > 0 ? note : "no league read yet - the game has to be in an area");
+
             Trade();
             return;
         }

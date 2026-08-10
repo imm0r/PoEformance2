@@ -43,7 +43,7 @@ public class SchemaTests
         Assert.Equal(0x8C0, schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
         Assert.Equal(0x8B0, schema.Structs["Actor"].OffsetOf("AnimationId"));
         Assert.Equal(0x69, schema.Structs["Targetable"].OffsetOf("IsTargetable"));
-        Assert.Equal(0x21E0, schema.Structs["ServerDataStructure"].OffsetOf("League"));
+        Assert.Equal(0x21E0, schema.Structs["ServerDataOffsets"].OffsetOf("League"));
         Assert.Equal(0x10, schema.Structs["GameState"].Constants["StateEntrySize"]);
         Assert.Equal(4, schema.Structs["GameState"].Constants["InGameStateIndex"]);
 
