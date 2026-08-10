@@ -40,7 +40,20 @@ public static class RecordingFormat
     public static ReadOnlySpan<byte> Magic => "POEFREC1"u8;
 
     /// <summary>Current format version. Bumped whenever the entry layout changes.</summary>
-    public const uint Version = 3;
+    /// <remarks>
+    /// 4 stores the entries as a chain of finished Brotli streams rather than one long one,
+    /// which is what makes a half-written recording readable - see BrotliWriter. The bump
+    /// exists because an older build reading a version-4 file would decode the first segment
+    /// and stop, and a recording that silently ends early is the exact failure this whole
+    /// change was chasing.
+    /// </remarks>
+    public const uint Version = 4;
+
+    /// <summary>
+    /// The version whose entries were one long Brotli stream. Read the same way, since a
+    /// single stream is a chain of one.
+    /// </summary>
+    public const uint SingleStreamVersion = 3;
 
     /// <summary>
     /// The last version whose entries were stored uncompressed. Still readable, because

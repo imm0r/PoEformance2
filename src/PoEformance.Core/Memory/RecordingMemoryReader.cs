@@ -1,5 +1,4 @@
 using System.Buffers.Binary;
-using System.IO.Compression;
 
 namespace PoEformance.Core.Memory;
 
@@ -19,6 +18,7 @@ public sealed class RecordingMemoryReader : IMemoryReader
 {
     private readonly IMemoryReader _inner;
     private readonly BinaryWriter _writer;
+    private readonly BrotliWriter _body;
     private readonly CountingStream _file;
     private readonly long _startTimestamp;
     private long _lastFlush;
@@ -89,11 +89,17 @@ public sealed class RecordingMemoryReader : IMemoryReader
         header.Write(DateTime.UtcNow.Ticks);
         header.Flush();
 
-        // Optimal rather than Fastest, measured on a real 25 MB session: it compressed the
-        // entry stream to two thirds of what Fastest managed and took seven milliseconds
-        // against four, for a whole session. The recorder writes from the reader thread at
-        // thirty ticks a second, so that cost is not detectable and the size is.
-        _writer = new BinaryWriter(new BrotliStream(_file, CompressionLevel.Optimal));
+        // Brotli, at what CompressionLevel.Optimal means: measured on a real 25 MB session,
+        // it compressed the entry stream to two thirds of what Fastest managed and took
+        // seven milliseconds against four, for a whole session. The recorder writes from the
+        // reader thread at thirty ticks a second, so that cost is not detectable.
+        //
+        // Through BrotliWriter rather than BrotliStream, and that is not a detail: see the
+        // measurements there. BrotliStream's Flush leaves the data unreadable until an
+        // eight-megabyte block fills, which is how two recordings came to end at exactly
+        // 8,388,608 bytes.
+        _body = new BrotliWriter(_file);
+        _writer = new BinaryWriter(_body);
     }
 
     public bool IsAttached => _inner.IsAttached;
@@ -141,12 +147,18 @@ public sealed class RecordingMemoryReader : IMemoryReader
 
     /// <summary>Writes a frame boundary. Call once per reader tick.</summary>
     /// <remarks>
-    /// Also where the compressor is flushed, at most once a second. A recording that ends
-    /// because the game or the tool was KILLED - which is the interesting way for one to
-    /// end - stops at the last flush, so this is the difference between losing a fraction
-    /// of a second and losing everything since the file was opened. Flushing on a frame
-    /// boundary rather than mid-frame keeps whole ticks; flushing at most once a second
-    /// keeps the compressor from restarting its tables thirty times a second.
+    /// Also where the compressor is closed off into a segment. A recording that ends because
+    /// the game or the tool was KILLED - which is the interesting way for one to end - is
+    /// readable up to the last segment boundary, so this is the difference between losing a
+    /// few seconds and losing everything since the file was opened. On a frame boundary
+    /// rather than mid-frame, so whole ticks survive.
+    ///
+    /// By SIZE first and time second. Size, because what a kill costs is content rather than
+    /// wall-clock, and a segment boundary costs the compressor its history: measured on a
+    /// real session, 128 KB segments cost 9% in size and put at most 11 seconds at risk,
+    /// where 8 KB segments cost 46% for less than a second. Time as well, because a quiet
+    /// session writes almost nothing and would otherwise hold its tail open indefinitely -
+    /// and what it is holding is small, so closing it early costs little.
     /// </remarks>
     public void MarkFrame()
     {
@@ -162,7 +174,7 @@ public sealed class RecordingMemoryReader : IMemoryReader
             _writer.Write((uint)(Environment.TickCount64 - _startTimestamp));
 
             long now = Environment.TickCount64;
-            if (now - _lastFlush >= FlushEveryMs)
+            if (_body.SinceFlush >= FlushEveryBytes || now - _lastFlush >= FlushEveryMs)
             {
                 _lastFlush = now;
                 _writer.Flush();
@@ -171,8 +183,11 @@ public sealed class RecordingMemoryReader : IMemoryReader
         }
     }
 
-    /// <summary>How long the tail of a recording may lag behind the session.</summary>
-    public int FlushEveryMs { get; set; } = 1000;
+    /// <summary>How much of the entry stream may be at risk before a segment is closed.</summary>
+    public long FlushEveryBytes { get; set; } = 128 * 1024;
+
+    /// <summary>How long a segment may stay open when almost nothing is being written.</summary>
+    public int FlushEveryMs { get; set; } = 5000;
 
     /// <summary>
     /// Whether this read says anything the recording does not already hold.
