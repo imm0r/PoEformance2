@@ -40,6 +40,17 @@ namespace PoEformance.Game.Components;
 /// first: their mana came back as 4,580 and their fire resistance as 55%, both from the other
 /// bag, against a sheet saying 5,415 and 73%. So the bag is carried alongside every pair.
 ///
+/// HOW FAR THE SHIFT IS VERIFIED, which matters because it is one number standing in for a
+/// whole table. Every reading above is in the range 1 to 2034, and one more lands at 4290:
+/// base_body_armour_physical_damage_reduction_rating = 778 against an armour total of 1011,
+/// which is what a body armour contributing most of it looks like. Beyond that it is
+/// EXTRAPOLATION. A row inserted anywhere in the game's table shifts everything after it, so
+/// a high id can be off by a different amount than a low one, and nothing here would say so.
+/// A flame wall's single stat, id 13189, resolves to
+/// freeze_as_though_damage_+%_final_with_main_hand - which is not a thing a flame wall has,
+/// and is either drift of exactly that kind or a stat that is genuinely there for reasons
+/// nobody has chased.
+///
 /// A name is a LABEL and never a fact: an id with no row is left as its number rather than
 /// guessed at, and the table drifts with the game, so a name that stops making sense means
 /// the table needs extracting again, not that the reading is wrong.

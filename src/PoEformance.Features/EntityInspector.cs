@@ -275,6 +275,7 @@ public sealed class EntityInspector
         // else. Verified against the recording: Stats+0xF8 and Stats+0x100 both read 0x0.
         StructDef layout = _schema.Structs["Stats"];
         var notes = new List<string>();
+        var read = new Dictionary<ulong, string>();
 
         foreach (string source in new[] { "StatsByBuffAndActions", "StatsByItems" })
         {
@@ -290,6 +291,16 @@ public sealed class EntityInspector
                 continue;
             }
 
+            // The two pointers are sometimes the SAME object - a flame wall's are - and
+            // listing it twice under two headings reads as two independent sightings of a
+            // number that was only ever read once. Said instead of shown.
+            if (read.TryGetValue(internals, out string? already))
+            {
+                notes.Add($"{source} is the same bag as {already}");
+                continue;
+            }
+
+            read[internals] = source;
             (int taken, string note) = ReadPairs(internals, stats, source);
             notes.Add($"{taken} from {source}{note}");
         }
