@@ -29,6 +29,19 @@ public readonly record struct ComponentTally(string Name, int Count, bool Descri
 /// </remarks>
 public readonly record struct TimedEffect(string Name, float TimeLeft, float TotalTime, int Charges);
 
+/// <summary>One (stat id, value) pair off the inspected entity's Stats component.</summary>
+/// <remarks>
+/// The game keeps an entity's numbers here as a flat vector of pairs - an id and an integer,
+/// eight bytes each - and the ids are the same ones the game's own Stats table names. So this
+/// is a list of everything the game currently believes about that entity, in a form that can
+/// be looked up rather than guessed at: the AHK tool ships 27,004 of those names extracted
+/// from the game data, in which 347 is base_skill_effect_duration and 351 is
+/// skill_effect_duration.
+///
+/// Read for the SELECTED entity only, same as the buffs beside it, and for the same reason.
+/// </remarks>
+public readonly record struct EntityStat(uint Id, int Value);
+
 /// <summary>What the entity browser wants to see.</summary>
 /// <param name="Survey">
 /// Entities to count components across, for the one-shot survey. Supplied by the window
@@ -53,12 +66,17 @@ public sealed record EntityView(
     int SurveyedEntities,
     string Status,
     IReadOnlyList<TimedEffect>? Effects = null,
-    string EffectsNote = "")
+    string EffectsNote = "",
+    IReadOnlyList<EntityStat>? Stats = null,
+    string StatsNote = "")
 {
     public static EntityView Empty { get; } = new(0, 0, string.Empty, [], [], 0, "nothing selected");
 
     /// <summary>What is currently on this entity, with its clock. Empty when it carries no Buffs.</summary>
     public IReadOnlyList<TimedEffect> Timed => Effects ?? [];
+
+    /// <summary>The entity's own stat pairs. Empty when it carries no Stats component.</summary>
+    public IReadOnlyList<EntityStat> Numbers => Stats ?? [];
 
     /// <summary>How many of this entity's components nobody has described.</summary>
     public int Undescribed => Components.Count(component => !component.Described);
@@ -203,6 +221,8 @@ public sealed class EntityInspector
                     : "carries Buffs, with nothing on it";
         }
 
+        (List<EntityStat> numbers, string statsNote) = ReadStats(entity);
+
         return new EntityView(
             entity.Address,
             entity.Id,
@@ -213,7 +233,74 @@ public sealed class EntityInspector
             $"{components.Count} components, {components.Count(c => !c.Described)} not described"
                 + (effects.Count > 0 ? $", {effects.Count} timed" : string.Empty),
             effects,
-            note);
+            note,
+            numbers,
+            statsNote);
+    }
+
+    /// <summary>
+    /// Reads the entity's own stat pairs, and says which kind of nothing it found.
+    /// </summary>
+    /// <remarks>
+    /// A flat vector of (id u32, value i32), which is why it costs one read for the bounds
+    /// and one for the block rather than a walk. Capped, because a corrupt pair of pointers
+    /// must not turn into a gigabyte of reading - the cap is reported rather than hidden,
+    /// since a truncated list that looks complete is the failure worth avoiding here.
+    /// </remarks>
+    private (List<EntityStat> Stats, string Note) ReadStats(Entity entity)
+    {
+        const int MaxStats = 256;
+        const int PairSize = 8;
+
+        var stats = new List<EntityStat>();
+        ulong component = entity.Component("Stats");
+        if (component == 0)
+        {
+            return (stats, string.Empty);
+        }
+
+        StructDef layout = _schema.Structs["Stats"];
+        int at = layout.OffsetOf("StatsInternalStatsVector");
+        if (!_reader.TryRead(component + (ulong)at, out ulong first)
+            || !_reader.TryRead(component + (ulong)(at + 8), out ulong last))
+        {
+            return (stats, "carries Stats, and it could not be read");
+        }
+
+        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last < first)
+        {
+            return (stats, "carries Stats, with nothing readable in it");
+        }
+
+        long count = (long)(last - first) / PairSize;
+        if (count is < 0 or > 65536)
+        {
+            return (stats, $"carries Stats, and its vector reads as {count} pairs - not believable");
+        }
+
+        if (count == 0)
+        {
+            return (stats, "carries Stats, with no numbers in it");
+        }
+
+        int wanted = (int)Math.Min(count, MaxStats);
+        byte[] block = new byte[wanted * PairSize];
+        if (!_reader.TryRead(first, block))
+        {
+            return (stats, "carries Stats, and its vector could not be read");
+        }
+
+        for (int i = 0; i < wanted; i++)
+        {
+            stats.Add(new EntityStat(
+                BitConverter.ToUInt32(block, i * PairSize),
+                BitConverter.ToInt32(block, (i * PairSize) + 4)));
+        }
+
+        string note = count > wanted
+            ? $"{count} stats, showing the first {wanted}:"
+            : $"{count} stats:";
+        return (stats, note);
     }
 
     /// <summary>Counts every component name across a set of entities.</summary>

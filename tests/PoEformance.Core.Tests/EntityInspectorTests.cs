@@ -259,6 +259,63 @@ public class EntityInspectorTests
         Assert.Contains("nothing on it", view.EffectsNote, StringComparison.Ordinal);
     }
 
+    /// <summary>The entity's own stat pairs are read, and a truncated list says it is one.</summary>
+    /// <remarks>
+    /// The Stats component is where the game keeps what it believes about an entity, as a
+    /// flat vector of (id, value). It is the remaining place a flame wall's ten-second
+    /// duration could be sitting, now that its Buffs turned out to be empty - and it is worth
+    /// reading for its own sake, because those ids are the game's own and can be looked up.
+    ///
+    /// The cap is reported rather than applied silently: a list that stops at 256 while
+    /// claiming to be everything is how somebody concludes a stat is absent when it is merely
+    /// off the end.
+    /// </remarks>
+    [Fact]
+    public void TheEntitysOwnStatPairsAreRead()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Anomalies/Firewall", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Stats");
+
+        StructDef layout = schema.Structs["Stats"];
+        EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        ulong component = placed.Components.Single(c => c.Name == "Stats").Address;
+
+        const ulong PairsAt = 0x3200_0000_0000;
+        int at = layout.OffsetOf("StatsInternalStatsVector");
+        reader.Place(component + (ulong)at, PairsAt);
+        reader.Place(component + (ulong)(at + 8), PairsAt + 16);      // two pairs
+
+        var block = new byte[16];
+        BitConverter.TryWriteBytes(block.AsSpan(0, 4), 351u);          // skill_effect_duration
+        BitConverter.TryWriteBytes(block.AsSpan(4, 4), 10300);         // milliseconds
+        BitConverter.TryWriteBytes(block.AsSpan(8, 4), 347u);          // base_skill_effect_duration
+        BitConverter.TryWriteBytes(block.AsSpan(12, 4), 10000);
+        reader.Place(PairsAt, block);
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Equal(2, view.Numbers.Count);
+        Assert.Equal(10300, view.Numbers.Single(s => s.Id == 351).Value);
+        Assert.Contains("2 stats", view.StatsNote, StringComparison.Ordinal);
+    }
+
+    /// <summary>A Stats component nobody could read says THAT, rather than "no numbers".</summary>
+    [Fact]
+    public void AStatsComponentThatCannotBeReadIsNotReportedAsEmpty()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Anomalies/Firewall", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Stats");
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Empty(view.Numbers);
+        Assert.Contains("could not be read", view.StatsNote, StringComparison.Ordinal);
+    }
+
     /// <summary>A Buffs component nobody could read says THAT, rather than "nothing on it".</summary>
     [Fact]
     public void ABuffsComponentThatCannotBeReadIsNotReportedAsEmpty()
