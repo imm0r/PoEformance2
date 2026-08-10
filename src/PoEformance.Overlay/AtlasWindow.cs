@@ -41,39 +41,11 @@ public sealed class AtlasWindow
         _save = save;
     }
 
-    /// <summary>Whether the window is on screen.</summary>
-    public bool Visible { get; set; }
+    /// <summary>Draws the tab's content.</summary>
+    public void DrawTab() => Draw();
 
-    /// <summary>Draws the window.</summary>
-    public void Render()
-    {
-        if (!Visible)
-        {
-            return;
-        }
-
-        ImGui.SetNextWindowSize(new Vector2(560f, 520f), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowPos(new Vector2(180f, 160f), ImGuiCond.FirstUseEver);
-
-        bool open = Visible;
-        bool expanded = ImGui.Begin("The atlas", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
-
-        // End in a finally: an exception between Begin and End leaves ImGui's stack
-        // unbalanced, and the assert that follows takes the process down.
-        try
-        {
-            if (expanded)
-            {
-                Draw();
-            }
-        }
-        finally
-        {
-            ImGui.End();
-        }
-
-        Visible = open;
-    }
+    /// <summary>While the tab is not in front: a change made and left behind still lands.</summary>
+    public void Idle() => Settle();
 
     private void Draw()
     {
@@ -175,9 +147,17 @@ public sealed class AtlasWindow
             _unsaved = true;
         }
 
-        // WRITTEN only once nothing is being dragged or typed in. Applied and saved together,
-        // a colour picker held down writes the settings file on every frame of the drag, and
-        // a search box writes it on every keystroke.
+        Settle();
+    }
+
+    /// <summary>Writes down a change once nothing is being dragged or typed in.</summary>
+    /// <remarks>
+    /// Applied and saved separately on purpose: a colour picker held down writes the
+    /// settings file on every frame of the drag, and a search box writes it on every
+    /// keystroke, so the save waits for quiet while the atlas follows the drag live.
+    /// </remarks>
+    private void Settle()
+    {
         if (_unsaved && !ImGui.IsAnyItemActive())
         {
             _unsaved = false;

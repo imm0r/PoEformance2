@@ -91,41 +91,18 @@ public sealed class AlertWindow
         _showPreloadNow = showNow;
     }
 
-    /// <summary>Whether the window is on screen.</summary>
-    public bool Visible { get; set; }
-
-    /// <summary>Draws the window.</summary>
-    public void Render()
+    /// <summary>Draws the tab's content.</summary>
+    public void DrawTab()
     {
-        if (!Visible)
-        {
-            Settle();
-            return;
-        }
+        Draw();
 
-        ImGui.SetNextWindowSize(new Vector2(600f, 420f), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowPos(new Vector2(300f, 100f), ImGuiCond.FirstUseEver);
-
-        bool open = Visible;
-        bool expanded = ImGui.Begin("Alerts", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
-
-        // End in a finally: an exception between Begin and End leaves ImGui's stack
-        // unbalanced and the assert that follows takes the process down.
-        try
-        {
-            if (expanded)
-            {
-                Draw();
-            }
-        }
-        finally
-        {
-            ImGui.End();
-        }
-
+        // After the content, so a drag that ended this frame is written down now rather
+        // than waiting for whatever happens next - including the tab being switched away.
         Settle();
-        Visible = open;
     }
+
+    /// <summary>While the tab is not in front: a change made and left behind still lands.</summary>
+    public void Idle() => Settle();
 
     private void Draw()
     {

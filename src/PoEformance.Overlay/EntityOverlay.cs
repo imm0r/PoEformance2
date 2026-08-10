@@ -152,20 +152,33 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>How much of the area has been walked, if it is being measured.</summary>
     public MapCoverage? Coverage { get; set; }
 
+    /// <summary>The tabbed window every tool lives in.</summary>
+    /// <remarks>
+    /// The tools below register themselves here as they are attached; what remains of each
+    /// window class is its tab's content and the work it does while not in front. The order
+    /// passed with each registration pins the tab's place in the bar - play-time tools left
+    /// of the reverse-engineering ones - rather than leaving it to attach order, which is
+    /// app wiring and not an interface decision.
+    /// </remarks>
+    private readonly ToolTabs _tools = new();
+
+    // The tab names things elsewhere in the overlay jump to.
+    private const string UiBrowserTab = "uibrowser";
+    private const string DissectorTab = "dissector";
+
+    // Only the tools something else still reaches for keep a field; the rest live on as
+    // their tab's callbacks and nothing more. A field that nothing reads is a claim that
+    // somebody talks to that window, and here nobody does.
     private CostWindow? _costWindow;
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
-    private EntityBrowserWindow? _entityBrowser;
     private PoiLayer? _poi;
-    private StyleWindow? _styleWindow;
     private AlertWatcher? _alerts;
     private readonly AlertBanner _banner = new();
     private readonly UnwalkedLayer _unwalked = new();
     private readonly HealthBarLayer _healthBars = new();
     private readonly AtlasLayer _atlas = new();
     private AtlasWatch? _atlasWatch;
-    private AtlasWindow? _atlasWindow;
-    private StashWindow? _stashWindow;
     private readonly RitualLayer _ritual = new();
     private RitualWatch? _ritualWatch;
     private RitualWindow? _ritualWindow;
@@ -183,7 +196,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(watcher);
         ArgumentNullException.ThrowIfNull(saved);
         _alerts = watcher;
-        _alertWindow = new AlertWindow(watcher, saved) { Visible = visible };
+        var window = new AlertWindow(watcher, saved);
+        _alertWindow = window;
+        _tools.Add(0, "alerts", "Alerts", window.DrawTab, window.Idle);
+        if (visible)
+        {
+            _tools.Show("alerts");
+        }
+
         AlertsChanged = saved;
 
         // The preload list is edited in this window, and it may have been attached first -
@@ -211,7 +231,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private AlertWindow? _alertWindow;
-    private PreloadWindow? _preloadWindow;
     private PreloadWatch? _preload;
     private PreloadSettings _preloadSettings = PreloadSettings.Default;
     private readonly PreloadPanel _preloadPanel = new();
@@ -254,14 +273,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _preloadSettings = settings;
         _preloadPanel.Enabled = settings.List;
         PreloadRulesChanged = rulesChanged;
-        _preloadWindow = new PreloadWindow(
+        var window = new PreloadWindow(
             watch,
             lookAgain,
             sweep,
-            () => TookPreload(_preloadSettings with { Rules = watch.Rules }))
+            () => TookPreload(_preloadSettings with { Rules = watch.Rules }));
+        _tools.Add(1, "preload", "In this area", window.DrawTab);
+        if (visible)
         {
-            Visible = visible,
-        };
+            _tools.Show("preload");
+        }
 
         // The editor for these lives in the alerts window, which may already be attached -
         // both orders happen depending on how the app is wired, so neither is assumed.
@@ -347,7 +368,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachStyleEditor(Action saved, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(saved);
-        _styleWindow = new StyleWindow(Style, saved) { Visible = visible };
+        var window = new StyleWindow(Style, saved);
+        _tools.Add(5, "style", "Appearance", window.DrawTab, window.Idle);
+        if (visible)
+        {
+            _tools.Show("style");
+        }
     }
 
     /// <summary>Radius in pixels of an entity dot.</summary>
@@ -485,7 +511,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachUiBrowser(UiTreeInspector inspector, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(inspector);
-        _uiBrowser = new UiBrowserWindow(inspector) { Visible = visible, Style = _style };
+        var window = new UiBrowserWindow(inspector) { Style = _style };
+        _uiBrowser = window;
+        _tools.Add(8, UiBrowserTab, "UI browser", window.DrawTab, window.Idle);
+        if (visible)
+        {
+            _tools.Show(UiBrowserTab);
+        }
     }
 
     /// <summary>
@@ -500,7 +532,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(saved);
         _atlasWatch = watch;
-        _atlasWindow = new AtlasWindow(watch, saved) { Visible = visible };
+        var window = new AtlasWindow(watch, saved);
+        _tools.Add(2, "atlas", "Atlas", window.DrawTab, window.Idle);
+        if (visible)
+        {
+            _tools.Show("atlas");
+        }
+
         _atlas.Style = _style;
     }
 
@@ -508,7 +546,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Adds the stash listing.
     /// </summary>
     /// <remarks>
-    /// A window and nothing else: it draws nothing over the game, because what it answers -
+    /// A tab and nothing else: it draws nothing over the game, because what it answers -
     /// what have I got, and where - is not a question anybody asks mid-fight.
     /// </remarks>
     public void AttachStash(
@@ -529,12 +567,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // so the window is handed a way to turn a file into something drawable rather than
         // being given the renderer itself. The sign-in is handed in for the same shape of
         // reason: the trade window is a browser, and this layer cannot see that one.
-        _stashWindow = new StashWindow(
+        var window = new StashWindow(
             inspector, art, prices, trade, signIn,
-            file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture)
+            file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture);
+        _tools.Add(4, "stash", "Stash", window.DrawTab);
+        if (visible)
         {
-            Visible = visible,
-        };
+            _tools.Show("stash");
+        }
     }
 
     /// <summary>
@@ -542,7 +582,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </summary>
     /// <remarks>
     /// Separate from the atlas even though it shares its read: it answers a different question,
-    /// it is idle unless a line is being drawn, and its window is a list somebody works through
+    /// it is idle unless a line is being drawn, and its tab is a list somebody works through
     /// rather than a set of switches.
     /// </remarks>
     public void AttachRitual(
@@ -554,7 +594,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         ArgumentNullException.ThrowIfNull(watch);
         _ritualWatch = watch;
-        _ritualWindow = new RitualWindow(watch, worth, apply, save) { Visible = visible };
+        var window = new RitualWindow(watch, worth, apply, save);
+        _ritualWindow = window;
+        _tools.Add(3, "ritual", "Ritual line", window.DrawTab);
+        if (visible)
+        {
+            _tools.Show("ritual");
+        }
     }
 
     /// <summary>
@@ -569,7 +615,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachDissector(StructureInspector inspector, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(inspector);
-        _dissector = new DissectorWindow(inspector) { Visible = visible };
+        var window = new DissectorWindow(inspector);
+        _dissector = window;
+        _tools.Add(9, DissectorTab, "Dissector", window.DrawTab, window.Idle);
+        if (visible)
+        {
+            _tools.Show(DissectorTab);
+        }
     }
 
     /// <summary>
@@ -583,12 +635,26 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachEntityBrowser(EntityInspector inspector, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(inspector);
-        _entityBrowser = new EntityBrowserWindow(
+
+        // The jump also brings the dissector's tab in front - "show me this" used to mean
+        // opening that window, and with tabs it means switching to it. Only for a real
+        // address: Show ignores zero, and a tab switch to an unchanged dissector would
+        // just take the browser away from under the click that asked for it.
+        var window = new EntityBrowserWindow(
             inspector,
-            (address, label, layout) => _dissector?.Show(address, label, layout))
+            (address, label, layout) =>
+            {
+                if (address != 0 && _dissector is not null)
+                {
+                    _dissector.Show(address, label, layout);
+                    _tools.Show(DissectorTab);
+                }
+            });
+        _tools.Add(7, "entities", "Entity browser", () => window.DrawTab(_snapshot, _snapshot.Player), window.Idle);
+        if (visible)
         {
-            Visible = visible,
-        };
+            _tools.Show("entities");
+        }
     }
 
     /// <summary>
@@ -927,25 +993,35 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
-        // Outside the "in an area" gate: an element can be inspected on a login screen or in
-        // a hideout, and the browser reports for itself when there is no tree to read.
+        // Registered on first use rather than at attach because the cost history is a
+        // property, set whenever the app happens to wire it - the tab appears the moment
+        // there is something for it to show.
         if (Costs is not null)
         {
-            _costWindow ??= new CostWindow(Costs);
+            if (_costWindow is null)
+            {
+                var made = new CostWindow(Costs);
+                _costWindow = made;
+                _tools.Add(6, "cost", "Read cost", made.DrawTab);
+            }
+
             _costWindow.CurrentArea = _snapshot.AreaHash;
-            _costWindow.Render();
         }
 
-        _uiBrowser?.Render(_tracked);
-        _entityBrowser?.Render(_snapshot, _snapshot.Player);
-        _dissector?.Render();
+        // Polled outside the tools window on purpose: F8 captures what is under the cursor
+        // the moment it is pressed, with the tools closed or on another tab, and the pick
+        // is what brings the browser in front - not the other way around.
+        if (_uiBrowser is not null && _uiBrowser.Tick(_tracked))
+        {
+            _tools.Show(UiBrowserTab);
+        }
+
+        // Its own small window rather than a tab, alone among the tools: routing is done
+        // WHILE playing, and a route picked from inside the toolbox would mean parking a
+        // full-size window over the fight to click a destination.
         _poi?.DrawPicker(_snapshot, _snapshot.Player);
-        _styleWindow?.Render();
-        _alertWindow?.Render();
-        _preloadWindow?.Render();
-        _atlasWindow?.Render();
-        _ritualWindow?.Render();
-        _stashWindow?.Render();
+
+        _tools.Render();
 
         // A window rather than something painted, so it can be closed and moved - which means
         // it belongs here with the windows and not in the drawing pass. Only where the
@@ -1262,9 +1338,34 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     ImGui.TextColored(new Vector4(0.65f, 0.7f, 0.78f, 1f), $"terrain:  {DescribeTerrain()}");
                 }
 
-                // Not behind --debug. The UI browser is a working tool rather than a
-                // measurement, and its whole point is being reachable in the moment a panel
-                // is open - which is not a moment anyone restarts the tool for.
+                // The summary stays here even though the full list moved into the tools
+                // window: the common case needs no window at all - the answer is one line
+                // and it is already on screen.
+                if (_preload is not null)
+                {
+                    string here = _preload.Summary();
+                    ImGui.TextColored(
+                        new Vector4(0.65f, 0.75f, 0.68f, 1f),
+                        here.Length > 0 ? $"loaded:   {here}" : $"loaded:   {_preload.All.Count} files");
+                }
+
+                // ONE switch where a column of per-window checkboxes used to be: every tool
+                // now lives on a tab of the same window, so "which tools are open" stopped
+                // being a question this readout has to answer. Not behind --debug for the
+                // same reason the browsers never were - these are working tools, and their
+                // whole point is being reachable in the moment something is on screen,
+                // which is not a moment anyone restarts the tool for.
+                if (_tools.Any)
+                {
+                    bool tools = _tools.Visible;
+                    if (ImGui.Checkbox("Tools  (alerts, atlas, stash and the browsers - one tab each)", ref tools))
+                    {
+                        _tools.Visible = tools;
+                    }
+                }
+
+                // Not a tab like the rest: routing is done WHILE playing, so the picker
+                // keeps its own small window - see the note where it is drawn.
                 if (_poi is not null)
                 {
                     bool picking = _poi.ShowPicker;
@@ -1272,15 +1373,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     {
                         _poi.ShowPicker = picking;
                         SettingsChanged?.Invoke();
-                    }
-                }
-
-                if (_uiBrowser is not null)
-                {
-                    bool browsing = _uiBrowser.Visible;
-                    if (ImGui.Checkbox("UI browser  (F8 picks what is under the cursor)", ref browsing))
-                    {
-                        _uiBrowser.Visible = browsing;
                     }
                 }
 
@@ -1294,119 +1386,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     }
                 }
 
-                if (_costWindow is not null)
-                {
-                    bool costs = _costWindow.Visible;
-                    if (ImGui.Checkbox("Read cost over time  (per phase, over a whole map)", ref costs))
-                    {
-                        _costWindow.Visible = costs;
-                    }
-                }
-
-                if (_entityBrowser is not null)
-                {
-                    bool browsing = _entityBrowser.Visible;
-                    if (ImGui.Checkbox("Entity browser  (components, including the undescribed ones)", ref browsing))
-                    {
-                        _entityBrowser.Visible = browsing;
-                    }
-                }
-
-                if (_dissector is not null)
-                {
-                    bool dissecting = _dissector.Visible;
-                    if (ImGui.Checkbox("Memory dissector  (raw structures, and what moves in them)", ref dissecting))
-                    {
-                        _dissector.Visible = dissecting;
-                    }
-                }
-
-                if (_styleWindow is not null)
-                {
-                    bool styling = _styleWindow.Visible;
-                    if (ImGui.Checkbox("Appearance  (colour, size and icon of everything drawn)", ref styling))
-                    {
-                        _styleWindow.Visible = styling;
-                    }
-                }
-
                 bool hurtOnly = _healthBars.OnlyWhenHurt;
                 if (ImGui.Checkbox("Health bars only once hurt  (off shows every monster's)", ref hurtOnly))
                 {
                     _healthBars.OnlyWhenHurt = hurtOnly;
                     SettingsChanged?.Invoke();
-                }
-
-                if (_preload is not null && _preloadWindow is not null)
-                {
-                    // The summary next to the switch, so the common case needs no window at
-                    // all: the answer is one line and it is already on screen.
-                    string here = _preload.Summary();
-                    bool showing = _preloadWindow.Visible;
-                    if (ImGui.Checkbox(
-                            here.Length > 0
-                                ? $"In this area: {here}###preload"
-                                : $"In this area  ({_preload.All.Count} files)###preload",
-                            ref showing))
-                    {
-                        _preloadWindow.Visible = showing;
-                    }
-                }
-
-                if (_atlasWatch is not null && _atlasWindow is not null)
-                {
-                    // The count beside the switch, because an atlas overlay that draws
-                    // nothing looks the same whether the panel is shut or the read failed -
-                    // and one of those is worth opening the window for.
-                    AtlasView atlas = _atlasWatch.View;
-                    bool showing = _atlasWindow.Visible;
-                    if (ImGui.Checkbox(
-                            atlas.Total > 0
-                                ? $"The atlas  ({atlas.Total} maps, {atlas.Open} you can enter now)###atlas"
-                                : $"The atlas  ({atlas.Status})###atlas",
-                            ref showing))
-                    {
-                        _atlasWindow.Visible = showing;
-                    }
-                }
-
-                if (_stashWindow is not null)
-                {
-                    bool listing = _stashWindow.Visible;
-                    if (ImGui.Checkbox("Stash  (every tab, with each item's stats)", ref listing))
-                    {
-                        _stashWindow.Visible = listing;
-                    }
-                }
-
-                if (_ritualWatch is not null && _ritualWindow is not null)
-                {
-                    // Only offered while a line is being drawn, which is the only time it has
-                    // anything to say - a permanent switch for a few seconds a session is
-                    // clutter, and its absence is itself the answer to "why is it empty".
-                    RitualView ritual = _ritualWatch.View;
-                    if (ritual.Drawing)
-                    {
-                        bool planning = _ritualWindow.Visible;
-                        if (ImGui.Checkbox($"Ritual line  ({ritual.Chains.Count} routes)###ritual", ref planning))
-                        {
-                            _ritualWindow.Visible = planning;
-                        }
-                    }
-                }
-
-                if (_alerts is not null && _alertWindow is not null)
-                {
-                    // The count is here rather than only in the window because "it has not
-                    // said anything" and "it is not running" look identical, and this is a
-                    // feature whose correct behaviour is mostly silence.
-                    bool alerting = _alertWindow.Visible;
-                    if (ImGui.Checkbox(
-                            $"Alerts  ({_alerts.Rules.Count(rule => rule.Enabled)} watched for, {_alerts.Raised} raised)",
-                            ref alerting))
-                    {
-                        _alertWindow.Visible = alerting;
-                    }
                 }
 
                 // Only when there is one. A path that does not work otherwise shows up as a

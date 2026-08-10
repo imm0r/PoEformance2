@@ -109,39 +109,8 @@ public sealed class StashWindow
         _picture = picture;
     }
 
-    /// <summary>Whether the window is on screen.</summary>
-    public bool Visible { get; set; }
-
-    /// <summary>Draws the window.</summary>
-    public void Render()
-    {
-        if (!Visible)
-        {
-            return;
-        }
-
-        ImGui.SetNextWindowSize(new Vector2(860f, 600f), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowPos(new Vector2(160f, 120f), ImGuiCond.FirstUseEver);
-
-        bool open = Visible;
-        bool expanded = ImGui.Begin("Stash", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
-
-        // End in a finally: an exception between Begin and End leaves ImGui's stack unbalanced,
-        // and the assert that follows takes the process down.
-        try
-        {
-            if (expanded)
-            {
-                Draw();
-            }
-        }
-        finally
-        {
-            ImGui.End();
-        }
-
-        Visible = open;
-    }
+    /// <summary>Draws the tab's content.</summary>
+    public void DrawTab() => Draw();
 
     private void Draw()
     {

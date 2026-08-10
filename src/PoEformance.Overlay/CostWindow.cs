@@ -45,42 +45,11 @@ public sealed class CostWindow
         _history = history;
     }
 
-    /// <summary>Whether the window is on screen.</summary>
-    public bool Visible { get; set; }
-
     /// <summary>The area being read right now, so "this map only" has something to mean.</summary>
     public uint CurrentArea { get; set; }
 
-    /// <summary>Draws the window.</summary>
-    public void Render()
-    {
-        if (!Visible)
-        {
-            return;
-        }
-
-        ImGui.SetNextWindowSize(new Vector2(680f, 640f), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowPos(new Vector2(200f, 80f), ImGuiCond.FirstUseEver);
-
-        bool open = Visible;
-        bool expanded = ImGui.Begin("Read cost", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
-
-        // End in a finally: an exception between Begin and End leaves ImGui's stack unbalanced
-        // and the assert that follows takes the process down.
-        try
-        {
-            if (expanded)
-            {
-                Draw();
-            }
-        }
-        finally
-        {
-            ImGui.End();
-        }
-
-        Visible = open;
-    }
+    /// <summary>Draws the tab's content.</summary>
+    public void DrawTab() => Draw();
 
     private void Draw()
     {
