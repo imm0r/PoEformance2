@@ -3,6 +3,7 @@ using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Features;
 using PoEformance.Game.Components;
+using PoEformance.Game.Ui;
 
 namespace PoEformance.Overlay;
 
@@ -99,15 +100,17 @@ public sealed class DamageWindow
         }
         else
         {
-            // In SCREENS rather than world units, because that is the unit the judgement is
-            // made in - "nothing is killed two screens away" is a statement somebody can
-            // agree or disagree with, and "nothing is killed 3826 units away" is not.
+            // GRID UNITS, the same as the rows above and as the entity browser. It was in
+            // screens, which read more naturally but could not be compared with anything:
+            // the figures it has to be set against - how far the list reaches, where things
+            // went missing, GameHelper2's measured bubble near 200 - are all in grid, and a
+            // control in its own private unit cannot be set from them.
             ImGui.SetNextItemWidth(220f);
-            float screens = _meter.CreditWithin / DamageMeter.ScreenWorldUnits;
-            if (ImGui.SliderFloat("only within", ref screens, 0f, 6f,
-                    screens <= 0f ? "any distance" : "%.1f screens"))
+            float limit = _meter.CreditWithin / MapView.WorldToGrid;
+            if (ImGui.SliderFloat("only within", ref limit, 0f, 600f,
+                    limit <= 0f ? "any distance" : "%.0f grid"))
             {
-                _meter.CreditWithin = screens * DamageMeter.ScreenWorldUnits;
+                _meter.CreditWithin = limit * MapView.WorldToGrid;
             }
 
             ImGui.SameLine();
@@ -142,50 +145,73 @@ public sealed class DamageWindow
             return;
         }
 
-        float screens = _meter.FurthestVanish / DamageMeter.ScreenWorldUnits;
-        float gate = _meter.CreditWithin / DamageMeter.ScreenWorldUnits;
+        // IN GRID UNITS, which is what the entity browser measures distance in and what
+        // GameHelper2 measured the network bubble in (~200, "by checking when entity leave
+        // the bubble"). Screens were the wrong unit for a diagnostic: the conversion to them
+        // is the one derived constant in this feature, so "1.45 screens" could mean 255 grid
+        // or 128 depending on whether the coverage figure it comes from is a radius or a
+        // diameter - and that is exactly the difference between outside the bubble and well
+        // inside it. A number nobody can place is not a measurement.
+        float furthest = _meter.FurthestVanish / MapView.WorldToGrid;
+        float gate = _meter.CreditWithin / MapView.WorldToGrid;
 
-        // ONE LINE WHILE NOTHING HAS BEEN REFUSED, because then the two figures are the same
-        // event and printing them as two rows invites them to disagree about it - which they
-        // did: 1.45 screens was called "beyond killing range" on one row and "clear of the
-        // limit" on the next, because the first was judged against a screen and the second
-        // against the limit. Two references for one number is how a readout contradicts
-        // itself, and a reader who has to work out which row to believe has been given less
-        // than one row would have been.
+        // The denominator: how far the entity list reaches at all. Without it the figure
+        // above is far only in relation to nothing.
+        if (_meter.FurthestSeen > 0f)
+        {
+            float seen = _meter.FurthestSeen / MapView.WorldToGrid;
+            float edge = _meter.VanishedAtEdge;
+
+            ImGui.TextColored(
+                DimText,
+                ImGuiText.Escape(
+                    $"  seen out to: {seen:0} grid  - the reach of the entity list, so the"
+                    + " furthest anything can be and still be watched"));
+
+            // The one comparison that settles what the disappearances are. Crowding the edge
+            // is what leaving the bubble looks like; well inside it, the only thing that
+            // removes a monster is dying.
+            ImGui.TextColored(
+                edge >= 0.9f ? SoftText : DimText,
+                ImGuiText.Escape(
+                    $"  gone at:     {furthest:0} grid  = {edge * 100:0}% of that"
+                    + (edge >= 0.9f
+                        ? "  - right at the edge, so these are monsters leaving, not dying"
+                        : "  - well inside the edge, so they went missing where things die")));
+        }
+
+        // NOTHING REFUSED: one line about the limit, not a second copy of the figure above.
+        // Two rows for one event is what let this readout contradict itself once, calling the
+        // same 1.45 "beyond killing range" and "clear of the limit" a line apart.
         if (_meter.WithheldCount == 0)
         {
             ImGui.TextColored(
                 DimText,
-                $"  furthest disappearance: {screens:0.00} screens - every one counted, none refused"
-                + (gate > 0f && screens < gate
-                    ? $"; the {gate:0.0}-screen limit is above all of them and is doing nothing"
-                    : string.Empty));
+                gate > 0f && furthest < gate
+                    ? $"  the {gate:0}-grid limit sits above all of them, so it is doing nothing"
+                    : "  nothing has been refused by the limit");
 
             return;
         }
 
-        // Both, once the limit has actually refused something - now they are different
-        // events and the gap between them is the finding. The limit's job is to sit in that
-        // gap: the counted figure well below it means it separates two populations, and the
-        // two pressed together means it is cutting through the middle of one.
-        ImGui.TextColored(
-            SoftText,
-            $"  furthest disappearance: {screens:0.00} screens - refused, so beyond the limit");
-
+        // Once the limit HAS refused something, how far the believed ones reach is a separate
+        // event from how far the disappearances reach, and the gap between them is the
+        // finding: the limit's job is to sit in it. Pressed against the counted figure, it is
+        // cutting through one population rather than between two.
         if (_meter.FurthestCounted < 0f)
         {
             return;
         }
 
-        float counted = _meter.FurthestCounted / DamageMeter.ScreenWorldUnits;
+        float counted = _meter.FurthestCounted / MapView.WorldToGrid;
         bool roomy = gate <= 0f || counted <= gate * 0.75f;
 
         ImGui.TextColored(
             roomy ? DimText : SoftText,
-            $"  furthest one counted:   {counted:0.00} screens"
+            $"  counted out to: {counted:0} grid, limit {gate:0}"
             + (roomy
-                ? "  - clear of the limit, so it is not cutting into kills"
-                : "  - close to the limit; it may be refusing real kills, so try widening it"));
+                ? "  - clear of it, so it is not cutting into kills"
+                : "  - close to it; it may be refusing real kills, so try widening it"));
     }
 
     private void DrawTargets()
