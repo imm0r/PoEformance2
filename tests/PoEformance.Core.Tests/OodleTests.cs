@@ -80,6 +80,22 @@ public class OodleTests
         }
     }
 
+    [Theory]
+    [InlineData("8C0C00A124883B12", "Leviathan")]   // what Path of Exile 2 actually packs with
+    [InlineData("8C0A00000000", "Mermaid or Selkie")]
+    [InlineData("8C0600000000", "Kraken")]
+    [InlineData("8C7F00000000", "decoder type 127")]
+    [InlineData("00000000", "not an Oodle chunk")]
+    [InlineData("8C", "not an Oodle chunk")]
+    public void ACHUNKIsAskedWhatItIsRatherThanTheDecoderThatRefusedIt(string head, string expected)
+    {
+        // THE DECODER'S OWN NAME FOR IT IS ONE OUT. OozSharp's enum starts at 1 where Oodle's
+        // starts at 0, so it called this install's Leviathan "Selkie" - a real codec, a wrong
+        // answer, and a day spent looking for the wrong decoder if it is believed. A chunk says
+        // what it is in its own first two bytes, so that is where the name comes from.
+        Assert.Contains(expected, Oodle.Codec(Convert.FromHexString(head)), StringComparison.Ordinal);
+    }
+
     [Fact]
     public void AREFUSEDChunkCarriesWhatTheDecoderSaidAndWhatItSaidItAbout()
     {
@@ -92,7 +108,9 @@ public class OodleTests
         // The first bytes because that is where a chunk names its own compressor: told them,
         // somebody who knows the format can say what this install packs with, from a log line.
         Assert.Contains("DEADBEEF", Oodle.LastRefusal, StringComparison.Ordinal);
-        Assert.NotEqual(string.Empty, Oodle.LastRefusal);
+
+        // And what the chunk says it is, read off the chunk rather than off the decoder.
+        Assert.Contains("not an Oodle chunk", Oodle.LastRefusal, StringComparison.Ordinal);
     }
 
     [Fact]
