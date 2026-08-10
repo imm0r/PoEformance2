@@ -108,35 +108,55 @@ public class RecordingCompressionTests
     /// are self-delimiting and a torn one can simply be dropped. A compressed one is
     /// readable up to the last complete BLOCK. The flush is what bounds the difference, so
     /// the test kills the session at a known flush and demands everything before it.
+    ///
+    /// Deliberately far more than a block's worth of frames. An earlier version of this test
+    /// wrote ten of them and passed against a flush that did not flush at all - the whole
+    /// recording fit inside the first block the encoder emitted anyway, so the assertion was
+    /// true for a reason that had nothing to do with what it claimed to check. Two real
+    /// recordings, ending at exactly 8,388,608 decoded bytes each, are what it missed.
     /// </remarks>
     [Fact]
     public void AKilledSessionKeepsEverythingUpToTheLastFlush()
     {
+        // Enough entries to pass the eight megabytes the encoder will otherwise sit on.
+        const int Frames = 2_200;
+        const int BlockSize = 4096;
+
         var memory = new FakeMemoryReader();
         var file = new MemoryStream();
         long durable = 0;
 
+        // Placed once and mutated in place: the fake keeps the array, and adding a region
+        // per frame would turn every read into a walk of thousands of them.
+        var moving = new byte[8];
+        var block = new byte[BlockSize];
+        memory.Place(Where, moving);
+        memory.Place(Where + 64, block);
+
         using (var recorder = new RecordingMemoryReader(memory, file) { FlushEveryMs = 0 })
         {
-            for (int frame = 0; frame < 10; frame++)
+            for (int frame = 0; frame < Frames; frame++)
             {
-                memory.Place(Where, (long)frame);
+                BitConverter.TryWriteBytes(moving, (long)frame);
+                BitConverter.TryWriteBytes(block.AsSpan(0, 8), (long)frame * 7);
+
                 recorder.MarkFrame();
 
                 // What would survive a kill at exactly this instant.
                 durable = recorder.FileBytes;
 
                 recorder.Read<long>(Where);
+                recorder.TryRead(Where + 64, new byte[BlockSize]);
             }
         }
 
         byte[] killed = file.ToArray()[..(int)durable];
         var replay = ReplayMemoryReader.Load(new MemoryStream(killed));
 
-        Assert.Equal(10, replay.FrameCount);
+        Assert.Equal(Frames, replay.FrameCount);
 
         // Every read before the last flush is there, frame for frame.
-        for (uint frame = 0; frame < 9; frame++)
+        for (uint frame = 0; frame < Frames - 1; frame++)
         {
             replay.Seek(frame);
             Assert.Equal((long)frame, replay.Read<long>(Where));
@@ -144,7 +164,43 @@ public class RecordingCompressionTests
 
         // And the last one, written after the flush, is gone rather than wrong - the replay
         // falls back to the newest data at or before that frame.
-        replay.Seek(9);
-        Assert.Equal(8L, replay.Read<long>(Where));
+        replay.Seek(Frames - 1);
+        Assert.Equal((long)(Frames - 2), replay.Read<long>(Where));
+    }
+
+    /// <summary>With the settings it actually ships with, a kill costs a few seconds.</summary>
+    /// <remarks>
+    /// The test above forces a segment per frame to exercise the mechanism; this one leaves
+    /// the defaults alone, because the number that matters is what a real recording loses.
+    /// A frame here is deliberately fat - twelve times what the game's reader writes per
+    /// tick - so a few thousand of them stand in for a long session without taking one.
+    /// </remarks>
+    [Fact]
+    public void TheDefaultSettingsLoseSecondsRatherThanMinutes()
+    {
+        const int Frames = 3_000;
+        const int BlockSize = 4096;
+
+        var memory = new FakeMemoryReader();
+        var file = new MemoryStream();
+        var block = new byte[BlockSize];
+        memory.Place(Where, block);
+
+        using (var recorder = new RecordingMemoryReader(memory, file))
+        {
+            for (int frame = 0; frame < Frames; frame++)
+            {
+                BitConverter.TryWriteBytes(block.AsSpan(0, 8), (long)frame);
+                recorder.MarkFrame();
+                recorder.TryRead(Where, new byte[BlockSize]);
+            }
+        }
+
+        // Killed: no Dispose, so the tail of the file is whatever the segments had closed.
+        // The whole file is 12 MB of entries; the default boundary is every 128 KB.
+        var replay = ReplayMemoryReader.Load(new MemoryStream(file.ToArray()));
+
+        Assert.True(replay.FrameCount > Frames * 0.95,
+            $"only {replay.FrameCount} of {Frames} frames survived");
     }
 }

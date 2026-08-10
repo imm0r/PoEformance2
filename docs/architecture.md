@@ -90,8 +90,24 @@ order:
   so the file is still identifiable and its version still readable.
 
 Together, on that same session: **25.7 MB → 137 KB**, with every sampled read replaying
-identically. The cost is that a killed session now decodes to its last flush rather than its
-last complete entry, which is why the writer flushes on a frame boundary once a second.
+identically.
+
+The cost is that a killed session decodes to its last complete *block* rather than its last
+complete *entry* — and that cost turned out to be much larger than "flush more often" could
+fix. **`BrotliStream.Flush()` does not make the data readable**: the encoder emits nothing
+until its input block fills, and that block is eight megabytes. Two real recordings ended at
+exactly 8,388,608 decoded bytes each, one of them a twelve-minute map clear that had been
+killed rather than closed. The same number twice, from sessions of different lengths, is a
+block size and not a coincidence. `BrotliEncoder.Flush()` behaves identically; Deflate flushes
+honestly at nearly twice the size. What works is finishing the Brotli stream and starting the
+next one, so the body is a **chain of finished streams** rather than one long one.
+
+Segment size is then the trade, because a boundary costs the compressor its history. Measured
+on that session's entry stream (8.4 MB, 11.2 KB/s): 8 KB segments cost 46% in size for less
+than a second at risk, 128 KB cost 9% for eleven seconds, 2 MB cost 1% for three minutes. The
+writer closes a segment every 128 KB, or every 5 s when almost nothing is being written.
+Re-recorded through it and killed without closing, that session kept **15,705 of 15,786
+frames (99.5%)** in a file 17% smaller than the one that lost the last ten minutes.
 
 ### 3. Layers the compiler enforces
 

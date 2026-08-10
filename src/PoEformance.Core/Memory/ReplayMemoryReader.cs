@@ -118,7 +118,9 @@ public sealed class ReplayMemoryReader : IMemoryReader
         }
 
         uint version = header.ReadUInt32();
-        if (version != RecordingFormat.Version && version != RecordingFormat.UncompressedVersion)
+        if (version is not (RecordingFormat.Version
+            or RecordingFormat.SingleStreamVersion
+            or RecordingFormat.UncompressedVersion))
         {
             throw new InvalidDataException($"Recording version {version} is not supported (expected {RecordingFormat.Version}).");
         }
@@ -209,9 +211,11 @@ public sealed class ReplayMemoryReader : IMemoryReader
     /// along with the torn end of it. The decoder reports <c>NeedMoreData</c> instead and
     /// leaves everything decoded so far in hand.
     ///
-    /// This is why the writer flushes on a frame boundary once a second: the file decodes
-    /// up to the last flush, which is where the "loads up to the last complete entry"
-    /// promise now lives.
+    /// The body is a CHAIN of finished Brotli streams rather than one long one - see
+    /// BrotliWriter for why nothing else made a half-written recording readable. So the
+    /// decoding runs one stream at a time and starts a fresh decoder wherever the last one
+    /// said it was done. A version-3 recording, written as a single stream, is the case
+    /// where that loop happens to run once.
     /// </remarks>
     private static MemoryStream Decompress(Stream input)
     {
@@ -227,18 +231,33 @@ public sealed class ReplayMemoryReader : IMemoryReader
         byte[] chunk = ArrayPool<byte>.Shared.Rent(64 * 1024);
         try
         {
-            using var decoder = new BrotliDecoder();
             ReadOnlySpan<byte> source = compressed;
-            while (true)
+            while (!source.IsEmpty)
             {
-                OperationStatus status = decoder.Decompress(source, chunk, out int consumed, out int written);
-                body.Write(chunk, 0, written);
-                source = source[consumed..];
+                using var decoder = new BrotliDecoder();
+                bool moved = false;
 
-                // Anything but "the destination filled up" means the decoder is finished
-                // with what it has - done, out of input, or looking at damaged bytes. A
-                // round that moved nothing would spin, so it ends the loop too.
-                if (status != OperationStatus.DestinationTooSmall || (consumed == 0 && written == 0))
+                while (true)
+                {
+                    OperationStatus status = decoder.Decompress(source, chunk, out int consumed, out int written);
+                    body.Write(chunk, 0, written);
+                    source = source[consumed..];
+                    moved |= consumed > 0 || written > 0;
+
+                    if (status == OperationStatus.DestinationTooSmall)
+                    {
+                        continue; // more of this segment to come
+                    }
+
+                    // Done: the segment ended, and another may follow. NeedMoreData: the
+                    // recording was cut mid-segment, so this is as far as it goes.
+                    // InvalidData: the same, said less politely.
+                    break;
+                }
+
+                // A round that took nothing and produced nothing would spin forever on a
+                // tail the decoder cannot make sense of.
+                if (!moved)
                 {
                     break;
                 }
