@@ -25,16 +25,22 @@ public enum AtlasNodeState
 /// every client. The displayed name is not: whatever the language, this is what to match on.
 /// </param>
 /// <param name="Grid">Where it sits on the atlas, in the game's own grid.</param>
-/// <param name="Connections">The grid positions this node has a line to.</param>
+/// <param name="Connections">
+/// The grid positions this node has a line to, from the panel's own table of them. A position
+/// here need not be a node in the same read: the atlas connects to maps the fog has not shown
+/// yet, and those have no element to be found on.
+/// </param>
 /// <param name="Biome">Which biome it belongs to, as the game numbers them.</param>
 /// <param name="Screen">Where it is drawn, for putting anything on top of it.</param>
 /// <param name="BadgeIds">
-/// The contents hanging off the node as objects, RAW - the low half identifies the content and
-/// the high half is how much of it there is. See <see cref="World.AtlasContentNames"/>.
+/// The named contents - the bold line at the top of the game's own tooltip. Ids only; a badge
+/// carries no magnitude, whichever of the two places it came from. See
+/// <see cref="World.AtlasContentNames"/>.
 /// </param>
 /// <param name="ContentTokens">
-/// The contents that arrive as bare numbers instead. Only a node the game has actually drawn
-/// has them, so an atlas scrolled far away reports none - which is not the same as a map with
+/// The contents that arrive as bare numbers instead, RAW: the low half identifies the effect
+/// and the high half is how much of it there is. Only a node the game has actually drawn has
+/// them, so an atlas scrolled far away reports none - which is not the same as a map with
 /// nothing in it.
 /// </param>
 public sealed record AtlasNode(
@@ -75,10 +81,17 @@ public sealed class AtlasReader
     /// <summary>Most nodes walked in one pass. A guard on a count that comes from memory.</summary>
     public const int MostNodes = 4096;
 
-    /// <summary>Most connections taken from one node, for the same reason.</summary>
-    public const int MostConnections = 32;
+    /// <summary>
+    /// Most lines taken off the atlas at once, for the same reason.
+    /// </summary>
+    /// <remarks>
+    /// A full atlas draws a few thousand, so this is generous rather than tight - what it is
+    /// for is the read where the two pointers are not a vector at all and their difference is
+    /// whatever two unrelated words happen to be.
+    /// </remarks>
+    public const int MostEdges = 16_384;
 
-    /// <summary>And most contents, which is the same guard on a different length.</summary>
+    /// <summary>And most contents on one node, which is the same guard on a different length.</summary>
     public const int MostContents = 64;
 
     private readonly IMemoryReader _reader;
@@ -90,12 +103,18 @@ public sealed class AtlasReader
     private readonly uint _mistNodeFp;
     private readonly int _flags;
 
+    private readonly int _edges;
+    private readonly int _edgeStride;
+    private readonly int _edgeSource;
+    private readonly int _edgeTarget;
+
     private readonly int _grid;
-    private readonly int _connections;
     private readonly int _contentVector;
     private readonly int _badgeBegin;
     private readonly int _badgeEnd;
+    private readonly int[] _badgeChildPath;
     private readonly int _badgeContentId;
+    private readonly uint _badgeRowToContentId;
     private readonly int _dataStorage;
     private readonly int _data;
     private readonly int _completedBit;
@@ -129,12 +148,18 @@ public sealed class AtlasReader
         _mistNodeFp = (uint)panel.Constants["MistNodeFingerprint"];
         _flags = schema.Structs["UiElementBase"].OffsetOf("Flags");
 
+        _edges = panel.OffsetOf("ConnectionsVector");
+        _edgeStride = (int)panel.Constants["ConnectionEdgeStride"];
+        _edgeSource = (int)panel.Constants["ConnectionEdgeSource"];
+        _edgeTarget = (int)panel.Constants["ConnectionEdgeTarget"];
+
         _grid = node.OffsetOf("GridPosition");
-        _connections = node.OffsetOf("ConnectionsVector");
         _contentVector = node.OffsetOf("ContentVector");
         _badgeBegin = node.OffsetOf("BadgeVectorBegin");
         _badgeEnd = node.OffsetOf("BadgeVectorEnd");
+        _badgeChildPath = [(int)node.Constants["BadgeChild0"], (int)node.Constants["BadgeChild1"]];
         _badgeContentId = (int)node.Constants["BadgeContentId"];
+        _badgeRowToContentId = (uint)node.Constants["BadgeRowToContentId"];
         _dataStorage = (int)node.Constants["DataStoragePtr"];
         _data = (int)node.Constants["DataPtr"];
         _completedBit = (int)node.Constants["CompletedBit"];
@@ -187,15 +212,98 @@ public sealed class AtlasReader
         Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed =
             _elements.ReadSiblings(panel, children, scale);
 
+        // And the same for the lines: they are ONE table on the panel, so this is a single
+        // read rather than a question asked of each node in turn.
+        Dictionary<(int X, int Y), List<(int X, int Y)>> lines = Lines(panel);
+
         for (int i = 0; i < children.Count; i++)
         {
-            if (Node(i, children[i], placed) is AtlasNode node)
+            if (Node(i, children[i], placed, lines) is AtlasNode node)
             {
                 found.Add(node);
             }
         }
 
         return found;
+    }
+
+    /// <summary>
+    /// Every line on the atlas, as the neighbours of each grid position.
+    /// </summary>
+    /// <remarks>
+    /// THE PANEL OWNS THIS, not the nodes. The game keeps one flat vector of edges - an
+    /// unknown word, the grid position at each end - and a node has no list of its own. Reading
+    /// it as if it did is what this used to do, at the same offset on the wrong object: most
+    /// nodes then reported no connections and the occasional one reported invented ones, which
+    /// is a route to the right map along a way nobody can walk.
+    ///
+    /// Undirected, because the atlas is: a line listed once as source-to-target is walkable
+    /// both ways, and a search that only followed it forwards would call half the atlas
+    /// unreachable.
+    ///
+    /// ONE READ of the whole table. It is a few thousand edges on a full atlas, and the cost of
+    /// reading game memory is the number of calls rather than the number of bytes.
+    /// </remarks>
+    public Dictionary<(int X, int Y), List<(int X, int Y)>> Lines(ulong panel)
+    {
+        var joined = new Dictionary<(int X, int Y), List<(int X, int Y)>>();
+
+        ulong first = _reader.ReadPointer(panel + (ulong)_edges);
+        ulong last = _reader.ReadPointer(panel + (ulong)_edges + 8);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
+        {
+            return joined;
+        }
+
+        long span = (long)(last - first);
+        long count = span / _edgeStride;
+        if (span % _edgeStride != 0 || count <= 0 || count > MostEdges)
+        {
+            return joined;   // a length out of game memory, treated as a bad read
+        }
+
+        var bytes = new byte[count * _edgeStride];
+        if (!_reader.TryRead(first, bytes))
+        {
+            return joined;
+        }
+
+        for (long i = 0; i < count; i++)
+        {
+            ReadOnlySpan<byte> edge = bytes.AsSpan((int)(i * _edgeStride), _edgeStride);
+            (int X, int Y) from = Pair(edge[_edgeSource..]);
+            (int X, int Y) to = Pair(edge[_edgeTarget..]);
+
+            // An empty slot reads as (0,0), and a node joined to itself is not a line. Both
+            // would otherwise become a neighbour that sends a route nowhere.
+            if (to == (0, 0) || to == from)
+            {
+                continue;
+            }
+
+            Join(joined, from, to);
+            Join(joined, to, from);
+        }
+
+        return joined;
+
+        static (int X, int Y) Pair(ReadOnlySpan<byte> at)
+            => (BitConverter.ToInt32(at), BitConverter.ToInt32(at[4..]));
+
+        static void Join(
+            Dictionary<(int X, int Y), List<(int X, int Y)>> all, (int X, int Y) from, (int X, int Y) to)
+        {
+            if (!all.TryGetValue(from, out List<(int X, int Y)>? mine))
+            {
+                mine = new List<(int X, int Y)>(4);
+                all[from] = mine;
+            }
+
+            if (!mine.Contains(to))
+            {
+                mine.Add(to);
+            }
+        }
     }
 
     /// <summary>
@@ -220,7 +328,11 @@ public sealed class AtlasReader
             : _elements.ReadSiblings(panel, _elements.Children(panel, MostNodes), scale);
 
     /// <summary>One child of the panel, when it turns out to be a map.</summary>
-    private AtlasNode? Node(int index, ulong element, Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed)
+    private AtlasNode? Node(
+        int index,
+        ulong element,
+        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed,
+        Dictionary<(int X, int Y), List<(int X, int Y)>> lines)
     {
         if (!MemoryReaderExtensions.IsPlausiblePointer(element) || !IsMapNode(element))
         {
@@ -259,7 +371,7 @@ public sealed class AtlasReader
             (gridX, gridY),
             StateOf(status),
             biome,
-            Connections(element),
+            lines.TryGetValue((gridX, gridY), out List<(int X, int Y)>? joined) ? joined : [],
             drawn.Position,
             drawn.Size,
             Badges(element),
@@ -318,40 +430,18 @@ public sealed class AtlasReader
             : string.Empty;
     }
 
-    /// <summary>The grid positions this node is joined to.</summary>
-    private List<(int X, int Y)> Connections(ulong element)
-    {
-        var joined = new List<(int X, int Y)>();
-
-        ulong first = _reader.ReadPointer(element + (ulong)_connections);
-        ulong last = _reader.ReadPointer(element + (ulong)_connections + 8);
-        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
-        {
-            return joined;
-        }
-
-        long count = (long)(last - first) / 8;
-        if (count <= 0 || count > MostConnections)
-        {
-            return joined;   // a length out of game memory, treated as a bad read
-        }
-
-        for (long i = 0; i < count; i++)
-        {
-            ulong at = first + (ulong)(i * 8);
-            joined.Add((_reader.Read<int>(at), _reader.Read<int>(at + 4)));
-        }
-
-        return joined;
-    }
-
     /// <summary>
-    /// The contents that hang off the node as objects, by their raw id.
+    /// The named contents of a node, from BOTH of the places the game keeps them.
     /// </summary>
     /// <remarks>
-    /// A vector of POINTERS, each to a badge whose id sits at a fixed offset - so this is two
-    /// levels rather than one, and a badge that does not resolve is skipped rather than
-    /// recorded as content nought.
+    /// TWO STORES, and neither one is enough. The badge children are drawn, so they are culled
+    /// for a node under fog or off the edge of the screen; the byte vector is filled from the
+    /// server's cell state and survives that, but it can only hold what a byte can - so the
+    /// contents whose ids run past 255 (Corruption, Grand Mirror) are only ever children.
+    ///
+    /// The vector is a vector of BYTES. Reading it as a vector of pointers - which this used to
+    /// do - divides its length by eight, so a node with fewer than eight badges reported none
+    /// at all, and one with more read whatever was at the front of the buffer as an address.
     /// </remarks>
     private List<uint> Badges(ulong element)
     {
@@ -359,29 +449,49 @@ public sealed class AtlasReader
 
         ulong first = _reader.ReadPointer(element + (ulong)_badgeBegin);
         ulong last = _reader.ReadPointer(element + (ulong)_badgeEnd);
-        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
+        if (MemoryReaderExtensions.IsPlausiblePointer(first) && last > first)
         {
-            return ids;
-        }
-
-        long count = (long)(last - first) / 8;
-        if (count <= 0 || count > MostContents)
-        {
-            return ids;
-        }
-
-        for (long i = 0; i < count; i++)
-        {
-            ulong badge = _reader.ReadPointer(first + (ulong)(i * 8));
-            if (MemoryReaderExtensions.IsPlausiblePointer(badge)
-                && _reader.TryRead(badge + (ulong)_badgeContentId, out uint id)
-                && id != 0)
+            long count = (long)(last - first);
+            if (count > 0 && count <= MostContents)
             {
-                ids.Add(id);
+                var rows = new byte[count];
+                if (_reader.TryRead(first, rows))
+                {
+                    foreach (byte row in rows)
+                    {
+                        Keep(row + _badgeRowToContentId);
+                    }
+                }
+            }
+        }
+
+        ulong holder = element;
+        foreach (int step in _badgeChildPath)
+        {
+            holder = _elements.Child(holder, step);
+        }
+
+        foreach (ulong badge in _elements.Children(holder, MostContents))
+        {
+            if (_reader.TryRead(badge + (ulong)_badgeContentId, out uint id) && id != 0)
+            {
+                Keep(id);
             }
         }
 
         return ids;
+
+        // On the id ALONE, not on the whole word: the same content arrives from the vector as
+        // a bare id and from a child with a category tag above it, and comparing the words
+        // would list a breach twice.
+        void Keep(uint id)
+        {
+            uint mine = World.AtlasContentNames.IdOf(id);
+            if (!ids.Exists(seen => World.AtlasContentNames.IdOf(seen) == mine))
+            {
+                ids.Add(id);
+            }
+        }
     }
 
     /// <summary>The contents that are just numbers in a vector.</summary>
@@ -456,6 +566,20 @@ public sealed class AtlasReader
                 : string.Empty;
             said.Add($"    0x{kind:X}  x{count}{known}");
         }
+
+        // The lines, said separately from the nodes because they come from somewhere else. A
+        // full atlas has a few thousand; nought here is the answer that means no route can be
+        // drawn to anything, however well the nodes themselves read.
+        Dictionary<(int X, int Y), List<(int X, int Y)>> lines = Lines(panel);
+        int ends = 0;
+        foreach (List<(int X, int Y)> mine in lines.Values)
+        {
+            ends += mine.Count;
+        }
+
+        said.Add(lines.Count == 0
+            ? $"NO lines read off the panel at +0x{_edges:X} - without them nothing can be routed to"
+            : $"{ends / 2} lines between {lines.Count} places");
 
         List<AtlasNode> nodes = Read(uiRoot, scale);
         said.Add($"{nodes.Count} of them read as maps");

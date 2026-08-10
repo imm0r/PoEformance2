@@ -5,12 +5,38 @@ namespace PoEformance.Game.World;
 
 /// <summary>What one atlas content id means.</summary>
 /// <param name="Name">The short name, where the game has one. Empty for a bare effect.</param>
-/// <param name="Description">The line the game shows on the node.</param>
+/// <param name="Description">
+/// The line the game shows on the node. A <c>{0}</c> in it is where the node's own number goes -
+/// "Contains {0} additional Shrines" is one entry covering every count of them.
+/// </param>
 /// <param name="Icon">The game's own art name for it, for anybody drawing icons later.</param>
 public readonly record struct AtlasContent(string Name, string Description, string Icon)
 {
+    /// <summary>Where a magnitude goes, in the wordings that have room for one.</summary>
+    public const string Placeholder = "{0}";
+
     /// <summary>The best single label: the name when there is one, the description otherwise.</summary>
     public string Label => Name.Length > 0 ? Name : Description;
+
+    /// <summary>
+    /// The label with this node's own number written into it.
+    /// </summary>
+    /// <remarks>
+    /// THE WORDING DECIDES whether a number is shown at all, which is the whole rule and the
+    /// one this project got wrong: a magnitude was appended to everything as "x3", so every
+    /// content on the atlas ended in the magnitude of a plain effect - "Area contains Abysses
+    /// x64" - because a plain effect carries 1, and 1 is written as 64.
+    /// </remarks>
+    public string Say(uint raw)
+    {
+        string label = Label;
+        return label.Contains(Placeholder, StringComparison.Ordinal)
+            ? label.Replace(
+                Placeholder,
+                AtlasContentNames.MagnitudeOf(raw).ToString(System.Globalization.CultureInfo.InvariantCulture),
+                StringComparison.Ordinal)
+            : label;
+    }
 }
 
 /// <summary>
@@ -60,13 +86,35 @@ public sealed class AtlasContentNames
     public static uint IdOf(uint raw) => raw & 0xFFFF;
 
     /// <summary>
-    /// How much of it there is, from the high half - 3 in "3 additional Shrines".
+    /// The high half is a magnitude in SIXTY-FOURTHS, not a count.
+    /// </summary>
+    /// <remarks>
+    /// Which is why a plain effect - one of anything - arrives as 64 rather than as 1, and why
+    /// this project spent a while showing "Area contains Abysses x64" on every node of the
+    /// atlas. A binary effect ("always", "doubles") carries 100.
+    /// </remarks>
+    public const uint MagnitudeUnit = 64;
+
+    /// <summary>
+    /// Delirious, the one token whose high half is not all magnitude.
+    /// </summary>
+    /// <remarks>
+    /// Its top two bits are flags, so they are masked off before the division. Left unmasked a
+    /// delirious map reads as tens of thousands of per cent.
+    /// </remarks>
+    public const uint DeliriousId = 0x685A;
+
+    /// <summary>
+    /// How much of it there is - 3 in "3 additional Shrines".
     /// </summary>
     /// <remarks>
     /// Zero for the many contents that are simply present or absent, and the caller should
     /// treat zero as "no number to show" rather than as the number nought.
     /// </remarks>
-    public static uint MagnitudeOf(uint raw) => raw >> 16;
+    public static uint MagnitudeOf(uint raw)
+        => IdOf(raw) == DeliriousId
+            ? ((raw >> 16) & 0x3FFF) / MagnitudeUnit
+            : (raw >> 16) / MagnitudeUnit;
 
     /// <summary>What a badge id means, or null when this table has never heard of it.</summary>
     public AtlasContent? Badge(uint raw) => Look(_badges, raw);

@@ -463,8 +463,13 @@ public sealed class AtlasWatch
     /// <remarks>
     /// The two arrive separately and overlap: a breach is a badge AND a token on the same
     /// node, and listing it twice is how a port announces that it has two tables rather than
-    /// that the map has two breaches. A magnitude is kept - "Ritual x3" is a different map
-    /// from "Ritual" - so the de-duplication is on the finished words rather than on the id.
+    /// that the map has two breaches. The de-duplication is on the finished words rather than
+    /// on the id, so "Contains 3 additional Shrines" survives beside a plain one.
+    ///
+    /// A BADGE NEVER CARRIES A NUMBER. It is the bold line at the top of the game's own
+    /// tooltip - the name of the thing - and its high half is a category tag rather than a
+    /// magnitude. Only the effect lines beneath it count anything, and only the ones whose
+    /// wording has somewhere to put a number.
     /// </remarks>
     public static IReadOnlyList<string> Words(AtlasNode node, AtlasContentNames contents)
     {
@@ -475,27 +480,19 @@ public sealed class AtlasWatch
 
         foreach (uint raw in node.BadgeIds)
         {
-            Add(contents.Badge(raw), raw);
+            Add(contents.Badge(raw)?.Label);
         }
 
         foreach (uint raw in node.ContentTokens)
         {
-            Add(contents.Effect(raw), raw);
+            Add(contents.Effect(raw)?.Say(raw));
         }
 
         return said;
 
-        void Add(AtlasContent? content, uint raw)
+        void Add(string? word)
         {
-            if (content is not { } known || known.Label.Length == 0)
-            {
-                return;
-            }
-
-            uint many = AtlasContentNames.MagnitudeOf(raw);
-            string word = many > 1 ? $"{known.Label} x{many}" : known.Label;
-
-            if (!said.Contains(word, StringComparer.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(word) && !said.Contains(word, StringComparer.OrdinalIgnoreCase))
             {
                 said.Add(word);
             }

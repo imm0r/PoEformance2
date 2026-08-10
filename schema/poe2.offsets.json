@@ -472,7 +472,9 @@
 
     "AtlasPanel": {
       "comment": "UNVERIFIED - ported from GameHelper2's ImportantUiElements (which credits yokkenUA's Atlas plugin), read on 2026-08 and not yet confirmed against this client. Nothing here has been seen working; the first live run should expect to correct it. The atlas panel is a fixed CHILD PATH from the game-UI root - 22, 0, 6 - and its children are the nodes, the you-are-here marker and the region buttons mixed together. They are told apart by the UiElement Flags word (0x180) with the visible bit (0x800) masked off, which acts as a type fingerprint.",
-      "fields": {},
+      "fields": {
+        "ConnectionsVector": { "offset": "0x5A8", "type": "stdVector", "comment": "EVERY line on the atlas, once, on the PANEL - not a per-node neighbour list. Drift history: this project first read it at the same offset on each NODE element, where a node's own bytes occasionally pass for two pointers a small distance apart, so most nodes reported no connections at all and a few reported invented ones. The symptom was a route drawn to the right map by a way nobody can walk. Entries are 0x14 bytes: an unknown i32, then the source grid pair, then the target grid pair." }
+      },
       "consts": {
         "PathFromUiRoot0": "22",
         "PathFromUiRoot1": "0",
@@ -481,7 +483,10 @@
         "MapNodeFingerprint": "0x542EF3",
         "MistNodeFingerprint": "0x442EF3",
         "CurrentNodeMarkerFingerprint": "0x502EF3",
-        "OceanRegionButtonRow": "2"
+        "OceanRegionButtonRow": "2",
+        "ConnectionEdgeStride": "0x14",
+        "ConnectionEdgeSource": "0x04",
+        "ConnectionEdgeTarget": "0x0C"
       }
     },
 
@@ -489,16 +494,18 @@
       "comment": "UNVERIFIED, same provenance as AtlasPanel. One node of the endgame atlas, which is a UiElement with its own data hanging off it. THE DATA IS NOT IN THE ELEMENT: the reference reads [node+0x10] (the children vector's first pointer) and then +0x20 into that, and the biome, status and map id live at the END of that chain, while the grid position sits on the element itself. Status is a bit field, not a number: 0x02 completed, 0x01 accessible, neither means locked.",
       "fields": {
         "GridPosition": { "offset": "0x320", "type": "i32", "comment": "x here, y at +0x324. On the node ELEMENT, not on its data. The same offset on a region button is a row pointer, which is why the fingerprint has to be checked first." },
-        "ContentVector": { "offset": "0x350", "type": "stdVector", "comment": "Content tokens for a rendered node." },
-        "BadgeVectorBegin": { "offset": "0x368", "type": "ptr" },
-        "BadgeVectorEnd": { "offset": "0x370", "type": "ptr" },
-        "ConnectionsVector": { "offset": "0x5A8", "type": "stdVector" }
+        "ContentVector": { "offset": "0x350", "type": "stdVector", "comment": "Content tokens for a rendered node, four bytes each. Only a node the game has drawn has them." },
+        "BadgeVectorBegin": { "offset": "0x368", "type": "ptr", "comment": "A vector of BYTES, one per badge, not of pointers: each is an EndgameMapContent ROW and the content id is the row plus 100. It is filled from the server's cell state rather than from the drawing, so it survives fog and culling - which is why it is worth having as well as the badge children." },
+        "BadgeVectorEnd": { "offset": "0x370", "type": "ptr" }
       },
       "consts": {
         "DataStoragePtr": "0x10",
         "DataPtr": "0x20",
         "RitualModsChild": "0x3B8",
+        "BadgeChild0": "0",
+        "BadgeChild1": "0",
         "BadgeContentId": "0x188",
+        "BadgeRowToContentId": "100",
         "CompletedBit": "0x02",
         "AccessibleBit": "0x01"
       }
