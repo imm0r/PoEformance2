@@ -73,6 +73,16 @@ public sealed class ReplayMemoryReader : IMemoryReader
     /// <summary>Number of frame markers in the recording.</summary>
     public int FrameCount => _frameTimes.Count;
 
+    /// <summary>
+    /// When each frame happened, in milliseconds since the session started.
+    /// </summary>
+    /// <remarks>
+    /// Frames are the recording's clock, and a question worth asking of one is almost always
+    /// about a MOMENT - "what did memory hold when that monster died" - rather than about a
+    /// frame number. This is what turns the one into the other.
+    /// </remarks>
+    public IReadOnlyList<uint> FrameTimes => _frameTimes;
+
     /// <summary>Derived key/value facts stored in the recording.</summary>
     public IReadOnlyDictionary<string, string> Notes => _notes;
 
