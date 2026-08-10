@@ -8,8 +8,9 @@ namespace PoEformance.Core.Tests;
 /// <remarks>
 /// The table's key is the 0-based row index of the game's Stats.csv, and its own header says
 /// that is what memory holds. It is not: memory holds that index PLUS ONE. Established
-/// against a live level-96 character rather than argued about, and confirmed several times
-/// over in one reading - see StatNames.
+/// against a live level-96 character and its own character sheet - eleven numbers, exact,
+/// including a maximum life of ONE and the three uncapped resistances the sheet prints in
+/// brackets. See StatNames for the readings.
 ///
 /// Read straight, the same character's stats are individually plausible and collectively
 /// nonsense: id 1 becomes "item_drop_slots" with a value of 96, and the three resistances at
@@ -36,15 +37,21 @@ public class StatNamesTests
         StatNames names = Load();
         Assert.True(names.Count > 25_000, $"only {names.Count} names loaded");
 
-        // What the live character read, with what it has to resolve to.
+        // Every one of these was read off a live character and matched its character sheet
+        // exactly - see StatNames for the readings beside the numbers the game printed.
         Assert.Equal("level", names.Of(1));
-        Assert.Equal("base_maximum_life", names.Of(118));
-        Assert.Equal("base_maximum_mana", names.Of(122));
-        Assert.Equal("movement_velocity_+permyriad", names.Of(236));
+        Assert.Equal("maximum_life", names.Of(239));
+        Assert.Equal("maximum_mana", names.Of(240));
+        Assert.Equal("armour", names.Of(235));
         Assert.Equal("cold_damage_resistance_%", names.Of(298));
         Assert.Equal("fire_damage_resistance_%", names.Of(299));
         Assert.Equal("lightning_damage_resistance_%", names.Of(300));
         Assert.Equal("chaos_damage_resistance_%", names.Of(301));
+        Assert.Equal("uncapped_fire_damage_resistance_%", names.Of(2032));
+        Assert.Equal("uncapped_cold_damage_resistance_%", names.Of(2033));
+        Assert.Equal("uncapped_lightning_damage_resistance_%", names.Of(2034));
+        Assert.Equal("intelligence", names.Of(566));
+        Assert.Equal("dexterity", names.Of(569));
     }
 
     /// <summary>An id with no row is left as a number rather than guessed at.</summary>

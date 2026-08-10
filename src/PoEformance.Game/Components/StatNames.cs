@@ -10,27 +10,35 @@ namespace PoEformance.Game.Components;
 ///
 /// THE IDS ARE OFF BY ONE, and that is the whole reason this type has a comment. The table's
 /// key is the CSV's 0-based row index and its header claims that is what memory holds; memory
-/// holds that index PLUS ONE. Established against a live character rather than argued about,
-/// and by more than one coincidence:
+/// holds that index PLUS ONE. Established against a live character and its own character
+/// sheet, every line of it, rather than argued about:
 ///
 /// <code>
-///   memory  value                shifted by -1
-///        1     96   level                                 - the game's own UI said Level 96
-///      118    309   base_maximum_life
-///      122    991   base_maximum_mana
-///      236   4000   movement_velocity_+permyriad          - 4000 permyriad, i.e. +40%
-///      240   4580   maximum_mana
-///      298     75   cold_damage_resistance_%              - at the cap
-///      299     55   fire_damage_resistance_%              - not at the cap
-///      300     75   lightning_damage_resistance_%         - at the cap
-///      301     -7   chaos_damage_resistance_%
-///      146     -7   base_chaos_damage_resistance_%        - the same -7, from another stat
-///     2035     -7   uncapped_chaos_damage_resistance_%    - and again from a third
+///   memory  shifted by -1                            the sheet said
+///        1  level                                    Level 96
+///      239  maximum_life                        1    1          - a chaos inoculation build
+///      240  maximum_mana                     5415    5415
+///      235  armour                           1011    1011
+///      299  fire_damage_resistance_%           73    73%
+///      298  cold_damage_resistance_%           75    75%
+///      300  lightning_damage_resistance_%      75    75%
+///      301  chaos_damage_resistance_%          -7    -7%
+///     2032  uncapped_fire_damage_resistance_%  73    (73%)
+///     2033  uncapped_cold_damage_resistance_%  82    (82%)
+///     2034  uncapped_lightning_..._%           78    (78%)
+///      566  intelligence                      566    566
+///      569  dexterity                          50    50
 /// </code>
 ///
-/// Read straight, id 1 is "item_drop_slots" with a value of 96 and 298 is a fire damage
-/// modifier - a set of numbers that is individually plausible and collectively nonsense,
-/// which is exactly how an off-by-one hides.
+/// Eleven numbers, exact, including the three uncapped resistances the sheet prints in
+/// brackets and a maximum life of ONE. Read straight, id 1 is "item_drop_slots" with a value
+/// of 96 and the resistances become fire damage modifiers - individually plausible,
+/// collectively nonsense, which is exactly how an off-by-one hides.
+///
+/// The values above all come from ONE of the entity's two stat bags. The same stat sits in
+/// both with different numbers, and reading the merged list is what made this look wrong at
+/// first: their mana came back as 4,580 and their fire resistance as 55%, both from the other
+/// bag, against a sheet saying 5,415 and 73%. So the bag is carried alongside every pair.
 ///
 /// A name is a LABEL and never a fact: an id with no row is left as its number rather than
 /// guessed at, and the table drifts with the game, so a name that stops making sense means
