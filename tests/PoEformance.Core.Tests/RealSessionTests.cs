@@ -52,6 +52,35 @@ public class RealSessionTests
         }
     }
 
+    /// <summary>
+    /// A whole map: 7,041 frames over 321 seconds, from entering to the loading screen out.
+    /// </summary>
+    /// <remarks>
+    /// The first recording that holds a session rather than a moment, and the only one that
+    /// can be asked what happens over TIME - monsters dying, packs being left behind, the
+    /// damage meter's figures accumulating. The earlier fixtures are single instants and
+    /// answer none of that.
+    ///
+    /// 1.4 MB, which is large for a fixture and worth it: every question settled against it
+    /// so far had been argued about for days beforehand. It is also what the recorder's own
+    /// changes are measured against - the compression, the redundant-read elimination and the
+    /// segment size all have their numbers from this file.
+    /// </remarks>
+    internal static string MapFixturePath
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+            {
+                dir = dir.Parent;
+            }
+
+            Assert.NotNull(dir);
+            return Path.Combine(dir.FullName, "tests", "fixtures", "session-2026-08-map.rec");
+        }
+    }
+
     /// <summary>The shipped schema, for tests in sibling classes.</summary>
     internal static OffsetSchema Schema() => LoadSchema();
 

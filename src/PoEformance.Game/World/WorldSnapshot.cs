@@ -398,9 +398,15 @@ public sealed class WorldReader
         // this costs a lookup and no read at all.
         bool temporary = entity.Component("DiesAfterTime") != 0;
 
+        // Whether it has a Life component at all - the reference's test for whether an entity
+        // is a monster in the first place, and the one that separates a projectile or a patch
+        // of burning ground from something you can fight. An empty component list means the
+        // walk told us nothing, which is a different answer from "it has none".
+        bool? hasLife = entity.Components.Count > 0 ? life != 0 : null;
+
         return new MonsterSigns(
             health, targetable, monsterRarity >= ItemRarity.Unique, monsterRarity, pool, shield,
-            friendly, temporary);
+            friendly, temporary, hasLife);
     }
 
     /// <summary>Pulls one vital sub-struct out of a span read from the Life component.</summary>
@@ -569,7 +575,15 @@ public sealed class WorldReader
             // clock belongs to the monster and does not care which of its entities was seen.
             MonsterSigns signs = kind == EntityKind.Monster ? ReadMonsterSigns(entity) : default;
 
-            if (kind == EntityKind.Monster)
+            // Only over the monsters this is actually a question about: hostile ones that are
+            // not effects. Counting everything made the readout useless in precisely the
+            // situation it was built for - a Firewall build puts twenty of its own walls on
+            // the ground, none of which carries a Targetable component because none of them
+            // is something anybody targets, and the counter reported that the component was
+            // "mostly NOT BEING FOUND" every time the player cast. 6,669 sightings of Firewall
+            // against 3,618 of every real monster in a whole map, so the alarm was mostly
+            // measuring the build.
+            if (kind == EntityKind.Monster && !signs.Friendly && !signs.IsEffect)
             {
                 switch (signs.Targetable)
                 {
