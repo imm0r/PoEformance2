@@ -456,6 +456,39 @@ public class DamageMeterTests
         Assert.Equal(far, off.FurthestVanish);
     }
 
+    /// <summary>
+    /// The two furthest figures bracket the gate: one counts everything, one only the
+    /// vanishes that were believed.
+    /// </summary>
+    [Fact]
+    public void TheFurthestCountedExcludesWhatTheGateRefused()
+    {
+        var meter = new DamageMeter();
+        float near = 300f;
+        float far = (4f * DamageMeter.ScreenWorldUnits) + 1f;
+
+        meter.Look(Seen(1, Monster(1, 500, away: near), Monster(2, 500, away: far)), 0);
+        meter.Look(Seen(1), 100);
+
+        Assert.Equal(far, meter.FurthestVanish);    // everything that went missing
+        Assert.Equal(near, meter.FurthestCounted);  // only what was believed
+        Assert.Equal(500, meter.Credited);
+        Assert.Equal(500, meter.Withheld);
+    }
+
+    /// <summary>With nothing counted there is no counted figure, rather than a zero.</summary>
+    [Fact]
+    public void TheFurthestCountedIsAbsentWhenNothingWasCounted()
+    {
+        var meter = new DamageMeter { CountKills = false };
+
+        meter.Look(Seen(1, Monster(1, 500, away: 300f)), 0);
+        meter.Look(Seen(1), 100);
+
+        Assert.Equal(300f, meter.FurthestVanish); // still measured
+        Assert.True(meter.FurthestCounted < 0f);  // but nothing was believed
+    }
+
     /// <summary>With nothing gone missing yet there is no figure, rather than a zero.</summary>
     /// <remarks>
     /// Zero would read as "everything vanished right on top of you", which is the strongest

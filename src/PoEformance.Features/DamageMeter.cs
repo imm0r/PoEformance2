@@ -212,6 +212,26 @@ public sealed class DamageMeter
     /// </remarks>
     public float FurthestVanish { get; private set; } = -1f;
 
+    /// <summary>
+    /// The greatest distance at which a vanish was COUNTED as a kill. -1 for none.
+    /// </summary>
+    /// <remarks>
+    /// The other half of the bracket, and the one that says whether the gate is set too
+    /// tight. <see cref="FurthestVanish"/> shows how far the disappearances reach;
+    /// this shows how far the ones being believed reach. Read together they place the
+    /// threshold in the distribution rather than leaving it a guess:
+    ///
+    ///   - this figure well BELOW the gate, with the furthest well above it - the two
+    ///     populations are cleanly separated and the gate sits in the gap between them.
+    ///   - this figure pressed right UP against the gate - the gate is cutting into the
+    ///     distribution rather than between two, and some of what it refuses is likely to
+    ///     be kills.
+    ///
+    /// Which of those is true cannot be reasoned out from here. It is a fact about how far
+    /// away this character kills things, and it is different for a bow than for a hammer.
+    /// </remarks>
+    public float FurthestCounted { get; private set; } = -1f;
+
     /// <summary>Everything counted in this area, however it was counted.</summary>
     public long Total => Observed + Credited;
 
@@ -259,6 +279,7 @@ public sealed class DamageMeter
         Hurt = 0;
         Vanished = 0;
         FurthestVanish = -1f;
+        FurthestCounted = -1f;
     }
 
     /// <summary>Takes one snapshot and moves the figures on.</summary>
@@ -429,6 +450,11 @@ public sealed class DamageMeter
             }
 
             credited += target.Pool;
+            if (target.Distance > FurthestCounted)
+            {
+                FurthestCounted = target.Distance;
+            }
+
             if (target.Hurt)
             {
                 CreditedHurt += target.Pool;
