@@ -13,10 +13,12 @@ namespace PoEformance.Core.Tests;
 /// same list the browser does, one per entity at its own position, so twelve entries on four
 /// dots is twelve entries on four places.
 ///
-/// What these tests are really pinning is the SEPARATION of the two shapes. "Several keys,
-/// one object" is safe to collapse because there is only one monster; "separate objects, one
-/// position" is a judgement that a pack stacked on its spawn point would fail. One number
-/// covering both would hide exactly the distinction the fix depends on.
+/// What these tests pin is the SEPARATION of two shapes that look alike and are not. Sharing
+/// a Render component is one monster wearing several entities - a fault, and what the
+/// dissector found: ids 229, 230 and 231 shared every component address and differed only in
+/// Positioned. Sharing a POSITION is what stacked ground effects do on purpose, and the
+/// recorded session is full of it. One number covering both is how a rule keyed on position
+/// came to delete half of every overlapping firewall.
 /// </remarks>
 public class EntityDuplicatesTests
 {
@@ -57,11 +59,11 @@ public class EntityDuplicatesTests
     }
 
     /// <summary>
-    /// Several ids pointing at ONE object: the same monster, listed more than once.
+    /// Several entities over ONE object: the fault, as the dissector found it.
     /// </summary>
     /// <remarks>
-    /// The shape that is safe to collapse - there is only one monster, and the extra rows are
-    /// the map handing out more than one key for it.
+    /// Safe to collapse because there is only one monster there - one position, one model,
+    /// one health pool behind all of them. The entity addresses differ and mean nothing.
     /// </remarks>
     [Fact]
     public void SeveralKeysOnOneObjectAreCounted()
@@ -82,7 +84,7 @@ public class EntityDuplicatesTests
     }
 
     /// <summary>
-    /// Separate objects on a byte-identical position - the shape that needs a judgement.
+    /// Separate objects on a byte-identical position - reported, and NOT a fault.
     /// </summary>
     [Fact]
     public void SeparateObjectsOnOnePlaceAreCountedApartFromThat()
@@ -108,10 +110,12 @@ public class EntityDuplicatesTests
         Assert.Contains("which is normal", counted.Describe());
     }
 
-    /// <summary>Same spot, different monster: not the same thing twice.</summary>
+    /// <summary>Same spot, different monster: not even the same PLACE.</summary>
     /// <remarks>
-    /// The path is part of the key for this reason. A spider standing where a hyena stands is
-    /// two monsters, and a position-only key would quietly make it one.
+    /// The path is part of the place key for this reason - a spider standing where a hyena
+    /// stands is two monsters. It matters less than it did now that the fault is judged on
+    /// the component, but the place count is still read by a human, and one that called these
+    /// two the same spot would be reporting something untrue.
     /// </remarks>
     [Fact]
     public void DifferentKindsOnOneSpotAreNotDuplicates()
@@ -167,8 +171,6 @@ public class EntityDuplicatesTests
         {
             for (uint copy = 0; copy < 3; copy++)
             {
-                // Distinct ids and distinct objects, on four places - the shape that has to
-                // be told apart from twelve real monsters.
                 // Twelve entity objects with twelve ids, but three of them over each of
                 // four RENDER components - which is what the dissector found: ids 229, 230
                 // and 231 shared every component address, differing only in Positioned.
