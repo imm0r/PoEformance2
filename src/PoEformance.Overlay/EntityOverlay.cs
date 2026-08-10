@@ -152,6 +152,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>How much of the area has been walked, if it is being measured.</summary>
     public MapCoverage? Coverage { get; set; }
 
+    /// <summary>
+    /// How much damage is being done, if it is being measured.
+    /// </summary>
+    /// <remarks>
+    /// Fed on the READER thread - the meter takes one sample per snapshot, and sampling it
+    /// from here instead would count every VSync frame that redraws an unchanged snapshot as
+    /// a reading in which no damage happened. This side only reads the figures.
+    /// </remarks>
+    public DamageMeter? Damage { get; set; }
+
     /// <summary>The tabbed window every tool lives in.</summary>
     /// <remarks>
     /// The tools below register themselves here as they are attached; what remains of each
@@ -170,6 +180,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     // their tab's callbacks and nothing more. A field that nothing reads is a claim that
     // somebody talks to that window, and here nobody does.
     private CostWindow? _costWindow;
+    private DamageWindow? _damageWindow;
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
     private PoiLayer? _poi;
@@ -198,7 +209,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _alerts = watcher;
         var window = new AlertWindow(watcher, saved);
         _alertWindow = window;
-        _tools.Add(0, "alerts", "Alerts", window.DrawTab, window.Idle);
+        _tools.Add(10, "alerts", "Alerts", window.DrawTab, window.Idle);
         if (visible)
         {
             _tools.Show("alerts");
@@ -278,7 +289,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             lookAgain,
             sweep,
             () => TookPreload(_preloadSettings with { Rules = watch.Rules }));
-        _tools.Add(1, "preload", "In this area", window.DrawTab);
+        _tools.Add(20, "preload", "In this area", window.DrawTab);
         if (visible)
         {
             _tools.Show("preload");
@@ -369,7 +380,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         ArgumentNullException.ThrowIfNull(saved);
         var window = new StyleWindow(Style, saved);
-        _tools.Add(5, "style", "Appearance", window.DrawTab, window.Idle);
+        _tools.Add(70, "style", "Appearance", window.DrawTab, window.Idle);
         if (visible)
         {
             _tools.Show("style");
@@ -513,7 +524,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(inspector);
         var window = new UiBrowserWindow(inspector) { Style = _style };
         _uiBrowser = window;
-        _tools.Add(8, UiBrowserTab, "UI browser", window.DrawTab, window.Idle);
+        _tools.Add(100, UiBrowserTab, "UI browser", window.DrawTab, window.Idle);
         if (visible)
         {
             _tools.Show(UiBrowserTab);
@@ -533,7 +544,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(saved);
         _atlasWatch = watch;
         var window = new AtlasWindow(watch, saved);
-        _tools.Add(2, "atlas", "Atlas", window.DrawTab, window.Idle);
+        _tools.Add(40, "atlas", "Atlas", window.DrawTab, window.Idle);
         if (visible)
         {
             _tools.Show("atlas");
@@ -570,7 +581,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         var window = new StashWindow(
             inspector, art, prices, trade, signIn,
             file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture);
-        _tools.Add(4, "stash", "Stash", window.DrawTab);
+        _tools.Add(60, "stash", "Stash", window.DrawTab);
         if (visible)
         {
             _tools.Show("stash");
@@ -596,7 +607,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _ritualWatch = watch;
         var window = new RitualWindow(watch, worth, apply, save);
         _ritualWindow = window;
-        _tools.Add(3, "ritual", "Ritual line", window.DrawTab);
+        _tools.Add(50, "ritual", "Ritual line", window.DrawTab);
         if (visible)
         {
             _tools.Show("ritual");
@@ -617,7 +628,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(inspector);
         var window = new DissectorWindow(inspector);
         _dissector = window;
-        _tools.Add(9, DissectorTab, "Dissector", window.DrawTab, window.Idle);
+        _tools.Add(110, DissectorTab, "Dissector", window.DrawTab, window.Idle);
         if (visible)
         {
             _tools.Show(DissectorTab);
@@ -650,7 +661,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     _tools.Show(DissectorTab);
                 }
             });
-        _tools.Add(7, "entities", "Entity browser", () => window.DrawTab(_snapshot, _snapshot.Player), window.Idle);
+        _tools.Add(90, "entities", "Entity browser", () => window.DrawTab(_snapshot, _snapshot.Player), window.Idle);
         if (visible)
         {
             _tools.Show("entities");
@@ -1002,10 +1013,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 var made = new CostWindow(Costs);
                 _costWindow = made;
-                _tools.Add(6, "cost", "Read cost", made.DrawTab);
+                _tools.Add(80, "cost", "Read cost", made.DrawTab);
             }
 
             _costWindow.CurrentArea = _snapshot.AreaHash;
+        }
+
+        // Registered on first use for the same reason as the cost tab: the meter is a
+        // property, so the tab appears once there is something behind it.
+        if (Damage is DamageMeter meter && _damageWindow is null)
+        {
+            _damageWindow = new DamageWindow(meter);
+            _tools.Add(30, "damage", "Damage", _damageWindow.DrawTab);
         }
 
         // Polled outside the tools window on purpose: F8 captures what is under the cursor
@@ -1309,6 +1328,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 if (_snapshot.PlayerVitals is Vitals vitals)
                 {
                     ImGui.Text($"vitals:   life {Show(vitals.Life)}   mana {Show(vitals.Mana)}   es {Show(vitals.EnergyShield)}");
+                }
+
+                // Here rather than only on its tab, because this is a number you watch while
+                // doing the thing it measures - a damage figure you have to open a window to
+                // read cannot tell you whether the pack you just hit died to that skill.
+                if (Damage is DamageMeter damage && damage.Measuring)
+                {
+                    ImGui.TextColored(
+                        new Vector4(1f, 1f, 0.6f, 1f),
+                        $"damage:   {DamageWindow.Number(damage.Dps)} dps"
+                        + $"   peak {DamageWindow.Number(damage.Peak)}"
+                        + $"   {DamageWindow.Number(damage.Total)} this area");
                 }
 
                 // Always shown, including when it failed: an omitted row looks like a
