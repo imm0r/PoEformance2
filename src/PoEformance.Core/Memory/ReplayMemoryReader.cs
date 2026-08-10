@@ -1,3 +1,6 @@
+using System.Buffers;
+using System.IO.Compression;
+
 namespace PoEformance.Core.Memory;
 
 /// <summary>
@@ -87,24 +90,27 @@ public sealed class ReplayMemoryReader : IMemoryReader
     public static ReplayMemoryReader Load(Stream input)
     {
         ArgumentNullException.ThrowIfNull(input);
-        using var reader = new BinaryReader(input);
+        using var header = new BinaryReader(input, System.Text.Encoding.UTF8, leaveOpen: true);
 
         Span<byte> magic = stackalloc byte[RecordingFormat.Magic.Length];
-        if (reader.Read(magic) != magic.Length || !magic.SequenceEqual(RecordingFormat.Magic))
+        if (header.Read(magic) != magic.Length || !magic.SequenceEqual(RecordingFormat.Magic))
         {
             throw new InvalidDataException("Not a PoEformance recording (bad magic).");
         }
 
-        uint version = reader.ReadUInt32();
-        if (version != RecordingFormat.Version)
+        uint version = header.ReadUInt32();
+        if (version != RecordingFormat.Version && version != RecordingFormat.UncompressedVersion)
         {
             throw new InvalidDataException($"Recording version {version} is not supported (expected {RecordingFormat.Version}).");
         }
 
-        int processId = (int)reader.ReadUInt32();
-        ulong moduleBase = reader.ReadUInt64();
-        uint moduleSize = reader.ReadUInt32();
-        var createdUtc = new DateTime(reader.ReadInt64(), DateTimeKind.Utc);
+        int processId = (int)header.ReadUInt32();
+        ulong moduleBase = header.ReadUInt64();
+        uint moduleSize = header.ReadUInt32();
+        var createdUtc = new DateTime(header.ReadInt64(), DateTimeKind.Utc);
+
+        using var reader = new BinaryReader(
+            version == RecordingFormat.UncompressedVersion ? input : Decompress(input));
 
         var replay = new ReplayMemoryReader(processId, moduleBase, moduleSize, createdUtc);
         uint frame = 0;
@@ -170,6 +176,62 @@ public sealed class ReplayMemoryReader : IMemoryReader
 
         replay._currentFrame = frame;
         return replay;
+    }
+
+    /// <summary>
+    /// Unpacks the entry stream of a version-3 recording, keeping whatever a killed session
+    /// managed to write.
+    /// </summary>
+    /// <remarks>
+    /// Uses the raw <see cref="BrotliDecoder"/> rather than a <see cref="BrotliStream"/>
+    /// because a truncated tail has to be a RESULT here, not an exception. The stream
+    /// wrapper throws when the data runs out mid-block, and it throws from inside the same
+    /// call that produced the good bytes, so the healthy part of a recording would be lost
+    /// along with the torn end of it. The decoder reports <c>NeedMoreData</c> instead and
+    /// leaves everything decoded so far in hand.
+    ///
+    /// This is why the writer flushes on a frame boundary once a second: the file decodes
+    /// up to the last flush, which is where the "loads up to the last complete entry"
+    /// promise now lives.
+    /// </remarks>
+    private static MemoryStream Decompress(Stream input)
+    {
+        byte[] compressed;
+        using (input)
+        {
+            var raw = new MemoryStream();
+            input.CopyTo(raw);
+            compressed = raw.ToArray();
+        }
+
+        var body = new MemoryStream();
+        byte[] chunk = ArrayPool<byte>.Shared.Rent(64 * 1024);
+        try
+        {
+            using var decoder = new BrotliDecoder();
+            ReadOnlySpan<byte> source = compressed;
+            while (true)
+            {
+                OperationStatus status = decoder.Decompress(source, chunk, out int consumed, out int written);
+                body.Write(chunk, 0, written);
+                source = source[consumed..];
+
+                // Anything but "the destination filled up" means the decoder is finished
+                // with what it has - done, out of input, or looking at damaged bytes. A
+                // round that moved nothing would spin, so it ends the loop too.
+                if (status != OperationStatus.DestinationTooSmall || (consumed == 0 && written == 0))
+                {
+                    break;
+                }
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(chunk);
+        }
+
+        body.Position = 0;
+        return body;
     }
 
     /// <summary>Positions the replay at a frame. Reads then see the state as of that frame.</summary>
