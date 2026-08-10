@@ -6,11 +6,17 @@ namespace PoEformance.Game.Files;
 /// Undoing the compression the game's bundles use.
 /// </summary>
 /// <remarks>
-/// TWO DECODERS, AND THE INSTALL'S OWN WINS. Oodle is a commercial compressor and its library is
-/// not something this can ship - but it is already on the machine, because the game cannot run
-/// without it: <c>oo2core_9_win64.dll</c> sits in the game folder. Loading THAT decodes exactly
-/// what THAT install packed, by construction, and still ships nothing licensed. It is also what
-/// LibBundle3 does, and LibBundle3 is where the bundle format in this project came from.
+/// TWO DECODERS, AND THE INSTALL'S OWN WINS WHEN IT HAS ONE. Oodle is a commercial compressor
+/// and its library is not something this can ship - but the game cannot run without it, so a
+/// copy is already on the machine. Loading THAT decodes exactly what THAT install packed, by
+/// construction, and still ships nothing licensed. It is also what LibBundle3 does, and
+/// LibBundle3 is where the bundle format in this project came from.
+///
+/// WHERE that copy is depends on the game. Path of Exile 1 ships <c>oo2core_*.dll</c> beside the
+/// executable. Path of Exile 2 does NOT - checked on a real install, 2026-08-10, whose folder
+/// holds bink2w64, the D3D compilers, fmod, Aftermath, XeSS and steam_api and no Oodle at all -
+/// so there it is linked into something else. Hence a LIST of candidates, each ASKED for the
+/// entry point rather than believed to have it.
 ///
 /// The managed decoder stays as the fallback. OozSharp is a port of the ooz decoder - Kraken,
 /// Mermaid, Selkie, Leviathan - and it is what runs when the install cannot be found or its
@@ -29,8 +35,24 @@ namespace PoEformance.Game.Files;
 /// </remarks>
 public static class Oodle
 {
-    /// <summary>What the game's own decoder is called, whichever version it is.</summary>
-    public const string LibraryPattern = "oo2core*.dll";
+    /// <summary>
+    /// What the game's own decoder might be called, best first.
+    /// </summary>
+    /// <remarks>
+    /// <c>oo2core</c> is Oodle shipped as its own library, which is how Path of Exile 1 does it.
+    /// Path of Exile 2 does not: its folder holds no such file, so Oodle is linked into
+    /// something else there.
+    ///
+    /// <c>bink2w64</c> is in the list because Bink is RAD Game Tools' video codec and Oodle is
+    /// RAD's compressor - the same vendor, shipped together, and in some titles the one library
+    /// carries the other's exports. Whether it does HERE is not assumed: the library is asked
+    /// for OodleLZ_Decompress by name, and a library that does not have it is let go of again.
+    ///
+    /// Nothing else is tried, because probing means LOADING, and loading somebody's library
+    /// runs their startup code. These two are both RAD decompressors that the game itself has
+    /// already loaded; the rest of a game folder is not this tool's business.
+    /// </remarks>
+    public static readonly string[] LibraryPatterns = ["oo2core*.dll", "bink2w64.dll"];
 
     private static readonly OozSharp.Kraken Decoder = new();
     private static readonly Lock Gate = new();
@@ -166,33 +188,50 @@ public static class Oodle
 
             try
             {
-                // Matched by pattern, because the number in the name is the Oodle major version
-                // and changes under the tool's feet. Newest last, so the highest version wins.
-                string[] found = [.. Directory.EnumerateFiles(gameFolder, LibraryPattern).Order(StringComparer.Ordinal)];
-                if (found.Length == 0)
+                // Matched by pattern, because the number in an oo2core name is the Oodle major
+                // version and changes under the tool's feet. Newest last within a pattern, so
+                // the highest version wins; patterns in order, so oo2core beats its stand-ins.
+                string[] candidates =
+                [
+                    .. LibraryPatterns.SelectMany(pattern =>
+                        Directory.EnumerateFiles(gameFolder, pattern).Order(StringComparer.Ordinal).Reverse()),
+                ];
+
+                if (candidates.Length == 0)
                 {
-                    _problem = $"no {LibraryPattern} in the game folder";
+                    _problem = $"none of {string.Join(", ", LibraryPatterns)} in the game folder";
                     return null;
                 }
 
-                string file = found[^1];
-                if (!NativeLibrary.TryLoad(file, out nint library))
+                var refused = new List<string>();
+                foreach (string file in candidates)
                 {
-                    _problem = $"{Path.GetFileName(file)} would not load";
-                    return null;
+                    string called = Path.GetFileName(file);
+
+                    if (!NativeLibrary.TryLoad(file, out nint library))
+                    {
+                        refused.Add($"{called} would not load");
+                        continue;
+                    }
+
+                    // ASKED, NOT ASSUMED. A library either exports the entry point or it does
+                    // not, and this is the question itself rather than a belief about which
+                    // file carries Oodle - which is not knowable from a name.
+                    if (!NativeLibrary.TryGetExport(library, "OodleLZ_Decompress", out nint entry))
+                    {
+                        NativeLibrary.Free(library);
+                        refused.Add($"{called} has no OodleLZ_Decompress");
+                        continue;
+                    }
+
+                    unsafe
+                    {
+                        return new Native(called, entry);
+                    }
                 }
 
-                if (!NativeLibrary.TryGetExport(library, "OodleLZ_Decompress", out nint entry))
-                {
-                    NativeLibrary.Free(library);
-                    _problem = $"{Path.GetFileName(file)} has no OodleLZ_Decompress";
-                    return null;
-                }
-
-                unsafe
-                {
-                    return new Native(Path.GetFileName(file), entry);
-                }
+                _problem = string.Join("; ", refused);
+                return null;
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
                                                   or DllNotFoundException or BadImageFormatException
