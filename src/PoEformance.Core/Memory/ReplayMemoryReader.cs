@@ -24,6 +24,25 @@ public sealed class ReplayMemoryReader : IMemoryReader
     /// <summary>All recorded blocks in file order (which is also frame order).</summary>
     private readonly List<Block> _blocks = [];
 
+    /// <summary>Which blocks touch which page of memory, so a read need not scan them all.</summary>
+    /// <remarks>
+    /// Without this a read walks every block backwards looking for the newest coverage, which
+    /// is fine for a recording of a few thousand reads and hopeless for one of a few hundred
+    /// thousand: measured at 0.66 ms per read on a two-minute session, against the thousands
+    /// of reads a single world scan performs. Recordings became long enough to be worth
+    /// replaying and immediately became too long to replay.
+    ///
+    /// A block is registered under every page it covers, so scanning the pages a READ covers
+    /// finds every block that could answer any byte of it - the newest-wins rule below then
+    /// works exactly as it did over the whole list. Pages rather than addresses because reads
+    /// overlap: a field read four bytes into a struct is answered by the struct's own read,
+    /// which starts somewhere else entirely, and an index keyed on the start address would
+    /// quietly serve the older of the two.
+    /// </remarks>
+    private readonly Dictionary<ulong, List<int>> _byPage = [];
+
+    private const int PageShift = 12;
+
     /// <summary>Frame index -> elapsed ms since session start, for time scrubbing UIs.</summary>
     private readonly List<uint> _frameTimes = [];
 
@@ -147,7 +166,7 @@ public sealed class ReplayMemoryReader : IMemoryReader
                         break; // truncated tail
                     }
 
-                    replay._blocks.Add(new Block(frame, address, bytes));
+                    replay.Add(new Block(frame, address, bytes));
                 }
                 else if (tag == RecordingFormat.TagNote)
                 {
@@ -234,6 +253,25 @@ public sealed class ReplayMemoryReader : IMemoryReader
         return body;
     }
 
+    /// <summary>Keeps a block and files it under every page it covers.</summary>
+    private void Add(Block block)
+    {
+        int index = _blocks.Count;
+        _blocks.Add(block);
+
+        ulong first = block.Address >> PageShift;
+        ulong last = (block.Address + (ulong)block.Bytes.Length - 1) >> PageShift;
+        for (ulong page = first; page <= last; page++)
+        {
+            if (!_byPage.TryGetValue(page, out List<int>? bucket))
+            {
+                _byPage[page] = bucket = [];
+            }
+
+            bucket.Add(index);
+        }
+    }
+
     /// <summary>Positions the replay at a frame. Reads then see the state as of that frame.</summary>
     public void Seek(uint frame) => _currentFrame = frame;
 
@@ -244,14 +282,46 @@ public sealed class ReplayMemoryReader : IMemoryReader
             return false;
         }
 
+        ulong firstPage = address >> PageShift;
+        ulong lastPage = (address + (ulong)(destination.Length - 1)) >> PageShift;
+
+        List<int>? candidates;
+        if (firstPage == lastPage)
+        {
+            _byPage.TryGetValue(firstPage, out candidates);
+        }
+        else
+        {
+            // A read across a page boundary is rare enough not to be worth a merge: gather
+            // the buckets and sort, which restores the file order the walk below relies on.
+            // A block covering both pages lands in the list twice; the second visit finds
+            // every byte already covered and does nothing.
+            var spanning = new List<int>();
+            for (ulong page = firstPage; page <= lastPage; page++)
+            {
+                if (_byPage.TryGetValue(page, out List<int>? bucket))
+                {
+                    spanning.AddRange(bucket);
+                }
+            }
+
+            spanning.Sort();
+            candidates = spanning;
+        }
+
+        if (candidates is null)
+        {
+            return false;
+        }
+
         // Walk newest-to-oldest so later frames win, and fill the destination from
         // possibly-overlapping blocks until every byte is covered.
         Span<bool> covered = destination.Length <= 4096 ? stackalloc bool[destination.Length] : new bool[destination.Length];
         int remaining = destination.Length;
 
-        for (int i = _blocks.Count - 1; i >= 0 && remaining > 0; i--)
+        for (int i = candidates.Count - 1; i >= 0 && remaining > 0; i--)
         {
-            Block block = _blocks[i];
+            Block block = _blocks[candidates[i]];
             if (block.Frame > _currentFrame)
             {
                 continue;
