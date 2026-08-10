@@ -62,6 +62,11 @@ public sealed class UiBrowserWindow
     private bool _highlightSelected = true;
     private Vector2 _cursor;
 
+    // Where the cursor is THIS frame, captured by Tick for DrawTab. Two methods because the
+    // pick key is polled on every frame and the content only draws while the tab is in
+    // front - and both need the same cursor, translated once.
+    private Vector2? _pointer;
+
     public UiBrowserWindow(UiTreeInspector inspector)
     {
         ArgumentNullException.ThrowIfNull(inspector);
@@ -77,30 +82,32 @@ public sealed class UiBrowserWindow
     /// </remarks>
     public OverlayStyle Style { get; set; } = new();
 
-    /// <summary>Whether the window is on screen. Nothing is read while it is not.</summary>
-    public bool Visible { get; set; }
-
-    /// <summary>Draws the window and publishes what it wants read next.</summary>
+    /// <summary>
+    /// Polls the pick key, and says whether a pick wants the browser in front.
+    /// </summary>
+    /// <remarks>
+    /// Called every frame, tab in front or not - opening the browser to find out what was
+    /// under the cursor a moment ago is the wrong way round. Surfacing the tab is the
+    /// caller's half of that, because this class no longer owns a window to show.
+    /// </remarks>
     /// <param name="client">The game's client area, for turning the cursor into a hit point.</param>
-    public void Render(ClientRect client)
+    public bool Tick(ClientRect client)
     {
-        // The pick key is polled even while the window is closed - opening the browser to
-        // find out what was under the cursor a moment ago is the wrong way round.
-        Vector2? cursor = ScreenInput.CursorIn(client);
-        if (_pickKey.Pressed() && cursor is Vector2 point)
+        _pointer = ScreenInput.CursorIn(client);
+        if (_pickKey.Pressed() && _pointer is Vector2 point)
         {
             _cursor = point;
             _pickSequence++;
-            Visible = true;
+            return true;
         }
 
-        if (!Visible)
-        {
-            _inspector.Request(UiTreeRequest.Idle);
-            return;
-        }
+        return false;
+    }
 
-        if (_followCursor && cursor is Vector2 live)
+    /// <summary>Draws the tab's content and publishes what it wants read next.</summary>
+    public void DrawTab()
+    {
+        if (_followCursor && _pointer is Vector2 live)
         {
             _cursor = live;
             _pickSequence++;
@@ -110,7 +117,7 @@ public sealed class UiBrowserWindow
         ApplyPick(view);
 
         _hovered = 0;
-        DrawWindow(view);
+        DrawContent(view);
         DrawHighlights(view);
 
         _inspector.Request(new UiTreeRequest(
@@ -123,6 +130,9 @@ public sealed class UiBrowserWindow
             PickSequence: _pickSequence,
             Cursor: _cursor));
     }
+
+    /// <summary>While the tab is not in front, nothing is read for it.</summary>
+    public void Idle() => _inspector.Request(UiTreeRequest.Idle);
 
     /// <summary>
     /// Selects what the last pick found and opens the tree down to it.
@@ -149,36 +159,26 @@ public sealed class UiBrowserWindow
         _selected = view.PickChain[^1];
     }
 
-    private void DrawWindow(UiTreeView view)
+    private void DrawContent(UiTreeView view)
     {
-        ImGui.SetNextWindowSize(new Vector2(880, 520), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowPos(new Vector2(80, 80), ImGuiCond.FirstUseEver);
+        DrawToolbar(view);
+        ImGui.Separator();
 
-        bool open = Visible;
-        if (ImGui.Begin("UI Browser", ref open, ImGuiWindowFlags.NoFocusOnAppearing))
+        float paneWidth = Math.Max(240f, ImGui.GetContentRegionAvail().X * 0.45f);
+        if (ImGui.BeginChild("uib-left", new Vector2(paneWidth, 0), ImGuiChildFlags.Borders))
         {
-            DrawToolbar(view);
-            ImGui.Separator();
-
-            float paneWidth = Math.Max(240f, ImGui.GetContentRegionAvail().X * 0.45f);
-            if (ImGui.BeginChild("uib-left", new Vector2(paneWidth, 0), ImGuiChildFlags.Borders))
-            {
-                DrawLeftPane(view);
-            }
-
-            ImGui.EndChild();
-            ImGui.SameLine();
-
-            if (ImGui.BeginChild("uib-detail", Vector2.Zero, ImGuiChildFlags.Borders))
-            {
-                DrawDetails(view);
-            }
-
-            ImGui.EndChild();
+            DrawLeftPane(view);
         }
 
-        ImGui.End();
-        Visible = open;
+        ImGui.EndChild();
+        ImGui.SameLine();
+
+        if (ImGui.BeginChild("uib-detail", Vector2.Zero, ImGuiChildFlags.Borders))
+        {
+            DrawDetails(view);
+        }
+
+        ImGui.EndChild();
     }
 
     private void DrawToolbar(UiTreeView view)

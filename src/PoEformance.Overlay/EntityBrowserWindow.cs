@@ -53,60 +53,31 @@ public sealed class EntityBrowserWindow
         _dissect = dissect;
     }
 
-    /// <summary>Whether the window is on screen. Nothing is read while it is not.</summary>
-    public bool Visible { get; set; }
-
-    /// <summary>Draws the window and publishes what it wants read next.</summary>
+    /// <summary>Draws the tab's content and publishes what it wants read next.</summary>
     /// <param name="snapshot">
     /// The frame's entities. The LIST comes from here at no cost - it is already read and
     /// drawn - and only the selected entity is taken apart.
     /// </param>
-    public void Render(WorldSnapshot snapshot, WorldEntity? player)
+    public void DrawTab(WorldSnapshot snapshot, WorldEntity? player)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
-
-        if (!Visible)
-        {
-            _inspector.Request(EntityRequest.Idle);
-            return;
-        }
 
         EntityView view = _inspector.View;
         List<WorldEntity> listed = Listed(snapshot, player);
 
-        ImGui.SetNextWindowSize(new Vector2(880f, 560f), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowPos(new Vector2(120f, 120f), ImGuiCond.FirstUseEver);
+        DrawControls(view, snapshot);
+        ImGui.Separator();
 
-        bool open = Visible;
-        bool expanded = ImGui.Begin("Entity browser", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
-
-        // End() in a finally. An exception between Begin and End leaves ImGui's window stack
-        // unbalanced, and the assert that follows kills the process even though the overlay
-        // catches the exception itself.
-        try
+        if (_surveyPane)
         {
-            if (expanded)
-            {
-                DrawControls(view, snapshot);
-                ImGui.Separator();
-
-                if (_surveyPane)
-                {
-                    DrawSurvey(view);
-                }
-                else
-                {
-                    DrawList(listed, player);
-                    ImGui.SameLine();
-                    DrawComponents(view);
-                }
-            }
+            DrawSurvey(view);
         }
-        finally
+        else
         {
-            ImGui.End();
+            DrawList(listed, player);
+            ImGui.SameLine();
+            DrawComponents(view);
         }
-        Visible = open;
 
         _inspector.Request(new EntityRequest(
             Enabled: true,
@@ -114,6 +85,9 @@ public sealed class EntityBrowserWindow
             Survey: [.. snapshot.Entities.Select(entity => entity.Address)],
             SurveySequence: _surveySequence));
     }
+
+    /// <summary>While the tab is not in front, nothing is read for it.</summary>
+    public void Idle() => _inspector.Request(EntityRequest.Idle);
 
     private void DrawControls(EntityView view, WorldSnapshot snapshot)
     {

@@ -80,9 +80,6 @@ public sealed class DissectorWindow
         _inspector = inspector;
     }
 
-    /// <summary>Whether the window is on screen. Nothing is read while it is not.</summary>
-    public bool Visible { get; set; }
-
     /// <summary>
     /// Points the dissector at an address, from somewhere else in the tool.
     /// </summary>
@@ -90,6 +87,9 @@ public sealed class DissectorWindow
     /// What makes the entity browser worth having: it can say a component is at an address
     /// and nothing describes it, and this is the step from knowing that to looking at it.
     /// Typing the address across by hand would be the whole friction of the thing.
+    ///
+    /// Only the state moves here - bringing the dissector's tab in front is the caller's
+    /// half, because this class no longer owns a window to show.
     /// </remarks>
     /// <param name="knownLayout">A schema structure to name the rows by, when one applies.</param>
     public void Show(ulong address, string label = "", string knownLayout = "")
@@ -99,7 +99,6 @@ public sealed class DissectorWindow
             return;
         }
 
-        Visible = true;
         GoTo(address, -1, keepTrail: false);
         _cameFrom = label;
 
@@ -118,46 +117,18 @@ public sealed class DissectorWindow
     /// <summary>The schema's structure names, with "no names" first. Built once.</summary>
     private string[] Names() => _structNames ??= ["(no names)", .. _inspector.KnownStructures];
 
-    /// <summary>Draws the window and publishes what it wants read next.</summary>
-    public void Render()
+    /// <summary>Draws the tab's content and publishes what it wants read next.</summary>
+    public void DrawTab()
     {
-        if (!Visible)
-        {
-            _inspector.Request(StructureRequest.Idle);
-            return;
-        }
-
         StructureView view = _inspector.View;
         Remember(view);
 
-        ImGui.SetNextWindowSize(new Vector2(940f, 620f), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowPos(new Vector2(60f, 60f), ImGuiCond.FirstUseEver);
-
-        bool open = Visible;
-        bool expanded = ImGui.Begin("Memory dissector", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
-
-        // End() in a finally, and this is not defensive habit - it is the difference between
-        // a reported frame and a dead process. The overlay catches an escaping exception and
-        // skips the frame, but an exception thrown between Begin and End leaves ImGui's
-        // window stack unbalanced, and ImGui then asserts and takes the process down anyway.
-        // Catching the exception was never enough on its own.
-        try
-        {
-            if (expanded)
-            {
-                DrawControls(view);
-                ImGui.Separator();
-                DrawTrail();
-                DrawPeek(view);
-                ImGui.Separator();
-                DrawRows(view);
-            }
-        }
-        finally
-        {
-            ImGui.End();
-        }
-        Visible = open;
+        DrawControls(view);
+        ImGui.Separator();
+        DrawTrail();
+        DrawPeek(view);
+        ImGui.Separator();
+        DrawRows(view);
 
         _inspector.Request(new StructureRequest(
             Enabled: true,
@@ -170,6 +141,9 @@ public sealed class DissectorWindow
             PeekOffset: _peekOffset,
             PeekSequence: _peekSequence));
     }
+
+    /// <summary>While the tab is not in front, nothing is read for it.</summary>
+    public void Idle() => _inspector.Request(StructureRequest.Idle);
 
     private void DrawControls(StructureView view)
     {

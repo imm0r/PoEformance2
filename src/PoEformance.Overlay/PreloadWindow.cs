@@ -56,39 +56,8 @@ public sealed class PreloadWindow
         _rulesChanged = rulesChanged;
     }
 
-    /// <summary>Whether the window is on screen.</summary>
-    public bool Visible { get; set; }
-
-    /// <summary>Draws the window.</summary>
-    public void Render()
-    {
-        if (!Visible)
-        {
-            return;
-        }
-
-        ImGui.SetNextWindowSize(new Vector2(620f, 460f), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowPos(new Vector2(150f, 140f), ImGuiCond.FirstUseEver);
-
-        bool open = Visible;
-        bool expanded = ImGui.Begin("What is in this area", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
-
-        // End in a finally: an exception between Begin and End leaves ImGui's stack
-        // unbalanced and the assert that follows takes the process down.
-        try
-        {
-            if (expanded)
-            {
-                Draw();
-            }
-        }
-        finally
-        {
-            ImGui.End();
-        }
-
-        Visible = open;
-    }
+    /// <summary>Draws the tab's content.</summary>
+    public void DrawTab() => Draw();
 
     private void Draw()
     {
