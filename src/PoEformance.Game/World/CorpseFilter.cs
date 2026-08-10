@@ -24,6 +24,11 @@ namespace PoEformance.Game.World;
 /// maximum beside it, so a health bar costs nothing that was not already being paid for.
 /// </param>
 /// <param name="EnergyShield">The shield pool, which sits in the same span.</param>
+/// <param name="HasLife">
+/// Whether the entity carries a Life component at all. Null when the component list could
+/// not be read - which is not the same as "absent", and the difference decides whether a
+/// live monster stays on the overlay.
+/// </param>
 public readonly record struct MonsterSigns(
     int? Health,
     bool? Targetable,
@@ -32,24 +37,48 @@ public readonly record struct MonsterSigns(
     Vital Life = default,
     Vital EnergyShield = default,
     bool Friendly = false,
-    bool Temporary = false)
+    bool Temporary = false,
+    bool? HasLife = null)
 {
     /// <summary>
     /// Whether this is a passing effect rather than a monster - whichever side it is on.
     /// </summary>
     /// <remarks>
-    /// Ground effects are built out of the same components a monster is - they carry Life,
-    /// they sit in the entity map, they have a position - so anything that decides "monster"
-    /// from the path alone draws a flame wall as an enemy and puts a health bar over it.
-    /// That is what a screen full of unexplained dots turned out to be.
+    /// Ground effects are built out of the same components a monster is - they sit in the
+    /// entity map, they have a position, some of them carry Life - so anything that decides
+    /// "monster" from the path alone draws a flame wall as an enemy and puts a health bar
+    /// over it. That is what a screen full of unexplained dots turned out to be.
     ///
-    /// The rule is the reference's, including the let-out: a thing that expires on its own
+    /// TWO RULES, because one of them missed a whole class of them.
+    ///
+    /// The first is the reference's, including the let-out: a thing that expires on its own
     /// counts as an effect only when it cannot be TARGETED, because some genuinely summoned
-    /// monsters expire too and those are worth seeing. An entity with no targetable
-    /// component at all falls the same way as an untargetable one, which is deliberate - it
-    /// has offered no evidence that it is something you can fight.
+    /// monsters expire too and those are worth seeing. An entity with no targetable component
+    /// at all falls the same way as an untargetable one, which is deliberate - it has offered
+    /// no evidence that it is something you can fight.
+    ///
+    /// The second is that a monster HAS A LIFE COMPONENT. That is the reference's own test
+    /// for whether an entity is a monster at all, and it catches the ones that expire without
+    /// saying so. Counted over a recorded map, every monster-path entity that lacked one was
+    /// unmistakably not a monster:
+    ///
+    /// <code>
+    ///   LegionnaireSmokeGround   x76   8 components, GroundEffect + ControlZone
+    ///   LightningArrow           x36   5 components - a projectile
+    ///   Tier3OuterFires          x7    8 components
+    ///   AtziriArenaSnakeHeads    x6    5 components - arena scenery
+    /// </code>
+    ///
+    /// All four hostile, all four drawn as enemies. Against 25 names with Life AND Targetable
+    /// over the same map, which are the real monsters, and Firewall - the player's own, with
+    /// Life and no Targetable - which the friendly rule already handles. Keying on the
+    /// GroundEffect component instead would have caught only the first of the four.
+    ///
+    /// Null means the component list could not be read, and that makes no claim either way:
+    /// classifying an unreadable entity as an effect would drop live monsters off the overlay
+    /// exactly when the reading is going badly.
     /// </remarks>
-    public bool IsEffect => Temporary && Targetable != true;
+    public bool IsEffect => HasLife == false || (Temporary && Targetable != true);
 
     /// <summary>
     /// Whether the reader should drop it outright rather than hand it on.
@@ -83,6 +112,12 @@ public readonly record struct MonsterSigns(
 ///     clock is not running out - which is a fault in the timing, not in the reading.
 ///
 /// Counted rather than reasoned about because the first two were each guessed wrong once.
+///
+/// Over the HOSTILE, non-effect monsters only, because those are the ones a leftover dot
+/// would be. Counting everything made this useless in exactly the situation it was built
+/// for: a Firewall build puts twenty of its own walls on the ground, none of which carries
+/// a Targetable component, and the readout announced that the component was "mostly not
+/// being found" every time the player cast. A counter that cries wolf is one nobody reads.
 /// </remarks>
 /// <param name="Tracking">Monsters whose untargetable clock is currently running.</param>
 public readonly record struct CorpseSigns(int Targetable, int Untargetable, int Unreadable, int Tracking)
