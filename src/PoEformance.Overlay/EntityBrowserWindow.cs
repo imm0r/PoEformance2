@@ -300,9 +300,21 @@ public sealed class EntityBrowserWindow
         {
             ImGui.TextColored(view.Numbers.Count > 0 ? PathText : DimText, ImGuiText.Escape(view.StatsNote));
 
+            // Named where the game's own table has a name, three across when it does not -
+            // a hundred unnamed ids is a wall of numbers and a hundred named ones is a list
+            // worth reading, so the two want different shapes.
+            bool named = view.Numbers.Any(stat => stat.Name.Length > 0);
             int column = 0;
             foreach (EntityStat stat in view.Numbers)
             {
+                if (named)
+                {
+                    ImGui.TextColored(DimText, stat.Name.Length > 0
+                        ? $"  {ImGuiText.Escape(stat.Name)} = {stat.Value}"
+                        : $"  {stat.Id} = {stat.Value}   (no name for this id)");
+                    continue;
+                }
+
                 if (column % 3 != 0)
                 {
                     ImGui.SameLine();

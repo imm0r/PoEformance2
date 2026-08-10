@@ -40,7 +40,7 @@ public readonly record struct TimedEffect(string Name, float TimeLeft, float Tot
 ///
 /// Read for the SELECTED entity only, same as the buffs beside it, and for the same reason.
 /// </remarks>
-public readonly record struct EntityStat(uint Id, int Value);
+public readonly record struct EntityStat(uint Id, int Value, string Name = "");
 
 /// <summary>What the entity browser wants to see.</summary>
 /// <param name="Survey">
@@ -112,6 +112,7 @@ public sealed class EntityInspector
     private readonly IMemoryReader _reader;
     private readonly EntityReader _entities;
     private readonly PoEformance.Game.Components.BuffsReader _buffs;
+    private readonly PoEformance.Game.Components.StatNames _statNames;
     private readonly OffsetSchema _schema;
 
     private EntityRequest _request = EntityRequest.Idle;
@@ -121,10 +122,14 @@ public sealed class EntityInspector
     private IReadOnlyList<ComponentTally> _lastSurvey = [];
     private int _lastSurveyed;
 
-    public EntityInspector(IMemoryReader reader, OffsetSchema schema)
+    public EntityInspector(
+        IMemoryReader reader,
+        OffsetSchema schema,
+        PoEformance.Game.Components.StatNames? statNames = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
+        _statNames = statNames ?? PoEformance.Game.Components.StatNames.Empty;
         _reader = reader;
         _schema = schema;
         _entities = new EntityReader(reader, schema);
@@ -329,9 +334,11 @@ public sealed class EntityInspector
 
         for (int i = 0; i < wanted; i++)
         {
+            uint id = BitConverter.ToUInt32(block, i * PairSize);
             into.Add(new EntityStat(
-                BitConverter.ToUInt32(block, i * PairSize),
-                BitConverter.ToInt32(block, (i * PairSize) + 4)));
+                id,
+                BitConverter.ToInt32(block, (i * PairSize) + 4),
+                _statNames.Of(id) ?? string.Empty));
         }
 
         return (wanted, count > wanted ? $" (of {count})" : string.Empty);

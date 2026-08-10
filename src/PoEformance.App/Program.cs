@@ -448,7 +448,10 @@ internal static class Program
         // And the entity browser, which is the shortest route to something not yet
         // understood: the game names every component an entity carries, and most of them
         // still have nothing reading them.
-        var entityParts = new PoEformance.Features.EntityInspector(reader, schema);
+        // With the game's own names for the stat ids, when the table is next to the binary.
+        // Missing is fine - the ids still read, they are just numbers then.
+        var entityParts = new PoEformance.Features.EntityInspector(
+            reader, schema, PoEformance.Game.Components.StatNames.Load(FindDataFile("stat_name_map.tsv")));
 
         // Finding a way across the area is a search over millions of cells - measured at about
         // 1.8 seconds right across a real map - so it runs on the thread pool and the renderer
