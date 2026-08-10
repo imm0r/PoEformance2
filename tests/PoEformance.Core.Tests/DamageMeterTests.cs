@@ -18,21 +18,38 @@ namespace PoEformance.Core.Tests;
 public class DamageMeterTests
 {
     /// <summary>A monster with a life pool, and optionally a shield.</summary>
-    private static WorldEntity Monster(uint id, int life, int max = 1000, int shield = 0, int shieldMax = 0)
+    private static WorldEntity Monster(
+        uint id, int life, int max = 1000, int shield = 0, int shieldMax = 0, float away = 0f)
         => new(
             Id: id,
             Address: 0x1000 + id,
             Path: $"Metadata/Monsters/Test{id}",
             Kind: EntityKind.Monster,
-            WorldX: 0f,
+            WorldX: away,
             WorldY: 0f,
             WorldZ: 0f,
             Life: new Vital(life, max, 0, 0),
             EnergyShield: new Vital(shield, shieldMax, 0, 0),
             Name: $"Test {id}");
 
+    /// <summary>The player, at the origin - so a monster's WorldX is its distance.</summary>
+    private static WorldEntity Player()
+        => new(
+            Id: 999,
+            Address: 0x999,
+            Path: "Metadata/Player",
+            Kind: EntityKind.Player,
+            WorldX: 0f,
+            WorldY: 0f,
+            WorldZ: 0f,
+            Life: new Vital(100, 100, 0, 0));
+
     private static WorldSnapshot Area(uint hash, params WorldEntity[] entities)
         => new(true, null, entities, new float[16], AreaHash: hash);
+
+    /// <summary>An area with a player in it, which the distance gate needs to measure from.</summary>
+    private static WorldSnapshot Seen(uint hash, params WorldEntity[] entities)
+        => new(true, Player(), entities, new float[16], AreaHash: hash);
 
     /// <summary>
     /// A pool that falls by a known amount over a known time reads as that rate.
@@ -284,6 +301,119 @@ public class DamageMeterTests
 
         Assert.True(meter.Dps < peak / 10f);
         Assert.Equal(peak, meter.Peak);
+    }
+
+    /// <summary>
+    /// Credit is split by whether the monster was ever seen taking damage.
+    /// </summary>
+    /// <remarks>
+    /// The two are different claims wearing the same number. "It was being hurt and then it
+    /// was gone" is nearly certain; "it was there and then it was gone" is the assumption
+    /// under scrutiny, and it is also where a monster that merely left would land.
+    /// </remarks>
+    [Fact]
+    public void CreditIsSplitByWhetherItWasSeenTakingDamage()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Seen(1, Monster(1, 1_000), Monster(2, 1_000)), 0);
+        meter.Look(Seen(1, Monster(1, 400), Monster(2, 1_000)), 100);  // only #1 is hurt
+        meter.Look(Seen(1), 200);                                       // both vanish
+
+        Assert.Equal(600, meter.Observed);          // watched off #1
+        Assert.Equal(400, meter.CreditedHurt);      // #1's remainder
+        Assert.Equal(1_000, meter.CreditedUntouched); // #2, never seen to take a scratch
+        Assert.Equal(1_400, meter.Credited);
+        Assert.Equal(2_000, meter.Total);
+    }
+
+    /// <summary>A monster that vanishes far away is not credited as a kill.</summary>
+    /// <remarks>
+    /// The gate on the way this can be badly wrong: a monster that left the entity list
+    /// without dying. Nothing is killed two screens away, so distance separates those from
+    /// kills without needing to know why the game drops entities.
+    /// </remarks>
+    [Fact]
+    public void AMonsterThatVanishesFarAwayIsNotCredited()
+    {
+        var meter = new DamageMeter();
+        float far = (3f * DamageMeter.ScreenWorldUnits) + 1f;
+
+        meter.Look(Seen(1, Monster(1, 5_000, max: 5_000, away: far)), 0);
+        meter.Look(Seen(1), 100);
+
+        Assert.Equal(0, meter.Credited);
+        Assert.Equal(5_000, meter.Withheld);
+        Assert.Equal(1, meter.WithheldCount);
+        Assert.Equal(1, meter.Vanished); // still noticed, just not counted
+    }
+
+    /// <summary>A monster that vanishes close by is credited.</summary>
+    [Fact]
+    public void AMonsterThatVanishesNearbyIsCredited()
+    {
+        var meter = new DamageMeter();
+
+        meter.Look(Seen(1, Monster(1, 5_000, max: 5_000, away: 200f)), 0);
+        meter.Look(Seen(1), 100);
+
+        Assert.Equal(5_000, meter.CreditedUntouched);
+        Assert.Equal(0, meter.Withheld);
+    }
+
+    /// <summary>The gate can be turned off, and then distance stops mattering.</summary>
+    [Fact]
+    public void TheDistanceGateCanBeTurnedOff()
+    {
+        var meter = new DamageMeter { CreditWithin = 0f };
+        float far = 100f * DamageMeter.ScreenWorldUnits;
+
+        meter.Look(Seen(1, Monster(1, 5_000, max: 5_000, away: far)), 0);
+        meter.Look(Seen(1), 100);
+
+        Assert.Equal(5_000, meter.Credited);
+        Assert.Equal(0, meter.Withheld);
+    }
+
+    /// <summary>
+    /// With no player to measure from, the gate lets credit through rather than refusing it.
+    /// </summary>
+    /// <remarks>
+    /// The gate exists to exclude one identifiable mistake, and "we could not tell" is not
+    /// that mistake. Refusing here would silently drop damage that was really dealt.
+    /// </remarks>
+    [Fact]
+    public void WithNoPlayerTheGateDoesNotRefuse()
+    {
+        var meter = new DamageMeter();
+
+        // Area() builds a snapshot with no player in it.
+        meter.Look(Area(1, Monster(1, 5_000, max: 5_000, away: 999_999f)), 0);
+        meter.Look(Area(1), 100);
+
+        Assert.Equal(5_000, meter.Credited);
+        Assert.Equal(0, meter.Withheld);
+    }
+
+    /// <summary>
+    /// Distance is judged where it was last SEEN, not from wherever the player ended up.
+    /// </summary>
+    /// <remarks>
+    /// A monster killed in front of you was last seen close even if you then ran off; the
+    /// snapshot it last appeared in is the only place its distance can be read at all.
+    /// </remarks>
+    [Fact]
+    public void DistanceIsTakenAtTheLastSighting()
+    {
+        var meter = new DamageMeter();
+
+        // Seen close, killed close - then the next snapshot has no monster at all.
+        meter.Look(Seen(1, Monster(1, 3_000, max: 3_000, away: 100f)), 0);
+        meter.Look(Seen(1, Monster(1, 3_000, max: 3_000, away: 150f)), 100);
+        meter.Look(Seen(1), 200);
+
+        Assert.Equal(3_000, meter.Credited);
+        Assert.Equal(0, meter.Withheld);
     }
 
     /// <summary>Two readings inside the same millisecond lose no damage.</summary>

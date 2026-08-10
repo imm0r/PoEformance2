@@ -22,12 +22,23 @@ public class PriceStoreTests
 
     private static string Somewhere() => Path.Combine(Path.GetTempPath(), $"prices-{Guid.NewGuid():N}.json");
 
+    /// <summary>Waits for the store's background fetch to finish.</summary>
+    /// <remarks>
+    /// Generous ceiling and an assertion, for the reason the art store's twin learned the
+    /// hard way: a three-second budget that passes on this machine is not a three-second
+    /// budget on a shared CI runner, and a SILENT timeout makes the test fail later on
+    /// whatever the unfinished work did not produce - which reads as a bug in the code under
+    /// test rather than as "it was not done yet". The ceiling costs nothing while the work
+    /// finishes, because this polls.
+    /// </remarks>
     private static void Settle(PriceStore store)
     {
-        for (int i = 0; i < 300 && store.Busy; i++)
+        for (int i = 0; i < 3_000 && store.Busy; i++)
         {
             Thread.Sleep(10);
         }
+
+        Assert.False(store.Busy, "the store never settled - still busy");
     }
 
     [Fact]

@@ -20,12 +20,27 @@ public class ItemArtStoreTests
     private static string Somewhere() => Path.Combine(Path.GetTempPath(), $"art-{Guid.NewGuid():N}");
 
     /// <summary>Waits for the fetches to settle, so a test never depends on a race.</summary>
+    /// <summary>Waits for the store's background work to finish.</summary>
+    /// <remarks>
+    /// POLLS rather than waiting a fixed time, so the normal case costs only as long as the
+    /// work really takes and the ceiling is paid only when something is wrong. The ceiling is
+    /// generous because it is a figure for a SHARED CI RUNNER rather than for this machine:
+    /// the previous two seconds passed locally for months and then failed on a loaded runner,
+    /// which is the definition of a flake.
+    ///
+    /// And it ASSERTS, which the previous version did not. A silent timeout left the test to
+    /// fail on whatever the unfinished work had not produced - an ArgumentException about an
+    /// empty path, thrown three lines later - so a slow runner reported itself as a bug in
+    /// the code under test.
+    /// </remarks>
     private static void Settle(ItemArtStore store)
     {
-        for (int i = 0; i < 200 && store.Pending > 0; i++)
+        for (int i = 0; i < 3_000 && store.Pending > 0; i++)
         {
             Thread.Sleep(10);
         }
+
+        Assert.True(store.Pending == 0, $"the store never settled - {store.Pending} still pending");
     }
 
     [Fact]
