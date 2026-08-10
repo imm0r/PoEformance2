@@ -127,6 +127,41 @@ public class CorpseFilterTests
         filter.IsCorpse(0x9000, corpse, 60_000);
         Assert.Equal(1, filter.Tracking);
     }
+    /// <summary>
+    /// The clock belongs to the MONSTER, so a key that changes between readings breaks it.
+    /// </summary>
+    /// <remarks>
+    /// Not a hypothetical. The game wears several entity objects on one monster, the reader
+    /// keeps only one of them, and which one depends on the order the entity map is walked in
+    /// - which shifts as the tree rebalances around things dying and spawning. Keyed on the
+    /// entity, that flip restarts this clock every time it happens, the threshold is never
+    /// reached, and a cleared screen keeps its dots. That is exactly what came back on the
+    /// overlay once the collapsing landed, and it is why the reader now keys this on the
+    /// Render component.
+    ///
+    /// This test states the hazard rather than the fix: it shows what a changing key does, so
+    /// the next person to pass something entity-shaped in here has it in writing.
+    /// </remarks>
+    [Fact]
+    public void AKeyThatChangesBetweenReadingsNeverTimesAnythingOut()
+    {
+        var filter = new CorpseFilter();
+        MonsterSigns corpse = new(500, Targetable: false, IsBoss: false);
+
+        // Five seconds of a monster reading untargetable the whole time - but seen under a
+        // different entity each reading, as an entity-keyed caller would report it.
+        for (long now = 1000; now <= 6000; now += 100)
+        {
+            Assert.False(
+                filter.IsCorpse(0x2000 + (ulong)now, corpse, now),
+                $"a corpse was declared at {now} despite the key never repeating");
+        }
+
+        // And the same five seconds under one identity: recognised, and long before the end.
+        var steady = new CorpseFilter();
+        Assert.False(steady.IsCorpse(0x9000, corpse, 1000));
+        Assert.True(steady.IsCorpse(0x9000, corpse, 1000 + steady.UntargetableMs));
+    }
 }
 
 /// <summary>
@@ -206,5 +241,6 @@ public class PassingEffectTests
         // The clause that stops the discard rule from widening into "friendly things go".
         Assert.False(Signs(friendly: false, temporary: false, targetable: true).IsHostileEffect);
         Assert.False(Signs(friendly: false, temporary: true, targetable: true).IsHostileEffect);
-    }
+    
+}
 }
