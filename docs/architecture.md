@@ -396,7 +396,31 @@ memory:
 - **The index**, which files everything under a 64-bit hash of its path and keeps the
   spelled-out paths in a separate compressed blob. Finding a path means hashing it, so that
   blob is never unpacked at all.
-- **Oodle**, via OozSharp — a managed decoder, so there is no licensed library to ship.
+- **Oodle**, and this is the one that does not work. The managed decoder was chosen so there
+  would be no licensed library to ship; measured on a real install (2026-08-10) it cannot read
+  Path of Exile 2 at all.
+
+  **PoE2 packs with Leviathan.** The index is 565 chunks, 113,943,153 bytes in, 147,897,312
+  expected out, and the first chunk begins `8C 0C`: low nibble `0xC` says Oodle, and decoder
+  type `12` is Leviathan in ooz's own `Kraken_DecodeStep`. The header and the chunk table read
+  perfectly in the same breath, so it is the decoder and nothing else.
+
+  **OozSharp only implements Mermaid.** Its package blurb lists "Kraken / Mermaid / Selkie /
+  Leviathan"; its source carries the comment *"Only need Mermaid for Fortnite"*, and the word
+  Leviathan does not appear in it. It is a Fortnite replay decompressor.
+
+  **And it named the codec wrong.** It reported `Decoder type Selkie not supported`, because its
+  enum starts at 1 where Oodle's starts at 0 — every name it gives is one out. Selkie is a real
+  codec and a wrong answer. The name in a report is therefore read off the chunk's own first two
+  bytes rather than taken from whichever decoder just failed.
+
+  **What works instead is the game's own library.** Oodle is on the machine already — the game
+  cannot run without it — so `oo2core_*.dll` is loaded by path and called through a function
+  pointer, which ships nothing licensed. That is also what LibBundle3 does, and LibBundle3 is
+  where this bundle format came from; it has no managed decoder at all. PoE1 ships that DLL
+  beside its executable. **PoE2 does not** — its folder holds bink2w64, the D3D compilers, fmod,
+  Aftermath, XeSS and steam_api and no Oodle — so the tool also looks beside itself, and anybody
+  with a copy can drop it there. Without one, item pictures come from poe2db.
 
 Three things that fail **silently** rather than loudly, and are worth knowing before touching
 any of it:

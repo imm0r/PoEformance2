@@ -47,6 +47,18 @@
          release where every unique is nameless - the same way data\ was missed once before. -->
     <None Include="..\..\data\*.tsv" Link="data\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <!--
+      And the Oodle library, which is the one thing here that goes BESIDE THE EXE rather than
+      into data\ - it is not read as a file, it is LOADED as one, and beside the executable is
+      where a native library belongs and where this looks for it. Kept in data\ in the source
+      tree because that is where the shipped-with-the-tool things live; Link decides where it
+      lands, and the two do not have to agree.
+
+      Without it the item pictures come from poe2db instead: Path of Exile 2 packs its bundles
+      with Leviathan, the managed decoder only speaks Mermaid, and Path of Exile 2 ships no
+      Oodle of its own to borrow.
+    -->
+    <None Include="..\..\data\oo2core*.dll" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <!--
       item-stats.json is the big one - 27,000 stat rows, because what memory holds is a ROW
       INDEX into the game's stat table and a reader cannot know in advance which rows an item
       will use. It is what turns "1043: 79" into "+79 to maximum Life".

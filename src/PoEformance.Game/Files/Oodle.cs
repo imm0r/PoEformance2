@@ -18,15 +18,21 @@ namespace PoEformance.Game.Files;
 /// so there it is linked into something else. Hence a LIST of candidates, each ASKED for the
 /// entry point rather than believed to have it.
 ///
-/// The managed decoder stays as the fallback. OozSharp is a port of the ooz decoder - Kraken,
-/// Mermaid, Selkie, Leviathan - and it is what runs when the install cannot be found or its
-/// library will not load.
+/// The managed decoder is the fallback, AND IT CANNOT READ PATH OF EXILE 2. Its package says
+/// "Kraken / Mermaid / Selkie / Leviathan"; its source says otherwise, in a comment - "Only need
+/// Mermaid for Fortnite" - and Mermaid is the only quantum decoder in it. The word Leviathan
+/// does not appear in that library at all.
 ///
-/// WHY THE ORDER IS THIS WAY ROUND, and it is not a preference. Measured on a real install
-/// (2026-08-10): the managed decoder refuses the index outright - 565 chunks, 113,943,153 bytes
-/// in, 147,897,312 expected out, and nothing comes back. The header and the chunk table read
-/// perfectly in the same breath, so it is the decoder and not the framing. An install whose
-/// pictures cannot be read is the whole item-art feature gone.
+/// PATH OF EXILE 2 PACKS WITH LEVIATHAN. Measured on a real install (2026-08-10): 565 chunks,
+/// 113,943,153 bytes in, 147,897,312 expected out, and the very first chunk begins 8C 0C - the
+/// low nibble of 0xC that says Oodle, and decoder type 12, which is Leviathan in ooz's own
+/// Kraken_DecodeStep. The header and the chunk table read perfectly in the same breath, so it is
+/// the decoder and nothing else.
+///
+/// WHAT THE MANAGED DECODER CALLED IT WAS WRONG: "Decoder type Selkie not supported". Its enum
+/// starts at 1 where Oodle's starts at 0, so every name it reports is one out. Selkie is a real
+/// codec and a wrong answer, and chasing it would have been a day. The name in a report is
+/// therefore read off the chunk here rather than taken from the decoder - see Codec.
 ///
 /// EVERYTHING AROUND THIS IS TESTED AND THIS IS NOT. There is no Oodle compressor to build a
 /// fixture with, so the chunk table, the range arithmetic and the index are all checked against
@@ -54,6 +60,21 @@ public static class Oodle
     /// </remarks>
     public static readonly string[] LibraryPatterns = ["oo2core*.dll", "bink2w64.dll"];
 
+    /// <summary>
+    /// What a chunk's decoder byte means, in the reference's numbering.
+    /// </summary>
+    /// <remarks>
+    /// OURS RATHER THAN THE DECODER'S, and that is not pedantry. OozSharp's enum starts at 1
+    /// where Oodle's starts at 0, so every name it reports is one out: it called this install's
+    /// Leviathan "Selkie", which is a real codec and a wrong answer, and the next person to read
+    /// that line would go looking for the wrong decoder. Numbering from ooz's own
+    /// Kraken_DecodeStep, which is where the format in this project came from.
+    /// </remarks>
+    private static readonly Dictionary<int, string> Codecs = new()
+    {
+        [5] = "LZNA", [6] = "Kraken", [10] = "Mermaid or Selkie", [11] = "BitKnit", [12] = "Leviathan",
+    };
+
     private static readonly OozSharp.Kraken Decoder = new();
     private static readonly Lock Gate = new();
 
@@ -75,16 +96,33 @@ public static class Oodle
     /// <param name="gameFolder">Where the game is. Null or missing falls straight back.</param>
     public static Unpacker For(string? gameFolder)
     {
-        if (Native.Load(gameFolder) is { } native)
+        // BESIDE THE TOOL AS WELL AS BESIDE THE GAME, and in its data folder. Path of Exile 2
+        // ships no Oodle library at all, so the game folder is often a dead end - but anybody
+        // who has Path of Exile 1, or another game that ships one, already has the file, and
+        // putting it in either of the other two is then the whole of the setup.
+        //
+        // EACH PLACE IS NAMED IN THE REPORT. Written without the names first, every line said
+        // "the game folder" about all three, including the two that are not it - which is a
+        // message that does not know what it is talking about, and worse than none.
+        (string Where, string? Folder)[] places =
+        [
+            ("the game folder", gameFolder),
+            ("beside the tool", AppContext.BaseDirectory),
+            ("the tool's data folder", Path.Combine(AppContext.BaseDirectory, "data")),
+        ];
+
+        var looked = new List<string>();
+        foreach ((string where, string? folder) in places)
         {
-            return new Unpacker(native.Decompress, $"the install's own {native.Called}");
+            if (Native.Load(folder) is { } native)
+            {
+                return new Unpacker(native.Decompress, $"{native.Called} {where}");
+            }
+
+            looked.Add($"{where}: {Native.LastProblem}");
         }
 
-        return new Unpacker(
-            Decompress,
-            string.IsNullOrEmpty(Native.LastProblem)
-                ? "the shipped managed decoder"
-                : $"the shipped managed decoder ({Native.LastProblem})");
+        return new Unpacker(Decompress, $"the shipped managed decoder ({string.Join("; ", looked)})");
     }
 
     /// <summary>
@@ -143,7 +181,26 @@ public static class Oodle
     private static void Refused(string what, ReadOnlyMemory<byte> packed)
     {
         ReadOnlySpan<byte> head = packed.Span[..Math.Min(8, packed.Length)];
-        LastRefusal = $"{what} (chunk starts {Convert.ToHexString(head)})";
+        LastRefusal = $"{what} - the chunk is {Codec(packed.Span)} ({Convert.ToHexString(head)})";
+    }
+
+    /// <summary>
+    /// Which compressor a chunk names itself as.
+    /// </summary>
+    /// <remarks>
+    /// A chunk says what it is in its first two bytes: the low nibble of the first is 0xC on
+    /// every Oodle chunk, and the low seven bits of the second are the decoder. Read here rather
+    /// than taken from whatever the decoder that just failed calls it - see <see cref="Codecs"/>.
+    /// </remarks>
+    public static string Codec(ReadOnlySpan<byte> chunk)
+    {
+        if (chunk.Length < 2 || (chunk[0] & 0xF) != 0xC)
+        {
+            return "not an Oodle chunk";
+        }
+
+        int type = chunk[1] & 0x7F;
+        return Codecs.TryGetValue(type, out string? named) ? $"{named} ({type})" : $"decoder type {type}";
     }
 
     /// <summary>
@@ -162,9 +219,10 @@ public static class Oodle
         private readonly unsafe delegate* unmanaged[Cdecl]<
             byte*, nint, byte*, nint, int, int, int, byte*, nint, void*, void*, void*, nint, int, nint> _decompress;
 
-        private unsafe Native(string called, nint entry)
+        private unsafe Native(string where, nint entry)
         {
-            Called = called;
+            Where = where;
+            Called = Path.GetFileName(where);
             _decompress = (delegate* unmanaged[Cdecl]<
                 byte*, nint, byte*, nint, int, int, int, byte*, nint, void*, void*, void*, nint, int, nint>)entry;
         }
@@ -172,17 +230,20 @@ public static class Oodle
         /// <summary>What the file is called, for the line that says which decoder ran.</summary>
         public string Called { get; }
 
+        /// <summary>And where it was, because which COPY answered is half of that line.</summary>
+        public string Where { get; }
+
         /// <summary>Why there is no native decoder, when there is none.</summary>
         public static string LastProblem => _problem;
 
-        /// <summary>Finds and loads it, or returns null and says why.</summary>
-        public static Native? Load(string? gameFolder)
+        /// <summary>Finds and loads it from one folder, or returns null and says why.</summary>
+        public static Native? Load(string? folder)
         {
             _problem = string.Empty;
 
-            if (string.IsNullOrWhiteSpace(gameFolder) || !Directory.Exists(gameFolder))
+            if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
             {
-                _problem = "no game folder to take one from";
+                _problem = "not there";
                 return null;
             }
 
@@ -194,12 +255,12 @@ public static class Oodle
                 string[] candidates =
                 [
                     .. LibraryPatterns.SelectMany(pattern =>
-                        Directory.EnumerateFiles(gameFolder, pattern).Order(StringComparer.Ordinal).Reverse()),
+                        Directory.EnumerateFiles(folder, pattern).Order(StringComparer.Ordinal).Reverse()),
                 ];
 
                 if (candidates.Length == 0)
                 {
-                    _problem = $"none of {string.Join(", ", LibraryPatterns)} in the game folder";
+                    _problem = $"no {string.Join(" or ", LibraryPatterns)}";
                     return null;
                 }
 
@@ -226,7 +287,7 @@ public static class Oodle
 
                     unsafe
                     {
-                        return new Native(called, entry);
+                        return new Native(file, entry);
                     }
                 }
 
