@@ -90,6 +90,11 @@ public static class StyleCatalogue
         new("terrain.outline", "Map", "Area layout", Line, Rgb(150, 200, 255)),
         new("map.unwalked", "Map", "Still to walk", StyleTraits.Colour | StyleTraits.Scale, Rgb(120, 150, 190, 140)),
 
+        // The colour here is the HOT end of the ramp; the cool end is derived from it, so one
+        // choice moves the whole scale rather than leaving somebody to match two ends by eye.
+        // Scale sizes the patch, which is how a picture is made denser or airier.
+        new("map.heat", "Map", "Heat map", StyleTraits.Colour | StyleTraits.Scale, Rgb(255, 80, 40, 190)),
+
         // ── Health bars ─────────────────────────────────────────────────────
         // The BAR takes its colour from the monster's rarity entry above, so that one choice
         // covers the dot and the bar together. What is here is everything the rarity cannot
@@ -161,6 +166,7 @@ public static class StyleCatalogue
         public const string RouteArrow = "route.arrow";
         public const string Terrain = "terrain.outline";
         public const string Unwalked = "map.unwalked";
+        public const string Heat = "map.heat";
         public const string HealthBar = "healthbar";
         public const string HealthBarBack = "healthbar.back";
         public const string HealthBarShield = "healthbar.shield";
@@ -184,7 +190,7 @@ public static class StyleCatalogue
         /// <summary>All of them, for the test that keeps them honest.</summary>
         public static IReadOnlyList<string> All { get; } =
         [
-            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Banner, BannerBack,
+            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Heat, Banner, BannerBack,
             PreloadBannerBack, PreloadListBack,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,

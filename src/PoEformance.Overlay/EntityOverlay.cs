@@ -79,6 +79,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _preloadPanel.Style = value;
             _preloadEntry.Style = value;
             _unwalked.Style = value;
+            _heat.Style = value;
             _healthBars.Style = value;
             _atlas.Style = value;
         }
@@ -215,6 +216,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private AlertWatcher? _alerts;
     private readonly AlertBanner _banner = new();
     private readonly UnwalkedLayer _unwalked = new();
+    private readonly HeatLayer _heat = new();
     private readonly HealthBarLayer _healthBars = new();
     private readonly AtlasLayer _atlas = new();
     private AtlasWatch? _atlasWatch;
@@ -1084,7 +1086,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             if (_damageWindow is null)
             {
-                _damageWindow = new DamageWindow(meter);
+                _damageWindow = new DamageWindow(meter) { Heat = _heat };
                 _tools.Add(30, "damage", "Damage", _damageWindow.DrawTab);
             }
 
@@ -1638,6 +1640,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         ImDrawListPtr draw = ImGui.GetBackgroundDrawList();
+
+        // UNDER EVERYTHING, including the layout: it is the ground the rest is read against,
+        // and a monster dot lost behind a heat patch is a marker that did not work.
+        if (Damage is DamageMeter measured)
+        {
+            _heat.Draw(draw, map, measured.Heat, player, _snapshot.AreaHash);
+        }
 
         // Under the markers: the layout is context, not the thing being looked for.
         if (ShowTerrain && Style.Visible(StyleCatalogue.Keys.Terrain) && _snapshot.Terrain is TerrainGrid terrain)
