@@ -124,6 +124,10 @@ public sealed class DamageMeter
     // a pool of nought are different things, and a death must not read as one huge hit.
     private int? _pool;
     private long _tookThisStretch;
+
+    // Where the player was at the last reading, so the heat can be laid along the step rather
+    // than dropped at the end of it. Null in a fresh area: there is no step from nowhere.
+    private (float X, float Y)? _wasAt;
     private long _sampledObserved;
     private long _sampledHurt;
     private long _sampledUntouched;
@@ -468,6 +472,7 @@ public sealed class DamageMeter
         WorstHitAgainst = default;
         _pool = null;
         _tookThisStretch = 0;
+        _wasAt = null;
     }
 
     /// <summary>Takes one snapshot and moves the figures on.</summary>
@@ -539,10 +544,15 @@ public sealed class DamageMeter
         Suffer(snapshot);
 
         // Where all of that happened - which is the one thing the meter was never writing down
-        // alongside how much of it there was.
+        // alongside how much of it there was. Along the STEP rather than at the point of the
+        // read: a running player crosses more than one patch in a thirtieth of a second, and
+        // filing everything at the destination leaves a dotted line through ground they walked.
         if (snapshot.Player is WorldEntity here)
         {
-            Heat.Add(snapshot.AreaHash, here.WorldX, here.WorldY, dealt, Taken - tookBefore, dt);
+            (float fromX, float fromY) = _wasAt ?? (here.WorldX, here.WorldY);
+            Heat.Add(
+                snapshot.AreaHash, fromX, fromY, here.WorldX, here.WorldY, dealt, Taken - tookBefore, dt);
+            _wasAt = (here.WorldX, here.WorldY);
         }
 
         Record(nowMs, snapshot);

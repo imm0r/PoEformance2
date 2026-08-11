@@ -91,22 +91,79 @@ public sealed class HeatMap
         => (patchX * Step * MapView.WorldToGrid, patchY * Step * MapView.WorldToGrid);
 
     /// <summary>
-    /// Records what happened where the player is standing.
+    /// How many patches a step may be spread across before it is treated as a jump.
     /// </summary>
     /// <remarks>
+    /// A portal, a loading screen or a dash puts the player somewhere they did not walk, and
+    /// painting the line between would be a stripe across the map along ground nobody crossed.
+    /// Sixteen patches is far more than a thirtieth of a second of running and far less than
+    /// any teleport.
+    /// </remarks>
+    public const int MostStepsAcross = 16;
+
+    /// <summary>
+    /// Records what happened along the step the player just took.
+    /// </summary>
+    /// <remarks>
+    /// ALONG THE STEP, not at the destination. Reads land thirty times a second and a running
+    /// player crosses more than one patch between two of them, so filing everything at the
+    /// point of the read leaves a DOTTED line - patches with gaps between them that the player
+    /// walked straight through. That is what made the first picture look sparse: not a lack of
+    /// data, a lack of the ground between the samples.
+    ///
+    /// The amounts are split evenly across the patches crossed. Whether the damage really
+    /// happened at the start or the end of a thirtieth of a second is not a thing this can
+    /// know, and pretending otherwise by putting all of it on one end would be a sharper
+    /// picture of something invented.
+    ///
     /// Takes the amounts rather than reading them, because the only place that knows how much
     /// happened in ONE read is the meter that just worked it out - a running total handed over
     /// here would have to be differenced twice.
     /// </remarks>
-    public void Add(uint area, float worldX, float worldY, long dealt, long taken, float seconds)
+    public void Add(
+        uint area, float fromX, float fromY, float toX, float toY, long dealt, long taken, float seconds)
     {
         if (area == 0 || (dealt <= 0 && taken <= 0 && seconds <= 0f))
         {
             return;
         }
 
-        (int x, int y) = PatchOf(worldX, worldY);
+        (int firstX, int firstY) = PatchOf(fromX, fromY);
+        (int lastX, int lastY) = PatchOf(toX, toY);
 
+        int across = Math.Max(Math.Abs(lastX - firstX), Math.Abs(lastY - firstY));
+        if (across is <= 0 or > MostStepsAcross)
+        {
+            // One patch, or a jump. Either way the destination is the only place known to be
+            // true, so it takes the whole of it.
+            One(area, lastX, lastY, dealt, taken, seconds);
+            return;
+        }
+
+        // Every patch the step passed through, the ends included. Whole numbers rather than a
+        // line-drawing algorithm: at this size the difference is a patch's corner, and a corner
+        // is smaller than the blur a heat map is drawn with anyway.
+        int steps = across + 1;
+        for (int i = 0; i < steps; i++)
+        {
+            float along = (float)i / across;
+            One(
+                area,
+                (int)MathF.Round(firstX + ((lastX - firstX) * along)),
+                (int)MathF.Round(firstY + ((lastY - firstY) * along)),
+                dealt / steps,
+                taken / steps,
+                seconds / steps);
+        }
+    }
+
+    /// <summary>Records against one place, for a caller that took no step.</summary>
+    public void Add(uint area, float worldX, float worldY, long dealt, long taken, float seconds)
+        => Add(area, worldX, worldY, worldX, worldY, dealt, taken, seconds);
+
+    /// <summary>Records against one patch.</summary>
+    private void One(uint area, int x, int y, long dealt, long taken, float seconds)
+    {
         lock (_gate)
         {
             // A cap rather than an eviction policy: heat is only ever read for the area being

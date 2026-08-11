@@ -162,11 +162,57 @@ public class HeatMapTests
 
         IReadOnlyList<(int X, int Y, HeatCell Cell)> patches = meter.Heat.In(1);
 
-        Assert.Equal(2, patches.Count);
+        // The damage lands where it was dealt - standing still both times.
         Assert.Equal(600, patches.Single(patch => patch.X == 0).Cell.Dealt);
         Assert.Equal(300, patches.Single(patch => patch.X == 10).Cell.Dealt);
 
-        // Time lands where the damage did, so the third picture is of the same run.
+        // And the WALK between them is painted too: eleven patches, not two. Reads land thirty
+        // times a second and a running player crosses several patches between them, so filing
+        // everything at the point of the read leaves a dotted line through ground that was
+        // walked straight across - which is what made the first picture look sparse.
+        Assert.Equal(11, patches.Count);
         Assert.True(patches.All(patch => patch.Cell.Seconds > 0f));
+    }
+
+    [Fact]
+    public void ANDAJumpIsNotAWalk()
+    {
+        // A portal, a loading screen or a dash puts the player somewhere they did not walk.
+        // Painting the line between would be a stripe across the map along ground nobody
+        // crossed - which is a picture of something that did not happen.
+        var heat = new HeatMap();
+
+        heat.Add(
+            1,
+            Patch(0),
+            0f,
+            Patch(HeatMap.MostStepsAcross + 5),
+            0f,
+            dealt: 1000,
+            taken: 0,
+            seconds: 1f);
+
+        (int x, int _, HeatCell cell) = Assert.Single(heat.In(1));
+
+        Assert.Equal(HeatMap.MostStepsAcross + 5, x);
+        Assert.Equal(1000, cell.Dealt);
+    }
+
+    [Fact]
+    public void ANDTheStepIsSharedRatherThanCountedTwice()
+    {
+        // Split across the patches crossed, so a walk does not multiply the damage by however
+        // many patches it happened to cover. The picture has to add up to what was measured.
+        var heat = new HeatMap();
+        heat.Add(1, Patch(0), 0f, Patch(3), 0f, dealt: 400, taken: 0, seconds: 0f);
+
+        long total = 0;
+        foreach ((int _, int _, HeatCell cell) in heat.In(1))
+        {
+            total += cell.Dealt;
+        }
+
+        Assert.Equal(4, heat.In(1).Count);
+        Assert.Equal(400, total);
     }
 }
