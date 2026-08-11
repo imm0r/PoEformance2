@@ -30,8 +30,21 @@ public sealed class DamageWindow
     // figure, and it should not read as loudly as the part that was watched.
     private static readonly Vector4 SoftText = new(0.78f, 0.62f, 0.42f, 1f);
 
+    // The graph's three bands. A DELIBERATE RAMP from known to assumed - a bright, certain
+    // yellow at the bottom, through orange, to a dull red on top - so the eye reads how much
+    // of a spike was measured without being told. The text rows above use quieter versions of
+    // the same three hues; a band has to hold its own against the plate behind it, and a row
+    // of text does not.
+    private static readonly Vector4 WatchedBar = new(1f, 0.85f, 0.30f, 0.95f);
+    private static readonly Vector4 CreditedBar = new(0.95f, 0.55f, 0.22f, 0.95f);
+    private static readonly Vector4 UntouchedBar = new(0.74f, 0.32f, 0.28f, 0.95f);
+    private static readonly Vector4 PlotBack = new(0.08f, 0.09f, 0.11f, 0.85f);
+
     private readonly DamageMeter _meter;
     private readonly Func<long> _clock;
+
+    private bool _thisMapOnly = true;
+    private float _height = 90f;
 
     /// <param name="clock">
     /// The same monotonic clock the reader stamps with, so "how long since this was hit"
@@ -43,6 +56,9 @@ public sealed class DamageWindow
         _meter = meter;
         _clock = clock ?? (() => Environment.TickCount64);
     }
+
+    /// <summary>The area being read right now, so "this map only" has something to mean.</summary>
+    public uint CurrentArea { get; set; }
 
     /// <summary>Draws the tab's content.</summary>
     public void DrawTab()
@@ -125,7 +141,158 @@ public sealed class DamageWindow
         }
 
         ImGui.Separator();
+        DrawGraph();
+
+        ImGui.Separator();
         DrawTargets();
+    }
+
+    /// <summary>
+    /// What the damage did over the map, as a stacked band per quarter second.
+    /// </summary>
+    /// <remarks>
+    /// STACKED AND COLOURED rather than one line, because the split is the interesting part.
+    /// The height of a bar is the damage rate, and the colours say how much of it was really
+    /// known: the solid base was watched off monsters' health, the middle was credited to
+    /// monsters already being hurt, and the top rests entirely on the assumption. A burst made
+    /// of the top band is a different event from the same burst made of the base, and one line
+    /// cannot tell them apart - which matters here more than in most graphs, because on a
+    /// build that one-shots packs the assumed part is the majority.
+    ///
+    /// Drawn by hand rather than with PlotLines, which takes one series in one colour and is
+    /// therefore exactly the graph this must not be.
+    /// </remarks>
+    private void DrawGraph()
+    {
+        uint scope = _thisMapOnly ? CurrentArea : 0;
+
+        ImGui.Checkbox("this map only##dmg", ref _thisMapOnly);
+        ImGui.SameLine();
+        if (ImGui.Button("start over##dmg"))
+        {
+            _meter.History.Clear();
+        }
+
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(140f);
+        ImGui.SliderFloat("height##dmg", ref _height, 40f, 240f, "%.0f px");
+
+        IReadOnlyList<DamageSample> samples = _meter.History.In(scope);
+        if (samples.Count == 0)
+        {
+            ImGui.TextColored(
+                DimText,
+                _thisMapOnly && CurrentArea == 0
+                    ? "not in an area - nothing to scope to"
+                    : "nothing measured yet - the graph fills as damage is done");
+            return;
+        }
+
+        float tallest = _meter.History.Highest(scope);
+        Vector2 size = new(MathF.Max(120f, ImGui.GetContentRegionAvail().X - 90f), _height);
+        Vector2 at = ImGui.GetCursorScreenPos();
+
+        // An invisible button rather than a Dummy: it reserves the same space AND makes the
+        // plot hoverable, which is what turns a picture into something a number can be read
+        // off. A graph nobody can query is decoration.
+        ImGui.InvisibleButton("##dmg-plot", size);
+
+        ImDrawListPtr draw = ImGui.GetWindowDrawList();
+        draw.AddRectFilled(at, at + size, ImGui.ColorConvertFloat4ToU32(PlotBack), 3f);
+
+        if (tallest <= 0f)
+        {
+            draw.AddText(at + new Vector2(6f, 4f), ImGui.ColorConvertFloat4ToU32(DimText), "no damage in this scope");
+            return;
+        }
+
+        // Newest on the RIGHT, and only as many bars as there are pixels: a map's worth of
+        // samples is thousands and the plot is hundreds wide, so drawing them all would stack
+        // several on every column and cost the frames to do it. The recent end is the end
+        // anybody is looking at, so that is the end that is kept.
+        int columns = Math.Min(samples.Count, (int)size.X);
+        float step = size.X / columns;
+        int first = samples.Count - columns;
+
+        uint watched = ImGui.ColorConvertFloat4ToU32(WatchedBar);
+        uint credited = ImGui.ColorConvertFloat4ToU32(CreditedBar);
+        uint untouched = ImGui.ColorConvertFloat4ToU32(UntouchedBar);
+
+        for (int i = 0; i < columns; i++)
+        {
+            DamageSample sample = samples[first + i];
+            float left = at.X + (i * step);
+            float right = left + MathF.Max(1f, step);
+            float bottom = at.Y + size.Y;
+
+            // Bottom up, in order of how well known each part is. Each band's height is its
+            // own share of the bar, so the total is the rate and the colours are the split.
+            bottom = Band(draw, left, right, bottom, sample.Watched, tallest, size.Y, watched);
+            bottom = Band(draw, left, right, bottom, sample.Credited, tallest, size.Y, credited);
+            Band(draw, left, right, bottom, sample.Untouched, tallest, size.Y, untouched);
+        }
+
+        // The ceiling, so a bar's height can be turned into a number without hovering it.
+        draw.AddLine(at, at + new Vector2(size.X, 0f), ImGui.ColorConvertFloat4ToU32(DimText), 1f);
+        draw.AddText(
+            at + new Vector2(4f, 2f), ImGui.ColorConvertFloat4ToU32(DimText), $"{Number(tallest)} dps");
+
+        DrawHover(draw, at, size, samples, first, columns, step);
+
+        ImGui.SameLine();
+        ImGui.BeginGroup();
+        ImGui.TextColored(WatchedBar, "watched");
+        ImGui.TextColored(CreditedBar, "credited");
+        ImGui.TextColored(UntouchedBar, "untouched");
+        ImGui.TextColored(DimText, $"{_meter.History.SecondsIn(scope) / 60:F1} min");
+        ImGui.EndGroup();
+    }
+
+    /// <summary>One band of a stacked bar. Returns the top it reached, for the next one up.</summary>
+    private static float Band(
+        ImDrawListPtr draw, float left, float right, float bottom, float value, float tallest, float height, uint colour)
+    {
+        if (value <= 0f)
+        {
+            return bottom;
+        }
+
+        float top = bottom - (value / tallest * height);
+        draw.AddRectFilled(new Vector2(left, top), new Vector2(right, bottom), colour);
+        return top;
+    }
+
+    /// <summary>The three numbers behind whichever bar the cursor is on.</summary>
+    /// <remarks>
+    /// In a tooltip rather than on the plot, because the answer is wanted for one bar at a
+    /// time and labelling every bar is how a graph becomes unreadable.
+    /// </remarks>
+    private void DrawHover(
+        ImDrawListPtr draw,
+        Vector2 at,
+        Vector2 size,
+        IReadOnlyList<DamageSample> samples,
+        int first,
+        int columns,
+        float step)
+    {
+        if (!ImGui.IsItemHovered())
+        {
+            return;
+        }
+
+        int column = Math.Clamp((int)((ImGui.GetMousePos().X - at.X) / step), 0, columns - 1);
+        float line = at.X + (column * step) + (step * 0.5f);
+        draw.AddLine(
+            new Vector2(line, at.Y), new Vector2(line, at.Y + size.Y), ImGui.ColorConvertFloat4ToU32(DimText), 1f);
+
+        DamageSample sample = samples[first + column];
+        ImGui.BeginTooltip();
+        ImGui.TextColored(DpsText, $"{Number(sample.Total)} dps");
+        ImGui.TextColored(WatchedBar, $"watched    {Number(sample.Watched)}");
+        ImGui.TextColored(CreditedBar, $"credited   {Number(sample.Credited)}");
+        ImGui.TextColored(UntouchedBar, $"untouched  {Number(sample.Untouched)}");
+        ImGui.EndTooltip();
     }
 
     /// <summary>

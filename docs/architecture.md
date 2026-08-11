@@ -288,6 +288,17 @@ interesting part was not the feature:
 - **Read cost over time.** A live number answers "is it slow now", which you can already see.
   The useful questions need the shape over a whole map, per phase — one graph for the total
   says a frame was expensive and nothing about why.
+- **Damage over time, stacked by how much of it is known.** The same argument one step on: a
+  live dps figure answers "how am I doing right now", and the questions worth asking need the
+  shape. Two things decide whether such a graph is worth having. It plots a RATE, taken as the
+  difference of the meter's running totals over a fixed quarter-second — a total over a map only
+  goes up, and the shape of a ramp says nothing; taking differences of the meter's own numbers
+  also means the graph and the readout cannot disagree, whatever the crediting rules decide. And
+  it is STACKED in three colours rather than drawn as one line, because on a build that one-shots
+  packs the majority of the figure is inferred rather than watched: a burst made of the assumed
+  band is a different event from the same burst watched off monsters' health, and one line cannot
+  tell them apart. `PlotLines` takes one series in one colour and is therefore exactly the graph
+  this must not be, so it is drawn by hand.
 - **Complete overlay configurability.** A catalogue of every drawn thing, with the editor
   GENERATED from it, because a hand-written settings page is how a tool ends up with fourteen
   configurable things and three that are not. The promise it makes — everything painted over

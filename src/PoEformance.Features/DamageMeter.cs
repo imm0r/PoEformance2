@@ -104,6 +104,18 @@ public sealed class DamageMeter
     private uint _area;
     private float _overall;
 
+    // What the three running totals stood at when the last sample was written down, and when
+    // that was. Differences against these are what a sample IS - the meter's own totals only
+    // ever grow, and a graph of a growing total is a ramp.
+    //
+    // NULLABLE for the same reason _stampMs above is, and this repeated that mistake before
+    // the tests caught it: zero is a perfectly good timestamp, so a sentinel of zero means a
+    // clock that starts there never leaves the establishing branch.
+    private long? _sampledAtMs;
+    private long _sampledObserved;
+    private long _sampledHurt;
+    private long _sampledUntouched;
+
     // When the last reading was taken, or null when there is no baseline to measure against -
     // a fresh area, or the first reading back after a loading screen. Nullable rather than a
     // sentinel of zero, because zero is a perfectly good timestamp and a test that starts
@@ -179,6 +191,16 @@ public sealed class DamageMeter
 
     /// <summary>The highest <see cref="Dps"/> reached in this area.</summary>
     public float Peak { get; private set; }
+
+    /// <summary>
+    /// What the damage was doing over the map, kept so it can be looked at as a shape.
+    /// </summary>
+    /// <remarks>
+    /// Owned here rather than serviced separately because this is the only place that knows
+    /// both when a reading happened and which area it was in - a second service call would be
+    /// a second clock to keep in step with this one.
+    /// </remarks>
+    public DamageHistory History { get; } = new();
 
     /// <summary>Total damage watched fall off monster health in this area.</summary>
     public long Observed { get; private set; }
@@ -369,6 +391,15 @@ public sealed class DamageMeter
         FurthestSeen = -1f;
         _creditedDistanceByPool = 0;
         _creditedPoolWithDistance = 0;
+
+        // The baselines, but NOT the history: the totals restart at nought in a new area, so
+        // leaving them where they were would make the first sample of the map the whole of the
+        // last one, negated. What was recorded stays - it is filed by area, and the map before
+        // this one is a thing somebody wants to look back at.
+        _sampledAtMs = null;
+        _sampledObserved = 0;
+        _sampledHurt = 0;
+        _sampledUntouched = 0;
     }
 
     /// <summary>Takes one snapshot and moves the figures on.</summary>
@@ -396,6 +427,11 @@ public sealed class DamageMeter
             // decaying to zero across a portal and back - and dropping the baseline means
             // the first reading on the way back is not read as ten seconds of nothing.
             _stampMs = null;
+
+            // And the graph's stretch with it, for the same reason. Held, the next sample
+            // would cover the whole loading screen - a bar several seconds wide reported as a
+            // quarter second's worth of nothing.
+            _sampledAtMs = null;
             return;
         }
 
@@ -405,6 +441,11 @@ public sealed class DamageMeter
         {
             _stampMs = nowMs;
             Absorb(snapshot, nowMs);
+
+            // The graph's first stretch starts HERE, at the area's first reading. Left until
+            // the second one, the first sample would carry the damage of the interval before
+            // it as well - measured against a baseline of nought that was never true.
+            Record(nowMs);
             return;
         }
 
@@ -420,6 +461,53 @@ public sealed class DamageMeter
         _stampMs = nowMs;
         long dealt = Damage(snapshot, nowMs, dt);
         Advance(dealt, dt);
+        Record(nowMs);
+    }
+
+    /// <summary>
+    /// Writes down what the last stretch did, once the stretch is long enough to be one.
+    /// </summary>
+    /// <remarks>
+    /// The three parts are taken as DIFFERENCES of the running totals rather than accumulated
+    /// alongside them, which keeps this honest by construction: whatever the counting above
+    /// decides - a credit refused for distance, a monster that came back - the graph shows the
+    /// same figure the readout does, because it is made of the same numbers.
+    /// </remarks>
+    private void Record(long nowMs)
+    {
+        // No baseline yet - the first reading of an area. Take one, TOTALS AND ALL: a baseline
+        // that remembers only the time measures the next stretch against nought, which reads
+        // as every point of damage since the area loaded happening in one quarter second.
+        if (_sampledAtMs is not long from)
+        {
+            Baseline(nowMs);
+            return;
+        }
+
+        long span = nowMs - from;
+        if (span < DamageHistory.IntervalMs)
+        {
+            return;
+        }
+
+        float seconds = span / 1000f;
+        History.Add(new DamageSample(
+            nowMs,
+            _area,
+            (Observed - _sampledObserved) / seconds,
+            (CreditedHurt - _sampledHurt) / seconds,
+            (CreditedUntouched - _sampledUntouched) / seconds));
+
+        Baseline(nowMs);
+    }
+
+    /// <summary>Marks where the next stretch starts, in time and in all three totals.</summary>
+    private void Baseline(long nowMs)
+    {
+        _sampledAtMs = nowMs;
+        _sampledObserved = Observed;
+        _sampledHurt = CreditedHurt;
+        _sampledUntouched = CreditedUntouched;
     }
 
     /// <summary>Notes every monster's pool without counting any damage.</summary>
