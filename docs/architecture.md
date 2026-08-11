@@ -288,6 +288,23 @@ interesting part was not the feature:
 - **Read cost over time.** A live number answers "is it slow now", which you can already see.
   The useful questions need the shape over a whole map, per phase — one graph for the total
   says a frame was expensive and nothing about why.
+- **Damage over time, stacked by how much of it is known.** The same argument one step on: a
+  live dps figure answers "how am I doing right now", and the questions worth asking need the
+  shape. Two things decide whether such a graph is worth having. It plots a RATE, taken as the
+  difference of the meter's running totals over a fixed quarter-second — a total over a map only
+  goes up, and the shape of a ramp says nothing; taking differences of the meter's own numbers
+  also means the graph and the readout cannot disagree, whatever the crediting rules decide. And
+  it is STACKED in three colours rather than drawn as one line, because on a build that one-shots
+  packs the majority of the figure is inferred rather than watched: a burst made of the assumed
+  band is a different event from the same burst watched off monsters' health, and one line cannot
+  tell them apart. `PlotLines` takes one series in one colour and is therefore exactly the graph
+  this must not be, so it is drawn by hand — which also buys the hover readout, and each bar
+  carries a **census of what was around** when it happened, by rarity. That is what makes the
+  number mean anything: five thousand into a rare is a build working, and five thousand into
+  forty white monsters is a build that cannot single-target. Counted through the meter's own
+  monster filter, so the census describes the monsters the figure is about; in the game's own
+  rarity colours, which nobody has to learn. Not the boss flag — it sits in the schema marked as
+  an unverified hypothesis, and a readout is not what an unverified offset gets built on.
 - **Complete overlay configurability.** A catalogue of every drawn thing, with the editor
   GENERATED from it, because a hand-written settings page is how a tool ends up with fourteen
   configurable things and three that are not. The promise it makes — everything painted over
@@ -385,6 +402,14 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   place is a node it is not drawing, so it is dropped. The general lesson: a cached position is
   a lie whose cost depends entirely on what is drawn from it, and adding a new thing drawn from
   it can turn an invisible lie into the whole screen.
+- **A route is RUNS, not a polyline.** A route can cross a map the panel has no position for —
+  one the atlas has not materialised, or a grid position the edge table names that no map sits
+  on. Dropping that step and carrying on sounds harmless ("the line still goes the right way,
+  one corner cut") and is not: the line then runs straight across the gap, along no connection
+  anybody can walk, and with several steps missing what is drawn is a straight line between two
+  maps nowhere near each other. So a missing step ENDS a run and the next found step starts a
+  new one — which is what the reference does, setting its previous point back to nothing rather
+  than joining across. A hole is the honest answer; a bridge is an invented connection.
 - **The web is between the maps ON THE SCREEN.** Hiding the finished maps and the unreachable
   ones is how an atlas is made readable; a line to a hidden map is a line to nothing. The
   contract said "between drawn maps" and the code walked every live node — which drew nought

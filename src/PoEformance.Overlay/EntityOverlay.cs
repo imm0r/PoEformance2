@@ -1080,10 +1080,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // Registered on first use for the same reason as the cost tab: the meter is a
         // property, so the tab appears once there is something behind it.
-        if (Damage is DamageMeter meter && _damageWindow is null)
+        if (Damage is DamageMeter meter)
         {
-            _damageWindow = new DamageWindow(meter);
-            _tools.Add(30, "damage", "Damage", _damageWindow.DrawTab);
+            if (_damageWindow is null)
+            {
+                _damageWindow = new DamageWindow(meter);
+                _tools.Add(30, "damage", "Damage", _damageWindow.DrawTab);
+            }
+
+            _damageWindow.CurrentArea = _snapshot.AreaHash;
         }
 
         // Polled outside the tools window on purpose: F8 captures what is under the cursor

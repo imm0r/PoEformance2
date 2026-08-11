@@ -102,7 +102,7 @@ public sealed class AtlasLayer
         {
             foreach (AtlasMark mark in view.Marks)
             {
-                if (mark.Route.Count >= 2)
+                if (mark.Route.Count > 0)
                 {
                     DrawRoute(draw, mark, screen);
                 }
@@ -120,6 +120,10 @@ public sealed class AtlasLayer
 
     /// <summary>Draws the way to one map, in its group's colour.</summary>
     /// <remarks>
+    /// RUN BY RUN, with the holes left as holes. A route can cross a map the panel has no
+    /// position for, and a line joining the two sides of that gap runs along no connection
+    /// anybody can walk - which is what "some of the lines are arbitrary" was.
+    ///
     /// With the marker on the end NEAREST YOU rather than on the destination. The destination
     /// is already named and coloured; what a route is actually asked is "which of the maps I
     /// can enter now does this start from", and that end is otherwise just where a line stops.
@@ -129,22 +133,29 @@ public sealed class AtlasLayer
         uint colour = ColourOf(mark, 0.55f);
         float width = Style.Width(StyleCatalogue.Keys.AtlasRoute, 4f);
 
-        for (int i = 1; i < mark.Route.Count; i++)
+        foreach (IReadOnlyList<Vector2> run in mark.Route)
         {
-            if (Worth(mark.Route[i - 1], mark.Route[i], screen))
+            for (int i = 1; i < run.Count; i++)
             {
-                draw.AddLine(mark.Route[i - 1], mark.Route[i], colour, width);
+                if (Worth(run[i - 1], run[i], screen))
+                {
+                    draw.AddLine(run[i - 1], run[i], colour, width);
+                }
             }
         }
 
-        if (!Style.Visible(StyleCatalogue.Keys.AtlasEntry) || !On(mark.Route[0], screen))
+        // The near end of the FIRST run, which is the nearest end that could be placed. With
+        // the start of the route missing there is nothing honest to mark, and the dot is
+        // better absent than sitting on a map the route does not begin at.
+        Vector2 entry = mark.Route[0][0];
+        if (!Style.Visible(StyleCatalogue.Keys.AtlasEntry) || !On(entry, screen))
         {
             return;
         }
 
         float radius = Style.Sized(StyleCatalogue.Keys.AtlasEntry, MathF.Max(3f, width * 1.3f));
-        draw.AddCircleFilled(mark.Route[0], radius, Style.Colour(StyleCatalogue.Keys.AtlasEntry));
-        draw.AddCircle(mark.Route[0], radius, 0xFF00_0000, 0, MathF.Max(1f, radius * 0.35f));
+        draw.AddCircleFilled(entry, radius, Style.Colour(StyleCatalogue.Keys.AtlasEntry));
+        draw.AddCircle(entry, radius, 0xFF00_0000, 0, MathF.Max(1f, radius * 0.35f));
     }
 
     /// <summary>Draws one map's name, and what is in it underneath.</summary>

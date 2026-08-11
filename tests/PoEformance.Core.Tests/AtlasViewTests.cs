@@ -104,7 +104,10 @@ public class AtlasViewTests
 
         AtlasMark citadel = Assert.Single(view.Marks, mark => mark.MapId == "MapUberBoss_CopperCitadel");
         Assert.Equal(2, citadel.Hops);
-        Assert.Equal(3, citadel.Route.Count);
+
+        // One unbroken run of three: hiding a map takes away its LABEL, not its position, so
+        // the way through it is still a way somebody can walk.
+        Assert.Equal(3, Assert.Single(citadel.Route).Count);
 
         // And with routing switched off, the same setting does hide it - so the exception
         // above is the routing, not the hiding quietly not working.
@@ -141,15 +144,17 @@ public class AtlasViewTests
             Compose([here, between, far], AtlasSettings.Default, Grouping(loose), routes).Marks,
             found => found.MapId == "MapFar");
 
-        Assert.Equal(3, within.Route.Count);
+        Assert.Equal(3, Assert.Single(within.Route).Count);
     }
 
     [Fact]
-    public void ARouteThroughSomewhereScrolledOffTheAtlasKeepsGoing()
+    public void AROUTEIsBrokenAtAMapNothingCanBePlacedFor()
     {
-        // A route can pass through a node the atlas is not drawing this tick. Dropping the
-        // point cuts a corner; dropping the route makes the line flicker out whenever it
-        // crosses the edge of the screen.
+        // NOT joined across, which is what this used to do. A route can cross a map the panel
+        // has no position for - one the atlas has not materialised, or a grid position the edge
+        // table names that no map sits on - and a line from the map before it to the map after
+        // runs along no connection anybody can walk. With several steps missing that is a
+        // straight line between two maps nowhere near each other: the arbitrary line.
         AtlasNode here = Node(0, 0, "MapAugury", AtlasNodeState.Open, joined: [(1, 0)]);
         AtlasNode between = Node(1, 0, "MapArroyo", AtlasNodeState.Locked, joined: [(0, 0), (2, 0)]);
         AtlasNode far = Node(2, 0, "MapFar", AtlasNodeState.Locked, joined: [(1, 0)]);
@@ -162,8 +167,42 @@ public class AtlasViewTests
             Compose([here, far], AtlasSettings.Default, Grouping(groups), routes).Marks,
             found => found.MapId == "MapFar");
 
-        Assert.Equal(2, mark.Route.Count);
+        // Two ends and nothing in between: neither is a run of its own, so nothing is drawn -
+        // and the hop count still says how far it is, so the map does not look next door.
+        Assert.Empty(mark.Route);
         Assert.Equal(2, mark.Hops);
+    }
+
+    [Fact]
+    public void ANDTheRunsEitherSideOfAHoleAreStillDrawn()
+    {
+        // Broken is not the same as dropped. What can be placed is still the truth about where
+        // the route goes; only the join across the hole was ever an invention.
+        var centres = new Dictionary<(int X, int Y), Vector2>
+        {
+            [(0, 0)] = new(0, 0),
+            [(1, 0)] = new(10, 0),
+            // (2,0) is missing - the hole
+            [(3, 0)] = new(30, 0),
+            [(4, 0)] = new(40, 0),
+        };
+
+        IReadOnlyList<IReadOnlyList<Vector2>> runs =
+            AtlasWatch.Screened([(0, 0), (1, 0), (2, 0), (3, 0), (4, 0)], centres);
+
+        Assert.Equal(2, runs.Count);
+        Assert.Equal([new Vector2(0, 0), new Vector2(10, 0)], runs[0]);
+        Assert.Equal([new Vector2(30, 0), new Vector2(40, 0)], runs[1]);
+    }
+
+    [Fact]
+    public void ANDALoneStepIsNoRunAtAll()
+    {
+        // One point is a corner nobody can see. Kept, it would put the entry dot on a map the
+        // route does not begin at, which reads as a starting point and is not one.
+        var centres = new Dictionary<(int X, int Y), Vector2> { [(0, 0)] = new(0, 0), [(3, 0)] = new(30, 0) };
+
+        Assert.Empty(AtlasWatch.Screened([(0, 0), (1, 0), (2, 0), (3, 0)], centres));
     }
 
     [Fact]
