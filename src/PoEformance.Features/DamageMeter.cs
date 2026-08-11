@@ -445,7 +445,7 @@ public sealed class DamageMeter
             // The graph's first stretch starts HERE, at the area's first reading. Left until
             // the second one, the first sample would carry the damage of the interval before
             // it as well - measured against a baseline of nought that was never true.
-            Record(nowMs);
+            Record(nowMs, snapshot);
             return;
         }
 
@@ -461,8 +461,23 @@ public sealed class DamageMeter
         _stampMs = nowMs;
         long dealt = Damage(snapshot, nowMs, dt);
         Advance(dealt, dt);
-        Record(nowMs);
+        Record(nowMs, snapshot);
     }
+
+    /// <summary>
+    /// How far a monster counts as "around" for the census. About a screen's radius.
+    /// </summary>
+    /// <remarks>
+    /// HALF of <see cref="ScreenWorldUnits"/>, which is that figure's own see-radius before it
+    /// was doubled into a width - so this is a radius measured as a radius, unlike the credit
+    /// gate, which is a distance bound expressed in that same doubled figure. Said here because
+    /// the two numbers look like they should agree and do not.
+    ///
+    /// Not adjustable, unlike the credit gate: nothing rests on it. A census that is a little
+    /// wide or a little narrow is still a fair account of what a bar was fought against,
+    /// whereas the gate decides whether damage is counted at all.
+    /// </remarks>
+    public const float NearbyWorldUnits = ScreenWorldUnits / 2f;
 
     /// <summary>
     /// Writes down what the last stretch did, once the stretch is long enough to be one.
@@ -473,7 +488,7 @@ public sealed class DamageMeter
     /// decides - a credit refused for distance, a monster that came back - the graph shows the
     /// same figure the readout does, because it is made of the same numbers.
     /// </remarks>
-    private void Record(long nowMs)
+    private void Record(long nowMs, WorldSnapshot snapshot)
     {
         // No baseline yet - the first reading of an area. Take one, TOTALS AND ALL: a baseline
         // that remembers only the time measures the next stretch against nought, which reads
@@ -496,9 +511,68 @@ public sealed class DamageMeter
             _area,
             (Observed - _sampledObserved) / seconds,
             (CreditedHurt - _sampledHurt) / seconds,
-            (CreditedUntouched - _sampledUntouched) / seconds));
+            (CreditedUntouched - _sampledUntouched) / seconds,
+            Census(snapshot)));
 
         Baseline(nowMs);
+    }
+
+    /// <summary>What is around right now, by rarity.</summary>
+    /// <remarks>
+    /// Through the SAME filter the damage goes through, so the census is an account of the
+    /// monsters this figure is about rather than of everything in the entity list - effects,
+    /// friendly things and corpses are not what a bar was fought against.
+    ///
+    /// With no player there is no distance to measure, so everything the list holds is counted.
+    /// That is the honest degradation: the list is already a bubble around the player, so it is
+    /// the same question asked with a coarser radius rather than a different one.
+    /// </remarks>
+    private static MonsterCensus Census(WorldSnapshot snapshot)
+    {
+        int normal = 0;
+        int magic = 0;
+        int rare = 0;
+        int unique = 0;
+
+        foreach (WorldEntity monster in snapshot.Entities)
+        {
+            if (!Worth(monster))
+            {
+                continue;
+            }
+
+            float away = Away(monster, snapshot.Player);
+            if (away >= 0f && away > NearbyWorldUnits)
+            {
+                continue;
+            }
+
+            switch (monster.Rarity)
+            {
+                case ItemRarity.Magic:
+                    magic++;
+                    break;
+                case ItemRarity.Rare:
+                    rare++;
+                    break;
+
+                // Rarity 3 AND ABOVE, the same rule the read uses when it decides a monster is
+                // a boss. A rarity nobody has seen before reads as the rarest thing rather
+                // than as an ordinary monster, which is the safer way for it to be wrong.
+                case >= ItemRarity.Unique:
+                    unique++;
+                    break;
+
+                // Unknown lands here with Normal on purpose: a monster whose properties did
+                // not read is still a monster in the way, and leaving it out would make the
+                // count disagree with what is on the screen.
+                default:
+                    normal++;
+                    break;
+            }
+        }
+
+        return new MonsterCensus(normal, magic, rare, unique);
     }
 
     /// <summary>Marks where the next stretch starts, in time and in all three totals.</summary>

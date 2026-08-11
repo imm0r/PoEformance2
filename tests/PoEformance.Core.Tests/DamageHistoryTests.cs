@@ -15,21 +15,38 @@ namespace PoEformance.Core.Tests;
 /// </remarks>
 public class DamageHistoryTests
 {
-    private static WorldEntity Monster(uint id, int life, int max = 1000)
+    private static WorldEntity Monster(
+        uint id, int life, int max = 1000, ItemRarity rarity = ItemRarity.Unknown, float away = 0f)
         => new(
             Id: id,
             Address: 0x1000 + id,
             Path: $"Metadata/Monsters/Test{id}",
             Kind: EntityKind.Monster,
-            WorldX: 0f,
+            WorldX: away,
             WorldY: 0f,
             WorldZ: 0f,
+            Rarity: rarity,
             Life: new Vital(life, max, 0, 0),
             EnergyShield: new Vital(0, 0, 0, 0),
             Name: $"Test {id}");
 
+    /// <summary>The player at the origin, so a monster's WorldX is its distance.</summary>
+    private static WorldEntity Player()
+        => new(
+            Id: 999,
+            Address: 0x999,
+            Path: "Metadata/Player",
+            Kind: EntityKind.Player,
+            WorldX: 0f,
+            WorldY: 0f,
+            WorldZ: 0f,
+            Life: new Vital(100, 100, 0, 0));
+
     private static WorldSnapshot Area(uint hash, params WorldEntity[] entities)
         => new(true, null, entities, new float[16], AreaHash: hash);
+
+    private static WorldSnapshot Seen(uint hash, params WorldEntity[] entities)
+        => new(true, Player(), entities, new float[16], AreaHash: hash);
 
     [Fact]
     public void ASAMPLEIsARateRatherThanARunningTotal()
@@ -117,6 +134,67 @@ public class DamageHistoryTests
         // And the map before it is still there to look back at, filed under its own area.
         Assert.NotEmpty(meter.History.In(1));
         Assert.Equal([2u, 1u], meter.History.Areas());
+    }
+
+    [Fact]
+    public void ASAMPLESaysWhatItWasFoughtAgainst()
+    {
+        // A rate on its own does not say whether it was a good moment: five thousand into a
+        // rare is a build working, and five thousand into forty white monsters is a build that
+        // cannot single-target. The census is what turns the bar into something readable.
+        var meter = new DamageMeter { CountKills = false };
+
+        WorldEntity[] pack =
+        [
+            Monster(1, 1000, rarity: ItemRarity.Normal),
+            Monster(2, 1000, rarity: ItemRarity.Normal),
+            Monster(3, 1000, rarity: ItemRarity.Magic),
+            Monster(4, 1000, rarity: ItemRarity.Rare),
+            Monster(5, 1000, rarity: ItemRarity.Unique),
+        ];
+
+        meter.Look(Seen(1, pack), 0);
+        meter.Look(Seen(1, pack), 500);
+
+        MonsterCensus nearby = meter.History.In(1)[^1].Nearby;
+
+        Assert.Equal(new MonsterCensus(2, 1, 1, 1), nearby);
+        Assert.Equal(5, nearby.All);
+    }
+
+    [Fact]
+    public void ANDOnlyWhatIsActuallyNearby()
+    {
+        // "In the entity list" is not "around you": the list is a bubble a good deal wider than
+        // the screen, so counting all of it would report monsters nobody was fighting.
+        var meter = new DamageMeter { CountKills = false };
+
+        WorldEntity[] spread =
+        [
+            Monster(1, 1000, rarity: ItemRarity.Normal, away: 10f),
+            Monster(2, 1000, rarity: ItemRarity.Normal, away: DamageMeter.NearbyWorldUnits * 3f),
+        ];
+
+        meter.Look(Seen(1, spread), 0);
+        meter.Look(Seen(1, spread), 500);
+
+        Assert.Equal(1, meter.History.In(1)[^1].Nearby.All);
+    }
+
+    [Fact]
+    public void ANDWithNoPlayerToMeasureFromEverythingCounts()
+    {
+        // The honest degradation: there is no distance without a player, and the entity list is
+        // already a bubble around them - so it is the same question at a coarser radius rather
+        // than a different question, and reporting nothing would read as an empty map.
+        var meter = new DamageMeter { CountKills = false };
+
+        WorldEntity[] far = [Monster(1, 1000, rarity: ItemRarity.Rare, away: 99_999f)];
+
+        meter.Look(Area(1, far), 0);
+        meter.Look(Area(1, far), 500);
+
+        Assert.Equal(new MonsterCensus(0, 0, 1, 0), meter.History.In(1)[^1].Nearby);
     }
 
     [Fact]

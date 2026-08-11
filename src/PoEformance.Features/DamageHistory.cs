@@ -1,6 +1,29 @@
 namespace PoEformance.Features;
 
 /// <summary>
+/// How many monsters were around, by what kind of monster they are.
+/// </summary>
+/// <remarks>
+/// WHAT THE BAR WAS AGAINST. A damage rate on its own does not say whether it was a good
+/// moment: five thousand into a rare is a build working and five thousand into forty white
+/// monsters is a build that cannot single-target. The census is what turns the graph from a
+/// record of what happened into something that can be read.
+///
+/// The game's own four rarities rather than invented tiers. There IS a boss flag on the
+/// monster component, and it is marked in the schema as an unverified hypothesis - so it is
+/// not what a readout gets built on. Unique covers the bosses, which is how the rest of this
+/// codebase already treats rarity 3 and above.
+/// </remarks>
+public readonly record struct MonsterCensus(int Normal, int Magic, int Rare, int Unique)
+{
+    /// <summary>Every monster counted.</summary>
+    public int All => Normal + Magic + Rare + Unique;
+
+    /// <summary>Whether anything was counted at all.</summary>
+    public bool Any => All > 0;
+}
+
+/// <summary>
 /// How much damage was done over one short stretch, split by how well it is known.
 /// </summary>
 /// <remarks>
@@ -16,8 +39,13 @@ namespace PoEformance.Features;
 /// <param name="Watched">Damage per second seen falling off monster health.</param>
 /// <param name="Credited">Per second from monsters that were already being hurt when they went.</param>
 /// <param name="Untouched">Per second from monsters that vanished without a scratch seen.</param>
+/// <param name="Nearby">
+/// What was around at that moment, by rarity. Taken at the instant the sample was written
+/// rather than averaged over its stretch: "how many were there" is a thing you point at, and
+/// an average of a quarter second's monsters is a number that was never true.
+/// </param>
 public readonly record struct DamageSample(
-    long AtMs, uint Area, float Watched, float Credited, float Untouched)
+    long AtMs, uint Area, float Watched, float Credited, float Untouched, MonsterCensus Nearby = default)
 {
     /// <summary>All of it - the height of one bar on the graph.</summary>
     public float Total => Watched + Credited + Untouched;

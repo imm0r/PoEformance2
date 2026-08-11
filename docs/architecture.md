@@ -298,7 +298,13 @@ interesting part was not the feature:
   packs the majority of the figure is inferred rather than watched: a burst made of the assumed
   band is a different event from the same burst watched off monsters' health, and one line cannot
   tell them apart. `PlotLines` takes one series in one colour and is therefore exactly the graph
-  this must not be, so it is drawn by hand.
+  this must not be, so it is drawn by hand — which also buys the hover readout, and each bar
+  carries a **census of what was around** when it happened, by rarity. That is what makes the
+  number mean anything: five thousand into a rare is a build working, and five thousand into
+  forty white monsters is a build that cannot single-target. Counted through the meter's own
+  monster filter, so the census describes the monsters the figure is about; in the game's own
+  rarity colours, which nobody has to learn. Not the boss flag — it sits in the schema marked as
+  an unverified hypothesis, and a readout is not what an unverified offset gets built on.
 - **Complete overlay configurability.** A catalogue of every drawn thing, with the editor
   GENERATED from it, because a hand-written settings page is how a tool ends up with fourteen
   configurable things and three that are not. The promise it makes — everything painted over

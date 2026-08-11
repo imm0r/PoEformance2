@@ -40,6 +40,13 @@ public sealed class DamageWindow
     private static readonly Vector4 UntouchedBar = new(0.74f, 0.32f, 0.28f, 0.95f);
     private static readonly Vector4 PlotBack = new(0.08f, 0.09f, 0.11f, 0.85f);
 
+    // The census, in the game's OWN rarity colours - white, blue, yellow, orange. Nobody has
+    // to learn these; a player has been reading them since the first magic item.
+    private static readonly Vector4 NormalText = new(0.85f, 0.85f, 0.85f, 1f);
+    private static readonly Vector4 MagicText = new(0.53f, 0.53f, 1f, 1f);
+    private static readonly Vector4 RareText = new(1f, 1f, 0.46f, 1f);
+    private static readonly Vector4 UniqueText = new(0.68f, 0.37f, 0.13f, 1f);
+
     private readonly DamageMeter _meter;
     private readonly Func<long> _clock;
 
@@ -292,7 +299,36 @@ public sealed class DamageWindow
         ImGui.TextColored(WatchedBar, $"watched    {Number(sample.Watched)}");
         ImGui.TextColored(CreditedBar, $"credited   {Number(sample.Credited)}");
         ImGui.TextColored(UntouchedBar, $"untouched  {Number(sample.Untouched)}");
+
+        // WHAT IT WAS AGAINST, which is what makes the number above mean anything: five
+        // thousand into a rare is a build working, and five thousand into forty white monsters
+        // is a build that cannot single-target.
+        ImGui.Separator();
+        MonsterCensus nearby = sample.Nearby;
+        if (!nearby.Any)
+        {
+            ImGui.TextColored(DimText, "nothing nearby");
+        }
+        else
+        {
+            ImGui.TextColored(DimText, $"{nearby.All} nearby");
+            Count("normal", nearby.Normal, NormalText);
+            Count("magic", nearby.Magic, MagicText);
+            Count("rare", nearby.Rare, RareText);
+            Count("unique", nearby.Unique, UniqueText);
+        }
+
         ImGui.EndTooltip();
+
+        // Only the rarities that are actually there. A row of noughts is four lines saying
+        // nothing, and the interesting part of a census is what IS in it.
+        static void Count(string what, int many, Vector4 colour)
+        {
+            if (many > 0)
+            {
+                ImGui.TextColored(colour, $"  {many,3}  {what}");
+            }
+        }
     }
 
     /// <summary>
