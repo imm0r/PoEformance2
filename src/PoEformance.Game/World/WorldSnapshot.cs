@@ -256,6 +256,26 @@ public sealed class WorldReader
     /// reverse-engineering tools cannot see it either. That is what the switch is for.
     /// </remarks>
     public NoiseFilter Noise { get; } = new();
+
+    /// <summary>
+    /// Keep the ground effects instead of dropping them. FOR LOOKING AT, not for playing.
+    /// </summary>
+    /// <remarks>
+    /// A hostile thing that expires on its own and cannot be targeted is a ground effect
+    /// wearing a monster's components - a flame wall, damaging ground, an ice crystal - and
+    /// dropping it is what stopped a Firewall build covering its own screen in enemy markers.
+    /// That is the right default and this does not change it.
+    ///
+    /// What this is for is the other question: WHERE are they. A build dying to something it
+    /// cannot see, a mechanic whose danger zone is not obvious, an offset that needs a visible
+    /// thing to check against - none of those can be answered from an entity the read threw
+    /// away. So it is kept, marked as its own kind, and drawn only by something that asked for
+    /// that kind.
+    ///
+    /// OFF by default and worth leaving off while playing: these are the most numerous entities
+    /// in the game and every one of them costs a component read.
+    /// </remarks>
+    public bool KeepEffects { get; set; }
     private readonly GroundItemReader _groundItems;
     private readonly MinimapIconReader _mapIcons;
     private LandmarkNames _landmarkNames = LandmarkNames.Empty;
@@ -625,7 +645,17 @@ public sealed class WorldReader
             // and this is a question of fact - they travel on with IsEffect set instead.
             if (kind == EntityKind.Monster && signs.IsHostileEffect)
             {
-                continue;
+                // RECLASSIFIED, not un-dropped, when somebody asks to see them. Letting them
+                // travel on as monsters would put them back in every count and every health
+                // bar this rule exists to keep them out of; as their own kind they are
+                // invisible to all of it, because everything else here asks for Monster by
+                // name. The one place that draws them has to ask for Effect on purpose.
+                if (!KeepEffects)
+                {
+                    continue;
+                }
+
+                kind = EntityKind.Effect;
             }
 
             // Resolved here rather than filtered here: how good a drop is, is a fact about

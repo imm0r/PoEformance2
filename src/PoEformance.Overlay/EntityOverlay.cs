@@ -47,6 +47,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public NoiseFilter? Noise { get; set; }
 
     /// <summary>
+    /// Whether the reader keeps the hostile ground effects, for the same reason as above.
+    /// </summary>
+    /// <remarks>
+    /// A pair of callbacks rather than the reader itself: the overlay draws and has no other
+    /// business with it, and this is the one bit of it worth reaching for from up here.
+    /// </remarks>
+    public Func<bool>? KeepingEffects { get; set; }
+
+    /// <summary>Turns that dropping off and on.</summary>
+    public Action<bool>? KeepEffects { get; set; }
+
+    /// <summary>
     /// How every drawn thing looks - colours, sizes, line widths, and whether it is drawn.
     /// </summary>
     /// <remarks>
@@ -209,6 +221,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     // their tab's callbacks and nothing more. A field that nothing reads is a claim that
     // somebody talks to that window, and here nobody does.
     private CostWindow? _costWindow;
+    private EffectWindow? _effectWindow;
     private DamageWindow? _damageWindow;
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
@@ -217,6 +230,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly AlertBanner _banner = new();
     private readonly UnwalkedLayer _unwalked = new();
     private readonly HeatLayer _heat = new();
+    private readonly EffectLayer _effects = new();
     private readonly HealthBarLayer _healthBars = new();
     private readonly AtlasLayer _atlas = new();
     private AtlasWatch? _atlasWatch;
@@ -1032,6 +1046,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 DrawEntities(width, height);
             }
+
+            // After the dots, so an effect ring sits over the marker it belongs beside rather
+            // than under it - and it is a ring precisely so the marker still reads through.
+            _effects.Draw(
+                ImGui.GetBackgroundDrawList(),
+                _snapshot,
+                entity =>
+                {
+                    ScreenPoint point = ProjectGround(entity, width, height);
+                    return (point.OnScreen, point.X, point.Y);
+                });
         }
 
         // OUTSIDE the marker gate above, which only lets things through in a hostile area.
@@ -1078,6 +1103,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
 
             _costWindow.CurrentArea = _snapshot.AreaHash;
+        }
+
+        // The same first-use registration, and for the same reason: the two callbacks it needs
+        // are properties the app sets when it wires the reader up.
+        if (_effectWindow is null && KeepingEffects is not null && KeepEffects is not null)
+        {
+            var made = new EffectWindow(_effects, KeepingEffects, KeepEffects, Noise);
+            _effectWindow = made;
+            _tools.Add(95, "effects", "Effects", () => made.DrawTab(_snapshot));
         }
 
         // Registered on first use for the same reason as the cost tab: the meter is a

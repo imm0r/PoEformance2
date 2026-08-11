@@ -321,6 +321,18 @@ interesting part was not the feature:
   one long fight. Its clock starts at the first damage rather than the first sighting, and a kill
   the tool does not believe in — refused by the distance gate — never appears at all, because a
   log of kills containing ones it doubts is not a log of kills.
+- **Seeing the effects, which the read throws away three times over.** A debugging layer, off by
+  default. The interesting part is what it says about the name: **the game's actual particles are
+  not entities** — nothing in memory lists a spark. What is listed is the effect ENTITIES: ground
+  effects carrying Life and a position, and the engine's `/fx/` asset nodes. A screen of fire is
+  one entity, not a thousand, and saying so is the difference between a working tool and somebody
+  concluding the read is broken because the spark they looked for was never there. Turning it on
+  undoes three separate decisions that are each right for playing — the noise filter refusing
+  engine nodes before their components are read, the reader dropping hostile effects, and the
+  overlay declining to draw friendly ones. The safeguard that matters: a kept effect is
+  **reclassified**, not un-dropped. Letting it travel on as a Monster would put it back into every
+  count and every health bar the dropping exists to protect — it carries Life, which is exactly
+  why a Firewall build once covered its own screen in enemy markers.
 - **A heat map, because the map was already being drawn.** The cheapest interesting thing that
   could go on it: the meter already knew how much happened and the snapshot already knew where
   the player was, and nothing was writing the two down together. A total says a map was hard; a
