@@ -1045,6 +1045,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             AtlasSettings drawing = _atlasWatch.Settings;
             _atlas.ShowNames = drawing.Names;
             _atlas.TextScale = drawing.Writing;
+
+            // Published from HERE because this is the thread that has it. ImGui's mouse position
+            // is the real cursor even while the game has focus and the overlay is click-through:
+            // the library re-reads it from the system every frame rather than from the messages
+            // an unfocused window never receives.
+            _atlasWatch.Cursor = ImGui.GetMousePos();
+
             _atlas.Draw(ImGui.GetBackgroundDrawList(), _atlasWatch.View);
 
             // After the atlas, so a route runs OVER the map labels it passes rather than under

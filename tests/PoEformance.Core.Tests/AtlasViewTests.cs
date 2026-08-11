@@ -48,13 +48,15 @@ public class AtlasViewTests
         AtlasSettings? settings = null,
         AtlasGrouping? grouping = null,
         AtlasRoutes? routes = null,
-        Dictionary<(int X, int Y), IReadOnlyList<string>>? words = null)
+        Dictionary<(int X, int Y), IReadOnlyList<string>>? words = null,
+        Vector2 cursor = default)
         => AtlasWatch.Compose(
             live,
             settings ?? AtlasSettings.Default,
             grouping ?? AtlasGrouping.None,
             routes ?? AtlasRoutes.None,
-            words ?? NoWords);
+            words ?? NoWords,
+            cursor);
 
     [Fact]
     public void AMarkSitsAtTheMiddleOfItsNodeRatherThanItsCorner()
@@ -198,6 +200,102 @@ public class AtlasViewTests
     {
         AtlasNode alone = Node(0, 0, joined: [(9, 9)]);
         Assert.Empty(Compose([alone], new AtlasSettings(Web: true)).Web);
+    }
+
+    [Fact]
+    public void ANodeThePanelDidNotPlaceIsDROPPEDRatherThanLeftWhereItWas()
+    {
+        // The bug that made an atlas look like a spider's web. Keeping the last-seen position
+        // reads as harmless - a third of a second of lag is invisible on a label - and on a
+        // LINE it is not: dragging the atlas re-lays every node, so a node that missed a tick
+        // sits exactly one drag behind, and every line to it is a ray with that same offset.
+        // They are all parallel because they all share it.
+        AtlasNode here = Node(0, 0) with { Address = 0x1000 };
+        AtlasNode gone = Node(1, 0) with { Address = 0x2000 };
+
+        var placed = new Dictionary<ulong, (Vector2 Position, Vector2 Size)>
+        {
+            [0x1000] = (new Vector2(500, 600), new Vector2(40, 20)),
+        };
+
+        AtlasNode kept = Assert.Single(AtlasWatch.Live([here, gone], placed));
+
+        Assert.Equal(0x1000ul, kept.Address);
+        Assert.Equal(new Vector2(500, 600), kept.Screen);
+    }
+
+    [Fact]
+    public void NOTHINGIsDrawnWhileTheCursorIsOnAMap()
+    {
+        // The game puts its own panel over a hovered node - what the map is, its biome, what is
+        // in it - and every label and line here would be drawn across it.
+        AtlasNode node = Node(1, 1);   // drawn at 100,100, forty by twenty
+
+        Assert.True(AtlasWatch.Hovered([node], new Vector2(120, 110)));
+        Assert.False(AtlasWatch.Hovered([node], new Vector2(300, 110)));
+
+        Assert.False(Compose([node], new AtlasSettings(), cursor: new Vector2(120, 110)).Anything);
+        Assert.True(Compose([node], new AtlasSettings(), cursor: new Vector2(300, 110)).Anything);
+    }
+
+    [Fact]
+    public void ANDEveryMapCountsRatherThanOnlyTheDrawnOnes()
+    {
+        // The game shows its panel over a map whether or not this overlay chose to label it,
+        // and it is the OTHER maps' labels and lines that would be drawn across it.
+        AtlasNode shown = Node(3, 3);
+        AtlasNode finished = Node(1, 1, state: AtlasNodeState.Completed);
+
+        AtlasView view = Compose(
+            [shown, finished], new AtlasSettings(HideCompleted: true), cursor: new Vector2(120, 110));
+
+        Assert.Single(view.Marks);          // the finished one is hidden, as asked
+        Assert.True(view.Hovering);         // and hovering it still stops the drawing
+    }
+
+    [Fact]
+    public void ANDACursorNobodyHasReportedIsNotTheCorner()
+    {
+        // Nought is "not asked yet", not a position. Taken literally it sits inside whatever
+        // node happens to be drawn at the top-left, and the atlas would never draw at all.
+        Assert.False(AtlasWatch.Hovered([Node(0, 0)], default));
+        Assert.True(Compose([Node(0, 0)], new AtlasSettings()).Anything);
+    }
+
+    [Fact]
+    public void ANDTheGettingOutOfTheWayCanBeTurnedOff()
+    {
+        AtlasNode node = Node(1, 1);
+        Assert.True(Compose([node], new AtlasSettings(HideOnHover: false), cursor: new Vector2(120, 110)).Anything);
+    }
+
+    [Fact]
+    public void ANDHIDINGAMapHidesTheLinesToItTOO()
+    {
+        // Which is the point of hiding: a line to a map that is not on the screen is a line to
+        // nothing. This went unnoticed while the connections read as empty - the web drew nought
+        // lines and looked right - and announced itself the moment they worked, as two thousand
+        // lines across an atlas showing a hundred maps.
+        AtlasNode shown = Node(0, 0, joined: [(1, 0)]);
+        AtlasNode finished = Node(1, 0, state: AtlasNodeState.Completed, joined: [(0, 0)]);
+
+        Assert.Single(Compose([shown, finished], new AtlasSettings(Web: true, HideCompleted: false)).Web);
+        Assert.Empty(Compose([shown, finished], new AtlasSettings(Web: true, HideCompleted: true)).Web);
+    }
+
+    [Fact]
+    public void ANDSoDoesSearchingOneOut()
+    {
+        // Same rule through the other filter, because it is the same question: the web is
+        // between the maps ON THE SCREEN, whichever way the rest came to be off it.
+        AtlasNode augury = Node(0, 0, mapId: "MapAugury", joined: [(1, 0)]);
+        AtlasNode ravine = Node(1, 0, mapId: "MapRavine", joined: [(0, 0)]);
+
+        var searched = new AtlasSettings(Web: true, Search: "Augury");
+        var grouping = new AtlasGrouping([], AtlasMapNames.Empty);
+
+        Assert.Single(Compose([augury, ravine], new AtlasSettings(Web: true), grouping).Web);
+        Assert.Empty(Compose([augury, ravine], searched, grouping).Web);
     }
 
     [Fact]

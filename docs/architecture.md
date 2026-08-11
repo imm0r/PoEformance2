@@ -364,6 +364,31 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   the whole ancestor chain because a panel shut by its container keeps its own bit set. Asked
   first, it is also what makes the read idle: a walk up a handful of parents instead of several
   hundred nodes read for nothing.
+- **PoE2 has no "hovered UiElement" pointer, so hovering is geometry.** The overlay gets out of
+  the way while the cursor is on a map, because the game puts its own panel over that node. The
+  AHK tool had already gone looking for a pointer that answers this: the world-entity hover
+  chains (`MouseOver` off InGameState, and the hover tracker) resolve AREA ENTITIES only and
+  never see the interface, and two flat scans proved the client keeps no hovered-element slot
+  anywhere — only whole panels are pointed at, never the leaf under the cursor. It solved the
+  same problem for inventory items by descending the interface tree to whatever contains the
+  cursor. On the atlas that descent is one step: every map is a child of the one panel and its
+  rectangle was read this tick anyway. Tested against ALL maps rather than the drawn ones — the
+  game shows its panel whether or not this overlay labelled that node, and it is the OTHER maps'
+  labels and lines that would be drawn across it.
+- **A stale position is invisible on a label and catastrophic on a line.** The two-rate read
+  keeps what a node IS for a third of a second and re-reads WHERE it is every tick; a node the
+  panel did not place this tick used to keep its last-seen position, on the grounds that a third
+  of a second of lag cannot be seen. On a label it cannot. Dragging the atlas re-lays every
+  node, so every node that missed a tick sits exactly one drag behind — and once connections
+  started reading, every line to one of them became a ray with that same offset, all PARALLEL
+  because they all shared it, worse the further the atlas was scrolled. A node the panel did not
+  place is a node it is not drawing, so it is dropped. The general lesson: a cached position is
+  a lie whose cost depends entirely on what is drawn from it, and adding a new thing drawn from
+  it can turn an invisible lie into the whole screen.
+- **The web is between the maps ON THE SCREEN.** Hiding the finished maps and the unreachable
+  ones is how an atlas is made readable; a line to a hidden map is a line to nothing. The
+  contract said "between drawn maps" and the code walked every live node — which drew nought
+  lines while connections read as empty, and two thousand the moment they worked.
 - **The lines belong to the PANEL, not to the nodes.** One flat vector of edges — an unknown
   word, then the grid position at each end — and no node has a neighbour list of its own. Read
   at that offset on each node instead, the two words are whatever that node's bytes happen to
