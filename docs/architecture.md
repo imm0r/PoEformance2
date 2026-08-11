@@ -305,6 +305,27 @@ interesting part was not the feature:
   monster filter, so the census describes the monsters the figure is about; in the game's own
   rarity colours, which nobody has to learn. Not the boss flag — it sits in the schema marked as
   an unverified hypothesis, and a readout is not what an unverified offset gets built on.
+- **The figures a build is actually compared by, and why the obvious one is not among them.**
+  `Peak` was the only burst number and it is the one figure here that cannot be compared with
+  anybody else's: it is the high-water mark of a smoothed average, so it under-reports the real
+  burst and *moves when the smoothing slider does*. Asked the other way round — "over any window
+  this long, what is the most that actually landed" — it needs no smoothing, has nothing to
+  configure, and means the same thing on every machine. Three lengths, because a second (the
+  opening hit), five (a rare going down) and ten (whether it can keep going) are different
+  questions a build can pass and fail separately. Windows never span a hole, which is why each
+  sample carries its own span rather than having it inferred from the gap to the one before.
+- **Two things that fell out of data already being kept.** Single-target dps is not a separate
+  measurement: every bar already records how many monsters were near, so the stretches with one
+  monster near *are* the single-target fight — no dummy-hitting exercise needed. And the kill log
+  answers "how long does a rare take", which a rate averaged over a map cannot, because no map is
+  one long fight. Its clock starts at the first damage rather than the first sighting, and a kill
+  the tool does not believe in — refused by the distance gate — never appears at all, because a
+  log of kills containing ones it doubts is not a log of kills.
+- **A death is not a hit.** Damage taken is the same pool-difference measurement pointed at the
+  player, and at zero life the pool reads as *unread* rather than empty — otherwise the whole
+  pool is counted as one enormous hit on the way back in, and every death becomes the worst hit
+  of the map. The same baseline mistake (take it at the area's FIRST reading, not the second) has
+  now been made twice in this file and caught by tests both times.
 - **Complete overlay configurability.** A catalogue of every drawn thing, with the editor
   GENERATED from it, because a hand-written settings page is how a tool ends up with fourteen
   configurable things and three that are not. The promise it makes — everything painted over
