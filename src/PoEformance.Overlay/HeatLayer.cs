@@ -67,10 +67,12 @@ public sealed class HeatLayer
 
         uint hot = Style.Colour(StyleCatalogue.Keys.Heat);
 
-        // Half a patch on screen, so the marks meet rather than leaving a grid of gaps between
-        // them - a heat map with holes in it reads as sparse data rather than as a smooth one.
+        // MORE than half a patch, so neighbours OVERLAP rather than merely touching. Squares
+        // that exactly abut still read as squares - the eye finds the seams - and the thing
+        // being drawn is a field, not a mosaic. The overlap is what turns it into one.
         float half = MathF.Max(
-            1.5f, map.PixelsPerGridCell * HeatMap.Step * 0.5f * Style.Sized(StyleCatalogue.Keys.Heat, 1f));
+            2f,
+            map.PixelsPerGridCell * HeatMap.Step * 0.8f * Style.Sized(StyleCatalogue.Keys.Heat, 1f));
 
         int drawn = 0;
         foreach ((int x, int y, HeatCell cell) in heat.In(area))
@@ -95,49 +97,130 @@ public sealed class HeatLayer
 
             if (++drawn >= MostPatches)
             {
-                return;
+                break;
             }
+        }
+
+        // LAST, over the field, so it is never buried by it - and only once anything was
+        // actually painted, because a key to an empty map is a label on nothing.
+        if (drawn > 0)
+        {
+            DrawKey(draw, map, hot, hottest);
         }
     }
 
     /// <summary>
-    /// The colour for one patch, from cool at nothing to the chosen colour at the top.
+    /// The ramp, cold to hot. Blue, cyan, green, yellow, red.
     /// </summary>
     /// <remarks>
-    /// ONE COLOUR CHOSEN, both ends derived. A ramp needs two and asking for two means somebody
-    /// has to match them by eye; deriving the cool end by rotating the hot one back through the
-    /// spectrum keeps the pair related whatever is picked.
+    /// A REAL RAMP RATHER THAN ONE COLOUR FADED, and the reason is not prettiness. The first
+    /// version derived both ends from a single chosen colour, which produced a field of
+    /// orange-ish squares - indistinguishable at a glance from the loot and monster markers,
+    /// which are also small orange-ish squares. Somebody looking at their own map could not
+    /// tell the two apart, which is a complete failure of the thing.
     ///
-    /// ALPHA RISES WITH THE VALUE as well as the hue, which is what keeps this readable over a
-    /// game map rather than over a white page: a cool patch has to be nearly transparent or the
-    /// quiet nine tenths of a map becomes a solid sheet, and the map underneath is the thing
-    /// being annotated.
+    /// These five stops are what a heat map looks like everywhere, and the low end being BLUE
+    /// and GREEN is what does the work: no marker in this overlay is either, so a blue-green
+    /// wash is unmistakably data about the ground rather than a thing standing on it.
+    /// </remarks>
+    private static readonly (float At, float R, float G, float B)[] Ramp =
+    [
+        (0.00f, 0.16f, 0.20f, 0.85f),   // deep blue - been here, nothing happened
+        (0.25f, 0.10f, 0.75f, 0.85f),   // cyan
+        (0.50f, 0.20f, 0.85f, 0.25f),   // green
+        (0.75f, 0.95f, 0.85f, 0.15f),   // yellow
+        (1.00f, 1.00f, 0.20f, 0.10f),   // red - the busiest ground on the map
+    ];
+
+    /// <summary>
+    /// The colour for one patch.
+    /// </summary>
+    /// <remarks>
+    /// The chosen colour supplies the ALPHA only, which is what a style entry can usefully own
+    /// here: the hues are the ramp and the ramp is the whole point, while how strongly the
+    /// thing paints over the game is a matter of taste and screen.
+    ///
+    /// Alpha rises with the value as well as the hue - not squared, as it first was. Squaring
+    /// made the quiet nine tenths of a map nearly invisible, and the quiet nine tenths is what
+    /// gives the busy tenth something to be busy against. A floor keeps every visited patch
+    /// visible, so the picture reads as a filled field rather than as scattered dots.
     /// </remarks>
     private static uint Shade(uint hot, float share)
     {
         float heat = Math.Clamp(share, 0f, 1f);
-
-        // ImGui packs ABGR, alpha in the high byte.
-        float red = (hot & 0xFF) / 255f;
-        float green = ((hot >> 8) & 0xFF) / 255f;
-        float blue = ((hot >> 16) & 0xFF) / 255f;
         float alpha = ((hot >> 24) & 0xFF) / 255f;
 
-        // The cool end: the hot colour's channels swung towards blue. At heat 0 it is that
-        // swung colour, at 1 it is the colour as chosen.
-        float coolRed = red * 0.25f;
-        float coolGreen = green * 0.35f;
-        float coolBlue = MathF.Max(blue, 0.75f);
+        int upper = 1;
+        while (upper < Ramp.Length - 1 && heat > Ramp[upper].At)
+        {
+            upper++;
+        }
+
+        (float atLow, float lowR, float lowG, float lowB) = Ramp[upper - 1];
+        (float atHigh, float highR, float highG, float highB) = Ramp[upper];
+        float along = atHigh > atLow ? (heat - atLow) / (atHigh - atLow) : 0f;
 
         return Pack(
-            Mix(coolRed, red, heat),
-            Mix(coolGreen, green, heat),
-            Mix(coolBlue, blue, heat),
-
-            // Squared, so the quiet majority of a map stays faint and the busy patches carry
-            // the picture. Linear alpha makes a map that was mostly quiet look mostly painted.
-            alpha * ((0.18f * (1f - heat)) + (heat * heat)));
+            Mix(lowR, highR, along),
+            Mix(lowG, highG, along),
+            Mix(lowB, highB, along),
+            alpha * (0.45f + (0.55f * heat)));
     }
+
+    /// <summary>
+    /// The key, so nobody has to guess what they are looking at.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER HALF of telling this apart from the markers. The ramp says "this is a field
+    /// rather than a thing standing there"; the key says what the field IS - and without it the
+    /// first question anybody asks of a coloured map is which of the two it is.
+    ///
+    /// Drawn in the map's own corner rather than in a window, because it belongs to the picture
+    /// and a key somewhere else is a key nobody reads.
+    /// </remarks>
+    private void DrawKey(ImDrawListPtr draw, MapView map, uint hot, float hottest)
+    {
+        const float wide = 140f;
+        const float tall = 9f;
+
+        var at = new Vector2(map.Left + 12f, map.Top + 12f);
+        if (!map.Contains(at) || !map.Contains(at + new Vector2(wide, tall)))
+        {
+            return;
+        }
+
+        // A strip of the ramp, drawn in slices - the draw list has no gradient of its own and
+        // twenty slices across this width is already smooth.
+        const int slices = 20;
+        for (int i = 0; i < slices; i++)
+        {
+            float from = (float)i / slices;
+            draw.AddRectFilled(
+                at + new Vector2(from * wide, 0f),
+                at + new Vector2((from + (1f / slices)) * wide, tall),
+                Shade(hot, from));
+        }
+
+        uint text = ImGui.ColorConvertFloat4ToU32(new Vector4(0.85f, 0.88f, 0.92f, 1f));
+        draw.AddText(at + new Vector2(0f, tall + 2f), text, $"heat map: {Label(Showing)}");
+        draw.AddText(at + new Vector2(wide + 6f, -2f), text, Number(hottest));
+    }
+
+    /// <summary>What the key calls each measurement.</summary>
+    private static string Label(HeatOf what) => what switch
+    {
+        HeatOf.Taken => "damage taken",
+        HeatOf.Time => "time spent",
+        _ => "damage done",
+    };
+
+    /// <summary>The top of the scale, short enough for a corner.</summary>
+    private static string Number(float value) => value switch
+    {
+        >= 1_000_000f => $"{value / 1_000_000f:0.#}M",
+        >= 1_000f => $"{value / 1_000f:0.#}k",
+        _ => $"{value:0.#}",
+    };
 
     private static float Mix(float from, float to, float by) => from + ((to - from) * by);
 

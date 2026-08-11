@@ -344,6 +344,19 @@ interesting part was not the feature:
   standing in one place flattens the rest of the map into the same shade of nothing. And it is
   OFF by default: a picture of a whole map is for afterwards, and painted always it would be a
   wash of colour under every marker for the whole of every map.
+
+  The first version was sparse and unreadable, and the two causes are both worth keeping. It
+  looked SPARSE because a sample was filed at the point of the read, and reads land thirty times
+  a second while a running player crosses several patches between two of them — so the picture
+  was a dotted line through ground that had been walked straight across. The fix is to lay each
+  step ALONG the segment from the last position, sharing the amounts across the patches crossed
+  (with a jump guard, or a portal paints a stripe across the map). And it was UNIDENTIFIABLE
+  because a single colour faded to transparent produces orange-ish squares, which is precisely
+  what the loot and monster markers are: the reporter could not tell their own heat map from the
+  monsters on it. A real five-stop ramp fixes that, and the low end being blue-green is what does
+  the work — no marker in the overlay is either colour, so a blue-green wash is unmistakably
+  ground rather than a thing standing on it. Plus a key in the map's corner, because the first
+  question anybody asks of a coloured map is which of the two it is.
 - **A death is not a hit.** Damage taken is the same pool-difference measurement pointed at the
   player, and at zero life the pool reads as *unread* rather than empty — otherwise the whole
   pool is counted as one enormous hit on the way back in, and every death becomes the worst hit
