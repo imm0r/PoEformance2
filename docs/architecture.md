@@ -385,6 +385,14 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   place is a node it is not drawing, so it is dropped. The general lesson: a cached position is
   a lie whose cost depends entirely on what is drawn from it, and adding a new thing drawn from
   it can turn an invisible lie into the whole screen.
+- **A route is RUNS, not a polyline.** A route can cross a map the panel has no position for —
+  one the atlas has not materialised, or a grid position the edge table names that no map sits
+  on. Dropping that step and carrying on sounds harmless ("the line still goes the right way,
+  one corner cut") and is not: the line then runs straight across the gap, along no connection
+  anybody can walk, and with several steps missing what is drawn is a straight line between two
+  maps nowhere near each other. So a missing step ENDS a run and the next found step starts a
+  new one — which is what the reference does, setting its previous point back to nothing rather
+  than joining across. A hole is the honest answer; a bridge is an invented connection.
 - **The web is between the maps ON THE SCREEN.** Hiding the finished maps and the unreachable
   ones is how an atlas is made readable; a line to a hidden map is a line to nothing. The
   contract said "between drawn maps" and the code walked every live node — which drew nought

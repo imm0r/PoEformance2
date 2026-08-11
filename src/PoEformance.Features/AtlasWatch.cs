@@ -13,8 +13,12 @@ namespace PoEformance.Features;
 /// <param name="Group">The kind of map it is, or null when it is an ordinary one.</param>
 /// <param name="Contents">What the game says is in it, already turned into words.</param>
 /// <param name="Route">
-/// The way here from the nearest map that can be entered now, in screen positions, or empty
-/// when this is not a routing target. Includes both ends.
+/// The way here from the nearest map that can be entered now, in screen positions, as one or
+/// more unbroken RUNS - empty when this is not a routing target or none of it can be placed.
+///
+/// Runs rather than one list of points because a route can cross a map the panel has no
+/// position for, and joining the two sides of that gap draws a line along no connection
+/// anybody can walk. Each run is at least two points; the hole between them is the truth.
 /// </param>
 /// <param name="Hops">How many maps have to be run to get here. 0 for one you can enter now.</param>
 public sealed record AtlasMark(
@@ -25,7 +29,7 @@ public sealed record AtlasMark(
     AtlasNodeState State,
     AtlasGroup? Group,
     IReadOnlyList<string> Contents,
-    IReadOnlyList<Vector2> Route,
+    IReadOnlyList<IReadOnlyList<Vector2>> Route,
     int Hops);
 
 /// <summary>
@@ -444,7 +448,7 @@ public sealed class AtlasWatch
                 continue;
             }
 
-            IReadOnlyList<Vector2> route = [];
+            IReadOnlyList<IReadOnlyList<Vector2>> route = [];
             int hops = -1;
             if (routed)
             {
@@ -620,27 +624,61 @@ public sealed class AtlasWatch
         }
     }
 
-    /// <summary>A route's grid positions turned into screen ones, dropping any not drawn.</summary>
+    /// <summary>
+    /// A route's grid positions turned into screen ones, BROKEN wherever a step is missing.
+    /// </summary>
     /// <remarks>
-    /// A route can pass through a node the atlas has scrolled away from, which has no position
-    /// this tick. Dropping the point rather than the route keeps the line going the right way
-    /// with one corner cut - and the alternative is a route that vanishes whenever it happens
-    /// to cross the edge of the screen.
+    /// A route can pass through a map the panel has no position for - one the atlas has not
+    /// materialised, or a grid position the edge table names that no map sits on. This used to
+    /// drop the step and carry on, on the reasoning that a route with one corner cut still
+    /// goes the right way. It does not: the line then runs STRAIGHT ACROSS the gap, along no
+    /// connection anybody can walk, and with several steps missing what is drawn is a straight
+    /// line between two maps that are nowhere near each other. That is the arbitrary line.
+    ///
+    /// So a missing step ENDS a run and the next found step starts a new one, which is what the
+    /// reference does - its DrawNodePath sets its previous point back to nothing rather than
+    /// joining across. What is drawn is then only ever real connections, with holes where the
+    /// atlas cannot say.
     /// </remarks>
-    private static IReadOnlyList<Vector2> Screened(
+    public static IReadOnlyList<IReadOnlyList<Vector2>> Screened(
         IReadOnlyList<(int X, int Y)> path,
-        Dictionary<(int X, int Y), Vector2> centres)
+        IReadOnlyDictionary<(int X, int Y), Vector2> centres)
     {
-        var drawn = new List<Vector2>(path.Count);
+        ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(centres);
+
+        var runs = new List<IReadOnlyList<Vector2>>();
+        var run = new List<Vector2>();
+
         foreach ((int X, int Y) step in path)
         {
             if (centres.TryGetValue(step, out Vector2 at))
             {
-                drawn.Add(at);
+                run.Add(at);
+                continue;
             }
+
+            Close();
         }
 
-        return drawn.Count >= 2 ? drawn : [];
+        Close();
+        return runs;
+
+        // A single point is a corner nobody can see, not a piece of route: two are needed
+        // before there is a line, and keeping the stragglers would only put the entry dot
+        // somewhere the route does not go.
+        void Close()
+        {
+            if (run.Count >= 2)
+            {
+                runs.Add(run);
+                run = [];
+            }
+            else
+            {
+                run.Clear();
+            }
+        }
     }
 
     /// <summary>Every connection between DRAWN maps, each one once.</summary>
