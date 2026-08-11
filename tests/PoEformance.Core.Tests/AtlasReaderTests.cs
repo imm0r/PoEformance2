@@ -36,8 +36,12 @@ public class AtlasReaderTests
     }
 
     /// <summary>A panel with one child, laid out the way the schema describes a map node.</summary>
+    /// <param name="open">
+    /// Whether the panel is SHOWING. Shut by default, because that is the state the fixture
+    /// otherwise describes: everything present in the tree and nothing on the screen.
+    /// </param>
     private static (FakeMemoryReader Fake, OffsetSchema Schema) Atlas(
-        uint flags, byte status, int gridX = 7, int gridY = 9)
+        uint flags, byte status, int gridX = 7, int gridY = 9, bool open = false)
     {
         OffsetSchema schema = LoadSchema();
         StructDef ui = schema.Structs["UiElementBase"];
@@ -66,6 +70,11 @@ public class AtlasReaderTests
             fake.Place(at + (ulong)children + 8, array + (8 * ((ulong)(int)panel.Constants[key] + 1)));
             fake.Place(array + (8 * (ulong)(int)panel.Constants[key]), next);
             at = next;
+        }
+
+        if (open)
+        {
+            fake.Place(Panel + (ulong)ui.OffsetOf("Flags"), (uint)ui.Constants["FlagIsVisible"]);
         }
 
         // The panel's one child.
@@ -282,6 +291,30 @@ public class AtlasReaderTests
 
         (FakeMemoryReader fake, _) = Atlas(marker, status: 0x02);
         Assert.Empty(ReaderFor(fake, schema).Read(UiRoot, new UiScale(2560, 1600, 0)));
+    }
+
+    [Fact]
+    public void ASHUTAtlasStillHasEveryOneOfItsNodesInTheTree()
+    {
+        // Which is why counting them says nothing about whether anybody is looking at it, and
+        // why the overlay went on writing map names over the game after the player had left
+        // the atlas: closing it clears the panel's visible bit and leaves everything else
+        // exactly where it was. The nodes below still read - they are just not on the screen.
+        OffsetSchema schema = LoadSchema();
+        (FakeMemoryReader shut, _) = Atlas(MapNodeFlags(schema), status: 0x01);
+
+        Assert.Single(ReaderFor(shut, schema).Read(UiRoot, new UiScale(2560, 1600, 0)));
+        Assert.False(ReaderFor(shut, schema).IsOpen(Panel));
+
+        (FakeMemoryReader open, _) = Atlas(MapNodeFlags(schema), status: 0x01, open: true);
+        Assert.True(ReaderFor(open, schema).IsOpen(Panel));
+    }
+
+    [Fact]
+    public void ANDAPanelThatIsNotThereAtAllIsNotOpenEither()
+    {
+        OffsetSchema schema = LoadSchema();
+        Assert.False(ReaderFor(new FakeMemoryReader(), schema).IsOpen(0));
     }
 
     [Fact]

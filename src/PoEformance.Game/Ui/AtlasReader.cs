@@ -188,6 +188,22 @@ public sealed class AtlasReader
     }
 
     /// <summary>
+    /// Whether the atlas is OPEN, rather than merely present in the interface tree.
+    /// </summary>
+    /// <remarks>
+    /// THE PANEL DOES NOT GO AWAY WHEN IT IS SHUT. The game keeps it and its several hundred
+    /// node children in the tree, with their own flags still set and their own positions still
+    /// readable - closing the atlas clears the visible bit on the panel (or on something above
+    /// it) and nothing else. So "has it any children with positions" answers yes on a closed
+    /// atlas, and a caller that used that as its test kept drawing map names over the game
+    /// after the player had walked away.
+    ///
+    /// The whole chain matters, which is why this is <see cref="UiElementReader.IsVisible"/>
+    /// rather than one flag read: a panel shut by its container leaves its own bit set.
+    /// </remarks>
+    public bool IsOpen(ulong panel) => panel != 0 && _elements.IsVisible(panel);
+
+    /// <summary>
     /// Every map on the atlas, or an empty list when the panel is closed.
     /// </summary>
     /// <remarks>
@@ -544,6 +560,15 @@ public sealed class AtlasReader
             said.AddRange(Hunt(uiRoot));
             return said;
         }
+
+        // Said out loud because a shut panel reads almost exactly like an open one - the nodes
+        // are all still there - and this is the one line that tells them apart. Everything
+        // below is reported anyway: what the walk finds while the atlas is closed is worth
+        // seeing, it is just not worth drawing.
+        said.Add(IsOpen(panel)
+            ? "and it is open - the overlay draws"
+            : "but it is SHUT: it and its nodes stay in the tree when the atlas is closed, so"
+              + " the overlay draws nothing until the visible bit comes back");
 
         List<ulong> children = _elements.Children(panel, MostNodes);
         said.Add($"{children.Count} children under it");

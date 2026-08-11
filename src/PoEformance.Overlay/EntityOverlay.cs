@@ -106,6 +106,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ShowTerrain = settings.ShowTerrain;
         ShowLabels = settings.DotLabels;
         _healthBars.OnlyWhenHurt = settings.HealthBarsOnlyWhenHurt;
+        HideBehindPanels = settings.HideBehindPanels;
 
         if (Noise is not null)
         {
@@ -138,6 +139,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ShowTerrain = ShowTerrain,
             DotLabels = ShowLabels,
             HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
+            HideBehindPanels = HideBehindPanels,
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
             ShowPoi = _poi?.ShowPicker ?? basis.ShowPoi,
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
@@ -493,6 +495,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// they are fighting. The map is where a radar belongs.
     /// </remarks>
     public bool ShowWorldDots { get; set; }
+
+    /// <summary>
+    /// Stop drawing in world space while a screen-filling panel is open.
+    /// </summary>
+    /// <remarks>
+    /// ON by default, because it is what somebody expects: markers over a stash or health bars
+    /// across the passive tree are right information in the way, which is worse than none.
+    ///
+    /// It is a switch rather than a rule because the panels are found at unverified offsets and
+    /// paths, and the way a wrong one fails is the worst kind - a panel reported open forever,
+    /// so the overlay never comes back and nothing says why. The status window prints which
+    /// panels are being reported so a stuck one names itself, and this turns the question off
+    /// entirely for anybody who would rather have the markers than the tidiness.
+    /// </remarks>
+    public bool HideBehindPanels { get; set; } = true;
 
     /// <summary>
     /// Optional: read cost, completed reads and failures from the reader thread.
@@ -962,7 +979,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Nothing to mark in a town or a hideout, and a screen full of markers over the
         // stash is worse than no overlay. An area that did not resolve counts as hostile,
         // so a failed read never silently switches the tool off.
-        if (_snapshot.InGame && width > 0 && height > 0 && _snapshot.Area.WantsMarkers)
+        //
+        // Nor while a panel is over the game, which is the same argument one step further in:
+        // everything below draws in world space, and a screen-filling panel is what the player
+        // is actually looking at. Right information in the way is worse than none. What counts
+        // as a panel - and whether to ask at all - is PanelReader and HideBehindPanels.
+        if (_snapshot.InGame && width > 0 && height > 0 && _snapshot.Area.WantsMarkers
+            && !(HideBehindPanels && _snapshot.InAPanel))
         {
             // Markers go ON THE MAP, not over the 3D scene. Scattering dots across the game
             // world puts them between the player and what they are fighting; the map is
@@ -1423,6 +1446,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 {
                     _healthBars.OnlyWhenHurt = hurtOnly;
                     SettingsChanged?.Invoke();
+                }
+
+                bool behind = HideBehindPanels;
+                if (ImGui.Checkbox("Hide behind big panels  (stash, skill tree, atlas, world map)", ref behind))
+                {
+                    HideBehindPanels = behind;
+                    SettingsChanged?.Invoke();
+                }
+
+                // WHICH ones, not just whether. The panels are found at unverified offsets and
+                // paths, and the way a wrong one fails is that something reads open forever and
+                // the markers never come back - which looks exactly like an overlay that broke.
+                // Named here, it is instead one line saying which panel to stop believing.
+                if (_snapshot.InAPanel)
+                {
+                    ImGui.TextColored(new Vector4(1f, 0.8f, 0.35f, 1f), $"panels open:  {_snapshot.Panels}");
                 }
 
                 // Only when there is one. A path that does not work otherwise shows up as a

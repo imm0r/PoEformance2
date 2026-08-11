@@ -310,6 +310,18 @@ interesting part was not the feature:
 - **Routes that stay on one storey.** The walkable grid is flat: a bridge and the ground under
   it are the same cells and both walkable, so a two-dimensional search draws a route through
   the floor. Only the height separates them.
+- **Getting out of the way of the game's own panels.** Everything drawn in world space is drawn
+  UNDERNEATH a stash, a passive tree or a world map the moment one opens — right information in
+  the way, which is worse than none. `PanelReader` reports which screen-filling panels are open
+  and the world block is gated on it. Two things made this more than an `if`. The panels come
+  from two kinds of place and they fail differently: the left panel, the right panel, the world
+  map and the skill tree are POINTERS the game nulls when nothing is open, so a wrong offset
+  reads as a bad pointer and simply never fires; the rest are CHILD PATHS, and a wrong one can
+  land on a real element that is always showing — which hides the overlay forever with nothing
+  to say why. So everything unreadable reads as SHUT (the safe direction: an overlay drawn over
+  a panel is the status quo, an overlay that vanished is a bug report nobody can act on), the
+  answer is a flags enum rather than a bool so the status window can name the panel that is
+  stuck, and there is a switch to stop asking.
 
 ### The atlas — the one feature that is INTERFACE rather than world
 
@@ -331,6 +343,14 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
 - **Hide AFTER asking about routes.** A map worth routing to is one nobody has reached, so
   culling the unreachable first hides exactly the routes somebody turned on — while every
   setting still reads correct. The reference records learning this; it is a test here.
+- **A shut panel is not an empty one.** Closing the atlas clears the visible bit on the panel
+  and leaves everything else exactly as it was — several hundred node children still in the
+  tree, still flagged, still with readable positions. So "does it have any maps in it" answers
+  yes to an atlas nobody is looking at, and the overlay went on writing map names over the game
+  until it was opened again. The test is `UiElementReader.IsVisible` on the panel, which walks
+  the whole ancestor chain because a panel shut by its container keeps its own bit set. Asked
+  first, it is also what makes the read idle: a walk up a handful of parents instead of several
+  hundred nodes read for nothing.
 - **The lines belong to the PANEL, not to the nodes.** One flat vector of edges — an unknown
   word, then the grid position at each end — and no node has a neighbour list of its own. Read
   at that offset on each node instead, the two words are whatever that node's bytes happen to
