@@ -37,6 +37,12 @@ public sealed class PreloadPanel
     /// <summary>How every drawn thing looks. Shared with the overlay.</summary>
     public OverlayStyle Style { get; set; } = new();
 
+    /// <summary>The id this window's lock and click-through are filed under.</summary>
+    public const string ChromeId = "preload";
+
+    /// <summary>Whether this window is pinned in place or handed to the mouse.</summary>
+    public WindowChrome Chrome { get; set; } = new();
+
     /// <summary>Whether the list is wanted at all - the user's setting, not a style.</summary>
     public bool Enabled { get; set; } = true;
 
@@ -75,7 +81,7 @@ public sealed class PreloadPanel
         ImGui.SetNextWindowPos(new Vector2(screen.X * 0.015f, screen.Y * 0.22f), ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowBgAlpha(Alpha());
 
-        if (!ImGui.Begin("What loaded###preload-corner", Flags))
+        if (!ImGui.Begin("What loaded###preload-corner", Chrome.Flags(ChromeId, Flags)))
         {
             ImGui.End();
             return;
@@ -98,6 +104,10 @@ public sealed class PreloadPanel
             {
                 _closed = area;
             }
+
+            // LAST, after the contents. The menu declines to open over a control, and what is
+            // under the cursor is only known once the controls have been submitted.
+            Chrome.Menu(ChromeId);
         }
         finally
         {

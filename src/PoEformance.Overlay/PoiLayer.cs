@@ -37,6 +37,12 @@ public sealed class PoiLayer
     /// </summary>
     public OverlayStyle Style { get; set; } = new();
 
+    /// <summary>The id this window's lock and click-through are filed under.</summary>
+    public const string ChromeId = "poi";
+
+    /// <summary>Whether this window is pinned in place or handed to the mouse.</summary>
+    public WindowChrome Chrome { get; set; } = new();
+
     /// <summary>
     /// Finds the texture for a chosen picture, or zero when the shape should be drawn.
     /// </summary>
@@ -396,7 +402,8 @@ public sealed class PoiLayer
         ImGui.SetNextWindowPos(new Vector2(40, 320), ImGuiCond.FirstUseEver);
 
         bool open = ShowPicker;
-        if (ImGui.Begin("Points of interest", ref open, ImGuiWindowFlags.NoFocusOnAppearing))
+        if (ImGui.Begin(
+                "Points of interest", ref open, Chrome.Flags(ChromeId, ImGuiWindowFlags.NoFocusOnAppearing)))
         {
             if (player is null)
             {
@@ -406,6 +413,11 @@ public sealed class PoiLayer
             {
                 DrawPickerBody(snapshot, player);
             }
+
+            // LAST, after the contents. The menu declines to open over a control, and what is
+            // under the cursor is only known once the controls have been submitted - asked
+            // first it would steal the right-click every control here has its own use for.
+            Chrome.Menu(ChromeId);
         }
 
         ImGui.End();

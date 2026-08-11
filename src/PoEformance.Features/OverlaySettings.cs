@@ -22,8 +22,19 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("poiArrows")] bool PoiArrows = true,
     [property: JsonPropertyName("dotLabels")] bool DotLabels = false,
     [property: JsonPropertyName("healthBarsOnlyWhenHurt")] bool HealthBarsOnlyWhenHurt = false,
-    [property: JsonPropertyName("hideBehindPanels")] bool HideBehindPanels = true)
+    [property: JsonPropertyName("hideBehindPanels")] bool HideBehindPanels = true,
+    [property: JsonPropertyName("windows")] IReadOnlyDictionary<string, WindowRule>? Windows = null)
 {
+    /// <summary>What each window was told, by the window's own id. Empty until somebody says.</summary>
+    /// <remarks>
+    /// Only the windows somebody has actually pinned down are kept, so the file stays a record
+    /// of decisions rather than a list of every window that has ever existed - which is also
+    /// what lets a renamed or retired window disappear without leaving a stale entry behind.
+    /// </remarks>
+    public IReadOnlyDictionary<string, WindowRule> WindowsOrEmpty => Windows ?? NoWindows;
+
+    private static readonly Dictionary<string, WindowRule> NoWindows = [];
+
     /// <summary>
     /// Magic and above, and the layout shown. Path of Exile 2 drops normal-rarity items
     /// faster than they can be read, so marking all of them buries the drops worth walking
