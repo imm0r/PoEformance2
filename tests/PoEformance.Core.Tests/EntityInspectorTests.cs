@@ -304,6 +304,45 @@ public class EntityInspectorTests
         Assert.Contains("2 from StatsByBuffAndActions", view.StatsNote, StringComparison.Ordinal);
     }
 
+    /// <summary>One bag reached through two pointers is listed once, and said to be one.</summary>
+    /// <remarks>
+    /// A flame wall's two Stats pointers are the same address. Listed under both headings its
+    /// single stat appears twice, which reads as two independent sightings of a number that
+    /// was only ever read once - and this tool exists to stop exactly that kind of thing.
+    /// </remarks>
+    [Fact]
+    public void TheSameBagReachedTwiceIsOnlyListedOnce()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Anomalies/Firewall", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Stats");
+
+        StructDef component = schema.Structs["Stats"];
+        StructDef internals = schema.Structs["StatsInternal"];
+        EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        ulong stats = placed.Components.Single(c => c.Name == "Stats").Address;
+
+        const ulong SharedAt = 0x3400_0000_0000;
+        const ulong PairsAt = 0x3400_0001_0000;
+
+        // BOTH pointers at the same StatsInternal, as the game has them on a flame wall.
+        reader.Place(stats + (ulong)component.OffsetOf("StatsByBuffAndActions"), SharedAt);
+        reader.Place(stats + (ulong)component.OffsetOf("StatsByItems"), SharedAt);
+        reader.Place(SharedAt + (ulong)internals.OffsetOf("StatsVector"), PairsAt);
+        reader.Place(SharedAt + (ulong)internals.OffsetOf("StatsVectorLast"), PairsAt + 8);
+
+        var block = new byte[8];
+        BitConverter.TryWriteBytes(block.AsSpan(0, 4), 13189u);
+        BitConverter.TryWriteBytes(block.AsSpan(4, 4), 1);
+        reader.Place(PairsAt, block);
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Single(view.Numbers);
+        Assert.Contains("same bag", view.StatsNote, StringComparison.Ordinal);
+    }
+
     /// <summary>An empty stat vector is not reported as an unreadable one.</summary>
     /// <remarks>
     /// begin == end == null is what an entity with no stats from that source looks like, and
