@@ -89,6 +89,12 @@ public sealed class DamageMeter
         public ItemRarity Rarity = ItemRarity.Unknown;
         public bool Hurt;
 
+        // For the kill log: when the fight with THIS monster started, and how much of it was
+        // watched coming off. The remainder credited when it vanishes is added at that point,
+        // so the two together are what the monster cost.
+        public long FirstHurtMs;
+        public long Dealt;
+
         // How far from the player this was the last time it was SEEN, or -1 when there was no
         // player to measure against. At the last sighting rather than at the moment it went
         // missing, because the moment it went missing is the moment there is nothing left to
@@ -112,6 +118,12 @@ public sealed class DamageMeter
     // the tests caught it: zero is a perfectly good timestamp, so a sentinel of zero means a
     // clock that starts there never leaves the establishing branch.
     private long? _sampledAtMs;
+
+    // The player's own pool at the last reading, and what has come off it since the last
+    // sample was written. Nullable for the same reason as the clocks above: an unread pool and
+    // a pool of nought are different things, and a death must not read as one huge hit.
+    private int? _pool;
+    private long _tookThisStretch;
     private long _sampledObserved;
     private long _sampledHurt;
     private long _sampledUntouched;
@@ -201,6 +213,45 @@ public sealed class DamageMeter
     /// a second clock to keep in step with this one.
     /// </remarks>
     public DamageHistory History { get; } = new();
+
+    /// <summary>
+    /// The rares and uniques that went down, and what each cost.
+    /// </summary>
+    /// <remarks>
+    /// Kept across areas and scoped by one, like the history: "how long did that rare take"
+    /// is asked after the map, not during it.
+    /// </remarks>
+    public KillLog Kills { get; } = new();
+
+    /// <summary>
+    /// What came off the player's own life and shield in this area.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED THE SAME WAY as the damage out, and carrying the same limits: it is a pool
+    /// falling, so a hit that was fully absorbed by a recharge in the same thirty-millisecond
+    /// window is invisible, and a hit and a leech in that window read as their difference. What
+    /// it is good for is the question it is here to answer - what took a lot at once - and for
+    /// that the pool is the right thing to watch, because the pool is what runs out.
+    ///
+    /// LIFE AND SHIELD TOGETHER, because the thing that kills is the total running out. Split,
+    /// a shield popping and refilling would read as a stream of damage and recoveries rather
+    /// than as one hit.
+    /// </remarks>
+    public long Taken { get; private set; }
+
+    /// <summary>The largest single drop seen, and when. The one that nearly did it.</summary>
+    /// <remarks>
+    /// A SINGLE READ'S drop rather than a second's worth, because "what nearly killed me" is
+    /// about one moment: a slow bleed to the same total is a different problem with a different
+    /// answer, and averaging the two together loses both.
+    /// </remarks>
+    public long WorstHit { get; private set; }
+
+    /// <summary>What was around when the worst hit landed.</summary>
+    public MonsterCensus WorstHitAgainst { get; private set; }
+
+    /// <summary>How much of the pool that hit took, as a share of its maximum.</summary>
+    public float WorstHitShare { get; private set; }
 
     /// <summary>Total damage watched fall off monster health in this area.</summary>
     public long Observed { get; private set; }
@@ -400,6 +451,13 @@ public sealed class DamageMeter
         _sampledObserved = 0;
         _sampledHurt = 0;
         _sampledUntouched = 0;
+
+        Taken = 0;
+        WorstHit = 0;
+        WorstHitShare = 0f;
+        WorstHitAgainst = default;
+        _pool = null;
+        _tookThisStretch = 0;
     }
 
     /// <summary>Takes one snapshot and moves the figures on.</summary>
@@ -442,6 +500,11 @@ public sealed class DamageMeter
             _stampMs = nowMs;
             Absorb(snapshot, nowMs);
 
+            // The player's pool is noted here for the same reason every monster's is: without
+            // a first reading there is nothing to take a difference against, and the first hit
+            // of the area would be lost rather than measured.
+            Suffer(snapshot);
+
             // The graph's first stretch starts HERE, at the area's first reading. Left until
             // the second one, the first sample would carry the damage of the interval before
             // it as well - measured against a baseline of nought that was never true.
@@ -461,7 +524,50 @@ public sealed class DamageMeter
         _stampMs = nowMs;
         long dealt = Damage(snapshot, nowMs, dt);
         Advance(dealt, dt);
+        Suffer(snapshot);
         Record(nowMs, snapshot);
+    }
+
+    /// <summary>Counts what came off the player's own pool since the last reading.</summary>
+    /// <remarks>
+    /// The same difference-of-pools measurement the damage out uses, on one entity instead of
+    /// all of them - so it inherits the same blind spot and it is worth naming: a hit fully
+    /// undone by a recharge inside one read is invisible, and a hit plus a leech read as their
+    /// difference. For "what took a lot at once", which is what this is for, that is the right
+    /// trade: the pool is what actually runs out.
+    /// </remarks>
+    private void Suffer(WorldSnapshot snapshot)
+    {
+        if (snapshot.PlayerVitals is not Vitals vitals || vitals.IsDeadOrUnloaded)
+        {
+            // Dead or unread. Dropping the baseline is what stops the whole pool being counted
+            // as one enormous hit on the way back in - and a death is not a hit anybody wants
+            // measured, it is the end of the fight.
+            _pool = null;
+            return;
+        }
+
+        int pool = Math.Max(0, vitals.Life.Current) + Math.Max(0, vitals.EnergyShield.Current);
+        int most = Math.Max(1, Math.Max(0, vitals.Life.Max) + Math.Max(0, vitals.EnergyShield.Max));
+
+        if (_pool is int before)
+        {
+            int fell = before - pool;
+            if (fell > 0)
+            {
+                Taken += fell;
+                _tookThisStretch += fell;
+
+                if (fell > WorstHit)
+                {
+                    WorstHit = fell;
+                    WorstHitShare = (float)fell / most;
+                    WorstHitAgainst = Census(snapshot);
+                }
+            }
+        }
+
+        _pool = pool;
     }
 
     /// <summary>
@@ -512,8 +618,11 @@ public sealed class DamageMeter
             (Observed - _sampledObserved) / seconds,
             (CreditedHurt - _sampledHurt) / seconds,
             (CreditedUntouched - _sampledUntouched) / seconds,
-            Census(snapshot)));
+            Census(snapshot),
+            span,
+            _tookThisStretch / seconds));
 
+        _tookThisStretch = 0;
         Baseline(nowMs);
     }
 
@@ -651,10 +760,12 @@ public sealed class DamageMeter
                 dealt += fell;
                 Observed += fell;
                 target.DamagedMs = nowMs;
+                target.Dealt += fell;
 
                 if (!target.Hurt)
                 {
                     target.Hurt = true;
+                    target.FirstHurtMs = nowMs;
                     Hurt++;
                 }
             }
@@ -729,9 +840,38 @@ public sealed class DamageMeter
             {
                 CreditedUntouched += target.Pool;
             }
+
+            Log(target, nowMs);
         }
 
         return credited;
+    }
+
+    /// <summary>Writes a rare or better into the kill log, once it is actually gone.</summary>
+    /// <remarks>
+    /// AFTER the gate, deliberately: a monster refused for distance is one this tool does not
+    /// believe was killed, and a log of kills that includes ones it does not believe in is not
+    /// a log of kills. It never appears, rather than appearing with a caveat.
+    /// </remarks>
+    private void Log(Tracked target, long nowMs)
+    {
+        if (target.Rarity < KillLog.Interesting)
+        {
+            return;
+        }
+
+        Kills.Add(new KillRecord(
+            nowMs,
+            _area,
+            target.Name,
+            target.Rarity,
+            target.Dealt + target.Pool,
+
+            // From the FIRST damage rather than from when it was first seen. A rare that
+            // followed you across half a map before anybody hit it did not take a minute to
+            // kill, and timing from the sighting would say it did.
+            target.Hurt ? (nowMs - target.FirstHurtMs) / 1000f : 0f,
+            target.Hurt));
     }
 
     /// <summary>Moves the overall average on by one reading.</summary>

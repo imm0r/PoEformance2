@@ -40,6 +40,24 @@ public sealed class DamageWindow
     private static readonly Vector4 UntouchedBar = new(0.74f, 0.32f, 0.28f, 0.95f);
     private static readonly Vector4 PlotBack = new(0.08f, 0.09f, 0.11f, 0.85f);
 
+    // Brighter than the rest, because these are the figures worth writing down: unlike the
+    // headline they do not move as you fight, and unlike the peak they mean the same thing on
+    // anybody else's machine.
+    private static readonly Vector4 BurstText = new(0.65f, 1f, 0.75f, 1f);
+
+    // The slowest kill, in the colour the read-cost tab uses for its worst reading, and for
+    // the same reason: it is the one entry in the list somebody can act on.
+    private static readonly Vector4 WorstText = new(1f, 0.62f, 0.35f, 1f);
+
+    // The two halves of what a build is tuned between, told apart by colour rather than only
+    // by their labels - they sit on one line and are read at a glance.
+    private static readonly Vector4 SingleText = new(0.55f, 0.85f, 1f, 1f);
+    private static readonly Vector4 PackText = new(0.75f, 0.7f, 1f, 1f);
+
+    // The damage coming BACK, in the one colour nothing else here uses. It has to be told
+    // apart from all three bands at once, and red is what a health bar is.
+    private static readonly Vector4 TakenLine = new(1f, 0.35f, 0.38f, 1f);
+
     // The census, in the game's OWN rarity colours - white, blue, yellow, orange. Nobody has
     // to learn these; a player has been reading them since the first magic item.
     private static readonly Vector4 NormalText = new(0.85f, 0.85f, 0.85f, 1f);
@@ -72,7 +90,9 @@ public sealed class DamageWindow
     {
         ImGui.TextColored(DpsText, $"{Number(_meter.Dps)} dps");
         ImGui.SameLine();
-        ImGui.TextColored(DimText, $"   peak {Number(_meter.Peak)}   this area {Number(_meter.Total)} total");
+        ImGui.TextColored(DimText, $"   this area {Number(_meter.Total)} total");
+
+        DrawBurst();
 
         ImGui.Separator();
 
@@ -151,7 +171,173 @@ public sealed class DamageWindow
         DrawGraph();
 
         ImGui.Separator();
+        DrawKills();
+
+        ImGui.Separator();
         DrawTargets();
+    }
+
+    /// <summary>
+    /// What every rare and unique cost, newest first.
+    /// </summary>
+    /// <remarks>
+    /// THE QUESTION BEHIND MOST SINGLE-TARGET COMPLAINTS. "How long does a rare take" cannot
+    /// be got out of a rate averaged over a map, because no map is one long fight - the average
+    /// is mostly the packs. One line per kill answers it directly, and the slowest one is the
+    /// monster the build actually has trouble with.
+    /// </remarks>
+    private void DrawKills()
+    {
+        uint scope = _thisMapOnly ? CurrentArea : 0;
+        IReadOnlyList<KillRecord> kills = _meter.Kills.In(scope);
+
+        if (!ImGui.CollapsingHeader($"Rares and uniques ({kills.Count})###dmg-kills", ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            return;
+        }
+
+        if (kills.Count == 0)
+        {
+            ImGui.TextColored(DimText, "none down yet in this scope");
+            return;
+        }
+
+        // The slowest first and on its own line, because it is the one worth acting on and it
+        // would otherwise be somewhere in a list sorted by when things happened.
+        if (_meter.Kills.Worst(scope) is { } worst)
+        {
+            ImGui.TextColored(
+                WorstText,
+                $"slowest: {worst.Name}  {worst.Seconds:F1}s  ({Number(worst.Damage)} at {Number(worst.Dps)} dps)");
+        }
+
+        if (!ImGui.BeginTable("##dmg-kill-table", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TableSetupColumn("monster");
+            ImGui.TableSetupColumn("took");
+            ImGui.TableSetupColumn("damage");
+            ImGui.TableSetupColumn("dps");
+            ImGui.TableHeadersRow();
+
+            foreach (KillRecord kill in kills)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                ImGui.TextColored(RarityText(kill.Rarity), kill.Name.Length > 0 ? kill.Name : "(unnamed)");
+
+                ImGui.TableNextColumn();
+
+                // A one-shot has no fight to time, and printing 0.0s would read as a
+                // measurement rather than as the absence of one.
+                if (kill.Watched)
+                {
+                    ImGui.Text($"{kill.Seconds:F1}s");
+                }
+                else
+                {
+                    ImGui.TextColored(SoftText, "one-shot");
+                }
+
+                ImGui.TableNextColumn();
+                ImGui.Text(Number(kill.Damage));
+
+                ImGui.TableNextColumn();
+                ImGui.TextColored(kill.Watched ? DimText : SoftText, kill.Watched ? Number(kill.Dps) : "-");
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
+    }
+
+    /// <summary>A monster's rarity in the game's own colour for it.</summary>
+    private static Vector4 RarityText(ItemRarity rarity) => rarity switch
+    {
+        ItemRarity.Magic => MagicText,
+        ItemRarity.Rare => RareText,
+        >= ItemRarity.Unique => UniqueText,
+        _ => NormalText,
+    };
+
+    /// <summary>
+    /// The most damage sustained over one second, five and ten - the comparable numbers.
+    /// </summary>
+    /// <remarks>
+    /// THREE LENGTHS because they answer three different questions, and a build can be good at
+    /// one and poor at the next: a second is the opening hit, five is a rare going down, ten is
+    /// whether it can keep going. One figure would hide exactly the difference somebody is
+    /// tuning for.
+    ///
+    /// <c>Peak</c> is still shown, dimmed and last, with what it actually is written beside it -
+    /// it is the high-water mark of a smoothed average and moves with the smoothing slider, so
+    /// it is the one number here that cannot be compared with anybody else's.
+    /// </remarks>
+    private void DrawBurst()
+    {
+        uint scope = _thisMapOnly ? CurrentArea : 0;
+
+        float second = _meter.History.Best(1, scope);
+        if (second <= 0f)
+        {
+            return;
+        }
+
+        ImGui.TextColored(
+            BurstText,
+            $"best 1s {Number(second)}"
+            + $"   5s {Number(_meter.History.Best(5, scope))}"
+            + $"   10s {Number(_meter.History.Best(10, scope))}");
+
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, $"   peak {Number(_meter.Peak)} (smoothed, moves with the slider)");
+
+        DrawSplit(scope);
+    }
+
+    /// <summary>
+    /// What the build does against one monster, and against a crowd.
+    /// </summary>
+    /// <remarks>
+    /// The two numbers a build is actually tuned between, got for nothing: every bar already
+    /// records how many monsters were around, so the stretches with one monster near ARE the
+    /// single-target fight and no dummy-hitting exercise is needed to find them.
+    ///
+    /// Shown with HOW LONG each was measured over, because that is what says whether to believe
+    /// it. Twelve seconds of single target across a map is a figure; two is an accident.
+    /// </remarks>
+    private void DrawSplit(uint scope)
+    {
+        (DamageHistory.Split single, DamageHistory.Split pack) = _meter.History.Alone(scope);
+        if (single.Seconds <= 0 && pack.Seconds <= 0)
+        {
+            return;
+        }
+
+        if (single.Seconds > 0)
+        {
+            ImGui.TextColored(
+                SingleText, $"single target {Number(single.Dps)}");
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, $"over {single.Seconds:F0}s alone with one   ");
+            ImGui.SameLine();
+        }
+
+        if (pack.Seconds > 0)
+        {
+            ImGui.TextColored(PackText, $"in a pack {Number(pack.Dps)}");
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, $"over {pack.Seconds:F0}s with {DamageHistory.Crowd}+");
+            ImGui.SameLine();
+        }
+
+        // Ends the SameLine run above, whichever of the two ran last.
+        ImGui.NewLine();
     }
 
     /// <summary>
@@ -239,6 +425,14 @@ public sealed class DamageWindow
             Band(draw, left, right, bottom, sample.Untouched, tallest, size.Y, untouched);
         }
 
+        // WHAT WAS COMING BACK, over the bars rather than beside them. A line on its own scale,
+        // because the two figures are nowhere near each other in size - a build deals tens of
+        // thousands and dies to four - and drawn to the same ceiling it would be a flat line
+        // along the bottom saying nothing. What it is for is WHEN, not how much: the moment the
+        // damage out stopped and the damage in started is a shape, and it only shows on one
+        // timeline.
+        DrawTaken(draw, at, size, samples, first, columns, step);
+
         // The ceiling, so a bar's height can be turned into a number without hovering it.
         draw.AddLine(at, at + new Vector2(size.X, 0f), ImGui.ColorConvertFloat4ToU32(DimText), 1f);
         draw.AddText(
@@ -251,8 +445,118 @@ public sealed class DamageWindow
         ImGui.TextColored(WatchedBar, "watched");
         ImGui.TextColored(CreditedBar, "credited");
         ImGui.TextColored(UntouchedBar, "untouched");
+        ImGui.TextColored(TakenLine, "taken");
         ImGui.TextColored(DimText, $"{_meter.History.SecondsIn(scope) / 60:F1} min");
         ImGui.EndGroup();
+
+        DrawWorstHit();
+    }
+
+    /// <summary>
+    /// The single biggest thing that came off the pool, and what was around when it did.
+    /// </summary>
+    /// <remarks>
+    /// ONE READ'S drop rather than a second's worth, because "what nearly killed me" is about
+    /// one moment. A slow bleed to the same total is a different problem with a different
+    /// answer, and averaging the two together loses both.
+    ///
+    /// As a SHARE of the pool as well as a number, because that is the part that means
+    /// something: four thousand is a scratch or most of a life bar depending on the character,
+    /// and the tool knows which.
+    /// </remarks>
+    private void DrawWorstHit()
+    {
+        if (_meter.WorstHit <= 0)
+        {
+            return;
+        }
+
+        ImGui.TextColored(
+            TakenLine,
+            $"taken {Number(_meter.Taken)} this area"
+            + $"   -   worst hit {Number(_meter.WorstHit)} ({_meter.WorstHitShare:P0} of the pool)");
+
+        MonsterCensus against = _meter.WorstHitAgainst;
+        if (against.Any)
+        {
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, $"   with {Describe(against)} nearby");
+        }
+    }
+
+    /// <summary>A census in a few words, rarest first - what was actually worth naming.</summary>
+    private static string Describe(MonsterCensus census)
+    {
+        var parts = new List<string>(4);
+        if (census.Unique > 0)
+        {
+            parts.Add($"{census.Unique} unique");
+        }
+
+        if (census.Rare > 0)
+        {
+            parts.Add($"{census.Rare} rare");
+        }
+
+        if (census.Magic > 0)
+        {
+            parts.Add($"{census.Magic} magic");
+        }
+
+        if (census.Normal > 0)
+        {
+            parts.Add($"{census.Normal} normal");
+        }
+
+        return string.Join(", ", parts);
+    }
+
+    /// <summary>The damage coming back, as a line on its own scale over the bars.</summary>
+    /// <remarks>
+    /// ITS OWN SCALE, said out loud because it is a graph with two y axes and that is normally
+    /// a thing to avoid. Here the alternative is worse: a build deals tens of thousands and
+    /// dies to four, so on the bars' ceiling this would be a flat line along the bottom. The
+    /// line answers WHEN rather than how much, and the exact figure is in the hover.
+    /// </remarks>
+    private static void DrawTaken(
+        ImDrawListPtr draw,
+        Vector2 at,
+        Vector2 size,
+        IReadOnlyList<DamageSample> samples,
+        int first,
+        int columns,
+        float step)
+    {
+        float worst = 0f;
+        for (int i = 0; i < columns; i++)
+        {
+            worst = MathF.Max(worst, samples[first + i].Taken);
+        }
+
+        if (worst <= 0f)
+        {
+            return;
+        }
+
+        // Two thirds of the plate, so the line has room to peak without touching the ceiling
+        // the bars are measured against and being read as one of them.
+        float room = size.Y * 0.66f;
+        uint colour = ImGui.ColorConvertFloat4ToU32(TakenLine);
+        Vector2? previous = null;
+
+        for (int i = 0; i < columns; i++)
+        {
+            var point = new Vector2(
+                at.X + (i * step) + (step * 0.5f),
+                at.Y + size.Y - (samples[first + i].Taken / worst * room));
+
+            if (previous is Vector2 last)
+            {
+                draw.AddLine(last, point, colour, 1.5f);
+            }
+
+            previous = point;
+        }
     }
 
     /// <summary>One band of a stacked bar. Returns the top it reached, for the next one up.</summary>
@@ -299,6 +603,11 @@ public sealed class DamageWindow
         ImGui.TextColored(WatchedBar, $"watched    {Number(sample.Watched)}");
         ImGui.TextColored(CreditedBar, $"credited   {Number(sample.Credited)}");
         ImGui.TextColored(UntouchedBar, $"untouched  {Number(sample.Untouched)}");
+
+        if (sample.Taken > 0f)
+        {
+            ImGui.TextColored(TakenLine, $"taken      {Number(sample.Taken)}");
+        }
 
         // WHAT IT WAS AGAINST, which is what makes the number above mean anything: five
         // thousand into a rare is a build working, and five thousand into forty white monsters

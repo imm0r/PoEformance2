@@ -198,6 +198,107 @@ public class DamageHistoryTests
     }
 
     [Fact]
+    public void THEBestWindowIsTheMostThatActuallyLandedOverThatLong()
+    {
+        // Four quarter-seconds at 1000/s, then four at 100/s. The best second is the first
+        // four; the best two seconds has to include the quiet half and so reads as the mean.
+        var history = new DamageHistory();
+        for (int i = 0; i < 4; i++)
+        {
+            history.Add(new DamageSample(250 * (i + 1), 1, 1000f, 0f, 0f));
+        }
+
+        for (int i = 4; i < 8; i++)
+        {
+            history.Add(new DamageSample(250 * (i + 1), 1, 100f, 0f, 0f));
+        }
+
+        Assert.Equal(1000f, history.Best(1, 1), 1f);
+        Assert.Equal(550f, history.Best(2, 1), 1f);
+
+        // Longer than anything held is not a number: a window that was never filled would
+        // divide a burst by time that was never measured.
+        Assert.Equal(0f, history.Best(30, 1));
+    }
+
+    [Fact]
+    public void ANDAWindowNeverSpansAHole()
+    {
+        // Two bursts either side of a loading screen are two bursts. Added across the gap they
+        // would report one that never happened - the pause simply deleted.
+        var history = new DamageHistory();
+        history.Add(new DamageSample(250, 1, 1000f, 0f, 0f));
+        history.Add(new DamageSample(500, 1, 1000f, 0f, 0f));
+
+        // ... a minute of nothing ...
+        history.Add(new DamageSample(60_250, 1, 1000f, 0f, 0f));
+        history.Add(new DamageSample(60_500, 1, 1000f, 0f, 0f));
+
+        // Half a second either side, so no window of a whole second was ever fought.
+        Assert.Equal(0f, history.Best(1, 1));
+        Assert.Equal(1000f, history.Best(0.5, 1), 1f);
+    }
+
+    [Fact]
+    public void ANDItIsMeasuredOverREALTimeRatherThanOverSamples()
+    {
+        // A sample carries its own span, so a slow read that produced a longer bucket counts
+        // for the longer time it covered. Counting samples instead would let a stuttering
+        // machine report a burst it never sustained.
+        var history = new DamageHistory();
+        history.Add(new DamageSample(1000, 1, 1000f, 0f, 0f, SpanMs: 1000));
+
+        // One sample, but it IS a whole second of a thousand a second.
+        Assert.Equal(1000f, history.Best(1, 1), 1f);
+    }
+
+    [Fact]
+    public void SINGLETargetIsTheStretchesWhereOnlyOneThingWasThere()
+    {
+        // Got for nothing from what is already held: every bar records how many monsters were
+        // around, so the stretches with one near ARE the single-target fight - no separate
+        // dummy-hitting exercise is needed to find them.
+        var history = new DamageHistory();
+        history.Add(new DamageSample(250, 1, 400f, 0f, 0f, new MonsterCensus(0, 0, 1, 0)));
+        history.Add(new DamageSample(500, 1, 600f, 0f, 0f, new MonsterCensus(0, 0, 1, 0)));
+        history.Add(new DamageSample(750, 1, 5000f, 0f, 0f, new MonsterCensus(8, 0, 0, 0)));
+
+        (DamageHistory.Split single, DamageHistory.Split pack) = history.Alone(1);
+
+        Assert.Equal(500f, single.Dps, 1f);
+        Assert.Equal(0.5, single.Seconds, 0.01);
+        Assert.Equal(5000f, pack.Dps, 1f);
+        Assert.Equal(0.25, pack.Seconds, 0.01);
+    }
+
+    [Fact]
+    public void ANDTheMiddleIsNeitherRatherThanForcedIntoOne()
+    {
+        // Two or three monsters is not single target and not a pack. Folding it into either
+        // would move that figure for a reason that has nothing to do with the build.
+        var history = new DamageHistory();
+        history.Add(new DamageSample(250, 1, 9999f, 0f, 0f, new MonsterCensus(3, 0, 0, 0)));
+
+        (DamageHistory.Split single, DamageHistory.Split pack) = history.Alone(1);
+
+        Assert.Equal(0, single.Seconds);
+        Assert.Equal(0, pack.Seconds);
+    }
+
+    [Fact]
+    public void ANDItIsWeightedByTimeRatherThanBySample()
+    {
+        // The buckets are not equally long, so averaging the rates would let a stuttering read
+        // count its longer buckets for less than the time they actually covered.
+        var history = new DamageHistory();
+        history.Add(new DamageSample(1000, 1, 100f, 0f, 0f, new MonsterCensus(0, 0, 1, 0), SpanMs: 1000));
+        history.Add(new DamageSample(1250, 1, 500f, 0f, 0f, new MonsterCensus(0, 0, 1, 0), SpanMs: 250));
+
+        // (100*1 + 500*0.25) / 1.25 = 180, not the 300 an average of the rates would give.
+        Assert.Equal(180f, history.Alone(1).Single.Dps, 1f);
+    }
+
+    [Fact]
     public void THETallestBarIsWhatAGraphHasToBeScaledTo()
     {
         var history = new DamageHistory();
