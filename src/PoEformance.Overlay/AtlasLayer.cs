@@ -83,13 +83,18 @@ public sealed class AtlasLayer
             return;
         }
 
+        Vector2 screen = ImGui.GetIO().DisplaySize;
+
         if (Style.Visible(StyleCatalogue.Keys.AtlasWeb))
         {
             uint web = Style.Colour(StyleCatalogue.Keys.AtlasWeb);
             float thin = Style.Width(StyleCatalogue.Keys.AtlasWeb, 1.5f);
             foreach ((Vector2 from, Vector2 to) in view.Web)
             {
-                draw.AddLine(from, to, web, thin);
+                if (Worth(from, to, screen))
+                {
+                    draw.AddLine(from, to, web, thin);
+                }
             }
         }
 
@@ -99,7 +104,7 @@ public sealed class AtlasLayer
             {
                 if (mark.Route.Count >= 2)
                 {
-                    DrawRoute(draw, mark);
+                    DrawRoute(draw, mark, screen);
                 }
             }
         }
@@ -119,17 +124,20 @@ public sealed class AtlasLayer
     /// is already named and coloured; what a route is actually asked is "which of the maps I
     /// can enter now does this start from", and that end is otherwise just where a line stops.
     /// </remarks>
-    private void DrawRoute(ImDrawListPtr draw, AtlasMark mark)
+    private void DrawRoute(ImDrawListPtr draw, AtlasMark mark, Vector2 screen)
     {
         uint colour = ColourOf(mark, 0.55f);
         float width = Style.Width(StyleCatalogue.Keys.AtlasRoute, 4f);
 
         for (int i = 1; i < mark.Route.Count; i++)
         {
-            draw.AddLine(mark.Route[i - 1], mark.Route[i], colour, width);
+            if (Worth(mark.Route[i - 1], mark.Route[i], screen))
+            {
+                draw.AddLine(mark.Route[i - 1], mark.Route[i], colour, width);
+            }
         }
 
-        if (!Style.Visible(StyleCatalogue.Keys.AtlasEntry))
+        if (!Style.Visible(StyleCatalogue.Keys.AtlasEntry) || !On(mark.Route[0], screen))
         {
             return;
         }
@@ -209,6 +217,29 @@ public sealed class AtlasLayer
         draw.AddText(ImGui.GetFont(), font, at, text, title);
         return at.Y + size.Y + 3f;
     }
+
+    /// <summary>How far outside the screen a point still counts as being on it.</summary>
+    /// <remarks>
+    /// A margin rather than the exact edge, so a line whose far end is just past the border
+    /// still anchors properly instead of popping in as the atlas is dragged.
+    /// </remarks>
+    private const float Margin = 64f;
+
+    /// <summary>Whether a point is on the screen, give or take the margin.</summary>
+    private static bool On(Vector2 at, Vector2 screen)
+        => at.X >= -Margin && at.Y >= -Margin && at.X <= screen.X + Margin && at.Y <= screen.Y + Margin;
+
+    /// <summary>
+    /// Whether a segment is worth drawing at all - one end on the screen is enough.
+    /// </summary>
+    /// <remarks>
+    /// A full atlas is a couple of thousand connections and most of them are somewhere else
+    /// entirely, so this is what keeps the cost proportional to what is being looked at rather
+    /// than to how much of the atlas has been revealed. One end is enough on purpose: a route
+    /// that starts off-screen still has to be seen entering.
+    /// </remarks>
+    private static bool Worth(Vector2 from, Vector2 to, Vector2 screen)
+        => On(from, screen) || On(to, screen);
 
     /// <summary>The size to write at, from the interface's own and the chosen scale.</summary>
     private float Font => ImGui.GetFontSize() * (TextScale > 0f ? TextScale : 1f);

@@ -201,6 +201,57 @@ public class AtlasViewTests
     }
 
     [Fact]
+    public void ANodeThePanelDidNotPlaceIsDROPPEDRatherThanLeftWhereItWas()
+    {
+        // The bug that made an atlas look like a spider's web. Keeping the last-seen position
+        // reads as harmless - a third of a second of lag is invisible on a label - and on a
+        // LINE it is not: dragging the atlas re-lays every node, so a node that missed a tick
+        // sits exactly one drag behind, and every line to it is a ray with that same offset.
+        // They are all parallel because they all share it.
+        AtlasNode here = Node(0, 0) with { Address = 0x1000 };
+        AtlasNode gone = Node(1, 0) with { Address = 0x2000 };
+
+        var placed = new Dictionary<ulong, (Vector2 Position, Vector2 Size)>
+        {
+            [0x1000] = (new Vector2(500, 600), new Vector2(40, 20)),
+        };
+
+        AtlasNode kept = Assert.Single(AtlasWatch.Live([here, gone], placed));
+
+        Assert.Equal(0x1000ul, kept.Address);
+        Assert.Equal(new Vector2(500, 600), kept.Screen);
+    }
+
+    [Fact]
+    public void ANDHIDINGAMapHidesTheLinesToItTOO()
+    {
+        // Which is the point of hiding: a line to a map that is not on the screen is a line to
+        // nothing. This went unnoticed while the connections read as empty - the web drew nought
+        // lines and looked right - and announced itself the moment they worked, as two thousand
+        // lines across an atlas showing a hundred maps.
+        AtlasNode shown = Node(0, 0, joined: [(1, 0)]);
+        AtlasNode finished = Node(1, 0, state: AtlasNodeState.Completed, joined: [(0, 0)]);
+
+        Assert.Single(Compose([shown, finished], new AtlasSettings(Web: true, HideCompleted: false)).Web);
+        Assert.Empty(Compose([shown, finished], new AtlasSettings(Web: true, HideCompleted: true)).Web);
+    }
+
+    [Fact]
+    public void ANDSoDoesSearchingOneOut()
+    {
+        // Same rule through the other filter, because it is the same question: the web is
+        // between the maps ON THE SCREEN, whichever way the rest came to be off it.
+        AtlasNode augury = Node(0, 0, mapId: "MapAugury", joined: [(1, 0)]);
+        AtlasNode ravine = Node(1, 0, mapId: "MapRavine", joined: [(0, 0)]);
+
+        var searched = new AtlasSettings(Web: true, Search: "Augury");
+        var grouping = new AtlasGrouping([], AtlasMapNames.Empty);
+
+        Assert.Single(Compose([augury, ravine], new AtlasSettings(Web: true), grouping).Web);
+        Assert.Empty(Compose([augury, ravine], searched, grouping).Web);
+    }
+
+    [Fact]
     public void CONTENTSAreSaidOnceEvenWhenTheGameSaysThemTwice()
     {
         // A breach arrives as a badge AND as a token. Listing it twice announces that the port

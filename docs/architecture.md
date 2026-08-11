@@ -364,6 +364,20 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   the whole ancestor chain because a panel shut by its container keeps its own bit set. Asked
   first, it is also what makes the read idle: a walk up a handful of parents instead of several
   hundred nodes read for nothing.
+- **A stale position is invisible on a label and catastrophic on a line.** The two-rate read
+  keeps what a node IS for a third of a second and re-reads WHERE it is every tick; a node the
+  panel did not place this tick used to keep its last-seen position, on the grounds that a third
+  of a second of lag cannot be seen. On a label it cannot. Dragging the atlas re-lays every
+  node, so every node that missed a tick sits exactly one drag behind — and once connections
+  started reading, every line to one of them became a ray with that same offset, all PARALLEL
+  because they all shared it, worse the further the atlas was scrolled. A node the panel did not
+  place is a node it is not drawing, so it is dropped. The general lesson: a cached position is
+  a lie whose cost depends entirely on what is drawn from it, and adding a new thing drawn from
+  it can turn an invisible lie into the whole screen.
+- **The web is between the maps ON THE SCREEN.** Hiding the finished maps and the unreachable
+  ones is how an atlas is made readable; a line to a hidden map is a line to nothing. The
+  contract said "between drawn maps" and the code walked every live node — which drew nought
+  lines while connections read as empty, and two thousand the moment they worked.
 - **The lines belong to the PANEL, not to the nodes.** One flat vector of edges — an unknown
   word, then the grid position at each end — and no node has a neighbour list of its own. Read
   at that offset on each node instead, the two words are whatever that node's bytes happen to
