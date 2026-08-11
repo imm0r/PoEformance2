@@ -252,9 +252,21 @@ public sealed class AtlasWatch
         // three children twice a tick to arrive at the same address is nothing but duplication.
         ulong panel = _atlas.Panel(chain.UiRoot);
 
+        // IS IT OPEN - asked first, and asked of the panel's visibility rather than of its
+        // contents. Closing the atlas does not empty it: the panel and its several hundred
+        // nodes stay in the tree with readable positions, so "are there any maps" says yes to
+        // an atlas nobody is looking at, and the overlay went on writing map names over the
+        // game until the player opened it again. This is also what keeps the read idle: a
+        // walk up a handful of parents, against several hundred nodes read for nothing.
+        if (!_atlas.IsOpen(panel))
+        {
+            Forget();
+            Ritual?.Service(0, 0, [], RitualWorth);
+            return AtlasView.Closed;
+        }
+
         // WHERE the maps are, every tick, because that is the half that changes while somebody
-        // drags the atlas about. Reading it says whether the panel is open at all, so nothing
-        // more expensive happens while it is shut.
+        // drags the atlas about.
         Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed = _atlas.Where(panel, scale);
 
         if (placed.Count == 0)
