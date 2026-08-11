@@ -364,6 +364,17 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   the whole ancestor chain because a panel shut by its container keeps its own bit set. Asked
   first, it is also what makes the read idle: a walk up a handful of parents instead of several
   hundred nodes read for nothing.
+- **PoE2 has no "hovered UiElement" pointer, so hovering is geometry.** The overlay gets out of
+  the way while the cursor is on a map, because the game puts its own panel over that node. The
+  AHK tool had already gone looking for a pointer that answers this: the world-entity hover
+  chains (`MouseOver` off InGameState, and the hover tracker) resolve AREA ENTITIES only and
+  never see the interface, and two flat scans proved the client keeps no hovered-element slot
+  anywhere — only whole panels are pointed at, never the leaf under the cursor. It solved the
+  same problem for inventory items by descending the interface tree to whatever contains the
+  cursor. On the atlas that descent is one step: every map is a child of the one panel and its
+  rectangle was read this tick anyway. Tested against ALL maps rather than the drawn ones — the
+  game shows its panel whether or not this overlay labelled that node, and it is the OTHER maps'
+  labels and lines that would be drawn across it.
 - **A stale position is invisible on a label and catastrophic on a line.** The two-rate read
   keeps what a node IS for a third of a second and re-reads WHERE it is every tick; a node the
   panel did not place this tick used to keep its last-seen position, on the grounds that a third

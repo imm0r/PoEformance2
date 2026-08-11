@@ -121,6 +121,21 @@ public sealed class AtlasWindow
         // hiding those and wondering where the lines went is a short trip.
         ImGui.TextColored(DimText, "maps you are routing to stay visible either way");
 
+        bool hideOnHover = settings.HideOnHover;
+        if (ImGui.Checkbox("get out of the way while a map is hovered", ref hideOnHover))
+        {
+            changed = changed with { HideOnHover = hideOnHover };
+        }
+
+        // Said out loud, because "the overlay vanished" is what this looks like from the
+        // outside - and if a node's rectangle ever reads too big it would be permanent, so
+        // the line that names it is the difference between a setting and a mystery.
+        if (view.Hovering)
+        {
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, "- a map is hovered now, so nothing is drawn");
+        }
+
         string search = settings.Search;
         if (ImGui.InputText("only maps called", ref search, 64))
         {

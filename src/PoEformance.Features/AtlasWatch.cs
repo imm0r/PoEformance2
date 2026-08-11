@@ -45,12 +45,17 @@ public sealed record AtlasView(
     int Total,
     int Open,
     int Reachable,
-    string Status)
+    string Status,
+    bool Hovering = false)
 {
     public static AtlasView Closed { get; } = new([], [], 0, 0, 0, "atlas closed");
 
     /// <summary>Whether there is anything at all to draw.</summary>
-    public bool Anything => Marks.Count > 0 || Web.Count > 0;
+    /// <remarks>
+    /// False while a map is hovered, because the game is showing its own panel over that node
+    /// and everything here would be drawn across it. See <see cref="AtlasWatch.Hovered"/>.
+    /// </remarks>
+    public bool Anything => !Hovering && (Marks.Count > 0 || Web.Count > 0);
 }
 
 /// <summary>
@@ -120,6 +125,9 @@ public sealed class AtlasWatch
 
     private IReadOnlyDictionary<string, int> _ritualWorth = new Dictionary<string, int>();
 
+    private float _cursorX;
+    private float _cursorY;
+
     public AtlasWatch(
         IMemoryReader reader,
         OffsetSchema schema,
@@ -164,6 +172,29 @@ public sealed class AtlasWatch
 
     /// <summary>The newest answer. Never blocks, never null, never partially built.</summary>
     public AtlasView View => Volatile.Read(ref _view);
+
+    /// <summary>
+    /// Where the cursor is, in the pixels the overlay draws in. Published by the render thread.
+    /// </summary>
+    /// <remarks>
+    /// TWO FLOATS rather than a Vector2 field, because eight bytes are not written atomically
+    /// and this crosses a thread boundary every frame. The worst a torn pair can do is one tick
+    /// of a hover test taken at a corner the cursor passed through, which is a frame nobody
+    /// sees - but a Vector2 field would be a race with no name on it, and the two floats say
+    /// out loud that this is published rather than shared.
+    ///
+    /// Set every frame rather than folded into the settings: the settings rebuild the grouping
+    /// when they are replaced, and a cursor moving would throw that away sixty times a second.
+    /// </remarks>
+    public Vector2 Cursor
+    {
+        get => new(Volatile.Read(ref _cursorX), Volatile.Read(ref _cursorY));
+        set
+        {
+            Volatile.Write(ref _cursorX, value.X);
+            Volatile.Write(ref _cursorY, value.Y);
+        }
+    }
 
     /// <summary>What the last check made of each step of the walk. Empty until one is asked for.</summary>
     public IReadOnlyList<string> Checked => Volatile.Read(ref _checked);
@@ -306,7 +337,7 @@ public sealed class AtlasWatch
         // read is one byte, so this costs nothing while no line is being drawn.
         Ritual?.Service(panel, chain.UiRoot, live, RitualWorth);
 
-        return Compose(live, settings, Volatile.Read(ref _grouping), _routes, _said);
+        return Compose(live, settings, Volatile.Read(ref _grouping), _routes, _said, Cursor);
     }
 
     /// <summary>
@@ -364,7 +395,8 @@ public sealed class AtlasWatch
         AtlasSettings settings,
         AtlasGrouping grouping,
         AtlasRoutes routes,
-        IReadOnlyDictionary<(int X, int Y), IReadOnlyList<string>> words)
+        IReadOnlyDictionary<(int X, int Y), IReadOnlyList<string>> words,
+        Vector2 cursor = default)
     {
         ArgumentNullException.ThrowIfNull(live);
         ArgumentNullException.ThrowIfNull(settings);
@@ -446,7 +478,50 @@ public sealed class AtlasWatch
             live.Count,
             routes.Open,
             routes.Reachable,
-            string.Empty);
+            string.Empty,
+            settings.HideOnHover && Hovered(live, cursor));
+    }
+
+    /// <summary>
+    /// Whether the cursor is on a map, which is when the game shows its own panel about it.
+    /// </summary>
+    /// <remarks>
+    /// GEOMETRY, because the game does not offer the answer. The AHK tool went looking: the
+    /// world-entity hover chains (the MouseOver chain off InGameState, and the hover tracker)
+    /// resolve AREA ENTITIES only and never see the interface, and two flat scans proved PoE2
+    /// keeps no "hovered UiElement" slot anywhere - only whole panels are pointed at, never the
+    /// leaf under the cursor. It solved the same problem for inventory items by descending the
+    /// interface tree to whatever contains the cursor.
+    ///
+    /// Here that descent is one step: every map is a child of the one panel and its rectangle
+    /// was read this tick anyway, so this is a walk of a list that already exists.
+    ///
+    /// Against ALL the maps rather than the drawn ones. The game shows its panel over a map
+    /// whether or not this overlay chose to label it, and the labels and lines of OTHER maps
+    /// are what would be drawn across it.
+    /// </remarks>
+    public static bool Hovered(IReadOnlyList<AtlasNode> live, Vector2 cursor)
+    {
+        ArgumentNullException.ThrowIfNull(live);
+
+        // A cursor that has not been reported yet reads as the top-left corner, which is inside
+        // any node that happens to be drawn there. Nought is "not asked", not a position.
+        if (cursor == default)
+        {
+            return false;
+        }
+
+        foreach (AtlasNode node in live)
+        {
+            if (node.Size.X > 0 && node.Size.Y > 0
+                && cursor.X >= node.Screen.X && cursor.X <= node.Screen.X + node.Size.X
+                && cursor.Y >= node.Screen.Y && cursor.Y <= node.Screen.Y + node.Size.Y)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>One account of the walk, from wherever the chain currently reaches.</summary>

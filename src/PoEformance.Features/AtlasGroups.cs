@@ -213,6 +213,10 @@ public sealed class AtlasGrouping
 /// FOR, and hiding them by default would hide the feature.
 /// </param>
 /// <param name="Web">Draw every connection, not just the routes. Honest and very busy.</param>
+/// <param name="HideOnHover">
+/// Draw nothing while the cursor is on a map. The game puts its own panel over the node then -
+/// what the map is, its biome, what is in it - and everything here would be drawn across it.
+/// </param>
 /// <param name="Search">Show only the maps whose name contains this. Empty shows all of them.</param>
 /// <param name="TextScale">
 /// How big the writing on the atlas is, against the interface's own size. 1 is that size.
@@ -232,6 +236,7 @@ public sealed record AtlasSettings(
     [property: JsonPropertyName("hideCompleted")] bool HideCompleted = true,
     [property: JsonPropertyName("hideUnreachable")] bool HideUnreachable = false,
     [property: JsonPropertyName("web")] bool Web = false,
+    [property: JsonPropertyName("hideOnHover")] bool HideOnHover = true,
     [property: JsonPropertyName("search")] string Search = "",
     [property: JsonPropertyName("textScale")] float TextScale = 0f,
     [property: JsonPropertyName("ritualWorth")] IReadOnlyDictionary<string, int>? RitualWorth = null,

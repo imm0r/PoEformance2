@@ -48,13 +48,15 @@ public class AtlasViewTests
         AtlasSettings? settings = null,
         AtlasGrouping? grouping = null,
         AtlasRoutes? routes = null,
-        Dictionary<(int X, int Y), IReadOnlyList<string>>? words = null)
+        Dictionary<(int X, int Y), IReadOnlyList<string>>? words = null,
+        Vector2 cursor = default)
         => AtlasWatch.Compose(
             live,
             settings ?? AtlasSettings.Default,
             grouping ?? AtlasGrouping.None,
             routes ?? AtlasRoutes.None,
-            words ?? NoWords);
+            words ?? NoWords,
+            cursor);
 
     [Fact]
     public void AMarkSitsAtTheMiddleOfItsNodeRatherThanItsCorner()
@@ -220,6 +222,51 @@ public class AtlasViewTests
 
         Assert.Equal(0x1000ul, kept.Address);
         Assert.Equal(new Vector2(500, 600), kept.Screen);
+    }
+
+    [Fact]
+    public void NOTHINGIsDrawnWhileTheCursorIsOnAMap()
+    {
+        // The game puts its own panel over a hovered node - what the map is, its biome, what is
+        // in it - and every label and line here would be drawn across it.
+        AtlasNode node = Node(1, 1);   // drawn at 100,100, forty by twenty
+
+        Assert.True(AtlasWatch.Hovered([node], new Vector2(120, 110)));
+        Assert.False(AtlasWatch.Hovered([node], new Vector2(300, 110)));
+
+        Assert.False(Compose([node], new AtlasSettings(), cursor: new Vector2(120, 110)).Anything);
+        Assert.True(Compose([node], new AtlasSettings(), cursor: new Vector2(300, 110)).Anything);
+    }
+
+    [Fact]
+    public void ANDEveryMapCountsRatherThanOnlyTheDrawnOnes()
+    {
+        // The game shows its panel over a map whether or not this overlay chose to label it,
+        // and it is the OTHER maps' labels and lines that would be drawn across it.
+        AtlasNode shown = Node(3, 3);
+        AtlasNode finished = Node(1, 1, state: AtlasNodeState.Completed);
+
+        AtlasView view = Compose(
+            [shown, finished], new AtlasSettings(HideCompleted: true), cursor: new Vector2(120, 110));
+
+        Assert.Single(view.Marks);          // the finished one is hidden, as asked
+        Assert.True(view.Hovering);         // and hovering it still stops the drawing
+    }
+
+    [Fact]
+    public void ANDACursorNobodyHasReportedIsNotTheCorner()
+    {
+        // Nought is "not asked yet", not a position. Taken literally it sits inside whatever
+        // node happens to be drawn at the top-left, and the atlas would never draw at all.
+        Assert.False(AtlasWatch.Hovered([Node(0, 0)], default));
+        Assert.True(Compose([Node(0, 0)], new AtlasSettings()).Anything);
+    }
+
+    [Fact]
+    public void ANDTheGettingOutOfTheWayCanBeTurnedOff()
+    {
+        AtlasNode node = Node(1, 1);
+        Assert.True(Compose([node], new AtlasSettings(HideOnHover: false), cursor: new Vector2(120, 110)).Anything);
     }
 
     [Fact]
