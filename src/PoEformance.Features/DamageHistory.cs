@@ -50,6 +50,11 @@ public readonly record struct MonsterCensus(int Normal, int Magic, int Rare, int
 /// of area, a stretch the buffer has dropped - and a window summed across such a hole would
 /// report a burst that never happened.
 /// </param>
+/// <param name="Taken">
+/// What came off the player's own pool over the same stretch, per second. On the same sample as
+/// the damage out so the two can be read against each other - "the moment it stopped killing
+/// things is the moment it started taking hits" is a shape, and it only shows on one timeline.
+/// </param>
 public readonly record struct DamageSample(
     long AtMs,
     uint Area,
@@ -57,7 +62,8 @@ public readonly record struct DamageSample(
     float Credited,
     float Untouched,
     MonsterCensus Nearby = default,
-    long SpanMs = DamageHistory.IntervalMs)
+    long SpanMs = DamageHistory.IntervalMs,
+    float Taken = 0f)
 {
     /// <summary>All of it - the height of one bar on the graph.</summary>
     public float Total => Watched + Credited + Untouched;

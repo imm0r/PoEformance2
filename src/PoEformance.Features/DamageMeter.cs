@@ -118,6 +118,12 @@ public sealed class DamageMeter
     // the tests caught it: zero is a perfectly good timestamp, so a sentinel of zero means a
     // clock that starts there never leaves the establishing branch.
     private long? _sampledAtMs;
+
+    // The player's own pool at the last reading, and what has come off it since the last
+    // sample was written. Nullable for the same reason as the clocks above: an unread pool and
+    // a pool of nought are different things, and a death must not read as one huge hit.
+    private int? _pool;
+    private long _tookThisStretch;
     private long _sampledObserved;
     private long _sampledHurt;
     private long _sampledUntouched;
@@ -216,6 +222,36 @@ public sealed class DamageMeter
     /// is asked after the map, not during it.
     /// </remarks>
     public KillLog Kills { get; } = new();
+
+    /// <summary>
+    /// What came off the player's own life and shield in this area.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED THE SAME WAY as the damage out, and carrying the same limits: it is a pool
+    /// falling, so a hit that was fully absorbed by a recharge in the same thirty-millisecond
+    /// window is invisible, and a hit and a leech in that window read as their difference. What
+    /// it is good for is the question it is here to answer - what took a lot at once - and for
+    /// that the pool is the right thing to watch, because the pool is what runs out.
+    ///
+    /// LIFE AND SHIELD TOGETHER, because the thing that kills is the total running out. Split,
+    /// a shield popping and refilling would read as a stream of damage and recoveries rather
+    /// than as one hit.
+    /// </remarks>
+    public long Taken { get; private set; }
+
+    /// <summary>The largest single drop seen, and when. The one that nearly did it.</summary>
+    /// <remarks>
+    /// A SINGLE READ'S drop rather than a second's worth, because "what nearly killed me" is
+    /// about one moment: a slow bleed to the same total is a different problem with a different
+    /// answer, and averaging the two together loses both.
+    /// </remarks>
+    public long WorstHit { get; private set; }
+
+    /// <summary>What was around when the worst hit landed.</summary>
+    public MonsterCensus WorstHitAgainst { get; private set; }
+
+    /// <summary>How much of the pool that hit took, as a share of its maximum.</summary>
+    public float WorstHitShare { get; private set; }
 
     /// <summary>Total damage watched fall off monster health in this area.</summary>
     public long Observed { get; private set; }
@@ -415,6 +451,13 @@ public sealed class DamageMeter
         _sampledObserved = 0;
         _sampledHurt = 0;
         _sampledUntouched = 0;
+
+        Taken = 0;
+        WorstHit = 0;
+        WorstHitShare = 0f;
+        WorstHitAgainst = default;
+        _pool = null;
+        _tookThisStretch = 0;
     }
 
     /// <summary>Takes one snapshot and moves the figures on.</summary>
@@ -457,6 +500,11 @@ public sealed class DamageMeter
             _stampMs = nowMs;
             Absorb(snapshot, nowMs);
 
+            // The player's pool is noted here for the same reason every monster's is: without
+            // a first reading there is nothing to take a difference against, and the first hit
+            // of the area would be lost rather than measured.
+            Suffer(snapshot);
+
             // The graph's first stretch starts HERE, at the area's first reading. Left until
             // the second one, the first sample would carry the damage of the interval before
             // it as well - measured against a baseline of nought that was never true.
@@ -476,7 +524,50 @@ public sealed class DamageMeter
         _stampMs = nowMs;
         long dealt = Damage(snapshot, nowMs, dt);
         Advance(dealt, dt);
+        Suffer(snapshot);
         Record(nowMs, snapshot);
+    }
+
+    /// <summary>Counts what came off the player's own pool since the last reading.</summary>
+    /// <remarks>
+    /// The same difference-of-pools measurement the damage out uses, on one entity instead of
+    /// all of them - so it inherits the same blind spot and it is worth naming: a hit fully
+    /// undone by a recharge inside one read is invisible, and a hit plus a leech read as their
+    /// difference. For "what took a lot at once", which is what this is for, that is the right
+    /// trade: the pool is what actually runs out.
+    /// </remarks>
+    private void Suffer(WorldSnapshot snapshot)
+    {
+        if (snapshot.PlayerVitals is not Vitals vitals || vitals.IsDeadOrUnloaded)
+        {
+            // Dead or unread. Dropping the baseline is what stops the whole pool being counted
+            // as one enormous hit on the way back in - and a death is not a hit anybody wants
+            // measured, it is the end of the fight.
+            _pool = null;
+            return;
+        }
+
+        int pool = Math.Max(0, vitals.Life.Current) + Math.Max(0, vitals.EnergyShield.Current);
+        int most = Math.Max(1, Math.Max(0, vitals.Life.Max) + Math.Max(0, vitals.EnergyShield.Max));
+
+        if (_pool is int before)
+        {
+            int fell = before - pool;
+            if (fell > 0)
+            {
+                Taken += fell;
+                _tookThisStretch += fell;
+
+                if (fell > WorstHit)
+                {
+                    WorstHit = fell;
+                    WorstHitShare = (float)fell / most;
+                    WorstHitAgainst = Census(snapshot);
+                }
+            }
+        }
+
+        _pool = pool;
     }
 
     /// <summary>
@@ -528,8 +619,10 @@ public sealed class DamageMeter
             (CreditedHurt - _sampledHurt) / seconds,
             (CreditedUntouched - _sampledUntouched) / seconds,
             Census(snapshot),
-            span));
+            span,
+            _tookThisStretch / seconds));
 
+        _tookThisStretch = 0;
         Baseline(nowMs);
     }
 

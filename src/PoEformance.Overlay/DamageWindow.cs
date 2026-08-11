@@ -54,6 +54,10 @@ public sealed class DamageWindow
     private static readonly Vector4 SingleText = new(0.55f, 0.85f, 1f, 1f);
     private static readonly Vector4 PackText = new(0.75f, 0.7f, 1f, 1f);
 
+    // The damage coming BACK, in the one colour nothing else here uses. It has to be told
+    // apart from all three bands at once, and red is what a health bar is.
+    private static readonly Vector4 TakenLine = new(1f, 0.35f, 0.38f, 1f);
+
     // The census, in the game's OWN rarity colours - white, blue, yellow, orange. Nobody has
     // to learn these; a player has been reading them since the first magic item.
     private static readonly Vector4 NormalText = new(0.85f, 0.85f, 0.85f, 1f);
@@ -421,6 +425,14 @@ public sealed class DamageWindow
             Band(draw, left, right, bottom, sample.Untouched, tallest, size.Y, untouched);
         }
 
+        // WHAT WAS COMING BACK, over the bars rather than beside them. A line on its own scale,
+        // because the two figures are nowhere near each other in size - a build deals tens of
+        // thousands and dies to four - and drawn to the same ceiling it would be a flat line
+        // along the bottom saying nothing. What it is for is WHEN, not how much: the moment the
+        // damage out stopped and the damage in started is a shape, and it only shows on one
+        // timeline.
+        DrawTaken(draw, at, size, samples, first, columns, step);
+
         // The ceiling, so a bar's height can be turned into a number without hovering it.
         draw.AddLine(at, at + new Vector2(size.X, 0f), ImGui.ColorConvertFloat4ToU32(DimText), 1f);
         draw.AddText(
@@ -433,8 +445,118 @@ public sealed class DamageWindow
         ImGui.TextColored(WatchedBar, "watched");
         ImGui.TextColored(CreditedBar, "credited");
         ImGui.TextColored(UntouchedBar, "untouched");
+        ImGui.TextColored(TakenLine, "taken");
         ImGui.TextColored(DimText, $"{_meter.History.SecondsIn(scope) / 60:F1} min");
         ImGui.EndGroup();
+
+        DrawWorstHit();
+    }
+
+    /// <summary>
+    /// The single biggest thing that came off the pool, and what was around when it did.
+    /// </summary>
+    /// <remarks>
+    /// ONE READ'S drop rather than a second's worth, because "what nearly killed me" is about
+    /// one moment. A slow bleed to the same total is a different problem with a different
+    /// answer, and averaging the two together loses both.
+    ///
+    /// As a SHARE of the pool as well as a number, because that is the part that means
+    /// something: four thousand is a scratch or most of a life bar depending on the character,
+    /// and the tool knows which.
+    /// </remarks>
+    private void DrawWorstHit()
+    {
+        if (_meter.WorstHit <= 0)
+        {
+            return;
+        }
+
+        ImGui.TextColored(
+            TakenLine,
+            $"taken {Number(_meter.Taken)} this area"
+            + $"   -   worst hit {Number(_meter.WorstHit)} ({_meter.WorstHitShare:P0} of the pool)");
+
+        MonsterCensus against = _meter.WorstHitAgainst;
+        if (against.Any)
+        {
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, $"   with {Describe(against)} nearby");
+        }
+    }
+
+    /// <summary>A census in a few words, rarest first - what was actually worth naming.</summary>
+    private static string Describe(MonsterCensus census)
+    {
+        var parts = new List<string>(4);
+        if (census.Unique > 0)
+        {
+            parts.Add($"{census.Unique} unique");
+        }
+
+        if (census.Rare > 0)
+        {
+            parts.Add($"{census.Rare} rare");
+        }
+
+        if (census.Magic > 0)
+        {
+            parts.Add($"{census.Magic} magic");
+        }
+
+        if (census.Normal > 0)
+        {
+            parts.Add($"{census.Normal} normal");
+        }
+
+        return string.Join(", ", parts);
+    }
+
+    /// <summary>The damage coming back, as a line on its own scale over the bars.</summary>
+    /// <remarks>
+    /// ITS OWN SCALE, said out loud because it is a graph with two y axes and that is normally
+    /// a thing to avoid. Here the alternative is worse: a build deals tens of thousands and
+    /// dies to four, so on the bars' ceiling this would be a flat line along the bottom. The
+    /// line answers WHEN rather than how much, and the exact figure is in the hover.
+    /// </remarks>
+    private static void DrawTaken(
+        ImDrawListPtr draw,
+        Vector2 at,
+        Vector2 size,
+        IReadOnlyList<DamageSample> samples,
+        int first,
+        int columns,
+        float step)
+    {
+        float worst = 0f;
+        for (int i = 0; i < columns; i++)
+        {
+            worst = MathF.Max(worst, samples[first + i].Taken);
+        }
+
+        if (worst <= 0f)
+        {
+            return;
+        }
+
+        // Two thirds of the plate, so the line has room to peak without touching the ceiling
+        // the bars are measured against and being read as one of them.
+        float room = size.Y * 0.66f;
+        uint colour = ImGui.ColorConvertFloat4ToU32(TakenLine);
+        Vector2? previous = null;
+
+        for (int i = 0; i < columns; i++)
+        {
+            var point = new Vector2(
+                at.X + (i * step) + (step * 0.5f),
+                at.Y + size.Y - (samples[first + i].Taken / worst * room));
+
+            if (previous is Vector2 last)
+            {
+                draw.AddLine(last, point, colour, 1.5f);
+            }
+
+            previous = point;
+        }
     }
 
     /// <summary>One band of a stacked bar. Returns the top it reached, for the next one up.</summary>
@@ -481,6 +603,11 @@ public sealed class DamageWindow
         ImGui.TextColored(WatchedBar, $"watched    {Number(sample.Watched)}");
         ImGui.TextColored(CreditedBar, $"credited   {Number(sample.Credited)}");
         ImGui.TextColored(UntouchedBar, $"untouched  {Number(sample.Untouched)}");
+
+        if (sample.Taken > 0f)
+        {
+            ImGui.TextColored(TakenLine, $"taken      {Number(sample.Taken)}");
+        }
 
         // WHAT IT WAS AGAINST, which is what makes the number above mean anything: five
         // thousand into a rare is a build working, and five thousand into forty white monsters
