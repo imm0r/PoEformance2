@@ -45,6 +45,10 @@ public sealed class DamageWindow
     // anybody else's machine.
     private static readonly Vector4 BurstText = new(0.65f, 1f, 0.75f, 1f);
 
+    // The slowest kill, in the colour the read-cost tab uses for its worst reading, and for
+    // the same reason: it is the one entry in the list somebody can act on.
+    private static readonly Vector4 WorstText = new(1f, 0.62f, 0.35f, 1f);
+
     // The census, in the game's OWN rarity colours - white, blue, yellow, orange. Nobody has
     // to learn these; a player has been reading them since the first magic item.
     private static readonly Vector4 NormalText = new(0.85f, 0.85f, 0.85f, 1f);
@@ -158,8 +162,99 @@ public sealed class DamageWindow
         DrawGraph();
 
         ImGui.Separator();
+        DrawKills();
+
+        ImGui.Separator();
         DrawTargets();
     }
+
+    /// <summary>
+    /// What every rare and unique cost, newest first.
+    /// </summary>
+    /// <remarks>
+    /// THE QUESTION BEHIND MOST SINGLE-TARGET COMPLAINTS. "How long does a rare take" cannot
+    /// be got out of a rate averaged over a map, because no map is one long fight - the average
+    /// is mostly the packs. One line per kill answers it directly, and the slowest one is the
+    /// monster the build actually has trouble with.
+    /// </remarks>
+    private void DrawKills()
+    {
+        uint scope = _thisMapOnly ? CurrentArea : 0;
+        IReadOnlyList<KillRecord> kills = _meter.Kills.In(scope);
+
+        if (!ImGui.CollapsingHeader($"Rares and uniques ({kills.Count})###dmg-kills", ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            return;
+        }
+
+        if (kills.Count == 0)
+        {
+            ImGui.TextColored(DimText, "none down yet in this scope");
+            return;
+        }
+
+        // The slowest first and on its own line, because it is the one worth acting on and it
+        // would otherwise be somewhere in a list sorted by when things happened.
+        if (_meter.Kills.Worst(scope) is { } worst)
+        {
+            ImGui.TextColored(
+                WorstText,
+                $"slowest: {worst.Name}  {worst.Seconds:F1}s  ({Number(worst.Damage)} at {Number(worst.Dps)} dps)");
+        }
+
+        if (!ImGui.BeginTable("##dmg-kill-table", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TableSetupColumn("monster");
+            ImGui.TableSetupColumn("took");
+            ImGui.TableSetupColumn("damage");
+            ImGui.TableSetupColumn("dps");
+            ImGui.TableHeadersRow();
+
+            foreach (KillRecord kill in kills)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                ImGui.TextColored(RarityText(kill.Rarity), kill.Name.Length > 0 ? kill.Name : "(unnamed)");
+
+                ImGui.TableNextColumn();
+
+                // A one-shot has no fight to time, and printing 0.0s would read as a
+                // measurement rather than as the absence of one.
+                if (kill.Watched)
+                {
+                    ImGui.Text($"{kill.Seconds:F1}s");
+                }
+                else
+                {
+                    ImGui.TextColored(SoftText, "one-shot");
+                }
+
+                ImGui.TableNextColumn();
+                ImGui.Text(Number(kill.Damage));
+
+                ImGui.TableNextColumn();
+                ImGui.TextColored(kill.Watched ? DimText : SoftText, kill.Watched ? Number(kill.Dps) : "-");
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
+    }
+
+    /// <summary>A monster's rarity in the game's own colour for it.</summary>
+    private static Vector4 RarityText(ItemRarity rarity) => rarity switch
+    {
+        ItemRarity.Magic => MagicText,
+        ItemRarity.Rare => RareText,
+        >= ItemRarity.Unique => UniqueText,
+        _ => NormalText,
+    };
 
     /// <summary>
     /// The most damage sustained over one second, five and ten - the comparable numbers.

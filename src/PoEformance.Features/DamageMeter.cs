@@ -89,6 +89,12 @@ public sealed class DamageMeter
         public ItemRarity Rarity = ItemRarity.Unknown;
         public bool Hurt;
 
+        // For the kill log: when the fight with THIS monster started, and how much of it was
+        // watched coming off. The remainder credited when it vanishes is added at that point,
+        // so the two together are what the monster cost.
+        public long FirstHurtMs;
+        public long Dealt;
+
         // How far from the player this was the last time it was SEEN, or -1 when there was no
         // player to measure against. At the last sighting rather than at the moment it went
         // missing, because the moment it went missing is the moment there is nothing left to
@@ -201,6 +207,15 @@ public sealed class DamageMeter
     /// a second clock to keep in step with this one.
     /// </remarks>
     public DamageHistory History { get; } = new();
+
+    /// <summary>
+    /// The rares and uniques that went down, and what each cost.
+    /// </summary>
+    /// <remarks>
+    /// Kept across areas and scoped by one, like the history: "how long did that rare take"
+    /// is asked after the map, not during it.
+    /// </remarks>
+    public KillLog Kills { get; } = new();
 
     /// <summary>Total damage watched fall off monster health in this area.</summary>
     public long Observed { get; private set; }
@@ -652,10 +667,12 @@ public sealed class DamageMeter
                 dealt += fell;
                 Observed += fell;
                 target.DamagedMs = nowMs;
+                target.Dealt += fell;
 
                 if (!target.Hurt)
                 {
                     target.Hurt = true;
+                    target.FirstHurtMs = nowMs;
                     Hurt++;
                 }
             }
@@ -730,9 +747,38 @@ public sealed class DamageMeter
             {
                 CreditedUntouched += target.Pool;
             }
+
+            Log(target, nowMs);
         }
 
         return credited;
+    }
+
+    /// <summary>Writes a rare or better into the kill log, once it is actually gone.</summary>
+    /// <remarks>
+    /// AFTER the gate, deliberately: a monster refused for distance is one this tool does not
+    /// believe was killed, and a log of kills that includes ones it does not believe in is not
+    /// a log of kills. It never appears, rather than appearing with a caveat.
+    /// </remarks>
+    private void Log(Tracked target, long nowMs)
+    {
+        if (target.Rarity < KillLog.Interesting)
+        {
+            return;
+        }
+
+        Kills.Add(new KillRecord(
+            nowMs,
+            _area,
+            target.Name,
+            target.Rarity,
+            target.Dealt + target.Pool,
+
+            // From the FIRST damage rather than from when it was first seen. A rare that
+            // followed you across half a map before anybody hit it did not take a minute to
+            // kill, and timing from the sighting would say it did.
+            target.Hurt ? (nowMs - target.FirstHurtMs) / 1000f : 0f,
+            target.Hurt));
     }
 
     /// <summary>Moves the overall average on by one reading.</summary>
