@@ -321,6 +321,17 @@ interesting part was not the feature:
   one long fight. Its clock starts at the first damage rather than the first sighting, and a kill
   the tool does not believe in — refused by the distance gate — never appears at all, because a
   log of kills containing ones it doubts is not a log of kills.
+- **A heat map, because the map was already being drawn.** The cheapest interesting thing that
+  could go on it: the meter already knew how much happened and the snapshot already knew where
+  the player was, and nothing was writing the two down together. A total says a map was hard; a
+  picture says WHERE, and only the second is worth acting on. Three things worth recording about
+  it. It is anchored at the PLAYER for all three measurements, which is a choice and not the
+  only one — damage dealt could be filed where the monster stood, and for a question about pack
+  density that would be better; one rule for all three is what keeps them comparable on the same
+  picture. The scale is the area's **95th** busiest patch rather than its busiest, or one boss
+  standing in one place flattens the rest of the map into the same shade of nothing. And it is
+  OFF by default: a picture of a whole map is for afterwards, and painted always it would be a
+  wash of colour under every marker for the whole of every map.
 - **A death is not a hit.** Damage taken is the same pool-difference measurement pointed at the
   player, and at zero life the pool reads as *unread* rather than empty — otherwise the whole
   pool is counted as one enormous hit on the way back in, and every death becomes the worst hit

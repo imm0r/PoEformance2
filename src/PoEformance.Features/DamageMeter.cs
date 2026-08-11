@@ -224,6 +224,16 @@ public sealed class DamageMeter
     public KillLog Kills { get; } = new();
 
     /// <summary>
+    /// Where on the map the damage and the time went.
+    /// </summary>
+    /// <remarks>
+    /// Fed from here because this is the only place that knows how much happened in ONE read -
+    /// everything else has running totals, which would have to be differenced a second time to
+    /// get back to what this already has in hand.
+    /// </remarks>
+    public HeatMap Heat { get; } = new();
+
+    /// <summary>
     /// What came off the player's own life and shield in this area.
     /// </summary>
     /// <remarks>
@@ -524,7 +534,17 @@ public sealed class DamageMeter
         _stampMs = nowMs;
         long dealt = Damage(snapshot, nowMs, dt);
         Advance(dealt, dt);
+
+        long tookBefore = Taken;
         Suffer(snapshot);
+
+        // Where all of that happened - which is the one thing the meter was never writing down
+        // alongside how much of it there was.
+        if (snapshot.Player is WorldEntity here)
+        {
+            Heat.Add(snapshot.AreaHash, here.WorldX, here.WorldY, dealt, Taken - tookBefore, dt);
+        }
+
         Record(nowMs, snapshot);
     }
 

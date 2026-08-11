@@ -85,6 +85,16 @@ public sealed class DamageWindow
     /// <summary>The area being read right now, so "this map only" has something to mean.</summary>
     public uint CurrentArea { get; set; }
 
+    /// <summary>
+    /// The heat map painted over the game's own map, if one was attached.
+    /// </summary>
+    /// <remarks>
+    /// Its switches live in THIS tab rather than beside the other map settings, because what
+    /// it paints is the damage - it is a second view of the numbers on this page, and putting
+    /// its controls where the numbers are is what makes that obvious.
+    /// </remarks>
+    public HeatLayer? Heat { get; set; }
+
     /// <summary>Draws the tab's content.</summary>
     public void DrawTab()
     {
@@ -171,11 +181,66 @@ public sealed class DamageWindow
         DrawGraph();
 
         ImGui.Separator();
+        DrawHeat();
+
+        ImGui.Separator();
         DrawKills();
 
         ImGui.Separator();
         DrawTargets();
     }
+
+    /// <summary>
+    /// The heat map's switches - what it paints, and whether it paints at all.
+    /// </summary>
+    /// <remarks>
+    /// HERE rather than beside the other map settings, because what it paints is the damage:
+    /// it is a second view of the numbers on this page, and putting its controls where the
+    /// numbers are is what makes that obvious.
+    /// </remarks>
+    private void DrawHeat()
+    {
+        if (Heat is not HeatLayer heat)
+        {
+            return;
+        }
+
+        bool painting = heat.Enabled;
+        if (ImGui.Checkbox("paint the map by where it happened  (open the map to see it)", ref painting))
+        {
+            heat.Enabled = painting;
+        }
+
+        if (!painting)
+        {
+            return;
+        }
+
+        // Three, because they are three different questions about the same run: where the
+        // fighting was, where it went badly, and where the time actually went - and a map can
+        // answer one of them well and the other two not at all.
+        foreach ((HeatOf what, string label) in Sources)
+        {
+            ImGui.SameLine();
+            if (ImGui.RadioButton(label, heat.Showing == what))
+            {
+                heat.Showing = what;
+            }
+        }
+
+        ImGui.TextColored(
+            DimText,
+            $"{_meter.Heat.Count} patches held"
+            + "   -   the scale is this area's 95th busiest patch, so one boss cannot flatten the rest");
+    }
+
+    /// <summary>What the heat map can be asked to paint.</summary>
+    private static readonly (HeatOf What, string Label)[] Sources =
+    [
+        (HeatOf.Dealt, "damage done"),
+        (HeatOf.Taken, "damage taken"),
+        (HeatOf.Time, "time spent"),
+    ];
 
     /// <summary>
     /// What every rare and unique cost, newest first.
