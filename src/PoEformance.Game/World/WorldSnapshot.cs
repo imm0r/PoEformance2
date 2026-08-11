@@ -205,8 +205,18 @@ public sealed record WorldSnapshot(
     GameStateKind State = GameStateKind.NotLoaded,
     ReadCost Cost = default,
     int Collapsed = 0,
-    CorpseSigns Corpses = default)
+    CorpseSigns Corpses = default,
+    GamePanel Panels = GamePanel.None)
 {
+    /// <summary>
+    /// Whether the player is looking at a panel rather than at the game.
+    /// </summary>
+    /// <remarks>
+    /// Anything drawn in world space is drawn UNDERNEATH such a panel, so it is right
+    /// information in the way - which is worse than none. See <see cref="PanelReader"/>.
+    /// </remarks>
+    public bool InAPanel => Panels != GamePanel.None;
+
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
 }
@@ -250,6 +260,7 @@ public sealed class WorldReader
     private readonly MinimapIconReader _mapIcons;
     private LandmarkNames _landmarkNames = LandmarkNames.Empty;
     private readonly WorldAreaReader _areas;
+    private readonly PanelReader _panels;
     private readonly TerrainReader _terrain;
     private readonly int _playerInfo;
     private readonly int _serverData;
@@ -302,6 +313,7 @@ public sealed class WorldReader
         _groundItems = new GroundItemReader(reader, schema);
         _mapIcons = new MinimapIconReader(reader, schema);
         _areas = new WorldAreaReader(reader, schema);
+        _panels = new PanelReader(reader, schema, new UiElementReader(reader, schema));
         _terrain = new TerrainReader(reader, schema, rotation);
         _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
@@ -720,6 +732,12 @@ public sealed class WorldReader
             largeMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: true);
         }
 
+        // Which panels are in the way, from the same interface root that was just resolved.
+        // Read every tick rather than on an interval: a panel opens and shuts between two
+        // frames, and an overlay that lags a third of a second behind the stash is the thing
+        // this exists to stop.
+        GamePanel panels = _panels.Open(chain.UiRoot);
+
         double mapsMs = Since(mapsFrom);
 
         // Read BEFORE the terrain: which area this is decides which names apply to its tiles,
@@ -739,7 +757,8 @@ public sealed class WorldReader
             chain.State,
             new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, entities.Count, skipped),
             collapsed,
-            new CorpseSigns(targetable, untargetable, unreadableTargetable, _corpses.Tracking));
+            new CorpseSigns(targetable, untargetable, unreadableTargetable, _corpses.Tracking),
+            panels);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>

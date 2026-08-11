@@ -118,9 +118,30 @@
       "comment": "Relative to the KB/M UiRootStructPtr (= ReadPtr(InGameState + 0x2F0)). Controller mode uses a different layout.",
       "fields": {
         "ChatParentPtr": { "offset": "0x640", "type": "ptr" },
+        "LeftPanelPtr": { "offset": "0x6D8", "type": "ptr", "comment": "UNVERIFIED, from GameHelper2's ImportantUiElementsOffsets. Whichever left-side panel is open - character, skills, quests. Null while none is, so this is BOTH the address and half the answer; the other half is that the element it points at is only visible while its panel is showing." },
+        "RightPanelPtr": { "offset": "0x6E0", "type": "ptr", "comment": "UNVERIFIED, same source. The right-side one: inventory, stash, a vendor." },
         "PassiveSkillTreePanel": { "offset": "0x730", "type": "ptr" },
         "MapParentPtr": { "offset": "0x7C8", "type": "ptr" },
+        "WorldMapPanelPtr": { "offset": "0x988", "type": "ptr", "comment": "UNVERIFIED, same source. The world-travel map - the act screens, not the endgame atlas, which is its own panel at a child path." },
         "ControllerModeMapParentPtr": { "offset": "0xAA8", "type": "ptr" }
+      }
+    },
+
+    "BigPanels": {
+      "comment": "UNVERIFIED - the panels that take over the screen, ported from GameHelper2's IsAnyLargePanelOpen. Two kinds and the difference matters: the left panel, the right panel, the world map and the skill tree are POINTERS on ImportantUiElements, which is the sturdy half; the four below are CHILD PATHS, which is a position in somebody else's list and moves when a patch inserts a panel above them. A wrong path usually lands on nothing and reads as shut, which is harmless - but it can land on a real element that is always showing, and then the overlay is hidden forever with nothing to say why. That is what the readout in the status window and the switch beside it are for. The skill tree is the tree's NODE CONTAINER (child 2 of the panel) rather than the panel: in 0.5.x the per-node pointers read null, but the container's visible bit is reliable.",
+      "fields": {},
+      "consts": {
+        "SkillTreeNodesChild": "2",
+        "AtlasSkillsPath0": "25",
+        "AtlasSkillsPath1": "0",
+        "TemplePath0": "64",
+        "TemplePath1": "0",
+        "ExchangePath0": "114",
+        "ExchangePath1": "20",
+        "ExchangePath2": "6",
+        "ExchangePath3": "1",
+        "TrialPath0": "84",
+        "TrialPath1": "0"
       }
     },
 

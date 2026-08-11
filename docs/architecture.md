@@ -310,6 +310,18 @@ interesting part was not the feature:
 - **Routes that stay on one storey.** The walkable grid is flat: a bridge and the ground under
   it are the same cells and both walkable, so a two-dimensional search draws a route through
   the floor. Only the height separates them.
+- **Getting out of the way of the game's own panels.** Everything drawn in world space is drawn
+  UNDERNEATH a stash, a passive tree or a world map the moment one opens — right information in
+  the way, which is worse than none. `PanelReader` reports which screen-filling panels are open
+  and the world block is gated on it. Two things made this more than an `if`. The panels come
+  from two kinds of place and they fail differently: the left panel, the right panel, the world
+  map and the skill tree are POINTERS the game nulls when nothing is open, so a wrong offset
+  reads as a bad pointer and simply never fires; the rest are CHILD PATHS, and a wrong one can
+  land on a real element that is always showing — which hides the overlay forever with nothing
+  to say why. So everything unreadable reads as SHUT (the safe direction: an overlay drawn over
+  a panel is the status quo, an overlay that vanished is a bug report nobody can act on), the
+  answer is a flags enum rather than a bool so the status window can name the panel that is
+  stuck, and there is a switch to stop asking.
 
 ### The atlas — the one feature that is INTERFACE rather than world
 
