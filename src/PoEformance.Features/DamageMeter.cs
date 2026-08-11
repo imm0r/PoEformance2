@@ -512,7 +512,8 @@ public sealed class DamageMeter
             (Observed - _sampledObserved) / seconds,
             (CreditedHurt - _sampledHurt) / seconds,
             (CreditedUntouched - _sampledUntouched) / seconds,
-            Census(snapshot)));
+            Census(snapshot),
+            span));
 
         Baseline(nowMs);
     }

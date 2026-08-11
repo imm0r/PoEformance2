@@ -40,6 +40,11 @@ public sealed class DamageWindow
     private static readonly Vector4 UntouchedBar = new(0.74f, 0.32f, 0.28f, 0.95f);
     private static readonly Vector4 PlotBack = new(0.08f, 0.09f, 0.11f, 0.85f);
 
+    // Brighter than the rest, because these are the figures worth writing down: unlike the
+    // headline they do not move as you fight, and unlike the peak they mean the same thing on
+    // anybody else's machine.
+    private static readonly Vector4 BurstText = new(0.65f, 1f, 0.75f, 1f);
+
     // The census, in the game's OWN rarity colours - white, blue, yellow, orange. Nobody has
     // to learn these; a player has been reading them since the first magic item.
     private static readonly Vector4 NormalText = new(0.85f, 0.85f, 0.85f, 1f);
@@ -72,7 +77,9 @@ public sealed class DamageWindow
     {
         ImGui.TextColored(DpsText, $"{Number(_meter.Dps)} dps");
         ImGui.SameLine();
-        ImGui.TextColored(DimText, $"   peak {Number(_meter.Peak)}   this area {Number(_meter.Total)} total");
+        ImGui.TextColored(DimText, $"   this area {Number(_meter.Total)} total");
+
+        DrawBurst();
 
         ImGui.Separator();
 
@@ -152,6 +159,39 @@ public sealed class DamageWindow
 
         ImGui.Separator();
         DrawTargets();
+    }
+
+    /// <summary>
+    /// The most damage sustained over one second, five and ten - the comparable numbers.
+    /// </summary>
+    /// <remarks>
+    /// THREE LENGTHS because they answer three different questions, and a build can be good at
+    /// one and poor at the next: a second is the opening hit, five is a rare going down, ten is
+    /// whether it can keep going. One figure would hide exactly the difference somebody is
+    /// tuning for.
+    ///
+    /// <c>Peak</c> is still shown, dimmed and last, with what it actually is written beside it -
+    /// it is the high-water mark of a smoothed average and moves with the smoothing slider, so
+    /// it is the one number here that cannot be compared with anybody else's.
+    /// </remarks>
+    private void DrawBurst()
+    {
+        uint scope = _thisMapOnly ? CurrentArea : 0;
+
+        float second = _meter.History.Best(1, scope);
+        if (second <= 0f)
+        {
+            return;
+        }
+
+        ImGui.TextColored(
+            BurstText,
+            $"best 1s {Number(second)}"
+            + $"   5s {Number(_meter.History.Best(5, scope))}"
+            + $"   10s {Number(_meter.History.Best(10, scope))}");
+
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, $"   peak {Number(_meter.Peak)} (smoothed, moves with the slider)");
     }
 
     /// <summary>

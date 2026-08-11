@@ -44,11 +44,29 @@ public readonly record struct MonsterCensus(int Normal, int Magic, int Rare, int
 /// rather than averaged over its stretch: "how many were there" is a thing you point at, and
 /// an average of a quarter second's monsters is a number that was never true.
 /// </param>
+/// <param name="SpanMs">
+/// How long this sample covers. Carried rather than worked out from the gap to the one before
+/// it, because that gap is not the span whenever there is a hole - a loading screen, a change
+/// of area, a stretch the buffer has dropped - and a window summed across such a hole would
+/// report a burst that never happened.
+/// </param>
 public readonly record struct DamageSample(
-    long AtMs, uint Area, float Watched, float Credited, float Untouched, MonsterCensus Nearby = default)
+    long AtMs,
+    uint Area,
+    float Watched,
+    float Credited,
+    float Untouched,
+    MonsterCensus Nearby = default,
+    long SpanMs = DamageHistory.IntervalMs)
 {
     /// <summary>All of it - the height of one bar on the graph.</summary>
     public float Total => Watched + Credited + Untouched;
+
+    /// <summary>When this sample's stretch began.</summary>
+    public long FromMs => AtMs - SpanMs;
+
+    /// <summary>The damage itself, rather than the rate - what a window has to add up.</summary>
+    public float Dealt => Total * SpanMs / 1000f;
 }
 
 /// <summary>
@@ -166,6 +184,75 @@ public sealed class DamageHistory
         }
 
         return highest;
+    }
+
+    /// <summary>
+    /// The most damage per second sustained over any stretch this long.
+    /// </summary>
+    /// <remarks>
+    /// THE NUMBER BUILDS ARE COMPARED BY, and the one the meter did not have. <c>Peak</c> is the
+    /// high-water mark of an exponential average with a sub-second half-life: it is a smoothed
+    /// figure, so it under-reports a real burst by however much the smoothing flattened it, and
+    /// it MOVES WHEN THE SMOOTHING SLIDER DOES. Two builds measured at different slider
+    /// positions cannot be compared by it at all, which is most of what anybody wants a peak
+    /// for.
+    ///
+    /// This asks the question the other way round: over any window of this length, what is the
+    /// most damage that actually landed? No smoothing, nothing to configure, and the answer
+    /// means the same thing on every machine.
+    ///
+    /// WINDOWS NEVER SPAN A HOLE. Samples carry their own span, so a stretch the buffer dropped,
+    /// a loading screen or a change of area leaves a gap - and adding across one would report a
+    /// burst made of two separate fights with the pause between them deleted.
+    /// </remarks>
+    /// <param name="seconds">How long the window is. One, five and ten are the useful ones.</param>
+    public float Best(double seconds, uint area = 0)
+    {
+        if (seconds <= 0)
+        {
+            return 0f;
+        }
+
+        IReadOnlyList<DamageSample> mine = In(area);
+        long want = (long)(seconds * 1000);
+        float best = 0f;
+
+        // A window is [left, right]. It grows on the right, and gives up ground on the left
+        // only while what is left is still long enough to be the window that was asked for.
+        int left = 0;
+        float dealt = 0f;
+        long span = 0;
+
+        for (int right = 0; right < mine.Count; right++)
+        {
+            // A gap means the two sides are not one stretch of fighting. Start again from here
+            // rather than adding across it.
+            if (right > left && mine[right].FromMs - mine[right - 1].AtMs > IntervalMs)
+            {
+                left = right;
+                dealt = 0f;
+                span = 0;
+            }
+
+            dealt += mine[right].Dealt;
+            span += mine[right].SpanMs;
+
+            while (left < right && span - mine[left].SpanMs >= want)
+            {
+                dealt -= mine[left].Dealt;
+                span -= mine[left].SpanMs;
+                left++;
+            }
+
+            // Only once the window is actually as long as asked. A shorter one would divide a
+            // burst by less time than it was measured over and report a rate nobody sustained.
+            if (span >= want)
+            {
+                best = MathF.Max(best, dealt / (span / 1000f));
+            }
+        }
+
+        return best;
     }
 
     /// <summary>The areas held, newest first - one entry per map still in the buffer.</summary>
