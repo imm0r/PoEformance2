@@ -49,6 +49,11 @@ public sealed class DamageWindow
     // the same reason: it is the one entry in the list somebody can act on.
     private static readonly Vector4 WorstText = new(1f, 0.62f, 0.35f, 1f);
 
+    // The two halves of what a build is tuned between, told apart by colour rather than only
+    // by their labels - they sit on one line and are read at a glance.
+    private static readonly Vector4 SingleText = new(0.55f, 0.85f, 1f, 1f);
+    private static readonly Vector4 PackText = new(0.75f, 0.7f, 1f, 1f);
+
     // The census, in the game's OWN rarity colours - white, blue, yellow, orange. Nobody has
     // to learn these; a player has been reading them since the first magic item.
     private static readonly Vector4 NormalText = new(0.85f, 0.85f, 0.85f, 1f);
@@ -287,6 +292,48 @@ public sealed class DamageWindow
 
         ImGui.SameLine();
         ImGui.TextColored(DimText, $"   peak {Number(_meter.Peak)} (smoothed, moves with the slider)");
+
+        DrawSplit(scope);
+    }
+
+    /// <summary>
+    /// What the build does against one monster, and against a crowd.
+    /// </summary>
+    /// <remarks>
+    /// The two numbers a build is actually tuned between, got for nothing: every bar already
+    /// records how many monsters were around, so the stretches with one monster near ARE the
+    /// single-target fight and no dummy-hitting exercise is needed to find them.
+    ///
+    /// Shown with HOW LONG each was measured over, because that is what says whether to believe
+    /// it. Twelve seconds of single target across a map is a figure; two is an accident.
+    /// </remarks>
+    private void DrawSplit(uint scope)
+    {
+        (DamageHistory.Split single, DamageHistory.Split pack) = _meter.History.Alone(scope);
+        if (single.Seconds <= 0 && pack.Seconds <= 0)
+        {
+            return;
+        }
+
+        if (single.Seconds > 0)
+        {
+            ImGui.TextColored(
+                SingleText, $"single target {Number(single.Dps)}");
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, $"over {single.Seconds:F0}s alone with one   ");
+            ImGui.SameLine();
+        }
+
+        if (pack.Seconds > 0)
+        {
+            ImGui.TextColored(PackText, $"in a pack {Number(pack.Dps)}");
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, $"over {pack.Seconds:F0}s with {DamageHistory.Crowd}+");
+            ImGui.SameLine();
+        }
+
+        // Ends the SameLine run above, whichever of the two ran last.
+        ImGui.NewLine();
     }
 
     /// <summary>

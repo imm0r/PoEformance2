@@ -253,6 +253,52 @@ public class DamageHistoryTests
     }
 
     [Fact]
+    public void SINGLETargetIsTheStretchesWhereOnlyOneThingWasThere()
+    {
+        // Got for nothing from what is already held: every bar records how many monsters were
+        // around, so the stretches with one near ARE the single-target fight - no separate
+        // dummy-hitting exercise is needed to find them.
+        var history = new DamageHistory();
+        history.Add(new DamageSample(250, 1, 400f, 0f, 0f, new MonsterCensus(0, 0, 1, 0)));
+        history.Add(new DamageSample(500, 1, 600f, 0f, 0f, new MonsterCensus(0, 0, 1, 0)));
+        history.Add(new DamageSample(750, 1, 5000f, 0f, 0f, new MonsterCensus(8, 0, 0, 0)));
+
+        (DamageHistory.Split single, DamageHistory.Split pack) = history.Alone(1);
+
+        Assert.Equal(500f, single.Dps, 1f);
+        Assert.Equal(0.5, single.Seconds, 0.01);
+        Assert.Equal(5000f, pack.Dps, 1f);
+        Assert.Equal(0.25, pack.Seconds, 0.01);
+    }
+
+    [Fact]
+    public void ANDTheMiddleIsNeitherRatherThanForcedIntoOne()
+    {
+        // Two or three monsters is not single target and not a pack. Folding it into either
+        // would move that figure for a reason that has nothing to do with the build.
+        var history = new DamageHistory();
+        history.Add(new DamageSample(250, 1, 9999f, 0f, 0f, new MonsterCensus(3, 0, 0, 0)));
+
+        (DamageHistory.Split single, DamageHistory.Split pack) = history.Alone(1);
+
+        Assert.Equal(0, single.Seconds);
+        Assert.Equal(0, pack.Seconds);
+    }
+
+    [Fact]
+    public void ANDItIsWeightedByTimeRatherThanBySample()
+    {
+        // The buckets are not equally long, so averaging the rates would let a stuttering read
+        // count its longer buckets for less than the time they actually covered.
+        var history = new DamageHistory();
+        history.Add(new DamageSample(1000, 1, 100f, 0f, 0f, new MonsterCensus(0, 0, 1, 0), SpanMs: 1000));
+        history.Add(new DamageSample(1250, 1, 500f, 0f, 0f, new MonsterCensus(0, 0, 1, 0), SpanMs: 250));
+
+        // (100*1 + 500*0.25) / 1.25 = 180, not the 300 an average of the rates would give.
+        Assert.Equal(180f, history.Alone(1).Single.Dps, 1f);
+    }
+
+    [Fact]
     public void THETallestBarIsWhatAGraphHasToBeScaledTo()
     {
         var history = new DamageHistory();

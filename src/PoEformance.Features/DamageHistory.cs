@@ -255,6 +255,62 @@ public sealed class DamageHistory
         return best;
     }
 
+    /// <summary>What the damage did against one monster, and against a crowd.</summary>
+    /// <param name="Dps">The rate over the time that situation lasted. 0 when it never arose.</param>
+    /// <param name="Seconds">How long it lasted, so a figure from two seconds can be discounted.</param>
+    public readonly record struct Split(float Dps, double Seconds);
+
+    /// <summary>A crowd, for the purpose of telling single-target from clear speed.</summary>
+    /// <remarks>
+    /// Five, which is about a pack. The figure does not need to be exact - what it separates is
+    /// "one thing in front of me" from "a screen of them", and anything between those two is
+    /// reported as neither rather than being forced into one of them.
+    /// </remarks>
+    public const int Crowd = 5;
+
+    /// <summary>
+    /// The damage rate while exactly one monster was near, and while a crowd was.
+    /// </summary>
+    /// <remarks>
+    /// SINGLE-TARGET DPS WITHOUT MEASURING ANYTHING NEW. Every sample already says how many
+    /// monsters were around when it happened, so the split is arithmetic over what is held:
+    /// the stretches with one monster near ARE the single-target fight, and no separate
+    /// dummy-hitting exercise is needed to find them.
+    ///
+    /// Time-weighted rather than an average of the rates, because the buckets are not equally
+    /// long and a stuttering read must not make its longer buckets count for less.
+    ///
+    /// The middle is deliberately in NEITHER. Two or three monsters is not single target and
+    /// not a pack, and folding it into one of them would move both figures for a reason that
+    /// has nothing to do with the build.
+    /// </remarks>
+    public (Split Single, Split Pack) Alone(uint area = 0)
+    {
+        float single = 0f;
+        long singleMs = 0;
+        float crowd = 0f;
+        long crowdMs = 0;
+
+        foreach (DamageSample sample in In(area))
+        {
+            if (sample.Nearby.All == 1)
+            {
+                single += sample.Dealt;
+                singleMs += sample.SpanMs;
+            }
+            else if (sample.Nearby.All >= Crowd)
+            {
+                crowd += sample.Dealt;
+                crowdMs += sample.SpanMs;
+            }
+        }
+
+        return (Rate(single, singleMs), Rate(crowd, crowdMs));
+
+        static Split Rate(float dealt, long ms)
+            => ms <= 0 ? default : new Split(dealt / (ms / 1000f), ms / 1000.0);
+    }
+
     /// <summary>The areas held, newest first - one entry per map still in the buffer.</summary>
     public IReadOnlyList<uint> Areas()
     {
