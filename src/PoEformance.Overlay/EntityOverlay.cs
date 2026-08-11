@@ -87,6 +87,30 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private OverlayStyle _style = new();
 
     /// <summary>
+    /// Which windows are pinned in place or handed over to the mouse.
+    /// </summary>
+    /// <remarks>
+    /// ONE of these, like the style, and for the same reason: every window reads it and the
+    /// settings write it, so a copy per window is a copy that drifts. Handed to the windows
+    /// that draw themselves rather than reached for statically, so a test can hand them
+    /// another.
+    /// </remarks>
+    public WindowChrome Chrome { get; } = new();
+
+    /// <summary>Hands the shared window rules to everything that opens a window.</summary>
+    /// <remarks>
+    /// Called from the constructor rather than assigned where each window is built, because
+    /// two of them are created there and one arrives later - and a window that missed the
+    /// assignment silently keeps its own empty copy, which reads as a lock that did nothing.
+    /// </remarks>
+    private void ShareChrome()
+    {
+        _tools.Chrome = Chrome;
+        _preloadPanel.Chrome = Chrome;
+        Chrome.Changed = () => SettingsChanged?.Invoke();
+    }
+
+    /// <summary>
     /// Called when a setting the user can see was changed, so it can be written down.
     /// </summary>
     /// <remarks>
@@ -107,6 +131,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ShowLabels = settings.DotLabels;
         _healthBars.OnlyWhenHurt = settings.HealthBarsOnlyWhenHurt;
         HideBehindPanels = settings.HideBehindPanels;
+        Chrome.Apply(settings.WindowsOrEmpty);
 
         if (Noise is not null)
         {
@@ -140,6 +165,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             DotLabels = ShowLabels,
             HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
             HideBehindPanels = HideBehindPanels,
+            Windows = Chrome.Saved(),
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
             ShowPoi = _poi?.ShowPicker ?? basis.ShowPoi,
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
@@ -381,7 +407,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachStyleEditor(Action saved, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(saved);
-        var window = new StyleWindow(Style, saved);
+        var window = new StyleWindow(Style, saved) { Chrome = Chrome };
         _tools.Add(70, "style", "Appearance", window.DrawTab, window.Idle);
         if (visible)
         {
@@ -478,6 +504,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // The entry card takes its plates from the same cache the markers use, so a picture
         // that cannot be loaded is reported in one place and given up on once.
         _preloadEntry.Icons = _icons;
+
+        ShareChrome();
     }
 
     private IntPtr Upload(string key, SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image, bool srgb)
@@ -702,6 +730,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _poi = new PoiLayer(planner)
         {
             Style = _style,
+            Chrome = Chrome,
             IconFor = _icons.TextureFor,
         };
     }
@@ -1245,7 +1274,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ImGui.SetNextWindowPos(new Vector2(20, 20), ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowBgAlpha(0.7f);
 
-        if (ImGui.Begin("PoEformance", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing))
+        if (ImGui.Begin(
+                "PoEformance",
+                Chrome.Flags(
+                    WindowChrome.StatusId,
+                    ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing)))
         {
             if (!_snapshot.InGame)
             {
@@ -1499,6 +1532,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             if (!ShowDiagnostics)
             {
+                Chrome.Menu(WindowChrome.StatusId);
                 ImGui.End();
                 return;
             }
@@ -1553,6 +1587,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                       + $"   (scale {pixelsPerUnit:F2} px per world unit)"
                     : "probe:    scale unavailable - no character height to calibrate against");
             }
+
+            Chrome.Menu(WindowChrome.StatusId);
         }
 
         ImGui.End();

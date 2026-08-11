@@ -31,6 +31,16 @@ public sealed class StyleWindow
     private readonly OverlayStyle _style;
     private readonly Action _save;
 
+    /// <summary>
+    /// Which windows are pinned in place or handed to the mouse, if anybody said.
+    /// </summary>
+    /// <remarks>
+    /// Here rather than in a settings page of its own because this is the tab about how the
+    /// overlay LOOKS, and where a window sits is part of that. It is also the only place a
+    /// click-through window can be got back, so it has to be somewhere findable.
+    /// </remarks>
+    public WindowChrome? Chrome { get; set; }
+
     /// <summary>Which key's icon box is open. Only one at a time, to keep the rows short.</summary>
     private string _editingIcon = string.Empty;
     private string _iconPath = string.Empty;
@@ -107,6 +117,14 @@ public sealed class StyleWindow
         }
 
         ImGui.Separator();
+
+        // FIRST, above the colours, because this is the one thing in here somebody arrives
+        // looking for rather than browsing: a window that has been made click-through cannot
+        // offer its own menu any more, and this list is the only way back.
+        if (Chrome is not null && ImGui.CollapsingHeader("Windows", ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            Chrome.DrawList();
+        }
 
         foreach (IGrouping<string, StyleEntry> group in StyleCatalogue.Grouped())
         {

@@ -39,8 +39,14 @@ public sealed class ToolTabs
     // on an undrawn frame would make surfacing a tool work only sometimes.
     private string? _bringToFront;
 
+    /// <summary>The id this window's lock and click-through are filed under.</summary>
+    public const string ChromeId = "tools";
+
     /// <summary>Whether the window is on screen. The idle callbacks run either way.</summary>
     public bool Visible { get; set; }
+
+    /// <summary>Whether this window is pinned in place or handed to the mouse.</summary>
+    public WindowChrome Chrome { get; set; } = new();
 
     /// <summary>Whether anything registered a tab, so an empty window is never offered.</summary>
     public bool Any => _tabs.Count > 0;
@@ -119,7 +125,8 @@ public sealed class ToolTabs
         }
 
         bool open = Visible;
-        bool expanded = ImGui.Begin("Tools", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
+        bool expanded = ImGui.Begin(
+            "Tools", ref open, Chrome.Flags(ChromeId, ImGuiWindowFlags.NoFocusOnAppearing));
 
         string? inFront = null;
 
@@ -130,6 +137,12 @@ public sealed class ToolTabs
             if (expanded)
             {
                 inFront = DrawTabs();
+
+                // LAST, after the tabs and their contents. The menu declines to open over a
+                // control, and what is under the cursor is only known once the controls have
+                // been submitted - asked first it would steal the right-click the colour
+                // pickers in the Appearance tab have their own use for.
+                Chrome.Menu(ChromeId);
             }
         }
         finally

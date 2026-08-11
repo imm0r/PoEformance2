@@ -310,6 +310,19 @@ interesting part was not the feature:
 - **Routes that stay on one storey.** The walkable grid is flat: a bridge and the ground under
   it are the same cells and both walkable, so a two-dimensional search draws a route through
   the floor. Only the height separates them.
+- **Pinning a window down, or handing it to the mouse.** Two things per window: LOCKED (still
+  clickable, cannot be dragged out of place by a stray click) and CLICK-THROUGH (the mouse does
+  not see it at all). The second looks like it should need Win32 work and needs one ImGui flag:
+  ClickableTransparentOverlay flips the whole overlay window between clickable and
+  `WS_EX_TRANSPARENT` every frame on `io.WantCaptureMouse` alone, and a window carrying
+  `NoMouseInputs` never sets it — so trying to do this with our own hit-test regions would be
+  fighting the library for the same setting. The part that needed thought was the way back: a
+  click-through window cannot be right-clicked, so its own menu is gone the moment it is
+  switched on. The undo lives in Tools → Appearance, which is opened from the status window, so
+  the status window is the one window that will not go click-through — an exemption is cheaper
+  than a global hotkey to clash with the game over. It is refused in the setter as well as in
+  the control, because the settings file is hand-editable and this is the one state nothing in
+  the tool can undo.
 - **Getting out of the way of the game's own panels.** Everything drawn in world space is drawn
   UNDERNEATH a stash, a passive tree or a world map the moment one opens — right information in
   the way, which is worse than none. `PanelReader` reports which screen-filling panels are open
