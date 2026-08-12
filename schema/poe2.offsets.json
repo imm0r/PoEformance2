@@ -632,6 +632,20 @@
       }
     },
 
+    "Inventories": {
+      "comment": "Component: what an entity itself carries - a monster's equipment, a chest's contents. NOT the ServerData 'Inventory' further down, which is the player's stash and backpack reached through PlayerInventories; the two share a word and nothing else. NOWHERE IN EITHER REFERENCE - GameHelper2's Objects/Components/ holds 21 files and no inventory among them - so all of this was read off the live dissector (2026-08, owner, on a VultureDemon@75) with nothing to corroborate it. THE COMPONENT IS AN ARRAY, which is what the plural name was saying all along: sub-objects of 0x150 bytes lying inline, the first starting at the component address itself, two of them seen. Three independent things say 0x150: the module pointers at +0x000 and +0x018 repeat exactly at +0x150 and +0x168 (same vtable, same type), the vector below repeats at +0x170, and its inline buffer repeats at +0x188. EACH SUB-OBJECT OWNS A VECTOR WITH INLINE STORAGE, and that is why most of the component reads as empty: begin/end/capacity at +0x20/+0x28/+0x30 point back INTO the sub-object, at +0x38, where 16 slots run to +0xB8. Two entries in the first sub-object, three in the second, and in both the rows go empty at exactly the address 'end' holds. A begin pointer landing inside the structure you are looking at is the tell for inline storage - the empty rows after it are unused slots, not undecoded fields, and reading them as fields is a day lost. WHAT THE ENTRIES ARE IS STILL OPEN: they were followed live and none is a dat row, so the search that went looking for one is closed, not unfinished. ALSO OPEN: +0x158, where the second sub-object's header would put OwnerEntity, holds something other than the entity +0x008 holds - so either the sub-objects are not all the same thing, or that field is not the owner. A third copy at +0x2A0 would settle it.",
+      "consts": { "SubObjectStride": "0x150", "InlineBuffer": "0x38", "InlineSlots": "16" },
+      "fields": {
+        "EntriesVec": {
+          "offset": "0x20", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 16 },
+          "comment": "begin, with end at +0x28. Pointers, 8 bytes each. maxCount is the inline capacity, so a count above 16 means this is not the vector any more."
+        },
+        "EntriesVecLast": { "offset": "0x28", "type": "ptr", "comment": "Vector end; count = (Last - First) / 8." },
+        "EntriesCapacityEnd": { "offset": "0x30", "type": "ptr", "comment": "End of the inline buffer: begin + 0x80. Its distance from begin is what says the storage is inline and 16 slots wide." }
+      }
+    },
+
     "Component": {
       "comment": "The two fields EVERY component starts with, whatever it is. Worth having as a layout of its own because it is what orients you in one nobody has decoded: the first row says WHICH TYPE this is and the second says whose it is, so a window of unknown bytes already has two rows that mean something. Confirmed live on a DemonicApparitionPortal's Transitionable, where OwnerEntity held exactly the entity address the browser was showing. Named ComponentHeader in the AHK tool.",
       "fields": {

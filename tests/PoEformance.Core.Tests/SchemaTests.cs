@@ -58,6 +58,25 @@ public class SchemaTests
     }
 
     [Fact]
+    public void InventoriesRecordsInlineStorageRatherThanAHeapVector()
+    {
+        OffsetSchema schema = SchemaJson.Load(SchemaPath);
+
+        // The name has to stay exactly the component's, or the entity browser stops
+        // finding it and the component goes back to reading as undescribed.
+        StructDef inventories = schema.Structs["Inventories"];
+
+        Assert.Equal(0x20, inventories.OffsetOf("EntriesVec"));
+        Assert.Equal(0x30, inventories.OffsetOf("EntriesCapacityEnd"));
+        Assert.Equal(0x150, inventories.Constants["SubObjectStride"]);
+
+        // The numbers check each other, which is the only reason to pin them: the
+        // capacity end observed live sat at +0xB8, and that is exactly the buffer at
+        // +0x38 plus sixteen 8-byte slots. Lose either constant and this stops adding up.
+        Assert.Equal(0xB8L, inventories.Constants["InlineBuffer"] + (8 * inventories.Constants["InlineSlots"]));
+    }
+
+    [Fact]
     public void MissingField_ThrowsNamingStructAndField()
     {
         OffsetSchema schema = SchemaJson.Load(SchemaPath);
