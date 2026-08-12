@@ -727,7 +727,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 }
             },
             (address, worldX, worldY) => _planner?.Toggle(address, worldX, worldY),
-            address => _planner?.IsTarget(address) ?? false);
+            address => _planner?.IsTarget(address) ?? false,
+            (address, label) =>
+            {
+                // Brings the dissector forward exactly as "dissect" does, and for the same
+                // reason: the new place appearing beside the others IS the confirmation that
+                // the click landed. Adding a third costs one tab click back, which is cheap
+                // next to a button that looks like it did nothing.
+                if (address != 0 && _dissector is not null && _dissector.Compare(address, label))
+                {
+                    _tools.Show(DissectorTab);
+                }
+            });
         _tools.Add(90, "entities", "Entity browser", () => window.DrawTab(_snapshot, _snapshot.Player), window.Idle);
         if (visible)
         {

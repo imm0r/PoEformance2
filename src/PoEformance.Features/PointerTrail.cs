@@ -17,10 +17,16 @@ namespace PoEformance.Features;
 /// crashed when stepping back off the last hop, it skipped the first offset, and it never
 /// showed the name it started from, so every route read as a bare address. None of that was
 /// visible from the outside until it took the tool down.
+///
+/// A hop remembers where EVERY place open at the time came from, because the dissector can
+/// walk several addresses through the same offset at once. The route is still one route -
+/// that is the whole point of walking them together, and "+0x598 is health on all three of
+/// these" is a far stronger claim than the same sentence about one monster - but stepping
+/// back has to put each place where it individually was.
 /// </remarks>
 public sealed class PointerTrail
 {
-    private readonly List<(ulong From, int Offset)> _hops = [];
+    private readonly List<(ulong[] From, int Offset)> _hops = [];
     private string _origin = string.Empty;
 
     /// <summary>How many hops have been taken.</summary>
@@ -44,28 +50,36 @@ public sealed class PointerTrail
         _origin = origin;
     }
 
-    /// <summary>Records following the pointer at <paramref name="offset"/> of <paramref name="from"/>.</summary>
-    public void Follow(ulong from, int offset)
+    /// <summary>
+    /// Records following the pointer at <paramref name="offset"/> out of every place open.
+    /// </summary>
+    /// <param name="from">
+    /// Where each place stood before the hop, in the order the places are shown. The first is
+    /// the one a route with no name is named after.
+    /// </param>
+    public void Follow(IReadOnlyList<ulong> from, int offset)
     {
-        if (_hops.Count == 0 && _origin.Length == 0)
+        ArgumentNullException.ThrowIfNull(from);
+
+        if (_hops.Count == 0 && _origin.Length == 0 && from.Count > 0)
         {
-            _origin = $"0x{from:X}";
+            _origin = $"0x{from[0]:X}";
         }
 
-        _hops.Add((from, offset));
+        _hops.Add(([.. from], offset));
     }
 
-    /// <summary>Steps back one hop, giving the address it came from.</summary>
+    /// <summary>Steps back one hop, giving each place the address it came from.</summary>
     /// <returns>False when there is nothing to step back to.</returns>
-    public bool TryStepBack(out ulong address)
+    public bool TryStepBack(out IReadOnlyList<ulong> addresses)
     {
         if (_hops.Count == 0)
         {
-            address = 0;
+            addresses = [];
             return false;
         }
 
-        address = _hops[^1].From;
+        addresses = _hops[^1].From;
         _hops.RemoveAt(_hops.Count - 1);
         return true;
     }
@@ -78,14 +92,16 @@ public sealed class PointerTrail
             return string.Empty;
         }
 
-        string route = _origin.Length > 0
-            ? _origin
-            : $"0x{_hops[0].From.ToString("X", CultureInfo.InvariantCulture)}";
+        // No origin and no address to fall back on means Follow was handed no places at all.
+        // The offsets are still true, so the route is still worth showing without a name.
+        string route = _origin.Length > 0 ? _origin
+            : _hops[0].From.Length > 0 ? $"0x{_hops[0].From[0].ToString("X", CultureInfo.InvariantCulture)}"
+            : string.Empty;
 
         // Every hop, in the order taken. Each holds the offset followed FROM that address,
         // so the last one lands on wherever we are now - which is why none of them is
         // skipped and none is the current position.
-        foreach ((ulong _, int offset) in _hops)
+        foreach ((ulong[] _, int offset) in _hops)
         {
             if (offset >= 0)
             {

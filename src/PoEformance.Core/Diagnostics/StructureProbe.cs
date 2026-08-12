@@ -171,6 +171,86 @@ public static class StructureProbe
         return changed;
     }
 
+    /// <summary>
+    /// The offsets where several readings of the SAME kind of structure disagree.
+    /// </summary>
+    /// <remarks>
+    /// The other half of <see cref="Changes"/>, and the reason to look at more than one place
+    /// at a time. One structure over time answers "which part of this was that action". Two
+    /// structures of the same kind, side by side, answer the question no single window can
+    /// ask: which part of this is the INSTANCE and which part is the KIND.
+    ///
+    /// Two monsters of one species agree on their vtable, their class pointer, the dat row
+    /// they were built from - every row that MATCHES is something the species shares, and it
+    /// is the row to follow when looking for what a thing is. Health, position, id and target
+    /// are the rows that DIFFER, and they are where anything about this one monster lives.
+    /// From a single window both look identical: bytes.
+    ///
+    /// A place that could not be read contributes nothing rather than counting as a
+    /// disagreement - an unmapped address would otherwise mark every row and read as though
+    /// the two structures had nothing in common.
+    /// </remarks>
+    /// <param name="windows">One window per place, all read at the same size and stride.</param>
+    public static List<int> Differences(IReadOnlyList<byte[]> windows, int stride = 8)
+    {
+        ArgumentNullException.ThrowIfNull(windows);
+        if (stride is not (4 or 8))
+        {
+            throw new ArgumentOutOfRangeException(nameof(stride), stride, "a row is four or eight bytes");
+        }
+
+        var differing = new List<int>();
+        int shortest = int.MaxValue;
+        int usable = 0;
+
+        foreach (byte[] window in windows)
+        {
+            if (window.Length < stride)
+            {
+                continue;
+            }
+
+            usable++;
+            shortest = Math.Min(shortest, window.Length);
+        }
+
+        // One window agrees with itself. Saying so would be a finding about nothing.
+        if (usable < 2)
+        {
+            return differing;
+        }
+
+        for (int offset = 0; offset + stride <= shortest; offset += stride)
+        {
+            ReadOnlySpan<byte> first = default;
+            bool have = false;
+
+            foreach (byte[] window in windows)
+            {
+                if (window.Length < stride)
+                {
+                    continue;
+                }
+
+                ReadOnlySpan<byte> row = window.AsSpan(offset, stride);
+                if (!have)
+                {
+                    first = row;
+                    have = true;
+                    continue;
+                }
+
+                if (!row.SequenceEqual(first))
+                {
+                    differing.Add(offset);
+                    break;
+                }
+            }
+        }
+
+        return differing;
+    }
+
     /// <summary>True when a value is worth showing as an address rather than as numbers.</summary>
     /// <remarks>See <see cref="LowestLikelyPointer"/> for why this is stricter than following one.</remarks>
     public static bool LooksLikePointer(ulong value)
