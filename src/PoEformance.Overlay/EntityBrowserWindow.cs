@@ -464,9 +464,15 @@ public sealed class EntityBrowserWindow
             return;
         }
 
+        DrawFieldsInto(values, "        ");
+    }
+
+    /// <summary>One line per field, and the same again for whatever a field leads to.</summary>
+    private static void DrawFieldsInto(IReadOnlyList<FieldReading> values, string indent)
+    {
         foreach (FieldReading field in values)
         {
-            ImGui.TextColored(DimText, $"        +0x{field.Offset:X3}");
+            ImGui.TextColored(DimText, $"{indent}+0x{field.Offset:X3}");
             ImGui.SameLine();
             ImGui.TextColored(PathText, ImGuiText.Escape(field.Name));
             ImGui.SameLine();
@@ -480,6 +486,15 @@ public sealed class EntityBrowserWindow
                 ImGui.SetTooltip(
                     $"{field.Name}  ({field.Type.ToString().ToLowerInvariant()}) at +0x{field.Offset:X}\n\n"
                     + ImGuiText.Escape(Wrapped(field.Comment)));
+            }
+
+            // Always unfolded rather than behind another click. A field the schema bothered
+            // to point at another struct IS that struct - Life.Health is a pool with a
+            // maximum, not an address - and hiding it behind a second click would leave the
+            // wall of hex that this exists to get rid of.
+            if (field.Children is { Count: > 0 } children)
+            {
+                DrawFieldsInto(children, indent + "    ");
             }
         }
     }

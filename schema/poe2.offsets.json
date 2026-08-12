@@ -204,7 +204,7 @@
     "WorldAreaDetails": {
       "comment": "Reached through WorldData.WorldAreaDetailsPtr (0x98). TWO hops, not one: WorldData -> WorldAreaDetails -> the WorldAreas.dat ROW. Ported from the AHK tool, which uses exactly this chain in game.",
       "fields": {
-        "RowPtr": { "offset": "0xA0", "type": "ptr", "invariant": { "kind": "nonNullPtr" }, "comment": "The WorldAreas.dat row for the area currently loaded." }
+        "RowPtr": { "offset": "0xA0", "type": "ptr", "struct": "WorldAreaDat", "invariant": { "kind": "nonNullPtr" }, "comment": "The WorldAreas.dat row for the area currently loaded." }
       }
     },
 
@@ -317,7 +317,7 @@
     "MinimapIcon": {
       "comment": "The component an entity carries when the GAME ITSELF marks it on the map - which makes it the authoritative answer to 'is this a point of interest', including quest targets. Source: GameHelper2 RemoteObjects/Components/MinimapIcon.cs.",
       "fields": {
-        "IconRowPtr": { "offset": "0x20", "type": "ptr", "comment": "Row in MinimapIcons.dat. Its first field is the icon's name. CONFIRMED LIVE (2026-08, owner, in the dissector): the row reads Id \"NPC\" on an NPC, at the same address the recording independently resolved." },
+        "IconRowPtr": { "offset": "0x20", "type": "ptr", "struct": "MinimapIconRow", "comment": "Row in MinimapIcons.dat. Its first field is the icon's name. CONFIRMED LIVE (2026-08, owner, in the dissector): the row reads Id \"NPC\" on an NPC, at the same address the recording independently resolved." },
         "TablePtr": {
           "offset": "0x28", "type": "ptr",
           "comment": "The TABLE the row above belongs to - a dat-file object whose +0x08 is a pointer to its path, read live as \"Data/Balance/MinimapIcons.dat\". FOUND 2026-08 by following the pointer next to the row, and worth having because it answers the one question a row cannot answer about itself: the dissector can say \"dat row, Id X\" from the layout alone but not WHICH TABLE, and the table name is what turns a row into a computed column layout (scripts\\dat-offsets.ps1 -Table MinimapIcons). Neither reference decodes it - GameHelper2 has no offsets file for this component at all and reads only the 0x20. If the same pointer-pair shape turns up beside other row pointers (ItemBaseComponent.UniqueIviRow, ChestData.StrongboxDatPtr), it is the same thing."
@@ -447,9 +447,9 @@
     "Life": {
       "comment": "Component. DRIFT HISTORY: vital bases shifted in 4.5.x (Health 0x1A8->0x1B0, Mana 0x1F8->0x208, ES 0x230->0x248); confirmed in-game via component probe. Matches GameHelper2 Life.cs. Each vital is a Vital sub-struct.",
       "fields": {
-        "Health": { "offset": "0x1B0", "type": "ptr", "comment": "Vital sub-struct base, not a pointer - read Vital fields relative to this offset." },
-        "Mana": { "offset": "0x208", "type": "ptr" },
-        "EnergyShield": { "offset": "0x248", "type": "ptr" }
+        "Health": { "offset": "0x1B0", "type": "ptr", "struct": "Vital", "inline": true, "comment": "Vital sub-struct base, not a pointer - read Vital fields relative to this offset. The \"inline\" flag says exactly that, so the browser unfolds it instead of showing eight bytes as an address." },
+        "Mana": { "offset": "0x208", "type": "ptr", "struct": "Vital", "inline": true },
+        "EnergyShield": { "offset": "0x248", "type": "ptr", "struct": "Vital", "inline": true }
       }
     },
 
@@ -468,7 +468,8 @@
       "fields": {
         "Reaction": {
           "offset": "0x1E0", "type": "u8",
-          "comment": "(reaction & 0x7F) == 1 means friendly. Feeds isFriendly everywhere."
+          "values": { "1": "friendly" },
+          "comment": "(reaction & 0x7F) == 1 means friendly. Feeds isFriendly everywhere. Only the one value is named, deliberately: the low seven bits carry more than a side and nobody here has read what the others mean, so every other number stays a number rather than being labelled from a guess."
         }
       }
     },
@@ -630,7 +631,7 @@
 
     "Chest": {
       "fields": {
-        "ChestDataPtr": { "offset": "0x160", "type": "ptr" },
+        "ChestDataPtr": { "offset": "0x160", "type": "ptr", "struct": "ChestData" },
         "IsOpened": { "offset": "0x168", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 } }
       }
     },
@@ -709,7 +710,7 @@
       "comment": "Component: the model an entity actually loaded. Worth having because it tells apart entities that SHARE a metadata path but look different - the ExpeditionMarker flag variants were the case that needed it. The path is two hops away: ModelInfoPtr -> AnimatedModelInfo.ModelFileRecordPtr -> FileInfoValue.Name. Both references agree.",
       "fields": {
         "AnimatedEntityPtr": { "offset": "0x280", "type": "ptr" },
-        "ModelInfoPtr": { "offset": "0x358", "type": "ptr" }
+        "ModelInfoPtr": { "offset": "0x358", "type": "ptr", "struct": "AnimatedModelInfo" }
       }
     },
 
@@ -791,10 +792,10 @@
     "Stats": {
       "comment": "The component. It holds no stat pairs itself - it holds POINTERS to StatsInternal sub-structures, and the pairs live in those. Written down because the layout invited exactly one wrong reading and got it: StatsInternalStatsVector was declared here as though 0xF8 were an offset into the component, and reading it that way returns a zeroed field on every entity, which then looks like 'this entity has no stats'. Verified against a flame wall in a recorded session: Stats+0xF8 and Stats+0x100 both read 0x0, while the AHK tool reaches the same data through StatsByItems and StatsByBuffAndActions. Offsets from that tool, which is battle-tested against PoE2.",
       "fields": {
-        "StatsByItems": { "offset": "0x160", "type": "ptr", "comment": "-> StatsInternal: what the entity's gear gives it." },
+        "StatsByItems": { "offset": "0x160", "type": "ptr", "struct": "StatsInternal", "comment": "-> StatsInternal: what the entity's gear gives it." },
         "CurrentWeaponIndex": { "offset": "0x168", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 8 } },
         "ShapeshiftPtr": { "offset": "0x170", "type": "ptr", "comment": "Non-null while shapeshifted." },
-        "StatsByBuffAndActions": { "offset": "0x1C8", "type": "ptr", "comment": "-> StatsInternal: what buffs and actions give it. The one a skill's own numbers would be in." }
+        "StatsByBuffAndActions": { "offset": "0x1C8", "type": "ptr", "struct": "StatsInternal", "comment": "-> StatsInternal: what buffs and actions give it. The one a skill's own numbers would be in." }
       }
     },
 
@@ -814,7 +815,7 @@
       "comment": "Component on items and rare/magic monsters.",
       "fields": {
         "Identified": { "offset": "0x90", "type": "u8" },
-        "Rarity": { "offset": "0x94", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 10 } },
+        "Rarity": { "offset": "0x94", "type": "i32", "values": { "0": "Normal", "1": "Magic", "2": "Rare", "3": "Unique", "5": "Currency" }, "invariant": { "kind": "range", "min": 0, "max": 10 }, "comment": "Names from the tool's own ItemRarity (Rarities.FromRaw accepts 0..3; 5 is currency). The range invariant stays wider than the map on purpose - a number nobody has seen must not be rejected, and it keeps its digits on screen." },
         "StatsFromMods": { "offset": "0x148", "type": "stdVector", "comment": "The item's RESOLVED stats as (stat id, value) pairs - what the game shows on the item, already summed across its mods. The per-mod vectors say which mods are on it; this says what they add up to." },
         "AllMods": { "offset": "0xA0", "type": "stdVector" }
       }
@@ -823,7 +824,7 @@
     "ObjectMagicProperties": {
       "comment": "Rarity and mods, for the things that carry this INSTEAD of a Mods component - monsters, and on the item side flasks, gems and some magic items. Which of the two an item has cannot be told from its path, so a reader tries both and keeps whichever decodes better. The rarity range stays 0-10 because monsters use more of it than items do. Ground drops: currency and fragments carry no rarity component at all - classify those by path (contains /Currency/), not by a rarity read of -1. The two offsets below were reached separately by the AHK tool (imm0r/PoEformance) and by this project, which is as close to confirmation as an offset gets without the game.",
       "fields": {
-        "Rarity": { "offset": "0x144", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 10 } },
+        "Rarity": { "offset": "0x144", "type": "i32", "values": { "0": "Normal", "1": "Magic", "2": "Rare", "3": "Unique", "5": "Currency" }, "invariant": { "kind": "range", "min": 0, "max": 10 } },
         "AllMods": { "offset": "0x150", "type": "stdVector", "comment": "Five vectors in a row - implicit, explicit, enchant, and two league ones - each 0x18 bytes." },
         "StatsFromMods": { "offset": "0x1F8", "type": "stdVector", "comment": "The resolved (stat id, value) pairs, as the Mods component has at 0x148." }
       }
@@ -894,7 +895,7 @@
 
     "ItemBaseComponent": {
       "fields": {
-        "UniqueIviRow": { "offset": "0x30", "type": "ptr", "comment": "ItemVisualIdentity dat row for uniques (0 for non-uniques); its +0x00 points to the IVI Id wide string." }
+        "UniqueIviRow": { "offset": "0x30", "type": "ptr", "struct": "ItemVisualIdentityRow", "comment": "ItemVisualIdentity dat row for uniques (0 for non-uniques); its +0x00 points to the IVI Id wide string." }
       }
     },
 
@@ -952,7 +953,7 @@
     "ChargesComponent": {
       "comment": "Component on a flask item: how many charges it holds and what a use costs. Together they answer the only question that matters before pressing the key - is this flask usable AT ALL. Confirmed identically by GameHelper2's ChargesOffsets and the AHK tool.",
       "fields": {
-        "ChargesInternalPtr": { "offset": "0x10", "type": "ptr", "comment": "-> ChargesInternal, which holds the per-use cost." },
+        "ChargesInternalPtr": { "offset": "0x10", "type": "ptr", "struct": "ChargesInternal", "comment": "-> ChargesInternal, which holds the per-use cost." },
         "Current": { "offset": "0x18", "type": "i32", "comment": "Charges the flask currently holds." }
       }
     },
