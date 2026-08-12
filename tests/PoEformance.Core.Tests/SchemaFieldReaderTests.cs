@@ -63,6 +63,12 @@ public class SchemaFieldReaderTests
         var reader = new FakeMemoryReader();
         reader.Place(At, new byte[0x80]);
         reader.PlaceStdWString(At + 0x10, "Vaal Chest", At + 0x200);
+
+        // Room around the characters, because the reader asks for its whole limit at once and
+        // halves until a read succeeds - so a region that ends where the string ends returns a
+        // SHORTER string rather than failing. That is the page-edge behaviour, pinned in its
+        // own test below; here it would be an accident, and it was one.
+        reader.Place(At + 0x300, new byte[0x100]);
         reader.Place(At + 0x40, At + 0x300);
         reader.PlaceUtf16(At + 0x300, "Waypoint");
 
@@ -75,6 +81,25 @@ public class SchemaFieldReaderTests
 
         Assert.Equal("\"Vaal Chest\"", read.Single(field => field.Name == "Name").Text);
         Assert.Equal("\"Waypoint\"", read.Single(field => field.Name == "Icon").Text);
+    }
+
+    [Fact]
+    public void AStringWhoseTailCannotBeReadComesBackShortRatherThanEmpty()
+    {
+        // Deliberate, in the reader this borrows: a string sitting near the end of a mapped
+        // page cannot be read at full length, and returning nothing there would lose names
+        // that are perfectly readable up to the edge. Worth pinning because the shortened
+        // answer arrives with no mark on it - "Waypoi" looks like a value, not a truncation -
+        // and this test exists because it fooled the test next to it first.
+        var reader = new FakeMemoryReader();
+        reader.Place(At, new byte[0x80]);
+        reader.Place(At + 0x40, At + 0x300);
+        reader.PlaceUtf16(At + 0x300, "Waypoint");   // and nothing behind it
+
+        IReadOnlyList<FieldReading> read = SchemaFieldReader.Read(
+            reader, Layout(new FieldDef("Icon", 0x40, FieldType.Utf16Ptr, null, null)), At);
+
+        Assert.Equal("\"Waypoi\"", read.Single().Text);
     }
 
     [Fact]
