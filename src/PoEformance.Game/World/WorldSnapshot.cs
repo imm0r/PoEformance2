@@ -125,10 +125,21 @@ public sealed record WorldEntity(
     bool IsFriendly = false,
     bool IsEffect = false,
     string Name = "",
-    ulong Render = 0)
+    ulong Render = 0,
+    bool? Present = null)
 {
     /// <summary>Whether this is a chest somebody has already been through.</summary>
     public bool IsSpent => Opened == true;
+
+    /// <summary>Whether this is a place worth marking on the map.</summary>
+    /// <remarks>
+    /// A fact plus a let-out. The kind says the thing is a place; <see cref="Present"/> says
+    /// whether the game agrees it is there, and only an explicit NO takes it off the map.
+    /// Null - no Targetable component, or a read that failed - still draws, because a place
+    /// nobody could judge is worth more on screen than off it, and because this rule reaches
+    /// every checkpoint and exit in the game.
+    /// </remarks>
+    public bool IsPlace => Poi != PoiKind.None && Present != false;
     /// <summary>
     /// A readable label for a point of interest.
     /// </summary>
@@ -687,13 +698,35 @@ public sealed class WorldReader
                 opened = openFlag != 0;
             }
 
+            PoiKind poi = PointsOfInterest.Classify(entity.Path, mapIcon);
+
+            // Whether the game itself thinks this place is really there. An NPC that belongs
+            // to a quest nobody has taken sits in the entity list all the same - awake, valid,
+            // positioned, carrying a MinimapIcon whose row says "NPC" - and the overlay marked
+            // a person standing in an empty map ("Lurking Creature", 2026-08). Nothing about
+            // the entity says it is absent; the game's own answer is the targetable byte.
+            //
+            // Only for places, and never for monsters or chests, both of which already ask
+            // this byte a different question: on a monster it is the corpse test above, and
+            // on a chest a 0 means "already opened", which Opened carries instead.
+            bool? present = null;
+            if (poi != PoiKind.None && poi != PoiKind.Chest && kind != EntityKind.Monster)
+            {
+                ulong targetableComponent = entity.Component("Targetable");
+                if (targetableComponent != 0
+                    && _reader.TryRead(targetableComponent + (ulong)_isTargetable, out byte reachable))
+                {
+                    present = reachable != 0;
+                }
+            }
+
             var world = new WorldEntity(
                 id, address, entity.Path, kind,
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
-                PointsOfInterest.Classify(entity.Path, mapIcon), mapIcon,
+                poi, mapIcon,
                 signs.Life, signs.EnergyShield, opened, signs.Friendly, signs.IsEffect,
-                NameOf(address, renderAddress), renderAddress);
+                NameOf(address, renderAddress), renderAddress, present);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

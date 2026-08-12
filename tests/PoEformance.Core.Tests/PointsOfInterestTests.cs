@@ -102,6 +102,33 @@ public class PointsOfInterestTests
     }
 
     [Fact]
+    public void APlaceTheGameSaysIsNotThereIsNotAPlace()
+    {
+        // The quest NPC that started this: awake, positioned, carrying the game's own NPC
+        // minimap icon, and not in the area at all until somebody takes the quest.
+        var absent = new WorldEntity(
+            1, 0x1000, "Metadata/NPC/Hideout/JusticeOracleIdentifier/AbyssJusticeOracleIdentifierWild",
+            EntityKind.Npc, 100f, 100f, 0f, Poi: PoiKind.Npc, Present: false);
+
+        Assert.Equal(PoiKind.Npc, absent.Poi);
+        Assert.False(absent.IsPlace);
+    }
+
+    [Fact]
+    public void APlaceNobodyCouldJudgeIsStillDrawn()
+    {
+        // The let-out, and the reason it is not the other way round: most exits and
+        // checkpoints carry no Targetable component at all, so an unknown that hid them
+        // would empty the map of exactly the markers people navigate by.
+        var unjudged = new WorldEntity(
+            2, 0x2000, "Metadata/MiscellaneousObjects/Checkpoints/Checkpoint_Endgame",
+            EntityKind.Unknown, 100f, 100f, 0f, Poi: PoiKind.Checkpoint);
+
+        Assert.Null(unjudged.Present);
+        Assert.True(unjudged.IsPlace);
+    }
+
+    [Fact]
     public void ANameThatWouldSayNothingFallsBackToTheKind()
     {
         // Trailing variant numbers are stripped, so a path can reduce to nothing at all - and

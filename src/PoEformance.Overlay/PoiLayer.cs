@@ -174,7 +174,7 @@ public sealed class PoiLayer
 
         foreach (WorldEntity entity in snapshot.Entities)
         {
-            if (entity.Poi != PoiKind.None && DrawnKinds.Contains(entity.Poi))
+            if (entity.IsPlace && DrawnKinds.Contains(entity.Poi))
             {
                 places.Add(new Place(
                     entity.Address, entity.PoiName, entity.Poi,

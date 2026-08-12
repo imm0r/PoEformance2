@@ -78,7 +78,10 @@ public sealed record AlertRule(
             return false;
         }
 
-        if (Place != PoiKind.None && entity.Poi != Place)
+        // IsPlace rather than Poi: a rule that asks for a place means one that is there.
+        // The same absent quest NPC the map stopped drawing would otherwise still fire an
+        // alert, which is the louder half of the same bug.
+        if (Place != PoiKind.None && (entity.Poi != Place || !entity.IsPlace))
         {
             return false;
         }
