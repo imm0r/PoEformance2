@@ -66,8 +66,17 @@ $ValidForPoE2 = 0x02
 # Byte width per column type, as the row sits in memory. Everything here is packed:
 # a bool really does cost one byte and the next column starts on the next byte, which
 # is why so many of these offsets are odd numbers.
+#
+# This is the .datc64 FILE width table from the AHK tool (tools/poe_tools.py,
+# TYPE_SIZES_DATC64), which has been extracting these tables from the game's own data
+# for months. That it also describes the layout IN MEMORY is the whole point: the game
+# does not repack a row when it loads it, it keeps the file layout and fills the
+# references in place. Derived independently here and then found to agree type for type -
+# including the two widths that were guessed wrong first, see 'row' and 'foreignrow'.
 $Widths = @{
     'bool'   = 1
+    'i8'     = 1
+    'u8'     = 1
     'i16'    = 2
     'u16'    = 2
     'i32'    = 4
@@ -75,17 +84,22 @@ $Widths = @{
     'f32'    = 4
     # A reference to a table that has no columns of its own. Behaves like an i32 index.
     'enumrow' = 4
+    # The schema's placeholder for "a row reference whose table we have not identified yet".
+    'rid'    = 4
     # In the FILE this is an offset into the variable-length section; in MEMORY it is a
     # pointer to a raw UTF-16 string. Same width either way.
     'string' = 8
-    # A reference to a row of another table. This is where the column STARTS; which half
-    # of the 16 bytes holds the actual pointer is not settled, so an offset landing inside
-    # one of these is a lead, not an answer. See BuffVisualsKey in schema\poe2.offsets.json.
+    # 64-bit TABLE reference followed by 64-bit ROW reference. So the pointer to the
+    # referenced row sits at +8, not at the column start - the offset this script reports
+    # is where the COLUMN begins. GameHelper2 corroborates it from the other side: its
+    # GrantedEffects.ActiveSkillDatPtr is 0x57, and the ActiveSkill column starts at 0x4F.
     'foreignrow' = 16
-    # A reference to a row of the SAME table. 8 and 16 both reproduce every offset we
-    # can check, because no offset we know sits behind one. Left at 16 to match
-    # foreignrow; treat any offset computed past a self-reference as unverified.
-    'row'    = 16
+    # A reference to a row of the SAME table, and only 8 bytes - there is no table
+    # reference to store. This was 16 here at first, which nothing in this repo could
+    # disprove because no offset we read sits behind one; 41 PoE2 tables do have such a
+    # column, and in WorldAreas it is column 13 of 82, so everything after ParentTown was
+    # coming out 8 bytes too far.
+    'row'    = 8
 }
 
 # Count plus offset in the file, two pointers in memory. Applies to an array of anything,
@@ -165,12 +179,15 @@ function Format-Layout($layout) {
 # The offsets are NOT repeated here - they are read from schema\poe2.offsets.json, so
 # this fails if either side drifts. Where our name differs from the column name it is
 # because we named it before we knew; the column name is the truth.
+#
+# 'Column+8' means the field is not the start of that column but the row reference
+# inside it - see the note on foreignrow above.
 $KnownRows = @(
     @{ Struct = 'WorldAreaDat';          Table = 'WorldAreas'
        Fields = [ordered]@{ IdPtr = 'Id'; NamePtr = 'Name'; Act = 'Act'
                             IsTown = 'IsTown'; HasWaypoint = 'HasWaypoint' } }
     @{ Struct = 'BuffDefinition';        Table = 'BuffDefinitions'
-       Fields = [ordered]@{ Name = 'Id'; BuffVisualsKey = 'BuffVisual'; BuffType = 'BuffCategory' } }
+       Fields = [ordered]@{ Name = 'Id'; BuffVisualsKey = 'BuffVisual+8'; BuffType = 'BuffCategory' } }
     @{ Struct = 'MinimapIconRow';        Table = 'MinimapIcons'
        Fields = [ordered]@{ NamePtr = 'Id' } }
     @{ Struct = 'ItemVisualIdentityRow'; Table = 'ItemVisualIdentity'
@@ -192,6 +209,12 @@ function Invoke-SelfTest($schema) {
 
         foreach ($field in $row.Fields.Keys) {
             $expected = $row.Fields[$field]
+            $inset = 0
+            if ($expected -match '^(.+)\+(\d+)$') {
+                $expected = $Matches[1]
+                $inset = [int]$Matches[2]
+            }
+
             $declared = $struct.fields.$field
             if (-not $declared) {
                 Write-Host "FAIL $($row.Struct).$field - not declared" -ForegroundColor Red
@@ -200,11 +223,13 @@ function Invoke-SelfTest($schema) {
             }
 
             $offset = [Convert]::ToInt32($declared.offset.Replace('0x', ''), 16)
-            $column = $layout | Where-Object { $_.Offset -eq $offset } | Select-Object -First 1
+            $column = $layout | Where-Object { $_.Offset -eq ($offset - $inset) } | Select-Object -First 1
             $label = '{0}.{1} @ 0x{2:X2}' -f $row.Struct, $field, $offset
+            $where = if ($inset) { " (+$inset into it)" } else { '' }
 
             if (-not $column) {
-                Write-Host "FAIL $label - no column starts here in $($row.Table)" -ForegroundColor Red
+                $at = if ($inset) { "0x{0:X2}" -f ($offset - $inset) } else { 'here' }
+                Write-Host "FAIL $label - no column starts at $at in $($row.Table)" -ForegroundColor Red
                 $failed++
             }
             elseif ($column.Name -ne $expected) {
@@ -212,7 +237,7 @@ function Invoke-SelfTest($schema) {
                 $failed++
             }
             else {
-                Write-Host "ok   $label -> $($row.Table).$($column.Name) ($($column.Type))" -ForegroundColor DarkGray
+                Write-Host "ok   $label -> $($row.Table).$($column.Name) ($($column.Type))$where" -ForegroundColor DarkGray
             }
         }
     }

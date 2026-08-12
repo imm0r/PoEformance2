@@ -216,15 +216,22 @@
     // with no alignment padding - which is why so many of these offsets are odd numbers.
     // poe-tool-dev/dat-schema publishes that column order for 1275 PoE2 tables, so for a
     // dat row the offset of any column is arithmetic. Column widths in memory:
-    //     bool 1 | i16/u16 2 | i32/u32/f32 4 | enum-row 4 | string 8 (a UTF-16 pointer)
-    //     reference to another table's row 16 | array of anything 16
-    // Those widths are not a guess: out of the sixteen plausible combinations, exactly one
-    // reproduces every dat-row offset in this file, and the two that pin it down are
-    // BuffDefinition 0x55 and 0x67, both of which sit behind an array, an enum and two row
-    // references. scripts\dat-offsets.ps1 does the arithmetic and -SelfTest re-runs that
-    // check. STILL UNKNOWN: the width of a SELF-reference (a column pointing at its own
-    // table) - 8 and 16 both fit, because nothing we read sits behind one. And which half
-    // of a 16-byte row reference holds the pointer is unsettled; see BuffVisualsKey.
+    //     bool/i8/u8 1 | i16/u16 2 | i32/u32/f32 4 | enum-row 4 | string 8 (a UTF-16
+    //     pointer) | reference to ANOTHER table's row 16 | reference to a row of the SAME
+    //     table 8 | array of anything 16
+    // A 16-byte foreign reference is a TABLE reference followed by a ROW reference, so a
+    // pointer to the referenced row sits at +8, not at the column start. See BuffVisualsKey.
+    // Where these come from: derived here by elimination - out of sixteen plausible
+    // combinations exactly one reproduces every dat-row offset in this file, and the two
+    // that pin it down are BuffDefinition 0x55 and 0x67, both sitting behind an array, an
+    // enum and two row references - and then found to agree, type for type, with the
+    // .datc64 table the AHK tool has been extracting these files with for months
+    // (tools/poe_tools.py, TYPE_SIZES_DATC64). Two of these were guessed wrong first, and
+    // both wrong guesses survived the elimination because nothing in this file could
+    // disprove them: the self-reference width (41 PoE2 tables have such a column, and in
+    // WorldAreas it is column 13 of 82) and which half of a foreign reference holds the
+    // pointer. Reading the reference first would have cost a minute.
+    // scripts\dat-offsets.ps1 does the arithmetic; -SelfTest re-runs the check.
     // NONE OF THIS APPLIES TO COMPONENTS. Life, Actor, Render, Positioned, Buffs,
     // StatusEffect, Entity and the UI structs have no .dat table behind them. ChestData
     // is the trap: it POINTS AT a Chests row but is not one, and checking it against that
@@ -703,7 +710,7 @@
       "comment": "The static description a StatusEffect points at, and A ROW OF BuffDefinitions.dat - so its offsets are computable rather than searchable, see the note above WorldAreaDat. BuffType 0x04 marks a FLASK buff, which is what makes 'is this flask still active' answerable without name matching.",
       "fields": {
         "Name": { "offset": "0x00", "type": "utf16Ptr", "comment": "-> raw UTF-16 string, NOT a StdWString, e.g. \"flask_effect_life\". This is the table's Id column, i.e. the ENGINE identifier, which is what we want: it stays English on a localised client. The localised display name is a separate column at 0x12, and the description at 0x08, if either is ever wanted for the UI." },
-        "BuffVisualsKey": { "offset": "0x55", "type": "ptr", "comment": "UNVERIFIED - declared, never read. 0x55 is where the BuffVisual column STARTS, and that column is a 16-byte row reference, so a pointer inside it plausibly sits at 0x5D rather than 0x55. Do not read this without checking that first." },
+        "BuffVisualsKey": { "offset": "0x5D", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "DERIVED, NOT OBSERVED - declared, never read, and never seen in a live game. It was 0x55, which is where the BuffVisual COLUMN starts; that column is a 16-byte table reference followed by a row reference, so the pointer is the second half. Two independent references agree on the +8: the AHK tool's .datc64 layout, and GameHelper2 reading GrantedEffects.ActiveSkillDatPtr at 0x57 where that column starts at 0x4F. The invariant is there so the claim is checkable rather than argued about, but note that nothing checks it today: the drift report walks GameState -> InGameState -> AreaInstance/WorldData -> LocalPlayerStruct, and this row is not on that chain. It costs nothing and settles the question the moment anyone validates a BuffDefinition." },
         "BuffType": { "offset": "0x67", "type": "u8", "comment": "0x04 = flask buff. The column is really called BuffCategory and is an i32; reading the low byte works and is what the reference does, but the upper three bytes are not padding - they are part of the value." }
       },
       "consts": { "BuffTypeFlask": "0x04" }
