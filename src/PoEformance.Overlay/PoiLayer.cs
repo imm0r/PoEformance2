@@ -59,10 +59,19 @@ public sealed class PoiLayer
     private readonly Dictionary<ulong, int> _slots = [];
 
     /// <summary>Which kinds are marked. Everything that is a destination rather than a thing.</summary>
+    /// <remarks>
+    /// EVERY kind but None, and it is worth saying why rather than leaving the list to be
+    /// read as a choice. Chest was the one missing, on the reasoning that a chest is a thing
+    /// you find and not a place you walk to - which is wrong for the only chests that get
+    /// this far. Classify already threw out the thousands of pots and passage chests; what
+    /// survives is strongboxes and league reward chests, and a strongbox guarded by ten packs
+    /// is exactly the kind of thing somebody wants a line drawn to. It cost the Vaal chest
+    /// twice over: the classifier let it through and this dropped it again.
+    /// </remarks>
     public HashSet<PoiKind> DrawnKinds { get; } =
     [
         PoiKind.AreaTransition, PoiKind.Waypoint, PoiKind.Checkpoint,
-        PoiKind.Mechanic, PoiKind.Shrine, PoiKind.Npc,
+        PoiKind.Mechanic, PoiKind.Shrine, PoiKind.Npc, PoiKind.Chest,
         PoiKind.Quest, PoiKind.Marked, PoiKind.BossArena,
     ];
 
