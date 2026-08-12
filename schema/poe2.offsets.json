@@ -232,6 +232,18 @@
     // WorldAreas it is column 13 of 82) and which half of a foreign reference holds the
     // pointer. Reading the reference first would have cost a minute.
     // scripts\dat-offsets.ps1 does the arithmetic; -SelfTest re-runs the check.
+    // CONFIRMED FROM THE OTHER SIDE, 2026-08, and this is the check the width table had been
+    // missing: -SelfTest only ever asked whether the computed offsets agree with offsets this
+    // file already knew, which cannot catch a width that is wrong everywhere at once. The
+    // STRIDE can. Rows of one table sit end to end in memory, so the gap between any two of
+    // them is a multiple of the computed row size - and a wrong width table would put them on
+    // the wrong grid. Twenty-three MinimapIcons rows harvested from the owner's recording
+    // (Id "NPC" through "AbyssChestInactive", spanning 934 row indices and 0x8AA4 bytes) land
+    // on a 0x26 grid without a single exception, and 0x26 is exactly what the widths compute
+    // for that table's 9 columns. The same recording puts its WorldAreas rows ("MapRustbowl",
+    // "G_Endgame_Town", the ExpeditionLogBook set) on a 0x300 grid, and 0x300 is what the
+    // widths compute for that table's 82 columns. Two tables, two strides, no adjustment.
+    // A row's INDEX is therefore computable too: (row - anyKnownRow) / rowSize is exact.
     // NONE OF THIS APPLIES TO COMPONENTS. Life, Actor, Render, Positioned, Buffs,
     // StatusEffect, Entity and the UI structs have no .dat table behind them. ChestData
     // is the trap: it POINTS AT a Chests row but is not one, and checking it against that
@@ -305,7 +317,18 @@
     "MinimapIcon": {
       "comment": "The component an entity carries when the GAME ITSELF marks it on the map - which makes it the authoritative answer to 'is this a point of interest', including quest targets. Source: GameHelper2 RemoteObjects/Components/MinimapIcon.cs.",
       "fields": {
-        "IconRowPtr": { "offset": "0x20", "type": "ptr", "comment": "Row in MinimapIcons.dat. Its first field is the icon's name." }
+        "IconRowPtr": { "offset": "0x20", "type": "ptr", "comment": "Row in MinimapIcons.dat. Its first field is the icon's name. CONFIRMED LIVE (2026-08, owner, in the dissector): the row reads Id \"NPC\" on an NPC, at the same address the recording independently resolved." },
+        "TablePtr": {
+          "offset": "0x28", "type": "ptr",
+          "comment": "The TABLE the row above belongs to - a dat-file object whose +0x08 is a pointer to its path, read live as \"Data/Balance/MinimapIcons.dat\". FOUND 2026-08 by following the pointer next to the row, and worth having because it answers the one question a row cannot answer about itself: the dissector can say \"dat row, Id X\" from the layout alone but not WHICH TABLE, and the table name is what turns a row into a computed column layout (scripts\\dat-offsets.ps1 -Table MinimapIcons). Neither reference decodes it - GameHelper2 has no offsets file for this component at all and reads only the 0x20. If the same pointer-pair shape turns up beside other row pointers (ItemBaseComponent.UniqueIviRow, ChestData.StrongboxDatPtr), it is the same thing."
+        }
+      }
+    },
+
+    "DatTable": {
+      "comment": "One of the game's static content tables as it sits in memory - what MinimapIcon.TablePtr points at. Only the path is decoded, and the path is the point: it names the table, which is the missing half of every dat row this tool finds. The fields around it (0x1D and 0x1F as ints, another pointer at 0x28 into the same table blob) are unread and unexplained.",
+      "fields": {
+        "PathPtr": { "offset": "0x08", "type": "ptr", "comment": "-> \"Data/Balance/MinimapIcons.dat\" as text." }
       }
     },
 
@@ -456,16 +479,16 @@
         "IsTargetable": {
           "offset": "0x69", "type": "u8",
           "invariant": { "kind": "range", "min": 0, "max": 1 },
-          "comment": "The ONLY byte that flips closed(1)/opened(0) across 20+2 chests; also 1 for living monsters, 0 for corpses. Drives highlighting, corpse detection, the kill counter - and now whether a place is drawn at all, since a thing the game will not let you touch is usually a thing that is not there."
+          "comment": "The ONLY byte that flips closed(1)/opened(0) across 20+2 chests; also 1 for living monsters, 0 for corpses. Drives highlighting, corpse detection, the kill counter - and now whether a place is drawn at all, since a thing the game will not let you touch is usually a thing that is not there. THAT LAST USE IS CONFIRMED IN GAME (2026-08, owner, in the dissector): the quest NPC that was being drawn in an empty map reads 0 here, and the map stopped showing it. Worth stating because the entity gives no other sign - it is awake, its validity flag is clear, it has a world position and the game's own NPC minimap icon."
         },
         "IsTargetedByPlayer": { "offset": "0x6B", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 }, "comment": "Hover-diff confirmed: only the attacked monster's byte flipped 0->1." },
         "MeetsQuestState": {
           "offset": "0x6E", "type": "u8",
-          "comment": "PLACED BY ARITHMETIC, NOT SEEN: GameHelper2's TargetableOffsets 0x56 plus the 0x18 this struct sits below it. The reference's own note is '4 -> true', so it is a state number and NOT a bool - do not read it as one until somebody has watched it. Worth having written down because the name is the exact problem it answers: an NPC that belongs to a quest nobody has taken is in the entity list all the same, fully formed, with a position and a minimap icon, and the overlay drew a person who was not there ('Lurking Creature', AbyssJusticeOracleIdentifier, 2026-08). Check it with the dissector on such an NPC against one that is really standing there."
+          "comment": "PLACED BY ARITHMETIC, NOT SEEN: GameHelper2's TargetableOffsets 0x56 plus the 0x18 this struct sits below it. The reference's own note is '4 -> true', so it is a state number and NOT a bool - do not read it as one until somebody has watched it. Worth having written down because the name is the exact problem it answers: an NPC that belongs to a quest nobody has taken is in the entity list all the same, fully formed, with a position and a minimap icon, and the overlay drew a person who was not there ('Lurking Creature', AbyssJusticeOracleIdentifier, 2026-08). OBSERVED ONCE, 1, on that NPC with the quest inactive - which is consistent with the reference's '4 means true' and proves nothing on its own. What would settle it is the same NPC with the quest ACTIVE. Nothing reads this field; IsTargetable already answered the case that motivated it."
         },
         "HiddenFromPlayer": {
           "offset": "0x71", "type": "u8",
-          "comment": "GameHelper2's 0x59 plus the same 0x18. CORRECTED: this was entered at the reference's raw 0x59 while its two neighbours had already been verified 0x18 further on, so it was reading a byte belonging to nothing - unused, which is the only reason it never showed. Reference note: '2 -> False'. Unverified here either way."
+          "comment": "GameHelper2's 0x59 plus the same 0x18. CORRECTED: this was entered at the reference's raw 0x59 while its two neighbours had already been verified 0x18 further on, so it was reading a byte belonging to nothing - unused, which is the only reason it never showed. Reference note: '2 -> False'. OBSERVED ONCE, 0, on the absent quest NPC - so whatever hides that one, it is not this. At least it now reads a plausible bool, which 0x59 did not."
         }
       }
     },
