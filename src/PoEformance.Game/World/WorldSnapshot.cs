@@ -128,8 +128,22 @@ public sealed record WorldEntity(
     ulong Render = 0,
     bool? Present = null)
 {
-    /// <summary>Whether this is a chest somebody has already been through.</summary>
-    public bool IsSpent => Opened == true;
+    /// <summary>Whether this is a place somebody has already been through.</summary>
+    /// <remarks>
+    /// Two ways of being told the same thing. A chest says it itself, in the byte Opened
+    /// carries. A league mechanic says it in the icon the GAME chose: an abyss trail's
+    /// markers read AbyssPitActive until the chest at the end has been taken and
+    /// AbyssPitInactive afterwards, and the same Active/Inactive pairing runs through
+    /// AbyssCrack, AbyssChest and the G4 encounters.
+    ///
+    /// Matched on "Inactive" exactly, and deliberately NOT on the idea of "not active":
+    /// the checkpoint icon is CheckpointNotActive and means the opposite - one you have not
+    /// used yet is precisely the one worth walking to. Two spellings are all that separates
+    /// those, which is thin enough that this may only ever thin out a LIST. What is drawn on
+    /// the map does not depend on it.
+    /// </remarks>
+    public bool IsSpent => Opened == true
+        || MapIcon.EndsWith("Inactive", StringComparison.Ordinal);
 
     /// <summary>Whether this is a place worth marking on the map.</summary>
     /// <remarks>

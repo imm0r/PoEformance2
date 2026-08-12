@@ -59,10 +59,19 @@ public sealed class PoiLayer
     private readonly Dictionary<ulong, int> _slots = [];
 
     /// <summary>Which kinds are marked. Everything that is a destination rather than a thing.</summary>
+    /// <remarks>
+    /// EVERY kind but None, and it is worth saying why rather than leaving the list to be
+    /// read as a choice. Chest was the one missing, on the reasoning that a chest is a thing
+    /// you find and not a place you walk to - which is wrong for the only chests that get
+    /// this far. Classify already threw out the thousands of pots and passage chests; what
+    /// survives is strongboxes and league reward chests, and a strongbox guarded by ten packs
+    /// is exactly the kind of thing somebody wants a line drawn to. It cost the Vaal chest
+    /// twice over: the classifier let it through and this dropped it again.
+    /// </remarks>
     public HashSet<PoiKind> DrawnKinds { get; } =
     [
         PoiKind.AreaTransition, PoiKind.Waypoint, PoiKind.Checkpoint,
-        PoiKind.Mechanic, PoiKind.Shrine, PoiKind.Npc,
+        PoiKind.Mechanic, PoiKind.Shrine, PoiKind.Npc, PoiKind.Chest,
         PoiKind.Quest, PoiKind.Marked, PoiKind.BossArena,
     ];
 
@@ -451,7 +460,16 @@ public sealed class PoiLayer
 
         ImGui.Separator();
 
-        List<Place> places = [.. PlacesIn(snapshot).OrderBy(p => Distance(p, player))];
+        // Spent places are dropped from the LIST and stay on the map. An abyss that has
+        // been run leaves its whole trail marked, and every one of those markers is a place
+        // nobody is going to walk to again - as is a looted strongbox. Still routed to means
+        // still listed, or the line on the map could not be turned off again.
+        List<Place> places =
+        [
+            .. PlacesIn(snapshot)
+                .Where(place => !place.Spent || _planner.IsTarget(place.Id))
+                .OrderBy(place => Distance(place, player)),
+        ];
 
         if (places.Count == 0)
         {
@@ -459,7 +477,7 @@ public sealed class PoiLayer
             return;
         }
 
-        foreach (Place place in places)
+        foreach ((Place place, int repeats) in Collapse(places))
         {
             bool routed = _planner.IsTarget(place.Id);
             RouteView? route = routed ? _planner.For(place.Id) : null;
@@ -472,6 +490,7 @@ public sealed class PoiLayer
             // matters now that a route right across a map takes a second or two: the direct
             // distance sitting there unchanged reads as nothing having happened.
             string spent = place.Spent ? "  (opened)" : string.Empty;
+            string more = repeats > 0 ? $"  x{repeats + 1}" : string.Empty;
             string away = route is { Cells.Count: >= 2 }
                 ? $"{route.LengthCells:F0} walk"
                 : route is not null && route.Status.Length > 0
@@ -488,7 +507,7 @@ public sealed class PoiLayer
 
             // ### rather than ##: the label is built from game data and everything after a ##
             // would be read as the identity, so two places could collapse into one row.
-            bool clicked = ImGui.Selectable($"{place.Name}{spent}  -  {away}###{place.Id:X}", routed);
+            bool clicked = ImGui.Selectable($"{place.Name}{spent}{more}  -  {away}###{place.Id:X}", routed);
 
             ImGui.PopStyleColor();
 
@@ -497,6 +516,46 @@ public sealed class PoiLayer
                 _planner.Toggle(place.Id, place.WorldX, place.WorldY);
             }
         }
+    }
+
+    /// <summary>
+    /// One row per KIND of place, nearest first, with how many more of it there are.
+    /// </summary>
+    /// <remarks>
+    /// A list is for choosing, and forty-eight rows reading "Abyss Crack Inactive" are not a
+    /// choice - an Abyss map filled the panel with them and buried the one checkpoint in it,
+    /// which is the only row anybody was going to click. The markers on the MAP stay: where
+    /// the abyss runs is worth seeing, and that is what a map is for.
+    ///
+    /// Nearest survives because it is the only one of a repeated kind anybody walks to. A
+    /// place already being routed to is never collapsed away - it has a line on the map in
+    /// its own colour, and the row is how that line gets turned off again.
+    /// </remarks>
+    /// <param name="places">Places, already sorted by distance.</param>
+    private List<(Place Place, int Repeats)> Collapse(List<Place> places)
+    {
+        var shown = new List<(Place Place, int Repeats)>();
+        var firstOfKind = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        foreach (Place place in places)
+        {
+            if (_planner.IsTarget(place.Id))
+            {
+                shown.Add((place, 0));
+                continue;
+            }
+
+            if (firstOfKind.TryGetValue(place.Name, out int at))
+            {
+                shown[at] = (shown[at].Place, shown[at].Repeats + 1);
+                continue;
+            }
+
+            firstOfKind[place.Name] = shown.Count;
+            shown.Add((place, 0));
+        }
+
+        return shown;
     }
 
     private static float Distance(Place place, WorldEntity player)

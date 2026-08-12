@@ -216,7 +216,19 @@ public static class PointsOfInterest
         if (path.StartsWith("Metadata/Chests/", StringComparison.Ordinal))
         {
             // Chests are thousands per map; only the ones with their own name are landmarks.
+            //
+            // "league" and "encounter" are here because a league mechanic's chest is the
+            // reward for the mechanic, and the game does not always mark it: the Vaal chest
+            // of an Incursion (Metadata/Chests/LeagueIncursion/EncounterChest) carries no
+            // MinimapIcon component at all, so nothing else in this file could have caught
+            // it, and it was missing from the places list while forty abyss cracks were in it.
+            // Both words are the game's own folder convention rather than a league's name -
+            // LeagueIncursion, LeagueAbyss, IncursionPedestalEncounter all appear in one
+            // recording - so a new league arrives already matched. The junk stays out: every
+            // pot and passage chest in the same recording lives under DryRuinPots or straight
+            // under Chests/, and carries neither word.
             return Has(path, "strongbox") || Has(path, "vault") || Has(path, "chestepic")
+                || Has(path, "league") || Has(path, "encounter")
                 ? PoiKind.Chest
                 : PoiKind.None;
         }
