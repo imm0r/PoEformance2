@@ -62,6 +62,25 @@ and the pull would conflict, it stops and tells you instead of merging surprises
 .\scripts\test.ps1                # run the test suite (no game needed)
 ```
 
+### Offsets you do not have to hunt for
+
+Some of what this reads is not an engine object but a row of one of the game's static
+content tables, loaded into memory — `WorldAreaDat`, `BuffDefinition`, `MinimapIconRow`,
+`ItemVisualIdentityRow`. Those rows keep the column order the `.dat` file declares,
+packed, so their offsets can be **calculated** from the community schema instead of
+searched for:
+
+```powershell
+.\scripts\dat-offsets.ps1 -Table BuffDefinitions              # every column with its offset
+.\scripts\dat-offsets.ps1 -Table BuffDefinitions -Offset 0x67 # "what is at 0x67?"
+.\scripts\dat-offsets.ps1 -SelfTest                           # check the schema against it
+```
+
+It needs pwsh 7 and downloads the schema once (cached in your temp directory). This says
+nothing about components — `Life`, `Actor`, `Render` and friends have no `.dat` table
+behind them. The long comment above `WorldAreaDat` in `schema\poe2.offsets.json` explains
+where the column widths come from and what is still unknown.
+
 ## `-Watch`: offsets change with zero builds
 
 This is the mode the whole architecture was built for:

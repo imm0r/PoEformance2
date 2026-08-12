@@ -208,6 +208,27 @@
       }
     },
 
+    // ── dat ROWS are computable, not searchable ──
+    // Four structs here are not engine objects at all - they are rows of the game's static
+    // content tables, loaded into memory: WorldAreaDat (WorldAreas), BuffDefinition
+    // (BuffDefinitions), MinimapIconRow (MinimapIcons) and ItemVisualIdentityRow
+    // (ItemVisualIdentity). A row keeps the column ORDER the .dat file declares, PACKED,
+    // with no alignment padding - which is why so many of these offsets are odd numbers.
+    // poe-tool-dev/dat-schema publishes that column order for 1275 PoE2 tables, so for a
+    // dat row the offset of any column is arithmetic. Column widths in memory:
+    //     bool 1 | i16/u16 2 | i32/u32/f32 4 | enum-row 4 | string 8 (a UTF-16 pointer)
+    //     reference to another table's row 16 | array of anything 16
+    // Those widths are not a guess: out of the sixteen plausible combinations, exactly one
+    // reproduces every dat-row offset in this file, and the two that pin it down are
+    // BuffDefinition 0x55 and 0x67, both of which sit behind an array, an enum and two row
+    // references. scripts\dat-offsets.ps1 does the arithmetic and -SelfTest re-runs that
+    // check. STILL UNKNOWN: the width of a SELF-reference (a column pointing at its own
+    // table) - 8 and 16 both fit, because nothing we read sits behind one. And which half
+    // of a 16-byte row reference holds the pointer is unsettled; see BuffVisualsKey.
+    // NONE OF THIS APPLIES TO COMPONENTS. Life, Actor, Render, Positioned, Buffs,
+    // StatusEffect, Entity and the UI structs have no .dat table behind them. ChestData
+    // is the trap: it POINTS AT a Chests row but is not one, and checking it against that
+    // table lands on offsets that are not even column boundaries.
     "WorldAreaDat": {
       "comment": "A row of WorldAreas.dat: what KIND of area this is. There is no IsHideout field - the reference derives it from the Id containing 'hideout' but not 'map', because hideout areas are named that way and map areas are not.",
       "fields": {
@@ -284,7 +305,7 @@
     "MinimapIconRow": {
       "comment": "A row of MinimapIcons.dat. The name is the game's own category for the marker (\"Waypoint\", \"QuestObject\", \"RewardChestExpedition\").",
       "fields": {
-        "NamePtr": { "offset": "0x00", "type": "ptr" }
+        "NamePtr": { "offset": "0x00", "type": "ptr", "comment": "The table's Id column, which is the engine identifier and stays English. The localised label is a separate column at 0x1A." }
       }
     },
 
@@ -679,11 +700,11 @@
     },
 
     "BuffDefinition": {
-      "comment": "The static description a StatusEffect points at. BuffType 0x04 marks a FLASK buff, which is what makes 'is this flask still active' answerable without name matching.",
+      "comment": "The static description a StatusEffect points at, and A ROW OF BuffDefinitions.dat - so its offsets are computable rather than searchable, see the note above WorldAreaDat. BuffType 0x04 marks a FLASK buff, which is what makes 'is this flask still active' answerable without name matching.",
       "fields": {
-        "Name": { "offset": "0x00", "type": "utf16Ptr", "comment": "-> raw UTF-16 string, NOT a StdWString, e.g. \"flask_effect_life\"." },
-        "BuffVisualsKey": { "offset": "0x55", "type": "ptr" },
-        "BuffType": { "offset": "0x67", "type": "u8", "comment": "0x04 = flask buff." }
+        "Name": { "offset": "0x00", "type": "utf16Ptr", "comment": "-> raw UTF-16 string, NOT a StdWString, e.g. \"flask_effect_life\". This is the table's Id column, i.e. the ENGINE identifier, which is what we want: it stays English on a localised client. The localised display name is a separate column at 0x12, and the description at 0x08, if either is ever wanted for the UI." },
+        "BuffVisualsKey": { "offset": "0x55", "type": "ptr", "comment": "UNVERIFIED - declared, never read. 0x55 is where the BuffVisual column STARTS, and that column is a 16-byte row reference, so a pointer inside it plausibly sits at 0x5D rather than 0x55. Do not read this without checking that first." },
+        "BuffType": { "offset": "0x67", "type": "u8", "comment": "0x04 = flask buff. The column is really called BuffCategory and is an i32; reading the low byte works and is what the reference does, but the upper three bytes are not padding - they are part of the value." }
       },
       "consts": { "BuffTypeFlask": "0x04" }
     },
