@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
+using PoEformance.Core.Schema;
 using PoEformance.Features;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
@@ -34,6 +35,16 @@ public sealed class EntityBrowserWindow
 
     private readonly EntityInspector _inspector;
     private readonly Action<ulong, string, string> _dissect;
+    private readonly Action<ulong, float, float>? _route;
+    private readonly Func<ulong, bool>? _routed;
+
+    /// <summary>Components unfolded to their fields, by name, kept across selections.</summary>
+    /// <remarks>
+    /// By NAME rather than by address, on purpose: unfolding Life and then clicking through
+    /// six monsters should keep showing Life. Addresses change with every selection, and
+    /// keying on them would fold everything shut on each click.
+    /// </remarks>
+    private readonly HashSet<string> _open = new(StringComparer.Ordinal);
 
     private ulong _selected;
     private string _filter = string.Empty;
@@ -45,12 +56,23 @@ public sealed class EntityBrowserWindow
     /// when one applies. A callback rather than the window itself - "show me this" is all
     /// either side needs to know about the other.
     /// </param>
-    public EntityBrowserWindow(EntityInspector inspector, Action<ulong, string, string> dissect)
+    /// <param name="route">
+    /// Asks for a walkable way to something, given where it stands. Optional, because the
+    /// browser is useful without a map open and must not require one.
+    /// </param>
+    /// <param name="routed">Whether a route to this address is already being drawn.</param>
+    public EntityBrowserWindow(
+        EntityInspector inspector,
+        Action<ulong, string, string> dissect,
+        Action<ulong, float, float>? route = null,
+        Func<ulong, bool>? routed = null)
     {
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(dissect);
         _inspector = inspector;
         _dissect = dissect;
+        _route = route;
+        _routed = routed;
     }
 
     /// <summary>Draws the tab's content and publishes what it wants read next.</summary>
@@ -83,7 +105,8 @@ public sealed class EntityBrowserWindow
             Enabled: true,
             Address: _selected,
             Survey: [.. snapshot.Entities.Select(entity => entity.Address)],
-            SurveySequence: _surveySequence));
+            SurveySequence: _surveySequence,
+            Expand: [.. _open]));
     }
 
     /// <summary>While the tab is not in front, nothing is read for it.</summary>
@@ -224,6 +247,7 @@ public sealed class EntityBrowserWindow
                         entity.Address == _selected))
                 {
                     _selected = entity.Address;
+                    RouteTo(entity);
                 }
             }
         }
@@ -231,6 +255,29 @@ public sealed class EntityBrowserWindow
         {
             ImGui.EndChild();
         }
+    }
+
+    /// <summary>Draws the way to whatever was just picked.</summary>
+    /// <remarks>
+    /// Picking a thing and being shown how to reach it is one action, not two - the browser
+    /// is where you find the entity that matters and the map is where you have to walk to it.
+    ///
+    /// ADDS, never toggles: selecting the same row twice would otherwise take the line away,
+    /// and re-picking a row is what somebody does to confirm they picked the right one. The
+    /// planner drops its oldest when full, so clicking down a list always draws the newest.
+    ///
+    /// The destination is where the thing stood when it was picked. For a chest or a portal
+    /// that is the whole answer; for a monster on the move it goes stale, and the alternative
+    /// - a route re-planned as it walks - costs a search per step.
+    /// </remarks>
+    private void RouteTo(WorldEntity entity)
+    {
+        if (_route is null || _routed?.Invoke(entity.Address) == true)
+        {
+            return;
+        }
+
+        _route(entity.Address, entity.WorldX, entity.WorldY);
     }
 
     private void DrawComponents(EntityView view)
@@ -345,6 +392,30 @@ public sealed class EntityBrowserWindow
 
         foreach (ComponentEntry component in view.Components)
         {
+            // Open before dissect, and only where there is something to open. A component
+            // nobody has written down has nothing to unfold, and a row that offers it anyway
+            // would promise an answer this tool does not have.
+            if (component.Described)
+            {
+                bool open = _open.Contains(component.Name);
+                if (ImGui.SmallButton($"{(open ? "-" : "+")}##open{component.Name}"))
+                {
+                    if (!_open.Remove(component.Name))
+                    {
+                        _open.Add(component.Name);
+                    }
+                }
+
+                ImGui.SameLine();
+            }
+            else
+            {
+                // Holds the column, so the dissect buttons stay in one line whether or not
+                // the row above had something to unfold.
+                ImGui.Dummy(new Vector2(17f, 0f));
+                ImGui.SameLine();
+            }
+
             if (ImGui.SmallButton($"dissect##{component.Address:X}"))
             {
                 // The component's own layout when the schema has one. When it does not - the
@@ -367,7 +438,76 @@ public sealed class EntityBrowserWindow
                 component.Described
                     ? $"{component.Fields} field{(component.Fields == 1 ? string.Empty : "s")}"
                     : "nothing written down");
+
+            if (_open.Contains(component.Name))
+            {
+                DrawFields(component);
+            }
         }
+    }
+
+    /// <summary>Lists what the schema says this component holds, with what it currently says.</summary>
+    /// <remarks>
+    /// The reason to look at an entity at all. A named field with a live value is what turns
+    /// the schema from a claim into something the game can settle: hit a monster and watch
+    /// Health move, open a chest and watch IsOpened turn over. A wrong offset shows up here
+    /// as a number that will not move or a string that is not one.
+    /// </remarks>
+    private void DrawFields(ComponentEntry component)
+    {
+        IReadOnlyList<FieldReading>? values = component.Values;
+        if (values is null || values.Count == 0)
+        {
+            // Open, and the reader has not come back with it yet. Saying so beats an empty
+            // gap that reads as "this component holds nothing".
+            ImGui.TextColored(DimText, "        reading...");
+            return;
+        }
+
+        foreach (FieldReading field in values)
+        {
+            ImGui.TextColored(DimText, $"        +0x{field.Offset:X3}");
+            ImGui.SameLine();
+            ImGui.TextColored(PathText, ImGuiText.Escape(field.Name));
+            ImGui.SameLine();
+            ImGui.TextColored(KnownText, ImGuiText.Escape(field.Text));
+
+            // The WHY, where the schema has one. That text is the expensive part of this
+            // project - drift history, what proved the offset, what it must not be confused
+            // with - and a tooltip is the one place it costs nothing to carry.
+            if (field.Comment.Length > 0 && ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(
+                    $"{field.Name}  ({field.Type.ToString().ToLowerInvariant()}) at +0x{field.Offset:X}\n\n"
+                    + ImGuiText.Escape(Wrapped(field.Comment)));
+            }
+        }
+    }
+
+    /// <summary>Breaks a schema comment into lines a tooltip can hold.</summary>
+    private static string Wrapped(string text, int width = 90)
+    {
+        var built = new System.Text.StringBuilder(text.Length + 16);
+        int since = 0;
+
+        foreach (string word in text.Split(' '))
+        {
+            if (since > 0 && since + word.Length + 1 > width)
+            {
+                built.Append('\n');
+                since = 0;
+            }
+            else if (since > 0)
+            {
+                built.Append(' ');
+                since++;
+            }
+
+            built.Append(word);
+            since += word.Length;
+        }
+
+        return built.ToString();
     }
 
     private void DrawSurvey(EntityView view)
