@@ -451,7 +451,16 @@ public sealed class PoiLayer
 
         ImGui.Separator();
 
-        List<Place> places = [.. PlacesIn(snapshot).OrderBy(p => Distance(p, player))];
+        // Spent places are dropped from the LIST and stay on the map. An abyss that has
+        // been run leaves its whole trail marked, and every one of those markers is a place
+        // nobody is going to walk to again - as is a looted strongbox. Still routed to means
+        // still listed, or the line on the map could not be turned off again.
+        List<Place> places =
+        [
+            .. PlacesIn(snapshot)
+                .Where(place => !place.Spent || _planner.IsTarget(place.Id))
+                .OrderBy(place => Distance(place, player)),
+        ];
 
         if (places.Count == 0)
         {

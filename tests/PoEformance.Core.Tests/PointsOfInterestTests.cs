@@ -101,6 +101,37 @@ public class PointsOfInterestTests
         Assert.Equal("Reward Chest Expedition", PointsOfInterest.Readable("RewardChestExpedition"));
     }
 
+    [Theory]
+    // The one that was missing: a league mechanic's reward chest, carrying no MinimapIcon
+    // component at all, so the path is the only thing that could have caught it.
+    [InlineData("Metadata/Chests/LeagueIncursion/EncounterChest", PoiKind.Chest)]
+    [InlineData("Metadata/Chests/StrongBoxes/ArmourerStrongboxHigh", PoiKind.Chest)]
+    // ...and the thousands that must stay out, from the same recording.
+    [InlineData("Metadata/Chests/TraitorsPassagePot_01", PoiKind.None)]
+    [InlineData("Metadata/Chests/DryRuinPots/DryRuinsUrn_03", PoiKind.None)]
+    public void OnlyChestsWorthWalkingToCount(string path, PoiKind expected)
+        => Assert.Equal(expected, PointsOfInterest.Classify(path, ""));
+
+    [Fact]
+    public void TheGamesOwnIconSaysWhenAMechanicIsDoneWith()
+    {
+        // An abyss that has been run leaves its whole trail marked, and the game flips every
+        // marker to Inactive. Same answer as a looted chest's own byte.
+        var run = new WorldEntity(
+            1, 0x1000, "Metadata/MiscellaneousObjects/Abyss/AbyssFinalNodeBase",
+            EntityKind.Unknown, 0f, 0f, 0f, Poi: PoiKind.Mechanic, MapIcon: "AbyssPitInactive");
+
+        Assert.True(run.IsSpent);
+
+        // The counter-example that keeps this from being a rule about "not active": a
+        // checkpoint you have NOT used is the one most worth walking to.
+        var unused = new WorldEntity(
+            2, 0x2000, "Metadata/MiscellaneousObjects/Checkpoints/Checkpoint_Endgame",
+            EntityKind.Unknown, 0f, 0f, 0f, Poi: PoiKind.Checkpoint, MapIcon: "CheckpointNotActive");
+
+        Assert.False(unused.IsSpent);
+    }
+
     [Fact]
     public void APlaceTheGameSaysIsNotThereIsNotAPlace()
     {
