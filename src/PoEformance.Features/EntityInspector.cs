@@ -5,14 +5,29 @@ using PoEformance.Game.Entities;
 namespace PoEformance.Features;
 
 /// <summary>One component an entity carries.</summary>
-/// <param name="Described">
-/// True when the schema has a layout of this name. False is the interesting case: the game
+/// <param name="Fields">
+/// How many fields the schema has for this component. Zero is the interesting case: the game
 /// says the component is there and nobody has written down what is in it.
 /// </param>
-public readonly record struct ComponentEntry(string Name, ulong Address, bool Described);
+public readonly record struct ComponentEntry(string Name, ulong Address, int Fields)
+{
+    /// <summary>True when at least one field of this component is written down.</summary>
+    /// <remarks>
+    /// FIELDS, not "the schema has a struct of this name" - which is what this asked before,
+    /// and the answer flattered us. A struct declared with no fields (BaseEvents, Functions
+    /// and InteractionAction all are) counted as described, so a monster reporting "5 of 19
+    /// not described" really had 7 that nobody had written a byte of. A number whose entire
+    /// job is to point at what is unknown must not round it down.
+    /// </remarks>
+    public bool Described => Fields > 0;
+}
 
-/// <summary>How often a component turns up across a whole area, and whether it is described.</summary>
-public readonly record struct ComponentTally(string Name, int Count, bool Described);
+/// <summary>How often a component turns up across a whole area, and how much of it is written down.</summary>
+public readonly record struct ComponentTally(string Name, int Count, int Fields)
+{
+    /// <inheritdoc cref="ComponentEntry.Described"/>
+    public bool Described => Fields > 0;
+}
 
 /// <summary>One timed effect sitting on the inspected entity.</summary>
 /// <remarks>
@@ -201,7 +216,7 @@ public sealed class EntityInspector
         List<ComponentEntry> components =
         [
             .. entity.Components
-                .Select(pair => new ComponentEntry(pair.Key, pair.Value, _schema.Structs.ContainsKey(pair.Key)))
+                .Select(pair => new ComponentEntry(pair.Key, pair.Value, FieldsOf(pair.Key)))
                 .OrderBy(component => component.Described)      // the unknown ones first: they are the point
                 .ThenBy(component => component.Name, StringComparer.Ordinal),
         ];
@@ -387,7 +402,7 @@ public sealed class EntityInspector
         List<ComponentTally> tally =
         [
             .. counts
-                .Select(pair => new ComponentTally(pair.Key, pair.Value, _schema.Structs.ContainsKey(pair.Key)))
+                .Select(pair => new ComponentTally(pair.Key, pair.Value, FieldsOf(pair.Key)))
 
                 // Undescribed first, and the RAREST of those first within that - a component
                 // two entities in an area carry is a far better lead than one everything has.
@@ -398,4 +413,8 @@ public sealed class EntityInspector
 
         return (tally, read);
     }
+
+    /// <summary>How many fields the schema writes down for a component, 0 when it says nothing.</summary>
+    private int FieldsOf(string component)
+        => _schema.Structs.TryGetValue(component, out StructDef? definition) ? definition.Fields.Count : 0;
 }

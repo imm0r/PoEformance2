@@ -618,6 +618,20 @@
       }
     },
 
+    "TriggerableBlockage": {
+      "comment": "The barrier a trial or an encounter puts across a doorway. COPIED FROM GameHelper2 (TriggerableBlockageOffsets), not yet seen in this game - the entity browser listed it as a component nobody here had written a byte of, and the reference already had it. Verify by standing at a closed barrier and watching the row flip when it opens.",
+      "fields": {
+        "IsBlocked": { "offset": "0x30", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 }, "comment": "1 while the way is shut." }
+      }
+    },
+
+    "Shrine": {
+      "comment": "COPIED FROM GameHelper2 (ShrineOffsets), not yet verified here. Two more fields sit commented out in that file and are worth the look if this one proves right: EntityIdWhoLastPickedTheShrine at 0x20, and a pointer to the Shrines dat row at 0x30 - the latter would name the shrine, since that row starts with its Id string.",
+      "fields": {
+        "IsUsed": { "offset": "0x24", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 }, "comment": "1 once somebody has taken it." }
+      }
+    },
+
     "Component": {
       "comment": "The two fields EVERY component starts with, whatever it is. Worth having as a layout of its own because it is what orients you in one nobody has decoded: the first row says WHICH TYPE this is and the second says whose it is, so a window of unknown bytes already has two rows that mean something. Confirmed live on a DemonicApparitionPortal's Transitionable, where OwnerEntity held exactly the entity address the browser was showing. Named ComponentHeader in the AHK tool.",
       "fields": {

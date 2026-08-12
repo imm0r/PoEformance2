@@ -122,16 +122,41 @@ public class EntityInspectorTests
     [Fact]
     public void ComponentsTheSchemaDoesNotDescribeAreMarkedAsSUCH()
     {
-        // The claim the whole feature rests on, and it has to be right both ways round.
+        // The claim the whole feature rests on, and it has to be right both ways round. The
+        // undescribed one is a made-up name on purpose: this used to name a real component the
+        // schema happened not to cover, and then somebody covered it and the test went red for
+        // the one reason that is not a bug.
         OffsetSchema schema = Schema();
         FakeMemoryReader reader = Entity(
             schema, "Metadata/Monsters/Skeleton", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
-            "Render", "TriggerableBlockage");
+            "Render", "NoSuchComponentWillEverBeAdded");
 
         EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
 
         Assert.True(view.Components.Single(c => c.Name == "Render").Described);
-        Assert.False(view.Components.Single(c => c.Name == "TriggerableBlockage").Described);
+        Assert.False(view.Components.Single(c => c.Name == "NoSuchComponentWillEverBeAdded").Described);
+        Assert.Equal(1, view.Undescribed);
+    }
+
+    [Fact]
+    public void AStructWithNoFieldsInItDoesNotCountAsDescribed()
+    {
+        // The reason this counts fields instead of asking whether a struct of that name exists.
+        // Several components are declared here as a bare name with nothing in them, and under
+        // the old test they counted as understood - so the one number whose job is to point at
+        // what is unknown pointed too low.
+        OffsetSchema schema = Schema();
+        string empty = schema.Structs.First(entry => entry.Value.Fields.Count == 0).Key;
+
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Skeleton", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", empty);
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Equal(0, view.Components.Single(c => c.Name == empty).Fields);
+        Assert.False(view.Components.Single(c => c.Name == empty).Described);
+        Assert.True(view.Components.Single(c => c.Name == "Render").Fields > 0);
         Assert.Equal(1, view.Undescribed);
     }
 

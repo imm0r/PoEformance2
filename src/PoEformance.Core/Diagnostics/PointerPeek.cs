@@ -21,6 +21,9 @@ public enum TargetKind
     /// <summary>A begin/end pair bracketing an array - the shape of a std::vector.</summary>
     Vector,
 
+    /// <summary>A row of one of the game's static content tables, identified by its Id string.</summary>
+    DatRow,
+
     /// <summary>Readable, and none of the above. Another structure, waiting to be looked at.</summary>
     Structure,
 }
@@ -105,6 +108,15 @@ public static class PointerPeek
             return new PeekResult(TargetKind.Text, $"\"{Trim(plain)}\"", address);
         }
 
+        // BEFORE the vector test, which it would otherwise be mistaken for: a dat row often
+        // starts with two string columns whose characters live in the same blob, and Id then
+        // Description is a readable begin/end pair with a small, neatly divisible span. That
+        // is every requirement TryVector has.
+        if (got >= 8 && TryDatRow(reader, head, out string id))
+        {
+            return new PeekResult(TargetKind.DatRow, $"dat row, Id \"{Trim(id)}\"", address);
+        }
+
         if (got >= 16 && TryVector(head, out long span, out IReadOnlyList<int> sizes))
         {
             string counts = string.Join(", ", sizes.Select(size => $"{span / size} x 0x{size:X}"));
@@ -131,6 +143,44 @@ public static class PointerPeek
         }
 
         return 0;
+    }
+
+    /// <summary>True when a structure starts the way a row of a .dat table starts.</summary>
+    /// <remarks>
+    /// Half of this game's PoE2 tables declare Id as their first column, and a string column
+    /// is a pointer to wide characters once the row is in memory - so "the first eight bytes
+    /// point at readable wide text" is what a dat row looks like from outside.
+    ///
+    /// What makes it worth saying rather than a coin flip is the alternative. An engine object
+    /// starts with a vtable, which points into the module and is refused here, so the two
+    /// commonest things behind a pointer are told apart by their first field. It is still a
+    /// FINGERPRINT and not a proof: any structure whose first member happens to be a string
+    /// pointer matches, and which table this is a row OF cannot be answered from the layout
+    /// alone. The Id usually answers it for a human - "flask_effect_life" needs no lookup.
+    /// </remarks>
+    private static bool TryDatRow(IMemoryReader reader, ReadOnlySpan<byte> head, out string id)
+    {
+        id = string.Empty;
+
+        ulong first = BinaryPrimitives.ReadUInt64LittleEndian(head);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(first))
+        {
+            return false;
+        }
+
+        if (reader.ModuleSize > 0 && first >= reader.ModuleBase && first < reader.ModuleBase + reader.ModuleSize)
+        {
+            return false;   // a vtable: an engine object, not a row
+        }
+
+        string text = reader.ReadUnicodeString(first, 64);
+        if (!Readable(text))
+        {
+            return false;
+        }
+
+        id = text;
+        return true;
     }
 
     /// <summary>True when a begin/end pair looks like a vector rather than two unrelated pointers.</summary>

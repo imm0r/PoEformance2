@@ -358,6 +358,15 @@ public sealed class EntityBrowserWindow
             ImGui.TextColored(component.Described ? KnownText : UnknownText, component.Name);
             ImGui.SameLine();
             ImGui.TextColored(DimText, $"0x{component.Address:X}");
+
+            // The field count, because described is not binary: Monster has one field, and a
+            // component in the game has dozens. "yes" hides the difference between the two.
+            ImGui.SameLine();
+            ImGui.TextColored(
+                DimText,
+                component.Described
+                    ? $"{component.Fields} field{(component.Fields == 1 ? string.Empty : "s")}"
+                    : "nothing written down");
         }
     }
 
@@ -397,7 +406,7 @@ public sealed class EntityBrowserWindow
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableSetupColumn("component", ImGuiTableColumnFlags.WidthFixed, 280f);
         ImGui.TableSetupColumn("carried by", ImGuiTableColumnFlags.WidthFixed, 90f);
-        ImGui.TableSetupColumn("described", ImGuiTableColumnFlags.WidthStretch);
+        ImGui.TableSetupColumn("fields", ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableHeadersRow();
 
         foreach (ComponentTally entry in view.Survey)
@@ -416,7 +425,9 @@ public sealed class EntityBrowserWindow
             ImGui.Text(entry.Count.ToString(CultureInfo.InvariantCulture));
 
             ImGui.TableNextColumn();
-            ImGui.TextColored(DimText, entry.Described ? "yes" : "-");
+            ImGui.TextColored(
+                DimText,
+                entry.Described ? entry.Fields.ToString(CultureInfo.InvariantCulture) : "-");
         }
     }
 
