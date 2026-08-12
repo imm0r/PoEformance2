@@ -695,6 +695,7 @@
         "TotalTime": { "offset": "0x18", "type": "f32" },
         "TimeLeft": { "offset": "0x1C", "type": "f32", "comment": "Seconds remaining. The signal for 'this flask is still doing its job'." },
         "SourceEntityId": { "offset": "0x28", "type": "u32" },
+        "RawStage": { "offset": "0x2C", "type": "u32", "comment": "The buff's internal stage counter, for effects that ramp up while they run. RAW is the load-bearing word: this is NOT the stage the game shows, and its scale is per-skill. GameHelper2 named it in commit 9a459ac and converts Whirling Slash (buff \"spear_sandstorm\") with (RawStage - 15) / 3 - it starts at 15 and steps by 3. So a consumer needs a calibration per skill, not one shared formula, and the only skill anyone has verified is that one. Second trap from the same commit: that buff does NOT sit on the player. The skill spawns its own effect entity (path contains sandstorm_swipe/sandstorm_swipe_storm) and the buff hangs off THAT entity, so reading only the player's Buffs never sees it." },
         "Charges": { "offset": "0x40", "type": "i16", "comment": "SIGNED - the reference reads a short." },
         "FlaskSlot": { "offset": "0x42", "type": "i16", "comment": "RAW slot 0-4 for a flask buff, i.e. belt slot 1-5; anything outside that range means this buff did not come from a flask. Signed short, not a byte." },
         "Effectiveness": { "offset": "0x48", "type": "i16", "comment": "Percentage delta: the effective value is 100 + this." }
