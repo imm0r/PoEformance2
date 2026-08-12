@@ -142,7 +142,10 @@ public class EntityInspectorTests
 
         ComponentEntry open = view.Components.Single(component => component.Name == "Positioned");
         Assert.NotNull(open.Values);
-        Assert.Contains(open.Values!, field => field.Name == "Reaction" && field.Text == "1");
+
+        // Named rather than numbered, because the schema says what a 1 means here. That is
+        // the whole difference between a value somebody has to look up and one they can read.
+        Assert.Contains(open.Values!, field => field.Name == "Reaction" && field.Text == "friendly (1)");
 
         Assert.Null(view.Components.Single(component => component.Name == "Render").Values);
     }

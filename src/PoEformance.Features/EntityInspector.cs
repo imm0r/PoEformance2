@@ -446,7 +446,7 @@ public sealed class EntityInspector
         }
 
         return _schema.Structs.TryGetValue(component, out StructDef? definition) && definition.Fields.Count > 0
-            ? SchemaFieldReader.Read(_reader, definition, address)
+            ? SchemaFieldReader.Read(_reader, definition, address, _schema)
             : null;
     }
 }

@@ -152,7 +152,18 @@ public static class SchemaJson
         };
 
         Invariant? invariant = f.Invariant is null ? null : ParseInvariant(where, f.Invariant);
-        return new FieldDef(fieldName, offset, type, f.Comment, invariant);
+
+        Dictionary<long, string>? values = null;
+        if (f.Values is { Count: > 0 })
+        {
+            values = new Dictionary<long, string>(f.Values.Count);
+            foreach ((string raw, string label) in f.Values)
+            {
+                values[ParseNumber(raw, structName, fieldName)] = label;
+            }
+        }
+
+        return new FieldDef(fieldName, offset, type, f.Comment, invariant, f.Struct, f.Inline ?? false, values);
     }
 
     private static Invariant ParseInvariant(string where, InvariantDto dto) => dto.Kind?.ToLowerInvariant() switch
@@ -263,6 +274,18 @@ public sealed class FieldDto
 
     [JsonPropertyName("invariant")]
     public InvariantDto? Invariant { get; set; }
+
+    /// <summary>Another struct this field leads to, by name.</summary>
+    [JsonPropertyName("struct")]
+    public string? Struct { get; set; }
+
+    /// <summary>True when that struct sits AT this offset instead of behind a pointer.</summary>
+    [JsonPropertyName("inline")]
+    public bool? Inline { get; set; }
+
+    /// <summary>What the field's numbers mean, keyed by the number as text ("0", "0x2").</summary>
+    [JsonPropertyName("values")]
+    public Dictionary<string, string>? Values { get; set; }
 }
 
 public sealed class InvariantDto

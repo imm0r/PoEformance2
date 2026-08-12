@@ -58,6 +58,39 @@ public class SchemaTests
     }
 
     [Fact]
+    public void EveryFieldThatNamesAnotherStructFindsIt()
+    {
+        // A typo in a "struct" key does not fail, it just quietly stops unfolding - the one
+        // failure mode of this whole mechanism that nobody would notice from the screen.
+        OffsetSchema schema = SchemaJson.Load(SchemaPath);
+
+        foreach (StructDef layout in schema.Structs.Values)
+        {
+            foreach (FieldDef field in layout.Fields)
+            {
+                if (field.Target is null)
+                {
+                    continue;
+                }
+
+                Assert.True(
+                    schema.Structs.TryGetValue(field.Target, out StructDef? target),
+                    $"{layout.Name}.{field.Name} names struct '{field.Target}', which does not exist here.");
+                Assert.True(
+                    target!.Fields.Count > 0,
+                    $"{layout.Name}.{field.Name} names '{field.Target}', which has no fields to show.");
+            }
+        }
+
+        // The case that asked for the mechanism, pinned: a vital is not behind that pointer,
+        // it IS that pointer's eight bytes, and reading it as an address was the wrong answer
+        // that still looked like a number.
+        FieldDef health = schema.Structs["Life"].Field("Health")!;
+        Assert.Equal("Vital", health.Target);
+        Assert.True(health.Inline);
+    }
+
+    [Fact]
     public void InventoriesRecordsInlineStorageRatherThanAHeapVector()
     {
         OffsetSchema schema = SchemaJson.Load(SchemaPath);

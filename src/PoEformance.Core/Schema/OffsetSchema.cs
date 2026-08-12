@@ -123,13 +123,24 @@ public sealed class StructDef
 /// <summary>One field of a struct.</summary>
 public sealed class FieldDef
 {
-    public FieldDef(string name, int offset, FieldType type, string? comment, Invariant? invariant)
+    public FieldDef(
+        string name,
+        int offset,
+        FieldType type,
+        string? comment,
+        Invariant? invariant,
+        string? target = null,
+        bool inline = false,
+        IReadOnlyDictionary<long, string>? values = null)
     {
         Name = name;
         Offset = offset;
         Type = type;
         Comment = comment;
         Invariant = invariant;
+        Target = target;
+        Inline = inline;
+        Values = values;
     }
 
     public string Name { get; }
@@ -147,6 +158,39 @@ public sealed class FieldDef
 
     /// <summary>What a correct value looks like, or null when nothing is declared.</summary>
     public Invariant? Invariant { get; }
+
+    /// <summary>
+    /// Another struct in this schema that this field leads to. The <c>"struct"</c> key.
+    /// </summary>
+    /// <remarks>
+    /// What turns a wall of addresses into something readable. Life.Health is a Vital, and
+    /// saying so is the difference between "0x333C00003335" and a pool with a maximum in it.
+    /// The knowledge was already in the schema - in a COMMENT, where only a person could use
+    /// it - and this is the same sentence in a form the tool can act on.
+    /// </remarks>
+    public string? Target { get; }
+
+    /// <summary>
+    /// Whether <see cref="Target"/> sits AT this offset rather than behind a pointer.
+    /// The <c>"inline"</c> key.
+    /// </summary>
+    /// <remarks>
+    /// Both shapes are everywhere in this game and they look identical from outside: eight
+    /// bytes that are either an address or the start of a struct. Reading one as the other
+    /// produces a plausible-looking wrong answer rather than a failure, which is why it is
+    /// declared rather than guessed.
+    /// </remarks>
+    public bool Inline { get; }
+
+    /// <summary>
+    /// What this field's numbers MEAN, when they are a fixed set. The <c>"values"</c> key.
+    /// </summary>
+    /// <remarks>
+    /// A rarity of 2 tells nobody anything; "Rare" does. Partial maps are fine and expected -
+    /// an unlisted value keeps its number, which is how a value nobody has seen before stays
+    /// visible instead of being hidden behind a wrong name.
+    /// </remarks>
+    public IReadOnlyDictionary<long, string>? Values { get; }
 }
 
 /// <summary>Wire type of a field. Determines read size and display formatting.</summary>

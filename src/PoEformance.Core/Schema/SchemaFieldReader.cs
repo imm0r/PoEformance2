@@ -9,8 +9,13 @@ namespace PoEformance.Core.Schema;
 /// which is a fact about the offset rather than an error - a struct whose fields all read
 /// that way is one whose base address is wrong.
 /// </param>
+/// <param name="Children">
+/// The fields of the struct this one leads to, where the schema names one. Null when it
+/// names none, or when the pointer led nowhere.
+/// </param>
 public readonly record struct FieldReading(
-    string Name, int Offset, FieldType Type, string Text, string Comment);
+    string Name, int Offset, FieldType Type, string Text, string Comment,
+    IReadOnlyList<FieldReading>? Children = null);
 
 /// <summary>
 /// Reads every field a schema struct declares, at an address.
@@ -38,7 +43,13 @@ public static class SchemaFieldReader
     /// they are commonly hundreds of bytes apart with nothing known in between. Reading the
     /// span would mean reading all of that to use a fraction of it.
     /// </remarks>
-    public static IReadOnlyList<FieldReading> Read(IMemoryReader reader, StructDef layout, ulong baseAddress)
+    /// <param name="schema">
+    /// Supplied to follow the fields that name another struct - Life.Health into a Vital, and
+    /// so on. Left out for the nested read itself, which is what stops this at one level: a
+    /// struct that names itself, directly or round a ring, would otherwise never finish.
+    /// </param>
+    public static IReadOnlyList<FieldReading> Read(
+        IMemoryReader reader, StructDef layout, ulong baseAddress, OffsetSchema? schema = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(layout);
@@ -46,15 +57,50 @@ public static class SchemaFieldReader
         var readings = new List<FieldReading>(layout.Fields.Count);
         foreach (FieldDef field in layout.Fields)
         {
+            ulong at = baseAddress + (ulong)field.Offset;
+            IReadOnlyList<FieldReading>? children = ChildrenOf(reader, field, at, schema);
+            string text = Format(reader, field, at);
+
+            if (children is not null)
+            {
+                // An inline struct's own eight bytes are not a value at all - they are the
+                // start of the thing below - so showing them as one is worse than showing
+                // nothing. Behind a pointer the address still means something, and it is
+                // what somebody copies into the dissector.
+                text = field.Inline ? field.Target! : $"{text} -> {field.Target}";
+            }
+
             readings.Add(new FieldReading(
-                field.Name,
-                field.Offset,
-                field.Type,
-                Format(reader, field, baseAddress + (ulong)field.Offset),
-                field.Comment ?? string.Empty));
+                field.Name, field.Offset, field.Type, text, field.Comment ?? string.Empty, children));
         }
 
         return readings;
+    }
+
+    /// <summary>Reads the struct a field leads to, when the schema names one.</summary>
+    private static IReadOnlyList<FieldReading>? ChildrenOf(
+        IMemoryReader reader, FieldDef field, ulong at, OffsetSchema? schema)
+    {
+        if (schema is null
+            || field.Target is null
+            || !schema.Structs.TryGetValue(field.Target, out StructDef? target)
+            || target.Fields.Count == 0)
+        {
+            return null;
+        }
+
+        ulong childBase = at;
+        if (!field.Inline)
+        {
+            if (!reader.TryRead(at, out ulong pointer) || pointer == 0)
+            {
+                return null;
+            }
+
+            childBase = pointer;
+        }
+
+        return Read(reader, target, childBase);
     }
 
     private static string Format(IMemoryReader reader, FieldDef field, ulong at)
@@ -62,21 +108,21 @@ public static class SchemaFieldReader
         switch (field.Type)
         {
             case FieldType.U8:
-                return reader.TryRead(at, out byte u8) ? Whole(u8) : Unreadable;
+                return reader.TryRead(at, out byte u8) ? Whole(field,u8) : Unreadable;
             case FieldType.U16:
-                return reader.TryRead(at, out ushort u16) ? Whole(u16) : Unreadable;
+                return reader.TryRead(at, out ushort u16) ? Whole(field,u16) : Unreadable;
             case FieldType.U32:
-                return reader.TryRead(at, out uint u32) ? Whole(u32) : Unreadable;
+                return reader.TryRead(at, out uint u32) ? Whole(field,u32) : Unreadable;
             case FieldType.U64:
-                return reader.TryRead(at, out ulong u64) ? Whole((long)u64) : Unreadable;
+                return reader.TryRead(at, out ulong u64) ? Whole(field,(long)u64) : Unreadable;
             case FieldType.I8:
-                return reader.TryRead(at, out sbyte i8) ? Whole(i8) : Unreadable;
+                return reader.TryRead(at, out sbyte i8) ? Whole(field,i8) : Unreadable;
             case FieldType.I16:
-                return reader.TryRead(at, out short i16) ? Whole(i16) : Unreadable;
+                return reader.TryRead(at, out short i16) ? Whole(field,i16) : Unreadable;
             case FieldType.I32:
-                return reader.TryRead(at, out int i32) ? Whole(i32) : Unreadable;
+                return reader.TryRead(at, out int i32) ? Whole(field,i32) : Unreadable;
             case FieldType.I64:
-                return reader.TryRead(at, out long i64) ? Whole(i64) : Unreadable;
+                return reader.TryRead(at, out long i64) ? Whole(field,i64) : Unreadable;
             case FieldType.F32:
                 return reader.TryRead(at, out float f32) ? Real(f32) : Unreadable;
             case FieldType.F64:
@@ -122,6 +168,15 @@ public static class SchemaFieldReader
                         return "empty";
                     }
 
+                    // Only when BOTH ends are real. One null end is not a vector of two
+                    // hundred and eighty gigabytes, it is a vector that is not there - and
+                    // subtracting the two produces exactly that number, which reads like a
+                    // measurement instead of like nonsense. Seen on Actor.DeployedEntities.
+                    if (first == 0 || last == 0)
+                    {
+                        return $"0x{first:X} .. 0x{last:X}  (one end missing)";
+                    }
+
                     return last >= first
                         ? $"0x{first:X} .. 0x{last:X}  ({last - first} bytes)"
                         : $"0x{first:X} .. 0x{last:X}  (end before start)";
@@ -135,7 +190,29 @@ public static class SchemaFieldReader
         }
     }
 
-    private static string Whole(long value) => value.ToString(CultureInfo.InvariantCulture);
+    /// <summary>A whole number, as whatever the schema says it means.</summary>
+    /// <remarks>
+    /// Two ways of saying more than the digits do. A declared value map wins - "Rare" beats
+    /// 2, and an unlisted number keeps its digits rather than being hidden behind a guess.
+    ///
+    /// Failing that, a field declaring a range of 0..1 has already said it is a yes or a no;
+    /// that is what this schema's flags look like, and reading "yes" is faster than deciding
+    /// what 1 meant on this particular field. The number stays for anything wider.
+    /// </remarks>
+    private static string Whole(FieldDef field, long value)
+    {
+        if (field.Values is not null && field.Values.TryGetValue(value, out string? label))
+        {
+            return $"{label} ({value})";
+        }
+
+        if (field.Invariant is Invariant.Range { Min: 0, Max: 1 })
+        {
+            return value == 0 ? "no" : "yes";
+        }
+
+        return value.ToString(CultureInfo.InvariantCulture);
+    }
 
     private static string Real(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 
