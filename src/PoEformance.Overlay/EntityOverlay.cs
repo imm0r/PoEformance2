@@ -226,6 +226,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
     private PoiLayer? _poi;
+    private RoutePlanner? _planner;
     private AlertWatcher? _alerts;
     private readonly AlertBanner _banner = new();
     private readonly UnwalkedLayer _unwalked = new();
@@ -712,6 +713,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // opening that window, and with tabs it means switching to it. Only for a real
         // address: Show ignores zero, and a tab switch to an unchanged dissector would
         // just take the browser away from under the click that asked for it.
+        // The planner is read through the field rather than captured, because the two Attach
+        // calls have no fixed order and a captured null would silently mean "this build has
+        // no routes" - which looks exactly like a broken feature.
         var window = new EntityBrowserWindow(
             inspector,
             (address, label, layout) =>
@@ -721,7 +725,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     _dissector.Show(address, label, layout);
                     _tools.Show(DissectorTab);
                 }
-            });
+            },
+            (address, worldX, worldY) => _planner?.Toggle(address, worldX, worldY),
+            address => _planner?.IsTarget(address) ?? false);
         _tools.Add(90, "entities", "Entity browser", () => window.DrawTab(_snapshot, _snapshot.Player), window.Idle);
         if (visible)
         {
@@ -743,6 +749,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Takes the style as it stands, and the setter hands it on if it is replaced later -
         // so the order these two are done in does not matter. It otherwise would, and the
         // symptom of getting it wrong is a whole layer that ignores the editor.
+        // Kept as well as handed on: the entity browser routes to whatever is selected, and
+        // it is attached separately from this.
+        _planner = planner;
+
         _poi = new PoiLayer(planner)
         {
             Style = _style,

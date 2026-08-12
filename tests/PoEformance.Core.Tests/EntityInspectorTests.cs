@@ -120,6 +120,34 @@ public class EntityInspectorTests
     }
 
     [Fact]
+    public void AnOpenedComponentIsReadFieldByFieldAndAShutOneIsNot()
+    {
+        // Both halves matter. The values are the point of unfolding a component at all, and
+        // NOT reading the others is what keeps it affordable: this is a read per field, and
+        // an entity carrying twenty components would otherwise pay for all of them every tick
+        // to show the one somebody opened.
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Skeleton", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Positioned");
+
+        // Positioned is the second component the fixture lays out, and its Reaction byte sits
+        // further in than the fixture's own block reaches.
+        ulong positioned = ComponentsAt + 0x10_0000 + 0x1000;
+        reader.Place(positioned + (ulong)schema.Structs["Positioned"].OffsetOf("Reaction"), (byte)1);
+
+        EntityView view = Look(
+            new EntityInspector(reader, schema),
+            new EntityRequest(true, EntityAt, Expand: ["Positioned"]));
+
+        ComponentEntry open = view.Components.Single(component => component.Name == "Positioned");
+        Assert.NotNull(open.Values);
+        Assert.Contains(open.Values!, field => field.Name == "Reaction" && field.Text == "1");
+
+        Assert.Null(view.Components.Single(component => component.Name == "Render").Values);
+    }
+
+    [Fact]
     public void ComponentsTheSchemaDoesNotDescribeAreMarkedAsSUCH()
     {
         // The claim the whole feature rests on, and it has to be right both ways round. The

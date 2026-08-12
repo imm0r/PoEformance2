@@ -9,7 +9,13 @@ namespace PoEformance.Features;
 /// How many fields the schema has for this component. Zero is the interesting case: the game
 /// says the component is there and nobody has written down what is in it.
 /// </param>
-public readonly record struct ComponentEntry(string Name, ulong Address, int Fields)
+/// <param name="Values">
+/// The component's declared fields, read - but only while the window has this one open.
+/// Null means "not asked for", which is a different thing from a component with nothing in
+/// it, and the window says so rather than drawing an empty list under an open row.
+/// </param>
+public readonly record struct ComponentEntry(
+    string Name, ulong Address, int Fields, IReadOnlyList<FieldReading>? Values = null)
 {
     /// <summary>True when at least one field of this component is written down.</summary>
     /// <remarks>
@@ -69,11 +75,17 @@ public readonly record struct EntityStat(uint Id, int Value, string Name = "", s
 /// Entities to count components across, for the one-shot survey. Supplied by the window
 /// because it already has the area's entity list - so this costs no extra scan.
 /// </param>
+/// <param name="Expand">
+/// Components whose declared fields are wanted, by name. Only the open ones, because this is
+/// a read per field and an entity carrying twenty components would otherwise pay for all of
+/// them every tick to show a handful.
+/// </param>
 public sealed record EntityRequest(
     bool Enabled = false,
     ulong Address = 0,
     IReadOnlyList<ulong>? Survey = null,
-    int SurveySequence = 0)
+    int SurveySequence = 0,
+    IReadOnlyList<string>? Expand = null)
 {
     public static EntityRequest Idle { get; } = new();
 }
@@ -216,7 +228,8 @@ public sealed class EntityInspector
         List<ComponentEntry> components =
         [
             .. entity.Components
-                .Select(pair => new ComponentEntry(pair.Key, pair.Value, FieldsOf(pair.Key)))
+                .Select(pair => new ComponentEntry(
+                    pair.Key, pair.Value, FieldsOf(pair.Key), ValuesOf(pair.Key, pair.Value, request.Expand)))
                 .OrderBy(component => component.Described)      // the unknown ones first: they are the point
                 .ThenBy(component => component.Name, StringComparer.Ordinal),
         ];
@@ -417,4 +430,23 @@ public sealed class EntityInspector
     /// <summary>How many fields the schema writes down for a component, 0 when it says nothing.</summary>
     private int FieldsOf(string component)
         => _schema.Structs.TryGetValue(component, out StructDef? definition) ? definition.Fields.Count : 0;
+
+    /// <summary>Reads a component's declared fields, for the components the window has open.</summary>
+    /// <remarks>
+    /// The point of the whole thing: about twenty components have a decoder, and until now the
+    /// browser could only say SO. Standing next to a monster and watching Life.Health move as
+    /// you hit it is how an offset gets checked against the game, and it was three clicks and
+    /// a hex window away.
+    /// </remarks>
+    private IReadOnlyList<FieldReading>? ValuesOf(string component, ulong address, IReadOnlyList<string>? open)
+    {
+        if (address == 0 || open is null || !open.Contains(component, StringComparer.Ordinal))
+        {
+            return null;
+        }
+
+        return _schema.Structs.TryGetValue(component, out StructDef? definition) && definition.Fields.Count > 0
+            ? SchemaFieldReader.Read(_reader, definition, address)
+            : null;
+    }
 }
