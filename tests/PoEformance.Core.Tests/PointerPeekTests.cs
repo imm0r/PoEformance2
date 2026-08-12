@@ -86,6 +86,59 @@ public class PointerPeekTests
     }
 
     [Fact]
+    public void ARowOfADataTableIsRecognisedByTheIdItStartsWith()
+    {
+        // Half of this game's PoE2 tables declare Id as their first column, and a string column
+        // is a pointer to wide characters once the row is loaded. So a structure whose first
+        // eight bytes lead to a name is almost always a row - and the name says which one,
+        // which is the difference between "another structure" and "flask_effect_life".
+        const ulong Id = 0x4000_0000_0000;
+
+        var reader = new FakeMemoryReader();
+        reader.Place(Target, new byte[64]);
+        reader.Place(Target, Id);
+        reader.Place(Id, new byte[256]);
+        reader.PlaceUtf16(Id, "flask_effect_life");
+
+        PeekResult found = PointerPeek.Peek(reader, Target);
+
+        Assert.Equal(TargetKind.DatRow, found.Kind);
+        Assert.Contains("flask_effect_life", found.Summary, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ARowIsNotReportedAsAListJustBecauseTwoOfItsColumnsAreStrings()
+    {
+        // Why the row is looked for BEFORE the list. Id and Description sit next to each other
+        // in several tables and their characters share one blob, so the two pointers are a
+        // readable begin/end pair with a small, neatly divisible span - every requirement a
+        // vector has. Called a list, the row's own name would never be shown.
+        const ulong Strings = 0x4000_0000_0000;
+
+        var reader = new FakeMemoryReader();
+        reader.Place(Target, new byte[64]);
+        reader.Place(Target, Strings);
+        reader.Place(Target + 8, Strings + 0x40);
+        reader.Place(Strings, new byte[256]);
+        reader.PlaceUtf16(Strings, "flask_effect_life");
+
+        Assert.Equal(TargetKind.DatRow, PointerPeek.Peek(reader, Target).Kind);
+    }
+
+    [Fact]
+    public void AnEngineObjectIsNotARowBecauseItStartsWithAVtable()
+    {
+        // What makes the fingerprint worth stating at all. The two commonest things behind a
+        // pointer in this game are a component and a data row, and they are told apart by
+        // their first field: one points into the module, the other at a name.
+        var reader = new FakeMemoryReader { ModuleBase = 0x1_4000_0000, ModuleSize = 0x8000_0000 };
+        reader.Place(Target, new byte[64]);
+        reader.Place(Target, 0x1_4000_1234UL);
+
+        Assert.NotEqual(TargetKind.DatRow, PointerPeek.Peek(reader, Target).Kind);
+    }
+
+    [Fact]
     public void CodeIsNamedAsAnOffsetIntoTheGameRatherThanAnAddress()
     {
         // module+0x1234 is the same across every run of the game; the raw address is not. One
