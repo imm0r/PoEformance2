@@ -209,18 +209,35 @@
     },
 
     // ── dat ROWS are computable, not searchable ──
-    // Four structs here are not engine objects at all - they are rows of the game's static
+    // Six structs here are not engine objects at all - they are rows of the game's static
     // content tables, loaded into memory: WorldAreaDat (WorldAreas), BuffDefinition
-    // (BuffDefinitions), MinimapIconRow (MinimapIcons) and ItemVisualIdentityRow
-    // (ItemVisualIdentity). A row keeps the column ORDER the .dat file declares, PACKED,
+    // (BuffDefinitions), MinimapIconRow (MinimapIcons), ItemVisualIdentityRow
+    // (ItemVisualIdentity), QuestFlagsRow (QuestFlags) and NpcsRow (NPCs).
+    // A row keeps the column ORDER the .dat file declares, PACKED,
     // with no alignment padding - which is why so many of these offsets are odd numbers.
     // poe-tool-dev/dat-schema publishes that column order for 1275 PoE2 tables, so for a
     // dat row the offset of any column is arithmetic. Column widths in memory:
     //     bool/i8/u8 1 | i16/u16 2 | i32/u32/f32 4 | enum-row 4 | string 8 (a UTF-16
     //     pointer) | reference to ANOTHER table's row 16 | reference to a row of the SAME
     //     table 8 | array of anything 16
-    // A 16-byte foreign reference is a TABLE reference followed by a ROW reference, so a
-    // pointer to the referenced row sits at +8, not at the column start. See BuffVisualsKey.
+    // A 16-byte foreign reference is a ROW reference followed by a TABLE reference: the
+    // pointer to the referenced row sits AT the column start and the table it belongs to at
+    // +8. OBSERVED 2026-08 in session-2026-08-questflags.rec, and which half is which is not
+    // a matter of opinion there. NPCs column 4 (QuestFlags, computed start 0x18) holds one
+    // pointer that lands EXACTLY on the 12-byte row grid of the QuestFlags rows array - row
+    // 2170 of 5717, no remainder - and one that starts with a module pointer, which is a
+    // vtable and so an engine object rather than a row. Two NPCs rows agree, a row of a third
+    // table pointing at the same table agrees, and MinimapIcon has carried this order live
+    // for months (IconRowPtr 0x20, TablePtr 0x28).
+    // THIS REVERSES WHAT THIS NOTE SAID BEFORE - "a TABLE reference followed by a ROW
+    // reference, so the pointer sits at +8" - which was derived and never observed, from the
+    // AHK tool's .datc64 layout and from GameHelper2 reading GrantedEffects.ActiveSkillDatPtr
+    // at 0x57 where dat-schema computes that column starting at 0x4F. That second witness is
+    // now the odd one out and wants re-checking rather than trusting: an 8-byte drift in
+    // GrantedEffects' earlier columns explains it exactly, and a stale reference offset
+    // agreeing with a wrong reading is not corroboration (Render.Name, below, cost a day to
+    // that). The only offset in this file that rested on the old rule is
+    // BuffDefinition.BuffVisualsKey, moved 0x5D -> 0x55 with it; nothing reads it.
     // Where these come from: derived here by elimination - out of sixteen plausible
     // combinations exactly one reproduces every dat-row offset in this file, and the two
     // that pin it down are BuffDefinition 0x55 and 0x67, both sitting behind an array, an
@@ -326,9 +343,68 @@
     },
 
     "DatTable": {
-      "comment": "One of the game's static content tables as it sits in memory - what MinimapIcon.TablePtr points at. Only the path is decoded, and the path is the point: it names the table, which is the missing half of every dat row this tool finds. The fields around it (0x1D and 0x1F as ints, another pointer at 0x28 into the same table blob) are unread and unexplained.",
+      "comment": "One of the game's static content tables as it sits in memory - what MinimapIcon.TablePtr points at, and the second half of every 16-byte foreign reference. The path NAMES the table, which is the missing half of every dat row this tool finds. THE TWO INTS BESIDE IT ARE THE PATH'S OWN HEADER, and this file had them written down as a mystery for months: \"0x1D and 0x1F as ints\". 0x08 is simply a std::wstring, and ReadStdWString puts size at +0x10 and capacity at +0x18 OF THE STRING - which is 0x18 and 0x20 here. 0x1D is 29, the length of \"Data/Balance/MinimapIcons.dat\" to the character; the 0x1F beside it is the capacity, and reads 31 for both tables seen so far, a 32-character buffer less its terminator. Worth having as a field of its own rather than as trivia, because the LENGTH is one read while the text is a pointer further away: a recording that never followed the pointer still carries the number, and a length identifies a table on its own more often than it sounds - QuestFlags below is the only 12-byte-row table in the game with a 27-character path.",
       "fields": {
-        "PathPtr": { "offset": "0x08", "type": "ptr", "comment": "-> \"Data/Balance/MinimapIcons.dat\" as text." }
+        "Path": { "offset": "0x08", "type": "stdWString", "comment": "\"Data/Balance/MinimapIcons.dat\". Declared as a bare PathPtr before, which read the same characters and left the two ints next to it unexplained." },
+        "RowStorePtr": { "offset": "0x28", "type": "ptr", "struct": "DatRowStore", "invariant": { "kind": "plausiblePtr" }, "comment": "The rows themselves and the indices over them. This is the \"another pointer at 0x28 into the same table blob\" that used to be listed as unread." }
+      }
+    },
+
+    "DatRowStore": {
+      "comment": "What DatTable.RowStorePtr points at: a table's rows, plus one index by Id and one by HASH32. THREE CONTAINERS OF FOUR POINTERS EACH - begin, end, end again, end-of-allocation - so they stride 0x20 apart, NOT the 0x18 of a std::vector, and reading them as std::vectors walks off by 8 at the second one. The duplicated third pointer is what says the container is not std::vector; it held the identical value in all three, in the one table read so far. Counts come out equal and exact for all three (5717 rows, 5717 by-Id entries, 5717 by-HASH32 entries on QuestFlags), which is what says the two indices are DENSE, entry-per-row arrays in row order rather than bucket arrays: a bucket array would be capacity-sized and mostly empty. Where the buckets actually live is open - the capacity/grow-at/load-factor triples beside each index describe a table of 8192 slots at 0.8, and no pointer to 8192 of anything is in this struct. THE ROW SIZE FALLS OUT OF THIS, which is the part worth having. A by-Id entry is a fixed 0x18 whatever the table, and there is exactly one per row - so the index says how many rows there are, and the rows array divided by that says how big one is. A table therefore reports its own row size, with no dat-schema and no download: (rowsEnd - rowsBegin) / ((byIdEnd - byIdBegin) / 0x18), which is 68604 / 5717 = 12 on QuestFlags. Until now that number could only be COMPUTED from the community schema's column list and then checked against a stride by hand, which is how the width table was verified three times (MinimapIcons 0x26, WorldAreas 0x300, NPCs 0xBF). This turns that into something the game answers directly, for every table it has loaded.",
+      "fields": {
+        "Rows": { "offset": "0x00", "type": "stdVector", "comment": "The rows, back to back, at the table's own row size - so (end - begin) / rowSize is the row count, and rowSize comes from dat-schema (see the column-width note above). No vectorSane invariant on purpose: the element size is per-table and this struct does not know which table it belongs to." },
+        "ByIdIndex": { "offset": "0x20", "type": "stdVector", "invariant": { "kind": "vectorSane", "elementSize": 24, "maxCount": 1000000 }, "comment": "One 0x18 entry per row: the Id's characters at +0x00, its LENGTH IN CHARACTERS at +0x08 (an i64, so the 4 bytes at +0x0C read 0), and the row it belongs to at +0x10. The characters pointer is the same one the row's own Id column holds." },
+        "ByIdCapacity": { "offset": "0x40", "type": "i64", "comment": "8192 on QuestFlags, against 5717 entries - so a capacity in ENTRIES, and the allocation confirms it: end-of-allocation is begin + 8192 * 0x18 exactly." },
+        "ByIdGrowAt": { "offset": "0x48", "type": "i64", "comment": "6553 = 8192 * 0.8, i.e. capacity times the load factor below, precomputed." },
+        "ByIdLoadFactor": { "offset": "0x50", "type": "f32", "comment": "0.8. The four bytes above it are not part of it." },
+        "ByHashIndex": { "offset": "0x58", "type": "stdVector", "invariant": { "kind": "vectorSane", "elementSize": 16, "maxCount": 1000000 }, "comment": "One 0x10 entry per row: the row's HASH32 column at +0x00, four bytes of nothing, and the row at +0x08. The spare four bytes are UNINITIALISED rather than reserved - they read as UTF-16 text fragments (0x005F0065, 0x00410000), which is what a reused allocation looks like, and a field decoded out of them would be leftovers from a string blob." },
+        "ByHashCapacity": { "offset": "0x78", "type": "i64" },
+        "ByHashGrowAt": { "offset": "0x80", "type": "i64" },
+        "ByHashLoadFactor": { "offset": "0x88", "type": "f32" }
+      },
+      "consts": {
+        "ContainerSize": "0x20",
+        "ByIdEntrySize": "0x18",
+        "ByIdEntryRowAt": "0x10",
+        "ByHashEntrySize": "0x10"
+      }
+    },
+
+    "QuestFlagsRow": {
+      "comment": "A row of QuestFlags.dat: EVERY quest flag the client knows, by name - \"a1q1-KilledHillock\", \"Act4TownIntroComplete\", \"BreachstoneAreaEntered\", \"EnteredHideout\". 5717 of them in 0.5.x. FOUND 2026-08 by the owner in the dissector, from a VaalTimeScientist's NPC component. THE TABLE SAYS SO ITSELF: DatTable.Path reads \"Data/Balance/QuestFlags.dat\" straight out of the recording. That was found last rather than first, and the three numbers that had already agreed before anyone followed the pointer are kept here, because they are what the next unnamed table will have to be identified by. (1) The rows are 0x0C apart, and QuestFlags is one of 26 PoE2 tables whose columns compute to a 12-byte row. (2) The path LENGTH beside the pointer reads 27, and of those 26 tables exactly one has a 27-character path - so the name was predicted from a number, and then read. (3) An NPCs row reaches it through the NPCs.QuestFlags column, which dat-schema declares as a foreign reference to QuestFlags, at the offset the column widths compute. The Ids reading like quest flags is the fourth witness and the weakest, since that is what suggested the answer in the first place. WHAT THIS IS NOT: a character's progress. There is no value, no bit and no state anywhere in the row or beside it - the table is identical for every character and is the game's list of flag NAMES. Where the flags a character has actually SET are kept is not in this recording; QuestStates.dat gating its text on FlagsPresent/FlagsMissing says the client must hold such a set somewhere, and the way to find it is a recording taken with the quest panel open, then a sweep for a structure holding many pointers into the rows array (that sweep over this session finds only the table's own two indices).",
+      "fields": {
+        "Id": { "offset": "0x00", "type": "utf16Ptr", "comment": "-> the flag name as raw UTF-16, not a std::wstring. The strings sit back to back in one blob in row order, each followed by four bytes of terminator and padding - verified across 64 consecutive rows, where the gap to the next string is (length * 2 + 4) every time." },
+        "Hash32": { "offset": "0x08", "type": "u32", "comment": "The table's own HASH32 column, straight from the file rather than computed at load: FNV-1a, FNV-1, djb2, sdbm, murmur3, CRC-32 and Adler-32 were all tried over the name in UTF-16 and UTF-8, raw and lower-cased, and none reproduces it. Not a loose end - dat-schema calls the column HASH32 because nobody knows the algorithm either. DatRowStore.ByHashIndex is keyed on exactly this value." }
+      },
+      "consts": { "RowSize": "0x0C" }
+    },
+
+    "NpcsRow": {
+      "comment": "A row of NPCs.dat, and the reason the QuestFlags table was reachable at all. Row size 0xBF: 191 bytes over 18 columns, and the stride between the two rows in the fixture is 191 to the byte - the same independent check the MinimapIcons 0x26 and WorldAreas 0x300 strides gave the column-width table, now on a third table. Rows are NOT aligned (both sit at addresses ending in 6 and 5), which is what packed columns look like from outside.",
+      "fields": {
+        "Id": { "offset": "0x00", "type": "utf16Ptr", "comment": "The engine identifier, e.g. \"Metadata/NPC/Hideout/VaalTimeScientist\". The Metadata column at 0x10 holds the SAME pointer, not a copy." },
+        "Name": { "offset": "0x08", "type": "utf16Ptr", "comment": "The display name - \"Zolin\", \"Zelina\". Localised, so classify on Id. ShortName at 0x38 holds the same pointer on both rows seen." },
+        "Metadata": { "offset": "0x10", "type": "utf16Ptr" },
+        "QuestFlagsRowPtr": { "offset": "0x18", "type": "ptr", "struct": "QuestFlagsRow", "comment": "The flag this NPC hangs off - the ROW half of the foreign reference, at the column start. See the order note above; this column is where it was settled." },
+        "QuestFlagsTablePtr": { "offset": "0x20", "type": "ptr", "struct": "DatTable", "comment": "The TABLE half, +8 from the column start." },
+        "ShortName": { "offset": "0x38", "type": "utf16Ptr" },
+        "Act": { "offset": "0x40", "type": "i32", "comment": "Read 10 on both hideout NPCs, which is not an act number anyone plays through - treat the column name as dat-schema's, not as verified here." }
+      },
+      "consts": { "RowSize": "0xBF" }
+    },
+
+    "Npc": {
+      "comment": "Component: an entity that talks. SEEN ONCE (2026-08, in session-2026-08-questflags.rec, on Metadata/NPC/Hideout/VaalTimeScientist) and not on any other entity, so treat the offset as one observation rather than as confirmed. Its shape is the one Chest already has - a component pointing at a shared data object that carries the dat row - and the row it lands on is the NPCs row for this entity's own metadata path, which is the check that makes a single sighting worth writing down.",
+      "fields": {
+        "NpcDataPtr": { "offset": "0x18", "type": "ptr", "struct": "NpcData", "invariant": { "kind": "plausiblePtr" } }
+      }
+    },
+
+    "NpcData": {
+      "comment": "Shared per-NPC-type data, one per metadata path rather than one per entity. Only the row is decoded.",
+      "fields": {
+        "NpcsRowPtr": { "offset": "0x10", "type": "ptr", "struct": "NpcsRow", "invariant": { "kind": "plausiblePtr" } }
       }
     },
 
@@ -769,7 +845,7 @@
       "comment": "The static description a StatusEffect points at, and A ROW OF BuffDefinitions.dat - so its offsets are computable rather than searchable, see the note above WorldAreaDat. BuffType 0x04 marks a FLASK buff, which is what makes 'is this flask still active' answerable without name matching.",
       "fields": {
         "Name": { "offset": "0x00", "type": "utf16Ptr", "comment": "-> raw UTF-16 string, NOT a StdWString, e.g. \"flask_effect_life\". This is the table's Id column, i.e. the ENGINE identifier, which is what we want: it stays English on a localised client. The localised display name is a separate column at 0x12, and the description at 0x08, if either is ever wanted for the UI." },
-        "BuffVisualsKey": { "offset": "0x5D", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "DERIVED, NOT OBSERVED - declared, never read, and never seen in a live game. It was 0x55, which is where the BuffVisual COLUMN starts; that column is a 16-byte table reference followed by a row reference, so the pointer is the second half. Two independent references agree on the +8: the AHK tool's .datc64 layout, and GameHelper2 reading GrantedEffects.ActiveSkillDatPtr at 0x57 where that column starts at 0x4F. The invariant is there so the claim is checkable rather than argued about, but note that nothing checks it today: the drift report walks GameState -> InGameState -> AreaInstance/WorldData -> LocalPlayerStruct, and this row is not on that chain. It costs nothing and settles the question the moment anyone validates a BuffDefinition." },
+        "BuffVisualsKey": { "offset": "0x55", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "STILL DERIVED, NOT OBSERVED - declared, never read, never seen in a live game. 0x55 is where the BuffVisual COLUMN starts, and a foreign reference holds the ROW pointer at the column start (see the order note above WorldAreaDat, settled 2026-08 on NPCs.QuestFlags). MOVED BACK HERE FROM 0x5D, which is where the old +8 rule put it, on the strength of that observation - and the reference this disagrees with is still worth respecting: GameHelper2 reads GrantedEffects.ActiveSkillDatPtr at 0x57 where dat-schema computes that column starting at 0x4F, which is the +8 rule and cannot be reconciled with what the fixture shows unless GrantedEffects' earlier columns have drifted by 8. So this field is now the cheapest live test of a rule the whole column arithmetic rests on: read a real BuffDefinition, follow this pointer, and see whether it lands on a row (a pointer to text) or on an engine object (a module pointer, i.e. a vtable). Nothing checks it today - the drift report walks GameState -> InGameState -> AreaInstance/WorldData -> LocalPlayerStruct and this row is not on that chain." },
         "BuffType": { "offset": "0x67", "type": "u8", "comment": "0x04 = flask buff. The column is really called BuffCategory and is an i32; reading the low byte works and is what the reference does, but the upper three bytes are not padding - they are part of the value." }
       },
       "consts": { "BuffTypeFlask": "0x04" }

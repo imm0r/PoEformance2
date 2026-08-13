@@ -179,6 +179,9 @@ public sealed class StructureInspector
     private readonly OffsetSchema _schema;
     private readonly ulong _gameStatesStatic;
 
+    /// <summary>Where a dat table keeps its path and rows, so a peek can name one.</summary>
+    private readonly DatTableShape? _tables;
+
     /// <summary>What each place used to say, one entry per place, in the order asked for.</summary>
     private readonly List<Tracked> _tracked = [];
 
@@ -196,6 +199,7 @@ public sealed class StructureInspector
         _reader = reader;
         _schema = schema;
         _gameStatesStatic = gameStatesStatic;
+        _tables = DatTableShape.From(schema);
     }
 
     /// <summary>The newest reading. Never blocks, never null, never partially built.</summary>
@@ -394,8 +398,18 @@ public sealed class StructureInspector
 
         if (peeking)
         {
+            // The NEXT eight bytes go with it. A foreign reference is a row followed by its
+            // table, so handing the peek both halves is what turns "dat row, Id X" into which
+            // table it is a row of and which row - the one question a row cannot answer about
+            // itself. Zero when the window ends here, which the peek reads as "no neighbour".
             tracked.Peek = request.PeekOffset >= 0 && request.PeekOffset + 8 <= bytes.Length
-                ? PointerPeek.Peek(_reader, BitConverter.ToUInt64(bytes, request.PeekOffset))
+                ? PointerPeek.Peek(
+                    _reader,
+                    BitConverter.ToUInt64(bytes, request.PeekOffset),
+                    _tables,
+                    request.PeekOffset + 16 <= bytes.Length
+                        ? BitConverter.ToUInt64(bytes, request.PeekOffset + 8)
+                        : 0)
                 : null;
         }
 

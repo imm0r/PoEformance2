@@ -24,6 +24,9 @@ public enum TargetKind
     /// <summary>A row of one of the game's static content tables, identified by its Id string.</summary>
     DatRow,
 
+    /// <summary>One of those tables itself, which knows its own path, row count and row size.</summary>
+    DatTable,
+
     /// <summary>Readable, and none of the above. Another structure, waiting to be looked at.</summary>
     Structure,
 }
@@ -41,6 +44,39 @@ public sealed record PeekResult(
 {
     /// <summary>Nothing there.</summary>
     public static PeekResult Nothing(ulong address) => new(TargetKind.Unreadable, "unreadable", address);
+}
+
+/// <summary>What a dat table says about itself.</summary>
+/// <param name="Path">Its file path, e.g. "Data/Balance/QuestFlags.dat". Empty when unreadable.</param>
+/// <param name="Name">Just the table name - "QuestFlags" - which is what dat-schema calls it.</param>
+/// <param name="Rows">How many rows it holds.</param>
+/// <param name="RowSize">How many bytes one row takes.</param>
+/// <param name="RowsBegin">The first row, so a row pointer turns into an index.</param>
+public sealed record DatTableFacts(string Path, string Name, long Rows, long RowSize, ulong RowsBegin)
+{
+    /// <summary>The table's name if its path was readable, or "dat" so a sentence still reads.</summary>
+    public string Label => Name.Length > 0 ? Name : "dat";
+
+    /// <summary>Which row an address is, or -1 when it is not one of this table's.</summary>
+    public long IndexOf(ulong row)
+    {
+        if (RowSize <= 0 || row < RowsBegin)
+        {
+            return -1;
+        }
+
+        ulong offset = row - RowsBegin;
+
+        // Exactly on the grid or not at all. A pointer INTO a row - at its second column, say -
+        // divides with a remainder, and calling that "row 41" would be worse than saying nothing.
+        if (offset % (ulong)RowSize != 0)
+        {
+            return -1;
+        }
+
+        long index = (long)(offset / (ulong)RowSize);
+        return index < Rows ? index : -1;
+    }
 }
 
 /// <summary>
@@ -67,8 +103,34 @@ public static class PointerPeek
     /// <summary>How much of an unknown structure to show as a preview.</summary>
     private const int PreviewBytes = 32;
 
+    /// <summary>Most rows a table is believed to have. Beyond this the containers are garbage.</summary>
+    private const long MostRows = 2_000_000;
+
+    /// <summary>And the biggest row. WorldAreas' 0x300 is the largest this game is known to have.</summary>
+    private const int LargestRow = 0x1000;
+
+    /// <summary>Longest table path taken seriously.</summary>
+    private const int LongestTablePath = 128;
+
     /// <summary>Looks at what a pointer leads to.</summary>
     public static PeekResult Peek(IMemoryReader reader, ulong address)
+        => Peek(reader, address, null, 0);
+
+    /// <summary>
+    /// Looks at what a pointer leads to, able to recognise dat tables and to number the rows
+    /// of one.
+    /// </summary>
+    /// <param name="tables">
+    /// Where a table keeps its path and rows. Without it this behaves exactly as before -
+    /// tables read as anonymous structures, which is what they did for months.
+    /// </param>
+    /// <param name="following">
+    /// The eight bytes AFTER the peeked ones, when the caller has them. A foreign reference is
+    /// a row followed by its table, so this is what lets a row be named and numbered rather
+    /// than just shown - and it is the only reason a row can say WHICH table it belongs to,
+    /// which the layout alone has never been able to answer.
+    /// </param>
+    public static PeekResult Peek(IMemoryReader reader, ulong address, DatTableShape? tables, ulong following)
     {
         ArgumentNullException.ThrowIfNull(reader);
 
@@ -108,13 +170,33 @@ public static class PointerPeek
             return new PeekResult(TargetKind.Text, $"\"{Trim(plain)}\"", address);
         }
 
+        // A TABLE before a row, because it is the thing that can name one. Its own first field
+        // is a vtable, so nothing above matched it and nothing below would have: it used to
+        // read as an anonymous structure, which is exactly how the QuestFlags table sat
+        // unrecognised in a dissector window for as long as anyone looked at it.
+        if (tables is { } shape && Describe(reader, address, shape) is { } self)
+        {
+            return new PeekResult(TargetKind.DatTable, Summarise(self), address);
+        }
+
         // BEFORE the vector test, which it would otherwise be mistaken for: a dat row often
         // starts with two string columns whose characters live in the same blob, and Id then
         // Description is a readable begin/end pair with a small, neatly divisible span. That
         // is every requirement TryVector has.
         if (got >= 8 && TryDatRow(reader, head, out string id))
         {
-            return new PeekResult(TargetKind.DatRow, $"dat row, Id \"{Trim(id)}\"", address);
+            // The table half of a foreign reference, if the caller handed us the bytes it
+            // sits in. WHICH table a row belongs to cannot be answered from the row.
+            DatTableFacts? owner = tables is { } ownerShape && following != 0
+                ? Describe(reader, following, ownerShape)
+                : null;
+
+            long index = owner?.IndexOf(address) ?? -1;
+            string summary = owner is null ? $"dat row, Id \"{Trim(id)}\""
+                : index >= 0 ? $"{owner.Label} row {index} of {owner.Rows}, Id \"{Trim(id)}\""
+                : $"{owner.Label} row, Id \"{Trim(id)}\"";
+
+            return new PeekResult(TargetKind.DatRow, summary, address);
         }
 
         if (got >= 16 && TryVector(head, out long span, out IReadOnlyList<int> sizes))
@@ -181,6 +263,100 @@ public static class PointerPeek
 
         id = text;
         return true;
+    }
+
+    /// <summary>
+    /// Reads what a dat table says about itself, or null when the address is not one.
+    /// </summary>
+    /// <remarks>
+    /// THE ROW SIZE IS THE POINT, and it comes out of the table rather than out of a schema.
+    /// A by-Id index entry is a fixed 0x18 whatever the table is, and there is exactly one per
+    /// row - so that index says how many rows there are, and the rows array divided by that
+    /// says how big one is. Until this, a row size could only be COMPUTED from the community
+    /// schema's column list and then checked by hand against a stride; now the game answers it
+    /// for every table it has loaded, which is also what makes a row pointer into "row 2170 of
+    /// 5717" instead of an address.
+    ///
+    /// WHAT MAKES IT A TABLE AND NOT A COINCIDENCE is the last check rather than the path: the
+    /// first entry of the by-Id index must point at the first row. Two containers whose spans
+    /// happen to divide is a shape several structures have; two containers that agree with
+    /// each other about where the rows start is not. The path is only the LABEL, deliberately
+    /// not a requirement - it lives one pointer further away, so a recording that never
+    /// followed it, or a table caught mid-load, still gets recognised and counted rather than
+    /// falling back to "another structure".
+    /// </remarks>
+    private static DatTableFacts? Describe(IMemoryReader reader, ulong address, DatTableShape shape)
+    {
+        if (!MemoryReaderExtensions.IsPlausiblePointer(address))
+        {
+            return null;
+        }
+
+        ulong store = reader.ReadPointer(address + (ulong)shape.RowStoreOffset);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(store))
+        {
+            return null;
+        }
+
+        ulong rowsBegin = reader.ReadPointer(store + (ulong)shape.RowsOffset);
+        ulong rowsEnd = reader.ReadPointer(store + (ulong)shape.RowsOffset + sizeof(ulong));
+        ulong idBegin = reader.ReadPointer(store + (ulong)shape.ByIdIndexOffset);
+        ulong idEnd = reader.ReadPointer(store + (ulong)shape.ByIdIndexOffset + sizeof(ulong));
+
+        if (!MemoryReaderExtensions.IsPlausiblePointer(rowsBegin)
+            || !MemoryReaderExtensions.IsPlausiblePointer(idBegin)
+            || rowsEnd <= rowsBegin
+            || idEnd <= idBegin)
+        {
+            return null;
+        }
+
+        long rows = (long)(idEnd - idBegin) / shape.ByIdEntrySize;
+        long span = (long)(rowsEnd - rowsBegin);
+        if (rows is <= 0 or > MostRows || span % rows != 0)
+        {
+            return null;
+        }
+
+        long rowSize = span / rows;
+        if (rowSize is <= 0 or > LargestRow)
+        {
+            return null;
+        }
+
+        if (reader.ReadPointer(idBegin + (ulong)shape.ByIdEntryRowAt) != rowsBegin)
+        {
+            return null;
+        }
+
+        string path = reader.ReadStdWString(address + (ulong)shape.PathOffset, LongestTablePath);
+        bool named = LooksLikeATablePath(path);
+        return new DatTableFacts(
+            named ? path : string.Empty,
+            named ? NameIn(path) : string.Empty,
+            rows,
+            rowSize,
+            rowsBegin);
+    }
+
+    /// <summary>One line for a table: what it is called and how big it is.</summary>
+    private static string Summarise(DatTableFacts table) => table.Path.Length > 0
+        ? $"dat table \"{table.Path}\", {table.Rows} rows of 0x{table.RowSize:X}"
+        : $"dat table, {table.Rows} rows of 0x{table.RowSize:X}";
+
+    /// <summary>True when a string reads as the path of one of the game's tables.</summary>
+    private static bool LooksLikeATablePath(string text)
+        => text.Length is > 4 and <= LongestTablePath
+            && text.Contains('/', StringComparison.Ordinal)
+            && text.Contains(".dat", StringComparison.OrdinalIgnoreCase)
+            && !text.Any(char.IsControl);
+
+    /// <summary>"Data/Balance/QuestFlags.dat" -> "QuestFlags", which is what dat-schema calls it.</summary>
+    private static string NameIn(string path)
+    {
+        int start = path.LastIndexOf('/') + 1;
+        int end = path.IndexOf('.', start);
+        return end > start ? path[start..end] : path[start..];
     }
 
     /// <summary>True when a begin/end pair looks like a vector rather than two unrelated pointers.</summary>
