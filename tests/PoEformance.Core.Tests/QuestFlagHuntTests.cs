@@ -298,13 +298,24 @@ public class QuestFlagHuntTests
         // held before, since a marker without a condition never writes there. Only landing on
         // the row grid separates them.
         int nonZero = 0;
+        int plausible = 0;
         int onGrid = 0;
         for (int i = 0; i < count; i++)
         {
-            ulong flag = replay.ReadPointer(list + (ulong)(i * stride) + (ulong)marker.OffsetOf("QuestFlagRowPtr"));
-            if (flag != 0)
+            ulong at = list + (ulong)(i * stride) + (ulong)marker.OffsetOf("QuestFlagRowPtr");
+            if (replay.Read<ulong>(at) != 0)
             {
                 nonZero++;
+            }
+
+            // ReadPointer refuses anything outside the range a heap pointer can occupy, which
+            // is already enough to throw out all three leftovers here - 1.0f and 0xFEF are not
+            // addresses. The grid check below is what makes it robust rather than lucky: a
+            // leftover CAN be a plausible-looking number, and then only the table can say.
+            ulong flag = replay.ReadPointer(at);
+            if (flag != 0)
+            {
+                plausible++;
             }
 
             if (facts!.IndexOf(flag) >= 0)
@@ -314,6 +325,7 @@ public class QuestFlagHuntTests
         }
 
         Assert.Equal(4, nonZero);
+        Assert.Equal(1, plausible);
         Assert.Equal(1, onGrid);
 
         // Every NPC marker names its NPC, and they all sit on the 0xBF NPCs row grid - which

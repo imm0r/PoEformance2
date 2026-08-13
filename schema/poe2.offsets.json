@@ -1018,7 +1018,7 @@
         "NpcTablePtr": { "offset": "0x28", "type": "ptr", "struct": "DatTable" },
         "QuestFlagRowPtr": {
           "offset": "0x80", "type": "ptr", "struct": "QuestFlagsRow",
-          "comment": "The flag a marker waits for - read live as CanSeeAngeInHideout on one of the NPC markers. ONLY MEANINGFUL WHEN IT LANDS ON THE ROW GRID, and that is not pedantry: three of the fourteen markers hold floats and small integers in this slot (0x3F800000 is 1.0f), so it is written by the entries that have a condition and left as whatever was there before by the ones that do not. Checking the pointer against the table's rows costs one division and is the difference between one condition and four. First written here as 'zero or a flag', which the same recording disproves.",
+          "comment": "The flag a marker waits for - read live as CanSeeAngeInHideout on one of the NPC markers. NOT ZERO WHEN THERE IS NO CONDITION, which is what this was first written down as: three of the fourteen markers hold floats and small integers here (0x3F800000 is 1.0f), because the slot is written by the entries that have a condition and left as whatever the allocation held by the ones that do not. Counting non-zero slots finds four conditions where there is one. ReadPointer's plausibility range happens to throw out all three of those - 1.0f and 0xFEF are not addresses - but that is luck rather than a check: a leftover can look like an address, and then only the table can say. Checking the value against the table's own rows costs one division, which is why the reader does it and the test counts all three ways.",
           "invariant": { "kind": "plausiblePtr" }
         },
         "QuestFlagTablePtr": { "offset": "0x88", "type": "ptr", "struct": "DatTable" }
