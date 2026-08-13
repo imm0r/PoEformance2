@@ -1,3 +1,4 @@
+using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Game.Diagnostics;
@@ -179,6 +180,28 @@ public class QuestFlagHuntTests
     /// <summary>ServerData as that session resolved it, read to its full 128 KB.</summary>
     private const ulong HuntServerData = 0x41EB5EA4000UL;
 
+    /// <summary>
+    /// The session where following pointers paid off: the same ServerData, plus everything one
+    /// hop out of it.
+    /// </summary>
+    private static string MarkerFixturePath
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+            {
+                dir = dir.Parent;
+            }
+
+            Assert.NotNull(dir);
+            return Path.Combine(dir!.FullName, "tests", "fixtures", "session-2026-08-areamarkers.rec");
+        }
+    }
+
+    /// <summary>Same address as the hunt fixture - the same process, captured twice.</summary>
+    private const ulong MarkerServerData = 0x41EB5EA4000UL;
+
     [Fact]
     public void TheWholeTableIsReadWhenTheWholeTableIsThere()
     {
@@ -220,6 +243,110 @@ public class QuestFlagHuntTests
         Assert.Equal(5370, swept.Targets.Count);
         Assert.Equal(2326, swept.Targets.Select(t => t.Begin).Distinct().Count());
         Assert.Equal(825, swept.Targets.Count(t => t.Bytes != QuestFlagHunt.LonePointerBytes));
+    }
+
+    [Fact]
+    public void TheAreaMarkersAreWhatFollowingAPointerFound()
+    {
+        // What the hunt turned up while looking for something else: ServerData+0x2248 is the
+        // area's own marker list, and one of its entries hangs off a quest flag. The entry
+        // NAMES ITSELF twice over - a MinimapIcons row pointer and the same row as an index -
+        // and the two agreeing is what makes a single sighting worth a struct.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(MarkerFixturePath));
+        OffsetSchema schema = RealSessionTests.Schema();
+        StructDef marker = schema.Structs["AreaMarker"];
+        long stride = marker.Constants["EntrySize"];
+
+        ulong list = replay.ReadPointer(
+            MarkerServerData + (ulong)schema.Structs["ServerDataOffsets"].OffsetOf("AreaMarkers"));
+        ulong end = replay.ReadPointer(
+            MarkerServerData + (ulong)schema.Structs["ServerDataOffsets"].OffsetOf("AreaMarkers") + 8);
+        long count = (long)(end - list) / stride;
+        Assert.Equal(14, count);
+
+        // Two entries whose indices differ by one, whose rows differ by the MinimapIcons row
+        // size, and whose names say what they are.
+        ulong stash = list + (ulong)(9 * stride);
+        ulong guild = list + (ulong)(13 * stride);
+        Assert.Equal(169u, replay.Read<uint>(stash + (ulong)marker.OffsetOf("IconRow")));
+        Assert.Equal(170u, replay.Read<uint>(guild + (ulong)marker.OffsetOf("IconRow")));
+        Assert.Equal(
+            0x26UL,
+            replay.ReadPointer(guild + (ulong)marker.OffsetOf("IconRowPtr"))
+                - replay.ReadPointer(stash + (ulong)marker.OffsetOf("IconRowPtr")));
+        Assert.Equal(
+            "StashPlayer",
+            replay.ReadUnicodeString(replay.ReadPointer(replay.ReadPointer(stash + (ulong)marker.OffsetOf("IconRowPtr")))));
+
+        // The one entry that is conditional, and the flag it waits for.
+        ulong ange = list + (ulong)(4 * stride);
+        ulong flagRow = replay.ReadPointer(ange + (ulong)marker.OffsetOf("QuestFlagRowPtr"));
+        ulong flagTable = replay.ReadPointer(ange + (ulong)marker.OffsetOf("QuestFlagTablePtr"));
+        DatTableShape? shape = DatTableShape.From(schema);
+        DatTableFacts? facts = PointerPeek.DescribeTable(replay, flagTable, shape!.Value);
+
+        Assert.NotNull(facts);
+        Assert.Equal("Data/Balance/QuestFlags.dat", facts!.Path);
+        Assert.Equal(851, facts.IndexOf(flagRow));
+        Assert.Equal(
+            "CanSeeAngeInHideout",
+            replay.ReadUnicodeString(replay.ReadPointer(flagRow)));
+
+        // ONE condition among the fourteen - and counting them is the test, because the
+        // obvious way to count is wrong. Four entries have a non-zero value in that slot;
+        // three of those are floats and small integers left over from whatever the allocation
+        // held before, since a marker without a condition never writes there. Only landing on
+        // the row grid separates them.
+        int nonZero = 0;
+        int plausible = 0;
+        int onGrid = 0;
+        for (int i = 0; i < count; i++)
+        {
+            ulong at = list + (ulong)(i * stride) + (ulong)marker.OffsetOf("QuestFlagRowPtr");
+            if (replay.Read<ulong>(at) != 0)
+            {
+                nonZero++;
+            }
+
+            // ReadPointer refuses anything outside the range a heap pointer can occupy, which
+            // is already enough to throw out all three leftovers here - 1.0f and 0xFEF are not
+            // addresses. The grid check below is what makes it robust rather than lucky: a
+            // leftover CAN be a plausible-looking number, and then only the table can say.
+            ulong flag = replay.ReadPointer(at);
+            if (flag != 0)
+            {
+                plausible++;
+            }
+
+            if (facts!.IndexOf(flag) >= 0)
+            {
+                onGrid++;
+            }
+        }
+
+        Assert.Equal(4, nonZero);
+        Assert.Equal(1, plausible);
+        Assert.Equal(1, onGrid);
+
+        // Every NPC marker names its NPC, and they all sit on the 0xBF NPCs row grid - which
+        // is what says the field is an NPCs reference rather than a pointer that happens to be
+        // there. One of them is the row an earlier session identified by name.
+        long npcStride = schema.Structs["NpcsRow"].Constants["RowSize"];
+        int npcs = 0;
+        for (int i = 0; i < count; i++)
+        {
+            ulong row = replay.ReadPointer(list + (ulong)(i * stride) + (ulong)marker.OffsetOf("NpcRowPtr"));
+            if (row == 0)
+            {
+                continue;
+            }
+
+            npcs++;
+            long delta = (long)row - (long)QuestFlagsTableTests.NpcsRowAddress;
+            Assert.Equal(0L, delta % npcStride);
+        }
+
+        Assert.Equal(6, npcs);
     }
 
     [Fact]

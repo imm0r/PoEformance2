@@ -398,7 +398,7 @@ public sealed class QuestFlagHunt
     /// Neither reference decodes anything of it beyond inventories, so there is nothing to
     /// copy and this is new ground.
     /// </remarks>
-    public QuestFlagHuntResult Run(ulong gameStatesStatic, int serverDataBytes = 128 * 1024)
+    public QuestFlagHuntResult Run(ulong gameStatesStatic, int serverDataBytes = 1024 * 1024)
     {
         if (_tables is null)
         {
@@ -444,14 +444,18 @@ public sealed class QuestFlagHunt
             }
         }
 
-        swept.AddRange(FollowEverything(
-            swept,
-            hashes,
-            facts?.RowsBegin ?? 0,
-            facts?.Rows ?? 0,
-            (int)(facts?.RowSize ?? 0),
-            out int followed,
-            out long followedBytes));
+        // Two hops, and the second one only follows LISTS. One hop was enough to turn up the
+        // area markers, which is a container inside ServerData - so a set of flags sitting one
+        // container deeper is exactly the shape to expect next, and a lone pointer at that
+        // depth is too many for too little.
+        var visited = new HashSet<ulong>();
+        long spent = 0;
+        List<SweptRegion> first = Follow(swept, hashes, facts, visited, ref spent, listsOnly: false);
+        List<SweptRegion> second = Follow(first, hashes, facts, visited, ref spent, listsOnly: true);
+        swept.AddRange(first.Where(r => r.Sightings.Count > 0));
+        swept.AddRange(second.Where(r => r.Sightings.Count > 0));
+        int followed = visited.Count;
+        long followedBytes = spent;
 
         return new QuestFlagHuntResult(
             table,
@@ -479,51 +483,54 @@ public sealed class QuestFlagHunt
     /// budget on one allocation. The field is still what gets named in the report, because a
     /// hit is only useful as an offset somebody can write into the schema.
     /// </remarks>
-    private List<SweptRegion> FollowEverything(
+    /// <summary>
+    /// Reads everything a set of swept regions pointed at, and sweeps that too.
+    /// </summary>
+    /// <remarks>
+    /// Targets are deduplicated by where they POINT, not by where the pointer was: the same
+    /// list is reachable from several fields, and reading it once per field would spend the
+    /// budget on one allocation. The field is still what gets NAMED, because a hit is only
+    /// useful as an offset somebody can write into the schema - ServerData+0x2248 is how the
+    /// area markers got theirs.
+    ///
+    /// <paramref name="listsOnly"/> is what keeps a second hop affordable. Everything is worth
+    /// following once; at the next depth only the things shaped like lists are, or the walk
+    /// turns into a heap dump for the sake of a kilobyte apiece.
+    /// </remarks>
+    private List<SweptRegion> Follow(
         IReadOnlyList<SweptRegion> from,
         IReadOnlyDictionary<uint, int> hashes,
-        ulong rowsBegin,
-        long rows,
-        int rowSize,
-        out int followed,
-        out long followedBytes)
+        DatTableFacts? facts,
+        HashSet<ulong> visited,
+        ref long spent,
+        bool listsOnly)
     {
-        var withFlags = new List<SweptRegion>();
-        var visited = new HashSet<ulong>();
-        long spent = 0;
+        var swept = new List<SweptRegion>();
 
         foreach (SweptRegion region in from)
         {
             foreach (FollowTarget target in region.Targets)
             {
-                if (spent >= FollowBudget || !visited.Add(target.Begin))
+                if (spent >= FollowBudget
+                    || (listsOnly && target.Bytes == LonePointerBytes)
+                    || !visited.Add(target.Begin))
                 {
                     continue;
                 }
 
                 spent += target.Bytes;
-                SweptRegion swept = Sweep(
+                swept.Add(Sweep(
                     $"{region.Name}+0x{target.At - region.Address:X}",
                     target.Begin,
                     target.Bytes,
                     hashes,
-                    rowsBegin,
-                    rows,
-                    rowSize,
-                    collectTargets: false);
-
-                // Kept only when it says something. Nine hundred empty lists in a report is
-                // the same as no report.
-                if (swept.Sightings.Count > 0)
-                {
-                    withFlags.Add(swept);
-                }
+                    facts?.RowsBegin ?? 0,
+                    facts?.Rows ?? 0,
+                    (int)(facts?.RowSize ?? 0)));
             }
         }
 
-        followed = visited.Count;
-        followedBytes = spent;
-        return withFlags;
+        return swept;
     }
 
     /// <summary>Prints the hunt for a person.</summary>
