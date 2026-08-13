@@ -452,6 +452,12 @@ public class QuestFlagHuntTests
         Assert.Equal(Far + 0x40, Assert.Single(far.Sightings).At);
         Assert.Equal(Rows + 0x10_0000 + 0x40, Assert.Single(near.Sightings).At);
 
+        // Stopping because the cap filled is not the same answer as stopping because the
+        // budget ran out, and reporting them alike once read as "too expensive" when the
+        // truth was "too many hits to list".
+        Assert.True(near.HitSightingCap);
+        Assert.True(near.Truncated);
+
         // And the reach says how far out the budget carried, which is what turns "found
         // nothing" into "found nothing within this distance".
         Assert.True(near.Reach < 0x20_0000, $"reach {near.Reach:X}");

@@ -16,13 +16,23 @@ public readonly record struct RowSighting(ulong At, int Row, bool ByPointer);
 /// <c>Truncated</c>, where it is the difference between "nothing is out there" and "the budget
 /// ran out two terabytes short of the interesting part".
 /// </param>
+/// <param name="HitSightingCap">
+/// True when the collection limit stopped it rather than the byte budget.
+/// </param>
+/// <remarks>
+/// The two ways of stopping mean opposite things and were reported identically, which cost a
+/// run: 955 MB scanned out of an 8 GB budget read as "the budget ran out" when what actually
+/// happened was the sighting cap filling in the first neighbourhood it looked at. One says the
+/// search was too expensive; the other says it was too successful.
+/// </remarks>
 public sealed record HeapScanResult(
     long RegionsWalked,
     long BytesScanned,
     long RegionsSkipped,
     IReadOnlyList<RowSighting> Sightings,
     bool Truncated,
-    ulong Reach = 0);
+    ulong Reach = 0,
+    bool HitSightingCap = false);
 
 /// <summary>
 /// Searches the ENTIRE address space for references to a table's rows, instead of following
@@ -90,7 +100,13 @@ public static class HeapScan
     /// <param name="rows">How many rows it has.</param>
     /// <param name="rowSize">How many bytes one row takes.</param>
     /// <param name="keys">Row key (HASH32) to row index, from the table itself.</param>
-    /// <param name="mostSightings">Stop collecting past this, so a pathological hit rate cannot exhaust memory.</param>
+    /// <param name="mostSightings">
+    /// Stop collecting past this, so a pathological hit rate cannot exhaust memory. Raised from
+    /// 4096 after a live run filled it in 955 MB - inside the FIRST neighbourhood the anchored
+    /// walk looked at, which is exactly where the answer would be. A cap that bites there does
+    /// not bound a runaway, it hides the result; a quarter of a million sightings is a few
+    /// megabytes and is past anything a real structure produces.
+    /// </param>
     /// <param name="anchor">
     /// Address to scan outward from, nearest region first. Zero keeps the enumeration order.
     /// </param>
@@ -120,7 +136,7 @@ public static class HeapScan
         int rowSize,
         IReadOnlyDictionary<uint, int> keys,
         IReadOnlyList<MemoryRegion>? exclude = null,
-        int mostSightings = 4096,
+        int mostSightings = 256 * 1024,
         ulong anchor = 0)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -193,7 +209,8 @@ public static class HeapScan
             ArrayPool<byte>.Shared.Return(buffer);
         }
 
-        return new HeapScanResult(walked, scanned, skipped, sightings, truncated, reach);
+        return new HeapScanResult(
+            walked, scanned, skipped, sightings, truncated, reach, sightings.Count >= mostSightings);
     }
 
     /// <summary>
