@@ -85,6 +85,15 @@ public sealed class QuestFlagHunt
     public const int LonePointerBytes = 1024;
 
     /// <summary>
+    /// How much to take of an object InGameState points at directly.
+    /// </summary>
+    /// <remarks>
+    /// 16 KB rather than a kilobyte, and rather than the 64 that would be comfortable: there
+    /// are 286 of them, so the window is what decides whether this costs 4.6 MB or eighteen.
+    /// </remarks>
+    public const int StateObjectBytes = 16 * 1024;
+
+    /// <summary>
     /// Ceiling on the whole second pass, so a region full of pointers cannot turn a diagnostic
     /// into a heap dump. Measured against a real session: 907 distinct list targets came to
     /// 1.2 MB, and every pointer in all four regions to about three more.
@@ -461,13 +470,52 @@ public sealed class QuestFlagHunt
             }
         }
 
-        // Two hops, and the second one only follows LISTS. One hop was enough to turn up the
-        // area markers, which is a container inside ServerData - so a set of flags sitting one
-        // container deeper is exactly the shape to expect next, and a lone pointer at that
-        // depth is too many for too little.
         var visited = new HashSet<ulong>();
         long spent = 0;
-        List<SweptRegion> first = Follow(swept, hashes, facts, visited, ref spent, listsOnly: false);
+
+        // WHAT INGAMESTATE POINTS AT IS STRUCTURE, NOT DATA, and a kilobyte is the wrong window
+        // for it. Two recordings of the same game - one character each, switched without
+        // restarting - differ in 111 bytes of this object, and twelve of those are pointers
+        // that lead somewhere else for the other character. Only one of the twelve was ever
+        // read properly (AreaInstance); the rest got a kilobyte apiece as ordinary lone
+        // pointers, which would miss anything past their first page. So its direct targets get
+        // a real window before the general follow starts, and the follow skips them afterwards
+        // because they are already visited.
+        //
+        // Honest about what the diff proves: those two recordings differ in AREA as well as in
+        // character, so a pointer that changed is character-scoped OR area-scoped. Either way
+        // it belongs to something that is not the same twice, which is what a set of quest
+        // flags is.
+        var structural = new List<SweptRegion>();
+        foreach (FollowTarget target in swept
+            .Where(r => r.Name == "InGameState")
+            .SelectMany(r => r.Targets))
+        {
+            if (spent >= FollowBudget || !visited.Add(target.Begin))
+            {
+                continue;
+            }
+
+            spent += StateObjectBytes;
+            structural.Add(Sweep(
+                $"InGameState+0x{target.At - chain.InGameState:X}",
+                target.Begin,
+                StateObjectBytes,
+                hashes,
+                facts?.RowsBegin ?? 0,
+                facts?.Rows ?? 0,
+                (int)(facts?.RowSize ?? 0)));
+        }
+
+        // Then two hops of the ordinary kind, the second following only LISTS. One hop was
+        // enough to turn up the area markers, which is a container inside ServerData - so a set
+        // of flags sitting one container deeper is exactly the shape to expect next, and a lone
+        // pointer at that depth is too many for too little.
+        var sources = new List<SweptRegion>(swept);
+        sources.AddRange(structural);
+        swept.AddRange(structural.Where(r => r.Sightings.Count > 0));
+
+        List<SweptRegion> first = Follow(sources, hashes, facts, visited, ref spent, listsOnly: false);
         List<SweptRegion> second = Follow(first, hashes, facts, visited, ref spent, listsOnly: true);
         swept.AddRange(first.Where(r => r.Sightings.Count > 0));
         swept.AddRange(second.Where(r => r.Sightings.Count > 0));
