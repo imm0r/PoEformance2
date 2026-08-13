@@ -35,7 +35,8 @@ public sealed record QuestFlagHuntResult(
     IReadOnlyList<SweptRegion> Regions,
     string Note,
     int Followed = 0,
-    long FollowedBytes = 0)
+    long FollowedBytes = 0,
+    int SkippedTargets = 0)
 {
     /// <summary>Every sighting across every region, which is the answer when there is one.</summary>
     public IEnumerable<FlagSighting> Sightings => Regions.SelectMany(r => r.Sightings);
@@ -95,10 +96,20 @@ public sealed class QuestFlagHunt
 
     /// <summary>
     /// Ceiling on the whole second pass, so a region full of pointers cannot turn a diagnostic
-    /// into a heap dump. Measured against a real session: 907 distinct list targets came to
-    /// 1.2 MB, and every pointer in all four regions to about three more.
+    /// into a heap dump.
     /// </summary>
-    public const long FollowBudget = 16 * 1024 * 1024;
+    /// <remarks>
+    /// RAISED TO 64 MB BECAUSE EVERY RUN SO FAR HIT THE OLD 16, and a sweep that stops early
+    /// cannot say "not there" - only "not there, as far as it got", which is a different and
+    /// much weaker sentence. Four sessions of this hunt reported nothing found and all four
+    /// were truncated, so the negative they carried was worth less than it looked.
+    ///
+    /// What it costs is bounded and known: 11 MB of reads compressed to 1.5 MB of recording at
+    /// the old ceiling, so a completed sweep should land around 6 MB - still a file that can be
+    /// sent to somebody. What it BUYS is the difference between a search and an answer, and
+    /// SkippedTargets below says which of the two happened.
+    /// </remarks>
+    public const long FollowBudget = 64 * 1024 * 1024;
 
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
@@ -515,8 +526,9 @@ public sealed class QuestFlagHunt
         sources.AddRange(structural);
         swept.AddRange(structural.Where(r => r.Sightings.Count > 0));
 
-        List<SweptRegion> first = Follow(sources, hashes, facts, visited, ref spent, listsOnly: false);
-        List<SweptRegion> second = Follow(first, hashes, facts, visited, ref spent, listsOnly: true);
+        int skipped = 0;
+        List<SweptRegion> first = Follow(sources, hashes, facts, visited, ref spent, listsOnly: false, ref skipped);
+        List<SweptRegion> second = Follow(first, hashes, facts, visited, ref spent, listsOnly: true, ref skipped);
         swept.AddRange(first.Where(r => r.Sightings.Count > 0));
         swept.AddRange(second.Where(r => r.Sightings.Count > 0));
         int followed = visited.Count;
@@ -532,7 +544,8 @@ public sealed class QuestFlagHunt
                     + "so a --record session can be swept offline once the table is known"
                 : string.Empty,
             followed,
-            followedBytes);
+            followedBytes,
+            skipped);
     }
 
     /// <summary>
@@ -568,7 +581,8 @@ public sealed class QuestFlagHunt
         DatTableFacts? facts,
         HashSet<ulong> visited,
         ref long spent,
-        bool listsOnly)
+        bool listsOnly,
+        ref int skipped)
     {
         var swept = new List<SweptRegion>();
 
@@ -576,9 +590,15 @@ public sealed class QuestFlagHunt
         {
             foreach (FollowTarget target in region.Targets)
             {
-                if (spent >= FollowBudget
-                    || (listsOnly && target.Bytes == LonePointerBytes)
-                    || !visited.Add(target.Begin))
+                if (spent >= FollowBudget)
+                {
+                    // Counted rather than ignored: the number of targets the budget cost is
+                    // exactly what says whether "nothing found" is an answer or a timeout.
+                    skipped++;
+                    continue;
+                }
+
+                if ((listsOnly && target.Bytes == LonePointerBytes) || !visited.Add(target.Begin))
                 {
                     continue;
                 }
@@ -621,9 +641,9 @@ public sealed class QuestFlagHunt
             // Whether the budget ran out MATTERS, and saying nothing about it is how a partial
             // sweep gets read as an exhaustive one. 13 MB of a real session came back empty and
             // the honest description of that is "empty as far as it got".
-            string spent = result.FollowedBytes >= FollowBudget
-                ? " - THE BUDGET RAN OUT, so this is as far as the sweep got"
-                : " - only the ones holding flags are listed";
+            string spent = result.SkippedTargets > 0
+                ? $" - THE BUDGET RAN OUT with {result.SkippedTargets} targets left, so this is as far as the sweep got"
+                : " - the sweep FINISHED, so what is not listed is not there";
 
             output.WriteLine(
                 $"  followed {result.Followed} pointers out of those regions, "
