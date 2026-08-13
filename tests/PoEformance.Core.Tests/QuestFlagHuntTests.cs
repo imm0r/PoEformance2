@@ -133,6 +133,96 @@ public class QuestFlagHuntTests
     }
 
     [Fact]
+    public void WhatARegionPointsAtIsNotedForReading()
+    {
+        // The reason the first sweep found nothing: a set of flags is a CONTAINER, and its
+        // contents live wherever it allocated them - so the bytes of ServerData hold the two
+        // pointers bracketing the answer and none of the answer itself. A begin/end pair gets
+        // read to its own length; anything else gets a kilobyte, which is the whole of a
+        // bitset over 5717 flags.
+        const ulong ListAt = 0x5000_0000_0000;
+        const ulong LoneAt = 0x5500_0000_0000;
+
+        FakeMemoryReader reader = FakeTable();
+        reader.Place(RegionAt, new byte[4096]);
+        reader.Place(RegionAt + 0x40, ListAt);
+        reader.Place(RegionAt + 0x48, ListAt + 0x1000);
+        reader.Place(RegionAt + 0x100, LoneAt);
+
+        SweptRegion swept = Hunt(reader).Sweep("ServerData", RegionAt, 4096, Needles(), RowsAt, Rows, RowSize);
+
+        Assert.Contains(swept.Targets, t => t.At == RegionAt + 0x40 && t.Begin == ListAt && t.Bytes == 0x1000);
+        Assert.Contains(
+            swept.Targets,
+            t => t.At == RegionAt + 0x100 && t.Begin == LoneAt && t.Bytes == QuestFlagHunt.LonePointerBytes);
+    }
+
+    /// <summary>
+    /// The session <c>--questflags</c> was first run in: the whole table, and the four regions
+    /// read in full.
+    /// </summary>
+    private static string HuntFixturePath
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+            {
+                dir = dir.Parent;
+            }
+
+            Assert.NotNull(dir);
+            return Path.Combine(dir!.FullName, "tests", "fixtures", "session-2026-08-questflags-hunt.rec");
+        }
+    }
+
+    /// <summary>ServerData as that session resolved it, read to its full 128 KB.</summary>
+    private const ulong HuntServerData = 0x41EB5EA4000UL;
+
+    [Fact]
+    public void TheWholeTableIsReadWhenTheWholeTableIsThere()
+    {
+        // The other half of the partial-read test below: given a session that actually read
+        // the rows, all 5717 come back. 68 KB in seventeen chunks, and no row missing means
+        // no chunk was silently dropped.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(HuntFixturePath));
+        OffsetSchema schema = RealSessionTests.Schema();
+
+        Dictionary<uint, int> hashes = new QuestFlagHunt(replay, schema).HashesIn(0x41ED8080990UL);
+
+        Assert.Equal(5717, hashes.Count);
+        Assert.Equal(0, hashes[0x5085C604]);
+    }
+
+    [Fact]
+    public void ServerDataHeldNoFlagsAndPlentyOfPointers()
+    {
+        // THE NEGATIVE RESULT, kept as a test because it is what the next step was built on.
+        // 128 KB of a character's own server blob, every one of the 5717 hashes tested against
+        // it, and nothing - while the same bytes hold thousands of pointers leading somewhere
+        // that was never read. A set of flags is a container; its contents are not in the
+        // struct that owns it. If a future change makes this assertion fail, the hunt has
+        // either found something or broken, and both are worth stopping for.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(HuntFixturePath));
+        OffsetSchema schema = RealSessionTests.Schema();
+        var hunt = new QuestFlagHunt(replay, schema);
+
+        ulong table = 0x41ED8080990UL;
+        ulong rows = replay.ReadPointer(
+            replay.ReadPointer(table + (ulong)schema.Structs["DatTable"].OffsetOf("RowStorePtr"))
+            + (ulong)schema.Structs["DatRowStore"].OffsetOf("Rows"));
+
+        SweptRegion swept = hunt.Sweep(
+            "ServerData", HuntServerData, 128 * 1024, hunt.HashesIn(table), rows, 5717, 0x0C);
+
+        Assert.Equal(128 * 1024, swept.Read);
+        Assert.Empty(swept.Sightings);
+        Assert.Equal(5370, swept.Targets.Count);
+        Assert.Equal(2326, swept.Targets.Select(t => t.Begin).Distinct().Count());
+        Assert.Equal(825, swept.Targets.Count(t => t.Bytes != QuestFlagHunt.LonePointerBytes));
+    }
+
+    [Fact]
     public void RealTable_YieldsTheHashesTheRecordingActuallyHolds()
     {
         // Against the session the table was found in. The recording holds the first kilobyte
