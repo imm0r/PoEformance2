@@ -63,6 +63,7 @@
     },
 
     "InGameState": {
+      "comment": "WHICH OF ITS FIELDS BELONG TO THE CHARACTER, measured rather than guessed. Two recordings of the SAME running game with two different characters - switched without restarting, so this object keeps its address - differ in 111 of 32768 bytes, and twelve of those are pointers leading somewhere else for the other character: 0x290 (AreaInstanceData), 0x2E8, 0x2F0 (UiRootStructPtr), 0x2F8, 0x300, 0x308, 0x388, 0x3A0, 0x4C0, 0x510, 0x5B8, plus two non-pointer words at 0x490 and 0x568. Everything else is the same object twice, WorldData at 0x368 included - which is worth knowing on its own: that one survives an area change rather than being rebuilt with it. The caveat that keeps this honest is that the two recordings differ in AREA as well as in character, so a changed pointer is character-scoped OR area-scoped and this does not say which. It is still the shortest list of places a character's own state can be, which is what --questflags now reads properly instead of giving each a kilobyte.",
       "fields": {
         "AreaInstanceData": {
           "offset": "0x290", "type": "ptr",
