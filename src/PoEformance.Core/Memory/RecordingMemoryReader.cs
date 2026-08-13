@@ -14,7 +14,7 @@ namespace PoEformance.Core.Memory;
 /// <see cref="MarkFrame"/> once per reader tick and the replay can answer "what did
 /// this address contain around frame N".
 /// </remarks>
-public sealed class RecordingMemoryReader : IMemoryReader
+public sealed class RecordingMemoryReader : IMemoryReader, IMemoryRegions
 {
     private readonly IMemoryReader _inner;
     private readonly BinaryWriter _writer;
@@ -257,6 +257,25 @@ public sealed class RecordingMemoryReader : IMemoryReader
     // The last bytes written for each (address, length) - the memory this trades for the
     // disk it no longer spends.
     private readonly Dictionary<(ulong Address, int Length), byte[]> _lastWritten = [];
+
+    /// <summary>
+    /// The wrapped reader's regions, or none if it cannot enumerate them.
+    /// </summary>
+    /// <remarks>
+    /// WITHOUT THIS, --record SILENTLY DISABLES --heapscan. The scan asks whether its reader
+    /// can enumerate regions, and a wrapper that does not forward the question answers no for
+    /// a live reader that would have said yes - so the scan skipped itself, the report came
+    /// back with every other section intact, and the missing one read as "found nothing".
+    /// A recorded heap scan is exactly the combination worth having, since the hits are only
+    /// worth anything if the session they came from can be replayed.
+    ///
+    /// Not recorded, and that is not a gap: region enumeration is a query about the process
+    /// rather than a read of its memory, and the scan's own reads pass through TryRead like
+    /// any other. They land above MaxRecordedReadBytes and are skipped there, which is what
+    /// keeps a scanned session's recording small.
+    /// </remarks>
+    public IEnumerable<MemoryRegion> Regions() =>
+        _inner is IMemoryRegions regions ? regions.Regions() : [];
 
     public bool TryRead(ulong address, Span<byte> destination)
     {
