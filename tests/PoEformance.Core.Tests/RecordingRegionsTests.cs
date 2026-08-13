@@ -37,6 +37,11 @@ public class RecordingRegionsTests
 
         public IEnumerable<MemoryRegion> Regions() =>
             [new MemoryRegion(0x10000, 0x1000), new MemoryRegion(0x20000, 0x2000)];
+
+        /// <summary>Nothing to release; IMemoryReader is IDisposable for the live one's handle.</summary>
+        public void Dispose()
+        {
+        }
     }
 
     [Fact]
