@@ -730,7 +730,9 @@ public sealed class QuestFlagHunt
                 $"  heap scan {scan.RegionsWalked} regions, {scan.BytesScanned / 1024 / 1024} MB, "
                 + $"{byPointer} pointers and {scan.Sightings.Count - byPointer} hash matches"
                 + (scan.Truncated
-                    ? $" - STOPPED EARLY: everything within {scan.Reach / 1024 / 1024} MB of the table was covered, beyond that nothing"
+                    ? scan.HitSightingCap
+                        ? $" - STOPPED AT THE SIGHTING CAP inside {scan.Reach / 1024 / 1024} MB of the table, so there are more"
+                        : $" - BUDGET SPENT: everything within {scan.Reach / 1024 / 1024} MB of the table was covered, beyond that nothing"
                     : " - the whole address space"));
         }
 
