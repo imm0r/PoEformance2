@@ -12,13 +12,20 @@ namespace PoEformance.Game.Diagnostics;
 /// <param name="ByPointer">True when a row POINTER was found, false when the row's HASH32 was.</param>
 public readonly record struct FlagSighting(int Row, string Id, ulong At, bool ByPointer);
 
+/// <summary>Something a swept region pointed at, worth reading in its own right.</summary>
+/// <param name="At">The field the pointer was found in - what to call the finding if it pays off.</param>
+/// <param name="Begin">Where the thing starts.</param>
+/// <param name="Bytes">How much of it to take.</param>
+public readonly record struct FollowTarget(ulong At, ulong Begin, int Bytes);
+
 /// <summary>What one swept region turned out to hold.</summary>
 public sealed record SweptRegion(
     string Name,
     ulong Address,
     int Wanted,
     int Read,
-    IReadOnlyList<FlagSighting> Sightings);
+    IReadOnlyList<FlagSighting> Sightings,
+    IReadOnlyList<FollowTarget> Targets);
 
 /// <summary>The whole hunt: what was found, and what was merely captured.</summary>
 public sealed record QuestFlagHuntResult(
@@ -26,7 +33,9 @@ public sealed record QuestFlagHuntResult(
     string Path,
     int Rows,
     IReadOnlyList<SweptRegion> Regions,
-    string Note)
+    string Note,
+    int Followed = 0,
+    long FollowedBytes = 0)
 {
     /// <summary>Every sighting across every region, which is the answer when there is one.</summary>
     public IEnumerable<FlagSighting> Sightings => Regions.SelectMany(r => r.Sightings);
@@ -68,6 +77,19 @@ public sealed class QuestFlagHunt
 
     /// <summary>Largest table this will read rows from, as a guard on a length from memory.</summary>
     public const int MostRows = 100_000;
+
+    /// <summary>How much of a list found in a region to take.</summary>
+    public const int ListBytes = 256 * 1024;
+
+    /// <summary>And of something that is only a pointer - one bitset over 5717 flags is 715 bytes.</summary>
+    public const int LonePointerBytes = 1024;
+
+    /// <summary>
+    /// Ceiling on the whole second pass, so a region full of pointers cannot turn a diagnostic
+    /// into a heap dump. Measured against a real session: 907 distinct list targets came to
+    /// 1.2 MB, and every pointer in all four regions to about three more.
+    /// </summary>
+    public const long FollowBudget = 16 * 1024 * 1024;
 
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
@@ -198,11 +220,13 @@ public sealed class QuestFlagHunt
         IReadOnlyDictionary<uint, int> hashes,
         ulong rowsBegin,
         long rows,
-        int rowSize)
+        int rowSize,
+        bool collectTargets = true)
     {
         ArgumentNullException.ThrowIfNull(hashes);
 
         var sightings = new List<FlagSighting>();
+        var targets = new List<FollowTarget>();
         var seen = new HashSet<int>();
         var buffer = new byte[ChunkBytes];
         int read = 0;
@@ -253,9 +277,74 @@ public sealed class QuestFlagHunt
                     sightings.Add(new FlagSighting((int)index, IdOf(rowsBegin, rowSize, (int)index), here, ByPointer: true));
                 }
             }
+
+            if (collectTargets)
+            {
+                CollectTargets(buffer, want, address + (ulong)taken, targets);
+            }
         }
 
-        return new SweptRegion(name, address, bytes, read, sightings);
+        return new SweptRegion(name, address, bytes, read, sightings, targets);
+    }
+
+    /// <summary>
+    /// Notes everything in a chunk worth reading in its own right.
+    /// </summary>
+    /// <remarks>
+    /// THE REASON THE FIRST SWEEP FOUND NOTHING, most likely. A set of flags is a CONTAINER,
+    /// and a container's contents live wherever it allocated them - so sweeping the bytes of
+    /// ServerData looks straight past it and sees only the two pointers bracketing it. The
+    /// second recording made that concrete: 128 KB of ServerData read in full, all 5717
+    /// hashes tested against every byte of it, zero matches, and 2,326 distinct heap pointers
+    /// sitting in it leading somewhere unread.
+    ///
+    /// Two shapes, and the cheap one is not a mistake:
+    ///   - a begin/end PAIR is a list, and its span says how much to take. This is what a
+    ///     vector of flags looks like from outside, whatever the elements are.
+    ///   - a LONE pointer gets a kilobyte. That is not enough to sweep a list, and it is not
+    ///     meant to be: a bitset over 5717 flags is 715 bytes, so one kilobyte is the whole
+    ///     of one - and even where the shape is neither, a kilobyte of every target lands in
+    ///     the recording, which is what makes the NEXT round of this happen offline.
+    /// </remarks>
+    private void CollectTargets(byte[] chunk, int length, ulong at, List<FollowTarget> into)
+    {
+        for (int i = 0; i + sizeof(ulong) <= length; i += sizeof(ulong))
+        {
+            ulong begin = BitConverter.ToUInt64(chunk, i);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(begin))
+            {
+                continue;
+            }
+
+            // Not the module. Nearly every object starts with a vtable, so leaving these in
+            // would spend a good part of the budget reading the game's own code back.
+            if (_reader.ModuleSize > 0
+                && begin >= _reader.ModuleBase
+                && begin < _reader.ModuleBase + _reader.ModuleSize)
+            {
+                continue;
+            }
+
+            int take = LonePointerBytes;
+            if (i + (2 * sizeof(ulong)) <= length)
+            {
+                ulong end = BitConverter.ToUInt64(chunk, i + sizeof(ulong));
+                if (end > begin && MemoryReaderExtensions.IsPlausiblePointer(end))
+                {
+                    ulong span = end - begin;
+
+                    // Divisible by SOMETHING an element could be, or it is two unrelated
+                    // pointers into one allocation rather than a list - which is most pairs.
+                    if (span is >= 16 and <= 8 * 1024 * 1024
+                        && (span % 4 == 0 || span % 12 == 0))
+                    {
+                        take = (int)Math.Min(span, ListBytes);
+                    }
+                }
+            }
+
+            into.Add(new FollowTarget(at + (ulong)i, begin, take));
+        }
     }
 
     /// <summary>
@@ -343,6 +432,15 @@ public sealed class QuestFlagHunt
             }
         }
 
+        swept.AddRange(FollowEverything(
+            swept,
+            hashes,
+            facts?.RowsBegin ?? 0,
+            facts?.Rows ?? 0,
+            (int)(facts?.RowSize ?? 0),
+            out int followed,
+            out long followedBytes));
+
         return new QuestFlagHuntResult(
             table,
             facts?.Path ?? string.Empty,
@@ -351,7 +449,69 @@ public sealed class QuestFlagHunt
             table == 0
                 ? "no NPC in this area carried a QuestFlags reference - the regions were still read, "
                     + "so a --record session can be swept offline once the table is known"
-                : string.Empty);
+                : string.Empty,
+            followed,
+            followedBytes);
+    }
+
+    /// <summary>
+    /// Reads everything the first pass pointed at, and sweeps that too.
+    /// </summary>
+    /// <remarks>
+    /// One level deep, deliberately. Following what THESE turn up would walk the heap, and the
+    /// point is not to search all of memory - it is to look inside the containers a character's
+    /// state object holds, which is one hop by construction.
+    ///
+    /// Targets are deduplicated by where they POINT, not by where the pointer was: the same
+    /// list is reachable from several fields, and reading it once per field would spend the
+    /// budget on one allocation. The field is still what gets named in the report, because a
+    /// hit is only useful as an offset somebody can write into the schema.
+    /// </remarks>
+    private List<SweptRegion> FollowEverything(
+        IReadOnlyList<SweptRegion> from,
+        IReadOnlyDictionary<uint, int> hashes,
+        ulong rowsBegin,
+        long rows,
+        int rowSize,
+        out int followed,
+        out long followedBytes)
+    {
+        var withFlags = new List<SweptRegion>();
+        var visited = new HashSet<ulong>();
+        long spent = 0;
+
+        foreach (SweptRegion region in from)
+        {
+            foreach (FollowTarget target in region.Targets)
+            {
+                if (spent >= FollowBudget || !visited.Add(target.Begin))
+                {
+                    continue;
+                }
+
+                spent += target.Bytes;
+                SweptRegion swept = Sweep(
+                    $"{region.Name}+0x{target.At - region.Address:X}",
+                    target.Begin,
+                    target.Bytes,
+                    hashes,
+                    rowsBegin,
+                    rows,
+                    rowSize,
+                    collectTargets: false);
+
+                // Kept only when it says something. Nine hundred empty lists in a report is
+                // the same as no report.
+                if (swept.Sightings.Count > 0)
+                {
+                    withFlags.Add(swept);
+                }
+            }
+        }
+
+        followed = visited.Count;
+        followedBytes = spent;
+        return withFlags;
     }
 
     /// <summary>Prints the hunt for a person.</summary>
@@ -370,6 +530,13 @@ public sealed class QuestFlagHunt
         if (result.Note.Length > 0)
         {
             output.WriteLine($"  note     {result.Note}");
+        }
+
+        if (result.Followed > 0)
+        {
+            output.WriteLine(
+                $"  followed {result.Followed} pointers out of those regions, "
+                + $"{result.FollowedBytes / 1024} KB - only the ones holding flags are listed");
         }
 
         foreach (SweptRegion region in result.Regions)
