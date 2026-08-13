@@ -280,7 +280,9 @@ public sealed class QuestFlagHunt
 
             if (collectTargets)
             {
-                CollectTargets(buffer, want, address + (ulong)taken, targets);
+                // Whether the chunk after this one is still inside the region, which decides
+                // what happens to a pointer sitting in its last eight bytes - see below.
+                CollectTargets(buffer, want, address + (ulong)taken, targets, taken + want < bytes);
             }
         }
 
@@ -306,7 +308,7 @@ public sealed class QuestFlagHunt
     ///     of one - and even where the shape is neither, a kilobyte of every target lands in
     ///     the recording, which is what makes the NEXT round of this happen offline.
     /// </remarks>
-    private void CollectTargets(byte[] chunk, int length, ulong at, List<FollowTarget> into)
+    private void CollectTargets(byte[] chunk, int length, ulong at, List<FollowTarget> into, bool lookAhead)
     {
         for (int i = 0; i + sizeof(ulong) <= length; i += sizeof(ulong))
         {
@@ -325,10 +327,20 @@ public sealed class QuestFlagHunt
                 continue;
             }
 
+            // The second half of a pair can be in the NEXT chunk, and a list whose begin
+            // lands in the last eight bytes of this one would then read as a lone pointer -
+            // 1 KB instead of its own span, which is how a list gets missed at a seam. One
+            // extra read per chunk boundary removes the seam; at the END of the region there
+            // is nothing to look ahead into, and reading past it would make the result depend
+            // on whatever the allocator put there.
             int take = LonePointerBytes;
-            if (i + (2 * sizeof(ulong)) <= length)
+            bool paired = i + (2 * sizeof(ulong)) <= length;
+            if (paired || lookAhead)
             {
-                ulong end = BitConverter.ToUInt64(chunk, i + sizeof(ulong));
+                ulong end = paired
+                    ? BitConverter.ToUInt64(chunk, i + sizeof(ulong))
+                    : _reader.TryRead(at + (ulong)i + sizeof(ulong), out ulong next) ? next : 0;
+
                 if (end > begin && MemoryReaderExtensions.IsPlausiblePointer(end))
                 {
                     ulong span = end - begin;
