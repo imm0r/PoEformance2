@@ -174,7 +174,7 @@ public static class PointerPeek
         // is a vtable, so nothing above matched it and nothing below would have: it used to
         // read as an anonymous structure, which is exactly how the QuestFlags table sat
         // unrecognised in a dissector window for as long as anyone looked at it.
-        if (tables is { } shape && Describe(reader, address, shape) is { } self)
+        if (tables is { } shape && DescribeTable(reader, address, shape) is { } self)
         {
             return new PeekResult(TargetKind.DatTable, Summarise(self), address);
         }
@@ -188,7 +188,7 @@ public static class PointerPeek
             // The table half of a foreign reference, if the caller handed us the bytes it
             // sits in. WHICH table a row belongs to cannot be answered from the row.
             DatTableFacts? owner = tables is { } ownerShape && following != 0
-                ? Describe(reader, following, ownerShape)
+                ? DescribeTable(reader, following, ownerShape)
                 : null;
 
             long index = owner?.IndexOf(address) ?? -1;
@@ -285,8 +285,9 @@ public static class PointerPeek
     /// followed it, or a table caught mid-load, still gets recognised and counted rather than
     /// falling back to "another structure".
     /// </remarks>
-    private static DatTableFacts? Describe(IMemoryReader reader, ulong address, DatTableShape shape)
+    public static DatTableFacts? DescribeTable(IMemoryReader reader, ulong address, DatTableShape shape)
     {
+        ArgumentNullException.ThrowIfNull(reader);
         if (!MemoryReaderExtensions.IsPlausiblePointer(address))
         {
             return null;
