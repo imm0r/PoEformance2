@@ -428,6 +428,23 @@ public sealed class QuestFlagHunt
             ("PlayerEntity", chain.PlayerEntity, 8 * 1024),
         };
 
+        // EVERY game state, not just the one being played. A blind spot worth closing before
+        // the search widens any further: the tool has only ever looked at InGameState, and a
+        // character's quest flags are exactly the kind of thing that would live on a state
+        // that OUTLASTS the area - the login or character-select object, which is still in
+        // that array while you play. Cheap, since the array is thirteen pointers.
+        StructDef gs = _schema.Structs["GameState"];
+        ulong states = _reader.ReadPointer(
+            _reader.ReadPointer(gameStatesStatic) + (ulong)gs.OffsetOf("States"));
+        for (int i = 0; states != 0 && i < gs.Constants["TotalStates"]; i++)
+        {
+            ulong state = _reader.ReadPointer(states + (ulong)(i * gs.Constants["StateEntrySize"]));
+            if (state != 0 && state != chain.InGameState)
+            {
+                regions.Add(($"GameState[{i}]", state, 16 * 1024));
+            }
+        }
+
         var swept = new List<SweptRegion>();
         foreach ((string name, ulong address, int bytes) in regions)
         {
@@ -553,9 +570,16 @@ public sealed class QuestFlagHunt
 
         if (result.Followed > 0)
         {
+            // Whether the budget ran out MATTERS, and saying nothing about it is how a partial
+            // sweep gets read as an exhaustive one. 13 MB of a real session came back empty and
+            // the honest description of that is "empty as far as it got".
+            string spent = result.FollowedBytes >= FollowBudget
+                ? " - THE BUDGET RAN OUT, so this is as far as the sweep got"
+                : " - only the ones holding flags are listed";
+
             output.WriteLine(
                 $"  followed {result.Followed} pointers out of those regions, "
-                + $"{result.FollowedBytes / 1024} KB - only the ones holding flags are listed");
+                + $"{result.FollowedBytes / 1024} KB{spent}");
         }
 
         foreach (SweptRegion region in result.Regions)
