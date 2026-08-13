@@ -39,12 +39,19 @@ public class MatrixHuntTests
     /// with {3,7,11,15}. This one centres the player and divides by a plausible camera
     /// distance, so the scene spreads out.
     /// </summary>
-    private static float[] HealthyMatrix(float playerX, float playerY, float w)
+    /// <remarks>
+    /// The z term is not decoration. Height must move a point on screen or the hunt refuses
+    /// the matrix outright, and a synthetic one without it would be testing a shape the real
+    /// thing cannot have. It cancels at the player - the constant carries -playerY + playerZ -
+    /// so the crowd, all standing on the same ground, projects exactly as it did before.
+    /// </remarks>
+    private static float[] HealthyMatrix(float playerX, float playerY, float playerZ, float w)
     {
         var m = new float[16];
-        m[0] = 1; m[12] = -playerX;   // clip.x = x - playerX
-        m[5] = 1; m[13] = -playerY;   // clip.y = y - playerY
-        m[15] = w;                    // clip.w = constant camera distance
+        m[0] = 1; m[12] = -playerX;              // clip.x = x - playerX
+        m[5] = 1; m[9] = -1;                     // clip.y = y - z ...
+        m[13] = playerZ - playerY;               // ... - playerY + playerZ
+        m[15] = w;                               // clip.w = constant camera distance
         return m;
     }
 
@@ -64,7 +71,7 @@ public class MatrixHuntTests
     [Fact]
     public void Hunt_FindsAMatrixThatCentresThePlayerAndSpreadsTheScene()
     {
-        FakeMemoryReader fake = PlaceMatrix(HealthyMatrix(1000, 2000, 1000));
+        FakeMemoryReader fake = PlaceMatrix(HealthyMatrix(1000, 2000, -80, 1000));
 
         List<ProjectionCandidate> found = MatrixHunt.Find(fake, WorldData, Scene());
 
@@ -74,6 +81,7 @@ public class MatrixHuntTests
         Assert.False(best.Transposed);
         Assert.True(best.PlayerOffCentre < 0.001, $"player off-centre {best.PlayerOffCentre}");
         Assert.True(best.Spread > 0.5, $"spread {best.Spread}");
+        Assert.True(best.DepthResponse > 0.01, $"depth response {best.DepthResponse}");
     }
 
     [Fact]
@@ -82,7 +90,7 @@ public class MatrixHuntTests
         // THE REGRESSION. w is inflated a thousandfold, so every entity - the player
         // included - divides down onto the same point. The old single-point check called
         // this "MATRIX PROVEN"; the hunt must refuse it.
-        float[] collapsed = HealthyMatrix(1000, 2000, 10_000_000f);
+        float[] collapsed = HealthyMatrix(1000, 2000, -80, 10_000_000f);
         FakeMemoryReader fake = PlaceMatrix(collapsed);
 
         // The player really does land dead centre - that is precisely the trap.
@@ -124,6 +132,14 @@ public class MatrixHuntTests
 
         // The duplicate right after it, and a clear margin over everything else.
         Assert.Contains(found, c => c.Offset == 0x1E0 && Math.Abs(c.Linearity - best.Linearity) < 0.001);
+
+        // AND IT MUST BE 0x1A0 RATHER THAN ITS TWIN EVERY TIME. The two score identically -
+        // the same sixteen floats 0x40 apart - and List.Sort is not stable, so before the
+        // offset tie-break which of them the report named was decided by the sort's internals.
+        // An answer that changes between runs over the same memory is the failure this pins.
+        Assert.True(
+            found.FindIndex(c => c.Offset == 0x1A0) < found.FindIndex(c => c.Offset == 0x1E0),
+            "the tie between the matrix and its duplicate did not resolve to the lower offset");
         Assert.True(best.Linearity > 0.9, $"linearity {best.Linearity:F4}");
         Assert.True(
             found.Where(c => c.Offset is not (0x1A0 or 0x1E0)).All(c => c.Linearity < best.Linearity - 0.15),
@@ -134,22 +150,52 @@ public class MatrixHuntTests
     }
 
     [Fact]
-    public void RealScene_TheFlatTransformAt0x150_IgnoresHeight()
+    public void RealScene_TheFlatTransformAt0x150_IsRefusedBecauseItIgnoresHeight()
     {
         // 0x150 spreads the scene WIDER than the real matrix and centres the player better,
         // so a spread-led ranking preferred it - this is why the scoring changed. It is not
         // a world-to-screen matrix at all: moving a point vertically does not shift it by a
         // single pixel, which is the signature of a flat 2D transform.
+        //
+        // It used to be RANKED and beaten. Now it is not admitted at all, because a live run
+        // showed that ranking is not enough: a candidate with no depth response won on
+        // centring alone against a matrix the same run had just proven. Both halves are
+        // asserted here - that the hunt no longer offers it, and the measurement that
+        // disqualifies it, taken directly so the evidence does not depend on the hunt.
         var replay = ReplayMemoryReader.Load(File.OpenRead(RealSessionTests.SceneFixturePath));
         OffsetSchema schema = RealSessionTests.Schema();
         var chain = PoEformance.Core.Diagnostics.GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
         WorldSnapshot snapshot = new WorldReader(replay, schema).Read(replay.ResolvedStatics["GameStates"]);
 
-        ProjectionCandidate flat = Assert.Single(
+        Assert.DoesNotContain(
             MatrixHunt.Find(replay, chain.WorldData, snapshot), c => c.Offset == 0x150 && !c.Transposed);
 
-        Assert.True(flat.Spread > 4.0, $"spread {flat.Spread:F3}");     // it really does spread
-        Assert.Equal(0, flat.DepthResponse, 4);                          // but height does nothing
+        float[] flat = PoEformance.Core.Diagnostics.MatrixScan.ReadMatrix(replay, chain.WorldData, 0x150)!;
+        WorldEntity player = snapshot.Player!;
+
+        (double px, double py, double pw) = MatrixHunt.Clip(flat, transposed: false, player.WorldX, player.WorldY, player.WorldZ);
+        (double hx, double hy, double hw) = MatrixHunt.Clip(flat, transposed: false, player.WorldX, player.WorldY, player.WorldZ + 100f);
+
+        Assert.Equal(px / pw, hx / hw, 6);   // a whole character's height...
+        Assert.Equal(py / pw, hy / hw, 6);   // ...and not one pixel of movement
+
+        // And it really does spread, which is what made it dangerous to a spread-led ranking.
+        // BOTH axes, because that is what the hunt measures: its spread is the wider of the
+        // two, and this transform's x extent alone comes to 3.8 while its y extent is what
+        // carries it past 4.
+        double minX = double.MaxValue, maxX = double.MinValue;
+        double minY = double.MaxValue, maxY = double.MinValue;
+        foreach (WorldEntity entity in snapshot.Entities)
+        {
+            (double x, double y, double w) = MatrixHunt.Clip(flat, transposed: false, entity.WorldX, entity.WorldY, entity.WorldZ);
+            minX = Math.Min(minX, x / w);
+            maxX = Math.Max(maxX, x / w);
+            minY = Math.Min(minY, y / w);
+            maxY = Math.Max(maxY, y / w);
+        }
+
+        double spread = Math.Max(maxX - minX, maxY - minY);
+        Assert.True(spread > 4.0, $"NDC spread {spread:F3}");
     }
 
     [Fact]

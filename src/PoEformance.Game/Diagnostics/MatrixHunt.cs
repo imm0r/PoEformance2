@@ -57,12 +57,15 @@ public sealed record ProjectionCandidate(
 /// divided by it collapses to ~0, so everything - including the player - lands dead centre.
 ///
 /// So the decisive test is not one point, it is the SCENE. With the camera following the
-/// player, a correct matrix must do two things at once:
-///   1. put the player at the centre, and
-///   2. spread the other entities out in proportion to their world distance.
+/// player, a correct matrix must do three things at once:
+///   1. put the player at the centre,
+///   2. spread the other entities out in proportion to their world distance, and
+///   3. move a point on screen when its world HEIGHT changes.
 /// A collapsed matrix passes (1) and fails (2). A shifted or transposed read usually passes
-/// (2) and fails (1). Only the real matrix does both, which makes this test decisive where
-/// the single-point check was not.
+/// (2) and fails (1). A flat 2D transform can pass both and still fail (3) - and (3) is the
+/// one the tool actually needs, since a marker over an entity's head is placed by projecting
+/// its height. All three are hard admission tests; only the ranking among survivors is a
+/// score, and it is led by linearity.
 /// </remarks>
 public static class MatrixHunt
 {
@@ -75,6 +78,29 @@ public static class MatrixHunt
 
     /// <summary>The scene must occupy at least this much NDC, or the matrix collapsed it.</summary>
     private const double MinSpread = 0.05;
+
+    /// <summary>
+    /// Raising a point by a character's height must move it on screen by at least this much.
+    /// </summary>
+    /// <remarks>
+    /// THIS WAS COMPUTED AND PRINTED FOR MONTHS WITHOUT BEING USED, and a live run showed what
+    /// that cost. The hunt reported "BEST: W2SMatrix = 0x2A8" against a schema offset the same
+    /// run had just proven, and the winner's depth response was 0.000 - it ignores world z
+    /// entirely. It won on off-centre alone: 0.0044 against the real matrix's 0.1773, worth
+    /// 0.0432 of score, while linearity actually favoured the real one by 0.0174. That perfect
+    /// centring is the documented failure mode rather than a merit, and its cause is visible
+    /// in the same row: w of 480,696 against the real 2,114, which divides every numerator
+    /// down to nothing. Spread agrees - 0.826 against 1.778 - so three columns called it and
+    /// the ranking still did not.
+    ///
+    /// Depth is the right test to promote because it is the one the tool's purpose depends on.
+    /// A marker over an entity's head is placed by projecting Z - ModelBounds.Z, so a matrix
+    /// that does not respond to height cannot do the job it is being chosen for, however
+    /// neatly it centres the player. The separation is not marginal either: every rejected
+    /// candidate in that run scored exactly 0.000 while the real matrix scored 0.119, so this
+    /// threshold sits an order of magnitude below the true value and two above the decoys.
+    /// </remarks>
+    private const double MinDepthResponse = 0.01;
 
     /// <summary>
     /// Scans <paramref name="worldData"/> + [<paramref name="start"/>..<paramref name="end"/>)
@@ -121,7 +147,16 @@ public static class MatrixHunt
             }
         }
 
-        results.Sort((a, b) => b.Score.CompareTo(a.Score));
+        // Ties broken by offset, so the answer does not depend on the sort's internals. The
+        // scene puts two IDENTICAL matrices 0x40 apart - 0x1A0 and 0x1E0, the same sixteen
+        // floats twice - and List.Sort is not stable, so which one the report named as best
+        // was a coin flip between runs. Reporting a different offset each time from the same
+        // memory is worse than reporting an arbitrary one of two equals.
+        results.Sort((a, b) =>
+        {
+            int byScore = b.Score.CompareTo(a.Score);
+            return byScore != 0 ? byScore : a.Offset.CompareTo(b.Offset);
+        });
         return results;
     }
 
@@ -187,6 +222,11 @@ public static class MatrixHunt
         double depthResponse = hw > MinW
             ? Math.Abs((hx / hw) - playerX) + Math.Abs((hy / hw) - playerY)
             : 0;
+
+        if (depthResponse < MinDepthResponse)
+        {
+            return null;
+        }
 
         double linearity = projected >= 8
             ? Math.Min(FitQuality(worldX, worldY, screenX), FitQuality(worldX, worldY, screenY))
