@@ -180,15 +180,22 @@ public class MatrixHuntTests
         Assert.Equal(py / pw, hy / hw, 6);   // ...and not one pixel of movement
 
         // And it really does spread, which is what made it dangerous to a spread-led ranking.
+        // BOTH axes, because that is what the hunt measures: its spread is the wider of the
+        // two, and this transform's x extent alone comes to 3.8 while its y extent is what
+        // carries it past 4.
         double minX = double.MaxValue, maxX = double.MinValue;
+        double minY = double.MaxValue, maxY = double.MinValue;
         foreach (WorldEntity entity in snapshot.Entities)
         {
-            (double x, _, double w) = MatrixHunt.Clip(flat, transposed: false, entity.WorldX, entity.WorldY, entity.WorldZ);
+            (double x, double y, double w) = MatrixHunt.Clip(flat, transposed: false, entity.WorldX, entity.WorldY, entity.WorldZ);
             minX = Math.Min(minX, x / w);
             maxX = Math.Max(maxX, x / w);
+            minY = Math.Min(minY, y / w);
+            maxY = Math.Max(maxY, y / w);
         }
 
-        Assert.True(maxX - minX > 4.0, $"NDC width {maxX - minX:F3}");
+        double spread = Math.Max(maxX - minX, maxY - minY);
+        Assert.True(spread > 4.0, $"NDC spread {spread:F3}");
     }
 
     [Fact]
