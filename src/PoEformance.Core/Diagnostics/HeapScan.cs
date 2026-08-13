@@ -11,12 +11,18 @@ namespace PoEformance.Core.Diagnostics;
 public readonly record struct RowSighting(ulong At, int Row, bool ByPointer);
 
 /// <summary>What a whole-process scan cost and what it turned up.</summary>
+/// <param name="Reach">
+/// How far from the anchor the scan actually got, in bytes. Only meaningful next to
+/// <c>Truncated</c>, where it is the difference between "nothing is out there" and "the budget
+/// ran out two terabytes short of the interesting part".
+/// </param>
 public sealed record HeapScanResult(
     long RegionsWalked,
     long BytesScanned,
     long RegionsSkipped,
     IReadOnlyList<RowSighting> Sightings,
-    bool Truncated);
+    bool Truncated,
+    ulong Reach = 0);
 
 /// <summary>
 /// Searches the ENTIRE address space for references to a table's rows, instead of following
@@ -85,6 +91,27 @@ public static class HeapScan
     /// <param name="rowSize">How many bytes one row takes.</param>
     /// <param name="keys">Row key (HASH32) to row index, from the table itself.</param>
     /// <param name="mostSightings">Stop collecting past this, so a pathological hit rate cannot exhaust memory.</param>
+    /// <param name="anchor">
+    /// Address to scan outward from, nearest region first. Zero keeps the enumeration order.
+    /// </param>
+    /// <remarks>
+    /// THE ANCHOR IS WHAT MAKES THE BUDGET MEAN ANYTHING, and a live run is what showed it.
+    /// Scanning in address order, the first 8 GB of the budget went entirely on mappings
+    /// between 0x1E0_8030_0000 and 0x2166_3100_0000 - driver and reservation territory - and
+    /// the walk stopped two terabytes of address space BELOW the game's own data heap. It
+    /// reported 1790 references and not one of them was a pointer: every single one was a
+    /// 32-bit hash coincidence, at a rate (1790 against ~2900 expected by chance over that many
+    /// four-byte positions) that says noise and nothing else. Meanwhile the structural pass in
+    /// the same run was reading real row pointers at 0x41EB_2A11_F5E, which the scan never
+    /// reached. A budget spent on the wrong end of a 128 TB address space buys nothing.
+    ///
+    /// Anchoring on the table's own rows fixes it, and not by luck: whatever holds a reference
+    /// to a row is something the game allocated, and this game's allocator keeps its data
+    /// together - the table, the marker list, the state objects and the pool arena that
+    /// recycles blocks all sit within a few gigabytes of each other. Nearest-first also makes
+    /// truncation honest, because what gets cut is then the far and unlikely rather than
+    /// whatever happened to sort last.
+    /// </remarks>
     public static HeapScanResult Run(
         IMemoryReader reader,
         IMemoryRegions regions,
@@ -93,7 +120,8 @@ public static class HeapScan
         int rowSize,
         IReadOnlyDictionary<uint, int> keys,
         IReadOnlyList<MemoryRegion>? exclude = null,
-        int mostSightings = 4096)
+        int mostSightings = 4096,
+        ulong anchor = 0)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(regions);
@@ -102,12 +130,17 @@ public static class HeapScan
         var sightings = new List<RowSighting>();
         long walked = 0, scanned = 0, skipped = 0;
         bool truncated = false;
+        ulong reach = 0;
         ulong rowsEnd = rowsBegin + (ulong)(rows * rowSize);
+
+        IEnumerable<MemoryRegion> order = anchor == 0
+            ? regions.Regions()
+            : [.. regions.Regions().OrderBy(r => Distance(r, anchor))];
 
         byte[] buffer = ArrayPool<byte>.Shared.Rent(ChunkBytes);
         try
         {
-            foreach (MemoryRegion region in regions.Regions())
+            foreach (MemoryRegion region in order)
             {
                 // The TABLE'S OWN STORAGE is not a finding. Its rows point at their own Id
                 // strings, and both of its indices hold one entry per row - so scanning them
@@ -126,6 +159,7 @@ public static class HeapScan
                 }
 
                 walked++;
+                reach = Math.Max(reach, Distance(region, anchor));
                 for (ulong taken = 0; taken < region.Size; taken += ChunkBytes)
                 {
                     int want = (int)Math.Min((ulong)ChunkBytes, region.Size - taken);
@@ -159,7 +193,30 @@ public static class HeapScan
             ArrayPool<byte>.Shared.Return(buffer);
         }
 
-        return new HeapScanResult(walked, scanned, skipped, sightings, truncated);
+        return new HeapScanResult(walked, scanned, skipped, sightings, truncated, reach);
+    }
+
+    /// <summary>
+    /// How far a region sits from the anchor - zero when it contains it.
+    /// </summary>
+    /// <remarks>
+    /// Measured to the NEAR EDGE rather than to the start, so a large region beginning below
+    /// the anchor and ending above it is not pushed to the back of the queue by its own size.
+    /// </remarks>
+    private static ulong Distance(MemoryRegion region, ulong anchor)
+    {
+        if (anchor == 0)
+        {
+            return 0;
+        }
+
+        ulong end = region.Address + region.Size;
+        if (anchor >= region.Address && anchor < end)
+        {
+            return 0;
+        }
+
+        return anchor < region.Address ? region.Address - anchor : anchor - end;
     }
 
     /// <summary>True when a region touches any of the ranges the caller wants left alone.</summary>
