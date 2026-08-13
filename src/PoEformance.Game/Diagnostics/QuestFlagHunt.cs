@@ -129,6 +129,12 @@ public sealed class QuestFlagHunt
     private readonly OffsetSchema _schema;
     private readonly DatTableShape? _tables;
 
+    /// <summary>
+    /// What the whole-address-space scan cost, when one was asked for.
+    /// </summary>
+    /// <remarks>Not named HeapScan: that is the class this calls, and the property would hide it.</remarks>
+    public HeapScanResult? LastHeapScan { get; private set; }
+
     public QuestFlagHunt(IMemoryReader reader, OffsetSchema schema)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -413,6 +419,41 @@ public sealed class QuestFlagHunt
         return want < sizeof(uint) ? 0 : want;
     }
 
+    /// <summary>
+    /// The table's own three arrays, so a whole-address-space scan can leave them alone.
+    /// </summary>
+    /// <remarks>
+    /// Every one of them is full of references to the table BY CONSTRUCTION - the rows point
+    /// at their Id strings, the by-Id index holds one entry per row and the by-HASH32 index
+    /// another. Scanning them reports 11,434 sightings that say nothing, and would exhaust the
+    /// cap before the scan reached memory that might have something to say.
+    /// </remarks>
+    private IReadOnlyList<MemoryRegion> TableStorage(ulong table, DatTableFacts facts)
+    {
+        var ranges = new List<MemoryRegion>
+        {
+            new(facts.RowsBegin, (ulong)(facts.Rows * facts.RowSize)),
+        };
+
+        if (_tables is not { } shape)
+        {
+            return ranges;
+        }
+
+        ulong store = _reader.ReadPointer(table + (ulong)shape.RowStoreOffset);
+        foreach (int at in (int[])[shape.ByIdIndexOffset, shape.ByIdIndexOffset + 0x38])
+        {
+            ulong begin = _reader.ReadPointer(store + (ulong)at);
+            ulong end = _reader.ReadPointer(store + (ulong)at + sizeof(ulong));
+            if (begin != 0 && end > begin)
+            {
+                ranges.Add(new MemoryRegion(begin, end - begin));
+            }
+        }
+
+        return ranges;
+    }
+
     /// <summary>Reads one row's Id, which only matters for the rows that matched.</summary>
     private string IdOf(ulong rowsBegin, int rowSize, int row)
     {
@@ -432,7 +473,7 @@ public sealed class QuestFlagHunt
     /// Neither reference decodes anything of it beyond inventories, so there is nothing to
     /// copy and this is new ground.
     /// </remarks>
-    public QuestFlagHuntResult Run(ulong gameStatesStatic, int serverDataBytes = 1024 * 1024)
+    public QuestFlagHuntResult Run(ulong gameStatesStatic, int serverDataBytes = 1024 * 1024, bool scanHeap = false)
     {
         if (_tables is null)
         {
@@ -549,6 +590,32 @@ public sealed class QuestFlagHunt
         int followed = visited.Count;
         long followedBytes = spent;
 
+        // THE WHOLE ADDRESS SPACE, when asked. Everything above walks pointers from a root and
+        // can only find what hangs off one; this does not, which is the one thing six sessions
+        // of pointer-walking could never rule out. Left opt-in because it reads gigabytes.
+        if (scanHeap && facts is { } known && _reader is IMemoryRegions space)
+        {
+            HeapScanResult scan = HeapScan.Run(
+                _reader,
+                space,
+                known.RowsBegin,
+                known.Rows,
+                (int)known.RowSize,
+                hashes,
+                TableStorage(table, known));
+
+            LastHeapScan = scan;
+            foreach (IGrouping<ulong, RowSighting> group in scan.Sightings.GroupBy(s => s.At >> 20))
+            {
+                List<FlagSighting> found = [.. group
+                    .DistinctBy(g => g.Row)
+                    .Select(g => new FlagSighting(
+                        g.Row, IdOf(known.RowsBegin, (int)known.RowSize, g.Row), g.At, g.ByPointer))];
+
+                swept.Add(new SweptRegion($"heap 0x{group.Key << 20:X}", group.Key << 20, 0, 0, found, []));
+            }
+        }
+
         return new QuestFlagHuntResult(
             table,
             facts?.Path ?? string.Empty,
@@ -649,6 +716,14 @@ public sealed class QuestFlagHunt
         if (result.Note.Length > 0)
         {
             output.WriteLine($"  note     {result.Note}");
+        }
+
+        if (LastHeapScan is { } scan)
+        {
+            output.WriteLine(
+                $"  heap scan {scan.RegionsWalked} regions, {scan.BytesScanned / 1024 / 1024} MB, "
+                + $"{scan.Sightings.Count} references"
+                + (scan.Truncated ? " - STOPPED EARLY, so this is not the whole address space" : " - the whole address space"));
         }
 
         if (result.Followed > 0)
