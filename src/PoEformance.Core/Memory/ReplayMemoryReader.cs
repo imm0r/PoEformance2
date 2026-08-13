@@ -16,7 +16,7 @@ namespace PoEformance.Core.Memory;
 /// on the live reader. That symmetry is intentional: code that works against a replay
 /// works against the game.
 /// </remarks>
-public sealed class ReplayMemoryReader : IMemoryReader
+public sealed class ReplayMemoryReader : IMemoryReader, IMemoryRegions
 {
     /// <summary>One recorded read: which frame it happened in and the captured bytes.</summary>
     private readonly record struct Block(uint Frame, ulong Address, byte[] Bytes);
@@ -381,6 +381,34 @@ public sealed class ReplayMemoryReader : IMemoryReader
         }
 
         return remaining == 0;
+    }
+
+    /// <summary>
+    /// What the recording actually holds, as regions.
+    /// </summary>
+    /// <remarks>
+    /// This is what makes a heap-wide scanner testable without the game: a replay answers the
+    /// same question a live process does, only about a far smaller address space. Blocks that
+    /// touch are merged, because a recording of one object arrives as dozens of overlapping
+    /// reads and a scanner would otherwise walk the same bytes dozens of times.
+    /// </remarks>
+    public IEnumerable<MemoryRegion> Regions()
+    {
+        List<(ulong Start, ulong End)> spans = [.. _blocks
+            .Select(b => (Start: b.Address, End: b.Address + (ulong)b.Bytes.Length))
+            .OrderBy(s => s.Start)];
+
+        int at = 0;
+        while (at < spans.Count)
+        {
+            (ulong start, ulong end) = spans[at++];
+            while (at < spans.Count && spans[at].Start <= end)
+            {
+                end = Math.Max(end, spans[at++].End);
+            }
+
+            yield return new MemoryRegion(start, end - start);
+        }
     }
 
     public void Dispose()

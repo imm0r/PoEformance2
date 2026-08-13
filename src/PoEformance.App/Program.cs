@@ -160,7 +160,7 @@ internal static class Program
             if (options.HuntQuestFlags)
             {
                 var hunt = new PoEformance.Game.Diagnostics.QuestFlagHunt(reader, worldSchema);
-                hunt.Report(hunt.Run(gameStatesAddress), Console.Out);
+                hunt.Report(hunt.Run(gameStatesAddress, scanHeap: options.ScanHeap), Console.Out);
                 recorder?.MarkFrame();
             }
         }
@@ -1248,14 +1248,15 @@ internal static class Program
         bool ProbeKeys,
         bool Debug,
         bool ShowUiBrowser,
-        bool HuntQuestFlags)
+        bool HuntQuestFlags,
+        bool ScanHeap)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
-            bool uiBrowser = false, questFlags = false;
+            bool uiBrowser = false, questFlags = false, scanHeap = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -1297,6 +1298,10 @@ internal static class Program
                     case "--questflags":
                         questFlags = true;
                         break;
+                    case "--heapscan":
+                        questFlags = true;
+                        scanHeap = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
@@ -1305,7 +1310,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags);
+                debug, uiBrowser, questFlags, scanHeap);
         }
     }
 }

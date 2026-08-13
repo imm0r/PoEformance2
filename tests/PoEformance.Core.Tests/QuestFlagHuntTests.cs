@@ -367,4 +367,49 @@ public class QuestFlagHuntTests
         Assert.Equal(0, hashes[0x5085C604]);
         Assert.DoesNotContain(0u, hashes.Keys);
     }
+
+    [Fact]
+    public void HeapScan_FindsWhatPointerWalkingWouldHaveToReachFor()
+    {
+        // The whole address space instead of a pointer walk - here, the address space of a
+        // recording, which is what makes the thing testable at all. Two sightings, and both
+        // are the point: the row store's own begin pointer, and the area marker's condition,
+        // which a pointer walk only reached after six sessions and 130 MB.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(MarkerFixturePath));
+        OffsetSchema schema = RealSessionTests.Schema();
+        StructDef store = schema.Structs["DatRowStore"];
+        DatTableShape shape = DatTableShape.From(schema)!.Value;
+
+        ulong table = 0x41ED8080990UL;
+        DatTableFacts facts = PointerPeek.DescribeTable(replay, table, shape)!;
+        var keys = new QuestFlagHunt(replay, schema).HashesIn(table);
+
+        // The table's own storage, which is nothing but references to itself.
+        ulong rowStore = replay.ReadPointer(table + (ulong)shape.RowStoreOffset);
+        var exclude = new List<MemoryRegion>
+        {
+            new(facts.RowsBegin, (ulong)(facts.Rows * facts.RowSize)),
+        };
+
+        foreach (int at in (int[])[store.OffsetOf("ByIdIndex"), store.OffsetOf("ByHashIndex")])
+        {
+            ulong begin = replay.ReadPointer(rowStore + (ulong)at);
+            ulong end = replay.ReadPointer(rowStore + (ulong)at + 8);
+            if (begin != 0 && end > begin)
+            {
+                exclude.Add(new MemoryRegion(begin, end - begin));
+            }
+        }
+
+        HeapScanResult scan = HeapScan.Run(
+            replay, replay, facts.RowsBegin, facts.Rows, (int)facts.RowSize, keys, exclude);
+
+        Assert.False(scan.Truncated);
+        Assert.Equal(2, scan.Sightings.Count);
+        Assert.Contains(scan.Sightings, s => s.Row == 851 && s.At == 0x41F31D2F380UL && s.ByPointer);
+
+        // And it left the table alone rather than drowning in its own indices.
+        Assert.Equal(2, scan.RegionsSkipped);
+        Assert.DoesNotContain(scan.Sightings, s => s.At >= facts.RowsBegin && s.At < facts.RowsBegin + (ulong)(facts.Rows * facts.RowSize));
+    }
 }

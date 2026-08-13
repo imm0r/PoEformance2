@@ -1,0 +1,204 @@
+using System.Buffers;
+using System.Buffers.Binary;
+using PoEformance.Core.Memory;
+
+namespace PoEformance.Core.Diagnostics;
+
+/// <summary>Somewhere in the target that refers to a row of a table.</summary>
+/// <param name="At">Where the reference sits.</param>
+/// <param name="Row">Which row it names.</param>
+/// <param name="ByPointer">True for a pointer at the row, false for the row's 32-bit key.</param>
+public readonly record struct RowSighting(ulong At, int Row, bool ByPointer);
+
+/// <summary>What a whole-process scan cost and what it turned up.</summary>
+public sealed record HeapScanResult(
+    long RegionsWalked,
+    long BytesScanned,
+    long RegionsSkipped,
+    IReadOnlyList<RowSighting> Sightings,
+    bool Truncated);
+
+/// <summary>
+/// Searches the ENTIRE address space for references to a table's rows, instead of following
+/// pointers from a root.
+/// </summary>
+/// <remarks>
+/// WHY THIS EXISTS, and it is a confession as much as a feature. Every search this project has
+/// made walks pointers from a static: statics to states, states to objects, objects to lists.
+/// That can only ever find what is reachable from the roots it knows, and six sessions of
+/// hunting a character's quest flags that way swept about 130 MB and found nothing but rules.
+/// The explanation that survives all of it is an object hanging off none of those roots - and
+/// no amount of following pointers can rule that in or out. This can.
+///
+/// TWO NEEDLES, both cheap per byte. A pointer that lands EXACTLY on the row grid of a table
+/// is how the game's own data refers to a row, and a 32-bit key from the table's own index is
+/// how a compact runtime structure would. Both are checked at every four-byte offset rather
+/// than at their natural alignment, because this game's packed dat rows sit on odd addresses
+/// and an aligned-only scan would miss every reference inside one.
+///
+/// NOT RECORDED, ON PURPOSE. The scan reads in megabyte chunks, which is above the recorder's
+/// cap, so a --record session does not swell by the size of the game's heap. The bytes that
+/// matter are the HITS, and a caller that wants those in the recording should read their
+/// neighbourhoods afterwards in ordinary small reads.
+/// </remarks>
+public static class HeapScan
+{
+    /// <summary>Read size. Above the recorder's cap, so a scan does not land in a recording.</summary>
+    public const int ChunkBytes = 1024 * 1024;
+
+    /// <summary>
+    /// Ceiling on one scan, so a walk that goes wrong stops rather than reading forever.
+    /// </summary>
+    /// <remarks>
+    /// A game with everything loaded commits a few gigabytes; eight is room to spare without
+    /// being unbounded. Reported as <c>Truncated</c> when it bites, because "found nothing"
+    /// and "stopped looking" are different answers - a lesson this project has already paid
+    /// for once, in the sweep whose budget quietly ran out four times running.
+    /// </remarks>
+    public const long ByteBudget = 8L * 1024 * 1024 * 1024;
+
+    /// <summary>Largest single region taken seriously. Beyond this it is a reservation, not data.</summary>
+    public const ulong LargestRegion = 2UL * 1024 * 1024 * 1024;
+
+    /// <summary>
+    /// Walks every readable region and reports each reference to one of the table's rows.
+    /// </summary>
+    /// <param name="rowsBegin">First row of the table.</param>
+    /// <param name="rows">How many rows it has.</param>
+    /// <param name="rowSize">How many bytes one row takes.</param>
+    /// <param name="keys">Row key (HASH32) to row index, from the table itself.</param>
+    /// <param name="mostSightings">Stop collecting past this, so a pathological hit rate cannot exhaust memory.</param>
+    public static HeapScanResult Run(
+        IMemoryReader reader,
+        IMemoryRegions regions,
+        ulong rowsBegin,
+        long rows,
+        int rowSize,
+        IReadOnlyDictionary<uint, int> keys,
+        IReadOnlyList<MemoryRegion>? exclude = null,
+        int mostSightings = 4096)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+        ArgumentNullException.ThrowIfNull(regions);
+        ArgumentNullException.ThrowIfNull(keys);
+
+        var sightings = new List<RowSighting>();
+        long walked = 0, scanned = 0, skipped = 0;
+        bool truncated = false;
+        ulong rowsEnd = rowsBegin + (ulong)(rows * rowSize);
+
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(ChunkBytes);
+        try
+        {
+            foreach (MemoryRegion region in regions.Regions())
+            {
+                // The TABLE'S OWN STORAGE is not a finding. Its rows point at their own Id
+                // strings, and both of its indices hold one entry per row - so scanning them
+                // yields 11,434 self-references on QuestFlags alone, which would fill the
+                // sighting cap before the scan reached anything anybody wanted.
+                if (region.Size > LargestRegion || Overlaps(region, exclude))
+                {
+                    skipped++;
+                    continue;
+                }
+
+                if (scanned >= ByteBudget || sightings.Count >= mostSightings)
+                {
+                    truncated = true;
+                    break;
+                }
+
+                walked++;
+                for (ulong taken = 0; taken < region.Size; taken += ChunkBytes)
+                {
+                    int want = (int)Math.Min((ulong)ChunkBytes, region.Size - taken);
+
+                    // Halve rather than give up: a region can be readable at its start and
+                    // gone by its end - the game is running while this walks, and a page that
+                    // was there when VirtualQueryEx answered may not be a moment later.
+                    while (want >= sizeof(ulong) && !reader.TryRead(region.Address + taken, buffer.AsSpan(0, want)))
+                    {
+                        want /= 2;
+                    }
+
+                    if (want < sizeof(ulong))
+                    {
+                        break;
+                    }
+
+                    scanned += want;
+                    Sweep(buffer.AsSpan(0, want), region.Address + taken, rowsBegin, rowsEnd, rowSize, keys, sightings, mostSightings);
+
+                    if (sightings.Count >= mostSightings)
+                    {
+                        truncated = true;
+                        break;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+
+        return new HeapScanResult(walked, scanned, skipped, sightings, truncated);
+    }
+
+    /// <summary>True when a region touches any of the ranges the caller wants left alone.</summary>
+    private static bool Overlaps(MemoryRegion region, IReadOnlyList<MemoryRegion>? exclude)
+    {
+        if (exclude is null)
+        {
+            return false;
+        }
+
+        ulong end = region.Address + region.Size;
+        foreach (MemoryRegion other in exclude)
+        {
+            if (region.Address < other.Address + other.Size && other.Address < end)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>Checks one chunk for both needles at every four-byte offset.</summary>
+    private static void Sweep(
+        ReadOnlySpan<byte> chunk,
+        ulong at,
+        ulong rowsBegin,
+        ulong rowsEnd,
+        int rowSize,
+        IReadOnlyDictionary<uint, int> keys,
+        List<RowSighting> into,
+        int most)
+    {
+        for (int i = 0; i + sizeof(uint) <= chunk.Length && into.Count < most; i += sizeof(uint))
+        {
+            if (keys.TryGetValue(BinaryPrimitives.ReadUInt32LittleEndian(chunk[i..]), out int keyed))
+            {
+                into.Add(new RowSighting(at + (ulong)i, keyed, ByPointer: false));
+            }
+
+            if (i + sizeof(ulong) > chunk.Length)
+            {
+                continue;
+            }
+
+            ulong value = BinaryPrimitives.ReadUInt64LittleEndian(chunk[i..]);
+            if (value < rowsBegin || value >= rowsEnd)
+            {
+                continue;
+            }
+
+            ulong offset = value - rowsBegin;
+            if (offset % (ulong)rowSize == 0)
+            {
+                into.Add(new RowSighting(at + (ulong)i, (int)(offset / (ulong)rowSize), ByPointer: true));
+            }
+        }
+    }
+}
