@@ -65,6 +65,20 @@ public sealed record QuestFlagHuntResult(
 /// than pointers). A third shape - row indices as u16/u32 - is deliberately not looked for
 /// here: an index below 5717 is too ordinary a number to tell from noise, and a sweep for it
 /// over a recorded session found only false positives.
+///
+/// WHAT IT ACTUALLY FINDS, after six sessions and two characters: conditions. Every quest-flag
+/// reference in running memory is a rule about when something applies - a map marker that
+/// waits for CanSeeAngeInHideout, area logic that checks LogbookQuestRune4Used, the act list
+/// gated on Visited-G1_town. The fresh character settles what that means: standing in the
+/// first town it holds references to A2PerennialKingSlain and HaveAscendancy, which it cannot
+/// possibly have set. So this is a map of the game's RULES, and a useful one; the set of flags
+/// a character has is a closed hunt, written up beside QuestFlagsRow in the schema.
+///
+/// That makes the tool's shape wrong in a way worth stating: the brute-force follow below has
+/// never found anything. Both of its deep runs ended with more than half a million targets
+/// still queued, so it does not converge and a bigger budget cannot fix that. Every sighting
+/// this has ever produced came from a TARGETED read - the structural pass over what the state
+/// objects point at, and one list one hop out of ServerData.
 /// </remarks>
 public sealed class QuestFlagHunt
 {
@@ -498,39 +512,40 @@ public sealed class QuestFlagHunt
         // it belongs to something that is not the same twice, which is what a set of quest
         // flags is.
         var structural = new List<SweptRegion>();
-        foreach (FollowTarget target in swept
-            .Where(r => r.Name == "InGameState")
-            .SelectMany(r => r.Targets))
+        foreach (SweptRegion region in swept.Where(r => r.Name is "InGameState" or "AreaInstance").ToList())
         {
-            if (spent >= FollowBudget || !visited.Add(target.Begin))
+            foreach (FollowTarget target in region.Targets)
             {
-                continue;
-            }
+                if (spent >= FollowBudget || !visited.Add(target.Begin))
+                {
+                    continue;
+                }
 
-            spent += StateObjectBytes;
-            structural.Add(Sweep(
-                $"InGameState+0x{target.At - chain.InGameState:X}",
-                target.Begin,
-                StateObjectBytes,
-                hashes,
-                facts?.RowsBegin ?? 0,
-                facts?.Rows ?? 0,
-                (int)(facts?.RowSize ?? 0)));
+                spent += StateObjectBytes;
+                structural.Add(Sweep(
+                    $"{region.Name}+0x{target.At - region.Address:X}",
+                    target.Begin,
+                    StateObjectBytes,
+                    hashes,
+                    facts?.RowsBegin ?? 0,
+                    facts?.Rows ?? 0,
+                    (int)(facts?.RowSize ?? 0)));
+            }
         }
 
-        // Then two hops of the ordinary kind, the second following only LISTS. One hop was
-        // enough to turn up the area markers, which is a container inside ServerData - so a set
-        // of flags sitting one container deeper is exactly the shape to expect next, and a lone
-        // pointer at that depth is too many for too little.
+        // Then ONE hop of the ordinary kind, and no more. A second hop was tried and dropped:
+        // it ended both of its runs with 672,439 and 964,026 targets still queued, which is not
+        // a budget that needs raising but a search that does not converge - and in 130 MB it
+        // never produced a single sighting. EVERY hit this hunt has ever had came from a
+        // targeted read: the area markers from a list one hop out of ServerData, and every
+        // quest-flag condition from the structural pass above.
         var sources = new List<SweptRegion>(swept);
         sources.AddRange(structural);
         swept.AddRange(structural.Where(r => r.Sightings.Count > 0));
 
         int skipped = 0;
         List<SweptRegion> first = Follow(sources, hashes, facts, visited, ref spent, listsOnly: false, ref skipped);
-        List<SweptRegion> second = Follow(first, hashes, facts, visited, ref spent, listsOnly: true, ref skipped);
         swept.AddRange(first.Where(r => r.Sightings.Count > 0));
-        swept.AddRange(second.Where(r => r.Sightings.Count > 0));
         int followed = visited.Count;
         long followedBytes = spent;
 
