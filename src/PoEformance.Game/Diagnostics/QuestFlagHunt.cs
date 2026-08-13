@@ -701,6 +701,49 @@ public sealed class QuestFlagHunt
         return swept;
     }
 
+    /// <summary>
+    /// The longest run of row pointers lying back to back, and where it starts.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE NUMBER THAT ANSWERS THE QUESTION THIS HUNT ASKS. A set of the flags a character
+    /// has set, held as pointers, is pointers packed one after another - 8 bytes apart for bare
+    /// pointers, 16 for the row-and-table pairs the game's own data uses - and hundreds of them
+    /// for anyone past the first act. Definition data looks nothing like that: its references
+    /// sit one per record, so they come at the table's row stride, whatever that is.
+    ///
+    /// Computed over ALL sightings rather than the listed ones, which is the point of having it
+    /// here at all. The per-region listing shows twenty rows, so reading packing off the report
+    /// samples at most twenty per megabyte and could miss a run of a thousand inside a region
+    /// that reported 927. This cannot.
+    /// </remarks>
+    private static (int Longest, ulong At) LongestPacking(IReadOnlyList<RowSighting> sightings)
+    {
+        ulong[] addresses = [.. sightings.Where(s => s.ByPointer).Select(s => s.At).Order()];
+        int longest = addresses.Length == 0 ? 0 : 1, run = 1;
+        ulong at = addresses.Length == 0 ? 0 : addresses[0], start = at;
+
+        for (int i = 1; i < addresses.Length; i++)
+        {
+            ulong gap = addresses[i] - addresses[i - 1];
+            if (gap is sizeof(ulong) or 2 * sizeof(ulong))
+            {
+                run++;
+                if (run > longest)
+                {
+                    longest = run;
+                    at = start;
+                }
+            }
+            else
+            {
+                run = 1;
+                start = addresses[i];
+            }
+        }
+
+        return (longest, at);
+    }
+
     /// <summary>Prints the hunt for a person.</summary>
     public void Report(QuestFlagHuntResult result, TextWriter output)
     {
@@ -734,6 +777,11 @@ public sealed class QuestFlagHunt
                         ? $" - STOPPED AT THE SIGHTING CAP inside {scan.Reach / 1024 / 1024} MB of the table, so there are more"
                         : $" - BUDGET SPENT: everything within {scan.Reach / 1024 / 1024} MB of the table was covered, beyond that nothing"
                     : " - the whole address space"));
+
+            (int longest, ulong at) = LongestPacking(scan.Sightings);
+            output.WriteLine(
+                $"  packing  longest run of row pointers 8 or 16 bytes apart is {longest}"
+                + (longest > 1 ? $", at 0x{at:X}" : string.Empty));
         }
 
         if (result.Followed > 0)
