@@ -35,6 +35,7 @@ public sealed class EntityBrowserWindow
 
     private readonly EntityInspector _inspector;
     private readonly Action<ulong, string, string> _dissect;
+    private readonly Action<ulong, string>? _compare;
     private readonly Action<ulong, float, float>? _route;
     private readonly Func<ulong, bool>? _routed;
 
@@ -61,11 +62,18 @@ public sealed class EntityBrowserWindow
     /// browser is useful without a map open and must not require one.
     /// </param>
     /// <param name="routed">Whether a route to this address is already being drawn.</param>
+    /// <param name="compare">
+    /// Pins an address BESIDE whatever the dissector already has open, rather than replacing
+    /// it. This is where a comparison comes from: two monsters of a kind, or the same
+    /// component off two entities, picked out of a list that already knows where they are.
+    /// Nobody assembles one by copying addresses out of here by hand.
+    /// </param>
     public EntityBrowserWindow(
         EntityInspector inspector,
         Action<ulong, string, string> dissect,
         Action<ulong, float, float>? route = null,
-        Func<ulong, bool>? routed = null)
+        Func<ulong, bool>? routed = null,
+        Action<ulong, string>? compare = null)
     {
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(dissect);
@@ -73,6 +81,7 @@ public sealed class EntityBrowserWindow
         _dissect = dissect;
         _route = route;
         _routed = routed;
+        _compare = compare;
     }
 
     /// <summary>Draws the tab's content and publishes what it wants read next.</summary>
@@ -310,6 +319,23 @@ public sealed class EntityBrowserWindow
             _dissect(view.Address, view.Path, "Entity");
         }
 
+        if (_compare is not null)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("compare with##entity"))
+            {
+                _compare(view.Address, view.Path);
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(
+                    "Holds this entity BESIDE the one already in the dissector instead of\n"
+                    + "replacing it. Two of a kind read side by side separate what the species\n"
+                    + "is from what this one is - and they walk their pointers together.");
+            }
+        }
+
         ImGui.Separator();
 
         // What is on this entity with a clock running. Here rather than in the world read
@@ -423,6 +449,23 @@ public sealed class EntityBrowserWindow
                 // component shares, so an unknown structure is never opened completely blind.
                 _dissect(component.Address, $"{Short(view.Path)}.{component.Name}",
                     component.Described ? component.Name : "Component");
+            }
+
+            if (_compare is not null)
+            {
+                // The same component off a second entity, which is the comparison that pays
+                // best: one Life beside another has the same layout by construction, so every
+                // row that differs is a quantity about that monster rather than about Life.
+                ImGui.SameLine();
+                if (ImGui.SmallButton($"+##compare{component.Address:X}"))
+                {
+                    _compare(component.Address, $"{Short(view.Path)}.{component.Name}");
+                }
+
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip("hold beside what the dissector already has open");
+                }
             }
 
             ImGui.SameLine();

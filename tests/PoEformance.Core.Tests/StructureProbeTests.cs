@@ -197,9 +197,66 @@ public class StructureProbeTests
         => Assert.Equal(sensible, StructureProbe.SensibleFloat(value));
 
     [Fact]
+    public void TwoInstancesOfOneStructureAgreeOnTheKindAndDifferOnTheINDIVIDUAL()
+    {
+        // The question a single window cannot ask. Two monsters of one species were built
+        // from the same row of the same table, so what they SHARE is the species - and what
+        // is left over is everything about this one monster. Both look like bytes alone.
+        byte[] skeleton = Window(0x7FF6_0000_1234UL, 90, 0, 12750.0f, 0f);
+        byte[] zombie = Window(0x7FF6_0000_1234UL, 41, 0, 9310.0f, 0f);
+
+        Assert.Equal([8, 16], StructureProbe.Differences([skeleton, zombie]));
+    }
+
+    [Fact]
+    public void OneWindowAgreesWithItself()
+    {
+        // Nothing to compare against is not the same as "all of it matches", and either
+        // answer stated confidently would be a finding about nothing.
+        Assert.Empty(StructureProbe.Differences([Window(1, 2, 3, 4)]));
+        Assert.Empty(StructureProbe.Differences([]));
+    }
+
+    [Fact]
+    public void APlaceThatCouldNotBeReadSaysNothingRatherThanDisagreeing()
+    {
+        // An unmapped address would otherwise mark every row, and the pair would read as two
+        // structures with nothing whatsoever in common - which is a loud, wrong finding.
+        byte[] read = Window(1, 0, 2, 0);
+
+        Assert.Empty(StructureProbe.Differences([read, []]));
+        Assert.Empty(StructureProbe.Differences([read, read, []]));
+    }
+
+    [Fact]
+    public void ARowThatOnlyTheTHIRDPlaceDisagreesOnIsStillReported()
+    {
+        // Two agreeing is a coincidence away from meaning nothing; a third is what settles
+        // it. So the comparison is against ALL of them, not against the first pair.
+        byte[] first = Window(1, 0, 2, 0);
+        byte[] second = Window(1, 0, 2, 0);
+        byte[] third = Window(1, 0, 7, 0);
+
+        Assert.Equal([8], StructureProbe.Differences([first, second, third]));
+    }
+
+    [Fact]
+    public void DisagreementIsReportedAtTheRowWIDTHBeingRead()
+    {
+        // Four-byte rows are how two small fields sharing eight bytes get told apart, and the
+        // difference has to land on the half that actually moved rather than on both.
+        byte[] first = Window(1, 5);
+        byte[] second = Window(1, 9);
+
+        Assert.Equal([0], StructureProbe.Differences([first, second]));
+        Assert.Equal([4], StructureProbe.Differences([first, second], stride: 4));
+    }
+
+    [Fact]
     public void ARowWidthOtherThanFourOrEightIsRefused()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => StructureProbe.Describe(Window(1, 2), Somewhere, stride: 3));
         Assert.Throws<ArgumentOutOfRangeException>(() => StructureProbe.Changes(Window(1), Window(2), stride: 7));
+        Assert.Throws<ArgumentOutOfRangeException>(() => StructureProbe.Differences([Window(1)], stride: 5));
     }
 }

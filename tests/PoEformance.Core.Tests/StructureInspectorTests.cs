@@ -17,6 +17,8 @@ public class StructureInspectorTests
 {
     private const ulong Somewhere = 0x2000_0000_0000;
     private const ulong Elsewhere = 0x3000_0000_0000;
+    private const ulong Yonder = 0x4000_0000_0000;
+    private const ulong Beyond = 0x5000_0000_0000;
 
     private static OffsetSchema Schema()
     {
@@ -429,6 +431,165 @@ public class StructureInspectorTests
         BitConverter.GetBytes((long)text.Length).CopyTo(bytes, 16);
         BitConverter.GetBytes((long)text.Length).CopyTo(bytes, 24);
         return bytes;
+    }
+
+    [Fact]
+    public void SeveralPlacesAreReadAtOnceAndEachSaysWhatItHolds()
+    {
+        // The comparison the dissector exists for: one structure in two instances, held side
+        // by side. Neither window says anything the other does not - that is the point.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 7, 0, 11, 0);
+        Fill(reader, Elsewhere, 7, 0, 99, 0);
+
+        StructureView view = Look(Inspector(reader), At(Somewhere) with { Compared = [Elsewhere] });
+
+        Assert.Equal(2, view.Columns.Count);
+        Assert.Equal(Somewhere, view.Columns[0].Address);
+        Assert.Equal(Elsewhere, view.Columns[1].Address);
+        Assert.Equal(11, view.Columns[0].Slots[1].Low);
+        Assert.Equal(99, view.Columns[1].Slots[1].Low);
+    }
+
+    [Fact]
+    public void WhereThePlacesDISAGREEIsTheWholeFinding()
+    {
+        // What two monsters share is the species - the vtable, the class pointer, the dat row
+        // they were built from. What they do not share is the individual. From one window
+        // both are just bytes, and no amount of staring separates them.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 7, 0, 11, 0, 4, 0);
+        Fill(reader, Elsewhere, 7, 0, 99, 0, 4, 0);
+
+        StructureView view = Look(Inspector(reader), At(Somewhere) with { Compared = [Elsewhere] });
+
+        Assert.Equal([8], view.Differing.Order());
+    }
+
+    [Fact]
+    public void OnePlaceOnItsOwnDisagreesWithNothing()
+    {
+        // A structure agrees with itself. Reporting every row as differing - or none of them
+        // as matching - would put a finding on the screen that means nothing at all.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 7, 0, 11, 0);
+
+        Assert.Empty(Look(Inspector(reader), At(Somewhere)).Differing);
+    }
+
+    [Fact]
+    public void APlaceThatCannotBeReadDoesNotTakeTheOthersDownWithIt()
+    {
+        // An address goes stale on every area change, and a comparison assembled over a few
+        // minutes will have one. The rest of it is still worth having, and a place that reads
+        // nothing must not silently count as one that agrees with nothing either.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 7, 0, 11, 0);
+
+        StructureView view = Look(Inspector(reader), At(Somewhere) with { Compared = [Elsewhere] });
+
+        Assert.Equal(2, view.Columns.Count);
+        Assert.NotEmpty(view.Columns[0].Slots);
+        Assert.Empty(view.Columns[1].Slots);
+        Assert.Contains("nothing readable", view.Columns[1].Status, StringComparison.Ordinal);
+        Assert.Empty(view.Differing);
+    }
+
+    [Fact]
+    public void TheMarkIsTakenInEveryPlaceAtTheSameINSTANT()
+    {
+        // Marked one place at a time, the set of marks would come from different moments and
+        // the comparison against them would be between things that never coexisted.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 1, 0, 2, 0);
+        Fill(reader, Elsewhere, 1, 0, 2, 0);
+
+        StructureInspector inspector = Inspector(reader);
+        StructureRequest marked = At(Somewhere) with { Compared = [Elsewhere], SnapshotSequence = 1 };
+        Look(inspector, marked);
+
+        reader.Place(Elsewhere + 8, Bytes(42));            // the second place, and only it
+        StructureView after = Look(inspector, marked);
+
+        Assert.True(after.Columns[0].HasBaseline);
+        Assert.True(after.Columns[1].HasBaseline);
+        Assert.Empty(after.Columns[0].SinceBaseline);
+        Assert.Equal([8], after.Columns[1].SinceBaseline.Order());
+    }
+
+    [Fact]
+    public void WhatAPointerLeadsToIsAnsweredPerPlace()
+    {
+        // The fastest way there is to name an unknown row: peek at it with two monsters open
+        // and "Skeleton" beside "Zombie" settles what it is in one click. Answered once for
+        // the first place, it would name the row after whichever monster happened to be left.
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+        reader.Place(Somewhere, Elsewhere);
+        reader.Place(Yonder, new byte[512]);
+        reader.Place(Yonder, Beyond);
+        reader.Place(Elsewhere, new byte[256]);
+        reader.PlaceUtf16(Elsewhere, "Skeleton");
+        reader.Place(Beyond, new byte[256]);
+        reader.PlaceUtf16(Beyond, "Zombie");
+
+        StructureView view = Look(
+            Inspector(reader),
+            At(Somewhere) with { Compared = [Yonder], PeekOffset = 0, PeekSequence = 1 });
+
+        Assert.Contains("Skeleton", view.Columns[0].Peek?.Summary ?? string.Empty, StringComparison.Ordinal);
+        Assert.Contains("Zombie", view.Columns[1].Peek?.Summary ?? string.Empty, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MorePlacesThanAreServedAreLeftUnread()
+    {
+        // Every place is a full window read every tick, on the thread that also drives the
+        // world read and auto-flask. The cap is what stops a list of pinned addresses from
+        // quietly becoming a cost nobody chose.
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+
+        var compared = new ulong[StructureInspector.MaxColumns + 4];
+        for (int i = 0; i < compared.Length; i++)
+        {
+            compared[i] = Somewhere;
+        }
+
+        StructureView view = Look(Inspector(reader), At(Somewhere) with { Compared = compared });
+
+        Assert.Equal(StructureInspector.MaxColumns, view.Columns.Count);
+    }
+
+    [Fact]
+    public void OnlyTheFirstPlaceCanBlameARootForHavingNoAddress()
+    {
+        // A pinned place that came out zero is a pointer that led nowhere, and saying
+        // "AreaInstance did not resolve" over it would send someone looking at the game state
+        // instead of at the hop they just took.
+        var reader = new FakeMemoryReader();
+        reader.Place(Somewhere, new byte[512]);
+
+        StructureView view = Look(
+            Inspector(reader),
+            At(Somewhere) with { Root = StructureRoot.Custom, Compared = [0UL] });
+
+        Assert.Equal("no address", view.Columns[1].Status);
+    }
+
+    [Fact]
+    public void TheSinglePlaceViewStillReadsAsOneWindow()
+    {
+        // Everything else in the tool asks this view for slots, text and an address without
+        // knowing places exist. The first place IS that view, and it stays that way.
+        var reader = new FakeMemoryReader();
+        Fill(reader, Somewhere, 7, 0, 11, 0);
+        Fill(reader, Elsewhere, 1, 0, 2, 0);
+
+        StructureView view = Look(Inspector(reader), At(Somewhere) with { Compared = [Elsewhere] });
+
+        Assert.Equal(Somewhere, view.Address);
+        Assert.Equal(view.Columns[0].Slots, view.Slots);
     }
 
     [Fact]

@@ -28,6 +28,12 @@ public enum StructureRoot
 /// every tick it would re-baseline continuously and nothing would ever look changed - which is
 /// precisely the opposite of what it is for.
 /// </remarks>
+/// <param name="Compared">
+/// Further addresses to read BESIDE the first one, at the same size and stride, so the same
+/// structure can be looked at in several instances at once. Plain addresses rather than roots:
+/// they are places pinned by hand or handed over by the entity browser, and a root resolves
+/// to exactly one place by definition.
+/// </param>
 public sealed record StructureRequest(
     bool Enabled = false,
     StructureRoot Root = StructureRoot.Custom,
@@ -37,12 +43,13 @@ public sealed record StructureRequest(
     string StructName = "",
     int SnapshotSequence = 0,
     int PeekOffset = -1,
-    int PeekSequence = 0)
+    int PeekSequence = 0,
+    IReadOnlyList<ulong>? Compared = null)
 {
     public static StructureRequest Idle { get; } = new();
 }
 
-/// <summary>What was found at an address, and what has been moving.</summary>
+/// <summary>One place being read, and what has been moving in it.</summary>
 /// <param name="Live">
 /// Rows that differ from the PREVIOUS tick - what is moving right now. A timer, a position,
 /// an animation.
@@ -56,21 +63,62 @@ public sealed record StructureRequest(
 /// pointer. Most of this game's structures are half strings, and without this they read as a
 /// pointer and two meaningless numbers.
 /// </param>
-public sealed record StructureView(
+/// <param name="Peek">
+/// What is behind this place's pointer at the peeked row. Per place rather than shared: the
+/// row is the same row in each, but what it LEADS TO is the answer being asked for, and with
+/// two monsters open it is the fastest way to tell a row apart - "Skeleton" beside "Zombie"
+/// names a row in one click.
+/// </param>
+public sealed record StructureColumn(
     ulong Address,
     IReadOnlyList<StructureSlot> Slots,
     IReadOnlySet<int> Live,
     IReadOnlySet<int> SinceBaseline,
-    IReadOnlyDictionary<int, string> FieldNames,
     IReadOnlyDictionary<int, string> Text,
     PeekResult? Peek,
-    int PeekOffset,
     bool HasBaseline,
     string Status)
 {
-    public static StructureView Empty { get; } = new(
+    public static StructureColumn Empty { get; } = new(
         0, [], new HashSet<int>(), new HashSet<int>(), new Dictionary<int, string>(),
-        new Dictionary<int, string>(), null, -1, false, "nothing to look at yet");
+        null, false, "nothing to look at yet");
+}
+
+/// <summary>What was found at every place open, and where they disagree.</summary>
+/// <param name="Columns">
+/// The places, in the order asked for. The FIRST is the one the root, the peek and the
+/// single-place view all mean, and there is always at least one.
+/// </param>
+/// <param name="Differing">
+/// Rows that do not read the same in every place. Empty with one place open, because a
+/// structure agrees with itself.
+/// </param>
+public sealed record StructureView(
+    IReadOnlyList<StructureColumn> Columns,
+    IReadOnlyDictionary<int, string> FieldNames,
+    IReadOnlySet<int> Differing,
+    int PeekOffset,
+    string Status)
+{
+    public static StructureView Empty { get; } = new(
+        [], new Dictionary<int, string>(), new HashSet<int>(), -1, "nothing to look at yet");
+
+    /// <summary>The first place. Everything a single-place view asks for comes from here.</summary>
+    public StructureColumn Primary => Columns.Count > 0 ? Columns[0] : StructureColumn.Empty;
+
+    public ulong Address => Primary.Address;
+
+    public IReadOnlyList<StructureSlot> Slots => Primary.Slots;
+
+    public IReadOnlySet<int> Live => Primary.Live;
+
+    public IReadOnlySet<int> SinceBaseline => Primary.SinceBaseline;
+
+    public IReadOnlyDictionary<int, string> Text => Primary.Text;
+
+    public PeekResult? Peek => Primary.Peek;
+
+    public bool HasBaseline => Primary.HasBaseline;
 }
 
 /// <summary>
@@ -86,6 +134,10 @@ public sealed record StructureView(
 /// last tick shows what is live at all. What changed since a baseline the user took shows
 /// what one particular action did - and that is the only way to find a field whose meaning is
 /// a verb, since nothing about its bytes says "health" until something takes some away.
+///
+/// And a third comparison, across PLACES rather than across time: several addresses read at
+/// once, so two instances of one structure can be held side by side. What they share is the
+/// kind, what they do not is the instance - see <see cref="StructureProbe.Differences"/>.
 /// </remarks>
 public sealed class StructureInspector
 {
@@ -98,7 +150,17 @@ public sealed class StructureInspector
     /// </remarks>
     public const int MaxSize = 8192;
 
+    /// <summary>How many places can be held side by side.</summary>
+    /// <remarks>
+    /// Every place is a full window read every tick, on the thread that also drives the world
+    /// read and auto-flask, so this is a real cost and not a formality. Six is well past what
+    /// the comparison needs: two instances answer "instance or kind" outright, and a third
+    /// settles a coincidence. Past that the screen runs out before the reader does.
+    /// </remarks>
+    public const int MaxColumns = 6;
+
     /// <summary>Pointer candidates checked per tick, so a fresh window cannot burst.</summary>
+    /// <remarks>Shared across the places, not granted to each - the reader has one budget.</remarks>
     private const int MaxChecksPerTick = 128;
 
     /// <summary>Largest number of verdicts kept before starting over.</summary>
@@ -117,15 +179,14 @@ public sealed class StructureInspector
     private readonly OffsetSchema _schema;
     private readonly ulong _gameStatesStatic;
 
+    /// <summary>What each place used to say, one entry per place, in the order asked for.</summary>
+    private readonly List<Tracked> _tracked = [];
+
     private StructureRequest _request = StructureRequest.Idle;
     private StructureView _view = StructureView.Empty;
 
-    private byte[] _previous = [];
-    private byte[] _baseline = [];
-    private ulong _baselineAddress;
     private int _servedSnapshot;
     private int _servedPeek;
-    private PeekResult? _lastPeek;
     private int _lastPeekOffset = -1;
 
     public StructureInspector(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic)
@@ -193,71 +254,179 @@ public sealed class StructureInspector
 
     private StructureView Build(StructureRequest request)
     {
-        ulong address = request.Root == StructureRoot.Custom ? request.Address : Resolve(request.Root);
+        int size = Math.Clamp(request.Size, 8, MaxSize);
+        int stride = request.Stride == 4 ? 4 : 8;
+        List<ulong> addresses = Places(request);
+
+        // Both of these happen ONCE per press rather than every tick, and both apply to every
+        // place at the same instant - which is what makes them comparable at all. A mark taken
+        // per place as its turn came round would be a set of marks from different moments.
+        bool marking = request.SnapshotSequence != _servedSnapshot;
+        _servedSnapshot = request.SnapshotSequence;
+
+        bool peeking = request.PeekSequence != _servedPeek;
+        _servedPeek = request.PeekSequence;
+        if (peeking)
+        {
+            _lastPeekOffset = request.PeekOffset;
+        }
+
+        // One budget for the whole tick, handed round the places in turn. Granting each its
+        // own would let six places cost six times the reads on the thread that also drives
+        // auto-flask - and the point of the cap is the total.
+        int pointerBudget = MaxChecksPerTick;
+        int textBudget = MaxChecksPerTick;
+
+        var windows = new byte[addresses.Count][];
+        var columns = new List<StructureColumn>(addresses.Count);
+
+        for (int i = 0; i < addresses.Count; i++)
+        {
+            windows[i] = [];
+            columns.Add(Read(
+                request, i, addresses[i], size, stride, marking, peeking,
+                ref pointerBudget, ref textBudget, out windows[i]));
+        }
+
+        // Only the places that read contribute; see Differences. With one place open this is
+        // empty, which is the honest answer rather than a comparison of a thing with itself.
+        var differing = new HashSet<int>(StructureProbe.Differences(windows, stride));
+
+        return new StructureView(
+            columns,
+            NamesFor(request.StructName, stride),
+            differing,
+            _lastPeekOffset,
+            columns.Count > 1
+                ? $"{columns[0].Status} - {columns.Count} places, {differing.Count} rows differ"
+                : columns[0].Status);
+    }
+
+    /// <summary>The addresses to read this tick: the root or the typed one, then the pinned.</summary>
+    private List<ulong> Places(StructureRequest request)
+    {
+        var addresses = new List<ulong>(1 + (request.Compared?.Count ?? 0))
+        {
+            request.Root == StructureRoot.Custom ? request.Address : Resolve(request.Root),
+        };
+
+        if (request.Compared is null)
+        {
+            return addresses;
+        }
+
+        foreach (ulong address in request.Compared)
+        {
+            if (addresses.Count >= MaxColumns)
+            {
+                break;
+            }
+
+            addresses.Add(address);
+        }
+
+        return addresses;
+    }
+
+    /// <summary>Reads one place and says what moved in it.</summary>
+    private StructureColumn Read(
+        StructureRequest request,
+        int index,
+        ulong address,
+        int size,
+        int stride,
+        bool marking,
+        bool peeking,
+        ref int pointerBudget,
+        ref int textBudget,
+        out byte[] window)
+    {
+        Tracked tracked = TrackedAt(index);
+        window = [];
+
         if (address == 0)
         {
-            return StructureView.Empty with
+            tracked.Forget();
+            return StructureColumn.Empty with
             {
-                Status = request.Root == StructureRoot.Custom ? "no address" : $"{request.Root} did not resolve",
+                // Only the first place can have a root behind it. A pinned address that came
+                // out zero is just an address that is zero, and blaming the root for it would
+                // send someone looking at the game state instead of at the pointer they
+                // followed.
+                Status = index == 0 && request.Root != StructureRoot.Custom
+                    ? $"{request.Root} did not resolve"
+                    : "no address",
             };
         }
 
-        int size = Math.Clamp(request.Size, 8, MaxSize);
-        int stride = request.Stride == 4 ? 4 : 8;
-
-        var window = new byte[size];
-        if (!_reader.TryRead(address, window))
+        var bytes = new byte[size];
+        if (!_reader.TryRead(address, bytes))
         {
             // The commonest failure by far, and worth naming: an address one digit out, or a
-            // pointer that was valid until the area changed.
-            return StructureView.Empty with { Status = $"nothing readable at 0x{address:X} for {size} bytes" };
+            // pointer that was valid until the area changed. One place failing must not take
+            // the others with it - the rest of the comparison is still worth having.
+            tracked.Forget();
+            return StructureColumn.Empty with
+            {
+                Address = address,
+                Status = $"nothing readable at 0x{address:X} for {size} bytes",
+            };
         }
 
         // Both comparisons only mean anything against the SAME address. After following a
         // pointer every row would otherwise read as changed, which is noise dressed as a
         // finding.
-        bool sameAddress = address == _view.Address;
-        IReadOnlySet<int> live = sameAddress && _previous.Length == window.Length
-            ? new HashSet<int>(StructureProbe.Changes(_previous, window, stride))
+        bool sameAddress = tracked.Address == address;
+        IReadOnlySet<int> live = sameAddress && tracked.Previous.Length == bytes.Length
+            ? new HashSet<int>(StructureProbe.Changes(tracked.Previous, bytes, stride))
             : new HashSet<int>();
 
-        if (request.SnapshotSequence != _servedSnapshot)
+        if (marking)
         {
-            _servedSnapshot = request.SnapshotSequence;
-            _baseline = [.. window];
-            _baselineAddress = address;
+            tracked.Baseline = [.. bytes];
+            tracked.BaselineAddress = address;
         }
 
-        bool haveBaseline = _baseline.Length > 0 && _baselineAddress == address;
+        bool haveBaseline = tracked.Baseline.Length > 0 && tracked.BaselineAddress == address;
         IReadOnlySet<int> sinceBaseline = haveBaseline
-            ? new HashSet<int>(StructureProbe.Changes(_baseline, window, stride))
+            ? new HashSet<int>(StructureProbe.Changes(tracked.Baseline, bytes, stride))
             : new HashSet<int>();
 
-        if (request.PeekSequence != _servedPeek)
+        if (peeking)
         {
-            _servedPeek = request.PeekSequence;
-            _lastPeekOffset = request.PeekOffset;
-            _lastPeek = request.PeekOffset >= 0 && request.PeekOffset + 8 <= window.Length
-                ? PointerPeek.Peek(_reader, BitConverter.ToUInt64(window, request.PeekOffset))
+            tracked.Peek = request.PeekOffset >= 0 && request.PeekOffset + 8 <= bytes.Length
+                ? PointerPeek.Peek(_reader, BitConverter.ToUInt64(bytes, request.PeekOffset))
                 : null;
         }
 
-        _previous = window;
+        tracked.Previous = bytes;
+        tracked.Address = address;
+        window = bytes;
 
-        List<StructureSlot> slots = Verify(StructureProbe.Describe(
-            window, address, stride, _reader.ModuleBase, _reader.ModuleSize));
+        List<StructureSlot> slots = Verify(
+            StructureProbe.Describe(bytes, address, stride, _reader.ModuleBase, _reader.ModuleSize),
+            ref pointerBudget);
 
-        return new StructureView(
+        return new StructureColumn(
             address,
             slots,
             live,
             sinceBaseline,
-            NamesFor(request.StructName, stride),
-            TextIn(window, slots),
-            _lastPeek,
-            _lastPeekOffset,
+            TextIn(bytes, slots, ref textBudget),
+            tracked.Peek,
             haveBaseline,
             $"{slots.Count} rows at 0x{address:X}");
+    }
+
+    /// <summary>What the place at this position used to say, created the first time it is asked for.</summary>
+    private Tracked TrackedAt(int index)
+    {
+        while (_tracked.Count <= index)
+        {
+            _tracked.Add(new Tracked());
+        }
+
+        return _tracked[index];
     }
 
     /// <summary>
@@ -278,10 +447,9 @@ public sealed class StructureInspector
     /// per tick so a screen full of new candidates cannot turn into a burst of reads on the
     /// thread that also drives auto-flask.
     /// </remarks>
-    private List<StructureSlot> Verify(List<StructureSlot> slots)
+    private List<StructureSlot> Verify(List<StructureSlot> slots, ref int budget)
     {
         Span<byte> probe = stackalloc byte[8];
-        int fresh = 0;
 
         for (int i = 0; i < slots.Count; i++)
         {
@@ -293,12 +461,12 @@ public sealed class StructureInspector
             ulong target = slots[i].Raw;
             if (!_readable.TryGetValue(target, out bool leadsSomewhere))
             {
-                if (fresh >= MaxChecksPerTick)
+                if (budget <= 0)
                 {
                     continue;   // left as a candidate; the next tick finishes the job
                 }
 
-                fresh++;
+                budget--;
                 leadsSomewhere = _reader.TryRead(target, probe);
 
                 // Wholesale rather than evicting one at a time: the verdicts are cheap to
@@ -335,10 +503,9 @@ public sealed class StructureInspector
     /// - a bare POINTER to characters, with no header, which is how the data tables store
     ///   their names. Only a read can tell, and it shares the same cache.
     /// </remarks>
-    private IReadOnlyDictionary<int, string> TextIn(byte[] window, List<StructureSlot> slots)
+    private IReadOnlyDictionary<int, string> TextIn(byte[] window, List<StructureSlot> slots, ref int budget)
     {
         var found = new Dictionary<int, string>();
-        int fetched = 0;
 
         foreach (StructureSlot slot in slots)
         {
@@ -363,12 +530,12 @@ public sealed class StructureInspector
 
             if (!_textAt.TryGetValue(at, out string? text))
             {
-                if (fetched >= MaxChecksPerTick)
+                if (budget <= 0)
                 {
                     continue;   // the next tick finishes the rest
                 }
 
-                fetched++;
+                budget--;
                 text = Fetch(at, candidate.Shape == TextShape.Heap ? candidate.Length : 0);
 
                 if (_textAt.Count >= MaxRemembered)
@@ -433,5 +600,35 @@ public sealed class StructureInspector
         }
 
         return names;
+    }
+
+    /// <summary>What one place used to say, so what it says now can be compared against it.</summary>
+    /// <remarks>
+    /// Per place rather than one set of bytes for the whole window, and the address is carried
+    /// with them: a place that moved - because a pointer was followed, or because the slot now
+    /// holds a different monster - has nothing worth comparing, and comparing anyway would
+    /// light every row of it on arrival.
+    /// </remarks>
+    private sealed class Tracked
+    {
+        public ulong Address { get; set; }
+
+        public byte[] Previous { get; set; } = [];
+
+        public byte[] Baseline { get; set; } = [];
+
+        public ulong BaselineAddress { get; set; }
+
+        public PeekResult? Peek { get; set; }
+
+        /// <summary>Drops everything remembered, for a place that no longer reads.</summary>
+        public void Forget()
+        {
+            Address = 0;
+            Previous = [];
+            Baseline = [];
+            BaselineAddress = 0;
+            Peek = null;
+        }
     }
 }
