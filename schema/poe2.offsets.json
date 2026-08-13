@@ -994,8 +994,36 @@
       "comment": "What LocalPlayerStruct.ServerDataPtr actually points at. It is NOT the struct holding PlayerInventories - that one is reached through the vector below. Missing this hop reads PlayerInventories off the wrong base, where it is simply zero, which looks exactly like a drifted offset. Source: GameHelper2 ServerDataOffsets.",
       "fields": {
         "PlayerServerData": { "offset": "0x48", "type": "stdVector", "comment": "StdVector of pointers to ServerDataStructure; the first entry is the local player's." },
+        "AreaMarkers": {
+          "offset": "0x2248", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 192, "maxCount": 4096 },
+          "comment": "THE MAP MARKERS THE GAME ITSELF PLACES IN THIS AREA, one AreaMarker each. Found 2026-08 by --questflags, which was hunting something else entirely: it follows every pointer out of ServerData and sweeps what it finds, and this list was the one place in 3.5 MB that held a reference to a QuestFlags row. Different from MinimapIcon, and the difference is the point - that component only exists on an ENTITY, so it can only mark things that are entities and awake. This is the area's own list, server-sent, with grid coordinates for each marker, and it carries things an entity walk never sees. Read live in a hideout: waypoint, map device, crafting bench, both stashes, the healing well and five NPCs, sorted by Y."
+        },
         "League": { "offset": "0x21E0", "type": "stdWString", "comment": "Active league name, EXACTLY poe.ninja/poe2scout's value (\"Standard\", \"HC Runes of Aldur\") - it drives price-league detection, so a wrong one silently prices a stash against another economy. ON THE OUTER STRUCT, not on the inner one the inventories are on, and that is the whole trap: it was read off the inner struct first and came back empty, which reads as 'not in the game yet' and cost every price in the tool. The AHK tool says which struct in the shape of its own resolve - the pointer it reads the league from is whichever one's +0x48 is a plausible vector, which is the OUTER by definition, while it reads inventories from what that vector points at. Confirmed from the other side in a recording, 2026-08-09: at this offset on the INNER struct sit two heap pointers interleaved with two into the module image - a pair of vtables - in the same frames where that struct's inventory vector reads 118 inventories perfectly. Value live-verified by the owner 2026-06-22 (AHK tool)." }
       }
+    },
+
+    "AreaMarker": {
+      "comment": "One entry of ServerDataOffsets.AreaMarkers: what to draw, where, and what it depends on. THE ENTRY NAMES ITSELF, which is what makes a single sighting worth writing down: 0x00 is a foreign reference to MinimapIcons - row then table, the order settled on NPCs.QuestFlags - and 0x10 repeats that row as an INDEX. The two agree, and their agreement is the check: StashPlayer and StashGuild sit at indices 169 and 170 and their row pointers are 0x26 apart, which is exactly the row size the column widths compute for MinimapIcons. NPC is index 4 in every entry that has it, MapDevice is 164, and 164 - 4 = 160 rows = 0x17C0 bytes, which is the gap between those two row pointers to the byte. SEEN IN ONE PROCESS across two captures, at the same offset both times - so the offset is corroborated but NOT across a restart, which is the check still missing.",
+      "fields": {
+        "IconRowPtr": { "offset": "0x00", "type": "ptr", "struct": "MinimapIconRow", "comment": "The MinimapIcons row: Waypoint, MapDevice, StashPlayer, NPC..." },
+        "IconTablePtr": { "offset": "0x08", "type": "ptr", "struct": "DatTable", "comment": "The table half of that reference, which is what names it - \"Data/Balance/MinimapIcons.dat\"." },
+        "IconRow": { "offset": "0x10", "type": "u32", "comment": "The same row as an index. Redundant, and useful precisely because of that - see the comment above." },
+        "GridX": { "offset": "0x14", "type": "u32", "invariant": { "kind": "range", "min": 0, "max": 65535 } },
+        "GridY": { "offset": "0x18", "type": "u32", "invariant": { "kind": "range", "min": 0, "max": 65535 }, "comment": "The list is sorted by this, which is a drawing order and not a coincidence to rely on." },
+        "NpcRowPtr": {
+          "offset": "0x20", "type": "ptr", "struct": "NpcsRow",
+          "comment": "WHICH NPC this marker is, when it is one - an NPCs.dat reference, zero on every marker whose icon is not NPC. Verified by grid rather than by reading it: all six NPC markers in the hideout land exactly on the 0xBF NPCs row stride relative to a row identified in an earlier session, and one of them IS that row - Metadata/NPC/Hideout/VaalTimeScientist, the NPC this whole chain was first followed from. So a marker can be named without the entity existing, which is the thing MinimapIcon cannot do."
+        },
+        "NpcTablePtr": { "offset": "0x28", "type": "ptr", "struct": "DatTable" },
+        "QuestFlagRowPtr": {
+          "offset": "0x80", "type": "ptr", "struct": "QuestFlagsRow",
+          "comment": "The flag a marker waits for - read live as CanSeeAngeInHideout on one of the NPC markers. ONLY MEANINGFUL WHEN IT LANDS ON THE ROW GRID, and that is not pedantry: three of the fourteen markers hold floats and small integers in this slot (0x3F800000 is 1.0f), so it is written by the entries that have a condition and left as whatever was there before by the ones that do not. Checking the pointer against the table's rows costs one division and is the difference between one condition and four. First written here as 'zero or a flag', which the same recording disproves.",
+          "invariant": { "kind": "plausiblePtr" }
+        },
+        "QuestFlagTablePtr": { "offset": "0x88", "type": "ptr", "struct": "DatTable" }
+      },
+      "consts": { "EntrySize": "0xC0" }
     },
 
     "ServerDataStructure": {
