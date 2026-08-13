@@ -108,7 +108,9 @@ public class QuestFlagsTableTests
         OffsetSchema schema = LoadSchema();
         StructDef npcs = schema.Structs["NpcsRow"];
 
-        Assert.Equal(npcs.Constants["RowSize"], (long)(NextNpcsRow - NpcsRow));
+        // The measured stride is the expected value and the schema's constant is what is being
+        // checked, not the other way round: memory is the authority here.
+        Assert.Equal((long)(NextNpcsRow - NpcsRow), npcs.Constants["RowSize"]);
         Assert.Equal(
             "Metadata/NPC/Hideout/BloodPriestFemale",
             replay.ReadUnicodeString(replay.ReadPointer(NextNpcsRow + (ulong)npcs.OffsetOf("Id"))));

@@ -178,8 +178,13 @@ public class PointerPeekTests
     private const ulong FakeStoreAt = 0x5000_0000_0000;
     private const ulong FakeRowsAt = 0x6000_0000_0000;
     private const ulong FakeByIdAt = 0x7000_0000_0000;
-    private const ulong FakePathAt = 0x8000_0000_0000;
-    private const ulong FakeIdAt = 0x9000_0000_0000;
+    // Below MaxPlausiblePointer, or the reader refuses them and the fake table is unreadable
+    // in a way no real one ever is. Both of these started at 0x8000_0000_0000 and up, which is
+    // past the user-space ceiling: the table still parsed and still counted its rows, and only
+    // its NAME went missing - a good demonstration of the path being the label rather than the
+    // evidence, arrived at by accident.
+    private const ulong FakePathAt = 0x1000_0000_0000;
+    private const ulong FakeIdAt = 0x1100_0000_0000;
 
     /// <summary>
     /// Builds a dat table in fake memory, at whatever offsets the shipped schema declares.
