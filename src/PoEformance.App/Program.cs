@@ -1305,6 +1305,18 @@ internal static class Program
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
+                    default:
+                        // A BUILD THAT IS TOO OLD LOOKS EXACTLY LIKE A WORKING ONE without
+                        // this. An option it has never heard of was dropped without a word,
+                        // and the report that came back looked entirely normal because
+                        // everything else still ran - so the missing section read as "the scan
+                        // found nothing" rather than "the scan does not exist here". That cost
+                        // a game session with --heapscan, which is the whole reason this
+                        // branch says something.
+                        Console.Error.WriteLine(
+                            $"unknown option \"{args[i]}\" - ignored. If you expected it to do "
+                            + "something, this build is older than the option.");
+                        break;
                 }
             }
 
