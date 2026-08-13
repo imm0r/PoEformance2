@@ -173,4 +173,133 @@ public class PointerPeekTests
     {
         Assert.Equal(TargetKind.Unreadable, PointerPeek.Peek(new FakeMemoryReader(), 42).Kind);
     }
+
+    private const ulong FakeTableAt = 0x2100_0000_0000;
+    private const ulong FakeStoreAt = 0x5000_0000_0000;
+    private const ulong FakeRowsAt = 0x6000_0000_0000;
+    private const ulong FakeByIdAt = 0x7000_0000_0000;
+    private const ulong FakePathAt = 0x8000_0000_0000;
+    private const ulong FakeIdAt = 0x9000_0000_0000;
+
+    /// <summary>
+    /// Builds a dat table in fake memory, at whatever offsets the shipped schema declares.
+    /// </summary>
+    private static (FakeMemoryReader Reader, DatTableShape Shape) FakeTable(string path, int rows, int rowSize)
+    {
+        DatTableShape? shape = DatTableShape.From(RealSessionTests.Schema());
+        Assert.NotNull(shape);
+
+        var reader = new FakeMemoryReader { ModuleSize = 0x8000_0000 };
+        reader.Place(FakeTableAt, new byte[0x40]);
+        reader.Place(FakeTableAt, reader.ModuleBase + 0x1234);   // a vtable, as a real one has
+        reader.Place(FakeTableAt + (ulong)shape.Value.RowStoreOffset, FakeStoreAt);
+        if (path.Length > 0)
+        {
+            reader.PlaceStdWString(FakeTableAt + (ulong)shape.Value.PathOffset, path, FakePathAt);
+        }
+
+        reader.Place(FakeStoreAt, new byte[0x90]);
+        reader.Place(FakeStoreAt + (ulong)shape.Value.RowsOffset, FakeRowsAt);
+        reader.Place(FakeStoreAt + (ulong)shape.Value.RowsOffset + 8, FakeRowsAt + (ulong)(rows * rowSize));
+        reader.Place(FakeStoreAt + (ulong)shape.Value.ByIdIndexOffset, FakeByIdAt);
+        reader.Place(
+            FakeStoreAt + (ulong)shape.Value.ByIdIndexOffset + 8,
+            FakeByIdAt + (ulong)(rows * shape.Value.ByIdEntrySize));
+
+        reader.Place(FakeByIdAt, new byte[0x40]);
+        reader.Place(FakeByIdAt + (ulong)shape.Value.ByIdEntryRowAt, FakeRowsAt);
+
+        return (reader, shape.Value);
+    }
+
+    [Fact]
+    public void ATableNamesItselfAndWorksOutItsOwnRowSize()
+    {
+        // The row size is DERIVED, not looked up: a by-Id entry is a fixed 0x18 whatever the
+        // table, and there is one per row, so the index says how many rows there are and the
+        // rows array divided by that says how big one is. Before this, a row size could only
+        // come from the community schema's column list.
+        (FakeMemoryReader reader, DatTableShape shape) = FakeTable("Data/Balance/QuestFlags.dat", 4, 0x0C);
+
+        PeekResult found = PointerPeek.Peek(reader, FakeTableAt, shape, 0);
+
+        Assert.Equal(TargetKind.DatTable, found.Kind);
+        Assert.Equal("dat table \"Data/Balance/QuestFlags.dat\", 4 rows of 0xC", found.Summary);
+    }
+
+    [Fact]
+    public void ATableWithNoReadablePathIsStillATable()
+    {
+        // The path is the label, not the evidence. It lives one pointer further away than the
+        // numbers do, and a table caught without it is still worth recognising and counting.
+        (FakeMemoryReader reader, DatTableShape shape) = FakeTable(string.Empty, 4, 0x0C);
+
+        PeekResult found = PointerPeek.Peek(reader, FakeTableAt, shape, 0);
+
+        Assert.Equal(TargetKind.DatTable, found.Kind);
+        Assert.Equal("dat table, 4 rows of 0xC", found.Summary);
+    }
+
+    [Fact]
+    public void TwoListsThatDisagreeWithEachOtherAreNotATable()
+    {
+        // The check that makes this a fingerprint rather than a coincidence. Two containers
+        // whose spans happen to divide is a shape plenty of structures have; two containers
+        // that agree about where the rows START is not - so the first index entry has to point
+        // at the first row, and here it deliberately does not.
+        (FakeMemoryReader reader, DatTableShape shape) = FakeTable("Data/Balance/QuestFlags.dat", 4, 0x0C);
+        reader.Place(FakeByIdAt + (ulong)shape.ByIdEntryRowAt, FakeRowsAt + 8);
+
+        Assert.NotEqual(TargetKind.DatTable, PointerPeek.Peek(reader, FakeTableAt, shape, 0).Kind);
+    }
+
+    [Fact]
+    public void ARowIsNumberedWhenItsTableIsInTheNextEightBytes()
+    {
+        // A foreign reference is a row followed by its table, so a peek handed both halves can
+        // answer the one question a row has never been able to answer about itself: which
+        // table it is a row of, and which row.
+        (FakeMemoryReader reader, DatTableShape shape) = FakeTable("Data/Balance/QuestFlags.dat", 4, 0x0C);
+        ulong row = FakeRowsAt + (2 * 0x0C);
+        reader.Place(row, new byte[0x30]);
+        reader.Place(row, FakeIdAt);
+        reader.Place(FakeIdAt, new byte[256]);
+        reader.PlaceUtf16(FakeIdAt, "EnteredHideout");
+
+        PeekResult found = PointerPeek.Peek(reader, row, shape, FakeTableAt);
+
+        Assert.Equal(TargetKind.DatRow, found.Kind);
+        Assert.Equal("QuestFlags row 2 of 4, Id \"EnteredHideout\"", found.Summary);
+    }
+
+    [Fact]
+    public void ARowWithNoTableBesideItIsStillJustARow()
+    {
+        // What every row that is not a foreign reference looks like, which is most of them.
+        (FakeMemoryReader reader, DatTableShape shape) = FakeTable("Data/Balance/QuestFlags.dat", 4, 0x0C);
+        ulong row = FakeRowsAt + (2 * 0x0C);
+        reader.Place(row, new byte[0x30]);
+        reader.Place(row, FakeIdAt);
+        reader.Place(FakeIdAt, new byte[256]);
+        reader.PlaceUtf16(FakeIdAt, "EnteredHideout");
+
+        Assert.Equal("dat row, Id \"EnteredHideout\"", PointerPeek.Peek(reader, row, shape, 0).Summary);
+    }
+
+    [Fact]
+    public void AnAddressThatIsNotOnTheRowGridIsNotGivenARowNumber()
+    {
+        // Halfway into a row - a pointer at its second column, say. Dividing with a remainder
+        // means this is not row 2, and saying "row 2" would be worse than saying nothing.
+        (FakeMemoryReader reader, DatTableShape shape) = FakeTable("Data/Balance/QuestFlags.dat", 4, 0x0C);
+        ulong inside = FakeRowsAt + (2 * 0x0C) + 4;
+        reader.Place(inside, new byte[0x30]);
+        reader.Place(inside, FakeIdAt);
+        reader.Place(FakeIdAt, new byte[256]);
+        reader.PlaceUtf16(FakeIdAt, "EnteredHideout");
+
+        Assert.Equal(
+            "QuestFlags row, Id \"EnteredHideout\"",
+            PointerPeek.Peek(reader, inside, shape, FakeTableAt).Summary);
+    }
 }

@@ -1084,7 +1084,7 @@ public sealed class DissectorWindow
     {
         TargetKind.WideText or TargetKind.Text => NameText,
         TargetKind.Vector => new Vector4(0.8f, 0.6f, 1f, 1f),
-        TargetKind.DatRow => TextFound,
+        TargetKind.DatRow or TargetKind.DatTable => TextFound,
         TargetKind.Structure => PointerText,
         _ => DimText,
     };

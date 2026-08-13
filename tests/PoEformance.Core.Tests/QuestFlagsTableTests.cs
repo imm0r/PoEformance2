@@ -1,3 +1,4 @@
+using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 
@@ -33,6 +34,12 @@ public class QuestFlagsTableTests
     /// <summary>How many entries of each index this recording actually holds.</summary>
     private const int RecordedIdEntries = 64;
     private const int RecordedHashEntries = 25;
+
+    /// <summary>
+    /// A foreign reference in the wild: a row of another table pointing at the flag
+    /// EnteredHideout, with the QuestFlags table in the eight bytes after it.
+    /// </summary>
+    private const ulong ForeignReference = 0x41EB2A11F8CUL;
 
     private static string FixturePath
     {
@@ -138,20 +145,64 @@ public class QuestFlagsTableTests
     }
 
     [Fact]
-    public void DatTable_KnowsHowLongItsPathIs()
+    public void DatTable_NamesItself()
     {
-        // "Data/Balance/QuestFlags.dat" is 27 characters, and of the 26 PoE2 tables whose
-        // columns compute to a 12-byte row it is the only one with a path that length. The
-        // string itself was never followed in this session - which is the point: the length
-        // is one read away and identifies the table on its own.
+        // The table settles its own identity - and the prediction that came before it is worth
+        // keeping in the same test. "Data/Balance/QuestFlags.dat" is 27 characters, and of the
+        // 26 PoE2 tables whose columns compute to a 12-byte row it is the only one with a path
+        // that long, so the LENGTH alone named the table before the text was ever followed.
+        // That is the part that generalises: the next unnamed table may not have its characters
+        // in the recording, and two ints beside a pointer are cheap.
         ReplayMemoryReader replay = LoadSession();
         OffsetSchema schema = LoadSchema();
         ulong table = replay.ReadPointer(NpcsRow + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
+        ulong path = table + (ulong)schema.Structs["DatTable"].OffsetOf("Path");
+
+        Assert.Equal("Data/Balance/QuestFlags.dat", replay.ReadStdWString(path));
 
         // std::wstring keeps its size 0x10 into itself - the same layout ReadStdWString reads.
-        ulong path = table + (ulong)schema.Structs["DatTable"].OffsetOf("Path");
         Assert.Equal(27L, replay.Read<long>(path + 0x10));
         Assert.Equal(31L, replay.Read<long>(path + 0x18));
+    }
+
+    [Fact]
+    public void PeekingTheTable_NamesItAndSizesItsRows()
+    {
+        // What the dissector now shows on that pointer instead of a hex preview. The row size
+        // is not looked up anywhere: the by-Id index has a fixed 0x18 entry per row, so the
+        // table divides out its own 0x0C.
+        ReplayMemoryReader replay = LoadSession();
+        OffsetSchema schema = LoadSchema();
+        DatTableShape? shape = DatTableShape.From(schema);
+        Assert.NotNull(shape);
+
+        ulong table = replay.ReadPointer(NpcsRow + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
+        PeekResult found = PointerPeek.Peek(replay, table, shape, 0);
+
+        Assert.Equal(TargetKind.DatTable, found.Kind);
+        Assert.Equal("dat table \"Data/Balance/QuestFlags.dat\", 5717 rows of 0xC", found.Summary);
+    }
+
+    [Fact]
+    public void PeekingAForeignReference_NumbersTheRow()
+    {
+        // A real foreign reference in this session, in a row of some other table: the flag
+        // EnteredHideout followed by the table it is a row of. Before, this peeked as
+        // "dat row, Id EnteredHideout" and which table it belonged to was unanswerable from
+        // the row - the pointer beside it is what answers it.
+        ReplayMemoryReader replay = LoadSession();
+        OffsetSchema schema = LoadSchema();
+        DatTableShape? shape = DatTableShape.From(schema);
+
+        ulong row = replay.ReadPointer(ForeignReference);
+        ulong table = replay.ReadPointer(ForeignReference + 8);
+        PeekResult found = PointerPeek.Peek(replay, row, shape, table);
+
+        Assert.Equal(TargetKind.DatRow, found.Kind);
+        Assert.Equal("QuestFlags row 46 of 5717, Id \"EnteredHideout\"", found.Summary);
+
+        // Without the neighbour it falls back to what it always said.
+        Assert.Equal("dat row, Id \"EnteredHideout\"", PointerPeek.Peek(replay, row, shape, 0).Summary);
     }
 
     [Fact]
