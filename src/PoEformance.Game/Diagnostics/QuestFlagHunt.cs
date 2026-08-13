@@ -602,7 +602,8 @@ public sealed class QuestFlagHunt
                 known.Rows,
                 (int)known.RowSize,
                 hashes,
-                TableStorage(table, known));
+                TableStorage(table, known),
+                anchor: known.RowsBegin);
 
             LastHeapScan = scan;
             foreach (IGrouping<ulong, RowSighting> group in scan.Sightings.GroupBy(s => s.At >> 20))
@@ -720,10 +721,17 @@ public sealed class QuestFlagHunt
 
         if (LastHeapScan is { } scan)
         {
+            // POINTERS AND HASHES COUNTED APART, because summing them says the opposite of the
+            // truth. A run reported "1790 references" and every one was a 32-bit coincidence -
+            // at a rate chance predicts within a factor of two - while the pointer count, the
+            // only kind that cannot happen by accident, was zero. One number hid both facts.
+            int byPointer = scan.Sightings.Count(s => s.ByPointer);
             output.WriteLine(
                 $"  heap scan {scan.RegionsWalked} regions, {scan.BytesScanned / 1024 / 1024} MB, "
-                + $"{scan.Sightings.Count} references"
-                + (scan.Truncated ? " - STOPPED EARLY, so this is not the whole address space" : " - the whole address space"));
+                + $"{byPointer} pointers and {scan.Sightings.Count - byPointer} hash matches"
+                + (scan.Truncated
+                    ? $" - STOPPED EARLY: everything within {scan.Reach / 1024 / 1024} MB of the table was covered, beyond that nothing"
+                    : " - the whole address space"));
         }
 
         if (result.Followed > 0)

@@ -412,4 +412,48 @@ public class QuestFlagHuntTests
         Assert.Equal(2, scan.RegionsSkipped);
         Assert.DoesNotContain(scan.Sightings, s => s.At >= facts.RowsBegin && s.At < facts.RowsBegin + (ulong)(facts.Rows * facts.RowSize));
     }
+
+    /// <summary>A process whose committed memory sits in two places, far apart.</summary>
+    private sealed class TwoIslands(ulong low, ulong high, ulong size) : IMemoryRegions
+    {
+        // Low first, which is the order VirtualQueryEx answers in and the order that wasted a
+        // whole budget on driver mappings before the game's own heap was ever reached.
+        public IEnumerable<MemoryRegion> Regions() => [new(low, size), new(high, size)];
+    }
+
+    [Fact]
+    public void HeapScan_ScansOutwardFromTheTableRatherThanUpwardFromZero()
+    {
+        // THE FAILURE THIS PINS came from a live run: walking in address order, the budget was
+        // spent entirely on mappings two terabytes BELOW the game's data heap, and the scan
+        // reported 1790 references without ever reaching a single real one. Anchoring on the
+        // table makes what gets cut the far and unlikely instead of whatever sorts last.
+        const ulong Rows = 0x4000_0000_0000, Far = 0x1000_0000_0000, Size = 0x1000;
+        const int RowSize = 12;
+
+        var memory = new FakeMemoryReader();
+        memory.Place(Rows, new byte[RowSize * 4]);          // the table's own rows
+        memory.Place(Far, new byte[Size]);
+        memory.Place(Rows + 0x10_0000, new byte[Size]);
+
+        // The same row pointed at from both islands, so only the ORDER can tell them apart.
+        memory.Place(Far + 0x40, Rows + (ulong)(2 * RowSize));
+        memory.Place(Rows + 0x10_0000 + 0x40, Rows + (ulong)(2 * RowSize));
+
+        var space = new TwoIslands(Far, Rows + 0x10_0000, Size);
+
+        HeapScanResult far = HeapScan.Run(
+            memory, space, Rows, 4, RowSize, new Dictionary<uint, int>(), mostSightings: 1);
+        HeapScanResult near = HeapScan.Run(
+            memory, space, Rows, 4, RowSize, new Dictionary<uint, int>(), mostSightings: 1, anchor: Rows);
+
+        // One sighting each, because the cap bites after the first - so which one it is IS the
+        // scan order. Unanchored takes the low island; anchored takes the one beside the table.
+        Assert.Equal(Far + 0x40, Assert.Single(far.Sightings).At);
+        Assert.Equal(Rows + 0x10_0000 + 0x40, Assert.Single(near.Sightings).At);
+
+        // And the reach says how far out the budget carried, which is what turns "found
+        // nothing" into "found nothing within this distance".
+        Assert.True(near.Reach < 0x20_0000, $"reach {near.Reach:X}");
+    }
 }
