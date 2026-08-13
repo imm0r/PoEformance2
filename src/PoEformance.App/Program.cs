@@ -152,6 +152,17 @@ internal static class Program
                     .Report(gameStatesAddress, Console.Out);
                 recorder?.MarkFrame();
             }
+
+            // Opt-in, because it reads a couple of hundred kilobytes it has no other use for.
+            // That reading IS the point: a recording made with this on carries the regions a
+            // character's quest flags could live in, and two sessions have now failed to
+            // answer the question for the sole reason that nothing ever read them.
+            if (options.HuntQuestFlags)
+            {
+                var hunt = new PoEformance.Game.Diagnostics.QuestFlagHunt(reader, worldSchema);
+                hunt.Report(hunt.Run(gameStatesAddress), Console.Out);
+                recorder?.MarkFrame();
+            }
         }
 
         // ── Auto-flask ───────────────────────────────────────────────────────
@@ -1236,14 +1247,15 @@ internal static class Program
         bool ProbeFlasks,
         bool ProbeKeys,
         bool Debug,
-        bool ShowUiBrowser)
+        bool ShowUiBrowser,
+        bool HuntQuestFlags)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
-            bool uiBrowser = false;
+            bool uiBrowser = false, questFlags = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -1282,6 +1294,9 @@ internal static class Program
                     case "--uibrowser":
                         uiBrowser = true;
                         break;
+                    case "--questflags":
+                        questFlags = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
@@ -1290,7 +1305,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser);
+                debug, uiBrowser, questFlags);
         }
     }
 }

@@ -28,7 +28,7 @@ public class QuestFlagsTableTests
     private const ulong NpcComponent = 0x41ECA2B3AB0UL;
 
     /// <summary>Its NPCs.dat row, and the row 0xBF further on (BloodPriestFemale, "Zelina").</summary>
-    private const ulong NpcsRow = 0x41EC21DCD26UL;
+    internal const ulong NpcsRowAddress = 0x41EC21DCD26UL;
     private const ulong NextNpcsRow = 0x41EC21DCDE5UL;
 
     /// <summary>How many entries of each index this recording actually holds.</summary>
@@ -41,7 +41,7 @@ public class QuestFlagsTableTests
     /// </summary>
     private const ulong ForeignReference = 0x41EB2A11F8CUL;
 
-    private static string FixturePath
+    internal static string FixturePath
     {
         get
         {
@@ -79,7 +79,7 @@ public class QuestFlagsTableTests
 
         ulong data = replay.ReadPointer(NpcComponent + (ulong)schema.Structs["Npc"].OffsetOf("NpcDataPtr"));
         ulong row = replay.ReadPointer(data + (ulong)schema.Structs["NpcData"].OffsetOf("NpcsRowPtr"));
-        Assert.Equal(NpcsRow, row);
+        Assert.Equal(NpcsRowAddress, row);
 
         StructDef npcs = schema.Structs["NpcsRow"];
         Assert.Equal(
@@ -110,7 +110,7 @@ public class QuestFlagsTableTests
 
         // The measured stride is the expected value and the schema's constant is what is being
         // checked, not the other way round: memory is the authority here.
-        Assert.Equal((long)(NextNpcsRow - NpcsRow), npcs.Constants["RowSize"]);
+        Assert.Equal((long)(NextNpcsRow - NpcsRowAddress), npcs.Constants["RowSize"]);
         Assert.Equal(
             "Metadata/NPC/Hideout/BloodPriestFemale",
             replay.ReadUnicodeString(replay.ReadPointer(NextNpcsRow + (ulong)npcs.OffsetOf("Id"))));
@@ -130,8 +130,8 @@ public class QuestFlagsTableTests
         OffsetSchema schema = LoadSchema();
         StructDef npcs = schema.Structs["NpcsRow"];
 
-        ulong flagRow = replay.ReadPointer(NpcsRow + (ulong)npcs.OffsetOf("QuestFlagsRowPtr"));
-        ulong table = replay.ReadPointer(NpcsRow + (ulong)npcs.OffsetOf("QuestFlagsTablePtr"));
+        ulong flagRow = replay.ReadPointer(NpcsRowAddress + (ulong)npcs.OffsetOf("QuestFlagsRowPtr"));
+        ulong table = replay.ReadPointer(NpcsRowAddress + (ulong)npcs.OffsetOf("QuestFlagsTablePtr"));
 
         ulong store = replay.ReadPointer(table + (ulong)schema.Structs["DatTable"].OffsetOf("RowStorePtr"));
         ulong rows = replay.ReadPointer(store + (ulong)schema.Structs["DatRowStore"].OffsetOf("Rows"));
@@ -157,7 +157,7 @@ public class QuestFlagsTableTests
         // in the recording, and two ints beside a pointer are cheap.
         ReplayMemoryReader replay = LoadSession();
         OffsetSchema schema = LoadSchema();
-        ulong table = replay.ReadPointer(NpcsRow + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
+        ulong table = replay.ReadPointer(NpcsRowAddress + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
         ulong path = table + (ulong)schema.Structs["DatTable"].OffsetOf("Path");
 
         Assert.Equal("Data/Balance/QuestFlags.dat", replay.ReadStdWString(path));
@@ -178,7 +178,7 @@ public class QuestFlagsTableTests
         DatTableShape? shape = DatTableShape.From(schema);
         Assert.NotNull(shape);
 
-        ulong table = replay.ReadPointer(NpcsRow + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
+        ulong table = replay.ReadPointer(NpcsRowAddress + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
         PeekResult found = PointerPeek.Peek(replay, table, shape, 0);
 
         Assert.Equal(TargetKind.DatTable, found.Kind);
@@ -215,7 +215,7 @@ public class QuestFlagsTableTests
         StructDef store = schema.Structs["DatRowStore"];
         StructDef flag = schema.Structs["QuestFlagsRow"];
 
-        ulong table = replay.ReadPointer(NpcsRow + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
+        ulong table = replay.ReadPointer(NpcsRowAddress + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
         ulong rowStore = replay.ReadPointer(table + (ulong)schema.Structs["DatTable"].OffsetOf("RowStorePtr"));
 
         ulong rows = replay.ReadPointer(rowStore + (ulong)store.OffsetOf("Rows"));
@@ -265,7 +265,7 @@ public class QuestFlagsTableTests
         StructDef store = schema.Structs["DatRowStore"];
         StructDef flag = schema.Structs["QuestFlagsRow"];
 
-        ulong table = replay.ReadPointer(NpcsRow + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
+        ulong table = replay.ReadPointer(NpcsRowAddress + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
         ulong rowStore = replay.ReadPointer(table + (ulong)schema.Structs["DatTable"].OffsetOf("RowStorePtr"));
         ulong rows = replay.ReadPointer(rowStore + (ulong)store.OffsetOf("Rows"));
         ulong byId = replay.ReadPointer(rowStore + (ulong)store.OffsetOf("ByIdIndex"));
@@ -322,7 +322,7 @@ public class QuestFlagsTableTests
 
         // And the rows really are that dense: row 1's Id is a pointer, not the tail of
         // row 0's fields.
-        ulong table = replay.ReadPointer(NpcsRow + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
+        ulong table = replay.ReadPointer(NpcsRowAddress + (ulong)schema.Structs["NpcsRow"].OffsetOf("QuestFlagsTablePtr"));
         ulong rowStore = replay.ReadPointer(table + (ulong)schema.Structs["DatTable"].OffsetOf("RowStorePtr"));
         ulong rows = replay.ReadPointer(rowStore + (ulong)schema.Structs["DatRowStore"].OffsetOf("Rows"));
 

@@ -216,7 +216,14 @@ PoEformance.App                                # attach + drift report
 PoEformance.App --overlay                      # the in-game overlay
 PoEformance.App --record session.rec           # same, capturing everything
 PoEformance.App --replay session.rec           # rerun against the capture, no game needed
+PoEformance.App --record s.rec --questflags    # + read where a character's quest flags could be
 ```
+
+`--questflags` is a hunt rather than a feature: it finds the QuestFlags table through any NPC
+in the area and sweeps ServerData and the state objects for references to its rows. The sweep
+reports what it matched, but the reason to run it is the READING - the regions land in the
+recording, and a question that needs the game becomes one that can be answered offline as
+often as it takes.
 
 ## Status
 

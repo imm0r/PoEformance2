@@ -1,0 +1,396 @@
+using PoEformance.Core.Diagnostics;
+using PoEformance.Core.Memory;
+using PoEformance.Core.Schema;
+using PoEformance.Game.Entities;
+
+namespace PoEformance.Game.Diagnostics;
+
+/// <summary>One flag the sweep matched, and where the match was.</summary>
+/// <param name="Row">Which row of QuestFlags.dat it is.</param>
+/// <param name="Id">The flag's name, read only for rows that actually matched.</param>
+/// <param name="At">Where in memory the match sits.</param>
+/// <param name="ByPointer">True when a row POINTER was found, false when the row's HASH32 was.</param>
+public readonly record struct FlagSighting(int Row, string Id, ulong At, bool ByPointer);
+
+/// <summary>What one swept region turned out to hold.</summary>
+public sealed record SweptRegion(
+    string Name,
+    ulong Address,
+    int Wanted,
+    int Read,
+    IReadOnlyList<FlagSighting> Sightings);
+
+/// <summary>The whole hunt: what was found, and what was merely captured.</summary>
+public sealed record QuestFlagHuntResult(
+    ulong Table,
+    string Path,
+    int Rows,
+    IReadOnlyList<SweptRegion> Regions,
+    string Note)
+{
+    /// <summary>Every sighting across every region, which is the answer when there is one.</summary>
+    public IEnumerable<FlagSighting> Sightings => Regions.SelectMany(r => r.Sightings);
+}
+
+/// <summary>
+/// Looks for the flags a CHARACTER has set, as opposed to the list of flags that exist.
+/// </summary>
+/// <remarks>
+/// WHY THIS IS A READER AND NOT AN ANALYSIS. QuestFlags.dat is static content - 5717 names,
+/// identical for every character, with no bit anywhere saying whether one is set. The set a
+/// character HAS must exist client-side, because QuestStates.dat gates its text on
+/// FlagsPresent/FlagsMissing and something has to evaluate that. Two recordings have now
+/// failed to contain it, and neither failure was informative: a recording holds only what the
+/// running build READ, and nothing in this tool has ever had a reason to read the regions a
+/// per-character blob would live in. The second one - taken deliberately with the quest list
+/// open - had 64 bytes of ServerData in it out of the first 32 KB.
+///
+/// So this reads them. The match below is a bonus; the POINT is that the bytes land in a
+/// <c>--record</c> session, which turns a question that needs the game into one that can be
+/// answered offline as often as it takes. PlayerProbe exists for the same reason.
+///
+/// WHAT IT LOOKS FOR, and why both: a row POINTER (16 bytes of foreign reference is how the
+/// game's own data refers to a flag) and the row's HASH32 (the table carries an index keyed on
+/// exactly that value, so a compact runtime set has an obvious reason to store hashes rather
+/// than pointers). A third shape - row indices as u16/u32 - is deliberately not looked for
+/// here: an index below 5717 is too ordinary a number to tell from noise, and a sweep for it
+/// over a recorded session found only false positives.
+/// </remarks>
+public sealed class QuestFlagHunt
+{
+    /// <summary>How much of each region to take, in one chunk.</summary>
+    /// <remarks>
+    /// A read only succeeds when every byte of it is mapped, so a big region is taken in
+    /// pieces: one unmapped page at the end must not cost the whole thing. 4 KB is the page
+    /// size, so a chunk either lands entirely in a mapped page or in one that is not there.
+    /// </remarks>
+    public const int ChunkBytes = 4096;
+
+    /// <summary>Largest table this will read rows from, as a guard on a length from memory.</summary>
+    public const int MostRows = 100_000;
+
+    private readonly IMemoryReader _reader;
+    private readonly OffsetSchema _schema;
+    private readonly DatTableShape? _tables;
+
+    public QuestFlagHunt(IMemoryReader reader, OffsetSchema schema)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+        ArgumentNullException.ThrowIfNull(schema);
+        _reader = reader;
+        _schema = schema;
+        _tables = DatTableShape.From(schema);
+    }
+
+    /// <summary>
+    /// Finds the QuestFlags table by way of an NPC standing in the world.
+    /// </summary>
+    /// <remarks>
+    /// NPCs.dat declares a QuestFlags column, so every NPC entity carries a foreign reference
+    /// to a row of the table - which makes any NPC a route to it. This is how the table was
+    /// found in the first place, in a hideout, and a hideout is also where the quest list is
+    /// read, so the one place this route fails is a place the hunt is not run.
+    ///
+    /// The table is CHECKED, not assumed: the pointer's own path must end in QuestFlags.dat.
+    /// A route through three offsets that lands on the wrong table would otherwise sweep for
+    /// the hashes of something else entirely and report a confident nothing.
+    /// </remarks>
+    public ulong FindTableViaNpc(ulong areaInstance, int maxEntities = 512)
+    {
+        if (_tables is not { } shape)
+        {
+            return 0;
+        }
+
+        StructDef ai = _schema.Structs["AreaInstance"];
+        StructDef npc = _schema.Structs["Npc"];
+        StructDef data = _schema.Structs["NpcData"];
+        StructDef row = _schema.Structs["NpcsRow"];
+
+        // The ADDRESS of the map struct, not a pointer read from it - the tree's root sits
+        // inside AreaInstance rather than behind it, and reading through the field lands one
+        // hop too far in.
+        ulong map = areaInstance + (ulong)ai.OffsetOf("AwakeEntities");
+        var entities = new EntityReader(_reader, _schema);
+        foreach (ulong address in new EntityMapReader(_reader, _schema)
+            .ReadEntityPointers(map, maxEntities).Values)
+        {
+            ulong component = entities.Read(address)?.Component("NPC") ?? 0;
+            if (component == 0)
+            {
+                continue;
+            }
+
+            ulong table = _reader.ReadChain(
+                component,
+                npc.OffsetOf("NpcDataPtr"),
+                data.OffsetOf("NpcsRowPtr"),
+                row.OffsetOf("QuestFlagsTablePtr"));
+
+            if (PointerPeek.DescribeTable(_reader, table, shape) is { } facts
+                && facts.Path.EndsWith("QuestFlags.dat", StringComparison.OrdinalIgnoreCase))
+            {
+                return table;
+            }
+        }
+
+        return 0;
+    }
+
+    /// <summary>Every row's HASH32, by row index - the needles the sweep looks for.</summary>
+    /// <remarks>
+    /// Read as one block per chunk rather than row by row: 5717 rows is 68 KB, which is one
+    /// read per page and not 5717 of them. The Ids are NOT read here - only the rows that
+    /// turn out to match are worth a string read, and that is the difference between a
+    /// diagnostic that costs a page and one that costs six thousand.
+    /// </remarks>
+    public Dictionary<uint, int> HashesIn(ulong table)
+    {
+        var hashes = new Dictionary<uint, int>();
+        if (_tables is not { } shape
+            || PointerPeek.DescribeTable(_reader, table, shape) is not { } facts
+            || facts.Rows is <= 0 or > MostRows)
+        {
+            return hashes;
+        }
+
+        StructDef flag = _schema.Structs["QuestFlagsRow"];
+        int hashAt = flag.OffsetOf("Hash32");
+        int size = (int)facts.RowSize;
+        var block = new byte[size * (int)facts.Rows];
+        var have = new bool[block.Length];
+
+        for (int taken = 0; taken < block.Length; taken += ChunkBytes)
+        {
+            int got = TakeChunk(facts.RowsBegin + (ulong)taken, block.AsSpan(taken), Math.Min(ChunkBytes, block.Length - taken));
+            Array.Fill(have, true, taken, got);
+        }
+
+        // Only rows that were wholly read. A chunk that failed leaves zeros behind, and a
+        // zero indexed as a hash would put a real row number on a value that is simply
+        // missing - which is exactly the kind of confident wrong answer a replayed session
+        // (where most pages were never captured) would produce.
+        for (int i = 0; i < facts.Rows; i++)
+        {
+            int at = (i * size) + hashAt;
+            if (have[at] && have[at + sizeof(uint) - 1])
+            {
+                hashes[BitConverter.ToUInt32(block, at)] = i;
+            }
+        }
+
+        return hashes;
+    }
+
+    /// <summary>
+    /// Reads a region and reports every flag it refers to.
+    /// </summary>
+    /// <remarks>
+    /// Scanned at four-byte steps for both shapes rather than at their natural alignment. A
+    /// pointer is eight-byte aligned in anything the compiler laid out, but the game's own dat
+    /// rows are PACKED and land on odd addresses, so alignment is not a safe assumption in
+    /// this process - and the cost of dropping it is one extra pass over a few kilobytes.
+    /// </remarks>
+    public SweptRegion Sweep(
+        string name,
+        ulong address,
+        int bytes,
+        IReadOnlyDictionary<uint, int> hashes,
+        ulong rowsBegin,
+        long rows,
+        int rowSize)
+    {
+        ArgumentNullException.ThrowIfNull(hashes);
+
+        var sightings = new List<FlagSighting>();
+        var seen = new HashSet<int>();
+        var buffer = new byte[ChunkBytes];
+        int read = 0;
+
+        for (int taken = 0; taken < bytes; taken += ChunkBytes)
+        {
+            // As much of the chunk as is mapped. A region walks off the end of its allocation
+            // sooner or later - these sizes are guesses about where a blob ends - and a read
+            // fails on ALL of its bytes when one page is missing, so asking for less is the
+            // difference between half a region and none of it.
+            int want = TakeChunk(address + (ulong)taken, buffer, Math.Min(ChunkBytes, bytes - taken));
+            if (want == 0)
+            {
+                continue;
+            }
+
+            read += want;
+
+            for (int at = 0; at + sizeof(uint) <= want; at += sizeof(uint))
+            {
+                ulong here = address + (ulong)(taken + at);
+
+                if (hashes.TryGetValue(BitConverter.ToUInt32(buffer, at), out int row) && seen.Add(row))
+                {
+                    sightings.Add(new FlagSighting(row, IdOf(rowsBegin, rowSize, row), here, ByPointer: false));
+                }
+
+                if (at + sizeof(ulong) > want || rowSize <= 0)
+                {
+                    continue;
+                }
+
+                ulong value = BitConverter.ToUInt64(buffer, at);
+                if (value < rowsBegin)
+                {
+                    continue;
+                }
+
+                ulong offset = value - rowsBegin;
+                if (offset % (ulong)rowSize != 0)
+                {
+                    continue;
+                }
+
+                long index = (long)(offset / (ulong)rowSize);
+                if (index < rows && seen.Add((int)index))
+                {
+                    sightings.Add(new FlagSighting((int)index, IdOf(rowsBegin, rowSize, (int)index), here, ByPointer: true));
+                }
+            }
+        }
+
+        return new SweptRegion(name, address, bytes, read, sightings);
+    }
+
+    /// <summary>
+    /// Reads as much of a chunk as is actually mapped, and says how much that was.
+    /// </summary>
+    /// <remarks>
+    /// Halving rather than giving up, which is what PreloadReader's sweep does for the same
+    /// reason: ReadProcessMemory refuses the WHOLE range when any byte of it is unmapped, so
+    /// a region that ends mid-page reads as nothing at all. It also matters off the game
+    /// entirely - a replayed recording holds only the bytes that were captured, and demanding
+    /// a full page from one would report an empty sweep over data that is right there.
+    /// </remarks>
+    private int TakeChunk(ulong address, Span<byte> destination, int want)
+    {
+        while (want >= sizeof(uint) && !_reader.TryRead(address, destination[..want]))
+        {
+            want /= 2;
+        }
+
+        return want < sizeof(uint) ? 0 : want;
+    }
+
+    /// <summary>Reads one row's Id, which only matters for the rows that matched.</summary>
+    private string IdOf(ulong rowsBegin, int rowSize, int row)
+    {
+        int idAt = _schema.Structs["QuestFlagsRow"].OffsetOf("Id");
+        ulong text = _reader.ReadPointer(rowsBegin + (ulong)(row * rowSize) + (ulong)idAt);
+        return _reader.ReadUnicodeString(text, 128);
+    }
+
+    /// <summary>
+    /// Runs the whole hunt: find the table, then sweep the places a character's flags could be.
+    /// </summary>
+    /// <remarks>
+    /// THE REGIONS ARE GUESSES AND THAT IS FINE, because the sweep is not the only thing that
+    /// happens here - reading them is what puts them in a recording. ServerData first and
+    /// biggest: it is the blob the server sends about this character, it is where the league
+    /// name and every inventory already live, and quest state is server-authoritative.
+    /// Neither reference decodes anything of it beyond inventories, so there is nothing to
+    /// copy and this is new ground.
+    /// </remarks>
+    public QuestFlagHuntResult Run(ulong gameStatesStatic, int serverDataBytes = 128 * 1024)
+    {
+        if (_tables is null)
+        {
+            return new QuestFlagHuntResult(0, string.Empty, 0, [], "the schema does not describe dat tables");
+        }
+
+        GameChainAddresses chain = GameChain.Resolve(_reader, _schema, gameStatesStatic);
+        if (chain.AreaInstance == 0)
+        {
+            return new QuestFlagHuntResult(0, string.Empty, 0, [], "not in game");
+        }
+
+        ulong table = FindTableViaNpc(chain.AreaInstance);
+        DatTableFacts? facts = table == 0 ? null : PointerPeek.DescribeTable(_reader, table, _tables.Value);
+        Dictionary<uint, int> hashes = table == 0 ? [] : HashesIn(table);
+
+        StructDef ai = _schema.Structs["AreaInstance"];
+        ulong serverData = _reader.ReadPointer(
+            chain.AreaInstance + (ulong)ai.OffsetOf("PlayerInfo")
+            + (ulong)_schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr"));
+
+        var regions = new List<(string Name, ulong Address, int Bytes)>
+        {
+            ("ServerData", serverData, serverDataBytes),
+            ("InGameState", chain.InGameState, 32 * 1024),
+            ("AreaInstance", chain.AreaInstance, 32 * 1024),
+            ("PlayerEntity", chain.PlayerEntity, 8 * 1024),
+        };
+
+        var swept = new List<SweptRegion>();
+        foreach ((string name, ulong address, int bytes) in regions)
+        {
+            if (address != 0)
+            {
+                swept.Add(Sweep(
+                    name,
+                    address,
+                    bytes,
+                    hashes,
+                    facts?.RowsBegin ?? 0,
+                    facts?.Rows ?? 0,
+                    (int)(facts?.RowSize ?? 0)));
+            }
+        }
+
+        return new QuestFlagHuntResult(
+            table,
+            facts?.Path ?? string.Empty,
+            hashes.Count,
+            swept,
+            table == 0
+                ? "no NPC in this area carried a QuestFlags reference - the regions were still read, "
+                    + "so a --record session can be swept offline once the table is known"
+                : string.Empty);
+    }
+
+    /// <summary>Prints the hunt for a person.</summary>
+    public void Report(QuestFlagHuntResult result, TextWriter output)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(output);
+
+        output.WriteLine();
+        output.WriteLine("Quest flags");
+        if (result.Table != 0)
+        {
+            output.WriteLine($"  table    0x{result.Table:X} \"{result.Path}\", {result.Rows} rows");
+        }
+
+        if (result.Note.Length > 0)
+        {
+            output.WriteLine($"  note     {result.Note}");
+        }
+
+        foreach (SweptRegion region in result.Regions)
+        {
+            output.WriteLine(
+                $"  {region.Name,-13} 0x{region.Address:X}  {region.Read}/{region.Wanted} bytes read, "
+                + $"{region.Sightings.Count} flags");
+
+            foreach (FlagSighting sighting in region.Sightings.Take(20))
+            {
+                output.WriteLine(
+                    $"      +0x{sighting.At - region.Address:X6} row {sighting.Row} "
+                    + $"{(sighting.ByPointer ? "pointer" : "hash")}  {sighting.Id}");
+            }
+        }
+
+        if (!result.Sightings.Any())
+        {
+            // Said plainly, because a silent nothing reads as a broken sweep. It is not: the
+            // regions are guesses, and the recording is the deliverable when they are wrong.
+            output.WriteLine("  nothing matched - the flags a character has set are not in these regions");
+        }
+    }
+}
