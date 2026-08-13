@@ -36,6 +36,16 @@ public sealed record HeapScanResult(
 /// than at their natural alignment, because this game's packed dat rows sit on odd addresses
 /// and an aligned-only scan would miss every reference inside one.
 ///
+/// A HIT IS NOT A LIVE REFERENCE. The game allocates out of pools - a debugger watching one
+/// block caught the free itself, three instructions that hang the block off a free list by
+/// writing the list head into the block's own first eight bytes and pointing the head at the
+/// block. Everything after that first qword is left exactly as the previous tenant wrote it,
+/// so a freed block still holds whatever row pointers it held while it was in use, and those
+/// are indistinguishable from live ones at the byte level. Two things follow for anything
+/// reading these results: a sighting is a place to look, not a finding, and a cluster in one
+/// region is worth more than a lone hit, because a live structure is referenced from
+/// somewhere while abandoned bytes are not.
+///
 /// NOT RECORDED, ON PURPOSE. The scan reads in megabyte chunks, which is above the recorder's
 /// cap, so a --record session does not swell by the size of the game's heap. The bytes that
 /// matter are the HITS, and a caller that wants those in the recording should read their
