@@ -429,6 +429,9 @@ public sealed class PoiLayer
         if (ImGui.Begin(
                 "Points of interest", ref open, Chrome.Flags(ChromeId, ImGuiWindowFlags.NoFocusOnAppearing)))
         {
+            // Before the body, and the close button declared so they stop short of it.
+            Chrome.TitleButtons(ChromeId, closable: true);
+
             if (player is null)
             {
                 ImGui.TextColored(DimText, "not in an area");
