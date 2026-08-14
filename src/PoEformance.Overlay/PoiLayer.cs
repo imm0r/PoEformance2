@@ -172,9 +172,13 @@ public sealed class PoiLayer
     /// distinction than the kind: a breach and a ritual are both "a mechanic", and they are
     /// the two markers most worth telling apart on sight.
     /// </param>
+    /// <param name="Remembered">
+    /// Whether this comes from the memory of a place rather than from this read. A terrain
+    /// landmark is never one: it is read out of the ground, which does not go out of range.
+    /// </param>
     private readonly record struct Place(
         ulong Id, string Name, PoiKind Kind, float WorldX, float WorldY, float Height, string Icon,
-        bool Spent = false);
+        bool Spent = false, bool Remembered = false);
 
     /// <summary>Everything markable in the area, from both sources.</summary>
     private List<Place> PlacesIn(WorldSnapshot snapshot)
@@ -188,7 +192,7 @@ public sealed class PoiLayer
                 places.Add(new Place(
                     entity.Address, entity.PoiName, entity.Poi,
                     entity.WorldX, entity.WorldY, entity.TerrainHeight, entity.MapIcon,
-                    entity.IsSpent));
+                    entity.IsSpent, entity.IsRemembered));
             }
         }
 
@@ -268,8 +272,15 @@ public sealed class PoiLayer
 
             // A destination takes its ROUTE's colour, which is the whole reason several
             // routes can be read at once: the line and the end it leads to match.
+            //
+            // Faded once the game has stopped listing it. A place does not move - that is why
+            // it is worth remembering at all - so the marker is where the thing is; what it
+            // can no longer promise is that nobody has been there since, and a dimmer marker
+            // is that difference said without taking the landmark off the map.
             bool routed = _planner.IsTarget(place.Id);
-            uint colour = routed ? RouteColour(place.Id) : ColourFor(glyph);
+            float fade = place.Remembered ? OverlayStyle.RememberedAlpha : 1f;
+            uint chosen = routed ? RouteColour(place.Id) : ColourFor(glyph);
+            uint colour = OverlayStyle.Faded(chosen, fade);
             float size = Style.Sized(key, radius);
 
             // A chosen picture instead of the shape, and the SHAPE when there is none or it
@@ -282,7 +293,8 @@ public sealed class PoiLayer
                 // its colours, and multiplying it by this glyph's default would look broken.
                 draw.AddImage(
                     icon, at - new Vector2(size, size), at + new Vector2(size, size),
-                    Vector2.Zero, Vector2.One, Style[key].ColourOr(0xFFFFFFFF));
+                    Vector2.Zero, Vector2.One,
+                    OverlayStyle.Faded(Style[key].ColourOr(0xFFFFFFFF), fade));
             }
             else
             {
@@ -296,7 +308,10 @@ public sealed class PoiLayer
 
             if (ShowLabels && map.IsLargeMap)
             {
-                draw.AddText(at + new Vector2(size + 3f, -7f), Style[StyleCatalogue.Keys.PlaceLabel].ColourOr(colour), place.Name);
+                draw.AddText(
+                    at + new Vector2(size + 3f, -7f),
+                    OverlayStyle.Faded(Style[StyleCatalogue.Keys.PlaceLabel].ColourOr(chosen), fade),
+                    place.Name);
             }
         }
     }
@@ -501,9 +516,9 @@ public sealed class PoiLayer
 
             ImGui.PushStyleColor(
                 ImGuiCol.Text,
-                ImGui.ColorConvertU32ToFloat4(routed
-                    ? RouteColour(place.Id)
-                    : ColourFor(PoiGlyphs.For(place.Icon, place.Kind))));
+                ImGui.ColorConvertU32ToFloat4(OverlayStyle.Faded(
+                    routed ? RouteColour(place.Id) : ColourFor(PoiGlyphs.For(place.Icon, place.Kind)),
+                    place.Remembered ? OverlayStyle.RememberedAlpha : 1f)));
 
             // ### rather than ##: the label is built from game data and everything after a ##
             // would be read as the identity, so two places could collapse into one row.

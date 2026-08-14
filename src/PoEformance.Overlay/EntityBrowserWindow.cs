@@ -110,10 +110,14 @@ public sealed class EntityBrowserWindow
             DrawComponents(view);
         }
 
+        // Listed, not Entities: the survey walks every address's component table, and a
+        // remembered entity's address belonged to an object the game may since have released.
+        // Reading one would count components out of whatever now occupies that memory, which
+        // is worse than missing it - a survey exists to be believed.
         _inspector.Request(new EntityRequest(
             Enabled: true,
             Address: _selected,
-            Survey: [.. snapshot.Entities.Select(entity => entity.Address)],
+            Survey: [.. snapshot.Listed.Select(entity => entity.Address)],
             SurveySequence: _surveySequence,
             Expand: [.. _open]));
     }
@@ -139,7 +143,7 @@ public sealed class EntityBrowserWindow
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(
-                $"Counts every component across the {snapshot.Entities.Count} entities here.\n"
+                $"Counts every component across the {snapshot.Entities.Count - snapshot.Remembered} entities here.\n"
                 + "The rare undescribed ones are the leads worth following.");
         }
 
@@ -163,7 +167,7 @@ public sealed class EntityBrowserWindow
         // nothing - and that is the point of leaving it in. It is the check on the collapsing
         // rather than a leftover: anything it still reports is a repeat the position key does
         // not catch, which is exactly what nobody would notice otherwise.
-        EntityDuplicates duplicates = EntityDuplicates.Of(snapshot.Entities);
+        EntityDuplicates duplicates = EntityDuplicates.Of([.. snapshot.Listed]);
         ImGui.TextColored(
             duplicates.Any ? WarnText : DimText,
             ImGuiText.Escape(duplicates.Describe()));
@@ -217,7 +221,15 @@ public sealed class EntityBrowserWindow
             _ => string.Empty,
         };
 
-        return life + shield + chest;
+        // Said out loud, because this row's numbers are a RECORDING and its address no longer
+        // points at anything: clicking it draws a route to where the thing was, which is
+        // useful, while taking it apart in the dissector reads whatever now sits at that
+        // address. Nothing else on the row would give that away.
+        string remembered = entity.RememberedForMs is int since
+            ? $"  remembered {since / 1000}s"
+            : string.Empty;
+
+        return life + shield + chest + remembered;
     }
 
     private void DrawList(List<WorldEntity> listed, WorldEntity? player)

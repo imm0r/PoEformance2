@@ -99,6 +99,19 @@ public readonly record struct ReadCost(
 /// <param name="Render">
 /// The Render component's address - what actually IDENTIFIES the thing in the world.
 /// </param>
+/// <param name="RememberedForMs">
+/// How long ago the game last listed this entity, for one it is no longer listing.
+///
+/// Null - the ordinary case - means the game listed it in the read this snapshot came from.
+/// A value means the entity map no longer has it and this is a SIGHTING: the position and
+/// everything else on it are what they were when it was last read. See
+/// <see cref="EntityMemory"/> for what gets kept and why nothing that moves ever does.
+///
+/// Carried rather than left implicit because the one thing a remembered entity cannot be used
+/// for is reading more memory: its address belonged to an object the game may since have
+/// freed, so anything that follows a pointer - the dissector, the duplicate check - has to be
+/// able to tell the two apart.
+/// </param>
 /// <remarks>
 /// Carried because the game hands one monster several entity objects over a single set of
 /// components, so an entity address is not an identity: three entities with three addresses
@@ -126,8 +139,12 @@ public sealed record WorldEntity(
     bool IsEffect = false,
     string Name = "",
     ulong Render = 0,
-    bool? Present = null)
+    bool? Present = null,
+    int? RememberedForMs = null)
 {
+    /// <summary>Whether this comes from memory rather than from the game's current list.</summary>
+    public bool IsRemembered => RememberedForMs is not null;
+
     /// <summary>Whether this is a place somebody has already been through.</summary>
     /// <remarks>
     /// Two ways of being told the same thing. A chest says it itself, in the byte Opened
@@ -214,6 +231,17 @@ public sealed record WorldEntity(
 /// Comparing the two is what makes a correct projection look broken. The map radar is a
 /// separate feature and needs the UI element tree; it does not exist yet.
 /// </remarks>
+/// <param name="Entities">
+/// What is in the area: everything read this frame, followed by the standing things the game
+/// has stopped listing because the player walked out of range of them. The tail carry
+/// <see cref="WorldEntity.RememberedForMs"/> and are counted by <paramref name="Remembered"/>;
+/// anything that must only ever touch entities the game is currently listing - anything that
+/// follows their addresses back into memory - filters on <see cref="WorldEntity.IsRemembered"/>.
+/// </param>
+/// <param name="Remembered">
+/// How many of <paramref name="Entities"/> came from memory rather than from this read. They
+/// sit at the END of the list, so the live ones are <c>Entities.Count - Remembered</c>.
+/// </param>
 public sealed record WorldSnapshot(
     bool InGame,
     WorldEntity? Player,
@@ -231,7 +259,8 @@ public sealed record WorldSnapshot(
     ReadCost Cost = default,
     int Collapsed = 0,
     CorpseSigns Corpses = default,
-    GamePanel Panels = GamePanel.None)
+    GamePanel Panels = GamePanel.None,
+    int Remembered = 0)
 {
     /// <summary>
     /// Whether the player is looking at a panel rather than at the game.
@@ -241,6 +270,20 @@ public sealed record WorldSnapshot(
     /// information in the way - which is worse than none. See <see cref="PanelReader"/>.
     /// </remarks>
     public bool InAPanel => Panels != GamePanel.None;
+
+    /// <summary>
+    /// Only what the game listed in this read: the entities whose addresses are still live.
+    /// </summary>
+    /// <remarks>
+    /// Where anything that goes back to MEMORY has to start - the component survey, the
+    /// duplicate check, the matrix hunt. A remembered entity's address belonged to an object
+    /// the game has since been free to release, so following it reads whatever is there now,
+    /// and the answer looks like data rather than like a mistake.
+    ///
+    /// Drawing is the other case and wants <see cref="Entities"/>: a marker needs a position,
+    /// which a sighting has, and not a pointer.
+    /// </remarks>
+    public IEnumerable<WorldEntity> Listed => Entities.Where(entity => !entity.IsRemembered);
 
     /// <summary>An empty snapshot - not in an area, or the chain did not resolve.</summary>
     public static WorldSnapshot Empty { get; } = new(false, null, [], new float[16]);
@@ -281,6 +324,17 @@ public sealed class WorldReader
     /// reverse-engineering tools cannot see it either. That is what the switch is for.
     /// </remarks>
     public NoiseFilter Noise { get; } = new();
+
+    /// <summary>
+    /// The standing things the game has stopped listing, kept rather than lost.
+    /// </summary>
+    /// <remarks>
+    /// The entity list is a bubble around the player, so everything already worked out about a
+    /// place goes away the moment it is far enough behind - which is exactly when it becomes
+    /// worth marking. See <see cref="EntityMemory"/> for the rule that decides when a thing is
+    /// genuinely gone rather than merely out of range.
+    /// </remarks>
+    public EntityMemory Memory { get; } = new();
 
     /// <summary>
     /// Keep the ground effects instead of dropping them. FOR LOOKING AT, not for playing.
@@ -826,16 +880,29 @@ public sealed class WorldReader
         TerrainGrid? terrain = _terrain.Read(chain.AreaInstance, nowMs);
         double terrainMs = Since(terrainFrom);
 
+        // The places and drops the game has stopped listing, appended AFTER everything that
+        // measures the read itself. Every count above - the cost breakdown, the corpse census,
+        // the collapsed duplicates - is about what was READ this frame, and folding sightings
+        // into those numbers would make a memory look like work being done.
+        //
+        // Last, because it wants the player: the rule that decides a thing is genuinely gone
+        // rather than merely out of range measures from where the player is standing, and the
+        // fallback above is what settles that on a frame the entity map did not.
+        IReadOnlyList<WorldEntity> remembered = Memory.Update(areaHash, entities, player, nowMs);
+        int live = entities.Count;
+        entities.AddRange(remembered);
+
         return new WorldSnapshot(
             true, player, entities, matrix, largeMap, miniMap, playerVitals, playerBuffs, flaskBelt,
             area,
             terrain,
             areaHash,
             chain.State,
-            new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, entities.Count, skipped),
+            new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, live, skipped),
             collapsed,
             new CorpseSigns(targetable, untargetable, unreadableTargetable, _corpses.Tracking),
-            panels);
+            panels,
+            remembered.Count);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>

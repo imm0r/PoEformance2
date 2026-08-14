@@ -16,6 +16,7 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("terrainColour")] string TerrainColour = "#96C8FF",
     [property: JsonPropertyName("terrainThickness")] int TerrainThickness = 1,
     [property: JsonPropertyName("hideNoise")] bool HideNoise = true,
+    [property: JsonPropertyName("rememberOutOfRange")] bool RememberOutOfRange = true,
     [property: JsonPropertyName("showPoi")] bool ShowPoi = true,
     [property: JsonPropertyName("poiLabels")] bool PoiLabels = true,
     [property: JsonPropertyName("poiRoutes")] bool PoiRoutes = true,

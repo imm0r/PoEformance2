@@ -142,6 +142,7 @@ public class OverlaySettingsRoundTripTests
             TerrainColour: "#112233",
             TerrainThickness: 3,
             HideNoise: false,
+            RememberOutOfRange: false,
             ShowPoi: false,
             PoiLabels: false,
             PoiRoutes: false,
@@ -179,6 +180,7 @@ public class OverlaySettingsRoundTripTests
 
             // The new ones take their defaults, which are what the tool did before they existed.
             Assert.True(loaded.HideNoise);
+            Assert.True(loaded.RememberOutOfRange);
             Assert.True(loaded.ShowPoi);
             Assert.False(loaded.DotLabels);
         }
@@ -196,6 +198,7 @@ public class OverlaySettingsRoundTripTests
         PoEformance.Features.OverlaySettings fresh = PoEformance.Features.OverlaySettings.Default;
 
         Assert.True(fresh.HideNoise);
+        Assert.True(fresh.RememberOutOfRange);
         Assert.True(fresh.ShowPoi);
         Assert.True(fresh.PoiRoutes);
         Assert.False(fresh.DotLabels);
@@ -218,6 +221,7 @@ public class OverlaySettingsMergeTests
         PoEformance.Features.OverlaySettings.Default with
         {
             HideNoise = false,
+            RememberOutOfRange = false,
             ShowPoi = false,
             PoiRoutes = false,
             DotLabels = true,
@@ -251,6 +255,7 @@ public class OverlaySettingsMergeTests
             Chosen().MergeFromPage(PoEformance.Features.OverlaySettings.Default);
 
         Assert.False(merged.HideNoise);
+        Assert.False(merged.RememberOutOfRange);
         Assert.False(merged.ShowPoi);
         Assert.False(merged.PoiRoutes);
         Assert.True(merged.DotLabels);

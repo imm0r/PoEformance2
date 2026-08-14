@@ -128,6 +128,41 @@ public sealed class OverlayStyle
     /// <summary>A size with the key's scale applied.</summary>
     public float Sized(string key, float baseSize) => this[key].Sized(baseSize);
 
+    /// <summary>
+    /// How much of its opacity a marker keeps once it is drawn from memory rather than read.
+    /// </summary>
+    /// <remarks>
+    /// Dim enough to be told apart from a live marker at a glance, and nowhere near faint
+    /// enough to be missed: what it is saying is "this was here", which is still the most
+    /// useful thing on an unexplored map. Shared by every layer that draws a sighting, so the
+    /// two kinds of marker cannot drift into meaning different amounts of fade in each.
+    /// </remarks>
+    public const float RememberedAlpha = 0.55f;
+
+    /// <summary>
+    /// The same colour, carrying part of its opacity. What a marker drawn from memory uses.
+    /// </summary>
+    /// <remarks>
+    /// The HUE is left alone deliberately: the colour is how a marker says what it is, and a
+    /// remembered chest that stopped being chest-coloured would have to be read twice. Only
+    /// how solid it looks changes, which is the thing being said - the position is as true as
+    /// it was, and whether it is still there is now last-known rather than current.
+    ///
+    /// ImGui packs colours as ABGR with alpha in the high byte, which is the reverse of the
+    /// #AARRGGBB a settings page sends - see <see cref="OverlaySettings.ParseColour"/>, where
+    /// getting that backwards produces something that looks deliberate and is wrong.
+    /// </remarks>
+    public static uint Faded(uint colour, float by)
+    {
+        if (by >= 1f)
+        {
+            return colour;
+        }
+
+        uint alpha = (colour >> 24) & 0xFF;
+        return (colour & 0x00FFFFFF) | ((uint)Math.Clamp(alpha * by, 0f, 255f) << 24);
+    }
+
     /// <summary>Sets one key. An entry equal to the default is REMOVED rather than stored.</summary>
     /// <remarks>
     /// So that resetting something actually resets it: a stored default looks identical today

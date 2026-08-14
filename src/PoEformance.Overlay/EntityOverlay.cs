@@ -47,6 +47,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public NoiseFilter? Noise { get; set; }
 
     /// <summary>
+    /// What the game has stopped listing and this keeps drawing, when the reader is sharing it.
+    /// </summary>
+    /// <remarks>
+    /// Held rather than copied, for the same reason the noise filter is: it is a switch the
+    /// reader owns and this window is where somebody reaches for it.
+    /// </remarks>
+    public EntityMemory? Memory { get; set; }
+
+    /// <summary>
     /// Whether the reader keeps the hostile ground effects, for the same reason as above.
     /// </summary>
     /// <remarks>
@@ -151,6 +160,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Noise.Enabled = settings.HideNoise;
         }
 
+        if (Memory is not null)
+        {
+            Memory.Enabled = settings.RememberOutOfRange;
+        }
+
         if (_poi is not null)
         {
             _poi.ShowPicker = settings.ShowPoi;
@@ -180,6 +194,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             HideBehindPanels = HideBehindPanels,
             Windows = Chrome.Saved(),
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
+            RememberOutOfRange = Memory?.Enabled ?? basis.RememberOutOfRange,
             ShowPoi = _poi?.ShowPicker ?? basis.ShowPoi,
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
             PoiRoutes = _poi?.ShowRoutes ?? basis.PoiRoutes,
@@ -940,7 +955,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// could not be loaded. Those are deliberately the same answer: a marker whose file went
     /// missing has to still be a marker, because its absence reads as nothing being there.
     /// </remarks>
-    private bool DrawIcon(ImDrawListPtr draw, string key, Vector2 at, float radius)
+    /// <param name="fade">
+    /// How much of the icon's opacity to keep. Below one for a marker drawn from memory - see
+    /// <see cref="FadeFor"/>.
+    /// </param>
+    private bool DrawIcon(ImDrawListPtr draw, string key, Vector2 at, float radius, float fade = 1f)
     {
         LayerStyle style = Style[key];
         IntPtr texture = _icons.TextureFor(style.Icon);
@@ -960,9 +979,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             at + new Vector2(radius, radius),
             Vector2.Zero,
             Vector2.One,
-            style.ColourOr(0xFFFFFFFF));
+            OverlayStyle.Faded(style.ColourOr(0xFFFFFFFF), fade));
         return true;
     }
+
+    /// <summary>How solid a marker is drawn, which is how it says whether it is a sighting.</summary>
+    /// <remarks>
+    /// A remembered thing has not moved - only the standing kinds are kept, which is the whole
+    /// rule in <see cref="EntityMemory"/> - so its position is exactly as true as it was when
+    /// it was read. What has aged is whether it is still THERE: somebody else may have opened
+    /// the chest, and the game is no longer in a position to say. Dimmer rather than hidden,
+    /// and dimmer rather than identical, because both of those answer a question that was not
+    /// asked.
+    /// </remarks>
+    private static float FadeFor(WorldEntity entity)
+        => entity.IsRemembered ? OverlayStyle.RememberedAlpha : 1f;
 
     /// <summary>
     /// One frame. Nothing that happens in here may end the process.
@@ -1226,14 +1257,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 continue; // behind the camera or outside the viewport
             }
 
-            uint colour = Style.Colour(key);
+            float fade = FadeFor(entity);
+            uint chosen = Style.Colour(key);
+            uint colour = OverlayStyle.Faded(chosen, fade);
             var position = new Vector2(point.X, point.Y);
             float size = Style.Sized(key, DotRadius);
 
-            if (!DrawIcon(draw, key, position, size))
+            if (!DrawIcon(draw, key, position, size, fade))
             {
                 draw.AddCircleFilled(position, size, colour);
-                draw.AddCircle(position, size, OutlineColour, 12, Style.Width(StyleCatalogue.Keys.DotOutline, 1.5f));
+                draw.AddCircle(
+                    position, size, OverlayStyle.Faded(OutlineColour, fade), 12,
+                    Style.Width(StyleCatalogue.Keys.DotOutline, 1.5f));
             }
 
             if (ShowLabels && entity.Kind is EntityKind.Monster or EntityKind.Chest or EntityKind.WorldItem)
@@ -1243,7 +1278,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 // rather than something to configure your way back to.
                 draw.AddText(
                     position + new Vector2(size + 3, -7),
-                    Style[StyleCatalogue.Keys.DotLabel].ColourOr(colour),
+                    OverlayStyle.Faded(Style[StyleCatalogue.Keys.DotLabel].ColourOr(chosen), fade),
                     entity.ShortName);
             }
         }
@@ -1380,7 +1415,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     area.WantsMarkers ? new Vector4(0.7f, 0.75f, 0.8f, 1f) : new Vector4(1f, 0.6f, 0.2f, 1f),
                     $"area:     {area.Describe()}{(area.WantsMarkers ? string.Empty : " - markers hidden")}");
 
-                ImGui.Text($"entities: {_snapshot.Entities.Count}");
+                // The two counts kept apart: one is what the game listed this read, the other
+                // is what it has stopped listing and this still draws. Added together they
+                // would read as the entity list having grown, which is the one thing this
+                // line is used to watch.
+                ImGui.Text(_snapshot.Remembered > 0
+                    ? $"entities: {_snapshot.Entities.Count - _snapshot.Remembered}"
+                      + $"  (+{_snapshot.Remembered} remembered out of range)"
+                    : $"entities: {_snapshot.Entities.Count}");
 
                 // The question a map is actually being looked at for near the end of a run:
                 // is there any of it left. Measured against what can be REACHED rather than
@@ -1539,6 +1581,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     if (ImGui.Checkbox("Hide noise  (effects, pets, daemons - off to see everything)", ref filtering))
                     {
                         Noise.Enabled = filtering;
+                        SettingsChanged?.Invoke();
+                    }
+                }
+
+                if (Memory is not null)
+                {
+                    bool remembering = Memory.Enabled;
+                    if (ImGui.Checkbox(
+                            "Keep what is out of range  (places and drops the game has stopped listing)",
+                            ref remembering))
+                    {
+                        Memory.Enabled = remembering;
                         SettingsChanged?.Invoke();
                     }
                 }
@@ -1749,10 +1803,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
 
             float size = Style.Sized(key, radius * SizeFor(entity));
-            if (!DrawIcon(draw, key, at, size))
+            float fade = FadeFor(entity);
+            if (!DrawIcon(draw, key, at, size, fade))
             {
-                draw.AddCircleFilled(at, size, Style.Colour(key));
-                draw.AddCircle(at, size, OutlineColour, 10, Style.Width(StyleCatalogue.Keys.DotOutline, 1f));
+                draw.AddCircleFilled(at, size, OverlayStyle.Faded(Style.Colour(key), fade));
+                draw.AddCircle(
+                    at, size, OverlayStyle.Faded(OutlineColour, fade), 10,
+                    Style.Width(StyleCatalogue.Keys.DotOutline, 1f));
             }
         }
 
@@ -1814,7 +1871,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         double minX = double.MaxValue, maxX = double.MinValue;
         double minY = double.MaxValue, maxY = double.MinValue;
-        foreach (WorldEntity entity in _snapshot.Entities)
+
+        // What the game is listing, not what is remembered: a sighting is out of the bubble
+        // by definition, so it projects far off screen and would inflate this on a correct
+        // matrix in proportion to how much of the map has been walked.
+        foreach (WorldEntity entity in _snapshot.Listed)
         {
             ScreenPoint point = WorldToScreen.Project(
                 _snapshot.Matrix, entity.WorldX, entity.WorldY, entity.TerrainHeight, width, height);

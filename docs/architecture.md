@@ -382,6 +382,21 @@ interesting part was not the feature:
 - **Map coverage.** The denominator is the whole difficulty. The walkable grid holds a great
   deal of ground nobody can reach, so the figure is measured against a flood fill from where
   the player came in; against every walkable cell a finished map reads as a few per cent.
+- **Keeping what walked out of range.** The entity list is a BUBBLE around the player, not an
+  area, so everything the tool worked out about a strongbox left for later leaves with it —
+  which is exactly when it becomes worth marking. Over the recorded map the game listed 143
+  standing things at one point or another and 12 of them at the end. `EntityMemory` keeps the
+  rest. Two things make it safe rather than a pile of stale markers. Only things that DO NOT
+  MOVE are kept — places and floor drops, never a monster, because a remembered monster dot is
+  wrong the moment it is drawn. And a sighting is dropped when the thing vanishes while the
+  player is close enough to have seen it go, which is the reference's own rule
+  (`CanExplodeOrRemovedFromGame && DistanceFrom(player) < NETWORK_BUBBLE_RADIUS`). The
+  threshold was checked against the recording rather than taken on trust: every drop-out from
+  the entity list is either under 26 cells (consumed underfoot) or over 165 (out of range),
+  with nothing in between, so the reference's 150 sits in an empty band and 130 sightings were
+  dropped over that map without one of them being a mistake that outlived a single frame. The
+  same walk settled the key: 200 things came back into the game's list after being remembered
+  and 98 of them came back at a NEW ADDRESS, so the memory is keyed on the entity id.
 
 - **Health bars, and looted chests.** Both came out of reads that were already happening or
   already described: the corpse check read a monster's current health and threw the maximum
