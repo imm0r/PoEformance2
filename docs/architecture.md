@@ -414,11 +414,19 @@ interesting part was not the feature:
   `NoMouseInputs` never sets it — so trying to do this with our own hit-test regions would be
   fighting the library for the same setting. The part that needed thought was the way back: a
   click-through window cannot be right-clicked, so its own menu is gone the moment it is
-  switched on. The undo lives in Tools → Appearance, which is opened from the status window, so
-  the status window is the one window that will not go click-through — an exemption is cheaper
-  than a global hotkey to clash with the game over. It is refused in the setter as well as in
-  the control, because the settings file is hand-editable and this is the one state nothing in
-  the tool can undo. Both switches are also two drawn icons in each window's own title bar, left
+  switched on. That is now the pointer ICON's job — it asks for `io.WantCaptureMouse` back for
+  exactly as long as the cursor sits inside that one square, so the window hands itself back
+  where the switch lives. It works because the same library reads the cursor with `GetCursorPos`
+  rather than from window messages, so the overlay still knows where the mouse is while it is
+  transparent to it; a message-driven position would freeze on the way out and the icon would be
+  unreachable with no symptom but a dead square. Two consequences worth knowing: the button
+  PRESS still comes from messages, so it only arrives a frame or two after the cursor lands
+  (hence acting on press, not release), and a click-through window is never collapsed, because a
+  collapsed one has no title bar drawn to hold the icon. This replaced an exemption — the status
+  window used to refuse click-through outright, since the only undo was Tools → Appearance, which
+  is opened from a checkbox inside the status window. A switch that undoes itself where it sits
+  needs no carve-out, so every window may now go click-through. The preload panel is the one that
+  still leans on the list, having no title bar at all. Both switches are also two drawn icons in each window's own title bar, left
   of the close button, which is where they are visible at all — a right-click menu says nothing
   about whether a window is already pinned. Putting ImGui items in a title bar has one trap worth
   the sentence: an item is measured as window CONTENT wherever it was submitted, so a strip
