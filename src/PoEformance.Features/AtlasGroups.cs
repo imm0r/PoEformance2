@@ -144,12 +144,15 @@ public sealed class AtlasGrouping
     private readonly AtlasMapNames _names;
     private readonly Dictionary<string, AtlasGroup?> _decided = new(StringComparer.OrdinalIgnoreCase);
 
-    public AtlasGrouping(IReadOnlyList<AtlasGroup> groups, AtlasMapNames names)
+    private readonly AtlasRatings _ratings;
+
+    public AtlasGrouping(IReadOnlyList<AtlasGroup> groups, AtlasMapNames names, AtlasRatings? ratings = null)
     {
         ArgumentNullException.ThrowIfNull(groups);
         ArgumentNullException.ThrowIfNull(names);
         _groups = groups;
         _names = names;
+        _ratings = ratings ?? AtlasRatings.Empty;
     }
 
     /// <summary>Nothing grouped, which is what an atlas with no settings gets.</summary>
@@ -160,6 +163,12 @@ public sealed class AtlasGrouping
 
     /// <summary>The name to show for a map, falling back to its raw id.</summary>
     public string Called(string mapId) => _names.Called(mapId);
+
+    /// <summary>What a map is rated, or null when nobody has said.</summary>
+    public int? Rated(string mapId) => _ratings.Of(mapId);
+
+    /// <summary>The top of the rating scale, which is what the colours run to.</summary>
+    public int BestRating => _ratings.Best;
 
     /// <summary>The group a map belongs to, or null when it belongs to none.</summary>
     public AtlasGroup? Of(string mapId)
@@ -237,6 +246,7 @@ public sealed record AtlasSettings(
     [property: JsonPropertyName("hideUnreachable")] bool HideUnreachable = false,
     [property: JsonPropertyName("web")] bool Web = false,
     [property: JsonPropertyName("hideOnHover")] bool HideOnHover = true,
+    [property: JsonPropertyName("ratings")] bool Ratings = true,
     [property: JsonPropertyName("search")] string Search = "",
     [property: JsonPropertyName("textScale")] float TextScale = 0f,
     [property: JsonPropertyName("ritualWorth")] IReadOnlyDictionary<string, int>? RitualWorth = null,

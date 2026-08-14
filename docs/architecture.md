@@ -487,6 +487,24 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   rectangle was read this tick anyway. Tested against ALL maps rather than the drawn ones — the
   game shows its panel whether or not this overlay labelled that node, and it is the OTHER maps'
   labels and lines that would be drawn across it.
+- **The map ratings are the one data file that is an OPINION.** Everything else in `data/` is
+  extracted from the client or ported from a reference; `atlas-ratings.json` is a judgement about
+  which maps are worth the time, which is exactly why it is a file — it will be disagreed with,
+  and disagreeing should not need a rebuild. It is written by DISPLAY NAME, because that is what
+  a person maintaining it can read, and resolved to ids ONCE at load through our own English
+  name table — never against a string the client translates, so the ratings land the same on a
+  German client. A name resolves to *every* id carrying it (three ids are all "Abyssal Depths").
+  Names that resolve to nothing are kept and reported rather than dropped: a typo is otherwise a
+  line somebody wrote that silently does nothing, which is indistinguishable from having
+  forgotten to write it. There is a test that the shipped file resolves completely, which is
+  what will catch a league renaming a map. The colour scale runs to the highest rating IN THE
+  FILE rather than to a fixed ten, so any scale works — the cost is that it is relative, and
+  that is the right way round for an opinion, where green should mean "the best there is". An
+  UNRATED map gets its own pill — a slate `?` off the ramp entirely, never a shade of red,
+  because a map nobody has judged is not a bad map and anywhere on the scale would be an opinion
+  nobody holds. Telling that apart from "ratings switched off" needed one thing: the scale
+  travels with the mark, so no-rating-with-a-scale means unrated and no-rating-without-one means
+  the feature is off. Both were the same `null` before.
 - **A stale position is invisible on a label and catastrophic on a line.** The two-rate read
   keeps what a node IS for a third of a second and re-reads WHERE it is every tick; a node the
   panel did not place this tick used to keep its last-seen position, on the grounds that a third

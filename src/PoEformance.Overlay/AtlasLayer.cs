@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
@@ -203,15 +204,35 @@ public sealed class AtlasLayer
     }
 
     /// <summary>Draws the name plate, and says where the next line down starts.</summary>
+    /// <remarks>
+    /// The rating rides ON THE PLATE, after the name, rather than on a line of its own. It is
+    /// one or two characters and it is read together with the name - "is this worth running" is
+    /// asked about a map, not about a row - so a second line would put an answer somewhere the
+    /// question was not.
+    /// </remarks>
     private float DrawName(
         ImDrawListPtr draw, AtlasMark mark, string title, Vector2 middle, uint text, uint plate, float alpha)
     {
         float font = Font;
         Vector2 size = Measure(title, font);
-        Vector2 at = middle - (size * 0.5f);
+
+        // The pill's width is taken BEFORE the plate is placed, so the whole thing stays
+        // centred on the node. Measured and then added to the middle instead, the name would
+        // shift left every time a map turned out to have a rating.
+        // A pill on every map while a scale is in force, INCLUDING the ones nobody has rated.
+        // "No pill" would otherwise mean two different things - the ratings are off, or this map
+        // has not been judged - and the second is the one worth seeing: it is a map to go and
+        // form an opinion about, and it looks identical to a map somebody deliberately skipped.
+        string rated = mark.BestRating <= 0 ? string.Empty
+            : mark.Rating is int worth ? worth.ToString(CultureInfo.InvariantCulture)
+            : Unrated;
+        Vector2 pillText = rated.Length > 0 ? Measure(rated, font) : Vector2.Zero;
+        float pillWide = rated.Length > 0 ? pillText.X + (PillPad * 2f) + PillGap : 0f;
+
+        Vector2 at = middle - (new Vector2(size.X + pillWide, size.Y) * 0.5f);
         var pad = new Vector2(5f, 2f);
 
-        draw.AddRectFilled(at - pad, at + size + pad, plate, 3f);
+        draw.AddRectFilled(at - pad, at + size + new Vector2(pillWide, 0f) + pad, plate, 3f);
 
         // A group's colour goes on the EDGE, not on the text. Group colours are chosen to be
         // told apart rather than to be read at ten pixels - as text half of them are illegible
@@ -221,12 +242,98 @@ public sealed class AtlasLayer
             uint edge = OverlaySettings.Fade(OverlaySettings.ParseColour(group.Colour), alpha);
             if (edge != 0)
             {
-                draw.AddRect(at - pad, at + size + pad, edge, 3f, ImDrawFlags.RoundCornersAll, 2f);
+                draw.AddRect(
+                    at - pad,
+                    at + size + new Vector2(pillWide, 0f) + pad,
+                    edge,
+                    3f,
+                    ImDrawFlags.RoundCornersAll,
+                    2f);
             }
         }
 
         draw.AddText(ImGui.GetFont(), font, at, text, title);
+
+        if (rated.Length > 0)
+        {
+            DrawPill(draw, at + new Vector2(size.X + PillGap, 0f), pillText, rated, mark, font, alpha);
+        }
+
         return at.Y + size.Y + 3f;
+    }
+
+    /// <summary>How much room the pill leaves around its number, and before it.</summary>
+    private const float PillPad = 4f;
+    private const float PillGap = 4f;
+
+    /// <summary>What a map nobody has judged carries instead of a number.</summary>
+    /// <remarks>
+    /// A question mark rather than a dash or a blank, because it asks the right thing: this is
+    /// not a map rated nothing, it is one nobody has looked at - and the difference matters to
+    /// whoever is filling the file in.
+    /// </remarks>
+    private const string Unrated = "?";
+
+    /// <summary>
+    /// The rating, as a filled pill from red at the worst to green at the best.
+    /// </summary>
+    /// <remarks>
+    /// A FILLED shape rather than coloured text, because the colour is the whole message: a
+    /// number is read one map at a time and a colour is read across the whole atlas at once,
+    /// which is what somebody scanning for where to go next is actually doing. The number is
+    /// there for when the answer matters rather than the impression.
+    ///
+    /// Black text on it, always. The ramp runs through yellow, and yellow is where white text
+    /// stops being readable - so the one colour that works on all of it is the one that works
+    /// on none of the plates, which is why this is the only text here that is not the plate's.
+    /// </remarks>
+    private void DrawPill(
+        ImDrawListPtr draw, Vector2 at, Vector2 size, string rated, AtlasMark mark, float font, float alpha)
+    {
+        var pad = new Vector2(PillPad, 1f);
+        float round = size.Y * 0.5f;
+
+        // AN UNRATED MAP IS NOT A BAD ONE, so its pill is off the ramp entirely: a slate plate
+        // with a pale question mark and an outline, rather than any shade of red. Put anywhere
+        // on the scale it would be an opinion nobody holds - and at the red end it would be the
+        // strongest one in the file.
+        if (mark.Rating is not int worth)
+        {
+            draw.AddRectFilled(at - pad, at + size + pad, OverlaySettings.Fade(0xC0_2A2A32, alpha), round);
+            draw.AddRect(
+                at - pad, at + size + pad, OverlaySettings.Fade(0xFF_7A7A88, alpha), round,
+                ImDrawFlags.RoundCornersAll, 1f);
+            draw.AddText(ImGui.GetFont(), font, at, OverlaySettings.Fade(0xFF_C8C8D2, alpha), rated);
+            return;
+        }
+
+        // Against the top of the scale the ratings themselves set, so any scale works: rate out
+        // of five and five is green. Guarded, because a file where everything is nought would
+        // otherwise divide by it.
+        float share = mark.BestRating > 0 ? Math.Clamp((float)worth / mark.BestRating, 0f, 1f) : 0f;
+
+        draw.AddRectFilled(at - pad, at + size + pad, Worth(share, alpha), round);
+        draw.AddText(ImGui.GetFont(), font, at, OverlaySettings.Fade(0xFF10_1010, alpha), rated);
+    }
+
+    /// <summary>Red at nothing, amber in the middle, green at the top.</summary>
+    /// <remarks>
+    /// Through AMBER rather than straight from red to green, which is the difference between a
+    /// scale somebody can read a middle value off and one where everything between the ends is
+    /// a muddy brown. It is also the one ramp nobody has to be taught.
+    /// </remarks>
+    private static uint Worth(float share, float alpha)
+    {
+        (float red, float green) = share < 0.5f
+            ? (1f, share * 2f * 0.75f)
+            : (1f - ((share - 0.5f) * 2f * 0.85f), 0.75f + ((share - 0.5f) * 2f * 0.05f));
+
+        uint colour = 0xFF00_0000
+                      | ((uint)(0.15f * 255f) << 16)
+                      | ((uint)(Math.Clamp(green, 0f, 1f) * 255f) << 8)
+                      | (uint)(Math.Clamp(red, 0f, 1f) * 255f);
+
+        return OverlaySettings.Fade(colour, alpha);
     }
 
     /// <summary>How far outside the screen a point still counts as being on it.</summary>

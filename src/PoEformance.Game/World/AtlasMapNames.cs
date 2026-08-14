@@ -67,6 +67,16 @@ public sealed class AtlasMapNames
     public int Count => _maps.Count;
 
     /// <summary>
+    /// Every map, by id. For anything that has to go the other way - name to id.
+    /// </summary>
+    /// <remarks>
+    /// Exposed rather than offering a name lookup here, because a name is not a key: several
+    /// ids share one, and the caller has to decide what that means for it. The ratings want all
+    /// of them; something else might want the first.
+    /// </remarks>
+    public IReadOnlyDictionary<string, AtlasMapInfo> All => _maps;
+
+    /// <summary>
     /// What is known about a map id, or <see cref="AtlasMapInfo.Unknown"/> when it is new.
     /// </summary>
     /// <remarks>
