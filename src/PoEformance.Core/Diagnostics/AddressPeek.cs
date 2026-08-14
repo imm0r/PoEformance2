@@ -360,19 +360,183 @@ public static class AddressPeek
                 continue;
             }
 
-            ulong address = windowStart + (ulong)(i * 8);
-            string where = objectBase != 0 && address >= objectBase
-                ? $"+0x{address - objectBase:X}"
-                : $"0x{address:X}";
-
-            lines.Add($"  {where,-12} {Slot(before[i])} -> {Slot(after[i])}"
-                + (after[i] is { } now ? $"  {Reading(reader, now, tables)}" : string.Empty));
+            lines.Add(Line(reader, windowStart + (ulong)(i * 8), objectBase, before[i], after[i], tables));
         }
 
         return lines;
     }
 
+    /// <summary>One slot's move, as a line: where it was, what it held, what it holds now.</summary>
+    public static string Line(
+        IMemoryReader reader,
+        ulong address,
+        ulong objectBase,
+        ulong? before,
+        ulong? after,
+        DatTableShape? tables = null)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+
+        string where = objectBase != 0 && address >= objectBase
+            ? $"+0x{address - objectBase:X}"
+            : $"0x{address:X}";
+
+        return $"  {where,-12} {Slot(before)} -> {Slot(after)}"
+            + (after is { } now ? $"  {Reading(reader, now, tables)}" : string.Empty);
+    }
+
     private static string Slot(ulong? value) => value is { } raw ? raw.ToString("X16", CultureInfo.InvariantCulture) : "unreadable";
+
+    /// <summary>One slot that moved, and whether it is still worth printing live.</summary>
+    public readonly record struct SlotChange(int Slot, ulong? Before, ulong? After, bool Print, bool LastPrint);
+
+    /// <summary>
+    /// Keeps score across a watch, so what a slot DOES is legible at the end of it.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THE FIRST REAL RUN OF THIS PRODUCED: ten seconds of watching printed six hundred
+    /// lines, and the answer was in none of them. It was in their distribution - one slot took
+    /// two values over and over and a handful of others once each, and the slot next to it
+    /// never repeated a value at all, because it was a clock. Neither fact is visible one line
+    /// at a time, and both are obvious in a tally.
+    ///
+    /// So a slot that keeps moving goes quiet after a few lines rather than drowning the ones
+    /// that moved once, and everything is counted for the summary regardless.
+    /// </remarks>
+    public sealed class PeekWatchLog
+    {
+        /// <summary>Lines a single slot may print before it is left to the summary.</summary>
+        private const int LoudChanges = 6;
+
+        /// <summary>Distinct values remembered per slot. Beyond this the answer is "lots".</summary>
+        private const int MostValuesKept = 64;
+
+        private readonly Dictionary<int, Tally> _slots = [];
+
+        private sealed class Tally
+        {
+            public int Changes { get; set; }
+
+            public bool Overflowed { get; set; }
+
+            /// <summary>Samples where the slot could not be read - a state of its own.</summary>
+            public int Unreadable { get; set; }
+
+            public Dictionary<ulong, int> Values { get; } = [];
+
+            public int Distinct => Values.Count + (Unreadable > 0 ? 1 : 0);
+        }
+
+        /// <summary>How many samples have been taken.</summary>
+        public int Samples { get; private set; }
+
+        /// <summary>Records a sample against the one before it and reports what moved.</summary>
+        public IReadOnlyList<SlotChange> Observe(IReadOnlyList<ulong?> before, IReadOnlyList<ulong?> after)
+        {
+            ArgumentNullException.ThrowIfNull(before);
+            ArgumentNullException.ThrowIfNull(after);
+
+            Samples++;
+            var changes = new List<SlotChange>();
+
+            for (int i = 0; i < Math.Min(before.Count, after.Count); i++)
+            {
+                if (!_slots.TryGetValue(i, out Tally? tally))
+                {
+                    _slots[i] = tally = new Tally();
+                    Count(tally, before[i]);
+                }
+
+                Count(tally, after[i]);
+
+                if (before[i] == after[i])
+                {
+                    continue;
+                }
+
+                tally.Changes++;
+                changes.Add(new SlotChange(
+                    i, before[i], after[i],
+                    Print: tally.Changes <= LoudChanges,
+                    LastPrint: tally.Changes == LoudChanges));
+            }
+
+            return changes;
+
+            static void Count(Tally tally, ulong? value)
+            {
+                if (value is not { } raw)
+                {
+                    tally.Unreadable++;
+                    return;
+                }
+
+                if (tally.Values.Count >= MostValuesKept && !tally.Values.ContainsKey(raw))
+                {
+                    tally.Overflowed = true;
+                    return;
+                }
+
+                tally.Values[raw] = tally.Values.GetValueOrDefault(raw) + 1;
+            }
+        }
+
+        /// <summary>What each slot did over the whole watch.</summary>
+        public IReadOnlyList<string> Summary(ulong windowStart, ulong objectBase)
+        {
+            var lines = new List<string> { $"summary over {Samples} samples" };
+
+            foreach ((int index, Tally tally) in _slots.OrderBy(pair => pair.Key))
+            {
+                if (tally.Changes == 0)
+                {
+                    continue;
+                }
+
+                ulong address = windowStart + (ulong)(index * 8);
+                string where = objectBase != 0 && address >= objectBase
+                    ? $"+0x{address - objectBase:X}"
+                    : $"0x{address:X}";
+
+                int distinct = tally.Distinct;
+
+                // A slot that never shows the same value twice is not a state anybody can test
+                // against - it is a counter, a clock or a handle, and saying so here is what
+                // stops the next person building a feature on one.
+                if (tally.Overflowed || distinct > tally.Changes)
+                {
+                    lines.Add($"  {where,-12} {tally.Changes} changes, never the same value twice - a counter or a clock");
+                    continue;
+                }
+
+                lines.Add($"  {where,-12} {tally.Changes} changes, {distinct} distinct value{(distinct == 1 ? string.Empty : "s")}");
+
+                var once = 0;
+                foreach ((ulong value, int seen) in tally.Values.OrderByDescending(pair => pair.Value))
+                {
+                    if (seen == 1)
+                    {
+                        once++;
+                        continue;
+                    }
+
+                    lines.Add($"                 {Slot(value)}  in {seen} samples");
+                }
+
+                if (tally.Unreadable > 0)
+                {
+                    lines.Add($"                 unreadable        in {tally.Unreadable} samples");
+                }
+
+                if (once > 0)
+                {
+                    lines.Add($"                 and {once} value{(once == 1 ? string.Empty : "s")} seen once only");
+                }
+            }
+
+            return lines;
+        }
+    }
 
     /// <summary>The object's first slot, when it is a vtable - the one thing that names a type.</summary>
     /// <remarks>
@@ -400,17 +564,25 @@ public static class AddressPeek
             return "empty";
         }
 
-        if (!MemoryReaderExtensions.IsPlausiblePointer(raw))
+        // BEFORE the pointer test, which would otherwise swallow it. "Art/Text" is
+        // 0x747865542F747241, comfortably above any pointer bound, so eight characters of a
+        // path read as a pointer into nowhere - and a path stored as characters in the object
+        // rather than behind a pointer is how this game keeps its asset names.
+        if (Inline(raw) is { Length: > 0 } inline)
         {
-            // Not a pointer, so show the readings a person actually checks: the two halves as
-            // integers, and the low half as a float, which is how the game stores most of them.
+            return $"text \"{inline}\"";
+        }
+
+        // StructureProbe's bound rather than the reader's, and the difference is the point.
+        // The reader will FOLLOW anything above 0x10000, which is right when a pointer is
+        // expected; here nothing is expected, and this game's heap starts above four
+        // gigabytes. A float of 7659.73 is 0x45EF5DD2 - comfortably "a pointer" by the loose
+        // rule, and reported as one for a whole session, when it was the game's own clock.
+        if (!StructureProbe.LooksLikePointer(raw))
+        {
             int low = (int)(uint)raw;
             int high = (int)(uint)(raw >> 32);
-            float asFloat = BitConverter.Int32BitsToSingle(low);
-            string floatPart = StructureProbe.SensibleFloat(asFloat)
-                ? $", {asFloat.ToString("0.###", CultureInfo.InvariantCulture)}f"
-                : string.Empty;
-            return $"i32 {low} / {high}{floatPart}";
+            return $"i32 {low} / {high}{Floats(low, high)}";
         }
 
         PeekResult peek = PointerPeek.Peek(reader, raw, tables, following: 0);
@@ -418,8 +590,151 @@ public static class AddressPeek
         // A pointer into memory this reader cannot serve is the ordinary case in a REPLAY,
         // where only what the tool read is there - so it is described as a pointer whose
         // target is missing, rather than as the reading "unreadable: unreadable".
-        return peek.Kind == TargetKind.Unreadable
-            ? "pointer, target not readable here"
-            : $"{peek.Kind.ToString().ToLowerInvariant()}: {peek.Summary}";
+        if (peek.Kind == TargetKind.Unreadable)
+        {
+            return "pointer, target not readable here";
+        }
+
+        string reading = $"{peek.Kind.ToString().ToLowerInvariant()}: {peek.Summary}";
+
+        // Text INSIDE the target, not at its front. PointerPeek only calls something text when
+        // the characters start at offset zero, and this game's records routinely put a vtable
+        // and a length in front of them - so the object naming the asset under the cursor read
+        // as an anonymous structure while its own path sat eight bytes further in.
+        return peek.Kind == TargetKind.Structure && Buried(reader, raw) is { Length: > 0 } buried
+            ? $"{reading}   holds \"{buried}\""
+            : reading;
+    }
+
+    /// <summary>The float readings of a slot, when they are the readings that make sense.</summary>
+    private static string Floats(int low, int high)
+    {
+        float first = BitConverter.Int32BitsToSingle(low);
+        float second = BitConverter.Int32BitsToSingle(high);
+        bool firstOk = StructureProbe.SensibleFloat(first);
+        bool secondOk = StructureProbe.SensibleFloat(second);
+
+        return (firstOk, secondOk) switch
+        {
+            (true, true) => $", {Show(first)}f / {Show(second)}f",
+            (true, false) => $", {Show(first)}f",
+            _ => string.Empty,
+        };
+
+        static string Show(float value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>Characters a slot must hold, of its eight bytes, before it is called text.</summary>
+    /// <remarks>
+    /// Six, with the rest NUL. Strict enough that no pointer this game uses can pass: a heap
+    /// address carries 0xE7 0x03 0x00 0x00 in its top four bytes and a module address 0xF6
+    /// 0x7F 0x00 0x00, and neither 0xE7 nor 0xF6 is a character.
+    /// </remarks>
+    private const int InlineTextChars = 6;
+
+    /// <summary>The slot read as characters stored in place, or empty when it is not.</summary>
+    private static string Inline(ulong raw)
+    {
+        Span<byte> bytes = stackalloc byte[8];
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt64LittleEndian(bytes, raw);
+
+        var printable = 0;
+        foreach (byte value in bytes)
+        {
+            if (value is >= 0x20 and < 0x7F)
+            {
+                printable++;
+            }
+            else if (value != 0)
+            {
+                return string.Empty;
+            }
+        }
+
+        if (printable < InlineTextChars)
+        {
+            return string.Empty;
+        }
+
+        var text = new System.Text.StringBuilder(8);
+        foreach (byte value in bytes)
+        {
+            if (value == 0)
+            {
+                break;
+            }
+
+            text.Append((char)value);
+        }
+
+        return text.ToString();
+    }
+
+    /// <summary>How far into an object to look for characters.</summary>
+    private const int BuriedTextBytes = 64;
+
+    /// <summary>Shortest run of characters worth calling text.</summary>
+    /// <remarks>
+    /// Strict on purpose: every structure gets offered to this, and a "string" label on four
+    /// bytes of coincidence sends somebody looking for a name that was never there.
+    /// </remarks>
+    private const int ShortestBuriedText = 6;
+
+    /// <summary>The longest run of readable characters inside an object, ASCII or UTF-16.</summary>
+    private static string Buried(IMemoryReader reader, ulong address)
+    {
+        Span<byte> head = stackalloc byte[BuriedTextBytes];
+        if (!reader.TryRead(address, head))
+        {
+            return string.Empty;
+        }
+
+        string best = Longest(head, stride: 1);
+        string wide = Longest(head, stride: 2);
+        return wide.Length > best.Length ? wide : best;
+
+        // stride 1 reads the bytes as ASCII, stride 2 as UTF-16 - the game uses both, and
+        // which one an object stores its name in is not knowable in advance.
+        static string Longest(ReadOnlySpan<byte> window, int stride)
+        {
+            int bestStart = 0, bestLength = 0, start = -1, length = 0;
+            for (int i = 0; i + stride <= window.Length; i += stride)
+            {
+                bool printable = window[i] is >= 0x20 and < 0x7F
+                    && (stride == 1 || window[i + 1] == 0);
+
+                if (printable)
+                {
+                    if (start < 0)
+                    {
+                        start = i;
+                        length = 0;
+                    }
+
+                    length++;
+                    if (length > bestLength)
+                    {
+                        (bestStart, bestLength) = (start, length);
+                    }
+                }
+                else
+                {
+                    start = -1;
+                }
+            }
+
+            if (bestLength < ShortestBuriedText)
+            {
+                return string.Empty;
+            }
+
+            var text = new System.Text.StringBuilder(bestLength);
+            for (int i = 0; i < bestLength; i++)
+            {
+                text.Append((char)window[bestStart + (i * stride)]);
+            }
+
+            return text.ToString();
+        }
     }
 }

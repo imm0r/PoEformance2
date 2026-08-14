@@ -289,7 +289,7 @@ internal static class Program
     private static void RunPeek(
         IMemoryReader reader, IReadOnlyList<string> paths, bool watch, RecordingMemoryReader? recorder)
     {
-        var watching = new List<(string Text, PointerPath Path, ulong Start, ulong ObjectBase, ulong?[] Last)>();
+        var watching = new List<(string Text, PointerPath Path, ulong Start, ulong ObjectBase, ulong?[] Last, AddressPeek.PeekWatchLog Log)>();
 
         Console.WriteLine();
         Console.WriteLine("peek");
@@ -315,7 +315,7 @@ internal static class Program
             if (at.Ok)
             {
                 (ulong start, int slots, _) = AddressPeek.Window(at.Target, AddressPeek.DefaultBefore, AddressPeek.DefaultAfter);
-                watching.Add((text, path, start, at.ObjectBase, AddressPeek.Sample(reader, start, slots)));
+                watching.Add((text, path, start, at.ObjectBase, AddressPeek.Sample(reader, start, slots), new AddressPeek.PeekWatchLog()));
             }
         }
 
@@ -336,7 +336,7 @@ internal static class Program
 
             for (int i = 0; i < watching.Count; i++)
             {
-                (string text, PointerPath path, ulong start, ulong objectBase, ulong?[] last) = watching[i];
+                (string text, PointerPath path, ulong start, ulong objectBase, ulong?[] last, AddressPeek.PeekWatchLog log) = watching[i];
 
                 PathResolution at = path.Resolve(reader);
                 if (!at.Ok)
@@ -353,21 +353,40 @@ internal static class Program
                     // window against the new one would print every slot as "changed".
                     Console.WriteLine($"  [{started.Elapsed.TotalSeconds,7:F1}s] {text}: the path now lands on 0x{at.Target:X}"
                         + $" (object 0x{at.ObjectBase:X}) - window restarted");
-                    watching[i] = (text, path, now, at.ObjectBase, sample);
+                    watching[i] = (text, path, now, at.ObjectBase, sample, log);
                     continue;
                 }
 
-                IReadOnlyList<string> changes = AddressPeek.Changes(reader, last, sample, now, objectBase);
-                if (changes.Count > 0)
+                foreach (AddressPeek.SlotChange change in log.Observe(last, sample))
                 {
-                    Console.WriteLine($"  [{started.Elapsed.TotalSeconds,7:F1}s] {text}");
-                    foreach (string line in changes)
+                    if (!change.Print)
                     {
-                        Console.WriteLine("  " + line);
+                        continue;
+                    }
+
+                    ulong address = now + (ulong)(change.Slot * 8);
+                    Console.WriteLine($"  [{started.Elapsed.TotalSeconds,7:F1}s] {text}");
+                    Console.WriteLine("  " + AddressPeek.Line(reader, address, objectBase, change.Before, change.After));
+
+                    if (change.LastPrint)
+                    {
+                        Console.WriteLine("               (this one keeps moving - quiet from here, see the summary)");
                     }
                 }
 
-                watching[i] = (text, path, start, objectBase, sample);
+                watching[i] = (text, path, start, objectBase, sample, log);
+            }
+        }
+
+        // The tally, which is where the answer actually is: a slot taking two values over and
+        // over is a state, and one that never repeats is a clock. Neither shows a line at a time.
+        foreach ((string text, _, ulong start, ulong objectBase, _, AddressPeek.PeekWatchLog log) in watching)
+        {
+            Console.WriteLine();
+            Console.WriteLine($"  {text}");
+            foreach (string line in log.Summary(start, objectBase))
+            {
+                Console.WriteLine("  " + line);
             }
         }
     }

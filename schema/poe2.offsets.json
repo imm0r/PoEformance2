@@ -38,15 +38,30 @@
   // aligned slot around an unaligned address, and with `--peekwatch` prints the slots that
   // move while something is done in the game.
   //
-  // OPEN, and deliberately not written into "structs" until it is more than a sighting:
-  // the object behind [module+0x468C3A8] has two adjacent pointers at +0x2358 and +0x2360
-  // that change together when the cursor enters an inventory item. Adjacent pointers that
-  // move together are usually a std::vector's begin/end (capacity would then be +0x2368),
-  // but nothing has read the object yet - no recording this project holds touches that page,
-  // and no pointer in 500k recorded reads lands anywhere near it, which is consistent with
-  // it hanging off a static rather than off any chain the tool walks. Note also that
-  // AtlasWatch.Hovered records the opposite finding for UI ELEMENTS ("PoE2 keeps no hovered
-  // UiElement slot"); this is a different object and does not overturn that.
+  // SETTLED, and it is NOT a mouse-over flag. tests/fixtures/session-2026-08-hover.rec is
+  // ten seconds of --peekwatch over that slot (92 samples) and HoverSlotTests replays it.
+  // What the two adjacent pointers at +0x2358 and +0x2360 turned out to be:
+  //   - a std::shared_ptr. _Ptr at +0x2358, _Rep at +0x2360, and _Ptr is ALWAYS exactly
+  //     _Rep + 0x10 in every settled sample, which is make_shared putting the payload inline
+  //     behind the control block. Every value either has ever held carries the same control
+  //     block vtable (module+0x30F2CB8), so it is one class rather than a pool.
+  //   - the vector theory died on the slot after them. begin/end/capacity would put capacity
+  //     at +0x2368; that slot changed in 89 of 92 samples and is a FLOAT CLOCK, 7754.7 s to
+  //     7764.4 s across the 10.2 s the recording covers.
+  //   - the payload names an ASSET. Two hops on (shared_ptr -> payload -> record) sit
+  //     "UI GlyphMap" and "Art/Textures/Interface2/2DArt/UIImages/InGame/HUD/CharmBarBg.dds",
+  //     with "Support Gem" and "LargeNormal" among the one-frame values. The object the
+  //     static points at also shares its first field with a back-pointer found in loaded-file
+  //     records, and this static sits 0xFA08 from FileRoot - it is the resource system.
+  // So the field holds the resource record most recently handled. It CORRELATES with hovering,
+  // because a tooltip pulls in the item's frame art and its class name, and it is not a
+  // question about the mouse: over ten seconds it took eight distinct values, most of them for
+  // a single frame. Not written into "structs" because nothing in the tool needs it - it is
+  // recorded here so the next person who finds this slot does not spend the day twice.
+  //
+  // AtlasWatch.Hovered stands: PoE2 still keeps no hovered-UiElement slot. For "is the cursor
+  // on an inventory item", the answer remains the geometric one - descend the UI tree to what
+  // contains the cursor, then UiElement.ItemPtr at +0x4F8.
 
   "version": 1,
   "gameVersion": "0.5.x (AreaInstance tail re-verified 2026-08 by owner: +0x08 wave; base port: AHK tool v0.45.13.298, 2026-07)",
