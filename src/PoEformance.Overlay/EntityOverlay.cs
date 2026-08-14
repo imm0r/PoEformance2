@@ -1384,6 +1384,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     WindowChrome.StatusId,
                     ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing)))
         {
+            // FIRST, not last like the menu below it. This window has several ways out of the
+            // body and only one way in, so the top is the single place the icons can be asked
+            // for without every early return having to remember them.
+            Chrome.TitleButtons(WindowChrome.StatusId);
+
             if (!_snapshot.InGame)
             {
                 // WHICH state, not just "no". A loading screen, the login screen and a

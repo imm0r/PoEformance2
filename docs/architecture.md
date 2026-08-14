@@ -418,7 +418,15 @@ interesting part was not the feature:
   the status window is the one window that will not go click-through — an exemption is cheaper
   than a global hotkey to clash with the game over. It is refused in the setter as well as in
   the control, because the settings file is hand-editable and this is the one state nothing in
-  the tool can undo.
+  the tool can undo. Both switches are also two drawn icons in each window's own title bar, left
+  of the close button, which is where they are visible at all — a right-click menu says nothing
+  about whether a window is already pinned. Putting ImGui items in a title bar has one trap worth
+  the sentence: an item is measured as window CONTENT wherever it was submitted, so a strip
+  anchored to an `AlwaysAutoResize` window's right edge feeds its own width back in and the
+  window walks off the screen. Two things keep it still — the strip ends at `WindowPadding`,
+  exactly where the content already stopped, and the hit areas exist only while the pointer is
+  in the title bar. The icons themselves are painted every frame regardless, because they are the
+  state as much as the switch.
 - **Getting out of the way of the game's own panels.** Everything drawn in world space is drawn
   UNDERNEATH a stash, a passive tree or a world map the moment one opens — right information in
   the way, which is worse than none. `PanelReader` reports which screen-filling panels are open

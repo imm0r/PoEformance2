@@ -136,6 +136,9 @@ public sealed class ToolTabs
         {
             if (expanded)
             {
+                // Before the tabs, and the close button declared so they stop short of it.
+                Chrome.TitleButtons(ChromeId, closable: true);
+
                 inFront = DrawTabs();
 
                 // LAST, after the tabs and their contents. The menu declines to open over a
