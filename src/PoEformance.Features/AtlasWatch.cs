@@ -28,6 +28,10 @@ namespace PoEformance.Features;
 /// ratings came from. Nought when there are none.
 /// </param>
 /// <param name="Hops">How many maps have to be run to get here. 0 for one you can enter now.</param>
+/// <param name="Biome">
+/// Which biome the map is in, as the game numbers them, or <see cref="AtlasBiomes.None"/> when
+/// there is none to draw. See <see cref="AtlasBiomes"/> for why that is not nought.
+/// </param>
 public sealed record AtlasMark(
     (int X, int Y) Grid,
     Vector2 Where,
@@ -39,7 +43,8 @@ public sealed record AtlasMark(
     IReadOnlyList<IReadOnlyList<Vector2>> Route,
     int Hops,
     int? Rating = null,
-    int BestRating = 0);
+    int BestRating = 0,
+    int Biome = AtlasBiomes.None);
 
 /// <summary>
 /// What the atlas looks like right now. Immutable, published whole, drawn as-is.
@@ -494,7 +499,8 @@ public sealed class AtlasWatch
                 // the difference between the two ways of having no rating: switched off means
                 // draw nothing, while a scale in force and no value on this map means the map
                 // is UNRATED and should say so. Without this they are the same null.
-                settings.Ratings ? grouping.BestRating : 0));
+                settings.Ratings ? grouping.BestRating : 0,
+                settings.Biomes ? node.Biome : AtlasBiomes.None));
         }
 
         return new AtlasView(

@@ -226,6 +226,10 @@ public sealed class AtlasGrouping
 /// Draw nothing while the cursor is on a map. The game puts its own panel over the node then -
 /// what the map is, its biome, what is in it - and everything here would be drawn across it.
 /// </param>
+/// <param name="Biomes">
+/// Ring each name in the colour of its biome. What a map's terrain is decides which league
+/// mechanics and which tablets suit it, and it is otherwise only readable one hover at a time.
+/// </param>
 /// <param name="Search">Show only the maps whose name contains this. Empty shows all of them.</param>
 /// <param name="TextScale">
 /// How big the writing on the atlas is, against the interface's own size. 1 is that size.
@@ -247,6 +251,7 @@ public sealed record AtlasSettings(
     [property: JsonPropertyName("web")] bool Web = false,
     [property: JsonPropertyName("hideOnHover")] bool HideOnHover = true,
     [property: JsonPropertyName("ratings")] bool Ratings = true,
+    [property: JsonPropertyName("biomes")] bool Biomes = true,
     [property: JsonPropertyName("search")] string Search = "",
     [property: JsonPropertyName("textScale")] float TextScale = 0f,
     [property: JsonPropertyName("ritualWorth")] IReadOnlyDictionary<string, int>? RitualWorth = null,

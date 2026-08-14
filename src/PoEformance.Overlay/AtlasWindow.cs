@@ -147,6 +147,22 @@ public sealed class AtlasWindow
                     + (_watch.Ratings.Unmatched.Count > 6 ? " ..." : string.Empty)));
         }
 
+        bool biomes = settings.Biomes;
+        if (ImGui.Checkbox("biome borders", ref biomes))
+        {
+            changed = changed with { Biomes = biomes };
+        }
+
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, "- the ring around each name says what terrain the map is");
+
+        // The key is drawn IN THE COLOURS, because a list of biome names in grey answers none of
+        // what somebody looking at a green ring on the atlas is asking.
+        if (biomes)
+        {
+            BiomeKey();
+        }
+
         bool hideOnHover = settings.HideOnHover;
         if (ImGui.Checkbox("get out of the way while a map is hovered", ref hideOnHover))
         {
@@ -346,6 +362,34 @@ public sealed class AtlasWindow
         }
 
         return string.Join(", ", said);
+    }
+
+    /// <summary>Every biome the game numbers, each written in the colour it rings a map in.</summary>
+    /// <remarks>
+    /// Wrapped by hand rather than with the text wrapper, because each name is its own coloured
+    /// item and ImGui wraps within one - a row of thirteen items has to be broken between them.
+    /// </remarks>
+    private static void BiomeKey()
+    {
+        // Taken at the start of a line, where what is left to the right IS the content width.
+        float edge = ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X;
+        float gap = ImGui.GetStyle().ItemSpacing.X;
+
+        ImGui.TextColored(DimText, "    ");
+
+        foreach (AtlasBiome biome in AtlasBiomes.All.Values)
+        {
+            ImGui.SameLine(0f, gap);
+
+            if (ImGui.GetCursorPosX() + ImGui.CalcTextSize(biome.Name).X > edge)
+            {
+                ImGui.NewLine();
+                ImGui.TextColored(DimText, "    ");
+                ImGui.SameLine(0f, gap);
+            }
+
+            ImGui.TextColored(ToVector(biome.Colour), biome.Name);
+        }
     }
 
     /// <summary>An ImGui-packed colour as the four floats a picker wants.</summary>

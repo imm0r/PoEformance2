@@ -209,6 +209,12 @@ public sealed class AtlasLayer
     /// one or two characters and it is read together with the name - "is this worth running" is
     /// asked about a map, not about a row - so a second line would put an answer somewhere the
     /// question was not.
+    ///
+    /// TWO BORDERS, on purpose, and they say different things: the group is what somebody asked
+    /// to be shown, the biome is what the map IS. So the group keeps the plate's own edge and
+    /// the biome rings it from outside, clear of it - which is where the reference draws its
+    /// biome border too. Sharing one edge would mean the setting somebody switched on quietly
+    /// hides the fact underneath it.
     /// </remarks>
     private float DrawName(
         ImDrawListPtr draw, AtlasMark mark, string title, Vector2 middle, uint text, uint plate, float alpha)
@@ -226,13 +232,40 @@ public sealed class AtlasLayer
         string rated = mark.BestRating <= 0 ? string.Empty
             : mark.Rating is int worth ? worth.ToString(CultureInfo.InvariantCulture)
             : Unrated;
+
         Vector2 pillText = rated.Length > 0 ? Measure(rated, font) : Vector2.Zero;
-        float pillWide = rated.Length > 0 ? pillText.X + (PillPad * 2f) + PillGap : 0f;
+
+        // AS WIDE AS THE WIDEST RATING rather than as wide as its own number, so every pill on
+        // the atlas is the same shape. Hugging the text makes a "7" pill visibly smaller than a
+        // "10" one, and a size that means nothing reads as though it means something.
+        float inside = rated.Length > 0 ? MathF.Max(pillText.X, Measure(Widest, font).X) : 0f;
+
+        // The gap is between the NAME and the pill's edge, not between the name and its number.
+        // Counted from the number, the padding ate the gap and the pill sat against the last
+        // letter - which is what it did.
+        float pillWide = rated.Length > 0 ? PillGap + inside + (PillPad * 2f) : 0f;
 
         Vector2 at = middle - (new Vector2(size.X + pillWide, size.Y) * 0.5f);
         var pad = new Vector2(5f, 2f);
+        Vector2 from = at - pad;
+        Vector2 to = at + size + new Vector2(pillWide, 0f) + pad;
 
-        draw.AddRectFilled(at - pad, at + size + new Vector2(pillWide, 0f) + pad, plate, 3f);
+        if (AtlasBiomes.Of(mark.Biome) is { } biome)
+        {
+            // Outside the plate by the ring's own width, so the ring lies entirely clear of the
+            // group's border rather than half on top of it. Rounded wider to match, or the
+            // corners cut across the plate's.
+            var beyond = new Vector2(BiomeRing, BiomeRing);
+            draw.AddRect(
+                from - beyond,
+                to + beyond,
+                OverlaySettings.Fade(biome.Colour, alpha),
+                3f + BiomeRing,
+                ImDrawFlags.RoundCornersAll,
+                BiomeRing);
+        }
+
+        draw.AddRectFilled(from, to, plate, 3f);
 
         // A group's colour goes on the EDGE, not on the text. Group colours are chosen to be
         // told apart rather than to be read at ten pixels - as text half of them are illegible
@@ -242,13 +275,7 @@ public sealed class AtlasLayer
             uint edge = OverlaySettings.Fade(OverlaySettings.ParseColour(group.Colour), alpha);
             if (edge != 0)
             {
-                draw.AddRect(
-                    at - pad,
-                    at + size + new Vector2(pillWide, 0f) + pad,
-                    edge,
-                    3f,
-                    ImDrawFlags.RoundCornersAll,
-                    2f);
+                draw.AddRect(from, to, edge, 3f, ImDrawFlags.RoundCornersAll, 2f);
             }
         }
 
@@ -256,7 +283,15 @@ public sealed class AtlasLayer
 
         if (rated.Length > 0)
         {
-            DrawPill(draw, at + new Vector2(size.X + PillGap, 0f), pillText, rated, mark, font, alpha);
+            DrawPill(
+                draw,
+                new Vector2(at.X + size.X + PillGap + PillPad, at.Y),
+                inside,
+                pillText,
+                rated,
+                mark,
+                font,
+                alpha);
         }
 
         return at.Y + size.Y + 3f;
@@ -264,7 +299,20 @@ public sealed class AtlasLayer
 
     /// <summary>How much room the pill leaves around its number, and before it.</summary>
     private const float PillPad = 4f;
-    private const float PillGap = 4f;
+    private const float PillGap = 7f;
+
+    /// <summary>How thick the biome ring is, and how far outside the plate it sits.</summary>
+    private const float BiomeRing = 2f;
+
+    /// <summary>
+    /// The widest rating a pill has to hold, for sizing rather than for showing.
+    /// </summary>
+    /// <remarks>
+    /// Two digits, which is what a scale out of ten needs. Measured rather than assumed at a
+    /// pixel count because the writing scales, and taken from digits rather than from the
+    /// question mark because the digits are the wider of the two.
+    /// </remarks>
+    private const string Widest = "00";
 
     /// <summary>What a map nobody has judged carries instead of a number.</summary>
     /// <remarks>
@@ -287,11 +335,26 @@ public sealed class AtlasLayer
     /// stops being readable - so the one colour that works on all of it is the one that works
     /// on none of the plates, which is why this is the only text here that is not the plate's.
     /// </remarks>
+    /// <param name="at">The top left of the pill's inside - its own padding goes outside this.</param>
+    /// <param name="inside">
+    /// How wide that inside is, which is the widest rating rather than this one. The number is
+    /// centred in it, so a one-digit rating sits in the middle of a pill sized for two.
+    /// </param>
     private void DrawPill(
-        ImDrawListPtr draw, Vector2 at, Vector2 size, string rated, AtlasMark mark, float font, float alpha)
+        ImDrawListPtr draw,
+        Vector2 at,
+        float inside,
+        Vector2 size,
+        string rated,
+        AtlasMark mark,
+        float font,
+        float alpha)
     {
         var pad = new Vector2(PillPad, 1f);
-        float round = size.Y * 0.5f;
+        Vector2 from = at - pad;
+        Vector2 to = at + new Vector2(inside, size.Y) + pad;
+        float round = (to.Y - from.Y) * 0.5f;
+        var where = new Vector2(at.X + ((inside - size.X) * 0.5f), at.Y);
 
         // AN UNRATED MAP IS NOT A BAD ONE, so its pill is off the ramp entirely: a slate plate
         // with a pale question mark and an outline, rather than any shade of red. Put anywhere
@@ -299,11 +362,11 @@ public sealed class AtlasLayer
         // strongest one in the file.
         if (mark.Rating is not int worth)
         {
-            draw.AddRectFilled(at - pad, at + size + pad, OverlaySettings.Fade(0xC0_2A2A32, alpha), round);
+            draw.AddRectFilled(from, to, OverlaySettings.Fade(0xC0_2A2A32, alpha), round);
             draw.AddRect(
-                at - pad, at + size + pad, OverlaySettings.Fade(0xFF_7A7A88, alpha), round,
+                from, to, OverlaySettings.Fade(0xFF_7A7A88, alpha), round,
                 ImDrawFlags.RoundCornersAll, 1f);
-            draw.AddText(ImGui.GetFont(), font, at, OverlaySettings.Fade(0xFF_C8C8D2, alpha), rated);
+            draw.AddText(ImGui.GetFont(), font, where, OverlaySettings.Fade(0xFF_C8C8D2, alpha), rated);
             return;
         }
 
@@ -312,8 +375,8 @@ public sealed class AtlasLayer
         // otherwise divide by it.
         float share = mark.BestRating > 0 ? Math.Clamp((float)worth / mark.BestRating, 0f, 1f) : 0f;
 
-        draw.AddRectFilled(at - pad, at + size + pad, Worth(share, alpha), round);
-        draw.AddText(ImGui.GetFont(), font, at, OverlaySettings.Fade(0xFF10_1010, alpha), rated);
+        draw.AddRectFilled(from, to, Worth(share, alpha), round);
+        draw.AddText(ImGui.GetFont(), font, where, OverlaySettings.Fade(0xFF10_1010, alpha), rated);
     }
 
     /// <summary>Red at nothing, amber in the middle, green at the top.</summary>

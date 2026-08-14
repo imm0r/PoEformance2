@@ -504,7 +504,23 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   because a map nobody has judged is not a bad map and anywhere on the scale would be an opinion
   nobody holds. Telling that apart from "ratings switched off" needed one thing: the scale
   travels with the mark, so no-rating-with-a-scale means unrated and no-rating-without-one means
-  the feature is off. Both were the same `null` before.
+  the feature is off. Both were the same `null` before. The pill is sized for the WIDEST rating
+  rather than for its own number and centres the text in it, so every pill on the atlas is the
+  same shape — a size that means nothing otherwise reads as though it means something.
+- **The biome ring goes outside the plate, so both borders can be read.** The group colour was
+  already on the plate's edge, and a biome border on the same edge would mean the thing somebody
+  switched on quietly hides the thing the map IS. The reference draws its biome border outside
+  its plate for its own reasons and that geometry solves this: the ring sits clear of the group's
+  border with no overlap. The id→colour table is ported from `Plugins/Atlas2/json/biome.json` and
+  cross-checked from the other side — the six "Also counts as a … Area" tablet effects in
+  `data/atlas-content.json` run Water, Mountain, Grass, Forest, Swamp, Desert, exactly ids 0–5.
+  Two colours are deliberately NOT the reference's, both because this is a two-pixel ring on a
+  dark plate where the reference has a coloured background: Swamp carried byte-for-byte the same
+  blue as Water there, and Forest at 0.0/0.266/0.097 cannot be seen at all. An id past the end of
+  the table draws no ring rather than a fallback colour — a league adding a biome would otherwise
+  ring every map in it confidently in a colour standing for something else. And "borders off"
+  travels as `-1`, not as `0`: nought is Water, and a sentinel inside its own range would paint
+  every unknown map as a lake.
 - **A stale position is invisible on a label and catastrophic on a line.** The two-rate read
   keeps what a node IS for a third of a second and re-reads WHERE it is every tick; a node the
   panel did not place this tick used to keep its last-seen position, on the grounds that a third
