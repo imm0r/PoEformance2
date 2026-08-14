@@ -219,7 +219,13 @@ public sealed class AtlasLayer
         // The pill's width is taken BEFORE the plate is placed, so the whole thing stays
         // centred on the node. Measured and then added to the middle instead, the name would
         // shift left every time a map turned out to have a rating.
-        string rated = mark.Rating is int worth ? worth.ToString(CultureInfo.InvariantCulture) : string.Empty;
+        // A pill on every map while a scale is in force, INCLUDING the ones nobody has rated.
+        // "No pill" would otherwise mean two different things - the ratings are off, or this map
+        // has not been judged - and the second is the one worth seeing: it is a map to go and
+        // form an opinion about, and it looks identical to a map somebody deliberately skipped.
+        string rated = mark.BestRating <= 0 ? string.Empty
+            : mark.Rating is int worth ? worth.ToString(CultureInfo.InvariantCulture)
+            : Unrated;
         Vector2 pillText = rated.Length > 0 ? Measure(rated, font) : Vector2.Zero;
         float pillWide = rated.Length > 0 ? pillText.X + (PillPad * 2f) + PillGap : 0f;
 
@@ -260,6 +266,14 @@ public sealed class AtlasLayer
     private const float PillPad = 4f;
     private const float PillGap = 4f;
 
+    /// <summary>What a map nobody has judged carries instead of a number.</summary>
+    /// <remarks>
+    /// A question mark rather than a dash or a blank, because it asks the right thing: this is
+    /// not a map rated nothing, it is one nobody has looked at - and the difference matters to
+    /// whoever is filling the file in.
+    /// </remarks>
+    private const string Unrated = "?";
+
     /// <summary>
     /// The rating, as a filled pill from red at the worst to green at the best.
     /// </summary>
@@ -277,15 +291,28 @@ public sealed class AtlasLayer
         ImDrawListPtr draw, Vector2 at, Vector2 size, string rated, AtlasMark mark, float font, float alpha)
     {
         var pad = new Vector2(PillPad, 1f);
+        float round = size.Y * 0.5f;
+
+        // AN UNRATED MAP IS NOT A BAD ONE, so its pill is off the ramp entirely: a slate plate
+        // with a pale question mark and an outline, rather than any shade of red. Put anywhere
+        // on the scale it would be an opinion nobody holds - and at the red end it would be the
+        // strongest one in the file.
+        if (mark.Rating is not int worth)
+        {
+            draw.AddRectFilled(at - pad, at + size + pad, OverlaySettings.Fade(0xC0_2A2A32, alpha), round);
+            draw.AddRect(
+                at - pad, at + size + pad, OverlaySettings.Fade(0xFF_7A7A88, alpha), round,
+                ImDrawFlags.RoundCornersAll, 1f);
+            draw.AddText(ImGui.GetFont(), font, at, OverlaySettings.Fade(0xFF_C8C8D2, alpha), rated);
+            return;
+        }
 
         // Against the top of the scale the ratings themselves set, so any scale works: rate out
         // of five and five is green. Guarded, because a file where everything is nought would
         // otherwise divide by it.
-        float share = mark.BestRating > 0
-            ? Math.Clamp((float)(mark.Rating ?? 0) / mark.BestRating, 0f, 1f)
-            : 0f;
+        float share = mark.BestRating > 0 ? Math.Clamp((float)worth / mark.BestRating, 0f, 1f) : 0f;
 
-        draw.AddRectFilled(at - pad, at + size + pad, Worth(share, alpha), size.Y * 0.5f);
+        draw.AddRectFilled(at - pad, at + size + pad, Worth(share, alpha), round);
         draw.AddText(ImGui.GetFont(), font, at, OverlaySettings.Fade(0xFF10_1010, alpha), rated);
     }
 

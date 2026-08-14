@@ -461,7 +461,12 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   forgotten to write it. There is a test that the shipped file resolves completely, which is
   what will catch a league renaming a map. The colour scale runs to the highest rating IN THE
   FILE rather than to a fixed ten, so any scale works — the cost is that it is relative, and
-  that is the right way round for an opinion, where green should mean "the best there is".
+  that is the right way round for an opinion, where green should mean "the best there is". An
+  UNRATED map gets its own pill — a slate `?` off the ramp entirely, never a shade of red,
+  because a map nobody has judged is not a bad map and anywhere on the scale would be an opinion
+  nobody holds. Telling that apart from "ratings switched off" needed one thing: the scale
+  travels with the mark, so no-rating-with-a-scale means unrated and no-rating-without-one means
+  the feature is off. Both were the same `null` before.
 - **A stale position is invisible on a label and catastrophic on a line.** The two-rate read
   keeps what a node IS for a third of a second and re-reads WHERE it is every tick; a node the
   panel did not place this tick used to keep its last-seen position, on the grounds that a third

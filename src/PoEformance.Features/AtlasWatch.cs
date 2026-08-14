@@ -489,7 +489,12 @@ public sealed class AtlasWatch
                 route,
                 hops,
                 settings.Ratings ? grouping.Rated(node.MapId) : null,
-                grouping.BestRating));
+
+                // NOUGHT when the ratings are switched off, and that is what tells the drawing
+                // the difference between the two ways of having no rating: switched off means
+                // draw nothing, while a scale in force and no value on this map means the map
+                // is UNRATED and should say so. Without this they are the same null.
+                settings.Ratings ? grouping.BestRating : 0));
         }
 
         return new AtlasView(

@@ -269,6 +269,11 @@ public class AtlasViewTests
             Compose([Node(0, 0, "MapAugury")], grouping: new AtlasGrouping([], LoadedNames(), ratings)).Marks);
 
         Assert.Null(mark.Rating);
+
+        // But the SCALE is still in force, which is what tells the drawing that this map is
+        // unrated rather than that the ratings are switched off - the difference between a
+        // question mark and no pill at all.
+        Assert.Equal(8, mark.BestRating);
     }
 
     [Fact]
@@ -283,6 +288,10 @@ public class AtlasViewTests
             Compose([Node(0, 0, "MapAugury")], new AtlasSettings(Ratings: false), grouping).Marks);
 
         Assert.Null(mark.Rating);
+
+        // No scale either, and that is the whole of how "off" is told from "unrated": both
+        // carry no rating, and only one of them carries a scale to be unrated against.
+        Assert.Equal(0, mark.BestRating);
     }
 
     [Fact]
