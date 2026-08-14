@@ -121,6 +121,32 @@ public sealed class AtlasWindow
         // hiding those and wondering where the lines went is a short trip.
         ImGui.TextColored(DimText, "maps you are routing to stay visible either way");
 
+        bool ratings = settings.Ratings;
+        if (ImGui.Checkbox("map ratings", ref ratings))
+        {
+            changed = changed with { Ratings = ratings };
+        }
+
+        ImGui.SameLine();
+        ImGui.TextColored(
+            DimText,
+            _watch.Ratings.Count > 0
+                ? $"{_watch.Ratings.Count} maps rated out of {_watch.Ratings.Best}"
+                  + "  -  edit data/atlas-ratings.json, it is an opinion rather than a fact"
+                : "none - data/atlas-ratings.json is missing or empty");
+
+        // A name in the file that matches no map is a rating that silently never appears, which
+        // is indistinguishable from having forgotten to write it. Named here, it is a typo.
+        if (_watch.Ratings.Unmatched.Count > 0)
+        {
+            ImGui.TextColored(
+                WarnText,
+                ImGuiText.Escape(
+                    $"    {_watch.Ratings.Unmatched.Count} rated names match no map: "
+                    + string.Join(", ", _watch.Ratings.Unmatched.Take(6))
+                    + (_watch.Ratings.Unmatched.Count > 6 ? " ..." : string.Empty)));
+        }
+
         bool hideOnHover = settings.HideOnHover;
         if (ImGui.Checkbox("get out of the way while a map is hovered", ref hideOnHover))
         {

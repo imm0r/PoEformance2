@@ -20,6 +20,13 @@ namespace PoEformance.Features;
 /// position for, and joining the two sides of that gap draws a line along no connection
 /// anybody can walk. Each run is at least two points; the hole between them is the truth.
 /// </param>
+/// <param name="Rating">
+/// What this map is worth running, on somebody's own scale, or null when nobody has said.
+/// </param>
+/// <param name="BestRating">
+/// The top of that scale, carried so the drawing can colour a rating without knowing where the
+/// ratings came from. Nought when there are none.
+/// </param>
 /// <param name="Hops">How many maps have to be run to get here. 0 for one you can enter now.</param>
 public sealed record AtlasMark(
     (int X, int Y) Grid,
@@ -30,7 +37,9 @@ public sealed record AtlasMark(
     AtlasGroup? Group,
     IReadOnlyList<string> Contents,
     IReadOnlyList<IReadOnlyList<Vector2>> Route,
-    int Hops);
+    int Hops,
+    int? Rating = null,
+    int BestRating = 0);
 
 /// <summary>
 /// What the atlas looks like right now. Immutable, published whole, drawn as-is.
@@ -137,7 +146,8 @@ public sealed class AtlasWatch
         OffsetSchema schema,
         ulong gameStatesStatic,
         AtlasContentNames? contents = null,
-        AtlasMapNames? names = null)
+        AtlasMapNames? names = null,
+        AtlasRatings? ratings = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
@@ -146,12 +156,16 @@ public sealed class AtlasWatch
         _gameStatesStatic = gameStatesStatic;
         _atlas = new AtlasReader(reader, schema, new UiElementReader(reader, schema));
         _contents = contents ?? AtlasContentNames.Empty;
-        _grouping = new AtlasGrouping(_settings.Sorting, names ?? AtlasMapNames.Empty);
         Names = names ?? AtlasMapNames.Empty;
+        Ratings = ratings ?? AtlasRatings.Empty;
+        _grouping = new AtlasGrouping(_settings.Sorting, Names, Ratings);
     }
 
     /// <summary>The map names in force, kept so settings can be replaced without them.</summary>
     public AtlasMapNames Names { get; }
+
+    /// <summary>What each map is worth running, for the same reason as the names.</summary>
+    public AtlasRatings Ratings { get; }
 
     /// <summary>
     /// The ritual line, when one is being drawn. Null unless somebody attached it.
@@ -226,7 +240,7 @@ public sealed class AtlasWatch
 
             // The grouping caches its decisions, so it is rebuilt rather than mutated - a
             // cache of answers from the old groups would outlive the change that replaced them.
-            Volatile.Write(ref _grouping, new AtlasGrouping(value.Sorting, Names));
+            Volatile.Write(ref _grouping, new AtlasGrouping(value.Sorting, Names, Ratings));
         }
     }
 
@@ -473,7 +487,9 @@ public sealed class AtlasWatch
                 group,
                 settings.Contents && words.TryGetValue(node.Grid, out IReadOnlyList<string>? said) ? said : [],
                 route,
-                hops));
+                hops,
+                settings.Ratings ? grouping.Rated(node.MapId) : null,
+                grouping.BestRating));
         }
 
         return new AtlasView(

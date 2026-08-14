@@ -433,12 +433,18 @@ internal static class Program
             PoEformance.Game.World.RitualMods.Load(FindDataFile("ritual-mods.json")),
             PoEformance.Game.World.AtlasMapNames.Load(FindDataFile("atlas-maps.json")));
 
+        // Loaded ONCE and handed to both, because the ratings are resolved against it: a second
+        // load would be a second table for the same file and a second chance for them to differ.
+        PoEformance.Game.World.AtlasMapNames mapNames =
+            PoEformance.Game.World.AtlasMapNames.Load(FindDataFile("atlas-maps.json"));
+
         var atlas = new PoEformance.Features.AtlasWatch(
             reader,
             schema,
             gameStatesStatic,
             PoEformance.Game.World.AtlasContentNames.Load(FindDataFile("atlas-content.json")),
-            PoEformance.Game.World.AtlasMapNames.Load(FindDataFile("atlas-maps.json")))
+            mapNames,
+            PoEformance.Game.World.AtlasRatings.Load(FindDataFile("atlas-ratings.json"), mapNames))
         {
             Settings = PoEformance.Features.AtlasStore.Load(),
             Ritual = ritual,

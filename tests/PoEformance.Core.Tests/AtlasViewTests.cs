@@ -242,6 +242,50 @@ public class AtlasViewTests
     }
 
     [Fact]
+    public void AMARKCarriesItsRatingAndTheScaleItIsAgainst()
+    {
+        // Both, because the drawing colours a rating and must not have to know where ratings
+        // come from to do it - the scale travels with the value.
+        AtlasRatings ratings = AtlasRatings.Resolve(
+            new Dictionary<string, int> { ["Augury"] = 4, ["Lost Towers"] = 8 }, LoadedNames());
+
+        var grouping = new AtlasGrouping([], LoadedNames(), ratings);
+
+        AtlasMark mark = Assert.Single(Compose([Node(0, 0, "MapAugury")], grouping: grouping).Marks);
+
+        Assert.Equal(4, mark.Rating);
+        Assert.Equal(8, mark.BestRating);
+    }
+
+    [Fact]
+    public void ANDAMapNobodyRatedCarriesNothingRatherThanNought()
+    {
+        // Nought is a rating - the worst one - and a map nobody has judged is not the worst
+        // map, it is an unjudged one. Drawn as a red pill it would be an opinion nobody held.
+        AtlasRatings ratings = AtlasRatings.Resolve(
+            new Dictionary<string, int> { ["Lost Towers"] = 8 }, LoadedNames());
+
+        AtlasMark mark = Assert.Single(
+            Compose([Node(0, 0, "MapAugury")], grouping: new AtlasGrouping([], LoadedNames(), ratings)).Marks);
+
+        Assert.Null(mark.Rating);
+    }
+
+    [Fact]
+    public void ANDTheyCanBeTurnedOff()
+    {
+        AtlasRatings ratings = AtlasRatings.Resolve(
+            new Dictionary<string, int> { ["Augury"] = 4 }, LoadedNames());
+
+        var grouping = new AtlasGrouping([], LoadedNames(), ratings);
+
+        AtlasMark mark = Assert.Single(
+            Compose([Node(0, 0, "MapAugury")], new AtlasSettings(Ratings: false), grouping).Marks);
+
+        Assert.Null(mark.Rating);
+    }
+
+    [Fact]
     public void ANodeThePanelDidNotPlaceIsDROPPEDRatherThanLeftWhereItWas()
     {
         // The bug that made an atlas look like a spider's web. Keeping the last-seen position
@@ -423,5 +467,17 @@ public class AtlasViewTests
         }
 
         return AtlasContentNames.Load(Path.Combine(dir!.FullName, "data", "atlas-content.json"));
+    }
+
+    /// <summary>The shipped map table, so a rating fixture can resolve real names to real ids.</summary>
+    private static AtlasMapNames LoadedNames()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "data", "atlas-maps.json")))
+        {
+            dir = dir.Parent;
+        }
+
+        return AtlasMapNames.Load(Path.Combine(dir!.FullName, "data", "atlas-maps.json"));
     }
 }
