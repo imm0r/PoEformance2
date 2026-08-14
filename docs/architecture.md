@@ -235,8 +235,16 @@ found a value that was 999 while the cursor was on an inventory item and 1000 wh
 — repeatable, and entirely an artefact: 999 is `0x3E7` and 1000 is `0x3E8`, the top halves of
 a 64-bit heap pointer seen four bytes into an eight-byte slot. The pair is different every time
 the game launches (the fixtures show 1054/1055, 646/647, 940/941, 1513), so an equality test
-against one of them is a test against one launch. See the block comment at the top of
-`schema/poe2.offsets.json`.
+against one of them is a test against one launch.
+
+The rest of that hunt is why the summary exists. Ten seconds of watching printed six hundred
+lines and the answer was in none of them — it was in their distribution: one slot took two
+values over and over, its neighbour never repeated a value at all because it was a clock, and
+the pair before them were `_Ptr`/`_Rep` of a `std::shared_ptr` (always exactly `0x10` apart,
+which is `make_shared` putting the payload inline behind the control block). So a slot that
+keeps moving now goes quiet after a few lines, everything is tallied, and the tally prints at
+the end. `tests/fixtures/session-2026-08-hover.rec` is that session, and `HoverSlotTests`
+replays it. See the block comment at the top of `schema/poe2.offsets.json`.
 
 `--questflags` is a hunt rather than a feature: it finds the QuestFlags table through any NPC
 in the area and sweeps ServerData and the state objects for references to its rows. The sweep

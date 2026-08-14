@@ -197,6 +197,106 @@ public class AddressPeekTests
     }
 
     [Fact]
+    public void AFloatIsNotReportedAsAPointer()
+    {
+        // What it did for a whole session: 7659.73 is 0x45EF5DD2, which the reader's loose
+        // "could this be a pointer" bound accepts - so the game's clock was described as a
+        // pointer to memory that could not be read, and the vector theory it killed survived
+        // a day longer than it should have.
+        var reader = new FakeMemoryReader { ModuleBase = Module, ModuleSize = ModuleSize };
+        reader.Place(Slot, new byte[0x80]);
+        reader.Place(Slot, 0x45EF5DD2UL);
+
+        string line = string.Join('\n', AddressPeek.Describe(reader, Slot))
+            .Split('\n').Single(text => text.Contains("-> ", StringComparison.Ordinal));
+
+        Assert.DoesNotContain("pointer", line, StringComparison.Ordinal);
+        Assert.Contains("7659.7", line, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void CharactersStoredInTheSlotAreReadAsCharacters()
+    {
+        // "Art/Text" is 0x747865542F747241 - far above any pointer bound, and this game keeps
+        // its asset paths as characters inside the record rather than behind a pointer.
+        var reader = new FakeMemoryReader { ModuleBase = Module, ModuleSize = ModuleSize };
+        reader.Place(Slot, new byte[0x80]);
+        reader.Place(Slot, System.Text.Encoding.ASCII.GetBytes("Art/Text"));
+
+        Assert.Contains("text \"Art/Text\"", string.Join('\n', AddressPeek.Describe(reader, Slot)), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void APointerIsStillAPointerWhenItsBytesCouldSpellSomething()
+    {
+        // The check above must not eat real addresses. It cannot: every pointer in this game
+        // carries 0xE7 0x03 0x00 0x00 or 0xF6 0x7F 0x00 0x00 in its top half, and neither
+        // 0xE7 nor 0xF6 is a character.
+        string line = string.Join('\n', AddressPeek.Describe(Game(Hovering), Slot))
+            .Split('\n').Single(text => text.Contains("-> ", StringComparison.Ordinal));
+
+        Assert.DoesNotContain("text \"", line, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TextBuriedInsideAnObjectIsSurfaced()
+    {
+        // PointerPeek only calls something text when the characters start at offset zero, and
+        // this game's records put a vtable and a length in front of them - so the object naming
+        // an asset read as an anonymous structure while its own path sat sixteen bytes in.
+        var reader = new FakeMemoryReader { ModuleBase = Module, ModuleSize = ModuleSize };
+        reader.Place(Slot, new byte[0x80]);
+        reader.Place(Slot, Hovering);
+        reader.Place(Hovering, new byte[0x80]);
+        reader.Place(Hovering, Module + 0x30F2CB8);                 // vtable
+        reader.Place(Hovering + 0x08, 0x42UL);                      // length
+        reader.PlaceUtf8(Hovering + 0x10, "Art/Textures/Interface2");
+
+        string report = string.Join('\n', AddressPeek.Describe(reader, Slot));
+
+        Assert.Contains("holds \"Art/Textures/Interface2\"", report, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AWatchTellsAStateApartFromAClock()
+    {
+        // The distinction the whole summary exists for. A slot alternating between two values
+        // is something that can be tested against; one that never repeats is a counter, and
+        // saying so is what stops the next person building a feature on it.
+        var log = new AddressPeek.PeekWatchLog();
+        ulong?[] previous = [Idle, 1000];
+        for (var i = 0; i < 20; i++)
+        {
+            ulong?[] sample = [i % 2 == 0 ? Hovering : Idle, (ulong)(1000 + i)];
+            log.Observe(previous, sample);
+            previous = sample;
+        }
+
+        string summary = string.Join('\n', log.Summary(0x1_0000_0000, 0));
+
+        Assert.Contains("0x100000000", summary, StringComparison.Ordinal);
+        Assert.Contains($"{Hovering:X16}", summary, StringComparison.Ordinal);
+        Assert.Contains("never the same value twice - a counter or a clock", summary, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ASlotThatKeepsMovingStopsPrintingButKeepsCounting()
+    {
+        var log = new AddressPeek.PeekWatchLog();
+        ulong?[] previous = [0];
+        var printed = 0;
+        for (var i = 1; i <= 30; i++)
+        {
+            ulong?[] sample = [(ulong)i];
+            printed += log.Observe(previous, sample).Count(change => change.Print);
+            previous = sample;
+        }
+
+        Assert.Equal(6, printed);                                   // loud for a few, then quiet
+        Assert.Contains("30 changes", string.Join('\n', log.Summary(0, 0)), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void TheWindowPutsTheTargetWhereItWasAskedFor()
     {
         (ulong start, int slots, int target) = AddressPeek.Window(0x1_0000_0044, 0x20, 0x40);
