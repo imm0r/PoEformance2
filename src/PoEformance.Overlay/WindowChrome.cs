@@ -12,10 +12,7 @@ namespace PoEformance.Overlay;
 /// a settings file nobody trusts.
 /// </param>
 /// <param name="Title">What it is called on screen.</param>
-/// <param name="MayClickThrough">
-/// False for the one window that is the way back. See <see cref="WindowChrome"/>.
-/// </param>
-public readonly record struct OverlayWindow(string Id, string Title, bool MayClickThrough = true);
+public readonly record struct OverlayWindow(string Id, string Title);
 
 /// <summary>
 /// Lets each overlay window be pinned in place, or made invisible to the mouse.
@@ -37,27 +34,39 @@ public readonly record struct OverlayWindow(string Id, string Title, bool MayCli
 /// window's title bar beside its close button (<see cref="TitleButtons"/>), the same two on
 /// its right-click menu (<see cref="Menu"/>), and every window at once in the Appearance tab
 /// (<see cref="DrawList"/>). The icons are the state as well as the switch and cost a glance;
-/// the menu is where a right-click looks; the list is the only one of the three a
-/// click-through window has not taken away from itself.
+/// the menu is where a right-click looks; the list is the one that reaches a window whose own
+/// two routes have been switched off.
 ///
-/// THERE HAS TO BE A WAY BACK. A click-through window cannot be right-clicked, so its own menu
-/// is gone the moment it is switched on - the way to undo it is the list in the Appearance tab,
-/// which is in the Tools window, which is opened from the status window. That chain is only a
-/// way back if its last link cannot be broken, so the status window is the one window that
-/// will not go click-through. It takes the lock like any other; the checkbox beside it is
-/// disabled and says why. The alternative was a global hotkey, which is a new key to clash
-/// with the game over, to solve a problem one exemption already solves.
+/// THERE HAS TO BE A WAY BACK, and it is the pointer icon itself. A click-through window
+/// cannot be right-clicked, so its menu goes the moment it is switched on; the icon does not,
+/// because <see cref="TitleButtons"/> asks the overlay to take the mouse back for exactly as
+/// long as the cursor is inside that one square. The cursor's position is known throughout -
+/// ClickableTransparentOverlay reads it with <c>GetCursorPos</c> rather than from window
+/// messages, so the overlay knows where the mouse is even while it is transparent to it, which
+/// is the fact this whole arrangement rests on.
+///
+/// THAT REPLACED AN EXEMPTION. The status window used to refuse click-through outright,
+/// because the only undo was the Appearance list, which is in the Tools window, which is
+/// opened from a checkbox in the status window - so a click-through status window took the
+/// list with it. A switch that undoes itself where it sits needs no such carve-out, so there
+/// is no longer a window that cannot go click-through. What the arrangement DOES need is that
+/// the title bar be there to hold the icon, which is why a click-through window is also never
+/// collapsed - see <see cref="Flags"/>.
+///
+/// The one window this does not cover is the preload panel, which has no title bar to put an
+/// icon on. Its undo is still the Appearance list, and that stays reachable because any other
+/// window can now hand itself back.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class WindowChrome
 {
-    /// <summary>The status window's id - see the note above about why it is special.</summary>
+    /// <summary>The status window's id.</summary>
     public const string StatusId = "status";
 
     /// <summary>Every window that can be pinned down, in the order the list offers them.</summary>
     public static IReadOnlyList<OverlayWindow> Windows { get; } =
     [
-        new(StatusId, "PoEformance", MayClickThrough: false),
+        new(StatusId, "PoEformance"),
         new("tools", "Tools"),
         new("poi", "Points of interest"),
         new("preload", "What loaded"),
@@ -71,21 +80,10 @@ public sealed class WindowChrome
     /// <summary>What a window was told. Free unless somebody said otherwise.</summary>
     public WindowRule Of(string id) => _rules.GetValueOrDefault(id) ?? WindowRule.Free;
 
-    /// <summary>
-    /// Replaces one window's rule, refusing click-through where it is not allowed.
-    /// </summary>
-    /// <remarks>
-    /// Refused HERE rather than only in the control that offers it, because a settings file is
-    /// hand-editable and the state this prevents is one nothing in the tool can undo.
-    /// </remarks>
+    /// <summary>Replaces one window's rule.</summary>
     public void Set(string id, WindowRule rule)
     {
         ArgumentNullException.ThrowIfNull(rule);
-
-        if (rule.ClickThrough && !Allows(id))
-        {
-            rule = rule with { ClickThrough = false };
-        }
 
         if (rule.Anything)
         {
@@ -107,16 +105,9 @@ public sealed class WindowChrome
         _rules.Clear();
         foreach (OverlayWindow window in Windows)
         {
-            if (saved.TryGetValue(window.Id, out WindowRule? rule) && rule is not null)
+            if (saved.TryGetValue(window.Id, out WindowRule? rule) && rule is not null && rule.Anything)
             {
-                WindowRule kept = rule.ClickThrough && !window.MayClickThrough
-                    ? rule with { ClickThrough = false }
-                    : rule;
-
-                if (kept.Anything)
-                {
-                    _rules[window.Id] = kept;
-                }
+                _rules[window.Id] = rule;
             }
         }
     }
@@ -129,22 +120,12 @@ public sealed class WindowChrome
     public IReadOnlyDictionary<string, WindowRule>? Saved()
         => _rules.Count == 0 ? null : new Dictionary<string, WindowRule>(_rules);
 
-    /// <summary>Whether this window is allowed to go click-through.</summary>
-    public static bool Allows(string id)
-    {
-        foreach (OverlayWindow window in Windows)
-        {
-            if (window.Id == id)
-            {
-                return window.MayClickThrough;
-            }
-        }
-
-        // Unknown ids are allowed: a window nobody registered is not the way back to anything.
-        return true;
-    }
-
     /// <summary>This window's own flags, plus whatever it has been told.</summary>
+    /// <remarks>
+    /// Also settles the next window's COLLAPSED state, which is a side effect and is meant to
+    /// be: this is called immediately before <c>ImGui.Begin</c> at every call site, which is
+    /// the only moment a <c>SetNextWindow*</c> can be said at all.
+    /// </remarks>
     public ImGuiWindowFlags Flags(string id, ImGuiWindowFlags own = ImGuiWindowFlags.None)
     {
         WindowRule rule = Of(id);
@@ -160,6 +141,16 @@ public sealed class WindowChrome
             // dragged anyway, and saying so keeps the flags describing the same window the
             // user is looking at rather than one that would move if it could.
             own |= ImGuiWindowFlags.NoMouseInputs | ImGuiWindowFlags.NoMove;
+
+            // AND NEVER COLLAPSED, which is what keeps the way back from being lost. A
+            // collapsed window submits no items and gets no title bar icons drawn, and a
+            // click-through one cannot be un-collapsed by double-clicking it either - so the
+            // pair is a window that shows nothing, takes no clicks and cannot be undone from
+            // itself. Refused rather than merely discouraged, because the pair is reachable
+            // without anybody choosing it: ImGui remembers collapsed state in its own ini and
+            // our settings file is hand-editable, so both halves can arrive already set.
+            own |= ImGuiWindowFlags.NoCollapse;
+            ImGui.SetNextWindowCollapsed(false);
         }
 
         return own;
@@ -195,8 +186,15 @@ public sealed class WindowChrome
     /// Both of those come at a price paid by a window that sizes itself to its contents, and
     /// the two comments in the body are how it is kept to nothing worth seeing.
     ///
-    /// Call it inside the <c>if (ImGui.Begin(...))</c> body: a collapsed window submits no
-    /// items at all, which is also why a collapsed window shows the X and not these.
+    /// A CLICK-THROUGH WINDOW GETS NEITHER, and takes no harm from it. Its items can never be
+    /// hovered - ImGui's hover search skips a window carrying NoMouseInputs outright - so the
+    /// icons are hit-tested by hand there instead; see <see cref="Reach"/>, which is the way
+    /// back out of the state. Nothing is lost by the swap, because the drag and the collapse
+    /// that an item exists to suppress went with the window's own inputs.
+    ///
+    /// Call it inside the <c>if (ImGui.Begin(...))</c> body. A collapsed window submits no
+    /// items and so shows the X and not these - which is exactly why a click-through window is
+    /// never collapsed (<see cref="Flags"/>): there, these ARE the X.
     /// </remarks>
     public void TitleButtons(string id, bool closable = false)
     {
@@ -230,8 +228,14 @@ public sealed class WindowChrome
         float left = right - (size * 2f) - gap;
 
         // Not onto the collapse arrow or the title. ImGui sizes its title text against its own
-        // buttons and knows nothing of ours, so on a window too narrow for both the icons would
-        // sit on top of the name - and the menu and the Appearance list are both still there.
+        // buttons and knows nothing of ours, so on a window too narrow for both, the icons would
+        // sit on top of the name.
+        //
+        // Giving up here also gives up the way back out of click-through, which is why the
+        // threshold is worth reading rather than trusting: it is about eighty pixels, and the
+        // narrowest window registered here is the route picker at three hundred and sixty. A
+        // window that ever could be that narrow needs the way back thought about again, not a
+        // smaller icon.
         if (left < corner.X + style.FramePadding.X + size + gap)
         {
             return;
@@ -240,11 +244,15 @@ public sealed class WindowChrome
         // WHETHER THE ICONS ARE ITEMS THIS FRAME, which is the rest of that same problem. The
         // inset above stops an auto-fitting window GROWING; what it cannot stop is the window
         // being held at its widest, because a measurement that reaches the content's edge also
-        // stops the content shrinking away from it. So the hit areas exist only while the
-        // pointer is in the title bar - the one moment nothing about the window's content is
-        // changing width - and the window is back to fitting itself the instant the pointer
-        // leaves. The ICONS are painted either way: they are the state as much as the switch,
-        // and a lock that is only visible while pointed at says nothing.
+        // stops the content shrinking away from it. So the items exist only while the pointer
+        // is in the title bar - the one moment nothing about the window's content is changing
+        // width - and the window is back to fitting itself the instant the pointer leaves. The
+        // ICONS are painted either way: they are the state as much as the switch, and a lock
+        // that is only visible while pointed at says nothing.
+        //
+        // The cursor is asked for here rather than taken from the hover state on purpose. It
+        // is the one question that still has an answer on a click-through window, where ImGui
+        // reports nothing hovered at all.
         Vector2 mouse = ImGui.GetMousePos();
         bool live = mouse.X >= corner.X
             && mouse.X < corner.X + width
@@ -262,7 +270,18 @@ public sealed class WindowChrome
 
             WindowRule rule = Of(id);
 
-            if (Toggle($"##locked-{id}", lockAt, size, live, enabled: true, tip: LockedTip(rule.Locked)))
+            // WHICH HIT TEST, and the split is forced rather than chosen. A click-through
+            // window carries NoMouseInputs, and ImGui's hover search skips such a window
+            // entirely - an item inside one can never be hovered, so an InvisibleButton there
+            // is a control that is drawn and dead. Reach() does the test by hand instead and
+            // buys the mouse back for the square it covers. It is also the path with nothing
+            // to lose by it: the drag and the double-click collapse that an item exists to
+            // suppress are already gone with the window's own inputs.
+            bool through = rule.ClickThrough;
+
+            if (through
+                ? Reach(lockAt, size, mouse, LockedTip(rule.Locked))
+                : Toggle($"##locked-{id}", lockAt, size, live, LockedTip(rule.Locked)))
             {
                 Set(id, rule with { Locked = !rule.Locked });
 
@@ -272,16 +291,17 @@ public sealed class WindowChrome
                 rule = Of(id);
             }
 
-            Padlock(draw, lockAt, size, Ink(rule.Locked, allowed: true), rule.Locked);
+            Padlock(draw, lockAt, size, Ink(rule.Locked), rule.Locked);
 
-            bool allowed = Allows(id);
-            if (Toggle($"##through-{id}", throughAt, size, live, allowed, ThroughTip(rule.ClickThrough, allowed)))
+            if (through
+                ? Reach(throughAt, size, mouse, ThroughTip(through))
+                : Toggle($"##through-{id}", throughAt, size, live, ThroughTip(through)))
             {
                 Set(id, rule with { ClickThrough = !rule.ClickThrough });
                 rule = Of(id);
             }
 
-            Pointer(draw, throughAt, size, Ink(rule.ClickThrough, allowed), rule.ClickThrough);
+            Pointer(draw, throughAt, size, Ink(rule.ClickThrough), rule.ClickThrough);
         }
         finally
         {
@@ -304,7 +324,7 @@ public sealed class WindowChrome
     /// <see cref="TitleButtons"/> about what an item in a title bar costs a window that fits
     /// itself to its contents.
     /// </param>
-    private static bool Toggle(string tag, Vector2 at, float size, bool live, bool enabled, string tip)
+    private static bool Toggle(string tag, Vector2 at, float size, bool live, string tip)
     {
         if (!live)
         {
@@ -312,52 +332,77 @@ public sealed class WindowChrome
         }
 
         ImGui.SetCursorScreenPos(at);
-        bool clicked = ImGui.InvisibleButton(tag, new Vector2(size, size)) && enabled;
+        bool clicked = ImGui.InvisibleButton(tag, new Vector2(size, size));
 
         if (!ImGui.IsItemHovered())
         {
             return clicked;
         }
 
-        // The tooltip even where the switch is refused: "why can this one not" is exactly the
-        // question a greyed-out icon raises, and the answer has nowhere else to go.
         ImGui.SetTooltip(tip);
-
-        if (enabled)
-        {
-            ImGui.GetWindowDrawList().AddCircleFilled(
-                at + new Vector2(size / 2f, size / 2f),
-                size * 0.55f,
-                ImGui.GetColorU32(ImGui.IsItemActive() ? ImGuiCol.ButtonActive : ImGuiCol.ButtonHovered),
-                12);
-        }
-
+        Backing(at, size, ImGui.IsItemActive());
         return clicked;
     }
 
-    /// <summary>What colour an icon is drawn in: lit when on, dim when off, fainter when refused.</summary>
-    private static uint Ink(bool on, bool allowed)
-        => !allowed
-            ? ImGui.GetColorU32(ImGuiCol.TextDisabled, 0.5f)
-            : ImGui.GetColorU32(on ? ImGuiCol.Text : ImGuiCol.TextDisabled);
+    /// <summary>
+    /// The same icon on a window the mouse has been told to ignore. True when it was clicked.
+    /// </summary>
+    /// <remarks>
+    /// THIS IS THE WAY BACK OUT OF CLICK-THROUGH, so it is worth saying exactly what carries
+    /// it. Two facts, both checked rather than assumed:
+    ///
+    /// - The overlay is clickable or transparent AS A WHOLE, and ClickableTransparentOverlay
+    ///   decides which every frame from <c>io.WantCaptureMouse</c> alone. So asking for the
+    ///   mouse back is not a per-window request at all - it is one flag, asserted for exactly
+    ///   as long as the cursor is inside this one square, and dropped the moment it leaves.
+    ///   Everywhere else on the window the click still lands on the game.
+    /// - The cursor's position keeps arriving while the overlay is transparent, because that
+    ///   library reads it with <c>GetCursorPos</c> and not from window messages. Were it
+    ///   message-driven the position would freeze on the way out and the cursor could never
+    ///   be seen arriving here - which is the failure that would make this a one-way switch
+    ///   with no symptom other than an icon that does nothing.
+    ///
+    /// The BUTTON presses do come from messages, so they only start arriving once the overlay
+    /// has been made clickable again - a frame or two after the cursor lands here, since the
+    /// flag is read at the top of the next frame. Hence the press rather than the release:
+    /// asking for a full click inside a square the size of a letter, when the first half of
+    /// one may have gone to the game, is asking for a switch that works on the second try.
+    /// </remarks>
+    private static bool Reach(Vector2 at, float size, Vector2 mouse, string tip)
+    {
+        if (mouse.X < at.X || mouse.X >= at.X + size || mouse.Y < at.Y || mouse.Y >= at.Y + size)
+        {
+            return false;
+        }
+
+        ImGui.SetNextFrameWantCaptureMouse(true);
+
+        ImGui.SetTooltip(tip);
+        Backing(at, size, ImGui.IsMouseDown(ImGuiMouseButton.Left));
+        return ImGui.IsMouseClicked(ImGuiMouseButton.Left);
+    }
+
+    /// <summary>The disc ImGui puts under its own title bar buttons when they are pointed at.</summary>
+    private static void Backing(Vector2 at, float size, bool held)
+        => ImGui.GetWindowDrawList().AddCircleFilled(
+            at + new Vector2(size / 2f, size / 2f),
+            size * 0.55f,
+            ImGui.GetColorU32(held ? ImGuiCol.ButtonActive : ImGuiCol.ButtonHovered),
+            12);
+
+    /// <summary>What colour an icon is drawn in: lit when the switch is on, dim when off.</summary>
+    private static uint Ink(bool on)
+        => ImGui.GetColorU32(on ? ImGuiCol.Text : ImGuiCol.TextDisabled);
 
     private static string LockedTip(bool locked)
         => locked
             ? "Locked - a stray click will not drag this window.\nClick to let it be moved again."
             : "Lock this window where it is.\nIt stays clickable; it just cannot be dragged.";
 
-    private static string ThroughTip(bool through, bool allowed)
-    {
-        if (!allowed)
-        {
-            return "Click-through is not offered here.\nThis window is how the others are unlocked again.";
-        }
-
-        return through
-            ? "Click-through is on - the game is getting the clicks.\nUndo it in Tools -> Appearance."
-            : "Hand the mouse to the game: clicks land on what is behind this window.\n"
-              + "It cannot be undone from here afterwards - the undo is Tools -> Appearance.";
-    }
+    private static string ThroughTip(bool through)
+        => through
+            ? "Click-through is on - the game is getting the clicks.\nThis icon still takes yours. Click to take the window back."
+            : "Hand the mouse to the game: clicks land on what is behind this window.\nThis icon stays live, and is how it comes back.";
 
     /// <summary>A padlock, shut or open - the icon for "will not be dragged".</summary>
     /// <remarks>
@@ -451,24 +496,21 @@ public sealed class WindowChrome
             }
 
             bool through = rule.ClickThrough;
-            if (Allows(id))
+            if (ImGui.MenuItem("Click-through  (the game gets the click)", string.Empty, ref through))
             {
-                if (ImGui.MenuItem("Click-through  (the game gets the click)", string.Empty, ref through))
-                {
-                    Set(id, rule with { ClickThrough = through });
-                }
-
-                if (through)
-                {
-                    ImGui.Separator();
-                    ImGui.TextDisabled("undo it in Tools -> Appearance:");
-                    ImGui.TextDisabled("right-clicking this window will not reach it");
-                }
+                Set(id, rule with { ClickThrough = through });
             }
-            else
+
+            if (through)
             {
-                ImGui.MenuItem("Click-through", string.Empty, ref through, enabled: false);
-                ImGui.TextDisabled("this window is how the others are unlocked");
+                // Said on the way IN rather than only afterwards, because afterwards this menu
+                // is gone - a click-through window cannot be right-clicked. Both routes named:
+                // the pointer is the near one, and the list is what the window with no title
+                // bar has instead.
+                ImGui.Separator();
+                ImGui.TextDisabled("right-clicking this window will not reach this menu again:");
+                ImGui.TextDisabled("the pointer in its title bar hands the window back,");
+                ImGui.TextDisabled("and Tools -> Appearance lists every window either way");
             }
         }
         finally
@@ -484,8 +526,9 @@ public sealed class WindowChrome
     public void DrawList()
     {
         ImGui.TextDisabled("Locked stays clickable and will not be dragged.");
-        ImGui.TextDisabled("Click-through hands the mouse to the game, buttons and all.");
-        ImGui.TextDisabled("Both are also on each window's title bar, and its right-click menu.");
+        ImGui.TextDisabled("Click-through hands the mouse to the game, buttons and all -");
+        ImGui.TextDisabled("except the pointer icon in the window's own title bar, which");
+        ImGui.TextDisabled("stays live and hands the window back. Both switches are there too.");
         ImGui.Spacing();
 
         if (!ImGui.BeginTable("##window-rules", 3, ImGuiTableFlags.SizingFixedFit))
@@ -517,15 +560,7 @@ public sealed class WindowChrome
 
                 ImGui.TableNextColumn();
                 bool through = rule.ClickThrough;
-                if (!window.MayClickThrough)
-                {
-                    ImGui.BeginDisabled();
-                    ImGui.Checkbox($"##through-{window.Id}", ref through);
-                    ImGui.EndDisabled();
-                    ImGui.SameLine();
-                    ImGui.TextDisabled("(the way back to this list)");
-                }
-                else if (ImGui.Checkbox($"##through-{window.Id}", ref through))
+                if (ImGui.Checkbox($"##through-{window.Id}", ref through))
                 {
                     Set(window.Id, rule with { ClickThrough = through });
                 }
