@@ -692,6 +692,7 @@ internal static class Program
                 PoEformance.Features.AtlasStore.Save(kept);
             });
         overlay.Noise = world.Noise;
+        overlay.Memory = world.Memory;
 
         // The effects debug switch, as a pair of callbacks: the overlay draws and has no other
         // business with the reader, and this is the one bit of it worth reaching from up there.

@@ -117,7 +117,19 @@ public static class MatrixHunt
         ArgumentNullException.ThrowIfNull(snapshot);
 
         var results = new List<ProjectionCandidate>();
-        if (worldData == 0 || snapshot.Player is not WorldEntity player || snapshot.Entities.Count < 2)
+        if (worldData == 0 || snapshot.Player is not WorldEntity player)
+        {
+            return results;
+        }
+
+        // ONLY WHAT THE GAME IS LISTING NOW. A snapshot also carries the places it has stopped
+        // listing, and every one of those is by definition far outside the bubble and so off
+        // the screen - which is precisely what one half of the score measures. Scoring a
+        // CORRECT matrix against them would count its off-screen fraction against it, in
+        // proportion to how much of the map has been walked. A hunt that gets worse the longer
+        // you play is the shape of check this file exists to avoid.
+        List<WorldEntity> scene = [.. snapshot.Listed];
+        if (scene.Count < 2)
         {
             return results;
         }
@@ -139,7 +151,7 @@ public static class MatrixHunt
 
             foreach (bool transposed in (ReadOnlySpan<bool>)[false, true])
             {
-                ProjectionCandidate? candidate = Evaluate(matrix, transposed, start + offset, player, snapshot.Entities);
+                ProjectionCandidate? candidate = Evaluate(matrix, transposed, start + offset, player, scene);
                 if (candidate is not null)
                 {
                     results.Add(candidate);
