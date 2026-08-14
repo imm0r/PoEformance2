@@ -111,6 +111,15 @@ internal static class Program
             }
         }
 
+        // ── Peek: one address somebody already found ─────────────────────────
+        // Before the world scan, because a peek is an answer to a question already being
+        // asked and everything below is background. It composes with --record on purpose:
+        // the sampling loop marks a frame per tick, so a hover experiment replays.
+        if (options.Peek.Count > 0)
+        {
+            RunPeek(reader, options.Peek, options.PeekWatch, recorder);
+        }
+
         // Probe the player and project its position - the end-to-end proof of the whole
         // read chain. Running it here also means a --record session captures the component
         // reads, so the projection can be verified offline from the recording.
@@ -255,6 +264,129 @@ internal static class Program
         }
 
         return result.GameStatesResolved ? 0 : 2;
+    }
+
+    /// <summary>How often <c>--peekwatch</c> re-reads the addresses it is watching.</summary>
+    /// <remarks>
+    /// Ten times a second, which is fast enough that a hover and its release land in
+    /// different samples and slow enough to cost nothing next to the overlay's own reads.
+    /// </remarks>
+    private const int PeekSampleMs = 100;
+
+    /// <summary>
+    /// Reports on the addresses given with <c>--peek</c>, and keeps sampling them under
+    /// <c>--peekwatch</c>.
+    /// </summary>
+    /// <remarks>
+    /// The sampling is the half that answers questions. One reading of an unknown slot says
+    /// almost nothing; two readings with something done in the game in between say which slot
+    /// is that thing - hover the item, take the hand off, and what printed is the short list.
+    ///
+    /// The path is resolved AGAIN every tick rather than once. A pointer path exists precisely
+    /// because the object moves, and a window pinned to where it used to be would keep
+    /// reporting "nothing changed" about somebody else's memory.
+    /// </remarks>
+    private static void RunPeek(
+        IMemoryReader reader, IReadOnlyList<string> paths, bool watch, RecordingMemoryReader? recorder)
+    {
+        var watching = new List<(string Text, PointerPath Path, ulong Start, ulong ObjectBase, ulong?[] Last)>();
+
+        Console.WriteLine();
+        Console.WriteLine("peek");
+
+        foreach (string text in paths)
+        {
+            if (!PointerPath.TryParse(text, out PointerPath? path, out string error) || path is null)
+            {
+                Console.WriteLine($"  {text}: {error}");
+                continue;
+            }
+
+            Console.WriteLine($"  {text}");
+            recorder?.MarkFrame();
+            foreach (string line in AddressPeek.Report(reader, path))
+            {
+                Console.WriteLine("  " + line);
+            }
+
+            Console.WriteLine();
+
+            PathResolution at = path.Resolve(reader);
+            if (at.Ok)
+            {
+                (ulong start, int slots, _) = AddressPeek.Window(at.Target, AddressPeek.DefaultBefore, AddressPeek.DefaultAfter);
+                watching.Add((text, path, start, at.ObjectBase, AddressPeek.Sample(reader, start, slots)));
+            }
+        }
+
+        if (!watch || watching.Count == 0)
+        {
+            return;
+        }
+
+        Console.WriteLine("  watching - do the thing in the game and the slots that moved will print.");
+        Console.WriteLine("  Any key to stop.");
+        Console.WriteLine();
+
+        var started = System.Diagnostics.Stopwatch.StartNew();
+        while (!KeyPressed())
+        {
+            Thread.Sleep(PeekSampleMs);
+            recorder?.MarkFrame();
+
+            for (int i = 0; i < watching.Count; i++)
+            {
+                (string text, PointerPath path, ulong start, ulong objectBase, ulong?[] last) = watching[i];
+
+                PathResolution at = path.Resolve(reader);
+                if (!at.Ok)
+                {
+                    continue;
+                }
+
+                (ulong now, int slots, _) = AddressPeek.Window(at.Target, AddressPeek.DefaultBefore, AddressPeek.DefaultAfter);
+                ulong?[] sample = AddressPeek.Sample(reader, now, slots);
+
+                if (now != start)
+                {
+                    // The object itself moved. Saying so is the finding; diffing the old
+                    // window against the new one would print every slot as "changed".
+                    Console.WriteLine($"  [{started.Elapsed.TotalSeconds,7:F1}s] {text}: the path now lands on 0x{at.Target:X}"
+                        + $" (object 0x{at.ObjectBase:X}) - window restarted");
+                    watching[i] = (text, path, now, at.ObjectBase, sample);
+                    continue;
+                }
+
+                IReadOnlyList<string> changes = AddressPeek.Changes(reader, last, sample, now, objectBase);
+                if (changes.Count > 0)
+                {
+                    Console.WriteLine($"  [{started.Elapsed.TotalSeconds,7:F1}s] {text}");
+                    foreach (string line in changes)
+                    {
+                        Console.WriteLine("  " + line);
+                    }
+                }
+
+                watching[i] = (text, path, start, objectBase, sample);
+            }
+        }
+    }
+
+    /// <summary>Whether a key is waiting, tolerating a console that has no keyboard.</summary>
+    /// <remarks>
+    /// <c>KeyAvailable</c> throws when input is redirected - which is exactly how this tool is
+    /// run from a script - and an unhandled throw there would end a watch that was working.
+    /// </remarks>
+    private static bool KeyPressed()
+    {
+        try
+        {
+            return Console.KeyAvailable;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -1256,14 +1388,17 @@ internal static class Program
         bool Debug,
         bool ShowUiBrowser,
         bool HuntQuestFlags,
-        bool ScanHeap)
+        bool ScanHeap,
+        IReadOnlyList<string> Peek,
+        bool PeekWatch)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
-            bool uiBrowser = false, questFlags = false, scanHeap = false;
+            bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
+            List<string> peek = [];
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -1309,6 +1444,16 @@ internal static class Program
                         questFlags = true;
                         scanHeap = true;
                         break;
+
+                    // Takes a Cheat Engine pointer path as written - "+468C3A8,235C" - so a
+                    // finding can be checked without transcribing it into an absolute address
+                    // that stops meaning anything the moment the game restarts.
+                    case "--peek" when i + 1 < args.Length:
+                        peek.Add(args[++i]);
+                        break;
+                    case "--peekwatch":
+                        peekWatch = true;
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
@@ -1329,7 +1474,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap);
+                debug, uiBrowser, questFlags, scanHeap, peek, peekWatch);
         }
     }
 }

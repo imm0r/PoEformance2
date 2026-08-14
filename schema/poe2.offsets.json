@@ -15,6 +15,39 @@
   //   invariant kinds  range | plausiblePtr | nonNullPtr | unitVector3
   //                    | vectorSane | stringContains | changes
 
+  // ── 999 AND 1000 ARE NOT VALUES, THEY ARE HALVES OF A POINTER ──────────────────
+  // Written down because it is a trap this project has now walked into, and the shape of
+  // it will catch the next reader too. A Cheat Engine four-byte scan found a slot that
+  // read 999 while the cursor sat on an inventory item and 1000 while it did not - clean,
+  // repeatable, two-state, and entirely an artefact of where the four-byte window sat.
+  //   999 = 0x3E7, 1000 = 0x3E8: the TOP THIRTY-TWO BITS of a 64-bit heap pointer.
+  // Measured on a 502,766-read recording: 99.41% of every four-byte 999 in it and 99.99%
+  // of every 1000 sat at an address four past an eight-byte boundary, and the two were the
+  // commonest non-zero high halves in the file (28.3% and 8.9% of 1.7M qwords). The game's
+  // heap for that run spanned the 0x3E8_00000000 boundary, so a pointer either side of it
+  // reads as one number or the other through a narrow window.
+  //
+  // WHICH PAIR IT IS DIFFERS PER LAUNCH. Across the committed fixtures: 1054/1055
+  // (pid 28332), 646/647 (26584), 940/941 (27844), 1513 (20652), 999/1000 (17996) - the
+  // same pid always gives the same pair, a new one never does. So a test written as
+  // "== 999" is a test against one launch of the game. What carries meaning is the whole
+  // eight bytes, and whether the pointer MOVED.
+  //
+  // The instrument for this is `--peek <path>` (Core/Diagnostics/AddressPeek.cs), which
+  // takes a Cheat Engine path as written - "PathOfExileSteam.exe+468C3A8,235C" - shows the
+  // aligned slot around an unaligned address, and with `--peekwatch` prints the slots that
+  // move while something is done in the game.
+  //
+  // OPEN, and deliberately not written into "structs" until it is more than a sighting:
+  // the object behind [module+0x468C3A8] has two adjacent pointers at +0x2358 and +0x2360
+  // that change together when the cursor enters an inventory item. Adjacent pointers that
+  // move together are usually a std::vector's begin/end (capacity would then be +0x2368),
+  // but nothing has read the object yet - no recording this project holds touches that page,
+  // and no pointer in 500k recorded reads lands anywhere near it, which is consistent with
+  // it hanging off a static rather than off any chain the tool walks. Note also that
+  // AtlasWatch.Hovered records the opposite finding for UI ELEMENTS ("PoE2 keeps no hovered
+  // UiElement slot"); this is a different object and does not overturn that.
+
   "version": 1,
   "gameVersion": "0.5.x (AreaInstance tail re-verified 2026-08 by owner: +0x08 wave; base port: AHK tool v0.45.13.298, 2026-07)",
 

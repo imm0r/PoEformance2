@@ -217,7 +217,26 @@ PoEformance.App --overlay                      # the in-game overlay
 PoEformance.App --record session.rec           # same, capturing everything
 PoEformance.App --replay session.rec           # rerun against the capture, no game needed
 PoEformance.App --record s.rec --questflags    # + read where a character's quest flags could be
+
+# Look at one address somebody already found (Cheat Engine path, as written):
+PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
+PoEformance.App --peek "+468C3A8,235C" --peekwatch   # + print the slots that move
 ```
+
+`--peek` takes a Cheat Engine pointer path — a module-relative base and a chain of offsets —
+and says what is actually at the end of it: the walk hop by hop, the eight-byte slot the
+address sits in, and every neighbouring slot with what its pointer leads to, numbered from the
+object rather than from the process. `--peekwatch` then re-reads on a timer and prints only
+what moved, which is how an unknown slot is identified: do the thing in the game, read the
+short list.
+
+The reason it leads with the ALIGNED slot is a trap this project walked into. A four-byte scan
+found a value that was 999 while the cursor was on an inventory item and 1000 while it was not
+— repeatable, and entirely an artefact: 999 is `0x3E7` and 1000 is `0x3E8`, the top halves of
+a 64-bit heap pointer seen four bytes into an eight-byte slot. The pair is different every time
+the game launches (the fixtures show 1054/1055, 646/647, 940/941, 1513), so an equality test
+against one of them is a test against one launch. See the block comment at the top of
+`schema/poe2.offsets.json`.
 
 `--questflags` is a hunt rather than a feature: it finds the QuestFlags table through any NPC
 in the area and sweeps ServerData and the state objects for references to its rows. The sweep
