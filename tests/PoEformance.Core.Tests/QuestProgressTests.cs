@@ -134,6 +134,52 @@ public class QuestProgressTests
         Assert.Contains(4, DatFile.Parse(bytes)!.TextOffsets());
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheArrayWordOrderIsMeasuredRatherThanAssumed(bool countFirst)
+    {
+        // TWO BELIEFS POINTING OPPOSITE WAYS. This reader was written count-first; the AHK
+        // tool's layout table says "8-byte offset + 8-byte count" - and that tool never decodes
+        // an array, so its comment is a belief and not a test. Guessing produces empty
+        // conditions, which makes every quest step hold, which shows a plausible objective from
+        // the wrong step. So the file is asked, and a table written either way must be read.
+        const int Count = 3;
+        var variable = new byte[8 + (Count * 16)];      // room for the array past the separator
+        byte[] bytes = Dat(6, 16, (b, at) =>
+        {
+            ulong count = Count;
+            ulong into = 8;
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at), countFirst ? count : into);
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + 8), countFirst ? into : count);
+        }, variable);
+
+        DatFile file = DatFile.Parse(bytes)!;
+
+        Assert.Equal(countFirst ? ArrayOrder.CountFirst : ArrayOrder.OffsetFirst, file.DetectArrays(0));
+        Assert.Equal(Count, file.References(0, 0).Count);
+    }
+
+    [Fact]
+    public void ReadingAnArrayTheWrongWayRoundFindsNothingRatherThanGarbage()
+    {
+        // The failure this is guarding: an offset read as a count is far too big for the bound,
+        // so the array comes back empty - a condition nobody declared, and a step that always
+        // holds. Empty is the safe half of the wrong answer; the detection above is the fix.
+        var variable = new byte[8 + (3 * 16)];
+        byte[] bytes = Dat(6, 16, (b, at) =>
+        {
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at), 8);          // offset first
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + 8), 3);      // count second
+        }, variable);
+
+        DatFile file = DatFile.Parse(bytes)!;
+
+        Assert.Empty(file.References(0, 0));            // read count-first by default: nothing
+        file.DetectArrays(0);
+        Assert.Equal(3, file.References(0, 0).Count);   // measured: three
+    }
+
     [Fact]
     public void AReferenceAnswersWithWhicheverHalfIsARow()
     {

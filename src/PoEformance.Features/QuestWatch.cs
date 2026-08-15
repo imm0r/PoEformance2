@@ -117,9 +117,10 @@ public sealed class QuestWatch
             // The string columns each table is read for, so a row size that disagrees can be
             // settled by asking the table rather than by rejecting it. QuestStates' Text is
             // legitimately empty on some states, so Message rides along with it.
-            (_quests, string why1) = QuestTables.Open(files, _layouts, "Quest", "Id", "Name");
-            (_states, string why2) = QuestTables.Open(files, _layouts, "QuestStates", "Text", "Message");
-            (_flagTable, string why3) = QuestTables.Open(files, _layouts, "QuestFlags", "Id");
+            (_quests, string why1) = QuestTables.Open(files, _layouts, "Quest", null, "Id", "Name");
+            (_states, string why2) = QuestTables.Open(
+                files, _layouts, "QuestStates", "FlagsPresent", "Text", "Message");
+            (_flagTable, string why3) = QuestTables.Open(files, _layouts, "QuestFlags", null, "Id");
             said.Add(why1);
             said.Add(why2);
             said.Add(why3);

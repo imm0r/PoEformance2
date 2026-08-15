@@ -2,6 +2,26 @@ using System.Buffers.Binary;
 
 namespace PoEformance.Game.Files;
 
+/// <summary>Which way round an array column stores its two words.</summary>
+/// <remarks>
+/// NOT KNOWN FROM ANY SOURCE THIS PROJECT TRUSTS, which is why it is a measurement and not a
+/// constant. The reader was written count-first; the AHK tool's layout table carries a comment
+/// saying "8-byte offset + 8-byte count", the other way round - and that tool never decodes an
+/// array, so its comment is a belief rather than a test. Two beliefs pointing opposite ways is
+/// exactly the situation that produces a plausible wrong answer, so the file is asked.
+/// </remarks>
+public enum ArrayOrder
+{
+    /// <summary>Nothing decided yet - reads fall back to count first.</summary>
+    Unknown,
+
+    /// <summary>The count, then the offset.</summary>
+    CountFirst,
+
+    /// <summary>The offset, then the count.</summary>
+    OffsetFirst,
+}
+
 /// <summary>A foreign reference as the FILE stores it: two 64-bit words.</summary>
 /// <remarks>
 /// Which of the two is the row is not written down anywhere this project trusts. The memory
@@ -55,6 +75,9 @@ public sealed class DatFile
     /// <summary>Longest string taken seriously, so a bad offset cannot run to the file end.</summary>
     private const int LongestString = 1024;
 
+    /// <summary>Most elements an array is believed to hold, as a plausibility bound.</summary>
+    private const int MostElements = 4096;
+
     private readonly byte[] _bytes;
 
     private DatFile(byte[] bytes, int rows, int rowSize, int variableAt)
@@ -73,6 +96,65 @@ public sealed class DatFile
 
     /// <summary>Where the variable-length section starts - offsets in rows are relative to it.</summary>
     public int VariableAt { get; }
+
+    /// <summary>
+    /// Which way round this file's array columns are, once something has measured it.
+    /// </summary>
+    public ArrayOrder Arrays { get; private set; }
+
+    /// <summary>
+    /// Works out the array word order by trying both against a column that holds arrays.
+    /// </summary>
+    /// <remarks>
+    /// A COUNT and an OFFSET are told apart by what they have to satisfy, not by what they
+    /// look like: the count must be small, the offset must land inside the variable-length
+    /// section, and the elements must fit between the offset and the end of it. One reading
+    /// of a row satisfies all three and the other usually satisfies none, so counting the
+    /// rows where exactly one works decides it for the file.
+    ///
+    /// Rows where BOTH readings work say nothing - an empty array is two zeros either way -
+    /// and are not counted for either side.
+    /// </remarks>
+    public ArrayOrder DetectArrays(int columnOffset, int elementWidth = 16)
+    {
+        var countFirst = 0;
+        var offsetFirst = 0;
+        int variableLength = _bytes.Length - VariableAt;
+
+        for (var row = 0; row < Rows; row++)
+        {
+            int at = At(row, columnOffset, 16);
+            if (at < 0)
+            {
+                break;
+            }
+
+            ulong first = BinaryPrimitives.ReadUInt64LittleEndian(_bytes.AsSpan(at));
+            ulong second = BinaryPrimitives.ReadUInt64LittleEndian(_bytes.AsSpan(at + 8));
+
+            bool a = Fits(first, second, elementWidth, variableLength);
+            bool b = Fits(second, first, elementWidth, variableLength);
+            if (a && !b)
+            {
+                countFirst++;
+            }
+            else if (b && !a)
+            {
+                offsetFirst++;
+            }
+        }
+
+        Arrays = countFirst == offsetFirst
+            ? ArrayOrder.Unknown
+            : countFirst > offsetFirst ? ArrayOrder.CountFirst : ArrayOrder.OffsetFirst;
+        return Arrays;
+    }
+
+    /// <summary>Whether this pair reads as a non-empty array that lies inside the file.</summary>
+    private static bool Fits(ulong count, ulong into, int elementWidth, int variableLength)
+        => count is > 0 and <= MostElements
+           && into <= (ulong)variableLength
+           && into + (count * (ulong)elementWidth) <= (ulong)variableLength;
 
     /// <summary>Reads a table, or null when the bytes are not one.</summary>
     public static DatFile? Parse(byte[]? bytes)
@@ -282,9 +364,11 @@ public sealed class DatFile
             return [];
         }
 
-        ulong count = BinaryPrimitives.ReadUInt64LittleEndian(_bytes.AsSpan(at));
-        ulong into = BinaryPrimitives.ReadUInt64LittleEndian(_bytes.AsSpan(at + 8));
-        if (count == 0 || count > 4096)
+        ulong first = BinaryPrimitives.ReadUInt64LittleEndian(_bytes.AsSpan(at));
+        ulong second = BinaryPrimitives.ReadUInt64LittleEndian(_bytes.AsSpan(at + 8));
+        (ulong count, ulong into) = Arrays == ArrayOrder.OffsetFirst ? (second, first) : (first, second);
+
+        if (count == 0 || count > MostElements)
         {
             return [];
         }
