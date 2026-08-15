@@ -35,7 +35,20 @@ public sealed record PathResolution(IReadOnlyList<PathHop> Hops, ulong Target, u
 public sealed record PointerPath(ulong BaseAddress, bool ModuleRelative, IReadOnlyList<long> Offsets)
 {
     /// <summary>
-    /// Parses <c>module+RVA[,offset]...</c>, or an absolute <c>0xADDRESS[,offset]...</c>.
+    /// A schema static to start from instead of an address, e.g. <c>GameStates</c>.
+    /// </summary>
+    /// <remarks>
+    /// The difference between a path that survives a patch and one that does not. A module RVA
+    /// is only right for the build it was read on; the statics are found by byte pattern every
+    /// time the tool attaches, so a path anchored on one keeps working when the game updates -
+    /// and it is also the only way to write down a chain that starts somewhere the pattern
+    /// scanner has to find in the first place.
+    /// </remarks>
+    public string StaticName { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Parses <c>module+RVA[,offset]...</c>, an absolute <c>0xADDRESS[,offset]...</c>, or a
+    /// schema static by name: <c>GameStates,88,290,5A0[,...]</c>.
     /// </summary>
     /// <remarks>
     /// Everything is hexadecimal, with or without the <c>0x</c>, because that is how both
@@ -47,6 +60,16 @@ public sealed record PointerPath(ulong BaseAddress, bool ModuleRelative, IReadOn
     /// for the standalone - so checking the name could only ever reject a path that is right.
     /// </remarks>
     public static bool TryParse(string text, out PointerPath? path, out string error)
+        => TryParse(text, out path, out error, null);
+
+    /// <inheritdoc cref="TryParse(string, out PointerPath?, out string)"/>
+    /// <param name="staticNames">
+    /// The statics the schema knows, so a name that would also parse as hexadecimal is still
+    /// read as the static. Optional; without it anything unparseable is taken as a name and
+    /// reported when the path is resolved.
+    /// </param>
+    public static bool TryParse(
+        string text, out PointerPath? path, out string error, IReadOnlyCollection<string>? staticNames)
     {
         path = null;
         error = string.Empty;
@@ -66,6 +89,7 @@ public sealed record PointerPath(ulong BaseAddress, bool ModuleRelative, IReadOn
 
         string head = parts[0];
         bool moduleRelative = false;
+        var named = string.Empty;
 
         // A '+' means "somewhere in the module", whatever sits in front of it. The last one
         // wins so that a path is still parsed when the name itself carries one.
@@ -76,7 +100,23 @@ public sealed record PointerPath(ulong BaseAddress, bool ModuleRelative, IReadOn
             head = head[(plus + 1)..].Trim();
         }
 
-        if (!TryParseHex(head, out long baseValue) || baseValue < 0)
+        long baseValue = 0;
+        bool known = staticNames?.Contains(head, StringComparer.OrdinalIgnoreCase) == true;
+
+        // The name wins over the number when the schema knows it, because a static could be
+        // called something that also reads as hexadecimal and the name is the intent.
+        if (plus < 0 && (known || !TryParseHex(head, out baseValue) || baseValue < 0))
+        {
+            if (head.Length == 0 || head.Any(c => !char.IsLetterOrDigit(c) && c != '_'))
+            {
+                error = $"\"{parts[0]}\" is not an address or a static name";
+                return false;
+            }
+
+            named = head;
+            baseValue = 0;
+        }
+        else if (plus >= 0 && (!TryParseHex(head, out baseValue) || baseValue < 0))
         {
             error = $"\"{parts[0]}\" is not an address";
             return false;
@@ -94,7 +134,7 @@ public sealed record PointerPath(ulong BaseAddress, bool ModuleRelative, IReadOn
             offsets.Add(offset);
         }
 
-        path = new PointerPath((ulong)baseValue, moduleRelative, offsets);
+        path = new PointerPath((ulong)baseValue, moduleRelative, offsets) { StaticName = named };
         return true;
     }
 
@@ -105,19 +145,36 @@ public sealed record PointerPath(ulong BaseAddress, bool ModuleRelative, IReadOn
     /// different problems with different fixes, and a chain that only ever answers 0 cannot
     /// tell them apart.
     /// </remarks>
-    public PathResolution Resolve(IMemoryReader reader)
+    public PathResolution Resolve(IMemoryReader reader) => Resolve(reader, null);
+
+    /// <inheritdoc cref="Resolve(IMemoryReader)"/>
+    /// <param name="statics">Resolved static addresses by name, for a path anchored on one.</param>
+    public PathResolution Resolve(IMemoryReader reader, IReadOnlyDictionary<string, ulong>? statics)
     {
         ArgumentNullException.ThrowIfNull(reader);
 
-        ulong current = ModuleRelative ? reader.ModuleBase + BaseAddress : BaseAddress;
+        ulong current;
+        string label;
+
+        if (StaticName.Length > 0)
+        {
+            if (statics is null || !statics.TryGetValue(StaticName, out current) || current == 0)
+            {
+                return new PathResolution(
+                    [new PathHop($"static {StaticName}", 0, 0, 0, Read: false)], 0, 0, Ok: false);
+            }
+
+            label = $"{StaticName} (module+0x{current - reader.ModuleBase:X})";
+        }
+        else
+        {
+            current = ModuleRelative ? reader.ModuleBase + BaseAddress : BaseAddress;
+            label = ModuleRelative ? $"module+0x{BaseAddress:X}" : $"0x{BaseAddress:X}";
+        }
+
         var hops = new List<PathHop>(Offsets.Count + 1)
         {
-            new(
-                ModuleRelative ? $"module+0x{BaseAddress:X}" : $"0x{BaseAddress:X}",
-                From: 0,
-                Pointee: 0,
-                Result: current,
-                Read: true),
+            new(label, From: 0, Pointee: 0, Result: current, Read: true),
         };
 
         ulong objectBase = 0;
@@ -239,13 +296,14 @@ public static class AddressPeek
         PointerPath path,
         int before = DefaultBefore,
         int after = DefaultAfter,
-        DatTableShape? tables = null)
+        DatTableShape? tables = null,
+        IReadOnlyDictionary<string, ulong>? statics = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(path);
 
         var lines = new List<string>();
-        PathResolution resolved = path.Resolve(reader);
+        PathResolution resolved = path.Resolve(reader, statics);
 
         foreach (PathHop hop in resolved.Hops)
         {

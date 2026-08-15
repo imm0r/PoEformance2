@@ -221,6 +221,9 @@ PoEformance.App --record s.rec --questflags    # + read where a character's ques
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
 PoEformance.App --peek "+468C3A8,235C" --peekwatch   # + print the slots that move
+
+# Or anchored on a schema static, which survives a patch where an RVA does not:
+PoEformance.App --peek "GameStates,88,290,5A0,60,188,248" --peekwatch --record qf.rec
 ```
 
 `--peek` takes a Cheat Engine pointer path — a module-relative base and a chain of offsets —
