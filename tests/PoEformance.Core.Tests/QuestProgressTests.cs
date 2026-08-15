@@ -228,6 +228,36 @@ public class QuestProgressTests
     }
 
     [Fact]
+    public void MoreThanOneStepHoldingIsReportedRatherThanResolvedQuietly()
+    {
+        // WHAT THE FIRST LIVE RUN SHOWED. The window offered "Quest Complete" as the current
+        // objective with an EARLIER step as "then", and named a step the game's own tracker did
+        // not - all three symptoms of several steps holding at once. The data intends exactly
+        // one: FlagsMissing rules out the ones already passed. So several holding is a fact
+        // about the READ, and hiding it behind a pick makes a wrong answer look like a right
+        // one.
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        // Both steps ask only for flags this character has, and neither excludes the other.
+        QuestOutlook outlook = QuestProgress.Read(quests, states, flags, layouts, [0, 1]);
+
+        QuestState quest = Assert.Single(outlook.Quests);
+        Assert.Equal(2, quest.Holding.Count);
+        Assert.Single(outlook.Ambiguous);
+    }
+
+    [Fact]
+    public void OneStepHoldingIsNotAmbiguous()
+    {
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        QuestOutlook outlook = QuestProgress.Read(quests, states, flags, layouts, [0]);
+
+        Assert.Single(Assert.Single(outlook.Quests).Holding);
+        Assert.Empty(outlook.Ambiguous);
+    }
+
+    [Fact]
     public void SettingTheNextFlagAdvancesTheQuest()
     {
         (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();

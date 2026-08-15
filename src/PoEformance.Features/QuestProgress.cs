@@ -25,6 +25,15 @@ public sealed record QuestStep(
 /// <summary>A quest and where the character stands in it.</summary>
 /// <param name="Now">The step whose conditions hold, or null when none does.</param>
 /// <param name="Next">The step after it, which is what completing the current one leads to.</param>
+/// <param name="Holding">
+/// EVERY step whose conditions hold, not just the chosen one.
+/// </param>
+/// <remarks>
+/// The data intends exactly one: a later step asks for flags an earlier one does not have, and
+/// FlagsMissing rules out the ones already passed. So more than one holding is not an
+/// ambiguity to resolve quietly - it is the sign that a condition is not being read, and it is
+/// carried here rather than hidden so the window can say so.
+/// </remarks>
 public sealed record QuestState(
     int Row,
     string Id,
@@ -32,7 +41,8 @@ public sealed record QuestState(
     int Act,
     QuestStep? Now,
     QuestStep? Next,
-    IReadOnlyList<QuestStep> Steps)
+    IReadOnlyList<QuestStep> Steps,
+    IReadOnlyList<QuestStep> Holding)
 {
     /// <summary>True when the last step of the quest is the one in force.</summary>
     public bool Complete => Now is not null && Next is null && Steps.Count > 0;
@@ -49,6 +59,16 @@ public sealed record QuestOutlook(IReadOnlyList<QuestState> Quests, IReadOnlyLis
 
     /// <summary>Quests with a step in force that is not the last one.</summary>
     public IEnumerable<QuestState> Active => Quests.Where(q => q.Now is not null && !q.Complete);
+
+    /// <summary>
+    /// Quests where more than one step holds, which the data should never produce.
+    /// </summary>
+    /// <remarks>
+    /// The count that says whether the READ is right, as opposed to whether it produced
+    /// something. A handful is a quest with genuinely parallel steps; most of them is a
+    /// condition column not being read, and the two look identical from any single row.
+    /// </remarks>
+    public IEnumerable<QuestState> Ambiguous => Quests.Where(q => q.Holding.Count > 1);
 }
 
 /// <summary>
@@ -145,7 +165,8 @@ public static class QuestProgress
             // The LAST step whose conditions hold, not the first. Steps are cumulative - an
             // early one asks for flags a later one also has - so the earliest match is where
             // the character has already been, and the latest is where they are.
-            QuestStep? now = steps.LastOrDefault(s => s.Holds(set));
+            List<QuestStep> holding = [.. steps.Where(s => s.Holds(set))];
+            QuestStep? now = holding.Count > 0 ? holding[^1] : null;
             QuestStep? next = now is null
                 ? steps.FirstOrDefault()
                 : steps.FirstOrDefault(s => s.Order > now.Order);
@@ -157,7 +178,8 @@ public static class QuestProgress
                 questAct < 0 ? 0 : quests.File.I32(quest, questAct),
                 now,
                 next,
-                steps));
+                steps,
+                holding));
         }
 
         made.Sort((a, b) => a.Act != b.Act ? a.Act.CompareTo(b.Act) : string.CompareOrdinal(a.Name, b.Name));

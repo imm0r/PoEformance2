@@ -69,6 +69,20 @@ public sealed class QuestWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, $"of {outlook.Quests.Count}");
 
+        // THE NUMBER THAT SAYS WHETHER THE READ IS RIGHT. The data intends exactly one step to
+        // hold per quest - a later one asks for flags an earlier one lacks, and FlagsMissing
+        // rules out the ones already passed. Several holding means a condition is not being
+        // read, and the symptom is a plausible objective from the wrong step, which is
+        // indistinguishable from a correct one unless this is on screen.
+        int ambiguous = outlook.Ambiguous.Count();
+        if (ambiguous > 0)
+        {
+            ImGui.TextColored(
+                WarnText,
+                $"{ambiguous} quests have more than one step holding - the conditions are not"
+                + " separating them, so the objective shown may be the wrong step");
+        }
+
         ImGui.Checkbox("finished too", ref _done);
         ImGui.SameLine();
         ImGui.Checkbox("show the flags", ref _conditions);
@@ -154,30 +168,51 @@ public sealed class QuestWindow
             ImGui.TextColored(DimText, $"    then: {next.Text}");
         }
 
-        if (_conditions && quest.Now is { } now)
+        if (_conditions)
         {
-            ImGui.TextColored(DimText, $"    step {now.Order}");
-            foreach (int flag in now.Present)
-            {
-                ImGui.TextColored(DimText, $"      set: {Name(flag)}");
-            }
-
-            foreach (int flag in now.Missing)
-            {
-                ImGui.TextColored(DimText, $"      not set: {Name(flag)}");
-            }
-
-            if (quest.Next is { } after)
-            {
-                foreach (int flag in after.Present.Where(f => !now.Present.Contains(f)))
-                {
-                    ImGui.TextColored(WarnText, $"      needs: {Name(flag)}");
-                }
-            }
+            Steps(quest);
         }
 
         ImGui.PopID();
     }
+
+    /// <summary>
+    /// Every step of a quest, marked with whether it holds - the view that shows WHY the line
+    /// above is what it is, and the only way to see several holding at once.
+    /// </summary>
+    private void Steps(QuestState quest)
+    {
+        ImGui.TextColored(
+            quest.Holding.Count > 1 ? WarnText : DimText,
+            $"    {quest.Steps.Count} steps, {quest.Holding.Count} holding");
+
+        foreach (QuestStep step in quest.Steps)
+        {
+            bool holds = quest.Holding.Contains(step);
+            ImGui.TextColored(
+                holds ? GoodText : DimText,
+                $"    {(holds ? "->" : "  ")} order {step.Order,-4} present {step.Present.Count,-2}"
+                + $" missing {step.Missing.Count,-2}  {Short(step.Text)}");
+
+            if (!holds || !_conditions)
+            {
+                continue;
+            }
+
+            foreach (int flag in step.Present)
+            {
+                ImGui.TextColored(DimText, $"          set: {Name(flag)}");
+            }
+
+            foreach (int flag in step.Missing)
+            {
+                ImGui.TextColored(DimText, $"          not set: {Name(flag)}");
+            }
+        }
+    }
+
+    private static string Short(string text)
+        => text.Length <= 60 ? text : text[..57] + "...";
 
     private string Name(int row)
     {
