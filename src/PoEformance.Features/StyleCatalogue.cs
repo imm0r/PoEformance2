@@ -113,6 +113,17 @@ public static class StyleCatalogue
         new("projectile.other", "Projectiles", "Everything else's", Marker, Rgb(255, 122, 89)),
         new("projectile.trail", "Projectiles", "Where it came from", Line, Rgb(255, 255, 255, 128)),
 
+        // The trail's HUE, by what the projectile appears to be. The mark itself keeps saying
+        // whose it is, so the two together answer both questions at once: a cyan dot on a red
+        // trail is your fireball. Which element a name means is a guess and can be wrong - see
+        // ProjectileElements - so anything unrecognised keeps the mark's own colour rather than
+        // taking one of these and stating something.
+        new("projectile.fire", "Projectiles", "Fire trail", StyleTraits.Colour, Rgb(255, 106, 61)),
+        new("projectile.cold", "Projectiles", "Cold trail", StyleTraits.Colour, Rgb(102, 179, 255)),
+        new("projectile.lightning", "Projectiles", "Lightning trail", StyleTraits.Colour, Rgb(255, 224, 92)),
+        new("projectile.chaos", "Projectiles", "Chaos trail", StyleTraits.Colour, Rgb(166, 122, 255)),
+        new("projectile.physical", "Projectiles", "Physical trail", StyleTraits.Colour, Rgb(214, 214, 214)),
+
         // ── Alerts ──────────────────────────────────────────────────────────
         new("alert.banner", "Alerts", "Alert line", StyleTraits.Colour, Rgb(255, 235, 179, 255)),
         new("alert.banner.back", "Alerts", "Alert backing", StyleTraits.Colour, Rgb(20, 18, 14, 215)),
@@ -256,6 +267,26 @@ public static class StyleCatalogue
 
         return $"{prefix}.{rank}";
     }
+
+    /// <summary>
+    /// The key a projectile's trail is coloured from, or empty when its element is unknown.
+    /// </summary>
+    /// <remarks>
+    /// EMPTY rather than a "projectile.unknown" entry, and the difference is the point. An
+    /// entry would be a colour, and a colour is a claim - it would say "this one is its own
+    /// sort of thing" about a projectile whose name simply did not match a keyword. Empty
+    /// sends the trail back to the mark's own colour, which is what it was before anybody
+    /// tried to read an element out of a name.
+    /// </remarks>
+    public static string ForElement(ProjectileElement element) => element switch
+    {
+        ProjectileElement.Fire => "projectile.fire",
+        ProjectileElement.Cold => "projectile.cold",
+        ProjectileElement.Lightning => "projectile.lightning",
+        ProjectileElement.Chaos => "projectile.chaos",
+        ProjectileElement.Physical => "projectile.physical",
+        _ => "",
+    };
 
     /// <summary>The key for a place's shape.</summary>
     public static string ForGlyph(PoEformance.Game.World.PoiGlyph glyph)

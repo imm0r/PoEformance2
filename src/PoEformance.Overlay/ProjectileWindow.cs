@@ -157,7 +157,7 @@ public sealed class ProjectileWindow
             return;
         }
 
-        if (!ImGui.BeginTable("##projectile-table", 3, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg))
+        if (!ImGui.BeginTable("##projectile-table", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg))
         {
             return;
         }
@@ -166,6 +166,7 @@ public sealed class ProjectileWindow
         {
             ImGui.TableSetupColumn("how many");
             ImGui.TableSetupColumn("mine");
+            ImGui.TableSetupColumn("trail");
             ImGui.TableSetupColumn("path");
             ImGui.TableHeadersRow();
 
@@ -179,6 +180,26 @@ public sealed class ProjectileWindow
                 ImGui.TextColored(
                     sort.Mine > 0 ? MineText : OtherText,
                     sort.Mine > 0 ? $"{sort.Mine}" : "-");
+
+                // What the trail will be coloured as. Printed because it is a GUESS read out
+                // of the name - the game's files carry no element for a projectile - and a
+                // guess nobody can see is one nobody can correct. "-" means the name said
+                // nothing, and the trail keeps the mark's own colour.
+                ImGui.TableNextColumn();
+                ProjectileElement element = ProjectileElements.Of(sort.Path);
+                string key = StyleCatalogue.ForElement(element);
+                if (key.Length == 0)
+                {
+                    ImGui.TextColored(DimText, "-");
+                }
+                else
+                {
+                    ImGui.TextColored(
+                        // Through the layer rather than a copy of its own: there is one style
+                        // and the editor writes to it, so a second reference is one that drifts.
+                        ImGui.ColorConvertU32ToFloat4(_layer.Style.Colour(key)),
+                        element.ToString().ToLowerInvariant());
+                }
 
                 ImGui.TableNextColumn();
 
