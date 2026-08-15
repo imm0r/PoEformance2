@@ -331,10 +331,18 @@ public sealed class DatFile
     }
 
     /// <summary>The characters at an offset into the variable-length section.</summary>
+    /// <remarks>
+    /// OFFSET 0 IS HOW A ROW SAYS "no string". Offsets count from the separator, so the first
+    /// eight bytes of the section are the 0xBB magic itself and nothing real can start there -
+    /// an unset column simply holds zero. Reading it anyway returns a run of U+BBBB, which is
+    /// not empty, and a caller choosing between two text columns then picks the garbage over
+    /// the real one. Found exactly that way: a step with only a long form started reporting
+    /// its empty short form as the objective.
+    /// </remarks>
     public string TextAt(ulong into)
     {
         long start = VariableAt + (long)into;
-        if (into > (ulong)_bytes.Length || start < 0 || start + 2 > _bytes.Length)
+        if (into < 8 || into > (ulong)_bytes.Length || start < 0 || start + 2 > _bytes.Length)
         {
             return string.Empty;
         }
