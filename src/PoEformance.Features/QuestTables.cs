@@ -147,13 +147,14 @@ public sealed record LoadedTable(
     public bool Usable => Agrees || Verified;
 
     /// <summary>One line about what was found, and on what grounds it is being used.</summary>
-    public string Say => Agrees
+    public string Say => (Agrees
         ? $"{Where}: {File.Rows} rows of {File.RowSize} bytes"
         : Verified
             ? $"{Where}: {File.Rows} rows of {File.RowSize} bytes against the column list's {Expected}"
                 + " - the tail differs, the fields read here were checked and hold"
             : $"{Where}: {File.Rows} rows of {File.RowSize} bytes, the column list computes {Expected},"
-                + $" and the fields read here do not hold - NOT USED. Strings are at {Offsets}";
+                + $" and the fields read here do not hold - NOT USED. Strings are at {Offsets}")
+        + (File.Arrays == ArrayOrder.Unknown ? string.Empty : $", arrays are {File.Arrays}");
 
     private string Offsets => Strings is { Count: > 0 }
         ? string.Join(", ", Strings.Take(8).Select(o => $"+{o}"))
@@ -192,8 +193,16 @@ public static class QuestTables
     /// String columns this reader depends on. When the row size disagrees, these are read
     /// across the table and the layout is accepted only if they hold text.
     /// </param>
+    /// <param name="arrayColumn">
+    /// A column holding arrays, used to work out which way round this file writes their two
+    /// words. Null skips the measurement, which leaves reads on the count-first default.
+    /// </param>
     public static (LoadedTable? Table, string Why) Open(
-        GameFiles files, QuestTableLayouts layouts, string table, params string[] mustReadAsText)
+        GameFiles files,
+        QuestTableLayouts layouts,
+        string table,
+        string? arrayColumn,
+        params string[] mustReadAsText)
     {
         ArgumentNullException.ThrowIfNull(files);
         ArgumentNullException.ThrowIfNull(layouts);
@@ -211,6 +220,14 @@ public static class QuestTables
             if (parsed is null)
             {
                 return (null, $"{path} is in the install but did not parse as a .dat");
+            }
+
+            // Before anything reads an array, and reported either way: the two beliefs about
+            // this word order point in opposite directions, so which one the file actually
+            // uses belongs in the readout rather than in a comment.
+            if (arrayColumn is not null && layouts.OffsetOf(table, arrayColumn) is >= 0 and var arrayAt)
+            {
+                parsed.DetectArrays(arrayAt);
             }
 
             var loaded = new LoadedTable(parsed, path, expected);
