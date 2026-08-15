@@ -121,6 +121,81 @@ public sealed class DatFile
         return null;
     }
 
+    /// <summary>How many rows a probe looks at before deciding.</summary>
+    private const int ProbeRows = 64;
+
+    /// <summary>What fraction of a probe's reads must be text, in tenths.</summary>
+    /// <remarks>
+    /// Eight in ten rather than all of them. A real string column has empty rows in it - not
+    /// every quest has an icon, not every state has a tracker line - and demanding perfection
+    /// would reject the correct offset for being honest about a blank.
+    /// </remarks>
+    private const int ProbeTenths = 8;
+
+    /// <summary>
+    /// Whether these offsets read as text across the table, which is how a layout is checked
+    /// against the game rather than against the schema that produced it.
+    /// </summary>
+    /// <remarks>
+    /// THE CHECK THAT MATTERS when the row size disagrees. A column list can be one patch out
+    /// of date in its TAIL and still be right about its front, and the front is usually all a
+    /// reader wants - so "does the field I am about to read actually hold a name" is a better
+    /// question than "does the whole row add up".
+    /// </remarks>
+    public bool ReadsAsText(IReadOnlyList<int> offsets)
+    {
+        ArgumentNullException.ThrowIfNull(offsets);
+
+        if (offsets.Count == 0)
+        {
+            return false;
+        }
+
+        int rows = Math.Min(Rows, ProbeRows);
+        var good = 0;
+        var total = 0;
+
+        for (var row = 0; row < rows; row++)
+        {
+            foreach (int offset in offsets)
+            {
+                total++;
+                if (Printable(Text(row, offset)))
+                {
+                    good++;
+                }
+            }
+        }
+
+        return total > 0 && good * 10 >= total * ProbeTenths;
+    }
+
+    /// <summary>
+    /// Every offset in a row that reads as text, which finds a moved column when one has moved.
+    /// </summary>
+    /// <remarks>
+    /// Not used to DECIDE anything - it is reported, so that a layout which stopped matching
+    /// says where its strings actually went instead of only that it failed. Strings are the
+    /// one column type that can be recognised from the bytes alone, which is what makes this
+    /// possible at all.
+    /// </remarks>
+    public IReadOnlyList<int> TextOffsets()
+    {
+        var found = new List<int>();
+        for (var offset = 0; offset + 8 <= RowSize; offset++)
+        {
+            if (ReadsAsText([offset]))
+            {
+                found.Add(offset);
+            }
+        }
+
+        return found;
+    }
+
+    private static bool Printable(string text)
+        => text.Length >= 2 && text.All(c => c is >= ' ' and <= '~');
+
     /// <summary>Where a row starts, or -1 when it is not in the file.</summary>
     private int At(int row, int offset, int width)
     {
