@@ -146,17 +146,26 @@ public sealed class QuestWindow
             ImGui.TextColored(DimText, "done");
         }
 
-        // The objective, which is the line this whole window exists to show. Empty is a real
-        // answer - some states carry a Message and no tracker Text - so it says which.
+        // BOTH TEXT COLUMNS, because the game uses one of them and it is not settled which.
+        // Held next to the game's own panel: every objective here came out as the LONGER,
+        // explanatory sentence where the panel showed a terse one - "The Devourer lives
+        // underground in a Mud Burrow. Find it." against "Slay the Devourer". Same step, same
+        // quest, different column. Showing one and picking wrong would read as a bug in the
+        // step selection, which is the thing that just took four rounds to get right; showing
+        // both costs a line and cannot mislead. The longer one is arguably the more useful of
+        // the two anyway - it says where to go.
         if (quest.Objective.Length > 0)
         {
             ImGui.TextWrapped($"    {quest.Objective}");
         }
-        else if (quest.Now is { Message.Length: > 0 })
+
+        if (quest.Now is { Message.Length: > 0 } message
+            && !string.Equals(message.Message, quest.Objective, StringComparison.Ordinal))
         {
-            ImGui.TextColored(DimText, $"    {quest.Now.Message}");
+            ImGui.TextColored(DimText, $"    also: {message.Message}");
         }
-        else if (!quest.Complete)
+
+        if (quest.Objective.Length == 0 && quest.Now is { Message.Length: 0 } && !quest.Complete)
         {
             ImGui.TextColored(DimText, "    (this step carries no text)");
         }
