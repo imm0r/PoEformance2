@@ -60,14 +60,24 @@ public readonly record struct OverlayWindow(string Id, string Title);
 [SupportedOSPlatform("windows")]
 public sealed class WindowChrome
 {
-    /// <summary>The status window's id.</summary>
+    /// <summary>The main window's id.</summary>
+    /// <remarks>
+    /// Still called "status" in the settings file although the window has since swallowed the
+    /// tools. The key is what a user's saved rule is filed under, and renaming one silently
+    /// discards whatever they set - which is a worse price than a name that has aged.
+    /// </remarks>
     public const string StatusId = "status";
 
     /// <summary>Every window that can be pinned down, in the order the list offers them.</summary>
+    /// <remarks>
+    /// "tools" is gone from here because the window is: every tool is a page of the main one
+    /// now, so there is nothing left with its own title bar to pin. A rule somebody had
+    /// already saved under that id stays in their file and does nothing, which is the same
+    /// harmless end any retired window comes to.
+    /// </remarks>
     public static IReadOnlyList<OverlayWindow> Windows { get; } =
     [
         new(StatusId, "PoEformance"),
-        new("tools", "Tools"),
         new("poi", "Points of interest"),
         new("preload", "What loaded"),
     ];
