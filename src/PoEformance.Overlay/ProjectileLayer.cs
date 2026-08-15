@@ -125,7 +125,18 @@ public sealed class ProjectileLayer
 
             if (ShowTrails && trailStyle.Visible && trailStrength > 0f)
             {
-                DrawTrail(draw, snapshot, watch.TrailOf(projectile), at, colour, trailStrength, trailWidth, width, height);
+                // The trail says WHAT it is while the mark says whose it is, so the two
+                // together answer both at once: a cyan dot on a red trail is your fireball.
+                // An unrecognised name falls back to the mark's colour rather than to a
+                // colour of its own - see ProjectileElements for why that is a guess.
+                string element = StyleCatalogue.ForElement(ProjectileElements.Of(projectile.Path));
+                uint trailColour = element.Length > 0 && Style.Visible(element)
+                    ? Style.Colour(element)
+                    : colour;
+
+                DrawTrail(
+                    draw, snapshot, watch.TrailOf(projectile), at, trailColour, trailStrength,
+                    trailWidth, width, height);
             }
 
             // Filled, unlike the effects' rings. A projectile is small, fast and usually over
