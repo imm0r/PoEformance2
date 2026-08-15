@@ -903,6 +903,10 @@ internal static class Program
         overlay.KeepingEffects = () => world.KeepEffects;
         overlay.KeepEffects = keep => world.KeepEffects = keep;
 
+        // And the one the projectiles need: the game files every projectile in flight as a
+        // visual entity, which the entity walk drops before its path is read.
+        overlay.ReadVisuals = read => world.ReadVisualEntities = read;
+
         overlay.Costs = costs;
         overlay.Coverage = coverage;
         overlay.Damage = damage;
