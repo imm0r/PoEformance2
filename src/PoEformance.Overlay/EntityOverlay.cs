@@ -666,6 +666,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>
+    /// Adds the quest list: every quest and the step it is waiting on.
+    /// </summary>
+    /// <remarks>
+    /// Its own tab rather than a line somewhere, because it is a LIST and the thing people go
+    /// looking for in it is the quest they forgot - which needs the whole act on screen at
+    /// once, not the one the game happens to be tracking.
+    /// </remarks>
+    public void AttachQuests(QuestWatch watch, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(watch);
+        var window = new QuestWindow(watch);
+        _tools.Add(25, "quests", "Quests", window.DrawTab);
+        if (visible)
+        {
+            _tools.Show("quests");
+        }
+    }
+
+    /// <summary>
     /// Adds the ritual-line planner, which rides the atlas read.
     /// </summary>
     /// <remarks>

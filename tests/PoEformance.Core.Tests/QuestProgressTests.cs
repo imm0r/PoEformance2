@@ -1,0 +1,284 @@
+using System.Buffers.Binary;
+using PoEformance.Features;
+using PoEformance.Game.Files;
+
+namespace PoEformance.Core.Tests;
+
+/// <summary>
+/// Turning a set of flags into "what is this character still supposed to do".
+/// </summary>
+/// <remarks>
+/// The join is direct and that is the whole reason it works: QuestStates declares its
+/// conditions as references into QuestFlags, and the set read out of the game is a bitset
+/// indexed by QuestFlags ROW NUMBER. The foreign key and the bit index are the same number.
+///
+/// Built against synthetic .dat files rather than the game's, because the game's are 300 MB of
+/// install nobody has in CI - and because a synthetic one can be made to hold the awkward
+/// cases on purpose: a step with no conditions, a reference that names nothing, a row size
+/// that disagrees with the column list.
+/// </remarks>
+public class QuestProgressTests
+{
+    /// <summary>Builds a .datc64: row count, rows, the separator, then the variable section.</summary>
+    private static byte[] Dat(int rows, int rowSize, Action<byte[], int> fill, byte[] variable)
+    {
+        var bytes = new byte[4 + (rows * rowSize) + 8 + variable.Length];
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes, (uint)rows);
+        for (var row = 0; row < rows; row++)
+        {
+            fill(bytes, 4 + (row * rowSize));
+        }
+
+        for (var i = 0; i < 8; i++)
+        {
+            bytes[4 + (rows * rowSize) + i] = 0xBB;
+        }
+
+        variable.CopyTo(bytes, 4 + (rows * rowSize) + 8);
+        return bytes;
+    }
+
+    [Fact]
+    public void TheRowSizeIsDerivedFromTheFileRatherThanDeclared()
+    {
+        // The check the whole reader rests on: a .dat says how big its rows are by where it
+        // puts the separator, so a column list that disagrees is caught instead of believed.
+        byte[] bytes = Dat(5, 12, (_, _) => { }, new byte[16]);
+
+        DatFile? file = DatFile.Parse(bytes);
+
+        Assert.NotNull(file);
+        Assert.Equal(5, file.Rows);
+        Assert.Equal(12, file.RowSize);
+    }
+
+    [Fact]
+    public void AStringColumnIsAnOffsetIntoTheVariableSection()
+    {
+        byte[] text = System.Text.Encoding.Unicode.GetBytes("EnteredHideout\0");
+        // Offset 8 is the first byte AFTER the separator, because offsets count from it.
+        byte[] bytes = Dat(1, 8, (b, at) => BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at), 8), text);
+
+        Assert.Equal("EnteredHideout", DatFile.Parse(bytes)!.Text(0, 0));
+    }
+
+    [Fact]
+    public void AReferenceAnswersWithWhicheverHalfIsARow()
+    {
+        // Which of the two 64-bit words is the row is not written down anywhere this project
+        // trusts - the memory layout puts the row second - so it is resolved by asking rather
+        // than assumed, and both orders have to work.
+        var first = new DatReference(7, DatReference.Nothing);
+        var second = new DatReference(0xFFFF_FFFF_FFFF_FFFF, 7);
+
+        Assert.Equal(7, first.RowIn(100));
+        Assert.Equal(7, second.RowIn(100));
+        Assert.Equal(-1, first.RowIn(3));       // 7 is not a row of a 3-row table
+    }
+
+    [Fact]
+    public void ColumnOffsetsAreTheSumOfTheWidthsInFront()
+    {
+        // QuestFlags is the check with an independent witness: Id (string, 8) then HASH32
+        // (i32, 4) computes 12, and the schema measured the rows 0x0C apart in real memory.
+        List<DatColumn> columns = [new("Id", "string", false), new("HASH32", "i32", false)];
+
+        Assert.Equal(12, DatColumns.Layout(columns));
+        Assert.Equal(0, columns[0].Offset);
+        Assert.Equal(8, columns[1].Offset);
+    }
+
+    [Fact]
+    public void AnUnpricedTypeAbandonsTheLayoutRatherThanLeavingAHole()
+    {
+        // Every offset after an unknown width is a guess, and a guess that looks like an
+        // answer is the expensive kind.
+        Assert.Equal(0, DatColumns.Layout([new("Id", "string", false), new("X", "somethingnew", false)]));
+    }
+
+    [Fact]
+    public void TheVendoredLayoutsMatchTheTablesTheyDescribe()
+    {
+        QuestTableLayouts? layouts = QuestTableLayouts.Load(DataFile("quest-tables.json"));
+
+        Assert.NotNull(layouts);
+        Assert.Equal(12, layouts.RowSizeOf("QuestFlags"));
+        Assert.True(layouts.RowSizeOf("Quest") > 0);
+        Assert.True(layouts.RowSizeOf("QuestStates") > 0);
+
+        // The columns the join needs, by name. A schema refresh that renames one turns the
+        // feature off with a note rather than reading the wrong field.
+        Assert.True(layouts.OffsetOf("QuestStates", "FlagsPresent") >= 0);
+        Assert.True(layouts.OffsetOf("QuestStates", "FlagsMissing") >= 0);
+        Assert.True(layouts.OffsetOf("QuestStates", "Text") >= 0);
+        Assert.True(layouts.OffsetOf("QuestStates", "Quest") >= 0);
+        Assert.True(layouts.OffsetOf("Quest", "Name") >= 0);
+    }
+
+    [Fact]
+    public void TheStepInForceIsTheLastOneWhoseConditionsHold()
+    {
+        // Steps are cumulative - an early one asks for flags a later one also has - so the
+        // FIRST match is where the character has already been. Taking it would report every
+        // quest as being on step one forever.
+        QuestStep one = new(1, [10], [], "kill it", string.Empty);
+        QuestStep two = new(2, [10, 11], [], "come back", string.Empty);
+        QuestStep three = new(3, [10, 11, 12], [], "done", string.Empty);
+
+        var set = new HashSet<int> { 10, 11 };
+
+        Assert.True(one.Holds(set));
+        Assert.True(two.Holds(set));
+        Assert.False(three.Holds(set));
+    }
+
+    [Fact]
+    public void AFlagThatMustBeAbsentBlocksTheStep()
+    {
+        QuestStep step = new(1, [10], [11], "before you talk to him", string.Empty);
+
+        Assert.True(step.Holds(new HashSet<int> { 10 }));
+        Assert.False(step.Holds(new HashSet<int> { 10, 11 }));
+    }
+
+    [Fact]
+    public void AWholeQuestResolvesToItsCurrentObjective()
+    {
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        QuestOutlook outlook = QuestProgress.Read(quests, states, flags, layouts, [0]);
+
+        QuestState quest = Assert.Single(outlook.Quests);
+        Assert.Equal("The Runeseeker", quest.Name);
+        Assert.Equal("Speak to Farrow", quest.Objective);
+        Assert.False(quest.Complete);
+        Assert.Equal("Return to town", quest.Next?.Text);
+    }
+
+    [Fact]
+    public void SettingTheNextFlagAdvancesTheQuest()
+    {
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        QuestOutlook outlook = QuestProgress.Read(quests, states, flags, layouts, [0, 1]);
+
+        QuestState quest = Assert.Single(outlook.Quests);
+        Assert.Equal("Return to town", quest.Objective);
+        Assert.True(quest.Complete);
+        Assert.Empty(outlook.Active);
+    }
+
+    /// <summary>
+    /// A two-step quest with two flags, as three synthetic tables.
+    /// </summary>
+    /// <remarks>
+    /// Laid out by the same arithmetic the real thing uses, so a width correction moves these
+    /// too - the fixture cannot quietly stop describing what the reader reads.
+    /// </remarks>
+    private static (LoadedTable Quests, LoadedTable States, LoadedTable Flags, QuestTableLayouts Layouts) Tiny()
+    {
+        var layouts = new QuestTableLayouts
+        {
+            Tables =
+            {
+                ["Quest"] = [new("Id", "string", false), new("Act", "i32", false), new("Name", "string", false)],
+                ["QuestFlags"] = [new("Id", "string", false), new("HASH32", "i32", false)],
+                ["QuestStates"] =
+                [
+                    new("Quest", "foreignrow", false),
+                    new("Order", "i32", false),
+                    new("FlagsPresent", "foreignrow", true),
+                    new("FlagsMissing", "foreignrow", true),
+                    new("Text", "string", false),
+                    new("Message", "string", false),
+                ],
+            },
+        };
+
+        int questSize = layouts.RowSizeOf("Quest");
+        int stateSize = layouts.RowSizeOf("QuestStates");
+        int flagSize = layouts.RowSizeOf("QuestFlags");
+
+        // Variable section: strings at known offsets, then the two one-element flag arrays.
+        // Offsets into the variable-length section are relative to the SEPARATOR, not to the
+        // first byte after it - so everything written here is eight bytes further on than its
+        // position in the blob. Getting that wrong reads four characters into the string
+        // before the one you wanted, which looks like a real string and is not.
+        const int Magic = 8;
+        var blob = new List<byte>();
+        int Put(string text)
+        {
+            int at = blob.Count;
+            blob.AddRange(System.Text.Encoding.Unicode.GetBytes(text + "\0"));
+            return at + Magic;
+        }
+
+        int questId = Put("a1q3");
+        int questName = Put("The Runeseeker");
+        int step1 = Put("Speak to Farrow");
+        int step2 = Put("Return to town");
+        int flag0 = Put("a1q3-Started");
+        int flag1 = Put("a1q3-SpokeToFarrow");
+
+        int at0 = blob.Count;                          // one reference to flag row 0
+        blob.AddRange(new byte[16]);
+        int at1 = blob.Count;                          // one reference to flag row 1
+        blob.AddRange(new byte[16]);
+        Span<byte> span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(blob);
+        BinaryPrimitives.WriteUInt64LittleEndian(span[at0..], 0);
+        BinaryPrimitives.WriteUInt64LittleEndian(span[(at0 + 8)..], DatReference.Nothing);
+        BinaryPrimitives.WriteUInt64LittleEndian(span[at1..], 1);
+        BinaryPrimitives.WriteUInt64LittleEndian(span[(at1 + 8)..], DatReference.Nothing);
+        int array0 = at0 + Magic;
+        int array1 = at1 + Magic;
+        byte[] variable = [.. blob];
+
+        byte[] questBytes = Dat(1, questSize, (b, at) =>
+        {
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + layouts.OffsetOf("Quest", "Id")), (ulong)questId);
+            BinaryPrimitives.WriteInt32LittleEndian(b.AsSpan(at + layouts.OffsetOf("Quest", "Act")), 1);
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + layouts.OffsetOf("Quest", "Name")), (ulong)questName);
+        }, variable);
+
+        byte[] flagBytes = Dat(2, flagSize, (_, _) => { }, variable);
+        {
+            // Row 0 and row 1 of QuestFlags, named.
+            BinaryPrimitives.WriteUInt64LittleEndian(flagBytes.AsSpan(4), (ulong)flag0);
+            BinaryPrimitives.WriteUInt64LittleEndian(flagBytes.AsSpan(4 + flagSize), (ulong)flag1);
+        }
+
+        var order = 0;
+        byte[] stateBytes = Dat(2, stateSize, (b, at) =>
+        {
+            order++;
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + layouts.OffsetOf("QuestStates", "Quest")), 0);
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + layouts.OffsetOf("QuestStates", "Quest") + 8), DatReference.Nothing);
+            BinaryPrimitives.WriteInt32LittleEndian(b.AsSpan(at + layouts.OffsetOf("QuestStates", "Order")), order);
+
+            int present = layouts.OffsetOf("QuestStates", "FlagsPresent");
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + present), 1);
+            BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + present + 8), (ulong)(order == 1 ? array0 : array1));
+
+            BinaryPrimitives.WriteUInt64LittleEndian(
+                b.AsSpan(at + layouts.OffsetOf("QuestStates", "Text")), (ulong)(order == 1 ? step1 : step2));
+        }, variable);
+
+        return (
+            new LoadedTable(DatFile.Parse(questBytes)!, "quest", questSize),
+            new LoadedTable(DatFile.Parse(stateBytes)!, "states", stateSize),
+            new LoadedTable(DatFile.Parse(flagBytes)!, "flags", flagSize),
+            layouts);
+    }
+
+    private static string DataFile(string name)
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "data", name)))
+        {
+            dir = dir.Parent;
+        }
+
+        Assert.NotNull(dir);
+        return Path.Combine(dir.FullName, "data", name);
+    }
+}

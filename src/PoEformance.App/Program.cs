@@ -273,6 +273,13 @@ internal static class Program
         return result.GameStatesResolved ? 0 : 2;
     }
 
+    /// <summary>How often the quest flag set is re-read while the overlay runs.</summary>
+    /// <remarks>
+    /// A second. The read itself is a handful of small reads, but the join behind it walks a
+    /// few thousand quest states, and no quest step changes between two frames of anything.
+    /// </remarks>
+    private const int QuestFlagIntervalMs = 1000;
+
     /// <summary>How often <c>--peekwatch</c> re-reads the addresses it is watching.</summary>
     /// <remarks>
     /// Ten times a second, which is fast enough that a hover and its release land in
@@ -526,6 +533,9 @@ internal static class Program
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
         ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
     {
+        // When the quest set was last re-read, so it happens on a timer and not per frame.
+        long questsRead = 0;
+
         var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation)
         {
             // Names for tiles somebody has described. Missing is fine: the boss arenas are
@@ -570,6 +580,17 @@ internal static class Program
         {
             Install = PoEformance.Overlay.InstalledArt.Source(describe: Console.WriteLine),
         };
+
+        // The quest tables come out of the INSTALL, not out of memory: a quest state is an
+        // array of flag references, and an array lives in the .dat's variable-length section,
+        // which the resident copy of a table does not carry. Opened once - they cannot change
+        // while the game runs - and then only the flag set is re-read.
+        var quests = new PoEformance.Features.QuestWatch();
+        quests.Open(
+            PoEformance.Game.Files.GameFiles.OpenOrSay(
+                PoEformance.Game.Files.GameInstall.Find(null)).Files,
+            FindDataFile("quest-tables.json"));
+        Console.WriteLine($"quests   {quests.Opening}");
 
         var stash = new PoEformance.Features.StashInspector(
             reader,
@@ -811,6 +832,17 @@ internal static class Program
                     LookAtWhatLoaded(snapshot.AreaHash);
                 }
 
+                // The flag set, about once a second. Reading it is a handful of reads, but
+                // the JOIN behind it walks a few thousand quest states, and a quest step does
+                // not change between two frames of anything.
+                if (quests.Ready && snapshot.ServerData != 0
+                    && Environment.TickCount64 - questsRead >= QuestFlagIntervalMs)
+                {
+                    questsRead = Environment.TickCount64;
+                    quests.Update(PoEformance.Game.Diagnostics.QuestFlagSet.Rows(
+                        reader, schema, snapshot.ServerData));
+                }
+
                 // Evaluated even when the feature is off: it costs a bool check, and its
                 // reason string is what the overlay's status line shows - including the
                 // word "disabled", which is the answer to the question actually asked.
@@ -876,6 +908,7 @@ internal static class Program
             SweepForTheCountField,
             preloadSettings,
             changed => PoEformance.Features.PreloadStore.Save(changed));
+        overlay.AttachQuests(quests);
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);

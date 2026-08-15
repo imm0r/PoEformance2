@@ -1,0 +1,228 @@
+{
+  "comment": "Column order of the three quest tables, from poe-tool-dev/dat-schema (PoE2 entries only). Offsets are NOT stored: they are arithmetic over the widths in DatFile, and recomputing them is what keeps this honest when a width is corrected. Vendored rather than downloaded so the feature works offline and so a schema refresh is a visible diff.",
+  "source": "poe-tool-dev/dat-schema, validFor & 2",
+  "tables": {
+    "Quest": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false,
+        "offset": 0
+      },
+      {
+        "name": "Act",
+        "type": "i32",
+        "array": false,
+        "offset": 8
+      },
+      {
+        "name": "Name",
+        "type": "string",
+        "array": false,
+        "offset": 12
+      },
+      {
+        "name": "Icon_DDSFile",
+        "type": "string",
+        "array": false,
+        "offset": 20
+      },
+      {
+        "name": "QuestId",
+        "type": "i32",
+        "array": false,
+        "offset": 28
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "array": false,
+        "offset": 32
+      },
+      {
+        "name": "Type",
+        "type": "foreignrow",
+        "array": false,
+        "offset": 33
+      },
+      {
+        "name": "",
+        "type": "i32",
+        "array": true,
+        "offset": 49
+      },
+      {
+        "name": "",
+        "type": "i32",
+        "array": false,
+        "offset": 65
+      },
+      {
+        "name": "TrackerGroup",
+        "type": "foreignrow",
+        "array": false,
+        "offset": 69
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "array": false,
+        "offset": 85
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "array": false,
+        "offset": 86
+      },
+      {
+        "name": "",
+        "type": "foreignrow",
+        "array": true,
+        "offset": 87
+      }
+    ],
+    "QuestFlags": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false,
+        "offset": 0
+      },
+      {
+        "name": "HASH32",
+        "type": "i32",
+        "array": false,
+        "offset": 8
+      }
+    ],
+    "QuestStates": [
+      {
+        "name": "Quest",
+        "type": "foreignrow",
+        "array": false,
+        "offset": 0
+      },
+      {
+        "name": "Order",
+        "type": "i32",
+        "array": false,
+        "offset": 16
+      },
+      {
+        "name": "FlagsPresent",
+        "type": "foreignrow",
+        "array": true,
+        "offset": 20
+      },
+      {
+        "name": "FlagsMissing",
+        "type": "foreignrow",
+        "array": true,
+        "offset": 36
+      },
+      {
+        "name": "Text",
+        "type": "string",
+        "array": false,
+        "offset": 52
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "array": false,
+        "offset": 60
+      },
+      {
+        "name": "Message",
+        "type": "string",
+        "array": false,
+        "offset": 61
+      },
+      {
+        "name": "MapPinsKeys",
+        "type": "foreignrow",
+        "array": true,
+        "offset": 69
+      },
+      {
+        "name": "",
+        "type": "i32",
+        "array": false,
+        "offset": 85
+      },
+      {
+        "name": "MapPinsText",
+        "type": "string",
+        "array": false,
+        "offset": 89
+      },
+      {
+        "name": "MapPinsKey",
+        "type": "foreignrow",
+        "array": false,
+        "offset": 97
+      },
+      {
+        "name": "",
+        "type": "foreignrow",
+        "array": true,
+        "offset": 113
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "array": false,
+        "offset": 129
+      },
+      {
+        "name": "",
+        "type": "i32",
+        "array": true,
+        "offset": 130
+      },
+      {
+        "name": "",
+        "type": "i32",
+        "array": true,
+        "offset": 146
+      },
+      {
+        "name": "",
+        "type": "i32",
+        "array": false,
+        "offset": 162
+      },
+      {
+        "name": "SoundEffect",
+        "type": "foreignrow",
+        "array": false,
+        "offset": 166
+      },
+      {
+        "name": "",
+        "type": "string",
+        "array": false,
+        "offset": 182
+      },
+      {
+        "name": "",
+        "type": "foreignrow",
+        "array": true,
+        "offset": 190
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "array": false,
+        "offset": 206
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "array": false,
+        "offset": 207
+      }
+    ]
+  }
+}
