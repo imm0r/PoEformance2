@@ -127,7 +127,11 @@ public sealed class EntityMemory
             // value: "there is a rare back at the entrance" is a thing worth being told.
             EntityKind.WorldItem => true,
 
-            EntityKind.Monster or EntityKind.Player or EntityKind.Effect => false,
+            // A projectile is the clearest case of all: it exists for half a second and it
+            // was never anywhere, it was passing through. Remembered, one would hang in the
+            // air where it happened to be on the last frame the game listed it.
+            EntityKind.Monster or EntityKind.Player or EntityKind.Effect
+                or EntityKind.Projectile => false,
 
             _ => entity.IsPlace,
         };

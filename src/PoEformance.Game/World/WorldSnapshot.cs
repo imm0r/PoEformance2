@@ -18,6 +18,16 @@ public enum EntityKind
     Npc,
     Effect,
     Terrain,
+
+    /// <summary>
+    /// Something in flight: an arrow, a fireball, a bolt.
+    /// </summary>
+    /// <remarks>
+    /// LAST on purpose. The alert rules store a kind by its NUMBER, so inserting a value
+    /// anywhere else renumbers everything after it and silently re-points every saved rule at
+    /// a different kind of entity.
+    /// </remarks>
+    Projectile,
 }
 
 /// <summary>
@@ -499,12 +509,7 @@ public sealed class WorldReader
         // Whose side it is on. One byte, and the thing that decides whether a dot is a
         // threat or your own summon - which nothing here was asking, so every minion, totem
         // and cast effect has been drawn as an enemy.
-        bool friendly = false;
-        ulong positioned = entity.Component("Positioned");
-        if (positioned != 0 && _reader.TryRead(positioned + (ulong)_reaction, out byte reaction))
-        {
-            friendly = (reaction & 0x7F) == 0x01;
-        }
+        bool friendly = ReadFriendly(entity);
 
         // Whether it expires on its own. Presence of the component is the whole answer, so
         // this costs a lookup and no read at all.
@@ -523,6 +528,27 @@ public sealed class WorldReader
         return new MonsterSigns(
             health, targetable, monsterRarity >= ItemRarity.Unique, monsterRarity, pool, shield,
             friendly, temporary, hasLife, hasTargetable);
+    }
+
+    /// <summary>Whether the game says this entity is on the player's side.</summary>
+    /// <remarks>
+    /// ONE byte and ONE copy of the rule, because two things ask it now: the monster signs,
+    /// where it separates a threat from your own summon, and a projectile, where it is the
+    /// only thing on the entity that answers "is this one mine".
+    ///
+    /// A missing Positioned component - or a read that fails - answers false, which is a claim
+    /// this cannot actually support. It is kept because the alternative costs more than it
+    /// buys: a tri-state would have to travel on every entity to serve the handful that cannot
+    /// be judged, and the consequence of being wrong here is a marker in the enemy colour
+    /// rather than a monster hidden. Whoever draws projectiles shows both sides by default for
+    /// exactly this reason.
+    /// </remarks>
+    private bool ReadFriendly(Entity entity)
+    {
+        ulong positioned = entity.Component("Positioned");
+        return positioned != 0
+               && _reader.TryRead(positioned + (ulong)_reaction, out byte reaction)
+               && (reaction & 0x7F) == 0x01;
     }
 
     /// <summary>Pulls one vital sub-struct out of a span read from the Life component.</summary>
@@ -691,6 +717,12 @@ public sealed class WorldReader
             // clock belongs to the monster and does not care which of its entities was seen.
             MonsterSigns signs = kind == EntityKind.Monster ? ReadMonsterSigns(entity) : default;
 
+            // Whose projectile this is. The monster signs are not read for this kind - a
+            // projectile has no health and nothing targets it, so all twelve of those reads
+            // would answer nothing - but the one byte that says whose side it is on is the
+            // whole question a projectile overlay is asked, so it is read on its own.
+            bool friendly = kind == EntityKind.Projectile ? ReadFriendly(entity) : signs.Friendly;
+
             // Only over the monsters this is actually a question about: hostile ones that are
             // not effects. Counting everything made the readout useless in precisely the
             // situation it was built for - a Firewall build puts twenty of its own walls on
@@ -794,7 +826,7 @@ public sealed class WorldReader
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
                 poi, mapIcon,
-                signs.Life, signs.EnergyShield, opened, signs.Friendly, signs.IsEffect,
+                signs.Life, signs.EnergyShield, opened, friendly, signs.IsEffect,
                 NameOf(address, renderAddress), renderAddress, present);
 
             entities.Add(world);
@@ -957,6 +989,23 @@ public sealed class WorldReader
         if (path.StartsWith("Metadata/Monsters/", StringComparison.Ordinal))
         {
             return EntityKind.Monster;
+        }
+
+        // Straight from the AHK tool's _ClassifyEntityType, which arrived at it against this
+        // game, and confirmed against the game's own file tree - Metadata/Projectiles is a real
+        // folder in the bundles (e.g. Metadata/Projectiles/ShockingArrowFaridun).
+        //
+        // NOT the only shape a projectile comes in, and the difference is worth stating so
+        // nobody looks for the missing half. A monster's skill often spawns its projectile
+        // under the monster instead - Metadata/Monsters/VaalHumanoids/VaalHumanoidBow/objects/
+        // LightningArrow, seen 36 times in one recorded map - and that path says Monsters, so
+        // it classifies as one and is dropped by the hostile-effect rule (it carries no Life).
+        // Changing that would put those back into every monster count and health bar the rule
+        // exists to keep them out of; this covers the entities the game itself files as
+        // projectiles, which is where a player's own skills put theirs.
+        if (path.StartsWith("Metadata/Projectiles/", StringComparison.Ordinal))
+        {
+            return EntityKind.Projectile;
         }
 
         if (path.StartsWith("Metadata/Chests/", StringComparison.Ordinal))

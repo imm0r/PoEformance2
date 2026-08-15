@@ -103,6 +103,16 @@ public static class StyleCatalogue
         new("healthbar.back", "Health bars", "Empty part", StyleTraits.Colour, Rgb(28, 18, 18, 200)),
         new("healthbar.shield", "Health bars", "Energy shield", StyleTraits.Colour, Rgb(140, 200, 255)),
 
+        // ── Projectiles ─────────────────────────────────────────────────────
+        // Two colours because there are two questions, and only one of them is "where is my
+        // fireball". The other is which of the things crossing the screen is coming AT you,
+        // and a single colour for both would answer neither. The trail takes its HUE from the
+        // projectile it belongs to, for the same reason; this entry sets how thick it is and,
+        // through its alpha, how strongly it shows.
+        new("projectile.mine", "Projectiles", "Yours", Marker, Rgb(102, 224, 255)),
+        new("projectile.other", "Projectiles", "Everything else's", Marker, Rgb(255, 122, 89)),
+        new("projectile.trail", "Projectiles", "Where it came from", Line, Rgb(255, 255, 255, 128)),
+
         // ── Alerts ──────────────────────────────────────────────────────────
         new("alert.banner", "Alerts", "Alert line", StyleTraits.Colour, Rgb(255, 235, 179, 255)),
         new("alert.banner.back", "Alerts", "Alert backing", StyleTraits.Colour, Rgb(20, 18, 14, 215)),
@@ -170,6 +180,9 @@ public static class StyleCatalogue
         public const string HealthBar = "healthbar";
         public const string HealthBarBack = "healthbar.back";
         public const string HealthBarShield = "healthbar.shield";
+        public const string ProjectileMine = "projectile.mine";
+        public const string ProjectileOther = "projectile.other";
+        public const string ProjectileTrail = "projectile.trail";
         public const string Banner = "alert.banner";
         public const string BannerBack = "alert.banner.back";
         public const string PreloadBannerBack = "preload.banner.back";
@@ -194,6 +207,7 @@ public static class StyleCatalogue
             PreloadBannerBack, PreloadListBack,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,
+            ProjectileMine, ProjectileOther, ProjectileTrail,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];
     }
