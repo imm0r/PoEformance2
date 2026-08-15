@@ -250,9 +250,28 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     private readonly ToolTabs _tools = new();
 
-    // The tab names things elsewhere in the overlay jump to.
+    // The tools something elsewhere in the overlay jumps to by name.
     private const string UiBrowserTab = "uibrowser";
     private const string DissectorTab = "dissector";
+
+    /// <summary>
+    /// The pages that hold more than one tool.
+    /// </summary>
+    /// <remarks>
+    /// Named constants rather than strings at each registration, because a page is a JOIN:
+    /// the tools that share one are wired up in different methods, at different times, and a
+    /// typo in one of them would not fail - it would quietly open a page of its own with one
+    /// tool on it, which is the fourteen-tab bar growing back a tab at a time.
+    ///
+    /// Grouped by the question they answer rather than by what they read. "How much damage am
+    /// I doing" and "where did my projectiles go" are one question asked twice, and so are
+    /// "what is that thing" and "what is inside it".
+    /// </remarks>
+    private const string Status = "status";
+    private const string Area = "area";
+    private const string Combat = "combat";
+    private const string Atlas = "atlas";
+    private const string Entities = "entities";
 
     // Only the tools something else still reaches for keep a field; the rest live on as
     // their tab's callbacks and nothing more. A field that nothing reads is a claim that
@@ -378,7 +397,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             lookAgain,
             sweep,
             () => TookPreload(_preloadSettings with { Rules = watch.Rules }));
-        _tools.Add(20, "preload", "In this area", window.DrawTab);
+        _tools.Add(20, "preload", "In this area", window.DrawTab, page: Area, pageLabel: "Area");
         if (visible)
         {
             _tools.Show("preload");
@@ -511,11 +530,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>Draw name labels next to dots.</summary>
     public bool ShowLabels { get; set; }
 
-    /// <summary>Draw the small status window: what is being read, and what auto-flask is doing.</summary>
-    public bool ShowStatus { get; set; } = true;
-
     /// <summary>
-    /// Add the projection measurements and the per-kind filters to the status window.
+    /// Add the projection measurements and the per-kind filters to the readout.
     /// </summary>
     /// <remarks>
     /// OFF by default, and that split is a correction rather than a preference. Everything
@@ -566,8 +582,27 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // that cannot be loaded is reported in one place and given up on once.
         _preloadEntry.Icons = _icons;
 
+        // FIRST, and registered here rather than where the tools attach, because this one is
+        // not attached by anybody: it is this class's own readout, it is what the window shows
+        // when nothing else is asked for, and being the leading page is what makes the window
+        // size itself to a dozen short lines during a fight. Order 0 keeps it leftmost however
+        // the rest are numbered.
+        _tools.Add(
+            0, Status, "Live readout", () => DrawStatusTab(_viewport.X, _viewport.Y),
+            page: Status, pageLabel: "Status");
+
         ShareChrome();
     }
+
+    /// <summary>
+    /// The viewport as the last frame measured it, for the pages that need it.
+    /// </summary>
+    /// <remarks>
+    /// A field because a tab's content is a callback registered once, while the size arrives
+    /// per frame. The readout is the only page that cares - it reports the viewport and
+    /// projects the player through it - and one frame's lag is not a thing anybody could see.
+    /// </remarks>
+    private (int X, int Y) _viewport;
 
     private IntPtr Upload(string key, SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image, bool srgb)
     {
@@ -630,7 +665,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(inspector);
         var window = new UiBrowserWindow(inspector) { Style = _style };
         _uiBrowser = window;
-        _tools.Add(100, UiBrowserTab, "UI browser", window.DrawTab, window.Idle);
+        _tools.Add(
+            100, UiBrowserTab, "Interface tree", window.DrawTab, window.Idle, page: Entities);
         if (visible)
         {
             _tools.Show(UiBrowserTab);
@@ -650,7 +686,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(saved);
         _atlasWatch = watch;
         var window = new AtlasWindow(watch, saved);
-        _tools.Add(40, "atlas", "Atlas", window.DrawTab, window.Idle);
+        _tools.Add(40, "atlas", "Atlas", window.DrawTab, window.Idle, page: Atlas, pageLabel: "Atlas");
         if (visible)
         {
             _tools.Show("atlas");
@@ -706,7 +742,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         ArgumentNullException.ThrowIfNull(watch);
         var window = new QuestWindow(watch);
-        _tools.Add(25, "quests", "Quests", window.DrawTab);
+        _tools.Add(25, "quests", "Quests", window.DrawTab, page: Area);
         if (visible)
         {
             _tools.Show("quests");
@@ -732,7 +768,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _ritualWatch = watch;
         var window = new RitualWindow(watch, worth, apply, save);
         _ritualWindow = window;
-        _tools.Add(50, "ritual", "Ritual line", window.DrawTab);
+        _tools.Add(50, "ritual", "Ritual line", window.DrawTab, page: Atlas);
         if (visible)
         {
             _tools.Show("ritual");
@@ -753,7 +789,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(inspector);
         var window = new DissectorWindow(inspector);
         _dissector = window;
-        _tools.Add(110, DissectorTab, "Dissector", window.DrawTab, window.Idle);
+        _tools.Add(110, DissectorTab, "Dissector", window.DrawTab, window.Idle, page: Entities);
         if (visible)
         {
             _tools.Show(DissectorTab);
@@ -802,7 +838,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     _tools.Show(DissectorTab);
                 }
             });
-        _tools.Add(90, "entities", "Entity browser", () => window.DrawTab(_snapshot, _snapshot.Player), window.Idle);
+        _tools.Add(
+            90, "entities", "Entity browser", () => window.DrawTab(_snapshot, _snapshot.Player),
+            window.Idle, page: Entities, pageLabel: "Entities");
         if (visible)
         {
             _tools.Show("entities");
@@ -1087,6 +1125,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // delegate call and a bool.
         ReadVisuals?.Invoke(_projectiles.Enabled);
 
+        _viewport = (width, height);
         _snapshot = _snapshotSource(new UiScale(width, height, _cull));
 
         // Nothing is drawn unless the game - or one of OUR windows - is in front. Not
@@ -1221,7 +1260,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 var made = new CostWindow(Costs);
                 _costWindow = made;
-                _tools.Add(80, "cost", "Read cost", made.DrawTab);
+                _tools.Add(80, "cost", "Read cost", made.DrawTab, page: Status);
             }
 
             _costWindow.CurrentArea = _snapshot.AreaHash;
@@ -1234,7 +1273,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             var made = new ProjectileWindow(
                 _projectiles, _projectileWatch, () => SettingsChanged?.Invoke());
             _projectileWindow = made;
-            _tools.Add(35, "projectiles", "Projectiles", () => made.DrawTab(_snapshot));
+            _tools.Add(
+                35, "projectiles", "Projectiles", () => made.DrawTab(_snapshot), page: Combat);
         }
 
         // The same first-use registration, and for the same reason: the two callbacks it needs
@@ -1243,7 +1283,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             var made = new EffectWindow(_effects, KeepingEffects, KeepEffects, Noise);
             _effectWindow = made;
-            _tools.Add(95, "effects", "Effects", () => made.DrawTab(_snapshot));
+            _tools.Add(95, "effects", "Effects", () => made.DrawTab(_snapshot), page: Entities);
         }
 
         // Registered on first use for the same reason as the cost tab: the meter is a
@@ -1253,7 +1293,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (_damageWindow is null)
             {
                 _damageWindow = new DamageWindow(meter) { Heat = _heat };
-                _tools.Add(30, "damage", "Damage", _damageWindow.DrawTab);
+                _tools.Add(30, "damage", "Damage", _damageWindow.DrawTab, page: Combat, pageLabel: "Combat");
             }
 
             _damageWindow.CurrentArea = _snapshot.AreaHash;
@@ -1284,10 +1324,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _preloadPanel.Draw(_snapshot.AreaHash, _preload.Findings);
         }
 
-        if (ShowStatus)
-        {
-            DrawStatusWindow(width, height);
-        }
     }
 
     /// <summary>
@@ -1445,36 +1481,88 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>
-    /// The live readout: what is being read, the pools, and what auto-flask is doing.
+    /// The window's leading page: what is being read, the pools, and the switches.
     /// </summary>
     /// <remarks>
-    /// Stays visible during play, because a blank overlay is otherwise ambiguous - "nothing
-    /// nearby" and "the read chain broke" look identical - and because "why did the flask
-    /// not fire" is a question asked mid-session, not during a debugging pass. The
-    /// projection measurements below it are the debugging pass, and hide behind --debug.
+    /// FIRST among the pages, because a blank overlay is otherwise ambiguous - "nothing
+    /// nearby" and "the read chain broke" look identical - and because "why did the flask not
+    /// fire" is a question asked mid-session rather than during a debugging pass. Leading also
+    /// means the window sizes itself to this page's dozen short lines while it is in front,
+    /// which is what lets it sit in a corner during a fight and still open into the dissector.
+    ///
+    /// The measurements are the debugging pass and hide behind --debug, in their own rows and
+    /// their own controls, so what is left is the part somebody reads at a glance.
     /// </remarks>
-    private void DrawStatusWindow(int width, int height)
+    private void DrawStatusTab(int width, int height)
     {
-        ImGui.SetNextWindowPos(new Vector2(20, 20), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowBgAlpha(0.7f);
+        DrawReadout(width, height);
 
-        if (ImGui.Begin(
-                "PoEformance",
-                Chrome.Flags(
-                    WindowChrome.StatusId,
-                    ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing)))
+        ImGui.Separator();
+        DrawSwitches();
+
+        if (!ShowDiagnostics)
         {
-            // FIRST, not last like the menu below it. This window has several ways out of the
-            // body and only one way in, so the top is the single place the icons can be asked
-            // for without every early return having to remember them.
-            Chrome.TitleButtons(WindowChrome.StatusId);
+            return;
+        }
 
+        ImGui.Separator();
+        DrawMeasuringControls(width, height);
+    }
+
+    /// <summary>A label and its value, as one row of the readout's two columns.</summary>
+    /// <remarks>
+    /// A TABLE rather than the padded strings this used to be - "area:     Clearfell" and
+    /// friends, lined up by counting spaces. That only ever looked right in a monospaced font,
+    /// and ImGui's default is not one: every row was a couple of pixels off from its
+    /// neighbours, and any value long enough to matter pushed its own label out of line.
+    ///
+    /// The colour is PUSHED rather than passed to TextColored, and that is not a style
+    /// preference. ImGui's Text calls are printf - a value read out of the game can carry a
+    /// percent sign, "100% Increased" is a real monster name, and TextColored would take it
+    /// as a conversion specifier and print whatever was in the register. TextUnformatted
+    /// cannot, so this row is safe by construction rather than by remembering to escape.
+    /// </remarks>
+    private static void Row(string label, string value, Vector4? colour = null)
+    {
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TextDisabled(label);
+        ImGui.TableNextColumn();
+
+        if (colour is Vector4 tint)
+        {
+            ImGui.PushStyleColor(ImGuiCol.Text, tint);
+        }
+
+        ImGui.TextUnformatted(value);
+
+        if (colour is not null)
+        {
+            ImGui.PopStyleColor();
+        }
+    }
+
+    private static readonly Vector4 Warning = new(1f, 0.6f, 0.2f, 1f);
+    private static readonly Vector4 Quiet = new(0.7f, 0.75f, 0.8f, 1f);
+    private static readonly Vector4 Measured = new(0.65f, 0.75f, 0.68f, 1f);
+    private static readonly Vector4 Bad = new(1f, 0.5f, 0.4f, 1f);
+
+    /// <summary>What is being read, the pools, and what auto-flask is doing.</summary>
+    private void DrawReadout(int width, int height)
+    {
+        if (!ImGui.BeginTable("##readout", 2, ImGuiTableFlags.SizingFixedFit))
+        {
+            return;
+        }
+
+        try
+        {
             if (!_snapshot.InGame)
             {
                 // WHICH state, not just "no". A loading screen, the login screen and a
                 // character select all draw nothing, and they are different situations -
                 // saying "not in an area" over a loading screen reads as a broken read.
-                string where = _snapshot.State switch
+                Row("idle", _snapshot.State switch
                 {
                     GameStateKind.AreaLoading or GameStateKind.Loading => "loading",
                     GameStateKind.Login or GameStateKind.PreGame => "at the login screen",
@@ -1485,321 +1573,332 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     GameStateKind.NotLoaded => "game not loaded",
                     GameStateKind.Unreadable => "state unreadable - falling back to the player pointer",
                     _ => $"in {_snapshot.State}",
-                };
-
-                ImGui.TextColored(new Vector4(1f, 0.6f, 0.2f, 1f), $"idle:     {where}");
-            }
-            else
-            {
-                // Named even when nothing is hidden. An overlay that goes blank in town
-                // otherwise looks broken, and this is the line that says it is not - it
-                // also reports the area id, which is what pins down any further rule about
-                // WHERE the overlay should be active.
-                AreaInfo area = _snapshot.Area;
-                ImGui.TextColored(
-                    area.WantsMarkers ? new Vector4(0.7f, 0.75f, 0.8f, 1f) : new Vector4(1f, 0.6f, 0.2f, 1f),
-                    $"area:     {area.Describe()}{(area.WantsMarkers ? string.Empty : " - markers hidden")}");
-
-                // The two counts kept apart: one is what the game listed this read, the other
-                // is what it has stopped listing and this still draws. Added together they
-                // would read as the entity list having grown, which is the one thing this
-                // line is used to watch.
-                ImGui.Text(_snapshot.Remembered > 0
-                    ? $"entities: {_snapshot.Entities.Count - _snapshot.Remembered}"
-                      + $"  (+{_snapshot.Remembered} remembered out of range)"
-                    : $"entities: {_snapshot.Entities.Count}");
-
-                // The question a map is actually being looked at for near the end of a run:
-                // is there any of it left. Measured against what can be REACHED rather than
-                // every walkable cell, which is why it is worth showing at all - the same
-                // figure against the whole grid reads as a few per cent on a finished map.
-                if (Coverage is MapCoverage walked && walked.Measuring)
-                {
-                    ImGui.TextColored(
-                        new Vector4(0.65f, 0.75f, 0.68f, 1f),
-                        ImGuiText.Escape(
-                            $"walked:   {walked.Percent:F0}%   ({walked.SeenCells} of {walked.ReachableCells})"
-                            + (walked.RegionKnown ? string.Empty : "  - still working out what is reachable")));
-                }
-                if (ReadStats is not null)
-                {
-                    (double ms, long reads, long failures) = ReadStats();
-                    ImGui.Text($"read:     {ms:F1} ms on its own thread   frame: {1000f / ImGui.GetIO().Framerate:F1} ms"
-                        + $"   ({reads} reads{(failures > 0 ? $", {failures} failed" : string.Empty)})");
-
-                    // WHERE the time went, not just how much. One number says a frame was
-                    // expensive and nothing about why, and an expensive phase is usually a
-                    // redundancy rather than a fundamental cost - which only a breakdown shows.
-                    if (_snapshot.Cost.TotalMs > 0)
-                    {
-                        ImGui.TextDisabled($"          {_snapshot.Cost}");
-                    }
-                }
-                if (ShowDiagnostics)
-                {
-                    ImGui.Text(_tracked.IsValid
-                        ? $"viewport: {width} x {height}  (game {_tracked.Width} x {_tracked.Height} @ {_tracked.X},{_tracked.Y})"
-                        : $"viewport: {width} x {height}  (game window not tracked)");
-                }
-
-                if (ShowDiagnostics && _snapshot.Player is WorldEntity player)
-                {
-                    ImGui.Text($"player:   ({player.WorldX:F0}, {player.WorldY:F0}, {player.WorldZ:F0})");
-
-                    // The live projection sanity check: the camera follows the player, so this
-                    // must sit at the screen centre. If it drifts, the matrix is wrong.
-                    ScreenPoint p = WorldToScreen.Project(
-                        _snapshot.Matrix, player.WorldX, player.WorldY, player.TerrainHeight, width, height);
-                    double offCentre = WorldToScreen.OffCentreFraction(p, width, height);
-
-                    // Centred ALONE is not proof: a matrix that blows w up collapses the whole
-                    // scene onto the centre, so the player looks perfect while nothing else is
-                    // drawable. Showing the scene's pixel spread next to it makes that failure
-                    // visible instead of reassuring.
-                    double spread = ScreenSpread(width, height);
-                    bool healthy = offCentre < 0.15 && spread > width * 0.05;
-                    Vector4 colour = healthy
-                        ? new Vector4(0.4f, 1f, 0.4f, 1f)
-                        : new Vector4(1f, 0.4f, 0.4f, 1f);
-                    ImGui.TextColored(colour, $"player off-centre: {offCentre:F3}   scene spread: {spread:F0} px");
-
-                    // The same thing in pixels, which is what a screenshot can be measured
-                    // against: how far the marker sits from the screen centre, and how tall
-                    // the character is on screen, so the two are directly comparable.
-                    ScreenPoint hb = WorldToScreen.Project(
-                        _snapshot.Matrix, player.WorldX, player.WorldY, player.WorldZ, width, height);
-                    ImGui.Text($"marker:   ({p.X:F0}, {p.Y:F0})   centre ({width / 2}, {height / 2})"
-                        + $"   delta ({p.X - (width / 2f):F0}, {p.Y - (height / 2f):F0}) px");
-                    ImGui.Text($"character on screen: {Math.Abs(hb.Y - p.Y):F0} px tall"
-                        + $"   (world z {player.WorldZ:F0} vs ground {player.TerrainHeight:F0})");
-                    if (!healthy && spread <= width * 0.05)
-                    {
-                        ImGui.TextColored(colour, "  scene collapsed - the matrix offset is wrong.");
-                    }
-                }
-
-                if (_snapshot.PlayerVitals is Vitals vitals)
-                {
-                    ImGui.Text($"vitals:   life {Show(vitals.Life)}   mana {Show(vitals.Mana)}   es {Show(vitals.EnergyShield)}");
-                }
-
-                // Here rather than only on its tab, because this is a number you watch while
-                // doing the thing it measures - a damage figure you have to open a window to
-                // read cannot tell you whether the pack you just hit died to that skill.
-                if (Damage is DamageMeter damage && damage.Measuring)
-                {
-                    ImGui.TextColored(
-                        new Vector4(1f, 1f, 0.6f, 1f),
-                        $"damage:   {DamageWindow.Number(damage.Dps)} dps"
-                        + $"   peak {DamageWindow.Number(damage.Peak)}"
-                        + $"   {DamageWindow.Number(damage.Total)} this area");
-                }
-
-                // Always shown, including when it failed: an omitted row looks like a
-                // feature that is not running, when it actually means a read gave up.
-                if (_snapshot.FlaskBelt is FlaskBelt belt && !belt.IsUnknown)
-                {
-                    ImGui.Text("belt:     " + string.Join("   ", belt.Flasks.Select(f =>
-                        $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}"
-                        + (f.IsCharm ? " (charm)" : f.CanUse ? string.Empty : " (empty)"))));
-                }
-                else
-                {
-                    ImGui.TextColored(new Vector4(1f, 0.5f, 0.4f, 1f),
-                        "belt:     not read - run with --flasks for the chain");
-                }
-
-                if (FlaskStatus is not null)
-                {
-                    ImGui.TextColored(new Vector4(0.8f, 0.7f, 0.4f, 1f), $"flask:    {FlaskStatus()}");
-                }
-
-                // In the overlay rather than only in the config window, because this is read
-                // while standing on the hill that shows the problem - a readout that needs a
-                // second window open is a readout nobody is looking at in that moment.
-                if (ShowTerrain)
-                {
-                    ImGui.TextColored(new Vector4(0.65f, 0.7f, 0.78f, 1f), $"terrain:  {DescribeTerrain()}");
-                }
-
-                // The summary stays here even though the full list moved into the tools
-                // window: the common case needs no window at all - the answer is one line
-                // and it is already on screen.
-                if (_preload is not null)
-                {
-                    string here = _preload.Summary();
-                    ImGui.TextColored(
-                        new Vector4(0.65f, 0.75f, 0.68f, 1f),
-                        here.Length > 0 ? $"loaded:   {here}" : $"loaded:   {_preload.All.Count} files");
-                }
-
-                // ONE switch where a column of per-window checkboxes used to be: every tool
-                // now lives on a tab of the same window, so "which tools are open" stopped
-                // being a question this readout has to answer. Not behind --debug for the
-                // same reason the browsers never were - these are working tools, and their
-                // whole point is being reachable in the moment something is on screen,
-                // which is not a moment anyone restarts the tool for.
-                if (_tools.Any)
-                {
-                    bool tools = _tools.Visible;
-                    if (ImGui.Checkbox("Tools  (alerts, atlas, stash and the browsers - one tab each)", ref tools))
-                    {
-                        _tools.Visible = tools;
-                    }
-                }
-
-                // Not a tab like the rest: routing is done WHILE playing, so the picker
-                // keeps its own small window - see the note where it is drawn.
-                if (_poi is not null)
-                {
-                    bool picking = _poi.ShowPicker;
-                    if (ImGui.Checkbox("Points of interest", ref picking))
-                    {
-                        _poi.ShowPicker = picking;
-                        SettingsChanged?.Invoke();
-                    }
-                }
-
-                if (Noise is not null)
-                {
-                    bool filtering = Noise.Enabled;
-                    if (ImGui.Checkbox("Hide noise  (effects, pets, daemons - off to see everything)", ref filtering))
-                    {
-                        Noise.Enabled = filtering;
-                        SettingsChanged?.Invoke();
-                    }
-                }
-
-                if (Memory is not null)
-                {
-                    bool remembering = Memory.Enabled;
-                    if (ImGui.Checkbox(
-                            "Keep what is out of range  (places and drops the game has stopped listing)",
-                            ref remembering))
-                    {
-                        Memory.Enabled = remembering;
-                        SettingsChanged?.Invoke();
-                    }
-                }
-
-                bool hurtOnly = _healthBars.OnlyWhenHurt;
-                if (ImGui.Checkbox("Health bars only once hurt  (off shows every monster's)", ref hurtOnly))
-                {
-                    _healthBars.OnlyWhenHurt = hurtOnly;
-                    SettingsChanged?.Invoke();
-                }
-
-                bool behind = HideBehindPanels;
-                if (ImGui.Checkbox("Hide behind big panels  (stash, skill tree, atlas, world map)", ref behind))
-                {
-                    HideBehindPanels = behind;
-                    SettingsChanged?.Invoke();
-                }
-
-                // WHICH ones, not just whether. The panels are found at unverified offsets and
-                // paths, and the way a wrong one fails is that something reads open forever and
-                // the markers never come back - which looks exactly like an overlay that broke.
-                // Named here, it is instead one line saying which panel to stop believing.
-                if (_snapshot.InAPanel)
-                {
-                    ImGui.TextColored(new Vector4(1f, 0.8f, 0.35f, 1f), $"panels open:  {_snapshot.Panels}");
-                }
-
-                // Only when there is one. A path that does not work otherwise shows up as a
-                // marker drawn its ordinary way, which is exactly what not setting an icon
-                // looks like - so the setting appears to do nothing at all.
-                foreach (string problem in _icons.Files.Problems)
-                {
-                    ImGui.TextColored(new Vector4(1f, 0.55f, 0.4f, 1f), $"icon:     {problem}");
-                }
-
-                // The kind breakdown doubles as the filter, since "what is out there" and
-                // "what do I want drawn" are the same question asked twice. Note the ##id
-                // suffix: ImGui derives a control's identity from its label, so a label
-                // carrying a live count would be a NEW control every frame and the click
-                // would never register.
-                if (ShowDiagnostics)
-                {
-                    foreach (IGrouping<EntityKind, WorldEntity> group in _snapshot.Entities.GroupBy(e => e.Kind).OrderBy(g => g.Key.ToString()))
-                    {
-                        bool drawn = DrawnKinds.Contains(group.Key);
-                        if (ImGui.Checkbox($"{group.Key,-10} {group.Count()}##kind{group.Key}", ref drawn))
-                        {
-                            if (drawn)
-                            {
-                                DrawnKinds.Add(group.Key);
-                            }
-                            else
-                            {
-                                DrawnKinds.Remove(group.Key);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!ShowDiagnostics)
-            {
-                Chrome.Menu(WindowChrome.StatusId);
-                ImGui.End();
+                }, Warning);
                 return;
             }
 
-            ImGui.Separator();
-            bool labels = ShowLabels;
-            if (ImGui.Checkbox("labels", ref labels))
+            // Named even when nothing is hidden. An overlay that goes blank in town otherwise
+            // looks broken, and this is the line that says it is not - it also reports the
+            // area id, which is what pins down any further rule about WHERE it should be
+            // active.
+            AreaInfo area = _snapshot.Area;
+            Row(
+                "area",
+                area.Describe() + (area.WantsMarkers ? string.Empty : "   - markers hidden"),
+                area.WantsMarkers ? Quiet : Warning);
+
+            // The two counts kept apart: one is what the game listed this read, the other is
+            // what it has stopped listing and this still draws. Added together they would
+            // read as the entity list having grown, which is the one thing this line is used
+            // to watch.
+            Row("entities", _snapshot.Remembered > 0
+                ? $"{_snapshot.Entities.Count - _snapshot.Remembered}"
+                  + $"   (+{_snapshot.Remembered} remembered out of range)"
+                : $"{_snapshot.Entities.Count}");
+
+            // The question a map is actually being looked at for near the end of a run: is
+            // there any of it left. Measured against what can be REACHED rather than every
+            // walkable cell, which is why it is worth showing at all - the same figure
+            // against the whole grid reads as a few per cent on a finished map.
+            if (Coverage is MapCoverage walked && walked.Measuring)
             {
-                ShowLabels = labels;
-                SettingsChanged?.Invoke();
+                Row(
+                    "walked",
+                    $"{walked.Percent:F0}%   ({walked.SeenCells} of {walked.ReachableCells})"
+                    + (walked.RegionKnown ? string.Empty : "   - still working out what is reachable"),
+                    Measured);
             }
 
-            ImGui.SameLine();
-            bool calibration = ShowCalibration;
-            if (ImGui.Checkbox("calibration", ref calibration))
+            if (ReadStats is not null)
             {
-                ShowCalibration = calibration;
+                (double ms, long reads, long failures) = ReadStats();
+                Row(
+                    "read",
+                    $"{ms:F1} ms on its own thread   frame {1000f / ImGui.GetIO().Framerate:F1} ms"
+                    + $"   ({reads} reads{(failures > 0 ? $", {failures} failed" : string.Empty)})");
             }
 
-            if (ShowCalibration && _snapshot.Player is WorldEntity subject)
+            if (_snapshot.PlayerVitals is Vitals vitals)
             {
-                // Drag until the marker sits on the X the game's own map draws at the
-                // player's position, then read the number off. Reported in BOTH units
-                // because that is what separates the possible causes: a round world height
-                // means the wrong height is being fed in, while a value that only makes
-                // sense in pixels means the error is in screen space.
-                ImGui.SetNextItemWidth(180);
-                float probe = ProbeHeight;
-                if (ImGui.DragFloat("probe height", ref probe, 0.5f, -200f, 200f, "%.0f world units"))
-                {
-                    ProbeHeight = probe;
-                }
-
-                ImGui.SameLine();
-                if (ImGui.SmallButton("reset"))
-                {
-                    ProbeHeight = 0;
-                }
-
-                // The character's own height calibrates world units against pixels: the two
-                // rings are exactly its Render z above the ground.
-                float characterUnits = Math.Abs(subject.ModelBoundsZ);
-                ScreenPoint top = WorldToScreen.Project(
-                    _snapshot.Matrix, subject.WorldX, subject.WorldY, subject.HealthBarZ, width, height);
-                ScreenPoint bottom = ProjectGround(subject, width, height);
-                float pixelsPerUnit = characterUnits > 0.01f
-                    ? Math.Abs(top.Y - bottom.Y) / characterUnits
-                    : 0f;
-
-                ImGui.Text(pixelsPerUnit > 0.0001f
-                    ? $"probe:    {ProbeHeight:F0} world units = {ProbeHeight * pixelsPerUnit:F0} px"
-                      + $"   (scale {pixelsPerUnit:F2} px per world unit)"
-                    : "probe:    scale unavailable - no character height to calibrate against");
+                Row("vitals", $"life {Show(vitals.Life)}   mana {Show(vitals.Mana)}   es {Show(vitals.EnergyShield)}");
             }
 
-            Chrome.Menu(WindowChrome.StatusId);
+            // Here rather than only on its page, because this is a number you watch while
+            // doing the thing it measures - a damage figure you have to open a window to read
+            // cannot tell you whether the pack you just hit died to that skill.
+            if (Damage is DamageMeter damage && damage.Measuring)
+            {
+                Row(
+                    "damage",
+                    $"{DamageWindow.Number(damage.Dps)} dps   peak {DamageWindow.Number(damage.Peak)}"
+                    + $"   {DamageWindow.Number(damage.Total)} this area",
+                    new Vector4(1f, 1f, 0.6f, 1f));
+            }
+
+            // Always shown, including when it failed: an omitted row looks like a feature that
+            // is not running, when it actually means a read gave up.
+            if (_snapshot.FlaskBelt is FlaskBelt belt && !belt.IsUnknown)
+            {
+                Row("belt", string.Join("   ", belt.Flasks.Select(f =>
+                    $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}"
+                    + (f.IsCharm ? " (charm)" : f.CanUse ? string.Empty : " (empty)"))));
+            }
+            else
+            {
+                Row("belt", "not read - run with --flasks for the chain", Bad);
+            }
+
+            if (FlaskStatus is not null)
+            {
+                Row("flask", FlaskStatus(), new Vector4(0.8f, 0.7f, 0.4f, 1f));
+            }
+
+            // The summary stays here even though the full list is a page of its own: the
+            // common case needs no page at all - the answer is one line and it is already on
+            // screen.
+            if (_preload is not null)
+            {
+                string here = _preload.Summary();
+                Row("loaded", here.Length > 0 ? here : $"{_preload.All.Count} files", Measured);
+            }
+
+            // WHICH ones, not just whether. The panels are found at unverified offsets and
+            // paths, and the way a wrong one fails is that something reads open forever and
+            // the markers never come back - which looks exactly like an overlay that broke.
+            // Named here, it is instead one line saying which panel to stop believing.
+            if (_snapshot.InAPanel)
+            {
+                Row("panels", _snapshot.Panels.ToString(), new Vector4(1f, 0.8f, 0.35f, 1f));
+            }
+
+            // Only when there is one. A path that does not work otherwise shows up as a
+            // marker drawn its ordinary way, which is exactly what not setting an icon looks
+            // like - so the setting appears to do nothing at all.
+            foreach (string problem in _icons.Files.Problems)
+            {
+                Row("icon", problem, Bad);
+            }
+
+            if (ShowDiagnostics)
+            {
+                DrawMeasurements(width, height);
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
+    }
+
+    /// <summary>
+    /// The rows that are only interesting while something is being worked out.
+    /// </summary>
+    /// <remarks>
+    /// BEHIND --debug, all of it, and that is a correction rather than a preference. Every row
+    /// here was written to settle a question - where the read's time goes, whether the terrain
+    /// heights line up, whether the projection still centres the player - and once settled
+    /// they are arithmetic nobody reads while playing. Left on, they were most of a readout
+    /// whose job is to answer "is it working" at a glance: a line reporting
+    /// "here ground 23 vs computed 23 (off by 0), texture 1932x1863" is a sentence you have to
+    /// stop and parse to learn that nothing is wrong.
+    /// </remarks>
+    private void DrawMeasurements(int width, int height)
+    {
+        // WHERE the read's time went, not just how much. One number says a frame was expensive
+        // and nothing about why, and an expensive phase is usually a redundancy rather than a
+        // fundamental cost - which only a breakdown shows.
+        if (_snapshot.Cost.TotalMs > 0)
+        {
+            Row("cost", _snapshot.Cost.ToString());
         }
 
-        ImGui.End();
+        Row("viewport", _tracked.IsValid
+            ? $"{width} x {height}   (game {_tracked.Width} x {_tracked.Height} @ {_tracked.X},{_tracked.Y})"
+            : $"{width} x {height}   (game window not tracked)");
+
+        // In the overlay rather than only in the config window, because this is read while
+        // standing on the hill that shows the problem - a readout that needs a second window
+        // open is a readout nobody is looking at in that moment.
+        if (ShowTerrain)
+        {
+            Row("terrain", DescribeTerrain(), new Vector4(0.65f, 0.7f, 0.78f, 1f));
+        }
+
+        if (_snapshot.Player is not WorldEntity player)
+        {
+            return;
+        }
+
+        Row("player", $"({player.WorldX:F0}, {player.WorldY:F0}, {player.WorldZ:F0})");
+
+        // The live projection sanity check: the camera follows the player, so this must sit at
+        // the screen centre. If it drifts, the matrix is wrong.
+        ScreenPoint p = WorldToScreen.Project(
+            _snapshot.Matrix, player.WorldX, player.WorldY, player.TerrainHeight, width, height);
+        double offCentre = WorldToScreen.OffCentreFraction(p, width, height);
+
+        // Centred ALONE is not proof: a matrix that blows w up collapses the whole scene onto
+        // the centre, so the player looks perfect while nothing else is drawable. Showing the
+        // scene's pixel spread next to it makes that failure visible instead of reassuring.
+        double spread = ScreenSpread(width, height);
+        bool healthy = offCentre < 0.15 && spread > width * 0.05;
+        Vector4 colour = healthy
+            ? new Vector4(0.4f, 1f, 0.4f, 1f)
+            : new Vector4(1f, 0.4f, 0.4f, 1f);
+
+        Row("projection", $"off-centre {offCentre:F3}   scene spread {spread:F0} px", colour);
+
+        // The same thing in pixels, which is what a screenshot can be measured against: how
+        // far the marker sits from the screen centre, and how tall the character is on screen,
+        // so the two are directly comparable.
+        ScreenPoint hb = WorldToScreen.Project(
+            _snapshot.Matrix, player.WorldX, player.WorldY, player.WorldZ, width, height);
+        Row(
+            "marker",
+            $"({p.X:F0}, {p.Y:F0})   centre ({width / 2}, {height / 2})"
+            + $"   delta ({p.X - (width / 2f):F0}, {p.Y - (height / 2f):F0}) px");
+        Row(
+            "character",
+            $"{Math.Abs(hb.Y - p.Y):F0} px tall"
+            + $"   (world z {player.WorldZ:F0} vs ground {player.TerrainHeight:F0})");
+
+        if (!healthy && spread <= width * 0.05)
+        {
+            Row(string.Empty, "scene collapsed - the matrix offset is wrong.", colour);
+        }
+    }
+
+    /// <summary>The switches with no page of their own.</summary>
+    /// <remarks>
+    /// One line each and every one of them is reached for mid-fight, which is why they sit
+    /// under the readout rather than on the appearance page: a switch you have to go to
+    /// another tab for is a switch you flip after the thing you wanted it for has happened.
+    /// </remarks>
+    private void DrawSwitches()
+    {
+        // Not a page like the rest: routing is done WHILE playing, so the picker keeps its own
+        // small window - see the note where it is drawn.
+        if (_poi is not null)
+        {
+            bool picking = _poi.ShowPicker;
+            if (ImGui.Checkbox("Points of interest", ref picking))
+            {
+                _poi.ShowPicker = picking;
+                SettingsChanged?.Invoke();
+            }
+        }
+
+        if (Noise is not null)
+        {
+            bool filtering = Noise.Enabled;
+            if (ImGui.Checkbox("Hide noise  (effects, pets, daemons - off to see everything)", ref filtering))
+            {
+                Noise.Enabled = filtering;
+                SettingsChanged?.Invoke();
+            }
+        }
+
+        if (Memory is not null)
+        {
+            bool remembering = Memory.Enabled;
+            if (ImGui.Checkbox(
+                    "Keep what is out of range  (places and drops the game has stopped listing)",
+                    ref remembering))
+            {
+                Memory.Enabled = remembering;
+                SettingsChanged?.Invoke();
+            }
+        }
+
+        bool hurtOnly = _healthBars.OnlyWhenHurt;
+        if (ImGui.Checkbox("Health bars only once hurt  (off shows every monster's)", ref hurtOnly))
+        {
+            _healthBars.OnlyWhenHurt = hurtOnly;
+            SettingsChanged?.Invoke();
+        }
+
+        bool behind = HideBehindPanels;
+        if (ImGui.Checkbox("Hide behind big panels  (stash, skill tree, atlas, world map)", ref behind))
+        {
+            HideBehindPanels = behind;
+            SettingsChanged?.Invoke();
+        }
+
+        bool labels = ShowLabels;
+        if (ImGui.Checkbox("Name labels beside the dots", ref labels))
+        {
+            ShowLabels = labels;
+            SettingsChanged?.Invoke();
+        }
+    }
+
+    /// <summary>The kind filter and the projection probe. Both are --debug work.</summary>
+    private void DrawMeasuringControls(int width, int height)
+    {
+        // The kind breakdown doubles as the filter, since "what is out there" and "what do I
+        // want drawn" are the same question asked twice. Note the ##id suffix: ImGui derives a
+        // control's identity from its label, so a label carrying a live count would be a NEW
+        // control every frame and the click would never register.
+        foreach (IGrouping<EntityKind, WorldEntity> group in
+                 _snapshot.Entities.GroupBy(e => e.Kind).OrderBy(g => g.Key.ToString(), StringComparer.Ordinal))
+        {
+            bool drawn = DrawnKinds.Contains(group.Key);
+            if (ImGui.Checkbox($"{group.Key,-12} {group.Count()}##kind{group.Key}", ref drawn))
+            {
+                if (drawn)
+                {
+                    DrawnKinds.Add(group.Key);
+                }
+                else
+                {
+                    DrawnKinds.Remove(group.Key);
+                }
+            }
+        }
+
+        bool calibration = ShowCalibration;
+        if (ImGui.Checkbox("Calibration aids  (screen centre and both candidate heights)", ref calibration))
+        {
+            ShowCalibration = calibration;
+        }
+
+        if (!ShowCalibration || _snapshot.Player is not WorldEntity subject)
+        {
+            return;
+        }
+
+        // Drag until the marker sits on the X the game's own map draws at the player's
+        // position, then read the number off. Reported in BOTH units because that is what
+        // separates the possible causes: a round world height means the wrong height is being
+        // fed in, while a value that only makes sense in pixels means the error is in screen
+        // space.
+        ImGui.SetNextItemWidth(180);
+        float probe = ProbeHeight;
+        if (ImGui.DragFloat("probe height", ref probe, 0.5f, -200f, 200f, "%.0f world units"))
+        {
+            ProbeHeight = probe;
+        }
+
+        ImGui.SameLine();
+        if (ImGui.SmallButton("reset"))
+        {
+            ProbeHeight = 0;
+        }
+
+        // The character's own height calibrates world units against pixels: the two rings are
+        // exactly its Render z above the ground.
+        float characterUnits = Math.Abs(subject.ModelBoundsZ);
+        ScreenPoint top = WorldToScreen.Project(
+            _snapshot.Matrix, subject.WorldX, subject.WorldY, subject.HealthBarZ, width, height);
+        ScreenPoint bottom = ProjectGround(subject, width, height);
+        float pixelsPerUnit = characterUnits > 0.01f
+            ? Math.Abs(top.Y - bottom.Y) / characterUnits
+            : 0f;
+
+        ImGui.TextUnformatted(pixelsPerUnit > 0.0001f
+            ? $"probe    {ProbeHeight:F0} world units = {ProbeHeight * pixelsPerUnit:F0} px"
+              + $"   (scale {pixelsPerUnit:F2} px per world unit)"
+            : "probe    scale unavailable - no character height to calibrate against");
     }
 
     /// <summary>
