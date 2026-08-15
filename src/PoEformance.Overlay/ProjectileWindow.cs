@@ -20,6 +20,7 @@ namespace PoEformance.Overlay;
 public sealed class ProjectileWindow
 {
     private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 WarnText = new(1f, 0.7f, 0.35f, 1f);
     private static readonly Vector4 MineText = new(0.4f, 0.88f, 1f, 1f);
     private static readonly Vector4 OtherText = new(1f, 0.55f, 0.4f, 1f);
 
@@ -51,6 +52,22 @@ public sealed class ProjectileWindow
         {
             _layer.Enabled = drawing;
             _changed();
+        }
+
+        // Said next to the switch that carries it, because it is the one control here with a
+        // price. The game files projectiles as visual entities and the reader skips those, so
+        // this switch turns the entity walk's own filter off as well - there is no way to see
+        // a projectile without paying for that.
+        if (drawing)
+        {
+            ImGui.TextColored(
+                WarnText,
+                "    this also makes the reader read the game's VISUAL entities, which is where"
+                + " projectiles are:");
+            ImGui.TextColored(
+                WarnText,
+                "    a recorded Spark session ran 17 gameplay entities against 51 visuals."
+                + " Watch the Read cost tab.");
         }
 
         ImGui.SameLine();
@@ -121,10 +138,16 @@ public sealed class ProjectileWindow
 
         if (sorts.Count == 0)
         {
-            // Both halves said, because they want different next steps and look identical from
-            // here: nothing being listed and nothing being CLASSIFIED as a projectile are not
-            // the same problem, and the second one is answered on the effects tab, where every
-            // entity nothing else recognises still turns up with its path.
+            // Three different problems that look identical from here, in the order they are
+            // worth checking. The first was the real one for a day: the switch above was off,
+            // so the reader never listed a projectile and no amount of casting could change it.
+            if (!_layer.Enabled)
+            {
+                ImGui.TextColored(
+                    DimText, "nothing is being read - tick \"draw them over the game\" above.");
+                return;
+            }
+
             ImGui.TextColored(DimText, "nothing right now - cast something.");
             ImGui.TextColored(
                 DimText,

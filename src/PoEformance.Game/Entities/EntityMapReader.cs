@@ -28,6 +28,20 @@ public sealed class EntityMapReader
     /// Entity ids at or above this are visuals and decorations, not gameplay entities.
     /// (The C# reference calls this filter IgnoreVisualsAndDecorations.)
     /// </summary>
+    /// <remarks>
+    /// AND PROJECTILES ARE AMONG THEM, which cost a day to establish and is written down so
+    /// nobody spends a second one. A recording of a Spark build casting for twenty seconds -
+    /// a screen solid with lightning - held 68 nodes per frame in this tree and yielded 17
+    /// entities: the player, three markers, a drop and the monsters. Everything the skill put
+    /// on the screen was in the other 51, thrown away here before a single component was read.
+    /// Nothing downstream could see them, so a projectile overlay drew nothing and the effects
+    /// list showed three doors.
+    ///
+    /// The reference filters them by default too, and gives itself a way back in:
+    /// <c>ProcessAllRenderableEntities</c>, against <c>EntityFilter.IgnoreVisualsAndDecorations</c>.
+    /// Its own note on the neighbouring list says what these are - "Decorations, Effects,
+    /// particles and etc." - and a projectile in flight is exactly that sort of object.
+    /// </remarks>
     public const uint MaxRealEntityId = 0x40000000;
 
     /// <summary>Bytes covering Left..ValueEntityPtr, read in one go per node.</summary>
@@ -64,8 +78,15 @@ public sealed class EntityMapReader
     /// ADDRESS of the std::map struct - e.g. AreaInstance + AwakeEntities - not a pointer
     /// read from it). Returns id -> entity address.
     /// </summary>
-    /// <param name="maxEntities">Hard cap on results, protecting against a corrupt tree.</param>
-    public Dictionary<uint, ulong> ReadEntityPointers(ulong mapStructAddress, int maxEntities = 4096)
+    /// <param name="maxEntities">
+    /// Hard cap on GAMEPLAY entities, protecting against a corrupt tree. Visuals do not count
+    /// against it - see <paramref name="includeVisuals"/>.
+    /// </param>
+    /// <param name="includeVisuals">
+    /// Keep the high-id entities as well: the effects, the decorations and the projectiles.
+    /// </param>
+    public Dictionary<uint, ulong> ReadEntityPointers(
+        ulong mapStructAddress, int maxEntities = 4096, bool includeVisuals = false)
     {
         var result = new Dictionary<uint, ulong>();
         if (!MemoryReaderExtensions.IsPlausiblePointer(mapStructAddress))
@@ -94,7 +115,16 @@ public sealed class EntityMapReader
         long visitBudget = Math.Min((size * 2) + 20, 8000);
         var nodeBuffer = new byte[NodeReadSize];
 
-        while (queue.Count > 0 && visited.Count < visitBudget && result.Count < maxEntities)
+        // Counted apart from the results, and that is the whole point of it. The walk is
+        // breadth-first, so which node comes next is a fact about the tree's shape rather than
+        // about what matters - and with the visuals let in they outnumber the gameplay
+        // entities three to one. Counted together, a cap of 512 would be reached by a screen
+        // of sparks and the monsters behind them would silently stop being read. So the budget
+        // belongs to the entities the cap was written for; the visuals ride along inside the
+        // visit budget, which bounds the walk itself.
+        int gameplay = 0;
+
+        while (queue.Count > 0 && visited.Count < visitBudget && gameplay < maxEntities)
         {
             ulong node = queue.Dequeue();
             if (node == head || !MemoryReaderExtensions.IsPlausiblePointer(node) || !visited.Add(node))
@@ -114,10 +144,15 @@ public sealed class EntityMapReader
             uint entityId = BitConverter.ToUInt32(span[_nodeKeyId..]);
             ulong entityPtr = BitConverter.ToUInt64(span[_nodeValue..]);
 
-            if (entityId > 0 && entityId < MaxRealEntityId
+            bool real = entityId > 0 && entityId < MaxRealEntityId;
+            if ((real || (includeVisuals && entityId > 0))
                 && MemoryReaderExtensions.IsPlausiblePointer(entityPtr))
             {
                 result[entityId] = entityPtr;
+                if (real)
+                {
+                    gameplay++;
+                }
             }
 
             if (left != head && MemoryReaderExtensions.IsPlausiblePointer(left))

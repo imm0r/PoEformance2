@@ -97,6 +97,48 @@ public class EntityMapReaderTests
     }
 
     [Fact]
+    public void Walk_KeepsTheVisualsWhenAskedTo()
+    {
+        // Because a projectile is one of them. Everything a skill puts on the screen is filed
+        // above the threshold, so with the filter on no projectile can reach a snapshot at all,
+        // however it is classified afterwards.
+        OffsetSchema schema = LoadSchema();
+        FakeMemoryReader fake = NewMap(schema, size: 2, root: NodeAt(0));
+        PlaceNode(fake, schema, 0, NodeAt(1), Head, 100, 0x50_0000);
+        PlaceNode(fake, schema, 1, Head, Head, EntityMapReader.MaxRealEntityId + 5, 0x51_0000);
+
+        Dictionary<uint, ulong> found = new EntityMapReader(fake, schema)
+            .ReadEntityPointers(MapStruct, includeVisuals: true);
+
+        Assert.Equal(2, found.Count);
+        Assert.Equal(0x51_0000UL, found[EntityMapReader.MaxRealEntityId + 5]);
+    }
+
+    [Fact]
+    public void Walk_NeverLetsTheVisualsCrowdOutAGameplayEntity()
+    {
+        // The cap counts gameplay entities only. Counted together, a screen of sparks would
+        // spend a cap of two on itself and the monsters behind them would silently stop being
+        // read - and the walk is breadth-first, so WHICH ones survive would be a fact about the
+        // tree's shape rather than about what matters.
+        OffsetSchema schema = LoadSchema();
+        FakeMemoryReader fake = NewMap(schema, size: 5, root: NodeAt(0));
+
+        // Three visuals in front of two real entities, in the order the walk reaches them.
+        PlaceNode(fake, schema, 0, NodeAt(1), NodeAt(2), EntityMapReader.MaxRealEntityId + 1, 0x50_0000);
+        PlaceNode(fake, schema, 1, NodeAt(3), Head, EntityMapReader.MaxRealEntityId + 2, 0x51_0000);
+        PlaceNode(fake, schema, 2, NodeAt(4), Head, EntityMapReader.MaxRealEntityId + 3, 0x52_0000);
+        PlaceNode(fake, schema, 3, Head, Head, 100, 0x53_0000);
+        PlaceNode(fake, schema, 4, Head, Head, 101, 0x54_0000);
+
+        Dictionary<uint, ulong> found = new EntityMapReader(fake, schema)
+            .ReadEntityPointers(MapStruct, maxEntities: 2, includeVisuals: true);
+
+        Assert.True(found.ContainsKey(100));
+        Assert.True(found.ContainsKey(101));
+    }
+
+    [Fact]
     public void Walk_SurvivesACyclicTree_WithoutHanging()
     {
         // The decisive robustness test: the tree is live and can be read mid-mutation, so a

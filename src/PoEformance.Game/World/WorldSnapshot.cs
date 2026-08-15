@@ -366,6 +366,25 @@ public sealed class WorldReader
     /// in the game and every one of them costs a component read.
     /// </remarks>
     public bool KeepEffects { get; set; }
+
+    /// <summary>
+    /// Read the game's visual entities too - which is where the projectiles are.
+    /// </summary>
+    /// <remarks>
+    /// The game keys its entity map by id and files everything from 0x40000000 up as a visual:
+    /// decorations, effects, and every projectile in flight. <see cref="EntityMapReader"/>
+    /// drops those before their path is read, so with this off no projectile can reach a
+    /// snapshot however it is classified afterwards - which is what an overlay that drew
+    /// nothing over a screen of Spark turned out to be.
+    ///
+    /// OFF by default and it costs what it says. A recorded Spark session ran 17 gameplay
+    /// entities against 51 visuals per frame, so this roughly quadruples what the entity walk
+    /// looks at. Most of the extra are engine nodes the noise filter refuses on their path
+    /// alone, before the expensive component walk - so the cost is far below four times the
+    /// read, and it is real. The read-cost breakdown is where to look at it rather than guess:
+    /// the entities figure is the one that moves.
+    /// </remarks>
+    public bool ReadVisualEntities { get; set; }
     private readonly GroundItemReader _groundItems;
     private readonly MinimapIconReader _mapIcons;
     private LandmarkNames _landmarkNames = LandmarkNames.Empty;
@@ -622,7 +641,8 @@ public sealed class WorldReader
 
         ulong mapStruct = chain.AreaInstance + (ulong)_awakeEntities;
         long entitiesFrom = System.Diagnostics.Stopwatch.GetTimestamp();
-        Dictionary<uint, ulong> pointers = _map.ReadEntityPointers(mapStruct, maxEntities);
+        Dictionary<uint, ulong> pointers =
+            _map.ReadEntityPointers(mapStruct, maxEntities, ReadVisualEntities);
         int skipped = 0;
 
         var entities = new List<WorldEntity>(pointers.Count);

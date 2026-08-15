@@ -68,6 +68,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public Action<bool>? KeepEffects { get; set; }
 
     /// <summary>
+    /// Tells the reader whether to read the game's visual entities, where the projectiles are.
+    /// </summary>
+    /// <remarks>
+    /// Driven by the projectile layer rather than offered as a switch of its own, and that is
+    /// one decision rather than two on purpose. Without it no projectile reaches a snapshot at
+    /// all - see <see cref="WorldReader.ReadVisualEntities"/> - so a separate switch would be a
+    /// second thing to find before the first one did anything, which is exactly the overlay
+    /// that drew nothing over a screen of Spark. Turning the layer off takes the read cost with
+    /// it, so nobody pays for a feature they are not looking at.
+    /// </remarks>
+    public Action<bool>? ReadVisuals { get; set; }
+
+    /// <summary>
     /// How every drawn thing looks - colours, sizes, line widths, and whether it is drawn.
     /// </summary>
     /// <remarks>
@@ -1068,6 +1081,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // reader guessing at a window it cannot see. Kept ahead of the foreground gate so
         // the viewport stays current while hidden - the game can be resized from a
         // borderless-window setting change without ever giving up focus.
+        // Kept in step every frame rather than on the switch being moved, because the switch
+        // moves from three places - the tab, the settings being applied, a future page - and
+        // one thing that syncs cannot drift out of step the way three callers can. It costs a
+        // delegate call and a bool.
+        ReadVisuals?.Invoke(_projectiles.Enabled);
+
         _snapshot = _snapshotSource(new UiScale(width, height, _cull));
 
         // Nothing is drawn unless the game - or one of OUR windows - is in front. Not
