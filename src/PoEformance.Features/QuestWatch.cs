@@ -22,10 +22,11 @@ public sealed class QuestWatch
     private QuestOutlook _outlook = QuestOutlook.Nothing("not read yet");
     private LoadedTable? _quests;
     private LoadedTable? _states;
-    private LoadedTable? _flags;
+    private LoadedTable? _flagTable;
     private QuestTableLayouts? _layouts;
     private string _opening = string.Empty;
     private bool _tried;
+    private int _flags;
 
     /// <summary>The last reading, safe to take from any thread.</summary>
     public QuestOutlook Outlook
@@ -46,7 +47,27 @@ public sealed class QuestWatch
         {
             lock (_gate)
             {
-                return _quests is not null && _states is not null && _flags is not null;
+                return _quests is not null && _states is not null && _flagTable is not null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// How many flags the last read found, whether or not the tables opened.
+    /// </summary>
+    /// <remarks>
+    /// Kept apart from the outlook because the two fail independently, and a run where the
+    /// flags read fine and a table did not is the one that needs telling apart from a run
+    /// where nothing resolved at all. It is also what makes a --record session of a failed
+    /// load worth anything: the reads happen either way, so the recording carries the set.
+    /// </remarks>
+    public int Flags
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _flags;
             }
         }
     }
@@ -95,7 +116,7 @@ public sealed class QuestWatch
             var said = new List<string>();
             (_quests, string why1) = QuestTables.Open(files, _layouts, "Quest");
             (_states, string why2) = QuestTables.Open(files, _layouts, "QuestStates");
-            (_flags, string why3) = QuestTables.Open(files, _layouts, "QuestFlags");
+            (_flagTable, string why3) = QuestTables.Open(files, _layouts, "QuestFlags");
             said.Add(why1);
             said.Add(why2);
             said.Add(why3);
@@ -115,12 +136,14 @@ public sealed class QuestWatch
 
         lock (_gate)
         {
-            if (_quests is null || _states is null || _flags is null || _layouts is null)
+            _flags = setFlags.Count;
+
+            if (_quests is null || _states is null || _flagTable is null || _layouts is null)
             {
                 return;
             }
 
-            _outlook = QuestProgress.Read(_quests, _states, _flags, _layouts, setFlags);
+            _outlook = QuestProgress.Read(_quests, _states, _flagTable, _layouts, setFlags);
         }
     }
 
@@ -129,9 +152,9 @@ public sealed class QuestWatch
     {
         lock (_gate)
         {
-            return _flags is null || _layouts is null
+            return _flagTable is null || _layouts is null
                 ? string.Empty
-                : QuestProgress.FlagId(_flags, _layouts, row);
+                : QuestProgress.FlagId(_flagTable, _layouts, row);
         }
     }
 }

@@ -835,7 +835,11 @@ internal static class Program
                 // The flag set, about once a second. Reading it is a handful of reads, but
                 // the JOIN behind it walks a few thousand quest states, and a quest step does
                 // not change between two frames of anything.
-                if (quests.Ready && snapshot.ServerData != 0
+                // NOT gated on the tables having opened. The flags are a handful of reads and
+                // they are the half that comes out of the process, so a --record session of a
+                // run where a table failed still carries them - which is exactly the session
+                // somebody wants to look at afterwards.
+                if (snapshot.ServerData != 0
                     && Environment.TickCount64 - questsRead >= QuestFlagIntervalMs)
                 {
                     questsRead = Environment.TickCount64;

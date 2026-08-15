@@ -138,12 +138,14 @@ public sealed record LoadedTable(DatFile File, string Where, int Expected)
 /// Finds and opens the three quest tables out of the game install.
 /// </summary>
 /// <remarks>
-/// THE PATHS ARE PROBED, not assumed. The only quest-table path this project has ever seen is
-/// the one the client holds in memory - "Data/Balance/QuestFlags.dat" - and whether the other
-/// two sit beside it, or directly under Data/, is not something a recording can answer. So
-/// every candidate is asked of the bundle index, which costs a hash lookup each, and the one
-/// that exists is reported. A wrong guess then reads as "not found here, looked in these
-/// places" instead of as a feature that does nothing.
+/// THE PATHS ARE PROBED, not assumed - and the probing has now answered. All three sit under
+/// <c>data/balance/</c> with the <c>.datc64</c> extension, observed on a real install: quest,
+/// queststates (1477 rows) and questflags (5717 rows). That matches the only path this project
+/// had ever seen, the in-memory "Data/Balance/QuestFlags.dat", and it is why the observed one
+/// is tried FIRST rather than last.
+///
+/// The other candidates stay, because a patch that moves them should cost a line in the
+/// readout rather than a feature that silently does nothing. Each costs one hash lookup.
 /// </remarks>
 public static class QuestTables
 {
@@ -152,10 +154,11 @@ public static class QuestTables
     {
         ArgumentException.ThrowIfNullOrEmpty(table);
 
-        yield return $"data/{table.ToLowerInvariant()}.datc64";
-        yield return $"data/{table.ToLowerInvariant()}.dat";
+        // Observed on a real install, so first.
         yield return $"data/balance/{table.ToLowerInvariant()}.datc64";
         yield return $"data/balance/{table.ToLowerInvariant()}.dat";
+        yield return $"data/{table.ToLowerInvariant()}.datc64";
+        yield return $"data/{table.ToLowerInvariant()}.dat";
     }
 
     /// <summary>Opens one table, saying where it looked when it fails.</summary>

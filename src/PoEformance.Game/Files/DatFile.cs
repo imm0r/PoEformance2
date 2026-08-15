@@ -88,23 +88,34 @@ public sealed class DatFile
             return null;
         }
 
-        // The FIRST separator, scanned on the eight-byte grid the rows themselves sit on.
-        // A row could hold these bytes as data, which is why the row size it implies is
-        // checked for divisibility rather than taken on trust.
-        for (int at = 4; at + 8 <= bytes.Length; at += 4)
+        // EVERY byte offset, not every fourth. Rows are PACKED - Quest.dat's is 103 bytes -
+        // so the separator lands wherever the rows end and is under no obligation to be
+        // aligned to anything. Scanning on the four-byte grid found QuestStates (208) and
+        // QuestFlags (12) and walked straight past Quest, which reported "in the install but
+        // did not parse" - a wrong answer that looked like a missing file.
+        //
+        // A row could hold these bytes as data, so the row size the position implies is
+        // checked for divisibility rather than taken on trust, and the search carries on when
+        // it does not divide.
+        Span<byte> separator = stackalloc byte[8];
+        BinaryPrimitives.WriteUInt64LittleEndian(separator, Separator);
+
+        for (int from = 4; from + 8 <= bytes.Length;)
         {
-            if (BinaryPrimitives.ReadUInt64LittleEndian(bytes.AsSpan(at)) != Separator)
+            int found = bytes.AsSpan(from).IndexOf(separator);
+            if (found < 0)
             {
-                continue;
+                return null;
             }
 
+            int at = from + found;
             int fixedBytes = at - 4;
-            if (fixedBytes <= 0 || fixedBytes % rows != 0)
+            if (fixedBytes > 0 && fixedBytes % rows == 0)
             {
-                continue;
+                return new DatFile(bytes, rows, fixedBytes / rows, at);
             }
 
-            return new DatFile(bytes, rows, fixedBytes / rows, at);
+            from = at + 1;
         }
 
         return null;
