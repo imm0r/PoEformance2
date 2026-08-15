@@ -102,6 +102,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _unwalked.Style = value;
             _heat.Style = value;
             _healthBars.Style = value;
+            _projectiles.Style = value;
             _atlas.Style = value;
         }
     }
@@ -153,6 +154,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ShowLabels = settings.DotLabels;
         _healthBars.OnlyWhenHurt = settings.HealthBarsOnlyWhenHurt;
         HideBehindPanels = settings.HideBehindPanels;
+        _projectiles.Enabled = settings.ShowProjectiles;
+        _projectiles.ShowTrails = settings.ProjectileTrails;
+        _projectiles.ShowPaths = settings.ProjectilePaths;
+        _projectiles.MineOnly = settings.ProjectilesMineOnly;
         Chrome.Apply(settings.WindowsOrEmpty);
 
         if (Noise is not null)
@@ -192,6 +197,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             DotLabels = ShowLabels,
             HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
             HideBehindPanels = HideBehindPanels,
+            ShowProjectiles = _projectiles.Enabled,
+            ProjectileTrails = _projectiles.ShowTrails,
+            ProjectilePaths = _projectiles.ShowPaths,
+            ProjectilesMineOnly = _projectiles.MineOnly,
             Windows = Chrome.Saved(),
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
             RememberOutOfRange = Memory?.Enabled ?? basis.RememberOutOfRange,
@@ -237,6 +246,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     // somebody talks to that window, and here nobody does.
     private CostWindow? _costWindow;
     private EffectWindow? _effectWindow;
+    private ProjectileWindow? _projectileWindow;
     private DamageWindow? _damageWindow;
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
@@ -248,6 +258,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly HeatLayer _heat = new();
     private readonly EffectLayer _effects = new();
     private readonly HealthBarLayer _healthBars = new();
+
+    // The trails belong to the LAYER's question rather than the reader's, so they are kept
+    // here: a projectile's path across the screen is something only a thing that sees every
+    // snapshot in order can assemble, and the reader hands out one snapshot at a time.
+    private readonly ProjectileLayer _projectiles = new();
+    private readonly ProjectileWatch _projectileWatch = new();
     private readonly AtlasLayer _atlas = new();
     private AtlasWatch? _atlasWatch;
     private readonly RitualLayer _ritual = new();
@@ -1128,6 +1144,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     ScreenPoint point = ProjectGround(entity, width, height);
                     return (point.OnScreen, point.X, point.Y);
                 });
+
+            // LAST of the world-space layers, so it lands on top of them. A projectile is the
+            // only thing drawn here that is gone within half a second, which makes it the one
+            // thing that cannot afford to be underneath something standing still.
+            //
+            // Followed on THIS thread, and only while it is being drawn. Where a projectile
+            // has been is a drawing question - it turns a mark that blinks into a direction -
+            // and nothing else in the tool asks it. A snapshot redrawn at VSync extends no
+            // trail, because the watch appends only where the position CHANGED; see
+            // ProjectileWatch.
+            if (_projectiles.Enabled)
+            {
+                _projectileWatch.Update(_snapshot, Environment.TickCount64);
+                _projectiles.Draw(
+                    ImGui.GetBackgroundDrawList(), _snapshot, _projectileWatch, width, height);
+            }
         }
 
         // OUTSIDE the marker gate above, which only lets things through in a hostile area.
@@ -1174,6 +1206,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
 
             _costWindow.CurrentArea = _snapshot.AreaHash;
+        }
+
+        // Registered here rather than at attach because nothing attaches it: the layer and its
+        // watch are owned by this class, so the tab exists the first time a frame is drawn.
+        if (_projectileWindow is null)
+        {
+            var made = new ProjectileWindow(
+                _projectiles, _projectileWatch, () => SettingsChanged?.Invoke());
+            _projectileWindow = made;
+            _tools.Add(35, "projectiles", "Projectiles", () => made.DrawTab(_snapshot));
         }
 
         // The same first-use registration, and for the same reason: the two callbacks it needs

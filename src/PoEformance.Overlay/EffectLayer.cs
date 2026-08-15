@@ -86,7 +86,7 @@ public sealed class EffectLayer
 
             if (ShowPaths)
             {
-                draw.AddText(at + new Vector2(9f, -6f), packed, Tail(entity.Path));
+                draw.AddText(at + new Vector2(9f, -6f), packed, ImGuiText.Tail(entity.Path));
             }
 
             if (++drawn >= MostMarks)
@@ -100,28 +100,4 @@ public sealed class EffectLayer
         => entity.Kind == EntityKind.Unknown ? NodeMark
             : entity.IsFriendly ? FriendlyMark
             : HostileMark;
-
-    /// <summary>
-    /// The last two segments of a metadata path, which is the part that says what it is.
-    /// </summary>
-    /// <remarks>
-    /// The whole path is a line of text per entity across a screen that may hold hundreds, and
-    /// the prefix is the same on all of them. The browser has the full one for when it matters.
-    /// </remarks>
-    private static string Tail(string path)
-    {
-        if (path.Length == 0)
-        {
-            return "(no path)";
-        }
-
-        int last = path.LastIndexOf('/');
-        if (last <= 0)
-        {
-            return path;
-        }
-
-        int before = path.LastIndexOf('/', last - 1);
-        return before < 0 ? path[(last + 1)..] : path[(before + 1)..];
-    }
 }

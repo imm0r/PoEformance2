@@ -24,6 +24,14 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("dotLabels")] bool DotLabels = false,
     [property: JsonPropertyName("healthBarsOnlyWhenHurt")] bool HealthBarsOnlyWhenHurt = false,
     [property: JsonPropertyName("hideBehindPanels")] bool HideBehindPanels = true,
+
+    // The projectile marks. On by default, because unlike the effect and terrain debug
+    // layers this is a playing feature: it costs nothing extra to read - a projectile is
+    // an entity the reader already walks past - and what it draws is small and brief.
+    [property: JsonPropertyName("showProjectiles")] bool ShowProjectiles = true,
+    [property: JsonPropertyName("projectileTrails")] bool ProjectileTrails = true,
+    [property: JsonPropertyName("projectilePaths")] bool ProjectilePaths = false,
+    [property: JsonPropertyName("projectilesMineOnly")] bool ProjectilesMineOnly = false,
     [property: JsonPropertyName("windows")] IReadOnlyDictionary<string, WindowRule>? Windows = null)
 {
     /// <summary>What each window was told, by the window's own id. Empty until somebody says.</summary>
