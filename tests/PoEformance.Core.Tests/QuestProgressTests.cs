@@ -52,6 +52,50 @@ public class QuestProgressTests
         Assert.Equal(12, file.RowSize);
     }
 
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(103)]
+    public void ASeparatorIsFoundWhereverThePackedRowsHappenToEnd(int rowSize)
+    {
+        // WHAT THIS COST, live: the scan stepped four bytes at a time, which found QuestStates
+        // (208 per row) and QuestFlags (12) and walked straight past Quest, whose row is 103
+        // bytes - so the separator sat at an offset no multiple of four could reach. It
+        // reported "in the install but did not parse", which reads like a missing file rather
+        // than like a reader that could not see it. Rows are PACKED; nothing is aligned.
+        byte[] bytes = Dat(7, rowSize, (_, _) => { }, new byte[16]);
+
+        DatFile? file = DatFile.Parse(bytes);
+
+        Assert.NotNull(file);
+        Assert.Equal(7, file.Rows);
+        Assert.Equal(rowSize, file.RowSize);
+    }
+
+    [Fact]
+    public void ASeparatorInsideARowIsSteppedOverRatherThanBelieved()
+    {
+        // A row is free to hold these bytes as data. The divisibility check is what tells the
+        // two apart, and the search has to CARRY ON when it fails rather than give up.
+        byte[] bytes = Dat(4, 9, (b, at) =>
+        {
+            if (at == 4)
+            {
+                // Row 0 holds an 0xBB run at a position no row boundary could explain.
+                for (var i = 0; i < 8; i++)
+                {
+                    b[at + 1 + i] = 0xBB;
+                }
+            }
+        }, new byte[16]);
+
+        DatFile? file = DatFile.Parse(bytes);
+
+        Assert.NotNull(file);
+        Assert.Equal(9, file.RowSize);
+    }
+
     [Fact]
     public void AStringColumnIsAnOffsetIntoTheVariableSection()
     {
