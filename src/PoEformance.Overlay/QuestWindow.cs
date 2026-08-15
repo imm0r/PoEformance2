@@ -69,18 +69,16 @@ public sealed class QuestWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, $"of {outlook.Quests.Count}");
 
-        // THE NUMBER THAT SAYS WHETHER THE READ IS RIGHT. The data intends exactly one step to
-        // hold per quest - a later one asks for flags an earlier one lacks, and FlagsMissing
-        // rules out the ones already passed. Several holding means a condition is not being
-        // read, and the symptom is a plausible objective from the wrong step, which is
-        // indistinguishable from a correct one unless this is on screen.
+        // Ordinary rather than alarming: most states declare only the flags that must be
+        // PRESENT, so every step already passed goes on holding and the furthest along is the
+        // answer. Kept on screen because a sudden jump in it is what a mis-read condition
+        // column would look like, and that is worth noticing on the day it happens.
         int ambiguous = outlook.Ambiguous.Count();
         if (ambiguous > 0)
         {
             ImGui.TextColored(
-                WarnText,
-                $"{ambiguous} quests have more than one step holding - the conditions are not"
-                + " separating them, so the objective shown may be the wrong step");
+                DimText,
+                $"{ambiguous} quests have several steps holding - normal, the furthest along is shown");
         }
 
         ImGui.Checkbox("finished too", ref _done);
