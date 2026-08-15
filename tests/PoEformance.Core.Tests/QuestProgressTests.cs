@@ -107,6 +107,34 @@ public class QuestProgressTests
     }
 
     [Fact]
+    public void AColumnListThatIsRightAboutItsFrontIsCheckedByReading()
+    {
+        // THE LIVE CASE. Quest.datc64 is 119 bytes where the community schema computes 103 -
+        // one 16-byte column added somewhere - but both of that schema's variants agree on the
+        // first four columns, and Id, Act and Name are three of them. Rejecting the table over
+        // its tail lost every quest's name, so a size mismatch now asks the table whether the
+        // fields being read hold what they should.
+        byte[] text = System.Text.Encoding.Unicode.GetBytes("The Runeseeker\0");
+        byte[] bytes = Dat(8, 24, (b, at) => BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + 12), 8), text);
+
+        DatFile file = DatFile.Parse(bytes)!;
+
+        Assert.True(file.ReadsAsText([12]));        // where the schema says Name is
+        Assert.False(file.ReadsAsText([0]));        // and where it is not
+    }
+
+    [Fact]
+    public void AFailedCheckSaysWhereTheStringsActuallyAre()
+    {
+        // So a layout that stopped matching reports where its columns went, instead of only
+        // that it failed - which is the difference between one round trip and several.
+        byte[] text = System.Text.Encoding.Unicode.GetBytes("EnteredHideout\0");
+        byte[] bytes = Dat(8, 24, (b, at) => BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + 4), 8), text);
+
+        Assert.Contains(4, DatFile.Parse(bytes)!.TextOffsets());
+    }
+
+    [Fact]
     public void AReferenceAnswersWithWhicheverHalfIsARow()
     {
         // Which of the two 64-bit words is the row is not written down anywhere this project

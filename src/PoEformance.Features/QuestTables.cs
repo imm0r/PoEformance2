@@ -115,23 +115,49 @@ public sealed partial class QuestTableJsonContext : JsonSerializerContext;
 /// <summary>A table that was found and opened, with the check that it is the right shape.</summary>
 /// <param name="Where">The path it came from, for the readout.</param>
 /// <param name="Expected">The row size the column list computes.</param>
-public sealed record LoadedTable(DatFile File, string Where, int Expected)
+/// <param name="Verified">
+/// True when the columns this reader actually reads were checked against the table itself, by
+/// reading them. Only consulted when the row size disagrees.
+/// </param>
+/// <param name="Strings">Where the table's strings really are, reported when the size disagrees.</param>
+public sealed record LoadedTable(
+    DatFile File, string Where, int Expected, bool Verified = false, IReadOnlyList<int>? Strings = null)
 {
     /// <summary>
     /// True when the file's own row size matches the one the columns compute.
     /// </summary>
     /// <remarks>
-    /// The whole reason the file is preferred over a declared layout: a .dat says how big its
-    /// rows are, by where it puts the separator. Disagreement means the column list is for a
-    /// different version of the table, and every field read through it would be silently
-    /// wrong - so it is reported and the table is not used.
+    /// A .dat says how big its rows are, by where it puts the separator, so this is a real
+    /// check on the column list and not a formality.
     /// </remarks>
     public bool Agrees => Expected > 0 && File.RowSize == Expected;
 
-    /// <summary>One line about what was found, whether or not it agreed.</summary>
+    /// <summary>
+    /// Whether the table can be read - by agreeing on size, or by the fields being checked.
+    /// </summary>
+    /// <remarks>
+    /// ALL-OR-NOTHING WAS TOO STRICT, and the live Quest table is why. It is 119 bytes where
+    /// the community schema computes 103, so one 16-byte column has been added somewhere - but
+    /// BOTH of that schema's variants agree on the first four columns, and Id, Act and Name are
+    /// three of them. Rejecting the table lost a quest's name over a disagreement about its
+    /// tail. So a size mismatch now asks the table itself whether the fields being read hold
+    /// what they should, and a column list that is one patch out of date in its tail keeps
+    /// working for its front.
+    /// </remarks>
+    public bool Usable => Agrees || Verified;
+
+    /// <summary>One line about what was found, and on what grounds it is being used.</summary>
     public string Say => Agrees
         ? $"{Where}: {File.Rows} rows of {File.RowSize} bytes"
-        : $"{Where}: {File.Rows} rows of {File.RowSize} bytes, but the column list computes {Expected} - NOT USED";
+        : Verified
+            ? $"{Where}: {File.Rows} rows of {File.RowSize} bytes against the column list's {Expected}"
+                + " - the tail differs, the fields read here were checked and hold"
+            : $"{Where}: {File.Rows} rows of {File.RowSize} bytes, the column list computes {Expected},"
+                + $" and the fields read here do not hold - NOT USED. Strings are at {Offsets}";
+
+    private string Offsets => Strings is { Count: > 0 }
+        ? string.Join(", ", Strings.Take(8).Select(o => $"+{o}"))
+        : "no offset in the row reads as text";
 }
 
 /// <summary>
@@ -162,11 +188,16 @@ public static class QuestTables
     }
 
     /// <summary>Opens one table, saying where it looked when it fails.</summary>
+    /// <param name="mustReadAsText">
+    /// String columns this reader depends on. When the row size disagrees, these are read
+    /// across the table and the layout is accepted only if they hold text.
+    /// </param>
     public static (LoadedTable? Table, string Why) Open(
-        GameFiles files, QuestTableLayouts layouts, string table)
+        GameFiles files, QuestTableLayouts layouts, string table, params string[] mustReadAsText)
     {
         ArgumentNullException.ThrowIfNull(files);
         ArgumentNullException.ThrowIfNull(layouts);
+        ArgumentNullException.ThrowIfNull(mustReadAsText);
 
         int expected = layouts.RowSizeOf(table);
         foreach (string path in Candidates(table))
@@ -183,7 +214,25 @@ public static class QuestTables
             }
 
             var loaded = new LoadedTable(parsed, path, expected);
-            return loaded.Agrees ? (loaded, loaded.Say) : (null, loaded.Say);
+            if (!loaded.Agrees)
+            {
+                int[] offsets = [.. mustReadAsText
+                    .Select(column => layouts.OffsetOf(table, column))
+                    .Where(offset => offset >= 0)];
+
+                bool holds = offsets.Length > 0 && parsed.ReadsAsText(offsets);
+
+                // Where the strings really are, but only when the check FAILED: the scan reads
+                // the whole table once per offset in a row, which is not worth paying for a
+                // table that is fine - and is exactly what somebody needs when one is not.
+                loaded = loaded with
+                {
+                    Verified = holds,
+                    Strings = holds ? null : parsed.TextOffsets(),
+                };
+            }
+
+            return loaded.Usable ? (loaded, loaded.Say) : (null, loaded.Say);
         }
 
         return (null, $"{table}: not found - looked in {string.Join(", ", Candidates(table))}");
