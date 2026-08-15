@@ -3,7 +3,9 @@ using PoEformance.Game.Files;
 namespace PoEformance.Features;
 
 /// <summary>One step of a quest, as QuestStates declares it.</summary>
-/// <param name="Order">Its place in the quest's sequence.</param>
+/// <param name="Order">
+/// Its place in the quest's sequence, COUNTING DOWN: the last state of a quest is Order 0.
+/// </param>
 /// <param name="Present">Flag rows that must be set for this step to be the current one.</param>
 /// <param name="Missing">Flag rows that must NOT be set.</param>
 /// <param name="Text">The tracker line - what the game itself shows as the objective.</param>
@@ -61,12 +63,15 @@ public sealed record QuestOutlook(IReadOnlyList<QuestState> Quests, IReadOnlyLis
     public IEnumerable<QuestState> Active => Quests.Where(q => q.Now is not null && !q.Complete);
 
     /// <summary>
-    /// Quests where more than one step holds, which the data should never produce.
+    /// Quests where more than one step holds at once.
     /// </summary>
     /// <remarks>
-    /// The count that says whether the READ is right, as opposed to whether it produced
-    /// something. A handful is a quest with genuinely parallel steps; most of them is a
-    /// condition column not being read, and the two look identical from any single row.
+    /// ORDINARY, as it turns out, and kept because it took a screenshot of it to work out why.
+    /// Most states declare only the flags that must be PRESENT and none that must be absent,
+    /// so every step the character has passed goes on holding - The Runeseeker had three at
+    /// once, all with one present flag and no missing one. The furthest along is the answer,
+    /// which is what the progression order decides. Still counted, because a sudden jump in
+    /// this number is what a mis-read condition column would look like.
     /// </remarks>
     public IEnumerable<QuestState> Ambiguous => Quests.Where(q => q.Holding.Count > 1);
 }
@@ -160,16 +165,28 @@ public static class QuestProgress
         var made = new List<QuestState>(byQuest.Count);
         foreach ((int quest, List<QuestStep> steps) in byQuest)
         {
-            steps.Sort((a, b) => a.Order.CompareTo(b.Order));
+            // DESCENDING, because Order counts DOWN. Read off the game with the flags shown:
+            // "Finding the Forge" runs order 4 "Speak to Renly in Clearfell Encampment", 3
+            // "Travel to Ogham Village and find Renly's tools", 2 "Find Renly's tools", 1
+            // "Bring the tools back to Renly", 0 "Quest Complete" - and "The Hunt Begins" the
+            // same way. Sorting the other way ran every quest's progress backwards: a finished
+            // quest reported its completion state as CURRENT with an earlier step as "then",
+            // and a quest genuinely in progress reported itself finished and was hidden, which
+            // is why two quests the game's own tracker listed were missing from this window.
+            steps.Sort((a, b) => b.Order.CompareTo(a.Order));
 
-            // The LAST step whose conditions hold, not the first. Steps are cumulative - an
-            // early one asks for flags a later one also has - so the earliest match is where
-            // the character has already been, and the latest is where they are.
+            // The LAST step whose conditions hold, in progression order. Steps are cumulative -
+            // an early one asks for flags a later one also has - so the earliest match is where
+            // the character has already been, and the furthest is where they are.
             List<QuestStep> holding = [.. steps.Where(s => s.Holds(set))];
             QuestStep? now = holding.Count > 0 ? holding[^1] : null;
-            QuestStep? next = now is null
+
+            // By POSITION rather than by comparing Order, so the direction lives in the sort
+            // above and in one place only.
+            int at = now is null ? -1 : steps.IndexOf(now);
+            QuestStep? next = at < 0
                 ? steps.FirstOrDefault()
-                : steps.FirstOrDefault(s => s.Order > now.Order);
+                : at + 1 < steps.Count ? steps[at + 1] : null;
 
             made.Add(new QuestState(
                 quest,

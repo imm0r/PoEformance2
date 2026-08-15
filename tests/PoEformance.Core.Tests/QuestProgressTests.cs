@@ -262,6 +262,10 @@ public class QuestProgressTests
     [Fact]
     public void AWholeQuestResolvesToItsCurrentObjective()
     {
+        // ORDER COUNTS DOWN, read off the game: "Finding the Forge" runs order 4 "Speak to
+        // Renly in Clearfell Encampment" through order 0 "Quest Complete". So the fixture's
+        // order 2 is the first step and order 1 the last, and a character holding only the
+        // first flag is on the first step.
         (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
 
         QuestOutlook outlook = QuestProgress.Read(quests, states, flags, layouts, [0]);
@@ -269,8 +273,10 @@ public class QuestProgressTests
         QuestState quest = Assert.Single(outlook.Quests);
         Assert.Equal("The Runeseeker", quest.Name);
         Assert.Equal("Speak to Farrow", quest.Objective);
+        Assert.Equal(2, quest.Now?.Order);
         Assert.False(quest.Complete);
         Assert.Equal("Return to town", quest.Next?.Text);
+        Assert.Equal(1, quest.Next?.Order);
     }
 
     [Fact]
@@ -312,8 +318,26 @@ public class QuestProgressTests
 
         QuestState quest = Assert.Single(outlook.Quests);
         Assert.Equal("Return to town", quest.Objective);
+        Assert.Equal(1, quest.Now?.Order);       // the LOWER order is the further step
         Assert.True(quest.Complete);
         Assert.Empty(outlook.Active);
+    }
+
+    [Fact]
+    public void ProgressRunsFromTheHighestOrderToTheLowest()
+    {
+        // WHAT SORTING IT THE OTHER WAY DID, and it was invisible in every synthetic test
+        // until the game was held next to the window: a FINISHED quest reported its completion
+        // state as the current objective with an earlier step as "then", and a quest genuinely
+        // in progress reported itself finished and was hidden - which is why two quests the
+        // game's own tracker listed were missing from this window entirely.
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        QuestOutlook outlook = QuestProgress.Read(quests, states, flags, layouts, [0]);
+        QuestState quest = Assert.Single(outlook.Quests);
+
+        Assert.Equal([2, 1], quest.Steps.Select(s => s.Order));
+        Assert.Single(outlook.Active);
     }
 
     /// <summary>
@@ -401,7 +425,12 @@ public class QuestProgressTests
             order++;
             BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + layouts.OffsetOf("QuestStates", "Quest")), 0);
             BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + layouts.OffsetOf("QuestStates", "Quest") + 8), DatReference.Nothing);
-            BinaryPrimitives.WriteInt32LittleEndian(b.AsSpan(at + layouts.OffsetOf("QuestStates", "Order")), order);
+
+            // ORDER COUNTS DOWN, so the first step of this two-step quest is order 2 and the
+            // last is order 1. Numbering them 1 then 2 modelled the game backwards, and every
+            // test here passed against it - which is exactly how the real direction went
+            // unnoticed until the window was held next to the game's own tracker.
+            BinaryPrimitives.WriteInt32LittleEndian(b.AsSpan(at + layouts.OffsetOf("QuestStates", "Order")), 3 - order);
 
             int present = layouts.OffsetOf("QuestStates", "FlagsPresent");
             BinaryPrimitives.WriteUInt64LittleEndian(b.AsSpan(at + present), 1);
