@@ -117,7 +117,14 @@ internal static class Program
         // the sampling loop marks a frame per tick, so a hover experiment replays.
         if (options.Peek.Count > 0)
         {
-            RunPeek(reader, options.Peek, options.PeekWatch, recorder);
+            // The statics come from the report above, so a path may be anchored on one by name
+            // ("GameStates,88,290,...") instead of on an RVA that is only right for this build.
+            RunPeek(
+                reader,
+                options.Peek,
+                options.PeekWatch,
+                recorder,
+                result.Statics.Where(s => s.Found).ToDictionary(s => s.Name, s => s.Address, StringComparer.OrdinalIgnoreCase));
         }
 
         // Probe the player and project its position - the end-to-end proof of the whole
@@ -287,7 +294,11 @@ internal static class Program
     /// reporting "nothing changed" about somebody else's memory.
     /// </remarks>
     private static void RunPeek(
-        IMemoryReader reader, IReadOnlyList<string> paths, bool watch, RecordingMemoryReader? recorder)
+        IMemoryReader reader,
+        IReadOnlyList<string> paths,
+        bool watch,
+        RecordingMemoryReader? recorder,
+        Dictionary<string, ulong> statics)
     {
         var watching = new List<(string Text, PointerPath Path, ulong Start, ulong ObjectBase, ulong?[] Last, AddressPeek.PeekWatchLog Log)>();
 
@@ -296,7 +307,7 @@ internal static class Program
 
         foreach (string text in paths)
         {
-            if (!PointerPath.TryParse(text, out PointerPath? path, out string error) || path is null)
+            if (!PointerPath.TryParse(text, out PointerPath? path, out string error, statics.Keys) || path is null)
             {
                 Console.WriteLine($"  {text}: {error}");
                 continue;
@@ -304,14 +315,14 @@ internal static class Program
 
             Console.WriteLine($"  {text}");
             recorder?.MarkFrame();
-            foreach (string line in AddressPeek.Report(reader, path))
+            foreach (string line in AddressPeek.Report(reader, path, statics: statics))
             {
                 Console.WriteLine("  " + line);
             }
 
             Console.WriteLine();
 
-            PathResolution at = path.Resolve(reader);
+            PathResolution at = path.Resolve(reader, statics);
             if (at.Ok)
             {
                 (ulong start, int slots, _) = AddressPeek.Window(at.Target, AddressPeek.DefaultBefore, AddressPeek.DefaultAfter);
@@ -338,7 +349,7 @@ internal static class Program
             {
                 (string text, PointerPath path, ulong start, ulong objectBase, ulong?[] last, AddressPeek.PeekWatchLog log) = watching[i];
 
-                PathResolution at = path.Resolve(reader);
+                PathResolution at = path.Resolve(reader, statics);
                 if (!at.Ok)
                 {
                     continue;
