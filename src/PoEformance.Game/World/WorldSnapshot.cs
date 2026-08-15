@@ -260,7 +260,8 @@ public sealed record WorldSnapshot(
     int Collapsed = 0,
     CorpseSigns Corpses = default,
     GamePanel Panels = GamePanel.None,
-    int Remembered = 0)
+    int Remembered = 0,
+    ulong ServerData = 0)
 {
     /// <summary>
     /// Whether the player is looking at a panel rather than at the game.
@@ -902,7 +903,11 @@ public sealed class WorldReader
             collapsed,
             new CorpseSigns(targetable, untargetable, unreadableTargetable, _corpses.Tracking),
             panels,
-            remembered.Count);
+            remembered.Count,
+
+            // Carried rather than re-resolved: the quest flags hang off this and the walk to
+            // it is four dereferences that this read has already paid for.
+            serverData);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>
