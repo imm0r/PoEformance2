@@ -36,7 +36,8 @@ public sealed record QuestFlagHuntResult(
     string Note,
     int Followed = 0,
     long FollowedBytes = 0,
-    int SkippedTargets = 0)
+    int SkippedTargets = 0,
+    IReadOnlyList<SetQuestFlag>? Set = null)
 {
     /// <summary>Every sighting across every region, which is the answer when there is one.</summary>
     public IEnumerable<FlagSighting> Sightings => Regions.SelectMany(r => r.Sightings);
@@ -454,6 +455,13 @@ public sealed class QuestFlagHunt
         return ranges;
     }
 
+    /// <summary>How many set flags the console report lists before it summarises.</summary>
+    /// <remarks>
+    /// A character past the first act has hundreds, and a wall of them buries every other line
+    /// of the report. The full set is on the result for anything that wants it.
+    /// </remarks>
+    public const int MostFlagsListed = 40;
+
     /// <summary>Reads one row's Id, which only matters for the rows that matched.</summary>
     private string IdOf(ulong rowsBegin, int rowSize, int row)
     {
@@ -494,6 +502,13 @@ public sealed class QuestFlagHunt
         ulong serverData = _reader.ReadPointer(
             chain.AreaInstance + (ulong)ai.OffsetOf("PlayerInfo")
             + (ulong)_schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr"));
+
+        // THE ANSWER, read before the sweep rather than searched for by it. Everything below
+        // this line is the hunt that could not find it - kept because it is what proves the
+        // set holds no reference of any kind, which is why it took a chain to reach.
+        IReadOnlyList<int> setRows = QuestFlagSet.Rows(_reader, _schema, serverData);
+        IReadOnlyList<SetQuestFlag> set = QuestFlagSet.Named(
+            _reader, setRows, table == 0 ? 0 : QuestFlagSet.ByIdIndex(_reader, table, _tables.Value));
 
         var regions = new List<(string Name, ulong Address, int Bytes)>
         {
@@ -628,7 +643,8 @@ public sealed class QuestFlagHunt
                 : string.Empty,
             followed,
             followedBytes,
-            skipped);
+            skipped,
+            set);
     }
 
     /// <summary>
@@ -760,6 +776,28 @@ public sealed class QuestFlagHunt
         if (result.Note.Length > 0)
         {
             output.WriteLine($"  note     {result.Note}");
+        }
+
+        // FIRST, because it is the answer and everything below it is the search that could not
+        // find one. The set is a sparse bitset over row numbers reached by a chain off
+        // ServerData - see QuestFlagSet - and it holds no pointer, hash or string, which is
+        // why the sweep below comes back empty however far it reaches.
+        if (result.Set is { Count: > 0 } set)
+        {
+            output.WriteLine($"  SET      {set.Count} flags");
+            foreach (SetQuestFlag flag in set.Take(MostFlagsListed))
+            {
+                output.WriteLine($"             {flag.Row,5}  {(flag.Id.Length > 0 ? flag.Id : "(name not read)")}");
+            }
+
+            if (set.Count > MostFlagsListed)
+            {
+                output.WriteLine($"             ... and {set.Count - MostFlagsListed} more");
+            }
+        }
+        else
+        {
+            output.WriteLine("  SET      the chain off ServerData did not resolve - no flags read");
         }
 
         if (LastHeapScan is { } scan)
