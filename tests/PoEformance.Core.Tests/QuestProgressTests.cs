@@ -324,6 +324,30 @@ public class QuestProgressTests
     }
 
     [Fact]
+    public void TheShortColumnIsTheObjectiveAndTheLongOneSitsUnderIt()
+    {
+        // MEASURED, by showing both and holding the window next to the game's own panel:
+        // Message matched it word for word - "Find the Red Vale", "Search for the meaning of
+        // the Runes etched into the Tree of Souls" - while Text was the longer sentence every
+        // time. The schema's names do not say which is which; both are just a string.
+        QuestStep step = new(1, [], [], "The Devourer lives underground in a Mud Burrow. Find it.", "Slay the Devourer");
+
+        Assert.Equal("Slay the Devourer", step.Line);
+        Assert.Equal("The Devourer lives underground in a Mud Burrow. Find it.", step.Detail);
+    }
+
+    [Fact]
+    public void AStepWithNoShortFormFallsBackToTheLongOne()
+    {
+        // And says nothing twice: a step whose only text is the long one shows it as the
+        // objective, with no detail line repeating it underneath.
+        QuestStep step = new(1, [], [], "Find Renly's tools.", string.Empty);
+
+        Assert.Equal("Find Renly's tools.", step.Line);
+        Assert.Equal(string.Empty, step.Detail);
+    }
+
+    [Fact]
     public void ProgressRunsFromTheHighestOrderToTheLowest()
     {
         // WHAT SORTING IT THE OTHER WAY DID, and it was invisible in every synthetic test

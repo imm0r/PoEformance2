@@ -8,7 +8,19 @@ namespace PoEformance.Features;
 /// </param>
 /// <param name="Present">Flag rows that must be set for this step to be the current one.</param>
 /// <param name="Missing">Flag rows that must NOT be set.</param>
-/// <param name="Text">The tracker line - what the game itself shows as the objective.</param>
+/// <param name="Text">
+/// The long form: what to do and usually WHERE. "The Devourer lives underground in a Mud
+/// Burrow. Find it."
+/// </param>
+/// <param name="Message">
+/// The short form, and the one the game's own quest panel renders.
+/// </param>
+/// <remarks>
+/// WHICH IS WHICH WAS MEASURED, by showing both and holding the window next to the game.
+/// Message matched the panel word for word on two quests - "Find the Red Vale" and "Search for
+/// the meaning of the Runes etched into the Tree of Souls" - while Text was the longer sentence
+/// in every case. The schema's names do not say this; the two columns are just a string each.
+/// </remarks>
 public sealed record QuestStep(
     int Order,
     IReadOnlyList<int> Present,
@@ -16,6 +28,13 @@ public sealed record QuestStep(
     string Text,
     string Message)
 {
+    /// <summary>The objective as the game words it, falling back to the long form.</summary>
+    public string Line => Message.Length > 0 ? Message : Text;
+
+    /// <summary>The long form, when it says more than the line above it.</summary>
+    public string Detail
+        => Text.Length > 0 && !string.Equals(Text, Line, StringComparison.Ordinal) ? Text : string.Empty;
+
     /// <summary>Whether this step's conditions hold for a given set of flags.</summary>
     public bool Holds(IReadOnlySet<int> set)
     {
@@ -50,7 +69,10 @@ public sealed record QuestState(
     public bool Complete => Now is not null && Next is null && Steps.Count > 0;
 
     /// <summary>What to do, in the game's own words, or an empty string when it has none.</summary>
-    public string Objective => Now?.Text ?? string.Empty;
+    public string Objective => Now?.Line ?? string.Empty;
+
+    /// <summary>The fuller sentence behind the objective, which usually says where to go.</summary>
+    public string Detail => Now?.Detail ?? string.Empty;
 }
 
 /// <summary>What the whole read produced, including why it produced nothing.</summary>

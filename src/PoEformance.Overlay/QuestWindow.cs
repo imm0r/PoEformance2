@@ -146,33 +146,30 @@ public sealed class QuestWindow
             ImGui.TextColored(DimText, "done");
         }
 
-        // BOTH TEXT COLUMNS, because the game uses one of them and it is not settled which.
-        // Held next to the game's own panel: every objective here came out as the LONGER,
-        // explanatory sentence where the panel showed a terse one - "The Devourer lives
-        // underground in a Mud Burrow. Find it." against "Slay the Devourer". Same step, same
-        // quest, different column. Showing one and picking wrong would read as a bug in the
-        // step selection, which is the thing that just took four rounds to get right; showing
-        // both costs a line and cannot mislead. The longer one is arguably the more useful of
-        // the two anyway - it says where to go.
+        // MESSAGE FIRST, measured rather than assumed: shown side by side against the game's
+        // own panel, this column matched it word for word - "Find the Red Vale", "Search for
+        // the meaning of the Runes etched into the Tree of Souls" - while Text was the longer
+        // sentence every time.
         if (quest.Objective.Length > 0)
         {
             ImGui.TextWrapped($"    {quest.Objective}");
         }
-
-        if (quest.Now is { Message.Length: > 0 } message
-            && !string.Equals(message.Message, quest.Objective, StringComparison.Ordinal))
-        {
-            ImGui.TextColored(DimText, $"    also: {message.Message}");
-        }
-
-        if (quest.Objective.Length == 0 && quest.Now is { Message.Length: 0 } && !quest.Complete)
+        else if (!quest.Complete)
         {
             ImGui.TextColored(DimText, "    (this step carries no text)");
         }
 
-        if (quest.Next is { Text.Length: > 0 } next)
+        // And the long form under it, because it is the half that says WHERE. "Slay the
+        // Devourer" is the objective; "The Devourer lives underground in a Mud Burrow" is the
+        // part worth having on screen.
+        if (quest.Detail.Length > 0)
         {
-            ImGui.TextColored(DimText, $"    then: {next.Text}");
+            ImGui.TextColored(DimText, $"    {quest.Detail}");
+        }
+
+        if (quest.Next is { } next && next.Line.Length > 0)
+        {
+            ImGui.TextColored(DimText, $"    then: {next.Line}");
         }
 
         if (_conditions)
