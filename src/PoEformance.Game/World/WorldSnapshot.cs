@@ -122,6 +122,15 @@ public readonly record struct ReadCost(
 /// freed, so anything that follows a pointer - the dissector, the duplicate check - has to be
 /// able to tell the two apart.
 /// </param>
+/// <param name="Buffs">
+/// What is currently on this monster, when somebody asked for it.
+///
+/// Null is the ordinary case and means NOBODY ASKED, not "nothing on it" - reading a monster's
+/// buffs is a component walk per monster that only the status icons want, so
+/// <see cref="WorldReader.ReadMonsterBuffs"/> has to be switched on and only the monsters worth
+/// the read are given one. An empty <see cref="ActiveBuffs"/> is the other answer: it was read
+/// and there was nothing on it.
+/// </param>
 /// <remarks>
 /// Carried because the game hands one monster several entity objects over a single set of
 /// components, so an entity address is not an identity: three entities with three addresses
@@ -150,7 +159,8 @@ public sealed record WorldEntity(
     string Name = "",
     ulong Render = 0,
     bool? Present = null,
-    int? RememberedForMs = null)
+    int? RememberedForMs = null,
+    ActiveBuffs? Buffs = null)
 {
     /// <summary>Whether this comes from memory rather than from the game's current list.</summary>
     public bool IsRemembered => RememberedForMs is not null;
@@ -385,6 +395,32 @@ public sealed class WorldReader
     /// the entities figure is the one that moves.
     /// </remarks>
     public bool ReadVisualEntities { get; set; }
+
+    /// <summary>
+    /// Read what is currently ON the monsters, which is what the status icons draw.
+    /// </summary>
+    /// <remarks>
+    /// OFF by default because it is the only per-monster read in here that nothing else wants.
+    /// A Buffs component is a vector walk plus three reads per entry, and paying it for every
+    /// monster on a screen would be the most expensive thing this reader does - so it is
+    /// switched on by the feature that needs it and taken with it when that is switched off.
+    ///
+    /// Even switched on it is not paid for every monster: see the rarity floor at the call
+    /// site. Forty white monsters in a breach are not what anybody is watching a debuff timer
+    /// on, and they are most of what an area contains.
+    /// </remarks>
+    public bool ReadMonsterBuffs { get; set; }
+
+    /// <summary>
+    /// The least rare monster whose buffs are worth reading.
+    /// </summary>
+    /// <remarks>
+    /// Rare and above, from the reference plugin, which shows monster status effects for
+    /// exactly that. It bounds the cost against the thing that makes it dangerous - a pack's
+    /// worth of ordinary monsters - while keeping every monster a person actually watches.
+    /// </remarks>
+    public ItemRarity MonsterBuffFloor { get; set; } = ItemRarity.Rare;
+
     private readonly GroundItemReader _groundItems;
     private readonly MinimapIconReader _mapIcons;
     private LandmarkNames _landmarkNames = LandmarkNames.Empty;
@@ -841,13 +877,27 @@ public sealed class WorldReader
                 }
             }
 
+            // What is currently on it, and ONLY when somebody is drawing that. The floor keeps
+            // the cost on the monsters a debuff timer is ever watched on; the friendly check
+            // keeps it off your own minions, which are numerous and whose buffs nothing here
+            // asks about.
+            ActiveBuffs? buffs = null;
+            if (ReadMonsterBuffs && kind == EntityKind.Monster && !friendly && rarity >= MonsterBuffFloor)
+            {
+                ulong monsterBuffs = entity.Component("Buffs");
+                if (monsterBuffs != 0)
+                {
+                    buffs = _buffs.Read(monsterBuffs);
+                }
+            }
+
             var world = new WorldEntity(
                 id, address, entity.Path, kind,
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
                 poi, mapIcon,
                 signs.Life, signs.EnergyShield, opened, friendly, signs.IsEffect,
-                NameOf(address, renderAddress), renderAddress, present);
+                NameOf(address, renderAddress), renderAddress, present, Buffs: buffs);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
