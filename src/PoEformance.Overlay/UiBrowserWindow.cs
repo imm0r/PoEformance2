@@ -34,7 +34,7 @@ public sealed class UiBrowserWindow
     /// <summary>Longest label a tree row shows before it is cut short.</summary>
     private const int MaxRowLabel = 56;
 
-    private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 DimText = OverlayTheme.Quiet;
     private static readonly Vector4 IdText = new(0.85f, 0.78f, 0.45f, 1f);
     private static readonly Vector4 HiddenText = new(0.55f, 0.45f, 0.45f, 1f);
 

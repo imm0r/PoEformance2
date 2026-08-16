@@ -42,7 +42,7 @@ public sealed class DissectorWindow
     /// </remarks>
     private const long FadeMs = 1500;
 
-    private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 DimText = OverlayTheme.Quiet;
     private static readonly Vector4 NameText = new(0.85f, 0.78f, 0.45f, 1f);
     private static readonly Vector4 PointerText = new(0.55f, 0.78f, 1f, 1f);
     private static readonly Vector4 FloatText = new(0.65f, 0.9f, 0.65f, 1f);

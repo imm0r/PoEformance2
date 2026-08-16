@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.Versioning;
 using System.Text;
 using ImGuiNET;
+using PoEformance.Features;
 
 namespace PoEformance.Overlay;
 
@@ -70,6 +71,14 @@ public sealed class ToolTabs
 
     /// <summary>Whether this window is pinned in place or handed to the mouse.</summary>
     public WindowChrome Chrome { get; set; } = new();
+
+    /// <summary>How solid this window is drawn, as the user set it.</summary>
+    /// <remarks>
+    /// Read at Begin rather than copied into a field on a change, so a slider dragged in the
+    /// Appearance page is seen while it is being dragged - which is the only way anybody can
+    /// judge how see-through is see-through enough.
+    /// </remarks>
+    public InterfaceStyle Interface { get; set; } = InterfaceStyle.Default;
 
     /// <summary>Whether anything registered a page, so an empty window is never offered.</summary>
     public bool Any => _pages.Count > 0;
@@ -185,7 +194,13 @@ public sealed class ToolTabs
         // the corner during a fight and wants to be out of the way; a table of struct bytes
         // with the game showing through it is unreadable, and squinting is not a trade worth
         // making for a window somebody deliberately opened.
-        ImGui.SetNextWindowBgAlpha(_sizedToContent ? 0.7f : 1f);
+        //
+        // BOTH ARE THE USER'S TO SET, because the trade is between reading this and seeing the
+        // game, and where that line falls depends on the screen, the resolution and how far
+        // away they sit. It used to be 0.7 and 1 written here, and 0.7 of near-black over a
+        // hideout at noon is a panel with foliage inside the letters.
+        ImGui.SetNextWindowBgAlpha(
+            _sizedToContent ? Interface.ReadoutOpacityOr : Interface.PanelOpacityOr);
 
         // Surfacing a tool must actually surface it: a jump into a collapsed window would
         // select the right tab inside a title bar.

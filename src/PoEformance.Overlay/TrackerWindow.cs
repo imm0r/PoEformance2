@@ -25,7 +25,7 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class TrackerWindow
 {
-    private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 DimText = OverlayTheme.Quiet;
     private static readonly Vector4 WarnText = new(1f, 0.7f, 0.35f, 1f);
     private static readonly Vector4 GoodText = new(0.55f, 0.9f, 0.6f, 1f);
 

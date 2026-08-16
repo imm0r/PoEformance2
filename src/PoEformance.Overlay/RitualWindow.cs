@@ -26,7 +26,7 @@ public sealed class RitualWindow
     /// <summary>How many routes are listed at once. The rest are counted, not drawn.</summary>
     public const int MostRows = 200;
 
-    private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 DimText = OverlayTheme.Quiet;
     private static readonly Vector4 GoodText = new(0.55f, 0.9f, 0.65f, 1f);
     private static readonly Vector4 WarnText = new(1f, 0.6f, 0.35f, 1f);
 
