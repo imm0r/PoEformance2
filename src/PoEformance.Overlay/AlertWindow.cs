@@ -23,7 +23,7 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class AlertWindow
 {
-    private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 DimText = OverlayTheme.Quiet;
     private static readonly Vector4 OffText = new(0.5f, 0.5f, 0.55f, 1f);
 
     /// <summary>What an added rule watches for, before it is narrowed.</summary>

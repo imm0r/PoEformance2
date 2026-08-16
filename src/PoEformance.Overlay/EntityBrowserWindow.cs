@@ -28,7 +28,7 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class EntityBrowserWindow
 {
-    private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 DimText = OverlayTheme.Quiet;
     private static readonly Vector4 UnknownText = new(1f, 0.62f, 0.35f, 1f);
     private static readonly Vector4 KnownText = new(0.55f, 0.78f, 1f, 1f);
     private static readonly Vector4 PathText = new(0.85f, 0.78f, 0.45f, 1f);

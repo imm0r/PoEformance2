@@ -26,7 +26,7 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class StyleWindow
 {
-    private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 DimText = OverlayTheme.Quiet;
 
     private readonly OverlayStyle _style;
     private readonly Action _save;
@@ -41,12 +41,53 @@ public sealed class StyleWindow
     /// </remarks>
     public WindowChrome? Chrome { get; set; }
 
+    /// <summary>
+    /// How the tool's own windows are drawn, when somebody has offered it for editing.
+    /// </summary>
+    /// <remarks>
+    /// Three callbacks rather than the settings themselves, because the three things happen at
+    /// different moments: the value is READ every frame (the overlay owns it, and the
+    /// configuration window can change it too), a change is APPLIED at once so it can be
+    /// judged by looking at it, and it is WRITTEN DOWN only once the drag has finished. Handing
+    /// this window the record instead would collapse the second and third into one, which is
+    /// sixty file writes a second for one adjustment.
+    /// </remarks>
+    /// <param name="Now">What the interface looks like at this moment.</param>
+    /// <param name="Chose">Applies a change immediately.</param>
+    /// <param name="Settled">Writes it down, once nothing is being dragged.</param>
+    public sealed record InterfaceEditor(Func<InterfaceStyle> Now, Action<InterfaceStyle> Chose, Action Settled);
+
+    /// <summary>The interface's own size and solidity, if anybody offered them.</summary>
+    /// <remarks>
+    /// Here, beside the marker colours, because "how the tool looks" is one question however
+    /// many files it is kept in. It sits at the TOP of the page for a plainer reason: somebody
+    /// who cannot read the interface cannot go looking through it for the control that fixes
+    /// that.
+    /// </remarks>
+    public InterfaceEditor? Interface { get; set; }
+
     /// <summary>Which key's icon box is open. Only one at a time, to keep the rows short.</summary>
     private string _editingIcon = string.Empty;
     private string _iconPath = string.Empty;
 
     // Something changed and has not been written down yet - see Settle.
     private bool _unsaved;
+
+    // The same, for the interface settings - which live in a different file with a different
+    // writer, so one flag could not say which of the two is waiting.
+    private bool _unsavedInterface;
+
+    /// <summary>
+    /// A text size being dragged, before it is committed. 0 when nothing is being dragged.
+    /// </summary>
+    /// <remarks>
+    /// The one setting here that is NOT applied while the slider moves, and the exception is
+    /// paid for: a new size means building a new font atlas and uploading a new texture, and
+    /// doing that on every frame of a drag across eighteen values is a visible stall. So the
+    /// draft is what the slider shows, and the size only really changes when the mouse is let
+    /// go.
+    /// </remarks>
+    private int _draftTextSize;
 
     /// <param name="save">Writes the style down. Called when a change has SETTLED, not per frame.</param>
     public StyleWindow(OverlayStyle style, Action save)
@@ -71,13 +112,22 @@ public sealed class StyleWindow
     /// <summary>Writes down a change once nothing is being dragged any more.</summary>
     private void Settle()
     {
-        if (!_unsaved || ImGui.IsAnyItemActive())
+        if (ImGui.IsAnyItemActive())
         {
             return;
         }
 
-        _unsaved = false;
-        _save();
+        if (_unsaved)
+        {
+            _unsaved = false;
+            _save();
+        }
+
+        if (_unsavedInterface)
+        {
+            _unsavedInterface = false;
+            Interface?.Settled();
+        }
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -118,9 +168,12 @@ public sealed class StyleWindow
 
         ImGui.Separator();
 
-        // FIRST, above the colours, because this is the one thing in here somebody arrives
-        // looking for rather than browsing: a window that has been made click-through cannot
-        // offer its own menu any more, and this list is the only way back.
+        // FIRST, above the colours, because these are the two things in here somebody arrives
+        // looking for rather than browsing: an interface they cannot read, and a window that
+        // has been made click-through - which cannot offer its own menu any more, so this
+        // list is the only way back.
+        DrawInterface();
+
         if (Chrome is not null && ImGui.CollapsingHeader("Windows", ImGuiTreeNodeFlags.DefaultOpen))
         {
             Chrome.DrawList();
@@ -139,6 +192,92 @@ public sealed class StyleWindow
             }
         }
     }
+
+    /// <summary>The interface's own text size and how solid its windows are.</summary>
+    /// <remarks>
+    /// THREE CONTROLS AND NO PALETTE. The colours of the tool's own windows are one decision
+    /// made once (see <see cref="OverlayTheme"/>) and offering them here would be a theme
+    /// editor - a large thing to build, maintain and get wrong, for a question almost nobody
+    /// asks. What people actually cannot read is text that is too small and a panel with the
+    /// game showing through it, and both of those depend on the screen rather than on taste,
+    /// so they are the two that have to be adjustable.
+    /// </remarks>
+    private void DrawInterface()
+    {
+        if (Interface is not InterfaceEditor editor
+            || !ImGui.CollapsingHeader("Text and panels", ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            return;
+        }
+
+        InterfaceStyle now = editor.Now();
+
+        ImGui.TextColored(DimText, "How this tool's own windows are drawn. Everything below is");
+        ImGui.TextColored(DimText, "about what it draws on the GAME.");
+        ImGui.Spacing();
+
+        int size = _draftTextSize > 0 ? _draftTextSize : now.TextSizeOr;
+        ImGui.SetNextItemWidth(200f);
+        if (ImGui.SliderInt("text size", ref size, InterfaceStyle.MinTextSize, InterfaceStyle.MaxTextSize, "%d px"))
+        {
+            _draftTextSize = size;
+        }
+
+        // On release rather than on change - see the note on the draft. Deactivated-after-edit
+        // covers the keyboard route too: ctrl-clicking a slider types into it, and that ends
+        // the same way.
+        if (ImGui.IsItemDeactivatedAfterEdit() && _draftTextSize > 0)
+        {
+            if (_draftTextSize != now.TextSizeOr)
+            {
+                editor.Chose(now with { TextSize = _draftTextSize });
+                _unsavedInterface = true;
+            }
+
+            _draftTextSize = 0;
+        }
+
+        // Whole percent, not a 0-to-1 fraction. Both read the same to the code and only one of
+        // them reads as anything to a person - and a slider labelled in percent can be
+        // ctrl-clicked and typed into, which one labelled "0.85" cannot usefully be.
+        int panels = Percent(now.PanelOpacityOr);
+        ImGui.SetNextItemWidth(200f);
+        if (ImGui.SliderInt("tool panels", ref panels, Floor, 100, "%d%% solid"))
+        {
+            editor.Chose(now with { PanelOpacity = panels / 100f });
+            _unsavedInterface = true;
+        }
+
+        int readout = Percent(now.ReadoutOpacityOr);
+        ImGui.SetNextItemWidth(200f);
+        if (ImGui.SliderInt("the readout", ref readout, Floor, 100, "%d%% solid"))
+        {
+            editor.Chose(now with { ReadoutOpacity = readout / 100f });
+            _unsavedInterface = true;
+        }
+
+        ImGui.TextColored(DimText, "The readout is the first page - the one that sits in a corner");
+        ImGui.TextColored(DimText, "while playing. The tools are every other page.");
+
+        if (now != InterfaceStyle.Default)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("reset text and panels"))
+            {
+                editor.Chose(InterfaceStyle.Default);
+                _draftTextSize = 0;
+                _unsavedInterface = true;
+            }
+        }
+
+        ImGui.Spacing();
+    }
+
+    /// <summary>An opacity as whole percent, for the sliders that show it that way.</summary>
+    private static int Percent(float value) => (int)MathF.Round(value * 100f);
+
+    /// <summary>The lowest the opacity sliders go, in the same whole percent.</summary>
+    private static readonly int Floor = Percent(InterfaceStyle.MinOpacity);
 
     /// <summary>One drawn thing: whether it is drawn, and everything its entry allows.</summary>
     private void DrawRow(StyleEntry entry)

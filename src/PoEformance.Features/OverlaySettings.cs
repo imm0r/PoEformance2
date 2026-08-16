@@ -32,8 +32,20 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("projectileTrails")] bool ProjectileTrails = true,
     [property: JsonPropertyName("projectilePaths")] bool ProjectilePaths = false,
     [property: JsonPropertyName("projectilesMineOnly")] bool ProjectilesMineOnly = false,
+
+    // How the tool's OWN windows are drawn, as its own object rather than three more fields
+    // out here: it is a different subject from what the overlay draws on the game, and a
+    // settings file stops being readable at exactly the point everything shares one level.
+    [property: JsonPropertyName("interface")] InterfaceStyle? Interface = null,
     [property: JsonPropertyName("windows")] IReadOnlyDictionary<string, WindowRule>? Windows = null)
 {
+    /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
+    /// <remarks>
+    /// Null until it is changed, like the window rules below, so an untouched settings file
+    /// gains no key at all and the defaults stay where they can be corrected in a release.
+    /// </remarks>
+    public InterfaceStyle InterfaceOrDefault => Interface ?? InterfaceStyle.Default;
+
     /// <summary>What each window was told, by the window's own id. Empty until somebody says.</summary>
     /// <remarks>
     /// Only the windows somebody has actually pinned down are kept, so the file stays a record
@@ -94,6 +106,11 @@ public sealed record OverlaySettings(
         {
             MinLootRarity = rarity,
             TerrainColour = ParseColour(TerrainColour) == 0 ? Default.TerrainColour : TerrainColour,
+
+            // Left null when it is null, rather than filled in with the defaults: an untouched
+            // file gains no key, and the defaults keep coming from the code where a correction
+            // can still reach somebody who never opened the sliders.
+            Interface = Interface?.Normalised(),
 
             // Capped low: this thickens the line in TEXTURE pixels, and past a few the
             // outline stops being a boundary and becomes a filled shape.

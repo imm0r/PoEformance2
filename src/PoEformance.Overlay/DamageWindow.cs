@@ -22,7 +22,7 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class DamageWindow
 {
-    private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 DimText = OverlayTheme.Quiet;
     private static readonly Vector4 DpsText = new(1f, 1f, 0.6f, 1f);
     private static readonly Vector4 JudgedText = new(0.85f, 0.75f, 0.5f, 1f);
 

@@ -1,0 +1,109 @@
+using PoEformance.Features;
+using PoEformance.Game.Components;
+
+namespace PoEformance.Core.Tests;
+
+/// <summary>
+/// The interface's own size and solidity: that its zero is harmless, and that it survives a
+/// restart without dragging the rest of the settings back to their defaults.
+/// </summary>
+public class InterfaceStyleTests
+{
+    [Fact]
+    public void ZeroMeansAsItComes()
+    {
+        // The value a settings file written before this existed produces, and the one a
+        // hand-edited file can hold. It has to mean the defaults rather than no text in an
+        // invisible window - there would be nothing left on screen to undo it with.
+        var blank = new InterfaceStyle(0, 0f, 0f);
+
+        Assert.Equal(InterfaceStyle.DefaultTextSize, blank.TextSizeOr);
+        Assert.Equal(InterfaceStyle.DefaultPanelOpacity, blank.PanelOpacityOr);
+        Assert.Equal(InterfaceStyle.DefaultReadoutOpacity, blank.ReadoutOpacityOr);
+    }
+
+    [Theory]
+    [InlineData(-40)]
+    [InlineData(400)]
+    [InlineData(1)]
+    public void TextSizeStaysWithinWhatCanBeDrawn(int written)
+    {
+        int size = new InterfaceStyle(written).TextSizeOr;
+        Assert.InRange(size, InterfaceStyle.MinTextSize, InterfaceStyle.MaxTextSize);
+    }
+
+    [Fact]
+    public void OpacityNeverGoesFaintEnoughToLosePanelIn()
+    {
+        // A panel at nothing is still there, still takes the mouse and cannot be seen, and
+        // the control that undoes it is inside it.
+        Assert.Equal(InterfaceStyle.MinOpacity, new InterfaceStyle(PanelOpacity: 0.01f).PanelOpacityOr);
+        Assert.Equal(1f, new InterfaceStyle(PanelOpacity: 4f).PanelOpacityOr);
+    }
+
+    [Fact]
+    public void NormalisedSaysTheSameNumbersItDraws()
+    {
+        // Otherwise the file keeps saying 400 back to whoever opens the slider while the
+        // screen shows 30, which gets reported as the slider being broken.
+        InterfaceStyle settled = new InterfaceStyle(400, 0f, 9f).Normalised();
+
+        Assert.Equal(settled.TextSizeOr, settled.TextSize);
+        Assert.Equal(settled.PanelOpacityOr, settled.PanelOpacity);
+        Assert.Equal(settled.ReadoutOpacityOr, settled.ReadoutOpacity);
+    }
+
+    [Fact]
+    public void UnsetInAFileMeansUnsetAfterLoading()
+    {
+        // Null rather than a copy of the defaults, so a default corrected in a release still
+        // reaches somebody who never touched the sliders.
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-interface-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(OverlaySettingsStore.Save(new OverlaySettings(ItemRarity.Rare), path));
+
+            OverlaySettings loaded = OverlaySettingsStore.Load(path);
+            Assert.Null(loaded.Interface);
+            Assert.Equal(InterfaceStyle.DefaultTextSize, loaded.InterfaceOrDefault.TextSizeOr);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ChosenSizeSurvivesARestart()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-interface-{Guid.NewGuid():N}.json");
+        try
+        {
+            var chosen = new OverlaySettings(ItemRarity.Rare) { Interface = new InterfaceStyle(24, 0.6f, 0.5f) };
+            Assert.True(OverlaySettingsStore.Save(chosen, path));
+
+            InterfaceStyle back = OverlaySettingsStore.Load(path).InterfaceOrDefault;
+            Assert.Equal(24, back.TextSize);
+            Assert.Equal(0.6f, back.PanelOpacity);
+            Assert.Equal(0.5f, back.ReadoutOpacity);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ThePageDoesNotResetIt()
+    {
+        // The configuration window sends the four settings it shows. Deserialising that into
+        // a whole record gives everything else its defaults, and saving it then quietly
+        // discards whatever was set on the overlay itself - see MergeFromPage.
+        var kept = new OverlaySettings(ItemRarity.Magic) { Interface = new InterfaceStyle(26) };
+
+        OverlaySettings merged = kept.MergeFromPage(new OverlaySettings(ItemRarity.Rare));
+
+        Assert.Equal(26, merged.InterfaceOrDefault.TextSize);
+        Assert.Equal(ItemRarity.Rare, merged.MinLootRarity);
+    }
+}

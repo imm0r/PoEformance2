@@ -38,7 +38,7 @@ public sealed class StashWindow
     /// </remarks>
     public const double WorthSaying = 1.0;
 
-    private static readonly Vector4 DimText = new(0.62f, 0.65f, 0.72f, 1f);
+    private static readonly Vector4 DimText = OverlayTheme.Quiet;
     private static readonly Vector4 GoodText = new(0.55f, 0.9f, 0.65f, 1f);
     private static readonly Vector4 WarnText = new(1f, 0.6f, 0.35f, 1f);
     private static readonly Vector4 MoneyText = new(1f, 0.83f, 0.42f, 1f);

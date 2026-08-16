@@ -158,6 +158,75 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private OverlayStyle _style = new();
 
     /// <summary>
+    /// How the tool's OWN windows are drawn - text size, and how solid the panels are.
+    /// </summary>
+    /// <remarks>
+    /// NOT APPLIED WHERE IT IS SET, and that is the whole reason this is a field with a flag
+    /// beside it rather than a property that does the work. ImGui's style and its font atlas
+    /// belong to the render thread's context, and the first thing that sets this is the saved
+    /// settings being applied while the app wires itself up - on the main thread, before that
+    /// context exists at all. Touching ImGui from there is a crash, and one that would only
+    /// happen on a machine slow enough to lose the race.
+    ///
+    /// So a change is only RECORDED here, and the next frame picks it up - see
+    /// <see cref="ApplyInterfaceIfAsked"/>. That also gives the font swap somewhere sensible
+    /// to live: rebuilding the atlas is expensive and must not happen on a frame that did not
+    /// ask for it.
+    /// </remarks>
+    public InterfaceStyle Interface
+    {
+        get => _interface;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _interface = value.Normalised();
+            _interfaceWanted = true;
+
+            // The tool window is the only one told: the preload panel's solidity is a
+            // catalogue entry of its own (StyleCatalogue.Keys.PreloadListBack), and two
+            // settings for one window is one of them being ignored.
+            _tools.Interface = _interface;
+        }
+    }
+
+    private InterfaceStyle _interface = InterfaceStyle.Default;
+
+    // Volatile because the two ends are different threads: the wiring and the configuration
+    // window ask, the render thread answers. Nothing here needs to be ordered against anything
+    // else - a change landing one frame later is invisible - but a flag that is never re-read
+    // is a setting that never arrives, and that failure would only show on somebody else's
+    // machine.
+    private volatile bool _interfaceWanted = true;
+    private int _wearing;
+
+    /// <summary>
+    /// Puts the chosen text size and palette on, on a frame that asked for them.
+    /// </summary>
+    /// <remarks>
+    /// Called at the top of the frame rather than part-way through it, so that no window is
+    /// drawn half in one palette and half in the next.
+    ///
+    /// The FONT is only touched when the size actually changed, because a change means
+    /// rebuilding the atlas and re-uploading the texture. The palette costs a couple of
+    /// hundred vector writes and is simply reapplied.
+    /// </remarks>
+    private void ApplyInterfaceIfAsked()
+    {
+        if (!_interfaceWanted)
+        {
+            return;
+        }
+
+        _interfaceWanted = false;
+        OverlayTheme.Apply(_interface);
+
+        if (_wearing != _interface.TextSizeOr)
+        {
+            WearASerif(_interface.TextSizeOr);
+        }
+    }
+
+    /// <summary>
     /// Which windows are pinned in place or handed over to the mouse.
     /// </summary>
     /// <remarks>
@@ -206,6 +275,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _projectiles.ShowTrails = settings.ProjectileTrails;
         _projectiles.ShowPaths = settings.ProjectilePaths;
         _projectiles.MineOnly = settings.ProjectilesMineOnly;
+        Interface = settings.InterfaceOrDefault;
         Chrome.Apply(settings.WindowsOrEmpty);
 
         if (Noise is not null)
@@ -249,6 +319,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
             ProjectilesMineOnly = _projectiles.MineOnly,
+
+            // Only once it differs from the defaults, so an untouched file gains no key and a
+            // default corrected in a release still reaches somebody who never opened the
+            // sliders - the same bargain the window rules and the marker styles make.
+            Interface = _interface == InterfaceStyle.Default ? basis.Interface : _interface,
             Windows = Chrome.Saved(),
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
             RememberOutOfRange = Memory?.Enabled ?? basis.RememberOutOfRange,
@@ -527,7 +602,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachStyleEditor(Action saved, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(saved);
-        var window = new StyleWindow(Style, saved) { Chrome = Chrome };
+        var window = new StyleWindow(Style, saved)
+        {
+            Chrome = Chrome,
+
+            // The interface's own size and solidity, which are kept in the OVERLAY settings
+            // rather than in the style file - so the writing down is SettingsChanged's, not
+            // this editor's own save. Applied the moment it changes and written down when the
+            // drag stops, which is the same bargain every other control on this page makes.
+            Interface = new StyleWindow.InterfaceEditor(
+                () => Interface,
+                chosen => Interface = chosen,
+                () => SettingsChanged?.Invoke()),
+        };
+
         _tools.Add(70, "style", "Appearance", window.DrawTab, window.Idle);
         if (visible)
         {
@@ -956,7 +1044,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     protected override Task PostInitialized()
     {
         VSync = true;
-        WearASerif();
+
+        // The palette and the font both land on the first frame instead of here, so there is
+        // ONE path that puts the interface on rather than one for start-up and another for a
+        // change - the second of which is the one that gets forgotten. See
+        // <see cref="ApplyInterfaceIfAsked"/>.
         return Task.CompletedTask;
     }
 
@@ -979,13 +1071,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         "pala.ttf",      // Palatino Linotype - the last resort that is still a serif
     ];
 
-    /// <summary>The size the interface is drawn at, when a face was found for it.</summary>
-    /// <remarks>
-    /// Bigger than the default 13, because a real face at 13 is thinner than a bitmap one and
-    /// this is read over a moving game rather than on a desk.
-    /// </remarks>
-    private const int SerifSize = 16;
-
     /// <summary>
     /// Puts the interface in a face that suits what it is drawn over, if one can be found.
     /// </summary>
@@ -994,9 +1079,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// because none of this is worth a tool that does not start: a missing Windows font, a
     /// locked file, a face ImGui refuses. ReplaceFont says whether it worked, so the answer is
     /// checked rather than assumed.
+    ///
+    /// THE SIZE IS REMEMBERED whether or not a face was found, and it is the ATTEMPT that is
+    /// recorded rather than the success. Otherwise a machine with none of these fonts asks for
+    /// a new atlas on every single frame, for a face it is never going to get.
     /// </remarks>
-    private void WearASerif()
+    /// <param name="size">Pixels. Comes from <see cref="Interface"/>, already inside its range.</param>
+    private void WearASerif(int size)
     {
+        _wearing = size;
+
         string fonts = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
         if (fonts.Length == 0)
         {
@@ -1010,7 +1102,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             try
             {
                 if (File.Exists(file)
-                    && ReplaceFont(file, SerifSize, ClickableTransparentOverlay.FontGlyphRangeType.English))
+                    && ReplaceFont(file, size, ClickableTransparentOverlay.FontGlyphRangeType.English))
                 {
                     return;
                 }
@@ -1190,6 +1282,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     private void RenderFrame()
     {
+        // FIRST, before anything is submitted: this is the thread that owns ImGui's style and
+        // its font atlas, and a palette applied part-way through a frame draws half a window
+        // in each of two of them.
+        ApplyInterfaceIfAsked();
+
         TrackGameWindow();
 
         int width = (int)ImGui.GetIO().DisplaySize.X;
