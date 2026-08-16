@@ -36,6 +36,7 @@ public sealed class TrackerWindow
     private readonly Func<TrackerSettings> _read;
     private readonly Action<TrackerSettings> _write;
     private readonly Func<IconCache.Picture> _sheet;
+    private readonly Func<AnimationNames> _animations;
 
     /// <summary>Which rule the sheet picker is choosing a tile for, when it is open.</summary>
     private string _picking = string.Empty;
@@ -50,15 +51,24 @@ public sealed class TrackerWindow
     /// and every edit in here is a decision made once.
     /// </param>
     /// <param name="sheet">The icon sheet as loaded, so the editor can show what it is drawing.</param>
+    /// <param name="animations">
+    /// The animation table, for naming what is being read. A function rather than the table
+    /// itself: it is loaded by the app and set on the overlay, and the two happen in that order.
+    /// </param>
     public TrackerWindow(
-        Func<TrackerSettings> read, Action<TrackerSettings> write, Func<IconCache.Picture> sheet)
+        Func<TrackerSettings> read,
+        Action<TrackerSettings> write,
+        Func<IconCache.Picture> sheet,
+        Func<AnimationNames> animations)
     {
         ArgumentNullException.ThrowIfNull(read);
         ArgumentNullException.ThrowIfNull(write);
         ArgumentNullException.ThrowIfNull(sheet);
+        ArgumentNullException.ThrowIfNull(animations);
         _read = read;
         _write = write;
         _sheet = sheet;
+        _animations = animations;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -70,9 +80,208 @@ public sealed class TrackerWindow
 
         DrawLines(settings);
         ImGui.Separator();
+        DrawAim(settings, snapshot);
+        ImGui.Separator();
         DrawGroundDanger(settings, snapshot);
         ImGui.Separator();
         DrawStatus(settings, snapshot);
+    }
+
+    // ── Where they are pointing ──────────────────────────────────────────────
+
+    /// <summary>The aim rays, and what the monsters on screen are doing right now.</summary>
+    /// <remarks>
+    /// The live action list is the same idea as the buff names below it, and needed for the same
+    /// reason: the animation table came from the PLAYER's own animations, and whether the ids
+    /// mean the same thing on a monster is reasonable rather than proven. A list of what is
+    /// actually being read - number beside name - is what makes a wrong table obvious instead of
+    /// invisible.
+    /// </remarks>
+    private void DrawAim(TrackerSettings settings, WorldSnapshot snapshot)
+    {
+        if (!ImGui.CollapsingHeader("Where they are pointing"))
+        {
+            return;
+        }
+
+        AimSettings aim = settings.AimOrDefault;
+
+        bool on = aim.Enabled;
+        if (ImGui.Checkbox("draw a ray along each monster's facing", ref on))
+        {
+            _write(settings with { Aim = aim with { Enabled = on } });
+        }
+
+        ImGui.TextColored(
+            DimText,
+            "    the game keeps no target - it aims by TURNING, so the facing is the aim as exactly"
+            + " as the game has it.");
+        ImGui.TextColored(
+            WarnText,
+            "    it is not a promise of where a skill lands: many attacks lock direction at the"
+            + " start, and homing ones ignore facing.");
+
+        if (on)
+        {
+            ImGui.TextColored(
+                DimText,
+                "    this makes the reader read a facing and an animation per monster; watch the"
+                + " Read cost tab.");
+        }
+
+        bool acting = aim.OnlyWhileActing;
+        if (ImGui.Checkbox("only while doing something", ref acting))
+        {
+            _write(settings with { Aim = aim with { OnlyWhileActing = acting } });
+        }
+
+        ImGui.SameLine();
+        bool turn = aim.ShowTurn;
+        if (ImGui.Checkbox("show the turn", ref turn))
+        {
+            _write(settings with { Aim = aim with { ShowTurn = turn } });
+        }
+
+        ImGui.SameLine();
+        bool action = aim.ShowAction;
+        if (ImGui.Checkbox("name the action", ref action))
+        {
+            _write(settings with { Aim = aim with { ShowAction = action } });
+        }
+
+        ImGui.SameLine();
+        bool player = aim.ShowPlayer;
+        if (ImGui.Checkbox("and your own", ref player))
+        {
+            _write(settings with { Aim = aim with { ShowPlayer = player } });
+        }
+
+        ImGui.SetNextItemWidth(150f);
+        float length = aim.Length;
+        if (ImGui.SliderFloat("##length", ref length, 5f, 400f, "%.0f world units"))
+        {
+            _write(settings with { Aim = aim with { Length = length } });
+        }
+
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(120f);
+        float thickness = aim.Thickness;
+        if (ImGui.SliderFloat("##thickness", ref thickness, 0.5f, 10f, "%.1f wide"))
+        {
+            _write(settings with { Aim = aim with { Thickness = thickness } });
+        }
+
+        ImGui.SameLine();
+        Vector4 colour = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(aim.Colour));
+        if (ImGui.ColorEdit4("##aimcolour", ref colour, SwatchFlags))
+        {
+            _write(settings with
+            {
+                Aim = aim with { Colour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(colour)) },
+            });
+        }
+
+        ImGui.SameLine();
+        Vector4 turnColour = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(aim.TurnColour));
+        if (ImGui.ColorEdit4("##turncolour", ref turnColour, SwatchFlags))
+        {
+            _write(settings with
+            {
+                Aim = aim with
+                {
+                    TurnColour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(turnColour)),
+                },
+            });
+        }
+
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, "facing / turning");
+
+        DrawActions(snapshot);
+    }
+
+    /// <summary>What the monsters on screen are doing, commonest first.</summary>
+    private void DrawActions(WorldSnapshot snapshot)
+    {
+        var counts = new Dictionary<int, int>();
+        int aimed = 0, turning = 0;
+        foreach (WorldEntity entity in snapshot.Entities)
+        {
+            if (entity.Aim is not Aim aim)
+            {
+                continue;
+            }
+
+            aimed++;
+            if (aim.IsTurning)
+            {
+                turning++;
+            }
+
+            if (aim.Animation >= 0)
+            {
+                counts[aim.Animation] = counts.GetValueOrDefault(aim.Animation) + 1;
+            }
+        }
+
+        ImGui.TextColored(DimText, $"{aimed} entities have a facing this frame, {turning} of them mid-turn");
+
+        if (counts.Count == 0)
+        {
+            ImGui.TextColored(
+                DimText,
+                aimed == 0
+                    ? "nothing is being read - tick the box above and stand near something."
+                    : "no animation ids came back - the Actor component did not read.");
+            return;
+        }
+
+        if (!ImGui.BeginTable("##actions", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TableSetupColumn("how many");
+            ImGui.TableSetupColumn("id");
+            ImGui.TableSetupColumn("name");
+            ImGui.TableSetupColumn("counts as");
+            ImGui.TableHeadersRow();
+
+            foreach ((int id, int count) in counts.OrderByDescending(entry => entry.Value).Take(12))
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(count.ToString(CultureInfo.CurrentCulture));
+
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(id.ToString(CultureInfo.CurrentCulture));
+
+                ImGui.TableNextColumn();
+                string? name = _animations().Of(id);
+                if (name is null)
+                {
+                    ImGui.TextColored(WarnText, "(not in the table)");
+                }
+                else
+                {
+                    ImGui.TextUnformatted(ImGuiText.Escape(name));
+                }
+
+                // What the ray filter makes of it. The one column that says WHY a monster has
+                // no ray while plainly doing something.
+                ImGui.TableNextColumn();
+                AnimationKind kind = _animations().KindOf(id);
+                ImGui.TextColored(
+                    kind is AnimationKind.Idle or AnimationKind.Moving ? DimText : GoodText,
+                    kind.ToString().ToLowerInvariant());
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
     }
 
     // ── Lines to monsters ────────────────────────────────────────────────────

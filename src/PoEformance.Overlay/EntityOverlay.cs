@@ -93,6 +93,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public Action<bool>? ReadMonsterBuffs { get; set; }
 
     /// <summary>
+    /// Tells the reader whether to read where things POINT and what they are doing.
+    /// </summary>
+    /// <remarks>
+    /// The third of these, on the same terms: two reads per monster that only the aim rays want,
+    /// switched on by the settings that ask for them and taken away again with them.
+    /// </remarks>
+    public Action<bool>? ReadAim { get; set; }
+
+    /// <summary>
     /// What the tracker draws - lines to monsters, rings on dangerous ground, status icons.
     /// </summary>
     /// <remarks>
@@ -110,6 +119,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _monsterLines.Settings = value;
             _groundDanger.Settings = value;
             _statusIcons.Settings = value;
+            _aim.Settings = value;
         }
     }
 
@@ -405,6 +415,28 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly MonsterLineLayer _monsterLines = new();
     private readonly GroundDangerLayer _groundDanger = new();
     private readonly StatusIconLayer _statusIcons = new();
+    private readonly AimLayer _aim = new();
+
+    /// <summary>
+    /// The animation table, for saying what a monster is doing rather than which number it is.
+    /// </summary>
+    /// <remarks>
+    /// Loaded from a data file by whoever wires this up, like every other table here - the
+    /// overlay draws, and where a file lives is not its business. Absent, the numbers still
+    /// show; a table is a label and never a fact.
+    /// </remarks>
+    public AnimationNames Animations
+    {
+        get => _animations;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _animations = value;
+            _aim.Animations = value;
+        }
+    }
+
+    private AnimationNames _animations = AnimationNames.Empty;
 
     // The trails belong to the LAYER's question rather than the reader's, so they are kept
     // here: a projectile's path across the screen is something only a thing that sees every
@@ -648,7 +680,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             },
             () => Tracker.IconSheet.Length == 0
                 ? default
-                : _icons.PictureFor(Tracker.IconSheet, IconCache.MaxSheetEdge));
+                : _icons.PictureFor(Tracker.IconSheet, IconCache.MaxSheetEdge),
+            () => Animations);
 
         _tools.Add(
             32, "tracker", "Tracker", () => window.DrawTab(_snapshot), page: Combat, pageLabel: "Combat");
@@ -1307,6 +1340,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // from the settings being applied, and one thing that syncs cannot drift out of step
         // the way two callers can.
         ReadMonsterBuffs?.Invoke(_tracker.NeedsMonsterBuffs);
+        ReadAim?.Invoke(_tracker.NeedsAim);
 
         _viewport = (width, height);
         _snapshot = _snapshotSource(new UiScale(width, height, _cull));
@@ -1377,6 +1411,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // After the health bars so a line lands over them rather than under, and before
             // the status icons so it never crosses the numbers they carry.
             _monsterLines.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+
+            // Between the lines and the icons: a ray is a world-space line like the monster
+            // lines, and the icons carry numbers that nothing should be drawn over.
+            _aim.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
             _statusIcons.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
 
             if (ShowWorldDots)

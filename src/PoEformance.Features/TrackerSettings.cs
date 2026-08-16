@@ -177,6 +177,53 @@ public sealed record StatusLayoutProfile(string Name, StatusIconLayout Player, S
 }
 
 /// <summary>
+/// The line showing where a monster is pointing, and what it is doing while it points there.
+/// </summary>
+/// <remarks>
+/// WHAT THIS ANSWERS AND WHAT IT CANNOT. The game keeps no target pointer - it aims by turning
+/// the actor to an angle and firing once it is within a tolerance - so a ray along the facing IS
+/// the aim, as exactly as the game itself has it. What it is NOT is a promise about where a
+/// skill will land: many attacks lock their direction at the moment they start and then the
+/// monster turns away, and a homing projectile ignores the facing entirely. The ray says where
+/// the monster is pointing right now, which is what it knows.
+///
+/// <see cref="OnlyWhileActing"/> is what makes it usable rather than a screen of lines: every
+/// monster in the area faces somewhere at all times, and almost none of them are about to do
+/// anything about it.
+/// </remarks>
+/// <param name="Length">How far the ray runs, in WORLD units - so it shrinks with the camera.</param>
+/// <param name="OnlyWhileActing">
+/// Draw only for monsters whose animation is not idling or walking. Unknown animations COUNT AS
+/// acting: the name table has 1084 entries and the game has more, and a marker that vanishes
+/// reads as "nothing is happening".
+/// </param>
+/// <param name="ShowTurn">
+/// Also draw the angle it is turning TO, when that differs from where it points. This is the
+/// aim proper, a step ahead of the pose, and it is only ever on screen for the length of a turn
+/// - a median of 94 ms.
+/// </param>
+public sealed record AimSettings(
+    [property: JsonPropertyName("enabled")] bool Enabled = false,
+    [property: JsonPropertyName("length")] float Length = 60f,
+    [property: JsonPropertyName("thickness")] float Thickness = 2f,
+    [property: JsonPropertyName("colour")] string Colour = "#B4FF6432",
+    [property: JsonPropertyName("turnColour")] string TurnColour = "#B4FFC800",
+    [property: JsonPropertyName("onlyWhileActing")] bool OnlyWhileActing = true,
+    [property: JsonPropertyName("showTurn")] bool ShowTurn = true,
+    [property: JsonPropertyName("showAction")] bool ShowAction = false,
+    [property: JsonPropertyName("showPlayer")] bool ShowPlayer = false)
+{
+    public static AimSettings Default { get; } = new();
+
+    /// <summary>Keeps the values inside what can be drawn.</summary>
+    public AimSettings Normalised() => this with
+    {
+        Length = Math.Clamp(Length, 5f, 400f),
+        Thickness = Math.Clamp(Thickness, 0.5f, 10f),
+    };
+}
+
+/// <summary>
 /// What the tracker draws: lines to monsters, rings on dangerous ground, status icons.
 /// </summary>
 /// <remarks>
@@ -210,7 +257,8 @@ public sealed record TrackerSettings(
     [property: JsonPropertyName("chargesX")] int ChargesX = 0,
     [property: JsonPropertyName("chargesY")] int ChargesY = 0,
     [property: JsonPropertyName("timerX")] int TimerX = 0,
-    [property: JsonPropertyName("timerY")] int TimerY = 0)
+    [property: JsonPropertyName("timerY")] int TimerY = 0,
+    [property: JsonPropertyName("aim")] AimSettings? Aim = null)
 {
     public static TrackerSettings Default { get; } = new();
 
@@ -243,6 +291,16 @@ public sealed record TrackerSettings(
     public bool NeedsMonsterBuffs
         => ShowMonsterStatus && MonsterStatusOrDefault.Any(rule => rule.Enabled && !rule.SaysNothing);
 
+    /// <summary>The aim settings, or their defaults when the file said nothing.</summary>
+    public AimSettings AimOrDefault => Aim ?? AimSettings.Default;
+
+    /// <summary>Whether the reader has to read facing and animation for anything to draw.</summary>
+    /// <remarks>
+    /// The second of the two priced settings, and asked here for the same reason as the first:
+    /// the reader and the layer must not be able to disagree about whether the read is happening.
+    /// </remarks>
+    public bool NeedsAim => AimOrDefault.Enabled;
+
     /// <summary>Keeps every value inside the range the overlay can draw.</summary>
     /// <remarks>
     /// A hand-edited file is the normal source of these, and every one of them has a way of
@@ -262,6 +320,7 @@ public sealed record TrackerSettings(
         IconTile = Math.Clamp(IconTile, 1, 512),
         ShadowAlpha = Math.Clamp(ShadowAlpha, 0f, 1f),
         ShadowSize = Math.Clamp(ShadowSize, 0, 2),
+        Aim = Aim?.Normalised(),
     };
 
     private static IReadOnlyList<StatusIconRule>? Cleaned(IReadOnlyList<StatusIconRule>? rules)
