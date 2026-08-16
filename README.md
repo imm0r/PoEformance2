@@ -82,6 +82,15 @@ town, a hideout, or a campaign zone. Corpses are filtered out, and drops below m
 RE instruments — dots out in the 3D world, the projection measurements, the calibration
 markers, and per-kind filters including terrain and effects.
 
+The **Tracker** tab (Combat page) carries the three features ported from the GameHelper2 plugin
+[`hyper911/Tracker-GH2`](https://github.com/hyper911/Tracker-GH2): lines from the player to
+unique/rare/magic monsters, rings around the ground effects you name by metadata path, and
+buff/debuff icons over the player and over rare-or-better monsters — each with its stack count
+and a timer bar drawn from the game's own remaining and total duration. The icon sheet is a PNG
+of your own choosing (any tile grid; the tab has a picker); without one each effect is drawn as
+its coloured disc with its caption on it. The monster half is the one setting that costs a read
+per monster, so it is off until switched on and takes its cost with it when switched off.
+
 The config window has a **Map** tab showing the same layout at a readable size, with the
 player and nearby markers on it. It stays open while the overlay runs and its settings apply
 immediately — no restart. Auto flask is off until switched on there, per belt slot; the key each flask

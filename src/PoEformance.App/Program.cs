@@ -907,6 +907,11 @@ internal static class Program
         // visual entity, which the entity walk drops before its path is read.
         overlay.ReadVisuals = read => world.ReadVisualEntities = read;
 
+        // And the one the status icons need: no monster carries buffs until the reader is
+        // asked to walk that component, and it is the only per-monster read here that nothing
+        // else in the tool wants.
+        overlay.ReadMonsterBuffs = read => world.ReadMonsterBuffs = read;
+
         overlay.Costs = costs;
         overlay.Coverage = coverage;
         overlay.Damage = damage;
@@ -917,6 +922,9 @@ internal static class Program
             preloadSettings,
             changed => PoEformance.Features.PreloadStore.Save(changed));
         overlay.AttachQuests(quests);
+        overlay.AttachTracker(
+            PoEformance.Features.TrackerStore.Load(),
+            changed => PoEformance.Features.TrackerStore.Save(changed));
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);

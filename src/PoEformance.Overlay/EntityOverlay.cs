@@ -81,6 +81,41 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public Action<bool>? ReadVisuals { get; set; }
 
     /// <summary>
+    /// Tells the reader whether to read what is ON the monsters, for the status icons.
+    /// </summary>
+    /// <remarks>
+    /// The same arrangement as the visual entities above and for the same reason: without the
+    /// read no monster carries buffs, so a separate switch would be a second thing to find
+    /// before the first one drew anything - and with it every rare-or-better monster costs a
+    /// component walk nothing else in the tool wants. Driven by the settings that ask for it,
+    /// so switching the icons off takes the cost with them.
+    /// </remarks>
+    public Action<bool>? ReadMonsterBuffs { get; set; }
+
+    /// <summary>
+    /// What the tracker draws - lines to monsters, rings on dangerous ground, status icons.
+    /// </summary>
+    /// <remarks>
+    /// ONE record shared by three layers, set through here rather than on each: they are edited
+    /// together in one tab, and three copies of the settings would be three things to keep in
+    /// step. The layers read it on the render thread every frame, so an edit lands on the next.
+    /// </remarks>
+    public TrackerSettings Tracker
+    {
+        get => _tracker;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _tracker = value;
+            _monsterLines.Settings = value;
+            _groundDanger.Settings = value;
+            _statusIcons.Settings = value;
+        }
+    }
+
+    private TrackerSettings _tracker = TrackerSettings.Default;
+
+    /// <summary>
     /// How every drawn thing looks - colours, sizes, line widths, and whether it is drawn.
     /// </summary>
     /// <remarks>
@@ -291,6 +326,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly EffectLayer _effects = new();
     private readonly HealthBarLayer _healthBars = new();
 
+    // The tracker's three layers, which share one settings record - see AttachTracker.
+    private readonly MonsterLineLayer _monsterLines = new();
+    private readonly GroundDangerLayer _groundDanger = new();
+    private readonly StatusIconLayer _statusIcons = new();
+
     // The trails belong to the LAYER's question rather than the reader's, so they are kept
     // here: a projectile's path across the screen is something only a thing that sees every
     // snapshot in order can assemble, and the reader hands out one snapshot at a time.
@@ -495,6 +535,42 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
     }
 
+    /// <summary>
+    /// Adds the tracker: lines to monsters, rings on dangerous ground, status icons.
+    /// </summary>
+    /// <remarks>
+    /// Its editor is a TAB rather than a page in the configuration window, and that is forced
+    /// by what has to be typed into it. A status rule matches on the game's own internal buff
+    /// name - a spelling nobody is ever shown - so the only way to write one is to have the
+    /// effect on you and read the list of what you are carrying, which means the editor has to
+    /// be open while playing.
+    /// </remarks>
+    public void AttachTracker(TrackerSettings settings, Action<TrackerSettings> saved, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(saved);
+
+        Tracker = settings;
+        var window = new TrackerWindow(
+            () => Tracker,
+            changed =>
+            {
+                Tracker = changed;
+                saved(changed);
+            },
+            () => Tracker.IconSheet.Length == 0
+                ? default
+                : _icons.PictureFor(Tracker.IconSheet, IconCache.MaxSheetEdge));
+
+        _tools.Add(
+            32, "tracker", "Tracker", () => window.DrawTab(_snapshot), page: Combat, pageLabel: "Combat");
+
+        if (visible)
+        {
+            _tools.Show("tracker");
+        }
+    }
+
     /// <summary>Radius in pixels of an entity dot.</summary>
     private const float DotRadius = 5f;
 
@@ -581,6 +657,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // The entry card takes its plates from the same cache the markers use, so a picture
         // that cannot be loaded is reported in one place and given up on once.
         _preloadEntry.Icons = _icons;
+
+        // And the status icon sheet out of the same one, for the same reason: one texture per
+        // file, and one place that says why a file did not load.
+        _statusIcons.Icons = _icons;
 
         // FIRST, and registered here rather than where the tools attach, because this one is
         // not attached by anybody: it is this class's own readout, it is what the window shows
@@ -1125,6 +1205,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // delegate call and a bool.
         ReadVisuals?.Invoke(_projectiles.Enabled);
 
+        // The same arrangement, for the read the status icons need: kept in step every frame
+        // rather than at the moment a switch moves, because the switch moves from the tab and
+        // from the settings being applied, and one thing that syncs cannot drift out of step
+        // the way two callers can.
+        ReadMonsterBuffs?.Invoke(_tracker.NeedsMonsterBuffs);
+
         _viewport = (width, height);
         _snapshot = _snapshotSource(new UiScale(width, height, _cull));
 
@@ -1182,10 +1268,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // where a radar belongs, and it is where the game already draws its own.
             DrawMapDots();
 
+            // UNDER everything else in world space, because it is drawn ON the ground and
+            // filled rings would otherwise cover the markers standing in them.
+            _groundDanger.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+
             // Over the monsters themselves rather than on the map, and separate from the
             // world dots for that reason: a dot in the world lands between the player and
             // what they are fighting, while a health bar goes where the eye already is.
             _healthBars.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+
+            // After the health bars so a line lands over them rather than under, and before
+            // the status icons so it never crosses the numbers they carry.
+            _monsterLines.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+            _statusIcons.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
 
             if (ShowWorldDots)
             {

@@ -42,6 +42,18 @@ public sealed class IconCache : IDisposable
     public const int MaxWideEdge = 1024;
 
     /// <summary>
+    /// Largest edge for a SHEET, whose tiles are addressed by coordinate.
+    /// </summary>
+    /// <remarks>
+    /// High enough that no ordinary sheet is resized at all, and that is the whole requirement
+    /// rather than a preference about detail. A tile is picked out with texture coordinates
+    /// derived from a tile size in PIXELS, so a sheet that was shrunk on the way in has a grid
+    /// that no longer matches the number it is being cut up by - every icon drawn lands part
+    /// way between two of them. The reference's own sheet is 256x3392, well inside this.
+    /// </remarks>
+    public const int MaxSheetEdge = 4096;
+
+    /// <summary>
     /// Whether a picture is handed to the renderer as an sRGB texture. It is not, and the
     /// reason is the RENDER TARGET rather than the picture.
     /// </summary>
