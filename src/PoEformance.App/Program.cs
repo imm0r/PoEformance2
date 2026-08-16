@@ -912,6 +912,11 @@ internal static class Program
         // else in the tool wants.
         overlay.ReadMonsterBuffs = read => world.ReadMonsterBuffs = read;
 
+        // And the one the aim rays need: where things point, and what they are doing.
+        overlay.ReadAim = read => world.ReadAim = read;
+        overlay.Animations = PoEformance.Game.Components.AnimationNames.Load(
+            FindDataFile("animations.tsv"));
+
         overlay.Costs = costs;
         overlay.Coverage = coverage;
         overlay.Damage = damage;

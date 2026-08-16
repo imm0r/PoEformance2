@@ -82,6 +82,13 @@ town, a hideout, or a campaign zone. Corpses are filtered out, and drops below m
 RE instruments — dots out in the 3D world, the projection measurements, the calibration
 markers, and per-kind filters including terrain and effects.
 
+It also draws **where a monster is pointing**. Path of Exile 2 keeps no target pointer anywhere in
+memory — the game aims by *turning* an actor to an angle and firing once it is within a tolerance —
+so the facing **is** the aim, as exactly as the game itself has it. The ray runs along it in world
+units, a second one shows where it is turning to while it turns, and the animation beside it says
+whether that is a slam starting or a monster walking past. Off by default: it costs the reader two
+reads per monster, and it takes them back the moment it is switched off.
+
 The **Tracker** tab (Combat page) carries the three features ported from the GameHelper2 plugin
 [`hyper911/Tracker-GH2`](https://github.com/hyper911/Tracker-GH2): lines from the player to
 unique/rare/magic monsters, rings around the ground effects you name by metadata path, and

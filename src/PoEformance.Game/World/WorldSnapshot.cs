@@ -62,6 +62,49 @@ public readonly record struct ReadCost(
            + $"  player {PlayerMs:F1}  terrain {TerrainMs:F1}  maps {MapsMs:F1}  other {OtherMs:F1}";
 }
 
+/// <summary>
+/// Where an entity is pointing and what it is doing - together, because neither is much use
+/// alone.
+/// </summary>
+/// <remarks>
+/// THE PAIR IS THE POINT. The angle says a monster is pointing at you and says nothing about
+/// whether that matters, since a monster walking past points at you too. The animation says a
+/// slam is starting and says nothing about where it will land. Together they are the only thing
+/// in memory that answers "that slam is coming HERE", which is the question this was built for -
+/// the game keeps no target pointer at all, it aims by turning (see the schema's
+/// RotationCurrent).
+/// </remarks>
+/// <param name="Angle">
+/// Which way it faces now, in radians. Zero is world -Y and it runs the same way round as
+/// atan2 - use <see cref="Facing"/> rather than working with it directly.
+/// </param>
+/// <param name="Turning">
+/// Which way it is turning to face: the aim, a step ahead of the pose. Equal to
+/// <paramref name="Angle"/> whenever nothing is turning, which is most of the time.
+/// </param>
+/// <param name="Animation">
+/// The game's own animation id, or -1 when it was not read. <see cref="AnimationNames"/> turns
+/// it into a name and a kind.
+/// </param>
+public readonly record struct Aim(float Angle, float Turning, int Animation = -1)
+{
+    /// <summary>How far it still has to turn, in radians, signed. Zero when it is settled.</summary>
+    public float Turn => Facing.Between(Angle, Turning);
+
+    /// <summary>Whether it is mid-turn - which is to say, taking aim right now.</summary>
+    /// <remarks>
+    /// The threshold is the same one the fixtures were measured with. Below it the two floats
+    /// are the same number and the entity is pointing where it means to.
+    /// </remarks>
+    public bool IsTurning => MathF.Abs(Turn) > 0.01f;
+
+    /// <summary>The unit direction it faces, in world space.</summary>
+    public (float X, float Y) Direction => Facing.Direction(Angle);
+
+    /// <summary>The unit direction it is turning to face.</summary>
+    public (float X, float Y) Aiming => Facing.Direction(Turning);
+}
+
 /// <summary>One entity as the overlay needs it: what it is, where it is, and its address.</summary>
 /// <param name="WorldZ">
 /// The entity's BASE height - its feet. This is what the world-to-screen projection wants:
@@ -131,6 +174,14 @@ public readonly record struct ReadCost(
 /// the read are given one. An empty <see cref="ActiveBuffs"/> is the other answer: it was read
 /// and there was nothing on it.
 /// </param>
+/// <param name="Aim">
+/// Where this entity is pointing and what it is doing, when somebody asked for it.
+///
+/// Null means NOBODY ASKED, on the same terms as <paramref name="Buffs"/>: it costs two reads
+/// per entity that nothing else in the tool wants, so <see cref="WorldReader.ReadAim"/> has to
+/// be switched on. Filled for the player and for hostile monsters - a friendly minion's aim is
+/// nobody's question, and scenery has no Actor component to ask.
+/// </param>
 /// <remarks>
 /// Carried because the game hands one monster several entity objects over a single set of
 /// components, so an entity address is not an identity: three entities with three addresses
@@ -160,7 +211,8 @@ public sealed record WorldEntity(
     ulong Render = 0,
     bool? Present = null,
     int? RememberedForMs = null,
-    ActiveBuffs? Buffs = null)
+    ActiveBuffs? Buffs = null,
+    Aim? Aim = null)
 {
     /// <summary>Whether this comes from memory rather than from the game's current list.</summary>
     public bool IsRemembered => RememberedForMs is not null;
@@ -421,6 +473,21 @@ public sealed class WorldReader
     /// </remarks>
     public ItemRarity MonsterBuffFloor { get; set; } = ItemRarity.Rare;
 
+    /// <summary>
+    /// Read where things are POINTING, and what they are doing - the aim overlay's input.
+    /// </summary>
+    /// <remarks>
+    /// OFF by default, like the buffs, and for the same reason: two reads per monster that
+    /// nothing else in the tool wants. It is the cheaper of the two - eight bytes off the Render
+    /// component that was already resolved, plus four off the Actor component - and it is still
+    /// a cost nobody should pay for a layer they have switched off.
+    ///
+    /// NO RARITY FLOOR, unlike the buffs, and that is deliberate. A debuff timer is something
+    /// you watch on a rare; a slam that is about to land is a question about whatever is next to
+    /// you, and an ordinary monster's slam kills exactly as well.
+    /// </remarks>
+    public bool ReadAim { get; set; }
+
     private readonly GroundItemReader _groundItems;
     private readonly MinimapIconReader _mapIcons;
     private LandmarkNames _landmarkNames = LandmarkNames.Empty;
@@ -443,6 +510,7 @@ public sealed class WorldReader
     private readonly int _monsterRarity;
     private readonly int _chestOpened;
     private readonly int _reaction;
+    private readonly int _animationId;
 
     /// <summary>Names already read, by entity address.</summary>
     /// <remarks>
@@ -503,6 +571,7 @@ public sealed class WorldReader
         _lifeSpan = _lifeEnergyShield - _lifeHealth + _vitalCurrent + sizeof(int);
         _isTargetable = schema.Structs["Targetable"].OffsetOf("IsTargetable");
         _monsterRarity = schema.Structs["ObjectMagicProperties"].OffsetOf("Rarity");
+        _animationId = schema.Structs["Actor"].OffsetOf("AnimationId");
         _chestOpened = schema.Structs["Chest"].OffsetOf("IsOpened");
         _reaction = schema.Structs["Positioned"].OffsetOf("Reaction");
     }
@@ -583,6 +652,35 @@ public sealed class WorldReader
         return new MonsterSigns(
             health, targetable, monsterRarity >= ItemRarity.Unique, monsterRarity, pool, shield,
             friendly, temporary, hasLife, hasTargetable);
+    }
+
+    /// <summary>
+    /// Where an entity is pointing and what it is doing, or null when neither could be read.
+    /// </summary>
+    /// <remarks>
+    /// The ANGLE is what makes this worth having, so an entity whose facing will not read gets
+    /// nothing at all - an animation on its own says a slam is starting and cannot say where it
+    /// is going, which is the half that was already available and never enough.
+    ///
+    /// The animation is the other way round: optional. Not everything that faces somewhere has
+    /// an Actor component, and -1 travels on to say "not read" rather than being mistaken for
+    /// animation zero, which is Idle.
+    /// </remarks>
+    private Aim? ReadAimOf(Entity entity, ulong renderAddress)
+    {
+        if (_render.ReadFacing(renderAddress) is not (float angle, float turning))
+        {
+            return null;
+        }
+
+        int animation = -1;
+        ulong actor = entity.Component("Actor");
+        if (actor != 0 && _reader.TryRead(actor + (ulong)_animationId, out int read))
+        {
+            animation = read;
+        }
+
+        return new Aim(angle, turning, animation);
     }
 
     /// <summary>Whether the game says this entity is on the player's side.</summary>
@@ -891,13 +989,22 @@ public sealed class WorldReader
                 }
             }
 
+            // Where it is pointing and what it is doing. Only the things that can aim at you -
+            // the player, and the monsters that are not on your side - because everything else
+            // here is scenery, a drop, or your own summon.
+            Aim? aim = null;
+            if (ReadAim && (kind == EntityKind.Player || (kind == EntityKind.Monster && !friendly)))
+            {
+                aim = ReadAimOf(entity, renderAddress);
+            }
+
             var world = new WorldEntity(
                 id, address, entity.Path, kind,
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
                 poi, mapIcon,
                 signs.Life, signs.EnergyShield, opened, friendly, signs.IsEffect,
-                NameOf(address, renderAddress), renderAddress, present, Buffs: buffs);
+                NameOf(address, renderAddress), renderAddress, present, Buffs: buffs, Aim: aim);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

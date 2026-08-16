@@ -41,6 +41,7 @@ public sealed class RenderReader
     private readonly int _terrainHeight;
     private readonly int _modelBounds;
     private readonly int _name;
+    private readonly int _rotation;
 
     public RenderReader(IMemoryReader reader, OffsetSchema schema)
     {
@@ -53,6 +54,35 @@ public sealed class RenderReader
         _terrainHeight = render.OffsetOf("TerrainHeight");
         _modelBounds = render.OffsetOf("CharacterModelBounds"); // x; y at +4, z at +8
         _name = render.OffsetOf("Name");
+        _rotation = render.OffsetOf("RotationCurrent"); // the turn target is the next float
+    }
+
+    /// <summary>
+    /// Which way this entity faces, and which way it is turning to face. Null when unreadable.
+    /// </summary>
+    /// <remarks>
+    /// SEPARATE FROM <see cref="Read"/>, and not folded into its span, which would be one read
+    /// rather than two and would break every recording already committed. A replay only serves
+    /// reads the running build actually performed: those files hold twelve bytes at the world
+    /// position, so a widened span would fail outright and take every entity in them with it.
+    /// The cost of the extra call is only paid where somebody asked for facing at all.
+    ///
+    /// The two floats are adjacent, so one call brings both. See <c>Facing</c> for what the
+    /// angle means - it is not measured from the axis anybody would guess.
+    /// </remarks>
+    public (float Angle, float Turning)? ReadFacing(ulong componentAddress)
+    {
+        if (!MemoryReaderExtensions.IsPlausiblePointer(componentAddress))
+        {
+            return null;
+        }
+
+        Span<float> pair = stackalloc float[2];
+        return _reader.TryRead(
+            componentAddress + (ulong)_rotation,
+            System.Runtime.InteropServices.MemoryMarshal.AsBytes(pair))
+            ? (pair[0], pair[1])
+            : null;
     }
 
     /// <summary>
