@@ -36,6 +36,15 @@ public class FacingTests
     /// <summary>The walking session: 22 s of moving about, facing led by the cursor.</summary>
     private const string Walking = "session-2026-08-rotation-walking.rec";
 
+    /// <summary>
+    /// The same again with movement bound to the MOUSE, which is what settles the convention.
+    /// </summary>
+    /// <remarks>
+    /// The only one of the three in which the facing and the path are the same thing, because
+    /// clicking to move points the character where it is going. 46 s, 978 samples.
+    /// </remarks>
+    private const string ClickMove = "session-2026-08-rotation-clickmove.rec";
+
     private static string FixturePath => Fixture(Standing);
 
     private static string Fixture(string name)
@@ -280,6 +289,98 @@ public class FacingTests
             sameSense < 0.6 && mirrored < 0.6,
             $"the facing tracked the path after all (consistency {sameSense:F2} / {mirrored:F2}) - "
             + "if that is real, the convention can finally be read off it");
+    }
+
+    /// <summary>
+    /// THE CONVENTION: zero points along world -Y, running the same way round as atan2.
+    /// </summary>
+    /// <remarks>
+    /// Checked THROUGH <see cref="Facing"/> rather than against a copy of the arithmetic here,
+    /// because the class is the thing that has to be right - a test that re-derives the maths
+    /// passes just as well when both copies are wrong in the same way.
+    ///
+    /// Only the samples that can say anything: the facing settled (not mid-turn, so it points
+    /// where it means to rather than where it is catching up to) and the player properly
+    /// moving. Under click-to-move those are the samples where the path IS the facing.
+    ///
+    /// Measured over the 108 of them - median 89.76 degrees, 5th-95th percentile 89.48-91.08,
+    /// 94% within five degrees. The handful outside are a fresh click reversing the path inside
+    /// one 47 ms sample, which is why the threshold is a share and not all of them.
+    /// </remarks>
+    [Fact]
+    public void TheFacingPointsAlongTheStepWhenTheCharacterWalksWhereItIsClicked()
+    {
+        List<Turn> samples = Read(ClickMove);
+
+        var errors = new List<double>();
+        for (int i = 0; i + 1 < samples.Count; i++)
+        {
+            if (Math.Abs(Wrapped(samples[i].Future - samples[i].Current)) > 0.001)
+            {
+                continue; // mid-turn: it is catching up, not pointing
+            }
+
+            float dx = samples[i + 1].X - samples[i].X;
+            float dy = samples[i + 1].Y - samples[i].Y;
+            if (Math.Sqrt((dx * dx) + (dy * dy)) < 10)
+            {
+                continue; // barely moving: the step's own direction is noise
+            }
+
+            // What the class says the facing should be for the step actually taken, against
+            // what the game had in the field.
+            errors.Add(Math.Abs(Facing.Between(Facing.FromHeading(dx, dy), samples[i].Current))
+                * 180 / Math.PI);
+        }
+
+        Assert.True(errors.Count > 50, $"only {errors.Count} settled moving samples");
+
+        errors.Sort();
+        double median = errors[errors.Count / 2];
+        int within = errors.Count(e => e < 5);
+
+        Assert.True(median < 2, $"median error {median:F2} deg - the convention is off");
+        Assert.True(
+            within > errors.Count * 0.85,
+            $"only {within} of {errors.Count} steps landed within 5 deg of the facing");
+    }
+
+    /// <summary>The direction and the angle are inverses of each other.</summary>
+    /// <remarks>
+    /// The property that keeps a marker and the ray it points along in step. Cheap, and it is
+    /// the half of the convention no recording exercises - <see cref="Facing.Direction"/> is
+    /// what a consumer actually calls, while the fixture check above goes through
+    /// <see cref="Facing.FromHeading"/>.
+    /// </remarks>
+    [Theory]
+    [InlineData(0f)]
+    [InlineData(1.2f)]
+    [InlineData(3.9f)]
+    [InlineData(6.2f)]
+    public void TurningAnAngleIntoADirectionAndBackGivesTheAngle(float angle)
+    {
+        (float x, float y) = Facing.Direction(angle);
+
+        Assert.Equal(1f, MathF.Sqrt((x * x) + (y * y)), 4);
+        Assert.Equal(0f, Facing.Between(angle, Facing.FromHeading(x, y)), 4);
+    }
+
+    /// <summary>Zero points along world -Y, and a quarter turn on points along +X.</summary>
+    /// <remarks>
+    /// Written out as the four compass points because that is the form a reader checks a
+    /// drawing against, and because it is the claim that would silently invert if somebody
+    /// "tidied" the sign in <see cref="Facing.Direction"/>.
+    /// </remarks>
+    [Fact]
+    public void ZeroFacesNegativeYAndTheAngleRunsTheSameWayAsAtan2()
+    {
+        Assert.Equal((0f, -1f), Round(Facing.Direction(0f)));
+        Assert.Equal((1f, 0f), Round(Facing.Direction(MathF.PI / 2)));
+        Assert.Equal((0f, 1f), Round(Facing.Direction(MathF.PI)));
+        Assert.Equal((-1f, 0f), Round(Facing.Direction(3 * MathF.PI / 2)));
+
+        static (float X, float Y) Round((float X, float Y) direction)
+            => (MathF.Round(direction.X, 3), MathF.Round(direction.Y, 3));
     }
 
     /// <summary>The shortest signed distance between two angles.</summary>
