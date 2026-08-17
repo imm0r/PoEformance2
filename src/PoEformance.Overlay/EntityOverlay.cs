@@ -1924,10 +1924,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             //
             // AND WHERE EACH ONE IS, which is a separate answer and fails separately: the bit
             // decides about the markers, the rectangle decides about this window. HOW it was
-            // arrived at is printed too, because the three ways differ in how much they can be
-            // trusted - "by element" is the panel's own size, "by children" is what it draws,
-            // and "by screen" is nothing measurable and the whole window assumed. A screenshot
-            // of this line is what settles which one a machine is taking.
+            // arrived at is printed too, because the ways differ in how much they can be
+            // trusted, and a screenshot of this line is what settles which one a machine took -
+            // it is how the atlas was caught reporting itself 733 pixels too narrow.
             if (_snapshot.InAPanel)
             {
                 string where = !HideWindowsBehindPanels
@@ -1938,7 +1937,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                             ", ",
                             _snapshot.Covering.Select(
                                 area => $"{area.Panel} {area.Right - area.Left:F0}x{area.Bottom - area.Top:F0}"
-                                        + $" by {area.From.ToString().ToLowerInvariant()}"));
+                                        + $" {Extent(area.From)}"));
 
                 Row(
                     "panels",
@@ -2359,6 +2358,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </summary>
     private static string Show(Vital vital)
         => vital.Percent < 0 ? "-" : $"{vital.Current}/{vital.Unreserved} ({vital.Percent}%)";
+
+    /// <summary>How a panel's rectangle was arrived at, in words rather than as an enum name.</summary>
+    /// <remarks>
+    /// Read while something is being diagnosed, so it says what it MEANS: a measurement that can
+    /// be wrong reads differently from a rule that cannot. "by element" is the one that has
+    /// already been caught lying, on the atlas, on an ultrawide.
+    /// </remarks>
+    private static string Extent(PanelExtent from) => from switch
+    {
+        PanelExtent.Element => "by its own size",
+        PanelExtent.Children => "by what it draws",
+        PanelExtent.Kind => "whole screen by kind",
+        _ => "whole screen - nothing measurable",
+    };
 
     /// <summary>
     /// Whether an entity is worth a marker: the loot filter, and the things that are still in
