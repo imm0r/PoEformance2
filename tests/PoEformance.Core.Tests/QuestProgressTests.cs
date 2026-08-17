@@ -239,9 +239,9 @@ public class QuestProgressTests
         // Steps are cumulative - an early one asks for flags a later one also has - so the
         // FIRST match is where the character has already been. Taking it would report every
         // quest as being on step one forever.
-        QuestStep one = new(1, [10], [], "kill it", string.Empty);
-        QuestStep two = new(2, [10, 11], [], "come back", string.Empty);
-        QuestStep three = new(3, [10, 11, 12], [], "done", string.Empty);
+        QuestStep one = new(1, [10], [], "kill it", string.Empty, []);
+        QuestStep two = new(2, [10, 11], [], "come back", string.Empty, []);
+        QuestStep three = new(3, [10, 11, 12], [], "done", string.Empty, []);
 
         var set = new HashSet<int> { 10, 11 };
 
@@ -253,7 +253,7 @@ public class QuestProgressTests
     [Fact]
     public void AFlagThatMustBeAbsentBlocksTheStep()
     {
-        QuestStep step = new(1, [10], [11], "before you talk to him", string.Empty);
+        QuestStep step = new(1, [10], [11], "before you talk to him", string.Empty, []);
 
         Assert.True(step.Holds(new HashSet<int> { 10 }));
         Assert.False(step.Holds(new HashSet<int> { 10, 11 }));
@@ -330,7 +330,7 @@ public class QuestProgressTests
         // Message matched it word for word - "Find the Red Vale", "Search for the meaning of
         // the Runes etched into the Tree of Souls" - while Text was the longer sentence every
         // time. The schema's names do not say which is which; both are just a string.
-        QuestStep step = new(1, [], [], "The Devourer lives underground in a Mud Burrow. Find it.", "Slay the Devourer");
+        QuestStep step = new(1, [], [], "The Devourer lives underground in a Mud Burrow. Find it.", "Slay the Devourer", []);
 
         Assert.Equal("Slay the Devourer", step.Line);
         Assert.Equal("The Devourer lives underground in a Mud Burrow. Find it.", step.Detail);
@@ -341,7 +341,7 @@ public class QuestProgressTests
     {
         // And says nothing twice: a step whose only text is the long one shows it as the
         // objective, with no detail line repeating it underneath.
-        QuestStep step = new(1, [], [], "Find Renly's tools.", string.Empty);
+        QuestStep step = new(1, [], [], "Find Renly's tools.", string.Empty, []);
 
         Assert.Equal("Find Renly's tools.", step.Line);
         Assert.Equal(string.Empty, step.Detail);
@@ -384,6 +384,35 @@ public class QuestProgressTests
         Assert.Null(none.Now);
         Assert.Equal(0, none.Passed);
         Assert.Equal(2, none.Remaining.Count);
+    }
+
+    [Fact]
+    public void AStepNamesThePlaceItPointsAt()
+    {
+        // MapPins is the "where" half. It carries no coordinates - Name, WorldArea and Act -
+        // so a pin answers WHICH PLACE and not which point, which is what a world-map pin is.
+        QuestStep step = new(1, [], [], "Find it.", "Slay the Devourer", ["Mud Burrow", "Clearfell"]);
+
+        Assert.Equal("Mud Burrow, Clearfell", step.Where);
+    }
+
+    [Fact]
+    public void AStepWithNoPinSaysNothingAboutWhere()
+    {
+        Assert.Equal(string.Empty, new QuestStep(1, [], [], "x", "y", []).Where);
+    }
+
+    [Fact]
+    public void WithoutMapPinsTheStepsStillRead()
+    {
+        // The pins are OPTIONAL on purpose: a missing MapPins costs the "where" of a step and
+        // nothing else, so it must not switch the whole feature off.
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        QuestState quest = Assert.Single(QuestProgress.Read(quests, states, flags, layouts, [0]).Quests);
+
+        Assert.Equal("Speak to Farrow", quest.Objective);
+        Assert.All(quest.Steps, s => Assert.Empty(s.Places));
     }
 
     [Fact]
