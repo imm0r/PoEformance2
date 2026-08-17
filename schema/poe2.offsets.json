@@ -168,7 +168,7 @@
       "fields": {
         "ChatParentPtr": { "offset": "0x640", "type": "ptr" },
         "LeftPanelPtr": { "offset": "0x6D8", "type": "ptr", "comment": "UNVERIFIED, from GameHelper2's ImportantUiElementsOffsets. Whichever left-side panel is open - character, skills, quests. Null while none is, so this is BOTH the address and half the answer; the other half is that the element it points at is only visible while its panel is showing." },
-        "RightPanelPtr": { "offset": "0x6E0", "type": "ptr", "comment": "UNVERIFIED, same source. The right-side one: inventory, stash, a vendor." },
+        "RightPanelPtr": { "offset": "0x6E0", "type": "ptr", "comment": "CONFIRMED against a real session 2026-08 (tests/fixtures/session-2026-08-panel.rec, PanelSessionTests): with the inventory open this resolves to a UiElement whose visibility walk says showing, while LeftPanelPtr is null and the tree and world map are present but hidden. The right-side one: inventory, stash, a vendor. Its EXTENT is still unknown - that recording predates the position/size read, and PoE2 lays the inventory out across the screen down to the hotbar rather than as a side column, so a fresh capture is what settles whether the element carries its own size or has to be measured from its children (see PanelReader.Where)." },
         "PassiveSkillTreePanel": { "offset": "0x730", "type": "ptr" },
         "MapParentPtr": { "offset": "0x7C8", "type": "ptr" },
         "WorldMapPanelPtr": { "offset": "0x988", "type": "ptr", "comment": "UNVERIFIED, same source. The world-travel map - the act screens, not the endgame atlas, which is its own panel at a child path." },

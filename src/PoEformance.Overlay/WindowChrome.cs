@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Features;
+using PoEformance.Game.Ui;
 
 namespace PoEformance.Overlay;
 
@@ -56,6 +57,13 @@ public readonly record struct OverlayWindow(string Id, string Title);
 /// The one window this does not cover is the preload panel, which has no title bar to put an
 /// icon on. Its undo is still the Appearance list, and that stays reachable because any other
 /// window can now hand itself back.
+///
+/// A THIRD THING LIVES HERE, and it is not a switch the user flips per window: whether a window
+/// is lying over one of the GAME's open panels, and so should take itself off screen until it
+/// is not. It belongs beside the other two because it is the same question - what this window
+/// is doing to the game underneath it - and because every window already asks this class for
+/// its flags immediately before Begin, which is the only moment such a decision can be acted
+/// on. See <see cref="Covered"/> and <see cref="Measure"/>.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class WindowChrome
@@ -129,6 +137,79 @@ public sealed class WindowChrome
     /// </remarks>
     public IReadOnlyDictionary<string, WindowRule>? Saved()
         => _rules.Count == 0 ? null : new Dictionary<string, WindowRule>(_rules);
+
+    /// <summary>
+    /// Which parts of the screen the game's own panels have taken this frame.
+    /// </summary>
+    /// <remarks>
+    /// Set every frame by whoever has the snapshot, EMPTY INCLUDED. A window hidden by a panel
+    /// comes back on the frame that panel shuts, and it can only do that if "nothing is open"
+    /// arrives as an answer rather than as a missing update.
+    ///
+    /// This is also the switch: left empty, no window is ever hidden by a panel, which is what
+    /// the user's setting turns into.
+    /// </remarks>
+    public IReadOnlyList<PanelArea> Covering { get; set; } = [];
+
+    /// <summary>Where each window was last drawn, in screen pixels.</summary>
+    private readonly Dictionary<string, (Vector2 At, Vector2 Size)> _seen = [];
+
+    /// <summary>Remembers where this window is, for the frame that has to decide about it.</summary>
+    /// <remarks>
+    /// Called between <c>Begin</c> and <c>End</c>, where ImGui will answer for the current
+    /// window - collapsed or not, expanded or not. A collapsed window reports its title bar,
+    /// which is exactly the ground it covers.
+    ///
+    /// LAST FRAME'S RECTANGLE IS WHAT THERE IS. A window's position and size are ImGui's, and
+    /// nothing outside a Begin/End pair can be asked for them - so the decision to hide is made
+    /// on where the window was drawn last, one frame behind. At sixty frames a second that is
+    /// invisible; what it is not is a guess, which a rectangle predicted before Begin would be.
+    /// </remarks>
+    public void Measure(string id) => _seen[id] = (ImGui.GetWindowPos(), ImGui.GetWindowSize());
+
+    /// <summary>
+    /// Whether this window is lying over one of the game's open panels, and should stay away.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME ARGUMENT THE WORLD LAYERS MAKE, one step further in. A panel is what the player
+    /// is actually looking at, and a readout parked across the stash is right information in the
+    /// way - worse than none. The difference is that a window is somewhere in particular, so
+    /// only the ones actually over a panel go: the corner readout stays put while the inventory
+    /// is open, and disappears when the passive tree takes the screen.
+    ///
+    /// A WINDOW NOBODY HAS SEEN YET IS NOT HIDDEN. Until it has drawn once there is no
+    /// rectangle to compare, and the honest answer to "is it in the way" is then no - which
+    /// costs at most one frame of a window on screen when the tool starts up with a panel
+    /// already open.
+    ///
+    /// THE WAY BACK, because a window that hides itself needs one. Shutting the panel is the
+    /// first: this reads the game's own state, so the window returns the moment the player
+    /// closes what they opened. The second is the setting, which lives in the Appearance page
+    /// of a window that is only ever hidden while a panel is open - so it is reachable in every
+    /// state except the one where a wrong offset reports a panel open forever. That failure
+    /// takes the world markers with it first and is what the status readout's panels row names;
+    /// the last resort is <c>config/overlay.json</c>.
+    /// </remarks>
+    public bool Covered(string id)
+    {
+        if (Covering.Count == 0 || !_seen.TryGetValue(id, out (Vector2 At, Vector2 Size) was))
+        {
+            return false;
+        }
+
+        float right = was.At.X + was.Size.X;
+        float bottom = was.At.Y + was.Size.Y;
+
+        foreach (PanelArea area in Covering)
+        {
+            if (area.Overlaps(was.At.X, was.At.Y, right, bottom))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>This window's own flags, plus whatever it has been told.</summary>
     /// <remarks>

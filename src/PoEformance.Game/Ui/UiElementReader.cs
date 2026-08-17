@@ -312,6 +312,21 @@ public sealed class UiElementReader
         return true;
     }
 
+    /// <summary>
+    /// This element's OWN visible bit, without asking about its ancestors.
+    /// </summary>
+    /// <remarks>
+    /// NOT A CHEAPER <see cref="IsVisible"/> and not a substitute for it: on its own this says
+    /// nothing about whether the element is on screen, because a closed panel leaves every flag
+    /// in its subtree set. It is only an answer for a caller that has ALREADY established the
+    /// chain above - measuring the children of a panel whose own visibility was just checked,
+    /// which is <c>PanelReader</c>'s case and would otherwise re-walk the same ancestors once
+    /// per child.
+    /// </remarks>
+    public bool IsShowingItself(ulong address)
+        => IsUiElement(address)
+           && (_reader.Read<uint>(address + (ulong)_flags) & _flagIsVisible) != 0;
+
     /// <summary>Reads the element's child pointers.</summary>
     public List<ulong> Children(ulong address, int max = 512)
     {
