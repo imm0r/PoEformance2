@@ -47,16 +47,37 @@ public enum GamePanel
     Trial = 1 << 8,
 }
 
+/// <summary>How a panel's rectangle was arrived at, which is worth reporting.</summary>
+/// <remarks>
+/// NOT DECORATION. The three differ in how much they can be trusted, and a screenshot of the
+/// status readout has to be able to say which one produced the rectangle it is showing - that
+/// is the difference between "the panel measures 1200x900" and "nobody could measure it, so the
+/// whole screen was assumed". The first recording of an open panel arrived with the position and
+/// size never read at all, which is exactly the sort of thing this makes visible.
+/// </remarks>
+public enum PanelExtent
+{
+    /// <summary>The panel element's own position and size.</summary>
+    Element,
+
+    /// <summary>What its visible children cover between them, the element claiming nothing.</summary>
+    Children,
+
+    /// <summary>Nothing could be measured, so the whole window is assumed.</summary>
+    Screen,
+}
+
 /// <summary>One open panel and the screen it is sitting on, in window pixels.</summary>
 /// <remarks>
 /// WHY A RECTANGLE AND NOT JUST A YES. Anything drawn in world space is underneath the whole
 /// panel wherever it is, so a bit per panel is all that decides. A WINDOW of the tool's own is
-/// somewhere in particular: the readout parked in the top-left corner is not in the way of an
-/// inventory panel on the right, and hiding it there would be taking a window away for no
-/// reason the user can see. So a window asks about the ground it covers rather than about the
-/// panel - see <c>WindowChrome.Covered</c>.
+/// somewhere in particular: a readout in the corner is not in the way of a panel that does not
+/// reach the corner, and hiding it there would be taking a window away for no reason the user
+/// can see. So a window asks about the ground it covers rather than about the panel - see
+/// <c>WindowChrome.Covered</c>.
 /// </remarks>
-public readonly record struct PanelArea(GamePanel Panel, float Left, float Top, float Right, float Bottom)
+public readonly record struct PanelArea(
+    GamePanel Panel, float Left, float Top, float Right, float Bottom, PanelExtent From)
 {
     /// <summary>Whether a rectangle in window pixels touches this one at all.</summary>
     /// <remarks>
@@ -236,27 +257,32 @@ public sealed class PanelReader
     }
 
     /// <summary>
-    /// The panels that take the WHOLE screen when they are open.
+    /// How many of a panel's children are worth measuring. See <see cref="Drawn"/>.
     /// </summary>
     /// <remarks>
-    /// Everything here except the two side panels, which is what the list is for: it is the
-    /// fallback when an element's own size cannot be read, and a guess of "all of it" is only
-    /// safe where the panel really does cover all of it. The left panel (character, skills,
-    /// quests) and the right one (inventory, stash, a vendor) leave most of the screen alone,
-    /// so a missing size there means no rectangle at all rather than a screen's worth.
+    /// A panel's own child list is a handful of pages and frames, not the hundreds of nodes the
+    /// atlas hangs under one element - so a cap this low costs nothing real and keeps a wrong
+    /// pointer from turning one panel into a thousand reads a tick.
     /// </remarks>
-    private const GamePanel WholeScreen =
-        GamePanel.SkillTree | GamePanel.WorldMap | GamePanel.Atlas | GamePanel.AtlasSkills
-        | GamePanel.Temple | GamePanel.Exchange | GamePanel.Trial;
+    private const int MostChildren = 64;
 
-    /// <summary>Records where an open panel is, if that can be said at all.</summary>
+    /// <summary>Records where an open panel is, by the best measurement available.</summary>
     /// <remarks>
-    /// A SIZE OF ZERO IS A REAL ANSWER HERE, not a broken read: the large map's UnscaledSize
-    /// reads 0 in PoE2 and its position is fine, which is a container that lays its children
-    /// out without claiming any extent of its own. So a panel that cannot say how big it is
-    /// falls back to the whole screen where the panel is known to cover it (see
-    /// <see cref="WholeScreen"/>), and to NOTHING where it is not - a side panel of unknown
-    /// extent hides nothing, which is the state before any of this existed.
+    /// THREE SOURCES, TRIED IN ORDER, because the obvious one is empty in this game more often
+    /// than not. A SIZE OF ZERO IS A REAL READING HERE - the large map's UnscaledSize is 0 and
+    /// its position is fine - and it means a container that lays its children out without
+    /// claiming any extent of its own. The first recording of PoE2's inventory panel read
+    /// exactly that way, which left the whole feature inert: an open panel with no rectangle
+    /// hides nothing.
+    ///
+    /// So: the element's own rectangle; failing that, WHAT ITS CHILDREN COVER BETWEEN THEM,
+    /// which is where a container that draws nothing itself has put everything it draws; and
+    /// failing both, the whole window. The last is the only step that is an assumption rather
+    /// than a measurement, and it is the safe direction for these panels specifically - every
+    /// one of them is a panel the player is looking AT, and PoE2's are far larger than their
+    /// names suggest (the inventory covers the screen down to the hotbar). Which of the three
+    /// answered is carried on the area and printed in the status readout, so an assumption never
+    /// passes itself off as a measurement.
     ///
     /// CLIPPED TO THE WINDOW, which does two jobs: an absurd rectangle from a wrong offset
     /// becomes "the screen" rather than a region reaching to infinity, and one that resolves
@@ -265,31 +291,91 @@ public sealed class PanelReader
     /// </remarks>
     private void Where(GamePanel panel, ulong element, UiScale scale, List<PanelArea> areas)
     {
-        UiElement? read = _elements.Read(element, scale, withStringId: false);
+        (float Left, float Top, float Right, float Bottom, PanelExtent From) measured =
+            Own(element, scale)
+            ?? Drawn(element, scale)
+            ?? (0f, 0f, scale.WindowWidth, scale.WindowHeight, PanelExtent.Screen);
 
-        if (read is null || !Sane(read.Position) || !Sane(read.Size)
-            || read.Size.X < 1f || read.Size.Y < 1f)
-        {
-            if ((panel & WholeScreen) != 0)
-            {
-                areas.Add(new PanelArea(panel, 0f, 0f, scale.WindowWidth, scale.WindowHeight));
-            }
-
-            return;
-        }
-
-        float left = Math.Max(read.Left, 0f);
-        float top = Math.Max(read.Top, 0f);
-        float right = Math.Min(read.Right, scale.WindowWidth);
-        float bottom = Math.Min(read.Bottom, scale.WindowHeight);
+        float left = Math.Max(measured.Left, 0f);
+        float top = Math.Max(measured.Top, 0f);
+        float right = Math.Min(measured.Right, scale.WindowWidth);
+        float bottom = Math.Min(measured.Bottom, scale.WindowHeight);
 
         if (right - left < 1f || bottom - top < 1f)
         {
             return; // off the side of the screen, or nothing left of it once clipped
         }
 
-        areas.Add(new PanelArea(panel, left, top, right, bottom));
+        areas.Add(new PanelArea(panel, left, top, right, bottom, measured.From));
     }
+
+    /// <summary>The rectangle the panel element itself claims, or null when it claims none.</summary>
+    private (float Left, float Top, float Right, float Bottom, PanelExtent From)? Own(
+        ulong element, UiScale scale)
+    {
+        UiElement? read = _elements.Read(element, scale, withStringId: false);
+
+        return Measurable(read?.Position, read?.Size)
+            ? (read!.Left, read.Top, read.Right, read.Bottom, PanelExtent.Element)
+            : null;
+    }
+
+    /// <summary>
+    /// What the panel's visible children cover between them, for a container that claims nothing.
+    /// </summary>
+    /// <remarks>
+    /// Their positions come from <see cref="UiElementReader.ReadSiblings"/>, which walks the
+    /// chain above the panel ONCE for all of them rather than per child - the difference between
+    /// a panel that can be measured every tick and one that cannot.
+    ///
+    /// Visibility is each child's OWN bit here, which is the one place that is enough: every
+    /// ancestor was just checked by <see cref="Showing"/> on the panel itself, and re-walking
+    /// the chain per child would ask the same question sixty times over. Hidden children have to
+    /// be left out or a panel's other tab - the same size, sitting behind the open one - decides
+    /// the answer as much as what is on screen does.
+    /// </remarks>
+    private (float Left, float Top, float Right, float Bottom, PanelExtent From)? Drawn(
+        ulong element, UiScale scale)
+    {
+        List<ulong> children = _elements.Children(element, MostChildren);
+        if (children.Count == 0)
+        {
+            return null;
+        }
+
+        float left = float.MaxValue;
+        float top = float.MaxValue;
+        float right = float.MinValue;
+        float bottom = float.MinValue;
+
+        foreach ((ulong child, (Vector2 position, Vector2 size)) in
+                 _elements.ReadSiblings(element, children, scale))
+        {
+            if (!Measurable(position, size) || !_elements.IsShowingItself(child))
+            {
+                continue;
+            }
+
+            left = Math.Min(left, position.X);
+            top = Math.Min(top, position.Y);
+            right = Math.Max(right, position.X + size.X);
+            bottom = Math.Max(bottom, position.Y + size.Y);
+        }
+
+        return right > left && bottom > top
+            ? (left, top, right, bottom, PanelExtent.Children)
+            : null;
+    }
+
+    /// <summary>Whether a position and size came from memory and describe a real rectangle.</summary>
+    /// <remarks>
+    /// A pair of coordinates in the millions is a torn or misaddressed read rather than a very
+    /// large panel, and a size under a pixel is the "container claims nothing" case. Both mean
+    /// the same thing to a caller: this is not the measurement, try the next one.
+    /// </remarks>
+    private static bool Measurable(Vector2? position, Vector2? size)
+        => position is Vector2 at && size is Vector2 extent
+           && Sane(at) && Sane(extent) && extent.X >= 1f && extent.Y >= 1f;
 
     /// <summary>Whether a pair of floats came from memory rather than from a torn read.</summary>
     private static bool Sane(Vector2 pair)

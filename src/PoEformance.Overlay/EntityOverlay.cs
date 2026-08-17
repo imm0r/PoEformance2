@@ -1922,10 +1922,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // the markers never come back - which looks exactly like an overlay that broke.
             // Named here, it is instead one line saying which panel to stop believing.
             //
-            // AND WHETHER EACH SAID WHERE IT IS, which is a separate answer and fails separately.
-            // The bit decides about the markers; the rectangle decides about this window, and a
-            // panel that reports open without a size leaves every window exactly where it was.
-            // Unsaid, that reads as a setting that does nothing.
+            // AND WHERE EACH ONE IS, which is a separate answer and fails separately: the bit
+            // decides about the markers, the rectangle decides about this window. HOW it was
+            // arrived at is printed too, because the three ways differ in how much they can be
+            // trusted - "by element" is the panel's own size, "by children" is what it draws,
+            // and "by screen" is nothing measurable and the whole window assumed. A screenshot
+            // of this line is what settles which one a machine is taking.
             if (_snapshot.InAPanel)
             {
                 string where = !HideWindowsBehindPanels
@@ -1935,7 +1937,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                         : "covering " + string.Join(
                             ", ",
                             _snapshot.Covering.Select(
-                                area => $"{area.Panel} {area.Right - area.Left:F0}x{area.Bottom - area.Top:F0}"));
+                                area => $"{area.Panel} {area.Right - area.Left:F0}x{area.Bottom - area.Top:F0}"
+                                        + $" by {area.From.ToString().ToLowerInvariant()}"));
 
                 Row(
                     "panels",

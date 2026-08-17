@@ -134,6 +134,25 @@ public class PanelReaderTests
     /// </remarks>
     private static UiScale Viewport => new(2560, 1600, 0);
 
+    private const ulong ChildArray = 0x40_0000;
+    private const ulong FirstChild = 0x41_0000;
+    private const ulong SecondChild = 0x42_0000;
+
+    /// <summary>Hangs a child vector off an element, with each child a showing UiElement.</summary>
+    private static void PlaceChildren(
+        FakeMemoryReader fake, OffsetSchema schema, ulong parent, ulong array, params ulong[] children)
+    {
+        StructDef ui = schema.Structs["UiElementBase"];
+        fake.Place(parent + (ulong)ui.OffsetOf("ChildrenFirst"), array);
+        fake.Place(parent + (ulong)ui.OffsetOf("ChildrenLast"), array + (ulong)(children.Length * 8));
+
+        for (int i = 0; i < children.Length; i++)
+        {
+            fake.Place(array + (ulong)(i * 8), children[i]);
+            PlaceElement(fake, schema, children[i], showing: true);
+        }
+    }
+
     /// <summary>Gives an element a position and a size, in the interface's own space.</summary>
     private static void Measure(
         FakeMemoryReader fake, OffsetSchema schema, ulong address, float x, float y, float width, float height)
@@ -182,28 +201,58 @@ public class PanelReaderTests
     }
 
     [Fact]
-    public void ASIDEPanelThatCannotSayHowBigItIsCoversNOTHING()
+    public void ACONTAINERWithNoSizeIsMeasuredByWhatItsChildrenCover()
     {
-        // A size of zero is a real reading in this game - the large map's is - and it means the
-        // element lays its children out without claiming any extent itself. Guessing a screen's
-        // worth for an INVENTORY would hide a window in the far corner for no visible reason,
-        // so the honest answer is no rectangle, which hides nothing at all.
+        // A size of zero is a real reading in this game - the large map's is, and so is PoE2's
+        // inventory panel - and it means the element lays its children out without claiming any
+        // extent itself. What it draws is therefore where its children are, and the union of
+        // those is the panel. Left unanswered, an open panel with no rectangle hides nothing,
+        // which is the bug this replaced.
+        //
+        // The panel sits at the origin so the arithmetic is the children's alone: a child's
+        // position is relative to its parent, so a panel with an offset would move both.
         OffsetSchema schema = Schema();
         FakeMemoryReader fake = WithPanel(schema, "RightPanelPtr", showing: true);
-        Measure(fake, schema, Element, 1700f, 100f, 0f, 0f);
+        Measure(fake, schema, Element, 0f, 0f, 0f, 0f);
+        PlaceChildren(fake, schema, Element, ChildArray, FirstChild, SecondChild);
+        Measure(fake, schema, FirstChild, 100f, 200f, 300f, 400f);
+        Measure(fake, schema, SecondChild, 1000f, 100f, 200f, 200f);
 
         PanelsOnScreen read = ReaderFor(fake, schema).Read(UiRoot, Viewport);
 
         Assert.Equal(GamePanel.Right, read.Panels);
-        Assert.Empty(read.Areas);
+        PanelArea area = Assert.Single(read.Areas);
+        Assert.Equal(PanelExtent.Children, area.From);
+        Assert.Equal((100f, 100f, 1200f, 600f), (area.Left, area.Top, area.Right, area.Bottom));
     }
 
     [Fact]
-    public void ASCREENFILLINGOneFallsBackToTheWholeScreenInstead()
+    public void ACHILDTheGameIsNotShowingDoesNotDecideWhereThePanelIs()
     {
-        // The other side of that decision, and why the two are not one rule: the world map
-        // takes the entire screen when it is open, so "all of it" is not a guess there - it is
-        // what the panel is. The same unreadable size therefore means something different.
+        // The other tab of the same panel, sitting behind the open one at the same size. Its own
+        // flags stay set while it is hidden, so counting it would make what is on screen and
+        // what is merely loaded look alike - and the panel would measure the same either way.
+        OffsetSchema schema = Schema();
+        FakeMemoryReader fake = WithPanel(schema, "RightPanelPtr", showing: true);
+        Measure(fake, schema, Element, 0f, 0f, 0f, 0f);
+        PlaceChildren(fake, schema, Element, ChildArray, FirstChild, SecondChild);
+        Measure(fake, schema, FirstChild, 100f, 200f, 300f, 400f);
+
+        // Placed again without the visible bit, and given the run of the screen: counted, it
+        // would swallow the sibling that IS showing.
+        PlaceElement(fake, schema, SecondChild, showing: false);
+        Measure(fake, schema, SecondChild, 0f, 0f, 2560f, 1600f);
+
+        PanelArea area = Assert.Single(ReaderFor(fake, schema).Read(UiRoot, Viewport).Areas);
+        Assert.Equal((100f, 200f, 400f, 600f), (area.Left, area.Top, area.Right, area.Bottom));
+    }
+
+    [Fact]
+    public void APANELThatNothingCanMeasureFallsBackToTheWholeScreen()
+    {
+        // No size of its own and no children with one either. The assumption is the safe
+        // direction for these panels specifically - every one of them is a panel the player is
+        // looking AT - and the area says it was an assumption, so the readout can too.
         OffsetSchema schema = Schema();
         FakeMemoryReader fake = WithPanel(schema, "WorldMapPanelPtr", showing: true);
         Measure(fake, schema, Element, 0f, 0f, 0f, 0f);
@@ -212,6 +261,7 @@ public class PanelReaderTests
 
         Assert.Equal(GamePanel.WorldMap, read.Panels);
         PanelArea area = Assert.Single(read.Areas);
+        Assert.Equal(PanelExtent.Screen, area.From);
         Assert.Equal((0f, 0f, 2560f, 1600f), (area.Left, area.Top, area.Right, area.Bottom));
     }
 
@@ -252,7 +302,7 @@ public class PanelReaderTests
         // The question a window asks, and it is not "most of me": a corner over an open stash
         // is a corner over an open stash. A window resting exactly against a panel's edge
         // covers none of it, though, or a window parked beside a panel would vanish.
-        var area = new PanelArea(GamePanel.Right, 1000f, 500f, 2000f, 1400f);
+        var area = new PanelArea(GamePanel.Right, 1000f, 500f, 2000f, 1400f, PanelExtent.Element);
 
         Assert.True(area.Overlaps(1200f, 600f, 1300f, 700f));   // inside
         Assert.True(area.Overlaps(900f, 400f, 1100f, 600f));    // a corner across it
