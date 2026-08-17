@@ -73,6 +73,41 @@ public sealed record QuestState(
 
     /// <summary>The fuller sentence behind the objective, which usually says where to go.</summary>
     public string Detail => Now?.Detail ?? string.Empty;
+
+    /// <summary>How many steps sit behind the current one.</summary>
+    public int Passed => Now is null ? 0 : Math.Max(At, 0);
+
+    /// <summary>Where the current step sits in the sequence, or -1.</summary>
+    private int At
+    {
+        get
+        {
+            for (var i = 0; i < Steps.Count; i++)
+            {
+                if (ReferenceEquals(Steps[i], Now))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+    }
+
+    /// <summary>
+    /// The current step and everything after it - what is actually left to do.
+    /// </summary>
+    /// <remarks>
+    /// A PATH, NOT A CHECKLIST, and the difference is worth stating because the number invites
+    /// the wrong reading. QuestStates is a state MACHINE: a quest with branches carries a state
+    /// per branch, so The Runeseeker has 87 of them and most are variations of "Search the
+    /// region for more Runestones" for the different regions it can be done in. The remaining
+    /// count is therefore an upper bound on the states still ahead, not a tally of distinct
+    /// things to go and do - which is exactly why the steps are shown in the game's own words
+    /// rather than counted down to a number.
+    /// </remarks>
+    public IReadOnlyList<QuestStep> Remaining
+        => Now is null || At < 0 ? Steps : [.. Steps.Skip(At)];
 }
 
 /// <summary>What the whole read produced, including why it produced nothing.</summary>

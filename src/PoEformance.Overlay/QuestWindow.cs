@@ -30,6 +30,9 @@ public sealed class QuestWindow
     private bool _done;
     private bool _conditions;
 
+    /// <summary>Which quest has its walkthrough open, or -1. One at a time on purpose.</summary>
+    private int _walkthrough = -1;
+
     public QuestWindow(QuestWatch watch)
     {
         ArgumentNullException.ThrowIfNull(watch);
@@ -172,12 +175,82 @@ public sealed class QuestWindow
             ImGui.TextColored(DimText, $"    then: {next.Line}");
         }
 
+        // One quest's walkthrough at a time. The steps are the same list every time and there
+        // are up to 87 of them, so opening all of them at once is a wall rather than a view.
+        bool open = _walkthrough == quest.Row;
+        if (ImGui.SmallButton(open ? "hide the steps" : "all the steps"))
+        {
+            _walkthrough = open ? -1 : quest.Row;
+        }
+
+        if (!open)
+        {
+            if (_conditions)
+            {
+                Steps(quest);
+            }
+
+            return;
+        }
+
+        Walkthrough(quest);
+
         if (_conditions)
         {
             Steps(quest);
         }
 
         ImGui.PopID();
+    }
+
+    /// <summary>
+    /// The quest as a route: what is behind, what is now, and what is still ahead.
+    /// </summary>
+    /// <remarks>
+    /// A PATH, NOT A CHECKLIST. QuestStates is a state machine, so a quest with branches
+    /// carries a state per branch - The Runeseeker has 87 and most are the same sentence for
+    /// the different regions it can be done in. Showing the words rather than a countdown is
+    /// what keeps that honest, and the count is labelled as states rather than as things to do.
+    ///
+    /// What is BEHIND is a count and not a list. Nobody needs to read the eleven things they
+    /// already did, and the one line saying how many there were is what places the current step
+    /// in the quest.
+    /// </remarks>
+    private void Walkthrough(QuestState quest)
+    {
+        if (quest.Passed > 0)
+        {
+            ImGui.TextColored(DimText, $"      {quest.Passed} steps behind you");
+        }
+
+        var at = 0;
+        foreach (QuestStep step in quest.Remaining)
+        {
+            if (step.Line.Length == 0)
+            {
+                continue;
+            }
+
+            bool now = at == 0;
+            ImGui.TextColored(now ? GoodText : DimText, $"      {(now ? "->" : "  ")} {step.Line}");
+
+            // The long form only for the step in hand. On the ones still ahead it doubles the
+            // height of the list to say what its own first line already said.
+            if (now && step.Detail.Length > 0)
+            {
+                ImGui.TextColored(DimText, $"           {step.Detail}");
+            }
+
+            at++;
+        }
+
+        if (at > 1)
+        {
+            ImGui.TextColored(
+                DimText,
+                $"      {at - 1} states ahead - a quest with branches carries one per branch,"
+                + " so this is a route rather than a count of things to do");
+        }
     }
 
     /// <summary>
