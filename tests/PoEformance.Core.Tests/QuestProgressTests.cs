@@ -348,6 +348,45 @@ public class QuestProgressTests
     }
 
     [Fact]
+    public void TheRouteIsTheCurrentStepAndEverythingAfterIt()
+    {
+        // "What must be done, step by step" is already in the data - QuestStates carries every
+        // state of every quest with its words, in order. What is behind is a count; what is
+        // ahead is the list.
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        QuestState first = Assert.Single(QuestProgress.Read(quests, states, flags, layouts, [0]).Quests);
+
+        Assert.Equal(0, first.Passed);
+        Assert.Equal(["Speak to Farrow", "Return to town"], first.Remaining.Select(s => s.Line));
+    }
+
+    [Fact]
+    public void TheRouteShortensAsTheQuestAdvances()
+    {
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        QuestState later = Assert.Single(QuestProgress.Read(quests, states, flags, layouts, [0, 1]).Quests);
+
+        Assert.Equal(1, later.Passed);
+        Assert.Equal(["Return to town"], later.Remaining.Select(s => s.Line));
+    }
+
+    [Fact]
+    public void AQuestNobodyHasStartedOffersItsWholeRoute()
+    {
+        // No step holds, so there is nothing behind and everything ahead - which is the useful
+        // answer for a quest not begun, rather than an empty list.
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        QuestState none = Assert.Single(QuestProgress.Read(quests, states, flags, layouts, []).Quests);
+
+        Assert.Null(none.Now);
+        Assert.Equal(0, none.Passed);
+        Assert.Equal(2, none.Remaining.Count);
+    }
+
+    [Fact]
     public void ProgressRunsFromTheHighestOrderToTheLowest()
     {
         // WHAT SORTING IT THE OTHER WAY DID, and it was invisible in every synthetic test
