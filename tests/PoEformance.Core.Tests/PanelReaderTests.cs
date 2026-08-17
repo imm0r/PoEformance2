@@ -248,21 +248,42 @@ public class PanelReaderTests
     }
 
     [Fact]
-    public void APANELThatNothingCanMeasureFallsBackToTheWholeScreen()
+    public void ASIDEPanelThatNothingCanMeasureFallsBackToTheWholeScreen()
     {
         // No size of its own and no children with one either. The assumption is the safe
-        // direction for these panels specifically - every one of them is a panel the player is
-        // looking AT - and the area says it was an assumption, so the readout can too.
+        // direction for a panel the player is looking AT - and the area says it WAS an
+        // assumption, so the readout can say so too rather than showing a number nobody measured.
         OffsetSchema schema = Schema();
-        FakeMemoryReader fake = WithPanel(schema, "WorldMapPanelPtr", showing: true);
+        FakeMemoryReader fake = WithPanel(schema, "RightPanelPtr", showing: true);
         Measure(fake, schema, Element, 0f, 0f, 0f, 0f);
 
         PanelsOnScreen read = ReaderFor(fake, schema).Read(UiRoot, Viewport);
 
-        Assert.Equal(GamePanel.WorldMap, read.Panels);
+        Assert.Equal(GamePanel.Right, read.Panels);
         PanelArea area = Assert.Single(read.Areas);
-        Assert.Equal(PanelExtent.Screen, area.From);
+        Assert.Equal(PanelExtent.Unmeasured, area.From);
         Assert.Equal((0f, 0f, 2560f, 1600f), (area.Left, area.Top, area.Right, area.Bottom));
+    }
+
+    [Fact]
+    public void ASCREENFILLINGPanelIsTheScreenEvenWhenItClaimsLess()
+    {
+        // The atlas's own numbers, and why this kind is not measured at all: it states
+        // 3008x1600 at ScaleIndex 2, which is BOTH axes by the height factor - 2707x1440 on a
+        // 3440x1440 screen, leaving the right 733 pixels uncovered while the atlas is plainly
+        // drawn across them. Believing it left a window sitting on the open atlas. On a 16:9
+        // screen the same numbers overflow the width and nothing looks wrong, which is why this
+        // test states the ultrawide.
+        OffsetSchema schema = Schema();
+        FakeMemoryReader fake = WithPanel(schema, "WorldMapPanelPtr", showing: true);
+        Measure(fake, schema, Element, 0f, 0f, 3008f, 1600f);
+        fake.Place<byte>(Element + (ulong)schema.Structs["UiElementBase"].OffsetOf("ScaleIndex"), 2);
+
+        var ultrawide = new UiScale(3440, 1440, 0);
+        PanelArea area = Assert.Single(ReaderFor(fake, schema).Read(UiRoot, ultrawide).Areas);
+
+        Assert.Equal(PanelExtent.Kind, area.From);
+        Assert.Equal((0f, 0f, 3440f, 1440f), (area.Left, area.Top, area.Right, area.Bottom));
     }
 
     [Fact]

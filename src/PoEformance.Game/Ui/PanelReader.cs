@@ -63,8 +63,11 @@ public enum PanelExtent
     /// <summary>What its visible children cover between them, the element claiming nothing.</summary>
     Children,
 
+    /// <summary>A panel of a kind that takes the whole screen. Not measured, by decision.</summary>
+    Kind,
+
     /// <summary>Nothing could be measured, so the whole window is assumed.</summary>
-    Screen,
+    Unmeasured,
 }
 
 /// <summary>One open panel and the screen it is sitting on, in window pixels.</summary>
@@ -266,23 +269,46 @@ public sealed class PanelReader
     /// </remarks>
     private const int MostChildren = 64;
 
+    /// <summary>
+    /// The panels that take the WHOLE screen, and are therefore not measured at all.
+    /// </summary>
+    /// <remarks>
+    /// NOT MEASURED BECAUSE MEASURING THEM GIVES THE WRONG ANSWER, which took an ultrawide to
+    /// show. The atlas element states an UnscaledSize of 3008x1600 at ScaleIndex 2 - both axes by
+    /// the HEIGHT factor - so on a 3440x1440 screen it reports 2707x1440 and leaves the right 733
+    /// pixels uncovered. The atlas is plainly drawn over those pixels: its own nodes are children
+    /// at positions from -2629 to +877, far outside the rectangle their parent claims, because
+    /// the panel is a viewport onto a map that pans rather than a box the size of what it shows.
+    /// Believing the element hid the window in the top-left corner and left one on the right
+    /// exactly where it was. At 16:9 the same numbers come to 2707 of 2560 and nothing looks
+    /// wrong at all - the shape of mistake this project has been caught by before.
+    ///
+    /// The two SIDE panels are absent for the opposite reason: they are measured, and the
+    /// measurement is worth having. PoE2's inventory reaches down to the hotbar but not over it,
+    /// so a window parked at the very bottom is genuinely not in the way of it.
+    /// </remarks>
+    private const GamePanel WholeScreen =
+        GamePanel.SkillTree | GamePanel.WorldMap | GamePanel.Atlas | GamePanel.AtlasSkills
+        | GamePanel.Temple | GamePanel.Exchange | GamePanel.Trial;
+
     /// <summary>Records where an open panel is, by the best measurement available.</summary>
     /// <remarks>
-    /// THREE SOURCES, TRIED IN ORDER, because the obvious one is empty in this game more often
-    /// than not. A SIZE OF ZERO IS A REAL READING HERE - the large map's UnscaledSize is 0 and
-    /// its position is fine - and it means a container that lays its children out without
-    /// claiming any extent of its own. The first recording of PoE2's inventory panel read
-    /// exactly that way, which left the whole feature inert: an open panel with no rectangle
-    /// hides nothing.
+    /// THE SCREEN-FILLING KINDS ARE NOT ASKED, they are known - see <see cref="WholeScreen"/>,
+    /// which is also where the measurement that would have been wrong is written down.
+    ///
+    /// EVERYTHING ELSE HAS THREE SOURCES, TRIED IN ORDER, because the obvious one is empty in
+    /// this game more often than not. A SIZE OF ZERO IS A REAL READING HERE - the large map's
+    /// UnscaledSize is 0 and its position is fine - and it means a container that lays its
+    /// children out without claiming any extent of its own. The first recording of PoE2's
+    /// inventory panel read exactly that way, which left the whole feature inert: an open panel
+    /// with no rectangle hides nothing.
     ///
     /// So: the element's own rectangle; failing that, WHAT ITS CHILDREN COVER BETWEEN THEM,
     /// which is where a container that draws nothing itself has put everything it draws; and
     /// failing both, the whole window. The last is the only step that is an assumption rather
-    /// than a measurement, and it is the safe direction for these panels specifically - every
-    /// one of them is a panel the player is looking AT, and PoE2's are far larger than their
-    /// names suggest (the inventory covers the screen down to the hotbar). Which of the three
-    /// answered is carried on the area and printed in the status readout, so an assumption never
-    /// passes itself off as a measurement.
+    /// than a measurement, and it is the safe direction for a panel the player is looking AT.
+    /// Which one answered is carried on the area and printed in the status readout, so an
+    /// assumption never passes itself off as a measurement.
     ///
     /// CLIPPED TO THE WINDOW, which does two jobs: an absurd rectangle from a wrong offset
     /// becomes "the screen" rather than a region reaching to infinity, and one that resolves
@@ -291,10 +317,17 @@ public sealed class PanelReader
     /// </remarks>
     private void Where(GamePanel panel, ulong element, UiScale scale, List<PanelArea> areas)
     {
+        if ((panel & WholeScreen) != 0)
+        {
+            areas.Add(new PanelArea(
+                panel, 0f, 0f, scale.WindowWidth, scale.WindowHeight, PanelExtent.Kind));
+            return;
+        }
+
         (float Left, float Top, float Right, float Bottom, PanelExtent From) measured =
             Own(element, scale)
             ?? Drawn(element, scale)
-            ?? (0f, 0f, scale.WindowWidth, scale.WindowHeight, PanelExtent.Screen);
+            ?? (0f, 0f, scale.WindowWidth, scale.WindowHeight, PanelExtent.Unmeasured);
 
         float left = Math.Max(measured.Left, 0f);
         float top = Math.Max(measured.Top, 0f);

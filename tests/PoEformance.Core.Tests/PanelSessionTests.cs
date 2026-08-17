@@ -111,7 +111,91 @@ public class PanelSessionTests
 
         PanelArea area = Assert.Single(panels.Read(uiRoot, Viewport).Areas);
 
-        Assert.Equal(PanelExtent.Screen, area.From);
+        Assert.Equal(PanelExtent.Unmeasured, area.From);
         Assert.Equal((0f, 0f, 2560f, 1440f), (area.Left, area.Top, area.Right, area.Bottom));
+    }
+
+    /// <summary>The same session with the ATLAS open, on a 3440x1440 screen.</summary>
+    /// <remarks>
+    /// The capture that settles the ultrawide, and it took one: the atlas element states an
+    /// extent, so nothing about it looks unreadable - it is simply 733 pixels narrower than the
+    /// screen it is drawn across, and only a window at the far right notices.
+    /// </remarks>
+    private static string AtlasFixturePath => FixturePath.Replace(
+        "session-2026-08-panel.rec", "session-2026-08-atlas-panel.rec", StringComparison.Ordinal);
+
+    private static ReplayMemoryReader LoadAtlas()
+        => ReplayMemoryReader.Load(File.OpenRead(AtlasFixturePath));
+
+    /// <summary>The screen that session was played on. The width is the whole point of it.</summary>
+    private static UiScale Ultrawide => new(3440, 1440, 0);
+
+    [Fact]
+    public void THEAtlasElementReportsItselfNarrowerThanTheScreenItCovers()
+    {
+        // The measurement that would have been believed, kept as a number rather than a story:
+        // UnscaledSize 3008x1600 at ScaleIndex 2 - both axes by the height factor - is 2707x1440
+        // here. The atlas is drawn over the remaining 733 pixels all the same, which is why the
+        // window parked at the far right stayed visible while the one in the corner went.
+        using ReplayMemoryReader replay = LoadAtlas();
+        OffsetSchema schema = RealSessionTests.Schema();
+        (_, UiElementReader elements, ulong uiRoot) = Attach(replay);
+
+        StructDef atlas = schema.Structs["AtlasPanel"];
+        ulong element = uiRoot;
+        foreach (string step in new[] { "PathFromUiRoot0", "PathFromUiRoot1", "PathFromUiRoot2" })
+        {
+            element = elements.Child(element, (int)atlas.Constants[step]);
+        }
+
+        UiElement panel = Assert.IsType<UiElement>(elements.Read(element, Ultrawide));
+
+        Assert.True(panel.Visible);
+        Assert.Equal(2707.2f, panel.Size.X, 1);
+        Assert.Equal(1440f, panel.Size.Y, 1);
+        Assert.True(panel.Size.X < Ultrawide.WindowWidth - 700f, "the shortfall this test exists for");
+    }
+
+    [Fact]
+    public void ANDITIsTakenAsTheWholeScreenAnyway()
+    {
+        // Which is the fix: a panel of this kind is not measured, because the measurement is
+        // known to understate it. The area says "by kind" so the readout never presents the
+        // decision as a reading.
+        using ReplayMemoryReader replay = LoadAtlas();
+        (PanelReader panels, _, ulong uiRoot) = Attach(replay);
+
+        PanelsOnScreen read = panels.Read(uiRoot, Ultrawide);
+
+        Assert.Equal(GamePanel.Atlas, read.Panels);
+        PanelArea area = Assert.Single(read.Areas);
+        Assert.Equal(PanelExtent.Kind, area.From);
+        Assert.Equal((0f, 0f, 3440f, 1440f), (area.Left, area.Top, area.Right, area.Bottom));
+    }
+
+    [Fact]
+    public void ANDTheAtlasNodesSitOutsideTheRectangleTheirParentClaims()
+    {
+        // Why the element understates itself, rather than that it does. The panel is a viewport
+        // onto a map that pans: its own children - the atlas nodes - are placed from well left of
+        // it to well right of it, so its size describes a frame and not what is on the screen.
+        // This is also what rules out measuring it from its children instead.
+        using ReplayMemoryReader replay = LoadAtlas();
+        OffsetSchema schema = RealSessionTests.Schema();
+        (_, UiElementReader elements, ulong uiRoot) = Attach(replay);
+
+        StructDef atlas = schema.Structs["AtlasPanel"];
+        ulong element = uiRoot;
+        foreach (string step in new[] { "PathFromUiRoot0", "PathFromUiRoot1", "PathFromUiRoot2" })
+        {
+            element = elements.Child(element, (int)atlas.Constants[step]);
+        }
+
+        List<ulong> children = elements.Children(element, 64);
+        Assert.NotEmpty(children);
+
+        var placed = elements.ReadSiblings(element, children, Ultrawide);
+        Assert.Contains(placed, child => child.Value.Position.X < -400f);
+        Assert.Contains(placed, child => child.Value.Position.Y < -400f);
     }
 }
