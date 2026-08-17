@@ -25,6 +25,12 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("healthBarsOnlyWhenHurt")] bool HealthBarsOnlyWhenHurt = false,
     [property: JsonPropertyName("hideBehindPanels")] bool HideBehindPanels = true,
 
+    // The same question for the tool's OWN windows, and its own key rather than a second use
+    // of the one above: hiding a marker layer costs nothing, while hiding a window takes its
+    // controls with it - so somebody may well want the one and not the other. Only the windows
+    // actually lying over an open panel go; see WindowChrome.Covered.
+    [property: JsonPropertyName("hideWindowsBehindPanels")] bool HideWindowsBehindPanels = true,
+
     // The projectile marks. On by default, because unlike the effect and terrain debug
     // layers this is a playing feature: it costs nothing extra to read - a projectile is
     // an entity the reader already walks past - and what it draws is small and brief.

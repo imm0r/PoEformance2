@@ -1,3 +1,4 @@
+using System.Numerics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 
@@ -46,6 +47,40 @@ public enum GamePanel
     Trial = 1 << 8,
 }
 
+/// <summary>One open panel and the screen it is sitting on, in window pixels.</summary>
+/// <remarks>
+/// WHY A RECTANGLE AND NOT JUST A YES. Anything drawn in world space is underneath the whole
+/// panel wherever it is, so a bit per panel is all that decides. A WINDOW of the tool's own is
+/// somewhere in particular: the readout parked in the top-left corner is not in the way of an
+/// inventory panel on the right, and hiding it there would be taking a window away for no
+/// reason the user can see. So a window asks about the ground it covers rather than about the
+/// panel - see <c>WindowChrome.Covered</c>.
+/// </remarks>
+public readonly record struct PanelArea(GamePanel Panel, float Left, float Top, float Right, float Bottom)
+{
+    /// <summary>Whether a rectangle in window pixels touches this one at all.</summary>
+    /// <remarks>
+    /// ANY overlap rather than a share of it, because that is the question a window is asking:
+    /// a corner over an open stash is a corner over an open stash. Edges that merely touch do
+    /// not count - a window resting exactly against a panel's edge covers none of it.
+    /// </remarks>
+    public bool Overlaps(float left, float top, float right, float bottom)
+        => left < Right && right > Left && top < Bottom && bottom > Top;
+}
+
+/// <summary>Which panels are open, and where they are.</summary>
+/// <param name="Panels">Every panel currently open, or <see cref="GamePanel.None"/>.</param>
+/// <param name="Areas">
+/// Where each of them is on screen. EMPTY EVEN WHEN PANELS ARE OPEN if the read was given no
+/// viewport to scale into - a UI position means nothing without one - so a caller that wants
+/// rectangles must pass a <see cref="UiScale"/>, and one that only wants the bits need not.
+/// </param>
+public readonly record struct PanelsOnScreen(GamePanel Panels, IReadOnlyList<PanelArea> Areas)
+{
+    /// <summary>Nothing open: between areas, or the interface did not resolve.</summary>
+    public static PanelsOnScreen Shut { get; } = new(GamePanel.None, []);
+}
+
 /// <summary>
 /// Which of the game's screen-filling panels are open.
 /// </summary>
@@ -55,6 +90,11 @@ public enum GamePanel
 /// bars across the passive tree - the information is correct and in the way, which is worse
 /// than not drawing it. Ported from GameHelper2's <c>IsAnyLargePanelOpen</c>, which its own
 /// HealthBars and Radar plugins use for exactly this.
+///
+/// AND WHERE THEY ARE, which the reference has no equivalent of and this tool needs because it
+/// also has WINDOWS of its own. A world-space layer is underneath a panel wherever the panel
+/// is, so the bit is the whole answer; a window sits in one place, and whether it is in the way
+/// depends on which part of the screen the panel took. See <see cref="PanelArea"/>.
 ///
 /// TWO KINDS OF ANSWER, and the difference is worth knowing before trusting one. The left
 /// panel, the right panel, the world map and the skill tree are POINTERS on the interface
@@ -131,53 +171,130 @@ public sealed class PanelReader
         ];
     }
 
-    /// <summary>Every screen-filling panel currently open, or <see cref="GamePanel.None"/>.</summary>
+    /// <summary>
+    /// Which screen-filling panels are open and where they are, from one walk of the interface.
+    /// </summary>
     /// <remarks>
-    /// All of them rather than the first one found, though every caller so far only asks
-    /// whether the set is empty: stopping early would make the readout report whichever panel
-    /// happens to be checked first, which is the opposite of what it is for.
+    /// All of them rather than the first one found, though the world overlay only asks whether
+    /// the set is empty: stopping early would make the readout report whichever panel happens
+    /// to be checked first, which is the opposite of what it is for.
+    ///
+    /// ONE WALK for both answers, rather than a second pass for the rectangles. Which panels
+    /// are open and where they sit come from the same elements, and resolving them twice is
+    /// twice the pointer chasing for a question already answered.
     /// </remarks>
-    public GamePanel Open(ulong uiRoot)
+    /// <param name="scale">
+    /// The viewport to place the panels in, or null for the bits only. Everything a UiElement
+    /// stores is in the interface's own 2560x1600 space, so without one there is nothing to
+    /// say about where a panel is.
+    /// </param>
+    public PanelsOnScreen Read(ulong uiRoot, UiScale? scale)
     {
         if (uiRoot == 0)
         {
-            return GamePanel.None;
+            return PanelsOnScreen.Shut;
         }
 
         GamePanel open = GamePanel.None;
+        List<PanelArea> areas = [];
 
-        if (Showing(_reader.ReadPointer(uiRoot + (ulong)_left)))
+        foreach ((GamePanel panel, ulong element) in Candidates(uiRoot))
         {
-            open |= GamePanel.Left;
-        }
-
-        if (Showing(_reader.ReadPointer(uiRoot + (ulong)_right)))
-        {
-            open |= GamePanel.Right;
-        }
-
-        if (Showing(_reader.ReadPointer(uiRoot + (ulong)_worldMap)))
-        {
-            open |= GamePanel.WorldMap;
-        }
-
-        // The tree's NODE CONTAINER, not the panel: the reference records that in 0.5.x the
-        // per-node pointers read null while this one's visible bit stays reliable.
-        if (Showing(_elements.Child(_reader.ReadPointer(uiRoot + (ulong)_skillTree), _skillTreeChild)))
-        {
-            open |= GamePanel.SkillTree;
-        }
-
-        foreach ((GamePanel panel, int[] path) in _paths)
-        {
-            if (Showing(Resolve(uiRoot, path)))
+            if (!Showing(element))
             {
-                open |= panel;
+                continue;
+            }
+
+            open |= panel;
+
+            if (scale is UiScale viewport)
+            {
+                Where(panel, element, viewport, areas);
             }
         }
 
-        return open;
+        return new PanelsOnScreen(open, areas);
     }
+
+    /// <summary>Every panel worth asking about, and the element that answers for it.</summary>
+    private IEnumerable<(GamePanel Panel, ulong Element)> Candidates(ulong uiRoot)
+    {
+        yield return (GamePanel.Left, _reader.ReadPointer(uiRoot + (ulong)_left));
+        yield return (GamePanel.Right, _reader.ReadPointer(uiRoot + (ulong)_right));
+        yield return (GamePanel.WorldMap, _reader.ReadPointer(uiRoot + (ulong)_worldMap));
+
+        // The tree's NODE CONTAINER, not the panel: the reference records that in 0.5.x the
+        // per-node pointers read null while this one's visible bit stays reliable.
+        yield return (
+            GamePanel.SkillTree,
+            _elements.Child(_reader.ReadPointer(uiRoot + (ulong)_skillTree), _skillTreeChild));
+
+        foreach ((GamePanel panel, int[] path) in _paths)
+        {
+            yield return (panel, Resolve(uiRoot, path));
+        }
+    }
+
+    /// <summary>
+    /// The panels that take the WHOLE screen when they are open.
+    /// </summary>
+    /// <remarks>
+    /// Everything here except the two side panels, which is what the list is for: it is the
+    /// fallback when an element's own size cannot be read, and a guess of "all of it" is only
+    /// safe where the panel really does cover all of it. The left panel (character, skills,
+    /// quests) and the right one (inventory, stash, a vendor) leave most of the screen alone,
+    /// so a missing size there means no rectangle at all rather than a screen's worth.
+    /// </remarks>
+    private const GamePanel WholeScreen =
+        GamePanel.SkillTree | GamePanel.WorldMap | GamePanel.Atlas | GamePanel.AtlasSkills
+        | GamePanel.Temple | GamePanel.Exchange | GamePanel.Trial;
+
+    /// <summary>Records where an open panel is, if that can be said at all.</summary>
+    /// <remarks>
+    /// A SIZE OF ZERO IS A REAL ANSWER HERE, not a broken read: the large map's UnscaledSize
+    /// reads 0 in PoE2 and its position is fine, which is a container that lays its children
+    /// out without claiming any extent of its own. So a panel that cannot say how big it is
+    /// falls back to the whole screen where the panel is known to cover it (see
+    /// <see cref="WholeScreen"/>), and to NOTHING where it is not - a side panel of unknown
+    /// extent hides nothing, which is the state before any of this existed.
+    ///
+    /// CLIPPED TO THE WINDOW, which does two jobs: an absurd rectangle from a wrong offset
+    /// becomes "the screen" rather than a region reaching to infinity, and one that resolves
+    /// entirely off-screen becomes nothing at all and is dropped. What a caller gets is
+    /// therefore always a piece of the screen somebody can point at.
+    /// </remarks>
+    private void Where(GamePanel panel, ulong element, UiScale scale, List<PanelArea> areas)
+    {
+        UiElement? read = _elements.Read(element, scale, withStringId: false);
+
+        if (read is null || !Sane(read.Position) || !Sane(read.Size)
+            || read.Size.X < 1f || read.Size.Y < 1f)
+        {
+            if ((panel & WholeScreen) != 0)
+            {
+                areas.Add(new PanelArea(panel, 0f, 0f, scale.WindowWidth, scale.WindowHeight));
+            }
+
+            return;
+        }
+
+        float left = Math.Max(read.Left, 0f);
+        float top = Math.Max(read.Top, 0f);
+        float right = Math.Min(read.Right, scale.WindowWidth);
+        float bottom = Math.Min(read.Bottom, scale.WindowHeight);
+
+        if (right - left < 1f || bottom - top < 1f)
+        {
+            return; // off the side of the screen, or nothing left of it once clipped
+        }
+
+        areas.Add(new PanelArea(panel, left, top, right, bottom));
+    }
+
+    /// <summary>Whether a pair of floats came from memory rather than from a torn read.</summary>
+    private static bool Sane(Vector2 pair)
+        => float.IsFinite(pair.X) && float.IsFinite(pair.Y)
+           && Math.Abs(pair.X) < 100_000f && Math.Abs(pair.Y) < 100_000f;
 
     /// <summary>Walks a child path from the interface root, or 0 when it leads nowhere.</summary>
     private ulong Resolve(ulong uiRoot, int[] path)

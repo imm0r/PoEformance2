@@ -422,12 +422,26 @@ public sealed class PoiLayer
             return;
         }
 
+        // Out of the way while it is lying over one of the game's own panels - see
+        // WindowChrome.Covered. ShowPicker is left alone: this is the picker getting out from
+        // under the stash for a moment, not the user closing it.
+        if (Chrome.Covered(ChromeId))
+        {
+            return;
+        }
+
         ImGui.SetNextWindowSize(new Vector2(360, 340), ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowPos(new Vector2(40, 320), ImGuiCond.FirstUseEver);
 
         bool open = ShowPicker;
-        if (ImGui.Begin(
-                "Points of interest", ref open, Chrome.Flags(ChromeId, ImGuiWindowFlags.NoFocusOnAppearing)))
+        bool expanded = ImGui.Begin(
+            "Points of interest", ref open, Chrome.Flags(ChromeId, ImGuiWindowFlags.NoFocusOnAppearing));
+
+        // Outside the expanded test: a collapsed window still covers its title bar, and where
+        // it covers is what the next frame weighs against the game's panels.
+        Chrome.Measure(ChromeId);
+
+        if (expanded)
         {
             // Before the body, and the close button declared so they stop short of it.
             Chrome.TitleButtons(ChromeId, closable: true);

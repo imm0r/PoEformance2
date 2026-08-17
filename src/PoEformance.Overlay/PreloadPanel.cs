@@ -69,6 +69,13 @@ public sealed class PreloadPanel
             return;
         }
 
+        // Out of the way while one of the game's panels is underneath it - see
+        // WindowChrome.Covered. Not remembered as closed: the panel shutting brings it back.
+        if (Chrome.Covered(ChromeId))
+        {
+            return;
+        }
+
         List<PreloadFinding> shown =
             [.. findings.Where(finding => Style.Visible(StyleCatalogue.ForWeight(finding.Weight)))];
 
@@ -81,7 +88,13 @@ public sealed class PreloadPanel
         ImGui.SetNextWindowPos(new Vector2(screen.X * 0.015f, screen.Y * 0.22f), ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowBgAlpha(Alpha());
 
-        if (!ImGui.Begin("What loaded###preload-corner", Chrome.Flags(ChromeId, Flags)))
+        bool expanded = ImGui.Begin("What loaded###preload-corner", Chrome.Flags(ChromeId, Flags));
+
+        // Before the early return, not after it: a collapsed window is still on screen, and
+        // where it sits is what decides next frame whether it is over a panel.
+        Chrome.Measure(ChromeId);
+
+        if (!expanded)
         {
             ImGui.End();
             return;

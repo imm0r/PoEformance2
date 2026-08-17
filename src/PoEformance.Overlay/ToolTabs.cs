@@ -187,6 +187,16 @@ public sealed class ToolTabs
             return;
         }
 
+        // Out of the way while one of the game's panels is under this window - the passive tree
+        // and the stash are what the player is looking at, and a readout across them is right
+        // information in the way. The idles still run: a tool told nobody is looking is exactly
+        // what a hidden window means, and the inspectors behind these tabs must stop reading.
+        if (Chrome.Covered(ChromeId))
+        {
+            RunIdles(null);
+            return;
+        }
+
         ImGui.SetNextWindowPos(new Vector2(20f, 20f), ImGuiCond.FirstUseEver);
         ImGui.SetNextWindowSize(ToolSize, ImGuiCond.FirstUseEver);
 
@@ -223,6 +233,11 @@ public sealed class ToolTabs
         }
 
         bool expanded = ImGui.Begin("PoEformance", Chrome.Flags(ChromeId, own));
+
+        // Before the contents and outside the expanded test, because a collapsed window is
+        // still somewhere: its title bar is the ground it covers, and that is what the next
+        // frame compares against the game's panels.
+        Chrome.Measure(ChromeId);
 
         string? inFront = null;
 

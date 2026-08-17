@@ -281,6 +281,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ShowLabels = settings.DotLabels;
         _healthBars.OnlyWhenHurt = settings.HealthBarsOnlyWhenHurt;
         HideBehindPanels = settings.HideBehindPanels;
+        HideWindowsBehindPanels = settings.HideWindowsBehindPanels;
         _projectiles.Enabled = settings.ShowProjectiles;
         _projectiles.ShowTrails = settings.ProjectileTrails;
         _projectiles.ShowPaths = settings.ProjectilePaths;
@@ -325,6 +326,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             DotLabels = ShowLabels,
             HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
             HideBehindPanels = HideBehindPanels,
+            HideWindowsBehindPanels = HideWindowsBehindPanels,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -837,6 +839,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public bool HideBehindPanels { get; set; } = true;
 
     /// <summary>
+    /// Whether the tool's own WINDOWS get out of the way of an open panel as well.
+    /// </summary>
+    /// <remarks>
+    /// The same idea as <see cref="HideBehindPanels"/> and deliberately its own switch, because
+    /// what the two cost when they are wrong is not the same. A marker layer that hides itself
+    /// leaves the game exactly as it was; a window that hides itself takes controls with it -
+    /// the tabs, the readout, and the Appearance page holding these two checkboxes.
+    ///
+    /// ONLY THE WINDOWS ACTUALLY OVER A PANEL, which is what makes it worth having on: the
+    /// corner readout stays where it is while an inventory is open on the other side of the
+    /// screen, and goes when the passive tree takes the whole screen. See
+    /// <see cref="WindowChrome.Covered"/>, which also records the ways back.
+    /// </remarks>
+    public bool HideWindowsBehindPanels { get; set; } = true;
+
+    /// <summary>
     /// Optional: read cost, completed reads and failures from the reader thread.
     /// </summary>
     /// <remarks>
@@ -1344,6 +1362,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         _viewport = (width, height);
         _snapshot = _snapshotSource(new UiScale(width, height, _cull));
+
+        // Where the game's panels are, handed to the windows so one lying over an open panel can
+        // take itself off screen until it is not. Published every frame including the empty
+        // case, which is what brings a hidden window back the moment the panel shuts - and the
+        // empty list is also how the switch is expressed, so a user who turned this off is
+        // indistinguishable from a player with no panel open.
+        Chrome.Covering = HideWindowsBehindPanels ? _snapshot.Covering : [];
 
         // Nothing is drawn unless the game - or one of OUR windows - is in front. Not
         // tidiness: the overlay is always-on-top and covers the game's whole client area,
@@ -1896,9 +1921,26 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // paths, and the way a wrong one fails is that something reads open forever and
             // the markers never come back - which looks exactly like an overlay that broke.
             // Named here, it is instead one line saying which panel to stop believing.
+            //
+            // AND WHETHER EACH SAID WHERE IT IS, which is a separate answer and fails separately.
+            // The bit decides about the markers; the rectangle decides about this window, and a
+            // panel that reports open without a size leaves every window exactly where it was.
+            // Unsaid, that reads as a setting that does nothing.
             if (_snapshot.InAPanel)
             {
-                Row("panels", _snapshot.Panels.ToString(), new Vector4(1f, 0.8f, 0.35f, 1f));
+                string where = !HideWindowsBehindPanels
+                    ? "windows staying put"
+                    : _snapshot.Covering.Count == 0
+                        ? "no screen area read - windows staying put"
+                        : "covering " + string.Join(
+                            ", ",
+                            _snapshot.Covering.Select(
+                                area => $"{area.Panel} {area.Right - area.Left:F0}x{area.Bottom - area.Top:F0}"));
+
+                Row(
+                    "panels",
+                    $"{_snapshot.Panels}   ({where})",
+                    new Vector4(1f, 0.8f, 0.35f, 1f));
             }
 
             // Only when there is one. A path that does not work otherwise shows up as a
@@ -2051,6 +2093,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (ImGui.Checkbox("Hide behind big panels  (stash, skill tree, atlas, world map)", ref behind))
         {
             HideBehindPanels = behind;
+            SettingsChanged?.Invoke();
+        }
+
+        bool windowsBehind = HideWindowsBehindPanels;
+        if (ImGui.Checkbox(
+                "Hide these windows over a panel  (only the ones actually on top of it)",
+                ref windowsBehind))
+        {
+            HideWindowsBehindPanels = windowsBehind;
             SettingsChanged?.Invoke();
         }
 

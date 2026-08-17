@@ -333,7 +333,8 @@ public sealed record WorldSnapshot(
     CorpseSigns Corpses = default,
     GamePanel Panels = GamePanel.None,
     int Remembered = 0,
-    ulong ServerData = 0)
+    ulong ServerData = 0,
+    IReadOnlyList<PanelArea>? PanelAreas = null)
 {
     /// <summary>
     /// Whether the player is looking at a panel rather than at the game.
@@ -343,6 +344,17 @@ public sealed record WorldSnapshot(
     /// information in the way - which is worse than none. See <see cref="PanelReader"/>.
     /// </remarks>
     public bool InAPanel => Panels != GamePanel.None;
+
+    /// <summary>
+    /// Which parts of the screen those panels took, for anything that sits in one place.
+    /// </summary>
+    /// <remarks>
+    /// Empty is the ordinary answer and means "nothing is in the way", but it does NOT follow
+    /// from <see cref="InAPanel"/> being false: a panel can be open and still contribute no
+    /// rectangle, because the read was given no viewport or the element could not say how big
+    /// it is. See <see cref="PanelReader"/> - the bit is the sturdy half of this.
+    /// </remarks>
+    public IReadOnlyList<PanelArea> Covering => PanelAreas ?? [];
 
     /// <summary>
     /// Only what the game listed in this read: the entities whose addresses are still live.
@@ -1073,11 +1085,15 @@ public sealed class WorldReader
             largeMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: true);
         }
 
-        // Which panels are in the way, from the same interface root that was just resolved.
-        // Read every tick rather than on an interval: a panel opens and shuts between two
-        // frames, and an overlay that lags a third of a second behind the stash is the thing
-        // this exists to stop.
-        GamePanel panels = _panels.Open(chain.UiRoot);
+        // Which panels are in the way and where, from the same interface root that was just
+        // resolved. Read every tick rather than on an interval: a panel opens and shuts between
+        // two frames, and an overlay that lags a third of a second behind the stash is the
+        // thing this exists to stop.
+        //
+        // The same viewport the maps were read with, which is what turns a panel into a
+        // rectangle somebody's window can be compared against. Without one - a diagnostic run
+        // with no overlay - the bits still arrive and the rectangles do not.
+        PanelsOnScreen panels = _panels.Read(chain.UiRoot, scale);
 
         double mapsMs = Since(mapsFrom);
 
@@ -1111,12 +1127,13 @@ public sealed class WorldReader
             new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, live, skipped),
             collapsed,
             new CorpseSigns(targetable, untargetable, unreadableTargetable, _corpses.Tracking),
-            panels,
+            panels.Panels,
             remembered.Count,
 
             // Carried rather than re-resolved: the quest flags hang off this and the walk to
             // it is four dereferences that this read has already paid for.
-            serverData);
+            serverData,
+            panels.Areas);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>
