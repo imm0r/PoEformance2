@@ -170,6 +170,13 @@ public sealed class QuestWindow
             ImGui.TextColored(DimText, $"    {quest.Detail}");
         }
 
+        // WHERE, when the step names a place. MapPins carries no coordinates - a name, a world
+        // area and an act - so this is "it is over there" and not a marker.
+        if (quest.Now is { } now && now.Where.Length > 0)
+        {
+            ImGui.TextColored(ActText, $"    at: {now.Where}");
+        }
+
         if (quest.Next is { } next && next.Line.Length > 0)
         {
             ImGui.TextColored(DimText, $"    then: {next.Line}");
@@ -183,23 +190,19 @@ public sealed class QuestWindow
             _walkthrough = open ? -1 : quest.Row;
         }
 
-        if (!open)
+        if (open)
         {
-            if (_conditions)
-            {
-                Steps(quest);
-            }
-
-            return;
+            Walkthrough(quest);
         }
-
-        Walkthrough(quest);
 
         if (_conditions)
         {
             Steps(quest);
         }
 
+        // Unconditionally. An earlier version returned out of the collapsed path before this,
+        // so every frame pushed an id it never popped - the stack grows without bound and ids
+        // start colliding, which shows up as the wrong quest's button responding.
         ImGui.PopID();
     }
 
@@ -233,6 +236,13 @@ public sealed class QuestWindow
 
             bool now = at == 0;
             ImGui.TextColored(now ? GoodText : DimText, $"      {(now ? "->" : "  ")} {step.Line}");
+
+            // The place on EVERY step of the route, unlike the long form below it. Where a step
+            // sends you is the half that makes a route worth reading ahead of time.
+            if (step.Where.Length > 0)
+            {
+                ImGui.TextColored(ActText, $"           at: {step.Where}");
+            }
 
             // The long form only for the step in hand. On the ones still ahead it doubles the
             // height of the list to say what its own first line already said.
