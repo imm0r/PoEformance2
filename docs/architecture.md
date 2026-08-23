@@ -249,11 +249,12 @@ keeps moving now goes quiet after a few lines, everything is tallied, and the ta
 the end. `tests/fixtures/session-2026-08-hover.rec` is that session, and `HoverSlotTests`
 replays it. See the block comment at the top of `schema/poe2.offsets.json`.
 
-`--questflags` is a hunt rather than a feature: it finds the QuestFlags table through any NPC
-in the area and sweeps ServerData and the state objects for references to its rows. The sweep
-reports what it matched, but the reason to run it is the READING - the regions land in the
-recording, and a question that needs the game becomes one that can be answered offline as
-often as it takes.
+`--questflags` was the hunt that did not find it. It locates the QuestFlags table through any
+NPC in the area and sweeps ServerData and the state objects for references to its rows — and
+that sweep could never have worked, because the set stores no references at all. It is kept for
+the READING: the regions land in the recording, so a question that needs the game becomes one
+that can be answered offline as often as it takes, which is how the chain was confirmed once
+somebody handed it over. See "Quests" below for what it actually is.
 
 ## Status
 
@@ -843,6 +844,139 @@ The transport is **handed in** — the price layer takes a "name and league in, 
 delegate — so all of the deciding is testable without a browser or a network, and the one place
 that talks to the trade site is visible from the constructor. It is also what keeps the layering
 honest: the queue lives in Features and the browser in Config, which Features cannot see.
+
+### Quests — what every one of them is waiting on
+
+The in-game tracker shows the quest you are tracking. This shows all of them, because the
+question worth asking is "what have I left behind" rather than "what am I doing" — the act-two
+side quest nobody remembers starting is exactly the one the tracker will not surface.
+
+It is the same state machine the game's own tracker runs on, so the answer is the same answer,
+for every quest at once and readable from a recording afterwards. Two halves have to meet: what
+the character has DONE, which is in the process, and what the quests ARE, which is in the
+install's own data files.
+
+#### The bitset — six sessions, and why none of them could have worked
+
+**`ServerData → +0x60 → +0x188 → +0x248`, and it is a sparse bitset over QuestFlags row
+numbers.** The vector at the end holds 9-byte records: one byte of chunk index, then eight
+bytes of flags, sorted and strictly increasing. Bit `n` of chunk `c` is quest flag row
+`c * 64 + n`, and that row number is the same number the tables use as a foreign key — so the
+join is arithmetic and there is no name matching anywhere in it.
+
+This was the longest-standing open question in the project, and it did not fall to a hunt. It
+was handed over as a pointer chain, and the value of the six sessions spent on it is entirely in
+knowing WHY each approach was doomed:
+
+- **Reference sweeps find nothing because there are no references.** `--questflags` looked for
+  pointers to QuestFlags rows. The set stores bit positions. A row's ADDRESS never appears
+  anywhere near it, so the sweep was searching for a thing that does not exist.
+- **Page-diffing is defeated by the container, not by the data.** The vector is sized exactly,
+  so setting a flag in a chunk that is not present yet inserts a record and reallocates the
+  whole buffer. Every byte moves. "Diff memory across doing one quest step" therefore reports
+  the entire region as changed, every time, and the one bit that actually flipped is invisible
+  in the noise.
+- **A four-byte scan for a flag value is a category error.** There is no per-flag variable to
+  find. The trap at the top of this file — 999/1000 turning out to be pointer high-dwords — came
+  out of exactly that search.
+
+**It is verified by naming rows, not by looking plausible.** The set read out of a live session
+is joined back against `QuestFlags.datc64` and the Ids printed: row 11 is
+`CompletedSkillGemTutorial`, row 22 is `CompletedLifeFlaskTutorial`, row 46 is `EnteredHideout`
+— all three things the character had demonstrably done, and none of them a thing a wrong chain
+could name by accident. A bitset off by one bit would name the neighbour instead.
+
+The fixture also catches BOTH ways a flag can arrive, which is what makes it a regression test
+rather than a snapshot: flag 1771 was set in chunk `0x1B`, which the set already held (it
+carried bits 31, 32, 44 and 46 before), while flag 644 arrived as a brand new chunk `0x0A` — the
+reallocating case that defeated the page-diffing.
+`tests/fixtures/session-2026-08-questflags-set.rec` is that session and `QuestFlagSetTests`
+replays it.
+
+#### The tables — `.datc64` out of the install
+
+The quests themselves are not in memory, they are in the game's own data files, read through
+the bundle reader the item art already needed. Four tables: `Quest` (127 rows), `QuestStates`
+(1477), `QuestFlags` (5717) and `MapPins`.
+
+The format is a `u32` row count, that many packed fixed-width rows, eight bytes of `0xBB` as a
+separator, and then a variable-length section holding every string and array. Three things in
+it are sharp:
+
+- **Offsets into the variable section count from the SEPARATOR, not from the file.** Which
+  makes offset 0 mean "no string" rather than "the first string", and reading it as a position
+  hands back the `0xBB` padding as a run of U+BBBB. That only showed up once two text columns
+  were compared against each other — on its own it looks like a decoding problem.
+- **The separator has to be searched byte by byte.** `Quest`'s rows are 119 bytes, so its
+  separator lands at an odd offset and a scan that steps four bytes at a time walks straight
+  past it. That table read as "not a .dat file at all" until the scan was fixed.
+- **The vendored column list will not always add up, and that is not a reason to reject a
+  table.** `Quest` measures 119 bytes per row where the schema's columns compute 103 — there are
+  columns the public schema does not know about. So a row size that disagrees is settled by
+  ASKING the table: read the columns the feature actually needs as strings and see whether they
+  come back as text. A prefix that reads correctly is worth more than an arithmetic identity,
+  and padding the column list until the numbers match would move every offset after the padding.
+
+The layouts live in `data/quest-tables.json` rather than being fetched, and the file records
+what was measured. Column widths follow dat-schema's rules — `foreignrow` is 16 bytes, `row` is
+8, an array is 16 — and `MapPins` is deliberately OPTIONAL: without it the quest steps still
+read, they just name no place, which is better than not reading them at all.
+
+#### The join, and the two things the game had to settle
+
+`QuestStates` is a state machine. Each state names the flags that must be PRESENT and the ones
+that must be ABSENT, and the state whose conditions hold is the current objective. Two
+properties of it are not derivable from the schema and were measured against the game instead —
+both of which had already produced a wrong answer that looked right:
+
+- **`Order` counts DOWN.** The last state of a quest is 0. Sorting it the other way ran every
+  quest backwards: a FINISHED quest reported its completion state as the current objective with
+  an earlier step as "then", and a quest genuinely in progress reported itself finished and was
+  hidden — which is why two quests the game's own tracker was listing were missing from the
+  window entirely. Every synthetic test passed throughout, because the fixture modelled the
+  direction backwards too. It took a screenshot to catch.
+- **`Message` is what the panel renders, not `Text`.** The two columns are just a string each
+  and the schema does not say which is which. Shown side by side against the game, `Message`
+  matched word for word — "Find the Red Vale" — while `Text` was the longer sentence every
+  time. So `Message` is the objective and `Text` is the detail under it, which is usually the
+  half that says where to go.
+
+**Several states holding at once is ordinary**, and it cost a screenshot to establish that too.
+Most states declare only the flags that must be present and none that must be absent, so every
+state the character has already passed goes on holding. The furthest along in progression order
+is the answer. It is still counted and shown, because a sudden jump in that number is what a
+mis-read condition column would look like.
+
+**The route folds its branches.** A quest with branches carries a state per branch — The
+Runeseeker has 87, most of them the same sentence for the different regions it can be done in —
+so consecutive states wording an objective identically collapse into one line with the count
+beside it. Only CONSECUTIVE ones, so the order is never rearranged to make the fold look
+tidier, and the fold gathers every PLACE those states named: the sentence is what they had in
+common, the region is what they differed in, and the wall of identical lines was hiding exactly
+that. The ordering is stable for the same reason — branch states share an `Order`, and an
+unstable sort would put ties in a different relative order on different reads.
+
+#### Map pins, and a question deliberately left open
+
+`MapPins` carries its own flag conditions — `QuestFlags1/2/3` as arrays, `QuestFlag1/2` singly —
+so the same bitset says which pins the game will draw. The useful half is the INVERSE of what
+the map shows: which pins are visible the map answers itself, but which flags a hidden pin is
+waiting on is visible nowhere, because a locked pin simply is not drawn.
+
+**What those five columns mean is not known, and no rule is baked in.** Unlike `QuestStates`,
+whose two are named `FlagsPresent` and `FlagsMissing`, nothing says which way any of the five
+point — all required, alternatives, or one of them an exclusion. So both readings are counted
+side by side in the tab, and comparing them against the number of pins the world map actually
+draws is what will settle it. One measurement rather than an argument, which is the same way
+`Order` and `Message` were settled. An empty condition counts for NEITHER reading: four of a
+pin's five columns are usually empty, so calling those satisfied would show every pin and
+calling them unsatisfied would lock every one.
+
+**What none of this can do**, said because the feature invites the assumption: `Text` is what
+GGG wrote and nothing derives more than that. "Find the Hooded One" is as specific as the data
+gets, and which room he is in is not in any table. `MapPins` has no coordinates either — a
+name, a world area and an act — so a pin answers WHICH PLACE and not which point. It is the
+sentence "and it is over there", and it can never become a marker in the world.
 
 ### Remaining
 

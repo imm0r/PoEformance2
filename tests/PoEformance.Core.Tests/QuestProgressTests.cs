@@ -432,6 +432,117 @@ public class QuestProgressTests
         Assert.Single(outlook.Active);
     }
 
+    [Fact]
+    public void ConsecutiveStatesWordedTheSameWayFoldIntoOneLeg()
+    {
+        // THE RUNESEEKER'S 87. Most of them are the same sentence for the different regions the
+        // quest can be done in, so listed one per line the route is a wall of one sentence.
+        QuestStep[] steps =
+        [
+            new(3, [], [], string.Empty, "Search the region for more Runestones", ["The Mire"]),
+            new(3, [], [], string.Empty, "Search the region for more Runestones", ["The Bluff"]),
+            new(3, [], [], string.Empty, "Search the region for more Runestones", ["The Vale"]),
+            new(2, [], [], string.Empty, "Return to Farrow", ["Clearfell"]),
+        ];
+
+        IReadOnlyList<QuestLeg> route = QuestState.Fold(steps);
+
+        Assert.Equal(2, route.Count);
+        Assert.Equal(3, route[0].States);
+        Assert.True(route[0].Branches);
+        Assert.Equal(1, route[1].States);
+        Assert.False(route[1].Branches);
+    }
+
+    [Fact]
+    public void TheFoldKeepsEveryPlaceBecauseThePlaceIsWhatDiffered()
+    {
+        // The whole reason folding says MORE and not less: the sentence never changed, the
+        // region did. Gathering them onto one line is shorter than the wall AND carries the only
+        // part the wall was varying.
+        QuestStep[] steps =
+        [
+            new(3, [], [], string.Empty, "Search the region", ["The Mire"]),
+            new(3, [], [], string.Empty, "Search the region", ["The Bluff"]),
+            new(3, [], [], string.Empty, "Search the region", ["The Mire"]),
+        ];
+
+        QuestLeg leg = Assert.Single(QuestState.Fold(steps));
+
+        Assert.Equal("The Mire, The Bluff", leg.Where);
+    }
+
+    [Fact]
+    public void TwoStretchesOfTheSameSentenceWithSomethingBetweenStayTwo()
+    {
+        // Only CONSECUTIVE states fold, so the route is never rearranged to make the folding
+        // look tidier. A quest that really does come back to something says so.
+        QuestStep[] steps =
+        [
+            new(3, [], [], string.Empty, "Search the region", []),
+            new(2, [], [], string.Empty, "Speak to Farrow", []),
+            new(1, [], [], string.Empty, "Search the region", []),
+        ];
+
+        Assert.Equal(3, QuestState.Fold(steps).Count);
+    }
+
+    [Fact]
+    public void AStateWithNoWordsIsDroppedRatherThanSplittingARun()
+    {
+        // Left in, it would break a run in two and the route would say the same sentence twice
+        // in a row - which is exactly the thing the fold exists to stop.
+        QuestStep[] steps =
+        [
+            new(3, [], [], string.Empty, "Search the region", []),
+            new(3, [], [], string.Empty, string.Empty, []),
+            new(3, [], [], string.Empty, "Search the region", []),
+        ];
+
+        QuestLeg leg = Assert.Single(QuestState.Fold(steps));
+
+        Assert.Equal(2, leg.States);
+    }
+
+    [Fact]
+    public void TheLongFormComesFromTheFirstStateThatHasOne()
+    {
+        // Branch states routinely leave Text empty on some of their number and fill it on
+        // others, so taking the first state's would lose it for the whole leg.
+        QuestStep[] steps =
+        [
+            new(3, [], [], string.Empty, "Search the region", []),
+            new(3, [], [], "Runestones are scattered across the region.", "Search the region", []),
+        ];
+
+        Assert.Equal("Runestones are scattered across the region.", QuestState.Fold(steps).Single().Detail);
+    }
+
+    [Fact]
+    public void TheRouteIsWhatIsLeftRatherThanTheWholeQuest()
+    {
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        QuestState quest = Assert.Single(QuestProgress.Read(quests, states, flags, layouts, [0]).Quests);
+
+        Assert.Equal(["Speak to Farrow", "Return to town"], quest.Route.Select(l => l.Line));
+    }
+
+    [Fact]
+    public void StatesThatTieOnOrderComeOutInTheSameOrderEveryTime()
+    {
+        // NOT A STYLE POINT. Branch states share an Order, and List.Sort is an introsort, which
+        // puts ties in an arbitrary relative order. Two things depend on that order being the
+        // same every read: which of several holding steps is picked as current, and which states
+        // end up adjacent for the route to fold.
+        (LoadedTable quests, LoadedTable states, LoadedTable flags, QuestTableLayouts layouts) = Tiny();
+
+        IReadOnlyList<QuestStep> first = QuestProgress.Read(quests, states, flags, layouts, [0]).Quests[0].Steps;
+        IReadOnlyList<QuestStep> again = QuestProgress.Read(quests, states, flags, layouts, [0]).Quests[0].Steps;
+
+        Assert.Equal(first.Select(s => s.Text), again.Select(s => s.Text));
+    }
+
     /// <summary>
     /// A two-step quest with two flags, as three synthetic tables.
     /// </summary>
