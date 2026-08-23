@@ -210,10 +210,14 @@ public sealed class QuestWindow
     /// The quest as a route: what is behind, what is now, and what is still ahead.
     /// </summary>
     /// <remarks>
-    /// A PATH, NOT A CHECKLIST. QuestStates is a state machine, so a quest with branches
-    /// carries a state per branch - The Runeseeker has 87 and most are the same sentence for
-    /// the different regions it can be done in. Showing the words rather than a countdown is
-    /// what keeps that honest, and the count is labelled as states rather than as things to do.
+    /// A PATH, NOT A CHECKLIST. QuestStates is a state machine, so a quest with branches carries
+    /// a state per branch - The Runeseeker has 87 and most are the same sentence for the
+    /// different regions it can be done in. Listed one per line that is a wall, so consecutive
+    /// states wording the same objective are folded into one leg and the count rides beside it.
+    ///
+    /// FOLDING SAYS MORE, NOT LESS. What twenty identical lines differ in is the PLACE, so the
+    /// fold gathers those and names them all on one line - "Search the region for more
+    /// Runestones - at: The Mire, The Bluff, ...". The wall was hiding the only part that varied.
     ///
     /// What is BEHIND is a count and not a list. Nobody needs to read the eleven things they
     /// already did, and the one line saying how many there were is what places the current step
@@ -226,41 +230,64 @@ public sealed class QuestWindow
             ImGui.TextColored(DimText, $"      {quest.Passed} steps behind you");
         }
 
-        var at = 0;
-        foreach (QuestStep step in quest.Remaining)
+        IReadOnlyList<QuestLeg> route = quest.Route;
+        var states = 0;
+
+        for (var at = 0; at < route.Count; at++)
         {
-            if (step.Line.Length == 0)
-            {
-                continue;
-            }
-
+            QuestLeg leg = route[at];
             bool now = at == 0;
-            ImGui.TextColored(now ? GoodText : DimText, $"      {(now ? "->" : "  ")} {step.Line}");
+            states += leg.States;
 
-            // The place on EVERY step of the route, unlike the long form below it. Where a step
-            // sends you is the half that makes a route worth reading ahead of time.
-            if (step.Where.Length > 0)
+            ImGui.TextColored(now ? GoodText : DimText, $"      {(now ? "->" : "  ")} {leg.Line}");
+
+            // The count only where there IS one, because "x1" on every other line is noise that
+            // makes the number stop being read at all.
+            if (leg.Branches)
             {
-                ImGui.TextColored(ActText, $"           at: {step.Where}");
+                ImGui.SameLine();
+                ImGui.TextColored(WarnText, $"x{leg.States}");
             }
 
-            // The long form only for the step in hand. On the ones still ahead it doubles the
+            // The place on EVERY leg of the route, unlike the long form below it. Where a step
+            // sends you is the half that makes a route worth reading ahead of time - and after a
+            // fold it is a list of them, so it wraps rather than running off the window.
+            if (leg.Where.Length > 0)
+            {
+                Wrapped(ActText, $"           at: {leg.Where}");
+            }
+
+            // The long form only for the leg in hand. On the ones still ahead it doubles the
             // height of the list to say what its own first line already said.
-            if (now && step.Detail.Length > 0)
+            if (now && leg.Detail.Length > 0)
             {
-                ImGui.TextColored(DimText, $"           {step.Detail}");
+                Wrapped(DimText, $"           {leg.Detail}");
             }
-
-            at++;
         }
 
-        if (at > 1)
+        if (route.Count > 1)
+        {
+            ImGui.TextColored(DimText, $"      {route.Count - 1} steps ahead");
+        }
+
+        // Only when folding actually happened, and it is the one line that stops the route being
+        // read as a tally of things to go and do: those states are alternatives, so a character
+        // walks ONE of each folded run and not all of them.
+        if (states > route.Count)
         {
             ImGui.TextColored(
                 DimText,
-                $"      {at - 1} states ahead - a quest with branches carries one per branch,"
-                + " so this is a route rather than a count of things to do");
+                $"      folded from {states} states - a quest with branches carries one per"
+                + " branch, and you walk one of each");
         }
+    }
+
+    /// <summary>Coloured text that wraps, which TextColored on its own does not.</summary>
+    private static void Wrapped(Vector4 colour, string text)
+    {
+        ImGui.PushStyleColor(ImGuiCol.Text, colour);
+        ImGui.TextWrapped(text);
+        ImGui.PopStyleColor();
     }
 
     /// <summary>

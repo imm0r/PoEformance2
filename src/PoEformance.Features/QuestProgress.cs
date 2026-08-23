@@ -50,6 +50,34 @@ public sealed record QuestStep(
     }
 }
 
+/// <summary>
+/// One stretch of a quest's route: an objective, and every state that words it the same way.
+/// </summary>
+/// <param name="States">
+/// How many states carry this line. More than one means the quest branches here.
+/// </param>
+/// <param name="Places">Every place any of those states points at, de-duplicated.</param>
+/// <remarks>
+/// THIS IS WHAT MAKES A STATE MACHINE READ AS A ROUTE. QuestStates carries a state per branch,
+/// so The Runeseeker has 87 of them and most are the same sentence for the different regions
+/// the quest can be done in. Listed one per line that is a wall; folded, it is one line with
+/// the regions named beside it, which is both shorter AND says more - the sentence never
+/// changed, the place is the part that did.
+///
+/// Only CONSECUTIVE states fold, so the order of the route is never rearranged to make the
+/// folding look better. Two stretches that happen to share a sentence with something else in
+/// between stay two stretches, which is the honest reading: the quest really does come back to
+/// it.
+/// </remarks>
+public sealed record QuestLeg(string Line, string Detail, int States, IReadOnlyList<string> Places)
+{
+    /// <summary>The places as one line, or empty when it names none.</summary>
+    public string Where => Places.Count == 0 ? string.Empty : string.Join(", ", Places);
+
+    /// <summary>True when more than one state words this objective the same way.</summary>
+    public bool Branches => States > 1;
+}
+
 /// <summary>A quest and where the character stands in it.</summary>
 /// <param name="Now">The step whose conditions hold, or null when none does.</param>
 /// <param name="Next">The step after it, which is what completing the current one leads to.</param>
@@ -115,6 +143,78 @@ public sealed record QuestState(
     /// </remarks>
     public IReadOnlyList<QuestStep> Remaining
         => Now is null || At < 0 ? Steps : [.. Steps.Skip(At)];
+
+    /// <summary>What is left to do, with the branch states folded into one line each.</summary>
+    public IReadOnlyList<QuestLeg> Route => Fold(Remaining);
+
+    /// <summary>
+    /// Folds runs of states that word their objective identically into one leg each.
+    /// </summary>
+    /// <remarks>
+    /// States with NO words at all are dropped rather than folded. They cannot be shown - there
+    /// is nothing to show - and left in they would split a run of identical lines in two, so a
+    /// quest with a wordless state in the middle of its branches would fold into two legs
+    /// saying the same sentence.
+    /// </remarks>
+    public static IReadOnlyList<QuestLeg> Fold(IReadOnlyList<QuestStep> steps)
+    {
+        ArgumentNullException.ThrowIfNull(steps);
+
+        var made = new List<QuestLeg>();
+        List<QuestStep>? run = null;
+
+        foreach (QuestStep step in steps)
+        {
+            if (step.Line.Length == 0)
+            {
+                continue;
+            }
+
+            if (run is not null && string.Equals(run[0].Line, step.Line, StringComparison.Ordinal))
+            {
+                run.Add(step);
+                continue;
+            }
+
+            if (run is not null)
+            {
+                made.Add(Leg(run));
+            }
+
+            run = [step];
+        }
+
+        if (run is not null)
+        {
+            made.Add(Leg(run));
+        }
+
+        return made;
+    }
+
+    private static QuestLeg Leg(List<QuestStep> run)
+    {
+        // Order-preserving and de-duplicated. The places are the part that DIFFERS across a
+        // fold - the same sentence for a different region - so losing them to the fold would
+        // throw away the only thing the folded states were not agreeing about.
+        var places = new List<string>();
+        foreach (QuestStep step in run)
+        {
+            foreach (string place in step.Places)
+            {
+                if (!places.Contains(place))
+                {
+                    places.Add(place);
+                }
+            }
+        }
+
+        // The first state that HAS a long form, not the first state's. Branch states routinely
+        // leave it empty on some of their number and fill it on others.
+        string detail = run.Select(s => s.Detail).FirstOrDefault(d => d.Length > 0) ?? string.Empty;
+
+        return new QuestLeg(run[0].Line, detail, run.Count, places);
+    }
 }
 
 /// <summary>What the whole read produced, including why it produced nothing.</summary>
@@ -236,7 +336,7 @@ public static class QuestProgress
         }
 
         var made = new List<QuestState>(byQuest.Count);
-        foreach ((int quest, List<QuestStep> steps) in byQuest)
+        foreach ((int quest, List<QuestStep> read) in byQuest)
         {
             // DESCENDING, because Order counts DOWN. Read off the game with the flags shown:
             // "Finding the Forge" runs order 4 "Speak to Renly in Clearfell Encampment", 3
@@ -246,7 +346,15 @@ public static class QuestProgress
             // quest reported its completion state as CURRENT with an earlier step as "then",
             // and a quest genuinely in progress reported itself finished and was hidden, which
             // is why two quests the game's own tracker listed were missing from this window.
-            steps.Sort((a, b) => b.Order.CompareTo(a.Order));
+            //
+            // STABLE, and by OrderByDescending rather than List.Sort for that reason alone.
+            // Branch states share an Order - they are alternatives at the same stage - and
+            // List.Sort is an introsort, so it puts ties in an arbitrary relative order. Two
+            // things downstream depend on that order not being arbitrary: which of several
+            // holding steps is picked as the current one, and which states end up adjacent for
+            // the route to fold. Row order is as good a tiebreak as any; being the SAME one
+            // every time is the part that matters.
+            List<QuestStep> steps = [.. read.OrderByDescending(s => s.Order)];
 
             // The LAST step whose conditions hold, in progression order. Steps are cumulative -
             // an early one asks for flags a later one also has - so the earliest match is where
