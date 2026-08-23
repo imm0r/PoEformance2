@@ -962,6 +962,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(watch);
         var window = new QuestWindow(watch);
         _tools.Add(25, "quests", "Quests", window.DrawTab, page: Area);
+
+        // Its own tab rather than a fold inside the quests one. It answers a different
+        // question - "what is my map still hiding" against "what am I supposed to do next" -
+        // and it rides the same read, so it costs a tab and nothing else.
+        var pins = new MapPinWindow(watch);
+        _tools.Add(26, "mappins", "Map pins", pins.DrawTab, page: Area);
+
         if (visible)
         {
             _tools.Show("quests");

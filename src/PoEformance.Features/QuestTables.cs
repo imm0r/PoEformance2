@@ -102,6 +102,16 @@ public sealed class QuestTableLayouts
         return columns.FirstOrDefault(c => c.Name == column)?.Offset ?? -1;
     }
 
+    /// <summary>Whether a named column holds an array, so a reader can pick how to read it.</summary>
+    /// <remarks>
+    /// A single reference and an array of them are both 16 bytes, so reading one as the other
+    /// finds nothing rather than something wrong - the safer half of a mistake, and still no
+    /// use. The column list already says which it is; this is asking it.
+    /// </remarks>
+    public bool IsArray(string table, string column)
+        => Tables.TryGetValue(table, out List<DatColumn>? columns)
+           && columns.FirstOrDefault(c => c.Name == column)?.Array == true;
+
     /// <summary>The row size the column list computes, or 0 when it cannot be computed.</summary>
     public int RowSizeOf(string table)
         => Tables.TryGetValue(table, out List<DatColumn>? columns) ? DatColumns.Layout(columns) : 0;

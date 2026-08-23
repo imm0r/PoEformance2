@@ -20,6 +20,7 @@ public sealed class QuestWatch
 {
     private readonly object _gate = new();
     private QuestOutlook _outlook = QuestOutlook.Nothing("not read yet");
+    private IReadOnlyList<MapPin> _pinStates = [];
     private LoadedTable? _quests;
     private LoadedTable? _states;
     private LoadedTable? _flagTable;
@@ -69,6 +70,24 @@ public sealed class QuestWatch
             lock (_gate)
             {
                 return _flags;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Every world-map pin with its flag conditions, against the character's set.
+    /// </summary>
+    /// <remarks>
+    /// Recomputed with the quests rather than on its own: it is the same flag set and the same
+    /// join, so splitting the two would mean reading the flags twice to answer one question.
+    /// </remarks>
+    public IReadOnlyList<MapPin> Pins
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _pinStates;
             }
         }
     }
@@ -155,6 +174,11 @@ public sealed class QuestWatch
             }
 
             _outlook = QuestProgress.Read(_quests, _states, _flagTable, _layouts, setFlags, _pins);
+
+            if (_pins is not null)
+            {
+                _pinStates = MapPinProgress.Read(_pins, _flagTable, _layouts, setFlags);
+            }
         }
     }
 
