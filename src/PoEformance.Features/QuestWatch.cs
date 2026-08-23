@@ -23,6 +23,7 @@ public sealed class QuestWatch
     private LoadedTable? _quests;
     private LoadedTable? _states;
     private LoadedTable? _flagTable;
+    private LoadedTable? _pins;
     private QuestTableLayouts? _layouts;
     private string _opening = string.Empty;
     private bool _tried;
@@ -121,9 +122,15 @@ public sealed class QuestWatch
             (_states, string why2) = QuestTables.Open(
                 files, _layouts, "QuestStates", "FlagsPresent", "Text", "Message");
             (_flagTable, string why3) = QuestTables.Open(files, _layouts, "QuestFlags", null, "Id");
+
+            // The pins are OPTIONAL, and deliberately not part of Ready: a missing MapPins
+            // costs the "where" of a step and nothing else, so it must not switch the whole
+            // feature off. Its line still appears in the readout.
+            (_pins, string why4) = QuestTables.Open(files, _layouts, "MapPins", "WorldAreasKeys", "Id", "Name");
             said.Add(why1);
             said.Add(why2);
             said.Add(why3);
+            said.Add(why4);
             _opening = string.Join("; ", said);
 
             if (!Ready)
@@ -147,7 +154,7 @@ public sealed class QuestWatch
                 return;
             }
 
-            _outlook = QuestProgress.Read(_quests, _states, _flagTable, _layouts, setFlags);
+            _outlook = QuestProgress.Read(_quests, _states, _flagTable, _layouts, setFlags, _pins);
         }
     }
 

@@ -1,227 +1,293 @@
 {
-  "comment": "Column order of the three quest tables, from poe-tool-dev/dat-schema (PoE2 entries only). Offsets are NOT stored: they are arithmetic over the widths in DatColumns, and recomputing them is what keeps this honest when a width is corrected. Vendored rather than downloaded so the feature works offline and so a schema refresh is a visible diff. MEASURED AGAINST A REAL INSTALL (2026-08): QuestStates computes 208 and the file's rows ARE 208 over 1477 rows; QuestFlags computes 12 and the file agrees over 5717, which is also the 0x0C row stride the schema measured in memory - so two of the three are confirmed exactly. QUEST DOES NOT AGREE: the file is 119 bytes over 127 rows against the 103 computed here, so one 16-byte column has been added that this schema does not carry. It is still USED, because both of dat-schema's Quest variants agree on the first four columns - Id +0, Act +8, Name +12, Icon_DDSFile +20 - and the three fields read here are among them; the mismatch is settled by READING Id and Name across the table rather than by trusting either number. Do not 'fix' the column list by padding it: the extra column's position is unknown, and inventing one in the wrong place would move Name without anything noticing.",
+  "comment": "Column order of the three quest tables, from poe-tool-dev/dat-schema (PoE2 entries only). Offsets are NOT stored: they are arithmetic over the widths in DatColumns, and recomputing them is what keeps this honest when a width is corrected. Vendored rather than downloaded so the feature works offline and so a schema refresh is a visible diff. MEASURED AGAINST A REAL INSTALL (2026-08): QuestStates computes 208 and the file's rows ARE 208 over 1477 rows; QuestFlags computes 12 and the file agrees over 5717, which is also the 0x0C row stride the schema measured in memory - so two of the three are confirmed exactly. QUEST DOES NOT AGREE: the file is 119 bytes over 127 rows against the 103 computed here, so one 16-byte column has been added that this schema does not carry. It is still USED, because both of dat-schema's Quest variants agree on the first four columns - Id +0, Act +8, Name +12, Icon_DDSFile +20 - and the three fields read here are among them; the mismatch is settled by READING Id and Name across the table rather than by trusting either number. Do not 'fix' the column list by padding it: the extra column's position is unknown, and inventing one in the wrong place would move Name without anything noticing. MAPPINS ADDED 2026-08 for the 'where' half of a step: it carries no coordinates - Name, WorldArea and Act - so a pin answers WHICH PLACE rather than which point, which is what a world-map pin is. QuestStates reaches them through MapPinsKeys (an array) and MapPinsKey (a single), and both are read because a state may use either.",
   "source": "poe-tool-dev/dat-schema, validFor & 2",
   "tables": {
-    "Quest": [
+    "MapPins": [
       {
         "name": "Id",
         "type": "string",
-        "array": false,
-        "offset": 0
+        "array": false
       },
       {
-        "name": "Act",
-        "type": "i32",
-        "array": false,
-        "offset": 8
+        "name": "WorldArea",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "WorldAreasKeys",
+        "type": "foreignrow",
+        "array": true
       },
       {
         "name": "Name",
         "type": "string",
-        "array": false,
-        "offset": 12
+        "array": false
+      },
+      {
+        "name": "FlavourText",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "QuestFlags1",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Act",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "QuestFlags2",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "QuestFlags3",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "QuestFlag1",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "ParentMapPin",
+        "type": "row",
+        "array": false
+      },
+      {
+        "name": "MetadataId",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "QuestFlag2",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "",
+        "type": "bool",
+        "array": false
+      }
+    ],
+    "Quest": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Act",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Name",
+        "type": "string",
+        "array": false
       },
       {
         "name": "Icon_DDSFile",
         "type": "string",
-        "array": false,
-        "offset": 20
+        "array": false
       },
       {
         "name": "QuestId",
         "type": "i32",
-        "array": false,
-        "offset": 28
+        "array": false
       },
       {
         "name": "",
         "type": "bool",
-        "array": false,
-        "offset": 32
+        "array": false
       },
       {
         "name": "Type",
         "type": "foreignrow",
-        "array": false,
-        "offset": 33
+        "array": false
       },
       {
         "name": "",
         "type": "i32",
-        "array": true,
-        "offset": 49
+        "array": true
       },
       {
         "name": "",
         "type": "i32",
-        "array": false,
-        "offset": 65
+        "array": false
       },
       {
         "name": "TrackerGroup",
         "type": "foreignrow",
-        "array": false,
-        "offset": 69
+        "array": false
       },
       {
         "name": "",
         "type": "bool",
-        "array": false,
-        "offset": 85
+        "array": false
       },
       {
         "name": "",
         "type": "bool",
-        "array": false,
-        "offset": 86
+        "array": false
       },
       {
         "name": "",
         "type": "foreignrow",
-        "array": true,
-        "offset": 87
+        "array": true
       }
     ],
     "QuestFlags": [
       {
         "name": "Id",
         "type": "string",
-        "array": false,
-        "offset": 0
+        "array": false
       },
       {
         "name": "HASH32",
         "type": "i32",
-        "array": false,
-        "offset": 8
+        "array": false
       }
     ],
     "QuestStates": [
       {
         "name": "Quest",
         "type": "foreignrow",
-        "array": false,
-        "offset": 0
+        "array": false
       },
       {
         "name": "Order",
         "type": "i32",
-        "array": false,
-        "offset": 16
+        "array": false
       },
       {
         "name": "FlagsPresent",
         "type": "foreignrow",
-        "array": true,
-        "offset": 20
+        "array": true
       },
       {
         "name": "FlagsMissing",
         "type": "foreignrow",
-        "array": true,
-        "offset": 36
+        "array": true
       },
       {
         "name": "Text",
         "type": "string",
-        "array": false,
-        "offset": 52
+        "array": false
       },
       {
         "name": "",
         "type": "bool",
-        "array": false,
-        "offset": 60
+        "array": false
       },
       {
         "name": "Message",
         "type": "string",
-        "array": false,
-        "offset": 61
+        "array": false
       },
       {
         "name": "MapPinsKeys",
         "type": "foreignrow",
-        "array": true,
-        "offset": 69
+        "array": true
       },
       {
         "name": "",
         "type": "i32",
-        "array": false,
-        "offset": 85
+        "array": false
       },
       {
         "name": "MapPinsText",
         "type": "string",
-        "array": false,
-        "offset": 89
+        "array": false
       },
       {
         "name": "MapPinsKey",
         "type": "foreignrow",
-        "array": false,
-        "offset": 97
+        "array": false
       },
       {
         "name": "",
         "type": "foreignrow",
-        "array": true,
-        "offset": 113
+        "array": true
       },
       {
         "name": "",
         "type": "bool",
-        "array": false,
-        "offset": 129
+        "array": false
       },
       {
         "name": "",
         "type": "i32",
-        "array": true,
-        "offset": 130
+        "array": true
       },
       {
         "name": "",
         "type": "i32",
-        "array": true,
-        "offset": 146
+        "array": true
       },
       {
         "name": "",
         "type": "i32",
-        "array": false,
-        "offset": 162
+        "array": false
       },
       {
         "name": "SoundEffect",
         "type": "foreignrow",
-        "array": false,
-        "offset": 166
+        "array": false
       },
       {
         "name": "",
         "type": "string",
-        "array": false,
-        "offset": 182
+        "array": false
       },
       {
         "name": "",
         "type": "foreignrow",
-        "array": true,
-        "offset": 190
+        "array": true
       },
       {
         "name": "",
         "type": "bool",
-        "array": false,
-        "offset": 206
+        "array": false
       },
       {
         "name": "",
         "type": "bool",
-        "array": false,
-        "offset": 207
+        "array": false
       }
     ]
   }

@@ -15,6 +15,9 @@ namespace PoEformance.Features;
 /// <param name="Message">
 /// The short form, and the one the game's own quest panel renders.
 /// </param>
+/// <param name="Places">
+/// Where the step points, by name - the world-map pins it carries.
+/// </param>
 /// <remarks>
 /// WHICH IS WHICH WAS MEASURED, by showing both and holding the window next to the game.
 /// Message matched the panel word for word on two quests - "Find the Red Vale" and "Search for
@@ -26,8 +29,12 @@ public sealed record QuestStep(
     IReadOnlyList<int> Present,
     IReadOnlyList<int> Missing,
     string Text,
-    string Message)
+    string Message,
+    IReadOnlyList<string> Places)
 {
+    /// <summary>The places this step points at, as one line, or empty when it names none.</summary>
+    public string Where => Places.Count == 0 ? string.Empty : string.Join(", ", Places);
+
     /// <summary>The objective as the game words it, falling back to the long form.</summary>
     public string Line => Message.Length > 0 ? Message : Text;
 
@@ -160,12 +167,17 @@ public static class QuestProgress
     /// Joins the tables to a set of flag rows.
     /// </summary>
     /// <param name="setFlags">QuestFlags row numbers the character has set.</param>
+    /// <param name="pins">
+    /// MapPins, for the "where" of a step. Optional: without it the steps still read, they
+    /// simply name no place, which is better than not reading them at all.
+    /// </param>
     public static QuestOutlook Read(
         LoadedTable quests,
         LoadedTable states,
         LoadedTable flags,
         QuestTableLayouts layouts,
-        IReadOnlyCollection<int> setFlags)
+        IReadOnlyCollection<int> setFlags,
+        LoadedTable? pins = null)
     {
         ArgumentNullException.ThrowIfNull(quests);
         ArgumentNullException.ThrowIfNull(states);
@@ -182,6 +194,9 @@ public static class QuestProgress
         int stateMissing = layouts.OffsetOf("QuestStates", "FlagsMissing");
         int stateText = layouts.OffsetOf("QuestStates", "Text");
         int stateMessage = layouts.OffsetOf("QuestStates", "Message");
+        int statePins = layouts.OffsetOf("QuestStates", "MapPinsKeys");
+        int statePin = layouts.OffsetOf("QuestStates", "MapPinsKey");
+        int pinName = layouts.OffsetOf("MapPins", "Name");
 
         if (questId < 0 || questName < 0 || stateQuest < 0 || statePresent < 0 || stateText < 0)
         {
@@ -206,7 +221,8 @@ public static class QuestProgress
                 Rows(states.File.References(row, statePresent), flags.File.Rows),
                 stateMissing < 0 ? [] : Rows(states.File.References(row, stateMissing), flags.File.Rows),
                 states.File.Text(row, stateText),
-                stateMessage < 0 ? string.Empty : states.File.Text(row, stateMessage));
+                stateMessage < 0 ? string.Empty : states.File.Text(row, stateMessage),
+                Places(states.File, row, statePins, statePin, pins, pinName));
 
             if (!byQuest.TryGetValue(quest, out List<QuestStep>? steps))
             {
@@ -268,6 +284,55 @@ public static class QuestProgress
         }
 
         return new QuestOutlook(made, notes);
+    }
+
+    /// <summary>
+    /// The places a step points at, by name.
+    /// </summary>
+    /// <remarks>
+    /// BOTH PIN COLUMNS, because a state may use either: QuestStates carries MapPinsKeys as an
+    /// array and MapPinsKey as a single reference, and which one a state fills in is not
+    /// something to assume. Names are de-duplicated - a state that lists the same place twice
+    /// would otherwise say so on screen.
+    ///
+    /// MapPins carries NO coordinates. Name, WorldArea and Act is all there is, so a pin
+    /// answers WHICH PLACE and not which point - which is what a pin on a world map is. This
+    /// cannot become a marker in the world; it is the sentence "and it is over there".
+    /// </remarks>
+    private static IReadOnlyList<string> Places(
+        DatFile states, int row, int arrayAt, int singleAt, LoadedTable? pins, int nameAt)
+    {
+        if (pins is null || nameAt < 0)
+        {
+            return [];
+        }
+
+        var rows = new List<int>();
+        if (arrayAt >= 0)
+        {
+            rows.AddRange(Rows(states.References(row, arrayAt), pins.File.Rows));
+        }
+
+        if (singleAt >= 0)
+        {
+            int one = states.Reference(row, singleAt).RowIn(pins.File.Rows);
+            if (one >= 0)
+            {
+                rows.Add(one);
+            }
+        }
+
+        var named = new List<string>(rows.Count);
+        foreach (int pin in rows.Distinct())
+        {
+            string name = pins.File.Text(pin, nameAt);
+            if (name.Length > 0 && !named.Contains(name))
+            {
+                named.Add(name);
+            }
+        }
+
+        return named;
     }
 
     /// <summary>The flag rows an array column names, dropping the ones that name nothing.</summary>
