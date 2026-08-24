@@ -109,7 +109,7 @@ public class RuleEngineTests
     }
 
     [Fact]
-    public void DrawsInTheBackgroundOnlyWhenAskedTo()
+    public void MakesItselfNoticedInTheBackgroundOnlyWhenAskedTo()
     {
         RuleSettings settings = Profile(OneRule(
             RuleCondition.Of(RuleFact.InGame),
@@ -118,7 +118,24 @@ public class RuleEngineTests
         RuleState away = Playing() with { GameFocused = false };
 
         Assert.Empty(Engine(settings).Evaluate(away, 1000).Drawings);
-        Assert.Single(Engine(settings with { DrawInBackground = true }).Evaluate(away, 1000).Drawings);
+        Assert.Single(Engine(settings with { NoticeInBackground = true }).Evaluate(away, 1000).Drawings);
+    }
+
+    [Fact]
+    public void ACueIsHeldBackByTheSameSwitchAsACaption()
+    {
+        // A sound is the half of "noticed" that reaches somebody who is not looking at the
+        // screen, so a rule beeping about a rare monster goes on beeping into whatever they
+        // alt-tabbed to. Unlike a caption drawn where they cannot see it, that is impossible
+        // to ignore - which is why the switch covers both and is not called "draw".
+        RuleSettings settings = Profile(OneRule(
+            RuleCondition.Of(RuleFact.InGame),
+            new RuleEffect(RuleEffectKind.Sound)));
+
+        RuleState away = Playing() with { GameFocused = false };
+
+        Assert.Empty(Engine(settings).Evaluate(away, 1000).Sounds);
+        Assert.Single(Engine(settings with { NoticeInBackground = true }).Evaluate(away, 1000).Sounds);
     }
 
     [Fact]

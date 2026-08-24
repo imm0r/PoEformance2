@@ -189,21 +189,28 @@ public sealed record RuleSettings(
     [property: JsonPropertyName("profile")] string Profile,
     [property: JsonPropertyName("profiles")] IReadOnlyList<RuleProfile> Profiles)
 {
-    /// <summary>Whether drawn effects show while the game is behind another window.</summary>
+    /// <summary>
+    /// Whether a rule may make itself noticed while the game is behind another window.
+    /// </summary>
     /// <remarks>
-    /// What this actually buys is captions while THIS TOOL'S own windows have focus, which is
-    /// the moment somebody is tuning a rule and wants to see it fire. It cannot show anything
-    /// while a browser is in front: the overlay covers the game's client area and refuses to
-    /// paint when neither the game nor one of our windows is foreground, so every dot would
-    /// land on whatever was alt-tabbed to. That rule is the overlay's and this does not reach
-    /// it.
+    /// Captions AND cues, which is why it is not called DrawInBackground. A sound is the half
+    /// that reaches somebody who is not looking at the screen, so a rule beeping about a rare
+    /// monster goes on beeping into whatever they alt-tabbed to - and unlike a caption drawn
+    /// somewhere they cannot see, that is impossible to ignore.
     ///
-    /// Only ever the DRAWN effects, either way. Input is gated on focus in the engine and no
-    /// setting reaches that gate, because the gate is not a preference - keystrokes land
-    /// wherever focus is.
+    /// What switching it ON actually buys is captions while THIS TOOL'S own windows have
+    /// focus, which is the moment somebody is tuning a rule and wants to see it fire. It
+    /// cannot draw anything while a browser is in front: the overlay covers the game's client
+    /// area and refuses to paint when neither the game nor one of our windows is foreground.
+    /// That rule is the overlay's and this does not reach it. A CUE has no such second gate,
+    /// so this switch is the only thing standing between a rule and somebody else's meeting.
+    ///
+    /// Input is not covered either way. It is gated on focus in the engine and no setting
+    /// reaches that gate, because the gate is not a preference - keystrokes land wherever
+    /// focus is.
     /// </remarks>
-    [JsonPropertyName("drawInBackground")]
-    public bool DrawInBackground { get; init; }
+    [JsonPropertyName("noticeInBackground")]
+    public bool NoticeInBackground { get; init; }
 
     /// <summary>Shortest gap between any two synthesised inputs, whichever rules asked.</summary>
     /// <remarks>

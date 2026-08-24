@@ -328,7 +328,7 @@ if (bridge.connected) {
       settings: {
         enabled: false,
         profile: "Default",
-        drawInBackground: false,
+        noticeInBackground: false,
         minInputGapMs: 100,
         profiles: [{
           name: "Default",

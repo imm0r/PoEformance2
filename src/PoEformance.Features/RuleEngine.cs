@@ -247,14 +247,17 @@ public sealed class RuleEngine
     {
         RuleEffect effect = rule.Effects[index];
 
+        // Captions and cues alike: an effect that makes itself noticed while the player is in
+        // another application is doing it in that application, and a beep is the half of that
+        // nobody can ignore.
+        if (!effect.Sends && !state.GameFocused && !settings.NoticeInBackground)
+        {
+            blocked.Add($"{rule.Name}: game not focused");
+            return;
+        }
+
         if (effect.Draws)
         {
-            if (!state.GameFocused && !settings.DrawInBackground)
-            {
-                blocked.Add($"{rule.Name}: game not focused");
-                return;
-            }
-
             drawings.Add(Draw(rule, effect, state));
             _showUntil[Key(rule, index)] = nowMs + effect.LingerMs;
             return;

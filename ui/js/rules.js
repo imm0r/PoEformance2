@@ -53,7 +53,7 @@ export class RulesPanel {
       this.save({ ...this.settings, enabled: $("rl-enabled").checked }));
 
     $("rl-background").addEventListener("change", () =>
-      this.save({ ...this.settings, drawInBackground: $("rl-background").checked }));
+      this.save({ ...this.settings, noticeInBackground: $("rl-background").checked }));
 
     $("rl-gap").addEventListener("change", () =>
       this.save({ ...this.settings, minInputGapMs: Number($("rl-gap").value) }));
@@ -207,7 +207,7 @@ export class RulesPanel {
     if (!this.settings) return;
 
     $("rl-enabled").checked = this.settings.enabled;
-    $("rl-background").checked = this.settings.drawInBackground;
+    $("rl-background").checked = this.settings.noticeInBackground;
     $("rl-gap").value = this.settings.minInputGapMs;
 
     const profiles = $("rl-profile");
