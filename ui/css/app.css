@@ -229,3 +229,207 @@ pre#log {
   white-space: pre-wrap;
   word-break: break-all;
 }
+
+/* ── Rules ──────────────────────────────────────────────────────────────── */
+
+/* The same author-display-beats-[hidden] rule the map tab needs: the flex below would
+   otherwise show a hidden tab. */
+#tab-rules { display: flex; flex-direction: column; height: calc(100vh - 108px); }
+#tab-rules[hidden] { display: none; }
+
+.rules-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #000;
+  flex-wrap: wrap;
+}
+
+.rules-bar .grow, .graph-bar .grow { flex: 1; }
+.rules-bar .rl-gap input { width: 72px; }
+
+.rules-body {
+  display: flex;
+  gap: 16px;
+  padding: 16px 20px;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* The list scrolls on its own, so a long profile cannot push the editor off the window. */
+.rules-list {
+  width: 260px;
+  flex: none;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.rules-list-head { display: flex; align-items: center; justify-content: space-between; }
+.rules-list-head h2 { margin: 0; font-size: 14px; color: var(--dim); }
+
+.rules-detail { flex: 1; overflow-y: auto; }
+.rules-detail .card { margin-bottom: 12px; }
+.rules-empty { padding: 40px 0; text-align: center; }
+
+.rl-group {
+  background: var(--card);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 8px 0;
+}
+
+.rl-group-head { display: flex; align-items: center; gap: 6px; }
+.rl-group-name { flex: 1; min-width: 0; background: none; border: none; color: var(--text); font: inherit; }
+.rl-group-name:focus { background: #00000044; border-radius: 3px; }
+
+.rl-where { display: flex; gap: 10px; margin: 4px 0 6px; }
+.rl-where .rl-field { gap: 3px; color: var(--dim); font-size: 12px; }
+
+.rl-rules { list-style: none; margin: 0; padding: 0; }
+.rl-rules li { display: flex; align-items: center; gap: 6px; border-radius: 3px; }
+.rl-rules li.chosen { background: #ffffff10; }
+
+.rl-rule-name {
+  flex: 1;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text);
+  padding: 3px 4px;
+}
+
+.rl-rule-name.dim { color: var(--dim); }
+.rl-add-rule { margin-top: 6px; width: 100%; }
+
+.rl-detail-head { display: flex; align-items: center; gap: 8px; }
+.rl-name { flex: 1; font-size: 15px; }
+.rl-comment { width: 100%; margin-top: 8px; }
+.rl-priority { width: 72px; }
+
+.rl-section-head { display: flex; align-items: center; justify-content: space-between; }
+.rl-section-head h2 { margin: 0; }
+
+.rl-field { display: inline-flex; align-items: center; gap: 6px; }
+.rl-field > span { color: var(--dim); font-size: 12px; }
+.rl-pair { display: inline-flex; gap: 4px; }
+.rl-pair input { width: 66px; }
+
+.rl-modes { display: flex; }
+.rl-modes button { border-radius: 0; color: var(--dim); }
+.rl-modes button:first-child { border-radius: 4px 0 0 4px; }
+.rl-modes button:last-child { border-radius: 0 4px 4px 0; }
+.rl-modes button.active { color: var(--accent); border-color: var(--accent); }
+
+.rl-expression {
+  width: 100%;
+  background: #00000055;
+  color: var(--text);
+  border: 1px solid #00000088;
+  border-radius: 4px;
+  padding: 8px;
+  font: 13px/1.6 ui-monospace, Consolas, monospace;
+  resize: vertical;
+}
+
+.rl-effect {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid #ffffff0f;
+}
+
+.rl-effect-fields { display: flex; flex-wrap: wrap; gap: 10px; flex: 1; }
+.rl-effect-fields input[type="number"] { width: 84px; }
+.rl-effect-fields input[type="text"] { min-width: 160px; }
+
+.rl-icon {
+  background: none;
+  border: none;
+  color: var(--dim);
+  padding: 0 6px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.rl-icon:hover { color: var(--bad); }
+
+/* ── The node editor ────────────────────────────────────────────────────── */
+
+.graph { border: 1px solid #00000088; border-radius: 6px; overflow: hidden; }
+.graph-bar { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: #00000033; }
+.graph-hint { font-size: 12px; }
+
+/* Scrolls in both directions: a graph is laid out in real coordinates, and clipping one
+   that outgrew the pane would hide boxes with no sign that they are there. */
+.graph-surface {
+  position: relative;
+  overflow: auto;
+  min-height: 260px;
+  max-height: 460px;
+  background:
+    radial-gradient(circle, #ffffff10 1px, transparent 1px) 0 0 / 24px 24px,
+    #00000022;
+}
+
+/* Behind the boxes and deaf to the mouse, except the wires themselves - a click on a wire
+   is how one is removed, and a transparent sheet over the canvas would eat every other click. */
+.graph-wires { position: absolute; inset: 0; pointer-events: none; }
+.graph-wire { fill: none; stroke: var(--accent); stroke-width: 2; pointer-events: stroke; cursor: pointer; }
+.graph-wire:hover { stroke: var(--bad); }
+
+.graph-node {
+  position: absolute;
+  width: 200px;
+  background: var(--card);
+  border: 1px solid #00000088;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px #00000066;
+}
+
+.graph-node.selected { border-color: var(--accent); }
+.graph-node.kind-output { width: 130px; border-color: var(--ok); }
+.graph-node.kind-not { width: 130px; }
+
+.graph-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: #ffffff0d;
+  border-radius: 5px 5px 0 0;
+  cursor: grab;
+  font-size: 12px;
+  color: var(--dim);
+  user-select: none;
+}
+
+.graph-head:active { cursor: grabbing; }
+.graph-remove { background: none; border: none; color: var(--dim); padding: 0 2px; line-height: 1; }
+.graph-remove:hover { color: var(--bad); }
+
+.graph-body { padding: 6px 8px 8px; display: flex; flex-direction: column; gap: 5px; }
+.graph-body select, .graph-body input[type="text"] { width: 100%; }
+.graph-row { display: flex; align-items: center; gap: 4px; }
+.graph-row input[type="number"] { width: 100%; min-width: 0; }
+.graph-row select { width: auto; }
+.graph-negate { display: flex; align-items: center; gap: 4px; color: var(--dim); font-size: 12px; }
+
+/* The ports sit ON the border, half outside the box, so a wire visibly ends at the dot. */
+.graph-port {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--card);
+  background: var(--accent);
+  cursor: crosshair;
+}
+
+.graph-port.in { left: -6px; }
+.graph-port.out { right: -6px; }
+.graph-port:hover { background: var(--ok); }

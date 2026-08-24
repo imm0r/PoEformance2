@@ -88,6 +88,121 @@ public sealed record MapLayoutMessage(
     [property: JsonPropertyName("area")] uint Area,
     [property: JsonPropertyName("layout")] MapLayout Layout);
 
+/// <summary>One fact the rule editor may offer, as the page needs to render it.</summary>
+/// <param name="Shape">"Flag" or "Number" - whether the editor shows a comparison at all.</param>
+/// <param name="Argument">"None", "Text", "Slot", "Distance" or "Seconds".</param>
+public sealed record FactView(
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("shape")] string Shape,
+    [property: JsonPropertyName("argument")] string Argument,
+    [property: JsonPropertyName("unit")] string Unit,
+    [property: JsonPropertyName("help")] string Help);
+
+/// <summary>
+/// What the rule editor is allowed to offer, sent once.
+/// </summary>
+/// <remarks>
+/// GENERATED from <see cref="RuleFacts.All"/> and <see cref="RuleKeys.Names"/> rather than
+/// written into the page, which is the same argument the style editor is built on: a
+/// hand-written list of conditions is how a tool ends up with thirty-four facts the engine can
+/// evaluate and twenty-nine the editor can offer. Sent once - it cannot change while the tool
+/// runs - and asked for by the page rather than pushed with every state, because it is static
+/// and the state travels once a second.
+/// </remarks>
+public sealed record RuleCatalogue(
+    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("facts")] IReadOnlyList<FactView> Facts,
+    [property: JsonPropertyName("keys")] IReadOnlyList<string> Keys,
+    [property: JsonPropertyName("effects")] IReadOnlyList<string> Effects,
+    [property: JsonPropertyName("comparisons")] IReadOnlyList<string> Comparisons)
+{
+    /// <summary>Builds the catalogue from the engine's own tables.</summary>
+    public static RuleCatalogue Build()
+    {
+        var facts = new List<FactView>(RuleFacts.All.Count);
+        foreach (FactInfo info in RuleFacts.All)
+        {
+            facts.Add(new FactView(
+                info.Name,
+                info.Shape.ToString(),
+                info.Argument.ToString(),
+                info.Unit,
+                info.Help));
+        }
+
+        return new RuleCatalogue(
+            "ruleCatalogue",
+            facts,
+            RuleKeys.Names,
+            Enum.GetNames<RuleEffectKind>(),
+            Enum.GetNames<Compare>());
+    }
+}
+
+/// <summary>The rules panel: the settings themselves, plus what the engine is doing with them.</summary>
+/// <param name="Status">
+/// The engine's last reason. Worth a line of its own for the reason auto-flask has one: a rule
+/// that is armed and silent and a rule that cannot fire look identical from the page.
+/// </param>
+/// <param name="KeySource">
+/// Where the flask bindings came from, for the effects bound to a belt slot rather than to a
+/// named key.
+/// </param>
+public sealed record RulesView(
+    [property: JsonPropertyName("settings")] RuleSettings Settings,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("acted")] int Acted,
+    [property: JsonPropertyName("keySource")] string KeySource,
+    [property: JsonPropertyName("shapes")] IReadOnlyDictionary<string, RuleShape> Shapes)
+{
+    /// <summary>Builds the panel, including a text and a graph for every rule.</summary>
+    public static RulesView Of(RuleEngine engine, string keySource)
+    {
+        ArgumentNullException.ThrowIfNull(engine);
+
+        var shapes = new Dictionary<string, RuleShape>(StringComparer.Ordinal);
+        RuleSettings settings = engine.Settings;
+        foreach (RuleProfile profile in settings.Profiles)
+        {
+            foreach (RuleGroup group in profile.Groups)
+            {
+                foreach (Rule rule in group.Rules)
+                {
+                    shapes[rule.Id] = new RuleShape(
+                        RuleExpression.Write(rule.Condition),
+
+                        // The stored layout when there is one, and a drawn one otherwise, so
+                        // opening the canvas on a rule somebody typed shows the same rule
+                        // rather than an empty sheet.
+                        rule.Graph ?? RuleGraph.From(rule.Condition));
+                }
+            }
+        }
+
+        return new RulesView(settings, engine.LastTick.Reason, engine.Acted, keySource, shapes);
+    }
+}
+
+/// <summary>The two other ways of looking at one rule's condition.</summary>
+/// <remarks>
+/// Beside the settings rather than on the rule, and that is the whole point: the settings
+/// record is exactly what the file holds, and the file is meant to be hand-edited. A "text"
+/// field on the stored rule would be a field that looks editable, is written on every save and
+/// is ignored on every load - which is a worse trap than not offering it.
+/// </remarks>
+public sealed record RuleShape(
+    [property: JsonPropertyName("text")] string Text,
+    [property: JsonPropertyName("graph")] RuleGraph Graph);
+
+/// <summary>The host's answer to a condition somebody typed.</summary>
+/// <param name="Column">Where the trouble is, counted from 1, so the page can point at it.</param>
+public sealed record ConditionMessage(
+    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("ok")] bool Ok,
+    [property: JsonPropertyName("error")] string Error,
+    [property: JsonPropertyName("column")] int Column,
+    [property: JsonPropertyName("condition")] RuleCondition? Condition);
+
 /// <summary>The host's state push: everything the config page shows.</summary>
 /// <remarks>
 /// One flat record on purpose. The page re-renders from whole states rather than patching
@@ -105,7 +220,8 @@ public sealed record ConfigState(
     [property: JsonPropertyName("entityCount")] int EntityCount,
     [property: JsonPropertyName("autoFlask")] AutoFlaskView? AutoFlask = null,
     [property: JsonPropertyName("overlay")] OverlayView? Overlay = null,
-    [property: JsonPropertyName("map")] MapStateView? Map = null);
+    [property: JsonPropertyName("map")] MapStateView? Map = null,
+    [property: JsonPropertyName("rules")] RulesView? Rules = null);
 
 /// <summary>
 /// Source-generated JSON for the bridge.
@@ -125,4 +241,7 @@ public sealed record ConfigState(
 [JsonSerializable(typeof(AutoFlaskSettings))]
 [JsonSerializable(typeof(OverlaySettings))]
 [JsonSerializable(typeof(MapLayoutMessage))]
+[JsonSerializable(typeof(RuleCatalogue))]
+[JsonSerializable(typeof(RuleSettings))]
+[JsonSerializable(typeof(ConditionMessage))]
 public sealed partial class ConfigJsonContext : JsonSerializerContext;

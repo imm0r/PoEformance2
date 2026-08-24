@@ -225,7 +225,7 @@ internal static class Program
         Thread? configWindow = options.ShowConfig
             ? StartConfigWindow(
                 reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings,
-                overlaySettings, overlayHandle, alwaysOnTop: options.ShowOverlay)
+                overlaySettings, ruleEngine, overlayHandle, alwaysOnTop: options.ShowOverlay)
             : null;
 
         if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
@@ -1163,6 +1163,7 @@ internal static class Program
         PoEformance.Features.FlaskKeys flaskKeys,
         PoEformance.Features.AutoFlaskSettings flaskSettings,
         PoEformance.Features.OverlaySettings overlaySettings,
+        PoEformance.Features.RuleEngine ruleEngine,
         OverlayHandle overlayHandle,
         bool alwaysOnTop)
     {
@@ -1208,7 +1209,13 @@ internal static class Program
                     overlay.TerrainColour,
                     overlay.TerrainThickness,
                     DescribeTerrain(overlayHandle)),
-                Map: BuildMapView(snapshot, overlay.MinLootRarity));
+                Map: BuildMapView(snapshot, overlay.MinLootRarity),
+
+                // Read off the engine rather than kept beside it. The engine normalises what
+                // it is given, so what it holds is what actually runs - and a copy here could
+                // show a threshold the engine rejected.
+                Rules: PoEformance.Config.RulesView.Of(
+                    ruleEngine, $"{flaskKeys.Source} - {flaskKeys.Detail}"));
         }
 
         // Rebuilding the outline is a pass over megabytes, so it is done once per area and
@@ -1241,6 +1248,36 @@ internal static class Program
                     PoEformance.Config.ConfigJsonContext.Default.MapLayoutMessage);
             }
 
+            if (request.Type == "getRuleCatalogue")
+            {
+                // Once per page load, and never pushed with a state. What a rule may ask about
+                // cannot change while the tool runs, and it is a few kilobytes that would
+                // otherwise ride the once-a-second poll.
+                return JsonSerializer.Serialize(
+                    PoEformance.Config.RuleCatalogue.Build(),
+                    PoEformance.Config.ConfigJsonContext.Default.RuleCatalogue);
+            }
+
+            if (request.Type == "parseCondition")
+            {
+                // The page never parses a condition itself. One parser, host-side, is what
+                // makes the text box and the canvas two views of the same thing - a second
+                // implementation in JavaScript would eventually accept something the engine
+                // does not, and the rule would save and then never fire.
+                string typed = request.Payload.ValueKind == JsonValueKind.Object
+                    && request.Payload.TryGetProperty("text", out JsonElement text)
+                        ? text.GetString() ?? string.Empty
+                        : string.Empty;
+
+                PoEformance.Features.ExpressionResult parsed =
+                    PoEformance.Features.RuleExpression.Parse(typed);
+
+                return JsonSerializer.Serialize(
+                    new PoEformance.Config.ConditionMessage(
+                        "condition", parsed.Ok, parsed.Error, parsed.Column, parsed.Condition),
+                    PoEformance.Config.ConfigJsonContext.Default.ConditionMessage);
+            }
+
             if (request.Payload.ValueKind != JsonValueKind.Object)
             {
                 return null;
@@ -1248,6 +1285,23 @@ internal static class Program
 
             switch (request.Type)
             {
+                case "setRuleSettings":
+                    PoEformance.Features.RuleSettings? rules = request.Payload.Deserialize(
+                        PoEformance.Config.ConfigJsonContext.Default.RuleSettings);
+                    if (rules is null)
+                    {
+                        return null;
+                    }
+
+                    // Configure normalises, and the engine is then the one copy of what runs -
+                    // which is also what the next state push reads back out, so the page can
+                    // never show a value the engine rejected.
+                    ruleEngine.Configure(rules);
+                    SaveWarning(
+                        PoEformance.Features.RuleSettingsStore.Save(ruleEngine.Settings),
+                        PoEformance.Features.RuleSettingsStore.DefaultPath);
+                    return string.Empty;
+
                 case "setFlaskSettings":
                     PoEformance.Features.AutoFlaskSettings? flasks = request.Payload.Deserialize(
                         PoEformance.Config.ConfigJsonContext.Default.AutoFlaskSettings);
