@@ -479,6 +479,68 @@ interesting part was not the feature:
   answer is a flags enum rather than a bool so the status window can name the panel that is
   stuck, and there is a switch to stop asking.
 
+### Rules — the one feature whose configuration is a LANGUAGE
+
+Ported from GameHelper2's **RuleCraft**: conditions over live game state driving overlay text,
+sounds and synthesised input. The AHK tool had the same idea in `CustomHotkeys` — a boolean
+condition tree per macro and an ordered list of actions — and where the two references disagree
+this follows the AHK one, because it is the design that survived contact with the game.
+
+The engine is a `RuleState` (facts gathered once per read), a `RuleCondition` tree, and a
+`RuleEngine` that returns what SHOULD happen. It reads no memory and presses nothing, on the
+same split as auto-flask, so the priorities, the cooldowns and every gate are ordinary tests.
+
+- **The expression library could not come along.** RuleCraft compiles its conditions with
+  `System.Linq.Dynamic.Core`, which builds an expression tree and calls `Compile()` — runtime
+  code generation, which Native AOT does not have. So the grammar is parsed by hand, and it is
+  deliberately a SUBSET: no arithmetic. `HealthPercent * 2 < Mana` parses there and cannot be
+  drawn in a node graph, so a rule written that way would open in the editor and silently lose
+  itself.
+- **The TREE is what is stored.** RuleCraft stores a condition string and regenerates it from
+  its graph on every edit, so a rule somebody adjusted as text loses that adjustment the moment
+  a box is dragged. Here an expression and a graph are both conversions of one tree, and the
+  graph carries only the LAYOUT. Neither view can overwrite the other with a stale copy.
+- **A number that could not be read is null, and satisfies no comparison.** This is the single
+  most load-bearing decision in the port. RuleCraft reports an unreadable life pool as 0 and
+  "no rare monster anywhere" as 9999, so `LifePercent <= 35` fires on a loading screen and
+  `NearestRare >= 100` is satisfied by an empty room — and both read as the feature working. It
+  is also why negation is never folded into the operator when a condition is written back out:
+  `!(x <= 45)` and `x > 45` differ exactly where the number is unknown, so rewriting one as the
+  other would change what a saved rule does.
+- **Input is gated in the DECISION.** Being in the game, having focus, and no panel being open
+  are checked in the engine, not by whoever sends the key, so no future caller can reach the
+  sending path around them. RuleCraft checks focus in three of its four input paths and not in
+  the fourth — its plain key press — so a KeyPress rule types into whatever window the player
+  alt-tabbed to, while its own documentation says input only runs while the game is in front.
+- **Everything is keyed on a rule's ID**, not its name. RuleCraft keys cooldowns and interval
+  timers on the name, which its own add button leaves as "New rule" for every rule somebody
+  adds — so two of them share one cooldown, and renaming one hands it a fresh one mid-fight.
+- **The key an effect presses can be a belt SLOT**, resolved live from the game's own config,
+  which is the AHK tool's output binding rather than RuleCraft's stored letter. The difference
+  shows up the first time somebody rebinds a flask: the letter goes on pressing what used to be
+  flask 2, with no symptom beyond "nothing happens". `FlaskCharges(slot)` is likewise answered
+  per slot, which RuleCraft's own documentation says it cannot do.
+- **Two of its conditions are deliberately absent.** `HasDebuff`/`DebuffTimeLeft` call the same
+  code as their buff counterparts there — the game keeps one list — so shipping them would
+  advertise a distinction the tool cannot make. `Stat`/`HasStat` are gone because nothing here
+  reads the player's stat block yet, and a condition that always answers zero is worse than one
+  that is not offered.
+- **The editor is GENERATED from the engine's own tables.** What conditions exist, which keys
+  can be pressed and which comparisons there are all travel to the page as a catalogue, on the
+  same argument as the overlay style editor: a hand-written list is how a tool ends up with
+  thirty-four facts the engine can evaluate and twenty-nine the page can offer. The page never
+  parses a condition itself either — it asks the host — so there is one parser and it is the
+  one that runs.
+- **What the evaluation costs is bounded by where it runs.** Once per read on the reader
+  thread, not per frame: RuleCraft evaluates inside its draw callback, which makes how often a
+  macro fires a function of the frame rate — the same rule types twice as fast on a better
+  graphics card. The sound is the opposite case and goes OFF that thread, because
+  `Console.Beep` blocks for its whole duration and a 120 ms cue played inline would stall four
+  reads.
+- **A caption lingers.** RuleCraft has no equivalent, which is why all of its own examples hang
+  off conditions that stay true for a while: a rule fired by an interval or by a single event
+  is otherwise drawn for one frame and, in practice, never seen.
+
 ### The atlas — the one feature that is INTERFACE rather than world
 
 Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it reads

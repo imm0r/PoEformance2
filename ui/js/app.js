@@ -4,6 +4,7 @@
 
 import { bridge } from "./bridge.js";
 import { MapPanel } from "./map.js";
+import { RulesPanel } from "./rules.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -37,6 +38,8 @@ function renderState(s) {
     }
   }
 
+  if (s.rules) rules.set(s.rules);
+
   if (s.map) {
     $("map-status").textContent = s.map.status;
     map.setState(s.map);
@@ -45,6 +48,10 @@ function renderState(s) {
     if (map.needsLayout(s.map.area)) bridge.send({ type: "getMapLayout" });
   }
 }
+
+// ── Rules tab ──────────────────────────────────────────────────────────────
+
+const rules = new RulesPanel();
 
 // ── Map tab ────────────────────────────────────────────────────────────────
 
@@ -70,6 +77,7 @@ function showTab(name) {
   }
 
   $("tab-setup").hidden = name !== "setup";
+  $("tab-rules").hidden = name !== "rules";
   $("tab-map").hidden = name !== "map";
   map.show(name === "map");
 
@@ -264,12 +272,33 @@ $("refresh").addEventListener("click", () => bridge.send({ type: "getState" }));
 if (bridge.connected) {
   bridge.send({ type: "hello" });
 
+  // Once, not with every state: what a rule may ask about cannot change while the tool runs,
+  // and it is a few kilobytes that would otherwise ride the once-a-second poll.
+  bridge.send({ type: "getRuleCatalogue" });
+
   // The status line and the charge counts are live values, so the panel keeps itself
   // current instead of waiting to be asked. Slow on purpose: each poll re-reads the world.
   setInterval(() => bridge.send({ type: "getState" }), 1000);
 } else {
   // Opened in a plain browser for UI work: render a fake state so layout is editable
   // without the host running.
+  //
+  // The rule catalogue is faked too, and deliberately SHORT. It exists so the tab can be
+  // laid out, not so it can be trusted - the real one is generated from the engine's tables,
+  // and a long copy here would be a second list to keep in step.
+  rules.catalogue = {
+    facts: [
+      { name: "InGame", shape: "Flag", argument: "None", unit: "", help: "In an area." },
+      { name: "LifePercent", shape: "Number", argument: "None", unit: "%", help: "Life, unreserved." },
+      { name: "HasBuff", shape: "Flag", argument: "Text", unit: "", help: "A named buff is on." },
+      { name: "FlaskCharges", shape: "Number", argument: "Slot", unit: "", help: "Charges in a slot." },
+      { name: "EverySeconds", shape: "Flag", argument: "Seconds", unit: "", help: "Once per interval." },
+    ],
+    keys: ["Q", "W", "1", "2", "F1", "Space"],
+    effects: ["Text", "Bar", "Sound", "KeyPress"],
+    comparisons: ["AtLeast", "AtMost", "Above", "Below", "Is", "IsNot"],
+  };
+
   renderState({
     toolVersion: "browser preview",
     gameVersion: "(no host - open via PoEformance.App --config)",
@@ -291,6 +320,40 @@ if (bridge.connected) {
         { slot: 4, enabled: false, vital: "Life", thresholdPercent: 50, key: "4", item: "", charges: "", isCharm: false },
         { slot: 5, enabled: false, vital: "Life", thresholdPercent: 50, key: "unbound", item: "", charges: "", isCharm: false },
       ],
+    },
+    rules: {
+      status: "browser preview",
+      acted: 0,
+      keySource: "Defaults - no host",
+      settings: {
+        enabled: false,
+        profile: "Default",
+        noticeInBackground: false,
+        minInputGapMs: 100,
+        profiles: [{
+          name: "Default",
+          groups: [{
+            name: "Example", enabled: true, inTown: false, inHideout: false, inMaps: true,
+            rules: [{
+              id: "preview", name: "Low life", enabled: false, priority: 0, allowLower: true,
+              comment: "", condition: { kind: "Fact", fact: "LifePercent", compare: "AtMost", value: 35 },
+              effects: [{ kind: "Text", text: "LOW LIFE", x: 0.5, y: 0.25, colour: "#FFFF2020" }],
+            }],
+          }],
+        }],
+      },
+      shapes: {
+        preview: {
+          text: "LifePercent <= 35",
+          graph: {
+            nodes: [
+              { id: "a", kind: "Fact", x: 20, y: 20, fact: "LifePercent", compare: "AtMost", value: 35, argument: 0, text: "", negate: false },
+              { id: "out", kind: "Output", x: 300, y: 20 },
+            ],
+            links: [{ from: "a", to: "out" }],
+          },
+        },
+      },
     },
   });
 }

@@ -334,7 +334,9 @@ public sealed record WorldSnapshot(
     GamePanel Panels = GamePanel.None,
     int Remembered = 0,
     ulong ServerData = 0,
-    IReadOnlyList<PanelArea>? PanelAreas = null)
+    IReadOnlyList<PanelArea>? PanelAreas = null,
+    int AreaLevel = 0,
+    int PlayerLevel = 0)
 {
     /// <summary>
     /// Whether the player is looking at a panel rather than at the game.
@@ -511,6 +513,8 @@ public sealed class WorldReader
     private readonly int _awakeEntities;
     private readonly int _w2sMatrix;
     private readonly int _areaHash;
+    private readonly int _areaLevel;
+    private readonly int _playerLevelField;
     private readonly int _lifeHealth;
     private readonly int _lifeEnergyShield;
     private readonly int _vitalCurrent;
@@ -565,6 +569,12 @@ public sealed class WorldReader
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
         _w2sMatrix = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
         _areaHash = schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash");
+
+        // Two levels the schema has carried - with invariants, so the drift report already
+        // checks them - that nothing read until the rule engine wanted to ask about them.
+        // One i32 each, off structs this read has already resolved.
+        _areaLevel = schema.Structs["AreaInstance"].OffsetOf("CurrentAreaLevel");
+        _playerLevelField = schema.Structs["Player"].OffsetOf("Level");
 
         // Read straight from the schema rather than through LifeReader, which would follow
         // three pools through twelve separate reads for every monster on screen. Life and
@@ -1063,6 +1073,16 @@ public sealed class WorldReader
             playerBuffs = _buffs.Read(buffsAddress);
         }
 
+        // Both stay 0 when they cannot be read, and 0 is out of range for either - the schema
+        // says a character is level 1-100 and an area is 0-100 - so "unreadable" and "really
+        // that value" never collide. What a rule sees is null, which is what stops a threshold
+        // firing on a number nobody produced.
+        ulong playerComponent = localPlayer?.Component("Player") ?? 0;
+        int playerLevel = playerComponent != 0
+            ? _reader.Read<int>(playerComponent + (ulong)_playerLevelField)
+            : 0;
+        int areaLevel = _reader.Read<int>(chain.AreaInstance + (ulong)_areaLevel);
+
         // The flask belt hangs off ServerData, which is the INLINE LocalPlayerStruct's
         // first field - the same struct the player pointer comes from.
         FlaskBelt? flaskBelt = null;
@@ -1133,7 +1153,9 @@ public sealed class WorldReader
             // Carried rather than re-resolved: the quest flags hang off this and the walk to
             // it is four dereferences that this read has already paid for.
             serverData,
-            panels.Areas);
+            panels.Areas,
+            areaLevel,
+            playerLevel);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>

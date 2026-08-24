@@ -408,6 +408,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private RoutePlanner? _planner;
     private AlertWatcher? _alerts;
     private readonly AlertBanner _banner = new();
+    private readonly RuleLayer _rules = new();
+
+    /// <summary>What the rule engine decided to show this tick, or null when it is not wired.</summary>
+    /// <remarks>
+    /// A function rather than the engine itself, and the reason is the layering: the engine is
+    /// evaluated on the READER thread, once per read, and the renderer redraws far more often
+    /// than that. Handing the overlay the engine would invite it to evaluate per frame, which
+    /// is how the reference plugin ends up with a macro whose firing rate depends on the frame
+    /// rate.
+    /// </remarks>
+    private Func<IReadOnlyList<RuleDrawing>>? _ruleDrawings;
     private readonly UnwalkedLayer _unwalked = new();
     private readonly HeatLayer _heat = new();
     private readonly EffectLayer _effects = new();
@@ -899,6 +910,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Attached rather than constructed here for the same reason as the browser: this class
     /// draws, and the atlas is read by something else. What it hands over is a finished view.
     /// </remarks>
+    /// <summary>Adds the rule engine's captions and bars.</summary>
+    /// <remarks>
+    /// Takes what to DRAW rather than the engine, so nothing here can trigger an evaluation.
+    /// See <see cref="_ruleDrawings"/>.
+    /// </remarks>
+    public void AttachRules(Func<IReadOnlyList<RuleDrawing>> drawings)
+    {
+        ArgumentNullException.ThrowIfNull(drawings);
+        _ruleDrawings = drawings;
+    }
+
     public void AttachAtlas(AtlasWatch watch, Action<AtlasSettings> saved, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(watch);
@@ -1386,7 +1408,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // this overlay's own controls gives IT focus, so the game stops being foreground,
         // so the next frame draws nothing, so there is nothing left to click: the window
         // disappears under the cursor and neither dragging nor a button ever registers.
-        // Keystrokes are a different question and stay strict - see FlaskKeySender.
+        // Keystrokes are a different question and stay strict - see InputSender.
         if (!GameWindowTracker.IsForeground(_gameWindow) && !GameWindowTracker.IsOwnProcessForeground())
         {
             return;
@@ -1413,6 +1435,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 _banner.Draw(ImGui.GetForegroundDrawList(), width, height, now);
                 _preloadEntry.Draw(ImGui.GetForegroundDrawList(), width, height, now);
             }
+        }
+
+        // Outside the InGame block and above the panel gate, both deliberately. A rule may
+        // legitimately watch for not being in the game - a reminder while a portal loads - and
+        // a caption is not a world marker, so a stash being open is no reason to take away a
+        // readout somebody put at the top of their screen. Whether any of this shows at all was
+        // decided by the engine, which knows about focus and about panels.
+        if (_ruleDrawings is not null && width > 0 && height > 0)
+        {
+            _rules.Draw(ImGui.GetForegroundDrawList(), _ruleDrawings(), width, height);
         }
 
         // Nothing to mark in a town or a hideout, and a screen full of markers over the
