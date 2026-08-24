@@ -202,6 +202,15 @@ internal static class Program
             }
         }
 
+        // The rule engine takes the same two sources: what to do from our file, which key from
+        // the game's own bindings - which is why the binding is handed in rather than copied
+        // into each effect. An effect bound to a belt slot follows a rebind; one that names a
+        // key does not, and that is the user's choice to make.
+        var ruleEngine = new PoEformance.Features.RuleEngine();
+        ruleEngine.Configure(PoEformance.Features.RuleSettingsStore.Load());
+        ruleEngine.Bind(flaskKeys);
+        var ruleHistory = new PoEformance.Features.RuleHistory();
+
         // The config window runs on its own thread so it can be open WHILE the overlay is,
         // which is what makes its switches worth having: a setting that needs a restart is
         // a settings file with extra steps.
@@ -239,7 +248,8 @@ internal static class Program
                 result.Statics.FirstOrDefault(s => s.Name == "TerrainRotatorHelper" && s.Found)?.Address ?? 0);
 
             RunOverlay(
-                reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask, rotation,
+                reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
+                ruleEngine, ruleHistory, rotation,
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
                 uiBrowser: options.ShowUiBrowser,
                 fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
@@ -529,6 +539,8 @@ internal static class Program
     private static void RunOverlay(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
         PoEformance.Features.AutoFlask autoFlask,
+        PoEformance.Features.RuleEngine ruleEngine,
+        PoEformance.Features.RuleHistory ruleHistory,
         PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
         ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
@@ -852,7 +864,7 @@ internal static class Program
                 // word "disabled", which is the answer to the question actually asked.
                 PoEformance.Features.FlaskTick tick = autoFlask.Evaluate(
                     snapshot.PlayerVitals,
-                    FlaskKeySender.IsForeground(gameWindow),
+                    InputSender.IsForeground(gameWindow),
                     Environment.TickCount64,
                     snapshot.PlayerBuffs,
                     snapshot.FlaskBelt,
@@ -860,8 +872,22 @@ internal static class Program
 
                 foreach (PoEformance.Features.FlaskUse use in tick.Used)
                 {
-                    FlaskKeySender.Press(use.Rule.Key);
+                    InputSender.Press(use.Rule.Key);
                 }
+
+                // The rules, on this thread and once per read - NOT in the renderer. The
+                // reference plugin evaluates inside its draw callback, which makes how often a
+                // macro fires a function of the frame rate: the same rule types twice as fast
+                // on a better graphics card, and a dropped frame skips a beat.
+                PoEformance.Features.RuleTick rules = ruleEngine.Evaluate(
+                    PoEformance.Features.RuleState.From(
+                        snapshot,
+                        InputSender.IsForeground(gameWindow),
+                        ruleHistory,
+                        Environment.TickCount64),
+                    Environment.TickCount64);
+
+                Perform(rules);
 
                 return snapshot;
             },
@@ -877,6 +903,11 @@ internal static class Program
             cull);
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
+
+        // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
+        // are decided once per read, so asking here would both cost a re-evaluation per frame
+        // and let an interval condition consume its timer sixty times a second.
+        overlay.AttachRules(() => ruleEngine.LastTick.Drawings);
         overlay.ShowDiagnostics = debug;
         overlay.ShowCalibration = debug;
         overlay.ShowWorldDots = debug;
@@ -958,6 +989,74 @@ internal static class Program
             PoEformance.Features.OverlaySettingsStore.Save(overlay.CurrentSettings(settings));
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Turns a tick's decision into something the outside world can observe.
+    /// </summary>
+    /// <remarks>
+    /// The whole side-effecting half of the rule engine, in one switch. Every gate that decides
+    /// WHETHER any of this happens - the game being in front, no panel being open, cooldowns,
+    /// priorities - was applied in <see cref="PoEformance.Features.RuleEngine"/>, and nothing
+    /// here re-checks them: a second copy of a safety rule is a copy that can disagree with the
+    /// one that matters. What this must not do is decide anything.
+    ///
+    /// Drawn effects are absent on purpose. They are not performed at all - the overlay reads
+    /// the same tick's list and paints it.
+    /// </remarks>
+    private static void Perform(PoEformance.Features.RuleTick tick)
+    {
+        foreach (PoEformance.Features.RuleSound sound in tick.Sounds)
+        {
+            SoundCue.Play(sound.Pitch, sound.Ms);
+        }
+
+        foreach (PoEformance.Features.RuleInput input in tick.Inputs)
+        {
+            switch (input.Kind)
+            {
+                case PoEformance.Features.RuleEffectKind.KeyPress:
+                case PoEformance.Features.RuleEffectKind.KeySequence:
+                    InputSender.Press(input.Keys);
+                    break;
+                case PoEformance.Features.RuleEffectKind.KeyDown:
+                    InputSender.Hold(input.Keys[0]);
+                    break;
+                case PoEformance.Features.RuleEffectKind.KeyUp:
+                    InputSender.Release(input.Keys[0]);
+                    break;
+                case PoEformance.Features.RuleEffectKind.MouseLeftClick:
+                    InputSender.Click(left: true);
+                    break;
+                case PoEformance.Features.RuleEffectKind.MouseRightClick:
+                    InputSender.Click(left: false);
+                    break;
+                case PoEformance.Features.RuleEffectKind.MouseLeftDown:
+                    InputSender.MouseDown(left: true);
+                    break;
+                case PoEformance.Features.RuleEffectKind.MouseLeftUp:
+                    InputSender.MouseUp(left: true);
+                    break;
+                case PoEformance.Features.RuleEffectKind.MouseRightDown:
+                    InputSender.MouseDown(left: false);
+                    break;
+                case PoEformance.Features.RuleEffectKind.MouseRightUp:
+                    InputSender.MouseUp(left: false);
+                    break;
+                case PoEformance.Features.RuleEffectKind.ScrollUp:
+                    InputSender.Scroll(up: true);
+                    break;
+                case PoEformance.Features.RuleEffectKind.ScrollDown:
+                    InputSender.Scroll(up: false);
+                    break;
+                default:
+                    // Text, Bar and Sound never reach here - the engine files those elsewhere -
+                    // so this is a kind added to the enum and not to this switch. Doing
+                    // nothing is the right answer for something whose effect nobody has
+                    // written yet.
+                    break;
+            }
+        }
     }
 
     /// <summary>

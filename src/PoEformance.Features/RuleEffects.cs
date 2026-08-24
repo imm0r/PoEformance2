@@ -95,17 +95,17 @@ public sealed record RuleEffect(
     [JsonPropertyName("scale")]
     public float Scale { get; init; } = 1.0f;
 
-    /// <summary>The colour, as #rrggbb or #rrggbbaa.</summary>
+    /// <summary>The colour, as #RRGGBB or #AARRGGBB - the tool's one colour spelling.</summary>
     /// <remarks>
     /// A string rather than four floats, because this is what the config page's colour input
     /// hands back and what somebody editing the file by hand can read. The overlay parses it
     /// once per frame, which is a handful of hex digits.
     /// </remarks>
     [JsonPropertyName("colour")]
-    public string Colour { get; init; } = "#33ff40";
+    public string Colour { get; init; } = RuleColours.DefaultText;
 
     [JsonPropertyName("backgroundColour")]
-    public string BackgroundColour { get; init; } = "#0f0f0fbf";
+    public string BackgroundColour { get; init; } = RuleColours.DefaultBack;
 
     /// <summary>
     /// How long a drawn effect stays up after its condition stops holding.
@@ -168,8 +168,8 @@ public sealed record RuleEffect(
         Text = Text ?? string.Empty,
         Key = (Key ?? string.Empty).Trim(),
         Keys = (Keys ?? string.Empty).Trim(),
-        Colour = Colours.Clean(Colour, "#33ff40"),
-        BackgroundColour = Colours.Clean(BackgroundColour, "#0f0f0fbf"),
+        Colour = RuleColours.Clean(Colour, RuleColours.DefaultText),
+        BackgroundColour = RuleColours.Clean(BackgroundColour, RuleColours.DefaultBack),
 
         // Positions may sit slightly outside the viewport - somebody parking a readout at the
         // very edge is legitimate - but not so far that it can never be found again.
@@ -281,61 +281,33 @@ public static class RuleText
     private static RuleTimers EmptyTimers { get; } = new();
 }
 
-/// <summary>Reading the colours the config page and the settings file use.</summary>
-public static class Colours
+/// <summary>The colours a rule's effects are drawn in.</summary>
+/// <remarks>
+/// Straight through to <see cref="OverlaySettings.ParseColour"/> rather than reading the hex
+/// here. The tool already has one colour vocabulary - <c>#RRGGBB</c> or <c>#AARRGGBB</c>, and
+/// ImGui's reversed byte order dealt with in one place - and a second parser with its own idea
+/// of where the alpha goes would draw every rule caption invisible on a file that reads
+/// perfectly to the style editor.
+/// </remarks>
+public static class RuleColours
 {
-    /// <summary>Reads #rrggbb or #rrggbbaa into packed RGBA.</summary>
-    public static bool TryParse(string? text, out uint rgba)
+    /// <summary>What a caption is drawn in when nothing was chosen.</summary>
+    public const string DefaultText = "#FF33FF40";
+
+    /// <summary>What sits behind a bar when nothing was chosen.</summary>
+    public const string DefaultBack = "#BF0F0F0F";
+
+    /// <summary>Reads a colour as ImGui packs it, or the fallback when it is not one.</summary>
+    public static uint Packed(string? colour, uint fallback)
     {
-        rgba = 0;
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return false;
-        }
-
-        ReadOnlySpan<char> digits = text.AsSpan().Trim();
-        if (digits.Length > 0 && digits[0] == '#')
-        {
-            digits = digits[1..];
-        }
-
-        if (digits.Length is not (6 or 8))
-        {
-            return false;
-        }
-
-        uint value = 0;
-        foreach (char digit in digits)
-        {
-            int nibble = digit switch
-            {
-                >= '0' and <= '9' => digit - '0',
-                >= 'a' and <= 'f' => digit - 'a' + 10,
-                >= 'A' and <= 'F' => digit - 'A' + 10,
-                _ => -1,
-            };
-
-            if (nibble < 0)
-            {
-                return false;
-            }
-
-            value = (value << 4) | (uint)nibble;
-        }
-
-        // Six digits means fully opaque. Defaulting the other way would draw every colour
-        // written the short way as invisible, which reads exactly like the feature not working.
-        rgba = digits.Length == 6 ? (value << 8) | 0xFF : value;
-        return true;
+        uint parsed = OverlaySettings.ParseColour(colour ?? string.Empty);
+        return parsed == 0 ? fallback : parsed;
     }
 
-    /// <summary>Reads a colour, or hands back the fallback when it is not one.</summary>
-    public static uint ToRgba(string? text, uint fallback)
-        => TryParse(text, out uint rgba) ? rgba : fallback;
-
     /// <summary>Normalises a colour string, or hands back the fallback when it is not one.</summary>
-    public static string Clean(string? text, string fallback)
-        => TryParse(text, out uint rgba)
-            ? "#" + rgba.ToString("x8", System.Globalization.CultureInfo.InvariantCulture)
-            : fallback;
+    public static string Clean(string? colour, string fallback)
+    {
+        uint parsed = OverlaySettings.ParseColour(colour ?? string.Empty);
+        return parsed == 0 ? fallback : OverlaySettings.FormatColour(parsed);
+    }
 }

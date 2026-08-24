@@ -191,8 +191,16 @@ public sealed record RuleSettings(
 {
     /// <summary>Whether drawn effects show while the game is behind another window.</summary>
     /// <remarks>
-    /// Only ever the DRAWN ones. Input is gated on focus in the engine and no setting reaches
-    /// that gate, because the gate is not a preference - keystrokes land wherever focus is.
+    /// What this actually buys is captions while THIS TOOL'S own windows have focus, which is
+    /// the moment somebody is tuning a rule and wants to see it fire. It cannot show anything
+    /// while a browser is in front: the overlay covers the game's client area and refuses to
+    /// paint when neither the game nor one of our windows is foreground, so every dot would
+    /// land on whatever was alt-tabbed to. That rule is the overlay's and this does not reach
+    /// it.
+    ///
+    /// Only ever the DRAWN effects, either way. Input is gated on focus in the engine and no
+    /// setting reaches that gate, because the gate is not a preference - keystrokes land
+    /// wherever focus is.
     /// </remarks>
     [JsonPropertyName("drawInBackground")]
     public bool DrawInBackground { get; init; }
