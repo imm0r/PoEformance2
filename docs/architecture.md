@@ -856,6 +856,10 @@ for every quest at once and readable from a recording afterwards. Two halves hav
 the character has DONE, which is in the process, and what the quests ARE, which is in the
 install's own data files.
 
+What follows is WHY the design is what it is. **[reading-quest-steps.md](reading-quest-steps.md)
+is the HOW** — every offset, struct and column of the pipeline, with the check that proves each
+stage, in enough detail to re-derive it or fix it when a patch moves something.
+
 #### The bitset — six sessions, and why none of them could have worked
 
 **`ServerData → +0x60 → +0x188 → +0x248`, and it is a sparse bitset over QuestFlags row
