@@ -446,6 +446,7 @@ pre#log {
 .rl-buffs > summary { cursor: pointer; color: var(--dim); font-size: 12px; }
 .rl-buffs-hint { font-size: 11px; margin: 6px 0; }
 .rl-buffs-read { font-size: 10px; margin: 6px 0 0; font-family: ui-monospace, monospace; }
+.rl-buffs-read.warn { color: var(--bad, #e06c6c); }
 
 .rl-buffs ul {
   list-style: none;

@@ -539,6 +539,17 @@ internal static class Program
     private sealed class OverlayHandle
     {
         public PoEformance.Overlay.EntityOverlay? Overlay { get; set; }
+
+        /// <summary>
+        /// The reader thread, once it exists, so the config window can say whether it is well.
+        /// </summary>
+        /// <remarks>
+        /// The feed swallows an exception out of its read callback on purpose - a stale pointer
+        /// during a zone change must not end it - and everything the callback does after the
+        /// throw stops happening. The config window is where somebody notices that, because it
+        /// is where the rules and the buff list claim to be live.
+        /// </remarks>
+        public PoEformance.Features.SnapshotFeed? Feed { get; set; }
     }
 
     private static void RunOverlay(
@@ -917,6 +928,9 @@ internal static class Program
             },
             TimeSpan.FromMilliseconds(33));
 
+        // Published as soon as it exists: the config window may already be open.
+        handle.Feed = feed;
+
         using var overlay = new PoEformance.Overlay.EntityOverlay(
             scale =>
             {
@@ -1240,7 +1254,8 @@ internal static class Program
                 // it is given, so what it holds is what actually runs - and a copy here could
                 // show a threshold the engine rejected.
                 Rules: PoEformance.Config.RulesView.Of(
-                    ruleEngine, $"{flaskKeys.Source} - {flaskKeys.Detail}", buffWatch));
+                    ruleEngine, $"{flaskKeys.Source} - {flaskKeys.Detail}", buffWatch,
+                    DescribeReader(overlayHandle)));
         }
 
         // Rebuilding the outline is a pass over megabytes, so it is done once per area and
@@ -1499,6 +1514,24 @@ internal static class Program
     /// </remarks>
     private static string DescribeTerrain(OverlayHandle handle)
         => handle.Overlay is null ? "overlay not running" : handle.Overlay.DescribeTerrain();
+
+    /// <summary>Whether the thread that feeds the rules is running, and what it last hit.</summary>
+    /// <remarks>
+    /// The rules and the buff list are produced by the reader thread's callback, and the feed
+    /// catches anything that comes out of it. So a rules tab that shows nothing has two very
+    /// different explanations - no reader at all, or a reader that throws before it gets to the
+    /// rules - and neither of them was visible from the window that shows the rules.
+    /// </remarks>
+    private static string DescribeReader(OverlayHandle handle)
+    {
+        if (handle.Feed is not PoEformance.Features.SnapshotFeed feed)
+        {
+            return "no reader thread - the rules only run with the overlay (--overlay)";
+        }
+
+        string health = $"{feed.ReadCount} reads, {feed.FailureCount} failed";
+        return feed.LastFailure.Length > 0 ? $"{health}; last failure {feed.LastFailure}" : health;
+    }
 
     /// <summary>The last segment of a metadata path - the readable half of an item name.</summary>
     private static string ShortItemName(string path)

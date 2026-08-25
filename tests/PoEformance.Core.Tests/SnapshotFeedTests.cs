@@ -199,4 +199,55 @@ public class SnapshotFeedTests
         // At 25ms per cycle, 250ms allows ~10. Drifting to 45ms per cycle would give ~5.
         Assert.True(done >= 7, $"only {done} reads in 250ms - the cadence drifted with cost");
     }
+
+    [Fact]
+    public void ASwallowedExceptionIsWrittenDown()
+    {
+        // Catching here is right - a stale pointer during a zone change must not end the feed -
+        // but the catch used to record only that something had happened. Everything the read
+        // callback does after the throw then simply stops: the rules, the buff list, the damage
+        // meter. From the config window that is indistinguishable from a feature nobody wired
+        // up, which is exactly how it presented.
+        using var feed = new SnapshotFeed(
+            _ => throw new InvalidOperationException("the entity map moved"),
+            TimeSpan.FromMilliseconds(5));
+
+        WaitFor(() => feed.FailureCount >= 1, "nothing failed");
+
+        Assert.Contains("InvalidOperationException", feed.LastFailure, StringComparison.Ordinal);
+        Assert.Contains("the entity map moved", feed.LastFailure, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void NothingHasThrownReadsAsNothingRatherThanAsAnEmptyMessage()
+    {
+        using var feed = new SnapshotFeed(_ => SnapshotWith(1), TimeSpan.FromMilliseconds(5));
+        WaitFor(() => feed.ReadCount >= 1, "no read completed");
+
+        Assert.Equal(string.Empty, feed.LastFailure);
+    }
+
+    [Fact]
+    public void TheDescriptionNamesTheFrameItCameOutOf()
+    {
+        // The message alone rarely says which of a dozen services on the reader thread threw,
+        // and the TOP of the stack is the read callback every time - so the deepest frame is
+        // the one worth keeping.
+        InvalidOperationException caught;
+        try
+        {
+            ThrowFromHere();
+            return;
+        }
+        catch (InvalidOperationException exception)
+        {
+            caught = exception;
+        }
+
+        string described = SnapshotFeed.Describe(caught);
+        Assert.Contains("InvalidOperationException: deep", described, StringComparison.Ordinal);
+        Assert.Contains("ThrowFromHere", described, StringComparison.Ordinal);
+    }
+
+    private static void ThrowFromHere() => throw new InvalidOperationException("deep");
 }

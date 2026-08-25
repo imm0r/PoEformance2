@@ -91,6 +91,17 @@ export class RulesPanel {
     // froze while somebody was typing a buff name would be useless exactly when it is wanted.
     this.renderBuffs(view.buffs ?? [], view.buffRead ?? "");
 
+    // Whether the thread that produces all of this is even running. Everything on this tab -
+    // the status, the buff list, the ranges - is made by the reader's callback, and the feed
+    // catches whatever comes out of it. So "nothing is happening" had two explanations that
+    // looked identical here: no reader at all, or a reader throwing before it reaches the
+    // rules. Neither said a word until this line.
+    const reader = $("rl-reader");
+    if (reader) {
+      reader.textContent = view.reader || "";
+      reader.classList.toggle("warn", /fail(ed|ure)|no reader/.test(view.reader || "") && !/0 failed/.test(view.reader || ""));
+    }
+
     // The live text always, the CONTROLS only while nothing is being edited - the same rule
     // the overlay panel follows. A poll landing mid-edit would otherwise put back the value
     // that was there before the keystroke.

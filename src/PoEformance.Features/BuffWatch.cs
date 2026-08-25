@@ -75,6 +75,7 @@ public sealed class BuffWatch
     private readonly Lock _gate = new();
 
     private BuffRead _lastRead;
+    private long _looks;
 
     /// <summary>What has been on, active ones first, then most recently seen.</summary>
     public IReadOnlyList<SeenBuff> Seen
@@ -96,13 +97,22 @@ public sealed class BuffWatch
     }
 
     /// <summary>Where the last walk of the buff vector got to, for a panel to explain itself.</summary>
-    public BuffRead LastRead
+    /// <remarks>
+    /// "NOBODY HAS LOOKED YET" IS A DIFFERENT ANSWER FROM "THERE IS NOTHING THERE", and the
+    /// first version of this conflated them: a reader thread that never reached Look left the
+    /// default reading behind, which printed as "no Buffs component on the player" - an
+    /// assertion about the game, made by code that had never been given anything to assert it
+    /// from. The count is what tells the two apart.
+    /// </remarks>
+    public string LastRead
     {
         get
         {
             lock (_gate)
             {
-                return _lastRead;
+                return _looks == 0
+                    ? "the reader has not looked at the player yet"
+                    : _lastRead.ToString();
             }
         }
     }
@@ -112,6 +122,10 @@ public sealed class BuffWatch
     {
         lock (_gate)
         {
+            // Counted BEFORE the early return, so "the reader is running and the snapshot had
+            // no buffs" cannot be mistaken for "the reader never ran".
+            _looks++;
+
             // Everything remembered stops being ACTIVE first, then what is really on is marked
             // again. Anything else and a buff that ended would sit in the list claiming twenty
             // seconds left forever, which is worse than not listing it: it reads as live.
@@ -125,6 +139,7 @@ public sealed class BuffWatch
 
             if (buffs is not ActiveBuffs on)
             {
+                _lastRead = default;
                 return;
             }
 
