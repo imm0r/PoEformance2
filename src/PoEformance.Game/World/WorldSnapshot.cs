@@ -1310,4 +1310,62 @@ public sealed class WorldReader
 
         return EntityKind.Unknown;
     }
+
+    /// <summary>
+    /// Which family of objects this one belongs to - "Hideout", "Sanctum" - or empty.
+    /// </summary>
+    /// <remarks>
+    /// The folder the game files it under, one level below its bucket. That segment is the
+    /// difference between two entities that are otherwise the same word: a Reforging Bench is
+    /// hideout furniture and a Relic Locker is Sanctum's, and the path says so where the kind
+    /// alone cannot.
+    ///
+    /// NOT a kind of its own, and that is the point. The families run to a dozen and gain one
+    /// every league, so an enum would need a value per league and every saved alert rule would
+    /// be renumbered around it - see the note on <see cref="EntityKind.Projectile"/>. This is a
+    /// LABEL, read from the path each time it is drawn, and nothing stores it.
+    ///
+    /// MiscellaneousObjects only, because that is the bucket whose contents differ by folder.
+    /// Monsters and chests have families too - Skeletons, StrongBoxes - and could be described
+    /// the same way, but nobody has asked to read them that way and a rule nobody wants is a
+    /// rule that only ever gets in the way.
+    /// </remarks>
+    public static string FamilyOf(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        const string bucket = "Metadata/MiscellaneousObjects/";
+        if (!path.StartsWith(bucket, StringComparison.Ordinal))
+        {
+            return string.Empty;
+        }
+
+        ReadOnlySpan<char> rest = path.AsSpan(bucket.Length);
+        int slash = rest.IndexOf('/');
+
+        // No sub-folder means no family: Metadata/MiscellaneousObjects/Stash is just a stash,
+        // and calling it a "Stash Object" would be saying one thing twice.
+        return slash <= 0 ? string.Empty : rest[..slash].ToString();
+    }
+
+    /// <summary>What to call an entity's kind in a list, family included where there is one.</summary>
+    /// <remarks>
+    /// "Hideout Object", "Sanctum Object" - the shape somebody reading the list asked for.
+    /// A family that repeats the kind is dropped rather than printed: the game files portals
+    /// under a Portals folder, and "Portals Portal" is noise where "Portal" is an answer.
+    /// </remarks>
+    public static string DescribeKind(EntityKind kind, string path)
+    {
+        string family = FamilyOf(path);
+        string name = kind.ToString();
+
+        if (family.Length == 0
+            || name.Contains(family, StringComparison.OrdinalIgnoreCase)
+            || family.Contains(name, StringComparison.OrdinalIgnoreCase))
+        {
+            return name;
+        }
+
+        return $"{family} {name}";
+    }
 }

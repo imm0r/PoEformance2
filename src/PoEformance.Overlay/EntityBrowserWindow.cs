@@ -391,10 +391,15 @@ public sealed class EntityBrowserWindow
                     ? $"{entity.Name}  ({entity.FileName})"
                     : entity.FileName;
 
+                // The family where the path names one - "Hideout Object", "Sanctum Object" -
+                // because two things that are both "Object" are told apart by the folder the
+                // game files them under, and reading it here saves opening the pane to see it.
+                string kind = WorldReader.DescribeKind(entity.Kind, entity.Path);
+
                 // ###address, not ##: the label carries a live distance, and ImGui derives a
                 // control's identity from its label - so without this the row would be a new
                 // control every frame and the click would never land.
-                if (ImGui.Selectable($"{entity.Kind}  {called}{away}{facts}###{entity.Address:X}",
+                if (ImGui.Selectable($"{kind}  {called}{away}{facts}###{entity.Address:X}",
                         entity.Address == _selected))
                 {
                     _selected = entity.Address;

@@ -230,6 +230,36 @@ public class EntityMapReaderTests
         Assert.Equal(EntityKind.Pet, WorldReader.ClassifyPath("Metadata/Pet/BetaKiwis/VaalKiwi"));
     }
 
+    /// <summary>
+    /// Two things that are both "Object", told apart by the folder the game files them under.
+    /// </summary>
+    /// <remarks>
+    /// Read off the running game: a Reforging Bench is hideout furniture and a Relic Locker is
+    /// Sanctum's, and the list said "Object" to both.
+    /// </remarks>
+    [Theory]
+    [InlineData("Metadata/MiscellaneousObjects/Hideout/ReforgingBench", "Hideout Object")]
+    [InlineData("Metadata/MiscellaneousObjects/Sanctum/SanctumLocker_Hideout", "Sanctum Object")]
+    [InlineData("Metadata/MiscellaneousObjects/Hideout/KaruiHealingWell", "Hideout Object")]
+    public void AnObjectIsNamedByItsFamily(string path, string expected)
+        => Assert.Equal(expected, WorldReader.DescribeKind(WorldReader.ClassifyPath(path), path));
+
+    [Theory]
+    // No sub-folder, so no family - and "Stash Object" would say one thing twice anyway.
+    [InlineData("Metadata/MiscellaneousObjects/Stash", "Object")]
+
+    // The game files portals under a Portals folder, and "Portals Portal" is noise where
+    // "Portal" is an answer.
+    [InlineData("Metadata/MiscellaneousObjects/Portals/DemonicApparitionPortal", "Portal")]
+
+    // Everything outside that bucket keeps the plain kind: the families of monsters and
+    // chests exist, but nobody asked to read the list that way.
+    [InlineData("Metadata/Monsters/LeagueDelirium/DeliriumMinion1", "Monster")]
+    [InlineData("Metadata/Chests/StrongBoxes/Arcanist", "Chest")]
+    [InlineData("Metadata/Something/Else", "Unknown")]
+    public void AndKeepsThePlainKindWhereAFamilyWouldAddNothing(string path, string expected)
+        => Assert.Equal(expected, WorldReader.DescribeKind(WorldReader.ClassifyPath(path), path));
+
     [Theory]
     [InlineData("Metadata/MiscellaneousObjects/WorldItem", EntityKind.WorldItem)]
     [InlineData("Metadata/MiscellaneousObjects/Delirium/DeliriumShardSeethingChymeDialogueController", EntityKind.Object)]
