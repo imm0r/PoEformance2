@@ -137,7 +137,18 @@ public static class ConfigWindowHost
         // page renders whole states rather than patching fields.
         if (request.Type is "hello" or "getState")
         {
-            return State(stateSource);
+            // Building a state READS GAME MEMORY on this thread, and a read can throw at any
+            // zone change. One thrown poll must cost one missing answer - the page asks again
+            // in a second - not the message channel it would have taken down by escaping.
+            try
+            {
+                return State(stateSource);
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine($"state build failed: {exception.Message}");
+                return null;
+            }
         }
 
         // Anything else is a command. A handled one answers with the WHOLE state rather

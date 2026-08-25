@@ -128,13 +128,29 @@ public sealed class ConfigWindow : Window
 
         _messageHandler = new CoreWebView2WebMessageReceivedEventHandler((_, args) =>
         {
-            // WebMessageAsJson works for any posted value; the string variant only for
-            // strings. The page posts objects, so this is the general read.
-            args.get_WebMessageAsJson(out PWSTR message).ThrowOnError();
-            string? reply = _handleMessage(message.ToStringAndDispose() ?? "");
-            if (reply is not null)
+            // NOTHING MAY ESCAPE THIS LAMBDA. It is a COM callback: an exception crossing
+            // that boundary is not a crash with a stack trace, it is undefined - and in
+            // practice it can leave the event registration dead, after which the browser
+            // never delivers another message. The page then polls into silence forever and
+            // shows its initial HTML: empty dropdowns, a dash for a status. One throwing
+            // state read during a zone change, timed against the first poll, produced
+            // exactly that - a config window that looked like it had never been wired up,
+            // on some launches and not others.
+            try
             {
-                Post(reply);
+                // WebMessageAsJson works for any posted value; the string variant only for
+                // strings. The page posts objects, so this is the general read.
+                args.get_WebMessageAsJson(out PWSTR message).ThrowOnError();
+                string? reply = _handleMessage(message.ToStringAndDispose() ?? "");
+                if (reply is not null)
+                {
+                    Post(reply);
+                }
+            }
+            catch (Exception exception)
+            {
+                // Answering nothing loses one poll; the page asks again in a second.
+                System.Console.Error.WriteLine($"config message failed: {exception.Message}");
             }
         });
         webView.add_WebMessageReceived(_messageHandler, ref _messageToken).ThrowOnError();
