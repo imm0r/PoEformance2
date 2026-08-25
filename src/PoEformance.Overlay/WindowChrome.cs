@@ -667,14 +667,27 @@ public sealed class WindowChrome
     /// right-click looks, it names both switches in words, and it reaches the one window with
     /// no title bar to put icons on.
     ///
-    /// NoOpenOverItems, so right-clicking a control inside a window still belongs to that
-    /// control. A menu that steals every right-click is a menu in the way.
+    /// Not over a control: right-clicking one inside the window still belongs to that
+    /// control - a menu that steals every right-click is a menu in the way.
+    ///
+    /// HAND-ROLLED rather than BeginPopupContextWindow, because that helper stops at child
+    /// boundaries: the tools window keeps each page in a scroll child so the tab bar stays
+    /// put, and to the helper a right-click on the page is then a click on some OTHER
+    /// window. The hover test here counts children as part of the window, which is what a
+    /// person pointing at it means; the item test is the helper's NoOpenOverItems by
+    /// another route.
     /// </remarks>
     public void Menu(string id)
     {
-        if (!ImGui.BeginPopupContextWindow(
-                $"##chrome-{id}",
-                ImGuiPopupFlags.MouseButtonRight | ImGuiPopupFlags.NoOpenOverItems))
+        if (ImGui.IsWindowHovered(
+                ImGuiHoveredFlags.ChildWindows | ImGuiHoveredFlags.AllowWhenBlockedByPopup)
+            && !ImGui.IsAnyItemHovered()
+            && ImGui.IsMouseReleased(ImGuiMouseButton.Right))
+        {
+            ImGui.OpenPopup($"##chrome-{id}");
+        }
+
+        if (!ImGui.BeginPopup($"##chrome-{id}"))
         {
             return;
         }

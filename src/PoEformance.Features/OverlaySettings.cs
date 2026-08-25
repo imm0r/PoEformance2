@@ -43,7 +43,12 @@ public sealed record OverlaySettings(
     // out here: it is a different subject from what the overlay draws on the game, and a
     // settings file stops being readable at exactly the point everything shares one level.
     [property: JsonPropertyName("interface")] InterfaceStyle? Interface = null,
-    [property: JsonPropertyName("windows")] IReadOnlyDictionary<string, WindowRule>? Windows = null)
+    [property: JsonPropertyName("windows")] IReadOnlyDictionary<string, WindowRule>? Windows = null,
+
+    // Which of the tools window's tabs are off the bar, by page id - ids rather than labels
+    // for the reason the window rules key on ids: a label is wording, and a reworded tab
+    // must not come back. Null until somebody hides one, so an untouched file gains no key.
+    [property: JsonPropertyName("hiddenTabs")] IReadOnlyList<string>? HiddenTabs = null)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>
@@ -51,6 +56,9 @@ public sealed record OverlaySettings(
     /// gains no key at all and the defaults stay where they can be corrected in a release.
     /// </remarks>
     public InterfaceStyle InterfaceOrDefault => Interface ?? InterfaceStyle.Default;
+
+    /// <summary>The hidden tab ids, empty until somebody hides one.</summary>
+    public IReadOnlyList<string> HiddenTabsOrEmpty => HiddenTabs ?? [];
 
     /// <summary>What each window was told, by the window's own id. Empty until somebody says.</summary>
     /// <remarks>

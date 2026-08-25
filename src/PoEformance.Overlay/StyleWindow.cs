@@ -41,6 +41,14 @@ public sealed class StyleWindow
     /// </remarks>
     public WindowChrome? Chrome { get; set; }
 
+    /// <summary>Draws the tab list, when the tools window has offered it.</summary>
+    /// <remarks>
+    /// Beside the window list for the same reason that one is here: which tabs are on the
+    /// bar is part of how the overlay looks, and this page is the one that can never hide
+    /// itself - so the way back from any hiding is always reachable.
+    /// </remarks>
+    public Action? TabList { get; set; }
+
     /// <summary>
     /// How the tool's own windows are drawn, when somebody has offered it for editing.
     /// </summary>
@@ -177,6 +185,11 @@ public sealed class StyleWindow
         if (Chrome is not null && ImGui.CollapsingHeader("Windows", ImGuiTreeNodeFlags.DefaultOpen))
         {
             Chrome.DrawList();
+        }
+
+        if (TabList is not null && ImGui.CollapsingHeader("Tabs", ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            TabList();
         }
 
         foreach (IGrouping<string, StyleEntry> group in StyleCatalogue.Grouped())
