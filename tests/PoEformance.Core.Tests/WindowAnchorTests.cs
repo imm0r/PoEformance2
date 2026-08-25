@@ -104,4 +104,37 @@ public class WindowAnchorTests
         Assert.True(settled.Anything);
         Assert.True(settled.Placed);
     }
+
+    [Fact]
+    public void TrackingFollowsAWindowPastTheEdgeWithoutPullingItBack()
+    {
+        // The drag tracker deliberately does NOT clamp: yanking a window back while somebody
+        // is still holding it is the fight the whole arrangement exists to avoid. The clamp
+        // belongs to the release, which Settle carries.
+        (double x, double y, int pivotX, int pivotY) =
+            WindowAnchor.Track(ViewW - 100f, ViewH - 50f, 300f, 200f, ViewW, ViewH);
+
+        Assert.Equal(1, pivotX);
+        Assert.Equal(1, pivotY);
+        Assert.True(x > 1.0);
+        Assert.True(y > 1.0);
+    }
+
+    [Fact]
+    public void TrackingAndSettlingAgreeWhereverBothApply()
+    {
+        // The release frame asserts what was TRACKED, and Measure then persists what was
+        // SETTLED. For a window already inside the screen those must be the same numbers,
+        // or letting go of a window would nudge it.
+        const float X = ViewW - 360f;
+        const float Y = ViewH - 340f;
+
+        (double tx, double ty, int tpx, int tpy) = WindowAnchor.Track(X, Y, 360f, 340f, ViewW, ViewH);
+        WindowRule settled = WindowAnchor.Settle(WindowRule.Free, X, Y, 360f, 340f, ViewW, ViewH);
+
+        Assert.Equal(settled.X!.Value, tx, 6);
+        Assert.Equal(settled.Y!.Value, ty, 6);
+        Assert.Equal(settled.PivotX, tpx);
+        Assert.Equal(settled.PivotY, tpy);
+    }
 }
