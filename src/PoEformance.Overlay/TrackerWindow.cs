@@ -112,20 +112,20 @@ public sealed class TrackerWindow
             _write(settings with { Aim = aim with { Enabled = on } });
         }
 
-        ImGui.TextColored(
+        ImGuiText.Hint(
             DimText,
-            "    the game keeps no target - it aims by TURNING, so the facing is the aim as exactly"
+            "the game keeps no target - it aims by TURNING, so the facing is the aim as exactly"
             + " as the game has it.");
-        ImGui.TextColored(
+        ImGuiText.Hint(
             WarnText,
-            "    it is not a promise of where a skill lands: many attacks lock direction at the"
+            "it is not a promise of where a skill lands: many attacks lock direction at the"
             + " start, and homing ones ignore facing.");
 
         if (on)
         {
-            ImGui.TextColored(
+            ImGuiText.Hint(
                 DimText,
-                "    this makes the reader read a facing and an animation per monster; watch the"
+                "this makes the reader read a facing and an animation per monster; watch the"
                 + " Read cost tab.");
         }
 
@@ -353,19 +353,17 @@ public sealed class TrackerWindow
         // The two reasons this draws nothing while being configured correctly, said HERE
         // rather than left to be discovered. Both are deliberate rules elsewhere in the
         // reader, and neither is guessable from an overlay that stays empty.
-        ImGui.TextColored(
+        ImGuiText.Hint(
             DimText,
-            "    the radius is in SCREEN PIXELS, not world units - it does not shrink as the camera pulls back.");
-        ImGui.TextColored(
+            "the radius is in SCREEN PIXELS, not world units - it does not shrink as the camera pulls back.");
+        ImGuiText.Hint(
             WarnText,
-            "    nothing appears? the reader drops hostile ground effects unless the Effects tab's"
-            + " \"keep them\" is on,");
-        ImGui.TextColored(
-            WarnText,
-            "    and the noise filter refuses the engine's /fx/ and /mat/ nodes before they are read at all.");
-        ImGui.TextColored(
+            "nothing appears? the reader drops hostile ground effects unless the Effects tab's"
+            + " \"keep them\" is on, and the noise filter refuses the engine's /fx/ and /mat/"
+            + " nodes before they are read at all.");
+        ImGuiText.Hint(
             DimText,
-            "    the Effects tab lists what IS being read, with paths - copy the start of one into a rule.");
+            "the Effects tab lists what IS being read, with paths - copy the start of one into a rule.");
 
         List<GroundDangerRule> rules = [.. settings.GroundDangerOrDefault];
         bool edited = false;
@@ -541,9 +539,9 @@ public sealed class TrackerWindow
 
         // Said next to the switch that carries it, like the projectile tab's warning: this is
         // the only setting in here that makes the READER do more work per monster.
-        ImGui.TextColored(
+        ImGuiText.Hint(
             DimText,
-            "    the monster half makes the reader read a Buffs component per rare-or-better"
+            "the monster half makes the reader read a Buffs component per rare-or-better"
             + " monster; watch the Read cost tab.");
 
         // Titled rules between the blocks, like the alerts tab: five near-identical control
@@ -588,33 +586,33 @@ public sealed class TrackerWindow
 
         if (settings.IconSheet.Length == 0)
         {
-            ImGui.TextColored(
+            ImGuiText.Hint(
                 DimText,
-                "    no sheet: each effect is drawn as its coloured disc with its own caption on it.");
+                "no sheet: each effect is drawn as its coloured disc with its own caption on it.");
             return;
         }
 
         IconCache.Picture sheet = _sheet();
         if (!sheet.Ready)
         {
-            ImGui.TextColored(WarnText, "    that file did not load - see the Appearance tab for the reason.");
+            ImGuiText.Hint(WarnText, "that file did not load - see the Appearance tab for the reason.");
             return;
         }
 
         int columns = Math.Max(1, sheet.Width / settings.IconTile);
         int rows = Math.Max(1, sheet.Height / settings.IconTile);
-        ImGui.TextColored(
+        ImGuiText.Hint(
             GoodText,
-            $"    loaded: {sheet.Width}x{sheet.Height}, which is {columns} x {rows} tiles of {settings.IconTile}px");
+            $"loaded: {sheet.Width}x{sheet.Height}, which is {columns} x {rows} tiles of {settings.IconTile}px");
 
         // A sheet that is not a whole number of tiles across is the symptom BOTH of a wrong
         // tile size and of a sheet so large it was shrunk on the way in - and either way every
         // icon lands part way between two of them, which reads as the coordinates being wrong.
         if (sheet.Width % settings.IconTile != 0 || sheet.Height % settings.IconTile != 0)
         {
-            ImGui.TextColored(
+            ImGuiText.Hint(
                 WarnText,
-                $"    that is not a whole number of {settings.IconTile}px tiles - either the tile size is"
+                $"that is not a whole number of {settings.IconTile}px tiles - either the tile size is"
                 + $" wrong, or the sheet is over {IconCache.MaxSheetEdge}px and was shrunk to fit.");
         }
     }
@@ -1013,7 +1011,7 @@ public sealed class TrackerWindow
             return;
         }
 
-        ImGui.TextColored(DimText, "copy a name into a rule above - matching is loose, so a fragment works.");
+        ImGuiText.Wrapped(DimText, "copy a name into a rule above - matching is loose, so a fragment works.");
 
         Names("on you", snapshot.PlayerBuffs);
 
@@ -1034,7 +1032,7 @@ public sealed class TrackerWindow
 
         if (shown == 0)
         {
-            ImGui.TextColored(
+            ImGuiText.Wrapped(
                 DimText,
                 "no monster buffs are being read - tick \"over rare and unique monsters\" above and"
                 + " stand next to one.");

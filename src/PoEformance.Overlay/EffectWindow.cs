@@ -55,10 +55,12 @@ public sealed class EffectWindow
     {
         ArgumentNullException.ThrowIfNull(snapshot);
 
-        ImGui.TextColored(
+        // One wrapped sentence rather than two lines broken by hand: the hand break assumed
+        // a window width, and at any other width it read as two half-lines.
+        ImGuiText.Wrapped(
             DimText,
-            "For looking, not for playing. Everything here is normally thrown away on purpose,");
-        ImGui.TextColored(DimText, "and every switch below undoes one of those decisions.");
+            "For looking, not for playing. Everything here is normally thrown away on purpose,"
+            + " and every switch below undoes one of those decisions.");
         ImGui.Separator();
 
         bool drawing = _layer.Enabled;
@@ -82,9 +84,9 @@ public sealed class EffectWindow
 
         // Said next to the switch, because the reason it is off is the reason a screen full of
         // enemy markers once looked like a broken overlay rather than a working Firewall.
-        ImGui.TextColored(
+        ImGuiText.Hint(
             DimText,
-            "    a flame wall carries Life and a position, so kept as monsters they were drawn"
+            "a flame wall carries Life and a position, so kept as monsters they were drawn"
             + " as enemies and given health bars.");
 
         if (_noise is NoiseFilter noise)
@@ -97,9 +99,9 @@ public sealed class EffectWindow
 
             if (engine)
             {
-                ImGui.TextColored(
+                ImGuiText.Hint(
                     WarnText,
-                    "    these are the most numerous entities in the game and each costs a"
+                    "these are the most numerous entities in the game and each costs a"
                     + " component read - expect the read cost to climb.");
             }
         }
@@ -109,12 +111,10 @@ public sealed class EffectWindow
         // Said out loud, because "particles" invites an expectation nothing in memory can
         // meet, and somebody looking for a spark that is not there would conclude the read is
         // broken rather than that the thing was never listed.
-        ImGui.TextColored(
+        ImGuiText.Wrapped(
             DimText,
-            "The game's actual particles are rendering and are not entities - nothing lists a spark.");
-        ImGui.TextColored(
-            DimText,
-            "A screen of fire is ONE entity here, and that entity is what gets a mark.");
+            "The game's actual particles are rendering and are not entities - nothing lists a"
+            + " spark. A screen of fire is ONE entity here, and that entity is what gets a mark.");
 
         ImGui.Separator();
         DrawSorts(snapshot);

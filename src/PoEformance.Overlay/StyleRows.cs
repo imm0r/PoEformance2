@@ -100,7 +100,7 @@ public sealed class StyleRows
     public void DrawResetLine()
     {
         int changed = _style.Changed.Count;
-        ImGui.TextColored(
+        ImGuiText.Wrapped(
             DimText,
             changed == 0
                 ? "everything as it comes - nothing changed yet"
@@ -318,7 +318,7 @@ public sealed class StyleRows
             _editingIcon = string.Empty;
         }
 
-        ImGui.TextColored(DimText, "a .png next to the tool, or any full path. Missing files draw the shape.");
+        ImGuiText.Wrapped(DimText, "a .png next to the tool, or any full path. Missing files draw the shape.");
         return wanted;
     }
 

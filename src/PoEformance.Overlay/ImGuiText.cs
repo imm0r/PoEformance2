@@ -1,4 +1,6 @@
+using System.Numerics;
 using System.Runtime.Versioning;
+using ImGuiNET;
 
 namespace PoEformance.Overlay;
 
@@ -26,6 +28,40 @@ internal static class ImGuiText
 {
     /// <summary>Doubles every percent sign, which is how printf spells a literal one.</summary>
     public static string Escape(string text) => text.Replace("%", "%%", StringComparison.Ordinal);
+
+    /// <summary>Coloured text that wraps at the window's edge, which TextColored never does.</summary>
+    /// <remarks>
+    /// The named helper exists because the composition kept being skipped: TextColored never
+    /// wraps and TextWrapped takes no colour, so every explainer written with the former ran
+    /// off the window as one long line - and reading it meant dragging the window across the
+    /// monitor. Some were even broken in two BY HAND at a width somebody's window happened to
+    /// have. Wrapping only works where the window has a real width, which every tool page has;
+    /// the auto-sized readout and the popups are the places this must not be used.
+    ///
+    /// Still printf underneath, like everything in this file: interpolated data needs
+    /// <see cref="Escape"/> on its way in.
+    /// </remarks>
+    public static void Wrapped(Vector4 colour, string text)
+    {
+        ImGui.PushStyleColor(ImGuiCol.Text, colour);
+        ImGui.TextWrapped(text);
+        ImGui.PopStyleColor();
+    }
+
+    /// <summary>An indented, wrapped explainer under the control it belongs to.</summary>
+    /// <remarks>
+    /// What the four-leading-spaces prefix was trying to be. The prefix only indented the
+    /// FIRST line - a wrapped continuation returned to column zero - and it made the text
+    /// unequal to itself for searching. A real indent survives the wrap, and scales with the
+    /// text like everything else.
+    /// </remarks>
+    public static void Hint(Vector4 colour, string text)
+    {
+        float by = ImGui.GetFontSize() * 1.2f;
+        ImGui.Indent(by);
+        Wrapped(colour, text);
+        ImGui.Unindent(by);
+    }
 
     /// <summary>
     /// The last two segments of a metadata path, which is the part that says what it is.

@@ -146,9 +146,9 @@ public sealed class DamageWindow
         // and the whole of anything deleted between two reads - is never watched falling.
         if (!counting)
         {
-            ImGui.TextColored(
+            ImGuiText.Hint(
                 DimText,
-                "    with this off the figure is only what was watched, which under-reports"
+                "with this off the figure is only what was watched, which under-reports"
                 + " by the whole of every killing blow.");
         }
         else
@@ -228,7 +228,7 @@ public sealed class DamageWindow
             }
         }
 
-        ImGui.TextColored(
+        ImGuiText.Wrapped(
             DimText,
             $"{_meter.Heat.Count} patches held"
             + "   -   the scale is this area's 95th busiest patch, so one boss cannot flatten the rest");

@@ -51,7 +51,7 @@ public sealed class QuestWindow
             // The flag count separately, because the two halves fail independently: flags out
             // of the process, tables out of the install. "42 flags but no tables" and "nothing
             // at all" want opposite fixes and would otherwise look the same.
-            ImGui.TextColored(
+            ImGuiText.Wrapped(
                 _watch.Flags > 0 ? GoodText : DimText,
                 _watch.Flags > 0
                     ? $"{_watch.Flags} flags are set - the tables are what did not load"
@@ -79,7 +79,7 @@ public sealed class QuestWindow
         int ambiguous = outlook.Ambiguous.Count();
         if (ambiguous > 0)
         {
-            ImGui.TextColored(
+            ImGuiText.Wrapped(
                 DimText,
                 $"{ambiguous} quests have several steps holding - normal, the furthest along is shown");
         }

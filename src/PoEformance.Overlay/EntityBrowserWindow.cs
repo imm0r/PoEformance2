@@ -188,7 +188,7 @@ public sealed class EntityBrowserWindow
             // the position key this rule no longer uses, and a line that documents a rule
             // nobody applies any more is worse than no line: it is what the next person
             // reads instead of the code.
-            ImGui.TextColored(
+            ImGuiText.Wrapped(
                 DimText,
                 $"{snapshot.Collapsed} repeat entities dropped this read - the game gives one"
                 + " monster several entities over one set of components");

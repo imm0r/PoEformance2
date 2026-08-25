@@ -117,7 +117,7 @@ public sealed class PreloadWindow
         IReadOnlyList<PreloadFinding> findings = _watch.Findings;
         if (findings.Count == 0)
         {
-            ImGui.TextColored(DimText, all.Count > 0
+            ImGuiText.Wrapped(DimText, all.Count > 0
                 ? "nothing here is on the list of things worth a line - search below to see what is"
                 : "nothing to say about this area");
         }
@@ -135,7 +135,10 @@ public sealed class PreloadWindow
                 finding.Files == 1 ? "1 file" : $"{finding.Files} files");
 
             ImGui.SameLine();
-            ImGui.TextColored(DimText, finding.Path);
+
+            // Wrapped, because a metadata path is the longest thing on the tab and the one
+            // that used to decide how wide the window had to be dragged.
+            ImGuiText.Wrapped(DimText, finding.Path);
         }
 
         ImGui.Spacing();
