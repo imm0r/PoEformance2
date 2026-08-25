@@ -258,6 +258,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _tools.Chrome = Chrome;
         _preloadPanel.Chrome = Chrome;
         Chrome.Changed = () => SettingsChanged?.Invoke();
+        _tools.HiddenChanged = () => SettingsChanged?.Invoke();
     }
 
     /// <summary>
@@ -288,6 +289,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _projectiles.MineOnly = settings.ProjectilesMineOnly;
         Interface = settings.InterfaceOrDefault;
         Chrome.Apply(settings.WindowsOrEmpty);
+        _tools.ApplyHidden(settings.HiddenTabsOrEmpty);
 
         if (Noise is not null)
         {
@@ -337,6 +339,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // sliders - the same bargain the window rules and the marker styles make.
             Interface = _interface == InterfaceStyle.Default ? basis.Interface : _interface,
             Windows = Chrome.Saved(),
+            HiddenTabs = _tools.Hidden() is { Length: > 0 } hiddenTabs ? hiddenTabs : null,
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
             RememberOutOfRange = Memory?.Enabled ?? basis.RememberOutOfRange,
             ShowPoi = _poi?.ShowPicker ?? basis.ShowPoi,
@@ -663,6 +666,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 () => Interface,
                 chosen => Interface = chosen,
                 () => SettingsChanged?.Invoke()),
+
+            // This page hosts the list, so it is the page the list must never offer to
+            // hide - see DrawHideList.
+            TabList = () => _tools.DrawHideList("style"),
         };
 
         _tools.Add(70, "style", "Appearance", window.DrawTab, window.Idle);

@@ -53,6 +53,12 @@ public sealed class ToolTabs
 
     private readonly List<Page> _pages = [];
 
+    // The pages somebody took off the bar. A registered tool stays registered - its idle
+    // callback keeps running, its jumps keep working - the tab is just not offered, which is
+    // what "I never use this one" actually asks for. Ids rather than Page references because
+    // the settings apply before every page has registered.
+    private readonly HashSet<string> _hidden = [];
+
     // The page to force in front on the next frame the bar draws, and the section to unfold
     // when it gets there. Kept until then rather than for exactly one frame, because the
     // window can be collapsed when the request is made - F8 picks an element with the tools
@@ -82,6 +88,29 @@ public sealed class ToolTabs
 
     /// <summary>Whether anything registered a page, so an empty window is never offered.</summary>
     public bool Any => _pages.Count > 0;
+
+    /// <summary>Fires when the set of hidden pages changes, so it can be written down.</summary>
+    public Action? HiddenChanged { get; set; }
+
+    /// <summary>The hidden page ids, sorted so the settings file is stable.</summary>
+    public string[] Hidden() => _hidden.Order(StringComparer.Ordinal).ToArray();
+
+    /// <summary>Replaces the hidden set with what a settings file says.</summary>
+    /// <remarks>
+    /// Not validated against the registered pages: settings are applied while the tools are
+    /// still being wired up, so a page hidden here may well register a moment later - and an
+    /// id no page ever claims simply never matters.
+    /// </remarks>
+    public void ApplyHidden(IEnumerable<string> ids)
+    {
+        ArgumentNullException.ThrowIfNull(ids);
+
+        _hidden.Clear();
+        foreach (string id in ids)
+        {
+            _hidden.Add(id);
+        }
+    }
 
     /// <summary>How wide and tall the window opens when a tool is in front.</summary>
     /// <remarks>
@@ -177,6 +206,14 @@ public sealed class ToolTabs
 
         _bringToFront = page?.Id ?? id;
         _unfold = id;
+
+        // A jump wins over a hiding: F8 must surface the interface tree whether or not its
+        // tab is on the bar. Hidden-and-unreachable would make every "open this tool"
+        // affordance work only sometimes, which reads as the tool being broken.
+        if (page is not null && _hidden.Remove(page.Id))
+        {
+            HiddenChanged?.Invoke();
+        }
     }
 
     /// <summary>Draws the window.</summary>
@@ -305,6 +342,15 @@ public sealed class ToolTabs
         {
             foreach (Page page in _pages)
             {
+                // A hidden page's tab is simply not offered - except the first, which is the
+                // readout and the way back into everything, this list's editor included. The
+                // hide list never offers it either; this guard is for a settings file that
+                // says otherwise.
+                if (_hidden.Contains(page.Id) && page != _pages[0])
+                {
+                    continue;
+                }
+
                 ImGuiTabItemFlags flags = page.Id == bringing
                     ? ImGuiTabItemFlags.SetSelected
                     : ImGuiTabItemFlags.None;
@@ -319,7 +365,7 @@ public sealed class ToolTabs
 
                 try
                 {
-                    DrawSections(page);
+                    DrawPage(page);
                     inFront = page.Id;
                 }
                 finally
@@ -346,6 +392,43 @@ public sealed class ToolTabs
         _leftTheReadout = _sizedToContent && !sizes;
         _sizedToContent = sizes;
         return inFront;
+    }
+
+    /// <summary>The page's content, inside a scroll region so the tab bar stays put.</summary>
+    /// <remarks>
+    /// The bar used to leave with the page: a page taller than the window scrolled as a
+    /// WHOLE, tabs and all, so switching tabs from anywhere below the fold meant scrolling
+    /// back to the top first - every time, on every tall page. With the content in a child
+    /// window the scrollbar is the page's own, and the bar, the title and its icons never
+    /// move.
+    ///
+    /// The readout is the exception: it is the page that sizes the window to its content
+    /// (see <see cref="SizesItself"/>), and a fill-what-remains child inside a window asking
+    /// its content how big to be is a circle ImGui resolves as a box of nothing.
+    /// </remarks>
+    private void DrawPage(Page page)
+    {
+        if (page == _pages[0])
+        {
+            DrawSections(page);
+            return;
+        }
+
+        try
+        {
+            // Its own id per page, so every page keeps its own scroll position across
+            // switches.
+            if (ImGui.BeginChild($"page-{page.Id}"))
+            {
+                DrawSections(page);
+            }
+        }
+        finally
+        {
+            // In a finally, and unconditionally: EndChild pairs with BeginChild whatever it
+            // returned, and an exception between the two leaves ImGui's stack unbalanced.
+            ImGui.EndChild();
+        }
     }
 
     /// <summary>Draws a page: one tool bare, several as an accordion.</summary>
@@ -413,6 +496,50 @@ public sealed class ToolTabs
         }
 
         _drawn.Clear();
+    }
+
+    /// <summary>Checkboxes for which pages sit on the bar, drawn wherever the caller puts it.</summary>
+    /// <remarks>
+    /// The answer to "several of these tabs I never use": the tool stays registered and its
+    /// idle keeps running, the TAB is just not offered any more. Two pages are never offered
+    /// for hiding: the FIRST, because the readout is the way back into everything - this
+    /// list's own editor included - and the page named by <paramref name="except"/>, which
+    /// is the page this list is drawn on: hiding the list with the list leaves no way to
+    /// undo either. A hidden page is not gone - <see cref="Show"/> puts it back on the bar,
+    /// so F8 and the browser-to-dissector handoff keep working.
+    /// </remarks>
+    /// <param name="except">The page hosting this list, which must not offer to hide itself.</param>
+    public void DrawHideList(string except)
+    {
+        ImGui.TextDisabled("Unticked tabs leave the bar. They come back here - or by");
+        ImGui.TextDisabled("themselves, the moment something jumps to them (F8, a handoff).");
+        ImGui.Spacing();
+
+        foreach (Page page in _pages)
+        {
+            if (page == _pages[0] || page.Id == except)
+            {
+                continue;
+            }
+
+            // ###id for the reason the tabs carry it: the checkbox must survive a relabel.
+            bool shown = !_hidden.Contains(page.Id);
+            if (!ImGui.Checkbox($"{page.Label}###tab-{page.Id}", ref shown))
+            {
+                continue;
+            }
+
+            if (shown)
+            {
+                _hidden.Remove(page.Id);
+            }
+            else
+            {
+                _hidden.Add(page.Id);
+            }
+
+            HiddenChanged?.Invoke();
+        }
     }
 
     /// <summary>ImGui's BeginTabItem with flags but WITHOUT a close button.</summary>

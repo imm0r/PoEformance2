@@ -162,6 +162,52 @@ public class OverlaySettingsRoundTripTests
     }
 
     [Fact]
+    public void TheHiddenTabsComeBack()
+    {
+        // By CONTENT rather than record equality: a list property compares by reference,
+        // so Assert.Equal on the records would pass with both null and prove nothing here.
+        var wanted = PoEformance.Features.OverlaySettings.Default with
+        {
+            HiddenTabs = ["atlas", "stash"],
+        };
+
+        string path = TempPath();
+        try
+        {
+            Assert.True(PoEformance.Features.OverlaySettingsStore.Save(wanted, path));
+            Assert.Equal(
+                new[] { "atlas", "stash" },
+                PoEformance.Features.OverlaySettingsStore.Load(path).HiddenTabsOrEmpty);
+
+            // By id in the file, so a relabelled tab stays hidden across an upgrade.
+            Assert.Contains("hiddenTabs", File.ReadAllText(path), StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void AnUntouchedFileHidesNothing()
+    {
+        // The default, and the upgrade: a file with no such key means every tab on the bar,
+        // exactly as the tool behaved before tabs could hide.
+        Assert.Empty(PoEformance.Features.OverlaySettings.Default.HiddenTabsOrEmpty);
+
+        string path = TempPath();
+        File.WriteAllText(path, """{"minLootRarity":2}""");
+        try
+        {
+            Assert.Empty(PoEformance.Features.OverlaySettingsStore.Load(path).HiddenTabsOrEmpty);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void ASettingsFileWrittenBEFORETheseOptionsExistedStillLoads()
     {
         // The upgrade case, and the one that would be found by a user rather than by a test:
