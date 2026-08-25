@@ -28,6 +28,31 @@ public enum EntityKind
     /// a different kind of entity.
     /// </remarks>
     Projectile,
+
+    /// <summary>
+    /// Something the world is furnished with: a bench, a well, a stash, a locker, a lever.
+    /// </summary>
+    /// <remarks>
+    /// The game's own bucket - these are what it files under MiscellaneousObjects - and the
+    /// reason a hideout used to be pages of "Unknown". A kind rather than nothing because
+    /// "Unknown" is a claim that nobody has looked, and here the path says plainly what it is.
+    ///
+    /// APPENDED, like every kind after it, for the numbering reason above.
+    /// </remarks>
+    Object,
+
+    /// <summary>A way between areas: a portal, a transition.</summary>
+    Portal,
+
+    /// <summary>
+    /// A pet following somebody about.
+    /// </summary>
+    /// <remarks>
+    /// Its own kind rather than a monster, which is the reference's reading too - GameHelper2
+    /// lists <c>Metadata/Pet</c> among the paths its monster classification refuses. Two of
+    /// them turn up in this project's own delirium recording, classified as nothing.
+    /// </remarks>
+    Pet,
 }
 
 /// <summary>
@@ -1247,6 +1272,40 @@ public sealed class WorldReader
         if (path.StartsWith("Metadata/Terrain/", StringComparison.Ordinal))
         {
             return EntityKind.Terrain;
+        }
+
+        // ── What used to fall through as Unknown ─────────────────────────────
+        //
+        // LAST, and only ever turning UNKNOWN into something. Every rule above still decides
+        // first, so the noise filter, the alert rules, the health bars and the drawn-kind
+        // filter see exactly what they saw before - these entities were Unknown, and Unknown
+        // is drawn by nothing and styled as "anything else". Nothing on screen moves; the
+        // browser stops saying it has no idea.
+        //
+        // A pet is its own kind rather than a monster, which is the reference's reading too:
+        // GameHelper2 lists Metadata/Pet among the paths its monster classification refuses.
+        // The prefix is deliberately "Pet" and not "Pets/" - that is the spelling in both the
+        // reference's list and this project's own recording (Metadata/Pet/BetaKiwis/VaalKiwi).
+        if (path.StartsWith("Metadata/Pet", StringComparison.Ordinal))
+        {
+            return EntityKind.Pet;
+        }
+
+        // The game's own furniture drawer, and the reason a hideout listed page after page of
+        // nothing: benches, wells, stashes, lockers, waypoints and portals all live here.
+        // Confirmed against the running game rather than supposed - Hideout/TransmutationBench,
+        // Hideout/KaruiHealingWell, Hideout/ReforgingBench, Sanctum/SanctumLocker_Hideout and
+        // Portals/DemonicApparitionPortal were all read out of one hideout.
+        if (path.StartsWith("Metadata/MiscellaneousObjects/", StringComparison.Ordinal))
+        {
+            // A way out is worth telling apart from the furniture. Both words rather than the
+            // folder alone, because the game files exits under either - the Portals folder,
+            // and a name ending in Transition - which is the same breadth the points-of-
+            // interest rules settled on after an exit built into terrain went missing.
+            return path.Contains("Portal", StringComparison.OrdinalIgnoreCase)
+                   || path.Contains("Transition", StringComparison.OrdinalIgnoreCase)
+                ? EntityKind.Portal
+                : EntityKind.Object;
         }
 
         return EntityKind.Unknown;

@@ -202,4 +202,46 @@ public class EntityMapReaderTests
     [InlineData("Metadata/Something/Else", EntityKind.Unknown)]
     public void ClassifyPath_UsesTheMetadataPrefix(string path, EntityKind expected)
         => Assert.Equal(expected, WorldReader.ClassifyPath(path));
+
+    /// <summary>
+    /// The paths a hideout is actually made of, which used to classify as nothing.
+    /// </summary>
+    /// <remarks>
+    /// Every one of these was read out of the running game rather than supposed - a hideout
+    /// listed page after page of "Unknown" while the path plainly said what each thing was.
+    /// </remarks>
+    [Theory]
+    [InlineData("Metadata/MiscellaneousObjects/Hideout/TransmutationBench", EntityKind.Object)]
+    [InlineData("Metadata/MiscellaneousObjects/Hideout/KaruiHealingWell", EntityKind.Object)]
+    [InlineData("Metadata/MiscellaneousObjects/Hideout/ReforgingBench", EntityKind.Object)]
+    [InlineData("Metadata/MiscellaneousObjects/Sanctum/SanctumLocker_Hideout", EntityKind.Object)]
+    [InlineData("Metadata/MiscellaneousObjects/Stash", EntityKind.Object)]
+    [InlineData("Metadata/MiscellaneousObjects/Portals/DemonicApparitionPortal", EntityKind.Portal)]
+    public void TheFurnitureOfAnAreaIsNotUnknown(string path, EntityKind expected)
+        => Assert.Equal(expected, WorldReader.ClassifyPath(path));
+
+    [Fact]
+    public void APetIsItsOwnKindRatherThanAMonster()
+    {
+        // The reference's reading as well as ours: GameHelper2 lists Metadata/Pet among the
+        // paths its monster classification refuses. Both of these are out of this project's
+        // own delirium recording, where they classified as nothing at all.
+        Assert.Equal(EntityKind.Pet, WorldReader.ClassifyPath("Metadata/Pet/BetaKiwis/FaridunKiwi"));
+        Assert.Equal(EntityKind.Pet, WorldReader.ClassifyPath("Metadata/Pet/BetaKiwis/VaalKiwi"));
+    }
+
+    [Theory]
+    [InlineData("Metadata/MiscellaneousObjects/WorldItem", EntityKind.WorldItem)]
+    [InlineData("Metadata/MiscellaneousObjects/Delirium/DeliriumShardSeethingChymeDialogueController", EntityKind.Object)]
+    [InlineData("Metadata/Monsters/MarakethSanctumTrial/Hazards/ProjectilePortal", EntityKind.Monster)]
+    [InlineData("Metadata/Terrain/Gallows/Act2/2_5/Objects/LightlessPassageTransition", EntityKind.Terrain)]
+    public void TheNewRulesOnlyEverTurnUnknownIntoSomething(string path, EntityKind expected)
+    {
+        // The whole safety of the change. These rules run LAST, so everything already
+        // classified keeps its kind: a drop under MiscellaneousObjects is still a drop, a
+        // monster whose name happens to contain "Portal" is still a monster - the reference
+        // lists that exact one - and an exit built into terrain is still terrain, which is
+        // what the noise filter, the health bars and the drawn-kind filter all read.
+        Assert.Equal(expected, WorldReader.ClassifyPath(path));
+    }
 }
