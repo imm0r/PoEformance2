@@ -33,6 +33,17 @@ internal static class Program
         var options = CliOptions.Parse(args);
         Console.WriteLine("PoEformance (C# port) - drift report");
 
+        // What the tool HEARD, not what was typed - the one line that settles "but I always
+        // pass --overlay" against a launcher, a shortcut or a batch variable that quietly
+        // dropped it. Only the switches that change what runs; the probe flags answer for
+        // themselves in their own output.
+        Console.WriteLine("heard   overlay=" + OnOff(options.ShowOverlay)
+            + " config=" + OnOff(options.ShowConfig)
+            + " autoflask=" + OnOff(options.AutoFlask)
+            + (options.RecordPath is string recording ? $" record={recording}" : "")
+            + (options.ReplayPath is string replaying ? $" replay={replaying}" : "")
+            + (options.Debug ? " debug" : ""));
+
         string schemaPath = options.SchemaPath ?? FindSchemaFile();
         Console.WriteLine($"schema  {schemaPath}");
 
@@ -444,6 +455,8 @@ internal static class Program
     /// <c>KeyAvailable</c> throws when input is redirected - which is exactly how this tool is
     /// run from a script - and an unhandled throw there would end a watch that was working.
     /// </remarks>
+    private static string OnOff(bool value) => value ? "on" : "off";
+
     private static bool KeyPressed()
     {
         try
@@ -1882,18 +1895,41 @@ internal static class Program
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             List<string> peek = [];
 
+            // An option that takes a value must not be handed the NEXT OPTION as that value.
+            // "--record --overlay --config" - a forgotten file name, or a batch variable that
+            // expanded to nothing - used to record to a file literally named "--overlay" and
+            // silently drop the overlay, the rules and the buff list with it. Nothing warned:
+            // every token was consumed, so the unknown-option branch never saw one. Refusing
+            // here is a hard stop on purpose - the line was not what the person meant, and a
+            // tool that runs half of it looks broken in whichever half was eaten.
+            string Value(ref int at)
+            {
+                string option = args[at];
+                if (at + 1 >= args.Length || args[at + 1].StartsWith('-'))
+                {
+                    string got = at + 1 < args.Length ? $"\"{args[at + 1]}\"" : "nothing";
+                    Console.Error.WriteLine(
+                        $"{option} needs a value and got {got}. Nothing was started, because "
+                        + "running the rest of the line would silently drop whatever the "
+                        + "missing value swallowed.");
+                    Environment.Exit(2);
+                }
+
+                return args[++at];
+            }
+
             for (int i = 0; i < args.Length; i++)
             {
                 switch (args[i])
                 {
-                    case "--schema" when i + 1 < args.Length:
-                        schema = args[++i];
+                    case "--schema":
+                        schema = Value(ref i);
                         break;
-                    case "--replay" when i + 1 < args.Length:
-                        replay = args[++i];
+                    case "--replay":
+                        replay = Value(ref i);
                         break;
-                    case "--record" when i + 1 < args.Length:
-                        record = args[++i];
+                    case "--record":
+                        record = Value(ref i);
                         break;
                     case "--watch":
                         watch = true;
@@ -1930,8 +1966,8 @@ internal static class Program
                     // Takes a Cheat Engine pointer path as written - "+468C3A8,235C" - so a
                     // finding can be checked without transcribing it into an absolute address
                     // that stops meaning anything the moment the game restarts.
-                    case "--peek" when i + 1 < args.Length:
-                        peek.Add(args[++i]);
+                    case "--peek":
+                        peek.Add(Value(ref i));
                         break;
                     case "--peekwatch":
                         peekWatch = true;
