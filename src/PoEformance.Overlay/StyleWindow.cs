@@ -150,8 +150,10 @@ public sealed class StyleWindow
 
         InterfaceStyle now = editor.Now();
 
-        ImGui.TextColored(DimText, "How this tool's own windows are drawn. What it draws on the");
-        ImGui.TextColored(DimText, "GAME is styled where each feature lives - and on Markers.");
+        ImGuiText.Wrapped(
+            DimText,
+            "How this tool's own windows are drawn. What it draws on the GAME is styled where"
+            + " each feature lives - and on Markers.");
         ImGui.Spacing();
 
         int size = _draftTextSize > 0 ? _draftTextSize : now.TextSizeOr;
@@ -194,8 +196,10 @@ public sealed class StyleWindow
             _unsavedInterface = true;
         }
 
-        ImGui.TextColored(DimText, "The readout is the first page - the one that sits in a corner");
-        ImGui.TextColored(DimText, "while playing. The tools are every other page.");
+        ImGuiText.Wrapped(
+            DimText,
+            "The readout is the first page - the one that sits in a corner while playing."
+            + " The tools are every other page.");
 
         if (now != InterfaceStyle.Default)
         {

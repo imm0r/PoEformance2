@@ -224,7 +224,8 @@ public sealed class RitualWindow
     /// <summary>What each reward is worth, which is what orders the list.</summary>
     private void Weights()
     {
-        ImGui.TextColored(DimText, "what a reward is worth to you - routes are sorted by the sum over their own");
+        ImGuiText.Wrapped(
+            DimText, "what a reward is worth to you - routes are sorted by the sum over their own");
 
         if (!ImGui.BeginChild("ritual-weights", new Vector2(0f, 0f), ImGuiChildFlags.Borders))
         {

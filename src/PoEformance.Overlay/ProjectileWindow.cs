@@ -60,14 +60,11 @@ public sealed class ProjectileWindow
         // a projectile without paying for that.
         if (drawing)
         {
-            ImGui.TextColored(
+            ImGuiText.Hint(
                 WarnText,
-                "    this also makes the reader read the game's VISUAL entities, which is where"
-                + " projectiles are:");
-            ImGui.TextColored(
-                WarnText,
-                "    a recorded Spark session ran 17 gameplay entities against 51 visuals."
-                + " Watch the Read cost tab.");
+                "this also makes the reader read the game's VISUAL entities, which is where"
+                + " projectiles are: a recorded Spark session ran 17 gameplay entities against"
+                + " 51 visuals. Watch the Read cost tab.");
         }
 
         ImGui.SameLine();
@@ -97,25 +94,21 @@ public sealed class ProjectileWindow
         // and if that byte is not set on the projectiles a build spawns, this switch is the
         // difference between an overlay that works and one that draws nothing - with no hint
         // as to which. The list below is where somebody checks before flipping it.
-        ImGui.TextColored(
+        ImGuiText.Hint(
             DimText,
-            "    whose it is comes from one byte - the same one that tells your minions from the"
-            + " monsters.");
-        ImGui.TextColored(
-            DimText,
-            "    check the list below says \"mine\" for your own skills before relying on this.");
+            "whose it is comes from one byte - the same one that tells your minions from the"
+            + " monsters. Check the list below says \"mine\" for your own skills before"
+            + " relying on this.");
 
         ImGui.Separator();
 
         // The same warning the effects tab carries, for the same reason: "projectiles" invites
         // an expectation nothing in memory can meet, and somebody looking for the fire itself
         // would conclude the read is broken rather than that it was never listed.
-        ImGui.TextColored(
+        ImGuiText.Wrapped(
             DimText,
-            "The game's own particles are rendering, not entities - nothing lists a spark.");
-        ImGui.TextColored(
-            DimText,
-            "What is marked is the projectile ENTITY the skill spawns, one per projectile.");
+            "The game's own particles are rendering, not entities - nothing lists a spark."
+            + " What is marked is the projectile ENTITY the skill spawns, one per projectile.");
 
         ImGui.Separator();
         DrawSorts(snapshot);
@@ -149,11 +142,10 @@ public sealed class ProjectileWindow
             }
 
             ImGui.TextColored(DimText, "nothing right now - cast something.");
-            ImGui.TextColored(
+            ImGuiText.Wrapped(
                 DimText,
                 "if a skill of yours never appears here, its entity is filed somewhere other than"
-                + " Metadata/Projectiles;");
-            ImGui.TextColored(DimText, "the Effects tab lists everything else, with paths.");
+                + " Metadata/Projectiles; the Effects tab lists everything else, with paths.");
             return;
         }
 

@@ -128,7 +128,7 @@ public sealed class AtlasWindow
         }
 
         ImGui.SameLine();
-        ImGui.TextColored(
+        ImGuiText.Wrapped(
             DimText,
             _watch.Ratings.Count > 0
                 ? $"{_watch.Ratings.Count} maps rated out of {_watch.Ratings.Best}"

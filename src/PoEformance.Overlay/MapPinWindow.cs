@@ -47,7 +47,10 @@ public sealed class MapPinWindow
         if (pins.Count == 0)
         {
             ImGui.TextColored(WarnText, "no pins read");
-            ImGui.TextColored(DimText, "MapPins is optional - the quest steps work without it. See the Quests tab for why it did not open.");
+            ImGuiText.Wrapped(
+                DimText,
+                "MapPins is optional - the quest steps work without it. See the Quests tab for"
+                + " why it did not open.");
             return;
         }
 
@@ -64,7 +67,7 @@ public sealed class MapPinWindow
         ImGui.TextColored(ActText, $"every condition met: {all}");
         ImGui.SameLine();
         ImGui.TextColored(ActText, $"   any condition met: {any}");
-        ImGui.TextColored(
+        ImGuiText.Wrapped(
             DimText,
             "what the five flag columns mean is not known - count the pins your world map draws"
             + " and see which of these two it matches");

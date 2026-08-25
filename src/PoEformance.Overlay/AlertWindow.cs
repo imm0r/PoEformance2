@@ -130,7 +130,7 @@ public sealed class AlertWindow
 
         if (_rules.Count == 0)
         {
-            ImGui.TextColored(DimText, "nothing watched for - add a rule below, or delete the file to start over");
+            ImGuiText.Wrapped(DimText, "nothing watched for - add a rule below, or delete the file to start over");
         }
 
         ImGui.Separator();

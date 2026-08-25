@@ -49,6 +49,9 @@ public sealed class EntityBrowserWindow
 
     private ulong _selected;
     private string _filter = string.Empty;
+
+    /// <summary>Where the list ends and the components begin. Draggable; 0.4 was the old 360px.</summary>
+    private readonly PaneSplit _split = new(0.4f);
     private int _surveySequence;
     private bool _surveyPane;
 
@@ -106,7 +109,7 @@ public sealed class EntityBrowserWindow
         else
         {
             DrawList(listed, player);
-            ImGui.SameLine();
+            _split.Bar();
             DrawComponents(view);
         }
 
@@ -188,7 +191,7 @@ public sealed class EntityBrowserWindow
             // the position key this rule no longer uses, and a line that documents a rule
             // nobody applies any more is worse than no line: it is what the next person
             // reads instead of the code.
-            ImGui.TextColored(
+            ImGuiText.Wrapped(
                 DimText,
                 $"{snapshot.Collapsed} repeat entities dropped this read - the game gives one"
                 + " monster several entities over one set of components");
@@ -236,7 +239,7 @@ public sealed class EntityBrowserWindow
     {
         // BeginChild is paired with EndChild whatever it returns, and the finally is there
         // for the same reason the window's is.
-        ImGui.BeginChild("entities", new Vector2(360f, 0f), ImGuiChildFlags.Borders);
+        ImGui.BeginChild("entities", new Vector2(_split.Left(), 0f), ImGuiChildFlags.Borders);
 
         try
         {
