@@ -1149,7 +1149,10 @@ internal static class Program
         // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
         // are decided once per read, so asking here would both cost a re-evaluation per frame
         // and let an interval condition consume its timer sixty times a second.
-        overlay.AttachRules(() => ruleEngine.LastTick.Drawings, () => ruleEngine.LastPreview);
+        overlay.AttachRules(
+            () => ruleEngine.LastTick.Drawings,
+            () => ruleEngine.LastPreview,
+            () => ruleEngine.LastPreviewFacts);
         overlay.ShowDiagnostics = debug;
         overlay.ShowCalibration = debug;
         overlay.ShowWorldDots = debug;

@@ -60,18 +60,45 @@ public sealed class RuleLayer
     /// as an ellipse on screen because the projection puts it there, which is the shape the
     /// measurement actually has.
     /// </remarks>
+    /// <summary>A leaf whose number could not be read - its own colour, not a failure's.</summary>
+    private const uint FactUnknown = 0xC0B0_B0B0;
+
     public void DrawRanges(
         ImDrawListPtr draw,
         IReadOnlyList<PreviewRing> rings,
         WorldSnapshot snapshot,
         (float X, float Y)? cursor,
         int width,
-        int height)
+        int height,
+        IReadOnlyList<PreviewFact>? facts = null)
     {
         ArgumentNullException.ThrowIfNull(rings);
         ArgumentNullException.ThrowIfNull(snapshot);
 
-        if (rings.Count == 0 || width <= 0 || height <= 0 || snapshot.Player is not WorldEntity player)
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
+        // The whole rule as a checklist, before the rings and independent of them: the rings
+        // carry the two range counters, and somebody watching a rule that will not fire was
+        // left guessing which of the OTHER conditions was the one saying no. Left edge, above
+        // half height - clear of the quest tracker on the right and the bars below.
+        if (facts is { Count: > 0 })
+        {
+            var at = new Vector2(12f, height * 0.28f);
+            float line = ImGui.GetFontSize() + 3f;
+            foreach (PreviewFact fact in facts)
+            {
+                uint colour = fact.Holds ? RingHolds : fact.Known ? RingWaits : FactUnknown;
+                string text = (fact.Holds ? "+ " : fact.Known ? "- " : "? ") + fact.Label;
+                draw.AddText(at + new Vector2(ShadowOffset, ShadowOffset), Shadow, text);
+                draw.AddText(at, colour, text);
+                at.Y += line;
+            }
+        }
+
+        if (rings.Count == 0 || snapshot.Player is not WorldEntity player)
         {
             return;
         }

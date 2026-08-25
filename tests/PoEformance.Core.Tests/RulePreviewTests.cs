@@ -159,4 +159,72 @@ public class RulePreviewTests
         engine.Evaluate(state, 200);
         Assert.Empty(engine.LastPreview);
     }
+
+    [Fact]
+    public void EveryLeafIsListedWithItsVerdict()
+    {
+        // The rings carry the range counters; everything else in the rule was invisible, so
+        // somebody watching a rule that will not fire was left guessing which of the other
+        // conditions was the one saying no.
+        RuleCondition condition = RuleCondition.All(
+            RuleCondition.Of(RuleFact.InMap),
+            RuleCondition.Of(RuleFact.Mana, Compare.AtLeast, 2500),
+            new RuleCondition { Fact = RuleFact.HasBuff, Text = "lightning_infusion", Negate = true });
+
+        RuleState state = Fighting() with
+        {
+            InTown = false,
+            InHideout = false,
+            Vitals = new Vitals(new Vital(100, 100, 0, 0), new Vital(5746, 5746, 0, 0), default),
+        };
+        IReadOnlyList<PreviewFact> facts = RulePreview.Facts(condition, state);
+
+        Assert.Equal(3, facts.Count);
+
+        Assert.Equal("InMap", facts[0].Label);
+        Assert.True(facts[0].Holds);
+
+        Assert.Equal("Mana = 5746, needs >= 2500", facts[1].Label);
+        Assert.True(facts[1].Holds);
+        Assert.True(facts[1].Known);
+
+        // The buff is not on, and the leaf is negated - so it HOLDS, and says what it asked.
+        Assert.Equal("not HasBuff(lightning_infusion)", facts[2].Label);
+        Assert.True(facts[2].Holds);
+    }
+
+    [Fact]
+    public void AnUnreadableNumberIsItsOwnState()
+    {
+        // "Mana = -, needs >= 2500" is a different problem from "Mana = 1900, needs >= 2500".
+        // The engine treats both as "does not hold"; a person debugging must see which.
+        RuleCondition condition = RuleCondition.Of(RuleFact.Mana, Compare.AtLeast, 2500);
+        IReadOnlyList<PreviewFact> facts = RulePreview.Facts(condition, Fighting());
+
+        PreviewFact mana = Assert.Single(facts);
+        Assert.False(mana.Holds);
+        Assert.False(mana.Known);
+        Assert.StartsWith("Mana = -", mana.Label, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ARangeLeafCarriesItsRadiusInTheLabel()
+    {
+        RuleCondition condition = new()
+        {
+            Fact = RuleFact.MonsterCountAtCursor, Argument = 450, Compare = Compare.AtLeast, Value = 3,
+        };
+
+        IReadOnlyList<PreviewFact> facts = RulePreview.Facts(condition, Fighting());
+        Assert.Contains("(450u)", Assert.Single(facts).Label, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheListIsBounded()
+    {
+        RuleCondition condition = RuleCondition.All(
+            [.. Enumerable.Range(0, RulePreview.MaxFacts * 2).Select(_ => RuleCondition.Of(RuleFact.InMap))]);
+
+        Assert.Equal(RulePreview.MaxFacts, RulePreview.Facts(condition, Fighting()).Count);
+    }
 }

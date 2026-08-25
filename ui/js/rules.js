@@ -232,6 +232,14 @@ export class RulesPanel {
    * it was before both.
    */
   save(settings, redraw = true) {
+    // NEVER FROM A PANEL THAT HOLDS NOTHING. Before the first state arrives this.settings is
+    // null, and {...null, enabled: true} is a legal spread - so one reflexive click on a
+    // toolbar switch in a dead panel posted a settings object with every other field missing,
+    // which the host filled with defaults, normalised and SAVED. That is how a broken state
+    // feed became a wiped rules file: the page's death turned into the data's death. With no
+    // state ever received there is nothing meaningful to change, so refusing costs nothing.
+    if (!this.settings) return;
+
     this.claim();
     this.settings = settings;
     bridge.send({ type: "setRuleSettings", payload: settings });

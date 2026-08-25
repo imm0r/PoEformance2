@@ -422,6 +422,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     /// <summary>The ranges the rule being edited measures, for the debug view.</summary>
     private Func<IReadOnlyList<PreviewRing>>? _ruleRanges;
+    private Func<IReadOnlyList<PreviewFact>>? _ruleFacts;
     private readonly UnwalkedLayer _unwalked = new();
     private readonly HeatLayer _heat = new();
     private readonly EffectLayer _effects = new();
@@ -920,11 +921,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public void AttachRules(
         Func<IReadOnlyList<RuleDrawing>> drawings,
-        Func<IReadOnlyList<PreviewRing>>? ranges = null)
+        Func<IReadOnlyList<PreviewRing>>? ranges = null,
+        Func<IReadOnlyList<PreviewFact>>? facts = null)
     {
         ArgumentNullException.ThrowIfNull(drawings);
         _ruleDrawings = drawings;
         _ruleRanges = ranges;
+        _ruleFacts = facts;
     }
 
     public void AttachAtlas(AtlasWatch watch, Action<AtlasSettings> saved, bool visible = false)
@@ -1465,7 +1468,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 _snapshot,
                 GameWindowTracker.CursorInClient(_gameWindow),
                 width,
-                height);
+                height,
+                _ruleFacts?.Invoke());
         }
 
         // Nothing to mark in a town or a hideout, and a screen full of markers over the
