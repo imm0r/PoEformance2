@@ -113,6 +113,9 @@ public sealed class RuleEngine
     /// <summary>The ranges to draw over the game, from the last tick. Empty when off.</summary>
     public IReadOnlyList<PreviewRing> LastPreview { get; private set; } = [];
 
+    /// <summary>Every leaf of the previewed rule with its current verdict. Empty when off.</summary>
+    public IReadOnlyList<PreviewFact> LastPreviewFacts { get; private set; } = [];
+
     /// <summary>How many times any rule has acted since the engine started.</summary>
     public int Acted { get; private set; }
 
@@ -161,17 +164,17 @@ public sealed class RuleEngine
         // when the overlay asks: the renderer draws far more often than a snapshot arrives, so
         // asking there would re-read the same facts sixty times a second - and the numbers on
         // the rings would be a different moment from the one the rule acted on.
-        LastPreview = Ringed(state);
+        (LastPreview, LastPreviewFacts) = Previewed(state);
         return tick;
     }
 
-    /// <summary>The ranges the rule being edited measures, or none when nothing is being edited.</summary>
-    private IReadOnlyList<PreviewRing> Ringed(RuleState state)
+    /// <summary>What the rule being edited measures and asks, or nothing when nothing is edited.</summary>
+    private (IReadOnlyList<PreviewRing> Rings, IReadOnlyList<PreviewFact> Facts) Previewed(RuleState state)
     {
         string id = _previewRuleId;
         if (id.Length == 0 || _settings.Current is not RuleProfile profile)
         {
-            return [];
+            return ([], []);
         }
 
         foreach (RuleGroup group in profile.Groups)
@@ -183,12 +186,12 @@ public sealed class RuleEngine
                     // Whether the rule is ENABLED does not matter here. A rule is switched off
                     // for most of the time it is being built, and refusing to show its ranges
                     // then would take the tool away exactly when it is wanted.
-                    return RulePreview.Rings(rule.Condition, state);
+                    return (RulePreview.Rings(rule.Condition, state), RulePreview.Facts(rule.Condition, state));
                 }
             }
         }
 
-        return [];
+        return ([], []);
     }
 
     private RuleTick Decide(RuleState state, long nowMs)
