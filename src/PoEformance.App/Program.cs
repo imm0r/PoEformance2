@@ -234,7 +234,8 @@ internal static class Program
                 overlaySettings, ruleEngine, buffWatch, overlayHandle, alwaysOnTop: options.ShowOverlay)
             : null;
 
-        if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
+        bool overlayRuns = options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0;
+        if (overlayRuns)
         {
             // The letterbox bar width. UI positions are scaled by the window MINUS these
             // bars and then shifted by one, so a missing cull misplaces every UI-derived
@@ -261,6 +262,19 @@ internal static class Program
                 fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
                 areaCounter: result.Statics.FirstOrDefault(s => s.Name == "AreaChangeCounter" && s.Found)?.Address ?? 0,
                 recorder: recorder);
+        }
+        else if (gameStatesAddress != 0 && options.ReplayPath is null
+                 && (options.ShowConfig || options.AutoFlask))
+        {
+            // The rules and auto-flask WITHOUT the overlay. They used to live only inside
+            // RunOverlay's read loop, which quietly made --overlay a precondition for every
+            // form of automation: --config alone gave a settings window whose rules said
+            // "not started" forever, and --autoflask alone did nothing at all. The AHK tool
+            // this replaces never had an overlay, so the coupling was an accident of where
+            // the code happened to sit, not a design.
+            RunRulesWithoutOverlay(
+                reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow,
+                autoFlask, ruleEngine, ruleHistory, buffWatch, overlayHandle, configWindow);
         }
 
         configWindow?.Join();
@@ -573,6 +587,93 @@ internal static class Program
         {
             get => Volatile.Read(ref _feed);
             set => Volatile.Write(ref _feed, value);
+        }
+    }
+
+    /// <summary>
+    /// The reader loop for a session with no overlay: rules, buffs and auto-flask, nothing drawn.
+    /// </summary>
+    /// <remarks>
+    /// The same decisions as the overlay's loop, at the same 33ms cadence, minus everything
+    /// that exists to be painted - terrain, icons, the atlas, the stash. Drawn rule effects
+    /// still come out of the engine and simply have no consumer, which is the effects model
+    /// working as designed: the engine decides, consumers take what they can show.
+    ///
+    /// Runs on the main thread's watch but the reads happen on the feed's own thread, so the
+    /// config window's once-a-second snapshot read coexists with it exactly as it does with
+    /// the overlay's loop. The feed is published on the handle for the rules panel's health
+    /// line, and disposed only after the config window closes - a panel that outlives the
+    /// reader it reports on would end the session with a lie on screen.
+    /// </remarks>
+    private static void RunRulesWithoutOverlay(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow,
+        PoEformance.Features.AutoFlask autoFlask,
+        PoEformance.Features.RuleEngine ruleEngine,
+        PoEformance.Features.RuleHistory ruleHistory,
+        PoEformance.Features.BuffWatch buffWatch,
+        OverlayHandle handle,
+        Thread? configWindow)
+    {
+        var world = new PoEformance.Game.World.WorldReader(reader, schema);
+
+        using var feed = new PoEformance.Features.SnapshotFeed(
+            _ =>
+            {
+                PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic);
+
+                PoEformance.Features.FlaskTick tick = autoFlask.Evaluate(
+                    snapshot.PlayerVitals,
+                    InputSender.IsForeground(gameWindow),
+                    Environment.TickCount64,
+                    snapshot.PlayerBuffs,
+                    snapshot.FlaskBelt,
+                    snapshot.State == PoEformance.Core.Diagnostics.GameStateKind.InGame);
+                foreach (PoEformance.Features.FlaskUse use in tick.Used)
+                {
+                    InputSender.Press(use.Rule.Key);
+                }
+
+                PoEformance.Features.PointerView? pointer = null;
+                PoEformance.Overlay.ClientRect client =
+                    PoEformance.Overlay.GameWindowTracker.TryGet(gameWindow);
+                if (client.IsValid
+                    && PoEformance.Overlay.GameWindowTracker.CursorInClient(gameWindow) is (float cx, float cy))
+                {
+                    pointer = new PoEformance.Features.PointerView(cx, cy, client.Width, client.Height);
+                }
+
+                buffWatch.Look(snapshot.PlayerBuffs, Environment.TickCount64);
+
+                Perform(ruleEngine.Evaluate(
+                    PoEformance.Features.RuleState.From(
+                        snapshot,
+                        InputSender.IsForeground(gameWindow),
+                        ruleHistory,
+                        Environment.TickCount64,
+                        pointer),
+                    Environment.TickCount64));
+
+                return snapshot;
+            },
+            TimeSpan.FromMilliseconds(33));
+
+        handle.Feed = feed;
+
+        Console.WriteLine();
+        Console.WriteLine("rules running without the overlay - keys, mouse and sounds work; captions,");
+        Console.WriteLine("bars and the in-game range drawings need --overlay.");
+
+        if (configWindow is not null)
+        {
+            configWindow.Join();
+            return;
+        }
+
+        // --autoflask with neither window: nothing will ever join, so a key ends it.
+        Console.WriteLine("any key stops.");
+        while (!KeyPressed())
+        {
+            Thread.Sleep(200);
         }
     }
 
@@ -1587,17 +1688,17 @@ internal static class Program
     {
         if (handle.Feed is not PoEformance.Features.SnapshotFeed feed)
         {
-            // WHICH PROCESS, because the first version of this line said "the rules only run
+            // WHICH PROCESS, because an earlier version of this line said "the rules only run
             // with the overlay" to somebody who had started the tool with --overlay and could
             // see it drawing. Both halves can be true at once: an overlay drawn by one instance
-            // and a config window belonging to another. The overlay object is published from
-            // the same method as the feed and a few lines later, so "no feed but an overlay" is
-            // a fault in this process while "neither" means this process never ran one.
+            // and a config window belonging to another. Since the rules gained their own loop
+            // the reader exists whenever this process attached, so no feed here means it never
+            // did - the game was not running when this instance started, or this is a replay.
             int id = Environment.ProcessId;
             return handle.Overlay is null
-                ? $"no reader thread in this process (pid {id}), and no overlay here either - "
-                  + "the rules run only with --overlay, and an overlay you can see may belong "
-                  + "to another instance"
+                ? $"no reader in this process (pid {id}) - it starts when the tool attaches, "
+                  + "so start the game first and this tool after; an overlay you can see may "
+                  + "belong to another instance"
                 : $"the overlay is up in this process (pid {id}) but published no reader - "
                   + "that is a fault here, not a missing switch";
         }
