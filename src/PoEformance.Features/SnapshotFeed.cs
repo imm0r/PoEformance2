@@ -49,6 +49,7 @@ public sealed class SnapshotFeed : IDisposable
     private long _readCount;
     private long _failureCount;
     private long _lastReadTicks;
+    private string _lastFailure = string.Empty;
 
     /// <summary>Starts the reader thread.</summary>
     /// <param name="read">Reads one snapshot. Called only on the feed's thread.</param>
@@ -83,6 +84,17 @@ public sealed class SnapshotFeed : IDisposable
     /// </summary>
     public long FailureCount => Interlocked.Read(ref _failureCount);
 
+    /// <summary>What the last swallowed exception was, or empty when nothing has thrown.</summary>
+    /// <remarks>
+    /// A COUNT WITHOUT A MESSAGE IS NOT A DIAGNOSTIC. Catching here is right - a stale pointer
+    /// during a zone change must not end the feed - but the catch used to record only that
+    /// something had happened, and everything the callback does after the throw simply stopped
+    /// happening. From the outside that is indistinguishable from a feature that was never
+    /// wired up: the rules said "not started", the buff list stayed empty, and the overlay went
+    /// on drawing the last good snapshot, so nothing anywhere said a word about an exception.
+    /// </remarks>
+    public string LastFailure => Volatile.Read(ref _lastFailure);
+
     /// <summary>Tells the reader which viewport the renderer is drawing into.</summary>
     /// <remarks>
     /// Called every frame, so it publishes only on a change. The comparison is against a
@@ -111,12 +123,23 @@ public sealed class SnapshotFeed : IDisposable
                 Volatile.Write(ref _latest, snapshot);
                 Interlocked.Increment(ref _readCount);
             }
-            catch (Exception) when (!_cancellation.IsCancellationRequested)
+            catch (Exception exception) when (!_cancellation.IsCancellationRequested)
             {
                 // A read that throws must not end the feed. Pointers go stale on every zone
                 // change, and the correct response is to keep the last good snapshot and
                 // try again - a dead reader thread would be a far worse outcome than a
                 // frame of slightly old data.
+                //
+                // But it is WRITTEN DOWN. Everything the callback does after the throw - the
+                // rules, the buff list, the damage meter - simply stops happening, and with
+                // only a counter to go on that is indistinguishable from a feature nobody
+                // wired up. The throwing frame is kept because the message alone rarely says
+                // which of a dozen services on this thread it came out of.
+                // The MESSAGE first, then the count. Anything watching notices the count and
+                // then goes looking for the reason, so incrementing first leaves a window in
+                // which a failure is visible and unexplained - which is the state this whole
+                // field exists to abolish.
+                Volatile.Write(ref _lastFailure, Describe(exception));
                 Interlocked.Increment(ref _failureCount);
             }
 
@@ -131,6 +154,39 @@ public sealed class SnapshotFeed : IDisposable
                 _cancellation.Token.WaitHandle.WaitOne(remaining);
             }
         }
+    }
+
+    /// <summary>One line naming the exception and the frame it came out of.</summary>
+    /// <remarks>
+    /// Public because it is the format the config window shows, and a format nobody can test
+    /// is a format that quietly stops naming the frame.
+    /// </remarks>
+    public static string Describe(Exception exception)
+    {
+        ArgumentNullException.ThrowIfNull(exception);
+
+        // The DEEPEST frame, which is where it actually went wrong - the top of the stack
+        // string is the read callback every time and says nothing.
+        string where = string.Empty;
+        string? stack = exception.StackTrace;
+        if (!string.IsNullOrEmpty(stack))
+        {
+            string[] lines = stack.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            where = lines[0].Trim();
+            if (where.StartsWith("at ", StringComparison.Ordinal))
+            {
+                where = where[3..];
+            }
+
+            int file = where.IndexOf(" in ", StringComparison.Ordinal);
+            if (file >= 0)
+            {
+                where = where[..file];
+            }
+        }
+
+        string what = $"{exception.GetType().Name}: {exception.Message}";
+        return where.Length > 0 ? $"{what} - in {where}" : what;
     }
 
     public void Dispose()
