@@ -109,4 +109,103 @@ public class WorldToScreenTests
     {
         Assert.False(WorldToScreen.Project([1, 2, 3], 0, 0, 0, Width, Height).OnScreen);
     }
+
+    /// <summary>
+    /// A camera that is TILTED and off-axis, so a round trip is a real test.
+    /// </summary>
+    /// <remarks>
+    /// The identity would pass a projection that swapped its columns, mixed up its signs or
+    /// dropped the perspective divide, because every one of those is a no-op on it. This one
+    /// has a different scale per axis, a z that feeds screen y (the tilt), a translation and a
+    /// perspective w - so each of those mistakes moves the answer.
+    ///
+    /// Column-major, matching the reading Project() uses: element i of the clip vector is a dot
+    /// with elements {i, i+4, i+8, i+12}.
+    /// </remarks>
+    private static float[] Tilted =>
+    [
+        // column for clip.x        clip.y      clip.z    clip.w
+        0.031f, 0.019f, 0f, 0.0004f,
+        -0.028f, 0.021f, 0f, -0.0003f,
+        0f, -0.041f, 1f, 0f,
+        0.05f, -0.12f, 0f, 1.6f,
+    ];
+
+    [Theory]
+    [InlineData(0f, 0f, 0f)]
+    [InlineData(37f, -18f, 0f)]
+    [InlineData(-64f, 51f, 12f)]
+    [InlineData(120f, 120f, -8f)]
+    public void ProjectingAPointAndUnProjectingItGivesThePointBack(float x, float y, float z)
+    {
+        // The check that pins the inverse: a wrong column, a sign or a missed divide all
+        // survive an identity matrix and none of them survives this.
+        ScreenPoint screen = WorldToScreen.Project(Tilted, x, y, z, Width, Height);
+
+        (float X, float Y)? back = WorldToScreen.OnGround(Tilted, screen.X, screen.Y, z, Width, Height);
+
+        Assert.NotNull(back);
+        Assert.Equal(x, back!.Value.X, 2);
+        Assert.Equal(y, back.Value.Y, 2);
+    }
+
+    [Fact]
+    public void ACircleOnTheGroundIsNotACircleOnTheScreen()
+    {
+        // The whole reason a cursor radius is measured in the world rather than in pixels. A
+        // round area on the ground projects to an ELLIPSE, so a screen-pixel circle around the
+        // cursor covers a ground region stretched away from the camera - a different shape
+        // from the one any skill has.
+        const float radius = 50f;
+        float widest = 0f;
+        float tallest = 0f;
+
+        ScreenPoint centre = WorldToScreen.Project(Tilted, 0, 0, 0, Width, Height);
+        for (int step = 0; step < 64; step++)
+        {
+            float angle = step / 64f * MathF.Tau;
+            ScreenPoint edge = WorldToScreen.Project(
+                Tilted, radius * MathF.Cos(angle), radius * MathF.Sin(angle), 0, Width, Height);
+
+            widest = MathF.Max(widest, MathF.Abs(edge.X - centre.X));
+            tallest = MathF.Max(tallest, MathF.Abs(edge.Y - centre.Y));
+        }
+
+        Assert.True(widest > tallest * 1.2f,
+            $"a ground circle should project wider than it is tall, got {widest:F1} x {tallest:F1}");
+    }
+
+    [Fact]
+    public void APixelPointingPastTheHorizonHasNoGroundPoint()
+    {
+        // The ray meets the plane behind the viewer. The algebra hands back that point
+        // happily, and it projects to a plausible pixel - so it is refused here rather than
+        // left to a caller to notice.
+        float[] behind =
+        [
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, -1,
+        ];
+
+        Assert.Null(WorldToScreen.OnGround(behind, Width / 2f, Height / 2f, 0, Width, Height));
+    }
+
+    [Fact]
+    public void ADegenerateViewHasNoAnswerRatherThanAHugeOne()
+    {
+        // A matrix that says nothing about y: every pixel names a line, not a point. A
+        // near-zero divisor would hand back an enormous coordinate, which looks like a
+        // position rather than like a failure.
+        float[] flat =
+        [
+            1, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1,
+        ];
+
+        Assert.Null(WorldToScreen.OnGround(flat, 100, 100, 0, Width, Height));
+    }
 }

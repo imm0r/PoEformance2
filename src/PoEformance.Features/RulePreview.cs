@@ -4,9 +4,8 @@ namespace PoEformance.Features;
 /// One radius a rule measures, drawn over the game while it is being built.
 /// </summary>
 /// <param name="AtCursor">
-/// Whether the ring is centred on the cursor, in screen pixels, rather than on the player, in
-/// world units. The two are not interchangeable and a ring that did not say which it was would
-/// be worse than no ring - see <see cref="FactArgument.Pixels"/>.
+/// Whether the ring is centred on where the cursor points rather than on the player. Both are
+/// circles of world units on the ground; only the centre differs.
 /// </param>
 /// <param name="Reads">What the fact answers right now.</param>
 /// <param name="Holds">Whether the comparison in the rule is satisfied by that answer.</param>
@@ -73,7 +72,7 @@ public static class RulePreview
         }
 
         FactInfo info = RuleFacts.Describe(node.Fact);
-        if (info.Argument is not (FactArgument.Distance or FactArgument.Pixels))
+        if (info.Argument != FactArgument.Distance)
         {
             return;
         }
@@ -81,7 +80,7 @@ public static class RulePreview
         double? reads = RuleFacts.Answer(node, state);
 
         found.Add(new PreviewRing(
-            AtCursor: info.Argument == FactArgument.Pixels,
+            AtCursor: info.AtCursor,
             Radius: node.Argument,
 
             // What it reads first, because that is the number somebody is watching change;

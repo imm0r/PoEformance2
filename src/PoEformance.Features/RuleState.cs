@@ -199,29 +199,40 @@ public sealed record RuleState
     /// <summary>How many live rares and uniques are within a distance of the player.</summary>
     public int RareOrUniqueCountWithin(double distance) => CountWithin(distance, RareOrUnique);
 
-    /// <summary>Where the mouse is, or null when it is not over the game.</summary>
-    public PointerView? Pointer { get; init; }
+    /// <summary>
+    /// Where on the ground the cursor is pointing, or null when it is not over the game.
+    /// </summary>
+    /// <remarks>
+    /// The screen pixel run back through the camera matrix onto the plane at the PLAYER's
+    /// height - see <see cref="WorldToScreen.OnGround"/>. Which is also its limit: on a ledge
+    /// or a staircase the ground is not at that height, and the point lands where that plane
+    /// is rather than where the floor is.
+    /// </remarks>
+    public (float X, float Y)? CursorGround { get; init; }
 
     /// <summary>
-    /// How many live monsters are drawn within a radius of the CURSOR, in pixels.
+    /// How many live monsters are within a radius of where the CURSOR is pointing.
     /// </summary>
     /// <remarks>
     /// The question a targeted skill actually asks. "Three monsters near me" and "three
     /// monsters where I am aiming" are different rules, and for anything placed at the cursor
     /// - a wall, a ground effect, a targeted blast - only the second one is about the skill.
-    /// Ported from the AHK tool's cursor radius mode, which is the half of its monster count
-    /// that has no equivalent in the reference plugin at all.
+    /// Ported from the AHK tool's cursor radius, which is the half of its monster count that
+    /// has no equivalent in the reference plugin at all.
     ///
-    /// In PIXELS, and that is a real limitation rather than an oversight: it is a radius on
-    /// the screen, so it covers more ground when the camera is zoomed out and the number does
-    /// not transfer between two people at different resolutions.
+    /// IN WORLD UNITS, measured from the cursor's ground point, and that is a correction to
+    /// how this shipped. It was a radius in screen PIXELS, which is what the AHK tool's plain
+    /// cursor mode does - and a circle on the screen is an ELLIPSE on the ground, stretched
+    /// away from the camera by the tilt. So a pixel radius counts monsters in a region no
+    /// skill has, and the number moves with the resolution and the zoom besides. The AHK tool
+    /// has the world-space mode too, and that is the one worth having.
     /// </remarks>
-    public int MonsterCountAtCursor(double pixels) => CountAtCursor(pixels, null);
+    public int MonsterCountAtCursor(double distance) => CountAtCursor(distance, null);
 
-    /// <summary>How many live rares and uniques are drawn within a radius of the cursor.</summary>
-    public int RareOrUniqueCountAtCursor(double pixels) => CountAtCursor(pixels, RareOrUnique);
+    /// <summary>How many live rares and uniques are within a radius of the cursor's ground point.</summary>
+    public int RareOrUniqueCountAtCursor(double distance) => CountAtCursor(distance, RareOrUnique);
 
-    /// <summary>Pixels from the cursor to the nearest live monster, or null when there is none.</summary>
+    /// <summary>World units from the cursor to the nearest live monster, or null when there is none.</summary>
     /// <remarks>
     /// Answers "am I aiming at anything at all", which is the companion to the counts: a rule
     /// can hold fire until the pointer is actually over a fight rather than over the floor.
@@ -230,7 +241,7 @@ public sealed record RuleState
     {
         get
         {
-            if (Pointer is not PointerView at)
+            if (CursorGround is not (float cx, float cy))
             {
                 return null;
             }
@@ -238,10 +249,7 @@ public sealed record RuleState
             double nearest = double.MaxValue;
             foreach (NearMonster monster in Monsters)
             {
-                if (monster.OnScreen)
-                {
-                    nearest = Math.Min(nearest, Pixels(monster, at));
-                }
+                nearest = Math.Min(nearest, Away(monster, cx, cy));
             }
 
             return nearest == double.MaxValue ? null : nearest;
@@ -298,10 +306,18 @@ public sealed record RuleState
             Vitals = snapshot.PlayerVitals,
             Buffs = snapshot.PlayerBuffs,
             Belt = snapshot.FlaskBelt,
-            Pointer = pointer is PointerView view && view.IsValid ? view : null,
-            Monsters = NearbyMonsters(snapshot, player, pointer),
+            CursorGround = OnGround(snapshot, player, pointer),
+            Monsters = NearbyMonsters(snapshot, player),
         };
     }
+
+    /// <summary>Where the cursor is pointing on the plane at the player's height.</summary>
+    private static (float X, float Y)? OnGround(
+        WorldSnapshot snapshot, WorldEntity? player, PointerView? pointer)
+        => pointer is PointerView view && view.IsValid && player is WorldEntity at
+            ? WorldToScreen.OnGround(
+                snapshot.Matrix, view.X, view.Y, at.WorldZ, view.Width, view.Height)
+            : null;
 
     /// <summary>
     /// The live monsters around the player, nearest first.
@@ -315,20 +331,13 @@ public sealed record RuleState
     /// Nothing filters remembered entities here because nothing that MOVES is ever remembered
     /// (see <see cref="EntityMemory"/>), so a monster cannot arrive from that half of the list.
     /// </remarks>
-    private static List<NearMonster> NearbyMonsters(
-        WorldSnapshot snapshot, WorldEntity? player, PointerView? pointer)
+    private static List<NearMonster> NearbyMonsters(WorldSnapshot snapshot, WorldEntity? player)
     {
         var found = new List<NearMonster>();
         if (player is not WorldEntity at)
         {
             return found;
         }
-
-        // Projected only when a cursor rule could want it. The matrix multiply is cheap, but
-        // it is per monster per read and buys nothing at all while nobody is aiming.
-        bool project = pointer is PointerView view && view.IsValid;
-        int width = pointer?.Width ?? 0;
-        int height = pointer?.Height ?? 0;
 
         foreach (WorldEntity entity in snapshot.Entities)
         {
@@ -343,21 +352,9 @@ public sealed record RuleState
 
             float dx = entity.WorldX - at.WorldX;
             float dy = entity.WorldY - at.WorldY;
-            var near = new NearMonster(MathF.Sqrt((dx * dx) + (dy * dy)), entity.Rarity);
 
-            if (project)
-            {
-                // The monster's BASE, not the top of its model. A cursor rule is about where a
-                // skill would land, and the game places one on the ground the monster stands
-                // on - the model height is what a health bar wants, and it is a different
-                // question by tens of pixels on a large monster.
-                ScreenPoint point = WorldToScreen.Project(
-                    snapshot.Matrix, entity.WorldX, entity.WorldY, entity.WorldZ, width, height);
-
-                near = near with { ScreenX = point.X, ScreenY = point.Y, OnScreen = point.OnScreen };
-            }
-
-            found.Add(near);
+            found.Add(new NearMonster(
+                MathF.Sqrt((dx * dx) + (dy * dy)), entity.Rarity, entity.WorldX, entity.WorldY));
         }
 
         found.Sort(static (left, right) => left.Distance.CompareTo(right.Distance));
@@ -378,9 +375,9 @@ public sealed record RuleState
         return total;
     }
 
-    private int CountAtCursor(double pixels, Func<ItemRarity, bool>? matches)
+    private int CountAtCursor(double distance, Func<ItemRarity, bool>? matches)
     {
-        if (Pointer is not PointerView at)
+        if (CursorGround is not (float cx, float cy))
         {
             return 0;
         }
@@ -388,11 +385,10 @@ public sealed record RuleState
         int total = 0;
         foreach (NearMonster monster in Monsters)
         {
-            // Not sorted by this measure - the list is ordered by world distance - so every
-            // monster is looked at rather than the walk stopping at the first one out of range.
-            if (monster.OnScreen
-                && Pixels(monster, at) <= pixels
-                && (matches is null || matches(monster.Rarity)))
+            // Not sorted by this measure - the list is ordered by distance from the PLAYER -
+            // so every monster is looked at rather than the walk stopping at the first one out
+            // of range.
+            if (Away(monster, cx, cy) <= distance && (matches is null || matches(monster.Rarity)))
             {
                 total++;
             }
@@ -401,10 +397,10 @@ public sealed record RuleState
         return total;
     }
 
-    private static double Pixels(NearMonster monster, PointerView pointer)
+    private static double Away(NearMonster monster, float x, float y)
     {
-        double dx = monster.ScreenX - pointer.X;
-        double dy = monster.ScreenY - pointer.Y;
+        double dx = monster.WorldX - x;
+        double dy = monster.WorldY - y;
         return Math.Sqrt((dx * dx) + (dy * dy));
     }
 
@@ -481,21 +477,12 @@ public sealed record RuleState
 /// may since have been freed.
 /// </remarks>
 /// <param name="Distance">World units from the player.</param>
-/// <param name="ScreenX">
-/// Where the monster is drawn, for the rules that measure from the CURSOR. Only meaningful
-/// when <paramref name="OnScreen"/> is set.
-/// </param>
-/// <param name="OnScreen">
-/// Whether the projection landed in front of the camera and inside the viewport. Carried
-/// rather than inferred from the coordinates, because a point behind the camera projects to a
-/// perfectly plausible pixel - which is the historic projection bug in miniature.
-/// </param>
+/// <param name="WorldX">Where it stands, for the rules that measure from somewhere else.</param>
 public readonly record struct NearMonster(
     double Distance,
     ItemRarity Rarity,
-    float ScreenX = 0,
-    float ScreenY = 0,
-    bool OnScreen = false);
+    float WorldX = 0,
+    float WorldY = 0);
 
 /// <summary>Where the mouse is, in the pixels the projection produces.</summary>
 /// <remarks>

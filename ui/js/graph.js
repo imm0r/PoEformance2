@@ -32,23 +32,34 @@ const COMPARE_LABELS = {
 /** Where a box's ports sit, as a share of its height. Kept here so wires and dots agree. */
 const PORT_Y = 0.5;
 
+/** The widths the stylesheet gives a box, for the moment before one has been laid out. */
+const GuessedWidth = (node) =>
+  node.kind === "Output" || node.kind === "Not" ? 130 : 200;
+
+/** And a height. Only ever a stand-in - the observer redraws with the real one. */
+const GuessedHeight = 74;
+
 export class GraphEditor {
   /**
    * @param {HTMLElement} host      where to build the editor
    * @param {object} catalogue      what the engine will accept - facts, comparisons
    * @param {(graph: object) => void} onChange  called after every edit
    * @param {() => void} onBusy     called whenever an interaction STARTS, before any edit
+   * @param {(input: HTMLInputElement, fact: string) => void} onField
+   *        called for each text field a fact box builds, so the panel can decorate it - the
+   *        buff list attaches its completions and learns which field a click should fill
    *
    * onBusy is not a nicety. The page polls the host once a second and rebuilds this editor
    * from the answer; a drag is one edit that takes several seconds, and without something to
    * say "in use" the poll lands mid-drag and puts the box back where it started. The symptom
    * is that only quick flicks move a box - slow, careful positioning always snaps back.
    */
-  constructor(host, catalogue, onChange, onBusy = () => {}) {
+  constructor(host, catalogue, onChange, onBusy = () => {}, onField = () => {}) {
     this.host = host;
     this.catalogue = catalogue;
     this.onChange = onChange;
     this.onBusy = onBusy;
+    this.onField = onField;
     this.graph = { nodes: [], links: [] };
     this.selected = null;
 
@@ -107,7 +118,25 @@ export class GraphEditor {
       }
     });
 
+    // Redraws the wires when a box's SIZE changes, which happens in two places that both
+    // produced wires ending nowhere near their dots. The detail pane is built detached and
+    // appended afterwards, so every box measures zero at the moment render() runs; and picking
+    // a different fact grows or shrinks a box, which moves the dot on its edge. Watching the
+    // sizes covers both without either one having to remember to ask.
+    if (typeof ResizeObserver === "function") {
+      this.sizes = new ResizeObserver(() => this.drawWires());
+      this.sizes.observe(this.content);
+    }
+
     this.host.appendChild(this.surface);
+  }
+
+  /** Watches every box, so one changing height redraws the wires that end on it. */
+  watch() {
+    if (!this.sizes) return;
+    for (const box of this.content.querySelectorAll(".graph-node")) {
+      this.sizes.observe(box);
+    }
   }
 
   button(label, onClick, title) {
@@ -274,6 +303,7 @@ export class GraphEditor {
     const { width, height } = this.extent();
     this.resize(width, height);
     this.drawWires();
+    this.watch();
   }
 
   /**
@@ -326,12 +356,21 @@ export class GraphEditor {
     }
   }
 
-  /** Where a box's port sits, in surface coordinates. */
+  /**
+   * Where a box's port sits, in canvas coordinates.
+   *
+   * A box that has not been LAID OUT yet measures zero, and zero is a number rather than a
+   * missing value - so `offsetWidth ?? 200` never fires and every wire is drawn to the box's
+   * top-left CORNER instead of to its dot. That is not a corner case: the detail pane is built
+   * detached and appended afterwards, so this is the state on every re-render, and the wires
+   * only look right until the next one. Falling back is half the answer; the other half is
+   * the observer in build(), which redraws once the sizes are real.
+   */
   port(node, out) {
     const box = this.content.querySelector(`[data-node="${node.id}"]`);
-    const w = box?.offsetWidth ?? 200;
-    const h = box?.offsetHeight ?? 60;
-    return { x: node.x + (out ? w : 0), y: node.y + h * PORT_Y };
+    const w = box?.offsetWidth || GuessedWidth(node);
+    const h = box?.offsetHeight || GuessedHeight;
+    return { x: node.x + (out ? w : 0), y: node.y + (h * PORT_Y) };
   }
 
   box(node) {
@@ -522,14 +561,17 @@ export class GraphEditor {
         node.text = input.value;
         this.changed();
       });
+
+      // Handed to whoever built this editor before it goes in, so the buff list can attach its
+      // completions - the box itself has no idea what a buff is.
+      this.onField(input, info.name);
+
       row.appendChild(input);
       return row;
     }
 
-    // The word in front of the field carries the UNIT's meaning: "within 30" reads the same
-    // for world units and for pixels, and those are wildly different radii.
-    const LEAD = { Slot: "slot", Seconds: "every", Distance: "within", Pixels: "of cursor" };
-    const UNIT = { Seconds: "s", Distance: "u", Pixels: "px" };
+    const LEAD = { Slot: "slot", Seconds: "every", Distance: "within" };
+    const UNIT = { Seconds: "s", Distance: "u" };
 
     const label = document.createElement("span");
     label.className = "dim";

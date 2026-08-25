@@ -45,6 +45,12 @@ export class RulesPanel {
     // edit landing before the first answer would otherwise write the wrong rule's condition.
     this.parsing = null;
 
+    // What the character has had on, and the buff field a click should fill. The list is a
+    // DISCOVERY tool: the name a rule matches is the game's internal one, which is nowhere on
+    // the player's screen, so clicking has to put it somewhere rather than only showing it.
+    this.buffs = [];
+    this.buffField = null;
+
     this.wire();
   }
 
@@ -81,6 +87,10 @@ export class RulesPanel {
     this.shapes = view.shapes ?? {};
     $("rl-status").textContent = view.status;
 
+    // Always, even mid-edit: it is a readout, it replaces no control, and a buff list that
+    // froze while somebody was typing a buff name would be useless exactly when it is wanted.
+    this.renderBuffs(view.buffs ?? []);
+
     // The live text always, the CONTROLS only while nothing is being edited - the same rule
     // the overlay panel follows. A poll landing mid-edit would otherwise put back the value
     // that was there before the keystroke.
@@ -92,6 +102,102 @@ export class RulesPanel {
 
   root() {
     return $("tab-rules");
+  }
+
+  /** The buffs the character has had on, active ones first. */
+  renderBuffs(buffs) {
+    this.buffs = buffs;
+
+    const active = buffs.filter((buff) => buff.active).length;
+    $("rl-buffs-count").textContent = buffs.length
+      ? `(${active} on now, ${buffs.length} known)`
+      : "(none yet)";
+
+    const list = $("rl-buffs");
+    list.replaceChildren();
+
+    for (const buff of buffs) {
+      const item = document.createElement("li");
+      item.className = buff.active ? "on" : "";
+
+      // The READABLE name where the game gave one, with the id beneath it in monospace.
+      // That way round because the readable one is what somebody is looking for, and the id
+      // is what they need to end up with - showing only the id is what made this guesswork,
+      // and showing only the readable name would hide the thing a rule actually matches.
+      const pick = document.createElement("button");
+      pick.type = "button";
+      pick.className = "rl-buff-name";
+
+      const readable = document.createElement("span");
+      readable.className = "rl-buff-readable";
+      readable.textContent = buff.displayName || buff.name;
+      pick.appendChild(readable);
+
+      if (buff.displayName && buff.displayName !== buff.name) {
+        const id = document.createElement("span");
+        id.className = "rl-buff-id";
+        id.textContent = buff.name;
+        pick.appendChild(id);
+      }
+
+      pick.title = [
+        `Rules match: ${buff.name}`,
+        buff.description || "",
+        buff.flaskSlot > 0 ? `A flask buff, from belt slot ${buff.flaskSlot}` : "",
+        "Click to use this name in the buff field you last used",
+      ].filter(Boolean).join("\n");
+
+      pick.addEventListener("click", () => this.useBuff(buff.name));
+      item.appendChild(pick);
+
+      const detail = document.createElement("span");
+      detail.className = "dim rl-buff-detail";
+      detail.textContent = buff.active
+        ? [
+            buff.timeLeft > 0 && buff.timeLeft < 1e6 ? `${buff.timeLeft.toFixed(1)}s` : "",
+            buff.charges > 0 ? `x${buff.charges}` : "",
+          ].filter(Boolean).join("  ")
+        : "off";
+      item.appendChild(detail);
+
+      list.appendChild(item);
+    }
+
+    // The same names as a datalist, so the field itself completes as it is typed.
+    let options = $("rl-buff-names");
+    if (!options) {
+      options = document.createElement("datalist");
+      options.id = "rl-buff-names";
+      this.root().appendChild(options);
+    }
+
+    options.replaceChildren();
+    for (const buff of buffs) {
+      const option = document.createElement("option");
+
+      // The value is the ID, always - that is what lands in the field and what a rule
+      // matches. The label is only how the browser describes the choice while picking.
+      option.value = buff.name;
+      if (buff.displayName && buff.displayName !== buff.name) option.label = buff.displayName;
+      options.appendChild(option);
+    }
+  }
+
+  /**
+   * Puts a name into the buff field somebody last touched.
+   *
+   * Rather than into "the" buff field, because a rule can have several - and rather than the
+   * clipboard, which needs a permission this window may not have and gives no sign of having
+   * worked. Nothing focused means nothing happens, and the panel says which field it will use.
+   */
+  useBuff(name) {
+    const field = this.buffField;
+    if (!field || !field.isConnected) return;
+
+    this.claim();
+    field.value = name;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+    field.focus();
   }
 
   claim() {
@@ -139,10 +245,27 @@ export class RulesPanel {
     const nodes = this.shapes[rule.id]?.graph?.nodes ?? [];
     const ranged = new Set(
       (this.catalogue?.facts ?? [])
-        .filter((f) => f.argument === "Distance" || f.argument === "Pixels")
+        .filter((f) => f.argument === "Distance")
         .map((f) => f.name));
 
     return nodes.some((node) => node.kind === "Fact" && ranged.has(node.fact));
+  }
+
+  /**
+   * Attaches the buff list to a text field that wants one.
+   *
+   * Only the buff facts: AreaContains takes a piece of an area name, and offering it a list of
+   * buffs would be a completion that can only ever be wrong.
+   */
+  decorate(input, fact) {
+    if (!fact.toLowerCase().includes("buff")) return;
+
+    input.setAttribute("list", "rl-buff-names");
+    input.placeholder = "internal buff name - see the list";
+    input.addEventListener("focus", () => {
+      this.buffField = input;
+      $("rl-buffs-panel").open = true;
+    });
   }
 
   /** The rule the editor has open, or null. */
@@ -513,7 +636,9 @@ export class RulesPanel {
 
       // Interaction started. Holds off the once-a-second poll for as long as it goes on, so a
       // slow drag is not undone by the host answering with the positions from before it.
-      () => this.claim());
+      () => this.claim(),
+
+      (input, fact) => this.decorate(input, fact));
     this.graph.set(shape.graph);
     return host;
   }
@@ -522,6 +647,12 @@ export class RulesPanel {
   parsed(message) {
     const at = this.parsing;
     this.parsing = null;
+
+    // What the character has had on, and the buff field a click should fill. The list is a
+    // DISCOVERY tool: the name a rule matches is the game's internal one, which is nowhere on
+    // the player's screen, so clicking has to put it somewhere rather than only showing it.
+    this.buffs = [];
+    this.buffField = null;
     if (!at) return;
 
     if (!message.ok) {

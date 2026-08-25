@@ -148,17 +148,22 @@ public sealed record RuleCatalogue(
 /// Where the flask bindings came from, for the effects bound to a belt slot rather than to a
 /// named key.
 /// </param>
+/// <param name="Buffs">
+/// What the character has had on, so a buff condition can be picked instead of guessed at.
+/// </param>
 public sealed record RulesView(
     [property: JsonPropertyName("settings")] RuleSettings Settings,
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("acted")] int Acted,
     [property: JsonPropertyName("keySource")] string KeySource,
-    [property: JsonPropertyName("shapes")] IReadOnlyDictionary<string, RuleShape> Shapes)
+    [property: JsonPropertyName("shapes")] IReadOnlyDictionary<string, RuleShape> Shapes,
+    [property: JsonPropertyName("buffs")] IReadOnlyList<SeenBuff> Buffs)
 {
     /// <summary>Builds the panel, including a text and a graph for every rule.</summary>
-    public static RulesView Of(RuleEngine engine, string keySource)
+    public static RulesView Of(RuleEngine engine, string keySource, BuffWatch buffs)
     {
         ArgumentNullException.ThrowIfNull(engine);
+        ArgumentNullException.ThrowIfNull(buffs);
 
         var shapes = new Dictionary<string, RuleShape>(StringComparer.Ordinal);
         RuleSettings settings = engine.Settings;
@@ -179,7 +184,8 @@ public sealed record RulesView(
             }
         }
 
-        return new RulesView(settings, engine.LastTick.Reason, engine.Acted, keySource, shapes);
+        return new RulesView(
+            settings, engine.LastTick.Reason, engine.Acted, keySource, shapes, buffs.Seen);
     }
 }
 

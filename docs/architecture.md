@@ -544,20 +544,60 @@ same split as auto-flask, so the priorities, the cooldowns and every gate are or
   radius, which the reference plugin has no equivalent for at all. For anything placed where
   the pointer is — a wall, a ground effect, a targeted blast — "three monsters near me" is the
   wrong question: the pack behind the character does not make a wall in front of it worth
-  casting. It is measured in SCREEN PIXELS, by projecting each monster and comparing, rather
-  than by un-projecting the cursor into the world: the ground is not a plane, and the
-  projection is the half that is already proven against the game. The cost is real and is
-  written on the fact — a pixel radius covers more ground zoomed out, and the number does not
-  transfer between two people at different resolutions.
+  casting.
+
+  It shipped measuring SCREEN PIXELS from the cursor, and that was wrong twice over. **A
+  circle on the screen is an ellipse on the ground**, stretched away from the camera by the
+  tilt — so a pixel radius counts monsters in a region no skill has; and the number moves with
+  the resolution and the zoom besides. The AHK tool has both modes and its world-space one is
+  the one worth having. So the cursor is now run BACKWARDS through the camera matrix onto the
+  plane at the player's height (`WorldToScreen.OnGround`) and the radius is world units, the
+  same as every other radius here. The AHK tool inverts a fitted isometric constant instead —
+  a scale and sin(38.7°) — which works because its ring is drawn with the same constant; the
+  matrix is the game's own answer and there is nothing to fit. Its limit is worth knowing: the
+  plane is at the player's height, so on a ledge or a staircase the point lands where that
+  plane is rather than where the floor is.
+
+  The inverse is pinned by a ROUND TRIP through a tilted, off-axis matrix — project a point,
+  un-project it, get the point back. An identity matrix passes a projection that has swapped
+  its columns or dropped its perspective divide; that one does not.
 - **The ranges can be drawn on the ground.** The same working rule this project applies to
   itself: a radius is a number in a text field, and the honest way to know whether 30 is right
   is to see the circle with the monsters it counts inside it. A player ring is a world circle
   projected point by point (an ellipse on screen, and drawing it as one would need the
-  camera's tilt, which the drawing layer has no business knowing); a cursor ring is a screen
-  circle. They are drawn differently ON PURPOSE — they are not the same measurement, and a
-  preview that made them look alike would teach the wrong thing about the rule. Each carries
+  camera's tilt, which the drawing layer has no business knowing); a cursor ring is the same
+  thing centred where the pointer aims. Both come out as ellipses on screen because the
+  projection puts them there — which is the shape the measurement actually has, and seeing
+  that is what settled the pixel question above. Each carries
   what it currently reads and what it needs, and turns colour on the leaf's answer INCLUDING
   its negation, so a "no monsters within 30" ring is green when the circle is empty.
+
+#### The two names a buff has
+
+A rule matches the **engine identifier** — `fire_wall` — where the game paints **Flame Wall**.
+Some ids are close enough to guess and plenty are not, so a buff condition was written by
+guesswork, and the reference plugin's answer to that is its own debug window and a lot of
+scrolling.
+
+Both are now read and shown together, and matching stays on the ID deliberately: it is the same
+on every client, where matching a display name would break every rule the moment somebody
+changed their game's language. `BuffWatch` REMEMBERS what a character has had on rather than
+listing only what is on now, because a buff worth a rule lasts a few seconds and is long gone
+by the time anyone has switched to the config window.
+
+The readable name is `BuffDefinitions.Name` at **0x12**, and how much that offset is worth is
+the interesting part: it is **computed from the column layout, not observed in a live game**.
+The same arithmetic over dat-schema's columns (string 8, bool 1, i32 4, enumrow 4, foreignrow
+16, array 16) reproduces `BuffVisualsKey` at 0x55 and `BuffCategory` at 0x67 EXACTLY — and both
+of those were already in the schema, derived the same way and committed to long before. Two
+independent hits on a derivation are what make the third one evidence rather than a guess. The
+description at 0x08 is read for the same reason it is shown: two independent strings landing
+correctly at once is unlikely by accident, so a wrong offset reads as obvious rubbish in the
+picker rather than as a quiet lie.
+
+One caveat carried from dat-schema: it marks that column NOT localized, so it is a design-time
+English name, and the string the game actually paints may instead be `BuffVisuals.BuffName`,
+which IS localized. Which is the second reason rules match the id.
 
 #### Three defects the first version shipped with, and what each one was
 
@@ -569,11 +609,21 @@ All three were reported from one session, and none of them was visible from the 
   the wires came back, the effect was configured, the status line said it was watching. The
   fix makes the graph the SOURCE when a rule has one, derived in `Rule.Normalised()` — the one
   place a rule becomes what the engine runs.
-- **The wires were drawn into the wrong box.** The SVG layer was stretched to the scrolling
-  surface while its `viewBox` described the whole canvas, so an SVG asked to fit a smaller box
-  than its viewBox squashed it: measured, 207 pixels away from the ports it was meant to join.
-  The layer now sits in a content element sized to what the boxes reach, so the mapping is one
-  to one.
+- **The wires were drawn into the wrong box — twice, for two different reasons.** The SVG layer
+  was stretched to the scrolling surface while its `viewBox` described the whole canvas, so an
+  SVG asked to fit a smaller box than its viewBox squashed it; it now sits in a content element
+  sized to what the boxes reach. And separately, `port()` measured a box that HAD NOT BEEN LAID
+  OUT: the detail pane is built detached and appended afterwards, so every box reports
+  `offsetWidth` **0** at the moment `render()` runs — and zero is a number, so the
+  `?? 200` fallback beside it never fired. Every wire went to the box's top-left CORNER. Now
+  the fallback tests for falsy rather than null, and a `ResizeObserver` redraws once the sizes
+  are real, which also covers a box growing when its fact changes.
+
+  Fixing the first and claiming both were fixed is the part worth recording. The A/B check
+  said 1 pixel, and it was measuring a canvas that a DRAG had already corrected — dragging
+  redraws with the boxes attached. **A check that passes for the wrong reason is the failure
+  mode this file keeps describing**, and the fix was to measure the state actually complained
+  about: the wires as they FIRST appear, no click, no drag, no re-render.
 - **A slow drag snapped back.** The page polls the host once a second and rebuilds the editor
   from the answer; a drag is one edit that takes several seconds and claimed "in use" only at
   the END, so the poll landed mid-drag and restored the position from before it. Only quick

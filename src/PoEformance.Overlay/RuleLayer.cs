@@ -52,10 +52,13 @@ public sealed class RuleLayer
     /// working rule: a radius is a number in a text field, and the honest way to know whether
     /// 30 is right is to see the circle with the monsters it counts inside it.
     ///
-    /// A player ring is in WORLD units and follows the ground; a cursor ring is in SCREEN
-    /// pixels and follows the mouse. Drawing them differently is deliberate - they are not the
-    /// same kind of measurement, and a preview that made them look alike would teach the wrong
-    /// thing about the rule it is explaining.
+    /// BOTH kinds are world circles on the ground, differing only in where they are centred.
+    /// The cursor one was a circle of screen PIXELS around the mouse, and that was wrong twice
+    /// over: a circle on the screen is an ELLIPSE on the ground - stretched away from the
+    /// camera by the tilt - so it counted monsters in a region no skill has, and its radius
+    /// moved with the resolution and the zoom besides. Drawn as a world circle, it comes out
+    /// as an ellipse on screen because the projection puts it there, which is the shape the
+    /// measurement actually has.
     /// </remarks>
     public void DrawRanges(
         ImDrawListPtr draw,
@@ -68,10 +71,18 @@ public sealed class RuleLayer
         ArgumentNullException.ThrowIfNull(rings);
         ArgumentNullException.ThrowIfNull(snapshot);
 
-        if (rings.Count == 0 || width <= 0 || height <= 0)
+        if (rings.Count == 0 || width <= 0 || height <= 0 || snapshot.Player is not WorldEntity player)
         {
             return;
         }
+
+        // Where the pointer is on the ground, computed here rather than taken from the tick:
+        // the renderer redraws far more often than a snapshot arrives, so the cursor ring
+        // follows the mouse instead of stepping after it. Same function the rules use, so the
+        // two cannot disagree about where "there" is.
+        (float X, float Y)? aimed = cursor is (float sx, float sy)
+            ? WorldToScreen.OnGround(snapshot.Matrix, sx, sy, player.WorldZ, width, height)
+            : null;
 
         foreach (PreviewRing ring in rings)
         {
@@ -79,27 +90,24 @@ public sealed class RuleLayer
 
             if (ring.AtCursor)
             {
-                if (cursor is (float cx, float cy))
+                if (aimed is (float ax, float ay))
                 {
-                    var at = new Vector2(cx, cy);
-                    draw.AddCircle(at, (float)ring.Radius, colour, 0, 2f);
-                    Label(draw, ring.Label, at + new Vector2(0, (float)ring.Radius + 4f), colour);
+                    WorldRing(draw, snapshot, ax, ay, player.WorldZ, ring, colour, width, height);
                 }
 
                 continue;
             }
 
-            if (snapshot.Player is WorldEntity player)
-            {
-                WorldRing(draw, snapshot, player, ring, colour, width, height);
-            }
+            WorldRing(draw, snapshot, player.WorldX, player.WorldY, player.WorldZ, ring, colour, width, height);
         }
     }
 
     private static void WorldRing(
         ImDrawListPtr draw,
         WorldSnapshot snapshot,
-        WorldEntity player,
+        float centreX,
+        float centreY,
+        float groundZ,
         PreviewRing ring,
         uint colour,
         int width,
@@ -113,14 +121,14 @@ public sealed class RuleLayer
         for (int step = 0; step <= RingPoints; step++)
         {
             float angle = step / (float)RingPoints * MathF.Tau;
-            float x = player.WorldX + ((float)ring.Radius * MathF.Cos(angle));
-            float y = player.WorldY + ((float)ring.Radius * MathF.Sin(angle));
+            float x = centreX + ((float)ring.Radius * MathF.Cos(angle));
+            float y = centreY + ((float)ring.Radius * MathF.Sin(angle));
 
-            // At the player's own height rather than at the terrain under each point. The ring
-            // is a distance in the XY plane - which is what the rule measures - so following
-            // the ground would draw a different shape from the one being explained.
+            // At one height rather than at the terrain under each point. The ring is a distance
+            // in the XY plane - which is what the rule measures - so following the ground would
+            // draw a different shape from the one being explained.
             ScreenPoint point = WorldToScreen.Project(
-                snapshot.Matrix, x, y, player.WorldZ, width, height);
+                snapshot.Matrix, x, y, groundZ, width, height);
 
             if (!point.OnScreen)
             {

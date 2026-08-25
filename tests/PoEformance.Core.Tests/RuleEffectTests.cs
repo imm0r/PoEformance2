@@ -121,26 +121,49 @@ public class RuleEffectTests
         var state = new RuleState
         {
             InGame = true,
-            Pointer = new PointerView(800, 400, 1920, 1080),
+            CursorGround = (100f, 100f),
             Monsters =
             [
-                // Two under the pointer, three clustered far away - all equally "nearby" in
-                // world terms, which is what makes this a different answer rather than a
-                // narrower one.
-                new NearMonster(10, ItemRarity.Normal, 810, 410, true),
-                new NearMonster(12, ItemRarity.Rare, 780, 390, true),
-                new NearMonster(14, ItemRarity.Normal, 200, 900, true),
-                new NearMonster(16, ItemRarity.Normal, 240, 950, true),
-                new NearMonster(18, ItemRarity.Normal, 180, 880, true),
+                // Two where the cursor points, three clustered elsewhere - all equally near the
+                // PLAYER, which is what makes this a different answer rather than a narrower one.
+                new NearMonster(10, ItemRarity.Normal, 105, 100),
+                new NearMonster(12, ItemRarity.Rare, 100, 92),
+                new NearMonster(14, ItemRarity.Normal, -80, -60),
+                new NearMonster(16, ItemRarity.Normal, -75, -70),
+                new NearMonster(18, ItemRarity.Normal, -90, -55),
             ],
         };
 
         Assert.Equal(5, state.MonsterCount);
-        Assert.Equal(2, state.MonsterCountAtCursor(120));
-        Assert.Equal(1, state.RareOrUniqueCountAtCursor(120));
-        Assert.Equal(5, state.MonsterCountAtCursor(2000));
-        // (810, 410) against a cursor at (800, 400) - ten pixels each way.
-        Assert.Equal(Math.Sqrt(200), state.NearestMonsterAtCursor ?? -1, 3);
+        Assert.Equal(2, state.MonsterCountAtCursor(30));
+        Assert.Equal(1, state.RareOrUniqueCountAtCursor(30));
+        Assert.Equal(5, state.MonsterCountAtCursor(1000));
+        Assert.Equal(5, state.NearestMonsterAtCursor ?? -1, 3);
+    }
+
+    [Fact]
+    public void ACursorRadiusIsMeasuredOnTheGround_NotOnTheScreen()
+    {
+        // The correction this shipped with. A circle of screen pixels around the mouse is an
+        // ELLIPSE on the ground, stretched away from the camera by the tilt - so it counts
+        // monsters in a region no skill has. Two monsters the same world distance from the
+        // cursor must count the same, whichever direction they lie in; measured in pixels the
+        // one further from the camera would fall outside while the other stayed in.
+        var state = new RuleState
+        {
+            InGame = true,
+            CursorGround = (0f, 0f),
+            Monsters =
+            [
+                new NearMonster(0, ItemRarity.Normal, 25, 0),
+                new NearMonster(0, ItemRarity.Normal, 0, 25),
+                new NearMonster(0, ItemRarity.Normal, -25, 0),
+                new NearMonster(0, ItemRarity.Normal, 0, -25),
+            ],
+        };
+
+        Assert.Equal(4, state.MonsterCountAtCursor(26));
+        Assert.Equal(0, state.MonsterCountAtCursor(24));
     }
 
     [Fact]
@@ -152,7 +175,7 @@ public class RuleEffectTests
         var state = new RuleState
         {
             InGame = true,
-            Monsters = [new NearMonster(10, ItemRarity.Normal, 800, 400, true)],
+            Monsters = [new NearMonster(10, ItemRarity.Normal, 5, 5)],
         };
 
         Assert.Equal(0, state.MonsterCountAtCursor(500));
@@ -161,22 +184,6 @@ public class RuleEffectTests
         // And a comparison against an absent number says no, whichever way it is written.
         var leaf = new RuleCondition { Fact = RuleFact.NearestMonsterAtCursor, Compare = Compare.AtMost, Value = 100 };
         Assert.False(leaf.Holds(state, new RuleTimers(), "rule"));
-    }
-
-    [Fact]
-    public void AMonsterOffScreenIsNotUnderTheCursor()
-    {
-        // A point behind the camera projects to a perfectly plausible pixel, which is the
-        // historic projection bug in miniature - so the flag decides, never the coordinates.
-        var state = new RuleState
-        {
-            InGame = true,
-            Pointer = new PointerView(800, 400, 1920, 1080),
-            Monsters = [new NearMonster(10, ItemRarity.Normal, 800, 400, false)],
-        };
-
-        Assert.Equal(0, state.MonsterCountAtCursor(120));
-        Assert.Null(state.NearestMonsterAtCursor);
     }
 
     [Theory]
