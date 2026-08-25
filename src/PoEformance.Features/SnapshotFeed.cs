@@ -189,8 +189,19 @@ public sealed class SnapshotFeed : IDisposable
         return where.Length > 0 ? $"{what} - in {where}" : what;
     }
 
+    private bool _disposed;
+
     public void Dispose()
     {
+        // Idempotent, because a feed handed out early and replaced later is disposed at the
+        // hand-off AND by whatever scope held it - and Cancel on a disposed token source
+        // throws, which would turn a tidy shutdown into a crash.
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
         _cancellation.Cancel();
 
         // Bounded: the thread is a background one, so a read wedged inside the game process

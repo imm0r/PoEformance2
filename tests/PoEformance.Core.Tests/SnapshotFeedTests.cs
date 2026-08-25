@@ -250,4 +250,15 @@ public class SnapshotFeedTests
     }
 
     private static void ThrowFromHere() => throw new InvalidOperationException("deep");
+
+    [Fact]
+    public void DisposingTwiceIsHarmless()
+    {
+        // A feed handed out early and replaced later is disposed at the hand-off AND by the
+        // scope that held it. Cancel on a disposed token source throws, so without the guard
+        // a tidy shutdown became a crash - in the one path that exists to make start-up safer.
+        var feed = new SnapshotFeed(_ => SnapshotWith(1), TimeSpan.FromMilliseconds(5));
+        feed.Dispose();
+        feed.Dispose();
+    }
 }
