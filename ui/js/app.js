@@ -327,6 +327,7 @@ if (bridge.connected) {
       status: "browser preview",
       acted: 0,
       keySource: "Defaults - no host",
+      buffRead: "Buffs at 0xPREVIEW, 24 bytes = 3 entries; 3 followed, 3 defined, 3 named",
 
       // Hand-written to match the wire, which means driving the page in a browser can never
       // catch a host that spells these differently - and one did, sending Name/Active while

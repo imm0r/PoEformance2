@@ -89,7 +89,7 @@ export class RulesPanel {
 
     // Always, even mid-edit: it is a readout, it replaces no control, and a buff list that
     // froze while somebody was typing a buff name would be useless exactly when it is wanted.
-    this.renderBuffs(view.buffs ?? []);
+    this.renderBuffs(view.buffs ?? [], view.buffRead ?? "");
 
     // The live text always, the CONTROLS only while nothing is being edited - the same rule
     // the overlay panel follows. A poll landing mid-edit would otherwise put back the value
@@ -105,13 +105,20 @@ export class RulesPanel {
   }
 
   /** The buffs the character has had on, active ones first. */
-  renderBuffs(buffs) {
+  renderBuffs(buffs, reading) {
     this.buffs = buffs;
 
     const active = buffs.filter((buff) => buff.active).length;
     $("rl-buffs-count").textContent = buffs.length
       ? `(${active} on now, ${buffs.length} known)`
       : "(none yet)";
+
+    // How far the read got. Shown ALWAYS, not only when the list is empty: an empty list has
+    // five causes - no component, bounds that did not read, a span refused, entries leading
+    // nowhere, definitions with no readable name - and every one of them used to look
+    // identical from here. A short list with "12 entries, 12 defined, 1 named" says which.
+    const note = $("rl-buffs-read");
+    if (note) note.textContent = reading || "";
 
     const list = $("rl-buffs");
     list.replaceChildren();

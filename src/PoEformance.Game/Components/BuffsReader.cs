@@ -28,12 +28,61 @@ public readonly record struct ActiveBuff(
     string DisplayName = "",
     string Description = "");
 
+/// <summary>How far a walk of the Buffs vector got, whether or not it produced anything.</summary>
+/// <param name="Component">The component address, or 0 when the entity has no Buffs.</param>
+/// <param name="SpanBytes">Bytes between the vector's two bounds; -1 when they did not read.</param>
+/// <param name="Entries">Pointers the span describes.</param>
+/// <param name="Followed">Entries whose pointer was worth dereferencing.</param>
+/// <param name="Defined">Entries that led to a plausible BuffDefinition.</param>
+/// <param name="Named">Entries that produced a non-empty name - the ones a rule can match.</param>
+/// <remarks>
+/// AN EMPTY BUFF LIST HAS FIVE CAUSES AND USED TO LOOK LIKE ONE. No component, bounds that did
+/// not read, a span refused as a partial vector, entries whose pointers led nowhere, and
+/// definitions with no readable name are five different faults with five different fixes, and
+/// every one of them showed up as "this character has no buffs on" - the exact shape of failure
+/// that let a wrong stride survive for months. So the walk reports where it stopped, and the
+/// rule editor prints it under the buff list.
+/// </remarks>
+public readonly record struct BuffRead(
+    ulong Component = 0,
+    long SpanBytes = -1,
+    int Entries = 0,
+    int Followed = 0,
+    int Defined = 0,
+    int Named = 0)
+{
+    /// <summary>One line, for a panel that has to explain an empty list.</summary>
+    public override string ToString()
+    {
+        if (Component == 0)
+        {
+            return "no Buffs component on the player";
+        }
+
+        if (SpanBytes < 0)
+        {
+            return $"Buffs at 0x{Component:X}, the vector's bounds did not read";
+        }
+
+        if (Entries == 0)
+        {
+            return $"Buffs at 0x{Component:X}, {SpanBytes} bytes - not a whole number of entries";
+        }
+
+        return $"Buffs at 0x{Component:X}, {SpanBytes} bytes = {Entries} entries; "
+               + $"{Followed} followed, {Defined} defined, {Named} named";
+    }
+}
+
 /// <summary>The player's active buffs and debuffs.</summary>
 public sealed class ActiveBuffs
 {
     public static ActiveBuffs None { get; } = new([]);
 
     public IReadOnlyList<ActiveBuff> All { get; }
+
+    /// <summary>Where the walk that produced <see cref="All"/> got to.</summary>
+    public BuffRead Reading { get; init; }
 
     public ActiveBuffs(IReadOnlyList<ActiveBuff> all)
     {
@@ -127,48 +176,63 @@ public sealed class BuffsReader
 
         ulong first = _reader.ReadPointer(componentAddress + (ulong)_first);
         ulong last = _reader.ReadPointer(componentAddress + (ulong)_last);
+        var reading = new BuffRead(componentAddress);
         if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
         {
-            return ActiveBuffs.None;
+            return new ActiveBuffs([]) { Reading = reading };
         }
 
         long span = (long)(last - first);
+        reading = reading with { SpanBytes = span };
         long count = span / _pointerSize;
         if (count is < 0 or > 2048 || span % _pointerSize != 0)
         {
             // Not a whole number of pointers, so this is a read caught mid-resize rather than
             // a real list. Checked rather than floored on purpose: flooring is exactly what
             // hid the wrong stride for as long as it did.
-            return ActiveBuffs.None;
+            return new ActiveBuffs([]) { Reading = reading };
         }
 
+        reading = reading with { Entries = (int)count };
         var buffs = new List<ActiveBuff>((int)Math.Min(count, MaxBuffs));
         for (long i = 0; i < count && buffs.Count < MaxBuffs; i++)
         {
-            ActiveBuff? buff = ReadOne(_reader.ReadPointer(first + (ulong)(i * _pointerSize)));
+            ActiveBuff? buff = ReadOne(
+                _reader.ReadPointer(first + (ulong)(i * _pointerSize)), ref reading);
             if (buff is ActiveBuff value)
             {
                 buffs.Add(value);
             }
         }
 
-        return new ActiveBuffs(buffs);
+        return new ActiveBuffs(buffs) { Reading = reading };
     }
 
-    private ActiveBuff? ReadOne(ulong entry)
+    private ActiveBuff? ReadOne(ulong entry, ref BuffRead reading)
     {
         if (!MemoryReaderExtensions.IsPlausiblePointer(entry))
         {
             return null;
         }
 
+        reading = reading with { Followed = reading.Followed + 1 };
         ulong definition = _reader.ReadPointer(entry + (ulong)_definitionPtr);
         if (!MemoryReaderExtensions.IsPlausiblePointer(definition))
         {
             return null;
         }
 
-        string name = Text(definition + (ulong)_name);
+        reading = reading with { Defined = reading.Defined + 1 };
+
+        // The id is checked for SHAPE, not just for being non-empty. A pointer that lands on
+        // something which is not a string still yields characters - the wrong stride produced
+        // "䑐⟄翷" and it went into the picker as a buff somebody could click - and an id that
+        // is not [a-z0-9_] is not an id whatever it looks like.
+        string name = Identifier(definition + (ulong)_name);
+        if (name.Length > 0)
+        {
+            reading = reading with { Named = reading.Named + 1 };
+        }
 
         // The readable pair. Computed offsets rather than observed ones - see the schema - so
         // both are read defensively and an unreadable one is simply absent: the id beside them
@@ -200,5 +264,36 @@ public sealed class BuffsReader
         return MemoryReaderExtensions.IsPlausiblePointer(pointer)
             ? _reader.ReadUtf16(pointer)
             : string.Empty;
+    }
+
+    /// <summary>An engine identifier, or empty when what is there cannot be one.</summary>
+    /// <remarks>
+    /// The ids in this table are `[a-z0-9_]` - "fire_wall", "flask_effect_life". Anything else
+    /// is a pointer that landed on bytes rather than on a row, and the honest answer to that is
+    /// nothing at all: a name is what a rule MATCHES, so a plausible-looking wrong one is worse
+    /// than none. Deliberately a check a wrong value fails rather than one it passes.
+    /// </remarks>
+    private string Identifier(ulong at)
+    {
+        string text = Text(at);
+        if (text.Length is 0 or > 128)
+        {
+            return string.Empty;
+        }
+
+        bool letter = false;
+        foreach (char c in text)
+        {
+            if (c is >= 'a' and <= 'z')
+            {
+                letter = true;
+            }
+            else if (c is not ((>= '0' and <= '9') or '_'))
+            {
+                return string.Empty;
+            }
+        }
+
+        return letter ? text : string.Empty;
     }
 }

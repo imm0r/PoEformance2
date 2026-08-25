@@ -155,6 +155,11 @@
           <p class="dim rl-buffs-hint">Click one to put its name in the buff field you last used.
             Rules match the game's internal name, which is not the one on your screen.</p>
           <ul id="rl-buffs"></ul>
+          <!--
+            Where the read of the buff vector got to. An empty list has five causes and they
+            used to look identical from here, which is how a wrong stride survived for months.
+          -->
+          <p class="dim rl-buffs-read" id="rl-buffs-read"></p>
         </details>
       </aside>
 

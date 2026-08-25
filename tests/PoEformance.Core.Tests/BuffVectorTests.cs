@@ -189,6 +189,52 @@ public class BuffVectorTests
     }
 
     [Fact]
+    public void AGarbageNameIsRefusedRatherThanListed()
+    {
+        // What the wrong stride actually produced: a pointer that landed on something which
+        // was not a string, read out as "䑐⟄翷", and offered in the picker as a buff somebody
+        // could click into a rule. A name is what a rule MATCHES, so a plausible-looking wrong
+        // one is worse than none - and an engine id is [a-z0-9_] whatever the bytes look like.
+        OffsetSchema schema = RealSessionTests.Schema();
+        StructDef effect = schema.Structs["StatusEffect"];
+        var reader = new FakeMemoryReader();
+
+        reader.Place(Component + PointerVector, VectorAt);
+        reader.Place(Component + PointerVectorEnd, VectorAt + 8);
+        reader.Place(VectorAt, EffectAt);
+        reader.Place(EffectAt + (ulong)effect.OffsetOf("BuffDefinitionPtr"), DefinitionAt);
+        reader.Place(DefinitionAt + (ulong)schema.Structs["BuffDefinition"].OffsetOf("Name"), NameAt);
+        reader.PlaceUtf16(NameAt, "䑐⟄翿");
+
+        ActiveBuffs buffs = new BuffsReader(reader, schema).Read(Component);
+
+        // Not dropped silently: the walk says it got all the way to a definition and found no
+        // name there, which is a different fault from finding no entries.
+        Assert.Equal(string.Empty, Assert.Single(buffs.All).Name);
+        Assert.Equal(1, buffs.Reading.Defined);
+        Assert.Equal(0, buffs.Reading.Named);
+    }
+
+    [Fact]
+    public void TheWalkSaysHowFarItGot()
+    {
+        // The point of the whole record. "No buffs" was five different faults wearing one face.
+        OffsetSchema schema = RealSessionTests.Schema();
+        var reader = new FakeMemoryReader();
+
+        Assert.Equal(
+            "no Buffs component on the player",
+            new BuffsReader(reader, schema).Read(0).Reading.ToString());
+
+        reader.Place(Component + PointerVector, VectorAt);
+        reader.Place(Component + PointerVectorEnd, VectorAt + OldInlineStride + 4);
+        Assert.Contains(
+            "not a whole number of entries",
+            new BuffsReader(reader, schema).Read(Component).Reading.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void AVectorThatIsNotAWholeNumberOfPointersIsRefused()
     {
         // Flooring is exactly how the wrong stride hid for as long as it did: a span that made
