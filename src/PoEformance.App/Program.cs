@@ -74,6 +74,7 @@ internal static class Program
             }
 
             Console.WriteLine($"attach  pid {live.ProcessId}, module 0x{live.ModuleBase:X} ({live.ModuleSize / (1024 * 1024)} MB)");
+            WarnAboutOtherInstances();
 
             // The overlay sizes itself to this window, so a wrong viewport is impossible.
             gameWindow = game.MainWindowHandle;
@@ -536,9 +537,28 @@ internal static class Program
     /// A field the overlay fills in on start is the whole mechanism; the config thread only
     /// ever assigns an enum through it, and an enum write is atomic.
     /// </remarks>
+    /// <summary>
+    /// What the overlay publishes about itself for the config window to read.
+    /// </summary>
+    /// <remarks>
+    /// BOTH FIELDS CROSS A THREAD. The overlay runs on the main thread and fills them in; the
+    /// config window reads them from its own thread, once a second, for as long as the tool is
+    /// up. Plain auto-properties gave no guarantee that the second thread would ever observe
+    /// the first thread's write - the memory model permits the read to be hoisted and the value
+    /// cached indefinitely - so a config window that opened first could go on reporting "not
+    /// running" about an overlay that plainly was. Volatile is the whole cost of ruling that
+    /// out, and it is the second unsynchronised cross-thread field this feature has produced.
+    /// </remarks>
     private sealed class OverlayHandle
     {
-        public PoEformance.Overlay.EntityOverlay? Overlay { get; set; }
+        private PoEformance.Overlay.EntityOverlay? _overlay;
+        private PoEformance.Features.SnapshotFeed? _feed;
+
+        public PoEformance.Overlay.EntityOverlay? Overlay
+        {
+            get => Volatile.Read(ref _overlay);
+            set => Volatile.Write(ref _overlay, value);
+        }
 
         /// <summary>
         /// The reader thread, once it exists, so the config window can say whether it is well.
@@ -549,7 +569,11 @@ internal static class Program
         /// throw stops happening. The config window is where somebody notices that, because it
         /// is where the rules and the buff list claim to be live.
         /// </remarks>
-        public PoEformance.Features.SnapshotFeed? Feed { get; set; }
+        public PoEformance.Features.SnapshotFeed? Feed
+        {
+            get => Volatile.Read(ref _feed);
+            set => Volatile.Write(ref _feed, value);
+        }
     }
 
     private static void RunOverlay(
@@ -1512,6 +1536,43 @@ internal static class Program
     /// Terrain populates well after an area loads - a minute or more on a large map - so
     /// "nothing yet" is a normal state that needs saying rather than an empty box.
     /// </remarks>
+    /// <summary>Says so when another copy of the tool is already running.</summary>
+    /// <remarks>
+    /// A WARNING, NOT A REFUSAL: two instances are occasionally what somebody wants - one
+    /// recording while another is used - and the tool has no business deciding otherwise.
+    /// But two are also indistinguishable from one when both draw over the same game, and an
+    /// overlay drawn by the first instance beside a config window belonging to the second
+    /// reads exactly like a single instance whose config window has stopped working. That
+    /// cost three rounds of diagnosis, and one line at startup would have ended it.
+    /// </remarks>
+    private static void WarnAboutOtherInstances()
+    {
+        int mine = Environment.ProcessId;
+        int[] others;
+        try
+        {
+            others = [.. System.Diagnostics.Process
+                .GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName)
+                .Select(p => p.Id)
+                .Where(id => id != mine)];
+        }
+        catch (InvalidOperationException)
+        {
+            return; // enumerating processes is a courtesy, never a reason to fail to start
+        }
+
+        if (others.Length == 0)
+        {
+            return;
+        }
+
+        Console.WriteLine($"        NOTE: {others.Length} other copy of this tool is already "
+            + $"running (pid {string.Join(", ", others)}).");
+        Console.WriteLine("        Each has its own overlay and its own rules, so what you see "
+            + "drawn and what a");
+        Console.WriteLine("        config window shows can belong to different ones.");
+    }
+
     private static string DescribeTerrain(OverlayHandle handle)
         => handle.Overlay is null ? "overlay not running" : handle.Overlay.DescribeTerrain();
 
@@ -1526,7 +1587,19 @@ internal static class Program
     {
         if (handle.Feed is not PoEformance.Features.SnapshotFeed feed)
         {
-            return "no reader thread - the rules only run with the overlay (--overlay)";
+            // WHICH PROCESS, because the first version of this line said "the rules only run
+            // with the overlay" to somebody who had started the tool with --overlay and could
+            // see it drawing. Both halves can be true at once: an overlay drawn by one instance
+            // and a config window belonging to another. The overlay object is published from
+            // the same method as the feed and a few lines later, so "no feed but an overlay" is
+            // a fault in this process while "neither" means this process never ran one.
+            int id = Environment.ProcessId;
+            return handle.Overlay is null
+                ? $"no reader thread in this process (pid {id}), and no overlay here either - "
+                  + "the rules run only with --overlay, and an overlay you can see may belong "
+                  + "to another instance"
+                : $"the overlay is up in this process (pid {id}) but published no reader - "
+                  + "that is a fault here, not a missing switch";
         }
 
         string health = $"{feed.ReadCount} reads, {feed.FailureCount} failed";
