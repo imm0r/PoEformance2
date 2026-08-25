@@ -7,15 +7,46 @@ namespace PoEformance.Core.Tests;
 /// Remembering which buffs a character has had on.
 /// </summary>
 /// <remarks>
-/// This exists because the name a rule matches is not the name the game shows: memory carries
-/// the ENGINE identifier - "flask_effect_life" - and the localised display name is a column
-/// nothing here reads. So somebody looking at "Lightning Infusion" on their own screen has no
-/// way to work out what to type, and a buff condition is written by guessing at a spelling.
+/// This exists because the name a rule matches is not the name the game shows: a rule matches
+/// the ENGINE identifier - "fire_wall" - where the game paints "Flame Wall". Both are read, so
+/// somebody can find the buff by the name they recognise and end up with the id a rule needs;
+/// matching stays on the id, which is the same on every client.
 /// </remarks>
 public class BuffWatchTests
 {
     private static ActiveBuffs On(params string[] names)
         => new([.. names.Select(name => new ActiveBuff(name, 5f, 10f, 2, 0, false))]);
+
+    [Fact]
+    public void CarriesTheReadableNameBesideTheIdItMatches()
+    {
+        // The whole reason both are read. Nobody looking at "Flame Wall" on their own screen
+        // would guess "fire_wall", and a rule that matched the readable one would stop working
+        // the moment somebody changed their game's language - so it is shown, never matched.
+        var watch = new BuffWatch();
+        watch.Look(
+            new ActiveBuffs([new ActiveBuff(
+                "fire_wall", 6f, 8f, 0, 0, false, "Flame Wall", "Deals fire damage over time.")]),
+            0);
+
+        SeenBuff buff = Assert.Single(watch.Seen);
+        Assert.Equal("fire_wall", buff.Name);
+        Assert.Equal("Flame Wall", buff.DisplayName);
+        Assert.Equal("Deals fire damage over time.", buff.Description);
+    }
+
+    [Fact]
+    public void AReadableNameThatCouldNotBeReadIsSimplyAbsent()
+    {
+        // Its offset is COMPUTED rather than observed, so the id - which comes from an offset
+        // that is proven - has to stand on its own when the other one does not resolve.
+        var watch = new BuffWatch();
+        watch.Look(On("fire_wall"), 0);
+
+        SeenBuff buff = Assert.Single(watch.Seen);
+        Assert.Equal("fire_wall", buff.Name);
+        Assert.Equal(string.Empty, buff.DisplayName);
+    }
 
     [Fact]
     public void ListsWhatIsOnTheCharacter()

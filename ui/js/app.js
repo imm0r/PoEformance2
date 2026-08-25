@@ -328,9 +328,9 @@ if (bridge.connected) {
       acted: 0,
       keySource: "Defaults - no host",
       buffs: [
-        { name: "lightning_infusion", active: true, timeLeft: 18.4, charges: 2, flaskSlot: 0, lastSeenMs: 0 },
-        { name: "flask_effect_life", active: true, timeLeft: 3.1, charges: 0, flaskSlot: 1, lastSeenMs: 0 },
-        { name: "chilled", active: false, timeLeft: 0, charges: 0, flaskSlot: 0, lastSeenMs: 0 },
+        { name: "fire_wall", displayName: "Flame Wall", description: "Deals fire damage over time.", active: true, timeLeft: 18.4, charges: 2, flaskSlot: 0, lastSeenMs: 0 },
+        { name: "flask_effect_life", displayName: "Life Flask", description: "", active: true, timeLeft: 3.1, charges: 0, flaskSlot: 1, lastSeenMs: 0 },
+        { name: "chilled", displayName: "Chilled", description: "", active: false, timeLeft: 0, charges: 0, flaskSlot: 0, lastSeenMs: 0 },
       ],
       settings: {
         enabled: false,

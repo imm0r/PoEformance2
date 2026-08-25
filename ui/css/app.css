@@ -474,3 +474,9 @@ pre#log {
 .rl-buffs li.on .rl-buff-name { color: var(--ok); }
 .rl-buffs li .rl-buff-name:hover { color: var(--accent); }
 .rl-buff-detail { font-size: 11px; white-space: nowrap; }
+
+/* Two names per row: the readable one to find it by, the id underneath because that is what
+   a rule actually matches. */
+.rl-buffs li .rl-buff-name { display: flex; flex-direction: column; gap: 0; }
+.rl-buff-readable { font: 12px/1.4 system-ui, "Segoe UI", sans-serif; }
+.rl-buff-id { font: 11px/1.3 ui-monospace, Consolas, monospace; opacity: 0.65; }

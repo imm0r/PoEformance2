@@ -120,13 +120,33 @@ export class RulesPanel {
       const item = document.createElement("li");
       item.className = buff.active ? "on" : "";
 
+      // The READABLE name where the game gave one, with the id beneath it in monospace.
+      // That way round because the readable one is what somebody is looking for, and the id
+      // is what they need to end up with - showing only the id is what made this guesswork,
+      // and showing only the readable name would hide the thing a rule actually matches.
       const pick = document.createElement("button");
       pick.type = "button";
       pick.className = "rl-buff-name";
-      pick.textContent = buff.name;
-      pick.title = buff.flaskSlot > 0
-        ? `A flask buff, from belt slot ${buff.flaskSlot}`
-        : "Click to use this name in the buff field you last used";
+
+      const readable = document.createElement("span");
+      readable.className = "rl-buff-readable";
+      readable.textContent = buff.displayName || buff.name;
+      pick.appendChild(readable);
+
+      if (buff.displayName && buff.displayName !== buff.name) {
+        const id = document.createElement("span");
+        id.className = "rl-buff-id";
+        id.textContent = buff.name;
+        pick.appendChild(id);
+      }
+
+      pick.title = [
+        `Rules match: ${buff.name}`,
+        buff.description || "",
+        buff.flaskSlot > 0 ? `A flask buff, from belt slot ${buff.flaskSlot}` : "",
+        "Click to use this name in the buff field you last used",
+      ].filter(Boolean).join("\n");
+
       pick.addEventListener("click", () => this.useBuff(buff.name));
       item.appendChild(pick);
 
@@ -154,7 +174,11 @@ export class RulesPanel {
     options.replaceChildren();
     for (const buff of buffs) {
       const option = document.createElement("option");
+
+      // The value is the ID, always - that is what lands in the field and what a rule
+      // matches. The label is only how the browser describes the choice while picking.
       option.value = buff.name;
+      if (buff.displayName && buff.displayName !== buff.name) option.label = buff.displayName;
       options.appendChild(option);
     }
   }

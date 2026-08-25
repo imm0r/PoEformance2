@@ -3,9 +3,9 @@ using PoEformance.Game.Components;
 namespace PoEformance.Features;
 
 /// <summary>One buff the character has had on, and what it was doing when last looked at.</summary>
-/// <param name="Name">
-/// The ENGINE identifier, which is the only name a buff has from this side.
-/// </param>
+/// <param name="Name">The ENGINE identifier - what a rule matches.</param>
+/// <param name="DisplayName">The readable name, or empty when the game did not give one.</param>
+/// <param name="Description">The buff's own description text, or empty.</param>
 /// <param name="Active">Whether it is on right now, rather than remembered from earlier.</param>
 public sealed record SeenBuff(
     string Name,
@@ -13,21 +13,23 @@ public sealed record SeenBuff(
     float TimeLeft,
     int Charges,
     int FlaskSlot,
-    long LastSeenMs);
+    long LastSeenMs,
+    string DisplayName = "",
+    string Description = "");
 
 /// <summary>
 /// Remembers which buffs a character has had on, so a rule need not be written by guesswork.
 /// </summary>
 /// <remarks>
-/// THE NAME A RULE MATCHES IS NOT THE NAME THE GAME SHOWS. What memory carries is the Id
-/// column of BuffDefinitions - the engine identifier, spelled like `flask_effect_life` - and
-/// the localised display name is a different column that nothing here reads. So a player
-/// looking at "Lightning Infusion" on their own screen has no way to work out what to type,
-/// and the reference plugin's answer to that is its own debug window and a lot of scrolling.
+/// THE NAME A RULE MATCHES IS NOT THE NAME THE GAME SHOWS. What a rule matches is the Id
+/// column of BuffDefinitions - the engine identifier, spelled like `fire_wall` - while the
+/// game paints "Flame Wall". Some ids are close enough to guess and plenty are not, and the
+/// reference plugin's answer to that is its own debug window and a lot of scrolling.
 ///
-/// The engine id is the RIGHT thing to match on, which is why this remembers rather than
-/// translates: an id stays English on a localised client, where a display name would make
-/// every rule stop working the moment somebody changes their game's language.
+/// So BOTH names are carried: the id, which is what a rule uses, and the readable one beside
+/// it, which is how somebody finds the id they want. Matching stays on the id deliberately -
+/// it is the same on every client, where a display name would make every rule stop working
+/// the moment somebody changed their game's language.
 ///
 /// It REMEMBERS rather than only listing what is on now, and that is the point. A buff worth
 /// writing a rule about is usually one that lasts a few seconds, so the moment somebody
@@ -99,7 +101,8 @@ public sealed class BuffWatch
             }
 
             _seen[buff.Name] = new SeenBuff(
-                buff.Name, true, buff.TimeLeft, buff.Charges, buff.FlaskSlot, nowMs);
+                buff.Name, true, buff.TimeLeft, buff.Charges, buff.FlaskSlot, nowMs,
+                buff.DisplayName, buff.Description);
         }
 
         Expire(nowMs);

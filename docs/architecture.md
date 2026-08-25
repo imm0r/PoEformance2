@@ -572,6 +572,33 @@ same split as auto-flask, so the priorities, the cooldowns and every gate are or
   what it currently reads and what it needs, and turns colour on the leaf's answer INCLUDING
   its negation, so a "no monsters within 30" ring is green when the circle is empty.
 
+#### The two names a buff has
+
+A rule matches the **engine identifier** — `fire_wall` — where the game paints **Flame Wall**.
+Some ids are close enough to guess and plenty are not, so a buff condition was written by
+guesswork, and the reference plugin's answer to that is its own debug window and a lot of
+scrolling.
+
+Both are now read and shown together, and matching stays on the ID deliberately: it is the same
+on every client, where matching a display name would break every rule the moment somebody
+changed their game's language. `BuffWatch` REMEMBERS what a character has had on rather than
+listing only what is on now, because a buff worth a rule lasts a few seconds and is long gone
+by the time anyone has switched to the config window.
+
+The readable name is `BuffDefinitions.Name` at **0x12**, and how much that offset is worth is
+the interesting part: it is **computed from the column layout, not observed in a live game**.
+The same arithmetic over dat-schema's columns (string 8, bool 1, i32 4, enumrow 4, foreignrow
+16, array 16) reproduces `BuffVisualsKey` at 0x55 and `BuffCategory` at 0x67 EXACTLY — and both
+of those were already in the schema, derived the same way and committed to long before. Two
+independent hits on a derivation are what make the third one evidence rather than a guess. The
+description at 0x08 is read for the same reason it is shown: two independent strings landing
+correctly at once is unlikely by accident, so a wrong offset reads as obvious rubbish in the
+picker rather than as a quiet lie.
+
+One caveat carried from dat-schema: it marks that column NOT localized, so it is a design-time
+English name, and the string the game actually paints may instead be `BuffVisuals.BuffName`,
+which IS localized. Which is the second reason rules match the id.
+
 #### Three defects the first version shipped with, and what each one was
 
 All three were reported from one session, and none of them was visible from the tests:

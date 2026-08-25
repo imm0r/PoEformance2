@@ -4,14 +4,29 @@ using PoEformance.Core.Schema;
 namespace PoEformance.Game.Components;
 
 /// <summary>One buff or debuff currently on the player.</summary>
+/// <param name="Name">
+/// The ENGINE identifier - "fire_wall" - and the only name anything matches on.
+/// </param>
 /// <param name="FlaskSlot">Belt slot 1-5 for a flask buff, 0 for anything else.</param>
+/// <param name="DisplayName">
+/// The readable name from the same row - "Flame Wall" - or empty when it could not be read.
+/// </param>
+/// <param name="Description">The buff's own description text, or empty.</param>
+/// <remarks>
+/// The two names are carried separately and never conflated. An id is what a rule matches,
+/// because it is the same on every client; a display name is what a person recognises, and
+/// nobody looking at "Flame Wall" on their own screen would guess "fire_wall". Offering only
+/// the first is what made buff rules guesswork.
+/// </remarks>
 public readonly record struct ActiveBuff(
     string Name,
     float TimeLeft,
     float TotalTime,
     int Charges,
     int FlaskSlot,
-    bool IsFlask);
+    bool IsFlask,
+    string DisplayName = "",
+    string Description = "");
 
 /// <summary>The player's active buffs and debuffs.</summary>
 public sealed class ActiveBuffs
@@ -63,6 +78,8 @@ public sealed class BuffsReader
     private readonly int _charges;
     private readonly int _flaskSlot;
     private readonly int _name;
+    private readonly int _displayName;
+    private readonly int _description;
     private readonly int _buffType;
     private readonly byte _flaskType;
 
@@ -86,6 +103,8 @@ public sealed class BuffsReader
 
         StructDef definition = schema.Structs["BuffDefinition"];
         _name = definition.OffsetOf("Name");
+        _displayName = definition.OffsetOf("DisplayName");
+        _description = definition.OffsetOf("Description");
         _buffType = definition.OffsetOf("BuffType");
         _flaskType = (byte)definition.Constants["BuffTypeFlask"];
     }
@@ -138,10 +157,13 @@ public sealed class BuffsReader
             return null;
         }
 
-        ulong namePointer = _reader.ReadPointer(definition + (ulong)_name);
-        string name = MemoryReaderExtensions.IsPlausiblePointer(namePointer)
-            ? _reader.ReadUtf16(namePointer)
-            : string.Empty;
+        string name = Text(definition + (ulong)_name);
+
+        // The readable pair. Computed offsets rather than observed ones - see the schema - so
+        // both are read defensively and an unreadable one is simply absent: the id beside them
+        // is what everything actually depends on, and it comes from an offset that is proven.
+        string displayName = Text(definition + (ulong)_displayName);
+        string description = Text(definition + (ulong)_description);
 
         byte type = _reader.Read<byte>(definition + (ulong)_buffType);
         short rawSlot = _reader.Read<short>(entry + (ulong)_flaskSlot);
@@ -155,6 +177,17 @@ public sealed class BuffsReader
             _reader.Read<float>(entry + (ulong)_totalTime),
             _reader.Read<short>(entry + (ulong)_charges),
             slot,
-            type == _flaskType);
+            type == _flaskType,
+            displayName,
+            description);
+    }
+
+    /// <summary>A string off a row, or empty when the pointer does not lead to one.</summary>
+    private string Text(ulong at)
+    {
+        ulong pointer = _reader.ReadPointer(at);
+        return MemoryReaderExtensions.IsPlausiblePointer(pointer)
+            ? _reader.ReadUtf16(pointer)
+            : string.Empty;
     }
 }
