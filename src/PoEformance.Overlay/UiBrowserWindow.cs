@@ -55,6 +55,9 @@ public sealed class UiBrowserWindow
     private ulong _selected;
     private ulong _hovered;
     private string _search = string.Empty;
+
+    /// <summary>Where the tree ends and the details begin. Draggable; 0.45 was the old default.</summary>
+    private readonly PaneSplit _split = new(0.45f);
     private int _searchSequence;
     private int _pickSequence;
     private int _lastAppliedPick;
@@ -164,14 +167,13 @@ public sealed class UiBrowserWindow
         DrawToolbar(view);
         ImGui.Separator();
 
-        float paneWidth = Math.Max(240f, ImGui.GetContentRegionAvail().X * 0.45f);
-        if (ImGui.BeginChild("uib-left", new Vector2(paneWidth, 0), ImGuiChildFlags.Borders))
+        if (ImGui.BeginChild("uib-left", new Vector2(_split.Left(), 0), ImGuiChildFlags.Borders))
         {
             DrawLeftPane(view);
         }
 
         ImGui.EndChild();
-        ImGui.SameLine();
+        _split.Bar();
 
         if (ImGui.BeginChild("uib-detail", Vector2.Zero, ImGuiChildFlags.Borders))
         {

@@ -64,6 +64,9 @@ public sealed class StashWindow
     private string _search = string.Empty;
     private int _page = -1;
     private float _cell = 44f;
+
+    /// <summary>Where the tab list ends and the items begin. Draggable; 0.24 was the old 220px.</summary>
+    private readonly PaneSplit _split = new(0.24f);
     private readonly HashSet<ulong> _open = [];
     private ulong _hovered;
 
@@ -191,7 +194,7 @@ public sealed class StashWindow
         }
 
         Tabs(view, book);
-        ImGui.SameLine();
+        _split.Bar();
 
         if (_page >= 0 && _page < view.Pages.Count && _search.Trim().Length == 0)
         {
@@ -350,7 +353,7 @@ public sealed class StashWindow
     /// <summary>The tabs down the left, with how much is in each.</summary>
     private void Tabs(StashView view, PriceBook book)
     {
-        if (!ImGui.BeginChild("stash-tabs", new Vector2(220f, 0f), ImGuiChildFlags.Borders))
+        if (!ImGui.BeginChild("stash-tabs", new Vector2(_split.Left(), 0f), ImGuiChildFlags.Borders))
         {
             ImGui.EndChild();
             return;
