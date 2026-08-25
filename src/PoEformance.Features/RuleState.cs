@@ -199,6 +199,55 @@ public sealed record RuleState
     /// <summary>How many live rares and uniques are within a distance of the player.</summary>
     public int RareOrUniqueCountWithin(double distance) => CountWithin(distance, RareOrUnique);
 
+    /// <summary>Where the mouse is, or null when it is not over the game.</summary>
+    public PointerView? Pointer { get; init; }
+
+    /// <summary>
+    /// How many live monsters are drawn within a radius of the CURSOR, in pixels.
+    /// </summary>
+    /// <remarks>
+    /// The question a targeted skill actually asks. "Three monsters near me" and "three
+    /// monsters where I am aiming" are different rules, and for anything placed at the cursor
+    /// - a wall, a ground effect, a targeted blast - only the second one is about the skill.
+    /// Ported from the AHK tool's cursor radius mode, which is the half of its monster count
+    /// that has no equivalent in the reference plugin at all.
+    ///
+    /// In PIXELS, and that is a real limitation rather than an oversight: it is a radius on
+    /// the screen, so it covers more ground when the camera is zoomed out and the number does
+    /// not transfer between two people at different resolutions.
+    /// </remarks>
+    public int MonsterCountAtCursor(double pixels) => CountAtCursor(pixels, null);
+
+    /// <summary>How many live rares and uniques are drawn within a radius of the cursor.</summary>
+    public int RareOrUniqueCountAtCursor(double pixels) => CountAtCursor(pixels, RareOrUnique);
+
+    /// <summary>Pixels from the cursor to the nearest live monster, or null when there is none.</summary>
+    /// <remarks>
+    /// Answers "am I aiming at anything at all", which is the companion to the counts: a rule
+    /// can hold fire until the pointer is actually over a fight rather than over the floor.
+    /// </remarks>
+    public double? NearestMonsterAtCursor
+    {
+        get
+        {
+            if (Pointer is not PointerView at)
+            {
+                return null;
+            }
+
+            double nearest = double.MaxValue;
+            foreach (NearMonster monster in Monsters)
+            {
+                if (monster.OnScreen)
+                {
+                    nearest = Math.Min(nearest, Pixels(monster, at));
+                }
+            }
+
+            return nearest == double.MaxValue ? null : nearest;
+        }
+    }
+
     /// <summary>
     /// Gathers the facts from one snapshot.
     /// </summary>
@@ -209,7 +258,13 @@ public sealed record RuleState
     /// in rather than kept in statics, so two engines (or a test and a game) never share them.
     /// </param>
     /// <param name="nowMs">A monotonic clock.</param>
-    public static RuleState From(WorldSnapshot snapshot, bool focused, RuleHistory track, long nowMs)
+    /// <param name="pointer">
+    /// Where the mouse is over the game, for the rules that measure from the cursor. Null - a
+    /// pointer somewhere else, or no window - makes every cursor rule answer no rather than
+    /// answering about a place nobody is aiming at.
+    /// </param>
+    public static RuleState From(
+        WorldSnapshot snapshot, bool focused, RuleHistory track, long nowMs, PointerView? pointer = null)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(track);
@@ -243,7 +298,8 @@ public sealed record RuleState
             Vitals = snapshot.PlayerVitals,
             Buffs = snapshot.PlayerBuffs,
             Belt = snapshot.FlaskBelt,
-            Monsters = NearbyMonsters(snapshot, player),
+            Pointer = pointer is PointerView view && view.IsValid ? view : null,
+            Monsters = NearbyMonsters(snapshot, player, pointer),
         };
     }
 
@@ -259,13 +315,20 @@ public sealed record RuleState
     /// Nothing filters remembered entities here because nothing that MOVES is ever remembered
     /// (see <see cref="EntityMemory"/>), so a monster cannot arrive from that half of the list.
     /// </remarks>
-    private static List<NearMonster> NearbyMonsters(WorldSnapshot snapshot, WorldEntity? player)
+    private static List<NearMonster> NearbyMonsters(
+        WorldSnapshot snapshot, WorldEntity? player, PointerView? pointer)
     {
         var found = new List<NearMonster>();
         if (player is not WorldEntity at)
         {
             return found;
         }
+
+        // Projected only when a cursor rule could want it. The matrix multiply is cheap, but
+        // it is per monster per read and buys nothing at all while nobody is aiming.
+        bool project = pointer is PointerView view && view.IsValid;
+        int width = pointer?.Width ?? 0;
+        int height = pointer?.Height ?? 0;
 
         foreach (WorldEntity entity in snapshot.Entities)
         {
@@ -280,7 +343,21 @@ public sealed record RuleState
 
             float dx = entity.WorldX - at.WorldX;
             float dy = entity.WorldY - at.WorldY;
-            found.Add(new NearMonster(MathF.Sqrt((dx * dx) + (dy * dy)), entity.Rarity));
+            var near = new NearMonster(MathF.Sqrt((dx * dx) + (dy * dy)), entity.Rarity);
+
+            if (project)
+            {
+                // The monster's BASE, not the top of its model. A cursor rule is about where a
+                // skill would land, and the game places one on the ground the monster stands
+                // on - the model height is what a health bar wants, and it is a different
+                // question by tens of pixels on a large monster.
+                ScreenPoint point = WorldToScreen.Project(
+                    snapshot.Matrix, entity.WorldX, entity.WorldY, entity.WorldZ, width, height);
+
+                near = near with { ScreenX = point.X, ScreenY = point.Y, OnScreen = point.OnScreen };
+            }
+
+            found.Add(near);
         }
 
         found.Sort(static (left, right) => left.Distance.CompareTo(right.Distance));
@@ -299,6 +376,36 @@ public sealed record RuleState
         }
 
         return total;
+    }
+
+    private int CountAtCursor(double pixels, Func<ItemRarity, bool>? matches)
+    {
+        if (Pointer is not PointerView at)
+        {
+            return 0;
+        }
+
+        int total = 0;
+        foreach (NearMonster monster in Monsters)
+        {
+            // Not sorted by this measure - the list is ordered by world distance - so every
+            // monster is looked at rather than the walk stopping at the first one out of range.
+            if (monster.OnScreen
+                && Pixels(monster, at) <= pixels
+                && (matches is null || matches(monster.Rarity)))
+            {
+                total++;
+            }
+        }
+
+        return total;
+    }
+
+    private static double Pixels(NearMonster monster, PointerView pointer)
+    {
+        double dx = monster.ScreenX - pointer.X;
+        double dy = monster.ScreenY - pointer.Y;
+        return Math.Sqrt((dx * dx) + (dy * dy));
     }
 
     private int CountWithin(double distance, Func<ItemRarity, bool>? matches)
@@ -373,7 +480,33 @@ public sealed record RuleState
 /// carrying the whole record would let a future condition do exactly that on an address that
 /// may since have been freed.
 /// </remarks>
-public readonly record struct NearMonster(double Distance, ItemRarity Rarity);
+/// <param name="Distance">World units from the player.</param>
+/// <param name="ScreenX">
+/// Where the monster is drawn, for the rules that measure from the CURSOR. Only meaningful
+/// when <paramref name="OnScreen"/> is set.
+/// </param>
+/// <param name="OnScreen">
+/// Whether the projection landed in front of the camera and inside the viewport. Carried
+/// rather than inferred from the coordinates, because a point behind the camera projects to a
+/// perfectly plausible pixel - which is the historic projection bug in miniature.
+/// </param>
+public readonly record struct NearMonster(
+    double Distance,
+    ItemRarity Rarity,
+    float ScreenX = 0,
+    float ScreenY = 0,
+    bool OnScreen = false);
+
+/// <summary>Where the mouse is, in the pixels the projection produces.</summary>
+/// <remarks>
+/// Handed to <see cref="RuleState.From"/> rather than read there: asking Windows where the
+/// cursor is belongs at the composition root, and this keeps the whole state - including
+/// every cursor rule - buildable in a test.
+/// </remarks>
+public readonly record struct PointerView(float X, float Y, int Width, int Height)
+{
+    public bool IsValid => Width > 0 && Height > 0;
+}
 
 /// <summary>What the previous tick has to say about this one.</summary>
 public readonly record struct RuleMovement(bool Moving, double? Speed, double SecondsInArea);

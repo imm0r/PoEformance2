@@ -65,6 +65,8 @@ export class RulesPanel {
     $("rl-profile-delete").addEventListener("click", () => this.removeProfile());
     $("rl-group-new").addEventListener("click", () => this.addGroup());
 
+    $("rl-preview").addEventListener("change", () => this.preview());
+
     bridge.on("ruleCatalogue", (message) => {
       this.catalogue = message;
       this.render();
@@ -110,6 +112,43 @@ export class RulesPanel {
     this.settings = settings;
     bridge.send({ type: "setRuleSettings", payload: settings });
     if (redraw) this.render();
+  }
+
+  /**
+   * Tells the host which rule's ranges to draw over the game.
+   *
+   * The switch and the SELECTION together: a preview with no rule chosen has nothing to draw,
+   * and one left pointing at a rule nobody has open would go on painting circles on the ground
+   * after the editor moved elsewhere. Sent on both, so the two cannot come apart.
+   */
+  preview() {
+    const rule = this.chosen();
+    const on = $("rl-preview").checked && rule;
+    bridge.send({ type: "setRulePreview", payload: { ruleId: on ? rule.id : "" } });
+  }
+
+  /**
+   * Whether this rule measures anything a ring could show.
+   *
+   * Read off the GRAPH rather than the condition: the page never sees the condition tree in a
+   * form it can walk, and the graph is the same facts with the same arguments. A rule with no
+   * radius in it draws nothing, and saying so beside the switch is cheaper than switching it
+   * on and going to look.
+   */
+  hasRanges(rule) {
+    const nodes = this.shapes[rule.id]?.graph?.nodes ?? [];
+    const ranged = new Set(
+      (this.catalogue?.facts ?? [])
+        .filter((f) => f.argument === "Distance" || f.argument === "Pixels")
+        .map((f) => f.name));
+
+    return nodes.some((node) => node.kind === "Fact" && ranged.has(node.fact));
+  }
+
+  /** The rule the editor has open, or null. */
+  chosen() {
+    const group = this.profile()?.groups[this.selected?.group ?? -1];
+    return group?.rules[this.selected?.rule ?? -1] ?? null;
   }
 
   profile() {
@@ -285,6 +324,10 @@ export class RulesPanel {
         open.addEventListener("click", () => {
           this.selected = { group: groupIndex, rule: ruleIndex };
           this.render();
+
+          // The preview follows the selection, or it goes on drawing the ranges of a rule
+          // nobody is looking at any more.
+          this.preview();
         });
         item.appendChild(open);
 
@@ -322,6 +365,8 @@ export class RulesPanel {
     }
 
     const { group: gi, rule: ri } = this.selected;
+
+    $("rl-preview-label").classList.toggle("dim", !this.hasRanges(rule));
 
     host.appendChild(this.ruleHeader(rule, gi, ri, group));
     host.appendChild(this.conditionSection(rule, gi, ri));
@@ -456,12 +501,19 @@ export class RulesPanel {
 
     // Rebuilt per render rather than kept: the detail pane is replaced whole when the
     // selection changes, so a retained editor would be attached to a node that is gone.
-    this.graph = new GraphEditor(host, this.catalogue, (graph) => {
-      // The local shape moves with the edit. Everything that redraws reads shapes, and until
-      // the host answers this is the only copy that has the new box in it.
-      if (this.shapes[rule.id]) this.shapes[rule.id] = { ...this.shapes[rule.id], graph };
-      this.withRule(gi, ri, { graph }, false);
-    });
+    this.graph = new GraphEditor(
+      host,
+      this.catalogue,
+      (graph) => {
+        // The local shape moves with the edit. Everything that redraws reads shapes, and until
+        // the host answers this is the only copy that has the new box in it.
+        if (this.shapes[rule.id]) this.shapes[rule.id] = { ...this.shapes[rule.id], graph };
+        this.withRule(gi, ri, { graph }, false);
+      },
+
+      // Interaction started. Holds off the once-a-second poll for as long as it goes on, so a
+      // slow drag is not undone by the host answering with the positions from before it.
+      () => this.claim());
     this.graph.set(shape.graph);
     return host;
   }

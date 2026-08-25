@@ -1,4 +1,5 @@
 using PoEformance.Features;
+using PoEformance.Game.Components;
 
 namespace PoEformance.Core.Tests;
 
@@ -189,6 +190,84 @@ public class RuleGraphTests
             Assert.Equal(condition, read.Condition);
             Assert.NotNull(read.Graph);
             Assert.Equal(condition, read.Graph!.ToCondition());
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ARuleDrawnOnTheCanvasEvaluatesWhatWasDrawn()
+    {
+        // The bug this exists for, reported from a real session: the canvas saved a wired-up
+        // graph faithfully and the rule never fired. Nothing derived a condition from the
+        // boxes, so a rule built there kept the empty condition it was created with - which
+        // says nothing, and a condition that says nothing fires nothing. Every part of the
+        // feature looked correct: the graph came back, the wires were right, the effect was
+        // configured, and the status line said it was watching.
+        var graph = new RuleGraph(
+            [
+                Fact("a", RuleFact.InMap),
+                new GraphNode("b", GraphNodeKind.Fact, 0, 0)
+                {
+                    Fact = RuleFact.MonsterCount,
+                    Compare = Compare.AtLeast,
+                    Value = 3,
+                },
+                Box("and", GraphNodeKind.All),
+                Box("out", GraphNodeKind.Output),
+            ],
+            [new GraphLink("a", "and"), new GraphLink("b", "and"), new GraphLink("and", "out")]);
+
+        Rule drawn = new Rule("id", "Flamewall", new RuleCondition { Kind = ConditionKind.All }, [])
+        {
+            Graph = graph,
+        }.Normalised();
+
+        Assert.False(drawn.Condition.SaysNothing);
+        Assert.Equal("InMap && MonsterCount >= 3", RuleExpression.Write(drawn.Condition));
+
+        var state = new RuleState
+        {
+            InGame = true,
+            GameFocused = true,
+            Monsters = [new NearMonster(10, ItemRarity.Normal), new NearMonster(20, ItemRarity.Normal), new NearMonster(30, ItemRarity.Rare)],
+        };
+
+        Assert.True(drawn.Condition.Holds(state, new RuleTimers(), "rule"));
+        Assert.False(drawn.Condition.Holds(state with { Monsters = [] }, new RuleTimers(), "rule"));
+    }
+
+    [Fact]
+    public void ATypedRuleKeepsItsOwnCondition()
+    {
+        // The other half of the same rule: with no graph, the condition stands on its own and
+        // nothing overwrites it. Deriving from an absent graph would empty every typed rule.
+        RuleCondition typed = RuleExpression.Parse("InTown").Condition!;
+
+        Assert.Equal(typed, new Rule("id", "Typed", typed, []).Normalised().Condition);
+    }
+
+    [Fact]
+    public void TheDrawnConditionSurvivesTheSettingsFile()
+    {
+        // End to end, because the derivation lives in Normalised() and the file goes through
+        // it twice - once on save, once on load.
+        RuleCondition condition = RuleExpression.Parse("InMap && MonsterCountWithin(30) >= 3").Condition!;
+        var rule = new Rule("id", "Flamewall", new RuleCondition { Kind = ConditionKind.All }, [new RuleEffect()])
+        {
+            Graph = RuleGraph.From(condition),
+        };
+
+        string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Assert.True(RuleSettingsStore.Save(
+                new RuleSettings(true, "P", [new RuleProfile("P", [new RuleGroup("G", [rule])])]), path));
+
+            Rule loaded = RuleSettingsStore.Load(path).Profiles[0].Groups[0].Rules[0];
+            Assert.Equal(condition, loaded.Condition);
         }
         finally
         {

@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Features;
+using PoEformance.Game.World;
 
 namespace PoEformance.Overlay;
 
@@ -29,6 +30,139 @@ public sealed class RuleLayer
 
     /// <summary>Padding around a bar's label.</summary>
     private const float LabelGap = 4f;
+
+    /// <summary>How many points a world-space circle is drawn from.</summary>
+    /// <remarks>
+    /// Enough that a ring on the ground reads as a circle rather than as a polygon at the
+    /// radii these rules use. It is projected point by point on purpose: the ground circle is
+    /// an ellipse on screen, and drawing an actual ellipse would need the camera's tilt, which
+    /// this layer has no business knowing.
+    /// </remarks>
+    private const int RingPoints = 48;
+
+    /// <summary>The colour of a range whose condition is satisfied, and of one that is not.</summary>
+    private const uint RingHolds = 0xC050_FF50;
+    private const uint RingWaits = 0xC060_A0FF;
+
+    /// <summary>
+    /// Draws the ranges a rule measures, so a radius can be checked against the ground.
+    /// </summary>
+    /// <remarks>
+    /// The debug view for building rules, and the reason it exists is the project's own
+    /// working rule: a radius is a number in a text field, and the honest way to know whether
+    /// 30 is right is to see the circle with the monsters it counts inside it.
+    ///
+    /// A player ring is in WORLD units and follows the ground; a cursor ring is in SCREEN
+    /// pixels and follows the mouse. Drawing them differently is deliberate - they are not the
+    /// same kind of measurement, and a preview that made them look alike would teach the wrong
+    /// thing about the rule it is explaining.
+    /// </remarks>
+    public void DrawRanges(
+        ImDrawListPtr draw,
+        IReadOnlyList<PreviewRing> rings,
+        WorldSnapshot snapshot,
+        (float X, float Y)? cursor,
+        int width,
+        int height)
+    {
+        ArgumentNullException.ThrowIfNull(rings);
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        if (rings.Count == 0 || width <= 0 || height <= 0)
+        {
+            return;
+        }
+
+        foreach (PreviewRing ring in rings)
+        {
+            uint colour = ring.Holds ? RingHolds : RingWaits;
+
+            if (ring.AtCursor)
+            {
+                if (cursor is (float cx, float cy))
+                {
+                    var at = new Vector2(cx, cy);
+                    draw.AddCircle(at, (float)ring.Radius, colour, 0, 2f);
+                    Label(draw, ring.Label, at + new Vector2(0, (float)ring.Radius + 4f), colour);
+                }
+
+                continue;
+            }
+
+            if (snapshot.Player is WorldEntity player)
+            {
+                WorldRing(draw, snapshot, player, ring, colour, width, height);
+            }
+        }
+    }
+
+    private static void WorldRing(
+        ImDrawListPtr draw,
+        WorldSnapshot snapshot,
+        WorldEntity player,
+        PreviewRing ring,
+        uint colour,
+        int width,
+        int height)
+    {
+        Vector2 previous = default;
+        bool hadPrevious = false;
+        Vector2 lowest = default;
+        bool hadLowest = false;
+
+        for (int step = 0; step <= RingPoints; step++)
+        {
+            float angle = step / (float)RingPoints * MathF.Tau;
+            float x = player.WorldX + ((float)ring.Radius * MathF.Cos(angle));
+            float y = player.WorldY + ((float)ring.Radius * MathF.Sin(angle));
+
+            // At the player's own height rather than at the terrain under each point. The ring
+            // is a distance in the XY plane - which is what the rule measures - so following
+            // the ground would draw a different shape from the one being explained.
+            ScreenPoint point = WorldToScreen.Project(
+                snapshot.Matrix, x, y, player.WorldZ, width, height);
+
+            if (!point.OnScreen)
+            {
+                // A gap rather than a chord across the screen. A point behind the camera
+                // projects to a plausible pixel, and joining to it draws a line through the
+                // middle of everything - the same trap the atlas routes record.
+                hadPrevious = false;
+                continue;
+            }
+
+            var here = new Vector2(point.X, point.Y);
+            if (hadPrevious)
+            {
+                draw.AddLine(previous, here, colour, 2f);
+            }
+
+            previous = here;
+            hadPrevious = true;
+
+            if (!hadLowest || here.Y > lowest.Y)
+            {
+                lowest = here;
+                hadLowest = true;
+            }
+        }
+
+        if (hadLowest)
+        {
+            // At the ring's lowest point on screen, which is the near edge - so the label sits
+            // between the player and the camera rather than behind the character.
+            Label(draw, ring.Label, lowest + new Vector2(0, 4f), colour);
+        }
+    }
+
+    private static void Label(ImDrawListPtr draw, string text, Vector2 at, uint colour)
+    {
+        Vector2 size = ImGui.CalcTextSize(text);
+        var corner = new Vector2(at.X - (size.X / 2f), at.Y);
+
+        draw.AddText(corner + new Vector2(ShadowOffset, ShadowOffset), Shadow, text);
+        draw.AddText(corner, colour, text);
+    }
 
     /// <summary>Draws one tick's worth of captions and bars.</summary>
     public void Draw(ImDrawListPtr draw, IReadOnlyList<RuleDrawing> drawings, int width, int height)

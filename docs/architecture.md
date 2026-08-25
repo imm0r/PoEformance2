@@ -540,6 +540,51 @@ same split as auto-flask, so the priorities, the cooldowns and every gate are or
 - **A caption lingers.** RuleCraft has no equivalent, which is why all of its own examples hang
   off conditions that stay true for a while: a rule fired by an interval or by a single event
   is otherwise drawn for one frame and, in practice, never seen.
+- **Counting what you are AIMING at, not what is near you.** Ported from the AHK tool's cursor
+  radius, which the reference plugin has no equivalent for at all. For anything placed where
+  the pointer is — a wall, a ground effect, a targeted blast — "three monsters near me" is the
+  wrong question: the pack behind the character does not make a wall in front of it worth
+  casting. It is measured in SCREEN PIXELS, by projecting each monster and comparing, rather
+  than by un-projecting the cursor into the world: the ground is not a plane, and the
+  projection is the half that is already proven against the game. The cost is real and is
+  written on the fact — a pixel radius covers more ground zoomed out, and the number does not
+  transfer between two people at different resolutions.
+- **The ranges can be drawn on the ground.** The same working rule this project applies to
+  itself: a radius is a number in a text field, and the honest way to know whether 30 is right
+  is to see the circle with the monsters it counts inside it. A player ring is a world circle
+  projected point by point (an ellipse on screen, and drawing it as one would need the
+  camera's tilt, which the drawing layer has no business knowing); a cursor ring is a screen
+  circle. They are drawn differently ON PURPOSE — they are not the same measurement, and a
+  preview that made them look alike would teach the wrong thing about the rule. Each carries
+  what it currently reads and what it needs, and turns colour on the leaf's answer INCLUDING
+  its negation, so a "no monsters within 30" ring is green when the circle is empty.
+
+#### Three defects the first version shipped with, and what each one was
+
+All three were reported from one session, and none of them was visible from the tests:
+
+- **The canvas was a drawing.** `RuleGraph.ToCondition()` existed and was called by nothing, so
+  a rule built entirely in the node editor kept the empty condition it was created with — which
+  says nothing, and therefore fires nothing. Every part of it looked right: the graph saved,
+  the wires came back, the effect was configured, the status line said it was watching. The
+  fix makes the graph the SOURCE when a rule has one, derived in `Rule.Normalised()` — the one
+  place a rule becomes what the engine runs.
+- **The wires were drawn into the wrong box.** The SVG layer was stretched to the scrolling
+  surface while its `viewBox` described the whole canvas, so an SVG asked to fit a smaller box
+  than its viewBox squashed it: measured, 207 pixels away from the ports it was meant to join.
+  The layer now sits in a content element sized to what the boxes reach, so the mapping is one
+  to one.
+- **A slow drag snapped back.** The page polls the host once a second and rebuilds the editor
+  from the answer; a drag is one edit that takes several seconds and claimed "in use" only at
+  the END, so the poll landed mid-drag and restored the position from before it. Only quick
+  flicks moved a box.
+
+The last two are worth a note about how they were FOUND, because the first attempt to catch
+them proved nothing. Driving the page in a browser exercises its no-host preview path, which
+renders once and never polls — and the poll is the entire mechanism. A harness that installs a
+fake `window.chrome.webview` before the modules load, and answers like the host does, tells the
+merged build and the fix apart on both counts. A check a wrong value passes is worse than no
+check, and a browser check with no host was exactly that.
 
 ### The atlas — the one feature that is INTERFACE rather than world
 

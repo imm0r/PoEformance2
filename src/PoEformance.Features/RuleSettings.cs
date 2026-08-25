@@ -41,14 +41,21 @@ public sealed record Rule(
     /// The node graph this rule was drawn as, when it was drawn rather than typed.
     /// </summary>
     /// <remarks>
-    /// The graph is a LAYOUT, not a second copy of the logic: <see cref="Condition"/> is what
-    /// runs, and the graph exists so that reopening the editor shows the boxes where they were
-    /// left rather than an auto-layout of the same tree. Null means the rule was written as
-    /// text, and the editor draws one from the tree on demand.
+    /// A rule has ONE source, and this is it whenever it is present: <see cref="Normalised"/>
+    /// derives <see cref="Condition"/> from the graph, so the two can never disagree about
+    /// what the rule asks. Null means the rule was written as text, and then the condition
+    /// stands on its own; the editor draws a graph from the tree on demand and only stores one
+    /// once somebody moves a box.
     ///
-    /// The reference plugin stores the graph as the source and REGENERATES its condition
-    /// string from it, which is why a rule edited as text there loses its edit the next time
-    /// the graph is touched.
+    /// This is a correction rather than the original design. The graph was described as
+    /// LAYOUT and nothing derived a condition from it, so a rule built entirely in the canvas
+    /// kept the empty condition it was created with - which says nothing, and therefore fires
+    /// nothing. Every box somebody wired up was saved faithfully and evaluated not at all.
+    ///
+    /// The cost of the correction, stated because the file is hand-editable: on a rule that
+    /// carries a graph, editing `condition` in the file does nothing - the next load derives
+    /// it again. Editing the graph, or switching the rule to text in the editor, is how that
+    /// rule's logic changes.
     /// </remarks>
     [JsonPropertyName("graph")]
     public RuleGraph? Graph { get; init; }
@@ -67,6 +74,13 @@ public sealed record Rule(
             effects.Add(effect.Normalised());
         }
 
+        // A drawn rule's boxes ARE its logic, so the tree is derived from them here - the one
+        // place a rule becomes what the engine runs, reached by the file and by the config
+        // page alike. Without this the canvas is a drawing: saved faithfully, evaluated never.
+        RuleCondition condition = Graph is RuleGraph drawn
+            ? drawn.ToCondition()
+            : Condition ?? new RuleCondition { Kind = ConditionKind.All };
+
         return this with
         {
             // An id is what everything about this rule is remembered under, so one is minted
@@ -75,7 +89,7 @@ public sealed record Rule(
             Id = string.IsNullOrWhiteSpace(Id) ? NewId() : Id.Trim(),
             Name = string.IsNullOrWhiteSpace(Name) ? "Rule" : Name.Trim(),
             Comment = Comment ?? string.Empty,
-            Condition = (Condition ?? new RuleCondition { Kind = ConditionKind.All }).Trimmed(),
+            Condition = condition.Trimmed(),
             Effects = effects,
         };
     }

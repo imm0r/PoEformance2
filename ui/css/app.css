@@ -361,21 +361,27 @@ pre#log {
 .graph-bar { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: #00000033; }
 .graph-hint { font-size: 12px; }
 
-/* Scrolls in both directions: a graph is laid out in real coordinates, and clipping one
-   that outgrew the pane would hide boxes with no sign that they are there. */
+/* The window onto the canvas: a fixed size that scrolls. A graph is laid out in real
+   coordinates, and clipping one that outgrew the pane would hide boxes with no sign that they
+   are there. */
 .graph-surface {
-  position: relative;
   overflow: auto;
-  min-height: 260px;
-  max-height: 460px;
+  height: 420px;
+  resize: vertical;
   background:
     radial-gradient(circle, #ffffff10 1px, transparent 1px) 0 0 / 24px 24px,
     #00000022;
 }
 
+/* The canvas itself, sized in JS to what the boxes reach. Everything is positioned inside
+   THIS rather than inside the surface, which is what keeps the wires straight: the surface is
+   the visible strip, so a wire layer stretched to it while the graph is taller has its viewBox
+   squashed into it - every wire in the right place for a canvas nobody is looking at. */
+.graph-content { position: relative; }
+
 /* Behind the boxes and deaf to the mouse, except the wires themselves - a click on a wire
    is how one is removed, and a transparent sheet over the canvas would eat every other click. */
-.graph-wires { position: absolute; inset: 0; pointer-events: none; }
+.graph-wires { position: absolute; left: 0; top: 0; pointer-events: none; }
 .graph-wire { fill: none; stroke: var(--accent); stroke-width: 2; pointer-events: stroke; cursor: pointer; }
 .graph-wire:hover { stroke: var(--bad); }
 

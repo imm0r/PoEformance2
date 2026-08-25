@@ -37,11 +37,18 @@ export class GraphEditor {
    * @param {HTMLElement} host      where to build the editor
    * @param {object} catalogue      what the engine will accept - facts, comparisons
    * @param {(graph: object) => void} onChange  called after every edit
+   * @param {() => void} onBusy     called whenever an interaction STARTS, before any edit
+   *
+   * onBusy is not a nicety. The page polls the host once a second and rebuilds this editor
+   * from the answer; a drag is one edit that takes several seconds, and without something to
+   * say "in use" the poll lands mid-drag and puts the box back where it started. The symptom
+   * is that only quick flicks move a box - slow, careful positioning always snaps back.
    */
-  constructor(host, catalogue, onChange) {
+  constructor(host, catalogue, onChange, onBusy = () => {}) {
     this.host = host;
     this.catalogue = catalogue;
     this.onChange = onChange;
+    this.onBusy = onBusy;
     this.graph = { nodes: [], links: [] };
     this.selected = null;
 
@@ -73,17 +80,27 @@ export class GraphEditor {
 
     this.host.appendChild(bar);
 
+    // Two elements, not one, and the split is what keeps the wires straight. The SURFACE is
+    // the window: a fixed size that scrolls. The CONTENT is as large as the boxes reach, and
+    // everything - wires included - is positioned inside it. Drawing into the surface instead
+    // means the wire layer is the size of the visible strip while the graph is taller, and an
+    // SVG asked to fit a smaller box than its viewBox SQUASHES it: every wire lands in the
+    // right place for a canvas nobody is looking at, and drifts as the graph grows.
     this.surface = document.createElement("div");
     this.surface.className = "graph-surface";
 
+    this.content = document.createElement("div");
+    this.content.className = "graph-content";
+    this.surface.appendChild(this.content);
+
     this.wires = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     this.wires.setAttribute("class", "graph-wires");
-    this.surface.appendChild(this.wires);
+    this.content.appendChild(this.wires);
 
     // Clicking empty space cancels a half-made wire. Without this an armed port stays armed
     // across every other interaction, and the next click anywhere makes a link nobody meant.
     this.surface.addEventListener("pointerdown", (event) => {
-      if (event.target === this.surface || event.target === this.wires) {
+      if (event.target === this.surface || event.target === this.content || event.target === this.wires) {
         this.linking = null;
         this.selected = null;
         this.render();
@@ -248,25 +265,40 @@ export class GraphEditor {
   }
 
   render() {
-    for (const box of [...this.surface.querySelectorAll(".graph-node")]) box.remove();
-
-    let width = 480;
-    let height = 240;
+    for (const box of [...this.content.querySelectorAll(".graph-node")]) box.remove();
 
     for (const node of this.graph.nodes) {
-      const box = this.box(node);
-      this.surface.appendChild(box);
-      width = Math.max(width, node.x + 260);
-      height = Math.max(height, node.y + 120);
+      this.content.appendChild(this.box(node));
     }
 
-    this.surface.style.width = `${width}px`;
-    this.surface.style.height = `${height}px`;
+    const { width, height } = this.extent();
+    this.resize(width, height);
+    this.drawWires();
+  }
+
+  /**
+   * Sizes the content and the wire layer to what the boxes reach.
+   *
+   * The two must agree EXACTLY, in CSS pixels as well as in the viewBox, so the mapping is one
+   * to one and a wire drawn at (400, 600) is painted at (400, 600).
+   */
+  resize(width, height) {
+    this.content.style.width = `${width}px`;
+    this.content.style.height = `${height}px`;
     this.wires.setAttribute("viewBox", `0 0 ${width} ${height}`);
     this.wires.setAttribute("width", width);
     this.wires.setAttribute("height", height);
+  }
 
-    this.drawWires();
+  /** The size the content needs, so a dragged box grows the canvas rather than being clipped. */
+  extent() {
+    let width = 480;
+    let height = 240;
+    for (const node of this.graph.nodes) {
+      width = Math.max(width, node.x + 260);
+      height = Math.max(height, node.y + 140);
+    }
+    return { width, height };
   }
 
   drawWires() {
@@ -296,7 +328,7 @@ export class GraphEditor {
 
   /** Where a box's port sits, in surface coordinates. */
   port(node, out) {
-    const box = this.surface.querySelector(`[data-node="${node.id}"]`);
+    const box = this.content.querySelector(`[data-node="${node.id}"]`);
     const w = box?.offsetWidth ?? 200;
     const h = box?.offsetHeight ?? 60;
     return { x: node.x + (out ? w : 0), y: node.y + h * PORT_Y };
@@ -380,20 +412,37 @@ export class GraphEditor {
     handle.addEventListener("pointerdown", (event) => {
       if (event.target.closest("button")) return;
 
+      // Claimed at the START, not on release. A drag takes seconds and the poll arrives every
+      // one of them; claiming only at the end means the box is put back before it ever gets
+      // there. Re-claimed on every move, so the claim outlives a long, careful drag.
+      this.onBusy();
+
       // Pointer capture rather than listeners on the document: a drag that leaves the window
       // otherwise never gets its release and the box follows the cursor forever.
       handle.setPointerCapture(event.pointerId);
-      const startX = event.clientX - node.x;
-      const startY = event.clientY - node.y;
+
+      // Measured against the CONTENT's own rectangle each time rather than against a fixed
+      // client offset taken at the start. The surface scrolls, so a drag that reaches its edge
+      // moves the content under the pointer - and a fixed offset would then place the box by
+      // however far it had scrolled.
+      const grabX = event.clientX - this.content.getBoundingClientRect().left - node.x;
+      const grabY = event.clientY - this.content.getBoundingClientRect().top - node.y;
 
       const move = (moved) => {
-        node.x = Math.max(0, moved.clientX - startX);
-        node.y = Math.max(0, moved.clientY - startY);
-        const box = this.surface.querySelector(`[data-node="${node.id}"]`);
+        this.onBusy();
+        const rect = this.content.getBoundingClientRect();
+        node.x = Math.max(0, moved.clientX - rect.left - grabX);
+        node.y = Math.max(0, moved.clientY - rect.top - grabY);
+        const box = this.content.querySelector(`[data-node="${node.id}"]`);
         if (box) {
           box.style.left = `${node.x}px`;
           box.style.top = `${node.y}px`;
         }
+
+        // Grown as the box travels, so dragging one to the edge scrolls the canvas out rather
+        // than clipping it against a size measured before the drag.
+        const { width, height } = this.extent();
+        this.resize(width, height);
         this.drawWires();
       };
 
@@ -477,9 +526,14 @@ export class GraphEditor {
       return row;
     }
 
+    // The word in front of the field carries the UNIT's meaning: "within 30" reads the same
+    // for world units and for pixels, and those are wildly different radii.
+    const LEAD = { Slot: "slot", Seconds: "every", Distance: "within", Pixels: "of cursor" };
+    const UNIT = { Seconds: "s", Distance: "u", Pixels: "px" };
+
     const label = document.createElement("span");
     label.className = "dim";
-    label.textContent = info.argument === "Slot" ? "slot" : info.argument === "Seconds" ? "every" : "within";
+    label.textContent = LEAD[info.argument] ?? "within";
     row.appendChild(label);
 
     const number = document.createElement("input");
@@ -499,8 +553,7 @@ export class GraphEditor {
     });
     row.appendChild(number);
 
-    if (info.argument === "Seconds") row.appendChild(unit("s"));
-    if (info.argument === "Distance") row.appendChild(unit("u"));
+    if (UNIT[info.argument]) row.appendChild(unit(UNIT[info.argument]));
     return row;
   }
 
