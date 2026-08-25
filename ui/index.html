@@ -191,11 +191,27 @@
   </section>
 
   <script>
-    // Before the modules: any script error lands in the log panel instead of an invisible
-    // devtools console - a dead page must explain itself.
+    // Before the modules: any script error lands where somebody is LOOKING, not only in the
+    // log panel - which lives on the Setup tab, so a page that died while the Rules tab was
+    // open showed nothing but its own initial HTML: empty dropdowns, an empty gap field, a
+    // dash for a status. That is indistinguishable from "the host sends no states", and the
+    // difference between those two is an evening of diagnosis. A banner on every tab is not.
     window.addEventListener("error", (e) => {
+      const text = `SCRIPT ERROR  ${e.message} (${(e.filename || "?").split("/").pop()}:${e.lineno})`;
       const log = document.getElementById("log");
-      if (log) log.textContent = `SCRIPT ERROR  ${e.message} (${e.filename}:${e.lineno})\n` + log.textContent;
+      if (log) log.textContent = text + "\n" + log.textContent;
+      let banner = document.getElementById("script-error");
+      if (!banner) {
+        banner = document.createElement("div");
+        banner.id = "script-error";
+        banner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99;background:#7a2222;"
+          + "color:#fff;font:12px ui-monospace,monospace;padding:6px 12px;white-space:pre-wrap;";
+        document.body.appendChild(banner);
+      }
+      banner.textContent = text;
+    });
+    window.addEventListener("unhandledrejection", (e) => {
+      window.dispatchEvent(new ErrorEvent("error", { message: `unhandled rejection: ${e.reason}` }));
     });
   </script>
   <script type="module" src="js/app.js"></script>
