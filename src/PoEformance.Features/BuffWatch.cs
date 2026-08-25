@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using PoEformance.Game.Components;
 
 namespace PoEformance.Features;
@@ -7,15 +8,22 @@ namespace PoEformance.Features;
 /// <param name="DisplayName">The readable name, or empty when the game did not give one.</param>
 /// <param name="Description">The buff's own description text, or empty.</param>
 /// <param name="Active">Whether it is on right now, rather than remembered from earlier.</param>
+/// <remarks>
+/// EVERY PROPERTY IS NAMED FOR THE WIRE. The config window's serializer context sets no naming
+/// policy - every record that crosses to the page spells its own JSON names - and a record that
+/// forgets goes over as "Name"/"Active" while the page reads name/active. Nothing fails: the
+/// list arrives with the right number of rows and every field in it is undefined, so the picker
+/// showed the word "undefined" as a buff name and wrote it into the field somebody clicked.
+/// </remarks>
 public sealed record SeenBuff(
-    string Name,
-    bool Active,
-    float TimeLeft,
-    int Charges,
-    int FlaskSlot,
-    long LastSeenMs,
-    string DisplayName = "",
-    string Description = "");
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("active")] bool Active,
+    [property: JsonPropertyName("timeLeft")] float TimeLeft,
+    [property: JsonPropertyName("charges")] int Charges,
+    [property: JsonPropertyName("flaskSlot")] int FlaskSlot,
+    [property: JsonPropertyName("lastSeenMs")] long LastSeenMs,
+    [property: JsonPropertyName("displayName")] string DisplayName = "",
+    [property: JsonPropertyName("description")] string Description = "");
 
 /// <summary>
 /// Remembers which buffs a character has had on, so a rule need not be written by guesswork.

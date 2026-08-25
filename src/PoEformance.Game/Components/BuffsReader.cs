@@ -71,7 +71,7 @@ public sealed class BuffsReader
     private readonly IMemoryReader _reader;
     private readonly int _first;
     private readonly int _last;
-    private readonly int _stride;
+    private readonly int _pointerSize;
     private readonly int _definitionPtr;
     private readonly int _totalTime;
     private readonly int _timeLeft;
@@ -92,7 +92,7 @@ public sealed class BuffsReader
         StructDef buffs = schema.Structs["Buffs"];
         _first = buffs.OffsetOf("StatusEffectFirst");
         _last = buffs.OffsetOf("StatusEffectLast");
-        _stride = (int)buffs.Constants["StatusEffectStructSize"];
+        _pointerSize = (int)buffs.Constants["StatusEffectPointerSize"];
 
         StructDef effect = schema.Structs["StatusEffect"];
         _definitionPtr = effect.OffsetOf("BuffDefinitionPtr");
@@ -111,10 +111,12 @@ public sealed class BuffsReader
 
     /// <summary>Reads every active buff from a Buffs component address.</summary>
     /// <remarks>
-    /// The entries sit INLINE in the vector at a fixed stride - they are not pointers to
-    /// dereference. GameHelper2 reads them the other way, and that difference is why this
-    /// is worth stating twice: the wrong interpretation reads plausible-looking garbage
-    /// rather than failing outright.
+    /// THE VECTOR HOLDS POINTERS, and each one has to be dereferenced to reach a StatusEffect.
+    /// This read used to walk it as INLINE structs at 0x50 stride - see the schema for the
+    /// recording that settled it - and the failure mode is worth remembering: the span of a
+    /// real vector here is 56 to 96 bytes, so dividing by 0x50 floored the count to 0 or 1 and
+    /// the tool reported no buffs at all. Nothing threw; every buff condition simply never
+    /// matched, and the one entry it did produce carried a name read off a StatusEffect.
     /// </remarks>
     public ActiveBuffs Read(ulong componentAddress)
     {
@@ -130,16 +132,20 @@ public sealed class BuffsReader
             return ActiveBuffs.None;
         }
 
-        long count = (long)(last - first) / _stride;
-        if (count is < 0 or > 2048)
+        long span = (long)(last - first);
+        long count = span / _pointerSize;
+        if (count is < 0 or > 2048 || span % _pointerSize != 0)
         {
-            return ActiveBuffs.None; // a read caught mid-resize, not a real list
+            // Not a whole number of pointers, so this is a read caught mid-resize rather than
+            // a real list. Checked rather than floored on purpose: flooring is exactly what
+            // hid the wrong stride for as long as it did.
+            return ActiveBuffs.None;
         }
 
         var buffs = new List<ActiveBuff>((int)Math.Min(count, MaxBuffs));
         for (long i = 0; i < count && buffs.Count < MaxBuffs; i++)
         {
-            ActiveBuff? buff = ReadOne(first + (ulong)(i * _stride));
+            ActiveBuff? buff = ReadOne(_reader.ReadPointer(first + (ulong)(i * _pointerSize)));
             if (buff is ActiveBuff value)
             {
                 buffs.Add(value);
@@ -151,6 +157,11 @@ public sealed class BuffsReader
 
     private ActiveBuff? ReadOne(ulong entry)
     {
+        if (!MemoryReaderExtensions.IsPlausiblePointer(entry))
+        {
+            return null;
+        }
+
         ulong definition = _reader.ReadPointer(entry + (ulong)_definitionPtr);
         if (!MemoryReaderExtensions.IsPlausiblePointer(definition))
         {

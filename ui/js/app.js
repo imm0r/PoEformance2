@@ -327,6 +327,11 @@ if (bridge.connected) {
       status: "browser preview",
       acted: 0,
       keySource: "Defaults - no host",
+
+      // Hand-written to match the wire, which means driving the page in a browser can never
+      // catch a host that spells these differently - and one did, sending Name/Active while
+      // this said name/active, so the picker showed one buff called "undefined". The check
+      // that catches that is on the C# side, over the serializer these names only imitate.
       buffs: [
         { name: "fire_wall", displayName: "Flame Wall", description: "Deals fire damage over time.", active: true, timeLeft: 18.4, charges: 2, flaskSlot: 0, lastSeenMs: 0 },
         { name: "flask_effect_life", displayName: "Life Flask", description: "", active: true, timeLeft: 3.1, charges: 0, flaskSlot: 1, lastSeenMs: 0 },
