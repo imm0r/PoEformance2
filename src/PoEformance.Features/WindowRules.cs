@@ -101,6 +101,30 @@ public static class WindowAnchor
         };
     }
 
+    /// <summary>
+    /// The anchor as it stands RIGHT NOW, unclamped and unpersisted - the shape a drag is
+    /// tracked in.
+    /// </summary>
+    /// <remarks>
+    /// Settle is what a window is REMEMBERED as; this is what it is DOING. The difference is
+    /// the release frame: the chrome must not re-assert a position while the button is held,
+    /// so the only way the first frame after a drag can assert the DRAGGED position is for
+    /// something to have watched the drag as it went. No clamp, because yanking a window back
+    /// mid-drag is the fight this exists to avoid - the clamp belongs to the release.
+    /// </remarks>
+    public static (double X, double Y, int PivotX, int PivotY) Track(
+        float x, float y, float width, float height, float viewWidth, float viewHeight)
+    {
+        int pivotX = x + (width / 2f) > viewWidth / 2f ? 1 : 0;
+        int pivotY = y + (height / 2f) > viewHeight / 2f ? 1 : 0;
+
+        return (
+            (x + (pivotX * width)) / viewWidth,
+            (y + (pivotY * height)) / viewHeight,
+            pivotX,
+            pivotY);
+    }
+
     /// <summary>The anchored corner's position in pixels, for handing back to the window.</summary>
     public static (float X, float Y)? Resolve(WindowRule rule, float viewWidth, float viewHeight)
     {

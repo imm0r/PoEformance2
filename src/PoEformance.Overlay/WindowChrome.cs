@@ -154,6 +154,21 @@ public sealed class WindowChrome
     /// <summary>Where each window was last drawn, in screen pixels.</summary>
     private readonly Dictionary<string, (Vector2 At, Vector2 Size)> _seen = [];
 
+    /// <summary>
+    /// Each window's anchor AS IT STANDS, drag included - unclamped, never persisted.
+    /// </summary>
+    /// <remarks>
+    /// The saved rule and this runtime copy exist because of one frame: the release. The
+    /// assert in <see cref="Flags"/> is off while the button is held - fighting the hand
+    /// holding the window is what a jitter is - so the first frame AFTER a drag asserts
+    /// whatever anchor it can see. The first build asserted the RULE, which still held the
+    /// pre-drag place, and every drag was undone at the exact moment it ended: the window
+    /// snapped home, and Measure then dutifully settled it there. Tracking the anchor through
+    /// the drag, one frame behind the mouse, is what gives the release frame the dragged
+    /// position to assert.
+    /// </remarks>
+    private readonly Dictionary<string, (double X, double Y, int PivotX, int PivotY)> _standing = [];
+
     /// <summary>Remembers where this window is, for the frame that has to decide about it.</summary>
     /// <remarks>
     /// Called between <c>Begin</c> and <c>End</c>, where ImGui will answer for the current
@@ -179,7 +194,16 @@ public sealed class WindowChrome
         _seen[id] = (at, size);
 
         Vector2 view = ImGui.GetIO().DisplaySize;
-        if (view.X <= 0 || view.Y <= 0 || ImGui.IsMouseDown(ImGuiMouseButton.Left))
+        if (view.X <= 0 || view.Y <= 0)
+        {
+            return;
+        }
+
+        // The anchor is tracked EVERY frame, held button included - see _standing for the
+        // release-frame reasoning. Unclamped here: the clamp is the release's business.
+        _standing[id] = WindowAnchor.Track(at.X, at.Y, size.X, size.Y, view.X, view.Y);
+
+        if (ImGui.IsMouseDown(ImGuiMouseButton.Left))
         {
             return;
         }
@@ -205,6 +229,14 @@ public sealed class WindowChrome
         if (moved)
         {
             Set(id, settled);
+        }
+
+        // The settled place is also what stands: after a clamp the window is about to be AT
+        // the clamped spot, and an anchor still naming the shoved-out one would assert it
+        // right back over the edge on the next frame.
+        if (settled is { X: double sx, Y: double sy })
+        {
+            _standing[id] = (sx, sy, settled.PivotX, settled.PivotY);
         }
     }
 
@@ -272,7 +304,18 @@ public sealed class WindowChrome
         if (!ImGui.IsMouseDown(ImGuiMouseButton.Left))
         {
             Vector2 view = ImGui.GetIO().DisplaySize;
-            if (WindowAnchor.Resolve(rule, view.X, view.Y) is (float anchorX, float anchorY))
+
+            // What STANDS first, the saved rule second. The runtime anchor followed any drag
+            // frame by frame, so the release frame asserts the dragged place; the rule is the
+            // fallback for the first frames of a session, where it is the restore.
+            if (_standing.TryGetValue(id, out (double X, double Y, int PivotX, int PivotY) standing))
+            {
+                ImGui.SetNextWindowPos(
+                    new Vector2((float)(standing.X * view.X), (float)(standing.Y * view.Y)),
+                    ImGuiCond.Always,
+                    new Vector2(standing.PivotX, standing.PivotY));
+            }
+            else if (WindowAnchor.Resolve(rule, view.X, view.Y) is (float anchorX, float anchorY))
             {
                 ImGui.SetNextWindowPos(
                     new Vector2(anchorX, anchorY),
