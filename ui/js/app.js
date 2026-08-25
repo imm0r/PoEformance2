@@ -291,6 +291,8 @@ if (bridge.connected) {
       { name: "InGame", shape: "Flag", argument: "None", unit: "", help: "In an area." },
       { name: "LifePercent", shape: "Number", argument: "None", unit: "%", help: "Life, unreserved." },
       { name: "HasBuff", shape: "Flag", argument: "Text", unit: "", help: "A named buff is on." },
+      // A second TEXT fact, so the preview can show that only the buff ones get the buff list.
+      { name: "AreaContains", shape: "Flag", argument: "Text", unit: "", help: "Part of an area name." },
       { name: "FlaskCharges", shape: "Number", argument: "Slot", unit: "", help: "Charges in a slot." },
       { name: "EverySeconds", shape: "Flag", argument: "Seconds", unit: "", help: "Once per interval." },
     ],
@@ -325,6 +327,11 @@ if (bridge.connected) {
       status: "browser preview",
       acted: 0,
       keySource: "Defaults - no host",
+      buffs: [
+        { name: "lightning_infusion", active: true, timeLeft: 18.4, charges: 2, flaskSlot: 0, lastSeenMs: 0 },
+        { name: "flask_effect_life", active: true, timeLeft: 3.1, charges: 0, flaskSlot: 1, lastSeenMs: 0 },
+        { name: "chilled", active: false, timeLeft: 0, charges: 0, flaskSlot: 0, lastSeenMs: 0 },
+      ],
       settings: {
         enabled: false,
         profile: "Default",

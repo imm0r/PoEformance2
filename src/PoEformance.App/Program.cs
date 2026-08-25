@@ -211,6 +211,11 @@ internal static class Program
         ruleEngine.Bind(flaskKeys);
         var ruleHistory = new PoEformance.Features.RuleHistory();
 
+        // What the character has had on, so a buff condition can be picked from a list. The
+        // name a rule matches is the ENGINE identifier, which is nowhere on the player's own
+        // screen - so without this a buff rule is written by guessing at a spelling.
+        var buffWatch = new PoEformance.Features.BuffWatch();
+
         // The config window runs on its own thread so it can be open WHILE the overlay is,
         // which is what makes its switches worth having: a setting that needs a restart is
         // a settings file with extra steps.
@@ -225,7 +230,7 @@ internal static class Program
         Thread? configWindow = options.ShowConfig
             ? StartConfigWindow(
                 reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings,
-                overlaySettings, ruleEngine, overlayHandle, alwaysOnTop: options.ShowOverlay)
+                overlaySettings, ruleEngine, buffWatch, overlayHandle, alwaysOnTop: options.ShowOverlay)
             : null;
 
         if (options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0)
@@ -249,7 +254,7 @@ internal static class Program
 
             RunOverlay(
                 reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
-                ruleEngine, ruleHistory, rotation,
+                ruleEngine, ruleHistory, buffWatch, rotation,
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
                 uiBrowser: options.ShowUiBrowser,
                 fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
@@ -541,6 +546,7 @@ internal static class Program
         PoEformance.Features.AutoFlask autoFlask,
         PoEformance.Features.RuleEngine ruleEngine,
         PoEformance.Features.RuleHistory ruleHistory,
+        PoEformance.Features.BuffWatch buffWatch,
         PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
         ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
@@ -891,6 +897,11 @@ internal static class Program
                     pointer = new PoEformance.Features.PointerView(cx, cy, client.Width, client.Height);
                 }
 
+                // On the read rather than in the config window: the window reads its own
+                // snapshot once a second, and a buff worth writing a rule about lasts a few
+                // seconds - so half of them would never be seen.
+                buffWatch.Look(snapshot.PlayerBuffs, Environment.TickCount64);
+
                 PoEformance.Features.RuleTick rules = ruleEngine.Evaluate(
                     PoEformance.Features.RuleState.From(
                         snapshot,
@@ -1177,6 +1188,7 @@ internal static class Program
         PoEformance.Features.AutoFlaskSettings flaskSettings,
         PoEformance.Features.OverlaySettings overlaySettings,
         PoEformance.Features.RuleEngine ruleEngine,
+        PoEformance.Features.BuffWatch buffWatch,
         OverlayHandle overlayHandle,
         bool alwaysOnTop)
     {
@@ -1228,7 +1240,7 @@ internal static class Program
                 // it is given, so what it holds is what actually runs - and a copy here could
                 // show a threshold the engine rejected.
                 Rules: PoEformance.Config.RulesView.Of(
-                    ruleEngine, $"{flaskKeys.Source} - {flaskKeys.Detail}"));
+                    ruleEngine, $"{flaskKeys.Source} - {flaskKeys.Detail}", buffWatch));
         }
 
         // Rebuilding the outline is a pass over megabytes, so it is done once per area and

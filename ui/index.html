@@ -143,6 +143,19 @@
           <button id="rl-group-new">Add group</button>
         </div>
         <div id="rl-groups"></div>
+
+        <!--
+          What the character has had on. The name a rule matches is the ENGINE identifier -
+          "flask_effect_life", not the "Life Flask" the game paints - and that name appears
+          nowhere on the player's own screen, so without this a buff condition is written by
+          guessing at a spelling. Cast the skill, then look here.
+        -->
+        <details id="rl-buffs-panel" class="rl-buffs">
+          <summary>Buffs seen <span id="rl-buffs-count" class="dim"></span></summary>
+          <p class="dim rl-buffs-hint">Click one to put its name in the buff field you last used.
+            Rules match the game's internal name, which is not the one on your screen.</p>
+          <ul id="rl-buffs"></ul>
+        </details>
       </aside>
 
       <div class="rules-detail" id="rl-detail">

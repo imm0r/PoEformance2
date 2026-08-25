@@ -582,11 +582,21 @@ All three were reported from one session, and none of them was visible from the 
   the wires came back, the effect was configured, the status line said it was watching. The
   fix makes the graph the SOURCE when a rule has one, derived in `Rule.Normalised()` — the one
   place a rule becomes what the engine runs.
-- **The wires were drawn into the wrong box.** The SVG layer was stretched to the scrolling
-  surface while its `viewBox` described the whole canvas, so an SVG asked to fit a smaller box
-  than its viewBox squashed it: measured, 207 pixels away from the ports it was meant to join.
-  The layer now sits in a content element sized to what the boxes reach, so the mapping is one
-  to one.
+- **The wires were drawn into the wrong box — twice, for two different reasons.** The SVG layer
+  was stretched to the scrolling surface while its `viewBox` described the whole canvas, so an
+  SVG asked to fit a smaller box than its viewBox squashed it; it now sits in a content element
+  sized to what the boxes reach. And separately, `port()` measured a box that HAD NOT BEEN LAID
+  OUT: the detail pane is built detached and appended afterwards, so every box reports
+  `offsetWidth` **0** at the moment `render()` runs — and zero is a number, so the
+  `?? 200` fallback beside it never fired. Every wire went to the box's top-left CORNER. Now
+  the fallback tests for falsy rather than null, and a `ResizeObserver` redraws once the sizes
+  are real, which also covers a box growing when its fact changes.
+
+  Fixing the first and claiming both were fixed is the part worth recording. The A/B check
+  said 1 pixel, and it was measuring a canvas that a DRAG had already corrected — dragging
+  redraws with the boxes attached. **A check that passes for the wrong reason is the failure
+  mode this file keeps describing**, and the fix was to measure the state actually complained
+  about: the wires as they FIRST appear, no click, no drag, no re-render.
 - **A slow drag snapped back.** The page polls the host once a second and rebuilds the editor
   from the answer; a drag is one edit that takes several seconds and claimed "in use" only at
   the END, so the poll landed mid-drag and restored the position from before it. Only quick
