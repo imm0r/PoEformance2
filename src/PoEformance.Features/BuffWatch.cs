@@ -157,8 +157,17 @@ public sealed class BuffWatch
                     Drop(nowMs);
                 }
 
+                // A PERMANENT buff reports INFINITY as its remaining time - auras and most
+                // of what is on a character standing in town - and JSON cannot say infinity:
+                // one such value killed EVERY state the config window asked for, which
+                // presented as a page stuck on its initial HTML and "the rules are gone".
+                // Clamped at the one place a SeenBuff is made, because this record's whole
+                // job is to cross that wire; the page already shows no clock for anything
+                // huge, which is what a buff that never runs out should look like.
+                float left = float.IsFinite(buff.TimeLeft) ? buff.TimeLeft : float.MaxValue;
+
                 _seen[buff.Name] = new SeenBuff(
-                    buff.Name, true, buff.TimeLeft, buff.Charges, buff.FlaskSlot, nowMs,
+                    buff.Name, true, left, buff.Charges, buff.FlaskSlot, nowMs,
                     buff.DisplayName, buff.Description);
             }
 

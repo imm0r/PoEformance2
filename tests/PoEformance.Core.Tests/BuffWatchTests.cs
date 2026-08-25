@@ -208,4 +208,25 @@ public class BuffWatchTests
 
         Assert.DoesNotContain(keys, key => char.IsUpper(key[0]));
     }
+
+    [Fact]
+    public void APermanentBuffStillCrossesTheWire()
+    {
+        // A permanent buff - an aura, an ascendancy effect, most of what is on a character
+        // standing in town - reports INFINITY as its remaining time, and JSON cannot say
+        // infinity. One such value in the list killed EVERY state the config window asked
+        // for: the page sat on its initial HTML and the rules looked deleted. The clamp is
+        // huge rather than zero because the page shows no clock for anything huge, and a
+        // buff that never runs out has no clock to show.
+        var watch = new BuffWatch();
+        watch.Look(new ActiveBuffs(
+        [
+            new ActiveBuff("player_aura_armour", float.PositiveInfinity, float.PositiveInfinity, 0, 0, false),
+            new ActiveBuff("garbage_read", float.NaN, float.NegativeInfinity, 0, 0, false),
+        ]), 0);
+
+        string json = JsonSerializer.Serialize(watch.Seen[0], BuffWireContext.Default.SeenBuff);
+        Assert.Contains("timeLeft", json, StringComparison.Ordinal);
+        Assert.All(watch.Seen, buff => Assert.True(float.IsFinite(buff.TimeLeft)));
+    }
 }
