@@ -294,6 +294,32 @@ export class GraphEditor {
   }
 
   render() {
+    // Reentrancy guard, because releasing the focus below can land right back here: the
+    // change handler a blur fires calls changed(), and changed() renders. The outer call
+    // finishes the job with current data; the nested one only needs to not fight it.
+    if (this.rendering) return;
+    this.rendering = true;
+    try {
+      this.paint();
+    } finally {
+      this.rendering = false;
+    }
+  }
+
+  paint() {
+    // The focus is released BEFORE any box is removed. Removing a box whose input is still
+    // focused fires blur - and change, when the value was edited - SYNCHRONOUSLY, in the
+    // middle of the removal; the handler saves and re-renders, and by the time the original
+    // removal resumes its box has been replaced. Chromium answers with the NotFoundError
+    // that names exactly this trap ("moved in a 'blur' event handler"), and the way in was
+    // ordinary: edit a field, then click the empty canvas - pointerdown renders before the
+    // browser has moved the focus. Blurring first lets those handlers run to completion,
+    // and the boxes are queried AFTER, so the list removed is the list that exists.
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement && this.content.contains(focused)) {
+      focused.blur();
+    }
+
     for (const box of [...this.content.querySelectorAll(".graph-node")]) box.remove();
 
     for (const node of this.graph.nodes) {
