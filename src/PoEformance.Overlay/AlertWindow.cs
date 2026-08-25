@@ -126,12 +126,7 @@ public sealed class AlertWindow
 
         ImGui.Separator();
 
-        // Highest priority first, which is the order they would be shown in - so the list
-        // reads as "what wins when several happen at once".
-        foreach (AlertRule rule in _rules.OrderByDescending(r => r.Priority).ToList())
-        {
-            DrawRule(rule);
-        }
+        DrawRules();
 
         if (_rules.Count == 0)
         {
@@ -143,17 +138,58 @@ public sealed class AlertWindow
 
         if (_preload is not null)
         {
+            // Real air and a TITLED rule between the two lists, not a hairline: the blocks
+            // are near-identical in shape, and butted together they read as one list that
+            // has lost its order - which is exactly how it was reported.
             ImGui.Spacing();
-            ImGui.Separator();
+            ImGui.Spacing();
+            ImGui.SeparatorText("What the area loaded");
+            ImGui.Spacing();
             DrawPreload(_preload);
+        }
+    }
+
+    /// <summary>
+    /// The rule rows, as a table: a stretching text column and a control column that sizes
+    /// itself.
+    /// </summary>
+    /// <remarks>
+    /// A TABLE rather than the old fixed-pixel pin (SameLine at avail minus 210), because
+    /// that pin was a guess about how wide the controls are - and the controls grow with the
+    /// text size, while the guess did not, so at any larger font the delete button sat past
+    /// the window's edge no matter how wide the window was dragged. The table measures the
+    /// control column from its own content, so every row ends at the same right edge at
+    /// every text size, and an overlong description clips instead of shoving the controls.
+    /// </remarks>
+    private void DrawRules()
+    {
+        if (_rules.Count == 0
+            || !ImGui.BeginTable("##alert-rules", 2, ImGuiTableFlags.SizingFixedFit))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TableSetupColumn("rule", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("controls");
+
+            // Highest priority first, which is the order they would be shown in - so the
+            // list reads as "what wins when several happen at once".
+            foreach (AlertRule rule in _rules.OrderByDescending(r => r.Priority).ToList())
+            {
+                DrawRule(rule);
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
         }
     }
 
     /// <summary>The second list: what the area loaded, read once on the way in.</summary>
     private void DrawPreload(PreloadWatch preload)
     {
-        ImGui.TextColored(DimText, "What the area loaded");
-
         bool banner = _preloadSettings.Banner;
         if (ImGui.Checkbox("say it on the way in", ref banner))
         {
@@ -168,7 +204,7 @@ public sealed class AlertWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(160f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 9.5f);
         int minFiles = _preloadSettings.MinFiles;
 
         // The gate that decides whether the line on the way in is trustworthy. One matching
@@ -190,9 +226,25 @@ public sealed class AlertWindow
             }
         }
 
-        foreach (PreloadRule rule in preload.Rules)
+        // The same two-column table as the entity rules above, for the same reason - and so
+        // the two lists close at the SAME right edge, instead of each ragged in its own way.
+        if (preload.Rules.Count > 0
+            && ImGui.BeginTable("##preload-rules", 2, ImGuiTableFlags.SizingFixedFit))
         {
-            DrawPreloadRule(preload, rule);
+            try
+            {
+                ImGui.TableSetupColumn("rule", ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("controls");
+
+                foreach (PreloadRule rule in preload.Rules)
+                {
+                    DrawPreloadRule(preload, rule);
+                }
+            }
+            finally
+            {
+                ImGui.EndTable();
+            }
         }
 
         ImGui.TextColored(
@@ -205,6 +257,8 @@ public sealed class AlertWindow
     private void DrawPreloadRule(PreloadWatch preload, PreloadRule rule)
     {
         ImGui.PushID($"preload-{rule.PathContains}");
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
 
         bool on = rule.Enabled;
         if (ImGui.Checkbox("###on", ref on))
@@ -218,9 +272,11 @@ public sealed class AlertWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, $"path has \"{rule.PathContains}\"");
 
-        ImGui.SameLine(ImGui.GetContentRegionAvail().X - 230f);
+        ImGui.TableNextColumn();
 
-        ImGui.SetNextItemWidth(110f);
+        // Font-relative rather than a pixel count, so "dangerous" still fits in the box
+        // when the text is set larger.
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 7f);
         if (ImGui.BeginCombo("###weight", rule.Weight.ToString().ToLowerInvariant()))
         {
             foreach (PreloadWeight weight in Enum.GetValues<PreloadWeight>())
@@ -272,6 +328,8 @@ public sealed class AlertWindow
     private void DrawRule(AlertRule rule)
     {
         ImGui.PushID(rule.Name);
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
 
         bool on = rule.Enabled;
         if (ImGui.Checkbox("###on", ref on))
@@ -285,11 +343,12 @@ public sealed class AlertWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, Describe(rule));
 
-        // Pinned right, so the numbers line up down the list instead of wandering with the
-        // length of each rule's description.
-        ImGui.SameLine(ImGui.GetContentRegionAvail().X - 210f);
+        ImGui.TableNextColumn();
 
-        ImGui.SetNextItemWidth(150f);
+        // Wide enough for its longest caption ("anywhere in the area") at the CURRENT text
+        // size - the distance is the knob that decides whether a rule is useful, so its
+        // label is the one that must never be the thing that gets clipped.
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 9f);
         float within = rule.WithinDistance;
         if (ImGui.SliderFloat(
                 "###within",
@@ -313,7 +372,7 @@ public sealed class AlertWindow
 
     private void DrawAdd()
     {
-        ImGui.SetNextItemWidth(230f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 13.5f);
         if (ImGui.BeginCombo("###template", Templates[_template].Label))
         {
             for (int i = 0; i < Templates.Length; i++)
@@ -328,7 +387,7 @@ public sealed class AlertWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(180f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 10.5f);
         bool entered = ImGui.InputText("###adding", ref _adding, 96, ImGuiInputTextFlags.EnterReturnsTrue);
 
         ImGui.SameLine();
