@@ -33,6 +33,17 @@ internal static class Program
         var options = CliOptions.Parse(args);
         Console.WriteLine("PoEformance (C# port) - drift report");
 
+        // What the tool HEARD, not what was typed - the one line that settles "but I always
+        // pass --overlay" against a launcher, a shortcut or a batch variable that quietly
+        // dropped it. Only the switches that change what runs; the probe flags answer for
+        // themselves in their own output.
+        Console.WriteLine("heard   overlay=" + OnOff(options.ShowOverlay)
+            + " config=" + OnOff(options.ShowConfig)
+            + " autoflask=" + OnOff(options.AutoFlask)
+            + (options.RecordPath is string recording ? $" record={recording}" : "")
+            + (options.ReplayPath is string replaying ? $" replay={replaying}" : "")
+            + (options.Debug ? " debug" : ""));
+
         string schemaPath = options.SchemaPath ?? FindSchemaFile();
         Console.WriteLine($"schema  {schemaPath}");
 
@@ -444,6 +455,8 @@ internal static class Program
     /// <c>KeyAvailable</c> throws when input is redirected - which is exactly how this tool is
     /// run from a script - and an unhandled throw there would end a watch that was working.
     /// </remarks>
+    private static string OnOff(bool value) => value ? "on" : "off";
+
     private static bool KeyPressed()
     {
         try
@@ -588,35 +601,54 @@ internal static class Program
             get => Volatile.Read(ref _feed);
             set => Volatile.Write(ref _feed, value);
         }
+
+        private string _stage = string.Empty;
+        private long _stageSinceMs;
+
+        /// <summary>Which part of the overlay's start-up is running, or empty once it is up.</summary>
+        /// <remarks>
+        /// The overlay builds a dozen services before its window exists, and some of them are
+        /// slow on a cold disk - the item-art store walks the game's own bundle index. For as
+        /// long as that runs, this process has every switch right and nothing on screen, which
+        /// used to be indistinguishable from a process that never started an overlay at all.
+        /// </remarks>
+        public string Stage
+        {
+            get => Volatile.Read(ref _stage);
+            set
+            {
+                Volatile.Write(ref _stageSinceMs, Environment.TickCount64);
+                Volatile.Write(ref _stage, value ?? string.Empty);
+            }
+        }
+
+        /// <summary>How long the current stage has been running.</summary>
+        public long StageSeconds
+            => (Environment.TickCount64 - Volatile.Read(ref _stageSinceMs)) / 1000;
     }
 
     /// <summary>
-    /// The reader loop for a session with no overlay: rules, buffs and auto-flask, nothing drawn.
+    /// A feed that evaluates only what acts - auto-flask, the rules, the buff watch.
     /// </summary>
     /// <remarks>
-    /// The same decisions as the overlay's loop, at the same 33ms cadence, minus everything
-    /// that exists to be painted - terrain, icons, the atlas, the stash. Drawn rule effects
-    /// still come out of the engine and simply have no consumer, which is the effects model
-    /// working as designed: the engine decides, consumers take what they can show.
-    ///
-    /// Runs on the main thread's watch but the reads happen on the feed's own thread, so the
-    /// config window's once-a-second snapshot read coexists with it exactly as it does with
-    /// the overlay's loop. The feed is published on the handle for the rules panel's health
-    /// line, and disposed only after the config window closes - a panel that outlives the
-    /// reader it reports on would end the session with a lie on screen.
+    /// The whole of the automation and none of the drawing, so it can run in two places: as
+    /// THE loop when there is no overlay, and as the stand-in during the overlay's own start.
+    /// The overlay builds a dozen services before its full loop exists - the item-art store
+    /// walks the game's bundle index, the price book reads disk, quest tables parse - and for
+    /// as long as that takes, a feed that waited on it left the rules dead and the buff list
+    /// empty in a process started with every right switch. The automation must not wait on
+    /// cosmetics.
     /// </remarks>
-    private static void RunRulesWithoutOverlay(
+    private static PoEformance.Features.SnapshotFeed StartRulesFeed(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow,
         PoEformance.Features.AutoFlask autoFlask,
         PoEformance.Features.RuleEngine ruleEngine,
         PoEformance.Features.RuleHistory ruleHistory,
-        PoEformance.Features.BuffWatch buffWatch,
-        OverlayHandle handle,
-        Thread? configWindow)
+        PoEformance.Features.BuffWatch buffWatch)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
 
-        using var feed = new PoEformance.Features.SnapshotFeed(
+        return new PoEformance.Features.SnapshotFeed(
             _ =>
             {
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic);
@@ -656,7 +688,28 @@ internal static class Program
                 return snapshot;
             },
             TimeSpan.FromMilliseconds(33));
+    }
 
+    /// <summary>
+    /// The reader loop for a session with no overlay: rules, buffs and auto-flask, nothing drawn.
+    /// </summary>
+    /// <remarks>
+    /// The feed is published on the handle for the rules panel's health line, and disposed
+    /// only after the config window closes - a panel that outlives the reader it reports on
+    /// would end the session with a lie on screen.
+    /// </remarks>
+    private static void RunRulesWithoutOverlay(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow,
+        PoEformance.Features.AutoFlask autoFlask,
+        PoEformance.Features.RuleEngine ruleEngine,
+        PoEformance.Features.RuleHistory ruleHistory,
+        PoEformance.Features.BuffWatch buffWatch,
+        OverlayHandle handle,
+        Thread? configWindow)
+    {
+        using PoEformance.Features.SnapshotFeed feed = StartRulesFeed(
+            reader, schema, gameStatesStatic, gameWindow,
+            autoFlask, ruleEngine, ruleHistory, buffWatch);
         handle.Feed = feed;
 
         Console.WriteLine();
@@ -687,6 +740,18 @@ internal static class Program
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
         ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
     {
+        // The rules FIRST, before any of the services below. Several of them are slow on a
+        // cold start - the item-art store walks the game's own bundle index - and for as long
+        // as they build, a process started with every right switch had a live config window,
+        // a working map and completely dead automation: no feed, no overlay, "the reader has
+        // not looked at the player yet". The stand-in runs the same decisions the full loop
+        // will, and is replaced by it in the moment the full loop exists.
+        PoEformance.Features.SnapshotFeed earlyRules = StartRulesFeed(
+            reader, schema, gameStatesStatic, gameWindow,
+            autoFlask, ruleEngine, ruleHistory, buffWatch);
+        handle.Feed = earlyRules;
+        handle.Stage = "loading landmarks";
+
         // When the quest set was last re-read, so it happens on a timer and not per frame.
         long questsRead = 0;
 
@@ -730,6 +795,7 @@ internal static class Program
         // permission and works offline. poe2db is the fallback for whatever that cannot give
         // up, and THAT stays off until somebody turns it on: nothing else here talks to the
         // network while playing.
+        handle.Stage = "opening the game's art bundle";
         using var itemArt = new PoEformance.Features.ItemArtStore
         {
             Install = PoEformance.Overlay.InstalledArt.Source(describe: Console.WriteLine),
@@ -739,6 +805,7 @@ internal static class Program
         // array of flag references, and an array lives in the .dat's variable-length section,
         // which the resident copy of a table does not carry. Opened once - they cannot change
         // while the game runs - and then only the flag set is re-read.
+        handle.Stage = "parsing quest tables";
         var quests = new PoEformance.Features.QuestWatch();
         quests.Open(
             PoEformance.Game.Files.GameFiles.OpenOrSay(
@@ -746,6 +813,7 @@ internal static class Program
             FindDataFile("quest-tables.json"));
         Console.WriteLine($"quests   {quests.Opening}");
 
+        handle.Stage = "loading item names";
         var stash = new PoEformance.Features.StashInspector(
             reader,
             schema,
@@ -759,12 +827,14 @@ internal static class Program
         // more firmly than the pictures, because there is no local copy of a price to prefer:
         // they exist only on somebody else's server. Which league to ask about comes from the
         // game rather than from a setting, so it cannot go stale at a league start.
+        handle.Stage = "opening the price book";
         using var prices = new PoEformance.Features.PriceStore();
 
         // And the other half of "what is this worth": the game's own trade site, for the
         // uniques poe.ninja has nothing on - which on Standard is all of them. It cannot be
         // asked over plain HTTP (the endpoints are Cloudflare-gated), so the query runs inside
         // a browser the player signs in to once, and only asking prices come back out.
+        handle.Stage = "preparing the trade session";
         using var tradeSession = new PoEformance.Config.TradeSession();
         using var trade = new PoEformance.Features.TradePrices(ask: tradeSession.Query);
 
@@ -775,6 +845,7 @@ internal static class Program
         // The ritual line rides the atlas read. Its own first read is one byte - the mode
         // flag - so having it switched on costs nothing while no line is being drawn, which is
         // all but a few seconds of a session.
+        handle.Stage = "loading ritual and atlas data";
         var ritual = new PoEformance.Features.RitualWatch(
             new PoEformance.Game.Ui.RitualLineReader(
                 reader, schema, new PoEformance.Game.Ui.UiElementReader(reader, schema)),
@@ -926,6 +997,13 @@ internal static class Program
         // Which stash read has already been offered to the trade layer.
         PoEformance.Features.StashView tradeAsked = PoEformance.Features.StashView.Nothing;
 
+        handle.Stage = "starting the full reader";
+
+        // The stand-in retires HERE, not at scope end: two feeds evaluating the same rule
+        // engine would race its timers. Disposal joins the stand-in's thread, so from this
+        // line on exactly one loop is deciding.
+        earlyRules.Dispose();
+
         using var feed = new PoEformance.Features.SnapshotFeed(
             scale =>
             {
@@ -1055,6 +1133,7 @@ internal static class Program
 
         // Published as soon as it exists: the config window may already be open.
         handle.Feed = feed;
+        handle.Stage = string.Empty;
 
         using var overlay = new PoEformance.Overlay.EntityOverlay(
             scale =>
@@ -1704,7 +1783,17 @@ internal static class Program
         }
 
         string health = $"{feed.ReadCount} reads, {feed.FailureCount} failed";
-        return feed.LastFailure.Length > 0 ? $"{health}; last failure {feed.LastFailure}" : health;
+        if (feed.LastFailure.Length > 0)
+        {
+            health = $"{health}; last failure {feed.LastFailure}";
+        }
+
+        // The overlay's start-up, while it is still going. The stand-in feed above keeps the
+        // rules alive through it, but "the overlay is not on screen yet" deserves its stage
+        // and its clock - a bundle walk on a cold disk is half a minute of exactly nothing.
+        return handle.Stage.Length > 0
+            ? $"{health}; overlay still starting: {handle.Stage} ({handle.StageSeconds}s)"
+            : health;
     }
 
     /// <summary>The last segment of a metadata path - the readable half of an item name.</summary>
@@ -1882,18 +1971,41 @@ internal static class Program
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             List<string> peek = [];
 
+            // An option that takes a value must not be handed the NEXT OPTION as that value.
+            // "--record --overlay --config" - a forgotten file name, or a batch variable that
+            // expanded to nothing - used to record to a file literally named "--overlay" and
+            // silently drop the overlay, the rules and the buff list with it. Nothing warned:
+            // every token was consumed, so the unknown-option branch never saw one. Refusing
+            // here is a hard stop on purpose - the line was not what the person meant, and a
+            // tool that runs half of it looks broken in whichever half was eaten.
+            string Value(ref int at)
+            {
+                string option = args[at];
+                if (at + 1 >= args.Length || args[at + 1].StartsWith('-'))
+                {
+                    string got = at + 1 < args.Length ? $"\"{args[at + 1]}\"" : "nothing";
+                    Console.Error.WriteLine(
+                        $"{option} needs a value and got {got}. Nothing was started, because "
+                        + "running the rest of the line would silently drop whatever the "
+                        + "missing value swallowed.");
+                    Environment.Exit(2);
+                }
+
+                return args[++at];
+            }
+
             for (int i = 0; i < args.Length; i++)
             {
                 switch (args[i])
                 {
-                    case "--schema" when i + 1 < args.Length:
-                        schema = args[++i];
+                    case "--schema":
+                        schema = Value(ref i);
                         break;
-                    case "--replay" when i + 1 < args.Length:
-                        replay = args[++i];
+                    case "--replay":
+                        replay = Value(ref i);
                         break;
-                    case "--record" when i + 1 < args.Length:
-                        record = args[++i];
+                    case "--record":
+                        record = Value(ref i);
                         break;
                     case "--watch":
                         watch = true;
@@ -1930,8 +2042,8 @@ internal static class Program
                     // Takes a Cheat Engine pointer path as written - "+468C3A8,235C" - so a
                     // finding can be checked without transcribing it into an absolute address
                     // that stops meaning anything the moment the game restarts.
-                    case "--peek" when i + 1 < args.Length:
-                        peek.Add(args[++i]);
+                    case "--peek":
+                        peek.Add(Value(ref i));
                         break;
                     case "--peekwatch":
                         peekWatch = true;
