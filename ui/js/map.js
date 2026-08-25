@@ -13,6 +13,29 @@ const KIND_COLOURS = {
   loot: "#66ccff",
 };
 
+/**
+ * What arrived, in one line, for when the map is blank.
+ *
+ * A blank map has three causes that look identical: no layout was sent, one was sent with no
+ * dimensions, or one was sent whose runs are all empty - the last being a terrain grid that
+ * produced no outline. They need different fixes, and none of them was visible from a panel
+ * showing an empty rectangle.
+ */
+function describeLayout(raw, kept) {
+  if (!raw) return "no layout has been sent";
+  if (!kept) return `layout ${raw.width ?? "?"}x${raw.height ?? "?"} - nothing to draw yet`;
+
+  let set = 0;
+  let on = false;
+  for (const run of kept.runs ?? []) {
+    if (on) set += run;
+    on = !on;
+  }
+
+  return `layout ${kept.width}x${kept.height} step ${kept.step ?? 1}, `
+    + `${(kept.runs ?? []).length} runs, ${set} outline pixels`;
+}
+
 /** Expands the run-length runs into a painted offscreen canvas, once per area. */
 function paintLayout(layout) {
   const surface = document.createElement("canvas");
@@ -56,17 +79,36 @@ export class MapPanel {
     this.follow = true;
     this.zoom = 1;
     this.visible = false;
+    this.note = "no layout has been sent";
+    this.askedAt = 0;
   }
 
-  /** True when the layout on hand is not the one for the area being played. */
+  /**
+   * True when the layout on hand is not the one for the area being played.
+   *
+   * ALSO TRUE WHILE THERE IS NO LAYOUT AT ALL, which the first version got wrong. Terrain
+   * loads a while after the area does - the host says so in its own status line - so the
+   * answer to the one question asked on entering an area is very often "nothing yet". That
+   * answer used to be recorded against the area and never revisited, so an unlucky portal
+   * left the map blank until the next one. Throttled rather than free, because the comment
+   * on the host's side is right: a page bug here must not become a per-second cost.
+   */
   needsLayout(area) {
-    return this.visible && area !== 0 && this.area !== area;
+    if (!this.visible || area === 0) return false;
+    if (this.area !== area) return true;
+    if (this.layout) return false;
+
+    const now = Date.now();
+    if (now - this.askedAt < 3000) return false;
+    this.askedAt = now;
+    return true;
   }
 
   setLayout(area, layout) {
     this.area = area;
     this.layout = layout && layout.width > 0 ? layout : null;
     this.surface = this.layout ? paintLayout(this.layout) : null;
+    this.note = describeLayout(layout, this.layout);
     this.draw();
   }
 
@@ -96,10 +138,15 @@ export class MapPanel {
     const context = this.canvas.getContext("2d");
     context.clearRect(0, 0, width, height);
 
+    // The note goes on FIRST and stays up whatever else is drawn: a map with markers and no
+    // outline looked exactly like a map whose outline had not arrived, and the difference
+    // between those is the difference between a drawing fault and a reading one.
+    context.fillStyle = "#8a8f9c";
+    context.font = "12px ui-monospace, monospace";
+    context.fillText(this.note, 12, 20);
+
     if (!this.surface) {
-      context.fillStyle = "#8a8f9c";
-      context.font = "13px system-ui, sans-serif";
-      context.fillText("no layout yet — terrain loads a while after the area does", 16, 28);
+      context.fillText("terrain loads a while after the area does", 12, 38);
       return;
     }
 
