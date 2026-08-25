@@ -223,7 +223,7 @@ public sealed class DissectorWindow
         string[] roots = Enum.GetNames<StructureRoot>();
         int rootIndex = (int)_root;
 
-        ImGui.SetNextItemWidth(150f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
         if (ImGui.Combo("start", ref rootIndex, roots, roots.Length))
         {
             _root = (StructureRoot)rootIndex;
@@ -233,7 +233,7 @@ public sealed class DissectorWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(170f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 9.5f);
         if (ImGui.InputText("address", ref _typedAddress, 20, ImGuiInputTextFlags.EnterReturnsTrue)
             && TryHex(_typedAddress, out ulong typed))
         {
@@ -241,11 +241,11 @@ public sealed class DissectorWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(110f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
         ImGui.Combo("rows", ref _strideIndex, ["8 bytes", "4 bytes"], 2);
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(110f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
         if (ImGui.InputInt("bytes", ref _size, 128, 512))
         {
             _size = Math.Clamp(_size, 8, StructureInspector.MaxSize);
@@ -254,7 +254,7 @@ public sealed class DissectorWindow
         // The schema's own names, laid over the rows. This is also how a MISALIGNED read
         // announces itself: every row gets a name and none of them make sense.
         string[] names = Names();
-        ImGui.SetNextItemWidth(220f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
         ImGui.Combo("known layout", ref _structIndex, names, names.Length);
 
         ImGui.SameLine();
@@ -298,7 +298,7 @@ public sealed class DissectorWindow
     {
         if (_places.Count > 1)
         {
-            ImGui.SetNextItemWidth(190f);
+            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 10.5f);
             ImGui.Combo("show", ref _agreement, ["every row", "only what differs", "only what matches"], 3);
 
             if (ImGui.IsItemHovered())
@@ -328,7 +328,7 @@ public sealed class DissectorWindow
             return;
         }
 
-        ImGui.SetNextItemWidth(170f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 9.5f);
         if (ImGui.InputText("compare with", ref _typedCompare, 20, ImGuiInputTextFlags.EnterReturnsTrue)
             && TryHex(_typedCompare, out ulong beside)
             && Compare(beside))

@@ -155,7 +155,7 @@ public sealed class StyleWindow
         ImGui.Spacing();
 
         int size = _draftTextSize > 0 ? _draftTextSize : now.TextSizeOr;
-        ImGui.SetNextItemWidth(200f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 11f);
         if (ImGui.SliderInt("text size", ref size, InterfaceStyle.MinTextSize, InterfaceStyle.MaxTextSize, "%d px"))
         {
             _draftTextSize = size;
@@ -179,7 +179,7 @@ public sealed class StyleWindow
         // them reads as anything to a person - and a slider labelled in percent can be
         // ctrl-clicked and typed into, which one labelled "0.85" cannot usefully be.
         int panels = Percent(now.PanelOpacityOr);
-        ImGui.SetNextItemWidth(200f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 11f);
         if (ImGui.SliderInt("tool panels", ref panels, Floor, 100, "%d%% solid"))
         {
             editor.Chose(now with { PanelOpacity = panels / 100f });
@@ -187,7 +187,7 @@ public sealed class StyleWindow
         }
 
         int readout = Percent(now.ReadoutOpacityOr);
-        ImGui.SetNextItemWidth(200f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 11f);
         if (ImGui.SliderInt("the readout", ref readout, Floor, 100, "%d%% solid"))
         {
             editor.Chose(now with { ReadoutOpacity = readout / 100f });

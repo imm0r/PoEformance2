@@ -107,7 +107,12 @@ public sealed class PreloadWindow
             ImGui.TextColored(DimText, line);
         }
 
-        ImGui.Separator();
+        // Titled rules between the halves, like the alerts tab: the findings and the raw
+        // list are different answers to different questions, and a hairline does not say
+        // where one ends.
+        ImGui.Spacing();
+        ImGui.SeparatorText("what that means");
+        ImGui.Spacing();
 
         IReadOnlyList<PreloadFinding> findings = _watch.Findings;
         if (findings.Count == 0)
@@ -133,7 +138,9 @@ public sealed class PreloadWindow
             ImGui.TextColored(DimText, finding.Path);
         }
 
-        ImGui.Separator();
+        ImGui.Spacing();
+        ImGui.SeparatorText("every file it loaded");
+        ImGui.Spacing();
         DrawSearch();
 
         if (!ImGui.BeginChild("preload-raw", Vector2.Zero, ImGuiChildFlags.Borders))
@@ -189,7 +196,7 @@ public sealed class PreloadWindow
 
     private void DrawSearch()
     {
-        ImGui.SetNextItemWidth(240f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 13.5f);
         bool entered = ImGui.InputText(
             "###preload-search", ref _search, 96, ImGuiInputTextFlags.EnterReturnsTrue);
 

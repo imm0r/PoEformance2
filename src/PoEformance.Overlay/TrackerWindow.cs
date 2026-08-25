@@ -156,7 +156,7 @@ public sealed class TrackerWindow
             _write(settings with { Aim = aim with { ShowPlayer = player } });
         }
 
-        ImGui.SetNextItemWidth(150f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
         float length = aim.Length;
         if (ImGui.SliderFloat("##length", ref length, 5f, 400f, "%.0f world units"))
         {
@@ -164,7 +164,7 @@ public sealed class TrackerWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(120f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
         float thickness = aim.Thickness;
         if (ImGui.SliderFloat("##thickness", ref thickness, 0.5f, 10f, "%.1f wide"))
         {
@@ -369,82 +369,116 @@ public sealed class TrackerWindow
 
         List<GroundDangerRule> rules = [.. settings.GroundDangerOrDefault];
         bool edited = false;
+        int removed = -1;
 
-        for (int i = 0; i < rules.Count; i++)
+        // A table, like the alert lists: every control in its own column, so the rows line up
+        // and stay lined up when the thickness slider comes and goes with "filled" - laid out
+        // by hand, that slider vanishing shifted everything after it sideways per row. The
+        // path takes the stretch column, so it soaks up the width at every text size.
+        if (rules.Count > 0 && ImGui.BeginTable("##ground-rules", 7, ImGuiTableFlags.SizingFixedFit))
         {
-            ImGui.PushID($"ground{i}");
             try
             {
-                GroundDangerRule rule = rules[i];
+                ImGui.TableSetupColumn("on");
+                ImGui.TableSetupColumn("colour");
+                ImGui.TableSetupColumn("filled");
+                ImGui.TableSetupColumn("radius");
+                ImGui.TableSetupColumn("thickness");
+                ImGui.TableSetupColumn("delete");
+                ImGui.TableSetupColumn("path", ImGuiTableColumnFlags.WidthStretch);
 
-                bool enabled = rule.Enabled;
-                if (ImGui.Checkbox("##on", ref enabled))
+                for (int i = 0; i < rules.Count; i++)
                 {
-                    rules[i] = rule with { Enabled = enabled };
-                    edited = true;
-                }
-
-                ImGui.SameLine();
-                Vector4 colour = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(rule.Colour));
-                if (ImGui.ColorEdit4("##colour", ref colour, SwatchFlags))
-                {
-                    rules[i] = rule with
+                    ImGui.PushID($"ground{i}");
+                    try
                     {
-                        Colour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(colour)),
-                    };
-                    edited = true;
-                }
+                        GroundDangerRule rule = rules[i];
+                        ImGui.TableNextRow();
 
-                ImGui.SameLine();
-                bool filled = rule.Filled;
-                if (ImGui.Checkbox("filled", ref filled))
-                {
-                    rules[i] = rule with { Filled = filled };
-                    edited = true;
-                }
+                        ImGui.TableNextColumn();
+                        bool enabled = rule.Enabled;
+                        if (ImGui.Checkbox("##on", ref enabled))
+                        {
+                            rules[i] = rule with { Enabled = enabled };
+                            edited = true;
+                        }
 
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(90f);
-                int radius = rule.Radius;
-                if (ImGui.SliderInt("##radius", ref radius, 10, 400, "%d px"))
-                {
-                    rules[i] = rule with { Radius = radius };
-                    edited = true;
-                }
+                        ImGui.TableNextColumn();
+                        Vector4 colour = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(rule.Colour));
+                        if (ImGui.ColorEdit4("##colour", ref colour, SwatchFlags))
+                        {
+                            rules[i] = rule with
+                            {
+                                Colour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(colour)),
+                            };
+                            edited = true;
+                        }
 
-                if (!rule.Filled)
-                {
-                    ImGui.SameLine();
-                    ImGui.SetNextItemWidth(70f);
-                    int thickness = rule.Thickness;
-                    if (ImGui.SliderInt("##weight", ref thickness, 1, 5, "%d wide"))
-                    {
-                        rules[i] = rule with { Thickness = thickness };
-                        edited = true;
+                        ImGui.TableNextColumn();
+                        bool filled = rule.Filled;
+                        if (ImGui.Checkbox("filled", ref filled))
+                        {
+                            rules[i] = rule with { Filled = filled };
+                            edited = true;
+                        }
+
+                        ImGui.TableNextColumn();
+                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
+                        int radius = rule.Radius;
+                        if (ImGui.SliderInt("##radius", ref radius, 10, 400, "%d px"))
+                        {
+                            rules[i] = rule with { Radius = radius };
+                            edited = true;
+                        }
+
+                        // The cell exists whether or not the slider does, which is what keeps
+                        // the columns from shifting when "filled" hides it.
+                        ImGui.TableNextColumn();
+                        if (!rule.Filled)
+                        {
+                            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 4f);
+                            int thickness = rule.Thickness;
+                            if (ImGui.SliderInt("##weight", ref thickness, 1, 5, "%d wide"))
+                            {
+                                rules[i] = rule with { Thickness = thickness };
+                                edited = true;
+                            }
+                        }
+
+                        ImGui.TableNextColumn();
+                        if (ImGui.SmallButton("x"))
+                        {
+                            // Noted rather than removed here: a return from inside the table
+                            // would leave it unended, and removing mid-loop shifts the ids of
+                            // every row after it while their controls are still live.
+                            removed = i;
+                        }
+
+                        ImGui.TableNextColumn();
+                        ImGui.SetNextItemWidth(-float.Epsilon);
+                        string path = rule.Path;
+                        if (ImGui.InputText("##path", ref path, 256))
+                        {
+                            rules[i] = rule with { Path = path };
+                            edited = true;
+                        }
                     }
-                }
-
-                ImGui.SameLine();
-                if (ImGui.SmallButton("x"))
-                {
-                    rules.RemoveAt(i);
-                    _write(settings with { GroundDanger = rules });
-                    return;
-                }
-
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 10f);
-                string path = rule.Path;
-                if (ImGui.InputText("##path", ref path, 256))
-                {
-                    rules[i] = rule with { Path = path };
-                    edited = true;
+                    finally
+                    {
+                        ImGui.PopID();
+                    }
                 }
             }
             finally
             {
-                ImGui.PopID();
+                ImGui.EndTable();
             }
+        }
+
+        if (removed >= 0)
+        {
+            rules.RemoveAt(removed);
+            edited = true;
         }
 
         if (ImGui.Button("add a ground rule"))
@@ -512,28 +546,32 @@ public sealed class TrackerWindow
             "    the monster half makes the reader read a Buffs component per rare-or-better"
             + " monster; watch the Read cost tab.");
 
+        // Titled rules between the blocks, like the alerts tab: five near-identical control
+        // rows in a stack read as one that lost its order, and a hairline does not say where
+        // one subject ends.
+        ImGui.SeparatorText("the icon sheet");
         DrawSheet(settings);
+
+        ImGui.SeparatorText("where the rows sit");
         DrawLayout(settings);
         DrawTextSettings(settings);
 
-        ImGui.Separator();
-        ImGui.TextUnformatted("on the player");
+        ImGui.SeparatorText("on the player");
         DrawRules(settings, settings.PlayerStatusOrDefault, "player",
             rules => settings with { PlayerStatus = rules });
 
-        ImGui.Separator();
-        ImGui.TextUnformatted("on monsters");
+        ImGui.SeparatorText("on monsters");
         DrawRules(settings, settings.MonsterStatusOrDefault, "monster",
             rules => settings with { MonsterStatus = rules });
 
-        ImGui.Separator();
+        ImGui.Spacing();
         DrawLiveNames(snapshot);
     }
 
     /// <summary>The sheet path, and what actually loaded from it.</summary>
     private void DrawSheet(TrackerSettings settings)
     {
-        ImGui.SetNextItemWidth(360f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 20f);
         string path = settings.IconSheet;
         if (ImGui.InputText("icon sheet", ref path, 512))
         {
@@ -541,7 +579,7 @@ public sealed class TrackerWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(90f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
         int tile = settings.IconTile;
         if (ImGui.InputInt("tile", ref tile, 8, 32))
         {
@@ -587,7 +625,7 @@ public sealed class TrackerWindow
         float screen = ImGui.GetIO().DisplaySize.Y;
         string[] names = [.. StatusLayoutProfile.All.Select(p => p.Name)];
 
-        ImGui.SetNextItemWidth(120f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
         ImGui.Combo("##profile", ref _profile, names, names.Length);
 
         ImGui.SameLine();
@@ -633,7 +671,7 @@ public sealed class TrackerWindow
         {
             StatusIconLayout? changed = null;
 
-            ImGui.SetNextItemWidth(110f);
+            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
             int x = layout.X;
             if (ImGui.SliderInt("##x", ref x, -400, 400, "across %d"))
             {
@@ -641,7 +679,7 @@ public sealed class TrackerWindow
             }
 
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(110f);
+            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
             int y = layout.Y;
             if (ImGui.SliderInt("##y", ref y, lowest, highest, "down %d"))
             {
@@ -649,7 +687,7 @@ public sealed class TrackerWindow
             }
 
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(90f);
+            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
             int gap = layout.Gap;
             if (ImGui.SliderInt("##gap", ref gap, 0, 50, "gap %d"))
             {
@@ -669,7 +707,7 @@ public sealed class TrackerWindow
     /// <summary>The shadow, the timer plate, and where the two small numbers sit.</summary>
     private void DrawTextSettings(TrackerSettings settings)
     {
-        ImGui.SetNextItemWidth(110f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
         float alpha = settings.ShadowAlpha;
         if (ImGui.SliderFloat("##shadow", ref alpha, 0f, 1f, "shadow %.2f"))
         {
@@ -677,7 +715,7 @@ public sealed class TrackerWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(90f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
         int size = settings.ShadowSize;
         if (ImGui.SliderInt("##shadowsize", ref size, 0, 2, "spread %d"))
         {
@@ -697,7 +735,7 @@ public sealed class TrackerWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, "timer bar background");
 
-        ImGui.SetNextItemWidth(100f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
         int chargesX = settings.ChargesX;
         if (ImGui.SliderInt("##chargesx", ref chargesX, -64, 64, "stacks x %d"))
         {
@@ -705,7 +743,7 @@ public sealed class TrackerWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(100f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
         int chargesY = settings.ChargesY;
         if (ImGui.SliderInt("##chargesy", ref chargesY, -64, 64, "stacks y %d"))
         {
@@ -713,7 +751,7 @@ public sealed class TrackerWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(100f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
         int timerX = settings.TimerX;
         if (ImGui.SliderInt("##timerx", ref timerX, -64, 64, "timer x %d"))
         {
@@ -721,7 +759,7 @@ public sealed class TrackerWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(100f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
         int timerY = settings.TimerY;
         if (ImGui.SliderInt("##timery", ref timerY, -64, 64, "timer y %d"))
         {
@@ -738,100 +776,141 @@ public sealed class TrackerWindow
     {
         List<StatusIconRule> rules = [.. current];
         bool edited = false;
+        int removed = -1;
 
-        for (int i = 0; i < rules.Count; i++)
+        // The same table the ground rules use, for the same reasons: aligned columns at any
+        // text size, and the name soaking up the width in the stretch column.
+        if (rules.Count > 0 && ImGui.BeginTable($"##status-rules-{id}", 9, ImGuiTableFlags.SizingFixedFit))
         {
-            string key = $"{id}{i}";
-            ImGui.PushID(key);
             try
             {
-                StatusIconRule rule = rules[i];
+                ImGui.TableSetupColumn("on");
+                ImGui.TableSetupColumn("bar");
+                ImGui.TableSetupColumn("text");
+                ImGui.TableSetupColumn("tile");
+                ImGui.TableSetupColumn("pick");
+                ImGui.TableSetupColumn("scale");
+                ImGui.TableSetupColumn("delete");
+                ImGui.TableSetupColumn("label");
+                ImGui.TableSetupColumn("name", ImGuiTableColumnFlags.WidthStretch);
 
-                bool enabled = rule.Enabled;
-                if (ImGui.Checkbox("##on", ref enabled))
+                for (int i = 0; i < rules.Count; i++)
                 {
-                    rules[i] = rule with { Enabled = enabled };
-                    edited = true;
-                }
-
-                ImGui.SameLine();
-                Vector4 bar = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(rule.BarColour));
-                if (ImGui.ColorEdit4("##bar", ref bar, SwatchFlags))
-                {
-                    rules[i] = rule with
+                    string key = $"{id}{i}";
+                    ImGui.PushID(key);
+                    try
                     {
-                        BarColour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(bar)),
-                    };
-                    edited = true;
-                }
+                        StatusIconRule rule = rules[i];
+                        ImGui.TableNextRow();
 
-                ImGui.SameLine();
-                Vector4 text = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(rule.TextColour));
-                if (ImGui.ColorEdit4("##text", ref text, SwatchFlags))
-                {
-                    rules[i] = rule with
+                        ImGui.TableNextColumn();
+                        bool enabled = rule.Enabled;
+                        if (ImGui.Checkbox("##on", ref enabled))
+                        {
+                            rules[i] = rule with { Enabled = enabled };
+                            edited = true;
+                        }
+
+                        ImGui.TableNextColumn();
+                        Vector4 bar = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(rule.BarColour));
+                        if (ImGui.ColorEdit4("##bar", ref bar, SwatchFlags))
+                        {
+                            rules[i] = rule with
+                            {
+                                BarColour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(bar)),
+                            };
+                            edited = true;
+                        }
+
+                        ImGui.TableNextColumn();
+                        Vector4 text = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(rule.TextColour));
+                        if (ImGui.ColorEdit4("##text", ref text, SwatchFlags))
+                        {
+                            rules[i] = rule with
+                            {
+                                TextColour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(text)),
+                            };
+                            edited = true;
+                        }
+
+                        ImGui.TableNextColumn();
+                        DrawTilePreview(settings, rule);
+
+                        ImGui.TableNextColumn();
+                        if (ImGui.SmallButton(_picking == key ? "picking" : "pick"))
+                        {
+                            _picking = _picking == key ? string.Empty : key;
+                        }
+
+                        ImGui.TableNextColumn();
+                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 4f);
+                        float scale = rule.IconScale;
+                        if (ImGui.SliderFloat("##scale", ref scale, 0.2f, 4f, "x%.2f"))
+                        {
+                            rules[i] = rule with { IconScale = scale };
+                            edited = true;
+                        }
+
+                        ImGui.TableNextColumn();
+                        if (ImGui.SmallButton("x"))
+                        {
+                            // Noted rather than removed here - see the ground rules.
+                            removed = i;
+                        }
+
+                        ImGui.TableNextColumn();
+                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
+                        string label = rule.Label;
+                        if (ImGui.InputText("##label", ref label, 64))
+                        {
+                            rules[i] = rule with { Label = label };
+                            edited = true;
+                        }
+
+                        ImGui.TableNextColumn();
+                        ImGui.SetNextItemWidth(-float.Epsilon);
+                        string name = rule.Name;
+                        if (ImGui.InputText("##name", ref name, 128))
+                        {
+                            rules[i] = rule with { Name = name };
+                            edited = true;
+                        }
+                    }
+                    finally
                     {
-                        TextColour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(text)),
-                    };
-                    edited = true;
-                }
-
-                ImGui.SameLine();
-                DrawTilePreview(settings, rule);
-
-                ImGui.SameLine();
-                if (ImGui.SmallButton(_picking == key ? "picking" : "pick"))
-                {
-                    _picking = _picking == key ? string.Empty : key;
-                }
-
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(70f);
-                float scale = rule.IconScale;
-                if (ImGui.SliderFloat("##scale", ref scale, 0.2f, 4f, "x%.2f"))
-                {
-                    rules[i] = rule with { IconScale = scale };
-                    edited = true;
-                }
-
-                ImGui.SameLine();
-                if (ImGui.SmallButton("x"))
-                {
-                    rules.RemoveAt(i);
-                    _write(rebuild(rules));
-                    return;
-                }
-
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(120f);
-                string label = rule.Label;
-                if (ImGui.InputText("##label", ref label, 64))
-                {
-                    rules[i] = rule with { Label = label };
-                    edited = true;
-                }
-
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 10f);
-                string name = rule.Name;
-                if (ImGui.InputText("##name", ref name, 128))
-                {
-                    rules[i] = rule with { Name = name };
-                    edited = true;
-                }
-
-                if (_picking == key && PickTile(settings, rules[i]) is StatusIconRule picked)
-                {
-                    rules[i] = picked;
-                    _picking = string.Empty;
-                    _write(rebuild(rules));
-                    return;
+                        ImGui.PopID();
+                    }
                 }
             }
             finally
             {
-                ImGui.PopID();
+                ImGui.EndTable();
             }
+        }
+
+        if (removed >= 0)
+        {
+            rules.RemoveAt(removed);
+            edited = true;
+        }
+
+        // BELOW the table rather than inside the picking row's cell: the picker is a
+        // full-width scrolling child, and a table cell is the one place that cannot hold it.
+        for (int i = 0; i < rules.Count; i++)
+        {
+            if (_picking != $"{id}{i}")
+            {
+                continue;
+            }
+
+            if (PickTile(settings, rules[i]) is StatusIconRule picked)
+            {
+                rules[i] = picked;
+                _picking = string.Empty;
+                edited = true;
+            }
+
+            break;
         }
 
         if (ImGui.Button($"add a rule##{id}"))

@@ -73,7 +73,7 @@ public sealed class MapPinWindow
         ImGui.SameLine();
         ImGui.Checkbox("show the columns", ref _columns);
 
-        ImGui.SetNextItemWidth(220f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
         ImGui.InputTextWithHint("##pin-search", "filter by name", ref _search, 64);
 
         ImGui.Separator();
@@ -107,8 +107,10 @@ public sealed class MapPinWindow
             if (pin.Act != act)
             {
                 act = pin.Act;
-                ImGui.TextColored(ActText, act > 0 ? $"Act {act}" : "no act");
-                ImGui.Separator();
+
+                // A titled rule, like the quest list's acts - the same boundary drawn the
+                // same way, so the two tabs on this page read as one interface.
+                ImGui.SeparatorText(act > 0 ? $"Act {act}" : "no act");
             }
 
             Row(pin);
@@ -116,6 +118,9 @@ public sealed class MapPinWindow
 
         ImGui.EndChild();
     }
+
+    /// <summary>One indent level, in the current text size - see the quest list's.</summary>
+    private static float In => ImGui.GetFontSize() * 1.2f;
 
     private void Row(MapPin pin)
     {
@@ -125,13 +130,15 @@ public sealed class MapPinWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, pin.All ? "shown" : pin.Any ? "partly" : "waiting");
 
+        ImGui.Indent(In);
+
         // WHAT IT IS WAITING ON, which is the line this tab exists for. Named, because a row
         // number says nothing and "a1q3-SpokeToFarrow" says what to go and do.
         foreach (PinCondition condition in pin.Real)
         {
             foreach (int flag in condition.Wanting)
             {
-                ImGui.TextColored(WarnText, $"    needs: {Name(flag)}");
+                ImGui.TextColored(WarnText, $"needs: {Name(flag)}");
             }
         }
 
@@ -141,10 +148,12 @@ public sealed class MapPinWindow
             {
                 ImGui.TextColored(
                     condition.Met ? GoodText : DimText,
-                    $"    {condition.Column,-13} {condition.Held.Count}/{condition.Rows.Count}");
+                    $"{condition.Column,-13} {condition.Held.Count}/{condition.Rows.Count}");
             }
         }
 
+        ImGui.Unindent(In);
+        ImGui.Spacing();
         ImGui.PopID();
     }
 

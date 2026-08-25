@@ -183,7 +183,7 @@ public sealed class UiBrowserWindow
 
     private void DrawToolbar(UiTreeView view)
     {
-        ImGui.SetNextItemWidth(220);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
         if (ImGui.InputText("##uib-search", ref _search, 128, ImGuiInputTextFlags.EnterReturnsTrue))
         {
             _searchSequence++;
