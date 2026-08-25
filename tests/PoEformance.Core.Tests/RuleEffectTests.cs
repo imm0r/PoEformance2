@@ -112,6 +112,73 @@ public class RuleEffectTests
         Assert.True(every.Holds(state, timers, "rule"));
     }
 
+    [Fact]
+    public void CountsWhatIsUnderTheCursor_NotWhatIsNearThePlayer()
+    {
+        // The AHK tool's cursor radius, which the reference plugin has no equivalent for. For a
+        // skill placed where you aim, "three monsters near me" is the wrong question entirely:
+        // the pack behind the character does not make a wall in front of it worth casting.
+        var state = new RuleState
+        {
+            InGame = true,
+            Pointer = new PointerView(800, 400, 1920, 1080),
+            Monsters =
+            [
+                // Two under the pointer, three clustered far away - all equally "nearby" in
+                // world terms, which is what makes this a different answer rather than a
+                // narrower one.
+                new NearMonster(10, ItemRarity.Normal, 810, 410, true),
+                new NearMonster(12, ItemRarity.Rare, 780, 390, true),
+                new NearMonster(14, ItemRarity.Normal, 200, 900, true),
+                new NearMonster(16, ItemRarity.Normal, 240, 950, true),
+                new NearMonster(18, ItemRarity.Normal, 180, 880, true),
+            ],
+        };
+
+        Assert.Equal(5, state.MonsterCount);
+        Assert.Equal(2, state.MonsterCountAtCursor(120));
+        Assert.Equal(1, state.RareOrUniqueCountAtCursor(120));
+        Assert.Equal(5, state.MonsterCountAtCursor(2000));
+        // (810, 410) against a cursor at (800, 400) - ten pixels each way.
+        Assert.Equal(Math.Sqrt(200), state.NearestMonsterAtCursor ?? -1, 3);
+    }
+
+    [Fact]
+    public void ACursorRuleAnswersNothingWhileThePointerIsElsewhere()
+    {
+        // Null rather than clamped to an edge: a pointer parked over the inventory would
+        // otherwise read as aiming at the edge of the world, and the rule would fire on
+        // whatever monster happened to stand nearest it.
+        var state = new RuleState
+        {
+            InGame = true,
+            Monsters = [new NearMonster(10, ItemRarity.Normal, 800, 400, true)],
+        };
+
+        Assert.Equal(0, state.MonsterCountAtCursor(500));
+        Assert.Null(state.NearestMonsterAtCursor);
+
+        // And a comparison against an absent number says no, whichever way it is written.
+        var leaf = new RuleCondition { Fact = RuleFact.NearestMonsterAtCursor, Compare = Compare.AtMost, Value = 100 };
+        Assert.False(leaf.Holds(state, new RuleTimers(), "rule"));
+    }
+
+    [Fact]
+    public void AMonsterOffScreenIsNotUnderTheCursor()
+    {
+        // A point behind the camera projects to a perfectly plausible pixel, which is the
+        // historic projection bug in miniature - so the flag decides, never the coordinates.
+        var state = new RuleState
+        {
+            InGame = true,
+            Pointer = new PointerView(800, 400, 1920, 1080),
+            Monsters = [new NearMonster(10, ItemRarity.Normal, 800, 400, false)],
+        };
+
+        Assert.Equal(0, state.MonsterCountAtCursor(120));
+        Assert.Null(state.NearestMonsterAtCursor);
+    }
+
     [Theory]
     [InlineData("Q", 0x51)]
     [InlineData("q", 0x51)]

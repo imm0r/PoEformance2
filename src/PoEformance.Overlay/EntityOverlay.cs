@@ -419,6 +419,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// rate.
     /// </remarks>
     private Func<IReadOnlyList<RuleDrawing>>? _ruleDrawings;
+
+    /// <summary>The ranges the rule being edited measures, for the debug view.</summary>
+    private Func<IReadOnlyList<PreviewRing>>? _ruleRanges;
     private readonly UnwalkedLayer _unwalked = new();
     private readonly HeatLayer _heat = new();
     private readonly EffectLayer _effects = new();
@@ -915,10 +918,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Takes what to DRAW rather than the engine, so nothing here can trigger an evaluation.
     /// See <see cref="_ruleDrawings"/>.
     /// </remarks>
-    public void AttachRules(Func<IReadOnlyList<RuleDrawing>> drawings)
+    public void AttachRules(
+        Func<IReadOnlyList<RuleDrawing>> drawings,
+        Func<IReadOnlyList<PreviewRing>>? ranges = null)
     {
         ArgumentNullException.ThrowIfNull(drawings);
         _ruleDrawings = drawings;
+        _ruleRanges = ranges;
     }
 
     public void AttachAtlas(AtlasWatch watch, Action<AtlasSettings> saved, bool visible = false)
@@ -1445,6 +1451,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (_ruleDrawings is not null && width > 0 && height > 0)
         {
             _rules.Draw(ImGui.GetForegroundDrawList(), _ruleDrawings(), width, height);
+        }
+
+        // The ranges a rule measures, while somebody is building it. Under the world-panel
+        // gate rather than over it, unlike the captions: these are drawn ON THE GROUND, so a
+        // stash open over them is the same "right information in the way" every other world
+        // marker is hidden for.
+        if (_ruleRanges is not null && width > 0 && height > 0 && !_snapshot.InAPanel)
+        {
+            _rules.DrawRanges(
+                ImGui.GetForegroundDrawList(),
+                _ruleRanges(),
+                _snapshot,
+                GameWindowTracker.CursorInClient(_gameWindow),
+                width,
+                height);
         }
 
         // Nothing to mark in a town or a hideout, and a screen full of markers over the

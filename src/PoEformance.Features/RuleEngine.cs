@@ -94,6 +94,25 @@ public sealed class RuleEngine
     /// <summary>The last tick's outcome, for the status readout and the config page.</summary>
     public RuleTick LastTick { get; private set; } = RuleTick.Nothing;
 
+    /// <summary>
+    /// Which rule to draw ranges for while it is being built, or empty for none.
+    /// </summary>
+    /// <remarks>
+    /// NOT a setting, and not written to the file: it names whichever rule the editor happens
+    /// to have open, which is meaningless the moment the window is shut. Volatile because the
+    /// config window sets it from its own thread while the reader is evaluating.
+    /// </remarks>
+    public string PreviewRuleId
+    {
+        get => _previewRuleId;
+        set => _previewRuleId = value ?? string.Empty;
+    }
+
+    private volatile string _previewRuleId = string.Empty;
+
+    /// <summary>The ranges to draw over the game, from the last tick. Empty when off.</summary>
+    public IReadOnlyList<PreviewRing> LastPreview { get; private set; } = [];
+
     /// <summary>How many times any rule has acted since the engine started.</summary>
     public int Acted { get; private set; }
 
@@ -137,7 +156,39 @@ public sealed class RuleEngine
 
         RuleTick tick = Decide(state, nowMs);
         LastTick = tick;
+
+        // Alongside the decision rather than inside it, and computed on this thread rather than
+        // when the overlay asks: the renderer draws far more often than a snapshot arrives, so
+        // asking there would re-read the same facts sixty times a second - and the numbers on
+        // the rings would be a different moment from the one the rule acted on.
+        LastPreview = Ringed(state);
         return tick;
+    }
+
+    /// <summary>The ranges the rule being edited measures, or none when nothing is being edited.</summary>
+    private IReadOnlyList<PreviewRing> Ringed(RuleState state)
+    {
+        string id = _previewRuleId;
+        if (id.Length == 0 || _settings.Current is not RuleProfile profile)
+        {
+            return [];
+        }
+
+        foreach (RuleGroup group in profile.Groups)
+        {
+            foreach (Rule rule in group.Rules)
+            {
+                if (string.Equals(rule.Id, id, StringComparison.Ordinal))
+                {
+                    // Whether the rule is ENABLED does not matter here. A rule is switched off
+                    // for most of the time it is being built, and refusing to show its ranges
+                    // then would take the tool away exactly when it is wanted.
+                    return RulePreview.Rings(rule.Condition, state);
+                }
+            }
+        }
+
+        return [];
     }
 
     private RuleTick Decide(RuleState state, long nowMs)

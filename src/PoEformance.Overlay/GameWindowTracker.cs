@@ -52,6 +52,10 @@ public static partial class GameWindowTracker
     private static partial bool IsWindow(IntPtr hWnd);
 
     [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetCursorPos(out Point point);
+
+    [LibraryImport("user32.dll")]
     private static partial IntPtr GetForegroundWindow();
 
     [LibraryImport("user32.dll")]
@@ -88,6 +92,38 @@ public static partial class GameWindowTracker
 
         GetWindowThreadProcessId(foreground, out uint processId);
         return processId == (uint)Environment.ProcessId;
+    }
+
+    /// <summary>
+    /// Where the mouse is inside the game's client area, or null when it is elsewhere.
+    /// </summary>
+    /// <remarks>
+    /// In the same pixels <see cref="PoEformance.Game.World.WorldToScreen"/> projects into, so
+    /// a monster's projected point and the cursor can be compared directly - which is what
+    /// "how many monsters am I aiming at" needs and what the AHK tool's own cursor radius
+    /// does. Un-projecting the cursor into the world would be the other way round, and it
+    /// means intersecting a ray with a ground plane that is not flat.
+    ///
+    /// GetCursorPos rather than a window message, for the reason the overlay's click-through
+    /// icon relies on: a message-driven position freezes the moment the pointer leaves, and
+    /// the answer here has to stay right while somebody is aiming.
+    ///
+    /// Null when the pointer is OUTSIDE the client area. Clamping instead would report a
+    /// cursor parked over the inventory as being at the edge of the world, and a rule aimed
+    /// at it would fire on whatever monster stood nearest that edge.
+    /// </remarks>
+    public static (float X, float Y)? CursorInClient(IntPtr windowHandle)
+    {
+        ClientRect client = TryGet(windowHandle);
+        if (!client.IsValid || !GetCursorPos(out Point cursor))
+        {
+            return null;
+        }
+
+        float x = cursor.X - client.X;
+        float y = cursor.Y - client.Y;
+
+        return x >= 0 && y >= 0 && x < client.Width && y < client.Height ? (x, y) : null;
     }
 
     /// <summary>

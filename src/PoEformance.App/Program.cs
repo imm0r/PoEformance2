@@ -879,12 +879,25 @@ internal static class Program
                 // reference plugin evaluates inside its draw callback, which makes how often a
                 // macro fires a function of the frame rate: the same rule types twice as fast
                 // on a better graphics card, and a dropped frame skips a beat.
+                // Where the mouse is, for the rules that count what you are AIMING at rather
+                // than what is near you. Read here rather than in the state: asking Windows
+                // belongs at the composition root, and it keeps every cursor rule testable.
+                PoEformance.Features.PointerView? pointer = null;
+                PoEformance.Overlay.ClientRect client =
+                    PoEformance.Overlay.GameWindowTracker.TryGet(gameWindow);
+                if (client.IsValid
+                    && PoEformance.Overlay.GameWindowTracker.CursorInClient(gameWindow) is (float cx, float cy))
+                {
+                    pointer = new PoEformance.Features.PointerView(cx, cy, client.Width, client.Height);
+                }
+
                 PoEformance.Features.RuleTick rules = ruleEngine.Evaluate(
                     PoEformance.Features.RuleState.From(
                         snapshot,
                         InputSender.IsForeground(gameWindow),
                         ruleHistory,
-                        Environment.TickCount64),
+                        Environment.TickCount64,
+                        pointer),
                     Environment.TickCount64);
 
                 Perform(rules);
@@ -907,7 +920,7 @@ internal static class Program
         // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
         // are decided once per read, so asking here would both cost a re-evaluation per frame
         // and let an interval condition consume its timer sixty times a second.
-        overlay.AttachRules(() => ruleEngine.LastTick.Drawings);
+        overlay.AttachRules(() => ruleEngine.LastTick.Drawings, () => ruleEngine.LastPreview);
         overlay.ShowDiagnostics = debug;
         overlay.ShowCalibration = debug;
         overlay.ShowWorldDots = debug;
@@ -1256,6 +1269,19 @@ internal static class Program
                 return JsonSerializer.Serialize(
                     PoEformance.Config.RuleCatalogue.Build(),
                     PoEformance.Config.ConfigJsonContext.Default.RuleCatalogue);
+            }
+
+            if (request.Type == "setRulePreview")
+            {
+                // Which rule the editor has open, so its ranges can be drawn on the ground.
+                // Kept in memory and never saved: it is meaningless once the window is shut.
+                ruleEngine.PreviewRuleId =
+                    request.Payload.ValueKind == JsonValueKind.Object
+                    && request.Payload.TryGetProperty("ruleId", out JsonElement previewed)
+                        ? previewed.GetString() ?? string.Empty
+                        : string.Empty;
+
+                return string.Empty;
             }
 
             if (request.Type == "parseCondition")
