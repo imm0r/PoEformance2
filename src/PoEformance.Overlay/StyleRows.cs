@@ -238,7 +238,7 @@ public sealed class StyleRows
             // Starts at the ordinary size rather than at zero, so dragging it is an
             // adjustment from what is on screen rather than from nothing.
             float scale = wanted.Scale > 0f ? wanted.Scale : 1f;
-            ImGui.SetNextItemWidth(120f);
+            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
             if (ImGui.SliderFloat("size###scale", ref scale, 0.3f, 4f, "x%.2f"))
             {
                 wanted = wanted with { Scale = Math.Abs(scale - 1f) < 0.001f ? 0f : scale };
@@ -253,7 +253,7 @@ public sealed class StyleRows
         if (entry.Traits.HasFlag(StyleTraits.Width))
         {
             float width = wanted.Width;
-            ImGui.SetNextItemWidth(120f);
+            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
 
             // Zero is a real value here and it means "scale it with the marker", which is
             // what a line should do by default - so the format says so rather than showing a
@@ -301,7 +301,7 @@ public sealed class StyleRows
             return wanted;
         }
 
-        ImGui.SetNextItemWidth(300f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 16.5f);
         ImGui.InputText("###iconpath", ref _iconPath, 512);
 
         ImGui.SameLine();

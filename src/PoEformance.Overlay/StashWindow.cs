@@ -148,7 +148,7 @@ public sealed class StashWindow
             ImGui.TextColored(DimText, view.Status);
         }
 
-        ImGui.SetNextItemWidth(300f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 16.5f);
         ImGui.InputTextWithHint("##search", "name, mod or stat...", ref _search, 128);
         ImGui.SameLine();
         ImGui.TextColored(DimText, "searches the stats too");
@@ -178,7 +178,7 @@ public sealed class StashWindow
         });
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(120f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
         ImGui.SliderFloat("cell", ref _cell, 24f, 96f, "%.0f px");
 
         Prices(book);

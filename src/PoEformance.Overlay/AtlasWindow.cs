@@ -298,7 +298,7 @@ public sealed class AtlasWindow
                     if (group.Route)
                     {
                         ImGui.SameLine();
-                        ImGui.SetNextItemWidth(90f);
+                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
 
                         int hops = group.MaxHops;
                         if (ImGui.InputInt("maps away", ref hops, 1))

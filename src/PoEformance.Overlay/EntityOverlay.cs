@@ -2283,7 +2283,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // separates the possible causes: a round world height means the wrong height is being
         // fed in, while a value that only makes sense in pixels means the error is in screen
         // space.
-        ImGui.SetNextItemWidth(180);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 10f);
         float probe = ProbeHeight;
         if (ImGui.DragFloat("probe height", ref probe, 0.5f, -200f, 200f, "%.0f world units"))
         {

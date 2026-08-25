@@ -125,7 +125,7 @@ public sealed class EffectWindow
     {
         IReadOnlyList<EffectSort> sorts = EffectCensus.Sorts(snapshot);
 
-        ImGui.SetNextItemWidth(240f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 13.5f);
         ImGui.InputTextWithHint("##effect-filter", "filter by path", ref _filter, 128);
 
         int shown = 0;

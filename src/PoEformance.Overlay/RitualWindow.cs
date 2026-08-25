@@ -96,7 +96,7 @@ public sealed class RitualWindow
             ? $"- from where the line has reached, {view.Length} maps long"
             : $"- from every map you can enter now, {view.Length} maps long");
 
-        ImGui.SetNextItemWidth(260f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 14.5f);
         ImGui.InputTextWithHint("##filter", "only routes paying...", ref _filter, 64);
         ImGui.SameLine();
 
@@ -244,7 +244,7 @@ public sealed class RitualWindow
                 ImGui.PushID(reward);
                 try
                 {
-                    ImGui.SetNextItemWidth(120f);
+                    ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
                     int edited = current;
                     if (ImGui.InputInt("##weight", ref edited))
                     {

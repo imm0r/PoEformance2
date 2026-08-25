@@ -127,7 +127,7 @@ public sealed class EntityBrowserWindow
 
     private void DrawControls(EntityView view, WorldSnapshot snapshot)
     {
-        ImGui.SetNextItemWidth(240f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 13.5f);
         ImGui.InputText("filter", ref _filter, 64);
 
         ImGui.SameLine();

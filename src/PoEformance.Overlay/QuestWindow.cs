@@ -88,7 +88,7 @@ public sealed class QuestWindow
         ImGui.SameLine();
         ImGui.Checkbox("show the flags", ref _conditions);
 
-        ImGui.SetNextItemWidth(220f);
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
         ImGui.InputTextWithHint("##quest-search", "filter by name", ref _search, 64);
 
         ImGui.Separator();
@@ -125,8 +125,11 @@ public sealed class QuestWindow
             if (quest.Act != act)
             {
                 act = quest.Act;
-                ImGui.TextColored(ActText, act > 0 ? $"Act {act}" : "no act");
-                ImGui.Separator();
+
+                // A titled rule rather than a coloured line over a hairline - the same
+                // boundary the alerts tab draws between its lists, so the acts read as
+                // sections instead of as two more rows.
+                ImGui.SeparatorText(act > 0 ? $"Act {act}" : "no act");
             }
 
             Row(quest);
@@ -134,6 +137,15 @@ public sealed class QuestWindow
 
         ImGui.EndChild();
     }
+
+    /// <summary>One indent level, in the current text size.</summary>
+    /// <remarks>
+    /// A real indent rather than the four leading spaces the lines used to carry, and the
+    /// difference shows the moment a line wraps: a wrapped continuation returns to column
+    /// zero under a space prefix, which is what made the list read as loose lines instead of
+    /// as blocks belonging to their quest.
+    /// </remarks>
+    private static float In => ImGui.GetFontSize() * 1.2f;
 
     private void Row(QuestState quest)
     {
@@ -149,17 +161,19 @@ public sealed class QuestWindow
             ImGui.TextColored(DimText, "done");
         }
 
+        ImGui.Indent(In);
+
         // MESSAGE FIRST, measured rather than assumed: shown side by side against the game's
         // own panel, this column matched it word for word - "Find the Red Vale", "Search for
         // the meaning of the Runes etched into the Tree of Souls" - while Text was the longer
         // sentence every time.
         if (quest.Objective.Length > 0)
         {
-            ImGui.TextWrapped($"    {quest.Objective}");
+            ImGui.TextWrapped(quest.Objective);
         }
         else if (!quest.Complete)
         {
-            ImGui.TextColored(DimText, "    (this step carries no text)");
+            ImGui.TextColored(DimText, "(this step carries no text)");
         }
 
         // And the long form under it, because it is the half that says WHERE. "Slay the
@@ -167,19 +181,19 @@ public sealed class QuestWindow
         // part worth having on screen.
         if (quest.Detail.Length > 0)
         {
-            ImGui.TextColored(DimText, $"    {quest.Detail}");
+            Wrapped(DimText, quest.Detail);
         }
 
         // WHERE, when the step names a place. MapPins carries no coordinates - a name, a world
         // area and an act - so this is "it is over there" and not a marker.
         if (quest.Now is { } now && now.Where.Length > 0)
         {
-            ImGui.TextColored(ActText, $"    at: {now.Where}");
+            Wrapped(ActText, $"at: {now.Where}");
         }
 
         if (quest.Next is { } next && next.Line.Length > 0)
         {
-            ImGui.TextColored(DimText, $"    then: {next.Line}");
+            Wrapped(DimText, $"then: {next.Line}");
         }
 
         // One quest's walkthrough at a time. The steps are the same list every time and there
@@ -199,6 +213,12 @@ public sealed class QuestWindow
         {
             Steps(quest);
         }
+
+        ImGui.Unindent(In);
+
+        // Air between the quests, so each block ends somewhere - without it the next name
+        // reads as one more line of this one.
+        ImGui.Spacing();
 
         // Unconditionally. An earlier version returned out of the collapsed path before this,
         // so every frame pushed an id it never popped - the stack grows without bound and ids
@@ -225,9 +245,13 @@ public sealed class QuestWindow
     /// </remarks>
     private void Walkthrough(QuestState quest)
     {
+        // One level deeper than the quest's own block, by the same indent the block uses -
+        // the route belongs to the quest the way the quest belongs to its act.
+        ImGui.Indent(In);
+
         if (quest.Passed > 0)
         {
-            ImGui.TextColored(DimText, $"      {quest.Passed} steps behind you");
+            ImGui.TextColored(DimText, $"{quest.Passed} steps behind you");
         }
 
         IReadOnlyList<QuestLeg> route = quest.Route;
@@ -239,7 +263,7 @@ public sealed class QuestWindow
             bool now = at == 0;
             states += leg.States;
 
-            ImGui.TextColored(now ? GoodText : DimText, $"      {(now ? "->" : "  ")} {leg.Line}");
+            ImGui.TextColored(now ? GoodText : DimText, $"{(now ? "->" : "  ")} {leg.Line}");
 
             // The count only where there IS one, because "x1" on every other line is noise that
             // makes the number stop being read at all.
@@ -254,20 +278,24 @@ public sealed class QuestWindow
             // fold it is a list of them, so it wraps rather than running off the window.
             if (leg.Where.Length > 0)
             {
-                Wrapped(ActText, $"           at: {leg.Where}");
+                ImGui.Indent(In);
+                Wrapped(ActText, $"at: {leg.Where}");
+                ImGui.Unindent(In);
             }
 
             // The long form only for the leg in hand. On the ones still ahead it doubles the
             // height of the list to say what its own first line already said.
             if (now && leg.Detail.Length > 0)
             {
-                Wrapped(DimText, $"           {leg.Detail}");
+                ImGui.Indent(In);
+                Wrapped(DimText, leg.Detail);
+                ImGui.Unindent(In);
             }
         }
 
         if (route.Count > 1)
         {
-            ImGui.TextColored(DimText, $"      {route.Count - 1} steps ahead");
+            ImGui.TextColored(DimText, $"{route.Count - 1} steps ahead");
         }
 
         // Only when folding actually happened, and it is the one line that stops the route being
@@ -275,11 +303,13 @@ public sealed class QuestWindow
         // walks ONE of each folded run and not all of them.
         if (states > route.Count)
         {
-            ImGui.TextColored(
+            Wrapped(
                 DimText,
-                $"      folded from {states} states - a quest with branches carries one per"
+                $"folded from {states} states - a quest with branches carries one per"
                 + " branch, and you walk one of each");
         }
+
+        ImGui.Unindent(In);
     }
 
     /// <summary>Coloured text that wraps, which TextColored on its own does not.</summary>
@@ -296,16 +326,18 @@ public sealed class QuestWindow
     /// </summary>
     private void Steps(QuestState quest)
     {
+        ImGui.Indent(In);
+
         ImGui.TextColored(
             quest.Holding.Count > 1 ? WarnText : DimText,
-            $"    {quest.Steps.Count} steps, {quest.Holding.Count} holding");
+            $"{quest.Steps.Count} steps, {quest.Holding.Count} holding");
 
         foreach (QuestStep step in quest.Steps)
         {
             bool holds = quest.Holding.Contains(step);
             ImGui.TextColored(
                 holds ? GoodText : DimText,
-                $"    {(holds ? "->" : "  ")} order {step.Order,-4} present {step.Present.Count,-2}"
+                $"{(holds ? "->" : "  ")} order {step.Order,-4} present {step.Present.Count,-2}"
                 + $" missing {step.Missing.Count,-2}  {Short(step.Text)}");
 
             if (!holds || !_conditions)
@@ -313,16 +345,21 @@ public sealed class QuestWindow
                 continue;
             }
 
+            ImGui.Indent(In);
             foreach (int flag in step.Present)
             {
-                ImGui.TextColored(DimText, $"          set: {Name(flag)}");
+                ImGui.TextColored(DimText, $"set: {Name(flag)}");
             }
 
             foreach (int flag in step.Missing)
             {
-                ImGui.TextColored(DimText, $"          not set: {Name(flag)}");
+                ImGui.TextColored(DimText, $"not set: {Name(flag)}");
             }
+
+            ImGui.Unindent(In);
         }
+
+        ImGui.Unindent(In);
     }
 
     private static string Short(string text)
