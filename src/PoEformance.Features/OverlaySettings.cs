@@ -48,7 +48,13 @@ public sealed record OverlaySettings(
     // Which of the tools window's tabs are off the bar, by page id - ids rather than labels
     // for the reason the window rules key on ids: a label is wording, and a reworded tab
     // must not come back. Null until somebody hides one, so an untouched file gains no key.
-    [property: JsonPropertyName("hiddenTabs")] IReadOnlyList<string>? HiddenTabs = null)
+    [property: JsonPropertyName("hiddenTabs")] IReadOnlyList<string>? HiddenTabs = null,
+
+    // What the entity browser leaves out of its list: metadata paths for a whole kind, and
+    // kind-plus-place for one entity. Both last, because hiding clutter is a decision made
+    // once - see EntityHiding, and EntitySpot for why a single one is not keyed on its id.
+    [property: JsonPropertyName("hiddenEntities")] IReadOnlyList<string>? HiddenEntities = null,
+    [property: JsonPropertyName("hiddenEntitySpots")] IReadOnlyList<EntitySpot>? HiddenEntitySpots = null)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>
@@ -59,6 +65,12 @@ public sealed record OverlaySettings(
 
     /// <summary>The hidden tab ids, empty until somebody hides one.</summary>
     public IReadOnlyList<string> HiddenTabsOrEmpty => HiddenTabs ?? [];
+
+    /// <summary>The entity kinds the browser leaves out, empty until somebody hides one.</summary>
+    public IReadOnlyList<string> HiddenEntitiesOrEmpty => HiddenEntities ?? [];
+
+    /// <summary>The single entities the browser leaves out, empty until somebody hides one.</summary>
+    public IReadOnlyList<EntitySpot> HiddenEntitySpotsOrEmpty => HiddenEntitySpots ?? [];
 
     /// <summary>What each window was told, by the window's own id. Empty until somebody says.</summary>
     /// <remarks>

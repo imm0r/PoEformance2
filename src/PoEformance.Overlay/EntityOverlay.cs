@@ -259,6 +259,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _preloadPanel.Chrome = Chrome;
         Chrome.Changed = () => SettingsChanged?.Invoke();
         _tools.HiddenChanged = () => SettingsChanged?.Invoke();
+        EntitiesHidden.Changed = () => SettingsChanged?.Invoke();
     }
 
     /// <summary>
@@ -271,6 +272,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// that is kept.
     /// </remarks>
     public Action? SettingsChanged { get; set; }
+
+    /// <summary>What the entity browser has been told to leave out of its list.</summary>
+    /// <remarks>
+    /// Owned here rather than by the browser window, because it is written to the settings
+    /// file and this class is what Apply and CurrentSettings run on. The window that edits it
+    /// is attached later, or not at all.
+    /// </remarks>
+    public EntityHiding EntitiesHidden { get; } = new();
 
     /// <summary>Applies the settings that persist, and remembers them for the next save.</summary>
     public void Apply(OverlaySettings settings)
@@ -290,6 +299,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Interface = settings.InterfaceOrDefault;
         Chrome.Apply(settings.WindowsOrEmpty);
         _tools.ApplyHidden(settings.HiddenTabsOrEmpty);
+        EntitiesHidden.Use(settings.HiddenEntitiesOrEmpty, settings.HiddenEntitySpotsOrEmpty);
 
         if (Noise is not null)
         {
@@ -340,6 +350,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Interface = _interface == InterfaceStyle.Default ? basis.Interface : _interface,
             Windows = Chrome.Saved(),
             HiddenTabs = _tools.Hidden() is { Length: > 0 } hiddenTabs ? hiddenTabs : null,
+            HiddenEntities = EntitiesHidden.Kinds is { Count: > 0 } kinds ? kinds : null,
+            HiddenEntitySpots = EntitiesHidden.Spots is { Count: > 0 } spots ? [.. spots] : null,
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
             RememberOutOfRange = Memory?.Enabled ?? basis.RememberOutOfRange,
             ShowPoi = _poi?.ShowPicker ?? basis.ShowPoi,
@@ -1132,6 +1144,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // no routes" - which looks exactly like a broken feature.
         var window = new EntityBrowserWindow(
             inspector,
+            EntitiesHidden,
             (address, label, layout) =>
             {
                 if (address != 0 && _dissector is not null)

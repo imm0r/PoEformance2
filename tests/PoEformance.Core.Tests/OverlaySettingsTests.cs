@@ -189,6 +189,38 @@ public class OverlaySettingsRoundTripTests
     }
 
     [Fact]
+    public void TheHiddenEntitiesComeBack()
+    {
+        // The whole point of the feature being persisted: somebody hides the scenery once and
+        // finds it still hidden next launch. By content rather than record equality - the
+        // lists compare by reference, so Assert.Equal on the records would pass on two nulls.
+        var wanted = PoEformance.Features.OverlaySettings.Default with
+        {
+            HiddenEntities = ["Metadata/MiscellaneousObjects/DoodadNoBlocking"],
+            HiddenEntitySpots = [new PoEformance.Features.EntitySpot("Metadata/Chests/Chest", 120, 340)],
+        };
+
+        string path = TempPath();
+        try
+        {
+            Assert.True(PoEformance.Features.OverlaySettingsStore.Save(wanted, path));
+            PoEformance.Features.OverlaySettings loaded = PoEformance.Features.OverlaySettingsStore.Load(path);
+
+            Assert.Equal(
+                new[] { "Metadata/MiscellaneousObjects/DoodadNoBlocking" }, loaded.HiddenEntitiesOrEmpty);
+
+            PoEformance.Features.EntitySpot spot = Assert.Single(loaded.HiddenEntitySpotsOrEmpty);
+            Assert.Equal("Metadata/Chests/Chest", spot.Path);
+            Assert.Equal(120, spot.X);
+            Assert.Equal(340, spot.Y);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void AnUntouchedFileHidesNothing()
     {
         // The default, and the upgrade: a file with no such key means every tab on the bar,
@@ -199,7 +231,10 @@ public class OverlaySettingsRoundTripTests
         File.WriteAllText(path, """{"minLootRarity":2}""");
         try
         {
-            Assert.Empty(PoEformance.Features.OverlaySettingsStore.Load(path).HiddenTabsOrEmpty);
+            PoEformance.Features.OverlaySettings loaded = PoEformance.Features.OverlaySettingsStore.Load(path);
+            Assert.Empty(loaded.HiddenTabsOrEmpty);
+            Assert.Empty(loaded.HiddenEntitiesOrEmpty);
+            Assert.Empty(loaded.HiddenEntitySpotsOrEmpty);
         }
         finally
         {

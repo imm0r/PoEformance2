@@ -34,6 +34,7 @@ public sealed class EntityBrowserWindow
     private static readonly Vector4 PathText = new(0.85f, 0.78f, 0.45f, 1f);
 
     private readonly EntityInspector _inspector;
+    private readonly EntityHiding _hiding;
     private readonly Action<ulong, string, string> _dissect;
     private readonly Action<ulong, string>? _compare;
     private readonly Action<ulong, float, float>? _route;
@@ -71,16 +72,20 @@ public sealed class EntityBrowserWindow
     /// component off two entities, picked out of a list that already knows where they are.
     /// Nobody assembles one by copying addresses out of here by hand.
     /// </param>
+    /// <param name="hiding">What the list has been told to leave out. See <see cref="EntityHiding"/>.</param>
     public EntityBrowserWindow(
         EntityInspector inspector,
+        EntityHiding hiding,
         Action<ulong, string, string> dissect,
         Action<ulong, float, float>? route = null,
         Func<ulong, bool>? routed = null,
         Action<ulong, string>? compare = null)
     {
         ArgumentNullException.ThrowIfNull(inspector);
+        ArgumentNullException.ThrowIfNull(hiding);
         ArgumentNullException.ThrowIfNull(dissect);
         _inspector = inspector;
+        _hiding = hiding;
         _dissect = dissect;
         _route = route;
         _routed = routed;
@@ -110,7 +115,11 @@ public sealed class EntityBrowserWindow
         {
             DrawList(listed, player);
             _split.Bar();
-            DrawComponents(view);
+
+            // From the whole snapshot rather than from the listed rows: hiding the selected
+            // entity takes its row away, and the pane must still show what it is showing -
+            // including the button that puts it back.
+            DrawComponents(view, snapshot.Entities.FirstOrDefault(entity => entity.Address == _selected));
         }
 
         // Listed, not Entities: the survey walks every address's component table, and a
@@ -196,9 +205,127 @@ public sealed class EntityBrowserWindow
                 $"{snapshot.Collapsed} repeat entities dropped this read - the game gives one"
                 + " monster several entities over one set of components");
         }
+
+        DrawHidden();
     }
 
     private static readonly Vector4 WarnText = new(1f, 0.72f, 0.42f, 1f);
+
+    /// <summary>The two ways to get a row out of the list, on the entity it is about.</summary>
+    /// <remarks>
+    /// HERE rather than on the row itself, which is where they were first drawn in the head:
+    /// a list of hundreds of rows, each carrying two buttons, is a wall of buttons - and one
+    /// of them is next to whatever the mouse is passing over on the way somewhere else. On
+    /// the pane they are two buttons in total, they name what they will do, and reaching them
+    /// takes the deliberate click that picking the entity already is.
+    /// </remarks>
+    private void DrawHideButtons(EntityView view, WorldEntity? chosen)
+    {
+        if (ImGui.SmallButton("hide this kind"))
+        {
+            _hiding.HideKind(view.Path);
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                "Leaves every entity with this metadata path out of the list, in every area\n"
+                + "and from now on. Undone under \"hidden\" below.");
+        }
+
+        // Only where the place is known. A remembered entity is a recording of somewhere it
+        // no longer is, and hiding "the one standing there" on that would name a spot that
+        // was true a minute ago.
+        if (chosen is { IsRemembered: false } entity)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("hide just this one"))
+            {
+                _hiding.HideOne(entity.Path, entity.WorldX, entity.WorldY);
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(
+                    "Leaves out this one entity - its kind, on the spot it stands on. Kept by\n"
+                    + "PLACE rather than by id, because the game hands ids out afresh per area:\n"
+                    + "scenery stays hidden across sessions, and anything that walks away comes\n"
+                    + "back to the list.");
+            }
+        }
+    }
+
+    /// <summary>What is being left out, and how to undo any of it.</summary>
+    /// <remarks>
+    /// A list that hides things without saying so is a list that lies. It sits behind a fold
+    /// because on most days it is one line of count and nothing else, and it stays out of the
+    /// pane so that undoing something does not need the entity that is no longer listed.
+    /// </remarks>
+    private void DrawHidden()
+    {
+        if (!_hiding.Any)
+        {
+            return;
+        }
+
+        if (!ImGui.CollapsingHeader($"hidden ({_hiding.Count})###hidden"))
+        {
+            return;
+        }
+
+        ImGui.SameLine();
+        if (ImGui.SmallButton("show everything again"))
+        {
+            _hiding.ShowEverything();
+            return;
+        }
+
+        foreach (string kind in _hiding.Kinds)
+        {
+            ImGui.PushID(kind);
+            try
+            {
+                if (ImGui.SmallButton("x"))
+                {
+                    _hiding.ShowKind(kind);
+
+                    // The list just changed under the loop, so this frame stops drawing it.
+                    // The finally pops the id - popping it here as well would unbalance the
+                    // stack, which is the bug the quest rows once had in the other direction.
+                    return;
+                }
+            }
+            finally
+            {
+                ImGui.PopID();
+            }
+
+            ImGui.SameLine();
+            ImGui.TextColored(PathText, ImGuiText.Escape(kind));
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, "every one");
+        }
+
+        foreach (EntitySpot spot in _hiding.Spots)
+        {
+            ImGui.PushID($"{spot.Path}@{spot.X},{spot.Y}");
+            try
+            {
+                if (ImGui.SmallButton("x"))
+                {
+                    _hiding.ShowOne(spot);
+                    return;
+                }
+            }
+            finally
+            {
+                ImGui.PopID();
+            }
+
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, ImGuiText.Escape(spot.Describe()));
+        }
+    }
 
     /// <summary>
     /// The reads that only some entities carry, written out where they can be watched.
@@ -304,13 +431,13 @@ public sealed class EntityBrowserWindow
         _route(entity.Address, entity.WorldX, entity.WorldY);
     }
 
-    private void DrawComponents(EntityView view)
+    private void DrawComponents(EntityView view, WorldEntity? chosen)
     {
         ImGui.BeginChild("components", new Vector2(0f, 0f), ImGuiChildFlags.Borders);
 
         try
         {
-            DrawComponentsInto(view);
+            DrawComponentsInto(view, chosen);
         }
         finally
         {
@@ -318,7 +445,7 @@ public sealed class EntityBrowserWindow
         }
     }
 
-    private void DrawComponentsInto(EntityView view)
+    private void DrawComponentsInto(EntityView view, WorldEntity? chosen)
     {
         if (view.Address == 0)
         {
@@ -328,6 +455,8 @@ public sealed class EntityBrowserWindow
 
         ImGui.TextColored(PathText, view.Path);
         ImGui.TextColored(DimText, $"id {view.Id}  at 0x{view.Address:X}");
+
+        DrawHideButtons(view, chosen);
 
         if (ImGui.SmallButton("dissect the entity"))
         {
@@ -648,6 +777,15 @@ public sealed class EntityBrowserWindow
     private List<WorldEntity> Listed(WorldSnapshot snapshot, WorldEntity? player)
     {
         IEnumerable<WorldEntity> entities = snapshot.Entities;
+
+        // Before the text filter, because the two say opposite things: a filter says what to
+        // KEEP, and this says what is never worth listing. Applied first, the hidden rows are
+        // gone whatever is typed - which is what makes the filter usable for finding one
+        // doodad among the scenery rather than a way of naming everything else.
+        if (_hiding.Any)
+        {
+            entities = entities.Where(entity => !_hiding.Hides(entity.Path, entity.WorldX, entity.WorldY));
+        }
 
         if (_filter.Length > 0)
         {
