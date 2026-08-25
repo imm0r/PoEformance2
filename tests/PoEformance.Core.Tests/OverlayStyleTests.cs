@@ -281,6 +281,21 @@ public class StyleCatalogueTests
         Assert.NotEmpty(groups);
         Assert.Equal(StyleCatalogue.Entries.Count, groups.Sum(group => group.Count()));
     }
+
+    [Fact]
+    public void EveryGroupIsShownOnExactlyOnePage()
+    {
+        // The rows are split across the feature tabs now, and the split is a declaration
+        // beside the entries. A group claimed twice would be edited in two places that fight;
+        // a group claimed nowhere would be a set of styles no editor shows - which is the
+        // catalogue's promise ("all of it can be changed") quietly going false for the
+        // entries someone adds next.
+        List<string> claimed = [.. StyleCatalogue.Homes.All()];
+        string[] real = [.. StyleCatalogue.Entries.Select(entry => entry.Group).Distinct()];
+
+        Assert.Equal(claimed.Count, claimed.Distinct().Count());
+        Assert.Equal([.. real.Order(StringComparer.Ordinal)], claimed.Order(StringComparer.Ordinal));
+    }
 }
 
 /// <summary>The chosen appearance has to survive a restart, and only it.</summary>

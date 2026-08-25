@@ -227,6 +227,53 @@ public static class StyleCatalogue
     public static IEnumerable<IGrouping<string, StyleEntry>> Grouped()
         => Entries.GroupBy(entry => entry.Group);
 
+    /// <summary>Which editor page each group of entries is shown on.</summary>
+    /// <remarks>
+    /// The style rows used to live on one page, all of them, and that page had become a wall:
+    /// twelve groups of colour pickers, most of them about a feature configured somewhere
+    /// else entirely. A feature's looks now sit WITH the feature - the atlas styles on the
+    /// atlas tab, the alert styles on the alerts tab - and what is drawn on the game world
+    /// itself, which has no feature tab, gets a page of its own.
+    ///
+    /// Declared HERE, beside the entries, so the same promise covers it: a test holds that
+    /// every group in the catalogue is claimed by exactly one page, which is what keeps a
+    /// newly added group from quietly appearing in no editor at all.
+    /// </remarks>
+    public static class Homes
+    {
+        /// <summary>On the alerts tab, beside the rules that fire them.</summary>
+        public static readonly string[] Alerts = ["Alerts"];
+
+        /// <summary>On the area page, under the list they draw.</summary>
+        public static readonly string[] Area = ["What the area loaded"];
+
+        /// <summary>On the atlas page.</summary>
+        public static readonly string[] Atlas = ["The atlas"];
+
+        /// <summary>On the combat page, beside the projectile switches.</summary>
+        public static readonly string[] Projectiles = ["Projectiles"];
+
+        /// <summary>
+        /// Everything drawn on the game world itself - the markers, the routes, the layout,
+        /// the measuring aids. These have no feature tab to live on, so they share one page.
+        /// </summary>
+        public static readonly string[] Markers =
+        [
+            "Monsters",
+            "Drops",
+            "Other entities",
+            "Places",
+            "Routes",
+            "Map",
+            "Health bars",
+            "Measuring aids",
+        ];
+
+        /// <summary>Every page's claim, for the test that keeps the mapping complete.</summary>
+        public static IEnumerable<string> All()
+            => Alerts.Concat(Area).Concat(Atlas).Concat(Projectiles).Concat(Markers);
+    }
+
     /// <summary>The entry for a key, or null when there is none.</summary>
     public static StyleEntry? Find(string key)
     {

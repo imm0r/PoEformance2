@@ -485,6 +485,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         var window = new AlertWindow(watcher, saved);
         _alertWindow = window;
         _tools.Add(10, "alerts", "Alerts", window.DrawTab, window.Idle);
+
+        // The banner's colours, beside the rules that fire it rather than on a style page
+        // two tabs away - a feature's looks live with the feature.
+        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Alerts);
+        _tools.Add(11, "alerts-style", "How it looks", styles.Draw, styles.Idle, page: "alerts");
+
         if (visible)
         {
             _tools.Show("alerts");
@@ -565,6 +571,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             sweep,
             () => TookPreload(_preloadSettings with { Rules = watch.Rules }));
         _tools.Add(20, "preload", "In this area", window.DrawTab, page: Area, pageLabel: "Area");
+
+        // The list's backings and the three weight markers, under the list they draw.
+        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Area);
+        _tools.Add(
+            21, "preload-style", "How the loaded list looks", styles.Draw, styles.Idle,
+            page: Area, pageLabel: "Area");
+
         if (visible)
         {
             _tools.Show("preload");
@@ -654,7 +667,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachStyleEditor(Action saved, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(saved);
-        var window = new StyleWindow(Style, saved)
+        _styleSaved = saved;
+        var window = new StyleWindow
         {
             Chrome = Chrome,
 
@@ -672,12 +686,41 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             TabList = () => _tools.DrawHideList("style"),
         };
 
+        // What is drawn on the game WORLD - markers, routes, the layout, the aids - has no
+        // feature tab to be styled on, so it gets a page of its own, right before the page
+        // about the tool itself. The feature styles sit with their features; see
+        // StyleCatalogue.Homes for the split.
+        var markers = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Markers);
+        _tools.Add(
+            65,
+            "markers",
+            "Markers",
+            () =>
+            {
+                markers.DrawResetLine();
+                markers.Draw();
+            },
+            markers.Idle);
+
         _tools.Add(70, "style", "Appearance", window.DrawTab, window.Idle);
         if (visible)
         {
             _tools.Show("style");
         }
     }
+
+    /// <summary>
+    /// Writes the marker styles down, once the editor that knows how has been attached.
+    /// </summary>
+    /// <remarks>
+    /// Late-bound because the feature tabs carry style rows too, and their attach methods can
+    /// run before <see cref="AttachStyleEditor"/> brings the save action - both orders happen
+    /// depending on how the app is wired. Until it arrives, edits still apply live; they are
+    /// written down with the next change after the wiring completes.
+    /// </remarks>
+    private void SaveStyle() => _styleSaved?.Invoke();
+
+    private Action? _styleSaved;
 
     /// <summary>
     /// Adds the tracker: lines to monsters, rings on dangerous ground, status icons.
@@ -944,6 +987,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _atlasWatch = watch;
         var window = new AtlasWindow(watch, saved);
         _tools.Add(40, "atlas", "Atlas", window.DrawTab, window.Idle, page: Atlas, pageLabel: "Atlas");
+
+        // The atlas's plate, web and route colours, between the atlas and the ritual line
+        // that draws onto it.
+        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Atlas);
+        _tools.Add(
+            41, "atlas-style", "How the atlas looks", styles.Draw, styles.Idle,
+            page: Atlas, pageLabel: "Atlas");
+
         if (visible)
         {
             _tools.Show("atlas");
@@ -1601,6 +1652,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _projectileWindow = made;
             _tools.Add(
                 35, "projectiles", "Projectiles", () => made.DrawTab(_snapshot), page: Combat);
+
+            // The marks' and trails' colours, folded under the switches they belong to.
+            var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Projectiles);
+            _tools.Add(
+                36, "projectiles-style", "How projectiles look", styles.Draw, styles.Idle,
+                page: Combat);
         }
 
         // The same first-use registration, and for the same reason: the two callbacks it needs
