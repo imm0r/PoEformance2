@@ -1,7 +1,23 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using PoEformance.Features;
 using PoEformance.Game.Components;
 
 namespace PoEformance.Core.Tests;
+
+/// <summary>
+/// The config window's serializer settings, mirrored so a wire name can be checked here.
+/// </summary>
+/// <remarks>
+/// A COPY OF ConfigJsonContext's OPTIONS, and the missing naming policy is the whole point:
+/// the real context has none either, so every record spells its own JSON names and one that
+/// forgets goes over in PascalCase. Camel-casing here would make this check pass whether the
+/// attributes exist or not.
+/// </remarks>
+[JsonSourceGenerationOptions(
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, UseStringEnumConverter = true)]
+[JsonSerializable(typeof(SeenBuff))]
+internal sealed partial class BuffWireContext : JsonSerializerContext;
 
 /// <summary>
 /// Remembering which buffs a character has had on.
@@ -163,5 +179,33 @@ public class BuffWatchTests
         watch.Look(new ActiveBuffs([new ActiveBuff("flask_effect_life", 4f, 5f, 0, 3, true)]), 0);
 
         Assert.Equal(3, Assert.Single(watch.Seen).FlaskSlot);
+    }
+
+    [Fact]
+    public void EveryFieldGoesOverTheWireUnderTheNameThePageReads()
+    {
+        // The config window's serializer sets no naming policy - every record that crosses to
+        // the page spells its own JSON names - and this one did not, so it went over as
+        // "Name"/"Active" while the page read name/active. Nothing failed: the list arrived
+        // with the right number of rows and every field in it undefined, so the picker showed
+        // the word "undefined" as a buff name and wrote it into the field somebody clicked.
+        //
+        // Through a context with the real one's options - see BuffWireContext for why that
+        // matters more than it looks.
+        string json = JsonSerializer.Serialize(
+            new SeenBuff("fire_wall", true, 4.5f, 2, 3, 1234, "Flame Wall", "Burns things."),
+            BuffWireContext.Default.SeenBuff);
+
+        using JsonDocument document = JsonDocument.Parse(json);
+        var keys = document.RootElement.EnumerateObject().Select(p => p.Name).ToList();
+
+        // Every name ui/js/rules.js reads off a buff.
+        foreach (string expected in
+                 (string[])["name", "active", "timeLeft", "charges", "flaskSlot", "displayName", "description"])
+        {
+            Assert.Contains(expected, keys);
+        }
+
+        Assert.DoesNotContain(keys, key => char.IsUpper(key[0]));
     }
 }

@@ -636,6 +636,40 @@ fake `window.chrome.webview` before the modules load, and answers like the host 
 merged build and the fix apart on both counts. A check a wrong value passes is worse than no
 check, and a browser check with no host was exactly that.
 
+#### Two more, from the buff picker — and the older bug it uncovered
+
+The picker shipped listing one buff, named `undefined`, permanently off. Two independent
+defects stacked, and only the second was new code:
+
+- **The buff vector holds POINTERS, and had been read as inline structs since long before the
+  rules feature existed.** The schema called that "a deliberate divergence from GameHelper2",
+  which reads a `StdVector<IntPtr>`, on the strength of the AHK tool reading it inline at 0x50
+  stride. Both were wrong. `session-2026-08-buffs.rec` settles it three ways, and the first is
+  arithmetic: over 999 frames the vector's span is 56, 64, 72, 80, 88 or 96 bytes — always a
+  whole number of 8-byte pointers and only coincidentally of 0x50 structs. A span of 56 bytes
+  cannot be a list of 80-byte entries. Then the structural half: dereference the qword the
+  inline reading calls `entry[0].BuffDefinitionPtr` and its own first field holds **the Buffs
+  component's address** — a StatusEffect knows its owner, where a `.dat` row shared by every
+  entity in the game could not. And the size of it: over those frames the inline reading finds
+  218 buffs in total, the pointer reading 8185.
+
+  The failure mode is the reason it lasted. Dividing a span of 56–96 by 0x50 FLOORS to 0 or 1,
+  so nothing threw, no pointer came back empty, and there was nothing to notice — the tool
+  simply reported that the character had no buffs on. Every buff condition silently never
+  matched, `IsFlaskActive` always said "not running", and the flask automation that depends on
+  it spent charges re-using flasks that were still going. `BuffsReader` now REFUSES a span that
+  is not a whole number of pointers rather than flooring it, because flooring is precisely what
+  hid this.
+
+- **`SeenBuff` crossed the wire in PascalCase.** `ConfigJsonContext` sets no naming policy —
+  every record that reaches the page spells its own JSON names — and this one, alone among
+  them, carried no `[JsonPropertyName]`. Nothing failed: the list arrived with the right number
+  of rows and every field in each row `undefined`, so `buff.displayName || buff.name` rendered
+  the string "undefined", `buff.active` was falsy on everything, and clicking a row wrote
+  `undefined` into the rule. The guard is a test that serialises through a context with the
+  real one's options — **without** a naming policy, since camel-casing in the test would pass
+  whether the attributes exist or not.
+
 ### The atlas — the one feature that is INTERFACE rather than world
 
 Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it reads

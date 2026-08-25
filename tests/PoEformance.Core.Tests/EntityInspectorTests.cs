@@ -228,9 +228,11 @@ public class EntityInspectorTests
         StructDef buffs = schema.Structs["Buffs"];
         StructDef effect = schema.Structs["StatusEffect"];
         StructDef definition = schema.Structs["BuffDefinition"];
-        int stride = (int)buffs.Constants["StatusEffectStructSize"];
+        int pointerSize = (int)buffs.Constants["StatusEffectPointerSize"];
 
-        // The Buffs component the entity builder placed, and a two-entry vector after it.
+        // The Buffs component the entity builder placed, and a two-entry vector after it. The
+        // vector holds POINTERS to StatusEffects that live elsewhere - it is not an array of
+        // inline structs, which is what this was built as until a recording said otherwise.
         EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
         ulong component = placed.Components.Single(c => c.Name == "Buffs").Address;
 
@@ -239,20 +241,23 @@ public class EntityInspectorTests
         const ulong ForeverDefAt = 0x3000_0002_0000;
         const ulong TimedNameAt = 0x3000_0003_0000;
         const ulong ForeverNameAt = 0x3000_0004_0000;
+        const ulong TimedEffectAt = 0x3000_0005_0000;
+        const ulong ForeverEffectAt = 0x3000_0006_0000;
 
         reader.Place(component + (ulong)buffs.OffsetOf("StatusEffectFirst"), VectorAt);
-        reader.Place(component + (ulong)buffs.OffsetOf("StatusEffectLast"), VectorAt + (ulong)(2 * stride));
+        reader.Place(component + (ulong)buffs.OffsetOf("StatusEffectLast"), VectorAt + (ulong)(2 * pointerSize));
 
-        reader.Place(VectorAt + (ulong)effect.OffsetOf("BuffDefinitionPtr"), TimedDefAt);
-        reader.Place(VectorAt + (ulong)effect.OffsetOf("TimeLeft"), 4.5f);
-        reader.Place(VectorAt + (ulong)effect.OffsetOf("TotalTime"), 10.3f);
+        reader.Place(VectorAt, TimedEffectAt);
+        reader.Place(TimedEffectAt + (ulong)effect.OffsetOf("BuffDefinitionPtr"), TimedDefAt);
+        reader.Place(TimedEffectAt + (ulong)effect.OffsetOf("TimeLeft"), 4.5f);
+        reader.Place(TimedEffectAt + (ulong)effect.OffsetOf("TotalTime"), 10.3f);
         reader.Place(TimedDefAt + (ulong)definition.OffsetOf("Name"), TimedNameAt);
         reader.PlaceUtf16(TimedNameAt, "wall_of_fire");
 
-        ulong second = VectorAt + (ulong)stride;
-        reader.Place(second + (ulong)effect.OffsetOf("BuffDefinitionPtr"), ForeverDefAt);
-        reader.Place(second + (ulong)effect.OffsetOf("TimeLeft"), float.PositiveInfinity);
-        reader.Place(second + (ulong)effect.OffsetOf("TotalTime"), float.PositiveInfinity);
+        reader.Place(VectorAt + (ulong)pointerSize, ForeverEffectAt);
+        reader.Place(ForeverEffectAt + (ulong)effect.OffsetOf("BuffDefinitionPtr"), ForeverDefAt);
+        reader.Place(ForeverEffectAt + (ulong)effect.OffsetOf("TimeLeft"), float.PositiveInfinity);
+        reader.Place(ForeverEffectAt + (ulong)effect.OffsetOf("TotalTime"), float.PositiveInfinity);
         reader.Place(ForeverDefAt + (ulong)definition.OffsetOf("Name"), ForeverNameAt);
         reader.PlaceUtf16(ForeverNameAt, "something_permanent");
 

@@ -937,12 +937,12 @@
     },
 
     "Buffs": {
-      "comment": "Component: every buff and debuff currently on the entity. NOTE A DELIBERATE DIVERGENCE FROM GameHelper2: it reads this vector as StdVector<IntPtr> and dereferences each element, whereas in PoE2 the entries are stored INLINE, 0x50 apart, which is how the AHK tool reads them in production. Where the two references disagree, the PoE2-specific one wins - dereferencing an inline struct here yields garbage.",
+      "comment": "Component: every buff and debuff currently on the entity. A StdVector<StatusEffect*> - POINTERS, which each have to be dereferenced, exactly as GameHelper2 reads it. CORRECTED 2026-08 against session-2026-08-buffs.rec, and this entry used to say the opposite: that PoE2 stores the entries INLINE at 0x50 stride, 'a deliberate divergence from GameHelper2', on the strength of the AHK tool reading them that way. Both were wrong, and the recording settles it three ways. (1) ARITHMETIC: across 999 frames the vector's span is 56, 64, 72, 80, 88 or 96 bytes - always a multiple of 8, never of 0x50 except where 80 coincides. A vector of 0x50 structs cannot have a span of 56. (2) THE BACK-POINTER: dereference the qword the inline reading calls entry[0].BuffDefinitionPtr and its own +0x00 holds THE BUFFS COMPONENT ADDRESS - it is a StatusEffect pointing at its owner, not a .dat row. (3) COUNTS: over the same frames the inline reading yields 218 buffs in total and the pointer reading 8185, i.e. about 8 per frame against a character who visibly had that many. What the inline reading actually did was floor a span of 56-96 down to 0 or 1, so the tool reported no buffs at all most of the time and one garbage name otherwise - which is what 'HasBuff never matches' looked like from the outside. The AHK tool (ahk/PoE2ComponentDecoders.ahk, DecodeBuffsComponentBasic) still reads it inline and has the same bug.",
       "fields": {
-        "StatusEffectFirst": { "offset": "0x160", "type": "ptr", "comment": "StdVector begin: first inline StatusEffect." },
-        "StatusEffectLast": { "offset": "0x168", "type": "ptr", "comment": "StdVector end; count = (Last - First) / StatusEffectStructSize." }
+        "StatusEffectFirst": { "offset": "0x160", "type": "ptr", "comment": "StdVector begin: the first StatusEffect POINTER, not the first StatusEffect." },
+        "StatusEffectLast": { "offset": "0x168", "type": "ptr", "comment": "StdVector end; count = (Last - First) / StatusEffectPointerSize." }
       },
-      "consts": { "StatusEffectStructSize": "0x50" }
+      "consts": { "StatusEffectPointerSize": "0x08" }
     },
 
     "BuffDefinition": {
