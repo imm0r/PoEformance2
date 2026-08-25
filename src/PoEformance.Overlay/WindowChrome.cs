@@ -164,8 +164,49 @@ public sealed class WindowChrome
     /// nothing outside a Begin/End pair can be asked for them - so the decision to hide is made
     /// on where the window was drawn last, one frame behind. At sixty frames a second that is
     /// invisible; what it is not is a guess, which a rectangle predicted before Begin would be.
+    ///
+    /// ALSO WHERE THE WINDOW'S PLACE IS SETTLED, because this is the one moment each frame the
+    /// window can be asked where it is. While the mouse button is up, the position is clamped
+    /// into the game window - a window dragged past the edge snaps back the moment it is let
+    /// go - and remembered as a share of the screen, anchored by the corner nearest the edge.
+    /// Nothing is settled while the button is held: mid-drag the person is the authority on
+    /// where the window is, and fighting them for it is what a jittering drag feels like.
     /// </remarks>
-    public void Measure(string id) => _seen[id] = (ImGui.GetWindowPos(), ImGui.GetWindowSize());
+    public void Measure(string id)
+    {
+        Vector2 at = ImGui.GetWindowPos();
+        Vector2 size = ImGui.GetWindowSize();
+        _seen[id] = (at, size);
+
+        Vector2 view = ImGui.GetIO().DisplaySize;
+        if (view.X <= 0 || view.Y <= 0 || ImGui.IsMouseDown(ImGuiMouseButton.Left))
+        {
+            return;
+        }
+
+        (float clampedX, float clampedY) = WindowAnchor.Clamp(at.X, at.Y, size.X, size.Y, view.X, view.Y);
+        if (MathF.Abs(clampedX - at.X) > 0.5f || MathF.Abs(clampedY - at.Y) > 0.5f)
+        {
+            ImGui.SetWindowPos(new Vector2(clampedX, clampedY), ImGuiCond.Always);
+        }
+
+        WindowRule rule = Of(id);
+        WindowRule settled = WindowAnchor.Settle(rule, at.X, at.Y, size.X, size.Y, view.X, view.Y);
+
+        // Written down only when it MOVED, so an idle window costs no settings write. The
+        // epsilon is half a thousandth of the screen - under a pixel - because the same
+        // resting window must settle to the same numbers every frame.
+        bool moved = !rule.Placed
+            || rule.PivotX != settled.PivotX
+            || rule.PivotY != settled.PivotY
+            || Math.Abs((rule.X ?? -1) - (settled.X ?? -1)) > 0.0005
+            || Math.Abs((rule.Y ?? -1) - (settled.Y ?? -1)) > 0.0005;
+
+        if (moved)
+        {
+            Set(id, settled);
+        }
+    }
 
     /// <summary>
     /// Whether this window is lying over one of the game's open panels, and should stay away.
@@ -220,6 +261,25 @@ public sealed class WindowChrome
     public ImGuiWindowFlags Flags(string id, ImGuiWindowFlags own = ImGuiWindowFlags.None)
     {
         WindowRule rule = Of(id);
+
+        // The remembered place, re-asserted every frame THROUGH ITS ANCHORED CORNER - which is
+        // the whole trick. ImGui pins a window by its top-left, so one that sizes itself to its
+        // content grows down and right, and one parked at the bottom edge grows straight off
+        // the screen. Pinning the corner nearest the edge instead means growth always runs
+        // INTO the screen. Skipped while the button is held, so a drag is the person moving
+        // the window rather than a fight with this line; Measure settles the new place on
+        // release.
+        if (!ImGui.IsMouseDown(ImGuiMouseButton.Left))
+        {
+            Vector2 view = ImGui.GetIO().DisplaySize;
+            if (WindowAnchor.Resolve(rule, view.X, view.Y) is (float anchorX, float anchorY))
+            {
+                ImGui.SetNextWindowPos(
+                    new Vector2(anchorX, anchorY),
+                    ImGuiCond.Always,
+                    new Vector2(rule.PivotX, rule.PivotY));
+            }
+        }
 
         if (rule.Locked)
         {
