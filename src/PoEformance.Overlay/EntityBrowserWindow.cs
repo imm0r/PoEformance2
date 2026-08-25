@@ -206,6 +206,18 @@ public sealed class EntityBrowserWindow
                 + " monster several entities over one set of components");
         }
 
+        // What the bare number on each row is. It was read as an id, a count and an index
+        // before somebody asked - which is what an unlabelled column earns. Said once, above
+        // the list, rather than as a unit on every row: the list is read by scanning it, and
+        // this change took the file names off the rows for exactly that reason.
+        //
+        // Only where there IS a player to measure from, because that is the only time the
+        // number is on the rows at all.
+        if (snapshot.Player is not null)
+        {
+            ImGui.TextColored(DimText, "nearest first - the number is how far away, in grid squares");
+        }
+
         DrawHidden();
     }
 
@@ -383,13 +395,15 @@ public sealed class EntityBrowserWindow
                 // exactly like a read that works.
                 string facts = Facts(entity);
 
-                // BOTH names, where there are two. This window is where somebody finds out
-                // which entities carry a name at all, and showing only the winner would hide
-                // exactly that: "Elder Madox (ElderMadoxMapIntro)" answers the question, while
-                // "Elder Madox" alone leaves you unsure which of the two you are reading.
-                string called = entity.Name.Length > 0
-                    ? $"{entity.Name}  ({entity.FileName})"
-                    : entity.FileName;
+                // The name it SHOWS, and the file name only where it has no other. Both used to
+                // ride every row - "Doryani (DoryaniEndgameTownAtlasTalk)" - which answered
+                // "does this one carry a name at all" at the cost of doubling the width of a
+                // list that is read by scanning it. The pane already prints the whole path for
+                // whatever is selected, so the answer is one click away rather than gone.
+                //
+                // The FILTER still matches the path, which is what keeps that click reachable:
+                // typing "Karui" finds the Well whose row now says only "Well".
+                string called = entity.Name.Length > 0 ? entity.Name : entity.FileName;
 
                 // The family where the path names one - "Hideout Object", "Sanctum Object" -
                 // because two things that are both "Object" are told apart by the folder the
