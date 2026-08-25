@@ -157,7 +157,8 @@ public sealed record RulesView(
     [property: JsonPropertyName("acted")] int Acted,
     [property: JsonPropertyName("keySource")] string KeySource,
     [property: JsonPropertyName("shapes")] IReadOnlyDictionary<string, RuleShape> Shapes,
-    [property: JsonPropertyName("buffs")] IReadOnlyList<SeenBuff> Buffs)
+    [property: JsonPropertyName("buffs")] IReadOnlyList<SeenBuff> Buffs,
+    [property: JsonPropertyName("buffRead")] string BuffRead)
 {
     /// <summary>Builds the panel, including a text and a graph for every rule.</summary>
     public static RulesView Of(RuleEngine engine, string keySource, BuffWatch buffs)
@@ -185,7 +186,8 @@ public sealed record RulesView(
         }
 
         return new RulesView(
-            settings, engine.LastTick.Reason, engine.Acted, keySource, shapes, buffs.Seen);
+            settings, engine.LastTick.Reason, engine.Acted, keySource, shapes, buffs.Seen,
+            buffs.LastRead.ToString());
     }
 }
 

@@ -63,12 +63,30 @@ public sealed class BuffWatch
 
     private readonly Dictionary<string, SeenBuff> _seen = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Guards <see cref="_seen"/>, which two threads touch.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Look"/> runs on the reader thread thirty times a second; <see cref="Seen"/>
+    /// is read by the config window once a second. Copying a Dictionary while another thread
+    /// resizes it is not a rare race - it is a torn read or a throw, either of which reads
+    /// from the page as "no buffs", which is the one answer this class must never invent.
+    /// </remarks>
+    private readonly Lock _gate = new();
+
+    private BuffRead _lastRead;
+
     /// <summary>What has been on, active ones first, then most recently seen.</summary>
     public IReadOnlyList<SeenBuff> Seen
     {
         get
         {
-            var all = new List<SeenBuff>(_seen.Values);
+            List<SeenBuff> all;
+            lock (_gate)
+            {
+                all = new List<SeenBuff>(_seen.Values);
+            }
+
             all.Sort(static (left, right) => left.Active != right.Active
                 ? right.Active.CompareTo(left.Active)
                 : right.LastSeenMs.CompareTo(left.LastSeenMs));
@@ -77,47 +95,70 @@ public sealed class BuffWatch
         }
     }
 
+    /// <summary>Where the last walk of the buff vector got to, for a panel to explain itself.</summary>
+    public BuffRead LastRead
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _lastRead;
+            }
+        }
+    }
+
     /// <summary>Notes what is on the character now.</summary>
     public void Look(ActiveBuffs? buffs, long nowMs)
     {
-        // Everything remembered stops being ACTIVE first, then what is really on is marked
-        // again. Anything else and a buff that ended would sit in the list claiming twenty
-        // seconds left forever, which is worse than not listing it: it reads as live.
-        foreach ((string name, SeenBuff buff) in _seen)
+        lock (_gate)
         {
-            if (buff.Active)
+            // Everything remembered stops being ACTIVE first, then what is really on is marked
+            // again. Anything else and a buff that ended would sit in the list claiming twenty
+            // seconds left forever, which is worse than not listing it: it reads as live.
+            foreach ((string name, SeenBuff buff) in _seen)
             {
-                _seen[name] = buff with { Active = false };
-            }
-        }
-
-        if (buffs is not ActiveBuffs on)
-        {
-            return;
-        }
-
-        foreach (ActiveBuff buff in on.All)
-        {
-            if (string.IsNullOrWhiteSpace(buff.Name))
-            {
-                continue;
+                if (buff.Active)
+                {
+                    _seen[name] = buff with { Active = false };
+                }
             }
 
-            if (_seen.Count >= MaxRemembered && !_seen.ContainsKey(buff.Name))
+            if (buffs is not ActiveBuffs on)
             {
-                Drop(nowMs);
+                return;
             }
 
-            _seen[buff.Name] = new SeenBuff(
-                buff.Name, true, buff.TimeLeft, buff.Charges, buff.FlaskSlot, nowMs,
-                buff.DisplayName, buff.Description);
-        }
+            _lastRead = on.Reading;
 
-        Expire(nowMs);
+            foreach (ActiveBuff buff in on.All)
+            {
+                if (string.IsNullOrWhiteSpace(buff.Name))
+                {
+                    continue;
+                }
+
+                if (_seen.Count >= MaxRemembered && !_seen.ContainsKey(buff.Name))
+                {
+                    Drop(nowMs);
+                }
+
+                _seen[buff.Name] = new SeenBuff(
+                    buff.Name, true, buff.TimeLeft, buff.Charges, buff.FlaskSlot, nowMs,
+                    buff.DisplayName, buff.Description);
+            }
+
+            Expire(nowMs);
+        }
     }
 
     /// <summary>Forgets everything - a new character has different buffs.</summary>
-    public void Forget() => _seen.Clear();
+    public void Forget()
+    {
+        lock (_gate)
+        {
+            _seen.Clear();
+        }
+    }
 
     private void Expire(long nowMs)
     {
