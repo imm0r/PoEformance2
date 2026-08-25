@@ -526,10 +526,8 @@ export class GraphEditor {
       return row;
     }
 
-    // The word in front of the field carries the UNIT's meaning: "within 30" reads the same
-    // for world units and for pixels, and those are wildly different radii.
-    const LEAD = { Slot: "slot", Seconds: "every", Distance: "within", Pixels: "of cursor" };
-    const UNIT = { Seconds: "s", Distance: "u", Pixels: "px" };
+    const LEAD = { Slot: "slot", Seconds: "every", Distance: "within" };
+    const UNIT = { Seconds: "s", Distance: "u" };
 
     const label = document.createElement("span");
     label.className = "dim";

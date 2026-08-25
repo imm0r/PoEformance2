@@ -544,18 +544,31 @@ same split as auto-flask, so the priorities, the cooldowns and every gate are or
   radius, which the reference plugin has no equivalent for at all. For anything placed where
   the pointer is — a wall, a ground effect, a targeted blast — "three monsters near me" is the
   wrong question: the pack behind the character does not make a wall in front of it worth
-  casting. It is measured in SCREEN PIXELS, by projecting each monster and comparing, rather
-  than by un-projecting the cursor into the world: the ground is not a plane, and the
-  projection is the half that is already proven against the game. The cost is real and is
-  written on the fact — a pixel radius covers more ground zoomed out, and the number does not
-  transfer between two people at different resolutions.
+  casting.
+
+  It shipped measuring SCREEN PIXELS from the cursor, and that was wrong twice over. **A
+  circle on the screen is an ellipse on the ground**, stretched away from the camera by the
+  tilt — so a pixel radius counts monsters in a region no skill has; and the number moves with
+  the resolution and the zoom besides. The AHK tool has both modes and its world-space one is
+  the one worth having. So the cursor is now run BACKWARDS through the camera matrix onto the
+  plane at the player's height (`WorldToScreen.OnGround`) and the radius is world units, the
+  same as every other radius here. The AHK tool inverts a fitted isometric constant instead —
+  a scale and sin(38.7°) — which works because its ring is drawn with the same constant; the
+  matrix is the game's own answer and there is nothing to fit. Its limit is worth knowing: the
+  plane is at the player's height, so on a ledge or a staircase the point lands where that
+  plane is rather than where the floor is.
+
+  The inverse is pinned by a ROUND TRIP through a tilted, off-axis matrix — project a point,
+  un-project it, get the point back. An identity matrix passes a projection that has swapped
+  its columns or dropped its perspective divide; that one does not.
 - **The ranges can be drawn on the ground.** The same working rule this project applies to
   itself: a radius is a number in a text field, and the honest way to know whether 30 is right
   is to see the circle with the monsters it counts inside it. A player ring is a world circle
   projected point by point (an ellipse on screen, and drawing it as one would need the
-  camera's tilt, which the drawing layer has no business knowing); a cursor ring is a screen
-  circle. They are drawn differently ON PURPOSE — they are not the same measurement, and a
-  preview that made them look alike would teach the wrong thing about the rule. Each carries
+  camera's tilt, which the drawing layer has no business knowing); a cursor ring is the same
+  thing centred where the pointer aims. Both come out as ellipses on screen because the
+  projection puts them there — which is the shape the measurement actually has, and seeing
+  that is what settled the pixel question above. Each carries
   what it currently reads and what it needs, and turns colour on the leaf's answer INCLUDING
   its negation, so a "no monsters within 30" ring is green when the circle is empty.
 

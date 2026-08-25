@@ -83,17 +83,6 @@ public enum FactArgument
     /// <summary>A radius in world units.</summary>
     Distance,
 
-    /// <summary>
-    /// A radius in SCREEN pixels, for the facts measured from the cursor.
-    /// </summary>
-    /// <remarks>
-    /// Its own kind rather than reusing <see cref="Distance"/>, because the editor has to be
-    /// able to say which one a field is: 30 world units and 30 pixels are wildly different
-    /// radii, and a rule set with one meaning in mind and evaluated with the other is a rule
-    /// that fires constantly or never.
-    /// </remarks>
-    Pixels,
-
     /// <summary>An interval in seconds.</summary>
     Seconds,
 }
@@ -102,13 +91,23 @@ public enum FactArgument
 /// <param name="Unit">
 /// What the number means, for the editor to put beside the field. Empty for a flag.
 /// </param>
+/// <param name="AtCursor">
+/// Whether the fact measures from where the CURSOR points rather than from the player.
+/// </param>
+/// <remarks>
+/// AtCursor is here rather than inferred from the argument kind, which is how it started: both
+/// centres take a radius in world units now, so nothing about the ARGUMENT distinguishes them
+/// any more. It was the argument kind while the cursor radius was in pixels - and that pairing
+/// was the bug, not the shortcut.
+/// </remarks>
 public sealed record FactInfo(
     RuleFact Fact,
     string Name,
     FactShape Shape,
     FactArgument Argument,
     string Unit,
-    string Help);
+    string Help,
+    bool AtCursor = false);
 
 /// <summary>
 /// The one description of what a rule may ask, and the only place that answers it.
@@ -152,14 +151,14 @@ public static class RuleFacts
 
         new(RuleFact.MonsterCount, "MonsterCount", FactShape.Number, FactArgument.None, "", "Live monsters ANYWHERE the game is listing them - a bubble a long way past the screen, not what is in range of a skill. For that use MonsterCountWithin."),
         new(RuleFact.MonsterCountWithin, "MonsterCountWithin", FactShape.Number, FactArgument.Distance, "", "Live monsters within a radius of the player, in world units. For scale: the alert rules call a rare monster 'nearby' at 120, and a melee swing is nearer 20."),
-        new(RuleFact.MonsterCountAtCursor, "MonsterCountAtCursor", FactShape.Number, FactArgument.Pixels, "", "Live monsters drawn within a radius of the CURSOR, in screen pixels - the question a skill placed where you aim actually asks. Answers 0 while the pointer is off the game."),
+        new(RuleFact.MonsterCountAtCursor, "MonsterCountAtCursor", FactShape.Number, FactArgument.Distance, "", "Live monsters within a radius of where the CURSOR points, in world units - the question a skill placed where you aim actually asks. Answers 0 while the pointer is off the game.", AtCursor: true),
         new(RuleFact.RareMonsterCount, "RareMonsterCount", FactShape.Number, FactArgument.None, "", "Live rare monsters anywhere the game is listing them."),
         new(RuleFact.UniqueMonsterCount, "UniqueMonsterCount", FactShape.Number, FactArgument.None, "", "Live unique monsters anywhere the game is listing them."),
         new(RuleFact.RareOrUniqueMonsterCount, "RareOrUniqueMonsterCount", FactShape.Number, FactArgument.None, "", "Live rares and uniques together, anywhere they are listed."),
         new(RuleFact.RareOrUniqueCountWithin, "RareOrUniqueCountWithin", FactShape.Number, FactArgument.Distance, "", "Live rares and uniques within a radius of the player, in world units."),
-        new(RuleFact.RareOrUniqueCountAtCursor, "RareOrUniqueCountAtCursor", FactShape.Number, FactArgument.Pixels, "", "Live rares and uniques drawn within a radius of the cursor, in screen pixels."),
+        new(RuleFact.RareOrUniqueCountAtCursor, "RareOrUniqueCountAtCursor", FactShape.Number, FactArgument.Distance, "", "Live rares and uniques within a radius of where the cursor points, in world units.", AtCursor: true),
         new(RuleFact.NearestMonster, "NearestMonster", FactShape.Number, FactArgument.None, "u", "Distance to the closest live monster. No monster at all is no answer, so every comparison says no."),
-        new(RuleFact.NearestMonsterAtCursor, "NearestMonsterAtCursor", FactShape.Number, FactArgument.None, "px", "Pixels from the cursor to the nearest live monster - 'am I aiming at anything'. No answer while the pointer is off the game or nothing is on screen."),
+        new(RuleFact.NearestMonsterAtCursor, "NearestMonsterAtCursor", FactShape.Number, FactArgument.None, "u", "World units from where the cursor points to the nearest live monster - 'am I aiming at anything'. No answer while the pointer is off the game.", AtCursor: true),
         new(RuleFact.NearestRareMonster, "NearestRareMonster", FactShape.Number, FactArgument.None, "u", "Distance to the closest live rare."),
         new(RuleFact.NearestUniqueMonster, "NearestUniqueMonster", FactShape.Number, FactArgument.None, "u", "Distance to the closest live unique."),
         new(RuleFact.NearestRareOrUniqueMonster, "NearestRareOrUniqueMonster", FactShape.Number, FactArgument.None, "u", "Distance to the closest live rare or unique."),

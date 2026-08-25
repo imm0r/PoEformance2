@@ -19,7 +19,7 @@ public class RulePreviewTests
     {
         InGame = true,
         GameFocused = true,
-        Pointer = new PointerView(800, 400, 1920, 1080),
+        CursorGround = (100f, 100f),
         Monsters = monsters,
     };
 
@@ -68,16 +68,16 @@ public class RulePreviewTests
     [Fact]
     public void CursorRingsAndPlayerRingsAreToldApart()
     {
-        // Not interchangeable: 30 world units and 30 pixels are wildly different circles, and a
-        // preview that drew them the same way would teach the wrong thing about the rule.
+        // Same units, different CENTRE - and the ring has to say which, or a rule aimed at the
+        // cursor is checked against a circle drawn round the character.
         RuleCondition condition =
-            RuleExpression.Parse("MonsterCountWithin(30) >= 1 && MonsterCountAtCursor(120) >= 1").Condition!;
+            RuleExpression.Parse("MonsterCountWithin(30) >= 1 && MonsterCountAtCursor(25) >= 1").Condition!;
 
         IReadOnlyList<PreviewRing> rings = RulePreview.Rings(condition, Fighting());
 
         Assert.Equal(2, rings.Count);
         Assert.Single(rings, ring => !ring.AtCursor && ring.Radius == 30);
-        Assert.Single(rings, ring => ring.AtCursor && ring.Radius == 120);
+        Assert.Single(rings, ring => ring.AtCursor && ring.Radius == 25);
     }
 
     [Fact]

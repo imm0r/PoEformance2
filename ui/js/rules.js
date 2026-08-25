@@ -139,7 +139,7 @@ export class RulesPanel {
     const nodes = this.shapes[rule.id]?.graph?.nodes ?? [];
     const ranged = new Set(
       (this.catalogue?.facts ?? [])
-        .filter((f) => f.argument === "Distance" || f.argument === "Pixels")
+        .filter((f) => f.argument === "Distance")
         .map((f) => f.name));
 
     return nodes.some((node) => node.kind === "Fact" && ranged.has(node.fact));
