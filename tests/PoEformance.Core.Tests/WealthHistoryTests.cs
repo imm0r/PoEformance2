@@ -43,6 +43,39 @@ public class WealthHistoryTests
     }
 
     [Fact]
+    public void TheFileHoldsOnlyWhatCannotBeWorkedOutAgain()
+    {
+        // FOUND IN A REAL RECORD. Every point was being written as
+        //   {"at":…,"ex":…,"rate":…,"stacks":49,"Divine":2065.57…,"When":"2026-08-26T08:50:02…"}
+        // because a public read-only property is serialised by default - so both computed
+        // readings were stored beside the fields they are computed FROM. Nothing ever read them
+        // back (there are no setters), they doubled the size of the one file whose growth this
+        // class exists to bound, and they gave a hand-edited file two more ways to contradict
+        // itself.
+        string path = Scratch();
+        try
+        {
+            var history = new WealthHistory();
+            history.Note(Start, 1234.5, 581, 12);
+            Assert.True(history.Save(path));
+
+            string written = File.ReadAllText(path);
+
+            Assert.Contains("\"at\"", written, StringComparison.Ordinal);
+            Assert.Contains("\"ex\"", written, StringComparison.Ordinal);
+            Assert.Contains("\"rate\"", written, StringComparison.Ordinal);
+            Assert.Contains("\"stacks\"", written, StringComparison.Ordinal);
+
+            Assert.DoesNotContain("Divine", written, StringComparison.Ordinal);
+            Assert.DoesNotContain("When", written, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void TwoReadingsTooCloseTogetherAreOnePoint()
     {
         // Picking up currency moves the total several times a minute. A record of a month does

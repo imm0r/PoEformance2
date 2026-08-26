@@ -224,16 +224,96 @@ public class WealthTrackerTests
     }
 
     [Fact]
-    public void WithNothingRecordedThereIsNoMovementToReport()
+    public void WithNothingCountedAtAllThereIsNoMovementToReport()
     {
         var tracker = new WealthTracker();
 
         Assert.Null(tracker.Moved(TimeSpan.FromHours(1), Start));
+        Assert.Null(tracker.Overall);
+    }
 
-        tracker.Update(Purse(Exalted(100)), Real(), Start);
+    [Fact]
+    public void TheChangeIsMeasuredAgainstTheLIVECountRatherThanTheLastRecordedPoint()
+    {
+        // THE BUG THIS EXISTS FOR, off a real screenshot: the panel read "0 ex" as the total and
+        // "+494.6k ex over 33m" as the change, at the same moment. The total was the live count
+        // and the change ended at the last RECORDED point, and the two had drifted apart because
+        // the drop fell inside the thirty seconds during which no point may be written. Both
+        // halves were doing as they were told; together they described a purse that never was.
+        var tracker = new WealthTracker();
+        PriceBook book = Real();
 
-        // One point is a total, not a movement: there is nothing for it to have moved from.
-        Assert.Null(tracker.Moved(TimeSpan.FromHours(1), Start));
+        Assert.True(tracker.Update(Purse(Exalted(100)), book, Start));
+
+        // Too soon to be written down - but it IS what the purse is worth now.
+        Assert.False(tracker.Update(Purse(Exalted(160)), book, Start + 1_000));
+        Assert.Equal(1, tracker.History.Count);
+
+        Assert.Equal(60, tracker.Overall!.Value, 0);
+        Assert.Equal(60, tracker.Moved(TimeSpan.FromHours(1), Start + 1_000)!.Value.Exalted, 0);
+    }
+
+    [Fact]
+    public void ButNotWhenTheLiveCountIsOneItWouldRefuseToRecord()
+    {
+        // The other half of it. With no prices the live count is a zero meaning "not known", and
+        // measuring against THAT would report the whole purse as having been spent - which is
+        // the exact shape of the failure the refusal upstream exists to keep out of the record.
+        var tracker = new WealthTracker();
+
+        Assert.True(tracker.Update(Purse(Exalted(100)), Real(), Start));
+        Assert.False(tracker.Update(Purse(Exalted(100)), new PriceBook(), Start + 60_000));
+
+        Assert.False(tracker.Trusted);
+        Assert.Equal(0, tracker.Now.Exalted);
+
+        // Falls back to the last point that could be believed, so the change is 0 and not -100.
+        Assert.Equal(0, tracker.Overall!.Value, 0);
+    }
+
+    [Fact]
+    public void WhatIsSHOWNAndWhatTheChangeMeasuresToAreTheSameFigure()
+    {
+        // The invariant behind the "0 ex beside +494.6k" screen. Whatever a view draws as the
+        // total has to be the same number every change ends at, in every state - live, stale,
+        // and before anything has been counted.
+        var tracker = new WealthTracker();
+        PriceBook book = Real();
+
+        Assert.Null(tracker.Showing);
+        Assert.Null(tracker.Overall);
+
+        tracker.Update(Purse(Exalted(100)), book, Start);
+        Assert.True(tracker.Showing!.Value.Live);
+        Assert.Equal(100, tracker.Showing!.Value.Exalted, 0);
+
+        // Prices vanish: what is shown falls back to the last believable figure, and the change
+        // measured against it is therefore zero rather than the whole purse having been spent.
+        tracker.Update(Purse(Exalted(100)), new PriceBook(), Start + 60_000);
+        Assert.False(tracker.Showing!.Value.Live);
+        Assert.Equal(100, tracker.Showing!.Value.Exalted, 0);
+        Assert.Equal(0, tracker.Overall!.Value, 0);
+    }
+
+    [Fact]
+    public void AReadingTakenWhileThePriceBookIsStillArrivingIsNotRecorded()
+    {
+        // MEASURED, off the first record this ever wrote: its opening point carried a rate of
+        // 381.3 where every point thirty seconds later carried 473.4 - across an unchanged 49
+        // stacks. The book was still being assembled, so that point understated the purse by
+        // nearly forty per cent, permanently, in a record that never resets.
+        //
+        // Ready is not enough to catch it: "has a rate and some prices" is also true of a
+        // half-arrived refresh.
+        var tracker = new WealthTracker();
+
+        Assert.False(tracker.Update(Purse(Exalted(100)), Real(), Start, settling: true));
+        Assert.Equal(0, tracker.History.Count);
+        Assert.False(tracker.Trusted);
+
+        // And the same reading once it has settled.
+        Assert.True(tracker.Update(Purse(Exalted(100)), Real(), Start, settling: false));
+        Assert.Equal(1, tracker.History.Count);
     }
 
     [Fact]
