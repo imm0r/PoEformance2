@@ -93,6 +93,34 @@ internal static class ImGuiText
         }
     }
 
+    /// <summary>A block of figures in the mono face, wrapped at the window's edge.</summary>
+    /// <remarks>
+    /// For the long ones: a raw JSON body, a captured error, anything that arrived from outside
+    /// and has no line breaks of its own. <see cref="Mono(string)"/> does not wrap - it is built
+    /// for a table cell, where wrapping would be wrong - so a three-thousand-character answer
+    /// drawn with it leaves the window as one line and cannot be read at all.
+    ///
+    /// Wrapping is pushed here rather than reached for through <see cref="Wrapped"/>, because
+    /// that one is printf and this text is EXACTLY the kind that must not be: a JSON body is
+    /// somebody else's string, and a percent sign in it is theirs, not a conversion.
+    /// </remarks>
+    public static void MonoWrapped(Vector4 colour, string text)
+    {
+        ImGui.PushStyleColor(ImGuiCol.Text, colour);
+        OverlayFonts.PushMono();
+        ImGui.PushTextWrapPos(0f);
+        try
+        {
+            ImGui.TextUnformatted(text);
+        }
+        finally
+        {
+            ImGui.PopTextWrapPos();
+            OverlayFonts.PopMono();
+            ImGui.PopStyleColor();
+        }
+    }
+
     /// <summary>A tooltip whose contents are figures, in the mono face.</summary>
     /// <remarks>
     /// Built out rather than SetTooltip, for two reasons that both matter here. SetTooltip is

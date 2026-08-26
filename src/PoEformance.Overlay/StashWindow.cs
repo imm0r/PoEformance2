@@ -387,17 +387,12 @@ public sealed class StashWindow
         ImGuiText.Hint(
             DimText,
             "A one-off diagnostic. It reads the site's own currency ids, asks the exchange about "
-            + $"{ProbeMost} of them in a single request, and shows what came back - including the "
-            + "rate-limit headers and one raw listing.");
+            + $"ONE of them, and only if that works asks again about {ProbeMost} at once. Both "
+            + "answers are shown verbatim, with the rate-limit headers and one raw listing.");
 
         if (_probed is not { } probe)
         {
             return;
-        }
-
-        if (!probe.Ok)
-        {
-            ImGuiText.Wrapped(WarnText, $"{probe.Status} - {probe.Error}");
         }
 
         if (!ImGui.BeginTable("trade-probe", 2, ImGuiTableFlags.SizingFixedFit))
@@ -427,13 +422,23 @@ public sealed class StashWindow
             ImGuiText.Wrapped(DimText, "ids: " + string.Join(", ", probe.Tags.Take(ProbeMost)));
         }
 
+        // ALWAYS, not only on failure. The probe now reports what BOTH attempts said - the
+        // single-currency query and the batched one - and the interesting case is the one where
+        // one succeeds and the other does not. Shown in the mono face because it is a status
+        // line and a fragment of somebody's JSON.
+        if (probe.Error.Length > 0)
+        {
+            ImGuiText.Wrapped(probe.Ok ? DimText : WarnText, "what each attempt said:");
+            ImGuiText.MonoWrapped(probe.Ok ? DimText : WarnText, probe.Error);
+        }
+
         if (probe.Raw.Length > 0)
         {
             // THE SHAPE IS THE POINT. Whether a batched answer says which currency each listing
             // is for is the one thing that decides if this endpoint can price a whole purse, and
             // it can only be read off a real answer.
             ImGuiText.Wrapped(DimText, "one listing, as the site sent it:");
-            ImGuiText.Mono(probe.Raw);
+            ImGuiText.MonoWrapped(DimText, probe.Raw);
         }
     }
 

@@ -178,31 +178,55 @@ internal sealed class TradeSessionWindow : Window
                   post({ id: m.id, ok: false, status: statics.status, error: 'no currency ids in the static data' });
                   return;
                 }
-                // ASKED ABOUT IN ONE REQUEST, which is the whole question. Capped so a first
-                // look cannot be the thing that trips a rate limit.
-                var want = tags.slice(0, Math.max(1, m.most | 0));
-                var r = await fetch('/api/trade2/exchange/' + encodeURIComponent(m.league), {
-                  method: 'POST',
-                  headers: { 'content-type': 'application/json' },
-                  credentials: 'include',
-                  body: JSON.stringify({
-                    engine: 'new',
-                    query: { status: { option: 'online' }, have: ['exalted'], want: want },
-                    sort: { have: 'asc' }
-                  })
-                });
-                var limits = limitsOf(r);
-                if (!r.ok) {
-                  post({ id: m.id, ok: false, status: r.status, limits: limits, tags: tags,
-                         asked: want.length, error: 'exchange' });
-                  return;
+                // ONE FIRST, THEN MANY. The first attempt asked about twelve at once and came
+                // back 400 with the reason thrown away, which settles nothing: a rejected batch
+                // and a body that is simply wrong look identical from here. Asking about ONE
+                // first separates them - if the single query works, the shape is right and the
+                // array is the limit; if it does not, the array was never the problem.
+                var ask = async function (want) {
+                  var r = await fetch('/api/trade2/exchange/' + encodeURIComponent(m.league), {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                      engine: 'new',
+                      query: { status: { option: 'online' }, have: ['exalted'], want: want },
+                      sort: { have: 'asc' }
+                    })
+                  });
+                  // THE BODY OF A FAILURE IS THE ANSWER. GGG replies to a bad query with
+                  // {"error":{"code":N,"message":"..."}} that usually names the offending field,
+                  // and the first probe discarded it - which is why a 400 taught us nothing.
+                  var text = await r.text();
+                  var out = { status: r.status, limits: limitsOf(r), body: text.slice(0, 1500) };
+                  try { out.json = JSON.parse(text); } catch (e) { }
+                  return out;
+                };
+
+                var one = await ask([tags[0]]);
+                var many = null;
+                // Only when the single query worked: a second request against a shape already
+                // known to be wrong spends a rate-limit slot to learn nothing.
+                if (one.status >= 200 && one.status < 300) {
+                  many = await ask(tags.slice(0, Math.max(2, m.most | 0)));
                 }
-                var data = await r.json();
-                var results = data.result || {};
+
+                var chosen = (many && many.status >= 200 && many.status < 300) ? many : one;
+                var results = (chosen.json && chosen.json.result) || {};
                 var keys = Object.keys(results);
-                post({ id: m.id, ok: true, status: r.status, limits: limits, tags: tags,
-                       asked: want.length, got: keys.length,
-                       raw: (keys.length ? JSON.stringify(results[keys[0]]) : '').slice(0, 4000) });
+
+                post({
+                  id: m.id,
+                  ok: chosen.status >= 200 && chosen.status < 300,
+                  status: chosen.status,
+                  limits: chosen.limits,
+                  tags: tags,
+                  asked: many ? Math.max(2, m.most | 0) : 1,
+                  got: keys.length,
+                  raw: (keys.length ? JSON.stringify(results[keys[0]]) : '').slice(0, 3000),
+                  error: 'one=' + one.status + ' ' + (one.body || '').slice(0, 400)
+                       + (many ? '   many=' + many.status + ' ' + (many.body || '').slice(0, 400) : '')
+                });
               } catch (err) {
                 post({ id: m.id, ok: false, status: 0, error: String(err) });
               }
