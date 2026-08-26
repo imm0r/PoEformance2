@@ -53,7 +53,15 @@ public static class StashWorth
         ArgumentNullException.ThrowIfNull(item);
 
         string? unique = item.Unique.Length > 0 ? item.Unique : null;
-        return book.Worth(item.Art, unique) ?? (unique is not null ? trade?.Worth(unique) : null);
+
+        // THE BASE NAME IS OFFERED FIRST, because in Path of Exile 2 a picture is not a key: an
+        // orb and its Greater and Perfect variants draw the same art and are worth up to four
+        // hundred times as much. See PriceBook.Fungible - and note the name handed over is the
+        // one the shipped table resolved from the metadata path, not anything the client painted,
+        // so this stays language-independent.
+        return book.Fungible(item.Art, item.Base)
+               ?? book.Worth(item.Art, unique)
+               ?? (unique is not null ? trade?.Worth(unique) : null);
     }
 
     /// <summary>What the item is worth as it sits - the stack included.</summary>

@@ -65,6 +65,49 @@ public sealed class PriceBook
     private readonly Dictionary<string, double> _byName = new(StringComparer.Ordinal);
     private readonly Dictionary<string, double> _byId = new(StringComparer.Ordinal);
 
+    /// <summary>
+    /// The fungible lines under picture AND name, for the pictures more than one thing draws.
+    /// </summary>
+    /// <remarks>
+    /// BECAUSE THE PICTURE IS NOT A KEY IN PATH OF EXILE 2. Its Greater and Perfect variants draw
+    /// the SAME art as the orb they upgrade, and they are not worth the same - measured live on
+    /// Standard, all five of these collide:
+    ///
+    ///   currencyupgrademagictorare   Regal Orb 0.28 ex  |  Perfect Regal Orb 454.20 ex
+    ///   currencyupgradetomagic       Transmutation 0.05 |  Perfect Transmutation 13.76
+    ///   currencyaddmodtorare         Exalted 1.00       |  Greater 50.33  |  Perfect 151.39
+    ///   currencyaddmodtomagic        Augmentation 0.10  |  Greater 1.00   |  Perfect 26.06
+    ///   currencyrerollrare           Chaos 116.23       |  Greater 247.77 |  Perfect 876.61
+    ///
+    /// Keyed by picture alone the last line read simply overwrote the others, so a stash of plain
+    /// Transmutation Orbs priced at the PERFECT rate: 3,312 of them came to 45.6k Exalted instead
+    /// of 172. That is how a purse of 97 Divine reported itself as 2,700.
+    ///
+    /// THE NAME IS STILL LANGUAGE-INDEPENDENT, which is the property art-keying was chosen for.
+    /// It is not what the client painted: it is what the shipped table resolved from the item's
+    /// metadata path, in English, exactly as poe.ninja spells it.
+    /// </remarks>
+    private readonly Dictionary<string, double> _byArtName = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Which currencies draw each picture. More than one means the picture is not a price.
+    /// </summary>
+    /// <remarks>
+    /// COUNTED FROM THE ITEM TABLE, NOT FROM THE SURVIVING LINES, and that distinction is the
+    /// whole of it. Measured live: the plain Orb of Transmutation trades 0.006 Divine a day and
+    /// is thrown out by the volume gate, while the Perfect variant that draws the same picture
+    /// survives it. Counting the lines that got through would therefore find ONE claimant, call
+    /// the picture unambiguous, and hand every plain Transmutation the Perfect price - which is
+    /// exactly the wrong answer the gate was supposed to make impossible.
+    ///
+    /// A gated-out line still proves the picture is shared. So the claim is registered when the
+    /// item is seen, before anything decides whether its price is believable.
+    ///
+    /// A SET OF IDS rather than a count, so calling <see cref="Add"/> for several types cannot
+    /// count one currency twice and invent an ambiguity that is not there.
+    /// </remarks>
+    private readonly Dictionary<string, HashSet<string>> _drawnBy = new(StringComparer.Ordinal);
+
     /// <summary>How many Exalted one Divine is worth.</summary>
     /// <remarks>
     /// TAKEN ONLY FROM AN ANSWER THAT HAD PRICES IN IT. Every response carries a rate, including
@@ -152,15 +195,35 @@ public sealed class PriceBook
     private int Fungible(JsonElement root, JsonElement lines)
     {
         // The id-to-picture table, which is what turns a line into something an item can be
-        // matched against.
+        // matched against - and the id-to-NAME table beside it, which is what tells apart the
+        // things that draw the same picture. See _byArtName.
         var art = new Dictionary<string, string>(StringComparer.Ordinal);
+        var called = new Dictionary<string, string>(StringComparer.Ordinal);
         if (root.TryGetProperty("items", out JsonElement items) && items.ValueKind == JsonValueKind.Array)
         {
             foreach (JsonElement one in items.EnumerateArray())
             {
-                if (Text(one, "id") is { Length: > 0 } id && ArtOf(Text(one, "image")) is { Length: > 0 } named)
+                if (Text(one, "id") is not { Length: > 0 } id)
+                {
+                    continue;
+                }
+
+                if (ArtOf(Text(one, "image")) is { Length: > 0 } named)
                 {
                     art[id] = named;
+
+                    // HERE, before any gate has had a say - see _drawnBy.
+                    if (!_drawnBy.TryGetValue(named, out HashSet<string>? drawn))
+                    {
+                        _drawnBy[named] = drawn = new HashSet<string>(StringComparer.Ordinal);
+                    }
+
+                    drawn.Add(id);
+                }
+
+                if (Text(one, "name") is { Length: > 0 } spelt)
+                {
+                    called[id] = spelt;
                 }
             }
         }
@@ -195,6 +258,12 @@ public sealed class PriceBook
             if (art.TryGetValue(id, out string? picture))
             {
                 _byArt[picture] = worth;
+
+                if (called.TryGetValue(id, out string? spelt))
+                {
+                    _byArtName[Named(picture, spelt)] = worth;
+                }
+
                 added++;
             }
         }
@@ -241,13 +310,63 @@ public sealed class PriceBook
     /// <param name="name">What it is called, for the things that have no art handle.</param>
     public double? Worth(string? artPath, string? name = null)
     {
-        if (ArtOf(artPath) is { Length: > 0 } picture && _byArt.TryGetValue(picture, out double byArt))
+        // The ambiguity guard is here rather than only in Fungible, because this is the older
+        // door into the same table: a picture that several things draw must not answer through
+        // either of them. See _byArtName for what it costs to get this wrong.
+        if (ArtOf(artPath) is { Length: > 0 } picture
+            && !Shared(picture)
+            && _byArt.TryGetValue(picture, out double byArt))
         {
             return byArt;
         }
 
         return name is { Length: > 0 } && _byName.TryGetValue(Tidy(name), out double byName) ? byName : null;
     }
+
+    /// <summary>
+    /// What one of a fungible item is worth, told apart by name where the picture is shared.
+    /// </summary>
+    /// <remarks>
+    /// THE NAME IS TRIED FIRST and the picture only after, which is the way round that stays
+    /// right as poe.ninja adds variants. A picture nothing else draws answers on its own exactly
+    /// as it always did; a picture two things draw answers only to the one that also matches by
+    /// name, and to NOTHING otherwise. Nothing is the correct answer there: an unpriced stack is
+    /// visible in the unpriced count and understates a total, where guessing between two prices
+    /// that differ by four hundred times overstates it silently.
+    /// </remarks>
+    /// <param name="artPath">The item's own art path, as it carries it.</param>
+    /// <param name="name">
+    /// The item's base name out of the shipped table - English, resolved from its metadata path,
+    /// and therefore the same on a client running in any language.
+    /// </param>
+    public double? Fungible(string? artPath, string? name)
+    {
+        if (ArtOf(artPath) is not { Length: > 0 } picture)
+        {
+            return null;
+        }
+
+        if (name is { Length: > 0 }
+            && _byArtName.TryGetValue(Named(picture, name), out double exact))
+        {
+            return exact;
+        }
+
+        return !Shared(picture) && _byArt.TryGetValue(picture, out double one) ? one : null;
+    }
+
+    /// <summary>Whether more than one thing draws this picture, so the picture alone is not a price.</summary>
+    public bool Shared(string? picture)
+        => picture is { Length: > 0 }
+           && _drawnBy.TryGetValue(picture, out HashSet<string>? drawn)
+           && drawn.Count > 1;
+
+    /// <summary>A picture and a name as one key.</summary>
+    /// <remarks>
+    /// A NUL between them rather than any printable separator, so no name containing the
+    /// separator can be made to read as a different picture's key.
+    /// </remarks>
+    private static string Named(string picture, string name) => $"{picture}\0{name.Trim()}";
 
     /// <summary>
     /// What one of the currency an asking price is quoted in is worth, in Exalted.
