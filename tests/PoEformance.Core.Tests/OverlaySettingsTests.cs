@@ -341,4 +341,64 @@ public class OverlaySettingsMergeTests
         Assert.False(merged.PoiRoutes);
         Assert.True(merged.DotLabels);
     }
+
+    [Fact]
+    public void TheWealthTrackerIsOffUntilSomebodyAsksForIt()
+    {
+        // Both halves separately, and both off. Counting the purse sweeps every inventory every
+        // few seconds; the corner panel is a dead spot on the screen. Neither should arrive
+        // uninvited on somebody who never opened the page.
+        Assert.False(PoEformance.Features.OverlaySettings.Default.WealthWatch);
+        Assert.False(PoEformance.Features.OverlaySettings.Default.WealthPanel);
+        Assert.Equal(60, PoEformance.Features.OverlaySettings.Default.WealthWindowMinutes);
+    }
+
+    [Fact]
+    public void AndItsSwitchesSurviveARestart()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-wealth-settings-{Guid.NewGuid():N}.json");
+        try
+        {
+            var chosen = new PoEformance.Features.OverlaySettings(
+                PoEformance.Game.Components.ItemRarity.Rare)
+            {
+                WealthWatch = true,
+                WealthPanel = true,
+                WealthWindowMinutes = 10_080,
+            };
+
+            Assert.True(PoEformance.Features.OverlaySettingsStore.Save(chosen, path));
+
+            PoEformance.Features.OverlaySettings back =
+                PoEformance.Features.OverlaySettingsStore.Load(path);
+
+            Assert.True(back.WealthWatch);
+            Assert.True(back.WealthPanel);
+            Assert.Equal(10_080, back.WealthWindowMinutes);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void AndThePageDoesNotResetThem()
+    {
+        // The configuration page sends the four settings it shows. Everything else has to come
+        // through untouched, or opening the page and closing it silently turns the tracker off.
+        var kept = new PoEformance.Features.OverlaySettings(PoEformance.Game.Components.ItemRarity.Magic)
+        {
+            WealthWatch = true,
+            WealthPanel = true,
+            WealthWindowMinutes = 1440,
+        };
+
+        PoEformance.Features.OverlaySettings merged =
+            kept.MergeFromPage(PoEformance.Features.OverlaySettings.Default);
+
+        Assert.True(merged.WealthWatch);
+        Assert.True(merged.WealthPanel);
+        Assert.Equal(1440, merged.WealthWindowMinutes);
+    }
 }

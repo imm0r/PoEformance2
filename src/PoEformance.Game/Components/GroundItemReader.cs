@@ -1,6 +1,7 @@
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Game.Entities;
+using PoEformance.Game.Items;
 
 namespace PoEformance.Game.Components;
 
@@ -123,7 +124,11 @@ public sealed class GroundItemReader
         // Path FIRST, rarity second. Currency, fragments and essences have no rarity
         // component at all, so asking for one gets nothing and they would fall through as
         // Normal - the single most valuable class of drop, filtered out as junk.
-        if (item.Path.Contains("/Currency/", StringComparison.OrdinalIgnoreCase))
+        //
+        // The test itself moved to CurrencyPaths when the wealth tracker came to need the same
+        // question about stashed items: two copies of this rule would be two rules the day one
+        // of them learned about a family the other had not.
+        if (CurrencyPaths.IsCurrency(item.Path))
         {
             return ItemRarity.Currency;
         }

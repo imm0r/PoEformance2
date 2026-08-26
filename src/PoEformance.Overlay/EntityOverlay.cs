@@ -257,6 +257,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         _tools.Chrome = Chrome;
         _preloadPanel.Chrome = Chrome;
+        _wealthPanel.Chrome = Chrome;
         Chrome.Changed = () => SettingsChanged?.Invoke();
         _tools.HiddenChanged = () => SettingsChanged?.Invoke();
         EntitiesHidden.Changed = () => SettingsChanged?.Invoke();
@@ -300,6 +301,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Chrome.Apply(settings.WindowsOrEmpty);
         _tools.ApplyHidden(settings.HiddenTabsOrEmpty);
         EntitiesHidden.Use(settings.HiddenEntitiesOrEmpty, settings.HiddenEntitySpotsOrEmpty);
+
+        // The panel can be applied straight away; the page cannot exist yet - the tracker is
+        // attached later, like the stash - so the stretch is remembered until it does.
+        _wealthPanel.Enabled = settings.WealthPanel;
+        _wealthMinutes = settings.WealthWindowMinutes;
+        if (_wealthWindow is not null)
+        {
+            _wealthWindow.WindowMinutes = _wealthMinutes;
+        }
 
         if (Noise is not null)
         {
@@ -358,6 +368,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
             PoiRoutes = _poi?.ShowRoutes ?? basis.PoiRoutes,
             PoiArrows = _poi?.ShowArrows ?? basis.PoiArrows,
+
+            // The page's switch is the live one where there is a page; before it is attached
+            // the basis is what was read out of the file, and writing the default over it is
+            // how a setting gets lost by opening the tool and closing it again.
+            WealthWatch = _wealthWindow?.Watching ?? basis.WealthWatch,
+            WealthPanel = _wealthPanel.Enabled,
+            WealthWindowMinutes = _wealthWindow?.WindowMinutes ?? _wealthMinutes,
         };
     }
 
@@ -538,6 +555,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private PreloadWatch? _preload;
     private PreloadSettings _preloadSettings = PreloadSettings.Default;
     private readonly PreloadPanel _preloadPanel = new();
+
+    /// <summary>The corner panel and the record behind it. Null until the tracker is attached.</summary>
+    private readonly WealthPanel _wealthPanel = new();
+    private WealthTracker? _wealth;
+    private WealthWindow? _wealthWindow;
+    private int _wealthMinutes = 60;
     private readonly PreloadEntryBanner _preloadEntry = new();
 
     /// <summary>The area whose findings have already been said out loud.</summary>
@@ -1048,6 +1071,50 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             _tools.Show("stash");
         }
+    }
+
+    /// <summary>
+    /// Adds the wealth tracker: a page holding the record, and a corner panel over the game.
+    /// </summary>
+    /// <remarks>
+    /// TWO VIEWS OF ONE THING, because they answer different questions. "Am I up or down" is
+    /// asked mid-map and has to be readable without opening anything, so it is a corner panel;
+    /// "what has this league actually been worth" needs the record drawn, which needs a page.
+    /// They share the chosen stretch of time so the two figures on screen can never be labelled
+    /// differently and answer the same question.
+    ///
+    /// The panel is a window like any other - it appears in the window list, it can be pinned,
+    /// and its click-through is the ordinary one. That is what the user asked for and it is also
+    /// the only way it can be moved: painted pixels take no mouse.
+    /// </remarks>
+    public void AttachWealth(WealthTracker tracker, StashInspector inspector, PriceStore prices)
+    {
+        ArgumentNullException.ThrowIfNull(tracker);
+        ArgumentNullException.ThrowIfNull(inspector);
+        ArgumentNullException.ThrowIfNull(prices);
+
+        _wealth = tracker;
+        _wealthPanel.Chrome = Chrome;
+
+        var window = new WealthWindow(tracker, _wealthPanel, () => prices.Book)
+        {
+            Watching = inspector.WatchPurse,
+            WatchChanged = on =>
+            {
+                inspector.WatchPurse = on;
+                SettingsChanged?.Invoke();
+            },
+            Changed = () => SettingsChanged?.Invoke(),
+        };
+
+        // Whatever Apply already read out of the settings file, which ran before this - the
+        // tracker is attached late, like the stash, so the switches arrive before the thing
+        // they switch. Assigning them here is what stops an attached page starting at its
+        // defaults and then saving those over what the user chose.
+        window.WindowMinutes = _wealthMinutes;
+
+        _wealthWindow = window;
+        _tools.Add(61, "wealth", "Wealth", window.DrawTab);
     }
 
     /// <summary>
@@ -1831,6 +1898,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _preloadPanel.Draw(_snapshot.AreaHash, _preload.Findings);
         }
 
+        // Everywhere in the game, unlike the one above: what the purse is worth is as true in a
+        // town as in a map, and hiding it in the hideout would take it away at exactly the
+        // moment somebody is deciding what to spend.
+        if (_wealth is not null && _snapshot.InGame)
+        {
+            _wealthPanel.Alpha = _interface.ReadoutOpacityOr;
+            _wealthPanel.Draw(_wealth, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        }
     }
 
     /// <summary>

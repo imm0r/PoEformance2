@@ -54,7 +54,21 @@ public sealed record OverlaySettings(
     // kind-plus-place for one entity. Both last, because hiding clutter is a decision made
     // once - see EntityHiding, and EntitySpot for why a single one is not keyed on its id.
     [property: JsonPropertyName("hiddenEntities")] IReadOnlyList<string>? HiddenEntities = null,
-    [property: JsonPropertyName("hiddenEntitySpots")] IReadOnlyList<EntitySpot>? HiddenEntitySpots = null)
+    [property: JsonPropertyName("hiddenEntitySpots")] IReadOnlyList<EntitySpot>? HiddenEntitySpots = null,
+
+    // The wealth tracker. OFF by default, and both halves separately: counting the purse is a
+    // sweep of every inventory every few seconds, and the corner panel is a dead spot on the
+    // screen. Neither should arrive uninvited on somebody who never opened the page.
+    //
+    // The RECORD itself is not here - it lives in its own file, because it is data rather than
+    // a preference and it outgrows a settings file within a week. See WealthHistory.
+    [property: JsonPropertyName("wealthWatch")] bool WealthWatch = false,
+    [property: JsonPropertyName("wealthPanel")] bool WealthPanel = false,
+
+    // Which stretch both wealth views report on, in minutes. One setting for the two of them:
+    // two figures on screen labelled differently and answering the same question is how
+    // somebody ends up believing the smaller one.
+    [property: JsonPropertyName("wealthWindowMinutes")] int WealthWindowMinutes = 60)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>

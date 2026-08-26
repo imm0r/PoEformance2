@@ -23,6 +23,43 @@ public sealed record StashPage(
     int Rows,
     IReadOnlyList<StashSlot> Items);
 
+/// <summary>
+/// The currency a character is carrying, and how stale the stash half of it is.
+/// </summary>
+/// <remarks>
+/// TWO HALVES WITH DIFFERENT LIFETIMES, and that is forced by the game rather than chosen. The
+/// backpack hangs off the player and is readable wherever they are; the stash tabs are only
+/// there when the client has a stash loaded, which means standing near one. During a map the
+/// tabs are simply gone - so a purse read in a map that reported only the backpack would show
+/// somebody's wealth collapsing every time they left the hideout.
+///
+/// The stash half is therefore REMEMBERED, and stamped with when it was last actually seen, so
+/// a readout can say "plus what the stash held twenty minutes ago" instead of implying it is
+/// looking at it now.
+/// </remarks>
+/// <param name="Pages">
+/// The carried currency and the last-seen stashed currency together, which is what wants
+/// valuing. Only currency is in here - see <see cref="PoEformance.Game.Items.CurrencyPaths"/> -
+/// and worn gear never is.
+/// </param>
+/// <param name="StashSeenAt">
+/// Unix milliseconds of when the stash tabs were last actually read, or 0 when they have not
+/// been seen at all since the tool started.
+/// </param>
+/// <param name="Carried">How many of the pages are the player's own backpack.</param>
+/// <param name="Status">What happened, in words. Empty when there is nothing to say.</param>
+public sealed record PurseView(
+    IReadOnlyList<StashPage> Pages,
+    long StashSeenAt,
+    int Carried,
+    string Status)
+{
+    public static PurseView Nothing { get; } = new([], 0, 0, string.Empty);
+
+    /// <summary>Whether the stash half has ever been seen.</summary>
+    public bool SawStash => StashSeenAt > 0;
+}
+
 /// <summary>What the inspector found. Immutable, published whole, drawn as-is.</summary>
 /// <param name="Pages">Every inventory, in the order the game holds them.</param>
 /// <param name="Status">What happened, in words. Empty when there is nothing to say.</param>
@@ -76,6 +113,22 @@ public sealed class StashInspector
     /// </remarks>
     public static readonly TimeSpan LeagueEvery = TimeSpan.FromSeconds(5);
 
+    /// <summary>
+    /// How often the currency is re-counted.
+    /// </summary>
+    /// <remarks>
+    /// UNLIKE THE FULL READ, THIS ONE RUNS BY ITSELF, and it can because it is a different order
+    /// of work. A full read takes every item in every tab down to its mods and resolved stats; a
+    /// purse read asks each item only for its metadata path - the first hop of that walk - and
+    /// goes further on the handful that come back currency. A tab of gear costs one identity
+    /// read per item and nothing else.
+    ///
+    /// Five seconds because what it feeds is a graph whose finest resolution is thirty (see
+    /// <see cref="WealthHistory.MinGapMs"/>), and a readout that lags a pickup by half a minute
+    /// reads as broken even when the record it is writing is perfect.
+    /// </remarks>
+    public static readonly TimeSpan PurseEvery = TimeSpan.FromSeconds(5);
+
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
     private readonly ulong _gameStatesStatic;
@@ -103,6 +156,12 @@ public sealed class StashInspector
     private int _wanted;
     private int _served;
     private int _busy;
+
+    private PurseView _purse = PurseView.Nothing;
+    private long _purseAt;
+    private IReadOnlyList<StashPage> _stashed = [];
+    private long _stashedAt;
+    private bool _watchPurse;
 
     public StashInspector(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, ItemNames? names = null)
     {
@@ -161,10 +220,28 @@ public sealed class StashInspector
     /// </remarks>
     public string LeagueNote => Volatile.Read(ref _leagueNote);
 
+    /// <summary>The currency being carried, as of the last purse read. Never blocks, never null.</summary>
+    public PurseView Purse => Volatile.Read(ref _purse);
+
+    /// <summary>
+    /// Whether the purse is counted at all.
+    /// </summary>
+    /// <remarks>
+    /// OFF UNTIL SOMETHING WANTS IT. It is cheap next to a full read and it is not free: it walks
+    /// every inventory the game holds, every five seconds, forever. Nobody who has not opened the
+    /// wealth tracker should pay for it.
+    /// </remarks>
+    public bool WatchPurse
+    {
+        get => Volatile.Read(ref _watchPurse);
+        set => Volatile.Write(ref _watchPurse, value);
+    }
+
     /// <summary>Serves a requested read, and keeps the league current. Called on the reader thread.</summary>
     public void Service(long now)
     {
         Leagued(now);
+        Pursed(now);
 
         int wanted = Volatile.Read(ref _wanted);
         if (wanted == _served)
@@ -276,6 +353,123 @@ public sealed class StashInspector
             ref _leagueNote,
             $"no league at +0x{was:X}. Strings in the server-data structs - "
             + string.Join("  |  ", lines));
+    }
+
+    /// <summary>Re-counts the currency, at most every <see cref="PurseEvery"/>.</summary>
+    /// <remarks>
+    /// Failures are silent and leave the last count standing, like the league read beside it. Not
+    /// being in an area is the ordinary state at character selection, and a purse that cannot be
+    /// read this tick is not a purse that emptied.
+    /// </remarks>
+    private void Pursed(long now)
+    {
+        if (!WatchPurse || (_purseAt > 0 && now - _purseAt < (long)PurseEvery.TotalMilliseconds))
+        {
+            return;
+        }
+
+        _purseAt = now;
+
+        try
+        {
+            Volatile.Write(ref _purse, Count());
+        }
+        catch (Exception exception) when (exception is not OutOfMemoryException)
+        {
+            Volatile.Write(ref _purse, Purse with { Status = $"count failed: {exception.Message}" });
+        }
+    }
+
+    /// <summary>
+    /// Counts the currency in the backpack and, when they are loaded, the stash tabs.
+    /// </summary>
+    /// <remarks>
+    /// THE PATH IS ASKED FOR FIRST AND USUALLY LAST. Everything in every inventory costs one
+    /// identity read; only what comes back currency costs the full item walk. That ratio is what
+    /// makes this affordable on a timer - a stash of gear is thousands of identity reads and
+    /// nothing else.
+    ///
+    /// A WALL-CLOCK STAMP, not a tick count, because what consumes it writes a record that spans
+    /// sessions - see <see cref="WealthPoint"/>. Taken once per count rather than per item.
+    /// </remarks>
+    private PurseView Count()
+    {
+        GameChainAddresses chain = GameChain.Resolve(_reader, _schema, _gameStatesStatic);
+        if (chain.AreaInstance == 0)
+        {
+            return Purse with { Status = "not in an area" };
+        }
+
+        ulong serverData = ServerData(chain);
+        if (serverData == 0)
+        {
+            return Purse with { Status = "the server data did not resolve" };
+        }
+
+        IReadOnlyList<StashInventory> inventories = _stash.Read(serverData);
+        if (inventories.Count == 0)
+        {
+            return Purse with { Status = "no inventories" };
+        }
+
+        var carried = new List<StashPage>();
+        var stashed = new List<StashPage>();
+        var sawStash = false;
+
+        foreach (StashInventory inventory in inventories)
+        {
+            // Worn gear is never money, and skipping it here saves an identity read per slot on
+            // every count rather than filtering it out after paying for it.
+            if (inventory.Kind == InventoryKind.Equipped)
+            {
+                continue;
+            }
+
+            if (inventory.Kind == InventoryKind.Stash)
+            {
+                sawStash = true;
+            }
+
+            var found = new List<StashSlot>();
+            foreach (StashedItem item in inventory.Items)
+            {
+                if (!CurrencyPaths.IsCurrency(_items.PathOf(item.Entity)))
+                {
+                    continue;
+                }
+
+                InspectedItem inspected = _items.Read(item.Entity);
+                if (inspected.Path.Length > 0)
+                {
+                    found.Add(new StashSlot(item, inspected));
+                }
+            }
+
+            var page = new StashPage(
+                inventory.Id, inventory.Kind, inventory.Called,
+                inventory.Columns, inventory.Rows, found);
+
+            (inventory.Kind == InventoryKind.Backpack ? carried : stashed).Add(page);
+        }
+
+        // SEEN AT ALL, rather than "held currency". A currency tab somebody has just emptied is
+        // a real reading of zero and has to replace the remembered one; a map, where the tabs
+        // are not loaded, must not.
+        if (sawStash)
+        {
+            _stashed = stashed;
+            _stashedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
+
+        var pages = new List<StashPage>(carried.Count + _stashed.Count);
+        pages.AddRange(carried);
+        pages.AddRange(_stashed);
+
+        return new PurseView(
+            pages,
+            _stashedAt,
+            carried.Count,
+            sawStash ? string.Empty : "stash tabs not loaded - showing what they last held");
     }
 
     private StashView Build()
