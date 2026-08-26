@@ -335,12 +335,13 @@ public sealed class StashWindow
     }
 
     /// <summary>
-    /// How many currencies the probe asks about in its one request.
+    /// How many of the site's currency ids to print, so the naming can be eyeballed.
     /// </summary>
     /// <remarks>
-    /// Enough to prove an array is honoured rather than truncated, few enough that a first look
-    /// cannot be the thing that trips a rate limit. If the answer comes back with this many
-    /// distinct currencies in it, the question is settled.
+    /// This used to be how many the probe ASKED about, back when the open question was whether
+    /// one request could price a whole purse. The server has since answered that - want takes
+    /// exactly one id - so all that is left for the number to do is keep the id list from
+    /// filling the page.
     /// </remarks>
     private const int ProbeMost = 12;
 
@@ -386,9 +387,10 @@ public sealed class StashWindow
 
         ImGuiText.Hint(
             DimText,
-            "A one-off diagnostic. It reads the site's own currency ids, asks the exchange about "
-            + $"ONE of them, and only if that works asks again about {ProbeMost} at once. Both "
-            + "answers are shown verbatim, with the rate-limit headers and one raw listing.");
+            "A one-off diagnostic. It reads the site's own currency ids and asks the live exchange "
+            + "what one Divine costs in Exalted - the number every figure here is displayed "
+            + "through. Shown with the rate-limit headers and one listing exactly as the site "
+            + "sent it.");
 
         if (_probed is not { } probe)
         {
@@ -403,7 +405,19 @@ public sealed class StashWindow
         try
         {
             ProbeRow("status", probe.Status.ToString(System.Globalization.CultureInfo.CurrentCulture));
-            ProbeRow("asked about", $"{probe.Asked} currencies in one request");
+
+            // THE TWO NUMBERS SIDE BY SIDE, which is the whole reason to run this. Everything
+            // here is computed in Exalted and shown as Divine through one rate; if the exchange
+            // and poe.ninja disagree about it, every figure in the tool is off by that factor.
+            if (probe.Rate > 0)
+            {
+                double book = _prices.Book.Rate;
+                string against = book > 0
+                    ? $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.Rate / book)}x)"
+                    : string.Empty;
+                ProbeRow("1 div costs", $"{StashWorth.Money(probe.Rate)} ex{against}");
+            }
+
             ProbeRow("listings back", probe.Got.ToString(System.Globalization.CultureInfo.CurrentCulture));
             ProbeRow("currency ids", $"{probe.Tags.Count} known to the site");
 
@@ -422,13 +436,12 @@ public sealed class StashWindow
             ImGuiText.Wrapped(DimText, "ids: " + string.Join(", ", probe.Tags.Take(ProbeMost)));
         }
 
-        // ALWAYS, not only on failure. The probe now reports what BOTH attempts said - the
-        // single-currency query and the batched one - and the interesting case is the one where
-        // one succeeds and the other does not. Shown in the mono face because it is a status
-        // line and a fragment of somebody's JSON.
+        // THE BODY VERBATIM, because a status alone settles nothing: the first probe's 400 named
+        // its own cause in a body that was thrown away. Mono and wrapping because this is a
+        // fragment of somebody else's JSON, which has no line breaks of its own.
         if (probe.Error.Length > 0)
         {
-            ImGuiText.Wrapped(probe.Ok ? DimText : WarnText, "what each attempt said:");
+            ImGuiText.Wrapped(probe.Ok ? DimText : WarnText, "what the site said:");
             ImGuiText.MonoWrapped(probe.Ok ? DimText : WarnText, probe.Error);
         }
 

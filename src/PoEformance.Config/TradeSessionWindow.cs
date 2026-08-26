@@ -178,54 +178,66 @@ internal sealed class TradeSessionWindow : Window
                   post({ id: m.id, ok: false, status: statics.status, error: 'no currency ids in the static data' });
                   return;
                 }
-                // ONE FIRST, THEN MANY. The first attempt asked about twelve at once and came
-                // back 400 with the reason thrown away, which settles nothing: a rejected batch
-                // and a body that is simply wrong look identical from here. Asking about ONE
-                // first separates them - if the single query works, the shape is right and the
-                // array is the limit; if it does not, the array was never the problem.
-                var ask = async function (want) {
+                // WANT TAKES EXACTLY ONE. Asking about twelve came back
+                // 400 "Too many items `want` items selected." - and the reference had said so
+                // all along: Exiled Exchange builds every query as want: [oneTag] and puts its
+                // array on the OTHER side, have. So a purse cannot be priced in one request,
+                // and there is nothing left to measure about batching the want side.
+                //
+                // What is left is worth one request: the EXALTED-PER-DIVINE RATE. Every figure
+                // this tool shows is computed in Exalted and displayed as Divine through that
+                // one number, poe.ninja put it at 454.2, and Exiled Exchange showed 785 for the
+                // same league. Whichever is right, the live exchange is the thing that knows.
+                var ask = async function (want, have) {
                   var r = await fetch('/api/trade2/exchange/' + encodeURIComponent(m.league), {
                     method: 'POST',
                     headers: { 'content-type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify({
                       engine: 'new',
-                      query: { status: { option: 'online' }, have: ['exalted'], want: want },
+                      query: { status: { option: 'online' }, have: have, want: want },
                       sort: { have: 'asc' }
                     })
                   });
                   // THE BODY OF A FAILURE IS THE ANSWER. GGG replies to a bad query with
                   // {"error":{"code":N,"message":"..."}} that usually names the offending field,
-                  // and the first probe discarded it - which is why a 400 taught us nothing.
+                  // and the first probe discarded it - which is why its 400 taught us nothing.
                   var text = await r.text();
                   var out = { status: r.status, limits: limitsOf(r), body: text.slice(0, 1500) };
                   try { out.json = JSON.parse(text); } catch (e) { }
                   return out;
                 };
 
-                var one = await ask([tags[0]]);
-                var many = null;
-                // Only when the single query worked: a second request against a shape already
-                // known to be wrong spends a rate-limit slot to learn nothing.
-                if (one.status >= 200 && one.status < 300) {
-                  many = await ask(tags.slice(0, Math.max(2, m.most | 0)));
-                }
-
-                var chosen = (many && many.status >= 200 && many.status < 300) ? many : one;
-                var results = (chosen.json && chosen.json.result) || {};
+                var got = await ask(['divine'], ['exalted']);
+                var results = (got.json && got.json.result) || {};
                 var keys = Object.keys(results);
+
+                // ONE OFFER ONLY, as the reference does: a listing carrying several offers gives
+                // no way to say which of them the price is, so it cannot be read as a rate.
+                var rate = 0;
+                for (var i = 0; i < keys.length; i++) {
+                  var listing = results[keys[i]] && results[keys[i]].listing;
+                  var offers = (listing && listing.offers) || [];
+                  if (offers.length !== 1) { continue; }
+                  var paid = offers[0].exchange, per = offers[0].item;
+                  if (!paid || !per || !per.amount) { continue; }
+                  // sort: {have: 'asc'} already puts the cheapest first, so the first readable
+                  // listing IS the going rate - no need to scan for a minimum.
+                  rate = paid.amount / per.amount;
+                  break;
+                }
 
                 post({
                   id: m.id,
-                  ok: chosen.status >= 200 && chosen.status < 300,
-                  status: chosen.status,
-                  limits: chosen.limits,
+                  ok: got.status >= 200 && got.status < 300,
+                  status: got.status,
+                  limits: got.limits,
                   tags: tags,
-                  asked: many ? Math.max(2, m.most | 0) : 1,
+                  asked: 1,
                   got: keys.length,
+                  rate: rate,
                   raw: (keys.length ? JSON.stringify(results[keys[0]]) : '').slice(0, 3000),
-                  error: 'one=' + one.status + ' ' + (one.body || '').slice(0, 400)
-                       + (many ? '   many=' + many.status + ' ' + (many.body || '').slice(0, 400) : '')
+                  error: keys.length ? '' : ('divine for exalted: ' + got.status + ' ' + (got.body || '').slice(0, 600))
                 });
               } catch (err) {
                 post({ id: m.id, ok: false, status: 0, error: String(err) });

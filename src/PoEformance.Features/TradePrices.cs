@@ -29,12 +29,18 @@ public readonly record struct TradeAnswer(
 ///
 /// - WHAT THE TRADE SITE CALLS EACH CURRENCY. Its own ids are not poe.ninja's and not the
 ///   metadata paths, and pricing through it needs that table.
-/// - WHETHER ONE REQUEST CAN ASK ABOUT MANY. The exchange query takes want and have as ARRAYS,
-///   which would collapse the cost of pricing a whole purse from fifty requests to one - but
-///   every tool that uses this endpoint asks about a single item, so nothing proves the array
-///   is honoured rather than truncated.
 /// - WHAT THE REAL RATE LIMITS ARE. They arrive as headers on the answer, and the client-side
 ///   guess in the reference (one request per five seconds) is only a starting point.
+/// - WHAT ONE DIVINE ACTUALLY COSTS. Every figure this tool shows is computed in Exalted and
+///   displayed as Divine through that single number, so nothing else is as load-bearing - and
+///   poe.ninja said 454.2 for the same league where Exiled Exchange showed 785.
+///
+/// WHAT IT NO LONGER ASKS is whether one request can price a whole purse. It cannot: the first
+/// run of this probe put twelve ids in want and got back
+/// 400 "Too many items `want` items selected.", which is the reference's own shape stated by
+/// the server - Exiled Exchange builds every query as want: [oneTag] and batches on the OTHER
+/// side, have. Pricing fifty currencies means fifty requests, so it is not a thing to do on a
+/// timer at 45 requests per half hour.
 ///
 /// SO IT CARRIES THE RAW ANSWER rather than a parsed one. Parsing a shape nobody has seen yet
 /// would be inventing the shape; the point of a probe is to find out what it is.
@@ -43,8 +49,9 @@ public readonly record struct TradeAnswer(
 /// <param name="Status">The HTTP status. 0 when the request never left.</param>
 /// <param name="Limits">The X-Rate-Limit headers the site answered with, joined.</param>
 /// <param name="Tags">The currency ids the trade site's own static data lists.</param>
-/// <param name="Asked">How many of those the exchange query asked about in one request.</param>
+/// <param name="Asked">How many currencies the exchange query asked about in one request.</param>
 /// <param name="Got">How many listings came back.</param>
+/// <param name="Rate">Exalted per Divine, off the cheapest readable listing. 0 when none was.</param>
 /// <param name="Raw">One listing as the site sent it, so its shape can be read.</param>
 /// <param name="Error">What went wrong, in words.</param>
 public sealed record TradeProbe(
@@ -54,11 +61,12 @@ public sealed record TradeProbe(
     IReadOnlyList<string> Tags,
     int Asked,
     int Got,
+    double Rate,
     string Raw,
     string Error)
 {
     /// <summary>A probe that could not be run at all.</summary>
-    public static TradeProbe Not(string why) => new(false, 0, string.Empty, [], 0, 0, string.Empty, why);
+    public static TradeProbe Not(string why) => new(false, 0, string.Empty, [], 0, 0, 0, string.Empty, why);
 }
 
 /// <summary>
