@@ -27,8 +27,12 @@ namespace PoEformance.Config;
 /// own browser profile, next to the executable, and that is the whole of it. The cookie-manager
 /// route was available and deliberately not taken.
 ///
-/// The window is the user's proof of that, which is why it is a visible window and not a
-/// headless one: what it is doing is on screen.
+/// IT IS A REAL WINDOW AND IT STAYS ONE. Once the session works it is HIDDEN rather than closed
+/// or made headless - see <see cref="TradeSession.HideWhenSignedIn"/> - and that distinction is
+/// the point: a hidden window can be brought back with a button, and what it is doing is still a
+/// page anybody can look at. Hiding it changes when it is on screen, not what it does. It comes
+/// back by itself the moment the site answers 401 or 403, because that means the sign-in needs a
+/// person.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 internal sealed class TradeSessionWindow : Window
@@ -119,9 +123,12 @@ internal sealed class TradeSessionWindow : Window
     /// The page-side helper, injected into every document this window loads.
     /// </summary>
     /// <remarks>
-    /// It waits for a name, runs the two-step trade query as a SAME-ORIGIN fetch - the search
-    /// posts the query and gets an id plus a list of result ids, the fetch turns the first few
-    /// of those into listings - and posts back what it found.
+    /// It answers two commands. <c>tradeQuery</c> waits for a name and runs the two-step trade
+    /// query as a SAME-ORIGIN fetch - the search posts the query and gets an id plus a list of
+    /// result ids, the fetch turns the first few of those into listings - and posts back what it
+    /// found. <c>exchangeProbe</c> is the diagnostic described on <see cref="TradeProbe"/>: it
+    /// reads the site's own currency ids out of its static data, asks the currency exchange about
+    /// several of them in ONE request, and reports the rate-limit headers and one raw listing.
     ///
     /// <c>credentials: 'include'</c> is what makes it the signed-in browser asking rather than
     /// an anonymous one, and it is the only reason any of this works.
@@ -140,8 +147,67 @@ internal sealed class TradeSessionWindow : Window
           if (window.__poeformanceTrade) { return; }
           window.__poeformanceTrade = 1;
           var post = function (o) { try { window.chrome.webview.postMessage(o); } catch (e) { } };
+          var limitsOf = function (r) {
+            var out = [];
+            try {
+              r.headers.forEach(function (v, k) {
+                if (k.toLowerCase().indexOf('x-rate-limit') === 0) { out.push(k + '=' + v); }
+              });
+            } catch (e) { }
+            return out.join('   ');
+          };
           window.chrome.webview.addEventListener('message', async function (e) {
             var m = e.data;
+            if (m && m.cmd === 'exchangeProbe') {
+              try {
+                // The site's own currency ids, which are neither poe.ninja's nor the metadata
+                // paths - and the table any exchange pricing would have to join through.
+                var statics = await fetch('/api/trade2/data/static', { credentials: 'include' });
+                if (!statics.ok) {
+                  post({ id: m.id, ok: false, status: statics.status, error: 'static data' });
+                  return;
+                }
+                var tags = [];
+                var stat = await statics.json();
+                (stat.result || []).forEach(function (group) {
+                  if (group && group.id === 'Currency') {
+                    (group.entries || []).forEach(function (one) { if (one && one.id) { tags.push(one.id); } });
+                  }
+                });
+                if (tags.length === 0) {
+                  post({ id: m.id, ok: false, status: statics.status, error: 'no currency ids in the static data' });
+                  return;
+                }
+                // ASKED ABOUT IN ONE REQUEST, which is the whole question. Capped so a first
+                // look cannot be the thing that trips a rate limit.
+                var want = tags.slice(0, Math.max(1, m.most | 0));
+                var r = await fetch('/api/trade2/exchange/' + encodeURIComponent(m.league), {
+                  method: 'POST',
+                  headers: { 'content-type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify({
+                    engine: 'new',
+                    query: { status: { option: 'online' }, have: ['exalted'], want: want },
+                    sort: { have: 'asc' }
+                  })
+                });
+                var limits = limitsOf(r);
+                if (!r.ok) {
+                  post({ id: m.id, ok: false, status: r.status, limits: limits, tags: tags,
+                         asked: want.length, error: 'exchange' });
+                  return;
+                }
+                var data = await r.json();
+                var results = data.result || {};
+                var keys = Object.keys(results);
+                post({ id: m.id, ok: true, status: r.status, limits: limits, tags: tags,
+                       asked: want.length, got: keys.length,
+                       raw: (keys.length ? JSON.stringify(results[keys[0]]) : '').slice(0, 4000) });
+              } catch (err) {
+                post({ id: m.id, ok: false, status: 0, error: String(err) });
+              }
+              return;
+            }
             if (!m || m.cmd !== 'tradeQuery') { return; }
             try {
               var searchUrl = '/api/trade2/search/poe2/' + encodeURIComponent(m.league);

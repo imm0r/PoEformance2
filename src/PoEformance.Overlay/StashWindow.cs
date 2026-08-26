@@ -59,6 +59,19 @@ public sealed class StashWindow
     private readonly PriceStore _prices;
     private readonly TradePrices _trade;
     private readonly Action _signIn;
+
+    /// <summary>
+    /// Runs the exchange probe, when the wiring handed one in.
+    /// </summary>
+    /// <remarks>
+    /// A DELEGATE, like the sign-in above it and for the same reason: the trade session lives in
+    /// a layer this one cannot see. Null when nothing wired it, which is what a build without a
+    /// browser looks like - the button is simply not offered.
+    /// </remarks>
+    private readonly Func<int, Task<TradeProbe>>? _probe;
+
+    private Task<TradeProbe>? _probing;
+    private TradeProbe? _probed;
     private readonly Func<string, IntPtr> _picture;
 
     private string _search = string.Empty;
@@ -96,6 +109,7 @@ public sealed class StashWindow
         PriceStore prices,
         TradePrices trade,
         Action signIn,
+        Func<int, Task<TradeProbe>>? probe,
         Func<string, IntPtr> picture)
     {
         ArgumentNullException.ThrowIfNull(inspector);
@@ -109,6 +123,7 @@ public sealed class StashWindow
         _prices = prices;
         _trade = trade;
         _signIn = signIn;
+        _probe = probe;
         _picture = picture;
     }
 
@@ -315,6 +330,120 @@ public sealed class StashWindow
 
         string waiting = _trade.Waiting > 0 ? $", {_trade.Waiting} waiting" : string.Empty;
         ImGui.TextColored(DimText, $"{_trade.Known} asked{waiting} - {_trade.Status}");
+
+        DrawProbe();
+    }
+
+    /// <summary>
+    /// How many currencies the probe asks about in its one request.
+    /// </summary>
+    /// <remarks>
+    /// Enough to prove an array is honoured rather than truncated, few enough that a first look
+    /// cannot be the thing that trips a rate limit. If the answer comes back with this many
+    /// distinct currencies in it, the question is settled.
+    /// </remarks>
+    private const int ProbeMost = 12;
+
+    /// <summary>
+    /// One look at the currency exchange, and what it said.
+    /// </summary>
+    /// <remarks>
+    /// A DIAGNOSTIC BUTTON, not a feature - see TradeProbe. Nothing is valued from it; it exists
+    /// because three things about that endpoint cannot be learned by reading code, only by asking
+    /// it once: what the site calls each currency, whether one request can ask about many, and
+    /// what the real rate limits are.
+    /// </remarks>
+    private void DrawProbe()
+    {
+        if (_probe is null)
+        {
+            return;
+        }
+
+        // Collected here rather than in a callback: the answer arrives on some other thread, and
+        // ImGui state may only be touched by the one that draws.
+        if (_probing is { IsCompleted: true } finished)
+        {
+            _probed = finished.IsCompletedSuccessfully ? finished.Result : TradeProbe.Not("the probe failed");
+            _probing = null;
+        }
+
+        bool running = _probing is not null;
+        ImGui.BeginDisabled(running);
+        if (ImGui.SmallButton("ask the currency exchange once"))
+        {
+            _probed = null;
+            _probing = _probe(ProbeMost);
+        }
+
+        ImGui.EndDisabled();
+
+        if (running)
+        {
+            ImGui.SameLine();
+            ImGui.TextColored(DimText, "asking...");
+        }
+
+        ImGuiText.Hint(
+            DimText,
+            "A one-off diagnostic. It reads the site's own currency ids, asks the exchange about "
+            + $"{ProbeMost} of them in a single request, and shows what came back - including the "
+            + "rate-limit headers and one raw listing.");
+
+        if (_probed is not { } probe)
+        {
+            return;
+        }
+
+        if (!probe.Ok)
+        {
+            ImGuiText.Wrapped(WarnText, $"{probe.Status} - {probe.Error}");
+        }
+
+        if (!ImGui.BeginTable("trade-probe", 2, ImGuiTableFlags.SizingFixedFit))
+        {
+            return;
+        }
+
+        try
+        {
+            ProbeRow("status", probe.Status.ToString(System.Globalization.CultureInfo.CurrentCulture));
+            ProbeRow("asked about", $"{probe.Asked} currencies in one request");
+            ProbeRow("listings back", probe.Got.ToString(System.Globalization.CultureInfo.CurrentCulture));
+            ProbeRow("currency ids", $"{probe.Tags.Count} known to the site");
+
+            if (probe.Limits.Length > 0)
+            {
+                ProbeRow("rate limits", probe.Limits);
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
+
+        if (probe.Tags.Count > 0)
+        {
+            ImGuiText.Wrapped(DimText, "ids: " + string.Join(", ", probe.Tags.Take(ProbeMost)));
+        }
+
+        if (probe.Raw.Length > 0)
+        {
+            // THE SHAPE IS THE POINT. Whether a batched answer says which currency each listing
+            // is for is the one thing that decides if this endpoint can price a whole purse, and
+            // it can only be read off a real answer.
+            ImGuiText.Wrapped(DimText, "one listing, as the site sent it:");
+            ImGuiText.Mono(probe.Raw);
+        }
+    }
+
+    private static void ProbeRow(string label, string value)
+    {
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TextDisabled(label);
+        ImGui.TableNextColumn();
+        ImGuiText.Mono(value);
     }
 
     /// <summary>

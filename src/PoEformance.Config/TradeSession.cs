@@ -40,6 +40,7 @@ public sealed class TradeSession : IDisposable
     private readonly string _profile;
     private readonly Lock _gate = new();
     private readonly Dictionary<int, TaskCompletionSource<TradeAnswer>> _waiting = [];
+    private readonly Dictionary<int, TaskCompletionSource<TradeProbe>> _probing = [];
 
     private TradeSessionWindow? _window;
     private bool _starting;
@@ -59,6 +60,22 @@ public sealed class TradeSession : IDisposable
     {
         get { lock (_gate) { return _window is { Ready: true }; } }
     }
+
+    /// <summary>
+    /// Whether the window takes itself off screen once the site has actually answered.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THE SIGN-IN WINDOW IS FOR is the sign-in. After that it is a browser sitting on the
+    /// taskbar doing nothing visible, and the AHK tool this replaces hid it for exactly that
+    /// reason. Hidden rather than closed: closing it would mean creating a whole browser again
+    /// on the next query, and the sign-in has to survive anyway.
+    ///
+    /// IT COMES BACK BY ITSELF on 401 or 403. Those are the two answers that mean a person has
+    /// to do something, and a hidden window that silently stops working would be the worst of
+    /// both arrangements. Anything else - a timeout, a 429, a wall - is not a sign-in problem
+    /// and does not need a window.
+    /// </remarks>
+    public bool HideWhenSignedIn { get; set; } = true;
 
     /// <summary>
     /// Opens the window, or brings it forward if it is already there.
@@ -171,6 +188,90 @@ public sealed class TradeSession : IDisposable
         return Waited(id, answered, cancelling);
     }
 
+    /// <summary>
+    /// Asks the currency exchange about several currencies at once, and reports what came back.
+    /// </summary>
+    /// <remarks>
+    /// A DIAGNOSTIC. Nothing prices anything from this - see <see cref="TradeProbe"/> for the
+    /// three questions it exists to settle. It is run from a button, once, by somebody who is
+    /// looking at the answer.
+    /// </remarks>
+    /// <param name="most">
+    /// How many currencies the one request asks about. Capped by the caller rather than here so
+    /// that a first look cannot be the thing that trips a rate limit.
+    /// </param>
+    public Task<TradeProbe> Probe(string league, int most, CancellationToken cancelling)
+    {
+        TradeSessionWindow? window;
+        lock (_gate)
+        {
+            window = _window;
+        }
+
+        if (window is null)
+        {
+            Show(league);
+            return Task.FromResult(TradeProbe.Not(
+                "opening the trade site - sign in to pathofexile.com once, then ask again"));
+        }
+
+        if (!window.Ready)
+        {
+            return Task.FromResult(TradeProbe.Not("the trade page has not finished loading"));
+        }
+
+        int id;
+        var answered = new TaskCompletionSource<TradeProbe>(TaskCreationOptions.RunContinuationsAsynchronously);
+        lock (_gate)
+        {
+            id = ++_next;
+            _probing[id] = answered;
+        }
+
+        string json = new System.Text.Json.Nodes.JsonObject
+        {
+            ["cmd"] = "exchangeProbe",
+            ["id"] = id,
+            ["league"] = league,
+            ["most"] = most,
+        }.ToJsonString();
+
+        try
+        {
+            window.RunTaskOnUIThread(() => window.Post(json));
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or ObjectDisposedException)
+        {
+            FinishProbe(id, TradeProbe.Not("the trade window went away"));
+        }
+
+        return WaitedProbe(id, answered, cancelling);
+    }
+
+    private async Task<TradeProbe> WaitedProbe(
+        int id, TaskCompletionSource<TradeProbe> answered, CancellationToken cancelling)
+    {
+        using var giveUp = new CancellationTokenSource(Patience);
+        using CancellationTokenSource both =
+            CancellationTokenSource.CreateLinkedTokenSource(giveUp.Token, cancelling);
+
+        Task finished = await Task
+            .WhenAny(answered.Task, Task.Delay(Timeout.InfiniteTimeSpan, both.Token))
+            .ConfigureAwait(false);
+
+        if (ReferenceEquals(finished, answered.Task))
+        {
+            return await answered.Task.ConfigureAwait(false);
+        }
+
+        lock (_gate)
+        {
+            _probing.Remove(id);
+        }
+
+        return TradeProbe.Not("the trade site did not answer in time");
+    }
+
     /// <summary>The answer, or what happened instead of one.</summary>
     private async Task<TradeAnswer> Waited(
         int id, TaskCompletionSource<TradeAnswer> answered, CancellationToken cancelling)
@@ -260,6 +361,7 @@ public sealed class TradeSession : IDisposable
         finally
         {
             List<TaskCompletionSource<TradeAnswer>> stranded;
+            List<TaskCompletionSource<TradeProbe>> strandedProbes;
             lock (_gate)
             {
                 _window = null;
@@ -269,6 +371,8 @@ public sealed class TradeSession : IDisposable
                 _starting = false;
                 stranded = [.. _waiting.Values];
                 _waiting.Clear();
+                strandedProbes = [.. _probing.Values];
+                _probing.Clear();
             }
 
             // Everything still waiting is answered rather than left hanging: a question that
@@ -276,6 +380,11 @@ public sealed class TradeSession : IDisposable
             foreach (TaskCompletionSource<TradeAnswer> one in stranded)
             {
                 one.TrySetResult(TradeAnswer.Not("the trade window was closed"));
+            }
+
+            foreach (TaskCompletionSource<TradeProbe> one in strandedProbes)
+            {
+                one.TrySetResult(TradeProbe.Not("the trade window was closed"));
             }
         }
     }
@@ -328,6 +437,31 @@ public sealed class TradeSession : IDisposable
                 ? why.GetString() ?? string.Empty
                 : string.Empty;
 
+            // Whether this window still needs to be looked at, decided on every answer rather
+            // than only on the first: a session that expires has to bring the window back.
+            Settled(ok, status);
+
+            bool probing;
+            lock (_gate)
+            {
+                probing = _probing.ContainsKey(id);
+            }
+
+            if (probing)
+            {
+                FinishProbe(id, new TradeProbe(
+                    ok,
+                    status,
+                    Text(root, "limits"),
+                    Words(root, "tags"),
+                    Count(root, "asked"),
+                    Count(root, "got"),
+                    Text(root, "raw"),
+                    error));
+
+                return;
+            }
+
             Finish(id, new TradeAnswer(ok, status, Listings(root), error));
         }
         catch (JsonException)
@@ -358,6 +492,89 @@ public sealed class TradeSession : IDisposable
         }
 
         return found;
+    }
+
+    /// <summary>
+    /// Takes the window off screen once the site is answering, and brings it back when it is not.
+    /// </summary>
+    /// <remarks>
+    /// RUNS ON THE WINDOW'S OWN THREAD, because it is reached from the browser's message handler
+    /// - which is why it touches the window directly instead of posting the work to it. Posting
+    /// from the thread that would run the post is the shape that deadlocks.
+    ///
+    /// 401 AND 403 ARE THE ONLY REASONS TO COME BACK. They mean the sign-in needs a person.
+    /// Every other failure - a timeout, a 429, a wall - is not something a visible window helps
+    /// with, and showing it for those would make it flicker onto the screen mid-fight.
+    /// </remarks>
+    private void Settled(bool ok, int status)
+    {
+        TradeSessionWindow? window;
+        lock (_gate)
+        {
+            window = _window;
+        }
+
+        if (window is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (status is 401 or 403)
+            {
+                window.Show();
+                window.SetForeground();
+                return;
+            }
+
+            if (ok && HideWhenSignedIn && window.IsVisible)
+            {
+                window.Hide();
+            }
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or ObjectDisposedException)
+        {
+            // The window is on its way out, which settles the question a different way.
+        }
+    }
+
+    private static string Text(JsonElement root, string name)
+        => root.TryGetProperty(name, out JsonElement found) && found.ValueKind == JsonValueKind.String
+            ? found.GetString() ?? string.Empty
+            : string.Empty;
+
+    private static int Count(JsonElement root, string name)
+        => root.TryGetProperty(name, out JsonElement found) && found.TryGetInt32(out int how) ? how : 0;
+
+    private static IReadOnlyList<string> Words(JsonElement root, string name)
+    {
+        if (!root.TryGetProperty(name, out JsonElement found) || found.ValueKind != JsonValueKind.Array)
+        {
+            return [];
+        }
+
+        var said = new List<string>(found.GetArrayLength());
+        foreach (JsonElement one in found.EnumerateArray())
+        {
+            if (one.ValueKind == JsonValueKind.String && one.GetString() is { Length: > 0 } word)
+            {
+                said.Add(word);
+            }
+        }
+
+        return said;
+    }
+
+    private void FinishProbe(int id, TradeProbe answer)
+    {
+        TaskCompletionSource<TradeProbe>? waiting;
+        lock (_gate)
+        {
+            _probing.Remove(id, out waiting);
+        }
+
+        waiting?.TrySetResult(answer);
     }
 
     private void Finish(int id, TradeAnswer answer)

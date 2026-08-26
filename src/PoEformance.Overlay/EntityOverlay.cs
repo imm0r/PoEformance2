@@ -1045,12 +1045,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// A tab and nothing else: it draws nothing over the game, because what it answers -
     /// what have I got, and where - is not a question anybody asks mid-fight.
     /// </remarks>
+    /// <param name="probe">
+    /// Runs the one-off currency-exchange diagnostic, or null where nothing wired one. Handed in
+    /// like the sign-in beside it, because the trade session lives in a layer this cannot see.
+    /// </param>
     public void AttachStash(
         StashInspector inspector,
         ItemArtStore art,
         PriceStore prices,
         TradePrices trade,
         Action signIn,
+        Func<int, Task<TradeProbe>>? probe = null,
         bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(inspector);
@@ -1064,7 +1069,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // being given the renderer itself. The sign-in is handed in for the same shape of
         // reason: the trade window is a browser, and this layer cannot see that one.
         var window = new StashWindow(
-            inspector, art, prices, trade, signIn,
+            inspector, art, prices, trade, signIn, probe,
             file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture);
         _tools.Add(60, "stash", "Stash", window.DrawTab);
         if (visible)
