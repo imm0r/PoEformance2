@@ -129,7 +129,7 @@ public sealed class QuestWindow
                 // A titled rule rather than a coloured line over a hairline - the same
                 // boundary the alerts tab draws between its lists, so the acts read as
                 // sections instead of as two more rows.
-                ImGui.SeparatorText(act > 0 ? $"Act {act}" : "no act");
+                OverlayFonts.SectionTitle(act > 0 ? $"Act {act}" : "no act");
             }
 
             Row(quest);

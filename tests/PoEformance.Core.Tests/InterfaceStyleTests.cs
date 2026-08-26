@@ -32,6 +32,42 @@ public class InterfaceStyleTests
         Assert.InRange(size, InterfaceStyle.MinTextSize, InterfaceStyle.MaxTextSize);
     }
 
+    [Theory]
+    [InlineData(InterfaceStyle.MinTextSize, 15)]
+    [InlineData(InterfaceStyle.DefaultTextSize, 23)]
+    [InlineData(InterfaceStyle.MaxTextSize, 38)]
+    public void AHeadingIsAQuarterLargerThanWhatItHeads(int body, int expected)
+        => Assert.Equal(expected, InterfaceStyle.HeadingSizeFor(body));
+
+    [Fact]
+    public void AndIsAlwaysAtLeastOnePixelLarger()
+    {
+        // The whole point of the second size is that the eye can rank two lines. A ratio that
+        // rounded back onto the body size at some setting would leave that setting with a
+        // heading that is not one - which is a hierarchy that works everywhere except where
+        // somebody happened to put the slider.
+        for (int body = InterfaceStyle.MinTextSize; body <= InterfaceStyle.MaxTextSize; body++)
+        {
+            Assert.True(
+                InterfaceStyle.HeadingSizeFor(body) > body,
+                $"a heading over {body}px body text came out at {InterfaceStyle.HeadingSizeFor(body)}px");
+        }
+    }
+
+    [Fact]
+    public void TheHeadingFollowsWhateverTheTextSizeSettledOn()
+    {
+        // Including the bounds: a style asking for something absurd draws its body clamped,
+        // and its headings have to be a quarter above THAT rather than above the request.
+        Assert.Equal(
+            InterfaceStyle.HeadingSizeFor(InterfaceStyle.MaxTextSize),
+            new InterfaceStyle(400).HeadingSizeOr);
+
+        Assert.Equal(
+            InterfaceStyle.HeadingSizeFor(InterfaceStyle.DefaultTextSize),
+            new InterfaceStyle(0).HeadingSizeOr);
+    }
+
     [Fact]
     public void OpacityNeverGoesFaintEnoughToLosePanelIn()
     {

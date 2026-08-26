@@ -92,11 +92,37 @@ public sealed record InterfaceStyle(
     /// </remarks>
     public const float MinOpacity = 0.3f;
 
+    /// <summary>
+    /// How much larger a heading is than the body text.
+    /// </summary>
+    /// <remarks>
+    /// A RATIO rather than a number of pixels, so it holds across the whole range the text size
+    /// can be set to: a fixed "+4" is a shout at twelve pixels and invisible at thirty. A
+    /// quarter is enough for the eye to rank two lines without the heading becoming a banner.
+    /// </remarks>
+    public const float HeadingScale = 1.25f;
+
     /// <summary>Everything as it comes.</summary>
     public static InterfaceStyle Default { get; } = new();
 
     /// <summary>The size the text is actually drawn at.</summary>
     public int TextSizeOr => TextSize <= 0 ? DefaultTextSize : Math.Clamp(TextSize, MinTextSize, MaxTextSize);
+
+    /// <summary>The size a heading is drawn at, for a given body size.</summary>
+    /// <remarks>
+    /// Here rather than beside the font loading, because it is arithmetic about the interface's
+    /// own sizes and nothing about it needs ImGui to be wrong in - which is the same reason
+    /// the window geometry lives in this layer.
+    ///
+    /// Rounded AWAY from the body size rather than to even, so that every size in the range
+    /// gains at least a whole pixel: at the small end the difference between 15 and 15 is no
+    /// heading at all.
+    /// </remarks>
+    public static int HeadingSizeFor(int body)
+        => Math.Max(body + 1, (int)((body * HeadingScale) + 0.5f));
+
+    /// <summary>The size this style's headings are drawn at.</summary>
+    public int HeadingSizeOr => HeadingSizeFor(TextSizeOr);
 
     /// <summary>How solid a tool panel is actually drawn.</summary>
     public float PanelOpacityOr => Solidity(PanelOpacity, DefaultPanelOpacity);

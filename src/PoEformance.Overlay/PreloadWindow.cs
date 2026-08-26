@@ -111,7 +111,7 @@ public sealed class PreloadWindow
         // list are different answers to different questions, and a hairline does not say
         // where one ends.
         ImGui.Spacing();
-        ImGui.SeparatorText("what that means");
+        OverlayFonts.SectionTitle("what that means");
         ImGui.Spacing();
 
         IReadOnlyList<PreloadFinding> findings = _watch.Findings;
@@ -142,7 +142,7 @@ public sealed class PreloadWindow
         }
 
         ImGui.Spacing();
-        ImGui.SeparatorText("every file it loaded");
+        OverlayFonts.SectionTitle("every file it loaded");
         ImGui.Spacing();
         DrawSearch();
 

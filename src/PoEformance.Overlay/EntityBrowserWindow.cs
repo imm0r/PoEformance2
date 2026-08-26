@@ -280,7 +280,7 @@ public sealed class EntityBrowserWindow
             return;
         }
 
-        if (!ImGui.CollapsingHeader($"hidden ({_hiding.Count})###hidden"))
+        if (!OverlayFonts.SectionHeader($"hidden ({_hiding.Count})###hidden"))
         {
             return;
         }
