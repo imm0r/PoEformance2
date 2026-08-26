@@ -208,17 +208,32 @@ internal sealed class TradeSessionWindow : Window
                 // this tool shows is computed in Exalted and displayed as Divine through that
                 // one number, poe.ninja put it at 454.2, and Exiled Exchange showed 785 for the
                 // same league. Whichever is right, the live exchange is the thing that knows.
+                // SAY WHICH GAME. PoE1 has a league called Standard too, so an unqualified league
+                // name is ambiguous and resolves to the wrong realm - which is exactly why
+                // Standard came back 200-and-empty on both endpoints while "Runes of Aldur"
+                // worked: that name exists only in poe2, so it could not be mistaken.
+                //
+                // The uniques query further down this same file has said poe2 in its path since
+                // the day it was written, and it is the thing on this page that demonstrably
+                // answers for Standard. Two rounds of theories were spent not reading it.
                 var ask = async function (league, want, have) {
-                  var r = await fetch('/api/trade2/exchange/' + encodeURIComponent(league), {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                      engine: 'new',
-                      query: { status: { option: 'online' }, have: have, want: want },
-                      sort: { have: 'asc' }
-                    })
+                  var body = JSON.stringify({
+                    engine: 'new',
+                    query: { status: { option: 'online' }, have: have, want: want },
+                    sort: { have: 'asc' }
                   });
+                  var send = function (url) {
+                    return fetch(url, {
+                      method: 'POST',
+                      headers: { 'content-type': 'application/json' },
+                      credentials: 'include',
+                      body: body
+                    });
+                  };
+                  var r = await send('/api/trade2/exchange/poe2/' + encodeURIComponent(league));
+                  // The realm-qualified path is what search uses; whether exchange spells it the
+                  // same way is not something to assume, so an unqualified retry stays in.
+                  if (r.status === 404) { r = await send('/api/trade2/exchange/' + encodeURIComponent(league)); }
                   // THE BODY OF A FAILURE IS THE ANSWER. GGG replies to a bad query with
                   // {"error":{"code":N,"message":"..."}} that usually names the offending field,
                   // and the first probe discarded it - which is why its 400 taught us nothing.
@@ -255,7 +270,11 @@ internal sealed class TradeSessionWindow : Window
                 // full. Asked in the played league, always, because that is the contradiction.
                 var listed = null;
                 try {
-                  var s = await fetch('/api/trade2/search/' + encodeURIComponent(m.league), {
+                  // THE SHAPE THAT ALREADY WORKS, copied from the uniques query below rather than
+                  // rebuilt: the realm in the path, name rather than type, and no stat or trade
+                  // filters at all. The rebuilt version had none of those and answered 0 for
+                  // Standard with complexity 7 - a query the site understood and could not match.
+                  var s = await fetch('/api/trade2/search/poe2/' + encodeURIComponent(m.league), {
                     method: 'POST',
                     headers: { 'content-type': 'application/json' },
                     credentials: 'include',
@@ -263,9 +282,7 @@ internal sealed class TradeSessionWindow : Window
                       query: {
                         status: { option: 'online' },
                         // The site's own display name for the id, not a string typed from memory.
-                        type: named[div],
-                        stats: [{ type: 'and', filters: [] }],
-                        filters: { trade_filters: { filters: { price: { option: exa } } } }
+                        name: named[div]
                       },
                       sort: { price: 'asc' }
                     })
@@ -281,7 +298,7 @@ internal sealed class TradeSessionWindow : Window
                   // to read a going rate and cheap against the fetch limit.
                   if (ids.length && sj.id) {
                     var f = await fetch('/api/trade2/fetch/' + ids.slice(0, 3).join(',')
-                                        + '?query=' + encodeURIComponent(sj.id),
+                                        + '?query=' + sj.id + '&realm=poe2',
                                         { credentials: 'include' });
                     var fj = await f.json();
                     var rows = (fj && fj.result) || [];

@@ -41,27 +41,34 @@ public readonly record struct TradeAnswer(
 /// side, have. Pricing fifty currencies means fifty requests, so it is not a thing to do on a
 /// timer at 45 requests per half hour.
 ///
-/// WHAT IT FOUND, stated as what was seen rather than what it seemed to mean: asked for Divine
-/// against Exalted, THE EXCHANGE answered 200 with an empty result in Standard and 200 with
-/// listings in the challenge league, from the same ids in the same minute.
+/// THE ANSWER WAS A REALM BUG, AND IT TOOK THREE WRONG THEORIES TO GET THERE. Asked for Divine
+/// against Exalted, both apis answered 200 with an empty result in Standard while a challenge
+/// league answered with listings - and the reason is that POE1 HAS A LEAGUE CALLED STANDARD TOO.
+/// An unqualified league name is ambiguous, so it resolved to the wrong game; "Runes of Aldur"
+/// exists only in poe2 and therefore could not be mistaken. Every query here names the realm now:
+/// /api/trade2/search/poe2/{league}, and &amp;realm=poe2 on the fetch.
 ///
-/// THAT IS NOT THE SAME AS "STANDARD HAS NO MARKET", and reading it that way was the second
-/// wrong turn in a row. Exiled Exchange shows Standard prices as offers a person can click and
-/// whisper, which only a live trade API can produce - so something serves Standard. The
-/// reference says what: apiToSatisfySearch in its common.ts picks between TWO apis per item,
-/// "bulk" (this exchange) and "trade" (/api/trade2/search), and both return whisperable
-/// listings. An empty exchange therefore means the exchange is empty, and nothing more.
+/// THE FIX WAS ALREADY IN THE FILE. The uniques query in TradeSessionWindow has said poe2 in its
+/// path since it was written, and it is the one thing on the stash page that demonstrably answers
+/// for Standard - "15 asked, 15 answers remembered". Its shape is now copied rather than rebuilt:
+/// realm in the path, name rather than type, and no stat or trade filters. The rebuilt version
+/// had none of that and came back 0 with complexity 7 - a query the site parsed and could not
+/// match.
 ///
-/// SO THE PROBE ASKS BOTH, and reports them apart: <see cref="Rate"/> from the exchange with the
-/// <see cref="League"/> that answered it, <see cref="ListedRate"/> from the search in the league
-/// actually being played.
+/// THE THREE THEORIES, kept because each looked convincing and each was cheap to disprove and
+/// expensive to believe. First the ids were blamed: an earlier version hard-coded 'divine' and
+/// 'exalted', and the empty result was read as proof they were wrong. They were not - the site
+/// spells them exactly that way, as its own table confirms. Then the league was blamed: "Standard
+/// has no currency exchange". Then the endpoint: "the exchange is empty but the search is not".
+/// All three fit the evidence, and none was the cause.
 ///
-/// TWO ROUNDS WENT INTO GUESSING WHY THE EMPTY ANSWER CAME BACK. First the ids were blamed -
-/// an earlier version hard-coded 'divine' and 'exalted' and the empty result was read as proof
-/// they were wrong. They were not; the site spells them exactly that way, as its own table
-/// confirms. Then the league was blamed. The lesson under both: from here an empty market, a bad
-/// query and the wrong endpoint are all the same 200, and no amount of thinking separates them -
-/// only asking something else does.
+/// THE LESSON UNDER ALL OF THEM: from here a wrong realm, a bad query, the wrong endpoint and a
+/// genuinely empty market are the SAME 200 with the SAME empty array. Thinking does not separate
+/// them. Asking something that already works does.
+///
+/// SO THE PROBE ASKS BOTH APIS, and reports them apart: <see cref="Rate"/> from the exchange with
+/// the <see cref="League"/> that answered it, <see cref="ListedRate"/> from the search in the
+/// league actually being played.
 ///
 /// SO IT CARRIES THE RAW ANSWER rather than a parsed one. Parsing a shape nobody has seen yet
 /// would be inventing the shape; the point of a probe is to find out what it is.
