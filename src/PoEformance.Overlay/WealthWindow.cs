@@ -281,7 +281,7 @@ public sealed class WealthWindow
                 ImGui.TableNextColumn();
                 if (line.Unit is { } unit)
                 {
-                    ImGuiText.Mono($"{StashWorth.Money(unit)} ex");
+                    ImGuiText.Mono(StashWorth.Purse(unit, _book().Rate));
                 }
                 else
                 {
@@ -291,7 +291,7 @@ public sealed class WealthWindow
                 ImGui.TableNextColumn();
                 if (line.Unit is not null)
                 {
-                    ImGuiText.Mono($"{StashWorth.Money(line.Exalted)} ex");
+                    ImGuiText.Mono(StashWorth.Purse(line.Exalted, _book().Rate));
                 }
                 else
                 {
@@ -326,9 +326,7 @@ public sealed class WealthWindow
             // same number's two readings - see WealthTracker.Showing.
             WealthTracker.Shown showing = _tracker.Showing ?? new WealthTracker.Shown(0, 0, false);
 
-            Row("holding", showing.Rate > 0
-                ? $"{StashWorth.Money(showing.Exalted)} ex   {StashWorth.Money(showing.Divine)} div"
-                : $"{StashWorth.Money(showing.Exalted)} ex");
+            Row("holding", StashWorth.Purse(showing.Exalted, showing.Rate));
 
             if (!showing.Live)
             {
@@ -356,7 +354,7 @@ public sealed class WealthWindow
                 ImGui.TableNextColumn();
                 ImGuiText.Mono(
                     moved.Exalted > 0 ? Up : moved.Exalted < 0 ? Down : OverlayTheme.Quiet,
-                    $"{(moved.Exalted >= 0 ? "+" : "-")}{StashWorth.Money(Math.Abs(moved.Exalted))} ex"
+                    $"{(moved.Exalted >= 0 ? "+" : string.Empty)}{StashWorth.Purse(moved.Exalted, showing.Rate)}"
                     + $"   over {WealthPanel.Ago(moved.Over)}");
             }
         }
@@ -457,11 +455,11 @@ public sealed class WealthWindow
         }
 
         uint quiet = ImGui.ColorConvertFloat4ToU32(OverlayTheme.Quiet);
-        draw.AddText(at + new Vector2(4f, 2f), quiet, $"{StashWorth.Money(high)} ex");
+        draw.AddText(at + new Vector2(4f, 2f), quiet, StashWorth.Purse(high, _book().Rate));
         draw.AddText(
             at + new Vector2(4f, size.Y - (ImGui.GetFontSize() * 1.2f)),
             quiet,
-            $"{StashWorth.Money(low)} ex");
+            StashWorth.Purse(low, _book().Rate));
 
         Hover(at, size, points, first, across);
     }
@@ -505,9 +503,9 @@ public sealed class WealthWindow
 
         ImGuiText.MonoTooltip(
             $"{nearest.When.ToLocalTime():yyyy-MM-dd HH:mm}\n"
-            + $"holding  {StashWorth.Money(nearest.Exalted)} ex\n"
+            + $"holding  {StashWorth.Purse(nearest.Exalted, nearest.Rate)}\n"
             + (nearest.Rate > 0
-                ? $"         {StashWorth.Money(nearest.Divine)} div   (1 div = {StashWorth.Money(nearest.Rate)} ex)\n"
+                ? $"         1 div was {StashWorth.Money(nearest.Rate)} ex then\n"
                 : "         no rate recorded\n")
             + $"stacks   {nearest.Stacks}");
     }

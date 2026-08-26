@@ -134,4 +134,68 @@ public class StashWorthTests
         // Exalted, and below one Exalted the digits ARE the answer.
         Assert.Equal(expected, StashWorth.Money(exalted));
     }
+
+    // A Divine at the rate measured live on Standard the day this was written.
+    private const double Rate = 454.2;
+
+    [Theory]
+    [InlineData(0.0, "0 ex")]
+    [InlineData(0.05, "0.05 ex")]
+    [InlineData(82.0, "82 ex")]
+    [InlineData(454.1, "454 ex")]
+    public void BelowOneDivineItStaysInExalted(double exalted, string expected)
+    {
+        // The threshold is the rate itself rather than a chosen number, so it moves with the
+        // economy: a pile is worth saying "one Divine" about exactly when it is worth one.
+        Assert.Equal(expected, StashWorth.Purse(exalted, Rate));
+    }
+
+    [Fact]
+    public void AndAboveItCountsUpWithTheRemainderLeftOver()
+    {
+        // What a player actually holds. Nobody carries 44,057 Exalted - they carry 97 Divine and
+        // some change, and reading the first as the second means dividing in your head by a
+        // number that moves with the market.
+        Assert.Equal("2 div, 82 ex", StashWorth.Purse((2 * Rate) + 82, Rate));
+        Assert.Equal("97 div, 8 ex", StashWorth.Purse((97 * Rate) + 8, Rate));
+    }
+
+    [Fact]
+    public void ARemainderThatRoundsToNothingIsLeftOff()
+    {
+        // "1 div, 0 ex" says the same as "1 div" with more to read, and the zero invites the eye
+        // to look for a precision that is not there.
+        Assert.Equal("1 div", StashWorth.Purse(Rate, Rate));
+        Assert.Equal("3 div", StashWorth.Purse(3 * Rate, Rate));
+    }
+
+    [Fact]
+    public void AFallIsCarriedThroughAsOneNegativeFigure()
+    {
+        // A change can go down, and the sign belongs to the whole amount rather than to the
+        // Divine half of it.
+        Assert.Equal("-2 div, 82 ex", StashWorth.Purse(-((2 * Rate) + 82), Rate));
+        Assert.Equal("-82 ex", StashWorth.Purse(-82, Rate));
+    }
+
+    [Theory]
+    [InlineData(0.0)]
+    [InlineData(-1.0)]
+    public void WithNoRateThereIsNothingToCountInto(double rate)
+    {
+        // The state before the price book has arrived. Exalted is what the figure is measured
+        // in, so Exalted is what it stays in.
+        Assert.Equal("44.1k ex", StashWorth.Purse(44_057, rate));
+    }
+
+    [Fact]
+    public void BriefGivesTheLeadingUnitAloneForAPlaceWithNoRoom()
+    {
+        // A stash cell is about fifty pixels wide; "97 div, 8 ex" would be drawn over its
+        // neighbour. The cell only has to answer "is this worth walking over to".
+        Assert.Equal("97 div", StashWorth.Purse((97 * Rate) + 8, Rate, brief: true));
+
+        // And below a Divine it is the same string either way - there is nothing to drop.
+        Assert.Equal("82 ex", StashWorth.Purse(82, Rate, brief: true));
+    }
 }

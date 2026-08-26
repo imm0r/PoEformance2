@@ -126,4 +126,53 @@ public static class StashWorth
         > 0 => $"{exalted:0.##}",
         _ => "0",
     };
+
+    /// <summary>
+    /// The same amount with its unit, counted up into Divine once it is worth one.
+    /// </summary>
+    /// <remarks>
+    /// HOW A PLAYER ACTUALLY HOLDS IT. Everything in this tool is computed in Exalted because
+    /// that is the unit the price book is in, but nobody carries 44,057 Exalted - they carry 97
+    /// Divine and some change, and reading the first as the second means dividing in your head
+    /// by a number that moves with the market. So below one Divine the figure stays in Exalted,
+    /// where the digits ARE the answer, and above it becomes "97 div, 8 ex".
+    ///
+    /// THE THRESHOLD IS THE RATE ITSELF rather than a chosen number, which is what keeps this
+    /// honest as the economy moves: the moment a pile is worth a Divine is the moment it is
+    /// worth saying so, whatever a Divine costs that week.
+    ///
+    /// A REMAINDER THAT ROUNDS TO NOTHING IS LEFT OFF. "1 div, 0 ex" says the same as "1 div"
+    /// with more to read, and the zero invites the eye to look for a precision that is not there.
+    ///
+    /// WITH NO RATE it stays in Exalted, because there is nothing to count into. That is the
+    /// state before the price book has arrived - see <see cref="PriceBook.Rate"/>.
+    /// </remarks>
+    /// <param name="exalted">The amount. Negative is carried through, for a change that fell.</param>
+    /// <param name="rate">Exalted per Divine. 0 or less when nothing knows it yet.</param>
+    /// <param name="brief">
+    /// Drop the remainder and give one unit only - "97 div" rather than "97 div, 8 ex".
+    ///
+    /// FOR THE PLACES WITH NO ROOM, and there is exactly one class of them: a label painted
+    /// inside a stash cell, which is about fifty pixels wide. "2 div, 82 ex" does not fit in a
+    /// square that size and would be drawn over its neighbour. What the cell is for is deciding
+    /// whether to walk over and look, so the leading unit answers it; the row and the hover
+    /// beside it carry the whole figure.
+    /// </param>
+    public static string Purse(double exalted, double rate, bool brief = false)
+    {
+        string sign = exalted < 0 ? "-" : string.Empty;
+        double amount = Math.Abs(exalted);
+
+        if (rate <= 0 || amount < rate)
+        {
+            return $"{sign}{Money(amount)} ex";
+        }
+
+        double whole = Math.Floor(amount / rate);
+        string rest = brief ? "0" : Money(amount - (whole * rate));
+
+        return rest == "0"
+            ? $"{sign}{Money(whole)} div"
+            : $"{sign}{Money(whole)} div, {rest} ex";
+    }
 }

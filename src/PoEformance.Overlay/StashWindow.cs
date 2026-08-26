@@ -271,7 +271,7 @@ public sealed class StashWindow
             // can see is wrong.
             ImGui.TextColored(
                 MoneyText,
-                $"{StashWorth.Money(_total.Exalted)} ex across {_total.Priced} of {_total.Items} items");
+                $"{StashWorth.Purse(_total.Exalted, _prices.Book.Rate)} across {_total.Priced} of {_total.Items} items");
         }
 
         Trade();
@@ -388,7 +388,9 @@ public sealed class StashWindow
 
     /// <summary>What a pile came to, as it goes in a label. Empty when nothing is known.</summary>
     private static string Money(PriceBook book, Valued valued)
-        => book.Ready && valued.Priced > 0 ? $"  -  {StashWorth.Money(valued.Exalted)} ex" : string.Empty;
+        => book.Ready && valued.Priced > 0
+            ? $"  -  {StashWorth.Purse(valued.Exalted, book.Rate)}"
+            : string.Empty;
 
     /// <summary>The items, each opening to its full stats.</summary>
     private void Items(StashView view, PriceBook book)
@@ -588,7 +590,8 @@ public sealed class StashWindow
         // see WorthSaying.
         if (book.Of(slot.Item, _trade) is { } exalted && exalted >= WorthSaying)
         {
-            string worth = StashWorth.Money(exalted);
+            // Brief: a stash cell is about fifty pixels wide - see StashWorth.Purse.
+            string worth = StashWorth.Purse(exalted, book.Rate, brief: true);
             Vector2 size = ImGui.CalcTextSize(worth);
             var at = new Vector2(from.X + 3f, to.Y - size.Y - 2f);
             draw.AddRectFilled(at - new Vector2(2f, 1f), at + size + new Vector2(2f, 1f), 0xC0000000);
@@ -653,7 +656,7 @@ public sealed class StashWindow
             if (book.Of(item, _trade) is { } exalted)
             {
                 ImGui.SameLine();
-                ImGui.TextColored(MoneyText, $"{StashWorth.Money(exalted)} ex");
+                ImGui.TextColored(MoneyText, StashWorth.Purse(exalted, book.Rate));
             }
 
             if (where.Length > 0)
@@ -699,8 +702,9 @@ public sealed class StashWindow
                 ImGui.TextColored(
                     MoneyText,
                     item.Stack > 1
-                        ? $"{StashWorth.Money(exalted)} ex  -  {StashWorth.Money(exalted / item.Stack)} ex each{from}"
-                        : $"{StashWorth.Money(exalted)} ex{from}");
+                        ? $"{StashWorth.Purse(exalted, book.Rate)}"
+                          + $"  -  {StashWorth.Purse(exalted / item.Stack, book.Rate)} each{from}"
+                        : $"{StashWorth.Purse(exalted, book.Rate)}{from}");
             }
 
             if (item.Unique.Length > 0)
