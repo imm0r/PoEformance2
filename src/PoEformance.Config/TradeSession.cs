@@ -196,11 +196,7 @@ public sealed class TradeSession : IDisposable
     /// three questions it exists to settle. It is run from a button, once, by somebody who is
     /// looking at the answer.
     /// </remarks>
-    /// <param name="most">
-    /// How many currencies the one request asks about. Capped by the caller rather than here so
-    /// that a first look cannot be the thing that trips a rate limit.
-    /// </param>
-    public Task<TradeProbe> Probe(string league, int most, CancellationToken cancelling)
+    public Task<TradeProbe> Probe(string league, CancellationToken cancelling)
     {
         TradeSessionWindow? window;
         lock (_gate)
@@ -233,7 +229,6 @@ public sealed class TradeSession : IDisposable
             ["cmd"] = "exchangeProbe",
             ["id"] = id,
             ["league"] = league,
-            ["most"] = most,
         }.ToJsonString();
 
         try

@@ -167,15 +167,35 @@ internal sealed class TradeSessionWindow : Window
                   post({ id: m.id, ok: false, status: statics.status, error: 'static data' });
                   return;
                 }
-                var tags = [];
+                var tags = [], named = {};
                 var stat = await statics.json();
                 (stat.result || []).forEach(function (group) {
                   if (group && group.id === 'Currency') {
-                    (group.entries || []).forEach(function (one) { if (one && one.id) { tags.push(one.id); } });
+                    (group.entries || []).forEach(function (one) {
+                      if (one && one.id) { tags.push(one.id + ' = ' + (one.text || '?')); named[one.id] = one.text || ''; }
+                    });
                   }
                 });
                 if (tags.length === 0) {
                   post({ id: m.id, ok: false, status: statics.status, error: 'no currency ids in the static data' });
+                  return;
+                }
+
+                // LOOK THE TWO IDS UP; DO NOT SPELL THEM. The previous probe hard-coded
+                // 'divine' and 'exalted' while holding the site's own table of forty ids in a
+                // variable beside it, and got back a 200 with an empty result - which reads
+                // exactly like an empty market and is not one. Matching on the name the site
+                // itself prints is the difference between a wrong answer and no answer.
+                var idFor = function (name) {
+                  for (var k in named) {
+                    if (named[k] && named[k].toLowerCase() === name) { return k; }
+                  }
+                  return null;
+                };
+                var div = idFor('divine orb'), exa = idFor('exalted orb');
+                if (!div || !exa) {
+                  post({ id: m.id, ok: false, status: statics.status, tags: tags,
+                         error: 'the site lists no "Divine Orb" (' + div + ') or "Exalted Orb" (' + exa + ')' });
                   return;
                 }
                 // WANT TAKES EXACTLY ONE. Asking about twelve came back
@@ -188,8 +208,8 @@ internal sealed class TradeSessionWindow : Window
                 // this tool shows is computed in Exalted and displayed as Divine through that
                 // one number, poe.ninja put it at 454.2, and Exiled Exchange showed 785 for the
                 // same league. Whichever is right, the live exchange is the thing that knows.
-                var ask = async function (want, have) {
-                  var r = await fetch('/api/trade2/exchange/' + encodeURIComponent(m.league), {
+                var ask = async function (league, want, have) {
+                  var r = await fetch('/api/trade2/exchange/' + encodeURIComponent(league), {
                     method: 'POST',
                     headers: { 'content-type': 'application/json' },
                     credentials: 'include',
@@ -203,14 +223,33 @@ internal sealed class TradeSessionWindow : Window
                   // {"error":{"code":N,"message":"..."}} that usually names the offending field,
                   // and the first probe discarded it - which is why its 400 taught us nothing.
                   var text = await r.text();
-                  var out = { status: r.status, limits: limitsOf(r), body: text.slice(0, 1500) };
+                  var out = { league: league, status: r.status, limits: limitsOf(r), body: text.slice(0, 900) };
                   try { out.json = JSON.parse(text); } catch (e) { }
+                  out.keys = Object.keys((out.json && out.json.result) || {});
                   return out;
                 };
 
-                var got = await ask(['divine'], ['exalted']);
-                var results = (got.json && got.json.result) || {};
-                var keys = Object.keys(results);
+                var got = await ask(m.league, [div], [exa]);
+
+                // AN EMPTY ANSWER IS TWO DIFFERENT FACTS WEARING ONE FACE: a query the site
+                // cannot match, or a league that simply has no currency exchange. Only a second
+                // league tells them apart, and the difference decides the whole feature - an
+                // exchange that does not run in Standard cannot price this player's purse at all.
+                var elsewhere = null;
+                if (got.keys.length === 0 && got.status === 200) {
+                  try {
+                    var lg = await fetch('/api/trade2/data/leagues', { credentials: 'include' });
+                    var leagues = (await lg.json()).result || [];
+                    for (var n = 0; n < leagues.length; n++) {
+                      var other = leagues[n] && (leagues[n].id || leagues[n].text);
+                      if (other && other !== m.league) { elsewhere = await ask(other, [div], [exa]); break; }
+                    }
+                  } catch (e) { }
+                }
+
+                var chosen = (elsewhere && elsewhere.keys.length > 0) ? elsewhere : got;
+                var results = (chosen.json && chosen.json.result) || {};
+                var keys = chosen.keys;
 
                 // ONE OFFER ONLY, as the reference does: a listing carrying several offers gives
                 // no way to say which of them the price is, so it cannot be read as a rate.
@@ -227,17 +266,24 @@ internal sealed class TradeSessionWindow : Window
                   break;
                 }
 
+                // BOTH ATTEMPTS, ALWAYS, naming the ids actually sent. When the answer is empty
+                // the only useful thing left is what exactly was asked and where.
+                var said = function (a) {
+                  return a ? (a.league + ': ' + a.status + ' ' + a.keys.length + ' listings ' + (a.body || '')) : '';
+                };
+
                 post({
                   id: m.id,
-                  ok: got.status >= 200 && got.status < 300,
-                  status: got.status,
-                  limits: got.limits,
+                  ok: chosen.status >= 200 && chosen.status < 300,
+                  status: chosen.status,
+                  limits: chosen.limits,
                   tags: tags,
                   asked: 1,
                   got: keys.length,
                   rate: rate,
                   raw: (keys.length ? JSON.stringify(results[keys[0]]) : '').slice(0, 3000),
-                  error: keys.length ? '' : ('divine for exalted: ' + got.status + ' ' + (got.body || '').slice(0, 600))
+                  error: 'want ' + div + ', have ' + exa + '   |   ' + said(got)
+                       + (elsewhere ? '   |   ' + said(elsewhere) : '')
                 });
               } catch (err) {
                 post({ id: m.id, ok: false, status: 0, error: String(err) });

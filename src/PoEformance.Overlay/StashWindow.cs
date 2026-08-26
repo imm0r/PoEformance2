@@ -68,7 +68,7 @@ public sealed class StashWindow
     /// a layer this one cannot see. Null when nothing wired it, which is what a build without a
     /// browser looks like - the button is simply not offered.
     /// </remarks>
-    private readonly Func<int, Task<TradeProbe>>? _probe;
+    private readonly Func<Task<TradeProbe>>? _probe;
 
     private Task<TradeProbe>? _probing;
     private TradeProbe? _probed;
@@ -109,7 +109,7 @@ public sealed class StashWindow
         PriceStore prices,
         TradePrices trade,
         Action signIn,
-        Func<int, Task<TradeProbe>>? probe,
+        Func<Task<TradeProbe>>? probe,
         Func<string, IntPtr> picture)
     {
         ArgumentNullException.ThrowIfNull(inspector);
@@ -335,17 +335,6 @@ public sealed class StashWindow
     }
 
     /// <summary>
-    /// How many of the site's currency ids to print, so the naming can be eyeballed.
-    /// </summary>
-    /// <remarks>
-    /// This used to be how many the probe ASKED about, back when the open question was whether
-    /// one request could price a whole purse. The server has since answered that - want takes
-    /// exactly one id - so all that is left for the number to do is keep the id list from
-    /// filling the page.
-    /// </remarks>
-    private const int ProbeMost = 12;
-
-    /// <summary>
     /// One look at the currency exchange, and what it said.
     /// </summary>
     /// <remarks>
@@ -374,7 +363,7 @@ public sealed class StashWindow
         if (ImGui.SmallButton("ask the currency exchange once"))
         {
             _probed = null;
-            _probing = _probe(ProbeMost);
+            _probing = _probe();
         }
 
         ImGui.EndDisabled();
@@ -431,9 +420,13 @@ public sealed class StashWindow
             ImGui.EndTable();
         }
 
+        // ALL OF THEM, not a sample. Hard-coding two ids that the site spells differently is
+        // what made an earlier probe answer "no listings" for the most traded pair in the game,
+        // so the naming IS the finding here - and a sample of twelve hides the other twenty-eight.
         if (probe.Tags.Count > 0)
         {
-            ImGuiText.Wrapped(DimText, "ids: " + string.Join(", ", probe.Tags.Take(ProbeMost)));
+            ImGuiText.Wrapped(DimText, $"what the site calls its {probe.Tags.Count} currencies:");
+            ImGuiText.MonoWrapped(DimText, string.Join("   ", probe.Tags));
         }
 
         // THE BODY VERBATIM, because a status alone settles nothing: the first probe's 400 named
