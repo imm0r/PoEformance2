@@ -1,3 +1,4 @@
+using System.Numerics;
 using PoEformance.Features;
 using PoEformance.Game.Components;
 
@@ -66,6 +67,62 @@ public class InterfaceStyleTests
         Assert.Equal(
             InterfaceStyle.HeadingSizeFor(InterfaceStyle.DefaultTextSize),
             new InterfaceStyle(0).HeadingSizeOr);
+    }
+
+    [Fact]
+    public void ATintedInkStaysNearerTheInkThanTheAccent()
+    {
+        // WHAT MAKES IT A TINT rather than a second colour, and the failure this exists to
+        // catch: somebody deciding the tab bar could stand out a bit more and walking the ratio
+        // up until the labels are gold. Over a game that paints in gold that is not a stronger
+        // version of the same idea - it is a second accent arguing with the real one.
+        var ink = new Vector4(0.94f, 0.93f, 0.89f, 1f);
+        var accent = new Vector4(0.85f, 0.68f, 0.34f, 1f);
+
+        Vector4 tinted = InterfaceStyle.Tinted(ink, accent);
+
+        Assert.True(
+            (tinted - ink).Length() < (tinted - accent).Length(),
+            $"a tint at {InterfaceStyle.AccentTint} came out closer to the accent than to the ink");
+    }
+
+    [Fact]
+    public void ButIsNotSimplyTheInkAgain()
+    {
+        // The other end of it. A ratio rounded down to nothing leaves the tab bar written in
+        // exactly the body colour, which is the state this was added to get out of - and it
+        // would look like the setting had simply not been applied.
+        var ink = new Vector4(0.94f, 0.93f, 0.89f, 1f);
+        var accent = new Vector4(0.85f, 0.68f, 0.34f, 1f);
+
+        Vector4 tinted = InterfaceStyle.Tinted(ink, accent);
+
+        Assert.NotEqual(ink, tinted);
+
+        // And far enough to actually be seen. A twentieth of the way is arithmetically not the
+        // ink and visually indistinguishable from it, which would pass the line above while
+        // failing the thing it is there to protect.
+        Assert.True(
+            (tinted - ink).Length() > 0.05f,
+            $"a tint at {InterfaceStyle.AccentTint} is too small a step from the ink to be seen");
+    }
+
+    [Fact]
+    public void AndLandsBetweenTheTwoOnEveryChannel()
+    {
+        // A mix, not a recolour: no channel may overshoot either end. This is what lets the
+        // palette treat the result as "the ink, warmer" - including the alpha, since a tint
+        // that quietly changed how solid the text is would be a different bug wearing this
+        // one's clothes.
+        var ink = new Vector4(0.94f, 0.93f, 0.89f, 1f);
+        var accent = new Vector4(0.85f, 0.68f, 0.34f, 1f);
+
+        Vector4 tinted = InterfaceStyle.Tinted(ink, accent);
+
+        Assert.InRange(tinted.X, accent.X, ink.X);
+        Assert.InRange(tinted.Y, accent.Y, ink.Y);
+        Assert.InRange(tinted.Z, accent.Z, ink.Z);
+        Assert.Equal(ink.W, tinted.W);
     }
 
     [Fact]

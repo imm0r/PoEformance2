@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace PoEformance.Features;
@@ -101,6 +102,28 @@ public sealed record InterfaceStyle(
     /// quarter is enough for the eye to rank two lines without the heading becoming a banner.
     /// </remarks>
     public const float HeadingScale = 1.25f;
+
+    /// <summary>
+    /// How far a tinted piece of chrome leans towards the accent colour.
+    /// </summary>
+    /// <remarks>
+    /// THE POINT IS THAT IT IS SMALL. Chrome that is not part of any page - the tab bar is the
+    /// only one so far - says so by being written in a slightly different ink, and "slightly" is
+    /// the whole of the idea: far enough that the two are different colours side by side, near
+    /// enough that it is still the tool's own ink rather than a second accent. Over a game that
+    /// already paints in gold, chrome that went all the way to the accent would compete with the
+    /// real one instead of sitting under it.
+    ///
+    /// A RATIO, and here rather than in the palette, for the reason <see cref="HeadingSizeFor"/>
+    /// is: it is a rule about the interface's own appearance, it holds whatever the two colours
+    /// turn out to be, and nothing about it needs ImGui to be reasoned about - so it can be
+    /// argued with in a test rather than only in a screenshot.
+    /// </remarks>
+    public const float AccentTint = 0.28f;
+
+    /// <summary>The ink, carrying a cast of the accent. See <see cref="AccentTint"/>.</summary>
+    public static Vector4 Tinted(Vector4 ink, Vector4 accent)
+        => Vector4.Lerp(ink, accent, AccentTint);
 
     /// <summary>Everything as it comes.</summary>
     public static InterfaceStyle Default { get; } = new();

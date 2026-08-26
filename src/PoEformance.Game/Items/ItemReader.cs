@@ -198,6 +198,22 @@ public sealed class ItemReader
     }
 
     /// <summary>Reads one item, or <see cref="InspectedItem.Unreadable"/> when it is not there.</summary>
+    /// <summary>
+    /// The item's metadata path and nothing else.
+    /// </summary>
+    /// <remarks>
+    /// FOR DECIDING WHETHER AN ITEM IS WORTH READING. A full <see cref="Read"/> walks the
+    /// component dictionary, then both mod components, then their mod lists and their resolved
+    /// stat lists - which is the right price for an item somebody is looking at, and the wrong
+    /// one for the several thousand a sweep has to reject. The identity read is the first step
+    /// of that walk on its own, and the path is enough to answer "is this currency".
+    ///
+    /// Empty when nothing is there, which is what a stale pointer into a stash the game has
+    /// rearranged reads as. The caller skips those, exactly as <see cref="Read"/>'s callers do.
+    /// </remarks>
+    public string PathOf(ulong entity)
+        => _entities.ReadIdentity(entity)?.Path ?? string.Empty;
+
     public InspectedItem Read(ulong entity)
     {
         if (_entities.ReadIdentity(entity) is not { } identity)

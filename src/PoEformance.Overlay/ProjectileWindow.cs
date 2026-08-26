@@ -166,7 +166,7 @@ public sealed class ProjectileWindow
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted(sort.Count.ToString(System.Globalization.CultureInfo.CurrentCulture));
+                ImGuiText.Mono(sort.Count.ToString(System.Globalization.CultureInfo.CurrentCulture));
 
                 ImGui.TableNextColumn();
                 ImGui.TextColored(

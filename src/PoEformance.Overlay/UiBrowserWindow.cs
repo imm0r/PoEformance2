@@ -230,7 +230,9 @@ public sealed class UiBrowserWindow
         }
 
         ImGui.SameLine();
-        ImGui.TextColored(DimText, Escape($"root 0x{view.Root:X} | {view.Status} | F8 picks under the cursor"));
+        ImGuiText.Mono(DimText, $"root 0x{view.Root:X}");
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, Escape($"| {view.Status} | F8 picks under the cursor"));
     }
 
     private void DrawLeftPane(UiTreeView view)
@@ -287,7 +289,7 @@ public sealed class UiBrowserWindow
 
         if (!view.Nodes.TryGetValue(address, out UiNode? node))
         {
-            ImGui.TextColored(DimText, $"0x{address:X}  (reading...)");
+            ImGuiText.Mono(DimText, $"0x{address:X}  (reading...)");
             return;
         }
 
@@ -401,14 +403,18 @@ public sealed class UiBrowserWindow
         Field("Text", node.Text.Length > 0 ? node.Text : "(none)");
         ImGui.PopTextWrapPos();
 
-        Field("Address", $"0x{node.Address:X}");
+        Field("Address", $"0x{node.Address:X}", figure: true);
         ImGui.SameLine();
         Copy("copy##addr", $"0x{node.Address:X}");
 
-        string path = view.SelectedPath.Count > 0
+        // The one row here that is two different things rather than one thing with two values:
+        // a chain of child indices, or a sentence saying there is no chain. The condition is on
+        // WHICH of those is being drawn, not on what the numbers in it happen to be.
+        bool underRoot = view.SelectedPath.Count > 0;
+        string path = underRoot
             ? string.Concat(view.SelectedPath.Select(i => $"[{i}]"))
             : "(not under the browsed root)";
-        Field("Path", path);
+        Field("Path", path, figure: underRoot);
         if (view.SelectedPath.Count > 0)
         {
             ImGui.SameLine();
@@ -420,19 +426,25 @@ public sealed class UiBrowserWindow
         // Both halves of visibility, because which one is false is the answer to "why is this
         // not on screen": its own flag, or an ancestor's.
         Field("Visible", node.Visible ? "yes" : node.SelfVisible ? "no - an ancestor is hidden" : "no - own flag");
-        Field("Children", node.ChildCount.ToString());
-        Field("Screen", $"{node.Position.X:F0}, {node.Position.Y:F0}   {node.Size.X:F0} x {node.Size.Y:F0}");
-        Field("UI space", $"{node.UnscaledPosition.X:F1}, {node.UnscaledPosition.Y:F1}"
-                          + $"   (relative {node.RelativePosition.X:F1}, {node.RelativePosition.Y:F1})");
-        Field("Flags", $"0x{node.Flags:X8}   {DescribeFlags(node.Flags)}");
-        Field("Scale", $"index {node.ScaleIndex}, multiplier {node.LocalMultiplier:F2}");
-        Field("Parent", node.Parent != 0 ? $"0x{node.Parent:X}" : "(none)");
+        Field("Children", node.ChildCount.ToString(), figure: true);
+        Field(
+            "Screen",
+            $"{node.Position.X:F0}, {node.Position.Y:F0}   {node.Size.X:F0} x {node.Size.Y:F0}",
+            figure: true);
+        Field(
+            "UI space",
+            $"{node.UnscaledPosition.X:F1}, {node.UnscaledPosition.Y:F1}"
+            + $"   (relative {node.RelativePosition.X:F1}, {node.RelativePosition.Y:F1})",
+            figure: true);
+        Field("Flags", $"0x{node.Flags:X8}   {DescribeFlags(node.Flags)}", figure: true);
+        Field("Scale", $"index {node.ScaleIndex}, multiplier {node.LocalMultiplier:F2}", figure: true);
+        Field("Parent", node.Parent != 0 ? $"0x{node.Parent:X}" : "(none)", figure: node.Parent != 0);
 
         if (node.ItemPtr != 0)
         {
             // Only meaningful on inventory and stash slots, so it is shown only when it is
             // there rather than as a permanent row of zeroes.
-            Field("Item", $"0x{node.ItemPtr:X}");
+            Field("Item", $"0x{node.ItemPtr:X}", figure: true);
             ImGui.SameLine();
             Copy("copy##item", $"0x{node.ItemPtr:X}");
         }
@@ -545,11 +557,26 @@ public sealed class UiBrowserWindow
         return parts.Count > 0 ? string.Join(", ", parts) : "-";
     }
 
-    private static void Field(string label, string value)
+    /// <summary>One labelled value of the selected element.</summary>
+    /// <param name="figure">
+    /// Whether the value is an address, a flag word or a measurement rather than a name, and so
+    /// belongs in the mono face. Said per call because it is a property of the ROW - "Address"
+    /// is always hex and "Text" is always a caption - and not of whatever happens to be in it
+    /// this frame, which would make the pane change face as the game changes under it.
+    /// </param>
+    private static void Field(string label, string value, bool figure = false)
     {
         ImGui.TextColored(DimText, label);
         ImGui.SameLine(110);
-        ImGui.TextUnformatted(value);
+
+        if (figure)
+        {
+            ImGuiText.Mono(value);
+        }
+        else
+        {
+            ImGui.TextUnformatted(value);
+        }
     }
 
     private static void Copy(string id, string text)

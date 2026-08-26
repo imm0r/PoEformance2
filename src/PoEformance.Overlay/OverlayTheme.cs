@@ -40,7 +40,14 @@ public static class OverlayTheme
 {
     // The palette, named by what each colour IS rather than by where it is used, so that a
     // colour used in two places cannot drift into being two colours.
-    private static readonly Vector4 Ink = new(0.94f, 0.93f, 0.89f, 1f);
+
+    /// <summary>What the tool writes in: a warm off-white, not the pure one.</summary>
+    /// <remarks>
+    /// PUBLIC so that the colours derived from it are derived rather than transcribed - see
+    /// <see cref="GiltInk"/>. A copy of these three numbers somewhere else is a copy that stays
+    /// where it is when this one is adjusted.
+    /// </remarks>
+    public static readonly Vector4 Ink = new(0.94f, 0.93f, 0.89f, 1f);
 
     /// <summary>
     /// What the tool says in a quieter voice: explanations, units, "not in an area".
@@ -58,6 +65,32 @@ public static class OverlayTheme
     private static readonly Vector4 Raised = new(0.13f, 0.13f, 0.15f, 1f);
     private static readonly Vector4 Edge = new(0.42f, 0.39f, 0.33f, 0.9f);
     private static readonly Vector4 Gilt = new(0.85f, 0.68f, 0.34f, 1f);
+
+    /// <summary>
+    /// The ink with a cast of the gilt in it. What the tab bar's labels are set in.
+    /// </summary>
+    /// <remarks>
+    /// A TINT, NOT A SECOND COLOUR. The tab bar is the one strip of the tools window that is
+    /// not part of any page - it is the thing you leave the page to use - and until now it said
+    /// so with nothing at all: its labels were the same off-white as the sentence underneath
+    /// them, so the eye had to find the boundary from the tab shapes alone. Set apart, the bar
+    /// reads as the frame rather than as the first line of the content.
+    ///
+    /// A QUARTER OF THE WAY TO THE ACCENT and no further, which is the whole of the tuning. Far
+    /// enough that the two are different colours side by side; near enough that a tab label is
+    /// still the tool's own ink rather than a gold heading, which over a game that already
+    /// paints in gold would read as a second accent competing with the real one.
+    ///
+    /// DERIVED rather than written out, so it cannot drift: adjust <see cref="Ink"/> for
+    /// legibility and this follows it instead of staying behind as a colour nobody remembers
+    /// choosing. It is DARKENED BY THE MIX, not brightened - the accent is darker than the ink
+    /// in every channel - so it stays under the ink's contrast rather than shouting over it.
+    ///
+    /// How FAR it leans is <see cref="InterfaceStyle.AccentTint"/>, which is where the rule
+    /// about it being a tint rather than a second colour is written down and checked.
+    /// </remarks>
+    public static readonly Vector4 GiltInk = InterfaceStyle.Tinted(Ink, Gilt);
+
     private static readonly Vector4 Warm = new(0.30f, 0.24f, 0.14f, 1f);
     private static readonly Vector4 WarmLit = new(0.44f, 0.35f, 0.18f, 1f);
     private static readonly Vector4 WarmHeld = new(0.54f, 0.43f, 0.22f, 1f);

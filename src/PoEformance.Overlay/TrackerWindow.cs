@@ -253,10 +253,10 @@ public sealed class TrackerWindow
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted(count.ToString(CultureInfo.CurrentCulture));
+                ImGuiText.Mono(count.ToString(CultureInfo.CurrentCulture));
 
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted(id.ToString(CultureInfo.CurrentCulture));
+                ImGuiText.Mono(id.ToString(CultureInfo.CurrentCulture));
 
                 ImGui.TableNextColumn();
                 string? name = _animations().Of(id);

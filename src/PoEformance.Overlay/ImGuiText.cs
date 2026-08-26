@@ -48,6 +48,79 @@ internal static class ImGuiText
         ImGui.PopStyleColor();
     }
 
+    /// <summary>A figure - an address, an offset, a count, a measurement - in the mono face.</summary>
+    /// <remarks>
+    /// WHAT COUNTS AS A FIGURE is decided at the call site rather than by looking at the string,
+    /// and that is on purpose. A rule along the lines of "mono if it is all digits" would have
+    /// to answer for "Level 5" and "Act 3", and it would answer differently for the same row
+    /// depending on the value that happened to be in it - a table whose face flickers as the
+    /// game changes underneath it. The caller knows which of its columns is a measurement and
+    /// which is a name, and it knows it once rather than per frame.
+    ///
+    /// TextUnformatted rather than Text, so this is not printf at all - see the note at the top
+    /// of this file for what a stray percent sign does. It means a figure never needs
+    /// <see cref="Escape"/>, which matters here more than elsewhere: several of these strings
+    /// carry a percent sign as a UNIT.
+    /// </remarks>
+    public static void Mono(string text)
+    {
+        OverlayFonts.PushMono();
+        try
+        {
+            ImGui.TextUnformatted(text);
+        }
+        finally
+        {
+            OverlayFonts.PopMono();
+        }
+    }
+
+    /// <summary>The same, in a colour.</summary>
+    /// <remarks>
+    /// The colour is PUSHED rather than passed to TextColored, for the printf reason above:
+    /// TextColored is a format call and this must not be one.
+    /// </remarks>
+    public static void Mono(Vector4 colour, string text)
+    {
+        ImGui.PushStyleColor(ImGuiCol.Text, colour);
+        try
+        {
+            Mono(text);
+        }
+        finally
+        {
+            ImGui.PopStyleColor();
+        }
+    }
+
+    /// <summary>A tooltip whose contents are figures, in the mono face.</summary>
+    /// <remarks>
+    /// Built out rather than SetTooltip, for two reasons that both matter here. SetTooltip is
+    /// printf, and it offers no moment at which a font could be pushed - the whole tooltip is
+    /// drawn inside the one call.
+    ///
+    /// What it is for is the several readings of one value stacked in a block, LINED UP BY
+    /// SPACES. That is the layout every one of these tooltips uses, and in a proportional face
+    /// it does not line up at all: the labels are different words, so the columns after them
+    /// start wherever those words happened to end.
+    /// </remarks>
+    public static void MonoTooltip(string text)
+    {
+        if (!ImGui.BeginTooltip())
+        {
+            return;
+        }
+
+        try
+        {
+            Mono(text);
+        }
+        finally
+        {
+            ImGui.EndTooltip();
+        }
+    }
+
     /// <summary>An indented, wrapped explainer under the control it belongs to.</summary>
     /// <remarks>
     /// What the four-leading-spaces prefix was trying to be. The prefix only indented the

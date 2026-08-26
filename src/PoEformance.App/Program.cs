@@ -830,6 +830,16 @@ internal static class Program
         handle.Stage = "opening the price book";
         using var prices = new PoEformance.Features.PriceStore();
 
+        // The record of what the currency has been worth, read back from disk before anything
+        // else touches it. It spans every session there has ever been and NOTHING here ever
+        // clears it - see WealthHistory, which explains why that is worth saying out loud.
+        handle.Stage = "reading the wealth record";
+        var wealth = new PoEformance.Features.WealthTracker(PoEformance.Features.WealthHistory.Load());
+        stash.WatchPurse = settings.WealthWatch;
+        Console.WriteLine(
+            $"wealth   {wealth.History.Count} readings"
+            + (wealth.History.Readable ? string.Empty : " - the record on disk could not be read"));
+
         // And the other half of "what is this worth": the game's own trade site, for the
         // uniques poe.ninja has nothing on - which on Standard is all of them. It cannot be
         // asked over plain HTTP (the endpoints are Cloudflare-gated), so the query runs inside
@@ -1039,6 +1049,24 @@ internal static class Program
                     trade.Ask(tradeAsked, prices.Book);
                 }
 
+                // On the READER thread, beside the count that feeds it. The purse is re-counted
+                // on its own timer inside stash.Service above; this prices the result and
+                // decides whether it is fit to be written down - see WealthTracker.Fit.
+                //
+                // The wall clock rather than TickCount64, and that is not interchangeable here:
+                // the record spans sessions, and milliseconds-since-boot restarts at zero every
+                // time the machine does.
+                if (stash.WatchPurse
+                    && wealth.Update(stash.Purse, prices.Book, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()))
+                {
+                    // Written whenever a point was added rather than on a timer of its own. A
+                    // point is at most one every thirty seconds, so this is a few hundred
+                    // kilobytes a minute at the very worst - and the alternative is losing the
+                    // session's record to a crash or a kill, which is the failure this whole
+                    // feature is least able to afford.
+                    wealth.History.Save();
+                }
+
                 route.Service(snapshot, Environment.TickCount64);
                 costs.Add(snapshot.Cost, snapshot.AreaHash, Environment.TickCount64);
                 coverage.Look(snapshot);
@@ -1159,6 +1187,7 @@ internal static class Program
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.AttachAtlas(atlas, changed => PoEformance.Features.AtlasStore.Save(changed));
         overlay.AttachStash(stash, itemArt, prices, trade, () => tradeSession.Show(stash.League));
+        overlay.AttachWealth(wealth, stash, prices);
         overlay.AttachRitual(
             ritual,
             () => atlas.RitualWorth,
@@ -1234,6 +1263,14 @@ internal static class Program
             PoEformance.Features.OverlaySettingsStore.Save(overlay.CurrentSettings(settings));
         handle.Overlay = overlay;
         overlay.Start().GetAwaiter().GetResult();
+
+        // The record is already written every time a point is added, so this only catches a
+        // write that failed earlier - a file locked by a backup, a disk that was full. Cheap
+        // insurance on the one piece of state here that cannot be re-derived from the game.
+        if (wealth.History.Dirty)
+        {
+            wealth.History.Save();
+        }
     }
 
     /// <summary>

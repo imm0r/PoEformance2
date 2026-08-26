@@ -88,6 +88,7 @@ public sealed class WindowChrome
         new(StatusId, "PoEformance"),
         new("poi", "Points of interest"),
         new("preload", "What loaded"),
+        new(WealthPanel.ChromeId, "Wealth"),
     ];
 
     private readonly Dictionary<string, WindowRule> _rules = [];
