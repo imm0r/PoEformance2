@@ -68,7 +68,7 @@ public sealed class StashWindow
     /// a layer this one cannot see. Null when nothing wired it, which is what a build without a
     /// browser looks like - the button is simply not offered.
     /// </remarks>
-    private readonly Func<int, Task<TradeProbe>>? _probe;
+    private readonly Func<Task<TradeProbe>>? _probe;
 
     private Task<TradeProbe>? _probing;
     private TradeProbe? _probed;
@@ -109,7 +109,7 @@ public sealed class StashWindow
         PriceStore prices,
         TradePrices trade,
         Action signIn,
-        Func<int, Task<TradeProbe>>? probe,
+        Func<Task<TradeProbe>>? probe,
         Func<string, IntPtr> picture)
     {
         ArgumentNullException.ThrowIfNull(inspector);
@@ -335,17 +335,6 @@ public sealed class StashWindow
     }
 
     /// <summary>
-    /// How many of the site's currency ids to print, so the naming can be eyeballed.
-    /// </summary>
-    /// <remarks>
-    /// This used to be how many the probe ASKED about, back when the open question was whether
-    /// one request could price a whole purse. The server has since answered that - want takes
-    /// exactly one id - so all that is left for the number to do is keep the id list from
-    /// filling the page.
-    /// </remarks>
-    private const int ProbeMost = 12;
-
-    /// <summary>
     /// One look at the currency exchange, and what it said.
     /// </summary>
     /// <remarks>
@@ -374,7 +363,7 @@ public sealed class StashWindow
         if (ImGui.SmallButton("ask the currency exchange once"))
         {
             _probed = null;
-            _probing = _probe(ProbeMost);
+            _probing = _probe();
         }
 
         ImGui.EndDisabled();
@@ -406,16 +395,41 @@ public sealed class StashWindow
         {
             ProbeRow("status", probe.Status.ToString(System.Globalization.CultureInfo.CurrentCulture));
 
-            // THE TWO NUMBERS SIDE BY SIDE, which is the whole reason to run this. Everything
-            // here is computed in Exalted and shown as Divine through one rate; if the exchange
-            // and poe.ninja disagree about it, every figure in the tool is off by that factor.
+            // THE TWO NUMBERS SIDE BY SIDE - BUT ONLY WHEN THEY ARE THE SAME MARKET. Everything
+            // here is computed in Exalted and shown as Divine through one rate, so a disagreement
+            // between the exchange and poe.ninja would move every figure in the tool. A
+            // disagreement between two LEAGUES moves nothing and means nothing: the first run of
+            // this printed "240 ex (poe.ninja: 367 ex, 0.65x)" where the 240 was a challenge
+            // league's price and the 367 was Standard's, and that ratio is not a finding, it is
+            // two unrelated markets divided by each other.
+            double book = _prices.Book.Rate;
+
             if (probe.Rate > 0)
             {
-                double book = _prices.Book.Rate;
+                string from = probe.League.Length > 0 ? $" in {probe.League}" : string.Empty;
+                bool sameMarket = probe.League.Equals(_inspector.League, StringComparison.OrdinalIgnoreCase);
+                string against = book <= 0 || !sameMarket
+                    ? string.Empty
+                    : $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.Rate / book)}x)";
+                ProbeRow("exchange", $"1 div = {StashWorth.Money(probe.Rate)} ex{from}{against}");
+            }
+
+            // THE ONE THAT COUNTS when the exchange came back empty, because this is the api
+            // serving the league being played. Only this rate may be set beside poe.ninja's:
+            // both are then the same market, which is what makes a ratio mean anything.
+            if (probe.ListedRate > 0)
+            {
                 string against = book > 0
-                    ? $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.Rate / book)}x)"
+                    ? $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.ListedRate / book)}x)"
                     : string.Empty;
-                ProbeRow("1 div costs", $"{StashWorth.Money(probe.Rate)} ex{against}");
+                ProbeRow(
+                    "trade search",
+                    $"1 div = {StashWorth.Money(probe.ListedRate)} ex in {_inspector.League}"
+                    + $", {probe.Listed} listed{against}");
+            }
+            else if (probe.Listed > 0)
+            {
+                ProbeRow("trade search", $"{probe.Listed} listed in {_inspector.League}, none readable");
             }
 
             ProbeRow("listings back", probe.Got.ToString(System.Globalization.CultureInfo.CurrentCulture));
@@ -431,9 +445,36 @@ public sealed class StashWindow
             ImGui.EndTable();
         }
 
+        // THE CONCLUSION IN WORDS, and only as far as the two answers actually carry it. An
+        // empty exchange beside a full search means the exchange is empty - not that the league
+        // has no market, which is what an earlier version of this said and was wrong about.
+        bool exchangeElsewhere =
+            probe.Rate > 0 && !probe.League.Equals(_inspector.League, StringComparison.OrdinalIgnoreCase);
+
+        if (exchangeElsewhere && probe.Listed > 0)
+        {
+            ImGuiText.Wrapped(
+                GoodText,
+                $"The currency exchange has nothing in {_inspector.League} - that rate came from "
+                + $"{probe.League}. The ordinary trade search does cover {_inspector.League}, so "
+                + "that is where a live rate for this character would have to come from.");
+        }
+        else if (exchangeElsewhere)
+        {
+            ImGuiText.Wrapped(
+                WarnText,
+                $"Neither the exchange nor the search has anything in {_inspector.League} - the "
+                + $"exchange rate above came from {probe.League}. Prices here keep coming from "
+                + "poe.ninja, which does cover it.");
+        }
+
+        // ALL OF THEM, not a sample. Hard-coding two ids that the site spells differently is
+        // what made an earlier probe answer "no listings" for the most traded pair in the game,
+        // so the naming IS the finding here - and a sample of twelve hides the other twenty-eight.
         if (probe.Tags.Count > 0)
         {
-            ImGuiText.Wrapped(DimText, "ids: " + string.Join(", ", probe.Tags.Take(ProbeMost)));
+            ImGuiText.Wrapped(DimText, $"what the site calls its {probe.Tags.Count} currencies:");
+            ImGuiText.MonoWrapped(DimText, string.Join("   ", probe.Tags));
         }
 
         // THE BODY VERBATIM, because a status alone settles nothing: the first probe's 400 named

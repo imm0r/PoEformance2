@@ -1055,7 +1055,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         PriceStore prices,
         TradePrices trade,
         Action signIn,
-        Func<int, Task<TradeProbe>>? probe = null,
+        Func<Task<TradeProbe>>? probe = null,
         bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(inspector);

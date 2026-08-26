@@ -36,4 +36,51 @@ public sealed class TradeProbeTests
         Assert.Empty(never.Tags);
         Assert.Empty(never.Raw);
     }
+
+    [Fact]
+    public void AProbeThatCouldNotRunNamesNoLeagueToCompareAgainst()
+    {
+        TradeProbe never = TradeProbe.Not("the trade window was closed");
+
+        // The stash page decides whether to print poe.ninja's rate beside the probe's by
+        // comparing the two leagues. An empty league must therefore never equal a real one -
+        // if it did, a probe that reached nobody would be compared against the price book as
+        // though it had.
+        Assert.Empty(never.League);
+        Assert.False(never.League.Equals("Standard", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void ARateFromAnotherLeagueIsNotTheLeagueBeingPlayed()
+    {
+        // The shape the live probe actually returned: Standard had no listings at all, so the
+        // rate came from the challenge league instead. Printing "240 ex (poe.ninja: 367 ex,
+        // 0.65x)" off that pair divides two unrelated markets by each other, and the guard
+        // against it is this comparison - so pin that it distinguishes them.
+        var elsewhere = new TradeProbe(
+            Ok: true, Status: 200, Limits: string.Empty, Tags: [], Asked: 1, Got: 3,
+            Rate: 240, League: "Runes of Aldur", Listed: 0, ListedRate: 0,
+            Raw: string.Empty, Error: string.Empty);
+
+        Assert.False(elsewhere.League.Equals("Standard", StringComparison.OrdinalIgnoreCase));
+        Assert.Equal("runes of aldur", elsewhere.League, StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void AnEmptyExchangeSaysNothingAboutTheSearch()
+    {
+        // The shape that reading the exchange alone got wrong: no exchange listings in the
+        // played league, and plenty on the other api serving the same league. The page decides
+        // which of the two may be compared against poe.ninja from exactly these fields, so pin
+        // that they stay independent - an empty Got must not drag ListedRate down with it.
+        var mixed = new TradeProbe(
+            Ok: true, Status: 200, Limits: string.Empty, Tags: [], Asked: 1, Got: 0,
+            Rate: 240, League: "Runes of Aldur", Listed: 118, ListedRate: 367,
+            Raw: string.Empty, Error: string.Empty);
+
+        Assert.Equal(0, mixed.Got);
+        Assert.True(mixed.Listed > 0);
+        Assert.Equal(367, mixed.ListedRate);
+        Assert.NotEqual(mixed.Rate, mixed.ListedRate);
+    }
 }

@@ -1202,7 +1202,7 @@ internal static class Program
             prices,
             trade,
             () => tradeSession.Show(stash.League),
-            most => tradeSession.Probe(stash.League, most, CancellationToken.None));
+            () => tradeSession.Probe(stash.League, CancellationToken.None));
         overlay.AttachWealth(wealth, stash, prices);
         overlay.AttachRitual(
             ritual,
