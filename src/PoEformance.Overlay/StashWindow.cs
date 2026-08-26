@@ -419,13 +419,19 @@ public sealed class StashWindow
             // both are then the same market, which is what makes a ratio mean anything.
             if (probe.ListedRate > 0)
             {
-                string against = book > 0
+                // THE LEAGUE THE SEARCH ANSWERED FROM, not the one asked. The ladder's last rung
+                // is a control put to a different league on purpose, and setting ITS rate beside
+                // a Standard price book would repeat the mistake this row was added to stop.
+                bool ours = probe.ListedLeague.Equals(_inspector.League, StringComparison.OrdinalIgnoreCase);
+                string against = book > 0 && ours
                     ? $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.ListedRate / book)}x)"
                     : string.Empty;
+                string where = probe.ListedLeague.Length > 0 ? probe.ListedLeague : _inspector.League;
                 ProbeRow(
                     "trade search",
-                    $"1 div = {StashWorth.Money(probe.ListedRate)} ex in {_inspector.League}"
-                    + $", {probe.Listed} listed{against}");
+                    $"1 div = {StashWorth.Money(probe.ListedRate)} ex in {where}"
+                    + $", {probe.Listed} listed{against}"
+                    + (ours ? string.Empty : $"   - a control, not {_inspector.League}"));
             }
             else if (probe.Listed > 0)
             {

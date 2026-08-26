@@ -48,23 +48,26 @@ public readonly record struct TradeAnswer(
 /// exists only in poe2 and therefore could not be mistaken. Every query here names the realm now:
 /// /api/trade2/search/poe2/{league}, and &amp;realm=poe2 on the fetch.
 ///
-/// THE FIX WAS ALREADY IN THE FILE. The uniques query in TradeSessionWindow has said poe2 in its
-/// path since it was written, and it is the one thing on the stash page that demonstrably answers
-/// for Standard - "15 asked, 15 answers remembered". Its shape is now copied rather than rebuilt:
-/// realm in the path, name rather than type, and no stat or trade filters. The rebuilt version
-/// had none of that and came back 0 with complexity 7 - a query the site parsed and could not
-/// match.
+/// PART OF THE FIX WAS ALREADY IN THE FILE. The uniques query in TradeSessionWindow has said poe2
+/// in its path since it was written. What could NOT be copied from it is the item field: it sends
+/// name because a unique HAS one, and a Divine Orb does not - it is a base type, and a name the
+/// site cannot place comes back 400 "Unknown item name".
 ///
-/// THE THREE THEORIES, kept because each looked convincing and each was cheap to disprove and
-/// expensive to believe. First the ids were blamed: an earlier version hard-coded 'divine' and
-/// 'exalted', and the empty result was read as proof they were wrong. They were not - the site
-/// spells them exactly that way, as its own table confirms. Then the league was blamed: "Standard
-/// has no currency exchange". Then the endpoint: "the exchange is empty but the search is not".
-/// All three fit the evidence, and none was the cause.
+/// THE THEORIES, kept because each looked convincing, and because the pattern in them is worth
+/// more than any one of them. The ids were blamed first: an earlier version hard-coded 'divine'
+/// and 'exalted', and the empty result was read as proof they were wrong. They were not - the
+/// site spells them exactly that way. Then the league: "Standard has no currency exchange". Then
+/// the endpoint: "the exchange is empty but the search is not". Then the realm, which was real
+/// but not sufficient. Then the item field, likewise. Five rounds, each shipped as a build and
+/// answered by a screenshot.
 ///
-/// THE LESSON UNDER ALL OF THEM: from here a wrong realm, a bad query, the wrong endpoint and a
-/// genuinely empty market are the SAME 200 with the SAME empty array. Thinking does not separate
-/// them. Asking something that already works does.
+/// THE LESSON UNDER ALL OF THEM: from here a wrong realm, a bad query, the wrong endpoint, an
+/// over-narrow filter and a genuinely empty market are the SAME 200 with the SAME empty array.
+/// Thinking does not separate them, and neither does one hypothesis per build. What separates
+/// them is asking SEVERAL THINGS AT ONCE, narrowest first, with a control - which is why the
+/// search now walks a ladder and ends with the same query put to a different league. A run of it
+/// cannot come back ambiguous: either something answers, or the control answers and the played
+/// league is genuinely empty, or nothing answers and the query itself is still wrong.
 ///
 /// SO THE PROBE ASKS BOTH APIS, and reports them apart: <see cref="Rate"/> from the exchange with
 /// the <see cref="League"/> that answered it, <see cref="ListedRate"/> from the search in the
@@ -100,6 +103,11 @@ public readonly record struct TradeAnswer(
 /// The page said "nothing listed in Standard" for a while when the truth was
 /// 400 "Unknown item name" - an empty market and a refused question look identical in a count.
 /// </param>
+/// <param name="ListedLeague">
+/// WHICH LEAGUE THE SEARCH ANSWERED FROM. The last rung of the ladder asks another league on
+/// purpose, as a control, so this is not always the one being played - and a rate read from it
+/// must never be set beside a price book that covers a different market.
+/// </param>
 /// <param name="Raw">One listing as the site sent it, so its shape can be read.</param>
 /// <param name="Error">What went wrong, in words.</param>
 public sealed record TradeProbe(
@@ -114,12 +122,13 @@ public sealed record TradeProbe(
     int Listed,
     double ListedRate,
     int ListedStatus,
+    string ListedLeague,
     string Raw,
     string Error)
 {
     /// <summary>A probe that could not be run at all.</summary>
     public static TradeProbe Not(string why)
-        => new(false, 0, string.Empty, [], 0, 0, 0, string.Empty, 0, 0, 0, string.Empty, why);
+        => new(false, 0, string.Empty, [], 0, 0, 0, string.Empty, 0, 0, 0, string.Empty, string.Empty, why);
 }
 
 /// <summary>

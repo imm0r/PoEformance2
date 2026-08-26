@@ -278,41 +278,65 @@ internal sealed class TradeSessionWindow : Window
                   // That took two runs to see, because there were two faults at once: without the
                   // realm, type was already right and still returned nothing; with the realm,
                   // name was wrong. Each fix alone looked like a failure.
-                  var look = async function (withPrice) {
+                  // A LADDER, NOT A GUESS. Five rounds went one hypothesis at a time, each shipped
+                  // and each answered by a screenshot, and the query has been ACCEPTED since the
+                  // start - the site parses it and evaluates it (complexity 7) and finds nothing.
+                  // So the remaining question is not what is malformed but what is over-filtered,
+                  // and that is a question three requests settle at once rather than three builds.
+                  //
+                  // Ordered narrowest first, stopping at the first that finds anything:
+                  //   1. online + priced in Exalted - what a live rate would ideally be
+                  //   2. any status          - Standard is a graveyard league; its stock sits with
+                  //                            players who have not logged in for months, and an
+                  //                            online-only filter would hide all of it
+                  //   3. any, no price filter - in case the price option is what matches nothing
+                  //   4. the SAME query in the other league - the control. If Standard finds
+                  //      nothing where another league finds plenty, that is a fact about Standard
+                  //      and not about this query, and the guessing is over either way.
+                  var look = async function (league, status, withPrice) {
                     var query = {
-                      status: { option: 'online' },
+                      status: { option: status },
                       // The site's own display name for the id, not a string typed from memory.
                       type: named[div],
                       stats: [{ type: 'and', filters: [] }],
                       filters: {}
                     };
-                    // Priced in Exalted, which is the rate being asked for. Optional in the
-                    // reference, so a rejection here is worth separating from a rejection of
-                    // the query itself.
                     if (withPrice) {
                       query.filters = { trade_filters: { filters: { price: { option: exa } } } };
                     }
-                    return fetch('/api/trade2/search/poe2/' + encodeURIComponent(m.league), {
+                    var r = await fetch('/api/trade2/search/poe2/' + encodeURIComponent(league), {
                       method: 'POST',
                       headers: { 'content-type': 'application/json' },
                       credentials: 'include',
                       body: JSON.stringify({ query: query, sort: { price: 'asc' } })
                     });
+                    var t = await r.text();
+                    var o = { league: league, how: status + (withPrice ? '+priced' : ''), status: r.status, text: t };
+                    try { o.json = JSON.parse(t); } catch (e) { }
+                    o.total = (o.json && o.json.total) || 0;
+                    return o;
                   };
 
-                  var s = await look(true);
-                  var stext = await s.text();
-                  if (s.status === 400) {
-                    // The price filter is the only optional part, so it is the only thing a
-                    // second attempt may drop - anything more would be shotgunning.
-                    var bare = await look(false);
-                    var btext = await bare.text();
-                    if (bare.status >= 200 && bare.status < 300) { s = bare; stext = btext; }
-                    else { stext = stext + '   without price filter: ' + bare.status + ' ' + btext.slice(0, 200); }
+                  var other = (elsewhere && elsewhere.league !== m.league) ? elsewhere.league : null;
+                  var rungs = [
+                    [m.league, 'online', true],
+                    [m.league, 'any', true],
+                    [m.league, 'any', false]
+                  ];
+                  if (other) { rungs.push([other, 'any', false]); }
+
+                  var tried = [], s = null, sj = null, stext = '';
+                  for (var t = 0; t < rungs.length; t++) {
+                    var got2 = await look(rungs[t][0], rungs[t][1], rungs[t][2]);
+                    tried.push(got2.league + '/' + got2.how + ': ' + got2.status + ' ' + got2.total
+                               + (got2.status === 200 ? '' : ' ' + got2.text.slice(0, 160)));
+                    if (got2.total > 0 && got2.json) { s = got2; sj = got2.json; stext = got2.text; break; }
+                    s = got2; sj = got2.json; stext = got2.text;
                   }
-                  listed = { status: s.status, body: stext.slice(0, 500), total: 0, rate: 0 };
-                  var sj = null;
-                  try { sj = JSON.parse(stext); } catch (e) { }
+
+                  // The league the ANSWER came from, which on the last rung is not the one asked.
+                  listed = { status: s.status, body: tried.join('   |   ').slice(0, 900),
+                             league: s.league, total: 0, rate: 0 };
                   listed.total = (sj && sj.total) || 0;
                   var ids = (sj && sj.result) || [];
 
@@ -327,6 +351,11 @@ internal sealed class TradeSessionWindow : Window
                     for (var q = 0; q < rows.length; q++) {
                       var price = rows[q] && rows[q].listing && rows[q].listing.price;
                       if (!price || !price.amount) { continue; }
+                      // IN EXALTED OR NOT AT ALL. Two of the rungs drop the price filter, so a
+                      // listing here may be asking Chaos or Divine - and taking its amount as an
+                      // Exalted rate would be a wrong number that looks entirely reasonable,
+                      // which is the exact shape of every mistake this probe has already made.
+                      if (price.currency !== exa) { continue; }
                       // PER ORB, not per listing: a stack of twenty priced as one lot would
                       // otherwise read as a single orb costing twenty times too much.
                       var stack = (rows[q].item && rows[q].item.stackSize) || 1;
@@ -375,6 +404,7 @@ internal sealed class TradeSessionWindow : Window
                   listed: listed ? listed.total : 0,
                   listedRate: listed ? listed.rate : 0,
                   listedStatus: listed ? listed.status : 0,
+                  listedLeague: listed ? listed.league : '',
                   raw: ((keys.length ? JSON.stringify(results[keys[0]]) : '')
                         || (listed && listed.raw) || '').slice(0, 3000),
                   error: 'want ' + div + ', have ' + exa + '   |   exchange ' + said(got)

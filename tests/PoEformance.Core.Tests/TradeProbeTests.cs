@@ -59,7 +59,7 @@ public sealed class TradeProbeTests
         // against it is this comparison - so pin that it distinguishes them.
         var elsewhere = new TradeProbe(
             Ok: true, Status: 200, Limits: string.Empty, Tags: [], Asked: 1, Got: 3,
-            Rate: 240, League: "Runes of Aldur", Listed: 0, ListedRate: 0, ListedStatus: 200,
+            Rate: 240, League: "Runes of Aldur", Listed: 0, ListedRate: 0, ListedStatus: 200, ListedLeague: "Standard",
             Raw: string.Empty, Error: string.Empty);
 
         Assert.False(elsewhere.League.Equals("Standard", StringComparison.OrdinalIgnoreCase));
@@ -75,7 +75,7 @@ public sealed class TradeProbeTests
         // that they stay independent - an empty Got must not drag ListedRate down with it.
         var mixed = new TradeProbe(
             Ok: true, Status: 200, Limits: string.Empty, Tags: [], Asked: 1, Got: 0,
-            Rate: 240, League: "Runes of Aldur", Listed: 118, ListedRate: 367, ListedStatus: 200,
+            Rate: 240, League: "Runes of Aldur", Listed: 118, ListedRate: 367, ListedStatus: 200, ListedLeague: "Standard",
             Raw: string.Empty, Error: string.Empty);
 
         Assert.Equal(0, mixed.Got);
@@ -93,7 +93,7 @@ public sealed class TradeProbeTests
         // market. The status is the only thing that separates them, so pin that it does.
         var refused = new TradeProbe(
             Ok: true, Status: 200, Limits: string.Empty, Tags: [], Asked: 1, Got: 0,
-            Rate: 240, League: "Runes of Aldur", Listed: 0, ListedRate: 0, ListedStatus: 400,
+            Rate: 240, League: "Runes of Aldur", Listed: 0, ListedRate: 0, ListedStatus: 400, ListedLeague: "Standard",
             Raw: string.Empty, Error: "Unknown item name");
 
         var empty = refused with { ListedStatus = 200, Error = string.Empty };
@@ -102,5 +102,24 @@ public sealed class TradeProbeTests
         Assert.NotEqual(refused.ListedStatus, empty.ListedStatus);
         Assert.True(refused.ListedStatus is > 0 and not 200);
         Assert.False(empty.ListedStatus is > 0 and not 200);
+    }
+
+    [Fact]
+    public void AControlAnswerIsNotTheLeagueBeingPlayed()
+    {
+        // The ladder's last rung puts the same query to a DIFFERENT league on purpose, so a
+        // search rate can arrive from somewhere the price book does not cover. Setting those two
+        // beside each other is the mistake that produced "0.65x" out of two unrelated markets,
+        // and ListedLeague is the only thing standing between here and repeating it.
+        var control = new TradeProbe(
+            Ok: true, Status: 200, Limits: string.Empty, Tags: [], Asked: 1, Got: 4,
+            Rate: 240, League: "Runes of Aldur",
+            Listed: 61, ListedRate: 238, ListedStatus: 200, ListedLeague: "Runes of Aldur",
+            Raw: string.Empty, Error: string.Empty);
+
+        Assert.False(control.ListedLeague.Equals("Standard", StringComparison.OrdinalIgnoreCase));
+
+        var ours = control with { ListedLeague = "Standard", ListedRate = 367 };
+        Assert.Equal("standard", ours.ListedLeague, StringComparer.OrdinalIgnoreCase);
     }
 }
