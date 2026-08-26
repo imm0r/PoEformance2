@@ -115,7 +115,7 @@ public sealed class WealthPanel
 
         if (tracker.Moved(Window, nowMs) is { } moved)
         {
-            ImGuiText.Mono(Tint(moved.Exalted), Movement(moved));
+            ImGuiText.Mono(Tint(moved.Exalted), Movement(moved, showing.Rate));
         }
         else
         {
@@ -146,15 +146,15 @@ public sealed class WealthPanel
         }
     }
 
-    /// <summary>The total, in both units the tracker is measured in.</summary>
+    /// <summary>The total, counted up into Divine once it is worth one.</summary>
     /// <remarks>
-    /// Divine is omitted rather than shown as zero when the book has no rate. A rate of nothing
-    /// is not a purse worth no Divine, and "0 div" beside a real Exalted total reads as one.
+    /// One figure rather than the same amount twice in two units, which is what this used to be.
+    /// See <see cref="StashWorth.Purse"/> - and note that with no rate it stays in Exalted rather
+    /// than showing a Divine reading of zero, because a rate of nothing is not a purse worth no
+    /// Divine.
     /// </remarks>
     private static string Total(WealthTracker.Shown showing)
-        => showing.Rate > 0
-            ? $"{StashWorth.Money(showing.Exalted)} ex   {StashWorth.Money(showing.Divine)} div"
-            : $"{StashWorth.Money(showing.Exalted)} ex";
+        => StashWorth.Purse(showing.Exalted, showing.Rate);
 
     /// <summary>
     /// The movement, with the stretch it actually covers.
@@ -165,8 +165,14 @@ public sealed class WealthPanel
     /// with its real span is a number somebody divides to get an hourly rate. See
     /// <see cref="WealthTracker.Moved"/>.
     /// </remarks>
-    private static string Movement(WealthTracker.Movement moved)
-        => $"{(moved.Exalted >= 0 ? "+" : "-")}{StashWorth.Money(Math.Abs(moved.Exalted))} ex"
+    /// <param name="rate">
+    /// Exalted per Divine, so a change is counted up the same way the total above it is. A gain
+    /// of "+2 div, 82 ex" beside a total in Divine reads as one thing; the same gain left in
+    /// Exalted would have to be divided in the head before it could be compared to what it
+    /// changed.
+    /// </param>
+    private static string Movement(WealthTracker.Movement moved, double rate)
+        => $"{(moved.Exalted >= 0 ? "+" : string.Empty)}{StashWorth.Purse(moved.Exalted, rate)}"
            + $"   {Ago(moved.Over)}";
 
     private static Vector4 Tint(double change)

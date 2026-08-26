@@ -1196,7 +1196,13 @@ internal static class Program
         overlay.ShowWorldDots = debug;
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.AttachAtlas(atlas, changed => PoEformance.Features.AtlasStore.Save(changed));
-        overlay.AttachStash(stash, itemArt, prices, trade, () => tradeSession.Show(stash.League));
+        overlay.AttachStash(
+            stash,
+            itemArt,
+            prices,
+            trade,
+            () => tradeSession.Show(stash.League),
+            most => tradeSession.Probe(stash.League, most, CancellationToken.None));
         overlay.AttachWealth(wealth, stash, prices);
         overlay.AttachRitual(
             ritual,
