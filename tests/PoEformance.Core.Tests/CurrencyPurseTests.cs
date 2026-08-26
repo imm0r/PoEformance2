@@ -171,6 +171,28 @@ public class CurrencyPurseTests
         Assert.Equal(1, purse.Unpriced);
     }
 
+    [Theory]
+    [InlineData(true, true, true)]
+    [InlineData(false, true, false)]
+    [InlineData(true, false, false)]
+    [InlineData(false, false, false)]
+    public void TheStashHalfIsOnlyReplacedWhereAStashCanExist(bool canSee, bool sawTab, bool replaces)
+    {
+        // THE REGRESSION, off a real recorded purse. The first version replaced the remembered
+        // stash contents whenever the game listed any stash inventory, on the assumption that in
+        // a map the tabs are absent from the list. They are not - they are listed and empty. The
+        // record shows what that cost, in the player's own file:
+        //
+        //   09:06:11   74 stacks   1,280,968 ex     (in the hideout)
+        //   09:11:12    3 stacks          15 ex     (walked into a map)
+        //   09:18:38   59 stacks   1,272,975 ex     (came back)
+        //   09:25:34    2 stacks          55 ex     (left again)
+        //
+        // Every one of those transitions was written into a record that never resets, as a gain
+        // or loss of about 2,700 Divine that never happened.
+        Assert.Equal(replaces, StashInspector.ReplacesTheStash(canSee, sawTab));
+    }
+
     [Fact]
     public void DivineIsTheSameTotalRatherThanASecondOne()
     {

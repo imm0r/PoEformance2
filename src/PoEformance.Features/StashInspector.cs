@@ -28,14 +28,17 @@ public sealed record StashPage(
 /// </summary>
 /// <remarks>
 /// TWO HALVES WITH DIFFERENT LIFETIMES, and that is forced by the game rather than chosen. The
-/// backpack hangs off the player and is readable wherever they are; the stash tabs are only
-/// there when the client has a stash loaded, which means standing near one. During a map the
-/// tabs are simply gone - so a purse read in a map that reported only the backpack would show
-/// somebody's wealth collapsing every time they left the hideout.
+/// backpack hangs off the player and is readable wherever they are; the stash tabs only hold
+/// anything when the client has a stash loaded, which means standing near one.
 ///
-/// The stash half is therefore REMEMBERED, and stamped with when it was last actually seen, so
-/// a readout can say "plus what the stash held twenty minutes ago" instead of implying it is
-/// looking at it now.
+/// AND THE TABS DO NOT DISAPPEAR WHEN THEY ARE UNLOADED - they are still listed, just empty.
+/// That was measured rather than assumed, and assuming otherwise is what the first version of
+/// this got wrong: see <see cref="StashInspector.CanSeeAStash"/>. It means a purse read cannot
+/// tell "the tabs are empty" from "the tabs are not loaded" by looking at the tabs.
+///
+/// The stash half is therefore REMEMBERED, replaced only where a stash can exist at all, and
+/// stamped with when it was last actually seen - so a readout can say "plus what the stash held
+/// twenty minutes ago" instead of implying it is looking at it now.
 /// </remarks>
 /// <param name="Pages">
 /// The carried currency and the last-seen stashed currency together, which is what wants
@@ -162,6 +165,7 @@ public sealed class StashInspector
     private IReadOnlyList<StashPage> _stashed = [];
     private long _stashedAt;
     private bool _watchPurse;
+    private bool _canSeeAStash;
 
     public StashInspector(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, ItemNames? names = null)
     {
@@ -236,6 +240,42 @@ public sealed class StashInspector
         get => Volatile.Read(ref _watchPurse);
         set => Volatile.Write(ref _watchPurse, value);
     }
+
+    /// <summary>
+    /// Whether the player is somewhere a stash can exist at all - a town or a hideout.
+    /// </summary>
+    /// <remarks>
+    /// SET FROM OUTSIDE because the area is already read every tick by the world reader, and a
+    /// second read of it here would be the same answer bought twice.
+    ///
+    /// IT IS LOAD-BEARING, not a nicety, and it is here because the first version guessed and
+    /// was wrong. That version replaced the remembered stash contents whenever the game listed
+    /// any stash inventory at all, on the assumption that in a map the tabs are simply absent
+    /// from the list. THE RECORDED DATA SAYS OTHERWISE: a purse of 74 stacks worth 1.28M Exalted
+    /// dropped to 3 stacks worth 15 the moment the player left the hideout, and climbed back the
+    /// moment they returned - over and over. The tabs ARE listed in a map. They are just empty.
+    ///
+    /// So "the game listed a tab" cannot mean "I have seen the stash". Being where a stash can
+    /// be is a fact about the world rather than about a pointer, which is why the test moved
+    /// here. An empty currency tab in a hideout is still a real reading of zero and still
+    /// replaces what was remembered - that case was right before and stays right.
+    /// </remarks>
+    public bool CanSeeAStash
+    {
+        get => Volatile.Read(ref _canSeeAStash);
+        set => Volatile.Write(ref _canSeeAStash, value);
+    }
+
+    /// <summary>
+    /// Whether a count may replace what the stash tabs were last seen to hold.
+    /// </summary>
+    /// <remarks>
+    /// Named and public so the rule can be argued with in a test rather than only in a hideout.
+    /// BOTH operands are needed and the first is the one that was missing: see
+    /// <see cref="CanSeeAStash"/> for the recorded purse that proved it.
+    /// </remarks>
+    public static bool ReplacesTheStash(bool canSeeAStash, bool sawStashInventory)
+        => canSeeAStash && sawStashInventory;
 
     /// <summary>Serves a requested read, and keeps the league current. Called on the reader thread.</summary>
     public void Service(long now)
@@ -452,10 +492,14 @@ public sealed class StashInspector
             (inventory.Kind == InventoryKind.Backpack ? carried : stashed).Add(page);
         }
 
-        // SEEN AT ALL, rather than "held currency". A currency tab somebody has just emptied is
-        // a real reading of zero and has to replace the remembered one; a map, where the tabs
-        // are not loaded, must not.
-        if (sawStash)
+        // WHERE A STASH CAN BE, and only then. The game lists the tab inventories in a map as
+        // well - empty - so "a tab came back" says nothing about whether it was read. See
+        // CanSeeAStash for the measurements that settled this.
+        //
+        // Within a town or hideout the old rule still holds: seen AT ALL rather than "held
+        // currency", because a currency tab somebody has just emptied is a real reading of zero
+        // and has to replace what was remembered.
+        if (ReplacesTheStash(CanSeeAStash, sawStash))
         {
             _stashed = stashed;
             _stashedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -469,7 +513,9 @@ public sealed class StashInspector
             pages,
             _stashedAt,
             carried.Count,
-            sawStash ? string.Empty : "stash tabs not loaded - showing what they last held");
+            ReplacesTheStash(CanSeeAStash, sawStash)
+                ? string.Empty
+                : "away from the stash - showing what the tabs last held");
     }
 
     private StashView Build()

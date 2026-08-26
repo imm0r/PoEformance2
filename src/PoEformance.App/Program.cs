@@ -1056,8 +1056,18 @@ internal static class Program
                 // The wall clock rather than TickCount64, and that is not interchangeable here:
                 // the record spans sessions, and milliseconds-since-boot restarts at zero every
                 // time the machine does.
+                // WHERE A STASH CAN EXIST, from the area the world reader has just resolved -
+                // IsTown is the game's own field and IsHideout the reference's id test. Without
+                // this the remembered tab contents are wiped every time the player enters a
+                // map, because the game lists the tabs there too, empty. See CanSeeAStash.
+                stash.CanSeeAStash = snapshot.InGame && !snapshot.Area.IsHostile;
+
                 if (stash.WatchPurse
-                    && wealth.Update(stash.Purse, prices.Book, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()))
+                    && wealth.Update(
+                        stash.Purse,
+                        prices.Book,
+                        DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                        settling: prices.Busy))
                 {
                     // Written whenever a point was added rather than on a timer of its own. A
                     // point is at most one every thirty seconds, so this is a few hundred

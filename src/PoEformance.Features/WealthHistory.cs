@@ -31,9 +31,19 @@ public readonly record struct WealthPoint(
     [property: JsonPropertyName("stacks")] int Stacks = 0)
 {
     /// <summary>The same amount in Divine, at the rate that was in force when it was taken.</summary>
+    /// <remarks>
+    /// NOT WRITTEN TO THE FILE, and the attribute is the whole reason this remark exists. A
+    /// public read-only property is serialised by default, so both of these were being stored
+    /// beside the fields they are computed FROM - a "Divine" that no reader ever looks at (there
+    /// is no setter for it) and a "When" that repeats "at" in words. Two redundant fields per
+    /// point, in the one file whose size <see cref="WealthHistory.Most"/> exists to bound, and
+    /// two more chances for a hand-edited file to disagree with itself.
+    /// </remarks>
+    [JsonIgnore]
     public double Divine => Rate > 0 ? Exalted / Rate : 0;
 
-    /// <summary>When it was taken.</summary>
+    /// <inheritdoc cref="Divine"/>
+    [JsonIgnore]
     public DateTimeOffset When => DateTimeOffset.FromUnixTimeMilliseconds(At);
 }
 

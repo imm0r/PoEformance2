@@ -23,6 +23,7 @@ public sealed class WealthTracker
 {
     private readonly WealthHistory _history;
     private Reading _now = Reading.Nothing;
+    private bool _trusted;
 
     public WealthTracker(WealthHistory? history = null) => _history = history ?? new WealthHistory();
 
@@ -61,6 +62,9 @@ public sealed class WealthTracker
     /// <summary>The last count, priced. Cheap to read every frame.</summary>
     public Reading Now => _now;
 
+    /// <summary>Whether the last count was one this would have written down. See <see cref="Fit"/>.</summary>
+    public bool Trusted => _trusted;
+
     /// <summary>
     /// Whether a reading is fit to go into the record.
     /// </summary>
@@ -79,9 +83,19 @@ public sealed class WealthTracker
     /// away the lines nobody trades - so waiting for a complete purse would mean waiting for
     /// ever. Those items are missing from every point equally, so the SHAPE of the record, which
     /// is what a wealth graph is read for, stays true; the views say how many are missing.
+    ///
+    /// A THIRD REFUSAL, added after reading a real record: a book that is still being ASSEMBLED.
+    /// The first point ever written carried a rate of 381.3 where every point thirty seconds
+    /// later carried 473.4, across an unchanged 49 stacks - so that point understated the purse
+    /// by nearly forty per cent, permanently, in a record that never resets. Ready is not
+    /// enough: it means "has a rate and some prices", which a half-arrived refresh also has.
     /// </remarks>
-    public static bool Fit(Reading reading, bool bookReady)
-        => bookReady && reading.At > 0 && (reading.Priced > 0 || reading.Stacks == 0);
+    /// <param name="settling">
+    /// Whether the price store is mid-refresh. From <c>PriceStore.Busy</c> - passed in rather
+    /// than reached for, because this layer prices things and does not fetch them.
+    /// </param>
+    public static bool Fit(Reading reading, bool bookReady, bool settling = false)
+        => bookReady && !settling && reading.At > 0 && (reading.Priced > 0 || reading.Stacks == 0);
 
     /// <summary>
     /// Prices the latest count and records it if it is fit to be.
@@ -91,7 +105,9 @@ public sealed class WealthTracker
     /// <param name="nowMs">Unix milliseconds.</param>
     /// <param name="trade">The other half of "what is this worth", where there is one.</param>
     /// <returns>True when a point was written to the record.</returns>
-    public bool Update(PurseView? purse, PriceBook? book, long nowMs, TradePrices? trade = null)
+    /// <param name="settling">Whether the price store is mid-refresh. See <see cref="Fit"/>.</param>
+    public bool Update(
+        PurseView? purse, PriceBook? book, long nowMs, TradePrices? trade = null, bool settling = false)
     {
         if (purse is null || book is null)
         {
@@ -110,10 +126,55 @@ public sealed class WealthTracker
             purse.StashSeenAt);
 
         _now = reading;
+        _trusted = Fit(reading, book.Ready, settling);
 
-        return Fit(reading, book.Ready)
-               && _history.Note(nowMs, reading.Exalted, reading.Rate, reading.Stacks);
+        return _trusted && _history.Note(nowMs, reading.Exalted, reading.Rate, reading.Stacks);
     }
+
+    /// <summary>
+    /// What the purse is worth NOW, for measuring against - the live count where it can be
+    /// believed, and the last recorded point where it cannot.
+    /// </summary>
+    /// <remarks>
+    /// THE TWO FIGURES ON SCREEN HAVE TO COME FROM THE SAME PLACE, and this is where that is
+    /// decided. A panel showing "0 ex" beside "+494.6k over 33m" happened on a real screen: the
+    /// total was the live count and the change ended at the last RECORDED point, and the two had
+    /// drifted apart because the crash to zero fell inside the thirty seconds during which no
+    /// point may be written. Both halves were doing what they were told; together they described
+    /// a purse that never existed.
+    ///
+    /// The live count wins where it is fit to be written down, because that is the "Ist-Zustand"
+    /// the panel is read for. Where it is NOT - no prices yet, a book mid-refresh - the last
+    /// recorded point is the honest endpoint, since the live figure in that state is a zero that
+    /// means "not known" rather than "spent".
+    /// </remarks>
+    /// <param name="Live">
+    /// Whether this is the count as of a moment ago, or the last one that could be believed. A
+    /// view has to say which - a stale figure presented as current is the same lie as a wrong
+    /// one, just harder to notice.
+    /// </param>
+    public readonly record struct Shown(double Exalted, double Rate, bool Live)
+    {
+        /// <summary>The same amount in Divine, or 0 when there is no rate to divide by.</summary>
+        public double Divine => Rate > 0 ? Exalted / Rate : 0;
+    }
+
+    /// <summary>
+    /// The figure to put on screen - and the one every change is measured to.
+    /// </summary>
+    /// <remarks>
+    /// ONE SOURCE FOR BOTH HALVES. See the type remarks for the screen this comes from: a total
+    /// and a change that were each correct about a different moment, side by side, describing a
+    /// purse that never existed. Anything drawing both must take them from here.
+    ///
+    /// Null only before anything has ever been counted or recorded.
+    /// </remarks>
+    public Shown? Showing
+        => _trusted && _now.Any ? new Shown(_now.Exalted, _now.Rate, true)
+            : _history.Latest is { } last ? new Shown(last.Exalted, last.Rate, false)
+            : null;
+
+    private double? Endpoint => Showing?.Exalted;
 
     /// <summary>How much the purse has moved over the last stretch of time, in Exalted.</summary>
     /// <remarks>
@@ -121,10 +182,13 @@ public sealed class WealthTracker
     /// see <see cref="WealthHistory.ChangeSince"/>.
     /// </remarks>
     public double? Over(TimeSpan span, long nowMs)
-        => _history.ChangeSince(nowMs - (long)span.TotalMilliseconds);
+        => Endpoint is { } to && _history.At(nowMs - (long)span.TotalMilliseconds) is { } from
+            ? to - from.Exalted
+            : null;
 
-    /// <summary>Everything the record holds, first point to last.</summary>
-    public double? Overall => _history.Change;
+    /// <summary>Everything the record holds, first point to now.</summary>
+    public double? Overall
+        => Endpoint is { } to && _history.Earliest is { } from ? to - from.Exalted : null;
 
     /// <summary>
     /// How much the purse moved, and over how long it ACTUALLY moved that much.

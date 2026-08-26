@@ -207,9 +207,18 @@ public sealed class WealthWindow
 
         try
         {
-            Row("holding", held.Rate > 0
-                ? $"{StashWorth.Money(held.Exalted)} ex   {StashWorth.Money(held.Divine)} div"
-                : $"{StashWorth.Money(held.Exalted)} ex");
+            // The SHOWN figure rather than the raw count, so this and the change below are the
+            // same number's two readings - see WealthTracker.Showing.
+            WealthTracker.Shown showing = _tracker.Showing ?? new WealthTracker.Shown(0, 0, false);
+
+            Row("holding", showing.Rate > 0
+                ? $"{StashWorth.Money(showing.Exalted)} ex   {StashWorth.Money(showing.Divine)} div"
+                : $"{StashWorth.Money(showing.Exalted)} ex");
+
+            if (!showing.Live)
+            {
+                Row("but", "no prices right now - this is the last figure that could be believed");
+            }
 
             Row("stacks", held.Unpriced > 0
                 ? $"{held.Stacks}   ({held.Unpriced} of them the book has no price for)"

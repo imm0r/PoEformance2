@@ -105,7 +105,13 @@ public sealed class WealthPanel
     {
         WealthTracker.Reading now = tracker.Now;
 
-        ImGuiText.Mono(Total(now));
+        if (tracker.Showing is not { } showing)
+        {
+            ImGuiText.Mono(Flat, "nothing counted yet");
+            return;
+        }
+
+        ImGuiText.Mono(Total(showing));
 
         if (tracker.Moved(Window, nowMs) is { } moved)
         {
@@ -117,6 +123,15 @@ public sealed class WealthPanel
         }
 
         Sparkline(tracker, nowMs);
+
+        // NOT LIVE means the current count could not be believed - no prices yet, or a book
+        // mid-refresh - and what is on screen is the last one that could. Said plainly, because
+        // the alternative is showing the count itself, which in that state is a zero that reads
+        // as having spent everything.
+        if (!showing.Live)
+        {
+            ImGuiText.Mono(Flat, "no prices - last known figure");
+        }
 
         // Only when it matters. A total resting on tabs last seen an hour ago is not wrong, but
         // it is not what somebody reads it as - and during a map that is the ordinary state, so
@@ -136,10 +151,10 @@ public sealed class WealthPanel
     /// Divine is omitted rather than shown as zero when the book has no rate. A rate of nothing
     /// is not a purse worth no Divine, and "0 div" beside a real Exalted total reads as one.
     /// </remarks>
-    private static string Total(WealthTracker.Reading now)
-        => now.Rate > 0
-            ? $"{StashWorth.Money(now.Exalted)} ex   {StashWorth.Money(now.Divine)} div"
-            : $"{StashWorth.Money(now.Exalted)} ex";
+    private static string Total(WealthTracker.Shown showing)
+        => showing.Rate > 0
+            ? $"{StashWorth.Money(showing.Exalted)} ex   {StashWorth.Money(showing.Divine)} div"
+            : $"{StashWorth.Money(showing.Exalted)} ex";
 
     /// <summary>
     /// The movement, with the stretch it actually covers.
