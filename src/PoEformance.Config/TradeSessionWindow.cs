@@ -247,6 +247,57 @@ internal sealed class TradeSessionWindow : Window
                   } catch (e) { }
                 }
 
+                // THE OTHER ENDPOINT. The reference picks between two APIs per item -
+                // apiToSatisfySearch in common.ts returns "bulk" (the exchange asked above) or
+                // "trade" (/api/trade2/search) - and BOTH return live listings a person can
+                // whisper and click. So an empty exchange cannot be read as "this league has no
+                // market": it only means the exchange has nothing, and the search may still be
+                // full. Asked in the played league, always, because that is the contradiction.
+                var listed = null;
+                try {
+                  var s = await fetch('/api/trade2/search/' + encodeURIComponent(m.league), {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                      query: {
+                        status: { option: 'online' },
+                        // The site's own display name for the id, not a string typed from memory.
+                        type: named[div],
+                        stats: [{ type: 'and', filters: [] }],
+                        filters: { trade_filters: { filters: { price: { option: exa } } } }
+                      },
+                      sort: { price: 'asc' }
+                    })
+                  });
+                  var stext = await s.text();
+                  listed = { status: s.status, body: stext.slice(0, 500), total: 0, rate: 0 };
+                  var sj = null;
+                  try { sj = JSON.parse(stext); } catch (e) { }
+                  listed.total = (sj && sj.total) || 0;
+                  var ids = (sj && sj.result) || [];
+
+                  // sort: {price: 'asc'} means the first id is the cheapest, so three is plenty
+                  // to read a going rate and cheap against the fetch limit.
+                  if (ids.length && sj.id) {
+                    var f = await fetch('/api/trade2/fetch/' + ids.slice(0, 3).join(',')
+                                        + '?query=' + encodeURIComponent(sj.id),
+                                        { credentials: 'include' });
+                    var fj = await f.json();
+                    var rows = (fj && fj.result) || [];
+                    for (var q = 0; q < rows.length; q++) {
+                      var price = rows[q] && rows[q].listing && rows[q].listing.price;
+                      if (!price || !price.amount) { continue; }
+                      // PER ORB, not per listing: a stack of twenty priced as one lot would
+                      // otherwise read as a single orb costing twenty times too much.
+                      var stack = (rows[q].item && rows[q].item.stackSize) || 1;
+                      listed.rate = price.amount / stack;
+                      listed.raw = JSON.stringify(rows[q]).slice(0, 1200);
+                      break;
+                    }
+                  }
+                } catch (e) { }
+
                 var chosen = (elsewhere && elsewhere.keys.length > 0) ? elsewhere : got;
                 var results = (chosen.json && chosen.json.result) || {};
                 var keys = chosen.keys;
@@ -282,9 +333,14 @@ internal sealed class TradeSessionWindow : Window
                   got: keys.length,
                   rate: rate,
                   league: chosen.league,
-                  raw: (keys.length ? JSON.stringify(results[keys[0]]) : '').slice(0, 3000),
-                  error: 'want ' + div + ', have ' + exa + '   |   ' + said(got)
-                       + (elsewhere ? '   |   ' + said(elsewhere) : '')
+                  listed: listed ? listed.total : 0,
+                  listedRate: listed ? listed.rate : 0,
+                  raw: ((keys.length ? JSON.stringify(results[keys[0]]) : '')
+                        || (listed && listed.raw) || '').slice(0, 3000),
+                  error: 'want ' + div + ', have ' + exa + '   |   exchange ' + said(got)
+                       + (elsewhere ? '   |   exchange ' + said(elsewhere) : '')
+                       + (listed ? '   |   search ' + m.league + ': ' + listed.status + ' '
+                                 + listed.total + ' listed ' + (listed.rate ? '' : listed.body) : '')
                 });
               } catch (err) {
                 post({ id: m.id, ok: false, status: 0, error: String(err) });

@@ -402,17 +402,34 @@ public sealed class StashWindow
             // this printed "240 ex (poe.ninja: 367 ex, 0.65x)" where the 240 was a challenge
             // league's price and the 367 was Standard's, and that ratio is not a finding, it is
             // two unrelated markets divided by each other.
+            double book = _prices.Book.Rate;
+
             if (probe.Rate > 0)
             {
-                double book = _prices.Book.Rate;
                 string from = probe.League.Length > 0 ? $" in {probe.League}" : string.Empty;
                 bool sameMarket = probe.League.Equals(_inspector.League, StringComparison.OrdinalIgnoreCase);
-                string against = book <= 0
+                string against = book <= 0 || !sameMarket
                     ? string.Empty
-                    : sameMarket
-                        ? $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.Rate / book)}x)"
-                        : $"   (poe.ninja says {StashWorth.Money(book)} ex for {_inspector.League} - another league, so not the same price)";
-                ProbeRow("1 div costs", $"{StashWorth.Money(probe.Rate)} ex{from}{against}");
+                    : $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.Rate / book)}x)";
+                ProbeRow("exchange", $"1 div = {StashWorth.Money(probe.Rate)} ex{from}{against}");
+            }
+
+            // THE ONE THAT COUNTS when the exchange came back empty, because this is the api
+            // serving the league being played. Only this rate may be set beside poe.ninja's:
+            // both are then the same market, which is what makes a ratio mean anything.
+            if (probe.ListedRate > 0)
+            {
+                string against = book > 0
+                    ? $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.ListedRate / book)}x)"
+                    : string.Empty;
+                ProbeRow(
+                    "trade search",
+                    $"1 div = {StashWorth.Money(probe.ListedRate)} ex in {_inspector.League}"
+                    + $", {probe.Listed} listed{against}");
+            }
+            else if (probe.Listed > 0)
+            {
+                ProbeRow("trade search", $"{probe.Listed} listed in {_inspector.League}, none readable");
             }
 
             ProbeRow("listings back", probe.Got.ToString(System.Globalization.CultureInfo.CurrentCulture));
@@ -428,16 +445,27 @@ public sealed class StashWindow
             ImGui.EndTable();
         }
 
-        // THE CONCLUSION IN WORDS, because the two status lines above state it only by implication
-        // and it is the most consequential thing this probe can find: an exchange that has nothing
-        // to say about the league being played cannot price that player's purse at all, however
-        // well it answers about somewhere else.
-        if (probe.Rate > 0 && !probe.League.Equals(_inspector.League, StringComparison.OrdinalIgnoreCase))
+        // THE CONCLUSION IN WORDS, and only as far as the two answers actually carry it. An
+        // empty exchange beside a full search means the exchange is empty - not that the league
+        // has no market, which is what an earlier version of this said and was wrong about.
+        bool exchangeElsewhere =
+            probe.Rate > 0 && !probe.League.Equals(_inspector.League, StringComparison.OrdinalIgnoreCase);
+
+        if (exchangeElsewhere && probe.Listed > 0)
+        {
+            ImGuiText.Wrapped(
+                GoodText,
+                $"The currency exchange has nothing in {_inspector.League} - that rate came from "
+                + $"{probe.League}. The ordinary trade search does cover {_inspector.League}, so "
+                + "that is where a live rate for this character would have to come from.");
+        }
+        else if (exchangeElsewhere)
         {
             ImGuiText.Wrapped(
                 WarnText,
-                $"The exchange has no listings in {_inspector.League} - that answer came from "
-                + $"{probe.League}. Prices here keep coming from poe.ninja, which does cover it.");
+                $"Neither the exchange nor the search has anything in {_inspector.League} - the "
+                + $"exchange rate above came from {probe.League}. Prices here keep coming from "
+                + "poe.ninja, which does cover it.");
         }
 
         // ALL OF THEM, not a sample. Hard-coding two ids that the site spells differently is

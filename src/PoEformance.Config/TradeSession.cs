@@ -453,6 +453,8 @@ public sealed class TradeSession : IDisposable
                     Count(root, "got"),
                     Measure(root, "rate"),
                     Text(root, "league"),
+                    Count(root, "listed"),
+                    Measure(root, "listedRate"),
                     Text(root, "raw"),
                     error));
 

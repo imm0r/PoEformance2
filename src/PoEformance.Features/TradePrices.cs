@@ -41,18 +41,27 @@ public readonly record struct TradeAnswer(
 /// side, have. Pricing fifty currencies means fifty requests, so it is not a thing to do on a
 /// timer at 45 requests per half hour.
 ///
-/// WHAT IT FOUND, and the reason this stayed a diagnostic rather than becoming a price source:
-/// THE EXCHANGE DOES NOT COVER STANDARD. Asked for Divine against Exalted it answered
-/// 200 with an empty result in Standard and 200 with listings in the challenge league, from the
-/// same ids in the same minute. So for a Standard character there is nothing here to price with,
-/// no matter how the query is shaped, and poe.ninja stays the only source that covers them.
+/// WHAT IT FOUND, stated as what was seen rather than what it seemed to mean: asked for Divine
+/// against Exalted, THE EXCHANGE answered 200 with an empty result in Standard and 200 with
+/// listings in the challenge league, from the same ids in the same minute.
 ///
-/// THE EMPTY ANSWER COST A ROUND, because it looks exactly like a wrong query: an earlier version
-/// hard-coded the ids 'divine' and 'exalted' and the empty result was read as proof they were
-/// wrong. They were not - the site spells them exactly that way, as its own table confirms. The
-/// ids are looked up now regardless, since being right by luck is not being right, but the
-/// lesson worth keeping is that an empty market and a bad query are the same 200 from here, and
-/// only a second league tells them apart.
+/// THAT IS NOT THE SAME AS "STANDARD HAS NO MARKET", and reading it that way was the second
+/// wrong turn in a row. Exiled Exchange shows Standard prices as offers a person can click and
+/// whisper, which only a live trade API can produce - so something serves Standard. The
+/// reference says what: apiToSatisfySearch in its common.ts picks between TWO apis per item,
+/// "bulk" (this exchange) and "trade" (/api/trade2/search), and both return whisperable
+/// listings. An empty exchange therefore means the exchange is empty, and nothing more.
+///
+/// SO THE PROBE ASKS BOTH, and reports them apart: <see cref="Rate"/> from the exchange with the
+/// <see cref="League"/> that answered it, <see cref="ListedRate"/> from the search in the league
+/// actually being played.
+///
+/// TWO ROUNDS WENT INTO GUESSING WHY THE EMPTY ANSWER CAME BACK. First the ids were blamed -
+/// an earlier version hard-coded 'divine' and 'exalted' and the empty result was read as proof
+/// they were wrong. They were not; the site spells them exactly that way, as its own table
+/// confirms. Then the league was blamed. The lesson under both: from here an empty market, a bad
+/// query and the wrong endpoint are all the same 200, and no amount of thinking separates them -
+/// only asking something else does.
 ///
 /// SO IT CARRIES THE RAW ANSWER rather than a parsed one. Parsing a shape nobody has seen yet
 /// would be inventing the shape; the point of a probe is to find out what it is.
@@ -70,6 +79,15 @@ public readonly record struct TradeAnswer(
 /// probe reports the league that spoke - and a rate from one league says nothing about prices in
 /// another. Comparing them anyway is how a perfectly good number becomes a wrong one.
 /// </param>
+/// <param name="Listed">
+/// How many Divine Orbs the ordinary trade SEARCH found listed, in the league being played.
+/// This is the other api, and the one Exiled Exchange's clickable Standard offers must come
+/// from when the exchange has nothing.
+/// </param>
+/// <param name="ListedRate">
+/// Exalted per Divine off the cheapest of those, per orb rather than per listing. 0 when the
+/// search found nothing readable.
+/// </param>
 /// <param name="Raw">One listing as the site sent it, so its shape can be read.</param>
 /// <param name="Error">What went wrong, in words.</param>
 public sealed record TradeProbe(
@@ -81,12 +99,14 @@ public sealed record TradeProbe(
     int Got,
     double Rate,
     string League,
+    int Listed,
+    double ListedRate,
     string Raw,
     string Error)
 {
     /// <summary>A probe that could not be run at all.</summary>
     public static TradeProbe Not(string why)
-        => new(false, 0, string.Empty, [], 0, 0, 0, string.Empty, string.Empty, why);
+        => new(false, 0, string.Empty, [], 0, 0, 0, string.Empty, 0, 0, string.Empty, why);
 }
 
 /// <summary>
