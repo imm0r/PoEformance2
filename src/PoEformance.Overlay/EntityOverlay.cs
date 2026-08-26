@@ -1096,7 +1096,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _wealth = tracker;
         _wealthPanel.Chrome = Chrome;
 
-        var window = new WealthWindow(tracker, _wealthPanel, () => prices.Book)
+        var window = new WealthWindow(
+            tracker,
+            _wealthPanel,
+            () => prices.Book,
+            () => inspector.League,
+            () => inspector.Purse)
         {
             Watching = inspector.WatchPurse,
             WatchChanged = on =>
