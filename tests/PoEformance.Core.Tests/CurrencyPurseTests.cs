@@ -42,8 +42,12 @@ public class CurrencyPurseTests
         return book;
     }
 
+    // The base NAME is derived from the path rather than a constant, because the breakdown
+    // groups by art and labels by name - a fixture where every item is called the same thing
+    // hides a grouping bug instead of catching one.
     private static InspectedItem Item(string path, string art, int stack = 1)
-        => new(1, path, "base", string.Empty, string.Empty, -1, null, stack, 0, art, [], []);
+        => new(1, path, path[(path.LastIndexOf('/') + 1)..], string.Empty, string.Empty,
+            -1, null, stack, 0, art, [], []);
 
     private static StashPage Page(InventoryKind kind, params InspectedItem[] items)
         => new(
@@ -191,6 +195,96 @@ public class CurrencyPurseTests
         // Every one of those transitions was written into a record that never resets, as a gain
         // or loss of about 2,700 Divine that never happened.
         Assert.Equal(replaces, StashInspector.ReplacesTheStash(canSee, sawTab));
+    }
+
+    [Fact]
+    public void TheBreakdownSaysWhichStackProducedTheTotal()
+    {
+        // A single total is unfalsifiable: it is believed or distrusted, and neither can be
+        // acted on. These lines are what turn "that looks far too high" into a specific claim
+        // about a specific stack - which is the only form of it anybody can check.
+        PriceBook book = Real();
+
+        StashPage tab = Page(
+            InventoryKind.Stash,
+            Item("Metadata/Items/Currency/CurrencyModValues", "Art/2DItems/Currency/CurrencyModValues.dds", 3),
+            Item("Metadata/Items/Currency/CurrencyAddModToRare", "Art/2DItems/Currency/CurrencyAddModToRare.dds", 20));
+
+        IReadOnlyList<CurrencyPurse.PurseLine> lines = book.Breakdown([tab]);
+
+        Assert.Equal(2, lines.Count);
+
+        // Biggest contributor first: 3 Divine at 581 beats 20 Exalted at 1.
+        Assert.Equal(3, lines[0].Stack);
+        Assert.Equal(581, lines[0].Unit!.Value, 0);
+        Assert.Equal(1743, lines[0].Exalted, 0);
+
+        Assert.Equal(20, lines[1].Stack);
+        Assert.Equal(1, lines[1].Unit!.Value, 2);
+    }
+
+    [Fact]
+    public void AndAddsUpToExactlyWhatTheTotalSays()
+    {
+        // The breakdown has to be the SAME arithmetic as the total, not a second opinion about
+        // it. A table that does not sum to the figure above it is worse than no table.
+        PriceBook book = Real();
+
+        StashPage backpack = Page(
+            InventoryKind.Backpack,
+            Item("Metadata/Items/Currency/CurrencyAddModToRare", "Art/2DItems/Currency/CurrencyAddModToRare.dds", 7));
+        StashPage tab = Page(
+            InventoryKind.Stash,
+            Item("Metadata/Items/Currency/CurrencyModValues", "Art/2DItems/Currency/CurrencyModValues.dds", 2),
+            Item("Metadata/Items/Currency/CurrencyWeaponQuality", "Art/2DItems/Currency/CurrencyWeaponQuality.dds", 40));
+
+        Valued purse = book.Purse([backpack, tab]);
+        IReadOnlyList<CurrencyPurse.PurseLine> lines = book.Breakdown([backpack, tab]);
+
+        Assert.Equal(purse.Exalted, lines.Sum(line => line.Exalted), 3);
+    }
+
+    [Fact]
+    public void TheSameCurrencyInTwoPlacesIsOneLine()
+    {
+        // So the count can be compared against what the game's own tab shows, which is the check
+        // somebody actually performs.
+        PriceBook book = Real();
+
+        StashPage backpack = Page(
+            InventoryKind.Backpack,
+            Item("Metadata/Items/Currency/CurrencyAddModToRare", "Art/2DItems/Currency/CurrencyAddModToRare.dds", 7));
+        StashPage tab = Page(
+            InventoryKind.Stash,
+            Item("Metadata/Items/Currency/CurrencyAddModToRare", "Art/2DItems/Currency/CurrencyAddModToRare.dds", 13));
+
+        IReadOnlyList<CurrencyPurse.PurseLine> lines = book.Breakdown([backpack, tab]);
+
+        Assert.Single(lines);
+        Assert.Equal(20, lines[0].Stack);
+        Assert.Equal(20, lines[0].Exalted, 0);
+    }
+
+    [Fact]
+    public void WhatCouldNotBePricedIsListedRatherThanHidden()
+    {
+        // The other half of "is this right": a purse whose biggest holding is unpriced is
+        // understated, and that is as wrong as an overstatement. It goes last and contributes
+        // nothing, but it is on the page.
+        PriceBook book = Real();
+
+        StashPage tab = Page(
+            InventoryKind.Stash,
+            Item("Metadata/Items/Currency/CurrencyWeaponQuality", "Art/2DItems/Currency/CurrencyWeaponQuality.dds", 40),
+            Item("Metadata/Items/Currency/CurrencyAddModToRare", "Art/2DItems/Currency/CurrencyAddModToRare.dds", 5));
+
+        IReadOnlyList<CurrencyPurse.PurseLine> lines = book.Breakdown([tab]);
+
+        Assert.Equal(2, lines.Count);
+        Assert.NotNull(lines[0].Unit);
+        Assert.Null(lines[^1].Unit);
+        Assert.Equal(40, lines[^1].Stack);
+        Assert.Equal(0, lines[^1].Exalted);
     }
 
     [Fact]

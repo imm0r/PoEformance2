@@ -45,9 +45,12 @@ public sealed class WealthWindow
     private readonly WealthTracker _tracker;
     private readonly WealthPanel _panel;
     private readonly Func<PriceBook> _book;
+    private readonly Func<string> _league;
+    private readonly Func<PurseView> _purse;
 
     private int _window = 1;
     private bool _confirmingReset;
+    private bool _breakdown;
 
     /// <param name="tracker">The record and the live count.</param>
     /// <param name="panel">The corner panel, so the page can switch it on and share its window.</param>
@@ -56,14 +59,29 @@ public sealed class WealthWindow
     /// wholesale on a refresh, and a page holding the old one would price today at last hour's
     /// rate for as long as it stayed open.
     /// </param>
-    public WealthWindow(WealthTracker tracker, WealthPanel panel, Func<PriceBook> book)
+    /// <param name="league">
+    /// Which league the prices are for. Shown rather than assumed: the whole total rests on it,
+    /// and until it was on screen there was no way for a reader to tell a plausible-looking
+    /// figure priced against the wrong economy from a right one.
+    /// </param>
+    /// <param name="purse">The currency itself, for breaking the total down into what made it.</param>
+    public WealthWindow(
+        WealthTracker tracker,
+        WealthPanel panel,
+        Func<PriceBook> book,
+        Func<string> league,
+        Func<PurseView> purse)
     {
         ArgumentNullException.ThrowIfNull(tracker);
         ArgumentNullException.ThrowIfNull(panel);
         ArgumentNullException.ThrowIfNull(book);
+        ArgumentNullException.ThrowIfNull(league);
+        ArgumentNullException.ThrowIfNull(purse);
         _tracker = tracker;
         _panel = panel;
         _book = book;
+        _league = league;
+        _purse = purse;
     }
 
     /// <summary>Whether the purse is being counted at all. Wired to the inspector's own switch.</summary>
@@ -137,6 +155,8 @@ public sealed class WealthWindow
         ImGui.Separator();
         DrawTotals(now);
         ImGui.Separator();
+        DrawBreakdown();
+        ImGui.Separator();
         DrawGraph(now);
         ImGui.Separator();
         DrawRecord(now);
@@ -176,18 +196,113 @@ public sealed class WealthWindow
     private void DrawPrices()
     {
         PriceBook book = _book();
-        if (book.Ready)
+        if (!book.Ready)
         {
-            ImGuiText.Mono(
-                OverlayTheme.Quiet,
-                $"{book.Count} prices   1 div = {StashWorth.Money(book.Rate)} ex");
+            ImGuiText.Wrapped(
+                Warn,
+                "No prices yet. Nothing can be valued and nothing is being written to the record - "
+                + "turn prices on in the Stash tab, which is where they are fetched from.");
             return;
         }
 
-        ImGuiText.Wrapped(
-            Warn,
-            "No prices yet. Nothing can be valued and nothing is being written to the record - "
-            + "turn prices on in the Stash tab, which is where they are fetched from.");
+        // THE LEAGUE IS THE FIRST THING SHOWN, because every figure below is only as right as it
+        // is. It comes from the game rather than from a setting - so it cannot go stale at a
+        // league start - but that also means nobody ever typed it, and until it was on screen a
+        // total priced against the wrong economy looked exactly like a total priced against the
+        // right one.
+        string league = _league();
+        ImGuiText.Mono(
+            OverlayTheme.Quiet,
+            $"{(league.Length > 0 ? league : "league not read yet")}"
+            + $"   {book.Count} prices   1 div = {StashWorth.Money(book.Rate)} ex");
+
+        ImGuiText.Hint(
+            OverlayTheme.Quiet,
+            "Prices are poe.ninja's, for that league, and everything is converted into Exalted "
+            + "using that rate. If the figures look wrong, the breakdown below says which stack "
+            + "is producing them.");
+    }
+
+    /// <summary>
+    /// What the total is made of, so a wrong one can be pointed at.
+    /// </summary>
+    /// <remarks>
+    /// A SINGLE TOTAL IS UNFALSIFIABLE - it is believed or distrusted, and neither can be acted
+    /// on. Broken into the stacks that produced it, the reader can compare a count against the
+    /// tab in front of them and a unit price against what that currency actually trades at, and
+    /// find the wrong one in a second. Folded away, because it is the thing you open when
+    /// something looks off rather than something to read every time.
+    /// </remarks>
+    private void DrawBreakdown()
+    {
+        _breakdown = OverlayFonts.SectionHeader($"what the total is made of###wealth-breakdown");
+        if (!_breakdown)
+        {
+            return;
+        }
+
+        IReadOnlyList<CurrencyPurse.PurseLine> lines = _book().Breakdown(_purse().Pages);
+        if (lines.Count == 0)
+        {
+            ImGuiText.Wrapped(OverlayTheme.Quiet, "No currency counted yet.");
+            return;
+        }
+
+        if (!ImGui.BeginTable(
+                "wealth-breakdown",
+                4,
+                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY,
+                new Vector2(0f, ImGui.GetFontSize() * 14f)))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TableSetupScrollFreeze(0, 1);
+            ImGui.TableSetupColumn("currency", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("held", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFontSize() * 4f);
+            ImGui.TableSetupColumn("each", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFontSize() * 5f);
+            ImGui.TableSetupColumn("worth", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFontSize() * 6f);
+            ImGui.TableHeadersRow();
+
+            foreach (CurrencyPurse.PurseLine line in lines)
+            {
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(ImGuiText.Escape(line.Called));
+
+                ImGui.TableNextColumn();
+                ImGuiText.Mono(line.Stack.ToString(System.Globalization.CultureInfo.CurrentCulture));
+
+                // The unit price is the one to check against what the currency actually trades
+                // at - a total that is out by a factor is usually one of these being out by it.
+                ImGui.TableNextColumn();
+                if (line.Unit is { } unit)
+                {
+                    ImGuiText.Mono($"{StashWorth.Money(unit)} ex");
+                }
+                else
+                {
+                    ImGui.TextColored(OverlayTheme.Quiet, "no price");
+                }
+
+                ImGui.TableNextColumn();
+                if (line.Unit is not null)
+                {
+                    ImGuiText.Mono($"{StashWorth.Money(line.Exalted)} ex");
+                }
+                else
+                {
+                    ImGui.TextColored(OverlayTheme.Quiet, "-");
+                }
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
     }
 
     private void DrawTotals(long now)

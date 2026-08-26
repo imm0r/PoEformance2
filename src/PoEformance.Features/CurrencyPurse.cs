@@ -64,6 +64,81 @@ public static class CurrencyPurse
         return all;
     }
 
+    /// <summary>One kind of currency in the purse, and what it is contributing.</summary>
+    /// <param name="Called">What the game calls it, or its metadata path where no name resolved.</param>
+    /// <param name="Stack">How many, across every page it appears on.</param>
+    /// <param name="Unit">What one is worth in Exalted, or null when the book has no price.</param>
+    /// <param name="Exalted">What the whole holding comes to. 0 when there is no price.</param>
+    public readonly record struct PurseLine(string Called, int Stack, double? Unit, double Exalted);
+
+    /// <summary>
+    /// What the total is MADE OF, biggest contributor first.
+    /// </summary>
+    /// <remarks>
+    /// THE ANSWER TO "THAT NUMBER LOOKS WRONG", and there is no other way to give it. A single
+    /// total is unfalsifiable: it is either believed or distrusted, and neither reaction can be
+    /// acted on. Broken into the stacks that produced it, a wrong total stops being a mystery -
+    /// one line is holding an implausible count, or carrying a price that is not what that
+    /// currency trades at, and the reader can see WHICH in a second.
+    ///
+    /// GROUPED BY THE KEY IT IS PRICED ON - the art path - so the same currency in the backpack
+    /// and in a tab is one line rather than two, and two DIFFERENT currencies can never become
+    /// one. Grouping by the displayed name looks equivalent and is not: a name is what a table
+    /// resolved, so two things the table has not heard of, or has heard of under one word, would
+    /// merge into a single line carrying one of their prices and both of their counts - which is
+    /// exactly the kind of wrong figure this list exists to expose.
+    ///
+    /// One line per art also makes the count comparable to what the game's own tab shows, which
+    /// is the check somebody actually performs.
+    ///
+    /// UNPRICED LINES ARE IN IT, at the bottom with a null unit. They contribute nothing to the
+    /// total, and leaving them out would hide the other half of "is this right" - a purse whose
+    /// biggest holding is unpriced is understated, and that is just as wrong as an overstatement.
+    /// </remarks>
+    public static IReadOnlyList<PurseLine> Breakdown(
+        this PriceBook book, IEnumerable<StashPage>? pages, TradePrices? trade = null)
+    {
+        ArgumentNullException.ThrowIfNull(book);
+
+        if (pages is null)
+        {
+            return [];
+        }
+
+        var found = new Dictionary<string, PurseLine>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (StashPage page in pages)
+        {
+            foreach (StashSlot slot in CurrencyIn(page))
+            {
+                InspectedItem item = slot.Item;
+
+                // The art is the pricing key; the path is the fallback for an item whose picture
+                // did not read, which must still be its OWN line rather than joining another's.
+                string key = item.Art.Length > 0 ? item.Art : item.Path;
+                int stack = Math.Max(1, item.Stack);
+                double? unit = book.Unit(item, trade);
+
+                // A struct that was not there comes back as default, whose Called is NULL rather
+                // than empty - the one place a record struct differs from the class it reads like.
+                found.TryGetValue(key, out PurseLine had);
+
+                found[key] = new PurseLine(
+                    string.IsNullOrEmpty(had.Called) ? item.Called : had.Called,
+                    had.Stack + stack,
+                    unit ?? had.Unit,
+                    had.Exalted + (unit is { } each ? each * stack : 0));
+            }
+        }
+
+        // Priced first and biggest first within that, so what is driving the total is at the top
+        // and what is missing from it is a short list at the bottom.
+        return [.. found.Values
+            .OrderByDescending(line => line.Unit is not null)
+            .ThenByDescending(line => line.Exalted)
+            .ThenBy(line => line.Called, StringComparer.Ordinal)];
+    }
+
     /// <summary>How many separate stacks of currency are being carried.</summary>
     /// <remarks>
     /// Not the same as <see cref="Valued.Items"/>, which only counts what got as far as being
