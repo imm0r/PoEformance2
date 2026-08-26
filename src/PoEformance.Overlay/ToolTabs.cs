@@ -328,6 +328,13 @@ public sealed class ToolTabs
     /// would set every page in it; pushing it around the labels alone would leave the bar
     /// sized for the small face with the labels overflowing. Selecting inside the bar and
     /// drawing outside it is the arrangement where both are the size they should be.
+    ///
+    /// The same arrangement is what lets the bar have its own INK. ImGui has no colour of its
+    /// own for a tab's label: TabItemEx pushes none, and the label reaches the draw list through
+    /// TabItemLabelAndCloseButton, RenderTextEllipsis and RenderTextClippedEx, which asks for
+    /// ImGuiCol_Text at the last step (checked in ImGui 1.91.6, the version bundled here). So
+    /// the tint has to be pushed around the bar and taken off again before the page under it is
+    /// drawn, which is precisely the span this method already brackets for the font.
     /// </remarks>
     private string? DrawPages()
     {
@@ -339,6 +346,7 @@ public sealed class ToolTabs
         Page? front = null;
 
         OverlayFonts.PushHeading();
+        ImGui.PushStyleColor(ImGuiCol.Text, OverlayTheme.GiltInk);
         try
         {
             // Scrolling rather than squeezing when the bar runs out of room, with the popup
@@ -389,6 +397,7 @@ public sealed class ToolTabs
         }
         finally
         {
+            ImGui.PopStyleColor();
             OverlayFonts.PopHeading();
         }
 

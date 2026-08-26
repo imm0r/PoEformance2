@@ -98,9 +98,9 @@ public sealed class DamageWindow
     /// <summary>Draws the tab's content.</summary>
     public void DrawTab()
     {
-        ImGui.TextColored(DpsText, $"{Number(_meter.Dps)} dps");
+        ImGuiText.Mono(DpsText, $"{Number(_meter.Dps)} dps");
         ImGui.SameLine();
-        ImGui.TextColored(DimText, $"   this area {Number(_meter.Total)} total");
+        ImGuiText.Mono(DimText, $"   this area {Number(_meter.Total)} total");
 
         DrawBurst();
 
@@ -110,24 +110,29 @@ public sealed class DamageWindow
         // KNOWN. A damage number that does not say how much of itself is inferred is a
         // number nobody can check, and on a build that one-shots packs the inferred part is
         // the majority - so the split is the difference between a figure and a claim.
-        ImGui.TextColored(DimText, $"watched:   {Number(_meter.Observed)}  off {_meter.Hurt} monsters' health");
+        //
+        // THE FOUR LINES ARE ALIGNED BY SPACES, which is why they are set in the mono face and
+        // not merely because they hold figures. Their labels are different lengths, so in a
+        // proportional face the padding after them lands the values in four different places
+        // and the split stops reading as a split at all. None of them needs escaping any more:
+        // Mono is TextUnformatted rather than printf, and one of these carries a percentage.
+        ImGuiText.Mono(DimText, $"watched:   {Number(_meter.Observed)}  off {_meter.Hurt} monsters' health");
 
         // Nearly certain: something was hurting it, and then it was gone.
-        ImGui.TextColored(
+        ImGuiText.Mono(
             JudgedText,
             $"credited:  {Number(_meter.CreditedHurt)}  from ones we were already hurting");
 
         // The half that rests entirely on the assumption - and the half a monster that
         // merely walked off would land in.
-        ImGui.TextColored(
+        ImGuiText.Mono(
             SoftText,
-            ImGuiText.Escape(
-                $"  untouched: {Number(_meter.CreditedUntouched)}  vanished without a scratch seen"
-                + $"   ({Share(_meter.CreditedUntouched, _meter.Total)} of the total)"));
+            $"  untouched: {Number(_meter.CreditedUntouched)}  vanished without a scratch seen"
+            + $"   ({Share(_meter.CreditedUntouched, _meter.Total)} of the total)");
 
         if (_meter.WithheldCount > 0)
         {
-            ImGui.TextColored(
+            ImGuiText.Mono(
                 DimText,
                 $"  refused:   {Number(_meter.Withheld)}  from {_meter.WithheldCount} that vanished"
                 + " too far away to have been killed");
@@ -301,7 +306,7 @@ public sealed class DamageWindow
                 // measurement rather than as the absence of one.
                 if (kill.Watched)
                 {
-                    ImGui.Text($"{kill.Seconds:F1}s");
+                    ImGuiText.Mono($"{kill.Seconds:F1}s");
                 }
                 else
                 {
@@ -309,10 +314,17 @@ public sealed class DamageWindow
                 }
 
                 ImGui.TableNextColumn();
-                ImGui.Text(Number(kill.Damage));
+                ImGuiText.Mono(Number(kill.Damage));
 
                 ImGui.TableNextColumn();
-                ImGui.TextColored(kill.Watched ? DimText : SoftText, kill.Watched ? Number(kill.Dps) : "-");
+                if (kill.Watched)
+                {
+                    ImGuiText.Mono(DimText, Number(kill.Dps));
+                }
+                else
+                {
+                    ImGui.TextColored(SoftText, "-");
+                }
             }
         }
         finally
@@ -353,7 +365,7 @@ public sealed class DamageWindow
             return;
         }
 
-        ImGui.TextColored(
+        ImGuiText.Mono(
             BurstText,
             $"best 1s {Number(second)}"
             + $"   5s {Number(_meter.History.Best(5, scope))}"
@@ -386,7 +398,7 @@ public sealed class DamageWindow
 
         if (single.Seconds > 0)
         {
-            ImGui.TextColored(
+            ImGuiText.Mono(
                 SingleText, $"single target {Number(single.Dps)}");
             ImGui.SameLine();
             ImGui.TextColored(DimText, $"over {single.Seconds:F0}s alone with one   ");
@@ -395,7 +407,7 @@ public sealed class DamageWindow
 
         if (pack.Seconds > 0)
         {
-            ImGui.TextColored(PackText, $"in a pack {Number(pack.Dps)}");
+            ImGuiText.Mono(PackText, $"in a pack {Number(pack.Dps)}");
             ImGui.SameLine();
             ImGui.TextColored(DimText, $"over {pack.Seconds:F0}s with {DamageHistory.Crowd}+");
             ImGui.SameLine();
@@ -664,14 +676,16 @@ public sealed class DamageWindow
 
         DamageSample sample = samples[first + column];
         ImGui.BeginTooltip();
-        ImGui.TextColored(DpsText, $"{Number(sample.Total)} dps");
-        ImGui.TextColored(WatchedBar, $"watched    {Number(sample.Watched)}");
-        ImGui.TextColored(CreditedBar, $"credited   {Number(sample.Credited)}");
-        ImGui.TextColored(UntouchedBar, $"untouched  {Number(sample.Untouched)}");
+
+        // Padded into a column, like the split above the graph and for the same reason.
+        ImGuiText.Mono(DpsText, $"{Number(sample.Total)} dps");
+        ImGuiText.Mono(WatchedBar, $"watched    {Number(sample.Watched)}");
+        ImGuiText.Mono(CreditedBar, $"credited   {Number(sample.Credited)}");
+        ImGuiText.Mono(UntouchedBar, $"untouched  {Number(sample.Untouched)}");
 
         if (sample.Taken > 0f)
         {
-            ImGui.TextColored(TakenLine, $"taken      {Number(sample.Taken)}");
+            ImGuiText.Mono(TakenLine, $"taken      {Number(sample.Taken)}");
         }
 
         // WHAT IT WAS AGAINST, which is what makes the number above mean anything: five
@@ -845,11 +859,13 @@ public sealed class DamageWindow
                 // would be read as a format specifier.
                 ImGui.TextColored(Tint(target.Rarity), ImGuiText.Escape(target.Name));
 
+                // A single "%" rather than the doubled one this needed as a format string:
+                // Mono is TextUnformatted, so the sign is a sign.
                 ImGui.TableNextColumn();
-                ImGui.TextColored(DimText, target.Percent >= 0 ? $"{target.Percent}%%" : "-");
+                ImGuiText.Mono(DimText, target.Percent >= 0 ? $"{target.Percent}%" : "-");
 
                 ImGui.TableNextColumn();
-                ImGui.TextColored(DpsText, Number(target.Dps));
+                ImGuiText.Mono(DpsText, Number(target.Dps));
             }
         }
         finally

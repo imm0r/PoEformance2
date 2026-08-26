@@ -233,11 +233,25 @@ public sealed class DissectorWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 9.5f);
-        if (ImGui.InputText("address", ref _typedAddress, 20, ImGuiInputTextFlags.EnterReturnsTrue)
-            && TryHex(_typedAddress, out ulong typed))
+
+        // The box a sixteen-digit address is READ OUT OF and TYPED BACK INTO, which is the one
+        // place where telling 0 from O and 1 from l is not a nicety. The label goes with it -
+        // ImGui draws a control's label in whatever font is in force - and that is the right
+        // answer anyway: the field and its name read as one technical control rather than as a
+        // word in the page's face with a terminal stuck to it.
+        OverlayFonts.PushMono();
+        try
         {
-            GoTo(typed);
+            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 9.5f);
+            if (ImGui.InputText("address", ref _typedAddress, 20, ImGuiInputTextFlags.EnterReturnsTrue)
+                && TryHex(_typedAddress, out ulong typed))
+            {
+                GoTo(typed);
+            }
+        }
+        finally
+        {
+            OverlayFonts.PopMono();
         }
 
         ImGui.SameLine();
@@ -328,12 +342,21 @@ public sealed class DissectorWindow
             return;
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 9.5f);
-        if (ImGui.InputText("compare with", ref _typedCompare, 20, ImGuiInputTextFlags.EnterReturnsTrue)
-            && TryHex(_typedCompare, out ulong beside)
-            && Compare(beside))
+        // Mono for the same reason as the address box above: what goes in it is hex.
+        OverlayFonts.PushMono();
+        try
         {
-            _typedCompare = string.Empty;
+            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 9.5f);
+            if (ImGui.InputText("compare with", ref _typedCompare, 20, ImGuiInputTextFlags.EnterReturnsTrue)
+                && TryHex(_typedCompare, out ulong beside)
+                && Compare(beside))
+            {
+                _typedCompare = string.Empty;
+            }
+        }
+        finally
+        {
+            OverlayFonts.PopMono();
         }
 
         if (ImGui.IsItemHovered())
@@ -377,7 +400,7 @@ public sealed class DissectorWindow
             }
 
             ImGui.SameLine();
-            ImGui.TextColored(i == 0 ? NameText : DimText, $"{i + 1}: 0x{place.Address:X}");
+            ImGuiText.Mono(i == 0 ? NameText : DimText, $"{i + 1}: 0x{place.Address:X}");
 
             if (place.Label.Length > 0)
             {
@@ -461,13 +484,15 @@ public sealed class DissectorWindow
 
             if (!any)
             {
-                ImGui.TextColored(DimText, $"+0x{view.PeekOffset:X} leads to");
+                ImGuiText.Mono(DimText, $"+0x{view.PeekOffset:X}");
+                ImGui.SameLine();
+                ImGui.TextColored(DimText, "leads to");
                 any = true;
             }
 
             if (_places.Count > 1)
             {
-                ImGui.TextColored(DimText, $"  {i + 1}:");
+                ImGuiText.Mono(DimText, $"  {i + 1}:");
             }
 
             ImGui.SameLine();
@@ -544,7 +569,7 @@ public sealed class DissectorWindow
             Highlight(ImGuiTableBgTarget.RowBg0, 0, slot.Offset, moved, now);
 
             ImGui.TableNextColumn();
-            ImGui.TextColored(moved ? BaselineText : DimText, $"+0x{slot.Offset:X3}");
+            ImGuiText.Mono(moved ? BaselineText : DimText, $"+0x{slot.Offset:X3}");
 
             ImGui.TableNextColumn();
             if (view.FieldNames.TryGetValue(slot.Offset, out string? name))
@@ -555,14 +580,21 @@ public sealed class DissectorWindow
             ImGui.TableNextColumn();
             ImGui.TextColored(ColourOf(slot.Guess), slot.Guess.ToString().ToLowerInvariant());
 
+            // FOUR READINGS OF THE SAME EIGHT BYTES, side by side down a long table - which is
+            // the one place in this tool where a proportional face is not a matter of taste. A
+            // column of hex only reads as a column when the digits are the same width: the eye
+            // finds a differing nibble by its POSITION across the rows, and that only works if
+            // position means the same thing on every line.
             ImGui.TableNextColumn();
-            ImGui.Text($"{slot.Raw:X16}");
+            ImGuiText.Mono($"{slot.Raw:X16}");
 
             ImGui.TableNextColumn();
-            ImGui.Text(_strideIndex == 0 ? $"{slot.Low}  {slot.High}" : slot.Low.ToString(CultureInfo.InvariantCulture));
+            ImGuiText.Mono(_strideIndex == 0
+                ? $"{slot.Low}  {slot.High}"
+                : slot.Low.ToString(CultureInfo.InvariantCulture));
 
             ImGui.TableNextColumn();
-            ImGui.TextColored(
+            ImGuiText.Mono(
                 slot.Guess == SlotGuess.Float ? FloatText : DimText,
                 _strideIndex == 0
                     ? $"{Short(slot.FloatLow)}  {Short(slot.FloatHigh)}"
@@ -581,7 +613,7 @@ public sealed class DissectorWindow
             {
                 DrawWalk(slot.Offset, view);
                 ImGui.SameLine();
-                ImGui.TextColored(PointerText, $"0x{slot.Raw:X}");
+                ImGuiText.Mono(PointerText, $"0x{slot.Raw:X}");
             }
         }
     }
@@ -640,7 +672,7 @@ public sealed class DissectorWindow
             ImGui.TableNextRow();
 
             ImGui.TableNextColumn();
-            ImGui.TextColored(differs ? DiffersText : DimText, $"+0x{offset:X3}");
+            ImGuiText.Mono(differs ? DiffersText : DimText, $"+0x{offset:X3}");
 
             ImGui.TableNextColumn();
             if (view.FieldNames.TryGetValue(offset, out string? name))
@@ -684,7 +716,7 @@ public sealed class DissectorWindow
                     ImGui.TextColored(DimText, "=");
                     if (ImGui.IsItemHovered())
                     {
-                        ImGui.SetTooltip($"same as place 1\n\n{Everything(slot)}");
+                        ImGuiText.MonoTooltip($"same as place 1\n\n{Everything(slot)}");
                     }
 
                     continue;
@@ -696,10 +728,10 @@ public sealed class DissectorWindow
                     continue;
                 }
 
-                ImGui.TextColored(ColourOf(slot.Guess), Reading(slot));
+                ImGuiText.Mono(ColourOf(slot.Guess), Reading(slot));
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(Everything(slot));
+                    ImGuiText.MonoTooltip(Everything(slot));
                 }
             }
         }

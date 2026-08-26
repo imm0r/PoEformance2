@@ -1232,6 +1232,29 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     ];
 
     /// <summary>
+    /// Faces to try for figures, best first.
+    /// </summary>
+    /// <remarks>
+    /// EVERY ONE OF THESE IS A TERMINAL FACE, and that is the requirement rather than a style:
+    /// the strings drawn in it are addresses somebody reads off the screen and types back into
+    /// the dissector, so O and 0, and l and 1, have to be different shapes. All four also carry
+    /// the full ASCII range at a small size, which the display-oriented monospaces on a Windows
+    /// machine do not reliably do.
+    ///
+    /// Ordered by how well they sit beside the serif body text rather than by age: Consolas has
+    /// the largest x-height of the four, so at the same pixel size it does not read as a size
+    /// smaller than the line it sits in. The last two are there because they are the ones that
+    /// cannot be missing - Lucida Console since Windows 2000, Courier New since before that.
+    /// </remarks>
+    private static readonly string[] Monos =
+    [
+        "consola.ttf",       // Consolas - shipped with every Windows since Vista
+        "CascadiaMono.ttf",  // Cascadia Mono - Windows 11, and anywhere Windows Terminal is
+        "lucon.ttf",         // Lucida Console
+        "cour.ttf",          // Courier New - always there, and the last resort
+    ];
+
+    /// <summary>
     /// Puts the interface in a face that suits what it is drawn over, if one can be found.
     /// </summary>
     /// <remarks>
@@ -1260,13 +1283,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
+        // Chosen once, outside the loop: which monospace is present has nothing to do with
+        // which serif turns out to load, and asking the file system again per attempt would
+        // only make the answer able to differ between them.
+        string? mono = FirstPresent(fonts, Monos);
+
         foreach (string face in Serifs)
         {
             string file = Path.Combine(fonts, face);
 
             try
             {
-                if (File.Exists(file) && WearBothSizes(file, size))
+                if (File.Exists(file) && WearTheseFaces(file, mono, size))
                 {
                     return;
                 }
@@ -1277,22 +1305,63 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 // Try the next one. A font is decoration, and the built-in face is waiting.
             }
         }
+
+        // Nothing loaded. A delegate that ran and then had its atlas rejected will have left
+        // its pointers behind, and those now name fonts that are not in the atlas being drawn -
+        // so the state is said again rather than assumed to be still what it was set to above.
+        OverlayFonts.None();
+    }
+
+    /// <summary>The first of these font files that the machine actually has, if any.</summary>
+    private static string? FirstPresent(string folder, string[] faces)
+    {
+        foreach (string face in faces)
+        {
+            string file = Path.Combine(folder, face);
+
+            try
+            {
+                if (File.Exists(file))
+                {
+                    return file;
+                }
+            }
+            catch (Exception exception) when (
+                exception is IOException or UnauthorizedAccessException or ArgumentException)
+            {
+                // Unreadable counts as absent, same as everywhere else in here.
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Loads one face at two sizes: the body text, and the headings above it.
+    /// Loads the body face at two sizes and, if the machine has one, a face for figures.
     /// </summary>
     /// <remarks>
-    /// BOTH IN ONE DELEGATE, because the library clears the whole atlas before calling it and
-    /// rebuilds the texture after - so two separate requests would be two rebuilds, of which
-    /// the second would throw the first's font away. The delegate is the only place both fonts
+    /// ALL OF THEM IN ONE DELEGATE, because the library clears the whole atlas before calling it
+    /// and rebuilds the texture after - so separate requests would be separate rebuilds, of
+    /// which each would throw the last one's fonts away. The delegate is the only place they
     /// can exist at once, and the only place their pointers are known.
     ///
+    /// THE MONOSPACE IS LOADED AT THE BODY SIZE, deliberately the same number rather than one
+    /// tuned to match its x-height. A figure is drawn INSIDE a row of body text - a table cell,
+    /// a field's value - and ImGui gives a row the height of the tallest font used in it, so a
+    /// monospace even a pixel larger would make every table with a number in it taller than the
+    /// same table without one.
+    ///
     /// The glyph range is the default English one, which is what the single-font call this
-    /// replaced asked for. Reusing the one config across both AddFont calls is ImGui's own
+    /// replaced asked for. Reusing the one config across the AddFont calls is ImGui's own
     /// pattern; it copies what it needs out of it.
     /// </remarks>
-    private unsafe bool WearBothSizes(string file, int size)
+    /// <param name="file">The serif face. Already known to exist.</param>
+    /// <param name="mono">
+    /// The monospaced face, or null when the machine has none of them. Null leaves figures in
+    /// the body face, which is exactly how they were drawn before this existed.
+    /// </param>
+    /// <param name="size">Pixels, for the body text.</param>
+    private unsafe bool WearTheseFaces(string file, string? mono, int size)
     {
         // The library hands the delegate a raw ImFontConfig*, which is what makes this method
         // unsafe - the same reason the tab bar's own BeginTabItem is.
@@ -1301,14 +1370,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ImGuiIOPtr io = ImGui.GetIO();
             IntPtr english = io.Fonts.GetGlyphRangesDefault();
 
-            // FIRST is the default face, which is what everything not asking for a heading
-            // gets - so the body size has to be added first.
+            // FIRST is the default face, which is what everything not asking for one of the
+            // others gets - so the body size has to be added first.
             io.Fonts.AddFontFromFileTTF(file, size, config, english);
 
             ImFontPtr heading = io.Fonts.AddFontFromFileTTF(
                 file, InterfaceStyle.HeadingSizeFor(size), config, english);
 
             OverlayFonts.Rebuilt(heading);
+
+            if (mono is not null)
+            {
+                OverlayFonts.RebuiltMono(io.Fonts.AddFontFromFileTTF(mono, size, config, english));
+            }
         });
     }
 
@@ -1955,7 +2029,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// as a conversion specifier and print whatever was in the register. TextUnformatted
     /// cannot, so this row is safe by construction rather than by remembering to escape.
     /// </remarks>
-    private static void Row(string label, string value, Vector4? colour = null)
+    /// <param name="figure">
+    /// Whether the value is a measurement rather than a name, and so belongs in the mono face.
+    ///
+    /// THIS READOUT IS WHERE IT MATTERS MOST, because these rows are redrawn every frame with
+    /// new numbers in them. In a proportional face a value counting from 999 to 1000 is a value
+    /// that gets WIDER, so the whole line shifts - and several of these lines hold three or four
+    /// counters that all do it independently. The readout twitches the entire time it is being
+    /// watched, which is the entire time it is on screen. Fixed-width digits are what stop it.
+    ///
+    /// Set per row rather than worked out from the value, because a row's KIND does not change
+    /// between frames while a value very much does - see <see cref="ImGuiText.Mono(string)"/>.
+    /// </param>
+    private static void Row(string label, string value, Vector4? colour = null, bool figure = false)
     {
         ImGui.TableNextRow();
         ImGui.TableNextColumn();
@@ -1967,7 +2053,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ImGui.PushStyleColor(ImGuiCol.Text, tint);
         }
 
-        ImGui.TextUnformatted(value);
+        if (figure)
+        {
+            ImGuiText.Mono(value);
+        }
+        else
+        {
+            ImGui.TextUnformatted(value);
+        }
 
         if (colour is not null)
         {
@@ -2024,10 +2117,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // what it has stopped listing and this still draws. Added together they would
             // read as the entity list having grown, which is the one thing this line is used
             // to watch.
-            Row("entities", _snapshot.Remembered > 0
-                ? $"{_snapshot.Entities.Count - _snapshot.Remembered}"
-                  + $"   (+{_snapshot.Remembered} remembered out of range)"
-                : $"{_snapshot.Entities.Count}");
+            Row(
+                "entities",
+                _snapshot.Remembered > 0
+                    ? $"{_snapshot.Entities.Count - _snapshot.Remembered}"
+                      + $"   (+{_snapshot.Remembered} remembered out of range)"
+                    : $"{_snapshot.Entities.Count}",
+                figure: true);
 
             // The question a map is actually being looked at for near the end of a run: is
             // there any of it left. Measured against what can be REACHED rather than every
@@ -2039,7 +2135,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     "walked",
                     $"{walked.Percent:F0}%   ({walked.SeenCells} of {walked.ReachableCells})"
                     + (walked.RegionKnown ? string.Empty : "   - still working out what is reachable"),
-                    Measured);
+                    Measured,
+                    figure: true);
             }
 
             if (ReadStats is not null)
@@ -2048,12 +2145,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Row(
                     "read",
                     $"{ms:F1} ms on its own thread   frame {1000f / ImGui.GetIO().Framerate:F1} ms"
-                    + $"   ({reads} reads{(failures > 0 ? $", {failures} failed" : string.Empty)})");
+                    + $"   ({reads} reads{(failures > 0 ? $", {failures} failed" : string.Empty)})",
+                    figure: true);
             }
 
             if (_snapshot.PlayerVitals is Vitals vitals)
             {
-                Row("vitals", $"life {Show(vitals.Life)}   mana {Show(vitals.Mana)}   es {Show(vitals.EnergyShield)}");
+                Row(
+                    "vitals",
+                    $"life {Show(vitals.Life)}   mana {Show(vitals.Mana)}   es {Show(vitals.EnergyShield)}",
+                    figure: true);
             }
 
             // Here rather than only on its page, because this is a number you watch while
@@ -2065,16 +2166,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     "damage",
                     $"{DamageWindow.Number(damage.Dps)} dps   peak {DamageWindow.Number(damage.Peak)}"
                     + $"   {DamageWindow.Number(damage.Total)} this area",
-                    new Vector4(1f, 1f, 0.6f, 1f));
+                    new Vector4(1f, 1f, 0.6f, 1f),
+                    figure: true);
             }
 
             // Always shown, including when it failed: an omitted row looks like a feature that
             // is not running, when it actually means a read gave up.
             if (_snapshot.FlaskBelt is FlaskBelt belt && !belt.IsUnknown)
             {
-                Row("belt", string.Join("   ", belt.Flasks.Select(f =>
-                    $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}"
-                    + (f.IsCharm ? " (charm)" : f.CanUse ? string.Empty : " (empty)"))));
+                Row(
+                    "belt",
+                    string.Join("   ", belt.Flasks.Select(f =>
+                        $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}"
+                        + (f.IsCharm ? " (charm)" : f.CanUse ? string.Empty : " (empty)"))),
+                    figure: true);
             }
             else
             {
@@ -2120,7 +2225,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Row(
                     "panels",
                     $"{_snapshot.Panels}   ({where})",
-                    new Vector4(1f, 0.8f, 0.35f, 1f));
+                    new Vector4(1f, 0.8f, 0.35f, 1f),
+                    figure: true);
             }
 
             // Only when there is one. A path that does not work otherwise shows up as a
@@ -2161,19 +2267,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // fundamental cost - which only a breakdown shows.
         if (_snapshot.Cost.TotalMs > 0)
         {
-            Row("cost", _snapshot.Cost.ToString());
+            Row("cost", _snapshot.Cost.ToString(), figure: true);
         }
 
-        Row("viewport", _tracked.IsValid
-            ? $"{width} x {height}   (game {_tracked.Width} x {_tracked.Height} @ {_tracked.X},{_tracked.Y})"
-            : $"{width} x {height}   (game window not tracked)");
+        Row(
+            "viewport",
+            _tracked.IsValid
+                ? $"{width} x {height}   (game {_tracked.Width} x {_tracked.Height} @ {_tracked.X},{_tracked.Y})"
+                : $"{width} x {height}   (game window not tracked)",
+            figure: true);
 
         // In the overlay rather than only in the config window, because this is read while
         // standing on the hill that shows the problem - a readout that needs a second window
         // open is a readout nobody is looking at in that moment.
         if (ShowTerrain)
         {
-            Row("terrain", DescribeTerrain(), new Vector4(0.65f, 0.7f, 0.78f, 1f));
+            Row("terrain", DescribeTerrain(), new Vector4(0.65f, 0.7f, 0.78f, 1f), figure: true);
         }
 
         if (_snapshot.Player is not WorldEntity player)
@@ -2181,7 +2290,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        Row("player", $"({player.WorldX:F0}, {player.WorldY:F0}, {player.WorldZ:F0})");
+        Row("player", $"({player.WorldX:F0}, {player.WorldY:F0}, {player.WorldZ:F0})", figure: true);
 
         // The live projection sanity check: the camera follows the player, so this must sit at
         // the screen centre. If it drifts, the matrix is wrong.
@@ -2198,7 +2307,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ? new Vector4(0.4f, 1f, 0.4f, 1f)
             : new Vector4(1f, 0.4f, 0.4f, 1f);
 
-        Row("projection", $"off-centre {offCentre:F3}   scene spread {spread:F0} px", colour);
+        Row("projection", $"off-centre {offCentre:F3}   scene spread {spread:F0} px", colour, figure: true);
 
         // The same thing in pixels, which is what a screenshot can be measured against: how
         // far the marker sits from the screen centre, and how tall the character is on screen,
@@ -2208,11 +2317,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Row(
             "marker",
             $"({p.X:F0}, {p.Y:F0})   centre ({width / 2}, {height / 2})"
-            + $"   delta ({p.X - (width / 2f):F0}, {p.Y - (height / 2f):F0}) px");
+            + $"   delta ({p.X - (width / 2f):F0}, {p.Y - (height / 2f):F0}) px",
+            figure: true);
         Row(
             "character",
             $"{Math.Abs(hb.Y - p.Y):F0} px tall"
-            + $"   (world z {player.WorldZ:F0} vs ground {player.TerrainHeight:F0})");
+            + $"   (world z {player.WorldZ:F0} vs ground {player.TerrainHeight:F0})",
+            figure: true);
 
         if (!healthy && spread <= width * 0.05)
         {

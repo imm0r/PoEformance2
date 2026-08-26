@@ -473,7 +473,7 @@ public sealed class EntityBrowserWindow
         }
 
         ImGui.TextColored(PathText, view.Path);
-        ImGui.TextColored(DimText, $"id {view.Id}  at 0x{view.Address:X}");
+        ImGuiText.Mono(DimText, $"id {view.Id}  at 0x{view.Address:X}");
 
         DrawHideButtons(view, chosen);
 
@@ -634,7 +634,7 @@ public sealed class EntityBrowserWindow
             ImGui.SameLine();
             ImGui.TextColored(component.Described ? KnownText : UnknownText, component.Name);
             ImGui.SameLine();
-            ImGui.TextColored(DimText, $"0x{component.Address:X}");
+            ImGuiText.Mono(DimText, $"0x{component.Address:X}");
 
             // The field count, because described is not binary: Monster has one field, and a
             // component in the game has dozens. "yes" hides the difference between the two.
@@ -678,11 +678,18 @@ public sealed class EntityBrowserWindow
     {
         foreach (FieldReading field in values)
         {
-            ImGui.TextColored(DimText, $"{indent}+0x{field.Offset:X3}");
+            ImGuiText.Mono(DimText, $"{indent}+0x{field.Offset:X3}");
             ImGui.SameLine();
             ImGui.TextColored(PathText, ImGuiText.Escape(field.Name));
+
+            // The live reading, and the point of the whole pane: hit a monster and watch Health
+            // move. Watching a number MOVE is a comparison between one frame and the next, so
+            // the digits have to stand in the same place in both - in the body face a value
+            // going from 999 to 1000 shifts everything after it and the eye loses the field it
+            // was watching. No Escape here, unlike the name beside it: Mono is TextUnformatted
+            // rather than printf, and escaping it as well would print the doubled signs.
             ImGui.SameLine();
-            ImGui.TextColored(KnownText, ImGuiText.Escape(field.Text));
+            ImGuiText.Mono(KnownText, field.Text);
 
             // The WHY, where the schema has one. That text is the expensive part of this
             // project - drift history, what proved the offset, what it must not be confused
