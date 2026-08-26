@@ -395,16 +395,24 @@ public sealed class StashWindow
         {
             ProbeRow("status", probe.Status.ToString(System.Globalization.CultureInfo.CurrentCulture));
 
-            // THE TWO NUMBERS SIDE BY SIDE, which is the whole reason to run this. Everything
-            // here is computed in Exalted and shown as Divine through one rate; if the exchange
-            // and poe.ninja disagree about it, every figure in the tool is off by that factor.
+            // THE TWO NUMBERS SIDE BY SIDE - BUT ONLY WHEN THEY ARE THE SAME MARKET. Everything
+            // here is computed in Exalted and shown as Divine through one rate, so a disagreement
+            // between the exchange and poe.ninja would move every figure in the tool. A
+            // disagreement between two LEAGUES moves nothing and means nothing: the first run of
+            // this printed "240 ex (poe.ninja: 367 ex, 0.65x)" where the 240 was a challenge
+            // league's price and the 367 was Standard's, and that ratio is not a finding, it is
+            // two unrelated markets divided by each other.
             if (probe.Rate > 0)
             {
                 double book = _prices.Book.Rate;
-                string against = book > 0
-                    ? $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.Rate / book)}x)"
-                    : string.Empty;
-                ProbeRow("1 div costs", $"{StashWorth.Money(probe.Rate)} ex{against}");
+                string from = probe.League.Length > 0 ? $" in {probe.League}" : string.Empty;
+                bool sameMarket = probe.League.Equals(_inspector.League, StringComparison.OrdinalIgnoreCase);
+                string against = book <= 0
+                    ? string.Empty
+                    : sameMarket
+                        ? $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.Rate / book)}x)"
+                        : $"   (poe.ninja says {StashWorth.Money(book)} ex for {_inspector.League} - another league, so not the same price)";
+                ProbeRow("1 div costs", $"{StashWorth.Money(probe.Rate)} ex{from}{against}");
             }
 
             ProbeRow("listings back", probe.Got.ToString(System.Globalization.CultureInfo.CurrentCulture));
@@ -418,6 +426,18 @@ public sealed class StashWindow
         finally
         {
             ImGui.EndTable();
+        }
+
+        // THE CONCLUSION IN WORDS, because the two status lines above state it only by implication
+        // and it is the most consequential thing this probe can find: an exchange that has nothing
+        // to say about the league being played cannot price that player's purse at all, however
+        // well it answers about somewhere else.
+        if (probe.Rate > 0 && !probe.League.Equals(_inspector.League, StringComparison.OrdinalIgnoreCase))
+        {
+            ImGuiText.Wrapped(
+                WarnText,
+                $"The exchange has no listings in {_inspector.League} - that answer came from "
+                + $"{probe.League}. Prices here keep coming from poe.ninja, which does cover it.");
         }
 
         // ALL OF THEM, not a sample. Hard-coding two ids that the site spells differently is

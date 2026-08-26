@@ -32,8 +32,7 @@ public readonly record struct TradeAnswer(
 /// - WHAT THE REAL RATE LIMITS ARE. They arrive as headers on the answer, and the client-side
 ///   guess in the reference (one request per five seconds) is only a starting point.
 /// - WHAT ONE DIVINE ACTUALLY COSTS. Every figure this tool shows is computed in Exalted and
-///   displayed as Divine through that single number, so nothing else is as load-bearing - and
-///   poe.ninja said 454.2 for the same league where Exiled Exchange showed 785.
+///   displayed as Divine through that single number, so nothing else is as load-bearing.
 ///
 /// WHAT IT NO LONGER ASKS is whether one request can price a whole purse. It cannot: the first
 /// run of this probe put twelve ids in want and got back
@@ -41,6 +40,19 @@ public readonly record struct TradeAnswer(
 /// the server - Exiled Exchange builds every query as want: [oneTag] and batches on the OTHER
 /// side, have. Pricing fifty currencies means fifty requests, so it is not a thing to do on a
 /// timer at 45 requests per half hour.
+///
+/// WHAT IT FOUND, and the reason this stayed a diagnostic rather than becoming a price source:
+/// THE EXCHANGE DOES NOT COVER STANDARD. Asked for Divine against Exalted it answered
+/// 200 with an empty result in Standard and 200 with listings in the challenge league, from the
+/// same ids in the same minute. So for a Standard character there is nothing here to price with,
+/// no matter how the query is shaped, and poe.ninja stays the only source that covers them.
+///
+/// THE EMPTY ANSWER COST A ROUND, because it looks exactly like a wrong query: an earlier version
+/// hard-coded the ids 'divine' and 'exalted' and the empty result was read as proof they were
+/// wrong. They were not - the site spells them exactly that way, as its own table confirms. The
+/// ids are looked up now regardless, since being right by luck is not being right, but the
+/// lesson worth keeping is that an empty market and a bad query are the same 200 from here, and
+/// only a second league tells them apart.
 ///
 /// SO IT CARRIES THE RAW ANSWER rather than a parsed one. Parsing a shape nobody has seen yet
 /// would be inventing the shape; the point of a probe is to find out what it is.
@@ -52,6 +64,12 @@ public readonly record struct TradeAnswer(
 /// <param name="Asked">How many currencies the exchange query asked about in one request.</param>
 /// <param name="Got">How many listings came back.</param>
 /// <param name="Rate">Exalted per Divine, off the cheapest readable listing. 0 when none was.</param>
+/// <param name="League">
+/// WHICH LEAGUE <paramref name="Rate"/> CAME FROM, which is not always the one that was asked.
+/// Standard answered with no listings at all and a challenge league answered with three, so the
+/// probe reports the league that spoke - and a rate from one league says nothing about prices in
+/// another. Comparing them anyway is how a perfectly good number becomes a wrong one.
+/// </param>
 /// <param name="Raw">One listing as the site sent it, so its shape can be read.</param>
 /// <param name="Error">What went wrong, in words.</param>
 public sealed record TradeProbe(
@@ -62,11 +80,13 @@ public sealed record TradeProbe(
     int Asked,
     int Got,
     double Rate,
+    string League,
     string Raw,
     string Error)
 {
     /// <summary>A probe that could not be run at all.</summary>
-    public static TradeProbe Not(string why) => new(false, 0, string.Empty, [], 0, 0, 0, string.Empty, why);
+    public static TradeProbe Not(string why)
+        => new(false, 0, string.Empty, [], 0, 0, 0, string.Empty, string.Empty, why);
 }
 
 /// <summary>

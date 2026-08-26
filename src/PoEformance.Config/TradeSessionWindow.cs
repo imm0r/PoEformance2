@@ -281,6 +281,7 @@ internal sealed class TradeSessionWindow : Window
                   asked: 1,
                   got: keys.length,
                   rate: rate,
+                  league: chosen.league,
                   raw: (keys.length ? JSON.stringify(results[keys[0]]) : '').slice(0, 3000),
                   error: 'want ' + div + ', have ' + exa + '   |   ' + said(got)
                        + (elsewhere ? '   |   ' + said(elsewhere) : '')
