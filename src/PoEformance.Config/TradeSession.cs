@@ -456,6 +456,7 @@ public sealed class TradeSession : IDisposable
                     Words(root, "tags"),
                     Count(root, "asked"),
                     Count(root, "got"),
+                    Measure(root, "rate"),
                     Text(root, "raw"),
                     error));
 
@@ -546,6 +547,9 @@ public sealed class TradeSession : IDisposable
 
     private static int Count(JsonElement root, string name)
         => root.TryGetProperty(name, out JsonElement found) && found.TryGetInt32(out int how) ? how : 0;
+
+    private static double Measure(JsonElement root, string name)
+        => root.TryGetProperty(name, out JsonElement found) && found.TryGetDouble(out double how) ? how : 0;
 
     private static IReadOnlyList<string> Words(JsonElement root, string name)
     {
