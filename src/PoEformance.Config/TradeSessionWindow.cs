@@ -270,24 +270,46 @@ internal sealed class TradeSessionWindow : Window
                 // full. Asked in the played league, always, because that is the contradiction.
                 var listed = null;
                 try {
-                  // THE SHAPE THAT ALREADY WORKS, copied from the uniques query below rather than
-                  // rebuilt: the realm in the path, name rather than type, and no stat or trade
-                  // filters at all. The rebuilt version had none of those and answered 0 for
-                  // Standard with complexity 7 - a query the site understood and could not match.
-                  var s = await fetch('/api/trade2/search/poe2/' + encodeURIComponent(m.league), {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                      query: {
-                        status: { option: 'online' },
-                        // The site's own display name for the id, not a string typed from memory.
-                        name: named[div]
-                      },
-                      sort: { price: 'asc' }
-                    })
-                  });
+                  // TYPE, NOT NAME. The uniques query below sends name because a unique HAS one;
+                  // a Divine Orb does not - it is a base type, and the site answers a name it
+                  // cannot place with 400 "Unknown item name". The reference declares both fields
+                  // side by side for exactly this reason.
+                  //
+                  // That took two runs to see, because there were two faults at once: without the
+                  // realm, type was already right and still returned nothing; with the realm,
+                  // name was wrong. Each fix alone looked like a failure.
+                  var look = async function (withPrice) {
+                    var query = {
+                      status: { option: 'online' },
+                      // The site's own display name for the id, not a string typed from memory.
+                      type: named[div],
+                      stats: [{ type: 'and', filters: [] }],
+                      filters: {}
+                    };
+                    // Priced in Exalted, which is the rate being asked for. Optional in the
+                    // reference, so a rejection here is worth separating from a rejection of
+                    // the query itself.
+                    if (withPrice) {
+                      query.filters = { trade_filters: { filters: { price: { option: exa } } } };
+                    }
+                    return fetch('/api/trade2/search/poe2/' + encodeURIComponent(m.league), {
+                      method: 'POST',
+                      headers: { 'content-type': 'application/json' },
+                      credentials: 'include',
+                      body: JSON.stringify({ query: query, sort: { price: 'asc' } })
+                    });
+                  };
+
+                  var s = await look(true);
                   var stext = await s.text();
+                  if (s.status === 400) {
+                    // The price filter is the only optional part, so it is the only thing a
+                    // second attempt may drop - anything more would be shotgunning.
+                    var bare = await look(false);
+                    var btext = await bare.text();
+                    if (bare.status >= 200 && bare.status < 300) { s = bare; stext = btext; }
+                    else { stext = stext + '   without price filter: ' + bare.status + ' ' + btext.slice(0, 200); }
+                  }
                   listed = { status: s.status, body: stext.slice(0, 500), total: 0, rate: 0 };
                   var sj = null;
                   try { sj = JSON.parse(stext); } catch (e) { }
@@ -352,6 +374,7 @@ internal sealed class TradeSessionWindow : Window
                   league: chosen.league,
                   listed: listed ? listed.total : 0,
                   listedRate: listed ? listed.rate : 0,
+                  listedStatus: listed ? listed.status : 0,
                   raw: ((keys.length ? JSON.stringify(results[keys[0]]) : '')
                         || (listed && listed.raw) || '').slice(0, 3000),
                   error: 'want ' + div + ', have ' + exa + '   |   exchange ' + said(got)

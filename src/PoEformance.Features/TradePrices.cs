@@ -95,6 +95,11 @@ public readonly record struct TradeAnswer(
 /// Exalted per Divine off the cheapest of those, per orb rather than per listing. 0 when the
 /// search found nothing readable.
 /// </param>
+/// <param name="ListedStatus">
+/// What the search ANSWERED WITH, so that zero listings can be told apart from a rejected query.
+/// The page said "nothing listed in Standard" for a while when the truth was
+/// 400 "Unknown item name" - an empty market and a refused question look identical in a count.
+/// </param>
 /// <param name="Raw">One listing as the site sent it, so its shape can be read.</param>
 /// <param name="Error">What went wrong, in words.</param>
 public sealed record TradeProbe(
@@ -108,12 +113,13 @@ public sealed record TradeProbe(
     string League,
     int Listed,
     double ListedRate,
+    int ListedStatus,
     string Raw,
     string Error)
 {
     /// <summary>A probe that could not be run at all.</summary>
     public static TradeProbe Not(string why)
-        => new(false, 0, string.Empty, [], 0, 0, 0, string.Empty, 0, 0, string.Empty, why);
+        => new(false, 0, string.Empty, [], 0, 0, 0, string.Empty, 0, 0, 0, string.Empty, why);
 }
 
 /// <summary>

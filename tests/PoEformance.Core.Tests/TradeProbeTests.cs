@@ -59,7 +59,7 @@ public sealed class TradeProbeTests
         // against it is this comparison - so pin that it distinguishes them.
         var elsewhere = new TradeProbe(
             Ok: true, Status: 200, Limits: string.Empty, Tags: [], Asked: 1, Got: 3,
-            Rate: 240, League: "Runes of Aldur", Listed: 0, ListedRate: 0,
+            Rate: 240, League: "Runes of Aldur", Listed: 0, ListedRate: 0, ListedStatus: 200,
             Raw: string.Empty, Error: string.Empty);
 
         Assert.False(elsewhere.League.Equals("Standard", StringComparison.OrdinalIgnoreCase));
@@ -75,12 +75,32 @@ public sealed class TradeProbeTests
         // that they stay independent - an empty Got must not drag ListedRate down with it.
         var mixed = new TradeProbe(
             Ok: true, Status: 200, Limits: string.Empty, Tags: [], Asked: 1, Got: 0,
-            Rate: 240, League: "Runes of Aldur", Listed: 118, ListedRate: 367,
+            Rate: 240, League: "Runes of Aldur", Listed: 118, ListedRate: 367, ListedStatus: 200,
             Raw: string.Empty, Error: string.Empty);
 
         Assert.Equal(0, mixed.Got);
         Assert.True(mixed.Listed > 0);
         Assert.Equal(367, mixed.ListedRate);
         Assert.NotEqual(mixed.Rate, mixed.ListedRate);
+    }
+
+    [Fact]
+    public void ARefusedSearchIsTellableFromAnEmptyOne()
+    {
+        // Both of these count zero listings, and for three runs the page called both of them
+        // "nothing listed in Standard". One of them was the site answering
+        // 400 "Unknown item name" - a question it refused, which says nothing at all about the
+        // market. The status is the only thing that separates them, so pin that it does.
+        var refused = new TradeProbe(
+            Ok: true, Status: 200, Limits: string.Empty, Tags: [], Asked: 1, Got: 0,
+            Rate: 240, League: "Runes of Aldur", Listed: 0, ListedRate: 0, ListedStatus: 400,
+            Raw: string.Empty, Error: "Unknown item name");
+
+        var empty = refused with { ListedStatus = 200, Error = string.Empty };
+
+        Assert.Equal(refused.Listed, empty.Listed);
+        Assert.NotEqual(refused.ListedStatus, empty.ListedStatus);
+        Assert.True(refused.ListedStatus is > 0 and not 200);
+        Assert.False(empty.ListedStatus is > 0 and not 200);
     }
 }
