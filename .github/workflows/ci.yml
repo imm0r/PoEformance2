@@ -61,3 +61,26 @@ jobs:
           $out = "src/PoEformance.App/bin/Release/net10.0-windows/win-x64/publish"
           Get-ChildItem $out -Recurse -File | Select-Object @{n='file';e={$_.FullName.Substring($out.Length+1)}}, @{n='KB';e={[math]::Round($_.Length/1KB)}} | Format-Table -AutoSize
           if (-not (Test-Path "$out/PoEformance.App.exe")) { throw "no exe produced" }
+
+      # KEEP THE BINARY. This job already builds a complete, runnable tool and then throws
+      # it away, so the only way to get one has been to build it on a Windows machine with
+      # the SDK installed - which is exactly the machine somebody asking for a build tends
+      # not to have. Publishing the whole directory rather than the exe alone, because the
+      # exe alone does not run: it needs cimgui.dll, WebView2Loader.dll and oo2core.dll
+      # beside it, the data tables, the ui pages, and above all schema/poe2.offsets.json,
+      # which is where this project keeps the offsets it reads the game through.
+      #
+      # The .pdb files come along deliberately. They are the bulk of the download, and they
+      # are also the difference between a crash report naming a line and one naming a bare
+      # address - which, in a Native AOT binary reading another process's memory, is the
+      # difference between a diagnosable report and an unusable one.
+      #
+      # Named by run number so two builds downloaded on the same day cannot be confused.
+      # Running yesterday's exe while believing it is today's is the kind of mistake that
+      # costs an afternoon here, because the symptom is a wrong offset, not a wrong version.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PoEformance-win-x64-${{ github.run_number }}
+          path: src/PoEformance.App/bin/Release/net10.0-windows/win-x64/publish
+          if-no-files-found: error
+          retention-days: 14
