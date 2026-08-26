@@ -419,17 +419,30 @@ public sealed class StashWindow
             // both are then the same market, which is what makes a ratio mean anything.
             if (probe.ListedRate > 0)
             {
-                string against = book > 0
+                // THE LEAGUE THE SEARCH ANSWERED FROM, not the one asked. The ladder's last rung
+                // is a control put to a different league on purpose, and setting ITS rate beside
+                // a Standard price book would repeat the mistake this row was added to stop.
+                bool ours = probe.ListedLeague.Equals(_inspector.League, StringComparison.OrdinalIgnoreCase);
+                string against = book > 0 && ours
                     ? $"   (poe.ninja: {StashWorth.Money(book)} ex, {StashWorth.Money(probe.ListedRate / book)}x)"
                     : string.Empty;
+                string where = probe.ListedLeague.Length > 0 ? probe.ListedLeague : _inspector.League;
                 ProbeRow(
                     "trade search",
-                    $"1 div = {StashWorth.Money(probe.ListedRate)} ex in {_inspector.League}"
-                    + $", {probe.Listed} listed{against}");
+                    $"1 div = {StashWorth.Money(probe.ListedRate)} ex in {where}"
+                    + $", {probe.Listed} listed{against}"
+                    + (ours ? string.Empty : $"   - a control, not {_inspector.League}"));
             }
             else if (probe.Listed > 0)
             {
                 ProbeRow("trade search", $"{probe.Listed} listed in {_inspector.League}, none readable");
+            }
+            else if (probe.ListedStatus is > 0 and not 200)
+            {
+                // A REFUSED QUESTION IS NOT AN EMPTY MARKET, and printing a count for it says the
+                // opposite of the truth: this page read "nothing listed in Standard" for a while
+                // when the site had actually answered 400 "Unknown item name".
+                ProbeRow("trade search", $"refused with {probe.ListedStatus} - see below");
             }
 
             ProbeRow("listings back", probe.Got.ToString(System.Globalization.CultureInfo.CurrentCulture));
@@ -458,6 +471,14 @@ public sealed class StashWindow
                 $"The currency exchange has nothing in {_inspector.League} - that rate came from "
                 + $"{probe.League}. The ordinary trade search does cover {_inspector.League}, so "
                 + "that is where a live rate for this character would have to come from.");
+        }
+        else if (exchangeElsewhere && probe.ListedStatus is > 0 and not 200)
+        {
+            ImGuiText.Wrapped(
+                WarnText,
+                $"The exchange has nothing in {_inspector.League} and the search REFUSED the "
+                + $"question with {probe.ListedStatus} - so nothing here says whether "
+                + $"{_inspector.League} has a market. The reason is in the raw answer below.");
         }
         else if (exchangeElsewhere)
         {

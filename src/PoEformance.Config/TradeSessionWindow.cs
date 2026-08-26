@@ -208,17 +208,32 @@ internal sealed class TradeSessionWindow : Window
                 // this tool shows is computed in Exalted and displayed as Divine through that
                 // one number, poe.ninja put it at 454.2, and Exiled Exchange showed 785 for the
                 // same league. Whichever is right, the live exchange is the thing that knows.
+                // SAY WHICH GAME. PoE1 has a league called Standard too, so an unqualified league
+                // name is ambiguous and resolves to the wrong realm - which is exactly why
+                // Standard came back 200-and-empty on both endpoints while "Runes of Aldur"
+                // worked: that name exists only in poe2, so it could not be mistaken.
+                //
+                // The uniques query further down this same file has said poe2 in its path since
+                // the day it was written, and it is the thing on this page that demonstrably
+                // answers for Standard. Two rounds of theories were spent not reading it.
                 var ask = async function (league, want, have) {
-                  var r = await fetch('/api/trade2/exchange/' + encodeURIComponent(league), {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                      engine: 'new',
-                      query: { status: { option: 'online' }, have: have, want: want },
-                      sort: { have: 'asc' }
-                    })
+                  var body = JSON.stringify({
+                    engine: 'new',
+                    query: { status: { option: 'online' }, have: have, want: want },
+                    sort: { have: 'asc' }
                   });
+                  var send = function (url) {
+                    return fetch(url, {
+                      method: 'POST',
+                      headers: { 'content-type': 'application/json' },
+                      credentials: 'include',
+                      body: body
+                    });
+                  };
+                  var r = await send('/api/trade2/exchange/poe2/' + encodeURIComponent(league));
+                  // The realm-qualified path is what search uses; whether exchange spells it the
+                  // same way is not something to assume, so an unqualified retry stays in.
+                  if (r.status === 404) { r = await send('/api/trade2/exchange/' + encodeURIComponent(league)); }
                   // THE BODY OF A FAILURE IS THE ANSWER. GGG replies to a bad query with
                   // {"error":{"code":N,"message":"..."}} that usually names the offending field,
                   // and the first probe discarded it - which is why its 400 taught us nothing.
@@ -255,25 +270,73 @@ internal sealed class TradeSessionWindow : Window
                 // full. Asked in the played league, always, because that is the contradiction.
                 var listed = null;
                 try {
-                  var s = await fetch('/api/trade2/search/' + encodeURIComponent(m.league), {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                      query: {
-                        status: { option: 'online' },
-                        // The site's own display name for the id, not a string typed from memory.
-                        type: named[div],
-                        stats: [{ type: 'and', filters: [] }],
-                        filters: { trade_filters: { filters: { price: { option: exa } } } }
-                      },
-                      sort: { price: 'asc' }
-                    })
-                  });
-                  var stext = await s.text();
-                  listed = { status: s.status, body: stext.slice(0, 500), total: 0, rate: 0 };
-                  var sj = null;
-                  try { sj = JSON.parse(stext); } catch (e) { }
+                  // TYPE, NOT NAME. The uniques query below sends name because a unique HAS one;
+                  // a Divine Orb does not - it is a base type, and the site answers a name it
+                  // cannot place with 400 "Unknown item name". The reference declares both fields
+                  // side by side for exactly this reason.
+                  //
+                  // That took two runs to see, because there were two faults at once: without the
+                  // realm, type was already right and still returned nothing; with the realm,
+                  // name was wrong. Each fix alone looked like a failure.
+                  // A LADDER, NOT A GUESS. Five rounds went one hypothesis at a time, each shipped
+                  // and each answered by a screenshot, and the query has been ACCEPTED since the
+                  // start - the site parses it and evaluates it (complexity 7) and finds nothing.
+                  // So the remaining question is not what is malformed but what is over-filtered,
+                  // and that is a question three requests settle at once rather than three builds.
+                  //
+                  // Ordered narrowest first, stopping at the first that finds anything:
+                  //   1. online + priced in Exalted - what a live rate would ideally be
+                  //   2. any status          - Standard is a graveyard league; its stock sits with
+                  //                            players who have not logged in for months, and an
+                  //                            online-only filter would hide all of it
+                  //   3. any, no price filter - in case the price option is what matches nothing
+                  //   4. the SAME query in the other league - the control. If Standard finds
+                  //      nothing where another league finds plenty, that is a fact about Standard
+                  //      and not about this query, and the guessing is over either way.
+                  var look = async function (league, status, withPrice) {
+                    var query = {
+                      status: { option: status },
+                      // The site's own display name for the id, not a string typed from memory.
+                      type: named[div],
+                      stats: [{ type: 'and', filters: [] }],
+                      filters: {}
+                    };
+                    if (withPrice) {
+                      query.filters = { trade_filters: { filters: { price: { option: exa } } } };
+                    }
+                    var r = await fetch('/api/trade2/search/poe2/' + encodeURIComponent(league), {
+                      method: 'POST',
+                      headers: { 'content-type': 'application/json' },
+                      credentials: 'include',
+                      body: JSON.stringify({ query: query, sort: { price: 'asc' } })
+                    });
+                    var t = await r.text();
+                    var o = { league: league, how: status + (withPrice ? '+priced' : ''), status: r.status, text: t };
+                    try { o.json = JSON.parse(t); } catch (e) { }
+                    o.total = (o.json && o.json.total) || 0;
+                    return o;
+                  };
+
+                  var other = (elsewhere && elsewhere.league !== m.league) ? elsewhere.league : null;
+                  var rungs = [
+                    [m.league, 'online', true],
+                    [m.league, 'any', true],
+                    [m.league, 'any', false]
+                  ];
+                  if (other) { rungs.push([other, 'any', false]); }
+
+                  var tried = [], s = null, sj = null, stext = '';
+                  for (var t = 0; t < rungs.length; t++) {
+                    var got2 = await look(rungs[t][0], rungs[t][1], rungs[t][2]);
+                    tried.push(got2.league + '/' + got2.how + ': ' + got2.status + ' ' + got2.total
+                               + (got2.status === 200 ? '' : ' ' + got2.text.slice(0, 160)));
+                    if (got2.total > 0 && got2.json) { s = got2; sj = got2.json; stext = got2.text; break; }
+                    s = got2; sj = got2.json; stext = got2.text;
+                  }
+
+                  // The league the ANSWER came from, which on the last rung is not the one asked.
+                  listed = { status: s.status, body: tried.join('   |   ').slice(0, 900),
+                             league: s.league, total: 0, rate: 0 };
                   listed.total = (sj && sj.total) || 0;
                   var ids = (sj && sj.result) || [];
 
@@ -281,13 +344,18 @@ internal sealed class TradeSessionWindow : Window
                   // to read a going rate and cheap against the fetch limit.
                   if (ids.length && sj.id) {
                     var f = await fetch('/api/trade2/fetch/' + ids.slice(0, 3).join(',')
-                                        + '?query=' + encodeURIComponent(sj.id),
+                                        + '?query=' + sj.id + '&realm=poe2',
                                         { credentials: 'include' });
                     var fj = await f.json();
                     var rows = (fj && fj.result) || [];
                     for (var q = 0; q < rows.length; q++) {
                       var price = rows[q] && rows[q].listing && rows[q].listing.price;
                       if (!price || !price.amount) { continue; }
+                      // IN EXALTED OR NOT AT ALL. Two of the rungs drop the price filter, so a
+                      // listing here may be asking Chaos or Divine - and taking its amount as an
+                      // Exalted rate would be a wrong number that looks entirely reasonable,
+                      // which is the exact shape of every mistake this probe has already made.
+                      if (price.currency !== exa) { continue; }
                       // PER ORB, not per listing: a stack of twenty priced as one lot would
                       // otherwise read as a single orb costing twenty times too much.
                       var stack = (rows[q].item && rows[q].item.stackSize) || 1;
@@ -335,6 +403,8 @@ internal sealed class TradeSessionWindow : Window
                   league: chosen.league,
                   listed: listed ? listed.total : 0,
                   listedRate: listed ? listed.rate : 0,
+                  listedStatus: listed ? listed.status : 0,
+                  listedLeague: listed ? listed.league : '',
                   raw: ((keys.length ? JSON.stringify(results[keys[0]]) : '')
                         || (listed && listed.raw) || '').slice(0, 3000),
                   error: 'want ' + div + ', have ' + exa + '   |   exchange ' + said(got)
