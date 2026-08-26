@@ -1249,6 +1249,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         _wearing = size;
 
+        // Until a face is actually loaded there is no heading font to push, and saying so is
+        // what makes every heading in the tool fall back silently instead of pushing a
+        // pointer into an atlas that was just cleared.
+        OverlayFonts.None();
+
         string fonts = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
         if (fonts.Length == 0)
         {
@@ -1261,8 +1266,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             try
             {
-                if (File.Exists(file)
-                    && ReplaceFont(file, size, ClickableTransparentOverlay.FontGlyphRangeType.English))
+                if (File.Exists(file) && WearBothSizes(file, size))
                 {
                     return;
                 }
@@ -1273,6 +1277,39 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 // Try the next one. A font is decoration, and the built-in face is waiting.
             }
         }
+    }
+
+    /// <summary>
+    /// Loads one face at two sizes: the body text, and the headings above it.
+    /// </summary>
+    /// <remarks>
+    /// BOTH IN ONE DELEGATE, because the library clears the whole atlas before calling it and
+    /// rebuilds the texture after - so two separate requests would be two rebuilds, of which
+    /// the second would throw the first's font away. The delegate is the only place both fonts
+    /// can exist at once, and the only place their pointers are known.
+    ///
+    /// The glyph range is the default English one, which is what the single-font call this
+    /// replaced asked for. Reusing the one config across both AddFont calls is ImGui's own
+    /// pattern; it copies what it needs out of it.
+    /// </remarks>
+    private unsafe bool WearBothSizes(string file, int size)
+    {
+        // The library hands the delegate a raw ImFontConfig*, which is what makes this method
+        // unsafe - the same reason the tab bar's own BeginTabItem is.
+        return ReplaceFont(config =>
+        {
+            ImGuiIOPtr io = ImGui.GetIO();
+            IntPtr english = io.Fonts.GetGlyphRangesDefault();
+
+            // FIRST is the default face, which is what everything not asking for a heading
+            // gets - so the body size has to be added first.
+            io.Fonts.AddFontFromFileTTF(file, size, config, english);
+
+            ImFontPtr heading = io.Fonts.AddFontFromFileTTF(
+                file, InterfaceStyle.HeadingSizeFor(size), config, english);
+
+            OverlayFonts.Rebuilt(heading);
+        });
     }
 
     // What the settings page asked for, kept so the style can override it per frame without

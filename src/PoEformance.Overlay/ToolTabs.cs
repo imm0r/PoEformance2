@@ -317,81 +317,111 @@ public sealed class ToolTabs
     /// </remarks>
     private bool SizesItself(string? inFront) => inFront is not null && inFront == _pages[0].Id;
 
-    /// <summary>Draws the tab bar and the page in front, and says which page that was.</summary>
+    /// <summary>
+    /// Draws the tab bar and the page in front, and says which page that was.
+    /// </summary>
+    /// <remarks>
+    /// THE BAR CHOOSES; THE CONTENT IS DRAWN AFTER IT. Everywhere else a page's content sits
+    /// between BeginTabItem and EndTabItem, which is the shape ImGui's own examples use - but
+    /// the bar is set in the heading face, and a tab bar takes its height from the font in
+    /// force when it BEGINS. Pushing that face around the bar with the content still inside
+    /// would set every page in it; pushing it around the labels alone would leave the bar
+    /// sized for the small face with the labels overflowing. Selecting inside the bar and
+    /// drawing outside it is the arrangement where both are the size they should be.
+    /// </remarks>
     private string? DrawPages()
     {
-        // Scrolling rather than squeezing when the bar runs out of room, with the popup list
-        // as the way to see every page at once - squeezed-to-illegible titles are the
-        // many-windows problem wearing a different hat.
-        if (!ImGui.BeginTabBar(
-                "tools",
-                ImGuiTabBarFlags.Reorderable
-                | ImGuiTabBarFlags.TabListPopupButton
-                | ImGuiTabBarFlags.FittingPolicyScroll))
-        {
-            return null;
-        }
-
         // The request as it stood when the bar started drawing. A page's own content can file
         // the NEXT one - the entity browser's jump to the dissector runs inside its Draw - and
         // that request belongs to the next frame, not to the sweep that is already past it.
         string? bringing = _bringToFront;
 
-        string? inFront = null;
+        Page? front = null;
+
+        OverlayFonts.PushHeading();
         try
         {
-            foreach (Page page in _pages)
+            // Scrolling rather than squeezing when the bar runs out of room, with the popup
+            // list as the way to see every page at once - squeezed-to-illegible titles are the
+            // many-windows problem wearing a different hat.
+            if (!ImGui.BeginTabBar(
+                    "tools",
+                    ImGuiTabBarFlags.Reorderable
+                    | ImGuiTabBarFlags.TabListPopupButton
+                    | ImGuiTabBarFlags.FittingPolicyScroll))
             {
-                // A hidden page's tab is simply not offered - except the first, which is the
-                // readout and the way back into everything, this list's editor included. The
-                // hide list never offers it either; this guard is for a settings file that
-                // says otherwise.
-                if (_hidden.Contains(page.Id) && page != _pages[0])
-                {
-                    continue;
-                }
+                return null;
+            }
 
-                ImGuiTabItemFlags flags = page.Id == bringing
-                    ? ImGuiTabItemFlags.SetSelected
-                    : ImGuiTabItemFlags.None;
+            try
+            {
+                foreach (Page page in _pages)
+                {
+                    // A hidden page's tab is simply not offered - except the first, which is
+                    // the readout and the way back into everything, this list's editor
+                    // included. The hide list never offers it either; this guard is for a
+                    // settings file that says otherwise.
+                    if (_hidden.Contains(page.Id) && page != _pages[0])
+                    {
+                        continue;
+                    }
 
-                // ###id so a label could carry live text without the tab becoming a new
-                // control - ImGui identity comes from the label, as the status readout's
-                // checkboxes learned the hard way.
-                if (!BeginTabItem($"{page.Label}###{page.Id}", flags))
-                {
-                    continue;
-                }
+                    ImGuiTabItemFlags flags = page.Id == bringing
+                        ? ImGuiTabItemFlags.SetSelected
+                        : ImGuiTabItemFlags.None;
 
-                try
-                {
-                    DrawPage(page);
-                    inFront = page.Id;
-                }
-                finally
-                {
+                    // ###id so a label could carry live text without the tab becoming a new
+                    // control - ImGui identity comes from the label, as the status readout's
+                    // checkboxes learned the hard way.
+                    if (!BeginTabItem($"{page.Label}###{page.Id}", flags))
+                    {
+                        continue;
+                    }
+
+                    front = page;
                     ImGui.EndTabItem();
                 }
             }
-
-            // The bar drew, so the request it started with was either applied just now or
-            // named a page that does not exist - done with it either way. One filed during the
-            // sweep is a different request and stays for the next frame.
-            if (_bringToFront == bringing)
+            finally
             {
-                _bringToFront = null;
-                _unfold = null;
+                ImGui.EndTabBar();
             }
         }
         finally
         {
-            ImGui.EndTabBar();
+            OverlayFonts.PopHeading();
         }
 
-        bool sizes = SizesItself(inFront);
+        if (front is not null)
+        {
+            // The tab item used to be the page's id scope, and drawing outside it takes that
+            // away: two pages with a control of the same name - and several have a "filter" -
+            // would share one ImGui id, which is one scroll position and one open state
+            // between them. The page's own id restores exactly what the tab item gave.
+            ImGui.PushID(front.Id);
+            try
+            {
+                DrawPage(front);
+            }
+            finally
+            {
+                ImGui.PopID();
+            }
+        }
+
+        // AFTER the content, unlike before, because the content is what reads _unfold: the
+        // jump that names a section has to survive long enough for that section to be drawn.
+        // A request the content itself filed is a different one and stays for the next frame.
+        if (_bringToFront == bringing)
+        {
+            _bringToFront = null;
+            _unfold = null;
+        }
+
+        bool sizes = SizesItself(front?.Id);
         _leftTheReadout = _sizedToContent && !sizes;
         _sizedToContent = sizes;
-        return inFront;
+        return front?.Id;
     }
 
     /// <summary>The page's content, inside a scroll region so the tab bar stays put.</summary>
@@ -463,7 +493,10 @@ public sealed class ToolTabs
                 ImGui.SetNextItemOpen(true, ImGuiCond.Always);
             }
 
-            if (!ImGui.CollapsingHeader($"{section.Label}###{section.Id}"))
+            // In the heading face, like the tab above it and the titled rules below: a page
+            // that folds into several tools needs its fold lines to outrank their contents,
+            // which is the whole reason the second size exists.
+            if (!OverlayFonts.SectionHeader($"{section.Label}###{section.Id}"))
             {
                 continue;
             }

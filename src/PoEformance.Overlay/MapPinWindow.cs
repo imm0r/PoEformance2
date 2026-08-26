@@ -113,7 +113,7 @@ public sealed class MapPinWindow
 
                 // A titled rule, like the quest list's acts - the same boundary drawn the
                 // same way, so the two tabs on this page read as one interface.
-                ImGui.SeparatorText(act > 0 ? $"Act {act}" : "no act");
+                OverlayFonts.SectionTitle(act > 0 ? $"Act {act}" : "no act");
             }
 
             Row(pin);

@@ -143,7 +143,7 @@ public sealed class AlertWindow
             // has lost its order - which is exactly how it was reported.
             ImGui.Spacing();
             ImGui.Spacing();
-            ImGui.SeparatorText("What the area loaded");
+            OverlayFonts.SectionTitle("What the area loaded");
             ImGui.Spacing();
             DrawPreload(_preload);
         }
