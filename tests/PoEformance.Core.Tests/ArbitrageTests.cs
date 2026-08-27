@@ -8,8 +8,16 @@ namespace PoEformance.Core.Tests;
 /// <remarks>
 /// Every number here comes from the same real Standard hours and the same real catalogue capture
 /// the rest of these tests read. That matters more than usual: the whole class exists because
-/// SYNTHETIC data would never have shown the problem. Run over one live hour with no guard, the
-/// same arithmetic finds a route reading +314,900 percent.
+/// SYNTHETIC data would never have shown the problem.
+///
+/// WHAT THE COMMITTED HOURS ACTUALLY SHOW, kept separate from what prompted the work. Ungated,
+/// they yield six loops and the best reads +1,525 percent. Apply the depth rule and NOTHING is
+/// left - all six are thin on the straight leg. So on this data the second source is never
+/// reached, and its own tests are what hold it up.
+///
+/// The live hour that prompted the design was worse than these two - a route reading six figures
+/// that survived depth - but that hour is not committed and nothing here should be read as
+/// reproducing it.
 /// </remarks>
 public sealed class ArbitrageTests
 {
@@ -67,18 +75,166 @@ public sealed class ArbitrageTests
         Assert.Empty(Arbitrage.Routes(null, Index()));
     }
 
-    [Fact]
-    public void NoSurvivingRouteIsAbsurd()
+    /// <summary>
+    /// The same arithmetic with a guard switched off, so the fixtures can be shown to be ill.
+    /// </summary>
+    /// <remarks>
+    /// A test that only checks the gated result is a test that passes when Routes() is changed to
+    /// return nothing at all. This is the other half: it establishes that the captured hours
+    /// really do contain the thing being caught.
+    ///
+    /// <paramref name="deep"/> applies the depth rule EXACTLY as Routes does - all three legs,
+    /// the straight one included. Checking only the two routed legs made this report survivors
+    /// the real walk had already thrown out, and a measurement that flatters the guard it is
+    /// meant to test is worse than not measuring.
+    /// </remarks>
+    private static IReadOnlyList<(string Path, string Middle, double Gain)> Ungated(
+        ExchangePairs pairs, bool deep)
     {
-        // THE TEST THIS CLASS WAS WRITTEN FOR. Ungated, the same data yields six-figure
-        // percentages. Anything that gets past the guards has to be a number somebody could say
-        // out loud - and if this ever fails, the guards have stopped working and the page is
-        // lying again.
-        IReadOnlyList<Route> routes = Arbitrage.Routes(Standard(), Index());
+        var found = new List<(string, string, double)>();
 
-        foreach (Route route in routes)
+        foreach (string path in pairs.Everything())
         {
-            Assert.InRange(route.Gain, Arbitrage.Worthwhile, 1.0);
+            if (string.Equals(path, ExchangeFeed.Exalted, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            ExchangeRate straight = pairs.Rate(path, ExchangeFeed.Exalted);
+            if (!straight.Known || straight.Bid <= 0)
+            {
+                continue;
+            }
+
+            if (deep && straight.Stock < Arbitrage.Deep)
+            {
+                continue;
+            }
+
+            foreach (string middle in ExchangePairs.Majors)
+            {
+                if (string.Equals(middle, path, StringComparison.Ordinal)
+                    || string.Equals(middle, ExchangeFeed.Exalted, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                ExchangeRate first = pairs.Rate(path, middle);
+                ExchangeRate second = pairs.Rate(middle, ExchangeFeed.Exalted);
+                if (!first.Known || !second.Known || first.Bid <= 0 || second.Bid <= 0)
+                {
+                    continue;
+                }
+
+                if (deep && Math.Min(first.Stock, second.Stock) < Arbitrage.Deep)
+                {
+                    continue;
+                }
+
+                double gain = ((first.Bid * second.Bid) - straight.Bid) / straight.Bid;
+                if (gain < Arbitrage.Worthwhile)
+                {
+                    continue;
+                }
+
+                found.Add((path, middle, gain));
+            }
+        }
+
+        return found;
+    }
+
+    [Fact]
+    public void TheCapturedHoursReallyDoContainFantasies()
+    {
+        // THE HALF THAT MAKES THE OTHER HALF MEAN SOMETHING. On these two real Standard hours the
+        // ungated arithmetic finds six loops and the best reads over a thousand percent. Without
+        // this, "nothing survives" would also be true of a Routes() that returned nothing at all.
+        IReadOnlyList<(string Path, string Middle, double Gain)> found = Ungated(Standard(), deep: false);
+        double worst = found.Max(loop => loop.Gain);
+
+        Assert.True(found.Count >= 5, $"only {found.Count} ungated loops - the fixture has gone tame");
+        Assert.True(worst > 10, $"the worst ungated loop is only +{worst * 100:N0}%");
+    }
+
+    [Fact]
+    public void NothingSurvivesOnTheseHours()
+    {
+        // Which is the RIGHT answer rather than a disappointing one: Standard is efficient and
+        // every apparent loop in it is a stale fill.
+        //
+        // WHAT THIS ALONE DOES NOT PROVE, said out loud because the obvious reading is wrong. On
+        // this data the two guards are INDEPENDENTLY sufficient: depth clears all six by itself,
+        // and so does the second source. Removing either from the walk leaves this test still
+        // passing - checked, by removing each in turn - so it cannot show which one is load
+        // bearing, and neither guard is proven NECESSARY by these hours.
+        //
+        // That is a property of the fixture, not a weakness in the guards: the live hour that
+        // prompted the design had a route survive depth. What pins each rule separately is the
+        // test below and the Agrees tests under it.
+        Assert.Empty(Arbitrage.Routes(Standard(), Index()));
+        Assert.Empty(Ungated(Standard(), deep: true));
+    }
+
+    [Fact]
+    public void TheSecondSourceRejectsEveryLoopInTheseHours()
+    {
+        // THE SECOND SOURCE, PINNED WITHOUT LEANING ON DEPTH. Each loop is rejected for one of
+        // two reasons, and the test names which applies to which rather than averaging them.
+        //
+        // BEYOND ARGUMENT. A loop passes Agrees on all three legs only if the index corroborates
+        // each, and the index is ONE number per currency - so the three demands compose:
+        // i_p/i_e ~ straight, i_p/i_m ~ first, i_m/i_e ~ second, and the last two multiply into
+        // the first. A gain above (1+T)^3 - 1 cannot satisfy all three at once whatever the
+        // index says. Five of these six are an order of magnitude past that.
+        //
+        // AND THE ONE THAT IS NOT. The sixth gains +33%, which is inside the band - arithmetic
+        // does not touch it, and the REAL index rejecting it is the only thing that does. That
+        // row is the one place these fixtures exercise disagreement end to end, so it is
+        // asserted rather than waved through with the others.
+        ExchangePairs pairs = Standard();
+        IReadOnlyDictionary<string, ScoutEntry> index = Index();
+        double most = Math.Pow(1 + Arbitrage.Tolerance, 3) - 1;
+
+        var argued = 0;
+        foreach ((string path, string middle, double gain) in Ungated(pairs, deep: false))
+        {
+            if (gain > most)
+            {
+                continue;
+            }
+
+            argued++;
+            Assert.False(
+                Arbitrage.Agrees(pairs, index, path, ExchangeFeed.Exalted)
+                && Arbitrage.Agrees(pairs, index, path, middle)
+                && Arbitrage.Agrees(pairs, index, middle, ExchangeFeed.Exalted),
+                $"the index corroborated all three legs of a +{gain * 100:N0}% loop");
+        }
+
+        // If this ever reaches zero the assertion above has stopped running, and the test would
+        // go on passing while proving only the arithmetic half.
+        Assert.True(argued > 0, "no loop was inside the band, so disagreement was never exercised");
+    }
+
+    [Fact]
+    public void ASurvivingRouteCannotBeAbsurd()
+    {
+        // NOT A NUMBER SOMEBODY PICKED. Every leg has to sit within Tolerance of what the index
+        // implies, and the index is self-consistent, so the most a loop can gain is what three
+        // legs of slack multiply to: (1+T) on each of the two routed legs and (1+T) again on the
+        // straight leg being understated. At a quarter that is 1.25 * 1.25 * 1.25 - 1, a little
+        // over 95 percent, and the four-figure fantasies miss it by an order of magnitude.
+        //
+        // Asserted as arithmetic rather than over a result list, because the result list is
+        // empty on this data and a foreach over nothing proves nothing.
+        double most = Math.Pow(1 + Arbitrage.Tolerance, 3) - 1;
+
+        Assert.InRange(most, Arbitrage.Worthwhile, 1.0);
+
+        foreach (Route route in Arbitrage.Routes(Standard(), Index()))
+        {
+            Assert.InRange(route.Gain, Arbitrage.Worthwhile, most);
             Assert.True(route.Carries >= Arbitrage.Deep);
             Assert.NotEqual(ExchangeFeed.Exalted, route.Through);
             Assert.NotEqual(route.Path, route.Through);
@@ -88,6 +244,8 @@ public sealed class ArbitrageTests
     [Fact]
     public void RoutesComeBestFirst()
     {
+        // Vacuous on today's fixtures, on purpose: it is the ordering invariant, and the day a
+        // league does carry a real loop it is what stops the page burying it under a smaller one.
         IReadOnlyList<Route> routes = Arbitrage.Routes(Standard(), Index());
 
         for (var at = 1; at < routes.Count; at++)

@@ -21,9 +21,14 @@ public readonly record struct Route(
 /// WHAT THIS IS GUARDING AGAINST, measured rather than imagined. Run over one real hour of a
 /// live league with no guard at all, this finds 247 routes and the best of them reads
 /// +314,900 PERCENT. Filtering on traded volume does not remove it: the trade genuinely happened
-/// at that price, and one stale fill in an hourly digest is enough to produce it. Filtering on
-/// book DEPTH removes most, and still leaves +145% on Chaos Orb - the most traded item in the
-/// game, where a real inefficiency of that size cannot exist.
+/// at that price, and one stale fill in an hourly digest is enough to produce it.
+///
+/// HOW MUCH EACH GUARD ACTUALLY DOES depends on the hour, and it is worth being exact about
+/// that. On the two hours committed under tests/fixtures the two guards are INDEPENDENTLY
+/// sufficient: depth clears all six loops by itself, and so does the second source. On the live
+/// hour above depth did not - +145% survived it on Chaos Orb, the most traded item in the game,
+/// where a real inefficiency of that size cannot exist. So depth is necessary and demonstrably
+/// not sufficient, and which sort of hour a player gets is not something this can choose.
 ///
 /// SO THE DECIDING GUARD IS A SECOND OPINION. Every leg's rate has to agree with what an
 /// independent index says the two currencies are worth. A rate that disagrees is not an
