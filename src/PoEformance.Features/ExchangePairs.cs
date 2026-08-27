@@ -84,6 +84,26 @@ public sealed class ExchangePairs
     public string League { get; private set; } = string.Empty;
 
     /// <summary>
+    /// The currency this league actually treats as money.
+    /// </summary>
+    /// <remarks>
+    /// READ FROM THE MARKETS, NOT DECIDED HERE, because the answer is different per league and
+    /// picking either one as a constant is wrong in the other. Counted over six live hours:
+    ///
+    ///   Runes of Aldur   651 currencies   399 trade against Exalted   265 against Divine
+    ///   Standard         367 currencies    29 trade against Exalted   117 against Divine
+    ///
+    /// So an active league is an Exalted economy and Standard is a Divine one, and a tool that
+    /// hardcodes Exalted calls seven percent of Standard's currencies normal and the rest routed.
+    ///
+    /// THIS IS NOT THE UNIT. Everything is still valued IN Exalted - see <see cref="Worth"/> -
+    /// because the index quotes in Exalted and the wealth record is written in it. This only says
+    /// which currency a one-leg valuation is allowed to be against, and therefore which rows are
+    /// an ordinary trade rather than a detour. Exalted wins a tie, being the unit.
+    /// </remarks>
+    public string Pivot { get; private set; } = ExchangeFeed.Exalted;
+
+    /// <summary>
     /// Reads every market for one league out of one hour's digest.
     /// </summary>
     /// <remarks>
@@ -144,11 +164,61 @@ public sealed class ExchangePairs
                 Note(second, first, Flip(rate));
             }
 
+            Settle();
             return added;
         }
     }
 
-    /// <summary>What one currency is worth in Exalted, directly or through one hop.</summary>
+    /// <summary>Picks the currency the league trades against, now that the hours are in.</summary>
+    /// <remarks>
+    /// After every Add rather than once, because hours arrive one at a time and a single hour of
+    /// a thin league can name the wrong winner - the blend is what the choice has to be made on.
+    /// </remarks>
+    private void Settle()
+    {
+        string best = ExchangeFeed.Exalted;
+        int most = Against(ExchangeFeed.Exalted);
+
+        foreach (string major in Majors)
+        {
+            // Strictly more, so Exalted keeps a tie: it is the unit everything is reported in,
+            // and a coin toss that moves the unit would be a coin toss that moves every price.
+            int has = Against(major);
+            if (has > most)
+            {
+                best = major;
+                most = has;
+            }
+        }
+
+        Pivot = best;
+    }
+
+    /// <summary>How many currencies trade directly against one.</summary>
+    private int Against(string currency)
+        => _pairs.TryGetValue(currency, out Dictionary<string, ExchangeRate>? markets) ? markets.Count : 0;
+
+    /// <summary>
+    /// What one currency is worth IN EXALTED, directly or through one hop.
+    /// </summary>
+    /// <remarks>
+    /// EXALTED WHATEVER THE PIVOT IS. The unit and the pivot are different questions: the pivot
+    /// decides which markets a valuation may be built from, this always reports in Exalted,
+    /// because the index quotes in Exalted and the wealth record on disk is written in it.
+    /// Changing what the number MEANS would make every point ever recorded incomparable.
+    ///
+    /// THE DIRECT MARKET COMPETES, IT DOES NOT WIN BY DEFAULT. This used to return the Exalted
+    /// market the moment one existed, which sounds right - one leg is a stronger claim than two -
+    /// and quietly preferred whichever market happened to be against Exalted however thin it was.
+    /// Measured over six live hours, of the currencies that had both a direct Exalted market and
+    /// a usable route, the route's thinnest leg was DEEPER than the direct market in 9 of 11 in
+    /// Standard and 87 of 187 in Runes of Aldur. So the short circuit was choosing the worse
+    /// market most of the time in the league this tool is used in.
+    ///
+    /// Now every candidate is judged by the rule this file already applied to the hops - the
+    /// thinnest leg carries the route - and the direct one is simply first in line, so it keeps
+    /// a tie without needing a fudge factor to prefer it by.
+    /// </remarks>
     public Valuation Worth(string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -163,12 +233,17 @@ public sealed class ExchangePairs
             return new Valuation(1, string.Empty, double.PositiveInfinity, double.PositiveInfinity);
         }
 
+        Valuation best = default;
+
+        // First in line, so an equally deep direct market keeps the tie and stays a one-leg claim.
+        // NOT gated on Enough, unlike the hops: a thin direct market that nothing can outbid is
+        // still the only thing anybody knows about this currency, and this valuation would
+        // otherwise go from approximately right to absent - see the remark on Enough itself.
         if (Rate(path, ExchangeFeed.Exalted) is { Known: true } straight)
         {
-            return new Valuation(straight.Bid, string.Empty, straight.Volume, straight.Stock);
+            best = new Valuation(straight.Bid, string.Empty, straight.Volume, straight.Stock);
         }
 
-        Valuation best = default;
         foreach (string middle in Majors)
         {
             if (string.Equals(middle, path, StringComparison.Ordinal)
@@ -200,6 +275,21 @@ public sealed class ExchangePairs
 
         return best;
     }
+
+    /// <summary>
+    /// Whether a valuation is against the money this league uses, however many legs it took.
+    /// </summary>
+    /// <remarks>
+    /// The question the table's colouring actually wants answered. <see cref="Valuation.Direct"/>
+    /// asks whether a price came straight from an Exalted market, which in Standard is true of
+    /// seven percent of currencies - so colouring by it paints ninety-three percent of a perfectly
+    /// ordinary Divine economy as second-rate. A hop through the league's own money is a normal
+    /// trade; a hop through something else is the one worth pointing at.
+    /// </remarks>
+    public bool Ordinary(Valuation worth)
+        => worth.Known
+           && (worth.Direct
+               || string.Equals(worth.Through, Pivot, StringComparison.Ordinal));
 
     /// <summary>The rate between two currencies, or nothing when they never traded.</summary>
     public ExchangeRate Rate(string? from, string? to)

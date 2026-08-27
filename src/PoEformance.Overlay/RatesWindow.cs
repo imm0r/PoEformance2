@@ -82,11 +82,12 @@ public sealed class RatesWindow
 
         ImGuiText.Wrapped(
             OverlayTheme.Quiet,
-            $"{pairs.Count} currencies in {pairs.League} from the game's own exchange"
+            $"{pairs.Count} currencies in {pairs.League} from the game's own exchange, priced "
+            + $"against {Short(pairs.Pivot)} because that is what the league trades in"
             + (index.Count > 0
-                ? $", {index.Count} with a week of history from the index"
-                : ", and no index - so no arbitrage is offered, which is the intended refusal")
-            + (routes.Count > 0 ? $". {routes.Count} loops pay better than selling straight." : string.Empty));
+                ? $". {index.Count} have a week of history from the index"
+                : ". No index, so no arbitrage is offered - which is the intended refusal")
+            + (routes.Count > 0 ? $". {routes.Count} loops pay better than selling straight." : "."));
 
         Draw(pairs, index, better);
     }
@@ -216,11 +217,18 @@ public sealed class RatesWindow
                     // A two-leg value is a weaker claim than a one-leg one, and the reader should
                     // be able to find that out without it shouting on every row.
                     ImGuiText.MonoTooltip(
-                        $"no Exalted market this hour\nvalued through {Short(worth.Through)}");
+                        $"no Exalted market this hour\nvalued through {Short(worth.Through)}"
+                        + (pairs.Ordinary(worth)
+                            ? $", which is what {pairs.League} trades in"
+                            : $" - {pairs.League} trades in {Short(pairs.Pivot)}"));
                 }
 
+                // GOLD FOR THE LEAGUE'S OWN MONEY, not for Exalted specifically. Colouring by
+                // Direct painted nine Standard rows in ten as second-rate, when a Divine market
+                // is simply what a currency has there - see ExchangePairs.Ordinary.
                 ImGui.TableNextColumn();
-                ImGuiText.Mono(worth.Direct ? Money : OverlayTheme.Quiet, StashWorth.Money(worth.Exalted));
+                ImGuiText.Mono(
+                    pairs.Ordinary(worth) ? Money : OverlayTheme.Quiet, StashWorth.Money(worth.Exalted));
 
                 ImGui.TableNextColumn();
                 Week(index, path);
@@ -230,12 +238,14 @@ public sealed class RatesWindow
                     rate > 0 ? OverlayTheme.Quiet : Warn,
                     rate > 0 ? StashWorth.Money(rate) : "-");
 
-                // HOW THE VALUE WAS REACHED, which is a fact about most rows. This column used
-                // to carry the arbitrage route's middle instead - so it was blank on every row
-                // that had no loop, which is nearly all of them, while the routing that DID
-                // happen was hidden in a tooltip. The loop has its own column beside this one.
+                // HOW THE VALUE WAS REACHED, when that is worth remarking on. This column used
+                // to carry the arbitrage route's middle - blank on every row that had no loop,
+                // which is nearly all of them - and then it carried every hop, which in Standard
+                // meant the same word on all eighty rows, because a hop through Divine is what
+                // pricing anything there looks like. Now it names only the UNUSUAL detour.
                 ImGui.TableNextColumn();
-                ImGuiText.Mono(OverlayTheme.Quiet, worth.Direct ? string.Empty : Short(worth.Through));
+                ImGuiText.Mono(
+                    Warn, pairs.Ordinary(worth) ? string.Empty : Short(worth.Through));
 
                 ImGui.TableNextColumn();
                 if (better.TryGetValue(path, out Route loop))
@@ -243,9 +253,13 @@ public sealed class RatesWindow
                     ImGuiText.Mono(Up, $"+{loop.Gain * 100:0.#}%");
                     if (ImGui.IsItemHovered())
                     {
+                        // The loop is measured in the league's own money, so the unit is named
+                        // from the route rather than assumed - labelling Divine figures "ex"
+                        // would be off by a factor of two hundred and sixty in Standard.
+                        string unit = Unit(loop.Money);
                         ImGuiText.MonoTooltip(
-                            $"straight   {StashWorth.Money(loop.Direct)} ex\n"
-                            + $"via {Short(loop.Through),-14} {StashWorth.Money(loop.Routed)} ex\n"
+                            $"straight   {StashWorth.Money(loop.Direct)} {unit}\n"
+                            + $"via {Short(loop.Through),-14} {StashWorth.Money(loop.Routed)} {unit}\n"
                             + $"the thinner leg holds {StashWorth.Money(loop.Carries)}\n\n"
                             + "Both legs agree with the index to within a quarter, which is what\n"
                             + "separates a route from a stale fill that looks like one.");
@@ -423,4 +437,17 @@ public sealed class RatesWindow
 
     private static string Short(string path)
         => path.Length == 0 ? string.Empty : path[(path.LastIndexOf('/') + 1)..];
+
+    /// <summary>The short label for a currency a figure is quoted in.</summary>
+    /// <remarks>
+    /// The two the game itself treats as money get their usual abbreviations; anything else is
+    /// named by its path rather than guessed at, which is ugly and honest rather than tidy and
+    /// possibly wrong.
+    /// </remarks>
+    private static string Unit(string path) => path switch
+    {
+        ExchangeFeed.Exalted => "ex",
+        ExchangeFeed.Divine => "div",
+        _ => Short(path),
+    };
 }
