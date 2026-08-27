@@ -93,13 +93,22 @@ public sealed class ExchangePairs
     ///   Runes of Aldur   651 currencies   399 trade against Exalted   265 against Divine
     ///   Standard         367 currencies    29 trade against Exalted   117 against Divine
     ///
-    /// So an active league is an Exalted economy and Standard is a Divine one, and a tool that
-    /// hardcodes Exalted calls seven percent of Standard's currencies normal and the rest routed.
+    /// IT IS A DRIFT, NOT TWO FIXED STATES, which is the part a snapshot cannot show and years of
+    /// PoE1 can: a league opens as an Exalted economy and shifts towards Divine the longer it
+    /// runs, because the cheap currency inflates against the expensive one as supply accumulates.
+    /// Standard is a league that never ends, so it sits at the far end of that drift permanently.
+    /// A league therefore does not HAVE a money, it MOVES between two - and a constant is wrong
+    /// twice over: wrong for the other league, and wrong for the same league three months later.
     ///
     /// THIS IS NOT THE UNIT. Everything is still valued IN Exalted - see <see cref="Worth"/> -
     /// because the index quotes in Exalted and the wealth record is written in it. This only says
     /// which currency a one-leg valuation is allowed to be against, and therefore which rows are
     /// an ordinary trade rather than a detour. Exalted wins a tie, being the unit.
+    ///
+    /// AND NOTHING NUMERIC HANGS OFF IT, deliberately, because a drift has a crossover in the
+    /// middle and a league sitting on it is a coin toss. Only the colouring - see
+    /// <see cref="Ordinary"/> - and the arbitrage destination read this, so the worst a flip can
+    /// do is recolour a table. Valuations are chosen by liquidity and never consult it.
     /// </remarks>
     public string Pivot { get; private set; } = ExchangeFeed.Exalted;
 
@@ -171,8 +180,19 @@ public sealed class ExchangePairs
 
     /// <summary>Picks the currency the league trades against, now that the hours are in.</summary>
     /// <remarks>
-    /// After every Add rather than once, because hours arrive one at a time and a single hour of
-    /// a thin league can name the wrong winner - the blend is what the choice has to be made on.
+    /// OVER THE WHOLE BLEND, which is what keeps a league at the crossover from flickering, and
+    /// the difference is measured rather than assumed. Read ONE HOUR AT A TIME across eight
+    /// consecutive hours, HC Runes of Aldur named Divine, Exalted, Divine, Exalted, Divine,
+    /// Divine, Divine, Divine - three changes of mind, on counts as close as 28 against 28 and
+    /// 28 against 29, where a single market decides. Read as the six-hour blend this class
+    /// actually builds, the same eight hours named Divine every time.
+    ///
+    /// So this runs after every Add rather than once: each Add folds another hour in, and the
+    /// answer that matters is the one standing after the last of them.
+    ///
+    /// No hysteresis on top of that. It would need a threshold nobody has a measurement for, and
+    /// the blend already brought the observed flip rate to zero - if a flip is ever seen in the
+    /// wild, this remark is where to start, not a guessed margin.
     /// </remarks>
     private void Settle()
     {
