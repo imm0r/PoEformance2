@@ -179,14 +179,46 @@ public sealed class ScoutStoreTests
     [Fact]
     public async Task TwoRefreshesAtOnceOnlyRunOne()
     {
-        var feed = new Feed();
-        var store = new ScoutStore(feed.Ask, () => Noon) { Enabled = true };
+        // AT ONCE has to mean at once, and that needs a read that is still in flight when the
+        // second call arrives. An earlier version of this test just called Refresh twice and
+        // asserted one fetch - which passed by luck: the fake answers synchronously, so the
+        // first read could finish before the second call, and a refresh after one has finished
+        // SHOULD fetch again. It failed the day the machine was a little slower.
+        var holding = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var asked = 0;
+
+        var store = new ScoutStore(
+            (_, _) =>
+            {
+                Interlocked.Increment(ref asked);
+                return holding.Task;
+            },
+            () => Noon)
+        {
+            Enabled = true,
+        };
 
         store.Playing("Standard");
+
+        // Wait for the ASK, not for the busy flag. Refresh raises the flag and only then starts
+        // the task that does the asking, so a spin on Busy can leave here before the first read
+        // has actually reached the feed - which is what made the first attempt at this fix fail.
+        for (var spin = 0; spin < 200 && Volatile.Read(ref asked) == 0; spin++)
+        {
+            await Task.Delay(10);
+        }
+
+        Assert.Equal(1, Volatile.Read(ref asked));
+        Assert.True(store.Busy, "the read that has not answered yet should still count as busy");
+
         store.Refresh();
         store.Refresh();
+        Assert.Equal(1, Volatile.Read(ref asked));
+
+        holding.SetResult(Catalogue());
         await Settled(store);
 
-        Assert.Single(feed.Asked);
+        Assert.Equal(1, Volatile.Read(ref asked));
+        Assert.NotEmpty(store.Index);
     }
 }

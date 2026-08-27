@@ -33,6 +33,7 @@ public sealed class PreloadWindow
     private readonly Action _rulesChanged;
     private string _search = string.Empty;
     private string _said = string.Empty;
+    private string _saved = string.Empty;
 
     /// <param name="lookAgain">Runs the walk again, for when it needs forcing.</param>
     /// <param name="sweep">Looks for the count field instead of assuming one - see below.</param>
@@ -92,6 +93,24 @@ public sealed class PreloadWindow
             if (ImGui.SmallButton("find the count field"))
             {
                 _sweep();
+            }
+        }
+
+        // The whole list, out to a file. Offered beside the count rather than at the bottom of
+        // the raw list, because the reason to want it is the count being interesting.
+        if (all.Count > 0)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("save the list"))
+            {
+                _saved = PreloadAlertStore.Dump(_watch.Area, all, _watch.Note) is { } written
+                    ? $"written to {written}"
+                    : "could not write the list";
+            }
+
+            if (_saved.Length > 0)
+            {
+                ImGuiText.Wrapped(DimText, _saved);
             }
         }
 
