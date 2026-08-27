@@ -1049,6 +1049,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Runs the one-off currency-exchange diagnostic, or null where nothing wired one. Handed in
     /// like the sign-in beside it, because the trade session lives in a layer this cannot see.
     /// </param>
+    /// <param name="exchange">
+    /// The game's own Currency Exchange, or null where nothing wired one. Shown beside poe.ninja
+    /// rather than instead of it, because which of the two is right is not settled yet.
+    /// </param>
     public void AttachStash(
         StashInspector inspector,
         ItemArtStore art,
@@ -1056,6 +1060,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         TradePrices trade,
         Action signIn,
         Func<Task<TradeProbe>>? probe = null,
+        ExchangeStore? exchange = null,
         bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(inspector);
@@ -1070,7 +1075,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // reason: the trade window is a browser, and this layer cannot see that one.
         var window = new StashWindow(
             inspector, art, prices, trade, signIn, probe,
-            file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture);
+            file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture,
+            exchange);
         _tools.Add(60, "stash", "Stash", window.DrawTab);
         if (visible)
         {

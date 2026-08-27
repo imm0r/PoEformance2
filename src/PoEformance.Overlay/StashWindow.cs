@@ -70,6 +70,15 @@ public sealed class StashWindow
     /// </remarks>
     private readonly Func<Task<TradeProbe>>? _probe;
 
+    /// <summary>
+    /// The game's own Currency Exchange, when the wiring handed one in.
+    /// </summary>
+    /// <remarks>
+    /// Null in a build that has no feed reader, which is what every test of this window is - the
+    /// row simply does not appear, the way the probe button does not.
+    /// </remarks>
+    private readonly ExchangeStore? _exchange;
+
     private Task<TradeProbe>? _probing;
     private TradeProbe? _probed;
     private readonly Func<string, IntPtr> _picture;
@@ -110,7 +119,8 @@ public sealed class StashWindow
         TradePrices trade,
         Action signIn,
         Func<Task<TradeProbe>>? probe,
-        Func<string, IntPtr> picture)
+        Func<string, IntPtr> picture,
+        ExchangeStore? exchange = null)
     {
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(art);
@@ -125,6 +135,7 @@ public sealed class StashWindow
         _signIn = signIn;
         _probe = probe;
         _picture = picture;
+        _exchange = exchange;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -289,7 +300,72 @@ public sealed class StashWindow
                 $"{StashWorth.Purse(_total.Exalted, _prices.Book.Rate)} across {_total.Priced} of {_total.Items} items");
         }
 
+        Exchange(league);
         Trade();
+    }
+
+    /// <summary>
+    /// What the game's own Currency Exchange says, beside what poe.ninja does.
+    /// </summary>
+    /// <remarks>
+    /// BOTH NUMBERS BEFORE EITHER IS TRUSTED. The feed is executed trades from the game itself
+    /// and poe.ninja is an aggregated index, and the two are expected to disagree - by fifteen
+    /// to twenty percent on Standard in the hour this was written. Which is right is not a thing
+    /// to decide from a commit message, so nothing switches over: both are shown until somebody
+    /// has watched them for a while.
+    ///
+    /// THE SELLING SIDE IS QUOTED, because that is what a hoard is worth. The spread is shown
+    /// beside it rather than hidden, since on a thin market it is the difference between two
+    /// perfectly true numbers - 260 and 602 for the same orb, in the same minute.
+    /// </remarks>
+    private void Exchange(string league)
+    {
+        if (_exchange is null)
+        {
+            return;
+        }
+
+        bool asking = _exchange.Enabled;
+        if (ImGui.Checkbox("and the game's own currency exchange", ref asking))
+        {
+            _exchange.Enabled = asking;
+            if (asking)
+            {
+                _exchange.Playing(league);
+            }
+        }
+
+        ImGui.SameLine();
+
+        if (!asking)
+        {
+            ImGui.TextColored(DimText, "off");
+            return;
+        }
+
+        if (_exchange.Busy)
+        {
+            ImGui.TextColored(WarnText, "reading the exchange...");
+            return;
+        }
+
+        ImGui.TextColored(DimText, _exchange.Status);
+
+        ExchangeRate divine = _exchange.Pairs.Rate(ExchangeFeed.Divine, ExchangeFeed.Exalted);
+        if (!divine.Known)
+        {
+            return;
+        }
+
+        double book = _prices.Book.Rate;
+        string against = book > 0
+            ? $"   poe.ninja says {StashWorth.Money(book)} ({StashWorth.Money(divine.Bid / book)}x)"
+            : string.Empty;
+
+        ImGuiText.Wrapped(
+            MoneyText,
+            $"1 div sells for {StashWorth.Money(divine.Bid)} ex, costs {StashWorth.Money(divine.Ask)} ex"
+            + $"   -  {StashWorth.Money(divine.Volume)} traded{against}");
     }
 
     /// <summary>
