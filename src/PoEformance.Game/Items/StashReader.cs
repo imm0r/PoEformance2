@@ -32,13 +32,19 @@ public sealed record StashedItem(ulong Entity, int Left, int Top, int Width, int
 /// <param name="Columns">How wide the grid is.</param>
 /// <param name="Rows">And how deep.</param>
 /// <param name="Items">What is in it.</param>
+/// <param name="Loaded">
+/// Whether the game has ALLOCATED this inventory's item list at all. False means the tab was
+/// listed but never filled in - which is not the same as a tab holding nothing, and reading it
+/// as such is what let twenty-nine unopened tabs erase themselves from a total.
+/// </param>
 public sealed record StashInventory(
     int Id,
     InventoryKind Kind,
     ulong Address,
     int Columns,
     int Rows,
-    IReadOnlyList<StashedItem> Items)
+    IReadOnlyList<StashedItem> Items,
+    bool Loaded = true)
 {
     /// <summary>A name to show when the tab's own is not known.</summary>
     public string Called => Kind switch
@@ -207,7 +213,8 @@ public sealed class StashReader
             return null;
         }
 
-        return new StashInventory(id, KindOf(id), inventory, columns, rows, Items(inventory));
+        (bool loaded, List<StashedItem> items) = Items(inventory);
+        return new StashInventory(id, KindOf(id), inventory, columns, rows, items, loaded);
     }
 
     /// <summary>Everything in one inventory.</summary>
@@ -217,21 +224,35 @@ public sealed class StashReader
     /// tab holding one. The first entry for an item carries its whole rectangle, so the extra
     /// ones say nothing the first did not.
     /// </remarks>
-    private List<StashedItem> Items(ulong inventory)
+    private (bool Loaded, List<StashedItem> Items) Items(ulong inventory)
     {
         var items = new List<StashedItem>();
 
         ulong first = _reader.ReadPointer(inventory + (ulong)_itemList);
         ulong last = _reader.ReadPointer(inventory + (ulong)_itemListLast);
-        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
+
+        // NEVER ALLOCATED IS NOT EMPTY, and the two used to leave here as the same answer. The
+        // game fills in one stash tab at a time, so a player with thirty of them has one that
+        // can be read and twenty-nine that cannot - and a reading of nothing was allowed to
+        // stand for what those tabs hold.
+        //
+        // A null list pointer is the tab not being there to read. A valid pointer with
+        // last == first is an allocated, empty list: a tab somebody has just emptied, which IS
+        // a real zero and must still count as one.
+        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last < first)
         {
-            return items;
+            return (false, items);
+        }
+
+        if (last == first)
+        {
+            return (true, items);
         }
 
         ulong bytes = last - first;
         if (bytes % 8 != 0)
         {
-            return items;
+            return (false, items);
         }
 
         long count = Math.Min((long)(bytes / 8), MostItems);
@@ -264,7 +285,7 @@ public sealed class StashReader
                 Math.Max(1, bottom - top)));
         }
 
-        return items;
+        return (true, items);
     }
 
     /// <summary>

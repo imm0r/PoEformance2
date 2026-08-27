@@ -303,4 +303,76 @@ public class CurrencyPurseTests
 
         Assert.Equal(3, exalted / book.Rate, 3);
     }
+
+    private static StashPage Tab(int id, params InspectedItem[] items)
+        => new(
+            id,
+            InventoryKind.Stash,
+            $"Stash tab {id}",
+            12,
+            12,
+            [.. items.Select((item, i) => new StashSlot(new StashedItem((ulong)i + 1, i, 0, 1, 1), item))]);
+
+    [Fact]
+    public void ATabTHATWASNOTREADDoesNotEraseWhatItHeld()
+    {
+        // THE SYMPTOM, in the player's own words: "I added items and never took one out, and I
+        // am eight Divine down." A tab the game has not filled in reads as holding nothing, and
+        // replacing the whole remembered stash with one instant's reading let that nothing
+        // stand for the tab's contents.
+        InspectedItem money = Item(
+            "Metadata/Items/Currency/CurrencyAddModToRare",
+            "Art/2DItems/Currency/CurrencyAddModToRare.dds",
+            10);
+
+        IReadOnlyList<StashPage> had = [Tab(7, money), Tab(8, money)];
+
+        // Only tab 8 came back this read - tab 7 was not loaded, so it is not in the list at all.
+        IReadOnlyList<StashPage> now = StashInspector.Remembered(had, [Tab(8, money)]);
+
+        Assert.Equal(2, now.Count);
+        Assert.Single(now[0].Items);
+        Assert.Equal(7, now[0].Id);
+    }
+
+    [Fact]
+    public void ATabTHATWASReadAndCameBackEmptyIsARealZero()
+    {
+        // The other half, and it was right before: somebody who has just emptied a tab is
+        // looking at it, so it IS loaded, and its zero has to replace what it held.
+        InspectedItem money = Item(
+            "Metadata/Items/Currency/CurrencyAddModToRare",
+            "Art/2DItems/Currency/CurrencyAddModToRare.dds",
+            10);
+
+        IReadOnlyList<StashPage> now = StashInspector.Remembered([Tab(7, money)], [Tab(7)]);
+
+        Assert.Single(now);
+        Assert.Empty(now[0].Items);
+    }
+
+    [Fact]
+    public void AReadThatSawNOTabsAtAllChangesNothing()
+    {
+        IReadOnlyList<StashPage> had =
+        [
+            Tab(7, Item(
+                "Metadata/Items/Currency/CurrencyAddModToRare",
+                "Art/2DItems/Currency/CurrencyAddModToRare.dds",
+                10)),
+        ];
+
+        Assert.Same(had, StashInspector.Remembered(had, []));
+    }
+
+    [Fact]
+    public void TabsKeepTheGamesOwnOrderRatherThanTheOrderTheyWereSeenIn()
+    {
+        // Otherwise the breakdown reshuffles itself every time a different tab is the one that
+        // happened to be readable.
+        IReadOnlyList<StashPage> now = StashInspector.Remembered(
+            [Tab(9), Tab(3)], [Tab(5), Tab(1)]);
+
+        Assert.Equal([1, 3, 5, 9], now.Select(page => page.Id));
+    }
 }

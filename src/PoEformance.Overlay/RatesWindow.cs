@@ -145,7 +145,7 @@ public sealed class RatesWindow
         IReadOnlyDictionary<string, ScoutEntry> index,
         IReadOnlyDictionary<string, Route> better)
     {
-        var rows = new List<(string Path, string Called, Valuation Worth, ExchangeRate Rate)>();
+        var rows = new List<(string Path, string Called, Valuation Worth, double Book)>();
         foreach (string path in pairs.Everything())
         {
             if (string.Equals(path, ExchangeFeed.Exalted, StringComparison.Ordinal))
@@ -173,7 +173,7 @@ public sealed class RatesWindow
                 continue;
             }
 
-            rows.Add((path, called, worth, pairs.Rate(path, ExchangeFeed.Exalted)));
+            rows.Add((path, called, worth, worth.Stock));
         }
 
         // BY WHAT ONE IS WORTH, not by name. The question this page answers starts at the top of
@@ -205,7 +205,7 @@ public sealed class RatesWindow
             ImGui.TableSetupColumn("loop");
             ImGui.TableHeadersRow();
 
-            foreach ((string path, string called, Valuation worth, ExchangeRate rate) in rows.Take(MostRows))
+            foreach ((string path, string called, Valuation worth, double rate) in rows.Take(MostRows))
             {
                 ImGui.TableNextRow();
 
@@ -227,13 +227,15 @@ public sealed class RatesWindow
 
                 ImGui.TableNextColumn();
                 ImGuiText.Mono(
-                    rate.Stock > 0 ? OverlayTheme.Quiet : Warn,
-                    rate.Stock > 0 ? StashWorth.Money(rate.Stock) : "-");
+                    rate > 0 ? OverlayTheme.Quiet : Warn,
+                    rate > 0 ? StashWorth.Money(rate) : "-");
 
+                // HOW THE VALUE WAS REACHED, which is a fact about most rows. This column used
+                // to carry the arbitrage route's middle instead - so it was blank on every row
+                // that had no loop, which is nearly all of them, while the routing that DID
+                // happen was hidden in a tooltip. The loop has its own column beside this one.
                 ImGui.TableNextColumn();
-                ImGuiText.Mono(OverlayTheme.Quiet, better.TryGetValue(path, out Route route)
-                    ? Short(route.Through)
-                    : string.Empty);
+                ImGuiText.Mono(OverlayTheme.Quiet, worth.Direct ? string.Empty : Short(worth.Through));
 
                 ImGui.TableNextColumn();
                 if (better.TryGetValue(path, out Route loop))

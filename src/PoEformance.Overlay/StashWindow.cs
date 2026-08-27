@@ -588,7 +588,7 @@ public sealed class StashWindow
             // THE SHAPE IS THE POINT. Whether a batched answer says which currency each listing
             // is for is the one thing that decides if this endpoint can price a whole purse, and
             // it can only be read off a real answer.
-            ImGuiText.Wrapped(DimText, "one listing, as the site sent it:");
+            ImGuiText.Wrapped(DimText, "one listing per rung, as the site sent it:");
             ImGuiText.MonoWrapped(DimText, probe.Raw);
         }
     }

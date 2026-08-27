@@ -548,7 +548,17 @@ public sealed class StashInspector
                 inventory.Id, inventory.Kind, inventory.Called,
                 inventory.Columns, inventory.Rows, found);
 
-            (inventory.Kind == InventoryKind.Backpack ? carried : stashed).Add(page);
+            if (inventory.Kind == InventoryKind.Backpack)
+            {
+                carried.Add(page);
+            }
+            else if (inventory.Loaded)
+            {
+                // ONLY A TAB THAT WAS ACTUALLY READ speaks for itself. A tab the game has not
+                // filled in is not a tab holding nothing - see StashReader, where the two used
+                // to leave as the same answer.
+                stashed.Add(page);
+            }
         }
 
         // WHERE A STASH CAN BE, and only then. The game lists the tab inventories in a map as
@@ -560,7 +570,7 @@ public sealed class StashInspector
         // and has to replace what was remembered.
         if (ReplacesTheStash(CanSeeAStash, sawStash))
         {
-            _stashed = stashed;
+            _stashed = Remembered(_stashed, stashed);
             _stashedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
@@ -575,6 +585,59 @@ public sealed class StashInspector
             ReplacesTheStash(CanSeeAStash, sawStash)
                 ? string.Empty
                 : "away from the stash - showing what the tabs last held");
+    }
+
+    /// <summary>
+    /// The stash as it stands after a read: each tab replaced only by a reading of ITSELF.
+    /// </summary>
+    /// <remarks>
+    /// Public so the rule can be argued with in a test rather than only in a hideout, the same
+    /// reason <see cref="ReplacesTheStash"/> is.
+    /// </remarks>
+    /// <remarks>
+    /// PER TAB, because the game holds one tab's contents at a time. A player with thirty tabs
+    /// has one of them filled in and twenty-nine that the game has not been asked about, and
+    /// this used to replace the whole remembered stash with whatever that instant happened to
+    /// hold - so twenty-nine tabs' worth of currency vanished from the total on every read and
+    /// came back one at a time as they were opened.
+    ///
+    /// What that looks like from the outside is a number that drifts in both directions while
+    /// nothing is being spent: depositing into a tab brings the REST of that tab into view as a
+    /// gain, and walking away lets a tab fall out of view as a loss. Both were recorded into a
+    /// record that never resets.
+    ///
+    /// A tab that was read and came back EMPTY still replaces what it held. Somebody who has
+    /// just emptied a tab is looking at it, so it is loaded, and its zero is a real one - the
+    /// case that was right before and stays right.
+    ///
+    /// The cost is that a DELETED tab lingers until something else is read in its place. That is
+    /// the better way round: a tab is deleted about once a league, and not-loaded happens every
+    /// few seconds.
+    /// </remarks>
+    public static IReadOnlyList<StashPage> Remembered(
+        IReadOnlyList<StashPage> had, IReadOnlyList<StashPage> read)
+    {
+        if (read.Count == 0)
+        {
+            return had;
+        }
+
+        var by = new Dictionary<int, StashPage>(had.Count + read.Count);
+        foreach (StashPage page in had)
+        {
+            by[page.Id] = page;
+        }
+
+        foreach (StashPage page in read)
+        {
+            by[page.Id] = page;
+        }
+
+        // BY THE GAME'S OWN TAB ORDER, so the breakdown does not reshuffle itself every time a
+        // different tab happens to be the one on screen.
+        var kept = new List<StashPage>(by.Values);
+        kept.Sort((a, b) => a.Id.CompareTo(b.Id));
+        return kept;
     }
 
     /// <summary>

@@ -347,7 +347,7 @@ internal sealed class TradeSessionWindow : Window
                   }
 
                   // The league the ANSWER came from, which on the last rung is not the one asked.
-                  listed = { status: s.status, body: tried.join('   |   ').slice(0, 900),
+                  listed = { sums: [], status: s.status, body: tried.join('   |   ').slice(0, 900),
                              league: s.league, total: 0, rate: 0 };
                   listed.total = (sj && sj.total) || 0;
                   var ids = (sj && sj.result) || [];
@@ -373,6 +373,16 @@ internal sealed class TradeSessionWindow : Window
                       // otherwise read as a single orb costing twenty times too much.
                       var stack = (rows[q].item && rows[q].item.stackSize) || 1;
                       asked.push(price.amount / stack);
+
+                      // THE DIVISION, WRITTEN OUT. Whether the site's price is per orb or per
+                      // lot decides whether dividing by the stack is right or off by the stack
+                      // size, and the answer is not in this file - it is in what comes back.
+                      // A rate no one can check against its own inputs is how "1 div = 0.1 ex"
+                      // sat on screen beside "poe.ninja says 393" with nothing to say which.
+                      if (listed.sums.length < 6) {
+                        listed.sums.push(price.amount + '/' + stack + '=' + (price.amount / stack));
+                      }
+
                       if (!listed.raw) { listed.raw = JSON.stringify(rows[q]).slice(0, 1200); }
                     }
 
@@ -429,8 +439,21 @@ internal sealed class TradeSessionWindow : Window
                   listedRate: listed ? listed.rate : 0,
                   listedStatus: listed ? listed.status : 0,
                   listedLeague: listed ? listed.league : '',
-                  raw: ((keys.length ? JSON.stringify(results[keys[0]]) : '')
-                        || (listed && listed.raw) || '').slice(0, 3000),
+                  // ONE SAMPLE PER RUNG, each labelled. This used to be whichever the
+                  // exchange had, falling back to the search's - so on any league where the
+                  // exchange answered at all, the sample shown belonged to a different rung,
+                  // a different league and a different shape from the rate printed above it.
+                  raw: [
+                    keys.length
+                      ? 'EXCHANGE ' + chosen.league + ':  ' + JSON.stringify(results[keys[0]])
+                      : '',
+                    listed && listed.raw
+                      ? 'SEARCH ' + listed.league + ':  ' + listed.raw
+                        + (listed.sums.length
+                            ? '\n\nSEARCH priced amount/stack:  ' + listed.sums.join('   ')
+                            : '')
+                      : '',
+                  ].filter(Boolean).join('\n\n').slice(0, 3000),
                   error: 'want ' + div + ', have ' + exa + '   |   exchange ' + said(got)
                        + (elsewhere ? '   |   exchange ' + said(elsewhere) : '')
                        + (listed ? '   |   search ' + m.league + ': ' + listed.status + ' '
