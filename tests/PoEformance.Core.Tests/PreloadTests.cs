@@ -968,6 +968,55 @@ public class PreloadStoreTests
     }
 
     [Fact]
+    public void THEWHOLELISTCanBeTakenOffTheMachineRunningTheGame()
+    {
+        // Deciding what belongs in a watch list means comparing paths against each other, and
+        // "does this one carry a variant suffix" cannot be answered by scrolling a window on
+        // the machine the game is running on.
+        string file = Path.Combine(Path.GetTempPath(), $"preload-{Guid.NewGuid():N}", "area.txt");
+        try
+        {
+            string? written = PreloadAlertStore.Dump(
+                99, ["Metadata/Z/Last", "Metadata/A/First"], "a note about the read", file);
+
+            Assert.Equal(file, written);
+
+            string[] lines = File.ReadAllLines(file);
+            Assert.Equal("# area 99", lines[0]);
+            Assert.Equal("# 2 files", lines[1]);
+            Assert.Contains("a note", lines[2], StringComparison.Ordinal);
+
+            // SORTED, because the reason to read this is comparison - between two areas, or
+            // between an area and a list somebody is building. An arbitrary order makes a diff
+            // of two captures useless.
+            Assert.Equal("Metadata/A/First", lines[^2]);
+            Assert.Equal("Metadata/Z/Last", lines[^1]);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(file)!, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ANAreaWithNoFilesStillWritesItsHeader()
+    {
+        // An empty capture is evidence too: it says the walk ran and found nothing, which is a
+        // different thing from never having walked.
+        string file = Path.Combine(Path.GetTempPath(), $"preload-{Guid.NewGuid():N}", "area.txt");
+        try
+        {
+            Assert.NotNull(PreloadAlertStore.Dump(1, [], path: file));
+            Assert.Equal("# 0 files", File.ReadAllLines(file)[1]);
+            Assert.Null(PreloadAlertStore.Dump(1, null, path: file));
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(file)!, recursive: true);
+        }
+    }
+
+    [Fact]
     public void AMissingFileIsANEMPTYListRatherThanAShippedOne()
     {
         // Nothing ships, and that is the honest consequence of matching exactly: the exact

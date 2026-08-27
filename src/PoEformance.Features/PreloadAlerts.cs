@@ -220,6 +220,63 @@ public static class PreloadAlertStore
         }
     }
 
+    /// <summary>
+    /// Writes an area's whole loaded-file list out, so it can be read away from the game.
+    /// </summary>
+    /// <returns>The file written, or null when it could not be.</returns>
+    /// <remarks>
+    /// THE LIST IS ONLY EVER ON SCREEN OTHERWISE, and that is a real gap rather than a
+    /// convenience: deciding what belongs in a watch list means comparing paths against each
+    /// other, and questions like "does this one carry a variant suffix" cannot be answered by
+    /// scrolling a window on the machine running the game.
+    ///
+    /// A plain list of paths, one per line, under a few lines of comment naming the area. Plain
+    /// because the next thing anybody does with it is grep it.
+    /// </remarks>
+    public static string? Dump(
+        uint area, IReadOnlyList<string>? all, string note = "", string? path = null)
+    {
+        if (all is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            string file = path
+                ?? System.IO.Path.Combine(AppContext.BaseDirectory, "preloads", $"area-{area}.txt");
+
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(file)!);
+
+            var lines = new List<string>(all.Count + 4)
+            {
+                $"# area {area}",
+                $"# {all.Count} files",
+            };
+
+            if (note.Length > 0)
+            {
+                lines.Add($"# {note}");
+            }
+
+            lines.Add("#");
+
+            // SORTED, because the reason to read this is comparison - between two areas, or
+            // between one area and a list somebody is building. An arbitrary order makes a diff
+            // of two captures useless.
+            var sorted = new List<string>(all);
+            sorted.Sort(StringComparer.Ordinal);
+            lines.AddRange(sorted);
+
+            File.WriteAllLines(file, lines);
+            return file;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
     /// <summary>Where the record of what turned up goes.</summary>
     public static string LogPath
         => System.IO.Path.Combine(AppContext.BaseDirectory, "preloads-found.log");
