@@ -24,6 +24,21 @@ public sealed record StashPage(
     IReadOnlyList<StashSlot> Items);
 
 /// <summary>
+/// Which slots of one inventory held currency, and the arrangement that was true of.
+/// </summary>
+/// <param name="Print">
+/// A fingerprint of the whole inventory - every item's entity and its rectangle. Cheap because
+/// all of it is already in hand: reading the inventory produced these, so checking them costs no
+/// further look at the game's memory, which is the entire point.
+/// </param>
+/// <param name="Currency">
+/// The slots that came back currency last time this arrangement was seen. Their CONTENTS are
+/// deliberately not kept - see <c>StashInspector._known</c> for why a cached stack size would be
+/// wrong exactly when it mattered.
+/// </param>
+public sealed record PurseMemo(ulong Print, IReadOnlyList<StashedItem> Currency);
+
+/// <summary>
 /// The currency a character is carrying, and how stale the stash half of it is.
 /// </summary>
 /// <remarks>
@@ -122,9 +137,14 @@ public sealed class StashInspector
     /// <remarks>
     /// UNLIKE THE FULL READ, THIS ONE RUNS BY ITSELF, and it can because it is a different order
     /// of work. A full read takes every item in every tab down to its mods and resolved stats; a
-    /// purse read asks each item only for its metadata path - the first hop of that walk - and
-    /// goes further on the handful that come back currency. A tab of gear costs one identity
-    /// read per item and nothing else.
+    /// purse read goes that far only on the handful that are currency.
+    ///
+    /// AND IT COSTS ALMOST NOTHING WHILE NOTHING MOVES. It used to ask every item in every
+    /// inventory for its metadata path on every tick - thousands of reads to rediscover that a
+    /// stash of gear is still a stash of gear. Now that question is asked once per ARRANGEMENT
+    /// (see <c>_known</c>), so a tab nobody has touched costs one fingerprint over what the
+    /// inventory read already returned, and a backpack costs a real read only when something in
+    /// it actually moved.
     ///
     /// Five seconds because what it feeds is a graph whose finest resolution is thirty (see
     /// <see cref="WealthHistory.MinGapMs"/>), and a readout that lags a pickup by half a minute
@@ -166,6 +186,24 @@ public sealed class StashInspector
     private long _stashedAt;
     private bool _watchPurse;
     private bool _canSeeAStash;
+
+    /// <summary>
+    /// WHICH SLOTS OF EACH INVENTORY HELD CURRENCY, and the arrangement that was true of.
+    /// </summary>
+    /// <remarks>
+    /// The saving this exists for: a count used to pay ONE IDENTITY READ PER ITEM across every
+    /// inventory, every five seconds - thousands of reads a tick for a stash of gear, to rediscover
+    /// each time that a helmet is still not money. An inventory whose items have not moved cannot
+    /// have changed which of them are currency, so the answer is remembered per inventory and the
+    /// reads are skipped entirely while it stands.
+    ///
+    /// WHAT IS NOT CACHED IS WHAT THE CURRENCY IS WORTH, and that distinction is the whole
+    /// correctness of this. A stack GROWS WITHOUT MOVING - dropping ten Chaos onto a stack of five
+    /// changes neither the entity nor the slot - so the count of every remembered currency slot is
+    /// still read in full on every tick. Caching that too would freeze a purse the moment its owner
+    /// stopped rearranging it, which is precisely when they are filling it.
+    /// </remarks>
+    private readonly Dictionary<int, PurseMemo> _known = [];
 
     public StashInspector(IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, ItemNames? names = null)
     {
@@ -470,14 +508,35 @@ public sealed class StashInspector
                 sawStash = true;
             }
 
-            var found = new List<StashSlot>();
-            foreach (StashedItem item in inventory.Items)
+            // WHICH SLOTS ARE MONEY, asked once per arrangement rather than once per tick. See
+            // _known: an inventory whose items have not moved cannot have changed which of them
+            // are currency, and the identity read that answers it is the expensive part.
+            ulong print = Print(inventory);
+            IReadOnlyList<StashedItem> money;
+            if (_known.TryGetValue(inventory.Id, out PurseMemo? memo) && memo.Print == print)
             {
-                if (!CurrencyPaths.IsCurrency(_items.PathOf(item.Entity)))
+                money = memo.Currency;
+            }
+            else
+            {
+                var sifted = new List<StashedItem>();
+                foreach (StashedItem item in inventory.Items)
                 {
-                    continue;
+                    if (CurrencyPaths.IsCurrency(_items.PathOf(item.Entity)))
+                    {
+                        sifted.Add(item);
+                    }
                 }
 
+                money = sifted;
+                _known[inventory.Id] = new PurseMemo(print, sifted);
+            }
+
+            // AND WHAT THEY HOLD, every time. A stack grows without moving, so this is the read
+            // that must not be cached - it is the one that sees a pickup at all.
+            var found = new List<StashSlot>();
+            foreach (StashedItem item in money)
+            {
                 InspectedItem inspected = _items.Read(item.Entity);
                 if (inspected.Path.Length > 0)
                 {
@@ -516,6 +575,41 @@ public sealed class StashInspector
             ReplacesTheStash(CanSeeAStash, sawStash)
                 ? string.Empty
                 : "away from the stash - showing what the tabs last held");
+    }
+
+    /// <summary>
+    /// A fingerprint of one inventory's arrangement, from what reading it already produced.
+    /// </summary>
+    /// <remarks>
+    /// FNV-1a over each item's entity AND its rectangle. The entity alone would do almost as well,
+    /// but position comes free and closes the one way an entity address could lie: the game reuses
+    /// freed addresses, so an item replaced by another that happened to land on the same address
+    /// would otherwise read as unchanged. Same address AND same rectangle AND same neighbours is
+    /// not a coincidence that happens.
+    ///
+    /// COUNTED IN, because an inventory losing its last item would otherwise fingerprint the same
+    /// as one that never had any - both being the empty product.
+    /// </remarks>
+    public static ulong Print(StashInventory inventory)
+    {
+        ArgumentNullException.ThrowIfNull(inventory);
+
+        const ulong Seed = 14695981039346656037;
+        const ulong Wave = 1099511628211;
+
+        ulong print = Seed;
+        print = (print ^ (uint)inventory.Items.Count) * Wave;
+
+        foreach (StashedItem item in inventory.Items)
+        {
+            print = (print ^ item.Entity) * Wave;
+            print = (print ^ (uint)item.Left) * Wave;
+            print = (print ^ (uint)item.Top) * Wave;
+            print = (print ^ (uint)item.Width) * Wave;
+            print = (print ^ (uint)item.Height) * Wave;
+        }
+
+        return print;
     }
 
     private StashView Build()
