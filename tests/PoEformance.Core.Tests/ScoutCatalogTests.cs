@@ -138,6 +138,29 @@ public sealed class ScoutCatalogTests
     }
 
     [Fact]
+    public void ADayNOBODYTradedOnLeavesAHoleRatherThanAZero()
+    {
+        // WHAT THE DRAWN WEEK IS SPACED BY, and why it is not spaced by index. The site pads a
+        // day with no trades with a null; the parser drops it rather than carrying it as a zero,
+        // which would draw the line through the floor. So a currency's days are NOT seven
+        // consecutive dates: in this capture 37 of the day slots are null and three of the
+        // thirty-six currencies are short one. Chance Shard is the clearest - four points across
+        // five calendar days - and spread evenly its two-day step draws as an ordinary one.
+        IReadOnlyDictionary<string, ScoutEntry> book = ScoutCatalog.Read(Captured());
+
+        ScoutEntry shard = book["Metadata/Items/Currency/CurrencyUpgradeRandomlyShard"];
+        Assert.Equal(4, shard.Days.Count);
+        Assert.Equal(5, shard.Days[^1].Day.DayNumber - shard.Days[0].Day.DayNumber + 1);
+
+        // Stated as "it happens" rather than "it happens three times", so regenerating the
+        // capture does not fail a test about the shape of the feed.
+        Assert.Contains(
+            book.Values,
+            entry => entry.Days.Count >= 2
+                     && entry.Days[^1].Day.DayNumber - entry.Days[0].Day.DayNumber > entry.Days.Count - 1);
+    }
+
+    [Fact]
     public void RubbishIsAnEmptyCatalogueRatherThanACrash()
     {
         Assert.Empty(ScoutCatalog.Read("{not json"));
