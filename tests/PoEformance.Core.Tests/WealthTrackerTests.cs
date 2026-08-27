@@ -324,4 +324,62 @@ public class WealthTrackerTests
 
         Assert.Null(tracker.Over(TimeSpan.FromMinutes(5), Start));
     }
+
+    [Fact]
+    public void AFrozenTotalGetsAFrozenChangeRatherThanASlidingOne()
+    {
+        // REPORTED FROM A MAP WITH NO PRICES LOADED: the same 516 div beside "+8 div", and two
+        // minutes later the same 516 div beside "-42 div". Nothing had been counted in between -
+        // the figure was frozen at the last recorded point, correctly - but the baseline was
+        // still "one window before NOW", so it walked forward through the record while the
+        // endpoint stood still. Both halves came off the record; they were about different
+        // stretches of it.
+        //
+        // THE STEP HAS TO SIT IN THE BAND THE BASELINE CROSSES, or the two queries land on the
+        // same point and the test passes against the bug. A first attempt at this did exactly
+        // that: every point fell inside both windows, so both readings agreed and proved nothing.
+        var tracker = new WealthTracker();
+        PriceBook book = Real();
+        var window = TimeSpan.FromMinutes(10);
+
+        long begins = Start;
+        tracker.Update(Purse(Exalted(100)), book, begins);                    // reaches back far enough
+        tracker.Update(Purse(Exalted(100)), book, begins + (20 * 60_000));
+        tracker.Update(Purse(Exalted(150)), book, begins + (22 * 60_000));    // the step
+        tracker.Update(Purse(Exalted(150)), book, begins + (25 * 60_000));
+
+        long frozenAt = begins + (25 * 60_000);
+
+        // The book goes away - a map with nothing fetched. Nothing more is written, and the
+        // panel falls back to the last recorded point.
+        Assert.False(tracker.Update(Purse(Exalted(150)), new PriceBook(), frozenAt + 60_000));
+        Assert.False(tracker.Showing!.Value.Live);
+
+        // Two queries whose baselines fall either side of the step: 31 minutes in, the window
+        // reaches back to minute 21 (before it); 33 minutes in, to minute 23 (after it).
+        double? then = tracker.Over(window, begins + (31 * 60_000));
+        double? later = tracker.Over(window, begins + (33 * 60_000));
+
+        // Non-null first: two nulls are equal too, and that would prove nothing.
+        Assert.NotNull(then);
+        Assert.NotNull(later);
+
+        // A total that is not moving must sit beside a change that is not moving either.
+        Assert.Equal(then!.Value, later!.Value, 6);
+    }
+
+    [Fact]
+    public void ALiveTotalStillMeasuresBackFromNow()
+    {
+        // The other half: while the count CAN be believed, the window ends at the clock, which
+        // is what makes "the last hour" mean the last hour.
+        var tracker = new WealthTracker();
+        PriceBook book = Real();
+
+        tracker.Update(Purse(Exalted(100)), book, Start);
+        tracker.Update(Purse(Exalted(160)), book, Start + WealthHistory.HeartbeatMs);
+
+        Assert.True(tracker.Showing!.Value.Live);
+        Assert.Equal(60, tracker.Over(TimeSpan.FromMinutes(10), Start + WealthHistory.HeartbeatMs)!.Value, 0);
+    }
 }

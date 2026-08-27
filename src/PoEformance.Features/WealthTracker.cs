@@ -153,7 +153,13 @@ public sealed class WealthTracker
     /// view has to say which - a stale figure presented as current is the same lie as a wrong
     /// one, just harder to notice.
     /// </param>
-    public readonly record struct Shown(double Exalted, double Rate, bool Live)
+    /// <param name="At">
+    /// THE MOMENT THIS FIGURE DESCRIBES, which is not always now. Carried because a change is
+    /// measured from a window ending at the figure, and a frozen figure with a window that
+    /// keeps sliding is two halves about different moments all over again - see
+    /// <see cref="Over"/>, which is where that was still true after the value itself was fixed.
+    /// </param>
+    public readonly record struct Shown(double Exalted, double Rate, bool Live, long At)
     {
         /// <summary>The same amount in Divine, or 0 when there is no rate to divide by.</summary>
         public double Divine => Rate > 0 ? Exalted / Rate : 0;
@@ -170,25 +176,45 @@ public sealed class WealthTracker
     /// Null only before anything has ever been counted or recorded.
     /// </remarks>
     public Shown? Showing
-        => _trusted && _now.Any ? new Shown(_now.Exalted, _now.Rate, true)
-            : _history.Latest is { } last ? new Shown(last.Exalted, last.Rate, false)
+        => _trusted && _now.Any ? new Shown(_now.Exalted, _now.Rate, true, _now.At)
+            : _history.Latest is { } last ? new Shown(last.Exalted, last.Rate, false, last.At)
             : null;
-
-    private double? Endpoint => Showing?.Exalted;
 
     /// <summary>How much the purse has moved over the last stretch of time, in Exalted.</summary>
     /// <remarks>
     /// Null when the record does not reach that far back, which is not the same as no change -
     /// see <see cref="WealthHistory.ChangeSince"/>.
+    ///
+    /// THE WINDOW ENDS AT THE FIGURE, not at the clock, and that is the whole of this. Where the
+    /// count cannot be believed the figure freezes at the last recorded point - correctly - but
+    /// the baseline went on being "one hour before now", so it walked forward through the record
+    /// while the endpoint stood still. Reported from a map with no prices loaded: the same
+    /// 516 div beside "+8 div" and, two minutes later, the same 516 div beside "-42 div". Both
+    /// halves came from the record; they were about different hours of it.
+    ///
+    /// Measuring back from the figure's own moment freezes both ends together, so a total that
+    /// is not moving sits beside a change that is not moving either.
     /// </remarks>
     public double? Over(TimeSpan span, long nowMs)
-        => Endpoint is { } to && _history.At(nowMs - (long)span.TotalMilliseconds) is { } from
-            ? to - from.Exalted
+    {
+        if (Showing is not { } shown)
+        {
+            return null;
+        }
+
+        long ends = shown.Live ? nowMs : shown.At;
+        return _history.At(ends - (long)span.TotalMilliseconds) is { } from
+            ? shown.Exalted - from.Exalted
             : null;
+    }
 
     /// <summary>Everything the record holds, first point to now.</summary>
+    /// <remarks>
+    /// Both ends are fixed points here, so this never had the sliding-baseline problem
+    /// <see cref="Over"/> did - the earliest reading does not move as the clock does.
+    /// </remarks>
     public double? Overall
-        => Endpoint is { } to && _history.Earliest is { } from ? to - from.Exalted : null;
+        => Showing is { } shown && _history.Earliest is { } from ? shown.Exalted - from.Exalted : null;
 
     /// <summary>
     /// How much the purse moved, and over how long it ACTUALLY moved that much.
