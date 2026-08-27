@@ -16,7 +16,7 @@ namespace PoEformance.Overlay;
 /// it is where this differs most from the reference plugin, which evaluates its rules inside
 /// its render callback and presses keys from the loop that draws text.
 ///
-/// Straight onto the game rather than into a window, for the reason <see cref="AlertBanner"/>
+/// Straight onto the game rather than into a window, for the reason the preload card
 /// gives: the point of a combat readout is being read WITHOUT looking away.
 /// </remarks>
 [SupportedOSPlatform("windows")]

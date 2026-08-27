@@ -154,7 +154,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 _uiBrowser.Style = value;
             }
 
-            _banner.Style = value;
             _preloadPanel.Style = value;
             _preloadEntry.Style = value;
             _unwalked.Style = value;
@@ -438,8 +437,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private DissectorWindow? _dissector;
     private PoiLayer? _poi;
     private RoutePlanner? _planner;
-    private AlertWatcher? _alerts;
-    private readonly AlertBanner _banner = new();
     private readonly RuleLayer _rules = new();
 
     /// <summary>What the rule engine decided to show this tick, or null when it is not wired.</summary>
@@ -498,49 +495,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private RitualWatch? _ritualWatch;
     private RitualWindow? _ritualWindow;
 
-    /// <summary>
-    /// Adds the alert watcher, which says when something worth knowing about turned up.
-    /// </summary>
-    /// <remarks>
-    /// Looked at on the RENDER thread rather than the reader's, and that is deliberate: it
-    /// reads a finished snapshot and touches no memory, so putting it here costs the read
-    /// nothing and keeps the reader free of anything that produces user-facing output.
-    /// </remarks>
-    public void AttachAlerts(AlertWatcher watcher, Action saved, bool visible = false)
-    {
-        ArgumentNullException.ThrowIfNull(watcher);
-        ArgumentNullException.ThrowIfNull(saved);
-        _alerts = watcher;
-        var window = new AlertWindow(watcher, saved);
-        _alertWindow = window;
-        _tools.Add(10, "alerts", "Alerts", window.DrawTab, window.Idle);
-
-        // The banner's colours, beside the rules that fire it rather than on a style page
-        // two tabs away - a feature's looks live with the feature.
-        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Alerts);
-        _tools.Add(11, "alerts-style", "How it looks", styles.Draw, styles.Idle, page: "alerts");
-
-        if (visible)
-        {
-            _tools.Show("alerts");
-        }
-
-        AlertsChanged = saved;
-
-        // The preload list is edited in this window, and it may have been attached first -
-        // both orders happen, so neither attach assumes it went second.
-        if (_preload is not null && PreloadRulesChanged is not null)
-        {
-            _alertWindow.AttachPreload(_preload, _preloadSettings, TookPreload, SayItNow);
-        }
-    }
-
     /// <summary>Called when the preload alerts changed, so they can be written down.</summary>
-    /// <remarks>
-    /// Their own callback rather than <see cref="AlertsChanged"/>: they are a different list
-    /// in a different file, and one save that wrote both would make deleting an entity rule
-    /// rewrite the preload rules too.
-    /// </remarks>
     public Action<PreloadSettings>? PreloadRulesChanged { get; set; }
 
     /// <summary>Takes a change from either editor and passes it on.</summary>
@@ -551,7 +506,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         PreloadRulesChanged?.Invoke(changed);
     }
 
-    private AlertWindow? _alertWindow;
     private PreloadWatch? _preload;
     private PreloadSettings _preloadSettings = PreloadSettings.Default;
     private readonly PreloadPanel _preloadPanel = new();
@@ -618,9 +572,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _tools.Show("preload");
         }
 
-        // The editor for these lives in the alerts window, which may already be attached -
-        // both orders happen depending on how the app is wired, so neither is assumed.
-        _alertWindow?.AttachPreload(watch, settings, TookPreload, SayItNow);
     }
 
     /// <summary>
@@ -680,15 +631,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _preloadEntry.Announce(saying, Environment.TickCount64);
         }
     }
-
-    /// <summary>Called when an alert setting was changed, so it can be written down.</summary>
-    /// <remarks>
-    /// Separate from <see cref="SettingsChanged"/> because the two live in different files:
-    /// the alerts carry their RULES, which is a list rather than a switch, and mixing a list
-    /// somebody curates into the overlay's settings would put half a person's configuration
-    /// in each of two places.
-    /// </remarks>
-    public Action? AlertsChanged { get; set; }
 
     /// <summary>
     /// Adds the appearance editor, and says where its choices should be written down.
@@ -1726,19 +1668,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             long now = Environment.TickCount64;
 
-            // What the area loaded goes first, so that when both have something to say in the
-            // same frame the live one wins the banner: an entity alert is about something
-            // happening now, and this is about the area, which will still be true in a second.
             AnnounceWhatLoaded(now);
-
-            if (_alerts is not null && _alerts.Look(_snapshot, now) is Alert raised)
-            {
-                _banner.Show(raised);
-            }
 
             if (width > 0 && height > 0)
             {
-                _banner.Draw(ImGui.GetForegroundDrawList(), width, height, now);
                 _preloadEntry.Draw(ImGui.GetForegroundDrawList(), width, height, now);
             }
         }

@@ -15,7 +15,7 @@ namespace PoEformance.Overlay;
 /// the picture worth having: a plate can say "dangerous" in a shape the eye reads before the
 /// word underneath it has been focused on.
 ///
-/// Its own layer rather than the alert banner. That one exists to interrupt with something
+/// Its own layer, and it always was. It exists to interrupt with something
 /// happening NOW and is deliberately one line; this is a title card for the place you just
 /// walked into, and the two would fight over the same spot and the same colours.
 ///

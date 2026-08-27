@@ -1284,18 +1284,6 @@ internal static class Program
         overlay.Style = PoEformance.Features.OverlayStyleStore.Load();
         overlay.AttachStyleEditor(() => PoEformance.Features.OverlayStyleStore.Save(overlay.Style));
 
-        PoEformance.Features.AlertSettings alerts = PoEformance.Features.AlertStore.Load();
-        var watcher = new PoEformance.Features.AlertWatcher
-        {
-            Rules = alerts.Watching,
-            Enabled = alerts.Enabled,
-            QuietInTown = alerts.QuietInTown,
-        };
-        overlay.AttachAlerts(
-            watcher,
-            () => PoEformance.Features.AlertStore.Save(
-                new PoEformance.Features.AlertSettings(watcher.Enabled, watcher.QuietInTown, watcher.Rules)));
-
         // AFTER the parts it configures are attached, or half of it would be applied to
         // things that do not exist yet - and silently, since every one of them is optional.
         overlay.Apply(settings);

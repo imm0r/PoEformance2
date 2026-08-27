@@ -83,7 +83,7 @@ public sealed class RuleEngine
 
     /// <summary>When input was last synthesised, or null when none has been.</summary>
     /// <remarks>
-    /// Null rather than 0, which is the same trap <see cref="AlertWatcher"/> records having
+    /// Null rather than 0, which is the same trap the removed entity alerts recorded having
     /// fallen into with a different sentinel. Zero looks like an obvious "long ago" and is a
     /// real timestamp: against a clock that starts near it - a test, a freshly booted machine -
     /// the gap since "never" measures as no gap at all, and the first input of the session is
