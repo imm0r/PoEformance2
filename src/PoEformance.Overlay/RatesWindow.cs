@@ -264,14 +264,26 @@ public sealed class RatesWindow
         }
     }
 
-    /// <summary>The seven-day move, from the index rather than the feed.</summary>
+    /// <summary>How wide the drawn week is, as a multiple of the font size.</summary>
+    private const float LineWide = 3.4f;
+
+    /// <summary>And how tall.</summary>
+    private const float LineTall = 0.9f;
+
+    /// <summary>The seven-day move: the shape of it, then the size of it.</summary>
     /// <remarks>
-    /// A NUMBER RATHER THAN A DRAWN LINE, for now. A sparkline in a table row is a handful of
-    /// pixels either way, and the thing somebody actually reads off it is the direction and the
-    /// size - which fit in six characters and cannot be misread at a glance.
+    /// BOTH, because they answer different questions. The number says how far the price moved
+    /// and is the one to read when comparing two rows; the line says HOW it got there, which a
+    /// single percentage cannot - a steady climb and a spike that fell back read identically at
+    /// +26% and are not the same thing to trade against.
     ///
-    /// It is blank rather than zero where the index has nothing: "flat" and "unknown" are
-    /// different answers, and a dash is the honest one.
+    /// This was a number alone, with a comment arguing that a few pixels in a table row could
+    /// not say anything the figure did not. That was a design call standing in for a request:
+    /// the reference this borrows from draws the line, and the screenshot asking for the feature
+    /// had it in every row.
+    ///
+    /// Blank rather than zero where the index has nothing: "flat" and "unknown" are different
+    /// answers, and a dash is the honest one.
     /// </remarks>
     private static void Week(IReadOnlyDictionary<string, ScoutEntry> index, string path)
     {
@@ -281,12 +293,20 @@ public sealed class RatesWindow
             return;
         }
 
-        ImGuiText.Mono(moved >= 0 ? Up : Down, $"{(moved >= 0 ? "+" : string.Empty)}{moved * 100:0.#}%");
+        // ONCE PER ROW. Settled is a property that sorts a copy of the volumes to find the median
+        // day, so every mention of it is two allocations and a sort - and this cell mentions it
+        // three times, on eighty rows, on every frame.
+        IReadOnlyList<ScoutDay> days = entry.Settled;
 
-        if (ImGui.IsItemHovered())
+        Vector4 tint = moved >= 0 ? Up : Down;
+        bool hovering = Line(days, tint);
+        ImGui.SameLine();
+        ImGuiText.Mono(tint, $"{(moved >= 0 ? "+" : string.Empty)}{moved * 100:0.#}%");
+
+        if (hovering || ImGui.IsItemHovered())
         {
             var said = new System.Text.StringBuilder();
-            foreach (ScoutDay day in entry.Settled)
+            foreach (ScoutDay day in days)
             {
                 said.Append(day.Day.ToString("MM-dd", System.Globalization.CultureInfo.InvariantCulture))
                     .Append("   ")
@@ -298,13 +318,107 @@ public sealed class RatesWindow
 
             // The unfinished day is named rather than silently dropped, because somebody looking
             // for today and not finding it deserves to know it was left out on purpose.
-            if (entry.Settled.Count < entry.Days.Count)
+            if (days.Count < entry.Days.Count)
             {
                 said.Append("\ntoday so far is left out - a part-day is not a day");
             }
 
             ImGuiText.MonoTooltip(said.ToString());
         }
+    }
+
+    /// <summary>
+    /// One currency's settled days, drawn as a line.
+    /// </summary>
+    /// <remarks>
+    /// SCALED TO ITS OWN RANGE, not to zero, for the reason the wealth graph is: a Mirror moving
+    /// from 2.9M to 3.1M against a zero baseline is a flat line along the top, and the shape is
+    /// the only thing this column has that the number beside it does not.
+    ///
+    /// A flat week draws down the middle rather than at the bottom - a price that did not move
+    /// is not a price of nothing, and the eye reads "at the floor" as the second one.
+    ///
+    /// Space is reserved with Dummy rather than an InvisibleButton because a button is a widget:
+    /// it takes the click, and the table's rows are clickable. Dummy reserves the space and is
+    /// still hoverable, which is all this needs - it says so, and the caller puts the same
+    /// tooltip on the line as on the figure beside it.
+    /// </remarks>
+    /// <returns>Whether the cursor is over the drawn week.</returns>
+    private static bool Line(IReadOnlyList<ScoutDay> days, Vector4 tint)
+    {
+        float wide = ImGui.GetFontSize() * LineWide;
+        float tall = ImGui.GetFontSize() * LineTall;
+
+        Vector2 at = ImGui.GetCursorScreenPos();
+        ImGui.Dummy(new Vector2(wide, tall));
+        bool hovering = ImGui.IsItemHovered();
+
+        if (days.Count < 2)
+        {
+            // Guarded rather than assumed: the caller only draws this when the trend exists, which
+            // means two settled days, but a helper that reads a list should not need to know that.
+            return hovering;
+        }
+
+        double low = days[0].Exalted;
+        double high = low;
+        for (var i = 1; i < days.Count; i++)
+        {
+            low = Math.Min(low, days[i].Exalted);
+            high = Math.Max(high, days[i].Exalted);
+        }
+
+        double range = high - low;
+        float middle = at.Y + (tall / 2f);
+
+        ImDrawListPtr draw = ImGui.GetWindowDrawList();
+        uint ink = ImGui.ColorConvertFloat4ToU32(tint with { W = tint.W * 0.85f });
+
+        if (range <= 0)
+        {
+            draw.AddLine(new Vector2(at.X, middle), new Vector2(at.X + wide, middle), ink, 1.2f);
+            return hovering;
+        }
+
+        // ACROSS BY DATE, NOT BY INDEX, the same way the wealth graph spaces its points by time.
+        // A day the site had no trades for arrives as a null and the catalogue drops it rather
+        // than carrying a zero, so the list has real holes: in the captured Standard index, 37 of
+        // the day slots are null and three of the thirty-six currencies are missing a day - Chance
+        // Shard has four points spanning five days. Spread evenly, that gap draws as an ordinary
+        // step and the week reads a day shorter than it was.
+        int first = days[0].Day.DayNumber;
+        float across = Math.Max(1, days[^1].Day.DayNumber - first);
+
+        Vector2 last = default;
+        for (var i = 0; i < days.Count; i++)
+        {
+            var here = new Vector2(
+                at.X + (wide * (days[i].Day.DayNumber - first) / across),
+                Height(days[i].Exalted, low, range, at.Y, tall));
+
+            if (i > 0)
+            {
+                draw.AddLine(last, here, ink, 1.2f);
+            }
+
+            last = here;
+        }
+
+        return hovering;
+    }
+
+    /// <summary>Where in the row one day's price sits, with the cheapest day at the bottom.</summary>
+    /// <remarks>
+    /// A seventh of the height is left free at the top and the same at the bottom. Without it the
+    /// week's high and low sit exactly on the row's edges, where a line a pixel wide is half eaten
+    /// by the row above and the row below - so the two points whose position is most certain end
+    /// up the two drawn worst.
+    /// </remarks>
+    private static float Height(double value, double low, double range, float top, float tall)
+    {
+        const float Air = 0.15f;
+        var part = (float)((value - low) / range);
+        return top + (tall * (1f - Air - (part * (1f - (2f * Air)))));
     }
 
     private static string Short(string path)
