@@ -25,7 +25,30 @@ public sealed class WealthTracker
     private Reading _now = Reading.Nothing;
     private bool _trusted;
 
-    public WealthTracker(WealthHistory? history = null) => _history = history ?? new WealthHistory();
+    public WealthTracker(WealthHistory? history = null)
+    {
+        _history = history ?? new WealthHistory();
+
+        // PICKED UP WHERE THE RECORD LEFT OFF, not started at zero. Only differences of the
+        // drift are ever read, but they are read ACROSS points - and a run that began counting
+        // again from zero would put its first point below every point before it, so any window
+        // spanning the restart would report a price collapse that never happened.
+        _drift = _history.Latest?.Drift ?? 0;
+    }
+
+    /// <summary>The book the last reading was priced with, for measuring what the next one moved.</summary>
+    private PriceBook? _priced;
+
+    /// <summary>
+    /// Everything the PRICES have moved across this record, in Exalted, up to the last reading.
+    /// </summary>
+    /// <remarks>
+    /// The book only. A unique whose asking price moved on the trade site is not counted here
+    /// and lands in the gathered half, which is the smaller error of the two available: the book
+    /// covers the currency that makes up almost all of a purse, and the alternative is pricing
+    /// every unique twice per reading to catch the rest.
+    /// </remarks>
+    private double _drift;
 
     /// <summary>What the purse came to at the last count, whether or not it was recorded.</summary>
     /// <param name="Exalted">The total.</param>
@@ -116,6 +139,22 @@ public sealed class WealthTracker
 
         Valued worth = book.Purse(purse.Pages, trade);
 
+        // WHAT THE PRICES DID, measured against THE SAME HOLDINGS. This is the only moment it
+        // can be measured: both books are in hand and the purse has not moved between them, so
+        // the difference is the prices and nothing else. A record of totals cannot be taken
+        // apart afterwards - "the purse went from 200k to 220k" does not say whether twenty
+        // thousand was gathered or repriced.
+        //
+        // Only when the book has actually been REPLACED. Handed the same book twice, the
+        // difference is zero anyway, but pricing the whole purse a second time to learn that is
+        // a walk over every stack for nothing.
+        if (_priced is { } before && !ReferenceEquals(before, book))
+        {
+            _drift += worth.Exalted - before.Purse(purse.Pages, trade).Exalted;
+        }
+
+        _priced = book;
+
         var reading = new Reading(
             worth.Exalted,
             book.Rate,
@@ -128,7 +167,7 @@ public sealed class WealthTracker
         _now = reading;
         _trusted = Fit(reading, book.Ready, settling);
 
-        return _trusted && _history.Note(nowMs, reading.Exalted, reading.Rate, reading.Stacks);
+        return _trusted && _history.Note(nowMs, reading.Exalted, reading.Rate, reading.Stacks, _drift);
     }
 
     /// <summary>
@@ -226,6 +265,52 @@ public sealed class WealthTracker
     /// holds instead. A view must SAY so when this is set - see <see cref="Moved"/>.
     /// </param>
     public readonly record struct Movement(double Exalted, TimeSpan Over, bool WholeRecord);
+
+    /// <summary>What a stretch of movement was made of.</summary>
+    /// <param name="Gathered">What was picked up or spent, at the prices of the moment.</param>
+    /// <param name="Repriced">And what the same holdings became worth as the prices moved.</param>
+    /// <remarks>
+    /// THERE IS NO "IS THIS TRUSTWORTHY" FLAG, and one was written before it was noticed that it
+    /// could not be filled in honestly. A point recorded before the drift existed carries zero;
+    /// so does a point recorded after it, over a stretch where the prices genuinely did not
+    /// move. The two are the same number and nothing distinguishes them.
+    ///
+    /// What that costs is bounded and heals itself: the first window reaching back past the
+    /// upgrade attributes this run's drift to it, and every window after the record has filled
+    /// with new points is exact.
+    /// </remarks>
+    public readonly record struct MadeOf(double Gathered, double Repriced)
+    {
+        /// <summary>The two halves together, which is the movement itself.</summary>
+        public double Exalted => Gathered + Repriced;
+    }
+
+    /// <summary>
+    /// How much of a stretch was picked up and how much was the prices moving.
+    /// </summary>
+    /// <remarks>
+    /// ONE SUBTRACTION, because the drift is cumulative: the price share of any stretch is its
+    /// drift at the end less its drift at the start, and everything else that moved is what was
+    /// actually gathered. The decomposition itself happened at each reading, where both books
+    /// were in hand - see the drift field.
+    /// </remarks>
+    public MadeOf? Made(TimeSpan span, long nowMs)
+    {
+        if (Showing is not { } shown)
+        {
+            return null;
+        }
+
+        long ends = shown.Live ? nowMs : shown.At;
+        if (_history.At(ends - (long)span.TotalMilliseconds) is not { } from)
+        {
+            return null;
+        }
+
+        double moved = shown.Exalted - from.Exalted;
+        double repriced = _drift - from.Drift;
+        return new MadeOf(moved - repriced, repriced);
+    }
 
     /// <summary>
     /// The change over a stretch, falling back to the whole record when it is younger than that.
