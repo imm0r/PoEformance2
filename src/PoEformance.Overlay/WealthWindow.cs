@@ -65,12 +65,18 @@ public sealed class WealthWindow
     /// figure priced against the wrong economy from a right one.
     /// </param>
     /// <param name="purse">The currency itself, for breaking the total down into what made it.</param>
+    /// <param name="pairs">
+    /// The game's own exchange, for the per-tab worth. Null where nothing wired one, and then
+    /// the section simply does not appear - it would be a table of blanks, since the aggregated
+    /// index knows a fraction of what a stash actually holds.
+    /// </param>
     public WealthWindow(
         WealthTracker tracker,
         WealthPanel panel,
         Func<PriceBook> book,
         Func<string> league,
-        Func<PurseView> purse)
+        Func<PurseView> purse,
+        Func<ExchangePairs?>? pairs = null)
     {
         ArgumentNullException.ThrowIfNull(tracker);
         ArgumentNullException.ThrowIfNull(panel);
@@ -82,7 +88,23 @@ public sealed class WealthWindow
         _book = book;
         _league = league;
         _purse = purse;
+        _pairs = pairs;
     }
+
+    private readonly Func<ExchangePairs?>? _pairs;
+
+    /// <summary>
+    /// Tabs the player has taken out of the total, remembered by the game's own tab id.
+    /// </summary>
+    /// <remarks>
+    /// BY ID RATHER THAN BY NAME, because a tab can be renamed and a mule tab usually is. The
+    /// set lives here rather than in the settings file for now: it is a view choice about one
+    /// session's stash, and persisting it would mean deciding what happens to an id that no
+    /// longer exists.
+    /// </remarks>
+    private readonly HashSet<int> _skipping = [];
+
+    private bool _worth = true;
 
     /// <summary>Whether the purse is being counted at all. Wired to the inspector's own switch.</summary>
     public bool Watching { get; set; }
@@ -156,6 +178,8 @@ public sealed class WealthWindow
         DrawTotals(now);
         ImGui.Separator();
         DrawBreakdown();
+        ImGui.Separator();
+        DrawByTab();
         ImGui.Separator();
         DrawGraph(now);
         ImGui.Separator();
@@ -375,6 +399,115 @@ public sealed class WealthWindow
 
     /// <summary>Which stretch is being looked at, or everything.</summary>
     private TimeSpan Span() => Windows[_window].Span;
+
+    /// <summary>
+    /// Where the money actually is, one line per inventory.
+    /// </summary>
+    /// <remarks>
+    /// PRICED FROM THE GAME'S OWN EXCHANGE rather than the index above it, and that is what makes
+    /// the section possible at all: the index knows 38 currencies in Standard where the exchange
+    /// knows 95. Built on the index, an Essence tab, a Rune tab and an Omen tab would all read as
+    /// empty - not a rounding error but the wrong answer, printed confidently.
+    ///
+    /// AN UNTICKED TAB STAYS ON SCREEN, greyed and still counted, just not added up. Somebody
+    /// taking a mule tab out of the total wants it out of the total; a row that vanished could
+    /// never be found again to put back.
+    /// </remarks>
+    private void DrawByTab()
+    {
+        if (_pairs is null)
+        {
+            return;
+        }
+
+        _worth = OverlayFonts.SectionHeader("where it is###wealth-by-tab");
+        if (!_worth)
+        {
+            return;
+        }
+
+        ExchangePairs? pairs = _pairs();
+        IReadOnlyList<TabWorth> tabs = NetWorth.ByTab(_purse().Pages, pairs, _book(), _skipping);
+        if (tabs.Count == 0)
+        {
+            ImGuiText.Wrapped(
+                OverlayTheme.Quiet,
+                "No inventory read yet. The stash tabs the game has not opened are not readable, "
+                + "so this fills in as they are visited.");
+            return;
+        }
+
+        TabWorth all = NetWorth.Total(tabs);
+        double rate = _book().Rate;
+
+        ImGui.TextColored(Line, StashWorth.Purse(all.Exalted, rate));
+        ImGui.SameLine();
+        ImGuiText.Wrapped(
+            OverlayTheme.Quiet,
+            $"across {all.Called}"
+            + (all.Unpriced > 0 ? $", {all.Unpriced} stacks unpriced" : string.Empty));
+
+        if (!ImGui.BeginTable(
+                "wealth-by-tab",
+                4,
+                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY,
+                new Vector2(0f, ImGui.GetFontSize() * 12f)))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TableSetupScrollFreeze(0, 1);
+            ImGui.TableSetupColumn(" ");
+            ImGui.TableSetupColumn("tab");
+            ImGui.TableSetupColumn("worth");
+            ImGui.TableSetupColumn("stacks");
+            ImGui.TableHeadersRow();
+
+            foreach (TabWorth tab in tabs)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+
+                bool counted = tab.Counted;
+                if (ImGui.Checkbox($"##tab{tab.Id}", ref counted))
+                {
+                    if (counted)
+                    {
+                        _skipping.Remove(tab.Id);
+                    }
+                    else
+                    {
+                        _skipping.Add(tab.Id);
+                    }
+                }
+
+                Vector4 ink = tab.Counted ? OverlayTheme.Ink : OverlayTheme.Quiet;
+
+                ImGui.TableNextColumn();
+                ImGui.TextColored(ink, tab.Called);
+
+                ImGui.TableNextColumn();
+                ImGuiText.Mono(tab.Counted ? Line : OverlayTheme.Quiet,
+                    StashWorth.Purse(tab.Exalted, rate));
+
+                ImGui.TableNextColumn();
+
+                // The unpriced count sits beside the stack count rather than in a column of its
+                // own, because it is only ever interesting when it is not zero.
+                ImGuiText.Mono(
+                    tab.Unpriced > 0 ? Warn : ink,
+                    tab.Unpriced > 0
+                        ? $"{tab.Stacks}  ({tab.Unpriced} unpriced)"
+                        : tab.Stacks.ToString(System.Globalization.CultureInfo.CurrentCulture));
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
+    }
 
     private void DrawGraph(long now)
     {

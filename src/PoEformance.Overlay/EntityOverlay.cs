@@ -1098,7 +1098,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// and its click-through is the ordinary one. That is what the user asked for and it is also
     /// the only way it can be moved: painted pixels take no mouse.
     /// </remarks>
-    public void AttachWealth(WealthTracker tracker, StashInspector inspector, PriceStore prices)
+    /// <param name="exchange">
+    /// The game's own Currency Exchange, or null where nothing wired one. It is what the per-tab
+    /// worth is priced from: the aggregated index covers a fraction of what a stash holds, and a
+    /// breakdown built on it would report whole tabs as empty.
+    /// </param>
+    public void AttachWealth(
+        WealthTracker tracker,
+        StashInspector inspector,
+        PriceStore prices,
+        ExchangeStore? exchange = null)
     {
         ArgumentNullException.ThrowIfNull(tracker);
         ArgumentNullException.ThrowIfNull(inspector);
@@ -1112,7 +1121,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _wealthPanel,
             () => prices.Book,
             () => inspector.League,
-            () => inspector.Purse)
+            () => inspector.Purse,
+            exchange is null ? null : () => exchange.Pairs)
         {
             Watching = inspector.WatchPurse,
             WatchChanged = on =>
