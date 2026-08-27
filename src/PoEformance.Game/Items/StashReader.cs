@@ -35,7 +35,7 @@ public sealed record StashedItem(ulong Entity, int Left, int Top, int Width, int
 /// <param name="Loaded">
 /// Whether the game has ALLOCATED this inventory's item list at all. False means the tab was
 /// listed but never filled in - which is not the same as a tab holding nothing, and reading it
-/// as such is what let twenty-nine unopened tabs erase themselves from a total.
+/// as such is what let unvisited tabs erase themselves from a total.
 /// </param>
 public sealed record StashInventory(
     int Id,
@@ -231,10 +231,18 @@ public sealed class StashReader
         ulong first = _reader.ReadPointer(inventory + (ulong)_itemList);
         ulong last = _reader.ReadPointer(inventory + (ulong)_itemListLast);
 
-        // NEVER ALLOCATED IS NOT EMPTY, and the two used to leave here as the same answer. The
-        // game fills in one stash tab at a time, so a player with thirty of them has one that
-        // can be read and twenty-nine that cannot - and a reading of nothing was allowed to
+        // NEVER ALLOCATED IS NOT EMPTY, and the two used to leave here as the same answer.
+        //
+        // WHAT THE GAME ACTUALLY DOES, from the player rather than from a guess: it keeps the
+        // last state you LOOKED AT. A tab opened at some point stays readable; a tab never
+        // opened this session has no list to read. So a player with thirty tabs has as many
+        // filled in as they have visited, and the rest answer nothing - which was allowed to
         // stand for what those tabs hold.
+        //
+        // Two guesses were wrong on the way here and are recorded so nobody spends the time
+        // again: that only the ACTIVE tab is held (no), and that a tab can fall back OUT of
+        // memory once seen (no). Ctrl-clicking an item into the stash opens the destination tab
+        // itself, which is why depositing is the moment a tab first becomes readable.
         //
         // A null list pointer is the tab not being there to read. A valid pointer with
         // last == first is an allocated, empty list: a tab somebody has just emptied, which IS
