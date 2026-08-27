@@ -69,7 +69,6 @@ public sealed class PreloadEntryBanner
 
     private const float TextPadX = 12f;
     private const float TextPadY = 5f;
-    private const float BlockGap = 10f;
 
     /// <summary>
     /// Where a plate's writing goes, as fractions of the picture it is written on.

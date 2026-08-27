@@ -27,13 +27,6 @@ public sealed class PreloadWindow
     private static readonly Vector4 GoodText = new(0.55f, 0.9f, 0.65f, 1f);
     private static readonly Vector4 WarnText = new(1f, 0.6f, 0.35f, 1f);
 
-    private static readonly Vector4[] ByWeight =
-    [
-        new(0.75f, 0.8f, 0.88f, 1f),   // notable
-        new(1f, 0.85f, 0.4f, 1f),      // valuable
-        new(1f, 0.45f, 0.4f, 1f),      // dangerous
-    ];
-
     private readonly PreloadWatch _watch;
     private readonly Action _lookAgain;
     private readonly Action _sweep;
