@@ -749,10 +749,15 @@ public class PreloadAlertEntryTests
     {
         // The editor asks it per row, so that a typo is visible as "this matches nothing here"
         // rather than as an area that simply does not have the thing.
-        Assert.True(PreloadAlerts.Here("Metadata/X", ["metadata/x"]));
-        Assert.False(PreloadAlerts.Here("Metadata/X", ["Metadata/Y"]));
-        Assert.False(PreloadAlerts.Here("", ["Metadata/X"]));
+        Assert.True(PreloadAlerts.Here("Metadata/X", PreloadAlerts.Lookup(["metadata/x"])));
+        Assert.False(PreloadAlerts.Here("Metadata/X", PreloadAlerts.Lookup(["Metadata/Y"])));
+        Assert.False(PreloadAlerts.Here("", PreloadAlerts.Lookup(["Metadata/X"])));
         Assert.False(PreloadAlerts.Here("Metadata/X", null));
+
+        // Built once per frame rather than per row, so an empty area answers as nothing at all
+        // rather than as a set nobody can be in.
+        Assert.Null(PreloadAlerts.Lookup(null));
+        Assert.Null(PreloadAlerts.Lookup([]));
     }
 
     [Fact]

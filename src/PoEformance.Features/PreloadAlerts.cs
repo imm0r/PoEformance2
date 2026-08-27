@@ -99,8 +99,7 @@ public static class PreloadAlerts
             return [];
         }
 
-        var here = new HashSet<string>(loaded, StringComparer.OrdinalIgnoreCase);
-        if (here.Count == 0)
+        if (Lookup(loaded) is not HashSet<string> here)
         {
             return [];
         }
@@ -117,29 +116,34 @@ public static class PreloadAlerts
         return found;
     }
 
+    /// <summary>
+    /// The loaded paths in the form the editor asks about them, or null when there are none.
+    /// </summary>
+    /// <remarks>
+    /// BUILT ONCE PER FRAME, not once per row. The editor asks "is this row in the area" for
+    /// every row it draws, an area loads a few thousand paths, and a list can run to hundreds
+    /// of rows - so a linear scan per row is a few hundred thousand string comparisons per
+    /// frame, in a window that redraws at the refresh rate.
+    /// </remarks>
+    public static HashSet<string>? Lookup(IEnumerable<string>? loaded)
+    {
+        if (loaded is null)
+        {
+            return null;
+        }
+
+        var here = new HashSet<string>(loaded, StringComparer.OrdinalIgnoreCase);
+        return here.Count > 0 ? here : null;
+    }
+
     /// <summary>Whether one path is in a set of loaded ones, by the same rule as <see cref="Found"/>.</summary>
     /// <remarks>
     /// Exposed so an editor can show, per row, whether that row matches the area being stood in.
     /// A list of paths nobody can check is a list of guesses, and a typo in one is otherwise
     /// indistinguishable from an area that simply does not have the thing.
     /// </remarks>
-    public static bool Here(string? path, IEnumerable<string>? loaded)
-    {
-        if (string.IsNullOrWhiteSpace(path) || loaded is null)
-        {
-            return false;
-        }
-
-        foreach (string one in loaded)
-        {
-            if (string.Equals(one, path, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    public static bool Here(string? path, IReadOnlySet<string>? loaded)
+        => !string.IsNullOrWhiteSpace(path) && loaded is not null && loaded.Contains(path);
 
     /// <summary>The line written to disk for a found entry.</summary>
     /// <remarks>

@@ -122,7 +122,7 @@ public sealed class PreloadAlertWindow
     private void List()
     {
         IReadOnlyList<PreloadAlertEntry> entries = _watch.Watching;
-        IReadOnlyList<string> here = _watch.All;
+        HashSet<string>? here = PreloadAlerts.Lookup(_watch.All);
 
         Adding();
 
@@ -233,7 +233,7 @@ public sealed class PreloadAlertWindow
         ref PreloadAlertEntry entry,
         List<PreloadAlertEntry> all,
         int at,
-        IReadOnlyList<string> here)
+        IReadOnlySet<string>? here)
     {
         var edit = Edit.None;
 
