@@ -1,0 +1,285 @@
+{
+ "next_change_id": 1787810400,
+ "markets": [
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 2121,
+    "Metadata/Items/Currency/CurrencyModValues": 208
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 2121,
+    "Metadata/Items/Currency/CurrencyModValues": 208
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SupportGemAilithLineage|Metadata/Items/Currency/CurrencyUpgradeToRare",
+   "market_pair": [
+    "Metadata/Items/Gems/SupportGemAilithLineage",
+    "Metadata/Items/Currency/CurrencyUpgradeToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SupportGemAilithLineage": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SupportGemAilithLineage": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 23
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SupportGemAilithLineage": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 23
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SupportGemAilithLineage": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SupportGemAilithLineage": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/Breach/BreachPinnacleKey|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/Breach/BreachPinnacleKey",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/Breach/BreachPinnacleKey": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 22
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/Breach/BreachPinnacleKey": 47,
+    "Metadata/Items/Currency/CurrencyModValues": 811
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/Breach/BreachPinnacleKey": 47,
+    "Metadata/Items/Currency/CurrencyModValues": 811
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/Breach/BreachPinnacleKey": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 22
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/Breach/BreachPinnacleKey": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 22
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SkillGemUncut20|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gems/SkillGemUncut20",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SkillGemUncut20": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 12
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut20": 523,
+    "Metadata/Items/Currency/CurrencyModValues": 627
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut20": 523,
+    "Metadata/Items/Currency/CurrencyModValues": 638
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut20": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 12
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut20": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 12
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 16,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 7571
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 752,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 895805
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 757,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 897365
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 602
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 260
+   }
+  },
+  {
+   "league": "Runes of Aldur",
+   "market_id": "Metadata/Items/SoulCores/RuneWardSpecial3|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneWardSpecial3",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 37,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 37,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Runes of Aldur",
+   "market_id": "Metadata/Items/SoulCores/RuneWardSpecial3|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneWardSpecial3",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 28,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 28,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneWardSpecial3": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   }
+  },
+  {
+   "league": "Runes of Aldur",
+   "market_id": "Metadata/Items/SoulCores/ThesisOfExperiments|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/ThesisOfExperiments",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/ThesisOfExperiments": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/ThesisOfExperiments": 166,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/ThesisOfExperiments": 166,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/ThesisOfExperiments": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/ThesisOfExperiments": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Runes of Aldur",
+   "market_id": "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 76,
+    "Metadata/Items/Currency/CurrencyRerollRare": 82
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 199,
+    "Metadata/Items/Currency/CurrencyRerollRare": 121
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 214,
+    "Metadata/Items/Currency/CurrencyRerollRare": 169
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 4,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   }
+  },
+  {
+   "league": "Runes of Aldur",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2734,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 993648
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 6199,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 3754128
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 6696,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 3854842
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 379
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 350
+   }
+  }
+ ]
+}
