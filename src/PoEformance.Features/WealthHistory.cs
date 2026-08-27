@@ -24,11 +24,30 @@ namespace PoEformance.Features;
 /// <param name="Exalted">What the currency came to, in Exalted.</param>
 /// <param name="Rate">Exalted per Divine at that moment. 0 when the book had no rate.</param>
 /// <param name="Stacks">How many separate stacks of currency were being carried.</param>
+/// <param name="Drift">
+/// How much of this record's whole movement, up to and including this point, was the PRICES
+/// moving rather than the holdings.
+/// </param>
+/// <remarks>
+/// DRIFT IS CUMULATIVE, and that is what makes it answerable over any window later: the price
+/// share of a stretch is one subtraction, Drift at the end minus Drift at the start, and the
+/// rest of the movement is what was actually picked up.
+///
+/// It has to be accumulated at the MOMENT, because that is the only time both holdings and both
+/// price books are in hand. A record of totals cannot be decomposed afterwards - "the purse went
+/// from 200k to 220k" says nothing about whether twenty thousand was gathered or repriced, and
+/// no amount of arithmetic on the stored numbers recovers it.
+///
+/// Zero on points written before this existed, which reads as "all of it was gathered". That is
+/// the wrong answer for those points and the only one available; a window that reaches back into
+/// them says so rather than quietly attributing the lot.
+/// </remarks>
 public readonly record struct WealthPoint(
     [property: JsonPropertyName("at")] long At,
     [property: JsonPropertyName("ex")] double Exalted,
     [property: JsonPropertyName("rate")] double Rate = 0,
-    [property: JsonPropertyName("stacks")] int Stacks = 0)
+    [property: JsonPropertyName("stacks")] int Stacks = 0,
+    [property: JsonPropertyName("drift")] double Drift = 0)
 {
     /// <summary>The same amount in Divine, at the rate that was in force when it was taken.</summary>
     /// <remarks>
@@ -216,7 +235,7 @@ public sealed class WealthHistory
     /// </remarks>
     /// <param name="nowMs">Unix milliseconds. See the remarks on <see cref="WealthPoint"/>.</param>
     /// <returns>True when a point was written.</returns>
-    public bool Note(long nowMs, double exalted, double rate, int stacks)
+    public bool Note(long nowMs, double exalted, double rate, int stacks, double drift = 0)
     {
         lock (_gate)
         {
@@ -227,7 +246,7 @@ public sealed class WealthHistory
                     _since = nowMs;
                 }
 
-                return Write(new WealthPoint(nowMs, exalted, rate, stacks));
+                return Write(new WealthPoint(nowMs, exalted, rate, stacks, drift));
             }
 
             WealthPoint last = _points[^1];
@@ -241,7 +260,7 @@ public sealed class WealthHistory
                          || Math.Abs(rate - last.Rate) >= Enough;
 
             return (moved || nowMs - last.At >= HeartbeatMs)
-                   && Write(new WealthPoint(nowMs, exalted, rate, stacks));
+                   && Write(new WealthPoint(nowMs, exalted, rate, stacks, drift));
         }
     }
 

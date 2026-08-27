@@ -380,6 +380,8 @@ public sealed class WealthWindow
                     moved.Exalted > 0 ? Up : moved.Exalted < 0 ? Down : OverlayTheme.Quiet,
                     $"{(moved.Exalted >= 0 ? "+" : string.Empty)}{StashWorth.Purse(moved.Exalted, showing.Rate)}"
                     + $"   over {WealthPanel.Ago(moved.Over)}");
+
+                Split(showing.Rate, moved.Over, now);
             }
         }
         finally
@@ -387,6 +389,42 @@ public sealed class WealthWindow
             ImGui.EndTable();
         }
     }
+
+    /// <summary>
+    /// What the movement was made of: picked up, against the prices moving under it.
+    /// </summary>
+    /// <remarks>
+    /// A LINE OF ITS OWN rather than a longer one above, because these answer different
+    /// questions and only one of them is about how the evening went. A purse of six hundred
+    /// Divine moves by tens on an ordinary price refresh, which reads as a map's loot and is
+    /// not - and the figure above cannot say so, because it is one number.
+    ///
+    /// Shown only where there is something to say. A stretch where the prices did not move is a
+    /// stretch where the line above is already the whole answer.
+    /// </remarks>
+    private void Split(double rate, TimeSpan over, long now)
+    {
+        if (_tracker.Made(over, now) is not { } made)
+        {
+            return;
+        }
+
+        if (Math.Abs(made.Repriced) < 1)
+        {
+            return;
+        }
+
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        ImGui.TextDisabled("made of");
+        ImGui.TableNextColumn();
+        ImGuiText.Mono(
+            OverlayTheme.Quiet,
+            $"{Signed(made.Gathered, rate)} gathered, {Signed(made.Repriced, rate)} the prices");
+    }
+
+    private static string Signed(double exalted, double rate)
+        => (exalted >= 0 ? "+" : string.Empty) + StashWorth.Purse(exalted, rate);
 
     private static void Row(string label, string value)
     {

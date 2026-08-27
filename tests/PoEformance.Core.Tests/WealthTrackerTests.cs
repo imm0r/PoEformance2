@@ -382,4 +382,133 @@ public class WealthTrackerTests
         Assert.True(tracker.Showing!.Value.Live);
         Assert.Equal(60, tracker.Over(TimeSpan.FromMinutes(10), Start + WealthHistory.HeartbeatMs)!.Value, 0);
     }
+
+    [Fact]
+    public void APRICEREFRESHIsNotLoot()
+    {
+        // THE WHOLE POINT. A purse of six hundred Divine moves by tens when poe.ninja refreshes,
+        // and the change line reads that as a map's takings. It is the same items.
+        var tracker = new WealthTracker();
+        PriceBook book = Real();
+
+        tracker.Update(Purse(Exalted(100)), book, Start);
+        tracker.Update(Purse(Exalted(100)), book, Start + WealthHistory.HeartbeatMs);
+
+        WealthTracker.MadeOf made = tracker.Made(TimeSpan.FromMinutes(10), Start + WealthHistory.HeartbeatMs)!.Value;
+
+        // Nothing gathered, nothing repriced - the same book twice.
+        Assert.Equal(0, made.Gathered, 6);
+        Assert.Equal(0, made.Repriced, 6);
+    }
+
+    [Fact]
+    public void WHATWASGATHEREDIsWhatTheHoldingsDid()
+    {
+        var tracker = new WealthTracker();
+        PriceBook book = Real();
+
+        tracker.Update(Purse(Exalted(100)), book, Start);
+        tracker.Update(Purse(Exalted(160)), book, Start + WealthHistory.HeartbeatMs);
+
+        long at = Start + WealthHistory.HeartbeatMs;
+        WealthTracker.MadeOf made = tracker.Made(TimeSpan.FromMinutes(10), at)!.Value;
+
+        // On an unchanged book, all of the movement is gathered - compared against the movement
+        // itself rather than a round number, since an Exalted Orb is not priced at exactly one.
+        Assert.Equal(tracker.Over(TimeSpan.FromMinutes(10), at)!.Value, made.Gathered, 6);
+        Assert.Equal(0, made.Repriced, 6);
+    }
+
+    [Fact]
+    public void THETWOHALVESAlwaysAddUpToTheMovementItself()
+    {
+        // Whatever the split says, it has to describe the SAME movement the line above shows -
+        // two figures on screen that do not add up is how somebody stops believing both.
+        var tracker = new WealthTracker();
+        PriceBook book = Real();
+
+        tracker.Update(Purse(Exalted(100)), book, Start);
+        tracker.Update(Purse(Exalted(250)), book, Start + WealthHistory.HeartbeatMs);
+
+        long at = Start + WealthHistory.HeartbeatMs;
+        double moved = tracker.Over(TimeSpan.FromMinutes(10), at)!.Value;
+
+        Assert.Equal(moved, tracker.Made(TimeSpan.FromMinutes(10), at)!.Value.Exalted, 6);
+    }
+
+    [Fact]
+    public void THEDRIFTPicksUpWhereTheRecordLeftOff()
+    {
+        // A run that began counting again from zero would put its first point below every point
+        // before it, so any window spanning the restart would report a price collapse that never
+        // happened.
+        var history = new WealthHistory();
+        history.Note(Start, 100, 400, 1, 250);
+
+        var tracker = new WealthTracker(history);
+        tracker.Update(Purse(Exalted(100)), Real(), Start + WealthHistory.HeartbeatMs);
+
+        WealthPoint written = history.Latest!.Value;
+
+        Assert.True(written.At > Start, "the new point should have been written");
+        Assert.Equal(250, written.Drift, 6);
+    }
+
+    /// <summary>The same captured answer with every price moved, as a refresh moves them.</summary>
+    /// <remarks>
+    /// The real fixture with primaryValue scaled, so the SHAPE of the book - which items it
+    /// knows, how they relate - is the captured one. What is synthetic is only that they all
+    /// moved by the same fraction, which no real refresh does; the arithmetic under test does
+    /// not care, since it compares two whole valuations rather than any single price.
+    /// </remarks>
+    private static PriceBook Moved(double by)
+    {
+        string json = System.Text.RegularExpressions.Regex.Replace(
+            Captured("ninja-exchange.json"),
+            @"""primaryValue"":\s*([0-9.eE+-]+)",
+            match => $@"""primaryValue"": {double.Parse(match.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture) * by}",
+            System.Text.RegularExpressions.RegexOptions.None,
+            TimeSpan.FromSeconds(5));
+
+        var book = new PriceBook();
+        book.Add(PriceKind.Exchange, json);
+        return book;
+    }
+
+    [Fact]
+    public void APRICEREFRESHLandsInTheRepricedHalfRatherThanTheGatheredOne()
+    {
+        // THE WHOLE POINT OF THE SPLIT. A purse of six hundred Divine moves by tens when the
+        // prices refresh, and one number cannot say whether that was a map's takings.
+        var tracker = new WealthTracker();
+
+        tracker.Update(Purse(Exalted(1000)), Real(), Start);
+        tracker.Update(Purse(Exalted(1000)), Moved(1.10), Start + WealthHistory.HeartbeatMs);
+
+        long at = Start + WealthHistory.HeartbeatMs;
+        WealthTracker.MadeOf made = tracker.Made(TimeSpan.FromMinutes(10), at)!.Value;
+
+        // Not one orb changed hands, so nothing was gathered - all of the movement is prices.
+        Assert.Equal(0, made.Gathered, 6);
+        Assert.NotEqual(0, made.Repriced);
+        Assert.Equal(tracker.Over(TimeSpan.FromMinutes(10), at)!.Value, made.Exalted, 6);
+    }
+
+    [Fact]
+    public void LOOTANDAPriceMoveInTheSameStretchAreToldApart()
+    {
+        var tracker = new WealthTracker();
+
+        tracker.Update(Purse(Exalted(1000)), Real(), Start);
+        tracker.Update(Purse(Exalted(1400)), Moved(1.10), Start + WealthHistory.HeartbeatMs);
+
+        long at = Start + WealthHistory.HeartbeatMs;
+        WealthTracker.MadeOf made = tracker.Made(TimeSpan.FromMinutes(10), at)!.Value;
+
+        // Four hundred orbs picked up, valued at what they were worth when they arrived, and the
+        // rest of the movement is the thousand already held becoming dearer.
+        Assert.True(made.Gathered > 0, $"gathered came out {made.Gathered}");
+        Assert.True(made.Repriced > 0, $"repriced came out {made.Repriced}");
+        Assert.Equal(tracker.Over(TimeSpan.FromMinutes(10), at)!.Value, made.Exalted, 6);
+    }
 }
