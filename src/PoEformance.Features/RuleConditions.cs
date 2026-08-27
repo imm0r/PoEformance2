@@ -114,8 +114,8 @@ public sealed record RuleCondition
     /// <remarks>
     /// An empty group is the shape a half-built rule has, and it must not fire. Logic would
     /// call an empty "all" vacuously true, which here means a rule somebody was midway
-    /// through drawing starts pressing keys - the same reasoning that makes an alert rule
-    /// with no conditions match nothing rather than everything.
+    /// through drawing starts pressing keys - the same reasoning that makes a preload entry
+    /// with no path match nothing rather than everything.
     /// </remarks>
     public bool SaysNothing => Kind != ConditionKind.Fact && Children.Count == 0;
 

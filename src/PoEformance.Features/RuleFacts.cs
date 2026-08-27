@@ -150,7 +150,7 @@ public static class RuleFacts
         new(RuleFact.Speed, "Speed", FactShape.Number, FactArgument.None, "u/s", "How fast the player is moving, in world units per second."),
 
         new(RuleFact.MonsterCount, "MonsterCount", FactShape.Number, FactArgument.None, "", "Live monsters ANYWHERE the game is listing them - a bubble a long way past the screen, not what is in range of a skill. For that use MonsterCountWithin."),
-        new(RuleFact.MonsterCountWithin, "MonsterCountWithin", FactShape.Number, FactArgument.Distance, "", "Live monsters within a radius of the player, in world units. For scale: the alert rules call a rare monster 'nearby' at 120, and a melee swing is nearer 20."),
+        new(RuleFact.MonsterCountWithin, "MonsterCountWithin", FactShape.Number, FactArgument.Distance, "", "Live monsters within a radius of the player, in world units. For scale: a melee swing reaches about 20, and 120 is roughly a screen away."),
         new(RuleFact.MonsterCountAtCursor, "MonsterCountAtCursor", FactShape.Number, FactArgument.Distance, "", "Live monsters within a radius of where the CURSOR points, in world units - the question a skill placed where you aim actually asks. Answers 0 while the pointer is off the game.", AtCursor: true),
         new(RuleFact.RareMonsterCount, "RareMonsterCount", FactShape.Number, FactArgument.None, "", "Live rare monsters anywhere the game is listing them."),
         new(RuleFact.UniqueMonsterCount, "UniqueMonsterCount", FactShape.Number, FactArgument.None, "", "Live unique monsters anywhere the game is listing them."),
