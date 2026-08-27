@@ -96,8 +96,8 @@ public sealed class RatesWindow
     /// </summary>
     /// <remarks>
     /// ONE SWITCH FOR TWO SOURCES, because a state where the exchange is on and the index is off
-    /// is not a state anybody wants: the index is one request every half hour and its only job
-    /// here is to disagree with the exchange when the exchange is wrong. Wiring it to its own
+    /// is not a state anybody wants: the index costs a handful of requests every two hours, and its
+    /// job here is to disagree with the exchange when the exchange is wrong. Wiring it to its own
     /// checkbox would offer the reader a way to turn off the check while leaving the numbers it
     /// guards - see <see cref="Arbitrage"/> for what that costs.
     ///
@@ -125,8 +125,8 @@ public sealed class RatesWindow
         {
             ImGuiText.Wrapped(
                 OverlayTheme.Quiet,
-                "off - it is two public feeds, one request an hour and one every half hour, "
-                + "and neither needs a sign-in.");
+                "off - it is two public feeds, neither needing a sign-in: the game's own exchange "
+                + "once an hour, and the index once every two hours, a category at a time.");
             return false;
         }
 

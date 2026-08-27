@@ -4,15 +4,21 @@ namespace PoEformance.Features;
 /// Keeps the aggregated index current: history, and the second opinion routes are checked against.
 /// </summary>
 /// <remarks>
-/// ONE REQUEST PER LEAGUE, refreshed on the same sort of schedule as the price book beside it.
-/// The daily points it carries do not move within a day, and the current price it also carries is
-/// deliberately not what anything here reads - see <see cref="ScoutEntry.Steady"/> - so there is
-/// nothing to gain from asking often.
+/// ONE REQUEST PER CATEGORY, plus one that asks which categories the league has. Seventeen where
+/// there used to be one, because one bought thirty-five trend lines out of three hundred and
+/// sixty-eight rows - see <see cref="ScoutCatalog"/> for the measurement.
+///
+/// SO THE INTERVAL PAYS FOR IT. The points this carries are DAILY, and the current price it also
+/// carries is deliberately not what anything here reads - see <see cref="ScoutEntry.Steady"/>.
+/// Nothing it serves can move in half an hour, so the old half-hour window was already asking
+/// far more often than the data changes; widening it to two hours costs a new day's point being
+/// noticed up to two hours late, on a seven-day line, and brings the average back to well under
+/// ten requests an hour. Seventeen every thirty minutes would have been thirty-four.
 /// </remarks>
 public sealed class ScoutStore : IDisposable
 {
     /// <summary>When the catalogue is worth asking for again.</summary>
-    public static readonly TimeSpan GoesStale = TimeSpan.FromMinutes(30);
+    public static readonly TimeSpan GoesStale = TimeSpan.FromHours(2);
 
     /// <summary>How long one request is given before it counts as lost.</summary>
     public static readonly TimeSpan Patience = TimeSpan.FromSeconds(30);
@@ -30,7 +36,11 @@ public sealed class ScoutStore : IDisposable
     private DateTimeOffset _read;
     private bool _busy;
 
-    /// <param name="ask">Where the catalogue comes from. Handed in so tests need no network.</param>
+    /// <param name="ask">
+    /// Fetches one ADDRESS, or null when it could not. Addresses rather than leagues because
+    /// there are now two shapes of request - the category list and a category's page - and one
+    /// transport that knows neither is a smaller seam than two delegates that know both.
+    /// </param>
     /// <param name="clock">What time it is, for the same reason.</param>
     public ScoutStore(
         Func<string, CancellationToken, Task<string?>>? ask = null,
@@ -128,8 +138,42 @@ public sealed class ScoutStore : IDisposable
     {
         try
         {
-            string? page = await _ask(league, _closing.Token).ConfigureAwait(false);
-            IReadOnlyDictionary<string, ScoutEntry> read = ScoutCatalog.Read(page);
+            string? listed = await _ask(ScoutCatalog.Categories(league), _closing.Token).ConfigureAwait(false);
+            IReadOnlyList<string> categories = ScoutCatalog.ReadCategories(listed);
+
+            if (categories.Count == 0)
+            {
+                // A silent category list is not a reason to read nothing. The one category whose
+                // name is certain still carries Exalted, Divine and Chaos, which is everything
+                // the arbitrage check needs - so this degrades to the old behaviour rather than
+                // to no index at all.
+                categories = [ScoutCatalog.Fallback];
+            }
+
+            var read = new Dictionary<string, ScoutEntry>(StringComparer.Ordinal);
+            var answered = 0;
+
+            // ONE AT A TIME rather than all at once. Seventeen requests fired together at a
+            // volunteer-run index to save four seconds on a background task is a bad trade.
+            foreach (string category in categories)
+            {
+                string? page = await _ask(ScoutCatalog.Where(league, category), _closing.Token)
+                    .ConfigureAwait(false);
+
+                if (page is null)
+                {
+                    // Told apart from an empty category on purpose: the list only names
+                    // categories that HAVE prices, so an empty answer is a failure wearing a
+                    // success's clothes, and counting it as read would make the status line lie.
+                    continue;
+                }
+
+                answered++;
+                foreach ((string path, ScoutEntry entry) in ScoutCatalog.Read(page))
+                {
+                    read[path] = entry;
+                }
+            }
 
             if (read.Count == 0)
             {
@@ -141,11 +185,18 @@ public sealed class ScoutStore : IDisposable
 
             lock (_gate)
             {
+                // REPLACED, NOT MERGED WITH WHAT WAS HELD, even when only some categories
+                // answered. Merging would keep a category alive in the index long after the
+                // league stopped pricing it, and there would be no way to tell the difference.
+                // A short read costs some trend lines until the next refresh, and says so.
                 _index = read;
                 _read = _clock();
             }
 
-            Status = $"{read.Count} currencies for {league}, {ScoutCatalog.Days} days each";
+            Status = $"{read.Count} currencies for {league}, {ScoutCatalog.Days} days each"
+                     + (answered == categories.Count
+                         ? $", {answered} categories"
+                         : $", only {answered} of {categories.Count} categories answered");
         }
         catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
         {
@@ -161,12 +212,12 @@ public sealed class ScoutStore : IDisposable
     }
 
     /// <summary>The one place that talks to the outside world.</summary>
-    private async Task<string?> Download(string league, CancellationToken cancelling)
+    private async Task<string?> Download(string address, CancellationToken cancelling)
     {
         _http ??= new HttpClient { Timeout = Patience };
 
         using HttpResponseMessage answer = await _http
-            .GetAsync(ScoutCatalog.Where(league), cancelling)
+            .GetAsync(address, cancelling)
             .ConfigureAwait(false);
 
         return answer.IsSuccessStatusCode

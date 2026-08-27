@@ -12,15 +12,14 @@ namespace PoEformance.Core.Tests;
 /// </remarks>
 public sealed class ScoutCatalogTests
 {
-    private static string Captured()
+    private static string Captured(string name = "scout-currency-standard.json")
     {
-        const string Name = "scout-currency-standard.json";
         foreach (string root in new[] { AppContext.BaseDirectory, Directory.GetCurrentDirectory() })
         {
             var at = new DirectoryInfo(root);
             while (at is not null)
             {
-                string candidate = Path.Combine(at.FullName, "fixtures", Name);
+                string candidate = Path.Combine(at.FullName, "fixtures", name);
                 if (File.Exists(candidate))
                 {
                     return File.ReadAllText(candidate);
@@ -30,7 +29,7 @@ public sealed class ScoutCatalogTests
             }
         }
 
-        throw new FileNotFoundException($"captured catalogue {Name} not found");
+        throw new FileNotFoundException($"capture {name} not found");
     }
 
     private static ScoutEntry Divine()
@@ -175,5 +174,62 @@ public sealed class ScoutCatalogTests
 
         Assert.Contains("Runes%20of%20Aldur", where, StringComparison.Ordinal);
         Assert.Contains($"dataPoints={ScoutCatalog.Days}", where, StringComparison.Ordinal);
+        Assert.Contains($"category={ScoutCatalog.Fallback}", where, StringComparison.Ordinal);
+
+        // A category with a space or a slash in it would otherwise walk out of the query string.
+        Assert.Contains("category=a%2Fb", ScoutCatalog.Where("Standard", "a/b"), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheCategoryNamesAreReadRatherThanGuessed()
+    {
+        // WHY THIS IS FETCHED AND NOT A CONST ARRAY. The api ids are not derivable from the
+        // labels the site shows: "Ritual Omens" is `ritual`, "Soul Cores" is `ultimatum`,
+        // "Reliquary Keys" is `vaultkeys`, "Idols" is `idol` singular. Guessing them while
+        // writing this produced `omens`, `soulcores`, `keys` and `idols` - and the index answers
+        // an unknown category with 200 and an empty page, so all four looked like categories
+        // that simply had nothing in them. A wrong name here is silent, which is the worst kind.
+        IReadOnlyList<string> categories = ScoutCatalog.ReadCategories(Captured("scout-categories-standard.json"));
+
+        Assert.Equal(16, categories.Count);
+        Assert.Contains("currency", categories);
+        Assert.Contains("ritual", categories);
+        Assert.Contains("ultimatum", categories);
+        Assert.Contains("vaultkeys", categories);
+        Assert.Contains("idol", categories);
+
+        // The names that reading the labels would have produced. None of them is real.
+        Assert.DoesNotContain("omens", categories);
+        Assert.DoesNotContain("soulcores", categories);
+        Assert.DoesNotContain("keys", categories);
+        Assert.DoesNotContain("idols", categories);
+
+        // The one category whose name is relied on when the list cannot be read has to be in it.
+        Assert.Contains(ScoutCatalog.Fallback, categories);
+    }
+
+    [Fact]
+    public void UniqueCategoriesAreNotCurrencyCategories()
+    {
+        // The same answer carries both, and the unique half is served by a different endpoint
+        // that Where() does not build. Asking Currencies/ByCategory for one would be sixteen
+        // more requests returning empty pages.
+        const string Both =
+            """
+            {"UniqueCategories":[{"ItemCategoryId":1,"ApiId":"weapon","Label":"Weapons","Icon":""}],
+             "CurrencyCategories":[{"CurrencyCategoryId":21,"ApiId":"currency","Label":"Currency","Icon":""}]}
+            """;
+
+        Assert.Equal(["currency"], ScoutCatalog.ReadCategories(Both));
+    }
+
+    [Fact]
+    public void RubbishCategoriesIsAnEmptyListRatherThanACrash()
+    {
+        // Which is what makes the store fall back to the one category it can name itself.
+        Assert.Empty(ScoutCatalog.ReadCategories("{not json"));
+        Assert.Empty(ScoutCatalog.ReadCategories("{}"));
+        Assert.Empty(ScoutCatalog.ReadCategories("""{"CurrencyCategories":"nope"}"""));
+        Assert.Empty(ScoutCatalog.ReadCategories(null));
     }
 }

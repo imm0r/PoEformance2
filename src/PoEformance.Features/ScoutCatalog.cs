@@ -120,7 +120,14 @@ public readonly record struct ScoutEntry(
 ///
 /// HISTORY, because the exchange feed is hourly digests of a moment - seven days of it is a
 /// hundred and sixty-eight requests, and the trend a person actually wants is daily anyway. This
-/// serves seven daily points per currency, with the volume behind each, in one request.
+/// serves seven daily points per currency, with the volume behind each, a category at a time.
+///
+/// A CATEGORY AT A TIME, and all of them. Asking only for the one called "currency" is asking for
+/// thirty-eight of the five hundred and eleven it knows - and the exchange names three hundred
+/// and sixty-eight in Standard, so a page sorted by worth is almost entirely rows the index was
+/// never asked about. Measured against a live hour: 35 of 368 rows had a trend with one category,
+/// 337 of 368 with all sixteen. Omens, runes, essences, soul cores, keys and idols are each their
+/// own category, and each was silently missing.
 ///
 /// A SECOND OPINION, because an arbitrage route computed from one source alone cannot be
 /// checked. A single stale fill in an hourly digest produces a route showing three hundred
@@ -139,10 +146,75 @@ public static class ScoutCatalog
     /// <summary>How many days of history to ask for.</summary>
     public const int Days = 7;
 
-    /// <summary>The address of one league's currency catalogue.</summary>
-    public static string Where(string league)
+    /// <summary>The category asked for when the index will not say which exist.</summary>
+    /// <remarks>
+    /// The one category that is certain to be there, and the only one whose contents this tool
+    /// needs for anything but history - Exalted, Divine and Chaos all live in it, and they are
+    /// what <see cref="ExchangePairs.Majors"/> routes through and what arbitrage is checked
+    /// against. So a silent category list costs the trend lines and nothing else.
+    /// </remarks>
+    public const string Fallback = "currency";
+
+    /// <summary>The address of the list of categories that have prices in one league.</summary>
+    /// <remarks>
+    /// ASKED RATHER THAN HARDCODED. The list is sixteen entries today and the names are not
+    /// guessable from the labels - "Ritual Omens" is <c>ritual</c>, "Soul Cores" is
+    /// <c>ultimatum</c>, "Idols" is <c>idol</c> - and PoE2 adds a mechanic, and with it a
+    /// category, every few months. Worse, an unknown category is not an error here: the index
+    /// answers 200 with an empty page, so a hardcoded name that drifts goes quiet instead of
+    /// failing. Every wrong name guessed while writing this returned 200 and nothing.
+    ///
+    /// It returns only categories that HAVE prices in the league asked for, so this is also what
+    /// keeps a dead league from costing sixteen empty requests.
+    /// </remarks>
+    public static string Categories(string league)
+        => $"{Host}{Uri.EscapeDataString(league)}/Items/Categories";
+
+    /// <summary>The address of one category of one league's currency catalogue.</summary>
+    public static string Where(string league, string category = Fallback)
         => $"{Host}{Uri.EscapeDataString(league)}/Currencies/ByCategory"
-           + $"?category=currency&perPage=250&dataPoints={Days}";
+           + $"?category={Uri.EscapeDataString(category)}&perPage=250&dataPoints={Days}";
+
+    /// <summary>
+    /// The currency categories a league has prices for, in the order the index lists them.
+    /// </summary>
+    /// <remarks>
+    /// The UNIQUE categories in the same answer are ignored: they are unique items, which this
+    /// tool prices from the game's own exchange or not at all, and they are served by a different
+    /// endpoint that this would not be able to read anyway.
+    /// </remarks>
+    public static IReadOnlyList<string> ReadCategories(string? json)
+    {
+        var found = new List<string>();
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return found;
+        }
+
+        try
+        {
+            using JsonDocument page = JsonDocument.Parse(json);
+            if (!page.RootElement.TryGetProperty("CurrencyCategories", out JsonElement categories)
+                || categories.ValueKind != JsonValueKind.Array)
+            {
+                return found;
+            }
+
+            foreach (JsonElement category in categories.EnumerateArray())
+            {
+                if (Text(category, "ApiId") is { Length: > 0 } named && !found.Contains(named, StringComparer.Ordinal))
+                {
+                    found.Add(named);
+                }
+            }
+        }
+        catch (JsonException)
+        {
+            return found;
+        }
+
+        return found;
+    }
 
     /// <summary>Reads a catalogue, keyed by metadata path.</summary>
     public static IReadOnlyDictionary<string, ScoutEntry> Read(string? json)
