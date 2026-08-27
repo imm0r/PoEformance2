@@ -156,6 +156,18 @@ internal sealed class TradeSessionWindow : Window
             } catch (e) { }
             return out.join('   ');
           };
+          // THE MEDIAN OF THE CHEAPEST FEW, NEVER THE SINGLE CHEAPEST. Both apis sort ascending,
+          // so the first result is the lowest price anyone has posted - which is the scam, the
+          // typo or the bait, not the market. Taking it produced "1 div = 0.1 ex" out of 675
+          // real listings, and "1 div = 10 ex" out of an order book that had said 240 an hour
+          // before. The rule and its two numbers come from TradePrices, where the same mistake
+          // was already made and fixed for uniques - see the remark on Enough, which begins
+          // "TWO IS NOT A MEDIAN".
+          var going = function (rates, enough, cheapest) {
+            if (rates.length < enough) { return 0; }
+            rates.sort(function (a, b) { return a - b; });
+            return rates[Math.min(cheapest, rates.length) >> 1];
+          };
           window.chrome.webview.addEventListener('message', async function (e) {
             var m = e.data;
             if (m && m.cmd === 'exchangeProbe') {
@@ -340,14 +352,15 @@ internal sealed class TradeSessionWindow : Window
                   listed.total = (sj && sj.total) || 0;
                   var ids = (sj && sj.result) || [];
 
-                  // sort: {price: 'asc'} means the first id is the cheapest, so three is plenty
-                  // to read a going rate and cheap against the fetch limit.
+                  // TEN, because that is what the fetch endpoint takes in one call and because
+                  // a median of the cheapest eight needs eight to be a median of anything.
                   if (ids.length && sj.id) {
-                    var f = await fetch('/api/trade2/fetch/' + ids.slice(0, 3).join(',')
+                    var f = await fetch('/api/trade2/fetch/' + ids.slice(0, 10).join(',')
                                         + '?query=' + sj.id + '&realm=poe2',
                                         { credentials: 'include' });
                     var fj = await f.json();
                     var rows = (fj && fj.result) || [];
+                    var asked = [];
                     for (var q = 0; q < rows.length; q++) {
                       var price = rows[q] && rows[q].listing && rows[q].listing.price;
                       if (!price || !price.amount) { continue; }
@@ -359,10 +372,19 @@ internal sealed class TradeSessionWindow : Window
                       // PER ORB, not per listing: a stack of twenty priced as one lot would
                       // otherwise read as a single orb costing twenty times too much.
                       var stack = (rows[q].item && rows[q].item.stackSize) || 1;
-                      listed.rate = price.amount / stack;
-                      listed.raw = JSON.stringify(rows[q]).slice(0, 1200);
-                      break;
+                      asked.push(price.amount / stack);
+                      if (!listed.raw) { listed.raw = JSON.stringify(rows[q]).slice(0, 1200); }
                     }
+
+                    listed.rate = going(asked, m.enough | 0, m.cheapest | 0);
+
+                    // HOW MANY THE PRICE ACTUALLY CAME FROM, which is not how many are listed.
+                    // A rate of zero beside "675 listed" is otherwise unreadable: it could mean
+                    // the fetch failed, or that only two of the ten were priced in Exalted and
+                    // two is not a market.
+                    listed.body = listed.body + '   |   priced ' + asked.length + ' of '
+                                + rows.length + ' fetched, median of the cheapest '
+                                + (m.cheapest | 0);
                   }
                 } catch (e) { }
 
@@ -372,18 +394,20 @@ internal sealed class TradeSessionWindow : Window
 
                 // ONE OFFER ONLY, as the reference does: a listing carrying several offers gives
                 // no way to say which of them the price is, so it cannot be read as a rate.
-                var rate = 0;
+                //
+                // EVERY readable one, not the first. sort: {have: 'asc'} puts the cheapest first,
+                // and the cheapest offer in an order book is the one nobody sane posted.
+                var seen = [];
                 for (var i = 0; i < keys.length; i++) {
                   var listing = results[keys[i]] && results[keys[i]].listing;
                   var offers = (listing && listing.offers) || [];
                   if (offers.length !== 1) { continue; }
                   var paid = offers[0].exchange, per = offers[0].item;
                   if (!paid || !per || !per.amount) { continue; }
-                  // sort: {have: 'asc'} already puts the cheapest first, so the first readable
-                  // listing IS the going rate - no need to scan for a minimum.
-                  rate = paid.amount / per.amount;
-                  break;
+                  seen.push(paid.amount / per.amount);
                 }
+
+                var rate = going(seen, m.enough | 0, m.cheapest | 0);
 
                 // BOTH ATTEMPTS, ALWAYS, naming the ids actually sent. When the answer is empty
                 // the only useful thing left is what exactly was asked and where.

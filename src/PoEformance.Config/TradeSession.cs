@@ -229,6 +229,13 @@ public sealed class TradeSession : IDisposable
             ["cmd"] = "exchangeProbe",
             ["id"] = id,
             ["league"] = league,
+
+            // HANDED IN RATHER THAN SPELLED AGAIN IN THE PAGE. What makes a market and how many
+            // of the cheapest the price comes from is decided once, in TradePrices, and the probe
+            // has no business holding a second opinion - a divergence between the two would show
+            // up as the diagnostic quietly disagreeing with the thing it is meant to diagnose.
+            ["enough"] = TradePrices.Enough,
+            ["cheapest"] = TradePrices.Cheapest,
         }.ToJsonString();
 
         try

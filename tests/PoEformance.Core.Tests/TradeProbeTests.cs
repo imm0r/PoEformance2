@@ -122,4 +122,44 @@ public sealed class TradeProbeTests
         var ours = control with { ListedLeague = "Standard", ListedRate = 367 };
         Assert.Equal("standard", ours.ListedLeague, StringComparer.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public void TheCheapestListingIsNotThePrice()
+    {
+        // WHAT THE PROBE PRINTED BEFORE THIS RULE REACHED IT: "1 div = 0.1 ex" out of 675 real
+        // listings, and "1 div = 10 ex" out of an order book that had said 240 an hour earlier.
+        // Both apis sort ascending, so taking the first result finds the scam, the typo or the
+        // bait - reliably, because that is exactly what sorting ascending is for.
+        //
+        // The probe now hands its listings to the same rule as the uniques, and these two
+        // constants are handed to the page rather than spelled there, so this test covers both.
+        // An empty book is enough: Quoted("exalted") is 1.0 by definition, so nothing
+        // here depends on a fetched economy.
+        var book = new PriceBook();
+        TradeListing[] withABaitListing =
+        [
+            new(0.1, "exalted"),
+            new(330, "exalted"), new(335, "exalted"), new(338, "exalted"),
+            new(340, "exalted"), new(342, "exalted"), new(345, "exalted"),
+            new(350, "exalted"),
+        ];
+
+        double? asked = TradePrices.Robust(withABaitListing, book);
+
+        Assert.NotNull(asked);
+        Assert.InRange(asked.Value, 300, 360);
+        Assert.NotEqual(0.1, asked.Value);
+    }
+
+    [Fact]
+    public void TooFewListingsAreNotAMarket()
+    {
+        // The other half of the rule, and the reason the exchange - which answered with two
+        // listings - must report no rate at all rather than the mean of two strangers.
+        var book = new PriceBook();
+        TradeListing[] two = [new(10, "exalted"), new(338, "exalted")];
+
+        Assert.True(two.Length < TradePrices.Enough);
+        Assert.Null(TradePrices.Robust(two, book));
+    }
 }
