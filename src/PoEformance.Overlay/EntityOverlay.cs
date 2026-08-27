@@ -1098,7 +1098,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// and its click-through is the ordinary one. That is what the user asked for and it is also
     /// the only way it can be moved: painted pixels take no mouse.
     /// </remarks>
-    public void AttachWealth(WealthTracker tracker, StashInspector inspector, PriceStore prices)
+    /// <param name="exchange">
+    /// The game's own Currency Exchange, or null where nothing wired one. It is what the per-tab
+    /// worth is priced from: the aggregated index covers a fraction of what a stash holds, and a
+    /// breakdown built on it would report whole tabs as empty.
+    /// </param>
+    public void AttachWealth(
+        WealthTracker tracker,
+        StashInspector inspector,
+        PriceStore prices,
+        ExchangeStore? exchange = null)
     {
         ArgumentNullException.ThrowIfNull(tracker);
         ArgumentNullException.ThrowIfNull(inspector);
@@ -1112,7 +1121,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _wealthPanel,
             () => prices.Book,
             () => inspector.League,
-            () => inspector.Purse)
+            () => inspector.Purse,
+            exchange is null ? null : () => exchange.Pairs)
         {
             Watching = inspector.WatchPurse,
             WatchChanged = on =>
@@ -1131,6 +1141,28 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         _wealthWindow = window;
         _tools.Add(61, "wealth", "Wealth", window.DrawTab);
+    }
+
+    /// <summary>
+    /// Adds the rates page: what everything is going for, where it has been, and where a loop pays.
+    /// </summary>
+    /// <remarks>
+    /// A tab and nothing else, for the same reason as the stash beside it: nobody reads a price
+    /// table mid-fight.
+    ///
+    /// BOTH SOURCES OR NEITHER. The page is handed the two stores rather than their data because
+    /// it owns the switch that starts them, and that switch turns both on together - the index is
+    /// what makes the arbitrage column believable, so a state where the rates are read and the
+    /// check is not is a state worth making unreachable.
+    /// </remarks>
+    public void AttachRates(ExchangeStore exchange, ScoutStore scout, Func<string> league)
+    {
+        ArgumentNullException.ThrowIfNull(exchange);
+        ArgumentNullException.ThrowIfNull(scout);
+        ArgumentNullException.ThrowIfNull(league);
+
+        var window = new RatesWindow(exchange, scout, league);
+        _tools.Add(62, "rates", "Rates", window.DrawTab);
     }
 
     /// <summary>

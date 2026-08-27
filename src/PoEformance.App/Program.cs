@@ -835,6 +835,11 @@ internal static class Program
         // market in the league - see ExchangeStore.
         using var exchange = new PoEformance.Features.ExchangeStore();
 
+        // And the aggregated index beside it, which is here for the two things an hourly digest
+        // of one moment cannot give: a week of history, and somebody to disagree with. Switched
+        // on and off together with the exchange - see RatesWindow.
+        using var scout = new PoEformance.Features.ScoutStore();
+
         // The record of what the currency has been worth, read back from disk before anything
         // else touches it. It spans every session there has ever been and NOTHING here ever
         // clears it - see WealthHistory, which explains why that is worth saying out loud.
@@ -1046,6 +1051,13 @@ internal static class Program
                 // has turned. Its digests are immutable, so a refresh is one request.
                 exchange.Playing(stash.League);
 
+                // The index RIDES THE EXCHANGE'S SWITCH, and this is the line that makes that
+                // true no matter which tab did the switching: the Stash tab's checkbox knows
+                // only about the exchange, so without this an index switched on from the Rates
+                // tab would go dark again the moment somebody used the other one.
+                scout.Enabled = exchange.Enabled;
+                scout.Playing(stash.League);
+
                 trade.Watching(stash.League);
                 trade.Book = prices.Book;
                 trade.Service();
@@ -1214,7 +1226,8 @@ internal static class Program
             () => tradeSession.Show(stash.League),
             () => tradeSession.Probe(stash.League, CancellationToken.None),
             exchange);
-        overlay.AttachWealth(wealth, stash, prices);
+        overlay.AttachWealth(wealth, stash, prices, exchange);
+        overlay.AttachRates(exchange, scout, () => stash.League);
         overlay.AttachRitual(
             ritual,
             () => atlas.RitualWorth,
