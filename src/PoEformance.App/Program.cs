@@ -930,8 +930,11 @@ internal static class Program
         // What a loaded path MEANS is the user's list rather than this file's. It grows every
         // league, from whoever is reading the raw paths on the day the tool has nothing to say
         // about a new thing - so it is read from disk here and added to from that same window.
+        //
+        // TWO FILES, because the list is the half worth handing to somebody else: importing
+        // one person's watch list must not bring their window position with it.
         PoEformance.Features.PreloadSettings preloadSettings = PoEformance.Features.PreloadStore.Load();
-        preload.UseRules(preloadSettings.Watching);
+        preload.Watch(PoEformance.Features.PreloadAlertStore.Load());
 
         void SweepForTheCountField()
         {
@@ -1002,6 +1005,11 @@ internal static class Program
                     }
 
                     preload.Took(area, files, note);
+
+                    // On the way in, once, from the thread that just read the list. Only the
+                    // entries that asked for it write anything - see PreloadAlertStore.Log.
+                    PoEformance.Features.PreloadAlertStore.Log(
+                        area, preload.Found, DateTimeOffset.Now);
                 }
                 catch (Exception exception)
                 {
@@ -1271,6 +1279,7 @@ internal static class Program
             SweepForTheCountField,
             preloadSettings,
             changed => PoEformance.Features.PreloadStore.Save(changed));
+        overlay.PreloadListChanged = list => PoEformance.Features.PreloadAlertStore.Save(list);
         overlay.AttachQuests(quests);
         overlay.AttachTracker(
             PoEformance.Features.TrackerStore.Load(),

@@ -134,9 +134,10 @@ public static class StyleCatalogue
         // is written instead. Scale is the plate's width, so one weight can be made to shout.
         new("preload.banner.back", "What the area loaded", "Entry line backing", StyleTraits.Colour, Rgb(14, 20, 28, 215)),
         new("preload.list.back", "What the area loaded", "List backing", StyleTraits.Colour, Rgb(14, 20, 28, 170)),
-        new("preload.notable", "What the area loaded", "Notable", Marker, Rgb(191, 204, 224)),
-        new("preload.valuable", "What the area loaded", "Valuable", Marker, Rgb(255, 217, 102)),
-        new("preload.dangerous", "What the area loaded", "Dangerous", Marker, Rgb(255, 115, 102)),
+        // ONE plate rather than three. There used to be one per weight, back when an entry's
+        // colour came from a weight; entries now carry their own colour, so what is left for the
+        // catalogue is the card's plate itself - its icon, and how wide it is drawn.
+        new("preload.card", "What the area loaded", "Entry card plate", Marker, Rgb(255, 217, 102)),
 
         // ── The atlas ───────────────────────────────────────────────────────
         // A map's own colour comes from the GROUP it is in, and that is set beside the group
@@ -191,6 +192,7 @@ public static class StyleCatalogue
         public const string ProjectileTrail = "projectile.trail";
         public const string PreloadBannerBack = "preload.banner.back";
         public const string PreloadListBack = "preload.list.back";
+        public const string PreloadCard = "preload.card";
         public const string AtlasLabel = "atlas.label";
         public const string AtlasPlate = "atlas.plate";
         public const string AtlasContent = "atlas.content";
@@ -208,7 +210,7 @@ public static class StyleCatalogue
         public static IReadOnlyList<string> All { get; } =
         [
             DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Heat,
-            PreloadBannerBack, PreloadListBack,
+            PreloadBannerBack, PreloadListBack, PreloadCard,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,
             ProjectileMine, ProjectileOther, ProjectileTrail,
@@ -328,19 +330,6 @@ public static class StyleCatalogue
     /// <summary>The key for a place's shape.</summary>
     public static string ForGlyph(PoEformance.Game.World.PoiGlyph glyph)
         => $"poi.{glyph.ToString().ToLowerInvariant()}";
-
-    /// <summary>The key a preload finding of a given weight is drawn from.</summary>
-    /// <remarks>
-    /// Anything that is not one of the three weights takes the quietest, for the same reason
-    /// an unknown rarity takes the ordinary one: a value nobody chose is not a forgotten
-    /// catalogue entry and should not draw in the colour reserved for those.
-    /// </remarks>
-    public static string ForWeight(PreloadWeight weight) => weight switch
-    {
-        PreloadWeight.Valuable => "preload.valuable",
-        PreloadWeight.Dangerous => "preload.dangerous",
-        _ => "preload.notable",
-    };
 
     /// <summary>The key for an entity that is not a monster or a drop.</summary>
     public static string ForKind(PoEformance.Game.World.EntityKind kind) => kind switch

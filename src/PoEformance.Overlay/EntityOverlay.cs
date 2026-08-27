@@ -495,14 +495,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private RitualWatch? _ritualWatch;
     private RitualWindow? _ritualWindow;
 
-    /// <summary>Called when the preload alerts changed, so they can be written down.</summary>
+    /// <summary>Called when a preload switch changed, so it can be written down.</summary>
     public Action<PreloadSettings>? PreloadRulesChanged { get; set; }
 
-    /// <summary>Takes a change from either editor and passes it on.</summary>
+    /// <summary>Called when the curated list changed, which is a different file.</summary>
+    public Action<IReadOnlyList<PreloadAlertEntry>>? PreloadListChanged { get; set; }
+
+    /// <summary>Takes a change from the editor and passes it on.</summary>
     private void TookPreload(PreloadSettings changed)
     {
         _preloadSettings = changed;
-        _preloadPanel.Enabled = changed.List;
+        _preloadPanel.Enabled = changed.Window;
+        _preloadPanel.HideWhenEmpty = changed.HideWhenEmpty;
         PreloadRulesChanged?.Invoke(changed);
     }
 
@@ -523,6 +527,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// finding. Zero is not an area, so it also covers the state before anything was read.
     /// </remarks>
     private uint _announced;
+
+    /// <summary>When the area last changed, for the timer. Zero until one has.</summary>
+    /// <remarks>
+    /// Set where the card is announced rather than from the snapshot's area, because that is
+    /// the one place that already knows an area is NEW - the snapshot carries which area you
+    /// are in, not when you arrived, and comparing it every frame would restart the clock on
+    /// any frame the hash was read as zero.
+    /// </remarks>
+    private long _areaAtMs;
 
     /// <summary>
     /// Adds the "what is in this area" list.
@@ -552,16 +565,24 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(rulesChanged);
         _preload = watch;
         _preloadSettings = settings;
-        _preloadPanel.Enabled = settings.List;
+        _preloadPanel.Enabled = settings.Window;
+        _preloadPanel.HideWhenEmpty = settings.HideWhenEmpty;
         PreloadRulesChanged = rulesChanged;
-        var window = new PreloadWindow(
-            watch,
-            lookAgain,
-            sweep,
-            () => TookPreload(_preloadSettings with { Rules = watch.Rules }));
+        var window = new PreloadWindow(watch, lookAgain, sweep, () => PreloadListChanged?.Invoke(watch.Watching));
         _tools.Add(20, "preload", "In this area", window.DrawTab, page: Area, pageLabel: "Area");
 
-        // The list's backings and the three weight markers, under the list they draw.
+        // The list that decides what gets said, beside the raw one it is built from. Two tabs
+        // rather than one long page: finding a path and curating the list are different jobs,
+        // and the raw one is thousands of rows deep.
+        var alerts = new PreloadAlertWindow(
+            watch,
+            () => _preloadSettings,
+            TookPreload,
+            list => PreloadListChanged?.Invoke(list),
+            SayItNow);
+        _tools.Add(22, "preload-alerts", "Tell me about", alerts.DrawTab, page: Area, pageLabel: "Area");
+
+        // The list's backings and the card's plate, under the list they draw.
         var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Area);
         _tools.Add(
             21, "preload-style", "How the loaded list looks", styles.Draw, styles.Idle,
@@ -588,7 +609,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     private void AnnounceWhatLoaded(long nowMs)
     {
-        if (_preload is not { Looked: true } watch || !_preloadSettings.Banner)
+        if (_preload is not { Looked: true } watch || !_preloadSettings.Card)
         {
             return;
         }
@@ -600,10 +621,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         _announced = area;
+        _areaAtMs = nowMs;
 
-        IReadOnlyList<(PreloadWeight Weight, string Names)> saying =
-            watch.AnnounceableByWeight(_preloadSettings.MinFiles);
-
+        IReadOnlyList<PreloadAlertEntry> saying = watch.Found;
         if (saying.Count > 0)
         {
             _preloadEntry.Announce(saying, nowMs);
@@ -623,9 +643,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        IReadOnlyList<(PreloadWeight Weight, string Names)> saying =
-            watch.AnnounceableByWeight(_preloadSettings.MinFiles);
-
+        IReadOnlyList<PreloadAlertEntry> saying = watch.Found;
         if (saying.Count > 0)
         {
             _preloadEntry.Announce(saying, Environment.TickCount64);
@@ -1870,13 +1888,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _tools.Render();
 
         // A window rather than something painted, so it can be closed and moved - which means
-        // it belongs here with the windows and not in the drawing pass. Only where the
-        // findings are about the ground under your feet: the walk never runs in a town, so
-        // what is held there is the last MAP's list, and showing that beside the stash would
-        // be a straight lie.
-        if (_preload is not null && _snapshot.InGame && _snapshot.Area.WantsMarkers)
+        // it belongs here with the windows and not in the drawing pass.
+        //
+        // In town it is STALE rather than absent, and which of those you get is a setting. The
+        // walk never runs in a town, so what is held there is the last map's list; the window
+        // says so in as many words rather than showing it as though it were where you stand.
+        if (_preload is not null && _snapshot.InGame)
         {
-            _preloadPanel.Draw(_snapshot.AreaHash, _preload.Findings);
+            bool stale = !_snapshot.Area.WantsMarkers;
+            if (!stale || !_preloadSettings.HideInTown)
+            {
+                _preloadPanel.Draw(
+                    _snapshot.AreaHash,
+                    _preload.Found,
+                    _preloadSettings.Timer && _areaAtMs > 0 ? Environment.TickCount64 - _areaAtMs : -1,
+                    stale);
+            }
         }
 
         // Everywhere in the game, unlike the one above: what the purse is worth is as true in a

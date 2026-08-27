@@ -46,6 +46,9 @@ public sealed class PreloadPanel
     /// <summary>Whether the list is wanted at all - the user's setting, not a style.</summary>
     public bool Enabled { get; set; } = true;
 
+    /// <summary>Whether an empty window is taken away rather than left as a bare timer.</summary>
+    public bool HideWhenEmpty { get; set; }
+
     /// <summary>
     /// Draws the list for an area, when there is something in it.
     /// </summary>
@@ -54,17 +57,30 @@ public sealed class PreloadPanel
     /// here does not dismiss it for the next map - "in the way right now" and "I never want
     /// this" are different requests, and the second one is the setting.
     /// </param>
-    /// <remarks>
-    /// Everything found goes in, including the one-file findings the entry card leaves out.
-    /// The count beside each name is the whole story: "Breach 43" is the mechanic being here
-    /// and "Delirium 1" is a mention somewhere, and a reader tells those apart at a glance
-    /// without the list having to decide for them.
-    /// </remarks>
-    public void Draw(uint area, IReadOnlyList<PreloadFinding> findings)
+    /// <param name="found">What this area turned out to hold, in the list's own order.</param>
+    /// <param name="sinceMs">
+    /// How long since the last area loaded, or negative to leave the timer out. It is the one
+    /// thing here that is worth reading when nothing was found: a map that has been open eleven
+    /// minutes is a different decision from one opened just now.
+    /// </param>
+    /// <param name="stale">
+    /// Whether the file list belongs somewhere other than where you are standing - town and
+    /// hideout, where it is not refreshed. Said rather than hidden, because a window that
+    /// silently shows the LAST area's contents is worse than one that admits it.
+    /// </param>
+    public void Draw(uint area, IReadOnlyList<PreloadAlertEntry> found, long sinceMs = -1, bool stale = false)
     {
-        ArgumentNullException.ThrowIfNull(findings);
+        ArgumentNullException.ThrowIfNull(found);
 
-        if (!Enabled || findings.Count == 0 || (area != 0 && area == _closed))
+        if (!Enabled || (area != 0 && area == _closed))
+        {
+            return;
+        }
+
+        // Nothing to say and nothing to say it with: no entries, no timer, no warning. The
+        // window would be an empty box, which is worse than not being there.
+        bool empty = found.Count == 0 && !stale;
+        if (empty && (HideWhenEmpty || sinceMs < 0))
         {
             return;
         }
@@ -72,14 +88,6 @@ public sealed class PreloadPanel
         // Out of the way while one of the game's panels is underneath it - see
         // WindowChrome.Covered. Not remembered as closed: the panel shutting brings it back.
         if (Chrome.Covered(ChromeId))
-        {
-            return;
-        }
-
-        List<PreloadFinding> shown =
-            [.. findings.Where(finding => Style.Visible(StyleCatalogue.ForWeight(finding.Weight)))];
-
-        if (shown.Count == 0)
         {
             return;
         }
@@ -104,10 +112,23 @@ public sealed class PreloadPanel
         // and the assert that follows takes the process down.
         try
         {
-            foreach (PreloadFinding finding in shown)
+            if (sinceMs >= 0)
             {
-                string key = StyleCatalogue.ForWeight(finding.Weight);
-                ImGui.TextColored(Unpack(Style.Colour(key)), $"{finding.Name}  {finding.Files}");
+                ImGui.TextDisabled($"{sinceMs / 1000f:00.0}s");
+                ImGui.Separator();
+            }
+
+            if (stale)
+            {
+                // The reference says the same thing in the same place, and for the same reason:
+                // the game does not reload the file table in town, so what is held is the last
+                // real area. Naming that is the difference between a stale window and a lying one.
+                ImGui.TextDisabled("not updated here");
+            }
+
+            foreach (PreloadAlertEntry entry in found)
+            {
+                ImGui.TextColored(Unpack(entry.Colour), entry.Shown);
             }
 
             // Under the list rather than in a corner of it: the window sizes itself to its

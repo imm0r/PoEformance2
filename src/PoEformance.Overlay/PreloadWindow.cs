@@ -114,31 +114,21 @@ public sealed class PreloadWindow
         OverlayFonts.SectionTitle("what that means");
         ImGui.Spacing();
 
-        IReadOnlyList<PreloadFinding> findings = _watch.Findings;
-        if (findings.Count == 0)
+        IReadOnlyList<PreloadAlertEntry> found = _watch.Found;
+        if (found.Count == 0)
         {
             ImGuiText.Wrapped(DimText, all.Count > 0
-                ? "nothing here is on the list of things worth a line - search below to see what is"
+                ? "nothing here is on the watch list - search below and add what is worth a line"
                 : "nothing to say about this area");
         }
 
-        foreach (PreloadFinding finding in findings)
+        foreach (PreloadAlertEntry entry in found)
         {
-            ImGui.TextColored(ByWeight[(int)finding.Weight], finding.Name);
-            ImGui.SameLine();
-
-            // The count, before the path. One file is a mention somewhere; forty is the thing
-            // being here, and reading that next to the name is what stops a stray reference
-            // being taken for an encounter. Marked when it is weak rather than hidden.
-            ImGui.TextColored(
-                finding.Files <= 1 ? WarnText : DimText,
-                finding.Files == 1 ? "1 file" : $"{finding.Files} files");
-
-            ImGui.SameLine();
+            ImGui.TextColored(ImGui.ColorConvertU32ToFloat4(entry.Colour), entry.Shown);
 
             // Wrapped, because a metadata path is the longest thing on the tab and the one
             // that used to decide how wide the window had to be dragged.
-            ImGuiText.Wrapped(DimText, finding.Path);
+            ImGuiText.Wrapped(DimText, entry.Path);
         }
 
         ImGui.Spacing();
@@ -165,12 +155,13 @@ public sealed class PreloadWindow
                 ImGui.PushID(shown);
 
                 // The whole point of the raw list, and the reason it is searchable: a path
-                // that turns out to mean something becomes a rule from here, without anybody
-                // having to type it or wait for a release. What is WATCHED for is the folder
-                // rather than this exact file - see Fragment.
+                // that turns out to mean something is added from here, without anybody having
+                // to type it or wait for a release. THIS EXACT PATH is what gets watched - so
+                // what was clicked and what is stored can never disagree, which is the whole
+                // bargain of matching exactly.
                 if (ImGui.SmallButton("+ watch"))
                 {
-                    Add(PreloadMeanings.WatchableFragment(path));
+                    Add(path);
                 }
 
                 ImGui.SameLine();
@@ -226,12 +217,12 @@ public sealed class PreloadWindow
     /// THIS area contains it, so "nothing happened" is the correct display for both a
     /// successful add and a duplicate. Saying which is what stops the second click.
     /// </remarks>
-    private void Add(string fragment)
+    private void Add(string path)
     {
-        var rule = new PreloadRule(Pretty(fragment), fragment, PreloadWeight.Valuable);
-        _said = _watch.AddRule(rule)
-            ? $"watching for \"{fragment}\""
-            : $"already watching for \"{fragment}\"";
+        var entry = new PreloadAlertEntry(path, PreloadMeanings.Suggest(path));
+        _said = _watch.Add(entry)
+            ? $"watching for \"{entry.Shown}\""
+            : $"already watching for \"{entry.Shown}\"";
 
         _rulesChanged();
     }

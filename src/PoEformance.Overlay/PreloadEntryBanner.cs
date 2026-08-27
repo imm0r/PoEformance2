@@ -89,17 +89,17 @@ public sealed class PreloadEntryBanner
     private const float TextRight = 0.94f;
     private const float TextMiddle = 0.45f;
 
-    private IReadOnlyList<(PreloadWeight Weight, string Names)> _saying = [];
+    private IReadOnlyList<PreloadAlertEntry> _saying = [];
     private long _atMs;
 
     /// <summary>How every drawn thing looks. Shared with the overlay.</summary>
     public OverlayStyle Style { get; set; } = new();
 
-    /// <summary>Where a weight's picture comes from, when one was chosen.</summary>
+    /// <summary>Where the plate's picture comes from, when one was chosen.</summary>
     public IconCache? Icons { get; set; }
 
-    /// <summary>Says a new set of findings, replacing anything still on screen.</summary>
-    public void Announce(IReadOnlyList<(PreloadWeight Weight, string Names)> saying, long nowMs)
+    /// <summary>Says a new set of entries, replacing anything still on screen.</summary>
+    public void Announce(IReadOnlyList<PreloadAlertEntry> saying, long nowMs)
     {
         ArgumentNullException.ThrowIfNull(saying);
         _saying = saying;
@@ -128,37 +128,40 @@ public sealed class PreloadEntryBanner
             return;
         }
 
-        float alpha = PreloadCard.Readability(age);
-
-        float y = height * FromTop;
-        foreach ((PreloadWeight weight, string names) in _saying)
+        if (!Style.Visible(StyleCatalogue.Keys.PreloadCard))
         {
-            string key = StyleCatalogue.ForWeight(weight);
-            if (!Style.Visible(key))
-            {
-                continue;   // this weight was switched off; the others still have their say
-            }
-
-            y = DrawBlock(draw, width, height, y, key, weight, names, alpha) + BlockGap;
+            return;
         }
+
+        float alpha = PreloadCard.Readability(age);
+        DrawBlock(draw, width, height, height * FromTop, StyleCatalogue.Keys.PreloadCard, _saying, alpha);
     }
 
-    /// <summary>One plate and its line. Returns where the next block starts.</summary>
+    /// <summary>
+    /// One plate and the names on it. Returns where the block ended.
+    /// </summary>
+    /// <remarks>
+    /// ONE plate for the whole card, and the names written across it EACH IN ITS OWN COLOUR.
+    /// The card used to draw a plate per weight because the colour came from the weight; an
+    /// entry now carries its own, and stacking a plate per entry would put eight painted
+    /// banners down the middle of the screen. So the plate is the card and the colours are in
+    /// the writing - which is also what the standing window does, one line each.
+    /// </remarks>
     private float DrawBlock(
         ImDrawListPtr draw,
         int width,
         int height,
         float top,
         string key,
-        PreloadWeight weight,
-        string names,
+        IReadOnlyList<PreloadAlertEntry> saying,
         float alpha)
     {
         LayerStyle style = Style[key];
         uint colour = OverlaySettings.Fade(Style.Colour(key), alpha);
+        string names = string.Join(Separator, saying.Select(entry => entry.Shown));
         float centre = width / 2f;
 
-        IconCache.Picture picture = PlateFor(weight, style.Icon);
+        IconCache.Picture picture = PlateFor(style.Icon);
 
         if (picture.Ready)
         {
@@ -193,25 +196,18 @@ public sealed class PreloadEntryBanner
                 float x = Math.Clamp(
                     ((from + to) / 2f) - (line.X / 2f), from, Math.Max(from, to - line.X));
 
-                Written(
+                Coloured(
                     draw, new Vector2(x, top + (tall * TextMiddle) - (line.Y / 2f)),
-                    said, font, colour, alpha);
+                    said, names, saying, font, colour, alpha);
             }
 
             return top + tall;
         }
 
-        // No picture chosen, or it could not be loaded. The weight's own name over a plain
-        // backing, which is the whole point of the plate said in the plainest way there is -
-        // and the names below it, since there is no cloth to write them on.
-        float y = top;
-        string word = weight.ToString().ToUpperInvariant();
-        Vector2 heading = ImGui.CalcTextSize(word);
-        draw.AddText(new Vector2(centre - (heading.X / 2f), y), colour, word);
-        y += heading.Y + 2f;
-
+        // No picture chosen, or it could not be loaded. The names over a plain backing, which
+        // is the whole point of the plate said in the plainest way there is.
         Vector2 plain = ImGui.CalcTextSize(names);
-        var at = new Vector2(centre - (plain.X / 2f), y + TextPadY);
+        var at = new Vector2(centre - (plain.X / 2f), top + TextPadY);
 
         draw.AddRectFilled(
             at - new Vector2(TextPadX, TextPadY),
@@ -219,7 +215,20 @@ public sealed class PreloadEntryBanner
             OverlaySettings.Fade(Style.Colour(StyleCatalogue.Keys.PreloadBannerBack), alpha),
             4f);
 
-        draw.AddText(at, colour, names);
+        float ink = at.X;
+        for (var i = 0; i < saying.Count; i++)
+        {
+            if (i > 0)
+            {
+                draw.AddText(new Vector2(ink, at.Y), colour, Separator);
+                ink += ImGui.CalcTextSize(Separator).X;
+            }
+
+            string one = saying[i].Shown;
+            draw.AddText(new Vector2(ink, at.Y), OverlaySettings.Fade(saying[i].Colour, alpha), one);
+            ink += ImGui.CalcTextSize(one).X;
+        }
+
         return at.Y + plain.Y + TextPadY;
     }
 
@@ -315,14 +324,18 @@ public sealed class PreloadEntryBanner
     }
 
     /// <summary>
-    /// The plate for a weight: the chosen file, else the one that shipped, else nothing.
+    /// The card's plate: the chosen file, else the one that shipped, else nothing.
     /// </summary>
     /// <remarks>
     /// That order and not the other one. A shipped plate means the card looks right the
     /// moment the tool is installed, with no path to type and no file to keep hold of; a
     /// chosen file has to beat it, or setting one would appear to do nothing.
+    ///
+    /// The three plates that shipped for the old weights are all still on disk and all still
+    /// choosable - what changed is that one of them is now the default rather than each being
+    /// tied to a weight that no longer exists.
     /// </remarks>
-    private IconCache.Picture PlateFor(PreloadWeight weight, string? chosen)
+    private IconCache.Picture PlateFor(string? chosen)
     {
         if (Icons is not IconCache icons)
         {
@@ -330,8 +343,46 @@ public sealed class PreloadEntryBanner
         }
 
         IconCache.Picture own = icons.PictureFor(chosen, IconCache.MaxWideEdge);
-        return own.Ready
-            ? own
-            : icons.BuiltIn($"preload-{weight.ToString().ToLowerInvariant()}.png", IconCache.MaxWideEdge);
+        return own.Ready ? own : icons.BuiltIn("preload-valuable.png", IconCache.MaxWideEdge);
     }
+
+    /// <summary>The same fitted line, but each name in the colour its entry chose.</summary>
+    /// <remarks>
+    /// Falls back to one colour when the fitting SHORTENED the line: the fitted text no longer
+    /// lines up with the entries it was built from, and writing chunks at positions measured
+    /// from a different string is how text ends up overlapping itself.
+    /// </remarks>
+    private static void Coloured(
+        ImDrawListPtr draw,
+        Vector2 at,
+        string said,
+        string names,
+        IReadOnlyList<PreloadAlertEntry> saying,
+        float font,
+        uint colour,
+        float alpha)
+    {
+        if (!string.Equals(said, names, StringComparison.Ordinal))
+        {
+            Written(draw, at, said, font, colour, alpha);
+            return;
+        }
+
+        float ink = at.X;
+        for (var i = 0; i < saying.Count; i++)
+        {
+            if (i > 0)
+            {
+                Written(draw, new Vector2(ink, at.Y), Separator, font, colour, alpha);
+                ink += Measure(Separator, font).X;
+            }
+
+            string one = saying[i].Shown;
+            Written(draw, new Vector2(ink, at.Y), one, font, OverlaySettings.Fade(saying[i].Colour, alpha), alpha);
+            ink += Measure(one, font).X;
+        }
+    }
+
+    /// <summary>What goes between two names on the card.</summary>
+    private const string Separator = "   ";
 }
