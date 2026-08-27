@@ -348,7 +348,7 @@ public sealed class WealthWindow
         {
             // The SHOWN figure rather than the raw count, so this and the change below are the
             // same number's two readings - see WealthTracker.Showing.
-            WealthTracker.Shown showing = _tracker.Showing ?? new WealthTracker.Shown(0, 0, false);
+            WealthTracker.Shown showing = _tracker.Showing ?? new WealthTracker.Shown(0, 0, false, 0);
 
             Row("holding", StashWorth.Purse(showing.Exalted, showing.Rate));
 
