@@ -1,0 +1,235 @@
+using PoEformance.Features;
+
+namespace PoEformance.Core.Tests;
+
+/// <summary>
+/// Pricing a whole league off the exchange, against two real hours of Standard.
+/// </summary>
+/// <remarks>
+/// The fixtures carry EVERY Standard market from the hours they were captured in, which is the
+/// only reason these tests can say anything about routing: Standard is where routing matters,
+/// because barely a fifth of its currencies trade against Exalted in any given hour.
+/// </remarks>
+public sealed class ExchangePairsTests
+{
+    private const string Chaos = "Metadata/Items/Currency/CurrencyRerollRare";
+
+    private static string Hour(int which)
+    {
+        string name = $"ggg-exchange-hour{which}.json";
+        foreach (string root in new[] { AppContext.BaseDirectory, Directory.GetCurrentDirectory() })
+        {
+            var at = new DirectoryInfo(root);
+            while (at is not null)
+            {
+                string candidate = Path.Combine(at.FullName, "fixtures", name);
+                if (File.Exists(candidate))
+                {
+                    return File.ReadAllText(candidate);
+                }
+
+                at = at.Parent;
+            }
+        }
+
+        throw new FileNotFoundException($"captured hour {name} not found");
+    }
+
+    private static ExchangePairs Standard(params int[] hours)
+    {
+        var pairs = new ExchangePairs();
+        foreach (int hour in hours)
+        {
+            pairs.Add(Hour(hour), "Standard");
+        }
+
+        return pairs;
+    }
+
+    [Fact]
+    public void AnExaltedOrbIsWorthAnExaltedOrb()
+    {
+        // The feed has no market of a thing against itself, and "unpriced" would be the wrong
+        // answer for the very unit everything else is quoted in.
+        Valuation one = Standard(1).Worth(ExchangeFeed.Exalted);
+
+        Assert.Equal(1, one.Exalted);
+        Assert.True(one.Direct);
+    }
+
+    [Fact]
+    public void ADirectMarketIsPricedWithoutAHop()
+    {
+        Valuation divine = Standard(1).Worth(ExchangeFeed.Divine);
+
+        Assert.True(divine.Known);
+        Assert.True(divine.Direct);
+        Assert.Empty(divine.Through);
+
+        // The selling side, which is the 260 the game's own window showed - not the 602 it
+        // would charge, and not the 473 that changed hands between them.
+        Assert.Equal(260, divine.Exalted, 0);
+    }
+
+    [Fact]
+    public void MostOfStandardWouldBeUnpriceableWithoutRouting()
+    {
+        // THE MEASUREMENT THAT MADE THIS CLASS EXIST. If this ever stops being true the graph is
+        // dead weight, and if it stays true a direct-only reading is throwing most of a stash
+        // away. Either outcome is worth knowing about.
+        ExchangePairs pairs = Standard(1);
+
+        var direct = 0;
+        var routed = 0;
+        foreach (string path in pairs.Everything())
+        {
+            Valuation worth = pairs.Worth(path);
+            if (!worth.Known)
+            {
+                continue;
+            }
+
+            if (worth.Direct)
+            {
+                direct++;
+            }
+            else
+            {
+                routed++;
+            }
+        }
+
+        Assert.True(routed > 0, "no currency needed a hop - the fixture is not Standard-like");
+        Assert.True(
+            routed > direct,
+            $"expected routing to carry most of Standard; direct {direct}, routed {routed}");
+    }
+
+    [Fact]
+    public void AHoppedValueIsMarkedAsOne()
+    {
+        ExchangePairs pairs = Standard(1);
+
+        string hopped = pairs.Everything().First(p => pairs.Worth(p) is { Known: true, Direct: false });
+        Valuation worth = pairs.Worth(hopped);
+
+        // A two-leg claim says so, because it is a weaker one than a direct market and whoever
+        // reads it deserves to know which they have.
+        Assert.NotEmpty(worth.Through);
+        Assert.Contains(worth.Through, ExchangePairs.Majors);
+        Assert.NotEqual(ExchangeFeed.Exalted, worth.Through);
+    }
+
+    [Fact]
+    public void AHopMultipliesTheTwoLegsItNames()
+    {
+        // Not a tautology: it pins that the value really is the two bids multiplied, so a
+        // future change that quietly used the ask, or the traded rate, or one leg only, fails.
+        ExchangePairs pairs = Standard(1);
+
+        string hopped = pairs.Everything().First(p => pairs.Worth(p) is { Known: true, Direct: false });
+        Valuation worth = pairs.Worth(hopped);
+
+        ExchangeRate first = pairs.Rate(hopped, worth.Through);
+        ExchangeRate second = pairs.Rate(worth.Through, ExchangeFeed.Exalted);
+
+        Assert.Equal(first.Bid * second.Bid, worth.Exalted, 8);
+    }
+
+    [Fact]
+    public void ARouteIsWorthItsThinnestLeg()
+    {
+        ExchangePairs pairs = Standard(1);
+
+        string hopped = pairs.Everything().First(p => pairs.Worth(p) is { Known: true, Direct: false });
+        Valuation worth = pairs.Worth(hopped);
+
+        ExchangeRate first = pairs.Rate(hopped, worth.Through);
+        ExchangeRate second = pairs.Rate(worth.Through, ExchangeFeed.Exalted);
+
+        // A fat second leg cannot rescue a first one that two orbs set, so the smaller carries.
+        Assert.Equal(Math.Min(first.Volume, second.Volume), worth.Volume, 6);
+    }
+
+    [Fact]
+    public void APairIsFoundWhicheverWayTheFeedHappenedToListIt()
+    {
+        ExchangePairs pairs = Standard(1);
+
+        ExchangeRate divInEx = pairs.Rate(ExchangeFeed.Divine, ExchangeFeed.Exalted);
+        ExchangeRate exInDiv = pairs.Rate(ExchangeFeed.Exalted, ExchangeFeed.Divine);
+
+        Assert.True(divInEx.Known);
+        Assert.True(exInDiv.Known);
+        Assert.Equal(1.0 / divInEx.Traded, exInDiv.Traded, 8);
+    }
+
+    [Fact]
+    public void FlippingAMarketSwapsTheSidesRatherThanJustInvertingThem()
+    {
+        // The subtle one. What you RECEIVE selling a Divine is the reciprocal of what you PAY
+        // buying an Exalted - not of what you receive for one. Getting this wrong would price
+        // every hopped currency at the wrong side of every spread, invisibly.
+        ExchangePairs pairs = Standard(1);
+
+        ExchangeRate forward = pairs.Rate(ExchangeFeed.Divine, ExchangeFeed.Exalted);
+        ExchangeRate back = pairs.Rate(ExchangeFeed.Exalted, ExchangeFeed.Divine);
+
+        Assert.Equal(1.0 / forward.Ask, back.Bid, 8);
+        Assert.Equal(1.0 / forward.Bid, back.Ask, 8);
+        Assert.NotEqual(1.0 / forward.Bid, back.Bid, 8);
+    }
+
+    [Fact]
+    public void AnOlderHourFillsGapsRatherThanOverwriting()
+    {
+        ExchangePairs one = Standard(1);
+        ExchangePairs both = Standard(1, 2);
+
+        // Standard is thin enough that a second hour brings genuinely new markets.
+        Assert.True(both.Count > one.Count, $"one hour {one.Count}, two hours {both.Count}");
+
+        // And the newer hour's answer for a market both had is kept - hours arrive newest first,
+        // so the first answer is also the freshest.
+        Assert.Equal(
+            one.Rate(ExchangeFeed.Divine, ExchangeFeed.Exalted).Bid,
+            both.Rate(ExchangeFeed.Divine, ExchangeFeed.Exalted).Bid,
+            6);
+    }
+
+    [Fact]
+    public void AnotherLeagueContributesNothing()
+    {
+        var pairs = new ExchangePairs();
+        pairs.Add(Hour(1), "Runes of Aldur");
+
+        // The fixture carries a handful of that league's markets alongside Standard's, and
+        // mixing two leagues' prices into one book is the mistake that already cost a day here.
+        Assert.True(pairs.Count > 0);
+        Assert.True(
+            pairs.Count < Standard(1).Count,
+            "reading one league picked up another league's markets");
+    }
+
+    [Fact]
+    public void SomethingNobodyTradedIsUnpricedRatherThanFree()
+    {
+        ExchangePairs pairs = Standard(1);
+
+        Assert.False(pairs.Worth("Metadata/Items/Currency/CurrencyNobodyHasEverSeen").Known);
+        Assert.False(pairs.Worth(null).Known);
+        Assert.False(pairs.Worth(string.Empty).Known);
+    }
+
+    [Fact]
+    public void RubbishAddsNothingAndThrowsNothing()
+    {
+        var pairs = new ExchangePairs();
+
+        Assert.Equal(0, pairs.Add("{not json", "Standard"));
+        Assert.Equal(0, pairs.Add("{}", "Standard"));
+        Assert.Equal(0, pairs.Add(null, "Standard"));
+        Assert.Equal(0, pairs.Add(Hour(1), string.Empty));
+        Assert.Equal(0, pairs.Count);
+    }
+}

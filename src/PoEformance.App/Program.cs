@@ -830,6 +830,11 @@ internal static class Program
         handle.Stage = "opening the price book";
         using var prices = new PoEformance.Features.PriceStore();
 
+        // The game's own Currency Exchange, alongside poe.ninja rather than in place of it. Its
+        // hours are immutable, so after the first read this costs one request an hour for every
+        // market in the league - see ExchangeStore.
+        using var exchange = new PoEformance.Features.ExchangeStore();
+
         // The record of what the currency has been worth, read back from disk before anything
         // else touches it. It spans every session there has ever been and NOTHING here ever
         // clears it - see WealthHistory, which explains why that is worth saying out loud.
@@ -1036,6 +1041,11 @@ internal static class Program
                 // seconds, and this only starts a fetch when it is news or the book has aged.
                 prices.Watching(stash.League);
 
+                // The same arrangement for the game's own exchange, and for the same reason:
+                // told the league every tick, it refreshes only when that is news or the hour
+                // has turned. Its digests are immutable, so a refresh is one request.
+                exchange.Playing(stash.League);
+
                 trade.Watching(stash.League);
                 trade.Book = prices.Book;
                 trade.Service();
@@ -1202,7 +1212,8 @@ internal static class Program
             prices,
             trade,
             () => tradeSession.Show(stash.League),
-            () => tradeSession.Probe(stash.League, CancellationToken.None));
+            () => tradeSession.Probe(stash.League, CancellationToken.None),
+            exchange);
         overlay.AttachWealth(wealth, stash, prices);
         overlay.AttachRitual(
             ritual,
