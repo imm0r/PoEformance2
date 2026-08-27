@@ -70,10 +70,13 @@ public sealed class ExchangePairsTests
     private static string Where(string path, double how)
         => Quoted(path) + ":" + how.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
+    private static string Feed(params string[] markets)
+        => "{\"markets\":[" + string.Join(",", markets) + "]}";
+
     private static ExchangePairs Made(params string[] markets)
     {
         var pairs = new ExchangePairs();
-        pairs.Add("{\"markets\":[" + string.Join(",", markets) + "]}", "Test");
+        pairs.Add(Feed(markets), "Test");
         return pairs;
     }
 
@@ -94,6 +97,45 @@ public sealed class ExchangePairsTests
             Market("Metadata/Items/C", ExchangeFeed.Divine, 5, 100, 100));
 
         Assert.Equal(ExchangeFeed.Exalted, active.Pivot);
+    }
+
+    [Fact]
+    public void TheBlendNamesTheMoneyRatherThanTheLastHourRead()
+    {
+        // WHAT KEEPS A LEAGUE AT THE CROSSOVER FROM FLICKERING, and the reason it is measured
+        // over every hour held rather than the newest. A league does not have a money, it drifts
+        // from Exalted towards Divine as it ages - so every league spends a while sitting on the
+        // boundary. Read ONE HOUR AT A TIME over eight consecutive hours, HC Runes of Aldur
+        // named Divine, Exalted, Divine, Exalted, Divine, Divine, Divine, Divine, on counts as
+        // close as 28 against 28. Read as the six-hour blend, all eight named Divine.
+        var pairs = new ExchangePairs();
+
+        pairs.Add(
+            Feed(
+                Market("Metadata/Items/C", ExchangeFeed.Divine, 3, 100, 100),
+                Market("Metadata/Items/D", ExchangeFeed.Divine, 3, 100, 100),
+                Market("Metadata/Items/E", ExchangeFeed.Divine, 3, 100, 100)),
+            "Test");
+
+        Assert.Equal(ExchangeFeed.Divine, pairs.Pivot);
+
+        // THE ASSERTION THAT DISCRIMINATES. On its own this hour says Exalted, two markets to
+        // none - so a pivot read off the newest hour would move here. Across both hours it is
+        // Divine three to two, and that is what has to win. An earlier draft of this test walked
+        // the counts the other way and every step gave the same answer either way, which made it
+        // a test of nothing.
+        pairs.Add(
+            Feed(
+                Market("Metadata/Items/A", ExchangeFeed.Exalted, 3, 100, 100),
+                Market("Metadata/Items/B", ExchangeFeed.Exalted, 3, 100, 100)),
+            "Test");
+
+        Assert.Equal(ExchangeFeed.Divine, pairs.Pivot);
+
+        // One more Exalted market makes the blend three each, and a tie stays with the unit.
+        pairs.Add(Feed(Market("Metadata/Items/F", ExchangeFeed.Exalted, 3, 100, 100)), "Test");
+
+        Assert.Equal(ExchangeFeed.Exalted, pairs.Pivot);
     }
 
     [Fact]
