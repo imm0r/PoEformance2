@@ -232,7 +232,11 @@ public sealed class ExchangePairs
         Bid: rate.Ask > 0 ? 1 / rate.Ask : 0,
         Ask: rate.Bid > 0 ? 1 / rate.Bid : 0,
         Traded: rate.Traded > 0 ? 1 / rate.Traded : 0,
-        Volume: rate.Volume * rate.Traded);
+        Volume: rate.Volume * rate.Traded,
+
+        // Depth is already the THINNER side of the book, so it reads the same from either
+        // direction - the shallower end of a market does not deepen by being looked at.
+        Stock: rate.Stock);
 
     private static (string, string)? Pair(JsonElement market, string league)
     {

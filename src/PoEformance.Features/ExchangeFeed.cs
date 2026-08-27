@@ -31,7 +31,13 @@ namespace PoEformance.Features;
 /// volume - which is what makes a blend across hours volume-weighted rather than a mean of
 /// means, where a one-orb hour would count as heavily as a thousand-orb one.
 /// </param>
-public readonly record struct ExchangeRate(double Bid, double Ask, double Traded, double Volume)
+/// <param name="Stock">
+/// HOW DEEP THE BOOK IS - the thinner side of what was standing in it. Volume says what moved;
+/// this says what could. They come apart exactly where it matters: a pair that traded once at a
+/// silly price has volume and no depth, and reading only the first calls that a market.
+/// </param>
+public readonly record struct ExchangeRate(
+    double Bid, double Ask, double Traded, double Volume, double Stock = 0)
 {
     /// <summary>Whether anything is here at all.</summary>
     public bool Known => Bid > 0 || Ask > 0 || Traded > 0;
@@ -215,8 +221,9 @@ public static class ExchangeFeed
         double ask = Side(market, "lowest_ratio", first, second);
         double traded = Side(market, "volume_traded", first, second);
         double moved = Moved(market, first, second);
+        double standing = Deep(market, first, second);
 
-        return new ExchangeRate(bid, ask, traded, moved);
+        return new ExchangeRate(bid, ask, traded, moved, standing);
     }
 
     private static bool Is(JsonElement market, string league, string first, string second)
@@ -261,6 +268,23 @@ public static class ExchangeFeed
         double a = Number(pair, first);
         double b = Number(pair, second);
         return a > 0 && b > 0 ? b / a : 0;
+    }
+
+    /// <summary>The thinner side of what was standing in the book.</summary>
+    /// <remarks>
+    /// THE THINNER SIDE, because a route can only move as much as its shallower end allows -
+    /// nine hundred thousand Exalted facing seven hundred Divine is a seven-hundred-Divine
+    /// market, whatever the other number says.
+    /// </remarks>
+    private static double Deep(JsonElement market, string first, string second)
+    {
+        if (!market.TryGetProperty("lowest_stock", out JsonElement pair)
+            || pair.ValueKind != JsonValueKind.Object)
+        {
+            return 0;
+        }
+
+        return Math.Min(Number(pair, first), Number(pair, second));
     }
 
     /// <summary>How many of the first currency moved, when both sides really did.</summary>

@@ -50,6 +50,30 @@ public readonly record struct ScoutEntry(
     }
 
     /// <summary>
+    /// The price to compare anything against - the newest FINISHED day.
+    /// </summary>
+    /// <remarks>
+    /// NOT CurrentPrice, and finding that out cost a test. The index's current price is today so
+    /// far, and today so far is a partial day: it read 194.7 for a Divine in the captured hour
+    /// where the finished days ran 245 to 354 and the game's own exchange was paying 260. Used as
+    /// a second opinion it declared the exchange wrong by a third, which is the opposite of what
+    /// a corroborating source is for.
+    ///
+    /// The NEWEST finished day rather than a median of them, because this is a cross-check
+    /// against something an hour old and the closest real day is the fairest thing to hold it to.
+    /// Falls back to the current price when there is no finished day at all - one imperfect
+    /// number beats refusing to answer.
+    /// </remarks>
+    public double Steady
+    {
+        get
+        {
+            IReadOnlyList<ScoutDay> days = Settled;
+            return days.Count > 0 && days[^1].Exalted > 0 ? days[^1].Exalted : Exalted;
+        }
+    }
+
+    /// <summary>
     /// How the price has moved across the settled days, as a fraction.
     /// </summary>
     /// <remarks>
