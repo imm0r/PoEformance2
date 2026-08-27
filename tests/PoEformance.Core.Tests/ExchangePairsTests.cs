@@ -232,4 +232,85 @@ public sealed class ExchangePairsTests
         Assert.Equal(0, pairs.Add(Hour(1), string.Empty));
         Assert.Equal(0, pairs.Count);
     }
+
+    [Fact]
+    public void THEBOOKBehindAPriceIsTheMarketThatSetIt()
+    {
+        // MEASURED, and the reason this exists. The rates page asked the direct Exalted market
+        // for the depth behind every row - but on these hours only 13 of the 115 priced
+        // currencies HAVE a direct Exalted market, so the column read as an empty one while 88
+        // more had a book on the leg they were actually priced through.
+        ExchangePairs pairs = Standard(1, 2);
+
+        int priced = 0, routed = 0, routedWithBook = 0, directWithBook = 0;
+        foreach (string path in pairs.Everything())
+        {
+            if (string.Equals(path, ExchangeFeed.Exalted, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            Valuation worth = pairs.Worth(path);
+            if (!worth.Known)
+            {
+                continue;
+            }
+
+            priced++;
+            if (pairs.Rate(path, ExchangeFeed.Exalted).Stock > 0)
+            {
+                directWithBook++;
+            }
+
+            if (worth.Direct)
+            {
+                continue;
+            }
+
+            routed++;
+            if (worth.Stock > 0)
+            {
+                routedWithBook++;
+            }
+        }
+
+        Assert.True(priced > 100, $"only {priced} priced");
+        Assert.True(routed > directWithBook * 4,
+            $"{routed} routed against {directWithBook} with a direct book - the gap is the point");
+        Assert.True(routedWithBook > directWithBook * 4,
+            $"only {routedWithBook} routed rows carry a book, against {directWithBook} direct");
+    }
+
+    [Fact]
+    public void ARoutedBookIsTheTHINNERLegRatherThanEither()
+    {
+        // A chain is worth its weakest link: being able to sell a thousand of something into
+        // Divine is worth nothing if the Divine side can only absorb ten.
+        ExchangePairs pairs = Standard();
+
+        foreach (string path in pairs.Everything())
+        {
+            Valuation worth = pairs.Worth(path);
+            if (!worth.Known || worth.Direct || worth.Through.Length == 0)
+            {
+                continue;
+            }
+
+            double first = pairs.Rate(path, worth.Through).Stock;
+            double second = pairs.Rate(worth.Through, ExchangeFeed.Exalted).Stock;
+
+            Assert.Equal(Math.Min(first, second), worth.Stock);
+        }
+    }
+
+    [Fact]
+    public void ADirectPriceCarriesItsOwnBook()
+    {
+        ExchangePairs pairs = Standard(1, 2);
+        Valuation divine = pairs.Worth(ExchangeFeed.Divine);
+
+        Assert.True(divine.Direct);
+        Assert.Equal(pairs.Rate(ExchangeFeed.Divine, ExchangeFeed.Exalted).Stock, divine.Stock);
+        Assert.True(divine.Stock > 0);
+    }
 }

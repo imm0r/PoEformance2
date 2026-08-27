@@ -10,7 +10,13 @@ namespace PoEformance.Features;
 /// reader deserves to know which they are looking at.
 /// </param>
 /// <param name="Volume">The thinnest leg's traded volume - how much of a market said this.</param>
-public readonly record struct Valuation(double Exalted, string Through, double Volume)
+/// <param name="Stock">
+/// The thinnest leg's BOOK depth - how much the price could actually move, as opposed to how
+/// much moved already. Carried here rather than looked up again by whoever draws it: the legs
+/// are known at the moment the route is chosen and not afterwards, and a caller asking the
+/// direct Exalted market for the depth behind a ROUTED price gets a dash on nine rows in ten.
+/// </param>
+public readonly record struct Valuation(double Exalted, string Through, double Volume, double Stock = 0)
 {
     /// <summary>Whether a price was found at all.</summary>
     public bool Known => Exalted > 0;
@@ -154,12 +160,12 @@ public sealed class ExchangePairs
         {
             // An Exalted Orb is one Exalted Orb. Said rather than looked up, because the feed
             // has no market of a thing against itself and the answer is not "unpriced".
-            return new Valuation(1, string.Empty, double.PositiveInfinity);
+            return new Valuation(1, string.Empty, double.PositiveInfinity, double.PositiveInfinity);
         }
 
         if (Rate(path, ExchangeFeed.Exalted) is { Known: true } straight)
         {
-            return new Valuation(straight.Bid, string.Empty, straight.Volume);
+            return new Valuation(straight.Bid, string.Empty, straight.Volume, straight.Stock);
         }
 
         Valuation best = default;
@@ -185,7 +191,11 @@ public sealed class ExchangePairs
                 continue;
             }
 
-            best = new Valuation(first.Bid * second.Bid, middle, carries);
+            // The thinner leg again, for the same reason it decides the volume: being able to
+            // sell a thousand of something into Divine is worth nothing if the Divine side can
+            // only absorb ten.
+            best = new Valuation(
+                first.Bid * second.Bid, middle, carries, Math.Min(first.Stock, second.Stock));
         }
 
         return best;
