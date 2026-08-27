@@ -327,9 +327,9 @@ public sealed class ArbitrageTests
     [Fact]
     public void AGainIsMeasuredAgainstSellingItStraight()
     {
-        var route = new Route("x", "X", "m", Direct: 100, Routed: 125, Carries: 500);
+        var route = new Route("x", "X", "m", ExchangeFeed.Exalted, Direct: 100, Routed: 125, Carries: 500);
 
         Assert.Equal(0.25, route.Gain, 8);
-        Assert.Equal(0, new Route("x", "X", "m", 0, 125, 500).Gain);
+        Assert.Equal(0, new Route("x", "X", "m", ExchangeFeed.Exalted, 0, 125, 500).Gain);
     }
 }

@@ -4,11 +4,16 @@ namespace PoEformance.Features;
 /// <param name="Path">The currency the loop is around.</param>
 /// <param name="Called">What to show it as.</param>
 /// <param name="Through">The currency it routes through.</param>
-/// <param name="Direct">What one sells for in Exalted, straight.</param>
+/// <param name="Money">
+/// The currency both sides are measured in - the league's own, which is Exalted in an active
+/// league and Divine in Standard. Carried rather than assumed, because a tooltip that labels
+/// Divine figures "ex" is off by a factor of two hundred and sixty.
+/// </param>
+/// <param name="Direct">What one sells for straight, in <paramref name="Money"/>.</param>
 /// <param name="Routed">And what it comes to through the middle.</param>
 /// <param name="Carries">The thinnest leg's book depth - how much the route could actually move.</param>
 public readonly record struct Route(
-    string Path, string Called, string Through, double Direct, double Routed, double Carries)
+    string Path, string Called, string Through, string Money, double Direct, double Routed, double Carries)
 {
     /// <summary>What the loop gains, as a fraction.</summary>
     public double Gain => Direct > 0 ? (Routed - Direct) / Direct : 0;
@@ -78,21 +83,28 @@ public static class Arbitrage
             return [];
         }
 
+        // THE LOOP ENDS IN THE LEAGUE'S MONEY, not always in Exalted. A loop has to start and end
+        // somewhere a player would actually hold, and in Standard that is Divine: only 29 of 367
+        // currencies there have a direct Exalted market at all, and only 14 of them a book deep
+        // enough to trade, so an Exalted-ended loop was arithmetically almost impossible to find.
+        // In an active league the pivot IS Exalted and this reads exactly as it used to.
+        string money = pairs.Pivot;
+
         var found = new List<Route>();
         foreach (string path in pairs.Everything())
         {
-            if (string.Equals(path, ExchangeFeed.Exalted, StringComparison.Ordinal))
+            if (string.Equals(path, money, StringComparison.Ordinal))
             {
                 continue;
             }
 
-            ExchangeRate straight = pairs.Rate(path, ExchangeFeed.Exalted);
+            ExchangeRate straight = pairs.Rate(path, money);
             if (!straight.Known || straight.Bid <= 0 || straight.Stock < Deep)
             {
                 continue;
             }
 
-            if (!Agrees(pairs, index, path, ExchangeFeed.Exalted))
+            if (!Agrees(pairs, index, path, money))
             {
                 continue;
             }
@@ -101,13 +113,13 @@ public static class Arbitrage
             foreach (string middle in ExchangePairs.Majors)
             {
                 if (string.Equals(middle, path, StringComparison.Ordinal)
-                    || string.Equals(middle, ExchangeFeed.Exalted, StringComparison.Ordinal))
+                    || string.Equals(middle, money, StringComparison.Ordinal))
                 {
                     continue;
                 }
 
                 ExchangeRate first = pairs.Rate(path, middle);
-                ExchangeRate second = pairs.Rate(middle, ExchangeFeed.Exalted);
+                ExchangeRate second = pairs.Rate(middle, money);
                 if (!first.Known || !second.Known || first.Bid <= 0 || second.Bid <= 0)
                 {
                     continue;
@@ -119,7 +131,7 @@ public static class Arbitrage
                     continue;
                 }
 
-                if (!Agrees(pairs, index, path, middle) || !Agrees(pairs, index, middle, ExchangeFeed.Exalted))
+                if (!Agrees(pairs, index, path, middle) || !Agrees(pairs, index, middle, money))
                 {
                     continue;
                 }
@@ -141,6 +153,7 @@ public static class Arbitrage
                     path,
                     index.TryGetValue(path, out ScoutEntry named) ? named.Called : Short(path),
                     middle,
+                    money,
                     straight.Bid,
                     routed,
                     carries);

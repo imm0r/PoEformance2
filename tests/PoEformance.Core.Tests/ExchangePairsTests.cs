@@ -46,6 +46,171 @@ public sealed class ExchangePairsTests
         return pairs;
     }
 
+    /// <summary>One market, in the feed's own shape, for the cases no capture happens to hold.</summary>
+    /// <remarks>
+    /// Both ratio sides are set to the same number, so bid equals ask: these tests are about
+    /// WHICH market gets chosen, and a spread would only make the arithmetic harder to read.
+    /// </remarks>
+    private static string Market(string a, string b, double bid, double volume, double stock)
+    {
+        // Written by hand rather than with a raw string literal: the shape ends in four closing
+        // braces, and a $$"""...""" cannot tell those apart from an interpolation hole.
+        string Both(double first, double second)
+            => Where(a, first) + "," + Where(b, second);
+
+        return "{\"league\":\"Test\",\"market_pair\":[" + Quoted(a) + "," + Quoted(b) + "],"
+               + "\"volume_traded\":{" + Both(volume, volume * bid) + "},"
+               + "\"lowest_stock\":{" + Both(stock, stock) + "},"
+               + "\"lowest_ratio\":{" + Both(1, bid) + "},"
+               + "\"highest_ratio\":{" + Both(1, bid) + "}}";
+    }
+
+    private static string Quoted(string what) => "\"" + what + "\"";
+
+    private static string Where(string path, double how)
+        => Quoted(path) + ":" + how.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private static ExchangePairs Made(params string[] markets)
+    {
+        var pairs = new ExchangePairs();
+        pairs.Add("{\"markets\":[" + string.Join(",", markets) + "]}", "Test");
+        return pairs;
+    }
+
+    [Fact]
+    public void TheLeaguesOwnMoneyIsReadOffTheMarketsRatherThanAssumed()
+    {
+        // WHAT REPLACED A HARDCODED EXALTED. Counted over six live hours, Runes of Aldur has 399
+        // currencies trading against Exalted and 265 against Divine; Standard has 29 against
+        // Exalted and 117 against Divine. Neither currency is the right constant, because the
+        // right answer is different per league - so it is counted instead.
+        Assert.Equal(ExchangeFeed.Divine, Standard(1).Pivot);
+        Assert.Equal(ExchangeFeed.Divine, Standard(1, 2).Pivot);
+
+        // And the other way round, so this is a measurement and not a rename of the constant.
+        ExchangePairs active = Made(
+            Market("Metadata/Items/A", ExchangeFeed.Exalted, 3, 100, 100),
+            Market("Metadata/Items/B", ExchangeFeed.Exalted, 4, 100, 100),
+            Market("Metadata/Items/C", ExchangeFeed.Divine, 5, 100, 100));
+
+        Assert.Equal(ExchangeFeed.Exalted, active.Pivot);
+    }
+
+    [Fact]
+    public void NothingReadAtAllStillNamesAMoney()
+    {
+        // Exalted until the markets say otherwise. A pivot of "" would make every comparison
+        // against it quietly false, which is a worse failure than an assumption that is right
+        // in one league out of two.
+        Assert.Equal(ExchangeFeed.Exalted, new ExchangePairs().Pivot);
+    }
+
+    [Fact]
+    public void ADeeperRouteBeatsAThinnerDirectMarket()
+    {
+        // THE BUG THE PIVOT WORK FOUND. Worth() used to return the Exalted market the instant
+        // one existed, which sounds like the stronger claim - one leg, one spread. Measured over
+        // six live hours, of the currencies that had BOTH a direct Exalted market and a usable
+        // route, the route's thinnest leg was deeper than the direct market in 9 of 11 in
+        // Standard and 87 of 187 in Runes of Aldur. So "direct wins" was choosing the worse
+        // market most of the time in the league this tool is actually used in.
+        const string Thing = "Metadata/Items/Thing";
+
+        ExchangePairs pairs = Made(
+            Market(Thing, ExchangeFeed.Exalted, 10, 3, 3),        // direct, and almost nobody traded it
+            Market(Thing, ExchangeFeed.Divine, 0.05, 900, 900),   // deep first leg
+            Market(ExchangeFeed.Divine, ExchangeFeed.Exalted, 260, 900, 900));
+
+        Valuation worth = pairs.Worth(Thing);
+
+        Assert.Equal(ExchangeFeed.Divine, worth.Through);
+        Assert.Equal(0.05 * 260, worth.Exalted, 6);
+        Assert.Equal(900, worth.Volume, 6);
+    }
+
+    [Fact]
+    public void AnEquallyDeepDirectMarketKeepsTheTie()
+    {
+        // Which is what makes "one leg is the stronger claim" survive without a fudge factor to
+        // prefer it by: the direct candidate is simply weighed first, and the hop has to be
+        // strictly deeper to displace it.
+        const string Thing = "Metadata/Items/Thing";
+
+        ExchangePairs pairs = Made(
+            Market(Thing, ExchangeFeed.Exalted, 10, 900, 900),
+            Market(Thing, ExchangeFeed.Divine, 0.05, 900, 900),
+            Market(ExchangeFeed.Divine, ExchangeFeed.Exalted, 260, 900, 900));
+
+        Valuation worth = pairs.Worth(Thing);
+
+        Assert.True(worth.Direct);
+        Assert.Equal(10, worth.Exalted, 6);
+    }
+
+    [Fact]
+    public void AHopThroughTheLeaguesOwnMoneyIsAnOrdinaryTrade()
+    {
+        // The distinction the table's colouring needs. Direct means "came from an Exalted
+        // market", which in Standard is true of a handful of currencies - colouring by it paints
+        // a perfectly ordinary Divine economy as second-rate on nine rows in ten.
+        ExchangePairs pairs = Standard(1);
+        Assert.Equal(ExchangeFeed.Divine, pairs.Pivot);
+
+        Valuation exalted = pairs.Worth(ExchangeFeed.Divine);
+        Assert.True(exalted.Direct);
+        Assert.True(pairs.Ordinary(exalted));
+
+        string viaMoney = pairs.Everything()
+            .First(p => pairs.Worth(p) is { Known: true, Direct: false } w
+                        && string.Equals(w.Through, pairs.Pivot, StringComparison.Ordinal));
+
+        Assert.True(pairs.Ordinary(pairs.Worth(viaMoney)));
+
+        // And something nobody has a price for is not "ordinary", it is nothing.
+        Assert.False(pairs.Ordinary(pairs.Worth("Metadata/Items/Currency/CurrencyNobodyHasEverSeen")));
+    }
+
+    [Fact]
+    public void MostOfStandardIsAnOrdinaryTradeEvenThoughAlmostNoneOfItIsDirect()
+    {
+        // THE MEASUREMENT THE PIVOT EXISTS FOR, on the two committed hours. Colouring the table
+        // by Direct calls almost all of Standard second-rate; colouring it by Ordinary calls
+        // almost all of it what it is - a currency with a working Divine market. Both counts are
+        // asserted, so this fails if either the pivot stops being read or Direct starts lying.
+        ExchangePairs pairs = Standard(1, 2);
+
+        var priced = 0;
+        var direct = 0;
+        var ordinary = 0;
+        foreach (string path in pairs.Everything())
+        {
+            Valuation worth = pairs.Worth(path);
+            if (!worth.Known)
+            {
+                continue;
+            }
+
+            priced++;
+            if (worth.Direct)
+            {
+                direct++;
+            }
+
+            if (pairs.Ordinary(worth))
+            {
+                ordinary++;
+            }
+        }
+
+        Assert.True(priced > 100, $"only {priced} priced - the fixture is not Standard-like");
+        Assert.True(
+            direct * 4 < priced,
+            $"expected direct Exalted markets to be rare in Standard; {direct} of {priced}");
+        Assert.True(
+            ordinary > priced / 2,
+            $"expected most rows to be against the league's own money; {ordinary} of {priced}");
+    }
+
     [Fact]
     public void AnExaltedOrbIsWorthAnExaltedOrb()
     {
