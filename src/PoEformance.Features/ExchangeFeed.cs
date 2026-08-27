@@ -136,12 +136,7 @@ public static class ExchangeFeed
                     continue;
                 }
 
-                double bid = Side(market, "highest_ratio", first, second);
-                double ask = Side(market, "lowest_ratio", first, second);
-                double traded = Side(market, "volume_traded", first, second);
-                double moved = Moved(market, first, second);
-
-                return new ExchangeRate(bid, ask, traded, moved);
+                return Of(market, first, second);
             }
         }
         catch (JsonException)
@@ -202,6 +197,25 @@ public static class ExchangeFeed
         }
 
         double traded = firstSide > 0 ? secondSide / firstSide : 0;
+        return new ExchangeRate(bid, ask, traded, moved);
+    }
+
+    /// <summary>
+    /// Reads one already-located market element, without going near the rest of the document.
+    /// </summary>
+    /// <remarks>
+    /// Separate from <see cref="Read"/> so that a caller holding a parsed digest can walk its
+    /// markets once. Going back through Read per market would re-parse the whole file for each
+    /// of them - two hundred passes over a hundred and eighty kilobytes to answer two hundred
+    /// questions that one pass already had in hand.
+    /// </remarks>
+    public static ExchangeRate Of(JsonElement market, string first, string second)
+    {
+        double bid = Side(market, "highest_ratio", first, second);
+        double ask = Side(market, "lowest_ratio", first, second);
+        double traded = Side(market, "volume_traded", first, second);
+        double moved = Moved(market, first, second);
+
         return new ExchangeRate(bid, ask, traded, moved);
     }
 

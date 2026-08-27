@@ -115,6 +115,3982 @@
   },
   {
    "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyCorrupt|Metadata/Items/Currency/CurrencyRerollRare2",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyCorrupt",
+    "Metadata/Items/Currency/CurrencyRerollRare2"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare2": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Currency/CurrencyRerollRare2": 1
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Currency/CurrencyRerollRare2": 1
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare2": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare2": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyCorrupt|Metadata/Items/Currency/CurrencyAddSkillGemSocket4",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyCorrupt",
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 4,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 5,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyCorrupt|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyCorrupt",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 548,
+    "Metadata/Items/Currency/CurrencyModValues": 54
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 36802,
+    "Metadata/Items/Currency/CurrencyModValues": 705
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 37095,
+    "Metadata/Items/Currency/CurrencyModValues": 705
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 10,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 51,
+    "Metadata/Items/Currency/CurrencyModValues": 5
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyCorrupt|Metadata/Items/Gem/SupportGemAtzirisCommunion",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyCorrupt",
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 100,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 100,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyCorrupt|Metadata/Items/Currency/CurrencyAddSkillGemSocket5",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyCorrupt",
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 2362,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 2362,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorrupt": 0,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyGemQuality|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyGemQuality",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 18,
+    "Metadata/Items/Currency/CurrencyRerollRare": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 933,
+    "Metadata/Items/Currency/CurrencyRerollRare": 45
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 942,
+    "Metadata/Items/Currency/CurrencyRerollRare": 45
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 9,
+    "Metadata/Items/Currency/CurrencyRerollRare": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 9,
+    "Metadata/Items/Currency/CurrencyRerollRare": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyGemQuality|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyGemQuality",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 92,
+    "Metadata/Items/Currency/CurrencyModValues": 32
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 27515,
+    "Metadata/Items/Currency/CurrencyModValues": 2471
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 27515,
+    "Metadata/Items/Currency/CurrencyModValues": 2478
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 64,
+    "Metadata/Items/Currency/CurrencyModValues": 25
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyGemQuality": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyIncursionJewelleryQuality|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyIncursionJewelleryQuality",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyIncursionJewelleryQuality": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionJewelleryQuality": 22,
+    "Metadata/Items/Currency/CurrencyModValues": 7204
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionJewelleryQuality": 22,
+    "Metadata/Items/Currency/CurrencyModValues": 7204
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionJewelleryQuality": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionJewelleryQuality": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyJewelQualityMana|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyJewelQualityMana",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyJewelQualityMana": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 6
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelQualityMana": 243,
+    "Metadata/Items/Currency/CurrencyModValues": 254
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelQualityMana": 244,
+    "Metadata/Items/Currency/CurrencyModValues": 346
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelQualityMana": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 6
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelQualityMana": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 6
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/RuneLightningGreater|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneLightningGreater",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneLightningGreater": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneLightningGreater": 177,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneLightningGreater": 177,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneLightningGreater": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneLightningGreater": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/CarvedMajesty|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/CarvedMajesty",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/CarvedMajesty": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/CarvedMajesty": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 10961
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/CarvedMajesty": 5,
+    "Metadata/Items/Currency/CurrencyModValues": 10961
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/CarvedMajesty": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/CarvedMajesty": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnChanceAncientOrb|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnChanceAncientOrb",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnChanceAncientOrb": 10,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnChanceAncientOrb": 2065,
+    "Metadata/Items/Currency/CurrencyModValues": 257
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnChanceAncientOrb": 2065,
+    "Metadata/Items/Currency/CurrencyModValues": 258
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnChanceAncientOrb": 5,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnChanceAncientOrb": 5,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemAmmoConservationFour|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemAmmoConservationFour",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemAmmoConservationFour": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemAmmoConservationFour": 83,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemAmmoConservationFour": 84,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemAmmoConservationFour": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemAmmoConservationFour": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyIncursionExtractAllSocketablesCurrency|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyIncursionExtractAllSocketablesCurrency",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyIncursionExtractAllSocketablesCurrency": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionExtractAllSocketablesCurrency": 34,
+    "Metadata/Items/Currency/CurrencyModValues": 711
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionExtractAllSocketablesCurrency": 34,
+    "Metadata/Items/Currency/CurrencyModValues": 711
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionExtractAllSocketablesCurrency": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionExtractAllSocketablesCurrency": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/RuneSpecial3|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneSpecial3",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneSpecial3": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 57
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneSpecial3": 37,
+    "Metadata/Items/Currency/CurrencyModValues": 819
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneSpecial3": 37,
+    "Metadata/Items/Currency/CurrencyModValues": 837
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneSpecial3": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 39
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneSpecial3": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 18
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenSellVendorRandomise|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenSellVendorRandomise",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenSellVendorRandomise": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenSellVendorRandomise": 17592,
+    "Metadata/Items/Currency/CurrencyModValues": 375
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenSellVendorRandomise": 17592,
+    "Metadata/Items/Currency/CurrencyModValues": 375
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenSellVendorRandomise": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenSellVendorRandomise": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyGreaterEssenceCritical|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyGreaterEssenceCritical",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyGreaterEssenceCritical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyGreaterEssenceCritical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 364
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyGreaterEssenceCritical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 384
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyGreaterEssenceCritical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyGreaterEssenceCritical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Pinnacle/RitualPinnacleEffigyPiece|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Pinnacle/RitualPinnacleEffigyPiece",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Pinnacle/RitualPinnacleEffigyPiece": 12,
+    "Metadata/Items/Currency/CurrencyModValues": 41
+   },
+   "lowest_stock": {
+    "Metadata/Items/Pinnacle/RitualPinnacleEffigyPiece": 2919,
+    "Metadata/Items/Currency/CurrencyModValues": 3238
+   },
+   "highest_stock": {
+    "Metadata/Items/Pinnacle/RitualPinnacleEffigyPiece": 2928,
+    "Metadata/Items/Currency/CurrencyModValues": 3243
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Pinnacle/RitualPinnacleEffigyPiece": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 4
+   },
+   "highest_ratio": {
+    "Metadata/Items/Pinnacle/RitualPinnacleEffigyPiece": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 5
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyIncursionDoubleCorrupt|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorrupt",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorrupt": 32,
+    "Metadata/Items/Currency/CurrencyModValues": 24
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorrupt": 20252,
+    "Metadata/Items/Currency/CurrencyModValues": 2334
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorrupt": 20276,
+    "Metadata/Items/Currency/CurrencyModValues": 2337
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorrupt": 6,
+    "Metadata/Items/Currency/CurrencyModValues": 5
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorrupt": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemVruunsInevitability|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemVruunsInevitability",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemVruunsInevitability": 0,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemVruunsInevitability": 5,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemVruunsInevitability": 5,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemVruunsInevitability": 0,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemVruunsInevitability": 0,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/IdolHawk|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/IdolHawk",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/IdolHawk": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/IdolHawk": 14,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/IdolHawk": 14,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/IdolHawk": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/IdolHawk": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Pinnacle/MothersoulCombined|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Pinnacle/MothersoulCombined",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Pinnacle/MothersoulCombined": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Pinnacle/MothersoulCombined": 94,
+    "Metadata/Items/Currency/CurrencyModValues": 6730
+   },
+   "highest_stock": {
+    "Metadata/Items/Pinnacle/MothersoulCombined": 95,
+    "Metadata/Items/Currency/CurrencyModValues": 6793
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Pinnacle/MothersoulCombined": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Pinnacle/MothersoulCombined": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SkillGemUncut16|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/Gems/SkillGemUncut16",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SkillGemUncut16": 2,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut16": 124,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut16": 124,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut16": 2,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut16": 2,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/ReservationGemUncut20|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gems/ReservationGemUncut20",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/ReservationGemUncut20": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/ReservationGemUncut20": 127,
+    "Metadata/Items/Currency/CurrencyModValues": 7275
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/ReservationGemUncut20": 127,
+    "Metadata/Items/Currency/CurrencyModValues": 7275
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/ReservationGemUncut20": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/ReservationGemUncut20": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnDivineRerollImplicits|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnDivineRerollImplicits",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnDivineRerollImplicits": 6,
+    "Metadata/Items/Currency/CurrencyModValues": 12
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnDivineRerollImplicits": 1064,
+    "Metadata/Items/Currency/CurrencyModValues": 1692
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnDivineRerollImplicits": 1084,
+    "Metadata/Items/Currency/CurrencyModValues": 1692
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnDivineRerollImplicits": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnDivineRerollImplicits": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyIncursionMutateCorruptionEnchantJewel|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyIncursionMutateCorruptionEnchantJewel",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyIncursionMutateCorruptionEnchantJewel": 3,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionMutateCorruptionEnchantJewel": 40,
+    "Metadata/Items/Currency/CurrencyModValues": 191
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionMutateCorruptionEnchantJewel": 40,
+    "Metadata/Items/Currency/CurrencyModValues": 193
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionMutateCorruptionEnchantJewel": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionMutateCorruptionEnchantJewel": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/MapFragments/CurrencyBreachFragment|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/MapFragments/CurrencyBreachFragment",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/MapFragments/CurrencyBreachFragment": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/MapFragments/CurrencyBreachFragment": 4988,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   },
+   "highest_stock": {
+    "Metadata/Items/MapFragments/CurrencyBreachFragment": 4988,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   },
+   "lowest_ratio": {
+    "Metadata/Items/MapFragments/CurrencyBreachFragment": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/MapFragments/CurrencyBreachFragment": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyLesserEssencePhysical|Metadata/Items/Currency/CurrencyAddModToMagic2",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyLesserEssencePhysical",
+    "Metadata/Items/Currency/CurrencyAddModToMagic2"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyLesserEssencePhysical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyLesserEssencePhysical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyLesserEssencePhysical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyLesserEssencePhysical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyLesserEssencePhysical": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/MapFragments/VaultKeyPinnacle|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/MapFragments/VaultKeyPinnacle",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/MapFragments/VaultKeyPinnacle": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/MapFragments/VaultKeyPinnacle": 67,
+    "Metadata/Items/Currency/CurrencyModValues": 73
+   },
+   "highest_stock": {
+    "Metadata/Items/MapFragments/VaultKeyPinnacle": 68,
+    "Metadata/Items/Currency/CurrencyModValues": 94
+   },
+   "lowest_ratio": {
+    "Metadata/Items/MapFragments/VaultKeyPinnacle": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/MapFragments/VaultKeyPinnacle": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyAfflictionShard|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyAfflictionShard",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyAfflictionShard": 210,
+    "Metadata/Items/Currency/CurrencyModValues": 6
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyAfflictionShard": 11107,
+    "Metadata/Items/Currency/CurrencyModValues": 696
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyAfflictionShard": 11107,
+    "Metadata/Items/Currency/CurrencyModValues": 701
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyAfflictionShard": 35,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyAfflictionShard": 35,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Pinnacle/MothersoulEmbryo|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Pinnacle/MothersoulEmbryo",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Pinnacle/MothersoulEmbryo": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Pinnacle/MothersoulEmbryo": 76,
+    "Metadata/Items/Currency/CurrencyModValues": 997
+   },
+   "highest_stock": {
+    "Metadata/Items/Pinnacle/MothersoulEmbryo": 76,
+    "Metadata/Items/Currency/CurrencyModValues": 997
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Pinnacle/MothersoulEmbryo": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Pinnacle/MothersoulEmbryo": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnExaltAddSuffixes|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnExaltAddSuffixes",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnExaltAddSuffixes": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnExaltAddSuffixes": 824,
+    "Metadata/Items/Currency/CurrencyModValues": 109
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnExaltAddSuffixes": 824,
+    "Metadata/Items/Currency/CurrencyModValues": 109
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnExaltAddSuffixes": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnExaltAddSuffixes": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/EndgameDistilledEmotion3|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/EndgameDistilledEmotion3",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion3": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 43
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion3": 140,
+    "Metadata/Items/Currency/CurrencyModValues": 2028
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion3": 141,
+    "Metadata/Items/Currency/CurrencyModValues": 2118
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion3": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 43
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion3": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 43
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnDeathPreventExpLoss|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnDeathPreventExpLoss",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnDeathPreventExpLoss": 108,
+    "Metadata/Items/Currency/CurrencyModValues": 40
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnDeathPreventExpLoss": 10786,
+    "Metadata/Items/Currency/CurrencyModValues": 44
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnDeathPreventExpLoss": 10867,
+    "Metadata/Items/Currency/CurrencyModValues": 44
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnDeathPreventExpLoss": 27,
+    "Metadata/Items/Currency/CurrencyModValues": 10
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnDeathPreventExpLoss": 27,
+    "Metadata/Items/Currency/CurrencyModValues": 10
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnLowLifeFullyHeal|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnLowLifeFullyHeal",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnLowLifeFullyHeal": 5,
+    "Metadata/Items/Currency/CurrencyRerollRare": 15
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnLowLifeFullyHeal": 169,
+    "Metadata/Items/Currency/CurrencyRerollRare": 8
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnLowLifeFullyHeal": 169,
+    "Metadata/Items/Currency/CurrencyRerollRare": 8
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnLowLifeFullyHeal": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 3
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnLowLifeFullyHeal": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 3
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemHerDeclaration|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemHerDeclaration",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemHerDeclaration": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemHerDeclaration": 7,
+    "Metadata/Items/Currency/CurrencyModValues": 15686
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemHerDeclaration": 8,
+    "Metadata/Items/Currency/CurrencyModValues": 17106
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemHerDeclaration": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemHerDeclaration": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemStyrnsFerocity|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemStyrnsFerocity",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemStyrnsFerocity": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemStyrnsFerocity": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 205
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemStyrnsFerocity": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 205
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemStyrnsFerocity": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemStyrnsFerocity": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemUhtredsAugury|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemUhtredsAugury",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemUhtredsAugury": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemUhtredsAugury": 25,
+    "Metadata/Items/Currency/CurrencyModValues": 8095
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemUhtredsAugury": 25,
+    "Metadata/Items/Currency/CurrencyModValues": 8846
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemUhtredsAugury": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemUhtredsAugury": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemKaomsMadness|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemKaomsMadness",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemKaomsMadness": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemKaomsMadness": 39,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemKaomsMadness": 39,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemKaomsMadness": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemKaomsMadness": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/AugmentAnoint|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/AugmentAnoint",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/AugmentAnoint": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/AugmentAnoint": 23,
+    "Metadata/Items/Currency/CurrencyModValues": 3815
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/AugmentAnoint": 23,
+    "Metadata/Items/Currency/CurrencyModValues": 3815
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/AugmentAnoint": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/AugmentAnoint": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/StrongboxKey|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/StrongboxKey",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/StrongboxKey": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 16
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/StrongboxKey": 111,
+    "Metadata/Items/Currency/CurrencyModValues": 459
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/StrongboxKey": 111,
+    "Metadata/Items/Currency/CurrencyModValues": 471
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/StrongboxKey": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 4
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/StrongboxKey": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 4
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/AbyssalBenchTicketJewellery|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/AbyssalBenchTicketJewellery",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/AbyssalBenchTicketJewellery": 981,
+    "Metadata/Items/Currency/CurrencyModValues": 392
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketJewellery": 5746,
+    "Metadata/Items/Currency/CurrencyModValues": 70
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketJewellery": 6727,
+    "Metadata/Items/Currency/CurrencyModValues": 80
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketJewellery": 5,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketJewellery": 13,
+    "Metadata/Items/Currency/CurrencyModValues": 5
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/UlamansGaze|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/UlamansGaze",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/UlamansGaze": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 20
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/UlamansGaze": 27,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/UlamansGaze": 27,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/UlamansGaze": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 20
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/UlamansGaze": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 20
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnChaosPrefix|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnChaosPrefix",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnChaosPrefix": 27,
+    "Metadata/Items/Currency/CurrencyModValues": 3444
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosPrefix": 339,
+    "Metadata/Items/Currency/CurrencyModValues": 27866
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosPrefix": 364,
+    "Metadata/Items/Currency/CurrencyModValues": 29816
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosPrefix": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 130
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosPrefix": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 123
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/EndgameDistilledEmotion1|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/EndgameDistilledEmotion1",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion1": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion1": 188,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion1": 188,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion1": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/EndgameDistilledEmotion1": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/ReservationGemUncut16|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/Gems/ReservationGemUncut16",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/ReservationGemUncut16": 2,
+    "Metadata/Items/Currency/CurrencyRerollRare": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/ReservationGemUncut16": 2,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/ReservationGemUncut16": 2,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/ReservationGemUncut16": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/ReservationGemUncut16": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyJewelleryQualityChaos|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyJewelleryQualityChaos",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyJewelleryQualityChaos": 14,
+    "Metadata/Items/Currency/CurrencyModValues": 28
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelleryQualityChaos": 502,
+    "Metadata/Items/Currency/CurrencyModValues": 190
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelleryQualityChaos": 1002,
+    "Metadata/Items/Currency/CurrencyModValues": 190
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelleryQualityChaos": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelleryQualityChaos": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyIncursionCorruptTablet|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyIncursionCorruptTablet",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyIncursionCorruptTablet": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionCorruptTablet": 39,
+    "Metadata/Items/Currency/CurrencyModValues": 134
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyIncursionCorruptTablet": 39,
+    "Metadata/Items/Currency/CurrencyModValues": 137
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionCorruptTablet": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyIncursionCorruptTablet": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemTecrodsRevenge|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemTecrodsRevenge",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemTecrodsRevenge": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemTecrodsRevenge": 56,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemTecrodsRevenge": 56,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemTecrodsRevenge": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemTecrodsRevenge": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnChaosLowestLevelMod|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnChaosLowestLevelMod",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnChaosLowestLevelMod": 108,
+    "Metadata/Items/Currency/CurrencyModValues": 6775
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosLowestLevelMod": 3834,
+    "Metadata/Items/Currency/CurrencyModValues": 30939
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosLowestLevelMod": 3934,
+    "Metadata/Items/Currency/CurrencyModValues": 33379
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosLowestLevelMod": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 64
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosLowestLevelMod": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 60
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyAddModToMagic3|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyAddModToMagic3",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic3": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic3": 103485,
+    "Metadata/Items/Currency/CurrencyModValues": 236
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic3": 103485,
+    "Metadata/Items/Currency/CurrencyModValues": 236
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic3": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic3": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/MapFragments/VaultKeyAzmeriSpirits|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/MapFragments/VaultKeyAzmeriSpirits",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/MapFragments/VaultKeyAzmeriSpirits": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/MapFragments/VaultKeyAzmeriSpirits": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 2882
+   },
+   "highest_stock": {
+    "Metadata/Items/MapFragments/VaultKeyAzmeriSpirits": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 2882
+   },
+   "lowest_ratio": {
+    "Metadata/Items/MapFragments/VaultKeyAzmeriSpirits": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/MapFragments/VaultKeyAzmeriSpirits": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyRerollRare2|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyRerollRare2",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyRerollRare2": 6,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare2": 60499,
+    "Metadata/Items/Currency/CurrencyModValues": 6619
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare2": 60499,
+    "Metadata/Items/Currency/CurrencyModValues": 6619
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare2": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare2": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/RuneSpecial5|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneSpecial5",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneSpecial5": 56,
+    "Metadata/Items/Currency/CurrencyModValues": 112
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneSpecial5": 1470,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneSpecial5": 1470,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneSpecial5": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneSpecial5": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/RuneColdGreater|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneColdGreater",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneColdGreater": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneColdGreater": 515,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneColdGreater": 515,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneColdGreater": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneColdGreater": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/DistilledEmotion6|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/DistilledEmotion6",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/DistilledEmotion6": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/DistilledEmotion6": 119,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/DistilledEmotion6": 119,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/DistilledEmotion6": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/DistilledEmotion6": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnChaosMapMonsterRarity|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterRarity",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterRarity": 8,
+    "Metadata/Items/Currency/CurrencyModValues": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterRarity": 72042,
+    "Metadata/Items/Currency/CurrencyModValues": 967
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterRarity": 72042,
+    "Metadata/Items/Currency/CurrencyModValues": 971
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterRarity": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterRarity": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyAddSkillGemSocket4|Metadata/Items/Currency/CurrencyUpgradeToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4",
+    "Metadata/Items/Currency/CurrencyUpgradeToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 224
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 224
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket4": 0,
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemAmanamusTithe|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemAmanamusTithe",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemAmanamusTithe": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemAmanamusTithe": 112,
+    "Metadata/Items/Currency/CurrencyModValues": 20
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemAmanamusTithe": 112,
+    "Metadata/Items/Currency/CurrencyModValues": 20
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemAmanamusTithe": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemAmanamusTithe": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemHelbrymsHide|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemHelbrymsHide",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemHelbrymsHide": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemHelbrymsHide": 65,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemHelbrymsHide": 65,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemHelbrymsHide": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemHelbrymsHide": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemHayoxisFulmination|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemHayoxisFulmination",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemHayoxisFulmination": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemHayoxisFulmination": 42,
+    "Metadata/Items/Currency/CurrencyModValues": 25
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemHayoxisFulmination": 43,
+    "Metadata/Items/Currency/CurrencyModValues": 25
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemHayoxisFulmination": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemHayoxisFulmination": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/ReservationGemUncut14|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gems/ReservationGemUncut14",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/ReservationGemUncut14": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/ReservationGemUncut14": 47,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/ReservationGemUncut14": 47,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/ReservationGemUncut14": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/ReservationGemUncut14": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/AbyssalBenchTicketArmour|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 250,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 250,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/AbyssalBenchTicketArmour|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 4614,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 4614,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmour": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/SoulCoreSpecial7|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/SoulCoreSpecial7",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial7": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial7": 17,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial7": 17,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial7": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial7": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyAddModToRare2|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyAddModToRare2",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyAddModToRare2": 8,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare2": 25860,
+    "Metadata/Items/Currency/CurrencyModValues": 405
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare2": 25860,
+    "Metadata/Items/Currency/CurrencyModValues": 405
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare2": 8,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare2": 8,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemCathasBrilliance|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemCathasBrilliance",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemCathasBrilliance": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemCathasBrilliance": 26,
+    "Metadata/Items/Currency/CurrencyModValues": 20
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemCathasBrilliance": 27,
+    "Metadata/Items/Currency/CurrencyModValues": 30
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemCathasBrilliance": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemCathasBrilliance": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyJewelQualityLife|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyJewelQualityLife",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyJewelQualityLife": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelQualityLife": 235,
+    "Metadata/Items/Currency/CurrencyModValues": 104
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelQualityLife": 235,
+    "Metadata/Items/Currency/CurrencyModValues": 304
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelQualityLife": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelQualityLife": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/RuneEnhanceGreater|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneEnhanceGreater",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 223,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 223,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 1,
+    "Metadata/Items/Currency/CurrencyRerollRare": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/RuneEnhanceGreater|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneEnhanceGreater",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 6597,
+    "Metadata/Items/Currency/CurrencyModValues": 55
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 6599,
+    "Metadata/Items/Currency/CurrencyModValues": 55
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/RuneEnhanceGreater|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneEnhanceGreater",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 9,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 72
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 26,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 814
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 27,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 878
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 8
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneEnhanceGreater": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 8
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/SoulCoreSpecial4|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/SoulCoreSpecial4",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial4": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial4": 453,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial4": 453,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial4": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/SoulCoreSpecial4": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SkillGemUncut18|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/Gems/SkillGemUncut18",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SkillGemUncut18": 0,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut18": 1572,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut18": 1590,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut18": 0,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut18": 0,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SkillGemUncut18|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Gems/SkillGemUncut18",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SkillGemUncut18": 10,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut18": 7359,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut18": 7364,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut18": 5,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut18": 5,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyUpgradeToMagic3|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyUpgradeToMagic3",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyUpgradeToMagic3": 155,
+    "Metadata/Items/Currency/CurrencyModValues": 5
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyUpgradeToMagic3": 104228,
+    "Metadata/Items/Currency/CurrencyModValues": 48
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyUpgradeToMagic3": 104228,
+    "Metadata/Items/Currency/CurrencyModValues": 48
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyUpgradeToMagic3": 31,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyUpgradeToMagic3": 31,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemBreachlordsRift|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemBreachlordsRift",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemBreachlordsRift": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemBreachlordsRift": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 2421
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemBreachlordsRift": 3,
+    "Metadata/Items/Currency/CurrencyModValues": 3222
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemBreachlordsRift": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemBreachlordsRift": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/Ritual/RitualPinnacleKey|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/Ritual/RitualPinnacleKey",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/Ritual/RitualPinnacleKey": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 136
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/Ritual/RitualPinnacleKey": 34,
+    "Metadata/Items/Currency/CurrencyModValues": 1384
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/Ritual/RitualPinnacleKey": 36,
+    "Metadata/Items/Currency/CurrencyModValues": 1446
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/Ritual/RitualPinnacleKey": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 38
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/Ritual/RitualPinnacleKey": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 30
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemUhtredsOmen|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemUhtredsOmen",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemUhtredsOmen": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemUhtredsOmen": 24,
+    "Metadata/Items/Currency/CurrencyModValues": 2005
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemUhtredsOmen": 24,
+    "Metadata/Items/Currency/CurrencyModValues": 2158
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemUhtredsOmen": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemUhtredsOmen": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SupportGemUncut5|Metadata/Items/Currency/CurrencyRerollRare",
+   "market_pair": [
+    "Metadata/Items/Gems/SupportGemUncut5",
+    "Metadata/Items/Currency/CurrencyRerollRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SupportGemUncut5": 10,
+    "Metadata/Items/Currency/CurrencyRerollRare": 5
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SupportGemUncut5": 108,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SupportGemUncut5": 108,
+    "Metadata/Items/Currency/CurrencyRerollRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SupportGemUncut5": 2,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SupportGemUncut5": 2,
+    "Metadata/Items/Currency/CurrencyRerollRare": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SupportGemUncut5|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gems/SupportGemUncut5",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SupportGemUncut5": 93,
+    "Metadata/Items/Currency/CurrencyModValues": 10
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SupportGemUncut5": 10455,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SupportGemUncut5": 10519,
+    "Metadata/Items/Currency/CurrencyModValues": 7
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SupportGemUncut5": 8,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SupportGemUncut5": 21,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SupportGemUncut5|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Gems/SupportGemUncut5",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SupportGemUncut5": 48,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1242
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SupportGemUncut5": 153,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1989
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SupportGemUncut5": 193,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 2024
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SupportGemUncut5": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 30
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SupportGemUncut5": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 5
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemDiallasDesire|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemDiallasDesire",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemDiallasDesire": 3,
+    "Metadata/Items/Currency/CurrencyModValues": 24
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemDiallasDesire": 1797,
+    "Metadata/Items/Currency/CurrencyModValues": 1286
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemDiallasDesire": 1799,
+    "Metadata/Items/Currency/CurrencyModValues": 1286
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemDiallasDesire": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemDiallasDesire": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 8
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyCorruptedEssenceHorror|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceHorror",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceHorror": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 36
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceHorror": 3199,
+    "Metadata/Items/Currency/CurrencyModValues": 37
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceHorror": 3202,
+    "Metadata/Items/Currency/CurrencyModValues": 37
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceHorror": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 9
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceHorror": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 9
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyJewelQualityCaster|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyJewelQualityCaster",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyJewelQualityCaster": 3,
+    "Metadata/Items/Currency/CurrencyModValues": 284
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelQualityCaster": 232,
+    "Metadata/Items/Currency/CurrencyModValues": 6348
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelQualityCaster": 235,
+    "Metadata/Items/Currency/CurrencyModValues": 6536
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelQualityCaster": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 96
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelQualityCaster": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 94
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemHardyTotemsThree|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemHardyTotemsThree",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemHardyTotemsThree": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemHardyTotemsThree": 194,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemHardyTotemsThree": 194,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemHardyTotemsThree": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemHardyTotemsThree": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemEshsRadiance|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemEshsRadiance",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemEshsRadiance": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemEshsRadiance": 46,
+    "Metadata/Items/Currency/CurrencyModValues": 480
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemEshsRadiance": 46,
+    "Metadata/Items/Currency/CurrencyModValues": 548
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemEshsRadiance": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemEshsRadiance": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnChaosMapItemRarity|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnChaosMapItemRarity",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnChaosMapItemRarity": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 12
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosMapItemRarity": 287,
+    "Metadata/Items/Currency/CurrencyModValues": 848
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosMapItemRarity": 291,
+    "Metadata/Items/Currency/CurrencyModValues": 848
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosMapItemRarity": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosMapItemRarity": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/OmenOnChaosMapMonsterEffectiveness|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterEffectiveness",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterEffectiveness": 4,
+    "Metadata/Items/Currency/CurrencyModValues": 9
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterEffectiveness": 832,
+    "Metadata/Items/Currency/CurrencyModValues": 752
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterEffectiveness": 832,
+    "Metadata/Items/Currency/CurrencyModValues": 754
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterEffectiveness": 2,
+    "Metadata/Items/Currency/CurrencyModValues": 7
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/OmenOnChaosMapMonsterEffectiveness": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/SoulCoreMaxMana|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/SoulCoreMaxMana",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/SoulCoreMaxMana": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 5
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/SoulCoreMaxMana": 364,
+    "Metadata/Items/Currency/CurrencyModValues": 1145
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/SoulCoreMaxMana": 364,
+    "Metadata/Items/Currency/CurrencyModValues": 1145
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/SoulCoreMaxMana": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 5
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/SoulCoreMaxMana": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 5
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemTrickstersShard|Metadata/Items/Currency/CurrencyDuplicate",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemTrickstersShard",
+    "Metadata/Items/Currency/CurrencyDuplicate"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 0,
+    "Metadata/Items/Currency/CurrencyDuplicate": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 4,
+    "Metadata/Items/Currency/CurrencyDuplicate": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 4,
+    "Metadata/Items/Currency/CurrencyDuplicate": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 0,
+    "Metadata/Items/Currency/CurrencyDuplicate": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 0,
+    "Metadata/Items/Currency/CurrencyDuplicate": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemTrickstersShard|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemTrickstersShard",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 44,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 44,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemTrickstersShard": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyJewelQualityAttribute|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyJewelQualityAttribute",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyJewelQualityAttribute": 5,
+    "Metadata/Items/Currency/CurrencyModValues": 5
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelQualityAttribute": 228,
+    "Metadata/Items/Currency/CurrencyModValues": 34
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyJewelQualityAttribute": 228,
+    "Metadata/Items/Currency/CurrencyModValues": 34
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelQualityAttribute": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyJewelQualityAttribute": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemZarokhsRefrain|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemZarokhsRefrain",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemZarokhsRefrain": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemZarokhsRefrain": 28,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemZarokhsRefrain": 28,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemZarokhsRefrain": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemZarokhsRefrain": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyAddModToMagic2|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyAddModToMagic2",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 3965,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 3966,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToMagic2": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyRerollRare|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyRerollRare",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 595,
+    "Metadata/Items/Currency/CurrencyModValues": 153
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 215280,
+    "Metadata/Items/Currency/CurrencyModValues": 26067
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 215860,
+    "Metadata/Items/Currency/CurrencyModValues": 26074
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 7,
+    "Metadata/Items/Currency/CurrencyModValues": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 5,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyRerollRare|Metadata/Items/Gems/SkillGemUncut17",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyRerollRare",
+    "Metadata/Items/Gems/SkillGemUncut17"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 1,
+    "Metadata/Items/Gems/SkillGemUncut17": 25
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 0,
+    "Metadata/Items/Gems/SkillGemUncut17": 353
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 0,
+    "Metadata/Items/Gems/SkillGemUncut17": 353
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 1,
+    "Metadata/Items/Gems/SkillGemUncut17": 25
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 1,
+    "Metadata/Items/Gems/SkillGemUncut17": 25
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyRerollRare|Metadata/Items/Gem/SupportGemAtzirisCommunion",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyRerollRare",
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 0,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 241,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 241,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 0,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 0,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyRerollRare|Metadata/Items/Currency/CurrencyPerfectEssenceColdResist",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyRerollRare",
+    "Metadata/Items/Currency/CurrencyPerfectEssenceColdResist"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 1,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceColdResist": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 0,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceColdResist": 9
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 0,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceColdResist": 9
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 1,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceColdResist": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 1,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceColdResist": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyRerollRare|Metadata/Items/Currency/CurrencyRemoveMod",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyRerollRare",
+    "Metadata/Items/Currency/CurrencyRemoveMod"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 2,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 42,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 2319
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 42,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 2319
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 2,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 2,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyRerollRare|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyRerollRare",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 55
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 287,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 280521
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 287,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 280521
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 55
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 55
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyRerollRare|Metadata/Items/Currency/CurrencyAddSkillGemSocket5",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyRerollRare",
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 4,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 149,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 1080
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 149,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 1080
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 4,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyRerollRare": 4,
+    "Metadata/Items/Currency/CurrencyAddSkillGemSocket5": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/AbyssalBenchTicketArmourHigh|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/AbyssalBenchTicketArmourHigh",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmourHigh": 12,
+    "Metadata/Items/Currency/CurrencyModValues": 32
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmourHigh": 1504,
+    "Metadata/Items/Currency/CurrencyModValues": 173
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmourHigh": 1514,
+    "Metadata/Items/Currency/CurrencyModValues": 174
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmourHigh": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 3
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketArmourHigh": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/RuneSpecial10|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/RuneSpecial10",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/RuneSpecial10": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/RuneSpecial10": 61,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/RuneSpecial10": 61,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/RuneSpecial10": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/RuneSpecial10": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/SoulCores/KurgalsGaze|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/SoulCores/KurgalsGaze",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/SoulCores/KurgalsGaze": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 24
+   },
+   "lowest_stock": {
+    "Metadata/Items/SoulCores/KurgalsGaze": 93,
+    "Metadata/Items/Currency/CurrencyModValues": 454
+   },
+   "highest_stock": {
+    "Metadata/Items/SoulCores/KurgalsGaze": 93,
+    "Metadata/Items/Currency/CurrencyModValues": 454
+   },
+   "lowest_ratio": {
+    "Metadata/Items/SoulCores/KurgalsGaze": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 24
+   },
+   "highest_ratio": {
+    "Metadata/Items/SoulCores/KurgalsGaze": 1,
+    "Metadata/Items/Currency/CurrencyModValues": 24
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyDuplicate|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyDuplicate",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyDuplicate": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyDuplicate": 78,
+    "Metadata/Items/Currency/CurrencyModValues": 4468134
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyDuplicate": 79,
+    "Metadata/Items/Currency/CurrencyModValues": 4486634
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyDuplicate": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyDuplicate": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gem/SupportGemBreachlordsAmalgam|Metadata/Items/Currency/CurrencyModValues",
+   "market_pair": [
+    "Metadata/Items/Gem/SupportGemBreachlordsAmalgam",
+    "Metadata/Items/Currency/CurrencyModValues"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gem/SupportGemBreachlordsAmalgam": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gem/SupportGemBreachlordsAmalgam": 9,
+    "Metadata/Items/Currency/CurrencyModValues": 1985
+   },
+   "highest_stock": {
+    "Metadata/Items/Gem/SupportGemBreachlordsAmalgam": 9,
+    "Metadata/Items/Currency/CurrencyModValues": 2536
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gem/SupportGemBreachlordsAmalgam": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gem/SupportGemBreachlordsAmalgam": 0,
+    "Metadata/Items/Currency/CurrencyModValues": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemRigwaldsFerocity",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemRigwaldsFerocity"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 103,
+    "Metadata/Items/Gem/SupportGemRigwaldsFerocity": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1998,
+    "Metadata/Items/Gem/SupportGemRigwaldsFerocity": 51
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 2567,
+    "Metadata/Items/Gem/SupportGemRigwaldsFerocity": 54
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 51,
+    "Metadata/Items/Gem/SupportGemRigwaldsFerocity": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 52,
+    "Metadata/Items/Gem/SupportGemRigwaldsFerocity": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/AbyssalBenchTicketWeaponHigh",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/AbyssalBenchTicketWeaponHigh"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 61,
+    "Metadata/Items/Currency/AbyssalBenchTicketWeaponHigh": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 12444,
+    "Metadata/Items/Currency/AbyssalBenchTicketWeaponHigh": 256
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 12444,
+    "Metadata/Items/Currency/AbyssalBenchTicketWeaponHigh": 259
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 13,
+    "Metadata/Items/Currency/AbyssalBenchTicketWeaponHigh": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 16,
+    "Metadata/Items/Currency/AbyssalBenchTicketWeaponHigh": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Pinnacle/MothersoulEgg",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Pinnacle/MothersoulEgg"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 33,
+    "Metadata/Items/Pinnacle/MothersoulEgg": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1935,
+    "Metadata/Items/Pinnacle/MothersoulEgg": 100
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1935,
+    "Metadata/Items/Pinnacle/MothersoulEgg": 100
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 33,
+    "Metadata/Items/Pinnacle/MothersoulEgg": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 33,
+    "Metadata/Items/Pinnacle/MothersoulEgg": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemSeraphsHeart",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemSeraphsHeart"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemSeraphsHeart": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 10036,
+    "Metadata/Items/Gem/SupportGemSeraphsHeart": 2
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 12703,
+    "Metadata/Items/Gem/SupportGemSeraphsHeart": 2
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemSeraphsHeart": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemSeraphsHeart": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyJewelleryQualityAttribute",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttribute"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttribute": 20
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 16,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttribute": 5617
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 17,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttribute": 5617
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttribute": 10
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttribute": 10
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencySetKalguuranSkillGemLevel20",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencySetKalguuranSkillGemLevel20"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencySetKalguuranSkillGemLevel20": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 14,
+    "Metadata/Items/Currency/CurrencySetKalguuranSkillGemLevel20": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 24,
+    "Metadata/Items/Currency/CurrencySetKalguuranSkillGemLevel20": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencySetKalguuranSkillGemLevel20": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencySetKalguuranSkillGemLevel20": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/OmenOnAbyssRerollOptions",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/OmenOnAbyssRerollOptions"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 143,
+    "Metadata/Items/Currency/OmenOnAbyssRerollOptions": 58
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1887,
+    "Metadata/Items/Currency/OmenOnAbyssRerollOptions": 6329
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1890,
+    "Metadata/Items/Currency/OmenOnAbyssRerollOptions": 6383
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnAbyssRerollOptions": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 5,
+    "Metadata/Items/Currency/OmenOnAbyssRerollOptions": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/OmenOnAnnulRemoveAbyssMod",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/OmenOnAnnulRemoveAbyssMod"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1696,
+    "Metadata/Items/Currency/OmenOnAnnulRemoveAbyssMod": 14
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 37763,
+    "Metadata/Items/Currency/OmenOnAnnulRemoveAbyssMod": 1202
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 37879,
+    "Metadata/Items/Currency/OmenOnAnnulRemoveAbyssMod": 1222
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 116,
+    "Metadata/Items/Currency/OmenOnAnnulRemoveAbyssMod": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 122,
+    "Metadata/Items/Currency/OmenOnAnnulRemoveAbyssMod": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/AbyssalBenchTicketJewelleryHigh",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/AbyssalBenchTicketJewelleryHigh"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 388,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewelleryHigh": 9
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 2245,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewelleryHigh": 413
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 2329,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewelleryHigh": 420
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 40,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewelleryHigh": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 44,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewelleryHigh": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemArbitersIgnition",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemArbitersIgnition"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 30,
+    "Metadata/Items/Gem/SupportGemArbitersIgnition": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 14,
+    "Metadata/Items/Gem/SupportGemArbitersIgnition": 26
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 14,
+    "Metadata/Items/Gem/SupportGemArbitersIgnition": 26
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 30,
+    "Metadata/Items/Gem/SupportGemArbitersIgnition": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 30,
+    "Metadata/Items/Gem/SupportGemArbitersIgnition": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemRakiatasFlow",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemRakiatasFlow"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 400,
+    "Metadata/Items/Gem/SupportGemRakiatasFlow": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 3415,
+    "Metadata/Items/Gem/SupportGemRakiatasFlow": 35
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 3415,
+    "Metadata/Items/Gem/SupportGemRakiatasFlow": 35
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 400,
+    "Metadata/Items/Gem/SupportGemRakiatasFlow": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 400,
+    "Metadata/Items/Gem/SupportGemRakiatasFlow": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gems/ReservationGemUncut18",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gems/ReservationGemUncut18"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/ReservationGemUncut18": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/ReservationGemUncut18": 279
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/ReservationGemUncut18": 279
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/ReservationGemUncut18": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/ReservationGemUncut18": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyJewelleryQualityAttack",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttack"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 4,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttack": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 295,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttack": 5367
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 295,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttack": 5370
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttack": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityAttack": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/SoulCores/TalismanSpecial7",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/SoulCores/TalismanSpecial7"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 8,
+    "Metadata/Items/SoulCores/TalismanSpecial7": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 5,
+    "Metadata/Items/SoulCores/TalismanSpecial7": 192
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 5,
+    "Metadata/Items/SoulCores/TalismanSpecial7": 192
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 8,
+    "Metadata/Items/SoulCores/TalismanSpecial7": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 8,
+    "Metadata/Items/SoulCores/TalismanSpecial7": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyMagicQuality",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyMagicQuality"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyMagicQuality": 28
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 771,
+    "Metadata/Items/Currency/CurrencyMagicQuality": 5588
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 771,
+    "Metadata/Items/Currency/CurrencyMagicQuality": 5588
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyMagicQuality": 28
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyMagicQuality": 28
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemTulsAvalanche",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemTulsAvalanche"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Gem/SupportGemTulsAvalanche": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 40,
+    "Metadata/Items/Gem/SupportGemTulsAvalanche": 13
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 40,
+    "Metadata/Items/Gem/SupportGemTulsAvalanche": 13
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Gem/SupportGemTulsAvalanche": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Gem/SupportGemTulsAvalanche": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gems/ReservationGemUncut12",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gems/ReservationGemUncut12"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Gems/ReservationGemUncut12": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/ReservationGemUncut12": 223
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/ReservationGemUncut12": 223
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Gems/ReservationGemUncut12": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Gems/ReservationGemUncut12": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyJewelleryQualityCaster",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyJewelleryQualityCaster"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 10,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityCaster": 20
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 970,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityCaster": 3275
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 970,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityCaster": 3275
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityCaster": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyJewelleryQualityCaster": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyIncursionDoubleCorruptGem",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorruptGem"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 14,
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorruptGem": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 4093,
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorruptGem": 4895
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 4100,
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorruptGem": 4895
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 7,
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorruptGem": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 7,
+    "Metadata/Items/Currency/CurrencyIncursionDoubleCorruptGem": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemGarukhansResolve",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemGarukhansResolve"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemGarukhansResolve": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 10237,
+    "Metadata/Items/Gem/SupportGemGarukhansResolve": 27
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 11125,
+    "Metadata/Items/Gem/SupportGemGarukhansResolve": 28
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemGarukhansResolve": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemGarukhansResolve": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gems/SupportGemVilentasPropulsion",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gems/SupportGemVilentasPropulsion"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gems/SupportGemVilentasPropulsion": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemVilentasPropulsion": 285
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemVilentasPropulsion": 285
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gems/SupportGemVilentasPropulsion": 4
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gems/SupportGemVilentasPropulsion": 4
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/DistilledEmotion10",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/DistilledEmotion10"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 28,
+    "Metadata/Items/Currency/DistilledEmotion10": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 181,
+    "Metadata/Items/Currency/DistilledEmotion10": 67
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 181,
+    "Metadata/Items/Currency/DistilledEmotion10": 67
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 28,
+    "Metadata/Items/Currency/DistilledEmotion10": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 28,
+    "Metadata/Items/Currency/DistilledEmotion10": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/MapFragments/CurrencyRitualBossFragment",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/MapFragments/CurrencyRitualBossFragment"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 8,
+    "Metadata/Items/MapFragments/CurrencyRitualBossFragment": 15
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 279,
+    "Metadata/Items/MapFragments/CurrencyRitualBossFragment": 102562
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 285,
+    "Metadata/Items/MapFragments/CurrencyRitualBossFragment": 102562
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/MapFragments/CurrencyRitualBossFragment": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/MapFragments/CurrencyRitualBossFragment": 3
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyJewelQualityMinion",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyJewelQualityMinion"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 25,
+    "Metadata/Items/Currency/CurrencyJewelQualityMinion": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 3536,
+    "Metadata/Items/Currency/CurrencyJewelQualityMinion": 428
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 3536,
+    "Metadata/Items/Currency/CurrencyJewelQualityMinion": 428
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 25,
+    "Metadata/Items/Currency/CurrencyJewelQualityMinion": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 25,
+    "Metadata/Items/Currency/CurrencyJewelQualityMinion": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/OmenOnChaosSuffix",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/OmenOnChaosSuffix"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1911,
+    "Metadata/Items/Currency/OmenOnChaosSuffix": 17
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 27271,
+    "Metadata/Items/Currency/OmenOnChaosSuffix": 212
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 27841,
+    "Metadata/Items/Currency/OmenOnChaosSuffix": 227
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 103,
+    "Metadata/Items/Currency/OmenOnChaosSuffix": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 114,
+    "Metadata/Items/Currency/OmenOnChaosSuffix": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/OmenOnExaltAddPrefixes",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/OmenOnExaltAddPrefixes"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnExaltAddPrefixes": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 390,
+    "Metadata/Items/Currency/OmenOnExaltAddPrefixes": 1390
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 390,
+    "Metadata/Items/Currency/OmenOnExaltAddPrefixes": 1390
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnExaltAddPrefixes": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnExaltAddPrefixes": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/AbyssalBenchTicketJewel",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/AbyssalBenchTicketJewel"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 884,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewel": 12
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 15775,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewel": 574
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 15909,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewel": 585
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 67,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewel": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 75,
+    "Metadata/Items/Currency/AbyssalBenchTicketJewel": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/SoulCores/TalismanMonkey",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/SoulCores/TalismanMonkey"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/SoulCores/TalismanMonkey": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/TalismanMonkey": 57
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/TalismanMonkey": 57
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/SoulCores/TalismanMonkey": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/SoulCores/TalismanMonkey": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemDaressosPassion",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemDaressosPassion"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemDaressosPassion": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemDaressosPassion": 331
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemDaressosPassion": 331
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemDaressosPassion": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemDaressosPassion": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemAtzirisCommunion",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 29204,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 8
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 34005,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 9
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemAtzirisCommunion": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/Abyss/AbyssPinnacleKey",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/Abyss/AbyssPinnacleKey"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 84,
+    "Metadata/Items/Currency/Abyss/AbyssPinnacleKey": 13
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 3547,
+    "Metadata/Items/Currency/Abyss/AbyssPinnacleKey": 4530
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 3577,
+    "Metadata/Items/Currency/Abyss/AbyssPinnacleKey": 4533
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 6,
+    "Metadata/Items/Currency/Abyss/AbyssPinnacleKey": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 8,
+    "Metadata/Items/Currency/Abyss/AbyssPinnacleKey": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gems/SupportGemAtaluiBloodletting",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gems/SupportGemAtaluiBloodletting"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemAtaluiBloodletting": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 72,
+    "Metadata/Items/Gems/SupportGemAtaluiBloodletting": 22
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 72,
+    "Metadata/Items/Gems/SupportGemAtaluiBloodletting": 22
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemAtaluiBloodletting": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemAtaluiBloodletting": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyRemoveMod",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyRemoveMod"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 230,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 1610
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 4636,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 381428
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 4636,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 383024
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 7
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyRemoveMod": 7
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyFractureRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyFractureRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 640,
+    "Metadata/Items/Currency/CurrencyFractureRare": 32
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 18542,
+    "Metadata/Items/Currency/CurrencyFractureRare": 5740
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 18542,
+    "Metadata/Items/Currency/CurrencyFractureRare": 5772
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 20,
+    "Metadata/Items/Currency/CurrencyFractureRare": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 20,
+    "Metadata/Items/Currency/CurrencyFractureRare": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemXibaquasRending",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemXibaquasRending"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemXibaquasRending": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemXibaquasRending": 33
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemXibaquasRending": 33
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemXibaquasRending": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemXibaquasRending": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/SoulCores/RuneIntelligenceGreater",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/SoulCores/RuneIntelligenceGreater"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneIntelligenceGreater": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneIntelligenceGreater": 491
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneIntelligenceGreater": 491
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneIntelligenceGreater": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneIntelligenceGreater": 0
+   }
+  },
+  {
+   "league": "Standard",
    "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyAddModToRare",
    "market_pair": [
     "Metadata/Items/Currency/CurrencyModValues",
@@ -139,6 +4115,1350 @@
    "highest_ratio": {
     "Metadata/Items/Currency/CurrencyModValues": 1,
     "Metadata/Items/Currency/CurrencyAddModToRare": 260
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gems/SkillGemUncut19",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gems/SkillGemUncut19"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gems/SkillGemUncut19": 7
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SkillGemUncut19": 1168
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SkillGemUncut19": 1168
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gems/SkillGemUncut19": 7
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gems/SkillGemUncut19": 7
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gems/SupportGemOisinsOath",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gems/SupportGemOisinsOath"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Gems/SupportGemOisinsOath": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemOisinsOath": 130
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemOisinsOath": 132
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gems/SupportGemOisinsOath": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gems/SupportGemOisinsOath": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyUpgradeRandomly",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyUpgradeRandomly"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 9,
+    "Metadata/Items/Currency/CurrencyUpgradeRandomly": 93
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 59,
+    "Metadata/Items/Currency/CurrencyUpgradeRandomly": 21728
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 63,
+    "Metadata/Items/Currency/CurrencyUpgradeRandomly": 21821
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyUpgradeRandomly": 11
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyUpgradeRandomly": 10
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/SoulCores/RuneSpecial17",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/SoulCores/RuneSpecial17"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 10,
+    "Metadata/Items/SoulCores/RuneSpecial17": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneSpecial17": 242
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneSpecial17": 244
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 5,
+    "Metadata/Items/SoulCores/RuneSpecial17": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 5,
+    "Metadata/Items/SoulCores/RuneSpecial17": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyJewelQualityCold",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyJewelQualityCold"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Currency/CurrencyJewelQualityCold": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 74,
+    "Metadata/Items/Currency/CurrencyJewelQualityCold": 115
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 74,
+    "Metadata/Items/Currency/CurrencyJewelQualityCold": 115
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyJewelQualityCold": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyJewelQualityCold": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Pinnacle/BurningMonolithKey1",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Pinnacle/BurningMonolithKey1"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 3,
+    "Metadata/Items/Pinnacle/BurningMonolithKey1": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1189,
+    "Metadata/Items/Pinnacle/BurningMonolithKey1": 687
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1189,
+    "Metadata/Items/Pinnacle/BurningMonolithKey1": 687
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 3,
+    "Metadata/Items/Pinnacle/BurningMonolithKey1": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 3,
+    "Metadata/Items/Pinnacle/BurningMonolithKey1": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/SoulCores/TecrodsGaze",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/SoulCores/TecrodsGaze"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 48,
+    "Metadata/Items/SoulCores/TecrodsGaze": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 282,
+    "Metadata/Items/SoulCores/TecrodsGaze": 171
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 282,
+    "Metadata/Items/SoulCores/TecrodsGaze": 171
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 48,
+    "Metadata/Items/SoulCores/TecrodsGaze": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 48,
+    "Metadata/Items/SoulCores/TecrodsGaze": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemVruunsAftermath",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemVruunsAftermath"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gem/SupportGemVruunsAftermath": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemVruunsAftermath": 154
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemVruunsAftermath": 156
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gem/SupportGemVruunsAftermath": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gem/SupportGemVruunsAftermath": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemCombatReload",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemCombatReload"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemCombatReload": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemCombatReload": 31
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemCombatReload": 31
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemCombatReload": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemCombatReload": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyCorruptedEssenceBreach",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceBreach"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 26,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceBreach": 7
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 387,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceBreach": 142
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 387,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceBreach": 202
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceBreach": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 4,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceBreach": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyCorruptedEssenceDelirium",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceDelirium"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceDelirium": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 13,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceDelirium": 201
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 13,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceDelirium": 201
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceDelirium": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceDelirium": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/EndgameDistilledEmotionTimeLost1",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/EndgameDistilledEmotionTimeLost1"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Currency/EndgameDistilledEmotionTimeLost1": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 46,
+    "Metadata/Items/Currency/EndgameDistilledEmotionTimeLost1": 138
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 47,
+    "Metadata/Items/Currency/EndgameDistilledEmotionTimeLost1": 138
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/EndgameDistilledEmotionTimeLost1": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/EndgameDistilledEmotionTimeLost1": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyPerfectEssenceAttack",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyPerfectEssenceAttack"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceAttack": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceAttack": 129
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceAttack": 129
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceAttack": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceAttack": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gems/SupportGemCorruptingCryThree",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gems/SupportGemCorruptingCryThree"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemCorruptingCryThree": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemCorruptingCryThree": 65
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemCorruptingCryThree": 65
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemCorruptingCryThree": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemCorruptingCryThree": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyIncursionCasterWeaponQuality",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyIncursionCasterWeaponQuality"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Currency/CurrencyIncursionCasterWeaponQuality": 4
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 83,
+    "Metadata/Items/Currency/CurrencyIncursionCasterWeaponQuality": 351
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 84,
+    "Metadata/Items/Currency/CurrencyIncursionCasterWeaponQuality": 351
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyIncursionCasterWeaponQuality": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyIncursionCasterWeaponQuality": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/OmenOnChaosMapPackSize",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/OmenOnChaosMapPackSize"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 16,
+    "Metadata/Items/Currency/OmenOnChaosMapPackSize": 10
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1289,
+    "Metadata/Items/Currency/OmenOnChaosMapPackSize": 3306
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1290,
+    "Metadata/Items/Currency/OmenOnChaosMapPackSize": 3308
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnChaosMapPackSize": 4
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 5,
+    "Metadata/Items/Currency/OmenOnChaosMapPackSize": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/SoulCores/SoulCoreEnlighten",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/SoulCores/SoulCoreEnlighten"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 3,
+    "Metadata/Items/SoulCores/SoulCoreEnlighten": 3
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1007,
+    "Metadata/Items/SoulCores/SoulCoreEnlighten": 16098
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1007,
+    "Metadata/Items/SoulCores/SoulCoreEnlighten": 16100
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/SoulCores/SoulCoreEnlighten": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/SoulCores/SoulCoreEnlighten": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemUhtredsExodus",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemUhtredsExodus"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 150,
+    "Metadata/Items/Gem/SupportGemUhtredsExodus": 2
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 666,
+    "Metadata/Items/Gem/SupportGemUhtredsExodus": 75
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 752,
+    "Metadata/Items/Gem/SupportGemUhtredsExodus": 76
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 50,
+    "Metadata/Items/Gem/SupportGemUhtredsExodus": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 100,
+    "Metadata/Items/Gem/SupportGemUhtredsExodus": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/MapFragments/CurrencyAfflictionFragment",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/MapFragments/CurrencyAfflictionFragment"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 52,
+    "Metadata/Items/MapFragments/CurrencyAfflictionFragment": 3
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 10154,
+    "Metadata/Items/MapFragments/CurrencyAfflictionFragment": 1647
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 11954,
+    "Metadata/Items/MapFragments/CurrencyAfflictionFragment": 1647
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 17,
+    "Metadata/Items/MapFragments/CurrencyAfflictionFragment": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 35,
+    "Metadata/Items/MapFragments/CurrencyAfflictionFragment": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemTangmazusThurible",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemTangmazusThurible"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gem/SupportGemTangmazusThurible": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemTangmazusThurible": 20
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemTangmazusThurible": 20
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gem/SupportGemTangmazusThurible": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Gem/SupportGemTangmazusThurible": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/OmenOnAbyssAddPrefixes",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/OmenOnAbyssAddPrefixes"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnAbyssAddPrefixes": 5
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 219,
+    "Metadata/Items/Currency/OmenOnAbyssAddPrefixes": 659
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 219,
+    "Metadata/Items/Currency/OmenOnAbyssAddPrefixes": 659
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnAbyssAddPrefixes": 5
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnAbyssAddPrefixes": 5
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyRerollRare3",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyRerollRare3"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 59,
+    "Metadata/Items/Currency/CurrencyRerollRare3": 30
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 40695,
+    "Metadata/Items/Currency/CurrencyRerollRare3": 110575
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 40726,
+    "Metadata/Items/Currency/CurrencyRerollRare3": 110595
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 39,
+    "Metadata/Items/Currency/CurrencyRerollRare3": 20
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 2,
+    "Metadata/Items/Currency/CurrencyRerollRare3": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/DistilledEmotionTimeLost8",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/DistilledEmotionTimeLost8"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/DistilledEmotionTimeLost8": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/DistilledEmotionTimeLost8": 172
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/DistilledEmotionTimeLost8": 172
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/DistilledEmotionTimeLost8": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/DistilledEmotionTimeLost8": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/SoulCores/SoulCoreCrit",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/SoulCores/SoulCoreCrit"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 10,
+    "Metadata/Items/SoulCores/SoulCoreCrit": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/SoulCoreCrit": 38
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/SoulCoreCrit": 38
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 10,
+    "Metadata/Items/SoulCores/SoulCoreCrit": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 10,
+    "Metadata/Items/SoulCores/SoulCoreCrit": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/OmenOnAnnulRemovePrefixes",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/OmenOnAnnulRemovePrefixes"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1444,
+    "Metadata/Items/Currency/OmenOnAnnulRemovePrefixes": 10
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 41422,
+    "Metadata/Items/Currency/OmenOnAnnulRemovePrefixes": 1308
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 42762,
+    "Metadata/Items/Currency/OmenOnAnnulRemovePrefixes": 1316
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 140,
+    "Metadata/Items/Currency/OmenOnAnnulRemovePrefixes": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 145,
+    "Metadata/Items/Currency/OmenOnAnnulRemovePrefixes": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/OmenOnExaltAddTwoMods",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/OmenOnExaltAddTwoMods"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnExaltAddTwoMods": 5
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 201,
+    "Metadata/Items/Currency/OmenOnExaltAddTwoMods": 16337
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 201,
+    "Metadata/Items/Currency/OmenOnExaltAddTwoMods": 16337
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnExaltAddTwoMods": 5
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/OmenOnExaltAddTwoMods": 5
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/SoulCores/SoulCoreSpecial5",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/SoulCores/SoulCoreSpecial5"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/SoulCoreSpecial5": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/SoulCores/SoulCoreSpecial5": 36
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/SoulCores/SoulCoreSpecial5": 36
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/SoulCoreSpecial5": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/SoulCoreSpecial5": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyIncursionMartialWeaponQuality",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyIncursionMartialWeaponQuality"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyIncursionMartialWeaponQuality": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 121,
+    "Metadata/Items/Currency/CurrencyIncursionMartialWeaponQuality": 42
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 121,
+    "Metadata/Items/Currency/CurrencyIncursionMartialWeaponQuality": 42
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyIncursionMartialWeaponQuality": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyIncursionMartialWeaponQuality": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Pinnacle/BurningMonolithKey2",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Pinnacle/BurningMonolithKey2"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 3,
+    "Metadata/Items/Pinnacle/BurningMonolithKey2": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 292,
+    "Metadata/Items/Pinnacle/BurningMonolithKey2": 1050
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 292,
+    "Metadata/Items/Pinnacle/BurningMonolithKey2": 1050
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 3,
+    "Metadata/Items/Pinnacle/BurningMonolithKey2": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 3,
+    "Metadata/Items/Pinnacle/BurningMonolithKey2": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemUulNetolsEmbrace",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemUulNetolsEmbrace"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 755,
+    "Metadata/Items/Gem/SupportGemUulNetolsEmbrace": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 3786,
+    "Metadata/Items/Gem/SupportGemUulNetolsEmbrace": 10
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 4541,
+    "Metadata/Items/Gem/SupportGemUulNetolsEmbrace": 11
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 755,
+    "Metadata/Items/Gem/SupportGemUulNetolsEmbrace": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 755,
+    "Metadata/Items/Gem/SupportGemUulNetolsEmbrace": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyPerfectEssenceSpeed",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyPerfectEssenceSpeed"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceSpeed": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceSpeed": 128
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceSpeed": 128
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceSpeed": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyPerfectEssenceSpeed": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemRomirasRequital",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemRomirasRequital"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemRomirasRequital": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemRomirasRequital": 157
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemRomirasRequital": 157
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemRomirasRequital": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemRomirasRequital": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/SoulCores/RuneFireGreater",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/SoulCores/RuneFireGreater"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneFireGreater": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneFireGreater": 498
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneFireGreater": 498
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneFireGreater": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/SoulCores/RuneFireGreater": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyArmourQuality",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyArmourQuality"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 17,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 338
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 17,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 29041
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 38,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 29291
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 22
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 1,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 19
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gem/SupportGemXophsPyre",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gem/SupportGemXophsPyre"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemXophsPyre": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 91,
+    "Metadata/Items/Gem/SupportGemXophsPyre": 18
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 99,
+    "Metadata/Items/Gem/SupportGemXophsPyre": 18
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemXophsPyre": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gem/SupportGemXophsPyre": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Gems/SupportGemBrutusBrain",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Gems/SupportGemBrutusBrain"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemBrutusBrain": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemBrutusBrain": 282
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemBrutusBrain": 282
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemBrutusBrain": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Gems/SupportGemBrutusBrain": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyModValues|Metadata/Items/Currency/CurrencyAddModToRare3",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyModValues",
+    "Metadata/Items/Currency/CurrencyAddModToRare3"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare3": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 49278,
+    "Metadata/Items/Currency/CurrencyAddModToRare3": 679350
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyModValues": 49278,
+    "Metadata/Items/Currency/CurrencyAddModToRare3": 679350
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare3": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyModValues": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare3": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyUpgradeToRare|Metadata/Items/Currency/CurrencyAddEquipmentSocketShard",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyUpgradeToRare",
+    "Metadata/Items/Currency/CurrencyAddEquipmentSocketShard"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0,
+    "Metadata/Items/Currency/CurrencyAddEquipmentSocketShard": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0,
+    "Metadata/Items/Currency/CurrencyAddEquipmentSocketShard": 1
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0,
+    "Metadata/Items/Currency/CurrencyAddEquipmentSocketShard": 1
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0,
+    "Metadata/Items/Currency/CurrencyAddEquipmentSocketShard": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0,
+    "Metadata/Items/Currency/CurrencyAddEquipmentSocketShard": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyUpgradeToRare|Metadata/Items/Currency/CurrencyAddModToMagic",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyUpgradeToRare",
+    "Metadata/Items/Currency/CurrencyAddModToMagic"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 2,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 11
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 142
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 142
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 2,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 11
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyUpgradeToRare": 2,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 11
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyMagicQuality|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyMagicQuality",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyMagicQuality": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 7
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyMagicQuality": 45,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 12058
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyMagicQuality": 45,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 12058
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyMagicQuality": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 7
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyMagicQuality": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 7
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/AbyssalBenchTicketWeapon|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/AbyssalBenchTicketWeapon",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/AbyssalBenchTicketWeapon": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 5
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketWeapon": 929,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/AbyssalBenchTicketWeapon": 929,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketWeapon": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 5
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/AbyssalBenchTicketWeapon": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 5
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SkillGemUncut17|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Gems/SkillGemUncut17",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SkillGemUncut17": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut17": 5747,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut17": 5747,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut17": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut17": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Gems/SkillGemUncut15|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Gems/SkillGemUncut15",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Gems/SkillGemUncut15": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut15": 2769,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_stock": {
+    "Metadata/Items/Gems/SkillGemUncut15": 2769,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut15": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Gems/SkillGemUncut15": 0,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyAddModToRare|Metadata/Items/Gems/SkillGemUncut14",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyAddModToRare",
+    "Metadata/Items/Gems/SkillGemUncut14"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0,
+    "Metadata/Items/Gems/SkillGemUncut14": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0,
+    "Metadata/Items/Gems/SkillGemUncut14": 8822
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0,
+    "Metadata/Items/Gems/SkillGemUncut14": 8822
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0,
+    "Metadata/Items/Gems/SkillGemUncut14": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 0,
+    "Metadata/Items/Gems/SkillGemUncut14": 0
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyAddModToRare|Metadata/Items/Currency/CurrencyUpgradeMagicToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyAddModToRare",
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 77,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 14
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1996,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 527
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 2004,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 541
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 11,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 11,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyAddModToRare|Metadata/Items/Currency/CurrencyUpgradeMagicToRare2",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyAddModToRare",
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 4,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 1
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1364,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 463
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1364,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 463
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 4,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 1
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 4,
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 1
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyAddModToRare|Metadata/Items/Currency/CurrencyArmourQuality",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyAddModToRare",
+    "Metadata/Items/Currency/CurrencyArmourQuality"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 114,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 76
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1923,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 1024
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1923,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 1024
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 3,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 2
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyAddModToRare": 3,
+    "Metadata/Items/Currency/CurrencyArmourQuality": 2
+   }
+  },
+  {
+   "league": "Standard",
+   "market_id": "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2|Metadata/Items/Currency/CurrencyAddModToMagic",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2",
+    "Metadata/Items/Currency/CurrencyAddModToMagic"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 0
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 1113
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 1113
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 0
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2": 0,
+    "Metadata/Items/Currency/CurrencyAddModToMagic": 0
    }
   },
   {
@@ -251,6 +5571,34 @@
    "highest_ratio": {
     "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 14,
     "Metadata/Items/Currency/CurrencyModValues": 1
+   }
+  },
+  {
+   "league": "Runes of Aldur",
+   "market_id": "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss|Metadata/Items/Currency/CurrencyAddModToRare",
+   "market_pair": [
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss",
+    "Metadata/Items/Currency/CurrencyAddModToRare"
+   ],
+   "volume_traded": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 160,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 678
+   },
+   "lowest_stock": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 294,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 2474
+   },
+   "highest_stock": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 323,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 2755
+   },
+   "lowest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 25
+   },
+   "highest_ratio": {
+    "Metadata/Items/Currency/CurrencyCorruptedEssenceAbyss": 1,
+    "Metadata/Items/Currency/CurrencyAddModToRare": 1
    }
   },
   {
