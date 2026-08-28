@@ -21,10 +21,10 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class EffectWindow
 {
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
-    private static readonly Vector4 WarnText = new(1f, 0.7f, 0.35f, 1f);
-    private static readonly Vector4 HostileText = new(1f, 0.55f, 0.4f, 1f);
-    private static readonly Vector4 FriendlyText = new(0.5f, 0.85f, 1f, 1f);
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
+    private static readonly Vector4 WarnText = OverlayInk.Warn;
+    private static readonly Vector4 HostileText = OverlayInk.Hostile;
+    private static readonly Vector4 FriendlyText = OverlayInk.Friendly;
 
     private readonly EffectLayer _layer;
     private readonly Func<bool> _keepingEffects;

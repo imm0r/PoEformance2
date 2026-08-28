@@ -29,10 +29,10 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class EntityBrowserWindow
 {
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
-    private static readonly Vector4 UnknownText = new(1f, 0.62f, 0.35f, 1f);
-    private static readonly Vector4 KnownText = new(0.55f, 0.78f, 1f, 1f);
-    private static readonly Vector4 PathText = new(0.85f, 0.78f, 0.45f, 1f);
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
+    private static readonly Vector4 UnknownText = OverlayInk.Warn;
+    private static readonly Vector4 KnownText = OverlayInk.Reference;
+    private static readonly Vector4 PathText = OverlayInk.Name;
 
     private readonly EntityInspector _inspector;
     private readonly EntityHiding _hiding;
@@ -230,7 +230,7 @@ public sealed class EntityBrowserWindow
         DrawHidden();
     }
 
-    private static readonly Vector4 WarnText = new(1f, 0.72f, 0.42f, 1f);
+    private static readonly Vector4 WarnText = OverlayInk.Warn;
 
     /// <summary>The two ways to get a row out of the list, on the entity it is about.</summary>
     /// <remarks>

@@ -23,7 +23,7 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class StyleWindow
 {
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
 
     /// <summary>
     /// Which windows are pinned in place or handed to the mouse, if anybody said.

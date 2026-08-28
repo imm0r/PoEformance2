@@ -26,9 +26,9 @@ public sealed class RitualWindow
     /// <summary>How many routes are listed at once. The rest are counted, not drawn.</summary>
     public const int MostRows = 200;
 
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
-    private static readonly Vector4 GoodText = new(0.55f, 0.9f, 0.65f, 1f);
-    private static readonly Vector4 WarnText = new(1f, 0.6f, 0.35f, 1f);
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
+    private static readonly Vector4 GoodText = OverlayInk.Good;
+    private static readonly Vector4 WarnText = OverlayInk.Warn;
 
     private readonly RitualWatch _watch;
     private readonly Func<IReadOnlyDictionary<string, int>> _worth;
@@ -186,7 +186,7 @@ public sealed class RitualWindow
                     // In its own colour when it is drawn, so the row and the line match.
                     Vector4 colour = Picked.TryGetValue(chain.Key, out int slot)
                         ? Unpack(RitualLayer.ColourFor(slot))
-                        : new Vector4(0.82f, 0.85f, 0.9f, 1f);
+                        : OverlayInk.Ink;
 
                     if (chain.Worth != 0)
                     {

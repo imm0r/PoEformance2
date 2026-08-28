@@ -346,7 +346,7 @@ public sealed class ToolTabs
         Page? front = null;
 
         OverlayFonts.PushHeading();
-        ImGui.PushStyleColor(ImGuiCol.Text, OverlayTheme.GiltInk);
+        ImGui.PushStyleColor(ImGuiCol.Text, OverlayInk.AccentInk);
         try
         {
             // Scrolling rather than squeezing when the bar runs out of room, with the popup

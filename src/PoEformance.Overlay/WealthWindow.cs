@@ -36,11 +36,11 @@ public sealed class WealthWindow
         ("everything", TimeSpan.MaxValue),
     ];
 
-    private static readonly Vector4 Up = new(0.55f, 0.85f, 0.45f, 1f);
-    private static readonly Vector4 Down = new(0.92f, 0.45f, 0.40f, 1f);
-    private static readonly Vector4 PlotBack = new(0.05f, 0.05f, 0.06f, 0.85f);
-    private static readonly Vector4 Line = new(0.85f, 0.68f, 0.34f, 1f);
-    private static readonly Vector4 Warn = new(1f, 0.72f, 0.3f, 1f);
+    private static readonly Vector4 Up = OverlayInk.Good;
+    private static readonly Vector4 Down = OverlayInk.Bad;
+    private static readonly Vector4 PlotBack = OverlayInk.Sunken with { W = 0.85f };
+    private static readonly Vector4 Line = OverlayInk.Accent;
+    private static readonly Vector4 Warn = OverlayInk.Warn;
 
     private readonly WealthTracker _tracker;
     private readonly WealthPanel _panel;
@@ -167,7 +167,7 @@ public sealed class WealthWindow
         if (!Watching)
         {
             ImGuiText.Hint(
-                OverlayTheme.Quiet,
+                OverlayInk.Quiet,
                 "Nothing is counted while this is off, and the record simply has a gap for the "
                 + "time it was - which is the honest picture of not having been watching.");
             return;
@@ -203,7 +203,7 @@ public sealed class WealthWindow
         }
 
         ImGuiText.Hint(
-            OverlayTheme.Quiet,
+            OverlayInk.Quiet,
             "The corner panel can be moved, and made click-through from its own title menu so it "
             + "stops taking the mouse during a fight.");
     }
@@ -236,12 +236,12 @@ public sealed class WealthWindow
         // right one.
         string league = _league();
         ImGuiText.Mono(
-            OverlayTheme.Quiet,
+            OverlayInk.Quiet,
             $"{(league.Length > 0 ? league : "league not read yet")}"
             + $"   {book.Count} prices   1 div = {StashWorth.Money(book.Rate)} ex");
 
         ImGuiText.Hint(
-            OverlayTheme.Quiet,
+            OverlayInk.Quiet,
             "Prices are poe.ninja's, for that league, and everything is converted into Exalted "
             + "using that rate. If the figures look wrong, the breakdown below says which stack "
             + "is producing them.");
@@ -268,7 +268,7 @@ public sealed class WealthWindow
         IReadOnlyList<CurrencyPurse.PurseLine> lines = _book().Breakdown(_purse().Pages);
         if (lines.Count == 0)
         {
-            ImGuiText.Wrapped(OverlayTheme.Quiet, "No currency counted yet.");
+            ImGuiText.Wrapped(OverlayInk.Quiet, "No currency counted yet.");
             return;
         }
 
@@ -309,7 +309,7 @@ public sealed class WealthWindow
                 }
                 else
                 {
-                    ImGui.TextColored(OverlayTheme.Quiet, "no price");
+                    ImGui.TextColored(OverlayInk.Quiet, "no price");
                 }
 
                 ImGui.TableNextColumn();
@@ -319,7 +319,7 @@ public sealed class WealthWindow
                 }
                 else
                 {
-                    ImGui.TextColored(OverlayTheme.Quiet, "-");
+                    ImGui.TextColored(OverlayInk.Quiet, "-");
                 }
             }
         }
@@ -335,7 +335,7 @@ public sealed class WealthWindow
 
         if (!held.Any)
         {
-            ImGuiText.Wrapped(OverlayTheme.Quiet, "Nothing counted yet - the first count is a few seconds away.");
+            ImGuiText.Wrapped(OverlayInk.Quiet, "Nothing counted yet - the first count is a few seconds away.");
             return;
         }
 
@@ -377,7 +377,7 @@ public sealed class WealthWindow
                 ImGui.TextDisabled(moved.WholeRecord ? "all of it" : Windows[_window].Label);
                 ImGui.TableNextColumn();
                 ImGuiText.Mono(
-                    moved.Exalted > 0 ? Up : moved.Exalted < 0 ? Down : OverlayTheme.Quiet,
+                    moved.Exalted > 0 ? Up : moved.Exalted < 0 ? Down : OverlayInk.Quiet,
                     $"{(moved.Exalted >= 0 ? "+" : string.Empty)}{StashWorth.Purse(moved.Exalted, showing.Rate)}"
                     + $"   over {WealthPanel.Ago(moved.Over)}");
 
@@ -419,7 +419,7 @@ public sealed class WealthWindow
         ImGui.TextDisabled("made of");
         ImGui.TableNextColumn();
         ImGuiText.Mono(
-            OverlayTheme.Quiet,
+            OverlayInk.Quiet,
             $"{Signed(made.Gathered, rate)} gathered, {Signed(made.Repriced, rate)} the prices");
     }
 
@@ -469,7 +469,7 @@ public sealed class WealthWindow
         if (tabs.Count == 0)
         {
             ImGuiText.Wrapped(
-                OverlayTheme.Quiet,
+                OverlayInk.Quiet,
                 "No inventory read yet. The stash tabs the game has not opened are not readable, "
                 + "so this fills in as they are visited.");
             return;
@@ -481,7 +481,7 @@ public sealed class WealthWindow
         ImGui.TextColored(Line, StashWorth.Purse(all.Exalted, rate));
         ImGui.SameLine();
         ImGuiText.Wrapped(
-            OverlayTheme.Quiet,
+            OverlayInk.Quiet,
             $"across {all.Called}"
             + (all.Unpriced > 0 ? $", {all.Unpriced} stacks unpriced" : string.Empty));
 
@@ -521,13 +521,13 @@ public sealed class WealthWindow
                     }
                 }
 
-                Vector4 ink = tab.Counted ? OverlayTheme.Ink : OverlayTheme.Quiet;
+                Vector4 ink = tab.Counted ? OverlayInk.Ink : OverlayInk.Quiet;
 
                 ImGui.TableNextColumn();
                 ImGui.TextColored(ink, tab.Called);
 
                 ImGui.TableNextColumn();
-                ImGuiText.Mono(tab.Counted ? Line : OverlayTheme.Quiet,
+                ImGuiText.Mono(tab.Counted ? Line : OverlayInk.Quiet,
                     StashWorth.Purse(tab.Exalted, rate));
 
                 ImGui.TableNextColumn();
@@ -586,7 +586,7 @@ public sealed class WealthWindow
         {
             draw.AddText(
                 at + new Vector2(6f, 4f),
-                ImGui.ColorConvertFloat4ToU32(OverlayTheme.Quiet),
+                ImGui.ColorConvertFloat4ToU32(OverlayInk.Quiet),
                 "not enough recorded yet to draw a line");
             return;
         }
@@ -625,7 +625,7 @@ public sealed class WealthWindow
             last = here;
         }
 
-        uint quiet = ImGui.ColorConvertFloat4ToU32(OverlayTheme.Quiet);
+        uint quiet = ImGui.ColorConvertFloat4ToU32(OverlayInk.Quiet);
         draw.AddText(at + new Vector2(4f, 2f), quiet, StashWorth.Purse(high, _book().Rate));
         draw.AddText(
             at + new Vector2(4f, size.Y - (ImGui.GetFontSize() * 1.2f)),
@@ -669,7 +669,7 @@ public sealed class WealthWindow
         draw.AddLine(
             new Vector2(line, at.Y),
             new Vector2(line, at.Y + size.Y),
-            ImGui.ColorConvertFloat4ToU32(OverlayTheme.Quiet),
+            ImGui.ColorConvertFloat4ToU32(OverlayInk.Quiet),
             1f);
 
         ImGuiText.MonoTooltip(
@@ -698,17 +698,17 @@ public sealed class WealthWindow
         if (history.Earliest is { } begins)
         {
             ImGuiText.Mono(
-                OverlayTheme.Quiet,
+                OverlayInk.Quiet,
                 $"{history.Count} readings over {WealthPanel.Ago(now - begins.At)}"
                 + $", since {begins.When.ToLocalTime():yyyy-MM-dd HH:mm}");
         }
         else
         {
-            ImGuiText.Wrapped(OverlayTheme.Quiet, "Nothing recorded yet.");
+            ImGuiText.Wrapped(OverlayInk.Quiet, "Nothing recorded yet.");
         }
 
         ImGuiText.Hint(
-            OverlayTheme.Quiet,
+            OverlayInk.Quiet,
             "The record never clears itself - not on a new league, not on a new character, and "
             + "not when it gets long. Only the button below empties it.");
 

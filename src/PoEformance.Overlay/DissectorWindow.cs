@@ -42,11 +42,11 @@ public sealed class DissectorWindow
     /// </remarks>
     private const long FadeMs = 1500;
 
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
-    private static readonly Vector4 NameText = new(0.85f, 0.78f, 0.45f, 1f);
-    private static readonly Vector4 PointerText = new(0.55f, 0.78f, 1f, 1f);
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
+    private static readonly Vector4 NameText = OverlayInk.Name;
+    private static readonly Vector4 PointerText = OverlayInk.Reference;
     private static readonly Vector4 FloatText = new(0.65f, 0.9f, 0.65f, 1f);
-    private static readonly Vector4 BaselineText = new(1f, 0.55f, 0.35f, 1f);
+    private static readonly Vector4 BaselineText = OverlayInk.Warn;
     private static readonly Vector4 TextFound = new(0.75f, 0.95f, 0.75f, 1f);
 
     /// <summary>Rows the places disagree on. Its own colour because it is its own finding.</summary>
@@ -1109,7 +1109,7 @@ public sealed class DissectorWindow
         SlotGuess.Text => NameText,
         SlotGuess.Code => DimText,
         SlotGuess.Empty => DimText,
-        _ => new Vector4(0.85f, 0.85f, 0.9f, 1f),
+        _ => OverlayInk.Ink,
     };
 
     private static Vector4 ColourOf(TargetKind kind) => kind switch

@@ -34,8 +34,8 @@ public sealed class UiBrowserWindow
     /// <summary>Longest label a tree row shows before it is cut short.</summary>
     private const int MaxRowLabel = 56;
 
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
-    private static readonly Vector4 IdText = new(0.85f, 0.78f, 0.45f, 1f);
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
+    private static readonly Vector4 IdText = OverlayInk.Name;
     private static readonly Vector4 HiddenText = new(0.55f, 0.45f, 0.45f, 1f);
 
     private readonly UiTreeInspector _inspector;
@@ -539,7 +539,7 @@ public sealed class UiBrowserWindow
     private static string Escape(string text) => ImGuiText.Escape(text);
 
     private static Vector4 TextColour(UiNode node)
-        => node.StringId.Length > 0 ? IdText : new Vector4(0.86f, 0.88f, 0.92f, 1f);
+        => node.StringId.Length > 0 ? IdText : OverlayInk.Ink;
 
     private static string DescribeFlags(uint flags)
     {

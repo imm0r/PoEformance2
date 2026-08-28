@@ -2186,10 +2186,24 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
     }
 
-    private static readonly Vector4 Warning = new(1f, 0.6f, 0.2f, 1f);
-    private static readonly Vector4 Quiet = new(0.7f, 0.75f, 0.8f, 1f);
-    private static readonly Vector4 Measured = new(0.65f, 0.75f, 0.68f, 1f);
-    private static readonly Vector4 Bad = new(1f, 0.5f, 0.4f, 1f);
+    // THE READOUT WROTE IN ITS OWN INK, and that was the worst instance of a problem the whole
+    // palette exists to fix: this is the surface that is on screen the entire time somebody is
+    // playing, and its quiet grey was (0.70, 0.75, 0.80) - a COLD one - where every other window
+    // in the tool writes its quiet text in a warm (0.72, 0.70, 0.65). Nothing about the readout
+    // wanted to be cooler than the rest of the tool; it was simply written on a different day.
+    // Named here rather than used inline so the rows below still read as rows.
+    private static readonly Vector4 Warning = OverlayInk.Warn;
+    private static readonly Vector4 Quiet = OverlayInk.Quiet;
+    private static readonly Vector4 Bad = OverlayInk.Bad;
+
+    /// <summary>A figure this tool worked out, as against one it read off the game.</summary>
+    /// <remarks>
+    /// Was a green-grey, which was making a judgement it had no business making: green means
+    /// "this is good" in every other window here, so "walked 43%" read as approval of 43%. See
+    /// <see cref="OverlayInk.Measured"/>, which is the ordinary ink leaned towards the pointer
+    /// blue - visibly derived, and saying nothing at all about whether the number is welcome.
+    /// </remarks>
+    private static readonly Vector4 Measured = OverlayInk.Measured;
 
     /// <summary>What is being read, the pools, and what auto-flask is doing.</summary>
     private void DrawReadout(int width, int height)
@@ -2284,7 +2298,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     "damage",
                     $"{DamageWindow.Number(damage.Dps)} dps   peak {DamageWindow.Number(damage.Peak)}"
                     + $"   {DamageWindow.Number(damage.Total)} this area",
-                    new Vector4(1f, 1f, 0.6f, 1f),
+                    Measured,
                     figure: true);
             }
 
@@ -2306,7 +2320,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             if (FlaskStatus is not null)
             {
-                Row("flask", FlaskStatus(), new Vector4(0.8f, 0.7f, 0.4f, 1f));
+                Row("flask", FlaskStatus(), OverlayInk.Accent);
             }
 
             // The summary stays here even though the full list is a page of its own: the
@@ -2343,7 +2357,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Row(
                     "panels",
                     $"{_snapshot.Panels}   ({where})",
-                    new Vector4(1f, 0.8f, 0.35f, 1f),
+                    Measured,
                     figure: true);
             }
 
@@ -2400,7 +2414,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // open is a readout nobody is looking at in that moment.
         if (ShowTerrain)
         {
-            Row("terrain", DescribeTerrain(), new Vector4(0.65f, 0.7f, 0.78f, 1f), figure: true);
+            Row("terrain", DescribeTerrain(), Measured, figure: true);
         }
 
         if (_snapshot.Player is not WorldEntity player)
@@ -2421,9 +2435,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // scene's pixel spread next to it makes that failure visible instead of reassuring.
         double spread = ScreenSpread(width, height);
         bool healthy = offCentre < 0.15 && spread > width * 0.05;
-        Vector4 colour = healthy
-            ? new Vector4(0.4f, 1f, 0.4f, 1f)
-            : new Vector4(1f, 0.4f, 0.4f, 1f);
+        Vector4 colour = healthy ? OverlayInk.Good : Bad;
 
         Row("projection", $"off-centre {offCentre:F3}   scene spread {spread:F0} px", colour, figure: true);
 

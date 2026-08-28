@@ -28,7 +28,7 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class PoiLayer
 {
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
 
     private readonly RoutePlanner _planner;
 

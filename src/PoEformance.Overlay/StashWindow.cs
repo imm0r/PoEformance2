@@ -38,21 +38,10 @@ public sealed class StashWindow
     /// </remarks>
     public const double WorthSaying = 1.0;
 
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
-    private static readonly Vector4 GoodText = new(0.55f, 0.9f, 0.65f, 1f);
-    private static readonly Vector4 WarnText = new(1f, 0.6f, 0.35f, 1f);
-    private static readonly Vector4 MoneyText = new(1f, 0.83f, 0.42f, 1f);
-
-    /// <summary>What each rarity looks like, in the game's own colours.</summary>
-    private static readonly Vector4[] ByRarity =
-    [
-        new(0.86f, 0.86f, 0.86f, 1f),   // normal
-        new(0.53f, 0.53f, 1f, 1f),      // magic
-        new(1f, 1f, 0.46f, 1f),         // rare
-        new(0.68f, 0.4f, 0.15f, 1f),    // unique
-        new(0.29f, 0.78f, 0.29f, 1f),   // quest
-        new(0.67f, 0.55f, 0.4f, 1f),    // currency
-    ];
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
+    private static readonly Vector4 GoodText = OverlayInk.Good;
+    private static readonly Vector4 WarnText = OverlayInk.Warn;
+    private static readonly Vector4 MoneyText = OverlayInk.Money;
 
     private readonly StashInspector _inspector;
     private readonly ItemArtStore _art;
@@ -828,8 +817,7 @@ public sealed class StashWindow
         var from = new Vector2(origin.X + (slot.At.Left * cell), origin.Y + (slot.At.Top * cell));
         var to = new Vector2(from.X + (slot.At.Width * cell), from.Y + (slot.At.Height * cell));
 
-        int rarity = slot.Item.Rarity >= 0 && slot.Item.Rarity < ByRarity.Length ? slot.Item.Rarity : 0;
-        Vector4 colour = ByRarity[rarity];
+        Vector4 colour = OverlayInk.Rarity(slot.Item.Rarity);
 
         // The rarity as a tinted backing and a border, which is how the game says it - and it
         // keeps saying it while a picture is still on its way.
@@ -916,9 +904,7 @@ public sealed class StashWindow
             bool open = _open.Contains(item.Entity);
             string arrow = open ? "v" : ">";
 
-            Vector4 colour = item.Rarity >= 0 && item.Rarity < ByRarity.Length
-                ? ByRarity[item.Rarity]
-                : ByRarity[0];
+            Vector4 colour = OverlayInk.Rarity(item.Rarity);
 
             string stack = item.Stack > 1 ? $" x{item.Stack}" : string.Empty;
 

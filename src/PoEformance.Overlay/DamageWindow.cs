@@ -22,7 +22,7 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class DamageWindow
 {
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
     private static readonly Vector4 DpsText = new(1f, 1f, 0.6f, 1f);
     private static readonly Vector4 JudgedText = new(0.85f, 0.75f, 0.5f, 1f);
 
@@ -47,7 +47,7 @@ public sealed class DamageWindow
 
     // The slowest kill, in the colour the read-cost tab uses for its worst reading, and for
     // the same reason: it is the one entry in the list somebody can act on.
-    private static readonly Vector4 WorstText = new(1f, 0.62f, 0.35f, 1f);
+    private static readonly Vector4 WorstText = OverlayInk.Warn;
 
     // The two halves of what a build is tuned between, told apart by colour rather than only
     // by their labels - they sit on one line and are read at a glance.
@@ -59,11 +59,13 @@ public sealed class DamageWindow
     private static readonly Vector4 TakenLine = new(1f, 0.35f, 0.38f, 1f);
 
     // The census, in the game's OWN rarity colours - white, blue, yellow, orange. Nobody has
-    // to learn these; a player has been reading them since the first magic item.
-    private static readonly Vector4 NormalText = new(0.85f, 0.85f, 0.85f, 1f);
-    private static readonly Vector4 MagicText = new(0.53f, 0.53f, 1f, 1f);
-    private static readonly Vector4 RareText = new(1f, 1f, 0.46f, 1f);
-    private static readonly Vector4 UniqueText = new(0.68f, 0.37f, 0.13f, 1f);
+    // to learn these; a player has been reading them since the first magic item. They are the
+    // shared ladder rather than four numbers here, because the stash page prints the same four
+    // and the two copies had already drifted apart by a shade of orange.
+    private static readonly Vector4 NormalText = OverlayInk.Rarity(ItemRarity.Normal);
+    private static readonly Vector4 MagicText = OverlayInk.Rarity(ItemRarity.Magic);
+    private static readonly Vector4 RareText = OverlayInk.Rarity(ItemRarity.Rare);
+    private static readonly Vector4 UniqueText = OverlayInk.Rarity(ItemRarity.Unique);
 
     private readonly DamageMeter _meter;
     private readonly Func<long> _clock;
@@ -875,13 +877,12 @@ public sealed class DamageWindow
     }
 
     /// <summary>The game's own rarity colours, so a pack leader reads the same as everywhere else.</summary>
-    private static Vector4 Tint(ItemRarity rarity) => rarity switch
-    {
-        ItemRarity.Unique => new Vector4(0.68f, 0.37f, 0.13f, 1f),
-        ItemRarity.Rare => new Vector4(1f, 1f, 0.46f, 1f),
-        ItemRarity.Magic => new Vector4(0.53f, 0.53f, 1f, 1f),
-        _ => new Vector4(0.85f, 0.85f, 0.85f, 1f),
-    };
+    /// <remarks>
+    /// Kept as a method rather than replaced by its one line at the call sites, because "a
+    /// monster's rarity" and "an item's rarity" are the same ladder read for different reasons -
+    /// this is where a monster-only exception would go if one is ever wanted.
+    /// </remarks>
+    private static Vector4 Tint(ItemRarity rarity) => OverlayInk.Rarity(rarity);
 
     /// <summary>What share one part is of the whole, for reading the split at a glance.</summary>
     private static string Share(long part, long whole)
