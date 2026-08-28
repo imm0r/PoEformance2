@@ -595,16 +595,27 @@ public sealed class EntityBrowserWindow
 
             // AttackCrit holds 0, 1 or 2 - a kind, not a chance. Drawn as a bare number for
             // exactly that reason: a percent sign here would be an invented statistic.
-            // Blood is still a row number: nothing shipped resolves it.
             MonsterKind? kind = table.Kind(one);
+            string blood = table.BloodName(one);
             ImGuiText.Mono(
                 DimText,
-                $"  crit kind {one.Crit}   blood #{one.Blood}   type "
+                $"  crit kind {one.Crit}   blood "
+                + (blood.Length > 0 ? blood : "#" + one.Blood.ToString(CultureInfo.InvariantCulture))
+                + "   type "
                 + (kind is null ? "#" + one.Type.ToString(CultureInfo.InvariantCulture) : kind.Id));
 
             if (kind is { Spread: > 0 })
             {
                 ImGuiText.Mono(DimText, $"  damage spread {kind.Spread}");
+            }
+
+            // PROFILE NAMES, NOT PERCENTAGES - see MonsterVarieties.ResistancesOf. The rows
+            // behind these carry 32 numeric columns whose tiers the export does not explain, and
+            // "MajorFireResist" is what a reader wants anyway.
+            string[] resists = [.. table.ResistancesOf(one)];
+            if (resists.Length > 0)
+            {
+                ImGuiText.Mono(DimText, "  resistances  " + string.Join(", ", resists));
             }
 
             if (kind is { Summoned: true })

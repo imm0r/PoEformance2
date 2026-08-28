@@ -22,8 +22,8 @@ namespace PoEformance.Game.Entities;
 /// <see cref="SpecialMods"/> now have tables to resolve against, and the names live beside them
 /// on <see cref="MonsterVarieties"/> rather than replacing them - the number is the game's own
 /// identity, and the next table keyed on it joins without another export.
-/// <see cref="Blood"/> and <see cref="Quest"/> still have nowhere to point; QuestFlags is read
-/// from the game's memory rather than shipped, so that one resolves at runtime or not at all.
+/// <see cref="Quest"/> is the last one with nowhere to point, and always will be: QuestFlags is
+/// read from the game's own memory rather than shipped, so it resolves at runtime or not at all.
 /// </remarks>
 /// <param name="Name">
 /// What the game calls it. Absent on the 24 rows whose name is a bracketed placeholder.
@@ -111,7 +111,9 @@ public sealed record ModifierMeaning(
 /// monster armour would be wrong twice over. The real values sit one join away, on the type:
 /// Armour on 44% of the types in use, Evasion on 30%, EnergyShieldFromLife on 23%.
 ///
-/// <see cref="Resistances"/> is a row number again, into a table that is not here.
+/// <see cref="Resistances"/> stays a row number, resolved through
+/// <see cref="MonsterVarieties.ResistancesOf"/> - and it is a profile NAME rather than a
+/// percentage, because the numbers behind it are 32 columns of tiers this export cannot explain.
 /// </remarks>
 /// <param name="Id">
 /// What the type is called - LumberingDead, YamaBoss, IgnagdukBogWitch. It names the monster,
@@ -160,6 +162,8 @@ public sealed class MonsterVarieties
         new Dictionary<int, ModifierMeaning>(),
         new Dictionary<int, string>(),
         new Dictionary<int, MonsterKind>(),
+        new Dictionary<int, string>(),
+        new Dictionary<int, string>(),
         string.Empty);
 
     private readonly IReadOnlyDictionary<string, MonsterVariety> _byPath;
@@ -167,6 +171,8 @@ public sealed class MonsterVarieties
     private readonly IReadOnlyDictionary<int, ModifierMeaning> _modifiers;
     private readonly IReadOnlyDictionary<int, string> _tags;
     private readonly IReadOnlyDictionary<int, MonsterKind> _types;
+    private readonly IReadOnlyDictionary<int, string> _blood;
+    private readonly IReadOnlyDictionary<int, string> _resistances;
 
     private MonsterVarieties(
         IReadOnlyDictionary<string, MonsterVariety> byPath,
@@ -174,6 +180,8 @@ public sealed class MonsterVarieties
         IReadOnlyDictionary<int, ModifierMeaning> modifiers,
         IReadOnlyDictionary<int, string> tags,
         IReadOnlyDictionary<int, MonsterKind> types,
+        IReadOnlyDictionary<int, string> blood,
+        IReadOnlyDictionary<int, string> resistances,
         string generated)
     {
         _byPath = byPath;
@@ -181,6 +189,8 @@ public sealed class MonsterVarieties
         _modifiers = modifiers;
         _tags = tags;
         _types = types;
+        _blood = blood;
+        _resistances = resistances;
         Generated = generated;
     }
 
@@ -264,7 +274,14 @@ public sealed class MonsterVarieties
             }
 
             return new MonsterVarieties(
-                byPath, skills, modifiers, tags, types, file.Generated ?? string.Empty);
+                byPath,
+                skills,
+                modifiers,
+                tags,
+                types,
+                Rows(file.Blood),
+                Rows(file.Resistances),
+                file.Generated ?? string.Empty);
         }
         catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
         {
@@ -302,6 +319,56 @@ public sealed class MonsterVarieties
         foreach (int row in one?.Effects ?? [])
         {
             string name = SkillName(row);
+            yield return name.Length > 0
+                ? name
+                : "#" + row.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+    }
+
+    /// <summary>A row-number-keyed map, as the generator wrote it: JSON has no integer keys.</summary>
+    /// <remarks>
+    /// A row that will not parse is dropped rather than defaulted. Row 0 is a real blood type
+    /// (plain Blood, which 1092 monsters carry), so a silent 0 would name it.
+    /// </remarks>
+    private static Dictionary<int, string> Rows(Dictionary<string, string>? from)
+    {
+        var got = new Dictionary<int, string>(from?.Count ?? 0);
+        foreach ((string row, string name) in from ?? [])
+        {
+            if (int.TryParse(row, System.Globalization.CultureInfo.InvariantCulture, out int at))
+            {
+                got[at] = name;
+            }
+        }
+
+        return got;
+    }
+
+    /// <summary>What the game calls this monster's blood, or empty when it is not known.</summary>
+    /// <remarks>
+    /// Not decoration: NoBlood is why a corpse cannot be raised or exploded, and the 56 rows
+    /// separate Blood from BonesNew, GhostBlood, SandBlood and Stone - which is the difference
+    /// between a thing that leaves a corpse and one that does not.
+    /// </remarks>
+    public string BloodName(MonsterVariety? one)
+        => one is not null && _blood.TryGetValue(one.Blood, out string? name) ? name : string.Empty;
+
+    /// <summary>
+    /// The resistance profiles this monster's TYPE carries, by name.
+    /// </summary>
+    /// <remarks>
+    /// NAMES ONLY, and that is deliberate. Each profile also holds 32 numeric columns -
+    /// Fire1..Fire5, Cold1..Cold5 and so on, some of them arrays - and what the numbered tiers
+    /// mean is not something the export settles: MinorColdResist reads 30, 30, 30 across the
+    /// first three and MajorColdResist reads 75, 60, 50, which fits area tiers and several other
+    /// readings equally well. "MajorFireResist" already says what a reader wants; a number here
+    /// under a guessed label would be the same mistake as calling AttackSpeed a percentage.
+    /// </remarks>
+    public IEnumerable<string> ResistancesOf(MonsterVariety? one)
+    {
+        foreach (int row in Kind(one)?.Resistances ?? [])
+        {
+            string name = _resistances.TryGetValue(row, out string? got) ? got : string.Empty;
             yield return name.Length > 0
                 ? name
                 : "#" + row.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -408,6 +475,12 @@ internal sealed class MonsterVarietyFile
 
     [JsonPropertyName("types")]
     public Dictionary<string, MonsterKind>? Types { get; init; }
+
+    [JsonPropertyName("blood")]
+    public Dictionary<string, string>? Blood { get; init; }
+
+    [JsonPropertyName("resistances")]
+    public Dictionary<string, string>? Resistances { get; init; }
 }
 
 /// <summary>Source-generated JSON, so the monster table survives Native AOT.</summary>
