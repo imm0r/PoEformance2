@@ -26,21 +26,51 @@ namespace PoEformance.Features;
 /// </remarks>
 /// <param name="Path">
 /// The loaded file's full path, matched exactly. Empty means the entry says nothing - see
-/// <see cref="SaysNothing"/>.
+/// <see cref="SaysNothing"/>. It stays the entry's IDENTITY even when there are others: the
+/// order, the de-duplication and the log line are all keyed on it.
 /// </param>
 /// <param name="Called">What to show instead of the path. Empty falls back to the file's name.</param>
 /// <param name="Colour">Packed ABGR, like every other colour here.</param>
 /// <param name="Enabled">Off keeps the entry without acting on it. Deleting is the other way.</param>
 /// <param name="Log">Also write a line to disk when the area turns out to have it.</param>
+/// <param name="Also">
+/// More paths that mean the same thing. The entry fires when ANY of them is loaded.
+/// </param>
 public sealed record PreloadAlertEntry(
     [property: JsonPropertyName("path")] string Path,
     [property: JsonPropertyName("called")] string Called = "",
     [property: JsonPropertyName("colour")] uint Colour = PreloadAlerts.Plain,
     [property: JsonPropertyName("enabled")] bool Enabled = true,
-    [property: JsonPropertyName("log")] bool Log = false)
+    [property: JsonPropertyName("log")] bool Log = false,
+    [property: JsonPropertyName("also")] IReadOnlyList<string>? Also = null)
 {
     /// <summary>Whether this entry says anything at all about what to look for.</summary>
     public bool SaysNothing => string.IsNullOrWhiteSpace(Path);
+
+    /// <summary>Every path this entry answers to, the primary one first.</summary>
+    /// <remarks>
+    /// A MECHANIC IS NOT ONE FILE, which twenty captured areas settled. What a Breach area loads
+    /// depends on which breach monsters rolled, so no single path is in every one of them: across
+    /// five Breach maps the largest set of paths ALL of them share is empty, and the same is true
+    /// of Delirium, Abyss and Vaal. Only Essence turned out to have one file in all five of its
+    /// maps.
+    ///
+    /// So one row has to be able to say "any of these". The alternative measured first was a
+    /// single path per row, and the only way to cover five Breach maps that way was to include
+    /// paths that merely happened to correlate - a checkpoint model, a shield-block gem - which
+    /// is a rule that fits the sample and predicts nothing.
+    /// </remarks>
+    public IEnumerable<string> Every
+    {
+        get
+        {
+            yield return Path;
+            foreach (string other in Also ?? [])
+            {
+                yield return other;
+            }
+        }
+    }
 
     /// <summary>
     /// What to put on screen for it.
@@ -162,7 +192,9 @@ public static class PreloadAlerts
         var found = new List<PreloadAlertEntry>();
         foreach (PreloadAlertEntry entry in entries)
         {
-            if (entry is { Enabled: true, SaysNothing: false } && here.Contains(Same(entry.Path)))
+            // ANY of the entry's paths, not all: they are alternatives for one thing, and an area
+            // that loaded a mechanic's monsters may have loaded none of its doodads.
+            if (entry is { Enabled: true, SaysNothing: false } && Anywhere(entry, here))
             {
                 found.Add(entry);
             }
@@ -207,6 +239,25 @@ public static class PreloadAlerts
     /// </remarks>
     public static bool Here(string? path, IReadOnlySet<string>? loaded)
         => !string.IsNullOrWhiteSpace(path) && loaded is not null && loaded.Contains(Same(path));
+
+    /// <summary>Whether ANY of an entry's paths is in the area, by the same rule.</summary>
+    public static bool Anywhere(PreloadAlertEntry? entry, IReadOnlySet<string>? loaded)
+    {
+        if (entry is null || loaded is null)
+        {
+            return false;
+        }
+
+        foreach (string path in entry.Every)
+        {
+            if (Here(path, loaded))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>The line written to disk for a found entry.</summary>
     /// <remarks>
