@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Core.Schema;
 using PoEformance.Features;
+using PoEformance.Game.Entities;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
@@ -39,6 +40,7 @@ public sealed class EntityBrowserWindow
     private readonly Action<ulong, string>? _compare;
     private readonly Action<ulong, float, float>? _route;
     private readonly Func<ulong, bool>? _routed;
+    private readonly Func<MonsterVarieties>? _monsters;
 
     /// <summary>Components unfolded to their fields, by name, kept across selections.</summary>
     /// <remarks>
@@ -73,13 +75,19 @@ public sealed class EntityBrowserWindow
     /// Nobody assembles one by copying addresses out of here by hand.
     /// </param>
     /// <param name="hiding">What the list has been told to leave out. See <see cref="EntityHiding"/>.</param>
+    /// <param name="monsters">
+    /// The game's monster table, asked for each frame rather than held, so a table wired up
+    /// after this window was built is still found. Optional: without it the browser shows what
+    /// it always showed.
+    /// </param>
     public EntityBrowserWindow(
         EntityInspector inspector,
         EntityHiding hiding,
         Action<ulong, string, string> dissect,
         Action<ulong, float, float>? route = null,
         Func<ulong, bool>? routed = null,
-        Action<ulong, string>? compare = null)
+        Action<ulong, string>? compare = null,
+        Func<MonsterVarieties>? monsters = null)
     {
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(hiding);
@@ -90,6 +98,7 @@ public sealed class EntityBrowserWindow
         _route = route;
         _routed = routed;
         _compare = compare;
+        _monsters = monsters;
     }
 
     /// <summary>Draws the tab's content and publishes what it wants read next.</summary>
@@ -450,6 +459,277 @@ public sealed class EntityBrowserWindow
         _route(entity.Address, entity.WorldX, entity.WorldY);
     }
 
+    /// <summary>
+    /// What the game's own table says about the thing selected.
+    /// </summary>
+    /// <remarks>
+    /// ABOVE THE COMPONENTS, because it answers a different question than they do. A component
+    /// says what this ONE monster is doing right now; the table says what its KIND is - and that
+    /// half was never readable here at all. Until now a monster was a path and a rarity, so
+    /// "Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium" was the whole of what the browser
+    /// could say about it. It is a Risen Farmhand with one skill and 120% damage.
+    ///
+    /// Nothing is drawn for an entity the table has never heard of - a chest, an effect, a
+    /// waypoint - so this costs a non-monster exactly one dictionary miss.
+    /// </remarks>
+    /// <summary>
+    /// The tags worth putting on the first line, out of the 185 in use.
+    /// </summary>
+    /// <remarks>
+    /// The same six GameHelper2 derives its MonsterCategory from, and for the same reason: they
+    /// say what a thing IS. A monster may carry several - a werewolf is humanoid and beast at
+    /// once - which is why this is a filter over the list rather than a lookup for one value.
+    /// </remarks>
+    private static readonly string[] Kinds =
+        ["humanoid", "human", "undead", "construct", "beast", "demon", "eldritch", "golem"];
+
+    private void DrawTable(string path)
+    {
+        MonsterVarieties table = _monsters?.Invoke() ?? MonsterVarieties.Empty;
+        MonsterVariety? one = table.Find(path);
+        if (one is null)
+        {
+            return;
+        }
+
+        if (one.Name is { Length: > 0 })
+        {
+            ImGuiText.Mono(KnownText, one.Boss ? $"{one.Name}  (boss)" : one.Name);
+        }
+        else if (one.Boss)
+        {
+            ImGuiText.Mono(KnownText, "(boss)");
+        }
+
+        // WHAT KIND OF THING IT IS, from the tags. These six are the ones GameHelper2 reads for
+        // the same purpose, and they are the half of the tag list somebody actually wants at a
+        // glance - the rest is movement speed, on-hit audio and attribute exclusions.
+        string[] kinds =
+        [
+            .. table.TagsOf(one).Where(tag => Kinds.Contains(tag, StringComparer.Ordinal)),
+        ];
+
+        if (kinds.Length > 0)
+        {
+            ImGuiText.Mono(DimText, string.Join(", ", kinds));
+        }
+
+        // ARMOUR AND EVASION LIVE ON THE TYPE, not on the monster. The row's own MonsterArmour
+        // column is filled on 16 of 2734 rows, so reading that one and concluding the game does
+        // not store monster armour would be wrong twice over.
+        MonsterKind? kind = table.Kind(one);
+        if (kind is not null && (kind.Armour > 0 || kind.Evasion > 0 || kind.EnergyShield > 0))
+        {
+            var defence = new System.Text.StringBuilder();
+            if (kind.Armour > 0)
+            {
+                defence.Append($"armour {kind.Armour}  ");
+            }
+
+            if (kind.Evasion > 0)
+            {
+                defence.Append($"evasion {kind.Evasion}  ");
+            }
+
+            if (kind.EnergyShield > 0)
+            {
+                defence.Append($"energy shield {kind.EnergyShield}");
+            }
+
+            ImGuiText.Mono(DimText, defence.ToString().TrimEnd());
+        }
+
+        // MULTIPLIERS ARE CALLED MULTIPLIERS. The table's Life/Damage/XP sit at a median of
+        // about 110 with 100 as the baseline, so they are percentages of a base this row does
+        // not carry - 120 is "a fifth more than its kind", not 120 life.
+        ImGuiText.Mono(DimText, $"life {one.Life}%  damage {one.Damage}%  xp {one.Xp}%");
+
+        // Deliberately unlabelled units - see MonsterVariety. Speed and attack speed are
+        // plainly not percentages, and this table cannot say what they are.
+        ImGuiText.Mono(
+            DimText,
+            $"speed {one.Speed}  attack {one.AttackSpeed}  reach {one.MinAttack}-{one.MaxAttack}"
+            + $"  aggro {one.MinAggro}-{one.MaxAggro}");
+
+        if (one.Stance is { Length: > 0 })
+        {
+            ImGui.SameLine();
+            ImGuiText.Mono(DimText, $"  {one.Stance}");
+        }
+
+        // THE QUEST FLAG, on the 68 monsters that carry one - every named campaign boss. It
+        // says this kill advances a quest, not where anything is.
+        if (one.Quest > 0)
+        {
+            ImGuiText.Mono(UnknownText, $"quest step - QuestFlags row {one.Quest}");
+        }
+
+        DrawSkills(table, one);
+        DrawModifiers(table, one);
+        DrawRest(table, one);
+
+        ImGui.Separator();
+    }
+
+    /// <summary>
+    /// The rest of the row: the shape of the thing, and the columns still holding row numbers.
+    /// </summary>
+    /// <remarks>
+    /// FOLDED, because these are the fields somebody goes looking for rather than reads at a
+    /// glance - and half of them are numbers pointing into tables this build does not carry.
+    /// They are shown anyway, with a # to say so: a field that is loaded and never drawn is
+    /// indistinguishable from one that was never carried, and the next person wanting
+    /// MonsterType would go and export it again.
+    /// </remarks>
+    private static void DrawRest(MonsterVarieties table, MonsterVariety one)
+    {
+        if (!ImGui.TreeNode("the rest of the row"))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGuiText.Mono(
+                DimText,
+                $"  size {one.Size}   model {one.ModelSize}%   poise "
+                + one.Poise.ToString("0.###", CultureInfo.InvariantCulture));
+
+            // AttackCrit holds 0, 1 or 2 - a kind, not a chance. Drawn as a bare number for
+            // exactly that reason: a percent sign here would be an invented statistic.
+            // Blood is still a row number: nothing shipped resolves it.
+            MonsterKind? kind = table.Kind(one);
+            ImGuiText.Mono(
+                DimText,
+                $"  crit kind {one.Crit}   blood #{one.Blood}   type "
+                + (kind is null ? "#" + one.Type.ToString(CultureInfo.InvariantCulture) : kind.Id));
+
+            if (kind is { Spread: > 0 })
+            {
+                ImGuiText.Mono(DimText, $"  damage spread {kind.Spread}");
+            }
+
+            if (kind is { Summoned: true })
+            {
+                ImGuiText.Mono(DimText, "  summoned");
+            }
+
+            // THE FULL TAG LIST, not just the six on the first line. The rest is movement speed,
+            // attribute exclusions and on-hit audio - rarely what somebody came for, but the
+            // place they would look for it.
+            string[] all = [.. table.TagsOf(one)];
+            if (all.Length > 0)
+            {
+                ImGuiText.Wrapped(DimText, "  tags  " + string.Join(", ", all));
+            }
+
+            if (one.Base is { Length: > 0 })
+            {
+                ImGuiText.Mono(DimText, "  base  " + one.Base);
+            }
+
+            // The league bases live here - AbyssMonsterBase, SanctumMonsterBase - which is what
+            // makes this column worth drawing despite pointing outside this table.
+            foreach (string parent in one.Inherits ?? [])
+            {
+                ImGuiText.Mono(DimText, "  from  " + parent);
+            }
+        }
+        finally
+        {
+            ImGui.TreePop();
+        }
+    }
+
+    /// <summary>
+    /// What the monster can do, by name.
+    /// </summary>
+    /// <remarks>
+    /// FOLDED SHUT BY DEFAULT, because a boss carries sixty-seven of these and the browser's
+    /// left pane is a list of everything in the area. The header carries the count, which is
+    /// the part worth seeing without asking: one skill and sixty-seven are different animals.
+    ///
+    /// The skill names are the game's own internal ids rather than what a tooltip would say -
+    /// GSYamaChaosCloud, not "Chaos Cloud". They read well enough to be worth showing, and the
+    /// table that holds the pretty names is a different export again.
+    /// </remarks>
+    private static void DrawSkills(MonsterVarieties table, MonsterVariety one)
+    {
+        if (one.SkillCount == 0)
+        {
+            return;
+        }
+
+        string header = one.SkillCount == 1 ? "1 skill" : $"{one.SkillCount} skills";
+
+        // Named or not is worth saying in the header rather than leaving somebody to wonder
+        // why every line is a number: an unexported reference table and a monster whose skills
+        // are genuinely unknown look identical from the list alone.
+        if (table.NamedSkills == 0)
+        {
+            header += " (no names - the skill table was not exported)";
+        }
+
+        if (!ImGui.TreeNode(header))
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (string skill in table.Skills(one))
+            {
+                ImGuiText.Mono(skill.StartsWith('#') ? UnknownText : DimText, "  " + skill);
+            }
+        }
+        finally
+        {
+            ImGui.TreePop();
+        }
+    }
+
+    /// <summary>
+    /// The modifiers the game hangs on this kind, and the stats they set.
+    /// </summary>
+    /// <remarks>
+    /// This is the half that answers "why is this one different": MonsterUniqueT2Boss sets
+    /// monster_dropped_item_rarity_+% to 1600 and i_am_boss_of_tier to 2, and neither is
+    /// visible anywhere else in this tool.
+    ///
+    /// The empty slots are already gone - Mods2 is a fixed-width array whose filler row is
+    /// literally called "Nothing", and 29% of all modifier references pointed at it. They are
+    /// dropped when the table is built rather than here, so nothing downstream has to know.
+    /// </remarks>
+    private static void DrawModifiers(MonsterVarieties table, MonsterVariety one)
+    {
+        ModifierMeaning[] carried = [.. table.Modifiers(one)];
+        if (carried.Length == 0)
+        {
+            return;
+        }
+
+        if (!ImGui.TreeNode(carried.Length == 1 ? "1 modifier" : $"{carried.Length} modifiers"))
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (ModifierMeaning meaning in carried)
+            {
+                ImGuiText.Mono(KnownText, "  " + meaning.Id);
+                foreach (ModifierStat stat in meaning.Stats ?? [])
+                {
+                    ImGuiText.Mono(DimText, $"      {stat.Stat}  {stat.Range}");
+                }
+            }
+        }
+        finally
+        {
+            ImGui.TreePop();
+        }
+    }
+
     private void DrawComponents(EntityView view, WorldEntity? chosen)
     {
         ImGui.BeginChild("components", new Vector2(0f, 0f), ImGuiChildFlags.Borders);
@@ -474,6 +754,8 @@ public sealed class EntityBrowserWindow
 
         ImGui.TextColored(PathText, view.Path);
         ImGuiText.Mono(DimText, $"id {view.Id}  at 0x{view.Address:X}");
+
+        DrawTable(view.Path);
 
         DrawHideButtons(view, chosen);
 
