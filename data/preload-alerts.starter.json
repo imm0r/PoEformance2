@@ -1,0 +1,68 @@
+[
+  {
+    "path": "Metadata/Terrain/Leagues/Breach/brequelportal.arm",
+    "called": "Breach",
+    "colour": 4286270696,
+    "enabled": true,
+    "log": false,
+    "also": [
+      "Metadata/Monsters/Breach/BreachElitePaleElite2",
+      "Metadata/Effects/Microtransactions/Misc/rare_unique_kill/breach/breachhole.ao"
+    ]
+  },
+  {
+    "path": "Metadata/NPC/League/Affliction/ElderMadoxMapIntro",
+    "called": "Delirium",
+    "colour": 4291348680,
+    "enabled": true,
+    "log": false,
+    "also": [
+      "Metadata/Effects/Microtransactions/Spells/despair_curse/delirium/despair.ao.tok"
+    ]
+  },
+  {
+    "path": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/immune_aura/epks/immune_main.epk",
+    "called": "Abyss",
+    "colour": 4282400928,
+    "enabled": true,
+    "log": false,
+    "also": [
+      "Metadata/Terrain/Islands/Tiles/CoralDungeon/coral_abyss.et",
+      "Metadata/Chests/Abyss/AbyssFinalChest.ao",
+      "Metadata/Terrain/Prison/Abyss/prison_abyss.gt",
+      "Minimap/Metadata_Terrain_Woods_GraveyardDungeons_Abyss.mtp"
+    ]
+  },
+  {
+    "path": "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/attachments/weapons/Daggers_01/VaalZealotDaggers_01.fmt",
+    "called": "Vaal",
+    "colour": 4282168395,
+    "enabled": true,
+    "log": false,
+    "also": [
+      "Metadata/Chests/VaalStoneChest01",
+      "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/headfeathers/rig.ast",
+      "Metadata/Chests/VaalGoldChest03",
+      "Metadata/Projectiles/VaalZealotColdEyeOfWinterMain",
+      "Metadata/Terrain/Doodads/Jungle/VaalProps/ChaosTemple/remains20.ao"
+    ]
+  },
+  {
+    "path": "Metadata/Effects/Spells/monsters_effects/essence2/BeastSkin/EssenceImpale.epk",
+    "called": "Essence",
+    "colour": 4293445708,
+    "enabled": true,
+    "log": false,
+    "also": []
+  },
+  {
+    "path": "Metadata/Projectiles/AzmeriFabricationSkull",
+    "called": "Azmeri",
+    "colour": 4283222216,
+    "enabled": true,
+    "log": false,
+    "also": [
+      "Metadata/Monsters/LeagueAzmeri/AzmeriMonsterBase.ot.tok"
+    ]
+  }
+]

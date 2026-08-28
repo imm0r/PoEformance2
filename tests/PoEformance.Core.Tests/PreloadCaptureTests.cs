@@ -45,6 +45,9 @@ public sealed class PreloadCaptureTests
 
     private static IReadOnlyList<string> Map() => Captured("map-rich.txt");
 
+    /// <summary>A map with 850 files in it and not one league mechanic.</summary>
+    private static IReadOnlyList<string> Plain() => Captured("map-plain.txt");
+
     /// <summary>The two currency items every area carries, whatever it contains.</summary>
     private const string OmenItem = "Metadata/Items/Currency/OmenStrongboxOpenableAgain";
     private const string KeyItem = "Metadata/Items/Currency/StrongboxKey";
@@ -143,6 +146,112 @@ public sealed class PreloadCaptureTests
             Assert.False(PreloadAlerts.Here(path, hideout), path);
             Assert.False(PreloadAlerts.Here(path, map), path);
         }
+    }
+
+    [Fact]
+    public void THETABLEOFSTRONGBOXESIsNotEvidenceOfOne()
+    {
+        // A DISPROOF WORTH KEEPING, because the path looks exactly like the answer and the next
+        // person to read a capture will land on it too. Data/Balance/Strongboxes.dat was offered
+        // here as a one-line marker on the strength of four captures. Twenty settled it: seven
+        // areas load the table, ONE of them has a box. It is the game reading its own data file,
+        // which it does whether or not the area rolled the thing the file describes.
+        //
+        // Both of these areas load it. Only one of them has a chest, and that is the difference
+        // between a marker and a false positive six times in seven.
+        const string Table = "Data/Balance/Strongboxes.dat";
+
+        HashSet<string>? rich = PreloadAlerts.Lookup(Map());
+        HashSet<string>? plain = PreloadAlerts.Lookup(Plain());
+
+        Assert.True(PreloadAlerts.Here(Table, rich));
+        Assert.True(PreloadAlerts.Here(Table, plain));
+
+        Assert.True(PreloadAlerts.Here(TheChest, rich));
+        Assert.False(PreloadAlerts.Here(TheChest, plain));
+    }
+
+    [Fact]
+    public void ARowFiresOnANYOfItsPathsRatherThanAll()
+    {
+        // WHY A ROW HOLDS SEVERAL. Twenty captured areas say a mechanic is not one file: what a
+        // Breach area loads depends on which breach monsters rolled, and across five Breach maps
+        // the set of paths ALL of them share is empty. Same for Delirium, Abyss and Vaal. Only
+        // Essence had a single file in all five of its maps.
+        var breach = new PreloadAlertEntry(
+            "Metadata/Terrain/Leagues/Breach/Doodads/TileableWall12.ao",
+            "Breach",
+            Also: ["Metadata/Terrain/Leagues/Breach/brequelportal.arm"]);
+
+        // Only the SECOND path is in this area, which is the case a single-path row misses.
+        string[] area = ["Metadata/Terrain/Leagues/Breach/brequelportal.arm", "Art/Models/Whatever.ast"];
+
+        Assert.Single(PreloadAlerts.Found([breach], area));
+        Assert.True(PreloadAlerts.Anywhere(breach, PreloadAlerts.Lookup(area)));
+
+        // And an area with neither says nothing, so this is not a row that always fires.
+        Assert.Empty(PreloadAlerts.Found([breach], ["Art/Models/Whatever.ast"]));
+    }
+
+    [Fact]
+    public void ASavedRowKeepsItsExtraPaths()
+    {
+        // The file is the point of the feature - a list worth handing to somebody else - so the
+        // extra paths have to survive the round trip rather than only living in memory.
+        string file = Path.Combine(Path.GetTempPath(), $"preload-{Guid.NewGuid():N}.json");
+        try
+        {
+            var entry = new PreloadAlertEntry("a/one", "Thing", Also: ["a/two", "a/three"]);
+            Assert.True(PreloadAlertStore.Save([entry], file));
+
+            IReadOnlyList<PreloadAlertEntry> back = PreloadAlertStore.Load(file);
+
+            Assert.Single(back);
+            Assert.Equal(["a/one", "a/two", "a/three"], back[0].Every);
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
+    [Fact]
+    public void THESTARTERLISTIsQuietInAHideoutAndSpeaksInAMap()
+    {
+        // Built from twenty captures, and only from paths that carry their mechanic's own name -
+        // see data/preload-alerts.starter.json. A first attempt let any path in and "covered" all
+        // five Breach maps with a checkpoint model and a shield-block gem, which fits the sample
+        // and predicts nothing.
+        IReadOnlyList<PreloadAlertEntry> starter = PreloadAlertStore.Load(Starter());
+        Assert.True(starter.Count >= 5, $"only {starter.Count} entries - is the file there?");
+
+        // A hideout has none of it. If this ever fires, a path in the list is not mechanic-bound.
+        Assert.Empty(PreloadAlerts.Found(starter, Hideout()));
+
+        // THE CONTROL THAT ACTUALLY COSTS SOMETHING. A hideout is quiet for any list at all - it
+        // loads almost nothing - so staying quiet there proves very little. This is a real map,
+        // 850 files deep, that simply rolled none of the six; a path that merely correlates with
+        // "being in a map" fires here and nowhere else that would catch it.
+        Assert.Empty(PreloadAlerts.Found(starter, Plain()));
+
+        IReadOnlyList<PreloadAlertEntry> found = PreloadAlerts.Found(starter, Map());
+        var called = found.Select(entry => entry.Shown).ToHashSet(StringComparer.Ordinal);
+
+        // The three this map carries in bulk - 143 Delirium paths, 203 Abyss, 98 Vaal.
+        Assert.Contains("Delirium", called);
+        Assert.Contains("Abyss", called);
+        Assert.Contains("Vaal", called);
+    }
+
+    private static string Starter()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "data", "preload-alerts.starter.json")))
+        {
+            dir = dir.Parent;
+        }
+
+        return Path.Combine(dir!.FullName, "data", "preload-alerts.starter.json");
     }
 
     [Fact]

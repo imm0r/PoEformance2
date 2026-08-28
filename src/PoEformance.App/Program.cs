@@ -1280,7 +1280,12 @@ internal static class Program
             () => LookAtWhatLoaded(preloadArea),
             SweepForTheCountField,
             preloadSettings,
-            changed => PoEformance.Features.PreloadStore.Save(changed));
+            changed => PoEformance.Features.PreloadStore.Save(changed),
+            // READ WHEN THE BUTTON IS PRESSED, not now. It is six rows off a disk nobody is
+            // waiting on, and reading it at startup would make a file most people never ask
+            // for part of every launch.
+            starter: () => PoEformance.Features.PreloadAlertStore.Load(
+                FindDataFile("preload-alerts.starter.json")));
         overlay.PreloadListChanged = list => PoEformance.Features.PreloadAlertStore.Save(list);
         overlay.AttachQuests(quests);
         overlay.AttachTracker(

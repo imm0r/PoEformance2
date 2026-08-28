@@ -550,13 +550,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Writes the rules down. Called from the raw-list window as well as the editor, because
     /// a rule added by pressing "+ watch" on a path is exactly as permanent as a typed one.
     /// </param>
+    /// <param name="starter">
+    /// The shipped list, read on demand. Null means there is none to offer, and the editor then
+    /// says what it said before anything shipped: build your own from the area tab.
+    /// </param>
     public void AttachPreload(
         PreloadWatch watch,
         Action lookAgain,
         Action sweep,
         PreloadSettings settings,
         Action<PreloadSettings> rulesChanged,
-        bool visible = false)
+        bool visible = false,
+        Func<IReadOnlyList<PreloadAlertEntry>>? starter = null)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(lookAgain);
@@ -579,7 +584,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             () => _preloadSettings,
             TookPreload,
             list => PreloadListChanged?.Invoke(list),
-            SayItNow);
+            SayItNow,
+            starter);
         _tools.Add(22, "preload-alerts", "Tell me about", alerts.DrawTab, page: Area, pageLabel: "Area");
 
         // The list's backings and the card's plate, under the list they draw.

@@ -32,17 +32,20 @@ public sealed class PreloadAlertWindow
     private readonly Action<PreloadSettings> _switched;
     private readonly Action<IReadOnlyList<PreloadAlertEntry>> _listed;
     private readonly Action _sayItNow;
+    private readonly Func<IReadOnlyList<PreloadAlertEntry>>? _starter;
 
     private string _filter = string.Empty;
     private string _addPath = string.Empty;
     private string _addCalled = string.Empty;
+    private string _tookStarter = string.Empty;
 
     public PreloadAlertWindow(
         PreloadWatch watch,
         Func<PreloadSettings> settings,
         Action<PreloadSettings> switched,
         Action<IReadOnlyList<PreloadAlertEntry>> listed,
-        Action sayItNow)
+        Action sayItNow,
+        Func<IReadOnlyList<PreloadAlertEntry>>? starter = null)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(settings);
@@ -54,6 +57,7 @@ public sealed class PreloadAlertWindow
         _switched = switched;
         _listed = listed;
         _sayItNow = sayItNow;
+        _starter = starter;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -125,14 +129,19 @@ public sealed class PreloadAlertWindow
         HashSet<string>? here = PreloadAlerts.Lookup(_watch.All);
 
         Adding();
+        Starter();
 
         if (entries.Count == 0)
         {
             ImGuiText.Wrapped(
                 Dim,
-                "Nothing is being watched for. Nothing ships either: the exact paths a PoE2 area "
-                + "loads are not something this tool has been told, so the list is built from the "
-                + "\"In this area\" tab - walk into a map and add the rows that mean something.");
+                _starter is null
+                    ? "Nothing is being watched for, and the shipped list was not found beside the "
+                      + "program. Build one from the \"In this area\" tab - walk into a map and add "
+                      + "the rows that mean something."
+                    : "Nothing is being watched for. The button above starts you off with six "
+                      + "mechanics measured across twenty captured maps; everything else is built "
+                      + "from the \"In this area\" tab, one row per path that means something.");
             return;
         }
 
@@ -312,12 +321,31 @@ public sealed class PreloadAlertWindow
         // WHETHER THIS ROW IS IN THE AREA YOU ARE STANDING IN. A path that matches nothing is
         // otherwise indistinguishable from an area that simply does not have the thing, and a
         // typo in one would never announce itself.
+        //
+        // A row can carry several paths - see PreloadAlertEntry.Every - so the cell says how many
+        // and the hover lists them. Without the count a two-path row and a one-path row look
+        // identical, and the second path is then invisible until it fires.
         ImGui.TableNextColumn();
-        bool matching = PreloadAlerts.Here(entry.Path, here);
-        ImGui.TextColored(matching ? Good : Dim, entry.Path);
-        if (matching && ImGui.IsItemHovered())
+        bool matching = PreloadAlerts.Anywhere(entry, here);
+        int extra = entry.Also?.Count ?? 0;
+        ImGui.TextColored(
+            matching ? Good : Dim,
+            extra > 0 ? $"{entry.Path}  (+{extra})" : entry.Path);
+
+        if (ImGui.IsItemHovered() && (matching || extra > 0))
         {
-            ImGui.SetTooltip("this area loaded it");
+            var said = new System.Text.StringBuilder();
+            if (matching)
+            {
+                said.Append("this area loaded it\n\n");
+            }
+
+            foreach (string one in entry.Every)
+            {
+                said.Append(PreloadAlerts.Here(one, here) ? "* " : "  ").Append(one).Append('\n');
+            }
+
+            ImGui.SetTooltip(said.ToString().TrimEnd());
         }
 
         ImGui.TableNextColumn();
@@ -328,6 +356,50 @@ public sealed class PreloadAlertWindow
         }
 
         return edit;
+    }
+
+    /// <summary>
+    /// Offers the shipped list, and says what taking it did.
+    /// </summary>
+    /// <remarks>
+    /// IT ADDS RATHER THAN REPLACES, and the count it reports is what actually went in: rows
+    /// already being watched are refused by PreloadWatch.Add, so pressing it twice says "0 added"
+    /// instead of drawing everything a second time. A list somebody has curated is not something
+    /// to overwrite because they pressed a button to see what was in the shipped one.
+    /// </remarks>
+    private void Starter()
+    {
+        if (_starter is null)
+        {
+            return;
+        }
+
+        if (ImGui.SmallButton("add the shipped list"))
+        {
+            int added = _starter().Count(_watch.Add);
+            if (added > 0)
+            {
+                _listed(_watch.Watching);
+            }
+
+            _tookStarter = added > 0
+                ? $"added {added}"
+                : "already had all of them";
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                "Breach, Delirium, Abyss, Vaal, Essence and Azmeri, as paths that carry the\n"
+                + "mechanic's own name and appeared in no map without it - measured over\n"
+                + "twenty captured areas. It adds to your list rather than replacing it.");
+        }
+
+        if (_tookStarter.Length > 0)
+        {
+            ImGui.SameLine();
+            ImGuiText.Wrapped(Dim, _tookStarter);
+        }
     }
 
     private void Adding()
