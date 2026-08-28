@@ -59,8 +59,12 @@ public static class StashWorth
         // hundred times as much. See PriceBook.Fungible - and note the name handed over is the
         // one the shipped table resolved from the metadata path, not anything the client painted,
         // so this stays language-independent.
+        // THE BASE NAME GOES TO BOTH DOORS. Worth reads the same picture table Fungible does, so
+        // handing it the name is what stops a refusal there from being granted here - see
+        // PriceBook.Spoken. Left off, every Orb of Augmentation in a stash went on wearing the
+        // Perfect variant's price after Fungible had already said no.
         return book.Fungible(item.Art, item.Base)
-               ?? book.Worth(item.Art, unique)
+               ?? book.Worth(item.Art, unique, item.Base)
                ?? (unique is not null ? trade?.Worth(unique) : null);
     }
 

@@ -181,6 +181,105 @@ public class ItemNamesTests
     }
 
     [Fact]
+    public void THESHIPPEDTABLECanNameEveryCurrencyThePriceBookQuotes()
+    {
+        // THE CHECK THAT WOULD HAVE CAUGHT A STALE TABLE, and it is not hypothetical: a price is
+        // found by the item's picture AND the name this table resolves, so a currency the table
+        // spells differently from the source goes unpriced with no symptom but a smaller total.
+        //
+        // GGG renamed four orbs from a descriptive form to a personal one - "Profane Orb of
+        // Sacrifice" became "Kamasa's", "Royal" became "Yugul's" - and the shipped table went on
+        // saying the old ones. Two of the forty-one currencies in this captured answer could not
+        // be named at all, and nothing said so.
+        //
+        // The capture is frozen, so this cannot go red for anything the game does later. It goes
+        // red when a REGENERATED table covers less of it than the one before, which is the only
+        // way this file gets worse.
+        ItemNames names = Loaded();
+        var spelt = new HashSet<string>(StringComparer.Ordinal);
+        foreach (string path in Bases())
+        {
+            spelt.Add(names.Base(path));
+        }
+
+        using System.Text.Json.JsonDocument book =
+            System.Text.Json.JsonDocument.Parse(File.ReadAllText(Fixture("ninja-currency-live.json")));
+
+        var missing = new List<string>();
+        var seen = 0;
+        foreach (System.Text.Json.JsonElement item in book.RootElement.GetProperty("items").EnumerateArray())
+        {
+            if (item.TryGetProperty("name", out System.Text.Json.JsonElement called)
+                && called.GetString() is { Length: > 0 } name)
+            {
+                seen++;
+                if (!spelt.Contains(name))
+                {
+                    missing.Add(name);
+                }
+            }
+        }
+
+        Assert.True(seen > 30, $"only {seen} currencies in the capture - is it the right file?");
+        Assert.True(
+            missing.Count == 0,
+            $"the shipped table cannot name {missing.Count} of {seen} priced currencies "
+            + $"({string.Join(", ", missing)}) - regenerate data/item-names.json from the game");
+    }
+
+    [Fact]
+    public void ANDTheFiveOrbFamiliesAreFifteenDistinctNames()
+    {
+        // The data half of the tier bug. Every family draws ONE picture, so the name is the only
+        // thing that tells a plain orb from the Perfect one - if the table ever answered the same
+        // string for two of them, the price side could not tell them apart however careful it is.
+        ItemNames names = Loaded();
+        string[] stems =
+        [
+            "CurrencyUpgradeToMagic", "CurrencyAddModToMagic", "CurrencyAddModToRare",
+            "CurrencyRerollRare", "CurrencyUpgradeMagicToRare",
+        ];
+
+        var all = new HashSet<string>(StringComparer.Ordinal);
+        foreach (string stem in stems)
+        {
+            foreach (string tier in new[] { string.Empty, "2", "3" })
+            {
+                string name = names.Base($"Metadata/Items/Currency/{stem}{tier}");
+
+                // Not the path's last segment, which is what an unknown path falls back to.
+                Assert.DoesNotContain(stem, name, StringComparison.Ordinal);
+                Assert.True(all.Add(name), $"{stem}{tier} is called {name}, which is already taken");
+            }
+        }
+
+        Assert.Equal(15, all.Count);
+    }
+
+    private static IEnumerable<string> Bases()
+    {
+        // Straight off the shipped file, so this asks the same table the reader loads.
+        using System.Text.Json.JsonDocument file =
+            System.Text.Json.JsonDocument.Parse(File.ReadAllText(DataFile("item-names.json")));
+
+        foreach (System.Text.Json.JsonProperty entry in file.RootElement.GetProperty("bases").EnumerateObject())
+        {
+            yield return entry.Name;
+        }
+    }
+
+    private static string Fixture(string name)
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "fixtures", name)))
+        {
+            dir = dir.Parent;
+        }
+
+        return Path.Combine(dir!.FullName, "fixtures", name);
+    }
+
+    [Fact]
     public void ANDAMissingTableIsQuietRatherThanFatal()
     {
         // Without them the items still list - with raw paths, mod ids and stat numbers, which

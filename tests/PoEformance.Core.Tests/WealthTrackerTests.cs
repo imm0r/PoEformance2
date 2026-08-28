@@ -42,8 +42,19 @@ public class WealthTrackerTests
         return book;
     }
 
+    /// <summary>
+    /// The base name out of the SHIPPED table, exactly as the reader fills it in the game.
+    /// </summary>
+    /// <remarks>
+    /// It used to be the literal "base", which no price line is ever called - harmless while the
+    /// picture alone could answer, and a fixture that priced nothing the moment the picture
+    /// stopped being allowed to. A test whose items are named something the book cannot know
+    /// tests the book's fallback, not the tool.
+    /// </remarks>
+    private static readonly ItemNames Names = TestNames.Shipped;
+
     private static InspectedItem Item(string path, string art, int stack)
-        => new(1, path, "base", string.Empty, string.Empty, -1, null, stack, 0, art, [], []);
+        => new(1, path, Names.Base(path), string.Empty, string.Empty, -1, null, stack, 0, art, [], []);
 
     private static PurseView Purse(params InspectedItem[] items)
         => new(

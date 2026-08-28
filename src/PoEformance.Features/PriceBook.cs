@@ -308,13 +308,19 @@ public sealed class PriceBook
     /// <summary>What one of a thing is worth in Exalted, or null when nothing is known about it.</summary>
     /// <param name="artPath">The item's own art path, as it carries it.</param>
     /// <param name="name">What it is called, for the things that have no art handle.</param>
-    public double? Worth(string? artPath, string? name = null)
+    /// <param name="based">
+    /// The item's base name where one resolved, so this door applies the same rule as
+    /// <see cref="Fungible"/> - see <see cref="Spoken"/>. Null leaves the older behaviour, for
+    /// callers with no name to offer.
+    /// </param>
+    public double? Worth(string? artPath, string? name = null, string? based = null)
     {
         // The ambiguity guard is here rather than only in Fungible, because this is the older
         // door into the same table: a picture that several things draw must not answer through
         // either of them. See _byArtName for what it costs to get this wrong.
         if (ArtOf(artPath) is { Length: > 0 } picture
             && !Shared(picture)
+            && !Spoken(picture, based)
             && _byArt.TryGetValue(picture, out double byArt))
         {
             return byArt;
@@ -352,8 +358,39 @@ public sealed class PriceBook
             return exact;
         }
 
+        // A NAME WE HAVE IS THE LAST WORD - see Spoken, which says it for both doors.
+        //
+        // _drawnBy already counts claimants from the ITEM table rather than the surviving lines,
+        // which closes the case where a variant's price is gated out. The hole left was the case
+        // where the source never mentions the variant at all: measured live, poe.ninja carries
+        // all three tiers of Exalted, Chaos and Regal - so those pictures read as shared and this
+        // never fires - but of the Augmentation and Transmutation families it lists ONLY the
+        // Perfect one. One claimant made the picture look unambiguous, and every plain Orb of
+        // Augmentation in a stash took the Perfect orb's price.
+        //
+        // Of thirty-four real currencies checked against that live answer, thirty were priced by
+        // name and the four that reached the picture fallback were all wrong, so refusing here
+        // costs nothing that was right. The fallback below still serves an item whose name did
+        // not resolve, which is what it was written for.
+        if (Spoken(picture, name))
+        {
+            return null;
+        }
+
         return !Shared(picture) && _byArt.TryGetValue(picture, out double one) ? one : null;
     }
+
+    /// <summary>
+    /// Whether a picture must keep quiet because the item carrying it has a name.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME RULE AT BOTH DOORS. <see cref="Fungible"/> and <see cref="Worth"/> read one table
+    /// through two entrances, and <see cref="StashWorth.Unit"/> asks the first and falls through
+    /// to the second - so closing only one left every mispriced orb walking in through the other.
+    /// The fix survived its own test run that way once.
+    /// </remarks>
+    private bool Spoken(string picture, string? name)
+        => name is { Length: > 0 } && _drawnBy.ContainsKey(picture);
 
     /// <summary>Whether more than one thing draws this picture, so the picture alone is not a price.</summary>
     public bool Shared(string? picture)
