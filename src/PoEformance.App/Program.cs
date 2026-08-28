@@ -814,14 +814,16 @@ internal static class Program
         Console.WriteLine($"quests   {quests.Opening}");
 
         handle.Stage = "loading item names";
-        var stash = new PoEformance.Features.StashInspector(
-            reader,
-            schema,
-            gameStatesStatic,
-            PoEformance.Game.Items.ItemNames.Load(
-                FindDataFile("item-stats.json"),
-                FindDataFile("item-names.json"),
-                FindDataFile("unique_ivi_name_map.tsv")));
+
+        // HELD RATHER THAN BUILT INLINE, because the stash is no longer the only reader: the
+        // rates page names the rows its index has never heard of from the same table, and loading
+        // five thousand entries a second time to answer the same questions would be silly.
+        PoEformance.Game.Items.ItemNames itemNames = PoEformance.Game.Items.ItemNames.Load(
+            FindDataFile("item-stats.json"),
+            FindDataFile("item-names.json"),
+            FindDataFile("unique_ivi_name_map.tsv"));
+
+        var stash = new PoEformance.Features.StashInspector(reader, schema, gameStatesStatic, itemNames);
 
         // What things are worth. OFF until somebody switches it on in the stash window - and
         // more firmly than the pictures, because there is no local copy of a price to prefer:
@@ -1235,7 +1237,7 @@ internal static class Program
             () => tradeSession.Probe(stash.League, CancellationToken.None),
             exchange);
         overlay.AttachWealth(wealth, stash, prices, exchange);
-        overlay.AttachRates(exchange, scout, () => stash.League);
+        overlay.AttachRates(exchange, scout, () => stash.League, itemNames.Base);
         overlay.AttachRitual(
             ritual,
             () => atlas.RitualWorth,
