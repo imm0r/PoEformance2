@@ -517,8 +517,68 @@ public sealed class EntityBrowserWindow
 
         DrawSkills(table, one);
         DrawModifiers(table, one);
+        DrawRest(one);
 
         ImGui.Separator();
+    }
+
+    /// <summary>
+    /// The rest of the row: the shape of the thing, and the columns still holding row numbers.
+    /// </summary>
+    /// <remarks>
+    /// FOLDED, because these are the fields somebody goes looking for rather than reads at a
+    /// glance - and half of them are numbers pointing into tables this build does not carry.
+    /// They are shown anyway, with a # to say so: a field that is loaded and never drawn is
+    /// indistinguishable from one that was never carried, and the next person wanting
+    /// MonsterType would go and export it again.
+    /// </remarks>
+    private static void DrawRest(MonsterVariety one)
+    {
+        if (!ImGui.TreeNode("the rest of the row"))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGuiText.Mono(
+                DimText,
+                $"  size {one.Size}   model {one.ModelSize}%   poise "
+                + one.Poise.ToString("0.###", CultureInfo.InvariantCulture));
+
+            // AttackCrit holds 0, 1 or 2 - a kind, not a chance. Drawn as a bare number for
+            // exactly that reason: a percent sign here would be an invented statistic.
+            ImGuiText.Mono(DimText, $"  crit kind {one.Crit}   blood #{one.Blood}   type #{one.Type}");
+
+            if (one.Tags is { Count: > 0 })
+            {
+                ImGuiText.Mono(DimText, $"  tags  {string.Join(", ", one.Tags.Select(tag => "#" + tag))}");
+            }
+
+            if (one.Base is { Length: > 0 })
+            {
+                ImGuiText.Mono(DimText, "  base  " + one.Base);
+            }
+
+            // The league bases live here - AbyssMonsterBase, SanctumMonsterBase - which is what
+            // makes this column worth drawing despite pointing outside this table.
+            foreach (string parent in one.Inherits ?? [])
+            {
+                ImGuiText.Mono(DimText, "  from  " + parent);
+            }
+
+            if (one.Tags is { Count: > 0 } || one.Type > 0)
+            {
+                ImGuiText.Wrapped(
+                    DimText,
+                    "  # is a row number in a table this build does not carry, so it has no "
+                    + "name yet. Exporting Tags and MonsterTypes would give these words.");
+            }
+        }
+        finally
+        {
+            ImGui.TreePop();
+        }
     }
 
     /// <summary>

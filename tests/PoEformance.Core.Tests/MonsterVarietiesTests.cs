@@ -311,6 +311,42 @@ public sealed class MonsterVarietiesTests
     }
 
     [Fact]
+    public void EVERYCOLUMNTheGeneratorKeepsSurvivesTheRoundTrip()
+    {
+        // WHAT THIS CATCHES: a column quietly lost between the generator and here. Renaming a
+        // JSON property on one side only leaves the field at its default, which for an int is 0
+        // and for a list is null - and a browser drawing "type #0" looks like data rather than
+        // like a field that stopped arriving. Each of these is 100% filled in the shipped table,
+        // so a zero is never legitimate.
+        MonsterVariety? one = Shipped().Find("Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium");
+        Assert.NotNull(one);
+
+        Assert.Equal("Risen Farmhand", one.Name);
+        Assert.True(one.Type > 0, "MonsterType");
+        Assert.True(one.Speed > 0, "MovementSpeed");
+        Assert.True(one.Size > 0, "ObjectSize");
+        Assert.True(one.ModelSize > 0, "ModelSizeMultiplier");
+        Assert.True(one.MinAttack > 0, "MinimumAttackDistance");
+        Assert.True(one.MaxAttack > 0, "MaximumAttackDistance");
+        Assert.True(one.MinAggro > 0, "MinAgroRange");
+        Assert.True(one.MaxAggro > 0, "MaxAgroRange");
+        Assert.True(one.Xp > 0, "ExperienceMultiplier");
+        Assert.True(one.Damage > 0, "DamageMultiplier");
+        Assert.True(one.Life > 0, "LifeMultiplier");
+        Assert.True(one.AttackSpeed > 0, "AttackSpeed");
+        Assert.True(one.Blood > 0, "BloodType");
+        Assert.True(one.Poise > 0d, "PoiseThreshold");
+        Assert.NotNull(one.Tags);
+        Assert.NotEmpty(one.Tags);
+        Assert.NotNull(one.Base);
+
+        // Two from the partly-filled set, which need a monster that really has them - the
+        // zombie has neither, and asserting them on it would only pin a wrong assumption.
+        Assert.Equal("stance8", Shipped().Find("Metadata/Monsters/ApparitionBoss/SilentSpiresApparition")?.Stance);
+        Assert.NotEmpty(Shipped().Find("Metadata/Monsters/MaggotHusks/MaggotHuskStrongbox")?.Inherits ?? []);
+    }
+
+    [Fact]
     public void THETABLESaysWhenItWasBuilt()
     {
         // A monster table is a snapshot of one patch, and the way a stale one fails is that new
