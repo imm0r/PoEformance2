@@ -21,8 +21,8 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class PreloadAlertWindow
 {
-    private static readonly Vector4 Dim = OverlayTheme.Quiet;
-    private static readonly Vector4 Good = new(0.55f, 0.9f, 0.65f, 1f);
+    private static readonly Vector4 Dim = OverlayInk.Quiet;
+    private static readonly Vector4 Good = OverlayInk.Good;
 
     private const ImGuiColorEditFlags ColourFlags =
         ImGuiColorEditFlags.NoInputs | ImGuiColorEditFlags.NoLabel;

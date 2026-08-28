@@ -19,10 +19,10 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class ProjectileWindow
 {
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
-    private static readonly Vector4 WarnText = new(1f, 0.7f, 0.35f, 1f);
-    private static readonly Vector4 MineText = new(0.4f, 0.88f, 1f, 1f);
-    private static readonly Vector4 OtherText = new(1f, 0.55f, 0.4f, 1f);
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
+    private static readonly Vector4 WarnText = OverlayInk.Warn;
+    private static readonly Vector4 MineText = OverlayInk.Friendly;
+    private static readonly Vector4 OtherText = OverlayInk.Hostile;
 
     private readonly ProjectileLayer _layer;
     private readonly ProjectileWatch _watch;

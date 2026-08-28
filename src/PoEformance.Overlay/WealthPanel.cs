@@ -47,10 +47,10 @@ public sealed class WealthPanel
     /// </remarks>
     public static readonly TimeSpan Stale = TimeSpan.FromMinutes(5);
 
-    private static readonly Vector4 Up = new(0.55f, 0.85f, 0.45f, 1f);
-    private static readonly Vector4 Down = new(0.92f, 0.45f, 0.40f, 1f);
-    private static readonly Vector4 Flat = new(0.72f, 0.70f, 0.65f, 1f);
-    private static readonly Vector4 Line = new(0.85f, 0.68f, 0.34f, 1f);
+    private static readonly Vector4 Up = OverlayInk.Good;
+    private static readonly Vector4 Down = OverlayInk.Bad;
+    private static readonly Vector4 Flat = OverlayInk.Quiet;
+    private static readonly Vector4 Line = OverlayInk.Accent;
 
     /// <summary>Whether the panel is wanted at all - the user's setting.</summary>
     public bool Enabled { get; set; }

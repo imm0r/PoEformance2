@@ -20,10 +20,10 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class QuestWindow
 {
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
-    private static readonly Vector4 GoodText = new(0.55f, 0.9f, 0.65f, 1f);
-    private static readonly Vector4 WarnText = new(1f, 0.6f, 0.35f, 1f);
-    private static readonly Vector4 ActText = new(0.75f, 0.8f, 0.95f, 1f);
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
+    private static readonly Vector4 GoodText = OverlayInk.Good;
+    private static readonly Vector4 WarnText = OverlayInk.Warn;
+    private static readonly Vector4 ActText = OverlayInk.Measured;
 
     private readonly QuestWatch _watch;
     private string _search = string.Empty;

@@ -205,6 +205,39 @@ process. ImGui via the native cimgui binding is unproblematic.
 - Tests run on any OS, against synthetic memory or recordings — a test that needs
   the game running is a manual checklist item, not a test.
 
+### The interface's own appearance
+
+A colour the tool writes *meaning* in has exactly one home: `OverlayInk`, in the Features
+layer. Not in the Overlay layer beside ImGui, for the same reason `InterfaceStyle.Tinted`
+is not — a palette is arithmetic about how the tool looks, nothing about it needs a render
+thread to be reasoned about, and a rule that can be argued with in a test is worth more
+than one that can only be argued with in a screenshot. `OverlayTheme` decides which of
+ImGui's slots each ink goes into, and nothing else; a slot there names an ink or a stop on
+the ink's own ramp, never a new colour.
+
+That split is a correction. There were twenty-two private copies of these colours across
+the overlay — six oranges for a warning, three greens for "good", two rarity ladders that
+disagreed, and a live readout writing its quiet text in a *cold* grey where every other
+window used a warm one. Nobody chose any of that; each was chosen once, beside the last
+one nobody could see.
+
+Two rules hold it together, and both are checked in `OverlayInkTests` rather than asserted
+in prose:
+
+- **Every ink is readable on what it is drawn on** — the panel *and* the band under a
+  picked row. The second is where this started: at the old selection colour the game's
+  unique orange sat at 2.2:1, which is not a dim name but an unreadable one, on the row
+  somebody had just clicked. The band was pulled down the warm ramp until the game's own
+  darkest colour cleared 3:1 on it.
+- **How far apart is far enough is the game's number, not ours** — the floor for the three
+  status inks is the distance between the game's unique and currency colours, the tightest
+  pair a player is already expected to tell apart at a glance.
+
+Spacing follows the same idea one step over: `InterfaceMetrics` makes every padding and gap
+a ratio of the text size rather than a constant tuned by eye at 18px, since that size is
+adjustable from 12 to 30. Every ratio reproduces today's pixel value at 18, so at the
+default nothing moves at all.
+
 ## Building and running
 
 ```bash

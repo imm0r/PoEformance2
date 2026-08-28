@@ -32,8 +32,8 @@ public sealed class CostWindow
         (CostPhase.Other, "other"),
     ];
 
-    private static readonly Vector4 DimText = OverlayTheme.Quiet;
-    private static readonly Vector4 WorstText = new(1f, 0.62f, 0.35f, 1f);
+    private static readonly Vector4 DimText = OverlayInk.Quiet;
+    private static readonly Vector4 WorstText = OverlayInk.Warn;
 
     private readonly CostHistory _history;
     private bool _thisMapOnly = true;

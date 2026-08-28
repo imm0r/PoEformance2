@@ -21,10 +21,10 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class RatesWindow
 {
-    private static readonly Vector4 Up = new(0.55f, 0.85f, 0.45f, 1f);
-    private static readonly Vector4 Down = new(0.92f, 0.45f, 0.40f, 1f);
-    private static readonly Vector4 Money = new(1f, 0.83f, 0.42f, 1f);
-    private static readonly Vector4 Warn = new(1f, 0.72f, 0.3f, 1f);
+    private static readonly Vector4 Up = OverlayInk.Good;
+    private static readonly Vector4 Down = OverlayInk.Bad;
+    private static readonly Vector4 Money = OverlayInk.Money;
+    private static readonly Vector4 Warn = OverlayInk.Warn;
 
     /// <summary>How many rows are drawn. The rest are counted.</summary>
     /// <remarks>
@@ -76,7 +76,7 @@ public sealed class RatesWindow
         if (pairs.Count == 0)
         {
             ImGuiText.Wrapped(
-                OverlayTheme.Quiet,
+                OverlayInk.Quiet,
                 _exchange.Busy
                     ? "Reading the exchange..."
                     : "Nothing read yet.");
@@ -92,7 +92,7 @@ public sealed class RatesWindow
         var better = routes.ToDictionary(route => route.Path, StringComparer.Ordinal);
 
         ImGuiText.Wrapped(
-            OverlayTheme.Quiet,
+            OverlayInk.Quiet,
             $"{pairs.Count} currencies in {pairs.League} from the game's own exchange, priced "
             + $"against {Short(pairs.Pivot)} because that is what the league trades in"
             + (index.Count > 0
@@ -136,17 +136,17 @@ public sealed class RatesWindow
         if (!asking)
         {
             ImGuiText.Wrapped(
-                OverlayTheme.Quiet,
+                OverlayInk.Quiet,
                 "off - it is two public feeds, neither needing a sign-in: the game's own exchange "
                 + "once an hour, and the index once every two hours, a category at a time.");
             return false;
         }
 
-        ImGui.TextColored(_exchange.Busy ? Warn : OverlayTheme.Quiet,
+        ImGui.TextColored(_exchange.Busy ? Warn : OverlayInk.Quiet,
             _exchange.Busy ? "reading the exchange..." : _exchange.Status);
 
         ImGuiText.Wrapped(
-            _scout.Busy ? Warn : OverlayTheme.Quiet,
+            _scout.Busy ? Warn : OverlayInk.Quiet,
             _scout.Busy ? "reading the index..." : _scout.Status);
 
         return true;
@@ -202,7 +202,7 @@ public sealed class RatesWindow
 
         if (rows.Count == 0)
         {
-            ImGuiText.Wrapped(OverlayTheme.Quiet, "Nothing matches.");
+            ImGuiText.Wrapped(OverlayInk.Quiet, "Nothing matches.");
             return;
         }
 
@@ -274,14 +274,14 @@ public sealed class RatesWindow
                 // is simply what a currency has there - see ExchangePairs.Ordinary.
                 ImGui.TableNextColumn();
                 ImGuiText.Mono(
-                    pairs.Ordinary(worth) ? Money : OverlayTheme.Quiet, StashWorth.Money(worth.Exalted));
+                    pairs.Ordinary(worth) ? Money : OverlayInk.Quiet, StashWorth.Money(worth.Exalted));
 
                 ImGui.TableNextColumn();
                 Week(index, path);
 
                 ImGui.TableNextColumn();
                 ImGuiText.Mono(
-                    rate > 0 ? OverlayTheme.Quiet : Warn,
+                    rate > 0 ? OverlayInk.Quiet : Warn,
                     rate > 0 ? StashWorth.Money(rate) : "-");
 
                 // HOW THE VALUE WAS REACHED, when that is worth remarking on. This column used
@@ -329,7 +329,7 @@ public sealed class RatesWindow
 
         if (rows.Count > MostRows)
         {
-            ImGuiText.Wrapped(OverlayTheme.Quiet, $"{rows.Count - MostRows} more not shown.");
+            ImGuiText.Wrapped(OverlayInk.Quiet, $"{rows.Count - MostRows} more not shown.");
         }
     }
 
@@ -358,7 +358,7 @@ public sealed class RatesWindow
     {
         if (!index.TryGetValue(path, out ScoutEntry entry) || entry.Trend is not { } moved)
         {
-            ImGuiText.Mono(OverlayTheme.Quiet, "-");
+            ImGuiText.Mono(OverlayInk.Quiet, "-");
             return;
         }
 
