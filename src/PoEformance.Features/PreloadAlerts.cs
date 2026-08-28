@@ -79,6 +79,61 @@ public static class PreloadAlerts
     /// <summary>The colour an entry gets when nobody chose one - packed ABGR, opaque white.</summary>
     public const uint Plain = 0xFFFFFFFF;
 
+    /// <summary>What the game uses to pack several paths into one entry.</summary>
+    private static readonly char[] Joined = [';', '|'];
+
+    /// <summary>
+    /// Every path one loaded line actually names - the line itself, and each part of it.
+    /// </summary>
+    /// <remarks>
+    /// A LINE IS NOT ALWAYS ONE PATH, measured across five captured areas: 279 of 4,376 distinct
+    /// lines pack two or three together with a semicolon or a pipe, like
+    ///
+    ///   Art/.../WaygateDeviceMaraketh.tgt|Metadata/.../Maraketh_MaterialOverride.tmo;Metadata/...
+    ///
+    /// and 105 Metadata paths exist ONLY inside such a line. Matching whole lines makes those
+    /// impossible to watch and invisible in the "In this area" tab - not wrong, just permanently
+    /// absent, which is the failure mode this file already argues is the worst kind.
+    ///
+    /// THE WHOLE LINE IS KEPT AS WELL as its parts, so a list built before this still matches.
+    /// A row added from the area tab carries the compound line verbatim, and dropping it would
+    /// silently break exactly the lists that were built the way the tool tells people to.
+    ///
+    /// Backslashes become slashes on the way through. Only two lines in five areas use them -
+    /// Metadata\Doodads\Maps\Mesa\MMSA_DeadGrass01.dlp is one - but a path that differs from its
+    /// watch entry by a slash matches nothing and explains nothing.
+    /// </remarks>
+    public static IEnumerable<string> Names(string? line)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            yield break;
+        }
+
+        string whole = Same(line);
+        if (whole.Length == 0)
+        {
+            yield break;
+        }
+
+        yield return whole;
+
+        if (whole.IndexOfAny(Joined) < 0)
+        {
+            yield break;
+        }
+
+        foreach (string part in whole.Split(
+                     Joined, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            yield return part;
+        }
+    }
+
+    /// <summary>One path in the spelling both sides are compared in.</summary>
+    public static string Same(string? path)
+        => string.IsNullOrWhiteSpace(path) ? string.Empty : path.Replace('\\', '/').Trim();
+
     /// <summary>
     /// Which entries the area turned out to hold, in the list's own order.
     /// </summary>
@@ -107,7 +162,7 @@ public static class PreloadAlerts
         var found = new List<PreloadAlertEntry>();
         foreach (PreloadAlertEntry entry in entries)
         {
-            if (entry is { Enabled: true, SaysNothing: false } && here.Contains(entry.Path))
+            if (entry is { Enabled: true, SaysNothing: false } && here.Contains(Same(entry.Path)))
             {
                 found.Add(entry);
             }
@@ -132,7 +187,15 @@ public static class PreloadAlerts
             return null;
         }
 
-        var here = new HashSet<string>(loaded, StringComparer.OrdinalIgnoreCase);
+        var here = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (string line in loaded)
+        {
+            foreach (string name in Names(line))
+            {
+                here.Add(name);
+            }
+        }
+
         return here.Count > 0 ? here : null;
     }
 
@@ -143,7 +206,7 @@ public static class PreloadAlerts
     /// indistinguishable from an area that simply does not have the thing.
     /// </remarks>
     public static bool Here(string? path, IReadOnlySet<string>? loaded)
-        => !string.IsNullOrWhiteSpace(path) && loaded is not null && loaded.Contains(path);
+        => !string.IsNullOrWhiteSpace(path) && loaded is not null && loaded.Contains(Same(path));
 
     /// <summary>The line written to disk for a found entry.</summary>
     /// <remarks>
@@ -336,7 +399,9 @@ public static class PreloadAlertStore
         var kept = new List<PreloadAlertEntry>(entries.Count);
         foreach (PreloadAlertEntry entry in entries)
         {
-            if (entry is not null && !entry.SaysNothing && seen.Add(entry.Path))
+            // By the spelling the matching uses, so a hand-edited file carrying the same path once
+            // with slashes and once with backslashes does not draw the same line twice.
+            if (entry is not null && !entry.SaysNothing && seen.Add(PreloadAlerts.Same(entry.Path)))
             {
                 kept.Add(entry);
             }
