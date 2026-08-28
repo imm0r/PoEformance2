@@ -81,15 +81,21 @@ public static class CurrencyPurse
     /// one line is holding an implausible count, or carrying a price that is not what that
     /// currency trades at, and the reader can see WHICH in a second.
     ///
-    /// GROUPED BY THE KEY IT IS PRICED ON - the art path - so the same currency in the backpack
-    /// and in a tab is one line rather than two, and two DIFFERENT currencies can never become
-    /// one. Grouping by the displayed name looks equivalent and is not: a name is what a table
-    /// resolved, so two things the table has not heard of, or has heard of under one word, would
-    /// merge into a single line carrying one of their prices and both of their counts - which is
-    /// exactly the kind of wrong figure this list exists to expose.
+    /// GROUPED BY THE PICTURE AND THE NAME TOGETHER, which is the pair it is priced on. The
+    /// picture alone was the key, on the reasoning that two different currencies can never draw
+    /// the same one. PoE2 says otherwise: an orb, its Greater and its Perfect variant share one
+    /// art file and the game paints the tier as an overlay. Five families do it - Transmutation,
+    /// Augmentation, Regal, Exalted, Chaos - so a stash holding 3,357 plain Orbs of Transmutation,
+    /// 425 Greater and 114 Perfect came out as ONE line reading 3,896, beside whichever of the
+    /// three unit prices was written last. The count was real and the row was a fiction.
     ///
-    /// One line per art also makes the count comparable to what the game's own tab shows, which
-    /// is the check somebody actually performs.
+    /// The name ALONE is still not the key, for the reason the old remark gave: a name is what a
+    /// table resolved, so two things it has not heard of would merge. Both together are safe -
+    /// same picture and same name is the same currency - and it is the same pair the price book
+    /// keys on, so a row can never group differently from the way it was valued.
+    ///
+    /// One line per currency also keeps the count comparable to what the game's own tab shows,
+    /// which is the check somebody actually performs - and the tab shows the tiers apart.
     ///
     /// UNPRICED LINES ARE IN IT, at the bottom with a null unit. They contribute nothing to the
     /// total, and leaving them out would hide the other half of "is this right" - a purse whose
@@ -113,9 +119,13 @@ public static class CurrencyPurse
             {
                 InspectedItem item = slot.Item;
 
-                // The art is the pricing key; the path is the fallback for an item whose picture
-                // did not read, which must still be its OWN line rather than joining another's.
-                string key = item.Art.Length > 0 ? item.Art : item.Path;
+                // The art AND the name, because the art alone is not an identity - see above. The
+                // path is the fallback for an item whose picture did not read, which must still be
+                // its OWN line rather than joining another's; a NUL joins the two halves so no
+                // name can be made to read as a different picture's key.
+                string key = item.Art.Length > 0
+                    ? $"{item.Art}\0{item.Called}"
+                    : item.Path;
                 int stack = Math.Max(1, item.Stack);
                 double? unit = book.Unit(item, trade);
 

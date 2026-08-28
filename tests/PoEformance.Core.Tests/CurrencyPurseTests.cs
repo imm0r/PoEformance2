@@ -42,11 +42,12 @@ public class CurrencyPurseTests
         return book;
     }
 
-    // The base NAME is derived from the path rather than a constant, because the breakdown
-    // groups by art and labels by name - a fixture where every item is called the same thing
-    // hides a grouping bug instead of catching one.
+    // The base NAME comes from the SHIPPED table, exactly as the game reader fills it. It used to
+    // be the path's own last segment, which is distinct per item - enough to catch a grouping bug,
+    // and never equal to anything a price book calls a line. That was invisible while the picture
+    // alone could answer for a price and became every test at once the day it could not.
     private static InspectedItem Item(string path, string art, int stack = 1)
-        => new(1, path, path[(path.LastIndexOf('/') + 1)..], string.Empty, string.Empty,
+        => new(1, path, TestNames.Shipped.Base(path), string.Empty, string.Empty,
             -1, null, stack, 0, art, [], []);
 
     private static StashPage Page(InventoryKind kind, params InspectedItem[] items)
