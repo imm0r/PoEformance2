@@ -17,11 +17,13 @@ namespace PoEformance.Game.Entities;
 /// <see cref="Crit"/> is the trap in that set. It is called AttackCrit and holds 0, 1 or 2 - it
 /// is a kind, not a chance - so anything drawing it as "0%" would be inventing a statistic.
 ///
-/// SEVERAL FIELDS ARE ROW NUMBERS, not names: <see cref="Type"/>, <see cref="Tags"/>,
-/// <see cref="Effects"/>, <see cref="Mods"/>, <see cref="Mods2"/>, <see cref="SpecialMods"/>,
-/// <see cref="Blood"/> and <see cref="Quest"/> all point into tables this repository does not
-/// carry. They are kept as numbers so the join can be added without a re-export - see the
-/// generator at scripts/monster-varieties.py.
+/// EVERY FIELD HERE THAT IS A ROW NUMBER STAYS ONE, even the resolved ones. <see cref="Type"/>,
+/// <see cref="Tags"/>, <see cref="Effects"/>, <see cref="Mods"/>, <see cref="Mods2"/> and
+/// <see cref="SpecialMods"/> now have tables to resolve against, and the names live beside them
+/// on <see cref="MonsterVarieties"/> rather than replacing them - the number is the game's own
+/// identity, and the next table keyed on it joins without another export.
+/// <see cref="Blood"/> and <see cref="Quest"/> still have nowhere to point; QuestFlags is read
+/// from the game's memory rather than shipped, so that one resolves at runtime or not at all.
 /// </remarks>
 /// <param name="Name">
 /// What the game calls it. Absent on the 24 rows whose name is a bracketed placeholder.
@@ -101,6 +103,30 @@ public sealed record ModifierMeaning(
     [property: JsonPropertyName("stats")] IReadOnlyList<ModifierStat>? Stats = null);
 
 /// <summary>
+/// The defensive block the game hangs on a monster's TYPE rather than on the monster.
+/// </summary>
+/// <remarks>
+/// THIS IS WHERE ARMOUR ACTUALLY LIVES. MonsterVarieties has a MonsterArmour column of its own
+/// and it is filled on 16 rows of 2734 - reading it and concluding the game does not store
+/// monster armour would be wrong twice over. The real values sit one join away, on the type:
+/// Armour on 44% of the types in use, Evasion on 30%, EnergyShieldFromLife on 23%.
+///
+/// <see cref="Resistances"/> is a row number again, into a table that is not here.
+/// </remarks>
+/// <param name="Id">
+/// What the type is called - LumberingDead, YamaBoss, IgnagdukBogWitch. It names the monster,
+/// which is what makes the alignment of this table checkable at all.
+/// </param>
+public sealed record MonsterKind(
+    [property: JsonPropertyName("id")] string Id = "",
+    [property: JsonPropertyName("armour")] int Armour = 0,
+    [property: JsonPropertyName("evasion")] int Evasion = 0,
+    [property: JsonPropertyName("energyShield")] int EnergyShield = 0,
+    [property: JsonPropertyName("spread")] int Spread = 0,
+    [property: JsonPropertyName("summoned")] bool Summoned = false,
+    [property: JsonPropertyName("resistances")] IReadOnlyList<int>? Resistances = null);
+
+/// <summary>
 /// The game's monster table, keyed by the path an entity carries.
 /// </summary>
 /// <remarks>
@@ -132,21 +158,29 @@ public sealed class MonsterVarieties
         new Dictionary<string, MonsterVariety>(StringComparer.OrdinalIgnoreCase),
         new Dictionary<int, string>(),
         new Dictionary<int, ModifierMeaning>(),
+        new Dictionary<int, string>(),
+        new Dictionary<int, MonsterKind>(),
         string.Empty);
 
     private readonly IReadOnlyDictionary<string, MonsterVariety> _byPath;
     private readonly IReadOnlyDictionary<int, string> _skills;
     private readonly IReadOnlyDictionary<int, ModifierMeaning> _modifiers;
+    private readonly IReadOnlyDictionary<int, string> _tags;
+    private readonly IReadOnlyDictionary<int, MonsterKind> _types;
 
     private MonsterVarieties(
         IReadOnlyDictionary<string, MonsterVariety> byPath,
         IReadOnlyDictionary<int, string> skills,
         IReadOnlyDictionary<int, ModifierMeaning> modifiers,
+        IReadOnlyDictionary<int, string> tags,
+        IReadOnlyDictionary<int, MonsterKind> types,
         string generated)
     {
         _byPath = byPath;
         _skills = skills;
         _modifiers = modifiers;
+        _tags = tags;
+        _types = types;
         Generated = generated;
     }
 
@@ -211,7 +245,26 @@ public sealed class MonsterVarieties
                 }
             }
 
-            return new MonsterVarieties(byPath, skills, modifiers, file.Generated ?? string.Empty);
+            var tags = new Dictionary<int, string>(file.Tags?.Count ?? 0);
+            foreach ((string row, string name) in file.Tags ?? [])
+            {
+                if (int.TryParse(row, System.Globalization.CultureInfo.InvariantCulture, out int at))
+                {
+                    tags[at] = name;
+                }
+            }
+
+            var types = new Dictionary<int, MonsterKind>(file.Types?.Count ?? 0);
+            foreach ((string row, MonsterKind kind) in file.Types ?? [])
+            {
+                if (int.TryParse(row, System.Globalization.CultureInfo.InvariantCulture, out int at))
+                {
+                    types[at] = kind;
+                }
+            }
+
+            return new MonsterVarieties(
+                byPath, skills, modifiers, tags, types, file.Generated ?? string.Empty);
         }
         catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
         {
@@ -254,6 +307,41 @@ public sealed class MonsterVarieties
                 : "#" + row.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
     }
+
+    /// <summary>How many tags carry a name. Zero when the reference table was not exported.</summary>
+    public int NamedTags => _tags.Count;
+
+    /// <summary>
+    /// What the game tags this monster as, named where a name is known.
+    /// </summary>
+    /// <remarks>
+    /// This is the column GameHelper2 reads to decide whether a thing is a Beast: humanoid,
+    /// human, undead, construct, beast and demon all live here, and a monster may carry several.
+    ///
+    /// It is NOT a way to tell which league mechanic an area has. The table carries
+    /// delve_monster, blight_monster, legion_monster, incursion_monster and breach_monster_fire
+    /// among others, and not one monster in the game carries any of them - they are PoE1 rows
+    /// left behind, the same trap Data/Balance/PreloadGroups.dat turned out to be. Only sanctum
+    /// (77 monsters), expedition (30), azmeri (23), affliction (19), precursor (12) and
+    /// sanctified (10) are real.
+    /// </remarks>
+    public IEnumerable<string> TagsOf(MonsterVariety? one)
+    {
+        foreach (int row in one?.Tags ?? [])
+        {
+            string name = Tag(row);
+            yield return name.Length > 0
+                ? name
+                : "#" + row.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+    }
+
+    /// <summary>What the game calls this tag row, or empty when it is not known.</summary>
+    public string Tag(int row) => _tags.TryGetValue(row, out string? name) ? name : string.Empty;
+
+    /// <summary>The defensive block for this monster's type, or null.</summary>
+    public MonsterKind? Kind(MonsterVariety? one)
+        => one is not null && _types.TryGetValue(one.Type, out MonsterKind? kind) ? kind : null;
 
     /// <summary>Every modifier this monster carries that resolved to something.</summary>
     /// <remarks>
@@ -314,6 +402,12 @@ internal sealed class MonsterVarietyFile
 
     [JsonPropertyName("modifiers")]
     public Dictionary<string, ModifierMeaning>? Modifiers { get; init; }
+
+    [JsonPropertyName("tags")]
+    public Dictionary<string, string>? Tags { get; init; }
+
+    [JsonPropertyName("types")]
+    public Dictionary<string, MonsterKind>? Types { get; init; }
 }
 
 /// <summary>Source-generated JSON, so the monster table survives Native AOT.</summary>

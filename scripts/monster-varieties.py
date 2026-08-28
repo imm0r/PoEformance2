@@ -11,11 +11,12 @@ fresh export to find out whether a missing field was dropped on purpose or lost.
 Run it after exporting the tables from the game files:
 
     python3 scripts/monster-varieties.py MonsterVarieties.csv data/monster-varieties.json \
-        --skills GrantedEffects.csv --mods Mods.csv --stats Stats.csv
+        --skills GrantedEffects.csv --mods Mods.csv --stats Stats.csv \
+        --tags Tags.csv --types MonsterTypes.csv
 
-The three reference tables are OPTIONAL and each one is independent. Without
-them the numbers still ship and the browser shows them as numbers, which is what
-it did before they were available; with them the same numbers also carry a name.
+The reference tables are OPTIONAL and each one is independent. Without them the
+numbers still ship and the browser shows them as numbers, which is what it did
+before they were available; with them the same numbers also carry a name.
 
 THE INDICES ARE 0-BASED, and that is measured rather than assumed. An off-by-one
 resolves every skill to its neighbour, which is the kind of wrong that reads as
@@ -25,15 +26,25 @@ settles it is that a named boss's skills carry the boss's own name - Yama gets
 GSYamaChaosCloud and YamaSoulrend at 0-based, and DTTPaleFishman at 1-based. The
 generator checks that on every run and refuses to write a table that fails it.
 
-WHAT IS STILL NOT RESOLVED. Tags and MonsterType point at tables that are not
-here yet, so they stay as numbers. The row number is kept for the resolved
-columns too, rather than replaced by the name: it is the game's own identity for
-that skill, and a later table keyed on it can still be joined without another
-export.
+The row number is kept alongside every name rather than replaced by it: it is
+the game's own identity for that skill, tag or type, and a later table keyed on
+it can still be joined without another export.
+
+WHAT THE TAG TABLE IS NOT. It carries a tag for most PoE1 league mechanics -
+delve_monster, blight_monster, legion_monster, incursion_monster,
+breach_monster_fire and more - and ZERO monsters carry any of them. They are
+legacy rows GGG never removed, the same trap Data/Balance/PreloadGroups.dat
+turned out to be. Only sanctum_monster (77), expedition_monster (30),
+azmeri_cultist_monster (23), affliction_daemon (19), precursor_monster (12) and
+sanctified_monster (10) are real, so a mechanic cannot be read off this column
+in general. What it IS good for is the classification GameHelper2 also takes
+from it: humanoid, human, undead, construct, beast and demon, plus movement
+speed, melee/caster/ranged and blood type.
 """
 
 import csv
 import json
+import re
 import sys
 from datetime import datetime, timezone
 
@@ -226,6 +237,115 @@ def prove_alignment(monsters, named):
             )
 
 
+def tag_names(monsters, tags):
+    """Row number to tag id, for the rows monsters actually use - 185 of 1327."""
+    wanted = set()
+    for one in monsters.values():
+        wanted.update(one.get("tags", []))
+
+    named = {}
+    for row in sorted(wanted):
+        if 0 <= row < len(tags):
+            ident = (tags[row].get("Id") or "").strip()
+            if ident:
+                named[str(row)] = ident
+    return named
+
+
+def prove_tags(monsters, named):
+    """A zombie is tagged a zombie, or the tag table is misaligned.
+
+    Same shape of check as the skills, and it needs to be: shifted by one the
+    Risen Farmhand's six tags go from undead/zombie/melee to beast/skeleton/rodent,
+    all of which are real tags on real monsters and none of which is obviously
+    wrong until you know what a Risen Farmhand is.
+    """
+    one = monsters.get("Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium")
+    if one is None:
+        return
+
+    got = {named.get(str(row), "") for row in one.get("tags", [])}
+    for expected in ("undead", "zombie"):
+        if expected not in got:
+            raise SystemExit(
+                f"tag table looks misaligned: a Risen Farmhand is not tagged {expected!r}. "
+                f"It has {sorted(got)}."
+            )
+
+
+def type_stats(monsters, types):
+    """Row number to the defensive block the game hangs on a monster's TYPE.
+
+    This is where Armour, Evasion and EnergyShieldFromLife live - MonsterVarieties
+    itself carries a MonsterArmour column that is filled on 16 of 2734 rows and is
+    not the answer.
+    """
+    wanted = {one.get("type", 0) for one in monsters.values()}
+
+    named = {}
+    for row in sorted(wanted):
+        if not 0 <= row < len(types):
+            continue
+
+        entry = types[row]
+        ident = (entry.get("Id") or "").strip()
+        if not ident:
+            continue
+
+        got = {"id": ident}
+        for column, short in (
+            ("Armour", "armour"),
+            ("Evasion", "evasion"),
+            ("EnergyShieldFromLife", "energyShield"),
+            ("DamageSpread", "spread"),
+        ):
+            value = number((entry.get(column) or "").strip())
+            if value:
+                got[short] = value
+
+        if (entry.get("IsSummoned") or "").strip().lower() == "true":
+            got["summoned"] = True
+
+        resistances = [number(p) for p in parts(entry.get("MonsterResistances") or "")]
+        resistances = [r for r in resistances if r]
+        if resistances:
+            got["resistances"] = resistances
+
+        named[str(row)] = got
+
+    return named
+
+
+def prove_types(monsters, named):
+    """A monster's type is named after the monster, or the type table is misaligned.
+
+    Measured: the type id shares a word with the monster's own path on 88% of rows,
+    and on 55% when the table is shifted by one - the baseline is high because
+    neighbouring types belong to the same family, which is exactly why the check is
+    a proportion rather than a single lookup.
+    """
+    hits = seen = 0
+    for path, one in monsters.items():
+        ident = named.get(str(one.get("type", -1)), {}).get("id", "")
+        if not ident:
+            continue
+
+        seen += 1
+        last = path.rsplit("/", 1)[-1]
+        if _words(ident) & _words(last):
+            hits += 1
+
+    if seen and hits * 4 < seen * 3:
+        raise SystemExit(
+            f"type table looks misaligned: only {hits} of {seen} monsters ({100 * hits // seen}%) "
+            "have a type named after them. A correct table measured 88%, a shifted one 55%."
+        )
+
+
+def _words(text):
+    return set(re.findall(r"[A-Z][a-z]+", text))
+
+
 def mod_meanings(monsters, mods, stats):
     """Row number to what the modifier is called and which stats it sets."""
     wanted = set()
@@ -282,7 +402,7 @@ def drop_filler(monsters, mods):
 def main():
     argv = sys.argv[1:]
     extra = {}
-    for flag in ("--skills", "--mods", "--stats"):
+    for flag in ("--skills", "--mods", "--stats", "--tags", "--types"):
         if flag in argv:
             at = argv.index(flag)
             extra[flag[2:]] = argv[at + 1]
@@ -297,6 +417,8 @@ def main():
     skills = read(extra["skills"]) if "skills" in extra else []
     mods = read(extra["mods"]) if "mods" in extra else []
     stats = read(extra["stats"]) if "stats" in extra else []
+    tags = read(extra["tags"]) if "tags" in extra else []
+    types = read(extra["types"]) if "types" in extra else []
 
     named_skills = skill_names(monsters, skills) if skills else {}
     if named_skills:
@@ -305,11 +427,21 @@ def main():
     named_mods = mod_meanings(monsters, mods, stats) if mods and stats else {}
     drop_filler(monsters, mods)
 
+    named_tags = tag_names(monsters, tags) if tags else {}
+    if named_tags:
+        prove_tags(monsters, named_tags)
+
+    named_types = type_stats(monsters, types) if types else {}
+    if named_types:
+        prove_types(monsters, named_types)
+
     payload = {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": "MonsterVarieties, exported from the game's data tables",
         "skills": named_skills,
         "modifiers": named_mods,
+        "tags": named_tags,
+        "types": named_types,
         "monsters": monsters,
     }
 
@@ -318,7 +450,10 @@ def main():
         handle.write("\n")
 
     total = len(monsters)
-    print(f"{total} monsters, {len(named_skills)} skills named, {len(named_mods)} modifiers named")
+    print(
+        f"{total} monsters, {len(named_skills)} skills, {len(named_mods)} modifiers, "
+        f"{len(named_tags)} tags, {len(named_types)} types"
+    )
     fields = {}
     for one in monsters.values():
         for key in one:

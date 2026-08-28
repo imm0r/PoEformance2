@@ -472,6 +472,17 @@ public sealed class EntityBrowserWindow
     /// Nothing is drawn for an entity the table has never heard of - a chest, an effect, a
     /// waypoint - so this costs a non-monster exactly one dictionary miss.
     /// </remarks>
+    /// <summary>
+    /// The tags worth putting on the first line, out of the 185 in use.
+    /// </summary>
+    /// <remarks>
+    /// The same six GameHelper2 derives its MonsterCategory from, and for the same reason: they
+    /// say what a thing IS. A monster may carry several - a werewolf is humanoid and beast at
+    /// once - which is why this is a filter over the list rather than a lookup for one value.
+    /// </remarks>
+    private static readonly string[] Kinds =
+        ["humanoid", "human", "undead", "construct", "beast", "demon", "eldritch", "golem"];
+
     private void DrawTable(string path)
     {
         MonsterVarieties table = _monsters?.Invoke() ?? MonsterVarieties.Empty;
@@ -488,6 +499,44 @@ public sealed class EntityBrowserWindow
         else if (one.Boss)
         {
             ImGuiText.Mono(KnownText, "(boss)");
+        }
+
+        // WHAT KIND OF THING IT IS, from the tags. These six are the ones GameHelper2 reads for
+        // the same purpose, and they are the half of the tag list somebody actually wants at a
+        // glance - the rest is movement speed, on-hit audio and attribute exclusions.
+        string[] kinds =
+        [
+            .. table.TagsOf(one).Where(tag => Kinds.Contains(tag, StringComparer.Ordinal)),
+        ];
+
+        if (kinds.Length > 0)
+        {
+            ImGuiText.Mono(DimText, string.Join(", ", kinds));
+        }
+
+        // ARMOUR AND EVASION LIVE ON THE TYPE, not on the monster. The row's own MonsterArmour
+        // column is filled on 16 of 2734 rows, so reading that one and concluding the game does
+        // not store monster armour would be wrong twice over.
+        MonsterKind? kind = table.Kind(one);
+        if (kind is not null && (kind.Armour > 0 || kind.Evasion > 0 || kind.EnergyShield > 0))
+        {
+            var defence = new System.Text.StringBuilder();
+            if (kind.Armour > 0)
+            {
+                defence.Append($"armour {kind.Armour}  ");
+            }
+
+            if (kind.Evasion > 0)
+            {
+                defence.Append($"evasion {kind.Evasion}  ");
+            }
+
+            if (kind.EnergyShield > 0)
+            {
+                defence.Append($"energy shield {kind.EnergyShield}");
+            }
+
+            ImGuiText.Mono(DimText, defence.ToString().TrimEnd());
         }
 
         // MULTIPLIERS ARE CALLED MULTIPLIERS. The table's Life/Damage/XP sit at a median of
@@ -517,7 +566,7 @@ public sealed class EntityBrowserWindow
 
         DrawSkills(table, one);
         DrawModifiers(table, one);
-        DrawRest(one);
+        DrawRest(table, one);
 
         ImGui.Separator();
     }
@@ -532,7 +581,7 @@ public sealed class EntityBrowserWindow
     /// indistinguishable from one that was never carried, and the next person wanting
     /// MonsterType would go and export it again.
     /// </remarks>
-    private static void DrawRest(MonsterVariety one)
+    private static void DrawRest(MonsterVarieties table, MonsterVariety one)
     {
         if (!ImGui.TreeNode("the rest of the row"))
         {
@@ -548,11 +597,30 @@ public sealed class EntityBrowserWindow
 
             // AttackCrit holds 0, 1 or 2 - a kind, not a chance. Drawn as a bare number for
             // exactly that reason: a percent sign here would be an invented statistic.
-            ImGuiText.Mono(DimText, $"  crit kind {one.Crit}   blood #{one.Blood}   type #{one.Type}");
+            // Blood is still a row number: nothing shipped resolves it.
+            MonsterKind? kind = table.Kind(one);
+            ImGuiText.Mono(
+                DimText,
+                $"  crit kind {one.Crit}   blood #{one.Blood}   type "
+                + (kind is null ? "#" + one.Type.ToString(CultureInfo.InvariantCulture) : kind.Id));
 
-            if (one.Tags is { Count: > 0 })
+            if (kind is { Spread: > 0 })
             {
-                ImGuiText.Mono(DimText, $"  tags  {string.Join(", ", one.Tags.Select(tag => "#" + tag))}");
+                ImGuiText.Mono(DimText, $"  damage spread {kind.Spread}");
+            }
+
+            if (kind is { Summoned: true })
+            {
+                ImGuiText.Mono(DimText, "  summoned");
+            }
+
+            // THE FULL TAG LIST, not just the six on the first line. The rest is movement speed,
+            // attribute exclusions and on-hit audio - rarely what somebody came for, but the
+            // place they would look for it.
+            string[] all = [.. table.TagsOf(one)];
+            if (all.Length > 0)
+            {
+                ImGuiText.Wrapped(DimText, "  tags  " + string.Join(", ", all));
             }
 
             if (one.Base is { Length: > 0 })
@@ -565,14 +633,6 @@ public sealed class EntityBrowserWindow
             foreach (string parent in one.Inherits ?? [])
             {
                 ImGuiText.Mono(DimText, "  from  " + parent);
-            }
-
-            if (one.Tags is { Count: > 0 } || one.Type > 0)
-            {
-                ImGuiText.Wrapped(
-                    DimText,
-                    "  # is a row number in a table this build does not carry, so it has no "
-                    + "name yet. Exporting Tags and MonsterTypes would give these words.");
             }
         }
         finally
