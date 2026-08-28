@@ -1115,13 +1115,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// what makes the arbitrage column believable, so a state where the rates are read and the
     /// check is not is a state worth making unreachable.
     /// </remarks>
-    public void AttachRates(ExchangeStore exchange, ScoutStore scout, Func<string> league)
+    /// <param name="named">
+    /// What the game calls a metadata path, for the rows the index has no name for. Optional -
+    /// without it those rows read as their own path, which is what they did before.
+    /// </param>
+    public void AttachRates(
+        ExchangeStore exchange, ScoutStore scout, Func<string> league, Func<string, string>? named = null)
     {
         ArgumentNullException.ThrowIfNull(exchange);
         ArgumentNullException.ThrowIfNull(scout);
         ArgumentNullException.ThrowIfNull(league);
 
-        var window = new RatesWindow(exchange, scout, league);
+        var window = new RatesWindow(exchange, scout, league, named);
         _tools.Add(62, "rates", "Rates", window.DrawTab);
     }
 

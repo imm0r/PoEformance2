@@ -37,11 +37,21 @@ public sealed class RatesWindow
     private readonly ExchangeStore _exchange;
     private readonly ScoutStore _scout;
     private readonly Func<string> _league;
+    private readonly Func<string, string>? _named;
 
     private string _search = string.Empty;
     private bool _routesOnly;
 
-    public RatesWindow(ExchangeStore exchange, ScoutStore scout, Func<string> league)
+    /// <param name="named">
+    /// What the game calls a metadata path, for the rows the index has no name for.
+    /// </param>
+    /// <remarks>
+    /// A DELEGATE RATHER THAN THE TABLE ITSELF, so this stays clear of the layer the table lives
+    /// in and of how it is loaded. It is optional because the page is still worth drawing without
+    /// it - the rows it cannot name simply read as they did before.
+    /// </remarks>
+    public RatesWindow(
+        ExchangeStore exchange, ScoutStore scout, Func<string> league, Func<string, string>? named = null)
     {
         ArgumentNullException.ThrowIfNull(exchange);
         ArgumentNullException.ThrowIfNull(scout);
@@ -49,6 +59,7 @@ public sealed class RatesWindow
         _exchange = exchange;
         _scout = scout;
         _league = league;
+        _named = named;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -165,9 +176,17 @@ public sealed class RatesWindow
                 continue;
             }
 
-            string called = index.TryGetValue(path, out ScoutEntry named)
+            // THE INDEX FIRST, THEN THE GAME'S OWN TABLE, then the bare path. The index names
+            // most of it - 326 of 337 Standard currencies in a measured hour - and the shipped
+            // table named all eleven it did not: Panther Idol, Perfect Storm Rune, Medved's
+            // Felling and the like, which were reading as IdolPanther and RuneLightningPerfect.
+            //
+            // The order is not a preference. Across the 511 paths both sources name they disagree
+            // on NONE, so this only fills gaps; keeping the index in front means the label goes on
+            // matching the source the numbers beside it came from.
+            string called = index.TryGetValue(path, out ScoutEntry named) && named.Called.Length > 0
                 ? named.Called
-                : Short(path);
+                : Called(path);
 
             if (_search.Length > 0 && !called.Contains(_search, StringComparison.OrdinalIgnoreCase))
             {
@@ -469,6 +488,18 @@ public sealed class RatesWindow
         const float Air = 0.15f;
         var part = (float)((value - low) / range);
         return top + (tall * (1f - Air - (part * (1f - (2f * Air)))));
+    }
+
+    /// <summary>What to call a path the index had no name for.</summary>
+    /// <remarks>
+    /// The shipped table answers the path's own last segment when it has never heard of it, which
+    /// is the same string this would fall back to anyway - so a miss costs nothing and needs no
+    /// telling apart.
+    /// </remarks>
+    private string Called(string path)
+    {
+        string known = _named?.Invoke(path) ?? string.Empty;
+        return known.Length > 0 ? known : Short(path);
     }
 
     private static string Short(string path)

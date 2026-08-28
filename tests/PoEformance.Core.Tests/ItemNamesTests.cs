@@ -256,6 +256,51 @@ public class ItemNamesTests
         Assert.Equal(15, all.Count);
     }
 
+    [Fact]
+    public void ANDITNamesWhatThePriceIndexHasNeverHeardOf()
+    {
+        // THE ROWS THE RATES PAGE USED TO SHOW AS A PATH. Its labels come from the aggregated
+        // index, which names 326 of 337 Standard currencies - and the eleven it misses were
+        // reading as their own last segment. Every one of them is in this table, so the page now
+        // asks it before falling back to the path.
+        //
+        // These are the observed eleven, not a sample: if a regenerated table stops answering for
+        // any of them, a row silently goes back to reading like a file name.
+        //
+        // The FOLDERS are worth looking at, because a first draft of this test guessed them and
+        // seven of the eleven were wrong. Runes live under SoulCores; two support gems that were
+        // added in the same patch sit under "Gem" and "Gems" respectively. Nothing about a path
+        // here is derivable - which is the whole reason there is a table.
+        ItemNames names = Loaded();
+        (string Path, string Called)[] raw =
+        [
+            ("Metadata/Items/SoulCores/IdolPanther", "Panther Idol"),
+            ("Metadata/Items/SoulCores/IdolHawk", "Hawk Idol"),
+            ("Metadata/Items/SoulCores/EmergentVigour", "Emergent Vigour"),
+            ("Metadata/Items/Currency/Delirium/DeliriumPinnacleKey", "Raven's Reflection"),
+            ("Metadata/Items/Gem/SupportGemMedvedsFelling", "Medved's Felling"),
+            ("Metadata/Items/Gems/SupportGemEonyrsThunder", "Eonyr's Thunder"),
+            ("Metadata/Items/SoulCores/RuneEnhancePerfect", "Perfect Iron Rune"),
+            ("Metadata/Items/SoulCores/RuneLightningPerfect", "Perfect Storm Rune"),
+            ("Metadata/Items/SoulCores/RuneOfTheAncients21", "Rune of the Prism"),
+            ("Metadata/Items/SoulCores/RuneOfTheAncients22", "Rune of the Blossom"),
+            ("Metadata/Items/SoulCores/RuneWarpingOlrothsLegacy", "Aldur's Legacy"),
+        ];
+
+        var missing = new List<string>();
+        foreach ((string path, string called) in raw)
+        {
+            // The paths were read off a live exchange hour, so a wrong one here would fall back
+            // to its own segment and quietly pass a laxer check. Compare the NAME.
+            if (names.Base(path) != called)
+            {
+                missing.Add($"{path} -> {names.Base(path)} (wanted {called})");
+            }
+        }
+
+        Assert.True(missing.Count == 0, string.Join("\n", missing));
+    }
+
     private static IEnumerable<string> Bases()
     {
         // Straight off the shipped file, so this asks the same table the reader loads.
