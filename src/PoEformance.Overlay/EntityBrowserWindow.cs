@@ -474,7 +474,8 @@ public sealed class EntityBrowserWindow
     /// </remarks>
     private void DrawTable(string path)
     {
-        MonsterVariety? one = _monsters?.Invoke().Find(path);
+        MonsterVarieties table = _monsters?.Invoke() ?? MonsterVarieties.Empty;
+        MonsterVariety? one = table.Find(path);
         if (one is null)
         {
             return;
@@ -507,25 +508,6 @@ public sealed class EntityBrowserWindow
             ImGuiText.Mono(DimText, $"  {one.Stance}");
         }
 
-        // SKILLS AS A COUNT, because that is all this table can honestly give. GrantedEffects
-        // holds row numbers into a table this build does not carry, so the names are not
-        // available - but "67 skills" against "1 skill" is already the difference between a
-        // boss and a trash mob, and it is true today rather than after another export.
-        if (one.SkillCount > 0)
-        {
-            ImGuiText.Mono(
-                DimText,
-                one.SkillCount == 1 ? "1 skill" : $"{one.SkillCount} skills");
-
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip(
-                    "GrantedEffects rows: " + string.Join(", ", one.Effects ?? [])
-                    + "\n\nRow numbers rather than names - the table they point at is not\n"
-                    + "shipped with this build, so there is nothing to look them up in yet.");
-            }
-        }
-
         // THE QUEST FLAG, on the 68 monsters that carry one - every named campaign boss. It
         // says this kill advances a quest, not where anything is.
         if (one.Quest > 0)
@@ -533,7 +515,99 @@ public sealed class EntityBrowserWindow
             ImGuiText.Mono(UnknownText, $"quest step - QuestFlags row {one.Quest}");
         }
 
+        DrawSkills(table, one);
+        DrawModifiers(table, one);
+
         ImGui.Separator();
+    }
+
+    /// <summary>
+    /// What the monster can do, by name.
+    /// </summary>
+    /// <remarks>
+    /// FOLDED SHUT BY DEFAULT, because a boss carries sixty-seven of these and the browser's
+    /// left pane is a list of everything in the area. The header carries the count, which is
+    /// the part worth seeing without asking: one skill and sixty-seven are different animals.
+    ///
+    /// The skill names are the game's own internal ids rather than what a tooltip would say -
+    /// GSYamaChaosCloud, not "Chaos Cloud". They read well enough to be worth showing, and the
+    /// table that holds the pretty names is a different export again.
+    /// </remarks>
+    private static void DrawSkills(MonsterVarieties table, MonsterVariety one)
+    {
+        if (one.SkillCount == 0)
+        {
+            return;
+        }
+
+        string header = one.SkillCount == 1 ? "1 skill" : $"{one.SkillCount} skills";
+
+        // Named or not is worth saying in the header rather than leaving somebody to wonder
+        // why every line is a number: an unexported reference table and a monster whose skills
+        // are genuinely unknown look identical from the list alone.
+        if (table.NamedSkills == 0)
+        {
+            header += " (no names - the skill table was not exported)";
+        }
+
+        if (!ImGui.TreeNode(header))
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (string skill in table.Skills(one))
+            {
+                ImGuiText.Mono(skill.StartsWith('#') ? UnknownText : DimText, "  " + skill);
+            }
+        }
+        finally
+        {
+            ImGui.TreePop();
+        }
+    }
+
+    /// <summary>
+    /// The modifiers the game hangs on this kind, and the stats they set.
+    /// </summary>
+    /// <remarks>
+    /// This is the half that answers "why is this one different": MonsterUniqueT2Boss sets
+    /// monster_dropped_item_rarity_+% to 1600 and i_am_boss_of_tier to 2, and neither is
+    /// visible anywhere else in this tool.
+    ///
+    /// The empty slots are already gone - Mods2 is a fixed-width array whose filler row is
+    /// literally called "Nothing", and 29% of all modifier references pointed at it. They are
+    /// dropped when the table is built rather than here, so nothing downstream has to know.
+    /// </remarks>
+    private static void DrawModifiers(MonsterVarieties table, MonsterVariety one)
+    {
+        ModifierMeaning[] carried = [.. table.Modifiers(one)];
+        if (carried.Length == 0)
+        {
+            return;
+        }
+
+        if (!ImGui.TreeNode(carried.Length == 1 ? "1 modifier" : $"{carried.Length} modifiers"))
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (ModifierMeaning meaning in carried)
+            {
+                ImGuiText.Mono(KnownText, "  " + meaning.Id);
+                foreach (ModifierStat stat in meaning.Stats ?? [])
+                {
+                    ImGuiText.Mono(DimText, $"      {stat.Stat}  {stat.Range}");
+                }
+            }
+        }
+        finally
+        {
+            ImGui.TreePop();
+        }
     }
 
     private void DrawComponents(EntityView view, WorldEntity? chosen)

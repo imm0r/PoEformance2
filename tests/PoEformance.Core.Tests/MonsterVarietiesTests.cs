@@ -216,6 +216,100 @@ public sealed class MonsterVarietiesTests
             $"a boss should be far busier than a zombie; {boss.SkillCount} vs {mob.SkillCount}");
     }
 
+    [Theory]
+    [InlineData("Metadata/Monsters/YamaBoss/YamaBoss", "Yama")]
+    [InlineData("Metadata/Monsters/IgnagdukBogWitch/IgnagdukBogWitch", "Ignagduk")]
+    [InlineData("Metadata/Monsters/MudBurrower/MudBurrowerHeadBoss", "MudBurrower")]
+    public void ABOSSSSkillsAreNamedAfterTheBoss(string path, string word)
+    {
+        // THE CHECK THAT CATCHES AN OFF-BY-ONE, which is the only way this resolution can be
+        // wrong while looking entirely right. Shifted by one row every monster still gets a
+        // plausible skill - a zombie's "MeleeAtAnimationSpeed" becomes "MeleeAtAnimationSpeed2"
+        // and nothing about that reads as broken.
+        //
+        // What a shift cannot survive is the game naming a boss's skills after the boss.
+        // Ignagduk really does have GTIgnagdukBoneWall1, 2 and 3; shift the table and she gets
+        // GTBogShamanBoneWall1 and Yama gets DTTPaleFishman.
+        MonsterVarieties table = Shipped();
+        MonsterVariety? one = table.Find(path);
+
+        Assert.NotNull(one);
+        Assert.True(one.SkillCount > 3, $"{path} should be a boss with several skills");
+
+        string[] named = [.. table.Skills(one)];
+        int hits = named.Count(name => name.Contains(word, StringComparison.OrdinalIgnoreCase));
+
+        Assert.True(
+            hits * 2 > named.Length,
+            $"only {hits} of {named.Length} skills mention {word}: {string.Join(", ", named)}");
+    }
+
+    [Fact]
+    public void ATRASHMOBGetsTheSkillItReallyHas()
+    {
+        // The other end of the same measurement, and the one an off-by-one makes look fine. It
+        // is here so the boss check above is not the only thing standing between a shifted
+        // table and a shipped one.
+        MonsterVarieties table = Shipped();
+        MonsterVariety? zombie = table.Find("Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium");
+
+        Assert.NotNull(zombie);
+        Assert.Equal(["MeleeAtAnimationSpeed"], table.Skills(zombie));
+    }
+
+    [Fact]
+    public void AMODIFIERSaysWhatItSets()
+    {
+        // Modifiers are the half that answers "why is this one different", and they are only
+        // worth drawing if they arrive with their stats attached rather than as a bare id.
+        MonsterVarieties table = Shipped();
+        MonsterVariety? yama = table.Find("Metadata/Monsters/YamaBoss/YamaBoss");
+
+        Assert.NotNull(yama);
+
+        ModifierMeaning[] carried = [.. table.Modifiers(yama)];
+        Assert.NotEmpty(carried);
+        Assert.All(carried, one => Assert.NotEmpty(one.Id));
+
+        // The boss modifier, and the stat that says it is one.
+        ModifierMeaning? boss = carried.FirstOrDefault(
+            one => one.Stats?.Any(stat => stat.Stat == "i_am_boss_of_tier") == true);
+        Assert.NotNull(boss);
+    }
+
+    [Fact]
+    public void THEEMPTYMODIFIERSLOTSAreGone()
+    {
+        // Mods2 is a fixed-width array whose filler row is literally called "Nothing", and 29%
+        // of every modifier reference in the table pointed at it. Left in, a monster with one
+        // real modifier draws five blank lines under it.
+        MonsterVarieties table = Shipped();
+
+        MonsterVariety? zombie = table.Find("Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium");
+        Assert.NotNull(zombie);
+
+        ModifierMeaning[] carried = [.. table.Modifiers(zombie)];
+        Assert.NotEmpty(carried);
+        Assert.All(carried, one => Assert.NotEqual("Nothing", one.Id));
+
+        // And the one it really has, with the value the game gives it.
+        ModifierMeaning? stance = carried.FirstOrDefault(one => one.Id == "StanceMovementSpeed300");
+        Assert.NotNull(stance);
+        Assert.Equal("300", stance.Stats?.Single(s => s.Stat.Contains("movement_speed", StringComparison.Ordinal)).Range);
+    }
+
+    [Fact]
+    public void ANUNNAMEDSKILLStaysVisibleAsItsRow()
+    {
+        // A row with no name must not vanish. A monster with sixty-seven skills and forty names
+        // is a table that needs refreshing; one that quietly showed forty would look complete.
+        MonsterVarieties none = MonsterVarieties.Empty;
+        var one = new MonsterVariety(Effects: [7, 11]);
+
+        Assert.Equal(["#7", "#11"], none.Skills(one));
+        Assert.Equal(0, none.NamedSkills);
+    }
+
     [Fact]
     public void THETABLESaysWhenItWasBuilt()
     {

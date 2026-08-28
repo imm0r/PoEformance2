@@ -77,6 +77,29 @@ public sealed record MonsterVariety(
     public bool SaysSomething => Name is { Length: > 0 } || SkillCount > 0;
 }
 
+/// <summary>One stat a modifier sets, and the range it sets it to.</summary>
+/// <remarks>
+/// The export writes every value as a [min, max] pair and almost all of them are the same number
+/// twice. Both are kept anyway: a modifier that really does roll is not distinguishable from a
+/// fixed one once the second half is thrown away, and there is no second export to go back to.
+/// </remarks>
+public sealed record ModifierStat(
+    [property: JsonPropertyName("stat")] string Stat = "",
+    [property: JsonPropertyName("min")] int Min = 0,
+    [property: JsonPropertyName("max")] int Max = 0)
+{
+    /// <summary>The range as one readable value.</summary>
+    public string Range => Min == Max
+        ? Min.ToString(System.Globalization.CultureInfo.InvariantCulture)
+        : $"{Min.ToString(System.Globalization.CultureInfo.InvariantCulture)}"
+          + $"-{Max.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+}
+
+/// <summary>What one of a monster's modifier rows is called, and what it does.</summary>
+public sealed record ModifierMeaning(
+    [property: JsonPropertyName("id")] string Id = "",
+    [property: JsonPropertyName("stats")] IReadOnlyList<ModifierStat>? Stats = null);
+
 /// <summary>
 /// The game's monster table, keyed by the path an entity carries.
 /// </summary>
@@ -105,14 +128,25 @@ public sealed record MonsterVariety(
 public sealed class MonsterVarieties
 {
     /// <summary>Nothing known - what a missing or unreadable table produces.</summary>
-    public static MonsterVarieties Empty { get; } =
-        new(new Dictionary<string, MonsterVariety>(StringComparer.OrdinalIgnoreCase), string.Empty);
+    public static MonsterVarieties Empty { get; } = new(
+        new Dictionary<string, MonsterVariety>(StringComparer.OrdinalIgnoreCase),
+        new Dictionary<int, string>(),
+        new Dictionary<int, ModifierMeaning>(),
+        string.Empty);
 
     private readonly IReadOnlyDictionary<string, MonsterVariety> _byPath;
+    private readonly IReadOnlyDictionary<int, string> _skills;
+    private readonly IReadOnlyDictionary<int, ModifierMeaning> _modifiers;
 
-    private MonsterVarieties(IReadOnlyDictionary<string, MonsterVariety> byPath, string generated)
+    private MonsterVarieties(
+        IReadOnlyDictionary<string, MonsterVariety> byPath,
+        IReadOnlyDictionary<int, string> skills,
+        IReadOnlyDictionary<int, ModifierMeaning> modifiers,
+        string generated)
     {
         _byPath = byPath;
+        _skills = skills;
+        _modifiers = modifiers;
         Generated = generated;
     }
 
@@ -155,7 +189,29 @@ public sealed class MonsterVarieties
                 byPath[Same(id)] = one;
             }
 
-            return new MonsterVarieties(byPath, file.Generated ?? string.Empty);
+            // THE ROW NUMBER IS THE KEY, kept as the game's own rather than replaced by the
+            // name it resolves to. JSON has no integer keys, so the generator writes them as
+            // text and they are parsed back here; a row that will not parse is dropped rather
+            // than defaulted, because row 0 is a real skill and a silent 0 would name it.
+            var skills = new Dictionary<int, string>(file.Skills?.Count ?? 0);
+            foreach ((string row, string name) in file.Skills ?? [])
+            {
+                if (int.TryParse(row, System.Globalization.CultureInfo.InvariantCulture, out int at))
+                {
+                    skills[at] = name;
+                }
+            }
+
+            var modifiers = new Dictionary<int, ModifierMeaning>(file.Modifiers?.Count ?? 0);
+            foreach ((string row, ModifierMeaning meaning) in file.Modifiers ?? [])
+            {
+                if (int.TryParse(row, System.Globalization.CultureInfo.InvariantCulture, out int at))
+                {
+                    modifiers[at] = meaning;
+                }
+            }
+
+            return new MonsterVarieties(byPath, skills, modifiers, file.Generated ?? string.Empty);
         }
         catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
         {
@@ -168,6 +224,58 @@ public sealed class MonsterVarieties
     {
         string key = Same(entityPath);
         return key.Length > 0 && _byPath.TryGetValue(key, out MonsterVariety? one) ? one : null;
+    }
+
+    /// <summary>How many skills carry a name. Zero when the reference table was not exported.</summary>
+    public int NamedSkills => _skills.Count;
+
+    /// <summary>What the game calls this skill row, or empty when it is not known.</summary>
+    public string SkillName(int row) => _skills.TryGetValue(row, out string? name) ? name : string.Empty;
+
+    /// <summary>What this modifier row is called and what it sets, or null.</summary>
+    public ModifierMeaning? Modifier(int row)
+        => _modifiers.TryGetValue(row, out ModifierMeaning? meaning) ? meaning : null;
+
+    /// <summary>
+    /// This monster's skills, named where a name is known and numbered where it is not.
+    /// </summary>
+    /// <remarks>
+    /// A ROW WITH NO NAME STAYS VISIBLE, as "#4211" rather than being dropped. A monster with
+    /// sixty-seven skills and forty names is a table that needs refreshing; one that quietly
+    /// showed forty would look complete and be wrong.
+    /// </remarks>
+    public IEnumerable<string> Skills(MonsterVariety? one)
+    {
+        foreach (int row in one?.Effects ?? [])
+        {
+            string name = SkillName(row);
+            yield return name.Length > 0
+                ? name
+                : "#" + row.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+    }
+
+    /// <summary>Every modifier this monster carries that resolved to something.</summary>
+    /// <remarks>
+    /// The three columns are read as one list because nothing here distinguishes them: Mods,
+    /// Mods2 and Special_Mods all end up as rows of the same table, and which slot a modifier
+    /// arrived in says nothing about what it does.
+    /// </remarks>
+    public IEnumerable<ModifierMeaning> Modifiers(MonsterVariety? one)
+    {
+        if (one is null)
+        {
+            yield break;
+        }
+
+        foreach (int row in (one.Mods ?? []).Concat(one.Mods2 ?? []).Concat(one.SpecialMods ?? []))
+        {
+            ModifierMeaning? meaning = Modifier(row);
+            if (meaning is not null)
+            {
+                yield return meaning;
+            }
+        }
     }
 
     /// <summary>
@@ -199,6 +307,13 @@ internal sealed class MonsterVarietyFile
 
     [JsonPropertyName("monsters")]
     public Dictionary<string, MonsterVariety>? Monsters { get; init; }
+
+    /// <summary>Skill row number to what the game calls it. Row numbers are text - JSON keys.</summary>
+    [JsonPropertyName("skills")]
+    public Dictionary<string, string>? Skills { get; init; }
+
+    [JsonPropertyName("modifiers")]
+    public Dictionary<string, ModifierMeaning>? Modifiers { get; init; }
 }
 
 /// <summary>Source-generated JSON, so the monster table survives Native AOT.</summary>

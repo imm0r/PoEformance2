@@ -8,16 +8,28 @@ under 1%. Which columns survived is a MEASUREMENT rather than a preference, and
 without the script that made the cut the next person has to redo it against a
 fresh export to find out whether a missing field was dropped on purpose or lost.
 
-Run it after exporting the table from the game files:
+Run it after exporting the tables from the game files:
 
-    python3 scripts/monster-varieties.py MonsterVarieties.csv data/monster-varieties.json
+    python3 scripts/monster-varieties.py MonsterVarieties.csv data/monster-varieties.json \
+        --skills GrantedEffects.csv --mods Mods.csv --stats Stats.csv
 
-WHAT IS DELIBERATELY NOT RESOLVED. Tags, GrantedEffects, Mods, Mods2,
-Special_Mods and MonsterType are ROW INDICES into other tables, not names. They
-are carried through as numbers because the tables they point at are not in this
-repository; a monster's skills read as "[1195]" until GrantedEffects.dat is
-exported too. Carrying them costs little and means the join can be added later
-without re-exporting anything.
+The three reference tables are OPTIONAL and each one is independent. Without
+them the numbers still ship and the browser shows them as numbers, which is what
+it did before they were available; with them the same numbers also carry a name.
+
+THE INDICES ARE 0-BASED, and that is measured rather than assumed. An off-by-one
+resolves every skill to its neighbour, which is the kind of wrong that reads as
+right: a zombie's one skill is "MeleeAtAnimationSpeed" at 1195 and
+"MeleeAtAnimationSpeed2" at 1196, and nothing about either looks incorrect. What
+settles it is that a named boss's skills carry the boss's own name - Yama gets
+GSYamaChaosCloud and YamaSoulrend at 0-based, and DTTPaleFishman at 1-based. The
+generator checks that on every run and refuses to write a table that fails it.
+
+WHAT IS STILL NOT RESOLVED. Tags and MonsterType point at tables that are not
+here yet, so they stay as numbers. The row number is kept for the resolved
+columns too, rather than replaced by the name: it is the game's own identity for
+that skill, and a later table keyed on it can still be joined without another
+export.
 """
 
 import csv
@@ -154,19 +166,150 @@ def build(rows):
     return out
 
 
+def read(path):
+    with open(path, encoding="utf-8", errors="replace") as handle:
+        return list(csv.DictReader(handle))
+
+
+# The one mod row that means "this slot is empty". Mods2 is a fixed-width array
+# and 1023 of its 3553 references - 29% - point here, so keeping them would put
+# five "Nothing" lines under every monster that has one real modifier.
+FILLER = "Nothing"
+
+
+def skill_names(monsters, skills):
+    """Row number to skill id, for the rows monsters actually use.
+
+    Shipping all 8347 would be a third again as much file for rows nothing reads.
+    """
+    wanted = set()
+    for one in monsters.values():
+        wanted.update(one.get("effects", []))
+
+    named = {}
+    for row in sorted(wanted):
+        if 0 <= row < len(skills):
+            ident = (skills[row].get("Id") or "").strip()
+            if ident:
+                named[str(row)] = ident
+    return named
+
+
+def prove_alignment(monsters, named):
+    """A named boss's skills carry the boss's own name, or the table is misaligned.
+
+    THE CHECK THE WHOLE RESOLUTION RESTS ON. An index shifted by one still
+    produces a plausible skill for every monster, so nothing about a wrong table
+    looks wrong. What a shift cannot survive is that Ignagduk's skills are all
+    called GTIgnagduk-something: the game itself names them after their owner, and
+    that is a reference this script cannot talk itself out of.
+    """
+    checks = [
+        ("Metadata/Monsters/YamaBoss/YamaBoss", "Yama"),
+        ("Metadata/Monsters/IgnagdukBogWitch/IgnagdukBogWitch", "Ignagduk"),
+        ("Metadata/Monsters/MudBurrower/MudBurrowerHeadBoss", "MudBurrower"),
+    ]
+
+    for path, word in checks:
+        one = monsters.get(path)
+        if one is None:
+            continue
+
+        got = [named.get(str(row), "") for row in one.get("effects", [])]
+        hits = sum(1 for name in got if word.lower() in name.lower())
+        if not got:
+            continue
+        if hits * 2 < len(got):
+            raise SystemExit(
+                f"skill table looks misaligned: only {hits} of {len(got)} skills on {path} "
+                f"mention {word!r}. An off-by-one in the row numbering does exactly this."
+            )
+
+
+def mod_meanings(monsters, mods, stats):
+    """Row number to what the modifier is called and which stats it sets."""
+    wanted = set()
+    for one in monsters.values():
+        for key in ("mods", "mods2", "specialMods"):
+            wanted.update(one.get(key, []))
+
+    named = {}
+    for row in sorted(wanted):
+        if not 0 <= row < len(mods):
+            continue
+
+        entry = mods[row]
+        ident = (entry.get("Id") or "").strip()
+        if not ident or ident == FILLER:
+            continue
+
+        carried = []
+        for slot in range(1, 5):
+            at = (entry.get(f"Stat{slot}") or "").strip()
+            if not at.isdigit() or int(at) >= len(stats):
+                continue
+
+            low, high = 0, 0
+            values = parts(entry.get(f"Stat{slot}Value") or "")
+            if values:
+                low = number(values[0]) or 0
+                high = number(values[-1]) if len(values) > 1 else low
+            carried.append(
+                {"stat": (stats[int(at)].get("Id") or "").strip(), "min": low, "max": high or low}
+            )
+
+        named[str(row)] = {"id": ident, "stats": carried}
+
+    return named
+
+
+def drop_filler(monsters, mods):
+    """Take the empty slots out of every monster's modifier lists."""
+    if not mods:
+        return
+
+    empty = {row for row, entry in enumerate(mods) if (entry.get("Id") or "").strip() == FILLER}
+    for one in monsters.values():
+        for key in ("mods", "mods2", "specialMods"):
+            if key in one:
+                kept = [row for row in one[key] if row not in empty]
+                if kept:
+                    one[key] = kept
+                else:
+                    del one[key]
+
+
 def main():
-    if len(sys.argv) != 3:
+    argv = sys.argv[1:]
+    extra = {}
+    for flag in ("--skills", "--mods", "--stats"):
+        if flag in argv:
+            at = argv.index(flag)
+            extra[flag[2:]] = argv[at + 1]
+            del argv[at : at + 2]
+
+    if len(argv) != 2:
         print(__doc__)
         return 1
 
-    with open(sys.argv[1], encoding="utf-8", errors="replace") as handle:
-        rows = list(csv.DictReader(handle))
+    monsters = build(read(argv[0]))
 
-    monsters = build(rows)
+    skills = read(extra["skills"]) if "skills" in extra else []
+    mods = read(extra["mods"]) if "mods" in extra else []
+    stats = read(extra["stats"]) if "stats" in extra else []
+
+    named_skills = skill_names(monsters, skills) if skills else {}
+    if named_skills:
+        prove_alignment(monsters, named_skills)
+
+    named_mods = mod_meanings(monsters, mods, stats) if mods and stats else {}
+    drop_filler(monsters, mods)
 
     payload = {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": "MonsterVarieties, exported from the game's data tables",
+        "skills": named_skills,
+        "modifiers": named_mods,
         "monsters": monsters,
     }
 
@@ -175,7 +318,7 @@ def main():
         handle.write("\n")
 
     total = len(monsters)
-    print(f"{total} monsters from {len(rows)} rows")
+    print(f"{total} monsters, {len(named_skills)} skills named, {len(named_mods)} modifiers named")
     fields = {}
     for one in monsters.values():
         for key in one:
