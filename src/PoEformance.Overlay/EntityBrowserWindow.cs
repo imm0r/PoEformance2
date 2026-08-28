@@ -567,8 +567,6 @@ public sealed class EntityBrowserWindow
         DrawSkills(table, one);
         DrawModifiers(table, one);
         DrawRest(table, one);
-
-        ImGui.Separator();
     }
 
     /// <summary>
@@ -744,6 +742,22 @@ public sealed class EntityBrowserWindow
         }
     }
 
+    /// <summary>
+    /// The selected entity, in three folds.
+    /// </summary>
+    /// <remarks>
+    /// THREE SECTIONS RATHER THAN ONE SCROLL, and the split is by where the answer COMES FROM
+    /// rather than by what it is about. What the thing IS comes from the game's shipped tables
+    /// and is the same for every one of its kind; what it is CARRYING is read out of this one
+    /// entity's memory and changes while you watch; what it is MADE OF is the component layout,
+    /// which is a reverse-engineering view and not something to read at a glance.
+    ///
+    /// Mixing them cost the pane its shape: a monster with 22 stats and 18 components pushed its
+    /// own name off the top, so the half that identifies it was the half you had to scroll for.
+    ///
+    /// ImGui remembers each fold by id, so a section closed once stays closed across selections -
+    /// which is the point. Somebody reading stats all afternoon closes the other two once.
+    /// </remarks>
     private void DrawComponentsInto(EntityView view, WorldEntity? chosen)
     {
         if (view.Address == 0)
@@ -752,36 +766,29 @@ public sealed class EntityBrowserWindow
             return;
         }
 
-        ImGui.TextColored(PathText, view.Path);
-        ImGuiText.Mono(DimText, $"id {view.Id}  at 0x{view.Address:X}");
-
-        DrawTable(view.Path);
-
-        DrawHideButtons(view, chosen);
-
-        if (ImGui.SmallButton("dissect the entity"))
+        // ONE CALL PER SECTION, each owning its own fold. The shape matters: written as an
+        // early return out of a closed section, the last one has to be invoked from two places,
+        // and the next return added anywhere above it silently drops a third of the pane.
+        if (ImGui.CollapsingHeader("what this is", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            _dissect(view.Address, view.Path, "Entity");
+            ImGui.TextColored(PathText, view.Path);
+            ImGuiText.Mono(DimText, $"id {view.Id}  at 0x{view.Address:X}");
+            DrawTable(view.Path);
         }
 
-        if (_compare is not null)
+        DrawCarried(view);
+        DrawInnards(view, chosen);
+    }
+
+    /// <summary>
+    /// What this one entity has on it right now - read from its memory, not from a table.
+    /// </summary>
+    private void DrawCarried(EntityView view)
+    {
+        if (!ImGui.CollapsingHeader("what it is carrying", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.SameLine();
-            if (ImGui.SmallButton("compare with##entity"))
-            {
-                _compare(view.Address, view.Path);
-            }
-
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip(
-                    "Holds this entity BESIDE the one already in the dissector instead of\n"
-                    + "replacing it. Two of a kind read side by side separate what the species\n"
-                    + "is from what this one is - and they walk their pointers together.");
-            }
+            return;
         }
-
-        ImGui.Separator();
 
         // What is on this entity with a clock running. Here rather than in the world read
         // because it is a vector walk per entity - affordable for the one under the cursor,
@@ -852,9 +859,50 @@ public sealed class EntityBrowserWindow
                 ImGui.TextColored(DimText, $"  {stat.Id,6} = {stat.Value,-11}");
                 column++;
             }
-
-            ImGui.Separator();
         }
+    }
+
+    /// <summary>
+    /// What the entity is made of, and the four things that can be done to it.
+    /// </summary>
+    /// <remarks>
+    /// THE BUTTONS LIVE HERE, at the top, rather than under the identity block where they were.
+    /// All four reach past what a thing IS and into the machinery - hiding a kind, opening it in
+    /// the dissector, holding two side by side - so they belong with the component list they act
+    /// on rather than between a monster's name and its stats.
+    /// </remarks>
+    private void DrawInnards(EntityView view, WorldEntity? chosen)
+    {
+        if (!ImGui.CollapsingHeader("what it is made of", ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            return;
+        }
+
+        DrawHideButtons(view, chosen);
+
+        if (ImGui.SmallButton("dissect the entity"))
+        {
+            _dissect(view.Address, view.Path, "Entity");
+        }
+
+        if (_compare is not null)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("compare with##entity"))
+            {
+                _compare(view.Address, view.Path);
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(
+                    "Holds this entity BESIDE the one already in the dissector instead of\n"
+                    + "replacing it. Two of a kind read side by side separate what the species\n"
+                    + "is from what this one is - and they walk their pointers together.");
+            }
+        }
+
+        ImGui.Separator();
 
         if (view.Undescribed > 0)
         {
