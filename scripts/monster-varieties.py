@@ -12,7 +12,8 @@ Run it after exporting the tables from the game files:
 
     python3 scripts/monster-varieties.py MonsterVarieties.csv data/monster-varieties.json \
         --skills GrantedEffects.csv --mods Mods.csv --stats Stats.csv \
-        --tags Tags.csv --types MonsterTypes.csv
+        --tags Tags.csv --types MonsterTypes.csv \
+        --blood BloodTypes.csv --resistances MonsterResistances.csv
 
 The reference tables are OPTIONAL and each one is independent. Without them the
 numbers still ship and the browser shows them as numbers, which is what it did
@@ -346,6 +347,151 @@ def _words(text):
     return set(re.findall(r"[A-Z][a-z]+", text))
 
 
+def blood_names(monsters, bloods):
+    """Row number to blood type id, for the rows monsters actually use - 37 of 56."""
+    wanted = {one.get("blood", 0) for one in monsters.values()}
+
+    named = {}
+    for row in sorted(wanted):
+        if 0 <= row < len(bloods):
+            ident = (bloods[row].get("Id") or "").strip()
+            if ident:
+                named[str(row)] = ident
+    return named
+
+
+# Monsters whose blood type is known exactly, and what it must be. A Risen Farmhand is a
+# rotting corpse and bleeds RotBlood; Yama bleeds plain Blood.
+BLOOD_ANCHORS = {
+    "Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium": "RotBlood",
+    "Metadata/Monsters/YamaBoss/YamaBoss": "Blood",
+    # The self-verifying one: the game named this blood type after the monster that has it, the
+    # same way MonsterTypes names its rows. It is also the only anchor here whose row has a
+    # neighbour in every direction, so it is what catches a shift the other two sit through.
+    "Metadata/Monsters/Baron/BaronBossCorruptedWolfForm": "GeonorSpecificBlood",
+}
+
+
+def prove_blood(monsters, named):
+    """Named monsters resolve to exactly the blood they have, or the table is misaligned.
+
+    WHY EXACT NAMES AND NOT A WORD MATCH, which is what this check was first written as and why
+    it had to be replaced. 52 of the 56 rows have "blood" in their name, and the table is ordered
+    in near-duplicate runs - Blood, BloodNoDeathBlood, BloodNoCorpseStainEPK, then BugBlood,
+    BugBloodNoCorpseStainEPK. A check asking "does the name contain the word blood" is satisfied
+    by almost any row: shifted by one it still passed at 85%, and the file was written.
+
+    That is the exact failure this project warns about - a check a wrong value passes is worse
+    than no check, because it launders the wrong value as verified. Exact equality against a
+    monster whose blood is known cannot do that: shift either way and RotBlood becomes
+    InsectBloodNoCorpseStainEPK or RotBloodNoCorpseStainEPK, and both are simply not RotBlood.
+
+    The count check behind it is the other half: row 0 is plain Blood and 1092 monsters carry it,
+    more than any other, and no shift leaves the commonest row named Blood.
+    """
+    for path, expected in BLOOD_ANCHORS.items():
+        one = monsters.get(path)
+        if one is None or "blood" not in one:
+            continue
+
+        got = named.get(str(one["blood"]), "")
+        if got != expected:
+            raise SystemExit(
+                f"blood table looks misaligned: {path} should bleed {expected!r} and resolves "
+                f"to {got!r}."
+            )
+
+    carried = {}
+    for one in monsters.values():
+        if "blood" in one:
+            name = named.get(str(one["blood"]), "")
+            carried[name] = carried.get(name, 0) + 1
+
+    if carried:
+        commonest = max(carried, key=lambda name: carried[name])
+        if commonest != "Blood":
+            raise SystemExit(
+                f"blood table looks misaligned: the commonest blood type is {commonest!r} on "
+                f"{carried[commonest]} monsters, and it should be 'Blood'."
+            )
+
+
+def resistance_names(types, resistances):
+    """Row number to the resistance profile's name.
+
+    ONLY THE NAME. Each row also carries 32 numeric columns - Fire1..Fire5, Cold1..Cold5 and so
+    on, some of them arrays - and what the numbered tiers mean is not something this export
+    settles. MinorColdResist reads 30, 30, 30 across the first three and MajorColdResist reads
+    75, 60, 50, which is consistent with area tiers and with several other things. The name
+    already says what a reader wants; a number here under a guessed label would be the same
+    mistake as calling AttackSpeed a percentage.
+    """
+    wanted = set()
+    for one in types.values():
+        wanted.update(one.get("resistances", []))
+
+    named = {}
+    for row in sorted(wanted):
+        if 0 <= row < len(resistances):
+            ident = (resistances[row].get("Id") or "").strip()
+            if ident:
+                named[str(row)] = ident
+    return named
+
+
+def prove_resistances(monsters, types, named, tags):
+    """A fire-themed monster RESISTS fire rather than being weak to it.
+
+    ELEMENT AND POLARITY TOGETHER, which is what makes this discriminate at all. The table runs
+    in fours - MinorColdResist, MajorColdResist, MinorColdVuln, MajorColdVuln, then the same for
+    fire - so a shift of one keeps the element three times in four. Asking only "does it mention
+    cold" is nearly vacuous here, the same way the first blood check was.
+
+    Asking whether the monster RESISTS its own element separates cleanly, because half the shifts
+    turn a resistance into a vulnerability. Measured over the 346 monsters that are element-themed
+    and whose type carries a profile:
+
+        correct     77%
+        shifted -1  35%
+        shifted +1  53%
+
+    The floor is 65%, which no shift in either direction reaches.
+    """
+    if not tags:
+        return
+
+    elements = ("fire", "cold", "lightning", "chaos")
+    hits = seen = 0
+
+    for one in monsters.values():
+        kind = types.get(str(one.get("type", -1)))
+        if kind is None:
+            continue
+
+        carried = {tags.get(str(row), "") for row in one.get("tags", [])}
+        affinity = [element for element in elements if f"{element}_affinity" in carried]
+        if not affinity:
+            continue
+
+        profiles = [named.get(str(row), "").lower() for row in kind.get("resistances", [])]
+        profiles = [name for name in profiles if name]
+        if not profiles:
+            continue
+
+        seen += 1
+        if any(
+            element in name and "resist" in name for name in profiles for element in affinity
+        ):
+            hits += 1
+
+    if seen and hits * 20 < seen * 13:
+        raise SystemExit(
+            f"resistance table looks misaligned: only {hits} of {seen} element-themed monsters "
+            f"({100 * hits // seen}%) resist their own element. A correct table measured 77%, and "
+            "a shift measured 35% one way and 53% the other."
+        )
+
+
 def mod_meanings(monsters, mods, stats):
     """Row number to what the modifier is called and which stats it sets."""
     wanted = set()
@@ -402,7 +548,7 @@ def drop_filler(monsters, mods):
 def main():
     argv = sys.argv[1:]
     extra = {}
-    for flag in ("--skills", "--mods", "--stats", "--tags", "--types"):
+    for flag in ("--skills", "--mods", "--stats", "--tags", "--types", "--blood", "--resistances"):
         if flag in argv:
             at = argv.index(flag)
             extra[flag[2:]] = argv[at + 1]
@@ -419,6 +565,8 @@ def main():
     stats = read(extra["stats"]) if "stats" in extra else []
     tags = read(extra["tags"]) if "tags" in extra else []
     types = read(extra["types"]) if "types" in extra else []
+    bloods = read(extra["blood"]) if "blood" in extra else []
+    resistances = read(extra["resistances"]) if "resistances" in extra else []
 
     named_skills = skill_names(monsters, skills) if skills else {}
     if named_skills:
@@ -435,6 +583,14 @@ def main():
     if named_types:
         prove_types(monsters, named_types)
 
+    named_blood = blood_names(monsters, bloods) if bloods else {}
+    if named_blood:
+        prove_blood(monsters, named_blood)
+
+    named_resistances = resistance_names(named_types, resistances) if resistances else {}
+    if named_resistances:
+        prove_resistances(monsters, named_types, named_resistances, named_tags)
+
     payload = {
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": "MonsterVarieties, exported from the game's data tables",
@@ -442,6 +598,8 @@ def main():
         "modifiers": named_mods,
         "tags": named_tags,
         "types": named_types,
+        "blood": named_blood,
+        "resistances": named_resistances,
         "monsters": monsters,
     }
 
@@ -452,7 +610,8 @@ def main():
     total = len(monsters)
     print(
         f"{total} monsters, {len(named_skills)} skills, {len(named_mods)} modifiers, "
-        f"{len(named_tags)} tags, {len(named_types)} types"
+        f"{len(named_tags)} tags, {len(named_types)} types, {len(named_blood)} blood types, "
+        f"{len(named_resistances)} resistance profiles"
     )
     fields = {}
     for one in monsters.values():

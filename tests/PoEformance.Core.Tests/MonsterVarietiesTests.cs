@@ -474,6 +474,80 @@ public sealed class MonsterVarietiesTests
     }
 
     [Fact]
+    public void AROTTINGCORPSEBleedsRotBlood()
+    {
+        // EXACT NAMES, and the reason is a check of mine that had to be thrown away. This started
+        // as "does the resolved name contain the word blood" - which 52 of the 56 rows satisfy,
+        // because the table runs in near-duplicate families: Blood, BloodNoDeathBlood,
+        // BloodNoCorpseStainEPK, then BugBlood, BugBloodNoCorpseStainEPK. Shifted by one it still
+        // passed at 85%, and the generator happily wrote the file.
+        //
+        // Exact equality cannot do that: shift either way and RotBlood becomes
+        // InsectBloodNoCorpseStainEPK or RotBloodNoCorpseStainEPK, and neither is RotBlood.
+        MonsterVarieties table = Shipped();
+
+        Assert.Equal("RotBlood", table.BloodName(table.Find("Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium")));
+        Assert.Equal("Blood", table.BloodName(table.Find("Metadata/Monsters/YamaBoss/YamaBoss")));
+
+        // THE ANCHOR THAT CATCHES THE OTHER DIRECTION, and the reason there are three. The map
+        // ships only the 37 rows monsters use, so it is SPARSE: shifting it down leaves any row
+        // whose predecessor is absent untouched, and both anchors above sit on such rows. That
+        // corruption changed 26 of 37 entries and neither of them noticed.
+        //
+        // This one is on row 55, which has a neighbour in both directions - and it verifies
+        // itself besides: the game named the blood type after the monster that bleeds it.
+        Assert.Equal(
+            "GeonorSpecificBlood",
+            table.BloodName(table.Find("Metadata/Monsters/Baron/BaronBossCorruptedWolfForm")));
+    }
+
+    [Fact]
+    public void ATHEMEDMONSTERResistsItsOwnElement()
+    {
+        // The resistance table runs in fours - MinorColdResist, MajorColdResist, MinorColdVuln,
+        // MajorColdVuln, then the same for fire - so a shift keeps the ELEMENT three times in
+        // four. Asking only "does it mention cold" is nearly vacuous here for the same reason the
+        // first blood check was.
+        //
+        // Element AND polarity separates: half the shifts turn a resistance into a vulnerability.
+        // Measured over the element-themed monsters: 77% correct, 35% shifted one way, 53% the
+        // other. This asserts the floor the generator enforces.
+        MonsterVarieties table = Shipped();
+
+        string[] elements = ["fire", "cold", "lightning", "chaos"];
+        int hits = 0, seen = 0;
+
+        foreach (MonsterVariety one in Every(table))
+        {
+            var tags = table.TagsOf(one).ToHashSet(StringComparer.Ordinal);
+            string[] themed = [.. elements.Where(e => tags.Contains(e + "_affinity"))];
+            if (themed.Length == 0)
+            {
+                continue;
+            }
+
+            string[] profiles = [.. table.ResistancesOf(one).Where(name => !name.StartsWith('#'))];
+            if (profiles.Length == 0)
+            {
+                continue;
+            }
+
+            seen++;
+            if (profiles.Any(name => themed.Any(element =>
+                    name.Contains(element, StringComparison.OrdinalIgnoreCase)
+                    && name.Contains("Resist", StringComparison.OrdinalIgnoreCase))))
+            {
+                hits++;
+            }
+        }
+
+        Assert.True(seen > 100, $"only {seen} element-themed monsters carried a profile");
+        Assert.True(
+            hits * 20 >= seen * 13,
+            $"only {hits} of {seen} ({100 * hits / seen}%) resist their own element");
+    }
+
+    [Fact]
     public void THETABLESaysWhenItWasBuilt()
     {
         // A monster table is a snapshot of one patch, and the way a stale one fails is that new
