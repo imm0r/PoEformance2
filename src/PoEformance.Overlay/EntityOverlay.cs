@@ -5,6 +5,7 @@ using ImGuiNET;
 using PoEformance.Core.Diagnostics;
 using PoEformance.Features;
 using PoEformance.Game.Components;
+using PoEformance.Game.Entities;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
@@ -483,6 +484,28 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private AnimationNames _animations = AnimationNames.Empty;
+
+    /// <summary>
+    /// The game's monster table, for saying what a thing IS rather than where its files live.
+    /// </summary>
+    /// <remarks>
+    /// Same arrangement as <see cref="Animations"/>: loaded by whoever wires this up, and the
+    /// overlay only draws it. Absent, the browser shows what it always showed - a path.
+    ///
+    /// Read through this property rather than captured at construction, because the Attach calls
+    /// have no fixed order and a captured Empty would look exactly like a build with no table.
+    /// </remarks>
+    public MonsterVarieties Monsters
+    {
+        get => _monsters;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _monsters = value;
+        }
+    }
+
+    private MonsterVarieties _monsters = MonsterVarieties.Empty;
 
     // The trails belong to the LAYER's question rather than the reader's, so they are kept
     // here: a projectile's path across the screen is something only a thing that sees every
@@ -1251,7 +1274,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 {
                     _tools.Show(DissectorTab);
                 }
-            });
+            },
+            () => Monsters);
         _tools.Add(
             90, "entities", "Entity browser", () => window.DrawTab(_snapshot, _snapshot.Player),
             window.Idle, page: Entities, pageLabel: "Entities");

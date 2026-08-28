@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Core.Schema;
 using PoEformance.Features;
+using PoEformance.Game.Entities;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
@@ -39,6 +40,7 @@ public sealed class EntityBrowserWindow
     private readonly Action<ulong, string>? _compare;
     private readonly Action<ulong, float, float>? _route;
     private readonly Func<ulong, bool>? _routed;
+    private readonly Func<MonsterVarieties>? _monsters;
 
     /// <summary>Components unfolded to their fields, by name, kept across selections.</summary>
     /// <remarks>
@@ -73,13 +75,19 @@ public sealed class EntityBrowserWindow
     /// Nobody assembles one by copying addresses out of here by hand.
     /// </param>
     /// <param name="hiding">What the list has been told to leave out. See <see cref="EntityHiding"/>.</param>
+    /// <param name="monsters">
+    /// The game's monster table, asked for each frame rather than held, so a table wired up
+    /// after this window was built is still found. Optional: without it the browser shows what
+    /// it always showed.
+    /// </param>
     public EntityBrowserWindow(
         EntityInspector inspector,
         EntityHiding hiding,
         Action<ulong, string, string> dissect,
         Action<ulong, float, float>? route = null,
         Func<ulong, bool>? routed = null,
-        Action<ulong, string>? compare = null)
+        Action<ulong, string>? compare = null,
+        Func<MonsterVarieties>? monsters = null)
     {
         ArgumentNullException.ThrowIfNull(inspector);
         ArgumentNullException.ThrowIfNull(hiding);
@@ -90,6 +98,7 @@ public sealed class EntityBrowserWindow
         _route = route;
         _routed = routed;
         _compare = compare;
+        _monsters = monsters;
     }
 
     /// <summary>Draws the tab's content and publishes what it wants read next.</summary>
@@ -450,6 +459,83 @@ public sealed class EntityBrowserWindow
         _route(entity.Address, entity.WorldX, entity.WorldY);
     }
 
+    /// <summary>
+    /// What the game's own table says about the thing selected.
+    /// </summary>
+    /// <remarks>
+    /// ABOVE THE COMPONENTS, because it answers a different question than they do. A component
+    /// says what this ONE monster is doing right now; the table says what its KIND is - and that
+    /// half was never readable here at all. Until now a monster was a path and a rarity, so
+    /// "Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium" was the whole of what the browser
+    /// could say about it. It is a Risen Farmhand with one skill and 120% damage.
+    ///
+    /// Nothing is drawn for an entity the table has never heard of - a chest, an effect, a
+    /// waypoint - so this costs a non-monster exactly one dictionary miss.
+    /// </remarks>
+    private void DrawTable(string path)
+    {
+        MonsterVariety? one = _monsters?.Invoke().Find(path);
+        if (one is null)
+        {
+            return;
+        }
+
+        if (one.Name is { Length: > 0 })
+        {
+            ImGuiText.Mono(KnownText, one.Boss ? $"{one.Name}  (boss)" : one.Name);
+        }
+        else if (one.Boss)
+        {
+            ImGuiText.Mono(KnownText, "(boss)");
+        }
+
+        // MULTIPLIERS ARE CALLED MULTIPLIERS. The table's Life/Damage/XP sit at a median of
+        // about 110 with 100 as the baseline, so they are percentages of a base this row does
+        // not carry - 120 is "a fifth more than its kind", not 120 life.
+        ImGuiText.Mono(DimText, $"life {one.Life}%  damage {one.Damage}%  xp {one.Xp}%");
+
+        // Deliberately unlabelled units - see MonsterVariety. Speed and attack speed are
+        // plainly not percentages, and this table cannot say what they are.
+        ImGuiText.Mono(
+            DimText,
+            $"speed {one.Speed}  attack {one.AttackSpeed}  reach {one.MinAttack}-{one.MaxAttack}"
+            + $"  aggro {one.MinAggro}-{one.MaxAggro}");
+
+        if (one.Stance is { Length: > 0 })
+        {
+            ImGui.SameLine();
+            ImGuiText.Mono(DimText, $"  {one.Stance}");
+        }
+
+        // SKILLS AS A COUNT, because that is all this table can honestly give. GrantedEffects
+        // holds row numbers into a table this build does not carry, so the names are not
+        // available - but "67 skills" against "1 skill" is already the difference between a
+        // boss and a trash mob, and it is true today rather than after another export.
+        if (one.SkillCount > 0)
+        {
+            ImGuiText.Mono(
+                DimText,
+                one.SkillCount == 1 ? "1 skill" : $"{one.SkillCount} skills");
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(
+                    "GrantedEffects rows: " + string.Join(", ", one.Effects ?? [])
+                    + "\n\nRow numbers rather than names - the table they point at is not\n"
+                    + "shipped with this build, so there is nothing to look them up in yet.");
+            }
+        }
+
+        // THE QUEST FLAG, on the 68 monsters that carry one - every named campaign boss. It
+        // says this kill advances a quest, not where anything is.
+        if (one.Quest > 0)
+        {
+            ImGuiText.Mono(UnknownText, $"quest step - QuestFlags row {one.Quest}");
+        }
+
+        ImGui.Separator();
+    }
+
     private void DrawComponents(EntityView view, WorldEntity? chosen)
     {
         ImGui.BeginChild("components", new Vector2(0f, 0f), ImGuiChildFlags.Borders);
@@ -474,6 +560,8 @@ public sealed class EntityBrowserWindow
 
         ImGui.TextColored(PathText, view.Path);
         ImGuiText.Mono(DimText, $"id {view.Id}  at 0x{view.Address:X}");
+
+        DrawTable(view.Path);
 
         DrawHideButtons(view, chosen);
 

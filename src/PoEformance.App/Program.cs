@@ -1272,6 +1272,11 @@ internal static class Program
         overlay.Animations = PoEformance.Game.Components.AnimationNames.Load(
             FindDataFile("animations.tsv"));
 
+        // What a monster IS, beside what it is doing. Keyed on the entity's own path, so the
+        // browser can name a thing the moment it is selected - see MonsterVarieties.
+        overlay.Monsters = PoEformance.Game.Entities.MonsterVarieties.Load(
+            FindDataFile("monster-varieties.json"));
+
         overlay.Costs = costs;
         overlay.Coverage = coverage;
         overlay.Damage = damage;
