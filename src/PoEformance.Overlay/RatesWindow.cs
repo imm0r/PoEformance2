@@ -187,9 +187,27 @@ public sealed class RatesWindow
             return;
         }
 
+        // A COLUMN THAT CANNOT SAY ANYTHING IS NOT DRAWN, decided from the rows about to be shown
+        // rather than from the league. Both of these are alive in an active league and dead in
+        // Standard, and the difference is structural rather than a bad hour - measured against a
+        // live six hours:
+        //
+        //   via   names a hop through something other than the league's money. Standard prices
+        //         everything through Divine, which IS its money, so nothing is ever unusual.
+        //   loop  needs a second deep route beside the direct one. Of 359 Standard currencies,
+        //         74 have a deep market against Divine, 28 of those the index agrees with, and
+        //         exactly ONE has a second deep route at all - so nothing survives to compare.
+        //         Runes of Aldur: 651, 162, 28, 20 with a route, 7 loops paying over two percent.
+        //
+        // So neither can be deleted without costing a league its arbitrage, and neither should
+        // occupy a column in Standard. Hiding the empty one does both.
+        List<(string Path, string Called, Valuation Worth, double Book)> shown = [.. rows.Take(MostRows)];
+        bool anyVia = shown.Exists(row => !pairs.Ordinary(row.Worth));
+        bool anyLoop = shown.Exists(row => better.ContainsKey(row.Path));
+
         if (!ImGui.BeginTable(
                 "rates",
-                6,
+                4 + (anyVia ? 1 : 0) + (anyLoop ? 1 : 0),
                 ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY))
         {
             return;
@@ -202,11 +220,20 @@ public sealed class RatesWindow
             ImGui.TableSetupColumn("in exalted");
             ImGui.TableSetupColumn("7 days");
             ImGui.TableSetupColumn("book");
-            ImGui.TableSetupColumn("via");
-            ImGui.TableSetupColumn("loop");
+
+            if (anyVia)
+            {
+                ImGui.TableSetupColumn("via");
+            }
+
+            if (anyLoop)
+            {
+                ImGui.TableSetupColumn("loop");
+            }
+
             ImGui.TableHeadersRow();
 
-            foreach ((string path, string called, Valuation worth, double rate) in rows.Take(MostRows))
+            foreach ((string path, string called, Valuation worth, double rate) in shown)
             {
                 ImGui.TableNextRow();
 
@@ -242,10 +269,19 @@ public sealed class RatesWindow
                 // to carry the arbitrage route's middle - blank on every row that had no loop,
                 // which is nearly all of them - and then it carried every hop, which in Standard
                 // meant the same word on all eighty rows, because a hop through Divine is what
-                // pricing anything there looks like. Now it names only the UNUSUAL detour.
-                ImGui.TableNextColumn();
-                ImGuiText.Mono(
-                    Warn, pairs.Ordinary(worth) ? string.Empty : Short(worth.Through));
+                // pricing anything there looks like. Now it names only the UNUSUAL detour, and
+                // is absent entirely when no row on screen has one.
+                if (anyVia)
+                {
+                    ImGui.TableNextColumn();
+                    ImGuiText.Mono(
+                        Warn, pairs.Ordinary(worth) ? string.Empty : Short(worth.Through));
+                }
+
+                if (!anyLoop)
+                {
+                    continue;
+                }
 
                 ImGui.TableNextColumn();
                 if (better.TryGetValue(path, out Route loop))
