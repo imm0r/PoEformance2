@@ -106,8 +106,11 @@ public sealed record SkillHuntFindings(
 ///    animation id. A companion pointer at 0x228 names the file outright.
 ///  - FIVE OF THE SIX NAMES MATCH data/animations.tsv WORD FOR WORD, which is what gave the game
 ///    away - had they been skill ids they would not have. The sixth is the payoff: the file said
-///    InteractLeanWell for 889 where the game says ElementalWeakness, and the file has been
-///    corrected. <c>ActionReader.Names</c> now takes the game's answer live.
+///    InteractLeanWell for 889 where the game says ElementalWeakness. That looked like one stale
+///    row and was hand-patched as one; reading the whole table later showed it was the tail of a
+///    three-row insertion that had moved 500 rows. Six samples can say something is wrong and
+///    never what. <c>ActionReader.Names</c> takes the game's answer live; <c>--animdump</c> reads
+///    the array.
 ///  - THE SKILL ID IS STILL NOT REACHED. Within 0x400 of the wrapper the ONLY dat file referenced
 ///    is Animation.dat, and two hops out of <c>Actor.CurrentSkillPtr</c> reached NO text at all -
 ///    the report for that session lists no chain beginning "skill+". So the skill object holds

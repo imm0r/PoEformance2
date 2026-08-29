@@ -588,9 +588,24 @@ internal static class Program
 
         if (reader is ReplayMemoryReader replay)
         {
-            for (uint frame = 0; frame < replay.FrameCount && !dump.Sample(gameStatesStatic); frame++)
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
             {
+                // SEEK FIRST, THEN SAMPLE. The other way round reads whatever frame the reader
+                // happened to be parked on and then moves - which on a replay samples one frame
+                // behind throughout, and leaves the reader somewhere arbitrary afterwards.
                 replay.Seek(frame);
+                if (dump.Sample(gameStatesStatic))
+                {
+                    break;
+                }
+            }
+
+            // The walk needs the frame the live run made its reads on. The last one carries the
+            // newest recorded value of every address, so it is the only position that can hold a
+            // whole table read at some single moment.
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
             }
         }
         else

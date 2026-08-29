@@ -39,23 +39,35 @@ public enum AnimationKind
 /// </summary>
 /// <remarks>
 /// The Actor component holds one integer for what the entity is doing right now - the game's
-/// CastType - and nothing else. The table comes from the AHK tool's hand-maintained
-/// <c>ahk/AnimationID.ahk</c>, 1084 entries, extracted to a TSV.
+/// CastType - and nothing else. The table is GENERATED FROM THE GAME by <c>--animdump</c>: 1087
+/// rows read straight out of Data/Balance/Animation.dat. It used to be a transcription of the AHK
+/// tool's hand-maintained <c>ahk/AnimationID.ahk</c>, and the change was not cosmetic - see below.
 ///
 /// THE TABLE IS ALIGNED, and that is checked rather than assumed - the stat names in the same
-/// folder are off by one, so the question is a real one. The AHK tool's own drift
-/// investigation recorded eight ids observed live while playing, and every one of them lands on
-/// the right name here: 0 Idle, 4 Run, 195 FixedRun, 268 DodgeRoll, 402 DodgeRollBack,
-/// 872 SprintEnd, and the cast types 299 SparkAdditive, 472 Flamewall, 474 OrbOfStorms. Eight
-/// independent readings, no shift.
+/// folder are off by one, so the question is a real one. The AHK tool's own drift investigation
+/// recorded eight ids observed live while playing; seven land on the right name here (0 Idle,
+/// 4 Run, 195 FixedRun, 268 DodgeRoll, 402 DodgeRollBack, and the cast types 299 SparkAdditive,
+/// 472 Flamewall, 474 OrbOfStorms), and the eighth is the check that earns its keep.
 ///
-/// WHAT IS NOT ESTABLISHED: all eight were read off the PLAYER. That the same table serves
+/// WHY THE EIGHTH MOVED. Three rows have been inserted into the game's file since that
+/// transcription - at 584, 599 and 904 - shifting everything after them by one, two and three.
+/// All seven ids above land BELOW the first insertion; 872 is the only one above it, and the AHK
+/// tool's live reading of it as SprintEnd is off by exactly two against this table, where 874 is
+/// SprintEnd. An outside observation landing precisely where the insertions predict is what turns
+/// that finding from one recording's word into a measurement. See <c>AimTests</c>.
+///
+/// WHAT IT COST while the old table stood: 500 of its 1084 rows named the wrong animation, 177
+/// changing <see cref="AnimationKind"/>, and 37 classified quiet when the real animation is not -
+/// threats the evasion filter dropped in silence. <see cref="IsQuiet"/> is deliberately asked the
+/// safe way round so an UNKNOWN animation still counts; a confident WRONG name walks past it.
+///
+/// WHAT IS NOT ESTABLISHED: those readings were off the PLAYER. That the same table serves
 /// MONSTERS follows from it being the game's own CastType enum rather than a per-monster list,
 /// and it is not proven here. The tracker tab prints the id beside the name for exactly this
 /// reason - a monster whose names read like nonsense would say so at a glance.
 ///
-/// A name is a LABEL and never a fact: an id with no row keeps its number, and the table drifts
-/// with the game, so names that stop making sense mean the table needs extracting again.
+/// A name is a LABEL and never a fact. The table no longer drifts by being hand-maintained, but
+/// it still ages with the game: re-run <c>--animdump</c> after a patch and diff.
 /// </remarks>
 public sealed class AnimationNames
 {
@@ -97,10 +109,17 @@ public sealed class AnimationNames
     /// field is its id string (see <c>ActionWrapper.AnimationRow</c> in the schema). So an
     /// animation the tool actually SEES can be named by the game rather than by the table.
     ///
-    /// The first thing that bought was a correction: the game calls animation 889
-    /// ElementalWeakness and the shipped file calls it InteractLeanWell. Five other ids read the
-    /// same both ways, so the table is mostly right and drifts a row at a time - which is exactly
-    /// the failure a person cannot spot by reading it.
+    /// The first thing that bought was a correction, and then a bigger one. Six animations read
+    /// live disagreed with the file on exactly one: 889, InteractLeanWell in the file,
+    /// ElementalWeakness in the game. From six rows that looked like a table drifting one row at
+    /// a time, and it was hand-patched as such. It was not. Reading the WHOLE table (--animdump)
+    /// showed three rows inserted since - at 584, 599 and 904 - shifting 500 of the file's 1084
+    /// rows by one, two or three, with zero rows left over. 889 was a symptom of the shift, and
+    /// patching it made the file less consistent rather than more.
+    ///
+    /// THE LESSON IS ABOUT THE SAMPLE, not about the table: six rows can tell you that something
+    /// is wrong and can never tell you what. Only a whole-table read separates "a few bad rows"
+    /// from "everything above 584 moved".
     ///
     /// Concurrent because the reader thread learns while the render thread asks.
     /// </remarks>
