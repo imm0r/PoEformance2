@@ -78,13 +78,28 @@ public readonly record struct EscapeChoice(int Index, float X, float Y, double S
 ///    PLAYER's skills put theirs - so <see cref="ProjectileWatch"/> today follows your own
 ///    projectiles, not a boss's wave.
 ///
-/// So the lead is real and the plumbing is most of the way there, and it is still a lead: what a
-/// wave actually looks like in the entity list is unobserved. Both switches are live in the
-/// overlay - the Projectiles tab turns on the visuals, the Effects tab keeps the ground effects -
-/// and both now PERSIST, which they had to before the question could be asked at all: watching a
-/// browser through a boss fight is not a thing anybody can do, so the answer comes from a
-/// recording, and a recording can only contain reads the running build performed. A switch that
-/// forgot itself on exit could never be on when the recording started.
+/// MEASURED SINCE, against a real map boss with both switches on
+/// (tests/fixtures/session-2026-08-effects.rec, <c>HostileEffectTests</c>), and it splits the
+/// question rather than answering it:
+///
+/// - MOVEMENT ALONE DOES NOT MEAN A HAZARD, which the first reading of that recording got wrong.
+///   It reported PermanentEffect as a travelling threat on 1304 clean consecutive-frame steps -
+///   all true, and all belonging to three effects PINNED TO THE PLAYER: never more than thirty
+///   units away across 975 frames, having travelled the same ten thousand units the player did.
+///   The discriminator is RANGE, not movement: a thing whose distance to you never changes is
+///   attached to you, whatever its path says.
+/// - WHAT IS LEFT IS SHORT-LIVED. The boss's own effects run about ten frames each - half a
+///   second at the reader's rate - so an observation-based model gets roughly ten sightings to
+///   decide from. One of them closes on the player monotonically (ten steps, none opening),
+///   which is one instance and not a rule. Ground effects move exactly zero, so standing danger
+///   and travelling danger ARE distinguishable.
+/// - THE PATH NAMES NOTHING. Effect, PermanentEffect, SleepableEffect, BeamEffect - engine words,
+///   not skill names. Geometry can be observed; IDENTITY cannot. A table may still be wanted for
+///   what a thing IS, while what it is DOING comes from the world for free.
+/// - THE THIRD BARRIER IS CONFIRMED. Every one of 6864 sightings under Metadata/Projectiles in
+///   that fight is the PLAYER's own Spark. Not one monster projectile classified as a projectile.
+///
+/// THE WAVE ITSELF IS STILL UNOBSERVED - the boss is drawn at random and that recording had none.
 ///
 /// NOTHING HERE IS CHANGED ON THE STRENGTH OF THAT. The line model is right for the case it was
 /// built for and free for slams, which is two of the three; the third wants a decision about
