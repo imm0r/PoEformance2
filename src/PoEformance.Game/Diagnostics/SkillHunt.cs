@@ -96,13 +96,36 @@ public sealed record SkillHuntFindings(
 ///    <c>CurrentSkillPtr</c> therefore cannot be the whole answer for a warning that wants to
 ///    fire before the cast is under way.
 ///
+/// WHAT THE FIRST REAL SESSION ANSWERED (tests/fixtures/session-2026-08-skills.rec, six skills
+/// cast deliberately), and it is not what was being looked for:
+///
+///  - THE WINNING CHAIN IS <c>wrapper+0x220+0x000</c> and it names the ANIMATION, not the skill.
+///    It reaches the animation's own row in Data/Balance/Animation.dat, whose first field is its
+///    id string. PROVEN by the stride rather than by the strings: the row address is
+///    <c>base + id * 106</c> exactly, over a span of 590 ids, which is a row array indexed by
+///    animation id. A companion pointer at 0x228 names the file outright.
+///  - FIVE OF THE SIX NAMES MATCH data/animations.tsv WORD FOR WORD, which is what gave the game
+///    away - had they been skill ids they would not have. The sixth is the payoff: the file said
+///    InteractLeanWell for 889 where the game says ElementalWeakness, and the file has been
+///    corrected. <c>ActionReader.Names</c> now takes the game's answer live.
+///  - THE SKILL ID IS STILL NOT REACHED. Within 0x400 of the wrapper the ONLY dat file referenced
+///    is Animation.dat, and two hops out of <c>Actor.CurrentSkillPtr</c> reached NO text at all -
+///    the report for that session lists no chain beginning "skill+". So the skill object holds
+///    pointers to things that are not rows, or the row is further than two hops.
+///  - THE FILTER EARNED ITS KEEP. The same session offered "WandSpiritShield" for all eight
+///    animations and "Data/Balance/Animation.dat" for six - both perfectly readable strings that
+///    name nothing, and both correctly left unmarked.
+///  - ONE THING THIS SESSION COULD NOT ANSWER: whether the name is available at COMMITMENT. It
+///    holds no frame with a wrapper and no animation yet, so the question stands.
+///
 /// SO IT ALSO HUNTS THE OTHER ROUTE, through the actor's own granted-skill table. The schema
 /// records <c>ActiveSkillDetails.CastType</c> at 0x0C as reading zero on every entry of a real
 /// 41-skill table, i.e. wrong for PoE2, and notes that settling it "needs a recording made by a
 /// build that reads the whole block". This is that build: it scans each entry for the frame's
 /// LIVE animation id, so the offset that holds it turns up by itself rather than being guessed.
 /// That route names a skill without any action pointer, which is the half the timing problem
-/// needs.
+/// needs. IT FOUND NOTHING on the first session: no offset in the first 0x100 of an entry held
+/// the live animation id on exactly one entry, so the cast type is not an i32 there.
 /// </remarks>
 public sealed class SkillHunt
 {
@@ -130,9 +153,6 @@ public sealed class SkillHunt
 
     /// <summary>Shortest run of printable characters that counts as a name rather than as noise.</summary>
     private const int LeastChars = 3;
-
-    /// <summary>How much of a string to ask for at a time. See TextAt for why it is not one read.</summary>
-    private const int ChunkBytes = 16;
 
     /// <summary>Most granted-skill entries walked.</summary>
     private const int MostSkills = 128;
@@ -362,16 +382,10 @@ public sealed class SkillHunt
     /// testing for: a block of pointers, floats or counters essentially never matches it, and a
     /// false positive here costs one line in a report rather than a wrong offset in the schema.
     ///
-    /// READ IN SMALL CHUNKS, NOT AS ONE BLOCK, and that is a correctness point rather than a
-    /// tuning one: ReadProcessMemory fails a span ENTIRELY if any part of it is unmapped, so
-    /// asking for 128 bytes at a short string near the end of a page returns nothing at all -
-    /// and a name that is missed because of where the allocator happened to put it is the worst
-    /// kind of missing, since it comes back on the next run and looks like flakiness.
-    ///
-    /// A chunk that fails after some text has already been collected returns what was collected.
-    /// Truncation cannot invent a name, and the analysis it feeds treats two different strings
-    /// for one skill as a DISQUALIFICATION - so the failure mode is a chain rejected, never a
-    /// wrong chain accepted.
+    /// The READ is <see cref="MemoryReaderExtensions.ReadUtf16"/>, which is page-aware and
+    /// shrinks an unreadable chunk rather than failing whole - a short name near the end of a
+    /// mapped page would otherwise be missed, and that comes back looking like flakiness. All
+    /// this adds is the judgement of whether what came back is text at all.
     /// </remarks>
     public static string? TextAt(IMemoryReader reader, ulong address, int mostChars = MostChars)
     {
@@ -382,36 +396,21 @@ public sealed class SkillHunt
             return null;
         }
 
-        Span<char> chars = stackalloc char[mostChars];
-        Span<byte> chunk = stackalloc byte[ChunkBytes];
-        int length = 0;
-
-        while (length < mostChars)
+        string text = reader.ReadUtf16(address, mostChars);
+        if (text.Length < LeastChars)
         {
-            if (!reader.TryRead(address + (ulong)(length * 2), chunk))
+            return null;
+        }
+
+        foreach (char character in text)
+        {
+            if (character is < (char)0x20 or > (char)0x7E)
             {
-                break;
-            }
-
-            for (int at = 0; at + 1 < chunk.Length && length < mostChars; at += 2)
-            {
-                if (chunk[at] == 0 && chunk[at + 1] == 0)
-                {
-                    return length >= LeastChars ? new string(chars[..length]) : null;
-                }
-
-                // High byte non-zero means it is not the ASCII-in-UTF-16 this looks for; a byte
-                // outside printable range means it is not text at all.
-                if (chunk[at + 1] != 0 || chunk[at] < 0x20 || chunk[at] > 0x7E)
-                {
-                    return null;
-                }
-
-                chars[length++] = (char)chunk[at];
+                return null;
             }
         }
 
-        return length >= LeastChars ? new string(chars[..length]) : null;
+        return text;
     }
 
     private string? TextAt(ulong address) => TextAt(_reader, address);

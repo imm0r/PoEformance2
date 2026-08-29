@@ -138,6 +138,28 @@ public sealed class ActionReader
     private readonly int _animationId;
     private readonly int _targetGrid;
     private readonly int _originGrid;
+    private readonly int _animationRow;
+
+    /// <summary>Animation ids already named, so each costs one resolution per session.</summary>
+    private readonly HashSet<int> _resolved = [];
+
+    /// <summary>
+    /// How many times an id has been TRIED and failed.
+    /// </summary>
+    /// <remarks>
+    /// A FAILED RESOLUTION IS NOT CACHED AS A SUCCESS - the lesson this project already paid for
+    /// once, where a single bad frame cached against a stable pointer silenced a whole session
+    /// (see ActionHunt.SampleFrame). An id whose first sighting happened to be unreadable would
+    /// otherwise never be named again, which is exactly what happened here: four of six skills
+    /// learned, and the two that lost the race stayed anonymous with nothing to say so.
+    ///
+    /// Bounded rather than infinite, because the other failure is a row that is never readable -
+    /// two pointer reads per frame forever, for an answer that is not coming.
+    /// </remarks>
+    private readonly Dictionary<int, int> _attempts = [];
+
+    /// <summary>How many times to try naming one animation before letting it go.</summary>
+    private const int MostAttempts = 8;
 
     public ActionReader(IMemoryReader reader, OffsetSchema schema)
     {
@@ -155,7 +177,23 @@ public sealed class ActionReader
         StructDef wrapper = schema.Structs["ActionWrapper"];
         _targetGrid = wrapper.OffsetOf("TargetGrid");
         _originGrid = wrapper.OffsetOf("OriginGrid");
+        _animationRow = wrapper.OffsetOf("AnimationRow");
     }
+
+    /// <summary>
+    /// Where to record the names read out of the game, or null to read none.
+    /// </summary>
+    /// <remarks>
+    /// OPT-IN, and a property rather than a constructor argument so the diagnostics and the tests
+    /// that only want an action pay nothing. When it is set, every animation id is resolved ONCE
+    /// per session - not once per frame, and not only when the shipped table lacks a name.
+    ///
+    /// Once per id rather than only-when-unknown is deliberate: the shipped table is
+    /// hand-maintained and drifts, so an id it already "knows" is exactly the case worth
+    /// checking. That is how the ElementalWeakness / InteractLeanWell disagreement turned up,
+    /// and it would have stayed invisible under an only-when-missing rule.
+    /// </remarks>
+    public AnimationNames? Names { get; set; }
 
     /// <summary>
     /// Reads the action off an Actor component address. Returns
@@ -218,6 +256,8 @@ public sealed class ActionReader
             return new ActorAction(kind, rawId, 0, 0, 0, 0, skill, animation);
         }
 
+        LearnAnimationName(wrapper, animation);
+
         int originAt = _originGrid - _targetGrid;
         return new ActorAction(
             kind,
@@ -228,6 +268,55 @@ public sealed class ActionReader
             ToWorld(BitConverter.ToInt32(block[(originAt + sizeof(int))..])),
             skill,
             animation);
+    }
+
+    /// <summary>
+    /// Asks the GAME what this animation is called, once per id per session.
+    /// </summary>
+    /// <remarks>
+    /// The wrapper points straight at the animation's own row in Data/Balance/Animation.dat and
+    /// the row's first field is its id string - see <c>ActionWrapper.AnimationRow</c> in the
+    /// schema, where the proof lives (the rows are an array indexed by animation id, stride 106).
+    /// Two pointer hops and a short string, and only for an id not yet seen this session.
+    ///
+    /// WHY IT IS WORTH DOING AT ALL when a table ships with the tool: that table is
+    /// hand-maintained, its own header calls a name "a LABEL, never a fact", and the game
+    /// disagrees with it. A name feeds <see cref="AnimationNames.KindOf"/>, which is what decides
+    /// whether an animation is quiet - so a wrong name is a mis-filtered threat, and a missing
+    /// one is an animation the tool can only report as a number.
+    ///
+    /// Failures are silent by design. This is a label, the caller asked for an action, and an
+    /// unreadable row must not turn a good action read into a bad one.
+    /// </remarks>
+    private void LearnAnimationName(ulong wrapper, int animation)
+    {
+        if (Names is not AnimationNames names || animation <= 0 || _resolved.Contains(animation))
+        {
+            return;
+        }
+
+        int tried = _attempts.GetValueOrDefault(animation);
+        if (tried >= MostAttempts)
+        {
+            return;
+        }
+
+        _attempts[animation] = tried + 1;
+
+        ulong row = _reader.ReadPointer(wrapper + (ulong)_animationRow);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(row))
+        {
+            return;
+        }
+
+        ulong id = _reader.ReadPointer(row);
+        if (PoEformance.Game.Diagnostics.SkillHunt.TextAt(_reader, id) is not string name)
+        {
+            return;
+        }
+
+        names.Learn(animation, name);
+        _resolved.Add(animation);
     }
 
     /// <summary>

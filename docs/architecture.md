@@ -537,6 +537,39 @@ interesting part was not the feature:
     `ActiveSkillDetails.CastType` in the same pass, by scanning each entry for the *live*
     animation id rather than trusting a reference's offset.
 
+    **What the first real session answered — and it was not the question.** Six skills cast
+    deliberately (`session-2026-08-skills.rec`); the winning chain was `wrapper+0x220+0x000`,
+    and it names the **animation**, not the skill. The proof is the stride rather than the
+    strings: the row address is `base + id * 106` exactly, over a span of 590 ids — a row array
+    indexed by animation id — and a companion pointer at `0x228` names the file outright,
+    `Data/Balance/Animation.dat`. Five of the six names match `data/animations.tsv` word for
+    word, which is what gave it away; had they been skill ids they would not have.
+    - **The sixth is the payoff.** The file said `InteractLeanWell` for animation 889; the game
+      says `ElementalWeakness`. The file is hand-maintained — its own header calls a name "a
+      LABEL, never a fact" — and it drifts a row at a time, which is exactly the failure nobody
+      spots by reading it. `ActionReader.Names` now asks the game once per animation id per
+      session and prefers its answer, `AnimationNames.Disagreements` lists the rows that differ,
+      and 889 has been corrected in the file. The reader re-asks about ids the table *already*
+      has for precisely this reason: under an only-when-missing rule 889 would never have been
+      looked at, because the file had an answer. A wrong one.
+    - **The name is not cosmetic**: `KindOf` classifies it, and that decides whether an animation
+      is quiet enough to ignore. A wrong name is a mis-filtered threat; a missing one is a
+      monster the tool can only report as a number.
+    - **The filter earned its keep.** The same session offered `WandSpiritShield` for all eight
+      animations and `Data/Balance/Animation.dat` for six — readable strings that name nothing,
+      both correctly left unmarked, because a chain only counts when it gives a *different*
+      name to every skill.
+    - **Still open:** the skill id. Within 0x400 of the wrapper the only dat file referenced is
+      Animation.dat, and two hops out of `CurrentSkillPtr` reached no text at all. The
+      granted-skill route found nothing either — no offset in the first 0x100 of an entry holds
+      the live animation id on exactly one entry, so the cast type is not an i32 there. And that
+      session holds no frame with a wrapper but no animation, so whether a name is available at
+      *commitment* is still unanswered.
+    - One bug this shook out, of a kind this project has paid for before: the reader marked an
+      animation id "resolved" *before* the read succeeded, so an id whose first sighting was
+      unreadable was burned for the session — four of six skills learned, silently. Failures are
+      now retried, bounded.
+
     What the game's data will **not** give, checked against dat-schema's `poe2/_Core.gql`: no
     radius, area or shape column exists on `ActiveSkills`, `GrantedEffects`,
     `GrantedEffectsPerLevel` or the stat sets. Radius, where it exists at all, is a stat row

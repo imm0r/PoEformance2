@@ -1268,6 +1268,14 @@ internal static class Program
                 // has to appear the moment they switch it on.
                 world.ReadActions = evasionPlanner.Settings.NeedsActions;
 
+                // Let the game name its own animations. Two hops and a short string, ONCE per
+                // animation id per session - and it beats the shipped table, which is
+                // hand-maintained and provably drifts (it calls animation 889 InteractLeanWell;
+                // the game calls it ElementalWeakness). The name is what KindOf classifies, so
+                // this is the difference between filtering an animation correctly and reporting
+                // it as a number.
+                world.AnimationNames = animationNames;
+
                 // The keyboard hook, started the first tick steering is switched on and never
                 // before it. Idempotent and a volatile read when it is already running, so it
                 // costs nothing to ask every tick - and asking every tick is what lets the
