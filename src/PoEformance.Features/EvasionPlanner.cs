@@ -71,11 +71,25 @@ public sealed record EvasionTick(IReadOnlyList<Threat> Draw, bool Dodge, string 
 /// skill and a real target while the animation still reads Idle, and those are precisely the
 /// frames a warning wants. An animation-only filter would throw them away.
 ///
-/// WHAT THIS DELIBERATELY DOES NOT DO: steer the roll. In the game a dodge roll goes where the
-/// character is already pointing, and pointing it somewhere else means moving the player's mouse
-/// - which fights their own aim in the middle of a fight. So the decision here is WHETHER to
-/// roll, never WHERE, and the direction stays the player's. Saying so plainly is better than a
-/// feature that silently drags the cursor.
+/// WHAT THIS DELIBERATELY DOES NOT DO: steer the roll. A dodge runs along the line the character
+/// FACES - forwards or backwards, never across it - which <c>DodgeRollDirectionTests</c>
+/// measures off five real rolls. Two things follow, and the second is why this only presses:
+///
+///   - Sideways is not available. A slam landing to your left cannot be rolled away from while
+///     you point north; the character has to turn, which means moving the player's mouse in the
+///     middle of a fight.
+///   - Nothing here knows which END of that line the game will pick. Both a forward and a
+///     backward roll appear in one recording, so the choice is something the player's own input
+///     decides, and no recording can see input.
+///
+/// So the decision is WHETHER to roll and never WHERE, and a press can currently send the
+/// character either way along its facing - towards the danger as readily as away from it. That
+/// is a real limit rather than a tidy design, and it is written here rather than hidden: until
+/// the forward/backward choice is settled, ACTING IS A COIN TOSS ON THE AXIS YOU ALREADY HOLD.
+///
+/// AND IT IS SETTLED FOR CLICK-TO-MOVE ONLY. Every recording behind the measurement was made
+/// with the game switched to click-to-move; under WASD movement nothing has been recorded, and
+/// the owner plays WASD.
 /// </remarks>
 public sealed class EvasionPlanner
 {

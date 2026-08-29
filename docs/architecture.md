@@ -446,9 +446,14 @@ interesting part was not the feature:
   be a unit test. Drawing and acting have **separate rarity floors** because they cost different
   things: a marker for a white monster is a ring on the screen, a keystroke for one is a roll
   charge, and white monsters are most of what an area contains. Both default to off.
-  - **It decides whether to roll, never where.** A dodge goes where the character is already
-    pointing, and steering it would mean moving the player's mouse mid-fight. Saying so is
-    better than a feature that silently drags the cursor.
+  - **It decides whether to roll, never where — and that is a limit, not a design.** A dodge
+    runs along the line the character *faces*, forwards or backwards, never across it
+    (`DodgeRollDirectionTests`, five real rolls: forward at 0–32°, backward at 167–179°). So
+    sideways is unavailable without turning the player's mouse mid-fight, and nothing yet knows
+    which end of the axis the game will pick — both appear in one session, so the player's own
+    input decides it. Until that is settled a press can send the character *towards* the danger
+    as readily as away. **Measured for click-to-move only**: every recording was made with the
+    game switched to that mode, and the owner plays WASD.
   - **The dodge key is the one key not read from the game.** The flask spellings were
     established against a real config; nobody has established what this game calls the dodge
     roll, and reading a plausible-looking line would be a guess dressed as a measurement — one
