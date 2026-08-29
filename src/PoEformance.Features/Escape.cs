@@ -55,12 +55,34 @@ public readonly record struct EscapeChoice(int Index, float X, float Y, double S
 /// per-animation table of shape and radius - the obvious next step, and the one deferred here -
 /// could not express a wave even if somebody wrote it. It would need a travel speed too.
 ///
-/// WHICH POINTS AT NOT WRITING A TABLE AT ALL. The game spawns effect entities for these and the
-/// reader already flags them (<c>WorldEntity.IsEffect</c>), and <see cref="ProjectileWatch"/>
-/// already derives a direction and a speed from watching a thing MOVE over successive reads. A
-/// front that can be observed needs no table and never goes stale - the same "ask the game
-/// rather than keep a list" move that answered the steering's hold. Unmeasured, so it is a lead
-/// and not a plan.
+/// WHICH POINTS AT NOT WRITING A TABLE AT ALL. The owner's follow-up (2026-08-29) is that a wave
+/// ought to be visible in the particles, and the shape of the tool agrees: a front that can be
+/// OBSERVED needs no table and never goes stale, which is the same "ask the game rather than keep
+/// a list" move that answered the steering's hold. <see cref="ProjectileWatch"/> already derives
+/// a direction and a speed from watching something move across successive reads.
+///
+/// BUT A HOSTILE WAVE REACHES NONE OF THAT TODAY, and the first draft of this note implied it was
+/// closer than it is. It is dropped three times over, each with a recorded reason:
+///
+/// 1. <c>WorldReader.ReadVisualEntities</c> is OFF. The game files everything from id 0x40000000
+///    up as a visual - decorations, effects, every projectile in flight - and the entity walk
+///    drops those before the path is even read. Measured cost of turning it on: 17 gameplay
+///    entities against 51 visuals per frame on a recorded Spark session.
+/// 2. <c>WorldReader.KeepEffects</c> is OFF. A hostile thing that expires on its own and cannot
+///    be targeted is dropped as "a ground effect wearing a monster's components" - the rule that
+///    stopped flame walls being drawn as enemies with health bars.
+/// 3. EVEN WITH BOTH ON, a monster's projectile is usually filed under the MONSTER's own path
+///    (Metadata/Monsters/.../objects/LightningArrow, 36 sightings in one recorded map), so it
+///    classifies as a Monster, carries no Life, and is dropped by rule 2 again. Only
+///    Metadata/Projectiles/... becomes <c>EntityKind.Projectile</c>, and that is mostly where a
+///    PLAYER's skills put theirs - so <see cref="ProjectileWatch"/> today follows your own
+///    projectiles, not a boss's wave.
+///
+/// So the lead is real and the plumbing is most of the way there, and it is still a lead: what a
+/// wave actually looks like in the entity list is unobserved. Both switches are live in the
+/// overlay - the Projectiles tab turns on the visuals, the Effects tab keeps the ground effects -
+/// so the question is answerable by turning them on during one and looking, before anything is
+/// designed around the answer.
 ///
 /// NOTHING HERE IS CHANGED ON THE STRENGTH OF THAT. The line model is right for the case it was
 /// built for and free for slams, which is two of the three; the third wants a decision about
