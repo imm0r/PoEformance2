@@ -71,20 +71,21 @@ public sealed record EvasionTick(IReadOnlyList<Threat> Draw, bool Dodge, string 
 /// skill and a real target while the animation still reads Idle, and those are precisely the
 /// frames a warning wants. An animation-only filter would throw them away.
 ///
-/// THE PLAYER STEERS AND THIS SUPPLIES THE TIMING, and that division is the design rather than
-/// a gap in it. A dodge roll goes TOWARDS THE MOUSE, so the direction is already in the hand of
-/// the person playing - and the thing they cannot do is know that a slam is committed before its
-/// animation starts, which is exactly what the action fields give. Two minutes in front of a map
-/// boss, the owner steering with the mouse alone and this pressing the key, cost zero hits.
+/// WHAT DECIDES A ROLL'S DIRECTION, settled by the owner testing it under WASD movement:
+/// a held movement key wins, and with none held the roll goes towards the cursor. So the player
+/// is already steering it, with whichever of the two they happen to be using.
 ///
-/// SO DO NOT READ <c>Render.RotationCurrent</c> AS THE ROLL'S DIRECTION. During a backward roll
-/// (animation 402) the model's rotation points OPPOSITE the travel, because that is what rolling
-/// backwards is - <c>DodgeRollDirectionTests</c> measures it on real rolls, and anything using it
-/// to work out where a roll went is exactly reversed on every one of them.
+/// THIS ONLY PRESSES, AND THAT IS CURRENTLY A CHOICE RATHER THAN A LIMIT. The rule above means
+/// the roll IS steerable from here - a movement key held for the length of a keypress would pick
+/// the direction, with no need to touch the mouse - and this does not do it. What the tool
+/// supplies is the TIMING, which is the half a person cannot do: the action fields say an attack
+/// is committed and where it lands before any animation shows it. Two minutes in front of a map
+/// boss, the owner steering and this pressing, cost zero hits.
 ///
-/// WHAT IS NOT ESTABLISHED: how the game behaves under WASD movement. Every recording here was
-/// made with the game switched to click-to-move for the purpose, and the owner normally plays
-/// WASD - where the mouse still steers the roll, but nothing has been recorded of it.
+/// DO NOT READ <c>Render.RotationCurrent</c> AS THE ROLL'S DIRECTION. It follows the cursor, so
+/// it is right only for the no-key case; on a roll steered by a movement key it points somewhere
+/// else entirely, and on a backward one exactly the opposite way. See
+/// <c>DodgeRollDirectionTests</c>, where that is measured on real rolls.
 /// </remarks>
 public sealed class EvasionPlanner
 {

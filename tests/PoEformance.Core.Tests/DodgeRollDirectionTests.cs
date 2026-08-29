@@ -11,14 +11,20 @@ namespace PoEformance.Core.Tests;
 /// Which way a dodge roll actually goes - measured off the player's own rolls.
 /// </summary>
 /// <remarks>
-/// WHERE A ROLL GOES IS THE CURSOR, AND THIS FILE MEASURES SOMETHING ELSE - which is the whole
-/// reason it is worth keeping. The owner, who plays this game, states it plainly: the roll goes
-/// towards the mouse. Two minutes spent in front of a map boss steering with the mouse alone,
-/// while the tool supplied only the timing, cost zero hits.
+/// WHAT DECIDES A ROLL'S DIRECTION, settled by the owner testing it deliberately under WASD
+/// movement, which is how they play:
 ///
-/// What the five rolls in <c>tests/fixtures/session-2026-08-monsters.rec</c> measure is the
-/// angle between where the character TRAVELLED and <c>Render.RotationCurrent</c>, which is the
-/// model's own rotation:
+///   1. IF A MOVEMENT KEY IS HELD, the roll goes that way.
+///   2. OTHERWISE it goes towards the cursor.
+///
+/// That is the whole rule, and it explains every number below rather than merely coexisting
+/// with them. It also means the roll IS steerable without touching the mouse - a movement key
+/// held for the length of a keypress picks the direction - which two earlier readings of this
+/// same data concluded was impossible.
+///
+/// WHAT THE FIVE ROLLS IN <c>tests/fixtures/session-2026-08-monsters.rec</c> MEASURE is the
+/// angle between where the character TRAVELLED and <c>Render.RotationCurrent</c>, which follows
+/// the cursor:
 ///
 /// <code>
 ///   anim  travel  angle from RotationCurrent   turned during the roll
@@ -29,27 +35,23 @@ namespace PoEformance.Core.Tests;
 ///   268      509                          0.0                      59
 /// </code>
 ///
-/// THE FINDING IS A WARNING, NOT A STEERING RULE. For the forward animation the rotation points
-/// along the travel; for the BACKWARD one it points the opposite way, because that is what a
-/// backward roll is - the body keeps its orientation while the character moves the other way. So
-/// <c>RotationCurrent</c> DOES NOT SAY WHERE A ROLL IS GOING, and anything reading it during one
-/// gets the direction exactly reversed half the time. That is the trap this file exists to mark.
+/// Read through the rule the two animations stop being a mystery: a 402 is a roll whose held
+/// movement key pointed AWAY from the cursor, so the travel runs opposite the rotation and the
+/// game plays its backward animation; a 268 with a near-zero angle is a roll taken with no key
+/// held, going where the cursor was. The rotation was the cursor all along.
 ///
-/// AN EARLIER READING OF THE SAME NUMBERS WAS WRONG, and how it was wrong is worth keeping. It
-/// took the rotation for the cursor direction, concluded that a roll can only run along the line
-/// the character already faces, and wrote down that sideways was unavailable and that arming the
-/// dodge was "a coin toss on the axis you already hold". None of that survives contact with the
-/// game: the cursor steers, so any direction is available, and the player chooses it. A second
-/// guess - that the facing locks onto a target during a backward roll - was checked against this
-/// same fixture and does not hold either: the nearest monster during those frames is 1100 world
-/// units away and 45 to 124 degrees off the rotation. Two wrong explanations from one set of
-/// correct measurements, which is what happens when a number is asked what it means instead of a
-/// person who can see the screen.
+/// SO THE TEST BELOW IS A WARNING ABOUT ONE READING, not a rule about the game:
+/// <c>RotationCurrent</c> must not be taken for where a roll is GOING, because on every backward
+/// roll it points exactly the other way.
 ///
-/// WHAT THE TOOL TAKES FROM THIS. The evasion feature supplies TIMING and the player supplies
-/// DIRECTION, and that division is not a limitation to be engineered away - it is why the thing
-/// works. The action fields say when something is committed and where it lands, before the
-/// animation shows it; the hand on the mouse says where to go.
+/// TWO WRONG EXPLANATIONS CAME OUT OF THESE CORRECT NUMBERS BEFORE THE RULE DID, and both are
+/// kept because the shape of the mistake is worth more than the tidy version. The first took the
+/// rotation for the steering input and concluded a roll can only run along the line already
+/// faced - so sideways was impossible and arming the dodge was "a coin toss". The second guessed
+/// that the facing locks onto a target during a backward roll; that one was at least checked
+/// against this fixture before being written down, and refuted by it - the nearest monster in
+/// those frames is 1100 world units away and up to 124 degrees off. Both came of asking a
+/// number what it meant instead of the person who could see the screen.
 ///
 /// The dodge's own ActionWrapper target is NOT the destination, which is worth writing down
 /// because it looks like one: it sits within a few cells of where the roll STARTED and reads a

@@ -446,20 +446,21 @@ interesting part was not the feature:
   be a unit test. Drawing and acting have **separate rarity floors** because they cost different
   things: a marker for a white monster is a ring on the screen, a keystroke for one is a roll
   charge, and white monsters are most of what an area contains. Both default to off.
-  - **The player steers, the tool times — and that division is the design.** A dodge roll goes
-    towards the *mouse*, so the direction is already in the hand of the person playing; what they
-    cannot do is know a slam is committed before its animation starts, which is what the action
-    fields supply. Two minutes in front of a map boss, the owner steering with the mouse alone
-    and the tool pressing the key, cost zero hits.
-  - **Do not read `RotationCurrent` as the roll's direction.** During a backward roll (animation
-    402) the model's rotation points *opposite* the travel — `DodgeRollDirectionTests` measures
-    it on five real rolls, and a reader that takes rotation for direction is exactly reversed on
-    every one of them. Two wrong explanations came out of those correct numbers before the owner
-    simply said what the game does: first that a roll can only run along the line already faced
-    (so sideways was impossible and arming the dodge was "a coin toss"), then that the facing
-    locks onto a target — the second checked against the same fixture and refuted by it, the
-    nearest monster being 1100 units away and up to 124° off. Worth keeping as the shape of the
-    mistake: a number was asked what it meant instead of a person who can see the screen.
+  - **What decides a roll's direction**, settled by the owner testing it under WASD: a held
+    movement key wins, and with none held the roll goes towards the cursor. So the roll *is*
+    steerable from the tool — a movement key held for the length of a keypress picks the
+    direction, with no need to touch the mouse — and the tool currently does not do it. What it
+    supplies is the **timing**, the half a person cannot do: an attack is committed, and its
+    landing spot known, before any animation shows it. Two minutes in front of a map boss, the
+    owner steering and the tool pressing, cost zero hits.
+  - **Do not read `RotationCurrent` as the roll's direction.** It follows the cursor, so it is
+    right only for the no-key case; on a key-steered roll it points elsewhere, and on a backward
+    one exactly the other way. Two wrong explanations came out of those correct numbers before
+    the rule did: first that a roll can only run along the line already faced (so sideways was
+    impossible and arming the dodge was "a coin toss"), then that the facing locks onto a target
+    — the second at least checked against the fixture and refuted by it, the nearest monster
+    being 1100 units away and up to 124° off. Worth keeping as the shape of the mistake: a number
+    was asked what it meant instead of the person who could see the screen.
   - **The dodge key is the one key not read from the game.** The flask spellings were
     established against a real config; nobody has established what this game calls the dodge
     roll, and reading a plausible-looking line would be a guess dressed as a measurement — one
