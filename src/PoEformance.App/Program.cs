@@ -149,6 +149,16 @@ internal static class Program
             recorder?.MarkFrame();
             new PoEformance.Game.Diagnostics.PlayerProbe(reader, probeSchema).ProbeAndReport(gameStates, Console.Out);
             recorder?.MarkFrame();
+
+            // Same reasoning as the probe above, for the one Actor field nobody could ever
+            // check: it reads empty both when it is right and when it is 0x10 short, so it
+            // can only be settled while minions or totems are actually out. Unconditional
+            // because a recording carries only the reads that were performed, and every
+            // fixture in the repo is missing this one - which is exactly why the question
+            // stayed open. About a hundred bytes.
+            new PoEformance.Game.Diagnostics.DeployedEntitiesProbe(reader, probeSchema)
+                .Report(gameStates, Console.Out);
+            recorder?.MarkFrame();
         }
 
         // Scan the whole entity map once. Besides the readout, this is what puts the map
