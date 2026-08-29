@@ -38,6 +38,7 @@ function renderState(s) {
     }
   }
 
+  if (s.evasion) renderEvasion(s.evasion);
   if (s.rules) rules.set(s.rules);
 
   if (s.map) {
@@ -255,6 +256,131 @@ function send(af) {
 $("af-enabled").addEventListener("change", () => {
   if (flasks) send({ ...flasks, enabled: $("af-enabled").checked });
 });
+
+// ── Evasion ────────────────────────────────────────────────────────────────
+//
+// The last settings block the host sent. Edits are applied to a COPY and posted back, exactly
+// as the flasks are: the host normalises what it receives and the next state carries whatever
+// it decided, so the page never becomes a second source of truth.
+let evasion = null;
+
+// While a field is being typed in, a poll must not put the old value back mid-keystroke. Same
+// guard the overlay card uses, and for the same reason it needed one.
+let evasionEditingUntil = 0;
+const holdEvasion = () => (evasionEditingUntil = Date.now() + 2000);
+
+function renderEvasion(ev) {
+  evasion = ev.settings;
+
+  // Live text always - it is the answer to "why is nothing happening" and is worth being
+  // current even while somebody is editing the thing that will change it.
+  $("ev-status").textContent = ev.status;
+
+  // Measured during a fight and read standing here, which is the whole reason it is on this
+  // page: on the overlay it is overwritten about once a second. It says whether the ceiling
+  // above still needs to be touched, so it belongs beside it and nowhere else.
+  $("ev-rolltimes").textContent = ev.rollTimes
+    ? `Measured: ${ev.rollTimes}. The confirmed times are one of the game's frames plus a few ms — if none are on the ceiling, the number above is never reached.`
+    : "";
+
+  $("ev-keyname").textContent = ev.keyName;
+  $("ev-keyhints").textContent = ev.keyHints.length
+    ? `Lines in the game's config that mention a dodge: ${ev.keyHints.join("  ·  ")}`
+    : "Nothing in the game's config mentions a dodge — set the code yourself.";
+  $("ev-movenames").textContent = ev.moveKeyNames ?? "–";
+  $("ev-movehints").textContent = (ev.moveHints ?? []).length
+    ? `Lines in the game's config that mention movement: ${ev.moveHints.join("  ·  ")}`
+    : "W A S D is what the game ships with — check these if you have rebound them.";
+
+  if (Date.now() < evasionEditingUntil) return;
+
+  const warn = ev.settings.warn ?? {};
+  const act = ev.settings.act ?? {};
+  $("ev-warn").checked = !!warn.enabled;
+  $("ev-act").checked = !!act.enabled;
+  $("ev-warn-rarity").value = warn.fromRarity ?? "Normal";
+  $("ev-act-rarity").value = act.fromRarity ?? "Rare";
+  $("ev-key").value = ev.settings.dodgeKey ?? 0;
+  $("ev-radius").value = ev.settings.dangerRadius ?? 90;
+  $("ev-cooldown").value = ev.settings.cooldownMs ?? 1200;
+  $("ev-quiet").checked = !!ev.settings.onlyDangerousAnimations;
+  $("ev-only").value = (warn.onlyPaths ?? []).join(", ");
+  $("ev-ignore").value = (warn.ignorePaths ?? []).join(", ");
+
+  const keys = ev.settings.keys ?? {};
+  $("ev-steer").checked = !!ev.settings.steer;
+  $("ev-move-up").value = keys.up ?? 0x57;
+  $("ev-move-left").value = keys.left ?? 0x41;
+  $("ev-move-down").value = keys.down ?? 0x53;
+  $("ev-move-right").value = keys.right ?? 0x44;
+  $("ev-roll").value = ev.settings.rollDistance ?? 400;
+  $("ev-hold").value = ev.settings.steerHoldMs ?? 60;
+}
+
+// A comma-separated field to the list the host wants. Empty means "no filter", which is not
+// the same as a list holding one empty string - that would match every monster.
+const paths = (id) =>
+  $(id).value.split(",").map((p) => p.trim()).filter((p) => p.length > 0);
+
+function sendEvasion() {
+  if (!evasion) return;
+  holdEvasion();
+
+  // The type filters are edited once and applied to BOTH gates. Two sets of boxes would be
+  // the more flexible page and a worse one: the question "which monsters is this about" has
+  // one answer, and the two gates already differ where it matters - by rarity.
+  const only = paths("ev-only");
+  const ignore = paths("ev-ignore");
+
+  bridge.send({
+    type: "setEvasionSettings",
+    payload: {
+      ...evasion,
+      warn: {
+        enabled: $("ev-warn").checked,
+        fromRarity: $("ev-warn-rarity").value,
+        onlyPaths: only,
+        ignorePaths: ignore,
+      },
+      act: {
+        enabled: $("ev-act").checked,
+        fromRarity: $("ev-act-rarity").value,
+        onlyPaths: only,
+        ignorePaths: ignore,
+      },
+      dodgeKey: Number($("ev-key").value) || 0,
+      dangerRadius: Number($("ev-radius").value) || 90,
+      cooldownMs: Number($("ev-cooldown").value) || 0,
+      onlyDangerousAnimations: $("ev-quiet").checked,
+      steer: $("ev-steer").checked,
+      rollDistance: Number($("ev-roll").value) || 400,
+
+      // NOT `|| 60`: zero is a legal hold and means "send the keys and release them at once",
+      // which is worth being able to try on a machine with a high frame rate. The fallback is
+      // for a field that is empty or unparseable, and Number("") is 0 - so it has to be tested
+      // for emptiness rather than for falsiness.
+      steerHoldMs: $("ev-hold").value === "" ? 60 : Number($("ev-hold").value),
+      keys: {
+        up: Number($("ev-move-up").value) || 0,
+        left: Number($("ev-move-left").value) || 0,
+        down: Number($("ev-move-down").value) || 0,
+        right: Number($("ev-move-right").value) || 0,
+      },
+    },
+  });
+}
+
+for (const id of [
+  "ev-warn", "ev-act", "ev-warn-rarity", "ev-act-rarity",
+  "ev-key", "ev-radius", "ev-cooldown", "ev-quiet", "ev-only", "ev-ignore",
+  "ev-steer", "ev-roll", "ev-hold",
+  "ev-move-up", "ev-move-left", "ev-move-down", "ev-move-right",
+]) {
+  // On "change", not "input": every one of these posts to the host, and a number field fires
+  // per keystroke - which would send a radius of 9 on the way to typing 90.
+  $(id).addEventListener("change", sendEvasion);
+  $(id).addEventListener("input", holdEvasion);
+}
 
 // ── Wiring ─────────────────────────────────────────────────────────────────
 

@@ -57,15 +57,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public EntityMemory? Memory { get; set; }
 
     /// <summary>
-    /// Whether the reader keeps the hostile ground effects, for the same reason as above.
+    /// Tells the reader whether to keep the hostile ground effects it otherwise drops.
     /// </summary>
     /// <remarks>
-    /// A pair of callbacks rather than the reader itself: the overlay draws and has no other
-    /// business with it, and this is the one bit of it worth reaching for from up here.
+    /// A callback rather than the reader itself: the overlay draws and has no other business
+    /// with it, and this is the one bit of it worth reaching for from up here.
+    ///
+    /// PUSHED EVERY FRAME from <c>EffectLayer.KeepHostile</c> rather than at the moment the
+    /// switch moves, which is the arrangement <see cref="ReadVisuals"/> already uses and for a
+    /// second reason here: the switch is SAVED, and settings are applied before this delegate is
+    /// wired, so a one-shot push during Apply would go nowhere and a restored value would be
+    /// silently lost. There is no matching getter - the layer holds the state, so asking the
+    /// reader what it is doing would be asking the wrong end.
     /// </remarks>
-    public Func<bool>? KeepingEffects { get; set; }
-
-    /// <summary>Turns that dropping off and on.</summary>
     public Action<bool>? KeepEffects { get; set; }
 
     /// <summary>
@@ -125,6 +129,27 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private TrackerSettings _tracker = TrackerSettings.Default;
+
+    /// <summary>
+    /// What the evasion warnings draw, and where their threats come from.
+    /// </summary>
+    /// <remarks>
+    /// Its own settings record rather than a section of the tracker's, because the same file
+    /// decides whether the tool PRESSES A KEY - and that is worth being able to find in one
+    /// place. See <see cref="EvasionSettings"/>.
+    /// </remarks>
+    public Func<EvasionSettings>? Evasion
+    {
+        get => _evasion.Settings;
+        set => _evasion.Settings = value;
+    }
+
+    /// <summary>Where the layer gets the threats the planner last decided.</summary>
+    public Func<IReadOnlyList<Threat>>? EvasionThreats
+    {
+        get => _evasion.Threats;
+        set => _evasion.Threats = value;
+    }
 
     /// <summary>
     /// How every drawn thing looks - colours, sizes, line widths, and whether it is drawn.
@@ -282,6 +307,38 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public EntityHiding EntitiesHidden { get; } = new();
 
+    /// <summary>Hands the saved stash switches to whichever stores are attached.</summary>
+    /// <remarks>
+    /// Called from both ends - when the settings arrive and when the stores do - because either
+    /// can be second and only the later one can complete the pair. Cheap and idempotent, so
+    /// calling it when nothing has changed costs four assignments.
+    ///
+    /// The exchange's league is deliberately NOT set here: it is not known until the player is
+    /// in an area, so <c>StashWindow</c> tells the store on every draw where it is playing.
+    /// </remarks>
+    private void PushStashWants()
+    {
+        if (_stashArt is not null)
+        {
+            _stashArt.Enabled = _stashWants.Art;
+        }
+
+        if (_stashPrices is not null)
+        {
+            _stashPrices.Enabled = _stashWants.Prices;
+        }
+
+        if (_stashExchange is not null)
+        {
+            _stashExchange.Enabled = _stashWants.Exchange;
+        }
+
+        if (_stashTrade is not null)
+        {
+            _stashTrade.Enabled = _stashWants.Trade;
+        }
+    }
+
     /// <summary>Applies the settings that persist, and remembers them for the next save.</summary>
     public void Apply(OverlaySettings settings)
     {
@@ -297,7 +354,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _projectiles.ShowTrails = settings.ProjectileTrails;
         _projectiles.ShowPaths = settings.ProjectilePaths;
         _projectiles.MineOnly = settings.ProjectilesMineOnly;
+        _effects.Enabled = settings.ShowEffects;
+        _effects.ShowPaths = settings.EffectPaths;
+        _effects.KeepHostile = settings.KeepEffects;
         Interface = settings.InterfaceOrDefault;
+
+        // Remembered rather than applied, because the stores do not exist yet - AttachStash
+        // runs after this, exactly like the wealth stretch below. Pushed straight through as
+        // well, for the second and later Apply: the config page re-applies while the tool runs.
+        _stashWants = (settings.StashItemArt, settings.StashPrices,
+            settings.StashExchange, settings.StashTrade);
+        PushStashWants();
         Chrome.Apply(settings.WindowsOrEmpty);
         _tools.ApplyHidden(settings.HiddenTabsOrEmpty);
         EntitiesHidden.Use(settings.HiddenEntitiesOrEmpty, settings.HiddenEntitySpotsOrEmpty);
@@ -314,6 +381,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (Noise is not null)
         {
             Noise.Enabled = settings.HideNoise;
+
+            // Every kind back on first, so a name dropped from the file turns its class back
+            // ON rather than leaving it let through from the last time this ran.
+            IReadOnlyList<string> letThrough = settings.NoiseOffOrEmpty;
+            foreach (NoiseKind kind in NoiseFilter.Kinds)
+            {
+                Noise.Set(
+                    kind,
+                    !letThrough.Contains(kind.ToString(), StringComparer.OrdinalIgnoreCase));
+            }
         }
 
         if (Memory is not null)
@@ -353,6 +430,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
             ProjectilesMineOnly = _projectiles.MineOnly,
+            ShowEffects = _effects.Enabled,
+            EffectPaths = _effects.ShowPaths,
+            KeepEffects = _effects.KeepHostile,
+
+            // From the stores where they exist, and from what was loaded where they do not:
+            // saving before the stash is attached must not write four falses over the file.
+            StashItemArt = _stashArt?.Enabled ?? basis.StashItemArt,
+            StashPrices = _stashPrices?.Enabled ?? basis.StashPrices,
+            StashExchange = _stashExchange?.Enabled ?? basis.StashExchange,
+            StashTrade = _stashTrade?.Enabled ?? basis.StashTrade,
 
             // Only once it differs from the defaults, so an untouched file gains no key and a
             // default corrected in a release still reaches somebody who never opened the
@@ -363,6 +450,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             HiddenEntities = EntitiesHidden.Kinds is { Count: > 0 } kinds ? kinds : null,
             HiddenEntitySpots = EntitiesHidden.Spots is { Count: > 0 } spots ? [.. spots] : null,
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
+
+            // Only once one is let through, so an untouched file gains no key - the same
+            // bargain the hidden tabs make. Null rather than an empty array for the same reason.
+            NoiseOff = Noise is null
+                ? basis.NoiseOff
+                : NoiseFilter.Kinds.Where(k => !Noise.IsOn(k)).Select(k => k.ToString()).ToArray()
+                    is { Length: > 0 } through
+                    ? through
+                    : null,
             RememberOutOfRange = Memory?.Enabled ?? basis.RememberOutOfRange,
             ShowPoi = _poi?.ShowPicker ?? basis.ShowPoi,
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
@@ -456,6 +552,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly UnwalkedLayer _unwalked = new();
     private readonly HeatLayer _heat = new();
     private readonly EffectLayer _effects = new();
+
+    /// <summary>
+    /// The Stash tab's four network switches, as loaded, until the stores exist to take them.
+    /// </summary>
+    /// <remarks>
+    /// Apply runs before AttachStash, so a value pushed at the stores when the settings land
+    /// would be pushed at nulls and lost - the same trap the effect switches fell into, arriving
+    /// by the other road. The wealth stretch below solves it the same way.
+    /// </remarks>
+    private (bool Art, bool Prices, bool Exchange, bool Trade) _stashWants;
+
+    private ItemArtStore? _stashArt;
+    private PriceStore? _stashPrices;
+    private TradePrices? _stashTrade;
+    private ExchangeStore? _stashExchange;
     private readonly HealthBarLayer _healthBars = new();
 
     // The tracker's three layers, which share one settings record - see AttachTracker.
@@ -463,6 +574,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly GroundDangerLayer _groundDanger = new();
     private readonly StatusIconLayer _statusIcons = new();
     private readonly AimLayer _aim = new();
+
+    /// <summary>The evasion warnings. Not one of the tracker's - it has its own settings file.</summary>
+    private readonly EvasionLayer _evasion = new();
 
     /// <summary>
     /// The animation table, for saying what a monster is doing rather than which number it is.
@@ -960,6 +1074,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public Func<string>? FlaskStatus { get; set; }
 
+    /// <summary>Optional: what the evasion planner did, or why it did nothing.</summary>
+    /// <remarks>
+    /// The same argument as <see cref="FlaskStatus"/>, and it carries more weight here: this
+    /// feature has more ways of being armed and silent - both gates, a rarity floor nothing in
+    /// the area reaches, an unset dodge key, the cooldown - and every one of them looks
+    /// identical from the outside.
+    /// </remarks>
+    public Func<string>? EvasionStatus { get; set; }
+
     /// <summary>
     /// Adds the interface browser, served by an inspector on the reader thread.
     /// </summary>
@@ -1062,9 +1185,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // so the window is handed a way to turn a file into something drawable rather than
         // being given the renderer itself. The sign-in is handed in for the same shape of
         // reason: the trade window is a browser, and this layer cannot see that one.
+        // Kept so the four switches can be saved and restored: they belong to the stores, not
+        // to the window, and this class is what Apply and CurrentSettings run on.
+        _stashArt = art;
+        _stashPrices = prices;
+        _stashTrade = trade;
+        _stashExchange = exchange;
+        PushStashWants();
+
         var window = new StashWindow(
             inspector, art, prices, trade, signIn, probe,
             file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture,
+            () => SettingsChanged?.Invoke(),
             exchange);
         _tools.Add(60, "stash", "Stash", window.DrawTab);
         if (visible)
@@ -1308,6 +1440,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Style = _style,
             Chrome = Chrome,
             IconFor = _icons.TextureFor,
+            Changed = () => SettingsChanged?.Invoke(),
         };
     }
 
@@ -1683,6 +1816,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // delegate call and a bool.
         ReadVisuals?.Invoke(_projectiles.Enabled);
 
+        // The same arrangement again, and it is what makes this switch survive a restart: the
+        // settings are applied before the reader can be reached, so a value pushed at the reader
+        // during Apply would be pushed at nothing. Held on the layer and synced here, a saved
+        // "keep the hostile effects" is in force from the first frame - which is the whole point
+        // of saving it, since a recording can only contain reads the build actually performed.
+        KeepEffects?.Invoke(_effects.KeepHostile);
+
         // The same arrangement, for the read the status icons need: kept in step every frame
         // rather than at the moment a switch moves, because the switch moves from the tab and
         // from the settings being applied, and one thing that syncs cannot drift out of step
@@ -1787,6 +1927,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // Between the lines and the icons: a ray is a world-space line like the monster
             // lines, and the icons carry numbers that nothing should be drawn over.
             _aim.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+
+            // AFTER the aim rays and before the icons, deliberately: a ray says where something
+            // is pointing and this says where its attack will LAND, so when both are on the
+            // marker has to be the one on top. It is the half you are meant to react to.
+            _evasion.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
             _statusIcons.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
 
             if (ShowWorldDots)
@@ -1887,9 +2032,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // The same first-use registration, and for the same reason: the two callbacks it needs
         // are properties the app sets when it wires the reader up.
-        if (_effectWindow is null && KeepingEffects is not null && KeepEffects is not null)
+        if (_effectWindow is null && KeepEffects is not null)
         {
-            var made = new EffectWindow(_effects, KeepingEffects, KeepEffects, Noise);
+            var made = new EffectWindow(_effects, Noise, () => SettingsChanged?.Invoke());
             _effectWindow = made;
             _tools.Add(95, "effects", "Effects", () => made.DrawTab(_snapshot), page: Entities);
         }
@@ -2321,6 +2466,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (FlaskStatus is not null)
             {
                 Row("flask", FlaskStatus(), OverlayInk.Accent);
+            }
+
+            if (EvasionStatus is not null)
+            {
+                Row("evade", EvasionStatus(), OverlayInk.Accent);
             }
 
             // The summary stays here even though the full list is a page of its own: the

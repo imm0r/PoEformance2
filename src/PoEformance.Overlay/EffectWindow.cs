@@ -27,27 +27,32 @@ public sealed class EffectWindow
     private static readonly Vector4 FriendlyText = OverlayInk.Friendly;
 
     private readonly EffectLayer _layer;
-    private readonly Func<bool> _keepingEffects;
-    private readonly Action<bool> _keepEffects;
     private readonly NoiseFilter? _noise;
+    private readonly Action _changed;
 
     private string _filter = string.Empty;
 
-    /// <param name="keepEffects">
-    /// Turns the reader's own dropping of hostile effects off and on. A pair of callbacks
-    /// rather than the reader itself: the window has no business with anything else on it, and
-    /// the reader lives a layer below where this can reach.
+    /// <param name="layer">
+    /// Holds all three of its own switches, including the one that is not about drawing at all:
+    /// the reader's dropping of hostile effects. It lives there so it can be SAVED - the window
+    /// is attached long after the settings are applied, and a switch owned here would start from
+    /// nothing on every launch. <c>EntityOverlay</c> pushes it at the reader every frame.
     /// </param>
-    public EffectWindow(
-        EffectLayer layer, Func<bool> keepingEffects, Action<bool> keepEffects, NoiseFilter? noise)
+    /// <param name="changed">
+    /// Called when a switch moved, so the choice is WRITTEN DOWN. Somewhere to keep the value
+    /// and something to notice it moved are two separate things, and having only the first is
+    /// indistinguishable from having neither: the settings file is written when this fires and
+    /// at no other time, so a switch that does not call it is saved only by whatever unrelated
+    /// change happens to fire next. That is what "still not saved" was, after the fields, the
+    /// Apply and the round-trip test were all in place and all correct.
+    /// </param>
+    public EffectWindow(EffectLayer layer, NoiseFilter? noise, Action changed)
     {
         ArgumentNullException.ThrowIfNull(layer);
-        ArgumentNullException.ThrowIfNull(keepingEffects);
-        ArgumentNullException.ThrowIfNull(keepEffects);
+        ArgumentNullException.ThrowIfNull(changed);
         _layer = layer;
-        _keepingEffects = keepingEffects;
-        _keepEffects = keepEffects;
         _noise = noise;
+        _changed = changed;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -67,6 +72,7 @@ public sealed class EffectWindow
         if (ImGui.Checkbox("draw them in the world", ref drawing))
         {
             _layer.Enabled = drawing;
+            _changed();
         }
 
         ImGui.SameLine();
@@ -74,12 +80,14 @@ public sealed class EffectWindow
         if (ImGui.Checkbox("with their paths", ref paths))
         {
             _layer.ShowPaths = paths;
+            _changed();
         }
 
-        bool keeping = _keepingEffects();
+        bool keeping = _layer.KeepHostile;
         if (ImGui.Checkbox("keep the hostile ground effects  (the reader drops them)", ref keeping))
         {
-            _keepEffects(keeping);
+            _layer.KeepHostile = keeping;
+            _changed();
         }
 
         // Said next to the switch, because the reason it is off is the reason a screen full of
@@ -95,6 +103,7 @@ public sealed class EffectWindow
             if (ImGui.Checkbox("let the engine's own nodes through  (/fx/, /mat/, /epk/ ...)", ref engine))
             {
                 noise.Set(NoiseKind.Engine, !engine);
+                _changed();
             }
 
             if (engine)
@@ -188,6 +197,6 @@ public sealed class EffectWindow
             ImGui.EndTable();
         }
 
-        bool keepingNothing() => !_keepingEffects() && (_noise is null || _noise.IsOn(NoiseKind.Engine));
+        bool keepingNothing() => !_layer.KeepHostile && (_noise is null || _noise.IsOn(NoiseKind.Engine));
     }
 }

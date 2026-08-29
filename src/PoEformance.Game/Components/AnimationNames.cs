@@ -39,23 +39,35 @@ public enum AnimationKind
 /// </summary>
 /// <remarks>
 /// The Actor component holds one integer for what the entity is doing right now - the game's
-/// CastType - and nothing else. The table comes from the AHK tool's hand-maintained
-/// <c>ahk/AnimationID.ahk</c>, 1084 entries, extracted to a TSV.
+/// CastType - and nothing else. The table is GENERATED FROM THE GAME by <c>--animdump</c>: 1087
+/// rows read straight out of Data/Balance/Animation.dat. It used to be a transcription of the AHK
+/// tool's hand-maintained <c>ahk/AnimationID.ahk</c>, and the change was not cosmetic - see below.
 ///
 /// THE TABLE IS ALIGNED, and that is checked rather than assumed - the stat names in the same
-/// folder are off by one, so the question is a real one. The AHK tool's own drift
-/// investigation recorded eight ids observed live while playing, and every one of them lands on
-/// the right name here: 0 Idle, 4 Run, 195 FixedRun, 268 DodgeRoll, 402 DodgeRollBack,
-/// 872 SprintEnd, and the cast types 299 SparkAdditive, 472 Flamewall, 474 OrbOfStorms. Eight
-/// independent readings, no shift.
+/// folder are off by one, so the question is a real one. The AHK tool's own drift investigation
+/// recorded eight ids observed live while playing; seven land on the right name here (0 Idle,
+/// 4 Run, 195 FixedRun, 268 DodgeRoll, 402 DodgeRollBack, and the cast types 299 SparkAdditive,
+/// 472 Flamewall, 474 OrbOfStorms), and the eighth is the check that earns its keep.
 ///
-/// WHAT IS NOT ESTABLISHED: all eight were read off the PLAYER. That the same table serves
+/// WHY THE EIGHTH MOVED. Three rows have been inserted into the game's file since that
+/// transcription - at 584, 599 and 904 - shifting everything after them by one, two and three.
+/// All seven ids above land BELOW the first insertion; 872 is the only one above it, and the AHK
+/// tool's live reading of it as SprintEnd is off by exactly two against this table, where 874 is
+/// SprintEnd. An outside observation landing precisely where the insertions predict is what turns
+/// that finding from one recording's word into a measurement. See <c>AimTests</c>.
+///
+/// WHAT IT COST while the old table stood: 500 of its 1084 rows named the wrong animation, 177
+/// changing <see cref="AnimationKind"/>, and 37 classified quiet when the real animation is not -
+/// threats the evasion filter dropped in silence. <see cref="IsQuiet"/> is deliberately asked the
+/// safe way round so an UNKNOWN animation still counts; a confident WRONG name walks past it.
+///
+/// WHAT IS NOT ESTABLISHED: those readings were off the PLAYER. That the same table serves
 /// MONSTERS follows from it being the game's own CastType enum rather than a per-monster list,
 /// and it is not proven here. The tracker tab prints the id beside the name for exactly this
 /// reason - a monster whose names read like nonsense would say so at a glance.
 ///
-/// A name is a LABEL and never a fact: an id with no row keeps its number, and the table drifts
-/// with the game, so names that stop making sense mean the table needs extracting again.
+/// A name is a LABEL and never a fact. The table no longer drifts by being hand-maintained, but
+/// it still ages with the game: re-run <c>--animdump</c> after a patch and diff.
 /// </remarks>
 public sealed class AnimationNames
 {
@@ -86,15 +98,126 @@ public sealed class AnimationNames
     public static AnimationNames Empty { get; } = new([]);
 
     private readonly Dictionary<int, string> _names;
-    private readonly Dictionary<int, AnimationKind> _kinds = [];
+
+    /// <summary>
+    /// Names read from the RUNNING GAME, which beat the shipped ones.
+    /// </summary>
+    /// <remarks>
+    /// THE SHIPPED TABLE IS HAND-MAINTAINED AND DEMONSTRABLY DRIFTS - its own header says so, and
+    /// it says a name is "a LABEL, never a fact". The game carries the truth: an action wrapper
+    /// points straight at the animation's own row in Data/Balance/Animation.dat, whose first
+    /// field is its id string (see <c>ActionWrapper.AnimationRow</c> in the schema). So an
+    /// animation the tool actually SEES can be named by the game rather than by the table.
+    ///
+    /// The first thing that bought was a correction, and then a bigger one. Six animations read
+    /// live disagreed with the file on exactly one: 889, InteractLeanWell in the file,
+    /// ElementalWeakness in the game. From six rows that looked like a table drifting one row at
+    /// a time, and it was hand-patched as such. It was not. Reading the WHOLE table (--animdump)
+    /// showed three rows inserted since - at 584, 599 and 904 - shifting 500 of the file's 1084
+    /// rows by one, two or three, with zero rows left over. 889 was a symptom of the shift, and
+    /// patching it made the file less consistent rather than more.
+    ///
+    /// THE LESSON IS ABOUT THE SAMPLE, not about the table: six rows can tell you that something
+    /// is wrong and can never tell you what. Only a whole-table read separates "a few bad rows"
+    /// from "everything above 584 moved".
+    ///
+    /// Concurrent because the reader thread learns while the render thread asks.
+    /// </remarks>
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<int, string> _learned = new();
+
+    /// <summary>
+    /// The classification cache. Concurrent for the same reason, and CLEARED PER ID when that id
+    /// is learned - a kind derived from the old name would otherwise outlive it.
+    /// </summary>
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<int, AnimationKind> _kinds = new();
 
     private AnimationNames(Dictionary<int, string> names) => _names = names;
 
     /// <summary>How many names were loaded.</summary>
     public int Count => _names.Count;
 
-    /// <summary>The game's name for an animation id, or null when the table has none.</summary>
-    public string? Of(int id) => _names.TryGetValue(id, out string? name) ? name : null;
+    /// <summary>How many the running game has supplied.</summary>
+    public int LearnedCount => _learned.Count;
+
+    /// <summary>
+    /// Ids where the game disagrees with the shipped table, as (id, shipped, game).
+    /// </summary>
+    /// <remarks>
+    /// Worth being able to ask rather than merely correcting silently: a growing list means the
+    /// file wants re-extracting, and a person reading the table has no other way to find out.
+    /// </remarks>
+    public IReadOnlyList<(int Id, string Shipped, string Game)> Disagreements =>
+        [.. _learned
+            .Where(pair => _names.TryGetValue(pair.Key, out string? shipped)
+                           && !string.Equals(shipped, pair.Value, StringComparison.Ordinal))
+            .Select(pair => (pair.Key, _names[pair.Key], pair.Value))
+            .OrderBy(row => row.Key)];
+
+    /// <summary>
+    /// Records what the game calls an animation. The game wins over the shipped table.
+    /// </summary>
+    public void Learn(int id, string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return;
+        }
+
+        _learned[id] = name.Trim();
+        _kinds.TryRemove(id, out _);
+    }
+
+    /// <summary>Every id whose name contains <paramref name="word"/>, ignoring case.</summary>
+    /// <remarks>
+    /// THE POINT IS TO ASK THE GAME RATHER THAN TO KEEP A LIST. "Which animations are dodge
+    /// rolls" has a list-shaped answer - DodgeRoll, DodgeRollBack, FloatDodgeRoll, DodgeRollSprint,
+    /// CannonDodgeRollBack and eight more - and any list of those written by hand is a list
+    /// somebody has to maintain against a game that adds them. The table is the game's own, so
+    /// the question can be asked of it instead, which is the same reasoning that made
+    /// <see cref="Classify"/> match on words rather than on ids.
+    ///
+    /// A SUBSTRING IS A BLUNT INSTRUMENT and the caller has to choose the word carefully:
+    /// "roll" also catches RollingMagma, which is a spell. That is the caller's problem to get
+    /// right - see <c>RollWatch</c>, which asks for "dodgeroll" for exactly this reason.
+    /// </remarks>
+    public IReadOnlySet<int> IdsNamed(string word)
+    {
+        var found = new HashSet<int>();
+        if (string.IsNullOrWhiteSpace(word))
+        {
+            return found;
+        }
+
+        // The shipped table first, then the learned names on top - and a learned name can
+        // REMOVE an id as well as add one, which is why the second pass sets rather than adds.
+        foreach ((int id, string name) in _names)
+        {
+            if (name.Contains(word, StringComparison.OrdinalIgnoreCase))
+            {
+                found.Add(id);
+            }
+        }
+
+        foreach ((int id, string name) in _learned)
+        {
+            if (name.Contains(word, StringComparison.OrdinalIgnoreCase))
+            {
+                found.Add(id);
+            }
+            else
+            {
+                found.Remove(id);
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>The game's name for an animation id, or null when nothing has one.</summary>
+    public string? Of(int id)
+        => _learned.TryGetValue(id, out string? live) ? live
+            : _names.TryGetValue(id, out string? name) ? name
+            : null;
 
     /// <summary>The name, or the bare number when there is none - for showing a person.</summary>
     public string Label(int id) => Of(id) ?? id.ToString(System.Globalization.CultureInfo.InvariantCulture);

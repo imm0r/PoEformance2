@@ -39,6 +39,33 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("projectilePaths")] bool ProjectilePaths = false,
     [property: JsonPropertyName("projectilesMineOnly")] bool ProjectilesMineOnly = false,
 
+    // The effect debug layer and the read behind it. OFF, unlike the projectiles above, because
+    // this one costs: KeepEffects undoes the rule that stops a Firewall build covering its own
+    // screen in enemy markers, and it only pays off with the visual entities read as well.
+    //
+    // SAVED AT ALL because they were not, and that was a real hole rather than an omission. The
+    // three switches sat one tab away from the projectile ones, which have always persisted, so
+    // the difference read as a bug - and it IS one for the job these are for: a recording can
+    // only contain reads the running build performed, so anything needing hostile effects in the
+    // file has to have this on BEFORE the process starts, and a session-only switch cannot be.
+    [property: JsonPropertyName("showEffects")] bool ShowEffects = false,
+    [property: JsonPropertyName("effectPaths")] bool EffectPaths = true,
+    [property: JsonPropertyName("keepEffects")] bool KeepEffects = false,
+
+    // The Stash tab's four switches. ALL FOUR REACH THE NETWORK - poe2db for pictures,
+    // poe.ninja and the trade site for prices, and the game's own currency exchange - which is
+    // why every one of them ships off and why the stores that own them say "off until somebody
+    // says otherwise".
+    //
+    // SAYING SO ONCE IS WHAT THAT SENTENCE MEANS. Until now it had to be said again on every
+    // launch, which is not a policy about outbound requests - a tool that asks poe.ninja the
+    // moment you tick a box asks it just the same the second time you tick it - it was simply
+    // four switches nobody had wired to the file.
+    [property: JsonPropertyName("stashItemArt")] bool StashItemArt = false,
+    [property: JsonPropertyName("stashPrices")] bool StashPrices = false,
+    [property: JsonPropertyName("stashExchange")] bool StashExchange = false,
+    [property: JsonPropertyName("stashTrade")] bool StashTrade = false,
+
     // How the tool's OWN windows are drawn, as its own object rather than three more fields
     // out here: it is a different subject from what the overlay draws on the game, and a
     // settings file stops being readable at exactly the point everything shares one level.
@@ -49,6 +76,15 @@ public sealed record OverlaySettings(
     // for the reason the window rules key on ids: a label is wording, and a reworded tab
     // must not come back. Null until somebody hides one, so an untouched file gains no key.
     [property: JsonPropertyName("hiddenTabs")] IReadOnlyList<string>? HiddenTabs = null,
+
+    // Which classes of noise are LET THROUGH, by name, and null until somebody lets one through -
+    // the same bargain as the hidden tabs above. By name so a kind added to the enum later
+    // cannot silently turn a saved choice into a different one.
+    //
+    // The Effects tab is the only thing that edits this, and it edits one: the engine's own
+    // /fx/ and /mat/ nodes, which are what a wave would arrive as. Session-only until now, which
+    // made it the same hole as the switches beside it.
+    [property: JsonPropertyName("noiseOff")] IReadOnlyList<string>? NoiseOff = null,
 
     // What the entity browser leaves out of its list: metadata paths for a whole kind, and
     // kind-plus-place for one entity. Both last, because hiding clutter is a decision made
@@ -79,6 +115,9 @@ public sealed record OverlaySettings(
 
     /// <summary>The hidden tab ids, empty until somebody hides one.</summary>
     public IReadOnlyList<string> HiddenTabsOrEmpty => HiddenTabs ?? [];
+
+    /// <summary>The noise classes let through, empty until somebody lets one through.</summary>
+    public IReadOnlyList<string> NoiseOffOrEmpty => NoiseOff ?? [];
 
     /// <summary>The entity kinds the browser leaves out, empty until somebody hides one.</summary>
     public IReadOnlyList<string> HiddenEntitiesOrEmpty => HiddenEntities ?? [];

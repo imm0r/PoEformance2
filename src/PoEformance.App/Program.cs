@@ -201,6 +201,29 @@ internal static class Program
                 hunt.Report(hunt.Run(gameStatesAddress, scanHeap: options.ScanHeap), Console.Out);
                 recorder?.MarkFrame();
             }
+
+            // Opt-in and interactive: samples the player's Actor while the person plays the
+            // protocol it prints, hunting the action fields (ActionPtr / ActionId / the
+            // wrapper's Destination) that no reference carries PoE2 numbers for. Against a
+            // replay it steps the recording's own frames instead, which is what lets a hunt
+            // that was recorded once be re-scored offline after every analyzer change.
+            if (options.HuntActions)
+            {
+                RunActionHunt(reader, worldSchema, gameStatesAddress, recorder);
+            }
+
+            // The same shape one question further on: --actionhunt finds WHERE an action is
+            // aimed, this finds WHAT it is. Kept a separate switch because it costs far more
+            // per frame and answers nothing the other one is asked for.
+            if (options.HuntSkills)
+            {
+                RunSkillHunt(reader, worldSchema, gameStatesAddress, recorder);
+            }
+
+            if (options.DumpAnimations)
+            {
+                RunAnimationDump(reader, worldSchema, gameStatesAddress, recorder);
+            }
         }
 
         // ── Auto-flask ───────────────────────────────────────────────────────
@@ -238,6 +261,13 @@ internal static class Program
         // screen - so without this a buff rule is written by guessing at a spelling.
         var buffWatch = new PoEformance.Features.BuffWatch();
 
+        // What is about to land on the player. Created HERE rather than inside the overlay loop
+        // because the config window starts first and edits the same planner: two of them would
+        // mean the window changing settings that the reader never sees, which is the shape of
+        // "the switch does nothing" that this tool has no way of showing.
+        var evasionPlanner = new PoEformance.Features.EvasionPlanner(
+            PoEformance.Features.EvasionSettingsStore.Load());
+
         // The config window runs on its own thread so it can be open WHILE the overlay is,
         // which is what makes its switches worth having: a setting that needs a restart is
         // a settings file with extra steps.
@@ -252,7 +282,8 @@ internal static class Program
         Thread? configWindow = options.ShowConfig
             ? StartConfigWindow(
                 reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings,
-                overlaySettings, ruleEngine, buffWatch, overlayHandle, alwaysOnTop: options.ShowOverlay)
+                overlaySettings, ruleEngine, buffWatch, evasionPlanner, overlayHandle,
+                alwaysOnTop: options.ShowOverlay)
             : null;
 
         bool overlayRuns = options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0;
@@ -277,7 +308,7 @@ internal static class Program
 
             RunOverlay(
                 reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
-                ruleEngine, ruleHistory, buffWatch, rotation,
+                ruleEngine, ruleHistory, buffWatch, evasionPlanner, rotation,
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
                 uiBrowser: options.ShowUiBrowser,
                 fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
@@ -537,6 +568,272 @@ internal static class Program
     }
 
     /// <summary>
+    /// Sampling cadence of the action hunt. The rotation recordings resolved 94 ms turns at
+    /// ~47 ms a sample, so 50 ms comfortably resolves casts and click-moves.
+    /// </summary>
+    private const int ActionSampleMs = 50;
+
+    /// <summary>
+    /// Consecutive empty ticks before a live hunt gives up (~5 s) - reached when the game
+    /// leaves the world, so a hunt started in a menu says so instead of hanging.
+    /// </summary>
+    private const int ActionHuntMostFailures = 100;
+
+    /// <summary>
+    /// Reads the whole animation-name table out of the game and writes it beside the executable.
+    /// </summary>
+    /// <remarks>
+    /// SHORT BY DESIGN, unlike the hunts: nothing is being searched for. It samples only until
+    /// two different animations agree on the row array's base - usually a few seconds of moving
+    /// and hitting something - and then reads every row in one pass.
+    ///
+    /// It writes a NEW file and prints the diff rather than replacing data/animations.tsv. A
+    /// dozen behaviours classify off those names, so re-extracting them is a deliberate act with
+    /// a diff somebody looked at, the same way an offset change is.
+    /// </remarks>
+    private static void RunAnimationDump(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var dump = new PoEformance.Game.Diagnostics.AnimationDump(reader, schema);
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                // SEEK FIRST, THEN SAMPLE. The other way round reads whatever frame the reader
+                // happened to be parked on and then moves - which on a replay samples one frame
+                // behind throughout, and leaves the reader somewhere arbitrary afterwards.
+                replay.Seek(frame);
+                if (dump.Sample(gameStatesStatic))
+                {
+                    break;
+                }
+            }
+
+            // The walk needs the frame the live run made its reads on. The last one carries the
+            // newest recorded value of every address, so it is the only position that can hold a
+            // whole table read at some single moment.
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("animation table dump - reading the game's own names.");
+            Console.WriteLine();
+            Console.WriteLine("  MOVE AROUND AND HIT SOMETHING. The row array's base comes from");
+            Console.WriteLine("  seeing real animations, and TWO DIFFERENT ones have to agree on");
+            Console.WriteLine("  it - standing still in town will never confirm it.");
+            Console.WriteLine("  Press a key to give up.");
+            Console.WriteLine();
+
+            int ticks = 0;
+            while (!KeyPressed() && !dump.Sample(gameStatesStatic))
+            {
+                recorder?.MarkFrame();
+
+                if (++ticks % 100 == 0)
+                {
+                    Console.WriteLine(
+                        $"  ... still waiting for a second animation ({dump.Table.Observations} sighting(s))");
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Components.AnimationNames shipped =
+            PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"));
+        PoEformance.Game.Diagnostics.AnimationDumpResult result = dump.Read(shipped);
+        PoEformance.Game.Diagnostics.AnimationDump.Report(result, Console.Out, dump.Slots);
+
+        if (result.Confirmed && result.Names.Count > 0)
+        {
+            string path = Path.Combine(AppContext.BaseDirectory, "animations.generated.tsv");
+            PoEformance.Game.Diagnostics.AnimationDump.WriteTsv(
+                result,
+                path,
+                $"Read {DateTimeOffset.Now:yyyy-MM-dd}, base confirmed by animations "
+                + $"{result.ConfirmedBy.First} and {result.ConfirmedBy.Second}.");
+
+            Console.WriteLine();
+            Console.WriteLine($"  written to {path}");
+            Console.WriteLine("  Diff it against data/animations.tsv before replacing anything.");
+        }
+    }
+
+    /// <summary>
+    /// Runs the skill-name hunt: follows the skill object out to whatever names it.
+    /// </summary>
+    /// <remarks>
+    /// THE SESSION HAS TO BE PLAYED A PARTICULAR WAY and the console says so, because the whole
+    /// method is telling skills apart: a chain that produced one string for one skill has proved
+    /// nothing, since a class name or a shared label does exactly that. Cast several DIFFERENT
+    /// skills, deliberately, and the report marks the chains that gave a different name to each.
+    ///
+    /// Same replay/live split as the action hunt, and for the same reason: the recording IS the
+    /// session, so a chain nobody thought of can be scored offline afterwards without playing
+    /// again - provided the bytes are in the file, which is precisely what this build reads and
+    /// the earlier ones did not.
+    /// </remarks>
+    private static void RunSkillHunt(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var hunt = new PoEformance.Game.Diagnostics.SkillHunt(reader, schema);
+        var samples = new List<PoEformance.Game.Diagnostics.SkillHuntSample>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    samples.Add(sample);
+                }
+            }
+
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("skill hunt - following Actor.CurrentSkillPtr out to whatever names it.");
+            Console.WriteLine();
+            Console.WriteLine("  CAST SEVERAL DIFFERENT SKILLS while this runs. One skill cannot");
+            Console.WriteLine("  distinguish a name from a label that every skill shares.");
+            Console.WriteLine("  Record it (--record) so the file can be re-scored offline.");
+            Console.WriteLine("  Press a key to stop.");
+            Console.WriteLine();
+
+            int failures = 0;
+            int ticks = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    failures = 0;
+                    samples.Add(sample);
+                }
+                else
+                {
+                    failures++;
+                }
+
+                if (++ticks % 200 == 0)
+                {
+                    int named = samples.Count(s => s.Texts.Count > 0);
+                    Console.WriteLine(
+                        $"  ... {samples.Count} frames, {named} with a readable string,"
+                        + $" {hunt.SkillTableEntries} granted skills");
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.SkillHunt.Report(
+            PoEformance.Game.Diagnostics.SkillHunt.Analyze(samples), Console.Out);
+    }
+
+    /// <summary>
+    /// Runs the action-field hunt: live, a sampling loop the person plays against; on a
+    /// replay, a walk over the recording's frames. Same samples, same analysis, one code path
+    /// for the conclusions - the recording IS the session, which is the property every other
+    /// hunt here is built around.
+    /// </summary>
+    private static void RunActionHunt(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var hunt = new PoEformance.Game.Diagnostics.ActionHunt(reader, schema);
+        var samples = new List<PoEformance.Game.Diagnostics.ActionHuntSample>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    samples.Add(sample);
+                }
+            }
+
+            // Back to the reader's default position (the last frame), so whatever reads the
+            // replay after this hunt sees the same final state it would have seen without it.
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("action hunt - sampling the player's Actor component AND every monster's.");
+            Console.WriteLine("  to settle the OFFSETS (player): click-move somewhere and LET THE CHARACTER");
+            Console.WriteLine("  ARRIVE before the next click - a dozen clicks, different directions, an");
+            Console.WriteLine("  idle beat between them - then cast a few skills at distinct spots.");
+            Console.WriteLine("  to settle MONSTERS: stand in a fight. Let things walk at you rather than");
+            Console.WriteLine("  killing them instantly - a monster that arrives somewhere is the evidence,");
+            Console.WriteLine("  and one that dies mid-stride is not.");
+            Console.WriteLine("  Any key to stop and score.");
+            Console.WriteLine();
+
+            int failures = 0;
+            int ticks = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    failures = 0;
+                    samples.Add(sample);
+                }
+                else
+                {
+                    failures++;
+                }
+
+                if (++ticks % 200 == 0)
+                {
+                    // The monster count is in the status line because the first fight recording
+                    // had none and nobody could have known until it was replayed: eighty-six
+                    // seconds of sampling that could not answer the question it was made for.
+                    int monsters = samples.Count > 0 ? samples[^1].Monsters?.Count ?? 0 : 0;
+                    Console.WriteLine(
+                        $"  ... {samples.Count} frames, following {hunt.FollowedSlots.Count} toggling slots,"
+                        + $" {monsters} hostile monster(s) in view");
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.ActionHuntFindings findings = PoEformance.Game.Diagnostics.ActionHunt
+            .Analyze(samples, hunt.AnimationIdOffset, hunt.PlayerCastTypes);
+        PoEformance.Game.Diagnostics.ActionHunt.Report(findings, hunt.AnimationIdOffset, Console.Out);
+
+        // The monster question, asked of the whole session rather than of one frame: the
+        // arrival test and the bearing cross-check, over every monster that was sampled.
+        PoEformance.Game.Diagnostics.MonsterActionCheck.Report(
+            PoEformance.Game.Diagnostics.MonsterActionCheck.Analyze(samples), Console.Out);
+
+        // And what the fields the hunt already found say right now - on the player and, the
+        // case none of them has ever been checked against, on monsters. The hunt searches;
+        // this reads. Both run from one session so a person in a fight gets both answers.
+        var readout = new PoEformance.Game.Diagnostics.ActionReadout(reader, schema);
+        PoEformance.Game.Diagnostics.ActionReadout.Report(
+            readout.Read(gameStatesStatic, PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"))),
+            Console.Out);
+    }
+
+    /// <summary>
     /// Scores every candidate matrix offset against the scene and prints the ranking.
     /// </summary>
     /// <remarks>
@@ -740,12 +1037,57 @@ internal static class Program
         }
     }
 
+    /// <summary>
+    /// Builds the question <see cref="DodgeSteer"/> asks the game: has the roll started yet?
+    /// </summary>
+    /// <remarks>
+    /// THE POINT OF IT is that the steering has to hold the movement keys across one of the
+    /// game's frames and had no way of knowing when one had passed, so it held for a guessed
+    /// length of time instead. The game knows: the player's animation id turns into a roll the
+    /// moment it commits to one, and committing is when it reads the keys. Asked here, in the
+    /// composition root, because it needs the reader and the schema and DodgeSteer must have
+    /// neither - it presses keys, and that is all it should know how to do.
+    ///
+    /// Returns null - meaning "hold for the full time, as before" - whenever any part of the
+    /// question cannot be put: no steering, no Actor address, no offset for the field, or an
+    /// animation table with no roll in it. Every one of those lands on behaviour that works.
+    /// </remarks>
+    private static Func<bool>? RollConfirmer(
+        IMemoryReader reader,
+        PoEformance.Game.Components.AnimationNames names,
+        int animationIdAt,
+        PoEformance.Game.World.WorldSnapshot snapshot,
+        PoEformance.Features.MoveDirection steer)
+    {
+        ulong actor = snapshot.Player?.Actor ?? 0;
+        if (steer == PoEformance.Features.MoveDirection.None || actor == 0 || animationIdAt < 0)
+        {
+            return null;
+        }
+
+        // Read FRESH rather than taken from the snapshot, which can be a whole reader tick old:
+        // the comparison is against what is playing as the key goes down, and a stale "before"
+        // would let the animation it has already moved on to count as the new roll.
+        var watch = PoEformance.Features.RollWatch.For(names, AnimationAt(reader, actor, animationIdAt));
+        return watch.CanWatch ? () => watch.Started(AnimationAt(reader, actor, animationIdAt)) : null;
+    }
+
+    /// <summary>The animation an actor is playing, or -1 when it cannot be read.</summary>
+    /// <remarks>
+    /// Called from the steering thread as well as this one. Safe there because a read is one
+    /// ReadProcessMemory on a handle that is only ever read from, and the caller owns the buffer -
+    /// there is no state between two readers to race over.
+    /// </remarks>
+    private static int AnimationAt(IMemoryReader reader, ulong actor, int offset)
+        => reader.TryRead(actor + (ulong)offset, out int id) ? id : -1;
+
     private static void RunOverlay(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
         PoEformance.Features.AutoFlask autoFlask,
         PoEformance.Features.RuleEngine ruleEngine,
         PoEformance.Features.RuleHistory ruleHistory,
         PoEformance.Features.BuffWatch buffWatch,
+        PoEformance.Features.EvasionPlanner evasionPlanner,
         PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
         ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
@@ -765,11 +1107,33 @@ internal static class Program
         // When the quest set was last re-read, so it happens on a timer and not per frame.
         long questsRead = 0;
 
+        // How many table disagreements have been reported. Not a count of problems - a cursor,
+        // so each row is named once rather than on every read for the rest of the session.
+        int animationDrift = 0;
+
+        // The planner arrives already configured - the config window shares it, and a second
+        // one here would edit settings the reader never sees.
+        PoEformance.Game.Components.AnimationNames animationNames =
+            PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"));
+
+        // Where an actor's animation id sits, resolved once. The steering re-reads that ONE
+        // field while a roll is in flight - a hundred times faster than this loop ticks - so it
+        // cannot go through the snapshot. Missing from the schema switches the confirmation off
+        // rather than guessing a number: the fallback is the flat hold, which works.
+        int animationIdAt = schema.Structs.TryGetValue("Actor", out StructDef? actorDef)
+            ? actorDef.Field("AnimationId")?.Offset ?? -1
+            : -1;
+
         var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation)
         {
             // Names for tiles somebody has described. Missing is fine: the boss arenas are
             // found from the shape of the ground either way, this only names them.
             LandmarkNames = PoEformance.Game.World.LandmarkNames.Load(FindDataFile("landmarks.json")),
+
+            // Set per tick below rather than here: the config window can switch the feature on
+            // while the tool runs, and a flag fixed at construction would make that edit take a
+            // restart to notice.
+            ReadActions = evasionPlanner.Settings.NeedsActions,
         };
         Console.WriteLine();
         Console.WriteLine(gameWindow != IntPtr.Zero
@@ -1055,6 +1419,48 @@ internal static class Program
                 // that ends by being killed still ends somewhere.
                 recorder?.MarkFrame();
 
+                // Before the read, because it decides what the read DOES: four reads per hostile
+                // monster that nobody should pay for a feature they have switched off, and that
+                // has to appear the moment they switch it on.
+                world.ReadActions = evasionPlanner.Settings.NeedsActions;
+
+                // Let the game name its own animations. Two hops and a short string, ONCE per
+                // animation id per session - and it beats the shipped table, which ages with the
+                // game: three rows have been inserted into Data/Balance/Animation.dat since the
+                // file was first transcribed, and while that stood, 37 animations were classified
+                // QUIET that are not. The name is what KindOf classifies, so this is the
+                // difference between filtering an animation correctly and dropping a threat.
+                world.AnimationNames = animationNames;
+
+                // AND SAY SO WHEN IT HAPPENS. The table is generated now, so a disagreement means
+                // the game has moved on since it was generated - which is exactly the state that
+                // last time went unnoticed until somebody went looking. Correcting it silently
+                // fixes this session and lets the file rot; one line names the row and what to
+                // run. Reported once per id, and only for ids the file HAS - a name for an id it
+                // never had is news rather than a contradiction.
+                if (animationNames.Disagreements.Count > animationDrift)
+                {
+                    foreach ((int id, string shipped, string live) in animationNames.Disagreements.Skip(animationDrift))
+                    {
+                        Console.WriteLine(
+                            $"  animation {id}: the table says {shipped}, the game says {live}"
+                            + " - data/animations.tsv is behind, re-run --animdump");
+                    }
+
+                    animationDrift = animationNames.Disagreements.Count;
+                }
+
+                // The keyboard hook, started the first tick steering is switched on and never
+                // before it. Idempotent and a volatile read when it is already running, so it
+                // costs nothing to ask every tick - and asking every tick is what lets the
+                // config window turn steering on without a restart. It is deliberately NOT
+                // started at launch: a global keyboard hook is a thing to install when it is
+                // needed for something, not one to have running because it might be.
+                if (evasionPlanner.Settings.CanSteer)
+                {
+                    PhysicalKeys.Watch();
+                }
+
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
                 uiTree.Service(scale);
                 structures.Service();
@@ -1175,6 +1581,33 @@ internal static class Program
                     InputSender.Press(use.Rule.Key);
                 }
 
+                // What is about to land on the player, and whether to roll out of it. On this
+                // thread and once per read for the same reason the rules are: deciding in the
+                // renderer would make how often the tool rolls a function of the frame rate.
+                //
+                // The planner is pure - it returns a decision, and the press happens HERE, at
+                // the one place in the codebase that can synthesise input.
+                PoEformance.Features.EvasionTick evasion = evasionPlanner.Evaluate(
+                    snapshot,
+                    animationNames,
+                    InputSender.IsForeground(gameWindow),
+                    Environment.TickCount64);
+
+                if (evasion.Dodge)
+                {
+                    // Steered or not, one call: with no direction chosen this is the plain
+                    // press it has always been, and the movement keys are never touched.
+                    PoEformance.Features.EvasionSettings evade = evasionPlanner.Settings;
+                    DodgeSteer.Roll(
+                        (ushort)evade.DodgeKey,
+                        evade.KeysOrDefault.KeysFor(evasion.Steer),
+                        evasion.Steer == PoEformance.Features.MoveDirection.None
+                            ? []
+                            : evade.KeysOrDefault.All,
+                        evade.SteerHoldMs,
+                        RollConfirmer(reader, animationNames, animationIdAt, snapshot, evasion.Steer));
+                }
+
                 // The rules, on this thread and once per read - NOT in the renderer. The
                 // reference plugin evaluates inside its draw callback, which makes how often a
                 // macro fires a function of the frame rate: the same rule types twice as fast
@@ -1225,6 +1658,13 @@ internal static class Program
             cull);
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
+        // The planner's reason, plus what the last few steered rolls cost the game to notice.
+        // A SPREAD and not the latest number: the reason half already changes every tick, and a
+        // second value that also moved once a second made the line unreadable while playing -
+        // which is the state it was actually built to be read in.
+        overlay.EvasionStatus = () => DodgeSteer.Times.Describe() is { Length: > 0 } rolls
+            ? $"{evasionPlanner.LastTick.Reason} · {rolls}"
+            : evasionPlanner.LastTick.Reason;
 
         // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
         // are decided once per read, so asking here would both cost a re-evaluation per frame
@@ -1265,7 +1705,6 @@ internal static class Program
 
         // The effects debug switch, as a pair of callbacks: the overlay draws and has no other
         // business with the reader, and this is the one bit of it worth reaching from up there.
-        overlay.KeepingEffects = () => world.KeepEffects;
         overlay.KeepEffects = keep => world.KeepEffects = keep;
 
         // And the one the projectiles need: the game files every projectile in flight as a
@@ -1279,6 +1718,13 @@ internal static class Program
 
         // And the one the aim rays need: where things point, and what they are doing.
         overlay.ReadAim = read => world.ReadAim = read;
+
+        // The evasion warnings: the settings decide what is drawn, and the threats come from the
+        // LAST EVALUATED tick rather than a fresh one - the renderer runs at VSync while the
+        // planner decides once per read, so asking here would consume the dodge cooldown sixty
+        // times a second.
+        overlay.Evasion = () => evasionPlanner.Settings;
+        overlay.EvasionThreats = () => evasionPlanner.LastTick.Draw;
         overlay.Animations = PoEformance.Game.Components.AnimationNames.Load(
             FindDataFile("animations.tsv"));
 
@@ -1506,6 +1952,7 @@ internal static class Program
         PoEformance.Features.OverlaySettings overlaySettings,
         PoEformance.Features.RuleEngine ruleEngine,
         PoEformance.Features.BuffWatch buffWatch,
+        PoEformance.Features.EvasionPlanner evasionPlanner,
         OverlayHandle overlayHandle,
         bool alwaysOnTop)
     {
@@ -1517,6 +1964,14 @@ internal static class Program
         // a state and replaces them when the page saves.
         PoEformance.Features.AutoFlaskSettings settings = flaskSettings;
         PoEformance.Features.OverlaySettings overlay = overlaySettings;
+
+        // ONCE, not per poll. These come off the game's config file and cannot change while the
+        // tool runs, and the state is rebuilt every second - reading an ini sixty times a minute
+        // to show a hint nobody is watching would be pure waste.
+        IReadOnlyList<string> dodgeHints =
+            [.. PoEformance.Features.DodgeKeyHints.Find().Select(hint => hint.Describe())];
+        IReadOnlyList<string> moveHints =
+            [.. PoEformance.Features.DodgeKeyHints.FindMovement().Select(hint => hint.Describe())];
 
         // One reader for the window's whole life. The terrain grid is cached inside it, so
         // building a fresh one per request would re-read megabytes on every poll.
@@ -1558,7 +2013,22 @@ internal static class Program
                 // show a threshold the engine rejected.
                 Rules: PoEformance.Config.RulesView.Of(
                     ruleEngine, $"{flaskKeys.Source} - {flaskKeys.Detail}", buffWatch,
-                    DescribeReader(overlayHandle)));
+                    DescribeReader(overlayHandle)),
+
+                // Read off the planner rather than from a copy kept beside it, for the same
+                // reason the rules are: the planner normalises what it is given, so what it
+                // holds is what actually runs.
+                Evasion: new PoEformance.Config.EvasionView(
+                    evasionPlanner.Settings,
+                    evasionPlanner.LastTick.Reason,
+                    PoEformance.Features.FlaskKeyBindings.Describe((ushort)evasionPlanner.Settings.DodgeKey),
+                    dodgeHints,
+                    moveHints,
+                    evasionPlanner.Settings.KeysOrDefault.Describe(),
+
+                    // Beside the setting it replaced. This window is read while standing still,
+                    // which is the only place a measurement taken mid-fight can actually be read.
+                    DodgeSteer.Times.Describe()));
         }
 
         // Rebuilding the outline is a pass over megabytes, so it is done once per area and
@@ -1674,6 +2144,23 @@ internal static class Program
                     SaveWarning(
                         PoEformance.Features.AutoFlaskSettingsStore.Save(settings),
                         PoEformance.Features.AutoFlaskSettingsStore.DefaultPath);
+                    return string.Empty;
+
+                case "setEvasionSettings":
+                    PoEformance.Features.EvasionSettings? evasion = request.Payload.Deserialize(
+                        PoEformance.Config.ConfigJsonContext.Default.EvasionSettings);
+                    if (evasion is null)
+                    {
+                        return null;
+                    }
+
+                    // Configure NORMALISES, so the planner holds trustworthy values whatever the
+                    // page sent - and the file is written from what the planner ended up with
+                    // rather than from what arrived, so the two cannot disagree.
+                    evasionPlanner.Configure(evasion);
+                    SaveWarning(
+                        PoEformance.Features.EvasionSettingsStore.Save(evasionPlanner.Settings),
+                        PoEformance.Features.EvasionSettingsStore.DefaultPath);
                     return string.Empty;
 
                 case "setOverlaySettings":
@@ -2059,6 +2546,9 @@ internal static class Program
         bool ShowUiBrowser,
         bool HuntQuestFlags,
         bool ScanHeap,
+        bool HuntActions,
+        bool HuntSkills,
+        bool DumpAnimations,
         IReadOnlyList<string> Peek,
         bool PeekWatch)
     {
@@ -2068,6 +2558,7 @@ internal static class Program
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
+            bool actionHunt = false, skillHunt = false, animDump = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -2137,6 +2628,25 @@ internal static class Program
                         questFlags = true;
                         scanHeap = true;
                         break;
+                    case "--actionhunt":
+                        actionHunt = true;
+                        break;
+
+                    // The follow-up hunt: what the action fields cannot say is WHAT is being
+                    // cast, and this follows the skill object until it reaches the game's own
+                    // name for it. Separate from --actionhunt because it reads far more per
+                    // frame - two hops out of every pointer - and only the session that is
+                    // looking for a name should pay for that.
+                    case "--skillhunt":
+                        skillHunt = true;
+                        break;
+
+                    // Regenerates data/animations.tsv from the game. Not a hunt - nothing is
+                    // being searched for any more - so it stops the moment the row array's base
+                    // is confirmed rather than sampling for as long as somebody plays.
+                    case "--animdump":
+                        animDump = true;
+                        break;
 
                     // Takes a Cheat Engine pointer path as written - "+468C3A8,235C" - so a
                     // finding can be checked without transcribing it into an absolute address
@@ -2167,7 +2677,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, peek, peekWatch);
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, animDump, peek, peekWatch);
         }
     }
 }

@@ -92,6 +92,128 @@
         area does, so "loading" right after a portal is normal.</p>
     </section>
 
+    <!--
+      Evasion. Two gates rather than one master switch, because drawing a marker is free and
+      pressing a key is not: seeing everything coming while the tool only acts on a rare's slam
+      is the ordinary setup, and one threshold cannot say it.
+    -->
+    <section class="card" id="evasion">
+      <h2>Evasion</h2>
+      <p class="dim">Monsters commit to an attack, and to a place it will land, before the
+        animation shows it. This marks that place — and can roll you out of it.</p>
+
+      <label class="master">
+        <input type="checkbox" id="ev-warn">
+        <span>Mark where incoming attacks will land</span>
+      </label>
+      <div class="cfg-row">
+        <label for="ev-warn-rarity">Mark monsters from</label>
+        <select id="ev-warn-rarity">
+          <option value="Normal">Normal — everything</option>
+          <option value="Magic">Magic and better</option>
+          <option value="Rare">Rare and better</option>
+          <option value="Unique">Unique only</option>
+        </select>
+      </div>
+
+      <label class="master">
+        <input type="checkbox" id="ev-act">
+        <span>Press the dodge key when one is aimed at me</span>
+      </label>
+      <div class="cfg-row">
+        <label for="ev-act-rarity">Dodge for monsters from</label>
+        <select id="ev-act-rarity">
+          <option value="Normal">Normal — everything</option>
+          <option value="Magic">Magic and better</option>
+          <option value="Rare">Rare and better</option>
+          <option value="Unique">Unique only</option>
+        </select>
+      </div>
+
+      <!--
+        Editable here, unlike the flask keys, and the difference is deliberate: their config
+        spelling was established against a real file, and nobody has established what this game
+        calls the dodge roll. The hints below are lines FROM that file that mention it - a place
+        to look, never a reading.
+      -->
+      <div class="cfg-row">
+        <label for="ev-key">Dodge key (virtual-key code, 0 = unset)</label>
+        <input type="number" id="ev-key" min="0" max="255" step="1">
+        <span class="dim" id="ev-keyname">–</span>
+      </div>
+      <p class="dim" id="ev-keyhints"></p>
+
+      <div class="cfg-row">
+        <label for="ev-radius">Counts as aimed at me within</label>
+        <input type="number" id="ev-radius" min="10" max="2000" step="10">
+        <span class="dim">world units</span>
+      </div>
+      <div class="cfg-row">
+        <label for="ev-cooldown">Shortest gap between dodges</label>
+        <input type="number" id="ev-cooldown" min="0" max="60000" step="100">
+        <span class="dim">ms</span>
+      </div>
+
+      <div class="cfg-row">
+        <label for="ev-only">Only these monster types</label>
+        <input type="text" id="ev-only" placeholder="Goatman, Skeleton — part of the metadata path, comma separated">
+      </div>
+      <div class="cfg-row">
+        <label for="ev-ignore">Never these</label>
+        <input type="text" id="ev-ignore" placeholder="left empty means no exclusions">
+      </div>
+
+      <div class="cfg-row">
+        <label><input type="checkbox" id="ev-quiet"> Ignore monsters that are only walking</label>
+      </div>
+
+      <!--
+        Steering. Its own switch on top of "press the dodge key", because the two hand the tool
+        different amounts: pressing leaves the direction entirely with the player, while this
+        takes the movement keys over for the length of a roll. Left off, the feature is the one
+        that has been played with for hours.
+      -->
+      <label class="master">
+        <input type="checkbox" id="ev-steer">
+        <span>Also choose which way to roll</span>
+      </label>
+      <p class="dim">Without this the roll goes where you are already pointing — which is at the
+        boss, when you are fighting one, and straight along the beam it is channelling at you.
+        With it, the tool holds a movement key for the length of the roll so it goes
+        <em>across</em> what is coming instead. Your own keys are handed back the moment it ends;
+        if nothing is safer than standing still, it does not roll at all.</p>
+
+      <div class="cfg-row">
+        <label for="ev-move-up">Movement keys (virtual-key codes)</label>
+        <input type="number" id="ev-move-up" min="0" max="255" step="1" title="Forward — W by default">
+        <input type="number" id="ev-move-left" min="0" max="255" step="1" title="Left — A">
+        <input type="number" id="ev-move-down" min="0" max="255" step="1" title="Back — S">
+        <input type="number" id="ev-move-right" min="0" max="255" step="1" title="Right — D">
+        <span class="dim" id="ev-movenames">–</span>
+      </div>
+      <p class="dim" id="ev-movehints"></p>
+
+      <div class="cfg-row">
+        <label for="ev-roll">A roll travels</label>
+        <input type="number" id="ev-roll" min="50" max="2000" step="10">
+        <span class="dim">world units — measured at about 400 on a recorded session</span>
+      </div>
+      <div class="cfg-row">
+        <label for="ev-hold">Hold the movement key for at most</label>
+        <input type="number" id="ev-hold" min="0" max="500" step="10">
+        <span class="dim">ms — a ceiling, not a wait. The tool watches for the roll actually
+          starting and hands your keys straight back when it does, which is one frame however
+          long that frame took. This is only what happens if nothing confirms.</span>
+      </div>
+      <p class="dim" id="ev-rolltimes"></p>
+
+      <p class="dim" id="ev-status">–</p>
+      <p class="dim">With steering off, the roll follows a held movement key or your
+        <em>mouse</em> when none is held — so you steer, and this only decides <em>when</em>.
+        Knowing an attack is committed before its animation starts is the part you cannot do
+        yourself.</p>
+    </section>
+
     <section class="card">
       <h2>Bridge</h2>
       <p class="dim">Raw traffic, newest first — the debugging view while the protocol grows.</p>

@@ -88,6 +88,18 @@ public sealed class PoiLayer
     public bool ShowPicker { get; set; }
 
     /// <summary>
+    /// Called when one of the switches above moved, so the choice is written down.
+    /// </summary>
+    /// <remarks>
+    /// SEVERAL OF THESE PERSIST - showPoi, poiLabels, poiRoutes, poiArrows all have a key in the
+    /// settings file - and until this existed the two edited from inside the picker changed the
+    /// value and told nobody. Holding a value and announcing that it moved are separate jobs,
+    /// and a switch that does only the first is indistinguishable from one that does neither:
+    /// the file is written when this fires and at no other time.
+    /// </remarks>
+    public Action? Changed { get; set; }
+
+    /// <summary>
     /// Keep marking chests that have already been opened.
     /// </summary>
     /// <remarks>
@@ -462,7 +474,14 @@ public sealed class PoiLayer
         }
 
         ImGui.End();
-        ShowPicker = open;
+
+        // Only on an actual change: this runs every frame, and announcing "it is still open"
+        // sixty times a second would rewrite the settings file sixty times a second.
+        if (open != ShowPicker)
+        {
+            ShowPicker = open;
+            Changed?.Invoke();
+        }
     }
 
     private void DrawPickerBody(WorldSnapshot snapshot, WorldEntity player)
@@ -483,6 +502,7 @@ public sealed class PoiLayer
             if (ImGui.Checkbox("arrows", ref arrows))
             {
                 ShowArrows = arrows;
+                Changed?.Invoke();
             }
         }
         else

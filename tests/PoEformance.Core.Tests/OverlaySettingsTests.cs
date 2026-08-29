@@ -401,4 +401,182 @@ public class OverlaySettingsMergeTests
         Assert.True(merged.WealthPanel);
         Assert.Equal(1440, merged.WealthWindowMinutes);
     }
+
+    /// <summary>The effect switches survive a restart, which is the whole reason they exist.</summary>
+    /// <remarks>
+    /// THEY DID NOT, and the report that found it is what makes this worth a test rather than a
+    /// line of wiring: the three switches on the Effects tab were session-only while the
+    /// projectile ones next door had always persisted, so the difference read as a bug.
+    ///
+    /// It is one for the job these are for. A recording can only contain reads the running build
+    /// actually performed, so anything that wants hostile ground effects IN the file needs
+    /// KeepEffects on BEFORE the process starts - and a switch that forgets itself on exit can
+    /// never be on before the process starts. The setting was unreachable for its own purpose.
+    ///
+    /// "THE ONLY ONE OF ITS KIND" WAS WRONG when it was first written here. That sweep compared
+    /// the drawing LAYERS against <c>TrackerSettings</c> and found them all covered - true, and
+    /// not the question. The switches that were missing belong to WINDOWS holding their own
+    /// state, which that sweep never looked at, and the owner found the next four on the Stash
+    /// tab within the hour. A search that answers a narrower question than the one asked reads
+    /// exactly like an answer - the same shape of mistake as six animation rows standing in for
+    /// a table.
+    ///
+    /// AND THEN THIS TEST PASSED WHILE THE FEATURE WAS BROKEN, which is the part worth the ink.
+    /// The field, the Apply, the CurrentSettings and the round-trip below were all in place and
+    /// all correct, and the switches still did not survive a restart: the settings file is
+    /// written when <c>EntityOverlay.SettingsChanged</c> fires and at NO OTHER TIME, and no
+    /// switch on either tab called it. Somewhere to keep a value and something to notice it
+    /// moved are separate jobs, and having only the first is indistinguishable from having
+    /// neither. Every window that owns persisted state now takes a REQUIRED changed callback -
+    /// not an optional one - because that is the only version of this the compiler can check.
+    ///
+    /// WHAT THAT COSTS TO TEST, honestly: nothing here can drive an ImGui checkbox, so no test
+    /// in this file would have caught it and none added since would either. The guard is the
+    /// required constructor argument, not this test.
+    /// </remarks>
+    [Fact]
+    public void TheEffectSwitchesSurviveARestart()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-effects-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(OverlaySettingsStore.Save(
+                OverlaySettings.Default with
+                {
+                    ShowEffects = true,
+                    EffectPaths = false,
+                    KeepEffects = true,
+                },
+                path));
+
+            OverlaySettings back = OverlaySettingsStore.Load(path);
+
+            Assert.True(back.ShowEffects);
+            Assert.False(back.EffectPaths);
+            Assert.True(back.KeepEffects);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    /// <summary>All three ship off-or-harmless, because keeping the effects costs a read.</summary>
+    /// <remarks>
+    /// Persisting a switch is not the same as turning it on. KeepEffects undoes the rule that
+    /// stops a Firewall build covering its own screen in enemy markers, so the default has to
+    /// stay where it was - the complaint was that the setting would not STICK, not that it was
+    /// off. The paths default to true because they are what the layer is for once it is drawn.
+    /// </remarks>
+    [Fact]
+    public void KeepingTheEffectsIsStillOffByDefault()
+    {
+        Assert.False(OverlaySettings.Default.ShowEffects);
+        Assert.False(OverlaySettings.Default.KeepEffects);
+        Assert.True(OverlaySettings.Default.EffectPaths);
+    }
+
+    /// <summary>The config page must not reset them either.</summary>
+    /// <remarks>
+    /// The same trap as the wealth settings above, and worth pinning for these specifically:
+    /// they are set from the overlay and the page has never heard of them, so a merge that
+    /// dropped unknown fields would turn the recording switch off the moment somebody opened
+    /// the configuration window - between arming it and starting the fight.
+    /// </remarks>
+    [Fact]
+    public void AndThePageDoesNotResetTheEffectSwitchesEither()
+    {
+        OverlaySettings armed = OverlaySettings.Default with { ShowEffects = true, KeepEffects = true };
+
+        OverlaySettings merged = armed.MergeFromPage(OverlaySettings.Default);
+
+        Assert.True(merged.ShowEffects);
+        Assert.True(merged.KeepEffects);
+    }
+
+    /// <summary>The Stash tab's four network switches survive a restart too.</summary>
+    /// <remarks>
+    /// FOUND AFTER the effect ones, and by the owner rather than by the sweep that was supposed
+    /// to have covered them. All four reach the network - poe2db for pictures, poe.ninja and the
+    /// trade site for prices, the game's own exchange - and every store that owns one documents
+    /// itself as "off until somebody says otherwise". Saying so once is what that sentence
+    /// means; until now it had to be said again on every launch.
+    ///
+    /// Persisting them is not a change of policy about outbound requests. A tool that asks
+    /// poe.ninja the moment the box is ticked asks it just the same the second time it is
+    /// ticked - the only thing that changed is having to tick it four times a day.
+    /// </remarks>
+    [Fact]
+    public void TheStashSwitchesSurviveARestart()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-stash-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(OverlaySettingsStore.Save(
+                OverlaySettings.Default with
+                {
+                    StashItemArt = true,
+                    StashPrices = true,
+                    StashExchange = true,
+                    StashTrade = true,
+                },
+                path));
+
+            OverlaySettings back = OverlaySettingsStore.Load(path);
+
+            Assert.True(back.StashItemArt);
+            Assert.True(back.StashPrices);
+            Assert.True(back.StashExchange);
+            Assert.True(back.StashTrade);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    /// <summary>And all four still ship off, because all four reach the network.</summary>
+    [Fact]
+    public void TheStashSwitchesAreStillOffByDefault()
+    {
+        Assert.False(OverlaySettings.Default.StashItemArt);
+        Assert.False(OverlaySettings.Default.StashPrices);
+        Assert.False(OverlaySettings.Default.StashExchange);
+        Assert.False(OverlaySettings.Default.StashTrade);
+    }
+
+    /// <summary>Letting a class of noise through survives a restart, and by NAME.</summary>
+    /// <remarks>
+    /// The fourth switch on the Effects tab, missed by the first pass over that very tab: it
+    /// lets the engine's own <c>/fx/</c> and <c>/mat/</c> nodes past the noise filter, which is
+    /// what a wave's particles would arrive as. Stored by name so a kind inserted into
+    /// <c>NoiseKind</c> later cannot silently turn a saved choice into a different class - the
+    /// same reason the loot rarity round-trips by name above.
+    /// </remarks>
+    [Fact]
+    public void LettingNoiseThroughSurvivesARestart()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-noise-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(OverlaySettingsStore.Save(
+                OverlaySettings.Default with { NoiseOff = ["Engine"] },
+                path));
+
+            Assert.Contains("Engine", OverlaySettingsStore.Load(path).NoiseOffOrEmpty);
+            Assert.Contains("Engine", File.ReadAllText(path), StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    /// <summary>Nothing let through writes no key, so an untouched file stays untouched.</summary>
+    [Fact]
+    public void NothingLetThroughIsNotAnEmptyList()
+    {
+        Assert.Null(OverlaySettings.Default.NoiseOff);
+        Assert.Empty(OverlaySettings.Default.NoiseOffOrEmpty);
+    }
 }

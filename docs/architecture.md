@@ -250,6 +250,7 @@ PoEformance.App --overlay                      # the in-game overlay
 PoEformance.App --record session.rec           # same, capturing everything
 PoEformance.App --replay session.rec           # rerun against the capture, no game needed
 PoEformance.App --record s.rec --questflags    # + read where a character's quest flags could be
+PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action fields (see below)
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
@@ -288,6 +289,87 @@ that sweep could never have worked, because the set stores no references at all.
 the READING: the regions land in the recording, so a question that needs the game becomes one
 that can be answered offline as often as it takes, which is how the chain was confirmed once
 somebody handed it over. See "Quests" below for what it actually is.
+
+`--actionhunt` **found the action fields**, and it now also reads them back. It samples the
+player's Actor *and every hostile monster's* while the person plays a small protocol (click-move
+and ARRIVE, then a few casts; for the monster half, stand in a fight and let things walk at you),
+scores candidates by what the game then does, and finishes with two verdicts: whether the
+monsters bear the same offsets out, and a readout of what the schema's action fields say right
+now.
+
+What that hunt settled, from `tests/fixtures/session-2026-08-actions.rec`:
+
+| Field | Offset | What it is |
+| --- | --- | --- |
+| `Actor.ActionId` | 0x2A0 (short) | 0 nothing, 2 skill, 4224 move |
+| `Actor.SkillActionPtr` | 0x238 | → `ActionWrapper` while casting |
+| `Actor.MoveActionPtr` | 0x240 | → `ActionWrapper` while moving |
+| `Actor.CurrentSkillPtr` | 0x3A0 | the skill being cast, 1:1 with the animation id |
+| `ActionWrapper.TargetGrid` | 0x150 | where it is aimed — **integer grid cells** |
+| `ActionWrapper.OriginGrid` | 0x180 | where it started from, same units |
+
+The destination is proven the way this project prefers: not structurally, but by the game. Over
+the four completed move actions in that session the player came to rest at exactly
+`TargetGrid + (0.5, 0.5)` cells — every axis of every arrival inside 0.4999..0.5000 — so the
+stored integer names a cell, the actor stops in the middle of it, and `ActionReader` converts
+with that half cell to predict the arrival to **0.00 world units**. `ActionFieldsTests` replays
+the fixture and asserts it.
+
+Two things that recording taught beyond the offsets, both of which matter more for a warning
+system than the offsets do. **An action can run with no animation at all**: two frames carry a
+committed skill action with a real target while `AnimationId` reads Idle, so an animation-only
+reader is blind to exactly the earliest moment. And **the skill pointer follows the cast, not
+the commitment** — it is still null in those frames, so the earliest signal available is
+`ActionId` plus the wrapper's target.
+
+A **second session** (`tests/fixtures/session-2026-08-fight.rec`, a different area on a
+different day) re-derives all of it from scratch — the same pointer slot, the same short id, the
+same pair at the same offset, with 43 arrivals where the first had four, and a scale-free fit
+that recovers the grid factor without being told it. Two independent sessions agreeing is what
+separates a measurement from a coincidence, and `FightSessionTests` asserts it.
+
+That second recording also taught two lessons about the *tool*, both of which cost it the
+question it was made for, and both fixed:
+
+- **It sampled only the player**, so the entity list in the file is whatever the startup scan
+  saw — seven entities, frozen, none of them a monster, through 86 seconds in which the player
+  demonstrably fought. A recording holds only what the running build read, and no build had ever
+  read a monster's actor. The hunt now walks the entity map every tick with `ReadActions` and
+  `ReadAim` on, so the monsters land in the file.
+- **A failed resolution was cached.** The player pointer is one address all session, so a single
+  unreadable frame at the start — a loading screen — stuck, and every later frame returned
+  nothing. Replayed against the build that made it, that file yields *zero* samples out of 1390
+  readable frames, and the report says "no frames" about a perfectly good session. Nothing
+  crashed and nothing warned; it is the expensive kind of bug, and it is now a regression test.
+
+**The monster question is settled** (`tests/fixtures/session-2026-08-monsters.rec`: 130 seconds
+of a real fight, 54 monsters, 27,156 sightings, 9,300 of them acting). Every offset above had
+been measured on the *player's* actor while the feature they exist for reads *monsters*, and the
+game answered in the two ways it can:
+
+- **The arrival.** 210 monster moves ran to completion and ended on the destination the field
+  named — **185 of them exactly**: median miss 0.00 world units, worst 10.87, which is one grid
+  cell. Across 39 distinct monsters of eleven kinds, none of which anybody had aimed a probe at.
+  A wrong offset does not pass this once, let alone 210 times.
+- **The bearing.** Over 1649 monster *skill* actions the direction from origin to target agrees
+  with `Render.RotationCurrent` to a median of **1.6°**, 94% inside thirty — a field found a
+  month earlier by a different method on a different recording, so this is two unrelated readings
+  agreeing rather than one looking plausible.
+
+Two things that session added. `ActionId` is a **flags word**, not an enum: seven values turn up
+and they decompose into two bits — every id carrying `0x0002` had the skill slot filled, every id
+carrying `0x1000` had the move slot filled, and `0x1002` had both. Read as whole numbers five of
+those seven are strangers; read as bits they are two facts, which is what `ActionReader` now
+tests. And **monsters do not face where they walk** — a move's bearing sits 25.9° off the facing,
+and measuring it from where the monster currently stands makes it *worse* (32.5°). It faces its
+quarry and walks around obstacles, exactly as the player faces the cursor rather than the path.
+That is why `MonsterActionCheck` reports the two bearings apart: mixed, they drag a corroborating
+1.6° out to a doubtful 17.7° and slander a working field.
+
+`WorldReader.ReadActions` remains a separate switch from `ReadAim` — now not because the actions
+are unproven, but because they cost four reads per entity where the aim costs two, and a layer
+that only wants a direction should not pay for a destination. Offsets go in the schema, not in
+code; see the `Actor` and `ActionWrapper` block comments in `schema/poe2.offsets.json`.
 
 ## Status
 
@@ -355,6 +437,267 @@ work was everything around it:
 Every one of these reads a finished `WorldSnapshot` and touches no memory, which is why they
 are testable against a recording and why none of them can slow a read down. In each case the
 interesting part was not the feature:
+
+- **Evasion: warning and acting, and why they are two settings.** The action fields say what a
+  monster has committed to and *where that lands*, so this marks the place and can roll you out
+  of it. `EvasionPlanner` is pure in the way `AutoFlask` is — it returns *whether* to dodge, and
+  `Program.cs` does the pressing at the one place in the codebase that can synthesise input —
+  which is what lets every gate between a monster twitching and a keystroke leaving the process
+  be a unit test. Drawing and acting have **separate rarity floors** because they cost different
+  things: a marker for a white monster is a ring on the screen, a keystroke for one is a roll
+  charge, and white monsters are most of what an area contains. Both default to off.
+  - **What decides a roll's direction**, settled by the owner testing it under WASD: a held
+    movement key wins, and with none held the roll goes towards the cursor. Left alone the tool
+    supplies only the **timing**, the half a person cannot do: an attack is committed, and its
+    landing spot known, before any animation shows it. Two minutes in front of a map boss, the
+    owner steering and the tool pressing, cost zero hits — which is why that stayed a mode rather
+    than becoming a stepping stone.
+  - **Steering, and why the danger had to become a line.** Timing alone loses one case, and the
+    owner named it: a boss channelling a beam *at* you, while you point at the boss, because that
+    is what you do when you are fighting one. So the roll runs down the beam. Switching `Steer`
+    on has the tool hold a movement key for the length of the roll — the rule above says that
+    wins over the cursor, so no mouse is touched. The scoring is the part worth reading
+    (`Escape`): **the threat is a segment from where the action starts to where it is aimed,
+    extended past the target by one roll.** Scoring by distance from the target *point* instead
+    rates rolling backwards exactly as well as rolling sideways — both end a roll's length from
+    the same point — and backwards stays in the beam for its whole length. The extension is free
+    for everything else: nothing here can tell a beam from a slam (that needs the game's skill
+    data, which this tool does not read), and for a slam centred on the target sideways is just
+    as safe as backwards anyway. A rule that is right for one shape and costless for the other is
+    the one to take when the shape is unknown. Each of the eight key directions is scored by its
+    **worst** threat, not its average — escaping one attack into another is not an escape — and
+    every action with a target counts, including ones the rarity gates would never have drawn:
+    what to draw, what to react to, and where it is safe to land are three questions. If nothing
+    beats standing still it does not roll, and says so.
+  - **"Costless for the other" is too strong, and a wave is the case that breaks it.** Named by
+    the owner (2026-08-29) while deciding whether to build a per-animation danger table: a **wave
+    rolling at the player** is a wide *front* — thin along its travel, long across it — and the
+    segment the model draws runs along its direction of travel. So perpendicular moves *along*
+    the front and does not leave it, while rolling forward *through* a thin front is the direction
+    that plausibly works and scores zero, because it stays on the segment. The rule ranks the
+    likely answer last. Not less precise on a third shape: **inverted on it.** And the shape is
+    only half the problem — **a wave moves**, so whether a place is safe depends on *when* you
+    arrive, and there is no time anywhere in the scoring. Two hazards with identical geometry
+    need opposite answers depending on whether the front is advancing, which means the obvious
+    next step — a table of shape and radius keyed on animation id — could not express a wave even
+    if somebody wrote it; it would need a travel speed too. Which points at not writing a table
+    at all — a front that can be *observed* needs no table and never goes stale, the same "ask the
+    game rather than keep a list" move that answered the steering's hold, and `ProjectileWatch`
+    already derives a direction and a speed from watching something move across successive reads.
+    **But a hostile wave reaches none of that today**, and it is dropped three times over, each
+    with a recorded reason: `ReadVisualEntities` is off, so the entity walk discards everything
+    from id `0x40000000` up — decorations, effects, every projectile in flight — before the path
+    is read (measured: 17 gameplay entities against 51 visuals per frame on a Spark session);
+    `KeepEffects` is off, so a hostile thing that expires on its own and cannot be targeted is
+    dropped as a ground effect wearing a monster's components (the rule that stopped flame walls
+    being health-barred); and even with both on, a monster's projectile is usually filed under the
+    *monster's* own path (`Metadata/Monsters/…/objects/LightningArrow`, 36 sightings in one
+    recorded map), so it classifies as a Monster, carries no Life, and is dropped again — only
+    `Metadata/Projectiles/…` becomes `EntityKind.Projectile`, which is mostly where a *player's*
+    skills put theirs. So `ProjectileWatch` today follows your own projectiles, not a boss's wave.
+    Both switches are live in the overlay (the **Projectiles** tab turns on the visuals, the
+    **Effects** tab keeps the ground effects) and both now **persist**, which they had to before
+    the question could be asked at all: nobody can watch an entity browser through a boss fight,
+    so the answer comes from a `--record`ing — and a recording can only contain reads the running
+    build performed, so a switch that forgot itself on exit could never be on when one started.
+  - **Measured against a real boss** (`tests/fixtures/session-2026-08-effects.rec`,
+    `HostileEffectTests`), and it **splits the question rather than answering it**.
+    **Movement alone does not mean a hazard** — the first reading of this recording said it did.
+    It reported `PermanentEffect` as a travelling threat on **1304 clean consecutive-frame
+    steps, every one under 200 units and none over 1000**, and every one of those numbers is
+    true. They belong to three effects **pinned to the player**: never more than thirty units
+    away across 975 frames, having travelled the same ten thousand units the player did. A clean
+    measurement was read as a travelling hazard without asking *what* was travelling, and what
+    exposed it was the owner mentioning they had spent the recording running. **The
+    discriminator is range, not movement.** What is left is short-lived: the boss's own effects
+    run about **ten frames each**, half a second at the reader's rate, so an observation-based
+    model gets roughly ten sightings to decide from — and one of them does close on the player
+    monotonically (ten steps, none opening), which is one instance and not a rule. Ground effects
+    move **exactly zero**, so standing and travelling danger *are* distinguishable.
+    **But the path names nothing** —
+    `Effect`, `PermanentEffect`, `SleepableEffect`, `BeamEffect` are engine words, not skill
+    names — so geometry can be observed and *identity* cannot; a table may still be wanted for
+    what a thing **is** while what it is **doing** comes from the world for free. And the third
+    barrier is confirmed on data: **all 6864 sightings under `Metadata/Projectiles` in that
+    fight are the player's own Spark**, not one monster projectile classified as a projectile.
+    The wave itself is still unobserved — the boss is drawn at random and that fight had none;
+    **the danger model is an open question and the scoring is unchanged.**
+  - **Which way is "W"** comes from the game's own matrix, not from an isometric constant:
+    project the player, step up the screen, invert onto the player's ground plane, and the
+    difference is the world direction (`ScreenBasis`). Over the 1984 in-game frames of the
+    monsters fixture that gives up-screen = world (0.7071, 0.7071) and right = (0.7071, −0.7071)
+    — the world axes run diagonally across the screen — with the two screen axes coming back
+    **0.19° from perpendicular in the world** at worst, which was not guaranteed and is what
+    makes the diagonals evenly spread. The decisive test puts the derived direction back through
+    the projection and asks whether it lands directly above the player on screen; a sign error, a
+    swapped column or a row-major reading all fail it, and none of them fails a length check.
+    That the game's forward key moves the character up the screen was the one thing no
+    recording could answer — it is a fact about the *controls*, not about memory — and the owner
+    settled it at the keyboard (2026-08-29), the same route by which the roll rule was
+    established. **The whole sequence then held up over two complete maps** (2026-08-29): the roll
+    goes the way the planner chose, WSAD can be held down throughout, and movement resumes in the
+    held direction the instant the roll ends — no key to press again. That last part is what
+    `PhysicalKeys` exists for, and the only way to confirm it was to play, because no recording
+    can show a finger still on a key. Steering still ships off, on a different argument: taking
+    the movement keys over should be something a person switches on deliberately.
+  - **How long to hold is asked of the game, not of a setting.** The steering key has to stay
+    down across the frame in which the game resolves the roll's direction, and one frame is
+    16.7 ms at 60 fps and 62 ms at 16 — so `SteerHoldMs` was a single number that is too long on
+    a fast machine and, worse, too short on a slow one, where it fails *silently*: the roll goes
+    where the player was already pointing, which looks exactly like the steering choosing that
+    direction. The obvious fix is to read the frame rate and scale, and it was looked for first —
+    GameHelper2's FPS is its own overlay's `ImGui.GetIO().Framerate`, the AHK tool's is its own
+    profiler's, and **no reference reads a frame rate out of the game**, so a hunt would have had
+    nothing to check its answer against. It is also the wrong question. A frame rate is a *proxy*
+    for "has the game seen the keys yet", and the game answers that itself: `RollWatch` waits for
+    the player's own animation id to turn into one the game calls a dodge roll, because
+    committing to the roll is when the direction is read. `DodgeSteer` gives the keys back the
+    moment it does — one frame and a little, however long that frame took, through a stutter that
+    an averaged frame rate would have smoothed away. `SteerHoldMs` is now a **ceiling**, reached
+    only when nothing confirms (no table, no `Actor` address, or a roll chained out of another,
+    where the id never changes) — every one of which falls back on the behaviour that already
+    worked. The word is `"dodgeroll"` and not `"roll"` for a reason one id wide: 402 is
+    DodgeRollBack and 403 is RollingMagma, a spell. The wait spins rather than sleeping, because
+    `Thread.Sleep` is quantised to the per-process system timer — 15.6 ms unless this process has
+    raised it, which also means every flat hold measured so far was a floor and not a duration.
+  - **The measurement had to become a spread before it could be read.** It was first shown as
+    the latest confirmation — `roll seen after 18 ms` — and the owner's answer settled it: a roll
+    happens about once a second in a fight, so the line is overwritten before anyone can read it,
+    and a fight is the only place the number is ever produced. `RollTimes` keeps the last 32 and
+    reports `14 rolls seen in 17-24 ms (middle 19)`, on the overlay and in the config window
+    beside the ceiling it is about. **It is also the better measurement**, which is what makes it
+    a fix rather than a presentation change: one confirmation is one frame of one moment, and a
+    stutter, a zone load or a shader compile each produce a single large number indistinguishable
+    from a finding. The middle value ignores the outlier and the range beside it keeps the
+    outlier visible — a middle of 19 over 17–24 is a healthy machine; a middle of 19 over 17–180
+    is one worth asking about. Rolls nobody could watch are not counted at all, because "nobody
+    looked" and "the game never noticed" are different answers and only one of them is a problem.
+    This is the closest thing the tool has to a frame-time measurement, and it is what the FPS
+    question was really after.
+  - **Giving the keys back is the delicate half, and it needs a keyboard hook.** Windows has one
+    up/down state per key: a synthesised W-up is not "the tool's W-up", it is W being up, and the
+    player's finger on the physical key does not put it back. So the sequence is release, steer,
+    roll, restore — and after the tool's own key-up, *no* API can say whether the player is still
+    holding W. Restoring the snapshot blind fails when they let go mid-roll: their release lands
+    on a key that is already up, the restore presses it down, and the character runs forwards
+    until they happen to tap it again. `PhysicalKeys` is a `WH_KEYBOARD_LL` hook that ignores
+    `LLKHF_INJECTED` events, which is how the AHK tool backs its own `GetKeyState(key, "P")`. It
+    is installed on the first tick steering is switched on, never at launch, on its own thread
+    because a low-level hook is only delivered to a thread that pumps messages — and one that
+    does not pump installs successfully and then silently never fires. `BlockInput` is not the
+    answer to this: it does not clear what is already held, and it swallows the release, which
+    produces exactly the stuck key it was meant to avoid.
+  - **Do not read `RotationCurrent` as the roll's direction.** It follows the cursor, so it is
+    right only for the no-key case; on a key-steered roll it points elsewhere, and on a backward
+    one exactly the other way. Two wrong explanations came out of those correct numbers before
+    the rule did: first that a roll can only run along the line already faced (so sideways was
+    impossible and arming the dodge was "a coin toss"), then that the facing locks onto a target
+    — the second at least checked against the fixture and refuted by it, the nearest monster
+    being 1100 units away and up to 124° off. Worth keeping as the shape of the mistake: a number
+    was asked what it meant instead of the person who could see the screen.
+  - **The dodge key is the one key not read from the game.** The flask spellings were
+    established against a real config; nobody has established what this game calls the dodge
+    roll, and reading a plausible-looking line would be a guess dressed as a measurement — one
+    that presses a key the player never bound. `DodgeKeyHints` shows the candidate lines from
+    the ini and picks none of them. The AHK tool settles it the same way.
+  - **Naming the skill: what is known, and what the next recording has to answer.** The warning
+    knows an attack is committed and *where* it lands, never *what* it is — which is why every
+    threat is one shape. The route to a name is `Actor.CurrentSkillPtr`, and four things about it
+    are now measured rather than assumed (`SkillObjectTests`, against the monsters fixture):
+    - **It is finer than the skill, correcting this project's own claim.** The schema recorded a
+      1:1 correspondence with the animation id from 27 frames of one session; over the monster
+      session it is **four objects to three animation ids**, two of them both playing 299. Each
+      object plays one animation, but not the reverse — so the pointer keys "same cast as last
+      frame", never "which skill is this".
+    - **The action wrapper does not carry it** anywhere in the 0x200 anyone has recorded. PoE1
+      put the skill at wrapper+0x150; in PoE2 that is `TargetGrid`, so the obvious port lands on
+      a field that reads as plausible integers.
+    - **Only 53 of 122 committed skill actions had a skill object at all** — the timing problem
+      as a number. Naming from this pointer cannot be the whole answer for a warning meant to
+      fire before the cast is under way, which is why the hunt also walks the actor's own
+      granted-skill table.
+    - **Every pointer that leaves the object is a dead end offline.** Its own 0x200 is in the
+      file; nothing follows the five outward pointers (0x000, 0x008, 0x010, 0x1F0, 0x1F8). A
+      recording holds only what the running build read, so this needs a new session — which is
+      what `--skillhunt` is for.
+
+    The hunt searches for **text**, because that is the shape of the answer: `ActiveSkills` and
+    `GrantedEffects` both carry `Id: string` as their first column, and this codebase already
+    resolves two other dat rows exactly that way (`ItemReader` — "the dat row's first field is a
+    pointer to the mod's id string"). It follows two hops out and reports every string with the
+    offsets that reached it, marking only the chains that gave a **different** name to every
+    skill — because a class name or an engine label gives the same one to all of them and looks
+    like an answer until it is asked to tell two skills apart. It hunts the broken
+    `ActiveSkillDetails.CastType` in the same pass, by scanning each entry for the *live*
+    animation id rather than trusting a reference's offset.
+
+    **What the first real session answered — and it was not the question.** Six skills cast
+    deliberately (`session-2026-08-skills.rec`); the winning chain was `wrapper+0x220+0x000`,
+    and it names the **animation**, not the skill. The proof is the stride rather than the
+    strings: the row address is `base + id * 106` exactly, over a span of 590 ids — a row array
+    indexed by animation id — and a companion pointer at `0x228` names the file outright,
+    `Data/Balance/Animation.dat`. Five of the six names match `data/animations.tsv` word for
+    word, which is what gave it away; had they been skill ids they would not have.
+    - **The sixth is the payoff, and then it got bigger.** The file said `InteractLeanWell` for
+      animation 889; the game says `ElementalWeakness`. From six rows that looked like a table
+      drifting a row at a time, and it was hand-patched as such — wrongly. Reading the **whole**
+      table (`--animdump`) showed **three rows inserted** since the file was transcribed, at 584
+      (`AbyssalLivingBomb`), 599 (`AbyssalPact`) and 904 (`RemidusDive`), shifting everything
+      after them by one, two and three. Every one of the old file's 1084 rows fits one of those
+      shifts **exactly, with zero leftovers** — so it was never a drifting table, it was a
+      faithful table of an older patch. 889 was a symptom, and patching it made the file less
+      consistent rather than more. Six samples can say that something is wrong and can never say
+      what; only a whole-table read separates "a few bad rows" from "everything above 584 moved".
+    - **What it cost while it stood:** 500 of 1084 ids named the wrong animation, 177 of them
+      changing `AnimationKind`, and **37 classified quiet when the real animation is not** —
+      `ElectricSpit` read as `DodgeRollSprint`, an empowered wyvern flame breath read as
+      `FixedRunLayerBaseForward`. Those are threats the evasion filter dropped in silence.
+      `IsQuiet` is asked the safe way round precisely so an *unknown* animation still counts; a
+      confident **wrong** name walks straight past that guard. `data/animations.tsv` is now
+      generated, and `AimTests` keeps the AHK tool's own live reading of id 872 as the outside
+      check — the only one of its eight ids above an insertion point, off by exactly two.
+    - **The name is not cosmetic**: `KindOf` classifies it, and that decides whether an animation
+      is quiet enough to ignore. A wrong name is a mis-filtered threat; a missing one is a
+      monster the tool can only report as a number.
+    - **The filter earned its keep.** The same session offered `WandSpiritShield` for all eight
+      animations and `Data/Balance/Animation.dat` for six — readable strings that name nothing,
+      both correctly left unmarked, because a chain only counts when it gives a *different*
+      name to every skill.
+    - **Still open:** the skill id. Within 0x400 of the wrapper the only dat file referenced is
+      Animation.dat, and two hops out of `CurrentSkillPtr` reached no text at all. The
+      granted-skill route found nothing either — no offset in the first 0x100 of an entry holds
+      the live animation id on exactly one entry, so the cast type is not an i32 there. And that
+      session holds no frame with a wrapper but no animation, so whether a name is available at
+      *commitment* is still unanswered.
+    - One bug this shook out, of a kind this project has paid for before: the reader marked an
+      animation id "resolved" *before* the read succeeded, so an id whose first sighting was
+      unreadable was burned for the session — four of six skills learned, silently. Failures are
+      now retried, bounded.
+
+    **`--animdump` closes the loop on the shipped table.** The rows are an array, so ONE sighting
+    addresses all of them: `base = row − id·106`. That turns `data/animations.tsv` from a
+    hand-maintained list into something the game regenerates — run it after a patch, diff, done.
+    The safety is entirely in the base, because a wrong row pointer still computes a base, every
+    row still "reads", and the output would be a full table of confident nonsense committed over
+    a working one. So **two *different* animations must agree** before it is used; the same id
+    twice agrees by arithmetic rather than by evidence and is refused. It writes a new file beside
+    the executable and prints the diff rather than replacing anything — re-extracting names that a
+    dozen behaviours classify off is a deliberate act with a diff someone looked at, the same way
+    an offset change is. It also samples both action slots, which answers in passing whether a
+    MOVE wrapper carries the row pointer at the same offset as the SKILL wrapper it was found on.
+
+    What the game's data will **not** give, checked against dat-schema's `poe2/_Core.gql`: no
+    radius, area or shape column exists on `ActiveSkills`, `GrantedEffects`,
+    `GrantedEffectsPerLevel` or the stat sets. Radius, where it exists at all, is a stat row
+    reached through `ConstantStats`/`AdditionalStats`; **shape is nowhere**. So a per-skill table
+    curated by hand, keyed on the id this hunt is after, is the realistic route to anything
+    better than the line model — the way `data/animations.tsv` already works.
+  - **A monster's move bearing is not a check on anything**, which the same recording measured:
+    monsters face their quarry and walk around obstacles, so a destination 26° off the facing is
+    the game working. Only aimed *skills* corroborate the facing, and the report says so.
+  - The one bug the tests caught before the game did was mine: `long.MinValue` as the "never
+    dodged" sentinel makes `now - last` **overflow**, so the first threat of every session reads
+    as still cooling down and nothing is ever pressed. It looks exactly like a working tool.
 
 - **Read cost over time.** A live number answers "is it slow now", which you can already see.
   The useful questions need the shape over a whole map, per phase — one graph for the total
