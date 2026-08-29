@@ -487,6 +487,28 @@ interesting part was not the feature:
     `PhysicalKeys` exists for, and the only way to confirm it was to play, because no recording
     can show a finger still on a key. Steering still ships off, on a different argument: taking
     the movement keys over should be something a person switches on deliberately.
+  - **How long to hold is asked of the game, not of a setting.** The steering key has to stay
+    down across the frame in which the game resolves the roll's direction, and one frame is
+    16.7 ms at 60 fps and 62 ms at 16 — so `SteerHoldMs` was a single number that is too long on
+    a fast machine and, worse, too short on a slow one, where it fails *silently*: the roll goes
+    where the player was already pointing, which looks exactly like the steering choosing that
+    direction. The obvious fix is to read the frame rate and scale, and it was looked for first —
+    GameHelper2's FPS is its own overlay's `ImGui.GetIO().Framerate`, the AHK tool's is its own
+    profiler's, and **no reference reads a frame rate out of the game**, so a hunt would have had
+    nothing to check its answer against. It is also the wrong question. A frame rate is a *proxy*
+    for "has the game seen the keys yet", and the game answers that itself: `RollWatch` waits for
+    the player's own animation id to turn into one the game calls a dodge roll, because
+    committing to the roll is when the direction is read. `DodgeSteer` gives the keys back the
+    moment it does — one frame and a little, however long that frame took, through a stutter that
+    an averaged frame rate would have smoothed away. `SteerHoldMs` is now a **ceiling**, reached
+    only when nothing confirms (no table, no `Actor` address, or a roll chained out of another,
+    where the id never changes) — every one of which falls back on the behaviour that already
+    worked. The word is `"dodgeroll"` and not `"roll"` for a reason one id wide: 402 is
+    DodgeRollBack and 403 is RollingMagma, a spell. The wait spins rather than sleeping, because
+    `Thread.Sleep` is quantised to the per-process system timer — 15.6 ms unless this process has
+    raised it, which also means every flat hold measured so far was a floor and not a duration.
+    The overlay's evasion line reports what each roll cost, which is the closest thing the tool
+    has to a frame-time measurement.
   - **Giving the keys back is the delicate half, and it needs a keyboard hook.** Windows has one
     up/down state per key: a synthesised W-up is not "the tool's W-up", it is W being up, and the
     player's finger on the physical key does not put it back. So the sequence is release, steer,

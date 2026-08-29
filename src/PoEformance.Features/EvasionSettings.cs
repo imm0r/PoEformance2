@@ -148,27 +148,35 @@ public sealed record EvasionGate(
 /// character's movement speed changes it and nobody has measured that relationship.
 /// </param>
 /// <param name="SteerHoldMs">
-/// How long the steering keys stay down around the roll.
+/// The LONGEST the steering keys may stay down around the roll. A ceiling, not a duration.
 ///
-/// THE ONE NUMBER HERE THAT WAS A JUDGEMENT, and it now has two readings against it: 60 ms and
-/// 20 ms both work, on the owner's machine (2026-08-29). That is more useful than it sounds,
-/// because it turns the setting from a guess into a rule with a reason.
+/// IT USED TO BE THE DURATION and that is the interesting part of its history. The keys have to
+/// stay down across one of the game's frames - input that goes down and up between two of the
+/// game's polls can be missed entirely - and nothing told the tool when a frame had passed, so
+/// this number was how long to hold and it was a JUDGEMENT. It got two readings against it:
+/// 60 ms and 20 ms both work, on the owner's machine (2026-08-29). One frame is 16.7 ms at
+/// 60 fps, 33 ms at 30, 62 ms at 16, so 20 clears a frame only above roughly 50 fps while 60
+/// covers everything down to about 16 - which is exactly the shape of those two readings, since
+/// the owner plays well above 50. The failure below the line is SILENT: the roll simply goes
+/// where the player was already pointing, which looks like the steering choosing that direction.
 ///
-/// THE FLOOR IS ONE OF THE GAME'S FRAMES. Input that goes down and up again between two polls
-/// can be missed entirely, so the hold has to span at least one - and one frame is 16.7 ms at
-/// 60 fps, 33 ms at 30, 62 ms at 16. So 20 ms clears a frame only above roughly 50 fps, while 60
-/// covers everything down to about 16. That is exactly the shape of the two readings: the owner
-/// plays well above 50, and at that frame rate the shorter hold has a whole frame to be seen in.
+/// SO IT IS NOT A DURATION ANY MORE. <c>RollWatch</c> asks the game whether the roll has started
+/// and <c>DodgeSteer</c> gives the keys back the moment it has, which is one frame and a little
+/// however long that frame took - on a machine at 30 fps, on a machine at 144, and through a
+/// stutter that a frame-rate reading would have averaged away. What is left for this number is
+/// the case where nothing confirms: no animation table, no Actor address, or a roll chained out
+/// of another one, where the animation id never changes.
 ///
-/// SO THE DEFAULT STAYS AT 60 and the shorter value is a tuning, not a fix. It ships for the
-/// machine nobody has measured rather than the one that has, because the failure at too-low is
-/// silent - the roll simply goes where the player was already pointing, which looks like the
-/// steering deciding on that direction.
+/// THE DEFAULT STAYS AT 60 for that reason. As a duration it was sized for the slowest machine
+/// anyone might have; as a ceiling it wants to be sized for the slowest frame anyone might hit,
+/// which is the same number for the same reason. Lowering it now only shortens the fallback -
+/// and on a normal frame it changes nothing at all, because the confirmation gets there first.
 ///
-/// SHORTER IS SAFER WHERE IT WORKS, though, and worth saying: the hold is the window in which
-/// the tool owns the movement keys, so a player who lets go of one inside it gets it pressed
-/// back down by the restore (see <c>PhysicalKeys</c> for why that window cannot be closed
-/// entirely). Twenty milliseconds is a third of the exposure of sixty.
+/// SHORTER IS STILL SAFER WHERE IT WORKS, and worth saying: the hold is the window in which the
+/// tool owns the movement keys, so a player who lets go of one inside it gets it pressed back
+/// down by the restore (see <c>PhysicalKeys</c> for why that window cannot be closed entirely).
+/// The confirmation is what closes most of it, on every machine, without anyone choosing a
+/// number: the overlay's evasion line reports what each roll actually cost.
 /// </param>
 /// <param name="Keys">The movement keys to steer with. See <see cref="MovementKeys"/>.</param>
 public sealed record EvasionSettings(
@@ -245,8 +253,10 @@ public sealed record EvasionSettings(
         // the steering would pick whichever came first. The ceiling is well past any roll seen.
         RollDistance = Math.Clamp(RollDistance, 50f, 2000f),
 
-        // Bounded well below the cooldown at both ends. Zero is legal and means "send the keys
-        // and release them at once", which is worth being able to try when a frame rate is high.
+        // Bounded well below the cooldown at both ends. Zero is legal and means "give the keys
+        // back at once" - which now defeats the confirmation as well as the hold, since there is
+        // no time left in which to notice the roll. It stays legal because it is the honest way
+        // to switch the whole wait off.
         SteerHoldMs = Math.Clamp(SteerHoldMs, 0, 500),
         Keys = KeysOrDefault.Normalised(),
         MarkerRadius = Math.Clamp(MarkerRadius, 2f, 200f),

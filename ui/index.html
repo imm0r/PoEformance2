@@ -199,11 +199,12 @@
         <span class="dim">world units — measured at about 400 on a recorded session</span>
       </div>
       <div class="cfg-row">
-        <label for="ev-hold">Hold the movement key for</label>
+        <label for="ev-hold">Hold the movement key for at most</label>
         <input type="number" id="ev-hold" min="0" max="500" step="10">
-        <span class="dim">ms — must span one of the game's frames: 17 ms at 60 fps, 33 at 30,
-          62 at 16. The default covers a slow machine; 20 works above ~50 fps and is safer,
-          because it is a shorter window in which the tool owns your keys.</span>
+        <span class="dim">ms — a ceiling, not a wait. The tool watches for the roll actually
+          starting and hands your keys straight back when it does, which is one frame however
+          long that frame took. This is only what happens if nothing confirms. The overlay's
+          evasion line shows what each roll really cost.</span>
       </div>
 
       <p class="dim" id="ev-status">–</p>

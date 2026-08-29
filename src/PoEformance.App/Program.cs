@@ -1027,6 +1027,50 @@ internal static class Program
         }
     }
 
+    /// <summary>
+    /// Builds the question <see cref="DodgeSteer"/> asks the game: has the roll started yet?
+    /// </summary>
+    /// <remarks>
+    /// THE POINT OF IT is that the steering has to hold the movement keys across one of the
+    /// game's frames and had no way of knowing when one had passed, so it held for a guessed
+    /// length of time instead. The game knows: the player's animation id turns into a roll the
+    /// moment it commits to one, and committing is when it reads the keys. Asked here, in the
+    /// composition root, because it needs the reader and the schema and DodgeSteer must have
+    /// neither - it presses keys, and that is all it should know how to do.
+    ///
+    /// Returns null - meaning "hold for the full time, as before" - whenever any part of the
+    /// question cannot be put: no steering, no Actor address, no offset for the field, or an
+    /// animation table with no roll in it. Every one of those lands on behaviour that works.
+    /// </remarks>
+    private static Func<bool>? RollConfirmer(
+        IMemoryReader reader,
+        PoEformance.Game.Components.AnimationNames names,
+        int animationIdAt,
+        PoEformance.Game.World.WorldSnapshot snapshot,
+        PoEformance.Features.MoveDirection steer)
+    {
+        ulong actor = snapshot.Player?.Actor ?? 0;
+        if (steer == PoEformance.Features.MoveDirection.None || actor == 0 || animationIdAt < 0)
+        {
+            return null;
+        }
+
+        // Read FRESH rather than taken from the snapshot, which can be a whole reader tick old:
+        // the comparison is against what is playing as the key goes down, and a stale "before"
+        // would let the animation it has already moved on to count as the new roll.
+        var watch = PoEformance.Features.RollWatch.For(names, AnimationAt(reader, actor, animationIdAt));
+        return watch.CanWatch ? () => watch.Started(AnimationAt(reader, actor, animationIdAt)) : null;
+    }
+
+    /// <summary>The animation an actor is playing, or -1 when it cannot be read.</summary>
+    /// <remarks>
+    /// Called from the steering thread as well as this one. Safe there because a read is one
+    /// ReadProcessMemory on a handle that is only ever read from, and the caller owns the buffer -
+    /// there is no state between two readers to race over.
+    /// </remarks>
+    private static int AnimationAt(IMemoryReader reader, ulong actor, int offset)
+        => reader.TryRead(actor + (ulong)offset, out int id) ? id : -1;
+
     private static void RunOverlay(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, IntPtr gameWindow, int cull,
         PoEformance.Features.AutoFlask autoFlask,
@@ -1061,6 +1105,14 @@ internal static class Program
         // one here would edit settings the reader never sees.
         PoEformance.Game.Components.AnimationNames animationNames =
             PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"));
+
+        // Where an actor's animation id sits, resolved once. The steering re-reads that ONE
+        // field while a roll is in flight - a hundred times faster than this loop ticks - so it
+        // cannot go through the snapshot. Missing from the schema switches the confirmation off
+        // rather than guessing a number: the fallback is the flat hold, which works.
+        int animationIdAt = schema.Structs.TryGetValue("Actor", out StructDef? actorDef)
+            ? actorDef.Field("AnimationId")?.Offset ?? -1
+            : -1;
 
         var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation)
         {
@@ -1542,7 +1594,8 @@ internal static class Program
                         evasion.Steer == PoEformance.Features.MoveDirection.None
                             ? []
                             : evade.KeysOrDefault.All,
-                        evade.SteerHoldMs);
+                        evade.SteerHoldMs,
+                        RollConfirmer(reader, animationNames, animationIdAt, snapshot, evasion.Steer));
                 }
 
                 // The rules, on this thread and once per read - NOT in the renderer. The
@@ -1595,7 +1648,13 @@ internal static class Program
             cull);
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
-        overlay.EvasionStatus = () => evasionPlanner.LastTick.Reason;
+        // The planner's reason, plus what the last steered roll actually cost. The second half
+        // is the only place the tool ever shows a measurement of the game's frame time, and it
+        // is worth showing because the hold used to be a setting somebody had to guess at: a
+        // line reading "roll seen after 18 ms" is that guess being replaced in front of them.
+        overlay.EvasionStatus = () => DodgeSteer.LastRoll is { Length: > 0 } roll
+            ? $"{evasionPlanner.LastTick.Reason} · {roll}"
+            : evasionPlanner.LastTick.Reason;
 
         // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
         // are decided once per read, so asking here would both cost a re-evaluation per frame
