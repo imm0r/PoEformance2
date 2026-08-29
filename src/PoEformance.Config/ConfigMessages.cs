@@ -230,7 +230,30 @@ public sealed record ConfigState(
     [property: JsonPropertyName("autoFlask")] AutoFlaskView? AutoFlask = null,
     [property: JsonPropertyName("overlay")] OverlayView? Overlay = null,
     [property: JsonPropertyName("map")] MapStateView? Map = null,
-    [property: JsonPropertyName("rules")] RulesView? Rules = null);
+    [property: JsonPropertyName("rules")] RulesView? Rules = null,
+    [property: JsonPropertyName("evasion")] EvasionView? Evasion = null);
+
+/// <summary>The evasion panel: the settings, the key, and why nothing is happening.</summary>
+/// <param name="Status">
+/// The planner's last reason. Worth its own line here as well as on the overlay, because this
+/// feature has more ways of being armed and silent than any other in the tool - both gates, a
+/// rarity floor nothing in the area reaches, an unset key, the cooldown - and they look
+/// identical from the outside.
+/// </param>
+/// <param name="KeyName">
+/// The dodge key in words, or "unbound". Editable here, unlike the flask keys: this is the one
+/// key the tool does NOT read from the game, because nobody has established what the game calls
+/// it - see <see cref="Features.DodgeKeyHints"/>.
+/// </param>
+/// <param name="KeyHints">
+/// Lines from the game's own config that MIGHT be the dodge binding, so somebody can fill the
+/// setting in without opening the ini. Suggestions, never a reading.
+/// </param>
+public sealed record EvasionView(
+    [property: JsonPropertyName("settings")] EvasionSettings Settings,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("keyName")] string KeyName,
+    [property: JsonPropertyName("keyHints")] IReadOnlyList<string> KeyHints);
 
 /// <summary>
 /// Source-generated JSON for the bridge.
@@ -253,4 +276,5 @@ public sealed record ConfigState(
 [JsonSerializable(typeof(RuleCatalogue))]
 [JsonSerializable(typeof(RuleSettings))]
 [JsonSerializable(typeof(ConditionMessage))]
+[JsonSerializable(typeof(EvasionSettings))]
 public sealed partial class ConfigJsonContext : JsonSerializerContext;

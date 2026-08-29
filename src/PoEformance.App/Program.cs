@@ -238,6 +238,13 @@ internal static class Program
         // screen - so without this a buff rule is written by guessing at a spelling.
         var buffWatch = new PoEformance.Features.BuffWatch();
 
+        // What is about to land on the player. Created HERE rather than inside the overlay loop
+        // because the config window starts first and edits the same planner: two of them would
+        // mean the window changing settings that the reader never sees, which is the shape of
+        // "the switch does nothing" that this tool has no way of showing.
+        var evasionPlanner = new PoEformance.Features.EvasionPlanner(
+            PoEformance.Features.EvasionSettingsStore.Load());
+
         // The config window runs on its own thread so it can be open WHILE the overlay is,
         // which is what makes its switches worth having: a setting that needs a restart is
         // a settings file with extra steps.
@@ -252,7 +259,8 @@ internal static class Program
         Thread? configWindow = options.ShowConfig
             ? StartConfigWindow(
                 reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings,
-                overlaySettings, ruleEngine, buffWatch, overlayHandle, alwaysOnTop: options.ShowOverlay)
+                overlaySettings, ruleEngine, buffWatch, evasionPlanner, overlayHandle,
+                alwaysOnTop: options.ShowOverlay)
             : null;
 
         bool overlayRuns = options.ShowOverlay && options.ReplayPath is null && gameStatesAddress != 0;
@@ -277,7 +285,7 @@ internal static class Program
 
             RunOverlay(
                 reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
-                ruleEngine, ruleHistory, buffWatch, rotation,
+                ruleEngine, ruleHistory, buffWatch, evasionPlanner, rotation,
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
                 uiBrowser: options.ShowUiBrowser,
                 fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
@@ -849,6 +857,7 @@ internal static class Program
         PoEformance.Features.RuleEngine ruleEngine,
         PoEformance.Features.RuleHistory ruleHistory,
         PoEformance.Features.BuffWatch buffWatch,
+        PoEformance.Features.EvasionPlanner evasionPlanner,
         PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
         ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
@@ -868,11 +877,21 @@ internal static class Program
         // When the quest set was last re-read, so it happens on a timer and not per frame.
         long questsRead = 0;
 
+        // The planner arrives already configured - the config window shares it, and a second
+        // one here would edit settings the reader never sees.
+        PoEformance.Game.Components.AnimationNames animationNames =
+            PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"));
+
         var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation)
         {
             // Names for tiles somebody has described. Missing is fine: the boss arenas are
             // found from the shape of the ground either way, this only names them.
             LandmarkNames = PoEformance.Game.World.LandmarkNames.Load(FindDataFile("landmarks.json")),
+
+            // Set per tick below rather than here: the config window can switch the feature on
+            // while the tool runs, and a flag fixed at construction would make that edit take a
+            // restart to notice.
+            ReadActions = evasionPlanner.Settings.NeedsActions,
         };
         Console.WriteLine();
         Console.WriteLine(gameWindow != IntPtr.Zero
@@ -1158,6 +1177,11 @@ internal static class Program
                 // that ends by being killed still ends somewhere.
                 recorder?.MarkFrame();
 
+                // Before the read, because it decides what the read DOES: four reads per hostile
+                // monster that nobody should pay for a feature they have switched off, and that
+                // has to appear the moment they switch it on.
+                world.ReadActions = evasionPlanner.Settings.NeedsActions;
+
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
                 uiTree.Service(scale);
                 structures.Service();
@@ -1278,6 +1302,23 @@ internal static class Program
                     InputSender.Press(use.Rule.Key);
                 }
 
+                // What is about to land on the player, and whether to roll out of it. On this
+                // thread and once per read for the same reason the rules are: deciding in the
+                // renderer would make how often the tool rolls a function of the frame rate.
+                //
+                // The planner is pure - it returns a decision, and the press happens HERE, at
+                // the one place in the codebase that can synthesise input.
+                PoEformance.Features.EvasionTick evasion = evasionPlanner.Evaluate(
+                    snapshot,
+                    animationNames,
+                    InputSender.IsForeground(gameWindow),
+                    Environment.TickCount64);
+
+                if (evasion.Dodge)
+                {
+                    InputSender.Press((ushort)evasionPlanner.Settings.DodgeKey);
+                }
+
                 // The rules, on this thread and once per read - NOT in the renderer. The
                 // reference plugin evaluates inside its draw callback, which makes how often a
                 // macro fires a function of the frame rate: the same rule types twice as fast
@@ -1328,6 +1369,7 @@ internal static class Program
             cull);
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
+        overlay.EvasionStatus = () => evasionPlanner.LastTick.Reason;
 
         // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
         // are decided once per read, so asking here would both cost a re-evaluation per frame
@@ -1382,6 +1424,13 @@ internal static class Program
 
         // And the one the aim rays need: where things point, and what they are doing.
         overlay.ReadAim = read => world.ReadAim = read;
+
+        // The evasion warnings: the settings decide what is drawn, and the threats come from the
+        // LAST EVALUATED tick rather than a fresh one - the renderer runs at VSync while the
+        // planner decides once per read, so asking here would consume the dodge cooldown sixty
+        // times a second.
+        overlay.Evasion = () => evasionPlanner.Settings;
+        overlay.EvasionThreats = () => evasionPlanner.LastTick.Draw;
         overlay.Animations = PoEformance.Game.Components.AnimationNames.Load(
             FindDataFile("animations.tsv"));
 
@@ -1609,6 +1658,7 @@ internal static class Program
         PoEformance.Features.OverlaySettings overlaySettings,
         PoEformance.Features.RuleEngine ruleEngine,
         PoEformance.Features.BuffWatch buffWatch,
+        PoEformance.Features.EvasionPlanner evasionPlanner,
         OverlayHandle overlayHandle,
         bool alwaysOnTop)
     {
@@ -1620,6 +1670,12 @@ internal static class Program
         // a state and replaces them when the page saves.
         PoEformance.Features.AutoFlaskSettings settings = flaskSettings;
         PoEformance.Features.OverlaySettings overlay = overlaySettings;
+
+        // ONCE, not per poll. These come off the game's config file and cannot change while the
+        // tool runs, and the state is rebuilt every second - reading an ini sixty times a minute
+        // to show a hint nobody is watching would be pure waste.
+        IReadOnlyList<string> dodgeHints =
+            [.. PoEformance.Features.DodgeKeyHints.Find().Select(hint => hint.Describe())];
 
         // One reader for the window's whole life. The terrain grid is cached inside it, so
         // building a fresh one per request would re-read megabytes on every poll.
@@ -1661,7 +1717,16 @@ internal static class Program
                 // show a threshold the engine rejected.
                 Rules: PoEformance.Config.RulesView.Of(
                     ruleEngine, $"{flaskKeys.Source} - {flaskKeys.Detail}", buffWatch,
-                    DescribeReader(overlayHandle)));
+                    DescribeReader(overlayHandle)),
+
+                // Read off the planner rather than from a copy kept beside it, for the same
+                // reason the rules are: the planner normalises what it is given, so what it
+                // holds is what actually runs.
+                Evasion: new PoEformance.Config.EvasionView(
+                    evasionPlanner.Settings,
+                    evasionPlanner.LastTick.Reason,
+                    PoEformance.Features.FlaskKeyBindings.Describe((ushort)evasionPlanner.Settings.DodgeKey),
+                    dodgeHints));
         }
 
         // Rebuilding the outline is a pass over megabytes, so it is done once per area and
@@ -1777,6 +1842,23 @@ internal static class Program
                     SaveWarning(
                         PoEformance.Features.AutoFlaskSettingsStore.Save(settings),
                         PoEformance.Features.AutoFlaskSettingsStore.DefaultPath);
+                    return string.Empty;
+
+                case "setEvasionSettings":
+                    PoEformance.Features.EvasionSettings? evasion = request.Payload.Deserialize(
+                        PoEformance.Config.ConfigJsonContext.Default.EvasionSettings);
+                    if (evasion is null)
+                    {
+                        return null;
+                    }
+
+                    // Configure NORMALISES, so the planner holds trustworthy values whatever the
+                    // page sent - and the file is written from what the planner ended up with
+                    // rather than from what arrived, so the two cannot disagree.
+                    evasionPlanner.Configure(evasion);
+                    SaveWarning(
+                        PoEformance.Features.EvasionSettingsStore.Save(evasionPlanner.Settings),
+                        PoEformance.Features.EvasionSettingsStore.DefaultPath);
                     return string.Empty;
 
                 case "setOverlaySettings":

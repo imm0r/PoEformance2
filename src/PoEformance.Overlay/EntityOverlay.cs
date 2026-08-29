@@ -127,6 +127,27 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private TrackerSettings _tracker = TrackerSettings.Default;
 
     /// <summary>
+    /// What the evasion warnings draw, and where their threats come from.
+    /// </summary>
+    /// <remarks>
+    /// Its own settings record rather than a section of the tracker's, because the same file
+    /// decides whether the tool PRESSES A KEY - and that is worth being able to find in one
+    /// place. See <see cref="EvasionSettings"/>.
+    /// </remarks>
+    public Func<EvasionSettings>? Evasion
+    {
+        get => _evasion.Settings;
+        set => _evasion.Settings = value;
+    }
+
+    /// <summary>Where the layer gets the threats the planner last decided.</summary>
+    public Func<IReadOnlyList<Threat>>? EvasionThreats
+    {
+        get => _evasion.Threats;
+        set => _evasion.Threats = value;
+    }
+
+    /// <summary>
     /// How every drawn thing looks - colours, sizes, line widths, and whether it is drawn.
     /// </summary>
     /// <remarks>
@@ -463,6 +484,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly GroundDangerLayer _groundDanger = new();
     private readonly StatusIconLayer _statusIcons = new();
     private readonly AimLayer _aim = new();
+
+    /// <summary>The evasion warnings. Not one of the tracker's - it has its own settings file.</summary>
+    private readonly EvasionLayer _evasion = new();
 
     /// <summary>
     /// The animation table, for saying what a monster is doing rather than which number it is.
@@ -959,6 +983,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// automation feature, and a silent no-op cannot answer it.
     /// </remarks>
     public Func<string>? FlaskStatus { get; set; }
+
+    /// <summary>Optional: what the evasion planner did, or why it did nothing.</summary>
+    /// <remarks>
+    /// The same argument as <see cref="FlaskStatus"/>, and it carries more weight here: this
+    /// feature has more ways of being armed and silent - both gates, a rarity floor nothing in
+    /// the area reaches, an unset dodge key, the cooldown - and every one of them looks
+    /// identical from the outside.
+    /// </remarks>
+    public Func<string>? EvasionStatus { get; set; }
 
     /// <summary>
     /// Adds the interface browser, served by an inspector on the reader thread.
@@ -1787,6 +1820,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // Between the lines and the icons: a ray is a world-space line like the monster
             // lines, and the icons carry numbers that nothing should be drawn over.
             _aim.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+
+            // AFTER the aim rays and before the icons, deliberately: a ray says where something
+            // is pointing and this says where its attack will LAND, so when both are on the
+            // marker has to be the one on top. It is the half you are meant to react to.
+            _evasion.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
             _statusIcons.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
 
             if (ShowWorldDots)
@@ -2321,6 +2359,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (FlaskStatus is not null)
             {
                 Row("flask", FlaskStatus(), OverlayInk.Accent);
+            }
+
+            if (EvasionStatus is not null)
+            {
+                Row("evade", EvasionStatus(), OverlayInk.Accent);
             }
 
             // The summary stays here even though the full list is a page of its own: the
