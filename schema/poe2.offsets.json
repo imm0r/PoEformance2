@@ -701,7 +701,7 @@
         "AnimationId": {
           "offset": "0x8B0", "type": "i32",
           "invariant": { "kind": "range", "min": 0, "max": 8192 },
-          "comment": "DRIFT HISTORY: was 0x8A0, shifted +0x10. The old offset FROZE at 0 while acting - the 'changes' symptom. Confirmed via ActorProbe: 0x8B0 cycles Idle(0)/FixedRun(195)/DodgeRoll(268) and skill CastTypes. Vector offsets below did NOT move with it. WHAT 0x380 ACTUALLY IS, measured 2026-08-29 rather than left as 'a locomotion-LAYER field, not this': it mirrors this field for MOVEMENT (195 while 195 here) but collapses every cast to a single 503, whatever the skill - so it is the animation LAYER's id, coarser than this one and never a substitute for it. It also reads 0 during the skill action that had no animation at all (see ActionId), which is what places it on the animation side of the split rather than the action side."
+          "comment": "DRIFT HISTORY: was 0x8A0, shifted +0x10. The old offset FROZE at 0 while acting - the 'changes' symptom. Confirmed via ActorProbe: 0x8B0 cycles Idle(0)/FixedRun(195)/DodgeRoll(268) and skill CastTypes. THE VECTORS BELOW DID NOT ALL STAY PUT, and the sentence that used to end this comment said they did: ActiveSkills and Cooldowns genuinely did not move - both were proven in place by content - while DeployedEntities moved by this same +0x10, in the same upstream commit as this field. It was lumped in with the other two because it read empty, which is what an unverified field looks like when nothing was deployed; see its comment. WHAT 0x380 ACTUALLY IS, measured 2026-08-29 rather than left as 'a locomotion-LAYER field, not this': it mirrors this field for MOVEMENT (195 while 195 here) but collapses every cast to a single 503, whatever the skill - so it is the animation LAYER's id, coarser than this one and never a substitute for it. It also reads 0 during the skill action that had no animation at all (see ActionId), which is what places it on the animation side of the split rather than the action side."
         },
         "ActiveSkills": {
           "offset": "0xB08", "type": "stdVector",
@@ -713,7 +713,27 @@
           "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 256 },
           "comment": "Count stays at the number of cooldown-capable skills; live timers are inside each entry's cdList, not the list size."
         },
-        "DeployedEntities": { "offset": "0xC18", "type": "stdVector", "comment": "Empty (begin=end) with no minions/totems out - that is not a drift. UPSTREAM DISAGREES SINCE 2026-08 and nobody here has looked with minions out: GameHelper2 main now reads DeployedEntityArray at 0xC28 with a 0x18 element ('PoE2 grew this element from 20 to 24 bytes'), while this 0xC18 and the AHK tool's 0x14 stride both predate that. If this offset is the stale one, begin==end forever is EXACTLY what the mis-read looks like - i.e. the sentence above would be masking the drift. To check: a recording with totems/minions deployed, reading both candidates." }
+        "DeployedEntities": {
+          "offset": "0xC28", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 24, "maxCount": 256 },
+          "comment": "The player's own totems/minions/mines, as entity ids - what threat logic needs in order to STOP counting them as threats. DRIFT HISTORY: was 0xC18, shifted +0x10, and the correction is the same one AnimationId above already carries. GameHelper2 moved BOTH in ONE commit (97d84cc, 'Adds Condition for Command skills not on cooldown'): AnimationId 0x8A0->0x8B0 and DeployedEntityArray 0xC18->0xC28, while ActiveSkills 0xB08 and Cooldowns 0xB20 were left untouched. Three of those four fields are independently confirmed here: AnimationId at 0x8B0 in-game (see its comment), and the two vectors NOT moving, in-game, by CONTENT - ActiveSkills@0xB08 decoded 42 entries with 10/10 valid detail pointers while +0x10 gave count=155587 and garbage; Cooldowns@0xB20 decoded 4 entries with real datIds and clean 8000/10000 ms timers (AHK ActorVectorProbeRun, 0.45.13.181). This field is the ONLY one of that commit nobody ever checked, and the reason is the trap: the probe ran with NO minions or totems out, so the vector was empty at both candidate offsets and neither could be told from the other. The note that stood here - 'Empty (begin=end) with no minions/totems out, that is not a drift' - restated that untested case as a finding. It is precisely the symptom a 0x10-short read produces FOREVER, including with a full army out, so it could never have caught the drift it was dismissing. NOT YET CONFIRMED IN GAME HERE, and it cannot be settled from the committed recordings: all 15 fixtures under tests/fixtures were checked and not one holds a single byte of the Actor tail (0xB00..0xC48), because nothing in the build ever read it. DeployedEntitiesProbe now does, every run, at this offset AND its +/-0x10 neighbours, so the next --record session with minions deployed settles it - and it decides by CONTENT (decoded entity ids that exist in the entity map), not by a plausible-looking count, which is the check that let 0xB08 and 0xB20 be proven."
+        }
+      },
+      "consts": {
+        "DeployedEntitySize": "0x18"
+      }
+    },
+
+    "DeployedEntity": {
+      "comment": "One entry of Actor.DeployedEntities: a totem, minion or mine the player put into the world. GameHelper2's DeployedEntityStructure. THE ELEMENT GREW FOR PoE2, 20 bytes to 24 (0x14 -> 0x18), which is a second and INDEPENDENT way to read 'no deployed entities' off a perfectly correct pointer: a reader that checks the vector's byte length against its element size rejects the whole vector when the two do not divide, so an undersized element makes the count read 0 rather than read wrong. Both halves of that trap - the offset and the stride - therefore fail with the identical, harmless-looking symptom, which is why this entry records the stride next to the offset instead of leaving it to whoever first decodes an entry. EntityId cross-references the entity map, and that is the check worth making: an id that names a real entity is the game settling the question, where a plausible count is not.",
+      "fields": {
+        "EntityId": { "offset": "0x00", "type": "u32" },
+        "ActiveSkillsDatId": { "offset": "0x04", "type": "i32" },
+        "DeployedObjectType": { "offset": "0x08", "type": "i32" },
+        "Counter": { "offset": "0x10", "type": "i32" }
+      },
+      "consts": {
+        "Size": "0x18"
       }
     },
 
