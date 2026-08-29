@@ -291,9 +291,11 @@ that can be answered offline as often as it takes, which is how the chain was co
 somebody handed it over. See "Quests" below for what it actually is.
 
 `--actionhunt` **found the action fields**, and it now also reads them back. It samples the
-player's Actor while the person plays a small protocol (click-move and ARRIVE, then a few
-casts), scores candidates by what the game then does, and finishes with a readout of what the
-schema's action fields say right now — for the player *and* for monsters.
+player's Actor *and every hostile monster's* while the person plays a small protocol (click-move
+and ARRIVE, then a few casts; for the monster half, stand in a fight and let things walk at you),
+scores candidates by what the game then does, and finishes with two verdicts: whether the
+monsters bear the same offsets out, and a readout of what the schema's action fields say right
+now.
 
 What that hunt settled, from `tests/fixtures/session-2026-08-actions.rec`:
 
@@ -320,11 +322,35 @@ reader is blind to exactly the earliest moment. And **the skill pointer follows 
 the commitment** — it is still null in those frames, so the earliest signal available is
 `ActionId` plus the wrapper's target.
 
-Still open, and the reason the hunt now reads facing and monsters: every one of these offsets
-was measured on the *player's* actor, while the feature they exist for reads *monsters*. Run
-`--actionhunt` in a fight and the readout's monster rows are the first evidence either way;
-its bearing column then cross-checks each aimed target against `Render.RotationCurrent`, which
-was found independently. Winners go into the schema, not into code; see the `Actor` and
+A **second session** (`tests/fixtures/session-2026-08-fight.rec`, a different area on a
+different day) re-derives all of it from scratch — the same pointer slot, the same short id, the
+same pair at the same offset, with 43 arrivals where the first had four, and a scale-free fit
+that recovers the grid factor without being told it. Two independent sessions agreeing is what
+separates a measurement from a coincidence, and `FightSessionTests` asserts it.
+
+That second recording also taught two lessons about the *tool*, both of which cost it the
+question it was made for, and both fixed:
+
+- **It sampled only the player**, so the entity list in the file is whatever the startup scan
+  saw — seven entities, frozen, none of them a monster, through 86 seconds in which the player
+  demonstrably fought. A recording holds only what the running build read, and no build had ever
+  read a monster's actor. The hunt now walks the entity map every tick with `ReadActions` and
+  `ReadAim` on, so the monsters land in the file.
+- **A failed resolution was cached.** The player pointer is one address all session, so a single
+  unreadable frame at the start — a loading screen — stuck, and every later frame returned
+  nothing. Replayed against the build that made it, that file yields *zero* samples out of 1390
+  readable frames, and the report says "no frames" about a perfectly good session. Nothing
+  crashed and nothing warned; it is the expensive kind of bug, and it is now a regression test.
+
+Still open: every one of these offsets was measured on the *player's* actor, while the feature
+they exist for reads *monsters*. `WorldReader.ReadActions` is deliberately a separate switch from
+`ReadAim` for that reason — the facing is settled on monsters, the actions are not, and one
+switch would let the weaker reading ride in on the stronger one's evidence. `MonsterActionCheck`
+is what will settle it, by the same two tests that settled the player: a monster whose move names
+a destination must **end up there**, and an aimed action's direction must agree with
+`Render.RotationCurrent`, found independently a month earlier. Its verdict on a file with no
+monsters in it is "nothing to say" rather than "no problems found" — the distinction the whole
+diagnostic exists for. Winners go into the schema, not into code; see the `Actor` and
 `ActionWrapper` block comments in `schema/poe2.offsets.json`.
 
 ## Status

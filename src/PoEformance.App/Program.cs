@@ -581,11 +581,14 @@ internal static class Program
         else
         {
             Console.WriteLine();
-            Console.WriteLine("action hunt - sampling the player's Actor component.");
-            Console.WriteLine("  protocol: click-move somewhere and LET THE CHARACTER ARRIVE before the");
-            Console.WriteLine("  next click - a dozen clicks, different directions, an idle beat between");
-            Console.WriteLine("  them - then cast a few skills at distinct spots. The arrivals are the");
-            Console.WriteLine("  evidence the scoring runs on. Any key to stop and score.");
+            Console.WriteLine("action hunt - sampling the player's Actor component AND every monster's.");
+            Console.WriteLine("  to settle the OFFSETS (player): click-move somewhere and LET THE CHARACTER");
+            Console.WriteLine("  ARRIVE before the next click - a dozen clicks, different directions, an");
+            Console.WriteLine("  idle beat between them - then cast a few skills at distinct spots.");
+            Console.WriteLine("  to settle MONSTERS: stand in a fight. Let things walk at you rather than");
+            Console.WriteLine("  killing them instantly - a monster that arrives somewhere is the evidence,");
+            Console.WriteLine("  and one that dies mid-stride is not.");
+            Console.WriteLine("  Any key to stop and score.");
             Console.WriteLine();
 
             int failures = 0;
@@ -605,8 +608,13 @@ internal static class Program
 
                 if (++ticks % 200 == 0)
                 {
+                    // The monster count is in the status line because the first fight recording
+                    // had none and nobody could have known until it was replayed: eighty-six
+                    // seconds of sampling that could not answer the question it was made for.
+                    int monsters = samples.Count > 0 ? samples[^1].Monsters?.Count ?? 0 : 0;
                     Console.WriteLine(
-                        $"  ... {samples.Count} frames, following {hunt.FollowedSlots.Count} toggling slots");
+                        $"  ... {samples.Count} frames, following {hunt.FollowedSlots.Count} toggling slots,"
+                        + $" {monsters} hostile monster(s) in view");
                 }
 
                 Thread.Sleep(ActionSampleMs);
@@ -616,6 +624,11 @@ internal static class Program
         PoEformance.Game.Diagnostics.ActionHuntFindings findings = PoEformance.Game.Diagnostics.ActionHunt
             .Analyze(samples, hunt.AnimationIdOffset, hunt.PlayerCastTypes);
         PoEformance.Game.Diagnostics.ActionHunt.Report(findings, hunt.AnimationIdOffset, Console.Out);
+
+        // The monster question, asked of the whole session rather than of one frame: the
+        // arrival test and the bearing cross-check, over every monster that was sampled.
+        PoEformance.Game.Diagnostics.MonsterActionCheck.Report(
+            PoEformance.Game.Diagnostics.MonsterActionCheck.Analyze(samples), Console.Out);
 
         // And what the fields the hunt already found say right now - on the player and, the
         // case none of them has ever been checked against, on monsters. The hunt searches;
