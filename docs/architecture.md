@@ -290,18 +290,42 @@ the READING: the regions land in the recording, so a question that needs the gam
 that can be answered offline as often as it takes, which is how the chain was confirmed once
 somebody handed it over. See "Quests" below for what it actually is.
 
-`--actionhunt` samples the player's Actor component while the person plays a small protocol
-(click-move and ARRIVE, a dozen times, then a few casts) and scores three things no reference
-carries PoE2 offsets for: the action pointer (null at idle, set while acting), the action id
-(zero at idle), and — the prize for the evasion work — the current action's DESTINATION, found
-as a pair inside a followed block that the player's own position then converges on, fitted
-scale-free across arrivals so grid and world encodings both qualify. ExileCore2 proves the
-fields exist in PoE2 (its metadata names ActionPtr/SimpleActionPtr/ActionId and exposes
-CurrentAction.Destination) but decodes its offsets at runtime, so the numbers have to be found
-here; the PoE1 shape (ActionPtr 0x1A8 → wrapper with Destination 0x170, ActionId 0x208) bounds
-the search. Run it with `--record` and the whole hunt replays offline — against a replay it
-steps the recording's frames instead of the clock. Winners go into the schema, not into code;
-see the `Actor` block comment in `schema/poe2.offsets.json`.
+`--actionhunt` **found the action fields**, and it now also reads them back. It samples the
+player's Actor while the person plays a small protocol (click-move and ARRIVE, then a few
+casts), scores candidates by what the game then does, and finishes with a readout of what the
+schema's action fields say right now — for the player *and* for monsters.
+
+What that hunt settled, from `tests/fixtures/session-2026-08-actions.rec`:
+
+| Field | Offset | What it is |
+| --- | --- | --- |
+| `Actor.ActionId` | 0x2A0 (short) | 0 nothing, 2 skill, 4224 move |
+| `Actor.SkillActionPtr` | 0x238 | → `ActionWrapper` while casting |
+| `Actor.MoveActionPtr` | 0x240 | → `ActionWrapper` while moving |
+| `Actor.CurrentSkillPtr` | 0x3A0 | the skill being cast, 1:1 with the animation id |
+| `ActionWrapper.TargetGrid` | 0x150 | where it is aimed — **integer grid cells** |
+| `ActionWrapper.OriginGrid` | 0x180 | where it started from, same units |
+
+The destination is proven the way this project prefers: not structurally, but by the game. Over
+the four completed move actions in that session the player came to rest at exactly
+`TargetGrid + (0.5, 0.5)` cells — every axis of every arrival inside 0.4999..0.5000 — so the
+stored integer names a cell, the actor stops in the middle of it, and `ActionReader` converts
+with that half cell to predict the arrival to **0.00 world units**. `ActionFieldsTests` replays
+the fixture and asserts it.
+
+Two things that recording taught beyond the offsets, both of which matter more for a warning
+system than the offsets do. **An action can run with no animation at all**: two frames carry a
+committed skill action with a real target while `AnimationId` reads Idle, so an animation-only
+reader is blind to exactly the earliest moment. And **the skill pointer follows the cast, not
+the commitment** — it is still null in those frames, so the earliest signal available is
+`ActionId` plus the wrapper's target.
+
+Still open, and the reason the hunt now reads facing and monsters: every one of these offsets
+was measured on the *player's* actor, while the feature they exist for reads *monsters*. Run
+`--actionhunt` in a fight and the readout's monster rows are the first evidence either way;
+its bearing column then cross-checks each aimed target against `Render.RotationCurrent`, which
+was found independently. Winners go into the schema, not into code; see the `Actor` and
+`ActionWrapper` block comments in `schema/poe2.offsets.json`.
 
 ## Status
 

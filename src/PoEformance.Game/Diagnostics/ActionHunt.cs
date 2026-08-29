@@ -12,12 +12,23 @@ namespace PoEformance.Game.Diagnostics;
 /// For each followed slot (byte offset into <paramref name="Window"/>) that held a plausible
 /// pointer this tick, the first <see cref="ActionHunt.FollowSize"/> bytes behind it.
 /// </param>
+/// <param name="Facing">
+/// Which way the actor was pointing, in radians, or NaN when unread.
+/// </param>
+/// <remarks>
+/// The facing is here because leaving it out cost the first hunt its best cross-check. A cast
+/// is aimed with the mouse and the character faces the mouse, so the bearing from an action's
+/// origin to its claimed target must match this - and that check could not be run against the
+/// first recording at all, because nothing in that build read the rotation bytes and a
+/// recording holds only what the running build read.
+/// </remarks>
 public sealed record ActionHuntSample(
     ulong ActorAddress,
     byte[] Window,
     float PlayerX,
     float PlayerY,
-    IReadOnlyDictionary<int, byte[]> Followed);
+    IReadOnlyDictionary<int, byte[]> Followed,
+    float Facing = float.NaN);
 
 /// <summary>A pointer slot that comes and goes with activity - an ActionPtr candidate.</summary>
 /// <param name="ActingNonNull">Share of acting frames in which the slot held a pointer.</param>
@@ -233,6 +244,11 @@ public sealed class ActionHunt
             return null;
         }
 
+        // Read even though this hunt does not score with it: the next question about these
+        // fields is whether a cast's target agrees with where the actor is pointing, and that
+        // question can only be asked of a recording whose build performed this read.
+        float facing = _render.ReadFacing(_cachedRender) is (float angle, _) ? angle : float.NaN;
+
         var window = new byte[WindowSize];
         if (!ReadChunked(_cachedActor, window))
         {
@@ -257,7 +273,7 @@ public sealed class ActionHunt
             }
         }
 
-        return new ActionHuntSample(_cachedActor, window, position.X, position.Y, followed);
+        return new ActionHuntSample(_cachedActor, window, position.X, position.Y, followed, facing);
     }
 
     /// <summary>Resolves the player's Actor and Render once, and its skill CastType table.</summary>

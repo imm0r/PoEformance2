@@ -616,6 +616,14 @@ internal static class Program
         PoEformance.Game.Diagnostics.ActionHuntFindings findings = PoEformance.Game.Diagnostics.ActionHunt
             .Analyze(samples, hunt.AnimationIdOffset, hunt.PlayerCastTypes);
         PoEformance.Game.Diagnostics.ActionHunt.Report(findings, hunt.AnimationIdOffset, Console.Out);
+
+        // And what the fields the hunt already found say right now - on the player and, the
+        // case none of them has ever been checked against, on monsters. The hunt searches;
+        // this reads. Both run from one session so a person in a fight gets both answers.
+        var readout = new PoEformance.Game.Diagnostics.ActionReadout(reader, schema);
+        PoEformance.Game.Diagnostics.ActionReadout.Report(
+            readout.Read(gameStatesStatic, PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"))),
+            Console.Out);
     }
 
     /// <summary>
