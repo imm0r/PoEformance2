@@ -71,25 +71,20 @@ public sealed record EvasionTick(IReadOnlyList<Threat> Draw, bool Dodge, string 
 /// skill and a real target while the animation still reads Idle, and those are precisely the
 /// frames a warning wants. An animation-only filter would throw them away.
 ///
-/// WHAT THIS DELIBERATELY DOES NOT DO: steer the roll. A dodge runs along the line the character
-/// FACES - forwards or backwards, never across it - which <c>DodgeRollDirectionTests</c>
-/// measures off five real rolls. Two things follow, and the second is why this only presses:
+/// THE PLAYER STEERS AND THIS SUPPLIES THE TIMING, and that division is the design rather than
+/// a gap in it. A dodge roll goes TOWARDS THE MOUSE, so the direction is already in the hand of
+/// the person playing - and the thing they cannot do is know that a slam is committed before its
+/// animation starts, which is exactly what the action fields give. Two minutes in front of a map
+/// boss, the owner steering with the mouse alone and this pressing the key, cost zero hits.
 ///
-///   - Sideways is not available. A slam landing to your left cannot be rolled away from while
-///     you point north; the character has to turn, which means moving the player's mouse in the
-///     middle of a fight.
-///   - Nothing here knows which END of that line the game will pick. Both a forward and a
-///     backward roll appear in one recording, so the choice is something the player's own input
-///     decides, and no recording can see input.
+/// SO DO NOT READ <c>Render.RotationCurrent</c> AS THE ROLL'S DIRECTION. During a backward roll
+/// (animation 402) the model's rotation points OPPOSITE the travel, because that is what rolling
+/// backwards is - <c>DodgeRollDirectionTests</c> measures it on real rolls, and anything using it
+/// to work out where a roll went is exactly reversed on every one of them.
 ///
-/// So the decision is WHETHER to roll and never WHERE, and a press can currently send the
-/// character either way along its facing - towards the danger as readily as away from it. That
-/// is a real limit rather than a tidy design, and it is written here rather than hidden: until
-/// the forward/backward choice is settled, ACTING IS A COIN TOSS ON THE AXIS YOU ALREADY HOLD.
-///
-/// AND IT IS SETTLED FOR CLICK-TO-MOVE ONLY. Every recording behind the measurement was made
-/// with the game switched to click-to-move; under WASD movement nothing has been recorded, and
-/// the owner plays WASD.
+/// WHAT IS NOT ESTABLISHED: how the game behaves under WASD movement. Every recording here was
+/// made with the game switched to click-to-move for the purpose, and the owner normally plays
+/// WASD - where the mouse still steers the roll, but nothing has been recorded of it.
 /// </remarks>
 public sealed class EvasionPlanner
 {

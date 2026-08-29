@@ -11,45 +11,45 @@ namespace PoEformance.Core.Tests;
 /// Which way a dodge roll actually goes - measured off the player's own rolls.
 /// </summary>
 /// <remarks>
-/// THE QUESTION THE EVASION FEATURE RESTS ON, and it was answered by assumption until this was
-/// written. The feature shipped saying "the roll goes where the character is already pointing",
-/// which is close enough to true to be dangerous: it is an AXIS, not a direction.
+/// WHERE A ROLL GOES IS THE CURSOR, AND THIS FILE MEASURES SOMETHING ELSE - which is the whole
+/// reason it is worth keeping. The owner, who plays this game, states it plainly: the roll goes
+/// towards the mouse. Two minutes spent in front of a map boss steering with the mouse alone,
+/// while the tool supplied only the timing, cost zero hits.
 ///
-/// <c>tests/fixtures/session-2026-08-monsters.rec</c> holds five rolls - three DodgeRoll
-/// (animation 268) and two DodgeRollBack (402). Measured against <c>Render.RotationCurrent</c>,
-/// which follows the mouse, taken at the END of each roll:
+/// What the five rolls in <c>tests/fixtures/session-2026-08-monsters.rec</c> measure is the
+/// angle between where the character TRAVELLED and <c>Render.RotationCurrent</c>, which is the
+/// model's own rotation:
 ///
 /// <code>
-///   anim  travel  angle from facing   turned during the roll
-///   402      520              178.6                      49
-///   268      391                1.8                      15
-///   268      141               32.4                     103
-///   402      232              166.9                      61
-///   268      509                0.0                      59
+///   anim  travel  angle from RotationCurrent   turned during the roll
+///   402      520                        178.6                      49
+///   268      391                          1.8                      15
+///   268      141                         32.4                     103
+///   402      232                        166.9                      61
+///   268      509                          0.0                      59
 /// </code>
 ///
-/// A roll runs along the FACING LINE - forwards for 268, backwards for 402 - and never across
-/// it. The separation is clean with nothing near the middle. The two loose readings are the two
-/// with the largest turn inside the roll, so the direction tracks the mouse as it moves rather
-/// than being fixed when the roll starts; that is a reading of five rolls, not a measurement,
-/// and it is written down as the hypothesis it is.
+/// THE FINDING IS A WARNING, NOT A STEERING RULE. For the forward animation the rotation points
+/// along the travel; for the BACKWARD one it points the opposite way, because that is what a
+/// backward roll is - the body keeps its orientation while the character moves the other way. So
+/// <c>RotationCurrent</c> DOES NOT SAY WHERE A ROLL IS GOING, and anything reading it during one
+/// gets the direction exactly reversed half the time. That is the trap this file exists to mark.
 ///
-/// Two consequences, and both change what the feature can do:
+/// AN EARLIER READING OF THE SAME NUMBERS WAS WRONG, and how it was wrong is worth keeping. It
+/// took the rotation for the cursor direction, concluded that a roll can only run along the line
+/// the character already faces, and wrote down that sideways was unavailable and that arming the
+/// dodge was "a coin toss on the axis you already hold". None of that survives contact with the
+/// game: the cursor steers, so any direction is available, and the player chooses it. A second
+/// guess - that the facing locks onto a target during a backward roll - was checked against this
+/// same fixture and does not hold either: the nearest monster during those frames is 1100 world
+/// units away and 45 to 124 degrees off the rotation. Two wrong explanations from one set of
+/// correct measurements, which is what happens when a number is asked what it means instead of a
+/// person who can see the screen.
 ///
-///  1. YOU CANNOT ROLL SIDEWAYS. A slam landing to your left cannot be rolled away from while
-///     you point north - the character has to turn first, which means the mouse. Any evasion
-///     that assumes a free choice of direction is wrong about the game.
-///  2. THE COMMON CASE MAY NEED NO STEERING. You are usually facing the monster attacking you,
-///     so "away from the threat" is backwards along the axis you already hold.
-///
-/// WHAT THIS DOES NOT SETTLE, and it is the half the feature needs:
-///
-///   - WHAT CHOOSES BACKWARDS OVER FORWARDS. Both appear in one session, so it is something the
-///     player did; the movement input is the obvious candidate and no recording can see it.
-///   - WHAT HAPPENS UNDER WASD. THIS FIXTURE IS NOT WASD. The owner switched the game to
-///     click-to-move to make these recordings, and normally plays with WASD - so every roll
-///     measured here is a click-to-move roll, and the mode the tool has to work in is the one
-///     nothing has been recorded of. Anything below describes click-to-move only.
+/// WHAT THE TOOL TAKES FROM THIS. The evasion feature supplies TIMING and the player supplies
+/// DIRECTION, and that division is not a limitation to be engineered away - it is why the thing
+/// works. The action fields say when something is committed and where it lands, before the
+/// animation shows it; the hand on the mouse says where to go.
 ///
 /// The dodge's own ActionWrapper target is NOT the destination, which is worth writing down
 /// because it looks like one: it sits within a few cells of where the roll STARTED and reads a
@@ -195,18 +195,16 @@ public class DodgeRollDirectionTests
     }
 
     [Fact]
-    public void EachAnimationPicksOneEndOfTheFacingLine()
+    public void TheModelsRotationIsReversedForABackwardRoll()
     {
-        // THE FINDING, asserted at the strength the five rolls actually support: a forward roll
-        // travels on the forward half of the facing and a backward one on the back half, with
-        // nothing near the middle. That is what makes "roll away from the danger" a claim about
-        // where the character POINTS rather than a free choice of direction.
+        // THE WARNING. For the forward animation the rotation runs with the travel and for the
+        // backward one against it, cleanly, with nothing near the middle. So a reader that takes
+        // RotationCurrent for the roll's direction is exactly reversed on every 402 - and that
+        // is not a rare case, it is two of the five rolls here.
         //
-        // NOT asserted: that each is within a few degrees of exactly along it. Three of the five
-        // are (0.0, 1.8, 166.9 counting from the far end), and the two that are not are the two
-        // in which the player turned most while rolling - so the looseness has an explanation
-        // that this fixture cannot test, and a tight bound here would be fitted to the data
-        // rather than measured from it.
+        // NOT asserted: that each sits within a few degrees of the line. Three of the five do;
+        // the two that do not are the two in which the player turned most while rolling, and a
+        // tight bound over all five would be fitted to the data rather than measured from it.
         foreach (Roll roll in Rolls.Value)
         {
             double angle = roll.AngleFromFacing;
@@ -220,12 +218,11 @@ public class DodgeRollDirectionTests
     }
 
     [Fact]
-    public void ARollTakenWithoutTurningRunsAlmostExactlyAlongTheFacing()
+    public void ARollTakenWithoutTurningLinesUpWithTheModel()
     {
-        // The tight version of the same claim, on the rolls that can carry it: where the player
-        // barely turned during the roll, the travel is within a few degrees of the facing line.
-        // This is the evidence that the axis is the facing and not something merely correlated
-        // with it - and it is why the looser rolls are read as the mouse moving mid-roll.
+        // The tight version, on the rolls that can carry it: where the player barely turned, the
+        // travel is within a few degrees of the model's own axis. That is what makes the
+        // reversal above a property of the animation rather than noise.
         Roll[] steady = [.. Rolls.Value.Where(r => r.Turned < 30)];
         Assert.NotEmpty(steady);
 

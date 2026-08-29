@@ -446,14 +446,20 @@ interesting part was not the feature:
   be a unit test. Drawing and acting have **separate rarity floors** because they cost different
   things: a marker for a white monster is a ring on the screen, a keystroke for one is a roll
   charge, and white monsters are most of what an area contains. Both default to off.
-  - **It decides whether to roll, never where — and that is a limit, not a design.** A dodge
-    runs along the line the character *faces*, forwards or backwards, never across it
-    (`DodgeRollDirectionTests`, five real rolls: forward at 0–32°, backward at 167–179°). So
-    sideways is unavailable without turning the player's mouse mid-fight, and nothing yet knows
-    which end of the axis the game will pick — both appear in one session, so the player's own
-    input decides it. Until that is settled a press can send the character *towards* the danger
-    as readily as away. **Measured for click-to-move only**: every recording was made with the
-    game switched to that mode, and the owner plays WASD.
+  - **The player steers, the tool times — and that division is the design.** A dodge roll goes
+    towards the *mouse*, so the direction is already in the hand of the person playing; what they
+    cannot do is know a slam is committed before its animation starts, which is what the action
+    fields supply. Two minutes in front of a map boss, the owner steering with the mouse alone
+    and the tool pressing the key, cost zero hits.
+  - **Do not read `RotationCurrent` as the roll's direction.** During a backward roll (animation
+    402) the model's rotation points *opposite* the travel — `DodgeRollDirectionTests` measures
+    it on five real rolls, and a reader that takes rotation for direction is exactly reversed on
+    every one of them. Two wrong explanations came out of those correct numbers before the owner
+    simply said what the game does: first that a roll can only run along the line already faced
+    (so sideways was impossible and arming the dodge was "a coin toss"), then that the facing
+    locks onto a target — the second checked against the same fixture and refuted by it, the
+    nearest monster being 1100 units away and up to 124° off. Worth keeping as the shape of the
+    mistake: a number was asked what it meant instead of a person who can see the screen.
   - **The dodge key is the one key not read from the game.** The flask spellings were
     established against a real config; nobody has established what this game calls the dodge
     roll, and reading a plausible-looking line would be a guess dressed as a measurement — one
