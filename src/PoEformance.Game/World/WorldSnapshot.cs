@@ -555,6 +555,20 @@ public sealed class WorldReader
     /// </remarks>
     public bool ReadActions { get; set; }
 
+    /// <summary>
+    /// Where to record the animation names the game supplies, or null to read none.
+    /// </summary>
+    /// <remarks>
+    /// Passed straight through to <see cref="ActionReader.Names"/>. Here rather than on the
+    /// reader's constructor for the same reason <see cref="ReadActions"/> is a property: the
+    /// composition root decides, per tick, what the read is for.
+    /// </remarks>
+    public AnimationNames? AnimationNames
+    {
+        get => _actions.Names;
+        set => _actions.Names = value;
+    }
+
     private readonly GroundItemReader _groundItems;
     private readonly MinimapIconReader _mapIcons;
     private LandmarkNames _landmarkNames = LandmarkNames.Empty;

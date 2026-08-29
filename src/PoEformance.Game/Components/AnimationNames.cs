@@ -86,15 +86,73 @@ public sealed class AnimationNames
     public static AnimationNames Empty { get; } = new([]);
 
     private readonly Dictionary<int, string> _names;
-    private readonly Dictionary<int, AnimationKind> _kinds = [];
+
+    /// <summary>
+    /// Names read from the RUNNING GAME, which beat the shipped ones.
+    /// </summary>
+    /// <remarks>
+    /// THE SHIPPED TABLE IS HAND-MAINTAINED AND DEMONSTRABLY DRIFTS - its own header says so, and
+    /// it says a name is "a LABEL, never a fact". The game carries the truth: an action wrapper
+    /// points straight at the animation's own row in Data/Balance/Animation.dat, whose first
+    /// field is its id string (see <c>ActionWrapper.AnimationRow</c> in the schema). So an
+    /// animation the tool actually SEES can be named by the game rather than by the table.
+    ///
+    /// The first thing that bought was a correction: the game calls animation 889
+    /// ElementalWeakness and the shipped file calls it InteractLeanWell. Five other ids read the
+    /// same both ways, so the table is mostly right and drifts a row at a time - which is exactly
+    /// the failure a person cannot spot by reading it.
+    ///
+    /// Concurrent because the reader thread learns while the render thread asks.
+    /// </remarks>
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<int, string> _learned = new();
+
+    /// <summary>
+    /// The classification cache. Concurrent for the same reason, and CLEARED PER ID when that id
+    /// is learned - a kind derived from the old name would otherwise outlive it.
+    /// </summary>
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<int, AnimationKind> _kinds = new();
 
     private AnimationNames(Dictionary<int, string> names) => _names = names;
 
     /// <summary>How many names were loaded.</summary>
     public int Count => _names.Count;
 
-    /// <summary>The game's name for an animation id, or null when the table has none.</summary>
-    public string? Of(int id) => _names.TryGetValue(id, out string? name) ? name : null;
+    /// <summary>How many the running game has supplied.</summary>
+    public int LearnedCount => _learned.Count;
+
+    /// <summary>
+    /// Ids where the game disagrees with the shipped table, as (id, shipped, game).
+    /// </summary>
+    /// <remarks>
+    /// Worth being able to ask rather than merely correcting silently: a growing list means the
+    /// file wants re-extracting, and a person reading the table has no other way to find out.
+    /// </remarks>
+    public IReadOnlyList<(int Id, string Shipped, string Game)> Disagreements =>
+        [.. _learned
+            .Where(pair => _names.TryGetValue(pair.Key, out string? shipped)
+                           && !string.Equals(shipped, pair.Value, StringComparison.Ordinal))
+            .Select(pair => (pair.Key, _names[pair.Key], pair.Value))
+            .OrderBy(row => row.Key)];
+
+    /// <summary>
+    /// Records what the game calls an animation. The game wins over the shipped table.
+    /// </summary>
+    public void Learn(int id, string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return;
+        }
+
+        _learned[id] = name.Trim();
+        _kinds.TryRemove(id, out _);
+    }
+
+    /// <summary>The game's name for an animation id, or null when nothing has one.</summary>
+    public string? Of(int id)
+        => _learned.TryGetValue(id, out string? live) ? live
+            : _names.TryGetValue(id, out string? name) ? name
+            : null;
 
     /// <summary>The name, or the bare number when there is none - for showing a person.</summary>
     public string Label(int id) => Of(id) ?? id.ToString(System.Globalization.CultureInfo.InvariantCulture);
