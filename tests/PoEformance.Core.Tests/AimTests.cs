@@ -33,10 +33,16 @@ public class AimTests
     /// </summary>
     /// <remarks>
     /// Not a formality: the stat table in the same folder is off by one, so "the numbers line
-    /// up" is a real question and not an assumption. These eight were recorded by the AHK tool
-    /// while chasing the Actor offset drift - idling, running, dodging, and three skills whose
-    /// cast types it saw go past - and every one lands on the right row here. Eight independent
-    /// readings is what makes this a check rather than a restatement of the file.
+    /// up" is a real question and not an assumption. These were recorded by the AHK tool while
+    /// chasing the Actor offset drift - idling, running, dodging, and three skills whose cast
+    /// types it saw go past - and every one lands on the right row here. Independent readings by
+    /// another tool are what make this a check rather than a restatement of the file.
+    ///
+    /// ALL OF THEM SIT BELOW ANIMATION 584, which is not a coincidence and is why the eighth
+    /// reading moved out into its own test below. The table was re-read from the game in 2026-08
+    /// and three rows have been inserted since the AHK tool saw these: at 584, 599 and 904. Every
+    /// id below the first insertion is unmoved, so these still cross two tools AND two game
+    /// versions. The one above it is off by exactly two.
     /// </remarks>
     [Theory]
     [InlineData(0, "Idle")]
@@ -44,12 +50,31 @@ public class AimTests
     [InlineData(195, "FixedRun")]
     [InlineData(268, "DodgeRoll")]
     [InlineData(402, "DodgeRollBack")]
-    [InlineData(872, "SprintEnd")]
     [InlineData(299, "SparkAdditive")]
     [InlineData(472, "Flamewall")]
     [InlineData(474, "OrbOfStorms")]
     public void TheShippedTableMatchesWhatWasWatchedInGame(int id, string expected)
         => Assert.Equal(expected, Table().Of(id));
+
+    [Fact]
+    public void TheOneWatchedIdAboveTheInsertionsMovedByExactlyTwo()
+    {
+        // THE EIGHTH READING, and it is now evidence rather than a broken assertion. The AHK tool
+        // watched a sprint END and saw animation id 872. That was true of the game it was
+        // watching; two rows have since been inserted below it (584 AbyssalLivingBomb and 599
+        // AbyssalPact), so in the current game the same behaviour reports 874 and 872 is the
+        // sprint itself.
+        //
+        // WHY THIS IS WORTH A TEST RATHER THAN A DELETION: it is a live observation from a
+        // DIFFERENT TOOL, at the only one of its eight ids that sits above an insertion point,
+        // landing exactly where the insertion story predicts. Nothing about the dump that
+        // produced the current table could have arranged that. It is the outside check on a
+        // finding that otherwise rests on one recording.
+        AnimationNames names = Table();
+
+        Assert.Equal("SprintEnd", names.Of(874));
+        Assert.Equal("Sprint", names.Of(872));
+    }
 
     [Fact]
     public void TheShippedTableIsWholeAndUnnumberedIdsKeepTheirNumber()

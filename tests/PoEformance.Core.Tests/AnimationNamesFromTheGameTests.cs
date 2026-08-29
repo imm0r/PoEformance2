@@ -25,13 +25,17 @@ namespace PoEformance.Core.Tests;
 /// is Animation.dat, and two hops out of <c>Actor.CurrentSkillPtr</c> reached no text at all.
 /// That is worth stating plainly rather than letting a good-looking name stand in for it.
 ///
-/// WHAT IT IS WORTH ANYWAY, and it is not nothing: the shipped table is hand-maintained - its own
-/// header says a name is "a LABEL, never a fact" - and the very first session put to it caught a
-/// wrong row, animation 889, which the file called InteractLeanWell and the game calls
-/// ElementalWeakness. The file has since been corrected. A name is what
-/// <see cref="AnimationNames.KindOf"/> classifies, and that classification decides whether an
-/// animation is quiet enough to ignore - so a wrong name is a mis-filtered threat, and an id the
-/// file has never heard of is one the tool can only report as a number.
+/// WHAT IT IS WORTH ANYWAY, and it is not nothing: the then-shipped table was hand-maintained -
+/// its own header said a name is "a LABEL, never a fact" - and the very first session put to it
+/// caught a disagreement at animation 889, InteractLeanWell in the file and ElementalWeakness in
+/// the game. From six samples that read as one stale row and was patched as one. It was not:
+/// reading the whole array afterwards (<c>--animdump</c>, see <c>AnimationDumpTests</c>) showed
+/// three rows inserted since, shifting 500 of the file's 1084 rows. SIX SAMPLES CAN SAY THAT
+/// SOMETHING IS WRONG AND NEVER WHAT, which is the lesson worth keeping from this file.
+///
+/// A name is what <see cref="AnimationNames.KindOf"/> classifies, and that classification decides
+/// whether an animation is quiet enough to ignore - so a wrong name is a mis-filtered threat, and
+/// an id the file has never heard of is one the tool can only report as a number.
 /// </remarks>
 public class AnimationNamesFromTheGameTests
 {

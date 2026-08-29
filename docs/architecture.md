@@ -547,14 +547,24 @@ interesting part was not the feature:
     indexed by animation id — and a companion pointer at `0x228` names the file outright,
     `Data/Balance/Animation.dat`. Five of the six names match `data/animations.tsv` word for
     word, which is what gave it away; had they been skill ids they would not have.
-    - **The sixth is the payoff.** The file said `InteractLeanWell` for animation 889; the game
-      says `ElementalWeakness`. The file is hand-maintained — its own header calls a name "a
-      LABEL, never a fact" — and it drifts a row at a time, which is exactly the failure nobody
-      spots by reading it. `ActionReader.Names` now asks the game once per animation id per
-      session and prefers its answer, `AnimationNames.Disagreements` lists the rows that differ,
-      and 889 has been corrected in the file. The reader re-asks about ids the table *already*
-      has for precisely this reason: under an only-when-missing rule 889 would never have been
-      looked at, because the file had an answer. A wrong one.
+    - **The sixth is the payoff, and then it got bigger.** The file said `InteractLeanWell` for
+      animation 889; the game says `ElementalWeakness`. From six rows that looked like a table
+      drifting a row at a time, and it was hand-patched as such — wrongly. Reading the **whole**
+      table (`--animdump`) showed **three rows inserted** since the file was transcribed, at 584
+      (`AbyssalLivingBomb`), 599 (`AbyssalPact`) and 904 (`RemidusDive`), shifting everything
+      after them by one, two and three. Every one of the old file's 1084 rows fits one of those
+      shifts **exactly, with zero leftovers** — so it was never a drifting table, it was a
+      faithful table of an older patch. 889 was a symptom, and patching it made the file less
+      consistent rather than more. Six samples can say that something is wrong and can never say
+      what; only a whole-table read separates "a few bad rows" from "everything above 584 moved".
+    - **What it cost while it stood:** 500 of 1084 ids named the wrong animation, 177 of them
+      changing `AnimationKind`, and **37 classified quiet when the real animation is not** —
+      `ElectricSpit` read as `DodgeRollSprint`, an empowered wyvern flame breath read as
+      `FixedRunLayerBaseForward`. Those are threats the evasion filter dropped in silence.
+      `IsQuiet` is asked the safe way round precisely so an *unknown* animation still counts; a
+      confident **wrong** name walks straight past that guard. `data/animations.tsv` is now
+      generated, and `AimTests` keeps the AHK tool's own live reading of id 872 as the outside
+      check — the only one of its eight ids above an insertion point, off by exactly two.
     - **The name is not cosmetic**: `KindOf` classifies it, and that decides whether an animation
       is quiet enough to ignore. A wrong name is a mis-filtered threat; a missing one is a
       monster the tool can only report as a number.
