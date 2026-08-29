@@ -40,6 +40,31 @@ public readonly record struct EscapeChoice(int Index, float X, float Y, double S
 /// BACKWARDS IS NOT FORBIDDEN, only ranked below across: with a threat to each side it wins on
 /// its own merits, because every direction is scored against every threat at once and the one
 /// whose WORST case is best is the one taken.
+///
+/// THE "FREE FOR THE OTHER" CLAIM ABOVE IS TOO STRONG, and the owner named the case that breaks
+/// it (2026-08-29): a WAVE ROLLING AT THE PLAYER. It is a wide FRONT, thin along its travel and
+/// long across it, and the segment this models runs along its direction of travel - so rolling
+/// perpendicular moves ALONG the front and does not leave it. Worse than not helping: rolling
+/// forward THROUGH a thin front is the direction that plausibly works, and this scores it zero
+/// because it stays on the segment, so the rule ranks the likely answer LAST. Not "less precise
+/// on a third shape" - inverted on it.
+///
+/// AND THE SHAPE IS ONLY HALF OF IT. A wave MOVES, so whether a place is safe depends on WHEN
+/// you get there, and there is no time anywhere in this scoring. Two hazards with identical
+/// geometry need opposite answers depending on whether the front is advancing, which means a
+/// per-animation table of shape and radius - the obvious next step, and the one deferred here -
+/// could not express a wave even if somebody wrote it. It would need a travel speed too.
+///
+/// WHICH POINTS AT NOT WRITING A TABLE AT ALL. The game spawns effect entities for these and the
+/// reader already flags them (<c>WorldEntity.IsEffect</c>), and <see cref="ProjectileWatch"/>
+/// already derives a direction and a speed from watching a thing MOVE over successive reads. A
+/// front that can be observed needs no table and never goes stale - the same "ask the game
+/// rather than keep a list" move that answered the steering's hold. Unmeasured, so it is a lead
+/// and not a plan.
+///
+/// NOTHING HERE IS CHANGED ON THE STRENGTH OF THAT. The line model is right for the case it was
+/// built for and free for slams, which is two of the three; the third wants a decision about
+/// what the danger model IS, and that decision is the owner's and is open.
 /// </remarks>
 public static class Escape
 {

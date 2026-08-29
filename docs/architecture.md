@@ -469,6 +469,24 @@ interesting part was not the feature:
     every action with a target counts, including ones the rarity gates would never have drawn:
     what to draw, what to react to, and where it is safe to land are three questions. If nothing
     beats standing still it does not roll, and says so.
+  - **"Costless for the other" is too strong, and a wave is the case that breaks it.** Named by
+    the owner (2026-08-29) while deciding whether to build a per-animation danger table: a **wave
+    rolling at the player** is a wide *front* — thin along its travel, long across it — and the
+    segment the model draws runs along its direction of travel. So perpendicular moves *along*
+    the front and does not leave it, while rolling forward *through* a thin front is the direction
+    that plausibly works and scores zero, because it stays on the segment. The rule ranks the
+    likely answer last. Not less precise on a third shape: **inverted on it.** And the shape is
+    only half the problem — **a wave moves**, so whether a place is safe depends on *when* you
+    arrive, and there is no time anywhere in the scoring. Two hazards with identical geometry
+    need opposite answers depending on whether the front is advancing, which means the obvious
+    next step — a table of shape and radius keyed on animation id — could not express a wave even
+    if somebody wrote it; it would need a travel speed too. Which points at not writing a table
+    at all: the game spawns effect entities for these, the reader already flags them
+    (`WorldEntity.IsEffect`), and `ProjectileWatch` already derives a direction and a speed from
+    watching something *move* across successive reads. A front that can be observed needs no
+    table and never goes stale — the same "ask the game rather than keep a list" move that
+    answered the steering's hold. Unmeasured, so a lead and not a plan; **the danger model is an
+    open question and nothing has been changed on the strength of this.**
   - **Which way is "W"** comes from the game's own matrix, not from an isometric constant:
     project the player, step up the screen, invert onto the player's ground plane, and the
     difference is the world direction (`ScreenBasis`). Over the 1984 in-game frames of the
