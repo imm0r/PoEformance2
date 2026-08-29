@@ -191,6 +191,16 @@ internal static class Program
                 hunt.Report(hunt.Run(gameStatesAddress, scanHeap: options.ScanHeap), Console.Out);
                 recorder?.MarkFrame();
             }
+
+            // Opt-in and interactive: samples the player's Actor while the person plays the
+            // protocol it prints, hunting the action fields (ActionPtr / ActionId / the
+            // wrapper's Destination) that no reference carries PoE2 numbers for. Against a
+            // replay it steps the recording's own frames instead, which is what lets a hunt
+            // that was recorded once be re-scored offline after every analyzer change.
+            if (options.HuntActions)
+            {
+                RunActionHunt(reader, worldSchema, gameStatesAddress, recorder);
+            }
         }
 
         // ── Auto-flask ───────────────────────────────────────────────────────
@@ -524,6 +534,88 @@ internal static class Program
         }
 
         return snapshot;
+    }
+
+    /// <summary>
+    /// Sampling cadence of the action hunt. The rotation recordings resolved 94 ms turns at
+    /// ~47 ms a sample, so 50 ms comfortably resolves casts and click-moves.
+    /// </summary>
+    private const int ActionSampleMs = 50;
+
+    /// <summary>
+    /// Consecutive empty ticks before a live hunt gives up (~5 s) - reached when the game
+    /// leaves the world, so a hunt started in a menu says so instead of hanging.
+    /// </summary>
+    private const int ActionHuntMostFailures = 100;
+
+    /// <summary>
+    /// Runs the action-field hunt: live, a sampling loop the person plays against; on a
+    /// replay, a walk over the recording's frames. Same samples, same analysis, one code path
+    /// for the conclusions - the recording IS the session, which is the property every other
+    /// hunt here is built around.
+    /// </summary>
+    private static void RunActionHunt(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var hunt = new PoEformance.Game.Diagnostics.ActionHunt(reader, schema);
+        var samples = new List<PoEformance.Game.Diagnostics.ActionHuntSample>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    samples.Add(sample);
+                }
+            }
+
+            // Back to the reader's default position (the last frame), so whatever reads the
+            // replay after this hunt sees the same final state it would have seen without it.
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("action hunt - sampling the player's Actor component.");
+            Console.WriteLine("  protocol: click-move somewhere and LET THE CHARACTER ARRIVE before the");
+            Console.WriteLine("  next click - a dozen clicks, different directions, an idle beat between");
+            Console.WriteLine("  them - then cast a few skills at distinct spots. The arrivals are the");
+            Console.WriteLine("  evidence the scoring runs on. Any key to stop and score.");
+            Console.WriteLine();
+
+            int failures = 0;
+            int ticks = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    failures = 0;
+                    samples.Add(sample);
+                }
+                else
+                {
+                    failures++;
+                }
+
+                if (++ticks % 200 == 0)
+                {
+                    Console.WriteLine(
+                        $"  ... {samples.Count} frames, following {hunt.FollowedSlots.Count} toggling slots");
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.ActionHuntFindings findings = PoEformance.Game.Diagnostics.ActionHunt
+            .Analyze(samples, hunt.AnimationIdOffset, hunt.PlayerCastTypes);
+        PoEformance.Game.Diagnostics.ActionHunt.Report(findings, hunt.AnimationIdOffset, Console.Out);
     }
 
     /// <summary>
@@ -2049,6 +2141,7 @@ internal static class Program
         bool ShowUiBrowser,
         bool HuntQuestFlags,
         bool ScanHeap,
+        bool HuntActions,
         IReadOnlyList<string> Peek,
         bool PeekWatch)
     {
@@ -2058,6 +2151,7 @@ internal static class Program
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
+            bool actionHunt = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -2127,6 +2221,9 @@ internal static class Program
                         questFlags = true;
                         scanHeap = true;
                         break;
+                    case "--actionhunt":
+                        actionHunt = true;
+                        break;
 
                     // Takes a Cheat Engine pointer path as written - "+468C3A8,235C" - so a
                     // finding can be checked without transcribing it into an absolute address
@@ -2157,7 +2254,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, peek, peekWatch);
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, peek, peekWatch);
         }
     }
 }

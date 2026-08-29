@@ -250,6 +250,7 @@ PoEformance.App --overlay                      # the in-game overlay
 PoEformance.App --record session.rec           # same, capturing everything
 PoEformance.App --replay session.rec           # rerun against the capture, no game needed
 PoEformance.App --record s.rec --questflags    # + read where a character's quest flags could be
+PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action fields (see below)
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
@@ -288,6 +289,19 @@ that sweep could never have worked, because the set stores no references at all.
 the READING: the regions land in the recording, so a question that needs the game becomes one
 that can be answered offline as often as it takes, which is how the chain was confirmed once
 somebody handed it over. See "Quests" below for what it actually is.
+
+`--actionhunt` samples the player's Actor component while the person plays a small protocol
+(click-move and ARRIVE, a dozen times, then a few casts) and scores three things no reference
+carries PoE2 offsets for: the action pointer (null at idle, set while acting), the action id
+(zero at idle), and — the prize for the evasion work — the current action's DESTINATION, found
+as a pair inside a followed block that the player's own position then converges on, fitted
+scale-free across arrivals so grid and world encodings both qualify. ExileCore2 proves the
+fields exist in PoE2 (its metadata names ActionPtr/SimpleActionPtr/ActionId and exposes
+CurrentAction.Destination) but decodes its offsets at runtime, so the numbers have to be found
+here; the PoE1 shape (ActionPtr 0x1A8 → wrapper with Destination 0x170, ActionId 0x208) bounds
+the search. Run it with `--record` and the whole hunt replays offline — against a replay it
+steps the recording's frames instead of the clock. Winners go into the schema, not into code;
+see the `Actor` block comment in `schema/poe2.offsets.json`.
 
 ## Status
 

@@ -645,6 +645,7 @@
     },
 
     "Positioned": {
+      "comment": "Component: where the entity stands in the GRID world and how it is moving. Only Reaction is read here so far. KNOWN TO EXIST BUT NOT YET PLACED (2026-08): ExileCore2's PoE2 PositionedComponentOffsets additionally names RawVelocity, PrevPosition, TravelStart / TravelTarget / TravelProgress, GridPosition, Rotation and Scale - names only, its offset values are decoded at runtime. Velocity and travel target are the movement-prediction half of any evasion logic, so they are the hunt AFTER the Actor's action fields. ExileCore2 also shows a separate Pathfinding COMPONENT (WantMoveToPosition, DestinationNodes) - an entity's movement goal lives there, distinct from the Actor's skill destination.",
       "fields": {
         "Reaction": {
           "offset": "0x1E0", "type": "u8",
@@ -675,7 +676,7 @@
     },
 
     "Actor": {
-      "comment": "Component: animation + skills + cooldowns.",
+      "comment": "Component: animation + skills + cooldowns. WHAT IS KNOWN TO BE MISSING here, mapped 2026-08 for the evasion work: the CURRENT ACTION. In PoE1 tooling (ExileApi, GameOffsets/ActorComponentOffsets.cs) the actor carries ActionPtr (0x1A8) -> an ActionWrapper whose Target sits at 0xB0, Skill at 0x150 and Destination at 0x170, plus a short ActionId of flags at 0x208 - all BELOW AnimationId (0x230) in that layout. The fields exist in PoE2: ExileCore2's GameOffsets2.dll metadata names ActionPtr, SimpleActionPtr, ActionId and AnimationControllerPtr on ITS ActorComponentOffsets, and its API exposes Actor.CurrentAction with Skill and Destination - but that DLL decodes its offset values at runtime, so there are names to hunt for and no numbers to copy. Neither GameHelper2 (main) nor the AHK tool reads any of them, which is why they are absent here rather than drifted. The numbers have to be found in-game: --actionhunt watches this component while the player follows a small protocol and scores candidates by the one test the game settles itself - a destination the player then demonstrably walks to. See ActionHunt.cs; enter winners here, not there.",
       "fields": {
         "AnimationId": {
           "offset": "0x8B0", "type": "i32",
@@ -692,7 +693,26 @@
           "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 256 },
           "comment": "Count stays at the number of cooldown-capable skills; live timers are inside each entry's cdList, not the list size."
         },
-        "DeployedEntities": { "offset": "0xC18", "type": "stdVector", "comment": "Empty (begin=end) with no minions/totems out - that is not a drift." }
+        "DeployedEntities": { "offset": "0xC18", "type": "stdVector", "comment": "Empty (begin=end) with no minions/totems out - that is not a drift. UPSTREAM DISAGREES SINCE 2026-08 and nobody here has looked with minions out: GameHelper2 main now reads DeployedEntityArray at 0xC28 with a 0x18 element ('PoE2 grew this element from 20 to 24 bytes'), while this 0xC18 and the AHK tool's 0x14 stride both predate that. If this offset is the stale one, begin==end forever is EXACTLY what the mis-read looks like - i.e. the sentence above would be masking the drift. To check: a recording with totems/minions deployed, reading both candidates." }
+      }
+    },
+
+    "ActiveSkillStructure": {
+      "comment": "One entry of Actor.ActiveSkills, Size apart: a pointer to the skill's details plus one pointer nothing uses. Ported from GameHelper2's ActiveSkillStructure and the AHK tool's PoE2Offsets - two working PoE2 readers that agree - but NOT yet read by anything in this codebase; declared so the action hunt and any future skill reader share one layout.",
+      "fields": {
+        "ActiveSkillPtr": { "offset": "0x00", "type": "ptr", "struct": "ActiveSkillDetails" }
+      },
+      "consts": { "Size": "0x10" }
+    },
+
+    "ActiveSkillDetails": {
+      "comment": "What one granted skill is. Same provenance as ActiveSkillStructure (GameHelper2 + AHK tool, agreeing). CastType IS THE SAME ENUM AnimationId CARRIES while that skill is being cast - the AHK drift log observed 299 SparkAdditive, 472 Flamewall, 474 OrbOfStorms as live player AnimationIds, and all three are rows of data/animations.tsv. That identity is what answers 'which skill is casting right now' without an action pointer: match AnimationId against the player's own CastTypes. The action hunt prints that match as a live cross-check, which doubles as the first in-game verification of these two structs.",
+      "fields": {
+        "UseStage": { "offset": "0x08", "type": "i32" },
+        "CastType": { "offset": "0x0C", "type": "i32" },
+        "GrantedEffectsPerLevelDatRow": { "offset": "0x48", "type": "ptr", "comment": "-> the skill's GrantedEffectsPerLevel row; the reference resolves the skill NAME through it." },
+        "TotalUses": { "offset": "0xE4", "type": "i32" },
+        "TotalCooldownTimeInMs": { "offset": "0xE8", "type": "i32" }
       }
     },
 
