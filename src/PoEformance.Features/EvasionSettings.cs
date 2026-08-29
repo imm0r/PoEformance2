@@ -150,10 +150,25 @@ public sealed record EvasionGate(
 /// <param name="SteerHoldMs">
 /// How long the steering keys stay down around the roll.
 ///
-/// NOT MEASURED, and the one number here that is a judgement rather than a reading: the game
-/// samples input once a frame, so the key has to be down across at least one of its frames for
-/// the roll to see it, and how many that is depends on the frame rate. Long enough to cross a
-/// slow frame, short enough that the character does not walk anywhere in it.
+/// THE ONE NUMBER HERE THAT WAS A JUDGEMENT, and it now has two readings against it: 60 ms and
+/// 20 ms both work, on the owner's machine (2026-08-29). That is more useful than it sounds,
+/// because it turns the setting from a guess into a rule with a reason.
+///
+/// THE FLOOR IS ONE OF THE GAME'S FRAMES. Input that goes down and up again between two polls
+/// can be missed entirely, so the hold has to span at least one - and one frame is 16.7 ms at
+/// 60 fps, 33 ms at 30, 62 ms at 16. So 20 ms clears a frame only above roughly 50 fps, while 60
+/// covers everything down to about 16. That is exactly the shape of the two readings: the owner
+/// plays well above 50, and at that frame rate the shorter hold has a whole frame to be seen in.
+///
+/// SO THE DEFAULT STAYS AT 60 and the shorter value is a tuning, not a fix. It ships for the
+/// machine nobody has measured rather than the one that has, because the failure at too-low is
+/// silent - the roll simply goes where the player was already pointing, which looks like the
+/// steering deciding on that direction.
+///
+/// SHORTER IS SAFER WHERE IT WORKS, though, and worth saying: the hold is the window in which
+/// the tool owns the movement keys, so a player who lets go of one inside it gets it pressed
+/// back down by the restore (see <c>PhysicalKeys</c> for why that window cannot be closed
+/// entirely). Twenty milliseconds is a third of the exposure of sixty.
 /// </param>
 /// <param name="Keys">The movement keys to steer with. See <see cref="MovementKeys"/>.</param>
 public sealed record EvasionSettings(

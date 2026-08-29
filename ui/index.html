@@ -201,7 +201,9 @@
       <div class="cfg-row">
         <label for="ev-hold">Hold the movement key for</label>
         <input type="number" id="ev-hold" min="0" max="500" step="10">
-        <span class="dim">ms — long enough for the game to sample it on one of its frames</span>
+        <span class="dim">ms — must span one of the game's frames: 17 ms at 60 fps, 33 at 30,
+          62 at 16. The default covers a slow machine; 20 works above ~50 fps and is safer,
+          because it is a shorter window in which the tool owns your keys.</span>
       </div>
 
       <p class="dim" id="ev-status">–</p>
