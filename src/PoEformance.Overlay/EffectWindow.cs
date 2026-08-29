@@ -28,20 +28,31 @@ public sealed class EffectWindow
 
     private readonly EffectLayer _layer;
     private readonly NoiseFilter? _noise;
+    private readonly Action _changed;
 
     private string _filter = string.Empty;
 
     /// <param name="layer">
-    /// Holds all three switches, including the one that is not about drawing at all: the
-    /// reader's dropping of hostile effects. It lives there so it can be SAVED - the window is
-    /// attached long after the settings are applied, and a switch owned here would start from
+    /// Holds all three of its own switches, including the one that is not about drawing at all:
+    /// the reader's dropping of hostile effects. It lives there so it can be SAVED - the window
+    /// is attached long after the settings are applied, and a switch owned here would start from
     /// nothing on every launch. <c>EntityOverlay</c> pushes it at the reader every frame.
     /// </param>
-    public EffectWindow(EffectLayer layer, NoiseFilter? noise)
+    /// <param name="changed">
+    /// Called when a switch moved, so the choice is WRITTEN DOWN. Somewhere to keep the value
+    /// and something to notice it moved are two separate things, and having only the first is
+    /// indistinguishable from having neither: the settings file is written when this fires and
+    /// at no other time, so a switch that does not call it is saved only by whatever unrelated
+    /// change happens to fire next. That is what "still not saved" was, after the fields, the
+    /// Apply and the round-trip test were all in place and all correct.
+    /// </param>
+    public EffectWindow(EffectLayer layer, NoiseFilter? noise, Action changed)
     {
         ArgumentNullException.ThrowIfNull(layer);
+        ArgumentNullException.ThrowIfNull(changed);
         _layer = layer;
         _noise = noise;
+        _changed = changed;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -61,6 +72,7 @@ public sealed class EffectWindow
         if (ImGui.Checkbox("draw them in the world", ref drawing))
         {
             _layer.Enabled = drawing;
+            _changed();
         }
 
         ImGui.SameLine();
@@ -68,12 +80,14 @@ public sealed class EffectWindow
         if (ImGui.Checkbox("with their paths", ref paths))
         {
             _layer.ShowPaths = paths;
+            _changed();
         }
 
         bool keeping = _layer.KeepHostile;
         if (ImGui.Checkbox("keep the hostile ground effects  (the reader drops them)", ref keeping))
         {
             _layer.KeepHostile = keeping;
+            _changed();
         }
 
         // Said next to the switch, because the reason it is off is the reason a screen full of
@@ -89,6 +103,7 @@ public sealed class EffectWindow
             if (ImGui.Checkbox("let the engine's own nodes through  (/fx/, /mat/, /epk/ ...)", ref engine))
             {
                 noise.Set(NoiseKind.Engine, !engine);
+                _changed();
             }
 
             if (engine)

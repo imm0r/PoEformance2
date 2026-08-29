@@ -413,13 +413,26 @@ public class OverlaySettingsMergeTests
     /// KeepEffects on BEFORE the process starts - and a switch that forgets itself on exit can
     /// never be on before the process starts. The setting was unreachable for its own purpose.
     ///
-    /// "THE ONLY ONE OF ITS KIND" WAS WRONG when it was first written here, and the correction is
-    /// the part worth keeping. That sweep compared the drawing LAYERS against
-    /// <c>TrackerSettings</c> and found them all covered - true, and not the question. The
-    /// switches that were missing belong to WINDOWS holding their own state, which that sweep
-    /// never looked at, and the owner found the next four on the Stash tab within the hour.
-    /// A search that answers a narrower question than the one asked reads exactly like an
-    /// answer, which is the same shape of mistake as six animation rows standing in for a table.
+    /// "THE ONLY ONE OF ITS KIND" WAS WRONG when it was first written here. That sweep compared
+    /// the drawing LAYERS against <c>TrackerSettings</c> and found them all covered - true, and
+    /// not the question. The switches that were missing belong to WINDOWS holding their own
+    /// state, which that sweep never looked at, and the owner found the next four on the Stash
+    /// tab within the hour. A search that answers a narrower question than the one asked reads
+    /// exactly like an answer - the same shape of mistake as six animation rows standing in for
+    /// a table.
+    ///
+    /// AND THEN THIS TEST PASSED WHILE THE FEATURE WAS BROKEN, which is the part worth the ink.
+    /// The field, the Apply, the CurrentSettings and the round-trip below were all in place and
+    /// all correct, and the switches still did not survive a restart: the settings file is
+    /// written when <c>EntityOverlay.SettingsChanged</c> fires and at NO OTHER TIME, and no
+    /// switch on either tab called it. Somewhere to keep a value and something to notice it
+    /// moved are separate jobs, and having only the first is indistinguishable from having
+    /// neither. Every window that owns persisted state now takes a REQUIRED changed callback -
+    /// not an optional one - because that is the only version of this the compiler can check.
+    ///
+    /// WHAT THAT COSTS TO TEST, honestly: nothing here can drive an ImGui checkbox, so no test
+    /// in this file would have caught it and none added since would either. The guard is the
+    /// required constructor argument, not this test.
     /// </remarks>
     [Fact]
     public void TheEffectSwitchesSurviveARestart()

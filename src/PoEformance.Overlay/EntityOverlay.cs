@@ -1196,6 +1196,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         var window = new StashWindow(
             inspector, art, prices, trade, signIn, probe,
             file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture,
+            () => SettingsChanged?.Invoke(),
             exchange);
         _tools.Add(60, "stash", "Stash", window.DrawTab);
         if (visible)
@@ -1439,6 +1440,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Style = _style,
             Chrome = Chrome,
             IconFor = _icons.TextureFor,
+            Changed = () => SettingsChanged?.Invoke(),
         };
     }
 
@@ -2032,7 +2034,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // are properties the app sets when it wires the reader up.
         if (_effectWindow is null && KeepEffects is not null)
         {
-            var made = new EffectWindow(_effects, Noise);
+            var made = new EffectWindow(_effects, Noise, () => SettingsChanged?.Invoke());
             _effectWindow = made;
             _tools.Add(95, "effects", "Effects", () => made.DrawTab(_snapshot), page: Entities);
         }
