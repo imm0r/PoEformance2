@@ -342,16 +342,34 @@ question it was made for, and both fixed:
   readable frames, and the report says "no frames" about a perfectly good session. Nothing
   crashed and nothing warned; it is the expensive kind of bug, and it is now a regression test.
 
-Still open: every one of these offsets was measured on the *player's* actor, while the feature
-they exist for reads *monsters*. `WorldReader.ReadActions` is deliberately a separate switch from
-`ReadAim` for that reason — the facing is settled on monsters, the actions are not, and one
-switch would let the weaker reading ride in on the stronger one's evidence. `MonsterActionCheck`
-is what will settle it, by the same two tests that settled the player: a monster whose move names
-a destination must **end up there**, and an aimed action's direction must agree with
-`Render.RotationCurrent`, found independently a month earlier. Its verdict on a file with no
-monsters in it is "nothing to say" rather than "no problems found" — the distinction the whole
-diagnostic exists for. Winners go into the schema, not into code; see the `Actor` and
-`ActionWrapper` block comments in `schema/poe2.offsets.json`.
+**The monster question is settled** (`tests/fixtures/session-2026-08-monsters.rec`: 130 seconds
+of a real fight, 54 monsters, 27,156 sightings, 9,300 of them acting). Every offset above had
+been measured on the *player's* actor while the feature they exist for reads *monsters*, and the
+game answered in the two ways it can:
+
+- **The arrival.** 210 monster moves ran to completion and ended on the destination the field
+  named — **185 of them exactly**: median miss 0.00 world units, worst 10.87, which is one grid
+  cell. Across 39 distinct monsters of eleven kinds, none of which anybody had aimed a probe at.
+  A wrong offset does not pass this once, let alone 210 times.
+- **The bearing.** Over 1649 monster *skill* actions the direction from origin to target agrees
+  with `Render.RotationCurrent` to a median of **1.6°**, 94% inside thirty — a field found a
+  month earlier by a different method on a different recording, so this is two unrelated readings
+  agreeing rather than one looking plausible.
+
+Two things that session added. `ActionId` is a **flags word**, not an enum: seven values turn up
+and they decompose into two bits — every id carrying `0x0002` had the skill slot filled, every id
+carrying `0x1000` had the move slot filled, and `0x1002` had both. Read as whole numbers five of
+those seven are strangers; read as bits they are two facts, which is what `ActionReader` now
+tests. And **monsters do not face where they walk** — a move's bearing sits 25.9° off the facing,
+and measuring it from where the monster currently stands makes it *worse* (32.5°). It faces its
+quarry and walks around obstacles, exactly as the player faces the cursor rather than the path.
+That is why `MonsterActionCheck` reports the two bearings apart: mixed, they drag a corroborating
+1.6° out to a doubtful 17.7° and slander a working field.
+
+`WorldReader.ReadActions` remains a separate switch from `ReadAim` — now not because the actions
+are unproven, but because they cost four reads per entity where the aim costs two, and a layer
+that only wants a direction should not pay for a destination. Offsets go in the schema, not in
+code; see the `Actor` and `ActionWrapper` block comments in `schema/poe2.offsets.json`.
 
 ## Status
 
