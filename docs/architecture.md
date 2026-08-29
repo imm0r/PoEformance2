@@ -478,8 +478,11 @@ interesting part was not the feature:
     makes the diagonals evenly spread. The decisive test puts the derived direction back through
     the projection and asks whether it lands directly above the player on screen; a sign error, a
     swapped column or a row-major reading all fail it, and none of them fails a length check.
-    The one thing *not* measured is that the game's forward key moves the character up the
-    screen — nothing in a recording answers that — which is why steering ships off.
+    That the game's forward key moves the character up the screen was the one thing no
+    recording could answer — it is a fact about the *controls*, not about memory — and the owner
+    settled it at the keyboard (2026-08-29), the same route by which the roll rule was
+    established. Steering still ships off, but on a different argument: taking the movement keys
+    over for the length of a roll is a larger thing to hand a tool than pressing one key.
   - **Giving the keys back is the delicate half, and it needs a keyboard hook.** Windows has one
     up/down state per key: a synthesised W-up is not "the tool's W-up", it is W being up, and the
     player's finger on the physical key does not put it back. So the sequence is release, steer,

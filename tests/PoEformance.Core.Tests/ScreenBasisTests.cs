@@ -21,8 +21,11 @@ namespace PoEformance.Core.Tests;
 /// being derived, put to the projection rather than to an argument about it.
 ///
 /// WHAT IT CANNOT CHECK is whether the game's forward key moves the character up the screen.
-/// Nothing in a recording answers that; it is a fact about the controls, and it is the reason
-/// steering ships switched off with the derived directions on show.
+/// Nothing in a recording answers that - it is a fact about the CONTROLS, not about memory, and a
+/// replay shows where the character went but never which key would have sent it there. The owner
+/// settled it at the keyboard instead (2026-08-29): W does move the character up the screen, so
+/// the basis below is pointing the way the code assumes. That is the same route by which the roll
+/// rule itself was established, and it is the only route there is for a question of this shape.
 ///
 /// WHAT THE REAL CAMERA MEASURES, over the 1984 in-game frames of that fixture and recorded here
 /// because it is the sort of thing that is expensive to rediscover:
