@@ -25,11 +25,15 @@ namespace PoEformance.Features;
 /// line projects to a straight screen line, so the step length does not change the direction it
 /// measures either - it is chosen large only to keep the arithmetic well away from rounding.
 ///
-/// WHAT IS ASSUMED, and it is the one thing here that is not measured: that the game's forward
-/// movement key moves the character UP THE SCREEN, and its right key to the right. That is how
-/// camera-relative movement works everywhere, but nobody has put it to this game, so steering is
-/// off by default and the derived directions are reported in the status line where they can be
-/// compared against what the character actually does.
+/// THAT THE FORWARD KEY MOVES THE CHARACTER UP THE SCREEN IS NOW SETTLED, by the owner testing
+/// it deliberately (2026-08-29) - the same way the roll rule itself was settled. It was the one
+/// thing here that no recording could answer, because it is a fact about the CONTROLS rather than
+/// about memory: a replay shows where the character went, never which key would have sent it
+/// there. So it took a person at the keyboard, and now it is measured rather than assumed.
+///
+/// Steering still ships OFF, and that is now a different argument: not "we are unsure which way
+/// is which", but that taking the movement keys over for the length of a roll is a strictly
+/// larger thing to hand a tool than pressing one key. See EvasionSettings.Steer.
 /// </remarks>
 /// <param name="UpX">World x of a unit step up the screen.</param>
 /// <param name="RightX">World x of a unit step right across the screen.</param>

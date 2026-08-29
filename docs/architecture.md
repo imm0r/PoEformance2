@@ -478,8 +478,11 @@ interesting part was not the feature:
     makes the diagonals evenly spread. The decisive test puts the derived direction back through
     the projection and asks whether it lands directly above the player on screen; a sign error, a
     swapped column or a row-major reading all fail it, and none of them fails a length check.
-    The one thing *not* measured is that the game's forward key moves the character up the
-    screen — nothing in a recording answers that — which is why steering ships off.
+    That the game's forward key moves the character up the screen was the one thing no
+    recording could answer — it is a fact about the *controls*, not about memory — and the owner
+    settled it at the keyboard (2026-08-29), the same route by which the roll rule was
+    established. Steering still ships off, but on a different argument: taking the movement keys
+    over for the length of a roll is a larger thing to hand a tool than pressing one key.
   - **Giving the keys back is the delicate half, and it needs a keyboard hook.** Windows has one
     up/down state per key: a synthesised W-up is not "the tool's W-up", it is W being up, and the
     player's finger on the physical key does not put it back. So the sequence is release, steer,
@@ -569,6 +572,18 @@ interesting part was not the feature:
       animation id "resolved" *before* the read succeeded, so an id whose first sighting was
       unreadable was burned for the session — four of six skills learned, silently. Failures are
       now retried, bounded.
+
+    **`--animdump` closes the loop on the shipped table.** The rows are an array, so ONE sighting
+    addresses all of them: `base = row − id·106`. That turns `data/animations.tsv` from a
+    hand-maintained list into something the game regenerates — run it after a patch, diff, done.
+    The safety is entirely in the base, because a wrong row pointer still computes a base, every
+    row still "reads", and the output would be a full table of confident nonsense committed over
+    a working one. So **two *different* animations must agree** before it is used; the same id
+    twice agrees by arithmetic rather than by evidence and is refused. It writes a new file beside
+    the executable and prints the diff rather than replacing anything — re-extracting names that a
+    dozen behaviours classify off is a deliberate act with a diff someone looked at, the same way
+    an offset change is. It also samples both action slots, which answers in passing whether a
+    MOVE wrapper carries the row pointer at the same offset as the SKILL wrapper it was found on.
 
     What the game's data will **not** give, checked against dat-schema's `poe2/_Core.gql`: no
     radius, area or shape column exists on `ActiveSkills`, `GrantedEffects`,

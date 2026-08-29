@@ -166,6 +166,40 @@ public class AnimationNamesFromTheGameTests
     }
 
     [Fact]
+    public void TheRowArrayBaseIsConfirmedFromARealSession()
+    {
+        // The claim <see cref="AnimationTable"/> rests on, put to the recording rather than to
+        // arithmetic: two DIFFERENT animations seen in a real session agree on the same base, so
+        // one sighting is enough to address every other row. That is what turns "name what you
+        // happen to see" into "regenerate the whole file".
+        var replay = ReplayMemoryReader.Load(File.OpenRead(FixturePath));
+        OffsetSchema schema = RealSessionTests.Schema();
+        var dump = new PoEformance.Game.Diagnostics.AnimationDump(replay, schema);
+        ulong gameStates = replay.ResolvedStatics["GameStates"];
+
+        bool confirmed = false;
+        for (uint frame = 0; frame < replay.FrameCount && !confirmed; frame++)
+        {
+            replay.Seek(frame);
+            confirmed = dump.Sample(gameStates);
+        }
+
+        Assert.True(confirmed, $"the base was never confirmed over {replay.FrameCount} frames");
+        Assert.NotEqual(dump.Table.ConfirmedBy.First, dump.Table.ConfirmedBy.Second);
+
+        // And the base it settled on predicts the rows the other test measured independently.
+        foreach ((int animation, ulong row) in Session.Value.Rows)
+        {
+            Assert.Equal(row, dump.Table.RowOf(animation));
+        }
+
+        // WHICH SLOT IT CAME FROM, recorded because it answers a question nobody had asked: the
+        // row pointer was found on a SKILL wrapper, and whether a MOVE wrapper carries it at the
+        // same offset was never established. This session says what it says.
+        Assert.NotEmpty(dump.Slots);
+    }
+
+    [Fact]
     public void LearningReplacesTheNameAndTheKindTogether()
     {
         // The kind is CACHED per id and derived from the name, so a learned name that did not
