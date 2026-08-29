@@ -1695,7 +1695,6 @@ internal static class Program
 
         // The effects debug switch, as a pair of callbacks: the overlay draws and has no other
         // business with the reader, and this is the one bit of it worth reaching from up there.
-        overlay.KeepingEffects = () => world.KeepEffects;
         overlay.KeepEffects = keep => world.KeepEffects = keep;
 
         // And the one the projectiles need: the game files every projectile in flight as a

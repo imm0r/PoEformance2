@@ -57,15 +57,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public EntityMemory? Memory { get; set; }
 
     /// <summary>
-    /// Whether the reader keeps the hostile ground effects, for the same reason as above.
+    /// Tells the reader whether to keep the hostile ground effects it otherwise drops.
     /// </summary>
     /// <remarks>
-    /// A pair of callbacks rather than the reader itself: the overlay draws and has no other
-    /// business with it, and this is the one bit of it worth reaching for from up here.
+    /// A callback rather than the reader itself: the overlay draws and has no other business
+    /// with it, and this is the one bit of it worth reaching for from up here.
+    ///
+    /// PUSHED EVERY FRAME from <c>EffectLayer.KeepHostile</c> rather than at the moment the
+    /// switch moves, which is the arrangement <see cref="ReadVisuals"/> already uses and for a
+    /// second reason here: the switch is SAVED, and settings are applied before this delegate is
+    /// wired, so a one-shot push during Apply would go nowhere and a restored value would be
+    /// silently lost. There is no matching getter - the layer holds the state, so asking the
+    /// reader what it is doing would be asking the wrong end.
     /// </remarks>
-    public Func<bool>? KeepingEffects { get; set; }
-
-    /// <summary>Turns that dropping off and on.</summary>
     public Action<bool>? KeepEffects { get; set; }
 
     /// <summary>
@@ -318,6 +322,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _projectiles.ShowTrails = settings.ProjectileTrails;
         _projectiles.ShowPaths = settings.ProjectilePaths;
         _projectiles.MineOnly = settings.ProjectilesMineOnly;
+        _effects.Enabled = settings.ShowEffects;
+        _effects.ShowPaths = settings.EffectPaths;
+        _effects.KeepHostile = settings.KeepEffects;
         Interface = settings.InterfaceOrDefault;
         Chrome.Apply(settings.WindowsOrEmpty);
         _tools.ApplyHidden(settings.HiddenTabsOrEmpty);
@@ -374,6 +381,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
             ProjectilesMineOnly = _projectiles.MineOnly,
+            ShowEffects = _effects.Enabled,
+            EffectPaths = _effects.ShowPaths,
+            KeepEffects = _effects.KeepHostile,
 
             // Only once it differs from the defaults, so an untouched file gains no key and a
             // default corrected in a release still reaches somebody who never opened the
@@ -1716,6 +1726,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // delegate call and a bool.
         ReadVisuals?.Invoke(_projectiles.Enabled);
 
+        // The same arrangement again, and it is what makes this switch survive a restart: the
+        // settings are applied before the reader can be reached, so a value pushed at the reader
+        // during Apply would be pushed at nothing. Held on the layer and synced here, a saved
+        // "keep the hostile effects" is in force from the first frame - which is the whole point
+        // of saving it, since a recording can only contain reads the build actually performed.
+        KeepEffects?.Invoke(_effects.KeepHostile);
+
         // The same arrangement, for the read the status icons need: kept in step every frame
         // rather than at the moment a switch moves, because the switch moves from the tab and
         // from the settings being applied, and one thing that syncs cannot drift out of step
@@ -1925,9 +1942,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // The same first-use registration, and for the same reason: the two callbacks it needs
         // are properties the app sets when it wires the reader up.
-        if (_effectWindow is null && KeepingEffects is not null && KeepEffects is not null)
+        if (_effectWindow is null && KeepEffects is not null)
         {
-            var made = new EffectWindow(_effects, KeepingEffects, KeepEffects, Noise);
+            var made = new EffectWindow(_effects, Noise);
             _effectWindow = made;
             _tools.Add(95, "effects", "Effects", () => made.DrawTab(_snapshot), page: Entities);
         }

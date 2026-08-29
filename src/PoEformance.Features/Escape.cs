@@ -81,8 +81,10 @@ public readonly record struct EscapeChoice(int Index, float X, float Y, double S
 /// So the lead is real and the plumbing is most of the way there, and it is still a lead: what a
 /// wave actually looks like in the entity list is unobserved. Both switches are live in the
 /// overlay - the Projectiles tab turns on the visuals, the Effects tab keeps the ground effects -
-/// so the question is answerable by turning them on during one and looking, before anything is
-/// designed around the answer.
+/// and both now PERSIST, which they had to before the question could be asked at all: watching a
+/// browser through a boss fight is not a thing anybody can do, so the answer comes from a
+/// recording, and a recording can only contain reads the running build performed. A switch that
+/// forgot itself on exit could never be on when the recording started.
 ///
 /// NOTHING HERE IS CHANGED ON THE STRENGTH OF THAT. The line model is right for the case it was
 /// built for and free for slams, which is two of the three; the third wants a decision about

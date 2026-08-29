@@ -496,8 +496,12 @@ interesting part was not the feature:
     `Metadata/Projectiles/…` becomes `EntityKind.Projectile`, which is mostly where a *player's*
     skills put theirs. So `ProjectileWatch` today follows your own projectiles, not a boss's wave.
     Both switches are live in the overlay (the **Projectiles** tab turns on the visuals, the
-    **Effects** tab keeps the ground effects), so what a wave looks like in the entity list is
-    answerable by turning them on during one and looking. Unobserved, so a lead and not a plan;
+    **Effects** tab keeps the ground effects) and both now **persist**, which they had to before
+    the question could be asked at all: nobody can watch an entity browser through a boss fight,
+    so the answer comes from a `--record`ing — and a recording can only contain reads the running
+    build performed, so a switch that forgot itself on exit could never be on when one started.
+    The Effects tab's three switches were session-only until then, alone among the debug layers
+    (the rest persist through `TrackerSettings`). Unobserved, so a lead and not a plan;
     **the danger model is an open question and nothing has been changed on the strength of this.**
   - **Which way is "W"** comes from the game's own matrix, not from an isometric constant:
     project the player, step up the screen, invert onto the player's ground plane, and the

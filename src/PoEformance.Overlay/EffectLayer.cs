@@ -40,6 +40,21 @@ public sealed class EffectLayer
     /// <summary>Write the metadata path beside each mark. The whole point, and very busy.</summary>
     public bool ShowPaths { get; set; } = true;
 
+    /// <summary>
+    /// Whether the READER should keep the hostile ground effects it otherwise drops.
+    /// </summary>
+    /// <remarks>
+    /// NOT a drawing flag, and it sits here anyway - beside the two that are - for the same
+    /// reason the projectile layer owns the visual-entity read: the settings are applied before
+    /// the reader can be reached, so a value pushed at the reader during Apply would be pushed
+    /// at nothing and silently lost. Held here it survives, and <c>EntityOverlay</c> syncs it
+    /// every frame, which is also what keeps it right when the switch is moved from the tab.
+    ///
+    /// Off, and it costs what the tab says: the rule it undoes is what stops a Firewall build
+    /// covering its own screen in enemy markers.
+    /// </remarks>
+    public bool KeepHostile { get; set; }
+
     /// <summary>Draws a mark on every effect the snapshot carries.</summary>
     /// <param name="project">
     /// The overlay's own world-to-screen, handed over rather than repeated: it is the one piece
