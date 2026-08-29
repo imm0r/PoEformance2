@@ -413,10 +413,13 @@ public class OverlaySettingsMergeTests
     /// KeepEffects on BEFORE the process starts - and a switch that forgets itself on exit can
     /// never be on before the process starts. The setting was unreachable for its own purpose.
     ///
-    /// THE OTHER DEBUG LAYERS WERE CHECKED and are not in the same state: the heat map, the
-    /// unwalked ground, the monster lines, the ground danger, the status icons and the aim lines
-    /// are all persisted through <c>TrackerSettings</c>. The Effects tab was the only one of its
-    /// kind, which is what makes this fix complete rather than the first of several.
+    /// "THE ONLY ONE OF ITS KIND" WAS WRONG when it was first written here, and the correction is
+    /// the part worth keeping. That sweep compared the drawing LAYERS against
+    /// <c>TrackerSettings</c> and found them all covered - true, and not the question. The
+    /// switches that were missing belong to WINDOWS holding their own state, which that sweep
+    /// never looked at, and the owner found the next four on the Stash tab within the hour.
+    /// A search that answers a narrower question than the one asked reads exactly like an
+    /// answer, which is the same shape of mistake as six animation rows standing in for a table.
     /// </remarks>
     [Fact]
     public void TheEffectSwitchesSurviveARestart()
@@ -476,5 +479,91 @@ public class OverlaySettingsMergeTests
 
         Assert.True(merged.ShowEffects);
         Assert.True(merged.KeepEffects);
+    }
+
+    /// <summary>The Stash tab's four network switches survive a restart too.</summary>
+    /// <remarks>
+    /// FOUND AFTER the effect ones, and by the owner rather than by the sweep that was supposed
+    /// to have covered them. All four reach the network - poe2db for pictures, poe.ninja and the
+    /// trade site for prices, the game's own exchange - and every store that owns one documents
+    /// itself as "off until somebody says otherwise". Saying so once is what that sentence
+    /// means; until now it had to be said again on every launch.
+    ///
+    /// Persisting them is not a change of policy about outbound requests. A tool that asks
+    /// poe.ninja the moment the box is ticked asks it just the same the second time it is
+    /// ticked - the only thing that changed is having to tick it four times a day.
+    /// </remarks>
+    [Fact]
+    public void TheStashSwitchesSurviveARestart()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-stash-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(OverlaySettingsStore.Save(
+                OverlaySettings.Default with
+                {
+                    StashItemArt = true,
+                    StashPrices = true,
+                    StashExchange = true,
+                    StashTrade = true,
+                },
+                path));
+
+            OverlaySettings back = OverlaySettingsStore.Load(path);
+
+            Assert.True(back.StashItemArt);
+            Assert.True(back.StashPrices);
+            Assert.True(back.StashExchange);
+            Assert.True(back.StashTrade);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    /// <summary>And all four still ship off, because all four reach the network.</summary>
+    [Fact]
+    public void TheStashSwitchesAreStillOffByDefault()
+    {
+        Assert.False(OverlaySettings.Default.StashItemArt);
+        Assert.False(OverlaySettings.Default.StashPrices);
+        Assert.False(OverlaySettings.Default.StashExchange);
+        Assert.False(OverlaySettings.Default.StashTrade);
+    }
+
+    /// <summary>Letting a class of noise through survives a restart, and by NAME.</summary>
+    /// <remarks>
+    /// The fourth switch on the Effects tab, missed by the first pass over that very tab: it
+    /// lets the engine's own <c>/fx/</c> and <c>/mat/</c> nodes past the noise filter, which is
+    /// what a wave's particles would arrive as. Stored by name so a kind inserted into
+    /// <c>NoiseKind</c> later cannot silently turn a saved choice into a different class - the
+    /// same reason the loot rarity round-trips by name above.
+    /// </remarks>
+    [Fact]
+    public void LettingNoiseThroughSurvivesARestart()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-noise-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(OverlaySettingsStore.Save(
+                OverlaySettings.Default with { NoiseOff = ["Engine"] },
+                path));
+
+            Assert.Contains("Engine", OverlaySettingsStore.Load(path).NoiseOffOrEmpty);
+            Assert.Contains("Engine", File.ReadAllText(path), StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    /// <summary>Nothing let through writes no key, so an untouched file stays untouched.</summary>
+    [Fact]
+    public void NothingLetThroughIsNotAnEmptyList()
+    {
+        Assert.Null(OverlaySettings.Default.NoiseOff);
+        Assert.Empty(OverlaySettings.Default.NoiseOffOrEmpty);
     }
 }

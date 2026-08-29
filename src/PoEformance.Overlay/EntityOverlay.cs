@@ -307,6 +307,38 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public EntityHiding EntitiesHidden { get; } = new();
 
+    /// <summary>Hands the saved stash switches to whichever stores are attached.</summary>
+    /// <remarks>
+    /// Called from both ends - when the settings arrive and when the stores do - because either
+    /// can be second and only the later one can complete the pair. Cheap and idempotent, so
+    /// calling it when nothing has changed costs four assignments.
+    ///
+    /// The exchange's league is deliberately NOT set here: it is not known until the player is
+    /// in an area, so <c>StashWindow</c> tells the store on every draw where it is playing.
+    /// </remarks>
+    private void PushStashWants()
+    {
+        if (_stashArt is not null)
+        {
+            _stashArt.Enabled = _stashWants.Art;
+        }
+
+        if (_stashPrices is not null)
+        {
+            _stashPrices.Enabled = _stashWants.Prices;
+        }
+
+        if (_stashExchange is not null)
+        {
+            _stashExchange.Enabled = _stashWants.Exchange;
+        }
+
+        if (_stashTrade is not null)
+        {
+            _stashTrade.Enabled = _stashWants.Trade;
+        }
+    }
+
     /// <summary>Applies the settings that persist, and remembers them for the next save.</summary>
     public void Apply(OverlaySettings settings)
     {
@@ -326,6 +358,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _effects.ShowPaths = settings.EffectPaths;
         _effects.KeepHostile = settings.KeepEffects;
         Interface = settings.InterfaceOrDefault;
+
+        // Remembered rather than applied, because the stores do not exist yet - AttachStash
+        // runs after this, exactly like the wealth stretch below. Pushed straight through as
+        // well, for the second and later Apply: the config page re-applies while the tool runs.
+        _stashWants = (settings.StashItemArt, settings.StashPrices,
+            settings.StashExchange, settings.StashTrade);
+        PushStashWants();
         Chrome.Apply(settings.WindowsOrEmpty);
         _tools.ApplyHidden(settings.HiddenTabsOrEmpty);
         EntitiesHidden.Use(settings.HiddenEntitiesOrEmpty, settings.HiddenEntitySpotsOrEmpty);
@@ -342,6 +381,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (Noise is not null)
         {
             Noise.Enabled = settings.HideNoise;
+
+            // Every kind back on first, so a name dropped from the file turns its class back
+            // ON rather than leaving it let through from the last time this ran.
+            IReadOnlyList<string> letThrough = settings.NoiseOffOrEmpty;
+            foreach (NoiseKind kind in NoiseFilter.Kinds)
+            {
+                Noise.Set(
+                    kind,
+                    !letThrough.Contains(kind.ToString(), StringComparer.OrdinalIgnoreCase));
+            }
         }
 
         if (Memory is not null)
@@ -385,6 +434,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             EffectPaths = _effects.ShowPaths,
             KeepEffects = _effects.KeepHostile,
 
+            // From the stores where they exist, and from what was loaded where they do not:
+            // saving before the stash is attached must not write four falses over the file.
+            StashItemArt = _stashArt?.Enabled ?? basis.StashItemArt,
+            StashPrices = _stashPrices?.Enabled ?? basis.StashPrices,
+            StashExchange = _stashExchange?.Enabled ?? basis.StashExchange,
+            StashTrade = _stashTrade?.Enabled ?? basis.StashTrade,
+
             // Only once it differs from the defaults, so an untouched file gains no key and a
             // default corrected in a release still reaches somebody who never opened the
             // sliders - the same bargain the window rules and the marker styles make.
@@ -394,6 +450,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             HiddenEntities = EntitiesHidden.Kinds is { Count: > 0 } kinds ? kinds : null,
             HiddenEntitySpots = EntitiesHidden.Spots is { Count: > 0 } spots ? [.. spots] : null,
             HideNoise = Noise?.Enabled ?? basis.HideNoise,
+
+            // Only once one is let through, so an untouched file gains no key - the same
+            // bargain the hidden tabs make. Null rather than an empty array for the same reason.
+            NoiseOff = Noise is null
+                ? basis.NoiseOff
+                : NoiseFilter.Kinds.Where(k => !Noise.IsOn(k)).Select(k => k.ToString()).ToArray()
+                    is { Length: > 0 } through
+                    ? through
+                    : null,
             RememberOutOfRange = Memory?.Enabled ?? basis.RememberOutOfRange,
             ShowPoi = _poi?.ShowPicker ?? basis.ShowPoi,
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
@@ -487,6 +552,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly UnwalkedLayer _unwalked = new();
     private readonly HeatLayer _heat = new();
     private readonly EffectLayer _effects = new();
+
+    /// <summary>
+    /// The Stash tab's four network switches, as loaded, until the stores exist to take them.
+    /// </summary>
+    /// <remarks>
+    /// Apply runs before AttachStash, so a value pushed at the stores when the settings land
+    /// would be pushed at nulls and lost - the same trap the effect switches fell into, arriving
+    /// by the other road. The wealth stretch below solves it the same way.
+    /// </remarks>
+    private (bool Art, bool Prices, bool Exchange, bool Trade) _stashWants;
+
+    private ItemArtStore? _stashArt;
+    private PriceStore? _stashPrices;
+    private TradePrices? _stashTrade;
+    private ExchangeStore? _stashExchange;
     private readonly HealthBarLayer _healthBars = new();
 
     // The tracker's three layers, which share one settings record - see AttachTracker.
@@ -1105,6 +1185,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // so the window is handed a way to turn a file into something drawable rather than
         // being given the renderer itself. The sign-in is handed in for the same shape of
         // reason: the trade window is a browser, and this layer cannot see that one.
+        // Kept so the four switches can be saved and restored: they belong to the stores, not
+        // to the window, and this class is what Apply and CurrentSettings run on.
+        _stashArt = art;
+        _stashPrices = prices;
+        _stashTrade = trade;
+        _stashExchange = exchange;
+        PushStashWants();
+
         var window = new StashWindow(
             inspector, art, prices, trade, signIn, probe,
             file => _icons.PictureFor(file, IconCache.MaxWideEdge).Texture,

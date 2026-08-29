@@ -318,10 +318,17 @@ public sealed class StashWindow
         if (ImGui.Checkbox("and the game's own currency exchange", ref asking))
         {
             _exchange.Enabled = asking;
-            if (asking)
-            {
-                _exchange.Playing(league);
-            }
+        }
+
+        // TOLD ON EVERY DRAW, not only when the switch moves, and that fixes two things rather
+        // than one. The switch is saved now, so a restored "on" would otherwise never name a
+        // league at all - nothing else calls this. And it was already wrong for a league CHANGE:
+        // enabling it on Standard and then playing elsewhere left the store answering for the
+        // league you left, because the only call was on the click. Playing() compares before it
+        // does anything, so a draw that changes nothing costs a lock and a string comparison.
+        if (asking)
+        {
+            _exchange.Playing(league);
         }
 
         ImGui.SameLine();
