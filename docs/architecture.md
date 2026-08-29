@@ -500,9 +500,22 @@ interesting part was not the feature:
     the question could be asked at all: nobody can watch an entity browser through a boss fight,
     so the answer comes from a `--record`ing — and a recording can only contain reads the running
     build performed, so a switch that forgot itself on exit could never be on when one started.
-    The Effects tab's three switches were session-only until then, alone among the debug layers
-    (the rest persist through `TrackerSettings`). Unobserved, so a lead and not a plan;
-    **the danger model is an open question and nothing has been changed on the strength of this.**
+  - **Measured against a real boss** (`tests/fixtures/session-2026-08-effects.rec`,
+    `HostileEffectTests`), and it **splits the question rather than answering it**. A hostile
+    effect that travels is readable: `PermanentEffect` produces **1304 consecutive-frame
+    movements, every one under 200 units and none over 1000** — no id-reuse artefacts at all,
+    which is what makes it a measurement (the first pass tracked by `(path, id)` and reported
+    ten-thousand-unit "steps" that were the game reusing an id between two different effects;
+    tracking by *render address* across *consecutive* frames removes them entirely). Ground
+    effects move **exactly zero** over the same recording, so "is this coming at me" is
+    answerable from position over time with nothing named. **But the path names nothing** —
+    `Effect`, `PermanentEffect`, `SleepableEffect`, `BeamEffect` are engine words, not skill
+    names — so geometry can be observed and *identity* cannot; a table may still be wanted for
+    what a thing **is** while what it is **doing** comes from the world for free. And the third
+    barrier is confirmed on data: **all 6864 sightings under `Metadata/Projectiles` in that
+    fight are the player's own Spark**, not one monster projectile classified as a projectile.
+    The wave itself is still unobserved — the boss is drawn at random and that fight had none;
+    **the danger model is an open question and the scoring is unchanged.**
   - **Which way is "W"** comes from the game's own matrix, not from an isometric constant:
     project the player, step up the screen, invert onto the player's ground plane, and the
     difference is the world direction (`ScreenBasis`). Over the 1984 in-game frames of the

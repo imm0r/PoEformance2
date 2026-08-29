@@ -78,13 +78,22 @@ public readonly record struct EscapeChoice(int Index, float X, float Y, double S
 ///    PLAYER's skills put theirs - so <see cref="ProjectileWatch"/> today follows your own
 ///    projectiles, not a boss's wave.
 ///
-/// So the lead is real and the plumbing is most of the way there, and it is still a lead: what a
-/// wave actually looks like in the entity list is unobserved. Both switches are live in the
-/// overlay - the Projectiles tab turns on the visuals, the Effects tab keeps the ground effects -
-/// and both now PERSIST, which they had to before the question could be asked at all: watching a
-/// browser through a boss fight is not a thing anybody can do, so the answer comes from a
-/// recording, and a recording can only contain reads the running build performed. A switch that
-/// forgot itself on exit could never be on when the recording started.
+/// MEASURED SINCE, against a real map boss with both switches on
+/// (tests/fixtures/session-2026-08-effects.rec, <c>HostileEffectTests</c>), and it splits the
+/// question rather than answering it:
+///
+/// - A HOSTILE EFFECT THAT TRAVELS IS READABLE. PermanentEffect produces 1304 consecutive-frame
+///   movements, every one under 200 units and none over 1000 - no reuse artefacts at all. So
+///   "where is this hazard and is it coming at me" is answerable from the world, with nothing
+///   named and no table consulted. Ground effects move exactly zero over the same recording,
+///   which is what makes a moving one worth noticing.
+/// - THE PATH NAMES NOTHING. Effect, PermanentEffect, SleepableEffect, BeamEffect - engine words,
+///   not skill names. Geometry can be observed; IDENTITY cannot. A table may still be wanted for
+///   what a thing IS, while what it is DOING comes from the world for free.
+/// - THE THIRD BARRIER IS CONFIRMED. Every one of 6864 sightings under Metadata/Projectiles in
+///   that fight is the PLAYER's own Spark. Not one monster projectile classified as a projectile.
+///
+/// THE WAVE ITSELF IS STILL UNOBSERVED - the boss is drawn at random and that recording had none.
 ///
 /// NOTHING HERE IS CHANGED ON THE STRENGTH OF THAT. The line model is right for the case it was
 /// built for and free for slams, which is two of the three; the third wants a decision about
