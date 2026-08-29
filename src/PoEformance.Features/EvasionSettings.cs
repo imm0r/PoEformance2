@@ -129,6 +129,15 @@ public sealed record EvasionGate(
 /// leaves the direction entirely with the player and has been used for hours; this takes the
 /// steering away for the length of a roll, which is a strictly larger thing to hand a tool. The
 /// two are worth being able to switch on separately.
+///
+/// IT WORKS, over two complete maps (2026-08-29, the owner playing): the roll goes the way the
+/// planner chose, WSAD can be held down throughout, and movement continues in the held direction
+/// the moment the roll ends - no key to press again, no stutter. That last part is the whole
+/// point of <c>PhysicalKeys</c> and it is the half that could only ever be confirmed by playing,
+/// since a recording cannot show a finger still on a key.
+///
+/// THE DEFAULT STAYS OFF ANYWAY. Not because anything is unproven now, but because a tool that
+/// takes the movement keys over should be something a person switches on deliberately.
 /// </param>
 /// <param name="RollDistance">
 /// How far a roll travels, in world units - what the steering scores directions over.

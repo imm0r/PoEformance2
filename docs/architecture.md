@@ -481,8 +481,12 @@ interesting part was not the feature:
     That the game's forward key moves the character up the screen was the one thing no
     recording could answer — it is a fact about the *controls*, not about memory — and the owner
     settled it at the keyboard (2026-08-29), the same route by which the roll rule was
-    established. Steering still ships off, but on a different argument: taking the movement keys
-    over for the length of a roll is a larger thing to hand a tool than pressing one key.
+    established. **The whole sequence then held up over two complete maps** (2026-08-29): the roll
+    goes the way the planner chose, WSAD can be held down throughout, and movement resumes in the
+    held direction the instant the roll ends — no key to press again. That last part is what
+    `PhysicalKeys` exists for, and the only way to confirm it was to play, because no recording
+    can show a finger still on a key. Steering still ships off, on a different argument: taking
+    the movement keys over should be something a person switches on deliberately.
   - **Giving the keys back is the delicate half, and it needs a keyboard hook.** Windows has one
     up/down state per key: a synthesised W-up is not "the tool's W-up", it is W being up, and the
     player's finger on the physical key does not put it back. So the sequence is release, steer,

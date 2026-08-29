@@ -1053,6 +1053,10 @@ internal static class Program
         // When the quest set was last re-read, so it happens on a timer and not per frame.
         long questsRead = 0;
 
+        // How many table disagreements have been reported. Not a count of problems - a cursor,
+        // so each row is named once rather than on every read for the rest of the session.
+        int animationDrift = 0;
+
         // The planner arrives already configured - the config window shares it, and a second
         // one here would edit settings the reader never sees.
         PoEformance.Game.Components.AnimationNames animationNames =
@@ -1359,12 +1363,30 @@ internal static class Program
                 world.ReadActions = evasionPlanner.Settings.NeedsActions;
 
                 // Let the game name its own animations. Two hops and a short string, ONCE per
-                // animation id per session - and it beats the shipped table, which is
-                // hand-maintained and provably drifts (it calls animation 889 InteractLeanWell;
-                // the game calls it ElementalWeakness). The name is what KindOf classifies, so
-                // this is the difference between filtering an animation correctly and reporting
-                // it as a number.
+                // animation id per session - and it beats the shipped table, which ages with the
+                // game: three rows have been inserted into Data/Balance/Animation.dat since the
+                // file was first transcribed, and while that stood, 37 animations were classified
+                // QUIET that are not. The name is what KindOf classifies, so this is the
+                // difference between filtering an animation correctly and dropping a threat.
                 world.AnimationNames = animationNames;
+
+                // AND SAY SO WHEN IT HAPPENS. The table is generated now, so a disagreement means
+                // the game has moved on since it was generated - which is exactly the state that
+                // last time went unnoticed until somebody went looking. Correcting it silently
+                // fixes this session and lets the file rot; one line names the row and what to
+                // run. Reported once per id, and only for ids the file HAS - a name for an id it
+                // never had is news rather than a contradiction.
+                if (animationNames.Disagreements.Count > animationDrift)
+                {
+                    foreach ((int id, string shipped, string live) in animationNames.Disagreements.Skip(animationDrift))
+                    {
+                        Console.WriteLine(
+                            $"  animation {id}: the table says {shipped}, the game says {live}"
+                            + " - data/animations.tsv is behind, re-run --animdump");
+                    }
+
+                    animationDrift = animationNames.Disagreements.Count;
+                }
 
                 // The keyboard hook, started the first tick steering is switched on and never
                 // before it. Idempotent and a volatile read when it is already running, so it
