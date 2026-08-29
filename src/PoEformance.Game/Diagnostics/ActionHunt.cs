@@ -22,13 +22,32 @@ namespace PoEformance.Game.Diagnostics;
 /// first recording at all, because nothing in that build read the rotation bytes and a
 /// recording holds only what the running build read.
 /// </remarks>
+/// <param name="Monsters">
+/// Every hostile monster this tick, with what its own actor says it is doing.
+/// </param>
 public sealed record ActionHuntSample(
     ulong ActorAddress,
     byte[] Window,
     float PlayerX,
     float PlayerY,
     IReadOnlyDictionary<int, byte[]> Followed,
-    float Facing = float.NaN);
+    float Facing = float.NaN,
+    IReadOnlyList<MonsterSighting>? Monsters = null);
+
+/// <summary>One hostile monster at one tick, as its own Actor component describes it.</summary>
+/// <param name="EntityId">
+/// The game's id for it, which is what makes a TRACE possible: the arrival test needs one
+/// monster followed across frames, and an address cannot do that job - the game hands a single
+/// monster several entity objects, and reuses addresses once it is gone.
+/// </param>
+/// <param name="Facing">Which way it points, in radians, or NaN when unread.</param>
+public sealed record MonsterSighting(
+    uint EntityId,
+    string Name,
+    ActorAction Action,
+    float X,
+    float Y,
+    float Facing);
 
 /// <summary>A pointer slot that comes and goes with activity - an ActionPtr candidate.</summary>
 /// <param name="ActingNonNull">Share of acting frames in which the slot held a pointer.</param>
@@ -126,6 +145,13 @@ public sealed class ActionHunt
     /// <summary>Most skill entries walked for the CastType table. A 9-gem character has 42.</summary>
     private const int MostSkills = 128;
 
+    /// <summary>
+    /// Most hostile monsters sampled per tick. A breach puts hundreds on screen; the ones
+    /// worth the read are the ones near enough to act on you, and the snapshot lists them
+    /// nearest-first by the same walk order the overlay draws from.
+    /// </summary>
+    private const int MostMonsters = 32;
+
     /// <summary>Fewest frames of each state before a correlation means anything.</summary>
     private const int MinFramesPerState = 5;
 
@@ -157,6 +183,7 @@ public sealed class ActionHunt
     private readonly OffsetSchema _schema;
     private readonly EntityReader _entities;
     private readonly RenderReader _render;
+    private readonly World.WorldReader _world;
     private readonly int _animationId;
     private readonly int _activeSkills;
     private readonly int _skillEntrySize;
@@ -182,6 +209,11 @@ public sealed class ActionHunt
         _schema = schema;
         _entities = new EntityReader(reader, schema);
         _render = new RenderReader(reader, schema);
+
+        // Both switches on: the actions are what is being checked, and the facing is the
+        // independent cross-check on them. Off by default everywhere else, so a hunt is the
+        // only thing that pays for them.
+        _world = new World.WorldReader(reader, schema) { ReadActions = true, ReadAim = true };
 
         StructDef actor = schema.Structs["Actor"];
         _animationId = actor.OffsetOf("AnimationId");
@@ -229,7 +261,15 @@ public sealed class ActionHunt
         // The component walk is ~50 reads; component addresses are stable while the entity
         // lives, so it is done once per player pointer rather than once per tick. On a
         // replay the same code caches the same way, so the reads line up with the recording.
-        if (chain.PlayerEntity != _cachedPlayer)
+        //
+        // A FAILED RESOLUTION IS NEVER CACHED, and that is not a nicety - it is a bug this
+        // cost a whole recording to. The player pointer is the SAME address all session, so
+        // caching a failure against it means one bad frame switches the hunt off permanently:
+        // the retry condition never comes back true, every later frame returns null, and the
+        // report says "no frames" about a session that was perfectly readable a tick later.
+        // That is what happened to the first fight recording, whose first frames are a loading
+        // screen: 1390 readable frames, all of them discarded, because of frame 0.
+        if (chain.PlayerEntity != _cachedPlayer || _cachedActor == 0 || _cachedRender == 0)
         {
             ResolvePlayer(chain.PlayerEntity);
         }
@@ -273,7 +313,49 @@ public sealed class ActionHunt
             }
         }
 
-        return new ActionHuntSample(_cachedActor, window, position.X, position.Y, followed, facing);
+        return new ActionHuntSample(
+            _cachedActor, window, position.X, position.Y, followed, facing, ReadMonsters(gameStatesStatic));
+    }
+
+    /// <summary>
+    /// Every hostile monster's action this tick.
+    /// </summary>
+    /// <remarks>
+    /// THE WHOLE ENTITY WALK, EVERY TICK, and the first recording is why. That one sampled only
+    /// the player, so its entity list was whatever the startup scan happened to see - frozen for
+    /// the rest of the file. Replayed, it showed the same seven entities at second one and
+    /// second eighty-six, none of them monsters, through eighty-six seconds in which the player
+    /// demonstrably fought: 98 frames of Spark, 6 of Flamewall, 23,000 world units of running.
+    /// The monster question could not be asked of that file at all - not because the offsets are
+    /// wrong, but because nothing had read a monster. A recording holds only what the running
+    /// build read, and this is the read that was missing.
+    ///
+    /// The cost is one snapshot per tick, which is what the overlay already pays per frame, and
+    /// the recorder writes only reads whose bytes CHANGED - so a monster standing still costs
+    /// nothing after the first sighting.
+    /// </remarks>
+    private List<MonsterSighting> ReadMonsters(ulong gameStatesStatic)
+    {
+        var seen = new List<MonsterSighting>();
+        World.WorldSnapshot snapshot = _world.Read(gameStatesStatic);
+
+        foreach (World.WorldEntity monster in snapshot.Entities
+                     .Where(e => e.Kind == World.EntityKind.Monster && !e.IsFriendly)
+                     .Take(MostMonsters))
+        {
+            // The snapshot read these because ReadActions and ReadAim are on; a monster with no
+            // Actor component reads null and is carried anyway, since "it is here and doing
+            // nothing" is the answer half of the arrival test needs.
+            seen.Add(new MonsterSighting(
+                monster.Id,
+                monster.ShortName,
+                monster.Action ?? ActorAction.None,
+                monster.WorldX,
+                monster.WorldY,
+                monster.Aim?.Angle ?? float.NaN));
+        }
+
+        return seen;
     }
 
     /// <summary>Resolves the player's Actor and Render once, and its skill CastType table.</summary>

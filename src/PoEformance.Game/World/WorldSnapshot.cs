@@ -207,6 +207,15 @@ public readonly record struct Aim(float Angle, float Turning, int Animation = -1
 /// be switched on. Filled for the player and for hostile monsters - a friendly minion's aim is
 /// nobody's question, and scenery has no Actor component to ask.
 /// </param>
+/// <param name="Action">
+/// What this entity has COMMITTED to and where that is aimed, when somebody asked for it.
+///
+/// Null means NOBODY ASKED, exactly as for <paramref name="Aim"/>, and switched on by
+/// <see cref="WorldReader.ReadActions"/>. It answers the question the aim cannot: an aim is a
+/// direction and this is a PLACE, so a slam's landing spot is here and nowhere else. It is also
+/// the earlier signal of the two - an action is committed before any animation plays, which
+/// <c>ActionFieldsTests</c> measures - and that head start is the whole value of it to a warning.
+/// </param>
 /// <remarks>
 /// Carried because the game hands one monster several entity objects over a single set of
 /// components, so an entity address is not an identity: three entities with three addresses
@@ -237,7 +246,8 @@ public sealed record WorldEntity(
     bool? Present = null,
     int? RememberedForMs = null,
     ActiveBuffs? Buffs = null,
-    Aim? Aim = null)
+    Aim? Aim = null,
+    ActorAction? Action = null)
 {
     /// <summary>Whether this comes from memory rather than from the game's current list.</summary>
     public bool IsRemembered => RememberedForMs is not null;
@@ -423,6 +433,7 @@ public sealed class WorldReader
     private readonly RenderReader _render;
     private readonly LifeReader _life;
     private readonly BuffsReader _buffs;
+    private readonly ActionReader _actions;
     private readonly FlaskBeltReader _flasks;
     private readonly CorpseFilter _corpses = new();
 
@@ -527,6 +538,23 @@ public sealed class WorldReader
     /// </remarks>
     public bool ReadAim { get; set; }
 
+    /// <summary>
+    /// Read what things have COMMITTED to doing, and where - the evasion input.
+    /// </summary>
+    /// <remarks>
+    /// OFF by default on the same terms as <see cref="ReadAim"/>, and it is the more expensive
+    /// of the two: an id off the Actor component, then a pointer, then the wrapper's two pairs -
+    /// four reads where the aim costs two. Paid only for the player and hostile monsters.
+    ///
+    /// SEPARATE FROM <see cref="ReadAim"/> RATHER THAN FOLDED INTO IT, though the same layer
+    /// wants both, because they are separate CLAIMS. The facing pair is settled on the player and
+    /// on monsters alike - the aim overlay has drawn monster rays for a month. The action fields
+    /// were measured only on the player's own actor, so a monster's action is the newer and
+    /// weaker reading of the two, and a switch that turned both on at once would let the weaker
+    /// one ride into a feature on the stronger one's evidence.
+    /// </remarks>
+    public bool ReadActions { get; set; }
+
     private readonly GroundItemReader _groundItems;
     private readonly MinimapIconReader _mapIcons;
     private LandmarkNames _landmarkNames = LandmarkNames.Empty;
@@ -583,6 +611,7 @@ public sealed class WorldReader
         _render = new RenderReader(reader, schema);
         _life = new LifeReader(reader, schema);
         _buffs = new BuffsReader(reader, schema);
+        _actions = new ActionReader(reader, schema);
         _flasks = new FlaskBeltReader(reader, schema);
         _groundItems = new GroundItemReader(reader, schema);
         _mapIcons = new MinimapIconReader(reader, schema);
@@ -1045,13 +1074,28 @@ public sealed class WorldReader
                 aim = ReadAimOf(entity, renderAddress);
             }
 
+            // What it has committed to, and where. Same audience as the aim, and read here
+            // rather than by the consumer for the reason every other per-entity read is: the
+            // Actor component has already been located by the walk above, so asking later
+            // would mean resolving the whole component map a second time.
+            ActorAction? action = null;
+            if (ReadActions && (kind == EntityKind.Player || (kind == EntityKind.Monster && !friendly)))
+            {
+                ulong actorAddress = entity.Component("Actor");
+                if (actorAddress != 0)
+                {
+                    action = _actions.Read(actorAddress);
+                }
+            }
+
             var world = new WorldEntity(
                 id, address, entity.Path, kind,
                 position.Value.X, position.Value.Y, position.Value.Z,
                 position.Value.TerrainHeight, position.Value.ModelBoundsZ, rarity,
                 poi, mapIcon,
                 signs.Life, signs.EnergyShield, opened, friendly, signs.IsEffect,
-                NameOf(address, renderAddress), renderAddress, present, Buffs: buffs, Aim: aim);
+                NameOf(address, renderAddress), renderAddress, present,
+                Buffs: buffs, Aim: aim, Action: action);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
