@@ -27,26 +27,20 @@ public sealed class EffectWindow
     private static readonly Vector4 FriendlyText = OverlayInk.Friendly;
 
     private readonly EffectLayer _layer;
-    private readonly Func<bool> _keepingEffects;
-    private readonly Action<bool> _keepEffects;
     private readonly NoiseFilter? _noise;
 
     private string _filter = string.Empty;
 
-    /// <param name="keepEffects">
-    /// Turns the reader's own dropping of hostile effects off and on. A pair of callbacks
-    /// rather than the reader itself: the window has no business with anything else on it, and
-    /// the reader lives a layer below where this can reach.
+    /// <param name="layer">
+    /// Holds all three switches, including the one that is not about drawing at all: the
+    /// reader's dropping of hostile effects. It lives there so it can be SAVED - the window is
+    /// attached long after the settings are applied, and a switch owned here would start from
+    /// nothing on every launch. <c>EntityOverlay</c> pushes it at the reader every frame.
     /// </param>
-    public EffectWindow(
-        EffectLayer layer, Func<bool> keepingEffects, Action<bool> keepEffects, NoiseFilter? noise)
+    public EffectWindow(EffectLayer layer, NoiseFilter? noise)
     {
         ArgumentNullException.ThrowIfNull(layer);
-        ArgumentNullException.ThrowIfNull(keepingEffects);
-        ArgumentNullException.ThrowIfNull(keepEffects);
         _layer = layer;
-        _keepingEffects = keepingEffects;
-        _keepEffects = keepEffects;
         _noise = noise;
     }
 
@@ -76,10 +70,10 @@ public sealed class EffectWindow
             _layer.ShowPaths = paths;
         }
 
-        bool keeping = _keepingEffects();
+        bool keeping = _layer.KeepHostile;
         if (ImGui.Checkbox("keep the hostile ground effects  (the reader drops them)", ref keeping))
         {
-            _keepEffects(keeping);
+            _layer.KeepHostile = keeping;
         }
 
         // Said next to the switch, because the reason it is off is the reason a screen full of
@@ -188,6 +182,6 @@ public sealed class EffectWindow
             ImGui.EndTable();
         }
 
-        bool keepingNothing() => !_keepingEffects() && (_noise is null || _noise.IsOn(NoiseKind.Engine));
+        bool keepingNothing() => !_layer.KeepHostile && (_noise is null || _noise.IsOn(NoiseKind.Engine));
     }
 }

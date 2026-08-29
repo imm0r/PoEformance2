@@ -469,6 +469,40 @@ interesting part was not the feature:
     every action with a target counts, including ones the rarity gates would never have drawn:
     what to draw, what to react to, and where it is safe to land are three questions. If nothing
     beats standing still it does not roll, and says so.
+  - **"Costless for the other" is too strong, and a wave is the case that breaks it.** Named by
+    the owner (2026-08-29) while deciding whether to build a per-animation danger table: a **wave
+    rolling at the player** is a wide *front* — thin along its travel, long across it — and the
+    segment the model draws runs along its direction of travel. So perpendicular moves *along*
+    the front and does not leave it, while rolling forward *through* a thin front is the direction
+    that plausibly works and scores zero, because it stays on the segment. The rule ranks the
+    likely answer last. Not less precise on a third shape: **inverted on it.** And the shape is
+    only half the problem — **a wave moves**, so whether a place is safe depends on *when* you
+    arrive, and there is no time anywhere in the scoring. Two hazards with identical geometry
+    need opposite answers depending on whether the front is advancing, which means the obvious
+    next step — a table of shape and radius keyed on animation id — could not express a wave even
+    if somebody wrote it; it would need a travel speed too. Which points at not writing a table
+    at all — a front that can be *observed* needs no table and never goes stale, the same "ask the
+    game rather than keep a list" move that answered the steering's hold, and `ProjectileWatch`
+    already derives a direction and a speed from watching something move across successive reads.
+    **But a hostile wave reaches none of that today**, and it is dropped three times over, each
+    with a recorded reason: `ReadVisualEntities` is off, so the entity walk discards everything
+    from id `0x40000000` up — decorations, effects, every projectile in flight — before the path
+    is read (measured: 17 gameplay entities against 51 visuals per frame on a Spark session);
+    `KeepEffects` is off, so a hostile thing that expires on its own and cannot be targeted is
+    dropped as a ground effect wearing a monster's components (the rule that stopped flame walls
+    being health-barred); and even with both on, a monster's projectile is usually filed under the
+    *monster's* own path (`Metadata/Monsters/…/objects/LightningArrow`, 36 sightings in one
+    recorded map), so it classifies as a Monster, carries no Life, and is dropped again — only
+    `Metadata/Projectiles/…` becomes `EntityKind.Projectile`, which is mostly where a *player's*
+    skills put theirs. So `ProjectileWatch` today follows your own projectiles, not a boss's wave.
+    Both switches are live in the overlay (the **Projectiles** tab turns on the visuals, the
+    **Effects** tab keeps the ground effects) and both now **persist**, which they had to before
+    the question could be asked at all: nobody can watch an entity browser through a boss fight,
+    so the answer comes from a `--record`ing — and a recording can only contain reads the running
+    build performed, so a switch that forgot itself on exit could never be on when one started.
+    The Effects tab's three switches were session-only until then, alone among the debug layers
+    (the rest persist through `TrackerSettings`). Unobserved, so a lead and not a plan;
+    **the danger model is an open question and nothing has been changed on the strength of this.**
   - **Which way is "W"** comes from the game's own matrix, not from an isometric constant:
     project the player, step up the screen, invert onto the player's ground plane, and the
     difference is the world direction (`ScreenBasis`). Over the 1984 in-game frames of the

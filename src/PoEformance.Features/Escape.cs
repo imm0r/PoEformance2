@@ -40,6 +40,55 @@ public readonly record struct EscapeChoice(int Index, float X, float Y, double S
 /// BACKWARDS IS NOT FORBIDDEN, only ranked below across: with a threat to each side it wins on
 /// its own merits, because every direction is scored against every threat at once and the one
 /// whose WORST case is best is the one taken.
+///
+/// THE "FREE FOR THE OTHER" CLAIM ABOVE IS TOO STRONG, and the owner named the case that breaks
+/// it (2026-08-29): a WAVE ROLLING AT THE PLAYER. It is a wide FRONT, thin along its travel and
+/// long across it, and the segment this models runs along its direction of travel - so rolling
+/// perpendicular moves ALONG the front and does not leave it. Worse than not helping: rolling
+/// forward THROUGH a thin front is the direction that plausibly works, and this scores it zero
+/// because it stays on the segment, so the rule ranks the likely answer LAST. Not "less precise
+/// on a third shape" - inverted on it.
+///
+/// AND THE SHAPE IS ONLY HALF OF IT. A wave MOVES, so whether a place is safe depends on WHEN
+/// you get there, and there is no time anywhere in this scoring. Two hazards with identical
+/// geometry need opposite answers depending on whether the front is advancing, which means a
+/// per-animation table of shape and radius - the obvious next step, and the one deferred here -
+/// could not express a wave even if somebody wrote it. It would need a travel speed too.
+///
+/// WHICH POINTS AT NOT WRITING A TABLE AT ALL. The owner's follow-up (2026-08-29) is that a wave
+/// ought to be visible in the particles, and the shape of the tool agrees: a front that can be
+/// OBSERVED needs no table and never goes stale, which is the same "ask the game rather than keep
+/// a list" move that answered the steering's hold. <see cref="ProjectileWatch"/> already derives
+/// a direction and a speed from watching something move across successive reads.
+///
+/// BUT A HOSTILE WAVE REACHES NONE OF THAT TODAY, and the first draft of this note implied it was
+/// closer than it is. It is dropped three times over, each with a recorded reason:
+///
+/// 1. <c>WorldReader.ReadVisualEntities</c> is OFF. The game files everything from id 0x40000000
+///    up as a visual - decorations, effects, every projectile in flight - and the entity walk
+///    drops those before the path is even read. Measured cost of turning it on: 17 gameplay
+///    entities against 51 visuals per frame on a recorded Spark session.
+/// 2. <c>WorldReader.KeepEffects</c> is OFF. A hostile thing that expires on its own and cannot
+///    be targeted is dropped as "a ground effect wearing a monster's components" - the rule that
+///    stopped flame walls being drawn as enemies with health bars.
+/// 3. EVEN WITH BOTH ON, a monster's projectile is usually filed under the MONSTER's own path
+///    (Metadata/Monsters/.../objects/LightningArrow, 36 sightings in one recorded map), so it
+///    classifies as a Monster, carries no Life, and is dropped by rule 2 again. Only
+///    Metadata/Projectiles/... becomes <c>EntityKind.Projectile</c>, and that is mostly where a
+///    PLAYER's skills put theirs - so <see cref="ProjectileWatch"/> today follows your own
+///    projectiles, not a boss's wave.
+///
+/// So the lead is real and the plumbing is most of the way there, and it is still a lead: what a
+/// wave actually looks like in the entity list is unobserved. Both switches are live in the
+/// overlay - the Projectiles tab turns on the visuals, the Effects tab keeps the ground effects -
+/// and both now PERSIST, which they had to before the question could be asked at all: watching a
+/// browser through a boss fight is not a thing anybody can do, so the answer comes from a
+/// recording, and a recording can only contain reads the running build performed. A switch that
+/// forgot itself on exit could never be on when the recording started.
+///
+/// NOTHING HERE IS CHANGED ON THE STRENGTH OF THAT. The line model is right for the case it was
+/// built for and free for slams, which is two of the three; the third wants a decision about
+/// what the danger model IS, and that decision is the owner's and is open.
 /// </remarks>
 public static class Escape
 {

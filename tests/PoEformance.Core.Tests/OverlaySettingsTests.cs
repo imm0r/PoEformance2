@@ -401,4 +401,80 @@ public class OverlaySettingsMergeTests
         Assert.True(merged.WealthPanel);
         Assert.Equal(1440, merged.WealthWindowMinutes);
     }
+
+    /// <summary>The effect switches survive a restart, which is the whole reason they exist.</summary>
+    /// <remarks>
+    /// THEY DID NOT, and the report that found it is what makes this worth a test rather than a
+    /// line of wiring: the three switches on the Effects tab were session-only while the
+    /// projectile ones next door had always persisted, so the difference read as a bug.
+    ///
+    /// It is one for the job these are for. A recording can only contain reads the running build
+    /// actually performed, so anything that wants hostile ground effects IN the file needs
+    /// KeepEffects on BEFORE the process starts - and a switch that forgets itself on exit can
+    /// never be on before the process starts. The setting was unreachable for its own purpose.
+    ///
+    /// THE OTHER DEBUG LAYERS WERE CHECKED and are not in the same state: the heat map, the
+    /// unwalked ground, the monster lines, the ground danger, the status icons and the aim lines
+    /// are all persisted through <c>TrackerSettings</c>. The Effects tab was the only one of its
+    /// kind, which is what makes this fix complete rather than the first of several.
+    /// </remarks>
+    [Fact]
+    public void TheEffectSwitchesSurviveARestart()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-effects-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(OverlaySettingsStore.Save(
+                OverlaySettings.Default with
+                {
+                    ShowEffects = true,
+                    EffectPaths = false,
+                    KeepEffects = true,
+                },
+                path));
+
+            OverlaySettings back = OverlaySettingsStore.Load(path);
+
+            Assert.True(back.ShowEffects);
+            Assert.False(back.EffectPaths);
+            Assert.True(back.KeepEffects);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    /// <summary>All three ship off-or-harmless, because keeping the effects costs a read.</summary>
+    /// <remarks>
+    /// Persisting a switch is not the same as turning it on. KeepEffects undoes the rule that
+    /// stops a Firewall build covering its own screen in enemy markers, so the default has to
+    /// stay where it was - the complaint was that the setting would not STICK, not that it was
+    /// off. The paths default to true because they are what the layer is for once it is drawn.
+    /// </remarks>
+    [Fact]
+    public void KeepingTheEffectsIsStillOffByDefault()
+    {
+        Assert.False(OverlaySettings.Default.ShowEffects);
+        Assert.False(OverlaySettings.Default.KeepEffects);
+        Assert.True(OverlaySettings.Default.EffectPaths);
+    }
+
+    /// <summary>The config page must not reset them either.</summary>
+    /// <remarks>
+    /// The same trap as the wealth settings above, and worth pinning for these specifically:
+    /// they are set from the overlay and the page has never heard of them, so a merge that
+    /// dropped unknown fields would turn the recording switch off the moment somebody opened
+    /// the configuration window - between arming it and starting the fight.
+    /// </remarks>
+    [Fact]
+    public void AndThePageDoesNotResetTheEffectSwitchesEither()
+    {
+        OverlaySettings armed = OverlaySettings.Default with { ShowEffects = true, KeepEffects = true };
+
+        OverlaySettings merged = armed.MergeFromPage(OverlaySettings.Default);
+
+        Assert.True(merged.ShowEffects);
+        Assert.True(merged.KeepEffects);
+    }
 }

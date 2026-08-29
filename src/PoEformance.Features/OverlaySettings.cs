@@ -39,6 +39,19 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("projectilePaths")] bool ProjectilePaths = false,
     [property: JsonPropertyName("projectilesMineOnly")] bool ProjectilesMineOnly = false,
 
+    // The effect debug layer and the read behind it. OFF, unlike the projectiles above, because
+    // this one costs: KeepEffects undoes the rule that stops a Firewall build covering its own
+    // screen in enemy markers, and it only pays off with the visual entities read as well.
+    //
+    // SAVED AT ALL because they were not, and that was a real hole rather than an omission. The
+    // three switches sat one tab away from the projectile ones, which have always persisted, so
+    // the difference read as a bug - and it IS one for the job these are for: a recording can
+    // only contain reads the running build performed, so anything needing hostile effects in the
+    // file has to have this on BEFORE the process starts, and a session-only switch cannot be.
+    [property: JsonPropertyName("showEffects")] bool ShowEffects = false,
+    [property: JsonPropertyName("effectPaths")] bool EffectPaths = true,
+    [property: JsonPropertyName("keepEffects")] bool KeepEffects = false,
+
     // How the tool's OWN windows are drawn, as its own object rather than three more fields
     // out here: it is a different subject from what the overlay draws on the game, and a
     // settings file stops being readable at exactly the point everything shares one level.
