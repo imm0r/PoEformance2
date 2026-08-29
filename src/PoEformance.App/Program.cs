@@ -209,6 +209,11 @@ internal static class Program
             {
                 RunSkillHunt(reader, worldSchema, gameStatesAddress, recorder);
             }
+
+            if (options.DumpAnimations)
+            {
+                RunAnimationDump(reader, worldSchema, gameStatesAddress, recorder);
+            }
         }
 
         // ── Auto-flask ───────────────────────────────────────────────────────
@@ -563,6 +568,76 @@ internal static class Program
     /// leaves the world, so a hunt started in a menu says so instead of hanging.
     /// </summary>
     private const int ActionHuntMostFailures = 100;
+
+    /// <summary>
+    /// Reads the whole animation-name table out of the game and writes it beside the executable.
+    /// </summary>
+    /// <remarks>
+    /// SHORT BY DESIGN, unlike the hunts: nothing is being searched for. It samples only until
+    /// two different animations agree on the row array's base - usually a few seconds of moving
+    /// and hitting something - and then reads every row in one pass.
+    ///
+    /// It writes a NEW file and prints the diff rather than replacing data/animations.tsv. A
+    /// dozen behaviours classify off those names, so re-extracting them is a deliberate act with
+    /// a diff somebody looked at, the same way an offset change is.
+    /// </remarks>
+    private static void RunAnimationDump(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var dump = new PoEformance.Game.Diagnostics.AnimationDump(reader, schema);
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount && !dump.Sample(gameStatesStatic); frame++)
+            {
+                replay.Seek(frame);
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("animation table dump - reading the game's own names.");
+            Console.WriteLine();
+            Console.WriteLine("  MOVE AROUND AND HIT SOMETHING. The row array's base comes from");
+            Console.WriteLine("  seeing real animations, and TWO DIFFERENT ones have to agree on");
+            Console.WriteLine("  it - standing still in town will never confirm it.");
+            Console.WriteLine("  Press a key to give up.");
+            Console.WriteLine();
+
+            int ticks = 0;
+            while (!KeyPressed() && !dump.Sample(gameStatesStatic))
+            {
+                recorder?.MarkFrame();
+
+                if (++ticks % 100 == 0)
+                {
+                    Console.WriteLine(
+                        $"  ... still waiting for a second animation ({dump.Table.Observations} sighting(s))");
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Components.AnimationNames shipped =
+            PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"));
+        PoEformance.Game.Diagnostics.AnimationDumpResult result = dump.Read(shipped);
+        PoEformance.Game.Diagnostics.AnimationDump.Report(result, Console.Out, dump.Slots);
+
+        if (result.Confirmed && result.Names.Count > 0)
+        {
+            string path = Path.Combine(AppContext.BaseDirectory, "animations.generated.tsv");
+            PoEformance.Game.Diagnostics.AnimationDump.WriteTsv(
+                result,
+                path,
+                $"Read {DateTimeOffset.Now:yyyy-MM-dd}, base confirmed by animations "
+                + $"{result.ConfirmedBy.First} and {result.ConfirmedBy.Second}.");
+
+            Console.WriteLine();
+            Console.WriteLine($"  written to {path}");
+            Console.WriteLine("  Diff it against data/animations.tsv before replacing anything.");
+        }
+    }
 
     /// <summary>
     /// Runs the skill-name hunt: follows the skill object out to whatever names it.
@@ -2364,6 +2439,7 @@ internal static class Program
         bool ScanHeap,
         bool HuntActions,
         bool HuntSkills,
+        bool DumpAnimations,
         IReadOnlyList<string> Peek,
         bool PeekWatch)
     {
@@ -2373,7 +2449,7 @@ internal static class Program
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
-            bool actionHunt = false, skillHunt = false;
+            bool actionHunt = false, skillHunt = false, animDump = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -2456,6 +2532,13 @@ internal static class Program
                         skillHunt = true;
                         break;
 
+                    // Regenerates data/animations.tsv from the game. Not a hunt - nothing is
+                    // being searched for any more - so it stops the moment the row array's base
+                    // is confirmed rather than sampling for as long as somebody plays.
+                    case "--animdump":
+                        animDump = true;
+                        break;
+
                     // Takes a Cheat Engine pointer path as written - "+468C3A8,235C" - so a
                     // finding can be checked without transcribing it into an absolute address
                     // that stops meaning anything the moment the game restarts.
@@ -2485,7 +2568,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, peek, peekWatch);
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, animDump, peek, peekWatch);
         }
     }
 }

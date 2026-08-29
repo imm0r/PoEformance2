@@ -573,6 +573,18 @@ interesting part was not the feature:
       unreadable was burned for the session — four of six skills learned, silently. Failures are
       now retried, bounded.
 
+    **`--animdump` closes the loop on the shipped table.** The rows are an array, so ONE sighting
+    addresses all of them: `base = row − id·106`. That turns `data/animations.tsv` from a
+    hand-maintained list into something the game regenerates — run it after a patch, diff, done.
+    The safety is entirely in the base, because a wrong row pointer still computes a base, every
+    row still "reads", and the output would be a full table of confident nonsense committed over
+    a working one. So **two *different* animations must agree** before it is used; the same id
+    twice agrees by arithmetic rather than by evidence and is refused. It writes a new file beside
+    the executable and prints the diff rather than replacing anything — re-extracting names that a
+    dozen behaviours classify off is a deliberate act with a diff someone looked at, the same way
+    an offset change is. It also samples both action slots, which answers in passing whether a
+    MOVE wrapper carries the row pointer at the same offset as the SKILL wrapper it was found on.
+
     What the game's data will **not** give, checked against dat-schema's `poe2/_Core.gql`: no
     radius, area or shape column exists on `ActiveSkills`, `GrantedEffects`,
     `GrantedEffectsPerLevel` or the stat sets. Radius, where it exists at all, is a stat row
