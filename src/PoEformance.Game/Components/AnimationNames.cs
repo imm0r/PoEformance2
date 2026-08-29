@@ -167,6 +167,52 @@ public sealed class AnimationNames
         _kinds.TryRemove(id, out _);
     }
 
+    /// <summary>Every id whose name contains <paramref name="word"/>, ignoring case.</summary>
+    /// <remarks>
+    /// THE POINT IS TO ASK THE GAME RATHER THAN TO KEEP A LIST. "Which animations are dodge
+    /// rolls" has a list-shaped answer - DodgeRoll, DodgeRollBack, FloatDodgeRoll, DodgeRollSprint,
+    /// CannonDodgeRollBack and eight more - and any list of those written by hand is a list
+    /// somebody has to maintain against a game that adds them. The table is the game's own, so
+    /// the question can be asked of it instead, which is the same reasoning that made
+    /// <see cref="Classify"/> match on words rather than on ids.
+    ///
+    /// A SUBSTRING IS A BLUNT INSTRUMENT and the caller has to choose the word carefully:
+    /// "roll" also catches RollingMagma, which is a spell. That is the caller's problem to get
+    /// right - see <c>RollWatch</c>, which asks for "dodgeroll" for exactly this reason.
+    /// </remarks>
+    public IReadOnlySet<int> IdsNamed(string word)
+    {
+        var found = new HashSet<int>();
+        if (string.IsNullOrWhiteSpace(word))
+        {
+            return found;
+        }
+
+        // The shipped table first, then the learned names on top - and a learned name can
+        // REMOVE an id as well as add one, which is why the second pass sets rather than adds.
+        foreach ((int id, string name) in _names)
+        {
+            if (name.Contains(word, StringComparison.OrdinalIgnoreCase))
+            {
+                found.Add(id);
+            }
+        }
+
+        foreach ((int id, string name) in _learned)
+        {
+            if (name.Contains(word, StringComparison.OrdinalIgnoreCase))
+            {
+                found.Add(id);
+            }
+            else
+            {
+                found.Remove(id);
+            }
+        }
+
+        return found;
+    }
+
     /// <summary>The game's name for an animation id, or null when nothing has one.</summary>
     public string? Of(int id)
         => _learned.TryGetValue(id, out string? live) ? live
