@@ -279,6 +279,10 @@ function renderEvasion(ev) {
   $("ev-keyhints").textContent = ev.keyHints.length
     ? `Lines in the game's config that mention a dodge: ${ev.keyHints.join("  ·  ")}`
     : "Nothing in the game's config mentions a dodge — set the code yourself.";
+  $("ev-movenames").textContent = ev.moveKeyNames ?? "–";
+  $("ev-movehints").textContent = (ev.moveHints ?? []).length
+    ? `Lines in the game's config that mention movement: ${ev.moveHints.join("  ·  ")}`
+    : "W A S D is what the game ships with — check these if you have rebound them.";
 
   if (Date.now() < evasionEditingUntil) return;
 
@@ -294,6 +298,15 @@ function renderEvasion(ev) {
   $("ev-quiet").checked = !!ev.settings.onlyDangerousAnimations;
   $("ev-only").value = (warn.onlyPaths ?? []).join(", ");
   $("ev-ignore").value = (warn.ignorePaths ?? []).join(", ");
+
+  const keys = ev.settings.keys ?? {};
+  $("ev-steer").checked = !!ev.settings.steer;
+  $("ev-move-up").value = keys.up ?? 0x57;
+  $("ev-move-left").value = keys.left ?? 0x41;
+  $("ev-move-down").value = keys.down ?? 0x53;
+  $("ev-move-right").value = keys.right ?? 0x44;
+  $("ev-roll").value = ev.settings.rollDistance ?? 400;
+  $("ev-hold").value = ev.settings.steerHoldMs ?? 60;
 }
 
 // A comma-separated field to the list the host wants. Empty means "no filter", which is not
@@ -331,6 +344,20 @@ function sendEvasion() {
       dangerRadius: Number($("ev-radius").value) || 90,
       cooldownMs: Number($("ev-cooldown").value) || 0,
       onlyDangerousAnimations: $("ev-quiet").checked,
+      steer: $("ev-steer").checked,
+      rollDistance: Number($("ev-roll").value) || 400,
+
+      // NOT `|| 60`: zero is a legal hold and means "send the keys and release them at once",
+      // which is worth being able to try on a machine with a high frame rate. The fallback is
+      // for a field that is empty or unparseable, and Number("") is 0 - so it has to be tested
+      // for emptiness rather than for falsiness.
+      steerHoldMs: $("ev-hold").value === "" ? 60 : Number($("ev-hold").value),
+      keys: {
+        up: Number($("ev-move-up").value) || 0,
+        left: Number($("ev-move-left").value) || 0,
+        down: Number($("ev-move-down").value) || 0,
+        right: Number($("ev-move-right").value) || 0,
+      },
     },
   });
 }
@@ -338,6 +365,8 @@ function sendEvasion() {
 for (const id of [
   "ev-warn", "ev-act", "ev-warn-rarity", "ev-act-rarity",
   "ev-key", "ev-radius", "ev-cooldown", "ev-quiet", "ev-only", "ev-ignore",
+  "ev-steer", "ev-roll", "ev-hold",
+  "ev-move-up", "ev-move-left", "ev-move-down", "ev-move-right",
 ]) {
   // On "change", not "input": every one of these posts to the host, and a number field fires
   // per keystroke - which would send a radius of 9 on the way to typing 90.

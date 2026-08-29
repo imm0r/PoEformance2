@@ -13,6 +13,20 @@ namespace PoEformance.Features;
 /// What the animation calls it, or <see cref="AnimationKind.Unknown"/>. Carried so the overlay
 /// can say WHAT is coming, and so an id nobody has a name for is still visible as something.
 /// </param>
+/// <param name="MonsterX">Where the monster is standing NOW - the end of the line the overlay draws.</param>
+/// <param name="OriginX">
+/// Where the ACTION started, from its own wrapper rather than from the monster.
+/// </param>
+/// <remarks>
+/// THE ORIGIN AND THE MONSTER POSITION ARE TWO DIFFERENT THINGS and both are here, which is worth
+/// a sentence because they are nearly equal and the difference only shows in the case that
+/// matters. The monster's position is where it is at this instant; the origin is where the action
+/// it committed to was aimed FROM, quantised to a grid cell. <see cref="Escape"/> needs the
+/// latter: it is what makes origin-to-target a line to get off rather than a pair of points, and
+/// a monster that has walked a step since committing would otherwise tilt that line. The overlay
+/// draws from the former, because a line that starts anywhere but the monster you can see reads
+/// as a bug.
+/// </remarks>
 public sealed record Threat(
     uint EntityId,
     string Name,
@@ -22,6 +36,8 @@ public sealed record Threat(
     AnimationKind Animation,
     float MonsterX,
     float MonsterY,
+    float OriginX,
+    float OriginY,
     float TargetX,
     float TargetY,
     float TargetZ,
@@ -40,7 +56,15 @@ public sealed record Threat(
 /// happen" is the question actually asked of a feature like this, and a silent no-op cannot
 /// answer it.
 /// </param>
-public sealed record EvasionTick(IReadOnlyList<Threat> Draw, bool Dodge, string Reason)
+/// <param name="Steer">
+/// Which movement keys to hold so the roll goes where it should, or
+/// <see cref="MoveDirection.None"/> to leave the direction to the player.
+/// </param>
+public sealed record EvasionTick(
+    IReadOnlyList<Threat> Draw,
+    bool Dodge,
+    string Reason,
+    MoveDirection Steer = MoveDirection.None)
 {
     /// <summary>Nothing seen, nothing done.</summary>
     public static EvasionTick Idle { get; } = new([], false, "not started");
@@ -72,20 +96,22 @@ public sealed record EvasionTick(IReadOnlyList<Threat> Draw, bool Dodge, string 
 /// frames a warning wants. An animation-only filter would throw them away.
 ///
 /// WHAT DECIDES A ROLL'S DIRECTION, settled by the owner testing it under WASD movement:
-/// a held movement key wins, and with none held the roll goes towards the cursor. So the player
-/// is already steering it, with whichever of the two they happen to be using.
+/// a held movement key wins, and with none held the roll goes towards the cursor.
 ///
-/// THIS ONLY PRESSES, AND THAT IS CURRENTLY A CHOICE RATHER THAN A LIMIT. The rule above means
-/// the roll IS steerable from here - a movement key held for the length of a keypress would pick
-/// the direction, with no need to touch the mouse - and this does not do it. What the tool
-/// supplies is the TIMING, which is the half a person cannot do: the action fields say an attack
-/// is committed and where it lands before any animation shows it. Two minutes in front of a map
-/// boss, the owner steering and this pressing, cost zero hits.
+/// SO THERE ARE TWO MODES HERE AND BOTH ARE WORTH HAVING. Left alone, the tool supplies only the
+/// TIMING - the half a person cannot do, since the action fields say an attack is committed and
+/// where it lands before any animation shows it - and the player keeps the steering. Two minutes
+/// in front of a map boss on those terms cost zero hits. With <c>Steer</c> switched on it also
+/// holds a movement key for the length of the roll, because timing alone is not enough for the
+/// case that prompted it: a boss channelling a beam AT you is dodged by going ACROSS it, and a
+/// player pointing at the boss - which is where you point when you are fighting it - rolls along
+/// the beam instead. <see cref="Escape"/> is the geometry that tells those apart.
 ///
 /// DO NOT READ <c>Render.RotationCurrent</c> AS THE ROLL'S DIRECTION. It follows the cursor, so
 /// it is right only for the no-key case; on a roll steered by a movement key it points somewhere
 /// else entirely, and on a backward one exactly the opposite way. See
-/// <c>DodgeRollDirectionTests</c>, where that is measured on real rolls.
+/// <c>DodgeRollDirectionTests</c>, where that is measured on real rolls. The steering does not
+/// need it: it says which KEYS to hold, and the game resolves those into a direction itself.
 /// </remarks>
 public sealed class EvasionPlanner
 {
@@ -169,7 +195,11 @@ public sealed class EvasionPlanner
             return new EvasionTick([], false, "no player");
         }
 
-        var draw = new List<Threat>();
+        // EVERY action with a place, not only the ones a gate admits. The gates decide what is
+        // worth DRAWING and what is worth REACTING to; the steering has a third question - where
+        // is it safe to land - and a white monster's slam makes a spot unsafe whether or not it
+        // was ever worth a marker. So the walk collects them all and the gates filter afterwards.
+        var seen = new List<Threat>();
         int aimedForAct = 0;
 
         foreach (WorldEntity entity in world.Entities)
@@ -204,20 +234,17 @@ public sealed class EvasionPlanner
             float distance = Distance(action.TargetX, action.TargetY, player.WorldX, player.WorldY);
             bool aimed = distance <= settings.DangerRadius;
 
-            if (warn.Admits(entity.Rarity, entity.Path))
-            {
-                draw.Add(new Threat(
-                    entity.Id, entity.ShortName, entity.Path, entity.Rarity, action.Kind, kind,
-                    entity.WorldX, entity.WorldY, action.TargetX, action.TargetY, entity.WorldZ,
-                    aimed, distance));
-            }
+            seen.Add(new Threat(
+                entity.Id, entity.ShortName, entity.Path, entity.Rarity, action.Kind, kind,
+                entity.WorldX, entity.WorldY, action.OriginX, action.OriginY,
+                action.TargetX, action.TargetY, entity.WorldZ, aimed, distance));
 
             if (aimed && act.Admits(entity.Rarity, entity.Path))
             {
                 aimedForAct++;
             }
 
-            if (draw.Count >= MostThreats)
+            if (seen.Count >= MostThreats)
             {
                 break;
             }
@@ -225,7 +252,9 @@ public sealed class EvasionPlanner
 
         // Sorted so the closest threat is first: a capped list should keep the ones that matter,
         // and the overlay draws in this order too.
-        draw.Sort((a, b) => a.DistanceToPlayer.CompareTo(b.DistanceToPlayer));
+        seen.Sort((a, b) => a.DistanceToPlayer.CompareTo(b.DistanceToPlayer));
+
+        List<Threat> draw = [.. seen.Where(t => warn.Admits(t.Rarity, t.Path))];
 
         if (aimedForAct == 0)
         {
@@ -258,8 +287,44 @@ public sealed class EvasionPlanner
             return new EvasionTick(draw, false, $"{aimedForAct} aimed at you, dodge cooling down");
         }
 
+        // WHICH WAY, decided last and before the cooldown is spent - a tick that ends up not
+        // rolling must not have consumed the charge that the next one needs.
+        MoveDirection steer = MoveDirection.None;
+        string how = string.Empty;
+
+        if (settings.CanSteer)
+        {
+            if (ScreenBasis.Derive(world.Matrix, player.WorldX, player.WorldY, player.WorldZ)
+                is not ScreenBasis basis)
+            {
+                // Rolls anyway, unsteered, because that is the behaviour this feature had before
+                // steering existed and it is a good one - the player is still pointing somewhere.
+                // Refusing here would turn "I could not work out the directions" into "you take
+                // the hit", which is the wrong way round for the one thing this exists to prevent.
+                how = " (unsteered: the camera cannot say which way is which)";
+            }
+            else if (Escape.Best(
+                         seen, Escape.Options(basis), player.WorldX, player.WorldY,
+                         settings.RollDistance) is not EscapeChoice choice)
+            {
+                // Nowhere on offer is better than standing still: every direction lands in
+                // something, or the threat is too big to roll out of. Rolling would spend the
+                // charge to end up just as exposed, and with the player's own aim overridden
+                // on the way - so it does not, and says so. The cooldown is left alone rather
+                // than cleared: nothing was spent, and it is already past by this line.
+                return new EvasionTick(
+                    draw, false, $"{aimedForAct} aimed at you, but no direction is any safer");
+            }
+            else
+            {
+                steer = (MoveDirection)choice.Index;
+                how = $" {steer}, {choice.Safety:F0} units clear";
+            }
+        }
+
         _lastDodge = nowMs;
-        return new EvasionTick(draw, true, $"dodging: {aimedForAct} action(s) aimed at you");
+        return new EvasionTick(
+            draw, true, $"dodging{how}: {aimedForAct} action(s) aimed at you", steer);
     }
 
     /// <summary>The idle readout, so "nothing happened" is legible.</summary>

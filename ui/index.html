@@ -167,11 +167,48 @@
         <label><input type="checkbox" id="ev-quiet"> Ignore monsters that are only walking</label>
       </div>
 
+      <!--
+        Steering. Its own switch on top of "press the dodge key", because the two hand the tool
+        different amounts: pressing leaves the direction entirely with the player, while this
+        takes the movement keys over for the length of a roll. Left off, the feature is the one
+        that has been played with for hours.
+      -->
+      <label class="master">
+        <input type="checkbox" id="ev-steer">
+        <span>Also choose which way to roll</span>
+      </label>
+      <p class="dim">Without this the roll goes where you are already pointing — which is at the
+        boss, when you are fighting one, and straight along the beam it is channelling at you.
+        With it, the tool holds a movement key for the length of the roll so it goes
+        <em>across</em> what is coming instead. Your own keys are handed back the moment it ends;
+        if nothing is safer than standing still, it does not roll at all.</p>
+
+      <div class="cfg-row">
+        <label for="ev-move-up">Movement keys (virtual-key codes)</label>
+        <input type="number" id="ev-move-up" min="0" max="255" step="1" title="Forward — W by default">
+        <input type="number" id="ev-move-left" min="0" max="255" step="1" title="Left — A">
+        <input type="number" id="ev-move-down" min="0" max="255" step="1" title="Back — S">
+        <input type="number" id="ev-move-right" min="0" max="255" step="1" title="Right — D">
+        <span class="dim" id="ev-movenames">–</span>
+      </div>
+      <p class="dim" id="ev-movehints"></p>
+
+      <div class="cfg-row">
+        <label for="ev-roll">A roll travels</label>
+        <input type="number" id="ev-roll" min="50" max="2000" step="10">
+        <span class="dim">world units — measured at about 400 on a recorded session</span>
+      </div>
+      <div class="cfg-row">
+        <label for="ev-hold">Hold the movement key for</label>
+        <input type="number" id="ev-hold" min="0" max="500" step="10">
+        <span class="dim">ms — long enough for the game to sample it on one of its frames</span>
+      </div>
+
       <p class="dim" id="ev-status">–</p>
-      <p class="dim">The roll follows a held movement key, or your <em>mouse</em> when none is
-        held — so you steer, and this only decides <em>when</em>. That is the point rather than a
-        limitation: knowing an attack is committed before its animation starts is the part you
-        cannot do yourself.</p>
+      <p class="dim">With steering off, the roll follows a held movement key or your
+        <em>mouse</em> when none is held — so you steer, and this only decides <em>when</em>.
+        Knowing an attack is committed before its animation starts is the part you cannot do
+        yourself.</p>
     </section>
 
     <section class="card">

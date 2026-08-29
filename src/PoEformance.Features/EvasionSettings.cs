@@ -121,12 +121,42 @@ public sealed record EvasionGate(
 /// The AHK tool settles it the same way - its action hotkeys are always keys the person chose.
 /// <see cref="DodgeKeyHints"/> shows the candidates in the config to save somebody opening it.
 /// </param>
+/// <param name="Steer">
+/// Hold movement keys during the roll so it goes where the tool chooses, rather than where the
+/// player was already pointing.
+///
+/// ITS OWN SWITCH, DEFAULT OFF, on top of <paramref name="Act"/> being on. Pressing the dodge key
+/// leaves the direction entirely with the player and has been used for hours; this takes the
+/// steering away for the length of a roll, which is a strictly larger thing to hand a tool. The
+/// two are worth being able to switch on separately.
+/// </param>
+/// <param name="RollDistance">
+/// How far a roll travels, in world units - what the steering scores directions over.
+///
+/// MEASURED, NOT CHOSEN: the five rolls in <c>session-2026-08-monsters.rec</c> covered 141, 232,
+/// 391, 509 and 520 world units (see <c>DodgeRollDirectionTests</c>), so the ordinary roll is
+/// around four hundred and the short ones are rolls that met something. It is a setting because a
+/// character's movement speed changes it and nobody has measured that relationship.
+/// </param>
+/// <param name="SteerHoldMs">
+/// How long the steering keys stay down around the roll.
+///
+/// NOT MEASURED, and the one number here that is a judgement rather than a reading: the game
+/// samples input once a frame, so the key has to be down across at least one of its frames for
+/// the roll to see it, and how many that is depends on the frame rate. Long enough to cross a
+/// slow frame, short enough that the character does not walk anywhere in it.
+/// </param>
+/// <param name="Keys">The movement keys to steer with. See <see cref="MovementKeys"/>.</param>
 public sealed record EvasionSettings(
     [property: JsonPropertyName("warn")] EvasionGate? Warn = null,
     [property: JsonPropertyName("act")] EvasionGate? Act = null,
     [property: JsonPropertyName("dangerRadius")] float DangerRadius = 90f,
     [property: JsonPropertyName("cooldownMs")] int CooldownMs = 1200,
     [property: JsonPropertyName("dodgeKey")] int DodgeKey = 0,
+    [property: JsonPropertyName("steer")] bool Steer = false,
+    [property: JsonPropertyName("rollDistance")] float RollDistance = 400f,
+    [property: JsonPropertyName("steerHoldMs")] int SteerHoldMs = 60,
+    [property: JsonPropertyName("keys")] MovementKeys? Keys = null,
     [property: JsonPropertyName("onlyDangerousAnimations")] bool OnlyDangerousAnimations = true,
     [property: JsonPropertyName("markerColour")] string MarkerColour = "#C8FF3C28",
     [property: JsonPropertyName("aimedColour")] string AimedColour = "#FFFF0000",
@@ -150,6 +180,17 @@ public sealed record EvasionSettings(
 
     /// <summary>The act gate, on the same terms.</summary>
     public EvasionGate ActOrDefault => Act ?? Default.Act!;
+
+    /// <summary>The movement keys, or W A S D when the file said nothing.</summary>
+    public MovementKeys KeysOrDefault => Keys ?? MovementKeys.Default;
+
+    /// <summary>Whether steering can actually run: switched on, and with keys to press.</summary>
+    /// <remarks>
+    /// Asked in one place because the two halves fail differently and both are silent. Steering
+    /// switched on with a movement key unset would hold nothing and let the roll follow the
+    /// cursor, which is the OLD behaviour wearing the new switch's clothes.
+    /// </remarks>
+    public bool CanSteer => Steer && DodgeKey != 0 && KeysOrDefault.IsComplete;
 
     /// <summary>
     /// Whether the reader has to read monster ACTIONS for any of this to work.
@@ -175,6 +216,15 @@ public sealed record EvasionSettings(
         // stops a stray keystroke parking the feature for the rest of the session.
         CooldownMs = Math.Clamp(CooldownMs, 0, 60_000),
         DodgeKey = Math.Clamp(DodgeKey, 0, 0xFF),
+
+        // The floor is a roll that goes somewhere: below it every direction scores the same and
+        // the steering would pick whichever came first. The ceiling is well past any roll seen.
+        RollDistance = Math.Clamp(RollDistance, 50f, 2000f),
+
+        // Bounded well below the cooldown at both ends. Zero is legal and means "send the keys
+        // and release them at once", which is worth being able to try when a frame rate is high.
+        SteerHoldMs = Math.Clamp(SteerHoldMs, 0, 500),
+        Keys = KeysOrDefault.Normalised(),
         MarkerRadius = Math.Clamp(MarkerRadius, 2f, 200f),
         Thickness = Math.Clamp(Thickness, 0.5f, 10f),
     };

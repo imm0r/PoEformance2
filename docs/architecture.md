@@ -447,12 +447,52 @@ interesting part was not the feature:
   things: a marker for a white monster is a ring on the screen, a keystroke for one is a roll
   charge, and white monsters are most of what an area contains. Both default to off.
   - **What decides a roll's direction**, settled by the owner testing it under WASD: a held
-    movement key wins, and with none held the roll goes towards the cursor. So the roll *is*
-    steerable from the tool — a movement key held for the length of a keypress picks the
-    direction, with no need to touch the mouse — and the tool currently does not do it. What it
-    supplies is the **timing**, the half a person cannot do: an attack is committed, and its
+    movement key wins, and with none held the roll goes towards the cursor. Left alone the tool
+    supplies only the **timing**, the half a person cannot do: an attack is committed, and its
     landing spot known, before any animation shows it. Two minutes in front of a map boss, the
-    owner steering and the tool pressing, cost zero hits.
+    owner steering and the tool pressing, cost zero hits — which is why that stayed a mode rather
+    than becoming a stepping stone.
+  - **Steering, and why the danger had to become a line.** Timing alone loses one case, and the
+    owner named it: a boss channelling a beam *at* you, while you point at the boss, because that
+    is what you do when you are fighting one. So the roll runs down the beam. Switching `Steer`
+    on has the tool hold a movement key for the length of the roll — the rule above says that
+    wins over the cursor, so no mouse is touched. The scoring is the part worth reading
+    (`Escape`): **the threat is a segment from where the action starts to where it is aimed,
+    extended past the target by one roll.** Scoring by distance from the target *point* instead
+    rates rolling backwards exactly as well as rolling sideways — both end a roll's length from
+    the same point — and backwards stays in the beam for its whole length. The extension is free
+    for everything else: nothing here can tell a beam from a slam (that needs the game's skill
+    data, which this tool does not read), and for a slam centred on the target sideways is just
+    as safe as backwards anyway. A rule that is right for one shape and costless for the other is
+    the one to take when the shape is unknown. Each of the eight key directions is scored by its
+    **worst** threat, not its average — escaping one attack into another is not an escape — and
+    every action with a target counts, including ones the rarity gates would never have drawn:
+    what to draw, what to react to, and where it is safe to land are three questions. If nothing
+    beats standing still it does not roll, and says so.
+  - **Which way is "W"** comes from the game's own matrix, not from an isometric constant:
+    project the player, step up the screen, invert onto the player's ground plane, and the
+    difference is the world direction (`ScreenBasis`). Over the 1984 in-game frames of the
+    monsters fixture that gives up-screen = world (0.7071, 0.7071) and right = (0.7071, −0.7071)
+    — the world axes run diagonally across the screen — with the two screen axes coming back
+    **0.19° from perpendicular in the world** at worst, which was not guaranteed and is what
+    makes the diagonals evenly spread. The decisive test puts the derived direction back through
+    the projection and asks whether it lands directly above the player on screen; a sign error, a
+    swapped column or a row-major reading all fail it, and none of them fails a length check.
+    The one thing *not* measured is that the game's forward key moves the character up the
+    screen — nothing in a recording answers that — which is why steering ships off.
+  - **Giving the keys back is the delicate half, and it needs a keyboard hook.** Windows has one
+    up/down state per key: a synthesised W-up is not "the tool's W-up", it is W being up, and the
+    player's finger on the physical key does not put it back. So the sequence is release, steer,
+    roll, restore — and after the tool's own key-up, *no* API can say whether the player is still
+    holding W. Restoring the snapshot blind fails when they let go mid-roll: their release lands
+    on a key that is already up, the restore presses it down, and the character runs forwards
+    until they happen to tap it again. `PhysicalKeys` is a `WH_KEYBOARD_LL` hook that ignores
+    `LLKHF_INJECTED` events, which is how the AHK tool backs its own `GetKeyState(key, "P")`. It
+    is installed on the first tick steering is switched on, never at launch, on its own thread
+    because a low-level hook is only delivered to a thread that pumps messages — and one that
+    does not pump installs successfully and then silently never fires. `BlockInput` is not the
+    answer to this: it does not clear what is already held, and it swallows the release, which
+    produces exactly the stuck key it was meant to avoid.
   - **Do not read `RotationCurrent` as the roll's direction.** It follows the cursor, so it is
     right only for the no-key case; on a key-steered roll it points elsewhere, and on a backward
     one exactly the other way. Two wrong explanations came out of those correct numbers before

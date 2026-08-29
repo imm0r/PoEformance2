@@ -1182,6 +1182,17 @@ internal static class Program
                 // has to appear the moment they switch it on.
                 world.ReadActions = evasionPlanner.Settings.NeedsActions;
 
+                // The keyboard hook, started the first tick steering is switched on and never
+                // before it. Idempotent and a volatile read when it is already running, so it
+                // costs nothing to ask every tick - and asking every tick is what lets the
+                // config window turn steering on without a restart. It is deliberately NOT
+                // started at launch: a global keyboard hook is a thing to install when it is
+                // needed for something, not one to have running because it might be.
+                if (evasionPlanner.Settings.CanSteer)
+                {
+                    PhysicalKeys.Watch();
+                }
+
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
                 uiTree.Service(scale);
                 structures.Service();
@@ -1316,7 +1327,16 @@ internal static class Program
 
                 if (evasion.Dodge)
                 {
-                    InputSender.Press((ushort)evasionPlanner.Settings.DodgeKey);
+                    // Steered or not, one call: with no direction chosen this is the plain
+                    // press it has always been, and the movement keys are never touched.
+                    PoEformance.Features.EvasionSettings evade = evasionPlanner.Settings;
+                    DodgeSteer.Roll(
+                        (ushort)evade.DodgeKey,
+                        evade.KeysOrDefault.KeysFor(evasion.Steer),
+                        evasion.Steer == PoEformance.Features.MoveDirection.None
+                            ? []
+                            : evade.KeysOrDefault.All,
+                        evade.SteerHoldMs);
                 }
 
                 // The rules, on this thread and once per read - NOT in the renderer. The
@@ -1676,6 +1696,8 @@ internal static class Program
         // to show a hint nobody is watching would be pure waste.
         IReadOnlyList<string> dodgeHints =
             [.. PoEformance.Features.DodgeKeyHints.Find().Select(hint => hint.Describe())];
+        IReadOnlyList<string> moveHints =
+            [.. PoEformance.Features.DodgeKeyHints.FindMovement().Select(hint => hint.Describe())];
 
         // One reader for the window's whole life. The terrain grid is cached inside it, so
         // building a fresh one per request would re-read megabytes on every poll.
@@ -1726,7 +1748,9 @@ internal static class Program
                     evasionPlanner.Settings,
                     evasionPlanner.LastTick.Reason,
                     PoEformance.Features.FlaskKeyBindings.Describe((ushort)evasionPlanner.Settings.DodgeKey),
-                    dodgeHints));
+                    dodgeHints,
+                    moveHints,
+                    evasionPlanner.Settings.KeysOrDefault.Describe()));
         }
 
         // Rebuilding the outline is a pass over megabytes, so it is done once per area and
