@@ -275,6 +275,14 @@ function renderEvasion(ev) {
   // Live text always - it is the answer to "why is nothing happening" and is worth being
   // current even while somebody is editing the thing that will change it.
   $("ev-status").textContent = ev.status;
+
+  // Measured during a fight and read standing here, which is the whole reason it is on this
+  // page: on the overlay it is overwritten about once a second. It says whether the ceiling
+  // above still needs to be touched, so it belongs beside it and nowhere else.
+  $("ev-rolltimes").textContent = ev.rollTimes
+    ? `Measured: ${ev.rollTimes}. The confirmed times are one of the game's frames plus a few ms — if none are on the ceiling, the number above is never reached.`
+    : "";
+
   $("ev-keyname").textContent = ev.keyName;
   $("ev-keyhints").textContent = ev.keyHints.length
     ? `Lines in the game's config that mention a dodge: ${ev.keyHints.join("  ·  ")}`

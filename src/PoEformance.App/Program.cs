@@ -1648,12 +1648,12 @@ internal static class Program
             cull);
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
-        // The planner's reason, plus what the last steered roll actually cost. The second half
-        // is the only place the tool ever shows a measurement of the game's frame time, and it
-        // is worth showing because the hold used to be a setting somebody had to guess at: a
-        // line reading "roll seen after 18 ms" is that guess being replaced in front of them.
-        overlay.EvasionStatus = () => DodgeSteer.LastRoll is { Length: > 0 } roll
-            ? $"{evasionPlanner.LastTick.Reason} · {roll}"
+        // The planner's reason, plus what the last few steered rolls cost the game to notice.
+        // A SPREAD and not the latest number: the reason half already changes every tick, and a
+        // second value that also moved once a second made the line unreadable while playing -
+        // which is the state it was actually built to be read in.
+        overlay.EvasionStatus = () => DodgeSteer.Times.Describe() is { Length: > 0 } rolls
+            ? $"{evasionPlanner.LastTick.Reason} · {rolls}"
             : evasionPlanner.LastTick.Reason;
 
         // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
@@ -2015,7 +2015,11 @@ internal static class Program
                     PoEformance.Features.FlaskKeyBindings.Describe((ushort)evasionPlanner.Settings.DodgeKey),
                     dodgeHints,
                     moveHints,
-                    evasionPlanner.Settings.KeysOrDefault.Describe()));
+                    evasionPlanner.Settings.KeysOrDefault.Describe(),
+
+                    // Beside the setting it replaced. This window is read while standing still,
+                    // which is the only place a measurement taken mid-fight can actually be read.
+                    DodgeSteer.Times.Describe()));
         }
 
         // Rebuilding the outline is a pass over megabytes, so it is done once per area and

@@ -74,28 +74,20 @@ public static class DodgeSteer
     /// <summary>1 while a sequence owns the movement keys.</summary>
     private static int _running;
 
-    /// <summary>What the last steered roll actually cost, for the status line.</summary>
-    private static string _lastRoll = string.Empty;
-
-    /// <summary>Milliseconds the last steered roll held the keys, or -1 before the first.</summary>
-    private static int _lastHoldMs = -1;
-
     /// <summary>Whether a roll is being performed right now.</summary>
     public static bool Busy => Volatile.Read(ref _running) != 0;
 
     /// <summary>
-    /// How long the keys were held for the last steered roll, or -1 before there has been one.
+    /// How long the last few steered rolls took the game to notice.
     /// </summary>
     /// <remarks>
-    /// Worth having as a number rather than only as a sentence, because it is the closest thing
-    /// the tool has to a measurement of the game's frame time: a confirmed hold is one frame plus
-    /// <see cref="PollMs"/> plus <see cref="GraceMs"/>. Read it repeatedly and the frame rate is
-    /// in there - which is what the owner was after when they asked for the FPS.
+    /// THE CLOSEST THING THE TOOL HAS TO A MEASUREMENT OF THE GAME'S FRAME TIME, which is what
+    /// the owner was after when they asked for the FPS: a confirmed hold is one of the game's
+    /// frames plus <see cref="PollMs"/> plus <see cref="GraceMs"/>. A SPREAD rather than the
+    /// latest number, because a status line during a fight is overwritten about once a second
+    /// and because one sample cannot tell a slow machine from one stutter.
     /// </remarks>
-    public static int LastHoldMs => Volatile.Read(ref _lastHoldMs);
-
-    /// <summary>A sentence about the last steered roll, or empty before there has been one.</summary>
-    public static string LastRoll => Volatile.Read(ref _lastRoll);
+    public static PoEformance.Features.RollTimes Times { get; } = new();
 
     /// <summary>
     /// Presses the dodge key with <paramref name="steer"/> held, then restores the player's keys.
@@ -234,7 +226,7 @@ public static class DodgeSteer
                 Thread.Sleep(holdMs);
             }
 
-            Report(holdMs, -1, watched: false);
+            Report(-1, watched: false);
             return;
         }
 
@@ -268,29 +260,25 @@ public static class DodgeSteer
             Thread.SpinWait(64);
         }
 
-        Report(
-            (int)Math.Round(clock.Elapsed.TotalMilliseconds),
-            (int)Math.Round(confirmed),
-            watched: true);
+        Report((int)Math.Round(confirmed), watched: true);
     }
 
-    /// <summary>Records what the hold cost, for the status line.</summary>
+    /// <summary>Records what the hold cost.</summary>
     /// <remarks>
-    /// Three outcomes and not two, because "nobody was watching" and "watched and never
-    /// confirmed" are different things and only the second is worth a second look.
+    /// A ROLL NOBODY COULD WATCH IS NOT RECORDED AT ALL, which is the whole reason this takes
+    /// the flag. It measured nothing, and counting it as unconfirmed would read as the game
+    /// having failed to notice the keys rather than as nobody having looked - the difference
+    /// between a machine to investigate and a build with no animation table.
     /// </remarks>
-    private static void Report(int heldMs, int confirmedMs, bool watched)
+    private static void Report(int confirmedMs, bool watched)
     {
-        Volatile.Write(ref _lastHoldMs, heldMs);
-        Volatile.Write(
-            ref _lastRoll,
-            !watched ? $"held {heldMs} ms"
-                : confirmedMs >= 0 ? $"roll seen after {confirmedMs} ms"
-
-                    // Not necessarily a failure: chain-rolling never changes the animation id,
-                    // so this is also what a second roll out of a first one looks like. It IS
-                    // the case where the ceiling is doing the work, which is worth seeing.
-                    : $"held {heldMs} ms, roll unconfirmed");
+        if (watched)
+        {
+            // A negative time is a hold that ran to its ceiling. Not necessarily a failure:
+            // chain-rolling never changes the animation id, so a second roll out of a first
+            // one looks like this too.
+            Times.Add(confirmedMs);
+        }
     }
 
     /// <summary>Leaves exactly the keys the player is holding down, and no others.</summary>

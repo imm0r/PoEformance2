@@ -507,8 +507,20 @@ interesting part was not the feature:
     DodgeRollBack and 403 is RollingMagma, a spell. The wait spins rather than sleeping, because
     `Thread.Sleep` is quantised to the per-process system timer — 15.6 ms unless this process has
     raised it, which also means every flat hold measured so far was a floor and not a duration.
-    The overlay's evasion line reports what each roll cost, which is the closest thing the tool
-    has to a frame-time measurement.
+  - **The measurement had to become a spread before it could be read.** It was first shown as
+    the latest confirmation — `roll seen after 18 ms` — and the owner's answer settled it: a roll
+    happens about once a second in a fight, so the line is overwritten before anyone can read it,
+    and a fight is the only place the number is ever produced. `RollTimes` keeps the last 32 and
+    reports `14 rolls seen in 17-24 ms (middle 19)`, on the overlay and in the config window
+    beside the ceiling it is about. **It is also the better measurement**, which is what makes it
+    a fix rather than a presentation change: one confirmation is one frame of one moment, and a
+    stutter, a zone load or a shader compile each produce a single large number indistinguishable
+    from a finding. The middle value ignores the outlier and the range beside it keeps the
+    outlier visible — a middle of 19 over 17–24 is a healthy machine; a middle of 19 over 17–180
+    is one worth asking about. Rolls nobody could watch are not counted at all, because "nobody
+    looked" and "the game never noticed" are different answers and only one of them is a problem.
+    This is the closest thing the tool has to a frame-time measurement, and it is what the FPS
+    question was really after.
   - **Giving the keys back is the delicate half, and it needs a keyboard hook.** Windows has one
     up/down state per key: a synthesised W-up is not "the tool's W-up", it is W being up, and the
     player's finger on the physical key does not put it back. So the sequence is release, steer,

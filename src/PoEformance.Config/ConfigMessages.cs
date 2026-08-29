@@ -254,13 +254,24 @@ public sealed record ConfigState(
 /// the same caveat: the W A S D defaults are what the game ships with, not something read.
 /// </param>
 /// <param name="MoveKeyNames">The four movement keys in words, so a rebound one is visible.</param>
+/// <param name="RollTimes">
+/// How long the last few steered rolls took the game to notice, or empty before there have been
+/// any. See <see cref="Features.RollTimes"/>.
+///
+/// HERE BECAUSE THIS IS WHERE IT CAN BE READ. It is measured during a fight, where the overlay's
+/// line is overwritten about once a second; this window is opened standing still. It also sits
+/// next to the hold setting on purpose - the whole point of the measurement is to say whether
+/// that number still needs to be touched, and a reading a screen away from the thing it is about
+/// is a reading nobody joins up.
+/// </param>
 public sealed record EvasionView(
     [property: JsonPropertyName("settings")] EvasionSettings Settings,
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("keyName")] string KeyName,
     [property: JsonPropertyName("keyHints")] IReadOnlyList<string> KeyHints,
     [property: JsonPropertyName("moveHints")] IReadOnlyList<string> MoveHints,
-    [property: JsonPropertyName("moveKeyNames")] string MoveKeyNames);
+    [property: JsonPropertyName("moveKeyNames")] string MoveKeyNames,
+    [property: JsonPropertyName("rollTimes")] string RollTimes = "");
 
 /// <summary>
 /// Source-generated JSON for the bridge.
