@@ -506,6 +506,43 @@ interesting part was not the feature:
     roll, and reading a plausible-looking line would be a guess dressed as a measurement — one
     that presses a key the player never bound. `DodgeKeyHints` shows the candidate lines from
     the ini and picks none of them. The AHK tool settles it the same way.
+  - **Naming the skill: what is known, and what the next recording has to answer.** The warning
+    knows an attack is committed and *where* it lands, never *what* it is — which is why every
+    threat is one shape. The route to a name is `Actor.CurrentSkillPtr`, and four things about it
+    are now measured rather than assumed (`SkillObjectTests`, against the monsters fixture):
+    - **It is finer than the skill, correcting this project's own claim.** The schema recorded a
+      1:1 correspondence with the animation id from 27 frames of one session; over the monster
+      session it is **four objects to three animation ids**, two of them both playing 299. Each
+      object plays one animation, but not the reverse — so the pointer keys "same cast as last
+      frame", never "which skill is this".
+    - **The action wrapper does not carry it** anywhere in the 0x200 anyone has recorded. PoE1
+      put the skill at wrapper+0x150; in PoE2 that is `TargetGrid`, so the obvious port lands on
+      a field that reads as plausible integers.
+    - **Only 53 of 122 committed skill actions had a skill object at all** — the timing problem
+      as a number. Naming from this pointer cannot be the whole answer for a warning meant to
+      fire before the cast is under way, which is why the hunt also walks the actor's own
+      granted-skill table.
+    - **Every pointer that leaves the object is a dead end offline.** Its own 0x200 is in the
+      file; nothing follows the five outward pointers (0x000, 0x008, 0x010, 0x1F0, 0x1F8). A
+      recording holds only what the running build read, so this needs a new session — which is
+      what `--skillhunt` is for.
+
+    The hunt searches for **text**, because that is the shape of the answer: `ActiveSkills` and
+    `GrantedEffects` both carry `Id: string` as their first column, and this codebase already
+    resolves two other dat rows exactly that way (`ItemReader` — "the dat row's first field is a
+    pointer to the mod's id string"). It follows two hops out and reports every string with the
+    offsets that reached it, marking only the chains that gave a **different** name to every
+    skill — because a class name or an engine label gives the same one to all of them and looks
+    like an answer until it is asked to tell two skills apart. It hunts the broken
+    `ActiveSkillDetails.CastType` in the same pass, by scanning each entry for the *live*
+    animation id rather than trusting a reference's offset.
+
+    What the game's data will **not** give, checked against dat-schema's `poe2/_Core.gql`: no
+    radius, area or shape column exists on `ActiveSkills`, `GrantedEffects`,
+    `GrantedEffectsPerLevel` or the stat sets. Radius, where it exists at all, is a stat row
+    reached through `ConstantStats`/`AdditionalStats`; **shape is nowhere**. So a per-skill table
+    curated by hand, keyed on the id this hunt is after, is the realistic route to anything
+    better than the line model — the way `data/animations.tsv` already works.
   - **A monster's move bearing is not a check on anything**, which the same recording measured:
     monsters face their quarry and walk around obstacles, so a destination 26° off the facing is
     the game working. Only aimed *skills* corroborate the facing, and the report says so.
