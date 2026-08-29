@@ -501,14 +501,20 @@ interesting part was not the feature:
     so the answer comes from a `--record`ing — and a recording can only contain reads the running
     build performed, so a switch that forgot itself on exit could never be on when one started.
   - **Measured against a real boss** (`tests/fixtures/session-2026-08-effects.rec`,
-    `HostileEffectTests`), and it **splits the question rather than answering it**. A hostile
-    effect that travels is readable: `PermanentEffect` produces **1304 consecutive-frame
-    movements, every one under 200 units and none over 1000** — no id-reuse artefacts at all,
-    which is what makes it a measurement (the first pass tracked by `(path, id)` and reported
-    ten-thousand-unit "steps" that were the game reusing an id between two different effects;
-    tracking by *render address* across *consecutive* frames removes them entirely). Ground
-    effects move **exactly zero** over the same recording, so "is this coming at me" is
-    answerable from position over time with nothing named. **But the path names nothing** —
+    `HostileEffectTests`), and it **splits the question rather than answering it**.
+    **Movement alone does not mean a hazard** — the first reading of this recording said it did.
+    It reported `PermanentEffect` as a travelling threat on **1304 clean consecutive-frame
+    steps, every one under 200 units and none over 1000**, and every one of those numbers is
+    true. They belong to three effects **pinned to the player**: never more than thirty units
+    away across 975 frames, having travelled the same ten thousand units the player did. A clean
+    measurement was read as a travelling hazard without asking *what* was travelling, and what
+    exposed it was the owner mentioning they had spent the recording running. **The
+    discriminator is range, not movement.** What is left is short-lived: the boss's own effects
+    run about **ten frames each**, half a second at the reader's rate, so an observation-based
+    model gets roughly ten sightings to decide from — and one of them does close on the player
+    monotonically (ten steps, none opening), which is one instance and not a rule. Ground effects
+    move **exactly zero**, so standing and travelling danger *are* distinguishable.
+    **But the path names nothing** —
     `Effect`, `PermanentEffect`, `SleepableEffect`, `BeamEffect` are engine words, not skill
     names — so geometry can be observed and *identity* cannot; a table may still be wanted for
     what a thing **is** while what it is **doing** comes from the world for free. And the third

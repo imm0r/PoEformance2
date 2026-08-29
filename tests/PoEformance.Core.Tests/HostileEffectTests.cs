@@ -10,42 +10,68 @@ namespace PoEformance.Core.Tests;
 /// <remarks>
 /// THE QUESTION THIS ANSWERS was the owner's: if a skill is shaped like a wave, it ought to be
 /// visible among the particles - so could a danger be OBSERVED instead of described in a table
-/// keyed on animation id? The notes said the plumbing existed and the answer was unmeasured.
-/// This is the measurement, from a recording made with both switches on
-/// (<c>ReadVisualEntities</c> and <c>KeepEffects</c>) during a real map boss.
+/// keyed on animation id? This is the measurement, from a recording made with both switches on
+/// (<c>ReadVisualEntities</c> and <c>KeepEffects</c>) while the owner spent thirty seconds
+/// running circles around a map boss to make it cast.
 ///
-/// NO WAVE IN THIS ONE - the owner reports the boss is drawn at random and this one had none -
-/// so the wave itself is still unobserved. What the recording settles is the mechanism, and it
-/// settles it in three parts, two encouraging and one not:
+/// NO WAVE IN THIS ONE - the boss is drawn at random and this one had none - so the wave itself
+/// is still unobserved.
 ///
-/// 1. HOSTILE EFFECTS ARRIVE AND SOME OF THEM MOVE, cleanly. PermanentEffect is up to three at
-///    once and produces 1304 consecutive-frame movements, EVERY ONE of them under 200 units and
-///    none over 1000. That last figure is what makes it a measurement rather than an artefact:
-///    the first pass at this tracked entities by (path, id) and reported ten-thousand-unit
-///    "steps", which was the game reusing an id between two different effects. Tracked by RENDER
-///    address across consecutive frames only, the noise disappears from this path entirely.
-/// 2. STATIONARY DANGER LOOKS DIFFERENT, and that difference is readable. The ground effects
-///    (VisibleServerGroundEffect, seven at once) move exactly zero. So "is this hazard coming at
-///    me" is answerable from position over time, without knowing what the skill is.
-/// 3. THE PATH NAMES NOTHING. Effect, PermanentEffect, SleepableEffect, BeamEffect,
-///    ServerEffect - engine words, not skill names. So geometry can be observed and IDENTITY
-///    cannot, which splits the original question rather than answering it: a table may still be
-///    wanted for what a thing IS, while what it is DOING is readable from the world.
+/// THE FIRST READING OF THIS RECORDING WAS WRONG, AND HOW IT WAS WRONG IS THE POINT. It reported
+/// "a hostile effect travels: 1304 consecutive-frame steps, every one under 200 units, none over
+/// 1000 - no reuse artefacts at all", and every one of those numbers is true. They belong to
+/// three PermanentEffect instances that are PINNED TO THE PLAYER: never more than 21 to 30 units
+/// away across 975 of the recording's 998 frames, each having travelled 10552 units against the
+/// player's own 10557. Thirty units is a fourteenth of a dodge roll. They move because the
+/// player moves, trailing by about a frame. A clean measurement was
+/// read as a travelling hazard without ever asking WHAT was travelling - and the thing that
+/// exposed it was the owner saying they had spent the recording running, which is the shape of
+/// mistake this project keeps paying for.
 ///
-/// AND THE BARRIER IS CONFIRMED ON DATA. Every one of the 6864 sightings under
-/// Metadata/Projectiles is FRIENDLY - the player's own Spark. Not one monster projectile
-/// classified as <see cref="EntityKind.Projectile"/> in a thousand frames of a boss fight, which
-/// is what the schema comment predicted from a different session: a monster's projectile is
-/// filed under the monster's own path. <c>ProjectileWatch</c> follows your projectiles, not
-/// theirs.
+/// SO THE DISCRIMINATOR IS RANGE, NOT MOVEMENT. Anything whose distance to the player never
+/// changes is attached to the player, whatever its path says and however far it has travelled.
+///
+/// WHAT IS ACTUALLY THERE, once those three are set aside: 331 hostile-effect instances, and the
+/// boss's own are SHORT-LIVED - 276 Effect and 26 BeamEffect instances with a median life of ten
+/// frames, about half a second at this reader's rate. That is what several casts in thirty
+/// seconds looks like from the outside, and it is the budget any observation-based danger model
+/// would have: roughly ten sightings to decide from.
+///
+/// AND ONE OF THEM CLOSES ON THE PLAYER MONOTONICALLY - a BeamEffect over frames 604-614, ten
+/// steps, 433 units travelled, ten closing and none opening. The owner reports one of the two
+/// skills moved toward them. This is what that looks like in memory, and it is one instance
+/// rather than a rule.
+///
+/// TRACKING HAS TO BE GAP-AWARE. Render addresses are reused: keyed on the address alone, three
+/// separate effects across five hundred frames read as one long-lived one. A track therefore
+/// ENDS when its address is absent for a frame.
+///
+/// THE PATH NAMES NOTHING EITHER WAY. Effect, PermanentEffect, BeamEffect, ServerEffect - engine
+/// words, not skill names. Geometry can be observed; identity cannot.
 ///
 /// IT ALSO PROVES THE SWITCHES HELD. A recording contains only reads the running build actually
-/// performed, so hostile effects being IN this file means KeepEffects was on when the process
-/// started - which is the thing three attempts were needed to fix.
+/// performed, so hostile effects being in this file means KeepEffects was on when the process
+/// started - the thing three attempts were needed to fix.
 /// </remarks>
 public class HostileEffectTests
 {
     private const string Fixture = "session-2026-08-effects.rec";
+
+    /// <summary>One effect instance: from the frame it appeared to the frame it went.</summary>
+    private sealed class Track
+    {
+        public string Path = string.Empty;
+        public uint First;
+        public uint Last;
+        public int Steps;
+        public double Travelled;
+        public double Nearest = double.MaxValue;
+        public double Farthest;
+        public int Closing;
+        public int Opening;
+
+        public uint Frames => Last - First;
+    }
 
     private static string DirectoryHolding(string child)
     {
@@ -59,10 +85,7 @@ public class HostileEffectTests
         return dir.FullName;
     }
 
-    /// <summary>One path's behaviour over the recording.</summary>
-    private readonly record struct Seen(int MostAtOnce, int Mine, int Theirs, List<double> Steps);
-
-    private static readonly Lazy<Dictionary<string, Seen>> Watched = new(() =>
+    private static readonly Lazy<List<Track>> Instances = new(() =>
     {
         string path = Path.Combine(DirectoryHolding("tests"), "tests", "fixtures", Fixture);
         var replay = ReplayMemoryReader.Load(File.OpenRead(path));
@@ -78,60 +101,69 @@ public class HostileEffectTests
         };
 
         ulong gameStates = replay.ResolvedStatics["GameStates"];
-        var found = new Dictionary<string, Seen>();
-
-        // BY RENDER ADDRESS, and only between CONSECUTIVE frames. Both halves matter: the game
-        // reuses entity ids, so a (path, id) key silently follows one effect into another and
-        // reports the gap between them as a step.
-        var before = new Dictionary<ulong, (float X, float Y, uint Frame)>();
+        var all = new List<Track>();
+        var live = new Dictionary<ulong, Track>();
+        var was = new Dictionary<ulong, (float X, float Y, uint Frame)>();
 
         for (uint frame = 0; frame < replay.FrameCount; frame++)
         {
             replay.Seek(frame);
             WorldSnapshot snapshot = world.Read(gameStates);
+            if (snapshot.Player is not WorldEntity me)
+            {
+                continue;
+            }
 
-            var here = new Dictionary<string, int>();
             foreach (WorldEntity entity in snapshot.Entities)
             {
-                if (entity.Kind is not (EntityKind.Effect or EntityKind.Projectile) && !entity.IsEffect)
+                if (entity.Kind != EntityKind.Effect || entity.IsFriendly)
                 {
                     continue;
                 }
 
-                here[entity.Path] = here.GetValueOrDefault(entity.Path) + 1;
-
-                Seen was = found.GetValueOrDefault(entity.Path, new Seen(0, 0, 0, []));
-                found[entity.Path] = was with
-                {
-                    Mine = was.Mine + (entity.IsFriendly ? 1 : 0),
-                    Theirs = was.Theirs + (entity.IsFriendly ? 0 : 1),
-                };
-
                 ulong key = entity.Render != 0 ? entity.Render : entity.Address;
-                if (before.TryGetValue(key, out var last) && last.Frame == frame - 1)
-                {
-                    double moved = Math.Sqrt(
-                        ((entity.WorldX - last.X) * (entity.WorldX - last.X))
-                        + ((entity.WorldY - last.Y) * (entity.WorldY - last.Y)));
+                double range = Distance(entity.WorldX, entity.WorldY, me.WorldX, me.WorldY);
 
+                // A NEW instance whenever this address was absent last frame. Without that, one
+                // reused address reads as a single effect living half the recording.
+                if (!live.TryGetValue(key, out Track? track) || track.Last != frame - 1)
+                {
+                    track = new Track { Path = entity.Path, First = frame };
+                    live[key] = track;
+                    all.Add(track);
+                }
+
+                track.Last = frame;
+                track.Nearest = Math.Min(track.Nearest, range);
+                track.Farthest = Math.Max(track.Farthest, range);
+
+                if (was.TryGetValue(key, out var before) && before.Frame == frame - 1)
+                {
+                    double moved = Distance(entity.WorldX, entity.WorldY, before.X, before.Y);
                     if (moved > 0.5)
                     {
-                        found[entity.Path].Steps.Add(moved);
+                        track.Steps++;
+                        track.Travelled += moved;
+                        if (range < Distance(before.X, before.Y, me.WorldX, me.WorldY))
+                        {
+                            track.Closing++;
+                        }
+                        else
+                        {
+                            track.Opening++;
+                        }
                     }
                 }
 
-                before[key] = (entity.WorldX, entity.WorldY, frame);
-            }
-
-            foreach ((string seenPath, int count) in here)
-            {
-                Seen was = found[seenPath];
-                found[seenPath] = was with { MostAtOnce = Math.Max(was.MostAtOnce, count) };
+                was[key] = (entity.WorldX, entity.WorldY, frame);
             }
         }
 
-        return found;
+        return all;
     });
+
+    private static double Distance(double ax, double ay, double bx, double by)
+        => Math.Sqrt(((ax - bx) * (ax - bx)) + ((ay - by) * (ay - by)));
 
     /// <summary>The recording carries what only a build with both switches on could record.</summary>
     /// <remarks>
@@ -142,62 +174,96 @@ public class HostileEffectTests
     [Fact]
     public void TheSwitchesWereOnWhenThisWasRecorded()
     {
-        Dictionary<string, Seen> watched = Watched.Value;
+        List<Track> all = Instances.Value;
 
-        Assert.Contains("Metadata/Effects/Effect", watched);
-        Assert.Contains("Metadata/Projectiles/Spark", watched);
-        Assert.True(watched["Metadata/Effects/Effect"].Theirs > 1000);
-    }
-
-    /// <summary>A hostile effect that travels, with no reuse artefacts in the measurement.</summary>
-    /// <remarks>
-    /// THE ONE THAT MATTERS to the danger model: a hazard's movement is readable from the world
-    /// with nothing named and no table consulted. "None over 1000" is the assertion that earns
-    /// the rest - a single reused render address would put one there.
-    /// </remarks>
-    [Fact]
-    public void AHostileEffectMovesAndTheMovementIsReal()
-    {
-        Seen permanent = Watched.Value["Metadata/Effects/PermanentEffect"];
-
-        Assert.Equal(0, permanent.Mine);
-        Assert.True(permanent.Theirs > 2000);
-        Assert.True(permanent.Steps.Count > 1000, $"only {permanent.Steps.Count} steps");
-        Assert.DoesNotContain(permanent.Steps, step => step > 1000);
-    }
-
-    /// <summary>Ground effects sit still, which is what makes moving ones worth noticing.</summary>
-    [Fact]
-    public void GroundEffectsDoNotMoveAtAll()
-    {
-        Seen ground = Watched.Value["Metadata/Effects/Spells/ground_effects/VisibleServerGroundEffect"];
-
-        Assert.True(ground.Theirs > 1000);
-        Assert.Empty(ground.Steps);
+        Assert.True(all.Count > 100, $"only {all.Count} hostile-effect instances");
+        Assert.Contains(all, t => t.Path == "Metadata/Effects/Effect");
     }
 
     /// <summary>
-    /// Not one monster projectile arrived as a projectile, over a whole boss fight.
+    /// The long-lived "movers" never leave the player, so their movement is the player's.
     /// </summary>
     /// <remarks>
-    /// The schema predicted this from a different session - a monster's skill spawns its
-    /// projectile under the MONSTER's path, which classifies as a Monster and carries no Life,
-    /// so the hostile-effect rule drops it. This is the prediction meeting a thousand frames of
-    /// a boss fight: every sighting under Metadata/Projectiles is the player's own.
+    /// THE CORRECTION THIS FILE EXISTS FOR. These three were first published as a hostile hazard
+    /// travelling, on the strength of a movement measurement with no reuse artefacts in it. The
+    /// measurement was sound and the reading was not: they sit at range zero for every one of
+    /// their nine hundred frames. Movement alone cannot tell a hazard from a buff, and this is
+    /// the assertion that would have caught it.
     /// </remarks>
     [Fact]
-    public void EveryProjectileHereIsThePlayersOwn()
+    public void WhatMovedForTheWholeRecordingIsStuckToThePlayer()
     {
-        foreach ((string path, Seen seen) in Watched.Value)
-        {
-            if (path.StartsWith("Metadata/Projectiles/", StringComparison.Ordinal))
-            {
-                Assert.Equal(0, seen.Theirs);
-                Assert.True(seen.Mine > 0);
-            }
-        }
+        Track[] pinned = [.. Instances.Value.Where(t => t.Path == "Metadata/Effects/PermanentEffect")];
 
-        Assert.Contains("Metadata/Projectiles/Spark", Watched.Value);
+        Assert.Equal(3, pinned.Length);
+        Assert.All(pinned, t =>
+        {
+            Assert.True(t.Frames > 900, $"only {t.Frames} frames");
+            Assert.True(t.Travelled > 10_000, $"only travelled {t.Travelled:F0}");
+
+            // THE WHOLE POINT: it went ten thousand units and never got anywhere. The measured
+            // spread is 21 to 30 units - not zero, because it trails the player by a frame
+            // rather than being welded on - against a dodge roll of about four hundred. So the
+            // bound is a fraction of a roll, which is the scale at which "near the player"
+            // stops being a position and starts being an attachment.
+            Assert.True(t.Farthest < 50, $"reached {t.Farthest:F0} from the player");
+        });
+    }
+
+    /// <summary>The boss's own effects are short-lived, which is the observation budget.</summary>
+    /// <remarks>
+    /// Half a second of sightings at this reader's rate. Any danger model built on watching
+    /// these has about ten samples to decide from, which is worth knowing before one is designed.
+    /// </remarks>
+    [Fact]
+    public void TheBossesOwnEffectsLastAboutTenFrames()
+    {
+        Track[] brief =
+        [
+            .. Instances.Value.Where(t => t.Path is "Metadata/Effects/Effect" or "Metadata/Effects/BeamEffect"),
+        ];
+
+        Assert.True(brief.Length > 200, $"only {brief.Length} instances");
+
+        uint[] lives = [.. brief.Select(t => t.Frames).Order()];
+        uint median = lives[lives.Length / 2];
+        Assert.InRange(median, 1u, 40u);
+    }
+
+    /// <summary>At least one hostile effect travels straight at the player.</summary>
+    /// <remarks>
+    /// The owner reports the boss cast two skills in this recording and that one of them moved
+    /// toward them. This is what that looks like from memory - and it is ONE INSTANCE, not a
+    /// rule: stated as "at least one" because that is all the recording establishes.
+    /// </remarks>
+    [Fact]
+    public void OneOfThemClosesOnThePlayerWithoutEverBackingOff()
+    {
+        Track[] chasing =
+        [
+            .. Instances.Value.Where(t =>
+                t.Path != "Metadata/Effects/PermanentEffect"
+                && t.Steps >= 8
+                && t.Opening == 0
+                && t.Travelled > 100),
+        ];
+
+        Assert.NotEmpty(chasing);
+        Assert.All(chasing, t => Assert.True(t.Nearest < t.Farthest, "it never actually approached"));
+    }
+
+    /// <summary>Ground effects sit still, which is what makes a moving one worth noticing.</summary>
+    [Fact]
+    public void GroundEffectsDoNotMoveAtAll()
+    {
+        Track[] ground =
+        [
+            .. Instances.Value.Where(t =>
+                t.Path == "Metadata/Effects/Spells/ground_effects/VisibleServerGroundEffect"),
+        ];
+
+        Assert.NotEmpty(ground);
+        Assert.All(ground, t => Assert.Equal(0, t.Steps));
     }
 
     /// <summary>The paths are engine words, so identity cannot come from them.</summary>
@@ -208,12 +274,9 @@ public class HostileEffectTests
     [Fact]
     public void NoEffectPathNamesTheSkillBehindIt()
     {
-        string[] hostile =
-        [
-            .. Watched.Value.Where(w => w.Value.Theirs > 0 && w.Value.Mine == 0).Select(w => w.Key),
-        ];
+        string[] paths = [.. Instances.Value.Select(t => t.Path).Distinct()];
 
-        Assert.NotEmpty(hostile);
-        Assert.All(hostile, path => Assert.StartsWith("Metadata/Effects/", path, StringComparison.Ordinal));
+        Assert.NotEmpty(paths);
+        Assert.All(paths, path => Assert.StartsWith("Metadata/Effects/", path, StringComparison.Ordinal));
     }
 }

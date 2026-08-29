@@ -82,11 +82,17 @@ public readonly record struct EscapeChoice(int Index, float X, float Y, double S
 /// (tests/fixtures/session-2026-08-effects.rec, <c>HostileEffectTests</c>), and it splits the
 /// question rather than answering it:
 ///
-/// - A HOSTILE EFFECT THAT TRAVELS IS READABLE. PermanentEffect produces 1304 consecutive-frame
-///   movements, every one under 200 units and none over 1000 - no reuse artefacts at all. So
-///   "where is this hazard and is it coming at me" is answerable from the world, with nothing
-///   named and no table consulted. Ground effects move exactly zero over the same recording,
-///   which is what makes a moving one worth noticing.
+/// - MOVEMENT ALONE DOES NOT MEAN A HAZARD, which the first reading of that recording got wrong.
+///   It reported PermanentEffect as a travelling threat on 1304 clean consecutive-frame steps -
+///   all true, and all belonging to three effects PINNED TO THE PLAYER: never more than thirty
+///   units away across 975 frames, having travelled the same ten thousand units the player did.
+///   The discriminator is RANGE, not movement: a thing whose distance to you never changes is
+///   attached to you, whatever its path says.
+/// - WHAT IS LEFT IS SHORT-LIVED. The boss's own effects run about ten frames each - half a
+///   second at the reader's rate - so an observation-based model gets roughly ten sightings to
+///   decide from. One of them closes on the player monotonically (ten steps, none opening),
+///   which is one instance and not a rule. Ground effects move exactly zero, so standing danger
+///   and travelling danger ARE distinguishable.
 /// - THE PATH NAMES NOTHING. Effect, PermanentEffect, SleepableEffect, BeamEffect - engine words,
 ///   not skill names. Geometry can be observed; IDENTITY cannot. A table may still be wanted for
 ///   what a thing IS, while what it is DOING comes from the world for free.
