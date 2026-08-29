@@ -201,6 +201,14 @@ internal static class Program
             {
                 RunActionHunt(reader, worldSchema, gameStatesAddress, recorder);
             }
+
+            // The same shape one question further on: --actionhunt finds WHERE an action is
+            // aimed, this finds WHAT it is. Kept a separate switch because it costs far more
+            // per frame and answers nothing the other one is asked for.
+            if (options.HuntSkills)
+            {
+                RunSkillHunt(reader, worldSchema, gameStatesAddress, recorder);
+            }
         }
 
         // ── Auto-flask ───────────────────────────────────────────────────────
@@ -555,6 +563,84 @@ internal static class Program
     /// leaves the world, so a hunt started in a menu says so instead of hanging.
     /// </summary>
     private const int ActionHuntMostFailures = 100;
+
+    /// <summary>
+    /// Runs the skill-name hunt: follows the skill object out to whatever names it.
+    /// </summary>
+    /// <remarks>
+    /// THE SESSION HAS TO BE PLAYED A PARTICULAR WAY and the console says so, because the whole
+    /// method is telling skills apart: a chain that produced one string for one skill has proved
+    /// nothing, since a class name or a shared label does exactly that. Cast several DIFFERENT
+    /// skills, deliberately, and the report marks the chains that gave a different name to each.
+    ///
+    /// Same replay/live split as the action hunt, and for the same reason: the recording IS the
+    /// session, so a chain nobody thought of can be scored offline afterwards without playing
+    /// again - provided the bytes are in the file, which is precisely what this build reads and
+    /// the earlier ones did not.
+    /// </remarks>
+    private static void RunSkillHunt(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var hunt = new PoEformance.Game.Diagnostics.SkillHunt(reader, schema);
+        var samples = new List<PoEformance.Game.Diagnostics.SkillHuntSample>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    samples.Add(sample);
+                }
+            }
+
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("skill hunt - following Actor.CurrentSkillPtr out to whatever names it.");
+            Console.WriteLine();
+            Console.WriteLine("  CAST SEVERAL DIFFERENT SKILLS while this runs. One skill cannot");
+            Console.WriteLine("  distinguish a name from a label that every skill shares.");
+            Console.WriteLine("  Record it (--record) so the file can be re-scored offline.");
+            Console.WriteLine("  Press a key to stop.");
+            Console.WriteLine();
+
+            int failures = 0;
+            int ticks = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    failures = 0;
+                    samples.Add(sample);
+                }
+                else
+                {
+                    failures++;
+                }
+
+                if (++ticks % 200 == 0)
+                {
+                    int named = samples.Count(s => s.Texts.Count > 0);
+                    Console.WriteLine(
+                        $"  ... {samples.Count} frames, {named} with a readable string,"
+                        + $" {hunt.SkillTableEntries} granted skills");
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.SkillHunt.Report(
+            PoEformance.Game.Diagnostics.SkillHunt.Analyze(samples), Console.Out);
+    }
 
     /// <summary>
     /// Runs the action-field hunt: live, a sampling loop the person plays against; on a
@@ -1182,6 +1268,17 @@ internal static class Program
                 // has to appear the moment they switch it on.
                 world.ReadActions = evasionPlanner.Settings.NeedsActions;
 
+                // The keyboard hook, started the first tick steering is switched on and never
+                // before it. Idempotent and a volatile read when it is already running, so it
+                // costs nothing to ask every tick - and asking every tick is what lets the
+                // config window turn steering on without a restart. It is deliberately NOT
+                // started at launch: a global keyboard hook is a thing to install when it is
+                // needed for something, not one to have running because it might be.
+                if (evasionPlanner.Settings.CanSteer)
+                {
+                    PhysicalKeys.Watch();
+                }
+
                 PoEformance.Game.World.WorldSnapshot snapshot = world.Read(gameStatesStatic, scale: scale);
                 uiTree.Service(scale);
                 structures.Service();
@@ -1316,7 +1413,16 @@ internal static class Program
 
                 if (evasion.Dodge)
                 {
-                    InputSender.Press((ushort)evasionPlanner.Settings.DodgeKey);
+                    // Steered or not, one call: with no direction chosen this is the plain
+                    // press it has always been, and the movement keys are never touched.
+                    PoEformance.Features.EvasionSettings evade = evasionPlanner.Settings;
+                    DodgeSteer.Roll(
+                        (ushort)evade.DodgeKey,
+                        evade.KeysOrDefault.KeysFor(evasion.Steer),
+                        evasion.Steer == PoEformance.Features.MoveDirection.None
+                            ? []
+                            : evade.KeysOrDefault.All,
+                        evade.SteerHoldMs);
                 }
 
                 // The rules, on this thread and once per read - NOT in the renderer. The
@@ -1676,6 +1782,8 @@ internal static class Program
         // to show a hint nobody is watching would be pure waste.
         IReadOnlyList<string> dodgeHints =
             [.. PoEformance.Features.DodgeKeyHints.Find().Select(hint => hint.Describe())];
+        IReadOnlyList<string> moveHints =
+            [.. PoEformance.Features.DodgeKeyHints.FindMovement().Select(hint => hint.Describe())];
 
         // One reader for the window's whole life. The terrain grid is cached inside it, so
         // building a fresh one per request would re-read megabytes on every poll.
@@ -1726,7 +1834,9 @@ internal static class Program
                     evasionPlanner.Settings,
                     evasionPlanner.LastTick.Reason,
                     PoEformance.Features.FlaskKeyBindings.Describe((ushort)evasionPlanner.Settings.DodgeKey),
-                    dodgeHints));
+                    dodgeHints,
+                    moveHints,
+                    evasionPlanner.Settings.KeysOrDefault.Describe()));
         }
 
         // Rebuilding the outline is a pass over megabytes, so it is done once per area and
@@ -2245,6 +2355,7 @@ internal static class Program
         bool HuntQuestFlags,
         bool ScanHeap,
         bool HuntActions,
+        bool HuntSkills,
         IReadOnlyList<string> Peek,
         bool PeekWatch)
     {
@@ -2254,7 +2365,7 @@ internal static class Program
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
-            bool actionHunt = false;
+            bool actionHunt = false, skillHunt = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -2328,6 +2439,15 @@ internal static class Program
                         actionHunt = true;
                         break;
 
+                    // The follow-up hunt: what the action fields cannot say is WHAT is being
+                    // cast, and this follows the skill object until it reaches the game's own
+                    // name for it. Separate from --actionhunt because it reads far more per
+                    // frame - two hops out of every pointer - and only the session that is
+                    // looking for a name should pay for that.
+                    case "--skillhunt":
+                        skillHunt = true;
+                        break;
+
                     // Takes a Cheat Engine pointer path as written - "+468C3A8,235C" - so a
                     // finding can be checked without transcribing it into an absolute address
                     // that stops meaning anything the moment the game restarts.
@@ -2357,7 +2477,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, actionHunt, peek, peekWatch);
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, peek, peekWatch);
         }
     }
 }

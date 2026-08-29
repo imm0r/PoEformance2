@@ -170,4 +170,88 @@ public class EvasionSettingsTests
     [Fact]
     public void AMissingConfigYieldsNoHintsRatherThanThrowing()
         => Assert.Empty(DodgeKeyHints.Find(Path.Combine(Path.GetTempPath(), $"missing-{Guid.NewGuid():N}.ini")));
+
+    [Fact]
+    public void TheMovementHintsAreNarrowerThanTheDodgeOnes()
+    {
+        // Steering holds movement keys, so those get the same "here are the candidate lines,
+        // pick one yourself" treatment - but with a tighter word list. Matching a bare "up"
+        // would pull in the wheel bindings and half the interface, and a hint list that long is
+        // one nobody reads.
+        string[] config =
+        [
+            "[ACTION_KEYS]",
+            "Input_move_up=87",
+            "Input_move_left=65",
+            "Input_ui_scroll_up=0",
+            "Input_dodge_roll=32",
+        ];
+
+        string file = Path.Combine(Path.GetTempPath(), $"poe2-{Guid.NewGuid():N}.ini");
+        try
+        {
+            File.WriteAllLines(file, config);
+
+            IReadOnlyList<DodgeKeyHint> movement = DodgeKeyHints.FindMovement(file);
+            Assert.Equal(2, movement.Count);
+            Assert.Contains(movement, h => h.Setting == "Input_move_up" && h.Key == 0x57);
+            Assert.DoesNotContain(movement, h => h.Setting.Contains("scroll", StringComparison.Ordinal));
+            Assert.DoesNotContain(movement, h => h.Setting.Contains("dodge", StringComparison.Ordinal));
+
+            // And the dodge list keeps to itself. "roll" is a substring of "SCROLL", so this
+            // also pins the word boundary that stops every wheel binding in the game turning up
+            // beside the one line somebody is looking for.
+            DodgeKeyHint dodge = Assert.Single(DodgeKeyHints.Find(file));
+            Assert.Equal("Input_dodge_roll", dodge.Setting);
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
+    [Fact]
+    public void SteeringNeedsAllFourMovementKeys()
+    {
+        // Three of four would silently remove three of the eight directions, and the tool would
+        // then roll the best of what was left with nothing to say a better one was never tried.
+        Assert.True(MovementKeys.Default.IsComplete);
+        Assert.False((MovementKeys.Default with { Down = 0 }).IsComplete);
+
+        var settings = new EvasionSettings(Steer: true, DodgeKey: 0x20);
+        Assert.True(settings.CanSteer);
+        Assert.False((settings with { DodgeKey = 0 }).CanSteer);
+        Assert.False((settings with { Steer = false }).CanSteer);
+        Assert.False((settings with { Keys = MovementKeys.Default with { Up = 0 } }).CanSteer);
+    }
+
+    [Fact]
+    public void ADirectionMapsToTheKeysThatMakeIt()
+    {
+        MovementKeys keys = MovementKeys.Default;
+
+        Assert.Equal([0x57], keys.KeysFor(MoveDirection.Up));
+        Assert.Equal([0x57, 0x44], keys.KeysFor(MoveDirection.Up | MoveDirection.Right));
+        Assert.Empty(keys.KeysFor(MoveDirection.None));
+        Assert.Equal(8, MovementKeys.Compass.Count);
+        Assert.Equal(8, MovementKeys.Compass.Distinct().Count());
+    }
+
+    [Fact]
+    public void TheSteeringNumbersAreClampedToWhatCanBeUsed()
+    {
+        EvasionSettings wild = new EvasionSettings(
+            Steer: true, RollDistance: 99_999f, SteerHoldMs: 10_000).Normalised();
+
+        Assert.Equal(2000f, wild.RollDistance);
+        Assert.Equal(500, wild.SteerHoldMs);
+
+        // Zero is a legal hold - "send the keys and release at once" - so it must survive
+        // normalising rather than being rounded up to a default.
+        Assert.Equal(0, (new EvasionSettings(SteerHoldMs: 0)).Normalised().SteerHoldMs);
+
+        // A roll of nothing would make every direction score the same and the steering would
+        // take whichever came first.
+        Assert.Equal(50f, (new EvasionSettings(RollDistance: 1f)).Normalised().RollDistance);
+    }
 }

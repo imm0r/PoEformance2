@@ -15,8 +15,8 @@ public sealed record DodgeKeyHint(string Section, string Setting, string Value, 
 }
 
 /// <summary>
-/// Looks through the game's config for lines that could be the dodge-roll binding, and
-/// SUGGESTS them. It does not pick one.
+/// Looks through the game's config for lines that could be the bindings this tool presses - the
+/// dodge roll, and the movement keys the steering holds - and SUGGESTS them. It picks none.
 /// </summary>
 /// <remarks>
 /// WHY THIS IS A SUGGESTION AND NOT A READING, which is the whole point of the class. The flask
@@ -33,6 +33,11 @@ public sealed record DodgeKeyHint(string Section, string Setting, string Value, 
 ///
 /// If a future session establishes the real spelling against a live config, this becomes a
 /// reader and <c>EvasionSettings.DodgeKey</c> becomes the override it is currently not.
+///
+/// THE MOVEMENT KEYS ARE HERE FOR THE SAME REASON ONE STEP ON. Steering a roll holds W, A, S or
+/// D, so those became the second set of keys the tool can press - and a rebound one fails
+/// silently rather than loudly: the tool holds a key the game ignores, the roll follows the
+/// cursor instead, and the status line still reports the direction it meant to take.
 /// </remarks>
 public static partial class DodgeKeyHints
 {
@@ -44,6 +49,21 @@ public static partial class DodgeKeyHints
     /// </remarks>
     private static readonly string[] Words = ["dodge", "roll", "dash", "evade"];
 
+    /// <summary>Words that make a config line look like a MOVEMENT binding.</summary>
+    /// <remarks>
+    /// Steering a roll holds movement keys, so those are the second set of keys this tool can
+    /// press and they get the same treatment for the same reason: W A S D is the shipped layout
+    /// and a rebound one fails SILENTLY, holding a key the game ignores while the roll follows
+    /// the cursor - which looks exactly like steering that chose a different direction.
+    ///
+    /// Narrower than the dodge list on purpose. "up" and "down" alone would match the mouse
+    /// wheel, every panel scroll and half the interface bindings in the file, and a hint list
+    /// that long is one nobody reads.
+    /// </remarks>
+    private static readonly string[] MovementWords =
+        ["move_up", "move_down", "move_left", "move_right", "moveup", "movedown", "moveleft",
+         "moveright", "forward", "backward", "strafe", "walk"];
+
     /// <summary>Matches <c>anything=value</c>, which is all a config line is.</summary>
     [GeneratedRegex(@"^([^=\[\]]+?)\s*=\s*(.*)$")]
     private static partial Regex Binding();
@@ -54,11 +74,18 @@ public static partial class DodgeKeyHints
     /// works without this, and a hint that cannot be produced is not an error.
     /// </remarks>
     public static IReadOnlyList<DodgeKeyHint> Find(string? configPath = null)
+        => Read(configPath, Words);
+
+    /// <summary>The same, for the movement keys the steering holds.</summary>
+    public static IReadOnlyList<DodgeKeyHint> FindMovement(string? configPath = null)
+        => Read(configPath, MovementWords);
+
+    private static IReadOnlyList<DodgeKeyHint> Read(string? configPath, string[] words)
     {
         string path = configPath ?? FlaskKeyBindings.FindConfigPath();
         try
         {
-            return File.Exists(path) ? Parse(File.ReadAllLines(path)) : [];
+            return File.Exists(path) ? Parse(File.ReadAllLines(path), words) : [];
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException)
         {
@@ -67,9 +94,10 @@ public static partial class DodgeKeyHints
     }
 
     /// <summary>Scans config lines. Split out so it is testable without a file.</summary>
-    public static IReadOnlyList<DodgeKeyHint> Parse(IEnumerable<string> lines)
+    public static IReadOnlyList<DodgeKeyHint> Parse(IEnumerable<string> lines, string[]? words = null)
     {
         ArgumentNullException.ThrowIfNull(lines);
+        words ??= Words;
 
         var hints = new List<DodgeKeyHint>();
         string section = string.Empty;
@@ -95,7 +123,7 @@ public static partial class DodgeKeyHints
             }
 
             string setting = match.Groups[1].Value.Trim();
-            if (!Mentions(setting))
+            if (!Mentions(setting, words))
             {
                 continue;
             }
@@ -107,13 +135,32 @@ public static partial class DodgeKeyHints
         return hints;
     }
 
-    private static bool Mentions(string setting)
+    /// <summary>
+    /// Whether a setting name contains one of the words AS A WORD.
+    /// </summary>
+    /// <remarks>
+    /// THE BOUNDARY IS NOT PEDANTRY: "roll" is a substring of "SCROLL", so a plain
+    /// <c>Contains</c> lists every wheel and panel binding in the game's config alongside the
+    /// dodge. This list exists to save somebody reading the ini, and a list that reproduces half
+    /// of it does not. Found by a test rather than by reading the file, which is the honest way
+    /// round to admit it.
+    ///
+    /// A word ends where a letter stops, so the underscores the config separates its names with
+    /// count as boundaries and "Input_dodge_roll" still matches. Digits do too - a "roll2" is the
+    /// same binding with a number on it.
+    /// </remarks>
+    private static bool Mentions(string setting, string[] words)
     {
-        foreach (string word in Words)
+        foreach (string word in words)
         {
-            if (setting.Contains(word, StringComparison.OrdinalIgnoreCase))
+            for (int at = 0; (at = setting.IndexOf(word, at, StringComparison.OrdinalIgnoreCase)) >= 0; at++)
             {
-                return true;
+                int end = at + word.Length;
+                if ((at == 0 || !char.IsLetter(setting[at - 1]))
+                    && (end == setting.Length || !char.IsLetter(setting[end])))
+                {
+                    return true;
+                }
             }
         }
 

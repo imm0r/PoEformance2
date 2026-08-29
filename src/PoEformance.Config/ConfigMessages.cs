@@ -249,11 +249,18 @@ public sealed record ConfigState(
 /// Lines from the game's own config that MIGHT be the dodge binding, so somebody can fill the
 /// setting in without opening the ini. Suggestions, never a reading.
 /// </param>
+/// <param name="MoveHints">
+/// The same for the movement keys, which the steering holds. Shown for the same reason and with
+/// the same caveat: the W A S D defaults are what the game ships with, not something read.
+/// </param>
+/// <param name="MoveKeyNames">The four movement keys in words, so a rebound one is visible.</param>
 public sealed record EvasionView(
     [property: JsonPropertyName("settings")] EvasionSettings Settings,
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("keyName")] string KeyName,
-    [property: JsonPropertyName("keyHints")] IReadOnlyList<string> KeyHints);
+    [property: JsonPropertyName("keyHints")] IReadOnlyList<string> KeyHints,
+    [property: JsonPropertyName("moveHints")] IReadOnlyList<string> MoveHints,
+    [property: JsonPropertyName("moveKeyNames")] string MoveKeyNames);
 
 /// <summary>
 /// Source-generated JSON for the bridge.

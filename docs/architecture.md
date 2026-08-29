@@ -446,14 +446,103 @@ interesting part was not the feature:
   be a unit test. Drawing and acting have **separate rarity floors** because they cost different
   things: a marker for a white monster is a ring on the screen, a keystroke for one is a roll
   charge, and white monsters are most of what an area contains. Both default to off.
-  - **It decides whether to roll, never where.** A dodge goes where the character is already
-    pointing, and steering it would mean moving the player's mouse mid-fight. Saying so is
-    better than a feature that silently drags the cursor.
+  - **What decides a roll's direction**, settled by the owner testing it under WASD: a held
+    movement key wins, and with none held the roll goes towards the cursor. Left alone the tool
+    supplies only the **timing**, the half a person cannot do: an attack is committed, and its
+    landing spot known, before any animation shows it. Two minutes in front of a map boss, the
+    owner steering and the tool pressing, cost zero hits — which is why that stayed a mode rather
+    than becoming a stepping stone.
+  - **Steering, and why the danger had to become a line.** Timing alone loses one case, and the
+    owner named it: a boss channelling a beam *at* you, while you point at the boss, because that
+    is what you do when you are fighting one. So the roll runs down the beam. Switching `Steer`
+    on has the tool hold a movement key for the length of the roll — the rule above says that
+    wins over the cursor, so no mouse is touched. The scoring is the part worth reading
+    (`Escape`): **the threat is a segment from where the action starts to where it is aimed,
+    extended past the target by one roll.** Scoring by distance from the target *point* instead
+    rates rolling backwards exactly as well as rolling sideways — both end a roll's length from
+    the same point — and backwards stays in the beam for its whole length. The extension is free
+    for everything else: nothing here can tell a beam from a slam (that needs the game's skill
+    data, which this tool does not read), and for a slam centred on the target sideways is just
+    as safe as backwards anyway. A rule that is right for one shape and costless for the other is
+    the one to take when the shape is unknown. Each of the eight key directions is scored by its
+    **worst** threat, not its average — escaping one attack into another is not an escape — and
+    every action with a target counts, including ones the rarity gates would never have drawn:
+    what to draw, what to react to, and where it is safe to land are three questions. If nothing
+    beats standing still it does not roll, and says so.
+  - **Which way is "W"** comes from the game's own matrix, not from an isometric constant:
+    project the player, step up the screen, invert onto the player's ground plane, and the
+    difference is the world direction (`ScreenBasis`). Over the 1984 in-game frames of the
+    monsters fixture that gives up-screen = world (0.7071, 0.7071) and right = (0.7071, −0.7071)
+    — the world axes run diagonally across the screen — with the two screen axes coming back
+    **0.19° from perpendicular in the world** at worst, which was not guaranteed and is what
+    makes the diagonals evenly spread. The decisive test puts the derived direction back through
+    the projection and asks whether it lands directly above the player on screen; a sign error, a
+    swapped column or a row-major reading all fail it, and none of them fails a length check.
+    The one thing *not* measured is that the game's forward key moves the character up the
+    screen — nothing in a recording answers that — which is why steering ships off.
+  - **Giving the keys back is the delicate half, and it needs a keyboard hook.** Windows has one
+    up/down state per key: a synthesised W-up is not "the tool's W-up", it is W being up, and the
+    player's finger on the physical key does not put it back. So the sequence is release, steer,
+    roll, restore — and after the tool's own key-up, *no* API can say whether the player is still
+    holding W. Restoring the snapshot blind fails when they let go mid-roll: their release lands
+    on a key that is already up, the restore presses it down, and the character runs forwards
+    until they happen to tap it again. `PhysicalKeys` is a `WH_KEYBOARD_LL` hook that ignores
+    `LLKHF_INJECTED` events, which is how the AHK tool backs its own `GetKeyState(key, "P")`. It
+    is installed on the first tick steering is switched on, never at launch, on its own thread
+    because a low-level hook is only delivered to a thread that pumps messages — and one that
+    does not pump installs successfully and then silently never fires. `BlockInput` is not the
+    answer to this: it does not clear what is already held, and it swallows the release, which
+    produces exactly the stuck key it was meant to avoid.
+  - **Do not read `RotationCurrent` as the roll's direction.** It follows the cursor, so it is
+    right only for the no-key case; on a key-steered roll it points elsewhere, and on a backward
+    one exactly the other way. Two wrong explanations came out of those correct numbers before
+    the rule did: first that a roll can only run along the line already faced (so sideways was
+    impossible and arming the dodge was "a coin toss"), then that the facing locks onto a target
+    — the second at least checked against the fixture and refuted by it, the nearest monster
+    being 1100 units away and up to 124° off. Worth keeping as the shape of the mistake: a number
+    was asked what it meant instead of the person who could see the screen.
   - **The dodge key is the one key not read from the game.** The flask spellings were
     established against a real config; nobody has established what this game calls the dodge
     roll, and reading a plausible-looking line would be a guess dressed as a measurement — one
     that presses a key the player never bound. `DodgeKeyHints` shows the candidate lines from
     the ini and picks none of them. The AHK tool settles it the same way.
+  - **Naming the skill: what is known, and what the next recording has to answer.** The warning
+    knows an attack is committed and *where* it lands, never *what* it is — which is why every
+    threat is one shape. The route to a name is `Actor.CurrentSkillPtr`, and four things about it
+    are now measured rather than assumed (`SkillObjectTests`, against the monsters fixture):
+    - **It is finer than the skill, correcting this project's own claim.** The schema recorded a
+      1:1 correspondence with the animation id from 27 frames of one session; over the monster
+      session it is **four objects to three animation ids**, two of them both playing 299. Each
+      object plays one animation, but not the reverse — so the pointer keys "same cast as last
+      frame", never "which skill is this".
+    - **The action wrapper does not carry it** anywhere in the 0x200 anyone has recorded. PoE1
+      put the skill at wrapper+0x150; in PoE2 that is `TargetGrid`, so the obvious port lands on
+      a field that reads as plausible integers.
+    - **Only 53 of 122 committed skill actions had a skill object at all** — the timing problem
+      as a number. Naming from this pointer cannot be the whole answer for a warning meant to
+      fire before the cast is under way, which is why the hunt also walks the actor's own
+      granted-skill table.
+    - **Every pointer that leaves the object is a dead end offline.** Its own 0x200 is in the
+      file; nothing follows the five outward pointers (0x000, 0x008, 0x010, 0x1F0, 0x1F8). A
+      recording holds only what the running build read, so this needs a new session — which is
+      what `--skillhunt` is for.
+
+    The hunt searches for **text**, because that is the shape of the answer: `ActiveSkills` and
+    `GrantedEffects` both carry `Id: string` as their first column, and this codebase already
+    resolves two other dat rows exactly that way (`ItemReader` — "the dat row's first field is a
+    pointer to the mod's id string"). It follows two hops out and reports every string with the
+    offsets that reached it, marking only the chains that gave a **different** name to every
+    skill — because a class name or an engine label gives the same one to all of them and looks
+    like an answer until it is asked to tell two skills apart. It hunts the broken
+    `ActiveSkillDetails.CastType` in the same pass, by scanning each entry for the *live*
+    animation id rather than trusting a reference's offset.
+
+    What the game's data will **not** give, checked against dat-schema's `poe2/_Core.gql`: no
+    radius, area or shape column exists on `ActiveSkills`, `GrantedEffects`,
+    `GrantedEffectsPerLevel` or the stat sets. Radius, where it exists at all, is a stat row
+    reached through `ConstantStats`/`AdditionalStats`; **shape is nowhere**. So a per-skill table
+    curated by hand, keyed on the id this hunt is after, is the realistic route to anything
+    better than the line model — the way `data/animations.tsv` already works.
   - **A monster's move bearing is not a check on anything**, which the same recording measured:
     monsters face their quarry and walk around obstacles, so a destination 26° off the facing is
     the game working. Only aimed *skills* corroborate the facing, and the report says so.
