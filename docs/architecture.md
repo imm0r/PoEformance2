@@ -438,6 +438,29 @@ Every one of these reads a finished `WorldSnapshot` and touches no memory, which
 are testable against a recording and why none of them can slow a read down. In each case the
 interesting part was not the feature:
 
+- **Evasion: warning and acting, and why they are two settings.** The action fields say what a
+  monster has committed to and *where that lands*, so this marks the place and can roll you out
+  of it. `EvasionPlanner` is pure in the way `AutoFlask` is — it returns *whether* to dodge, and
+  `Program.cs` does the pressing at the one place in the codebase that can synthesise input —
+  which is what lets every gate between a monster twitching and a keystroke leaving the process
+  be a unit test. Drawing and acting have **separate rarity floors** because they cost different
+  things: a marker for a white monster is a ring on the screen, a keystroke for one is a roll
+  charge, and white monsters are most of what an area contains. Both default to off.
+  - **It decides whether to roll, never where.** A dodge goes where the character is already
+    pointing, and steering it would mean moving the player's mouse mid-fight. Saying so is
+    better than a feature that silently drags the cursor.
+  - **The dodge key is the one key not read from the game.** The flask spellings were
+    established against a real config; nobody has established what this game calls the dodge
+    roll, and reading a plausible-looking line would be a guess dressed as a measurement — one
+    that presses a key the player never bound. `DodgeKeyHints` shows the candidate lines from
+    the ini and picks none of them. The AHK tool settles it the same way.
+  - **A monster's move bearing is not a check on anything**, which the same recording measured:
+    monsters face their quarry and walk around obstacles, so a destination 26° off the facing is
+    the game working. Only aimed *skills* corroborate the facing, and the report says so.
+  - The one bug the tests caught before the game did was mine: `long.MinValue` as the "never
+    dodged" sentinel makes `now - last` **overflow**, so the first threat of every session reads
+    as still cooling down and nothing is ever pressed. It looks exactly like a working tool.
+
 - **Read cost over time.** A live number answers "is it slow now", which you can already see.
   The useful questions need the shape over a whole map, per phase — one graph for the total
   says a frame was expensive and nothing about why.

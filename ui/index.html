@@ -92,6 +92,87 @@
         area does, so "loading" right after a portal is normal.</p>
     </section>
 
+    <!--
+      Evasion. Two gates rather than one master switch, because drawing a marker is free and
+      pressing a key is not: seeing everything coming while the tool only acts on a rare's slam
+      is the ordinary setup, and one threshold cannot say it.
+    -->
+    <section class="card" id="evasion">
+      <h2>Evasion</h2>
+      <p class="dim">Monsters commit to an attack, and to a place it will land, before the
+        animation shows it. This marks that place — and can roll you out of it.</p>
+
+      <label class="master">
+        <input type="checkbox" id="ev-warn">
+        <span>Mark where incoming attacks will land</span>
+      </label>
+      <div class="cfg-row">
+        <label for="ev-warn-rarity">Mark monsters from</label>
+        <select id="ev-warn-rarity">
+          <option value="Normal">Normal — everything</option>
+          <option value="Magic">Magic and better</option>
+          <option value="Rare">Rare and better</option>
+          <option value="Unique">Unique only</option>
+        </select>
+      </div>
+
+      <label class="master">
+        <input type="checkbox" id="ev-act">
+        <span>Press the dodge key when one is aimed at me</span>
+      </label>
+      <div class="cfg-row">
+        <label for="ev-act-rarity">Dodge for monsters from</label>
+        <select id="ev-act-rarity">
+          <option value="Normal">Normal — everything</option>
+          <option value="Magic">Magic and better</option>
+          <option value="Rare">Rare and better</option>
+          <option value="Unique">Unique only</option>
+        </select>
+      </div>
+
+      <!--
+        Editable here, unlike the flask keys, and the difference is deliberate: their config
+        spelling was established against a real file, and nobody has established what this game
+        calls the dodge roll. The hints below are lines FROM that file that mention it - a place
+        to look, never a reading.
+      -->
+      <div class="cfg-row">
+        <label for="ev-key">Dodge key (virtual-key code, 0 = unset)</label>
+        <input type="number" id="ev-key" min="0" max="255" step="1">
+        <span class="dim" id="ev-keyname">–</span>
+      </div>
+      <p class="dim" id="ev-keyhints"></p>
+
+      <div class="cfg-row">
+        <label for="ev-radius">Counts as aimed at me within</label>
+        <input type="number" id="ev-radius" min="10" max="2000" step="10">
+        <span class="dim">world units</span>
+      </div>
+      <div class="cfg-row">
+        <label for="ev-cooldown">Shortest gap between dodges</label>
+        <input type="number" id="ev-cooldown" min="0" max="60000" step="100">
+        <span class="dim">ms</span>
+      </div>
+
+      <div class="cfg-row">
+        <label for="ev-only">Only these monster types</label>
+        <input type="text" id="ev-only" placeholder="Goatman, Skeleton — part of the metadata path, comma separated">
+      </div>
+      <div class="cfg-row">
+        <label for="ev-ignore">Never these</label>
+        <input type="text" id="ev-ignore" placeholder="left empty means no exclusions">
+      </div>
+
+      <div class="cfg-row">
+        <label><input type="checkbox" id="ev-quiet"> Ignore monsters that are only walking</label>
+      </div>
+
+      <p class="dim" id="ev-status">–</p>
+      <p class="dim">The roll goes where your character is already pointing — the tool decides
+        <em>whether</em> to roll, never <em>where</em>. Steering it would mean moving your mouse
+        mid-fight.</p>
+    </section>
+
     <section class="card">
       <h2>Bridge</h2>
       <p class="dim">Raw traffic, newest first — the debugging view while the protocol grows.</p>
