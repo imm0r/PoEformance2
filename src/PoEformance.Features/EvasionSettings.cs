@@ -176,7 +176,10 @@ public sealed record EvasionGate(
 /// tool owns the movement keys, so a player who lets go of one inside it gets it pressed back
 /// down by the restore (see <c>PhysicalKeys</c> for why that window cannot be closed entirely).
 /// The confirmation is what closes most of it, on every machine, without anyone choosing a
-/// number: the overlay's evasion line reports what each roll actually cost.
+/// number: <see cref="RollTimes"/> reports what the last few rolls actually cost, on the overlay
+/// and in the config window beside this setting. A spread rather than the latest reading,
+/// because the measurement is taken during a fight - where one number is overwritten before it
+/// can be read - and because one confirmation cannot tell a slow machine from one stutter.
 /// </param>
 /// <param name="Keys">The movement keys to steer with. See <see cref="MovementKeys"/>.</param>
 public sealed record EvasionSettings(
