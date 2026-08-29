@@ -71,6 +71,7 @@ public sealed class StashWindow
     private Task<TradeProbe>? _probing;
     private TradeProbe? _probed;
     private readonly Func<string, IntPtr> _picture;
+    private readonly Action _changed;
 
     private string _search = string.Empty;
     private int _page = -1;
@@ -101,6 +102,11 @@ public sealed class StashWindow
     /// Turns a file on disk into something drawable. Handed in because uploading a texture
     /// belongs to whoever owns the renderer, not to a window.
     /// </param>
+    /// <param name="changed">
+    /// Called when one of the four switches moved, so the choice is WRITTEN DOWN. The settings
+    /// file is written when this fires and at no other time, so a switch that keeps its value
+    /// somewhere and never calls this looks exactly like a switch that keeps it nowhere.
+    /// </param>
     public StashWindow(
         StashInspector inspector,
         ItemArtStore art,
@@ -109,6 +115,7 @@ public sealed class StashWindow
         Action signIn,
         Func<Task<TradeProbe>>? probe,
         Func<string, IntPtr> picture,
+        Action changed,
         ExchangeStore? exchange = null)
     {
         ArgumentNullException.ThrowIfNull(inspector);
@@ -117,6 +124,7 @@ public sealed class StashWindow
         ArgumentNullException.ThrowIfNull(trade);
         ArgumentNullException.ThrowIfNull(signIn);
         ArgumentNullException.ThrowIfNull(picture);
+        ArgumentNullException.ThrowIfNull(changed);
         _inspector = inspector;
         _art = art;
         _prices = prices;
@@ -125,6 +133,7 @@ public sealed class StashWindow
         _probe = probe;
         _picture = picture;
         _exchange = exchange;
+        _changed = changed;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -180,6 +189,7 @@ public sealed class StashWindow
         if (ImGui.Checkbox(installed ? "also ask poe2db" : "item pictures from poe2db", ref web))
         {
             _art.Enabled = web;
+            _changed();
         }
 
         ImGui.SameLine();
@@ -242,6 +252,7 @@ public sealed class StashWindow
         if (ImGui.Checkbox("prices from poe.ninja", ref asking))
         {
             _prices.Enabled = asking;
+            _changed();
         }
 
         ImGui.SameLine();
@@ -318,6 +329,7 @@ public sealed class StashWindow
         if (ImGui.Checkbox("and the game's own currency exchange", ref asking))
         {
             _exchange.Enabled = asking;
+            _changed();
         }
 
         // TOLD ON EVERY DRAW, not only when the switch moves, and that fixes two things rather
@@ -382,6 +394,7 @@ public sealed class StashWindow
         if (ImGui.Checkbox("ask the trade site about the uniques poe.ninja missed", ref asking))
         {
             _trade.Enabled = asking;
+            _changed();
         }
 
         if (!asking)
