@@ -9,7 +9,19 @@ public sealed record MonsterArrival(uint EntityId, string Name, float TargetX, f
 
 /// <summary>What a recording says about the action fields on MONSTERS.</summary>
 /// <param name="IdCounts">Every ActionId seen on a monster, and how often.</param>
-/// <param name="Bearings">Degrees between each aimed action and its actor's facing.</param>
+/// <param name="Bearings">
+/// Degrees between each SKILL action's direction and its actor's facing - the cross-check.
+/// </param>
+/// <param name="MoveBearings">
+/// The same for MOVE actions, kept apart because it is NOT a check.
+///
+/// A monster faces what it is fighting and walks around whatever is in the way, so its
+/// destination is not where it points and there is no reason for these to agree. Measured:
+/// 25.9 degrees median over 7597 monster moves, and 32.5 - WORSE - if taken from where the
+/// monster currently stands rather than from the run's origin. Averaged in with the skills it
+/// drags a 1.6-degree agreement out to 17.7 and makes a corroborated field look shaky, which is
+/// the only reason this is a separate list rather than a filter.
+/// </param>
 /// <param name="ImplausibleTargets">
 /// Aimed actions whose target is further from the actor than any skill reaches. The shape a
 /// wrong offset takes on an entity nobody has checked.
@@ -22,13 +34,32 @@ public sealed record MonsterActionFindings(
     IReadOnlyDictionary<int, int> IdCounts,
     IReadOnlyList<MonsterArrival> Arrivals,
     IReadOnlyList<double> Bearings,
-    int ImplausibleTargets)
+    int ImplausibleTargets,
+    IReadOnlyList<double>? MoveBearings = null)
 {
     /// <summary>Median distance between a completed move's destination and its arrival.</summary>
     public double MedianMiss => Median([.. Arrivals.Select(a => a.Miss)]);
 
-    /// <summary>Median disagreement between an aimed target and the actor's facing, in degrees.</summary>
+    /// <summary>Median disagreement between an AIMED target and the actor's facing, in degrees.</summary>
     public double MedianBearing => Median([.. Bearings]);
+
+    /// <summary>Share of aimed actions whose direction sits within thirty degrees of the facing.</summary>
+    /// <remarks>
+    /// The headline number, because a median hides the tail and the tail is what a wrong offset
+    /// would show up in. Measured at 94% on the monster session.
+    /// </remarks>
+    public double BearingAgreement => Bearings.Count == 0
+        ? double.NaN
+        : Bearings.Count(b => b <= 30) / (double)Bearings.Count;
+
+    /// <summary>The same median for MOVE actions - for contrast, never as a check.</summary>
+    public double MedianMoveBearing => Median([.. MoveBearings ?? []]);
+
+    /// <summary>
+    /// What the median would be if the two were mixed - the misleading number, kept so a test
+    /// can assert that keeping them apart still earns its place.
+    /// </summary>
+    public double MedianBearingIfMixed => Median([.. Bearings, .. MoveBearings ?? []]);
 
     internal static double Median(double[] values)
     {
@@ -104,6 +135,7 @@ public static class MonsterActionCheck
 
         var idCounts = new Dictionary<int, int>();
         var bearings = new List<double>();
+        var moveBearings = new List<double>();
         var arrivals = new List<MonsterArrival>();
         var distinct = new HashSet<uint>();
         int sightings = 0, acting = 0, implausible = 0;
@@ -137,12 +169,14 @@ public static class MonsterActionCheck
 
                     // The cross-check, only where there is a direction to compare: a target on
                     // top of the origin has no bearing, and an unread facing has nothing to
-                    // compare against.
+                    // compare against. SKILLS AND MOVES GO IN DIFFERENT LISTS - see the note on
+                    // MoveBearings for why mixing them slanders a corroborated field.
                     if (action.Reach > 1f && !float.IsNaN(m.Facing))
                     {
                         float aimed = Facing.FromHeading(
                             action.TargetX - action.OriginX, action.TargetY - action.OriginY);
-                        bearings.Add(Math.Abs(Facing.Between(aimed, m.Facing)) * 180.0 / Math.PI);
+                        double degrees = Math.Abs(Facing.Between(aimed, m.Facing)) * 180.0 / Math.PI;
+                        (action.Kind == ActionKind.Move ? moveBearings : bearings).Add(degrees);
                     }
                 }
 
@@ -181,7 +215,8 @@ public static class MonsterActionCheck
         }
 
         return new MonsterActionFindings(
-            samples.Count, sightings, distinct.Count, acting, idCounts, arrivals, bearings, implausible);
+            samples.Count, sightings, distinct.Count, acting, idCounts, arrivals, bearings, implausible,
+            moveBearings);
     }
 
     /// <summary>Keeps a finished run if it ran long enough AND actually reached its target.</summary>
@@ -257,14 +292,26 @@ public static class MonsterActionCheck
 
         if (findings.Bearings.Count > 0)
         {
-            output.WriteLine($"  BEARINGS: {findings.Bearings.Count} aimed action(s), median "
-                + $"{findings.MedianBearing:F1}°, worst {findings.Bearings.Max():F1}°");
+            output.WriteLine($"  BEARINGS (skills): {findings.Bearings.Count} aimed action(s), median "
+                + $"{findings.MedianBearing:F1}°, {findings.BearingAgreement:P0} within 30°");
             output.WriteLine("    (small means the target agrees with the facing - a field found");
             output.WriteLine("     independently, so agreement is corroboration rather than consistency)");
         }
         else
         {
-            output.WriteLine("  no bearings: nothing was aimed, or the facing did not read.");
+            output.WriteLine("  no skill bearings: nothing was aimed, or the facing did not read.");
+        }
+
+        // Printed, but explicitly NOT as a check. A reader who sees one bearing figure assumes
+        // it is the cross-check; this session's moves sit at 26 degrees and would read as a
+        // failure, when what they actually show is that a monster faces its quarry rather than
+        // its path - the same thing the player's own facing turned out to do.
+        if (findings.MoveBearings is { Count: > 0 } moves)
+        {
+            output.WriteLine($"  move bearings, for contrast: {moves.Count}, median "
+                + $"{MonsterActionFindings.Median([.. moves]):F1}° - NOT a check. A monster faces what");
+            output.WriteLine("    it is fighting and walks around what is in the way, so its destination is");
+            output.WriteLine("    not where it points. Only the skill row above is corroboration.");
         }
     }
 }

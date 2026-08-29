@@ -85,19 +85,50 @@ public readonly record struct ActorAction(
 /// grid pair mistaken for a world position lands a marker a hundred times too close to the
 /// map's origin, which looks like a projection bug rather than like a unit mix-up.
 ///
-/// WHAT IS NOT ESTABLISHED, and matters most for the feature this serves: every measurement
-/// behind these offsets was taken from the PLAYER's actor. Monsters carry the same component,
-/// so the same offsets should hold - "should" being exactly the word AnimationNames uses about
-/// the animation table for the same reason. Until a recording settles it, a monster reading
-/// nonsense here is a possibility to check for rather than a surprise.
+/// MONSTERS ARE SETTLED, and they were the whole point. Two sessions had measured all of this
+/// on the player only; <c>tests/fixtures/session-2026-08-monsters.rec</c> put it to 54 monsters
+/// in a real fight and the game answered twice over:
+///
+///  - 210 completed monster moves ended on the destination this reads, 185 of them EXACTLY -
+///    median miss 0.00 world units, worst 10.87, which is one cell. Across 39 distinct monsters
+///    of eleven kinds, none of which anybody had aimed a probe at.
+///  - Over 1649 monster SKILL actions the direction from origin to target agrees with
+///    Render.RotationCurrent to a median of 1.6 degrees, 94% inside thirty. That is a field
+///    found a month earlier by a different method on a different recording, so it is
+///    corroboration and not consistency.
+///
+/// MONSTERS DO NOT FACE WHERE THEY WALK, which is the same lesson the player taught and worth
+/// stating because the obvious check gets it backwards. Over 7597 monster MOVE actions the
+/// bearing to the destination sits 25.9 degrees off the facing, and measuring it from where the
+/// monster currently stands makes it WORSE (32.5) rather than better. A monster faces its
+/// quarry and walks around obstacles, so the facing says what it is aimed at and this says where
+/// it is going - two different questions, and an evasion warning wants both.
 /// </remarks>
 public sealed class ActionReader
 {
-    /// <summary>ActionId while a skill is running.</summary>
-    private const short SkillAction = 2;
+    /// <summary>
+    /// The bit that means a SKILL is running. ActionId is a flags word, not an enum.
+    /// </summary>
+    /// <remarks>
+    /// FOUND BY WATCHING MONSTERS (session-2026-08-monsters.rec, 4659 acting sightings across
+    /// 54 monsters), where the first two sessions had shown only the player's two values. The
+    /// ids that turned up are 0x0002, 0x1080, 0x0200, 0x1000, 0x1480, 0x1200 and 0x1002, and
+    /// they decompose cleanly: every id with this bit had the SKILL slot filled, every id with
+    /// <see cref="MoveBit"/> had the MOVE slot filled, and 0x1002 - which has both - had both.
+    /// Read as whole numbers instead, five of those seven are unrecognised values; read as
+    /// flags, they are two facts and some detail nobody needs yet.
+    /// </remarks>
+    private const short SkillBit = 0x0002;
 
-    /// <summary>ActionId while a move is running.</summary>
-    private const short MoveAction = 4224;
+    /// <summary>The bit that means a MOVE is running, on the same evidence.</summary>
+    /// <remarks>
+    /// 0x1080 is the ordinary one (3807 sightings, animation Run every time). 0x1000 WITHOUT
+    /// the 0x0080 beside it reads animation Idle every time (11 sightings) - the same
+    /// "committed but not yet moving" moment the player session found, showing up here as a
+    /// distinct id. Both are moves and both carry a destination, which is why the bit and not
+    /// the number is what this tests.
+    /// </remarks>
+    private const short MoveBit = 0x1000;
 
     private readonly IMemoryReader _reader;
     private readonly int _actionId;
@@ -148,19 +179,24 @@ public sealed class ActionReader
             return ActorAction.None;
         }
 
-        ActionKind kind = rawId switch
-        {
-            SkillAction => ActionKind.Skill,
-            MoveAction => ActionKind.Move,
-            _ => ActionKind.Unknown,
-        };
+        // SKILL WINS WHERE BOTH BITS ARE SET, and that ordering is measured rather than
+        // preferred: 812 of the 824 skill sightings in the monster session had BOTH wrapper
+        // slots filled - a monster casting with a move still pending - and in every one of
+        // them the skill slot held the aim point while the move slot held a stale walk. The
+        // dangerous half is the skill, so it is also the one to read.
+        ActionKind kind = (rawId & SkillBit) != 0 ? ActionKind.Skill
+            : (rawId & MoveBit) != 0 ? ActionKind.Move
+            : ActionKind.Unknown;
 
-        // Whichever slot is set. An Unknown id is looked up in both, because a kind nobody
-        // has named still has a wrapper somewhere and its target is the useful part.
-        ulong wrapper = _reader.ReadPointer(actorAddress + (ulong)_skillActionPtr);
+        // The slot that goes with the bit. An Unknown id is looked up in both, because a kind
+        // nobody has named still has a wrapper somewhere and its target is the useful part.
+        ulong wrapper = kind == ActionKind.Move
+            ? _reader.ReadPointer(actorAddress + (ulong)_moveActionPtr)
+            : _reader.ReadPointer(actorAddress + (ulong)_skillActionPtr);
         if (wrapper == 0)
         {
-            wrapper = _reader.ReadPointer(actorAddress + (ulong)_moveActionPtr);
+            wrapper = _reader.ReadPointer(actorAddress
+                + (ulong)(kind == ActionKind.Move ? _skillActionPtr : _moveActionPtr));
         }
 
         int animation = _reader.TryRead(actorAddress + (ulong)_animationId, out int read) ? read : -1;

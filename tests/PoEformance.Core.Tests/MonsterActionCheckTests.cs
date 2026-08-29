@@ -214,6 +214,9 @@ public class MonsterActionCheckTests
 
         string text = sink.ToString();
         Assert.Contains("ARRIVALS:", text, StringComparison.Ordinal);
-        Assert.Contains("BEARINGS:", text, StringComparison.Ordinal);
+
+        // Named "(skills)" since the monster session: a move's bearing is not a check, so the
+        // report must never print one number that a reader takes for the cross-check.
+        Assert.Contains("BEARINGS (skills):", text, StringComparison.Ordinal);
     }
 }
