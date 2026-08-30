@@ -142,8 +142,16 @@ PoEformance.App        composition root - wires everything BY HAND in Program.cs
   Find References.
 
 Things deliberately absent (each one is a lesson from reading GameHelper2): plugin
-system, launcher/updater, DI container, interfaces with a single implementation,
+system, **launcher**, DI container, interfaces with a single implementation,
 inheritance-based feature classes.
+
+The launcher is the one worth separating from the updater it used to be paired with here,
+because only one of the two is a structural cost. A launcher is a second program that owns
+the first — a process to start, a window to manage, a place for configuration to drift to.
+An updater is a few hundred lines that read two small files and unpack a zip; it adds no
+process, no window, and nothing any other feature has to know about. What made the pairing
+look right was GameHelper2 shipping them together. See **Updating itself** below for what
+this one actually is.
 
 ## Threading model
 
@@ -194,6 +202,49 @@ violations surface at build time, not at publish time.
 **Open risk, to verify early on Windows:** WebView2's COM interop under full AOT.
 Fallback if it misbehaves: self-contained trimmed deployment for the Config window
 process. ImGui via the native cimgui binding is unproblematic.
+
+## Updating itself
+
+Every push to `main` replaces the rolling `latest-dev` release, and until now the only way
+to take one was to notice, download a zip and unpack it over the folder by hand. The cost of
+not noticing is specific to this kind of tool: **an offset that drifted with a game patch is
+fixed in a build somebody is not running**, and the symptom is not "there is an update" — it
+is half the features quietly reading the wrong bytes.
+
+**The build has to be able to say what it is, and nothing already in it could.** The tag is
+`latest-dev` for every build ever made, and the assembly version has been `1.0.0.0` since the
+first commit. So the publish workflow writes a **`version.json`** next to the executable —
+tag, commit, build time, run number — and uploads *the same file* as a second release asset.
+The check is then a comparison between two stamps written by one step of one run, rather than
+meaning read into a timestamp (`Features/BuildStamp`, `Features/UpdateCheck`).
+
+The rejected shortcut is worth recording, because it is the obvious one: treat the zip
+asset's `updated_at` as the build time. It is wrong in the direction that matters — the
+upload finishes *after* the build, so the running build compares as older than itself and
+every launch offers an update to the copy already installed. A release with no stamp is
+therefore answered with "cannot compare", never with a guess.
+
+Four steps, and the last two are asked for:
+
+1. **Check** — two requests every six hours: the releases API (which also carries the
+   changelog, as the release body) and that release's `version.json`.
+2. **Notice** — a dot on the config window's Update tab, and the overlay's own section
+   header on the Status page changing to "Update available". The notice has to reach
+   somebody who is playing, not somebody who happens to have the settings window open.
+3. **Download** — into `update/`, unpacked into `update/staging/`, and checked for the
+   executable before anything else happens. **Nothing outside `update/` is touched by the
+   running tool**, and it could not be: the executable is running, and its image and the
+   native libraries beside it are locked. Staging is also the integrity check — every zip
+   entry carries a CRC32 and the extractor verifies it, so a truncated download fails in a
+   scratch folder rather than halfway through an installation.
+4. **Install** — a batch file (`Features/UpdateScript`) that outlives the process: it waits
+   for the pid, `robocopy /E` (never `/MIR` — that would delete `config/`), and starts the
+   tool again with the switches it had, plus `--updated <commit>` so the new build can say
+   what happened. A failed copy starts the *old* build with `--update-failed`, because an
+   update that goes wrong must not present as "the tool did not come back".
+
+`--record` is the one switch not carried into the restart: it names a file, and restarting
+would truncate a recording somebody deliberately captured.
 
 ## Conventions
 

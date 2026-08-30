@@ -1399,6 +1399,46 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>
+    /// Adds the update notice, beside the live readout on the Status page.
+    /// </summary>
+    /// <remarks>
+    /// ON THE STATUS PAGE, which is the page this window opens on and the one that is up during
+    /// a session. A notice on a page nobody has in front of them is not a notice - and its
+    /// header carries the news, so "there is a newer build" is legible with the section still
+    /// folded.
+    ///
+    /// The check and the installer are HANDED IN rather than made here, because the config
+    /// window drives the same two. One of each, or the two surfaces disagree about what the
+    /// tool is doing.
+    /// </remarks>
+    /// <param name="download">Fetches and unpacks the published build. Replaces nothing.</param>
+    /// <param name="install">Swaps the folders and restarts. Does not return.</param>
+    /// <param name="skip">Waves this build away, so the next one still gets to ask.</param>
+    /// <param name="outcome">What the last restart's update did - "updated", "failed", or empty.</param>
+    public void AttachUpdates(
+        UpdateCheck check,
+        UpdateInstaller installer,
+        Action download,
+        Action install,
+        Action skip,
+        string outcome,
+        string outcomeVersion)
+    {
+        var window = new UpdateWindow(check, installer, download, install, skip)
+        {
+            Outcome = outcome,
+            OutcomeVersion = outcomeVersion,
+        };
+
+        // The IDLE callback is what keeps the check ticking: this section is folded shut for
+        // the whole of an ordinary session, so hanging the tick off the draw would mean
+        // checking once at startup and never again.
+        _tools.Add(
+            5, "update", "Update", window.DrawTab, window.Idle,
+            page: Status, pageLabel: "Status", live: () => window.Label);
+    }
+
+    /// <summary>
     /// Adds the quest list: every quest and the step it is waiting on.
     /// </summary>
     /// <remarks>

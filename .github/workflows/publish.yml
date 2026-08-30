@@ -27,10 +27,31 @@ jobs:
     # steps below has to come back to pwsh with it.
     runs-on: ubuntu-latest
     steps:
+      # FULL HISTORY, not the default single commit. The release notes are the changelog the
+      # tool's own update tab shows, and building one means listing the commits between the
+      # build the release currently carries and this one - which a shallow clone cannot do.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
+
+      # BEFORE the build, because it reads what the release holds RIGHT NOW - the build that
+      # is about to be replaced. That sha is the "since" of the changelog below, and it is the
+      # only place it is recorded: a rolling tag has one release and no history of its own.
+      - name: Read the build the release currently carries
+        id: previous
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release download latest-dev -p version.json -O previous.json 2>/dev/null; then
+            echo "commit=$(jq -r '.commit // ""' previous.json)" >> "$GITHUB_OUTPUT"
+          else
+            # First run, or a release from before the update check existed. Both mean "no
+            # previous build to compare against", and the notes say so rather than guessing.
+            echo "commit=" >> "$GITHUB_OUTPUT"
+          fi
 
       # Self-contained single file: runs on any Windows without a .NET install.
       # (AOT off here for speed; the AOT publish gets its own verification pass later.)
@@ -39,6 +60,29 @@ jobs:
           --self-contained
           -p:PublishSingleFile=true
           -p:PublishAot=false
+
+      # WHAT THIS BUILD IS, written next to the executable so the copy somebody is running can
+      # say. Nothing else can: every build goes out under the same rolling tag, and the
+      # assembly version has been 1.0.0.0 since the first commit - neither distinguishes this
+      # week's build from March's. The tool reads this file at startup and compares it against
+      # the copy of it uploaded to the release; see Features/BuildStamp.
+      #
+      # The SAME file is uploaded as a release asset below, which is what makes the comparison
+      # exact rather than inferred from a timestamp: both sides were written here, by this
+      # step, in this run.
+      - name: Stamp the build
+        run: |
+          out="src/PoEformance.App/bin/Release/net10.0-windows/win-x64/publish"
+          cat > "$out/version.json" <<EOF
+          {
+            "tag": "latest-dev",
+            "commit": "${{ github.sha }}",
+            "builtUtc": "$(date -u '+%Y-%m-%dT%H:%M:%SZ')",
+            "runNumber": ${{ github.run_number }}
+          }
+          EOF
+          cp "$out/version.json" version.json
+          cat version.json
 
       # Fails loudly if the layout is not what a Windows user needs. On a cross-compile this
       # is worth asserting rather than trusting: the failure mode of a wrong RID is a publish
@@ -50,6 +94,9 @@ jobs:
           file "$out/PoEformance.App.exe" | grep -q "MS Windows" || {
             echo "not a Windows binary:"; file "$out/PoEformance.App.exe"; exit 1; }
           test -f "$out/schema/poe2.offsets.json" || { echo "no schema beside the exe"; exit 1; }
+          # A zip without this ships a build that cannot tell whether it is current, and the
+          # symptom is an update tab that says "local build" on a downloaded release.
+          test -f "$out/version.json" || { echo "no version.json beside the exe"; exit 1; }
           ls -la "$out"
 
       - name: Zip the publish output
@@ -74,19 +121,58 @@ jobs:
           # Written to a file rather than passed inline: the notes are full of backticks,
           # and every layer that would otherwise have to be escaped through is one more
           # place for the release notes to come out mangled.
-          cat > notes.md <<EOF
-          Automatic build of \`${{ github.sha }}\` ($(date -u '+%Y-%m-%d %H:%M') UTC).
+          #
+          # THE NOTES ARE THE CHANGELOG THE TOOL SHOWS. The update tab renders this body
+          # verbatim, so "automatic build of <sha>" - which is what this said for its whole
+          # life - is a changelog that answers nothing: somebody deciding whether to restart
+          # mid-session wants to know what they are getting, and a commit id is not that.
+          previous='${{ steps.previous.outputs.commit }}'
+          {
+            echo "Automatic build of \`${{ github.sha }}\` ($(date -u '+%Y-%m-%d %H:%M') UTC)."
+            echo
 
-          Unzip anywhere and run \`PoEformance.App.exe\` from an elevated terminal.
-          \`schema\poe2.offsets.json\` sits next to the exe and stays hot-editable
-          (\`--watch\`). No .NET install required.
-          EOF
+            if [ -n "$previous" ] && git cat-file -e "${previous}^{commit}" 2>/dev/null; then
+              count=$(git rev-list --no-merges --count "${previous}..${{ github.sha }}")
+              if [ "$count" -eq 0 ]; then
+                echo "No commits since the previous build - this is a rebuild."
+              else
+                echo "### ${count} change(s) since \`$(echo "$previous" | cut -c1-7)\`"
+                echo
+                # Merge commits left out: this repository merges pull requests, so the
+                # first-parent line reads "Merge pull request #186 from ..." while the
+                # commits underneath carry the sentences somebody actually wrote.
+                git log --no-merges --pretty='- %s' "${previous}..${{ github.sha }}" | head -60
+                if [ "$count" -gt 60 ]; then
+                  echo "- ... and $((count - 60)) more"
+                fi
+              fi
+            else
+              # Either the first stamped release, or a previous build whose commit is not in
+              # this clone (a force-push, a rewritten branch). Saying so beats an empty list
+              # that reads as "nothing changed".
+              echo "No previous stamped build to compare against."
+            fi
 
+            echo
+            echo "---"
+            echo
+            echo "Unzip anywhere and run \`PoEformance.App.exe\` from an elevated terminal."
+            echo "\`schema\poe2.offsets.json\` sits next to the exe and stays hot-editable"
+            echo "(\`--watch\`). No .NET install required."
+            echo
+            echo "Already running it? The tool checks this release on its own and can install"
+            echo "the update itself - config window, Update tab."
+          } > notes.md
+
+          # version.json goes up BESIDE the zip, as its own asset. It is a couple of hundred
+          # bytes and it is what the running tool fetches to decide whether it is current -
+          # asking for the whole zip to answer that question would be a hundred and fifty
+          # megabytes per check.
           if gh release view latest-dev >/dev/null 2>&1; then
-            gh release upload latest-dev PoEformance-win-x64.zip --clobber
+            gh release upload latest-dev PoEformance-win-x64.zip version.json --clobber
             gh release edit latest-dev --notes-file notes.md
           else
-            gh release create latest-dev PoEformance-win-x64.zip \
+            gh release create latest-dev PoEformance-win-x64.zip version.json \
               --prerelease --title "Latest build (auto)" --notes-file notes.md
           fi
 
