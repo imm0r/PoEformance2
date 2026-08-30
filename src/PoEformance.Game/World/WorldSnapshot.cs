@@ -216,16 +216,6 @@ public readonly record struct Aim(float Angle, float Turning, int Animation = -1
 /// the earlier signal of the two - an action is committed before any animation plays, which
 /// <c>ActionFieldsTests</c> measures - and that head start is the whole value of it to a warning.
 /// </param>
-/// <param name="Actor">
-/// The Actor component's own address, or 0 when it was not looked up.
-///
-/// Kept for the same reason <paramref name="Render"/> is: the component map has already been
-/// walked to fill <paramref name="Action"/>, and something outside the snapshot wants to read
-/// one field of it again LATER, at a moment the snapshot is too old to speak for. The steering
-/// is that something - it re-reads the animation id every millisecond while a roll is being sent,
-/// which is a hundred times faster than the reader ticks, and walking the components for each of
-/// those reads would cost more than the read.
-/// </param>
 /// <remarks>
 /// Carried because the game hands one monster several entity objects over a single set of
 /// components, so an entity address is not an identity: three entities with three addresses
@@ -257,8 +247,7 @@ public sealed record WorldEntity(
     int? RememberedForMs = null,
     ActiveBuffs? Buffs = null,
     Aim? Aim = null,
-    ActorAction? Action = null,
-    ulong Actor = 0)
+    ActorAction? Action = null)
 {
     /// <summary>Whether this comes from memory rather than from the game's current list.</summary>
     public bool IsRemembered => RememberedForMs is not null;
@@ -1104,10 +1093,9 @@ public sealed class WorldReader
             // Actor component has already been located by the walk above, so asking later
             // would mean resolving the whole component map a second time.
             ActorAction? action = null;
-            ulong actorAddress = 0;
             if (ReadActions && (kind == EntityKind.Player || (kind == EntityKind.Monster && !friendly)))
             {
-                actorAddress = entity.Component("Actor");
+                ulong actorAddress = entity.Component("Actor");
                 if (actorAddress != 0)
                 {
                     action = _actions.Read(actorAddress);
@@ -1121,7 +1109,7 @@ public sealed class WorldReader
                 poi, mapIcon,
                 signs.Life, signs.EnergyShield, opened, friendly, signs.IsEffect,
                 NameOf(address, renderAddress), renderAddress, present,
-                Buffs: buffs, Aim: aim, Action: action, Actor: actorAddress);
+                Buffs: buffs, Aim: aim, Action: action);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
