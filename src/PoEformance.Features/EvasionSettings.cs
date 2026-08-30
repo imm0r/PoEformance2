@@ -148,38 +148,41 @@ public sealed record EvasionGate(
 /// character's movement speed changes it and nobody has measured that relationship.
 /// </param>
 /// <param name="SteerHoldMs">
-/// The LONGEST the steering keys may stay down around the roll. A ceiling, not a duration.
+/// How long the steering keys stay down around the roll.
 ///
-/// IT USED TO BE THE DURATION and that is the interesting part of its history. The keys have to
-/// stay down across one of the game's frames - input that goes down and up between two of the
-/// game's polls can be missed entirely - and nothing told the tool when a frame had passed, so
-/// this number was how long to hold and it was a JUDGEMENT. It got two readings against it:
-/// 60 ms and 20 ms both work, on the owner's machine (2026-08-29). One frame is 16.7 ms at
-/// 60 fps, 33 ms at 30, 62 ms at 16, so 20 clears a frame only above roughly 50 fps while 60
-/// covers everything down to about 16 - which is exactly the shape of those two readings, since
-/// the owner plays well above 50. The failure below the line is SILENT: the roll simply goes
-/// where the player was already pointing, which looks like the steering choosing that direction.
+/// THE KEYS HAVE TO SPAN ONE OF THE GAME'S FRAMES. Input that goes down and up between two of
+/// the game's polls can be missed entirely, and one frame is 16.7 ms at 60 fps, 33 ms at 30,
+/// 62 ms at 16. The failure below the line is SILENT: the roll simply goes where the player was
+/// already pointing, which looks like the steering having chosen that direction.
 ///
-/// SO IT IS NOT A DURATION ANY MORE. <c>RollWatch</c> asks the game whether the roll has started
-/// and <c>DodgeSteer</c> gives the keys back the moment it has, which is one frame and a little
-/// however long that frame took - on a machine at 30 fps, on a machine at 144, and through a
-/// stutter that a frame-rate reading would have averaged away. What is left for this number is
-/// the case where nothing confirms: no animation table, no Actor address, or a roll chained out
-/// of another one, where the animation id never changes.
+/// TWO READINGS FROM PLAY, both on the owner's machine (2026-08-29): 60 ms and 20 ms both work.
+/// That is the shape the arithmetic predicts, since 20 clears a frame only above roughly 50 fps
+/// while 60 covers everything down to about 16.
 ///
-/// THE DEFAULT STAYS AT 60 for that reason. As a duration it was sized for the slowest machine
-/// anyone might have; as a ceiling it wants to be sized for the slowest frame anyone might hit,
-/// which is the same number for the same reason. Lowering it now only shortens the fallback -
-/// and on a normal frame it changes nothing at all, because the confirmation gets there first.
+/// SHORTER IS SAFER WHERE IT WORKS. The hold is the window in which the tool owns the movement
+/// keys, so a player who lets go of one inside it gets it pressed back down by the restore (see
+/// <c>PhysicalKeys</c> for why that window cannot be closed entirely). Twenty milliseconds is a
+/// third of the exposure of sixty, on a machine fast enough for it.
 ///
-/// SHORTER IS STILL SAFER WHERE IT WORKS, and worth saying: the hold is the window in which the
-/// tool owns the movement keys, so a player who lets go of one inside it gets it pressed back
-/// down by the restore (see <c>PhysicalKeys</c> for why that window cannot be closed entirely).
-/// The confirmation is what closes most of it, on every machine, without anyone choosing a
-/// number: <see cref="RollTimes"/> reports what the last few rolls actually cost, on the overlay
-/// and in the config window beside this setting. A spread rather than the latest reading,
-/// because the measurement is taken during a fight - where one number is overwritten before it
-/// can be read - and because one confirmation cannot tell a slow machine from one stutter.
+/// SO THE DEFAULT IS 60: it ships for the machine nobody has measured rather than the one that
+/// has, because too-low fails silently while too-high only costs exposure.
+///
+/// IT WAS BRIEFLY NOT A NUMBER AT ALL, and the attempt is worth recording because the premise
+/// was right. <c>RollWatch</c> asked the game whether the roll had STARTED - the player's own
+/// animation id turning into one the game calls a dodge roll - and the keys went back the moment
+/// it did, with this number demoted to a ceiling. The claim was that it would cost one frame and
+/// a little, however long that frame took.
+///
+/// IT COST THREE. Measured in play with the ceiling raised to 200 so the reading could not be
+/// truncated: 49-62 ms, tightly, none on the ceiling. At 60 fps that is three frames - and the
+/// same machine had already shown a flat 20 ms working, so the game reads the keys long before
+/// the animation id turns over. The signal is a LATE, downstream consequence of the roll rather
+/// than the moment the input was used: the roll starting IS the input having been used, but the
+/// animation id changing is not when the roll starts.
+///
+/// SO IT WAS REMOVED. It landed at 55-62 ms, which is where the guessed 60 already was, while
+/// 20 ms is the shortest hold anyone has shown to work - the machinery held three times longer
+/// than necessary and bought nothing. What is left is this number, sized against a frame.
 /// </param>
 /// <param name="Keys">The movement keys to steer with. See <see cref="MovementKeys"/>.</param>
 public sealed record EvasionSettings(
@@ -256,10 +259,8 @@ public sealed record EvasionSettings(
         // the steering would pick whichever came first. The ceiling is well past any roll seen.
         RollDistance = Math.Clamp(RollDistance, 50f, 2000f),
 
-        // Bounded well below the cooldown at both ends. Zero is legal and means "give the keys
-        // back at once" - which now defeats the confirmation as well as the hold, since there is
-        // no time left in which to notice the roll. It stays legal because it is the honest way
-        // to switch the whole wait off.
+        // Bounded well below the cooldown at both ends. Zero is legal and means "send the keys
+        // and release them at once", which is worth being able to try when a frame rate is high.
         SteerHoldMs = Math.Clamp(SteerHoldMs, 0, 500),
         Keys = KeysOrDefault.Normalised(),
         MarkerRadius = Math.Clamp(MarkerRadius, 2f, 200f),
