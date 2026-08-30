@@ -4,13 +4,17 @@ using PoEformance.Game.Ui;
 namespace PoEformance.Features;
 
 /// <summary>
-/// One part of the screen the map overlay must keep off, as fractions of the game window.
+/// One extra part of the screen the map overlay must keep off, as fractions of the game window.
 /// </summary>
 /// <remarks>
-/// FRACTIONS RATHER THAN PIXELS, because the thing being described is a piece of the game's
-/// interface and the interface is laid out proportionally: the same numbers hold when the
-/// window is resized, when the game is moved to another monitor, and when somebody plays
+/// FRACTIONS RATHER THAN PIXELS, because the thing being described is a piece of the screen and
+/// the same numbers have to hold when the window is resized, moved to another monitor, or played
 /// windowed. Pixels would be a setting that silently stops meaning what it meant.
+///
+/// AN EXTRA, and the word is doing work. The game's own interface is MEASURED - see
+/// <see cref="MapKeepOut"/> - so nothing here describes the orbs or the bars. A zone is for what
+/// measurement cannot reach: another overlay parked over the game, a streaming widget, a part of
+/// the interface whose element turns out to understate itself.
 /// </remarks>
 /// <param name="Name">What it is covering, for the editor's list and the readout.</param>
 /// <param name="On">
@@ -56,7 +60,7 @@ public sealed record MapKeepOutZone(
 }
 
 /// <summary>
-/// The parts of the screen the game's own interface owns, which the map overlay stays off.
+/// What the map overlay stays off: the game's own interface, and anything else somebody adds.
 /// </summary>
 /// <remarks>
 /// WHAT THIS IS FOR. The game's large map is drawn across the ENTIRE window - it has no frame
@@ -67,54 +71,57 @@ public sealed record MapKeepOutZone(
 /// sits above the game and cannot be painted under anything, so the only way to be underneath
 /// the interface is to not be there at all.
 ///
-/// WHY THESE ARE SETTINGS AND NOT MEASUREMENTS, which is the honest part. Nothing in the game's
-/// memory that this project has found names the pieces of the HUD: <c>ImportantUiElements</c>
-/// carries the panels and the maps and stops there, and the reference tool has no equivalent
-/// either - GameHelper2's Radar solves exactly this problem with a rectangle the user drags
-/// once and it remembers (its "culling window"). So this is the same bargain, with the shape
-/// generalised from one rectangle to a few, and the numbers below are eyeballed from the game
-/// rather than read out of it. They are marked as such, they are editable, and if an element
-/// that measures the HUD is ever identified they should be replaced by it.
+/// THE INTERFACE IS MEASURED, NOT DESCRIBED, and that correction is the whole point of this
+/// type's shape. It first shipped as a set of hand-dragged boxes with a guessed default, on the
+/// belief that nothing in memory named the pieces of the HUD - the reference tool has no
+/// equivalent either, and GameHelper2's Radar solves the same problem with a "culling window"
+/// the user drags once. That belief was simply wrong: the interface is one UiElement with
+/// StringId "HUD" among the UI root's own children, and its parts are its children, each
+/// carrying its own position and size. See <see cref="HudReader"/>. So the zones below are no
+/// longer where the orbs are; they are empty by default, and what they are for is whatever
+/// measurement cannot reach.
 ///
-/// WHY THE DEFAULT IS ONE BAND rather than the HUD's real silhouette. Every part of PoE2's
-/// interface that sits over the map runs along the BOTTOM edge - the orbs at the two corners,
-/// the flasks and skills between them, the experience strip under all of it - so one band
-/// across the bottom covers the lot, and its only guessed number is where the top of it goes.
-/// A default carved into the orb-shaped and bar-shaped pieces would keep more of the map, but
-/// it would be four guesses instead of one and every one of them wrong on a different aspect
-/// ratio. The editor is there to carve it for the screen it is actually on.
-///
-/// An open panel is a different matter and is NOT listed here: those the tool can measure, so
-/// they are added to the region at draw time from <c>PanelArea</c>.
+/// A PART CAN BE SWITCHED OFF BY NAME, which is the one thing measurement needs from a setting.
+/// Some of these parts are containers, and a container that reports a rectangle far larger than
+/// what it draws would quietly eat the map - the atlas panel has form here, understating itself
+/// by 733 pixels on an ultrawide. Naming the parts in the readout and letting one be switched
+/// off turns that from a mystery into a click.
 /// </remarks>
 public sealed record MapKeepOut(
     [property: JsonPropertyName("on")] bool On = true,
+    [property: JsonPropertyName("hud")] bool Hud = true,
+    [property: JsonPropertyName("hudOff")] IReadOnlyList<string>? HudOff = null,
     [property: JsonPropertyName("zones")] IReadOnlyList<MapKeepOutZone>? Zones = null)
 {
-    /// <summary>
-    /// Where the interface sits until somebody says otherwise: one band across the bottom.
-    /// </summary>
-    /// <remarks>
-    /// The top edge is the tallest thing down there, which is the orbs - measured off a
-    /// screenshot of the game at 16:9, where their upper arc starts a little under four
-    /// fifths of the way down. Deliberately a whisker generous: a band a few pixels too tall
-    /// costs a strip of map nobody was reading, and one a few pixels too short puts an outline
-    /// across the orb it was supposed to clear.
-    /// </remarks>
-    public static MapKeepOut Default { get; } = new(
-        On: true,
-        Zones: [new MapKeepOutZone("interface (bottom of the screen)", 0f, 0.80f, 1f, 1f)]);
+    /// <summary>Measure the interface, keep off it, and describe nothing by hand.</summary>
+    public static MapKeepOut Default { get; } = new();
 
-    /// <summary>The zones as edited, or the default set for a file that has never said.</summary>
-    /// <remarks>
-    /// A file that has said "none" gets none: an EMPTY list is somebody having deleted every
-    /// zone, which is a decision, while a MISSING one is a file written before this existed.
-    /// Folding the two together would make "I want the whole window" impossible to save.
-    /// </remarks>
-    public IReadOnlyList<MapKeepOutZone> ZonesOrDefault => Zones ?? Default.Zones ?? [];
+    /// <summary>The extra zones somebody drew, empty until somebody draws one.</summary>
+    public IReadOnlyList<MapKeepOutZone> ZonesOrEmpty => Zones ?? [];
+
+    /// <summary>The interface parts to ignore, by name. Empty until somebody switches one off.</summary>
+    public IReadOnlyList<string> HudOffOrEmpty => HudOff ?? [];
+
+    /// <summary>Whether a measured interface part is honoured.</summary>
+    public bool Honours(string part)
+        => Hud && !HudOffOrEmpty.Contains(part, StringComparer.Ordinal);
+
+    /// <summary>The same set with one interface part switched on or off by name.</summary>
+    public MapKeepOut Honouring(string part, bool on)
+    {
+        ArgumentNullException.ThrowIfNull(part);
+
+        List<string> off = [.. HudOffOrEmpty.Where(name => !string.Equals(name, part, StringComparison.Ordinal))];
+        if (!on)
+        {
+            off.Add(part);
+        }
+
+        return this with { HudOff = off };
+    }
 
     /// <summary>
-    /// The zones that are on, placed on a window of this size and ready for the region.
+    /// The extra zones that are on, placed on a window of this size and ready for the region.
     /// </summary>
     /// <remarks>
     /// Empty when the whole thing is switched off, which is what makes the switch mean "draw
@@ -128,7 +135,7 @@ public sealed record MapKeepOut(
             return blocking;
         }
 
-        foreach (MapKeepOutZone zone in ZonesOrDefault)
+        foreach (MapKeepOutZone zone in ZonesOrEmpty)
         {
             if (!zone.On)
             {
@@ -150,7 +157,7 @@ public sealed record MapKeepOut(
     {
         ArgumentNullException.ThrowIfNull(zone);
 
-        List<MapKeepOutZone> zones = [.. ZonesOrDefault];
+        List<MapKeepOutZone> zones = [.. ZonesOrEmpty];
         if (index < 0 || index >= zones.Count)
         {
             return this;
@@ -168,7 +175,7 @@ public sealed record MapKeepOut(
     /// </remarks>
     public MapKeepOut Plus()
     {
-        List<MapKeepOutZone> zones = [.. ZonesOrDefault];
+        List<MapKeepOutZone> zones = [.. ZonesOrEmpty];
         if (zones.Count >= ScreenRegion.MostKeptOut)
         {
             return this;
@@ -181,7 +188,7 @@ public sealed record MapKeepOut(
     /// <summary>The same set without one zone.</summary>
     public MapKeepOut Less(int index)
     {
-        List<MapKeepOutZone> zones = [.. ZonesOrDefault];
+        List<MapKeepOutZone> zones = [.. ZonesOrEmpty];
         if (index < 0 || index >= zones.Count)
         {
             return this;

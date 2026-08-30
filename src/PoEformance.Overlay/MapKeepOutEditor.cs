@@ -7,19 +7,19 @@ using PoEformance.Game.Ui;
 namespace PoEformance.Overlay;
 
 /// <summary>
-/// Lets somebody say where the game's interface is, by dragging boxes over it.
+/// Shows what the map is keeping off, and lets somebody add to it by dragging boxes.
 /// </summary>
 /// <remarks>
-/// BY DRAGGING RATHER THAN BY TYPING NUMBERS, and that is the whole reason this is a class
-/// instead of four sliders. What is being described is "that orb, there" - a thing on the
-/// screen the person is looking at - and the only way to check a number for it is to type one,
-/// look, and type another. The reference tool solves the same problem the same way: GameHelper2's
-/// Radar has a "culling window" the user drags over the game once and it remembers.
+/// MOSTLY A READOUT, and that is the shape it should have had from the start. The game's own
+/// interface is measured, part by part, from the elements the game itself keeps - see
+/// <see cref="HudReader"/> - so there is nothing here to describe by hand: the list names each
+/// part the map is staying off and how big it came out, which is what turns a container that
+/// over-claims from a mystery into a click.
 ///
-/// WHAT A BOX IS is deliberately literal: the window you drag IS the region kept out. Nothing
-/// is scaled, offset or interpreted between what is dragged and what is stored, so a box that
-/// looks right cannot be wrong - which matters because everything else about these zones is a
-/// description rather than a measurement (see <see cref="MapKeepOut"/>).
+/// THE BOXES ARE FOR WHAT MEASUREMENT CANNOT REACH - another overlay parked over the game, a
+/// widget, an interface part whose element understates itself. There are none by default. What
+/// they are is deliberately literal: the window you drag IS the region kept out, with nothing
+/// scaled or interpreted in between, so a box that looks right cannot be wrong.
 ///
 /// SAVED AS FRACTIONS of the window, so the zones survive a resolution change; the conversion
 /// happens here, on the way in and out, and nothing downstream sees pixels it did not ask for.
@@ -55,8 +55,18 @@ public sealed class MapKeepOutEditor
 
     private (int Width, int Height) _placedFor;
 
-    /// <summary>Where the interface is, as it stands. Replaced whenever a box moves.</summary>
+    /// <summary>What the map keeps off, as it stands. Replaced whenever anything here changes it.</summary>
     public MapKeepOut Zones { get; set; } = MapKeepOut.Default;
+
+    /// <summary>
+    /// The interface parts the last read measured, for the list. Published every frame.
+    /// </summary>
+    /// <remarks>
+    /// NOT stored and not saved: these are a measurement of what is on screen right now, and a
+    /// remembered one would be a list of where the orbs were the last time somebody looked at
+    /// this page. What IS saved is which of them to ignore, by name.
+    /// </remarks>
+    public IReadOnlyList<HudPart> Parts { get; set; } = [];
 
     /// <summary>Called after anything here changes it, so the settings are written down.</summary>
     public Action? Changed { get; set; }
@@ -76,7 +86,7 @@ public sealed class MapKeepOutEditor
     }
 
     /// <summary>
-    /// The rows that belong in the settings page: the switch, the list, and the way in.
+    /// The rows that belong in the settings page: the switch, what was measured, and the boxes.
     /// </summary>
     public void DrawControls()
     {
@@ -92,7 +102,8 @@ public sealed class MapKeepOutEditor
             ImGui.SetTooltip(
                 "The game draws the large map across the WHOLE window and paints the orbs, the"
                 + " bars and any open panel on top of it. This overlay cannot get underneath"
-                + " them, so it stays off the parts of the screen listed below.");
+                + " them, so it stays off what the interface covers - measured from the game's"
+                + " own HUD element, part by part.");
         }
 
         if (!on)
@@ -100,14 +111,90 @@ public sealed class MapKeepOutEditor
             return;
         }
 
-        bool editing = Editing;
-        if (ImGui.Checkbox("Show the zones, to drag them", ref editing))
+        // ### rather than ##: the label carries a live count, and ImGui derives a control's
+        // identity from its label - so with ## the node would be a NEW node every time a part
+        // appeared or went, and it would snap shut under the cursor. ### fixes the identity
+        // and lets the label say whatever it likes.
+        if (ImGui.TreeNode($"Interface parts ({Parts.Count} measured)###keepouthud"))
         {
-            Editing = editing;
+            DrawPartList();
+            ImGui.TreePop();
         }
 
-        DrawZoneList();
+        if (ImGui.TreeNode($"Extra boxes ({Zones.ZonesOrEmpty.Count})###keepoutzones"))
+        {
+            bool editing = Editing;
+            if (ImGui.Checkbox("Show them, to drag them", ref editing))
+            {
+                Editing = editing;
+            }
+
+            DrawZoneList();
+            ImGui.TreePop();
+        }
     }
+
+    /// <summary>
+    /// What the interface measured as, and which of it to honour.
+    /// </summary>
+    /// <remarks>
+    /// THE SIZES ARE THE POINT of showing this at all. Several of these parts are containers,
+    /// and a container that reports a rectangle far larger than what it draws would quietly eat
+    /// the map - the atlas panel has form here, stating an extent 733 pixels narrower than the
+    /// screen it covers. A part that reads absurdly is obvious in a list of its neighbours and
+    /// invisible in a screenshot of the map, so it is listed with the number it produced and a
+    /// switch beside it.
+    /// </remarks>
+    private void DrawPartList()
+    {
+        bool hud = Zones.Hud;
+        if (ImGui.Checkbox("Measure it##keepouthudon", ref hud))
+        {
+            Zones = Zones with { Hud = hud };
+            Changed?.Invoke();
+        }
+
+        if (!hud)
+        {
+            ImGui.TextDisabled("off - the map will be drawn over the orbs and the bars");
+            return;
+        }
+
+        if (Parts.Count == 0)
+        {
+            ImGui.TextDisabled("nothing measured - no HUD element resolved, or no game in front");
+            return;
+        }
+
+        foreach (HudPart part in Parts)
+        {
+            bool honoured = Zones.Honours(part.Label);
+            if (ImGui.Checkbox($"{part.Label}##keepoutpart{part.Address:X}", ref honoured))
+            {
+                Zones = Zones.Honouring(part.Label, honoured);
+                Changed?.Invoke();
+            }
+
+            ImGui.SameLine();
+            ImGui.TextDisabled(
+                $"{part.Where.Width:F0}x{part.Where.Height:F0} at"
+                + $" {part.Where.Left:F0},{part.Where.Top:F0}   {Extent(part.From)}");
+        }
+    }
+
+    /// <summary>How a part's rectangle was arrived at, in a word.</summary>
+    /// <remarks>
+    /// Printed because the ways differ in how much they can be trusted: an element that states
+    /// its own extent is a reading, and one measured from what its children cover is an
+    /// inference about a container that claimed nothing.
+    /// </remarks>
+    private static string Extent(PanelExtent from) => from switch
+    {
+        PanelExtent.Element => "its own",
+        PanelExtent.Children => "from its children",
+        PanelExtent.Kind => "by kind",
+        _ => "assumed",
+    };
 
     /// <summary>
     /// Add, reset, and one row per zone. Shared by the settings page and the floating controls.
@@ -128,14 +215,17 @@ public sealed class MapKeepOutEditor
         }
 
         ImGui.SameLine();
-        if (ImGui.SmallButton("Reset"))
+        if (ImGui.SmallButton("Remove all"))
         {
-            Zones = MapKeepOut.Default;
+            // Only the boxes: the interface switch beside them is a different decision, and a
+            // button labelled for one that quietly undoes the other is how a setting comes back
+            // on for no reason anybody can trace.
+            Zones = Zones with { Zones = [] };
             _place = true;
             Changed?.Invoke();
         }
 
-        IReadOnlyList<MapKeepOutZone> zones = Zones.ZonesOrDefault;
+        IReadOnlyList<MapKeepOutZone> zones = Zones.ZonesOrEmpty;
         int removing = -1;
 
         for (int i = 0; i < zones.Count; i++)
@@ -199,7 +289,7 @@ public sealed class MapKeepOutEditor
     /// <summary>One draggable box per zone, each one exactly the region it stands for.</summary>
     private void DrawBoxes(int width, int height)
     {
-        IReadOnlyList<MapKeepOutZone> zones = Zones.ZonesOrDefault;
+        IReadOnlyList<MapKeepOutZone> zones = Zones.ZonesOrEmpty;
 
         ImGui.PushStyleColor(ImGuiCol.WindowBg, BoxColour);
         ImGui.PushStyleColor(ImGuiCol.Border, BoxEdge);

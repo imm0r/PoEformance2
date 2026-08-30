@@ -1088,10 +1088,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Everything the map must not be drawn over, this frame.
     /// </summary>
     /// <remarks>
-    /// TWO SOURCES, and they differ in what they are worth. The zones are a description
-    /// somebody gave of where the HUD is, because nothing in memory says; the panel rectangles
-    /// are MEASURED, from the elements the game itself keeps, and cost nothing here because the
-    /// snapshot already read them.
+    /// ALL THREE SOURCES ARE MEASURED but one. The interface parts and the panel rectangles come
+    /// from the elements the game itself keeps, read by the snapshot this frame and costing
+    /// nothing here; the extra zones are the one thing somebody drew by hand, and they are empty
+    /// unless somebody drew one.
     ///
     /// The panels are included whatever <see cref="HideBehindPanels"/> says, which is not a
     /// contradiction of that switch. Turning it off means "do not blank the whole overlay
@@ -1101,6 +1101,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private List<ScreenRect> KeepOutOf(int width, int height)
     {
         List<ScreenRect> keepOut = KeepOut.Blocking(width, height);
+
+        if (KeepOut.On)
+        {
+            foreach (HudPart part in _snapshot.HudParts)
+            {
+                if (KeepOut.Honours(part.Label))
+                {
+                    keepOut.Add(part.Where);
+                }
+            }
+        }
 
         foreach (PanelArea panel in _snapshot.Covering)
         {
@@ -1893,6 +1904,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // indistinguishable from a player with no panel open.
         Chrome.Covering = HideWindowsBehindPanels ? _snapshot.Covering : [];
 
+        // The same arrangement for the interface parts: published every frame, including the
+        // empty case, because the settings page lists what was MEASURED and a remembered list
+        // would show where the orbs were the last time anybody looked at it.
+        _keepOut.Parts = _snapshot.HudParts;
+
         // Nothing is drawn unless the game - or one of OUR windows - is in front. Not
         // tidiness: the overlay is always-on-top and covers the game's whole client area,
         // so every dot painted while the user has alt-tabbed away lands on the browser or
@@ -2624,14 +2640,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Row("terrain", DescribeTerrain(), Measured, figure: true);
         }
 
-        // What the map is actually allowed to draw on, once the interface zones and any open
+        // What the map is actually allowed to draw on, once the game's interface and any open
         // panel are taken out. The one line that separates "the projection is wrong" from "the
-        // keep-out zones ate the map", which look identical from a screenshot: a region in
-        // ZERO pieces is a map covered edge to edge by its own zones, and there is nothing else
-        // in the tool that would say so.
+        // keep-out region ate the map", which look identical from a screenshot: a region in
+        // ZERO pieces is a map covered edge to edge, and there is nothing else in the tool that
+        // would say so. The part count beside it is the other half - a HUD that measured as
+        // nothing and one that was never found look the same on screen and not here.
         Row(
             "map area",
-            ScreenRegion.Of(ScreenRect.Window(width, height), KeepOutOf(width, height)).ToString(),
+            ScreenRegion.Of(ScreenRect.Window(width, height), KeepOutOf(width, height))
+            + $"   (interface {_snapshot.HudParts.Count} parts)",
             Measured,
             figure: true);
 

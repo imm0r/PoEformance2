@@ -371,8 +371,22 @@ public sealed record WorldSnapshot(
     ulong ServerData = 0,
     IReadOnlyList<PanelArea>? PanelAreas = null,
     int AreaLevel = 0,
-    int PlayerLevel = 0)
+    int PlayerLevel = 0,
+
+    // Where the game's own interface is this frame, part by part. Measured rather than
+    // configured - the HUD is an ordinary UiElement and its parts are its children - which is
+    // what lets the map overlay stay off it at any resolution or interface scale. See HudReader.
+    IReadOnlyList<HudPart>? Hud = null)
 {
+    /// <summary>The parts of the game's interface on screen, empty when none were read.</summary>
+    /// <remarks>
+    /// Empty is an ordinary answer and does NOT mean the HUD is gone: a diagnostic run with no
+    /// viewport reads no rectangles at all, and a loading screen has no interface to measure.
+    /// What it means to a caller is "nothing known to keep off", which leaves the overlay
+    /// exactly where it was rather than blanking it.
+    /// </remarks>
+    public IReadOnlyList<HudPart> HudParts => Hud ?? [];
+
     /// <summary>
     /// Whether the player is looking at a panel rather than at the game.
     /// </summary>
@@ -574,6 +588,20 @@ public sealed class WorldReader
     private LandmarkNames _landmarkNames = LandmarkNames.Empty;
     private readonly WorldAreaReader _areas;
     private readonly PanelReader _panels;
+
+    /// <summary>Where the game's own interface is, measured part by part every tick.</summary>
+    private readonly HudReader _hud;
+
+    /// <summary>
+    /// Reused across the readers that walk the interface, and reused for a reason.
+    /// </summary>
+    /// <remarks>
+    /// The class holds only resolved offsets, so sharing it costs nothing - but it is also the
+    /// thing that would have to be built twice a tick otherwise, once for the panels and once
+    /// for the HUD.
+    /// </remarks>
+    private readonly UiElementReader _uiElements;
+
     private readonly TerrainReader _terrain;
     private readonly int _playerInfo;
     private readonly int _serverData;
@@ -630,7 +658,9 @@ public sealed class WorldReader
         _groundItems = new GroundItemReader(reader, schema);
         _mapIcons = new MinimapIconReader(reader, schema);
         _areas = new WorldAreaReader(reader, schema);
-        _panels = new PanelReader(reader, schema, new UiElementReader(reader, schema));
+        _uiElements = new UiElementReader(reader, schema);
+        _panels = new PanelReader(reader, schema, _uiElements);
+        _hud = new HudReader(reader, schema, _uiElements);
         _terrain = new TerrainReader(reader, schema, rotation);
         _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
@@ -1180,12 +1210,29 @@ public sealed class WorldReader
 
         MapView? largeMap = null;
         MapView? miniMap = null;
+        IReadOnlyList<HudPart> hud = [];
         if (scale is UiScale viewport && chain.UiRoot != 0)
         {
             // Order matters: reading the minimap first is what leaves its diagonal cached
             // for the large map, which cannot supply its own.
             miniMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: false);
             largeMap = _mapRadar.Read(chain.UiRoot, viewport, largeMap: true);
+
+            // Where the game's own interface is, so the map overlay can stay off it - the large
+            // map is drawn across the whole window with the orbs and the bars painted on top,
+            // and an overlay has no way underneath.
+            //
+            // THE MAPS AND EVERYTHING THEY HANG UNDER ARE EXCLUDED BY ADDRESS. Whatever the tree
+            // turns out to look like, an element the minimap lives inside must never come back
+            // as a piece of interface: that would take the minimap out of the region it is meant
+            // to be drawn ON, and the radar would stop working while every readout reported a
+            // perfectly healthy HUD.
+            (ulong large, ulong mini) = _mapRadar.Resolve(chain.UiRoot);
+            var notThese = new HashSet<ulong>();
+            _uiElements.AndAncestors(large, notThese);
+            _uiElements.AndAncestors(mini, notThese);
+
+            hud = _hud.Read(chain.UiRoot, viewport, notThese);
         }
 
         // Which panels are in the way and where, from the same interface root that was just
@@ -1238,7 +1285,8 @@ public sealed class WorldReader
             serverData,
             panels.Areas,
             areaLevel,
-            playerLevel);
+            playerLevel,
+            hud);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>
