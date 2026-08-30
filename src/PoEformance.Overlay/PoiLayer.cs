@@ -230,6 +230,17 @@ public sealed class PoiLayer
     }
 
     /// <summary>Draws the markers and the routes onto whichever map is open.</summary>
+    /// <remarks>
+    /// CLIPPED, once per piece of the map that may be drawn on - see <see cref="MapView.Uncovered"/>.
+    /// A marker is a point and could be tested instead, and is; a ROUTE is a line hundreds of
+    /// pixels long that has to be CUT where the game's interface starts rather than dropped,
+    /// and a LABEL runs off to the right of the point that was tested. Only a clip rectangle
+    /// answers either, and ImGui has one at a time.
+    ///
+    /// The places are gathered ONCE, outside the loop: the pieces do not overlap, so a marker
+    /// lands in exactly one of them and the repeated passes cost a rejected point test rather
+    /// than a second marker. Building the list per piece would allocate it per piece per frame.
+    /// </remarks>
     public void DrawOnMap(ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
@@ -237,21 +248,42 @@ public sealed class PoiLayer
 
         ReleaseUnused();
 
-        if (ShowRoutes)
+        List<Place> places = PlacesIn(snapshot);
+
+        foreach (ScreenRect piece in map.Uncovered)
         {
-            foreach (RouteView route in _planner.Routes)
-            {
-                string key = StyleCatalogue.ForRoute(RouteSlot(route.Target));
-                if (Style.Visible(key))
-                {
-                    DrawRoute(draw, map, snapshot, player, route, Style.Colour(key), Style.Width(key, 0f));
-                }
-            }
+            draw.PushClipRect(piece.TopLeft, piece.BottomRight, intersect_with_current_clip_rect: true);
+            DrawRoutes(draw, map, snapshot, player);
+            DrawPlaces(draw, map, places, player);
+            draw.PopClipRect();
+        }
+    }
+
+    /// <summary>Every planned route, in its own colour.</summary>
+    private void DrawRoutes(ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player)
+    {
+        if (!ShowRoutes)
+        {
+            return;
         }
 
+        foreach (RouteView route in _planner.Routes)
+        {
+            string key = StyleCatalogue.ForRoute(RouteSlot(route.Target));
+            if (Style.Visible(key))
+            {
+                DrawRoute(draw, map, snapshot, player, route, Style.Colour(key), Style.Width(key, 0f));
+            }
+        }
+    }
+
+    /// <summary>The landmark markers, and their names when the large map is open.</summary>
+    private void DrawPlaces(
+        ImDrawListPtr draw, MapView map, List<Place> places, WorldEntity player)
+    {
         float radius = map.IsLargeMap ? 5f : 3.5f;
 
-        foreach (Place place in PlacesIn(snapshot))
+        foreach (Place place in places)
         {
             Vector2 at = map.Project(
                 place.WorldX, place.WorldY, place.Height,

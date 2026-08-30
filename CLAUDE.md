@@ -20,6 +20,11 @@ already cost real time on this project.
 - **The AHK tool** (`imm0r/PoEformance`, `ahk/`) is battle-tested against PoE2 specifically
   and carries drift history the upstream does not. Its `CLAUDE.md` is a long record of
   problems already solved.
+- **This tool's own interface browser** is a reference too, and the easiest one to forget
+  because it is not a file: the Interface tree tab walks the live UI element tree, prints
+  every element's StringId, rectangle, flags and child path, and F8 picks whatever is under
+  the cursor. Any question of the form "does the game name that thing, and where is it" is
+  one screenshot away — ask it there before concluding that something cannot be measured.
 - Do not trust a summarised directory listing over the real thing. A tree summary once
   reported "no Radar plugin" for a repo that plainly has one, and that wrong answer was
   taken at face value.
@@ -27,10 +32,20 @@ already cost real time on this project.
 What guessing produced, for the record: a matrix invariant that rejected the correct offset
 and accepted a decoy; a projection "proven" by a check that a wrong matrix passes trivially;
 a 52-pixel offset explained by an invented theory about HUD framing; markers moved onto
-`TerrainHeight`, which belongs to a different coordinate system entirely; and a hand-written
+`TerrainHeight`, which belongs to a different coordinate system entirely; a hand-written
 parser for the game's key bindings that missed both the `Input_flask_4_primary` spelling and
 the fact that a numeric value is a decimal VIRTUAL-KEY CODE (`81` is Q, not the 8 and 1
-keys). Each was a one-minute lookup away.
+keys); and a whole feature built to have the USER say where the HUD is, on the conclusion
+that the game does not name its parts — while the tool's own browser lists the HUD as an
+element called `HUD` with `life_orb`, `mana_orb` and `experience_bar` as its children. Each
+was a one-minute lookup away.
+
+That last one is the variant to watch for, because it does not feel like guessing: the
+reference projects were checked, neither had an answer, and "not measurable" followed. **The
+absence of an answer in the reference is not evidence of absence in the game.** GameHelper2's
+Radar has the user drag a culling window over their own screen; that is what the reference
+does, not what the game permits. Check what the game actually exposes before adopting
+somebody else's workaround.
 
 The game's own files are reference material too, not just the two projects above. The flask
 keys live in `poe2_production_Config.ini`, so the tool reads them rather than assuming the

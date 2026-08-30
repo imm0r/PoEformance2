@@ -852,6 +852,58 @@ interesting part was not the feature:
   a panel is the status quo, an overlay that vanished is a bug report nobody can act on), the
   answer is a flags enum rather than a bool so the status window can name the panel that is
   stuck, and there is a switch to stop asking.
+- **Getting out of the way of the game's own HUD, which is a different problem.** A panel is
+  open or shut and the answer is to stop drawing; the HUD is ALWAYS there and the answer cannot
+  be. The large map is the case: the game draws it across the whole window — its UI element says
+  so, and the element is right — and then paints the orbs, the flask and skill bars and the
+  experience strip on top of it. Everything this tool projects onto that map therefore landed on
+  the interface too, and a terrain outline over the life orb hides the one number a player is
+  watching. An overlay sits above the game and cannot be painted under anything, so the only way
+  to be underneath the HUD is to not be there.
+  - **A region, not a rectangle.** "Everywhere except those four places" is not a rectangle, so
+    `ScreenRegion` is a rectangle with holes and a partition of what is left. Point markers ask
+    `MapView.Contains`, which every one of them already did; the layers drawing CONTINUOUS
+    geometry — the terrain quad, a route line — draw once per piece, because ImGui clips to one
+    rectangle at a time. The pieces do not overlap, so nothing is drawn twice, and a route
+    crossing the HUD is CUT at its edge rather than dropped whole.
+  - **The HUD is MEASURED, and the first attempt at this got that wrong.** It shipped as boxes
+    the user drags over their own orbs, with a guessed band across the bottom as the default,
+    on the belief that nothing in memory named the pieces of the interface — `ImportantUiElements`
+    carries the panels and the maps and stops, and the reference has no answer either
+    (GameHelper2's Radar has the user drag a "culling window" once and remembers it). That
+    belief was wrong, and this project's own interface browser is what disproved it in a single
+    screenshot: the HUD is one UiElement with StringId `"HUD"` among the UI root's own children,
+    and its parts are its children — `experience_bar`, `life_orb`, `mana_orb`, `magma_mana_orb`,
+    `botleft_buttons_layout`, `HUDLeft`, `HUDRight`, the orb frames — each carrying its own
+    position and size like anything else in the tree. `HudReader` reads them every tick, so the
+    region holds at any resolution and any interface scale, with nothing eyeballed. **The tool
+    had already built the thing that answers this question and the question was asked without
+    using it.** That is the CLAUDE.md rule ("never guess — read the reference") failing against
+    the project's own code rather than against somebody else's.
+  - **Found by its id, not its index.** The HUD sits at child 97 of the root in this build, and
+    a position in a list of 156 siblings is the most fragile thing this could depend on: one
+    element inserted above it moves everything below, the wrong element is measured, and the map
+    is kept off a rectangle that is not there — silently, because a rectangle is a rectangle.
+    The index is a first guess, verified against the id; a miss falls back to a scan of the
+    root's children. The address is cached and re-checked each frame (it must still answer to
+    `"HUD"`), so an area change or a patch costs one scan rather than a wrong answer.
+  - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
+    the minimap lives under must never come back as a piece of interface — that would take the
+    minimap out of the region it is meant to be drawn ON, and the radar would stop working while
+    every readout showed a healthy HUD. Their ancestors are walked once and skipped by address,
+    at both levels the measurement descends.
+  - **A part can be switched off by name, and that is all the setting there is.** Some of these
+    parts are containers, and a container reporting a rectangle far larger than what it draws
+    would quietly eat the map — the atlas panel has form here, stating an extent 733 pixels
+    narrower than the screen it covers. Every measured part is listed with the number it
+    produced and how that number was arrived at (its own extent, or what its children cover), so
+    an over-claiming part names itself instead of looking like a broken projection. The
+    hand-dragged boxes survive as an EXTRA, empty by default, for what measurement cannot reach:
+    another overlay parked over the game, a widget, a part whose element understates itself.
+  - **Open panels are added to the same region, measured.** Those the tool CAN measure, so they
+    are not guessed at: the rectangles `PanelReader` already read this frame go in beside the
+    zones. That happens whatever "hide behind big panels" says — turning that off means "do not
+    blank the whole overlay", not "paint the level layout across my stash".
 
 ### Rules — the one feature whose configuration is a LANGUAGE
 

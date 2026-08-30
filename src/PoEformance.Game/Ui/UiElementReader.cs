@@ -327,6 +327,24 @@ public sealed class UiElementReader
         => IsUiElement(address)
            && (_reader.Read<uint>(address + (ulong)_flags) & _flagIsVisible) != 0;
 
+    /// <summary>Adds this element and every ancestor of it to <paramref name="into"/>.</summary>
+    /// <remarks>
+    /// The cheap way to ask "is this element inside that one" for a handful of elements whose
+    /// identity matters: the chain is a pointer each element already holds, so walking UP is a
+    /// few reads, while searching down from the candidate is the whole subtree. What it is for
+    /// is <c>HudReader</c>, which must never report an element the maps live under as part of
+    /// the interface - that would take the minimap out of the region it is drawn on.
+    /// </remarks>
+    public void AndAncestors(ulong address, ISet<ulong> into)
+    {
+        ArgumentNullException.ThrowIfNull(into);
+
+        for (int depth = 0; depth <= _maxDepth && IsUiElement(address) && into.Add(address); depth++)
+        {
+            address = _reader.ReadPointer(address + (ulong)_parent);
+        }
+    }
+
     /// <summary>Reads the element's child pointers.</summary>
     public List<ulong> Children(ulong address, int max = 512)
     {

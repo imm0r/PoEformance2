@@ -19,6 +19,17 @@ namespace PoEformance.Game.Ui;
 /// <param name="Top">Top edge of that rectangle.</param>
 /// <param name="Width">Width of that rectangle.</param>
 /// <param name="Height">Height of that rectangle.</param>
+/// <param name="Region">
+/// Where on that rectangle anything may actually be DRAWN, or null for all of it.
+///
+/// The two are not the same question and the large map is why. Its rectangle is the whole
+/// window - the game draws it edge to edge - but the game's own interface is painted ON TOP
+/// of it, and an overlay has no way underneath. So the rectangle stays the map's extent, which
+/// is what the projection is bounded by, and this carries the holes the interface punches in
+/// it. See <see cref="ScreenRegion"/>; it is attached by <see cref="Within"/> at draw time,
+/// because what covers the map is a decision about the overlay rather than a fact about
+/// the game's memory.
+/// </param>
 public readonly record struct MapView(
     Vector2 Centre,
     float Diagonal,
@@ -28,21 +39,66 @@ public readonly record struct MapView(
     float Left = 0f,
     float Top = 0f,
     float Width = 0f,
-    float Height = 0f)
+    float Height = 0f,
+    ScreenRegion? Region = null)
 {
     /// <summary>
-    /// True when a projected point falls on this map.
+    /// True when a projected point falls on this map AND on a part of it worth drawing on.
     /// </summary>
     /// <remarks>
     /// Markers are placed by projecting a world delta, which happily lands hundreds of
     /// pixels outside a minimap the size of a postage stamp - and a marker outside the map
     /// it belongs to is just a dot floating in the middle of the game. A map with no
     /// measured rectangle accepts everything rather than rejecting everything.
+    ///
+    /// THE ONE GATE every marker on the map already passes through, which is why the keep-out
+    /// region is answered here rather than at each layer: dots, landmarks, heat patches and
+    /// unwalked marks all ask this, so they all stop at the interface without a line of their
+    /// own. Only the layers drawing CONTINUOUS geometry - the terrain quad, a route line -
+    /// need more than a yes or no; those clip to <see cref="Uncovered"/>.
     /// </remarks>
     public bool Contains(Vector2 point)
-        => Width <= 0 || Height <= 0
-           || (point.X >= Left && point.X <= Left + Width
-               && point.Y >= Top && point.Y <= Top + Height);
+        => (Width <= 0 || Height <= 0
+            || (point.X >= Left && point.X <= Left + Width
+                && point.Y >= Top && point.Y <= Top + Height))
+           && (Region is null || Region.Contains(point));
+
+    /// <summary>
+    /// The pieces of this map that may be drawn on, for anything that cannot be point-tested.
+    /// </summary>
+    /// <remarks>
+    /// One rectangle in the ordinary case, and the map's own when no region was attached. A
+    /// caller clips to each in turn and draws its geometry once per piece: the pieces do not
+    /// overlap, so nothing is drawn twice, and a line crossing the interface is cut at the
+    /// edge rather than dropped whole.
+    /// </remarks>
+    public IReadOnlyList<ScreenRect> Uncovered
+        => Region?.Free ?? [Rectangle];
+
+    /// <summary>The rectangle this map occupies, edges rather than position and size.</summary>
+    /// <remarks>
+    /// A map with no measured size claims the whole of a very large rectangle, which is the
+    /// same "accepts everything" answer <see cref="Contains"/> gives - a caller must never
+    /// have to check for the zero case twice, in two different shapes.
+    /// </remarks>
+    public ScreenRect Rectangle
+        => Width > 0 && Height > 0
+            ? new ScreenRect(Left, Top, Left + Width, Top + Height)
+            : new ScreenRect(-100_000f, -100_000f, 100_000f, 100_000f);
+
+    /// <summary>
+    /// The same map, told which parts of the screen it must keep off.
+    /// </summary>
+    /// <remarks>
+    /// The region is intersected with the map's own rectangle rather than replacing it: the
+    /// minimap sits inside its own frame and the keep-out zones are described against the
+    /// window, so a zone that misses the minimap entirely must not widen it.
+    /// </remarks>
+    public MapView Within(IEnumerable<ScreenRect> keepOut)
+    {
+        ArgumentNullException.ThrowIfNull(keepOut);
+        return this with { Region = ScreenRegion.Of(Rectangle, keepOut) };
+    }
 
     /// <summary>The map's fixed viewing angle. Not the 3D camera's - the map has its own.</summary>
     public const double CameraAngle = 38.7 * Math.PI / 180.0;
@@ -220,7 +276,13 @@ public sealed class MapRadarReader
                                  + (scale.WindowHeight * (double)scale.WindowHeight)));
 
         // The large map's own UnscaledSize reads 0, so there is no rectangle to clip to -
-        // it covers the window, which is the honest bound for it anyway.
+        // it covers the window, which is the honest bound for it anyway: the game really does
+        // draw this map edge to edge.
+        //
+        // WHICH IS NOT THE SAME AS "anything may be drawn anywhere on it". The game paints its
+        // own interface over the top - the orbs, the bars, an open panel - and an overlay cannot
+        // get underneath. That is a decision about drawing rather than a fact about memory, so
+        // it is not made here: see MapView.Within and MapView.Region.
         return new MapView(
             centre, diagonal, ReadZoom(address), IsLargeMap: true, Visible: element.Visible,
             0f, 0f, scale.WindowWidth, scale.WindowHeight);

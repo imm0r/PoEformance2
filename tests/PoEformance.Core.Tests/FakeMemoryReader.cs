@@ -75,8 +75,21 @@ public sealed class FakeMemoryReader : IMemoryReader
         return PlaceUtf16(dataAddress, text);
     }
 
+    /// <summary>
+    /// How many reads have been served, so a test can assert on the COST of one.
+    /// </summary>
+    /// <remarks>
+    /// Some of what this project does is only correct because it is cheap - a cache that is
+    /// re-checked rather than rebuilt, a parent chain walked once for a list of siblings - and
+    /// the difference between the fast arrangement and the slow one is invisible in the answer
+    /// both produce. Counting reads is the only way such a decision can be tested at all.
+    /// </remarks>
+    public long Reads { get; private set; }
+
     public bool TryRead(ulong address, Span<byte> destination)
     {
+        Reads++;
+
         if (destination.IsEmpty)
         {
             return false;

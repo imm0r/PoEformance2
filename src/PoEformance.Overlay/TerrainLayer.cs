@@ -157,16 +157,20 @@ public sealed class TerrainLayer : IDisposable
             return;
         }
 
-        // Clipped to the map's own rectangle, so a grid larger than the minimap does not
-        // spill the level layout across the whole screen.
-        draw.PushClipRect(
-            new Vector2(map.Left, map.Top),
-            new Vector2(map.Left + map.Width, map.Top + map.Height),
-            intersect_with_current_clip_rect: true);
-
-        DrawQuad(draw, map, grid, player);
-
-        draw.PopClipRect();
+        // Clipped to the parts of the map that may be drawn on, so a grid larger than the
+        // minimap does not spill the level layout across the whole screen - and so the outline
+        // stops at the game's own interface instead of running over the orbs and the skill bar.
+        //
+        // ONE PASS PER PIECE, because ImGui clips to a single rectangle and the region has
+        // holes in it. That is affordable precisely because this layer is ONE quad: a piece
+        // costs four projections and an AddImageQuad, and the pieces do not overlap, so no
+        // pixel is drawn twice however many there are. The ordinary case is one piece.
+        foreach (ScreenRect piece in map.Uncovered)
+        {
+            draw.PushClipRect(piece.TopLeft, piece.BottomRight, intersect_with_current_clip_rect: true);
+            DrawQuad(draw, map, grid, player);
+            draw.PopClipRect();
+        }
     }
 
     /// <summary>

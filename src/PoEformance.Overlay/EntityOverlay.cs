@@ -350,6 +350,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _healthBars.OnlyWhenHurt = settings.HealthBarsOnlyWhenHurt;
         HideBehindPanels = settings.HideBehindPanels;
         HideWindowsBehindPanels = settings.HideWindowsBehindPanels;
+        KeepOut = settings.MapKeepOutOrDefault;
         _projectiles.Enabled = settings.ShowProjectiles;
         _projectiles.ShowTrails = settings.ProjectileTrails;
         _projectiles.ShowPaths = settings.ProjectilePaths;
@@ -426,6 +427,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
             HideBehindPanels = HideBehindPanels,
             HideWindowsBehindPanels = HideWindowsBehindPanels,
+            MapKeepOut = KeepOut,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -552,6 +554,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly UnwalkedLayer _unwalked = new();
     private readonly HeatLayer _heat = new();
     private readonly EffectLayer _effects = new();
+
+    /// <summary>Where the game's interface is, and the boxes for saying so.</summary>
+    /// <remarks>
+    /// The editor OWNS the zones rather than holding a copy of them - see the
+    /// <see cref="KeepOut"/> property, which reads straight through it. Two records of the same
+    /// setting drift, and the one that gets saved is the one nobody is looking at.
+    /// </remarks>
+    private readonly MapKeepOutEditor _keepOut = new();
 
     /// <summary>
     /// The Stash tab's four network switches, as loaded, until the stores exist to take them.
@@ -997,6 +1007,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             0, Status, "Live readout", () => DrawStatusTab(_viewport.X, _viewport.Y),
             page: Status, pageLabel: "Status");
 
+        // Dragging a zone is a settings change like any switch, and it has to reach the file:
+        // the whole value of saying where the interface is, is not saying it again next launch.
+        _keepOut.Changed = () => SettingsChanged?.Invoke();
+
         ShareChrome();
     }
 
@@ -1056,6 +1070,56 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <see cref="WindowChrome.Covered"/>, which also records the ways back.
     /// </remarks>
     public bool HideWindowsBehindPanels { get; set; } = true;
+
+    /// <summary>
+    /// Where the game's own interface sits, so the map overlay keeps off it.
+    /// </summary>
+    /// <remarks>
+    /// Edited by <see cref="MapKeepOutEditor"/> and saved with the rest of the settings. See
+    /// <see cref="Features.MapKeepOut"/> for what the zones are and why they are not measured.
+    /// </remarks>
+    public MapKeepOut KeepOut
+    {
+        get => _keepOut.Zones;
+        set => _keepOut.Zones = value;
+    }
+
+    /// <summary>
+    /// Everything the map must not be drawn over, this frame.
+    /// </summary>
+    /// <remarks>
+    /// ALL THREE SOURCES ARE MEASURED but one. The interface parts and the panel rectangles come
+    /// from the elements the game itself keeps, read by the snapshot this frame and costing
+    /// nothing here; the extra zones are the one thing somebody drew by hand, and they are empty
+    /// unless somebody drew one.
+    ///
+    /// The panels are included whatever <see cref="HideBehindPanels"/> says, which is not a
+    /// contradiction of that switch. Turning it off means "do not blank the whole overlay
+    /// because a panel is open" - it has never meant "paint the level layout across my stash",
+    /// and painting across the stash is the state that made this necessary.
+    /// </remarks>
+    private List<ScreenRect> KeepOutOf(int width, int height)
+    {
+        List<ScreenRect> keepOut = KeepOut.Blocking(width, height);
+
+        if (KeepOut.On)
+        {
+            foreach (HudPart part in _snapshot.HudParts)
+            {
+                if (KeepOut.Honours(part.Label))
+                {
+                    keepOut.Add(part.Where);
+                }
+            }
+        }
+
+        foreach (PanelArea panel in _snapshot.Covering)
+        {
+            keepOut.Add(new ScreenRect(panel.Left, panel.Top, panel.Right, panel.Bottom));
+        }
+
+        return keepOut;
+    }
 
     /// <summary>
     /// Optional: read cost, completed reads and failures from the reader thread.
@@ -1840,6 +1904,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // indistinguishable from a player with no panel open.
         Chrome.Covering = HideWindowsBehindPanels ? _snapshot.Covering : [];
 
+        // The same arrangement for the interface parts: published every frame, including the
+        // empty case, because the settings page lists what was MEASURED and a remembered list
+        // would show where the orbs were the last time anybody looked at it.
+        _keepOut.Parts = _snapshot.HudParts;
+
         // Nothing is drawn unless the game - or one of OUR windows - is in front. Not
         // tidiness: the overlay is always-on-top and covers the game's whole client area,
         // so every dot painted while the user has alt-tabbed away lands on the browser or
@@ -1909,7 +1978,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // Markers go ON THE MAP, not over the 3D scene. Scattering dots across the game
             // world puts them between the player and what they are fighting; the map is
             // where a radar belongs, and it is where the game already draws its own.
-            DrawMapDots();
+            DrawMapDots(width, height);
 
             // UNDER everything else in world space, because it is drawn ON the ground and
             // filled rings would otherwise cover the markers standing in them.
@@ -2066,6 +2135,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _poi?.DrawPicker(_snapshot, _snapshot.Player);
 
         _tools.Render();
+
+        // AFTER the tools, so a zone box being dragged sits over the page that switched it on
+        // rather than under it. It draws nothing at all unless somebody asked to see the boxes.
+        _keepOut.Draw(width, height);
 
         // A window rather than something painted, so it can be closed and moved - which means
         // it belongs here with the windows and not in the drawing pass.
@@ -2567,6 +2640,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Row("terrain", DescribeTerrain(), Measured, figure: true);
         }
 
+        // What the map is actually allowed to draw on, once the game's interface and any open
+        // panel are taken out. The one line that separates "the projection is wrong" from "the
+        // keep-out region ate the map", which look identical from a screenshot: a region in
+        // ZERO pieces is a map covered edge to edge, and there is nothing else in the tool that
+        // would say so. The part count beside it is the other half - a HUD that measured as
+        // nothing and one that was never found look the same on screen and not here.
+        Row(
+            "map area",
+            ScreenRegion.Of(ScreenRect.Window(width, height), KeepOutOf(width, height))
+            + $"   (interface {_snapshot.HudParts.Count} parts)",
+            Measured,
+            figure: true);
+
         if (_snapshot.Player is not WorldEntity player)
         {
             return;
@@ -2676,6 +2762,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             SettingsChanged?.Invoke();
         }
 
+        _keepOut.DrawControls();
+
         bool labels = ShowLabels;
         if (ImGui.Checkbox("Name labels beside the dots", ref labels))
         {
@@ -2767,8 +2855,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// is clipped to the chosen map's rectangle: the projection places a marker by world
     /// distance, which lands far outside a minimap for anything further away than its edge,
     /// and a marker outside its map is just a dot in the middle of the game.
+    ///
+    /// AND TO WHAT IS LEFT OF THAT RECTANGLE once the game's own interface is taken out of it.
+    /// The large map's rectangle IS the window - the game draws it edge to edge and paints the
+    /// orbs, the bars and any open panel on top - so clipping to the rectangle alone leaves
+    /// this drawing over every one of them, which is the state this replaced. See
+    /// <see cref="MapKeepOut"/> for where the zones come from and why they are settings.
     /// </remarks>
-    private void DrawMapDots()
+    private void DrawMapDots(int width, int height)
     {
         if (_snapshot.Player is not WorldEntity player)
         {
@@ -2782,6 +2876,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (chosen is not MapView map)
         {
             return; // neither map on screen - the player hid them, so hide with them
+        }
+
+        map = map.Within(KeepOutOf(width, height));
+        if (map.Uncovered.Count == 0)
+        {
+            return; // the interface has the whole map; nothing to draw on
         }
 
         ImDrawListPtr draw = ImGui.GetBackgroundDrawList();

@@ -31,6 +31,13 @@ public sealed record OverlaySettings(
     // actually lying over an open panel go; see WindowChrome.Covered.
     [property: JsonPropertyName("hideWindowsBehindPanels")] bool HideWindowsBehindPanels = true,
 
+    // Where the game's own interface sits, so the map overlay stays off it. Its own object
+    // rather than four numbers out here, for the same reason the interface style below is:
+    // a settings file stops being readable at the point everything shares one level. Null
+    // until somebody drags a zone, so an untouched file gains no key and the default stays
+    // where a release can correct it. See MapKeepOut - including why it is a setting at all.
+    [property: JsonPropertyName("mapKeepOut")] MapKeepOut? MapKeepOut = null,
+
     // The projectile marks. On by default, because unlike the effect and terrain debug
     // layers this is a playing feature: it costs nothing extra to read - a projectile is
     // an entity the reader already walks past - and what it draws is small and brief.
@@ -112,6 +119,9 @@ public sealed record OverlaySettings(
     /// gains no key at all and the defaults stay where they can be corrected in a release.
     /// </remarks>
     public InterfaceStyle InterfaceOrDefault => Interface ?? InterfaceStyle.Default;
+
+    /// <summary>Where the game's interface is, as edited or as it ships.</summary>
+    public MapKeepOut MapKeepOutOrDefault => MapKeepOut ?? Features.MapKeepOut.Default;
 
     /// <summary>The hidden tab ids, empty until somebody hides one.</summary>
     public IReadOnlyList<string> HiddenTabsOrEmpty => HiddenTabs ?? [];
