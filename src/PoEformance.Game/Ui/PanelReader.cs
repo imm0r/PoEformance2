@@ -79,8 +79,28 @@ public enum PanelExtent
 /// can see. So a window asks about the ground it covers rather than about the panel - see
 /// <c>WindowChrome.Covered</c>.
 /// </remarks>
+/// <param name="Measured">
+/// What the element ACTUALLY says it covers, where it says anything - as against the rectangle
+/// above, which for a screen-filling kind is the whole window by decision rather than by
+/// reading.
+///
+/// TWO ANSWERS BECAUSE TWO CALLERS WANT OPPOSITE THINGS FROM BEING WRONG. A window of the
+/// tool's own asks "am I in the way", and over-answering costs a hidden window, which is why
+/// the kinds that pan a viewport are taken as the whole screen (see <c>WholeScreen</c>). A
+/// LAYER drawn on the atlas asks "what is on top of me", and over-answering there erases the
+/// feature: the atlas skill panel is a column down one side, and treating it as the screen
+/// would leave the atlas overlay drawing nothing at all while most of the atlas is visible.
+/// So that caller takes this instead, and skips a panel that could not be measured - failing
+/// towards drawing, like every other unreadable answer in these readers.
+/// </param>
 public readonly record struct PanelArea(
-    GamePanel Panel, float Left, float Top, float Right, float Bottom, PanelExtent From)
+    GamePanel Panel,
+    float Left,
+    float Top,
+    float Right,
+    float Bottom,
+    PanelExtent From,
+    ScreenRect? Measured = null)
 {
     /// <summary>Whether a rectangle in window pixels touches this one at all.</summary>
     /// <remarks>
@@ -317,17 +337,32 @@ public sealed class PanelReader
     /// </remarks>
     private void Where(GamePanel panel, ulong element, UiScale scale, List<PanelArea> areas)
     {
+        (float Left, float Top, float Right, float Bottom, PanelExtent From)? read =
+            Own(element, scale) ?? Drawn(element, scale);
+
+        // Kept even for the screen-filling kinds, whose rectangle below is a decision rather
+        // than a reading. The measurement is still worth having: a caller that draws ON one of
+        // these - the atlas overlay - needs to know that the panel beside it is a column and
+        // not the screen, and the decision that is right for hiding a window would erase it.
+        ScreenRect? sized = read is { } was
+            ? new ScreenRect(was.Left, was.Top, was.Right, was.Bottom).ClippedTo(
+                ScreenRect.Window(scale.WindowWidth, scale.WindowHeight))
+            : null;
+
+        if (sized is { HasArea: false })
+        {
+            sized = null;
+        }
+
         if ((panel & WholeScreen) != 0)
         {
             areas.Add(new PanelArea(
-                panel, 0f, 0f, scale.WindowWidth, scale.WindowHeight, PanelExtent.Kind));
+                panel, 0f, 0f, scale.WindowWidth, scale.WindowHeight, PanelExtent.Kind, sized));
             return;
         }
 
         (float Left, float Top, float Right, float Bottom, PanelExtent From) measured =
-            Own(element, scale)
-            ?? Drawn(element, scale)
-            ?? (0f, 0f, scale.WindowWidth, scale.WindowHeight, PanelExtent.Unmeasured);
+            read ?? (0f, 0f, scale.WindowWidth, scale.WindowHeight, PanelExtent.Unmeasured);
 
         float left = Math.Max(measured.Left, 0f);
         float top = Math.Max(measured.Top, 0f);
@@ -339,7 +374,7 @@ public sealed class PanelReader
             return; // off the side of the screen, or nothing left of it once clipped
         }
 
-        areas.Add(new PanelArea(panel, left, top, right, bottom, measured.From));
+        areas.Add(new PanelArea(panel, left, top, right, bottom, measured.From, sized));
     }
 
     /// <summary>The rectangle the panel element itself claims, or null when it claims none.</summary>

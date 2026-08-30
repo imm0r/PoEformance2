@@ -1122,6 +1122,49 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>
+    /// Everything the ATLAS layers must not be drawn over, this frame.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME PROBLEM AS THE MAP'S, and it needs a different list for two reasons.
+    ///
+    /// The atlas panel IS what these layers draw on, so it cannot be kept out of - which the
+    /// map's list would do the moment the atlas is open, leaving the web, the routes and the
+    /// labels with nowhere to go.
+    ///
+    /// And a panel BESIDE the atlas has to be taken at its measured size rather than at the
+    /// whole screen. <c>PanelReader</c> reports the panning kinds as screen-filling on purpose,
+    /// because over-answering only costs a hidden window there; here it would erase the feature,
+    /// since the atlas skill panel is a column down one side with most of the atlas still
+    /// visible. So this uses <c>PanelArea.Measured</c> and SKIPS a panel that could not be
+    /// measured - failing towards drawing, like every other unreadable answer in these readers.
+    /// </remarks>
+    private List<ScreenRect> KeepOutOfAtlas(int width, int height)
+    {
+        List<ScreenRect> keepOut = KeepOut.Blocking(width, height);
+
+        if (KeepOut.On)
+        {
+            foreach (HudPart part in _snapshot.HudParts)
+            {
+                if (KeepOut.Honours(part.Label))
+                {
+                    keepOut.Add(part.Where);
+                }
+            }
+        }
+
+        foreach (PanelArea panel in _snapshot.Covering)
+        {
+            if (panel.Panel != GamePanel.Atlas && panel.Measured is ScreenRect where)
+            {
+                keepOut.Add(where);
+            }
+        }
+
+        return keepOut;
+    }
+
+    /// <summary>
     /// Optional: read cost, completed reads and failures from the reader thread.
     /// </summary>
     /// <remarks>
@@ -2050,6 +2093,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _atlas.ShowNames = drawing.Names;
             _atlas.TextScale = drawing.Writing;
 
+            // The atlas is drawn across the whole window with the game's own interface painted
+            // over it, exactly as the large map is - so the web, the routes and the labels get
+            // the same treatment. Built once here for both layers, since they draw on the same
+            // panel and would otherwise disagree about what is covering it.
+            var covering = ScreenRegion.Of(
+                ScreenRect.Window(width, height), KeepOutOfAtlas(width, height));
+            _atlas.Region = covering;
+
             // Published from HERE because this is the thread that has it. ImGui's mouse position
             // is the real cursor even while the game has focus and the overlay is click-through:
             // the library re-reads it from the system every frame rather than from the messages
@@ -2063,6 +2114,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (_ritualWatch is not null && _ritualWindow is not null)
             {
                 _ritual.TextScale = drawing.Writing;
+                _ritual.Region = covering;
                 _ritual.Draw(ImGui.GetBackgroundDrawList(), _ritualWatch.View, _ritualWindow.Picked);
             }
         }
@@ -2652,6 +2704,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             + $"   (interface {_snapshot.HudParts.Count} parts)",
             Measured,
             figure: true);
+
+        // The atlas keeps off a DIFFERENT list - it may not keep off the panel it is drawn on,
+        // and it takes a neighbouring panel at its measured size rather than at the whole
+        // screen. Two regions means two ways for one of them to come out empty, so both say so.
+        if ((_snapshot.Panels & GamePanel.Atlas) != 0)
+        {
+            Row(
+                "atlas area",
+                ScreenRegion.Of(ScreenRect.Window(width, height), KeepOutOfAtlas(width, height))
+                    .ToString(),
+                Measured,
+                figure: true);
+        }
 
         if (_snapshot.Player is not WorldEntity player)
         {

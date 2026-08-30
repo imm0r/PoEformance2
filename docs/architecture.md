@@ -892,6 +892,25 @@ interesting part was not the feature:
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while
     every readout showed a healthy HUD. Their ancestors are walked once and skipped by address,
     at both levels the measurement descends.
+  - **The atlas has the same problem and needs a different list.** Its panel is drawn across the
+    whole window too, with the orbs, an open inventory and an atlas skill panel painted over it,
+    so the web, the routes and the labels landed on all of them. It keeps off the same measured
+    HUD, but two things differ. It may not keep off the ATLAS panel — that is what it draws on,
+    and the map's list would leave it nowhere to go. And a panel BESIDE it is taken at its
+    measured size rather than at the whole screen: `PanelReader` reports the panning kinds as
+    screen-filling on purpose, because over-answering only costs a hidden window there, while
+    here it would erase the feature. So `PanelArea` carries both answers — the conservative
+    rectangle for windows, the reading for this — and the atlas skips a panel that could not be
+    measured, failing towards drawing.
+  - **Lines are CUT, text is all-or-nothing.** On the atlas the lines are the content: a
+    connection dropped because it clips the corner of a panel is a route that silently is not
+    there. So each segment is cut against the keep-out rectangles in its own parameter space
+    (Liang-Barsky, then the gaps between the blocked intervals) — a segment touching nothing
+    costs four comparisons per rectangle and comes back whole, which is nearly all of them.
+    Redrawing per free piece was the alternative and is not affordable at a couple of thousand
+    connections. Text goes the other way: half a name plate cut off by a clip rectangle is a
+    word broken mid-letter, so a plate that overlaps anything is not drawn at all, and the
+    contents under a skipped name keep their positions rather than shifting up into it.
   - **A part can be switched off by name, and that is all the setting there is.** Some of these
     parts are containers, and a container reporting a rectangle far larger than what it draws
     would quietly eat the map — the atlas panel has form here, stating an extent 733 pixels

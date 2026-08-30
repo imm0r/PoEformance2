@@ -185,6 +185,192 @@ public class ScreenRegionTests
         }
     }
 
+    [Fact]
+    public void ALineThroughAKeepOutIsCutRatherThanDropped()
+    {
+        // WHY CUT AND NOT DROP: on the atlas the lines ARE the content, and a connection removed
+        // because it clips the corner of an open panel is a route that silently is not there.
+        ScreenRegion region = ScreenRegion.Of(Screen, [new ScreenRect(1000f, 0f, 1400f, 1440f)]);
+
+        List<(Vector2 From, Vector2 To)> pieces = [];
+        region.ClipSegment(new Vector2(0f, 700f), new Vector2(2560f, 700f), pieces);
+
+        Assert.Equal(2, pieces.Count);
+        Assert.Equal(new Vector2(0f, 700f), pieces[0].From);
+        Assert.Equal(new Vector2(1000f, 700f), pieces[0].To);
+        Assert.Equal(new Vector2(1400f, 700f), pieces[1].From);
+        Assert.Equal(new Vector2(2560f, 700f), pieces[1].To);
+    }
+
+    [Fact]
+    public void ALineClearOfEverythingComesBackWhole()
+    {
+        // The case almost every line is in, and the one that has to stay cheap: no allocation
+        // of intervals, one piece out, the same two endpoints in.
+        ScreenRegion region = ScreenRegion.Of(Screen, [new ScreenRect(0f, 1152f, 2560f, 1440f)]);
+
+        List<(Vector2 From, Vector2 To)> pieces = [];
+        region.ClipSegment(new Vector2(100f, 200f), new Vector2(900f, 400f), pieces);
+
+        (Vector2 from, Vector2 to) = Assert.Single(pieces);
+        Assert.Equal(new Vector2(100f, 200f), from);
+        Assert.Equal(new Vector2(900f, 400f), to);
+    }
+
+    [Fact]
+    public void ALineWhollyInsideAKeepOutDisappears()
+    {
+        ScreenRegion region = ScreenRegion.Of(Screen, [new ScreenRect(900f, 600f, 1600f, 900f)]);
+
+        List<(Vector2 From, Vector2 To)> pieces = [];
+        region.ClipSegment(new Vector2(1000f, 700f), new Vector2(1500f, 800f), pieces);
+
+        Assert.Empty(pieces);
+    }
+
+    [Fact]
+    public void ALineIsCutByEveryKeepOutItCrosses()
+    {
+        // Several bites out of one connection, which is the ordinary case on the atlas: the
+        // interface is a row of parts along the bottom and a line runs the width of the screen.
+        ScreenRegion region = ScreenRegion.Of(
+            Screen,
+            [
+                new ScreenRect(300f, 0f, 500f, 1440f),
+                new ScreenRect(1200f, 0f, 1500f, 1440f),
+                new ScreenRect(2000f, 0f, 2100f, 1440f),
+            ]);
+
+        List<(Vector2 From, Vector2 To)> pieces = [];
+        region.ClipSegment(new Vector2(0f, 100f), new Vector2(2560f, 100f), pieces);
+
+        Assert.Equal(4, pieces.Count);
+        Assert.Equal(0f, pieces[0].From.X);
+        Assert.Equal(300f, pieces[0].To.X);
+        Assert.Equal(500f, pieces[1].From.X);
+        Assert.Equal(2560f, pieces[3].To.X);
+        Assert.All(pieces, piece => Assert.Equal(100f, piece.From.Y));
+    }
+
+    [Fact]
+    public void OverlappingKeepOutsCutOneHoleInALineRatherThanTwo()
+    {
+        // The intervals have to be merged, or the second one re-opens the piece the first
+        // closed and a stub of line is drawn back across the panel.
+        ScreenRegion region = ScreenRegion.Of(
+            Screen,
+            [
+                new ScreenRect(600f, 0f, 1200f, 1440f),
+                new ScreenRect(1000f, 0f, 1800f, 1440f),
+            ]);
+
+        List<(Vector2 From, Vector2 To)> pieces = [];
+        region.ClipSegment(new Vector2(0f, 500f), new Vector2(2560f, 500f), pieces);
+
+        Assert.Equal(2, pieces.Count);
+        Assert.Equal(600f, pieces[0].To.X);
+        Assert.Equal(1800f, pieces[1].From.X);
+    }
+
+    [Fact]
+    public void ALineIsAlsoCutAtTheEdgeOfTheScreen()
+    {
+        // The atlas pans, so most of its connections run off the side. The visible part is what
+        // gets drawn, and a segment entirely outside contributes nothing.
+        ScreenRegion region = ScreenRegion.Whole(Screen);
+
+        List<(Vector2 From, Vector2 To)> pieces = [];
+        region.ClipSegment(new Vector2(-500f, 300f), new Vector2(500f, 300f), pieces);
+
+        (Vector2 from, Vector2 to) = Assert.Single(pieces);
+        Assert.Equal(0f, from.X, 3);
+        Assert.Equal(500f, to.X, 3);
+
+        pieces.Clear();
+        region.ClipSegment(new Vector2(-900f, 300f), new Vector2(-500f, 300f), pieces);
+        Assert.Empty(pieces);
+    }
+
+    [Fact]
+    public void EveryPieceOfACutLineIsClearAndEveryGapIsBlocked()
+    {
+        // The general statement, sampled along the line rather than trusted from the endpoints:
+        // whatever comes back must be drawable end to end, and whatever was removed must have
+        // been inside something. A seeded sequence so a failure is reproducible.
+        var random = new Random(20260831);
+
+        for (int round = 0; round < 80; round++)
+        {
+            List<ScreenRect> holes = [];
+            for (int i = 0; i < random.Next(1, 4); i++)
+            {
+                float left = random.Next(0, 2200);
+                float top = random.Next(0, 1200);
+                holes.Add(new ScreenRect(
+                    left, top, left + random.Next(60, 700), top + random.Next(60, 500)));
+            }
+
+            ScreenRegion region = ScreenRegion.Of(Screen, holes);
+            var from = new Vector2(random.Next(0, 2560), random.Next(0, 1440));
+            var to = new Vector2(random.Next(0, 2560), random.Next(0, 1440));
+
+            List<(Vector2 From, Vector2 To)> pieces = [];
+            region.ClipSegment(from, to, pieces);
+
+            foreach ((Vector2 start, Vector2 end) in pieces)
+            {
+                for (int step = 1; step < 20; step++)
+                {
+                    Vector2 along = Vector2.Lerp(start, end, step / 20f);
+                    Assert.True(region.Contains(along), $"a drawn piece runs through {along}");
+                }
+            }
+
+            // And nothing drawable was thrown away: every sample the pieces do not cover has to
+            // be one the region would have refused anyway.
+            for (int step = 0; step <= 40; step++)
+            {
+                Vector2 along = Vector2.Lerp(from, to, step / 40f);
+                if (!region.Contains(along))
+                {
+                    continue;
+                }
+
+                Assert.Contains(pieces, piece => Near(piece, along));
+            }
+        }
+    }
+
+    /// <summary>Whether a point lies on a piece, within a pixel of rounding.</summary>
+    private static bool Near((Vector2 From, Vector2 To) piece, Vector2 point)
+    {
+        Vector2 along = piece.To - piece.From;
+        float length = along.LengthSquared();
+        if (length < 0.0001f)
+        {
+            return Vector2.Distance(piece.From, point) < 1f;
+        }
+
+        float t = Math.Clamp(Vector2.Dot(point - piece.From, along) / length, 0f, 1f);
+        return Vector2.Distance(piece.From + (along * t), point) < 1f;
+    }
+
+    [Fact]
+    public void ABoxOfWritingIsAllOrNothing()
+    {
+        // Text is the opposite case from a line: half a name plate cut off by the edge of a
+        // panel is a word broken mid-letter, and worse to look at than a label that is absent.
+        ScreenRegion region = ScreenRegion.Of(Screen, [new ScreenRect(1000f, 600f, 1600f, 900f)]);
+
+        Assert.True(region.Clear(new ScreenRect(200f, 200f, 500f, 240f)));
+        Assert.False(region.Clear(new ScreenRect(900f, 700f, 1100f, 740f)));  // clips the edge
+        Assert.False(region.Clear(new ScreenRect(1100f, 700f, 1300f, 740f))); // wholly inside
+
+        // The bounds are deliberately not consulted: a label at the edge of the screen is drawn
+        // half off it by the game too, and refusing those would strip the outermost row.
+        Assert.True(region.Clear(new ScreenRect(-100f, 200f, 100f, 240f)));
+    }
+
     /// <summary>
     /// Asserts the free pieces are exactly the bounds less the holes: every point that may be
     /// drawn on is in ONE piece, every point that may not is in none.
