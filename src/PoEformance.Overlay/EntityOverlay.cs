@@ -1104,7 +1104,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         if (KeepOut.On)
         {
-            foreach (HudPart part in _snapshot.HudParts)
+            foreach (InterfacePart part in _snapshot.InterfaceParts)
             {
                 if (KeepOut.Honours(part.Label))
                 {
@@ -1144,7 +1144,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         if (KeepOut.On)
         {
-            foreach (HudPart part in _snapshot.HudParts)
+            foreach (InterfacePart part in _snapshot.InterfaceParts)
             {
                 if (KeepOut.Honours(part.Label))
                 {
@@ -1950,7 +1950,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // The same arrangement for the interface parts: published every frame, including the
         // empty case, because the settings page lists what was MEASURED and a remembered list
         // would show where the orbs were the last time anybody looked at it.
-        _keepOut.Parts = _snapshot.HudParts;
+        _keepOut.Parts = _snapshot.InterfaceParts;
 
         // Nothing is drawn unless the game - or one of OUR windows - is in front. Not
         // tidiness: the overlay is always-on-top and covers the game's whole client area,
@@ -2707,7 +2707,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Row(
             "map area",
             ScreenRegion.Of(ScreenRect.Window(width, height), KeepOutOf(width, height))
-            + $"   (interface {_snapshot.HudParts.Count} parts)",
+            + $"   (interface {_snapshot.InterfaceParts.Count} parts)",
             Measured,
             figure: true);
 

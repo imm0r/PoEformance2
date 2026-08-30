@@ -891,7 +891,7 @@ interesting part was not the feature:
     screenshot: the HUD is one UiElement with StringId `"HUD"` among the UI root's own children,
     and its parts are its children — `experience_bar`, `life_orb`, `mana_orb`, `magma_mana_orb`,
     `botleft_buttons_layout`, `HUDLeft`, `HUDRight`, the orb frames — each carrying its own
-    position and size like anything else in the tree. `HudReader` reads them every tick, so the
+    position and size like anything else in the tree. `InterfaceReader` reads them every tick, so the
     region holds at any resolution and any interface scale, with nothing eyeballed. **The tool
     had already built the thing that answers this question and the question was asked without
     using it.** That is the CLAUDE.md rule ("never guess — read the reference") failing against
@@ -927,6 +927,17 @@ interesting part was not the feature:
     connections. Text goes the other way: half a name plate cut off by a clip rectangle is a
     word broken mid-letter, so a plate that overlaps anything is not drawn at all, and the
     contents under a skipped name keep their positions rather than shifting up into it.
+  - **The atlas screen has furniture of its own, and it is measured the same way.** The world
+    screen the atlas is a page of paints a title bar with the act tabs, a search box, a quest
+    selector, a map legend and a pin editor over the top of it — the same relationship the HUD
+    has to the large map, one screen along. Those are ordinary elements too, so
+    `InterfaceReader.AtlasChrome` reads them: it walks UP from the atlas panel, takes the screen
+    two levels above, and measures that screen's other visible children. Found by where the
+    atlas IS rather than by name or index, and the atlas's whole ancestry is excluded by address
+    — otherwise the page the atlas hangs in is a sibling of the furniture, and taking it would
+    blank the overlay while every measurement in the readout looked healthy. Only the VISIBLE
+    ones, which is not a detail: `fade_to_black`, `vignette` and `consume_input_frame` are the
+    size of the screen and usually idle.
   - **A part can be switched off by name, and that is all the setting there is.** Some of these
     parts are containers, and a container reporting a rectangle far larger than what it draws
     would quietly eat the map — the atlas panel has form here, stating an extent 733 pixels

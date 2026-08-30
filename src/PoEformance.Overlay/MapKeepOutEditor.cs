@@ -12,7 +12,7 @@ namespace PoEformance.Overlay;
 /// <remarks>
 /// MOSTLY A READOUT, and that is the shape it should have had from the start. The game's own
 /// interface is measured, part by part, from the elements the game itself keeps - see
-/// <see cref="HudReader"/> - so there is nothing here to describe by hand: the list names each
+/// <see cref="InterfaceReader"/> - so there is nothing here to describe by hand: the list names each
 /// part the map is staying off and how big it came out, which is what turns a container that
 /// over-claims from a mystery into a click.
 ///
@@ -66,7 +66,7 @@ public sealed class MapKeepOutEditor
     /// remembered one would be a list of where the orbs were the last time somebody looked at
     /// this page. What IS saved is which of them to ignore, by name.
     /// </remarks>
-    public IReadOnlyList<HudPart> Parts { get; set; } = [];
+    public IReadOnlyList<InterfacePart> Parts { get; set; } = [];
 
     /// <summary>Called after anything here changes it, so the settings are written down.</summary>
     public Action? Changed { get; set; }
@@ -166,7 +166,7 @@ public sealed class MapKeepOutEditor
             return;
         }
 
-        foreach (HudPart part in Parts)
+        foreach (InterfacePart part in Parts)
         {
             bool honoured = Zones.Honours(part.Label);
             if (ImGui.Checkbox($"{part.Label}##keepoutpart{part.Address:X}", ref honoured))
