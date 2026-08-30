@@ -22,6 +22,12 @@
     <button class="tab active" data-tab="setup">Setup</button>
     <button class="tab" data-tab="rules">Rules</button>
     <button class="tab" data-tab="map">Map</button>
+    <!--
+      The label carries the notice. A tab that reads "Update" whether or not there is one is
+      a tab nobody looks at twice; the dot beside it appears only while a newer build is
+      published and the user has not waved it away.
+    -->
+    <button class="tab" data-tab="update">Update<span id="up-dot" class="tab-dot" hidden></span></button>
   </nav>
 
   <main id="tab-setup">
@@ -309,6 +315,58 @@
     <div class="map-frame">
       <canvas id="map-canvas"></canvas>
     </div>
+  </section>
+
+  <!--
+    The update tab. Four steps, each of them asked for: check, read what changed, download,
+    restart. Nothing here closes the tool without a click - the tool is attached to a running
+    game, and deciding on its own that now is a good moment to exit is not a decision it gets
+    to make.
+  -->
+  <section id="tab-update" hidden>
+    <!-- The notification about the update that already happened, shown once per launch. -->
+    <div id="up-outcome" class="up-outcome" hidden></div>
+
+    <section class="card">
+      <h2>Version</h2>
+      <dl>
+        <dt>Running</dt><dd id="up-current">–</dd>
+        <dt>Published</dt><dd id="up-available">–</dd>
+        <dt>Last checked</dt><dd id="up-checked">–</dd>
+      </dl>
+      <p id="up-status" class="dim">–</p>
+
+      <div class="cfg-row">
+        <button id="up-check">Check now</button>
+        <button id="up-download" hidden>Download</button>
+        <button id="up-install" hidden>Install and restart</button>
+        <button id="up-skip" hidden>Not this one</button>
+      </div>
+
+      <!--
+        Real bytes, not a spinner. The asset is a self-contained runtime well over a hundred
+        megabytes, and a progress display that cannot distinguish "slow" from "stalled" is
+        the one thing a download this size must not have.
+      -->
+      <div id="up-progress" class="up-progress" hidden>
+        <div class="up-bar"><div id="up-bar-fill"></div></div>
+        <p class="dim" id="up-progress-text">–</p>
+      </div>
+
+      <label class="master up-auto">
+        <input type="checkbox" id="up-enabled">
+        <span>Check GitHub for newer builds</span>
+      </label>
+      <p class="dim">Two small requests every six hours, to the public releases API. It is the
+        only thing this tool sends without being asked, and it carries nothing about this
+        machine.</p>
+    </section>
+
+    <section class="card" id="up-notes-card" hidden>
+      <h2>What changed</h2>
+      <p class="dim" id="up-release">–</p>
+      <pre id="up-notes"></pre>
+    </section>
   </section>
 
   <script>

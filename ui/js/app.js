@@ -5,6 +5,7 @@
 import { bridge } from "./bridge.js";
 import { MapPanel } from "./map.js";
 import { RulesPanel } from "./rules.js";
+import { UpdatePanel } from "./updates.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -41,6 +42,11 @@ function renderState(s) {
   if (s.evasion) renderEvasion(s.evasion);
   if (s.rules) rules.set(s.rules);
 
+  // Every state, not only while the tab is open: the dot on the tab is what tells somebody
+  // sitting on Setup that a newer build exists, and it cannot appear on a tab that has to be
+  // visited before it renders.
+  updates.set(s.update);
+
   if (s.map) {
     $("map-status").textContent = s.map.status;
     map.setState(s.map);
@@ -53,6 +59,10 @@ function renderState(s) {
 // ── Rules tab ──────────────────────────────────────────────────────────────
 
 const rules = new RulesPanel();
+
+// ── Update tab ─────────────────────────────────────────────────────────────
+
+const updates = new UpdatePanel();
 
 // ── Map tab ────────────────────────────────────────────────────────────────
 
@@ -80,6 +90,7 @@ function showTab(name) {
   $("tab-setup").hidden = name !== "setup";
   $("tab-rules").hidden = name !== "rules";
   $("tab-map").hidden = name !== "map";
+  $("tab-update").hidden = name !== "update";
   map.show(name === "map");
 
   // The layout is only fetched while the tab is open, so opening it is when to ask.

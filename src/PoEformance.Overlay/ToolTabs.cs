@@ -41,7 +41,16 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class ToolTabs
 {
-    private sealed record Section(int Order, string Id, string Label, Action Draw, Action? Idle);
+    private sealed record Section(int Order, string Id, string Label, Action Draw, Action? Idle)
+    {
+        /// <summary>A label read per frame, for a header that has news to carry.</summary>
+        /// <remarks>
+        /// What the <c>###id</c> naming below was already built for. The registered label is
+        /// still there and is what a tool is called; this is the same tool saying something
+        /// about itself in the one place somebody is guaranteed to see it without opening it.
+        /// </remarks>
+        public Func<string>? Live { get; init; }
+    }
 
     private sealed class Page(string id, string label)
     {
@@ -150,6 +159,10 @@ public sealed class ToolTabs
     /// What that page is called. Only the first registration for a page needs it; later ones
     /// join whatever is already there.
     /// </param>
+    /// <param name="live">
+    /// A label read every frame, replacing <paramref name="label"/> on the section header.
+    /// For a tool with something to announce while it is folded away.
+    /// </param>
     public void Add(
         int order,
         string id,
@@ -157,7 +170,8 @@ public sealed class ToolTabs
         Action draw,
         Action? idle = null,
         string? page = null,
-        string? pageLabel = null)
+        string? pageLabel = null,
+        Func<string>? live = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(id);
         ArgumentException.ThrowIfNullOrEmpty(label);
@@ -177,7 +191,7 @@ public sealed class ToolTabs
         }
 
         int at = found.Sections.FindIndex(s => s.Order > order);
-        var made = new Section(order, id, label, draw, idle);
+        var made = new Section(order, id, label, draw, idle) { Live = live };
         if (at < 0)
         {
             found.Sections.Add(made);
@@ -505,7 +519,7 @@ public sealed class ToolTabs
             // In the heading face, like the tab above it and the titled rules below: a page
             // that folds into several tools needs its fold lines to outrank their contents,
             // which is the whole reason the second size exists.
-            if (!OverlayFonts.SectionHeader($"{section.Label}###{section.Id}"))
+            if (!OverlayFonts.SectionHeader($"{section.Live?.Invoke() ?? section.Label}###{section.Id}"))
             {
                 continue;
             }
