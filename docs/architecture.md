@@ -852,6 +852,37 @@ interesting part was not the feature:
   a panel is the status quo, an overlay that vanished is a bug report nobody can act on), the
   answer is a flags enum rather than a bool so the status window can name the panel that is
   stuck, and there is a switch to stop asking.
+- **Getting out of the way of the game's own HUD, which is a different problem.** A panel is
+  open or shut and the answer is to stop drawing; the HUD is ALWAYS there and the answer cannot
+  be. The large map is the case: the game draws it across the whole window — its UI element says
+  so, and the element is right — and then paints the orbs, the flask and skill bars and the
+  experience strip on top of it. Everything this tool projects onto that map therefore landed on
+  the interface too, and a terrain outline over the life orb hides the one number a player is
+  watching. An overlay sits above the game and cannot be painted under anything, so the only way
+  to be underneath the HUD is to not be there.
+  - **A region, not a rectangle.** "Everywhere except those four places" is not a rectangle, so
+    `ScreenRegion` is a rectangle with holes and a partition of what is left. Point markers ask
+    `MapView.Contains`, which every one of them already did; the layers drawing CONTINUOUS
+    geometry — the terrain quad, a route line — draw once per piece, because ImGui clips to one
+    rectangle at a time. The pieces do not overlap, so nothing is drawn twice, and a route
+    crossing the HUD is CUT at its edge rather than dropped whole.
+  - **The zones are a setting, and that is the honest part.** Nothing in memory that this
+    project has found names the pieces of the HUD: `ImportantUiElements` carries the panels and
+    the maps and stops. The reference has no answer either — GameHelper2's Radar solves exactly
+    this with a "culling window" the user drags once and it remembers — so `MapKeepOut` is the
+    same bargain with the shape generalised from one rectangle to a few, and the numbers are
+    eyeballed rather than read. They are stored as FRACTIONS of the window so they survive a
+    resolution change, and they are dragged rather than typed, because the only way to check a
+    number for "that orb, there" is to type one, look, and type another.
+  - **The default is ONE band across the bottom.** Every part of PoE2's interface that sits over
+    the map runs along the bottom edge, so one band covers the lot and its only guessed number
+    is where the top of it goes. A default carved into orb-shaped and bar-shaped pieces would
+    keep more map and be four guesses instead of one, every one of them wrong on a different
+    aspect ratio. The editor is there to carve it for the screen it is actually on.
+  - **Open panels are added to the same region, measured.** Those the tool CAN measure, so they
+    are not guessed at: the rectangles `PanelReader` already read this frame go in beside the
+    zones. That happens whatever "hide behind big panels" says — turning that off means "do not
+    blank the whole overlay", not "paint the level layout across my stash".
 
 ### Rules — the one feature whose configuration is a LANGUAGE
 
