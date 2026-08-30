@@ -552,14 +552,26 @@ interesting part was not the feature:
     for "has the game seen the keys yet", and the game answers that itself: `RollWatch` waits for
     the player's own animation id to turn into one the game calls a dodge roll, because
     committing to the roll is when the direction is read. `DodgeSteer` gives the keys back the
-    moment it does — one frame and a little, however long that frame took, through a stutter that
-    an averaged frame rate would have smoothed away. `SteerHoldMs` is now a **ceiling**, reached
+    moment it does. `SteerHoldMs` is now a **ceiling**, reached
     only when nothing confirms (no table, no `Actor` address, or a roll chained out of another,
     where the id never changes) — every one of which falls back on the behaviour that already
     worked. The word is `"dodgeroll"` and not `"roll"` for a reason one id wide: 402 is
     DodgeRollBack and 403 is RollingMagma, a spell. The wait spins rather than sleeping, because
     `Thread.Sleep` is quantised to the per-process system timer — 15.6 ms unless this process has
     raised it, which also means every flat hold measured so far was a floor and not a duration.
+  - **And the confirmation is three frames late, not one — measured in play, and it refutes the
+    paragraph above.** The claim was that waiting for the roll costs "one frame and a little".
+    With the ceiling raised to 200 so nothing could be truncated (2026-08-29), the owner's line
+    read **`4 rolls seen in 49-62 ms (middle 61)`** — tight, and none on the ceiling. At 60 fps
+    that is **three frames**. The reading at the shipped 60 ms ceiling had said the same thing in
+    censored form: `32 rolls, 15 seen in 42-59 ms, 17 on the ceiling` — more than half at the
+    bound, so the middle of 55 was never the real middle. **The same machine had already shown a
+    flat 20 ms hold working**, so the game reads the keys long before the animation id turns over.
+    The premise holds and the signal does not: the roll starting *is* the input having been used,
+    but the animation id changing is not when the roll starts — it is something downstream of it.
+    So the confirmation is **conservative, not tight**, and on this machine it buys nothing: it
+    lands at 55–62 ms, which is where the guessed 60 already was, while 20 ms is the shortest hold
+    anyone has shown to work. Whether to keep the machinery or go back to a flat duration is open.
   - **The measurement had to become a spread before it could be read.** It was first shown as
     the latest confirmation — `roll seen after 18 ms` — and the owner's answer settled it: a roll
     happens about once a second in a fight, so the line is overwritten before anyone can read it,

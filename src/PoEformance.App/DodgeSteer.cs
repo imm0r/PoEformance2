@@ -36,9 +36,16 @@ namespace PoEformance.App;
 /// HOW LONG TO HOLD IS ASKED OF THE GAME, not of a setting. The keys have to stay down until the
 /// game has read them, and the game says when that was: the roll starts. So the wait polls
 /// <c>PoEformance.Features.RollWatch</c> - the player's own animation id turning into one the
-/// game calls a dodge roll - and lets go as soon as it does, which is a frame and a bit however
-/// long that frame took. <c>SteerHoldMs</c> is what is left when nothing confirms: a CEILING, not
-/// a duration. See RollWatch for why this is the answer rather than reading the frame rate.
+/// game calls a dodge roll - and lets go as soon as it does. <c>SteerHoldMs</c> is what is left
+/// when nothing confirms: a CEILING, not a duration.
+///
+/// AND THE SIGNAL IS LATE, which this was built believing it would not be. Measured in play with
+/// the ceiling raised to 200 so nothing was truncated (2026-08-29): 49-62 ms, tightly, none on
+/// the ceiling. That is three frames at 60 fps, against the one this was designed around - and
+/// the same machine had already shown a flat 20 ms hold working, so the keys are read long before
+/// the animation id moves. The wait is therefore CONSERVATIVE rather than tight: it holds until
+/// something downstream of the input appears, not until the input was taken. Nothing here is
+/// wrong, it simply does not shorten the hold on a machine like that one. See EvasionSettings.
 ///
 /// THE FOCUS GATE STAYS IN THE PLANNER and is deliberately not repeated here. It checks the game
 /// has focus immediately before deciding, so the only exposure left is somebody alt-tabbing

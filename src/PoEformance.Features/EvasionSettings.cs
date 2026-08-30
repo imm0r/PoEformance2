@@ -160,17 +160,28 @@ public sealed record EvasionGate(
 /// the owner plays well above 50. The failure below the line is SILENT: the roll simply goes
 /// where the player was already pointing, which looks like the steering choosing that direction.
 ///
-/// SO IT IS NOT A DURATION ANY MORE. <c>RollWatch</c> asks the game whether the roll has started
-/// and <c>DodgeSteer</c> gives the keys back the moment it has, which is one frame and a little
-/// however long that frame took - on a machine at 30 fps, on a machine at 144, and through a
-/// stutter that a frame-rate reading would have averaged away. What is left for this number is
-/// the case where nothing confirms: no animation table, no Actor address, or a roll chained out
-/// of another one, where the animation id never changes.
+/// IT IS A CEILING NOW: <c>RollWatch</c> asks the game whether the roll has started and
+/// <c>DodgeSteer</c> gives the keys back the moment it has. The claim that used to stand here was
+/// that this costs "one frame and a little, however long that frame took".
 ///
-/// THE DEFAULT STAYS AT 60 for that reason. As a duration it was sized for the slowest machine
-/// anyone might have; as a ceiling it wants to be sized for the slowest frame anyone might hit,
-/// which is the same number for the same reason. Lowering it now only shortens the fallback -
-/// and on a normal frame it changes nothing at all, because the confirmation gets there first.
+/// THAT CLAIM IS REFUTED, by the owner playing with the ceiling raised to 200 so the measurement
+/// could not be truncated (2026-08-29): the confirmation arrives in 49-62 ms, tightly, with
+/// nothing on the ceiling. At 60 fps that is THREE FRAMES, not one. And the same machine had
+/// already shown 20 ms working as a flat hold - so the game reads the keys long before the
+/// animation id turns over, and this signal is a LATE, downstream consequence of the roll rather
+/// than the moment the input was used. The premise was sound and the signal is not: the roll
+/// starting is indeed the input having been used, but the roll starting is not what the animation
+/// id reports when it changes.
+///
+/// SO THE CONFIRMATION BUYS NOTHING HERE. It lands at 55-62 ms, which is where the guessed 60 ms
+/// already was. On the owner's machine the shortest exposure available is the one the flat hold
+/// gave: 20 ms, proven by playing. What the ceiling is still for is the case where nothing
+/// confirms - no animation table, no Actor address, a roll chained out of another one.
+///
+/// THE DEFAULT STAYS AT 60 anyway, and now for a smaller reason than before: it is the value
+/// sized for the slowest machine nobody has measured, and no machine has been measured except
+/// this one. On THIS one, 20 is better - it is the shortest hold that was shown to work, and the
+/// confirmation simply never fires inside it. That is a setting, not a default.
 ///
 /// SHORTER IS STILL SAFER WHERE IT WORKS, and worth saying: the hold is the window in which the
 /// tool owns the movement keys, so a player who lets go of one inside it gets it pressed back
