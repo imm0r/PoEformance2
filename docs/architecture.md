@@ -994,7 +994,15 @@ interesting part was not the feature:
     — otherwise the page the atlas hangs in is a sibling of the furniture, and taking it would
     blank the overlay while every measurement in the readout looked healthy. Only the VISIBLE
     ones, which is not a detail: `fade_to_black`, `vignette` and `consume_input_frame` are the
-    size of the screen and usually idle. And a region with nothing left in it is now taken as
+    size of the screen and usually idle — and their own flag is not enough to tell, so a part
+    whose rectangle covers the WHOLE screen is dropped on its own. That is the difference
+    between the region degrading and collapsing: honouring such a part is not "keep off
+    that bit" but "keep off everything", identical to the feature being switched off and
+    reached without anybody switching it off. Exactly the whole screen, never a share — a
+    part that over-claims by half stays honoured, listed with its rectangle, one click from
+    off. The `--debug` readout names whichever parts were dropped this way, because
+    finding out which one it was otherwise costs a round of screenshots. And a region with
+    nothing left in it is taken as
     evidence that the keep-out is wrong rather than that the atlas is covered: the panel is
     drawn across the whole window, so the overlay falls back to drawing everywhere — the
     same fail-towards-drawing rule every unreadable answer here gets.

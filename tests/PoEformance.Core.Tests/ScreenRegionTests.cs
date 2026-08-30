@@ -356,6 +356,27 @@ public class ScreenRegionTests
     }
 
     [Fact]
+    public void AKeepOutTheSizeOfWhatItCoversIsRecognisable()
+    {
+        // THE FAILURE THIS ANSWERS, and it took two rounds of screenshots to pin down: the world
+        // screen the atlas sits on holds furniture that genuinely covers the screen - a vignette,
+        // a fade, an input catcher - and honouring one of those is not "keep off that bit", it is
+        // "keep off everything". The atlas overlay went blank with every measurement in the
+        // readout looking healthy. The caller drops these one at a time so the title bar and the
+        // orbs keep working, rather than the whole region collapsing.
+        ScreenRect screen = Screen;
+
+        Assert.True(screen.Covers(screen));                                  // exactly the screen
+        Assert.True(new ScreenRect(-10f, -10f, 3000f, 2000f).Covers(screen)); // and larger still
+
+        // EXACTLY the whole of it, not most of it. A part that over-claims by half is a thing to
+        // see in the readout and switch off, not one to have discarded on your behalf.
+        Assert.False(new ScreenRect(0f, 0f, 2560f, 1439f).Covers(screen));
+        Assert.False(new ScreenRect(1f, 0f, 2560f, 1440f).Covers(screen));
+        Assert.False(new ScreenRect(0f, 1152f, 2560f, 1440f).Covers(screen)); // an ordinary band
+    }
+
+    [Fact]
     public void ABoxOfWritingIsAllOrNothing()
     {
         // Text is the opposite case from a line: half a name plate cut off by the edge of a

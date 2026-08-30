@@ -1137,10 +1137,26 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// since the atlas skill panel is a column down one side with most of the atlas still
     /// visible. So this uses <c>PanelArea.Measured</c> and SKIPS a panel that could not be
     /// measured - failing towards drawing, like every other unreadable answer in these readers.
+    ///
+    /// AND A PART THE SIZE OF THE SCREEN IS DROPPED, one at a time, which is the difference
+    /// between this degrading and this collapsing. The world screen holds furniture that is
+    /// genuinely screen-sized - a vignette, a fade, an input catcher - and honouring one of
+    /// those is not "keep off that bit", it is "keep off everything": identical to the feature
+    /// being switched off, and arrived at without anybody switching it off. Dropping only the
+    /// offender leaves the title bar, the search box and the orbs still doing their job, which
+    /// is what the region is for. Whole-screen is an exact test rather than a tuned share, so
+    /// nothing in between is quietly discarded - a part that over-claims by half is still
+    /// honoured, still listed with its rectangle, and still one click to switch off.
     /// </remarks>
     private List<ScreenRect> KeepOutOfAtlas(int width, int height)
     {
-        List<ScreenRect> keepOut = KeepOut.Blocking(width, height);
+        ScreenRect window = ScreenRect.Window(width, height);
+        List<ScreenRect> keepOut = [];
+
+        foreach (ScreenRect zone in KeepOut.Blocking(width, height))
+        {
+            Take(zone);
+        }
 
         if (KeepOut.On)
         {
@@ -1148,7 +1164,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 if (KeepOut.Honours(part.Label))
                 {
-                    keepOut.Add(part.Where);
+                    Take(part.Where);
                 }
             }
         }
@@ -1157,11 +1173,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             if (panel.Panel != GamePanel.Atlas && panel.Measured is ScreenRect where)
             {
-                keepOut.Add(where);
+                Take(where);
             }
         }
 
         return keepOut;
+
+        void Take(ScreenRect rect)
+        {
+            if (!rect.Covers(window))
+            {
+                keepOut.Add(rect);
+            }
+        }
     }
 
     /// <summary>
@@ -2765,10 +2789,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // screen. Two regions means two ways for one of them to come out empty, so both say so.
         if ((_snapshot.Panels & GamePanel.Atlas) != 0)
         {
+            // WHICH parts were dropped for being the whole screen, by name, not just how many.
+            // A screen-sized piece of furniture is the one thing that can take the atlas region
+            // down to nothing, and it took two rounds of screenshots to find out which it was -
+            // one line here answers that without either of us guessing.
+            ScreenRect window = ScreenRect.Window(width, height);
+            string swallowed = string.Join(
+                ", ",
+                _snapshot.InterfaceParts
+                    .Where(part => KeepOut.Honours(part.Label) && part.Where.Covers(window))
+                    .Select(part => part.Label));
+
             Row(
                 "atlas area",
-                ScreenRegion.Of(ScreenRect.Window(width, height), KeepOutOfAtlas(width, height))
-                    .ToString(),
+                ScreenRegion.Of(window, KeepOutOfAtlas(width, height))
+                + (swallowed.Length > 0 ? $"   (screen-sized, dropped: {swallowed})" : string.Empty),
                 Measured,
                 figure: true);
         }

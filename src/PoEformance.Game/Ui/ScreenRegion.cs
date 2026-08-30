@@ -36,6 +36,22 @@ public readonly record struct ScreenRect(float Left, float Top, float Right, flo
     public bool Overlaps(ScreenRect other)
         => Left < other.Right && Right > other.Left && Top < other.Bottom && Bottom > other.Top;
 
+    /// <summary>Whether this rectangle contains the whole of another.</summary>
+    /// <remarks>
+    /// WHAT IT IS FOR is a keep-out that turns out to be the size of the thing it was meant to
+    /// be kept out OF. The world screen the atlas sits on holds furniture that genuinely covers
+    /// the screen - a vignette, a fade, an input catcher - and honouring one of those is not
+    /// "keep off that bit", it is "keep off everything": indistinguishable from the feature
+    /// being switched off, and arrived at without anybody switching it off. That failure is
+    /// silent and total, which is the worst pair, so it is worth a named test.
+    ///
+    /// EXACTLY the whole of it, not most of it. A share would be a number picked to make one
+    /// screenshot look right, and it would quietly discard a part that over-claims by half -
+    /// which is a thing to see in the readout and switch off, not to have decided for you.
+    /// </remarks>
+    public bool Covers(ScreenRect other)
+        => Left <= other.Left && Top <= other.Top && Right >= other.Right && Bottom >= other.Bottom;
+
     /// <summary>The part of this rectangle that is also inside <paramref name="bounds"/>.</summary>
     /// <remarks>
     /// May come back with no area, which is the answer for a rectangle entirely outside -
