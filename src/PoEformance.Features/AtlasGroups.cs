@@ -223,8 +223,10 @@ public sealed class AtlasGrouping
 /// </param>
 /// <param name="Web">Draw every connection, not just the routes. Honest and very busy.</param>
 /// <param name="HideOnHover">
-/// Draw nothing while the cursor is on a map. The game puts its own panel over the node then -
-/// what the map is, its biome, what is in it - and everything here would be drawn across it.
+/// Draw nothing while the cursor is on a map AND the panel the game puts over that node - what
+/// the map is, its biome, what is in it - could not be measured. When it can, the overlay keeps
+/// off that rectangle and goes on drawing everywhere else, which is what this used to prevent by
+/// blanking the whole screen; see <see cref="AtlasHoverPanel"/>.
 /// </param>
 /// <param name="Biomes">
 /// Ring each name in the colour of its biome. What a map's terrain is decides which league

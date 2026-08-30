@@ -64,16 +64,25 @@ public sealed record AtlasView(
     int Open,
     int Reachable,
     string Status,
-    bool Hovering = false)
+    ScreenRect? Hovered = null)
 {
     public static AtlasView Closed { get; } = new([], [], 0, 0, 0, "atlas closed");
 
     /// <summary>Whether there is anything at all to draw.</summary>
+    public bool Anything => Marks.Count > 0 || Web.Count > 0;
+
+    /// <summary>
+    /// Whether the cursor is on a map, which is when the game puts its own panel up.
+    /// </summary>
     /// <remarks>
-    /// False while a map is hovered, because the game is showing its own panel over that node
-    /// and everything here would be drawn across it. See <see cref="AtlasWatch.Hovered"/>.
+    /// REPORTED, NOT ACTED ON. This used to switch the whole overlay off, because the game's
+    /// panel is drawn over the node and every label and line here would land across it. It no
+    /// longer does: the panel is a measured interface part like the orbs and the title bar, so
+    /// the overlay keeps off THAT rectangle and goes on drawing everywhere else. Blanking the
+    /// atlas is now only the fallback for the frame where the panel could not be measured -
+    /// see <see cref="AtlasHoverPanel"/>, which is where that decision lives.
     /// </remarks>
-    public bool Anything => !Hovering && (Marks.Count > 0 || Web.Count > 0);
+    public bool Hovering => Hovered is not null;
 }
 
 /// <summary>
@@ -510,11 +519,15 @@ public sealed class AtlasWatch
             routes.Open,
             routes.Reachable,
             string.Empty,
-            settings.HideOnHover && Hovered(live, cursor));
+
+            // WHATEVER THE SETTING SAYS. The hovered map is a fact about the screen, and the
+            // setting is about what to do when the game's panel over it could not be measured -
+            // a decision the overlay makes with the interface parts in hand, not this one.
+            Hovered(live, cursor));
     }
 
     /// <summary>
-    /// Whether the cursor is on a map, which is when the game shows its own panel about it.
+    /// Where the map under the cursor is drawn, which is where the game puts its own panel.
     /// </summary>
     /// <remarks>
     /// GEOMETRY, because the game does not offer the answer. The AHK tool went looking: the
@@ -530,8 +543,13 @@ public sealed class AtlasWatch
     /// Against ALL the maps rather than the drawn ones. The game shows its panel over a map
     /// whether or not this overlay chose to label it, and the labels and lines of OTHER maps
     /// are what would be drawn across it.
+    ///
+    /// THE RECTANGLE RATHER THAN A YES, because what is done with the answer has changed: the
+    /// overlay used to switch itself off and now keeps off the panel the game put up. Where the
+    /// node is drawn is what a reader looking for that panel has to start from, and it is also
+    /// the one line a readout can print when the panel is not found.
     /// </remarks>
-    public static bool Hovered(IReadOnlyList<AtlasNode> live, Vector2 cursor)
+    public static ScreenRect? Hovered(IReadOnlyList<AtlasNode> live, Vector2 cursor)
     {
         ArgumentNullException.ThrowIfNull(live);
 
@@ -539,7 +557,7 @@ public sealed class AtlasWatch
         // any node that happens to be drawn there. Nought is "not asked", not a position.
         if (cursor == default)
         {
-            return false;
+            return null;
         }
 
         foreach (AtlasNode node in live)
@@ -548,11 +566,13 @@ public sealed class AtlasWatch
                 && cursor.X >= node.Screen.X && cursor.X <= node.Screen.X + node.Size.X
                 && cursor.Y >= node.Screen.Y && cursor.Y <= node.Screen.Y + node.Size.Y)
             {
-                return true;
+                return new ScreenRect(
+                    node.Screen.X, node.Screen.Y,
+                    node.Screen.X + node.Size.X, node.Screen.Y + node.Size.Y);
             }
         }
 
-        return false;
+        return null;
     }
 
     /// <summary>One account of the walk, from wherever the chain currently reaches.</summary>

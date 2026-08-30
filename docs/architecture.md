@@ -1257,6 +1257,32 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   rectangle was read this tick anyway. Tested against ALL maps rather than the drawn ones — the
   game shows its panel whether or not this overlay labelled that node, and it is the OTHER maps'
   labels and lines that would be drawn across it.
+- **And getting out of the way is now a rectangle, not a blackout.** Hovering a map used to hide
+  the entire atlas overlay — every label, every route, every line, across the whole screen — which
+  was the only answer available while the overlay could not keep off part of the screen. It can
+  now, so the panel the game puts up gets the same treatment as the orbs and the title bar: it is
+  measured, the region is carved, and the drawing goes round it. `AtlasHoverPanel` finds it BY
+  APPEARING rather than by name, because **the game does not name it**: read out of the interface
+  browser with a map hovered, it is the element at `[22][17][1]` — a grandchild of the world
+  screen, 17 children of its own, 658×194 — with an EMPTY StringId, hanging in a nameless anchor
+  that carries the position it pops up at (the panel itself sits at relative 0,0 inside it). So
+  there is nothing to match on, and matching `[22][17]` instead would be an index into a list a
+  patch reorders, failing exactly as silently as a wrong name: the overlay draws across the panel
+  while the readout calls the keep-out healthy. What there is every tick is the measurement — the
+  parts on screen with nothing hovered are a free baseline, and a part that was not there, or was
+  not there *at that rectangle*, is the panel the game just put up. Both halves matter because of
+  how the anchor measures: it claims no extent of its own, so `InterfaceReader` falls to the
+  bounds of its visible children — nothing while no panel is up, the panel's own rectangle while
+  one is, somewhere new each time. That also makes the one-level-down rule in `Measure`
+  load-bearing rather than a nicety. The rectangle needs no extra work — the
+  panel is an ordinary interface part and was already in the keep-out list — so finding it only
+  answers whether the fallback is needed, and the `--debug` row NAMES the part, which is how that
+  StringId finally gets read. Three things make the fallback the safe direction rather than a
+  regression: a hover whose panel is not among the kept-off parts hides exactly as before, a
+  baseline taken on another screen is thrown away (opening the atlas with the cursor already on a
+  map hides until the cursor leaves a node once), and a part somebody switched off in the
+  keep-out editor does not count as found — it is not covering anything as far as the drawing is
+  concerned.
 - **The map ratings are the one data file that is an OPINION.** Everything else in `data/` is
   extracted from the client or ported from a reference; `atlas-ratings.json` is a judgement about
   which maps are worth the time, which is exactly why it is a file — it will be disagreed with,
