@@ -16,7 +16,7 @@ public class UiTreeReaderTests
 {
     /// <summary>
     /// Element n lives here. The tree fixture itself is shared - see <see cref="UiTree"/>,
-    /// which HudReader's tests build on too.
+    /// which InterfaceReader's tests build on too.
     /// </summary>
     private static ulong At(int index) => UiTree.At(index);
 

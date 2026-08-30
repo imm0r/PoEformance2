@@ -12,7 +12,7 @@ namespace PoEformance.Game.Ui;
 /// </param>
 /// <param name="Where">Where it is on screen.</param>
 /// <param name="From">How the rectangle was arrived at, which is worth reporting.</param>
-public readonly record struct HudPart(ulong Address, string Name, ScreenRect Where, PanelExtent From)
+public readonly record struct InterfacePart(ulong Address, string Name, ScreenRect Where, PanelExtent From)
 {
     /// <summary>
     /// What to call it - in a list, and in the settings file that says which parts to ignore.
@@ -56,8 +56,16 @@ public readonly record struct HudPart(ulong Address, string Name, ScreenRect Whe
 /// under must not become a keep-out zone: doing so would take the minimap out of the region it
 /// is meant to be drawn on and the radar would simply stop working, with the readout reporting
 /// a perfectly healthy HUD. The maps' ancestors are excluded by address rather than by name.
+///
+/// AND THE ATLAS SCREEN HAS A SECOND ONE. The HUD is not the only thing painted over something
+/// this tool draws on: the world screen the atlas is a page of carries its own furniture - the
+/// title bar with the act tabs, the search box, the quest selector, the map legend - and those
+/// are drawn over the atlas exactly as the orbs are drawn over the map. They are ordinary
+/// elements too, siblings of the branch the atlas panel hangs in, so the SAME measurement
+/// answers both; see <see cref="AtlasChrome"/>. What differs is only how the container is
+/// found, which is why that is the one thing split out per caller.
 /// </remarks>
-public sealed class HudReader
+public sealed class InterfaceReader
 {
     /// <summary>The interface element's own id. What the scan is looking for.</summary>
     public const string Id = "HUD";
@@ -72,7 +80,7 @@ public sealed class HudReader
     private ulong _hud;
     private ulong _under;
 
-    public HudReader(IMemoryReader reader, OffsetSchema schema, UiElementReader elements)
+    public InterfaceReader(IMemoryReader reader, OffsetSchema schema, UiElementReader elements)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
@@ -100,18 +108,74 @@ public sealed class HudReader
     /// Addresses that must never come back as parts, however the tree is arranged - the map
     /// elements and everything they hang under. See the remarks on this class.
     /// </param>
-    public List<HudPart> Read(ulong uiRoot, UiScale scale, IReadOnlyCollection<ulong> notThese)
+    public List<InterfacePart> Read(ulong uiRoot, UiScale scale, IReadOnlyCollection<ulong> notThese)
+        => PartsOf(Resolve(uiRoot), scale, notThese);
+
+    /// <summary>
+    /// The furniture of the world screen the atlas is a page of, in window pixels.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME PROBLEM AS THE HUD, one screen along. The atlas panel is drawn across the whole
+    /// window and the screen it lives on paints its own furniture over the top: a title bar
+    /// carrying the act tabs and a close button, the search box, the quest selector, the map
+    /// legend, the pin editor. The atlas overlay's web and labels landed on every one of them.
+    ///
+    /// FOUND BY WHERE THE ATLAS IS, not by name and not by a list. The atlas panel sits at a
+    /// child path from the interface root - root, then the screen, then the page - so the
+    /// furniture is exactly the SCREEN's other children: the ones the atlas does not hang under.
+    /// That is computed rather than assumed, by walking up from the atlas element and excluding
+    /// its whole ancestry, so no rearrangement of the pages can turn the atlas itself into a
+    /// piece of furniture and blank the overlay.
+    ///
+    /// Confirmed in game 2026-08 from this tool's own interface browser, with the atlas open:
+    /// the screen is root child 22, the atlas page hangs under its child 0, and its other
+    /// children are named header (close_button, title_label, act_buttons_layout with an
+    /// ActButton each), search_bar_frame, quest_selector, map_content_list, map_legends_frame,
+    /// atlas_master_selector, endgame_map_pin_editor, special_mode_title_frame, vignette,
+    /// fade_to_black and consume_input_frame. The last three are the reason only the VISIBLE
+    /// ones are taken: they are screen-sized, and honouring one while it is idle would blank
+    /// the atlas overlay entirely.
+    /// </remarks>
+    /// <param name="atlas">The atlas panel element, as resolved from its own path.</param>
+    /// <param name="scale">The viewport to place the furniture in.</param>
+    public List<InterfacePart> AtlasChrome(ulong atlas, UiScale scale)
+    {
+        List<InterfacePart> parts = [];
+        if (!_elements.IsUiElement(atlas))
+        {
+            return parts;
+        }
+
+        // The atlas's whole ancestry, which is both the exclusion list and the way the screen
+        // is found: the screen is the ancestor one below the root, and the page the atlas hangs
+        // in is the ancestor below that.
+        var ancestry = new List<ulong>();
+        var chain = new HashSet<ulong>();
+        _elements.AndAncestors(atlas, chain, ancestry);
+
+        // ancestry runs leaf-first, so the screen is the second-to-last entry and the root the
+        // last. Fewer than three means the atlas is not where its path says it is - the safe
+        // answer is then no furniture rather than a guess at which element is the screen.
+        return ancestry.Count < 3
+            ? parts
+            : PartsOf(ancestry[^2], scale, chain);
+    }
+
+    /// <summary>
+    /// Every visible child of one container, measured - the shape both readings above take.
+    /// </summary>
+    private List<InterfacePart> PartsOf(
+        ulong container, UiScale scale, IReadOnlyCollection<ulong> notThese)
     {
         ArgumentNullException.ThrowIfNull(notThese);
 
-        List<HudPart> parts = [];
-        ulong hud = Resolve(uiRoot);
-        if (hud == 0 || !_elements.IsVisible(hud))
+        List<InterfacePart> parts = [];
+        if (container == 0 || !_elements.IsVisible(container))
         {
-            return parts; // no interface on screen: a loading screen, or a state with no HUD
+            return parts; // nothing on screen: a loading screen, or a state without this part
         }
 
-        List<ulong> children = _elements.Children(hud, _mostParts);
+        List<ulong> children = _elements.Children(container, _mostParts);
         if (children.Count == 0)
         {
             return parts;
@@ -121,7 +185,7 @@ public sealed class HudReader
         // saving PanelReader makes, and the difference between measuring the interface every
         // tick and measuring it occasionally.
         Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed =
-            _elements.ReadSiblings(hud, children, scale);
+            _elements.ReadSiblings(container, children, scale);
 
         foreach (ulong child in children)
         {
@@ -137,7 +201,7 @@ public sealed class HudReader
             (ScreenRect where, PanelExtent from) = Measure(child, placed, scale, notThese);
             if (where.HasArea)
             {
-                parts.Add(new HudPart(child, NameOf(child), where, from));
+                parts.Add(new InterfacePart(child, NameOf(child), where, from));
             }
         }
 

@@ -12,7 +12,7 @@ namespace PoEformance.Core.Tests;
 /// one thing tests over a reverse-engineered layout exist to catch.
 ///
 /// Shared rather than private to one test class because two readers now walk this tree - the
-/// browser and <c>HudReader</c> - and a second copy of the fixture would be a second place for
+/// browser and <c>InterfaceReader</c> - and a second copy of the fixture would be a second place for
 /// an offset to be wrong in, with each copy vouching only for itself.
 /// </remarks>
 internal sealed class UiTree

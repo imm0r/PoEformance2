@@ -21,7 +21,7 @@ namespace PoEformance.Core.Tests;
 /// botleft_buttons_layout, HUDLeft, changes_note, HUDRight, chatButton, fade_from_black,
 /// Skip_Cutscene, and three the game does not name.
 /// </remarks>
-public class HudReaderTests
+public class InterfaceReaderTests
 {
     /// <summary>A 16:10 window, where both scale factors are 1 - so positions read directly.</summary>
     private static UiScale Window() => new(2560, 1600, 0);
@@ -68,7 +68,7 @@ public class HudReaderTests
         }
 
         tree.Add(root, children: rootChildren);
-        tree.Add(hud, parent: root, stringId: HudReader.Id, children: partIndices);
+        tree.Add(hud, parent: root, stringId: InterfaceReader.Id, children: partIndices);
 
         for (int i = 0; i < parts.Length; i++)
         {
@@ -79,7 +79,7 @@ public class HudReaderTests
         return (tree, UiTree.At(root));
     }
 
-    private static HudReader Reader(UiTree tree, OffsetSchema schema)
+    private static InterfaceReader Reader(UiTree tree, OffsetSchema schema)
         => new(tree.Reader, schema, new UiElementReader(tree.Reader, schema));
 
     [Fact]
@@ -95,7 +95,7 @@ public class HudReaderTests
             ("mana_orb", new Vector2(2200, 1240), new Vector2(300, 300)),
             ("experience_bar", new Vector2(0, 1570), new Vector2(2560, 30)));
 
-        List<HudPart> parts = Reader(tree, schema).Read(root, Window(), []);
+        List<InterfacePart> parts = Reader(tree, schema).Read(root, Window(), []);
 
         Assert.Equal(3, parts.Count);
         Assert.Equal(new ScreenRect(60f, 1240f, 360f, 1540f), parts[0].Where);
@@ -116,7 +116,7 @@ public class HudReaderTests
             FirstGuess() + 2,
             ("life_orb", new Vector2(60, 1240), new Vector2(300, 300)));
 
-        HudPart part = Assert.Single(Reader(tree, schema).Read(root, Window(), []));
+        InterfacePart part = Assert.Single(Reader(tree, schema).Read(root, Window(), []));
 
         Assert.Equal("life_orb", part.Name);
     }
@@ -131,12 +131,12 @@ public class HudReaderTests
         var tree = new UiTree(schema);
 
         tree.Add(0, children: [1]);
-        tree.Add(1, parent: 0, stringId: HudReader.Id, children: [2]);
+        tree.Add(1, parent: 0, stringId: InterfaceReader.Id, children: [2]);
         tree.Add(2, parent: 1, stringId: "HUDRight", relative: new Vector2(2000, 1400), children: [3, 4]);
         tree.Add(3, parent: 2, relative: new Vector2(0, 0), size: new Vector2(100, 100));
         tree.Add(4, parent: 2, relative: new Vector2(200, 50), size: new Vector2(100, 100));
 
-        HudPart part = Assert.Single(Reader(tree, schema).Read(UiTree.At(0), Window(), []));
+        InterfacePart part = Assert.Single(Reader(tree, schema).Read(UiTree.At(0), Window(), []));
 
         Assert.Equal(PanelExtent.Children, part.From);
         Assert.Equal(new ScreenRect(2000f, 1400f, 2300f, 1550f), part.Where);
@@ -152,13 +152,13 @@ public class HudReaderTests
         var tree = new UiTree(schema);
 
         tree.Add(0, children: [1]);
-        tree.Add(1, parent: 0, stringId: HudReader.Id, children: [2, 3]);
+        tree.Add(1, parent: 0, stringId: InterfaceReader.Id, children: [2, 3]);
         tree.Add(2, parent: 1, stringId: "life_orb", relative: new Vector2(60, 1240), size: new Vector2(300, 300));
         tree.Add(
             3, parent: 1, stringId: "magma_mana_orb", visible: false,
             relative: new Vector2(2200, 1240), size: new Vector2(300, 300));
 
-        HudPart part = Assert.Single(Reader(tree, schema).Read(UiTree.At(0), Window(), []));
+        InterfacePart part = Assert.Single(Reader(tree, schema).Read(UiTree.At(0), Window(), []));
 
         Assert.Equal("life_orb", part.Name);
     }
@@ -172,7 +172,7 @@ public class HudReaderTests
         var tree = new UiTree(schema);
 
         tree.Add(0, children: [1]);
-        tree.Add(1, parent: 0, stringId: HudReader.Id, visible: false, children: [2]);
+        tree.Add(1, parent: 0, stringId: InterfaceReader.Id, visible: false, children: [2]);
         tree.Add(2, parent: 1, stringId: "life_orb", relative: new Vector2(60, 1240), size: new Vector2(300, 300));
 
         Assert.Empty(Reader(tree, schema).Read(UiTree.At(0), Window(), []));
@@ -190,7 +190,7 @@ public class HudReaderTests
         var tree = new UiTree(schema);
 
         tree.Add(0, children: [1]);
-        tree.Add(1, parent: 0, stringId: HudReader.Id, children: [2, 3]);
+        tree.Add(1, parent: 0, stringId: InterfaceReader.Id, children: [2, 3]);
         tree.Add(2, parent: 1, stringId: "life_orb", relative: new Vector2(60, 1240), size: new Vector2(300, 300));
         tree.Add(3, parent: 1, stringId: "map_parent", relative: new Vector2(2100, 40), size: new Vector2(400, 400), children: [4]);
         tree.Add(4, parent: 3, stringId: "minimap", relative: new Vector2(0, 0), size: new Vector2(400, 400));
@@ -199,8 +199,8 @@ public class HudReaderTests
         var notThese = new HashSet<ulong>();
         elements.AndAncestors(UiTree.At(4), notThese);
 
-        HudPart part = Assert.Single(
-            new HudReader(tree.Reader, schema, elements).Read(UiTree.At(0), Window(), notThese));
+        InterfacePart part = Assert.Single(
+            new InterfaceReader(tree.Reader, schema, elements).Read(UiTree.At(0), Window(), notThese));
 
         Assert.Equal("life_orb", part.Name);
     }
@@ -215,7 +215,7 @@ public class HudReaderTests
         var tree = new UiTree(schema);
 
         tree.Add(0, children: [1]);
-        tree.Add(1, parent: 0, stringId: HudReader.Id, children: [2]);
+        tree.Add(1, parent: 0, stringId: InterfaceReader.Id, children: [2]);
         tree.Add(2, parent: 1, stringId: "HUDRight", relative: new Vector2(2000, 1400), children: [3, 4]);
         tree.Add(3, parent: 2, relative: new Vector2(0, 0), size: new Vector2(100, 100));
         tree.Add(4, parent: 2, stringId: "minimap", relative: new Vector2(-1800, -1300), size: new Vector2(400, 400));
@@ -227,7 +227,7 @@ public class HudReaderTests
         // The map's own ancestors include HUDRight itself, so the container goes entirely -
         // which is the safe direction: a piece of map drawn over is recoverable, a minimap that
         // cannot be drawn on is the feature not working.
-        Assert.Empty(new HudReader(tree.Reader, schema, elements).Read(UiTree.At(0), Window(), notThese));
+        Assert.Empty(new InterfaceReader(tree.Reader, schema, elements).Read(UiTree.At(0), Window(), notThese));
     }
 
     [Fact]
@@ -261,7 +261,7 @@ public class HudReaderTests
         (UiTree tree, ulong root) = WithHud(
             schema, FirstGuess() + 2, ("life_orb", new Vector2(60, 1240), new Vector2(300, 300)));
 
-        HudReader reader = Reader(tree, schema);
+        InterfaceReader reader = Reader(tree, schema);
         UiScale window = Window();
 
         reader.Read(root, window, []);
@@ -277,5 +277,102 @@ public class HudReaderTests
         Assert.True(
             second * 4 < afterFirst,
             $"a repeat read cost {second} of the first read's {afterFirst}: the cache is not holding");
+    }
+
+    /// <summary>
+    /// The tree the world screen actually has: a screen, the page the atlas hangs in, and the
+    /// screen's own furniture beside it.
+    /// </summary>
+    /// <remarks>
+    /// Shaped after what this tool's interface browser printed with the atlas open - the screen
+    /// at root child 22, the atlas page under its child 0, and header / search_bar_frame /
+    /// fade_to_black as siblings of that page.
+    /// </remarks>
+    private static (UiTree Tree, ulong Atlas) AtlasScreen(OffsetSchema schema)
+    {
+        var tree = new UiTree(schema);
+
+        tree.Add(0, children: [1]);
+        tree.Add(1, parent: 0, stringId: "world_screen", children: [2, 3, 4, 5]);
+        tree.Add(2, parent: 1, stringId: "pages", children: [6]);
+        tree.Add(6, parent: 2, stringId: "atlas", relative: new Vector2(0, 0), size: new Vector2(2560, 1600));
+        tree.Add(3, parent: 1, stringId: "header", relative: new Vector2(790, 0), size: new Vector2(980, 108));
+        tree.Add(4, parent: 1, stringId: "search_bar_frame", relative: new Vector2(40, 20), size: new Vector2(300, 44));
+        tree.Add(
+            5, parent: 1, stringId: "fade_to_black", visible: false,
+            relative: new Vector2(0, 0), size: new Vector2(2560, 1600));
+
+        return (tree, UiTree.At(6));
+    }
+
+    [Fact]
+    public void THEAtlasScreensFurnitureIsMeasuredFromWhereTheAtlasIs()
+    {
+        // The world screen paints its own title bar, act tabs and search box over the atlas,
+        // exactly as the HUD is painted over the map - and the atlas overlay's web and labels
+        // landed on all of it. The furniture is found by walking UP from the atlas rather than
+        // by naming anything, so nothing here depends on what the game calls these.
+        OffsetSchema schema = Schema();
+        (UiTree tree, ulong atlas) = AtlasScreen(schema);
+
+        List<InterfacePart> chrome = Reader(tree, schema).AtlasChrome(atlas, Window());
+
+        Assert.Equal(["header", "search_bar_frame"], chrome.Select(part => part.Name));
+        Assert.Equal(new ScreenRect(790f, 0f, 1770f, 108f), chrome[0].Where);
+    }
+
+    [Fact]
+    public void ANDTheAtlasItselfIsNeverFurniture()
+    {
+        // THE FAILURE THAT WOULD BE HARD TO SEE: the page the atlas hangs in is a sibling of the
+        // furniture, and taking it would keep the overlay off the whole atlas - a blank feature
+        // with a readout full of healthy measurements. Excluded by ancestry, so no rearrangement
+        // of the pages can reintroduce it.
+        OffsetSchema schema = Schema();
+        (UiTree tree, ulong atlas) = AtlasScreen(schema);
+
+        List<InterfacePart> chrome = Reader(tree, schema).AtlasChrome(atlas, Window());
+
+        Assert.DoesNotContain(chrome, part => part.Name is "pages" or "atlas");
+    }
+
+    [Fact]
+    public void ANDTheScreenSizedFurnitureIsOnlyHonouredWhileItIsSHOWING()
+    {
+        // fade_to_black, vignette and consume_input_frame are the whole size of the screen. They
+        // are real furniture and they are usually idle, so honouring one regardless would blank
+        // the atlas overlay for as long as the atlas was open.
+        OffsetSchema schema = Schema();
+        (UiTree tree, ulong atlas) = AtlasScreen(schema);
+
+        Assert.DoesNotContain(Reader(tree, schema).AtlasChrome(atlas, Window()), part => part.Name == "fade_to_black");
+    }
+
+    [Fact]
+    public void ANATLASThatDoesNotResolveHasNoFurniture()
+    {
+        // Fails towards DRAWING, like every other unreadable answer in these readers: a path that
+        // leads nowhere leaves the atlas overlay exactly as it was rather than blanking it.
+        OffsetSchema schema = Schema();
+        (UiTree tree, _) = AtlasScreen(schema);
+
+        Assert.Empty(Reader(tree, schema).AtlasChrome(0, Window()));
+        Assert.Empty(Reader(tree, schema).AtlasChrome(UiTree.At(99), Window()));
+    }
+
+    [Fact]
+    public void ANATLASTooCloseToTheRootIsNotGuessedAt()
+    {
+        // The screen is the ancestor one below the root, so an atlas found directly under the
+        // root has no screen to take furniture from. Answering anyway would mean picking the
+        // root itself, whose children are the whole interface - every panel in the game as a
+        // keep-out zone.
+        OffsetSchema schema = Schema();
+        var tree = new UiTree(schema);
+        tree.Add(0, children: [1, 2]);
+        tree.Add(1, parent: 0, stringId: "atlas", size: new Vector2(2560, 1600));
+        tree.Add(2, parent: 0, stringId: "something_else", size: new Vector2(400, 200));
+
+        Assert.Empty(Reader(tree, schema).AtlasChrome(UiTree.At(1), Window()));
     }
 }

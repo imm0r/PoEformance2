@@ -375,8 +375,8 @@ public sealed record WorldSnapshot(
 
     // Where the game's own interface is this frame, part by part. Measured rather than
     // configured - the HUD is an ordinary UiElement and its parts are its children - which is
-    // what lets the map overlay stay off it at any resolution or interface scale. See HudReader.
-    IReadOnlyList<HudPart>? Hud = null)
+    // what lets the map overlay stay off it at any resolution or interface scale. See InterfaceReader.
+    IReadOnlyList<InterfacePart>? Hud = null)
 {
     /// <summary>The parts of the game's interface on screen, empty when none were read.</summary>
     /// <remarks>
@@ -385,7 +385,7 @@ public sealed record WorldSnapshot(
     /// What it means to a caller is "nothing known to keep off", which leaves the overlay
     /// exactly where it was rather than blanking it.
     /// </remarks>
-    public IReadOnlyList<HudPart> HudParts => Hud ?? [];
+    public IReadOnlyList<InterfacePart> InterfaceParts => Hud ?? [];
 
     /// <summary>
     /// Whether the player is looking at a panel rather than at the game.
@@ -590,7 +590,17 @@ public sealed class WorldReader
     private readonly PanelReader _panels;
 
     /// <summary>Where the game's own interface is, measured part by part every tick.</summary>
-    private readonly HudReader _hud;
+    private readonly InterfaceReader _hud;
+
+    /// <summary>
+    /// The child path to the atlas panel, for finding the screen its furniture hangs on.
+    /// </summary>
+    /// <remarks>
+    /// The path rather than an AtlasReader: all that is wanted here is the element's ADDRESS,
+    /// so that InterfaceReader can walk up from it, and building the whole atlas decoder to ask
+    /// for three child pointers would be a second owner of a panel this class does not read.
+    /// </remarks>
+    private readonly int[] _atlasPath;
 
     /// <summary>
     /// Reused across the readers that walk the interface, and reused for a reason.
@@ -660,7 +670,15 @@ public sealed class WorldReader
         _areas = new WorldAreaReader(reader, schema);
         _uiElements = new UiElementReader(reader, schema);
         _panels = new PanelReader(reader, schema, _uiElements);
-        _hud = new HudReader(reader, schema, _uiElements);
+        _hud = new InterfaceReader(reader, schema, _uiElements);
+
+        StructDef atlasPanel = schema.Structs["AtlasPanel"];
+        _atlasPath =
+        [
+            (int)atlasPanel.Constants["PathFromUiRoot0"],
+            (int)atlasPanel.Constants["PathFromUiRoot1"],
+            (int)atlasPanel.Constants["PathFromUiRoot2"],
+        ];
         _terrain = new TerrainReader(reader, schema, rotation);
         _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
@@ -1210,7 +1228,7 @@ public sealed class WorldReader
 
         MapView? largeMap = null;
         MapView? miniMap = null;
-        IReadOnlyList<HudPart> hud = [];
+        IReadOnlyList<InterfacePart> hud = [];
         if (scale is UiScale viewport && chain.UiRoot != 0)
         {
             // Order matters: reading the minimap first is what leaves its diagonal cached
@@ -1244,6 +1262,22 @@ public sealed class WorldReader
         // rectangle somebody's window can be compared against. Without one - a diagnostic run
         // with no overlay - the bits still arrive and the rectangles do not.
         PanelsOnScreen panels = _panels.Read(chain.UiRoot, scale);
+
+        // The world screen's own furniture - the title bar and its act tabs, the search box, the
+        // quest selector, the map legend - which is painted over the atlas exactly as the orbs
+        // are painted over the map. Read ONLY while the atlas is actually open: it is a walk of
+        // a screen's children, and there is nothing on the atlas to keep off while nobody is
+        // looking at it.
+        if ((panels.Panels & GamePanel.Atlas) != 0 && scale is UiScale on)
+        {
+            ulong atlas = chain.UiRoot;
+            foreach (int step in _atlasPath)
+            {
+                atlas = _uiElements.Child(atlas, step);
+            }
+
+            hud = [.. hud, .. _hud.AtlasChrome(atlas, on)];
+        }
 
         double mapsMs = Since(mapsFrom);
 

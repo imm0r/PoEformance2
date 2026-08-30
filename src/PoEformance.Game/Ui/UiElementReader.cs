@@ -332,15 +332,22 @@ public sealed class UiElementReader
     /// The cheap way to ask "is this element inside that one" for a handful of elements whose
     /// identity matters: the chain is a pointer each element already holds, so walking UP is a
     /// few reads, while searching down from the candidate is the whole subtree. What it is for
-    /// is <c>HudReader</c>, which must never report an element the maps live under as part of
+    /// is <c>InterfaceReader</c>, which must never report an element the maps live under as part of
     /// the interface - that would take the minimap out of the region it is drawn on.
     /// </remarks>
-    public void AndAncestors(ulong address, ISet<ulong> into)
+    /// <param name="order">
+    /// Optionally, the same addresses in the order they were walked - LEAF FIRST, so the last
+    /// entry is the outermost element the chain reached. That order is the answer to "which
+    /// container is this element two levels inside", which is how the atlas's own screen is
+    /// found without naming it or trusting an index.
+    /// </param>
+    public void AndAncestors(ulong address, ISet<ulong> into, List<ulong>? order = null)
     {
         ArgumentNullException.ThrowIfNull(into);
 
         for (int depth = 0; depth <= _maxDepth && IsUiElement(address) && into.Add(address); depth++)
         {
+            order?.Add(address);
             address = _reader.ReadPointer(address + (ulong)_parent);
         }
     }

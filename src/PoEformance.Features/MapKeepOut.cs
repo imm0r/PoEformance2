@@ -77,7 +77,7 @@ public sealed record MapKeepOutZone(
 /// equivalent either, and GameHelper2's Radar solves the same problem with a "culling window"
 /// the user drags once. That belief was simply wrong: the interface is one UiElement with
 /// StringId "HUD" among the UI root's own children, and its parts are its children, each
-/// carrying its own position and size. See <see cref="HudReader"/>. So the zones below are no
+/// carrying its own position and size. See <see cref="InterfaceReader"/>. So the zones below are no
 /// longer where the orbs are; they are empty by default, and what they are for is whatever
 /// measurement cannot reach.
 ///

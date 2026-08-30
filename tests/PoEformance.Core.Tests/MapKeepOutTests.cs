@@ -15,7 +15,7 @@ namespace PoEformance.Core.Tests;
 /// map landed on the interface as well, and a terrain outline over the life orb hides the one
 /// number a player is watching.
 ///
-/// The interface itself is MEASURED - see <see cref="HudReaderTests"/>. What is tested here is
+/// The interface itself is MEASURED - see <see cref="InterfaceReaderTests"/>. What is tested here is
 /// the part that is still a setting: which measured parts to honour, and the extra boxes for
 /// whatever measurement cannot reach.
 /// </remarks>
