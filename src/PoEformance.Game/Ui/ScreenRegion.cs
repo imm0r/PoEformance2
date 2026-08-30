@@ -178,6 +178,178 @@ public sealed class ScreenRegion
         return true;
     }
 
+    /// <summary>
+    /// Whether a whole rectangle is clear of everything kept out.
+    /// </summary>
+    /// <remarks>
+    /// FOR THINGS THAT ARE A BOX RATHER THAN A POINT - a name plate, a reward, an icon. A label
+    /// is anchored at a point and drawn a couple of hundred pixels wide around it, so the point
+    /// test passes while half the writing lies across the panel it was supposed to stay off.
+    ///
+    /// ALL OR NOTHING, which is the right answer for text: a plate cut in half by a clip
+    /// rectangle is a word broken mid-letter, and worse to look at than one that is not there.
+    /// Lines are the opposite case and are cut instead - see <see cref="ClipSegment"/>.
+    ///
+    /// The BOUNDS are deliberately not consulted. A label near the edge of the screen is drawn
+    /// half off it by the game too, and refusing those would strip the outermost row of anything
+    /// this is used for.
+    /// </remarks>
+    public bool Clear(ScreenRect rect)
+    {
+        foreach (ScreenRect blocked in KeptOut)
+        {
+            if (blocked.Overlaps(rect))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// The parts of a line that may be drawn, appended to <paramref name="into"/>.
+    /// </summary>
+    /// <remarks>
+    /// CUT RATHER THAN DROPPED, and rather than redrawn per free piece. An atlas is a couple of
+    /// thousand connections; drawing all of them once for each piece of the region would be tens
+    /// of thousands of lines a frame to produce a picture that is mostly clipped away. And a
+    /// line dropped whole because it clips a corner of the interface is a connection that
+    /// silently is not there - on the atlas, that is the feature's whole content.
+    ///
+    /// So each segment is cut against the rectangles instead, in the segment's own parameter
+    /// space: for each keep-out, the interval of t where the line lies inside it (the standard
+    /// Liang-Barsky test), and then the gaps between those intervals are what gets drawn. A
+    /// segment that touches nothing costs four comparisons per rectangle and comes back whole,
+    /// which is the case almost every line is in.
+    /// </remarks>
+    public void ClipSegment(Vector2 from, Vector2 to, List<(Vector2 From, Vector2 To)> into)
+    {
+        ArgumentNullException.ThrowIfNull(into);
+
+        if (!Overlap(from, to, Bounds, out float start, out float end))
+        {
+            return;
+        }
+
+        List<(float From, float To)>? blocked = null;
+        foreach (ScreenRect rect in KeptOut)
+        {
+            if (!Overlap(from, to, rect, out float enters, out float leaves))
+            {
+                continue;
+            }
+
+            float lower = Math.Max(enters, start);
+            float upper = Math.Min(leaves, end);
+            if (upper > lower)
+            {
+                (blocked ??= []).Add((lower, upper));
+            }
+        }
+
+        if (blocked is null)
+        {
+            into.Add((At(from, to, start), At(from, to, end)));
+            return;
+        }
+
+        blocked.Sort((left, right) => left.From.CompareTo(right.From));
+
+        float at = start;
+        foreach ((float lower, float upper) in blocked)
+        {
+            if (lower - at > Sliver)
+            {
+                into.Add((At(from, to, at), At(from, to, lower)));
+            }
+
+            at = Math.Max(at, upper);
+            if (at >= end)
+            {
+                return;
+            }
+        }
+
+        if (end - at > Sliver)
+        {
+            into.Add((At(from, to, at), At(from, to, end)));
+        }
+    }
+
+    /// <summary>
+    /// A piece of line shorter than this along the segment is not worth emitting.
+    /// </summary>
+    /// <remarks>
+    /// In the segment's own parameter space, so it is a share of its length rather than a
+    /// distance: what it stops is a run of zero-length lines where several keep-out rectangles
+    /// meet along one connection.
+    /// </remarks>
+    private const float Sliver = 0.0005f;
+
+    private static Vector2 At(Vector2 from, Vector2 to, float t) => from + ((to - from) * t);
+
+    /// <summary>
+    /// The stretch of a segment that lies inside a rectangle, as a t-interval, or false.
+    /// </summary>
+    /// <remarks>
+    /// Liang-Barsky, in the form that answers "where is it INSIDE" rather than "draw this bit":
+    /// the same four comparisons then serve both the bounds (keep what is inside) and the
+    /// keep-outs (drop what is inside), which is why one helper expresses both.
+    /// </remarks>
+    private static bool Overlap(
+        Vector2 from, Vector2 to, ScreenRect rect, out float enters, out float leaves)
+    {
+        enters = 0f;
+        leaves = 1f;
+
+        float dx = to.X - from.X;
+        float dy = to.Y - from.Y;
+
+        Span<float> edge = [-dx, dx, -dy, dy];
+        Span<float> room =
+        [
+            from.X - rect.Left, rect.Right - from.X,
+            from.Y - rect.Top, rect.Bottom - from.Y,
+        ];
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (edge[i] == 0f)
+            {
+                // Parallel to this edge: wholly inside its half-plane, or wholly outside it.
+                if (room[i] < 0f)
+                {
+                    return false;
+                }
+
+                continue;
+            }
+
+            float crosses = room[i] / edge[i];
+            if (edge[i] < 0f)
+            {
+                if (crosses > leaves)
+                {
+                    return false;
+                }
+
+                enters = Math.Max(enters, crosses);
+            }
+            else
+            {
+                if (crosses < enters)
+                {
+                    return false;
+                }
+
+                leaves = Math.Min(leaves, crosses);
+            }
+        }
+
+        return leaves > enters;
+    }
+
     /// <summary>What the region covers, for a readout.</summary>
     public override string ToString()
         => $"{Bounds.Width:F0}x{Bounds.Height:F0} at {Bounds.Left:F0},{Bounds.Top:F0}"

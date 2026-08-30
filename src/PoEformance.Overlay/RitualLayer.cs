@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Features;
+using PoEformance.Game.Ui;
 
 namespace PoEformance.Overlay;
 
@@ -47,6 +48,19 @@ public sealed class RitualLayer
     /// <summary>Write each map's reward along the route.</summary>
     public bool ShowRewards { get; set; } = true;
 
+    /// <summary>
+    /// Where on the screen this may draw: everything, less whatever the game paints on top.
+    /// </summary>
+    /// <remarks>
+    /// The same region the atlas layer takes, and for the same reason - these lines are drawn
+    /// over the same panel, so they land on the orbs and any open side panel just as readily.
+    /// See <see cref="AtlasLayer.Region"/>.
+    /// </remarks>
+    public ScreenRegion? Region { get; set; }
+
+    /// <summary>Where a clipped line ends up. Reused, like the atlas layer's.</summary>
+    private readonly List<(Vector2 From, Vector2 To)> _pieces = [];
+
     /// <summary>The colour a route drawn Nth takes.</summary>
     public static uint ColourFor(int index) => Palette[((index % Palette.Count) + Palette.Count) % Palette.Count];
 
@@ -86,7 +100,11 @@ public sealed class RitualLayer
 
         // The start marked with a ring rather than a dot, because on a busy atlas a dot is
         // whatever the game already drew there.
-        draw.AddCircle(at, Width * 2f, colour, 0, Width * 0.6f);
+        var reach = new Vector2(Width * 2f, Width * 2f);
+        if (Fits(at - reach, at + reach))
+        {
+            draw.AddCircle(at, Width * 2f, colour, 0, Width * 0.6f);
+        }
 
         Vector2 previous = at;
         float font = ImGui.GetFontSize() * (TextScale > 0f ? TextScale : 1f);
@@ -99,7 +117,7 @@ public sealed class RitualLayer
                 continue;
             }
 
-            draw.AddLine(previous, next, colour, Width);
+            Line(draw, previous, next, colour);
             previous = next;
 
             if (!ShowRewards)
@@ -114,10 +132,35 @@ public sealed class RitualLayer
             var where = new Vector2(next.X - (size.X * 0.5f), next.Y + (Width * 2f));
             var pad = new Vector2(4f, 1f);
 
-            draw.AddRectFilled(where - pad, where + size + pad, Packed(0, 0, 0, 205), 3f);
-            draw.AddText(ImGui.GetFont(), font, where, colour, said);
+            if (Fits(where - pad, where + size + pad))
+            {
+                draw.AddRectFilled(where - pad, where + size + pad, Packed(0, 0, 0, 205), 3f);
+                draw.AddText(ImGui.GetFont(), font, where, colour, said);
+            }
         }
     }
+
+    /// <summary>Draws a line in as many pieces as the game's interface leaves room for.</summary>
+    private void Line(ImDrawListPtr draw, Vector2 from, Vector2 to, uint colour)
+    {
+        if (Region is not ScreenRegion region)
+        {
+            draw.AddLine(from, to, colour, Width);
+            return;
+        }
+
+        _pieces.Clear();
+        region.ClipSegment(from, to, _pieces);
+        foreach ((Vector2 start, Vector2 end) in _pieces)
+        {
+            draw.AddLine(start, end, colour, Width);
+        }
+    }
+
+    /// <summary>Whether a box of writing may be drawn where it wants to go.</summary>
+    private bool Fits(Vector2 from, Vector2 to)
+        => Region is not ScreenRegion region
+           || region.Clear(new ScreenRect(from.X, from.Y, to.X, to.Y));
 
     /// <summary>A colour as ImGui packs it - ABGR, alpha in the high byte.</summary>
     private static uint Packed(byte r, byte g, byte b, byte a = 255)

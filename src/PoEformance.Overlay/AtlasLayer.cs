@@ -68,6 +68,27 @@ public sealed class AtlasLayer
     public Vector2 Nudge { get; set; } = new(0f, -20f);
 
     /// <summary>
+    /// Where on the screen this may draw: everything, less whatever the game paints on top.
+    /// </summary>
+    /// <remarks>
+    /// THE ATLAS HAS THE SAME PROBLEM THE LARGE MAP HAD, in a different shape. The panel is
+    /// drawn across the whole window and the game paints its own interface over it - the orbs
+    /// and bars at the bottom, an open inventory down one side, an atlas skill panel down the
+    /// other - so the web, the routes and the labels all land on top of those unless something
+    /// says otherwise. Set by the overlay every frame; see <c>EntityOverlay.KeepOutOf</c>.
+    /// </remarks>
+    public ScreenRegion? Region { get; set; }
+
+    /// <summary>
+    /// Where a clipped line ends up, reused between frames.
+    /// </summary>
+    /// <remarks>
+    /// A field rather than a local because this is called a couple of thousand times a frame on
+    /// a full atlas, and a list per call is a list per connection per frame.
+    /// </remarks>
+    private readonly List<(Vector2 From, Vector2 To)> _pieces = [];
+
+    /// <summary>
     /// Draws the atlas view over the game's own.
     /// </summary>
     /// <remarks>
@@ -94,7 +115,7 @@ public sealed class AtlasLayer
             {
                 if (Worth(from, to, screen))
                 {
-                    draw.AddLine(from, to, web, thin);
+                    Line(draw, from, to, web, thin);
                 }
             }
         }
@@ -119,6 +140,40 @@ public sealed class AtlasLayer
         }
     }
 
+    /// <summary>
+    /// Draws a line, in as many pieces as the game's interface leaves room for.
+    /// </summary>
+    /// <remarks>
+    /// CUT RATHER THAN DROPPED. A connection that clips the corner of an open panel is still
+    /// most of a connection, and on the atlas the lines ARE the content - dropping one because
+    /// it touches the inventory would quietly remove a route somebody is reading.
+    /// </remarks>
+    private void Line(ImDrawListPtr draw, Vector2 from, Vector2 to, uint colour, float width)
+    {
+        if (Region is not ScreenRegion region)
+        {
+            draw.AddLine(from, to, colour, width);
+            return;
+        }
+
+        _pieces.Clear();
+        region.ClipSegment(from, to, _pieces);
+        foreach ((Vector2 start, Vector2 end) in _pieces)
+        {
+            draw.AddLine(start, end, colour, width);
+        }
+    }
+
+    /// <summary>Whether a box of writing may be drawn where it wants to go.</summary>
+    /// <remarks>
+    /// ALL OR NOTHING for text, unlike the lines above: half a name plate cut off by the edge
+    /// of the inventory is a word broken mid-letter, which is worse to look at than a label
+    /// that is simply not there. The map underneath is still named by the game.
+    /// </remarks>
+    private bool Fits(Vector2 from, Vector2 to)
+        => Region is not ScreenRegion region
+           || region.Clear(new ScreenRect(from.X, from.Y, to.X, to.Y));
+
     /// <summary>Draws the way to one map, in its group's colour.</summary>
     /// <remarks>
     /// RUN BY RUN, with the holes left as holes. A route can cross a map the panel has no
@@ -140,7 +195,7 @@ public sealed class AtlasLayer
             {
                 if (Worth(run[i - 1], run[i], screen))
                 {
-                    draw.AddLine(run[i - 1], run[i], colour, width);
+                    Line(draw, run[i - 1], run[i], colour, width);
                 }
             }
         }
@@ -155,6 +210,12 @@ public sealed class AtlasLayer
         }
 
         float radius = Style.Sized(StyleCatalogue.Keys.AtlasEntry, MathF.Max(3f, width * 1.3f));
+        var reach = new Vector2(radius, radius);
+        if (!Fits(entry - reach, entry + reach))
+        {
+            return;
+        }
+
         draw.AddCircleFilled(entry, radius, Style.Colour(StyleCatalogue.Keys.AtlasEntry));
         draw.AddCircle(entry, radius, 0xFF00_0000, 0, MathF.Max(1f, radius * 0.35f));
     }
@@ -197,8 +258,16 @@ public sealed class AtlasLayer
             Vector2 wide = Measure(line, font);
             var where = new Vector2(mark.Where.X + Nudge.X - (wide.X * 0.5f), below);
 
-            draw.AddRectFilled(where - new Vector2(3f, 1f), where + wide + new Vector2(3f, 1f), plate, 3f);
-            draw.AddText(ImGui.GetFont(), font, where, said, line);
+            // Each line asked separately, and the height advanced either way: a map whose name
+            // clears the interface but whose contents run under it keeps the lines that fit,
+            // and the ones that do not leave a gap where they were rather than shifting the
+            // rest up onto the panel.
+            if (Fits(where - new Vector2(3f, 1f), where + wide + new Vector2(3f, 1f)))
+            {
+                draw.AddRectFilled(where - new Vector2(3f, 1f), where + wide + new Vector2(3f, 1f), plate, 3f);
+                draw.AddText(ImGui.GetFont(), font, where, said, line);
+            }
+
             below += wide.Y + 2f;
         }
     }
@@ -249,6 +318,14 @@ public sealed class AtlasLayer
         var pad = new Vector2(5f, 2f);
         Vector2 from = at - pad;
         Vector2 to = at + size + new Vector2(pillWide, 0f) + pad;
+
+        // The height is returned WHETHER OR NOT the plate is drawn, so the contents underneath
+        // stay where they belong. Moving them up into the space a skipped name left would put
+        // them exactly where the name was refused.
+        if (!Fits(from, to))
+        {
+            return at.Y + size.Y + 3f;
+        }
 
         if (AtlasBiomes.Of(mark.Biome) is { } biome)
         {

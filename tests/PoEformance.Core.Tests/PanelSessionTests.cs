@@ -174,6 +174,27 @@ public class PanelSessionTests
     }
 
     [Fact]
+    public void ANDTheMeASUREMENTIsStillCarriedForTheCallerThatNeedsIt()
+    {
+        // The kind decision is right for a WINDOW asking "am I in the way" - over-answering
+        // costs a hidden window. It is wrong for a LAYER drawn on the atlas asking "what is on
+        // top of me": treating a side panel as the whole screen would erase the atlas overlay
+        // while most of the atlas is plainly visible. So both answers are carried, and this is
+        // the reading, on the one fixture where the two provably differ.
+        using ReplayMemoryReader replay = LoadAtlas();
+        (PanelReader panels, _, ulong uiRoot) = Attach(replay);
+
+        PanelArea area = Assert.Single(panels.Read(uiRoot, Ultrawide).Areas);
+
+        Assert.Equal(PanelExtent.Kind, area.From);
+        Assert.Equal(3440f, area.Right);
+
+        ScreenRect measured = Assert.NotNull(area.Measured);
+        Assert.Equal(2707.2f, measured.Width, 1);
+        Assert.Equal(1440f, measured.Height, 1);
+    }
+
+    [Fact]
     public void ANDTheAtlasNodesSitOutsideTheRectangleTheirParentClaims()
     {
         // Why the element understates itself, rather than that it does. The panel is a viewport
