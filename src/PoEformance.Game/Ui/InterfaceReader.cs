@@ -136,9 +136,10 @@ public sealed class InterfaceReader
     /// ones are taken: they are screen-sized, and honouring one while it is idle would blank
     /// the atlas overlay entirely.
     /// </remarks>
+    /// <param name="uiRoot">The interface root, which is where the walk upward stops counting.</param>
     /// <param name="atlas">The atlas panel element, as resolved from its own path.</param>
     /// <param name="scale">The viewport to place the furniture in.</param>
-    public List<InterfacePart> AtlasChrome(ulong atlas, UiScale scale)
+    public List<InterfacePart> AtlasChrome(ulong uiRoot, ulong atlas, UiScale scale)
     {
         List<InterfacePart> parts = [];
         if (!_elements.IsUiElement(atlas))
@@ -147,18 +148,21 @@ public sealed class InterfaceReader
         }
 
         // The atlas's whole ancestry, which is both the exclusion list and the way the screen
-        // is found: the screen is the ancestor one below the root, and the page the atlas hangs
-        // in is the ancestor below that.
+        // is found.
         var ancestry = new List<ulong>();
         var chain = new HashSet<ulong>();
         _elements.AndAncestors(atlas, chain, ancestry);
 
-        // ancestry runs leaf-first, so the screen is the second-to-last entry and the root the
-        // last. Fewer than three means the atlas is not where its path says it is - the safe
-        // answer is then no furniture rather than a guess at which element is the screen.
-        return ancestry.Count < 3
-            ? parts
-            : PartsOf(ancestry[^2], scale, chain);
+        // THE SCREEN IS THE ANCESTOR DIRECTLY UNDER THE ROOT WE WERE GIVEN, and it has to be
+        // found by that root's position rather than by counting back from the end of the chain.
+        // The chain does NOT stop where the caller's root does: the interface root is itself a
+        // child of the game's real UI root, so "the second-to-last entry" lands one or more
+        // levels ABOVE the screen - and that element's children are every panel in the game.
+        // Keeping the atlas off all of those left the whole overlay drawing nothing at all,
+        // which is exactly what it did the first time this shipped. A synthetic tree cannot
+        // catch it, because a fixture's root has no parent; see the test that gives it one.
+        int root = ancestry.IndexOf(uiRoot);
+        return root < 1 ? parts : PartsOf(ancestry[root - 1], scale, chain);
     }
 
     /// <summary>

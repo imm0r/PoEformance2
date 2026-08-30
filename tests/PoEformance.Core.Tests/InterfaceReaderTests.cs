@@ -315,7 +315,7 @@ public class InterfaceReaderTests
         OffsetSchema schema = Schema();
         (UiTree tree, ulong atlas) = AtlasScreen(schema);
 
-        List<InterfacePart> chrome = Reader(tree, schema).AtlasChrome(atlas, Window());
+        List<InterfacePart> chrome = Reader(tree, schema).AtlasChrome(UiTree.At(0), atlas, Window());
 
         Assert.Equal(["header", "search_bar_frame"], chrome.Select(part => part.Name));
         Assert.Equal(new ScreenRect(790f, 0f, 1770f, 108f), chrome[0].Where);
@@ -331,7 +331,7 @@ public class InterfaceReaderTests
         OffsetSchema schema = Schema();
         (UiTree tree, ulong atlas) = AtlasScreen(schema);
 
-        List<InterfacePart> chrome = Reader(tree, schema).AtlasChrome(atlas, Window());
+        List<InterfacePart> chrome = Reader(tree, schema).AtlasChrome(UiTree.At(0), atlas, Window());
 
         Assert.DoesNotContain(chrome, part => part.Name is "pages" or "atlas");
     }
@@ -345,7 +345,7 @@ public class InterfaceReaderTests
         OffsetSchema schema = Schema();
         (UiTree tree, ulong atlas) = AtlasScreen(schema);
 
-        Assert.DoesNotContain(Reader(tree, schema).AtlasChrome(atlas, Window()), part => part.Name == "fade_to_black");
+        Assert.DoesNotContain(Reader(tree, schema).AtlasChrome(UiTree.At(0), atlas, Window()), part => part.Name == "fade_to_black");
     }
 
     [Fact]
@@ -356,8 +356,8 @@ public class InterfaceReaderTests
         OffsetSchema schema = Schema();
         (UiTree tree, _) = AtlasScreen(schema);
 
-        Assert.Empty(Reader(tree, schema).AtlasChrome(0, Window()));
-        Assert.Empty(Reader(tree, schema).AtlasChrome(UiTree.At(99), Window()));
+        Assert.Empty(Reader(tree, schema).AtlasChrome(UiTree.At(0), 0, Window()));
+        Assert.Empty(Reader(tree, schema).AtlasChrome(UiTree.At(0), UiTree.At(99), Window()));
     }
 
     [Fact]
@@ -373,6 +373,49 @@ public class InterfaceReaderTests
         tree.Add(1, parent: 0, stringId: "atlas", size: new Vector2(2560, 1600));
         tree.Add(2, parent: 0, stringId: "something_else", size: new Vector2(400, 200));
 
-        Assert.Empty(Reader(tree, schema).AtlasChrome(UiTree.At(1), Window()));
+        Assert.Empty(Reader(tree, schema).AtlasChrome(UiTree.At(0), UiTree.At(1), Window()));
+    }
+
+    [Fact]
+    public void THEScreenIsFoundUNDERTheGivenRoot_NotUnderTheTOPOfTheTree()
+    {
+        // THE BUG THIS EXISTS FOR, and the one a fixture could not catch until it was given
+        // this shape. The interface root the tool resolves is itself a child of the game's real
+        // UI root, so walking up from the atlas does NOT stop where the caller's root does.
+        // Taking the second-to-last ancestor therefore landed one or more levels too high, and
+        // that element's children are every panel in the game - the whole atlas overlay was kept
+        // off everything and drew nothing at all, while its own tab reported the read as fine.
+        OffsetSchema schema = Schema();
+        var tree = new UiTree(schema);
+
+        // ONE level above the root the caller knows about, which is what the game has: the
+        // interface root is the real UI root's main child. That is enough to move the
+        // second-to-last ancestor off the screen and onto the interface root itself.
+        tree.Add(8, stringId: "real_ui_root", children: [0]);
+        tree.Add(0, parent: 8, stringId: "interface_root", children: [1, 7]);
+        tree.Add(1, parent: 0, stringId: "world_screen", children: [2, 3]);
+        tree.Add(2, parent: 1, stringId: "pages", children: [6]);
+        tree.Add(6, parent: 2, stringId: "atlas", size: new Vector2(2560, 1600));
+        tree.Add(3, parent: 1, stringId: "header", relative: new Vector2(790, 0), size: new Vector2(980, 108));
+
+        // A sibling of the SCREEN, i.e. what would be swept up by walking one level too high.
+        tree.Add(7, parent: 0, stringId: "some_other_panel", size: new Vector2(2560, 1600));
+
+        List<InterfacePart> chrome =
+            Reader(tree, schema).AtlasChrome(UiTree.At(0), UiTree.At(6), Window());
+
+        Assert.Equal("header", Assert.Single(chrome).Name);
+    }
+
+    [Fact]
+    public void ANDARootTheAtlasDoesNotHangUnderYieldsNothing()
+    {
+        // A root that is not on the atlas's chain at all - a wrong offset, or a call made with
+        // the wrong root. Answering anyway would mean picking an arbitrary ancestor, so the
+        // answer is no furniture: the safe direction is the overlay drawn as it was.
+        OffsetSchema schema = Schema();
+        (UiTree tree, ulong atlas) = AtlasScreen(schema);
+
+        Assert.Empty(Reader(tree, schema).AtlasChrome(UiTree.At(42), atlas, Window()));
     }
 }
