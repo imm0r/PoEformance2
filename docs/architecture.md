@@ -852,6 +852,22 @@ interesting part was not the feature:
   a panel is the status quo, an overlay that vanished is a bug report nobody can act on), the
   answer is a flags enum rather than a bool so the status window can name the panel that is
   stuck, and there is a switch to stop asking.
+  - **Except the atlas, which is a panel the tool WORKS ON.** The rule above holds for a panel
+    this tool has nothing to say about. On the atlas it names the maps, draws the routes, plans
+    the rituals and has a tab for each — so hiding every window the moment the atlas opened made
+    them disappear exactly when they became useful. Worse, it took the interface browser with
+    it, and that is a circle: the browser exists to walk the game's UI tree, most of what is
+    worth walking is inside a panel, and a browser that hides itself whenever a panel opens can
+    never be pointed at one. `PanelArea.WorkedOn` names the exception, `HidesWindows` asks it,
+    and the status readout lists only the panels that actually take a window with them — a line
+    reporting a hiding that is not happening is the same lie in the other direction. The rule
+    lives on `PanelArea` rather than in `WindowChrome` so it can be tested at all: the window
+    chrome is Windows-only and the test project is not.
+
+    Whether the atlas SKILL panel belongs with it is deliberately left open. It looks like a
+    column down one side, which would make it another case of hiding from something the atlas
+    tabs are for — but which panel of the interface it actually is has not been established, and
+    that is not a thing to guess at.
 - **Getting out of the way of the game's own HUD, which is a different problem.** A panel is
   open or shut and the answer is to stop drawing; the HUD is ALWAYS there and the answer cannot
   be. The large map is the case: the game draws it across the whole window — its UI element says
