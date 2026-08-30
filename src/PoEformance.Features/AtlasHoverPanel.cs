@@ -14,12 +14,24 @@ namespace PoEformance.Features;
 /// screen. It now has one, and it is the same one the orbs, the title bar and the search box get:
 /// the panel is measured and the drawing goes round it.
 ///
-/// FOUND BY APPEARING, not by name, and that is deliberate rather than lazy. The interface parts
-/// are re-measured every read tick anyway, so the parts on screen while nothing is hovered are a
-/// free baseline - and a part that is only there while the cursor is on a map is the panel the
-/// game just put up. Naming it would mean hard-coding a StringId nobody here has read yet, and
-/// the failure of a wrong name is silent: the overlay would draw across the panel while the
-/// readout claimed the keep-out was healthy.
+/// FOUND BY APPEARING, not by name, because THE GAME DOES NOT NAME IT. Read out of this tool's
+/// own interface browser in game, 2026-08, with a map hovered: the panel is the element at child
+/// path [22][17][1] - a grandchild of the world screen - with 17 children of its own, "Blooming
+/// Field" and content_modifier_layout among them, measuring 658x194 at 771,614. Its StringId is
+/// EMPTY, and so is its parent's: the parent is a bare anchor carrying the position the panel
+/// pops up at, which is why the panel itself sits at relative 0,0 inside it. So there is no name
+/// to match on, and matching on [22][17] instead would be an index into a list that a patch
+/// reorders - the exact fragility the HUD is deliberately found by id to avoid, with the same
+/// silent failure: the overlay draws across the panel while the readout calls the keep-out
+/// healthy.
+///
+/// What there IS, every tick, is the measurement: the interface parts are re-measured anyway, so
+/// the parts on screen while nothing is hovered are a free baseline, and a part that was not
+/// there - or was not THERE, at that rectangle - while nothing was hovered is the panel the game
+/// just put up. Both halves of that are needed because of how the anchor measures: it claims no
+/// extent of its own, so InterfaceReader falls to the bounds of its visible children, which is
+/// nothing at all while no panel is up (the part vanishes) and the panel's own rectangle while
+/// one is (the part appears, somewhere new each time, since the anchor moves to the hovered map).
 ///
 /// The rectangle itself needs no extra work: the panel is an ordinary interface part, so it is
 /// already in the keep-out list this was handed. Finding it only answers whether the fallback is
@@ -34,7 +46,7 @@ namespace PoEformance.Features;
 /// </remarks>
 public sealed class AtlasHoverPanel
 {
-    private readonly HashSet<ulong> _idle = [];
+    private readonly Dictionary<ulong, ScreenRect> _idle = [];
     private readonly List<InterfacePart> _shown = [];
     private bool _open;
     private bool _settled;
@@ -94,7 +106,7 @@ public sealed class AtlasHoverPanel
             _idle.Clear();
             foreach (InterfacePart part in keptOut)
             {
-                _idle.Add(part.Address);
+                _idle[part.Address] = part.Where;
             }
 
             _settled = open;
@@ -108,7 +120,12 @@ public sealed class AtlasHoverPanel
 
         foreach (InterfacePart part in keptOut)
         {
-            if (!_idle.Contains(part.Address))
+            // SOMEWHERE ELSE COUNTS AS NEW. The anchor the panel hangs in moves to whichever map
+            // is hovered, so if it ever measures as a part in its own right while nothing is up,
+            // its address alone would say "seen this one" about a rectangle 600 pixels away.
+            // What is kept off is this tick's rectangle either way - the list is rebuilt every
+            // frame from live positions - so a moved part is one the drawing is already avoiding.
+            if (!_idle.TryGetValue(part.Address, out ScreenRect idle) || idle != part.Where)
             {
                 _shown.Add(part);
             }

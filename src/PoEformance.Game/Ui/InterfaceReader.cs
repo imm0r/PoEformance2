@@ -131,10 +131,20 @@ public sealed class InterfaceReader
     /// the screen is root child 22, the atlas page hangs under its child 0, and its other
     /// children are named header (close_button, title_label, act_buttons_layout with an
     /// ActButton each), search_bar_frame, quest_selector, map_content_list, map_legends_frame,
-    /// atlas_master_selector, endgame_map_pin_editor, special_mode_title_frame, vignette,
-    /// fade_to_black and consume_input_frame. The last three are the reason only the VISIBLE
-    /// ones are taken: they are screen-sized, and honouring one while it is idle would blank
-    /// the atlas overlay entirely.
+    /// legend_anchor_frame, atlas_master_selector, endgame_map_pin_editor, favourite_pins_
+    /// container_frame, special_mode_title_frame, vignette, fade_to_black and consume_input_
+    /// frame, with a handful the game does not name. The screen-sized three are the reason only
+    /// the VISIBLE ones are taken: honouring one while it is idle would blank the atlas overlay
+    /// entirely.
+    ///
+    /// AND THE PANEL OVER A HOVERED MAP IS ONE OF THE UNNAMED ONES, which is what makes the
+    /// children rule in <see cref="Measure"/> load-bearing rather than a nicety. Seen with a map
+    /// hovered: screen child 17 is a nameless anchor with no extent of its own that moves to
+    /// whichever map the cursor is on, and the panel - "Blooming Field", its biome, its flavour
+    /// line, 658x194 - is its child, at relative 0,0 inside it. Measuring the anchor from its
+    /// visible children is therefore the whole of how that panel gets kept off, and it is also
+    /// what makes it come and go with the hover; see <c>AtlasHoverPanel</c>, which reads that
+    /// coming and going rather than a name the game does not give it.
     /// </remarks>
     /// <param name="uiRoot">The interface root, which is where the walk upward stops counting.</param>
     /// <param name="atlas">The atlas panel element, as resolved from its own path.</param>
@@ -226,6 +236,12 @@ public sealed class InterfaceReader
     /// measurement into a per-frame walk of the interface. Anything still unmeasured after one
     /// level contributes nothing, which is the safe direction: an unmeasured part leaves the map
     /// drawn where it was, and the readout names it.
+    ///
+    /// One level is also exactly what the atlas's hover panel needs, and that is luck worth
+    /// knowing about rather than a rule to relax: the panel is a child of a nameless anchor
+    /// which is a child of the world screen, so it is measured here and would not be one level
+    /// deeper. If a later screen buries something a level further down, the answer is a part
+    /// that measures as nothing and says so - not a deeper walk taken every frame for all of it.
     /// </remarks>
     private (ScreenRect Where, PanelExtent From) Measure(
         ulong part,

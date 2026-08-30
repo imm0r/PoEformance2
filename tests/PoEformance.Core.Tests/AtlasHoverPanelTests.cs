@@ -41,6 +41,25 @@ public sealed class AtlasHoverPanelTests
     }
 
     [Fact]
+    public void ANDAPartThatMovedCountsAsNewToo()
+    {
+        // The panel hangs in a NAMELESS ANCHOR that moves to whichever map is hovered - the
+        // panel sits at relative 0,0 inside it - so the same address can be an idle rectangle
+        // one tick and the panel's the next. By address alone that reads as "seen this one"
+        // about a rectangle six hundred pixels away. What is kept off is this tick's rectangle
+        // either way, since the list is rebuilt every frame from live positions.
+        var hover = new AtlasHoverPanel();
+
+        InterfacePart anchorIdle = new(0x4000, string.Empty, new ScreenRect(0, 0, 8, 8), PanelExtent.Children);
+        InterfacePart anchorUp = anchorIdle with { Where = new ScreenRect(771, 614, 1429, 808) };
+
+        hover.Look(open: true, hovering: false, [Header, anchorIdle]);
+        hover.Look(open: true, hovering: true, [Header, anchorUp]);
+
+        Assert.Equal(0x4000ul, Assert.Single(hover.Shown).Address);
+    }
+
+    [Fact]
     public void ANDNothingNewMEANSTheOverlayHasToHideAsItUsedTo()
     {
         // The failure this has to fail towards. If the game's panel is not among the parts being

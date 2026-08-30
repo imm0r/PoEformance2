@@ -1262,11 +1262,19 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   was the only answer available while the overlay could not keep off part of the screen. It can
   now, so the panel the game puts up gets the same treatment as the orbs and the title bar: it is
   measured, the region is carved, and the drawing goes round it. `AtlasHoverPanel` finds it BY
-  APPEARING rather than by name — the interface parts are re-measured every tick anyway, so the
-  parts on screen with nothing hovered are a free baseline, and a part that is only there while
-  the cursor is on a map is the panel the game just put up. Naming it would mean hard-coding a
-  StringId nobody has read yet, and a wrong name fails silently: the overlay draws across the
-  panel while the readout calls the keep-out healthy. The rectangle needs no extra work — the
+  APPEARING rather than by name, because **the game does not name it**: read out of the interface
+  browser with a map hovered, it is the element at `[22][17][1]` — a grandchild of the world
+  screen, 17 children of its own, 658×194 — with an EMPTY StringId, hanging in a nameless anchor
+  that carries the position it pops up at (the panel itself sits at relative 0,0 inside it). So
+  there is nothing to match on, and matching `[22][17]` instead would be an index into a list a
+  patch reorders, failing exactly as silently as a wrong name: the overlay draws across the panel
+  while the readout calls the keep-out healthy. What there is every tick is the measurement — the
+  parts on screen with nothing hovered are a free baseline, and a part that was not there, or was
+  not there *at that rectangle*, is the panel the game just put up. Both halves matter because of
+  how the anchor measures: it claims no extent of its own, so `InterfaceReader` falls to the
+  bounds of its visible children — nothing while no panel is up, the panel's own rectangle while
+  one is, somewhere new each time. That also makes the one-level-down rule in `Measure`
+  load-bearing rather than a nicety. The rectangle needs no extra work — the
   panel is an ordinary interface part and was already in the keep-out list — so finding it only
   answers whether the fallback is needed, and the `--debug` row NAMES the part, which is how that
   StringId finally gets read. Three things make the fallback the safe direction rather than a
