@@ -63,6 +63,14 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
+**A downloaded build keeps itself current.** It checks that release a couple of times a day,
+says so on the config window's **Update** tab and in the overlay's Status page, shows what
+changed since the build you are running, and — when you press the button — downloads it,
+unpacks it over its own folder and restarts into it, telling you it worked. Nothing is
+downloaded or replaced without a click, `config/` is never touched, and the check can be
+switched off on the same tab. Builds compiled locally say "local build" and are never
+offered an update, because a release zip has no business landing on top of a working tree.
+
 ```bash
 dotnet build        # any OS
 dotnet test         # any OS

@@ -482,3 +482,69 @@ pre#log {
 .rl-buffs li .rl-buff-name { display: flex; flex-direction: column; gap: 0; }
 .rl-buff-readable { font: 12px/1.4 system-ui, "Segoe UI", sans-serif; }
 .rl-buff-id { font: 11px/1.3 ui-monospace, Consolas, monospace; opacity: 0.65; }
+
+/* ── Update ─────────────────────────────────────────────────────────────── */
+
+/* The notice on the tab itself. It is the whole notification while another tab is open,
+   so it sits where the eye already goes rather than inside the page it announces. */
+.tab-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: middle;
+}
+
+#tab-update {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  padding: 16px 20px;
+  max-width: 900px;
+}
+
+/* The report on the update that already happened. Loud on purpose in both directions: a
+   successful one is the only confirmation anybody gets, and a failed one leaves the OLD
+   build running, which looks exactly like nothing having been attempted. */
+.up-outcome {
+  border-radius: 6px;
+  padding: 10px 14px;
+  border: 1px solid #00000066;
+}
+
+.up-good { background: #1d2a1e; color: var(--ok); }
+.up-bad { background: #2c1c1b; color: var(--bad); }
+
+.up-auto { margin-top: 12px; }
+
+.up-progress { margin: 10px 0 4px; }
+
+.up-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: #00000066;
+  overflow: hidden;
+}
+
+.up-bar > div {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.2s linear;
+}
+
+.up-bar > div.up-fill-bad { background: var(--bad); }
+
+/* The changelog, as the release wrote it. Monospace and pre-wrapped because it is markdown
+   with lists and shas in it, and it is inserted as TEXT - see updates.js. */
+#up-notes {
+  margin: 0;
+  max-height: 420px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font: 12px/1.6 ui-monospace, Consolas, monospace;
+  color: var(--text);
+}

@@ -212,6 +212,53 @@ public sealed record ConditionMessage(
     [property: JsonPropertyName("column")] int Column,
     [property: JsonPropertyName("condition")] RuleCondition? Condition);
 
+/// <summary>
+/// The update panel: what is running, what is published, and how far an install has got.
+/// </summary>
+/// <remarks>
+/// ONE BLOCK FOR THE WHOLE FEATURE, riding the once-a-second state push like everything else
+/// here. It carries the changelog, which is the largest thing on this bridge that is not the
+/// map layout - a few kilobytes of markdown at most, and only while a release is known. The
+/// alternative, fetching it on request the way the map layout is fetched, would buy back those
+/// kilobytes at the cost of a second protocol for a panel nobody has open for long.
+/// </remarks>
+/// <param name="Verdict">
+/// The check's decision by name - "NotChecked", "UpToDate", "Available", "CannotCompare" or
+/// "Failed". The page shows the status line either way; the verdict is what decides whether
+/// there is a button.
+/// </param>
+/// <param name="Current">This build in words, or why it cannot say.</param>
+/// <param name="Available">The published build in words. Empty until one has been read.</param>
+/// <param name="Notes">The release body - the changelog, as the release wrote it.</param>
+/// <param name="Step">
+/// How far an install has got - "Idle", "Downloading", "Extracting", "Ready" or "Failed".
+/// </param>
+/// <param name="Outcome">
+/// What the last restart was: "updated", "failed", or empty. This is the notification the
+/// user gets for an update that has already happened, which is the only moment the tool can
+/// report on one - the process that did the work no longer exists.
+/// </param>
+public sealed record UpdateView(
+    [property: JsonPropertyName("enabled")] bool Enabled,
+    [property: JsonPropertyName("verdict")] string Verdict,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("busy")] bool Busy,
+    [property: JsonPropertyName("offering")] bool Offering,
+    [property: JsonPropertyName("current")] string Current,
+    [property: JsonPropertyName("available")] string Available,
+    [property: JsonPropertyName("releaseName")] string ReleaseName,
+    [property: JsonPropertyName("releaseTag")] string ReleaseTag,
+    [property: JsonPropertyName("notes")] string Notes,
+    [property: JsonPropertyName("releaseSize")] long ReleaseSize,
+    [property: JsonPropertyName("checked")] string Checked,
+    [property: JsonPropertyName("step")] string Step,
+    [property: JsonPropertyName("installStatus")] string InstallStatus,
+    [property: JsonPropertyName("received")] long Received,
+    [property: JsonPropertyName("total")] long Total,
+    [property: JsonPropertyName("outcome")] string Outcome,
+    [property: JsonPropertyName("outcomeVersion")] string OutcomeVersion,
+    [property: JsonPropertyName("log")] string Log);
+
 /// <summary>The host's state push: everything the config page shows.</summary>
 /// <remarks>
 /// One flat record on purpose. The page re-renders from whole states rather than patching
@@ -231,7 +278,8 @@ public sealed record ConfigState(
     [property: JsonPropertyName("overlay")] OverlayView? Overlay = null,
     [property: JsonPropertyName("map")] MapStateView? Map = null,
     [property: JsonPropertyName("rules")] RulesView? Rules = null,
-    [property: JsonPropertyName("evasion")] EvasionView? Evasion = null);
+    [property: JsonPropertyName("evasion")] EvasionView? Evasion = null,
+    [property: JsonPropertyName("update")] UpdateView? Update = null);
 
 /// <summary>The evasion panel: the settings, the key, and why nothing is happening.</summary>
 /// <param name="Status">
@@ -284,4 +332,5 @@ public sealed record EvasionView(
 [JsonSerializable(typeof(RuleSettings))]
 [JsonSerializable(typeof(ConditionMessage))]
 [JsonSerializable(typeof(EvasionSettings))]
+[JsonSerializable(typeof(UpdateSettings))]
 public sealed partial class ConfigJsonContext : JsonSerializerContext;

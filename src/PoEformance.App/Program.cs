@@ -55,6 +55,13 @@ internal static class Program
             PoEformance.Features.KeyBindingProbe.Report(Console.Out);
         }
 
+        // BEFORE THE ATTACH, and that is the point rather than an ordering accident. This says
+        // which build is running and whether the last restart was an update that worked - two
+        // answers that must not depend on the game being open, because the launch where they
+        // matter most is the one right after an update, with the game not started yet.
+        using var updates = new UpdateService(options.UpdateOutcome, options.UpdatedVersion);
+        updates.Start();
+
         Console.WriteLine();
 
         // ── Attach (or replay) - the only Windows-specific step ──────────────
@@ -282,7 +289,7 @@ internal static class Program
         Thread? configWindow = options.ShowConfig
             ? StartConfigWindow(
                 reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings,
-                overlaySettings, ruleEngine, buffWatch, evasionPlanner, overlayHandle,
+                overlaySettings, ruleEngine, buffWatch, evasionPlanner, overlayHandle, updates,
                 alwaysOnTop: options.ShowOverlay)
             : null;
 
@@ -310,7 +317,7 @@ internal static class Program
                 reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
                 ruleEngine, ruleHistory, buffWatch, evasionPlanner, rotation,
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
-                uiBrowser: options.ShowUiBrowser,
+                uiBrowser: options.ShowUiBrowser, updates: updates,
                 fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
                 areaCounter: result.Statics.FirstOrDefault(s => s.Name == "AreaChangeCounter" && s.Found)?.Address ?? 0,
                 recorder: recorder);
@@ -1046,6 +1053,7 @@ internal static class Program
         PoEformance.Features.EvasionPlanner evasionPlanner,
         PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
+        UpdateService updates,
         ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
     {
         // The rules FIRST, before any of the services below. Several of them are slow on a
@@ -1629,6 +1637,11 @@ internal static class Program
             exchange);
         overlay.AttachWealth(wealth, stash, prices, exchange);
         overlay.AttachRates(exchange, scout, () => stash.League, itemNames.Base);
+        overlay.AttachUpdates(
+            updates.Check, updates.Installer,
+            download: updates.Download, install: updates.Apply,
+            skip: updates.Skip,
+            outcome: updates.Outcome, outcomeVersion: updates.OutcomeVersion);
         overlay.AttachRitual(
             ritual,
             () => atlas.RitualWorth,
@@ -1895,6 +1908,7 @@ internal static class Program
         PoEformance.Features.BuffWatch buffWatch,
         PoEformance.Features.EvasionPlanner evasionPlanner,
         OverlayHandle overlayHandle,
+        UpdateService updates,
         bool alwaysOnTop)
     {
         Console.WriteLine();
@@ -1924,6 +1938,11 @@ internal static class Program
 
         PoEformance.Config.ConfigState BuildState()
         {
+            // The one place that ticks the update check while only the config window is open.
+            // It costs nothing when the last answer is fresh, which it is for six hours out of
+            // every six hours and a moment.
+            updates.Tick();
+
             OffsetSchema schema = SchemaJson.Load(schemaPath);
             PoEformance.Game.World.WorldSnapshot snapshot = ReadSnapshot();
             bool inGame = snapshot.InGame;
@@ -1965,7 +1984,9 @@ internal static class Program
                     PoEformance.Features.FlaskKeyBindings.Describe((ushort)evasionPlanner.Settings.DodgeKey),
                     dodgeHints,
                     moveHints,
-                    evasionPlanner.Settings.KeysOrDefault.Describe()));
+                    evasionPlanner.Settings.KeysOrDefault.Describe()),
+
+                Update: updates.View());
         }
 
         // Rebuilding the outline is a pass over megabytes, so it is done once per area and
@@ -1976,6 +1997,13 @@ internal static class Program
 
         string? Apply(PoEformance.Config.ConfigRequest request)
         {
+            // FIRST, because two of these do not take a payload and one of them ends the
+            // process. The payload guard further down would drop "checkUpdate" on the floor.
+            if (updates.Handle(request) is string handled)
+            {
+                return handled;
+            }
+
             if (request.Type == "getMapLayout")
             {
                 PoEformance.Game.World.WorldSnapshot snapshot = ReadSnapshot();
@@ -2487,11 +2515,14 @@ internal static class Program
         bool HuntSkills,
         bool DumpAnimations,
         IReadOnlyList<string> Peek,
-        bool PeekWatch)
+        bool PeekWatch,
+        string UpdateOutcome,
+        string UpdatedVersion)
     {
         public static CliOptions Parse(string[] args)
         {
             string? schema = null, replay = null, record = null;
+            string updateOutcome = string.Empty, updatedVersion = string.Empty;
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
@@ -2594,6 +2625,19 @@ internal static class Program
                     case "--peekwatch":
                         peekWatch = true;
                         break;
+
+                    // NOT MEANT TO BE TYPED. The update script adds one of these when it starts
+                    // the tool again, and it is the only way an update can ever be reported:
+                    // the build that performed it has been overwritten and the script that did
+                    // the copying has exited, so the new process is the only thing left that
+                    // knows an update happened. See UpdateScript.
+                    case PoEformance.Features.UpdateScript.UpdatedFlag:
+                        updateOutcome = "updated";
+                        updatedVersion = Value(ref i);
+                        break;
+                    case PoEformance.Features.UpdateScript.FailedFlag:
+                        updateOutcome = "failed";
+                        break;
                     case "-v" or "--verbose":
                         verbose = true;
                         break;
@@ -2614,7 +2658,8 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, animDump, peek, peekWatch);
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, animDump, peek, peekWatch,
+                updateOutcome, updatedVersion);
         }
     }
 }

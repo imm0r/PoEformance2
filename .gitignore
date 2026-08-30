@@ -10,6 +10,11 @@ logs/
 recordings/
 config/*.local.json
 
+# What the updater downloads and unpacks, next to whichever executable is running. Also
+# where the publish workflow drops the build stamp before uploading it.
+update/
+/version.json
+
 # IDE
 .vs/
 .idea/
