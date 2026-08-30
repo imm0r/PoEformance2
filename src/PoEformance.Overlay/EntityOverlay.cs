@@ -2619,13 +2619,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // it is how the atlas was caught reporting itself 733 pixels too narrow.
             if (_snapshot.InAPanel)
             {
+                // Only the panels that actually take a window with them. The atlas is open at
+                // the same time as the tool's atlas tabs by design, so listing it as "covering"
+                // would have this line report a hiding that is not happening - see
+                // PanelArea.WorkedOn.
+                List<PanelArea> hiding = [.. _snapshot.Covering.Where(area => area.HidesWindows)];
+
                 string where = !HideWindowsBehindPanels
                     ? "windows staying put"
-                    : _snapshot.Covering.Count == 0
-                        ? "no screen area read - windows staying put"
+                    : hiding.Count == 0
+                        ? "nothing that hides a window - windows staying put"
                         : "covering " + string.Join(
                             ", ",
-                            _snapshot.Covering.Select(
+                            hiding.Select(
                                 area => $"{area.Panel} {area.Right - area.Left:F0}x{area.Bottom - area.Top:F0}"
                                         + $" {Extent(area.From)}"));
 

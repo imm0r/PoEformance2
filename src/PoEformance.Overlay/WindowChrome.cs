@@ -251,6 +251,12 @@ public sealed class WindowChrome
     /// only the ones actually over a panel go: the corner readout stays put while the inventory
     /// is open, and disappears when the passive tree takes the screen.
     ///
+    /// NOT EVERY PANEL, and the atlas is the exception - see <see cref="PanelArea.WorkedOn"/>,
+    /// which is where that decision and its reasons live. The argument above only holds for a
+    /// panel the tool has nothing to say about; on the atlas it names the maps, draws the routes
+    /// and plans the rituals, and the windows for all of that were vanishing exactly when they
+    /// became useful.
+    ///
     /// A WINDOW NOBODY HAS SEEN YET IS NOT HIDDEN. Until it has drawn once there is no
     /// rectangle to compare, and the honest answer to "is it in the way" is then no - which
     /// costs at most one frame of a window on screen when the tool starts up with a panel
@@ -276,7 +282,7 @@ public sealed class WindowChrome
 
         foreach (PanelArea area in Covering)
         {
-            if (area.Overlaps(was.At.X, was.At.Y, right, bottom))
+            if (area.HidesWindows && area.Overlaps(was.At.X, was.At.Y, right, bottom))
             {
                 return true;
             }

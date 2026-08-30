@@ -102,6 +102,41 @@ public readonly record struct PanelArea(
     PanelExtent From,
     ScreenRect? Measured = null)
 {
+    /// <summary>
+    /// The panels the tool WORKS ON rather than gets out of the way of.
+    /// </summary>
+    /// <remarks>
+    /// THE ATLAS IS NOT SOMETHING TO HIDE FROM, and treating it as one was a bug with an
+    /// unusually annoying shape. The rule the other panels follow is sound: a stash or a
+    /// passive tree is what the player is looking at, and a readout across it is right
+    /// information in the way. The atlas is the opposite case - this tool NAMES the maps on it,
+    /// draws the routes between them, plans rituals over it and has a tab for each of those.
+    /// Every one of those windows disappeared at exactly the moment it became useful.
+    ///
+    /// And it took the interface browser with it, which is the part that made this worth
+    /// fixing rather than living with: the browser exists to walk the game's UI tree, most of
+    /// what anybody wants to walk is inside a panel, and a browser that hides itself whenever a
+    /// panel opens can never be pointed at one. That is a circle - the tool could not be used to
+    /// answer questions about the very panels it was hiding from.
+    ///
+    /// ONLY the atlas, deliberately. Whether the atlas SKILL panel belongs here too is a real
+    /// question and not one to guess at: it is a column down one side in the screenshots, which
+    /// would make it another case of hiding from something the atlas tabs are for, but which
+    /// panel of the interface it actually is has not been established. See PanelExtent, and the
+    /// status readout's panels row, which names whichever one is doing the hiding.
+    /// </remarks>
+    public const GamePanel WorkedOn = GamePanel.Atlas;
+
+    /// <summary>
+    /// Whether one of the tool's own windows lying over this panel should take itself away.
+    /// </summary>
+    /// <remarks>
+    /// A property of the PANEL rather than of the window, because the question is what the
+    /// player is looking at. It lives here rather than in the overlay so it can be tested at
+    /// all - the window chrome is Windows-only and the test project is not.
+    /// </remarks>
+    public bool HidesWindows => (Panel & WorkedOn) == 0;
+
     /// <summary>Whether a rectangle in window pixels touches this one at all.</summary>
     /// <remarks>
     /// ANY overlap rather than a share of it, because that is the question a window is asking:

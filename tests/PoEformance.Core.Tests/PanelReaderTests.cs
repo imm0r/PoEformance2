@@ -332,4 +332,42 @@ public class PanelReaderTests
         Assert.False(area.Overlaps(2000f, 500f, 2400f, 1400f)); // the same on the other side
         Assert.False(area.Overlaps(1000f, 0f, 2000f, 500f));    // above it
     }
+
+    [Fact]
+    public void THEAtlasIsAPanelTheToolWorksOnRatherThanHidesFrom()
+    {
+        // The bug this fixes, and it had an unusually annoying shape: the atlas is reported as
+        // screen-filling, screen-filling panels hid every window the tool has, and the tool's
+        // ATLAS windows are the ones that were disappearing - the map names, the routes, the
+        // ritual plan, each with a tab that went dark exactly when it became useful.
+        //
+        // It took the interface browser with it too, which is the circle that made this worth
+        // fixing: the browser walks the game's UI tree, most of what is worth walking lives
+        // inside a panel, and a browser that hides itself whenever a panel opens can never be
+        // pointed at one.
+        var atlas = new PanelArea(GamePanel.Atlas, 0f, 0f, 2560f, 1600f, PanelExtent.Kind);
+
+        Assert.False(atlas.HidesWindows);
+        Assert.True(atlas.Overlaps(20f, 20f, 400f, 300f));
+    }
+
+    [Theory]
+    [InlineData(GamePanel.Right)]
+    [InlineData(GamePanel.Left)]
+    [InlineData(GamePanel.SkillTree)]
+    [InlineData(GamePanel.WorldMap)]
+    [InlineData(GamePanel.AtlasSkills)]
+    [InlineData(GamePanel.Temple)]
+    [InlineData(GamePanel.Exchange)]
+    [InlineData(GamePanel.Trial)]
+    public void ANDEveryOtherPanelStillTakesTheWindowsWithIt(GamePanel panel)
+    {
+        // The exception is ONE panel, listed rather than inferred. A stash or a passive tree is
+        // what the player is looking at and a readout across it is right information in the way;
+        // nothing about that argument changed. AtlasSkills is in this list on purpose: whether
+        // it belongs with the atlas is a real question and not one to settle by guessing.
+        var area = new PanelArea(panel, 0f, 0f, 2560f, 1600f, PanelExtent.Kind);
+
+        Assert.True(area.HidesWindows);
+    }
 }
