@@ -144,11 +144,19 @@ public class ScreenRegionTests
     }
 
     [Fact]
-    public void MoreKeepOutsThanTheCapAreDroppedRatherThanSweptOver()
+    public void MoreKeepOutsThanTheCapAreDroppedButSaidSoAboutLoudly()
     {
         // The sweep is quadratic in the number of zones and every piece it makes is a redraw,
         // so a list that grew without bound would show up as a frozen overlay. The cap makes
-        // that a wrong picture instead, which is the failure that can be seen and reported.
+        // that a wrong picture instead - and the count is what stops that wrong picture from
+        // being a MYSTERY.
+        //
+        // THE FAILURE THIS EXISTS FOR: a cap that drops the TAIL is a cap that decides which
+        // parts of the interface get honoured by their position in a list. The atlas grew from
+        // one source of keep-outs to three, the honest count went past sixteen, and the last
+        // one - the bookmarks panel - was drawn over while every part before it worked. That
+        // reads as a measurement problem and is not one, and nothing anywhere said a rectangle
+        // had been thrown away.
         List<ScreenRect> many = [];
         for (int i = 0; i < ScreenRegion.MostKeptOut + 8; i++)
         {
@@ -158,6 +166,45 @@ public class ScreenRegionTests
         ScreenRegion region = ScreenRegion.Of(Screen, many);
 
         Assert.Equal(ScreenRegion.MostKeptOut, region.KeptOut.Count);
+        Assert.Equal(8, region.Refused);
+        Assert.Contains("REFUSED", region.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANDAnOrdinaryInterfaceIsNowhereNearTheCap()
+    {
+        // What the cap has to leave room for, stated as a number rather than as a hope: the
+        // HUD's parts, the world screen's furniture and the panels beside it, all at once,
+        // which is what the atlas hands over. Nothing is refused and nothing is quietly lost.
+        List<ScreenRect> interfaceParts = [];
+        for (int i = 0; i < 30; i++)
+        {
+            interfaceParts.Add(new ScreenRect(i * 60f, 0f, (i * 60f) + 40f, 120f));
+        }
+
+        ScreenRegion region = ScreenRegion.Of(Screen, interfaceParts);
+
+        Assert.Equal(30, region.KeptOut.Count);
+        Assert.Equal(0, region.Refused);
+        Assert.DoesNotContain("REFUSED", region.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ARectangleWithNoAreaIsNotARefusal()
+    {
+        // A keep-out off the side of the screen, or a torn read, is not a rectangle the cap
+        // turned away - it is not a rectangle at all. Counting those would make the readout
+        // cry wolf on every frame a panel happened to resolve off-screen.
+        ScreenRegion region = ScreenRegion.Of(
+            Screen,
+            [
+                new ScreenRect(4000f, 100f, 4200f, 300f),  // entirely off the screen
+                new ScreenRect(float.NaN, 0f, 100f, 100f), // a torn read
+                new ScreenRect(0f, 0f, 200f, 200f),        // and one real one
+            ]);
+
+        Assert.Single(region.KeptOut);
+        Assert.Equal(0, region.Refused);
     }
 
     [Fact]
