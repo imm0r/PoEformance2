@@ -164,18 +164,27 @@ public sealed class AtlasWindow
         }
 
         bool hideOnHover = settings.HideOnHover;
-        if (ImGui.Checkbox("get out of the way while a map is hovered", ref hideOnHover))
+        if (ImGui.Checkbox("hide everything if a hovered map's panel cannot be measured", ref hideOnHover))
         {
             changed = changed with { HideOnHover = hideOnHover };
         }
+
+        // The setting no longer describes what usually happens, so the line under it does. The
+        // game's panel about a hovered map is measured like the rest of the interface and the
+        // drawing goes round it; this is only the fallback for the frame where it is not found,
+        // and leaving it looking like the main behaviour would have somebody switch it off to
+        // stop a blanking that is not happening.
+        ImGui.TextColored(
+            DimText,
+            "    the panel over a hovered map is normally kept off like any other part of the"
+            + " interface - this is what happens when it cannot be found");
 
         // Said out loud, because "the overlay vanished" is what this looks like from the
         // outside - and if a node's rectangle ever reads too big it would be permanent, so
         // the line that names it is the difference between a setting and a mystery.
         if (view.Hovering)
         {
-            ImGui.SameLine();
-            ImGui.TextColored(DimText, "- a map is hovered now, so nothing is drawn");
+            ImGui.TextColored(DimText, "    a map is hovered now");
         }
 
         string search = settings.Search;

@@ -317,17 +317,34 @@ public class AtlasViewTests
     }
 
     [Fact]
-    public void NOTHINGIsDrawnWhileTheCursorIsOnAMap()
+    public void WHEREAMapUnderTheCursorIsDrawnIsReported()
     {
         // The game puts its own panel over a hovered node - what the map is, its biome, what is
-        // in it - and every label and line here would be drawn across it.
+        // in it - and every label and line here would be drawn across it. The RECTANGLE rather
+        // than a yes, because the overlay now keeps off that panel instead of switching itself
+        // off, and where the node is drawn is where the panel comes up.
         AtlasNode node = Node(1, 1);   // drawn at 100,100, forty by twenty
 
-        Assert.True(AtlasWatch.Hovered([node], new Vector2(120, 110)));
-        Assert.False(AtlasWatch.Hovered([node], new Vector2(300, 110)));
+        Assert.Equal(
+            new ScreenRect(100, 100, 140, 120), AtlasWatch.Hovered([node], new Vector2(120, 110)));
+        Assert.Null(AtlasWatch.Hovered([node], new Vector2(300, 110)));
 
-        Assert.False(Compose([node], new AtlasSettings(), cursor: new Vector2(120, 110)).Anything);
-        Assert.True(Compose([node], new AtlasSettings(), cursor: new Vector2(300, 110)).Anything);
+        Assert.True(Compose([node], new AtlasSettings(), cursor: new Vector2(120, 110)).Hovering);
+        Assert.False(Compose([node], new AtlasSettings(), cursor: new Vector2(300, 110)).Hovering);
+    }
+
+    [Fact]
+    public void ANDTheViewItselfNoLongerBlanksOnAHover()
+    {
+        // What is drawn is no longer this record's decision: the panel over a hovered map is a
+        // measured interface part, so the overlay keeps off it and goes on drawing - and hiding
+        // everything is the fallback the overlay reaches for when it cannot find that part.
+        // Deciding it here would take that choice away from the only thread that has both the
+        // atlas view and the interface parts in the same frame.
+        AtlasView view = Compose([Node(1, 1)], new AtlasSettings(), cursor: new Vector2(120, 110));
+
+        Assert.True(view.Hovering);
+        Assert.True(view.Anything);
     }
 
     [Fact]
@@ -342,23 +359,28 @@ public class AtlasViewTests
             [shown, finished], new AtlasSettings(HideCompleted: true), cursor: new Vector2(120, 110));
 
         Assert.Single(view.Marks);          // the finished one is hidden, as asked
-        Assert.True(view.Hovering);         // and hovering it still stops the drawing
+        Assert.True(view.Hovering);         // and hovering it is still noticed
     }
 
     [Fact]
     public void ANDACursorNobodyHasReportedIsNotTheCorner()
     {
         // Nought is "not asked yet", not a position. Taken literally it sits inside whatever
-        // node happens to be drawn at the top-left, and the atlas would never draw at all.
-        Assert.False(AtlasWatch.Hovered([Node(0, 0)], default));
-        Assert.True(Compose([Node(0, 0)], new AtlasSettings()).Anything);
+        // node happens to be drawn at the top-left, and the atlas would report a hover forever.
+        Assert.Null(AtlasWatch.Hovered([Node(0, 0)], default));
+        Assert.False(Compose([Node(0, 0)], new AtlasSettings()).Hovering);
     }
 
     [Fact]
-    public void ANDTheGettingOutOfTheWayCanBeTurnedOff()
+    public void ANDTheHoverIsReportedWhateverTheSettingSays()
     {
+        // The setting decides what to do when the game's panel cannot be measured, which is a
+        // question about the interface rather than about the atlas. Folding it in here would
+        // leave the overlay unable to tell "not hovering" from "hovering, told not to care".
         AtlasNode node = Node(1, 1);
-        Assert.True(Compose([node], new AtlasSettings(HideOnHover: false), cursor: new Vector2(120, 110)).Anything);
+        Assert.True(
+            Compose([node], new AtlasSettings(HideOnHover: false), cursor: new Vector2(120, 110))
+                .Hovering);
     }
 
     [Fact]

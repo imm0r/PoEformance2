@@ -563,6 +563,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     private readonly MapKeepOutEditor _keepOut = new();
 
+    // Whether the game's own panel about a hovered map is accounted for, which is what decides
+    // between keeping off that panel and hiding the atlas overlay altogether. Kept here rather
+    // than on the watch because it compares against the interface parts, and this is the thread
+    // that has both those and the atlas view in the same frame.
+    private readonly AtlasHoverPanel _atlasHover = new();
+
     /// <summary>
     /// The Stash tab's four network switches, as loaded, until the stores exist to take them.
     /// </summary>
@@ -1158,15 +1164,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Take(zone);
         }
 
-        if (KeepOut.On)
+        foreach (InterfacePart part in AtlasInterface(window))
         {
-            foreach (InterfacePart part in _snapshot.InterfaceParts)
-            {
-                if (KeepOut.Honours(part.Label))
-                {
-                    Take(part.Where);
-                }
-            }
+            keepOut.Add(part.Where);
         }
 
         foreach (PanelArea panel in _snapshot.Covering)
@@ -1186,6 +1186,37 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 keepOut.Add(rect);
             }
         }
+    }
+
+    /// <summary>
+    /// The interface parts the atlas layers are actually keeping off, as parts rather than
+    /// rectangles.
+    /// </summary>
+    /// <remarks>
+    /// Split out of <see cref="KeepOutOfAtlas"/> because two things need the same list and only
+    /// one of them wants rectangles: <see cref="AtlasHoverPanel"/> works out whether the game's
+    /// hover panel is among them, and it can only do that from what the parts ARE. The switches
+    /// and the whole-screen drop are applied here, so both callers agree about what is being
+    /// kept off - a part filtered out for one and not the other is exactly the disagreement that
+    /// would have the overlay draw over the panel while claiming it did not.
+    /// </remarks>
+    private List<InterfacePart> AtlasInterface(ScreenRect window)
+    {
+        List<InterfacePart> parts = [];
+        if (!KeepOut.On)
+        {
+            return parts;
+        }
+
+        foreach (InterfacePart part in _snapshot.InterfaceParts)
+        {
+            if (KeepOut.Honours(part.Label) && !part.Where.Covers(window))
+            {
+                parts.Add(part);
+            }
+        }
+
+        return parts;
     }
 
     /// <summary>
@@ -2180,7 +2211,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // an unfocused window never receives.
             _atlasWatch.Cursor = ImGui.GetMousePos();
 
-            _atlas.Draw(ImGui.GetBackgroundDrawList(), _atlasWatch.View);
+            // Hovering a map used to switch the whole overlay off, because the game puts its own
+            // panel over that node. That panel is an interface part like any other, so now the
+            // region above keeps off IT and everything else goes on being drawn - and the old
+            // blanking is only what happens on a frame where the panel cannot be accounted for.
+            AtlasView view = _atlasWatch.View;
+            _atlasHover.Look(
+                (_snapshot.Panels & GamePanel.Atlas) != 0,
+                view.Hovering,
+                AtlasInterface(ScreenRect.Window(width, height)));
+
+            if (!drawing.HideOnHover || !view.Hovering || _atlasHover.Found)
+            {
+                _atlas.Draw(ImGui.GetBackgroundDrawList(), view);
+            }
 
             // After the atlas, so a route runs OVER the map labels it passes rather than under
             // them - it is the thing being looked at while it is on screen.
@@ -2806,6 +2850,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 + (swallowed.Length > 0 ? $"   (screen-sized, dropped: {swallowed})" : string.Empty),
                 Measured,
                 figure: true);
+
+            // WHAT THE HOVER PANEL TURNED OUT TO BE, by name. Nobody here has read the StringId
+            // of the panel the game puts over a hovered map - it is found by appearing rather
+            // than by name - so this line is how it gets read: hover a map with the readout open
+            // and it says which part came up. It is also the only way to tell "the overlay is
+            // hidden because a map is hovered" from "the overlay is hidden because something is
+            // wrong", which look identical on a screenshot and used to cost a round trip each.
+            if (_atlasWatch is not null)
+            {
+                Row(
+                    "atlas hover",
+                    _atlasHover.Describe(_atlasWatch.View.Hovered),
+                    _atlasWatch.View.Hovering && !_atlasHover.Found ? Warning : Measured,
+                    figure: true);
+            }
         }
 
         if (_snapshot.Player is not WorldEntity player)

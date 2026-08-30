@@ -1257,6 +1257,24 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   rectangle was read this tick anyway. Tested against ALL maps rather than the drawn ones — the
   game shows its panel whether or not this overlay labelled that node, and it is the OTHER maps'
   labels and lines that would be drawn across it.
+- **And getting out of the way is now a rectangle, not a blackout.** Hovering a map used to hide
+  the entire atlas overlay — every label, every route, every line, across the whole screen — which
+  was the only answer available while the overlay could not keep off part of the screen. It can
+  now, so the panel the game puts up gets the same treatment as the orbs and the title bar: it is
+  measured, the region is carved, and the drawing goes round it. `AtlasHoverPanel` finds it BY
+  APPEARING rather than by name — the interface parts are re-measured every tick anyway, so the
+  parts on screen with nothing hovered are a free baseline, and a part that is only there while
+  the cursor is on a map is the panel the game just put up. Naming it would mean hard-coding a
+  StringId nobody has read yet, and a wrong name fails silently: the overlay draws across the
+  panel while the readout calls the keep-out healthy. The rectangle needs no extra work — the
+  panel is an ordinary interface part and was already in the keep-out list — so finding it only
+  answers whether the fallback is needed, and the `--debug` row NAMES the part, which is how that
+  StringId finally gets read. Three things make the fallback the safe direction rather than a
+  regression: a hover whose panel is not among the kept-off parts hides exactly as before, a
+  baseline taken on another screen is thrown away (opening the atlas with the cursor already on a
+  map hides until the cursor leaves a node once), and a part somebody switched off in the
+  keep-out editor does not count as found — it is not covering anything as far as the drawing is
+  concerned.
 - **The map ratings are the one data file that is an OPINION.** Everything else in `data/` is
   extracted from the client or ported from a reference; `atlas-ratings.json` is a judgement about
   which maps are worth the time, which is exactly why it is a file — it will be disagreed with,
