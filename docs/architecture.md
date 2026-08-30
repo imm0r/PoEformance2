@@ -982,13 +982,22 @@ interesting part was not the feature:
     screen the atlas is a page of paints a title bar with the act tabs, a search box, a quest
     selector, a map legend and a pin editor over the top of it — the same relationship the HUD
     has to the large map, one screen along. Those are ordinary elements too, so
-    `InterfaceReader.AtlasChrome` reads them: it walks UP from the atlas panel, takes the screen
-    two levels above, and measures that screen's other visible children. Found by where the
+    `InterfaceReader.AtlasChrome` reads them: it walks UP from the atlas panel to the ancestor
+    sitting directly under the interface root, and measures that screen's other visible
+    children. **Under the root the caller was given**, not the top of the tree — the
+    interface root is itself the real UI root's main child, so counting back from the end of
+    the chain lands above the screen, whose siblings are every panel in the game. That
+    shipped once and turned the whole atlas overlay off: nothing drawn, while the Atlas tab
+    reported the read as perfectly healthy. A synthetic fixture cannot catch it either,
+    because a test tree's root has no parent — the regression test gives it one. Found by where the
     atlas IS rather than by name or index, and the atlas's whole ancestry is excluded by address
     — otherwise the page the atlas hangs in is a sibling of the furniture, and taking it would
     blank the overlay while every measurement in the readout looked healthy. Only the VISIBLE
     ones, which is not a detail: `fade_to_black`, `vignette` and `consume_input_frame` are the
-    size of the screen and usually idle.
+    size of the screen and usually idle. And a region with nothing left in it is now taken as
+    evidence that the keep-out is wrong rather than that the atlas is covered: the panel is
+    drawn across the whole window, so the overlay falls back to drawing everywhere — the
+    same fail-towards-drawing rule every unreadable answer here gets.
   - **A part can be switched off by name, and that is all the setting there is.** Some of these
     parts are containers, and a container reporting a rectangle far larger than what it draws
     would quietly eat the map — the atlas panel has form here, stating an extent 733 pixels

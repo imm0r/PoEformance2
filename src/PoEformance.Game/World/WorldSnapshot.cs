@@ -1276,7 +1276,7 @@ public sealed class WorldReader
                 atlas = _uiElements.Child(atlas, step);
             }
 
-            hud = [.. hud, .. _hud.AtlasChrome(atlas, on)];
+            hud = [.. hud, .. _hud.AtlasChrome(chain.UiRoot, atlas, on)];
         }
 
         double mapsMs = Since(mapsFrom);

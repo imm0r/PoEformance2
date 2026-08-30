@@ -2139,7 +2139,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // panel and would otherwise disagree about what is covering it.
             var covering = ScreenRegion.Of(
                 ScreenRect.Window(width, height), KeepOutOfAtlas(width, height));
-            _atlas.Region = covering;
+
+            // NOTHING LEFT MEANS THE KEEP-OUT IS WRONG, not that the atlas is covered. The
+            // panel is drawn across the whole window, so a region with no room in it says
+            // something was measured as covering everything - and the honest response is the
+            // one every unreadable answer in this tool gets: fail towards DRAWING. Shipped
+            // without this, one bad ancestor turned the entire atlas overlay off with nothing
+            // on screen to say why, while its own tab reported the read as healthy.
+            _atlas.Region = covering.HasAnything
+                ? covering
+                : ScreenRegion.Whole(ScreenRect.Window(width, height));
 
             // Published from HERE because this is the thread that has it. ImGui's mouse position
             // is the real cursor even while the game has focus and the overlay is click-through:
@@ -2154,7 +2163,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (_ritualWatch is not null && _ritualWindow is not null)
             {
                 _ritual.TextScale = drawing.Writing;
-                _ritual.Region = covering;
+                _ritual.Region = _atlas.Region;
                 _ritual.Draw(ImGui.GetBackgroundDrawList(), _ritualWatch.View, _ritualWindow.Picked);
             }
         }
