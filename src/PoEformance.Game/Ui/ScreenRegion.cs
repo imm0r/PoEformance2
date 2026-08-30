@@ -101,18 +101,41 @@ public sealed class ScreenRegion
     /// frozen overlay rather than as a wrong picture. A dozen is far past what the interface
     /// has parts.
     /// </remarks>
-    public const int MostKeptOut = 16;
+    /// <remarks>
+    /// RAISED FROM 16, and the reason is worth keeping: a cap that silently drops the TAIL of
+    /// the list is a cap that decides which parts of the interface get honoured by their
+    /// position in it. When the only source was the HUD, sixteen was far past what the
+    /// interface has parts. Then the atlas arrived with a second source - the world screen's
+    /// own furniture - and a third, the open panels beside it, and the honest count went to
+    /// nearly thirty. The bookmarks panel sat at the end of that list and was drawn over while
+    /// every part before it worked, which reads as a measurement problem and is not one.
+    ///
+    /// So: high enough that a real interface never reaches it, and <see cref="Refused"/> says
+    /// so when it does rather than leaving the tail to be found by screenshot.
+    /// </remarks>
+    public const int MostKeptOut = 64;
 
     private static readonly ScreenRect[] Nothing = [];
 
     private readonly ScreenRect[] _free;
 
-    private ScreenRegion(ScreenRect bounds, ScreenRect[] keptOut, ScreenRect[] free)
+    private ScreenRegion(ScreenRect bounds, ScreenRect[] keptOut, ScreenRect[] free, int refused = 0)
     {
         Bounds = bounds;
         KeptOut = keptOut;
         _free = free;
+        Refused = refused;
     }
+
+    /// <summary>
+    /// How many keep-outs were handed over and not honoured, because the cap was reached.
+    /// </summary>
+    /// <remarks>
+    /// ALWAYS ZERO in a working tool, which is exactly why it is worth reporting: the one time
+    /// it was not, the symptom was a single panel being drawn over with nothing anywhere to say
+    /// that anything had been dropped.
+    /// </remarks>
+    public int Refused { get; }
 
     /// <summary>The whole of <paramref name="bounds"/>, with nothing kept out of it.</summary>
     public static ScreenRegion Whole(ScreenRect bounds)
@@ -137,23 +160,30 @@ public sealed class ScreenRegion
         }
 
         List<ScreenRect> blocking = [];
+        int refused = 0;
         foreach (ScreenRect rect in keepOut)
         {
-            if (blocking.Count >= MostKeptOut)
+            ScreenRect clipped = rect.IsSane ? rect.ClippedTo(bounds) : default;
+            if (!clipped.HasArea)
             {
-                break;
+                continue; // off the screen, or nonsense: not refused, simply not a rectangle
             }
 
-            ScreenRect clipped = rect.IsSane ? rect.ClippedTo(bounds) : default;
-            if (clipped.HasArea)
+            // COUNTED RATHER THAN JUST STOPPED. The tail of the list is not junk - it is the
+            // parts of the interface that happen to be enumerated last - so a cap being reached
+            // is a thing to report, not a thing to do quietly.
+            if (blocking.Count >= MostKeptOut)
             {
-                blocking.Add(clipped);
+                refused++;
+                continue;
             }
+
+            blocking.Add(clipped);
         }
 
         return blocking.Count == 0
             ? Whole(bounds)
-            : new ScreenRegion(bounds, [.. blocking], Carve(bounds, blocking));
+            : new ScreenRegion(bounds, [.. blocking], Carve(bounds, blocking), refused);
     }
 
     /// <summary>The rectangle the region is cut out of.</summary>
@@ -369,7 +399,8 @@ public sealed class ScreenRegion
     /// <summary>What the region covers, for a readout.</summary>
     public override string ToString()
         => $"{Bounds.Width:F0}x{Bounds.Height:F0} at {Bounds.Left:F0},{Bounds.Top:F0}"
-           + $" less {KeptOut.Count} in {_free.Length} pieces";
+           + $" less {KeptOut.Count} in {_free.Length} pieces"
+           + (Refused > 0 ? $"   ({Refused} REFUSED - past the cap of {MostKeptOut})" : string.Empty);
 
     /// <summary>
     /// Cuts the holes out, as a partition of what is left.

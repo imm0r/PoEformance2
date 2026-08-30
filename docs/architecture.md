@@ -1006,6 +1006,14 @@ interesting part was not the feature:
     evidence that the keep-out is wrong rather than that the atlas is covered: the panel is
     drawn across the whole window, so the overlay falls back to drawing everywhere — the
     same fail-towards-drawing rule every unreadable answer here gets.
+  - **The cap on keep-outs is reported when it bites.** It was sixteen, which was far past what
+    the HUD alone has parts — and then the atlas arrived with three sources at once (the HUD, the
+    world screen's furniture, the panels beside it) and the honest count went to nearly thirty.
+    The tail of that list was dropped silently, so the bookmarks panel was drawn over while every
+    part ahead of it worked: a symptom that reads as a measurement problem and is not one. The cap
+    is now 64, and `ScreenRegion.Refused` counts what it turned away so the readout can say
+    `(N REFUSED - past the cap)` instead of leaving it to be found by screenshot. A rectangle
+    with no area is not a refusal — an off-screen panel must not make that line cry wolf.
   - **A part can be switched off by name, and that is all the setting there is.** Some of these
     parts are containers, and a container reporting a rectangle far larger than what it draws
     would quietly eat the map — the atlas panel has form here, stating an extent 733 pixels
