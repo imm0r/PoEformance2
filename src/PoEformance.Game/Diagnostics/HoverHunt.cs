@@ -20,29 +20,30 @@ public sealed record HoverSample(
     IReadOnlyList<(string Path, ItemRarity Rarity, byte Flag)> BossBytes);
 
 /// <summary>
-/// Reads the two things nineteen recordings cannot answer, because nothing has ever read them.
+/// Reads the two things nineteen recordings could not answer, because nothing had read them.
 /// </summary>
 /// <remarks>
-/// BOTH QUESTIONS ARE BLOCKED BY THE SAME RULE, not by a hard offset: a replay only serves
+/// BOTH QUESTIONS WERE BLOCKED BY THE SAME RULE, not by a hard offset: a replay only serves
 /// reads that actually happened, so an offset no build touches is absent from every session
 /// ever captured. That is why this exists at all - it is a switch whose whole job is to make
-/// the bytes land in a <c>--record</c> file.
+/// the bytes land in a <c>--record</c> file. One capture later
+/// (tests/fixtures/session-2026-08-hoverhunt.rec) the two questions stand differently:
 ///
-/// WHAT IT READS, and why more than the two candidate slots:
-///
-///  1. THE HOVERED ENTITY. GameHelper2 walks InGameState+0x300 -> +0x3F0 -> +0xA8. The middle
-///     hop resolves against this client and the last reads zero, which is equally what
-///     "nothing hovered" and "wrong offset" look like - and the sessions that could have told
-///     them apart were captures in which nobody was hovering on purpose. So this reads a
-///     WINDOW of each object rather than the two slots, on the same argument --questflags
-///     records regions it does not understand: a question that needs the game becomes one that
-///     can be re-asked offline as often as it takes, and a wrong reference offset stops being
-///     fatal to the capture.
-///  2. THE BOSS BYTE. Monster+0x27 has been in the schema as an unverified hypothesis for
-///     months and nothing reads it - MonsterSigns derives IsBoss from RARITY instead, so the
-///     field has never been exercised. One byte per monster settles it, and the pool-cell
-///     measurement says how much to read to be thorough: the Monster component's cell is 0x30,
-///     so 0x30 bytes IS the whole component and there is no cheaper way to be complete.
+///  1. THE HOVERED ENTITY - SETTLED. GameHelper2 walks InGameState+0x300 -> +0x3F0 -> +0xA8,
+///     and against this client it walks: 143 of 143 non-null readings named an entity the game
+///     was listing that same frame, over ten entities of four kinds, and it was null on the
+///     other 789. It is read in production now (MouseOverReader, WorldSnapshot.Hovered) and the
+///     schema carries the two hop structs. This hunt keeps reading a WINDOW of each object
+///     rather than the settled slots, on the same argument --questflags records regions it does
+///     not understand: the windows are what the SECOND cursor-tracking slot at sub+0xC8 was
+///     found in, and it is still unidentified.
+///  2. THE BOSS BYTE - STILL OPEN, and the capture is the reason to be careful about how that
+///     is said. Monster+0x27 came from a reference as an unverified hypothesis, and the run
+///     read it 14,462 times: zero every time, across Normal, Magic and Rare, with NO UNIQUE in
+///     the area. That is what a working boss flag reads too, so it refutes nothing - see the
+///     conclusion in Report, which now says which case was missing instead of concluding from
+///     its absence. The pool-cell measurement says how much to read to be thorough: the Monster
+///     component's cell is 0x30, so 0x30 bytes IS the whole component.
 ///
 /// The reading is the deliverable. What the bytes mean is decided afterwards, against the
 /// file, which is the only way either question has ever been settled here.
@@ -80,14 +81,20 @@ public sealed class HoverHunt
         _map = new EntityMapReader(reader, schema);
         _awake = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
         _mouseOverHost = schema.Structs["InGameState"].OffsetOf("MouseOverHostPtr");
+        _subPointerAt = schema.Structs["MouseOverHost"].OffsetOf("SubStructPtr");
+        _entityAt = schema.Structs["MouseOverSub"].OffsetOf("HoveredEntity");
         _rarity = schema.Structs["ObjectMagicProperties"].OffsetOf("Rarity");
     }
 
-    /// <summary>Sub-object offset the reference follows out of the host.</summary>
-    public const int SubPointerAt = 0x3F0;
-
-    /// <summary>Where the reference expects the hovered entity on the sub-object.</summary>
-    public const int EntityAt = 0xA8;
+    /// <summary>Sub-object offset followed out of the host, from the schema now that it holds it.</summary>
+    /// <remarks>
+    /// These two were hard-coded from the reference while the chain was a hypothesis, which was
+    /// right then and is wrong now: the schema carries them as MouseOverHost/MouseOverSub, and
+    /// a hunt reading its own copy would keep walking the old offsets after a drift - reporting
+    /// "nothing hovered" for a chain that had merely moved.
+    /// </remarks>
+    private readonly int _subPointerAt;
+    private readonly int _entityAt;
 
     /// <summary>Performs every read for one frame. Null when the chain is not in a world.</summary>
     public HoverSample? SampleFrame(ulong gameStatesStatic)
@@ -106,13 +113,13 @@ public sealed class HoverHunt
         {
             // The window first, so it lands in the recording even when the walk below fails.
             _reader.TryRead(host, _window);
-            sub = _reader.ReadPointer(host + SubPointerAt);
+            sub = _reader.ReadPointer(host + (ulong)_subPointerAt);
         }
 
         if (MemoryReaderExtensions.IsPlausiblePointer(sub))
         {
             _reader.TryRead(sub, _window);
-            entity = _reader.ReadPointer(sub + (ulong)EntityAt);
+            entity = _reader.ReadPointer(sub + (ulong)_entityAt);
         }
 
         if (MemoryReaderExtensions.IsPlausiblePointer(entity)
@@ -218,9 +225,18 @@ public sealed class HoverHunt
             output.WriteLine($"    {rarity,-8} byte={flag,-4} sightings={count}");
         }
 
+        // WHAT THIS MAY NOT SAY, learned by nearly saying it. The first capture read the byte
+        // 14,462 times and it was zero every time, which looks like a refutation and is not
+        // one: there was no unique monster in the area, and zero on every non-unique is what a
+        // WORKING boss flag reads. A hunt is only allowed to conclude when the case that
+        // separates the hypotheses was actually present, so it says whether it was.
         bool anySet = byRarity.Keys.Any(k => k.Flag != 0);
+        bool sawUnique = byRarity.Keys.Any(k => k.Rarity == ItemRarity.Unique);
         output.WriteLine(anySet
             ? "    the byte is not always zero - compare the rows above against what was on screen."
-            : "    the byte read ZERO on every monster seen. Either none was a boss, or 0x27 is wrong.");
+            : sawUnique
+                ? "    ZERO ON UNIQUES TOO, and a unique WAS in the list - so 0x27 is not this flag."
+                : "    the byte was zero throughout, but NO UNIQUE was in the list, so the question"
+                  + " was not asked. Run this in front of a boss.");
     }
 }

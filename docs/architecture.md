@@ -651,7 +651,7 @@ The switch reads a **window** of each object rather than the two candidate slots
 argument `--questflags` records regions it does not understand — so a wrong reference offset
 stops being fatal to the capture and the right slot can be hunted offline afterwards. For the
 boss byte it reads the whole Monster component, and the pool-cell measurement is what says how
-much that is: the cell is `0x30`, so thirty-two bytes *is* the component.
+much that is: the cell is `0x30`, so forty-eight bytes *is* the component.
 
 It wants a person doing something deliberate, like `--actionhunt` before it: hover a monster,
 hold, move onto empty ground, hover another. **The off-target moments matter as much as the
@@ -662,6 +662,49 @@ on-target ones** — a slot that never changes is not an answer, and only the co
 cannot answer, the hunt reports being unable to rather than reading absent memory as a result.
 A hunt announcing "the byte is 0 on every monster, so 0x27 is wrong" from a file that never
 read the byte would be worse than no hunt at all.
+
+#### What the capture came back with
+
+`tests/fixtures/session-2026-08-hoverhunt.rec` is that session: 940 frames, 66 seconds, a Vaal
+area with 96 monsters in it, hovering monsters, a chest, a checkpoint and a ground item on
+purpose. It settled one of the two questions and — more usefully — is a clean example of why
+the other one is *still* open despite thousands of readings.
+
+**The hovered entity: confirmed.** The host resolved on 932 of 940 frames, its `+0x3F0` on all
+932, and the entity slot behind that held something on 143 of them. The claim worth making is
+not "the slot holds a pointer" — a wrong offset into a live object holds pointers all day — but
+that **143 of 143 non-null readings are addresses the game itself was listing in `AwakeEntities`
+on that same frame**, across ten distinct entities of four kinds, with the slot taking 50
+different values over the session. The reading that would otherwise fit — a nearest-entity or
+last-targeted slot — is ruled out by the *emptiness*: it was null on 789 of 932 frames, in an
+area holding 96 monsters. A proximity slot is never empty; a cursor over floor always is.
+
+It is read in production now (`MouseOverReader`, `WorldSnapshot.Hovered`), three reads a frame,
+for the same second reason the frustum is: a slot read every frame lands in every `--record`
+session frame by frame, and this one was only settleable because a capture finally contained it.
+The schema carries the two hop structs, and `MouseOverHostPtr` deliberately has **no invariant**
+— the drift report counts an unreadable field as a failure exactly as loudly as a wrong value,
+and every fixture committed before this one predates anything reading the slot, so an invariant
+there would turn the whole baseline replay red without a byte having moved.
+
+**The boss byte: still open, and this is the interesting half.** The run read `Monster+0x27` on
+every monster in the area on every third frame — 14,462 sightings, **every single one zero**,
+across Normal, Magic and Rare. That table looks exactly like a refutation and is not one: *there
+was no unique monster in the area*, and zero on every non-unique is precisely what a working
+boss flag reads. A hypothesis is only refuted by the case that separates it from its
+alternatives, and that case was never on screen. `Report` now says which case was missing
+instead of concluding from its absence, and `HoverHuntTests` pins the sentence it may not print.
+The next capture needs a boss in front of the cursor; until then the schema keeps the hypothesis
+labelled as one.
+
+**And one thing the windows found that nobody was looking for.** Over 466 sampled frames, *two*
+slots on the sub-object separate hovering from not: `+0xA8` and `+0xC8` are both null in all 394
+idle frames and non-null in all 72 hovering ones. They differ in what they hold — `+0xA8` took
+15 distinct values, every one an entity in the game's list; `+0xC8` took 71, none of them in the
+list at all. A pointer allocated fresh five times as often as the hover changes reads like the
+tooltip or highlight record built for it, but that is a guess and it stays out of the schema's
+fields until somebody follows it. It exists here only because the hunt recorded a window it did
+not understand — which is the argument for windows, made a second time.
 
 ### Next
 
