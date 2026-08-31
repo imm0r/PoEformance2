@@ -143,7 +143,7 @@ public sealed class DamageWindow
         DrawFurthest();
 
         bool counting = _meter.CountKills;
-        if (ImGui.Checkbox("count what vanished  (off leaves only health seen to fall)", ref counting))
+        if (OverlayLayout.Toggle("Count what vanished", ref counting))
         {
             _meter.CountKills = counting;
         }
@@ -153,10 +153,11 @@ public sealed class DamageWindow
         // and the whole of anything deleted between two reads - is never watched falling.
         if (!counting)
         {
-            ImGuiText.Hint(
-                DimText,
-                "with this off the figure is only what was watched, which under-reports"
-                + " by the whole of every killing blow.");
+            // A caveat about the FIGURE rather than about the switch, and it applies while the
+            // switch is off - which is when nobody is hovering it. So it stays on screen.
+            OverlayLayout.Warning(
+                "With this off the figure is only what was watched, which under-reports by the"
+                + " whole of every killing blow.");
         }
         else
         {
@@ -172,8 +173,9 @@ public sealed class DamageWindow
                 _meter.CreditWithin = limit * MapView.WorldToGrid;
             }
 
-            ImGui.SameLine();
-            ImGui.TextColored(DimText, "of where it was last seen");
+            OverlayLayout.Hint(
+                "Measured from where the monster was last seen. Anything that vanished further"
+                + " away than this is refused rather than credited.");
         }
 
         float smoothing = _meter.SmoothingSeconds;
@@ -211,10 +213,12 @@ public sealed class DamageWindow
         }
 
         bool painting = heat.Enabled;
-        if (ImGui.Checkbox("paint the map by where it happened  (open the map to see it)", ref painting))
+        if (OverlayLayout.Toggle("Paint the map by where it happened", ref painting))
         {
             heat.Enabled = painting;
         }
+
+        OverlayLayout.Hint("Open the game's own map to see it.");
 
         if (!painting)
         {
@@ -436,14 +440,13 @@ public sealed class DamageWindow
     {
         uint scope = _thisMapOnly ? CurrentArea : 0;
 
-        ImGui.Checkbox("this map only##dmg", ref _thisMapOnly);
+        OverlayLayout.Toggle("This map only##dmg", ref _thisMapOnly);
         ImGui.SameLine();
-        if (ImGui.Button("start over##dmg"))
+        if (ImGui.Button("Start over##dmg"))
         {
             _meter.History.Clear();
         }
 
-        ImGui.SameLine();
         OverlayLayout.Slider("Plot height###dmg", ref _height, 40f, 240f, "%.0f px");
 
         IReadOnlyList<DamageSample> samples = _meter.History.In(scope);

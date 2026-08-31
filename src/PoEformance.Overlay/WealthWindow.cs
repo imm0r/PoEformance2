@@ -166,10 +166,11 @@ public sealed class WealthWindow
 
         if (!Watching)
         {
-            ImGuiText.Hint(
-                OverlayInk.Quiet,
-                "Nothing is counted while this is off, and the record simply has a gap for the "
-                + "time it was - which is the honest picture of not having been watching.");
+            // Stays: it describes what is happening RIGHT NOW because the switch is off, and
+            // nobody hovers a switch to find out why nothing is being recorded.
+            OverlayLayout.Note(
+                "Nothing is counted while this is off, and the record simply has a gap for the"
+                + " time it was - which is the honest picture of not having been watching.");
             return;
         }
 
@@ -202,10 +203,9 @@ public sealed class WealthWindow
             Changed?.Invoke();
         }
 
-        ImGuiText.Hint(
-            OverlayInk.Quiet,
-            "The corner panel can be moved, and made click-through from its own title menu so it "
-            + "stops taking the mouse during a fight.");
+        OverlayLayout.Hint(
+            "The corner panel can be moved, and made click-through from its own title menu so it"
+            + " stops taking the mouse during a fight.");
     }
 
     /// <summary>
@@ -240,11 +240,10 @@ public sealed class WealthWindow
             $"{(league.Length > 0 ? league : "league not read yet")}"
             + $"   {book.Count} prices   1 div = {StashWorth.Money(book.Rate)} ex");
 
-        ImGuiText.Hint(
-            OverlayInk.Quiet,
-            "Prices are poe.ninja's, for that league, and everything is converted into Exalted "
-            + "using that rate. If the figures look wrong, the breakdown below says which stack "
-            + "is producing them.");
+        OverlayLayout.Hint(
+            "Prices are poe.ninja's, for that league, and everything is converted into Exalted"
+            + " using that rate. If the figures look wrong, the breakdown below says which stack"
+            + " is producing them.");
     }
 
     /// <summary>
@@ -707,10 +706,9 @@ public sealed class WealthWindow
             ImGuiText.Wrapped(OverlayInk.Quiet, "Nothing recorded yet.");
         }
 
-        ImGuiText.Hint(
-            OverlayInk.Quiet,
-            "The record never clears itself - not on a new league, not on a new character, and "
-            + "not when it gets long. Only the button below empties it.");
+        OverlayLayout.Hint(
+            "The record never clears itself - not on a new league, not on a new character, and not"
+            + " when it gets long. Only the button below empties it.");
 
         // TWO PRESSES, because there is no undo. Everything this throws away is unrecoverable
         // and some of it is months old.

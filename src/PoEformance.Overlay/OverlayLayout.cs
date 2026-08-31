@@ -258,6 +258,41 @@ public static class OverlayLayout
     }
 
     /// <summary>
+    /// A warning about the line above it: something the feature cannot do, or has not done.
+    /// </summary>
+    /// <remarks>
+    /// THE THIRD KIND OF PROSE, and the one that stops <see cref="Hint"/> from being the answer
+    /// to everything. Most explanations belong in a tooltip because they are read once. Some do
+    /// not: "IT DOES NOT COVER EVERY HAZARD", "that value is a CANDIDATE, not a measurement",
+    /// "that file did not load". Those bound what the switch above can be TRUSTED to do, and a
+    /// limit nobody sees is a limit that gets discovered as a bug.
+    ///
+    /// So the test is not how long the text is, it is what happens if it is never read: an
+    /// unread explanation costs a moment of confusion, an unread warning costs a wrong
+    /// conclusion about the game.
+    ///
+    /// SHOW IT ONLY WHEN IT APPLIES. A caveat about what the rings cover is worth a line while
+    /// the rings are being drawn and is noise while they are switched off - and a page whose
+    /// warnings are always on screen teaches people to read past all of them, which costs the
+    /// one that mattered.
+    /// </remarks>
+    public static void Warning(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+
+        float step = Step();
+        ImGui.Indent(step);
+        try
+        {
+            ImGuiText.Wrapped(OverlayInk.Warn, ImGuiText.Escape(text));
+        }
+        finally
+        {
+            ImGui.Unindent(step);
+        }
+    }
+
+    /// <summary>
     /// The same explanation, in a tooltip on the line just drawn.
     /// </summary>
     /// <remarks>
