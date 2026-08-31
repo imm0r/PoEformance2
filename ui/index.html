@@ -313,6 +313,12 @@
         ms
       </label>
 
+      <label class="rl-gap">
+        Vary cooldowns by
+        <input type="number" id="rl-jitter" min="0" max="10000" step="10" title="How wide a random spread to put on every cooldown. At 50, a rule set to 1000 ms fires somewhere between 975 and 1025 ms, redrawn each time - so a rule that is always ready does not produce a keystroke on the exact same beat forever. 0 restores an exact cooldown.">
+        ms
+      </label>
+
       <label title="Captions stay up, and cues keep sounding, while the game is not in front. Captions still show nothing while another application has focus - the overlay refuses to paint then - but a beep has no such second gate.">
         <input type="checkbox" id="rl-background"> Show and sound without game focus
       </label>

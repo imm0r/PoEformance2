@@ -235,6 +235,26 @@ public sealed record RuleSettings(
     [JsonPropertyName("minInputGapMs")]
     public int MinInputGapMs { get; init; } = 100;
 
+    /// <summary>
+    /// How wide a random spread to put on every cooldown, in milliseconds.
+    /// </summary>
+    /// <remarks>
+    /// A rule whose condition is true most of the time - "monsters nearby and mana to spare" -
+    /// fires on its cooldown and nothing else, so a 1000 ms cooldown produces a keystroke
+    /// exactly every 1000 ms for as long as the fight lasts. Nothing a person does looks like
+    /// that. This spreads each wait around the configured one instead: at the default 50, a
+    /// 1000 ms cooldown lands somewhere in 975-1025, redrawn for every firing.
+    ///
+    /// The WIDTH of the window rather than a plus-or-minus, because that is the number worth
+    /// reading off the field: 50 here means the gaps land within 50 ms of each other, not 100.
+    ///
+    /// 0 turns it off and restores an exact cooldown. A cooldown of 0 is left alone whatever
+    /// this says - it means "as often as allowed", and inventing a wait there would be this
+    /// setting adding a cooldown rather than varying one.
+    /// </remarks>
+    [JsonPropertyName("cooldownJitterMs")]
+    public int CooldownJitterMs { get; init; } = 50;
+
     /// <summary>Nothing armed, and one empty profile to start from.</summary>
     /// <remarks>
     /// Off, and with no rules in it. A tool that presses nothing until asked is the only kind
@@ -293,6 +313,7 @@ public sealed record RuleSettings(
             Profile = selected,
             Profiles = profiles,
             MinInputGapMs = Math.Clamp(MinInputGapMs, 0, 10_000),
+            CooldownJitterMs = Math.Clamp(CooldownJitterMs, 0, 10_000),
         };
     }
 

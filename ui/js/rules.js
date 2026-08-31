@@ -64,6 +64,9 @@ export class RulesPanel {
     $("rl-gap").addEventListener("change", () =>
       this.save({ ...this.settings, minInputGapMs: Number($("rl-gap").value) }));
 
+    $("rl-jitter").addEventListener("change", () =>
+      this.save({ ...this.settings, cooldownJitterMs: Number($("rl-jitter").value) }));
+
     $("rl-profile").addEventListener("change", () =>
       this.save({ ...this.settings, profile: $("rl-profile").value }));
 
@@ -397,6 +400,7 @@ export class RulesPanel {
     $("rl-enabled").checked = this.settings.enabled;
     $("rl-background").checked = this.settings.noticeInBackground;
     $("rl-gap").value = this.settings.minInputGapMs;
+    $("rl-jitter").value = this.settings.cooldownJitterMs;
 
     const profiles = $("rl-profile");
     profiles.replaceChildren();
