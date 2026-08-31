@@ -282,7 +282,12 @@ public static class OverlayLayout
     /// belong together inside a section that is already open. Being unfoldable is the point:
     /// a fold offers a choice, and a choice about four checkboxes is a click asked for nothing.
     /// </remarks>
-    public static void Group(string title)
+    /// <param name="hint">
+    /// What the block is, when that needs saying. Drawn as a marker beside the title with the
+    /// sentence on hover - see <see cref="Hint"/> for why an explanation read once belongs
+    /// there rather than as a paragraph the block has to be read past every time.
+    /// </param>
+    public static void Group(string title, string? hint = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(title);
 
@@ -295,6 +300,17 @@ public static class OverlayLayout
         finally
         {
             ImGui.PopStyleColor();
+        }
+
+        if (hint is { Length: > 0 })
+        {
+            // The MARKER carries the hover, not the title. A heading that reacts to the mouse
+            // reads as something you can click, and there is nothing here to click; a small
+            // quiet mark beside it says "there is more about this" without making the same
+            // promise.
+            ImGui.SameLine();
+            ImGui.TextColored(OverlayInk.Quiet, "(?)");
+            Hint(hint);
         }
 
         ImGui.Separator();
@@ -699,6 +715,71 @@ public static class OverlayLayout
             ArgumentNullException.ThrowIfNull(label);
             ImGui.SetNextItemWidth(CompactWidth());
             return ImGui.InputText(label, ref value, maxLength);
+        }
+    }
+
+    /// <summary>
+    /// The same controls once more, each MEASURED to what it holds - the shape a toolbar wants.
+    /// </summary>
+    /// <remarks>
+    /// THE THIRD SORT OF ROW, and the one the vocabulary was still missing. <see
+    /// cref="FieldWidth"/> is for a column of settings read downwards; <see cref="Narrow"/> is
+    /// for several controls that only mean anything together. A TOOLBAR is neither: a run of
+    /// independent controls that are OPERATED rather than read, above the thing being worked on,
+    /// where the cost that matters is the height they take. The dissector is the case - four
+    /// controls at the field width filled a line and pushed the rest onto three more, which is
+    /// four lines of chrome above a table whose entire value is how many rows of it fit.
+    ///
+    /// AND THE WIDTH IS ASKED FOR RATHER THAN CHOSEN, which is what makes this different from
+    /// adding a fourth number to the file. A dropdown's options are a known list; a hex address
+    /// is sixteen digits. Both are things that can be MEASURED, like <see cref="ButtonRoom"/>
+    /// already measures buttons - and measured they are also right in the mono face, which is a
+    /// different width from the body face at the same size, and right at every text size rather
+    /// than at the one it was guessed at.
+    /// </remarks>
+    public static class Sized
+    {
+        /// <summary>A dropdown as wide as its longest option, and no wider.</summary>
+        /// <remarks>
+        /// It measures ITSELF: nothing has to be passed and so nothing can be passed wrongly.
+        /// A guess is what puts "AreaInstance" in a box showing "AreaInsta".
+        /// </remarks>
+        public static bool Combo(string label, ref int chosen, string[] options)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(label);
+            ArgumentNullException.ThrowIfNull(options);
+
+            float widest = 0f;
+            foreach (string option in options)
+            {
+                widest = Math.Max(widest, ImGui.CalcTextSize(option).X);
+            }
+
+            // The frame height on top is the arrow, which ImGui draws INSIDE the item width -
+            // so a combo sized to its text alone clips the last letter of its longest option.
+            ImGui.SetNextItemWidth(
+                widest + (ImGui.GetStyle().FramePadding.X * 2f) + ImGui.GetFrameHeight());
+            return ImGui.Combo(label, ref chosen, options, options.Length);
+        }
+
+        /// <summary>A text box as wide as the longest thing that can go in it.</summary>
+        /// <param name="longest">
+        /// A sample of the widest content, measured in the face IN FORCE - so a hex box must
+        /// call this with the mono face pushed, which is the face its digits are drawn in.
+        /// </param>
+        public static bool Input(
+            string label,
+            ref string value,
+            uint maxLength,
+            string longest,
+            ImGuiInputTextFlags flags = ImGuiInputTextFlags.None)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(label);
+            ArgumentNullException.ThrowIfNull(longest);
+
+            ImGui.SetNextItemWidth(
+                ImGui.CalcTextSize(longest).X + (ImGui.GetStyle().FramePadding.X * 2f));
+            return ImGui.InputText(label, ref value, maxLength, flags);
         }
     }
 
