@@ -22,7 +22,19 @@ public sealed record ComponentObservation(
     float WorldZ);
 
 /// <summary>What one frame of the sweep saw.</summary>
-public sealed record SweepFrame(int Frame, IReadOnlyList<ComponentObservation> Seen);
+/// <param name="Frame">The frame index, so a value can be placed in time.</param>
+/// <param name="Seen">Every swept component readable this frame.</param>
+/// <param name="EntityPoints">
+/// Where EVERY listed entity was this frame, not just the carriers. Free to keep - the sweep
+/// already reads each entity's Render position on its way past - and it is the reference the
+/// beam check needs: the far end of a beam lands on a MONSTER, and a monster carries none of
+/// the four, so pooling only the carriers' own positions asks the question against the wrong
+/// crowd. That mistake scored the real finding at 69 of 1098 before a test caught it.
+/// </param>
+public sealed record SweepFrame(
+    int Frame,
+    IReadOnlyList<ComponentObservation> Seen,
+    IReadOnlyList<(float X, float Y)> EntityPoints);
 
 /// <summary>
 /// Reads whole components of the classes nobody has a layout for.
@@ -63,6 +75,8 @@ public sealed class ComponentSweep
 
     /// <summary>Largest component read attempted when the schema names no cell.</summary>
     public const int DefaultCell = 0xC0;
+
+
 
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
@@ -106,6 +120,7 @@ public sealed class ComponentSweep
         }
 
         var seen = new List<ComponentObservation>();
+        var points = new List<(float X, float Y)>();
         foreach ((uint id, ulong address) in _map.ReadEntityPointers(chain.AreaInstance + (ulong)_awake))
         {
             if (_entities.ReadIdentity(address) is not { } identity || identity.Path.Length == 0)
@@ -125,6 +140,10 @@ public sealed class ComponentSweep
                 x = _reader.Read<float>(render + (ulong)_worldPosition);
                 y = _reader.Read<float>(render + (ulong)_worldPosition + 4);
                 z = _reader.Read<float>(render + (ulong)_worldPosition + 8);
+                if (x != 0 || y != 0)
+                {
+                    points.Add((x, y));
+                }
             }
 
             foreach ((string name, int cell) in _cells)
@@ -157,13 +176,20 @@ public sealed class ComponentSweep
             }
         }
 
-        return new SweepFrame(frame, seen);
+        return new SweepFrame(frame, seen, points);
     }
 
-    /// <summary>Says what the session holds, and runs the two checks the game can settle.</summary>
-    public static void Report(IReadOnlyList<SweepFrame> frames, TextWriter output)
+    /// <summary>Says what the session holds, and runs the checks the game can settle.</summary>
+    /// <param name="schema">
+    /// Where the decoded offsets come from. Taken rather than hard-coded because this exact
+    /// mistake has been made here before: HoverHunt kept its own copy of the chain offsets while
+    /// they were a hypothesis and had to be corrected once the schema carried them, or a drift
+    /// would have left it re-checking the OLD slots and reporting a clean bill of health.
+    /// </param>
+    public static void Report(IReadOnlyList<SweepFrame> frames, OffsetSchema schema, TextWriter output)
     {
         ArgumentNullException.ThrowIfNull(frames);
+        ArgumentNullException.ThrowIfNull(schema);
         ArgumentNullException.ThrowIfNull(output);
 
         output.WriteLine();
@@ -186,6 +212,7 @@ public sealed class ComponentSweep
             return;
         }
 
+        var pointsByFrame = frames.ToDictionary(f => f.Frame, f => f.EntityPoints);
         foreach (IGrouping<string, (int Frame, ComponentObservation O)> byComponent
             in all.GroupBy(t => t.O.Component))
         {
@@ -205,7 +232,93 @@ public sealed class ComponentSweep
 
             ReportCountdowns(obs, width, output);
             ReportPositions([.. obs.Select(t => t.O)], width, output);
+            ReportBeamLine(byComponent.Key, obs, width, pointsByFrame, schema, output);
         }
+    }
+
+    /// <summary>Re-checks the beam's two ends against the entity list, rather than restating them.</summary>
+    /// <remarks>
+    /// The pair is decoded, so what is left for a report is the check that earned it: the far end
+    /// lands on something the game is listing and THE MIDPOINT OF THE SAME LINE DOES NOT. Landing
+    /// near an entity is cheap in a fight - the midpoint control is what makes the number mean
+    /// anything, and a report that printed only the first half would look like a confirmation
+    /// while proving nothing.
+    ///
+    /// Matched WITHIN each frame rather than against every point the session ever saw, because a
+    /// beam ends on somebody who was standing there at the time; pooling the whole session would
+    /// let a monster that walked through later count as a hit.
+    /// </remarks>
+    private static void ReportBeamLine(
+        string component,
+        List<(int Frame, ComponentObservation O)> obs,
+        int width,
+        IReadOnlyDictionary<int, IReadOnlyList<(float X, float Y)>> pointsByFrame,
+        OffsetSchema schema,
+        TextWriter output)
+    {
+        if (!string.Equals(component, "Beam", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        StructDef beam = schema.Structs["Beam"];
+        int sourceAt = beam.OffsetOf("SourceX");
+        int targetAt = beam.OffsetOf("TargetX");
+        if (width < targetAt + 12)
+        {
+            return;
+        }
+
+        int endNear = 0, midNear = 0, tried = 0;
+        foreach ((int frame, ComponentObservation o) in obs)
+        {
+            if (!pointsByFrame.TryGetValue(frame, out IReadOnlyList<(float X, float Y)>? points)
+                || points.Count < 5)
+            {
+                continue;
+            }
+
+            float ax = BitConverter.ToSingle(o.Bytes, sourceAt);
+            float ay = BitConverter.ToSingle(o.Bytes, sourceAt + 4);
+            float bx = BitConverter.ToSingle(o.Bytes, targetAt);
+            float by = BitConverter.ToSingle(o.Bytes, targetAt + 4);
+            if (!float.IsFinite(ax) || !float.IsFinite(bx))
+            {
+                continue;
+            }
+
+            tried++;
+            if (NearestTo(points, bx, by) < NearMiss) { endNear++; }
+            if (NearestTo(points, (ax + bx) / 2, (ay + by) / 2) < NearMiss) { midNear++; }
+        }
+
+        if (tried == 0)
+        {
+            output.WriteLine("    no frame had enough known entity positions to check the far end.");
+            return;
+        }
+
+        double end = endNear * 100.0 / tried, mid = midNear * 100.0 / tried;
+        output.WriteLine($"    far end within {NearMiss} units of a listed entity on {end:F0}%,"
+            + $" the MIDPOINT of the same line on {mid:F0}% ({tried} readings)");
+        output.WriteLine(end > 80 && end > mid * 2
+            ? $"    AS DECODED: +0x{targetAt:X2} is where the beam ENDS - and the control separates it."
+            : "    NOT what it was decoded as - the far end no longer picks out entities, re-hunt it.");
+    }
+
+    /// <summary>How close counts as landing on somebody. A monster is a few units across.</summary>
+    public const int NearMiss = 30;
+
+    private static double NearestTo(IReadOnlyList<(float X, float Y)> points, float x, float y)
+    {
+        double best = double.MaxValue;
+        foreach ((float px, float py) in points)
+        {
+            double d = ((x - px) * (x - px)) + ((y - py) * (y - py));
+            if (d < best) { best = d; }
+        }
+
+        return Math.Sqrt(best);
     }
 
     /// <summary>

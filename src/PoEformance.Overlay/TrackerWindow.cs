@@ -337,12 +337,101 @@ public sealed class TrackerWindow
 
     // ── Ground effects ───────────────────────────────────────────────────────
 
+    /// <summary>
+    /// The two hazards the game names itself - no rule to write, and no path to guess.
+    /// </summary>
+    /// <remarks>
+    /// Above the rule list rather than below it, because this is the answer for anything it
+    /// covers and the rules are the fallback for the rest. Both switches are OFF by default:
+    /// they draw over the fight, and a person should choose that.
+    /// </remarks>
+    private void DrawKnownHazards(TrackerSettings settings)
+    {
+        bool ground = settings.ShowGroundEffects;
+        if (ImGui.Checkbox("ring every ground effect the GAME marks as one", ref ground))
+        {
+            _write(settings with { ShowGroundEffects = ground });
+        }
+
+        ImGuiText.Hint(
+            DimText,
+            "no rule needed: this asks the entity whether it carries a GroundEffect component,"
+            + " which is the game's own answer, and reads the countdown out of it.");
+
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
+        float radius = settings.GroundEffectRadius;
+        if (ImGui.SliderFloat("##groundradius", ref radius, 5f, 120f, "%.0f px radius"))
+        {
+            _write(settings with { GroundEffectRadius = radius });
+        }
+
+        ImGui.SameLine();
+        Vector4 groundColour =
+            ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(settings.GroundEffectColour));
+        if (ImGui.ColorEdit4("##groundcolour", ref groundColour, SwatchFlags))
+        {
+            _write(settings with
+            {
+                GroundEffectColour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(groundColour)),
+            });
+        }
+
+        ImGui.SameLine();
+        bool timer = settings.ShowGroundEffectTimer;
+        if (ImGui.Checkbox("seconds left", ref timer))
+        {
+            _write(settings with { ShowGroundEffectTimer = timer });
+        }
+
+        ImGuiText.Hint(
+            DimText,
+            "the number sits at 0.0 for a beat before the ring goes - the game's countdown"
+            + " reaches zero a measured 0.38 s before it stops listing the effect.");
+
+        bool beams = settings.ShowBeams;
+        if (ImGui.Checkbox("draw boss beams as the LINE they occupy", ref beams))
+        {
+            _write(settings with { ShowBeams = beams });
+        }
+
+        ImGuiText.Hint(
+            DimText,
+            "both ends come from the beam's own component, so this is the whole line rather than"
+            + " a ring on one end of it - a beam runs up to eleven hundred world units.");
+
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
+        float beamThickness = settings.BeamThickness;
+        if (ImGui.SliderFloat("##beamthickness", ref beamThickness, 0.5f, 12f, "%.1f px wide"))
+        {
+            _write(settings with { BeamThickness = beamThickness });
+        }
+
+        ImGuiText.Hint(
+            DimText,
+            "the width is yours to pick and means nothing: the component has no thickness field"
+            + " that survived checking, so a drawn danger zone would be an invention.");
+
+        ImGui.SameLine();
+        Vector4 beamColour = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(settings.BeamColour));
+        if (ImGui.ColorEdit4("##beamcolour", ref beamColour, SwatchFlags))
+        {
+            _write(settings with
+            {
+                BeamColour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(beamColour)),
+            });
+        }
+    }
+
     private void DrawGroundDanger(TrackerSettings settings, WorldSnapshot snapshot)
     {
         if (!OverlayFonts.SectionHeader("Dangerous ground"))
         {
             return;
         }
+
+        DrawKnownHazards(settings);
+
+        ImGui.Separator();
 
         bool on = settings.ShowGroundDanger;
         if (ImGui.Checkbox("ring the ground effects below", ref on))

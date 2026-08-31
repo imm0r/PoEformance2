@@ -123,6 +123,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _tracker = value;
             _monsterLines.Settings = value;
             _groundDanger.Settings = value;
+            _beams.Settings = value;
             _statusIcons.Settings = value;
             _aim.Settings = value;
         }
@@ -588,6 +589,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     // The tracker's three layers, which share one settings record - see AttachTracker.
     private readonly MonsterLineLayer _monsterLines = new();
     private readonly GroundDangerLayer _groundDanger = new();
+
+    /// <summary>The boss beams, drawn as the lines they occupy. See BeamLayer.</summary>
+    private readonly BeamLayer _beams = new();
     private readonly StatusIconLayer _statusIcons = new();
     private readonly AimLayer _aim = new();
 
@@ -2121,6 +2125,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // UNDER everything else in world space, because it is drawn ON the ground and
             // filled rings would otherwise cover the markers standing in them.
             _groundDanger.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+
+            // With the ground rings rather than with the monster lines, because a beam is a
+            // hazard on the floor and not a thing to walk to - and UNDER the health bars for
+            // the same reason the rings are: a line long enough to cross the screen would
+            // otherwise sit on top of every number the player is reading.
+            _beams.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
 
             // Over the monsters themselves rather than on the map, and separate from the
             // world dots for that reason: a dot in the world lands between the player and
