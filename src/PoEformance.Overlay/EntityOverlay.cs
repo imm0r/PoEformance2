@@ -1017,6 +1017,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             0, Status, "Live readout", () => DrawStatusTab(_viewport.X, _viewport.Y),
             page: Status, pageLabel: "Status");
 
+        // The live facts that belong on EVERY page rather than on this one - see
+        // DrawStatusStrip, and StatusBar for why the window stopped resizing itself once they
+        // moved up there.
+        _tools.Header = DrawStatusStrip;
+
         // Dragging a zone is a settings change like any switch, and it has to reach the file:
         // the whole value of saying where the interface is, is not saying it again next launch.
         _keepOut.Changed = () => SettingsChanged?.Invoke();
@@ -2602,6 +2607,85 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     private static readonly Vector4 Measured = OverlayInk.Measured;
 
+    /// <summary>
+    /// Why nothing is being read, when nothing is.
+    /// </summary>
+    /// <remarks>
+    /// WHICH state, not just "no". A loading screen, the login screen and a character select
+    /// all draw nothing, and they are different situations - saying "not in an area" over a
+    /// loading screen reads as a broken read.
+    ///
+    /// Its own method because it is now asked twice: once by the readout page and once by the
+    /// strip above the tabs, which has to answer this on every page. Two copies of a switch
+    /// over eight game states is two copies to keep in step.
+    /// </remarks>
+    private string Idling() => _snapshot.State switch
+    {
+        GameStateKind.AreaLoading or GameStateKind.Loading => "loading",
+        GameStateKind.Login or GameStateKind.PreGame => "at the login screen",
+        GameStateKind.SelectCharacter or GameStateKind.CreateCharacter
+            or GameStateKind.DeleteCharacter => "at character select",
+        GameStateKind.Escape => "in the escape menu",
+        GameStateKind.InGame => "in game, but the area has not resolved",
+        GameStateKind.NotLoaded => "game not loaded",
+        GameStateKind.Unreadable => "state unreadable - falling back to the player pointer",
+        _ => $"in {_snapshot.State}",
+    };
+
+    /// <summary>
+    /// The live strip above the tabs: the four or five facts worth having on every page.
+    /// </summary>
+    /// <remarks>
+    /// WHAT EARNS A PLACE HERE is the question asked while doing something else. "Is it reading
+    /// the game", "which area does it think this is", "how many entities", "is the read keeping
+    /// up" and "what is auto-flask doing" are all asked mid-fight, with some other tab in front,
+    /// and every one of them used to mean leaving that tab. Everything else the readout knows -
+    /// the belt, the panels, the projection probe, the whole debugging pass - stays on the
+    /// status PAGE, because those are read deliberately once while working something out.
+    ///
+    /// IN THE ORDER THEY ARE NEEDED, because a chip that does not fit is dropped rather than
+    /// wrapped (see <see cref="StatusBar.Chip(string, Vector4)"/>). Somebody who has dragged the
+    /// window narrow keeps the state and the area and loses the frame timing, which is the right
+    /// way round.
+    /// </remarks>
+    private void DrawStatusStrip()
+    {
+        if (!_snapshot.InGame)
+        {
+            StatusBar.Chip(Idling(), Warning);
+            return;
+        }
+
+        // FIRST AND ALWAYS, even though the area beside it implies it. This is the chip that
+        // answers "is the tool alive", and an answer that has to be inferred from the presence
+        // of another answer is not one you can take in at a glance.
+        StatusBar.Chip("reading", OverlayInk.Good);
+
+        AreaInfo area = _snapshot.Area;
+        StatusBar.Chip(area.Describe(), area.WantsMarkers ? Quiet : Warning);
+
+        // The remembered ones counted separately, for the reason the readout row does it: added
+        // together they read as the entity list having grown, which is what this number is
+        // watched for.
+        int listed = _snapshot.Entities.Count - _snapshot.Remembered;
+        StatusBar.Figure(
+            _snapshot.Remembered > 0 ? $"{listed} +{_snapshot.Remembered}" : $"{listed}");
+
+        if (ReadStats is not null)
+        {
+            (double ms, long _, long failures) = ReadStats();
+            StatusBar.Figure(
+                $"{ms:F1} ms / {1000f / ImGui.GetIO().Framerate:F1} ms"
+                + (failures > 0 ? $"  {failures} failed" : string.Empty),
+                failures > 0 ? Bad : OverlayInk.Measured);
+        }
+
+        if (FlaskStatus is not null)
+        {
+            StatusBar.Chip(FlaskStatus(), OverlayInk.Accent);
+        }
+    }
+
     /// <summary>What is being read, the pools, and what auto-flask is doing.</summary>
     private void DrawReadout(int width, int height)
     {
@@ -2614,21 +2698,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             if (!_snapshot.InGame)
             {
-                // WHICH state, not just "no". A loading screen, the login screen and a
-                // character select all draw nothing, and they are different situations -
-                // saying "not in an area" over a loading screen reads as a broken read.
-                Row("idle", _snapshot.State switch
-                {
-                    GameStateKind.AreaLoading or GameStateKind.Loading => "loading",
-                    GameStateKind.Login or GameStateKind.PreGame => "at the login screen",
-                    GameStateKind.SelectCharacter or GameStateKind.CreateCharacter
-                        or GameStateKind.DeleteCharacter => "at character select",
-                    GameStateKind.Escape => "in the escape menu",
-                    GameStateKind.InGame => "in game, but the area has not resolved",
-                    GameStateKind.NotLoaded => "game not loaded",
-                    GameStateKind.Unreadable => "state unreadable - falling back to the player pointer",
-                    _ => $"in {_snapshot.State}",
-                }, Warning);
+                Row("idle", Idling(), Warning);
                 return;
             }
 
@@ -2926,74 +2996,98 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// One line each and every one of them is reached for mid-fight, which is why they sit
     /// under the readout rather than on the appearance page: a switch you have to go to
     /// another tab for is a switch you flip after the thing you wanted it for has happened.
+    ///
+    /// IN TWO GROUPS, because they answer two different questions and used to be one list of
+    /// seven. "What gets drawn" and "when does the tool get out of the way" have nothing to do
+    /// with each other, and a reader who cannot see the join has to read all seven lines to
+    /// find the one they came for. The grouping is not decoration - it is the difference
+    /// between scanning and reading.
+    ///
+    /// AND WITH THEIR EXPLANATIONS IN TOOLTIPS. Every label here used to carry its own aside in
+    /// brackets - "Hide noise  (effects, pets, daemons - off to see everything)" - which is a
+    /// sentence read every time the page is opened by somebody who learned what it meant months
+    /// ago, and which made a block of seven checkboxes seven paragraphs tall. The name is on the
+    /// line; the explanation is under the pointer.
     /// </remarks>
     private void DrawSwitches()
     {
+        OverlayLayout.Group("What is drawn");
+
         // Not a page like the rest: routing is done WHILE playing, so the picker keeps its own
         // small window - see the note where it is drawn.
         if (_poi is not null)
         {
             bool picking = _poi.ShowPicker;
-            if (ImGui.Checkbox("Points of interest", ref picking))
+            if (OverlayLayout.Toggle("Points of interest", ref picking))
             {
                 _poi.ShowPicker = picking;
                 SettingsChanged?.Invoke();
             }
+
+            OverlayLayout.Hint("The picker for routing, in its own small window beside the map.");
         }
 
         if (Noise is not null)
         {
             bool filtering = Noise.Enabled;
-            if (ImGui.Checkbox("Hide noise  (effects, pets, daemons - off to see everything)", ref filtering))
+            if (OverlayLayout.Toggle("Hide noise", ref filtering))
             {
                 Noise.Enabled = filtering;
                 SettingsChanged?.Invoke();
             }
+
+            OverlayLayout.Hint("Effects, pets and daemons. Off to see everything the game lists.");
         }
 
         if (Memory is not null)
         {
             bool remembering = Memory.Enabled;
-            if (ImGui.Checkbox(
-                    "Keep what is out of range  (places and drops the game has stopped listing)",
-                    ref remembering))
+            if (OverlayLayout.Toggle("Keep what is out of range", ref remembering))
             {
                 Memory.Enabled = remembering;
                 SettingsChanged?.Invoke();
             }
+
+            OverlayLayout.Hint("Places and drops the game has stopped listing stay on the map.");
+        }
+
+        bool labels = ShowLabels;
+        if (OverlayLayout.Toggle("Name labels beside the dots", ref labels))
+        {
+            ShowLabels = labels;
+            SettingsChanged?.Invoke();
         }
 
         bool hurtOnly = _healthBars.OnlyWhenHurt;
-        if (ImGui.Checkbox("Health bars only once hurt  (off shows every monster's)", ref hurtOnly))
+        if (OverlayLayout.Toggle("Health bars only once hurt", ref hurtOnly))
         {
             _healthBars.OnlyWhenHurt = hurtOnly;
             SettingsChanged?.Invoke();
         }
 
+        OverlayLayout.Hint("Off draws a bar over every monster, at full life included.");
+
+        OverlayLayout.Group("Getting out of the way");
+
         bool behind = HideBehindPanels;
-        if (ImGui.Checkbox("Hide behind big panels  (stash, skill tree, atlas, world map)", ref behind))
+        if (OverlayLayout.Toggle("Hide markers behind big panels", ref behind))
         {
             HideBehindPanels = behind;
             SettingsChanged?.Invoke();
         }
 
+        OverlayLayout.Hint("The stash, the skill tree, the atlas and the world map.");
+
         bool windowsBehind = HideWindowsBehindPanels;
-        if (ImGui.Checkbox(
-                "Hide these windows over a panel  (only the ones actually on top of it)",
-                ref windowsBehind))
+        if (OverlayLayout.Toggle("Hide these windows over a panel", ref windowsBehind))
         {
             HideWindowsBehindPanels = windowsBehind;
             SettingsChanged?.Invoke();
         }
 
-        _keepOut.DrawControls();
+        OverlayLayout.Hint("Only the windows actually lying on top of the open panel.");
 
-        bool labels = ShowLabels;
-        if (ImGui.Checkbox("Name labels beside the dots", ref labels))
-        {
-            ShowLabels = labels;
-            SettingsChanged?.Invoke();
-        }
+        _keepOut.DrawControls();
     }
 
     /// <summary>The kind filter and the projection probe. Both are --debug work.</summary>
