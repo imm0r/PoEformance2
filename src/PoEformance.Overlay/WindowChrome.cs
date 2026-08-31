@@ -739,10 +739,14 @@ public sealed class WindowChrome
     /// <summary>Every window and its two switches - the list that can undo a click-through.</summary>
     public void DrawList()
     {
-        ImGui.TextDisabled("Locked stays clickable and will not be dragged.");
-        ImGui.TextDisabled("Click-through hands the mouse to the game, buttons and all -");
-        ImGui.TextDisabled("except the pointer icon in the window's own title bar, which");
-        ImGui.TextDisabled("stays live and hands the window back. Both switches are there too.");
+        // ONE PARAGRAPH THAT WRAPS, not four lines broken by hand. It used to be four
+        // TextDisabled calls, so the breaks fell where somebody's window happened to be wide
+        // on the day it was written - which reads as ragged at every other width, and is simply
+        // CUT OFF once the window is dragged narrower than that. See OverlayLayout.Note.
+        OverlayLayout.Note(
+            "Locked stays clickable and will not be dragged. Click-through hands the mouse to"
+            + " the game, buttons and all - except the pointer icon in the window's own title"
+            + " bar, which stays live and hands the window back. Both switches are there too.");
         ImGui.Spacing();
 
         if (!ImGui.BeginTable("##window-rules", 3, ImGuiTableFlags.SizingFixedFit))

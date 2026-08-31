@@ -156,13 +156,13 @@ public sealed class MapKeepOutEditor
 
         if (!hud)
         {
-            ImGui.TextDisabled("off - the map will be drawn over the orbs and the bars");
+            OverlayLayout.Note("Off - the map will be drawn over the orbs and the bars.");
             return;
         }
 
         if (Parts.Count == 0)
         {
-            ImGui.TextDisabled("nothing measured - no HUD element resolved, or no game in front");
+            OverlayLayout.Note("Nothing measured - no HUD element resolved, or no game in front.");
             return;
         }
 

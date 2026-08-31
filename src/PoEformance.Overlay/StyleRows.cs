@@ -231,34 +231,34 @@ public sealed class StyleRows
             return wanted;
         }
 
-        ImGui.Indent(26f);
+        float step = OverlayLayout.Step();
+        ImGui.Indent(step);
 
         if (entry.Traits.HasFlag(StyleTraits.Scale))
         {
             // Starts at the ordinary size rather than at zero, so dragging it is an
             // adjustment from what is on screen rather than from nothing.
             float scale = wanted.Scale > 0f ? wanted.Scale : 1f;
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
-            if (ImGui.SliderFloat("size###scale", ref scale, 0.3f, 4f, "x%.2f"))
+            if (OverlayLayout.Narrow.Slider("size###scale", ref scale, 0.3f, 4f, "x%.2f"))
             {
                 wanted = wanted with { Scale = Math.Abs(scale - 1f) < 0.001f ? 0f : scale };
             }
 
             if (entry.Traits.HasFlag(StyleTraits.Width))
             {
-                ImGui.SameLine();
+                OverlayLayout.Next();
             }
         }
 
         if (entry.Traits.HasFlag(StyleTraits.Width))
         {
             float width = wanted.Width;
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
 
             // Zero is a real value here and it means "scale it with the marker", which is
             // what a line should do by default - so the format says so rather than showing a
             // meaningless 0.0.
-            if (ImGui.SliderFloat("line###width", ref width, 0f, 8f, width <= 0f ? "as it comes" : "%.1f px"))
+            if (OverlayLayout.Narrow.Slider(
+                    "line###width", ref width, 0f, 8f, width <= 0f ? "as it comes" : "%.1f px"))
             {
                 wanted = wanted with { Width = width };
             }
@@ -269,7 +269,7 @@ public sealed class StyleRows
             wanted = DrawIcon(entry, wanted);
         }
 
-        ImGui.Unindent(26f);
+        ImGui.Unindent(step);
         return wanted;
     }
 
@@ -301,8 +301,9 @@ public sealed class StyleRows
             return wanted;
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 16.5f);
-        ImGui.InputText("###iconpath", ref _iconPath, 512);
+        OverlayLayout.Search(
+            "###iconpath", "a .png next to the tool, or a full path...", ref _iconPath, 512,
+            OverlayLayout.ButtonRoom("use", "none"));
 
         ImGui.SameLine();
         if (ImGui.SmallButton("use"))

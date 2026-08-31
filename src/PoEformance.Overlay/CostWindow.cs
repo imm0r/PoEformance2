@@ -63,8 +63,7 @@ public sealed class CostWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8f);
-        ImGui.SliderFloat("plot height", ref _height, 30f, 160f, "%.0f px");
+        OverlayLayout.Slider("Plot height", ref _height, 30f, 160f, "%.0f px");
 
         double seconds = _history.SecondsIn(scope);
         ImGui.TextColored(

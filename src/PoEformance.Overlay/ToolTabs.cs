@@ -581,8 +581,10 @@ public sealed class ToolTabs
     /// <param name="except">The page hosting this list, which must not offer to hide itself.</param>
     public void DrawHideList(string except)
     {
-        ImGui.TextDisabled("Unticked tabs leave the bar. They come back here - or by");
-        ImGui.TextDisabled("themselves, the moment something jumps to them (F8, a handoff).");
+        // One wrapping paragraph rather than two hand-broken lines - see OverlayLayout.Note.
+        OverlayLayout.Note(
+            "Unticked tabs leave the bar. They come back here - or by themselves, the moment"
+            + " something jumps to them (F8, a handoff).");
         ImGui.Spacing();
 
         foreach (Page page in _pages)

@@ -148,11 +148,13 @@ public sealed class EntityBrowserWindow
 
     private void DrawControls(EntityView view, WorldSnapshot snapshot)
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 13.5f);
-        ImGui.InputText("filter", ref _filter, 64);
+        // The label moves inside the box - "filter" beside a field is a word explaining a field
+        // that explains itself the moment it says "filter by name" in its own grey text.
+        string survey = _surveyPane ? "back to entities" : "survey this area";
+        OverlayLayout.Search("##filter", "filter by name...", ref _filter, 64, OverlayLayout.ButtonRoom(survey));
 
         ImGui.SameLine();
-        if (ImGui.Button(_surveyPane ? "back to entities" : "survey this area"))
+        if (ImGui.Button(survey))
         {
             _surveyPane = !_surveyPane;
             if (_surveyPane)
