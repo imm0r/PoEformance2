@@ -726,6 +726,7 @@ if (bridge.connected) {
         profile: "Default",
         noticeInBackground: false,
         minInputGapMs: 100,
+        cooldownJitterMs: 50,
         profiles: [{
           name: "Default",
           groups: [{
