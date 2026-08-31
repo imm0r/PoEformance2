@@ -12,12 +12,16 @@ namespace PoEformance.Game.Diagnostics;
 /// <param name="Entity">What the sub-object's +0xA8 holds, or 0.</param>
 /// <param name="EntityPath">The metadata path of that entity, when it is one.</param>
 /// <param name="BossBytes">Every hostile monster's Monster component byte 0x27, by path.</param>
+/// <param name="Companion">What the sub-object's +0xC8 holds, or 0. See CompanionAt.</param>
+/// <param name="CompanionRead">How many bytes of the companion's target the reader served.</param>
 public sealed record HoverSample(
     ulong Host,
     ulong Sub,
     ulong Entity,
     string EntityPath,
-    IReadOnlyList<(string Path, ItemRarity Rarity, byte Flag)> BossBytes);
+    IReadOnlyList<(string Path, ItemRarity Rarity, byte Flag)> BossBytes,
+    ulong Companion = 0,
+    int CompanionRead = 0);
 
 /// <summary>
 /// Reads the two things nineteen recordings could not answer, because nothing had read them.
@@ -36,7 +40,9 @@ public sealed record HoverSample(
 ///     schema carries the two hop structs. This hunt keeps reading a WINDOW of each object
 ///     rather than the settled slots, on the same argument --questflags records regions it does
 ///     not understand: the windows are what the SECOND cursor-tracking slot at sub+0xC8 was
-///     found in, and it is still unidentified.
+///     found in. It is still unidentified, and it is followed now (see CompanionAt) because the
+///     first capture took the offline half of that question as far as it goes - the one thing
+///     left is what its target holds, and no committed file has a byte of it.
 ///  2. THE BOSS BYTE - STILL OPEN, and the capture is the reason to be careful about how that
 ///     is said. Monster+0x27 came from a reference as an unverified hypothesis, and the run
 ///     read it 14,462 times: zero every time, across Normal, Magic and Rare, with NO UNIQUE in
@@ -60,6 +66,27 @@ public sealed class HoverHunt
 
     /// <summary>The whole Monster component - its pool cell is this, so nothing is missed.</summary>
     public const int MonsterComponentBytes = 0x30;
+
+    /// <summary>The sub-object's second cursor-tracking slot, the one nothing has identified.</summary>
+    /// <remarks>
+    /// It is not in the schema's fields on purpose - what it POINTS AT is unknown, and naming a
+    /// field for a pointer whose target nobody has read is how a guess becomes documentation.
+    /// It is followed here because a hunt is where an unidentified thing belongs.
+    /// </remarks>
+    public const int CompanionAt = 0xC8;
+
+    /// <summary>
+    /// Window sizes tried at the companion's target, largest first.
+    /// </summary>
+    /// <remarks>
+    /// A ladder rather than one size, because a single read is all-or-nothing: 0x200 bytes off a
+    /// small object at the end of a page fails outright and records NOTHING, which is the worst
+    /// outcome for a capture whose whole job is to bring bytes home. The measurements say to
+    /// expect something small - across 143 hovering frames every value was 16-byte aligned and
+    /// neighbouring ones sat 0x10 to 0x40 apart - so the ladder ends small enough to succeed
+    /// even if the object really is one cell.
+    /// </remarks>
+    public static readonly int[] CompanionWindows = [0x200, 0x80, 0x20, 0x10];
 
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
@@ -116,10 +143,29 @@ public sealed class HoverHunt
             sub = _reader.ReadPointer(host + (ulong)_subPointerAt);
         }
 
+        ulong companion = 0;
+        int companionRead = 0;
         if (MemoryReaderExtensions.IsPlausiblePointer(sub))
         {
             _reader.TryRead(sub, _window);
             entity = _reader.ReadPointer(sub + (ulong)_entityAt);
+            companion = _reader.ReadPointer(sub + CompanionAt);
+        }
+
+        if (MemoryReaderExtensions.IsPlausiblePointer(companion))
+        {
+            // WHY A LADDER AND NOT A FIXED WINDOW: see CompanionWindows. The first size that
+            // reads is kept, and how much it was is carried on the sample - "we read 0x10 of
+            // it" and "we read 0x200 of it" are different findings about the object, and a
+            // later pass over the file must not have to guess which happened.
+            foreach (int size in CompanionWindows)
+            {
+                if (_reader.TryRead(companion, _window.AsSpan(0, size)))
+                {
+                    companionRead = size;
+                    break;
+                }
+            }
         }
 
         if (MemoryReaderExtensions.IsPlausiblePointer(entity)
@@ -128,7 +174,8 @@ public sealed class HoverHunt
             path = identity.Path;
         }
 
-        return new HoverSample(host, sub, entity, path, ReadBossBytes(chain.AreaInstance));
+        return new HoverSample(
+            host, sub, entity, path, ReadBossBytes(chain.AreaInstance), companion, companionRead);
     }
 
     /// <summary>Byte 0x27 of every hostile monster's Monster component, beside its rarity.</summary>
@@ -202,6 +249,24 @@ public sealed class HoverHunt
             output.WriteLine("  the entity slot never held one. That is what nothing-hovered looks like AND");
             output.WriteLine("  what a wrong offset looks like - but the windows are in the recording now, so");
             output.WriteLine("  the right slot can be hunted offline. Hover a monster while this runs.");
+        }
+
+        // The companion slot. Reported as WHETHER THE BYTES CAME HOME rather than as a finding,
+        // because that is the whole reason it is followed: everything else about it was already
+        // measurable offline, and the one thing that was not is what its target holds.
+        var withCompanion = samples.Where(s => s.Companion != 0).ToList();
+        if (withCompanion.Count > 0)
+        {
+            int read = withCompanion.Count(s => s.CompanionRead > 0);
+            int smallest = read == 0 ? 0 : withCompanion.Where(s => s.CompanionRead > 0).Min(s => s.CompanionRead);
+            output.WriteLine();
+            output.WriteLine($"  sub+0x{CompanionAt:X} (unidentified): set on {withCompanion.Count} frames, "
+                + $"{withCompanion.Select(s => s.Companion).Distinct().Count()} distinct");
+            output.WriteLine(read == 0
+                ? "    its target read on NO frame - every window size failed, so the capture still"
+                  + " cannot say what it points at."
+                : $"    target captured on {read} of them, smallest window 0x{smallest:X} bytes."
+                  + " That is the part that was missing - mine it offline.");
         }
 
         // The boss byte, pooled over the whole session and shown against rarity, because the
