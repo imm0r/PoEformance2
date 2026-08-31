@@ -137,14 +137,11 @@ public sealed class AtlasWindow
             changed = changed with { Biomes = biomes };
         }
 
+        // THE KEY IS GONE. It listed all thirteen biome names, each in the colour it rings a map
+        // in, whenever the switch was on - a wrapped block of coloured words in the middle of a
+        // settings page, permanently, for a question asked once. The colours are on the atlas
+        // where they are used; a legend in the settings is a reference table nobody was reading.
         OverlayLayout.Hint("The ring around each name says what terrain the map is.");
-
-        // The key is drawn IN THE COLOURS, because a list of biome names in grey answers none of
-        // what somebody looking at a green ring on the atlas is asking.
-        if (biomes)
-        {
-            BiomeKey();
-        }
 
         // Whether the default reads at a real resolution is not something that could be
         // decided while writing it, so it is here to be turned up rather than guessed at.
@@ -196,7 +193,26 @@ public sealed class AtlasWindow
             // outside - and if a node's rectangle ever reads too big it would be permanent.
             + (view.Hovering ? "  A map is hovered now." : string.Empty));
 
-        OverlayLayout.Group("Finding the way");
+        Apply(settings, changed);
+    }
+
+    /// <summary>
+    /// The routing groups, as a section of their own.
+    /// </summary>
+    /// <remarks>
+    /// ITS OWN SECTION rather than a third group at the bottom of the settings, because it is
+    /// not a setting: it is a LIST, one row per group, that grows as somebody adds groups and
+    /// that is scrolled and edited rather than glanced at and left. Sitting under the switches
+    /// it made the page twice as long as anything on it, and pushed "what is drawn" - which is
+    /// checked far more often - above the fold on a short window.
+    ///
+    /// Registered as a second tool on the atlas page, so it gets a fold of its own beside the
+    /// ritual line - see where the pages are wired up.
+    /// </remarks>
+    public void DrawRouting()
+    {
+        AtlasSettings settings = _watch.Settings;
+        AtlasSettings changed = settings;
 
         // The filter above the groups, because it decides what any of them can match. Its name
         // is inside the box now - it had a label to its right and a width nobody chose twice.
@@ -208,6 +224,16 @@ public sealed class AtlasWindow
 
         changed = Groups(changed);
 
+        Apply(settings, changed);
+    }
+
+    /// <summary>Takes a changed settings record into use, and queues the save.</summary>
+    /// <remarks>
+    /// Shared by the two sections, which both edit the same record: whichever one is folded
+    /// open has to apply and settle on its own, since the other may not draw at all.
+    /// </remarks>
+    private void Apply(AtlasSettings settings, AtlasSettings changed)
+    {
         if (!ReferenceEquals(changed, settings))
         {
             // Applied at once, so the atlas follows a colour as it is dragged.
@@ -371,7 +397,12 @@ public sealed class AtlasWindow
 
                     if (group.Route)
                     {
-                        OverlayLayout.Next();
+                        // AT THE COLUMN, not after the name. Eleven groups have eleven names of
+                        // eleven lengths - "Quest" to "Where a route starts" - so hanging the
+                        // number box off the end of each put eleven identical controls at eleven
+                        // different x-positions, which is the ragged edge this whole pass is
+                        // about. See OverlayLayout.ToColumn.
+                        OverlayLayout.ToColumn();
 
                         int hops = group.MaxHops;
                         if (OverlayLayout.Narrow.Number("maps away", ref hops, 1))
@@ -435,48 +466,6 @@ public sealed class AtlasWindow
         }
 
         return string.Join(", ", said);
-    }
-
-    /// <summary>Every biome the game numbers, each written in the colour it rings a map in.</summary>
-    /// <remarks>
-    /// Wrapped by hand rather than with the text wrapper, because each name is its own coloured
-    /// item and ImGui wraps within one - a row of thirteen items has to be broken between them.
-    ///
-    /// Stepped in with a REAL indent, so it lines up with every other explanation on the page.
-    /// It used to be a run of four spaces printed as an item, which meant the key started at a
-    /// different place than the notes above and below it, and moved with the text size.
-    /// </remarks>
-    private static void BiomeKey()
-    {
-        float step = OverlayLayout.Step();
-        ImGui.Indent(step);
-        try
-        {
-            // Taken at the start of a line, where what is left to the right IS the content width.
-            float edge = ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X;
-            float gap = ImGui.GetStyle().ItemSpacing.X;
-            bool first = true;
-
-            foreach (AtlasBiome biome in AtlasBiomes.All.Values)
-            {
-                if (!first)
-                {
-                    ImGui.SameLine(0f, gap);
-
-                    if (ImGui.GetCursorPosX() + ImGui.CalcTextSize(biome.Name).X > edge)
-                    {
-                        ImGui.NewLine();
-                    }
-                }
-
-                first = false;
-                ImGui.TextColored(ToVector(biome.Colour), biome.Name);
-            }
-        }
-        finally
-        {
-            ImGui.Unindent(step);
-        }
     }
 
     /// <summary>An ImGui-packed colour as the four floats a picker wants.</summary>

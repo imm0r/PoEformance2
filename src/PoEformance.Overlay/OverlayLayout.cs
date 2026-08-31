@@ -282,6 +282,52 @@ public static class OverlayLayout
     /// </remarks>
     public static void Next() => ImGui.SameLine(0f, ImGui.GetFontSize() * 2f);
 
+    /// <summary>
+    /// How far in a row's controls begin, when the row starts with a name instead.
+    /// </summary>
+    /// <remarks>
+    /// Wide enough for the long names in the lists this is used on - "Where a route starts",
+    /// "Unique maps" - without pushing the controls so far right that a narrow window loses
+    /// them. Like every other measure here it is in text, so it holds at any text size.
+    /// </remarks>
+    private const float LabelEms = 14f;
+
+    /// <summary>
+    /// Moves to the column where a row's controls start, however long its name was.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER HALF OF THE GRID, and the half this vocabulary was missing. <see
+    /// cref="FieldWidth"/> handles the row that is a control with its name to the RIGHT, which
+    /// is ImGui's own arrangement and where most settings live. It does nothing for the other
+    /// shape: a list whose rows start with a name and carry controls after it - the atlas
+    /// groups, the marker styles, anything with a tick and a label in front.
+    ///
+    /// Those rows had no column at all. Each one's controls began wherever its own name
+    /// happened to end, so eleven atlas groups put eleven number boxes at eleven different
+    /// x-positions, and the marker rows put "size" and "icon" wherever the marker's name ran
+    /// out. A column of one-word names looks tidy and a column of real ones does not, which is
+    /// why this only becomes obvious with live data in it.
+    ///
+    /// NEVER OVERLAPS: a name longer than the column pushes its controls along instead of
+    /// having them drawn over it. A row out of line is untidy; a row on top of itself is
+    /// unreadable, and the second is what a plain SetCursorPosX would do.
+    /// </remarks>
+    public static void ToColumn(float ems = LabelEms)
+    {
+        // Read BEFORE the SameLine: after an item the cursor has wrapped to the next line, so
+        // its x is the row's own left margin - which already includes whatever indent is in
+        // force. Measuring the column from there is what makes this work inside an indent.
+        float margin = ImGui.GetCursorPosX();
+
+        ImGui.SameLine();
+
+        float want = margin + (ImGui.GetFontSize() * ems);
+        if (ImGui.GetCursorPosX() < want)
+        {
+            ImGui.SetCursorPosX(want);
+        }
+    }
+
     /// <summary>A checkbox. The one control whose label ImGui already puts in a fixed place.</summary>
     /// <remarks>
     /// Here despite needing no width set, so that a page can be written entirely in this

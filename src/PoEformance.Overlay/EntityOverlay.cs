@@ -1306,11 +1306,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         var window = new AtlasWindow(watch, saved);
         _tools.Add(40, "atlas", "Atlas", window.DrawTab, window.Idle, page: Atlas, pageLabel: "Atlas");
 
+        // ITS OWN SECTION, not the tail of the atlas settings. The groups are a LIST that grows
+        // as somebody adds to it - eleven rows before anybody has edited anything - so under the
+        // switches it made the page twice as long as everything on it put together, and pushed
+        // the switches that are actually reached for above the fold on a short window.
+        _tools.Add(
+            41, "atlas-routes", "Finding the way", window.DrawRouting, window.Idle,
+            page: Atlas, pageLabel: "Atlas");
+
         // The atlas's plate, web and route colours, between the atlas and the ritual line
         // that draws onto it.
         var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Atlas);
         _tools.Add(
-            41, "atlas-style", "How the atlas looks", styles.Draw, styles.Idle,
+            42, "atlas-style", "How the atlas looks", styles.Draw, styles.Idle,
             page: Atlas, pageLabel: "Atlas");
 
         if (visible)
