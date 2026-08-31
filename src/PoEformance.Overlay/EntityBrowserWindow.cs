@@ -264,20 +264,12 @@ public sealed class EntityBrowserWindow
         }
     }
 
-    /// <summary>One more fact on the line, ruled off from the last.</summary>
+    /// <summary>One more fact on the line - <see cref="OverlayLayout.Fact"/>, under this name.</summary>
     /// <remarks>
-    /// The same divider the window's own status strip uses, so a line of facts looks like a line
-    /// of facts wherever it is drawn. Not <see cref="StatusBar.Chip(string, Vector4)"/> itself:
-    /// that measures against the WINDOW's right edge and keeps a "has one been drawn yet" flag
-    /// for the single strip drawn per frame, neither of which is true inside a tab.
+    /// Written here first and lifted once the wealth page wanted the same line. Kept as a name
+    /// because the calls below read as what they are.
     /// </remarks>
-    private static void Fact(Vector4 ink, string text)
-    {
-        ImGui.SameLine();
-        ImGui.TextColored(OverlayInk.Edge, "|");
-        ImGui.SameLine();
-        ImGui.TextColored(ink, ImGuiText.Escape(text));
-    }
+    private static void Fact(Vector4 ink, string text) => OverlayLayout.Fact(ink, text);
 
     private static readonly Vector4 WarnText = OverlayInk.Warn;
 

@@ -86,6 +86,34 @@ public sealed class ToolTabs
         _tabbed.Add(page);
     }
 
+    // What each page draws ABOVE its tools, by page id - see Lead.
+    private readonly Dictionary<string, Action> _leads = [];
+
+    /// <summary>
+    /// Says what a page draws above its tools, whatever shape those take.
+    /// </summary>
+    /// <remarks>
+    /// FOR WHAT BELONGS TO THE PAGE RATHER THAN TO ANY OF ITS TOOLS. The atlas is the case: a
+    /// master switch decides whether the overlay draws at all, and under it sit four tools -
+    /// routing, filters, colours, the ritual line - none of which owns that switch. Put on one of
+    /// the four it is a setting somebody has to remember lives on the "filters" tab; repeated on
+    /// all four it is four checkboxes that must agree. Above them it is what it is.
+    ///
+    /// The same slot answers the other recurring case: a strip of headline figures that the tabs
+    /// beneath it break down. Which is why this is a page's own callback rather than a switch:
+    /// the page decides what a lead is, and it is never the same thing twice.
+    ///
+    /// Kept by page ID rather than against the Page, because a lead can be declared before
+    /// anything has registered a tool - the atlas declares it in the overlay's constructor,
+    /// where the four attach calls have not happened yet and may never.
+    /// </remarks>
+    public void Lead(string page, Action draw)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(page);
+        ArgumentNullException.ThrowIfNull(draw);
+        _leads[page] = draw;
+    }
+
     // The pages somebody took off the bar. A registered tool stays registered - its idle
     // callback keeps running, its jumps keep working - the tab is just not offered, which is
     // what "I never use this one" actually asks for. Ids rather than Page references because
@@ -525,6 +553,13 @@ public sealed class ToolTabs
     /// <summary>Draws a page: one tool bare, several as an accordion or a tab bar.</summary>
     private void DrawSections(Page page)
     {
+        // BEFORE the branch, so a lead is above its tools whether they came out as tabs, as
+        // folds, or as a single tool with no heading of its own at all.
+        if (_leads.TryGetValue(page.Id, out Action? lead))
+        {
+            lead();
+        }
+
         if (page.Sections.Count == 1)
         {
             page.Sections[0].Draw();

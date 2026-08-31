@@ -405,7 +405,11 @@ public static class OverlayLayout
     {
         ArgumentNullException.ThrowIfNull(text);
 
-        if (!ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        // Nothing to say is not the same as an empty tooltip, and the difference shows: a
+        // caller whose sentence is built from what it found - the atlas groups describe what
+        // each one matches on, and a group matching nothing describes nothing - would otherwise
+        // pop an empty box under the pointer.
+        if (text.Length == 0 || !ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
         {
             return;
         }
@@ -420,6 +424,43 @@ public static class OverlayLayout
         finally
         {
             ImGui.PopTextWrapPos();
+        }
+    }
+
+    /// <summary>
+    /// One headline figure: its name, its value, and its sentence under the pointer.
+    /// </summary>
+    /// <remarks>
+    /// THE SHAPE THAT REPLACES A PARAGRAPH OF NUMBERS. Three pages here open with figures that
+    /// only mean something next to each other - the damage split, what a purse is holding against
+    /// what it made - and all three wrote them as prose: "credited: 891.4k from ones we were
+    /// already hurting", four such lines, pushing the thing they introduce a screen down to
+    /// explain something that is read once and then known.
+    ///
+    /// What belongs on screen is the COMPARISON - which of these is large - and what belongs in a
+    /// tooltip is the sentence saying what the number rests on. Set in <see cref="Cell"/> columns
+    /// they also line up down the page, which is what makes two of them comparable at a glance.
+    ///
+    /// THE NAME AND THE VALUE ARE ONE HOVER TARGET. A BeginGroup pair makes them a single item as
+    /// far as <c>IsItemHovered</c> is concerned, because a pointer lands on whichever half it
+    /// lands on and a tooltip answering to only one of them is a tooltip nobody finds.
+    /// </remarks>
+    /// <param name="hint">The sentence about it. Pass empty for a figure that needs none.</param>
+    public static void Figure(string label, string value, Vector4 ink, string hint = "")
+    {
+        ArgumentNullException.ThrowIfNull(label);
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(hint);
+
+        ImGui.BeginGroup();
+        ImGui.TextColored(OverlayInk.Quiet, ImGuiText.Escape(label));
+        ImGui.SameLine();
+        ImGuiText.Mono(ink, value);
+        ImGui.EndGroup();
+
+        if (hint.Length > 0)
+        {
+            Hint(hint);
         }
     }
 
@@ -466,7 +507,13 @@ public static class OverlayLayout
     /// takes the room it needs rather than being overwritten by its neighbour.
     /// </remarks>
     /// <param name="column">Which column, counting the first control on the row as 0.</param>
-    public static void Cell(int column)
+    /// <param name="ems">
+    /// How wide one cell is, for a row whose contents are not switch labels. The headline
+    /// figures on the wealth page are the case: "Holding 601 div, 312 ex" does not fit a cell
+    /// sized for a tick and two words, and a cell too narrow silently degrades to a fixed gap -
+    /// which is what this exists to replace.
+    /// </param>
+    public static void Cell(int column, float ems = CellEms)
     {
         // Read before the SameLine, while the cursor is on the row's own left margin - see
         // ToColumn for why that is the only moment this can be measured.
@@ -474,11 +521,45 @@ public static class OverlayLayout
 
         ImGui.SameLine();
 
-        float want = margin + (ImGui.GetFontSize() * CellEms * column);
+        float want = margin + (ImGui.GetFontSize() * ems * column);
         if (ImGui.GetCursorPosX() < want)
         {
             ImGui.SetCursorPosX(want);
         }
+    }
+
+    /// <summary>
+    /// One more fact on a line of them, ruled off from the last.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER HALF OF <see cref="Figure"/>. A figure is a number somebody compares; a fact is
+    /// a short thing that qualifies the figures - which league, how many prices, how old the
+    /// stash reading is. Those were paragraphs, one per line, above the thing they qualify.
+    ///
+    /// The same divider the window's own status strip uses, so a line of facts looks like a line
+    /// of facts wherever it is drawn. Not <see cref="StatusBar.Chip(string, Vector4)"/> itself:
+    /// that measures against the WINDOW's right edge and keeps a "has one been drawn yet" flag
+    /// for the single strip drawn per frame, neither of which is true inside a tab.
+    /// </remarks>
+    public static void Fact(Vector4 ink, string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+
+        Divider();
+        ImGui.TextColored(ink, ImGuiText.Escape(text));
+    }
+
+    /// <summary>The rule between two facts, for a caller putting a CONTROL on that line.</summary>
+    /// <remarks>
+    /// A line of facts occasionally carries a switch that belongs with them - "hide empty tabs"
+    /// beside the count of what was read. Drawing the rule by hand at that one call site is how
+    /// two dividers end up looking slightly different.
+    /// </remarks>
+    public static void Divider()
+    {
+        ImGui.SameLine();
+        ImGui.TextColored(OverlayInk.Edge, "|");
+        ImGui.SameLine();
     }
 
     /// <summary>
