@@ -558,6 +558,55 @@ existing fixture sweeps that region once, so a replay cannot tell "constant" fro
 into the next `--record` session frame by frame. Until such a capture exists, a frustum older
 than the frame it is used on is unproven.
 
+#### Skipping the reads for what the camera cannot see
+
+The saving the frustum was worth reading for. `ReadAim` and `ReadMonsterBuffs` are the two
+switches this project already describes as costing a read per monster, and both feed things
+drawn *over* the monster — a ray from its feet, icons above its head. A monster off screen is
+drawn nowhere, so the read buys nothing, and `SkipOffScreenReads` (on by default) skips it.
+
+A culling gate is the shape of change that goes wrong silently: it can only remove work, so
+when it removes the wrong work nothing crashes — a ray stops being drawn and the first anybody
+hears of it is that the overlay "feels unreliable". So it is not shipped on the argument that
+it ought to be equivalent:
+
+- **The gate and the overlay decide the same thing by different routes.** What gets drawn is
+  decided by projecting; what gets read is decided by the frustum. Over the eighteen
+  recordings, at the frame each one actually read the frustum, the two agree on **all 1042
+  tested points** — every entity's feet and the top of its model — with nothing on screen yet
+  outside the frustum *and* nothing inside the frustum yet off screen. Not luck: the corners
+  project onto the viewport's edges exactly, so the two are one predicate computed twice.
+- **It fails open.** No frustum — an old recording, a drifted offset, a loading screen — and
+  nothing is skipped. An unreadable field must never be able to switch a feature off quietly.
+- **`ReadActions` is deliberately not gated.** It feeds evasion, which asks about danger to the
+  *player*: a boss commits a beam from outside the view volume and you are still standing in
+  it.
+- **The margin is sized, not chosen.** The fastest the player crosses the world in any
+  recording is 2045 units/s, so at the reader's 30 Hz the camera moves ~68 units per tick; 250
+  is three and a half ticks of headroom for a frustum the game may update a frame or two behind
+  the matrix.
+- **The saving is counted, not felt.** `ReadCost` carries it and the status line prints it, so
+  a gate that starts culling the visible world is something you can see rather than suspect.
+
+Two things it does change, stated because "provably free" would be too strong: the Tracker's
+action census is titled "what the monsters **on screen** are doing", so gating makes it match
+its own description; and its buff-name list, which exists so a name can be copied into a rule,
+narrows to visible monsters.
+
+**The safety net caught something on its first run**, which is the best evidence it works.
+`MonsterActionsSettledTests` went red: `ActionHunt` builds its own `WorldReader` and inherited
+the default, and the published monster-action numbers — 1649 aimed actions agreeing with the
+facing to a median of 1.6°, 210 completed moves — are a sample of *what the game did*, not of
+what was on screen while it did it. An instrument that measures the world reads all of it, so
+the hunt opts out explicitly. Anything else that measures rather than draws must do the same.
+
+How much it saves is the one number still owed. At the single fresh frame each recording can
+offer, 29 of 163 hostile-monster reads are skipped (18%), and the only fixture with a real
+crowd at that moment shows 11% — thin evidence, because a recording with one monster in frame 5
+says almost nothing. The session-wide figures look far better (94% on the monsters fixture) and
+are worthless: they measure how far the player walked away from a photograph of the camera. The
+honest figure needs the same capture that settles the freshness question.
+
 The same pass over the fixtures also turned up the component **pool cells**, the `Vital`
 back-pointer at `+0x08` (the component's own address, on every vital of every monster — a check
 a wrong base cannot pass), three `Life` vitals nothing has read but which the cell leaves room
