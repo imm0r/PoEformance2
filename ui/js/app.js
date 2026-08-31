@@ -589,16 +589,23 @@ function sendGround(list) {
   renderGroundRules();
   renderGroundPicker();
 
+  // WRAPPED IN AN OBJECT, and it has to be. The host drops any request whose payload is not
+  // a JSON object, before its switch is ever reached - a guard every other message satisfies
+  // because every other message sends a record. A bare array here was accepted by the page,
+  // discarded by the host without a word, and the row vanished a second later when the poll
+  // re-rendered from a state that had never changed.
   bridge.send({
     type: "setGroundRules",
-    payload: list.map((r) => ({
-      path: r.path ?? "",
-      enabled: r.enabled !== false,
-      colour: r.colour ?? "#99FF4D00",
-      radius: Number(r.radius) || 100,
-      thickness: Number(r.thickness) || 2,
-      filled: !!r.filled,
-    })),
+    payload: {
+      rules: list.map((r) => ({
+        path: r.path ?? "",
+        enabled: r.enabled !== false,
+        colour: r.colour ?? "#99FF4D00",
+        radius: Number(r.radius) || 100,
+        thickness: Number(r.thickness) || 2,
+        filled: !!r.filled,
+      })),
+    },
   });
 }
 

@@ -183,6 +183,48 @@ public class GroundWatchTests
         Assert.DoesNotContain(keys, key => char.IsUpper(key[0]));
     }
 
+    /// <summary>
+    /// The page posts its rules inside an object, because a bare array is thrown away.
+    /// </summary>
+    /// <remarks>
+    /// A SOURCE CHECK, and an unusual thing to write, so here is why it exists rather than a
+    /// nicer one. The config host refuses any request whose payload is not a JSON object,
+    /// before its switch is reached - a guard every other message satisfies because every other
+    /// message sends a record. This card sent a bare array. Nothing threw, nothing logged, the
+    /// page rendered its own edit optimistically for the length of its edit-hold, and then the
+    /// next poll re-rendered from a state that had never changed - so a newly added rule
+    /// appeared and vanished a second later, which reads as "the rule will not save".
+    ///
+    /// The honest test is the page driving the real host, and it cannot be written here: the
+    /// config project is net10.0-windows and this suite runs on Linux. Parsing the JSON the
+    /// page *ought* to send would be worse than nothing - it would pass against whatever shape
+    /// somebody believed in, which is exactly how the bug got written. So this asserts the one
+    /// thing that actually broke, in the one file that broke it.
+    /// </remarks>
+    [Fact]
+    public void ThePageSendsGroundRulesInsideAnObject()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "ui", "js", "app.js")))
+        {
+            dir = dir.Parent;
+        }
+
+        Assert.NotNull(dir);
+        string source = File.ReadAllText(Path.Combine(dir.FullName, "ui", "js", "app.js"));
+
+        int at = source.IndexOf("\"setGroundRules\"", StringComparison.Ordinal);
+        Assert.True(at > 0, "the page no longer posts setGroundRules at all");
+
+        // The payload as it is written immediately after the type, whitespace removed so the
+        // check survives reformatting but not a change of shape.
+        string after = new string(
+            source.AsSpan(at, Math.Min(120, source.Length - at)).ToArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
+
+        Assert.Contains("payload:{", after, StringComparison.Ordinal);
+        Assert.Contains("rules:", after, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void SaysWhetherAnyoneHasLookedYet()
     {

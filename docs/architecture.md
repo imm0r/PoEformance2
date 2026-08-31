@@ -980,6 +980,22 @@ be marked without one. `@nn` variant markers are trimmed when a path is seeded i
 `PreloadReader` already does elsewhere — a rule keeping the marker would match the one patch that
 happened to be on screen when it was added.
 
+**Every payload the page posts must be a JSON object.** The config host refuses anything else
+before its dispatch switch is reached — a guard every other message satisfies without thinking,
+because every other message sends a record. This card sent a bare array, and the result was the
+worst shape a bug can take: nothing threw, nothing logged, the page rendered its own edit
+optimistically for the length of its edit-hold, and the next poll re-rendered from a state that had
+never changed. A newly added rule appeared and vanished a second later, which reads from the
+outside as "this rule will not save". The rules now travel under a `rules` key, and a refused
+request **names itself on the console** rather than being dropped in silence — the guard was right,
+its quietness was not.
+
+The honest regression test would drive the page against the real host, and cannot be written: the
+config project is `net10.0-windows` and the suite runs on Linux. Parsing the JSON the page *ought*
+to send would be worse than nothing — it would pass against whatever shape somebody believed in,
+which is how the bug was written in the first place. So the test asserts the one thing that broke,
+in the one file that broke it, and it was checked to fail against the old shape.
+
 **What the picker cannot offer, measured rather than assumed.** The whole sweep capture yields four
 rows, one of them tagged. Not one is a `GroundOnDeath` daemon — the burning, shocked and chilled
 ground a rare monster leaves behind — even though that is the ground most worth a rule. Their paths
