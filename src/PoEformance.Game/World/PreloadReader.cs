@@ -425,6 +425,40 @@ public sealed class PreloadReader
             _recordCount);
     }
 
+    /// <summary>
+    /// Every file record in the table, whichever area loaded it.
+    /// </summary>
+    /// <remarks>
+    /// The walk without the question this class is named after. What is loaded is a stamp
+    /// filter away from what THIS AREA loaded, and the other caller wants the opposite: a dat
+    /// table is a file record (see the schema's DatTable), and the tables worth finding -
+    /// KeywordPopups, Stats, BaseItemTypes - are the ones the game dragged in at startup and
+    /// never re-stamped. So they are exactly what <see cref="Read"/> filters away.
+    ///
+    /// Public so there is one walker rather than two. The bucket stride, the slot size and
+    /// the guard on a drifted length are all offsets that can move, and a second copy of them
+    /// would move separately - which is the failure this returns nothing for, silently, in
+    /// front of somebody.
+    /// </remarks>
+    public IEnumerable<ulong> Records(ulong fileRootStatic)
+    {
+        LastError = string.Empty;
+        ulong root = _reader.ReadPointer(fileRootStatic);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(root))
+        {
+            LastError = "the file root did not resolve";
+            yield break;
+        }
+
+        for (int b = 0; b < _bucketCount; b++)
+        {
+            foreach (ulong record in RecordsIn(root + (ulong)(b * _bucketSize)))
+            {
+                yield return record;
+            }
+        }
+    }
+
     /// <summary>Every record a bucket points at, however many that turns out to be.</summary>
     private IEnumerable<ulong> RecordsIn(ulong bucket)
     {

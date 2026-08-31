@@ -346,6 +346,7 @@ PoEformance.App --record s.rec --questflags    # + read where a character's ques
 PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action fields (see below)
 PoEformance.App --record s.rec --hoverhunt    # + read the hovered-entity chain and the boss byte
 PoEformance.App --record s.rec --sweep        # + read four components nothing has a layout for
+PoEformance.App --record s.rec --glossary     # + find every loaded dat table and read the glossary
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
@@ -2111,6 +2112,52 @@ handed in and proving it needs real bundles.
 running process knows where its own executable is. The usual folders are only a fallback for
 reading with the game shut, and a folder counts because the files are in it, never because of
 its name.
+
+### The tables — a dat table is a loaded-file record
+
+Rows of the game's static tables have been readable for months, but only **sideways**. A
+MinimapIcon component holds a row, an NPC holds a row, a chest holds a row — so the tables this
+tool could read were exactly the tables something on screen happened to point at. A table that
+nothing points at was not far away, it was unreachable.
+
+It stopped being unreachable when the two things turned out to be one thing. The game already
+keeps an index of every file it has loaded, hanging off the `FileRoot` static — that is what
+the preload alerts walk — and **a `.dat` record in it is the table object itself**, row store
+and all. `FileRecord.Name` and `DatTable.Path` are not the same shape at the same offset, they
+are the same field.
+
+`session-2026-08-sweep.rec` says so from both directions at once. The object an NPCs row calls
+"the table" (`0x31826080AD0`, path `Data/Balance/QuestFlags.dat`) is also one of the 8,406
+records the `FileRoot` walk enumerates — and it is not one coincidence: of the four tables that
+recording holds a foreign pointer to, *every one* is a record in the file table.
+
+So the route to any loaded table is:
+
+```
+FileRoot -> LoadedFilesRoot -> bucket -> FileRecordSlot.Record -> DatTable -> RowStorePtr -> rows
+```
+
+`LoadedDatTables` walks it. **What decides which records are tables is not the name**: matching
+`.dat` on a path would cost a string read for all eight thousand records to find ninety, and
+would still believe a file named like a table but not parsed as one. `PointerPeek.DescribeTable`
+asks the structure instead — a row store, two containers that divide exactly, and a by-Id index
+whose first entry points at the first row — and reads the path only once a record has passed.
+For nearly every record that is a single read that fails.
+
+The first thing read through it is **`KeywordPopups`, the game's glossary**: the table behind
+the `[Key|Text]` markup its own skill and mod texts are written in. Rendering that markup needs
+no table at all — it carries both halves, so `KeywordGlossary.Plain` is static — but the popup
+behind a highlighted word lives nowhere else. The row was identified from a dissector screenshot
+two ways that cannot both be wrong (nine rows on a 0x48 grid; the only PoE2 table of 1,275 whose
+0x48 row starts with five string columns), and the reader **refuses a table that does not report
+0x48**, because a dat table divides its own rows by its own by-Id index and so answers its row
+size without any schema at all.
+
+One hop has no fixture behind it, which is worth knowing before trusting it: the preload walk
+reads a 32-byte string header at `record+0x08` and stops one byte short of `RowStorePtr` at
+`+0x28`, so no recording in this repo has ever read a file record's row store. It is the same
+`RowStorePtr` already confirmed on the same kind of object from the MinimapIcon and NPCs side,
+and on this route it is exercised synthetically until somebody runs `--glossary --record`.
 
 ### Prices — what the stash is worth
 
