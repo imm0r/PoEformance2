@@ -22,12 +22,19 @@ namespace PoEformance.Core.Tests;
 ///  - the eight corners lie exactly ON three of the six planes each, and four bytes to either
 ///    side not one of them lies on any;
 ///  - the player, who is on screen by definition, is inside all six in every recording;
-///  - the player's distance to the four side planes is the SAME NUMBER in every recording,
-///    at world positions six thousand units apart, which is what a frustum carried by a
+///  - the player's distance to the VERTICAL pair is the same number in every one of them, at
+///    world positions six thousand units apart, which is what a frustum carried by a
 ///    player-centred camera has to look like and what an accidental solid cannot be.
 ///
 /// And it closes the decoy: 0x11C is plane 1, so a mat4x4 read there takes planes 1 to 4 and
 /// the unit vector the old invariant wanted at +0x30 was plane 4's normal.
+///
+/// SINCE SETTLED, by session-2026-08-frustum.rec - the one recording made after the reader
+/// started reading this block every frame. The other eighteen swept it once, so a replay of
+/// them could not tell a live value from a photograph, and everything built on it was
+/// provisional. It is live: 669 stored reads, 669 distinct values, changing frame for frame
+/// exactly as the matrix does. The same file also narrowed a claim this file used to make
+/// about all four side planes - see the last test.
 /// </remarks>
 public class CameraFrustumTests
 {
@@ -42,7 +49,23 @@ public class CameraFrustumTests
         public float Distance(float x, float y, float z) => (A * x) + (B * y) + (C * z) + D;
     }
 
-    /// <summary>Every committed recording, because eighteen agreeing is the whole argument.</summary>
+    /// <summary>The session recorded to settle how often the game rewrites the block.</summary>
+    private static string FrustumFixture
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+            {
+                dir = dir.Parent;
+            }
+
+            Assert.NotNull(dir);
+            return Path.Combine(dir.FullName, "tests", "fixtures", "session-2026-08-frustum.rec");
+        }
+    }
+
+    /// <summary>Every committed recording, because nineteen agreeing is the whole argument.</summary>
     private static IEnumerable<string> Fixtures()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
@@ -266,6 +289,134 @@ public class CameraFrustumTests
     }
 
     [Fact]
+    public void TheGameRewritesTheFrustumEveryFrame_JustLikeTheMatrix()
+    {
+        // THE QUESTION THE OTHER EIGHTEEN RECORDINGS COULD NOT ANSWER, and the reason this
+        // fixture exists. They swept WorldData once at frame 5 and read only the matrix after
+        // that, so the frustum was CONSTANT in every replay of them for the same reason a
+        // photograph is - and a replay cannot tell that apart from a value the game never
+        // updates. Everything built on the frustum was provisional until this was settled.
+        //
+        // The recorder is what makes it answerable: it drops a read whose bytes match the last
+        // one WRITTEN for that address (RecordingMemoryReader), so a read that made it into the
+        // file is a read that CHANGED. Reading the block every frame therefore turns "how often
+        // does the game rewrite this" into "how many reads are in the file".
+        //
+        // Answer: 669 stored reads, 669 distinct values, and the gaps between them match the
+        // matrix's own frame for frame. The frustum is as live as the projection it belongs to.
+        using var replay = ReplayMemoryReader.Load(File.OpenRead(FrustumFixture));
+        OffsetSchema schema = RealSessionTests.Schema();
+        ulong gameStates = replay.ResolvedStatics["GameStates"];
+
+        ulong worldData = 0;
+        for (uint frame = 0; frame < replay.FrameCount && worldData == 0; frame++)
+        {
+            replay.Seek(frame);
+            worldData = GameChain.Resolve(replay, schema, gameStates).WorldData;
+        }
+
+        Assert.NotEqual(0ul, worldData);
+
+        // Walk the frames and count how many DISTINCT frustums the session held. Replaying
+        // rather than parsing the file, so this measures what a consumer would actually see.
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        int frames = 0;
+        int changedFromPrevious = 0;
+        string previous = "";
+
+        for (uint frame = 0; frame < replay.FrameCount; frame++)
+        {
+            replay.Seek(frame);
+            if (CameraFrustum.Read(replay, schema, worldData) is not { } frustum)
+            {
+                continue;
+            }
+
+            frames++;
+            string key = string.Join(",", frustum.Planes.Select(p => $"{p.D:R}"))
+                + string.Join(",", frustum.Corners.Select(c => $"{c.X:R}{c.Y:R}{c.Z:R}"));
+            seen.Add(key);
+            if (previous.Length > 0 && key != previous)
+            {
+                changedFromPrevious++;
+            }
+
+            previous = key;
+        }
+
+        Assert.True(frames > 1000, $"only {frames} frames held a frustum");
+
+        // Live, not lazily written: nearly every frame carries a different view volume. The
+        // few that repeat are frames where the reader itself did not advance, which the matrix
+        // shows identically.
+        Assert.True(seen.Count > frames * 0.55,
+            $"only {seen.Count} distinct frustums over {frames} frames - the block may be stale");
+        Assert.True(changedFromPrevious > frames * 0.55,
+            $"the frustum changed on only {changedFromPrevious} of {frames} frames");
+    }
+
+    [Fact]
+    public void TheAgreementToleranceSitsInAGapFourOrdersOfMagnitudeWide()
+    {
+        // Pins the reason AgreementTolerance is 0.5 and not the 0.01 it was first written as.
+        // The correct matrix does not read zero every frame: it and the frustum are two
+        // separate reads, so the game can write between them, and two frames in eleven hundred
+        // tear far enough that a tight bound would report drift on a working camera. A drift
+        // alarm that cries wolf twice a session is one nobody reads.
+        //
+        // The bound has room to be generous because the gap is enormous - a matrix read four
+        // bytes out misses by 52 at its most forgiving and by infinity on most frames.
+        OffsetSchema schema = RealSessionTests.Schema();
+        int matrixAt = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+        using var replay = ReplayMemoryReader.Load(File.OpenRead(FrustumFixture));
+        ulong gameStates = replay.ResolvedStatics["GameStates"];
+
+        var honest = new List<double>();
+        var drifted = new List<double>();
+        var real = new float[16];
+        var wrong = new float[16];
+
+        for (uint frame = 0; frame < replay.FrameCount; frame++)
+        {
+            replay.Seek(frame);
+            GameChainAddresses chain = GameChain.Resolve(replay, schema, gameStates);
+            if (chain.WorldData == 0
+                || CameraFrustum.Read(replay, schema, chain.WorldData) is not { } frustum)
+            {
+                continue;
+            }
+
+            if (replay.TryRead(chain.WorldData + (ulong)matrixAt,
+                    System.Runtime.InteropServices.MemoryMarshal.AsBytes(real.AsSpan())))
+            {
+                honest.Add(frustum.WorstCornerOffEdge(real));
+            }
+
+            // Four bytes out is the drift this alarm exists to catch, and the most forgiving
+            // wrong reading available - eight either way is infinite on every frame.
+            if (replay.TryRead(chain.WorldData + (ulong)(matrixAt - 4),
+                    System.Runtime.InteropServices.MemoryMarshal.AsBytes(wrong.AsSpan())))
+            {
+                drifted.Add(frustum.WorstCornerOffEdge(wrong));
+            }
+        }
+
+        Assert.True(honest.Count > 1000, $"only {honest.Count} frames");
+        honest.Sort();
+
+        // Typical is six orders of magnitude inside the bound; the tearing outliers are one.
+        Assert.True(honest[honest.Count / 2] < 1e-4, $"median {honest[honest.Count / 2]:E2}");
+        Assert.True(honest[^1] < CameraFrustum.AgreementTolerance,
+            $"the worst honest reading, {honest[^1]:E2}, is outside the tolerance");
+        Assert.True(honest[^1] > 1e-3,
+            "no frame tore at all - if that holds up, the tolerance could be tightened");
+
+        // And the wrong reading is nowhere near it, on every single frame.
+        Assert.All(drifted, d => Assert.True(d > CameraFrustum.AgreementTolerance * 10,
+            $"a matrix read four bytes out scored {d:F3}"));
+    }
+
+    [Fact]
     public void TheReaderPutsTheFrustumOnTheSnapshot_AndItContainsThePlayer()
     {
         // The per-frame read, end to end through the real reader rather than by hand. The
@@ -377,22 +528,37 @@ public class CameraFrustumTests
         }
 
         Assert.True(sideDistances.Count >= 15, $"only {sideDistances.Count} recordings answered");
-
-        // The part no accidental solid reproduces. The player wandered six thousand world
-        // units between these sessions and stayed exactly as far from the four side planes in
-        // every one of them, which is the signature of a frustum the camera carries.
         Assert.True(positions.Max() - positions.Min() > 5000, "the sessions are all in one place");
-        for (int plane = 0; plane < 4; plane++)
+
+        // The part no accidental solid reproduces, and it is the VERTICAL pair. Planes 2 and 3
+        // sit at 450.3 and 644.4 from the player in EVERY recording - nineteen sessions, five
+        // game launches, world positions six thousand units apart, not one exception. A solid
+        // that happened to contain the player would not follow him to the decimal.
+        foreach (int plane in (int[])[2, 3])
         {
             float[] across = [.. sideDistances.Select(d => d[plane])];
+            Assert.All(across, d => Assert.Equal(across[0], d, 1));
+        }
 
-            // Two sessions were captured with the map panned (the atlas and inventory ones),
-            // which trades distance between the left and right pair without moving the sum -
-            // so the claim is the median, not the maximum.
-            float median = across.Order().ElementAt(across.Length / 2);
-            int agreeing = across.Count(d => MathF.Abs(d - median) < 1f);
-            Assert.True(agreeing >= across.Length - 2,
-                $"side plane {plane}: only {agreeing} of {across.Length} sessions sit at {median:F1}");
+        // THE HORIZONTAL PAIR IS NOT, and the correction is worth more than the tidier claim
+        // it replaces. This test used to assert one number for all four planes with two
+        // sessions allowed to differ; a nineteenth recording made it three, which is the point
+        // at which "outliers" stops being an honest word. Planes 0 and 1 take one of two
+        // values - 1140.1/1140.1 in sixteen sessions and 1326.5/907.2 in three - and the two
+        // do not even sum alike (2280.2 against 2233.7), so it is not the camera panning and
+        // trading one for the other. Something about the viewport differs between those
+        // captures. What survives, and is all the frustum needs to be usable, is that the
+        // player is inside all six in every one of them.
+        var horizontal = sideDistances
+            .Select(d => $"{d[0]:F1}/{d[1]:F1}")
+            .Distinct()
+            .ToList();
+
+        Assert.True(horizontal.Count <= 2,
+            $"the horizontal half-extents take {horizontal.Count} values: {string.Join(", ", horizontal)}");
+        foreach (float[] distances in sideDistances)
+        {
+            Assert.True(distances[0] + distances[1] > 2200, $"horizontal extent {distances[0] + distances[1]:F1}");
         }
     }
 }

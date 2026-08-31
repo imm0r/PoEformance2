@@ -122,6 +122,87 @@ public class FrustumGateTests
     }
 
     [Fact]
+    public void OnALiveFrustum_TheGateAgreesWithTheProjectionAtScale_AndSavesNearlyHalf()
+    {
+        // THE MEASUREMENT THE OTHER FIXTURES COULD NOT MAKE. They swept the frustum once, so a
+        // gate tested across their frames would be tested against a photograph - which is why
+        // the test above is confined to one frame each and why the saving was, until this file
+        // existed, an honest 18% on a sample of 163. Here the block is rewritten every frame
+        // (CameraFrustumTests), so every frame is a fair question.
+        OffsetSchema schema = RealSessionTests.Schema();
+        int matrixAt = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+        using var replay = ReplayMemoryReader.Load(File.OpenRead(FrustumFixture));
+        ulong gameStates = replay.ResolvedStatics["GameStates"];
+        var reader = new WorldReader(replay, schema) { ReadVisualEntities = true, ReadAim = true };
+        var matrix = new float[16];
+
+        int points = 0, onScreenButCulled = 0, culledButOnScreen = 0;
+        double worstMiss = 0;
+        int audience = 0, skipped = 0;
+
+        for (uint frame = 0; frame < replay.FrameCount; frame += 3)
+        {
+            replay.Seek(frame);
+            GameChainAddresses chain = GameChain.Resolve(replay, schema, gameStates);
+            if (chain.WorldData == 0
+                || !replay.TryRead(
+                    chain.WorldData + (ulong)matrixAt,
+                    System.Runtime.InteropServices.MemoryMarshal.AsBytes(matrix.AsSpan())))
+            {
+                continue;
+            }
+
+            WorldSnapshot snapshot = reader.Read(gameStates, 4096);
+            if (snapshot.Frustum is not { } frustum)
+            {
+                continue;
+            }
+
+            skipped += snapshot.Cost.OffScreen;
+            audience += snapshot.Listed.Count(e =>
+                e.Kind == EntityKind.Player || (e.Kind == EntityKind.Monster && !e.IsFriendly));
+
+            foreach (WorldEntity entity in snapshot.Listed)
+            {
+                foreach (float z in (float[])[entity.WorldZ, entity.HealthBarZ])
+                {
+                    points++;
+                    bool drawn = WorldToScreen
+                        .Project(matrix, entity.WorldX, entity.WorldY, z, 1920, 1080).OnScreen;
+                    float margin = frustum.Margin(entity.WorldX, entity.WorldY, z);
+
+                    if (drawn && margin < 0)
+                    {
+                        onScreenButCulled++;
+                        worstMiss = Math.Max(worstMiss, -margin);
+                    }
+                    else if (!drawn && margin >= 0)
+                    {
+                        culledButOnScreen++;
+                    }
+                }
+            }
+        }
+
+        Assert.True(points > 20_000, $"only {points} points tested");
+
+        // Not zero any more, at this scale - and the number is what makes the margin
+        // defensible rather than chosen. A handful of points sit a fraction of a grid cell
+        // outside a boundary they are drawn on, which is float arithmetic on the edge, and the
+        // gate carries 250 world units of headroom over the worst of them.
+        double rate = onScreenButCulled / (double)points;
+        Assert.True(rate < 0.0005,
+            $"{onScreenButCulled} of {points} points ({rate:P4}) were on screen yet culled");
+        Assert.True(worstMiss < 10, $"worst miss {worstMiss:F2} world units - over one grid cell");
+        Assert.True(worstMiss < reader.OffScreenMargin / 10,
+            $"worst miss {worstMiss:F2} leaves too little of the {reader.OffScreenMargin} margin");
+        Assert.Equal(0, culledButOnScreen);
+
+        // And what it is all for: on a real map session, most of the audience is off screen.
+        Assert.True(skipped > audience * 0.3, $"only {skipped} of {audience} reads skipped");
+    }
+
+    [Fact]
     public void AnEntityTheCameraCannotSeeLosesItsAimAndBuffs_ButNeverItsAction()
     {
         // The split, through the real reader. This tests the WIRING rather than the geometry -
@@ -246,6 +327,21 @@ public class FrustumGateTests
         }
 
         Assert.True(frames > 0, "the fixture had no frame without a frustum to test with");
+    }
+
+    private static string FrustumFixture
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+            {
+                dir = dir.Parent;
+            }
+
+            Assert.NotNull(dir);
+            return Path.Combine(dir.FullName, "tests", "fixtures", "session-2026-08-frustum.rec");
+        }
     }
 
     private static string MonstersFixture
