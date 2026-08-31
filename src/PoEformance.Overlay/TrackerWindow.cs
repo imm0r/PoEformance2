@@ -1193,7 +1193,7 @@ public sealed class TrackerWindow
         DrawBuffPanel(
             "##live-player", "On you", new Vector2(half, 0f), settings.PlayerStatusOrDefault,
             name => _write(_read() with { PlayerStatus = [.. _read().PlayerStatusOrDefault, new StatusIconRule(name)] }),
-            panel => panel.Add(snapshot.PlayerBuffs is { All.Count: > 0 } ? "you" : string.Empty, snapshot.PlayerBuffs));
+            panel => panel.Add(0, snapshot.PlayerBuffs is { All.Count: > 0 } ? "you" : string.Empty, snapshot.PlayerBuffs));
 
         ImGui.SameLine();
 
@@ -1210,7 +1210,7 @@ public sealed class TrackerWindow
                         continue;
                     }
 
-                    panel.Add(monster.ShortName, monster.Buffs);
+                    panel.Add(shown, monster.ShortName, monster.Buffs);
                     if (++shown >= 4)
                     {
                         break;
@@ -1268,8 +1268,24 @@ public sealed class TrackerWindow
     /// </remarks>
     private readonly struct BuffPanel(IReadOnlyList<StatusIconRule> already, Action<string> add)
     {
-        /// <summary>Lists one thing's buffs, each of them clickable.</summary>
-        public void Add(string who, ActiveBuffs? buffs)
+        /// <summary>
+        /// Lists one thing's buffs, each of them clickable.
+        /// </summary>
+        /// <remarks>
+        /// THE SAME BUFF APPEARS MORE THAN ONCE. The game lists an instance per source, so a
+        /// character running two auras that both grant it shows "arcane_surge" twice, and a
+        /// reservation buff can appear three times over. That is a real reading and not a
+        /// duplicate to filter out - but it means a row's ImGui id cannot come from the buff's
+        /// NAME, because two rows would then share one id. ImGui says so out loud, in a popup
+        /// over the panel, and the second row of a colliding pair stops responding to clicks.
+        ///
+        /// So the id is the POSITION, here and per row: the slot this list occupies in the
+        /// panel, and the index of the row within it. Neither can repeat, whatever the game
+        /// lists - and two monsters of the same name in one panel would have collided the same
+        /// way if the outer scope had come from ShortName.
+        /// </remarks>
+        /// <param name="slot">Which list this is within its panel. Unique per panel.</param>
+        public void Add(int slot, string who, ActiveBuffs? buffs)
         {
             if (buffs is null || buffs.All.Count == 0)
             {
@@ -1281,19 +1297,28 @@ public sealed class TrackerWindow
                 return;
             }
 
-            if (who.Length > 0)
+            ImGui.PushID(slot);
+            try
             {
-                ImGui.TextUnformatted(ImGuiText.Escape(who));
-            }
+                if (who.Length > 0)
+                {
+                    ImGui.TextUnformatted(ImGuiText.Escape(who));
+                }
 
-            foreach (ActiveBuff buff in buffs.All)
+                for (int i = 0; i < buffs.All.Count; i++)
+                {
+                    Row(i, buffs.All[i]);
+                }
+            }
+            finally
             {
-                Row(buff);
+                ImGui.PopID();
             }
         }
 
         /// <summary>One buff: its name, what the drawing needs, and a click that rules it.</summary>
-        private void Row(ActiveBuff buff)
+        /// <param name="at">The row's position, which is its id - see the note on Add.</param>
+        private void Row(int at, ActiveBuff buff)
         {
             // A rule already covering this name means clicking again would add a duplicate
             // that can never be told from the first. Said rather than silently refused: a
@@ -1308,7 +1333,7 @@ public sealed class TrackerWindow
                 }
             }
 
-            ImGui.PushID(buff.Name);
+            ImGui.PushID(at);
             try
             {
                 // Selectable rather than text, so the whole row is the target and it lights up
