@@ -524,6 +524,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private const string Area = "area";
     private const string Combat = "combat";
     private const string Atlas = "atlas";
+    private const string Markers = "markers";
     private const string Entities = "entities";
 
     // Only the tools something else still reaches for keep a field; the rest live on as
@@ -859,17 +860,36 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // feature tab to be styled on, so it gets a page of its own, right before the page
         // about the tool itself. The feature styles sit with their features; see
         // StyleCatalogue.Homes for the split.
-        var markers = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Markers);
+        // FOUR TABS, not eight folds on one scroll. Forty rows of near-identical controls under
+        // eight headings is where somebody loses their place: every heading looks like the last
+        // one and the row you were looking at is three screens from the row you want to compare
+        // it with. Split by what a row is drawn ON - a thing, a place, a health bar, the tool's
+        // own furniture - which is the question somebody arrives at this page with.
+        _tools.AsTabs(Markers);
+
+        var entities = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerEntities);
+        var places = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerPlaces);
+        var health = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerHealth);
+        var aids = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerAids);
+
         _tools.Add(
             65,
             "markers",
-            "Markers",
+            "Entities & Drops",
             () =>
             {
-                markers.DrawResetLine();
-                markers.Draw();
+                // The reset line covers every drawn thing in the tool, not just this tab's -
+                // it says so - so it is drawn once, on the tab this page opens to.
+                entities.DrawResetLine();
+                entities.Draw();
             },
-            markers.Idle);
+            entities.Idle,
+            page: Markers,
+            pageLabel: "Markers");
+
+        _tools.Add(66, "markers-places", "Map & Places", places.Draw, places.Idle, page: Markers);
+        _tools.Add(67, "markers-health", "Health Bars", health.Draw, health.Idle, page: Markers);
+        _tools.Add(68, "markers-aids", "Measuring Aids", aids.Draw, aids.Idle, page: Markers);
 
         _tools.Add(70, "style", "Appearance", window.DrawTab, window.Idle);
         if (visible)
