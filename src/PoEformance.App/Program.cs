@@ -2268,8 +2268,15 @@ internal static class Program
                     PoEformance.Config.ConfigJsonContext.Default.ConditionMessage);
             }
 
+            // Every command below reads its payload as a record, so anything else is a message
+            // this host cannot act on. SAID OUT LOUD rather than dropped: a refusal here is
+            // indistinguishable from a working save whose setting does not stick, and finding
+            // that out cost an afternoon once - the page posted a bare array, the guard threw
+            // it away without a word, and the row disappeared a second later when the poll
+            // re-rendered from a state that had never changed.
             if (request.Payload.ValueKind != JsonValueKind.Object)
             {
+                Refused(request.Type, $"its payload is {request.Payload.ValueKind}, not an object");
                 return null;
             }
 
@@ -2311,7 +2318,17 @@ internal static class Program
                     return string.Empty;
 
                 case "setGroundRules":
-                    List<PoEformance.Features.GroundDangerRule>? ground = request.Payload.Deserialize(
+                    // The list arrives UNDER A KEY rather than as the payload itself, because
+                    // the guard above refuses any payload that is not an object - and it is
+                    // right to. A bare array was silently dropped there, which from the page
+                    // looked exactly like a rule that would not save: added, shown for a
+                    // second while the page held its own edit, then gone on the next poll.
+                    if (!request.Payload.TryGetProperty("rules", out JsonElement sentRules))
+                    {
+                        return null;
+                    }
+
+                    List<PoEformance.Features.GroundDangerRule>? ground = sentRules.Deserialize(
                         PoEformance.Config.ConfigJsonContext.Default.ListGroundDangerRule);
                     if (ground is null)
                     {
@@ -2373,9 +2390,17 @@ internal static class Program
                     return string.Empty;
 
                 default:
+                    Refused(request.Type, "no handler is registered for it");
                     return null;
             }
         }
+
+        // Names a message the host threw away. On the console rather than to the page, because
+        // the page is the thing that got it wrong and would be reporting on itself; and the
+        // Bridge card already shows the traffic, so the two together say what was sent and why
+        // nothing happened to it.
+        static void Refused(string type, string why)
+            => Console.WriteLine($"  config window: ignored \"{type}\" - {why}");
 
         return PoEformance.Config.ConfigWindowHost.Start("PoEformance", BuildState, Apply, alwaysOnTop);
     }

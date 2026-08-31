@@ -179,42 +179,63 @@ public class TrackerTests
     }
 
     /// <summary>
-    /// Ground the game tags itself is ringed once, by the pass that knows its size.
+    /// Ground a rule speaks for is ringed once, by the rule - not also by the component.
     /// </summary>
     /// <remarks>
-    /// IT USED TO BE RINGED TWICE. Both passes walk the same entity list and neither knew about
-    /// the other, so a tagged patch got a world-radius ring lying on the floor with an X and a
-    /// countdown AND a flat pixel circle of whatever size the rule carried - two circles of
-    /// different sizes on one patch of fire, from the settings the tool ships with. The
-    /// component pass wins because it is the one that can say how big the patch is: it reads the
-    /// radius out of the game, where a rule can only carry a number somebody typed.
+    /// IT USED TO BE RINGED TWICE, and then for one commit it was ringed by the wrong one.
+    ///
+    /// Both passes walk the same entity list and neither knew about the other, so a tagged patch
+    /// got a world-radius ring lying on the floor with an X and a countdown AND a flat pixel
+    /// circle of whatever size the rule carried - two circles of different sizes on one patch,
+    /// from the settings the tool ships with. The first fix gave the component the win, on the
+    /// belief that reading a radius out of memory beats a number somebody typed.
+    ///
+    /// THAT BELIEF WAS WRONG, and this is the test that now holds the correction in place. The
+    /// component marks a server-spawned ground DECAL, not damage - 5880 of 5916 readings in the
+    /// sweep capture are in a hideout - so it cannot outrank the one signal in the system that
+    /// is actually about danger, which is a path somebody deliberately wrote down.
     /// </remarks>
     [Fact]
-    public void TaggedGroundIsRingedByTheComponentPassAndNotAlsoByARule()
+    public void GroundARuleSpeaksForIsRingedByTheRuleAndNotAlsoByTheComponent()
     {
         WorldEntity tagged = Ground(
             "Metadata/Effects/Spells/ground_effects/VisibleServerGroundEffect") with { IsGroundEffect = true };
         var settings = TrackerSettings.Default with { ShowGroundEffects = true };
 
-        Assert.False(settings.RulesShouldRing(tagged));
-
-        // The rule itself still MATCHES - the refusal is about who draws, not about what the
-        // rule means. Somebody reading their rule list must not find it silently rewritten.
-        Assert.Contains(settings.GroundDangerOrDefault, rule => rule.Matches(tagged));
+        Assert.True(settings.RulesShouldRing(tagged));
+        Assert.False(settings.ComponentShouldRing(tagged));
     }
 
-    /// <summary>Turning the component rings off hands the tagged ground back to the rules.</summary>
+    /// <summary>Where no rule speaks, the component ring is what shows the decal at all.</summary>
     /// <remarks>
-    /// The other half, and the reason the refusal is keyed on the SWITCH: a switch that silently
-    /// deleted coverage somebody had written a rule for would be the worse surprise of the two.
+    /// The awareness half. Finding what to write a rule ABOUT needs something that marks ground
+    /// nobody has described yet, and this is it - which is the honest job for a signal that says
+    /// "the server put a decal here" and nothing more.
     /// </remarks>
     [Fact]
-    public void WithTheComponentRingsOffTheRulesTakeTaggedGroundBack()
+    public void WhereNoRuleSpeaksTheComponentRingsIt()
+    {
+        WorldEntity tagged = Ground("Metadata/Effects/Spells/ground_effects/Fire") with { IsGroundEffect = true };
+        var settings = TrackerSettings.Default with { ShowGroundEffects = true };
+
+        Assert.DoesNotContain(settings.GroundDangerOrDefault, rule => rule.Matches(tagged));
+        Assert.True(settings.ComponentShouldRing(tagged));
+    }
+
+    /// <summary>A rule pass switched off cannot be the reason the component stands aside.</summary>
+    /// <remarks>
+    /// The deference is to a ring that will actually be DRAWN. Standing aside for a rule that is
+    /// switched off would leave the entity marked by nothing at all, which is the one outcome
+    /// neither pass is allowed to produce between them.
+    /// </remarks>
+    [Fact]
+    public void ARuleThatCannotDrawDoesNotHoldTheComponentBack()
     {
         WorldEntity tagged = Ground(
             "Metadata/Effects/Spells/ground_effects/VisibleServerGroundEffect") with { IsGroundEffect = true };
 
-        Assert.True((TrackerSettings.Default with { ShowGroundEffects = false }).RulesShouldRing(tagged));
+        Assert.True((TrackerSettings.Default with { ShowGroundEffects = true, ShowGroundDanger = false })
+            .ComponentShouldRing(tagged));
     }
 
     /// <summary>Untagged ground is always the rules' to ring - it is the only thing that will.</summary>
@@ -222,12 +243,14 @@ public class TrackerTests
     public void UntaggedGroundIsAlwaysLeftToTheRules()
     {
         WorldEntity untagged = Ground("Metadata/Effects/Spells/ground_effects/Fire");
+        var settings = TrackerSettings.Default with { ShowGroundEffects = true };
 
-        Assert.True((TrackerSettings.Default with { ShowGroundEffects = true }).RulesShouldRing(untagged));
+        Assert.True(settings.RulesShouldRing(untagged));
+        Assert.False(settings.ComponentShouldRing(untagged));
     }
 
     /// <summary>
-    /// A remembered sighting is never ringed, whichever pass would have done it.
+    /// A remembered sighting is never ringed, by either pass.
     /// </summary>
     /// <remarks>
     /// Ground effects expire. A ring on a remembered one is a ring around ground that is SAFE
@@ -237,10 +260,12 @@ public class TrackerTests
     [Fact]
     public void RememberedGroundIsNeverRinged()
     {
-        WorldEntity gone = Ground("Metadata/Effects/Spells/ground_effects/Fire") with { RememberedForMs = 500 };
+        WorldEntity gone = Ground("Metadata/Effects/Spells/ground_effects/Fire")
+            with { IsGroundEffect = true, RememberedForMs = 500 };
+        var settings = TrackerSettings.Default with { ShowGroundEffects = true };
 
-        Assert.False((TrackerSettings.Default with { ShowGroundEffects = true }).RulesShouldRing(gone));
-        Assert.False((TrackerSettings.Default with { ShowGroundEffects = false }).RulesShouldRing(gone));
+        Assert.False(settings.RulesShouldRing(gone));
+        Assert.False(settings.ComponentShouldRing(gone));
     }
 
     /// <summary>An empty prefix would ring every entity in the area, so it matches none.</summary>

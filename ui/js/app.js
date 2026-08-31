@@ -455,11 +455,12 @@ function describeSeen(seen) {
   const notes = [];
   if (seen.onScreen) notes.push("here now");
 
-  // A rule on tagged ground is not merely redundant, it is IGNORED: the component pass owns
-  // those entities while it is switched on, so the rule would sit in the list looking active
-  // and draw nothing. Saying only "already ringed" is what would send somebody to add one.
-  if (seen.hasComponent) notes.push("the game tags this one — ringed already, a rule here is ignored");
-  else notes.push("untagged — a rule is the only way it gets marked");
+  // TAGGED IS NOT DANGEROUS. The component means the server drew a decal here - 5880 of 5916
+  // sightings in the recorded session were in a hideout - so a row that read "the game marks
+  // this one as dangerous" would be telling somebody the opposite of what was measured. Your
+  // rule wins over the ring either way, so adding one is never wasted.
+  if (seen.hasComponent) notes.push("has a ground decal — that is not a claim about damage");
+  else notes.push("no decal — a rule is the only way it gets marked");
 
   if (seen.most > 1) notes.push(`up to ${seen.most} at once`);
   if (groundRules.some((r) => matchesRule(r, seen.path))) notes.push("a rule covers it");
@@ -589,16 +590,23 @@ function sendGround(list) {
   renderGroundRules();
   renderGroundPicker();
 
+  // WRAPPED IN AN OBJECT, and it has to be. The host drops any request whose payload is not
+  // a JSON object, before its switch is ever reached - a guard every other message satisfies
+  // because every other message sends a record. A bare array here was accepted by the page,
+  // discarded by the host without a word, and the row vanished a second later when the poll
+  // re-rendered from a state that had never changed.
   bridge.send({
     type: "setGroundRules",
-    payload: list.map((r) => ({
-      path: r.path ?? "",
-      enabled: r.enabled !== false,
-      colour: r.colour ?? "#99FF4D00",
-      radius: Number(r.radius) || 100,
-      thickness: Number(r.thickness) || 2,
-      filled: !!r.filled,
-    })),
+    payload: {
+      rules: list.map((r) => ({
+        path: r.path ?? "",
+        enabled: r.enabled !== false,
+        colour: r.colour ?? "#99FF4D00",
+        radius: Number(r.radius) || 100,
+        thickness: Number(r.thickness) || 2,
+        filled: !!r.filled,
+      })),
+    },
   });
 }
 
