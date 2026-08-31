@@ -272,7 +272,7 @@ internal static class Program
         // into each effect. An effect bound to a belt slot follows a rebind; one that names a
         // key does not, and that is the user's choice to make.
         var ruleEngine = new PoEformance.Features.RuleEngine();
-        ruleEngine.Configure(PoEformance.Features.RuleSettingsStore.Load());
+        ruleEngine.Configure(PoEformance.Features.RuleSettingsStore.Read());
         ruleEngine.Bind(flaskKeys);
         var ruleHistory = new PoEformance.Features.RuleHistory();
 

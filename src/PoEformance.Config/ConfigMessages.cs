@@ -159,7 +159,12 @@ public sealed record RulesView(
     [property: JsonPropertyName("shapes")] IReadOnlyDictionary<string, RuleShape> Shapes,
     [property: JsonPropertyName("buffs")] IReadOnlyList<SeenBuff> Buffs,
     [property: JsonPropertyName("buffRead")] string BuffRead,
-    [property: JsonPropertyName("reader")] string Reader)
+    [property: JsonPropertyName("reader")] string Reader,
+
+    /// <summary>What the file could not give us, or empty. Beside the status, not in it:
+    /// the status is this tick's reason and changes every second, and a rule that was
+    /// dropped at startup has to stay readable for longer than that.</summary>
+    [property: JsonPropertyName("loadNote")] string LoadNote = "")
 {
     /// <summary>Builds the panel, including a text and a graph for every rule.</summary>
     public static RulesView Of(RuleEngine engine, string keySource, BuffWatch buffs, string reader = "")
@@ -188,7 +193,7 @@ public sealed record RulesView(
 
         return new RulesView(
             settings, engine.LastTick.Reason, engine.Acted, keySource, shapes, buffs.Seen,
-            buffs.LastRead, reader);
+            buffs.LastRead, reader, engine.LoadNote);
     }
 }
 

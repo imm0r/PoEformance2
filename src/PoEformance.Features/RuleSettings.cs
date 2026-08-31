@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace PoEformance.Features;
@@ -320,6 +321,31 @@ public sealed record RuleSettings(
     public const int MaxProfiles = 32;
 }
 
+/// <summary>
+/// What came of reading the file: the rules, and anything that had to be left out.
+/// </summary>
+/// <param name="Skipped">
+/// One line per rule that could not be read, naming it and where in it the trouble is. Empty
+/// on an ordinary load.
+/// </param>
+/// <param name="Backup">
+/// Where the original was copied before anything was dropped, or empty when nothing was.
+/// </param>
+public readonly record struct RuleLoad(
+    RuleSettings Settings,
+    IReadOnlyList<string> Skipped,
+    string Backup)
+{
+    public static RuleLoad Of(RuleSettings settings) => new(settings, [], string.Empty);
+
+    /// <summary>One line for the status readout, or empty when the file read cleanly.</summary>
+    public string Note => Skipped.Count == 0
+        ? string.Empty
+        : $"{Skipped.Count} rule{(Skipped.Count == 1 ? string.Empty : "s")} skipped: "
+          + string.Join("; ", Skipped)
+          + (Backup.Length > 0 ? $" - the file as it was is kept at {Path.GetFileName(Backup)}" : string.Empty);
+}
+
 /// <summary>Loads and saves the rules next to the executable.</summary>
 /// <remarks>
 /// Beside the executable, like the offsets schema and the auto-flask settings: the tool is a
@@ -334,25 +360,162 @@ public static class RuleSettingsStore
     /// A corrupt file loads as the defaults rather than throwing, and the defaults are off - so
     /// the failure mode of a settings file that arms key presses is a tool that does nothing.
     /// </remarks>
-    public static RuleSettings Load(string? path = null)
+    public static RuleSettings Load(string? path = null) => Read(path).Settings;
+
+    /// <summary>
+    /// Reads the rules, and says what it could not read.
+    /// </summary>
+    /// <remarks>
+    /// ONE UNREADABLE RULE USED TO COST THE WHOLE FILE, silently. The deserialiser throws on
+    /// the first thing it does not understand - a fact name from a newer build is the ordinary
+    /// way to get one - and the catch below turned that into <see cref="RuleSettings.Default"/>:
+    /// engine off, no rules, no message. Somebody who had edited in a condition their build did
+    /// not know played three maps wondering why nothing fired, and the tool had every reason to
+    /// tell them and did not.
+    ///
+    /// So a rule that cannot be read is now dropped ON ITS OWN and named. Dropped rather than
+    /// repaired, because the alternative - mapping an unknown fact onto some default - is a
+    /// rule that asks a different question from the one written down, which is worse than a
+    /// rule that is missing and said so.
+    ///
+    /// The salvage runs only after the ordinary read has failed, so nothing about the normal
+    /// path changes.
+    /// </remarks>
+    public static RuleLoad Read(string? path = null)
     {
         string file = path ?? DefaultPath;
         try
         {
             if (!File.Exists(file))
             {
-                return RuleSettings.Default;
+                return RuleLoad.Of(RuleSettings.Default);
             }
 
-            using FileStream stream = File.OpenRead(file);
-            RuleSettings? loaded = JsonSerializer.Deserialize(stream, RuleJsonContext.Default.RuleSettings);
-            return loaded?.Normalised() ?? RuleSettings.Default;
+            string json = File.ReadAllText(file);
+            try
+            {
+                RuleSettings? loaded = JsonSerializer.Deserialize(json, RuleJsonContext.Default.RuleSettings);
+                return RuleLoad.Of(loaded?.Normalised() ?? RuleSettings.Default);
+            }
+            catch (JsonException)
+            {
+                return Salvage(json, file);
+            }
         }
-        catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            return RuleSettings.Default;
+            return RuleLoad.Of(RuleSettings.Default);
         }
     }
+
+    /// <summary>Reads what it can of a file the deserialiser refused, rule by rule.</summary>
+    private static RuleLoad Salvage(string json, string file)
+    {
+        JsonNode? parsed;
+        try
+        {
+            parsed = JsonNode.Parse(json);
+        }
+        catch (JsonException)
+        {
+            // Not JSON at all - a truncated write, or something else entirely. There is no rule
+            // to salvage from that, and saying so beats the silence this replaced.
+            return new RuleLoad(RuleSettings.Default, ["the file is not valid JSON"], string.Empty);
+        }
+
+        if (parsed is not JsonObject document)
+        {
+            return new RuleLoad(RuleSettings.Default, ["the file does not hold a settings object"], string.Empty);
+        }
+
+        var skipped = new List<string>();
+        foreach (JsonNode? profile in Items(document["profiles"]))
+        {
+            foreach (JsonNode? group in Items(profile?["groups"]))
+            {
+                if (group?["rules"] is not JsonArray rules)
+                {
+                    continue;
+                }
+
+                // Backwards, because a rule that cannot be read is removed as it is found.
+                for (int index = rules.Count - 1; index >= 0; index--)
+                {
+                    JsonNode? rule = rules[index];
+                    try
+                    {
+                        _ = rule.Deserialize(RuleJsonContext.Default.Rule);
+                    }
+                    catch (JsonException problem)
+                    {
+                        skipped.Add($"'{NameOf(rule)}' at {Where(problem)}");
+                        rules.RemoveAt(index);
+                    }
+                }
+            }
+        }
+
+        try
+        {
+            RuleSettings? cleaned = JsonSerializer.Deserialize(
+                document.ToJsonString(), RuleJsonContext.Default.RuleSettings);
+
+            if (cleaned is null)
+            {
+                return new RuleLoad(RuleSettings.Default, ["the file could not be read"], string.Empty);
+            }
+
+            // Kept before the tool can overwrite it. The config page saves what the ENGINE
+            // holds, so the first save after a skip would write the dropped rule out of
+            // existence - and this change would have turned a loud failure into a quiet loss.
+            string backup = skipped.Count > 0 ? Keep(file) : string.Empty;
+            return new RuleLoad(cleaned.Normalised(), skipped, backup);
+        }
+        catch (JsonException problem)
+        {
+            // Something outside the rules is wrong - a mistyped top-level field, say. Nothing
+            // here can pick that apart, so the defaults stand, and now they say why.
+            skipped.Add($"the rest of the file could not be read ({Where(problem)})");
+            return new RuleLoad(RuleSettings.Default, skipped, string.Empty);
+        }
+    }
+
+    /// <summary>Copies the file aside, or returns empty when it could not be.</summary>
+    private static string Keep(string file)
+    {
+        try
+        {
+            string backup = file + ".rejected";
+            File.Copy(file, backup, overwrite: true);
+            return backup;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            // Worth trying and not worth failing over: the rules that DID load still should.
+            return string.Empty;
+        }
+    }
+
+    private static IEnumerable<JsonNode?> Items(JsonNode? node)
+        => node is JsonArray array ? array : [];
+
+    /// <summary>The rule's own name, for somebody who has to go and find it.</summary>
+    private static string NameOf(JsonNode? rule)
+    {
+        try
+        {
+            string? name = rule?["name"]?.GetValue<string>();
+            return string.IsNullOrWhiteSpace(name) ? "unnamed rule" : name;
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or FormatException)
+        {
+            return "unnamed rule";
+        }
+    }
+
+    /// <summary>Which field the deserialiser gave up on, without the type names around it.</summary>
+    private static string Where(JsonException problem)
+        => string.IsNullOrEmpty(problem.Path) ? "an unreadable field" : problem.Path;
 
     /// <summary>Writes the rules, returning false when it could not.</summary>
     /// <remarks>
@@ -393,4 +556,9 @@ public static class RuleSettingsStore
 /// </remarks>
 [JsonSourceGenerationOptions(WriteIndented = true, UseStringEnumConverter = true)]
 [JsonSerializable(typeof(RuleSettings))]
+
+// Declared for its own sake, not just as something reachable from the settings: the salvage in
+// RuleSettingsStore.Read deserialises ONE rule at a time to find out which of them the build
+// cannot understand, and that needs a JsonTypeInfo it can name.
+[JsonSerializable(typeof(Rule))]
 public sealed partial class RuleJsonContext : JsonSerializerContext;

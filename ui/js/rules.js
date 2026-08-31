@@ -90,6 +90,14 @@ export class RulesPanel {
     this.shapes = view.shapes ?? {};
     $("rl-status").textContent = view.status;
 
+    // Beside the status rather than in it: the status is this tick's reason and is replaced
+    // every second, and "a rule you wrote is not loaded" has to stay on screen long enough to
+    // be read. Hidden entirely when the file was fine, so it is never a line to tune out.
+    const note = $("rl-load-note");
+    note.textContent = view.loadNote ?? "";
+    note.title = view.loadNote ?? "";
+    note.hidden = !view.loadNote;
+
     // Always, even mid-edit: it is a readout, it replaces no control, and a buff list that
     // froze while somebody was typing a buff name would be useless exactly when it is wanted.
     this.renderBuffs(view.buffs ?? [], view.buffRead ?? "");
