@@ -888,6 +888,60 @@ into a `WorldSnapshot` — by re-running the countdown's prediction check *throu
 and by pinning that a pre-decode recording yields `null` rather than a zero that would ring the
 whole screen.
 
+#### Both are drawn the way the game draws them
+
+The two shapes come from Path of Exile's own idiom, and they were built by rendering the geometry
+to a file and looking at it before it shipped — twice each, because the first attempt was wrong
+both times.
+
+**What that render could and could not settle**, because it was trusted too far once. It settles
+SHAPE: the chevrons being squat rather than dart-like, and the arms forming an X rather than a
+plus, are both plainly visible in a picture and both were caught there. It does NOT settle
+OPACITY, and the first version of the preview actively lied about it — PIL's `ImageDraw` writes a
+colour and its alpha straight into the pixel instead of compositing it, so a 20%-alpha fill came
+back as the full colour and the band's interior rendered near-white. That produced one wrong
+conclusion (the ground ring's fill was dropped partly on the strength of it; the reference has no
+fill either, so the decision survives on better evidence) and nearly produced a second. Alpha is
+arithmetic and belongs in arithmetic: the beam's interior is `1 − (1 − 0.09)(1 − 0.18)` = **25%
+opaque**, and at a fully opaque configured colour it would still be 28%.
+
+**A ground effect is a ring on the floor with an X through it.** Not a screen-space circle: the
+ring is a circle of world radius projected point by point, so it lies on the ground, foreshortens
+as the ground does, and shrinks as the camera pulls back. Nothing is filled — the reference leaves
+the interior clear and so does this, which is also what keeps a screen full of them readable.
+
+The four quartering arms are picked **in screen space**, by taking the ring point nearest each
+screen diagonal. Stepping four fixed world angles instead — the obvious way — produced a **plus**
+rather than an X, because this game's isometric camera maps the world axes onto the screen
+diagonals.
+
+**A beam is a translucent band with chevrons marching along it**, the shape the game uses to point
+somewhere. The chevrons carry the one thing a plain line cannot: which way it points. Their
+proportions were measured off the game's own band — base about six tenths of the width, spacing a
+little under one width, and *squat*, wider across than long. The first attempt had them longer
+than wide and they read as darts strung on a wire.
+
+**A third of ground effects carry no timer, and that is a fact about the game.** In the sweep
+capture 33 of 72 effects held NaN in the countdown slot for their entire life and 39 held a real
+number, with **no entity ever crossing between the two** — so an absent countdown means "this one
+does not expire on a clock", not "the read failed". The ones without a timer are the long-lived
+ones, 59–104 s against the timed ones' handful of seconds. The first version of the layer gated
+the ring on the countdown and would have left a third of the burning ground unmarked; a test now
+pins the split and the ring depends only on the component being present.
+
+#### The radius candidate, and a better way to settle it
+
+`GroundEffect+0x38` is in the schema now as **`RadiusCandidate`** — the name is the disclaimer,
+because a field called `Radius` would assert something nothing has measured. The overlay sizes the
+ring from it by default, and *that is the experiment*: a world-radius ring either hugs the burning
+patch or it does not, and **one screenshot answers it**.
+
+The earlier suggestion — walk towards the effect and note where damage starts — was a bad one and
+is recorded as such in the schema. Ground effects expire, the scene they appear in is rarely
+survivable to experiment in, the game does not permit that kind of pixel-precise movement, and the
+result would have been a number nobody could report back. **Verify against something the game
+draws, not against something it does to you.**
+
 ### Next
 
 Two of the three follow-ups are now closed:

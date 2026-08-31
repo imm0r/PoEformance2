@@ -358,12 +358,29 @@ public sealed class TrackerWindow
             "no rule needed: this asks the entity whether it carries a GroundEffect component,"
             + " which is the game's own answer, and reads the countdown out of it.");
 
+        bool gameRadius = settings.GroundEffectUseGameRadius;
+        if (ImGui.Checkbox("size it from the component's own radius", ref gameRadius))
+        {
+            _write(settings with { GroundEffectUseGameRadius = gameRadius });
+        }
+
+        ImGuiText.Hint(
+            WarnText,
+            "that value is a CANDIDATE, not a measurement - a float in the right range that"
+            + " nothing has confirmed. Drawing it IS the experiment: if the ring hugs the"
+            + " burning patch it is the radius, and if it does not, switch this off and say so.");
+
         ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
         float radius = settings.GroundEffectRadius;
-        if (ImGui.SliderFloat("##groundradius", ref radius, 5f, 120f, "%.0f px radius"))
+        if (ImGui.SliderFloat("##groundradius", ref radius, 3f, 150f, "%.0f world units"))
         {
             _write(settings with { GroundEffectRadius = radius });
         }
+
+        ImGuiText.Hint(
+            DimText,
+            "WORLD units, not pixels: the ring is a circle on the floor, so it foreshortens and"
+            + " shrinks with the camera. Used when the switch above is off.");
 
         ImGui.SameLine();
         Vector4 groundColour =
@@ -389,27 +406,29 @@ public sealed class TrackerWindow
             + " reaches zero a measured 0.38 s before it stops listing the effect.");
 
         bool beams = settings.ShowBeams;
-        if (ImGui.Checkbox("draw boss beams as the LINE they occupy", ref beams))
+        if (ImGui.Checkbox("draw boss beams as the PATH they occupy", ref beams))
         {
             _write(settings with { ShowBeams = beams });
         }
 
         ImGuiText.Hint(
             DimText,
-            "both ends come from the beam's own component, so this is the whole line rather than"
-            + " a ring on one end of it - a beam runs up to eleven hundred world units.");
+            "both ends come from the beam's own component, so this is the whole path rather than"
+            + " a ring on one end of it - a beam runs up to eleven hundred world units, and the"
+            + " chevrons run towards the end that matters.");
 
         ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
         float beamThickness = settings.BeamThickness;
-        if (ImGui.SliderFloat("##beamthickness", ref beamThickness, 0.5f, 12f, "%.1f px wide"))
+        if (ImGui.SliderFloat("##beamthickness", ref beamThickness, 2f, 60f, "%.0f px wide"))
         {
             _write(settings with { BeamThickness = beamThickness });
         }
 
         ImGuiText.Hint(
-            DimText,
-            "the width is yours to pick and means nothing: the component has no thickness field"
-            + " that survived checking, so a drawn danger zone would be an invention.");
+            WarnText,
+            "the WIDTH is decoration and carries no claim: the component has no thickness field"
+            + " that survived checking, so a band drawn to look like a danger zone would be an"
+            + " invention. The line down its middle is the measured part.");
 
         ImGui.SameLine();
         Vector4 beamColour = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(settings.BeamColour));

@@ -279,7 +279,22 @@ public sealed record WorldEntity(
     // from the game's own countdown - see GroundEffect.SecondsRemaining in the schema, and note
     // that it reaches zero a consistent 0.38 s before the entity is delisted, so a display of
     // it will sit at 0.0 for a beat before the thing disappears.
+    // Whether this entity carries a GroundEffect component at all - the game's own answer to
+    // "is this dangerous ground". SEPARATE FROM THE COUNTDOWN ON PURPOSE: a third of the effects
+    // in the sweep capture never carry a readable timer, and gating the ring on the timer would
+    // silently leave those unmarked. Presence is the hazard; the countdown is extra.
+    bool IsGroundEffect = false,
+
+    // How long this patch still burns, or null when it has no timer. Null is COMMON and is not
+    // a failed read: 33 of the 72 effects in the sweep capture never carry a number here and 39
+    // always do, with not one entity crossing between the two. See GroundEffect.SecondsRemaining.
     float? GroundSeconds = null,
+
+    // How wide the patch is, in WORLD units - or null when the entity is not a ground effect.
+    // A candidate rather than a measurement: see GroundEffect.RadiusCandidate in the schema.
+    // It is carried so the overlay can draw a ring of exactly this size on the ground, which is
+    // what turns the question into one screenshot.
+    float? GroundRadius = null,
 
     // The line this beam draws, or null when the entity is not one. See BeamLine.
     BeamLine? Beam = null)
@@ -721,6 +736,7 @@ public sealed class WorldReader
     private readonly int _frustumCorners;
     private readonly int _frustumPlanes;
     private readonly int _groundSeconds;
+    private readonly int _groundRadius;
     private readonly int _beamSource;
     private readonly int _beamTarget;
     private readonly int _areaHash;
@@ -801,6 +817,7 @@ public sealed class WorldReader
         // hundreds of monsters the same loop already pays for. Gating it would cost more in
         // state that can be wrong than it could ever save.
         _groundSeconds = schema.Structs["GroundEffect"].OffsetOf("SecondsRemaining");
+        _groundRadius = schema.Structs["GroundEffect"].OffsetOf("RadiusCandidate");
         _beamSource = schema.Structs["Beam"].OffsetOf("SourceX");
         _beamTarget = schema.Structs["Beam"].OffsetOf("TargetX");
         _areaHash = schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash");
@@ -859,10 +876,29 @@ public sealed class WorldReader
             return null;
         }
 
-        // A garbage read must not become a countdown on screen. The observed range is a few
-        // seconds to under a minute; anything outside says the offset moved or the object was
-        // freed mid-read, and null is the honest answer to both.
+        // NOT FINITE IS THE ORDINARY ANSWER, not a failure: a third of ground effects carry no
+        // timer at all and hold NaN here for their whole life. Everything else out of range says
+        // the offset moved or the object was freed mid-read, and null is the honest answer to
+        // all three - the ring is still drawn, just without a number in it.
         return float.IsFinite(seconds) && seconds is >= 0 and <= 600 ? seconds : null;
+    }
+
+    /// <summary>The candidate radius of this patch in world units, or null if it is not one.</summary>
+    /// <remarks>
+    /// Read beside the countdown from the same component, so it costs one more 4-byte read on
+    /// an entity the loop is already holding. The range guard is wider than the observed 18.7
+    /// on purpose - the point of drawing it is to find out what it is, and a guard tight around
+    /// today's only sighting would hide the answer on the first effect that differs.
+    /// </remarks>
+    private float? ReadGroundRadius(Entity entity)
+    {
+        ulong at = entity.Component("GroundEffect");
+        if (at == 0 || !_reader.TryRead(at + (ulong)_groundRadius, out float radius))
+        {
+            return null;
+        }
+
+        return float.IsFinite(radius) && radius is > 0 and <= 500 ? radius : null;
     }
 
     /// <summary>Both ends of this beam, or null if it is not one.</summary>
@@ -1368,7 +1404,10 @@ public sealed class WorldReader
                 signs.Life, signs.EnergyShield, opened, friendly, signs.IsEffect,
                 NameOf(address, renderAddress), renderAddress, present,
                 Buffs: buffs, Aim: aim, Action: action,
-                GroundSeconds: ReadGroundSeconds(entity), Beam: ReadBeam(entity));
+                IsGroundEffect: entity.Component("GroundEffect") != 0,
+                GroundSeconds: ReadGroundSeconds(entity),
+                GroundRadius: ReadGroundRadius(entity),
+                Beam: ReadBeam(entity));
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

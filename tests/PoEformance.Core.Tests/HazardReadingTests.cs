@@ -122,6 +122,79 @@ public class HazardReadingTests
             "the countdown stopped predicting the delisting through the snapshot");
     }
 
+    /// <summary>
+    /// The radius candidate reaches the snapshot, and this test asserts nothing about what it is.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately weaker than the countdown's test, because the evidence is weaker. All that
+    /// is known is the value: a float that reads 18.66-18.67 on every ground effect in the
+    /// capture. It is in the right range for a radius in world units and an area needs one, but
+    /// nothing has checked it against the burning patch, so this pins the READING and leaves the
+    /// meaning alone. When the ring drawn at this size is seen to hug the patch - or not - the
+    /// schema field gets renamed and this test gets a real claim to make.
+    /// </remarks>
+    [Fact]
+    public void TheRadiusCandidateReachesTheSnapshot_WithoutAnythingClaimingItIsARadius()
+    {
+        List<WorldEntity> effects =
+            [.. Snapshots().SelectMany(s => s.Snapshot.Entities).Where(e => e.GroundRadius is not null)];
+
+        Assert.True(effects.Count > 200, $"only {effects.Count} readings carried the candidate");
+
+        // One value for one effect type, to within float noise. If a capture ever shows two
+        // clearly different sizes for two clearly different patches, that is the moment this
+        // stops being a candidate - and this assertion is what will notice.
+        Assert.All(effects, e => Assert.InRange(e.GroundRadius!.Value, 18.5f, 18.8f));
+
+        // It does NOT travel with the countdown, and that assumption was wrong when it was
+        // first written here: a third of these effects have no timer and every one of them
+        // still has this value. Pinned the right way round, because the ring is sized from
+        // this and drawn whether or not there is a number to put in it.
+        Assert.Contains(effects, e => e.GroundSeconds is null);
+        Assert.All(effects, e => Assert.True(e.IsGroundEffect));
+
+        // And the schema's name carries the doubt, so nobody reads a claim into the field list.
+        Assert.NotNull(RealSessionTests.Schema().Structs["GroundEffect"].Field("RadiusCandidate"));
+        Assert.Null(RealSessionTests.Schema().Structs["GroundEffect"].Field("Radius"));
+    }
+
+    /// <summary>
+    /// A third of ground effects have no timer, and the ring must not depend on one.
+    /// </summary>
+    /// <remarks>
+    /// The bug this pins was live for one build: the layer skipped any effect whose countdown
+    /// came back null, which would have left a third of the burning ground unmarked - the exact
+    /// failure the feature exists to remove. The split is a fact about the game rather than
+    /// about the read: 33 of 72 effects held NaN for their whole life, 39 held a number, and no
+    /// entity ever crossed between the two.
+    /// </remarks>
+    [Fact]
+    public void SomeGroundEffectsNeverCarryATimer_AndAreStillGroundEffects()
+    {
+        List<(double Seconds, WorldSnapshot Snapshot)> snapshots = Snapshots();
+
+        // Per entity: did it ever show a number, and did it ever not?
+        var withNumber = new HashSet<uint>();
+        var withoutNumber = new HashSet<uint>();
+        int marked = 0;
+        foreach ((double _, WorldSnapshot snapshot) in snapshots)
+        {
+            foreach (WorldEntity e in snapshot.Entities.Where(e => e.IsGroundEffect))
+            {
+                marked++;
+                _ = e.GroundSeconds is null ? withoutNumber.Add(e.Id) : withNumber.Add(e.Id);
+            }
+        }
+
+        Assert.True(marked > 400, $"only {marked} readings were marked as ground effects");
+        Assert.NotEmpty(withNumber);
+        Assert.NotEmpty(withoutNumber);
+
+        // NOT ONE entity in both sets. That is what makes an absent timer a kind of effect
+        // rather than a flaky read, and it is the whole reason the ring ignores the countdown.
+        Assert.Empty(withNumber.Intersect(withoutNumber));
+    }
+
     [Fact]
     public void BeamsReachTheSnapshotAsALineAnchoredOnTheirOwnEntity()
     {
@@ -195,5 +268,10 @@ public class HazardReadingTests
 
         // The timer defaults ON, because a ring without it says no more than the old rules did.
         Assert.True(TrackerSettings.Default.ShowGroundEffectTimer);
+
+        // And the ring is sized from the game by default. That is the point of drawing it: a
+        // ring at a size somebody picked can never disagree with the patch it is drawn on, so
+        // it can never settle anything either.
+        Assert.True(TrackerSettings.Default.GroundEffectUseGameRadius);
     }
 }
