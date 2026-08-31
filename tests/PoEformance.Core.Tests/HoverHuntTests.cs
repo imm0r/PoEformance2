@@ -200,6 +200,85 @@ public class HoverHuntTests
     }
 
     /// <summary>
+    /// The capture that finally refuted the boss byte, and what made it decisive.
+    /// </summary>
+    /// <remarks>
+    /// Not "more data" - the first capture had 14,462 readings and settled nothing. THE CASE
+    /// THAT SEPARATES THE HYPOTHESES. session-2026-08-hoverboss.rec was recorded in front of
+    /// Metadata/Monsters/MudBurrower/MudBurrowerHeadBossMAP2__@70: Unique rarity, the word Boss
+    /// in its own metadata path, and Monster+0x27 reads zero on it across every frame it was
+    /// listed. A flag clear on that monster is not a boss flag, and the schema field is gone.
+    ///
+    /// The offset is still read here, deliberately, so the next boss re-checks a refutation
+    /// that rests on ONE map boss rather than starting the question over.
+    /// </remarks>
+    [Fact]
+    public void OnAMapBoss_TheByteIsZeroThereToo_WhichRefutesIt()
+    {
+        List<HoverSample> samples = Replay("session-2026-08-hoverboss.rec");
+        List<(string Path, ItemRarity Rarity, byte Flag)> bytes = [.. samples.SelectMany(s => s.BossBytes)];
+
+        // The case the first capture lacked.
+        List<(string Path, ItemRarity Rarity, byte Flag)> uniques =
+            [.. bytes.Where(b => b.Rarity == ItemRarity.Unique)];
+        Assert.True(uniques.Count > 20, $"only {uniques.Count} sightings of a unique monster");
+        Assert.Contains(uniques, u => u.Path.Contains("Boss", StringComparison.Ordinal));
+
+        // And the byte is clear on it. This is the whole refutation.
+        Assert.All(uniques, u => Assert.Equal(0, u.Flag));
+        Assert.All(bytes, b => Assert.Equal(0, b.Flag));
+
+        var text = new StringWriter();
+        HoverHunt.Report(samples, text);
+        Assert.Contains("0x27 is not this flag", text.ToString(), StringComparison.Ordinal);
+
+        // The schema must not carry it any more - a field nothing can justify is a trap for
+        // whoever reads the struct next and assumes provenance means verified.
+        Assert.Null(RealSessionTests.Schema().Structs["Monster"].Field("IsBoss"));
+    }
+
+    /// <summary>
+    /// The companion slot, identified: a per-frame handle onto the entity +0xA8 already names.
+    /// </summary>
+    /// <remarks>
+    /// Two claims, and the test is written so either can fail on its own. The object's +0x00 is
+    /// ONE class across the session, and its +0x08 is the hovered entity plus a fixed 0x100 -
+    /// for a monster and for a ground item alike. Together they say the slot carries nothing new,
+    /// which is a real answer: it stops the next person hunting it a third time.
+    ///
+    /// What is NOT asserted is the rest of the 0x200 window, and that is deliberate. Those bytes
+    /// are neighbouring allocations in the same small-object arena - several different vtables
+    /// across the session where +0x00 has exactly one - and reading them as this object's fields
+    /// is the Inventories mistake wearing a new hat.
+    /// </remarks>
+    [Fact]
+    public void TheCompanionIsAPerFrameHandleOntoTheHoveredEntity()
+    {
+        List<HoverSample> samples = Replay("session-2026-08-hoverboss.rec", step: 1);
+        List<HoverSample> known = [.. samples.Where(s => s.CompanionRead > 0 && s.Entity != 0)];
+
+        Assert.True(known.Count > 100, $"only {known.Count} companion targets captured");
+
+        // One class.
+        Assert.Single(known.Select(s => s.CompanionVTable).Distinct());
+
+        // And a payload at a fixed offset into the hovered entity, without exception.
+        Assert.All(known, s => Assert.Equal(s.Entity + HoverHunt.CompanionPayloadIntoEntity, s.CompanionPayload));
+
+        // Both kinds of hovered thing, so the relation is not a property of monsters.
+        Assert.Contains(known, s => s.EntityPath.Contains("/Monsters/", StringComparison.Ordinal));
+        Assert.Contains(known, s => s.EntityPath.Contains("WorldItem", StringComparison.Ordinal));
+
+        // The address moved constantly while all of that held - which is what made it look like
+        // a find in the first place, and is worth keeping in the record.
+        Assert.True(known.Select(s => s.Companion).Distinct().Count() > known.Count / 2);
+
+        var text = new StringWriter();
+        HoverHunt.Report(samples, text);
+        Assert.Contains("AS IDENTIFIED", text.ToString(), StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// The boss byte was ASKED and not answered, and the report has to say which.
     /// </summary>
     /// <remarks>

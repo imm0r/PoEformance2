@@ -687,15 +687,14 @@ The schema carries the two hop structs, and `MouseOverHostPtr` deliberately has 
 and every fixture committed before this one predates anything reading the slot, so an invariant
 there would turn the whole baseline replay red without a byte having moved.
 
-**The boss byte: still open, and this is the interesting half.** The run read `Monster+0x27` on
+**The boss byte: not answered, and this is the interesting half.** The run read `Monster+0x27` on
 every monster in the area on every third frame — 14,462 sightings, **every single one zero**,
 across Normal, Magic and Rare. That table looks exactly like a refutation and is not one: *there
 was no unique monster in the area*, and zero on every non-unique is precisely what a working
 boss flag reads. A hypothesis is only refuted by the case that separates it from its
-alternatives, and that case was never on screen. `Report` now says which case was missing
-instead of concluding from its absence, and `HoverHuntTests` pins the sentence it may not print.
-The next capture needs a boss in front of the cursor; until then the schema keeps the hypothesis
-labelled as one.
+alternatives, and that case was never on screen. `Report` says which case was missing instead of
+concluding from its absence, and `HoverHuntTests` pins the sentence it may not print. **The next
+capture needed a boss in front of the cursor** — see below, where it got one.
 
 **And one thing the windows found that nobody was looking for.** *Two* slots on the sub-object
 separate hovering from not: `+0xA8` and `+0xC8` are both null in every idle frame and non-null
@@ -716,10 +715,42 @@ What the file settles about `+0xC8`, without a new capture:
 - **Shape:** every value 16-byte aligned, neighbouring ones `0x10`–`0x40` apart.
 
 So: a small object the game rebuilds every frame while the cursor is on something. What it
-*holds* is the one question left, and **no committed recording contains a byte of it** — the
-pointer was captured, its target never was. `--hoverhunt` follows it now, with a ladder of
-window sizes (`0x200 → 0x80 → 0x20 → 0x10`) rather than one size, because a single read is
+*holds* was the one question left, and **no recording committed at that point contained a byte
+of it** — the pointer was captured, its target never was. `--hoverhunt` follows it with a ladder
+of window sizes (`0x200 → 0x80 → 0x20 → 0x10`) rather than one size, because a single read is
 all-or-nothing and a too-large window off a small object records nothing at all.
+
+#### The second capture, which closed both
+
+`tests/fixtures/session-2026-08-hoverboss.rec` is 525 frames in front of a map boss, made with
+the build that follows the companion pointer. It is a good argument for asking two questions per
+capture: it answered both, and neither answer was available from the first file at any price.
+
+**`Monster+0x27` is REFUTED, and the field is gone from the schema.** The area held
+`Metadata/Monsters/MudBurrower/MudBurrowerHeadBossMAP2__@70` — Unique rarity, the word *Boss* in
+its own metadata path — for 142 sightings, and **the byte is zero on it too**. A flag that is
+clear on that monster is not a boss flag. Note what did *not* refute it: the first capture's
+14,462 zeroes, which were entirely consistent with the hypothesis. It took one boss, not more
+data. Nothing broke when the field went, because nothing used it — `MonsterSigns` derives
+`IsBoss` from rarity and always has — and `Monster` now stands as a component with a measured
+pool cell and **no fields at all**, which is the finding rather than a gap. The hunt still reads
+and reports the offset, so the next boss re-checks a refutation that currently rests on one.
+
+**`sub+0xC8` is EXPLAINED, and it is worth nothing.** Its target is a **16-byte object**: `+0x00`
+is a single module address across the whole session — one class — and `+0x08` is **the hovered
+entity plus `0x100`, on 126 of 126 frames**, for the boss and for a ground item alike. It is a
+per-frame handle wrapping an interior pointer into the very entity `+0xA8` already names. Every
+negative from the first file survives and now has an explanation: of course it is no component,
+of course it is reallocated every frame, of course it is not a `make_shared` pair.
+
+Everything past `+0x10` of that object is **neighbours, not fields**: those offsets carry several
+different module addresses across the session where `+0x00` carries exactly one, and most of them
+point back into the same small-object arena. Decoding them as this object's members would be the
+`Inventories` mistake in a new costume — one object's window read as its own sub-structures when
+it was the allocations beside it.
+
+`Report` now *re-checks* the identification rather than restating it: one vtable, and the payload
+at the fixed offset, or it says the layout changed and to hunt it again.
 
 ### Next
 
