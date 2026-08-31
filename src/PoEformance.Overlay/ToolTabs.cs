@@ -62,6 +62,30 @@ public sealed class ToolTabs
 
     private readonly List<Page> _pages = [];
 
+    // The pages whose tools are a row of tabs rather than a stack of folds. Ids rather than
+    // Page references, for the reason the hidden set holds ids: a page can be marked before
+    // anything has registered a tool on it.
+    private readonly HashSet<string> _tabbed = [];
+
+    /// <summary>
+    /// Says a page's tools should be TABS across the top rather than folds down the page.
+    /// </summary>
+    /// <remarks>
+    /// WHICH SHAPE FITS DEPENDS ON WHAT THE TOOLS ARE. Folds suit a page whose tools are read
+    /// TOGETHER - the combat page's damage figure, tracker and projectiles are three views of
+    /// one fight, and having two of them open at once is the point. Tabs suit a page whose
+    /// tools merely share a subject: the area page carries a file inspector, a watch list, a
+    /// quest tree and a pin editor, and nobody has ever wanted two of those on screen at the
+    /// same time. Stacked, they were a scroll with four unrelated things down it.
+    ///
+    /// A page rather than a global setting, because both shapes are right somewhere.
+    /// </remarks>
+    public void AsTabs(string page)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(page);
+        _tabbed.Add(page);
+    }
+
     // The pages somebody took off the bar. A registered tool stays registered - its idle
     // callback keeps running, its jumps keep working - the tab is just not offered, which is
     // what "I never use this one" actually asks for. Ids rather than Page references because
@@ -498,13 +522,19 @@ public sealed class ToolTabs
         }
     }
 
-    /// <summary>Draws a page: one tool bare, several as an accordion.</summary>
+    /// <summary>Draws a page: one tool bare, several as an accordion or a tab bar.</summary>
     private void DrawSections(Page page)
     {
         if (page.Sections.Count == 1)
         {
             page.Sections[0].Draw();
             _drawn.Add(page.Sections[0].Id);
+            return;
+        }
+
+        if (_tabbed.Contains(page.Id))
+        {
+            DrawSectionTabs(page);
             return;
         }
 
@@ -602,6 +632,65 @@ public sealed class ToolTabs
         Y = Math.Min(1f, colour.Y + 0.06f),
         Z = Math.Min(1f, colour.Z + 0.06f),
     };
+
+    /// <summary>
+    /// A page's tools as a row of tabs - see <see cref="AsTabs"/> for when that is right.
+    /// </summary>
+    /// <remarks>
+    /// THE JUMP STILL HAS TO LAND. <c>Show</c> names a section and expects it to be reachable -
+    /// F8 surfaces the interface tree, the entity browser hands an address to the dissector -
+    /// and on a folded page that means unfolding a header. Here it means SELECTING a tab, which
+    /// is the same request in the other shape. Without it a jump to a tabbed page would arrive
+    /// on whichever tab was last open and silently show the wrong tool.
+    /// </remarks>
+    private void DrawSectionTabs(Page page)
+    {
+        if (!ImGui.BeginTabBar($"sections-{page.Id}", ImGuiTabBarFlags.FittingPolicyScroll))
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (Section section in page.Sections)
+            {
+                ImGuiTabItemFlags flags = section.Id == _unfold
+                    ? ImGuiTabItemFlags.SetSelected
+                    : ImGuiTabItemFlags.None;
+
+                if (!BeginTabItem($"{section.Live?.Invoke() ?? section.Label}###{section.Id}", flags))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    // Its own id scope, exactly as the page tabs get one: two tools holding a
+                    // control of the same name would otherwise share one ImGui id, which is one
+                    // scroll position and one open state between them.
+                    ImGui.PushID(section.Id);
+                    try
+                    {
+                        ImGui.Spacing();
+                        section.Draw();
+                        _drawn.Add(section.Id);
+                    }
+                    finally
+                    {
+                        ImGui.PopID();
+                    }
+                }
+                finally
+                {
+                    ImGui.EndTabItem();
+                }
+            }
+        }
+        finally
+        {
+            ImGui.EndTabBar();
+        }
+    }
 
     /// <summary>Which sections drew this frame, so the rest can be told they did not.</summary>
     /// <remarks>

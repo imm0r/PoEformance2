@@ -137,7 +137,7 @@ public static class StyleCatalogue
         // ONE plate rather than three. There used to be one per weight, back when an entry's
         // colour came from a weight; entries now carry their own colour, so what is left for the
         // catalogue is the card's plate itself - its icon, and how wide it is drawn.
-        new("preload.card", "What the area loaded", "Entry card plate", Marker, Rgb(255, 217, 102)),
+        new("preload.card", "What the area loaded", "Card Scale", Marker, Rgb(255, 217, 102)),
 
         // ── The atlas ───────────────────────────────────────────────────────
         // A map's own colour comes from the GROUP it is in, and that is set beside the group
