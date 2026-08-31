@@ -260,6 +260,49 @@ public class RuleEffectTests
     }
 
     [Fact]
+    public void EachRarityIsWatchedAtItsOwnThreshold()
+    {
+        // A cull executes each rarity from a different share of its life, so the three
+        // thresholds have to look at three different monsters. One threshold over everything
+        // would answer about the white monster that is always the weakest thing on screen -
+        // and fire while the rare it was written for stands at half health.
+        var state = new RuleState
+        {
+            InGame = true,
+            Vitals = new Vitals(default, new Vital(1500, 1500, 0, 0), default),
+            Monsters =
+            [
+                new NearMonster(10, ItemRarity.Normal, 0, 0, 2),
+                new NearMonster(20, ItemRarity.Magic, 0, 0, 55),
+                new NearMonster(30, ItemRarity.Rare, 0, 0, 8),
+                new NearMonster(40, ItemRarity.Unique, 0, 0, 40),
+            ],
+        };
+
+        // The white monster at 2% is the weakest of the lot, and it is the answer only to the
+        // fact that asks about anything.
+        Assert.Equal(2, state.LowestMonsterLifePercent(100));
+        Assert.Equal(55, state.LowestMagicMonsterLifePercent(100));
+        Assert.Equal(8, state.LowestRareMonsterLifePercent(100));
+        Assert.Equal(40, state.LowestUniqueMonsterLifePercent(100));
+
+        // The Power Siphon rule: the rare is low enough, the magic and the unique are not.
+        RuleCondition cull = RuleExpression.Parse(
+            "InMap && Mana > 1000 && ("
+            + "LowestMagicMonsterLifePercent(100) < 20"
+            + " || LowestRareMonsterLifePercent(100) < 10"
+            + " || LowestUniqueMonsterLifePercent(100) < 5)").Condition!;
+
+        Assert.True(cull.Holds(state, new RuleTimers(), "rule"));
+
+        // Take the rare away and the rule goes quiet, even though a monster at 2% is still
+        // standing there: a rarity that is not in range is no answer, not a zero.
+        RuleState withoutRare = state with { Monsters = [state.Monsters[0], state.Monsters[1], state.Monsters[3]] };
+        Assert.Null(withoutRare.LowestRareMonsterLifePercent(100));
+        Assert.False(cull.Holds(withoutRare, new RuleTimers(), "rule"));
+    }
+
+    [Fact]
     public void MeasuresTheWeakestMonsterWhereTheCursorPoints()
     {
         // The same split the counts have: for a skill aimed at something, the weakest thing
