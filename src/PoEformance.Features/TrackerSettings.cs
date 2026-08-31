@@ -250,11 +250,19 @@ public sealed record TrackerSettings(
     // countdown and a direction, which no rule could.
     [property: JsonPropertyName("showGroundEffects")] bool ShowGroundEffects = false,
     [property: JsonPropertyName("groundEffectColour")] string GroundEffectColour = "#C8FF7A1E",
-    [property: JsonPropertyName("groundEffectRadius")] float GroundEffectRadius = 26f,
+    // WORLD units, not screen pixels - the ring is a circle on the floor, projected, so it
+    // foreshortens and shrinks with the camera exactly as the ground does. Only used when the
+    // game's own candidate value is switched off or unreadable.
+    [property: JsonPropertyName("groundEffectRadius")] float GroundEffectRadius = 20f,
+    [property: JsonPropertyName("groundEffectUseGameRadius")] bool GroundEffectUseGameRadius = true,
     [property: JsonPropertyName("showGroundEffectTimer")] bool ShowGroundEffectTimer = true,
     [property: JsonPropertyName("showBeams")] bool ShowBeams = false,
-    [property: JsonPropertyName("beamColour")] string BeamColour = "#E6FF3B30",
-    [property: JsonPropertyName("beamThickness")] float BeamThickness = 3f,
+    [property: JsonPropertyName("beamColour")] string BeamColour = "#E6FF6A2A",
+
+    // How wide the band is drawn, in screen pixels. A DISPLAY CHOICE that carries no claim
+    // about how far the beam reaches sideways - see BeamLayer. Wide enough by default to be
+    // glanceable during a fight, which is the whole reason it is a band and not a line.
+    [property: JsonPropertyName("beamThickness")] float BeamThickness = 24f,
     [property: JsonPropertyName("monsterStatus")] IReadOnlyList<StatusIconRule>? MonsterStatus = null,
     [property: JsonPropertyName("playerStatus")] IReadOnlyList<StatusIconRule>? PlayerStatus = null,
     [property: JsonPropertyName("showMonsterStatus")] bool ShowMonsterStatus = false,
