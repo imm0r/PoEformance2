@@ -156,6 +156,44 @@ public static class OverlayLayout
     private static readonly Vector4 OffInk = OverlayInk.Quiet;
 
     /// <summary>
+    /// A fold INSIDE a section, drawn so it cannot be mistaken for the section around it.
+    /// </summary>
+    /// <remarks>
+    /// THE LEVEL THE TOOL COULD NOT SHOW. A page folds into sections - those are the bars the
+    /// tab bar hands out, drawn framed, in the heading face, banded every other one. Several
+    /// tools then fold AGAIN inside their own section: the tracker has six of these, the marker
+    /// styles one per group, the appearance page three. Every one of them was drawn with the
+    /// same call as the bar containing it, so "Tracker" and "Status effects" were the same
+    /// widget in the same colour at the same size, and nothing on screen said one was inside
+    /// the other. On the combat page that put four levels of hierarchy on screen wearing two
+    /// appearances.
+    ///
+    /// SO IT LOOKS DIFFERENT IN TWO WAYS AT ONCE, because one is not enough to read at a
+    /// glance: no frame behind it - an arrow and a label rather than a filled bar - and the
+    /// body face rather than the heading one. Either alone could be mistaken for a section that
+    /// happened to be styled oddly; together they read as something smaller.
+    ///
+    /// NoTreePushOnOpen because the caller draws the contents itself and would otherwise owe a
+    /// TreePop - a pairing that leaks on whichever branch nobody tested, exactly like the font
+    /// stack this file's Heading helper exists to protect.
+    /// </remarks>
+    /// <param name="openByDefault">
+    /// Whether it greets a first-time reader open. Only the FIRST time: after that it is
+    /// ImGui's own memory of what they last had open, which is the right answer and not ours
+    /// to overrule.
+    /// </param>
+    /// <returns>Whether it is open, and so whether to draw its contents.</returns>
+    public static bool Subsection(string label, bool openByDefault = false)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(label);
+
+        ImGui.SetNextItemOpen(openByDefault, ImGuiCond.FirstUseEver);
+        return ImGui.TreeNodeEx(
+            label,
+            ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.SpanAvailWidth);
+    }
+
+    /// <summary>
     /// A named block of related settings, which is NOT a section and must not look like one.
     /// </summary>
     /// <remarks>

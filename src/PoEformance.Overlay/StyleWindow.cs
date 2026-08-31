@@ -117,12 +117,12 @@ public sealed class StyleWindow
     {
         DrawInterface();
 
-        if (Chrome is not null && OverlayFonts.SectionHeader("Windows", ImGuiTreeNodeFlags.DefaultOpen))
+        if (Chrome is not null && OverlayLayout.Subsection("Windows", openByDefault: true))
         {
             Chrome.DrawList();
         }
 
-        if (TabList is not null && OverlayFonts.SectionHeader("Tabs", ImGuiTreeNodeFlags.DefaultOpen))
+        if (TabList is not null && OverlayLayout.Subsection("Tabs", openByDefault: true))
         {
             TabList();
         }
@@ -140,7 +140,7 @@ public sealed class StyleWindow
     private void DrawInterface()
     {
         if (Interface is not InterfaceEditor editor
-            || !OverlayFonts.SectionHeader("Text and panels", ImGuiTreeNodeFlags.DefaultOpen))
+            || !OverlayLayout.Subsection("Text and panels", openByDefault: true))
         {
             return;
         }

@@ -99,7 +99,7 @@ public sealed class TrackerWindow
     /// </remarks>
     private void DrawAim(TrackerSettings settings, WorldSnapshot snapshot)
     {
-        if (!OverlayFonts.SectionHeader("Where they are pointing"))
+        if (!OverlayLayout.Subsection("Where they are pointing"))
         {
             return;
         }
@@ -286,7 +286,7 @@ public sealed class TrackerWindow
 
     private void DrawLines(TrackerSettings settings)
     {
-        if (!OverlayFonts.SectionHeader("Lines to monsters", ImGuiTreeNodeFlags.DefaultOpen))
+        if (!OverlayLayout.Subsection("Lines to monsters", openByDefault: true))
         {
             return;
         }
@@ -461,7 +461,7 @@ public sealed class TrackerWindow
 
     private void DrawGroundDanger(TrackerSettings settings, WorldSnapshot snapshot)
     {
-        if (!OverlayFonts.SectionHeader("Dangerous ground"))
+        if (!OverlayLayout.Subsection("Dangerous ground"))
         {
             return;
         }
@@ -643,7 +643,7 @@ public sealed class TrackerWindow
 
     private void DrawStatus(TrackerSettings settings, WorldSnapshot snapshot)
     {
-        if (!OverlayFonts.SectionHeader("Status effects"))
+        if (!OverlayLayout.Subsection("Status effects"))
         {
             return;
         }
@@ -671,18 +671,18 @@ public sealed class TrackerWindow
         // Titled rules between the blocks, like the alerts tab: five near-identical control
         // rows in a stack read as one that lost its order, and a hairline does not say where
         // one subject ends.
-        OverlayFonts.SectionTitle("the icon sheet");
+        OverlayLayout.Group("The icon sheet");
         DrawSheet(settings);
 
-        OverlayFonts.SectionTitle("where the rows sit");
+        OverlayLayout.Group("Where the rows sit");
         DrawLayout(settings);
         DrawTextSettings(settings);
 
-        OverlayFonts.SectionTitle("on the player");
+        OverlayLayout.Group("On the player");
         DrawRules(settings, settings.PlayerStatusOrDefault, "player",
             rules => settings with { PlayerStatus = rules });
 
-        OverlayFonts.SectionTitle("on monsters");
+        OverlayLayout.Group("On monsters");
         DrawRules(settings, settings.MonsterStatusOrDefault, "monster",
             rules => settings with { MonsterStatus = rules });
 
@@ -1116,7 +1116,7 @@ public sealed class TrackerWindow
     /// </remarks>
     private static void DrawLiveNames(WorldSnapshot snapshot)
     {
-        if (!OverlayFonts.SectionHeader("what is on things right now"))
+        if (!OverlayLayout.Subsection("What is on things right now"))
         {
             return;
         }

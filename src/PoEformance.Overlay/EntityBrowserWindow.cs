@@ -291,7 +291,7 @@ public sealed class EntityBrowserWindow
             return;
         }
 
-        if (!OverlayFonts.SectionHeader($"hidden ({_hiding.Count})###hidden"))
+        if (!OverlayLayout.Subsection($"Hidden ({_hiding.Count})###hidden"))
         {
             return;
         }

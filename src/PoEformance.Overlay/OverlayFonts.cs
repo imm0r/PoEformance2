@@ -110,19 +110,22 @@ public static class OverlayFonts
         }
     }
 
-    /// <summary>A titled rule, drawn in the heading face.</summary>
-    /// <remarks>
-    /// The one this tool uses most: every boundary between two blocks of a page is one of
-    /// these, and they are exactly the lines that should outrank what follows them.
-    /// </remarks>
-    public static void SectionTitle(string label)
-    {
-        ArgumentNullException.ThrowIfNull(label);
-        Heading(() => ImGui.SeparatorText(label));
-    }
+    // SectionTitle IS GONE. It was a titled rule in the heading face, used for the innermost
+    // level of a page - "the icon sheet", "on the player" - and being in the heading face was
+    // exactly its problem: the fourth level down was set in the same face as the first, so a
+    // page's four levels arrived on screen wearing two appearances. That level is
+    // OverlayLayout.Group now, which is the accent ink at body size, and it is deleted rather
+    // than left standing because a spare helper that draws a heading is how the next page
+    // quietly grows a fifth appearance.
 
     /// <summary>A collapsing header in the heading face. Says whether it is open.</summary>
     /// <remarks>
+    /// FOR THE SECTION BARS AND NOTHING ELSE - the folds a page is divided into, which
+    /// <c>ToolTabs</c> draws. A fold INSIDE one of those is OverlayLayout.Subsection, which is
+    /// deliberately drawn another way: unframed and at body size, so a reader can see which
+    /// contains which. Reaching for this one inside a section is what made the tracker's six
+    /// inner folds indistinguishable from the bar holding them.
+    ///
     /// Its own method rather than <see cref="Heading"/> with a callback, because this one
     /// ANSWERS: the caller draws the section's contents only when it returns true, and those
     /// contents belong in the body face. The push and pop stay inside, which is the whole

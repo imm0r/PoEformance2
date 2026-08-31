@@ -259,7 +259,7 @@ public sealed class WealthWindow
     /// </remarks>
     private void DrawBreakdown()
     {
-        _breakdown = OverlayFonts.SectionHeader($"what the total is made of###wealth-breakdown");
+        _breakdown = OverlayLayout.Subsection("What the total is made of###wealth-breakdown");
         if (!_breakdown)
         {
             return;
@@ -458,7 +458,7 @@ public sealed class WealthWindow
             return;
         }
 
-        _worth = OverlayFonts.SectionHeader("where it is###wealth-by-tab");
+        _worth = OverlayLayout.Subsection("Where it is###wealth-by-tab");
         if (!_worth)
         {
             return;

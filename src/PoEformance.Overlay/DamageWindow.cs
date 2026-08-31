@@ -261,7 +261,7 @@ public sealed class DamageWindow
         uint scope = _thisMapOnly ? CurrentArea : 0;
         IReadOnlyList<KillRecord> kills = _meter.Kills.In(scope);
 
-        if (!OverlayFonts.SectionHeader($"Rares and uniques ({kills.Count})###dmg-kills", ImGuiTreeNodeFlags.DefaultOpen))
+        if (!OverlayLayout.Subsection($"Rares and uniques ({kills.Count})###dmg-kills", openByDefault: true))
         {
             return;
         }
