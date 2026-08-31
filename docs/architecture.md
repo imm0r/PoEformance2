@@ -803,6 +803,58 @@ the two thin ones are deliberately not, because they do not clear its bar.
 `GroundEffect` is the one to record first if only one gets made: its carriers stand still for tens
 of seconds, so a person can point at one and let it run out.
 
+#### What the capture decoded
+
+`tests/fixtures/session-2026-08-sweep.rec` — 3697 frames, six minutes, all four components in it.
+Two decoded, two closed with a negative.
+
+**`GroundEffect+0x58` is seconds remaining.** Not "a float that falls to zero" — an alpha does
+that. It **predicts the delisting**: over 1445 readings on 54 effects, `now + value` names the
+frame the game stops listing the entity with a median error of **−0.38 s** and a 5th–95th band of
+−0.44 to −0.30. The bias is the finding, not the noise: **0.14 s of spread across 1445 readings**
+means the value hits zero a consistent 0.38 s *before* the entity goes — the game keeps it for a
+despawn beat. Nothing that merely decays holds a constant offset to a wall clock that tightly, and
+nothing predicts a delisting from thirty seconds out.
+
+**`Beam+0x58` and `+0x64` are the line it draws.** The near end is the beam entity's own position,
+*exactly*, on 63 of 63 — the anchor that makes the rest readable, since it is a value this tool
+already had from a different component. The far end is 17–1116 units away, median 400, and it is
+**the one worth having**: what a player has to be out of.
+
+The far end was confirmed by a control, not by plausibility. It lands within 30 units of an entity
+the game is listing on **98%** of readings — and the **midpoint of the same line**, same beam, same
+crowd, no reason to be anybody, manages **18%**. Landing near something is cheap in a fight;
+landing near something five times more often than the middle of your own line is not. The
+convergence says it twice: 60 distinct source points, 33 distinct targets, with three beams from
+three positions ending on one point.
+
+One control that did *not* discriminate, recorded so it is not mistaken for a second
+confirmation: another beam's far end from the same frame also scores 97% — which follows from the
+convergence rather than contradicting it.
+
+**And the mistake that check nearly made.** The first version pooled the *beam carriers'* own
+positions as the crowd, and scored the real finding at 69 of 1098. A beam ends on a monster, and a
+monster carries none of the swept components — the question was being asked against the wrong
+crowd. `SweepFrame` now carries **every** listed entity's position (free: the sweep already reads
+each one on its way past), and the match happens **within the frame**, because a beam ends on
+somebody standing there at that moment.
+
+**`LimitedLifespan` and `DiesAfterTime` hold no timer**, and that is a result rather than a gap.
+52,803 and 5,310 readings, 457 and 38 entities that expired inside the capture, and a timer was
+asked for in all three forms it could take: time *remaining* (falls to zero at expiry), a
+*deadline* (constant per entity, ordered like the death times), a *duration* (constant per entity,
+ordered like the lifetimes). None answered. Everything that varies is set once and never moves,
+and in both components the varying pair is one plausible pointer — the lifespan is presumably
+behind it. Both stay fieldless in the schema, and a test pins that: a component called
+`LimitedLifespan` that does not hold a lifespan is exactly what a later reader would assume had
+merely not been looked at.
+
+Two candidates are named in the schema without being fields, because a plausible shape is not a
+measurement: `GroundEffect+0x38` is a float reading 18.66–18.67 with three distinct values across
+72 effects — the shape a **radius** has, in the same units as `Render.CurrentWorldPosition`, to be
+settled by standing at a measured distance and seeing where damage starts; `+0x48` is a small
+integer with three distinct values, which is what a type or severity id looks like.
+
 ### Next
 
 Two of the three follow-ups are now closed:

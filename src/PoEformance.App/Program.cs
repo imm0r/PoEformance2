@@ -905,7 +905,7 @@ internal static class Program
             }
         }
 
-        PoEformance.Game.Diagnostics.ComponentSweep.Report(frames, Console.Out);
+        PoEformance.Game.Diagnostics.ComponentSweep.Report(frames, schema, Console.Out);
     }
 
     private static void RunActionHunt(
