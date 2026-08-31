@@ -218,12 +218,50 @@ public sealed class DissectorWindow
         return pinned;
     }
 
+    /// <summary>The widest thing either hex box ever holds, for measuring them by.</summary>
+    private const string HexRoom = "0000000000000000";
+
+    /// <summary>
+    /// The controls, as TOOLBARS: what is being read, then what to make of it.
+    /// </summary>
+    /// <remarks>
+    /// HEIGHT IS THE ONLY CURRENCY ON THIS TAB. Every one of these is operated rather than read
+    /// - a settings column's rules do not apply to them - and every line they take is a row of
+    /// the table below that nobody can see. At the field width four of them filled a line and
+    /// the rest wrapped onto three more, so the tool whose entire value is how many rows fit on
+    /// screen opened with four lines of chrome on top of them.
+    ///
+    /// Sized to their own content (see <see cref="OverlayLayout.Sized"/>) the same controls are
+    /// two lines, split by the question they answer: what is BEING READ, and what to MAKE of it.
+    /// The comparison filters get a third line but only once there is something to compare -
+    /// they are meaningless with one place open, and a control that can do nothing is still a
+    /// control somebody reads past.
+    /// </remarks>
     private void DrawControls(StructureView view)
+    {
+        DrawTheRead();
+        DrawWhatToMakeOfIt(view);
+        DrawComparisonFilters();
+
+        ImGui.TextColored(DimText, view.Status);
+
+        if (_places.Count == 1 && _places[0].Label.Length > 0)
+        {
+            ImGui.SameLine();
+            ImGui.TextColored(NameText, $"- {_places[0].Label}");
+        }
+    }
+
+    /// <summary>
+    /// The read itself: where it starts, where it is, how it is cut up, and what stands beside
+    /// it.
+    /// </summary>
+    private void DrawTheRead()
     {
         string[] roots = Enum.GetNames<StructureRoot>();
         int rootIndex = (int)_root;
 
-        if (OverlayLayout.Combo("Start", ref rootIndex, roots))
+        if (OverlayLayout.Sized.Combo("Start", ref rootIndex, roots))
         {
             _root = (StructureRoot)rootIndex;
             _trail.Restart(_root.ToString());
@@ -238,10 +276,14 @@ public sealed class DissectorWindow
         // ImGui draws a control's label in whatever font is in force - and that is the right
         // answer anyway: the field and its name read as one technical control rather than as a
         // word in the page's face with a terminal stuck to it.
+        //
+        // Measured INSIDE the mono push, because that is the face the digits are drawn in and
+        // it is not the width the body face would have given for the same sixteen characters.
         OverlayFonts.PushMono();
         try
         {
-            if (OverlayLayout.Input("Address", ref _typedAddress, 20, ImGuiInputTextFlags.EnterReturnsTrue)
+            if (OverlayLayout.Sized.Input(
+                    "Address", ref _typedAddress, 20, HexRoom, ImGuiInputTextFlags.EnterReturnsTrue)
                 && TryHex(_typedAddress, out ulong typed))
             {
                 GoTo(typed);
@@ -253,83 +295,21 @@ public sealed class DissectorWindow
         }
 
         ImGui.SameLine();
-        OverlayLayout.Narrow.Combo("Rows", ref _strideIndex, ["8 bytes", "4 bytes"]);
+        OverlayLayout.Sized.Combo("Rows", ref _strideIndex, ["8 bytes", "4 bytes"]);
 
-        OverlayLayout.Next();
+        ImGui.SameLine();
         if (OverlayLayout.Narrow.Number("Bytes", ref _size, 128))
         {
             _size = Math.Clamp(_size, 8, StructureInspector.MaxSize);
         }
 
-        // The schema's own names, laid over the rows. This is also how a MISALIGNED read
-        // announces itself: every row gets a name and none of them make sense.
-        string[] names = Names();
-        OverlayLayout.Combo("Known Layout", ref _structIndex, names);
-
         ImGui.SameLine();
-        if (ImGui.Button(view.HasBaseline ? "re-mark" : "mark"))
-        {
-            _snapshotSequence++;
-        }
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip(
-                "Remember these bytes, in every place at once. Do something in the game, and\n"
-                + "whatever moved since is marked - which is how a field whose meaning is a\n"
-                + "verb gets found.");
-        }
-
-        ImGui.SameLine();
-        ImGui.Checkbox("only what moved", ref _onlyChanged);
-
-        DrawComparisonControls();
-
-        ImGui.TextColored(DimText, view.Status);
-
-        if (_places.Count == 1 && _places[0].Label.Length > 0)
-        {
-            ImGui.SameLine();
-            ImGui.TextColored(NameText, $"- {_places[0].Label}");
-        }
+        DrawCompareBox();
     }
 
-    /// <summary>
-    /// Everything about holding several places at once, on a line of its own.
-    /// </summary>
-    /// <remarks>
-    /// Its own line rather than appended to the controls above, which were already a full row
-    /// wide. Crowding these in beside them would push something off the right edge of a narrow
-    /// tab - and the first thing to go would be whichever control was added last, which is
-    /// exactly the one nobody has learned to look for yet.
-    /// </remarks>
-    private void DrawComparisonControls()
+    /// <summary>Somewhere else to read beside this, when there is room for one.</summary>
+    private void DrawCompareBox()
     {
-        if (_places.Count > 1)
-        {
-            OverlayLayout.Combo("Show", ref _agreement, ["every row", "only what differs", "only what matches"]);
-
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip(
-                    "Rows that DIFFER between the places belong to the individual - health,\n"
-                    + "position, id. Rows that MATCH belong to the kind - the vtable, the class\n"
-                    + "pointer, the dat row every one of them was built from.");
-            }
-
-            ImGui.SameLine();
-            ImGui.Checkbox("hide empty", ref _hideEmpty);
-
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip(
-                    "Most of a window is zeroes, and zeroes MATCH each other - so without this\n"
-                    + "the \"only what matches\" side of the comparison is mostly padding.");
-            }
-
-            ImGui.SameLine();
-        }
-
         if (_places.Count >= StructureInspector.MaxColumns)
         {
             ImGui.TextColored(DimText, $"{StructureInspector.MaxColumns} places is as many as are read at once");
@@ -340,7 +320,8 @@ public sealed class DissectorWindow
         OverlayFonts.PushMono();
         try
         {
-            if (OverlayLayout.Input("Compare With", ref _typedCompare, 20, ImGuiInputTextFlags.EnterReturnsTrue)
+            if (OverlayLayout.Sized.Input(
+                    "Compare", ref _typedCompare, 20, HexRoom, ImGuiInputTextFlags.EnterReturnsTrue)
                 && TryHex(_typedCompare, out ulong beside)
                 && Compare(beside))
             {
@@ -352,13 +333,68 @@ public sealed class DissectorWindow
             OverlayFonts.PopMono();
         }
 
-        if (ImGui.IsItemHovered())
+        OverlayLayout.Hint(
+            "Another address of the SAME kind of structure, read beside this one and walked"
+            + " through the same offsets with it. The entity browser can send one over without"
+            + " typing.");
+    }
+
+    /// <summary>What to make of the bytes: names over them, a baseline, and what to leave out.</summary>
+    private void DrawWhatToMakeOfIt(StructureView view)
+    {
+        // The schema's own names, laid over the rows. This is also how a MISALIGNED read
+        // announces itself: every row gets a name and none of them make sense.
+        //
+        // The one control on either toolbar NOT measured to its content: a schema structure name
+        // is as long as somebody made it, and a dropdown sized to the longest of them would be
+        // the width of the window.
+        OverlayLayout.Combo("Known Layout", ref _structIndex, Names());
+
+        ImGui.SameLine();
+        if (ImGui.Button(view.HasBaseline ? "Re-Mark" : "Mark"))
         {
-            ImGui.SetTooltip(
-                "Another address of the SAME kind of structure, read beside this one and\n"
-                + "walked through the same offsets with it. The entity browser can send one\n"
-                + "over without typing.");
+            _snapshotSequence++;
         }
+
+        OverlayLayout.Hint(
+            "Remember these bytes, in every place at once. Do something in the game, and"
+            + " whatever moved since is marked - which is how a field whose meaning is a verb"
+            + " gets found.");
+
+        ImGui.SameLine();
+        ImGui.Checkbox("Only What Moved", ref _onlyChanged);
+    }
+
+    /// <summary>
+    /// What to keep of a comparison, on a line that exists only while there is one.
+    /// </summary>
+    /// <remarks>
+    /// THE REAL TOOL, once two places are open: "only what differs" on two monsters of a kind
+    /// turns sixty-four rows into the handful that describe an individual. It stays off the
+    /// toolbars above because with one place open both of these decide nothing, and a row of
+    /// controls that cannot do anything is still a row somebody has to read past.
+    /// </remarks>
+    private void DrawComparisonFilters()
+    {
+        if (_places.Count <= 1)
+        {
+            return;
+        }
+
+        OverlayLayout.Sized.Combo(
+            "Show", ref _agreement, ["every row", "only what differs", "only what matches"]);
+
+        OverlayLayout.Hint(
+            "Rows that DIFFER between the places belong to the individual - health, position,"
+            + " id. Rows that MATCH belong to the kind - the vtable, the class pointer, the dat"
+            + " row every one of them was built from.");
+
+        ImGui.SameLine();
+        ImGui.Checkbox("Hide Empty", ref _hideEmpty);
+
+        OverlayLayout.Hint(
+            "Most of a window is zeroes, and zeroes MATCH each other - so without this the"
+            + " \"only what matches\" side of the comparison is mostly padding.");
     }
 
     /// <summary>The places open, one line each, with what each of them is currently saying.</summary>

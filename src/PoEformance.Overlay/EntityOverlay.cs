@@ -527,6 +527,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private const string Markers = "markers";
     private const string Entities = "entities";
 
+    /// <summary>
+    /// What the low-level page is CALLED, said at every registration that joins it.
+    /// </summary>
+    /// <remarks>
+    /// A PAGE'S LABEL CAME FROM WHICHEVER TOOL HAPPENED TO REGISTER FIRST, which is attach order,
+    /// which is app wiring - the one thing the numbered order above exists to keep out of
+    /// interface decisions. This page proved it: the entity browser is the registration that
+    /// names it, the app attaches the interface browser before it, and so the tab on the bar read
+    /// "Interface tree" - the name of one of its four tools - for as long as that wiring stood.
+    /// Passed by every joiner, the name no longer depends on the order they arrive in.
+    ///
+    /// NOT "Entities", which is what the browser asked for and what the id still says. Three of
+    /// the four tools here are not about entities at all - a UI tree, raw memory, the engine's
+    /// effect nodes - and a page named after one of its tools is how somebody looking for the
+    /// dissector learns to look somewhere else. The id stays "entities" because it is in
+    /// settings files, where a name nobody reads is worth more than a name that is right.
+    /// </remarks>
+    private const string EntitiesLabel = "Inspect";
+
     // Only the tools something else still reaches for keep a field; the rest live on as
     // their tab's callbacks and nothing more. A field that nothing reads is a claim that
     // somebody talks to that window, and here nobody does.
@@ -1057,6 +1076,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // the whole value of saying where the interface is, is not saying it again next launch.
         _keepOut.Changed = () => SettingsChanged?.Invoke();
 
+        // THE LOW-LEVEL PAGE IS TABS, NOT FOLDS - see ToolTabs.AsTabs for which shape suits
+        // which page. Its four tools are the strongest case in the tool: each is a two-pane tree
+        // or a scrolling table that wants the whole window, and nobody has ever wanted two of
+        // them on screen at once - a pointer is followed in ONE of them at a time. Stacked as
+        // folds they were four collapsing bars taking the height off whichever one was open, and
+        // the entity browser's own panes then scrolled inside a page that was also scrolling.
+        //
+        // HERE rather than beside the registrations, because the four arrive from four separate
+        // Attach calls in no fixed order and any of them may not be attached at all - so said
+        // there, whether the page came out as tabs would depend on how the app was wired.
+        _tools.AsTabs(Entities);
+
         ShareChrome();
     }
 
@@ -1299,7 +1330,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         var window = new UiBrowserWindow(inspector) { Style = _style };
         _uiBrowser = window;
         _tools.Add(
-            100, UiBrowserTab, "Interface tree", window.DrawTab, window.Idle, page: Entities);
+            95, UiBrowserTab, "UI Browser", window.DrawTab, window.Idle,
+            page: Entities, pageLabel: EntitiesLabel);
         if (visible)
         {
             _tools.Show(UiBrowserTab);
@@ -1607,7 +1639,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(inspector);
         var window = new DissectorWindow(inspector);
         _dissector = window;
-        _tools.Add(110, DissectorTab, "Dissector", window.DrawTab, window.Idle, page: Entities);
+        _tools.Add(
+            110, DissectorTab, "Memory Dissector", window.DrawTab, window.Idle,
+            page: Entities, pageLabel: EntitiesLabel);
         if (visible)
         {
             _tools.Show(DissectorTab);
@@ -1659,8 +1693,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             },
             () => Monsters);
         _tools.Add(
-            90, "entities", "Entity browser", () => window.DrawTab(_snapshot, _snapshot.Player),
-            window.Idle, page: Entities, pageLabel: "Entities");
+            90, "entities", "Entity Browser", () => window.DrawTab(_snapshot, _snapshot.Player),
+            window.Idle, page: Entities, pageLabel: EntitiesLabel);
         if (visible)
         {
             _tools.Show("entities");
@@ -2328,7 +2362,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             var made = new EffectWindow(_effects, Noise, () => SettingsChanged?.Invoke());
             _effectWindow = made;
-            _tools.Add(95, "effects", "Effects", () => made.DrawTab(_snapshot), page: Entities);
+            _tools.Add(
+                100, "effects", "Effects Engine", () => made.DrawTab(_snapshot),
+                page: Entities, pageLabel: EntitiesLabel);
         }
 
         // Registered on first use for the same reason as the cost tab: the meter is a
