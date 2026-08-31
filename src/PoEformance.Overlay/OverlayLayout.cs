@@ -71,7 +71,26 @@ public static class OverlayLayout
     /// </remarks>
     private const float StepEms = 1f;
 
-    /// <summary>The width every value control on every page is drawn at.</summary>
+    /// <summary>
+    /// How wide a control is when it SHARES its line with others.
+    /// </summary>
+    /// <remarks>
+    /// THE SECOND SORT OF ROW, and the reason one width was not enough. Some rows are a single
+    /// setting with its name beside it; others are several controls that only mean anything
+    /// together - a rule's "monster count &lt; 5 within 50m", a marker's size and line width,
+    /// a colour's four channels. Those cannot all be twenty lines wide, and the tool proved it:
+    /// its rule editor alone had 4, 5, 5.5, 6, 6.5, 8.5 and 20 in one file, so no two rows of
+    /// the same editor lined up with each other.
+    ///
+    /// SIX, and the point again is that there is one of it. Two controls at six plus their
+    /// labels fit the field column; four still fit an ordinary window. What it buys is that a
+    /// stack of these rows is a GRID - the second control of every row starts where the second
+    /// control of the row above it started - which is what the colour tables in the tool being
+    /// copied here get right and what this tool got wrong every time.
+    /// </remarks>
+    private const float CompactEms = 6f;
+
+    /// <summary>The width every single-setting control on every page is drawn at.</summary>
     /// <remarks>
     /// Shrinks, and only shrinks, when the window is too narrow to hold the field and its
     /// label. A field that kept its full width in a narrow window would push its own label off
@@ -85,6 +104,9 @@ public static class OverlayLayout
         float room = ImGui.GetContentRegionAvail().X - (em * 8f);
         return Math.Max(em * 8f, Math.Min(em * FieldEms, room));
     }
+
+    /// <summary>The width a control takes when several share one line.</summary>
+    public static float CompactWidth() => ImGui.GetFontSize() * CompactEms;
 
     /// <summary>One step in, for a note or for a control that depends on the one above it.</summary>
     public static float Step() => ImGui.GetFontSize() * StepEms;
@@ -243,6 +265,23 @@ public static class OverlayLayout
         }
     }
 
+    /// <summary>
+    /// Puts the next control on the same line as the last, with the gap that means "these go
+    /// together".
+    /// </summary>
+    /// <remarks>
+    /// A NAMED GAP rather than bare <c>SameLine()</c>, because the two say different things and
+    /// the tool only had one of them. ImGui's default gap is the space between a control and
+    /// its own label - use it between two checkboxes and "Map names" runs into the box for
+    /// "What is in them", so a row of three switches reads as one long sentence with tick boxes
+    /// in it. Two lines' worth is enough to see three groups instead of one run.
+    ///
+    /// It is also the only sanctioned way to put two controls on one line here: a bare SameLine
+    /// after a wrapped paragraph is what put buttons wherever the prose happened to break, and
+    /// that call should not be reached for by habit.
+    /// </remarks>
+    public static void Next() => ImGui.SameLine(0f, ImGui.GetFontSize() * 2f);
+
     /// <summary>A checkbox. The one control whose label ImGui already puts in a fixed place.</summary>
     /// <remarks>
     /// Here despite needing no width set, so that a page can be written entirely in this
@@ -280,11 +319,20 @@ public static class OverlayLayout
     }
 
     /// <summary>A text box, at the one field width.</summary>
-    public static bool Input(string label, ref string value, uint maxLength)
+    public static bool Input(
+        string label, ref string value, uint maxLength, ImGuiInputTextFlags flags = ImGuiInputTextFlags.None)
     {
         ArgumentException.ThrowIfNullOrEmpty(label);
         ImGui.SetNextItemWidth(FieldWidth());
-        return ImGui.InputText(label, ref value, maxLength);
+        return ImGui.InputText(label, ref value, maxLength, flags);
+    }
+
+    /// <summary>A whole-number box, at the one field width.</summary>
+    public static bool Number(string label, ref int value, int step = 1)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(label);
+        ImGui.SetNextItemWidth(FieldWidth());
+        return ImGui.InputInt(label, ref value, step);
     }
 
     /// <summary>A dropdown, at the one field width.</summary>
@@ -294,6 +342,135 @@ public static class OverlayLayout
         ArgumentNullException.ThrowIfNull(options);
         ImGui.SetNextItemWidth(FieldWidth());
         return ImGui.Combo(label, ref chosen, options, options.Length);
+    }
+
+    /// <summary>
+    /// A filter box: the width of whatever is left, with its name written inside it.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE CONTROL THAT SHOULD FILL THE WINDOW, and the exception proves the rule the rest
+    /// of this file is built on. Fields are fixed so their LABELS stay in a column - a filter
+    /// box has no label beside it, because its name is the grey text inside it until somebody
+    /// types. There is no column to keep still, so the only question left is how much of the
+    /// window is useful for typing into, and the answer is all of it.
+    ///
+    /// The tool already drew filters this way in five places and at four different widths -
+    /// 12, 13.5 and 16.5 lines - each one a guess at how long a search term is. None of them
+    /// had to be guessed.
+    /// </remarks>
+    /// <param name="id">The control's ImGui id, as "##something" - never shown.</param>
+    /// <param name="hint">What is written in the empty box, e.g. "filter by name".</param>
+    /// <param name="reserve">Room to leave on the right, for a button that follows on the line.</param>
+    /// <param name="flags">
+    /// ImGui's own input flags. <c>EnterReturnsTrue</c> for the filters that only run a search
+    /// when the key is pressed - the tree browser and the preload list both search something
+    /// too expensive to redo per keystroke.
+    /// </param>
+    public static bool Search(
+        string id,
+        string hint,
+        ref string text,
+        uint maxLength,
+        float reserve = 0f,
+        ImGuiInputTextFlags flags = ImGuiInputTextFlags.None)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(id);
+        ArgumentNullException.ThrowIfNull(hint);
+
+        // A floor, so a box in a narrow window is still something you can type into rather than
+        // a slot showing two characters.
+        ImGui.SetNextItemWidth(
+            Math.Max(ImGui.GetFontSize() * 8f, ImGui.GetContentRegionAvail().X - reserve));
+        return ImGui.InputTextWithHint(id, hint, ref text, maxLength, flags);
+    }
+
+    /// <summary>
+    /// How much room a run of buttons needs, for a filter that has to leave space for them.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED, not guessed, and that is the point. A filter with a button beside it is the one
+    /// arrangement where a full-width field is wrong, and the tool's four instances of it each
+    /// picked a field width by eye that happened to leave about enough - so all four were a
+    /// different width, and each was wrong at some text size, since the button grows with the
+    /// text and a width in lines does not grow at the same rate.
+    /// </remarks>
+    public static float ButtonRoom(params string[] labels)
+    {
+        ArgumentNullException.ThrowIfNull(labels);
+
+        ImGuiStylePtr style = ImGui.GetStyle();
+        float room = 0f;
+        foreach (string label in labels)
+        {
+            room += ImGui.CalcTextSize(label).X + (style.FramePadding.X * 2f) + style.ItemSpacing.X;
+        }
+
+        return room;
+    }
+
+    /// <summary>
+    /// The same controls, for the rows where several of them share one line.
+    /// </summary>
+    /// <remarks>
+    /// A NAMED SORT OF ROW rather than a width passed at the call site, which is the whole
+    /// point: "this control shares its line" is a fact about the row, and once it is said the
+    /// width follows from it. Said as a number instead, it was said forty times in this tool
+    /// and no two of them agreed.
+    ///
+    /// Nested rather than a separate class so the call site reads as what it is -
+    /// <c>OverlayLayout.Narrow.Drag(...)</c> beside <c>OverlayLayout.Drag(...)</c> - and so
+    /// there is no second place to look for the vocabulary.
+    /// </remarks>
+    public static class Narrow
+    {
+        /// <summary>A fractional slider sharing its line.</summary>
+        public static bool Slider(string label, ref float value, float min, float max, string format)
+        {
+            ArgumentNullException.ThrowIfNull(label);
+            ImGui.SetNextItemWidth(CompactWidth());
+            return ImGui.SliderFloat(label, ref value, min, max, format);
+        }
+
+        /// <summary>A whole-number slider sharing its line.</summary>
+        public static bool Slider(string label, ref int value, int min, int max, string format)
+        {
+            ArgumentNullException.ThrowIfNull(label);
+            ImGui.SetNextItemWidth(CompactWidth());
+            return ImGui.SliderInt(label, ref value, min, max, format);
+        }
+
+        /// <summary>A drag field sharing its line.</summary>
+        public static bool Drag(string label, ref float value, float speed, float min, float max, string format)
+        {
+            ArgumentNullException.ThrowIfNull(label);
+            ImGui.SetNextItemWidth(CompactWidth());
+            return ImGui.DragFloat(label, ref value, speed, min, max, format);
+        }
+
+        /// <summary>A whole-number box sharing its line.</summary>
+        public static bool Number(string label, ref int value, int step = 0)
+        {
+            ArgumentNullException.ThrowIfNull(label);
+            ImGui.SetNextItemWidth(CompactWidth());
+            return ImGui.InputInt(label, ref value, step);
+        }
+
+        /// <summary>A dropdown sharing its line.</summary>
+        public static bool Combo(string label, ref int chosen, string[] options)
+        {
+            ArgumentNullException.ThrowIfNull(label);
+            ArgumentNullException.ThrowIfNull(options);
+            ImGui.SetNextItemWidth(CompactWidth());
+            return ImGui.Combo(label, ref chosen, options, options.Length);
+        }
+
+        /// <summary>A text box sharing its line.</summary>
+        public static bool Input(string label, ref string value, uint maxLength)
+        {
+            ArgumentNullException.ThrowIfNull(label);
+            ImGui.SetNextItemWidth(CompactWidth());
+            return ImGui.InputText(label, ref value, maxLength);
+        }
     }
 
     /// <summary>

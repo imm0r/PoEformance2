@@ -202,9 +202,9 @@ public sealed class PreloadWindow
 
     private void DrawSearch()
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 13.5f);
-        bool entered = ImGui.InputText(
-            "###preload-search", ref _search, 96, ImGuiInputTextFlags.EnterReturnsTrue);
+        bool entered = OverlayLayout.Search(
+            "###preload-search", "filter the files loaded here...", ref _search, 96,
+            OverlayLayout.ButtonRoom("watch for this"), ImGuiInputTextFlags.EnterReturnsTrue);
 
         ImGui.SameLine();
 

@@ -175,10 +175,9 @@ public sealed class StashWindow
             ImGui.TextColored(DimText, view.Status);
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 16.5f);
-        ImGui.InputTextWithHint("##search", "name, mod or stat...", ref _search, 128);
-        ImGui.SameLine();
-        ImGui.TextColored(DimText, "searches the stats too");
+        // The aside moves into the box's own hint rather than sitting beside it: "searches the
+        // stats too" is what the field DOES, and a placeholder is where a field says that.
+        OverlayLayout.Search("##search", "name, mod or stat - the stats are searched too...", ref _search, 128);
 
         // The switch is for the WEB only. Pictures out of the install need no permission - they
         // are files the player already has - so what is offered here is the fallback, and the
@@ -205,9 +204,8 @@ public sealed class StashWindow
             (false, false) => "off - and the game folder was not found, so there is nowhere else to get them",
         });
 
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
-        ImGui.SliderFloat("cell", ref _cell, 24f, 96f, "%.0f px");
+        OverlayLayout.Next();
+        OverlayLayout.Narrow.Slider("cell", ref _cell, 24f, 96f, "%.0f px");
 
         Prices(book);
 

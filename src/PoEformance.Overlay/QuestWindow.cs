@@ -88,8 +88,7 @@ public sealed class QuestWindow
         ImGui.SameLine();
         ImGui.Checkbox("show the flags", ref _conditions);
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
-        ImGui.InputTextWithHint("##quest-search", "filter by name", ref _search, 64);
+        OverlayLayout.Search("##quest-search", "filter by name", ref _search, 64);
 
         ImGui.Separator();
 

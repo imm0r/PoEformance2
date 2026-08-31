@@ -76,8 +76,7 @@ public sealed class MapPinWindow
         ImGui.SameLine();
         ImGui.Checkbox("show the columns", ref _columns);
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
-        ImGui.InputTextWithHint("##pin-search", "filter by name", ref _search, 64);
+        OverlayLayout.Search("##pin-search", "filter by name", ref _search, 64);
 
         ImGui.Separator();
 

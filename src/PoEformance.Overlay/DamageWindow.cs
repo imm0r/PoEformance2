@@ -165,9 +165,8 @@ public sealed class DamageWindow
             // the figures it has to be set against - how far the list reaches, where things
             // went missing, GameHelper2's measured bubble near 200 - are all in grid, and a
             // control in its own private unit cannot be set from them.
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
             float limit = _meter.CreditWithin / MapView.WorldToGrid;
-            if (ImGui.SliderFloat("only within", ref limit, 0f, 600f,
+            if (OverlayLayout.Slider("Only within", ref limit, 0f, 600f,
                     limit <= 0f ? "any distance" : "%.0f grid"))
             {
                 _meter.CreditWithin = limit * MapView.WorldToGrid;
@@ -177,9 +176,8 @@ public sealed class DamageWindow
             ImGui.TextColored(DimText, "of where it was last seen");
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
         float smoothing = _meter.SmoothingSeconds;
-        if (ImGui.SliderFloat("smoothing", ref smoothing, 0.1f, 5f, "%.2f s"))
+        if (OverlayLayout.Slider("Smoothing", ref smoothing, 0.1f, 5f, "%.2f s"))
         {
             _meter.SmoothingSeconds = smoothing;
         }
@@ -446,8 +444,7 @@ public sealed class DamageWindow
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8f);
-        ImGui.SliderFloat("height##dmg", ref _height, 40f, 240f, "%.0f px");
+        OverlayLayout.Slider("Plot height###dmg", ref _height, 40f, 240f, "%.0f px");
 
         IReadOnlyList<DamageSample> samples = _meter.History.In(scope);
         if (samples.Count == 0)

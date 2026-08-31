@@ -156,17 +156,15 @@ public sealed class TrackerWindow
             _write(settings with { Aim = aim with { ShowPlayer = player } });
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
         float length = aim.Length;
-        if (ImGui.SliderFloat("##length", ref length, 5f, 400f, "%.0f world units"))
+        if (OverlayLayout.Narrow.Slider("##length", ref length, 5f, 400f, "%.0f world units"))
         {
             _write(settings with { Aim = aim with { Length = length } });
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
         float thickness = aim.Thickness;
-        if (ImGui.SliderFloat("##thickness", ref thickness, 0.5f, 10f, "%.1f wide"))
+        if (OverlayLayout.Narrow.Slider("##thickness", ref thickness, 0.5f, 10f, "%.1f wide"))
         {
             _write(settings with { Aim = aim with { Thickness = thickness } });
         }
@@ -378,9 +376,8 @@ public sealed class TrackerWindow
             + " nothing has confirmed. Drawing it IS the experiment: if the ring hugs the"
             + " burning patch it is the radius, and if it does not, switch this off and say so.");
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
         float radius = settings.GroundEffectRadius;
-        if (ImGui.SliderFloat("##groundradius", ref radius, 3f, 150f, "%.0f world units"))
+        if (OverlayLayout.Narrow.Slider("##groundradius", ref radius, 3f, 150f, "%.0f world units"))
         {
             _write(settings with { GroundEffectRadius = radius });
         }
@@ -439,9 +436,8 @@ public sealed class TrackerWindow
             + " a ring on one end of it - a beam runs up to eleven hundred world units, and the"
             + " chevrons run towards the end that matters.");
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
         float beamThickness = settings.BeamThickness;
-        if (ImGui.SliderFloat("##beamthickness", ref beamThickness, 2f, 60f, "%.0f px wide"))
+        if (OverlayLayout.Narrow.Slider("##beamthickness", ref beamThickness, 2f, 60f, "%.0f px wide"))
         {
             _write(settings with { BeamThickness = beamThickness });
         }
@@ -551,9 +547,8 @@ public sealed class TrackerWindow
                         }
 
                         ImGui.TableNextColumn();
-                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
                         int radius = rule.Radius;
-                        if (ImGui.SliderInt("##radius", ref radius, 10, 400, "%d px"))
+                        if (OverlayLayout.Narrow.Slider("##radius", ref radius, 10, 400, "%d px"))
                         {
                             rules[i] = rule with { Radius = radius };
                             edited = true;
@@ -564,9 +559,8 @@ public sealed class TrackerWindow
                         ImGui.TableNextColumn();
                         if (!rule.Filled)
                         {
-                            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 4f);
                             int thickness = rule.Thickness;
-                            if (ImGui.SliderInt("##weight", ref thickness, 1, 5, "%d wide"))
+                            if (OverlayLayout.Narrow.Slider("##weight", ref thickness, 1, 5, "%d wide"))
                             {
                                 rules[i] = rule with { Thickness = thickness };
                                 edited = true;
@@ -699,17 +693,15 @@ public sealed class TrackerWindow
     /// <summary>The sheet path, and what actually loaded from it.</summary>
     private void DrawSheet(TrackerSettings settings)
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 20f);
         string path = settings.IconSheet;
-        if (ImGui.InputText("icon sheet", ref path, 512))
+        if (OverlayLayout.Input("icon sheet", ref path, 512))
         {
             _write(settings with { IconSheet = path });
         }
 
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
+        OverlayLayout.Next();
         int tile = settings.IconTile;
-        if (ImGui.InputInt("tile", ref tile, 8, 32))
+        if (OverlayLayout.Narrow.Number("tile", ref tile, 8))
         {
             _write(settings with { IconTile = Math.Clamp(tile, 1, 512) });
         }
@@ -753,8 +745,7 @@ public sealed class TrackerWindow
         float screen = ImGui.GetIO().DisplaySize.Y;
         string[] names = [.. StatusLayoutProfile.All.Select(p => p.Name)];
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
-        ImGui.Combo("##profile", ref _profile, names, names.Length);
+        OverlayLayout.Narrow.Combo("##profile", ref _profile, names);
 
         ImGui.SameLine();
         if (ImGui.Button("use this profile"))
@@ -799,25 +790,22 @@ public sealed class TrackerWindow
         {
             StatusIconLayout? changed = null;
 
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
             int x = layout.X;
-            if (ImGui.SliderInt("##x", ref x, -400, 400, "across %d"))
+            if (OverlayLayout.Narrow.Slider("##x", ref x, -400, 400, "across %d"))
             {
                 changed = layout with { X = x };
             }
 
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
             int y = layout.Y;
-            if (ImGui.SliderInt("##y", ref y, lowest, highest, "down %d"))
+            if (OverlayLayout.Narrow.Slider("##y", ref y, lowest, highest, "down %d"))
             {
                 changed = layout with { Y = y };
             }
 
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
             int gap = layout.Gap;
-            if (ImGui.SliderInt("##gap", ref gap, 0, 50, "gap %d"))
+            if (OverlayLayout.Narrow.Slider("##gap", ref gap, 0, 50, "gap %d"))
             {
                 changed = layout with { Gap = gap };
             }
@@ -835,17 +823,15 @@ public sealed class TrackerWindow
     /// <summary>The shadow, the timer plate, and where the two small numbers sit.</summary>
     private void DrawTextSettings(TrackerSettings settings)
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
         float alpha = settings.ShadowAlpha;
-        if (ImGui.SliderFloat("##shadow", ref alpha, 0f, 1f, "shadow %.2f"))
+        if (OverlayLayout.Narrow.Slider("##shadow", ref alpha, 0f, 1f, "shadow %.2f"))
         {
             _write(settings with { ShadowAlpha = alpha });
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
         int size = settings.ShadowSize;
-        if (ImGui.SliderInt("##shadowsize", ref size, 0, 2, "spread %d"))
+        if (OverlayLayout.Narrow.Slider("##shadowsize", ref size, 0, 2, "spread %d"))
         {
             _write(settings with { ShadowSize = size });
         }
@@ -863,33 +849,29 @@ public sealed class TrackerWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, "timer bar background");
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
         int chargesX = settings.ChargesX;
-        if (ImGui.SliderInt("##chargesx", ref chargesX, -64, 64, "stacks x %d"))
+        if (OverlayLayout.Narrow.Slider("##chargesx", ref chargesX, -64, 64, "stacks x %d"))
         {
             _write(settings with { ChargesX = chargesX });
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
         int chargesY = settings.ChargesY;
-        if (ImGui.SliderInt("##chargesy", ref chargesY, -64, 64, "stacks y %d"))
+        if (OverlayLayout.Narrow.Slider("##chargesy", ref chargesY, -64, 64, "stacks y %d"))
         {
             _write(settings with { ChargesY = chargesY });
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
         int timerX = settings.TimerX;
-        if (ImGui.SliderInt("##timerx", ref timerX, -64, 64, "timer x %d"))
+        if (OverlayLayout.Narrow.Slider("##timerx", ref timerX, -64, 64, "timer x %d"))
         {
             _write(settings with { TimerX = timerX });
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
         int timerY = settings.TimerY;
-        if (ImGui.SliderInt("##timery", ref timerY, -64, 64, "timer y %d"))
+        if (OverlayLayout.Narrow.Slider("##timery", ref timerY, -64, 64, "timer y %d"))
         {
             _write(settings with { TimerY = timerY });
         }
@@ -971,9 +953,8 @@ public sealed class TrackerWindow
                         }
 
                         ImGui.TableNextColumn();
-                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 4f);
                         float scale = rule.IconScale;
-                        if (ImGui.SliderFloat("##scale", ref scale, 0.2f, 4f, "x%.2f"))
+                        if (OverlayLayout.Narrow.Slider("##scale", ref scale, 0.2f, 4f, "x%.2f"))
                         {
                             rules[i] = rule with { IconScale = scale };
                             edited = true;
@@ -987,9 +968,8 @@ public sealed class TrackerWindow
                         }
 
                         ImGui.TableNextColumn();
-                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
                         string label = rule.Label;
-                        if (ImGui.InputText("##label", ref label, 64))
+                        if (OverlayLayout.Narrow.Input("##label", ref label, 64))
                         {
                             rules[i] = rule with { Label = label };
                             edited = true;

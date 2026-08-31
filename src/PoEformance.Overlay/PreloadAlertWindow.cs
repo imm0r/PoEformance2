@@ -145,10 +145,12 @@ public sealed class PreloadAlertWindow
             return;
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 16.5f);
-        ImGui.InputTextWithHint("##preload-filter", "filter...", ref _filter, 200);
-        ImGui.SameLine();
-        ImGuiText.Wrapped(Dim, $"{entries.Count} watched, {_watch.Found.Count} of them here");
+        OverlayLayout.Search("##preload-filter", "filter...", ref _filter, 200);
+
+        // The count on its own line rather than welded to the filter's right with SameLine.
+        // It is a wrapping paragraph, so where it started depended on the filter's width and
+        // where it ENDED depended on the window's - which is how a caption becomes a layout.
+        OverlayLayout.Note($"{entries.Count} watched, {_watch.Found.Count} of them here.");
 
         if (!ImGui.BeginTable(
                 "preload-alerts",
@@ -404,11 +406,14 @@ public sealed class PreloadAlertWindow
 
     private void Adding()
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
+        // The short field keeps the shared-line width; the path takes whatever is left, less
+        // room for the button. Both were guesses before - 12 lines and 28 - and the second one
+        // ran off any window narrower than somebody had happened to have open.
+        ImGui.SetNextItemWidth(OverlayLayout.CompactWidth() * 2f);
         ImGui.InputTextWithHint("##add-name", "name", ref _addCalled, 100);
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 28f);
-        ImGui.InputTextWithHint("##add-path", "Metadata/...", ref _addPath, 250);
+        OverlayLayout.Search(
+            "##add-path", "Metadata/...", ref _addPath, 250, OverlayLayout.ButtonRoom("add"));
         ImGui.SameLine();
 
         ImGui.BeginDisabled(string.IsNullOrWhiteSpace(_addPath));
