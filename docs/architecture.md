@@ -524,11 +524,39 @@ are the near/far pair and plane 4's normal is the view direction — `(0.466531,
 **equal**. The camera looks precisely along the world diagonal, which is independently what
 `ScreenBasis` recovers from the matrix when it reports up-screen as `(0.7071, 0.7071)`.
 
-What this does *not* say is how often the game rewrites it: every fixture sweeps that region
-once, so a replay cannot tell "constant" from "photographed" (see the recording limits above).
-Anything built on it wants a capture that reads it per frame first. Worth having anyway,
-because it is the game's own answer to *is this thing on screen* — six dot products, no
-projection, no letterbox correction — where everything else here infers it.
+#### The frustum and the matrix check each other, and that catches a live decoy
+
+The eight corners of the view volume *are* the eight corners of the viewport, so a correct
+matrix must send every one of them to an edge of normalised device space. It does — **worst
+corner 0.0000 off the edge, in all eighteen recordings**. Two independent descriptions of one
+camera, read from two places sixteen bytes apart, agreeing to the float.
+
+This is the first check on this projection that needs **no scene and no threshold anybody has
+to agree with**. "Is the player centred" passes for a matrix that collapses the world. "Do the
+entities spread out" needs entities, and a number somebody argued over. This needs the camera
+to be self-consistent, and a matrix four bytes out of place is not.
+
+It was not a theoretical improvement. On `session-2026-08-monsters.rec` the hunt's own ranking
+puts **`0x12C` read transposed** first — linearity 0.9791 against the true matrix's 0.9539 —
+and `0x12C` is **plane 2 of the frustum**. A person following that line would have moved the
+schema off a working offset onto a block of clipping planes: the `0x11C` mistake again,
+arriving this time through the check that was written to replace the one `0x11C` got past. So
+`MatrixHunt` now leads its recommendation with frustum agreement and names the higher-scoring
+candidate as a decoy, and `WorldToScreen.Clip` exists so both readers of that matrix share one
+convention rather than each re-deriving it.
+
+The clip `w` turns out to be worth a name too: measured against the frustum it is the distance
+along the view axis in **world units**, which is why the near and far clip distances come out
+round (near 140–200, far 3200–5500 across the sessions). The projection was already computing
+it and throwing it away.
+
+`WorldReader` now reads the block beside the matrix every frame — one 192-byte read, since the
+corners and planes are contiguous — and puts it on the snapshot. That is what makes the
+frustum usable at all, and it is also the only way the remaining question gets answered: every
+existing fixture sweeps that region once, so a replay cannot tell "constant" from
+"photographed" (see the recording limits above), and reading it per frame is what will put it
+into the next `--record` session frame by frame. Until such a capture exists, a frustum older
+than the frame it is used on is unproven.
 
 The same pass over the fixtures also turned up the component **pool cells**, the `Vital`
 back-pointer at `+0x08` (the component's own address, on every vital of every monster — a check

@@ -2,6 +2,7 @@ using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Game.Entities;
+using PoEformance.Game.World;
 
 namespace PoEformance.Core.Tests;
 
@@ -200,6 +201,130 @@ public class CameraFrustumTests
             Assert.Equal(near.A, near.B, 4);
             Assert.True(near.C > 0.7f, $"{session}: view direction is not pitched downward");
         }
+    }
+
+    [Fact]
+    public void TheCornersProjectOntoTheEdgesOfTheScreen_SoTheMatrixAndTheFrustumAreOneCamera()
+    {
+        OffsetSchema schema = RealSessionTests.Schema();
+        int matrixAt = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+        int answered = 0;
+
+        foreach (string path in Fixtures())
+        {
+            using var replay = ReplayMemoryReader.Load(File.OpenRead(path));
+            if (!replay.ResolvedStatics.TryGetValue("GameStates", out ulong gameStates))
+            {
+                continue;
+            }
+
+            var matrix = new float[16];
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                GameChainAddresses chain = GameChain.Resolve(replay, schema, gameStates);
+                if (chain.WorldData == 0
+                    || CameraFrustum.Read(replay, schema, chain.WorldData) is not { } frustum
+                    || !replay.TryRead(
+                        chain.WorldData + (ulong)matrixAt,
+                        System.Runtime.InteropServices.MemoryMarshal.AsBytes(matrix.AsSpan())))
+                {
+                    continue;
+                }
+
+                answered++;
+                string session = Path.GetFileNameWithoutExtension(path);
+
+                // The whole claim in one number. The eight corners of the view volume are the
+                // eight corners of the viewport, so a correct matrix sends every one of them
+                // to an edge of NDC space - and this is the only check on the projection here
+                // that needs neither a scene nor a threshold anybody had to argue about.
+                double worst = frustum.WorstCornerOffEdge(matrix);
+                Assert.True(worst < 1e-4, $"{session}: worst corner {worst:F5} off the viewport edge");
+                Assert.True(frustum.AgreesWith(matrix));
+
+                // Clip w is the view depth in world units, which is why the near and far
+                // distances come out round. Both are the game's own clip planes, so a reading
+                // that produced arbitrary numbers here would mean the two only appear to agree.
+                var depths = frustum.Corners
+                    .Select(c => WorldToScreen.Clip(matrix, c.X, c.Y, c.Z).W)
+                    .ToList();
+                Assert.Equal(4, depths.Count(d => Math.Abs(d - depths.Min()) < 0.5));
+                Assert.Equal(4, depths.Count(d => Math.Abs(d - depths.Max()) < 0.5));
+                Assert.True(depths.Min() is > 50 and < 400, $"{session}: near {depths.Min():F0}");
+                Assert.True(depths.Max() is > 2000 and < 20000, $"{session}: far {depths.Max():F0}");
+
+                // The planes say the same depth as the projection does, by a route that never
+                // touches the matrix: the near and far faces are one slab, and its thickness
+                // is far minus near.
+                Assert.Equal(depths.Max() - depths.Min(), frustum.Depth, 1);
+                break;
+            }
+        }
+
+        Assert.True(answered >= 15, $"only {answered} recordings held both blocks");
+    }
+
+    [Fact]
+    public void TheReaderPutsTheFrustumOnTheSnapshot_AndItContainsThePlayer()
+    {
+        // The per-frame read, end to end through the real reader rather than by hand. The
+        // committed recordings only hold the block from the frame their one sweep touched,
+        // so this asks the frames that CAN answer and asserts that the answer arrives.
+        OffsetSchema schema = RealSessionTests.Schema();
+        using var replay = ReplayMemoryReader.Load(File.OpenRead(RealSessionTests.MapFixturePath));
+        var reader = new WorldReader(replay, schema);
+        ulong gameStates = replay.ResolvedStatics["GameStates"];
+
+        int withFrustum = 0, containingPlayer = 0;
+        for (uint frame = 5; frame < Math.Min(replay.FrameCount, 60u); frame++)
+        {
+            replay.Seek(frame);
+            WorldSnapshot snapshot = reader.Read(gameStates);
+            if (snapshot.Frustum is not { } frustum || snapshot.Player is not { } player)
+            {
+                continue;
+            }
+
+            withFrustum++;
+            if (frustum.Contains(player.WorldX, player.WorldY, player.WorldZ))
+            {
+                containingPlayer++;
+            }
+
+            Assert.Equal(CameraFrustum.PlaneCount, frustum.Planes.Count);
+            Assert.Equal(CameraFrustum.CornerCount, frustum.Corners.Count);
+        }
+
+        Assert.True(withFrustum > 0, "the reader never produced a frustum");
+        Assert.Equal(withFrustum, containingPlayer);
+    }
+
+    [Fact]
+    public void AWrongMatrixDoesNotAgreeWithTheFrustum()
+    {
+        // The control on the check itself. Agreement is only worth reporting if disagreement
+        // is possible, and the obvious near miss is the strongest case to try: 0x1E0 holds
+        // the SAME sixteen floats as 0x1A0 - the game stores the matrix twice - so the decoy
+        // used here is the flat transform at 0x150, which the hunt already refuses on depth.
+        OffsetSchema schema = RealSessionTests.Schema();
+        using var replay = ReplayMemoryReader.Load(File.OpenRead(RealSessionTests.SceneFixturePath));
+        GameChainAddresses chain = GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
+        CameraFrustum? frustum = CameraFrustum.Read(replay, schema, chain.WorldData);
+        Assert.NotNull(frustum);
+
+        var real = new float[16];
+        Assert.True(replay.TryRead(
+            chain.WorldData + (ulong)schema.Structs["WorldData"].OffsetOf("W2SMatrix"),
+            System.Runtime.InteropServices.MemoryMarshal.AsBytes(real.AsSpan())));
+        Assert.True(frustum.AgreesWith(real));
+
+        float[] flat = PoEformance.Core.Diagnostics.MatrixScan.ReadMatrix(replay, chain.WorldData, 0x150)!;
+        Assert.False(frustum.AgreesWith(flat));
+
+        // And four bytes off the real one - the drift this is meant to catch - fails too.
+        float[] shifted = PoEformance.Core.Diagnostics.MatrixScan.ReadMatrix(replay, chain.WorldData, 0x1A4)!;
+        Assert.False(frustum.AgreesWith(shifted));
     }
 
     [Fact]

@@ -376,7 +376,12 @@ public sealed record WorldSnapshot(
     // Where the game's own interface is this frame, part by part. Measured rather than
     // configured - the HUD is an ordinary UiElement and its parts are its children - which is
     // what lets the map overlay stay off it at any resolution or interface scale. See InterfaceReader.
-    IReadOnlyList<InterfacePart>? Hud = null)
+    IReadOnlyList<InterfacePart>? Hud = null,
+
+    // The camera's own view volume, read beside the matrix. Null when the block was not
+    // readable, which is an ordinary answer - a recording made before anything read it has
+    // nothing there. See CameraFrustum.
+    CameraFrustum? Frustum = null)
 {
     /// <summary>The parts of the game's interface on screen, empty when none were read.</summary>
     /// <remarks>
@@ -617,6 +622,8 @@ public sealed class WorldReader
     private readonly int _serverData;
     private readonly int _awakeEntities;
     private readonly int _w2sMatrix;
+    private readonly int _frustumCorners;
+    private readonly int _frustumPlanes;
     private readonly int _areaHash;
     private readonly int _areaLevel;
     private readonly int _playerLevelField;
@@ -684,6 +691,8 @@ public sealed class WorldReader
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
         _w2sMatrix = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+        _frustumCorners = schema.Structs["WorldData"].OffsetOf("FrustumCorners");
+        _frustumPlanes = schema.Structs["WorldData"].OffsetOf("FrustumPlanes");
         _areaHash = schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash");
 
         // Two levels the schema has carried - with invariants, so the drift report already
@@ -897,6 +906,14 @@ public sealed class WorldReader
         _reader.TryRead(
             chain.WorldData + (ulong)_w2sMatrix,
             System.Runtime.InteropServices.MemoryMarshal.AsBytes(matrix.AsSpan()));
+
+        // One more read beside the matrix, and it buys two things. The camera's frustum is
+        // the game's own "is that on screen", which nothing here could ask before; and being
+        // read EVERY frame is what puts it into a --record session frame by frame, which is
+        // the only way to settle how often the game rewrites it. Every committed recording
+        // swept this region once, so a replay of them cannot tell a constant from a
+        // photograph - see docs/architecture.md.
+        CameraFrustum? frustum = CameraFrustum.Read(_reader, chain.WorldData, _frustumCorners, _frustumPlanes);
 
         // The map struct sits INLINE in AreaInstance: pass its address, not a pointer read
         // from it (its first field is the head, which is why reading it as a pointer works
@@ -1320,7 +1337,8 @@ public sealed class WorldReader
             panels.Areas,
             areaLevel,
             playerLevel,
-            hud);
+            hud,
+            frustum);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>
