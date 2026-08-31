@@ -383,7 +383,12 @@ public sealed record WorldSnapshot(
     // The camera's own view volume, read beside the matrix. Null when the block was not
     // readable, which is an ordinary answer - a recording made before anything read it has
     // nothing there. See CameraFrustum.
-    CameraFrustum? Frustum = null)
+    CameraFrustum? Frustum = null,
+
+    // The entity under the cursor, as the GAME has it, or 0 for none. An address rather than a
+    // WorldEntity: join it against Entities on Address when a caller wants the rest. Zero is
+    // the normal answer on most frames - the cursor is usually over floor. See MouseOverReader.
+    ulong Hovered = 0)
 {
     /// <summary>The parts of the game's interface on screen, empty when none were read.</summary>
     /// <remarks>
@@ -675,6 +680,7 @@ public sealed class WorldReader
     private readonly UiElementReader _uiElements;
 
     private readonly TerrainReader _terrain;
+    private readonly MouseOverReader _mouseOver;
     private readonly int _playerInfo;
     private readonly int _serverData;
     private readonly int _awakeEntities;
@@ -744,6 +750,7 @@ public sealed class WorldReader
             (int)atlasPanel.Constants["PathFromUiRoot2"],
         ];
         _terrain = new TerrainReader(reader, schema, rotation);
+        _mouseOver = new MouseOverReader(reader, schema);
         _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
@@ -971,6 +978,11 @@ public sealed class WorldReader
         // swept this region once, so a replay of them cannot tell a constant from a
         // photograph - see docs/architecture.md.
         CameraFrustum? frustum = CameraFrustum.Read(_reader, chain.WorldData, _frustumCorners, _frustumPlanes);
+
+        // Three reads for what the cursor is on. Kept unconditional for the same reason as the
+        // frustum above: a slot that is read every frame lands in a --record session frame by
+        // frame, and this one was only settled because a capture finally contained it.
+        ulong hovered = _mouseOver.Read(chain.InGameState);
 
         // The map struct sits INLINE in AreaInstance: pass its address, not a pointer read
         // from it (its first field is the head, which is why reading it as a pointer works
@@ -1420,7 +1432,8 @@ public sealed class WorldReader
             areaLevel,
             playerLevel,
             hud,
-            frustum);
+            frustum,
+            hovered);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>

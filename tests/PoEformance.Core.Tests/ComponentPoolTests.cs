@@ -36,6 +36,12 @@ public class ComponentPoolTests
         ["Buffs"] = 0x190,
         ["Inventories"] = 0x150,
         ["Life"] = 0x420,
+
+        // 0x30, which makes Monster one of the smallest components in the game and is the
+        // reason --hoverhunt reads the whole thing rather than the one byte it wanted: the
+        // component IS 48 bytes, so being complete costs nothing. It also bounds the boss-flag
+        // hypothesis at 0x27 - it fits, with one byte to spare.
+        ["Monster"] = 0x30,
         ["Pathfinding"] = 0x5A0,
         ["Positioned"] = 0x550,
         ["Render"] = 0x630,

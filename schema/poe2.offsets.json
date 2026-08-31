@@ -62,6 +62,12 @@
   // AtlasWatch.Hovered stands: PoE2 still keeps no hovered-UiElement slot. For "is the cursor
   // on an inventory item", the answer remains the geometric one - descend the UI tree to what
   // contains the cursor, then UiElement.ItemPtr at +0x4F8.
+  //
+  // WHAT THIS PARAGRAPH DOES NOT COVER, and was read as covering for months: the hovered
+  // ENTITY. That one the game does keep, at InGameState+0x300 -> +0x3F0 -> +0xA8, and it was
+  // confirmed in 2026-08 - see MouseOverHostPtr. The two questions look alike written down and
+  // are answered in different places, so "no hovered slot" was carried over to a slot that
+  // exists. A negative result is about the thing it tested; say which thing.
 
   "version": 1,
   "gameVersion": "0.5.x (AreaInstance tail re-verified 2026-08 by owner: +0x08 wave; base port: AHK tool v0.45.13.298, 2026-07)",
@@ -120,11 +126,33 @@
         },
         "UiRootStructPtr": { "offset": "0x2F0", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "KB/M UI manager (UserInterface_MouseAndKeyboard)." },
         "MouseOverHostPtr": {
-          "offset": "0x300", "type": "ptr",
-          "comment": "FIRST HOP OF A HOVERED-ENTITY CHAIN this project had written off. GameHelper2's InGameStateOffset names it MouseOverHostPtr and follows it to +0x3F0 (MouseOverSubStruct) and then +0xA8 for the entity - and the note at the top of this file says flatly that PoE2 keeps no hovered slot, on the strength of a hunt that was looking for a hovered UI ELEMENT and found a resource record instead. A hovered ENTITY is a different question and it was never asked. WHAT THE RECORDINGS SAY, which is less than a confirmation and more than nothing: the slot holds a plausible pointer whose target carries a module vtable, and following it to +0x3F0 resolves in 123 of 245 sampled frames, where +0xA8 then reads zero. Zero is exactly what nothing-hovered looks like AND exactly what a wrong offset looks like, so this is UNCONFIRMED - and it cannot become confirmed here, because the sessions that swept this region were --questflags captures in which nobody was hovering anything on purpose. It also sits in the list of twelve pointers that differ between two characters (see this struct's comment), which is at least consistent with per-character UI state. To settle it: record while deliberately hovering a monster, then check that +0xA8 names that monster's entity and goes back to zero when the cursor leaves. If it holds, EntityInspector and the alert rules get 'the thing under the cursor' for three reads instead of a descent through the UI tree."
+          "offset": "0x300", "type": "ptr", "struct": "MouseOverHost",
+          "comment": "NO INVARIANT ON PURPOSE, even though it is now confirmed and read every frame: the drift report counts an UNREADABLE field as a failure, exactly as loudly as a wrong value, and every recording committed before 2026-08 predates anything reading this slot - so a plausiblePtr here turns the whole baseline replay red without a byte having moved. It is the recording-limits rule biting from the other side, and it goes away once the fixtures are re-made with a build that reads the chain. FIRST HOP OF THE HOVERED-ENTITY CHAIN, and CONFIRMED 2026-08 against a capture made for it (tests/fixtures/session-2026-08-hoverhunt.rec, --hoverhunt, 940 frames of deliberately hovering things). It had been written off: the note at the top of this file says PoE2 keeps no hovered slot, on the strength of a hunt for a hovered UI ELEMENT that found a resource record. A hovered ENTITY is a different question and nobody had asked it - the sessions that swept this region were --questflags captures in which nothing was hovered on purpose, so +0xA8 read zero, which is what nothing-hovered and a wrong offset look like alike. WHAT THE CAPTURE SETTLES: the host resolved in 932 of 940 frames, its +0x3F0 in all 932, and the entity slot behind that held something in 143 of them. Every single one of those 143 values - 143 of 143 - is an address the game itself was listing in AwakeEntities that frame, across ten distinct entities of four kinds (six Vaal monsters, two chests, an endgame checkpoint, a world item), and the slot took 50 different values over the session. IT IS NOT A NEAREST-ENTITY SLOT: it was EMPTY on 789 of 932 frames in an area holding 96 monsters, which is what a cursor pointing at floor looks like and not what proximity looks like. It also sits in the list of twelve pointers that differ between two characters (see this struct's comment), consistent with per-character UI state. Cost: three reads for 'the thing under the cursor', against a descent through the UI tree."
         },
         "GamepadUiRootStructPtr": { "offset": "0x318", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "Controller UI manager." },
         "WorldData": { "offset": "0x368", "type": "ptr", "invariant": { "kind": "nonNullPtr" }, "comment": "CONFIRMED 2026-08 and no longer suspect: it was flagged because AreaInstanceData moved +0x08 in the same wave, and nonNullPtr passes at either slot since both hold plausible pointers. The matrix hunt settled it - the camera matrix resolves correctly at THIS base + 0x1A0, and a projection that maps 123 real entities linearly cannot come from the wrong struct. The earlier W2SMatrix failure was a bad invariant, not a drifted WorldData." }
+      }
+    },
+
+    "MouseOverHost": {
+      "comment": "The object InGameState+0x300 leads to - the middle of the hovered-entity chain. Only one of its fields is understood, and that is the honest state of it: the capture that settled the chain read a 0x400 window of this object every frame, and nothing else in that window separated hovering from not hovering. The window is in tests/fixtures/session-2026-08-hoverhunt.rec, so the rest of it can be mined offline whenever there is a reason to.",
+      "fields": {
+        "SubStructPtr": {
+          "offset": "0x3F0", "type": "ptr", "struct": "MouseOverSub",
+          "invariant": { "kind": "plausiblePtr" },
+          "comment": "Resolved in all 932 frames in which the host itself did. Named MouseOverSubStruct by GameHelper2; this client agrees at the same offset."
+        }
+      }
+    },
+
+    "MouseOverSub": {
+      "comment": "The end of the hovered-entity chain. TWO of its slots track the cursor and only one is understood - worth writing down together, because the second is the reason not to call the first 'the hover flag'. Over 466 sampled frames both +0xA8 and +0xC8 were zero in all 394 idle frames and non-null in all 72 hovering ones, so either would serve as 'is something hovered'. They differ in what they hold: +0xA8 took 15 distinct values, and every non-null one of them is an entity the game was listing that frame; +0xC8 took 71, and its values are not in the entity list at all. A pointer that changes five times as often as the thing hovered, allocated per hover, reads like the tooltip or highlight record built for it - but that is a guess, and it stays out of the fields until somebody follows it.",
+      "fields": {
+        "HoveredEntity": {
+          "offset": "0xA8", "type": "ptr", "struct": "Entity",
+          "invariant": { "kind": "plausiblePtr" },
+          "comment": "The entity under the cursor, or null. CONFIRMED 2026-08: 143 of 143 non-null readings were addresses in the game's own AwakeEntities list that frame, over ten entities and four kinds - monsters, a chest, a checkpoint, a ground item - and null on the other 789 frames. Monsters are not special to it: anything the game lets the cursor pick up appears here."
+        }
       }
     },
 
@@ -972,8 +1000,13 @@
     },
 
     "Monster": {
+      "comment": "The whole component is 0x30 bytes - that is its measured pool cell, so an offset past it is not in the object. See the ComponentPools note.",
+      "consts": { "PoolCell": "0x30" },
       "fields": {
-        "IsBoss": { "offset": "0x27", "type": "u8", "comment": "HYPOTHESIS from Sikaka/POE2Radar - VERIFY in-game against a known boss before relying on it." }
+        "IsBoss": {
+          "offset": "0x27", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 },
+          "comment": "HYPOTHESIS from Sikaka/POE2Radar, and STILL ONE after the 2026-08 hunt that went looking for it - which is worth recording precisely, because the run produced a table that reads like a refutation and is not one. --hoverhunt read the byte on every monster in tests/fixtures/session-2026-08-hoverhunt.rec: every monster in the area on every third frame, 14,462 sightings, every one of them zero, across Normal, Magic and Rare. NO UNIQUE WAS EVER IN THE AREA. Zero on every non-unique monster is exactly what a working boss flag reads, so the capture agrees with the hypothesis and settles nothing; 'the byte was always zero' is only evidence against it if a boss was on screen. The range invariant below rests on that too - 14,462 readings of 0 and not one of anything else, which would be a strange thing for a byte in the middle of a float or a pointer to do, but it has never been seen set. To settle it, run --hoverhunt in front of a rare-with-mods pack boss or an act boss and read the Unique row. MonsterSigns does not use this - it derives IsBoss from rarity >= Unique - so nothing breaks either way."
+        }
       }
     },
 
