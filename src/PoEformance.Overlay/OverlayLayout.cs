@@ -115,37 +115,32 @@ public static class OverlayLayout
     /// The switch a whole feature hangs off, drawn the same way on every page that has one.
     /// </summary>
     /// <remarks>
-    /// FIRST LINE, ALWAYS, AND IT LOOKS LIKE NOTHING ELSE ON THE PAGE. Half the pages in this
-    /// tool have one setting that decides whether the other twenty do anything, and it used to
-    /// be an ordinary checkbox somewhere among them - so "is this feature even on" was a
-    /// question you answered by reading the whole page and hoping you recognised the right
-    /// line. Given its own row, in the heading face, with the state spelled out in words beside
-    /// it, that question is answered from the top of the page without reading anything.
+    /// FIRST LINE, ALWAYS. Half the pages in this tool have one setting that decides whether the
+    /// other twenty do anything, and it used to be an ordinary checkbox somewhere among them -
+    /// so "is this feature even on" was a question you answered by reading the whole page and
+    /// hoping you recognised the right line. Its own row at the top, with the state spelled out
+    /// beside it and a rule under it, answers that without reading anything.
+    ///
+    /// NOT IN THE HEADING FACE, which is a correction. It was, on the reasoning that this line
+    /// outranks everything under it - but a heading is TEXT, and this is a CONTROL. Scaling the
+    /// face scales the checkbox with it, so the page opened with one tick box visibly larger
+    /// than every other tick box on it, which reads as a rendering fault rather than as
+    /// hierarchy. Position, the state beside it and the rule under it carry the rank; they are
+    /// what a reader is using anyway.
     ///
     /// The state is written out as well as ticked because a tick is a shape and this is the one
-    /// place the answer has to survive a glance at a moving screen. It is also what makes the
-    /// row worth the vertical space it costs.
+    /// place the answer has to survive a glance at a moving screen.
     /// </remarks>
     /// <returns>Whether the switch was just changed.</returns>
     public static bool Master(string label, ref bool on)
     {
         ArgumentException.ThrowIfNullOrEmpty(label);
 
-        bool changed = false;
         bool state = on;
+        bool changed = ImGui.Checkbox(label, ref state);
 
-        // The heading face, like a section title and a tab, because this line outranks
-        // everything under it - it decides whether any of it applies.
-        OverlayFonts.Heading(() =>
-        {
-            if (ImGui.Checkbox(label, ref state))
-            {
-                changed = true;
-            }
-
-            ImGui.SameLine();
-            ImGui.TextColored(state ? OnInk : OffInk, state ? "on" : "off");
-        });
+        ImGui.SameLine();
+        ImGui.TextColored(state ? OnInk : OffInk, state ? "on" : "off");
 
         on = state;
 
@@ -281,6 +276,47 @@ public static class OverlayLayout
     /// that call should not be reached for by habit.
     /// </remarks>
     public static void Next() => ImGui.SameLine(0f, ImGui.GetFontSize() * 2f);
+
+    /// <summary>How wide one cell of a switch grid is, in multiples of the text size.</summary>
+    /// <remarks>
+    /// Sized for the longest switch label that shares a row in this tool - "Every connection",
+    /// "Hide maps with no way there" gets a row to itself - plus its tick box. Too narrow and
+    /// the labels touch; too wide and three of them do not fit a window somebody has dragged in.
+    /// </remarks>
+    private const float CellEms = 11f;
+
+    /// <summary>
+    /// Puts the next control in a numbered column, so a block of switches is a grid.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Next"/> puts a control a fixed GAP after the last one, which lines up nothing:
+    /// where the second switch starts depends on how long the first one's label was, and where
+    /// the third starts depends on the first two. A row of three reads fine on its own and falls
+    /// apart the moment there is a SECOND row under it, because the second row's switches land
+    /// under the middle of the first row's rather than under their ticks.
+    ///
+    /// A column index fixes each one to the same x on every row, which is what makes a block of
+    /// switches scannable down as well as across - and what lets a switch move between rows
+    /// without dragging its neighbours sideways.
+    ///
+    /// Like <see cref="ToColumn"/> it only ever pushes right: a label too long for its cell
+    /// takes the room it needs rather than being overwritten by its neighbour.
+    /// </remarks>
+    /// <param name="column">Which column, counting the first control on the row as 0.</param>
+    public static void Cell(int column)
+    {
+        // Read before the SameLine, while the cursor is on the row's own left margin - see
+        // ToColumn for why that is the only moment this can be measured.
+        float margin = ImGui.GetCursorPosX();
+
+        ImGui.SameLine();
+
+        float want = margin + (ImGui.GetFontSize() * CellEms * column);
+        if (ImGui.GetCursorPosX() < want)
+        {
+            ImGui.SetCursorPosX(want);
+        }
+    }
 
     /// <summary>
     /// How far in a row's controls begin, when the row starts with a name instead.

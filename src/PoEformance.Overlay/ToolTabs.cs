@@ -533,7 +533,32 @@ public sealed class ToolTabs
             // In the heading face, like the tab above it and the titled rules below: a page
             // that folds into several tools needs its fold lines to outrank their contents,
             // which is the whole reason the second size exists.
-            if (!OverlayFonts.SectionHeader($"{section.Live?.Invoke() ?? section.Label}###{section.Id}"))
+            //
+            // BANDED, every other one a shade lighter. Folded, these bars are all a page shows -
+            // four identical strips of the same colour stacked touching each other, which reads
+            // as one block with words in it rather than as four things you can open. The band is
+            // the cheapest thing that separates them, and unlike a gap it costs no height.
+            bool banded = (i & 1) == 1;
+            if (banded)
+            {
+                PushBand();
+            }
+
+            bool open;
+            try
+            {
+                open = OverlayFonts.SectionHeader(
+                    $"{section.Live?.Invoke() ?? section.Label}###{section.Id}");
+            }
+            finally
+            {
+                if (banded)
+                {
+                    ImGui.PopStyleColor(3);
+                }
+            }
+
+            if (!open)
             {
                 continue;
             }
@@ -542,6 +567,41 @@ public sealed class ToolTabs
             _drawn.Add(section.Id);
         }
     }
+
+    /// <summary>
+    /// Lifts the next header's bar a shade, for the banding.
+    /// </summary>
+    /// <remarks>
+    /// ALL THREE STATES, not just the resting one. ImGui draws a collapsing header in
+    /// <c>Header</c>, <c>HeaderHovered</c> or <c>HeaderActive</c> depending on the mouse, so
+    /// pushing only the first gives a banded row that loses its band the moment it is pointed
+    /// at - and the hover then reads as the band rather than as the hover.
+    ///
+    /// Derived from the theme's own three rather than written out, so the banding follows any
+    /// later change to the palette instead of quietly drifting away from it.
+    /// </remarks>
+    private static void PushBand()
+    {
+        ImGui.PushStyleColor(ImGuiCol.Header, Lift(ImGui.GetStyle().Colors[(int)ImGuiCol.Header]));
+        ImGui.PushStyleColor(
+            ImGuiCol.HeaderHovered, Lift(ImGui.GetStyle().Colors[(int)ImGuiCol.HeaderHovered]));
+        ImGui.PushStyleColor(
+            ImGuiCol.HeaderActive, Lift(ImGui.GetStyle().Colors[(int)ImGuiCol.HeaderActive]));
+    }
+
+    /// <summary>One shade lighter, keeping the colour's own hue and how solid it is.</summary>
+    /// <remarks>
+    /// An ADDITION rather than a multiplication, because the resting header colour is dark and
+    /// multiplying a dark colour by 1.3 moves it by almost nothing - which is a band nobody can
+    /// see. A flat step lifts the dark states visibly and the lit ones proportionally less,
+    /// which is the way round it wants to be.
+    /// </remarks>
+    private static Vector4 Lift(Vector4 colour) => colour with
+    {
+        X = Math.Min(1f, colour.X + 0.06f),
+        Y = Math.Min(1f, colour.Y + 0.06f),
+        Z = Math.Min(1f, colour.Z + 0.06f),
+    };
 
     /// <summary>Which sections drew this frame, so the rest can be told they did not.</summary>
     /// <remarks>

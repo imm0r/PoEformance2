@@ -84,15 +84,17 @@ public sealed class AtlasWindow
 
         OverlayLayout.Group("What is drawn");
 
-        // THE THREE THAT REALLY DO BELONG ON ONE LINE - the three halves of a map's label - now
-        // spaced so they read as three switches rather than as one sentence.
+        // FIVE SWITCHES IN A GRID, three across and two down. They were three on one line and
+        // two on lines of their own, spaced with a fixed gap - so the second row's switches
+        // landed under the MIDDLE of the first row's rather than under their ticks, and the
+        // block read as a row plus some leftovers. Columns put every tick under a tick.
         bool names = settings.Names;
         if (OverlayLayout.Toggle("Map names", ref names))
         {
             changed = changed with { Names = names };
         }
 
-        OverlayLayout.Next();
+        OverlayLayout.Cell(1);
 
         bool contents = settings.Contents;
         if (OverlayLayout.Toggle("What is in them", ref contents))
@@ -100,7 +102,7 @@ public sealed class AtlasWindow
             changed = changed with { Contents = contents };
         }
 
-        OverlayLayout.Next();
+        OverlayLayout.Cell(2);
 
         bool web = settings.Web;
         if (OverlayLayout.Toggle("Every connection", ref web))
@@ -120,16 +122,7 @@ public sealed class AtlasWindow
                   + " data/atlas-ratings.json - it is an opinion rather than a fact."
                 : "None - data/atlas-ratings.json is missing or empty.");
 
-        // A name in the file that matches no map is a rating that silently never appears, which
-        // is indistinguishable from having forgotten to write it. Named here, it is a typo.
-        // A REAL INDENT rather than four spaces in the string: this one follows the text size.
-        if (_watch.Ratings.Unmatched.Count > 0)
-        {
-            Warn(
-                $"{_watch.Ratings.Unmatched.Count} rated names match no map: "
-                + string.Join(", ", _watch.Ratings.Unmatched.Take(6))
-                + (_watch.Ratings.Unmatched.Count > 6 ? " ..." : string.Empty));
-        }
+        OverlayLayout.Cell(1);
 
         bool biomes = settings.Biomes;
         if (OverlayLayout.Toggle("Biome borders", ref biomes))
@@ -142,6 +135,20 @@ public sealed class AtlasWindow
         // settings page, permanently, for a question asked once. The colours are on the atlas
         // where they are used; a legend in the settings is a reference table nobody was reading.
         OverlayLayout.Hint("The ring around each name says what terrain the map is.");
+
+        // A name in the file that matches no map is a rating that silently never appears, which
+        // is indistinguishable from having forgotten to write it. Named here, it is a typo.
+        //
+        // UNDER the grid rather than between its two rows, which is where it used to be: a
+        // warning that only appears when something is wrong must not push half the switches
+        // down a line when it does. A REAL indent, not four spaces in the string.
+        if (_watch.Ratings.Unmatched.Count > 0)
+        {
+            Warn(
+                $"{_watch.Ratings.Unmatched.Count} rated names match no map: "
+                + string.Join(", ", _watch.Ratings.Unmatched.Take(6))
+                + (_watch.Ratings.Unmatched.Count > 6 ? " ..." : string.Empty));
+        }
 
         // Whether the default reads at a real resolution is not something that could be
         // decided while writing it, so it is here to be turned up rather than guessed at.
@@ -280,9 +287,64 @@ public sealed class AtlasWindow
 
         OverlayLayout.Hint("Open the atlas first - it reads nothing while the panel is shut.");
 
-        foreach (string line in _watch.Checked)
+        DrawReport();
+    }
+
+    /// <summary>
+    /// What the last check said, in a box of its own.
+    /// </summary>
+    /// <remarks>
+    /// A REPORT, NOT PART OF THE PAGE. It is twenty-odd lines of addresses, flag words, child
+    /// paths and counts, and it used to be printed straight into the settings as ordinary quiet
+    /// text - so pressing the button pushed every switch on the page down by a screenful, and
+    /// what came back read as though the tool had started explaining itself unprompted. In its
+    /// own bordered, scrolling box it is an answer that appeared next to the question, and the
+    /// page underneath it does not move.
+    ///
+    /// IN THE MONO FACE, and that is not decoration. Nearly every line here is a figure -
+    /// "0x31936412410", "0x5026F3  x1", "child path 24, 2  -  1373 children" - which is what
+    /// the mono face exists for in this tool. It also fixes the indentation for free: the
+    /// report is built in the game layer, where there is no ImGui and no way to ask for an
+    /// indent, so it steps its sub-lines in with four spaces. In a proportional face those four
+    /// spaces are four of the narrowest glyph there is and the nesting barely shows; in a
+    /// fixed-width one they are exactly four characters, on every line, and the tree is legible.
+    ///
+    /// Wrapped rather than clipped, because a few lines are whole sentences of prose that would
+    /// otherwise run off the right edge with no way to read the end of them.
+    /// </remarks>
+    private void DrawReport()
+    {
+        IReadOnlyList<string> report = _watch.Checked;
+        if (report.Count == 0)
         {
-            OverlayLayout.Note(line);
+            return;
+        }
+
+        // Tall enough for the common report and no taller. A box sized to its content would put
+        // the settings a screen and a half down the page, which is the problem being fixed.
+        float height = ImGui.GetFrameHeightWithSpacing() * 9f;
+
+        if (!ImGui.BeginChild("atlas-check", new Vector2(0f, height), ImGuiChildFlags.Borders))
+        {
+            ImGui.EndChild();
+            return;
+        }
+
+        OverlayFonts.PushMono();
+        try
+        {
+            foreach (string line in report)
+            {
+                ImGui.TextWrapped(ImGuiText.Escape(line));
+            }
+        }
+        finally
+        {
+            OverlayFonts.PopMono();
+
+            // In a finally and unconditionally: EndChild pairs with BeginChild whatever it
+            // returned, and an exception between the two leaves ImGui's stack unbalanced.
+            ImGui.EndChild();
         }
     }
 
