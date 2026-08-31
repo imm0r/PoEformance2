@@ -89,10 +89,15 @@ $Widths = @{
     # In the FILE this is an offset into the variable-length section; in MEMORY it is a
     # pointer to a raw UTF-16 string. Same width either way.
     'string' = 8
-    # 64-bit TABLE reference followed by 64-bit ROW reference. So the pointer to the
-    # referenced row sits at +8, not at the column start - the offset this script reports
-    # is where the COLUMN begins. GameHelper2 corroborates it from the other side: its
-    # GrantedEffects.ActiveSkillDatPtr is 0x57, and the ActiveSkill column starts at 0x4F.
+    # 64-bit ROW reference followed by 64-bit TABLE reference, so the pointer to the
+    # referenced ROW sits AT the column start and the table it belongs to at +8. The offset
+    # this script reports is where the COLUMN begins, which is therefore also where the row
+    # pointer is. THIS WAS THE OTHER WAY ROUND HERE and the comment outlived the correction:
+    # the order was settled by observation in 2026-08 on NPCs.QuestFlags - see the note above
+    # WorldAreaDat in schema/poe2.offsets.json for the four witnesses. GameHelper2 reading
+    # GrantedEffects.ActiveSkillDatPtr at 0x57 where the ActiveSkill column starts at 0x4F is
+    # the one thing that still disagrees, and an 8-byte drift in that table's earlier columns
+    # explains it exactly.
     'foreignrow' = 16
     # A reference to a row of the SAME table, and only 8 bytes - there is no table
     # reference to store. This was 16 here at first, which nothing in this repo could
@@ -180,18 +185,32 @@ function Format-Layout($layout) {
 # this fails if either side drifts. Where our name differs from the column name it is
 # because we named it before we knew; the column name is the truth.
 #
-# 'Column+8' means the field is not the start of that column but the row reference
-# inside it - see the note on foreignrow above.
+# 'Column+8' means the field is not the start of that column but the TABLE reference in
+# its second half - see the note on foreignrow above. A row reference needs no inset,
+# because it sits at the column start.
 $KnownRows = @(
     @{ Struct = 'WorldAreaDat';          Table = 'WorldAreas'
        Fields = [ordered]@{ IdPtr = 'Id'; NamePtr = 'Name'; Act = 'Act'
                             IsTown = 'IsTown'; HasWaypoint = 'HasWaypoint' } }
     @{ Struct = 'BuffDefinition';        Table = 'BuffDefinitions'
-       Fields = [ordered]@{ Name = 'Id'; BuffVisualsKey = 'BuffVisual+8'; BuffType = 'BuffCategory' } }
+       # BuffVisualsKey has NO inset: it is the row half, which the reversal of 2026-08 put at
+       # the column start. The '+8' that stood here was the old rule, left behind when the
+       # offset itself was moved 0x5D -> 0x55 - so the check had been failing ever since.
+       Fields = [ordered]@{ Name = 'Id'; BuffVisualsKey = 'BuffVisual'; BuffType = 'BuffCategory' } }
     @{ Struct = 'MinimapIconRow';        Table = 'MinimapIcons'
        Fields = [ordered]@{ NamePtr = 'Id' } }
     @{ Struct = 'ItemVisualIdentityRow'; Table = 'ItemVisualIdentity'
        Fields = [ordered]@{ IdPtr = 'Id' } }
+    @{ Struct = 'QuestFlagsRow';         Table = 'QuestFlags'
+       Fields = [ordered]@{ Id = 'Id'; Hash32 = 'HASH32' } }
+    @{ Struct = 'NpcsRow';               Table = 'NPCs'
+       Fields = [ordered]@{ Id = 'Id'; Name = 'Name' } }
+    # The glossary. Three of its seven columns are decoded; the two unnamed strings are
+    # unnamed in the community schema too, and the two foreign references are null in every
+    # row seen. What pins it down is the ROW SIZE check below - 0x48 over five strings and
+    # two references is what identified the table in the first place.
+    @{ Struct = 'KeywordPopupsRow';      Table = 'KeywordPopups'
+       Fields = [ordered]@{ Id = 'Id'; Term = 'Term'; Definition = 'Definition' } }
 )
 
 function Invoke-SelfTest($schema) {
@@ -238,6 +257,26 @@ function Invoke-SelfTest($schema) {
             }
             else {
                 Write-Host "ok   $label -> $($row.Table).$($column.Name) ($($column.Type))$where" -ForegroundColor DarkGray
+            }
+        }
+
+        # AND THE TOTAL, where the struct declares one. The per-field checks above compare our
+        # offsets against columns computed with the SAME width table, so a width that is wrong
+        # everywhere at once passes every one of them - it moves our offsets and the computed
+        # ones together. The row size is the number that cannot hide from that, because it is
+        # also the STRIDE, and a stride is measurable in memory without any schema at all.
+        # That is how 0x26, 0x300 and 0xBF were confirmed, and how KeywordPopups' 0x48 was.
+        if ($struct.consts -and $struct.consts.RowSize) {
+            $declaredSize = [Convert]::ToInt32(([string]$struct.consts.RowSize).Replace('0x', ''), 16)
+            $computedSize = Get-RowSize $layout
+            if ($declaredSize -ne $computedSize) {
+                Write-Host ("FAIL {0}.RowSize - 0x{1:X} declared, {2} computes 0x{3:X} over {4} columns" `
+                    -f $row.Struct, $declaredSize, $row.Table, $computedSize, $layout.Count) -ForegroundColor Red
+                $failed++
+            }
+            else {
+                Write-Host ("ok   {0}.RowSize -> 0x{1:X} over {2} columns" `
+                    -f $row.Struct, $computedSize, $layout.Count) -ForegroundColor DarkGray
             }
         }
     }
