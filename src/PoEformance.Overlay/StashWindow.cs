@@ -148,7 +148,7 @@ public sealed class StashWindow
         PriceBook book = _prices.Book;
         Tally(view, book);
 
-        if (ImGui.Button("read the stash"))
+        if (ImGui.Button("Read the Stash"))
         {
             _inspector.ReadAgain();
         }
@@ -404,7 +404,7 @@ public sealed class StashWindow
 
         ImGui.SameLine();
 
-        if (ImGui.SmallButton("open the trade window"))
+        if (ImGui.SmallButton("Open the Trade Window"))
         {
             _signIn();
         }
@@ -443,7 +443,7 @@ public sealed class StashWindow
 
         bool running = _probing is not null;
         ImGui.BeginDisabled(running);
-        if (ImGui.SmallButton("ask the currency exchange once"))
+        if (ImGui.SmallButton("Ask the Currency Exchange Once"))
         {
             _probed = null;
             _probing = _probe();

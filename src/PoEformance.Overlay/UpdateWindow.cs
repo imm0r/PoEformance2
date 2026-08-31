@@ -119,7 +119,7 @@ public sealed class UpdateWindow
         }
 
         ImGui.Spacing();
-        if (ImGui.Button("Check now"))
+        if (ImGui.Button("Check Now"))
         {
             _check.Refresh();
         }
@@ -192,7 +192,7 @@ public sealed class UpdateWindow
                 break;
 
             case UpdateStep.Ready:
-                if (ImGui.Button("Install and restart"))
+                if (ImGui.Button("Install and Restart"))
                 {
                     _install();
                 }
@@ -206,7 +206,7 @@ public sealed class UpdateWindow
                 }
 
                 ImGui.SameLine();
-                if (ImGui.Button("Not this one"))
+                if (ImGui.Button("Not This One"))
                 {
                     _skip();
                 }

@@ -205,7 +205,7 @@ public sealed class DamageWindow
     /// </remarks>
     private void DrawGraphControls()
     {
-        OverlayLayout.Toggle("Reset per map", ref _thisMapOnly);
+        OverlayLayout.Toggle("Reset per Map", ref _thisMapOnly);
         OverlayLayout.Hint("Off keeps counting across areas, so the graph spans the session.");
 
         ImGui.SameLine();
@@ -245,13 +245,13 @@ public sealed class DamageWindow
     /// </remarks>
     private void DrawMeasurement()
     {
-        if (!OverlayLayout.Subsection("How the figure is measured"))
+        if (!OverlayLayout.Subsection("How the Figure Is Measured"))
         {
             return;
         }
 
         bool counting = _meter.CountKills;
-        if (OverlayLayout.Toggle("Track off-screen / vanished kills", ref counting))
+        if (OverlayLayout.Toggle("Track Off-Screen / Vanished Kills", ref counting))
         {
             _meter.CountKills = counting;
         }
@@ -275,7 +275,7 @@ public sealed class DamageWindow
             // went missing, GameHelper2's measured bubble near 200 - are all in grid, and a
             // control in its own private unit cannot be set from them.
             float limit = _meter.CreditWithin / MapView.WorldToGrid;
-            if (OverlayLayout.Slider("Max range", ref limit, 0f, 600f,
+            if (OverlayLayout.Slider("Max Range", ref limit, 0f, 600f,
                     limit <= 0f ? "any distance" : "%.0f grid"))
             {
                 _meter.CreditWithin = limit * MapView.WorldToGrid;
@@ -305,7 +305,7 @@ public sealed class DamageWindow
         }
 
         bool painting = heat.Enabled;
-        if (OverlayLayout.Toggle("Damage heatmap overlay", ref painting))
+        if (OverlayLayout.Toggle("Damage Heatmap Overlay", ref painting))
         {
             heat.Enabled = painting;
         }
@@ -374,7 +374,7 @@ public sealed class DamageWindow
         uint scope = _thisMapOnly ? CurrentArea : 0;
         IReadOnlyList<KillRecord> kills = _meter.Kills.In(scope);
 
-        if (!OverlayLayout.Subsection($"Rares and uniques ({kills.Count})###dmg-kills", openByDefault: true))
+        if (!OverlayLayout.Subsection($"Rares and Uniques ({kills.Count})###dmg-kills", openByDefault: true))
         {
             return;
         }

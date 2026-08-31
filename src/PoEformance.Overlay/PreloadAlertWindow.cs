@@ -65,7 +65,7 @@ public sealed class PreloadAlertWindow
     {
         Switches();
         ImGui.Spacing();
-        OverlayLayout.Group("What to watch for");
+        OverlayLayout.Group("What to Watch For");
         ImGui.Spacing();
         List();
     }
@@ -117,7 +117,7 @@ public sealed class PreloadAlertWindow
             _switched(wanted);
         }
 
-        if (ImGui.SmallButton("say it again now"))
+        if (ImGui.SmallButton("Say It Again Now"))
         {
             _sayItNow();
         }
@@ -351,7 +351,7 @@ public sealed class PreloadAlertWindow
         }
 
         ImGui.TableNextColumn();
-        if (ImGui.SmallButton("delete"))
+        if (ImGui.SmallButton("Delete"))
         {
             all.RemoveAt(at);
             return Edit.Shape;
@@ -376,7 +376,7 @@ public sealed class PreloadAlertWindow
             return;
         }
 
-        if (ImGui.SmallButton("add the shipped list"))
+        if (ImGui.SmallButton("Add the Shipped List"))
         {
             int added = _starter().Count(_watch.Add);
             if (added > 0)
@@ -417,7 +417,7 @@ public sealed class PreloadAlertWindow
         ImGui.SameLine();
 
         ImGui.BeginDisabled(string.IsNullOrWhiteSpace(_addPath));
-        if (ImGui.SmallButton("add"))
+        if (ImGui.SmallButton("Add"))
         {
             if (_watch.Add(new PreloadAlertEntry(
                     _addPath.Trim(),

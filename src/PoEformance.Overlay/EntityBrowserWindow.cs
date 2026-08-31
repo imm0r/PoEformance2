@@ -173,7 +173,7 @@ public sealed class EntityBrowserWindow
         if (_surveyPane)
         {
             ImGui.SameLine();
-            if (ImGui.Button("count again"))
+            if (ImGui.Button("Count Again"))
             {
                 _surveySequence++;
             }
@@ -244,7 +244,7 @@ public sealed class EntityBrowserWindow
     /// </remarks>
     private void DrawHideButtons(EntityView view, WorldEntity? chosen)
     {
-        if (ImGui.SmallButton("hide this kind"))
+        if (ImGui.SmallButton("Hide This Kind"))
         {
             _hiding.HideKind(view.Path);
         }
@@ -262,7 +262,7 @@ public sealed class EntityBrowserWindow
         if (chosen is { IsRemembered: false } entity)
         {
             ImGui.SameLine();
-            if (ImGui.SmallButton("hide just this one"))
+            if (ImGui.SmallButton("Hide Just This One"))
             {
                 _hiding.HideOne(entity.Path, entity.WorldX, entity.WorldY);
             }
@@ -297,7 +297,7 @@ public sealed class EntityBrowserWindow
         }
 
         ImGui.SameLine();
-        if (ImGui.SmallButton("show everything again"))
+        if (ImGui.SmallButton("Show Everything Again"))
         {
             _hiding.ShowEverything();
             return;
@@ -893,7 +893,7 @@ public sealed class EntityBrowserWindow
 
         DrawHideButtons(view, chosen);
 
-        if (ImGui.SmallButton("dissect the entity"))
+        if (ImGui.SmallButton("Dissect the Entity"))
         {
             _dissect(view.Address, view.Path, "Entity");
         }
@@ -901,7 +901,7 @@ public sealed class EntityBrowserWindow
         if (_compare is not null)
         {
             ImGui.SameLine();
-            if (ImGui.SmallButton("compare with##entity"))
+            if (ImGui.SmallButton("Compare With##entity"))
             {
                 _compare(view.Address, view.Path);
             }
@@ -948,7 +948,7 @@ public sealed class EntityBrowserWindow
                 ImGui.SameLine();
             }
 
-            if (ImGui.SmallButton($"dissect##{component.Address:X}"))
+            if (ImGui.SmallButton($"Dissect##{component.Address:X}"))
             {
                 // The component's own layout when the schema has one. When it does not - the
                 // whole reason to be here - the generic one still names the two rows every
