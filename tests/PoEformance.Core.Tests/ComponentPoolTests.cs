@@ -35,7 +35,15 @@ public class ComponentPoolTests
         ["Animated"] = 0x380,
         ["Buffs"] = 0x190,
         ["Inventories"] = 0x150,
+        // Two of the four undecoded components, here because the schema now carries their cells
+        // as consts and --sweep reads that many bytes: an unchecked number in the schema is a
+        // read width nobody would notice going wrong. The other two are deliberately absent -
+        // DiesAfterTime rests on seven gaps and Beam's divides only 69 of 88 across every
+        // recording, so neither clears the bar this test sets, and the sweep falls back to
+        // shorter reads rather than trusting them.
+        ["GroundEffect"] = 0xC0,
         ["Life"] = 0x420,
+        ["LimitedLifespan"] = 0x60,
 
         // 0x30, which makes Monster one of the smallest components in the game and is the
         // reason --hoverhunt reads the whole thing rather than the one byte it wanted: the

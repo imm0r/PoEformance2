@@ -345,6 +345,7 @@ PoEformance.App --replay session.rec           # rerun against the capture, no g
 PoEformance.App --record s.rec --questflags    # + read where a character's quest flags could be
 PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action fields (see below)
 PoEformance.App --record s.rec --hoverhunt    # + read the hovered-entity chain and the boss byte
+PoEformance.App --record s.rec --sweep        # + read four components nothing has a layout for
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
@@ -751,6 +752,56 @@ it was the allocations beside it.
 
 `Report` now *re-checks* the identification rather than restating it: one vtable, and the payload
 at the fixed offset, or it says the layout changed and to hunt it again.
+
+### The four components with no layout anywhere
+
+`--sweep` is the next capture, and the first question it settled was one about the *references*
+rather than the game. `LimitedLifespan`, `DiesAfterTime`, `GroundEffect` and `Beam` are the four
+unmodelled components the danger model actually needs, and **neither reference has a single field
+for any of them.** GameHelper2 registers layouts for 21 components and treats these as *markers* —
+its own note calls them "components present on entities but with no registered layout", and
+`Entity.cs` uses `DiesAfterTime` purely as "is this a temporary monster". The AHK tool's
+`DecodeDiesAfterTimeComponentBasic` reads the two header fields and stops. So there is nothing to
+copy and nothing to verify: this is a blind sweep, decoded afterwards against the file.
+
+**All four at once, and the numbers are why.** Each is tiny — measured pool cells `0x60`, `0x50`,
+`0xC0`, `0xA0` — so "the whole component" is complete by construction rather than a judgement
+about where to stop, the same argument that made `Monster` cheap to be thorough about. And they
+are not many at a time: across every committed recording the concurrent maxima are **39, 3, 11 and
+5**, so reading every carrier of all four costs under 9 KB a frame at the worst moment on file.
+There is no saving from doing them one at a time, and a real cost — these things appear during
+fights and the situations overlap, so four captures would be four fights and four chances to miss.
+
+Everything above was measured from the existing recordings **without reading a byte of any of the
+four**, which is the pool-cell trick applied a second time. What else it yielded, from the entity
+list alone:
+
+| Component | Carriers | At once | Measured lifetime |
+|---|---|---|---|
+| `LimitedLifespan` | `Effects/Effect`, `BeamEffect`, `ServerEffect` | 39 | median **0.5 s**, tail to 30 s |
+| `DiesAfterTime` | `Monsters/Totems/DarkEffigyTotem` | 3 | **7.2–19.1 s** |
+| `GroundEffect` | `VisibleServerGroundEffect` | 11 | **13.8–49.9 s** |
+| `Beam` | `BeamEffect` (0.5–0.6 s), `ServerBeamEffect` | 5 | **0.5–2.7 s** |
+
+Those lifetimes are not decoration — they are the decode. **A countdown must reach zero when the
+game stops listing the entity**, the entity list is in the same recording, so the check needs no
+prior belief about the layout and no argument: it is the game settling it. `Report` runs exactly
+that, and only over entities the capture saw both *arrive and leave* — one still listed on the
+last frame has no expiry to check against, and counting it would let a value that merely drifts
+down pass. The second signal is the same idea for space: **a position inside a component must be
+near the entity's own**, which is why every observation carries `Render.CurrentWorldPosition`
+alongside. Three floats in a plausible coordinate range prove nothing; three floats within a few
+units of where the game already says the entity is cannot happen by chance — and a beam's *far*
+end is then the interesting near-miss rather than a failure.
+
+The read width comes from the schema's `PoolCell`, with the companion hunt's ladder behind it:
+`DiesAfterTime`'s cell rests on seven gaps and `Beam`'s divides only 69 of 88, so a too-large read
+falls back to a shorter one rather than recording nothing. The two that *are* well measured —
+`LimitedLifespan` at 524 of 524 gaps, `GroundEffect` at 63 of 65 — are in the pool-cell audit;
+the two thin ones are deliberately not, because they do not clear its bar.
+
+`GroundEffect` is the one to record first if only one gets made: its carriers stand still for tens
+of seconds, so a person can point at one and let it run out.
 
 ### Next
 

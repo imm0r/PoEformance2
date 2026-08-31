@@ -235,6 +235,11 @@ internal static class Program
                 RunHoverHunt(reader, worldSchema, gameStatesAddress, recorder);
             }
 
+            if (options.SweepComponents)
+            {
+                RunComponentSweep(reader, worldSchema, gameStatesAddress, recorder);
+            }
+
             if (options.DumpAnimations)
             {
                 RunAnimationDump(reader, worldSchema, gameStatesAddress, recorder);
@@ -832,6 +837,75 @@ internal static class Program
         }
 
         PoEformance.Game.Diagnostics.HoverHunt.Report(samples, Console.Out);
+    }
+
+    private static void RunComponentSweep(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var sweep = new PoEformance.Game.Diagnostics.ComponentSweep(reader, schema);
+        var frames = new List<PoEformance.Game.Diagnostics.SweepFrame>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (sweep.SampleFrame(gameStatesStatic, (int)frame) is { } got)
+                {
+                    frames.Add(got);
+                }
+            }
+
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("component sweep - reading four components neither reference has a layout for.");
+            Console.WriteLine("  GET THE SITUATIONS ON SCREEN, and they are different for each:");
+            Console.WriteLine("    GroundEffect  - stand near burning/chilled/desecrated ground and LET IT RUN");
+            Console.WriteLine("                    OUT. They live 14-50 s; the expiry is the measurement.");
+            Console.WriteLine("    Beam          - a boss beam. They last half a second, so several is better");
+            Console.WriteLine("                    than one long look.");
+            Console.WriteLine("    DiesAfterTime - a totem, yours or the game's, watched until it vanishes.");
+            Console.WriteLine("    LimitedLifespan - any fight at all; these are everywhere and brief.");
+            Console.WriteLine("  WHAT MAKES A CAPTURE USEFUL is watching things EXPIRE while recording. A");
+            Console.WriteLine("  countdown is only provable against the frame the entity leaves the list.");
+            Console.WriteLine("  Any key to stop and report.");
+            Console.WriteLine();
+
+            int failures = 0, ticks = 0, frame = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (sweep.SampleFrame(gameStatesStatic, frame++) is { } got)
+                {
+                    failures = 0;
+                    frames.Add(got);
+                }
+                else
+                {
+                    failures++;
+                }
+
+                if (++ticks % 200 == 0)
+                {
+                    var counts = frames.SelectMany(f => f.Seen)
+                        .GroupBy(o => o.Component)
+                        .Select(g => $"{g.Key} {g.Select(o => o.EntityId).Distinct().Count()}")
+                        .ToList();
+                    Console.WriteLine($"  ... {frames.Count} frames; entities seen: "
+                        + (counts.Count > 0 ? string.Join(", ", counts) : "none yet"));
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.ComponentSweep.Report(frames, Console.Out);
     }
 
     private static void RunActionHunt(
@@ -2593,6 +2667,7 @@ internal static class Program
         bool HuntActions,
         bool HuntSkills,
         bool HuntHover,
+        bool SweepComponents,
         bool DumpAnimations,
         IReadOnlyList<string> Peek,
         bool PeekWatch,
@@ -2607,6 +2682,7 @@ internal static class Program
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false;
+            bool sweep = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -2696,6 +2772,14 @@ internal static class Program
                         hoverHunt = true;
                         break;
 
+                    // The components neither reference has a layout for. Blind, because there
+                    // is nothing to verify against - see ComponentSweep. Like the hunts above
+                    // it wants a person putting the situation on screen: a ground effect, a
+                    // beam, a totem running out.
+                    case "--sweep":
+                        sweep = true;
+                        break;
+
                     // Regenerates data/animations.tsv from the game. Not a hunt - nothing is
                     // being searched for any more - so it stops the moment the row array's base
                     // is confirmed rather than sampling for as long as somebody plays.
@@ -2745,7 +2829,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, animDump,
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep, animDump,
                 peek, peekWatch, updateOutcome, updatedVersion);
         }
     }
