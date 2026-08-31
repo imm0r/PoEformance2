@@ -195,6 +195,39 @@ public class HazardReadingTests
         Assert.Empty(withNumber.Intersect(withoutNumber));
     }
 
+    /// <summary>
+    /// The component is narrower than its name, and the rules are not made redundant by it.
+    /// </summary>
+    /// <remarks>
+    /// Worth a test because the opposite is the natural assumption, and acting on it would mean
+    /// deleting the path rules as superseded. Across every committed recording only two metadata
+    /// paths carry a GroundEffect: the VisibleServerGroundEffect and one Incursion smoke ground.
+    /// The GroundOnDeath monster mods - burning, shocked and chilled ground left by a dying
+    /// monster - carry none, and are refused by the noise filter's Daemon class before their
+    /// components are read at all.
+    ///
+    /// So a ring is a reliable YES about a hazard, and its absence says nothing either way.
+    /// </remarks>
+    [Fact]
+    public void OnlyAFewPathsCarryTheComponent_SoTheRulesStillHaveAJob()
+    {
+        var carriers = new HashSet<string>(StringComparer.Ordinal);
+        foreach ((double _, WorldSnapshot snapshot) in Snapshots())
+        {
+            foreach (WorldEntity e in snapshot.Entities.Where(e => e.IsGroundEffect))
+            {
+                carriers.Add(e.Path);
+            }
+        }
+
+        Assert.NotEmpty(carriers);
+
+        // A handful, not "everything that burns". If this ever grows a lot, the balance between
+        // the two mechanisms has changed and the tab's warning needs revisiting.
+        Assert.True(carriers.Count <= 4, $"{carriers.Count} paths carry it: {string.Join(", ", carriers)}");
+        Assert.Contains(carriers, p => p.Contains("ground_effects", StringComparison.OrdinalIgnoreCase));
+    }
+
     [Fact]
     public void BeamsReachTheSnapshotAsALineAnchoredOnTheirOwnEntity()
     {

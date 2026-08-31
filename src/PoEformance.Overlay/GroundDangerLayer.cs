@@ -210,6 +210,11 @@ public sealed class GroundDangerLayer
 
             DrawRing(draw, new Vector2(at.X, at.Y), colour, entity.GroundSeconds);
 
+            if (Settings.ShowGroundEffectLabels)
+            {
+                DrawLabel(draw, new Vector2(at.X, at.Y), colour, entity, radius);
+            }
+
             if (++drawn >= MostRings)
             {
                 break;
@@ -337,6 +342,59 @@ public sealed class GroundDangerLayer
             draw.AddText(centre - (size / 2), colour, text);
         }
     }
+
+    /// <summary>
+    /// Writes what the ring actually is, under it, for working out why it is where it is.
+    /// </summary>
+    /// <remarks>
+    /// A DEBUG AID AND SHAPED LIKE ONE. Two rings on a busy screen are two rings; which patch of
+    /// fire each belongs to, and whether a ring is missing entirely, cannot be worked out by
+    /// looking at circles. The full metadata path is written rather than the short name because
+    /// the path is what a person needs next: to type into a GroundDangerRule, to search a
+    /// recording for, or to say "this is not the thing I am standing in".
+    ///
+    /// THE NUMBERS BESIDE IT ARE THE OPEN QUESTIONS. The radius is printed because it is still a
+    /// candidate and a ring drawn at the wrong size is the symptom that settles it; the entity
+    /// id because two effects of one kind are otherwise indistinguishable; the countdown because
+    /// its absence is a fact about the effect rather than a gap - a third of them never have one.
+    ///
+    /// Below the ring, not on it: the ring is the thing being judged, and text through the
+    /// middle of it is text in the way of the judgement.
+    /// </remarks>
+    private void DrawLabel(ImDrawListPtr draw, Vector2 centre, uint colour, WorldEntity entity, float radius)
+    {
+        float bottom = centre.Y;
+        foreach (Vector2 p in _ring)
+        {
+            bottom = Math.Max(bottom, p.Y);
+        }
+
+        string detail = string.Create(
+            System.Globalization.CultureInfo.InvariantCulture,
+            $"#{entity.Id}  r={radius:0.##}  {(entity.GroundSeconds is { } left ? $"{left:0.0}s" : "no timer")}");
+
+        var at = new Vector2(centre.X, bottom + LabelGap);
+        foreach (string line in (string[])[entity.Path, detail])
+        {
+            Vector2 size = ImGui.CalcTextSize(line);
+            var origin = new Vector2(at.X - (size.X / 2), at.Y);
+
+            // A dark plate behind it. Ground effects are bright by nature and this text lands on
+            // top of one, where thin glyphs in the effect's own colour are unreadable.
+            draw.AddRectFilled(
+                origin - new Vector2(3, 1),
+                origin + size + new Vector2(3, 1),
+                LabelBackground);
+            draw.AddText(origin, colour, line);
+            at.Y += size.Y + 1;
+        }
+    }
+
+    /// <summary>Pixels between the bottom of the ring and the first line of the label.</summary>
+    private const float LabelGap = 3f;
+
+    /// <summary>The plate drawn behind label text, so it reads over a bright effect.</summary>
+    private const uint LabelBackground = 0xC0000000;
 
     /// <summary>The same colour at a different alpha. ImGui packs alpha in the top byte.</summary>
     private static uint WithAlpha(uint colour, float scale)
