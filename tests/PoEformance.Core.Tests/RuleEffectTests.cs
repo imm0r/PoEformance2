@@ -186,6 +186,104 @@ public class RuleEffectTests
         Assert.False(leaf.Holds(state, new RuleTimers(), "rule"));
     }
 
+    [Fact]
+    public void WatchesTheWeakestMonsterInRange_NotTheNearestOne()
+    {
+        // The cull question: "is anything in range nearly dead". Keyed on the LOWEST bar
+        // rather than the closest monster, because a full-health one stepping in front of the
+        // one that was about to die must not silence the rule - which is exactly the moment a
+        // cull is wanted.
+        var state = new RuleState
+        {
+            InGame = true,
+            Monsters =
+            [
+                new NearMonster(10, ItemRarity.Normal, 105, 100, 100),
+                new NearMonster(20, ItemRarity.Rare, 100, 92, 12),
+
+                // Out of the radius below, and lower than either of them: the radius is what
+                // decides, not the whole area.
+                new NearMonster(40, ItemRarity.Normal, -80, -60, 5),
+            ],
+        };
+
+        Assert.Equal(12, state.LowestMonsterLifePercent(30));
+        Assert.Equal(5, state.LowestMonsterLifePercent(100));
+        Assert.Equal(10, state.NearestMonster);
+
+        var cull = new RuleCondition
+        {
+            Fact = RuleFact.LowestMonsterLifePercent,
+            Compare = Compare.Below,
+            Value = 35,
+            Argument = 30,
+        };
+
+        Assert.True(cull.Holds(state, new RuleTimers(), "rule"));
+    }
+
+    [Fact]
+    public void NothingInRangeIsNoAnswer_NotAMonsterAtZeroHealth()
+    {
+        // The one trap this fact carries that the counts do not. An empty radius answering 0
+        // would satisfy "below 35" forever, so a rule whose whole job is to press a key would
+        // press it at the floor - and it would look like the feature working.
+        var state = new RuleState
+        {
+            InGame = true,
+            Monsters =
+            [
+                new NearMonster(80, ItemRarity.Normal, 0, 0, 4),
+
+                // In range, but its pool did not resolve. Skipped rather than counted as a
+                // monster at zero: Vital.Percent answers -1 for that, and the sentinel must not
+                // reach a comparison.
+                new NearMonster(10, ItemRarity.Normal, 5, 5),
+            ],
+        };
+
+        Assert.Null(state.LowestMonsterLifePercent(30));
+
+        var cull = new RuleCondition
+        {
+            Fact = RuleFact.LowestMonsterLifePercent,
+            Compare = Compare.Below,
+            Value = 35,
+            Argument = 30,
+        };
+
+        Assert.False(cull.Holds(state, new RuleTimers(), "rule"));
+
+        // And the other way round, which is the half a sentinel would get wrong quietly: an
+        // absent number satisfies no comparison, whichever direction it is written in.
+        Assert.False((cull with { Compare = Compare.AtLeast }).Holds(state, new RuleTimers(), "rule"));
+    }
+
+    [Fact]
+    public void MeasuresTheWeakestMonsterWhereTheCursorPoints()
+    {
+        // The same split the counts have: for a skill aimed at something, the weakest thing
+        // near the character is the wrong question.
+        var state = new RuleState
+        {
+            InGame = true,
+            CursorGround = (100f, 100f),
+            Monsters =
+            [
+                new NearMonster(10, ItemRarity.Normal, 105, 100, 60),
+                new NearMonster(12, ItemRarity.Rare, 100, 92, 20),
+                new NearMonster(14, ItemRarity.Normal, -80, -60, 3),
+            ],
+        };
+
+        Assert.Equal(20, state.LowestMonsterLifePercentAtCursor(30));
+        Assert.Equal(3, state.LowestMonsterLifePercent(30));
+
+        // A pointer that is not over the game answers nothing rather than answering about
+        // whatever stands nearest the edge of the world.
+        Assert.Null((state with { CursorGround = null }).LowestMonsterLifePercentAtCursor(500));
+    }
+
     [Theory]
     [InlineData("Q", 0x51)]
     [InlineData("q", 0x51)]
