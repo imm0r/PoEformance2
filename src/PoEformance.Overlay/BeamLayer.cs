@@ -164,6 +164,13 @@ public sealed class BeamLayer
         // Two nested quads rather than one flat fill: the wider, fainter one is what keeps the
         // band from ending in a hard line against a dark floor, and it is the cheapest stand-in
         // for the game's own soft edge that a draw list without shaders can manage.
+        //
+        // HOW SEE-THROUGH THAT LEAVES THE MIDDLE, worked out rather than eyeballed, because the
+        // preview render used to check the shape does not composite alpha and made this look
+        // solid: the two passes overlap, so the interior is 1 - (1 - 0.10a)(1 - 0.20a) of the
+        // configured colour's alpha a. At the default a = 0xE6 that is 25% opaque, and even at a
+        // fully opaque colour it is 28% - the band never stops being something you can see the
+        // fight through, whatever colour is picked for it.
         draw.AddQuadFilled(a + glow, b + glow, b - glow, a - glow, WithAlpha(colour, 0.10f));
 
         // The body stays well under the chosen alpha: this sits over the fight for as long as

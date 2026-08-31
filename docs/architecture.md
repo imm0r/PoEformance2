@@ -894,6 +894,17 @@ The two shapes come from Path of Exile's own idiom, and they were built by rende
 to a file and looking at it before it shipped — twice each, because the first attempt was wrong
 both times.
 
+**What that render could and could not settle**, because it was trusted too far once. It settles
+SHAPE: the chevrons being squat rather than dart-like, and the arms forming an X rather than a
+plus, are both plainly visible in a picture and both were caught there. It does NOT settle
+OPACITY, and the first version of the preview actively lied about it — PIL's `ImageDraw` writes a
+colour and its alpha straight into the pixel instead of compositing it, so a 20%-alpha fill came
+back as the full colour and the band's interior rendered near-white. That produced one wrong
+conclusion (the ground ring's fill was dropped partly on the strength of it; the reference has no
+fill either, so the decision survives on better evidence) and nearly produced a second. Alpha is
+arithmetic and belongs in arithmetic: the beam's interior is `1 − (1 − 0.09)(1 − 0.18)` = **25%
+opaque**, and at a fully opaque configured colour it would still be 28%.
+
 **A ground effect is a ring on the floor with an X through it.** Not a screen-space circle: the
 ring is a circle of world radius projected point by point, so it lies on the ground, foreshortens
 as the ground does, and shrinks as the camera pulls back. Nothing is filled — the reference leaves
