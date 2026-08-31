@@ -107,51 +107,52 @@ public sealed class TrackerWindow
         AimSettings aim = settings.AimOrDefault;
 
         bool on = aim.Enabled;
-        if (ImGui.Checkbox("draw a ray along each monster's facing", ref on))
+        if (OverlayLayout.Toggle("Draw a ray along each monster's facing", ref on))
         {
             _write(settings with { Aim = aim with { Enabled = on } });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "the game keeps no target - it aims by TURNING, so the facing is the aim as exactly"
-            + " as the game has it.");
-        ImGuiText.Hint(
-            WarnText,
-            "it is not a promise of where a skill lands: many attacks lock direction at the"
-            + " start, and homing ones ignore facing.");
+        // HOW IT WORKS goes in the tooltip; WHAT NOT TO TRUST stays on screen, and only while
+        // the rays are actually being drawn. The caveat is the one thing here somebody could
+        // get wrong in a way that costs them a death.
+        OverlayLayout.Hint(
+            "The game keeps no target - it aims by TURNING, so the facing is the aim as exactly"
+            + " as the game has it. Drawing this makes the reader read a facing and an animation"
+            + " per monster; watch the Read cost tab.");
 
         if (on)
         {
-            ImGuiText.Hint(
-                DimText,
-                "this makes the reader read a facing and an animation per monster; watch the"
-                + " Read cost tab.");
+            OverlayLayout.Warning(
+                "Not a promise of where a skill lands: many attacks lock direction at the start,"
+                + " and homing ones ignore facing.");
         }
 
         bool acting = aim.OnlyWhileActing;
-        if (ImGui.Checkbox("only while doing something", ref acting))
+        if (OverlayLayout.Toggle("Only while doing something", ref acting))
         {
             _write(settings with { Aim = aim with { OnlyWhileActing = acting } });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
+
         bool turn = aim.ShowTurn;
-        if (ImGui.Checkbox("show the turn", ref turn))
+        if (OverlayLayout.Toggle("Show the turn", ref turn))
         {
             _write(settings with { Aim = aim with { ShowTurn = turn } });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(2);
+
         bool action = aim.ShowAction;
-        if (ImGui.Checkbox("name the action", ref action))
+        if (OverlayLayout.Toggle("Name the action", ref action))
         {
             _write(settings with { Aim = aim with { ShowAction = action } });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(3);
+
         bool player = aim.ShowPlayer;
-        if (ImGui.Checkbox("and your own", ref player))
+        if (OverlayLayout.Toggle("And your own", ref player))
         {
             _write(settings with { Aim = aim with { ShowPlayer = player } });
         }
@@ -293,11 +294,18 @@ public sealed class TrackerWindow
 
         MonsterLineSettings lines = settings.LinesOrDefault;
 
-        ImGui.TextColored(DimText, "drawn from your own feet, so the eye can follow one out of a crowd.");
+        // THREE SWITCHES ON ONE LINE. They are one setting asked three times - which rarities
+        // get a line - so they belong in a row rather than stacked down the page with a
+        // paragraph over them. The paragraph itself is a tooltip on the first: what it says
+        // is true of all three and is read once.
+        (bool unique, string uniqueColour) = Line("Unique", lines.Unique, lines.UniqueColour);
+        OverlayLayout.Hint("Drawn from your own feet, so the eye can follow one out of a crowd.");
 
-        (bool unique, string uniqueColour) = Line("unique", lines.Unique, lines.UniqueColour);
-        (bool rare, string rareColour) = Line("rare", lines.Rare, lines.RareColour);
-        (bool magic, string magicColour) = Line("magic", lines.Magic, lines.MagicColour);
+        OverlayLayout.Cell(1);
+        (bool rare, string rareColour) = Line("Rare", lines.Rare, lines.RareColour);
+
+        OverlayLayout.Cell(2);
+        (bool magic, string magicColour) = Line("Magic", lines.Magic, lines.MagicColour);
 
         var wanted = new MonsterLineSettings(
             unique, rare, magic, uniqueColour, rareColour, magicColour);
@@ -346,35 +354,50 @@ public sealed class TrackerWindow
     private void DrawKnownHazards(TrackerSettings settings)
     {
         bool ground = settings.ShowGroundEffects;
-        if (ImGui.Checkbox("ring every ground effect the GAME marks as one", ref ground))
+        if (OverlayLayout.Toggle("Ring every ground effect the game marks as one", ref ground))
         {
             _write(settings with { ShowGroundEffects = ground });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "no rule needed: this asks the entity whether it carries a GroundEffect component,"
+        OverlayLayout.Hint(
+            "No rule needed: this asks the entity whether it carries a GroundEffect component,"
             + " which is the game's own answer, and reads the countdown out of it.");
 
-        ImGuiText.Hint(
-            WarnText,
-            "IT DOES NOT COVER EVERY HAZARD. Only two metadata paths have ever been seen"
-            + " carrying that component; the GroundOnDeath monster mods carry none, and their"
-            + " paths are refused by the noise filter's Daemon class before they are read at"
-            + " all. A patch of fire with no ring is that, not a bug - the rules below are"
-            + " still what covers it.");
+        // WHAT IT CANNOT DO stays on screen, because the way this fails is that a hazard has no
+        // ring - which looks exactly like the feature being broken, and sends somebody looking
+        // for a bug that is not there. Only while it is on: switched off, "it does not cover
+        // everything" is not a caveat, it is noise.
+        if (ground)
+        {
+            OverlayLayout.Warning(
+                "Does not cover every hazard. A patch of fire with no ring is that, not a bug -"
+                + " the rules below are still what covers it.");
+            OverlayLayout.Hint(
+                "Only two metadata paths have ever been seen carrying that component. The"
+                + " GroundOnDeath monster mods carry none, and their paths are refused by the"
+                + " noise filter's Daemon class before they are read at all.");
+        }
 
         bool gameRadius = settings.GroundEffectUseGameRadius;
-        if (ImGui.Checkbox("size it from the component's own radius", ref gameRadius))
+        if (OverlayLayout.Toggle("Size it from the component's own radius", ref gameRadius))
         {
             _write(settings with { GroundEffectUseGameRadius = gameRadius });
         }
 
-        ImGuiText.Hint(
-            WarnText,
-            "that value is a CANDIDATE, not a measurement - a float in the right range that"
-            + " nothing has confirmed. Drawing it IS the experiment: if the ring hugs the"
-            + " burning patch it is the radius, and if it does not, switch this off and say so.");
+        OverlayLayout.Hint(
+            "The alternative is the fixed size below. Drawing this IS the experiment: if the ring"
+            + " hugs the burning patch it is the radius, and if it does not, switch it off and"
+            + " say so.");
+
+        // The one caveat that has to be read BEFORE trusting what is on screen, so it cannot be
+        // a tooltip: the number being drawn is a guess, and a ring drawn from a guess looks
+        // exactly like a ring drawn from a measurement.
+        if (gameRadius)
+        {
+            OverlayLayout.Warning(
+                "That value is a CANDIDATE, not a measurement - a float in the right range that"
+                + " nothing has confirmed.");
+        }
 
         float radius = settings.GroundEffectRadius;
         if (OverlayLayout.Narrow.Slider("##groundradius", ref radius, 3f, 150f, "%.0f world units"))
@@ -382,8 +405,7 @@ public sealed class TrackerWindow
             _write(settings with { GroundEffectRadius = radius });
         }
 
-        ImGuiText.Hint(
-            DimText,
+        OverlayLayout.Hint(
             "WORLD units, not pixels: the ring is a circle on the floor, so it foreshortens and"
             + " shrinks with the camera. Used when the switch above is off.");
 
@@ -400,39 +422,36 @@ public sealed class TrackerWindow
 
         ImGui.SameLine();
         bool timer = settings.ShowGroundEffectTimer;
-        if (ImGui.Checkbox("seconds left", ref timer))
+        if (OverlayLayout.Toggle("Seconds left", ref timer))
         {
             _write(settings with { ShowGroundEffectTimer = timer });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "the number sits at 0.0 for a beat before the ring goes - the game's countdown"
-            + " reaches zero a measured 0.38 s before it stops listing the effect, and a third"
-            + " of effects have no timer at all and simply show none.");
+        OverlayLayout.Hint(
+            "The number sits at 0.0 for a beat before the ring goes - the game's countdown"
+            + " reaches zero a measured 0.38 s before it stops listing the effect. A third of"
+            + " effects have no timer at all and simply show none.");
 
         bool labels = settings.ShowGroundEffectLabels;
-        if (ImGui.Checkbox("label each ring with its metadata path (debug)", ref labels))
+        if (OverlayLayout.Toggle("Label each ring with its metadata path", ref labels))
         {
             _write(settings with { ShowGroundEffectLabels = labels });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "for working out which patch a ring belongs to, and whether one is MISSING. Prints"
+        OverlayLayout.Hint(
+            "For working out which patch a ring belongs to, and whether one is MISSING. Prints"
             + " the path, the entity id, the radius being used and the countdown. A hazard the"
             + " game draws but this does not ring will have no label anywhere near it - that is"
             + " the case worth reporting.");
 
         bool beams = settings.ShowBeams;
-        if (ImGui.Checkbox("draw boss beams as the PATH they occupy", ref beams))
+        if (OverlayLayout.Toggle("Draw boss beams as the path they occupy", ref beams))
         {
             _write(settings with { ShowBeams = beams });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "both ends come from the beam's own component, so this is the whole path rather than"
+        OverlayLayout.Hint(
+            "Both ends come from the beam's own component, so this is the whole path rather than"
             + " a ring on one end of it - a beam runs up to eleven hundred world units, and the"
             + " chevrons run towards the end that matters.");
 
@@ -442,11 +461,9 @@ public sealed class TrackerWindow
             _write(settings with { BeamThickness = beamThickness });
         }
 
-        ImGuiText.Hint(
-            WarnText,
-            "the WIDTH is decoration and carries no claim: the component has no thickness field"
-            + " that survived checking, so a band drawn to look like a danger zone would be an"
-            + " invention. The line down its middle is the measured part.");
+        OverlayLayout.Hint(
+            "The component has no thickness field that survived checking, so a band drawn to look"
+            + " like a danger zone would be an invention.");
 
         ImGui.SameLine();
         Vector4 beamColour = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(settings.BeamColour));
@@ -456,6 +473,14 @@ public sealed class TrackerWindow
             {
                 BeamColour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(beamColour)),
             });
+        }
+
+        // The width is a slider, so it invites being turned up until the band looks like the
+        // danger zone - and it is not one. That has to be readable while the beams are drawn,
+        // not hidden under a pointer.
+        if (beams)
+        {
+            OverlayLayout.Warning("The width is decoration. Only the line down its middle is measured.");
         }
     }
 
@@ -471,25 +496,27 @@ public sealed class TrackerWindow
         ImGui.Separator();
 
         bool on = settings.ShowGroundDanger;
-        if (ImGui.Checkbox("ring the ground effects below", ref on))
+        if (OverlayLayout.Toggle("Ring the ground effects below", ref on))
         {
             _write(settings with { ShowGroundDanger = on });
         }
 
-        // The two reasons this draws nothing while being configured correctly, said HERE
-        // rather than left to be discovered. Both are deliberate rules elsewhere in the
-        // reader, and neither is guessable from an overlay that stays empty.
-        ImGuiText.Hint(
-            DimText,
-            "the radius is in SCREEN PIXELS, not world units - it does not shrink as the camera pulls back.");
-        ImGuiText.Hint(
-            WarnText,
-            "nothing appears? the reader drops hostile ground effects unless the Effects tab's"
-            + " \"keep them\" is on, and the noise filter refuses the engine's /fx/ and /mat/"
-            + " nodes before they are read at all.");
-        ImGuiText.Hint(
-            DimText,
-            "the Effects tab lists what IS being read, with paths - copy the start of one into a rule.");
+        OverlayLayout.Hint(
+            "The radius is in SCREEN PIXELS, not world units - it does not shrink as the camera"
+            + " pulls back. The Effects tab lists what IS being read, with paths: copy the start"
+            + " of one into a rule.");
+
+        // The reason this draws nothing while being configured correctly. It stays on screen
+        // rather than going in the tooltip because it is the answer to "it is not working",
+        // and somebody asking that has already stopped hovering things - but only while the
+        // rings are switched on, since off is a perfectly good reason for nothing to appear.
+        if (on)
+        {
+            OverlayLayout.Warning(
+                "Nothing appearing? The reader drops hostile ground effects unless the Effects"
+                + " tab's \"keep them\" is on, and the noise filter refuses the engine's /fx/ and"
+                + " /mat/ nodes before they are read at all.");
+        }
 
         List<GroundDangerRule> rules = [.. settings.GroundDangerOrDefault];
         bool edited = false;
@@ -649,24 +676,24 @@ public sealed class TrackerWindow
         }
 
         bool player = settings.ShowPlayerStatus;
-        if (ImGui.Checkbox("over the player", ref player))
+        if (OverlayLayout.Toggle("Over the player", ref player))
         {
             _write(settings with { ShowPlayerStatus = player });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
         bool monsters = settings.ShowMonsterStatus;
-        if (ImGui.Checkbox("over rare and unique monsters", ref monsters))
+        if (OverlayLayout.Toggle("Over rare and unique monsters", ref monsters))
         {
             _write(settings with { ShowMonsterStatus = monsters });
         }
 
-        // Said next to the switch that carries it, like the projectile tab's warning: this is
-        // the only setting in here that makes the READER do more work per monster.
-        ImGuiText.Hint(
-            DimText,
-            "the monster half makes the reader read a Buffs component per rare-or-better"
-            + " monster; watch the Read cost tab.");
+        // On the switch that carries it rather than under the pair: this is the only setting in
+        // here that makes the READER do more work per monster, and it is the monster half that
+        // does it - a note under both says it of both.
+        OverlayLayout.Hint(
+            "Makes the reader read a Buffs component per rare-or-better monster; watch the Read"
+            + " cost tab.");
 
         // Titled rules between the blocks, like the alerts tab: five near-identical control
         // rows in a stack read as one that lost its order, and a hairline does not say where
@@ -708,34 +735,30 @@ public sealed class TrackerWindow
 
         if (settings.IconSheet.Length == 0)
         {
-            ImGuiText.Hint(
-                DimText,
-                "no sheet: each effect is drawn as its coloured disc with its own caption on it.");
+            OverlayLayout.Note("No sheet - each effect is drawn as its coloured disc with its own caption.");
             return;
         }
 
         IconCache.Picture sheet = _sheet();
         if (!sheet.Ready)
         {
-            ImGuiText.Hint(WarnText, "that file did not load - see the Appearance tab for the reason.");
+            OverlayLayout.Warning("That file did not load - see the Appearance tab for the reason.");
             return;
         }
 
         int columns = Math.Max(1, sheet.Width / settings.IconTile);
         int rows = Math.Max(1, sheet.Height / settings.IconTile);
-        ImGuiText.Hint(
-            GoodText,
-            $"loaded: {sheet.Width}x{sheet.Height}, which is {columns} x {rows} tiles of {settings.IconTile}px");
+        OverlayLayout.Note(
+            $"Loaded {sheet.Width}x{sheet.Height}, which is {columns} x {rows} tiles of {settings.IconTile}px.");
 
         // A sheet that is not a whole number of tiles across is the symptom BOTH of a wrong
         // tile size and of a sheet so large it was shrunk on the way in - and either way every
         // icon lands part way between two of them, which reads as the coordinates being wrong.
         if (sheet.Width % settings.IconTile != 0 || sheet.Height % settings.IconTile != 0)
         {
-            ImGuiText.Hint(
-                WarnText,
-                $"that is not a whole number of {settings.IconTile}px tiles - either the tile size is"
-                + $" wrong, or the sheet is over {IconCache.MaxSheetEdge}px and was shrunk to fit.");
+            OverlayLayout.Warning(
+                $"Not a whole number of {settings.IconTile}px tiles - either the tile size is wrong,"
+                + $" or the sheet is over {IconCache.MaxSheetEdge}px and was shrunk to fit.");
         }
     }
 

@@ -457,8 +457,7 @@ public sealed class StashWindow
             ImGui.TextColored(DimText, "asking...");
         }
 
-        ImGuiText.Hint(
-            DimText,
+        OverlayLayout.Hint(
             "A one-off diagnostic. It reads the site's own currency ids and asks the live exchange "
             + "what one Divine costs in Exalted - the number every figure here is displayed "
             + "through. Shown with the rate-limit headers and one listing exactly as the site "

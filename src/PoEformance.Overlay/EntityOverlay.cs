@@ -3123,7 +3123,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         bool calibration = ShowCalibration;
-        if (ImGui.Checkbox("Calibration aids  (screen centre and both candidate heights)", ref calibration))
+        if (OverlayLayout.Toggle("Calibration aids", ref calibration))
         {
             ShowCalibration = calibration;
         }

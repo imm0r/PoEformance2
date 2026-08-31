@@ -69,22 +69,22 @@ public sealed class EffectWindow
         ImGui.Separator();
 
         bool drawing = _layer.Enabled;
-        if (ImGui.Checkbox("draw them in the world", ref drawing))
+        if (OverlayLayout.Toggle("Draw them in the world", ref drawing))
         {
             _layer.Enabled = drawing;
             _changed();
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
         bool paths = _layer.ShowPaths;
-        if (ImGui.Checkbox("with their paths", ref paths))
+        if (OverlayLayout.Toggle("With their paths", ref paths))
         {
             _layer.ShowPaths = paths;
             _changed();
         }
 
         bool keeping = _layer.KeepHostile;
-        if (ImGui.Checkbox("keep the hostile ground effects  (the reader drops them)", ref keeping))
+        if (OverlayLayout.Toggle("Keep the hostile ground effects", ref keeping))
         {
             _layer.KeepHostile = keeping;
             _changed();
@@ -92,15 +92,14 @@ public sealed class EffectWindow
 
         // Said next to the switch, because the reason it is off is the reason a screen full of
         // enemy markers once looked like a broken overlay rather than a working Firewall.
-        ImGuiText.Hint(
-            DimText,
-            "a flame wall carries Life and a position, so kept as monsters they were drawn"
-            + " as enemies and given health bars.");
+        OverlayLayout.Hint(
+            "A flame wall carries Life and a position, so kept as monsters they were drawn as"
+            + " enemies and given health bars.");
 
         if (_noise is NoiseFilter noise)
         {
             bool engine = !noise.IsOn(NoiseKind.Engine) || !noise.Enabled;
-            if (ImGui.Checkbox("let the engine's own nodes through  (/fx/, /mat/, /epk/ ...)", ref engine))
+            if (OverlayLayout.Toggle("Let the engine's own nodes through", ref engine))
             {
                 noise.Set(NoiseKind.Engine, !engine);
                 _changed();
@@ -108,10 +107,9 @@ public sealed class EffectWindow
 
             if (engine)
             {
-                ImGuiText.Hint(
-                    WarnText,
-                    "these are the most numerous entities in the game and each costs a"
-                    + " component read - expect the read cost to climb.");
+                OverlayLayout.Warning(
+                    "These are the most numerous entities in the game and each costs a component"
+                    + " read - expect the read cost to climb.");
             }
         }
 
