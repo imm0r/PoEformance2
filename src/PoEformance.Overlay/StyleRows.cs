@@ -72,7 +72,7 @@ public sealed class StyleRows
                 continue;
             }
 
-            if (_groups.Length > 1 && !OverlayFonts.SectionHeader(group))
+            if (_groups.Length > 1 && !OverlayLayout.Subsection(group))
             {
                 continue;
             }

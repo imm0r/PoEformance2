@@ -65,7 +65,7 @@ public sealed class PreloadAlertWindow
     {
         Switches();
         ImGui.Spacing();
-        OverlayFonts.SectionTitle("what to watch for");
+        OverlayLayout.Group("What to watch for");
         ImGui.Spacing();
         List();
     }
