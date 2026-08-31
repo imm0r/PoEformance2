@@ -179,6 +179,50 @@ public class ComponentPoolTests
     }
 
     [Fact]
+    public void EverySchemaFieldFitsInsideItsComponentsPoolCell()
+    {
+        // The audit the cell measurement makes possible, over every component at once. A field
+        // past its cell cannot be in the object, so this REFUTES an offset without a byte of it
+        // ever having been read - which is the whole reason to measure cells rather than just
+        // note them. It runs in seconds and needs no game.
+        //
+        // It passes today on all twenty modelled components. That is a result rather than a
+        // formality: several of those offsets came out of a reference for a different client
+        // and had nothing but provenance behind them, and this is the first thing that has
+        // checked them against the object they claim to sit in.
+        OffsetSchema schema = RealSessionTests.Schema();
+
+        // The game names two components differently from the schema, which is a fact about the
+        // schema rather than about the game - the readers look them up by the game's name.
+        var aliases = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["NPC"] = "Npc",
+            ["WorldItem"] = "WorldItemComponent",
+        };
+
+        int audited = 0;
+        foreach ((string component, ulong cell) in Cells)
+        {
+            string name = aliases.GetValueOrDefault(component, component);
+            if (!schema.Structs.TryGetValue(name, out StructDef? def) || def.Fields.Count == 0)
+            {
+                continue;
+            }
+
+            audited++;
+            foreach (FieldDef field in def.Fields)
+            {
+                int end = field.Offset + FieldTypes.SizeOf(field.Type);
+                Assert.True(end <= (int)cell,
+                    $"{name}.{field.Name} ends at 0x{end:X} but the {component} pool cell is 0x{cell:X}"
+                    + " - the field cannot be inside the component");
+            }
+        }
+
+        Assert.True(audited >= 8, $"only {audited} components had both a cell and fields");
+    }
+
+    [Fact]
     public void LifeHasRoomForTheThreeVitalsNothingHasEverRead()
     {
         OffsetSchema schema = RealSessionTests.Schema();

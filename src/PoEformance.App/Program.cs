@@ -227,6 +227,14 @@ internal static class Program
                 RunSkillHunt(reader, worldSchema, gameStatesAddress, recorder);
             }
 
+            // The two questions nineteen recordings cannot answer, for the one reason a
+            // recording ever cannot: nothing has ever read those bytes. This switch exists to
+            // put them in a --record file - see HoverHunt.
+            if (options.HuntHover)
+            {
+                RunHoverHunt(reader, worldSchema, gameStatesAddress, recorder);
+            }
+
             if (options.DumpAnimations)
             {
                 RunAnimationDump(reader, worldSchema, gameStatesAddress, recorder);
@@ -755,6 +763,77 @@ internal static class Program
     /// for the conclusions - the recording IS the session, which is the property every other
     /// hunt here is built around.
     /// </summary>
+    /// <summary>
+    /// Samples the hover chain and every monster's Monster component while a person points at
+    /// things.
+    /// </summary>
+    /// <remarks>
+    /// The shape of --actionhunt and for the same reason: what settles these is a person doing
+    /// something deliberate while the reads happen. Against a replay it steps the recording's
+    /// frames instead, so a session captured once can be re-scored after every change to what
+    /// the bytes are thought to mean.
+    /// </remarks>
+    private static void RunHoverHunt(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var hunt = new PoEformance.Game.Diagnostics.HoverHunt(reader, schema);
+        var samples = new List<PoEformance.Game.Diagnostics.HoverSample>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    samples.Add(sample);
+                }
+            }
+
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("hover hunt - reading the two candidates nothing else in this tool reads.");
+            Console.WriteLine("  HOVER MONSTERS DELIBERATELY: put the cursor on one, hold it there a beat,");
+            Console.WriteLine("  move it off onto empty ground, then onto another. The off-target moments");
+            Console.WriteLine("  matter as much as the on-target ones - a slot that never changes is not an");
+            Console.WriteLine("  answer, and only the contrast can tell 'nothing hovered' from a wrong offset.");
+            Console.WriteLine("  FOR THE BOSS BYTE: have a unique or boss monster on screen at some point.");
+            Console.WriteLine("  Any key to stop and report.");
+            Console.WriteLine();
+
+            int failures = 0, ticks = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    failures = 0;
+                    samples.Add(sample);
+                }
+                else
+                {
+                    failures++;
+                }
+
+                if (++ticks % 200 == 0)
+                {
+                    int named = samples.Count(s => s.EntityPath.Length > 0);
+                    Console.WriteLine($"  ... {samples.Count} frames, {named} with an entity in the slot");
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.HoverHunt.Report(samples, Console.Out);
+    }
+
     private static void RunActionHunt(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
     {
@@ -2513,6 +2592,7 @@ internal static class Program
         bool ScanHeap,
         bool HuntActions,
         bool HuntSkills,
+        bool HuntHover,
         bool DumpAnimations,
         IReadOnlyList<string> Peek,
         bool PeekWatch,
@@ -2526,7 +2606,7 @@ internal static class Program
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
-            bool actionHunt = false, skillHunt = false, animDump = false;
+            bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -2609,6 +2689,13 @@ internal static class Program
                         skillHunt = true;
                         break;
 
+                    // Hovers and bosses: the two candidates that have sat unverified because
+                    // no build reads them, so no capture contains them. Separate from the
+                    // others because it wants a person deliberately pointing at things.
+                    case "--hoverhunt":
+                        hoverHunt = true;
+                        break;
+
                     // Regenerates data/animations.tsv from the game. Not a hunt - nothing is
                     // being searched for any more - so it stops the moment the row array's base
                     // is confirmed rather than sampling for as long as somebody plays.
@@ -2658,8 +2745,8 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, animDump, peek, peekWatch,
-                updateOutcome, updatedVersion);
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, animDump,
+                peek, peekWatch, updateOutcome, updatedVersion);
         }
     }
 }
