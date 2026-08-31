@@ -697,14 +697,29 @@ instead of concluding from its absence, and `HoverHuntTests` pins the sentence i
 The next capture needs a boss in front of the cursor; until then the schema keeps the hypothesis
 labelled as one.
 
-**And one thing the windows found that nobody was looking for.** Over 466 sampled frames, *two*
-slots on the sub-object separate hovering from not: `+0xA8` and `+0xC8` are both null in all 394
-idle frames and non-null in all 72 hovering ones. They differ in what they hold — `+0xA8` took
-15 distinct values, every one an entity in the game's list; `+0xC8` took 71, none of them in the
-list at all. A pointer allocated fresh five times as often as the hover changes reads like the
-tooltip or highlight record built for it, but that is a guess and it stays out of the schema's
-fields until somebody follows it. It exists here only because the hunt recorded a window it did
-not understand — which is the argument for windows, made a second time.
+**And one thing the windows found that nobody was looking for.** *Two* slots on the sub-object
+separate hovering from not: `+0xA8` and `+0xC8` are both null in every idle frame and non-null
+in every hovering one, so either would serve as "is something hovered". They differ in what they
+hold, and the second was then pushed as far as one recording goes. It exists here only because
+the hunt recorded a window it did not understand — the argument for windows, made a second time.
+
+What the file settles about `+0xC8`, without a new capture:
+
+- **It is reallocated per frame, not per hover.** 135 distinct values across 143 hovering
+  frames, and it changed on 108 of the 115 frame pairs where *the same entity stayed hovered*.
+  That kills the obvious guess — a tooltip or highlight record built when the hover starts.
+- **It is no entity's component.** 0 of 143 values match any address in the game's own component
+  tables, which this capture contains for every listed entity.
+- **It is not a `make_shared` pair.** The last slot hunted in this project (`+0x2358`) resolved
+  as `_Ptr` always sitting at `_Rep + 0x10`; here no slot in the whole `0x400` window holds
+  `+0xC8`'s value offset by any small constant, and it does not point inside the sub-object.
+- **Shape:** every value 16-byte aligned, neighbouring ones `0x10`–`0x40` apart.
+
+So: a small object the game rebuilds every frame while the cursor is on something. What it
+*holds* is the one question left, and **no committed recording contains a byte of it** — the
+pointer was captured, its target never was. `--hoverhunt` follows it now, with a ladder of
+window sizes (`0x200 → 0x80 → 0x20 → 0x10`) rather than one size, because a single read is
+all-or-nothing and a too-large window off a small object records nothing at all.
 
 ### Next
 

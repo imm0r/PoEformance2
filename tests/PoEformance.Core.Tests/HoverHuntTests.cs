@@ -237,6 +237,64 @@ public class HoverHuntTests
         Assert.DoesNotContain("0x27 is not this flag", report, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// The second cursor-tracking slot: what the file settles, and where it stops.
+    /// </summary>
+    /// <remarks>
+    /// `sub+0xC8` tracks the cursor exactly as `+0xA8` does and is not the entity. The offline
+    /// half of that question was taken as far as it goes against this capture, and the answer is
+    /// mostly NEGATIVE - which is worth pinning, because each negative removes a guess that
+    /// would otherwise look reasonable to the next person: it is reallocated per FRAME rather
+    /// than per hover, so it is not a tooltip record built when the hover starts.
+    ///
+    /// And then it stops, for the reason this whole file keeps running into: the pointer is in
+    /// the recording, its TARGET is not, because nothing read it. The hunt follows it now; until
+    /// a capture is made with that build, `CompanionRead` is 0 and the report has to say so
+    /// rather than implying the bytes are there.
+    /// </remarks>
+    [Fact]
+    public void TheCompanionSlotTracksTheCursorButItsTargetIsInNoRecording()
+    {
+        using var replay = ReplayMemoryReader.Load(File.OpenRead(Fixture("session-2026-08-hoverhunt.rec")));
+        OffsetSchema schema = RealSessionTests.Schema();
+        var hunt = new HoverHunt(replay, schema);
+        ulong gameStates = replay.ResolvedStatics["GameStates"];
+
+        var samples = new List<HoverSample>();
+        for (uint frame = 0; frame < replay.FrameCount; frame++)
+        {
+            replay.Seek(frame);
+            if (hunt.SampleFrame(gameStates) is { } sample)
+            {
+                samples.Add(sample);
+            }
+        }
+
+        List<HoverSample> set = [.. samples.Where(s => s.Companion != 0)];
+
+        // It fills and empties with the hover, exactly like the confirmed slot - which is why it
+        // cannot simply be ignored as noise in the window.
+        Assert.Equal(samples.Count(s => s.Entity != 0), set.Count);
+        Assert.All(samples.Where(s => s.Entity == 0), s => Assert.Equal(0ul, s.Companion));
+
+        // A fresh address on nearly every frame. If this ever drops towards one value per
+        // hovered entity, the per-frame reading is wrong and the tooltip guess is back.
+        Assert.True(
+            set.Select(s => s.Companion).Distinct().Count() > set.Count * 0.9,
+            "the companion no longer looks reallocated per frame");
+
+        // 16-byte aligned, every one.
+        Assert.All(set, s => Assert.Equal(0ul, s.Companion % 0x10));
+
+        // And the wall: no committed recording holds the target, so the hunt must report having
+        // captured none of it rather than serving zeros as content.
+        Assert.All(set, s => Assert.Equal(0, s.CompanionRead));
+
+        var text = new StringWriter();
+        HoverHunt.Report(samples, text);
+        Assert.Contains("its target read on NO frame", text.ToString(), StringComparison.Ordinal);
+    }
+
     [Fact]
     public void OnTheCaptureThatAnsweredIt_TheReportSaysTheChainNamedEntities()
     {
