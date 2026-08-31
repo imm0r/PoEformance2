@@ -102,7 +102,7 @@ public sealed class RitualWindow
             "##filter", "only routes paying...", ref _filter, 64, OverlayLayout.ButtonRoom("clear picks"));
         ImGui.SameLine();
 
-        if (ImGui.SmallButton("clear picks"))
+        if (ImGui.SmallButton("Clear Picks"))
         {
             Picked.Clear();
         }

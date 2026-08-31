@@ -206,7 +206,7 @@ public sealed class MapKeepOutEditor
     /// </remarks>
     private void DrawZoneList()
     {
-        if (ImGui.SmallButton("Add a zone"))
+        if (ImGui.SmallButton("Add a Zone"))
         {
             Zones = Zones.Plus();
             _place = true;
@@ -215,7 +215,7 @@ public sealed class MapKeepOutEditor
         }
 
         ImGui.SameLine();
-        if (ImGui.SmallButton("Remove all"))
+        if (ImGui.SmallButton("Remove All"))
         {
             // Only the boxes: the interface switch beside them is a different decision, and a
             // button labelled for one that quietly undoes the other is how a setting comes back

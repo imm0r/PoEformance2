@@ -524,7 +524,7 @@ public sealed class PoiLayer
         {
             ImGui.TextColored(DimText, $"{targets.Count} of {RoutePlanner.MaxRoutes} routes");
             ImGui.SameLine();
-            if (ImGui.SmallButton("clear all"))
+            if (ImGui.SmallButton("Clear All"))
             {
                 _planner.Clear();
             }

@@ -201,21 +201,21 @@ public sealed class UiBrowserWindow
             _searchSequence++;
         }
 
-        OverlayLayout.Toggle("Follow cursor", ref _followCursor);
+        OverlayLayout.Toggle("Follow Cursor", ref _followCursor);
         OverlayLayout.Next();
         OverlayLayout.Toggle("Highlight", ref _highlightSelected);
 
         // Root controls. Re-rooting is what makes a deep subtree workable - the interface is
         // over a hundred children wide at the top, and scrolling past it to reach the same
         // panel repeatedly is most of the work otherwise.
-        if (ImGui.Button("Game root"))
+        if (ImGui.Button("Game Root"))
         {
             _root = 0;
             _expanded.Clear();
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("Root here") && _selected != 0)
+        if (ImGui.Button("Root Here") && _selected != 0)
         {
             _root = _selected;
             _expanded.Clear();

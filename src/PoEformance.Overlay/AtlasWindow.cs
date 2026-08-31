@@ -75,21 +75,21 @@ public sealed class AtlasWindow
         // FIRST, because it decides whether any of the rest applies. It used to be the fifth
         // control on the page, below a diagnostic.
         bool enabled = settings.Enabled;
-        if (OverlayLayout.Master("Draw on the atlas", ref enabled))
+        if (OverlayLayout.Master("Draw on the Atlas", ref enabled))
         {
             changed = changed with { Enabled = enabled };
         }
 
         DrawTheRead(view);
 
-        OverlayLayout.Group("What is drawn");
+        OverlayLayout.Group("What Is Drawn");
 
         // FIVE SWITCHES IN A GRID, three across and two down. They were three on one line and
         // two on lines of their own, spaced with a fixed gap - so the second row's switches
         // landed under the MIDDLE of the first row's rather than under their ticks, and the
         // block read as a row plus some leftovers. Columns put every tick under a tick.
         bool names = settings.Names;
-        if (OverlayLayout.Toggle("Map names", ref names))
+        if (OverlayLayout.Toggle("Map Names", ref names))
         {
             changed = changed with { Names = names };
         }
@@ -97,7 +97,7 @@ public sealed class AtlasWindow
         OverlayLayout.Cell(1);
 
         bool contents = settings.Contents;
-        if (OverlayLayout.Toggle("What is in them", ref contents))
+        if (OverlayLayout.Toggle("What Is in Them", ref contents))
         {
             changed = changed with { Contents = contents };
         }
@@ -105,13 +105,13 @@ public sealed class AtlasWindow
         OverlayLayout.Cell(2);
 
         bool web = settings.Web;
-        if (OverlayLayout.Toggle("Every connection", ref web))
+        if (OverlayLayout.Toggle("Every Connection", ref web))
         {
             changed = changed with { Web = web };
         }
 
         bool ratings = settings.Ratings;
-        if (OverlayLayout.Toggle("Map ratings", ref ratings))
+        if (OverlayLayout.Toggle("Map Ratings", ref ratings))
         {
             changed = changed with { Ratings = ratings };
         }
@@ -125,7 +125,7 @@ public sealed class AtlasWindow
         OverlayLayout.Cell(1);
 
         bool biomes = settings.Biomes;
-        if (OverlayLayout.Toggle("Biome borders", ref biomes))
+        if (OverlayLayout.Toggle("Biome Borders", ref biomes))
         {
             changed = changed with { Biomes = biomes };
         }
@@ -154,16 +154,16 @@ public sealed class AtlasWindow
         // decided while writing it, so it is here to be turned up rather than guessed at.
         float writing = settings.Writing;
         if (OverlayLayout.Slider(
-                "Size of the writing", ref writing,
+                "Size of the Writing", ref writing,
                 AtlasSettings.SmallestText, AtlasSettings.LargestText, "%.2fx"))
         {
             changed = changed with { TextScale = writing };
         }
 
-        OverlayLayout.Group("What is hidden");
+        OverlayLayout.Group("What Is Hidden");
 
         bool hideDone = settings.HideCompleted;
-        if (OverlayLayout.Toggle("Hide finished maps", ref hideDone))
+        if (OverlayLayout.Toggle("Hide Finished Maps", ref hideDone))
         {
             changed = changed with { HideCompleted = hideDone };
         }
@@ -171,7 +171,7 @@ public sealed class AtlasWindow
         OverlayLayout.Next();
 
         bool hideLocked = settings.HideUnreachable;
-        if (OverlayLayout.Toggle("Hide maps with no way there", ref hideLocked))
+        if (OverlayLayout.Toggle("Hide Maps with No Way There", ref hideLocked))
         {
             changed = changed with { HideUnreachable = hideLocked };
         }
@@ -183,7 +183,7 @@ public sealed class AtlasWindow
         OverlayLayout.Note("Maps you are routing to stay visible either way.");
 
         bool hideOnHover = settings.HideOnHover;
-        if (OverlayLayout.Toggle("Hide everything over an unmeasurable hover panel", ref hideOnHover))
+        if (OverlayLayout.Toggle("Hide Everything over an Unmeasurable Hover Panel", ref hideOnHover))
         {
             changed = changed with { HideOnHover = hideOnHover };
         }
@@ -280,7 +280,7 @@ public sealed class AtlasWindow
             ImGui.SetCursorPosX(ImGui.GetCursorPosX() + room - button);
         }
 
-        if (ImGui.Button("Check the read"))
+        if (ImGui.Button("Check the Read"))
         {
             _watch.CheckTheRead();
         }

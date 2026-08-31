@@ -53,7 +53,7 @@ public sealed class ProjectileWindow
         // window. They were simply not on screen. A block of prose in the middle of a row is
         // not a formatting slip; it moves the controls after it somewhere nobody can reach.
         bool drawing = _layer.Enabled;
-        if (OverlayLayout.Toggle("Draw them over the game", ref drawing))
+        if (OverlayLayout.Toggle("Draw Them over the Game", ref drawing))
         {
             _layer.Enabled = drawing;
             _changed();
@@ -61,7 +61,7 @@ public sealed class ProjectileWindow
 
         OverlayLayout.Cell(1);
         bool trails = _layer.ShowTrails;
-        if (OverlayLayout.Toggle("With the line they came along", ref trails))
+        if (OverlayLayout.Toggle("With the Line They Came Along", ref trails))
         {
             _layer.ShowTrails = trails;
             _changed();
@@ -69,7 +69,7 @@ public sealed class ProjectileWindow
 
         OverlayLayout.Cell(2);
         bool paths = _layer.ShowPaths;
-        if (OverlayLayout.Toggle("And their paths", ref paths))
+        if (OverlayLayout.Toggle("And Their Paths", ref paths))
         {
             _layer.ShowPaths = paths;
             _changed();
@@ -88,7 +88,7 @@ public sealed class ProjectileWindow
         }
 
         bool mine = _layer.MineOnly;
-        if (OverlayLayout.Toggle("Only mine", ref mine))
+        if (OverlayLayout.Toggle("Only Mine", ref mine))
         {
             _layer.MineOnly = mine;
             _changed();

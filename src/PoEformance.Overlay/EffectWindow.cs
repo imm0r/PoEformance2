@@ -69,7 +69,7 @@ public sealed class EffectWindow
         ImGui.Separator();
 
         bool drawing = _layer.Enabled;
-        if (OverlayLayout.Toggle("Draw them in the world", ref drawing))
+        if (OverlayLayout.Toggle("Draw Them in the World", ref drawing))
         {
             _layer.Enabled = drawing;
             _changed();
@@ -77,14 +77,14 @@ public sealed class EffectWindow
 
         OverlayLayout.Cell(1);
         bool paths = _layer.ShowPaths;
-        if (OverlayLayout.Toggle("With their paths", ref paths))
+        if (OverlayLayout.Toggle("With Their Paths", ref paths))
         {
             _layer.ShowPaths = paths;
             _changed();
         }
 
         bool keeping = _layer.KeepHostile;
-        if (OverlayLayout.Toggle("Keep the hostile ground effects", ref keeping))
+        if (OverlayLayout.Toggle("Keep the Hostile Ground Effects", ref keeping))
         {
             _layer.KeepHostile = keeping;
             _changed();
@@ -99,7 +99,7 @@ public sealed class EffectWindow
         if (_noise is NoiseFilter noise)
         {
             bool engine = !noise.IsOn(NoiseKind.Engine) || !noise.Enabled;
-            if (OverlayLayout.Toggle("Let the engine's own nodes through", ref engine))
+            if (OverlayLayout.Toggle("Let the Engine's Own Nodes Through", ref engine))
             {
                 noise.Set(NoiseKind.Engine, !engine);
                 _changed();

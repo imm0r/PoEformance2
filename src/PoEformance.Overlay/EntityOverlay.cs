@@ -3019,14 +3019,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     private void DrawSwitches()
     {
-        OverlayLayout.Group("What is drawn");
+        OverlayLayout.Group("What Is Drawn");
 
         // Not a page like the rest: routing is done WHILE playing, so the picker keeps its own
         // small window - see the note where it is drawn.
         if (_poi is not null)
         {
             bool picking = _poi.ShowPicker;
-            if (OverlayLayout.Toggle("Points of interest", ref picking))
+            if (OverlayLayout.Toggle("Points of Interest", ref picking))
             {
                 _poi.ShowPicker = picking;
                 SettingsChanged?.Invoke();
@@ -3038,7 +3038,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (Noise is not null)
         {
             bool filtering = Noise.Enabled;
-            if (OverlayLayout.Toggle("Hide noise", ref filtering))
+            if (OverlayLayout.Toggle("Hide Noise", ref filtering))
             {
                 Noise.Enabled = filtering;
                 SettingsChanged?.Invoke();
@@ -3050,7 +3050,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (Memory is not null)
         {
             bool remembering = Memory.Enabled;
-            if (OverlayLayout.Toggle("Keep what is out of range", ref remembering))
+            if (OverlayLayout.Toggle("Keep What Is Out of Range", ref remembering))
             {
                 Memory.Enabled = remembering;
                 SettingsChanged?.Invoke();
@@ -3060,14 +3060,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         bool labels = ShowLabels;
-        if (OverlayLayout.Toggle("Name labels beside the dots", ref labels))
+        if (OverlayLayout.Toggle("Name Labels Beside the Dots", ref labels))
         {
             ShowLabels = labels;
             SettingsChanged?.Invoke();
         }
 
         bool hurtOnly = _healthBars.OnlyWhenHurt;
-        if (OverlayLayout.Toggle("Health bars only once hurt", ref hurtOnly))
+        if (OverlayLayout.Toggle("Health Bars Only Once Hurt", ref hurtOnly))
         {
             _healthBars.OnlyWhenHurt = hurtOnly;
             SettingsChanged?.Invoke();
@@ -3075,10 +3075,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         OverlayLayout.Hint("Off draws a bar over every monster, at full life included.");
 
-        OverlayLayout.Group("Getting out of the way");
+        OverlayLayout.Group("Getting Out of the Way");
 
         bool behind = HideBehindPanels;
-        if (OverlayLayout.Toggle("Hide markers behind big panels", ref behind))
+        if (OverlayLayout.Toggle("Hide Markers Behind Big Panels", ref behind))
         {
             HideBehindPanels = behind;
             SettingsChanged?.Invoke();
@@ -3087,7 +3087,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         OverlayLayout.Hint("The stash, the skill tree, the atlas and the world map.");
 
         bool windowsBehind = HideWindowsBehindPanels;
-        if (OverlayLayout.Toggle("Hide these windows over a panel", ref windowsBehind))
+        if (OverlayLayout.Toggle("Hide These Windows over a Panel", ref windowsBehind))
         {
             HideWindowsBehindPanels = windowsBehind;
             SettingsChanged?.Invoke();
@@ -3123,7 +3123,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         bool calibration = ShowCalibration;
-        if (OverlayLayout.Toggle("Calibration aids", ref calibration))
+        if (OverlayLayout.Toggle("Calibration Aids", ref calibration))
         {
             ShowCalibration = calibration;
         }
@@ -3139,7 +3139,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // fed in, while a value that only makes sense in pixels means the error is in screen
         // space.
         float probe = ProbeHeight;
-        if (OverlayLayout.Drag("Probe height", ref probe, 0.5f, -200f, 200f, "%.0f world units"))
+        if (OverlayLayout.Drag("Probe Height", ref probe, 0.5f, -200f, 200f, "%.0f world units"))
         {
             ProbeHeight = probe;
         }

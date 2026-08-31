@@ -108,7 +108,7 @@ public sealed class StyleRows
                   + " follows the defaults, so a corrected one reaches you.");
 
         ImGui.SameLine();
-        if (ImGui.SmallButton("reset all") && changed > 0)
+        if (ImGui.SmallButton("Reset All") && changed > 0)
         {
             _style.ResetAll();
             Changed();
@@ -209,7 +209,7 @@ public sealed class StyleRows
         if (!style.SaysNothing)
         {
             ImGui.SameLine();
-            if (ImGui.SmallButton("reset"))
+            if (ImGui.SmallButton("Reset"))
             {
                 _style.Reset(entry.Key);
                 Changed();
@@ -351,14 +351,14 @@ public sealed class StyleRows
         }
 
         ImGui.SameLine();
-        if (ImGui.SmallButton("use"))
+        if (ImGui.SmallButton("Use"))
         {
             wanted = wanted with { Icon = _iconPath.Trim() };
             _editingIcon = string.Empty;
         }
 
         ImGui.SameLine();
-        if (ImGui.SmallButton("none"))
+        if (ImGui.SmallButton("None"))
         {
             wanted = wanted with { Icon = string.Empty };
             _editingIcon = string.Empty;

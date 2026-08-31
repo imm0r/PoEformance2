@@ -140,7 +140,7 @@ public sealed class StyleWindow
     private void DrawInterface()
     {
         if (Interface is not InterfaceEditor editor
-            || !OverlayLayout.Subsection("Text and panels", openByDefault: true))
+            || !OverlayLayout.Subsection("Text and Panels", openByDefault: true))
         {
             return;
         }
@@ -154,7 +154,7 @@ public sealed class StyleWindow
 
         int size = _draftTextSize > 0 ? _draftTextSize : now.TextSizeOr;
         if (OverlayLayout.Slider(
-                "Text size", ref size, InterfaceStyle.MinTextSize, InterfaceStyle.MaxTextSize, "%d px"))
+                "Text Size", ref size, InterfaceStyle.MinTextSize, InterfaceStyle.MaxTextSize, "%d px"))
         {
             _draftTextSize = size;
         }
@@ -187,7 +187,7 @@ public sealed class StyleWindow
         // them reads as anything to a person - and a slider labelled in percent can be
         // ctrl-clicked and typed into, which one labelled "0.85" cannot usefully be.
         int panels = Percent(now.PanelOpacityOr);
-        if (OverlayLayout.Slider("Tool panels", ref panels, Floor, 100, "%d%% solid"))
+        if (OverlayLayout.Slider("Tool Panels", ref panels, Floor, 100, "%d%% solid"))
         {
             editor.Chose(now with { PanelOpacity = panels / 100f });
             _unsavedInterface = true;

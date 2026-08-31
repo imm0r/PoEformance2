@@ -258,7 +258,7 @@ public sealed class WealthWindow
     /// </remarks>
     private void DrawBreakdown()
     {
-        _breakdown = OverlayLayout.Subsection("What the total is made of###wealth-breakdown");
+        _breakdown = OverlayLayout.Subsection("What the Total Is Made Of###wealth-breakdown");
         if (!_breakdown)
         {
             return;
@@ -457,7 +457,7 @@ public sealed class WealthWindow
             return;
         }
 
-        _worth = OverlayLayout.Subsection("Where it is###wealth-by-tab");
+        _worth = OverlayLayout.Subsection("Where It Is###wealth-by-tab");
         if (!_worth)
         {
             return;
@@ -714,7 +714,7 @@ public sealed class WealthWindow
         // and some of it is months old.
         if (!_confirmingReset)
         {
-            if (ImGui.Button("start the record again"))
+            if (ImGui.Button("Start the Record Again"))
             {
                 _confirmingReset = true;
             }
@@ -724,7 +724,7 @@ public sealed class WealthWindow
 
         ImGuiText.Wrapped(Warn, "This deletes every reading. There is no way back.");
 
-        if (ImGui.Button("yes, throw it away"))
+        if (ImGui.Button("Yes, Throw It Away"))
         {
             _tracker.History.Reset(now);
             _confirmingReset = false;
@@ -732,7 +732,7 @@ public sealed class WealthWindow
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("keep it"))
+        if (ImGui.Button("Keep It"))
         {
             _confirmingReset = false;
         }

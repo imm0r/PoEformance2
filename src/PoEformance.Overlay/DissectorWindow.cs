@@ -264,7 +264,7 @@ public sealed class DissectorWindow
         // The schema's own names, laid over the rows. This is also how a MISALIGNED read
         // announces itself: every row gets a name and none of them make sense.
         string[] names = Names();
-        OverlayLayout.Combo("Known layout", ref _structIndex, names);
+        OverlayLayout.Combo("Known Layout", ref _structIndex, names);
 
         ImGui.SameLine();
         if (ImGui.Button(view.HasBaseline ? "re-mark" : "mark"))
@@ -340,7 +340,7 @@ public sealed class DissectorWindow
         OverlayFonts.PushMono();
         try
         {
-            if (OverlayLayout.Input("Compare with", ref _typedCompare, 20, ImGuiInputTextFlags.EnterReturnsTrue)
+            if (OverlayLayout.Input("Compare With", ref _typedCompare, 20, ImGuiInputTextFlags.EnterReturnsTrue)
                 && TryHex(_typedCompare, out ulong beside)
                 && Compare(beside))
             {
@@ -425,7 +425,7 @@ public sealed class DissectorWindow
             return;
         }
 
-        if (ImGui.SmallButton("back") && _trail.TryStepBack(out IReadOnlyList<ulong> back))
+        if (ImGui.SmallButton("Back") && _trail.TryStepBack(out IReadOnlyList<ulong> back))
         {
             for (int i = 0; i < _places.Count && i < back.Count; i++)
             {
@@ -445,7 +445,7 @@ public sealed class DissectorWindow
         ImGui.SameLine();
         ImGui.TextColored(NameText, route);
         ImGui.SameLine();
-        if (ImGui.SmallButton("copy"))
+        if (ImGui.SmallButton("Copy"))
         {
             ImGui.SetClipboardText(route);
         }
@@ -750,14 +750,14 @@ public sealed class DissectorWindow
         // Two separate acts on purpose. Peeking is cheap and answers "is this worth my time";
         // descending changes where you are and should not happen by accident on the way to
         // asking.
-        if (ImGui.SmallButton($"peek##{offset}"))
+        if (ImGui.SmallButton($"Peek##{offset}"))
         {
             _peekOffset = offset;
             _peekSequence++;
         }
 
         ImGui.SameLine();
-        if (ImGui.SmallButton($"go##{offset}"))
+        if (ImGui.SmallButton($"Go##{offset}"))
         {
             Walk(offset, view);
         }
