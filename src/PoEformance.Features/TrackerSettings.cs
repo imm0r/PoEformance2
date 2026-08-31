@@ -256,6 +256,11 @@ public sealed record TrackerSettings(
     [property: JsonPropertyName("groundEffectRadius")] float GroundEffectRadius = 20f,
     [property: JsonPropertyName("groundEffectUseGameRadius")] bool GroundEffectUseGameRadius = true,
     [property: JsonPropertyName("showGroundEffectTimer")] bool ShowGroundEffectTimer = true,
+
+    // The metadata path and the numbers under each ring. A DEBUG AID: it answers "which patch
+    // is that ring on, and is one missing", which circles alone cannot. Off by default because
+    // it writes a 56-character path under every effect on screen.
+    [property: JsonPropertyName("showGroundEffectLabels")] bool ShowGroundEffectLabels = false,
     [property: JsonPropertyName("showBeams")] bool ShowBeams = false,
     [property: JsonPropertyName("beamColour")] string BeamColour = "#E6FF6A2A",
 

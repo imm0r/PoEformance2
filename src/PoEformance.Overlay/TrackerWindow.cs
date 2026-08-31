@@ -358,6 +358,14 @@ public sealed class TrackerWindow
             "no rule needed: this asks the entity whether it carries a GroundEffect component,"
             + " which is the game's own answer, and reads the countdown out of it.");
 
+        ImGuiText.Hint(
+            WarnText,
+            "IT DOES NOT COVER EVERY HAZARD. Only two metadata paths have ever been seen"
+            + " carrying that component; the GroundOnDeath monster mods carry none, and their"
+            + " paths are refused by the noise filter's Daemon class before they are read at"
+            + " all. A patch of fire with no ring is that, not a bug - the rules below are"
+            + " still what covers it.");
+
         bool gameRadius = settings.GroundEffectUseGameRadius;
         if (ImGui.Checkbox("size it from the component's own radius", ref gameRadius))
         {
@@ -403,7 +411,21 @@ public sealed class TrackerWindow
         ImGuiText.Hint(
             DimText,
             "the number sits at 0.0 for a beat before the ring goes - the game's countdown"
-            + " reaches zero a measured 0.38 s before it stops listing the effect.");
+            + " reaches zero a measured 0.38 s before it stops listing the effect, and a third"
+            + " of effects have no timer at all and simply show none.");
+
+        bool labels = settings.ShowGroundEffectLabels;
+        if (ImGui.Checkbox("label each ring with its metadata path (debug)", ref labels))
+        {
+            _write(settings with { ShowGroundEffectLabels = labels });
+        }
+
+        ImGuiText.Hint(
+            DimText,
+            "for working out which patch a ring belongs to, and whether one is MISSING. Prints"
+            + " the path, the entity id, the radius being used and the countdown. A hazard the"
+            + " game draws but this does not ring will have no label anywhere near it - that is"
+            + " the case worth reporting.");
 
         bool beams = settings.ShowBeams;
         if (ImGui.Checkbox("draw boss beams as the PATH they occupy", ref beams))
