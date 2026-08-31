@@ -285,27 +285,33 @@ public sealed class TrackerWindow
 
     // ── Lines to monsters ────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Which rarities get a line. A GROUP rather than a fold, because it is one row.
+    /// </summary>
+    /// <remarks>
+    /// A fold offers to hide something, and what it would hide here is a single line of three
+    /// switches - so the header costs a click and a line of chrome to save one line. It only
+    /// became worth saying once the folds stopped looking like the section around them: at that
+    /// point a fold over one row reads as a fold that forgot what it was for.
+    /// </remarks>
     private void DrawLines(TrackerSettings settings)
     {
-        if (!OverlayLayout.Subsection("Lines to monsters", openByDefault: true))
-        {
-            return;
-        }
+        OverlayLayout.Group("Lines to monsters");
 
         MonsterLineSettings lines = settings.LinesOrDefault;
 
         // THREE SWITCHES ON ONE LINE. They are one setting asked three times - which rarities
         // get a line - so they belong in a row rather than stacked down the page with a
-        // paragraph over them. The paragraph itself is a tooltip on the first: what it says
-        // is true of all three and is read once.
-        (bool unique, string uniqueColour) = Line("Unique", lines.Unique, lines.UniqueColour);
-        OverlayLayout.Hint("Drawn from your own feet, so the eye can follow one out of a crowd.");
+        // paragraph over them.
+        const string why = "Drawn from your own feet, so the eye can follow one out of a crowd.";
+
+        (bool unique, string uniqueColour) = Line("Unique", lines.Unique, lines.UniqueColour, why);
 
         OverlayLayout.Cell(1);
-        (bool rare, string rareColour) = Line("Rare", lines.Rare, lines.RareColour);
+        (bool rare, string rareColour) = Line("Rare", lines.Rare, lines.RareColour, why);
 
         OverlayLayout.Cell(2);
-        (bool magic, string magicColour) = Line("Magic", lines.Magic, lines.MagicColour);
+        (bool magic, string magicColour) = Line("Magic", lines.Magic, lines.MagicColour, why);
 
         var wanted = new MonsterLineSettings(
             unique, rare, magic, uniqueColour, rareColour, magicColour);
@@ -317,11 +323,24 @@ public sealed class TrackerWindow
     }
 
     /// <summary>One rarity's switch and colour, as they stand after the row was drawn.</summary>
-    private static (bool On, string Colour) Line(string label, bool on, string colour)
+    /// <remarks>
+    /// THE TOOLTIP BELONGS TO EVERY ONE OF THESE, so it is asked for here rather than once
+    /// after the first. Written outside, it hung off whichever control happened to be drawn
+    /// last before it - the "Unique" label - so hovering "Rare" or "Magic" got nothing, and
+    /// the one explanation covering all three switches was reachable from a third of them.
+    ///
+    /// THE WHOLE ROW IS THE TARGET, not the label alone. A BeginGroup/EndGroup pair makes the
+    /// three controls one item as far as <c>IsItemHovered</c> is concerned, so the tooltip
+    /// answers to the tick and the swatch as well - which is where a pointer actually goes.
+    /// </remarks>
+    /// <param name="hint">What the tooltip says. The same for every rarity.</param>
+    private static (bool On, string Colour) Line(string label, bool on, string colour, string hint)
     {
         ImGui.PushID(label);
         try
         {
+            ImGui.BeginGroup();
+
             bool wanted = on;
             ImGui.Checkbox("##on", ref wanted);
 
@@ -333,6 +352,10 @@ public sealed class TrackerWindow
 
             ImGui.SameLine();
             ImGui.TextUnformatted(label);
+
+            ImGui.EndGroup();
+            OverlayLayout.Hint(hint);
+
             return (wanted, wantedColour);
         }
         finally
