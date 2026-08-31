@@ -98,7 +98,12 @@ public sealed class QuestWindow
             return;
         }
 
+        // AN ACT IS A FOLD, not a rule with a name on it. There are up to twelve of them and a
+        // player is in one, so the other eleven are a scroll past somebody else's progress. The
+        // fold state is ImGui's own, which means it survives switching tabs and restarting.
         var act = -1;
+        bool showing = true;
+
         foreach (QuestState quest in outlook.Quests)
         {
             if (!_done && quest.Complete)
@@ -124,11 +129,13 @@ public sealed class QuestWindow
             if (quest.Act != act)
             {
                 act = quest.Act;
+                showing = OverlayLayout.Subsection(
+                    act > 0 ? $"Act {act}" : "No Act", openByDefault: true);
+            }
 
-                // A titled rule rather than a coloured line over a hairline - the same
-                // boundary the alerts tab draws between its lists, so the acts read as
-                // sections instead of as two more rows.
-                OverlayLayout.Group(act > 0 ? $"Act {act}" : "No act");
+            if (!showing)
+            {
+                continue;
             }
 
             Row(quest);
@@ -334,10 +341,18 @@ public sealed class QuestWindow
         foreach (QuestStep step in quest.Steps)
         {
             bool holds = quest.Holding.Contains(step);
-            ImGui.TextColored(
-                holds ? GoodText : DimText,
-                $"{(holds ? "->" : "  ")} order {step.Order,-4} present {step.Present.Count,-2}"
-                + $" missing {step.Missing.Count,-2}  {Short(step.Text)}");
+
+            // The STATE as a word in its own colour, then the step. It was four numbers and a
+            // sentence on one line - "order 86 present 1 missing 0  Slay the Devourer" - which
+            // is the join's own working shown as though it were the answer. The working is
+            // still here, in the tooltip, because it is what settles a wrong join.
+            ImGui.TextColored(holds ? GoodText : DimText, holds ? "now " : "    ");
+            ImGui.SameLine();
+            ImGui.TextColored(holds ? GoodText : DimText, ImGuiText.Escape(Short(step.Text)));
+
+            OverlayLayout.Hint(
+                $"Step {step.Order}. {step.Present.Count} of its flags are set,"
+                + $" {step.Missing.Count} are not - a step holds when none are missing.");
 
             if (!holds || !_conditions)
             {

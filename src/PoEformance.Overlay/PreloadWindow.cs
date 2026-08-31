@@ -154,8 +154,25 @@ public sealed class PreloadWindow
             return;
         }
 
+        // A TABLE, so the paths start in a column. Laid out with SameLine the path began right
+        // after the button - which is a fixed width, so it looked fine until the day a button
+        // label changed - and the paths themselves are the longest thing on the tab. Two
+        // columns: what you can DO with a row, at the width the buttons need, and the path
+        // taking everything left.
+        if (!ImGui.BeginTable(
+                "##preload-files",
+                2,
+                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY))
+        {
+            ImGui.EndChild();
+            return;
+        }
+
         try
         {
+            ImGui.TableSetupColumn("##watch");
+            ImGui.TableSetupColumn("path", ImGuiTableColumnFlags.WidthStretch);
+
             int shown = 0;
             foreach (string path in all)
             {
@@ -164,6 +181,8 @@ public sealed class PreloadWindow
                     continue;
                 }
 
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
                 ImGui.PushID(shown);
 
                 // The whole point of the raw list, and the reason it is searchable: a path
@@ -176,7 +195,7 @@ public sealed class PreloadWindow
                     Add(path);
                 }
 
-                ImGui.SameLine();
+                ImGui.TableNextColumn();
 
                 // Copying still, because a path is also the thing you paste to somebody else
                 // when it needs looking at rather than watching for.
@@ -185,10 +204,15 @@ public sealed class PreloadWindow
                     ImGui.SetClipboardText(path);
                 }
 
+                OverlayLayout.Hint("Click to copy this path.");
+
                 ImGui.PopID();
 
                 if (++shown >= 400)
                 {
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();
+                    ImGui.TableNextColumn();
                     ImGui.TextColored(DimText, $"...and {all.Count - shown} more - narrow the search");
                     break;
                 }
@@ -196,6 +220,7 @@ public sealed class PreloadWindow
         }
         finally
         {
+            ImGui.EndTable();
             ImGui.EndChild();
         }
     }

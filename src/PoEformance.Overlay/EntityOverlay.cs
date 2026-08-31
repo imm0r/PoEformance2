@@ -730,8 +730,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _preloadPanel.Enabled = settings.Window;
         _preloadPanel.HideWhenEmpty = settings.HideWhenEmpty;
         PreloadRulesChanged = rulesChanged;
+        // A ROW OF TABS, not a stack of folds. Four unrelated tools share this page - a file
+        // inspector, a watch list, a quest tree and a pin editor - and nobody has ever wanted
+        // two of them on screen at once. See ToolTabs.AsTabs for when each shape is right.
+        _tools.AsTabs(Area);
+
+        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Area);
         var window = new PreloadWindow(watch, lookAgain, sweep, () => PreloadListChanged?.Invoke(watch.Watching));
-        _tools.Add(20, "preload", "In this area", window.DrawTab, page: Area, pageLabel: "Area");
+        _tools.Add(
+            20,
+            "preload",
+            "Loaded Files",
+            () =>
+            {
+                window.DrawTab();
+                styles.Draw();
+            },
+            styles.Idle,
+            page: Area,
+            pageLabel: "Area");
 
         // The list that decides what gets said, beside the raw one it is built from. Two tabs
         // rather than one long page: finding a path and curating the list are different jobs,
@@ -743,13 +760,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             list => PreloadListChanged?.Invoke(list),
             SayItNow,
             starter);
-        _tools.Add(22, "preload-alerts", "Tell me about", alerts.DrawTab, page: Area, pageLabel: "Area");
-
-        // The list's backings and the card's plate, under the list they draw.
-        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Area);
-        _tools.Add(
-            21, "preload-style", "How the loaded list looks", styles.Draw, styles.Idle,
-            page: Area, pageLabel: "Area");
+        _tools.Add(22, "preload-alerts", "Watch List", alerts.DrawTab, page: Area, pageLabel: "Area");
 
         if (visible)
         {
@@ -1528,7 +1539,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // question - "what is my map still hiding" against "what am I supposed to do next" -
         // and it rides the same read, so it costs a tab and nothing else.
         var pins = new MapPinWindow(watch);
-        _tools.Add(26, "mappins", "Map pins", pins.DrawTab, page: Area);
+        _tools.Add(26, "mappins", "Map Pins", pins.DrawTab, page: Area);
 
         if (visible)
         {
