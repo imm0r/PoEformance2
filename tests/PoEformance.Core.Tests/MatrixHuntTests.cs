@@ -223,4 +223,94 @@ public class MatrixHuntTests
 
         Assert.True(maxX - minX < 0.05, $"expected a collapsed scene, got NDC width {maxX - minX:F4}");
     }
+
+    [Fact]
+    public void RealScene_TheReportCrossChecksTheMatrixAgainstTheCameraFrustum()
+    {
+        // The one line in the report that does not score the matrix against the world. Every
+        // column beside it asks "does this project the scene sensibly", which a matrix and a
+        // frustum that drifted TOGETHER would still answer perfectly; this asks whether the
+        // two halves of the camera still agree with each other, which they would not.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(RealSessionTests.SceneFixturePath));
+        OffsetSchema schema = RealSessionTests.Schema();
+        var chain = PoEformance.Core.Diagnostics.GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
+        WorldSnapshot snapshot = new WorldReader(replay, schema).Read(replay.ResolvedStatics["GameStates"]);
+        Assert.NotNull(snapshot.Frustum);
+
+        List<ProjectionCandidate> found = MatrixHunt.Find(replay, chain.WorldData, snapshot);
+        int current = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+
+        ProjectionCandidate schemaOffset = found.Single(c => c.Offset == current && !c.Transposed);
+        Assert.True(schemaOffset.FrustumFit < 1e-4, $"frustum fit {schemaOffset.FrustumFit:F5}");
+
+        // Reported, never gated: a decoy that survives the scene tests still gets a row, and
+        // its frustum column is what tells it apart at a glance.
+        Assert.Contains(found, c => !c.Transposed && c.Offset != current && c.FrustumFit > 0.01);
+
+        // And the transposed reading is deliberately left unscored - comparing it against
+        // corners the game placed under the direct convention would answer a different
+        // question - so it must not turn up carrying a fit.
+        Assert.All(found.Where(c => c.Transposed), c => Assert.True(double.IsInfinity(c.FrustumFit)));
+
+        var text = new StringWriter();
+        MatrixHunt.Report(found, current, text);
+        Assert.Contains("camera frustum: AGREES", text.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RealScene_TheFrustumOverrulesAScoreThatWouldMoveTheMatrixOntoAClippingPlane()
+    {
+        // The regression this cross-check was worth adding for, and it is not hypothetical:
+        // on a real fight recording the ranking puts 0x12C READ TRANSPOSED first, at a
+        // linearity of 0.9791 against the true matrix's 0.9539 - and 0x12C is the third
+        // FRUSTUM PLANE. Followed, that line would have moved the schema off a working offset
+        // onto a block of clipping planes: the same class of mistake as the 0x11C decoy,
+        // arriving through the check that replaced the one which let 0x11C through.
+        var replay = ReplayMemoryReader.Load(File.OpenRead(MonstersFixturePath));
+        OffsetSchema schema = RealSessionTests.Schema();
+        var chain = PoEformance.Core.Diagnostics.GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
+
+        var reader = new WorldReader(replay, schema);
+        WorldSnapshot snapshot = WorldSnapshot.Empty;
+        for (uint frame = 5; frame < 40 && snapshot.Frustum is null; frame++)
+        {
+            replay.Seek(frame);
+            snapshot = reader.Read(replay.ResolvedStatics["GameStates"]);
+        }
+
+        Assert.NotNull(snapshot.Frustum);
+        List<ProjectionCandidate> found = MatrixHunt.Find(replay, chain.WorldData, snapshot);
+        int current = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+
+        // The score really does prefer the decoy - asserted so this test fails loudly if the
+        // ranking is ever changed to fix it there instead, rather than quietly passing for a
+        // different reason than the one it was written for.
+        Assert.Equal(0x12C, found[0].Offset);
+        Assert.True(found[0].Transposed);
+        Assert.True(double.IsInfinity(found[0].FrustumFit));
+
+        var text = new StringWriter();
+        MatrixHunt.Report(found, current, text);
+        string report = text.ToString();
+
+        Assert.Contains($"the schema offset 0x{current:X} is confirmed by the camera frustum", report, StringComparison.Ordinal);
+        Assert.DoesNotContain("BEST: W2SMatrix = 0x12C", report, StringComparison.Ordinal);
+        Assert.Contains("treat it as a decoy", report, StringComparison.Ordinal);
+    }
+
+    /// <summary>130 seconds of a real fight - the session whose ranking prefers a clipping plane.</summary>
+    private static string MonstersFixturePath
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+            {
+                dir = dir.Parent;
+            }
+
+            Assert.NotNull(dir);
+            return Path.Combine(dir.FullName, "tests", "fixtures", "session-2026-08-monsters.rec");
+        }
+    }
 }

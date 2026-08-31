@@ -36,6 +36,32 @@ public static class WorldToScreen
     /// So a clip component is a DOT WITH A COLUMN of the flat array:
     /// element indices {0,4,8,12} for x, {1,5,9,13} for y, {3,7,11,15} for w.
     /// </remarks>
+    /// <summary>
+    /// Clip coordinates for a world point: the projection before the divide.
+    /// </summary>
+    /// <remarks>
+    /// Separated from <see cref="Project"/> so that everything reading this matrix reads it
+    /// the same way. The convention is the thing that went wrong here once and it is not
+    /// obvious from the numbers, so it should exist in one place - not be re-derived by each
+    /// caller who needs normalised device coordinates rather than pixels.
+    ///
+    /// <c>w</c> is worth naming rather than treating as a divisor: measured against the
+    /// camera frustum it is the distance along the view axis in WORLD units, so the near and
+    /// far clip distances come out of it as round numbers.
+    /// </remarks>
+    public static (double X, double Y, double W) Clip(ReadOnlySpan<float> matrix, float x, float y, float z)
+    {
+        if (matrix.Length < 16)
+        {
+            return (0, 0, 0);
+        }
+
+        // Column-major: clip.i = matrix[column i] . (x, y, z, 1).
+        return (((double)matrix[0] * x) + ((double)matrix[4] * y) + ((double)matrix[8] * z) + matrix[12],
+            ((double)matrix[1] * x) + ((double)matrix[5] * y) + ((double)matrix[9] * z) + matrix[13],
+            ((double)matrix[3] * x) + ((double)matrix[7] * y) + ((double)matrix[11] * z) + matrix[15]);
+    }
+
     public static ScreenPoint Project(ReadOnlySpan<float> matrix, float x, float y, float z, int width, int height)
     {
         if (matrix.Length < 16)
@@ -43,10 +69,7 @@ public static class WorldToScreen
             return new ScreenPoint(0, 0, false);
         }
 
-        // Column-major: clip.i = matrix[column i] . (x, y, z, 1).
-        double cx = ((double)matrix[0] * x) + ((double)matrix[4] * y) + ((double)matrix[8] * z) + matrix[12];
-        double cy = ((double)matrix[1] * x) + ((double)matrix[5] * y) + ((double)matrix[9] * z) + matrix[13];
-        double cw = ((double)matrix[3] * x) + ((double)matrix[7] * y) + ((double)matrix[11] * z) + matrix[15];
+        (double cx, double cy, double cw) = Clip(matrix, x, y, z);
 
         if (cw <= 1e-6)
         {

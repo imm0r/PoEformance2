@@ -76,14 +76,16 @@ public readonly record struct ReadCost(
     double TerrainMs,
     double MapsMs,
     int Entities,
-    int Skipped)
+    int Skipped,
+    int OffScreen = 0)
 {
     /// <summary>Everything not attributed to a phase: the chain, the matrix, the area.</summary>
     public double OtherMs => Math.Max(0, TotalMs - EntitiesMs - PlayerMs - TerrainMs - MapsMs);
 
     /// <summary>A one-line summary for a status readout.</summary>
     public override string ToString()
-        => $"{TotalMs:F1} ms = ent {EntitiesMs:F1} ({Entities}, {Skipped} skipped)"
+        => $"{TotalMs:F1} ms = ent {EntitiesMs:F1} ({Entities}, {Skipped} skipped"
+           + (OffScreen > 0 ? $", {OffScreen} off screen)" : ")")
            + $"  player {PlayerMs:F1}  terrain {TerrainMs:F1}  maps {MapsMs:F1}  other {OtherMs:F1}";
 }
 
@@ -376,7 +378,12 @@ public sealed record WorldSnapshot(
     // Where the game's own interface is this frame, part by part. Measured rather than
     // configured - the HUD is an ordinary UiElement and its parts are its children - which is
     // what lets the map overlay stay off it at any resolution or interface scale. See InterfaceReader.
-    IReadOnlyList<InterfacePart>? Hud = null)
+    IReadOnlyList<InterfacePart>? Hud = null,
+
+    // The camera's own view volume, read beside the matrix. Null when the block was not
+    // readable, which is an ordinary answer - a recording made before anything read it has
+    // nothing there. See CameraFrustum.
+    CameraFrustum? Frustum = null)
 {
     /// <summary>The parts of the game's interface on screen, empty when none were read.</summary>
     /// <remarks>
@@ -570,6 +577,61 @@ public sealed class WorldReader
     public bool ReadActions { get; set; }
 
     /// <summary>
+    /// Skip the per-entity reads whose only consumers draw AT the entity, when the camera
+    /// cannot see it.
+    /// </summary>
+    /// <remarks>
+    /// The saving the frustum was worth reading for. <see cref="ReadAim"/> and
+    /// <see cref="ReadMonsterBuffs"/> are the two switches this file already describes as
+    /// costing a read per monster, and both feed things drawn over the monster - a ray from
+    /// its feet, icons above its head. A monster the camera cannot see is drawn nowhere, so
+    /// the read buys nothing.
+    ///
+    /// WHY THIS IS SAFE TO HAVE ON, in the order the evidence was gathered rather than in the
+    /// order that flatters it:
+    ///
+    ///  - The gate and the overlay agree. What gets drawn is decided by projecting; what gets
+    ///    read is decided here by the frustum. Over the eighteen committed recordings, at the
+    ///    frame each one actually read the frustum, the two agree on ALL 1042 tested points -
+    ///    every entity's feet and the top of its model - with nothing on screen yet outside
+    ///    the frustum, and nothing inside the frustum yet off screen. That is not luck: the
+    ///    frustum's eight corners project onto the edges of the viewport exactly, so the two
+    ///    are one predicate computed twice. FrustumGateTests measures it.
+    ///  - It fails OPEN. No frustum - an old recording, a drifted offset, a frame the block
+    ///    was unreadable - and nothing is skipped at all. An unreadable field must never be
+    ///    able to switch a feature off quietly, which is this project's most expensive
+    ///    recurring bug.
+    ///  - <see cref="ReadActions"/> is deliberately NOT gated. It feeds evasion, which is a
+    ///    question about danger to the player rather than about what is on screen.
+    ///
+    /// WHAT DOES CHANGE, stated because "provably free" would be too strong: two readouts in
+    /// the Tracker window list monsters rather than draw on them. Its action census is titled
+    /// "what the monsters ON SCREEN are doing", so gating makes it match its own description;
+    /// its buff-name list, which exists so a name can be copied into a rule, is narrowed to
+    /// monsters that are visible - which is where somebody reading names is looking anyway.
+    ///
+    /// THE ONE THING NOT MEASURED is how often the game rewrites the frustum. That is what
+    /// <see cref="OffScreenMargin"/> absorbs, and why it is sized rather than zero.
+    /// </remarks>
+    public bool SkipOffScreenReads { get; set; } = true;
+
+    /// <summary>
+    /// How far outside the view volume still counts as visible, in world units.
+    /// </summary>
+    /// <remarks>
+    /// SIZED FROM A MEASUREMENT, not chosen: the fastest the player crosses the world in any
+    /// committed recording is 2045 units per second, so at the reader's 30 Hz the camera moves
+    /// about 68 units between two ticks. 250 is three and a half ticks of that - headroom for
+    /// a frustum the game updates a frame or two behind the matrix, which is the only
+    /// staleness a per-frame read can still be exposed to.
+    ///
+    /// Being wrong high costs a handful of reads at the screen edge; being wrong low costs a
+    /// ray that flickers off as a monster reaches the boundary. The asymmetry is why it is
+    /// generous.
+    /// </remarks>
+    public float OffScreenMargin { get; set; } = 250f;
+
+    /// <summary>
     /// Where to record the animation names the game supplies, or null to read none.
     /// </summary>
     /// <remarks>
@@ -617,6 +679,8 @@ public sealed class WorldReader
     private readonly int _serverData;
     private readonly int _awakeEntities;
     private readonly int _w2sMatrix;
+    private readonly int _frustumCorners;
+    private readonly int _frustumPlanes;
     private readonly int _areaHash;
     private readonly int _areaLevel;
     private readonly int _playerLevelField;
@@ -684,6 +748,8 @@ public sealed class WorldReader
         _serverData = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _awakeEntities = schema.Structs["AreaInstance"].OffsetOf("AwakeEntities");
         _w2sMatrix = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
+        _frustumCorners = schema.Structs["WorldData"].OffsetOf("FrustumCorners");
+        _frustumPlanes = schema.Structs["WorldData"].OffsetOf("FrustumPlanes");
         _areaHash = schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash");
 
         // Two levels the schema has carried - with invariants, so the drift report already
@@ -898,6 +964,14 @@ public sealed class WorldReader
             chain.WorldData + (ulong)_w2sMatrix,
             System.Runtime.InteropServices.MemoryMarshal.AsBytes(matrix.AsSpan()));
 
+        // One more read beside the matrix, and it buys two things. The camera's frustum is
+        // the game's own "is that on screen", which nothing here could ask before; and being
+        // read EVERY frame is what puts it into a --record session frame by frame, which is
+        // the only way to settle how often the game rewrites it. Every committed recording
+        // swept this region once, so a replay of them cannot tell a constant from a
+        // photograph - see docs/architecture.md.
+        CameraFrustum? frustum = CameraFrustum.Read(_reader, chain.WorldData, _frustumCorners, _frustumPlanes);
+
         // The map struct sits INLINE in AreaInstance: pass its address, not a pointer read
         // from it (its first field is the head, which is why reading it as a pointer works
         // for the drift report but is not what the traversal needs).
@@ -925,6 +999,11 @@ public sealed class WorldReader
         // many repeat entities were dropped because of it. See where they are used, below.
         var rendered = new HashSet<ulong>();
         int collapsed = 0;
+
+        // How many entities the frustum gate spared a drawing read. Counted rather than felt,
+        // for the same reason every other number in ReadCost is: a saving nobody can see is
+        // indistinguishable from a feature that quietly stopped working.
+        int offScreen = 0;
 
         // What the corpse check saw, so a screen full of dots on cleared ground can be
         // explained instead of guessed at. See CorpseSigns for the three shapes.
@@ -1113,12 +1192,22 @@ public sealed class WorldReader
                 }
             }
 
+            // Would anything be DRAWN at this entity? That is the whole licence for skipping
+            // the two reads below and no licence at all for skipping the third - see
+            // SkipOffScreenReads. Both the entity's feet and the top of its model, because a
+            // marker floats at the second and the two are not the same point.
+            bool drawn = frustum is null || !SkipOffScreenReads
+                || frustum.Margin(position.Value.X, position.Value.Y, position.Value.Z) >= -OffScreenMargin
+                || frustum.Margin(
+                    position.Value.X, position.Value.Y, position.Value.Z - position.Value.ModelBoundsZ)
+                    >= -OffScreenMargin;
+
             // What is currently on it, and ONLY when somebody is drawing that. The floor keeps
             // the cost on the monsters a debuff timer is ever watched on; the friendly check
             // keeps it off your own minions, which are numerous and whose buffs nothing here
             // asks about.
             ActiveBuffs? buffs = null;
-            if (ReadMonsterBuffs && kind == EntityKind.Monster && !friendly && rarity >= MonsterBuffFloor)
+            if (ReadMonsterBuffs && drawn && kind == EntityKind.Monster && !friendly && rarity >= MonsterBuffFloor)
             {
                 ulong monsterBuffs = entity.Component("Buffs");
                 if (monsterBuffs != 0)
@@ -1131,15 +1220,25 @@ public sealed class WorldReader
             // the player, and the monsters that are not on your side - because everything else
             // here is scenery, a drop, or your own summon.
             Aim? aim = null;
-            if (ReadAim && (kind == EntityKind.Player || (kind == EntityKind.Monster && !friendly)))
+            bool wanted = kind == EntityKind.Player || (kind == EntityKind.Monster && !friendly);
+            if (ReadAim && drawn && wanted)
             {
                 aim = ReadAimOf(entity, renderAddress);
+            }
+
+            if (!drawn && wanted && (ReadAim || ReadMonsterBuffs))
+            {
+                offScreen++;
             }
 
             // What it has committed to, and where. Same audience as the aim, and read here
             // rather than by the consumer for the reason every other per-entity read is: the
             // Actor component has already been located by the walk above, so asking later
             // would mean resolving the whole component map a second time.
+            // NOT GATED ON THE FRUSTUM, and that is the point of the split rather than an
+            // oversight: this one feeds the evasion planner, which is a question about danger
+            // to the PLAYER and not about what is on screen. A boss commits a beam from
+            // outside the view volume and the player is still standing in it.
             ActorAction? action = null;
             if (ReadActions && (kind == EntityKind.Player || (kind == EntityKind.Monster && !friendly)))
             {
@@ -1308,7 +1407,7 @@ public sealed class WorldReader
             terrain,
             areaHash,
             chain.State,
-            new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, live, skipped),
+            new ReadCost(Since(started), entitiesMs, playerMs, terrainMs, mapsMs, live, skipped, offScreen),
             collapsed,
             new CorpseSigns(targetable, untargetable, unreadableTargetable, _corpses.Tracking),
             panels.Panels,
@@ -1320,7 +1419,8 @@ public sealed class WorldReader
             panels.Areas,
             areaLevel,
             playerLevel,
-            hud);
+            hud,
+            frustum);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>

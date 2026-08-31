@@ -119,6 +119,10 @@
           "comment": "Null while not in an area; nonNullPtr is only meaningful in-game. Re-confirmed 0x290 in the 2026-08 check (an older external baseline had 0x288)."
         },
         "UiRootStructPtr": { "offset": "0x2F0", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "KB/M UI manager (UserInterface_MouseAndKeyboard)." },
+        "MouseOverHostPtr": {
+          "offset": "0x300", "type": "ptr",
+          "comment": "FIRST HOP OF A HOVERED-ENTITY CHAIN this project had written off. GameHelper2's InGameStateOffset names it MouseOverHostPtr and follows it to +0x3F0 (MouseOverSubStruct) and then +0xA8 for the entity - and the note at the top of this file says flatly that PoE2 keeps no hovered slot, on the strength of a hunt that was looking for a hovered UI ELEMENT and found a resource record instead. A hovered ENTITY is a different question and it was never asked. WHAT THE RECORDINGS SAY, which is less than a confirmation and more than nothing: the slot holds a plausible pointer whose target carries a module vtable, and following it to +0x3F0 resolves in 123 of 245 sampled frames, where +0xA8 then reads zero. Zero is exactly what nothing-hovered looks like AND exactly what a wrong offset looks like, so this is UNCONFIRMED - and it cannot become confirmed here, because the sessions that swept this region were --questflags captures in which nobody was hovering anything on purpose. It also sits in the list of twelve pointers that differ between two characters (see this struct's comment), which is at least consistent with per-character UI state. To settle it: record while deliberately hovering a monster, then check that +0xA8 names that monster's entity and goes back to zero when the cursor leaves. If it holds, EntityInspector and the alert rules get 'the thing under the cursor' for three reads instead of a descent through the UI tree."
+        },
         "GamepadUiRootStructPtr": { "offset": "0x318", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "Controller UI manager." },
         "WorldData": { "offset": "0x368", "type": "ptr", "invariant": { "kind": "nonNullPtr" }, "comment": "CONFIRMED 2026-08 and no longer suspect: it was flagged because AreaInstanceData moved +0x08 in the same wave, and nonNullPtr passes at either slot since both hold plausible pointers. The matrix hunt settled it - the camera matrix resolves correctly at THIS base + 0x1A0, and a projection that maps 123 real entities linearly cannot come from the wrong struct. The earlier W2SMatrix failure was a bad invariant, not a drifted WorldData." }
       }
@@ -251,12 +255,27 @@
 
     "WorldData": {
       "fields": {
-        "WorldAreaDetailsPtr": { "offset": "0x98", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+        "WorldAreaDetailsPtr": { "offset": "0x98", "type": "ptr", "invariant": { "kind": "nonNullPtr" }, "comment": "WHAT IT POINTS AT IS THE AREA INSTANCE ITSELF, measured 2026-08: the value here equals InGameState.AreaInstanceData in every sampled frame of 21 of the 22 committed recordings. So WorldAreaDetails is not a separate object and its RowPtr(0xA0) is AreaInstance+0xA0 - the WorldAreas.dat row is reachable from either side, which is worth knowing when one of the two chains is unreadable. THE EXCEPTION IS THE ONE SESSION THAT CHANGES AREA (session-2026-08-actions.rec: 26 frames agreeing, 37 not), and it is the expected one rather than a counter-example - WorldData survives an area change while AreaInstance is rebuilt, so the two disagree across a transition. Anything comparing them has to tolerate that, and anything wanting 'the area the world is currently drawing' should prefer this one." },
         "CameraStructure": { "offset": "0x98", "type": "ptr", "comment": "INLINE camera struct base - do NOT dereference. GameHelper2's WorldDataOffset declares WorldAreaDetailsPtr and CameraStructurePtr at the SAME offset 0x98, the second as an inline struct, and its CameraStructure puts WorldToScreenMatrix at +0x108: 0x98 + 0x108 = WorldData+0x1A0, which is exactly the offset the AHK tool uses. (This field read 0xA0 before, arriving at the same 0x1A0 via +0x100; 0x98 is the referenced value.) No invariant: whatever floats sit here would validate anything." },
         "W2SMatrix": {
           "offset": "0x1A0", "type": "mat4x4",
-          "comment": "World-to-screen camera transform = CameraStructure(0x98) + 0x108. CONFIRMED IN-GAME 2026-08 against a 123-entity scene: MatrixHunt ranked it first with a fixed-camera linearity of 0.943, the nearest decoy reaching 0.728, and 0x1E0 scored IDENTICALLY - the duplicate copy GameHelper2 documents, which corroborates rather than contradicts. Also matches the AHK tool's WorldData+0x1A0. Read with the GameHelper2 convention (System.Numerics Matrix4x4 + Vector4.Transform), i.e. each clip component is a dot with a COLUMN of the flat array: x from {0,4,8,12}, w from {3,7,11,15}. DRIFT HISTORY: 0x1A8 -> 0x1A0 (a patch shifted it -8 bytes; issue #158) -> 0x11C (2026-08, WRONG, reverted). NO STRUCTURAL INVARIANT ON PURPOSE. The removed one demanded a unit-length direction vector CONTIGUOUS at +0x30, and it did the worst thing an invariant can do: it rejected the truth and accepted a decoy. Under this column convention the direction row is STRIDED across {3,7,11}, so it is not contiguous at +0x30 at all - the invariant failed here, at the correct offset, and passed at 0x11C, where an unrelated block of four unit rows happens to match. Projecting the real scene through 0x11C collapses all 76 entities into 0.01 NDC (a monster 79 units from the player landing 0.00000 away), and the check meant to catch that - 'does the player land at screen centre?' - PASSED, because an inflated w drives every numerator to ~0 and centres everything. Unit-length rows are far too weak a fingerprint; frustum planes, basis blocks and inverse transforms all have them. The replacement test is semantic and lives in MatrixHunt: the player must be centred AND the rest of the scene must spread out, scored against real entities."
+          "comment": "World-to-screen camera transform = CameraStructure(0x98) + 0x108. CONFIRMED IN-GAME 2026-08 against a 123-entity scene: MatrixHunt ranked it first with a fixed-camera linearity of 0.943, the nearest decoy reaching 0.728, and 0x1E0 scored IDENTICALLY - the duplicate copy GameHelper2 documents, which corroborates rather than contradicts. Also matches the AHK tool's WorldData+0x1A0. Read with the GameHelper2 convention (System.Numerics Matrix4x4 + Vector4.Transform), i.e. each clip component is a dot with a COLUMN of the flat array: x from {0,4,8,12}, w from {3,7,11,15}. DRIFT HISTORY: 0x1A8 -> 0x1A0 (a patch shifted it -8 bytes; issue #158) -> 0x11C (2026-08, WRONG, reverted). NO STRUCTURAL INVARIANT ON PURPOSE. The removed one demanded a unit-length direction vector CONTIGUOUS at +0x30, and it did the worst thing an invariant can do: it rejected the truth and accepted a decoy. Under this column convention the direction row is STRIDED across {3,7,11}, so it is not contiguous at +0x30 at all - the invariant failed here, at the correct offset, and passed at 0x11C, where an unrelated block of four unit rows happens to match. Projecting the real scene through 0x11C collapses all 76 entities into 0.01 NDC (a monster 79 units from the player landing 0.00000 away), and the check meant to catch that - 'does the player land at screen centre?' - PASSED, because an inflated w drives every numerator to ~0 and centres everything. Unit-length rows are far too weak a fingerprint; frustum planes, basis blocks and inverse transforms all have them. The replacement test is semantic and lives in MatrixHunt: the player must be centred AND the rest of the scene must spread out, scored against real entities. AND THE DECOY NOW HAS A NAME: 0x11C is the second of the six FRUSTUM PLANES below, which run from 0x10C at a stride of 0x10 - so reading a mat4x4 there takes planes 1 to 4, and the unit vector the old invariant demanded at +0x30 was plane 4's normal. It was never 'an unrelated block'; it is the camera's own frustum, sixteen bytes before the matrix."
+        },
+
+        "FrustumCorners": {
+          "offset": "0xAC", "type": "f32",
+          "comment": "THE EIGHT CORNERS OF THE VIEW FRUSTUM, in WORLD units: eight vec3 packed back to back, 0xAC to 0x10B. Found 2026-08 while mining the recordings for what surrounds the matrix, and settled by a test the wrong answer fails rather than by resemblance: each corner of a frustum lies exactly ON three of its six faces, so project all eight through the six planes at 0x10C and count the zeros. AT 0xAC ALL EIGHT LIE ON THREE PLANES, IN ALL EIGHTEEN COMMITTED RECORDINGS; read four bytes later, at 0xB0, NONE of them does, in any recording. Eight points fitting six planes to the float is not something a misread block does once, let alone eighteen times. The remaining distances are the frustum's own extents and come out in matching pairs, which is what a convex hexahedron looks like from the inside."
+        },
+
+        "FrustumPlanes": {
+          "offset": "0x10C", "type": "f32",
+          "comment": "THE SIX CLIPPING PLANES OF THE CAMERA, at a stride of 0x10: a unit normal (three floats) then the plane's distance, with the normals pointing INWARD - a point is inside the frustum when n.p + d >= 0 for all six. WHY THIS IS A MEASUREMENT AND NOT A FINGERPRINT, given that this file already records unit length as the weakest possible evidence: (1) the eight corners at 0xAC fit these six planes exactly and fit nothing at a neighbouring alignment (see above); (2) THE PLAYER IS INSIDE ALL SIX IN ALL EIGHTEEN RECORDINGS, across five separate game launches and world positions from x=3299 to x=19168; (3) better than inside - the player's distance to the four SIDE planes is the same number in every one of them (1140.1, 1140.1, 450.3, 644.4), which is what a frustum rigidly carried by a player-centred camera has to look like and what no other reading of these bytes would produce. Planes 4 and 5 are exact negatives of each other: they are the near and far plane, so the view direction is plane 4's normal and the depth is d[5] + d[4]. THAT DIRECTION IS A THIRD WITNESS. It reads (0.466531, 0.466531, 0.751464) in every recording - identical across all five launches, so the camera's orientation is fixed in this game - and its two horizontal components are EQUAL, i.e. the camera looks exactly along the world diagonal, which is independently what ScreenBasis measured for up-screen when it derived (0.7071, 0.7071) from the matrix by a completely different route. AND IT CROSS-CHECKS THE MATRIX, which is the reason to read it at all rather than merely to name it: the eight corners of the view volume ARE the eight corners of the viewport, so projecting them through W2SMatrix must land every one on an edge of normalised device space. It does, to 0.0000, in all eighteen recordings - two independent descriptions of one camera, read from two places sixteen bytes apart, agreeing to the float. That is the first check on this projection that needs no scene and no threshold anybody has to agree with, and MatrixHunt now leads its recommendation with it. THE CASE THAT MADE THAT NECESSARY: on session-2026-08-monsters.rec the hunt's own ranking puts 0x12C READ TRANSPOSED first, at a linearity of 0.9791 against the true matrix's 0.9539 - and 0x12C is PLANE 2 of this array. Followed, it would have moved the matrix onto a block of clipping planes, which is the 0x11C mistake arriving through the check that replaced the one 0x11C got past. The frustum column separates them at a glance. WHAT IS STILL NOT KNOWN, and the reason there is no invariant here: how often the game rewrites this. Every committed recording sweeps WorldData 0x000-0x840 ONCE, at frame 5, and then reads only the matrix per frame - so the block is CONSTANT in every replay for the same reason a photograph is, and a replay cannot tell that apart from a value the game never updates. The numbers differ between recordings, so it is not static. WorldReader now reads it beside the matrix every frame, which is what will put it into the next --record session frame by frame and answer this; until such a capture exists, treat a frustum older than the frame it is used on as unproven. Verified by CameraFrustumTests."
         }
+      },
+      "consts": {
+        "FrustumCornerCount": "8",
+        "FrustumPlaneCount": "6",
+        "FrustumPlaneStride": "0x10"
       }
     },
 
@@ -361,7 +380,7 @@
         "SleepingEntities": { "offset": "0x6F0", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "Was 0x6E8 (2026-08 +0x08 wave)." },
         "TerrainMetadata": {
           "offset": "0x8C0", "type": "ptr",
-          "comment": "TerrainStruct (was 0x8A0, then 0x8B8, now 0x8C0 - 2026-08 +0x08 wave). Source: GameHelper2 AreaInstanceOffsets.cs. NOTE: unlike most ptr fields this is an inline struct base in some builds - treat as base address, not pointer, when reading TerrainMetadata fields."
+          "comment": "TerrainStruct (was 0x8A0, then 0x8B8, now 0x8C0 - 2026-08 +0x08 wave). Source: GameHelper2 AreaInstanceOffsets.cs. NOTE: unlike most ptr fields this is an inline struct base in some builds - treat as base address, not pointer, when reading TerrainMetadata fields. INLINE IS THE CASE HERE, and the recordings say so outright: the eight bytes at 0x8C0 hold a MODULE address, which is a vtable and not a heap pointer, and the very next slot holds this AreaInstance's own address - a back-pointer to the owner, where GameHelper2's TerrainStruct has an unnamed field at +0x08."
         }
       }
     },
@@ -411,6 +430,10 @@
       "fields": {
         "TotalTilesX": { "offset": "0x18", "type": "i64", "invariant": { "kind": "range", "min": 1, "max": 4096 } },
         "TotalTilesY": { "offset": "0x20", "type": "i64", "invariant": { "kind": "range", "min": 1, "max": 4096 } },
+        "TotalTilesPlusOneX": {
+          "offset": "0x40", "type": "i64",
+          "comment": "The tile counts again, each plus one; Y at +0x48. GameHelper2 calls it TotalTilesPlusOne and nothing here uses it, but it is CONFIRMED against real memory (2026-08) and cheap to keep for one reason: it is a free consistency check on the two fields above, which nothing else in this struct can corroborate. In the two recordings whose sweep happens to cover it the area reads 39 x 45 tiles and this pair reads 40 x 46, exactly. The other sixteen never read the bytes, which is silence and not disagreement."
+        },
         "TileDetailsPtr": {
           "offset": "0x28", "type": "stdVector",
           "invariant": { "kind": "vectorSane", "elementSize": 56, "maxCount": 16777216 },
@@ -635,17 +658,33 @@
     },
 
     "Life": {
-      "comment": "Component. DRIFT HISTORY: vital bases shifted in 4.5.x (Health 0x1A8->0x1B0, Mana 0x1F8->0x208, ES 0x230->0x248); confirmed in-game via component probe. Matches GameHelper2 Life.cs. Each vital is a Vital sub-struct.",
+      "comment": "Component. DRIFT HISTORY: vital bases shifted in 4.5.x (Health 0x1A8->0x1B0, Mana 0x1F8->0x208, ES 0x230->0x248); confirmed in-game via component probe. Matches GameHelper2 Life.cs. Each vital is a Vital sub-struct. THREE MORE VITALS ARE LISTED BELOW UNREAD - see their comments and the pool-cell note above ComponentPools for why 0x420 is what makes them credible rather than merely copied.",
       "fields": {
         "Health": { "offset": "0x1B0", "type": "ptr", "struct": "Vital", "inline": true, "comment": "Vital sub-struct base, not a pointer - read Vital fields relative to this offset. The \"inline\" flag says exactly that, so the browser unfolds it instead of showing eight bytes as an address." },
         "Mana": { "offset": "0x208", "type": "ptr", "struct": "Vital", "inline": true },
-        "EnergyShield": { "offset": "0x248", "type": "ptr", "struct": "Vital", "inline": true }
+        "EnergyShield": { "offset": "0x248", "type": "ptr", "struct": "Vital", "inline": true },
+        "Ward": {
+          "offset": "0x2E8", "type": "ptr", "struct": "Vital", "inline": true,
+          "comment": "UNREAD HERE, from GameHelper2's LifeOffset. NOT VERIFIABLE FROM THE COMMITTED RECORDINGS and that is a statement about the files, not about the offset: no build has ever read past EnergyShield's Current, so every byte from 0x278 to the end of the component is absent from all eighteen sessions. What the recordings DO say is that there is room: the Life components are pool-allocated 0x420 apart (618 of 618 gaps divide by it), which puts this, Divinity and Spirit comfortably inside the object with 0x88 to spare. A capture that reads them is the whole remaining step."
+        },
+        "Divinity": { "offset": "0x338", "type": "ptr", "struct": "Vital", "inline": true, "comment": "UNREAD HERE, same provenance and same caveat as Ward." },
+        "Spirit": {
+          "offset": "0x380", "type": "stdVector",
+          "comment": "UNREAD HERE, same provenance and same caveat as Ward - but the one of the three worth capturing first, because SPIRIT IS A POE2 RESOURCE with no PoE1 counterpart: it is what reservations and persistent minions are paid for, so 'how much spirit is free' is a question this tool cannot answer at all today. GameHelper2 declares it a StdVector rather than a VitalStruct, so it is a LIST of something and not a pool with a Max and a Current; what the elements are is unknown here."
+        }
+      },
+      "consts": {
+        "PoolCell": "0x420"
       }
     },
 
     "Vital": {
-      "comment": "Sub-struct of Life (per vital). THE PERCENTAGE IS AGAINST THE UNRESERVED POOL, not against Max - GameHelper2's VitalStruct: reservedTotal = ceil(ReservedPercent / 10000 * Max) + ReservedFlat, then percent = round(100 * Current / (Max - reservedTotal)). Getting that wrong is not subtle: with half of mana reserved by auras, a FULL mana globe reads 50% against Max, so anything thresholded on it fires forever.",
+      "comment": "Sub-struct of Life (per vital). THE PERCENTAGE IS AGAINST THE UNRESERVED POOL, not against Max - GameHelper2's VitalStruct: reservedTotal = ceil(ReservedPercent / 10000 * Max) + ReservedFlat, then percent = round(100 * Current / (Max - reservedTotal)). Getting that wrong is not subtle: with half of mana reserved by auras, a FULL mana globe reads 50% against Max, so anything thresholded on it fires forever. THE FIRST EIGHT BYTES ARE NOT A VTABLE, which is what GameHelper2 has there: they read 0x0000333C00003335 for health and 0x00006A3000006A30 for both mana and energy shield, identical on all 136 monsters of the map session - two u32s, the same pair for every entity in the game, so a type tag or a pair of Stats.dat row ids rather than an address. The vtable-shaped slot is 0x08 (below), and the header is the one place this sub-struct differs from the reference.",
       "fields": {
+        "OwnerLifeComponent": {
+          "offset": "0x08", "type": "ptr",
+          "comment": "POINTS BACK AT THE LIFE COMPONENT THIS VITAL BELONGS TO - the value is the component's own address, exactly, for all three vitals of all 136 monsters in tests/fixtures/session-2026-08-map.rec. GameHelper2 names it PtrToLifeComponent and it is worth having for the same reason UiElementBase.Self is: *(vital+0x08) == lifeComponent is a free, unambiguous 'am I really looking at a vital' check before any number here is believed, and unlike a range check on Current it cannot be passed by a plausible-looking wrong offset. Sitting at +0x08 also anchors the rest of the sub-struct: the fields below are measured relative to a base this confirms."
+        },
         "ReservedFlat": { "offset": "0x10", "type": "i32", "comment": "Flat amount reserved, subtracted from Max directly." },
         "ReservedPercent": { "offset": "0x14", "type": "i32", "comment": "Reserved share in HUNDREDTHS OF A PERCENT: divide by 10000 to get a fraction (5000 = 50%). Named ReservedFraction here before it was read; the reference name and scale now match." },
         "Regen": { "offset": "0x28", "type": "f32" },
@@ -672,6 +711,10 @@
           "offset": "0x69", "type": "u8",
           "invariant": { "kind": "range", "min": 0, "max": 1 },
           "comment": "The ONLY byte that flips closed(1)/opened(0) across 20+2 chests; also 1 for living monsters, 0 for corpses. Drives highlighting, corpse detection, the kill counter - and now whether a place is drawn at all, since a thing the game will not let you touch is usually a thing that is not there. THAT LAST USE IS CONFIRMED IN GAME FROM BOTH SIDES (2026-08, owner, in the dissector), which is the strongest kind of check this project can make: the quest NPC that was being drawn in an empty map read 0 here, and the SAME NPC standing visibly in the world later read 1. A value that moves with the thing it claims to describe. Worth stating because the entity gives no other sign - it is awake, its validity flag is clear, it has a world position and the game's own NPC minimap icon."
+        },
+        "IsHighlightable": {
+          "offset": "0x6A", "type": "u8",
+          "comment": "PLACED BY ARITHMETIC, NOT SEEN: GameHelper2's 0x52 plus this struct's 0x18, so it lands exactly between the two flags that WERE verified in-game. The one flag of the group with an obvious use - it is what the game paints an outline on when the highlight key is held, which is a different question from IsTargetable and a better one for 'would a player see this'. UNREAD IN EVERY COMMITTED RECORDING, and that is a fact about the files rather than about the offset: the reader asks for exactly the four bytes it already knows about, so 0x6A has never been in a capture. One byte more per Targetable read settles it."
         },
         "IsTargetedByPlayer": { "offset": "0x6B", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 }, "comment": "Hover-diff confirmed: only the attacked monster's byte flipped 0->1. Seen again 2026-08 on an NPC with the cursor on it, reading 1 while the game showed its name banner." },
         "MeetsQuestState": {
@@ -721,7 +764,7 @@
         "Cooldowns": {
           "offset": "0xB20", "type": "stdVector",
           "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 256 },
-          "comment": "Count stays at the number of cooldown-capable skills; live timers are inside each entry's cdList, not the list size."
+          "comment": "Count stays at the number of cooldown-capable skills; live timers are inside each entry's cdList, not the list size. The entry layout is ActiveSkillCooldown below - it was missing, so this vector pointed at bytes nothing in the file described."
         },
         "DeployedEntities": {
           "offset": "0xC28", "type": "stdVector",
@@ -773,6 +816,18 @@
         "ActiveSkillPtr": { "offset": "0x00", "type": "ptr", "struct": "ActiveSkillDetails" }
       },
       "consts": { "Size": "0x10" }
+    },
+
+    "ActiveSkillCooldown": {
+      "comment": "One entry of Actor.Cooldowns, and the reason it is here is that the vector had no element type at all - a decoded pointer to undescribed bytes. UNVERIFIED, ported from GameHelper2's ActiveSkillCooldown, and the recordings cannot help: no build has read past the vector header, so all eighteen sessions hold the three pointers and none of the entries. The layout is also the reference's WEAKEST, because it declares two overlapping readings of the same struct (an id at 0x08 and again at 0x38, a cooldown time at 0x34) rather than one - so treat the offsets below as where to LOOK. What makes it worth looking: the live remaining cooldown is not here but inside CooldownsList, which is a vector per skill, so 'is this skill ready' is a two-hop question and not a field. THE ONE THING THAT WOULD SETTLE IT CHEAPLY is a capture taken while a long-cooldown skill is used and recovers, matched against the id in ActiveSkills - the same shape of protocol --actionhunt already runs.",
+      "fields": {
+        "MaxUses": { "offset": "0x30", "type": "i32" },
+        "TotalCooldownTimeInMs": { "offset": "0x34", "type": "i32" },
+        "ActiveSkillsDatId": { "offset": "0x38", "type": "i32", "comment": "Which skill this entry is for - the join back to ActiveSkills. GameHelper2 also names an id at 0x08 in the same struct; one of the two is stale and nothing here can say which." },
+        "CooldownsList": { "offset": "0x10", "type": "stdVector", "comment": "The live timers. A vector per skill, which is why the entry count stays flat while cooldowns come and go." },
+        "OwnerActorPlusOffset": { "offset": "0x28", "type": "ptr", "comment": "Back-pointer into the Actor component, at some offset from its base - the reference names it PtrToActorComponentPlusOffset and does not say what the offset is. Worth checking first of everything here, because a back-pointer is the one field in this struct that can be VERIFIED without knowing what any of the others mean: read it, subtract the actor's address, and either the difference is the same constant for every entry of every monster or the layout is wrong. That is exactly how Vital.OwnerLifeComponent was settled." }
+      },
+      "consts": { "Size": "0x48" }
     },
 
     "ActiveSkillDetails": {
@@ -937,8 +992,8 @@
     },
 
     "Inventories": {
-      "comment": "Component: what an entity itself carries - a monster's equipment, a chest's contents. NOT the ServerData 'Inventory' further down, which is the player's stash and backpack reached through PlayerInventories; the two share a word and nothing else. NOWHERE IN EITHER REFERENCE - GameHelper2's Objects/Components/ holds 21 files and no inventory among them - so all of this was read off the live dissector (2026-08, owner, on a VultureDemon@75) with nothing to corroborate it. THE COMPONENT IS AN ARRAY, which is what the plural name was saying all along: sub-objects of 0x150 bytes lying inline, the first starting at the component address itself, two of them seen. Three independent things say 0x150: the module pointers at +0x000 and +0x018 repeat exactly at +0x150 and +0x168 (same vtable, same type), the vector below repeats at +0x170, and its inline buffer repeats at +0x188. EACH SUB-OBJECT OWNS A VECTOR WITH INLINE STORAGE, and that is why most of the component reads as empty: begin/end/capacity at +0x20/+0x28/+0x30 point back INTO the sub-object, at +0x38, where 16 slots run to +0xB8. Two entries in the first sub-object, three in the second, and in both the rows go empty at exactly the address 'end' holds. A begin pointer landing inside the structure you are looking at is the tell for inline storage - the empty rows after it are unused slots, not undecoded fields, and reading them as fields is a day lost. WHAT THE ENTRIES ARE IS STILL OPEN: they were followed live and none is a dat row, so the search that went looking for one is closed, not unfinished. ALSO OPEN: +0x158, where the second sub-object's header would put OwnerEntity, holds something other than the entity +0x008 holds - so either the sub-objects are not all the same thing, or that field is not the owner. A third copy at +0x2A0 would settle it.",
-      "consts": { "SubObjectStride": "0x150", "InlineBuffer": "0x38", "InlineSlots": "16" },
+      "comment": "Component: what an entity itself carries - a monster's equipment, a chest's contents. NOT the ServerData 'Inventory' further down, which is the player's stash and backpack reached through PlayerInventories; the two share a word and nothing else. NOWHERE IN EITHER REFERENCE - GameHelper2's Objects/Components/ holds 21 files and no inventory among them - so all of this was read off the live dissector (2026-08, owner, on a VultureDemon@75) with nothing to corroborate it. THE COMPONENT OWNS A VECTOR WITH INLINE STORAGE, and that is why most of it reads as empty: begin/end/capacity at +0x20/+0x28/+0x30 point back INTO the component itself, at +0x38, where 16 slots run to +0xB8, and the rows go empty at exactly the address 'end' holds. A begin pointer landing inside the structure you are looking at is the tell for inline storage - the empty rows after it are unused slots, not undecoded fields, and reading them as fields is a day lost. WHAT THE ENTRIES ARE IS STILL OPEN: they were followed live and none is a dat row, so the search that went looking for one is closed, not unfinished. THE 'ARRAY OF SUB-OBJECTS' READING WAS WRONG, and this is the correction (2026-08, from the recordings). What repeats at +0x150 is the NEXT ENTITY'S Inventories component: 0x150 is the pool cell, not a sub-object stride. Everything the old reading rested on - the same module pointer at +0x000 and +0x150, the same vector at +0x020 and +0x170, the same inline buffer at +0x038 and +0x188 - is exactly what two components of one class lying side by side in a pool look like, and there is no reading of one object's own bytes that can tell the two apart. WHAT TELLS THEM APART IS THE ENTITY LIST, which is outside the object: over 22,363 sightings across every committed recording, the address one cell on is named as its OWN Inventories component by a DIFFERENT entity 16,560 times and by the SAME entity NEVER. In the 64 frames where the neighbour's header happened to be in the recording, its OwnerEntity holds that other entity. That also closes the open question about +0x158: it is the neighbour's OwnerEntity and names the neighbour, which is why it never matched this entity. See the ComponentPools note for the same measurement on nine other components.",
+      "consts": { "PoolCell": "0x150", "InlineBuffer": "0x38", "InlineSlots": "16" },
       "fields": {
         "EntriesVec": {
           "offset": "0x20", "type": "stdVector",
@@ -950,6 +1005,80 @@
       }
     },
 
+    // ── COMPONENTS ARE POOLED, AND THE CELL IS EVIDENCE ────────────────────────────
+    // Measured 2026-08 across all eighteen committed recordings, by walking every entity's
+    // component table and sorting the addresses each component name resolved to. The gaps
+    // are not arbitrary: for most components EVERY gap is a multiple of the smallest one,
+    // which is what a slab allocator handing out fixed cells looks like and what nothing
+    // else does.
+    //
+    //   Actor    0x0CE0 (500/500)   Life          0x0420 (618/618)   Positioned  0x0550 (1866/1866)
+    //   Render   0x0630 (1764/1764) Animated      0x0380 (1780/1780) Stats       0x0210 (753/753)
+    //   Buffs    0x0190 (786)       Pathfinding   0x05A0 (724/724)   Inventories 0x0150 (588)
+    //   OMP      0x02F0 (635)       StateMachine  0x01B0 (637)       Transitionable 0x0140
+    //   Targetable 0x00A0           Chest         0x01F0             MinimapIcon 0x0070
+    //   WorldItem  0x00D0           InteractionAction 0x0080         Preload     0x0030
+    //   Monster  0x0030             BaseEvents    0x0030             Functions   0x0040
+    //   LimitedLifespan 0x0060      Projectile    0x0040             Beam        0x00A0
+    //   GroundEffect 0x00C0         BuffOrbs      0x0090             NPC         0x0080
+    //   Player   0x05C0             PlayerClass   0x0180             ControlZone 0x0100
+    //
+    // WHAT IT IS FOR, and it is the only thing in this project that can say anything about a
+    // field NOBODY EVER READ. A recording holds only the bytes a running build asked for, so
+    // an offset out of a reference normally has exactly two states here: read and confirmed,
+    // or absent and unanswerable. The cell adds a third: an offset BEYOND it cannot be in the
+    // object at all, and one inside it has room. That is what turns Life.Ward (0x2E8),
+    // Divinity (0x338) and Spirit (0x380) from copied numbers into candidates - Life's cell is
+    // 0x420, so all three fit with 0x88 to spare, and had the cell come back 0x280 they would
+    // have been refuted without a single byte of them being read.
+    //
+    // AND IT COST A WRONG CONCLUSION ITS FOOTING. Two components of one class lying side by
+    // side are indistinguishable from one component containing two identical sub-objects, if
+    // all you look at is the object: same vtable one cell on, same vectors, same inline
+    // buffers. Inventories was read that way and the reading was wrong (see its comment). The
+    // discriminator is outside the object - ask the ENTITY LIST who owns the address one cell
+    // on. Over 22,363 Inventories sightings it is another entity's component 16,560 times and
+    // the same entity's NEVER, and the same test comes back the same way for Life (9,733),
+    // Buffs (19,165), Positioned (52,472), Render (31,816) and Actor (4,648), with zero
+    // same-entity repeats anywhere. It also explains two loose ends at a stroke: Inventories
+    // +0x158 (the neighbour's OwnerEntity, so of course it names somebody else) and the pair
+    // of live-looking pointers at Actor +0xF18/+0xF20, which are 0xCE0 + 0x238 and
+    // 0xCE0 + 0x240 - the next actor's SkillActionPtr and MoveActionPtr.
+    //
+    // The measurement is ComponentPoolTests; it replays the fixtures and needs no game.
+
+    // ── WHAT COMPONENTS THE GAME ACTUALLY ATTACHES ─────────────────────────────────
+    // The component table names its own entries, so this is a LIST the game hands over
+    // rather than a hunt. Counted over every committed recording, as distinct entities
+    // carrying each component (2026-08). Components with no struct in this file are marked
+    // (*) - not a to-do list, but the set of questions that CAN be asked.
+    //
+    //   Positioned 3664   BaseEvents 3646   Animated 3361   Render 3360   StateMachine 1726
+    //   Stats 1606   Buffs 1588   Life 1543   Pathfinding 1537   Targetable 1520
+    //   Functions 1216   Preload* 1138   ObjectMagicProperties 1112   Actor 1081
+    //   Inventories 1066   BuffOrbs* 1066   Monster 1051   Transitionable 506
+    //   InteractionAction 505   LimitedLifespan* 501   WorldItem 268   MinimapIcon 260
+    //   Projectile* 204   Beam* 126   TriggerableBlockage 94   Chest 65   ControlZone* 48
+    //   GroundEffect* 44   Wheels* 43   NPC 42   HideoutDoodad* 17   Player 15
+    //   PlayerClass* 15   Portal* 12   CritterAI* 12   DiesAfterTime* 9
+    //   GlobalAudioParamEvents* 5   ProximityTrigger* 4   PetAi* 3   Brackets* 2
+    //   AreaTransition 2   Timer* 1
+    //
+    // FOUR OF THE UNMODELLED ONES ARE THE OPEN QUESTIONS IN docs/architecture.md, which is
+    // the reason to write the list down at all. The danger model is stuck on not knowing how
+    // long a hazard lasts or how big it is: LimitedLifespan sits on 501 entities (effects AND
+    // monsters), DiesAfterTime on the totems, GroundEffect on the standing hazards, and Beam
+    // on Metadata/Effects/BeamEffect - the boss beam that made steering necessary in the first
+    // place. Projectile rides 204 entities including the player's own Spark, where
+    // ProjectileWatch currently derives a direction and a speed by watching one move between
+    // frames. NONE OF THEM CAN BE DECODED FROM THE COMMITTED FILES: no build has read a byte
+    // of any of them, so all eighteen recordings are silent about their contents and the cells
+    // above are the only thing known. That is the standing rule stated once more - a feature
+    // has to be running while a recording is made - and here it names exactly which switches
+    // to have on: the entity walk already resolves these components, so a capture with the
+    // Projectiles and Effects switches on and a build that reads the component bodies would
+    // answer all five at once.
+
     "Component": {
       "comment": "The two fields EVERY component starts with, whatever it is. Worth having as a layout of its own because it is what orients you in one nobody has decoded: the first row says WHICH TYPE this is and the second says whose it is, so a window of unknown bytes already has two rows that mean something. Confirmed live on a DemonicApparitionPortal's Transitionable, where OwnerEntity held exactly the entity address the browser was showing. Named ComponentHeader in the AHK tool.",
       "fields": {
@@ -957,7 +1086,7 @@
           "offset": "0x00", "type": "ptr",
           "comment": "The component's TYPE descriptor - identical across every instance of the same component, so it fingerprints the type. Two rows sharing this value are the same kind of thing."
         },
-        "OwnerEntity": { "offset": "0x08", "type": "ptr", "comment": "The entity this component belongs to." }
+        "OwnerEntity": { "offset": "0x08", "type": "ptr", "comment": "The entity this component belongs to. CORROBORATED FROM THE RECORDINGS 2026-08, by an argument that does not depend on this offset being right: components are pooled, so the address one cell past a component is a DIFFERENT entity's component of the same class, and in the 64 sightings where that neighbour's header happened to be in a recording this field held exactly the entity the entity list names as its owner. It reads unread far more often than not - no build has ever read a component header - so the sample is small and one-sided, and it is the SAME answer the live dissector gave on a DemonicApparitionPortal's Transitionable." }
       }
     },
 

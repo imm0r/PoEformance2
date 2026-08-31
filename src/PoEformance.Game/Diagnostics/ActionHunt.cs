@@ -213,7 +213,21 @@ public sealed class ActionHunt
         // Both switches on: the actions are what is being checked, and the facing is the
         // independent cross-check on them. Off by default everywhere else, so a hunt is the
         // only thing that pays for them.
-        _world = new World.WorldReader(reader, schema) { ReadActions = true, ReadAim = true };
+        //
+        // AND THE OFF-SCREEN GATE OFF, which is not a detail. That gate skips the aim read for
+        // monsters the camera cannot see, which is free for an overlay drawing over them and
+        // ruinous for a measurement: this hunt's published numbers - 1649 aimed actions
+        // agreeing with the facing to a median of 1.6 degrees, 210 completed moves - are a
+        // sample of what the game did, not of what was on screen while it did it. Leaving the
+        // default on cost that sample a third of itself the moment the gate was added, which
+        // MonsterActionsSettledTests caught. An instrument that measures the world reads all
+        // of it.
+        _world = new World.WorldReader(reader, schema)
+        {
+            ReadActions = true,
+            ReadAim = true,
+            SkipOffScreenReads = false,
+        };
 
         StructDef actor = schema.Structs["Actor"];
         _animationId = actor.OffsetOf("AnimationId");

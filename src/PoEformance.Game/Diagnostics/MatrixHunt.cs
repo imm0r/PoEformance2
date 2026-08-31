@@ -19,6 +19,11 @@ namespace PoEformance.Game.Diagnostics;
 /// How much the projection moves when world z changes. A real 3D projection must respond to
 /// height; a flat 2D transform (a minimap, say) ignores it entirely.
 /// </param>
+/// <param name="FrustumFit">
+/// Worst distance, in NDC, from any frustum corner to the edge of the screen once projected
+/// through this matrix - 0 when the two agree exactly. Infinity when no frustum was readable,
+/// which is not a mark against the candidate.
+/// </param>
 public sealed record ProjectionCandidate(
     int Offset,
     bool Transposed,
@@ -27,7 +32,8 @@ public sealed record ProjectionCandidate(
     double PlayerW,
     double OnScreenFraction,
     double Linearity,
-    double DepthResponse)
+    double DepthResponse,
+    double FrustumFit = double.PositiveInfinity)
 {
     /// <summary>
     /// Ranking score, led by <see cref="Linearity"/>.
@@ -151,7 +157,8 @@ public static class MatrixHunt
 
             foreach (bool transposed in (ReadOnlySpan<bool>)[false, true])
             {
-                ProjectionCandidate? candidate = Evaluate(matrix, transposed, start + offset, player, scene);
+                ProjectionCandidate? candidate =
+                    Evaluate(matrix, transposed, start + offset, player, scene, snapshot.Frustum);
                 if (candidate is not null)
                 {
                     results.Add(candidate);
@@ -173,8 +180,18 @@ public static class MatrixHunt
     }
 
     /// <summary>Scores one matrix against the scene, or null if it fails a hard test.</summary>
+    /// <remarks>
+    /// <paramref name="frustum"/> is REPORTED, not gated on, and the distinction is the whole
+    /// lesson of this file. Agreement with the frustum is by far the sharpest signal available
+    /// - two independent descriptions of one camera, matching to the float - but it is only a
+    /// signal about the PAIR. A patch that moves the whole camera block moves the frustum too,
+    /// and a hard test on it would then reject the true matrix at its new offset: precisely
+    /// the failure this hunt was written to replace. So it goes in the report, where a person
+    /// can see that both halves moved together, and the admission tests stay on the scene.
+    /// </remarks>
     private static ProjectionCandidate? Evaluate(
-        float[] matrix, bool transposed, int offset, WorldEntity player, IReadOnlyList<WorldEntity> entities)
+        float[] matrix, bool transposed, int offset, WorldEntity player, IReadOnlyList<WorldEntity> entities,
+        CameraFrustum? frustum)
     {
         (double px, double py, double pw) = Clip(matrix, transposed, player.WorldX, player.WorldY, player.WorldZ);
         if (pw is <= MinW or > MaxW)
@@ -244,8 +261,16 @@ public static class MatrixHunt
             ? Math.Min(FitQuality(worldX, worldY, screenX), FitQuality(worldX, worldY, screenY))
             : 0;
 
+        // Only the game's own convention can be compared with the frustum: the transposed
+        // reading is a different projection, and scoring it against corners the game placed
+        // under the direct one would be comparing two answers to different questions.
+        double frustumFit = frustum is not null && !transposed
+            ? frustum.WorstCornerOffEdge(matrix)
+            : double.PositiveInfinity;
+
         return new ProjectionCandidate(
-            offset, transposed, offCentre, spread, pw, onScreen / (double)projected, linearity, depthResponse);
+            offset, transposed, offCentre, spread, pw, onScreen / (double)projected, linearity, depthResponse,
+            frustumFit);
     }
 
     /// <summary>
@@ -334,21 +359,102 @@ public static class MatrixHunt
             return;
         }
 
-        output.WriteLine("  offset  layout      w    off-centre   spread  on-screen  linearity  depth");
+        output.WriteLine("  offset  layout      w    off-centre   spread  on-screen  linearity  depth  frustum");
         foreach (ProjectionCandidate c in candidates.Take(8))
         {
             output.WriteLine(
                 $"  +0x{c.Offset:X3}  {(c.Transposed ? "transposed" : "direct    ")} "
                 + $"{c.PlayerW,8:F1}  {c.PlayerOffCentre,8:F4} {c.Spread,8:F3}  {c.OnScreenFraction,7:P0}"
                 + $"  {c.Linearity,9:F4}  {c.DepthResponse,5:F3}"
+                + $"  {(double.IsInfinity(c.FrustumFit) ? "     -" : c.FrustumFit.ToString("F4"))}"
                 + (c.Offset == currentOffset ? "   <- schema" : string.Empty));
         }
 
-        ProjectionCandidate best = candidates[0];
+        Recommend(candidates, currentOffset, output);
+        ReportFrustum(candidates, currentOffset, output);
+    }
+
+    /// <summary>
+    /// Names the offset to use, letting the frustum overrule the score when it can.
+    /// </summary>
+    /// <remarks>
+    /// THE SCORE GETS THIS WRONG ON REAL DATA, which is why the frustum leads here. Against
+    /// tests/fixtures/session-2026-08-monsters.rec the ranking puts 0x12C READ TRANSPOSED
+    /// first, at a linearity of 0.9791 against the true matrix's 0.9539 - and 0x12C is the
+    /// THIRD FRUSTUM PLANE. The old decoy in a new guise: a person following that line would
+    /// have moved the schema off a working offset onto a block of clipping planes, exactly
+    /// the mistake this hunt was written after. The frustum column separates them at a
+    /// glance, 0.0000 against nothing at all.
+    ///
+    /// Preferring agreement over score is safe in the direction that matters. A frustum that
+    /// has itself drifted does not read at all - <see cref="World.CameraFrustum.Read"/>
+    /// refuses six normals that are not unit length - so the fallback is the old behaviour
+    /// rather than a confident wrong answer. What it cannot do is rescue a session with no
+    /// frustum in it, and it says so instead of pretending.
+    /// </remarks>
+    private static void Recommend(
+        IReadOnlyList<ProjectionCandidate> candidates, int currentOffset, TextWriter output)
+    {
         output.WriteLine();
+        ProjectionCandidate? agreeing = candidates.FirstOrDefault(c => !c.Transposed && c.FrustumFit < 0.01);
+
+        if (agreeing is not null)
+        {
+            output.WriteLine(agreeing.Offset == currentOffset
+                ? $"  the schema offset 0x{currentOffset:X} is confirmed by the camera frustum."
+                : $"  BEST: W2SMatrix = 0x{agreeing.Offset:X} - the camera frustum agrees with it, which"
+                  + " settles it over the ranking above.");
+            return;
+        }
+
+        ProjectionCandidate best = candidates[0];
         output.WriteLine(best.Offset == currentOffset && !best.Transposed
             ? $"  the schema offset 0x{currentOffset:X} is the best candidate."
             : $"  BEST: W2SMatrix = 0x{best.Offset:X}"
               + (best.Transposed ? " READ TRANSPOSED (the projection convention needs flipping)." : "."));
+    }
+
+    /// <summary>
+    /// Says whether the matrix and the camera frustum still describe the same camera.
+    /// </summary>
+    /// <remarks>
+    /// The sharpest line in this report and the shortest, because it needs no scene and no
+    /// threshold anybody has to agree with: the frustum's eight corners ARE the screen's, so a
+    /// correct matrix sends every one of them to an edge of NDC space. Eighteen recordings put
+    /// it at 0.0000. A number here that is not tiny means one of the two moved, which no
+    /// column above can tell you - they all score the matrix against the world, and a matrix
+    /// and a frustum that drifted TOGETHER would score perfectly and still agree with each
+    /// other. That is the case this line exists to distinguish from the alarming one.
+    /// </remarks>
+    private static void ReportFrustum(
+        IReadOnlyList<ProjectionCandidate> candidates, int currentOffset, TextWriter output)
+    {
+        ProjectionCandidate? schema = candidates
+            .FirstOrDefault(c => c.Offset == currentOffset && !c.Transposed);
+
+        output.WriteLine();
+        if (schema is null || double.IsInfinity(schema.FrustumFit))
+        {
+            output.WriteLine("  camera frustum: not readable - nothing to cross-check the matrix against.");
+            return;
+        }
+
+        output.WriteLine(schema.FrustumFit < 0.01
+            ? $"  camera frustum: AGREES with the schema matrix (worst corner {schema.FrustumFit:F4} off the"
+              + " viewport edge)."
+            : $"  camera frustum: DISAGREES with the schema matrix - worst corner {schema.FrustumFit:F4} off the"
+              + " viewport edge, where it should be 0. One of W2SMatrix, FrustumCorners or"
+              + " FrustumPlanes has drifted.");
+
+        // Said out loud because the two lines above can look like they contradict each other,
+        // and the resolution is the useful part: a candidate that beats the schema offset on
+        // the scene but not on the frustum is the failure mode this whole file exists for.
+        ProjectionCandidate top = candidates[0];
+        if (schema.FrustumFit < 0.01 && (top.Offset != schema.Offset || top.Transposed))
+        {
+            output.WriteLine(
+                $"  (0x{top.Offset:X} scores higher against the scene and does NOT agree with the frustum -"
+                + " treat it as a decoy.)");
+        }
     }
 }
