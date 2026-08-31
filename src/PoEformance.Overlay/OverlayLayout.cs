@@ -194,6 +194,80 @@ public static class OverlayLayout
     }
 
     /// <summary>
+    /// Splits one tool's own settings into pages, when it has too many to stack.
+    /// </summary>
+    /// <remarks>
+    /// THE ANSWER TO A TOOL THAT DOES NOT FIT. Folding helps a page with several tools on it;
+    /// it does not help a single tool with sixty settings, because those settings are all
+    /// ITS - folded away they are just as far off as before, and unfolded they are a scroll.
+    /// The tracker is the case: four subjects, and reading any one of them meant scrolling
+    /// past the other three.
+    ///
+    /// Tabs cut that to what is being worked on. They are also the one arrangement here that
+    /// cannot be confused with anything else on screen: nothing else in a page's body is a row
+    /// of clickable headings.
+    ///
+    /// WHOLE TABS AS CALLBACKS rather than a Begin/End pair offered to the caller. An
+    /// unbalanced pair is a corrupt ImGui stack and an assert that takes the process down, and
+    /// the shape that prevents it is the same one <see cref="OverlayFonts.Heading"/> uses. The
+    /// array and its closures are built per frame, which is a real cost and not one that
+    /// matters here: a settings page is drawn only while somebody is looking at it, and
+    /// somebody looking at a settings page is not in a fight.
+    /// </remarks>
+    /// <param name="id">The bar's ImGui id, unique within its window.</param>
+    /// <param name="tabs">Each tab's heading and what to draw inside it.</param>
+    public static void Tabs(string id, params (string Label, Action Draw)[] tabs)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(id);
+        ArgumentNullException.ThrowIfNull(tabs);
+
+        if (!ImGui.BeginTabBar(id, ImGuiTabBarFlags.FittingPolicyScroll))
+        {
+            return;
+        }
+
+        try
+        {
+            foreach ((string label, Action draw) in tabs)
+            {
+                // ImGui.NET only exposes the flags overload together with the ref-bool that
+                // puts a close button on every tab, and these tabs must not have one - a
+                // closed tab needs a list somewhere to reopen it from. BeginTabItem's plain
+                // overload is the one without it.
+                if (!ImGui.BeginTabItem(label))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    // Its own id scope per tab, so two tabs holding a control of the same
+                    // name - and several hold a "filter" - do not share one ImGui id, which
+                    // would be one scroll position and one open state between them.
+                    ImGui.PushID(label);
+                    try
+                    {
+                        ImGui.Spacing();
+                        draw();
+                    }
+                    finally
+                    {
+                        ImGui.PopID();
+                    }
+                }
+                finally
+                {
+                    ImGui.EndTabItem();
+                }
+            }
+        }
+        finally
+        {
+            ImGui.EndTabBar();
+        }
+    }
+
+    /// <summary>
     /// A named block of related settings, which is NOT a section and must not look like one.
     /// </summary>
     /// <remarks>

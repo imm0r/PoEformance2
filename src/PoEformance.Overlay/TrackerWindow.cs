@@ -71,20 +71,39 @@ public sealed class TrackerWindow
         _animations = animations;
     }
 
-    /// <summary>Draws the tab's content.</summary>
+    /// <summary>
+    /// Draws the tab's content, as four pages rather than one long scroll.
+    /// </summary>
+    /// <remarks>
+    /// FOUR SUBJECTS, AND READING ONE MEANT SCROLLING PAST THREE. This tool had five folds
+    /// stacked down a page that did not fit a screen at the smallest text size, and folding
+    /// did not help: everything under those folds belongs to this one tool, so folded they
+    /// were no nearer and unfolded they were a scroll. Tabs cut the page to the subject being
+    /// worked on - see <see cref="OverlayLayout.Tabs"/>.
+    ///
+    /// THE FOURTH IS NOT A SETTING. What is on the player right now is the thing that makes
+    /// the other three usable, because a status rule matches on an internal spelling nobody is
+    /// shown anywhere else. It was the last fold at the bottom of the longest page in the
+    /// tool; it is a tab of its own now, and clicking a name there writes the rule rather than
+    /// asking somebody to copy it upwards.
+    /// </remarks>
     public void DrawTab(WorldSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
 
         TrackerSettings settings = _read();
 
-        DrawLines(settings);
-        ImGui.Separator();
-        DrawAim(settings, snapshot);
-        ImGui.Separator();
-        DrawGroundDanger(settings, snapshot);
-        ImGui.Separator();
-        DrawStatus(settings, snapshot);
+        OverlayLayout.Tabs(
+            "tracker-parts",
+            ("Monsters & facing", () =>
+            {
+                DrawLines(settings);
+                ImGui.Spacing();
+                DrawAim(settings, snapshot);
+            }),
+            ("Hazards & ground", () => DrawGroundDanger(settings, snapshot)),
+            ("Status effects", () => DrawStatus(settings)),
+            ("Live inspector", () => DrawLiveNames(settings, snapshot)));
     }
 
     // ── Where they are pointing ──────────────────────────────────────────────
@@ -99,15 +118,12 @@ public sealed class TrackerWindow
     /// </remarks>
     private void DrawAim(TrackerSettings settings, WorldSnapshot snapshot)
     {
-        if (!OverlayLayout.Subsection("Where they are pointing"))
-        {
-            return;
-        }
+        OverlayLayout.Group("Facing vectors");
 
         AimSettings aim = settings.AimOrDefault;
 
         bool on = aim.Enabled;
-        if (OverlayLayout.Toggle("Draw a ray along each monster's facing", ref on))
+        if (OverlayLayout.Toggle("Draw facing ray", ref on))
         {
             _write(settings with { Aim = aim with { Enabled = on } });
         }
@@ -128,7 +144,7 @@ public sealed class TrackerWindow
         }
 
         bool acting = aim.OnlyWhileActing;
-        if (OverlayLayout.Toggle("Only while doing something", ref acting))
+        if (OverlayLayout.Toggle("Active only", ref acting))
         {
             _write(settings with { Aim = aim with { OnlyWhileActing = acting } });
         }
@@ -136,7 +152,7 @@ public sealed class TrackerWindow
         OverlayLayout.Cell(1);
 
         bool turn = aim.ShowTurn;
-        if (OverlayLayout.Toggle("Show the turn", ref turn))
+        if (OverlayLayout.Toggle("Show turn", ref turn))
         {
             _write(settings with { Aim = aim with { ShowTurn = turn } });
         }
@@ -144,7 +160,7 @@ public sealed class TrackerWindow
         OverlayLayout.Cell(2);
 
         bool action = aim.ShowAction;
-        if (OverlayLayout.Toggle("Name the action", ref action))
+        if (OverlayLayout.Toggle("Show action", ref action))
         {
             _write(settings with { Aim = aim with { ShowAction = action } });
         }
@@ -152,7 +168,7 @@ public sealed class TrackerWindow
         OverlayLayout.Cell(3);
 
         bool player = aim.ShowPlayer;
-        if (OverlayLayout.Toggle("And your own", ref player))
+        if (OverlayLayout.Toggle("Include self", ref player))
         {
             _write(settings with { Aim = aim with { ShowPlayer = player } });
         }
@@ -285,27 +301,33 @@ public sealed class TrackerWindow
 
     // ── Lines to monsters ────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Which rarities get a line. A GROUP rather than a fold, because it is one row.
+    /// </summary>
+    /// <remarks>
+    /// A fold offers to hide something, and what it would hide here is a single line of three
+    /// switches - so the header costs a click and a line of chrome to save one line. It only
+    /// became worth saying once the folds stopped looking like the section around them: at that
+    /// point a fold over one row reads as a fold that forgot what it was for.
+    /// </remarks>
     private void DrawLines(TrackerSettings settings)
     {
-        if (!OverlayLayout.Subsection("Lines to monsters", openByDefault: true))
-        {
-            return;
-        }
+        OverlayLayout.Group("Lines to monsters");
 
         MonsterLineSettings lines = settings.LinesOrDefault;
 
         // THREE SWITCHES ON ONE LINE. They are one setting asked three times - which rarities
         // get a line - so they belong in a row rather than stacked down the page with a
-        // paragraph over them. The paragraph itself is a tooltip on the first: what it says
-        // is true of all three and is read once.
-        (bool unique, string uniqueColour) = Line("Unique", lines.Unique, lines.UniqueColour);
-        OverlayLayout.Hint("Drawn from your own feet, so the eye can follow one out of a crowd.");
+        // paragraph over them.
+        const string why = "Drawn from your own feet, so the eye can follow one out of a crowd.";
+
+        (bool unique, string uniqueColour) = Line("Unique", lines.Unique, lines.UniqueColour, why);
 
         OverlayLayout.Cell(1);
-        (bool rare, string rareColour) = Line("Rare", lines.Rare, lines.RareColour);
+        (bool rare, string rareColour) = Line("Rare", lines.Rare, lines.RareColour, why);
 
         OverlayLayout.Cell(2);
-        (bool magic, string magicColour) = Line("Magic", lines.Magic, lines.MagicColour);
+        (bool magic, string magicColour) = Line("Magic", lines.Magic, lines.MagicColour, why);
 
         var wanted = new MonsterLineSettings(
             unique, rare, magic, uniqueColour, rareColour, magicColour);
@@ -317,11 +339,24 @@ public sealed class TrackerWindow
     }
 
     /// <summary>One rarity's switch and colour, as they stand after the row was drawn.</summary>
-    private static (bool On, string Colour) Line(string label, bool on, string colour)
+    /// <remarks>
+    /// THE TOOLTIP BELONGS TO EVERY ONE OF THESE, so it is asked for here rather than once
+    /// after the first. Written outside, it hung off whichever control happened to be drawn
+    /// last before it - the "Unique" label - so hovering "Rare" or "Magic" got nothing, and
+    /// the one explanation covering all three switches was reachable from a third of them.
+    ///
+    /// THE WHOLE ROW IS THE TARGET, not the label alone. A BeginGroup/EndGroup pair makes the
+    /// three controls one item as far as <c>IsItemHovered</c> is concerned, so the tooltip
+    /// answers to the tick and the swatch as well - which is where a pointer actually goes.
+    /// </remarks>
+    /// <param name="hint">What the tooltip says. The same for every rarity.</param>
+    private static (bool On, string Colour) Line(string label, bool on, string colour, string hint)
     {
         ImGui.PushID(label);
         try
         {
+            ImGui.BeginGroup();
+
             bool wanted = on;
             ImGui.Checkbox("##on", ref wanted);
 
@@ -333,6 +368,10 @@ public sealed class TrackerWindow
 
             ImGui.SameLine();
             ImGui.TextUnformatted(label);
+
+            ImGui.EndGroup();
+            OverlayLayout.Hint(hint);
+
             return (wanted, wantedColour);
         }
         finally
@@ -354,7 +393,7 @@ public sealed class TrackerWindow
     private void DrawKnownHazards(TrackerSettings settings)
     {
         bool ground = settings.ShowGroundEffects;
-        if (OverlayLayout.Toggle("Ring every ground effect the game marks as one", ref ground))
+        if (OverlayLayout.Toggle("Ring marked hazards", ref ground))
         {
             _write(settings with { ShowGroundEffects = ground });
         }
@@ -379,7 +418,7 @@ public sealed class TrackerWindow
         }
 
         bool gameRadius = settings.GroundEffectUseGameRadius;
-        if (OverlayLayout.Toggle("Size it from the component's own radius", ref gameRadius))
+        if (OverlayLayout.Toggle("Use component radius", ref gameRadius))
         {
             _write(settings with { GroundEffectUseGameRadius = gameRadius });
         }
@@ -433,7 +472,7 @@ public sealed class TrackerWindow
             + " effects have no timer at all and simply show none.");
 
         bool labels = settings.ShowGroundEffectLabels;
-        if (OverlayLayout.Toggle("Label each ring with its metadata path", ref labels))
+        if (OverlayLayout.Toggle("Show metadata path", ref labels))
         {
             _write(settings with { ShowGroundEffectLabels = labels });
         }
@@ -445,7 +484,7 @@ public sealed class TrackerWindow
             + " the case worth reporting.");
 
         bool beams = settings.ShowBeams;
-        if (OverlayLayout.Toggle("Draw boss beams as the path they occupy", ref beams))
+        if (OverlayLayout.Toggle("Draw boss beams", ref beams))
         {
             _write(settings with { ShowBeams = beams });
         }
@@ -486,17 +525,12 @@ public sealed class TrackerWindow
 
     private void DrawGroundDanger(TrackerSettings settings, WorldSnapshot snapshot)
     {
-        if (!OverlayLayout.Subsection("Dangerous ground"))
-        {
-            return;
-        }
-
         DrawKnownHazards(settings);
 
-        ImGui.Separator();
+        OverlayLayout.Group("Custom ground filter rules");
 
         bool on = settings.ShowGroundDanger;
-        if (OverlayLayout.Toggle("Ring the ground effects below", ref on))
+        if (OverlayLayout.Toggle("Ring what the rules below match", ref on))
         {
             _write(settings with { ShowGroundDanger = on });
         }
@@ -526,7 +560,8 @@ public sealed class TrackerWindow
         // and stay lined up when the thickness slider comes and goes with "filled" - laid out
         // by hand, that slider vanishing shifted everything after it sideways per row. The
         // path takes the stretch column, so it soaks up the width at every text size.
-        if (rules.Count > 0 && ImGui.BeginTable("##ground-rules", 7, ImGuiTableFlags.SizingFixedFit))
+        if (rules.Count > 0 && ImGui.BeginTable(
+                "##ground-rules", 7, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Resizable))
         {
             try
             {
@@ -668,13 +703,8 @@ public sealed class TrackerWindow
 
     // ── Status effects ───────────────────────────────────────────────────────
 
-    private void DrawStatus(TrackerSettings settings, WorldSnapshot snapshot)
+    private void DrawStatus(TrackerSettings settings)
     {
-        if (!OverlayLayout.Subsection("Status effects"))
-        {
-            return;
-        }
-
         bool player = settings.ShowPlayerStatus;
         if (OverlayLayout.Toggle("Over the player", ref player))
         {
@@ -683,7 +713,7 @@ public sealed class TrackerWindow
 
         OverlayLayout.Cell(1);
         bool monsters = settings.ShowMonsterStatus;
-        if (OverlayLayout.Toggle("Over rare and unique monsters", ref monsters))
+        if (OverlayLayout.Toggle("Rares \u0026 uniques only", ref monsters))
         {
             _write(settings with { ShowMonsterStatus = monsters });
         }
@@ -712,9 +742,6 @@ public sealed class TrackerWindow
         OverlayLayout.Group("On monsters");
         DrawRules(settings, settings.MonsterStatusOrDefault, "monster",
             rules => settings with { MonsterStatus = rules });
-
-        ImGui.Spacing();
-        DrawLiveNames(snapshot);
     }
 
     /// <summary>The sheet path, and what actually loaded from it.</summary>
@@ -872,27 +899,31 @@ public sealed class TrackerWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, "timer bar background");
 
+        // A 2x2 GRID, not a row of four. These are two offsets - where the stack count sits and
+        // where the timer sits - each with an x and a y, and a row of four puts "stacks y" and
+        // "timer x" side by side as though they were a pair. Two rows of two says which two
+        // numbers belong together, and each column is one axis: the x of one is directly above
+        // the x of the other, which is how you nudge both the same way.
         int chargesX = settings.ChargesX;
         if (OverlayLayout.Narrow.Slider("##chargesx", ref chargesX, -64, 64, "stacks x %d"))
         {
             _write(settings with { ChargesX = chargesX });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
         int chargesY = settings.ChargesY;
         if (OverlayLayout.Narrow.Slider("##chargesy", ref chargesY, -64, 64, "stacks y %d"))
         {
             _write(settings with { ChargesY = chargesY });
         }
 
-        ImGui.SameLine();
         int timerX = settings.TimerX;
         if (OverlayLayout.Narrow.Slider("##timerx", ref timerX, -64, 64, "timer x %d"))
         {
             _write(settings with { TimerX = timerX });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
         int timerY = settings.TimerY;
         if (OverlayLayout.Narrow.Slider("##timery", ref timerY, -64, 64, "timer y %d"))
         {
@@ -913,7 +944,8 @@ public sealed class TrackerWindow
 
         // The same table the ground rules use, for the same reasons: aligned columns at any
         // text size, and the name soaking up the width in the stretch column.
-        if (rules.Count > 0 && ImGui.BeginTable($"##status-rules-{id}", 9, ImGuiTableFlags.SizingFixedFit))
+        if (rules.Count > 0 && ImGui.BeginTable(
+                $"##status-rules-{id}", 9, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Resizable))
         {
             try
             {
@@ -1130,66 +1162,179 @@ public sealed class TrackerWindow
     }
 
     /// <summary>
-    /// What is on the player and on the monsters right now, by the game's own names.
+    /// What is on the player and on the monsters right now - and a click writes the rule.
     /// </summary>
     /// <remarks>
-    /// The half of this tab that makes the rest usable. A rule matches on an internal spelling
-    /// nobody is shown anywhere else, so without this the only way to write one is to guess -
-    /// and a rule that matches nothing looks exactly like a feature that does not work.
+    /// THE HALF OF THIS TAB THAT MAKES THE REST USABLE. A status rule matches on an internal
+    /// spelling nobody is shown anywhere else - "shocked_70", "stolen_mods_buff_70" - so
+    /// without this list the only way to write one is to guess, and a rule that matches
+    /// nothing looks exactly like a feature that does not work.
+    ///
+    /// SO CLICKING A NAME WRITES THE RULE. This was a wall of text under an instruction to
+    /// "copy a name into a rule above" - which meant reading a name off one part of the page,
+    /// scrolling to another, adding an empty rule and typing the name back in from memory,
+    /// with every chance to mistype a string that has to match exactly enough. The names are
+    /// on screen and the rule list is one call away; asking a person to be the clipboard
+    /// between them is work the tool can do.
+    ///
+    /// TWO PANELS SIDE BY SIDE rather than one column, because the two lists answer different
+    /// questions - what is on ME, and what is on THEM - and a click means a different thing in
+    /// each: one writes a player rule, the other a monster rule. Stacked, that difference
+    /// rests on which heading somebody last scrolled past.
     /// </remarks>
-    private static void DrawLiveNames(WorldSnapshot snapshot)
+    private void DrawLiveNames(TrackerSettings settings, WorldSnapshot snapshot)
     {
-        if (!OverlayLayout.Subsection("What is on things right now"))
+        OverlayLayout.Note("Click an entry to add it as a rule. Matching is loose, so a fragment works.");
+
+        // Half the width each, less the gap between them. Zero height fills what is left, so
+        // the two grow with the window rather than at a height chosen here.
+        float half = (ImGui.GetContentRegionAvail().X - ImGui.GetStyle().ItemSpacing.X) * 0.5f;
+
+        DrawBuffPanel(
+            "##live-player", "On you", new Vector2(half, 0f), settings.PlayerStatusOrDefault,
+            name => _write(_read() with { PlayerStatus = [.. _read().PlayerStatusOrDefault, new StatusIconRule(name)] }),
+            panel => panel.Add(snapshot.PlayerBuffs is { All.Count: > 0 } ? "you" : string.Empty, snapshot.PlayerBuffs));
+
+        ImGui.SameLine();
+
+        DrawBuffPanel(
+            "##live-monsters", "On monsters", new Vector2(half, 0f), settings.MonsterStatusOrDefault,
+            name => _write(_read() with { MonsterStatus = [.. _read().MonsterStatusOrDefault, new StatusIconRule(name)] }),
+            panel =>
+            {
+                int shown = 0;
+                foreach (WorldEntity monster in snapshot.Entities)
+                {
+                    if (monster.Kind != EntityKind.Monster || monster.Buffs is null || monster.Buffs.All.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    panel.Add(monster.ShortName, monster.Buffs);
+                    if (++shown >= 4)
+                    {
+                        break;
+                    }
+                }
+
+                if (shown == 0)
+                {
+                    OverlayLayout.Note(
+                        "Nothing being read - tick \"Rares & uniques only\" on the Status effects tab"
+                        + " and stand next to one.");
+                }
+            });
+    }
+
+    /// <summary>One side of the inspector: a bordered list of what is on something.</summary>
+    /// <param name="already">The rules that exist, so a name already covered says so.</param>
+    /// <param name="add">Writes a new rule for the name that was clicked.</param>
+    /// <param name="fill">Puts the things being listed into the panel.</param>
+    private static void DrawBuffPanel(
+        string id,
+        string title,
+        Vector2 size,
+        IReadOnlyList<StatusIconRule> already,
+        Action<string> add,
+        Action<BuffPanel> fill)
+    {
+        if (!ImGui.BeginChild(id, size, ImGuiChildFlags.Borders))
         {
+            ImGui.EndChild();
             return;
         }
 
-        ImGuiText.Wrapped(DimText, "copy a name into a rule above - matching is loose, so a fragment works.");
-
-        Names("on you", snapshot.PlayerBuffs);
-
-        int shown = 0;
-        foreach (WorldEntity monster in snapshot.Entities)
+        try
         {
-            if (monster.Kind != EntityKind.Monster || monster.Buffs is null || monster.Buffs.All.Count == 0)
-            {
-                continue;
-            }
-
-            Names(monster.ShortName, monster.Buffs);
-            if (++shown >= 4)
-            {
-                break;
-            }
+            OverlayLayout.Group(title);
+            fill(new BuffPanel(already, add));
         }
-
-        if (shown == 0)
+        finally
         {
-            ImGuiText.Wrapped(
-                DimText,
-                "no monster buffs are being read - tick \"over rare and unique monsters\" above and"
-                + " stand next to one.");
+            // In a finally and unconditionally: EndChild pairs with BeginChild whatever it
+            // returned, and an exception between the two leaves ImGui's stack unbalanced.
+            ImGui.EndChild();
         }
     }
 
-    /// <summary>One thing's buffs, with what the drawing needs from each.</summary>
-    private static void Names(string who, ActiveBuffs? buffs)
+    /// <summary>
+    /// One panel while it is being filled: what is listed, and what a click on it does.
+    /// </summary>
+    /// <remarks>
+    /// A small type rather than four parameters threaded through, because the two sides differ
+    /// only in what they list and what a click writes - and passing "the thing a click adds a
+    /// rule to" as a loose delegate beside a loose list is how the player's names end up
+    /// writing a monster rule.
+    /// </remarks>
+    private readonly struct BuffPanel(IReadOnlyList<StatusIconRule> already, Action<string> add)
     {
-        if (buffs is null || buffs.All.Count == 0)
+        /// <summary>Lists one thing's buffs, each of them clickable.</summary>
+        public void Add(string who, ActiveBuffs? buffs)
         {
-            ImGui.TextColored(DimText, $"{who}: nothing");
-            return;
+            if (buffs is null || buffs.All.Count == 0)
+            {
+                if (who.Length > 0)
+                {
+                    OverlayLayout.Note("Nothing on it.");
+                }
+
+                return;
+            }
+
+            if (who.Length > 0)
+            {
+                ImGui.TextUnformatted(ImGuiText.Escape(who));
+            }
+
+            foreach (ActiveBuff buff in buffs.All)
+            {
+                Row(buff);
+            }
         }
 
-        ImGui.TextUnformatted($"{who}:");
-        foreach (ActiveBuff buff in buffs.All)
+        /// <summary>One buff: its name, what the drawing needs, and a click that rules it.</summary>
+        private void Row(ActiveBuff buff)
         {
-            ImGui.TextColored(
-                DimText,
-                string.Create(
-                    CultureInfo.CurrentCulture,
-                    $"    {ImGuiText.Escape(buff.Name)}   {buff.TimeLeft:F1}s of {buff.TotalTime:F1}s"
-                    + $"{(buff.Charges > 0 ? $"   x{buff.Charges}" : string.Empty)}"));
+            // A rule already covering this name means clicking again would add a duplicate
+            // that can never be told from the first. Said rather than silently refused: a
+            // click that does nothing reads as a broken list.
+            bool have = false;
+            foreach (StatusIconRule rule in already)
+            {
+                if (rule.Matches(buff.Name))
+                {
+                    have = true;
+                    break;
+                }
+            }
+
+            ImGui.PushID(buff.Name);
+            try
+            {
+                // Selectable rather than text, so the whole row is the target and it lights up
+                // under the pointer - which is what says "this does something" without a word.
+                if (ImGui.Selectable(ImGuiText.Escape(buff.Name), have) && !have)
+                {
+                    add(buff.Name);
+                }
+
+                if (!have)
+                {
+                    OverlayLayout.Hint("Click to add a rule for this.");
+                }
+
+                ImGui.SameLine();
+                ImGuiText.Mono(
+                    OverlayInk.Quiet,
+                    string.Create(
+                        CultureInfo.CurrentCulture,
+                        $"{buff.TimeLeft:F1}s of {buff.TotalTime:F1}s"
+                        + $"{(buff.Charges > 0 ? $"   x{buff.Charges}" : string.Empty)}"));
+            }
+            finally
+            {
+                ImGui.PopID();
+            }
         }
     }
 }
