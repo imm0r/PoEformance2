@@ -2153,11 +2153,20 @@ two ways that cannot both be wrong (nine rows on a 0x48 grid; the only PoE2 tabl
 0x48**, because a dat table divides its own rows by its own by-Id index and so answers its row
 size without any schema at all.
 
-One hop has no fixture behind it, which is worth knowing before trusting it: the preload walk
-reads a 32-byte string header at `record+0x08` and stops one byte short of `RowStorePtr` at
-`+0x28`, so no recording in this repo has ever read a file record's row store. It is the same
-`RowStorePtr` already confirmed on the same kind of object from the MinimapIcon and NPCs side,
-and on this route it is exercised synthetically until somebody runs `--glossary --record`.
+**It runs.** `session-2026-08-glossary.rec` is `--glossary --record` on a live client, and
+`GlossaryTableTests` replays it: 6,907 loaded files, 131 dat tables among them, KeywordPopups
+found by name, and 1,026 rows of 0x48 read as English. That closes the one hop no other capture
+could reach — every other recording walks the file table for its *names*, and the preload reader
+stops one byte short of `RowStorePtr` at `+0x28`. It also turns the 0x48 from column arithmetic
+over dat-schema into the client's own number.
+
+**And it corrected the tool three times, all in the same direction.** The screenshot showed
+`+100%%`, so `Plain` collapsed a doubled percent — the raw column holds `+100%`, and the
+doubling was `ImGuiText.Escape` in our own drawing path. A bracket with no pipe was written down
+as a form "not seen in this table"; there are 859 of them. And the definition cap of 512
+characters silently truncated 56 rows, `Critical`'s ending mid-word. Every one of the three came
+from reading the tool's own rendering as if it were the game's data — which is the failure this
+document's first rule is about, arriving in the one place that felt safe.
 
 ### Prices — what the stash is worth
 
