@@ -217,6 +217,74 @@ button:hover { border-color: var(--accent); }
 .af-item { color: var(--text); }
 .af-empty { color: var(--dim); font-style: italic; }
 
+/* ── Dangerous ground ───────────────────────────────────────────────────── */
+
+#gd-rules {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0 12px;
+  table-layout: fixed;
+}
+
+#gd-rules th {
+  text-align: left;
+  font-weight: normal;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  padding: 0 8px 4px 0;
+  border-bottom: 1px solid #00000066;
+}
+
+#gd-rules td {
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid #ffffff0d;
+  vertical-align: middle;
+}
+
+/* The path takes what the six fixed columns leave: it is the only one whose content varies,
+   and it is long enough that a shared width would truncate every one of them. */
+#gd-rules th:nth-child(2) { width: auto; }
+#gd-rules th:nth-child(1),
+#gd-rules th:nth-child(6),
+#gd-rules th:nth-child(7) { width: 40px; }
+/* Wide enough for the HEADING, not for the swatch: the layout is fixed, so a column sized to
+   its control lets the uppercase label overflow into the next one. */
+#gd-rules th:nth-child(3) { width: 72px; }
+#gd-rules th:nth-child(4),
+#gd-rules th:nth-child(5) { width: 80px; }
+
+#gd-rules input[type="text"],
+#gd-rules input[type="number"] {
+  background: #2a2e38;
+  color: var(--text);
+  border: 1px solid #00000088;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font: inherit;
+}
+
+#gd-rules input[type="number"] { width: 64px; }
+
+/* Monospace because it is a path being trimmed to a prefix, and lining the segments up is
+   what makes "where does the variant part start" answerable at a glance. */
+#gd-rules .gd-path {
+  width: 100%;
+  font: 12px/1.5 ui-monospace, Consolas, monospace;
+}
+
+#gd-rules button { padding: 2px 8px; }
+
+/* The picker holds full metadata paths, which are long. Letting it take the row rather than
+   the widest option keeps the card from growing a horizontal scrollbar. */
+#gd-pick {
+  flex: 1;
+  min-width: 0;
+}
+
+#gd-read { font-size: 11px; font-family: ui-monospace, Consolas, monospace; }
+
 /* A charm slot has no key to press at all, so its row is greyed and its toggle locked. */
 tr.af-charm td { color: var(--dim); }
 

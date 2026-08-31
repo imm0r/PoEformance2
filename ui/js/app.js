@@ -40,6 +40,7 @@ function renderState(s) {
   }
 
   if (s.evasion) renderEvasion(s.evasion);
+  if (s.ground) renderGround(s.ground);
   if (s.rules) rules.set(s.rules);
 
   // Every state, not only while the tab is open: the dot on the tab is what tells somebody
@@ -385,6 +386,236 @@ for (const id of [
   $(id).addEventListener("input", holdEvasion);
 }
 
+// ── Dangerous ground ───────────────────────────────────────────────────────
+//
+// The rules the host last accepted, and what the session has seen. Edits go out as the WHOLE
+// rule list, the same shape the flasks and the evasion card post in: the host merges it into
+// the tracker's settings, normalises, and the next state carries what it decided.
+let groundRules = [];
+let groundSeen = [];
+
+// A table rebuilt under someone's cursor drops a half-typed path and yanks focus, so a poll
+// landing mid-edit leaves it alone - the same guard the other two cards needed.
+let groundEditingUntil = 0;
+const holdGround = () => (groundEditingUntil = Date.now() + 2000);
+
+function renderGround(g) {
+  groundRules = g.rules ?? [];
+  groundSeen = g.seen ?? [];
+
+  // The reading line is live ALWAYS, even mid-edit: it is the answer to "why is the dropdown
+  // empty", and an empty dropdown is the normal state in a hideout and the alarming one in
+  // a map. Holding it back while somebody types would hide it exactly when it is read.
+  $("gd-read").textContent = g.reading || "";
+
+  if (Date.now() < groundEditingUntil) return;
+
+  renderGroundPicker();
+  renderGroundRules();
+}
+
+/**
+ * The dropdown of what the session has walked past.
+ *
+ * Each row says the two things that decide whether a rule is worth writing: whether the game
+ * already tags it (a component ring covers those without any rule at all) and how many turn up
+ * at once (a rule on something that arrives in twenties fills the screen).
+ */
+function renderGroundPicker() {
+  const pick = $("gd-pick");
+  const chosen = pick.value;
+  pick.replaceChildren();
+
+  if (!groundSeen.length) {
+    const none = document.createElement("option");
+    none.value = "";
+    none.textContent = "nothing seen yet — walk past some";
+    pick.appendChild(none);
+    pick.disabled = true;
+    $("gd-add").disabled = true;
+    return;
+  }
+
+  pick.disabled = false;
+  $("gd-add").disabled = false;
+
+  for (const seen of groundSeen) {
+    const option = document.createElement("option");
+    option.value = seen.path;
+    option.textContent = `${seen.path}  —  ${describeSeen(seen)}`;
+    pick.appendChild(option);
+  }
+
+  // Keep the selection across the once-a-second poll, or the list would scroll back to the
+  // top under the cursor between opening it and pressing Add.
+  if (chosen && groundSeen.some((s) => s.path === chosen)) pick.value = chosen;
+}
+
+function describeSeen(seen) {
+  const notes = [];
+  if (seen.onScreen) notes.push("here now");
+
+  // A rule on tagged ground is not merely redundant, it is IGNORED: the component pass owns
+  // those entities while it is switched on, so the rule would sit in the list looking active
+  // and draw nothing. Saying only "already ringed" is what would send somebody to add one.
+  if (seen.hasComponent) notes.push("the game tags this one — ringed already, a rule here is ignored");
+  else notes.push("untagged — a rule is the only way it gets marked");
+
+  if (seen.most > 1) notes.push(`up to ${seen.most} at once`);
+  if (groundRules.some((r) => matchesRule(r, seen.path))) notes.push("a rule covers it");
+  return notes.join(", ");
+}
+
+const matchesRule = (rule, path) =>
+  (rule.path ?? "").trim().length > 0
+  && path.toLowerCase().startsWith(rule.path.trim().toLowerCase());
+
+function renderGroundRules() {
+  const rows = $("gd-rows");
+  rows.replaceChildren();
+
+  for (const [index, rule] of groundRules.entries()) {
+    const tr = document.createElement("tr");
+
+    tr.appendChild(cell(checkbox(rule.enabled !== false, false,
+      (on) => editGround(index, { enabled: on }))));
+    tr.appendChild(cell(groundPathField(rule, index)));
+    tr.appendChild(cell(groundColour(rule, index)));
+    tr.appendChild(cell(groundNumber(rule.radius ?? 100, 4, 2000, 5,
+      (v) => editGround(index, { radius: v }))));
+    tr.appendChild(cell(groundNumber(rule.thickness ?? 2, 1, 20, 1,
+      (v) => editGround(index, { thickness: v }))));
+    tr.appendChild(cell(checkbox(!!rule.filled, false,
+      (on) => editGround(index, { filled: on }))));
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "−";
+    remove.title = "Delete this rule";
+    remove.addEventListener("click", () =>
+      sendGround(groundRules.filter((_, i) => i !== index)));
+    tr.appendChild(cell(remove));
+
+    rows.appendChild(tr);
+  }
+
+  // The same paths as a datalist, so the field completes as it is typed - the dropdown is for
+  // picking one whole, this is for trimming one down to a prefix that covers its variants.
+  let options = $("gd-paths");
+  if (!options) {
+    options = document.createElement("datalist");
+    options.id = "gd-paths";
+    $("ground").appendChild(options);
+  }
+
+  options.replaceChildren();
+  for (const seen of groundSeen) {
+    const option = document.createElement("option");
+    option.value = seen.path;
+    options.appendChild(option);
+  }
+}
+
+function groundPathField(rule, index) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "gd-path";
+  input.value = rule.path ?? "";
+  input.placeholder = "Metadata/Effects/Spells/ground_effects/";
+  input.setAttribute("list", "gd-paths");
+  input.title = "Matched against the START of an entity's metadata path, ignoring case.";
+  input.addEventListener("input", holdGround);
+  input.addEventListener("change", () => editGround(index, { path: input.value }));
+  return input;
+}
+
+function groundNumber(value, min, max, step, onChange) {
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = min;
+  input.max = max;
+  input.step = step;
+  input.value = value;
+  input.addEventListener("input", holdGround);
+  // On "change", not "input": a number field fires per keystroke, which would save a radius
+  // of 1 on the way to typing 120.
+  input.addEventListener("change", () => onChange(Number(input.value)));
+  return input;
+}
+
+/**
+ * A colour picker over the tool's #AARRGGBB.
+ *
+ * The native input only understands #RRGGBB, so the alpha rides around it rather than being
+ * dropped - a ring somebody made faint must not turn solid because they nudged the hue. Same
+ * dance the rules tab does, and it is duplicated rather than shared because the two pages have
+ * no module between them and one import to move four lines would be the bigger coupling.
+ */
+function groundColour(rule, index) {
+  const text = (rule.colour ?? "#99FF4D00").replace("#", "");
+  const alpha = text.length === 8 ? text.slice(0, 2) : "99";
+  const rgb = text.length === 8 ? text.slice(2) : text;
+
+  const input = document.createElement("input");
+  input.type = "color";
+  input.value = `#${rgb}`;
+  input.addEventListener("input", holdGround);
+  input.addEventListener("change", () =>
+    editGround(index, { colour: `#${alpha}${input.value.replace("#", "")}` }));
+  return input;
+}
+
+function editGround(index, change) {
+  sendGround(groundRules.map((r, i) => (i === index ? { ...r, ...change } : r)));
+}
+
+/**
+ * Turns a path the session saw into the prefix a rule should hold.
+ *
+ * EVERYTHING AFTER AN '@' GOES. The game appends a variant marker to a lot of its metadata
+ * paths - `.../BurningGroundDaemonParent@75` - and it differs per instance, so a rule seeded
+ * with the marker still on it would match the one patch that was on screen when it was added
+ * and none of the others. The rest of this tool drops it in the same place and for the same
+ * reason; see PreloadReader.
+ */
+const asPrefix = (path) => {
+  const at = path.indexOf("@");
+  return at < 0 ? path : path.slice(0, at);
+};
+
+function sendGround(list) {
+  holdGround();
+  groundRules = list;
+  renderGroundRules();
+  renderGroundPicker();
+
+  bridge.send({
+    type: "setGroundRules",
+    payload: list.map((r) => ({
+      path: r.path ?? "",
+      enabled: r.enabled !== false,
+      colour: r.colour ?? "#99FF4D00",
+      radius: Number(r.radius) || 100,
+      thickness: Number(r.thickness) || 2,
+      filled: !!r.filled,
+    })),
+  });
+}
+
+$("gd-add").addEventListener("click", () => {
+  const path = asPrefix($("gd-pick").value ?? "");
+  if (!path) return;
+
+  // Adding the same prefix twice would draw two rings on one patch and give somebody two rows
+  // to keep in step, so a second press on the same choice does nothing rather than stacking.
+  if (groundRules.some((r) => (r.path ?? "").trim().toLowerCase() === path.toLowerCase())) return;
+
+  sendGround([...groundRules, { path, enabled: true, colour: "#99FF4D00", radius: 100, thickness: 2, filled: false }]);
+});
+
+$("gd-new").addEventListener("click", () =>
+  sendGround([...groundRules, { path: "", enabled: true, colour: "#99FF4D00", radius: 100, thickness: 2, filled: false }]));
+
 // ── Wiring ─────────────────────────────────────────────────────────────────
 
 bridge.on("state", renderState);
@@ -450,6 +681,20 @@ if (bridge.connected) {
         { slot: 3, enabled: false, vital: "Life", thresholdPercent: 50, key: "3", item: "CharmFreeze", charges: "12/12", isCharm: true },
         { slot: 4, enabled: false, vital: "Life", thresholdPercent: 50, key: "4", item: "", charges: "", isCharm: false },
         { slot: 5, enabled: false, vital: "Life", thresholdPercent: 50, key: "unbound", item: "", charges: "", isCharm: false },
+      ],
+    },
+    // Hand-written to match the wire, with the same caveat the buff list carries: driving the
+    // page in a browser cannot catch a host that spells these differently. The check for that
+    // is on the C# side, over the serializer these names only imitate.
+    ground: {
+      reading: "3 kinds remembered, 2 in the area on the last look",
+      rules: [
+        { path: "Metadata/Effects/Spells/ground_effects/", enabled: true, colour: "#99FF4D00", radius: 100, thickness: 2, filled: false },
+      ],
+      seen: [
+        { path: "Metadata/Effects/Spells/ground_effects/fire/", hasComponent: true, onScreen: true, most: 4, radius: 18.67, lastSeenMs: 0 },
+        { path: "Metadata/Monsters/MonsterMods/GroundOnDeath/BurningGroundDaemonParent@75", hasComponent: false, onScreen: true, most: 12, radius: 0, lastSeenMs: 0 },
+        { path: "Metadata/Effects/Spells/ground_effects/chilled/", hasComponent: false, onScreen: false, most: 1, radius: 0, lastSeenMs: 0 },
       ],
     },
     rules: {

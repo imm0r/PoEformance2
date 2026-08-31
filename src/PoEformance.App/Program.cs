@@ -297,12 +297,39 @@ internal static class Program
         var overlayHandle = new OverlayHandle();
         var overlaySettings = PoEformance.Features.OverlaySettingsStore.Load();
 
+        // What dangerous-looking ground this session has met, so a path can be PICKED in the
+        // config window instead of typed from memory. Fed from the read loops rather than from
+        // the window's own poll, for the reason the buff list is: what somebody wants a rule
+        // about is usually gone by the time they have alt-tabbed to write one.
+        var groundWatch = new PoEformance.Features.GroundWatch();
+
+        // The tracker's settings, loaded HERE rather than at the overlay's attach, because two
+        // windows now edit them: the overlay's own tab owns most of them and the config window's
+        // ground panel owns the rule list. One copy each would let a save from either silently
+        // discard the other's edits.
+        PoEformance.Features.TrackerSettings tracker = PoEformance.Features.TrackerStore.Load();
+        void WriteTracker(PoEformance.Features.TrackerSettings changed)
+        {
+            tracker = changed.Normalised();
+            SaveWarning(
+                PoEformance.Features.TrackerStore.Save(tracker),
+                PoEformance.Features.TrackerStore.DefaultPath);
+
+            // Null until the overlay actually starts, which is the normal state for a --config
+            // run: the setting is still saved, it just has nothing to apply to yet.
+            if (overlayHandle.Overlay is PoEformance.Overlay.EntityOverlay live)
+            {
+                live.Tracker = tracker;
+            }
+        }
+
         // Topmost only when the overlay is up, i.e. when a fullscreen game would otherwise
         // hide it. On its own it is an ordinary window and should behave like one.
         Thread? configWindow = options.ShowConfig
             ? StartConfigWindow(
                 reader, schemaPath, result, gameStatesAddress, autoFlask, flaskKeys, flaskSettings,
                 overlaySettings, ruleEngine, buffWatch, evasionPlanner, overlayHandle, updates,
+                groundWatch, () => tracker, WriteTracker,
                 alwaysOnTop: options.ShowOverlay)
             : null;
 
@@ -328,9 +355,10 @@ internal static class Program
 
             RunOverlay(
                 reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
-                ruleEngine, ruleHistory, buffWatch, evasionPlanner, rotation,
+                ruleEngine, ruleHistory, buffWatch, groundWatch, evasionPlanner, rotation,
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
                 uiBrowser: options.ShowUiBrowser, updates: updates,
+                tracker: tracker, writeTracker: WriteTracker,
                 fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
                 areaCounter: result.Statics.FirstOrDefault(s => s.Name == "AreaChangeCounter" && s.Found)?.Address ?? 0,
                 recorder: recorder);
@@ -346,7 +374,8 @@ internal static class Program
             // the code happened to sit, not a design.
             RunRulesWithoutOverlay(
                 reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow,
-                autoFlask, ruleEngine, ruleHistory, buffWatch, overlayHandle, configWindow);
+                autoFlask, ruleEngine, ruleHistory, buffWatch, groundWatch, overlayHandle,
+                configWindow);
         }
 
         configWindow?.Join();
@@ -1111,7 +1140,8 @@ internal static class Program
         PoEformance.Features.AutoFlask autoFlask,
         PoEformance.Features.RuleEngine ruleEngine,
         PoEformance.Features.RuleHistory ruleHistory,
-        PoEformance.Features.BuffWatch buffWatch)
+        PoEformance.Features.BuffWatch buffWatch,
+        PoEformance.Features.GroundWatch groundWatch)
     {
         var world = new PoEformance.Game.World.WorldReader(reader, schema);
 
@@ -1142,6 +1172,7 @@ internal static class Program
                 }
 
                 buffWatch.Look(snapshot.PlayerBuffs, Environment.TickCount64);
+                groundWatch.Look(snapshot, Environment.TickCount64);
 
                 Perform(ruleEngine.Evaluate(
                     PoEformance.Features.RuleState.From(
@@ -1171,12 +1202,13 @@ internal static class Program
         PoEformance.Features.RuleEngine ruleEngine,
         PoEformance.Features.RuleHistory ruleHistory,
         PoEformance.Features.BuffWatch buffWatch,
+        PoEformance.Features.GroundWatch groundWatch,
         OverlayHandle handle,
         Thread? configWindow)
     {
         using PoEformance.Features.SnapshotFeed feed = StartRulesFeed(
             reader, schema, gameStatesStatic, gameWindow,
-            autoFlask, ruleEngine, ruleHistory, buffWatch);
+            autoFlask, ruleEngine, ruleHistory, buffWatch, groundWatch);
         handle.Feed = feed;
 
         Console.WriteLine();
@@ -1203,10 +1235,16 @@ internal static class Program
         PoEformance.Features.RuleEngine ruleEngine,
         PoEformance.Features.RuleHistory ruleHistory,
         PoEformance.Features.BuffWatch buffWatch,
+        PoEformance.Features.GroundWatch groundWatch,
         PoEformance.Features.EvasionPlanner evasionPlanner,
         PoEformance.Game.World.TerrainRotationTables rotation, bool debug,
         PoEformance.Features.OverlaySettings settings, OverlayHandle handle, bool uiBrowser,
         UpdateService updates,
+        // The ONE copy of the tracker's settings, shared with the config window rather than
+        // loaded again here: both windows edit them, and a second copy would let a save from
+        // either silently discard the other's edits.
+        PoEformance.Features.TrackerSettings tracker,
+        Action<PoEformance.Features.TrackerSettings> writeTracker,
         ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
     {
         // The rules FIRST, before any of the services below. Several of them are slow on a
@@ -1217,7 +1255,7 @@ internal static class Program
         // will, and is replaced by it in the moment the full loop exists.
         PoEformance.Features.SnapshotFeed earlyRules = StartRulesFeed(
             reader, schema, gameStatesStatic, gameWindow,
-            autoFlask, ruleEngine, ruleHistory, buffWatch);
+            autoFlask, ruleEngine, ruleHistory, buffWatch, groundWatch);
         handle.Feed = earlyRules;
         handle.Stage = "loading landmarks";
 
@@ -1736,6 +1774,7 @@ internal static class Program
                 // snapshot once a second, and a buff worth writing a rule about lasts a few
                 // seconds - so half of them would never be seen.
                 buffWatch.Look(snapshot.PlayerBuffs, Environment.TickCount64);
+                groundWatch.Look(snapshot, Environment.TickCount64);
 
                 PoEformance.Features.RuleTick rules = ruleEngine.Evaluate(
                     PoEformance.Features.RuleState.From(
@@ -1856,9 +1895,7 @@ internal static class Program
                 FindDataFile("preload-alerts.starter.json")));
         overlay.PreloadListChanged = list => PoEformance.Features.PreloadAlertStore.Save(list);
         overlay.AttachQuests(quests);
-        overlay.AttachTracker(
-            PoEformance.Features.TrackerStore.Load(),
-            changed => PoEformance.Features.TrackerStore.Save(changed));
+        overlay.AttachTracker(tracker, writeTracker);
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
         overlay.AttachPointsOfInterest(route);
@@ -2062,6 +2099,9 @@ internal static class Program
         PoEformance.Features.EvasionPlanner evasionPlanner,
         OverlayHandle overlayHandle,
         UpdateService updates,
+        PoEformance.Features.GroundWatch groundWatch,
+        Func<PoEformance.Features.TrackerSettings> readTracker,
+        Action<PoEformance.Features.TrackerSettings> writeTracker,
         bool alwaysOnTop)
     {
         Console.WriteLine();
@@ -2138,6 +2178,12 @@ internal static class Program
                     dodgeHints,
                     moveHints,
                     evasionPlanner.Settings.KeysOrDefault.Describe()),
+
+                // The rule list and what the session has actually seen. Read through the
+                // getter rather than from a copy, so the panel shows what the overlay's own
+                // tab last wrote rather than a snapshot taken when this window opened.
+                Ground: new PoEformance.Config.GroundView(
+                    readTracker().GroundDangerOrDefault, groundWatch.Seen, groundWatch.LastRead),
 
                 Update: updates.View());
         }
@@ -2262,6 +2308,21 @@ internal static class Program
                     SaveWarning(
                         PoEformance.Features.AutoFlaskSettingsStore.Save(settings),
                         PoEformance.Features.AutoFlaskSettingsStore.DefaultPath);
+                    return string.Empty;
+
+                case "setGroundRules":
+                    List<PoEformance.Features.GroundDangerRule>? ground = request.Payload.Deserialize(
+                        PoEformance.Config.ConfigJsonContext.Default.ListGroundDangerRule);
+                    if (ground is null)
+                    {
+                        return null;
+                    }
+
+                    // MERGED, not replaced. The page holds one slice of the tracker's settings
+                    // and the overlay's tab holds the rest; sending the whole record from here
+                    // would reset every switch this panel does not show - silently, and noticed
+                    // only later.
+                    writeTracker(readTracker() with { GroundDanger = ground });
                     return string.Empty;
 
                 case "setEvasionSettings":

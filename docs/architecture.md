@@ -877,6 +877,27 @@ a feature built on a person describing something the game names itself. The rule
 they cover what the component does not: a Firewall or an ice crystal is a hostile effect wearing a
 monster's components and carries no `GroundEffect`.
 
+**They must not both fire on one entity, and for a while they did.** The two passes walk the same
+entity list and neither knew about the other. The shipped rule is spelled as the *exact* path that
+carries a `GroundEffect` component — not a prefix that happens to cover it — so under **default
+settings** every tagged patch was rung twice: once as a world-radius ring lying on the floor with
+an X and a countdown, once as a flat pixel circle of whatever size the rule carried. Two circles of
+different sizes on one patch of fire, which is precisely the "I cannot tell what these circles are"
+the feature exists to end.
+
+The component pass now **owns** the entities it can identify: while it is on, the rules skip
+anything carrying a `GroundEffect`. It wins because it is the one that can say how big the patch
+is — it reads the radius out of the game, where a rule can only carry a number somebody typed. The
+refusal is keyed on the **switch**, not on what the other pass managed to draw: an entity it
+declines for a frame (its ring reaching behind the camera) would otherwise flip to a pixel circle
+and back as the camera turns, reading as a bug in both. Turn the component rings off and the rules
+take it back, because a switch that silently deleted coverage somebody wrote a rule for is the
+worse surprise.
+
+The decision lives on `TrackerSettings.RulesShouldRing` rather than in the layer that draws, for a
+mundane but binding reason: the test project runs on Linux and cannot reference the Windows-only
+overlay, so a rule kept in the layer is a rule nothing can test.
+
 **The beam is drawn in full, and that is the point.** A ring on the beam entity's own position
 marks one end of a line up to 1116 world units long — worse than nothing, because it flags as
 dangerous the one spot the player is already clear of. What is *not* drawn is a width: the one
@@ -941,6 +962,36 @@ is recorded as such in the schema. Ground effects expire, the scene they appear 
 survivable to experiment in, the game does not permit that kind of pixel-precise movement, and the
 result would have been a number nobody could report back. **Verify against something the game
 draws, not against something it does to you.**
+
+#### Picking a path instead of typing one
+
+`GroundWatch` remembers every dangerous-looking path a session has met, keyed by path rather than
+by entity, and the config window's *Dangerous ground* card offers them as a dropdown. It is the
+same answer `BuffWatch` gives to the same problem — a rule matches an internal string written
+nowhere a player can see — and the reasoning is stronger here: a ground effect is *gone* by the
+time somebody has alt-tabbed to write a rule about it, so a list of what is there right now would
+be empty exactly when it is wanted. It remembers for two hours, against the buff list's shorter
+window, because league-mechanic ground is precisely what somebody sits down to write rules about
+afterwards.
+
+The row carries the column that decides whether a rule is worth writing at all: **whether the game
+tags it**. A tagged path already has a component ring and needs no rule; an untagged one will never
+be marked without one. `@nn` variant markers are trimmed when a path is seeded into a rule, as
+`PreloadReader` already does elsewhere — a rule keeping the marker would match the one patch that
+happened to be on screen when it was added.
+
+**What the picker cannot offer, measured rather than assumed.** The whole sweep capture yields four
+rows, one of them tagged. Not one is a `GroundOnDeath` daemon — the burning, shocked and chilled
+ground a rare monster leaves behind — even though that is the ground most worth a rule. Their paths
+run through `Metadata/Monsters/MonsterMods/…`, `NoiseFilter`'s **Daemon** class matches
+`monstermods`, and `WorldReader` drops them before a snapshot exists.
+
+The consequence is bigger than an incomplete dropdown, and it is the part worth remembering: **a
+`GroundDangerRule` written against such a path can never fire either**, whoever typed it and
+however correct the text is, for as long as that filter class is on. The shipped default rule
+(`Metadata/Effects/Spells/ground_effects/`) is not caught and does work. `GroundWatchTests` pins
+both halves, and the card says so on the page — a limit invisible from the panel is one somebody
+reads as a broken picker.
 
 ### Next
 
