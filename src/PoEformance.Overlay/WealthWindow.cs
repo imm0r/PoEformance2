@@ -50,7 +50,6 @@ public sealed class WealthWindow
 
     private int _window = 1;
     private bool _confirmingReset;
-    private bool _breakdown;
 
     /// <param name="tracker">The record and the live count.</param>
     /// <param name="panel">The corner panel, so the page can switch it on and share its window.</param>
@@ -104,8 +103,6 @@ public sealed class WealthWindow
     /// </remarks>
     private readonly HashSet<int> _skipping = [];
 
-    private bool _worth = true;
-
     /// <summary>Whether the purse is being counted at all. Wired to the inspector's own switch.</summary>
     public bool Watching { get; set; }
 
@@ -157,7 +154,21 @@ public sealed class WealthWindow
     /// <summary>Called when the record changed and is worth writing to disk.</summary>
     public Action? Changed { get; set; }
 
-    /// <summary>Draws the page.</summary>
+    /// <summary>
+    /// Draws the page: the headline, then whichever half of the record is being looked at.
+    /// </summary>
+    /// <remarks>
+    /// SIX THINGS DOWN ONE SCROLL is what this was: the switches, whether prices work, a table of
+    /// totals, a fold of the breakdown, a fold of the per-tab worth, the graph, and the record's
+    /// own age with the button that throws it away. Every one drawn every frame, so the graph -
+    /// which is the only thing here a live number cannot replace - opened below the fold, and the
+    /// two tables were folds because there was no room for them any other way.
+    ///
+    /// The split is by what is being ASKED. "What am I holding and is it going up" is the
+    /// headline, and it is on screen whichever tab is in front because it is the question this
+    /// page exists for. "Where is it and what is it made of" is two tables read side by side.
+    /// "What has it done over time" is a graph that wants the height.
+    /// </remarks>
     public void DrawTab()
     {
         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -174,38 +185,240 @@ public sealed class WealthWindow
             return;
         }
 
-        DrawPrices();
-        ImGui.Separator();
-        DrawTotals(now);
-        ImGui.Separator();
-        DrawBreakdown();
-        ImGui.Separator();
-        DrawByTab();
-        ImGui.Separator();
-        DrawGraph(now);
-        ImGui.Separator();
-        DrawRecord(now);
+        DrawHeadline(now);
+
+        OverlayLayout.Tabs(
+            "wealth-tabs",
+            ("Breakdown & Inventory", DrawHoldings),
+            ("History & Graph", () => DrawHistory(now)));
     }
 
     private void DrawSwitch()
     {
         bool on = Watching;
-        if (ImGui.Checkbox("watch what the currency is worth", ref on) && on != Watching)
+        if (ImGui.Checkbox("Enable Wealth Tracker", ref on) && on != Watching)
         {
             Watching = on;
             WatchChanged?.Invoke(on);
         }
 
+        OverlayLayout.Cell(1, 16f);
+
         bool panel = _panel.Enabled;
-        if (ImGui.Checkbox("and show it in a corner while playing", ref panel))
+        if (ImGui.Checkbox("Show Overlay", ref panel))
         {
             _panel.Enabled = panel;
             Changed?.Invoke();
         }
 
         OverlayLayout.Hint(
-            "The corner panel can be moved, and made click-through from its own title menu so it"
-            + " stops taking the mouse during a fight.");
+            "A panel in the corner of the game saying what the purse is worth and which way it"
+            + " went. It can be moved, and made click-through from its own title menu so it stops"
+            + " taking the mouse during a fight.");
+    }
+
+    /// <summary>
+    /// The three numbers this page exists to answer, and the facts that qualify them.
+    /// </summary>
+    /// <remarks>
+    /// THIS WAS A TWO-COLUMN TABLE OF PROSE. "holding | 601 div, 312 ex", "stacks | 3,201 (45 of
+    /// them the book has no price for)", "stash | as of 12m ago", "but | no prices right now -
+    /// this is the last figure that could be believed" - six rows, each a label and a sentence,
+    /// above a league line and a price count. Read once it is all worth knowing; read every time
+    /// it is five lines between the switch and the thing being looked at.
+    ///
+    /// So the three FIGURES are on one line, in columns so they do not shuffle sideways as the
+    /// numbers change width, and everything that qualifies them is either a fact on the line
+    /// below or a sentence on the figure's own hover. The rate is up here rather than buried
+    /// because every one of these is quoted in it: a purse "worth 601 div" against a rate that
+    /// moved is a different purse.
+    ///
+    /// THE LEAGUE STAYS ON SCREEN and is not a hover, because it is the answer to "prices for
+    /// what". Seeing the wrong one there is how somebody finds out they are pricing a softcore
+    /// stash against the hardcore economy, and nobody hovers a number they have no reason to
+    /// doubt.
+    /// </remarks>
+    private void DrawHeadline(long now)
+    {
+        PriceBook book = _book();
+        if (!book.Ready)
+        {
+            // Prices are off until somebody turns them on - they come from somebody else's
+            // server and nothing in this tool goes to a network uninvited - and with no book
+            // everything values at nothing. A page showing a wealth of zero without saying why
+            // is a page reporting a catastrophe.
+            ImGuiText.Wrapped(
+                Warn,
+                "No prices yet. Nothing can be valued and nothing is being written to the record -"
+                + " turn prices on in the Stash tab, which is where they are fetched from.");
+            ImGui.Separator();
+            return;
+        }
+
+        WealthTracker.Reading held = _tracker.Now;
+        if (!held.Any)
+        {
+            ImGuiText.Wrapped(OverlayInk.Quiet, "Nothing counted yet - the first count is a few seconds away.");
+            ImGui.Separator();
+            return;
+        }
+
+        // The SHOWN figure rather than the raw count, so this and the change beside it are the
+        // same number's two readings - see WealthTracker.Showing.
+        WealthTracker.Shown showing = _tracker.Showing ?? new WealthTracker.Shown(0, 0, false, 0);
+
+        OverlayLayout.Figure(
+            "Holding",
+            StashWorth.Purse(showing.Exalted, showing.Rate),
+            showing.Live ? Line : Warn,
+            showing.Live
+                ? "Every currency stack the game has let the tool see, priced and added up."
+                : "No prices right now - this is the last figure that could be believed.");
+
+        DrawGain(now, showing.Rate);
+
+        OverlayLayout.Cell(2, FigureEms);
+        OverlayLayout.Figure(
+            "1 div",
+            $"{StashWorth.Money(book.Rate)} ex",
+            OverlayInk.Ink,
+            "Everything above is converted into Exalted at this rate, poe.ninja's for this"
+            + " league. A total that looks wrong by a factor is usually this.");
+
+        DrawQualifiers(book, held, now);
+        ImGui.Separator();
+    }
+
+    /// <summary>How wide one headline cell is. Sized for "Holding  601 div, 312 ex".</summary>
+    private const float FigureEms = 17f;
+
+    /// <summary>
+    /// Which way it went over the chosen stretch, and what that movement was made of.
+    /// </summary>
+    /// <remarks>
+    /// THE SPLIT IS IN THE HOVER AND IT IS THE POINT OF THE FIGURE. A purse of six hundred Divine
+    /// moves by tens on an ordinary price refresh, which reads as a map's loot and is not - and
+    /// the figure cannot say so, because it is one number. It used to be a second table row
+    /// reading "made of | +12 gathered, -15.1k the prices", which is a sentence nobody reads
+    /// twice and a line the page paid for on every frame.
+    /// </remarks>
+    private void DrawGain(long now, double rate)
+    {
+        OverlayLayout.Cell(1, FigureEms);
+
+        if (_tracker.Moved(Span(), now) is not { } moved)
+        {
+            OverlayLayout.Figure(
+                Windows[_window].Label, "nothing recorded yet", OverlayInk.Quiet,
+                "Nothing in the record covers this stretch. Choose a longer one under History.");
+            return;
+        }
+
+        string split = _tracker.Made(moved.Over, now) is { } made && Math.Abs(made.Repriced) >= 1
+            ? $"\n\n{Signed(made.Gathered, rate)} of it was gathered and"
+              + $" {Signed(made.Repriced, rate)} was the prices moving under it."
+            : string.Empty;
+
+        OverlayLayout.Figure(
+            moved.WholeRecord ? "all of it" : Windows[_window].Label,
+            $"{(moved.Exalted >= 0 ? "+" : string.Empty)}{StashWorth.Purse(moved.Exalted, rate)}"
+            + $"  over {WealthPanel.Ago(moved.Over)}",
+            moved.Exalted > 0 ? Up : moved.Exalted < 0 ? Down : OverlayInk.Quiet,
+            "The stretch is chosen under History, and the corner panel reports on the same one."
+            + split);
+    }
+
+    /// <summary>What the figures above rest on, on one line under them.</summary>
+    private void DrawQualifiers(PriceBook book, WealthTracker.Reading held, long now)
+    {
+        string league = _league();
+        ImGui.TextColored(
+            league.Length > 0 ? OverlayInk.Quiet : Warn,
+            ImGuiText.Escape(league.Length > 0 ? league : "league not read yet"));
+
+        OverlayLayout.Hint(
+            "Which economy every figure above is priced against. It comes from the game rather"
+            + " than from a setting, so it cannot go stale at a league start - but it also means"
+            + " nobody ever typed it, and a total priced against the wrong league looks exactly"
+            + " like one priced against the right league.");
+
+        OverlayLayout.Fact(OverlayInk.Quiet, $"{book.Count} prices");
+
+        OverlayLayout.Fact(
+            held.Unpriced > 0 ? Warn : OverlayInk.Quiet,
+            held.Unpriced > 0 ? $"{held.Stacks} stacks, {held.Unpriced} unpriced" : $"{held.Stacks} stacks");
+
+        if (held.Unpriced > 0)
+        {
+            OverlayLayout.Hint(
+                "The book has no price for these, so they count as nothing. The breakdown names"
+                + " them.");
+        }
+
+        // WHERE THE STASH HALF CAME FROM. During a map the tabs are not loaded at all, so the
+        // total rests on what they last held - which is a fact about the number that changes how
+        // it should be read, not a footnote.
+        OverlayLayout.Fact(
+            held.StashSeenAt == 0 ? Warn : OverlayInk.Quiet,
+            held.StashSeenAt == 0
+                ? "stash not seen yet"
+                : $"stash as of {WealthPanel.Ago(now - held.StashSeenAt)} ago");
+
+        OverlayLayout.Hint(
+            held.StashSeenAt == 0
+                ? "Only what is being carried is counted so far. The stash tabs are read as the"
+                  + " game opens them."
+                : "The tabs are not loaded during a map, so the stash half of the total is what"
+                  + " they last held.");
+    }
+
+    /// <summary>
+    /// The two breakdowns, side by side.
+    /// </summary>
+    /// <remarks>
+    /// SIDE BY SIDE BECAUSE THEY ARE READ AGAINST EACH OTHER. One says what the total is made of
+    /// and the other says where it is sitting, and the question that brings somebody here -
+    /// "which pile is producing that number" - is answered by looking at both. Stacked, and
+    /// folded away because stacked they did not fit, each was a scroll away from the other.
+    ///
+    /// They also stop being folds. A fold is a choice about whether to look at something, and on
+    /// a tab whose entire content is these two there is nothing else to look at.
+    /// </remarks>
+    private void DrawHoldings()
+    {
+        if (_pairs is null)
+        {
+            // Nothing wired the game's own exchange, so there is no per-tab half to put beside
+            // this - the aggregated index knows a fraction of what a stash holds, and a
+            // breakdown built on it would report whole tabs as empty.
+            DrawBreakdown();
+            return;
+        }
+
+        float half = (ImGui.GetContentRegionAvail().X - ImGui.GetStyle().ItemSpacing.X) * 0.5f;
+
+        if (ImGui.BeginChild("wealth-made-of", new Vector2(half, 0f)))
+        {
+            DrawBreakdown();
+        }
+
+        ImGui.EndChild();
+        ImGui.SameLine();
+
+        if (ImGui.BeginChild("wealth-where", Vector2.Zero))
+        {
+            DrawByTab();
+        }
+
+        ImGui.EndChild();
+    }
+
+    /// <summary>The record over time: the stretch, the shape of it, and what it cost to keep.</summary>
+    private void DrawHistory(long now)
+    {
+        DrawGraph(now);
+        ImGui.Separator();
+        DrawRecord(now);
     }
 
     /// <summary>
@@ -258,11 +471,11 @@ public sealed class WealthWindow
     /// </remarks>
     private void DrawBreakdown()
     {
-        _breakdown = OverlayLayout.Subsection("What the Total Is Made Of###wealth-breakdown");
-        if (!_breakdown)
-        {
-            return;
-        }
+        OverlayLayout.Group(
+            "Currency Breakdown",
+            "A single total is believed or distrusted, and neither can be acted on. Broken into"
+            + " the stacks that produced it, a count can be compared against the tab in front of"
+            + " you and a unit price against what that currency actually trades at.");
 
         IReadOnlyList<CurrencyPurse.PurseLine> lines = _book().Breakdown(_purse().Pages);
         if (lines.Count == 0)
@@ -271,11 +484,14 @@ public sealed class WealthWindow
             return;
         }
 
+        // WHATEVER HEIGHT IS LEFT, rather than the fourteen lines it used to be given. It was a
+        // fold on a scroll of six things and had to be told how much of that scroll it could
+        // have; on half a tab of its own the answer is all of it.
         if (!ImGui.BeginTable(
                 "wealth-breakdown",
                 4,
                 ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY,
-                new Vector2(0f, ImGui.GetFontSize() * 14f)))
+                Vector2.Zero))
         {
             return;
         }
@@ -457,11 +673,12 @@ public sealed class WealthWindow
             return;
         }
 
-        _worth = OverlayLayout.Subsection("Where It Is###wealth-by-tab");
-        if (!_worth)
-        {
-            return;
-        }
+        OverlayLayout.Group(
+            "Stash / Inventory Breakdown",
+            "Priced from the game's own Currency Exchange rather than the index above, and that"
+            + " is what makes this possible at all: the index knows 38 currencies in Standard"
+            + " where the exchange knows 95. Built on the index, an Essence tab, a Rune tab and"
+            + " an Omen tab would all read as empty.");
 
         ExchangePairs? pairs = _pairs();
         IReadOnlyList<TabWorth> tabs = NetWorth.ByTab(_purse().Pages, pairs, _book(), _skipping);
@@ -488,7 +705,7 @@ public sealed class WealthWindow
                 "wealth-by-tab",
                 4,
                 ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY,
-                new Vector2(0f, ImGui.GetFontSize() * 12f)))
+                Vector2.Zero))
         {
             return;
         }
@@ -571,9 +788,14 @@ public sealed class WealthWindow
         long from = span == TimeSpan.MaxValue ? 0 : now - (long)span.TotalMilliseconds;
         IReadOnlyList<WealthPoint> points = _tracker.History.Between(from, now);
 
+        // WHATEVER IS LEFT, less the record's own three lines under it. Nine lines' worth was
+        // what it could have on a scroll of six things; on a tab of its own the shape of the
+        // movement is the thing being looked at, and the shape is what height buys.
         var size = new Vector2(
             Math.Max(ImGui.GetContentRegionAvail().X, ImGui.GetFontSize() * 10f),
-            ImGui.GetFontSize() * 9f);
+            Math.Max(
+                ImGui.GetFontSize() * 9f,
+                ImGui.GetContentRegionAvail().Y - (ImGui.GetFrameHeightWithSpacing() * 4f)));
 
         Vector2 at = ImGui.GetCursorScreenPos();
         ImGui.InvisibleButton("##wealth-graph", size);
@@ -714,7 +936,7 @@ public sealed class WealthWindow
         // and some of it is months old.
         if (!_confirmingReset)
         {
-            if (ImGui.Button("Start the Record Again"))
+            if (ImGui.Button("Reset Tracking History"))
             {
                 _confirmingReset = true;
             }

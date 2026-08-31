@@ -1088,6 +1088,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // there, whether the page came out as tabs would depend on how the app was wired.
         _tools.AsTabs(Entities);
 
+        // THE ATLAS PAGE IS TABS TOO, and for a different reason: its four tools are not read
+        // together, they are used at different times. The routing groups are edited at a league
+        // start, the filters are set once, the colours less often than that, and the ritual line
+        // is watched during a ritual. Stacked as folds the routing list alone - eleven rows that
+        // grow as somebody adds groups - made the page twice as long as everything else on it and
+        // pushed the switches below the fold.
+        _tools.AsTabs(Atlas);
+
         ShareChrome();
     }
 
@@ -1367,21 +1375,28 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         ArgumentNullException.ThrowIfNull(saved);
         _atlasWatch = watch;
         var window = new AtlasWindow(watch, saved);
-        _tools.Add(40, "atlas", "Atlas", window.DrawTab, window.Idle, page: Atlas, pageLabel: "Atlas");
 
-        // ITS OWN SECTION, not the tail of the atlas settings. The groups are a LIST that grows
-        // as somebody adds to it - eleven rows before anybody has edited anything - so under the
-        // switches it made the page twice as long as everything on it put together, and pushed
-        // the switches that are actually reached for above the fold on a short window.
+        // THE MASTER SWITCH AND THE READ BELONG TO THE PAGE, not to any one of its four tools -
+        // see ToolTabs.Lead. The switch decides whether the other three do anything at all, and
+        // "did it read the atlas" is asked from whichever tab somebody is standing on.
+        _tools.Lead(Atlas, window.DrawLead);
+
+        // ROUTING LEADS, because it is the tab people come here to use: the groups are somebody's
+        // own answer to what is worth walking to, they change every league, and the rest of this
+        // page is set once. It was buried under eleven switches.
         _tools.Add(
-            41, "atlas-routes", "Finding the way", window.DrawRouting, window.Idle,
+            40, "atlas-routes", "Routing", window.DrawRouting, window.Idle,
             page: Atlas, pageLabel: "Atlas");
 
-        // The atlas's plate, web and route colours, between the atlas and the ritual line
+        _tools.Add(
+            41, "atlas", "Display Filters", window.DrawTab, window.Idle,
+            page: Atlas, pageLabel: "Atlas");
+
+        // The atlas's plate, web and route colours, between the filters and the ritual line
         // that draws onto it.
         var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Atlas);
         _tools.Add(
-            42, "atlas-style", "How the atlas looks", styles.Draw, styles.Idle,
+            42, "atlas-style", "Visual Style", styles.Draw, styles.Idle,
             page: Atlas, pageLabel: "Atlas");
 
         if (visible)
@@ -1618,7 +1633,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _ritualWatch = watch;
         var window = new RitualWindow(watch, worth, apply, save);
         _ritualWindow = window;
-        _tools.Add(50, "ritual", "Ritual line", window.DrawTab, page: Atlas);
+        _tools.Add(50, "ritual", "Ritual Line", window.DrawTab, page: Atlas, pageLabel: "Atlas");
         if (visible)
         {
             _tools.Show("ritual");

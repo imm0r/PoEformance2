@@ -181,20 +181,13 @@ public sealed class DamageWindow
 
     /// <summary>One headline figure: its name, its value, and its sentence under the pointer.</summary>
     /// <remarks>
-    /// The name and the value are one hover target - a BeginGroup pair makes them one item as
-    /// far as <c>IsItemHovered</c> is concerned - because a pointer lands on whichever half it
-    /// lands on, and a tooltip that answers to only one of them is a tooltip nobody finds.
+    /// This was written here first and is now <see cref="OverlayLayout.Figure"/>, because the
+    /// wealth page wanted the same block of headline numbers and a second copy of a layout shape
+    /// is how nineteen field widths happened. Kept as a name so the call sites below still read
+    /// as what they are.
     /// </remarks>
     private static void Metric(string label, string value, Vector4 ink, string tooltip)
-    {
-        ImGui.BeginGroup();
-        ImGui.TextColored(DimText, label);
-        ImGui.SameLine();
-        ImGuiText.Mono(ink, value);
-        ImGui.EndGroup();
-
-        OverlayLayout.Hint(tooltip);
-    }
+        => OverlayLayout.Figure(label, value, ink, tooltip);
 
     /// <summary>The graph's own controls, on one line under it.</summary>
     /// <remarks>

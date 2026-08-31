@@ -48,7 +48,32 @@ public sealed class AtlasWindow
     public void Idle() => Settle();
 
     /// <summary>
-    /// The page, in the order somebody actually asks its questions.
+    /// What the whole page hangs off: the switch, and whether anything was read.
+    /// </summary>
+    /// <remarks>
+    /// ABOVE THE SUB-TABS RATHER THAN ON ONE OF THEM - see <see cref="ToolTabs.Lead"/>. The
+    /// switch decides whether ANY of the four tools below it does anything, and the read's own
+    /// account of itself is the answer to "why is nothing drawn", which is asked from whichever
+    /// tab somebody happens to be on. Both belong to the page.
+    /// </remarks>
+    public void DrawLead()
+    {
+        AtlasSettings settings = _watch.Settings;
+        AtlasSettings changed = settings;
+
+        bool enabled = settings.Enabled;
+        if (OverlayLayout.Master("Enable Atlas Overlay", ref enabled))
+        {
+            changed = changed with { Enabled = enabled };
+        }
+
+        DrawTheRead(_watch.View);
+
+        Apply(settings, changed);
+    }
+
+    /// <summary>
+    /// What gets drawn on the atlas and what gets kept off it.
     /// </summary>
     /// <remarks>
     /// THIS PAGE WAS THE WORST OF THE TOOL'S LAYOUT AND IT IS WORTH SAYING WHY, because every
@@ -61,10 +86,9 @@ public sealed class AtlasWindow
     /// grouping meaning anything. The master switch sat in the middle of the list, under a
     /// diagnostic button.
     ///
-    /// So the page now says what it is doing: the master switch first, the read's own account of
-    /// itself beside the button that re-checks it, and then the settings in three named groups -
-    /// what gets drawn, what gets hidden, and where to route. The switches did not change and
-    /// nor did what any of them does.
+    /// What is left here is the filters and nothing else. The switch, the read and the routing
+    /// list have each gone where they belong, and this tab is now the one question it answers:
+    /// of everything on the atlas, what do I want to see.
     /// </remarks>
     private void Draw()
     {
@@ -72,17 +96,7 @@ public sealed class AtlasWindow
         AtlasView view = _watch.View;
         AtlasSettings changed = settings;
 
-        // FIRST, because it decides whether any of the rest applies. It used to be the fifth
-        // control on the page, below a diagnostic.
-        bool enabled = settings.Enabled;
-        if (OverlayLayout.Master("Draw on the Atlas", ref enabled))
-        {
-            changed = changed with { Enabled = enabled };
-        }
-
-        DrawTheRead(view);
-
-        OverlayLayout.Group("What Is Drawn");
+        OverlayLayout.Group("Drawn");
 
         // FIVE SWITCHES IN A GRID, three across and two down. They were three on one line and
         // two on lines of their own, spaced with a fixed gap - so the second row's switches
@@ -160,7 +174,7 @@ public sealed class AtlasWindow
             changed = changed with { TextScale = writing };
         }
 
-        OverlayLayout.Group("What Is Hidden");
+        OverlayLayout.Group("Hidden");
 
         bool hideDone = settings.HideCompleted;
         if (OverlayLayout.Toggle("Hide Finished Maps", ref hideDone))
@@ -311,11 +325,21 @@ public sealed class AtlasWindow
     ///
     /// Wrapped rather than clipped, because a few lines are whole sentences of prose that would
     /// otherwise run off the right edge with no way to read the end of them.
+    ///
+    /// AND FOLDED, because it never went away. The box appears the moment the button is pressed
+    /// and then stays for the rest of the session - nine lines of addresses above every tab on
+    /// the page, long after the one question it answered was answered. Folded it costs a line,
+    /// and the line says a report is there.
     /// </remarks>
     private void DrawReport()
     {
         IReadOnlyList<string> report = _watch.Checked;
         if (report.Count == 0)
+        {
+            return;
+        }
+
+        if (!OverlayLayout.Subsection($"Panel Debug Log ({report.Count} lines)###atlas-report"))
         {
             return;
         }
@@ -415,14 +439,32 @@ public sealed class AtlasWindow
     {
         OverlayLayout.Note("A line is drawn across the atlas to the nearest map of every ticked group.");
 
-        if (!ImGui.BeginChild("atlas-groups", Vector2.Zero, ImGuiChildFlags.Borders))
+        // A TABLE, AND ONE ROW PER GROUP. Each group used to take two lines and sometimes
+        // three - the swatch and the tick, the hop box hung off a column stop, and under it a
+        // quiet line saying what the group matches on. Eleven groups is a scroll of
+        // twenty-odd lines for eleven ticks, and the rule under each one pushed the next
+        // group's swatch away from the one above it, so the column of colours read as a list
+        // of paragraphs rather than as a list.
+        //
+        // Real columns put the swatch, the tick and the distance each under their own on every
+        // row, whatever the name in between did - and "Quest" against "Where a route starts"
+        // is exactly the width difference a column stop cannot survive. The rule moves to the
+        // name's hover: it answers "why is that map not in this group", which is asked about
+        // one group at a time and never about eleven at once.
+        if (!ImGui.BeginTable(
+                "atlas-groups",
+                3,
+                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY))
         {
-            ImGui.EndChild();
             return settings;
         }
 
         try
         {
+            ImGui.TableSetupColumn("##colour");
+            ImGui.TableSetupColumn("##name", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("##hops");
+
             IReadOnlyList<AtlasGroup> groups = settings.Sorting;
             List<AtlasGroup>? edited = null;
 
@@ -435,12 +477,14 @@ public sealed class AtlasWindow
                 // while a checkbox is toggled - and written separately the second would be
                 // built from the unedited original and quietly undo the first.
                 AtlasGroup after = group;
+                ImGui.TableNextRow();
                 ImGui.PushID(i);
 
                 try
                 {
                     // The colour as a swatch rather than as its hex. It is what the group
                     // looks like on the atlas, and reading "#DB00E0" tells nobody that.
+                    ImGui.TableNextColumn();
                     Vector4 colour = ToVector(OverlaySettings.ParseColour(group.Colour));
                     if (ImGui.ColorEdit4(
                             "##colour", ref colour,
@@ -449,23 +493,23 @@ public sealed class AtlasWindow
                         after = after with { Colour = OverlaySettings.FormatColour(FromVector(colour)) };
                     }
 
-                    ImGui.SameLine();
-
+                    ImGui.TableNextColumn();
                     bool route = group.Route;
                     if (ImGui.Checkbox(group.Name, ref route))
                     {
                         after = after with { Route = route };
                     }
 
+                    // What the group is actually matched on. It is the answer to "why is that
+                    // map not in this group", and there is nowhere else to find it.
+                    OverlayLayout.Hint(Rule(group));
+
+                    // CLAIMED WHETHER OR NOT IT IS DRAWN. A row that skips its last cell leaves
+                    // the table one column short, and every row after it shifts - which is the
+                    // failure the marker list was rebuilt to stop.
+                    ImGui.TableNextColumn();
                     if (group.Route)
                     {
-                        // AT THE COLUMN, not after the name. Eleven groups have eleven names of
-                        // eleven lengths - "Quest" to "Where a route starts" - so hanging the
-                        // number box off the end of each put eleven identical controls at eleven
-                        // different x-positions, which is the ragged edge this whole pass is
-                        // about. See OverlayLayout.ToColumn.
-                        OverlayLayout.ToColumn();
-
                         int hops = group.MaxHops;
                         if (OverlayLayout.Narrow.Number("maps away", ref hops, 1))
                         {
@@ -475,7 +519,7 @@ public sealed class AtlasWindow
                         if (group.MaxHops <= 0)
                         {
                             ImGui.SameLine();
-                            ImGui.TextColored(DimText, "(any distance)");
+                            ImGui.TextColored(DimText, "(any)");
                         }
                     }
 
@@ -483,11 +527,6 @@ public sealed class AtlasWindow
                     {
                         (edited ??= [.. groups])[i] = after;
                     }
-
-                    // What the group is actually matched on, small and underneath. It is the
-                    // answer to "why is that map not in this group", and there is nowhere
-                    // else to find it. A measured indent rather than four spaces in the string.
-                    OverlayLayout.Note(Rule(group));
                 }
                 finally
                 {
@@ -499,7 +538,7 @@ public sealed class AtlasWindow
         }
         finally
         {
-            ImGui.EndChild();
+            ImGui.EndTable();
         }
     }
 
