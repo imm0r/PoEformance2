@@ -1005,6 +1005,46 @@
       "fields": {}
     },
 
+    // ── The four the danger model needs and NEITHER REFERENCE HAS ──────────────
+    // Worth stating as a fact about the references rather than a gap in this file, because the
+    // obvious next move is to go and look and the answer is already known: GameHelper2 registers
+    // layouts for 21 components (its ComponentOffsetTypes) and none of these four is among them.
+    // It treats them as MARKERS - its own note in OffsetHelperEngine.cs calls them "components
+    // present on entities but with no registered layout", and Entity.cs uses DiesAfterTime purely
+    // as "is this a temporary monster". The AHK tool does the same: DecodeDiesAfterTimeComponentBasic
+    // reads the two header fields and stops. So there are NO candidate offsets to verify here, and
+    // nothing to copy. --sweep exists for that: a blind read of the whole component, decoded
+    // afterwards against the file.
+    //
+    // WHAT IS KNOWN ALREADY, measured from the committed recordings without reading a byte of any
+    // of them - the pool cell, who carries them, and how long those live. The lifetimes are the
+    // part that matters, because a countdown inside one of these has to reach zero when the game
+    // stops listing the entity, and that is a check the game settles rather than an argument.
+
+    "LimitedLifespan": {
+      "comment": "On short-lived visual entities - Metadata/Effects/Effect, BeamEffect, ServerEffect, SleepableEffect. THE BEST-MEASURED CELL OF ANY COMPONENT HERE: 0x60, from 524 pooled gaps of which 524 divide it. Carriers are many but brief: up to 39 at once, and of 525 that both appeared and vanished inside a recording the MEDIAN LIFETIME IS 0.5 s, with a tail to 30 s. At ~48 ms a frame that is ten frames to see a countdown in, so a capture wants density rather than length. No fields: nothing has ever read one.",
+      "consts": { "PoolCell": "0x60" },
+      "fields": {}
+    },
+
+    "DiesAfterTime": {
+      "comment": "The one of the four that is not an effect: in every recording that has it, the carrier is a TOTEM (Metadata/Monsters/Totems/DarkEffigyTotem), and they live 7.2 to 19.1 s. That makes it the most legible of the four to decode - a slow countdown with a visible object attached - and the hardest to catch, because only one recording of nineteen contains any at all, at most 3 at once. CELL 0x50, but on THIN EVIDENCE: seven gaps, all divisible, where LimitedLifespan rests on 524. Treat 0x50 as the best estimate rather than a measurement, which is why --sweep falls back to shorter reads instead of trusting it. No fields: nothing has ever read one.",
+      "consts": { "PoolCell": "0x50" },
+      "fields": {}
+    },
+
+    "GroundEffect": {
+      "comment": "The dangerous-floor component, and the easiest of the four to capture: always Metadata/Effects/Spells/ground_effects/VisibleServerGroundEffect, never more than 11 at once, and LONG-LIVED - measured lifetimes 13.8 s to 49.9 s, against LimitedLifespan's 0.5 s. Something that stands still for half a minute is something a person can point at while recording. Cell 0xC0, from 65 pooled gaps of which 63 divide it. WHAT TO LOOK FOR ONCE THE BYTES EXIST: an area needs a radius, and a radius is a float in WORLD UNITS - the same units Render.CurrentWorldPosition is in, so it can be sanity-checked against the distance at which the player actually starts taking damage rather than against a guess. No fields: nothing has ever read one.",
+      "consts": { "PoolCell": "0xC0" },
+      "fields": {}
+    },
+
+    "Beam": {
+      "comment": "On Metadata/Effects/BeamEffect and ServerBeamEffect - the boss beam that made steering necessary. Two flavours by lifetime, which is itself a hint that they are different things: BeamEffect is startlingly consistent at 0.5-0.6 s over 84 measured instances, ServerBeamEffect runs to 2.7 s. Up to 5 at once. Cell 0xA0, and the weakest of the four - 88 pooled gaps and only 69 divide it, where LimitedLifespan is 524 of 524; the small gaps are all multiples of 0xA0 and the misses are long jumps, so it is probably right and is not proven. THE DECODE HAS A PIXEL-ACCURATE TEST WAITING: a beam has two ends, the entity's own position is one of them, and the other projects through the confirmed camera matrix onto the beam the game drew. That is the health-bar check again, and it is why --sweep carries the entity's own position on every observation. No fields: nothing has ever read one.",
+      "consts": { "PoolCell": "0xA0" },
+      "fields": {}
+    },
+
     "TriggerableBlockage": {
       "comment": "The barrier a trial or an encounter puts across a doorway. COPIED FROM GameHelper2 (TriggerableBlockageOffsets), not yet seen in this game - the entity browser listed it as a component nobody here had written a byte of, and the reference already had it. Verify by standing at a closed barrier and watching the row flip when it opens.",
       "fields": {
