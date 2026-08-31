@@ -433,10 +433,98 @@ public class RuleEffectTests
         try
         {
             File.WriteAllText(path, "{ this is not json");
-            RuleSettings loaded = RuleSettingsStore.Load(path);
+            RuleLoad loaded = RuleSettingsStore.Read(path);
 
-            Assert.False(loaded.Enabled);
-            Assert.Empty(loaded.Profiles[0].Groups);
+            Assert.False(loaded.Settings.Enabled);
+            Assert.Empty(loaded.Settings.Profiles[0].Groups);
+
+            // And it says so now, rather than looking exactly like an empty file.
+            Assert.Contains("not valid JSON", loaded.Note, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ARuleThisBuildCannotReadIsDroppedOnItsOwn()
+    {
+        // What used to cost the whole file, silently: one fact name from a newer build makes
+        // the deserialiser throw, and the catch turned that into "no rules, engine off, no
+        // message". Somebody played three maps wondering why nothing fired.
+        RuleSettings settings = new RuleSettings(
+            Enabled: true,
+            Profile: "P",
+            Profiles: [new RuleProfile("P", [new RuleGroup("G", [
+                // Watching is itself a RuleFact and defaults to LifePercent, so the keeper's
+                // effect has to watch something else - otherwise the edit below reaches into
+                // this rule too and the test proves nothing about dropping ONE.
+                new Rule("a", "Keeper", RuleCondition.Of(RuleFact.InMap), [
+                    new RuleEffect(RuleEffectKind.Text) { Watching = RuleFact.ManaPercent },
+                ]),
+                new Rule("b", "From the future", RuleCondition.Of(RuleFact.LifePercent, Compare.AtMost, 35), []),
+                new Rule("c", "Also fine", RuleCondition.Of(RuleFact.InGame), []),
+            ])])]);
+
+        string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Assert.True(RuleSettingsStore.Save(settings, path));
+
+            // Exactly what an older build sees in a file a newer one wrote.
+            File.WriteAllText(
+                path,
+                File.ReadAllText(path).Replace("\"LifePercent\"", "\"NotInThisBuild\"", StringComparison.Ordinal));
+
+            RuleLoad loaded = RuleSettingsStore.Read(path);
+            IReadOnlyList<Rule> rules = loaded.Settings.Profiles[0].Groups[0].Rules;
+
+            // The two readable rules survive - that is the whole point of the change.
+            Assert.Equal(["Keeper", "Also fine"], rules.Select(rule => rule.Name));
+            Assert.True(loaded.Settings.Enabled);
+
+            // And the one that did not is named, with the field that stopped it.
+            string skipped = Assert.Single(loaded.Skipped);
+            Assert.Contains("From the future", skipped, StringComparison.Ordinal);
+            Assert.Contains("fact", skipped, StringComparison.Ordinal);
+
+            // The file as it was is kept, because the config page saves what the ENGINE holds -
+            // so the first save after a skip would otherwise write the rule out of existence.
+            Assert.True(File.Exists(loaded.Backup), $"no backup at '{loaded.Backup}'");
+            Assert.Contains("NotInThisBuild", File.ReadAllText(loaded.Backup), StringComparison.Ordinal);
+
+            File.Delete(loaded.Backup);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void AFileThatReadsCleanlySaysNothing()
+    {
+        // The note has to stay empty on an ordinary load, or it becomes a line to tune out -
+        // and then it is not there when it matters.
+        RuleSettings settings = new RuleSettings(
+            Enabled: true,
+            Profile: "P",
+            Profiles: [new RuleProfile("P", [new RuleGroup("G", [
+                new Rule("a", "Fine", RuleCondition.Of(RuleFact.InMap), []),
+            ])])]);
+
+        string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Assert.True(RuleSettingsStore.Save(settings, path));
+            RuleLoad loaded = RuleSettingsStore.Read(path);
+
+            Assert.Empty(loaded.Skipped);
+            Assert.Empty(loaded.Note);
+            Assert.Empty(loaded.Backup);
+            Assert.False(File.Exists(path + ".rejected"));
+            Assert.Single(loaded.Settings.Profiles[0].Groups[0].Rules);
         }
         finally
         {

@@ -148,6 +148,33 @@ public sealed class RuleEngine
         _settings = settings.Normalised();
     }
 
+    /// <summary>Takes what was read from the file, including what could not be.</summary>
+    public void Configure(RuleLoad load)
+    {
+        LoadNote = load.Note;
+        Configure(load.Settings);
+    }
+
+    /// <summary>
+    /// What the file could not give us, for the status readout. Empty when it read cleanly.
+    /// </summary>
+    /// <remarks>
+    /// Kept for the session rather than cleared on the next <see cref="Configure(RuleSettings)"/>,
+    /// and that is deliberate: the config page republishes the settings on every keystroke, so
+    /// clearing it there would wipe the one message explaining why a rule somebody is looking
+    /// for is not in the list - within a second of them reading it.
+    ///
+    /// Volatile for the same reason as <see cref="PreviewRuleId"/>: written on the thread that
+    /// loads, read on the one that builds the config page's view.
+    /// </remarks>
+    public string LoadNote
+    {
+        get => _loadNote;
+        set => _loadNote = value ?? string.Empty;
+    }
+
+    private volatile string _loadNote = string.Empty;
+
     /// <summary>Tells the engine which key the game has bound to each flask slot.</summary>
     public void Bind(FlaskKeys keys)
     {
