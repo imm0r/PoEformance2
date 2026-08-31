@@ -877,6 +877,43 @@ a feature built on a person describing something the game names itself. The rule
 they cover what the component does not: a Firewall or an ice crystal is a hostile effect wearing a
 monster's components and carries no `GroundEffect`.
 
+#### The component does not mean "dangerous", and that was the load-bearing mistake
+
+Written first because it invalidates the confident paragraphs that follow it, which are kept as
+they were so the correction has something to correct.
+
+`GroundEffect` was read as the game's own answer to *"is this ground dangerous"* — a claim that
+justified building a hazard layer on it, ranking it above the user's own rules, and treating
+`+0x38` as the radius of a burning patch. It says no such thing. It marks a **server-spawned
+ground decal**, and the single path carrying it in the capture is the engine's generic
+`VisibleServerGroundEffect`.
+
+**The measurement, which was available the whole time and never taken:** of 5916 component
+readings in `session-2026-08-sweep.rec`, **5880 are in a hideout** and 36 in a map. A hideout
+damages nobody. Every quantitative statement this file makes about "ground effects" — the 39/33
+timer split, the 59–104 s lifetimes, the 0.38 s despawn beat — describes *hideout decorations*.
+The despawn-beat finding survives (it is about how the engine delists an entity, which is
+area-independent); the ones that read as facts about hazards do not.
+
+**The game settled it from the other side.** A screenshot of the overlay showed the ring drawn on
+an *Abyssal Arsenal* — a league object that does no damage — labelled `r=18.65`, the same constant
+every other one carries. Which brings the radius down too: across 5916 readings `+0x38` takes
+**three** values, 18.670750 (×5576), 18.664923 (×298) and 18.657303 (×42). A per-effect radius
+that is one constant on 94 % of readings is not describing individual areas.
+
+**What changed as a result.** A typed rule now beats the component ring, where for one commit it
+was the reverse. The two passes are not "precise" and "typed" — they answer different questions.
+The component answers *the server put a decal here*, which in a hideout is the furniture. A rule
+answers *this one hurts*, which is a claim only a person can make, because nothing found in memory
+has been shown to carry it. Overriding that threw away the only danger signal in the system.
+
+The ring keeps its job as an **awareness** layer: it marks decals nobody has described yet, which
+is exactly how you find a path worth writing a rule about. It stands aside wherever a rule speaks.
+
+**What is still needed:** a recording made in a map with real damaging ground in it. Thirty-six
+non-hideout readings cannot answer a single question about hazards, and no amount of re-reading
+this capture will change that.
+
 **They must not both fire on one entity, and for a while they did.** The two passes walk the same
 entity list and neither knew about the other. The shipped rule is spelled as the *exact* path that
 carries a `GroundEffect` component — not a prefix that happens to cover it — so under **default

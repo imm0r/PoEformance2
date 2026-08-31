@@ -35,10 +35,11 @@ namespace PoEformance.Overlay;
 /// happened to carry. Two rings of different sizes on one patch, which is exactly the "I cannot
 /// tell what these circles are" this feature is supposed to end.
 ///
-/// So the component pass OWNS the entities it can identify: while it is on, the rules skip
-/// anything carrying a GroundEffect. See TrackerSettings.RulesShouldRing. That is also what the
-/// comment below has always claimed the split was - the rules covering "what the component does
-/// not" - and it is now true rather than intended.
+/// THE RULE WINS. See TrackerSettings.ComponentShouldRing - and note that it was shipped the
+/// other way round for exactly one commit, on the belief that a GroundEffect component is the
+/// game's own answer to "is this dangerous ground". It is not. It marks a server-spawned ground
+/// DECAL and says nothing about damage, so a typed rule is the only thing in this system that
+/// makes a claim about danger at all.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class GroundDangerLayer
@@ -152,24 +153,26 @@ public sealed class GroundDangerLayer
     /// Rings every entity the GAME calls a ground effect, and says how long it has left.
     /// </summary>
     /// <remarks>
-    /// THE DIFFERENCE FROM THE RULES ABOVE is worth being precise about, because both draw
-    /// circles on the floor and only one of them can be wrong about what it is drawing. A rule
-    /// matches a metadata path somebody typed: it fires on whatever happens to start with that
-    /// text, misses anything nobody thought of, and cannot say anything about the patch beyond
-    /// "it matched". This asks the entity whether it carries a GroundEffect component, which is
-    /// the game's own answer to the same question, and reads the countdown out of it.
+    /// WHAT THIS ACTUALLY MARKS, corrected after it was sold as something better than it is.
+    /// It rings every entity carrying a GroundEffect component - and that component means "the
+    /// server spawned a ground decal here", NOT "this ground damages you". The two were treated
+    /// as one thing for several commits, on nothing but the component's name.
     ///
-    /// That is the shape of mistake this project has already paid for once - a whole feature
-    /// built on the user describing something the game names itself. The rules stay because
-    /// they still cover what the component does not: a Firewall or an ice crystal is a hostile
-    /// effect wearing a monster's components, and carries no GroundEffect.
+    /// The measurement that settles it: in the sweep capture 5880 of 5916 readings are in a
+    /// HIDEOUT, where nothing damages anything, and the single path carrying the component is
+    /// the engine's generic `VisibleServerGroundEffect`. A user screenshot showed the ring drawn
+    /// on an Abyssal Arsenal - a league object that does no damage at all.
     ///
-    /// A THIRD OF THEM HAVE NO NUMBER, and the ring is drawn anyway. In the sweep capture 33 of
-    /// 72 effects held NaN in the countdown slot for their whole life and 39 held a real one,
-    /// with no entity ever crossing between the two - so an absent timer is a kind of ground
-    /// effect rather than a failed read, and those patches burn exactly as much as the timed
-    /// ones. The first version gated the ring on the countdown and would have left a third of
-    /// the hazard unmarked, which is the failure this feature exists to remove.
+    /// So this is an AWARENESS layer, not a danger layer: it shows where the server has put
+    /// ground decals, which is genuinely useful for finding what to write a rule about, and is
+    /// why it stands aside wherever a rule already speaks. The rules are the only thing here
+    /// that claims anything about damage, because nothing found in memory has been shown to.
+    ///
+    /// A THIRD OF THEM HAVE NO NUMBER, and the ring is drawn anyway. 33 of the 72 entities held
+    /// NaN in the countdown slot for their whole life and 39 held a real one, with no entity
+    /// crossing between the two - so an absent timer is a kind of decal rather than a failed
+    /// read. Read that finding with the hideout caveat above: it describes the decorations in a
+    /// hideout, and almost nothing in the capture was ever in a fight.
     ///
     /// THE TIMER READS 0.0 FOR A BEAT before the ring goes. That is not a rounding artefact -
     /// the game's countdown reaches zero a measured 0.38 s before it stops listing the entity.
@@ -198,7 +201,9 @@ public sealed class GroundDangerLayer
             // patches burn exactly as much as the timed ones. Ringing only the ones that can be
             // counted down would leave a third of the hazard unmarked - the failure mode this
             // whole feature exists to remove.
-            if (entity.IsRemembered || !entity.IsGroundEffect)
+            // Refuses a remembered sighting, and stands aside where a RULE is already ringing
+            // this entity - see TrackerSettings.ComponentShouldRing for why that way round.
+            if (!Settings.ComponentShouldRing(entity))
             {
                 continue;
             }

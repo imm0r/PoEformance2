@@ -455,11 +455,12 @@ function describeSeen(seen) {
   const notes = [];
   if (seen.onScreen) notes.push("here now");
 
-  // A rule on tagged ground is not merely redundant, it is IGNORED: the component pass owns
-  // those entities while it is switched on, so the rule would sit in the list looking active
-  // and draw nothing. Saying only "already ringed" is what would send somebody to add one.
-  if (seen.hasComponent) notes.push("the game tags this one — ringed already, a rule here is ignored");
-  else notes.push("untagged — a rule is the only way it gets marked");
+  // TAGGED IS NOT DANGEROUS. The component means the server drew a decal here - 5880 of 5916
+  // sightings in the recorded session were in a hideout - so a row that read "the game marks
+  // this one as dangerous" would be telling somebody the opposite of what was measured. Your
+  // rule wins over the ring either way, so adding one is never wasted.
+  if (seen.hasComponent) notes.push("has a ground decal — that is not a claim about damage");
+  else notes.push("no decal — a rule is the only way it gets marked");
 
   if (seen.most > 1) notes.push(`up to ${seen.most} at once`);
   if (groundRules.some((r) => matchesRule(r, seen.path))) notes.push("a rule covers it");

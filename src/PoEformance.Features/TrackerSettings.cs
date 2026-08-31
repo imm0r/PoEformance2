@@ -332,7 +332,44 @@ public sealed record TrackerSettings(
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        return !entity.IsRemembered && !(ShowGroundEffects && entity.IsGroundEffect);
+        return !entity.IsRemembered;
+    }
+
+    /// <summary>Whether the component pass should ring this entity.</summary>
+    /// <remarks>
+    /// THE RULE WINS, and it took a screenshot to work out why round this way.
+    ///
+    /// This started inverted, on the belief that a GroundEffect component is the game's own
+    /// answer to "is this dangerous ground" - so the pass that reads a radius out of memory
+    /// ought to beat a number somebody typed. That belief is wrong. The component marks a
+    /// SERVER-SPAWNED GROUND DECAL and says nothing about damage: in the sweep capture 5880 of
+    /// 5916 readings are in a HIDEOUT, where nothing damages anything, and the one path that
+    /// carries it is the engine's generic `VisibleServerGroundEffect`. A user screenshot
+    /// settled it - a ring drawn on an Abyssal Arsenal, a league object that does no damage.
+    ///
+    /// So the two passes are not "precise" and "typed". They answer different questions. The
+    /// component answers "the server put a decal here", which is the whole area's worth of
+    /// harmless glow. A rule answers "THIS one hurts", which is a claim only a person can make
+    /// because nothing in memory has been shown to carry it. An explicit rule therefore beats
+    /// the component, and overriding it - which is what this did for one commit - throws away
+    /// the only signal in the system that is about danger at all.
+    ///
+    /// Remembered sightings are refused by both: ground effects expire, so a ring on one is a
+    /// ring around ground that is safe again.
+    /// </remarks>
+    public bool ComponentShouldRing(WorldEntity entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        if (entity.IsRemembered || !entity.IsGroundEffect)
+        {
+            return false;
+        }
+
+        // Only where a rule is not already ringing it. Checked against the rules that can
+        // actually draw - a disabled rule, or the whole rule pass switched off, rings nothing
+        // and so cannot be the reason this one is skipped.
+        return !ShowGroundDanger || !GroundDangerOrDefault.Any(rule => rule.Matches(entity));
     }
 
     /// <summary>The monster status rules, on the same terms.</summary>
