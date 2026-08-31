@@ -216,13 +216,27 @@ public sealed class CameraFrustum
     }
 
     /// <summary>
-    /// True when the matrix and the frustum agree closely enough to call it one camera.
+    /// How far the corners may miss the screen's edge before the two are called different
+    /// cameras.
     /// </summary>
     /// <remarks>
-    /// The tolerance is generous against a measurement that reads zero, deliberately: the
-    /// question is "did one of the two drift", and drift moves a corner right off the screen
-    /// rather than a hundredth of the way towards its edge. A tight bound would turn a future
-    /// float rounding difference into a false alarm about the thing this is meant to protect.
+    /// MEASURED INTO A GAP FOUR ORDERS OF MAGNITUDE WIDE, over the 1108 frames of
+    /// session-2026-08-frustum.rec:
+    ///
+    ///   the real matrix    median 8.5e-6, 99th percentile 2.1e-5, worst 6.4e-2
+    ///   read four bytes out    52.3 at its most forgiving, infinite on most frames
+    ///   read eight either way  infinite on every frame
+    ///
+    /// so anything between roughly 0.1 and 10 separates them. 0.5 is eight times the worst
+    /// honest reading and a hundredth of the most forgiving wrong one.
+    ///
+    /// THE WORST HONEST READING IS TEARING, not error, and it is why this is not 0.01 as first
+    /// written. The matrix and the frustum are two separate reads, so the game can write
+    /// between them; two frames in eleven hundred caught that, and at 0.01 both would have been
+    /// reported as drift. A drift alarm that cries wolf twice a session is one nobody reads.
     /// </remarks>
-    public bool AgreesWith(ReadOnlySpan<float> matrix) => WorstCornerOffEdge(matrix) < 0.01;
+    public const double AgreementTolerance = 0.5;
+
+    /// <summary>True when the matrix and the frustum agree closely enough to call it one camera.</summary>
+    public bool AgreesWith(ReadOnlySpan<float> matrix) => WorstCornerOffEdge(matrix) < AgreementTolerance;
 }

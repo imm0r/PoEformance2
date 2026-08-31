@@ -396,7 +396,7 @@ public static class MatrixHunt
         IReadOnlyList<ProjectionCandidate> candidates, int currentOffset, TextWriter output)
     {
         output.WriteLine();
-        ProjectionCandidate? agreeing = candidates.FirstOrDefault(c => !c.Transposed && c.FrustumFit < 0.01);
+        ProjectionCandidate? agreeing = candidates.FirstOrDefault(c => !c.Transposed && c.FrustumFit < World.CameraFrustum.AgreementTolerance);
 
         if (agreeing is not null)
         {
@@ -439,7 +439,7 @@ public static class MatrixHunt
             return;
         }
 
-        output.WriteLine(schema.FrustumFit < 0.01
+        output.WriteLine(schema.FrustumFit < World.CameraFrustum.AgreementTolerance
             ? $"  camera frustum: AGREES with the schema matrix (worst corner {schema.FrustumFit:F4} off the"
               + " viewport edge)."
             : $"  camera frustum: DISAGREES with the schema matrix - worst corner {schema.FrustumFit:F4} off the"
@@ -450,7 +450,8 @@ public static class MatrixHunt
         // and the resolution is the useful part: a candidate that beats the schema offset on
         // the scene but not on the frustum is the failure mode this whole file exists for.
         ProjectionCandidate top = candidates[0];
-        if (schema.FrustumFit < 0.01 && (top.Offset != schema.Offset || top.Transposed))
+        if (schema.FrustumFit < World.CameraFrustum.AgreementTolerance
+            && (top.Offset != schema.Offset || top.Transposed))
         {
             output.WriteLine(
                 $"  (0x{top.Offset:X} scores higher against the scene and does NOT agree with the frustum -"

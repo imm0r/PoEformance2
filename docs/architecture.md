@@ -513,10 +513,13 @@ worthless. It is three things a wrong reading fails:
   or later, not one of them lies on any, in any recording.
 - **The player is inside all six**, in every recording — which he must be, since he is on
   screen.
-- **The player's distance to the four side planes is the same number in every recording**
-  (1140.1, 1140.1, 450.3, 644.4) at world positions six thousand units apart. That is what a
-  frustum carried rigidly by a player-centred camera has to look like, and it is not something
-  an accidentally-convex block of floats can be.
+- **The player's distance to the vertical pair of side planes is the same number in every
+  recording** — 450.3 and 644.4, nineteen sessions, no exception, at world positions six
+  thousand units apart. That is what a frustum carried rigidly by a player-centred camera has
+  to look like, and it is not something an accidentally-convex block of floats can be. (The
+  *horizontal* pair is not one number, which this section used to claim: it takes 1140.1/1140.1
+  in sixteen sessions and 1326.5/907.2 in three, and the two do not sum alike, so it is not a
+  pan. Something about the viewport differs and nothing here has identified what.)
 
 A fourth reading corroborates from outside: plane 4 and plane 5 are exact negatives, so they
 are the near/far pair and plane 4's normal is the view direction — `(0.466531, 0.466531,
@@ -550,13 +553,21 @@ along the view axis in **world units**, which is why the near and far clip dista
 round (near 140–200, far 3200–5500 across the sessions). The projection was already computing
 it and throwing it away.
 
-`WorldReader` now reads the block beside the matrix every frame — one 192-byte read, since the
-corners and planes are contiguous — and puts it on the snapshot. That is what makes the
-frustum usable at all, and it is also the only way the remaining question gets answered: every
-existing fixture sweeps that region once, so a replay cannot tell "constant" from
-"photographed" (see the recording limits above), and reading it per frame is what will put it
-into the next `--record` session frame by frame. Until such a capture exists, a frustum older
-than the frame it is used on is unproven.
+`WorldReader` reads the block beside the matrix every frame — one 192-byte read, since the
+corners and planes are contiguous — and puts it on the snapshot.
+
+**And that settled the last open question: the game rewrites the frustum every frame.** The
+first eighteen fixtures swept the region once, so a replay of them could not tell "constant"
+from "photographed" (see the recording limits above), and everything built on the block was
+provisional. `session-2026-08-frustum.rec` is the capture made afterwards, and the recorder
+answers the question by construction — it drops a read whose bytes match the last one written,
+so **a read in the file is a read that changed**. 669 stored reads, 669 distinct values,
+changing frame for frame with gaps identical to the matrix's own. The frustum is as live as the
+projection it belongs to.
+
+One caveat survives: the matrix and the frustum are two separate reads, so they can straddle a
+game write. Over 1108 frames the corner-to-edge agreement has a **median of 8.5e-6** with two
+frames at 6.4e-2 — tearing, not drift, and far below anything that matters.
 
 #### Skipping the reads for what the camera cannot see
 
@@ -600,12 +611,13 @@ facing to a median of 1.6°, 210 completed moves — are a sample of *what the g
 what was on screen while it did it. An instrument that measures the world reads all of it, so
 the hunt opts out explicitly. Anything else that measures rather than draws must do the same.
 
-How much it saves is the one number still owed. At the single fresh frame each recording can
-offer, 29 of 163 hostile-monster reads are skipped (18%), and the only fixture with a real
-crowd at that moment shows 11% — thin evidence, because a recording with one monster in frame 5
-says almost nothing. The session-wide figures look far better (94% on the monsters fixture) and
-are worthless: they measure how far the player walked away from a photograph of the camera. The
-honest figure needs the same capture that settles the freshness question.
+**How much it saves is now measured too, on the same capture: 46%.** 528 of 1147 hostile-monster
+reads over a 53-second map session, with a frustum that is fresh on every frame — so unlike the
+figures this paragraph used to carry, it is a saving rather than an artefact of staleness. And
+the agreement holds at that scale: over 1108 frames and **134,572 tested points**, four points
+were on screen while outside the frustum, the worst by **1.37 world units** — an eighth of one
+grid cell, and 1/182nd of the 250-unit margin the gate ships with. Nothing was inside the
+frustum yet off screen at all.
 
 The same pass over the fixtures also turned up the component **pool cells**, the `Vital`
 back-pointer at `+0x08` (the component's own address, on every vital of every monster — a check
