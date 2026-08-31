@@ -301,6 +301,40 @@ public sealed record TrackerSettings(
     /// </remarks>
     public IReadOnlyList<GroundDangerRule> GroundDangerOrDefault => GroundDanger ?? DefaultTracker.GroundDanger;
 
+    /// <summary>Whether the typed ground rules may ring this entity at all.</summary>
+    /// <remarks>
+    /// TWO REFUSALS, and the second is the one that was missing.
+    ///
+    /// A REMEMBERED sighting has a position and no longer has the thing that was standing at it.
+    /// Ground effects expire, so a ring on one is a ring around ground that is SAFE again, which
+    /// is the single mistake this feature must not make.
+    ///
+    /// A COMPONENT-CARRYING entity belongs to the other pass, and until this existed both drew.
+    /// The shipped rule is spelled `Metadata/Effects/Spells/ground_effects/VisibleServerGroundEffect`
+    /// - the EXACT path that carries a GroundEffect component in the sweep capture, not a prefix
+    /// that happens to cover it - so the overlap under default settings was total: every tagged
+    /// patch was rung twice, once as a world-radius ring lying on the floor with an X and a
+    /// countdown, once as a flat pixel circle of whatever size the rule carried. Two circles of
+    /// different sizes on one patch, which is the "I cannot tell what these are" this feature
+    /// exists to end.
+    ///
+    /// The refusal is on the SWITCH rather than on what the other pass managed to draw. An
+    /// entity it declines for a frame - its ring reaching behind the camera - would otherwise
+    /// flip to a pixel circle and back as the camera turns, which reads as a bug in both.
+    ///
+    /// With the component pass off the rules take it back, because a switch that silently
+    /// deleted coverage somebody wrote a rule for would be the worse surprise.
+    ///
+    /// It lives HERE rather than in the layer that draws so it can be tested: the test project
+    /// runs on Linux and cannot reference the Windows-only overlay.
+    /// </remarks>
+    public bool RulesShouldRing(WorldEntity entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return !entity.IsRemembered && !(ShowGroundEffects && entity.IsGroundEffect);
+    }
+
     /// <summary>The monster status rules, on the same terms.</summary>
     public IReadOnlyList<StatusIconRule> MonsterStatusOrDefault => MonsterStatus ?? DefaultTracker.MonsterStatus;
 

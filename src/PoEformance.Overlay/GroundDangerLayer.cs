@@ -26,7 +26,19 @@ namespace PoEformance.Overlay;
 /// match a metadata path somebody typed and ring it at a radius in SCREEN PIXELS - the
 /// reference's figures are pixel figures, and a pixel ring does not shrink as the camera pulls
 /// back. The COMPONENT path rings whatever carries a GroundEffect, at a radius in WORLD units
-/// projected onto the floor, which does. See DrawKnownGroundEffects.
+/// read out of the game and projected onto the floor, which does. See DrawKnownGroundEffects.
+///
+/// THEY MUST NOT BOTH FIRE ON ONE ENTITY, and for a while they did. The shipped rule is spelled
+/// as the EXACT path that carries a GroundEffect component in the sweep capture, so with both
+/// switches on the DEFAULT configuration drew every tagged patch twice: once as a projected
+/// world ring with an X and a countdown, once as a flat pixel circle of whatever size the rule
+/// happened to carry. Two rings of different sizes on one patch, which is exactly the "I cannot
+/// tell what these circles are" this feature is supposed to end.
+///
+/// So the component pass OWNS the entities it can identify: while it is on, the rules skip
+/// anything carrying a GroundEffect. See TrackerSettings.RulesShouldRing. That is also what the
+/// comment below has always claimed the split was - the rules covering "what the component does
+/// not" - and it is now true rather than intended.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class GroundDangerLayer
@@ -81,10 +93,9 @@ public sealed class GroundDangerLayer
 
         foreach (WorldEntity entity in snapshot.Entities)
         {
-            // A SIGHTING has a position and no longer has the thing that was standing at it.
-            // Ground effects expire, so a remembered one is a ring around ground that is safe
-            // again - which is the one mistake this feature must not make.
-            if (entity.IsRemembered)
+            // Refuses a remembered sighting, and refuses anything the component pass owns. See
+            // TrackerSettings.RulesShouldRing - it lives there so it can be tested.
+            if (!Settings.RulesShouldRing(entity))
             {
                 continue;
             }

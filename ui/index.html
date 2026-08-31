@@ -108,8 +108,17 @@
     <section class="card" id="ground">
       <h2>Dangerous ground</h2>
       <p class="dim">Rings the ground the game does <em>not</em> mark for you. Effects the game
-        itself tags carry a component and are already ringed by the overlay's own switch — the
-        list below says which is which, so a rule is only written where one is needed.</p>
+        itself tags carry a component and are already ringed by the overlay's own switch — at a
+        radius read out of the game, which a rule cannot do. The list below says which is which,
+        so a rule is only written where one is needed.</p>
+      <!--
+        Said out loud because the rule stays in the list looking active. The component pass owns
+        the entities it can identify - it knows how big they are - so a rule on one of those is
+        matched and then not drawn. See TrackerSettings.RulesShouldRing.
+      -->
+      <p class="dim">A rule on ground the game already tags is <em>ignored</em> while the
+        overlay's ground-effect rings are on, because that pass knows the real size and a rule
+        does not. Switch those rings off and your rule takes over.</p>
       <!--
         Stated on the page because it is invisible from it, and because somebody hunting for the
         burning ground a rare left behind will otherwise conclude the picker is broken. The
