@@ -279,6 +279,7 @@ public sealed record ConfigState(
     [property: JsonPropertyName("map")] MapStateView? Map = null,
     [property: JsonPropertyName("rules")] RulesView? Rules = null,
     [property: JsonPropertyName("evasion")] EvasionView? Evasion = null,
+    [property: JsonPropertyName("ground")] GroundView? Ground = null,
     [property: JsonPropertyName("update")] UpdateView? Update = null);
 
 /// <summary>The evasion panel: the settings, the key, and why nothing is happening.</summary>
@@ -310,6 +311,24 @@ public sealed record EvasionView(
     [property: JsonPropertyName("moveHints")] IReadOnlyList<string> MoveHints,
     [property: JsonPropertyName("moveKeyNames")] string MoveKeyNames);
 
+/// <summary>The dangerous-ground panel: the rules, and what the session has actually seen.</summary>
+/// <param name="Rules">
+/// The path rules as they stand. Only this slice of the tracker's settings crosses to the page -
+/// the overlay's own tab owns the rest - and the host merges it back rather than replacing the
+/// whole record, so a switch that lives only on the overlay cannot be reset by a save from here.
+/// </param>
+/// <param name="Seen">
+/// Every kind of dangerous-looking ground the session has met, so a path is PICKED rather than
+/// typed. The list is the whole reason this panel exists in the config window: a metadata path
+/// is written nowhere a player can see it, and the ground that killed them is gone by the time
+/// they have alt-tabbed here.
+/// </param>
+/// <param name="Reading">Why the list looks the way it does - see GroundWatch.LastRead.</param>
+public sealed record GroundView(
+    [property: JsonPropertyName("rules")] IReadOnlyList<GroundDangerRule> Rules,
+    [property: JsonPropertyName("seen")] IReadOnlyList<SeenGround> Seen,
+    [property: JsonPropertyName("reading")] string Reading);
+
 /// <summary>
 /// Source-generated JSON for the bridge.
 /// </summary>
@@ -333,4 +352,5 @@ public sealed record EvasionView(
 [JsonSerializable(typeof(ConditionMessage))]
 [JsonSerializable(typeof(EvasionSettings))]
 [JsonSerializable(typeof(UpdateSettings))]
+[JsonSerializable(typeof(List<GroundDangerRule>))]
 public sealed partial class ConfigJsonContext : JsonSerializerContext;

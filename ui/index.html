@@ -99,6 +99,58 @@
     </section>
 
     <!--
+      Dangerous ground. A rule matches the START of a metadata path - a string written nowhere
+      a player can see, different per skill, per league mechanic and per boss - so the picker
+      above the table is the whole point of this card: what the session has walked past is a
+      list to choose from, and typing one from memory is how the feature ends up drawing
+      nothing. Same answer the buff list gives on the Rules tab, to the same problem.
+    -->
+    <section class="card" id="ground">
+      <h2>Dangerous ground</h2>
+      <p class="dim">Rings the ground the game does <em>not</em> mark for you. Effects the game
+        itself tags carry a component and are already ringed by the overlay's own switch — the
+        list below says which is which, so a rule is only written where one is needed.</p>
+      <!--
+        Stated on the page because it is invisible from it, and because somebody hunting for the
+        burning ground a rare left behind will otherwise conclude the picker is broken. The
+        overlay's own entity filter drops those before the reader ever lists them - see
+        GroundWatch, which carries the measurement.
+      -->
+      <p class="dim">The list holds what the reader lists. Ground that hangs off a monster's
+        modifiers — the burning patch a rare leaves when it dies — is dropped by the overlay's
+        <em>Daemon</em> entity filter before it gets here, so it can be neither picked nor
+        matched by a rule until that filter class is switched off.</p>
+
+      <div class="cfg-row">
+        <label for="gd-pick">Seen this session</label>
+        <select id="gd-pick"></select>
+        <button id="gd-add" type="button">Add a rule for this</button>
+      </div>
+      <!--
+        Why the list can be empty and what that means. Three different states look identical
+        without it: the reader never ran, it ran in a hideout, or it ran and found nothing.
+      -->
+      <p class="dim" id="gd-read">–</p>
+
+      <table id="gd-rules">
+        <thead>
+          <tr>
+            <th>On</th><th>Path starts with</th><th>Colour</th>
+            <th title="In screen pixels, not world units">Radius</th>
+            <th>Line</th><th>Fill</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="gd-rows"></tbody>
+      </table>
+
+      <div class="cfg-row">
+        <button id="gd-new" type="button">Add an empty rule</button>
+        <span class="dim">The radius is in screen pixels — it does not shrink as the camera
+          pulls back.</span>
+      </div>
+    </section>
+
+    <!--
       Evasion. Two gates rather than one master switch, because drawing a marker is free and
       pressing a key is not: seeing everything coming while the tool only acts on a rare's slam
       is the ordinary setup, and one threshold cannot say it.
