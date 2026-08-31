@@ -242,6 +242,19 @@ public sealed record TrackerSettings(
     [property: JsonPropertyName("lines")] MonsterLineSettings? Lines = null,
     [property: JsonPropertyName("groundDanger")] IReadOnlyList<GroundDangerRule>? GroundDanger = null,
     [property: JsonPropertyName("showGroundDanger")] bool ShowGroundDanger = true,
+
+    // ── The hazards the game names itself ────────────────────────────────────
+    // Separate switches from the rules above, and separate on purpose: a rule matches a path
+    // somebody thought to type, while these two draw whatever CARRIES THE COMPONENT. That is
+    // the difference between a list to maintain and a fact, and it is why they can also show a
+    // countdown and a direction, which no rule could.
+    [property: JsonPropertyName("showGroundEffects")] bool ShowGroundEffects = false,
+    [property: JsonPropertyName("groundEffectColour")] string GroundEffectColour = "#C8FF7A1E",
+    [property: JsonPropertyName("groundEffectRadius")] float GroundEffectRadius = 26f,
+    [property: JsonPropertyName("showGroundEffectTimer")] bool ShowGroundEffectTimer = true,
+    [property: JsonPropertyName("showBeams")] bool ShowBeams = false,
+    [property: JsonPropertyName("beamColour")] string BeamColour = "#E6FF3B30",
+    [property: JsonPropertyName("beamThickness")] float BeamThickness = 3f,
     [property: JsonPropertyName("monsterStatus")] IReadOnlyList<StatusIconRule>? MonsterStatus = null,
     [property: JsonPropertyName("playerStatus")] IReadOnlyList<StatusIconRule>? PlayerStatus = null,
     [property: JsonPropertyName("showMonsterStatus")] bool ShowMonsterStatus = false,

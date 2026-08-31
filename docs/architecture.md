@@ -855,6 +855,39 @@ measurement: `GroundEffect+0x38` is a float reading 18.66–18.67 with three dis
 settled by standing at a measured distance and seeing where damage starts; `+0x48` is a small
 integer with three distinct values, which is what a type or severity id looks like.
 
+#### Both are drawn now
+
+`WorldEntity` carries `GroundSeconds` and `Beam`; `GroundDangerLayer` rings every ground effect
+with its countdown and `BeamLayer` draws each beam as the line it occupies. Both switches live on
+the tracker's *Dangerous ground* tab and both default **off** — they draw over the fight, and an
+upgrade must not change a screen nobody asked to change.
+
+The reads are unconditional rather than behind a switch, decided on the measured counts: at most
+**11 ground effects and 5 beams alive at once** across every committed recording, so it is one
+4-byte read and one 24-byte read on a handful of entities, against the hundreds of monsters the
+same loop already pays for. Gating that would cost more in state that can be wrong than it could
+save.
+
+**The ground rings are the same feature the rules were, done properly.** A `GroundDangerRule`
+matches a metadata path somebody typed: it fires on whatever starts with that text, misses
+anything nobody thought of, and can say nothing about the patch beyond "it matched". The new path
+asks the entity whether it *carries a GroundEffect component* — the game's own answer — and reads
+the countdown out of it. That is the shape of mistake this file already records paying for once,
+a feature built on a person describing something the game names itself. The rules stay, because
+they cover what the component does not: a Firewall or an ice crystal is a hostile effect wearing a
+monster's components and carries no `GroundEffect`.
+
+**The beam is drawn in full, and that is the point.** A ring on the beam entity's own position
+marks one end of a line up to 1116 world units long — worse than nothing, because it flags as
+dangerous the one spot the player is already clear of. What is *not* drawn is a width: the one
+thickness candidate in the component was exceeded by the beam's own length on two thirds of
+readings, so a danger zone would be an invention, and the settings row says so next to the slider.
+
+`HazardReadingTests` covers the half a decode usually dies in — that the values survive the trip
+into a `WorldSnapshot` — by re-running the countdown's prediction check *through the snapshot*,
+and by pinning that a pre-decode recording yields `null` rather than a zero that would ring the
+whole screen.
+
 ### Next
 
 Two of the three follow-ups are now closed:

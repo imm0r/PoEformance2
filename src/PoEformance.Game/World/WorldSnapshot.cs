@@ -225,6 +225,30 @@ public readonly record struct Aim(float Angle, float Turning, int Animation = -1
 /// Positioned. Two entities sharing this are one object with one position and one model, and
 /// that is a proof rather than the coincidence a matching position would be.
 /// </remarks>
+/// <summary>The line a beam draws, both ends in world coordinates.</summary>
+/// <param name="SourceX">Where it starts - the beam entity's own position, exactly.</param>
+/// <param name="TargetX">Where it ends. This is the end a player has to be out of.</param>
+/// <remarks>
+/// Decoded 2026-08 from tests/fixtures/session-2026-08-sweep.rec; see the Beam struct in the
+/// schema for the control that settled the far end. Both ends are set once when the beam is
+/// created and never move while it lives, so a drawn line does not need re-reading per frame -
+/// it needs the beam to still be in the entity list, which is what makes it expire on its own.
+/// </remarks>
+public readonly record struct BeamLine(
+    float SourceX,
+    float SourceY,
+    float SourceZ,
+    float TargetX,
+    float TargetY,
+    float TargetZ)
+{
+    /// <summary>How long the beam is, in world units. Measured 17 to 1116 across one session.</summary>
+    public float Length => MathF.Sqrt(
+        ((TargetX - SourceX) * (TargetX - SourceX))
+        + ((TargetY - SourceY) * (TargetY - SourceY))
+        + ((TargetZ - SourceZ) * (TargetZ - SourceZ)));
+}
+
 public sealed record WorldEntity(
     uint Id,
     ulong Address,
@@ -249,7 +273,16 @@ public sealed record WorldEntity(
     int? RememberedForMs = null,
     ActiveBuffs? Buffs = null,
     Aim? Aim = null,
-    ActorAction? Action = null)
+    ActorAction? Action = null,
+
+    // How long this patch of ground still burns, or null when the entity is not one. Straight
+    // from the game's own countdown - see GroundEffect.SecondsRemaining in the schema, and note
+    // that it reaches zero a consistent 0.38 s before the entity is delisted, so a display of
+    // it will sit at 0.0 for a beat before the thing disappears.
+    float? GroundSeconds = null,
+
+    // The line this beam draws, or null when the entity is not one. See BeamLine.
+    BeamLine? Beam = null)
 {
     /// <summary>Whether this comes from memory rather than from the game's current list.</summary>
     public bool IsRemembered => RememberedForMs is not null;
@@ -687,6 +720,9 @@ public sealed class WorldReader
     private readonly int _w2sMatrix;
     private readonly int _frustumCorners;
     private readonly int _frustumPlanes;
+    private readonly int _groundSeconds;
+    private readonly int _beamSource;
+    private readonly int _beamTarget;
     private readonly int _areaHash;
     private readonly int _areaLevel;
     private readonly int _playerLevelField;
@@ -757,6 +793,16 @@ public sealed class WorldReader
         _w2sMatrix = schema.Structs["WorldData"].OffsetOf("W2SMatrix");
         _frustumCorners = schema.Structs["WorldData"].OffsetOf("FrustumCorners");
         _frustumPlanes = schema.Structs["WorldData"].OffsetOf("FrustumPlanes");
+
+        // The two hazards decoded from the --sweep capture. Read unconditionally rather than
+        // behind a switch, on the measured counts rather than on principle: across every
+        // committed recording there are at most 11 ground effects and 5 beams alive at once, so
+        // this is one 4-byte read and one 24-byte read on a handful of entities - against the
+        // hundreds of monsters the same loop already pays for. Gating it would cost more in
+        // state that can be wrong than it could ever save.
+        _groundSeconds = schema.Structs["GroundEffect"].OffsetOf("SecondsRemaining");
+        _beamSource = schema.Structs["Beam"].OffsetOf("SourceX");
+        _beamTarget = schema.Structs["Beam"].OffsetOf("TargetX");
         _areaHash = schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash");
 
         // Two levels the schema has carried - with invariants, so the drift report already
@@ -797,6 +843,59 @@ public sealed class WorldReader
     /// corpse and empty the overlay - which is exactly what the replay tests caught the
     /// moment this was written the convenient way. TryRead is the only correct call here.
     /// </remarks>
+    /// <summary>Seconds until this patch of ground stops burning, or null if it is not one.</summary>
+    /// <remarks>
+    /// The component's presence IS the answer to "is this dangerous ground" - which is what
+    /// makes this different from the path rules the tracker has had until now. Those were the
+    /// only way to name a hazard when nothing could read one, and they carry the usual cost of
+    /// asking a person to describe something the game already knows: a rule matches what
+    /// somebody thought to type.
+    /// </remarks>
+    private float? ReadGroundSeconds(Entity entity)
+    {
+        ulong at = entity.Component("GroundEffect");
+        if (at == 0 || !_reader.TryRead(at + (ulong)_groundSeconds, out float seconds))
+        {
+            return null;
+        }
+
+        // A garbage read must not become a countdown on screen. The observed range is a few
+        // seconds to under a minute; anything outside says the offset moved or the object was
+        // freed mid-read, and null is the honest answer to both.
+        return float.IsFinite(seconds) && seconds is >= 0 and <= 600 ? seconds : null;
+    }
+
+    /// <summary>Both ends of this beam, or null if it is not one.</summary>
+    private BeamLine? ReadBeam(Entity entity)
+    {
+        ulong at = entity.Component("Beam");
+        if (at == 0)
+        {
+            return null;
+        }
+
+        Span<float> ends = stackalloc float[6];
+        if (!_reader.TryRead(at + (ulong)_beamSource, System.Runtime.InteropServices.MemoryMarshal.AsBytes(ends[..3]))
+            || !_reader.TryRead(at + (ulong)_beamTarget, System.Runtime.InteropServices.MemoryMarshal.AsBytes(ends[3..])))
+        {
+            return null;
+        }
+
+        foreach (float f in ends)
+        {
+            if (!float.IsFinite(f))
+            {
+                return null;
+            }
+        }
+
+        var line = new BeamLine(ends[0], ends[1], ends[2], ends[3], ends[4], ends[5]);
+
+        // A beam of no length is a beam that has not been aimed yet, and drawing it puts a dot
+        // on its own source for a frame. Measured lengths start at 17 world units.
+        return line.Length > 1f ? line : null;
+    }
+
     private MonsterSigns ReadMonsterSigns(Entity entity)
     {
         int? health = null;
@@ -1268,7 +1367,8 @@ public sealed class WorldReader
                 poi, mapIcon,
                 signs.Life, signs.EnergyShield, opened, friendly, signs.IsEffect,
                 NameOf(address, renderAddress), renderAddress, present,
-                Buffs: buffs, Aim: aim, Action: action);
+                Buffs: buffs, Aim: aim, Action: action,
+                GroundSeconds: ReadGroundSeconds(entity), Beam: ReadBeam(entity));
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
