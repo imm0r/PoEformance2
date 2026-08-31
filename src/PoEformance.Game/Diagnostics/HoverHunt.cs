@@ -11,9 +11,11 @@ namespace PoEformance.Game.Diagnostics;
 /// <param name="Sub">What its +0x3F0 leads to, or 0.</param>
 /// <param name="Entity">What the sub-object's +0xA8 holds, or 0.</param>
 /// <param name="EntityPath">The metadata path of that entity, when it is one.</param>
-/// <param name="BossBytes">Every hostile monster's Monster component byte 0x27, by path.</param>
+/// <param name="BossBytes">Every monster's Monster component byte 0x27, by path. See RefutedBossByte.</param>
 /// <param name="Companion">What the sub-object's +0xC8 holds, or 0. See CompanionAt.</param>
 /// <param name="CompanionRead">How many bytes of the companion's target the reader served.</param>
+/// <param name="CompanionVTable">The companion object's +0x00 - one class across a session.</param>
+/// <param name="CompanionPayload">Its +0x08 - the hovered entity + CompanionPayloadIntoEntity.</param>
 public sealed record HoverSample(
     ulong Host,
     ulong Sub,
@@ -21,7 +23,9 @@ public sealed record HoverSample(
     string EntityPath,
     IReadOnlyList<(string Path, ItemRarity Rarity, byte Flag)> BossBytes,
     ulong Companion = 0,
-    int CompanionRead = 0);
+    int CompanionRead = 0,
+    ulong CompanionVTable = 0,
+    ulong CompanionPayload = 0);
 
 /// <summary>
 /// Reads the two things nineteen recordings could not answer, because nothing had read them.
@@ -30,29 +34,29 @@ public sealed record HoverSample(
 /// BOTH QUESTIONS WERE BLOCKED BY THE SAME RULE, not by a hard offset: a replay only serves
 /// reads that actually happened, so an offset no build touches is absent from every session
 /// ever captured. That is why this exists at all - it is a switch whose whole job is to make
-/// the bytes land in a <c>--record</c> file. One capture later
-/// (tests/fixtures/session-2026-08-hoverhunt.rec) the two questions stand differently:
+/// the bytes land in a <c>--record</c> file. TWO captures later both are closed, and it took
+/// two on purpose - the first could not answer either one, and knowing WHY is the useful part:
 ///
-///  1. THE HOVERED ENTITY - SETTLED. GameHelper2 walks InGameState+0x300 -> +0x3F0 -> +0xA8,
-///     and against this client it walks: 143 of 143 non-null readings named an entity the game
-///     was listing that same frame, over ten entities of four kinds, and it was null on the
-///     other 789. It is read in production now (MouseOverReader, WorldSnapshot.Hovered) and the
-///     schema carries the two hop structs. This hunt keeps reading a WINDOW of each object
-///     rather than the settled slots, on the same argument --questflags records regions it does
-///     not understand: the windows are what the SECOND cursor-tracking slot at sub+0xC8 was
-///     found in. It is still unidentified, and it is followed now (see CompanionAt) because the
-///     first capture took the offline half of that question as far as it goes - the one thing
-///     left is what its target holds, and no committed file has a byte of it.
-///  2. THE BOSS BYTE - STILL OPEN, and the capture is the reason to be careful about how that
-///     is said. Monster+0x27 came from a reference as an unverified hypothesis, and the run
-///     read it 14,462 times: zero every time, across Normal, Magic and Rare, with NO UNIQUE in
-///     the area. That is what a working boss flag reads too, so it refutes nothing - see the
-///     conclusion in Report, which now says which case was missing instead of concluding from
-///     its absence. The pool-cell measurement says how much to read to be thorough: the Monster
-///     component's cell is 0x30, so 0x30 bytes IS the whole component.
+///  1. THE HOVERED ENTITY - CONFIRMED (session-2026-08-hoverhunt.rec). GameHelper2 walks
+///     InGameState+0x300 -> +0x3F0 -> +0xA8, and against this client it walks: 143 of 143
+///     non-null readings named an entity the game was listing that same frame, over ten entities
+///     of four kinds, null on the other 789. Read in production now (MouseOverReader,
+///     WorldSnapshot.Hovered); the schema carries the two hop structs.
+///  2. THE SECOND SLOT at sub+0xC8 - EXPLAINED (session-2026-08-hoverboss.rec). It tracks the
+///     cursor exactly as +0xA8 does and took a fresh address nearly every frame, which made it
+///     look like a find. Its target is a 16-byte object: +0x00 one single module address across
+///     a session, +0x08 the HOVERED ENTITY PLUS 0x100 on 126 of 126 frames. A per-frame handle
+///     around an interior pointer to the entity +0xA8 already names - nothing new, and now
+///     written down so nobody hunts it a third time.
+///  3. THE BOSS BYTE - REFUTED. Monster+0x27 came from a reference as an unverified hypothesis.
+///     The FIRST capture read it 14,462 times, always zero, and settled nothing: no unique was
+///     in the area, and zero on every non-unique is what a working boss flag reads. The second
+///     was made in front of a map boss - Unique rarity, 'Boss' in its own metadata path, 142
+///     sightings - and the byte is zero there too. The field is gone from the schema. The offset
+///     is still read and reported here so another boss re-checks it rather than starting over.
 ///
 /// The reading is the deliverable. What the bytes mean is decided afterwards, against the
-/// file, which is the only way either question has ever been settled here.
+/// file, which is the only way any of this has ever been settled here.
 /// </remarks>
 public sealed class HoverHunt
 {
@@ -67,13 +71,32 @@ public sealed class HoverHunt
     /// <summary>The whole Monster component - its pool cell is this, so nothing is missed.</summary>
     public const int MonsterComponentBytes = 0x30;
 
-    /// <summary>The sub-object's second cursor-tracking slot, the one nothing has identified.</summary>
+    /// <summary>The byte that used to be in the schema as 'IsBoss', and is not one.</summary>
     /// <remarks>
-    /// It is not in the schema's fields on purpose - what it POINTS AT is unknown, and naming a
-    /// field for a pointer whose target nobody has read is how a guess becomes documentation.
-    /// It is followed here because a hunt is where an unidentified thing belongs.
+    /// A literal here rather than a schema lookup BECAUSE it was refuted: the field is gone from
+    /// Monster, and the hunt that disproved it is the only thing left that should read the
+    /// offset. Kept and still reported so a re-run in front of another boss re-checks it rather
+    /// than starting from nothing - a refutation stands on one map boss, and one is not many.
+    /// </remarks>
+    public const int RefutedBossByte = 0x27;
+
+    /// <summary>The sub-object's second cursor-tracking slot. Identified, and worth nothing.</summary>
+    /// <remarks>
+    /// Still not a schema field, for a better reason than when it was unknown: its target is a
+    /// per-frame handle whose only payload is the hovered entity + 0x100, so reading it would
+    /// buy a second, more expensive route to what +0xA8 gives directly. It stays here because
+    /// a hunt is where the evidence for that belongs.
     /// </remarks>
     public const int CompanionAt = 0xC8;
+
+    /// <summary>Where the companion's own payload points, relative to the hovered entity.</summary>
+    /// <remarks>
+    /// 126 of 126 frames in session-2026-08-hoverboss.rec, for a monster and a ground item
+    /// alike. Reported rather than assumed: if a future client changes the layout this is the
+    /// number that stops matching, and a hunt that printed "identified" without checking would
+    /// hide it.
+    /// </remarks>
+    public const int CompanionPayloadIntoEntity = 0x100;
 
     /// <summary>
     /// Window sizes tried at the companion's target, largest first.
@@ -143,7 +166,7 @@ public sealed class HoverHunt
             sub = _reader.ReadPointer(host + (ulong)_subPointerAt);
         }
 
-        ulong companion = 0;
+        ulong companion = 0, companionVTable = 0, companionPayload = 0;
         int companionRead = 0;
         if (MemoryReaderExtensions.IsPlausiblePointer(sub))
         {
@@ -163,6 +186,8 @@ public sealed class HoverHunt
                 if (_reader.TryRead(companion, _window.AsSpan(0, size)))
                 {
                     companionRead = size;
+                    companionVTable = BitConverter.ToUInt64(_window, 0);
+                    companionPayload = BitConverter.ToUInt64(_window, 8);
                     break;
                 }
             }
@@ -175,7 +200,8 @@ public sealed class HoverHunt
         }
 
         return new HoverSample(
-            host, sub, entity, path, ReadBossBytes(chain.AreaInstance), companion, companionRead);
+            host, sub, entity, path, ReadBossBytes(chain.AreaInstance),
+            companion, companionRead, companionVTable, companionPayload);
     }
 
     /// <summary>Byte 0x27 of every hostile monster's Monster component, beside its rarity.</summary>
@@ -210,7 +236,7 @@ public sealed class HoverHunt
                     ? (ItemRarity)raw
                     : ItemRarity.Unknown;
 
-            found.Add((identity.Path, rarity, _monster[0x27]));
+            found.Add((identity.Path, rarity, _monster[RefutedBossByte]));
         }
 
         return found;
@@ -251,22 +277,36 @@ public sealed class HoverHunt
             output.WriteLine("  the right slot can be hunted offline. Hover a monster while this runs.");
         }
 
-        // The companion slot. Reported as WHETHER THE BYTES CAME HOME rather than as a finding,
-        // because that is the whole reason it is followed: everything else about it was already
-        // measurable offline, and the one thing that was not is what its target holds.
+        // The companion slot. It is identified, so this RE-CHECKS the identification rather
+        // than restating it: one vtable and a payload at a fixed offset into the hovered entity
+        // are two claims a later client can break, and a hunt that printed the conclusion
+        // without testing it would be the thing hiding the breakage.
         var withCompanion = samples.Where(s => s.Companion != 0).ToList();
         if (withCompanion.Count > 0)
         {
             int read = withCompanion.Count(s => s.CompanionRead > 0);
-            int smallest = read == 0 ? 0 : withCompanion.Where(s => s.CompanionRead > 0).Min(s => s.CompanionRead);
             output.WriteLine();
-            output.WriteLine($"  sub+0x{CompanionAt:X} (unidentified): set on {withCompanion.Count} frames, "
-                + $"{withCompanion.Select(s => s.Companion).Distinct().Count()} distinct");
-            output.WriteLine(read == 0
-                ? "    its target read on NO frame - every window size failed, so the capture still"
-                  + " cannot say what it points at."
-                : $"    target captured on {read} of them, smallest window 0x{smallest:X} bytes."
-                  + " That is the part that was missing - mine it offline.");
+            output.WriteLine($"  sub+0x{CompanionAt:X}: set on {withCompanion.Count} frames, "
+                + $"{withCompanion.Select(s => s.Companion).Distinct().Count()} distinct addresses");
+
+            if (read == 0)
+            {
+                output.WriteLine("    its target read on NO frame - every window size failed, so this"
+                    + " capture cannot re-check what it points at.");
+            }
+            else
+            {
+                List<HoverSample> known = [.. withCompanion.Where(s => s.CompanionRead > 0 && s.Entity != 0)];
+                int classes = known.Select(s => s.CompanionVTable).Distinct().Count();
+                int agree = known.Count(s => s.CompanionPayload == s.Entity + CompanionPayloadIntoEntity);
+
+                output.WriteLine($"    target captured on {read}; one class over {classes} vtable(s), and its"
+                    + $" payload is the hovered entity + 0x{CompanionPayloadIntoEntity:X}"
+                    + $" on {agree} of {known.Count}.");
+                output.WriteLine(classes == 1 && agree == known.Count && known.Count > 0
+                    ? "    AS IDENTIFIED: a per-frame handle onto the entity +0xA8 already names."
+                    : "    NOT what it was identified as - the layout has changed, re-hunt it.");
+            }
         }
 
         // The boss byte, pooled over the whole session and shown against rarity, because the
@@ -278,7 +318,7 @@ public sealed class HoverHunt
         }
 
         output.WriteLine();
-        output.WriteLine("  Monster+0x27 ('IsBoss', an unverified hypothesis) against rarity:");
+        output.WriteLine("  Monster+0x27 ('IsBoss', REFUTED 2026-08 - re-checked here) against rarity:");
         if (byRarity.Count == 0)
         {
             output.WriteLine("    no monster carried a readable Monster component.");
