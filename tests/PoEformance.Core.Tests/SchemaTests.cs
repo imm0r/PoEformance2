@@ -101,7 +101,10 @@ public class SchemaTests
 
         Assert.Equal(0x20, inventories.OffsetOf("EntriesVec"));
         Assert.Equal(0x30, inventories.OffsetOf("EntriesCapacityEnd"));
-        Assert.Equal(0x150, inventories.Constants["SubObjectStride"]);
+        // Renamed from SubObjectStride: 0x150 is the POOL CELL, so what sits one of them on
+        // is the next entity's component rather than a second sub-object of this one. See
+        // ComponentPoolTests for the measurement that settled it.
+        Assert.Equal(0x150, inventories.Constants["PoolCell"]);
 
         // The numbers check each other, which is the only reason to pin them: the
         // capacity end observed live sat at +0xB8, and that is exactly the buffer at

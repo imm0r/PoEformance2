@@ -73,6 +73,48 @@ is in there, because resolving the chain reads it, but `root+Children` never was
 in that file can say anything about the atlas.) To record something that can answer questions
 about a feature offline, **that feature has to be running while the recording is made**.
 
+**And a third way a replay misleads, found 2026-08 while mining the committed fixtures for
+offsets nobody had decoded: a region swept ONCE reads as constant forever.** The replay serves
+the newest bytes at or before the current frame, so a block read at frame 5 and never again
+answers every later frame with those same bytes — which is indistinguishable from a field the
+game never writes. Every session in `tests/fixtures/` sweeps `WorldData` 0x000–0x840 exactly
+once (MatrixHunt's sweep) and then reads only the matrix per frame, so 258 of its 264 recorded
+slots "never change" and the six that do are the matrix. That is a fact about the recorder,
+and reading it the other way round would have produced a confident claim that the camera's
+frustum is static — while its numbers plainly differ between recordings. **The check costs one
+question: how many distinct reads actually covered this address?** One means the replay is a
+photograph, and the only claims it supports are about the instant it was taken.
+
+That instant is still worth a great deal, and this is the useful half of the lesson: **the
+same single sweep is present in eighteen independent files, from five game launches**, so a
+geometric claim can be tested eighteen times over even though no single file can time it. See
+`CameraFrustumTests`.
+
+**What a recording can say about a field nobody ever read: whether it fits.** The third state
+between "confirmed" and "unanswerable", and the reason the pool cells in the schema are worth
+measuring. Components of one class come out of one allocator, so sorting the addresses a class
+resolved to and taking the smallest gap gives the cell — 0x420 for `Life`, 0x550 for
+`Positioned`, 0x630 for `Render` — and every other gap being a whole number of cells is what
+makes that a measurement rather than one lucky pair (618 of 618 for `Life`). An offset past the
+cell cannot be in the object; one inside it has room. That is the entire evidence for the three
+`Life` vitals nothing in this project has read — `Ward`, `Divinity` and `Spirit`, the last of
+which is a PoE2 resource with no PoE1 counterpart — and had the cell come back 0x280 it would
+have refuted them without a byte of them being read.
+
+**The same cells cost a documented conclusion its footing, and that is the sharper lesson.**
+One component containing two identical sub-objects and two components lying side by side in a
+pool are *indistinguishable from inside the object*: the same vtable one cell on, the same
+vector, the same inline buffer. `Inventories` was read the first way and written down as an
+array with a 0x150 sub-object stride, on three pieces of evidence that are all equally true of
+the second reading. What separates them is outside the object — ask the **entity list** who
+owns the address one cell on. Over 22,363 sightings it belongs to a *different* entity 16,560
+times and to the same one **never**, and the same test comes back the same way for `Life`,
+`Buffs`, `Positioned`, `Render` and `Actor`, with zero same-entity repeats anywhere. It also
+closes two loose ends for free: `Inventories+0x158`, recorded as an open puzzle because it held
+"something other than the entity +0x008 holds", is the *neighbour's* `OwnerEntity`; and the two
+live-looking pointers at `Actor+0xF18`/`+0xF20` are 0xCE0 + 0x238 and 0xCE0 + 0x240 — the next
+actor's `SkillActionPtr` and `MoveActionPtr`. See `ComponentPoolTests`.
+
 **And one thing a recording has to be, to be evidence at all: long enough to contain the
 moment in question.** A capture taken while clearing a map turned out to hold 437 milliseconds
 — it hit its size cap before the first monster died, and every question anyone wanted to ask
@@ -452,6 +494,51 @@ check**, and structural fingerprints (a unit vector, a plausible pointer) are we
 The tests that hold now are ones the game itself settles — project an entity's health-bar
 height and see whether it lands on the bar the game drew; require the scene to spread, not
 just the player to centre.
+
+### The decoy has a name: the camera's frustum sits sixteen bytes before the matrix
+
+The block that broke the first matrix invariant was written off as "an unrelated block of four
+unit rows". It is nothing of the kind. `WorldData+0x10C` holds **six clipping planes** at a
+stride of 0x10 — a unit normal and a distance each, normals pointing inward — and `+0xAC` holds
+the **eight corners of the same frustum** in world units. Reading a `mat4x4` at 0x11C therefore
+takes planes 1 to 4, and the unit vector the old invariant demanded at `+0x30` was plane 4's
+normal. The decoy was never unrelated; it was the camera describing its own shape, immediately
+before describing its own projection.
+
+None of the evidence for that is unit length, because this file already records unit length as
+worthless. It is three things a wrong reading fails:
+
+- **The corners fit the planes.** Each corner of a frustum lies exactly *on* three of its six
+  faces. At `0xAC` all eight do, in all eighteen committed recordings; read four bytes earlier
+  or later, not one of them lies on any, in any recording.
+- **The player is inside all six**, in every recording — which he must be, since he is on
+  screen.
+- **The player's distance to the four side planes is the same number in every recording**
+  (1140.1, 1140.1, 450.3, 644.4) at world positions six thousand units apart. That is what a
+  frustum carried rigidly by a player-centred camera has to look like, and it is not something
+  an accidentally-convex block of floats can be.
+
+A fourth reading corroborates from outside: plane 4 and plane 5 are exact negatives, so they
+are the near/far pair and plane 4's normal is the view direction — `(0.466531, 0.466531,
+0.751464)`, identical across all five game launches, with its two horizontal components
+**equal**. The camera looks precisely along the world diagonal, which is independently what
+`ScreenBasis` recovers from the matrix when it reports up-screen as `(0.7071, 0.7071)`.
+
+What this does *not* say is how often the game rewrites it: every fixture sweeps that region
+once, so a replay cannot tell "constant" from "photographed" (see the recording limits above).
+Anything built on it wants a capture that reads it per frame first. Worth having anyway,
+because it is the game's own answer to *is this thing on screen* — six dot products, no
+projection, no letterbox correction — where everything else here infers it.
+
+The same pass over the fixtures also turned up the component **pool cells**, the `Vital`
+back-pointer at `+0x08` (the component's own address, on every vital of every monster — a check
+a wrong base cannot pass), three `Life` vitals nothing has read but which the cell leaves room
+for, and a list of what the game actually attaches to entities: **twenty component names with
+no struct in the schema**, four of which are the open danger-model questions wearing labels —
+`LimitedLifespan` on 501 entities, `GroundEffect`, `DiesAfterTime`, and `Beam` on
+`Metadata/Effects/BeamEffect`, the boss beam that made steering necessary. Not one of them can
+be decoded from the committed files, because no build has ever read a byte of any of them.
+That is the standing rule saying, for once, exactly which capture to make next.
 
 ### Next
 
