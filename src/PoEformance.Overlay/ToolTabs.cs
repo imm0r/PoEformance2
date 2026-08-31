@@ -101,6 +101,17 @@ public sealed class ToolTabs
     /// <summary>Fires when the set of hidden pages changes, so it can be written down.</summary>
     public Action? HiddenChanged { get; set; }
 
+    /// <summary>
+    /// The strip of live facts drawn above the tabs, on every page.
+    /// </summary>
+    /// <remarks>
+    /// A callback rather than the facts themselves, because this class knows nothing about the
+    /// game and should not start: what goes on the strip is whatever the overlay is currently
+    /// reading, and the overlay is the thing holding it. See <see cref="StatusBar"/> for why
+    /// there is a strip at all - and for why the window no longer resizes itself.
+    /// </remarks>
+    public Action? Header { get; set; }
+
     /// <summary>The hidden page ids, sorted so the settings file is stable.</summary>
     public string[] Hidden() => _hidden.Order(StringComparer.Ordinal).ToArray();
 
@@ -121,24 +132,34 @@ public sealed class ToolTabs
         }
     }
 
-    /// <summary>How wide and tall the window opens when a tool is in front.</summary>
+    /// <summary>
+    /// How wide and tall the window opens the FIRST time, and never again.
+    /// </summary>
     /// <remarks>
-    /// Roomy enough for the widest content, which is the dissector. The status page sizes
-    /// itself instead - see <see cref="Render"/>.
+    /// Roomy enough for the widest content, which is the dissector - but it is a starting
+    /// point, not a size the window is held at. See <see cref="Render"/>: the size belongs to
+    /// whoever dragged the corner last.
     /// </remarks>
     private static readonly Vector2 ToolSize = new(940f, 620f);
 
     /// <summary>
-    /// Whether the page in front sizes the window to its content.
+    /// Whether the readout page is in front, which decides only how see-through the window is.
     /// </summary>
     /// <remarks>
-    /// The live readout is a dozen short lines and is meant to sit in the corner during a
-    /// fight, so it auto-resizes as it always did. A tool wants room. Switching between them
-    /// therefore switches the flag, and the frame that leaves the readout has to SAY how big
-    /// to be - a window coming out of auto-resize otherwise keeps the small size it was just
-    /// given, and the dissector opens into a letterbox.
+    /// IT USED TO DECIDE THE SIZE TOO, and that was the window's worst habit. The readout page
+    /// auto-sized to its own dozen lines and every other page was forced to
+    /// <see cref="ToolSize"/> on the frame it arrived - so glancing at the readout and coming
+    /// back THREW AWAY whatever size the window had been dragged to. Anybody who had sized the
+    /// dissector to fit beside their game re-did it every time, and there was no way to keep a
+    /// size at all: the auto-resize flag also takes the resize grip off, so on the readout the
+    /// window could not be dragged, and off it the drag was overwritten.
+    ///
+    /// The live facts are a strip above the tabs now (see <see cref="Header"/>), so no page
+    /// needs to be small, so no page needs to set a size. The window has ONE size and it is the
+    /// user's. What is still worth switching is the OPACITY - the readout is looked past at a
+    /// glance during a fight and a tool is read - and that is all this flag does now.
     /// </remarks>
-    private bool _sizedToContent = true;
+    private bool _onReadout = true;
 
     /// <summary>
     /// Registers a tool. Without <paramref name="page"/> the tool is a page of its own.
@@ -261,7 +282,7 @@ public sealed class ToolTabs
         // away they sit. It used to be 0.7 and 1 written here, and 0.7 of near-black over a
         // hideout at noon is a panel with foliage inside the letters.
         ImGui.SetNextWindowBgAlpha(
-            _sizedToContent ? Interface.ReadoutOpacityOr : Interface.PanelOpacityOr);
+            _onReadout ? Interface.ReadoutOpacityOr : Interface.PanelOpacityOr);
 
         // Surfacing a tool must actually surface it: a jump into a collapsed window would
         // select the right tab inside a title bar.
@@ -270,20 +291,11 @@ public sealed class ToolTabs
             ImGui.SetNextWindowCollapsed(false);
         }
 
-        ImGuiWindowFlags own = ImGuiWindowFlags.NoFocusOnAppearing;
-        if (_sizedToContent)
-        {
-            own |= ImGuiWindowFlags.AlwaysAutoResize;
-        }
-        else if (_leftTheReadout)
-        {
-            // The one frame that has to say a size, because it is the frame the auto-resize
-            // flag comes off and ImGui would otherwise keep the readout's height.
-            _leftTheReadout = false;
-            ImGui.SetNextWindowSize(ToolSize, ImGuiCond.Always);
-        }
-
-        bool expanded = ImGui.Begin("PoEformance", Chrome.Flags(ChromeId, own));
+        // NO SIZE FLAG AT ALL, which is the point: neither AlwaysAutoResize nor a size set per
+        // page. ImGui then keeps whatever size the window has - which is the one the user
+        // dragged it to, remembered across pages, across sessions and across a tool that wants
+        // to be wide. See the note on _onReadout for what this replaces.
+        bool expanded = ImGui.Begin("PoEformance", Chrome.Flags(ChromeId, ImGuiWindowFlags.NoFocusOnAppearing));
 
         // Before the contents and outside the expanded test, because a collapsed window is
         // still somewhere: its title bar is the ground it covers, and that is what the next
@@ -303,6 +315,17 @@ public sealed class ToolTabs
                 // tool, so a close button would be a button that hides the button.
                 Chrome.TitleButtons(ChromeId);
 
+                // ABOVE THE TABS, so it is on screen whichever page is in front - which is the
+                // entire reason it exists. Outside DrawPages because it belongs to the window
+                // rather than to any page, and because the tab bar's heading face must not
+                // reach it.
+                if (Header is not null)
+                {
+                    StatusBar.Begin();
+                    Header();
+                    StatusBar.End();
+                }
+
                 inFront = DrawPages();
 
                 // LAST, after the tabs and their contents. The menu declines to open over a
@@ -320,16 +343,13 @@ public sealed class ToolTabs
         RunIdles(inFront);
     }
 
-    /// <summary>Whether the last frame was the auto-sized readout. See <see cref="_sizedToContent"/>.</summary>
-    private bool _leftTheReadout;
-
-    /// <summary>The page whose content sizes the window to itself, if it is in front.</summary>
+    /// <summary>Whether the readout page is the one in front.</summary>
     /// <remarks>
     /// The FIRST page, whatever it is called, rather than a name matched here. The window's
     /// leading page is its readout by construction - it is the one with the lowest order - and
     /// a rule keyed on "status" would quietly stop applying the day that page is renamed.
     /// </remarks>
-    private bool SizesItself(string? inFront) => inFront is not null && inFront == _pages[0].Id;
+    private bool OnReadout(string? inFront) => inFront is not null && inFront == _pages[0].Id;
 
     /// <summary>
     /// Draws the tab bar and the page in front, and says which page that was.
@@ -441,9 +461,7 @@ public sealed class ToolTabs
             _unfold = null;
         }
 
-        bool sizes = SizesItself(front?.Id);
-        _leftTheReadout = _sizedToContent && !sizes;
-        _sizedToContent = sizes;
+        _onReadout = OnReadout(front?.Id);
         return front?.Id;
     }
 
@@ -455,18 +473,14 @@ public sealed class ToolTabs
     /// window the scrollbar is the page's own, and the bar, the title and its icons never
     /// move.
     ///
-    /// The readout is the exception: it is the page that sizes the window to its content
-    /// (see <see cref="SizesItself"/>), and a fill-what-remains child inside a window asking
-    /// its content how big to be is a circle ImGui resolves as a box of nothing.
+    /// EVERY page, the readout included. The readout used to be the exception, because it was
+    /// the page that sized the window to its content and a fill-what-remains child inside a
+    /// window asking its content how big to be is a circle ImGui resolves as a box of nothing.
+    /// No page sizes the window any more, so the exception is gone with it - and the readout
+    /// gets what the other pages had all along: its own scrollbar, and a tab bar that stays put.
     /// </remarks>
     private void DrawPage(Page page)
     {
-        if (page == _pages[0])
-        {
-            DrawSections(page);
-            return;
-        }
-
         try
         {
             // Its own id per page, so every page keeps its own scroll position across
