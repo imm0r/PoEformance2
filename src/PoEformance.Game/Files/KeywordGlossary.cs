@@ -44,11 +44,21 @@ public sealed class KeywordGlossary
     /// </remarks>
     public const int MostRows = 8192;
 
-    /// <summary>Longest Id or Term taken seriously.</summary>
+    /// <summary>Longest Id or Term taken seriously. The longest Term in 1026 rows is 40.</summary>
     private const int LongestTerm = 128;
 
-    /// <summary>Longest popup text. The wordiest ones seen run to a couple of hundred characters.</summary>
-    private const int LongestDefinition = 512;
+    /// <summary>
+    /// Longest popup text.
+    /// </summary>
+    /// <remarks>
+    /// WAS 512 AND SILENTLY CUT 56 ROWS. A raw UTF-16 pointer carries no length, so this cap is
+    /// the only thing that ends the read - and a definition longer than it comes back truncated
+    /// rather than refused. The live table has 56 definitions of exactly 512 characters, which
+    /// is what a cap looks like from the inside; Critical's own text ends mid-word at
+    /// "would result in a final Criti". The real maximum is still unmeasured, because the run
+    /// that recorded the fixture was the one doing the truncating.
+    /// </remarks>
+    private const int LongestDefinition = 2048;
 
     private readonly Dictionary<string, KeywordPopup> _byId;
 
@@ -153,17 +163,30 @@ public sealed class KeywordGlossary
         => id is not null && _byId.TryGetValue(id, out KeywordPopup found) ? found : null;
 
     /// <summary>
-    /// The game's own text as a player sees it: markup resolved, percent signs undoubled.
+    /// The game's own text as a player sees it, with the keyword markup resolved.
     /// </summary>
     /// <remarks>
-    /// TWO RULES, BOTH READ OFF THE DATA RATHER THAN ASSUMED. "[Key|Text]" draws as Text: the
-    /// row whose Id is Critical carries the Term "Critical Hits", which is the right half of
-    /// "[Critical|Critical Hits]" to the character, so the markup names a row and then says how
-    /// to render it. And a literal percent is DOUBLED - "Default value is +100%%", "by 20%%" -
-    /// which is what the raw column holds and not a typo in it.
+    /// ONE RULE, and it is measured against the whole table rather than a handful of rows:
+    /// "[Key|Text]" draws as Text, and "[Key]" draws as Key. Both forms are real - 595 of the
+    /// 1026 definitions carry markup, and 859 of the brackets in them have no pipe at all
+    /// ("[Armour]", "[Bleeding]") - and both name a ROW of this same table: of the 317 distinct
+    /// keys referenced, 313 are Ids in it. The pipe form is the same row said twice, the key and
+    /// the words for it, which is why rendering needs no lookup.
     ///
-    /// A bracket with no pipe keeps what is inside. That form has not been seen in this table
-    /// and is the only reading that does not lose text, which is the right way to be wrong.
+    /// THERE IS NO PERCENT RULE, and there was one here until the live table said otherwise.
+    /// The dissector showed "+100%%" and "by 20%%", so this collapsed a doubled percent - but
+    /// the raw column holds "+100%" and "by 20%", and not one of the 236 definitions containing
+    /// a percent has it doubled. The doubling was OUR OWN: ImGui takes a label as a format
+    /// string, so ImGuiText.Escape replaces "%" with "%%" before drawing. A rule was derived
+    /// from reading the tool's rendering as if it were the game's data.
+    ///
+    /// A SECOND MARKUP EXISTS AND IS LEFT ALONE. The 33 Expedition rune rows are written in the
+    /// game's rich-text form instead - "&lt;rgb(219,217,206)&gt;{Fire Rune}", "&lt;italic&gt;{...}",
+    /// "&lt;font:'fontin'&gt;{...}", opening with a "&lt;&lt;ExpedRuneFire&gt;&gt;" style reference - and braces
+    /// appear in those 33 rows and nowhere else, so the two markups do not overlap. Stripping it
+    /// would throw away the colours and emphasis it exists to carry, and this method is not the
+    /// place to decide what a caller wants done with them: it is passed through verbatim until
+    /// something actually draws one.
     ///
     /// Static, and takes no glossary, because rendering needs none: the markup carries the
     /// words. What needs the table is the popup behind them.
@@ -175,10 +198,9 @@ public sealed class KeywordGlossary
             return string.Empty;
         }
 
-        if (!text.Contains('[', StringComparison.Ordinal)
-            && !text.Contains("%%", StringComparison.Ordinal))
+        if (!text.Contains('[', StringComparison.Ordinal))
         {
-            return text;   // nearly every line, and it should not be copied
+            return text;   // 431 of the 1026 definitions, and they should not be copied
         }
 
         var built = new StringBuilder(text.Length);
@@ -200,13 +222,6 @@ public sealed class KeywordGlossary
                 continue;
             }
 
-            if (text[i] == '%' && i + 1 < text.Length && text[i + 1] == '%')
-            {
-                built.Append('%');
-                i++;
-                continue;
-            }
-
             built.Append(text[i]);
         }
 
@@ -220,6 +235,11 @@ public sealed class KeywordGlossary
     /// The left halves, which is what a lookup needs: the right half is localised and the
     /// glossary is not keyed on it. This is what turns a rendered line into the set of popups
     /// it can offer.
+    ///
+    /// EXPECT A KEY THAT IS NOT THERE. Four of the 317 keys the live table refers to name no
+    /// row in it - Breach, DNT, DNT-UNUSED and passive_keystone_mind_over_matter, two of which
+    /// are plainly the game's own do-not-translate placeholders. A caller offering popups has to
+    /// cope with a miss; it is the game's data, not a failed read.
     /// </remarks>
     public static IReadOnlyList<string> KeysIn(string? text)
     {
