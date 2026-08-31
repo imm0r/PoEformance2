@@ -197,8 +197,15 @@ public sealed class StyleRows
             Preview(glyph, style.ColourOr(entry.Fallback), style.Sized(6f), style.WidthOr(0f));
         }
 
-        // What is set, and how to unset it. Shown only when there is something to unset, so
-        // an untouched list is a list of names rather than a wall of buttons.
+        wanted = DrawAdjustments(entry, wanted);
+
+        // AT THE END OF THE ROW, after the adjustments rather than before them. It used to sit
+        // straight after the name, which put a button in the middle of the row for the entries
+        // that have one and left a gap there for the ones that do not - so the controls after it
+        // started in a different place depending on whether anything had been changed yet.
+        //
+        // Shown only when there is something to unset, so an untouched list is a list of names
+        // rather than a wall of buttons.
         if (!style.SaysNothing)
         {
             ImGui.SameLine();
@@ -211,8 +218,6 @@ public sealed class StyleRows
             }
         }
 
-        wanted = DrawAdjustments(entry, wanted);
-
         if (wanted != style)
         {
             _style.Set(entry.Key, wanted);
@@ -222,7 +227,24 @@ public sealed class StyleRows
         ImGui.PopID();
     }
 
-    /// <summary>The sliders and the icon box, indented under the row they belong to.</summary>
+    /// <summary>
+    /// The sliders and the icon box, on the row's own line at a fixed column.
+    /// </summary>
+    /// <remarks>
+    /// ON THE SAME LINE, which is what this list wanted all along. Every adjustment used to go
+    /// on a SECOND line, indented under its row - so a marker with a size and an icon was three
+    /// lines tall, and a list of a dozen of them was forty lines of mostly nothing. There is
+    /// room on the line: what is on it is a tick, a swatch and a short name.
+    ///
+    /// AT A COLUMN rather than after the name, for the reason the atlas groups needed one. The
+    /// names here run from "Route" to "Where a route starts", so hanging the controls off the
+    /// end of each put "size" and "icon" wherever that row's name happened to stop - which is
+    /// exactly the ragged edge that makes a list of settings unreadable.
+    ///
+    /// A wider column than the default: the row in front of it is a checkbox, a colour swatch,
+    /// a name and sometimes a drawn preview of the marker, which is more than the tick and the
+    /// name the default was measured for.
+    /// </remarks>
     private LayerStyle DrawAdjustments(StyleEntry entry, LayerStyle wanted)
     {
         bool anySlider = entry.Traits.HasFlag(StyleTraits.Scale) || entry.Traits.HasFlag(StyleTraits.Width);
@@ -231,8 +253,7 @@ public sealed class StyleRows
             return wanted;
         }
 
-        float step = OverlayLayout.Step();
-        ImGui.Indent(step);
+        OverlayLayout.ToColumn(ControlColumn);
 
         if (entry.Traits.HasFlag(StyleTraits.Scale))
         {
@@ -266,12 +287,24 @@ public sealed class StyleRows
 
         if (entry.Traits.HasFlag(StyleTraits.Icon))
         {
+            if (anySlider)
+            {
+                OverlayLayout.Next();
+            }
+
             wanted = DrawIcon(entry, wanted);
         }
 
-        ImGui.Unindent(step);
         return wanted;
     }
+
+    /// <summary>Where a row's adjustments start, in multiples of the text size.</summary>
+    /// <remarks>
+    /// Measured against the longest name in the catalogue plus what sits in front of it. Its own
+    /// constant rather than the layout's default because the thing being cleared is wider here:
+    /// a tick, a swatch, the name and a drawn preview, against the tick and a name elsewhere.
+    /// </remarks>
+    private const float ControlColumn = 18f;
 
     /// <summary>The icon box: a path to a picture to draw instead of the built-in shape.</summary>
     /// <remarks>
@@ -301,9 +334,21 @@ public sealed class StyleRows
             return wanted;
         }
 
-        OverlayLayout.Search(
-            "###iconpath", "a .png next to the tool, or a full path...", ref _iconPath, 512,
-            OverlayLayout.ButtonRoom("use", "none"));
+        // The one thing that gets a line of its own, and only while it is open: a path is as
+        // long as a path, and the row it belongs to already holds a tick, a swatch, a name and
+        // two sliders. Stepped in so it reads as belonging to the row above it.
+        float step = OverlayLayout.Step();
+        ImGui.Indent(step);
+        try
+        {
+            OverlayLayout.Search(
+                "###iconpath", "a .png next to the tool, or a full path...", ref _iconPath, 512,
+                OverlayLayout.ButtonRoom("use", "none"));
+        }
+        finally
+        {
+            ImGui.Unindent(step);
+        }
 
         ImGui.SameLine();
         if (ImGui.SmallButton("use"))
