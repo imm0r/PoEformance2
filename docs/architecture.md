@@ -344,6 +344,7 @@ PoEformance.App --record session.rec           # same, capturing everything
 PoEformance.App --replay session.rec           # rerun against the capture, no game needed
 PoEformance.App --record s.rec --questflags    # + read where a character's quest flags could be
 PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action fields (see below)
+PoEformance.App --record s.rec --hoverhunt    # + read the hovered-entity chain and the boss byte
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
@@ -628,6 +629,39 @@ no struct in the schema**, four of which are the open danger-model questions wea
 `Metadata/Effects/BeamEffect`, the boss beam that made steering necessary. Not one of them can
 be decoded from the committed files, because no build has ever read a byte of any of them.
 That is the standing rule saying, for once, exactly which capture to make next.
+
+### Two candidates that were never wrong, only never asked
+
+`--hoverhunt` exists for a failure mode this file already names and which had quietly claimed
+two offsets: **a replay only serves reads that actually happened**, so an offset no build
+touches is absent from every session ever captured, and no amount of recording settles it.
+
+- **The hovered entity.** GameHelper2 walks `InGameState+0x300` → `+0x3F0` → `+0xA8`. This
+  project had written the question off — but that verdict came from a hunt looking for a
+  hovered *UI element*, which found a resource record instead. A hovered *entity* is a
+  different question and was never asked. The first two hops resolve against this client; the
+  third reads zero, which is equally what "nothing hovered" and "wrong offset" look like, and
+  the only sessions holding those bytes were `--questflags` captures in which nobody was
+  hovering on purpose.
+- **The boss byte.** `Monster+0x27` has sat in the schema as an unverified hypothesis for
+  months, and nothing reads it: `MonsterSigns` derives `IsBoss` from **rarity** instead, so the
+  field has never been exercised once.
+
+The switch reads a **window** of each object rather than the two candidate slots — the same
+argument `--questflags` records regions it does not understand — so a wrong reference offset
+stops being fatal to the capture and the right slot can be hunted offline afterwards. For the
+boss byte it reads the whole Monster component, and the pool-cell measurement is what says how
+much that is: the cell is `0x30`, so thirty-two bytes *is* the component.
+
+It wants a person doing something deliberate, like `--actionhunt` before it: hover a monster,
+hold, move onto empty ground, hover another. **The off-target moments matter as much as the
+on-target ones** — a slot that never changes is not an answer, and only the contrast separates
+"nothing hovered" from a wrong offset.
+
+`HoverHuntTests` pins the property that matters before any capture exists: on a file that
+cannot answer, the hunt reports being unable to rather than reading absent memory as a result.
+A hunt announcing "the byte is 0 on every monster, so 0x27 is wrong" from a file that never
+read the byte would be worse than no hunt at all.
 
 ### Next
 
