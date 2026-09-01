@@ -317,18 +317,34 @@ public sealed class InventorySweep
         return new InventorySweepFrame(frame, seen, lists, searched, hits, needle.Length > 0);
     }
 
-    /// <summary>How much of each struct the name hunt reads.</summary>
-    private const int HuntWindow = 0x100;
+    /// <summary>
+    /// How much of each struct the name hunt reads.
+    /// </summary>
+    /// <remarks>
+    /// 0x400 BECAUSE 0x100 WAS MEASURABLY TOO NARROW, and it took a player's pointer scan to show
+    /// it. The chain found on a live client is [X + 0x1E0] -> [Y + 0x18] -> the characters: the
+    /// hop that reaches the record holding the name sits at 0x1E0, so a hunt reading 0x100 of X
+    /// would never see that pointer, never enqueue Y, and would have reported NOT FOUND - a clean,
+    /// confident, wrong negative, of exactly the kind the Searched and Hunted flags exist to
+    /// prevent and which a window size can produce just as easily.
+    ///
+    /// The node budget pays for it: 0x100 across 4000 structs and 0x400 across 1500 cost about the
+    /// same recording, and the reference the game handed over says the width matters more than the
+    /// breadth. Widening also matches the inventory window, so a struct read by both is one entry
+    /// in the recording rather than two.
+    /// </remarks>
+    public const int HuntWindow = 0x400;
 
     /// <summary>How many pointers deep the hunt follows.</summary>
     /// <remarks>
     /// Three, because a name hanging off an inventory would be at most a container and a record
     /// away, and every extra hop multiplies the reads by the number of pointers in a struct.
     /// </remarks>
-    private const int HuntDepth = 3;
+    public const int HuntDepth = 3;
 
     /// <summary>How many structs the hunt may read, so a wide graph cannot fill the recording.</summary>
-    private const int MostNodes = 4000;
+    /// <remarks>Traded down from 4000 when the window went from 0x100 to 0x400 - see HuntWindow.</remarks>
+    private const int MostNodes = 1500;
 
     /// <summary>
     /// Walks outwards from the inventories looking for a name the player supplied.

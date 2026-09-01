@@ -83,6 +83,23 @@ public class InventorySweepTests
     }
 
     [Fact]
+    public void TheHuntsWindowReachesTheHopAPointerScanActuallyFound()
+    {
+        // MEASURED, NOT CHOSEN. A player's pointer scan on a live client produced
+        // [X + 0x1E0] -> [Y + 0x18] -> the characters, so the hop that reaches the record holding
+        // a tab name is at 0x1E0. The hunt shipped reading 0x100 per struct, which cannot see that
+        // pointer - it would have walked past the record and reported NOT FOUND, which is the same
+        // confident wrong negative as a read that never happened, just produced by a width.
+        //
+        // Pinned rather than left to a comment because narrowing this back is invisible: the
+        // report still looks healthy, it just stops being able to find the thing.
+        Assert.True(InventorySweep.HuntWindow > 0x1E0 + 8);
+
+        // And the record is one hop past X, so two is not enough to start from a container.
+        Assert.True(InventorySweep.HuntDepth >= 3);
+    }
+
+    [Fact]
     public void ANameHuntNOBodyAskedForIsNotReportedAsHavingFoundNothing()
     {
         // The same distinction as NOT SEARCHED, for the one search that can settle the question:
