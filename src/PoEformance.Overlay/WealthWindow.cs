@@ -395,15 +395,18 @@ public sealed class WealthWindow
             return;
         }
 
-        float half = (ImGui.GetContentRegionAvail().X - ImGui.GetStyle().ItemSpacing.X) * 0.5f;
-
-        if (ImGui.BeginChild("wealth-made-of", new Vector2(half, 0f)))
+        // DRAGGABLE, like the entity browser's and the stash's. A fixed half is a guess about
+        // which side is being read, and the two sides here want opposite things: the currency
+        // list is long and narrow, the tab list is short and its names are what somebody
+        // renamed them to. Asked just before the left pane begins, because Left() measures the
+        // room it is dividing - see PaneSplit.
+        if (ImGui.BeginChild("wealth-made-of", new Vector2(_holdings.Left(), 0f)))
         {
             DrawBreakdown();
         }
 
         ImGui.EndChild();
-        ImGui.SameLine();
+        _holdings.Bar();
 
         if (ImGui.BeginChild("wealth-where", Vector2.Zero))
         {
@@ -412,6 +415,45 @@ public sealed class WealthWindow
 
         ImGui.EndChild();
     }
+
+    /// <summary>Where the two breakdowns meet. Draggable; half and half to begin with.</summary>
+    private readonly PaneSplit _holdings = new(0.5f);
+
+    /// <summary>
+    /// How the two breakdown tables are drawn, so they are drawn the same way.
+    /// </summary>
+    /// <remarks>
+    /// THEY SIT SIDE BY SIDE AND ARE COMPARED, so a difference between them reads as a
+    /// difference in the data rather than as one of the two being built by a different hand.
+    /// Resizable because the columns hold "1 div, 2027 ex" on a good day and "3" on an ordinary
+    /// one; sortable because a breakdown answers a different question in each order - by worth
+    /// it is what is producing the total, by stacks it is what is taking up room, by name it is
+    /// whether the thing you are looking for is in there at all.
+    /// </remarks>
+    private const ImGuiTableFlags BreakdownFlags =
+        ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY
+        | ImGuiTableFlags.Resizable | ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.Sortable;
+
+    /// <summary>
+    /// How wide a money column starts, in text sizes.
+    /// </summary>
+    /// <remarks>
+    /// SIZED FOR WHAT GOES IN IT, which is what the four and five it replaces were not: these
+    /// hold <c>StashWorth.Purse</c>, whose longest ordinary reading is "105 div, 172 ex" - about
+    /// fifteen mono characters - and at five text sizes that was clipped to "105 div, 1" on
+    /// every valuable row. Clipped money is worse than no money: it still reads as a number.
+    /// </remarks>
+    private const float MoneyEms = 10f;
+
+    /// <summary>
+    /// And a column of counts, which never runs past four digits.
+    /// </summary>
+    /// <remarks>
+    /// Wider than the digits need, because the HEADING is what has to fit: "unpriced" is eight
+    /// characters and a sortable column spends a further arrow's worth of its width on the sort
+    /// marker. A column sized to its contents clips its own name.
+    /// </remarks>
+    private const float CountEms = 6f;
 
     /// <summary>The record over time: the stretch, the shape of it, and what it cost to keep.</summary>
     private void DrawHistory(long now)
@@ -487,25 +529,32 @@ public sealed class WealthWindow
         // WHATEVER HEIGHT IS LEFT, rather than the fourteen lines it used to be given. It was a
         // fold on a scroll of six things and had to be told how much of that scroll it could
         // have; on half a tab of its own the answer is all of it.
-        if (!ImGui.BeginTable(
-                "wealth-breakdown",
-                4,
-                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY,
-                Vector2.Zero))
+        if (!ImGui.BeginTable("wealth-breakdown", 4, BreakdownFlags, Vector2.Zero))
         {
             return;
         }
 
         try
         {
+            float em = ImGui.GetFontSize();
+
             ImGui.TableSetupScrollFreeze(0, 1);
             ImGui.TableSetupColumn("currency", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("held", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFontSize() * 4f);
-            ImGui.TableSetupColumn("each", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFontSize() * 5f);
-            ImGui.TableSetupColumn("worth", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFontSize() * 6f);
+
+            // "stacks", not "held", and second in both tables. The two sit side by side and are
+            // read across: one column called "held" beside another called "stacks", holding the
+            // same kind of number, is a difference somebody has to check before believing it is
+            // not a difference.
+            ImGui.TableSetupColumn("stacks", ImGuiTableColumnFlags.WidthFixed, em * CountEms);
+            ImGui.TableSetupColumn("each", ImGuiTableColumnFlags.WidthFixed, em * MoneyEms);
+            ImGui.TableSetupColumn(
+                "worth",
+                ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort
+                | ImGuiTableColumnFlags.PreferSortDescending,
+                em * MoneyEms);
             ImGui.TableHeadersRow();
 
-            foreach (CurrencyPurse.PurseLine line in lines)
+            foreach (CurrencyPurse.PurseLine line in Sorted(lines))
             {
                 ImGui.TableNextRow();
 
@@ -673,15 +722,23 @@ public sealed class WealthWindow
             return;
         }
 
+        ExchangePairs? pairs = _pairs();
+        IReadOnlyList<TabWorth> tabs = NetWorth.ByTab(_purse().Pages, pairs, _book(), _skipping);
+        double rate = _book().Rate;
+        TabWorth all = NetWorth.Total(tabs);
+
+        // THE TOTAL IS IN THE HEADING'S OWN HOVER, and that is not tidying for its own sake: it
+        // was a line between this heading and this table, which put the table's header row one
+        // line below the header row of the table beside it. Two tables read across each other
+        // whose columns do not start at the same height are two tables you cannot read across.
         OverlayLayout.Group(
             "Stash / Inventory Breakdown",
-            "Priced from the game's own Currency Exchange rather than the index above, and that"
-            + " is what makes this possible at all: the index knows 38 currencies in Standard"
+            (tabs.Count > 0 ? $"{StashWorth.Purse(all.Exalted, rate)} in all.\n\n" : string.Empty)
+            + "Priced from the game's own Currency Exchange rather than the index beside it, and"
+            + " that is what makes this possible at all: the index knows 38 currencies in Standard"
             + " where the exchange knows 95. Built on the index, an Essence tab, a Rune tab and"
             + " an Omen tab would all read as empty.");
 
-        ExchangePairs? pairs = _pairs();
-        IReadOnlyList<TabWorth> tabs = NetWorth.ByTab(_purse().Pages, pairs, _book(), _skipping);
         if (tabs.Count == 0)
         {
             ImGuiText.Wrapped(
@@ -691,36 +748,48 @@ public sealed class WealthWindow
             return;
         }
 
-        TabWorth all = NetWorth.Total(tabs);
-        double rate = _book().Rate;
-
-        ImGui.TextColored(Line, StashWorth.Purse(all.Exalted, rate));
-        ImGui.SameLine();
-        ImGuiText.Wrapped(
-            OverlayInk.Quiet,
-            $"across {all.Called}"
-            + (all.Unpriced > 0 ? $", {all.Unpriced} stacks unpriced" : string.Empty));
-
-        if (!ImGui.BeginTable(
-                "wealth-by-tab",
-                4,
-                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY,
-                Vector2.Zero))
+        if (!ImGui.BeginTable("wealth-by-tab", 5, BreakdownFlags, Vector2.Zero))
         {
             return;
         }
 
         try
         {
+            float em = ImGui.GetFontSize();
+
             ImGui.TableSetupScrollFreeze(0, 1);
-            ImGui.TableSetupColumn(" ");
-            ImGui.TableSetupColumn("tab");
-            ImGui.TableSetupColumn("worth");
-            ImGui.TableSetupColumn("stacks");
+
+            // The tick takes no sort: it is a control, not a reading, and a column that sorts by
+            // "have I excluded this" would reorder the list under the click that excluded it.
+            ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoSort);
+            ImGui.TableSetupColumn("tab", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("stacks", ImGuiTableColumnFlags.WidthFixed, em * CountEms);
+
+            // ITS OWN COLUMN. It used to sit inside the stack count as "12  (3 unpriced)", which
+            // is two numbers in one cell - so the stack counts did not line up as a column, and
+            // the one fact worth scanning for could not be scanned for.
+            ImGui.TableSetupColumn("unpriced", ImGuiTableColumnFlags.WidthFixed, em * CountEms);
+            ImGui.TableSetupColumn(
+                "worth",
+                ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.DefaultSort
+                | ImGuiTableColumnFlags.PreferSortDescending,
+                em * MoneyEms);
             ImGui.TableHeadersRow();
 
-            foreach (TabWorth tab in tabs)
+            int empty = 0;
+
+            foreach (TabWorth tab in Sorted(tabs))
             {
+                // ONLY WHAT HOLDS SOMETHING, as the Stash tab's own list does. A stash is mostly
+                // unused tabs, and a tab the game has never opened reads as empty from here too -
+                // so unfiltered this was a hundred rows of zeroes with the dozen that matter
+                // scattered among them, which is what the screenshot showed.
+                if (tab.Stacks == 0)
+                {
+                    empty++;
+                    continue;
+                }
+
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
 
@@ -737,30 +806,115 @@ public sealed class WealthWindow
                     }
                 }
 
+                OverlayLayout.Hint("Untick to leave this one out of the total. It stays listed.");
+
                 Vector4 ink = tab.Counted ? OverlayInk.Ink : OverlayInk.Quiet;
 
                 ImGui.TableNextColumn();
-                ImGui.TextColored(ink, tab.Called);
+                ImGui.TextColored(ink, ImGuiText.Escape(tab.Called));
 
                 ImGui.TableNextColumn();
-                ImGuiText.Mono(tab.Counted ? Line : OverlayInk.Quiet,
-                    StashWorth.Purse(tab.Exalted, rate));
+                ImGuiText.Mono(ink, tab.Stacks.ToString(System.Globalization.CultureInfo.CurrentCulture));
 
                 ImGui.TableNextColumn();
+                if (tab.Unpriced > 0)
+                {
+                    ImGuiText.Mono(Warn, tab.Unpriced.ToString(System.Globalization.CultureInfo.CurrentCulture));
+                }
 
-                // The unpriced count sits beside the stack count rather than in a column of its
-                // own, because it is only ever interesting when it is not zero.
-                ImGuiText.Mono(
-                    tab.Unpriced > 0 ? Warn : ink,
-                    tab.Unpriced > 0
-                        ? $"{tab.Stacks}  ({tab.Unpriced} unpriced)"
-                        : tab.Stacks.ToString(System.Globalization.CultureInfo.CurrentCulture));
+                ImGui.TableNextColumn();
+                ImGuiText.Mono(tab.Counted ? Line : OverlayInk.Quiet, StashWorth.Purse(tab.Exalted, rate));
+            }
+
+            // Said, because a list that drops rows without saying so is a list that lies - and
+            // "my tab is missing" is otherwise indistinguishable from "the read missed it".
+            if (empty > 0)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                ImGui.TableNextColumn();
+                ImGui.TextColored(OverlayInk.Quiet, $"{empty} empty, not listed");
+                ImGui.TableNextColumn();
+                ImGui.TableNextColumn();
+                ImGui.TableNextColumn();
             }
         }
         finally
         {
             ImGui.EndTable();
         }
+    }
+
+    /// <summary>
+    /// The currency lines in whatever order the header row was last clicked into.
+    /// </summary>
+    /// <remarks>
+    /// The same shape as the damage tab's kill table, and for the same reason: ImGui hands back
+    /// a NULL pointer until the header row has been drawn and somebody has chosen a column, so
+    /// the wrapper cannot be trusted without checking the pointer it wraps - reading SpecsCount
+    /// off a null one is a crash rather than a zero. The unsorted list is returned uncopied when
+    /// nothing has been chosen, so the ordinary case allocates nothing.
+    /// </remarks>
+    private static unsafe IReadOnlyList<CurrencyPurse.PurseLine> Sorted(
+        IReadOnlyList<CurrencyPurse.PurseLine> lines)
+    {
+        ImGuiTableSortSpecsPtr specs = ImGui.TableGetSortSpecs();
+        if (specs.NativePtr == null || specs.SpecsCount == 0)
+        {
+            return lines;
+        }
+
+        ImGuiTableColumnSortSpecsPtr by = specs.Specs;
+        bool up = by.SortDirection == ImGuiSortDirection.Ascending;
+
+        var order = new List<CurrencyPurse.PurseLine>(lines);
+        order.Sort((left, right) =>
+        {
+            int said = by.ColumnIndex switch
+            {
+                1 => left.Stack.CompareTo(right.Stack),
+
+                // An unpriced row has no unit price at all, and sorting it as zero would file it
+                // among the cheap things rather than among the unknown ones. Below everything
+                // priced is where it belongs in both directions.
+                2 => (left.Unit ?? double.MinValue).CompareTo(right.Unit ?? double.MinValue),
+                3 => left.Exalted.CompareTo(right.Exalted),
+                _ => string.Compare(left.Called, right.Called, StringComparison.OrdinalIgnoreCase),
+            };
+
+            return up ? said : -said;
+        });
+
+        return order;
+    }
+
+    /// <summary>The inventories in whatever order the header row was last clicked into.</summary>
+    private static unsafe IReadOnlyList<TabWorth> Sorted(IReadOnlyList<TabWorth> tabs)
+    {
+        ImGuiTableSortSpecsPtr specs = ImGui.TableGetSortSpecs();
+        if (specs.NativePtr == null || specs.SpecsCount == 0)
+        {
+            return tabs;
+        }
+
+        ImGuiTableColumnSortSpecsPtr by = specs.Specs;
+        bool up = by.SortDirection == ImGuiSortDirection.Ascending;
+
+        var order = new List<TabWorth>(tabs);
+        order.Sort((left, right) =>
+        {
+            int said = by.ColumnIndex switch
+            {
+                2 => left.Stacks.CompareTo(right.Stacks),
+                3 => left.Unpriced.CompareTo(right.Unpriced),
+                4 => left.Exalted.CompareTo(right.Exalted),
+                _ => string.Compare(left.Called, right.Called, StringComparison.OrdinalIgnoreCase),
+            };
+
+            return up ? said : -said;
+        });
+
+        return order;
     }
 
     private void DrawGraph(long now)
