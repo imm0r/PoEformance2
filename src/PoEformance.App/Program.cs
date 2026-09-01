@@ -805,10 +805,11 @@ internal static class Program
             output.WriteLine($"          {tables.LastError}");
         }
 
-        // THE NUMBER EVERYTHING ABOVE IS SCALED BY. Sixteen buckets is a constant ported from a
-        // PoE1 tool, and if it is too small then every count here is a fraction and "not in the
-        // file table" only ever meant "not in the part we look at". No recording can check it -
-        // nothing has ever read past the last bucket - so it is checked here, where the game is.
+        // THE NUMBER EVERYTHING ABOVE IS SCALED BY. If sixteen buckets were too small then every
+        // count here is a fraction and "not in the file table" only ever meant "not in the part
+        // we look at". No recording can check it - nothing had ever read past the last bucket -
+        // so it is checked here, where the game is. It came back clean on 2026-09-01; printed
+        // every run because the answer belongs to a build rather than to the game forever.
         int beyond = new PoEformance.Game.World.PreloadReader(reader, schema)
             .BucketsBeyondTheCount(fileRootStatic);
 

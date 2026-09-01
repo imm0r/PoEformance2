@@ -2328,22 +2328,39 @@ it reports its own row size, and `--tables` prints it.
 found 134 tables among 6,914 files, and **157 of those records are `.dat` files at all — against
 about 1,020 PoE2 tables** in the community schemas. Fifteen per cent.
 
-So a table being absent is the ordinary case. `WorldAreas`, `MinimapIcons`, `NPCs` and
-`ItemVisualIdentity` — the four this project reads rows from — are in none of the 6,913 record
-names `--tables` reads, in any spelling, while `Stats`, `Mods`, `BaseItemTypes` and `QuestFlags`
-happen to be there. That was first written up here as a *pattern*, which it isn't: at 15%
-coverage, four named tables all missing is a coin flip.
+`WorldAreas`, `MinimapIcons`, `NPCs` and `ItemVisualIdentity` — the four this project reads rows
+from — are in none of the 6,913 record names `--tables` reads, in any spelling, while `Stats`,
+`Mods`, `BaseItemTypes` and `QuestFlags` are. **Confirmed from the row side too**, so it isn't a
+name that failed to read: the same capture holds MinimapIcons *rows* — `Waypoint`, `StashPlayer`,
+`MapDevice`, 159 and 154 row-widths apart on the 0x26 grid — and no record the walk accepts
+brackets them. The table is in memory and out of the walk's reach at once.
 
-**Two things could produce that fraction, and nothing here can tell them apart.** The table may
-genuinely track only what the resource loader pulls in — it is mostly art, 1,219 `.tok` and 903
-`.ao` to its 157 `.dat` — or our walk may be seeing a slice of it. `BucketCount` is `0x10`
-**because GameHelper2 says so, and GameHelper2 is a PoE1 tool**; nothing here has ever checked it
-against Path of Exile 2, and if the real count is larger then every walk of this table has been
-partial and every absence only means we didn't look. No recording can settle it: not one fixture
-holds a single byte past the last bucket, because nothing has ever read there. So
-`PreloadReader.BucketsBeyondTheCount` probes the slots past the end and `--tables` prints whether
-any looks like a bucket. Until that runs, don't plan on finding a particular table this way — the
-row-pointer route through a component is the only route to one the walk doesn't turn up.
+**What that split is not is a story about which tables get loaded.** All eight are core tables the
+client can't start without — which is exactly why the QuestFlags hunt never had trouble reading
+its table. An earlier draft here called the four absences a coin flip at 15% coverage; that was
+worse than wrong, because the four *present* ones were picked because they were visible in the
+listing. A sample chosen after the fact says nothing.
+
+**Two explanations stood, and one is now out.** Either the table tracks only what the resource
+loader pulls in — it is mostly art, 1,219 `.tok` and 903 `.ao` to its 157 `.dat` — or our walk was
+seeing a slice of a larger table.
+
+This document argued for the slice, twice and wrongly. First on a fact: it said `BucketCount` is
+`0x10` "because GameHelper2 says so, and GameHelper2 is a PoE1 tool". **GameHelper2 is a PoE2
+tool** — its `GameOffsets/GameProcessName.cs` maps every process name it knows to "Path of Exile
+2", and this document's own first rule calls it "a working tool against the same game". So
+`TotalCount = 0x10` was a PoE2 number all along, not a PoE1 one carried over. Then on the
+reasoning: with that invented doubt in hand, the slice became "the more economical reading" — it
+was economical with a fact nobody had checked.
+
+**The probe has run.** `PreloadReader.BucketsBeyondTheCount` on a live client, 2026-09-01: nothing
+past the last bucket looks like one, and `--tables` says so on every run. Sixteen buckets is the
+whole table, and coverage is not why anything is missing from it.
+
+What's left is the resource-loader explanation — and with it the question of **why four core
+tables travel through the loader and four don't**, which is now the thing to answer rather than a
+rival to weigh. Either way, don't plan on finding a particular table this way: the row-pointer
+route through a component is the only route to one the walk doesn't turn up.
 
 And being on it is not being parsed: 23 of those 157 have nothing usable at `RowStorePtr`,
 `GrantedEffectsPerLevel` and `Languages` among them. A table can be present and rowless, which

@@ -195,11 +195,11 @@ public class LoadedDatTablesTests
     [Fact]
     public void ASeventeenthBucketWouldBeNoticed()
     {
-        // THE PROBE FOR A CONSTANT NOTHING HAS CHECKED. BucketCount is 0x10 because GameHelper2
-        // says so and GameHelper2 is a PoE1 tool. If this game uses more, every walk of the file
-        // table silently covers a fraction of it - and the symptom is not an error, it is a file
-        // that "is not in the table". A recording cannot settle it, because nothing has ever
-        // read past the last bucket; the game can, in one read per slot.
+        // THE PROBE FOR THE CONSTANT EVERY WALK OF THAT TABLE IS SCALED BY. If this game used
+        // more than BucketCount buckets, every walk would silently cover a fraction of the table
+        // - and the symptom is not an error, it is a file that "is not in the table". A recording
+        // cannot settle it, because nothing has ever read past the last bucket; the game can, in
+        // one read per slot, and did on 2026-09-01: the count holds.
         //
         // What this test says is only that the probe WORKS: it stays quiet on a table that ends
         // where the constant says, and speaks up on one that does not.
