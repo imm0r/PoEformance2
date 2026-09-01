@@ -109,6 +109,7 @@ export class RulesPanel {
     // Always, even mid-edit: it is a readout, it replaces no control, and a buff list that
     // froze while somebody was typing a buff name would be useless exactly when it is wanted.
     this.renderBuffs(view.buffs ?? [], view.buffRead ?? "");
+    this.renderLog(view.log ?? []);
 
     // Whether the thread that produces all of this is even running. Everything on this tab -
     // the status, the buff list, the ranges - is made by the reader's callback, and the feed
@@ -217,6 +218,49 @@ export class RulesPanel {
       option.value = buff.name;
       if (buff.displayName && buff.displayName !== buff.name) option.label = buff.displayName;
       options.appendChild(option);
+    }
+  }
+
+  /**
+   * What the rules have been doing, newest first.
+   *
+   * Rebuilt wholesale on every poll rather than appended to, which is the cheap way round and
+   * also the correct one: the ages on every line move with the clock, so even the lines that
+   * did not change have to be redrawn. The host already collapsed the repeats and worked out
+   * the ages against the READER's clock - this page has no access to it, and computing the
+   * gap here against the browser's would drift by however long the message took to arrive.
+   */
+  renderLog(log) {
+    const count = $("rl-log-count");
+    if (count) count.textContent = log.length ? `(${log.length})` : "(nothing yet)";
+
+    const list = $("rl-log");
+    if (!list) return;
+
+    list.replaceChildren();
+
+    for (const line of log) {
+      const item = document.createElement("li");
+      if (line.blocked) item.className = "blocked";
+
+      const age = document.createElement("span");
+      age.className = "rl-log-age";
+      age.textContent = line.ago;
+      item.appendChild(age);
+
+      const rule = document.createElement("span");
+      rule.className = "rl-log-rule";
+      rule.textContent = line.rule;
+      rule.title = line.rule;
+      item.appendChild(rule);
+
+      const what = document.createElement("span");
+      what.className = "rl-log-what";
+      what.textContent = line.count > 1 ? `${line.what}  x${line.count}` : line.what;
+      what.title = what.textContent;
+      item.appendChild(what);
+
+      list.appendChild(item);
     }
   }
 

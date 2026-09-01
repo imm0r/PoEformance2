@@ -202,6 +202,9 @@ public sealed class RuleEngine
 
     private volatile AimOutcome? _aim;
 
+    /// <summary>What the rules have been doing, further back than one status line reaches.</summary>
+    public RuleLog Log { get; } = new();
+
     /// <summary>
     /// Records what came of an aimed effect - including that it worked.
     /// </summary>
@@ -216,8 +219,34 @@ public sealed class RuleEngine
     ///
     /// Volatile for the usual reason: written by the aim thread, read by whatever is drawing.
     /// </remarks>
-    public void Aimed(string outcome, long nowMs)
-        => _aim = new AimOutcome(outcome ?? string.Empty, nowMs);
+    public void Aimed(string ruleId, string outcome, long nowMs)
+    {
+        _aim = new AimOutcome(outcome ?? string.Empty, nowMs);
+
+        // Into the history too, under the rule's NAME - with six rules configured, "the
+        // pointer landed on nothing" without saying whose pointer is a line you cannot act on.
+        Log.Acted(nowMs, Named(ruleId), outcome ?? string.Empty);
+    }
+
+    /// <summary>The name of the rule with this id, or the id when nothing carries it.</summary>
+    private string Named(string ruleId)
+    {
+        if (_settings.Current is RuleProfile profile)
+        {
+            foreach (RuleGroup group in profile.Groups)
+            {
+                foreach (Rule rule in group.Rules)
+                {
+                    if (string.Equals(rule.Id, ruleId, StringComparison.Ordinal))
+                    {
+                        return rule.Name;
+                    }
+                }
+            }
+        }
+
+        return ruleId;
+    }
 
     /// <summary>
     /// The last aim outcome with its age, or empty when nothing has aimed yet.
@@ -256,6 +285,7 @@ public sealed class RuleEngine
         _showUntil.Clear();
         _inputReadyAt = null;
         _aim = null;
+        Log.Clear();
         LastTick = RuleTick.Nothing;
     }
 
@@ -465,12 +495,24 @@ public sealed class RuleEngine
     {
         RuleEffect effect = rule.Effects[index];
 
+        // The status line takes every blocked reason; the history takes the ones worth reading
+        // back. ROUTINE means the engine pacing itself - a cooldown, the typing floor - which
+        // is true of most rules most of the time and would be nine tenths of the log.
+        void Block(string why, bool routine = false)
+        {
+            blocked.Add($"{rule.Name}: {why}");
+            if (!routine)
+            {
+                Log.Blocked(nowMs, rule.Name, why);
+            }
+        }
+
         // Captions and cues alike: an effect that makes itself noticed while the player is in
         // another application is doing it in that application, and a beep is the half of that
         // nobody can ignore.
         if (!effect.Sends && !state.GameFocused && !settings.NoticeInBackground)
         {
-            blocked.Add($"{rule.Name}: game not focused");
+            Block("game not focused");
             return;
         }
 
@@ -484,14 +526,14 @@ public sealed class RuleEngine
         // From here on the effect DOES something outside this process, so every gate applies.
         if (effect.Sends && Refuse(state) is string refusal)
         {
-            blocked.Add($"{rule.Name}: {refusal}");
+            Block(refusal);
             return;
         }
 
         string key = Key(rule, index);
         if (_readyAt.TryGetValue(key, out long ready) && nowMs < ready)
         {
-            blocked.Add($"{rule.Name}: cooling down");
+            Block("cooling down", routine: true);
             return;
         }
 
@@ -500,7 +542,7 @@ public sealed class RuleEngine
             // Not stamped as acted: the rule did not get its turn, and stamping would make it
             // sit out its own cooldown for something the engine did rather than something it
             // did. The very next tick after the gap can fire it.
-            blocked.Add($"{rule.Name}: input too soon");
+            Block("input too soon", routine: true);
             return;
         }
 
@@ -508,6 +550,7 @@ public sealed class RuleEngine
         {
             _readyAt[key] = nowMs + Spread(effect.CooldownMs, settings.CooldownJitterMs);
             sounds.Add(new RuleSound(rule.Id, effect.Pitch, effect.SoundMs));
+            Log.Acted(nowMs, rule.Name, "sound");
             return;
         }
 
@@ -517,7 +560,7 @@ public sealed class RuleEngine
             // Nothing to press. Reported rather than skipped silently, because an unbound key
             // and a condition that never holds look identical from outside and the fix is
             // completely different.
-            blocked.Add($"{rule.Name}: no key to press");
+            Block("no key to press");
             return;
         }
 
@@ -531,7 +574,7 @@ public sealed class RuleEngine
                 // rule whose aim spec disagrees with its own condition looks exactly like one
                 // that never holds, and the two want completely different fixes. Not stamping
                 // means the very next tick can act once something aimable appears.
-                blocked.Add($"{rule.Name}: nothing to aim at");
+                Block("nothing to aim at");
                 return;
             }
 
@@ -541,7 +584,22 @@ public sealed class RuleEngine
         _readyAt[key] = nowMs + Spread(effect.CooldownMs, settings.CooldownJitterMs);
         _inputReadyAt = nowMs + Stagger(settings.MinInputGapMs, settings.CooldownJitterMs);
         inputs.Add(new RuleInput(rule.Id, effect.Kind, codes, aim));
+
+        // "Sent" rather than "fired", because an aimed effect has not acted yet: the pointer
+        // still has to land and be confirmed, and its own outcome arrives as a second entry.
+        Log.Acted(nowMs, rule.Name, aim is null ? Did(effect) : $"{Did(effect)}, aiming");
     }
+
+    /// <summary>What an effect does, short enough for a log column.</summary>
+    private static string Did(RuleEffect effect) => effect.Kind switch
+    {
+        RuleEffectKind.KeyPress or RuleEffectKind.KeyDown or RuleEffectKind.KeyUp
+            => effect.KeySource == KeySource.FlaskSlot
+                ? $"{effect.Kind} flask {effect.Slot}"
+                : $"{effect.Kind} {effect.Key}",
+        RuleEffectKind.KeySequence => $"KeySequence {effect.Keys}",
+        _ => effect.Kind.ToString(),
+    };
 
     /// <summary>The rarity an aim spec names, or null for "any monster".</summary>
     private static ItemRarity? Rarity(AimTarget aim) => aim switch

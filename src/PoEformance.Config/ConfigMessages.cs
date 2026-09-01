@@ -169,7 +169,12 @@ public sealed record RulesView(
     /// <summary>What came of the last aimed effect, with its age, or empty. Its own field
     /// for the same reason as the note above: an aim finishes on a thread of its own, after
     /// the tick that started it, so it can never be part of a tick's reason.</summary>
-    [property: JsonPropertyName("aimNote")] string AimNote = "")
+    [property: JsonPropertyName("aimNote")] string AimNote = "",
+
+    /// <summary>What the rules have been doing, newest first, with each age already worked
+    /// out. Formatted HERE rather than in the page, because the ages are against the reader's
+    /// clock and the page has no access to it.</summary>
+    [property: JsonPropertyName("log")] IReadOnlyList<RuleLogLine>? Log = null)
 {
     /// <summary>Builds the panel, including a text and a graph for every rule.</summary>
     public static RulesView Of(RuleEngine engine, string keySource, BuffWatch buffs, string reader = "")
@@ -196,12 +201,32 @@ public sealed record RulesView(
             }
         }
 
+        long now = Environment.TickCount64;
+        var log = new List<RuleLogLine>();
+        foreach (RuleLogEntry entry in engine.Log.Recent(120))
+        {
+            log.Add(new RuleLogLine(
+                RuleLog.Age(now - entry.AtMs), entry.Rule, entry.What, entry.Count, entry.Blocked));
+        }
+
         return new RulesView(
             settings, engine.LastTick.Reason, engine.Acted, keySource, shapes, buffs.Seen,
             buffs.LastRead, reader, engine.LoadNote,
-            engine.AimNote(Environment.TickCount64));
+            engine.AimNote(now), log);
     }
 }
+
+/// <summary>One line of the rule history, with its age already in words.</summary>
+/// <param name="Blocked">
+/// Whether this is a reason nothing happened. Carried rather than left to the page to work out
+/// from the wording, for the same reason it is carried on the entry itself.
+/// </param>
+public sealed record RuleLogLine(
+    [property: JsonPropertyName("ago")] string Ago,
+    [property: JsonPropertyName("rule")] string Rule,
+    [property: JsonPropertyName("what")] string What,
+    [property: JsonPropertyName("count")] int Count,
+    [property: JsonPropertyName("blocked")] bool Blocked);
 
 /// <summary>The two other ways of looking at one rule's condition.</summary>
 /// <remarks>

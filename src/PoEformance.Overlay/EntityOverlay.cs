@@ -1356,6 +1356,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public Func<string>? AimStatus { get; set; }
 
+    /// <summary>Optional: what the rules have been doing, newest first.</summary>
+    /// <remarks>
+    /// The status line above answers what is happening THIS tick, and a tick is 33 ms. With
+    /// six rules configured that line changes several times a second - measured by the owner
+    /// as "no status lasts a second" - so every question about it is a question about the
+    /// recent past. Folded away by default: it is a page of text, and the readout's job is
+    /// still to answer "is it working" at a glance.
+    /// </remarks>
+    public Func<IReadOnlyList<RuleLogEntry>>? RuleHistory { get; set; }
+
     /// <summary>
     /// Adds the interface browser, served by an inspector on the reader thread.
     /// </summary>
@@ -2645,6 +2655,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private void DrawStatusTab(int width, int height)
     {
         DrawReadout(width, height);
+        DrawRuleHistory();
 
         ImGui.Separator();
         DrawSwitches();
@@ -3012,6 +3023,96 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         finally
         {
             ImGui.EndTable();
+        }
+    }
+
+    /// <summary>
+    /// The rules' recent history, folded away until it is wanted.
+    /// </summary>
+    /// <remarks>
+    /// WHY THIS EXISTS beside the one-line status: the line above holds this tick's reason, and
+    /// with six rules configured it is replaced several times a second. Everything actually
+    /// asked of it - did that rule fire, when did it stop, was the cull aimed - is a question
+    /// about seconds ago, and a field showing only the present answers none of them.
+    ///
+    /// NEWEST FIRST, and not scrolled to follow: a log that jumps while it is being read is one
+    /// nobody can read during a fight, and the newest line is the one being looked for anyway.
+    ///
+    /// The age is recomputed every frame from the same clock the engine stamps with, so the
+    /// numbers count up while the panel is open rather than freezing at whatever they were when
+    /// it was unfolded.
+    /// </remarks>
+    private void DrawRuleHistory()
+    {
+        if (RuleHistory is null)
+        {
+            return;
+        }
+
+        IReadOnlyList<RuleLogEntry> entries = RuleHistory();
+        if (entries.Count == 0)
+        {
+            return;
+        }
+
+        if (!ImGui.CollapsingHeader($"rule history ({entries.Count})"))
+        {
+            return;
+        }
+
+        long now = Environment.TickCount64;
+
+        // A fixed height with its own scrollbar rather than however tall the list happens to
+        // be: this panel sits in a corner during a fight, and a section that grows with its
+        // contents would push the switches under it off the screen after a busy pack.
+        float lines = Math.Min(entries.Count, 12);
+        if (!ImGui.BeginChild(
+            "##rulelog",
+            new Vector2(0, lines * ImGui.GetTextLineHeightWithSpacing() + 8),
+            ImGuiChildFlags.Borders))
+        {
+            ImGui.EndChild();
+            return;
+        }
+
+        try
+        {
+            if (!ImGui.BeginTable("##rulelogrows", 3, ImGuiTableFlags.SizingFixedFit))
+            {
+                return;
+            }
+
+            try
+            {
+                foreach (RuleLogEntry entry in entries)
+                {
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();
+                    ImGuiText.Mono(Quiet, RuleLog.Age(now - entry.AtMs));
+
+                    ImGui.TableNextColumn();
+
+                    // NOT escaped, and that is the correct half of the percent-sign rule
+                    // rather than a missed one: TextUnformatted is not a format call, so
+                    // doubling the signs here would print them doubled. A rule somebody named
+                    // "Spark 100%" is exactly the case.
+                    ImGui.TextUnformatted(entry.Rule);
+
+                    ImGui.TableNextColumn();
+                    string what = entry.Count > 1 ? $"{entry.What}  x{entry.Count}" : entry.What;
+                    ImGui.PushStyleColor(ImGuiCol.Text, entry.Blocked ? Warning : OverlayInk.Good);
+                    ImGui.TextUnformatted(what);
+                    ImGui.PopStyleColor();
+                }
+            }
+            finally
+            {
+                ImGui.EndTable();
+            }
+        }
+        finally
+        {
+            ImGui.EndChild();
         }
     }
 
