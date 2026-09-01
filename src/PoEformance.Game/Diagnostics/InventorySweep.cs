@@ -24,6 +24,10 @@ namespace PoEformance.Game.Diagnostics;
 /// per inventory against this whole window's 544, and it is not what the sweep is for. What the
 /// number is good for is telling a loaded tab from an unopened one, which it does exactly.
 /// </remarks>
+/// <param name="Shared">
+/// What the slot's SECOND pointer leads to - the bytes before the Inventory, which nothing has
+/// ever read. Empty when that pointer is not one. See InventorySweep.SharedWindow.
+/// </param>
 public sealed record InventoryObservation(
     int Id,
     ulong Entry,
@@ -32,7 +36,8 @@ public sealed record InventoryObservation(
     byte[] Bytes,
     int Columns,
     int Rows,
-    int Cells);
+    int Cells,
+    byte[] Shared);
 
 /// <summary>What one frame of the sweep saw.</summary>
 public sealed record InventorySweepFrame(int Frame, IReadOnlyList<InventoryObservation> Seen);
@@ -72,12 +77,34 @@ public sealed class InventorySweep
     /// How much of each Inventory to take.
     /// </summary>
     /// <remarks>
-    /// Past the last field anybody has decoded - ServerRequestCounter at 0x1E8 - and no further.
-    /// The cost is what decides it: a stash of 140 inventories is 76 KB a frame at this size, and
-    /// a sweep somebody leaves running while they open tabs takes a frame every couple of
-    /// seconds. Doubling the window doubles a recording that has to be uploaded.
+    /// WIDENED FROM 0x220 AFTER THE FIRST CAPTURE ANSWERED WITH IT. A byte-by-byte scan of that
+    /// window across 181 inventories, at every width and every alignment, produced exactly one
+    /// kind of hit: TotalBoxes and TotalBoxesY, plus the same bytes read misaligned. Nothing
+    /// else in it is constant within a grid shape and different across shapes, which a type
+    /// must be. So the answer is not there, and the window is worth what a recording costs.
+    ///
+    /// A stash of 180 inventories is 180 KB a frame at this size. The sweep takes a frame every
+    /// couple of seconds and the recorder drops a read whose bytes have not moved, so a capture
+    /// pays this once rather than per frame.
     /// </remarks>
-    public const int Window = 0x220;
+    public const int Window = 0x400;
+
+    /// <summary>
+    /// How much to take from the slot's SECOND pointer, which nothing has ever read.
+    /// </summary>
+    /// <remarks>
+    /// THE OBJECT STARTS BEFORE WHAT WE CALL THE INVENTORY. Every array slot holds two pointers,
+    /// at +0x08 and +0x10, and the second is consistently sixteen bytes BELOW the first - so the
+    /// struct the schema calls Inventory begins 0x10 into a larger object, and those sixteen
+    /// bytes have never been in a recording.
+    ///
+    /// Which is exactly where a C++ object keeps its vtable, and a vtable is a far better answer
+    /// to "what sort is this" than any small integer: different stash types are different
+    /// classes, so the pointer differs by construction rather than by convention. Read from the
+    /// second pointer rather than from Ptr0 minus 0x10, because the relationship is an
+    /// observation about a handful of rows and not a rule anybody has established.
+    /// </remarks>
+    public const int SharedWindow = 0x40;
 
     /// <summary>One slot of the inventory array, whole.</summary>
     public const int EntryWindow = 0x18;
@@ -107,8 +134,12 @@ public sealed class InventorySweep
     private readonly int _itemList;
     private readonly int _itemListLast;
 
+    /// <summary>Where the slot's second, unnamed pointer sits. See SharedWindow.</summary>
+    public const int SecondPointer = 0x10;
+
     private readonly byte[] _buffer = new byte[Window];
     private readonly byte[] _entry = new byte[EntryWindow];
+    private readonly byte[] _shared = new byte[SharedWindow];
 
     public InventorySweep(IMemoryReader reader, OffsetSchema schema)
     {
@@ -190,7 +221,22 @@ public sealed class InventorySweep
                 continue;
             }
 
-            if (!_reader.TryRead(at, _buffer.AsSpan()))
+            // A LADDER, the one the component sweep earned: a read is all-or-nothing, so a
+            // window that runs past the end of a mapping - or past what an OLDER recording
+            // happens to hold - takes nothing at all rather than the part that is there. The
+            // steps are the windows this sweep has shipped with, so a capture made before it
+            // was widened still replays.
+            var got = 0;
+            foreach (int size in (int[])[Window, 0x220, 0x160])
+            {
+                if (_reader.TryRead(at, _buffer.AsSpan(0, size)))
+                {
+                    got = size;
+                    break;
+                }
+            }
+
+            if (got == 0)
             {
                 continue;
             }
@@ -201,8 +247,16 @@ public sealed class InventorySweep
                 ? (int)Math.Min((long)(itemsEnd - items) / 8, StashReader.MostItems)
                 : 0;
 
+            // The slot's second pointer, read as a window of its own rather than assumed to be
+            // the first minus sixteen - see SharedWindow.
+            ulong shared = BitConverter.ToUInt64(_entry, SecondPointer);
+            byte[] before = MemoryReaderExtensions.IsPlausiblePointer(shared)
+                             && _reader.TryRead(shared, _shared.AsSpan())
+                ? _shared[..]
+                : [];
+
             seen.Add(new InventoryObservation(
-                id, entry, _entry[..], at, _buffer[..], columns, rows, cells));
+                id, entry, _entry[..], at, _buffer[..got], columns, rows, cells, before));
         }
 
         return new InventorySweepFrame(frame, seen);
@@ -259,10 +313,118 @@ public sealed class InventorySweep
                 "  tested against a sort we know. Open the Merchant window once and sweep again.");
         }
 
+        DrawByShape("array slot", seen, one => one.EntryBytes, output);
+        DrawByShape("inventory head", seen, one => one.Bytes, output);
+        DrawByShape("before the inventory", seen, one => one.Shared, output);
         DrawCandidates("array slot", seen, one => one.EntryBytes, EntryWindow, output);
         DrawCandidates("inventory head", seen, one => one.Bytes, Window, output);
+        DrawCandidates("before the inventory", seen, one => one.Shared, SharedWindow, output);
         DrawInventories(seen, output);
     }
+
+    /// <summary>
+    /// Fields that are the same for every tab of one grid shape and differ between shapes.
+    /// </summary>
+    /// <remarks>
+    /// THE BETTER CONTROL, and it replaces an assumption that turned out to be unsupported. The
+    /// shop-page test below rests on the two pages being a distinct SORT, which nothing
+    /// establishes: their grid is an ordinary twelve by twelve and their type may be ordinary
+    /// too. What is not an assumption is that a type DECIDES a layout - a currency stash is
+    /// 37x10 and nothing else is - so a type cannot vary among tabs that share a shape, and must
+    /// vary between a 37x10 and a 12x12.
+    ///
+    /// Every width and every ALIGNMENT, because a twenty-five row enum most likely fits a byte,
+    /// and a byte at an odd offset is invisible to a scan that steps four at a time. That gap is
+    /// how the first pass missed everything it could have found.
+    ///
+    /// The grid itself passes this test, necessarily. It is left in rather than filtered out,
+    /// because seeing TotalBoxes come back is the proof that the scan is looking where it thinks.
+    /// </remarks>
+    private static void DrawByShape(
+        string what,
+        IReadOnlyList<InventoryObservation> seen,
+        Func<InventoryObservation, byte[]> bytesOf,
+        TextWriter output)
+    {
+        output.WriteLine();
+        output.WriteLine($"  {what} - constant within a grid shape, different across shapes:");
+
+        List<IGrouping<(int Columns, int Rows), InventoryObservation>> shapes =
+            [.. seen.GroupBy(one => (one.Columns, one.Rows))];
+
+        int window = seen.Count == 0 ? 0 : seen.Min(one => bytesOf(one).Length);
+
+        // NOT READ IS NOT THE SAME AS NOTHING FOUND, and this whole line of work has already
+        // cost a round to that confusion once - a capture came back without the sweep in it and
+        // the report said nothing survived. A window nobody filled says so.
+        if (window == 0)
+        {
+            output.WriteLine("    NOT READ in this capture - so nothing here can be concluded.");
+            return;
+        }
+
+        var found = 0;
+
+        foreach (int width in (int[])[1, 2, 4, 8])
+        {
+            for (int offset = 0; offset + width <= window; offset++)
+            {
+                var perShape = new List<((int Columns, int Rows) Shape, ulong Value)>();
+                var uniform = true;
+
+                foreach (IGrouping<(int Columns, int Rows), InventoryObservation> shape in shapes)
+                {
+                    ulong? agreed = null;
+                    foreach (InventoryObservation one in shape)
+                    {
+                        ulong value = At(bytesOf(one), offset, width);
+                        if (agreed is { } already && already != value)
+                        {
+                            uniform = false;
+                            break;
+                        }
+
+                        agreed ??= value;
+                    }
+
+                    if (!uniform)
+                    {
+                        break;
+                    }
+
+                    perShape.Add((shape.Key, agreed ?? 0));
+                }
+
+                if (!uniform || perShape.Select(pair => pair.Value).Distinct().Count() < 2)
+                {
+                    continue;
+                }
+
+                found++;
+                output.WriteLine(
+                    $"    +0x{offset:X3} w{width}  "
+                    + string.Join(
+                        "  ",
+                        perShape.Take(8).Select(pair =>
+                            $"{pair.Shape.Columns}x{pair.Shape.Rows}=0x{pair.Value:X}"))
+                    + (perShape.Count > 8 ? " ..." : string.Empty));
+            }
+        }
+
+        if (found == 0)
+        {
+            output.WriteLine("    none - nothing here tracks what sort of grid the tab has.");
+        }
+    }
+
+    /// <summary>A field of the given width at an offset, however it is aligned.</summary>
+    private static ulong At(byte[] bytes, int offset, int width) => width switch
+    {
+        1 => bytes[offset],
+        2 => BitConverter.ToUInt16(bytes, offset),
+        4 => BitConverter.ToUInt32(bytes, offset),
+        _ => BitConverter.ToUInt64(bytes, offset),
+    };
 
     /// <summary>
     /// Every 4-byte field that could be a type, and whether the game agrees it is one.
@@ -294,6 +456,13 @@ public sealed class InventorySweep
     {
         output.WriteLine();
         output.WriteLine($"  {what} - fields that could carry a sort:");
+
+        // See DrawByShape: a window nobody read cannot be reported on as if it were empty.
+        if (seen.Count == 0 || seen.Min(one => bytesOf(one).Length) == 0)
+        {
+            output.WriteLine("    NOT READ in this capture - so nothing here can be concluded.");
+            return;
+        }
 
         var found = 0;
 

@@ -19,6 +19,11 @@ public class InventorySweepTests
 
     /// <summary>An inventory whose head is zeroes, for a test to plant one field in.</summary>
     private static InventoryObservation Make(int id, params (int Offset, uint Value)[] fields)
+        => Shaped(id, 12, 12, fields);
+
+    /// <summary>The same, with a grid shape - which is what the type test groups by.</summary>
+    private static InventoryObservation Shaped(
+        int id, int columns, int rows, params (int Offset, uint Value)[] fields)
     {
         var head = new byte[InventorySweep.Window];
         var slot = new byte[InventorySweep.EntryWindow];
@@ -28,7 +33,8 @@ public class InventorySweepTests
             BitConverter.TryWriteBytes(head.AsSpan(offset), value);
         }
 
-        return new InventoryObservation(id, 0x1000, slot, 0x2000, head, 12, 12, 144);
+        return new InventoryObservation(
+            id, 0x1000, slot, 0x2000, head, columns, rows, columns * rows, []);
     }
 
     private static string Sweep(params InventoryObservation[] seen)
@@ -94,6 +100,37 @@ public class InventorySweepTests
             Make(NormalId, (0x40, 5)));
 
         Assert.DoesNotContain("+0x040", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AFieldConstantWithinAGridShapeAndDifferentAcrossThemIsReported()
+    {
+        // WHAT A TYPE HAS TO LOOK LIKE, and the test that rests on something rather than on an
+        // assumption: a type DECIDES a layout - a currency stash is 37x10 and nothing else is -
+        // so it cannot vary among tabs sharing a shape and must vary between shapes.
+        //
+        // A BYTE at an ODD offset, because that is the shape the first pass could not see: it
+        // stepped four at a time, and a twenty-five row enum most likely fits one byte.
+        string said = Sweep(
+            Shaped(1, 12, 12, (0x2D, 4)),
+            Shaped(2, 12, 12, (0x2D, 4)),
+            Shaped(3, 37, 10, (0x2D, 9)),
+            Shaped(4, 24, 24, (0x2D, 1)));
+
+        Assert.Contains("+0x02D w1", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AFieldTHATVariesAmongTabsOfOneShapeIsNotACandidate()
+    {
+        // Two tabs of one shape disagreeing rules the field out whatever else it does: a type
+        // that differed between two 12x12 tabs would not have made them both 12x12.
+        string said = Sweep(
+            Shaped(1, 12, 12, (0x2D, 4)),
+            Shaped(2, 12, 12, (0x2D, 5)),
+            Shaped(3, 37, 10, (0x2D, 9)));
+
+        Assert.DoesNotContain("+0x02D w1", said, StringComparison.Ordinal);
     }
 
     [Fact]
