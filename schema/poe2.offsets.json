@@ -327,6 +327,12 @@
     //     bool/i8/u8 1 | i16/u16 2 | i32/u32/f32 4 | enum-row 4 | string 8 (a UTF-16
     //     pointer) | reference to ANOTHER table's row 16 | reference to a row of the SAME
     //     table 8 | array of anything 16
+    //     ...AND AN INTERVAL COLUMN COSTS TWICE ITS TYPE. dat-schema marks that with a FLAG
+    //     rather than a type, which is exactly why it went unnoticed: the column reads i32 and
+    //     prices as 4, and the row comes out four bytes short for every one of them. It is two
+    //     values - Mods.Stat1Value..Stat8Value are a modifier's minimum and maximum roll.
+    //     21 PoE2 columns carry the flag, in four tables, and NONE of them is in a table this
+    //     file computes an offset in - so nothing shipped was ever wrong, only the checking.
     // A 16-byte foreign reference is a ROW reference followed by a TABLE reference: the
     // pointer to the referenced row sits AT the column start and the table it belongs to at
     // +8. OBSERVED 2026-08 in session-2026-08-questflags.rec, and which half is which is not
@@ -377,23 +383,41 @@
     // table REPORTS ITS OWN ROW SIZE - the row store divides its rows by its by-Id index, see
     // DatRowStore - so walking the loaded-file table asks every table in memory the question in
     // one pass, with nothing computed on the game's side. Over the 131 tables of
-    // session-2026-08-glossary.rec: 126 are in dat-schema, and 123 of those report EXACTLY what
-    // the widths compute, from ModFamily's 8 bytes to Mods' 677. A width that is wrong for a
-    // common type cannot survive that - one byte off on 'bool' would move about ninety of these,
-    // and a wrong reference width would move nearly all of them.
-    // THE THREE THAT DISAGREE ARE NOT THIS TABLE'S FAULT, and the direction is the evidence:
-    // EndgameMaps computes 0xEF against the game's 0xF0, AlternateTreeVersions 0x1A against
-    // 0x26, Mods 0x285 against 0x2A5. All three are the GAME BEING BIGGER, which is what a
-    // community schema that has not caught up with a patch looks like - a missing column adds
-    // bytes, whereas a wrong width would just as readily subtract them. Five more loaded tables
-    // (MTXTypes, MTXPreviewCameras, AtlasPassiveSkillSubtrees, CharacterShapeshiftBasicSkills,
-    // AtlasPassiveGrantedSkillsFromSubtreePoints) are not in dat-schema at all, which says the
-    // same thing from the other end.
-    // SO DO NOT COMPUTE AN OFFSET IN Mods, EndgameMaps OR AlternateTreeVersions from the column
-    // list. Everything before the first missing column is right and everything after it is not,
-    // and a row size cannot say where the break is. Mods is the one to watch - 16679 rows, and
-    // it is what item modifiers hang off. For those three the game's own row size is the only
-    // number worth trusting until dat-schema catches up; --tables prints it.
+    // session-2026-08-glossary.rec, and the 134 of session-2026-09-tables.rec: EVERY ONE of them
+    // is in dat-schema, and 133 report EXACTLY what the widths compute, from ModFamily's 8 bytes
+    // to Mods' 677. A width that is wrong for a common type cannot survive that - one byte off
+    // on 'bool' would move about ninety of these, and a wrong reference width would move nearly
+    // all of them. It read 123 of 126 at first, and both of the gaps were in the ASKING; see
+    // below, because both are traps the next person will walk into.
+    // TWO TRAPS SAT BETWEEN THE GAME AND THE SCHEMA, and this note carried both as findings
+    // about the GAME before either was caught. It said "three tables disagree, all with the game
+    // bigger, which is what a reference lagging a patch looks like" and "five tables are not in
+    // dat-schema at all". Neither was true, and both were flushed out by somebody asking whether
+    // it was really sure.
+    // (1) THE INTERVAL RULE, missing from the widths above. Mods computed 0x285 against 0x2A5
+    // and AlternateTreeVersions 0x1A against 0x26 - Mods has eight interval columns and 8 * 4 is
+    // 32, AlternateTreeVersions three and 3 * 4 is 12. A HYPOTHESIS THAT EXPLAINS THE SIGN OF
+    // EVERY DISCREPANCY IS NOT THEREBY RIGHT: "the reference is behind" and "our arithmetic is
+    // incomplete" both make the game bigger, and only one of them was testable from here.
+    // (2) CAPITALISATION. The game's path and dat-schema's table name disagree on case, so an
+    // exact-match lookup reports a table as unknown rather than as different: the game loads
+    // AtlasPassiveSkillSubtrees where the schema says AtlasPassiveSkillSubTrees, and likewise
+    // MTXTypes/MtxTypes, MTXPreviewCameras/MtxPreviewCameras,
+    // CharacterShapeshiftBasicSkills/CharacterShapeShiftBasicSkills and
+    // AtlasPassiveGrantedSkillsFrom{Subtree,SubTree}Points. All five agree on their row size to
+    // the byte once matched. MATCH A TABLE NAME CASE-INSENSITIVELY, always - dat-offsets.ps1
+    // does, because PowerShell's -eq is, and LoadedDatTables.FindAll does on purpose.
+    // ONE IS LEFT, and it is a single byte: EndgameMaps computes 0xEF where the game says 0xF0,
+    // with no interval column anywhere in it. A missing bool is the shape of that. THE TWO
+    // COMMUNITY SCHEMAS DO NOT AGREE ABOUT THAT TABLE EITHER: jchantrell/dat-schema's poe2 copy
+    // lists 19 columns totalling 0x98 where poe-tool-dev lists 27 totalling 0xEF, and it opens
+    // with an i32 that poe-tool-dev does not have at all - so one of them has EndgameMaps' first
+    // column wrong, and neither reaches the game's 0xF0. That fork is worth a second opinion on
+    // any table this file starts computing offsets in; for EndgameMaps specifically, trust
+    // neither and read the row size off the game.
+    // SO an offset computed in EndgameMaps is right up to the missing column and wrong after it,
+    // and its row size cannot say where the break is. For any table the game's own row size is
+    // the number to trust; --tables prints it.
     // A row's INDEX is therefore computable too: (row - anyKnownRow) / rowSize is exact.
     // NONE OF THIS APPLIES TO COMPONENTS. Life, Actor, Render, Positioned, Buffs,
     // StatusEffect, Entity and the UI structs have no .dat table behind them. ChestData
@@ -510,7 +534,7 @@
     },
 
     "DatTable": {
-      "comment": "One of the game's static content tables as it sits in memory - what MinimapIcon.TablePtr points at, and the second half of every 16-byte foreign reference. The path NAMES the table, which is the missing half of every dat row this tool finds. THE TWO INTS BESIDE IT ARE THE PATH'S OWN HEADER, and this file had them written down as a mystery for months: \"0x1D and 0x1F as ints\". 0x08 is simply a std::wstring, and ReadStdWString puts size at +0x10 and capacity at +0x18 OF THE STRING - which is 0x18 and 0x20 here. 0x1D is 29, the length of \"Data/Balance/MinimapIcons.dat\" to the character; the 0x1F beside it is the capacity, and reads 31 for both tables seen so far, a 32-character buffer less its terminator. Worth having as a field of its own rather than as trivia, because the LENGTH is one read while the text is a pointer further away: a recording that never followed the pointer still carries the number, and a length identifies a table on its own more often than it sounds - QuestFlags below is the only 12-byte-row table in the game with a 27-character path. A TABLE IS A LOADED-FILE RECORD, and that is what turns every table the game has loaded into something reachable from a STATIC rather than only from an object that happens to point at one. FileRecord.Name and DatTable.Path are not merely the same shape at the same offset - they are the same field of the same object. MEASURED 2026-08 in tests/fixtures/session-2026-08-sweep.rec, in both directions at once: the table an NPCs row names at +0x20 (0x31826080AD0, whose Path reads \"Data/Balance/QuestFlags.dat\", 27 characters, and whose row grid the row half at +0x18 lands on) is ALSO one of the 8406 records the FileRoot walk enumerates, reached bucket -> slot -> record with nothing assumed. It is not one coincidence either: of the four tables that recording holds a foreign pointer to - Stats, GroundEffects, BuffDefinitions, QuestFlags - every one is a record in the file table. So the route is FileRoot -> LoadedFilesRoot -> bucket -> FileRecordSlot.Record -> here, and RowStorePtr from there; Game/Files/LoadedDatTables.cs walks it and PointerPeek.DescribeTable decides which records really are tables. NOT EVERY TABLE THE GAME HAS IS ON IT, and the honest form of that is a measurement rather than a promise: one walk of a live client turned up 131 tables among 6908 files - Stats, Mods, BaseItemTypes, PassiveSkills, BuffDefinitions, QuestFlags, Projectiles among them - and the four tables THIS PROJECT ALREADY READS ROWS FROM were not among them (WorldAreas, MinimapIcons, NPCs, ItemVisualIdentity). Whether their records are absent, or present with nothing at RowStorePtr at that moment, is NOT ANSWERED: the walk reads a record's name only after the structural checks pass, so a record that fails them leaves no name in the recording, and no capture in this repo can be asked. Do not read \"131\" as \"all of them\", and do not assume a table will be there - Find returns nothing rather than throwing for exactly this reason. Settling it needs --tables on a running client, where the names of the records that FAIL can be read too. AND THE ROUTE RUNS, END TO END, 2026-08-31 (session-2026-08-glossary.rec): FileRoot -> 6907 records -> the KeywordPopups record -> RowStorePtr at +0x28 -> 1026 rows of 0x48, read as English. That last hop had no fixture until then, because the preload walk reads a 32-byte string header at +0x08 and stops one byte short of +0x28, so nothing had ever read a file record's row store; it was the same RowStorePtr already confirmed from the MinimapIcon and NPCs side on the same kind of object, and now it is confirmed on this route as well. 131 of those 6907 files are dat tables, which is the size of the thing this opens up.",
+      "comment": "One of the game's static content tables as it sits in memory - what MinimapIcon.TablePtr points at, and the second half of every 16-byte foreign reference. The path NAMES the table, which is the missing half of every dat row this tool finds. THE TWO INTS BESIDE IT ARE THE PATH'S OWN HEADER, and this file had them written down as a mystery for months: \"0x1D and 0x1F as ints\". 0x08 is simply a std::wstring, and ReadStdWString puts size at +0x10 and capacity at +0x18 OF THE STRING - which is 0x18 and 0x20 here. 0x1D is 29, the length of \"Data/Balance/MinimapIcons.dat\" to the character; the 0x1F beside it is the capacity, and reads 31 for both tables seen so far, a 32-character buffer less its terminator. Worth having as a field of its own rather than as trivia, because the LENGTH is one read while the text is a pointer further away: a recording that never followed the pointer still carries the number, and a length identifies a table on its own more often than it sounds - QuestFlags below is the only 12-byte-row table in the game with a 27-character path. A TABLE IS A LOADED-FILE RECORD, and that is what turns every table the game has loaded into something reachable from a STATIC rather than only from an object that happens to point at one. FileRecord.Name and DatTable.Path are not merely the same shape at the same offset - they are the same field of the same object. MEASURED 2026-08 in tests/fixtures/session-2026-08-sweep.rec, in both directions at once: the table an NPCs row names at +0x20 (0x31826080AD0, whose Path reads \"Data/Balance/QuestFlags.dat\", 27 characters, and whose row grid the row half at +0x18 lands on) is ALSO one of the 8406 records the FileRoot walk enumerates, reached bucket -> slot -> record with nothing assumed. It is not one coincidence either: of the four tables that recording holds a foreign pointer to - Stats, GroundEffects, BuffDefinitions, QuestFlags - every one is a record in the file table. So the route is FileRoot -> LoadedFilesRoot -> bucket -> FileRecordSlot.Record -> here, and RowStorePtr from there; Game/Files/LoadedDatTables.cs walks it and PointerPeek.DescribeTable decides which records really are tables. NOT EVERY TABLE THE GAME HAS IS ON IT. A live walk turns up 134 tables among 6914 files - Stats, Mods, BaseItemTypes, PassiveSkills, BuffDefinitions, QuestFlags, Projectiles among them - and WorldAreas, MinimapIcons, NPCs and ItemVisualIdentity, the four THIS PROJECT ALREADY READS ROWS FROM, are not among them. session-2026-09-tables.rec reads the name of 6913 of those 6914 records (--tables names every record that is NOT a table, which no other capture does) and not one of them mentions WorldAreas, MinimapIcons, NPCs or ItemVisualIdentity in any spelling, while Stats.dat, Mods.dat, BaseItemTypes.dat and QuestFlags.dat all are there. SAY THAT AS \"NOT IN THE SIXTEEN BUCKETS WE WALK\" AND NOT AS \"NOT IN THE FILE TABLE\", because BucketCount 0x10 is ported from GameHelper2, which is a PoE1 tool, and has never been checked here: if the real count is larger, every walk of this table is a fraction of it and every absence above means only that we did not look. No recording can settle it - not one fixture in this repo holds a single byte past the last bucket, because nothing has ever read there - so PreloadReader.BucketsBeyondTheCount probes the slots past the end and --tables prints what it finds. UNTIL THAT RUNS GREEN, treat the limit as real but unproven: the row-pointer route through a component is the only known way to those four either way. WHAT THIS LIST REALLY IS points the same way: 157 of the 6914 records are .dat files at all, against 1219 .tok, 903 .ao and 462 .ast - it is the RESOURCE SYSTEM's list (the hover note above puts FileRoot 0xFA08 from the object that turned out to be exactly that), and the content tables on it are the ones that travel through the resource loader. AND BEING ON IT IS NOT BEING PARSED: 23 of those 157 have nothing usable at RowStorePtr, GrantedEffectsPerLevel and Languages among them, so a table can be present and rowless. Find returns nothing rather than throwing for all of this. AND THE ROUTE RUNS, END TO END, 2026-08-31 (session-2026-08-glossary.rec): FileRoot -> 6907 records -> the KeywordPopups record -> RowStorePtr at +0x28 -> 1026 rows of 0x48, read as English. That last hop had no fixture until then, because the preload walk reads a 32-byte string header at +0x08 and stops one byte short of +0x28, so nothing had ever read a file record's row store; it was the same RowStorePtr already confirmed from the MinimapIcon and NPCs side on the same kind of object, and now it is confirmed on this route as well. 131 of those 6907 files are dat tables, which is the size of the thing this opens up.",
       "fields": {
         "Path": { "offset": "0x08", "type": "stdWString", "comment": "\"Data/Balance/MinimapIcons.dat\". Declared as a bare PathPtr before, which read the same characters and left the two ints next to it unexplained." },
         "RowStorePtr": { "offset": "0x28", "type": "ptr", "struct": "DatRowStore", "invariant": { "kind": "plausiblePtr" }, "comment": "The rows themselves and the indices over them. This is the \"another pointer at 0x28 into the same table blob\" that used to be listed as unread." }

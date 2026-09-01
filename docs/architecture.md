@@ -2184,25 +2184,57 @@ arithmetic had been confirmed on **three** tables — by harvesting rows out of 
 checking their stride by hand. A loaded table reports its **own** row size, so one walk asks all
 of them at once, and `--tables` prints the answers.
 
-Over the 131 tables in that capture: 126 are in dat-schema, and **123 of them report exactly what
+Over those captures: **every one of the 134 tables is in dat-schema, and 133 report exactly what
 the widths compute**, from `ModFamily`'s 8 bytes to `Mods`' 677. A width that is wrong for a
 common type could not survive that — one byte off on `bool` would move about ninety of these.
 
-The three that disagree are not the width table's fault, and the direction is the evidence:
-`EndgameMaps` computes 0xEF against the game's 0xF0, `AlternateTreeVersions` 0x1A against 0x26,
-`Mods` 0x285 against 0x2A5. All three have the **game bigger**, which is what a community schema
-that has not caught up with a patch looks like; five more loaded tables aren't in dat-schema at
-all. So don't compute an offset in those three from the column list — everything before the first
-missing column is right and everything after it is not, and a row size can't say where the break
-is. `Mods` is the one to watch: 16,679 rows, and it is what item modifiers hang off.
+**It first read 123 of 126, and both gaps were in the asking, not in the game.** This document
+said "three tables disagree, all with the game bigger, which is what a reference lagging a patch
+looks like" and "five tables aren't in dat-schema at all". Neither was true.
 
-**And an open question, stated as one.** The walk found 131 tables, and the four this project
-already reads rows from — `WorldAreas`, `MinimapIcons`, `NPCs`, `ItemVisualIdentity` — were not
-among them. Whether their records are absent from the file table or present with nothing at
-`RowStorePtr` cannot be answered from a recording, because the cheap walk reads a record's name
-only *after* the structural checks pass, so a record that fails leaves nothing to identify it by.
-That is what `--tables` names the refused `.dat` files for. Until someone runs it, read "131" as
-131 and not as "all of them".
+- **The interval rule.** An interval column is two values, so it costs twice its type — and
+  `Mods.Stat1Value…Stat8Value` are a modifier's minimum and maximum roll. Eight of them at +4 is
+  the 32 bytes `Mods` was short; `AlternateTreeVersions`' three are its 12. A hypothesis that
+  explains the *sign* of every discrepancy is not thereby right: "the reference is behind" and
+  "our arithmetic is incomplete" both make the game bigger, and only one was testable from here.
+- **Capitalisation.** The game's path and dat-schema's table name disagree on case, so an
+  exact-match lookup reports a table as *unknown* rather than as different: the game loads
+  `AtlasPassiveSkillSubtrees`, the schema says `AtlasPassiveSkillSubTrees`, and likewise
+  `MTXTypes`/`MtxTypes`. All five "missing" tables agree on their row size to the byte once
+  matched case-insensitively.
+
+Nothing shipped was ever wrong — none of the seven tables this project computes offsets in has an
+interval column, so the bug was in the checking. `dat-offsets.ps1` now doubles interval columns.
+
+One is left, and it is a byte: `EndgameMaps` computes 0xEF where the game says 0xF0, with no
+interval column in it. The two community schemas don't agree about that table either —
+jchantrell's PoE2 fork lists 19 columns totalling 0x98 where poe-tool-dev lists 27 totalling 0xEF,
+and opens with an `i32` poe-tool-dev doesn't have. So one of them has its first column wrong and
+neither reaches 0xF0: trust neither there, and read the row size off the game.
+
+**And the route's limit — with the caveat that makes it honest.** The walk found 131 tables, and
+the four this project already reads rows from — `WorldAreas`, `MinimapIcons`, `NPCs`,
+`ItemVisualIdentity` — were not among them. `--tables` names every record that is *not* a table,
+which no other capture does: of 6,913 record names read, **not one mentions those four in any
+spelling**, while `Stats.dat`, `Mods.dat`, `BaseItemTypes.dat` and `QuestFlags.dat` all do.
+
+That is "not in the sixteen buckets we walk", and it is worth saying it that way. `BucketCount`
+is `0x10` **because GameHelper2 says so, and GameHelper2 is a PoE1 tool** — nothing here has ever
+checked it against Path of Exile 2. If the real count is larger, every walk of this table is a
+fraction of it and every absence above only means we didn't look. No recording can settle it:
+not one fixture holds a single byte past the last bucket, because nothing has ever read there.
+So `PreloadReader.BucketsBeyondTheCount` probes the slots past the end and `--tables` prints
+whether any of them looks like a bucket. Until that comes back clean, the limit is real but
+unproven — and the row-pointer route through a component is the only known way to those four
+either way.
+
+What the list is points the same way. 157 of its 6,914 records are `.dat` files at all, against
+1,219 `.tok`, 903 `.ao` and 462 `.ast`: **it is the resource system's list**, and the content
+tables on it are the ones that travel through the resource loader.
+
+And being on it is not being parsed: 23 of those 157 have nothing usable at `RowStorePtr`,
+`GrantedEffectsPerLevel` and `Languages` among them. A table can be present and rowless, which
+is why `Survey` reports the two states separately.
 
 ### Prices — what the stash is worth
 

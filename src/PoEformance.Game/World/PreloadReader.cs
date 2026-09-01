@@ -459,6 +459,57 @@ public sealed class PreloadReader
         }
     }
 
+    /// <summary>
+    /// How many of the slots PAST the last bucket also look like buckets.
+    /// </summary>
+    /// <remarks>
+    /// THE CONSTANT NOTHING HAS EVER CHECKED. BucketCount is 0x10 because GameHelper2 says so,
+    /// and GameHelper2 is a PoE1 tool - so every walk of this table, the preload alerts and the
+    /// dat-table route alike, covers sixteen buckets on a ported number. If the real count is
+    /// larger, none of them is wrong in a way anything would notice: the walk simply never sees
+    /// the rest of the files, and "not in the file table" comes to mean "not in the part we
+    /// look at". That distinction is load-bearing now, because the route's limit is stated as a
+    /// measurement over this table's contents.
+    ///
+    /// It cannot be settled from a recording. A capture holds only the bytes that were read, and
+    /// nothing has ever read past the last bucket - not one of the twenty-eight fixtures in this
+    /// repo contains a single byte there. So it takes the game, and this is the one read that
+    /// asks: a bucket is a begin/end pair a slot-size apart with a plausible count between them,
+    /// and a zero here is the answer being 0x10 after all.
+    ///
+    /// Returns how many of the next <paramref name="probe"/> slots pass that test. ANY non-zero
+    /// result means BucketCount is too small and every walk of this table is partial.
+    /// </remarks>
+    public int BucketsBeyondTheCount(ulong fileRootStatic, int probe = 8)
+    {
+        ulong root = _reader.ReadPointer(fileRootStatic);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(root))
+        {
+            return 0;
+        }
+
+        var looksLikeOne = 0;
+        for (int b = _bucketCount; b < _bucketCount + probe; b++)
+        {
+            ulong bucket = root + (ulong)(b * _bucketSize);
+            ulong first = _reader.ReadPointer(bucket);
+            ulong last = _reader.ReadPointer(bucket + sizeof(ulong));
+
+            if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
+            {
+                continue;
+            }
+
+            long slots = (long)(last - first) / _slotSize;
+            if (slots > 0 && slots <= MostSlotsPerBucket && (last - first) % (ulong)_slotSize == 0)
+            {
+                looksLikeOne++;
+            }
+        }
+
+        return looksLikeOne;
+    }
+
     /// <summary>Every record a bucket points at, however many that turns out to be.</summary>
     private IEnumerable<ulong> RecordsIn(ulong bucket)
     {

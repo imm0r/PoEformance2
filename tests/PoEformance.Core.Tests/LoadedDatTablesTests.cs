@@ -192,6 +192,33 @@ public class LoadedDatTablesTests
         Assert.Equal("Critical Hits", glossary.Lookup("Critical")?.Term);
     }
 
+    [Fact]
+    public void ASeventeenthBucketWouldBeNoticed()
+    {
+        // THE PROBE FOR A CONSTANT NOTHING HAS CHECKED. BucketCount is 0x10 because GameHelper2
+        // says so and GameHelper2 is a PoE1 tool. If this game uses more, every walk of the file
+        // table silently covers a fraction of it - and the symptom is not an error, it is a file
+        // that "is not in the table". A recording cannot settle it, because nothing has ever
+        // read past the last bucket; the game can, in one read per slot.
+        //
+        // What this test says is only that the probe WORKS: it stays quiet on a table that ends
+        // where the constant says, and speaks up on one that does not.
+        OffsetSchema schema = RealSessionTests.Schema();
+        var game = new FakeDatTables(schema);
+        game.PlainFile("Data/Balance/Something.dat");
+
+        var files = new PreloadReader(game.Memory, schema);
+        var bucketCount = (int)schema.Structs["LoadedFilesRoot"].Constants["BucketCount"];
+
+        Assert.Equal(0, files.BucketsBeyondTheCount(FakeDatTables.RootStatic));
+
+        game.PlantBucketAt(bucketCount, slots: 4);
+        Assert.Equal(1, files.BucketsBeyondTheCount(FakeDatTables.RootStatic));
+
+        game.PlantBucketAt(bucketCount + 3, slots: 9);
+        Assert.Equal(2, files.BucketsBeyondTheCount(FakeDatTables.RootStatic));
+    }
+
     /// <summary>Three rows of the real table, as the dissector showed them.</summary>
     private static readonly (string Id, string Term, string Definition)[] Rows =
     [
@@ -317,6 +344,18 @@ public class LoadedDatTablesTests
             {
                 Memory.Place(Root + (ulong)(b * bucketSize) + (ulong)bucket.OffsetOf("Capacity"), 0);
             }
+        }
+
+        /// <summary>Puts a plausible bucket at an index, past the count or otherwise.</summary>
+        internal void PlantBucketAt(int index, int slots)
+        {
+            var bucketSize = (int)_schema.Structs["LoadedFilesRoot"].Constants["BucketSize"];
+            var slotSize = (int)_schema.Structs["FileRecordSlot"].Constants["Size"];
+
+            ulong bucket = Root + (ulong)(index * bucketSize);
+            ulong first = Take(slotSize * slots);
+            Memory.Place(bucket, first);
+            Memory.Place(bucket + 8, first + (ulong)(slotSize * slots));
         }
 
         private ulong Take(int bytes)
