@@ -914,6 +914,40 @@ is exactly how you find a path worth writing a rule about. It stands aside where
 non-hideout readings cannot answer a single question about hazards, and no amount of re-reading
 this capture will change that.
 
+#### The game's own data files say where the answer lives
+
+The DAT schema (`repoe-fork/dat-export`, `current/poe2`) settles the *structure* even though no
+recording here settles the values:
+
+```
+GroundEffects      → GroundEffectTypesKey: GroundEffectTypes
+GroundEffectTypes  → Id, Stat, BuffDefinition1, BuffDefinition2
+```
+
+So **whether a patch of ground hurts is a property of its type**, expressed as the buffs that type
+applies. It is not a flag on the instance — which is why no amount of reading the component was
+ever going to produce one, and is worth writing down as the reason that search kept failing. What
+the component must carry instead is a way *back* to that row.
+
+**`+0x48` is the candidate**, and it now has the one property the search needed: a small integer
+taking 12, 17 and 20, **constant on 72 of 72 entities across their entire lives**. That is the
+signature of an immutable property. The two fields that looked like better separators are not:
+`+0x68` is zero on every hideout entity and non-zero on every map one — which reads as a hazard
+flag until the per-entity check shows it *moving* within a single entity's life, from 0 to about
+0.9. `+0x64` moves too. Checking for movement is what separates a property from running state, and
+it costs one pass over the capture.
+
+**Promoting it needs no new machinery.** `Files/DatFile.cs` already parses `.dat` and
+`Files/BundleIndex.cs` already opens the game's bundles — the tool reads the item art out of them
+today. Read `GroundEffectTypes.dat`, check it has more than 20 rows, and see whether rows 12, 17
+and 20 carry `Id`s that match what was observed. If they do, the `BuffDefinition` columns answer
+*does this ground damage me* outright, offline, for every ground effect in the game — and the
+feature stops depending on anyone typing a metadata path.
+
+The caveat that keeps this honest: the 18 map entities in the capture are long-lived (958–1415
+frames) and hold `+Infinity` in the countdown slot, so they look ambient as well. This capture may
+contain no damaging ground at all, which is a second reason the recording above is still wanted.
+
 **They must not both fire on one entity, and for a while they did.** The two passes walk the same
 entity list and neither knew about the other. The shipped rule is spelled as the *exact* path that
 carries a `GroundEffect` component — not a prefix that happens to cover it — so under **default
