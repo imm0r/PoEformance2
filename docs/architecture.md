@@ -2223,22 +2223,33 @@ it reports its own row size, and `--tables` prints it.
 found 134 tables among 6,914 files, and **157 of those records are `.dat` files at all — against
 about 1,020 PoE2 tables** in the community schemas. Fifteen per cent.
 
-So a table being absent is the ordinary case. `WorldAreas`, `MinimapIcons`, `NPCs` and
-`ItemVisualIdentity` — the four this project reads rows from — are in none of the 6,913 record
-names `--tables` reads, in any spelling, while `Stats`, `Mods`, `BaseItemTypes` and `QuestFlags`
-happen to be there. That was first written up here as a *pattern*, which it isn't: at 15%
-coverage, four named tables all missing is a coin flip.
+`WorldAreas`, `MinimapIcons`, `NPCs` and `ItemVisualIdentity` — the four this project reads rows
+from — are in none of the 6,913 record names `--tables` reads, in any spelling, while `Stats`,
+`Mods`, `BaseItemTypes` and `QuestFlags` are. **Confirmed from the row side too**, so it isn't a
+name that failed to read: the same capture holds MinimapIcons *rows* — `Waypoint`, `StashPlayer`,
+`MapDevice`, 159 and 154 row-widths apart on the 0x26 grid — and no record the walk accepts
+brackets them. The table is in memory and out of the walk's reach at once.
 
-**Two things could produce that fraction, and nothing here can tell them apart.** The table may
+**What that split is not is a story about which tables get loaded.** All eight are core tables the
+client can't start without — which is exactly why the QuestFlags hunt never had trouble reading
+its table. An earlier draft here called the four absences a coin flip at 15% coverage; that was
+worse than wrong, because the four *present* ones were picked because they were visible in the
+listing. A sample chosen after the fact says nothing.
+
+**Two things could produce the fraction, and nothing here can tell them apart.** The table may
 genuinely track only what the resource loader pulls in — it is mostly art, 1,219 `.tok` and 903
-`.ao` to its 157 `.dat` — or our walk may be seeing a slice of it. `BucketCount` is `0x10`
-**because GameHelper2 says so, and GameHelper2 is a PoE1 tool**; nothing here has ever checked it
-against Path of Exile 2, and if the real count is larger then every walk of this table has been
-partial and every absence only means we didn't look. No recording can settle it: not one fixture
-holds a single byte past the last bucket, because nothing has ever read there. So
-`PreloadReader.BucketsBeyondTheCount` probes the slots past the end and `--tables` prints whether
-any looks like a bucket. Until that runs, don't plan on finding a particular table this way — the
-row-pointer route through a component is the only route to one the walk doesn't turn up.
+`.ao` to its 157 `.dat` — in which case something has to explain why four core tables travel
+through the loader and four don't. Or our walk is seeing a slice of the table, which explains a
+split among equals without needing anything else. `BucketCount` is `0x10` **because GameHelper2
+says so, and GameHelper2 is a PoE1 tool**; nothing here has checked it against Path of Exile 2,
+and if the real count is larger then every walk has been partial and every absence only means we
+didn't look. The second is the more economical reading, and economy isn't evidence.
+
+No recording can settle it: not one fixture holds a byte past the last bucket, because nothing has
+ever read there. `PreloadReader.BucketsBeyondTheCount` probes the slots past the end and
+`--tables` prints whether any looks like a bucket. Until that runs, don't plan on finding a
+particular table this way — the row-pointer route through a component is the only route to one the
+walk doesn't turn up.
 
 And being on it is not being parsed: 23 of those 157 have nothing usable at `RowStorePtr`,
 `GrantedEffectsPerLevel` and `Languages` among them. A table can be present and rowless, which

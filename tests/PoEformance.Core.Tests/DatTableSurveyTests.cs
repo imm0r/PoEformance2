@@ -15,15 +15,19 @@ namespace PoEformance.Core.Tests;
 /// checks - so none of them could ever answer "is table X in this table at all". `--tables`
 /// reads the name of every record that is not a table, and this session holds 6913 of 6914.
 ///
-/// The answer is a FRACTION rather than a fact about any one table. 157 of the 6914 records are
-/// .dat files at all, against about 1020 PoE2 tables in the community schemas - fifteen per cent
-/// - so a table being absent is the ordinary case. WorldAreas, MinimapIcons, NPCs and
-/// ItemVisualIdentity, the four this project reads rows from, are in none of the 6913 names in
-/// any spelling, while Stats, Mods, BaseItemTypes and QuestFlags happen to be there; at that
-/// coverage, four named tables all missing is a coin flip and not a pattern, which is how it was
-/// first written up. The client plainly has those four tables' rows, so it reaches them some
-/// other way, and the row-pointer route through a component stays the only route to a table this
-/// walk does not turn up.
+/// 157 of the 6914 records are .dat files at all, against about 1020 PoE2 tables in the
+/// community schemas - fifteen per cent. WorldAreas, MinimapIcons, NPCs and ItemVisualIdentity, the four
+/// this project reads rows from, are in none of the 6913 names in any spelling, while Stats,
+/// Mods, BaseItemTypes and QuestFlags are.
+///
+/// THAT SPLIT IS NOT ABOUT WHICH TABLES ARE LOADED. All eight are core tables the client cannot
+/// start without - which is why the QuestFlags hunt never once had trouble reading its table. An
+/// earlier version of this comment called the four absences a coin flip at 15% coverage; that was
+/// worse than wrong, because the four PRESENT ones were picked out of the listing after the fact.
+/// What is left is two explanations this repo cannot separate: the table tracks only what the
+/// resource loader pulls in (and then something must explain the split among equals), or the walk
+/// sees a slice of the table (and then there is nothing to explain). See
+/// PreloadReader.BucketsBeyondTheCount.
 ///
 /// SAID PRECISELY, THAT IS "NOT IN THE SIXTEEN BUCKETS WE WALK". BucketCount is 0x10 because
 /// GameHelper2 says so, and GameHelper2 is a PoE1 tool; nothing here has checked it against this
@@ -118,6 +122,53 @@ public class DatTableSurveyTests
         foreach (string table in (string[])["Stats", "Mods", "BaseItemTypes", "QuestFlags"])
         {
             Assert.Contains(names, n => n.EndsWith($"/{table}.dat", StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    [Fact]
+    public void AMissingTableIsInMemoryAllTheSame()
+    {
+        // THE ABSENCE, CONFIRMED WITHOUT A NAME. Asking the record names whether MinimapIcons is
+        // in the file table can only ever fail one way - a name that did not read looks the same
+        // as a name that is not there. Its ROWS answer independently: this capture holds three of
+        // them, and no record the walk accepts brackets any of them. So the table is in memory
+        // and out of the walk's reach at the same time, which is the fact the two explanations in
+        // the type comment have to account for.
+        using ReplayMemoryReader replay = Session();
+        OffsetSchema schema = RealSessionTests.Schema();
+
+        // Rows of MinimapIcons, found by their Id strings. The addresses are frozen because a
+        // recording is a frozen process.
+        (ulong At, string Id)[] rows =
+        [
+            (0x38F4_0294166UL, "Waypoint"),
+            (0x38F4_0295842UL, "MapDevice"),
+            (0x38F4_0295900UL, "StashPlayer"),
+        ];
+
+        long rowSize = schema.Structs["MinimapIconRow"].Constants.TryGetValue("RowSize", out long declared)
+            ? declared
+            : 0x26;
+
+        foreach ((ulong at, string id) in rows)
+        {
+            Assert.Equal(id, replay.ReadUnicodeString(replay.ReadPointer(at)));
+
+            // ...and they lie on that table's row grid, which is what says they are rows of ONE
+            // table rather than three unrelated strings: 159 and 154 rows apart.
+            Assert.Equal(0UL, (at - rows[0].At) % (ulong)rowSize);
+        }
+
+        var tables = new LoadedDatTables(replay, schema);
+        foreach (LoadedDatTable table in tables.Read(replay.ResolvedStatics["FileRoot"]))
+        {
+            ulong end = table.Facts.RowsBegin + (ulong)(table.Facts.Rows * table.Facts.RowSize);
+            foreach ((ulong at, string id) in rows)
+            {
+                Assert.False(
+                    at >= table.Facts.RowsBegin && at < end,
+                    $"{id} at 0x{at:X} is inside {table.Facts.Name} - the walk does reach it after all");
+            }
         }
     }
 
