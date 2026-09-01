@@ -51,12 +51,18 @@ public sealed class KeywordGlossary
     /// Longest popup text.
     /// </summary>
     /// <remarks>
-    /// WAS 512 AND SILENTLY CUT 56 ROWS. A raw UTF-16 pointer carries no length, so this cap is
-    /// the only thing that ends the read - and a definition longer than it comes back truncated
-    /// rather than refused. The live table has 56 definitions of exactly 512 characters, which
-    /// is what a cap looks like from the inside; Critical's own text ends mid-word at
-    /// "would result in a final Criti". The real maximum is still unmeasured, because the run
-    /// that recorded the fixture was the one doing the truncating.
+    /// WAS 512 AND SILENTLY CUT 55 ROWS, and the cut was not cosmetic: a truncated definition
+    /// loses whatever markup its tail carried, so the table appeared to refer to 317 keywords
+    /// when it refers to 328. A raw UTF-16 pointer carries no length, so this cap is the only
+    /// thing that ends the read, and a definition longer than it comes back short rather than
+    /// refused.
+    ///
+    /// NOW MEASURED RATHER THAN GUESSED, which is the whole reason the number moved twice. A
+    /// second capture at 2048 (the committed fixture) reads every definition whole: the longest
+    /// is Flammability at 1429 characters, ending on its own full stop, and NOT ONE comes back
+    /// at the cap. So this is 619 characters of headroom over the real maximum rather than a
+    /// hopeful round number - and GlossaryTableTests fails the moment a patch writes a longer
+    /// one, instead of quietly shortening it.
     /// </remarks>
     private const int LongestDefinition = 2048;
 
@@ -167,11 +173,11 @@ public sealed class KeywordGlossary
     /// </summary>
     /// <remarks>
     /// ONE RULE, and it is measured against the whole table rather than a handful of rows:
-    /// "[Key|Text]" draws as Text, and "[Key]" draws as Key. Both forms are real - 595 of the
-    /// 1026 definitions carry markup, and 859 of the brackets in them have no pipe at all
-    /// ("[Armour]", "[Bleeding]") - and both name a ROW of this same table: of the 317 distinct
-    /// keys referenced, 313 are Ids in it. The pipe form is the same row said twice, the key and
-    /// the words for it, which is why rendering needs no lookup.
+    /// "[Key|Text]" draws as Text, and "[Key]" draws as Key. Both forms are real - 596 of the
+    /// 1026 definitions carry markup, holding 2096 brackets between them, and 913 of those have
+    /// no pipe at all ("[Armour]", "[Bleeding]") - and both name a ROW of this same table: of
+    /// the 328 distinct keys referenced, 324 are Ids in it. The pipe form is the same row said
+    /// twice, the key and the words for it, which is why rendering needs no lookup.
     ///
     /// THERE IS NO PERCENT RULE, and there was one here until the live table said otherwise.
     /// The dissector showed "+100%%" and "by 20%%", so this collapsed a doubled percent - but
@@ -200,7 +206,7 @@ public sealed class KeywordGlossary
 
         if (!text.Contains('[', StringComparison.Ordinal))
         {
-            return text;   // 431 of the 1026 definitions, and they should not be copied
+            return text;   // 430 of the 1026 definitions, and they should not be copied
         }
 
         var built = new StringBuilder(text.Length);
@@ -236,7 +242,7 @@ public sealed class KeywordGlossary
     /// glossary is not keyed on it. This is what turns a rendered line into the set of popups
     /// it can offer.
     ///
-    /// EXPECT A KEY THAT IS NOT THERE. Four of the 317 keys the live table refers to name no
+    /// EXPECT A KEY THAT IS NOT THERE. Four of the 328 keys the live table refers to name no
     /// row in it - Breach, DNT, DNT-UNUSED and passive_keystone_mind_over_matter, two of which
     /// are plainly the game's own do-not-translate placeholders. A caller offering popups has to
     /// cope with a miss; it is the game's data, not a failed read.
