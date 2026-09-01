@@ -2184,25 +2184,65 @@ arithmetic had been confirmed on **three** tables — by harvesting rows out of 
 checking their stride by hand. A loaded table reports its **own** row size, so one walk asks all
 of them at once, and `--tables` prints the answers.
 
-Over the 131 tables in that capture: 126 are in dat-schema, and **123 of them report exactly what
-the widths compute**, from `ModFamily`'s 8 bytes to `Mods`' 677. A width that is wrong for a
-common type could not survive that — one byte off on `bool` would move about ninety of these.
+Over those captures: **all 134 tables report exactly what the widths compute**, from
+`ModFamily`'s 8 bytes to `Mods`' 677. A width that is wrong for a common type could not survive
+that — one byte off on `bool` would move about ninety of these.
 
-The three that disagree are not the width table's fault, and the direction is the evidence:
-`EndgameMaps` computes 0xEF against the game's 0xF0, `AlternateTreeVersions` 0x1A against 0x26,
-`Mods` 0x285 against 0x2A5. All three have the **game bigger**, which is what a community schema
-that has not caught up with a patch looks like; five more loaded tables aren't in dat-schema at
-all. So don't compute an offset in those three from the column list — everything before the first
-missing column is right and everything after it is not, and a row size can't say where the break
-is. `Mods` is the one to watch: 16,679 rows, and it is what item modifiers hang off.
+**It first read 123 of 126, and both gaps were in the asking, not in the game.** This document
+said "three tables disagree, all with the game bigger, which is what a reference lagging a patch
+looks like" and "five tables aren't in dat-schema at all". Neither was true.
 
-**And an open question, stated as one.** The walk found 131 tables, and the four this project
-already reads rows from — `WorldAreas`, `MinimapIcons`, `NPCs`, `ItemVisualIdentity` — were not
-among them. Whether their records are absent from the file table or present with nothing at
-`RowStorePtr` cannot be answered from a recording, because the cheap walk reads a record's name
-only *after* the structural checks pass, so a record that fails leaves nothing to identify it by.
-That is what `--tables` names the refused `.dat` files for. Until someone runs it, read "131" as
-131 and not as "all of them".
+- **The interval rule.** An interval column is two values, so it costs twice its type — and
+  `Mods.Stat1Value…Stat8Value` are a modifier's minimum and maximum roll. Eight of them at +4 is
+  the 32 bytes `Mods` was short; `AlternateTreeVersions`' three are its 12. A hypothesis that
+  explains the *sign* of every discrepancy is not thereby right: "the reference is behind" and
+  "our arithmetic is incomplete" both make the game bigger, and only one was testable from here.
+- **Capitalisation.** The game's path and dat-schema's table name disagree on case, so an
+  exact-match lookup reports a table as *unknown* rather than as different: the game loads
+  `AtlasPassiveSkillSubtrees`, the schema says `AtlasPassiveSkillSubTrees`, and likewise
+  `MTXTypes`/`MtxTypes`. All five "missing" tables agree on their row size to the byte once
+  matched case-insensitively.
+
+Nothing shipped was ever wrong — none of the seven tables this project computes offsets in has an
+interval column, so the bug was in the checking. `dat-offsets.ps1` now doubles interval columns.
+
+- **A missing trailing column.** `EndgameMaps` computed 0xEF where the game says 0xF0, with no
+  interval column in it — and a third source settles it: repoe-fork/dat-export's *heuristic*
+  PoE2 schema, derived from the data itself, lists 28 columns to poe-tool-dev's 27, the extra
+  being a `bool` at the very end, and totals 0xF0 to the byte.
+
+**134 of 134 explained**, with nothing left attributed to "the reference is behind" that wasn't
+then found in a reference. Three sources, and they disagree, so it's worth knowing what each is
+for: poe-tool-dev/dat-schema is what `dat-offsets.ps1` downloads — one file, every table, and it
+agreed with the game on 133 of 134; repoe-fork/dat-export publishes a schema derived from the
+data, which is why it caught a column nobody had named — check it when a table disagrees with the
+game; jchantrell/dat-schema was the least complete of the three here. **The game is the arbiter**:
+it reports its own row size, and `--tables` prints it.
+
+**And the route's limit, which is a fraction rather than a fact about any one table.** The walk
+found 134 tables among 6,914 files, and **157 of those records are `.dat` files at all — against
+about 1,020 PoE2 tables** in the community schemas. Fifteen per cent.
+
+So a table being absent is the ordinary case. `WorldAreas`, `MinimapIcons`, `NPCs` and
+`ItemVisualIdentity` — the four this project reads rows from — are in none of the 6,913 record
+names `--tables` reads, in any spelling, while `Stats`, `Mods`, `BaseItemTypes` and `QuestFlags`
+happen to be there. That was first written up here as a *pattern*, which it isn't: at 15%
+coverage, four named tables all missing is a coin flip.
+
+**Two things could produce that fraction, and nothing here can tell them apart.** The table may
+genuinely track only what the resource loader pulls in — it is mostly art, 1,219 `.tok` and 903
+`.ao` to its 157 `.dat` — or our walk may be seeing a slice of it. `BucketCount` is `0x10`
+**because GameHelper2 says so, and GameHelper2 is a PoE1 tool**; nothing here has ever checked it
+against Path of Exile 2, and if the real count is larger then every walk of this table has been
+partial and every absence only means we didn't look. No recording can settle it: not one fixture
+holds a single byte past the last bucket, because nothing has ever read there. So
+`PreloadReader.BucketsBeyondTheCount` probes the slots past the end and `--tables` prints whether
+any looks like a bucket. Until that runs, don't plan on finding a particular table this way — the
+row-pointer route through a component is the only route to one the walk doesn't turn up.
+
+And being on it is not being parsed: 23 of those 157 have nothing usable at `RowStorePtr`,
+`GrantedEffectsPerLevel` and `Languages` among them. A table can be present and rowless, which
+is why `Survey` reports the two states separately.
 
 ### Prices — what the stash is worth
 

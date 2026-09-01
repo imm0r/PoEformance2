@@ -55,6 +55,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# One file with every table, which is why it is the default. It is not the only column list and
+# it is not always the most complete: measured against 134 loaded tables it agreed with the game
+# on 133, and the one it missed - EndgameMaps, short by a trailing bool - is right in
+# repoe-fork/dat-export's heuristic PoE2 schema, which is derived from the data itself
+# (current/poe2/heuristics/schema/graphql/<Table>.gql). Check that one when a table disagrees
+# with the row size the game reports; PoEformance.App --tables prints those.
 $SchemaUrl = 'https://github.com/poe-tool-dev/dat-schema/releases/download/latest/schema.min.json'
 $RepoRoot = Split-Path $PSScriptRoot -Parent
 
@@ -128,12 +134,28 @@ function Get-Schema {
     return Get-Content $cache -Raw | ConvertFrom-Json
 }
 
+# AN INTERVAL COLUMN IS TWO VALUES, so it costs twice its type. The schema marks it with a flag
+# rather than a type, which is exactly how this was missed for as long as it was: the column
+# reads i32 and prices as 4, and the row comes out short by 4 for every one of them.
+# CAUGHT BY THE GAME, 2026-09. Walking the loaded-file table asks 129 tables their own row size,
+# and three disagreed with this script - Mods by 32, AlternateTreeVersions by 12, EndgameMaps by
+# 1. The first two are exactly their interval columns: Mods has eight (Stat1Value..Stat8Value,
+# which are a modifier's min and max roll, so of course they are pairs) and 8 * 4 = 32;
+# AlternateTreeVersions has three, and 3 * 4 = 12. Doubling them takes the agreement from 126 to
+# 128 of 129. It was read as dat-schema lagging the game, which it was not.
 function Get-ColumnWidth($column) {
-    if ($column.array -or $column.type -eq 'array') { return $ArrayWidth }
-    if (-not $Widths.ContainsKey($column.type)) {
+    $width = if ($column.array -or $column.type -eq 'array') {
+        $ArrayWidth
+    }
+    elseif ($Widths.ContainsKey($column.type)) {
+        $Widths[$column.type]
+    }
+    else {
         throw "Unknown column type '$($column.type)' - the schema gained a type this script does not price."
     }
-    return $Widths[$column.type]
+
+    if ($column.interval) { return $width * 2 }
+    return $width
 }
 
 # Returns the columns of one PoE2 table, each with the offset it lands on in memory.

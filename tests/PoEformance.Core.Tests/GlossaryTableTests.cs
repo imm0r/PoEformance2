@@ -112,12 +112,12 @@ public class GlossaryTableTests
             Assert.Equal(schema.Structs[row].Constants["RowSize"], loaded.Facts.RowSize);
         }
 
-        // AND THE FOUR THIS PROJECT READS ROWS FROM ARE NOT HERE, which is the open question
-        // rather than a bug: the walk found 131 tables and none of them is WorldAreas,
-        // MinimapIcons, NPCs or ItemVisualIdentity, and no recording can say whether their
-        // records are absent or merely unparsed - a record that fails the checks never has its
-        // name read. IF THIS EVER FAILS, the question has been answered: a capture found one of
-        // them, and the note on DatTable in the schema wants updating rather than this test.
+        // AND THE FOUR THIS PROJECT READS ROWS FROM ARE NOT HERE. That was an open question when
+        // this test was written and is now settled: their records are not in the loaded-file
+        // table at all, so the route cannot reach them however it is walked. The proof needs a
+        // capture that names every record rather than only the tables - see
+        // DatTableSurveyTests, which is where that finding lives. This stays as the cheap
+        // restatement of it on the capture the glossary uses.
         foreach (string missing in (string[])["WorldAreas", "MinimapIcons", "NPCs", "ItemVisualIdentity"])
         {
             Assert.Empty(tables.FindAll(missing));

@@ -96,17 +96,25 @@ public sealed class LoadedDatTables
     /// The same walk, and the .dat files it did NOT accept as tables.
     /// </summary>
     /// <remarks>
-    /// THE QUESTION THIS EXISTS TO ANSWER. One walk of a live client found 131 tables among 6908
-    /// files, and the four tables this project already reads rows from - WorldAreas,
-    /// MinimapIcons, NPCs, ItemVisualIdentity - were not among them. Whether their records are
-    /// absent from the file table or present with nothing at RowStorePtr cannot be told from
-    /// <see cref="Read"/>, because it reads a record's NAME only after the structural checks
-    /// pass: a record that fails them leaves nothing behind to identify it by.
+    /// THE QUESTION THIS EXISTED TO ANSWER, AND THE ANSWER. A walk of a live client found 131
+    /// tables and none of them was WorldAreas, MinimapIcons, NPCs or ItemVisualIdentity - the
+    /// four this project already reads rows from - and <see cref="Read"/> could not say why,
+    /// because it reads a record's NAME only after the structural checks pass: a record that
+    /// fails them leaves nothing behind to identify it by.
     ///
-    /// So this reads the name of every record that failed, and reports the ones that call
-    /// themselves .dat files. That costs a string read per record rather than per table - the
-    /// difference between a few hundred reads and several thousand - which is why it is a
-    /// separate call and not what <see cref="Read"/> does.
+    /// So this reads the name of every record that failed. Run against the game it settled two
+    /// things (session-2026-09-tables.rec, DatTableSurveyTests). Those four are in none of the
+    /// 6913 names it read, in any spelling - so within the sixteen buckets this walk covers they
+    /// are simply not there, and the row-pointer route through a component stays the only known
+    /// way to them. Sixteen is itself a ported constant nothing has checked, which is why that
+    /// sentence says "within" rather than "at all"; see PreloadReader.BucketsBeyondTheCount. And
+    /// 23 records DO call themselves .dat files while having nothing usable at RowStorePtr,
+    /// GrantedEffectsPerLevel and Languages among them - so being in the table and being parsed
+    /// into rows really are two states, and that is what this reports separately.
+    ///
+    /// It costs a string read per record rather than per table - the difference between a few
+    /// hundred reads and several thousand - which is why it is a separate call and not what
+    /// <see cref="Read"/> does.
     /// </remarks>
     public DatTableSurvey Survey(ulong fileRootStatic) => Walk(fileRootStatic, nameTheRest: true);
 
