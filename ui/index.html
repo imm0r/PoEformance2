@@ -232,6 +232,35 @@
       </div>
 
       <!--
+        Damaging ground. Two switches rather than one because they cost different things: the
+        first only changes the direction of a roll that was going to happen anyway, and the
+        second presses the key in a situation where the tool used to do nothing at all.
+      -->
+      <div class="cfg-row">
+        <label><input type="checkbox" id="ev-avoid-ground"> Never dodge into damaging ground</label>
+      </div>
+      <p class="dim">Free: the roll was already happening, this only stops it landing in fire.
+        Ground the game marks as <em>helpful</em> — Consecration, an oasis — is left out, so it
+        will not roll you off something good.</p>
+
+      <div class="cfg-row">
+        <label><input type="checkbox" id="ev-escape-ground"> Roll out when I am standing in it</label>
+      </div>
+      <p class="dim">This one presses the dodge key with <em>no monster winding up</em> — the
+        danger is already underfoot and will not announce itself. It needs "press the dodge key"
+        above to be on, and it leans hardest on the radius below being right.</p>
+
+      <div class="cfg-row">
+        <label for="ev-ground-radius">Assume a patch reaches</label>
+        <input type="number" id="ev-ground-radius" min="2" max="500" step="1">
+        <span class="dim">world units</span>
+      </div>
+      <p class="dim"><strong>This is a guess.</strong> Nothing found in the game's memory has been
+        shown to carry the size of a ground effect. It is the same number the overlay's ring uses,
+        so what you see is what the steering is reasoning about — if the ring looks too small for
+        the fire it is drawn on, this is too small too.</p>
+
+      <!--
         Steering. Its own switch on top of "press the dodge key", because the two hand the tool
         different amounts: pressing leaves the direction entirely with the player, while this
         takes the movement keys over for the length of a roll. Left off, the feature is the one

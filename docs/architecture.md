@@ -934,6 +934,46 @@ The label leads with the game's own sentence, because no amount of reverse engin
 produce a better one than the game was already going to show. Helpful ground is dimmed rather than
 hidden — a screen where everything is equally red is a screen nobody reads.
 
+#### Damaging ground feeds the dodge
+
+The evasion planner scores eight directions by the **worst** distance to any danger and rolls only
+when one beats standing still. Ground joins that scoring rather than getting a mechanism of its own,
+and the join is one line of arithmetic: a patch contributes `distance − radius`, so **inside it
+scores below zero**.
+
+That is what makes "roll out of the fire" need no special case. A threat is a line and nothing is
+ever *inside* one, so distance alone would rate the middle of a burning patch the same as its rim.
+With the radius taken off, standing in one is strictly worse than standing anywhere outside it —
+which is exactly the ordering `Escape.Best` already knew how to act on.
+
+**Two switches, because they cost different things.**
+
+| | default | what it does |
+|---|---|---|
+| *Never dodge into damaging ground* | **on** | only changes the direction of a roll that was already happening |
+| *Roll out when I am standing in it* | **off** | presses the key with **no monster winding up** |
+
+The first is free — nobody wants the tool to dodge *into* fire. The second is a new trigger in a
+situation where the tool used to do nothing, so it is the user's call, and it still needs the act
+gate on: pressing a key is that gate's business whatever prompted it. Its *rarity* floor is not
+consulted, because a patch of fire has no rarity.
+
+**Helpful ground is excluded, and that is the payoff of classifying the table.** Six of the 53 rows
+grant something; rolling off a Consecration would be the tool actively making things worse.
+Uncertainty goes the other way: an unclear row, or one no table can name, counts as harmful, because
+leaving a neutral patch costs a roll charge and staying in a burning one costs life.
+
+**Not filtered on `IsFriendly`**, deliberately — across both committed captures **not one** ground
+effect carries that flag. Filtering on it would look like protection against rolling away from your
+own ground and provide none.
+
+**The radius is the guess this rests on**, and it is the same 20 world units the overlay's ring
+draws, so what somebody sees is what the steering is reasoning about.
+
+**The tests are synthetic, and the reason is measured**: the closest a ground effect ever comes to
+the player is 38 world units in one capture and 44 in the other, so **nobody ever stands in one** in
+the recorded material. A replay cannot exercise the case this exists for.
+
 #### The size of a ground effect is still unknown
 
 `+0x38` was the candidate and it is dead. Reading the **raw bytes** rather than the filtered value —

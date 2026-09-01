@@ -14,6 +14,16 @@ public readonly record struct EscapeOption(int Index, float X, float Y);
 /// </param>
 public readonly record struct EscapeChoice(int Index, float X, float Y, double Safety);
 
+/// <summary>A patch of ground worth not standing in, as a circle.</summary>
+/// <param name="Radius">
+/// How far the patch reaches, in world units. A SETTING, not a measurement - nothing found in
+/// memory has been shown to carry the size of a ground effect, and GroundEffect+0x38 was the
+/// candidate until it turned out to read one constant in one capture and 1.6 billion in another.
+/// So this is what the user typed, and every distance below inherits that uncertainty.
+/// </param>
+/// <param name="Name">What it is, so a status line can say what it rolled away from.</param>
+public readonly record struct GroundHazard(float X, float Y, float Radius, string Name);
+
 /// <summary>
 /// Picks which way to roll out of what is coming.
 /// </summary>
@@ -201,16 +211,34 @@ public static class Escape
         float playerY,
         double rollDistance,
         double atLeast = 1.0)
+        => Best(threats, [], options, playerX, playerY, rollDistance, atLeast);
+
+    /// <summary>
+    /// The safest direction, counting incoming attacks AND the ground already burning.
+    /// </summary>
+    /// <param name="ground">
+    /// Patches worth not being in. Unlike <paramref name="threats"/>, these need no gate: a patch
+    /// of fire is dangerous to stand in whoever left it, and there is no rarity to admit.
+    /// </param>
+    public static EscapeChoice? Best(
+        IReadOnlyList<Threat> threats,
+        IReadOnlyList<GroundHazard> ground,
+        IReadOnlyList<EscapeOption> options,
+        float playerX,
+        float playerY,
+        double rollDistance,
+        double atLeast = 1.0)
     {
         ArgumentNullException.ThrowIfNull(threats);
+        ArgumentNullException.ThrowIfNull(ground);
         ArgumentNullException.ThrowIfNull(options);
 
-        if (threats.Count == 0 || options.Count == 0)
+        if ((threats.Count == 0 && ground.Count == 0) || options.Count == 0)
         {
             return null;
         }
 
-        double standingStill = Worst(threats, playerX, playerY, rollDistance);
+        double standingStill = Worst(threats, ground, playerX, playerY, rollDistance);
 
         EscapeChoice? best = null;
         foreach (EscapeOption option in options)
@@ -228,7 +256,7 @@ public static class Escape
 
             // THE WORST case over every threat, not the sum: a direction that escapes one attack
             // by rolling into another is not an escape, and averaging would let it look like one.
-            double safety = Worst(threats, x, y, rollDistance);
+            double safety = Worst(threats, ground, x, y, rollDistance);
             if (best is null || safety > best.Value.Safety)
             {
                 best = new EscapeChoice(option.Index, option.X, option.Y, safety);
@@ -241,16 +269,58 @@ public static class Escape
         return best is { } choice && choice.Safety >= standingStill + atLeast ? choice : null;
     }
 
+    /// <summary>
+    /// How far a point sits from one patch of ground - NEGATIVE inside it.
+    /// </summary>
+    /// <remarks>
+    /// SUBTRACTING THE RADIUS IS THE WHOLE TRICK, and it is what lets ground join the same
+    /// scoring as an incoming attack without a second mechanism. A threat's score is a raw
+    /// distance to a line: bigger is safer, and nothing is ever "inside" it. Ground has an edge,
+    /// so distance alone would score the middle of a burning patch the same as its rim.
+    ///
+    /// With the radius taken off, a spot inside the patch scores below zero. That makes standing
+    /// in one strictly worse than standing anywhere outside it, which is exactly the ordering the
+    /// direction chooser already knows how to act on - so "roll out of the fire" needs no special
+    /// case, it falls out of picking the best of eight directions.
+    /// </remarks>
+    public static double SafetyFrom(GroundHazard ground, double x, double y)
+    {
+        double dx = x - ground.X, dy = y - ground.Y;
+        return Math.Sqrt((dx * dx) + (dy * dy)) - ground.Radius;
+    }
+
     /// <summary>Distance to the nearest of several threats, each taken as its extended line.</summary>
     public static double Worst(
         IReadOnlyList<Threat> threats, double x, double y, double rollDistance)
+        => Worst(threats, [], x, y, rollDistance);
+
+    /// <summary>
+    /// Distance to the nearest danger of either kind - the lines, and the ground.
+    /// </summary>
+    /// <remarks>
+    /// THE WORST OF BOTH, for the reason the threats alone were already taking the worst of each
+    /// other: a direction that escapes a slam by landing in burning ground is not an escape, and
+    /// anything but a minimum would let it score like one.
+    /// </remarks>
+    public static double Worst(
+        IReadOnlyList<Threat> threats,
+        IReadOnlyList<GroundHazard> ground,
+        double x,
+        double y,
+        double rollDistance)
     {
         ArgumentNullException.ThrowIfNull(threats);
+        ArgumentNullException.ThrowIfNull(ground);
 
         double worst = double.MaxValue;
         foreach (Threat threat in threats)
         {
             worst = Math.Min(worst, SafetyFrom(threat, x, y, rollDistance));
+        }
+
+        foreach (GroundHazard patch in ground)
+        {
+            worst = Math.Min(worst, SafetyFrom(patch, x, y));
         }
 
         return worst == double.MaxValue ? 0 : worst;

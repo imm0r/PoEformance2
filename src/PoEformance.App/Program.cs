@@ -1609,6 +1609,12 @@ internal static class Program
                 installed, FindDataFile("ground-tables.json"), FindDataFile("ground-effect-types.json"));
         Console.WriteLine($"ground   {groundTypes.Why}");
 
+        // The evasion planner needs the same table, for a different question: the tracker asks it
+        // what to WRITE beside a ring, and the planner asks it which patches are worth rolling out
+        // of. Without it every ground effect counts as harmful - the safe direction, and wrong for
+        // the six rows that grant something.
+        evasionPlanner.GroundTypes = groundTypes;
+
         handle.Stage = "loading item names";
 
         // HELD RATHER THAN BUILT INLINE, because the stash is no longer the only reader: the

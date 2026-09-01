@@ -144,6 +144,17 @@ public sealed class EvasionPlanner
     /// <summary>The last tick's outcome, for the overlay's status line.</summary>
     public EvasionTick LastTick { get; private set; } = EvasionTick.Idle;
 
+    /// <summary>
+    /// The game's own table of ground-effect kinds, which is how HARMFUL is known.
+    /// </summary>
+    /// <remarks>
+    /// Set once at startup, never from a setting - it is a table read out of the install, not a
+    /// preference. Null is survivable and the status line says so: without it every ground effect
+    /// counts as harmful, which is the safe direction and also the wrong one for the six rows
+    /// that grant something. A Consecration nobody can identify becomes a patch to roll out of.
+    /// </remarks>
+    public GroundEffectTypeTable? GroundTypes { get; set; }
+
     /// <summary>Swaps in a new configuration while running.</summary>
     /// <remarks>
     /// Does NOT clear the dodge cooldown, on the same argument the flask engine makes: otherwise
@@ -256,16 +267,38 @@ public sealed class EvasionPlanner
 
         List<Threat> draw = [.. seen.Where(t => warn.Admits(t.Rarity, t.Path))];
 
-        if (aimedForAct == 0)
+        // The ground, which needs no gate: a patch of fire is dangerous to stand in whoever left
+        // it, and there is no rarity to admit. Collected before the aimed check because standing
+        // in one is a reason to move even when nothing is winding up.
+        List<GroundHazard> ground = settings.UsesGround ? Burning(world, settings) : [];
+        GroundHazard? standingIn = null;
+        foreach (GroundHazard patch in ground)
         {
-            return new EvasionTick(draw, false, Describe(draw, act.Enabled));
+            if (Escape.SafetyFrom(patch, player.WorldX, player.WorldY) <= 0)
+            {
+                standingIn = patch;
+                break;
+            }
         }
+
+        // A SECOND REASON TO ROLL, and the only one in this planner that is not about an incoming
+        // action: the danger is already underneath the character and will not announce itself.
+        bool escaping = settings.EscapeGroundEffects && standingIn is not null;
+
+        if (aimedForAct == 0 && !escaping)
+        {
+            return new EvasionTick(draw, false, Describe(draw, act.Enabled, ground.Count));
+        }
+
+        string why = escaping && aimedForAct == 0
+            ? $"standing in {standingIn!.Value.Name}"
+            : $"{aimedForAct} aimed at you";
 
         // Everything below decides whether to PRESS, and each gate is a reason of its own so the
         // status line can say which one stopped it.
         if (!act.Enabled)
         {
-            return new EvasionTick(draw, false, $"{aimedForAct} aimed at you (acting is off)");
+            return new EvasionTick(draw, false, $"{why} (acting is off)");
         }
 
         // Armed with no key to press. Its own reason because it is the one misconfiguration that
@@ -274,7 +307,7 @@ public sealed class EvasionPlanner
         // the game - see DodgeKeyHints for why - so an empty setting is the ordinary first state.
         if (settings.DodgeKey == 0)
         {
-            return new EvasionTick(draw, false, $"{aimedForAct} aimed at you, but no dodge key is set");
+            return new EvasionTick(draw, false, $"{why}, but no dodge key is set");
         }
 
         if (!gameFocused)
@@ -284,7 +317,7 @@ public sealed class EvasionPlanner
 
         if (_lastDodge is long last && nowMs - last < settings.CooldownMs)
         {
-            return new EvasionTick(draw, false, $"{aimedForAct} aimed at you, dodge cooling down");
+            return new EvasionTick(draw, false, $"{why}, dodge cooling down");
         }
 
         // WHICH WAY, decided last and before the cooldown is spent - a tick that ends up not
@@ -304,7 +337,7 @@ public sealed class EvasionPlanner
                 how = " (unsteered: the camera cannot say which way is which)";
             }
             else if (Escape.Best(
-                         seen, Escape.Options(basis), player.WorldX, player.WorldY,
+                         seen, ground, Escape.Options(basis), player.WorldX, player.WorldY,
                          settings.RollDistance) is not EscapeChoice choice)
             {
                 // Nowhere on offer is better than standing still: every direction lands in
@@ -313,7 +346,7 @@ public sealed class EvasionPlanner
                 // on the way - so it does not, and says so. The cooldown is left alone rather
                 // than cleared: nothing was spent, and it is already past by this line.
                 return new EvasionTick(
-                    draw, false, $"{aimedForAct} aimed at you, but no direction is any safer");
+                    draw, false, $"{why}, but no direction is any safer");
             }
             else
             {
@@ -324,19 +357,75 @@ public sealed class EvasionPlanner
 
         _lastDodge = nowMs;
         return new EvasionTick(
-            draw, true, $"dodging{how}: {aimedForAct} action(s) aimed at you", steer);
+            draw, true, $"dodging{how}: {why}", steer);
+    }
+
+    /// <summary>
+    /// Every patch of harmful ground in the area, as circles to stay out of.
+    /// </summary>
+    /// <remarks>
+    /// HELPFUL GROUND IS LEFT OUT, which is the whole payoff of classifying the table: six of its
+    /// 53 rows grant something, and rolling away from a Consecration would be the tool actively
+    /// making things worse.
+    ///
+    /// UNCLEAR COUNTS AS HARMFUL, and so does a row no table could name. The two mistakes are not
+    /// symmetric - leaving a neutral patch costs a roll charge, staying in a burning one costs
+    /// life - so uncertainty resolves towards moving.
+    ///
+    /// REMEMBERED SIGHTINGS ARE REFUSED. A remembered ground effect is one the game stopped
+    /// listing, which for ground means it burned out; steering around it would be steering around
+    /// nothing, and worse, it would keep doing so after the danger had gone.
+    ///
+    /// NOT FILTERED ON IsFriendly, deliberately, because that flag says nothing here: across both
+    /// committed captures not one ground effect is marked friendly. Filtering on it would look
+    /// like protection against rolling away from your own ground and provide none.
+    /// </remarks>
+    private List<GroundHazard> Burning(WorldSnapshot world, EvasionSettings settings)
+    {
+        var found = new List<GroundHazard>();
+        foreach (WorldEntity entity in world.Entities)
+        {
+            if (!entity.IsGroundEffect || entity.IsRemembered)
+            {
+                continue;
+            }
+
+            GroundEffectType? kind = GroundTypes?.Find(entity.GroundType);
+            if (kind is { Harm: GroundHarm.Helpful })
+            {
+                continue;
+            }
+
+            found.Add(new GroundHazard(
+                entity.WorldX, entity.WorldY, settings.GroundRadius,
+                kind is null ? "unidentified ground" : kind.Caption));
+
+            if (found.Count >= MostThreats)
+            {
+                break;
+            }
+        }
+
+        return found;
     }
 
     /// <summary>The idle readout, so "nothing happened" is legible.</summary>
-    private static string Describe(IReadOnlyList<Threat> draw, bool acting)
+    private static string Describe(IReadOnlyList<Threat> draw, bool acting, int ground)
     {
+        // The ground count rides along on every line: a person who switched this on wants to know
+        // it is SEEING patches, and "watching (nothing incoming)" on a screen full of fire is the
+        // shape of readout that sends somebody hunting for a bug that is not there.
+        string patches = ground > 0 ? $", {ground} patch(es) of ground" : string.Empty;
+
         if (draw.Count == 0)
         {
-            return acting ? "watching (nothing incoming)" : "watching (nothing incoming, acting is off)";
+            return (acting ? "watching (nothing incoming)" : "watching (nothing incoming, acting is off)")
+                + patches;
         }
 
         Threat nearest = draw[0];
-        return $"watching {draw.Count} action(s), nearest {nearest.Name} at {nearest.DistanceToPlayer:F0} units";
+        return $"watching {draw.Count} action(s), nearest {nearest.Name} "
+            + $"at {nearest.DistanceToPlayer:F0} units{patches}";
     }
 
     private static float Distance(float ax, float ay, float bx, float by)
