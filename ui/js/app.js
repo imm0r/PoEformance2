@@ -319,6 +319,12 @@ function renderEvasion(ev) {
   $("ev-move-right").value = keys.right ?? 0x44;
   $("ev-roll").value = ev.settings.rollDistance ?? 400;
   $("ev-hold").value = ev.settings.steerHoldMs ?? 60;
+
+  // Damaging ground. Avoiding defaults ON and escaping OFF, matching the host - a page that
+  // showed them the other way round would have somebody switch off a thing that was never on.
+  $("ev-avoid-ground").checked = ev.settings.avoidGroundEffects !== false;
+  $("ev-escape-ground").checked = !!ev.settings.escapeGroundEffects;
+  $("ev-ground-radius").value = ev.settings.groundRadius ?? 20;
 }
 
 // A comma-separated field to the list the host wants. Empty means "no filter", which is not
@@ -364,6 +370,9 @@ function sendEvasion() {
       // for a field that is empty or unparseable, and Number("") is 0 - so it has to be tested
       // for emptiness rather than for falsiness.
       steerHoldMs: $("ev-hold").value === "" ? 60 : Number($("ev-hold").value),
+      avoidGroundEffects: $("ev-avoid-ground").checked,
+      escapeGroundEffects: $("ev-escape-ground").checked,
+      groundRadius: Number($("ev-ground-radius").value) || 20,
       keys: {
         up: Number($("ev-move-up").value) || 0,
         left: Number($("ev-move-left").value) || 0,
@@ -378,6 +387,7 @@ for (const id of [
   "ev-warn", "ev-act", "ev-warn-rarity", "ev-act-rarity",
   "ev-key", "ev-radius", "ev-cooldown", "ev-quiet", "ev-only", "ev-ignore",
   "ev-steer", "ev-roll", "ev-hold",
+  "ev-avoid-ground", "ev-escape-ground", "ev-ground-radius",
   "ev-move-up", "ev-move-left", "ev-move-down", "ev-move-right",
 ]) {
   // On "change", not "input": every one of these posts to the host, and a number field fires
@@ -690,6 +700,33 @@ if (bridge.connected) {
         { slot: 5, enabled: false, vital: "Life", thresholdPercent: 50, key: "unbound", item: "", charges: "", isCharm: false },
       ],
     },
+    // The evasion block was MISSING here until a browser check went looking for it, and its
+    // absence was invisible: renderEvasion simply never ran, so every control on that card kept
+    // its bare HTML default and sendEvasion returned early because it had no settings to copy.
+    // A preview that silently skips a whole card is worse than no preview of it.
+    evasion: {
+      status: "browser preview",
+      keyName: "Space",
+      keyHints: [],
+      moveHints: [],
+      moveKeyNames: "W A S D",
+      settings: {
+        warn: { enabled: true, fromRarity: "Normal", onlyPaths: [], ignorePaths: [] },
+        act: { enabled: false, fromRarity: "Rare", onlyPaths: [], ignorePaths: [] },
+        dangerRadius: 90,
+        cooldownMs: 1200,
+        dodgeKey: 32,
+        steer: false,
+        rollDistance: 400,
+        steerHoldMs: 60,
+        onlyDangerousAnimations: true,
+        keys: { up: 0x57, left: 0x41, down: 0x53, right: 0x44 },
+        avoidGroundEffects: true,
+        escapeGroundEffects: false,
+        groundRadius: 20,
+      },
+    },
+
     // Hand-written to match the wire, with the same caveat the buff list carries: driving the
     // page in a browser cannot catch a host that spells these differently. The check for that
     // is on the C# side, over the serializer these names only imitate.

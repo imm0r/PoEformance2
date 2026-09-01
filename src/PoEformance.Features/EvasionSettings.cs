@@ -201,7 +201,27 @@ public sealed record EvasionSettings(
     [property: JsonPropertyName("markerRadius")] float MarkerRadius = 14f,
     [property: JsonPropertyName("thickness")] float Thickness = 2f,
     [property: JsonPropertyName("showLine")] bool ShowLine = true,
-    [property: JsonPropertyName("showName")] bool ShowName = false)
+    [property: JsonPropertyName("showName")] bool ShowName = false,
+
+    // ── Damaging ground ──────────────────────────────────────────────────────
+    // Two switches, not one, because they cost completely different things.
+    //
+    // AVOIDING is free: the roll was already going to happen, and this only stops it choosing a
+    // direction that lands in fire. There is no case where somebody wants the tool to dodge INTO
+    // burning ground, so it defaults ON.
+    [property: JsonPropertyName("avoidGroundEffects")] bool AvoidGroundEffects = true,
+
+    // ESCAPING presses the key in a situation where the tool previously did nothing at all -
+    // standing in a patch with no monster winding up - so it is the user's call and defaults OFF.
+    // It is also the half that leans hardest on the radius below being right.
+    [property: JsonPropertyName("escapeGroundEffects")] bool EscapeGroundEffects = false,
+
+    // HOW BIG A PATCH IS ASSUMED TO BE, in world units, and it is a GUESS. Nothing found in the
+    // game's memory has been shown to carry the size of a ground effect: GroundEffect+0x38 was
+    // the candidate until the raw bytes showed it reading one constant in one capture and 1.6
+    // billion in another. The same 20 the tracker's ring uses, so the circle somebody sees is the
+    // circle the steering is reasoning about - if the ring looks too small, this is too small.
+    [property: JsonPropertyName("groundRadius")] float GroundRadius = 20f)
 {
     /// <summary>Off, and drawing for everything / acting on rares once switched on.</summary>
     /// <remarks>
@@ -240,6 +260,14 @@ public sealed record EvasionSettings(
     /// </remarks>
     public bool NeedsActions => WarnOrDefault.Enabled || ActOrDefault.Enabled;
 
+    /// <summary>Whether either half of the ground handling is switched on.</summary>
+    /// <remarks>
+    /// Costs NOTHING in the reader, which is why it is not part of <see cref="NeedsActions"/>:
+    /// the GroundEffect component is already read for the overlay's rings on every tick, so this
+    /// spends only the arithmetic of comparing a few positions.
+    /// </remarks>
+    public bool UsesGround => AvoidGroundEffects || EscapeGroundEffects;
+
     /// <summary>Keeps every value inside what the planner and the overlay can use.</summary>
     public EvasionSettings Normalised() => this with
     {
@@ -265,6 +293,11 @@ public sealed record EvasionSettings(
         Keys = KeysOrDefault.Normalised(),
         MarkerRadius = Math.Clamp(MarkerRadius, 2f, 200f),
         Thickness = Math.Clamp(Thickness, 0.5f, 10f),
+
+        // The floor is above zero on purpose: a radius of zero would make a patch a bare point,
+        // and "standing in it" would then be true only at one exact coordinate - which is a
+        // switch that looks on and never fires. The ceiling is well past any plausible patch.
+        GroundRadius = Math.Clamp(GroundRadius, 2f, 500f),
     };
 }
 
