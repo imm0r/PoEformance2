@@ -10,6 +10,18 @@ namespace PoEformance.Game.Files;
 /// <param name="Facts">What it says about itself: path, name, row count and row size.</param>
 public readonly record struct LoadedDatTable(ulong Address, DatTableFacts Facts);
 
+/// <summary>What one walk of the loaded-file table found.</summary>
+/// <param name="Tables">The records that really are dat tables, with what each says about itself.</param>
+/// <param name="Refused">
+/// Paths of records that call themselves .dat files and did NOT resolve as tables - the list that
+/// says whether a table is missing from the file table or merely unparsed at that moment.
+/// </param>
+/// <param name="Records">How many file records were looked at, for judging the cost.</param>
+public readonly record struct DatTableSurvey(
+    IReadOnlyList<LoadedDatTable> Tables,
+    IReadOnlyList<string> Refused,
+    int Records);
+
 /// <summary>
 /// Every .dat table the game has loaded, reached from a static rather than from luck.
 /// </summary>
@@ -78,6 +90,27 @@ public sealed class LoadedDatTables
     /// </summary>
     /// <param name="fileRootStatic">The FileRoot static's address.</param>
     public IReadOnlyList<LoadedDatTable> Read(ulong fileRootStatic)
+        => Walk(fileRootStatic, nameTheRest: false).Tables;
+
+    /// <summary>
+    /// The same walk, and the .dat files it did NOT accept as tables.
+    /// </summary>
+    /// <remarks>
+    /// THE QUESTION THIS EXISTS TO ANSWER. One walk of a live client found 131 tables among 6908
+    /// files, and the four tables this project already reads rows from - WorldAreas,
+    /// MinimapIcons, NPCs, ItemVisualIdentity - were not among them. Whether their records are
+    /// absent from the file table or present with nothing at RowStorePtr cannot be told from
+    /// <see cref="Read"/>, because it reads a record's NAME only after the structural checks
+    /// pass: a record that fails them leaves nothing behind to identify it by.
+    ///
+    /// So this reads the name of every record that failed, and reports the ones that call
+    /// themselves .dat files. That costs a string read per record rather than per table - the
+    /// difference between a few hundred reads and several thousand - which is why it is a
+    /// separate call and not what <see cref="Read"/> does.
+    /// </remarks>
+    public DatTableSurvey Survey(ulong fileRootStatic) => Walk(fileRootStatic, nameTheRest: true);
+
+    private DatTableSurvey Walk(ulong fileRootStatic, bool nameTheRest)
     {
         LastError = string.Empty;
         RecordsWalked = 0;
@@ -86,16 +119,29 @@ public sealed class LoadedDatTables
         if (_shape is not { } shape)
         {
             LastError = "the schema does not describe dat tables";
-            return Tables;
+            return new DatTableSurvey([], [], 0);
         }
 
         var found = new List<LoadedDatTable>();
+        var refused = new List<string>();
         foreach (ulong record in _files.Records(fileRootStatic))
         {
             RecordsWalked++;
             if (PointerPeek.DescribeTable(_reader, record, shape) is { } facts)
             {
                 found.Add(new LoadedDatTable(record, facts));
+                continue;
+            }
+
+            if (!nameTheRest)
+            {
+                continue;
+            }
+
+            string path = _reader.ReadStdWString(record + (ulong)shape.PathOffset, LongestPath);
+            if (path.EndsWith(".dat", StringComparison.OrdinalIgnoreCase))
+            {
+                refused.Add(path);
             }
         }
 
@@ -111,8 +157,11 @@ public sealed class LoadedDatTables
         }
 
         Tables = found;
-        return Tables;
+        return new DatTableSurvey(found, refused, RecordsWalked);
     }
+
+    /// <summary>Longest path taken seriously. Anything longer is a bad read, not a file.</summary>
+    private const int LongestPath = 256;
 
     /// <summary>
     /// Every loaded table of that name - "KeywordPopups", as dat-schema spells it.
