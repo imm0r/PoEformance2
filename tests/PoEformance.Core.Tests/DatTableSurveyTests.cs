@@ -24,18 +24,19 @@ namespace PoEformance.Core.Tests;
 /// start without - which is why the QuestFlags hunt never once had trouble reading its table. An
 /// earlier version of this comment called the four absences a coin flip at 15% coverage; that was
 /// worse than wrong, because the four PRESENT ones were picked out of the listing after the fact.
-/// What is left is two explanations this repo cannot separate: the table tracks only what the
-/// resource loader pulls in (and then something must explain the split among equals), or the walk
-/// sees a slice of the table (and then there is nothing to explain). See
-/// PreloadReader.BucketsBeyondTheCount.
 ///
-/// SAID PRECISELY, THAT IS "NOT IN THE SIXTEEN BUCKETS WE WALK". BucketCount is 0x10 because
-/// GameHelper2 says so, and GameHelper2 is a PoE1 tool; nothing here has checked it against this
-/// game. If the real count is larger then every walk of this table is a fraction of it and these
-/// absences mean only that we did not look - so the assertions below are about what the walk
-/// covers, which is the thing they can be about. No recording can close that gap: nothing has
-/// ever read past the last bucket, in any fixture. PreloadReader.BucketsBeyondTheCount is the
-/// read that asks, and it needs the game.
+/// TWO EXPLANATIONS STOOD, AND ONE IS NOW OUT. The walk might have been seeing a slice of a
+/// larger table - but PreloadReader.BucketsBeyondTheCount ran against a live client on
+/// 2026-09-01 and found nothing past the last bucket that looks like one, so sixteen is the whole
+/// table and coverage is not why anything is missing. What is left is that the table tracks only
+/// what the resource loader pulls in, and the open question is why four core tables travel
+/// through the loader and four do not.
+///
+/// THE ASSERTIONS BELOW ARE ABOUT WHAT THE WALK COVERS, which for a while was a real caveat:
+/// if BucketCount were too small then every walk of this table would be a fraction of it and
+/// these absences would mean only that we did not look. No recording can close that gap - nothing
+/// has ever read past the last bucket, in any fixture - so it took the game, and the probe came
+/// back clean. What the walk covers IS the table.
 ///
 /// So the file table is not "the dat files the game has". It is the resource system's list (the
 /// schema's hover note puts FileRoot 0xFA08 from the object that turned out to be exactly that),
