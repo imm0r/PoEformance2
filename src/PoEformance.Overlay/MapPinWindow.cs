@@ -76,8 +76,7 @@ public sealed class MapPinWindow
         ImGui.SameLine();
         ImGui.Checkbox("show the columns", ref _columns);
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
-        ImGui.InputTextWithHint("##pin-search", "filter by name", ref _search, 64);
+        OverlayLayout.Search("##pin-search", "filter by name", ref _search, 64);
 
         ImGui.Separator();
 
@@ -113,7 +112,7 @@ public sealed class MapPinWindow
 
                 // A titled rule, like the quest list's acts - the same boundary drawn the
                 // same way, so the two tabs on this page read as one interface.
-                OverlayFonts.SectionTitle(act > 0 ? $"Act {act}" : "no act");
+                OverlayLayout.Group(act > 0 ? $"Act {act}" : "No act");
             }
 
             Row(pin);

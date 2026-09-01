@@ -62,6 +62,58 @@ public sealed class ToolTabs
 
     private readonly List<Page> _pages = [];
 
+    // The pages whose tools are a row of tabs rather than a stack of folds. Ids rather than
+    // Page references, for the reason the hidden set holds ids: a page can be marked before
+    // anything has registered a tool on it.
+    private readonly HashSet<string> _tabbed = [];
+
+    /// <summary>
+    /// Says a page's tools should be TABS across the top rather than folds down the page.
+    /// </summary>
+    /// <remarks>
+    /// WHICH SHAPE FITS DEPENDS ON WHAT THE TOOLS ARE. Folds suit a page whose tools are read
+    /// TOGETHER - the combat page's damage figure, tracker and projectiles are three views of
+    /// one fight, and having two of them open at once is the point. Tabs suit a page whose
+    /// tools merely share a subject: the area page carries a file inspector, a watch list, a
+    /// quest tree and a pin editor, and nobody has ever wanted two of those on screen at the
+    /// same time. Stacked, they were a scroll with four unrelated things down it.
+    ///
+    /// A page rather than a global setting, because both shapes are right somewhere.
+    /// </remarks>
+    public void AsTabs(string page)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(page);
+        _tabbed.Add(page);
+    }
+
+    // What each page draws ABOVE its tools, by page id - see Lead.
+    private readonly Dictionary<string, Action> _leads = [];
+
+    /// <summary>
+    /// Says what a page draws above its tools, whatever shape those take.
+    /// </summary>
+    /// <remarks>
+    /// FOR WHAT BELONGS TO THE PAGE RATHER THAN TO ANY OF ITS TOOLS. The atlas is the case: a
+    /// master switch decides whether the overlay draws at all, and under it sit four tools -
+    /// routing, filters, colours, the ritual line - none of which owns that switch. Put on one of
+    /// the four it is a setting somebody has to remember lives on the "filters" tab; repeated on
+    /// all four it is four checkboxes that must agree. Above them it is what it is.
+    ///
+    /// The same slot answers the other recurring case: a strip of headline figures that the tabs
+    /// beneath it break down. Which is why this is a page's own callback rather than a switch:
+    /// the page decides what a lead is, and it is never the same thing twice.
+    ///
+    /// Kept by page ID rather than against the Page, because a lead can be declared before
+    /// anything has registered a tool - the atlas declares it in the overlay's constructor,
+    /// where the four attach calls have not happened yet and may never.
+    /// </remarks>
+    public void Lead(string page, Action draw)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(page);
+        ArgumentNullException.ThrowIfNull(draw);
+        _leads[page] = draw;
+    }
+
     // The pages somebody took off the bar. A registered tool stays registered - its idle
     // callback keeps running, its jumps keep working - the tab is just not offered, which is
     // what "I never use this one" actually asks for. Ids rather than Page references because
@@ -101,6 +153,17 @@ public sealed class ToolTabs
     /// <summary>Fires when the set of hidden pages changes, so it can be written down.</summary>
     public Action? HiddenChanged { get; set; }
 
+    /// <summary>
+    /// The strip of live facts drawn above the tabs, on every page.
+    /// </summary>
+    /// <remarks>
+    /// A callback rather than the facts themselves, because this class knows nothing about the
+    /// game and should not start: what goes on the strip is whatever the overlay is currently
+    /// reading, and the overlay is the thing holding it. See <see cref="StatusBar"/> for why
+    /// there is a strip at all - and for why the window no longer resizes itself.
+    /// </remarks>
+    public Action? Header { get; set; }
+
     /// <summary>The hidden page ids, sorted so the settings file is stable.</summary>
     public string[] Hidden() => _hidden.Order(StringComparer.Ordinal).ToArray();
 
@@ -121,24 +184,34 @@ public sealed class ToolTabs
         }
     }
 
-    /// <summary>How wide and tall the window opens when a tool is in front.</summary>
+    /// <summary>
+    /// How wide and tall the window opens the FIRST time, and never again.
+    /// </summary>
     /// <remarks>
-    /// Roomy enough for the widest content, which is the dissector. The status page sizes
-    /// itself instead - see <see cref="Render"/>.
+    /// Roomy enough for the widest content, which is the dissector - but it is a starting
+    /// point, not a size the window is held at. See <see cref="Render"/>: the size belongs to
+    /// whoever dragged the corner last.
     /// </remarks>
     private static readonly Vector2 ToolSize = new(940f, 620f);
 
     /// <summary>
-    /// Whether the page in front sizes the window to its content.
+    /// Whether the readout page is in front, which decides only how see-through the window is.
     /// </summary>
     /// <remarks>
-    /// The live readout is a dozen short lines and is meant to sit in the corner during a
-    /// fight, so it auto-resizes as it always did. A tool wants room. Switching between them
-    /// therefore switches the flag, and the frame that leaves the readout has to SAY how big
-    /// to be - a window coming out of auto-resize otherwise keeps the small size it was just
-    /// given, and the dissector opens into a letterbox.
+    /// IT USED TO DECIDE THE SIZE TOO, and that was the window's worst habit. The readout page
+    /// auto-sized to its own dozen lines and every other page was forced to
+    /// <see cref="ToolSize"/> on the frame it arrived - so glancing at the readout and coming
+    /// back THREW AWAY whatever size the window had been dragged to. Anybody who had sized the
+    /// dissector to fit beside their game re-did it every time, and there was no way to keep a
+    /// size at all: the auto-resize flag also takes the resize grip off, so on the readout the
+    /// window could not be dragged, and off it the drag was overwritten.
+    ///
+    /// The live facts are a strip above the tabs now (see <see cref="Header"/>), so no page
+    /// needs to be small, so no page needs to set a size. The window has ONE size and it is the
+    /// user's. What is still worth switching is the OPACITY - the readout is looked past at a
+    /// glance during a fight and a tool is read - and that is all this flag does now.
     /// </remarks>
-    private bool _sizedToContent = true;
+    private bool _onReadout = true;
 
     /// <summary>
     /// Registers a tool. Without <paramref name="page"/> the tool is a page of its own.
@@ -261,7 +334,7 @@ public sealed class ToolTabs
         // away they sit. It used to be 0.7 and 1 written here, and 0.7 of near-black over a
         // hideout at noon is a panel with foliage inside the letters.
         ImGui.SetNextWindowBgAlpha(
-            _sizedToContent ? Interface.ReadoutOpacityOr : Interface.PanelOpacityOr);
+            _onReadout ? Interface.ReadoutOpacityOr : Interface.PanelOpacityOr);
 
         // Surfacing a tool must actually surface it: a jump into a collapsed window would
         // select the right tab inside a title bar.
@@ -270,20 +343,11 @@ public sealed class ToolTabs
             ImGui.SetNextWindowCollapsed(false);
         }
 
-        ImGuiWindowFlags own = ImGuiWindowFlags.NoFocusOnAppearing;
-        if (_sizedToContent)
-        {
-            own |= ImGuiWindowFlags.AlwaysAutoResize;
-        }
-        else if (_leftTheReadout)
-        {
-            // The one frame that has to say a size, because it is the frame the auto-resize
-            // flag comes off and ImGui would otherwise keep the readout's height.
-            _leftTheReadout = false;
-            ImGui.SetNextWindowSize(ToolSize, ImGuiCond.Always);
-        }
-
-        bool expanded = ImGui.Begin("PoEformance", Chrome.Flags(ChromeId, own));
+        // NO SIZE FLAG AT ALL, which is the point: neither AlwaysAutoResize nor a size set per
+        // page. ImGui then keeps whatever size the window has - which is the one the user
+        // dragged it to, remembered across pages, across sessions and across a tool that wants
+        // to be wide. See the note on _onReadout for what this replaces.
+        bool expanded = ImGui.Begin("PoEformance", Chrome.Flags(ChromeId, ImGuiWindowFlags.NoFocusOnAppearing));
 
         // Before the contents and outside the expanded test, because a collapsed window is
         // still somewhere: its title bar is the ground it covers, and that is what the next
@@ -303,6 +367,17 @@ public sealed class ToolTabs
                 // tool, so a close button would be a button that hides the button.
                 Chrome.TitleButtons(ChromeId);
 
+                // ABOVE THE TABS, so it is on screen whichever page is in front - which is the
+                // entire reason it exists. Outside DrawPages because it belongs to the window
+                // rather than to any page, and because the tab bar's heading face must not
+                // reach it.
+                if (Header is not null)
+                {
+                    StatusBar.Begin();
+                    Header();
+                    StatusBar.End();
+                }
+
                 inFront = DrawPages();
 
                 // LAST, after the tabs and their contents. The menu declines to open over a
@@ -320,16 +395,13 @@ public sealed class ToolTabs
         RunIdles(inFront);
     }
 
-    /// <summary>Whether the last frame was the auto-sized readout. See <see cref="_sizedToContent"/>.</summary>
-    private bool _leftTheReadout;
-
-    /// <summary>The page whose content sizes the window to itself, if it is in front.</summary>
+    /// <summary>Whether the readout page is the one in front.</summary>
     /// <remarks>
     /// The FIRST page, whatever it is called, rather than a name matched here. The window's
     /// leading page is its readout by construction - it is the one with the lowest order - and
     /// a rule keyed on "status" would quietly stop applying the day that page is renamed.
     /// </remarks>
-    private bool SizesItself(string? inFront) => inFront is not null && inFront == _pages[0].Id;
+    private bool OnReadout(string? inFront) => inFront is not null && inFront == _pages[0].Id;
 
     /// <summary>
     /// Draws the tab bar and the page in front, and says which page that was.
@@ -441,9 +513,7 @@ public sealed class ToolTabs
             _unfold = null;
         }
 
-        bool sizes = SizesItself(front?.Id);
-        _leftTheReadout = _sizedToContent && !sizes;
-        _sizedToContent = sizes;
+        _onReadout = OnReadout(front?.Id);
         return front?.Id;
     }
 
@@ -455,18 +525,14 @@ public sealed class ToolTabs
     /// window the scrollbar is the page's own, and the bar, the title and its icons never
     /// move.
     ///
-    /// The readout is the exception: it is the page that sizes the window to its content
-    /// (see <see cref="SizesItself"/>), and a fill-what-remains child inside a window asking
-    /// its content how big to be is a circle ImGui resolves as a box of nothing.
+    /// EVERY page, the readout included. The readout used to be the exception, because it was
+    /// the page that sized the window to its content and a fill-what-remains child inside a
+    /// window asking its content how big to be is a circle ImGui resolves as a box of nothing.
+    /// No page sizes the window any more, so the exception is gone with it - and the readout
+    /// gets what the other pages had all along: its own scrollbar, and a tab bar that stays put.
     /// </remarks>
     private void DrawPage(Page page)
     {
-        if (page == _pages[0])
-        {
-            DrawSections(page);
-            return;
-        }
-
         try
         {
             // Its own id per page, so every page keeps its own scroll position across
@@ -484,13 +550,26 @@ public sealed class ToolTabs
         }
     }
 
-    /// <summary>Draws a page: one tool bare, several as an accordion.</summary>
+    /// <summary>Draws a page: one tool bare, several as an accordion or a tab bar.</summary>
     private void DrawSections(Page page)
     {
+        // BEFORE the branch, so a lead is above its tools whether they came out as tabs, as
+        // folds, or as a single tool with no heading of its own at all.
+        if (_leads.TryGetValue(page.Id, out Action? lead))
+        {
+            lead();
+        }
+
         if (page.Sections.Count == 1)
         {
             page.Sections[0].Draw();
             _drawn.Add(page.Sections[0].Id);
+            return;
+        }
+
+        if (_tabbed.Contains(page.Id))
+        {
+            DrawSectionTabs(page);
             return;
         }
 
@@ -519,13 +598,132 @@ public sealed class ToolTabs
             // In the heading face, like the tab above it and the titled rules below: a page
             // that folds into several tools needs its fold lines to outrank their contents,
             // which is the whole reason the second size exists.
-            if (!OverlayFonts.SectionHeader($"{section.Live?.Invoke() ?? section.Label}###{section.Id}"))
+            //
+            // BANDED, every other one a shade lighter. Folded, these bars are all a page shows -
+            // four identical strips of the same colour stacked touching each other, which reads
+            // as one block with words in it rather than as four things you can open. The band is
+            // the cheapest thing that separates them, and unlike a gap it costs no height.
+            bool banded = (i & 1) == 1;
+            if (banded)
+            {
+                PushBand();
+            }
+
+            bool open;
+            try
+            {
+                open = OverlayFonts.SectionHeader(
+                    $"{section.Live?.Invoke() ?? section.Label}###{section.Id}");
+            }
+            finally
+            {
+                if (banded)
+                {
+                    ImGui.PopStyleColor(3);
+                }
+            }
+
+            if (!open)
             {
                 continue;
             }
 
             section.Draw();
             _drawn.Add(section.Id);
+        }
+    }
+
+    /// <summary>
+    /// Lifts the next header's bar a shade, for the banding.
+    /// </summary>
+    /// <remarks>
+    /// ALL THREE STATES, not just the resting one. ImGui draws a collapsing header in
+    /// <c>Header</c>, <c>HeaderHovered</c> or <c>HeaderActive</c> depending on the mouse, so
+    /// pushing only the first gives a banded row that loses its band the moment it is pointed
+    /// at - and the hover then reads as the band rather than as the hover.
+    ///
+    /// Derived from the theme's own three rather than written out, so the banding follows any
+    /// later change to the palette instead of quietly drifting away from it.
+    /// </remarks>
+    private static void PushBand()
+    {
+        ImGui.PushStyleColor(ImGuiCol.Header, Lift(ImGui.GetStyle().Colors[(int)ImGuiCol.Header]));
+        ImGui.PushStyleColor(
+            ImGuiCol.HeaderHovered, Lift(ImGui.GetStyle().Colors[(int)ImGuiCol.HeaderHovered]));
+        ImGui.PushStyleColor(
+            ImGuiCol.HeaderActive, Lift(ImGui.GetStyle().Colors[(int)ImGuiCol.HeaderActive]));
+    }
+
+    /// <summary>One shade lighter, keeping the colour's own hue and how solid it is.</summary>
+    /// <remarks>
+    /// An ADDITION rather than a multiplication, because the resting header colour is dark and
+    /// multiplying a dark colour by 1.3 moves it by almost nothing - which is a band nobody can
+    /// see. A flat step lifts the dark states visibly and the lit ones proportionally less,
+    /// which is the way round it wants to be.
+    /// </remarks>
+    private static Vector4 Lift(Vector4 colour) => colour with
+    {
+        X = Math.Min(1f, colour.X + 0.06f),
+        Y = Math.Min(1f, colour.Y + 0.06f),
+        Z = Math.Min(1f, colour.Z + 0.06f),
+    };
+
+    /// <summary>
+    /// A page's tools as a row of tabs - see <see cref="AsTabs"/> for when that is right.
+    /// </summary>
+    /// <remarks>
+    /// THE JUMP STILL HAS TO LAND. <c>Show</c> names a section and expects it to be reachable -
+    /// F8 surfaces the interface tree, the entity browser hands an address to the dissector -
+    /// and on a folded page that means unfolding a header. Here it means SELECTING a tab, which
+    /// is the same request in the other shape. Without it a jump to a tabbed page would arrive
+    /// on whichever tab was last open and silently show the wrong tool.
+    /// </remarks>
+    private void DrawSectionTabs(Page page)
+    {
+        if (!ImGui.BeginTabBar($"sections-{page.Id}", ImGuiTabBarFlags.FittingPolicyScroll))
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (Section section in page.Sections)
+            {
+                ImGuiTabItemFlags flags = section.Id == _unfold
+                    ? ImGuiTabItemFlags.SetSelected
+                    : ImGuiTabItemFlags.None;
+
+                if (!BeginTabItem($"{section.Live?.Invoke() ?? section.Label}###{section.Id}", flags))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    // Its own id scope, exactly as the page tabs get one: two tools holding a
+                    // control of the same name would otherwise share one ImGui id, which is one
+                    // scroll position and one open state between them.
+                    ImGui.PushID(section.Id);
+                    try
+                    {
+                        ImGui.Spacing();
+                        section.Draw();
+                        _drawn.Add(section.Id);
+                    }
+                    finally
+                    {
+                        ImGui.PopID();
+                    }
+                }
+                finally
+                {
+                    ImGui.EndTabItem();
+                }
+            }
+        }
+        finally
+        {
+            ImGui.EndTabBar();
         }
     }
 
@@ -567,8 +765,10 @@ public sealed class ToolTabs
     /// <param name="except">The page hosting this list, which must not offer to hide itself.</param>
     public void DrawHideList(string except)
     {
-        ImGui.TextDisabled("Unticked tabs leave the bar. They come back here - or by");
-        ImGui.TextDisabled("themselves, the moment something jumps to them (F8, a handoff).");
+        // One wrapping paragraph rather than two hand-broken lines - see OverlayLayout.Note.
+        OverlayLayout.Note(
+            "Unticked tabs leave the bar. They come back here - or by themselves, the moment"
+            + " something jumps to them (F8, a handoff).");
         ImGui.Spacing();
 
         foreach (Page page in _pages)

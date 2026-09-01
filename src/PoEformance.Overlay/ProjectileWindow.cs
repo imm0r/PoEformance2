@@ -47,58 +47,61 @@ public sealed class ProjectileWindow
     {
         ArgumentNullException.ThrowIfNull(snapshot);
 
+        // THE WHOLE ROW FIRST, THEN THE WARNING. It used to be drawn between the first switch
+        // and the SameLine of the second - so the two that followed were placed beside the
+        // WARNING rather than beside the switch, and ran off the right edge of any ordinary
+        // window. They were simply not on screen. A block of prose in the middle of a row is
+        // not a formatting slip; it moves the controls after it somewhere nobody can reach.
         bool drawing = _layer.Enabled;
-        if (ImGui.Checkbox("draw them over the game", ref drawing))
+        if (OverlayLayout.Toggle("Draw Them over the Game", ref drawing))
         {
             _layer.Enabled = drawing;
             _changed();
         }
 
-        // Said next to the switch that carries it, because it is the one control here with a
-        // price. The game files projectiles as visual entities and the reader skips those, so
-        // this switch turns the entity walk's own filter off as well - there is no way to see
-        // a projectile without paying for that.
-        if (drawing)
-        {
-            ImGuiText.Hint(
-                WarnText,
-                "this also makes the reader read the game's VISUAL entities, which is where"
-                + " projectiles are: a recorded Spark session ran 17 gameplay entities against"
-                + " 51 visuals. Watch the Read cost tab.");
-        }
-
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
         bool trails = _layer.ShowTrails;
-        if (ImGui.Checkbox("with the line they came along", ref trails))
+        if (OverlayLayout.Toggle("With the Line They Came Along", ref trails))
         {
             _layer.ShowTrails = trails;
             _changed();
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(2);
         bool paths = _layer.ShowPaths;
-        if (ImGui.Checkbox("and their paths", ref paths))
+        if (OverlayLayout.Toggle("And Their Paths", ref paths))
         {
             _layer.ShowPaths = paths;
             _changed();
         }
 
+        // Under the row that carries it, because it is the one control here with a price. The
+        // game files projectiles as visual entities and the reader skips those, so this switch
+        // turns the entity walk's own filter off as well - there is no way to see a projectile
+        // without paying for that.
+        if (drawing)
+        {
+            OverlayLayout.Warning(
+                "Also makes the reader read the game's VISUAL entities, which is where"
+                + " projectiles are: a recorded Spark session ran 17 gameplay entities against 51"
+                + " visuals. Watch the Read cost tab.");
+        }
+
         bool mine = _layer.MineOnly;
-        if (ImGui.Checkbox("only mine", ref mine))
+        if (OverlayLayout.Toggle("Only Mine", ref mine))
         {
             _layer.MineOnly = mine;
             _changed();
         }
 
-        // Said next to the switch rather than left to be discovered. "Mine" rests on one byte,
-        // and if that byte is not set on the projectiles a build spawns, this switch is the
-        // difference between an overlay that works and one that draws nothing - with no hint
-        // as to which. The list below is where somebody checks before flipping it.
-        ImGuiText.Hint(
-            DimText,
-            "whose it is comes from one byte - the same one that tells your minions from the"
-            + " monsters. Check the list below says \"mine\" for your own skills before"
-            + " relying on this.");
+        // "Mine" rests on one byte, and if that byte is not set on the projectiles a build
+        // spawns, this switch is the difference between an overlay that works and one that
+        // draws nothing - with no hint as to which. The list below is where somebody checks
+        // before flipping it.
+        OverlayLayout.Hint(
+            "Whose it is comes from one byte - the same one that tells your minions from the"
+            + " monsters. Check the list below says \"mine\" for your own skills before relying"
+            + " on this.");
 
         ImGui.Separator();
 

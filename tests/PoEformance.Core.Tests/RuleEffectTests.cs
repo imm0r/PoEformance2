@@ -186,6 +186,147 @@ public class RuleEffectTests
         Assert.False(leaf.Holds(state, new RuleTimers(), "rule"));
     }
 
+    [Fact]
+    public void WatchesTheWeakestMonsterInRange_NotTheNearestOne()
+    {
+        // The cull question: "is anything in range nearly dead". Keyed on the LOWEST bar
+        // rather than the closest monster, because a full-health one stepping in front of the
+        // one that was about to die must not silence the rule - which is exactly the moment a
+        // cull is wanted.
+        var state = new RuleState
+        {
+            InGame = true,
+            Monsters =
+            [
+                new NearMonster(10, ItemRarity.Normal, 105, 100, 100),
+                new NearMonster(20, ItemRarity.Rare, 100, 92, 12),
+
+                // Out of the radius below, and lower than either of them: the radius is what
+                // decides, not the whole area.
+                new NearMonster(40, ItemRarity.Normal, -80, -60, 5),
+            ],
+        };
+
+        Assert.Equal(12, state.LowestMonsterLifePercent(30));
+        Assert.Equal(5, state.LowestMonsterLifePercent(100));
+        Assert.Equal(10, state.NearestMonster);
+
+        var cull = new RuleCondition
+        {
+            Fact = RuleFact.LowestMonsterLifePercent,
+            Compare = Compare.Below,
+            Value = 35,
+            Argument = 30,
+        };
+
+        Assert.True(cull.Holds(state, new RuleTimers(), "rule"));
+    }
+
+    [Fact]
+    public void NothingInRangeIsNoAnswer_NotAMonsterAtZeroHealth()
+    {
+        // The one trap this fact carries that the counts do not. An empty radius answering 0
+        // would satisfy "below 35" forever, so a rule whose whole job is to press a key would
+        // press it at the floor - and it would look like the feature working.
+        var state = new RuleState
+        {
+            InGame = true,
+            Monsters =
+            [
+                new NearMonster(80, ItemRarity.Normal, 0, 0, 4),
+
+                // In range, but its pool did not resolve. Skipped rather than counted as a
+                // monster at zero: Vital.Percent answers -1 for that, and the sentinel must not
+                // reach a comparison.
+                new NearMonster(10, ItemRarity.Normal, 5, 5),
+            ],
+        };
+
+        Assert.Null(state.LowestMonsterLifePercent(30));
+
+        var cull = new RuleCondition
+        {
+            Fact = RuleFact.LowestMonsterLifePercent,
+            Compare = Compare.Below,
+            Value = 35,
+            Argument = 30,
+        };
+
+        Assert.False(cull.Holds(state, new RuleTimers(), "rule"));
+
+        // And the other way round, which is the half a sentinel would get wrong quietly: an
+        // absent number satisfies no comparison, whichever direction it is written in.
+        Assert.False((cull with { Compare = Compare.AtLeast }).Holds(state, new RuleTimers(), "rule"));
+    }
+
+    [Fact]
+    public void EachRarityIsWatchedAtItsOwnThreshold()
+    {
+        // A cull executes each rarity from a different share of its life, so the three
+        // thresholds have to look at three different monsters. One threshold over everything
+        // would answer about the white monster that is always the weakest thing on screen -
+        // and fire while the rare it was written for stands at half health.
+        var state = new RuleState
+        {
+            InGame = true,
+            Vitals = new Vitals(default, new Vital(1500, 1500, 0, 0), default),
+            Monsters =
+            [
+                new NearMonster(10, ItemRarity.Normal, 0, 0, 2),
+                new NearMonster(20, ItemRarity.Magic, 0, 0, 55),
+                new NearMonster(30, ItemRarity.Rare, 0, 0, 8),
+                new NearMonster(40, ItemRarity.Unique, 0, 0, 40),
+            ],
+        };
+
+        // The white monster at 2% is the weakest of the lot, and it is the answer only to the
+        // fact that asks about anything.
+        Assert.Equal(2, state.LowestMonsterLifePercent(100));
+        Assert.Equal(55, state.LowestMagicMonsterLifePercent(100));
+        Assert.Equal(8, state.LowestRareMonsterLifePercent(100));
+        Assert.Equal(40, state.LowestUniqueMonsterLifePercent(100));
+
+        // The Power Siphon rule: the rare is low enough, the magic and the unique are not.
+        RuleCondition cull = RuleExpression.Parse(
+            "InMap && Mana > 1000 && ("
+            + "LowestMagicMonsterLifePercent(100) < 20"
+            + " || LowestRareMonsterLifePercent(100) < 10"
+            + " || LowestUniqueMonsterLifePercent(100) < 5)").Condition!;
+
+        Assert.True(cull.Holds(state, new RuleTimers(), "rule"));
+
+        // Take the rare away and the rule goes quiet, even though a monster at 2% is still
+        // standing there: a rarity that is not in range is no answer, not a zero.
+        RuleState withoutRare = state with { Monsters = [state.Monsters[0], state.Monsters[1], state.Monsters[3]] };
+        Assert.Null(withoutRare.LowestRareMonsterLifePercent(100));
+        Assert.False(cull.Holds(withoutRare, new RuleTimers(), "rule"));
+    }
+
+    [Fact]
+    public void MeasuresTheWeakestMonsterWhereTheCursorPoints()
+    {
+        // The same split the counts have: for a skill aimed at something, the weakest thing
+        // near the character is the wrong question.
+        var state = new RuleState
+        {
+            InGame = true,
+            CursorGround = (100f, 100f),
+            Monsters =
+            [
+                new NearMonster(10, ItemRarity.Normal, 105, 100, 60),
+                new NearMonster(12, ItemRarity.Rare, 100, 92, 20),
+                new NearMonster(14, ItemRarity.Normal, -80, -60, 3),
+            ],
+        };
+
+        Assert.Equal(20, state.LowestMonsterLifePercentAtCursor(30));
+        Assert.Equal(3, state.LowestMonsterLifePercent(30));
+
+        // A pointer that is not over the game answers nothing rather than answering about
+        // whatever stands nearest the edge of the world.
+        Assert.Null((state with { CursorGround = null }).LowestMonsterLifePercentAtCursor(500));
+    }
+
     [Theory]
     [InlineData("Q", 0x51)]
     [InlineData("q", 0x51)]
@@ -292,10 +433,98 @@ public class RuleEffectTests
         try
         {
             File.WriteAllText(path, "{ this is not json");
-            RuleSettings loaded = RuleSettingsStore.Load(path);
+            RuleLoad loaded = RuleSettingsStore.Read(path);
 
-            Assert.False(loaded.Enabled);
-            Assert.Empty(loaded.Profiles[0].Groups);
+            Assert.False(loaded.Settings.Enabled);
+            Assert.Empty(loaded.Settings.Profiles[0].Groups);
+
+            // And it says so now, rather than looking exactly like an empty file.
+            Assert.Contains("not valid JSON", loaded.Note, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void ARuleThisBuildCannotReadIsDroppedOnItsOwn()
+    {
+        // What used to cost the whole file, silently: one fact name from a newer build makes
+        // the deserialiser throw, and the catch turned that into "no rules, engine off, no
+        // message". Somebody played three maps wondering why nothing fired.
+        RuleSettings settings = new RuleSettings(
+            Enabled: true,
+            Profile: "P",
+            Profiles: [new RuleProfile("P", [new RuleGroup("G", [
+                // Watching is itself a RuleFact and defaults to LifePercent, so the keeper's
+                // effect has to watch something else - otherwise the edit below reaches into
+                // this rule too and the test proves nothing about dropping ONE.
+                new Rule("a", "Keeper", RuleCondition.Of(RuleFact.InMap), [
+                    new RuleEffect(RuleEffectKind.Text) { Watching = RuleFact.ManaPercent },
+                ]),
+                new Rule("b", "From the future", RuleCondition.Of(RuleFact.LifePercent, Compare.AtMost, 35), []),
+                new Rule("c", "Also fine", RuleCondition.Of(RuleFact.InGame), []),
+            ])])]);
+
+        string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Assert.True(RuleSettingsStore.Save(settings, path));
+
+            // Exactly what an older build sees in a file a newer one wrote.
+            File.WriteAllText(
+                path,
+                File.ReadAllText(path).Replace("\"LifePercent\"", "\"NotInThisBuild\"", StringComparison.Ordinal));
+
+            RuleLoad loaded = RuleSettingsStore.Read(path);
+            IReadOnlyList<Rule> rules = loaded.Settings.Profiles[0].Groups[0].Rules;
+
+            // The two readable rules survive - that is the whole point of the change.
+            Assert.Equal(["Keeper", "Also fine"], rules.Select(rule => rule.Name));
+            Assert.True(loaded.Settings.Enabled);
+
+            // And the one that did not is named, with the field that stopped it.
+            string skipped = Assert.Single(loaded.Skipped);
+            Assert.Contains("From the future", skipped, StringComparison.Ordinal);
+            Assert.Contains("fact", skipped, StringComparison.Ordinal);
+
+            // The file as it was is kept, because the config page saves what the ENGINE holds -
+            // so the first save after a skip would otherwise write the rule out of existence.
+            Assert.True(File.Exists(loaded.Backup), $"no backup at '{loaded.Backup}'");
+            Assert.Contains("NotInThisBuild", File.ReadAllText(loaded.Backup), StringComparison.Ordinal);
+
+            File.Delete(loaded.Backup);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void AFileThatReadsCleanlySaysNothing()
+    {
+        // The note has to stay empty on an ordinary load, or it becomes a line to tune out -
+        // and then it is not there when it matters.
+        RuleSettings settings = new RuleSettings(
+            Enabled: true,
+            Profile: "P",
+            Profiles: [new RuleProfile("P", [new RuleGroup("G", [
+                new Rule("a", "Fine", RuleCondition.Of(RuleFact.InMap), []),
+            ])])]);
+
+        string path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Assert.True(RuleSettingsStore.Save(settings, path));
+            RuleLoad loaded = RuleSettingsStore.Read(path);
+
+            Assert.Empty(loaded.Skipped);
+            Assert.Empty(loaded.Note);
+            Assert.Empty(loaded.Backup);
+            Assert.False(File.Exists(path + ".rejected"));
+            Assert.Single(loaded.Settings.Profiles[0].Groups[0].Rules);
         }
         finally
         {

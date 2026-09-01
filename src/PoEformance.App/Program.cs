@@ -246,12 +246,38 @@ internal static class Program
             }
         }
 
-        // Needs no game PROCESS at all - it reads the install - so it sits outside the block
+        // Needs no game PROCESS at all - it reads the INSTALL, so it sits outside the block
         // above, which is gated on being attached. Somebody diagnosing why their ground rings
-        // have no names should not have to launch the game to find out.
+        // have no names should not have to launch the game to find out. Note the difference
+        // from the two below: those read tables the game has already LOADED, off FileRoot, so
+        // they need a process but no area; this one needs neither.
         if (options.DumpGroundTypes)
         {
             RunGroundTypeDump();
+        }
+
+        // OUTSIDE the block above on purpose. Everything in it hangs off the game state, and
+        // the loaded-file table does not: it hangs off FileRoot, so the tables are there at the
+        // login screen, before any area exists. That is also what makes them worth having -
+        // a table is the same table for every character and every zone.
+        if (options.ReadGlossary)
+        {
+            RunGlossary(
+                reader,
+                SchemaJson.Load(schemaPath),
+                result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
+                Console.Out);
+            recorder?.MarkFrame();
+        }
+
+        if (options.ListTables)
+        {
+            RunTableList(
+                reader,
+                SchemaJson.Load(schemaPath),
+                result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
+                Console.Out);
+            recorder?.MarkFrame();
         }
 
         // ── Auto-flask ───────────────────────────────────────────────────────
@@ -280,7 +306,7 @@ internal static class Program
         // into each effect. An effect bound to a belt slot follows a rebind; one that names a
         // key does not, and that is the user's choice to make.
         var ruleEngine = new PoEformance.Features.RuleEngine();
-        ruleEngine.Configure(PoEformance.Features.RuleSettingsStore.Load());
+        ruleEngine.Configure(PoEformance.Features.RuleSettingsStore.Read());
         ruleEngine.Bind(flaskKeys);
         var ruleHistory = new PoEformance.Features.RuleHistory();
 
@@ -648,6 +674,167 @@ internal static class Program
     /// dozen behaviours classify off those names, so re-extracting them is a deliberate act with
     /// a diff somebody looked at, the same way an offset change is.
     /// </remarks>
+    /// <summary>
+    /// Walks the loaded-file table, names every dat table in it, and reads the glossary.
+    /// </summary>
+    /// <remarks>
+    /// THE ROUTE IS THE POINT, more than the words it prints. Until a dat table turned out to
+    /// be a loaded-file record, the tables this tool could read were the ones something on
+    /// screen happened to point at; this walks from a static to any of them by name. The
+    /// glossary is what it was written for, and is also the check that the route arrived
+    /// somewhere real - a wrong turn does not produce readable English.
+    ///
+    /// Worth running with --record. No recording in this repo has ever read a file record's
+    /// row store, because the preload walk stops one byte short of it, so the last hop of this
+    /// route has no fixture behind it. This run is what would give it one.
+    /// </remarks>
+    private static void RunGlossary(
+        IMemoryReader reader, OffsetSchema schema, ulong fileRootStatic, TextWriter output)
+    {
+        output.WriteLine();
+        if (fileRootStatic == 0)
+        {
+            output.WriteLine("glossary  the FileRoot static did not resolve - no file table to walk.");
+            return;
+        }
+
+        var tables = new PoEformance.Game.Files.LoadedDatTables(reader, schema);
+        IReadOnlyList<PoEformance.Game.Files.LoadedDatTable> loaded = tables.Read(fileRootStatic);
+        output.WriteLine(
+            $"glossary  {loaded.Count} dat tables among {tables.RecordsWalked} loaded files");
+
+        if (tables.LastError.Length > 0)
+        {
+            output.WriteLine($"          {tables.LastError}");
+        }
+
+        PoEformance.Game.Files.KeywordGlossary glossary =
+            PoEformance.Game.Files.KeywordGlossary.Read(tables, reader, schema);
+
+        if (glossary.Table is not { } found)
+        {
+            output.WriteLine($"          {glossary.LastError}");
+
+            // A few of the tables that WERE found, so a walk that arrived somewhere can be told
+            // from one that arrived nowhere. Those are different problems and look identical
+            // from a count.
+            foreach (PoEformance.Game.Files.LoadedDatTable table in loaded.Take(6))
+            {
+                output.WriteLine(
+                    $"            {table.Facts.Path} - {table.Facts.Rows} rows of 0x{table.Facts.RowSize:X}");
+            }
+
+            return;
+        }
+
+        output.WriteLine(
+            $"          {found.Facts.Path} at 0x{found.Address:X} - {found.Facts.Rows} rows "
+            + $"of 0x{found.Facts.RowSize:X}, {glossary.ById.Count} keywords read");
+        output.WriteLine();
+
+        foreach (PoEformance.Game.Files.KeywordPopup entry in glossary.ById.Values.Take(8))
+        {
+            output.WriteLine($"  {entry.Id,-22}  {entry.Term}");
+            if (entry.Definition.Length > 0)
+            {
+                output.WriteLine(
+                    $"  {string.Empty,-22}  {PoEformance.Game.Files.KeywordGlossary.Plain(entry.Definition)}");
+            }
+        }
+
+        // The table explaining itself: a definition written in the markup, rendered, and then
+        // the keywords inside it looked up in the same table. If that reads as English, every
+        // hop from the static to the string pool is right.
+        // Take(1) over a filter rather than FirstOrDefault: these are structs, so "none found"
+        // and "the first one" are the same value and a null check would print the empty entry.
+        foreach (PoEformance.Game.Files.KeywordPopup example in glossary.ById.Values
+                     .Where(e => PoEformance.Game.Files.KeywordGlossary.KeysIn(e.Definition).Count > 0)
+                     .Take(1))
+        {
+            output.WriteLine();
+            output.WriteLine($"  {example.Term}: {PoEformance.Game.Files.KeywordGlossary.Plain(example.Definition)}");
+            foreach (string key in PoEformance.Game.Files.KeywordGlossary.KeysIn(example.Definition))
+            {
+                output.WriteLine(
+                    glossary.Lookup(key) is { } popup
+                        ? $"    -> {key} = {popup.Term}"
+                        : $"    -> {key} is not a row of this table");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Lists every dat table the game has loaded, and the .dat files that are not one.
+    /// </summary>
+    /// <remarks>
+    /// A TABLE REPORTS ITS OWN ROW SIZE, which is what makes this more than a listing: the row
+    /// store divides its rows by its by-Id index, so every line here is a number the game
+    /// computed. Checking those against the column widths in the schema is what turned a
+    /// three-table confirmation into a 123-table one - see the note above WorldAreaDat - and
+    /// re-running it after a patch is how the next disagreement gets found.
+    ///
+    /// The refused list is the open question in printable form. Four tables this tool reads rows
+    /// from were missing from the 131 a live walk found, and no recording can say why, because
+    /// a record that fails the checks never has its name read. This reads them.
+    /// </remarks>
+    private static void RunTableList(
+        IMemoryReader reader, OffsetSchema schema, ulong fileRootStatic, TextWriter output)
+    {
+        output.WriteLine();
+        if (fileRootStatic == 0)
+        {
+            output.WriteLine("tables    the FileRoot static did not resolve - no file table to walk.");
+            return;
+        }
+
+        var tables = new PoEformance.Game.Files.LoadedDatTables(reader, schema);
+        PoEformance.Game.Files.DatTableSurvey survey = tables.Survey(fileRootStatic);
+
+        output.WriteLine(
+            $"tables    {survey.Tables.Count} dat tables among {survey.Records} loaded files");
+
+        if (tables.LastError.Length > 0)
+        {
+            output.WriteLine($"          {tables.LastError}");
+        }
+
+        // THE NUMBER EVERYTHING ABOVE IS SCALED BY. Sixteen buckets is a constant ported from a
+        // PoE1 tool, and if it is too small then every count here is a fraction and "not in the
+        // file table" only ever meant "not in the part we look at". No recording can check it -
+        // nothing has ever read past the last bucket - so it is checked here, where the game is.
+        int beyond = new PoEformance.Game.World.PreloadReader(reader, schema)
+            .BucketsBeyondTheCount(fileRootStatic);
+
+        output.WriteLine(
+            beyond == 0
+                ? "          nothing past the last bucket looks like one, so the count holds."
+                : $"          WARNING: {beyond} slots past the last bucket ALSO look like buckets - "
+                    + "BucketCount is too small and every walk of this table has been partial.");
+
+        output.WriteLine();
+        foreach (PoEformance.Game.Files.LoadedDatTable table in survey.Tables
+                     .OrderBy(t => t.Facts.Name, StringComparer.OrdinalIgnoreCase))
+        {
+            output.WriteLine(
+                $"  {table.Facts.Name,-46} {table.Facts.Rows,7} rows of 0x{table.Facts.RowSize:X}");
+        }
+
+        output.WriteLine();
+        if (survey.Refused.Count == 0)
+        {
+            // Which is itself an answer: every .dat file in the table is a parsed table, so the
+            // ones missing from the list above are missing from the FILE TABLE, not unparsed.
+            output.WriteLine("          every .dat file in the table resolved as a table.");
+            return;
+        }
+
+        output.WriteLine($"          {survey.Refused.Count} .dat files did NOT resolve as tables:");
+        foreach (string path in survey.Refused.Order(StringComparer.OrdinalIgnoreCase))
+        {
+            output.WriteLine($"            {path}");
+        }
+    }
+
     private static void RunAnimationDump(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
     {
@@ -2831,6 +3018,8 @@ internal static class Program
         bool SweepComponents,
         bool DumpGroundTypes,
         bool DumpAnimations,
+        bool ReadGlossary,
+        bool ListTables,
         IReadOnlyList<string> Peek,
         bool PeekWatch,
         string UpdateOutcome,
@@ -2844,7 +3033,7 @@ internal static class Program
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false;
-            bool sweep = false, groundTypeDump = false;
+            bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -2953,6 +3142,22 @@ internal static class Program
                         animDump = true;
                         break;
 
+                    // Walks the loaded-file table and reads the game's glossary out of it.
+                    // Opt-in because the walk is thousands of records, and worth recording
+                    // with --record: no fixture in this repo has ever read a file record's
+                    // row store, so this is the run that turns the route into a test.
+                    case "--glossary":
+                        glossary = true;
+                        break;
+
+                    // The same walk, listing every table instead of reading one - and the .dat
+                    // files that did NOT resolve as tables, which is the open question: four
+                    // tables this tool reads rows from were missing from the 131 a live walk
+                    // found, and nothing recorded so far can say why.
+                    case "--tables":
+                        listTables = true;
+                        break;
+
                     // Takes a Cheat Engine pointer path as written - "+468C3A8,235C" - so a
                     // finding can be checked without transcribing it into an absolute address
                     // that stops meaning anything the moment the game restarts.
@@ -2995,8 +3200,9 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep, groundTypeDump, animDump,
-                peek, peekWatch, updateOutcome, updatedVersion);
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep,
+                groundTypeDump, animDump,
+                glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
     }
 }

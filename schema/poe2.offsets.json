@@ -315,10 +315,11 @@
     },
 
     // ── dat ROWS are computable, not searchable ──
-    // Six structs here are not engine objects at all - they are rows of the game's static
+    // Seven structs here are not engine objects at all - they are rows of the game's static
     // content tables, loaded into memory: WorldAreaDat (WorldAreas), BuffDefinition
     // (BuffDefinitions), MinimapIconRow (MinimapIcons), ItemVisualIdentityRow
-    // (ItemVisualIdentity), QuestFlagsRow (QuestFlags) and NpcsRow (NPCs).
+    // (ItemVisualIdentity), QuestFlagsRow (QuestFlags), NpcsRow (NPCs) and
+    // KeywordPopupsRow (KeywordPopups).
     // A row keeps the column ORDER the .dat file declares, PACKED,
     // with no alignment padding - which is why so many of these offsets are odd numbers.
     // poe-tool-dev/dat-schema publishes that column order for 1275 PoE2 tables, so for a
@@ -326,6 +327,12 @@
     //     bool/i8/u8 1 | i16/u16 2 | i32/u32/f32 4 | enum-row 4 | string 8 (a UTF-16
     //     pointer) | reference to ANOTHER table's row 16 | reference to a row of the SAME
     //     table 8 | array of anything 16
+    //     ...AND AN INTERVAL COLUMN COSTS TWICE ITS TYPE. dat-schema marks that with a FLAG
+    //     rather than a type, which is exactly why it went unnoticed: the column reads i32 and
+    //     prices as 4, and the row comes out four bytes short for every one of them. It is two
+    //     values - Mods.Stat1Value..Stat8Value are a modifier's minimum and maximum roll.
+    //     21 PoE2 columns carry the flag, in four tables, and NONE of them is in a table this
+    //     file computes an offset in - so nothing shipped was ever wrong, only the checking.
     // A 16-byte foreign reference is a ROW reference followed by a TABLE reference: the
     // pointer to the referenced row sits AT the column start and the table it belongs to at
     // +8. OBSERVED 2026-08 in session-2026-08-questflags.rec, and which half is which is not
@@ -370,6 +377,55 @@
     // for that table's 9 columns. The same recording puts its WorldAreas rows ("MapRustbowl",
     // "G_Endgame_Town", the ExpeditionLogBook set) on a 0x300 grid, and 0x300 is what the
     // widths compute for that table's 82 columns. Two tables, two strides, no adjustment.
+    //
+    // AND THEN 123 TABLES AT ONCE, which is what closes this. The strides above were harvested
+    // by hand, a table at a time, out of rows that happened to be in a recording. A loaded dat
+    // table REPORTS ITS OWN ROW SIZE - the row store divides its rows by its by-Id index, see
+    // DatRowStore - so walking the loaded-file table asks every table in memory the question in
+    // one pass, with nothing computed on the game's side. Over the 131 tables of
+    // session-2026-08-glossary.rec, and the 134 of session-2026-09-tables.rec: EVERY ONE of them
+    // reports EXACTLY what the widths compute, from ModFamily's 8 bytes to Mods' 677 - 134 of
+    // 134, with one of those needing a column list from a second source (see EndgameMaps below).
+    // A width that is wrong for a common type cannot survive that: one byte off on 'bool' would
+    // move about ninety of these, and a wrong reference width would move nearly all of them.
+    // IT READ 123 OF 126 AT FIRST, and every one of the gaps was in the ASKING rather than in
+    // the game - see below, because all three are traps the next person will walk into.
+    // TWO TRAPS SAT BETWEEN THE GAME AND THE SCHEMA, and this note carried both as findings
+    // about the GAME before either was caught. It said "three tables disagree, all with the game
+    // bigger, which is what a reference lagging a patch looks like" and "five tables are not in
+    // dat-schema at all". Neither was true, and both were flushed out by somebody asking whether
+    // it was really sure.
+    // (1) THE INTERVAL RULE, missing from the widths above. Mods computed 0x285 against 0x2A5
+    // and AlternateTreeVersions 0x1A against 0x26 - Mods has eight interval columns and 8 * 4 is
+    // 32, AlternateTreeVersions three and 3 * 4 is 12. A HYPOTHESIS THAT EXPLAINS THE SIGN OF
+    // EVERY DISCREPANCY IS NOT THEREBY RIGHT: "the reference is behind" and "our arithmetic is
+    // incomplete" both make the game bigger, and only one of them was testable from here.
+    // (2) CAPITALISATION. The game's path and dat-schema's table name disagree on case, so an
+    // exact-match lookup reports a table as unknown rather than as different: the game loads
+    // AtlasPassiveSkillSubtrees where the schema says AtlasPassiveSkillSubTrees, and likewise
+    // MTXTypes/MtxTypes, MTXPreviewCameras/MtxPreviewCameras,
+    // CharacterShapeshiftBasicSkills/CharacterShapeShiftBasicSkills and
+    // AtlasPassiveGrantedSkillsFrom{Subtree,SubTree}Points. All five agree on their row size to
+    // the byte once matched. MATCH A TABLE NAME CASE-INSENSITIVELY, always - dat-offsets.ps1
+    // does, because PowerShell's -eq is, and LoadedDatTables.FindAll does on purpose.
+    // AND THE LAST ONE IS A MISSING TRAILING BOOL. EndgameMaps computed 0xEF where the game says
+    // 0xF0, with no interval column in it, and a THIRD source settles it: repoe-fork/dat-export
+    // (current/poe2/heuristics/schema/graphql) lists 28 columns where poe-tool-dev lists 27, the
+    // extra being a bool at the very end, and its total is 0xF0 to the byte. So poe-tool-dev's
+    // PoE2 copy of that table is one column short at the tail.
+    // WHICH LEAVES 134 OF 134 EXPLAINED - every dat table these two captures found, with nothing
+    // put down to "the reference is behind" that was not then found in a reference.
+    // THREE SOURCES, AND THEY DISAGREE, so it is worth knowing what each is for.
+    // poe-tool-dev/dat-schema is what scripts\dat-offsets.ps1 downloads: one file, every table,
+    // and it agreed with the game on 133 of 134. repoe-fork/dat-export publishes a HEURISTIC
+    // schema derived from the data itself, which is why it caught a trailing column nobody had
+    // named - check it when a table disagrees with the game. jchantrell/dat-schema is a third
+    // opinion and was the LEAST complete of the three here: 19 columns totalling 0x98 for
+    // EndgameMaps, opening with an i32 the other two do not have. THE GAME IS THE ARBITER in all
+    // of this - it reports its own row size and --tables prints it.
+    // SO an offset computed in EndgameMaps is right up to the missing column and wrong after it,
+    // and its row size cannot say where the break is. For any table the game's own row size is
+    // the number to trust; --tables prints it.
     // A row's INDEX is therefore computable too: (row - anyKnownRow) / rowSize is exact.
     // NONE OF THIS APPLIES TO COMPONENTS. Life, Actor, Render, Positioned, Buffs,
     // StatusEffect, Entity and the UI structs have no .dat table behind them. ChestData
@@ -486,7 +542,7 @@
     },
 
     "DatTable": {
-      "comment": "One of the game's static content tables as it sits in memory - what MinimapIcon.TablePtr points at, and the second half of every 16-byte foreign reference. The path NAMES the table, which is the missing half of every dat row this tool finds. THE TWO INTS BESIDE IT ARE THE PATH'S OWN HEADER, and this file had them written down as a mystery for months: \"0x1D and 0x1F as ints\". 0x08 is simply a std::wstring, and ReadStdWString puts size at +0x10 and capacity at +0x18 OF THE STRING - which is 0x18 and 0x20 here. 0x1D is 29, the length of \"Data/Balance/MinimapIcons.dat\" to the character; the 0x1F beside it is the capacity, and reads 31 for both tables seen so far, a 32-character buffer less its terminator. Worth having as a field of its own rather than as trivia, because the LENGTH is one read while the text is a pointer further away: a recording that never followed the pointer still carries the number, and a length identifies a table on its own more often than it sounds - QuestFlags below is the only 12-byte-row table in the game with a 27-character path.",
+      "comment": "One of the game's static content tables as it sits in memory - what MinimapIcon.TablePtr points at, and the second half of every 16-byte foreign reference. The path NAMES the table, which is the missing half of every dat row this tool finds. THE TWO INTS BESIDE IT ARE THE PATH'S OWN HEADER, and this file had them written down as a mystery for months: \"0x1D and 0x1F as ints\". 0x08 is simply a std::wstring, and ReadStdWString puts size at +0x10 and capacity at +0x18 OF THE STRING - which is 0x18 and 0x20 here. 0x1D is 29, the length of \"Data/Balance/MinimapIcons.dat\" to the character; the 0x1F beside it is the capacity, and reads 31 for both tables seen so far, a 32-character buffer less its terminator. Worth having as a field of its own rather than as trivia, because the LENGTH is one read while the text is a pointer further away: a recording that never followed the pointer still carries the number, and a length identifies a table on its own more often than it sounds - QuestFlags below is the only 12-byte-row table in the game with a 27-character path. A TABLE IS A LOADED-FILE RECORD, and that is what turns every table the game has loaded into something reachable from a STATIC rather than only from an object that happens to point at one. FileRecord.Name and DatTable.Path are not merely the same shape at the same offset - they are the same field of the same object. MEASURED 2026-08 in tests/fixtures/session-2026-08-sweep.rec, in both directions at once: the table an NPCs row names at +0x20 (0x31826080AD0, whose Path reads \"Data/Balance/QuestFlags.dat\", 27 characters, and whose row grid the row half at +0x18 lands on) is ALSO one of the 8406 records the FileRoot walk enumerates, reached bucket -> slot -> record with nothing assumed. It is not one coincidence either: of the four tables that recording holds a foreign pointer to - Stats, GroundEffects, BuffDefinitions, QuestFlags - every one is a record in the file table. So the route is FileRoot -> LoadedFilesRoot -> bucket -> FileRecordSlot.Record -> here, and RowStorePtr from there; Game/Files/LoadedDatTables.cs walks it and PointerPeek.DescribeTable decides which records really are tables. MOST OF THE GAME'S TABLES ARE NOT ON IT, and the fraction is the finding rather than any one absence. A live walk turns up 134 tables among 6914 files, and 157 of those records are .dat files at all - against about 1020 PoE2 tables in the community schemas. FIFTEEN PER CENT. So a table being absent is the ordinary case, not a special fact about it: WorldAreas, MinimapIcons, NPCs and ItemVisualIdentity, the four THIS PROJECT READS ROWS FROM, are in none of the 6913 record names session-2026-09-tables.rec holds (--tables names every record that is NOT a table, which no other capture does) - and at 15% coverage, four named tables all being missing is a coin flip rather than a pattern. It was first written up here AS a pattern, which it is not. Stats, Mods, BaseItemTypes and QuestFlags happen to be there. TWO THINGS COULD PRODUCE THAT FRACTION and this file cannot tell them apart: the table may genuinely track only the files the resource loader pulls in, or our walk may be seeing a slice of it - BucketCount 0x10 is ported from GameHelper2, a PoE1 tool, and has never been checked here, so if the real count is larger every walk of this table has been partial and every absence means only that we did not look. No recording can settle it: not one fixture in this repo holds a single byte past the last bucket, because nothing has ever read there. PreloadReader.BucketsBeyondTheCount probes the slots past the end and --tables prints what it finds. UNTIL THAT RUNS, do not plan on finding a particular table here - the row-pointer route through a component is the only route to a table this walk does not turn up. WHAT THIS LIST REALLY IS points the same way: 157 of the 6914 records are .dat files at all, against 1219 .tok, 903 .ao and 462 .ast - it is the RESOURCE SYSTEM's list (the hover note above puts FileRoot 0xFA08 from the object that turned out to be exactly that), and the content tables on it are the ones that travel through the resource loader. AND BEING ON IT IS NOT BEING PARSED: 23 of those 157 have nothing usable at RowStorePtr, GrantedEffectsPerLevel and Languages among them, so a table can be present and rowless. Find returns nothing rather than throwing for all of this. AND THE ROUTE RUNS, END TO END, 2026-08-31 (session-2026-08-glossary.rec): FileRoot -> 6907 records -> the KeywordPopups record -> RowStorePtr at +0x28 -> 1026 rows of 0x48, read as English. That last hop had no fixture until then, because the preload walk reads a 32-byte string header at +0x08 and stops one byte short of +0x28, so nothing had ever read a file record's row store; it was the same RowStorePtr already confirmed from the MinimapIcon and NPCs side on the same kind of object, and now it is confirmed on this route as well. 131 of those 6907 files are dat tables, which is the size of the thing this opens up.",
       "fields": {
         "Path": { "offset": "0x08", "type": "stdWString", "comment": "\"Data/Balance/MinimapIcons.dat\". Declared as a bare PathPtr before, which read the same characters and left the two ints next to it unexplained." },
         "RowStorePtr": { "offset": "0x28", "type": "ptr", "struct": "DatRowStore", "invariant": { "kind": "plausiblePtr" }, "comment": "The rows themselves and the indices over them. This is the \"another pointer at 0x28 into the same table blob\" that used to be listed as unread." }
@@ -531,6 +587,16 @@
         "Hash32": { "offset": "0x08", "type": "u32", "comment": "The table's own HASH32 column, straight from the file rather than computed at load: FNV-1a, FNV-1, djb2, sdbm, murmur3, CRC-32 and Adler-32 were all tried over the name in UTF-16 and UTF-8, raw and lower-cased, and none reproduces it. Not a loose end - dat-schema calls the column HASH32 because nobody knows the algorithm either. DatRowStore.ByHashIndex is keyed on exactly this value." }
       },
       "consts": { "RowSize": "0x0C" }
+    },
+
+    "KeywordPopupsRow": {
+      "comment": "A row of KeywordPopups.dat: THE GAME'S GLOSSARY, and the table that resolves the [Key|Text] markup its own texts are written in. FOUND 2026-08 by the owner in the dissector, on a hand-followed trail; identified here two ways that cannot both be wrong. (1) THE CONTENT. Every row is an Id, a display term and a popup text - \"CriticalDamageBonus\" / \"Critical Damage Bonus\" / \"Multiplies the damage dealt by [Critical|Critical Hits]...\" - and that Definition names ANOTHER ROW OF THIS TABLE by its Id: row \"Critical\" carries the term \"Critical Hits\", which is the right half of the markup to the character. A table whose text is keyed on its own Id column is what a glossary is. (2) THE ARITHMETIC. Nine consecutive rows in the same screenshot sit on a 0x48 grid without an exception (+0x000, +0x048, +0x090 ... +0x240), and of all 1275 PoE2 tables in dat-schema exactly one has a 0x48 row that STARTS WITH FIVE STRING COLUMNS: KeywordPopups, at 5 * 8 + 2 * 16. The two 16-byte columns are the foreign references ItemReference and ModReference, both null in every row seen - which is precisely the four empty qwords the dissector shows at +0x28..+0x40, and null foreign references are a far more specific thing for four zeroed qwords to be than padding. WHAT THE OTHER TWO STRING COLUMNS ARE is not known here and is not known to dat-schema either, which leaves them unnamed. They are empty in every row seen, and both hold the SAME pointer in EVERY row - the data section's deduplicated empty string - which is what an empty string column looks like from outside and is a third witness to the column count. Not declared as fields because nothing can be said about them. THE STRING POOL, from the same screenshot: UTF-16, back to back, four zero bytes between them (\"Critical\" at 0x...B750, \"Critical Hits\" at 0x...B764 = 8 chars + 4, the next at 0x...B782 = 13 chars + 4) - the same packing QuestFlagsRow.Id documents, on a second table. CONFIRMED LIVE 2026-08-31 by the owner, and the whole route with it (tests/fixtures/session-2026-08-glossary.rec, GlossaryTableTests): 131 dat tables among 6907 loaded files, KeywordPopups found by name, and THE GAME ITSELF REPORTS 0x48 - the row store divides its rows by its by-Id index, so the row size that identified this table from a screenshot is now arithmetic the client did, with no dat-schema involved. 1026 rows, path length 30, row 0 is \"Test\" (\"This test case is designed to be overwitten by other content\", the game's own typo) and row 1025 is \"PowerRune\". TWO THINGS THE SCREENSHOT GOT WRONG, both corrected by that recording and worth keeping because both were read off OUR OWN RENDERING rather than off the game. (1) THERE IS NO DOUBLED PERCENT. This said a literal percent is doubled (\"+100%%\"); the raw column holds \"+100%\", and of the 236 definitions containing a percent not one has it doubled. ImGui takes a label as a format string, so ImGuiText.Escape doubles every '%' before drawing - the dissector was showing its own escaping. (2) A DEFINITION MAY BE EMPTY BUT Critical's IS NOT. 260 of the 1026 rows carry no definition and 251 no Term, so the empty case is real; Critical is simply not one of them - it holds several paragraphs. MARKUP: [Id|Term] renders as the part after the pipe and [Id] as the Id itself, both naming a row of this same table - 596 definitions carry markup, holding 2096 brackets of which 913 have no pipe, and 324 of the 328 keys referenced are Ids here. A SECOND MARKUP shares the column: the 33 Expedition rune rows are rich text instead (\"<rgb(219,217,206)>{Fire Rune}\", \"<font:'fontin'>{...}\", opening \"<<ExpedRuneFire>>\"), and braces occur in those 33 rows and nowhere else, so the two do not overlap. ROW SIZE IS NOT TRUSTED FROM HERE - the table reports its own, see DatRowStore, and KeywordGlossary refuses a table that does not report 0x48.",
+      "fields": {
+        "Id": { "offset": "0x00", "type": "utf16Ptr", "comment": "-> raw UTF-16, not a std::wstring. The ENGINE key, English on every client: \"Critical\", \"CriticalDamageBonus\", \"JaggedGround\", \"Totem\", \"Taunt\", \"Empowered\", \"Power\", \"Armour\", \"Burning\". This is what the left half of a [Key|Text] markup names, so it is what a lookup is keyed on - never Term, which is localised." },
+        "Term": { "offset": "0x08", "type": "utf16Ptr", "comment": "-> raw UTF-16. What the player reads: \"Critical Hits\", \"Jagged Ground\", \"Totems\", \"Monster Power\". Equals the right half of the markup, which is how the table was identified. Localised: display it, never match on it." },
+        "Definition": { "offset": "0x10", "type": "utf16Ptr", "comment": "-> raw UTF-16, and MAY BE EMPTY - 260 of the 1026 live rows carry no popup text at all, so a keyword can have a term and nothing to say about it. Contains markup of its own, into this same table. NO LENGTH TRAVELS WITH IT, which is a trap rather than a detail: a raw pointer ends at its terminator, so whatever cap a reader passes is where a long definition silently gets cut, and the cut takes the MARKUP in the tail with it - reading this table at a 512 cap made it look like it refers to 317 keywords when it refers to 328. MEASURED at a 2048 cap: the longest definition is Flammability at 1429 characters, and not one comes back at the cap, so 1429 is the table's real maximum in 0.5.x rather than a number a reader stopped at. 55 definitions are longer than 512." }
+      },
+      "consts": { "RowSize": "0x48" }
     },
 
     "NpcsRow": {
@@ -898,9 +964,9 @@
     },
 
     "FileRecord": {
-      "comment": "One loaded file. AreaChangeCount is the STAMP the game put on it when it loaded, and nothing re-stamps it - so the files carrying the newest stamp in the table are the ones the current area brought in. MEASURED LIVE (2026-08), and it disagrees with the reference: GameHelper2 puts the stamp at 0x40 and has 0x38 commented out as an UnknownConstant, and here it is the other way round. With the counter static reading 13, a sweep of 3999 records found 13 at +0x38 in 465 of them and NOWHERE at +0x40, where all 3999 held a flat 2. 465 records carrying the current area's stamp is what a freshly loaded map looks like; a field reading the same number in every record is a constant, not a stamp. GameHelper2 skips stamps below 3 because the first couple of areas of a session load the whole menu with them, and that is kept.",
+      "comment": "One loaded file. AreaChangeCount is the STAMP the game put on it when it loaded, and nothing re-stamps it - so the files carrying the newest stamp in the table are the ones the current area brought in. MEASURED LIVE (2026-08), and it disagrees with the reference: GameHelper2 puts the stamp at 0x40 and has 0x38 commented out as an UnknownConstant, and here it is the other way round. With the counter static reading 13, a sweep of 3999 records found 13 at +0x38 in 465 of them and NOWHERE at +0x40, where all 3999 held a flat 2. 465 records carrying the current area's stamp is what a freshly loaded map looks like; a field reading the same number in every record is a constant, not a stamp. GameHelper2 skips stamps below 3 because the first couple of areas of a session load the whole menu with them, and that is kept. A RECORD FOR A .dat FILE IS A DatTable - the same object, not a parallel one, so this table is also the index of every content table the game has loaded and the only route to one that starts at a static. The evidence is written up on DatTable; the consequence here is that FileRecord.Name and DatTable.Path are one field, and that this struct is deliberately not the whole record - a .dat record carries RowStorePtr at +0x28, which no walk of this table has ever read.",
       "fields": {
-        "Name": { "offset": "0x08", "type": "stdWString" },
+        "Name": { "offset": "0x08", "type": "stdWString", "comment": "The file's path, e.g. \"Data/Balance/QuestFlags.dat\" - and DatTable.Path is this same field. TWO THINGS DECORATE IT, so never match a whole path literally: a LANGUAGE PREFIX (\"en:Data/Balance/ClientStrings.dat\", in session-2026-08-deployed.rec) on the localised copy of a table, and an '@' variant suffix that PreloadReader.Tidy drops. Match the last segment - PointerPeek's table Name does exactly that, and gets \"ClientStrings\" out of the prefixed form for free." },
         "AreaChangeCount": { "offset": "0x38", "type": "i32" }
       },
       "consts": { "IgnoreFirstAreas": "2" }
@@ -1260,7 +1326,7 @@
     },
 
     "BuffDefinition": {
-      "comment": "The static description a StatusEffect points at, and A ROW OF BuffDefinitions.dat - so its offsets are computable rather than searchable, see the note above WorldAreaDat. BuffType 0x04 marks a FLASK buff, which is what makes 'is this flask still active' answerable without name matching.",
+      "comment": "The static description a StatusEffect points at, and A ROW OF BuffDefinitions.dat - so its offsets are computable rather than searchable, see the note above WorldAreaDat. BuffType 0x04 marks a FLASK buff, which is what makes 'is this flask still active' answerable without name matching. ROW SIZE 0x15F IS THE GAME'S OWN NUMBER, not a computation: the loaded-table walk reads it out of the row store (3217 rows, session-2026-08-glossary.rec), and dat-schema's 55 columns compute the same 0x15F. That matters more here than on most rows, because every offset below except Name was DERIVED from the column widths and none of them is on the drift report's chain - the total agreeing is the one check that covers the columns nothing reads.",
       "fields": {
         "Name": { "offset": "0x00", "type": "utf16Ptr", "comment": "-> raw UTF-16 string, NOT a StdWString, e.g. \"flask_effect_life\". This is the table's Id column, i.e. the ENGINE identifier, and it is what a RULE matches: it stays English on a localised client, where matching a display name would break every rule the moment somebody changed their game's language. DisplayName below is the readable one, shown but never matched." },
         "Description": { "offset": "0x08", "type": "utf16Ptr", "comment": "Column 1 of the same row - the buff's own description text. Read to CORROBORATE DisplayName as much as to show it: this row's layout is computed rather than observed, and two independent strings landing correctly at once is unlikely by accident, so a wrong offset reads as obvious rubbish in the rule editor's buff picker rather than as a quiet lie." },
@@ -1268,7 +1334,7 @@
         "BuffVisualsKey": { "offset": "0x55", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "STILL DERIVED, NOT OBSERVED - declared, never read, never seen in a live game. 0x55 is where the BuffVisual COLUMN starts, and a foreign reference holds the ROW pointer at the column start (see the order note above WorldAreaDat, settled 2026-08 on NPCs.QuestFlags). MOVED BACK HERE FROM 0x5D, which is where the old +8 rule put it, on the strength of that observation - and the reference this disagrees with is still worth respecting: GameHelper2 reads GrantedEffects.ActiveSkillDatPtr at 0x57 where dat-schema computes that column starting at 0x4F, which is the +8 rule and cannot be reconciled with what the fixture shows unless GrantedEffects' earlier columns have drifted by 8. So this field is now the cheapest live test of a rule the whole column arithmetic rests on: read a real BuffDefinition, follow this pointer, and see whether it lands on a row (a pointer to text) or on an engine object (a module pointer, i.e. a vtable). Nothing checks it today - the drift report walks GameState -> InGameState -> AreaInstance/WorldData -> LocalPlayerStruct and this row is not on that chain." },
         "BuffType": { "offset": "0x67", "type": "u8", "comment": "0x04 = flask buff. The column is really called BuffCategory and is an i32; reading the low byte works and is what the reference does, but the upper three bytes are not padding - they are part of the value." }
       },
-      "consts": { "BuffTypeFlask": "0x04" }
+      "consts": { "BuffTypeFlask": "0x04", "RowSize": "0x15F" }
     },
 
     "StatusEffect": {

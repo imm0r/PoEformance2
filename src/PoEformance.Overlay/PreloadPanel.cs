@@ -134,7 +134,7 @@ public sealed class PreloadPanel
             // Under the list rather than in a corner of it: the window sizes itself to its
             // contents, so a button pinned to the right edge would move with the longest
             // name and be somewhere different in every area.
-            if (ImGui.SmallButton("close for this map"))
+            if (ImGui.SmallButton("Close for This Map"))
             {
                 _closed = area;
             }

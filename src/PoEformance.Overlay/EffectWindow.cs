@@ -69,22 +69,22 @@ public sealed class EffectWindow
         ImGui.Separator();
 
         bool drawing = _layer.Enabled;
-        if (ImGui.Checkbox("draw them in the world", ref drawing))
+        if (OverlayLayout.Toggle("World Render", ref drawing))
         {
             _layer.Enabled = drawing;
             _changed();
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
         bool paths = _layer.ShowPaths;
-        if (ImGui.Checkbox("with their paths", ref paths))
+        if (OverlayLayout.Toggle("Draw Paths", ref paths))
         {
             _layer.ShowPaths = paths;
             _changed();
         }
 
         bool keeping = _layer.KeepHostile;
-        if (ImGui.Checkbox("keep the hostile ground effects  (the reader drops them)", ref keeping))
+        if (OverlayLayout.Toggle("Keep Hostile Ground", ref keeping))
         {
             _layer.KeepHostile = keeping;
             _changed();
@@ -92,15 +92,14 @@ public sealed class EffectWindow
 
         // Said next to the switch, because the reason it is off is the reason a screen full of
         // enemy markers once looked like a broken overlay rather than a working Firewall.
-        ImGuiText.Hint(
-            DimText,
-            "a flame wall carries Life and a position, so kept as monsters they were drawn"
-            + " as enemies and given health bars.");
+        OverlayLayout.Hint(
+            "A flame wall carries Life and a position, so kept as monsters they were drawn as"
+            + " enemies and given health bars.");
 
         if (_noise is NoiseFilter noise)
         {
             bool engine = !noise.IsOn(NoiseKind.Engine) || !noise.Enabled;
-            if (ImGui.Checkbox("let the engine's own nodes through  (/fx/, /mat/, /epk/ ...)", ref engine))
+            if (OverlayLayout.Toggle("Bypass Engine Noise Filter", ref engine))
             {
                 noise.Set(NoiseKind.Engine, !engine);
                 _changed();
@@ -108,24 +107,24 @@ public sealed class EffectWindow
 
             if (engine)
             {
-                ImGuiText.Hint(
-                    WarnText,
-                    "these are the most numerous entities in the game and each costs a"
-                    + " component read - expect the read cost to climb.");
+                OverlayLayout.Warning(
+                    "These are the most numerous entities in the game and each costs a component"
+                    + " read - expect the read cost to climb.");
             }
         }
-
-        ImGui.Separator();
 
         // Said out loud, because "particles" invites an expectation nothing in memory can
         // meet, and somebody looking for a spark that is not there would conclude the read is
         // broken rather than that the thing was never listed.
-        ImGuiText.Wrapped(
-            DimText,
+        //
+        // ON THE HEADING RATHER THAN ABOVE THE LIST. It is read once, by whoever is surprised
+        // by what the list contains - and as a paragraph between the switches and the list it
+        // was three lines of the tab's height, permanently, for a sentence nobody re-reads.
+        OverlayLayout.Group(
+            "What Is Out There",
             "The game's actual particles are rendering and are not entities - nothing lists a"
             + " spark. A screen of fire is ONE entity here, and that entity is what gets a mark.");
 
-        ImGui.Separator();
         DrawSorts(snapshot);
     }
 
@@ -134,8 +133,7 @@ public sealed class EffectWindow
     {
         IReadOnlyList<EffectSort> sorts = EffectCensus.Sorts(snapshot);
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 13.5f);
-        ImGui.InputTextWithHint("##effect-filter", "filter by path", ref _filter, 128);
+        OverlayLayout.Search("##effect-filter", "filter by path", ref _filter, 128);
 
         int shown = 0;
         int all = 0;

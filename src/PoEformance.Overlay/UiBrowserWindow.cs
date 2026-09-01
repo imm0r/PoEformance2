@@ -185,8 +185,12 @@ public sealed class UiBrowserWindow
 
     private void DrawToolbar(UiTreeView view)
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
-        if (ImGui.InputText("##uib-search", ref _search, 128, ImGuiInputTextFlags.EnterReturnsTrue))
+        // What the box searches goes in the box. It used to be a grey caption after the button,
+        // third item on a line of five - so the sentence explaining the field was separated
+        // from the field by a button.
+        if (OverlayLayout.Search(
+                "##uib-search", "id or displayed text...", ref _search, 128,
+                OverlayLayout.ButtonRoom("Search"), ImGuiInputTextFlags.EnterReturnsTrue))
         {
             _searchSequence++;
         }
@@ -197,26 +201,21 @@ public sealed class UiBrowserWindow
             _searchSequence++;
         }
 
-        ImGui.SameLine();
-        ImGui.TextColored(DimText, "id or displayed text");
-
-        ImGui.SameLine();
-        ImGui.Checkbox("Follow cursor", ref _followCursor);
-
-        ImGui.SameLine();
-        ImGui.Checkbox("Highlight", ref _highlightSelected);
+        OverlayLayout.Toggle("Follow Cursor", ref _followCursor);
+        OverlayLayout.Next();
+        OverlayLayout.Toggle("Highlight", ref _highlightSelected);
 
         // Root controls. Re-rooting is what makes a deep subtree workable - the interface is
         // over a hundred children wide at the top, and scrolling past it to reach the same
         // panel repeatedly is most of the work otherwise.
-        if (ImGui.Button("Game root"))
+        if (ImGui.Button("Game Root"))
         {
             _root = 0;
             _expanded.Clear();
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("Root here") && _selected != 0)
+        if (ImGui.Button("Root Here") && _selected != 0)
         {
             _root = _selected;
             _expanded.Clear();

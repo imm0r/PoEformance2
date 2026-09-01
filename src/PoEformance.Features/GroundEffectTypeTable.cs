@@ -43,6 +43,17 @@ public sealed record GroundEffectType(int Row, string Id, int Buffs, bool HasSta
 /// for the part of the row that is still right. Duplicating that here to get a better-fitting
 /// name would mean two copies of the only code that decides whether a table can be trusted.
 ///
+/// FROM THE INSTALL AND NOT FROM THE PROCESS, which is worth saying now that
+/// <see cref="Game.Files.LoadedDatTables"/> can reach any loaded table from FileRoot. That route
+/// is the better one for most questions and is the wrong one for this: the resident copy of a
+/// table carries the fixed-size rows and NOT the variable-length section, and `Id` is a string,
+/// which lives in exactly the half that is missing. See the remarks on
+/// <see cref="Game.Files.DatFile"/>, which was written for the same reason.
+///
+/// The two do have something to say to each other, and it is a cross-check worth remembering:
+/// the resident table knows its own row COUNT and row SIZE, so a running game can confirm the
+/// 64 bytes this vendored layout computes without parsing a file at all.
+///
 /// MISSING IS ORDINARY. No install found, a renamed table, a layout that stopped matching - all
 /// of them end with <see cref="Why"/> saying so and every lookup returning null. The ring is
 /// still drawn; it simply goes back to showing the entity path, which is where this started.

@@ -148,11 +148,20 @@ public sealed class EntityBrowserWindow
 
     private void DrawControls(EntityView view, WorldSnapshot snapshot)
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 13.5f);
-        ImGui.InputText("filter", ref _filter, 64);
+        // The label moves inside the box - "filter" beside a field is a word explaining a field
+        // that explains itself the moment it says "filter by name" in its own grey text.
+        //
+        // Room reserved for BOTH buttons whether or not the second is drawn, and for the longer
+        // of the two labels the first one wears - so the box is one width. Reserved for what is
+        // on screen instead, it grew and shrank every time the survey was opened, which moves
+        // the thing being typed into out from under the cursor that just clicked beside it.
+        string survey = _surveyPane ? "Back to Entities" : "Survey This Area";
+        OverlayLayout.Search(
+            "##filter", "filter by name...", ref _filter, 64,
+            OverlayLayout.ButtonRoom("Survey This Area", "Count Again"));
 
         ImGui.SameLine();
-        if (ImGui.Button(_surveyPane ? "back to entities" : "survey this area"))
+        if (ImGui.Button(survey))
         {
             _surveyPane = !_surveyPane;
             if (_surveyPane)
@@ -161,23 +170,45 @@ public sealed class EntityBrowserWindow
             }
         }
 
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip(
-                $"Counts every component across the {snapshot.Entities.Count - snapshot.Remembered} entities here.\n"
-                + "The rare undescribed ones are the leads worth following.");
-        }
+        OverlayLayout.Hint(
+            $"Counts every component across the {snapshot.Entities.Count - snapshot.Remembered}"
+            + " entities here. The rare undescribed ones are the leads worth following.");
 
         if (_surveyPane)
         {
             ImGui.SameLine();
-            if (ImGui.Button("count again"))
+            if (ImGui.Button("Count Again"))
             {
                 _surveySequence++;
             }
         }
 
-        ImGui.TextColored(DimText, view.Status);
+        DrawFacts(view, snapshot);
+        DrawHidden();
+    }
+
+    /// <summary>
+    /// What the read is doing, on ONE line, with the sentences on hover.
+    /// </summary>
+    /// <remarks>
+    /// FIVE PARAGRAPHS USED TO STAND HERE, between the filter and the panes, on the one tool in
+    /// this window that is nothing but height: the read's status, a duplicate check, a corpse
+    /// count, a note about dropped repeats, and a sentence saying what the number on each row
+    /// means. Every one of them is worth having and not one is worth a permanent line of the
+    /// list - which is what they cost, on every frame, whether or not anybody was reading them.
+    /// The panes started six lines down the tab.
+    ///
+    /// A FACT IS SHORT; THE SENTENCE ABOUT IT IS WHAT WAS LONG. So the fact stays on screen and
+    /// the sentence moves to a hover, which is where an explanation read once belongs. Nothing
+    /// is dropped and nothing goes behind a click.
+    ///
+    /// What is still said in full is what changes the meaning of the list: a repeat the
+    /// collapsing missed, and corpses that could not be read. Those are findings, and a finding
+    /// somebody has to hover to see is a finding nobody sees.
+    /// </remarks>
+    private static void DrawFacts(EntityView view, WorldSnapshot snapshot)
+    {
+        ImGui.TextColored(DimText, ImGuiText.Escape(view.Status));
 
         // WHY THIS IS HERE AND NOT BEHIND A BUTTON: it answers "am I looking at twelve
         // monsters or at four of them three times", and that question arrives while looking
@@ -187,32 +218,36 @@ public sealed class EntityBrowserWindow
         // It runs on the list AFTER the reader has collapsed repeats, so it should now find
         // nothing - and that is the point of leaving it in. It is the check on the collapsing
         // rather than a leftover: anything it still reports is a repeat the position key does
-        // not catch, which is exactly what nobody would notice otherwise.
+        // not catch, which is exactly what nobody would notice otherwise. So a FINDING is
+        // spelled out where it cannot be missed, and a clean check is two words with the counts
+        // it was made from one hover away.
         EntityDuplicates duplicates = EntityDuplicates.Of([.. snapshot.Listed]);
-        ImGui.TextColored(
+        Fact(
             duplicates.Any ? WarnText : DimText,
-            ImGuiText.Escape(duplicates.Describe()));
+            duplicates.Any ? duplicates.Describe() : "no repeats");
+        OverlayLayout.Hint(duplicates.Describe());
+
+        if (snapshot.Collapsed > 0)
+        {
+            Fact(DimText, $"{snapshot.Collapsed} repeats dropped");
+
+            // Says the MECHANISM, not the symptom. "On the same spot" was true but described
+            // the position key this rule no longer uses, and a line that documents a rule
+            // nobody applies any more is worse than no line: it is what the next person
+            // reads instead of the code.
+            OverlayLayout.Hint(
+                "Dropped by this read: the game gives one monster several entities over one set"
+                + " of components.");
+        }
 
         // What the corpse check saw. Here because dots left on cleared ground are noticed
         // while looking at this list, and because the three ways it can fail look identical
         // on the map and want completely different fixes - see CorpseSigns.
         if (snapshot.Corpses.Seen > 0)
         {
-            ImGui.TextColored(
+            Fact(
                 snapshot.Corpses.Unreadable > 0 ? WarnText : DimText,
-                ImGuiText.Escape("corpses: " + snapshot.Corpses.Describe()));
-        }
-
-        if (snapshot.Collapsed > 0)
-        {
-            // Says the MECHANISM, not the symptom. "On the same spot" was true but described
-            // the position key this rule no longer uses, and a line that documents a rule
-            // nobody applies any more is worse than no line: it is what the next person
-            // reads instead of the code.
-            ImGuiText.Wrapped(
-                DimText,
-                $"{snapshot.Collapsed} repeat entities dropped this read - the game gives one"
-                + " monster several entities over one set of components");
+                "corpses: " + snapshot.Corpses.Describe());
         }
 
         // What the bare number on each row is. It was read as an id, a count and an index
@@ -224,11 +259,17 @@ public sealed class EntityBrowserWindow
         // number is on the rows at all.
         if (snapshot.Player is not null)
         {
-            ImGui.TextColored(DimText, "nearest first - the number is how far away, in grid squares");
+            Fact(DimText, "nearest first");
+            OverlayLayout.Hint("The number on each row is how far away it is, in grid squares.");
         }
-
-        DrawHidden();
     }
+
+    /// <summary>One more fact on the line - <see cref="OverlayLayout.Fact"/>, under this name.</summary>
+    /// <remarks>
+    /// Written here first and lifted once the wealth page wanted the same line. Kept as a name
+    /// because the calls below read as what they are.
+    /// </remarks>
+    private static void Fact(Vector4 ink, string text) => OverlayLayout.Fact(ink, text);
 
     private static readonly Vector4 WarnText = OverlayInk.Warn;
 
@@ -242,7 +283,7 @@ public sealed class EntityBrowserWindow
     /// </remarks>
     private void DrawHideButtons(EntityView view, WorldEntity? chosen)
     {
-        if (ImGui.SmallButton("hide this kind"))
+        if (ImGui.SmallButton("Hide This Kind"))
         {
             _hiding.HideKind(view.Path);
         }
@@ -260,7 +301,7 @@ public sealed class EntityBrowserWindow
         if (chosen is { IsRemembered: false } entity)
         {
             ImGui.SameLine();
-            if (ImGui.SmallButton("hide just this one"))
+            if (ImGui.SmallButton("Hide Just This One"))
             {
                 _hiding.HideOne(entity.Path, entity.WorldX, entity.WorldY);
             }
@@ -289,13 +330,13 @@ public sealed class EntityBrowserWindow
             return;
         }
 
-        if (!OverlayFonts.SectionHeader($"hidden ({_hiding.Count})###hidden"))
+        if (!OverlayLayout.Subsection($"Hidden ({_hiding.Count})###hidden"))
         {
             return;
         }
 
         ImGui.SameLine();
-        if (ImGui.SmallButton("show everything again"))
+        if (ImGui.SmallButton("Show Everything Again"))
         {
             _hiding.ShowEverything();
             return;
@@ -891,7 +932,7 @@ public sealed class EntityBrowserWindow
 
         DrawHideButtons(view, chosen);
 
-        if (ImGui.SmallButton("dissect the entity"))
+        if (ImGui.SmallButton("Dissect the Entity"))
         {
             _dissect(view.Address, view.Path, "Entity");
         }
@@ -899,7 +940,7 @@ public sealed class EntityBrowserWindow
         if (_compare is not null)
         {
             ImGui.SameLine();
-            if (ImGui.SmallButton("compare with##entity"))
+            if (ImGui.SmallButton("Compare With##entity"))
             {
                 _compare(view.Address, view.Path);
             }
@@ -946,7 +987,7 @@ public sealed class EntityBrowserWindow
                 ImGui.SameLine();
             }
 
-            if (ImGui.SmallButton($"dissect##{component.Address:X}"))
+            if (ImGui.SmallButton($"Dissect##{component.Address:X}"))
             {
                 // The component's own layout when the schema has one. When it does not - the
                 // whole reason to be here - the generic one still names the two rows every

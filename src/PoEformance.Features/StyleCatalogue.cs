@@ -137,7 +137,7 @@ public static class StyleCatalogue
         // ONE plate rather than three. There used to be one per weight, back when an entry's
         // colour came from a weight; entries now carry their own colour, so what is left for the
         // catalogue is the card's plate itself - its icon, and how wide it is drawn.
-        new("preload.card", "What the area loaded", "Entry card plate", Marker, Rgb(255, 217, 102)),
+        new("preload.card", "What the area loaded", "Card Scale", Marker, Rgb(255, 217, 102)),
 
         // ── The atlas ───────────────────────────────────────────────────────
         // A map's own colour comes from the GROUP it is in, and that is set beside the group
@@ -249,16 +249,36 @@ public static class StyleCatalogue
         /// Everything drawn on the game world itself - the markers, the routes, the layout,
         /// the measuring aids. These have no feature tab to live on, so they share one page.
         /// </summary>
+        /// <summary>What is drawn over a THING: the monsters, their drops, everything else.</summary>
+        /// <remarks>
+        /// FOUR LISTS RATHER THAN ONE, because forty rows under eight headings on one scroll is
+        /// where somebody loses their place - see the markers page, which spreads them over four
+        /// tabs. The split is by what a row is drawn ON, which is the question somebody arrives
+        /// with: a thing, a place, a health bar, or the tool's own measuring furniture.
+        /// </remarks>
+        public static readonly string[] MarkerEntities = ["Monsters", "Drops", "Other entities"];
+
+        /// <summary>What is drawn on the GROUND: places, the layout, the routes between them.</summary>
+        public static readonly string[] MarkerPlaces = ["Places", "Map", "Routes"];
+
+        /// <summary>The bars over a monster's head.</summary>
+        public static readonly string[] MarkerHealth = ["Health bars"];
+
+        /// <summary>The tool's own furniture, drawn to check that the rest lands where it should.</summary>
+        public static readonly string[] MarkerAids = ["Measuring aids"];
+
+        /// <summary>
+        /// Every marker group, for the test that holds each one to exactly one page.
+        /// </summary>
+        /// <remarks>
+        /// DECLARED AFTER THE FOUR IT IS BUILT FROM, and that is not a style choice: static
+        /// fields initialise in declaration order, so written above them this read four nulls
+        /// and the page came up empty. The compiler says so, which is the only reason it was
+        /// not a mystery.
+        /// </remarks>
         public static readonly string[] Markers =
         [
-            "Monsters",
-            "Drops",
-            "Other entities",
-            "Places",
-            "Routes",
-            "Map",
-            "Health bars",
-            "Measuring aids",
+            .. MarkerEntities, .. MarkerPlaces, .. MarkerHealth, .. MarkerAids,
         ];
 
         /// <summary>Every page's claim, for the test that keeps the mapping complete.</summary>

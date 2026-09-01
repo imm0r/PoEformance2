@@ -65,7 +65,7 @@ public sealed class PreloadAlertWindow
     {
         Switches();
         ImGui.Spacing();
-        OverlayFonts.SectionTitle("what to watch for");
+        OverlayLayout.Group("Watch Rules");
         ImGui.Spacing();
         List();
     }
@@ -75,49 +75,63 @@ public sealed class PreloadAlertWindow
         PreloadSettings had = _settings();
         PreloadSettings wanted = had;
 
+        OverlayLayout.Group("Alert Settings");
+
+        // A 2x2 GRID rather than two pairs joined by a fixed gap, so the second row's switches
+        // sit under the first row's ticks instead of under the middle of their labels.
         bool window = had.Window;
-        if (ImGui.Checkbox("keep a window in the corner", ref window))
+        if (OverlayLayout.Toggle("Overlay Window", ref window))
         {
             wanted = wanted with { Window = window };
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Hint("Keeps a list in the corner of the screen for as long as the area lasts.");
+
+        OverlayLayout.Cell(1);
         bool card = had.Card;
-        if (ImGui.Checkbox("and say it on the way in", ref card))
+        if (OverlayLayout.Toggle("Announce on Enter", ref card))
         {
             wanted = wanted with { Card = card };
         }
 
+        OverlayLayout.Hint("Says what matched once, on the way in, and then gets out of the way.");
+
         bool timer = had.Timer;
-        if (ImGui.Checkbox("show time since the area loaded", ref timer))
+        if (OverlayLayout.Toggle("Show Load Timer", ref timer))
         {
             wanted = wanted with { Timer = timer };
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Hint("How long since the area loaded, counting up on the corner window.");
+
+        OverlayLayout.Cell(1);
         bool empty = had.HideWhenEmpty;
-        if (ImGui.Checkbox("hide the window when nothing matched", ref empty))
+        if (OverlayLayout.Toggle("Auto-Hide if Empty", ref empty))
         {
             wanted = wanted with { HideWhenEmpty = empty };
         }
 
         bool town = had.HideInTown;
-        if (ImGui.Checkbox("hide it in town and hideouts", ref town))
+        if (OverlayLayout.Toggle("Hide in Safe Zones", ref town))
         {
             wanted = wanted with { HideInTown = town };
         }
 
-        ImGuiText.Wrapped(
-            Dim,
-            "The file list is not refreshed in town, so what it holds there is the last real "
-            + "area. Left on, the window says so rather than showing it as though it were here.");
+        // THE PARAGRAPH BECOMES THE SWITCH'S OWN TOOLTIP. It explains why the switch exists at
+        // all - the file list is not refreshed in town, so what it holds there is the last real
+        // area - which is worth knowing once and is then known. On screen it was two lines of
+        // prose under a block of five switches, permanently.
+        OverlayLayout.Hint(
+            "Town and hideouts. The file list is not refreshed there, so what it holds is the last"
+            + " real area: left on, the window says so rather than showing it as though it were"
+            + " here.");
 
         if (wanted != had)
         {
             _switched(wanted);
         }
 
-        if (ImGui.SmallButton("say it again now"))
+        if (OverlayLayout.Actions("Say It Again Now") == 0)
         {
             _sayItNow();
         }
@@ -137,18 +151,20 @@ public sealed class PreloadAlertWindow
                 Dim,
                 _starter is null
                     ? "Nothing is being watched for, and the shipped list was not found beside the "
-                      + "program. Build one from the \"In this area\" tab - walk into a map and add "
+                      + "program. Build one from the Loaded Files tab - walk into a map and add "
                       + "the rows that mean something."
                     : "Nothing is being watched for. The button above starts you off with six "
                       + "mechanics measured across twenty captured maps; everything else is built "
-                      + "from the \"In this area\" tab, one row per path that means something.");
+                      + "from the Loaded Files tab, one row per path that means something.");
             return;
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 16.5f);
-        ImGui.InputTextWithHint("##preload-filter", "filter...", ref _filter, 200);
-        ImGui.SameLine();
-        ImGuiText.Wrapped(Dim, $"{entries.Count} watched, {_watch.Found.Count} of them here");
+        OverlayLayout.Search("##preload-filter", "filter...", ref _filter, 200);
+
+        // The count on its own line rather than welded to the filter's right with SameLine.
+        // It is a wrapping paragraph, so where it started depended on the filter's width and
+        // where it ENDED depended on the window's - which is how a caption becomes a layout.
+        OverlayLayout.Note($"{entries.Count} watched, {_watch.Found.Count} of them here.");
 
         if (!ImGui.BeginTable(
                 "preload-alerts",
@@ -349,7 +365,7 @@ public sealed class PreloadAlertWindow
         }
 
         ImGui.TableNextColumn();
-        if (ImGui.SmallButton("delete"))
+        if (ImGui.SmallButton("Delete"))
         {
             all.RemoveAt(at);
             return Edit.Shape;
@@ -374,7 +390,7 @@ public sealed class PreloadAlertWindow
             return;
         }
 
-        if (ImGui.SmallButton("add the shipped list"))
+        if (ImGui.SmallButton("Import Defaults"))
         {
             int added = _starter().Count(_watch.Add);
             if (added > 0)
@@ -404,15 +420,18 @@ public sealed class PreloadAlertWindow
 
     private void Adding()
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
+        // The short field keeps the shared-line width; the path takes whatever is left, less
+        // room for the button. Both were guesses before - 12 lines and 28 - and the second one
+        // ran off any window narrower than somebody had happened to have open.
+        ImGui.SetNextItemWidth(OverlayLayout.CompactWidth() * 2f);
         ImGui.InputTextWithHint("##add-name", "name", ref _addCalled, 100);
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 28f);
-        ImGui.InputTextWithHint("##add-path", "Metadata/...", ref _addPath, 250);
+        OverlayLayout.Search(
+            "##add-path", "Metadata/...", ref _addPath, 250, OverlayLayout.ButtonRoom("add"));
         ImGui.SameLine();
 
         ImGui.BeginDisabled(string.IsNullOrWhiteSpace(_addPath));
-        if (ImGui.SmallButton("add"))
+        if (ImGui.SmallButton("Add"))
         {
             if (_watch.Add(new PreloadAlertEntry(
                     _addPath.Trim(),

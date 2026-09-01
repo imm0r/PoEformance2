@@ -55,7 +55,7 @@ public sealed class PreloadWindow
 
     private void Draw()
     {
-        if (ImGui.Button("look again"))
+        if (ImGui.Button("Look Again"))
         {
             _lookAgain();
         }
@@ -90,7 +90,7 @@ public sealed class PreloadWindow
         if (all.Count == 0 && _watch.Looked)
         {
             ImGui.SameLine();
-            if (ImGui.SmallButton("find the count field"))
+            if (ImGui.SmallButton("Find the Count Field"))
             {
                 _sweep();
             }
@@ -101,7 +101,7 @@ public sealed class PreloadWindow
         if (all.Count > 0)
         {
             ImGui.SameLine();
-            if (ImGui.SmallButton("save the list"))
+            if (ImGui.SmallButton("Save the List"))
             {
                 _saved = PreloadAlertStore.Dump(_watch.Area, all, _watch.Note) is { } written
                     ? $"written to {written}"
@@ -123,7 +123,7 @@ public sealed class PreloadWindow
         // list are different answers to different questions, and a hairline does not say
         // where one ends.
         ImGui.Spacing();
-        OverlayFonts.SectionTitle("what that means");
+        OverlayLayout.Group("What That Means");
         ImGui.Spacing();
 
         IReadOnlyList<PreloadAlertEntry> found = _watch.Found;
@@ -144,7 +144,7 @@ public sealed class PreloadWindow
         }
 
         ImGui.Spacing();
-        OverlayFonts.SectionTitle("every file it loaded");
+        OverlayLayout.Group("Every File It Loaded");
         ImGui.Spacing();
         DrawSearch();
 
@@ -154,8 +154,25 @@ public sealed class PreloadWindow
             return;
         }
 
+        // A TABLE, so the paths start in a column. Laid out with SameLine the path began right
+        // after the button - which is a fixed width, so it looked fine until the day a button
+        // label changed - and the paths themselves are the longest thing on the tab. Two
+        // columns: what you can DO with a row, at the width the buttons need, and the path
+        // taking everything left.
+        if (!ImGui.BeginTable(
+                "##preload-files",
+                2,
+                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY))
+        {
+            ImGui.EndChild();
+            return;
+        }
+
         try
         {
+            ImGui.TableSetupColumn("##watch");
+            ImGui.TableSetupColumn("path", ImGuiTableColumnFlags.WidthStretch);
+
             int shown = 0;
             foreach (string path in all)
             {
@@ -164,6 +181,8 @@ public sealed class PreloadWindow
                     continue;
                 }
 
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
                 ImGui.PushID(shown);
 
                 // The whole point of the raw list, and the reason it is searchable: a path
@@ -171,12 +190,12 @@ public sealed class PreloadWindow
                 // to type it or wait for a release. THIS EXACT PATH is what gets watched - so
                 // what was clicked and what is stored can never disagree, which is the whole
                 // bargain of matching exactly.
-                if (ImGui.SmallButton("+ watch"))
+                if (ImGui.SmallButton("+ Watch"))
                 {
                     Add(path);
                 }
 
-                ImGui.SameLine();
+                ImGui.TableNextColumn();
 
                 // Copying still, because a path is also the thing you paste to somebody else
                 // when it needs looking at rather than watching for.
@@ -185,10 +204,15 @@ public sealed class PreloadWindow
                     ImGui.SetClipboardText(path);
                 }
 
+                OverlayLayout.Hint("Click to copy this path.");
+
                 ImGui.PopID();
 
                 if (++shown >= 400)
                 {
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();
+                    ImGui.TableNextColumn();
                     ImGui.TextColored(DimText, $"...and {all.Count - shown} more - narrow the search");
                     break;
                 }
@@ -196,15 +220,16 @@ public sealed class PreloadWindow
         }
         finally
         {
+            ImGui.EndTable();
             ImGui.EndChild();
         }
     }
 
     private void DrawSearch()
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 13.5f);
-        bool entered = ImGui.InputText(
-            "###preload-search", ref _search, 96, ImGuiInputTextFlags.EnterReturnsTrue);
+        bool entered = OverlayLayout.Search(
+            "###preload-search", "filter the files loaded here...", ref _search, 96,
+            OverlayLayout.ButtonRoom("watch for this"), ImGuiInputTextFlags.EnterReturnsTrue);
 
         ImGui.SameLine();
 
@@ -212,7 +237,7 @@ public sealed class PreloadWindow
         // already said what they care about, and it is a better rule than any single path
         // the search turned up - shorter, so it survives the file being renamed next league.
         string term = _search.Trim();
-        bool add = ImGui.Button("watch for this") || entered;
+        bool add = ImGui.Button("Watch for This") || entered;
         if (add && term.Length > 0)
         {
             Add(term);

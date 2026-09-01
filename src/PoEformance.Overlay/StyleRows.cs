@@ -36,8 +36,14 @@ public sealed class StyleRows
     private readonly Action _save;
     private readonly string[] _groups;
 
-    /// <summary>Which key's icon box is open. Only one at a time, to keep the rows short.</summary>
-    private string _editingIcon = string.Empty;
+    /// <summary>
+    /// The path being typed, while an icon popup is open.
+    /// </summary>
+    /// <remarks>
+    /// One field for every row, which is safe because ImGui allows one popup at a time: opening
+    /// another closes the first. The "which row is editing" flag this used to sit beside is
+    /// gone with it - the popup's own open state is that flag, kept where ImGui keeps it.
+    /// </remarks>
     private string _iconPath = string.Empty;
 
     // Something changed and has not been written down yet - see Settle.
@@ -55,38 +61,88 @@ public sealed class StyleRows
         _groups = groups;
     }
 
-    /// <summary>Draws the rows, and writes down whatever has settled.</summary>
+    /// <summary>
+    /// Draws the rows as a table, and writes down whatever has settled.
+    /// </summary>
     /// <remarks>
-    /// One group is drawn bare - its host's own header already says what it is. Several get
-    /// a collapsing header each, CLOSED by default: this shape only occurs on the markers
-    /// page, where eight groups open at once are the wall this arrangement replaced.
+    /// A TABLE BECAUSE EVERY ROW IS THE SAME ROW. A tick, a swatch, a name, a size, an icon and
+    /// a reset - forty times over on the markers page. Laid out with SameLine and a column stop
+    /// they still drifted, because what precedes the size is a NAME and names are different
+    /// lengths: "Route" and "Where a route starts" put their sliders in different places unless
+    /// something holds a column, and the reset button only exists on rows that have been
+    /// changed, so it moved everything after it on some rows and not others.
+    ///
+    /// Real columns hold. They also make the SHAPE of the list legible: a row with no size
+    /// slider now has an empty cell where the sliders are, which reads as "this one has no
+    /// size" instead of as a row that stops early.
+    ///
+    /// ONE TABLE FOR EVERY GROUP ON THE PAGE, not one per group. Column widths are measured per
+    /// table, so a table per group would line each group up with itself and with nothing else -
+    /// which is the same ragged edge one level up. The group names are rows inside the one
+    /// table.
     /// </remarks>
     public void Draw()
     {
-        foreach (string group in _groups)
+        // Sizes are per column and the name takes the slack, so the sliders sit at the same x
+        // whatever the longest name in the list happens to be.
+        if (!ImGui.BeginTable(
+                "##style-rows",
+                Columns,
+                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings))
         {
-            IGrouping<string, StyleEntry>? entries =
-                StyleCatalogue.Grouped().FirstOrDefault(g => g.Key == group);
-            if (entries is null)
-            {
-                continue;
-            }
+            Settle();
+            return;
+        }
 
-            if (_groups.Length > 1 && !OverlayFonts.SectionHeader(group))
-            {
-                continue;
-            }
+        try
+        {
+            ImGui.TableSetupColumn("##on");
+            ImGui.TableSetupColumn("##colour");
+            ImGui.TableSetupColumn("##name", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("##size");
+            ImGui.TableSetupColumn("##icon");
+            ImGui.TableSetupColumn("##reset");
 
-            foreach (StyleEntry entry in entries)
+            foreach (string group in _groups)
             {
-                DrawRow(entry);
+                IGrouping<string, StyleEntry>? entries =
+                    StyleCatalogue.Grouped().FirstOrDefault(g => g.Key == group);
+                if (entries is null)
+                {
+                    continue;
+                }
+
+                // A HEADING ROW rather than a fold. The groups are three or four rows each once
+                // they are spread over four tabs, and a fold over three rows is a click to
+                // reveal what would have fitted anyway. Only when there are several: one group
+                // is named by the tab it is on.
+                if (_groups.Length > 1)
+                {
+                    ImGui.TableNextRow();
+                    ImGui.TableNextColumn();
+                    ImGui.TableNextColumn();
+                    ImGui.TableNextColumn();
+                    ImGui.TextColored(OverlayInk.Accent, group);
+                }
+
+                foreach (StyleEntry entry in entries)
+                {
+                    DrawRow(entry);
+                }
             }
+        }
+        finally
+        {
+            ImGui.EndTable();
         }
 
         // After the content, so a drag that ended this frame is written down now rather
         // than waiting for whatever happens next - including the tab being switched away.
         Settle();
     }
+
+    /// <summary>What a row is made of: on, colour, name, size, icon, reset.</summary>
+    private const int Columns = 6;
 
     /// <summary>
     /// The global changed-count and its reset, for the one page that shows every leftover.
@@ -108,7 +164,7 @@ public sealed class StyleRows
                   + " follows the defaults, so a corrected one reaches you.");
 
         ImGui.SameLine();
-        if (ImGui.SmallButton("reset all") && changed > 0)
+        if (ImGui.SmallButton("Reset All") && changed > 0)
         {
             _style.ResetAll();
             Changed();
@@ -153,7 +209,12 @@ public sealed class StyleRows
         }
     }
 
-    /// <summary>One drawn thing: whether it is drawn, and everything its entry allows.</summary>
+    /// <summary>One drawn thing, as one row of the table: on, colour, name, size, icon, reset.</summary>
+    /// <remarks>
+    /// EVERY CELL IS CLAIMED even when the entry has nothing to put in it, because a table lays
+    /// out by cell and a skipped one shifts everything after it into the wrong column. An entry
+    /// with no colour leaves an empty swatch cell rather than sliding its name left.
+    /// </remarks>
     private void DrawRow(StyleEntry entry)
     {
         // ### rather than a plain label: ImGui derives a control's identity from its label, and
@@ -163,14 +224,16 @@ public sealed class StyleRows
         LayerStyle style = _style[entry.Key];
         LayerStyle wanted = style;
 
+        ImGui.TableNextRow();
+
+        ImGui.TableNextColumn();
         bool visible = style.Visible;
-        if (ImGui.Checkbox($"###show", ref visible))
+        if (ImGui.Checkbox("###show", ref visible))
         {
             wanted = wanted with { Hidden = !visible };
         }
 
-        ImGui.SameLine();
-
+        ImGui.TableNextColumn();
         if (entry.Traits.HasFlag(StyleTraits.Colour))
         {
             Vector4 colour = ImGui.ColorConvertU32ToFloat4(style.ColourOr(entry.Fallback));
@@ -182,27 +245,38 @@ public sealed class StyleRows
             {
                 wanted = wanted with { Colour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(colour)) };
             }
-
-            ImGui.SameLine();
         }
 
-        ImGui.Text(entry.Label);
+        ImGui.TableNextColumn();
 
-        // A marker's shape, at the size it is drawn on the large map, in the chosen colour.
-        // The row otherwise says "Breach" and a swatch, which is the two things somebody
-        // reading it already knows.
+        // A marker's shape, at the size it is drawn on the large map, in the chosen colour, in
+        // front of the name like an icon in a list. The row otherwise says "Breach" and a
+        // swatch, which is the two things somebody reading it already knows.
         if (PreviewGlyph(entry.Key) is PoiGlyph glyph)
         {
-            ImGui.SameLine();
             Preview(glyph, style.ColourOr(entry.Fallback), style.Sized(6f), style.WidthOr(0f));
+            ImGui.SameLine();
         }
 
-        // What is set, and how to unset it. Shown only when there is something to unset, so
-        // an untouched list is a list of names rather than a wall of buttons.
+        ImGui.TextUnformatted(entry.Label);
+
+        ImGui.TableNextColumn();
+        wanted = DrawSizes(entry, wanted);
+
+        ImGui.TableNextColumn();
+        if (entry.Traits.HasFlag(StyleTraits.Icon))
+        {
+            wanted = DrawIcon(entry, wanted);
+        }
+
+        // ITS OWN COLUMN, so a row that has been changed does not push its neighbours' controls
+        // sideways. Shown only when there is something to unset, so an untouched list is a list
+        // of names rather than a wall of buttons - but the column is there either way, which is
+        // what stops the rows disagreeing about where anything is.
+        ImGui.TableNextColumn();
         if (!style.SaysNothing)
         {
-            ImGui.SameLine();
-            if (ImGui.SmallButton("reset"))
+            if (ImGui.SmallButton("Reset"))
             {
                 _style.Reset(entry.Key);
                 Changed();
@@ -210,8 +284,6 @@ public sealed class StyleRows
                 return;
             }
         }
-
-        wanted = DrawAdjustments(entry, wanted);
 
         if (wanted != style)
         {
@@ -222,27 +294,27 @@ public sealed class StyleRows
         ImGui.PopID();
     }
 
-    /// <summary>The sliders and the icon box, indented under the row they belong to.</summary>
-    private LayerStyle DrawAdjustments(StyleEntry entry, LayerStyle wanted)
+    /// <summary>
+    /// The size and line-width sliders, in the row's own size cell.
+    /// </summary>
+    /// <remarks>
+    /// BOTH IN ONE CELL, because they are one question - how big is it drawn - asked two ways
+    /// for two kinds of thing. A marker gets a scale, a line gets a width, and a few get both;
+    /// giving each its own column would leave one of them empty on nearly every row.
+    /// </remarks>
+    private static LayerStyle DrawSizes(StyleEntry entry, LayerStyle wanted)
     {
-        bool anySlider = entry.Traits.HasFlag(StyleTraits.Scale) || entry.Traits.HasFlag(StyleTraits.Width);
-        if (!anySlider && !entry.Traits.HasFlag(StyleTraits.Icon))
-        {
-            return wanted;
-        }
-
-        ImGui.Indent(26f);
-
         if (entry.Traits.HasFlag(StyleTraits.Scale))
         {
             // Starts at the ordinary size rather than at zero, so dragging it is an
             // adjustment from what is on screen rather than from nothing.
             float scale = wanted.Scale > 0f ? wanted.Scale : 1f;
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
-            if (ImGui.SliderFloat("size###scale", ref scale, 0.3f, 4f, "x%.2f"))
+            if (OverlayLayout.Narrow.Slider("###scale", ref scale, 0.3f, 4f, "x%.2f"))
             {
                 wanted = wanted with { Scale = Math.Abs(scale - 1f) < 0.001f ? 0f : scale };
             }
+
+            OverlayLayout.Hint("How big the marker is drawn, against its ordinary size.");
 
             if (entry.Traits.HasFlag(StyleTraits.Width))
             {
@@ -253,25 +325,22 @@ public sealed class StyleRows
         if (entry.Traits.HasFlag(StyleTraits.Width))
         {
             float width = wanted.Width;
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
 
             // Zero is a real value here and it means "scale it with the marker", which is
             // what a line should do by default - so the format says so rather than showing a
             // meaningless 0.0.
-            if (ImGui.SliderFloat("line###width", ref width, 0f, 8f, width <= 0f ? "as it comes" : "%.1f px"))
+            if (OverlayLayout.Narrow.Slider(
+                    "###width", ref width, 0f, 8f, width <= 0f ? "as it comes" : "%.1f px"))
             {
                 wanted = wanted with { Width = width };
             }
+
+            OverlayLayout.Hint("How thick the line is. At zero it scales with the marker.");
         }
 
-        if (entry.Traits.HasFlag(StyleTraits.Icon))
-        {
-            wanted = DrawIcon(entry, wanted);
-        }
-
-        ImGui.Unindent(26f);
         return wanted;
     }
+
 
     /// <summary>The icon box: a path to a picture to draw instead of the built-in shape.</summary>
     /// <remarks>
@@ -280,45 +349,55 @@ public sealed class StyleRows
     /// </remarks>
     private LayerStyle DrawIcon(StyleEntry entry, LayerStyle wanted)
     {
-        bool editing = _editingIcon == entry.Key;
         bool has = !string.IsNullOrEmpty(wanted.Icon);
 
-        if (ImGui.SmallButton(editing ? "icon  v" : has ? "icon  *" : "icon"))
+        // A POPUP, not a field that unfolds in place. In a table a cell has one column's width,
+        // and a file path is longer than any column here would ever be - unfolded in the cell it
+        // either squeezed to nothing or pushed the column wide for every other row in the list.
+        // A popup floats over the table at whatever width it needs and takes none of it.
+        if (ImGui.SmallButton(has ? "Icon *" : "Icon"))
         {
-            _editingIcon = editing ? string.Empty : entry.Key;
             _iconPath = wanted.Icon ?? string.Empty;
-            editing = !editing;
+            ImGui.OpenPopup("icon");
         }
 
-        if (has && !editing)
-        {
-            ImGui.SameLine();
-            ImGui.TextColored(DimText, Path.GetFileName(wanted.Icon));
-        }
+        OverlayLayout.Hint(
+            has
+                ? $"Drawn as {Path.GetFileName(wanted.Icon)} instead of the built-in shape."
+                : "Draw a picture instead of the built-in shape.");
 
-        if (!editing)
+        if (!ImGui.BeginPopup("icon"))
         {
             return wanted;
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 16.5f);
-        ImGui.InputText("###iconpath", ref _iconPath, 512);
-
-        ImGui.SameLine();
-        if (ImGui.SmallButton("use"))
+        try
         {
-            wanted = wanted with { Icon = _iconPath.Trim() };
-            _editingIcon = string.Empty;
+            // A width said out loud, because a popup sizes itself to its contents and a text
+            // box asked to fill "what is left" inside one has nothing to measure against.
+            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 24f);
+            ImGui.InputTextWithHint(
+                "###iconpath", "a .png next to the tool, or a full path...", ref _iconPath, 512);
+
+            OverlayLayout.Note("A .png next to the tool, or any full path. Missing files draw the shape.");
+
+            int pressed = OverlayLayout.Actions("Use", "None");
+            if (pressed == 0)
+            {
+                wanted = wanted with { Icon = _iconPath.Trim() };
+                ImGui.CloseCurrentPopup();
+            }
+            else if (pressed == 1)
+            {
+                wanted = wanted with { Icon = string.Empty };
+                ImGui.CloseCurrentPopup();
+            }
+        }
+        finally
+        {
+            ImGui.EndPopup();
         }
 
-        ImGui.SameLine();
-        if (ImGui.SmallButton("none"))
-        {
-            wanted = wanted with { Icon = string.Empty };
-            _editingIcon = string.Empty;
-        }
-
-        ImGuiText.Wrapped(DimText, "a .png next to the tool, or any full path. Missing files draw the shape.");
         return wanted;
     }
 

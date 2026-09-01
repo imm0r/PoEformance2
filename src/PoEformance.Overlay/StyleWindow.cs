@@ -1,4 +1,3 @@
-using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Features;
@@ -23,8 +22,6 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public sealed class StyleWindow
 {
-    private static readonly Vector4 DimText = OverlayInk.Quiet;
-
     /// <summary>
     /// Which windows are pinned in place or handed to the mouse, if anybody said.
     /// </summary>
@@ -120,12 +117,12 @@ public sealed class StyleWindow
     {
         DrawInterface();
 
-        if (Chrome is not null && OverlayFonts.SectionHeader("Windows", ImGuiTreeNodeFlags.DefaultOpen))
+        if (Chrome is not null && OverlayLayout.Subsection("Windows", openByDefault: true))
         {
             Chrome.DrawList();
         }
 
-        if (TabList is not null && OverlayFonts.SectionHeader("Tabs", ImGuiTreeNodeFlags.DefaultOpen))
+        if (TabList is not null && OverlayLayout.Subsection("Tabs", openByDefault: true))
         {
             TabList();
         }
@@ -143,22 +140,21 @@ public sealed class StyleWindow
     private void DrawInterface()
     {
         if (Interface is not InterfaceEditor editor
-            || !OverlayFonts.SectionHeader("Text and panels", ImGuiTreeNodeFlags.DefaultOpen))
+            || !OverlayLayout.Subsection("Text and Panels", openByDefault: true))
         {
             return;
         }
 
         InterfaceStyle now = editor.Now();
 
-        ImGuiText.Wrapped(
-            DimText,
+        OverlayLayout.Note(
             "How this tool's own windows are drawn. What it draws on the GAME is styled where"
             + " each feature lives - and on Markers.");
         ImGui.Spacing();
 
         int size = _draftTextSize > 0 ? _draftTextSize : now.TextSizeOr;
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 11f);
-        if (ImGui.SliderInt("text size", ref size, InterfaceStyle.MinTextSize, InterfaceStyle.MaxTextSize, "%d px"))
+        if (OverlayLayout.Slider(
+                "Text Size", ref size, InterfaceStyle.MinTextSize, InterfaceStyle.MaxTextSize, "%d px"))
         {
             _draftTextSize = size;
         }
@@ -166,6 +162,12 @@ public sealed class StyleWindow
         // On release rather than on change - see the note on the draft. Deactivated-after-edit
         // covers the keyboard route too: ctrl-clicking a slider types into it, and that ends
         // the same way.
+        //
+        // BEFORE THE HINT, and that ordering is load-bearing rather than tidy: a tooltip is a
+        // window, and drawing one leaves ImGui's "last item" pointing at the text inside it.
+        // Asked afterwards, this would be asking whether a line of tooltip prose had just been
+        // edited - which is never - so the text size would fail to commit in exactly the case
+        // it matters, the one where the pointer is still over the slider that was just let go.
         if (ImGui.IsItemDeactivatedAfterEdit() && _draftTextSize > 0)
         {
             if (_draftTextSize != now.TextSizeOr)
@@ -177,39 +179,41 @@ public sealed class StyleWindow
             _draftTextSize = 0;
         }
 
+        OverlayLayout.Hint(
+            "Everything else follows this - the padding, the indents and the heading face are all"
+            + " ratios of it, so the interface stays in proportion at any size.");
+
         // Whole percent, not a 0-to-1 fraction. Both read the same to the code and only one of
         // them reads as anything to a person - and a slider labelled in percent can be
         // ctrl-clicked and typed into, which one labelled "0.85" cannot usefully be.
         int panels = Percent(now.PanelOpacityOr);
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 11f);
-        if (ImGui.SliderInt("tool panels", ref panels, Floor, 100, "%d%% solid"))
+        if (OverlayLayout.Slider("Tool Panels", ref panels, Floor, 100, "%d%% solid"))
         {
             editor.Chose(now with { PanelOpacity = panels / 100f });
             _unsavedInterface = true;
         }
 
+        OverlayLayout.Hint("Every page except the live readout.");
+
         int readout = Percent(now.ReadoutOpacityOr);
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 11f);
-        if (ImGui.SliderInt("the readout", ref readout, Floor, 100, "%d%% solid"))
+        if (OverlayLayout.Slider("Readout", ref readout, Floor, 100, "%d%% solid"))
         {
             editor.Chose(now with { ReadoutOpacity = readout / 100f });
             _unsavedInterface = true;
         }
 
-        ImGuiText.Wrapped(
-            DimText,
-            "The readout is the first page - the one that sits in a corner while playing."
-            + " The tools are every other page.");
+        OverlayLayout.Hint(
+            "The Status page - the one that sits in a corner while playing, and the one worth"
+            + " being able to see the game through.");
 
-        if (now != InterfaceStyle.Default)
+        // ITS OWN LINE, not stuck to the end of the paragraph above it with SameLine. That is
+        // what this button used to be, and it put the button wherever the prose happened to
+        // wrap - so dragging the window moved it.
+        if (now != InterfaceStyle.Default && OverlayLayout.Actions("Reset text and panels") == 0)
         {
-            ImGui.SameLine();
-            if (ImGui.SmallButton("reset text and panels"))
-            {
-                editor.Chose(InterfaceStyle.Default);
-                _draftTextSize = 0;
-                _unsavedInterface = true;
-            }
+            editor.Chose(InterfaceStyle.Default);
+            _draftTextSize = 0;
+            _unsavedInterface = true;
         }
 
         ImGui.Spacing();

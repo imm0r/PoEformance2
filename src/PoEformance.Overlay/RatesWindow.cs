@@ -83,10 +83,11 @@ public sealed class RatesWindow
             return;
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 16.5f);
-        ImGui.InputTextWithHint("##rates-search", "name...", ref _search, 64);
-        ImGui.SameLine();
-        ImGui.Checkbox("only where a loop pays", ref _routesOnly);
+        // The filter fills the line and the switch takes the next one. Sharing a line, the
+        // switch sat at whatever x the filter's width happened to end at - which was 16.5 lines
+        // here, 14.5 on the ritual page and 12 on two others, for the same pair of controls.
+        OverlayLayout.Search("##rates-search", "name...", ref _search, 64);
+        OverlayLayout.Toggle("Only Where a Loop Pays", ref _routesOnly);
 
         IReadOnlyList<Route> routes = Arbitrage.Routes(pairs, index);
         var better = routes.ToDictionary(route => route.Path, StringComparer.Ordinal);

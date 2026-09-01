@@ -139,7 +139,25 @@ public sealed class StashWindow
     /// <summary>Draws the tab's content.</summary>
     public void DrawTab() => Draw();
 
+    /// <summary>
+    /// Draws the page: the stash itself, or where its prices come from.
+    /// </summary>
+    /// <remarks>
+    /// TWO TABS BECAUSE THEY ARE VISITED AT DIFFERENT TIMES. The four price switches are agreed
+    /// to once - each is a decision about talking to somebody else's server, and one of them
+    /// opens a browser to sign in to - and after that they are never touched again. The stash
+    /// grid is what this page is opened for. Stacked, the switches and their five lines of
+    /// status sat permanently between the search box and the thing being searched, so the grid
+    /// started a third of the way down the tab and gave that up on every frame.
+    /// </remarks>
     private void Draw()
+        => OverlayLayout.Tabs(
+            "stash-tabs",
+            ("Stash Inspector", DrawInspector),
+            ("Price Sources", DrawSources));
+
+    /// <summary>The stash: a filter, the tabs down the left, and what is in the chosen one.</summary>
+    private void DrawInspector()
     {
         StashView view = _inspector.View;
 
@@ -148,70 +166,7 @@ public sealed class StashWindow
         PriceBook book = _prices.Book;
         Tally(view, book);
 
-        if (ImGui.Button("read the stash"))
-        {
-            _inspector.ReadAgain();
-        }
-
-        ImGui.SameLine();
-
-        if (_inspector.Reading)
-        {
-            // Said, because a full read of a big stash takes long enough to look like nothing
-            // happening - and pressing the button again would only queue another one.
-            ImGui.TextColored(WarnText, "reading every tab - this takes a moment");
-        }
-        else if (view.Pages.Count > 0)
-        {
-            ImGui.TextColored(GoodText, $"{view.Items} items in {view.Pages.Count} inventories");
-        }
-        else
-        {
-            ImGui.TextColored(DimText, "nothing read yet");
-        }
-
-        if (view.Status.Length > 0)
-        {
-            ImGui.TextColored(DimText, view.Status);
-        }
-
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 16.5f);
-        ImGui.InputTextWithHint("##search", "name, mod or stat...", ref _search, 128);
-        ImGui.SameLine();
-        ImGui.TextColored(DimText, "searches the stats too");
-
-        // The switch is for the WEB only. Pictures out of the install need no permission - they
-        // are files the player already has - so what is offered here is the fallback, and the
-        // label says which of the two is being turned on.
-        bool installed = _art.Install is not null;
-
-        bool web = _art.Enabled;
-        if (ImGui.Checkbox(installed ? "also ask poe2db" : "item pictures from poe2db", ref web))
-        {
-            _art.Enabled = web;
-            _changed();
-        }
-
-        ImGui.SameLine();
-
-        (int unpacked, int fetched, int missing) = _art.Tally;
-        string coming = _art.Pending > 0 ? $", {_art.Pending} on the way" : string.Empty;
-
-        ImGui.TextColored(DimText, (installed, web) switch
-        {
-            (true, true) => $"{unpacked} out of your install, {fetched} from poe2db, {missing} nowhere{coming}",
-            (true, false) => $"{unpacked} out of your install, {missing} not in it{coming}",
-            (false, true) => $"from poe2db, kept on disk - {fetched} fetched, {missing} not there{coming}",
-            (false, false) => "off - and the game folder was not found, so there is nowhere else to get them",
-        });
-
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
-        ImGui.SliderFloat("cell", ref _cell, 24f, 96f, "%.0f px");
-
-        Prices(book);
-
-        ImGui.Separator();
+        DrawInspectorBar(view, book);
 
         if (view.Pages.Count == 0)
         {
@@ -234,6 +189,88 @@ public sealed class StashWindow
     }
 
     /// <summary>
+    /// One line above the panes: what to look for, what to read again, and what was read.
+    /// </summary>
+    /// <remarks>
+    /// A TOOLBAR, on the tab whose whole value is how much of the grid fits. The button, the
+    /// read's account of itself, the search box, the cell slider and the total each had a line of
+    /// their own - five of them, above two panes that then got whatever was left.
+    /// </remarks>
+    private void DrawInspectorBar(StashView view, PriceBook book)
+    {
+        // The aside moves into the box's own hint rather than sitting beside it: "searches the
+        // stats too" is what the field DOES, and a placeholder is where a field says that.
+        OverlayLayout.Search(
+            "##search", "name, mod or stat - the stats are searched too...", ref _search, 128,
+            OverlayLayout.ButtonRoom("Scan Stash") + (ImGui.GetFontSize() * 9f));
+
+        ImGui.SameLine();
+        if (ImGui.Button("Scan Stash"))
+        {
+            _inspector.ReadAgain();
+        }
+
+        OverlayLayout.Hint("Reads every tab the game has loaded. A big stash takes a moment.");
+
+        ImGui.SameLine();
+        OverlayLayout.Narrow.Slider("cell", ref _cell, 24f, 96f, "%.0f px");
+        OverlayLayout.Hint("How big each item is drawn in the grid.");
+
+        if (_inspector.Reading)
+        {
+            // Said, because a full read of a big stash takes long enough to look like nothing
+            // happening - and pressing the button again would only queue another one.
+            ImGui.TextColored(WarnText, "reading every tab - this takes a moment");
+        }
+        else if (view.Pages.Count > 0)
+        {
+            ImGui.TextColored(GoodText, $"{view.Items} items in {view.Pages.Count} inventories");
+        }
+        else
+        {
+            ImGui.TextColored(DimText, "nothing read yet");
+        }
+
+        if (view.Status.Length > 0)
+        {
+            OverlayLayout.Fact(DimText, view.Status);
+        }
+
+        // Both halves, always. The total on its own reads as "what this stash is worth", and a
+        // book that could price a fifth of it would answer that with a number nobody can see is
+        // wrong.
+        if (_total.Priced > 0)
+        {
+            OverlayLayout.Fact(
+                MoneyText,
+                $"{StashWorth.Purse(_total.Exalted, book.Rate)} across {_total.Priced} of {_total.Items} items");
+        }
+
+        OverlayLayout.Divider();
+
+        bool hiding = _hideEmpty;
+        if (ImGui.Checkbox("Hide Empty Tabs", ref hiding))
+        {
+            _hideEmpty = hiding;
+
+            // The selected tab may have just left the list. Falling back to "Everything" keeps
+            // the grid showing something rather than a page index pointing at a row nobody
+            // can see to change.
+            if (_hideEmpty && _page >= 0 && _page < view.Pages.Count && view.Pages[_page].Items.Count == 0)
+            {
+                _page = -1;
+            }
+        }
+
+        OverlayLayout.Hint(
+            "A stash is mostly empty tabs, and a tab the game has never opened reads as empty"
+            + " here too - so the list is nearly all rows with nothing behind them.");
+    }
+
+    /// <summary>Whether tabs holding nothing are left out of the list. See the switch.</summary>
+    private bool _hideEmpty = true;
+
+    /// <summary>
     /// The price switch, and what asking for them got.
     /// </summary>
     /// <remarks>
@@ -246,18 +283,64 @@ public sealed class StashWindow
     /// what" - and because seeing the wrong one there is how somebody finds out the tool is
     /// pricing their softcore stash against the hardcore economy.
     /// </remarks>
-    private void Prices(PriceBook book)
+    /// <summary>
+    /// The four things this page can ask the outside world, and what each of them said.
+    /// </summary>
+    /// <remarks>
+    /// ONE SWITCH PER ROW, EACH WITH ITS OWN ANSWER BESIDE IT. These were four checkboxes with
+    /// their status welded on by <c>SameLine</c> and, on two of them, a wrapped paragraph
+    /// underneath - so the block was five to eight lines depending on what had been switched on,
+    /// which is a block that changes height while you use it, sitting above the grid.
+    ///
+    /// They stay full sentences rather than becoming hovers: each of these is a decision to talk
+    /// to somebody else's server, one of them signs in to an account, and what a switch SENDS is
+    /// not an aside. What moved to hovers is what came back.
+    /// </remarks>
+    private void DrawSources()
+    {
+        PriceBook book = _prices.Book;
+        string league = _inspector.League;
+
+        OverlayLayout.Group("Where the Prices Come From");
+
+        Ninja(book, league);
+        Exchange(league);
+        Trade();
+
+        OverlayLayout.Group("Item Pictures");
+        Pictures();
+
+        DrawProbe();
+    }
+
+    /// <summary>
+    /// The price switch, and what asking for them got.
+    /// </summary>
+    /// <remarks>
+    /// OFF UNTIL SOMEBODY TURNS IT ON, like the pictures - but for a stronger reason. There is
+    /// no local copy of a price to prefer: they only exist on somebody else's server, so the
+    /// switch is the difference between a tool that reads memory and a tool that talks to the
+    /// internet. What goes out is a league name and nothing else.
+    ///
+    /// The league is shown whether or not it is on, because it is the answer to "prices for
+    /// what" - and because seeing the wrong one there is how somebody finds out the tool is
+    /// pricing their softcore stash against the hardcore economy.
+    /// </remarks>
+    private void Ninja(PriceBook book, string league)
     {
         bool asking = _prices.Enabled;
-        if (ImGui.Checkbox("prices from poe.ninja", ref asking))
+        if (ImGui.Checkbox("Fetch poe.ninja", ref asking))
         {
             _prices.Enabled = asking;
             _changed();
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Hint(
+            "One anonymous request for a league's prices. What goes out is the league name and"
+            + " nothing else.");
 
-        string league = _inspector.League;
+        OverlayLayout.ToColumn(SourceEms);
+
         if (league.Length == 0)
         {
             // The note over the guess. "Not in an area" is only one of the two reasons, and the
@@ -267,8 +350,6 @@ public sealed class StashWindow
             ImGui.TextColored(
                 note.Length > 0 ? WarnText : DimText,
                 note.Length > 0 ? note : "no league read yet - the game has to be in an area");
-
-            Trade();
             return;
         }
 
@@ -287,21 +368,49 @@ public sealed class StashWindow
         {
             ImGui.TextColored(DimText, asking ? _prices.Status : "off");
         }
+    }
 
-        if (_total.Priced > 0)
+    /// <summary>Where a source's answer starts, so four of them line up under each other.</summary>
+    private const float SourceEms = 20f;
+
+    /// <summary>
+    /// Where the item pictures come from.
+    /// </summary>
+    /// <remarks>
+    /// The switch is for the WEB only. Pictures out of the install need no permission - they are
+    /// files the player already has - so what is offered here is the fallback, and the label says
+    /// which of the two is being turned on.
+    /// </remarks>
+    private void Pictures()
+    {
+        bool installed = _art.Install is not null;
+
+        bool web = _art.Enabled;
+        if (ImGui.Checkbox("Fetch poe2db", ref web))
         {
-            ImGui.SameLine();
-
-            // Both halves, always. The total on its own reads as "what this stash is worth",
-            // and a book that could price a fifth of it would answer that with a number nobody
-            // can see is wrong.
-            ImGui.TextColored(
-                MoneyText,
-                $"{StashWorth.Purse(_total.Exalted, _prices.Book.Rate)} across {_total.Priced} of {_total.Items} items");
+            _art.Enabled = web;
+            _changed();
         }
 
-        Exchange(league);
-        Trade();
+        OverlayLayout.Hint(
+            installed
+                ? "Your install is used first and needs no permission - these are files you"
+                  + " already have. This is the fallback for what is not in it."
+                : "The game folder was not found, so poe2db is the only place a picture can come"
+                  + " from. Fetched once and kept on disk.");
+
+        OverlayLayout.ToColumn(SourceEms);
+
+        (int unpacked, int fetched, int missing) = _art.Tally;
+        string coming = _art.Pending > 0 ? $", {_art.Pending} on the way" : string.Empty;
+
+        ImGui.TextColored(DimText, (installed, web) switch
+        {
+            (true, true) => $"{unpacked} out of your install, {fetched} from poe2db, {missing} nowhere{coming}",
+            (true, false) => $"{unpacked} out of your install, {missing} not in it{coming}",
+            (false, true) => $"from poe2db, kept on disk - {fetched} fetched, {missing} not there{coming}",
+            (false, false) => "off - and the game folder was not found, so there is nowhere else to get them",
+        });
     }
 
     /// <summary>
@@ -326,11 +435,17 @@ public sealed class StashWindow
         }
 
         bool asking = _exchange.Enabled;
-        if (ImGui.Checkbox("and the game's own currency exchange", ref asking))
+        if (ImGui.Checkbox("Fetch Currency Exchange", ref asking))
         {
             _exchange.Enabled = asking;
             _changed();
         }
+
+        OverlayLayout.Hint(
+            "The game's own exchange: executed trades rather than an aggregated index, and the"
+            + " two are expected to disagree. Nothing switches over - both are shown until"
+            + " somebody has watched them for a while. It is also what the per-tab worth on the"
+            + " Wealth page is priced from, since it knows far more currencies than the index.");
 
         // TOLD ON EVERY DRAW, not only when the switch moves, and that fixes two things rather
         // than one. The switch is saved now, so a restored "on" would otherwise never name a
@@ -343,7 +458,7 @@ public sealed class StashWindow
             _exchange.Playing(league);
         }
 
-        ImGui.SameLine();
+        OverlayLayout.ToColumn(SourceEms);
 
         if (!asking)
         {
@@ -370,7 +485,10 @@ public sealed class StashWindow
             ? $"   poe.ninja says {StashWorth.Money(book)} ({StashWorth.Money(divine.Bid / book)}x)"
             : string.Empty;
 
-        ImGuiText.Wrapped(
+        // THE SELLING SIDE FIRST, because that is what a hoard is worth. The spread is beside it
+        // rather than hidden: on a thin market it is the difference between two perfectly true
+        // numbers - 260 and 602 for the same orb, in the same minute.
+        OverlayLayout.Fact(
             MoneyText,
             $"1 div sells for {StashWorth.Money(divine.Bid)} ex, costs {StashWorth.Money(divine.Ask)} ex"
             + $"   -  {StashWorth.Money(divine.Volume)} traded{against}");
@@ -391,22 +509,28 @@ public sealed class StashWindow
     private void Trade()
     {
         bool asking = _trade.Enabled;
-        if (ImGui.Checkbox("ask the trade site about the uniques poe.ninja missed", ref asking))
+        if (ImGui.Checkbox("Fetch Trade API (Uniques)", ref asking))
         {
             _trade.Enabled = asking;
             _changed();
         }
 
+        OverlayLayout.Hint(
+            "For the uniques poe.ninja could not price. This one opens a browser, asks you to"
+            + " sign in to your own account, and then asks the game's own trade site one question"
+            + " at a time - which is a different thing to agree to than an anonymous index. The"
+            + " sign-in never comes near this tool: it lives in that browser's profile, and what"
+            + " crosses back is asking prices.");
+
+        OverlayLayout.ToColumn(SourceEms);
+
         if (!asking)
         {
-            ImGui.SameLine();
             ImGui.TextColored(DimText, "off - it opens a browser you sign in to once");
             return;
         }
 
-        ImGui.SameLine();
-
-        if (ImGui.SmallButton("open the trade window"))
+        if (ImGui.SmallButton("Open Trade Window"))
         {
             _signIn();
         }
@@ -415,8 +539,6 @@ public sealed class StashWindow
 
         string waiting = _trade.Waiting > 0 ? $", {_trade.Waiting} waiting" : string.Empty;
         ImGui.TextColored(DimText, $"{_trade.Known} asked{waiting} - {_trade.Status}");
-
-        DrawProbe();
     }
 
     /// <summary>
@@ -445,7 +567,7 @@ public sealed class StashWindow
 
         bool running = _probing is not null;
         ImGui.BeginDisabled(running);
-        if (ImGui.SmallButton("ask the currency exchange once"))
+        if (ImGui.SmallButton("Ask the Currency Exchange Once"))
         {
             _probed = null;
             _probing = _probe();
@@ -459,8 +581,7 @@ public sealed class StashWindow
             ImGui.TextColored(DimText, "asking...");
         }
 
-        ImGuiText.Hint(
-            DimText,
+        OverlayLayout.Hint(
             "A one-off diagnostic. It reads the site's own currency ids and asks the live exchange "
             + "what one Divine costs in Exalted - the number every figure here is displayed "
             + "through. Shown with the rate-limit headers and one listing exactly as the site "
@@ -663,15 +784,36 @@ public sealed class StashWindow
                 _page = -1;
             }
 
+            int hidden = 0;
+
             for (int i = 0; i < view.Pages.Count; i++)
             {
                 StashPage page = view.Pages[i];
+
+                // AN EMPTY TAB IS NEARLY EVERY TAB. A stash is mostly unused pages, and a page
+                // the game has never opened reads as empty from here too - so unfiltered the
+                // list is a hundred rows of nothing with the dozen that matter scattered among
+                // them. The one it is showing stays whatever happens, or hiding empties while
+                // looking at one would take the selection away under the cursor.
+                if (_hideEmpty && page.Items.Count == 0 && _page != i)
+                {
+                    hidden++;
+                    continue;
+                }
+
                 string worth = i < _perPage.Length ? Money(book, _perPage[i]) : string.Empty;
 
                 if (ImGui.Selectable($"{page.Called} ({page.Items.Count}){worth}###page{i}", _page == i))
                 {
                     _page = i;
                 }
+            }
+
+            // Said, because a list that leaves rows out without saying so is a list that lies -
+            // and "my tab is missing" is otherwise indistinguishable from "the read missed it".
+            if (hidden > 0)
+            {
+                ImGui.TextColored(DimText, $"{hidden} empty, not listed");
             }
         }
         finally

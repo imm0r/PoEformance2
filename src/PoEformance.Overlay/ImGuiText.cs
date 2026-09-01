@@ -149,20 +149,17 @@ internal static class ImGuiText
         }
     }
 
-    /// <summary>An indented, wrapped explainer under the control it belongs to.</summary>
-    /// <remarks>
-    /// What the four-leading-spaces prefix was trying to be. The prefix only indented the
-    /// FIRST line - a wrapped continuation returned to column zero - and it made the text
-    /// unequal to itself for searching. A real indent survives the wrap, and scales with the
-    /// text like everything else.
-    /// </remarks>
-    public static void Hint(Vector4 colour, string text)
-    {
-        float by = ImGui.GetFontSize() * 1.2f;
-        ImGui.Indent(by);
-        Wrapped(colour, text);
-        ImGui.Unindent(by);
-    }
+    // Hint IS GONE FROM HERE, and the rename is the point rather than a tidy-up. It drew an
+    // indented explainer that stays on screen for good - and it was called Hint, while
+    // OverlayLayout.Hint puts the same sort of text in a TOOLTIP. Two methods with one name
+    // doing opposite things is not a naming quibble: the tracker page called this one
+    // nineteen times, which is twenty-six lines of prose permanently between seventeen
+    // switches, and reading the call site gives no clue that the other one existed.
+    //
+    // The three kinds now say which they are, and the choice between them is a real one:
+    //   OverlayLayout.Hint    - a tooltip. An explanation read once, by whoever needs it.
+    //   OverlayLayout.Note    - a quiet line that stays. Context that has to be visible.
+    //   OverlayLayout.Warning - an orange line that stays. A limit on what to trust.
 
     /// <summary>
     /// The last two segments of a metadata path, which is the part that says what it is.

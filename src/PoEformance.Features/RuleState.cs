@@ -232,6 +232,77 @@ public sealed record RuleState
     /// <summary>How many live rares and uniques are within a radius of the cursor's ground point.</summary>
     public int RareOrUniqueCountAtCursor(double distance) => CountAtCursor(distance, RareOrUnique);
 
+    /// <summary>
+    /// The emptiest health bar within a radius of the player, 0-100, or null when there is none.
+    /// </summary>
+    /// <remarks>
+    /// "Is anything in range nearly dead" - the cull question, and the reason it is the LOWEST
+    /// rather than the nearest: a rule that watches the closest monster goes quiet the moment a
+    /// full-health one steps in front of the one that was about to die.
+    ///
+    /// Null and not 0 when the radius holds nothing, which is the same rule
+    /// <see cref="NearestMonster"/> follows and matters more here. The counts answer 0 because
+    /// an empty room is a real count; there is no such thing as the health of a monster that is
+    /// not there, and a 0 would make "below 35" fire forever in an empty room - on a rule whose
+    /// whole job is to press a key.
+    ///
+    /// Its own pool, not the player's scale: a white monster at 30% and a boss at 30% both
+    /// answer 30. That is what "nearly dead" means to the skill being fired, and it is the same
+    /// number the health bar over its head is drawn from.
+    /// </remarks>
+    public double? LowestMonsterLifePercent(double distance) => LowestWithin(distance, null);
+
+    /// <summary>The emptiest health bar on a MAGIC monster within a radius of the player.</summary>
+    /// <remarks>
+    /// Split by rarity because a cull threshold is: the game executes a magic monster from a
+    /// higher share of its life than a rare, and a rare from higher than a unique. One
+    /// threshold over every monster answers about whichever happens to be weakest, and the pack
+    /// of white monsters that is always the weakest thing on screen would keep the rule firing
+    /// while the rare it was written for stands at half health.
+    ///
+    /// Normal has no fact of its own: <see cref="LowestMonsterLifePercent"/> already answers
+    /// "anything at all", and a white monster does not survive long enough for a threshold to
+    /// be the thing that catches it.
+    /// </remarks>
+    public double? LowestMagicMonsterLifePercent(double distance)
+        => LowestWithin(distance, ItemRarity.Magic);
+
+    /// <summary>The emptiest health bar on a RARE monster within a radius of the player.</summary>
+    public double? LowestRareMonsterLifePercent(double distance)
+        => LowestWithin(distance, ItemRarity.Rare);
+
+    /// <summary>The emptiest health bar on a UNIQUE monster within a radius of the player.</summary>
+    public double? LowestUniqueMonsterLifePercent(double distance)
+        => LowestWithin(distance, ItemRarity.Unique);
+
+    /// <summary>The emptiest health bar within a radius of where the cursor points.</summary>
+    /// <remarks>
+    /// The companion to the counts, on the same terms: for anything aimed rather than cast at
+    /// the character, "the weakest thing near me" and "the weakest thing where I am pointing"
+    /// are different rules, and only the second one is about the skill.
+    /// </remarks>
+    public double? LowestMonsterLifePercentAtCursor(double distance)
+    {
+        if (CursorGround is not (float cx, float cy))
+        {
+            return null;
+        }
+
+        double? lowest = null;
+        foreach (NearMonster monster in Monsters)
+        {
+            // Not sorted by this measure - the list is ordered by distance from the PLAYER - so
+            // every monster is looked at rather than the walk stopping at the first one out of
+            // range.
+            if (Away(monster, cx, cy) <= distance)
+            {
+                lowest = Lower(lowest, monster.LifePercent);
+            }
+        }
+
+        return lowest;
+    }
+
     /// <summary>World units from the cursor to the nearest live monster, or null when there is none.</summary>
     /// <remarks>
     /// Answers "am I aiming at anything at all", which is the companion to the counts: a rule
@@ -353,8 +424,19 @@ public sealed record RuleState
             float dx = entity.WorldX - at.WorldX;
             float dy = entity.WorldY - at.WorldY;
 
+            // The same number the health bar over its head is drawn from - see
+            // HealthBarLayer, which reads this exact property. Vital.Percent answers -1 for a
+            // pool with nothing to measure, and that sentinel stops here: it becomes null, so a
+            // monster whose pool did not resolve is a monster with no reading rather than one
+            // reading as a hair from death.
+            int percent = entity.Life.Percent;
+
             found.Add(new NearMonster(
-                MathF.Sqrt((dx * dx) + (dy * dy)), entity.Rarity, entity.WorldX, entity.WorldY));
+                MathF.Sqrt((dx * dx) + (dy * dy)),
+                entity.Rarity,
+                entity.WorldX,
+                entity.WorldY,
+                percent < 0 ? null : percent));
         }
 
         found.Sort(static (left, right) => left.Distance.CompareTo(right.Distance));
@@ -396,6 +478,45 @@ public sealed record RuleState
 
         return total;
     }
+
+    /// <summary>The emptiest health bar within a radius of the player, of one rarity or of any.</summary>
+    /// <remarks>
+    /// Null for a rarity that is not in range, which is the same answer an empty radius gives
+    /// and for the same reason: "no unique nearby" and "a unique at 0%" must not read alike to
+    /// a rule that presses a key. A monster whose rarity did not resolve reads as
+    /// <see cref="ItemRarity.Unknown"/> and so matches no rarity asked for - it is still counted
+    /// by the any-rarity fact, which is the honest split between "I know what this is" and
+    /// "there is something there".
+    /// </remarks>
+    private double? LowestWithin(double distance, ItemRarity? only)
+    {
+        double? lowest = null;
+        foreach (NearMonster monster in Monsters)
+        {
+            // Sorted nearest first, so the first one out of range ends the walk.
+            if (monster.Distance > distance)
+            {
+                break;
+            }
+
+            if (only is null || monster.Rarity == only)
+            {
+                lowest = Lower(lowest, monster.LifePercent);
+            }
+        }
+
+        return lowest;
+    }
+
+    /// <summary>The smaller of two readings, ignoring one that could not be read.</summary>
+    /// <remarks>
+    /// A monster with no reading leaves the answer where it was, rather than becoming the
+    /// lowest one - which is the whole reason this is not a Math.Min over the list.
+    /// </remarks>
+    private static double? Lower(double? held, double? found)
+        => found is not double reading ? held
+            : held is not double best ? reading
+            : Math.Min(best, reading);
 
     private static double Away(NearMonster monster, float x, float y)
     {
@@ -478,11 +599,19 @@ public sealed record RuleState
 /// </remarks>
 /// <param name="Distance">World units from the player.</param>
 /// <param name="WorldX">Where it stands, for the rules that measure from somewhere else.</param>
+/// <param name="LifePercent">
+/// How full its health bar is, 0-100, or null when the pool could not be measured.
+///
+/// Null rather than 0 on the same argument as every other unreadable number here, and the trap
+/// is sharper for this one than most: a monster recorded at 0 satisfies "below 35" and a rule
+/// meant to cull something nearly dead would fire on every monster the reader could not read.
+/// </param>
 public readonly record struct NearMonster(
     double Distance,
     ItemRarity Rarity,
     float WorldX = 0,
-    float WorldY = 0);
+    float WorldY = 0,
+    double? LifePercent = null);
 
 /// <summary>Where the mouse is, in the pixels the projection produces.</summary>
 /// <remarks>

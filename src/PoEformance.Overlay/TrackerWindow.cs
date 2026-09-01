@@ -71,20 +71,39 @@ public sealed class TrackerWindow
         _animations = animations;
     }
 
-    /// <summary>Draws the tab's content.</summary>
+    /// <summary>
+    /// Draws the tab's content, as four pages rather than one long scroll.
+    /// </summary>
+    /// <remarks>
+    /// FOUR SUBJECTS, AND READING ONE MEANT SCROLLING PAST THREE. This tool had five folds
+    /// stacked down a page that did not fit a screen at the smallest text size, and folding
+    /// did not help: everything under those folds belongs to this one tool, so folded they
+    /// were no nearer and unfolded they were a scroll. Tabs cut the page to the subject being
+    /// worked on - see <see cref="OverlayLayout.Tabs"/>.
+    ///
+    /// THE FOURTH IS NOT A SETTING. What is on the player right now is the thing that makes
+    /// the other three usable, because a status rule matches on an internal spelling nobody is
+    /// shown anywhere else. It was the last fold at the bottom of the longest page in the
+    /// tool; it is a tab of its own now, and clicking a name there writes the rule rather than
+    /// asking somebody to copy it upwards.
+    /// </remarks>
     public void DrawTab(WorldSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
 
         TrackerSettings settings = _read();
 
-        DrawLines(settings);
-        ImGui.Separator();
-        DrawAim(settings, snapshot);
-        ImGui.Separator();
-        DrawGroundDanger(settings, snapshot);
-        ImGui.Separator();
-        DrawStatus(settings, snapshot);
+        OverlayLayout.Tabs(
+            "tracker-parts",
+            ("Monsters & facing", () =>
+            {
+                DrawLines(settings);
+                ImGui.Spacing();
+                DrawAim(settings, snapshot);
+            }),
+            ("Hazards & ground", () => DrawGroundDanger(settings, snapshot)),
+            ("Status effects", () => DrawStatus(settings)),
+            ("Live inspector", () => DrawLiveNames(settings, snapshot)));
     }
 
     // ── Where they are pointing ──────────────────────────────────────────────
@@ -99,74 +118,70 @@ public sealed class TrackerWindow
     /// </remarks>
     private void DrawAim(TrackerSettings settings, WorldSnapshot snapshot)
     {
-        if (!OverlayFonts.SectionHeader("Where they are pointing"))
-        {
-            return;
-        }
+        OverlayLayout.Group("Facing Vectors");
 
         AimSettings aim = settings.AimOrDefault;
 
         bool on = aim.Enabled;
-        if (ImGui.Checkbox("draw a ray along each monster's facing", ref on))
+        if (OverlayLayout.Toggle("Draw Facing Ray", ref on))
         {
             _write(settings with { Aim = aim with { Enabled = on } });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "the game keeps no target - it aims by TURNING, so the facing is the aim as exactly"
-            + " as the game has it.");
-        ImGuiText.Hint(
-            WarnText,
-            "it is not a promise of where a skill lands: many attacks lock direction at the"
-            + " start, and homing ones ignore facing.");
+        // HOW IT WORKS goes in the tooltip; WHAT NOT TO TRUST stays on screen, and only while
+        // the rays are actually being drawn. The caveat is the one thing here somebody could
+        // get wrong in a way that costs them a death.
+        OverlayLayout.Hint(
+            "The game keeps no target - it aims by TURNING, so the facing is the aim as exactly"
+            + " as the game has it. Drawing this makes the reader read a facing and an animation"
+            + " per monster; watch the Read cost tab.");
 
         if (on)
         {
-            ImGuiText.Hint(
-                DimText,
-                "this makes the reader read a facing and an animation per monster; watch the"
-                + " Read cost tab.");
+            OverlayLayout.Warning(
+                "Not a promise of where a skill lands: many attacks lock direction at the start,"
+                + " and homing ones ignore facing.");
         }
 
         bool acting = aim.OnlyWhileActing;
-        if (ImGui.Checkbox("only while doing something", ref acting))
+        if (OverlayLayout.Toggle("Active Only", ref acting))
         {
             _write(settings with { Aim = aim with { OnlyWhileActing = acting } });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
+
         bool turn = aim.ShowTurn;
-        if (ImGui.Checkbox("show the turn", ref turn))
+        if (OverlayLayout.Toggle("Show Turn", ref turn))
         {
             _write(settings with { Aim = aim with { ShowTurn = turn } });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(2);
+
         bool action = aim.ShowAction;
-        if (ImGui.Checkbox("name the action", ref action))
+        if (OverlayLayout.Toggle("Show Action", ref action))
         {
             _write(settings with { Aim = aim with { ShowAction = action } });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(3);
+
         bool player = aim.ShowPlayer;
-        if (ImGui.Checkbox("and your own", ref player))
+        if (OverlayLayout.Toggle("Include Self", ref player))
         {
             _write(settings with { Aim = aim with { ShowPlayer = player } });
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
         float length = aim.Length;
-        if (ImGui.SliderFloat("##length", ref length, 5f, 400f, "%.0f world units"))
+        if (OverlayLayout.Narrow.Slider("##length", ref length, 5f, 400f, "%.0f world units"))
         {
             _write(settings with { Aim = aim with { Length = length } });
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
         float thickness = aim.Thickness;
-        if (ImGui.SliderFloat("##thickness", ref thickness, 0.5f, 10f, "%.1f wide"))
+        if (OverlayLayout.Narrow.Slider("##thickness", ref thickness, 0.5f, 10f, "%.1f wide"))
         {
             _write(settings with { Aim = aim with { Thickness = thickness } });
         }
@@ -286,20 +301,33 @@ public sealed class TrackerWindow
 
     // ── Lines to monsters ────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Which rarities get a line. A GROUP rather than a fold, because it is one row.
+    /// </summary>
+    /// <remarks>
+    /// A fold offers to hide something, and what it would hide here is a single line of three
+    /// switches - so the header costs a click and a line of chrome to save one line. It only
+    /// became worth saying once the folds stopped looking like the section around them: at that
+    /// point a fold over one row reads as a fold that forgot what it was for.
+    /// </remarks>
     private void DrawLines(TrackerSettings settings)
     {
-        if (!OverlayFonts.SectionHeader("Lines to monsters", ImGuiTreeNodeFlags.DefaultOpen))
-        {
-            return;
-        }
+        OverlayLayout.Group("Lines to Monsters");
 
         MonsterLineSettings lines = settings.LinesOrDefault;
 
-        ImGui.TextColored(DimText, "drawn from your own feet, so the eye can follow one out of a crowd.");
+        // THREE SWITCHES ON ONE LINE. They are one setting asked three times - which rarities
+        // get a line - so they belong in a row rather than stacked down the page with a
+        // paragraph over them.
+        const string why = "Drawn from your own feet, so the eye can follow one out of a crowd.";
 
-        (bool unique, string uniqueColour) = Line("unique", lines.Unique, lines.UniqueColour);
-        (bool rare, string rareColour) = Line("rare", lines.Rare, lines.RareColour);
-        (bool magic, string magicColour) = Line("magic", lines.Magic, lines.MagicColour);
+        (bool unique, string uniqueColour) = Line("Unique", lines.Unique, lines.UniqueColour, why);
+
+        OverlayLayout.Cell(1);
+        (bool rare, string rareColour) = Line("Rare", lines.Rare, lines.RareColour, why);
+
+        OverlayLayout.Cell(2);
+        (bool magic, string magicColour) = Line("Magic", lines.Magic, lines.MagicColour, why);
 
         var wanted = new MonsterLineSettings(
             unique, rare, magic, uniqueColour, rareColour, magicColour);
@@ -311,11 +339,24 @@ public sealed class TrackerWindow
     }
 
     /// <summary>One rarity's switch and colour, as they stand after the row was drawn.</summary>
-    private static (bool On, string Colour) Line(string label, bool on, string colour)
+    /// <remarks>
+    /// THE TOOLTIP BELONGS TO EVERY ONE OF THESE, so it is asked for here rather than once
+    /// after the first. Written outside, it hung off whichever control happened to be drawn
+    /// last before it - the "Unique" label - so hovering "Rare" or "Magic" got nothing, and
+    /// the one explanation covering all three switches was reachable from a third of them.
+    ///
+    /// THE WHOLE ROW IS THE TARGET, not the label alone. A BeginGroup/EndGroup pair makes the
+    /// three controls one item as far as <c>IsItemHovered</c> is concerned, so the tooltip
+    /// answers to the tick and the swatch as well - which is where a pointer actually goes.
+    /// </remarks>
+    /// <param name="hint">What the tooltip says. The same for every rarity.</param>
+    private static (bool On, string Colour) Line(string label, bool on, string colour, string hint)
     {
         ImGui.PushID(label);
         try
         {
+            ImGui.BeginGroup();
+
             bool wanted = on;
             ImGui.Checkbox("##on", ref wanted);
 
@@ -327,6 +368,10 @@ public sealed class TrackerWindow
 
             ImGui.SameLine();
             ImGui.TextUnformatted(label);
+
+            ImGui.EndGroup();
+            OverlayLayout.Hint(hint);
+
             return (wanted, wantedColour);
         }
         finally
@@ -348,45 +393,58 @@ public sealed class TrackerWindow
     private void DrawKnownHazards(TrackerSettings settings)
     {
         bool ground = settings.ShowGroundEffects;
-        if (ImGui.Checkbox("ring every ground effect the GAME marks as one", ref ground))
+        if (OverlayLayout.Toggle("Ring Marked Hazards", ref ground))
         {
             _write(settings with { ShowGroundEffects = ground });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "no rule needed: this asks the entity whether it carries a GroundEffect component,"
+        OverlayLayout.Hint(
+            "No rule needed: this asks the entity whether it carries a GroundEffect component,"
             + " which is the game's own answer, and reads the countdown out of it.");
 
-        ImGuiText.Hint(
-            WarnText,
-            "IT DOES NOT COVER EVERY HAZARD. Only two metadata paths have ever been seen"
-            + " carrying that component; the GroundOnDeath monster mods carry none, and their"
-            + " paths are refused by the noise filter's Daemon class before they are read at"
-            + " all. A patch of fire with no ring is that, not a bug - the rules below are"
-            + " still what covers it.");
+        // WHAT IT CANNOT DO stays on screen, because the way this fails is that a hazard has no
+        // ring - which looks exactly like the feature being broken, and sends somebody looking
+        // for a bug that is not there. Only while it is on: switched off, "it does not cover
+        // everything" is not a caveat, it is noise.
+        if (ground)
+        {
+            OverlayLayout.Warning(
+                "Does not cover every hazard. A patch of fire with no ring is that, not a bug -"
+                + " the rules below are still what covers it.");
+            OverlayLayout.Hint(
+                "Only two metadata paths have ever been seen carrying that component. The"
+                + " GroundOnDeath monster mods carry none, and their paths are refused by the"
+                + " noise filter's Daemon class before they are read at all.");
+        }
 
         bool gameRadius = settings.GroundEffectUseGameRadius;
-        if (ImGui.Checkbox("size it from the component's own radius", ref gameRadius))
+        if (OverlayLayout.Toggle("Use Component Radius", ref gameRadius))
         {
             _write(settings with { GroundEffectUseGameRadius = gameRadius });
         }
 
-        ImGuiText.Hint(
-            WarnText,
-            "that value is a CANDIDATE, not a measurement - a float in the right range that"
-            + " nothing has confirmed. Drawing it IS the experiment: if the ring hugs the"
-            + " burning patch it is the radius, and if it does not, switch this off and say so.");
+        OverlayLayout.Hint(
+            "The alternative is the fixed size below. Drawing this IS the experiment: if the ring"
+            + " hugs the burning patch it is the radius, and if it does not, switch it off and"
+            + " say so.");
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
+        // The one caveat that has to be read BEFORE trusting what is on screen, so it cannot be
+        // a tooltip: the number being drawn is a guess, and a ring drawn from a guess looks
+        // exactly like a ring drawn from a measurement.
+        if (gameRadius)
+        {
+            OverlayLayout.Warning(
+                "That value is a CANDIDATE, not a measurement - a float in the right range that"
+                + " nothing has confirmed.");
+        }
+
         float radius = settings.GroundEffectRadius;
-        if (ImGui.SliderFloat("##groundradius", ref radius, 3f, 150f, "%.0f world units"))
+        if (OverlayLayout.Narrow.Slider("##groundradius", ref radius, 3f, 150f, "%.0f world units"))
         {
             _write(settings with { GroundEffectRadius = radius });
         }
 
-        ImGuiText.Hint(
-            DimText,
+        OverlayLayout.Hint(
             "WORLD units, not pixels: the ring is a circle on the floor, so it foreshortens and"
             + " shrinks with the camera. Used when the switch above is off.");
 
@@ -403,54 +461,48 @@ public sealed class TrackerWindow
 
         ImGui.SameLine();
         bool timer = settings.ShowGroundEffectTimer;
-        if (ImGui.Checkbox("seconds left", ref timer))
+        if (OverlayLayout.Toggle("Seconds Left", ref timer))
         {
             _write(settings with { ShowGroundEffectTimer = timer });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "the number sits at 0.0 for a beat before the ring goes - the game's countdown"
-            + " reaches zero a measured 0.38 s before it stops listing the effect, and a third"
-            + " of effects have no timer at all and simply show none.");
+        OverlayLayout.Hint(
+            "The number sits at 0.0 for a beat before the ring goes - the game's countdown"
+            + " reaches zero a measured 0.38 s before it stops listing the effect. A third of"
+            + " effects have no timer at all and simply show none.");
 
         bool labels = settings.ShowGroundEffectLabels;
-        if (ImGui.Checkbox("label each ring with its metadata path (debug)", ref labels))
+        if (OverlayLayout.Toggle("Show Metadata Path", ref labels))
         {
             _write(settings with { ShowGroundEffectLabels = labels });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "for working out which patch a ring belongs to, and whether one is MISSING. Prints"
+        OverlayLayout.Hint(
+            "For working out which patch a ring belongs to, and whether one is MISSING. Prints"
             + " the path, the entity id, the radius being used and the countdown. A hazard the"
             + " game draws but this does not ring will have no label anywhere near it - that is"
             + " the case worth reporting.");
 
         bool beams = settings.ShowBeams;
-        if (ImGui.Checkbox("draw boss beams as the PATH they occupy", ref beams))
+        if (OverlayLayout.Toggle("Draw Boss Beams", ref beams))
         {
             _write(settings with { ShowBeams = beams });
         }
 
-        ImGuiText.Hint(
-            DimText,
-            "both ends come from the beam's own component, so this is the whole path rather than"
+        OverlayLayout.Hint(
+            "Both ends come from the beam's own component, so this is the whole path rather than"
             + " a ring on one end of it - a beam runs up to eleven hundred world units, and the"
             + " chevrons run towards the end that matters.");
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8.5f);
         float beamThickness = settings.BeamThickness;
-        if (ImGui.SliderFloat("##beamthickness", ref beamThickness, 2f, 60f, "%.0f px wide"))
+        if (OverlayLayout.Narrow.Slider("##beamthickness", ref beamThickness, 2f, 60f, "%.0f px wide"))
         {
             _write(settings with { BeamThickness = beamThickness });
         }
 
-        ImGuiText.Hint(
-            WarnText,
-            "the WIDTH is decoration and carries no claim: the component has no thickness field"
-            + " that survived checking, so a band drawn to look like a danger zone would be an"
-            + " invention. The line down its middle is the measured part.");
+        OverlayLayout.Hint(
+            "The component has no thickness field that survived checking, so a band drawn to look"
+            + " like a danger zone would be an invention.");
 
         ImGui.SameLine();
         Vector4 beamColour = ImGui.ColorConvertU32ToFloat4(OverlaySettings.ParseColour(settings.BeamColour));
@@ -461,39 +513,44 @@ public sealed class TrackerWindow
                 BeamColour = OverlaySettings.FormatColour(ImGui.ColorConvertFloat4ToU32(beamColour)),
             });
         }
+
+        // The width is a slider, so it invites being turned up until the band looks like the
+        // danger zone - and it is not one. That has to be readable while the beams are drawn,
+        // not hidden under a pointer.
+        if (beams)
+        {
+            OverlayLayout.Warning("The width is decoration. Only the line down its middle is measured.");
+        }
     }
 
     private void DrawGroundDanger(TrackerSettings settings, WorldSnapshot snapshot)
     {
-        if (!OverlayFonts.SectionHeader("Dangerous ground"))
-        {
-            return;
-        }
-
         DrawKnownHazards(settings);
 
-        ImGui.Separator();
+        OverlayLayout.Group("Custom Ground Filter Rules");
 
         bool on = settings.ShowGroundDanger;
-        if (ImGui.Checkbox("ring the ground effects below", ref on))
+        if (OverlayLayout.Toggle("Ring What the Rules Below Match", ref on))
         {
             _write(settings with { ShowGroundDanger = on });
         }
 
-        // The two reasons this draws nothing while being configured correctly, said HERE
-        // rather than left to be discovered. Both are deliberate rules elsewhere in the
-        // reader, and neither is guessable from an overlay that stays empty.
-        ImGuiText.Hint(
-            DimText,
-            "the radius is in SCREEN PIXELS, not world units - it does not shrink as the camera pulls back.");
-        ImGuiText.Hint(
-            WarnText,
-            "nothing appears? the reader drops hostile ground effects unless the Effects tab's"
-            + " \"keep them\" is on, and the noise filter refuses the engine's /fx/ and /mat/"
-            + " nodes before they are read at all.");
-        ImGuiText.Hint(
-            DimText,
-            "the Effects tab lists what IS being read, with paths - copy the start of one into a rule.");
+        OverlayLayout.Hint(
+            "The radius is in SCREEN PIXELS, not world units - it does not shrink as the camera"
+            + " pulls back. The Effects tab lists what IS being read, with paths: copy the start"
+            + " of one into a rule.");
+
+        // The reason this draws nothing while being configured correctly. It stays on screen
+        // rather than going in the tooltip because it is the answer to "it is not working",
+        // and somebody asking that has already stopped hovering things - but only while the
+        // rings are switched on, since off is a perfectly good reason for nothing to appear.
+        if (on)
+        {
+            OverlayLayout.Warning(
+                "Nothing appearing? The reader drops hostile ground effects unless the Effects"
+                + " tab's \"keep them\" is on, and the noise filter refuses the engine's /fx/ and"
+                + " /mat/ nodes before they are read at all.");
+        }
 
         List<GroundDangerRule> rules = [.. settings.GroundDangerOrDefault];
         bool edited = false;
@@ -503,7 +560,8 @@ public sealed class TrackerWindow
         // and stay lined up when the thickness slider comes and goes with "filled" - laid out
         // by hand, that slider vanishing shifted everything after it sideways per row. The
         // path takes the stretch column, so it soaks up the width at every text size.
-        if (rules.Count > 0 && ImGui.BeginTable("##ground-rules", 7, ImGuiTableFlags.SizingFixedFit))
+        if (rules.Count > 0 && ImGui.BeginTable(
+                "##ground-rules", 7, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Resizable))
         {
             try
             {
@@ -551,9 +609,8 @@ public sealed class TrackerWindow
                         }
 
                         ImGui.TableNextColumn();
-                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
                         int radius = rule.Radius;
-                        if (ImGui.SliderInt("##radius", ref radius, 10, 400, "%d px"))
+                        if (OverlayLayout.Narrow.Slider("##radius", ref radius, 10, 400, "%d px"))
                         {
                             rules[i] = rule with { Radius = radius };
                             edited = true;
@@ -564,9 +621,8 @@ public sealed class TrackerWindow
                         ImGui.TableNextColumn();
                         if (!rule.Filled)
                         {
-                            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 4f);
                             int thickness = rule.Thickness;
-                            if (ImGui.SliderInt("##weight", ref thickness, 1, 5, "%d wide"))
+                            if (OverlayLayout.Narrow.Slider("##weight", ref thickness, 1, 5, "%d wide"))
                             {
                                 rules[i] = rule with { Thickness = thickness };
                                 edited = true;
@@ -609,7 +665,7 @@ public sealed class TrackerWindow
             edited = true;
         }
 
-        if (ImGui.Button("add a ground rule"))
+        if (ImGui.Button("Add a Ground Rule"))
         {
             rules.Add(new GroundDangerRule("Metadata/Effects/Spells/ground_effects/"));
             edited = true;
@@ -647,103 +703,89 @@ public sealed class TrackerWindow
 
     // ── Status effects ───────────────────────────────────────────────────────
 
-    private void DrawStatus(TrackerSettings settings, WorldSnapshot snapshot)
+    private void DrawStatus(TrackerSettings settings)
     {
-        if (!OverlayFonts.SectionHeader("Status effects"))
-        {
-            return;
-        }
-
         bool player = settings.ShowPlayerStatus;
-        if (ImGui.Checkbox("over the player", ref player))
+        if (OverlayLayout.Toggle("Over the Player", ref player))
         {
             _write(settings with { ShowPlayerStatus = player });
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
         bool monsters = settings.ShowMonsterStatus;
-        if (ImGui.Checkbox("over rare and unique monsters", ref monsters))
+        if (OverlayLayout.Toggle("Rares \u0026 Uniques Only", ref monsters))
         {
             _write(settings with { ShowMonsterStatus = monsters });
         }
 
-        // Said next to the switch that carries it, like the projectile tab's warning: this is
-        // the only setting in here that makes the READER do more work per monster.
-        ImGuiText.Hint(
-            DimText,
-            "the monster half makes the reader read a Buffs component per rare-or-better"
-            + " monster; watch the Read cost tab.");
+        // On the switch that carries it rather than under the pair: this is the only setting in
+        // here that makes the READER do more work per monster, and it is the monster half that
+        // does it - a note under both says it of both.
+        OverlayLayout.Hint(
+            "Makes the reader read a Buffs component per rare-or-better monster; watch the Read"
+            + " cost tab.");
 
         // Titled rules between the blocks, like the alerts tab: five near-identical control
         // rows in a stack read as one that lost its order, and a hairline does not say where
         // one subject ends.
-        OverlayFonts.SectionTitle("the icon sheet");
+        OverlayLayout.Group("The Icon Sheet");
         DrawSheet(settings);
 
-        OverlayFonts.SectionTitle("where the rows sit");
+        OverlayLayout.Group("Where the Rows Sit");
         DrawLayout(settings);
         DrawTextSettings(settings);
 
-        OverlayFonts.SectionTitle("on the player");
+        OverlayLayout.Group("On the Player");
         DrawRules(settings, settings.PlayerStatusOrDefault, "player",
             rules => settings with { PlayerStatus = rules });
 
-        OverlayFonts.SectionTitle("on monsters");
+        OverlayLayout.Group("On Monsters");
         DrawRules(settings, settings.MonsterStatusOrDefault, "monster",
             rules => settings with { MonsterStatus = rules });
-
-        ImGui.Spacing();
-        DrawLiveNames(snapshot);
     }
 
     /// <summary>The sheet path, and what actually loaded from it.</summary>
     private void DrawSheet(TrackerSettings settings)
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 20f);
         string path = settings.IconSheet;
-        if (ImGui.InputText("icon sheet", ref path, 512))
+        if (OverlayLayout.Input("Icon Sheet", ref path, 512))
         {
             _write(settings with { IconSheet = path });
         }
 
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
+        OverlayLayout.Next();
         int tile = settings.IconTile;
-        if (ImGui.InputInt("tile", ref tile, 8, 32))
+        if (OverlayLayout.Narrow.Number("tile", ref tile, 8))
         {
             _write(settings with { IconTile = Math.Clamp(tile, 1, 512) });
         }
 
         if (settings.IconSheet.Length == 0)
         {
-            ImGuiText.Hint(
-                DimText,
-                "no sheet: each effect is drawn as its coloured disc with its own caption on it.");
+            OverlayLayout.Note("No sheet - each effect is drawn as its coloured disc with its own caption.");
             return;
         }
 
         IconCache.Picture sheet = _sheet();
         if (!sheet.Ready)
         {
-            ImGuiText.Hint(WarnText, "that file did not load - see the Appearance tab for the reason.");
+            OverlayLayout.Warning("That file did not load - see the Appearance tab for the reason.");
             return;
         }
 
         int columns = Math.Max(1, sheet.Width / settings.IconTile);
         int rows = Math.Max(1, sheet.Height / settings.IconTile);
-        ImGuiText.Hint(
-            GoodText,
-            $"loaded: {sheet.Width}x{sheet.Height}, which is {columns} x {rows} tiles of {settings.IconTile}px");
+        OverlayLayout.Note(
+            $"Loaded {sheet.Width}x{sheet.Height}, which is {columns} x {rows} tiles of {settings.IconTile}px.");
 
         // A sheet that is not a whole number of tiles across is the symptom BOTH of a wrong
         // tile size and of a sheet so large it was shrunk on the way in - and either way every
         // icon lands part way between two of them, which reads as the coordinates being wrong.
         if (sheet.Width % settings.IconTile != 0 || sheet.Height % settings.IconTile != 0)
         {
-            ImGuiText.Hint(
-                WarnText,
-                $"that is not a whole number of {settings.IconTile}px tiles - either the tile size is"
-                + $" wrong, or the sheet is over {IconCache.MaxSheetEdge}px and was shrunk to fit.");
+            OverlayLayout.Warning(
+                $"Not a whole number of {settings.IconTile}px tiles - either the tile size is wrong,"
+                + $" or the sheet is over {IconCache.MaxSheetEdge}px and was shrunk to fit.");
         }
     }
 
@@ -753,11 +795,10 @@ public sealed class TrackerWindow
         float screen = ImGui.GetIO().DisplaySize.Y;
         string[] names = [.. StatusLayoutProfile.All.Select(p => p.Name)];
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
-        ImGui.Combo("##profile", ref _profile, names, names.Length);
+        OverlayLayout.Narrow.Combo("##profile", ref _profile, names);
 
         ImGui.SameLine();
-        if (ImGui.Button("use this profile"))
+        if (ImGui.Button("Use This Profile"))
         {
             StatusLayoutProfile chosen = StatusLayoutProfile.All[Math.Clamp(_profile, 0, names.Length - 1)];
             _write(settings with
@@ -769,7 +810,7 @@ public sealed class TrackerWindow
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("detect from this screen"))
+        if (ImGui.Button("Detect from This Screen"))
         {
             _profile = StatusLayoutProfile.All.ToList().IndexOf(StatusLayoutProfile.ForHeight(screen));
         }
@@ -799,25 +840,22 @@ public sealed class TrackerWindow
         {
             StatusIconLayout? changed = null;
 
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
             int x = layout.X;
-            if (ImGui.SliderInt("##x", ref x, -400, 400, "across %d"))
+            if (OverlayLayout.Narrow.Slider("##x", ref x, -400, 400, "across %d"))
             {
                 changed = layout with { X = x };
             }
 
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
             int y = layout.Y;
-            if (ImGui.SliderInt("##y", ref y, lowest, highest, "down %d"))
+            if (OverlayLayout.Narrow.Slider("##y", ref y, lowest, highest, "down %d"))
             {
                 changed = layout with { Y = y };
             }
 
             ImGui.SameLine();
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
             int gap = layout.Gap;
-            if (ImGui.SliderInt("##gap", ref gap, 0, 50, "gap %d"))
+            if (OverlayLayout.Narrow.Slider("##gap", ref gap, 0, 50, "gap %d"))
             {
                 changed = layout with { Gap = gap };
             }
@@ -835,17 +873,15 @@ public sealed class TrackerWindow
     /// <summary>The shadow, the timer plate, and where the two small numbers sit.</summary>
     private void DrawTextSettings(TrackerSettings settings)
     {
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6f);
         float alpha = settings.ShadowAlpha;
-        if (ImGui.SliderFloat("##shadow", ref alpha, 0f, 1f, "shadow %.2f"))
+        if (OverlayLayout.Narrow.Slider("##shadow", ref alpha, 0f, 1f, "shadow %.2f"))
         {
             _write(settings with { ShadowAlpha = alpha });
         }
 
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
         int size = settings.ShadowSize;
-        if (ImGui.SliderInt("##shadowsize", ref size, 0, 2, "spread %d"))
+        if (OverlayLayout.Narrow.Slider("##shadowsize", ref size, 0, 2, "spread %d"))
         {
             _write(settings with { ShadowSize = size });
         }
@@ -863,33 +899,33 @@ public sealed class TrackerWindow
         ImGui.SameLine();
         ImGui.TextColored(DimText, "timer bar background");
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
+        // A 2x2 GRID, not a row of four. These are two offsets - where the stack count sits and
+        // where the timer sits - each with an x and a y, and a row of four puts "stacks y" and
+        // "timer x" side by side as though they were a pair. Two rows of two says which two
+        // numbers belong together, and each column is one axis: the x of one is directly above
+        // the x of the other, which is how you nudge both the same way.
         int chargesX = settings.ChargesX;
-        if (ImGui.SliderInt("##chargesx", ref chargesX, -64, 64, "stacks x %d"))
+        if (OverlayLayout.Narrow.Slider("##chargesx", ref chargesX, -64, 64, "stacks x %d"))
         {
             _write(settings with { ChargesX = chargesX });
         }
 
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
+        OverlayLayout.Cell(1);
         int chargesY = settings.ChargesY;
-        if (ImGui.SliderInt("##chargesy", ref chargesY, -64, 64, "stacks y %d"))
+        if (OverlayLayout.Narrow.Slider("##chargesy", ref chargesY, -64, 64, "stacks y %d"))
         {
             _write(settings with { ChargesY = chargesY });
         }
 
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
         int timerX = settings.TimerX;
-        if (ImGui.SliderInt("##timerx", ref timerX, -64, 64, "timer x %d"))
+        if (OverlayLayout.Narrow.Slider("##timerx", ref timerX, -64, 64, "timer x %d"))
         {
             _write(settings with { TimerX = timerX });
         }
 
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5.5f);
+        OverlayLayout.Cell(1);
         int timerY = settings.TimerY;
-        if (ImGui.SliderInt("##timery", ref timerY, -64, 64, "timer y %d"))
+        if (OverlayLayout.Narrow.Slider("##timery", ref timerY, -64, 64, "timer y %d"))
         {
             _write(settings with { TimerY = timerY });
         }
@@ -908,7 +944,8 @@ public sealed class TrackerWindow
 
         // The same table the ground rules use, for the same reasons: aligned columns at any
         // text size, and the name soaking up the width in the stretch column.
-        if (rules.Count > 0 && ImGui.BeginTable($"##status-rules-{id}", 9, ImGuiTableFlags.SizingFixedFit))
+        if (rules.Count > 0 && ImGui.BeginTable(
+                $"##status-rules-{id}", 9, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Resizable))
         {
             try
             {
@@ -971,9 +1008,8 @@ public sealed class TrackerWindow
                         }
 
                         ImGui.TableNextColumn();
-                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 4f);
                         float scale = rule.IconScale;
-                        if (ImGui.SliderFloat("##scale", ref scale, 0.2f, 4f, "x%.2f"))
+                        if (OverlayLayout.Narrow.Slider("##scale", ref scale, 0.2f, 4f, "x%.2f"))
                         {
                             rules[i] = rule with { IconScale = scale };
                             edited = true;
@@ -987,9 +1023,8 @@ public sealed class TrackerWindow
                         }
 
                         ImGui.TableNextColumn();
-                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
                         string label = rule.Label;
-                        if (ImGui.InputText("##label", ref label, 64))
+                        if (OverlayLayout.Narrow.Input("##label", ref label, 64))
                         {
                             rules[i] = rule with { Label = label };
                             edited = true;
@@ -1041,7 +1076,7 @@ public sealed class TrackerWindow
             break;
         }
 
-        if (ImGui.Button($"add a rule##{id}"))
+        if (ImGui.Button($"Add a Rule##{id}"))
         {
             rules.Add(new StatusIconRule("", "new"));
             edited = true;
@@ -1127,66 +1162,204 @@ public sealed class TrackerWindow
     }
 
     /// <summary>
-    /// What is on the player and on the monsters right now, by the game's own names.
+    /// What is on the player and on the monsters right now - and a click writes the rule.
     /// </summary>
     /// <remarks>
-    /// The half of this tab that makes the rest usable. A rule matches on an internal spelling
-    /// nobody is shown anywhere else, so without this the only way to write one is to guess -
-    /// and a rule that matches nothing looks exactly like a feature that does not work.
+    /// THE HALF OF THIS TAB THAT MAKES THE REST USABLE. A status rule matches on an internal
+    /// spelling nobody is shown anywhere else - "shocked_70", "stolen_mods_buff_70" - so
+    /// without this list the only way to write one is to guess, and a rule that matches
+    /// nothing looks exactly like a feature that does not work.
+    ///
+    /// SO CLICKING A NAME WRITES THE RULE. This was a wall of text under an instruction to
+    /// "copy a name into a rule above" - which meant reading a name off one part of the page,
+    /// scrolling to another, adding an empty rule and typing the name back in from memory,
+    /// with every chance to mistype a string that has to match exactly enough. The names are
+    /// on screen and the rule list is one call away; asking a person to be the clipboard
+    /// between them is work the tool can do.
+    ///
+    /// TWO PANELS SIDE BY SIDE rather than one column, because the two lists answer different
+    /// questions - what is on ME, and what is on THEM - and a click means a different thing in
+    /// each: one writes a player rule, the other a monster rule. Stacked, that difference
+    /// rests on which heading somebody last scrolled past.
     /// </remarks>
-    private static void DrawLiveNames(WorldSnapshot snapshot)
+    private void DrawLiveNames(TrackerSettings settings, WorldSnapshot snapshot)
     {
-        if (!OverlayFonts.SectionHeader("what is on things right now"))
+        OverlayLayout.Note("Click an entry to add it as a rule. Matching is loose, so a fragment works.");
+
+        // Half the width each, less the gap between them. Zero height fills what is left, so
+        // the two grow with the window rather than at a height chosen here.
+        float half = (ImGui.GetContentRegionAvail().X - ImGui.GetStyle().ItemSpacing.X) * 0.5f;
+
+        DrawBuffPanel(
+            "##live-player", "On you", new Vector2(half, 0f), settings.PlayerStatusOrDefault,
+            name => _write(_read() with { PlayerStatus = [.. _read().PlayerStatusOrDefault, new StatusIconRule(name)] }),
+            panel => panel.Add(0, snapshot.PlayerBuffs is { All.Count: > 0 } ? "you" : string.Empty, snapshot.PlayerBuffs));
+
+        ImGui.SameLine();
+
+        DrawBuffPanel(
+            "##live-monsters", "On monsters", new Vector2(half, 0f), settings.MonsterStatusOrDefault,
+            name => _write(_read() with { MonsterStatus = [.. _read().MonsterStatusOrDefault, new StatusIconRule(name)] }),
+            panel =>
+            {
+                int shown = 0;
+                foreach (WorldEntity monster in snapshot.Entities)
+                {
+                    if (monster.Kind != EntityKind.Monster || monster.Buffs is null || monster.Buffs.All.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    panel.Add(shown, monster.ShortName, monster.Buffs);
+                    if (++shown >= 4)
+                    {
+                        break;
+                    }
+                }
+
+                if (shown == 0)
+                {
+                    OverlayLayout.Note(
+                        "Nothing being read - tick \"Rares & uniques only\" on the Status effects tab"
+                        + " and stand next to one.");
+                }
+            });
+    }
+
+    /// <summary>One side of the inspector: a bordered list of what is on something.</summary>
+    /// <param name="already">The rules that exist, so a name already covered says so.</param>
+    /// <param name="add">Writes a new rule for the name that was clicked.</param>
+    /// <param name="fill">Puts the things being listed into the panel.</param>
+    private static void DrawBuffPanel(
+        string id,
+        string title,
+        Vector2 size,
+        IReadOnlyList<StatusIconRule> already,
+        Action<string> add,
+        Action<BuffPanel> fill)
+    {
+        if (!ImGui.BeginChild(id, size, ImGuiChildFlags.Borders))
         {
+            ImGui.EndChild();
             return;
         }
 
-        ImGuiText.Wrapped(DimText, "copy a name into a rule above - matching is loose, so a fragment works.");
-
-        Names("on you", snapshot.PlayerBuffs);
-
-        int shown = 0;
-        foreach (WorldEntity monster in snapshot.Entities)
+        try
         {
-            if (monster.Kind != EntityKind.Monster || monster.Buffs is null || monster.Buffs.All.Count == 0)
-            {
-                continue;
-            }
-
-            Names(monster.ShortName, monster.Buffs);
-            if (++shown >= 4)
-            {
-                break;
-            }
+            OverlayLayout.Group(title);
+            fill(new BuffPanel(already, add));
         }
-
-        if (shown == 0)
+        finally
         {
-            ImGuiText.Wrapped(
-                DimText,
-                "no monster buffs are being read - tick \"over rare and unique monsters\" above and"
-                + " stand next to one.");
+            // In a finally and unconditionally: EndChild pairs with BeginChild whatever it
+            // returned, and an exception between the two leaves ImGui's stack unbalanced.
+            ImGui.EndChild();
         }
     }
 
-    /// <summary>One thing's buffs, with what the drawing needs from each.</summary>
-    private static void Names(string who, ActiveBuffs? buffs)
+    /// <summary>
+    /// One panel while it is being filled: what is listed, and what a click on it does.
+    /// </summary>
+    /// <remarks>
+    /// A small type rather than four parameters threaded through, because the two sides differ
+    /// only in what they list and what a click writes - and passing "the thing a click adds a
+    /// rule to" as a loose delegate beside a loose list is how the player's names end up
+    /// writing a monster rule.
+    /// </remarks>
+    private readonly struct BuffPanel(IReadOnlyList<StatusIconRule> already, Action<string> add)
     {
-        if (buffs is null || buffs.All.Count == 0)
+        /// <summary>
+        /// Lists one thing's buffs, each of them clickable.
+        /// </summary>
+        /// <remarks>
+        /// THE SAME BUFF APPEARS MORE THAN ONCE. The game lists an instance per source, so a
+        /// character running two auras that both grant it shows "arcane_surge" twice, and a
+        /// reservation buff can appear three times over. That is a real reading and not a
+        /// duplicate to filter out - but it means a row's ImGui id cannot come from the buff's
+        /// NAME, because two rows would then share one id. ImGui says so out loud, in a popup
+        /// over the panel, and the second row of a colliding pair stops responding to clicks.
+        ///
+        /// So the id is the POSITION, here and per row: the slot this list occupies in the
+        /// panel, and the index of the row within it. Neither can repeat, whatever the game
+        /// lists - and two monsters of the same name in one panel would have collided the same
+        /// way if the outer scope had come from ShortName.
+        /// </remarks>
+        /// <param name="slot">Which list this is within its panel. Unique per panel.</param>
+        public void Add(int slot, string who, ActiveBuffs? buffs)
         {
-            ImGui.TextColored(DimText, $"{who}: nothing");
-            return;
+            if (buffs is null || buffs.All.Count == 0)
+            {
+                if (who.Length > 0)
+                {
+                    OverlayLayout.Note("Nothing on it.");
+                }
+
+                return;
+            }
+
+            ImGui.PushID(slot);
+            try
+            {
+                if (who.Length > 0)
+                {
+                    ImGui.TextUnformatted(ImGuiText.Escape(who));
+                }
+
+                for (int i = 0; i < buffs.All.Count; i++)
+                {
+                    Row(i, buffs.All[i]);
+                }
+            }
+            finally
+            {
+                ImGui.PopID();
+            }
         }
 
-        ImGui.TextUnformatted($"{who}:");
-        foreach (ActiveBuff buff in buffs.All)
+        /// <summary>One buff: its name, what the drawing needs, and a click that rules it.</summary>
+        /// <param name="at">The row's position, which is its id - see the note on Add.</param>
+        private void Row(int at, ActiveBuff buff)
         {
-            ImGui.TextColored(
-                DimText,
-                string.Create(
-                    CultureInfo.CurrentCulture,
-                    $"    {ImGuiText.Escape(buff.Name)}   {buff.TimeLeft:F1}s of {buff.TotalTime:F1}s"
-                    + $"{(buff.Charges > 0 ? $"   x{buff.Charges}" : string.Empty)}"));
+            // A rule already covering this name means clicking again would add a duplicate
+            // that can never be told from the first. Said rather than silently refused: a
+            // click that does nothing reads as a broken list.
+            bool have = false;
+            foreach (StatusIconRule rule in already)
+            {
+                if (rule.Matches(buff.Name))
+                {
+                    have = true;
+                    break;
+                }
+            }
+
+            ImGui.PushID(at);
+            try
+            {
+                // Selectable rather than text, so the whole row is the target and it lights up
+                // under the pointer - which is what says "this does something" without a word.
+                if (ImGui.Selectable(ImGuiText.Escape(buff.Name), have) && !have)
+                {
+                    add(buff.Name);
+                }
+
+                if (!have)
+                {
+                    OverlayLayout.Hint("Click to add a rule for this.");
+                }
+
+                ImGui.SameLine();
+                ImGuiText.Mono(
+                    OverlayInk.Quiet,
+                    string.Create(
+                        CultureInfo.CurrentCulture,
+                        $"{buff.TimeLeft:F1}s of {buff.TotalTime:F1}s"
+                        + $"{(buff.Charges > 0 ? $"   x{buff.Charges}" : string.Empty)}"));
+            }
+            finally
+            {
+                ImGui.PopID();
+            }
         }
     }
 }

@@ -21,7 +21,7 @@ already cost real time on this project.
   and carries drift history the upstream does not. Its `CLAUDE.md` is a long record of
   problems already solved.
 - **This tool's own interface browser** is a reference too, and the easiest one to forget
-  because it is not a file: the Interface tree tab walks the live UI element tree, prints
+  because it is not a file: Inspect → UI Browser walks the live UI element tree, prints
   every element's StringId, rectangle, flags and child path, and F8 picks whatever is under
   the cursor. Any question of the form "does the game name that thing, and where is it" is
   one screenshot away — ask it there before concluding that something cannot be measured.

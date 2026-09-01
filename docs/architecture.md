@@ -346,6 +346,8 @@ PoEformance.App --record s.rec --questflags    # + read where a character's ques
 PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action fields (see below)
 PoEformance.App --record s.rec --hoverhunt    # + read the hovered-entity chain and the boss byte
 PoEformance.App --record s.rec --sweep        # + read four components nothing has a layout for
+PoEformance.App --record s.rec --glossary     # + find every loaded dat table and read the glossary
+PoEformance.App --record s.rec --tables       # + list them, with the row size each one reports
 
 # Reads the INSTALL, not the process - no game running, no fight to survive:
 PoEformance.App --groundtypes                 # what each ground-effect type row actually is
@@ -2165,6 +2167,136 @@ handed in and proving it needs real bundles.
 running process knows where its own executable is. The usual folders are only a fallback for
 reading with the game shut, and a folder counts because the files are in it, never because of
 its name.
+
+### The tables — a dat table is a loaded-file record
+
+Rows of the game's static tables have been readable for months, but only **sideways**. A
+MinimapIcon component holds a row, an NPC holds a row, a chest holds a row — so the tables this
+tool could read were exactly the tables something on screen happened to point at. A table that
+nothing points at was not far away, it was unreachable.
+
+It stopped being unreachable when the two things turned out to be one thing. The game already
+keeps an index of every file it has loaded, hanging off the `FileRoot` static — that is what
+the preload alerts walk — and **a `.dat` record in it is the table object itself**, row store
+and all. `FileRecord.Name` and `DatTable.Path` are not the same shape at the same offset, they
+are the same field.
+
+`session-2026-08-sweep.rec` says so from both directions at once. The object an NPCs row calls
+"the table" (`0x31826080AD0`, path `Data/Balance/QuestFlags.dat`) is also one of the 8,406
+records the `FileRoot` walk enumerates — and it is not one coincidence: of the four tables that
+recording holds a foreign pointer to, *every one* is a record in the file table.
+
+So the route to any loaded table is:
+
+```
+FileRoot -> LoadedFilesRoot -> bucket -> FileRecordSlot.Record -> DatTable -> RowStorePtr -> rows
+```
+
+`LoadedDatTables` walks it. **What decides which records are tables is not the name**: matching
+`.dat` on a path would cost a string read for all eight thousand records to find ninety, and
+would still believe a file named like a table but not parsed as one. `PointerPeek.DescribeTable`
+asks the structure instead — a row store, two containers that divide exactly, and a by-Id index
+whose first entry points at the first row — and reads the path only once a record has passed.
+For nearly every record that is a single read that fails.
+
+The first thing read through it is **`KeywordPopups`, the game's glossary**: the table behind
+the `[Key|Text]` markup its own skill and mod texts are written in. Rendering that markup needs
+no table at all — it carries both halves, so `KeywordGlossary.Plain` is static — but the popup
+behind a highlighted word lives nowhere else. The row was identified from a dissector screenshot
+two ways that cannot both be wrong (nine rows on a 0x48 grid; the only PoE2 table of 1,275 whose
+0x48 row starts with five string columns), and the reader **refuses a table that does not report
+0x48**, because a dat table divides its own rows by its own by-Id index and so answers its row
+size without any schema at all.
+
+**It runs.** `session-2026-08-glossary.rec` is `--glossary --record` on a live client, and
+`GlossaryTableTests` replays it: 6,907 loaded files, 131 dat tables among them, KeywordPopups
+found by name, and 1,026 rows of 0x48 read as English. That closes the one hop no other capture
+could reach — every other recording walks the file table for its *names*, and the preload reader
+stops one byte short of `RowStorePtr` at `+0x28`. It also turns the 0x48 from column arithmetic
+over dat-schema into the client's own number.
+
+**And it corrected the tool three times, all in the same direction.** The screenshot showed
+`+100%%`, so `Plain` collapsed a doubled percent — the raw column holds `+100%`, and the
+doubling was `ImGuiText.Escape` in our own drawing path. A bracket with no pipe was written down
+as a form "not seen in this table"; there are 913 of them. And the definition cap of 512
+characters silently truncated 55 rows, `Critical`'s ending mid-word. Every one of the three came
+from reading the tool's own rendering as if it were the game's data — which is the failure this
+document's first rule is about, arriving in the one place that felt safe.
+
+**A cap that truncates is not a cosmetic bug**, and the second capture is what shows it: read at
+512, the table appears to refer to 317 keywords; read whole, it refers to 328. Eleven references
+lived in the tails that were being cut, so the feature was losing exactly the thing it exists to
+provide, and no test could see it — a recording holds only what was read, so the capture taken
+with the short cap could never have disagreed. The committed fixture is now the 2048 one, and
+the maximum is measured rather than assumed: `Flammability`, 1429 characters, with nothing
+coming back at the cap.
+
+### What the same walk says about the column widths
+
+Every dat-row offset in this project is arithmetic over a table of column widths, and that
+arithmetic had been confirmed on **three** tables — by harvesting rows out of a recording and
+checking their stride by hand. A loaded table reports its **own** row size, so one walk asks all
+of them at once, and `--tables` prints the answers.
+
+Over those captures: **all 134 tables report exactly what the widths compute**, from
+`ModFamily`'s 8 bytes to `Mods`' 677. A width that is wrong for a common type could not survive
+that — one byte off on `bool` would move about ninety of these.
+
+**It first read 123 of 126, and both gaps were in the asking, not in the game.** This document
+said "three tables disagree, all with the game bigger, which is what a reference lagging a patch
+looks like" and "five tables aren't in dat-schema at all". Neither was true.
+
+- **The interval rule.** An interval column is two values, so it costs twice its type — and
+  `Mods.Stat1Value…Stat8Value` are a modifier's minimum and maximum roll. Eight of them at +4 is
+  the 32 bytes `Mods` was short; `AlternateTreeVersions`' three are its 12. A hypothesis that
+  explains the *sign* of every discrepancy is not thereby right: "the reference is behind" and
+  "our arithmetic is incomplete" both make the game bigger, and only one was testable from here.
+- **Capitalisation.** The game's path and dat-schema's table name disagree on case, so an
+  exact-match lookup reports a table as *unknown* rather than as different: the game loads
+  `AtlasPassiveSkillSubtrees`, the schema says `AtlasPassiveSkillSubTrees`, and likewise
+  `MTXTypes`/`MtxTypes`. All five "missing" tables agree on their row size to the byte once
+  matched case-insensitively.
+
+Nothing shipped was ever wrong — none of the seven tables this project computes offsets in has an
+interval column, so the bug was in the checking. `dat-offsets.ps1` now doubles interval columns.
+
+- **A missing trailing column.** `EndgameMaps` computed 0xEF where the game says 0xF0, with no
+  interval column in it — and a third source settles it: repoe-fork/dat-export's *heuristic*
+  PoE2 schema, derived from the data itself, lists 28 columns to poe-tool-dev's 27, the extra
+  being a `bool` at the very end, and totals 0xF0 to the byte.
+
+**134 of 134 explained**, with nothing left attributed to "the reference is behind" that wasn't
+then found in a reference. Three sources, and they disagree, so it's worth knowing what each is
+for: poe-tool-dev/dat-schema is what `dat-offsets.ps1` downloads — one file, every table, and it
+agreed with the game on 133 of 134; repoe-fork/dat-export publishes a schema derived from the
+data, which is why it caught a column nobody had named — check it when a table disagrees with the
+game; jchantrell/dat-schema was the least complete of the three here. **The game is the arbiter**:
+it reports its own row size, and `--tables` prints it.
+
+**And the route's limit, which is a fraction rather than a fact about any one table.** The walk
+found 134 tables among 6,914 files, and **157 of those records are `.dat` files at all — against
+about 1,020 PoE2 tables** in the community schemas. Fifteen per cent.
+
+So a table being absent is the ordinary case. `WorldAreas`, `MinimapIcons`, `NPCs` and
+`ItemVisualIdentity` — the four this project reads rows from — are in none of the 6,913 record
+names `--tables` reads, in any spelling, while `Stats`, `Mods`, `BaseItemTypes` and `QuestFlags`
+happen to be there. That was first written up here as a *pattern*, which it isn't: at 15%
+coverage, four named tables all missing is a coin flip.
+
+**Two things could produce that fraction, and nothing here can tell them apart.** The table may
+genuinely track only what the resource loader pulls in — it is mostly art, 1,219 `.tok` and 903
+`.ao` to its 157 `.dat` — or our walk may be seeing a slice of it. `BucketCount` is `0x10`
+**because GameHelper2 says so, and GameHelper2 is a PoE1 tool**; nothing here has ever checked it
+against Path of Exile 2, and if the real count is larger then every walk of this table has been
+partial and every absence only means we didn't look. No recording can settle it: not one fixture
+holds a single byte past the last bucket, because nothing has ever read there. So
+`PreloadReader.BucketsBeyondTheCount` probes the slots past the end and `--tables` prints whether
+any looks like a bucket. Until that runs, don't plan on finding a particular table this way — the
+row-pointer route through a component is the only route to one the walk doesn't turn up.
+
+And being on it is not being parsed: 23 of those 157 have nothing usable at `RowStorePtr`,
+`GrantedEffectsPerLevel` and `Languages` among them. A table can be present and rowless, which
+is why `Survey` reports the two states separately.
 
 ### Prices — what the stash is worth
 

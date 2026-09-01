@@ -75,21 +75,34 @@ public sealed class RuleEngine
 
     private readonly RuleTimers _timers = new();
 
-    /// <summary>When each rule's effect last acted, so a cooldown can be measured.</summary>
-    private readonly Dictionary<string, long> _acted = new(StringComparer.Ordinal);
+    /// <summary>
+    /// The earliest each rule's effect may act again.
+    /// </summary>
+    /// <remarks>
+    /// A DEADLINE, not the moment it last acted, and that is what makes
+    /// <see cref="RuleSettings.CooldownJitterMs"/> work rather than quietly collapse. The
+    /// spread has to be drawn ONCE, when the effect fires, and held until it fires again.
+    /// Drawing it inside the comparison instead would re-roll it on every tick - sixty chances
+    /// a second for a low draw to come up - so the wait would settle near the bottom of the
+    /// window. Measured: a 1000 ms cooldown spread by 50 comes out averaging 982 ms that way,
+    /// still varied, still looking like the feature working, and systematically FASTER than
+    /// the number in the field.
+    /// </remarks>
+    private readonly Dictionary<string, long> _readyAt = new(StringComparer.Ordinal);
 
     /// <summary>Until when each drawn effect stays up after its condition stopped holding.</summary>
     private readonly Dictionary<string, long> _showUntil = new(StringComparer.Ordinal);
 
-    /// <summary>When input was last synthesised, or null when none has been.</summary>
+    /// <summary>The earliest input may be synthesised again, or null when none ever has been.</summary>
     /// <remarks>
     /// Null rather than 0, which is the same trap the removed entity alerts recorded having
-    /// fallen into with a different sentinel. Zero looks like an obvious "long ago" and is a
-    /// real timestamp: against a clock that starts near it - a test, a freshly booted machine -
-    /// the gap since "never" measures as no gap at all, and the first input of the session is
-    /// silently swallowed. Nothing about that is visible; the rule simply never fires.
+    /// fallen into with a different sentinel - kept explicit here even though the deadline form
+    /// no longer walks into it, because "nothing has fired yet" is worth being able to see. It
+    /// was a TIMESTAMP, and against a clock that starts near zero - a test, a freshly booted
+    /// machine - the gap since "never" measured as no gap at all, and the session's first input
+    /// was silently swallowed.
     /// </remarks>
-    private long? _lastInputAt;
+    private long? _inputReadyAt;
 
     /// <summary>The last tick's outcome, for the status readout and the config page.</summary>
     public RuleTick LastTick { get; private set; } = RuleTick.Nothing;
@@ -135,6 +148,33 @@ public sealed class RuleEngine
         _settings = settings.Normalised();
     }
 
+    /// <summary>Takes what was read from the file, including what could not be.</summary>
+    public void Configure(RuleLoad load)
+    {
+        LoadNote = load.Note;
+        Configure(load.Settings);
+    }
+
+    /// <summary>
+    /// What the file could not give us, for the status readout. Empty when it read cleanly.
+    /// </summary>
+    /// <remarks>
+    /// Kept for the session rather than cleared on the next <see cref="Configure(RuleSettings)"/>,
+    /// and that is deliberate: the config page republishes the settings on every keystroke, so
+    /// clearing it there would wipe the one message explaining why a rule somebody is looking
+    /// for is not in the list - within a second of them reading it.
+    ///
+    /// Volatile for the same reason as <see cref="PreviewRuleId"/>: written on the thread that
+    /// loads, read on the one that builds the config page's view.
+    /// </remarks>
+    public string LoadNote
+    {
+        get => _loadNote;
+        set => _loadNote = value ?? string.Empty;
+    }
+
+    private volatile string _loadNote = string.Empty;
+
     /// <summary>Tells the engine which key the game has bound to each flask slot.</summary>
     public void Bind(FlaskKeys keys)
     {
@@ -146,11 +186,68 @@ public sealed class RuleEngine
     public void Forget()
     {
         _timers.Forget();
-        _acted.Clear();
+        _readyAt.Clear();
         _showUntil.Clear();
-        _lastInputAt = null;
+        _inputReadyAt = null;
         LastTick = RuleTick.Nothing;
     }
+
+    /// <summary>
+    /// Where the spread on each cooldown comes from.
+    /// </summary>
+    /// <remarks>
+    /// An instance rather than <see cref="Random.Shared"/>, on the same argument as
+    /// <see cref="RuleTimers"/> and <see cref="RuleHistory"/>: a test and a live engine in one
+    /// process must not draw from the same sequence, and a seeded one makes "the wait landed in
+    /// the window" an assertion rather than a sample. Not thread-safe, and does not need to be -
+    /// every draw happens inside <see cref="Evaluate"/>, which only the reader thread calls.
+    /// </remarks>
+    private readonly Random _random;
+
+    public RuleEngine()
+        : this(new Random())
+    {
+    }
+
+    /// <summary>For tests: a source whose draws are known in advance.</summary>
+    public RuleEngine(Random random)
+    {
+        ArgumentNullException.ThrowIfNull(random);
+        _random = random;
+    }
+
+    /// <summary>
+    /// A cooldown with its random spread, drawn once for one firing.
+    /// </summary>
+    /// <remarks>
+    /// Centred on the configured wait, so the average cadence stays the one that was asked for -
+    /// a spread that only ever delayed would make every rule slower than its own field says.
+    /// A cooldown of 0 is returned untouched: it means "as often as allowed", and a spread
+    /// there would be inventing a cooldown rather than varying one.
+    /// </remarks>
+    private long Spread(int cooldownMs, int jitterMs)
+    {
+        if (cooldownMs <= 0 || jitterMs <= 0)
+        {
+            return cooldownMs;
+        }
+
+        int half = jitterMs / 2;
+        return Math.Max(0, cooldownMs + _random.Next(-half, half + 1));
+    }
+
+    /// <summary>
+    /// The typing floor, staggered - upwards only.
+    /// </summary>
+    /// <remarks>
+    /// Never below the configured gap, because that gap is a SAFETY floor rather than a
+    /// preference: it is what stops six freely-firing rules becoming a stream of keystrokes,
+    /// and a spread that could dip under it would be this setting quietly raising the tool's
+    /// top speed. It is staggered at all because a rule with no cooldown of its own is paced
+    /// by this and nothing else, which would put the exact regularity straight back.
+    /// </remarks>
+    private long Stagger(int gapMs, int jitterMs)
+        => gapMs <= 0 || jitterMs <= 0 ? gapMs : gapMs + _random.Next(0, jitterMs + 1);
 
     /// <summary>Decides what the rules do now.</summary>
     public RuleTick Evaluate(RuleState state, long nowMs)
@@ -325,13 +422,13 @@ public sealed class RuleEngine
         }
 
         string key = Key(rule, index);
-        if (_acted.TryGetValue(key, out long last) && nowMs - last < effect.CooldownMs)
+        if (_readyAt.TryGetValue(key, out long ready) && nowMs < ready)
         {
             blocked.Add($"{rule.Name}: cooling down");
             return;
         }
 
-        if (effect.Sends && _lastInputAt is long sent && nowMs - sent < settings.MinInputGapMs)
+        if (effect.Sends && _inputReadyAt is long allowed && nowMs < allowed)
         {
             // Not stamped as acted: the rule did not get its turn, and stamping would make it
             // sit out its own cooldown for something the engine did rather than something it
@@ -342,7 +439,7 @@ public sealed class RuleEngine
 
         if (effect.Kind == RuleEffectKind.Sound)
         {
-            _acted[key] = nowMs;
+            _readyAt[key] = nowMs + Spread(effect.CooldownMs, settings.CooldownJitterMs);
             sounds.Add(new RuleSound(rule.Id, effect.Pitch, effect.SoundMs));
             return;
         }
@@ -357,8 +454,8 @@ public sealed class RuleEngine
             return;
         }
 
-        _acted[key] = nowMs;
-        _lastInputAt = nowMs;
+        _readyAt[key] = nowMs + Spread(effect.CooldownMs, settings.CooldownJitterMs);
+        _inputReadyAt = nowMs + Stagger(settings.MinInputGapMs, settings.CooldownJitterMs);
         inputs.Add(new RuleInput(rule.Id, effect.Kind, codes));
     }
 

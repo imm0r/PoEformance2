@@ -97,8 +97,53 @@ public sealed class DamageWindow
     /// </remarks>
     public HeatLayer? Heat { get; set; }
 
-    /// <summary>Draws the tab's content.</summary>
+    /// <summary>
+    /// Draws the tab: the figures, then the graph, then what died - and the settings last.
+    /// </summary>
+    /// <remarks>
+    /// THE CONTROLS USED TO PUSH THE DATA OFF THE SCREEN. Four switches and two sliders sat
+    /// between the headline and the graph, with eight lines of prose among them explaining how
+    /// each figure is arrived at - so the two things somebody opens this tab to look at, the
+    /// graph and the kill list, started below the fold. Everything on this page except those
+    /// two is either a number that belongs in the header or a setting that is changed once.
+    ///
+    /// So: figures, graph, table, and the settings folded under them. The settings did not get
+    /// smaller, they got out of the way - which is the only thing wrong with them.
+    /// </remarks>
     public void DrawTab()
+    {
+        DrawMetrics();
+
+        ImGui.Separator();
+        DrawGraph();
+        DrawGraphControls();
+
+        ImGui.Separator();
+        DrawKills();
+
+        ImGui.Separator();
+        DrawTargets();
+
+        ImGui.Spacing();
+        DrawMeasurement();
+        DrawHeat();
+    }
+
+    /// <summary>
+    /// The headline figures, as a block rather than a paragraph.
+    /// </summary>
+    /// <remarks>
+    /// THE SPLIT IS THE POINT OF THIS TAB and it was four lines of prose. A damage number that
+    /// does not say how much of itself is inferred is a number nobody can check, and on a build
+    /// that one-shots packs the inferred part is the majority - so the split is the difference
+    /// between a figure and a claim. But saying that took four lines reading "credited: 891.4k
+    /// from ones we were already hurting", and the four sentences pushed the graph down a
+    /// screen to explain something that is read once and then known.
+    ///
+    /// Four figures on one line, each with its sentence in a tooltip. What is on screen is the
+    /// comparison - which of the four is large - and that is what the split is FOR.
+    /// </remarks>
+    private void DrawMetrics()
     {
         ImGuiText.Mono(DpsText, $"{Number(_meter.Dps)} dps");
         ImGui.SameLine();
@@ -106,44 +151,100 @@ public sealed class DamageWindow
 
         DrawBurst();
 
-        ImGui.Separator();
+        Metric(
+            "Watched", Number(_meter.Observed), DimText,
+            $"Seen coming off {_meter.Hurt} monsters' health. The part that rests on nothing but"
+            + " a reading.");
 
-        // WHERE the figure came from, split three ways by how much each part is really
-        // KNOWN. A damage number that does not say how much of itself is inferred is a
-        // number nobody can check, and on a build that one-shots packs the inferred part is
-        // the majority - so the split is the difference between a figure and a claim.
-        //
-        // THE FOUR LINES ARE ALIGNED BY SPACES, which is why they are set in the mono face and
-        // not merely because they hold figures. Their labels are different lengths, so in a
-        // proportional face the padding after them lands the values in four different places
-        // and the split stops reading as a split at all. None of them needs escaping any more:
-        // Mono is TextUnformatted rather than printf, and one of these carries a percentage.
-        ImGuiText.Mono(DimText, $"watched:   {Number(_meter.Observed)}  off {_meter.Hurt} monsters' health");
+        OverlayLayout.Cell(1);
+        Metric(
+            "Credited", Number(_meter.CreditedHurt), JudgedText,
+            "Damage dealt to monsters that were already being hurt, and then vanished. Nearly"
+            + " certain: something was hurting it, and then it was gone.");
 
-        // Nearly certain: something was hurting it, and then it was gone.
-        ImGuiText.Mono(
-            JudgedText,
-            $"credited:  {Number(_meter.CreditedHurt)}  from ones we were already hurting");
-
-        // The half that rests entirely on the assumption - and the half a monster that
-        // merely walked off would land in.
-        ImGuiText.Mono(
-            SoftText,
-            $"  untouched: {Number(_meter.CreditedUntouched)}  vanished without a scratch seen"
-            + $"   ({Share(_meter.CreditedUntouched, _meter.Total)} of the total)");
+        OverlayLayout.Cell(2);
+        Metric(
+            "Untouched", Number(_meter.CreditedUntouched), SoftText,
+            $"{Share(_meter.CreditedUntouched, _meter.Total)} of the total. Monsters that"
+            + " vanished without a scratch seen - this half rests entirely on the assumption,"
+            + " and is where one that merely walked off would land.");
 
         if (_meter.WithheldCount > 0)
         {
-            ImGuiText.Mono(
-                DimText,
-                $"  refused:   {Number(_meter.Withheld)}  from {_meter.WithheldCount} that vanished"
-                + " too far away to have been killed");
+            OverlayLayout.Cell(3);
+            Metric(
+                "Out of range", Number(_meter.Withheld), DimText,
+                $"{_meter.WithheldCount} vanished too far away to have been killed, so their"
+                + " health was refused rather than credited.");
+        }
+    }
+
+    /// <summary>One headline figure: its name, its value, and its sentence under the pointer.</summary>
+    /// <remarks>
+    /// This was written here first and is now <see cref="OverlayLayout.Figure"/>, because the
+    /// wealth page wanted the same block of headline numbers and a second copy of a layout shape
+    /// is how nineteen field widths happened. Kept as a name so the call sites below still read
+    /// as what they are.
+    /// </remarks>
+    private static void Metric(string label, string value, Vector4 ink, string tooltip)
+        => OverlayLayout.Figure(label, value, ink, tooltip);
+
+    /// <summary>The graph's own controls, on one line under it.</summary>
+    /// <remarks>
+    /// UNDER THE GRAPH AND ON ONE LINE, because they are about the graph: what it covers, how
+    /// tall it is, how hard it is smoothed. They were spread over three places - two above the
+    /// figures, one inside the plot - so changing how the graph looked meant finding the
+    /// control in a different part of the page each time.
+    /// </remarks>
+    private void DrawGraphControls()
+    {
+        OverlayLayout.Toggle("Reset per Map", ref _thisMapOnly);
+        OverlayLayout.Hint("Off keeps counting across areas, so the graph spans the session.");
+
+        ImGui.SameLine();
+        if (ImGui.Button("Reset DPS"))
+        {
+            _meter.History.Clear();
         }
 
-        DrawFurthest();
+        OverlayLayout.Next();
+        OverlayLayout.Narrow.Slider("##dmg-height", ref _height, 40f, 240f, "%.0f px");
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, "Graph height");
+
+        OverlayLayout.Next();
+        float smoothing = _meter.SmoothingSeconds;
+        if (OverlayLayout.Narrow.Slider("##dmg-smoothing", ref smoothing, 0.1f, 5f, "%.2f s"))
+        {
+            _meter.SmoothingSeconds = smoothing;
+        }
+
+        ImGui.SameLine();
+        ImGui.TextColored(DimText, "Smooth window");
+        OverlayLayout.Hint(
+            "How long a window the headline dps is averaged over. The peak moves with this, which"
+            + " is why the peak cannot be compared with anybody else's.");
+    }
+
+    /// <summary>
+    /// How the figure is arrived at: the two settings that decide what counts, folded away.
+    /// </summary>
+    /// <remarks>
+    /// FOLDED, because these are decided once and then left - and left open they were the two
+    /// controls, the warning and the six diagnostic lines that stood between the headline and
+    /// the graph. Folded is not hidden: the fold says what it is, and everything that argues
+    /// about whether to trust the figure is behind it in one place instead of scattered up the
+    /// page.
+    /// </remarks>
+    private void DrawMeasurement()
+    {
+        if (!OverlayLayout.Subsection("How the Figure Is Measured"))
+        {
+            return;
+        }
 
         bool counting = _meter.CountKills;
-        if (ImGui.Checkbox("count what vanished  (off leaves only health seen to fall)", ref counting))
+        if (OverlayLayout.Toggle("Track Off-Screen / Vanished Kills", ref counting))
         {
             _meter.CountKills = counting;
         }
@@ -153,10 +254,11 @@ public sealed class DamageWindow
         // and the whole of anything deleted between two reads - is never watched falling.
         if (!counting)
         {
-            ImGuiText.Hint(
-                DimText,
-                "with this off the figure is only what was watched, which under-reports"
-                + " by the whole of every killing blow.");
+            // A caveat about the FIGURE rather than about the switch, and it applies while the
+            // switch is off - which is when nobody is hovering it. So it stays on screen.
+            OverlayLayout.Warning(
+                "With this off the figure is only what was watched, which under-reports by the"
+                + " whole of every killing blow.");
         }
         else
         {
@@ -165,36 +267,19 @@ public sealed class DamageWindow
             // the figures it has to be set against - how far the list reaches, where things
             // went missing, GameHelper2's measured bubble near 200 - are all in grid, and a
             // control in its own private unit cannot be set from them.
-            ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
             float limit = _meter.CreditWithin / MapView.WorldToGrid;
-            if (ImGui.SliderFloat("only within", ref limit, 0f, 600f,
+            if (OverlayLayout.Slider("Max Range", ref limit, 0f, 600f,
                     limit <= 0f ? "any distance" : "%.0f grid"))
             {
                 _meter.CreditWithin = limit * MapView.WorldToGrid;
             }
 
-            ImGui.SameLine();
-            ImGui.TextColored(DimText, "of where it was last seen");
+            OverlayLayout.Hint(
+                "Measured from where the monster was last seen. Anything that vanished further"
+                + " away than this is refused rather than credited.");
         }
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 12f);
-        float smoothing = _meter.SmoothingSeconds;
-        if (ImGui.SliderFloat("smoothing", ref smoothing, 0.1f, 5f, "%.2f s"))
-        {
-            _meter.SmoothingSeconds = smoothing;
-        }
-
-        ImGui.Separator();
-        DrawGraph();
-
-        ImGui.Separator();
-        DrawHeat();
-
-        ImGui.Separator();
-        DrawKills();
-
-        ImGui.Separator();
-        DrawTargets();
+        DrawFurthest();
     }
 
     /// <summary>
@@ -213,10 +298,14 @@ public sealed class DamageWindow
         }
 
         bool painting = heat.Enabled;
-        if (ImGui.Checkbox("paint the map by where it happened  (open the map to see it)", ref painting))
+        if (OverlayLayout.Toggle("Damage Heatmap Overlay", ref painting))
         {
             heat.Enabled = painting;
         }
+
+        OverlayLayout.Hint(
+            "Paints the game's own map by where the damage happened. Open the map to see it. The"
+            + " scale is this area's 95th busiest patch, so one boss cannot flatten the rest.");
 
         if (!painting)
         {
@@ -226,19 +315,34 @@ public sealed class DamageWindow
         // Three, because they are three different questions about the same run: where the
         // fighting was, where it went badly, and where the time actually went - and a map can
         // answer one of them well and the other two not at all.
-        foreach ((HeatOf what, string label) in Sources)
+        //
+        // A REAL INDENT rather than a leading SameLine, which is what put the first of them
+        // hard against the switch above and the rest trailing off its line.
+        float step = OverlayLayout.Step();
+        ImGui.Indent(step);
+        try
         {
-            ImGui.SameLine();
-            if (ImGui.RadioButton(label, heat.Showing == what))
+            bool first = true;
+            foreach ((HeatOf what, string label) in Sources)
             {
-                heat.Showing = what;
-            }
-        }
+                if (!first)
+                {
+                    OverlayLayout.Next();
+                }
 
-        ImGuiText.Wrapped(
-            DimText,
-            $"{_meter.Heat.Count} patches held"
-            + "   -   the scale is this area's 95th busiest patch, so one boss cannot flatten the rest");
+                first = false;
+                if (ImGui.RadioButton(label, heat.Showing == what))
+                {
+                    heat.Showing = what;
+                }
+            }
+
+            OverlayLayout.Note($"{_meter.Heat.Count} patches held.");
+        }
+        finally
+        {
+            ImGui.Unindent(step);
+        }
     }
 
     /// <summary>What the heat map can be asked to paint.</summary>
@@ -263,7 +367,7 @@ public sealed class DamageWindow
         uint scope = _thisMapOnly ? CurrentArea : 0;
         IReadOnlyList<KillRecord> kills = _meter.Kills.In(scope);
 
-        if (!OverlayFonts.SectionHeader($"Rares and uniques ({kills.Count})###dmg-kills", ImGuiTreeNodeFlags.DefaultOpen))
+        if (!OverlayLayout.Subsection($"Rares and Uniques ({kills.Count})###dmg-kills", openByDefault: true))
         {
             return;
         }
@@ -283,20 +387,30 @@ public sealed class DamageWindow
                 $"slowest: {worst.Name}  {worst.Seconds:F1}s  ({Number(worst.Damage)} at {Number(worst.Dps)} dps)");
         }
 
-        if (!ImGui.BeginTable("##dmg-kill-table", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg))
+        if (!ImGui.BeginTable(
+                "##dmg-kill-table",
+                4,
+                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.Sortable
+                | ImGuiTableFlags.Resizable))
         {
             return;
         }
 
         try
         {
-            ImGui.TableSetupColumn("monster");
+            // SORTABLE, because the list answers different questions depending on the order:
+            // by dps it is which fight went badly, by damage it is what was worth the time, by
+            // name it is whether one kind keeps showing up. It arrived in the order things
+            // happened, which answers only "what did I just kill" - and the slowest kill had
+            // to be pulled out and printed above the table precisely because the order buried
+            // it.
+            ImGui.TableSetupColumn("monster", ImGuiTableColumnFlags.DefaultSort);
             ImGui.TableSetupColumn("took");
             ImGui.TableSetupColumn("damage");
             ImGui.TableSetupColumn("dps");
             ImGui.TableHeadersRow();
 
-            foreach (KillRecord kill in kills)
+            foreach (KillRecord kill in Sorted(kills))
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
@@ -333,6 +447,49 @@ public sealed class DamageWindow
         {
             ImGui.EndTable();
         }
+    }
+
+    /// <summary>
+    /// The kills in whatever order the table's own header was last clicked into.
+    /// </summary>
+    /// <remarks>
+    /// ASKED PER FRAME rather than kept sorted, because ImGui owns the sort state: the header
+    /// row writes it when somebody clicks, and there is nowhere else it could live without two
+    /// copies that disagree. The cost is a sort of a list that holds one entry per rare or
+    /// unique in a map - a few dozen - which is nothing beside what the frame is already doing.
+    ///
+    /// The unsorted list is returned UNCOPIED when nothing has been chosen, so the ordinary
+    /// case allocates nothing at all.
+    /// </remarks>
+    private static unsafe IReadOnlyList<KillRecord> Sorted(IReadOnlyList<KillRecord> kills)
+    {
+        // ImGui hands back a null pointer until the header row has been drawn and somebody has
+        // chosen a column, so the wrapper cannot be trusted without checking the pointer it
+        // wraps - reading SpecsCount off a null one is a crash rather than a zero.
+        ImGuiTableSortSpecsPtr specs = ImGui.TableGetSortSpecs();
+        if (specs.NativePtr == null || specs.SpecsCount == 0)
+        {
+            return kills;
+        }
+
+        ImGuiTableColumnSortSpecsPtr by = specs.Specs;
+        bool up = by.SortDirection == ImGuiSortDirection.Ascending;
+
+        var order = new List<KillRecord>(kills);
+        order.Sort((left, right) =>
+        {
+            int said = by.ColumnIndex switch
+            {
+                1 => left.Seconds.CompareTo(right.Seconds),
+                2 => left.Damage.CompareTo(right.Damage),
+                3 => left.Dps.CompareTo(right.Dps),
+                _ => string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase),
+            };
+
+            return up ? said : -said;
+        });
+
+        return order;
     }
 
     /// <summary>A monster's rarity in the game's own colour for it.</summary>
@@ -438,17 +595,9 @@ public sealed class DamageWindow
     {
         uint scope = _thisMapOnly ? CurrentArea : 0;
 
-        ImGui.Checkbox("this map only##dmg", ref _thisMapOnly);
-        ImGui.SameLine();
-        if (ImGui.Button("start over##dmg"))
-        {
-            _meter.History.Clear();
-        }
-
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 8f);
-        ImGui.SliderFloat("height##dmg", ref _height, 40f, 240f, "%.0f px");
-
+        // The controls that used to be here are on one line UNDER the plot now - see
+        // DrawGraphControls. Above it they were the first thing on the graph's own block and
+        // pushed the plot itself further down a page that already started too low.
         IReadOnlyList<DamageSample> samples = _meter.History.In(scope);
         if (samples.Count == 0)
         {

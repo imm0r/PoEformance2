@@ -96,11 +96,13 @@ public sealed class RitualWindow
             ? $"- from where the line has reached, {view.Length} maps long"
             : $"- from every map you can enter now, {view.Length} maps long");
 
-        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 14.5f);
-        ImGui.InputTextWithHint("##filter", "only routes paying...", ref _filter, 64);
+        // Room left for the button that follows - the one thing that may share a filter's line,
+        // because a button beside a filter is a filter control rather than a second setting.
+        OverlayLayout.Search(
+            "##filter", "only routes paying...", ref _filter, 64, OverlayLayout.ButtonRoom("clear picks"));
         ImGui.SameLine();
 
-        if (ImGui.SmallButton("clear picks"))
+        if (ImGui.SmallButton("Clear Picks"))
         {
             Picked.Clear();
         }
@@ -117,19 +119,42 @@ public sealed class RitualWindow
         if (_watch.Proof.Recorded > 0)
         {
             (int held, int differed) = _watch.Proof.Tally;
-            ImGui.TextColored(
+            Stepped(
                 differed == 0 ? GoodText : WarnText,
-                $"    {held} agreed, {differed} did not - written to {RitualProof.DefaultPath}");
+                $"{held} agreed, {differed} did not - written to {RitualProof.DefaultPath}");
         }
         else if (checking)
         {
-            ImGui.TextColored(DimText, "    nothing to check yet - it needs a map already picked");
+            OverlayLayout.Note("Nothing to check yet - it needs a map already picked.");
         }
 
         ImGui.Separator();
         Routes(view);
         ImGui.Separator();
         Weights();
+    }
+
+    /// <summary>
+    /// A coloured line stepped in under what it is about.
+    /// </summary>
+    /// <remarks>
+    /// The step is <see cref="OverlayLayout.Step"/> rather than four spaces at the front of the
+    /// string, which is what this was. A space is a glyph: its width is whatever the face makes
+    /// it, it does not follow the text size, and it cannot line up with an indent made any other
+    /// way - so the tool's stepped-in lines each landed somewhere slightly different.
+    /// </remarks>
+    private static void Stepped(Vector4 ink, string text)
+    {
+        float step = OverlayLayout.Step();
+        ImGui.Indent(step);
+        try
+        {
+            ImGuiText.Wrapped(ink, ImGuiText.Escape(text));
+        }
+        finally
+        {
+            ImGui.Unindent(step);
+        }
     }
 
     /// <summary>The routes, best first, with a tick to draw one on the atlas.</summary>
@@ -245,9 +270,8 @@ public sealed class RitualWindow
                 ImGui.PushID(reward);
                 try
                 {
-                    ImGui.SetNextItemWidth(ImGui.GetFontSize() * 6.5f);
                     int edited = current;
-                    if (ImGui.InputInt("##weight", ref edited))
+                    if (OverlayLayout.Narrow.Number("##weight", ref edited, 1))
                     {
                         changed ??= new Dictionary<string, int>(worth);
                         if (edited == 0)

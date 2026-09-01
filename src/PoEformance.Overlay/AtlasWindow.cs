@@ -47,124 +47,157 @@ public sealed class AtlasWindow
     /// <summary>While the tab is not in front: a change made and left behind still lands.</summary>
     public void Idle() => Settle();
 
-    private void Draw()
+    /// <summary>
+    /// What the whole page hangs off: the switch, and whether anything was read.
+    /// </summary>
+    /// <remarks>
+    /// ABOVE THE SUB-TABS RATHER THAN ON ONE OF THEM - see <see cref="ToolTabs.Lead"/>. The
+    /// switch decides whether ANY of the four tools below it does anything, and the read's own
+    /// account of itself is the answer to "why is nothing drawn", which is asked from whichever
+    /// tab somebody happens to be on. Both belong to the page.
+    /// </remarks>
+    public void DrawLead()
     {
         AtlasSettings settings = _watch.Settings;
-        AtlasView view = _watch.View;
-
-        Account(view);
-
-        // EVERY ATLAS OFFSET IS UNCONFIRMED - they were ported from the reference with the
-        // game unavailable - so this button is not a diagnostic tucked away for later, it is
-        // the first thing to press when the atlas is open and nothing is drawn on it.
-        if (ImGui.Button("check the read"))
-        {
-            _watch.CheckTheRead();
-        }
-
-        ImGui.SameLine();
-        ImGui.TextColored(DimText, "open the atlas first - it reads nothing while the panel is shut");
-
-        foreach (string line in _watch.Checked)
-        {
-            ImGui.TextColored(DimText, line);
-        }
-
-        ImGui.Separator();
-
         AtlasSettings changed = settings;
 
         bool enabled = settings.Enabled;
-        if (ImGui.Checkbox("draw on the atlas", ref enabled))
+        if (OverlayLayout.Master("Enable Atlas Overlay", ref enabled))
         {
             changed = changed with { Enabled = enabled };
         }
 
+        DrawTheRead(_watch.View);
+
+        Apply(settings, changed);
+    }
+
+    /// <summary>
+    /// What gets drawn on the atlas and what gets kept off it.
+    /// </summary>
+    /// <remarks>
+    /// THIS PAGE WAS THE WORST OF THE TOOL'S LAYOUT AND IT IS WORTH SAYING WHY, because every
+    /// mistake here was made one reasonable line at a time. Eleven switches ran down it in the
+    /// order they were built, with no two explained the same way: some had their aside welded on
+    /// with <c>SameLine</c>, some had it on the next line, some had it INDENTED WITH FOUR
+    /// SPACES INSIDE THE STRING - "    a map is hovered now" - which is an indent that ignores
+    /// the text size, cannot be measured, and lands differently in every face. Three of the
+    /// switches were joined into one line by <c>SameLine</c> and the rest were not, without the
+    /// grouping meaning anything. The master switch sat in the middle of the list, under a
+    /// diagnostic button.
+    ///
+    /// What is left here is the filters and nothing else. The switch, the read and the routing
+    /// list have each gone where they belong, and this tab is now the one question it answers:
+    /// of everything on the atlas, what do I want to see.
+    /// </remarks>
+    private void Draw()
+    {
+        AtlasSettings settings = _watch.Settings;
+        AtlasView view = _watch.View;
+        AtlasSettings changed = settings;
+
+        OverlayLayout.Group("Drawn");
+
+        // FIVE SWITCHES IN A GRID, three across and two down. They were three on one line and
+        // two on lines of their own, spaced with a fixed gap - so the second row's switches
+        // landed under the MIDDLE of the first row's rather than under their ticks, and the
+        // block read as a row plus some leftovers. Columns put every tick under a tick.
         bool names = settings.Names;
-        if (ImGui.Checkbox("map names", ref names))
+        if (OverlayLayout.Toggle("Map Names", ref names))
         {
             changed = changed with { Names = names };
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(1);
 
         bool contents = settings.Contents;
-        if (ImGui.Checkbox("what is in them", ref contents))
+        if (OverlayLayout.Toggle("What Is in Them", ref contents))
         {
             changed = changed with { Contents = contents };
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Cell(2);
 
         bool web = settings.Web;
-        if (ImGui.Checkbox("every connection", ref web))
+        if (OverlayLayout.Toggle("Every Connection", ref web))
         {
             changed = changed with { Web = web };
         }
 
+        bool ratings = settings.Ratings;
+        if (OverlayLayout.Toggle("Map Ratings", ref ratings))
+        {
+            changed = changed with { Ratings = ratings };
+        }
+
+        OverlayLayout.Hint(
+            _watch.Ratings.Count > 0
+                ? $"{_watch.Ratings.Count} maps rated out of {_watch.Ratings.Best}. Edit"
+                  + " data/atlas-ratings.json - it is an opinion rather than a fact."
+                : "None - data/atlas-ratings.json is missing or empty.");
+
+        OverlayLayout.Cell(1);
+
+        bool biomes = settings.Biomes;
+        if (OverlayLayout.Toggle("Biome Borders", ref biomes))
+        {
+            changed = changed with { Biomes = biomes };
+        }
+
+        // THE KEY IS GONE. It listed all thirteen biome names, each in the colour it rings a map
+        // in, whenever the switch was on - a wrapped block of coloured words in the middle of a
+        // settings page, permanently, for a question asked once. The colours are on the atlas
+        // where they are used; a legend in the settings is a reference table nobody was reading.
+        OverlayLayout.Hint("The ring around each name says what terrain the map is.");
+
+        // A name in the file that matches no map is a rating that silently never appears, which
+        // is indistinguishable from having forgotten to write it. Named here, it is a typo.
+        //
+        // UNDER the grid rather than between its two rows, which is where it used to be: a
+        // warning that only appears when something is wrong must not push half the switches
+        // down a line when it does. A REAL indent, not four spaces in the string.
+        if (_watch.Ratings.Unmatched.Count > 0)
+        {
+            Warn(
+                $"{_watch.Ratings.Unmatched.Count} rated names match no map: "
+                + string.Join(", ", _watch.Ratings.Unmatched.Take(6))
+                + (_watch.Ratings.Unmatched.Count > 6 ? " ..." : string.Empty));
+        }
+
+        // Whether the default reads at a real resolution is not something that could be
+        // decided while writing it, so it is here to be turned up rather than guessed at.
+        float writing = settings.Writing;
+        if (OverlayLayout.Slider(
+                "Size of the Writing", ref writing,
+                AtlasSettings.SmallestText, AtlasSettings.LargestText, "%.2fx"))
+        {
+            changed = changed with { TextScale = writing };
+        }
+
+        OverlayLayout.Group("Hidden");
+
         bool hideDone = settings.HideCompleted;
-        if (ImGui.Checkbox("hide finished maps", ref hideDone))
+        if (OverlayLayout.Toggle("Hide Finished Maps", ref hideDone))
         {
             changed = changed with { HideCompleted = hideDone };
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Next();
 
         bool hideLocked = settings.HideUnreachable;
-        if (ImGui.Checkbox("hide maps with no way there", ref hideLocked))
+        if (OverlayLayout.Toggle("Hide Maps with No Way There", ref hideLocked))
         {
             changed = changed with { HideUnreachable = hideLocked };
         }
 
         // Said next to the switch that causes it, because this is the one pair whose effect
         // looks like the feature being broken: routes lead to maps nobody has reached, so
-        // hiding those and wondering where the lines went is a short trip.
-        ImGui.TextColored(DimText, "maps you are routing to stay visible either way");
-
-        bool ratings = settings.Ratings;
-        if (ImGui.Checkbox("map ratings", ref ratings))
-        {
-            changed = changed with { Ratings = ratings };
-        }
-
-        ImGui.SameLine();
-        ImGuiText.Wrapped(
-            DimText,
-            _watch.Ratings.Count > 0
-                ? $"{_watch.Ratings.Count} maps rated out of {_watch.Ratings.Best}"
-                  + "  -  edit data/atlas-ratings.json, it is an opinion rather than a fact"
-                : "none - data/atlas-ratings.json is missing or empty");
-
-        // A name in the file that matches no map is a rating that silently never appears, which
-        // is indistinguishable from having forgotten to write it. Named here, it is a typo.
-        if (_watch.Ratings.Unmatched.Count > 0)
-        {
-            ImGui.TextColored(
-                WarnText,
-                ImGuiText.Escape(
-                    $"    {_watch.Ratings.Unmatched.Count} rated names match no map: "
-                    + string.Join(", ", _watch.Ratings.Unmatched.Take(6))
-                    + (_watch.Ratings.Unmatched.Count > 6 ? " ..." : string.Empty)));
-        }
-
-        bool biomes = settings.Biomes;
-        if (ImGui.Checkbox("biome borders", ref biomes))
-        {
-            changed = changed with { Biomes = biomes };
-        }
-
-        ImGui.SameLine();
-        ImGui.TextColored(DimText, "- the ring around each name says what terrain the map is");
-
-        // The key is drawn IN THE COLOURS, because a list of biome names in grey answers none of
-        // what somebody looking at a green ring on the atlas is asking.
-        if (biomes)
-        {
-            BiomeKey();
-        }
+        // hiding those and wondering where the lines went is a short trip. On its own line
+        // rather than in a tooltip for that same reason - it is a warning, not an aside.
+        OverlayLayout.Note("Maps you are routing to stay visible either way.");
 
         bool hideOnHover = settings.HideOnHover;
-        if (ImGui.Checkbox("hide everything if a hovered map's panel cannot be measured", ref hideOnHover))
+        if (OverlayLayout.Toggle("Hide Everything over an Unmeasurable Hover Panel", ref hideOnHover))
         {
             changed = changed with { HideOnHover = hideOnHover };
         }
@@ -174,38 +207,54 @@ public sealed class AtlasWindow
         // drawing goes round it; this is only the fallback for the frame where it is not found,
         // and leaving it looking like the main behaviour would have somebody switch it off to
         // stop a blanking that is not happening.
-        ImGui.TextColored(
-            DimText,
-            "    the panel over a hovered map is normally kept off like any other part of the"
-            + " interface - this is what happens when it cannot be found");
+        OverlayLayout.Note(
+            "The panel over a hovered map is normally kept off like any other part of the"
+            + " interface. This is only what happens when it cannot be found."
+            // Said out loud, because "the overlay vanished" is what this looks like from the
+            // outside - and if a node's rectangle ever reads too big it would be permanent.
+            + (view.Hovering ? "  A map is hovered now." : string.Empty));
 
-        // Said out loud, because "the overlay vanished" is what this looks like from the
-        // outside - and if a node's rectangle ever reads too big it would be permanent, so
-        // the line that names it is the difference between a setting and a mystery.
-        if (view.Hovering)
-        {
-            ImGui.TextColored(DimText, "    a map is hovered now");
-        }
+        Apply(settings, changed);
+    }
 
+    /// <summary>
+    /// The routing groups, as a section of their own.
+    /// </summary>
+    /// <remarks>
+    /// ITS OWN SECTION rather than a third group at the bottom of the settings, because it is
+    /// not a setting: it is a LIST, one row per group, that grows as somebody adds groups and
+    /// that is scrolled and edited rather than glanced at and left. Sitting under the switches
+    /// it made the page twice as long as anything on it, and pushed "what is drawn" - which is
+    /// checked far more often - above the fold on a short window.
+    ///
+    /// Registered as a second tool on the atlas page, so it gets a fold of its own beside the
+    /// ritual line - see where the pages are wired up.
+    /// </remarks>
+    public void DrawRouting()
+    {
+        AtlasSettings settings = _watch.Settings;
+        AtlasSettings changed = settings;
+
+        // The filter above the groups, because it decides what any of them can match. Its name
+        // is inside the box now - it had a label to its right and a width nobody chose twice.
         string search = settings.Search;
-        if (ImGui.InputText("only maps called", ref search, 64))
+        if (OverlayLayout.Search("##atlas-search", "only maps called...", ref search, 64))
         {
             changed = changed with { Search = search };
         }
 
-        // Whether the default reads at a real resolution is not something that could be
-        // decided while writing it, so it is here to be turned up rather than guessed at.
-        float writing = settings.Writing;
-        if (ImGui.SliderFloat(
-                "size of the writing", ref writing,
-                AtlasSettings.SmallestText, AtlasSettings.LargestText, "%.2fx"))
-        {
-            changed = changed with { TextScale = writing };
-        }
-
-        ImGui.Separator();
         changed = Groups(changed);
 
+        Apply(settings, changed);
+    }
+
+    /// <summary>Takes a changed settings record into use, and queues the save.</summary>
+    /// <remarks>
+    /// Shared by the two sections, which both edit the same record: whichever one is folded
+    /// open has to apply and settle on its own, since the other may not draw at all.
+    /// </remarks>
+    private void Apply(AtlasSettings settings, AtlasSettings changed)
+    {
         if (!ReferenceEquals(changed, settings))
         {
             // Applied at once, so the atlas follows a colour as it is dragged.
@@ -214,6 +263,134 @@ public sealed class AtlasWindow
         }
 
         Settle();
+    }
+
+    /// <summary>
+    /// What the read made of the atlas, and the button that asks it again.
+    /// </summary>
+    /// <remarks>
+    /// TOGETHER, because they are one thought: the account says whether anything was read and
+    /// the button is what you press when it says nothing was. They used to be a button with a
+    /// caption, above a status line, above the master switch - three ideas in the space of two,
+    /// with the least important one at the top.
+    ///
+    /// EVERY ATLAS OFFSET IS UNCONFIRMED - they were ported from the reference with the game
+    /// unavailable - which is why the check stays this prominent rather than going to the
+    /// bottom with the other diagnostics.
+    /// </remarks>
+    private void DrawTheRead(AtlasView view)
+    {
+        Account(view);
+
+        ImGui.SameLine();
+
+        // Right-aligned, so it sits out of the account's way however long that runs and does not
+        // move as the counts change. Measured from what is LEFT on the line - after a SameLine
+        // that is the distance from the cursor to the window's inner right edge.
+        float button = ImGui.CalcTextSize("Check the read").X + (ImGui.GetStyle().FramePadding.X * 2f);
+        float room = ImGui.GetContentRegionAvail().X;
+        if (room > button)
+        {
+            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + room - button);
+        }
+
+        if (ImGui.Button("Check the Read"))
+        {
+            _watch.CheckTheRead();
+        }
+
+        OverlayLayout.Hint("Open the atlas first - it reads nothing while the panel is shut.");
+
+        DrawReport();
+    }
+
+    /// <summary>
+    /// What the last check said, in a box of its own.
+    /// </summary>
+    /// <remarks>
+    /// A REPORT, NOT PART OF THE PAGE. It is twenty-odd lines of addresses, flag words, child
+    /// paths and counts, and it used to be printed straight into the settings as ordinary quiet
+    /// text - so pressing the button pushed every switch on the page down by a screenful, and
+    /// what came back read as though the tool had started explaining itself unprompted. In its
+    /// own bordered, scrolling box it is an answer that appeared next to the question, and the
+    /// page underneath it does not move.
+    ///
+    /// IN THE MONO FACE, and that is not decoration. Nearly every line here is a figure -
+    /// "0x31936412410", "0x5026F3  x1", "child path 24, 2  -  1373 children" - which is what
+    /// the mono face exists for in this tool. It also fixes the indentation for free: the
+    /// report is built in the game layer, where there is no ImGui and no way to ask for an
+    /// indent, so it steps its sub-lines in with four spaces. In a proportional face those four
+    /// spaces are four of the narrowest glyph there is and the nesting barely shows; in a
+    /// fixed-width one they are exactly four characters, on every line, and the tree is legible.
+    ///
+    /// Wrapped rather than clipped, because a few lines are whole sentences of prose that would
+    /// otherwise run off the right edge with no way to read the end of them.
+    ///
+    /// AND FOLDED, because it never went away. The box appears the moment the button is pressed
+    /// and then stays for the rest of the session - nine lines of addresses above every tab on
+    /// the page, long after the one question it answered was answered. Folded it costs a line,
+    /// and the line says a report is there.
+    /// </remarks>
+    private void DrawReport()
+    {
+        IReadOnlyList<string> report = _watch.Checked;
+        if (report.Count == 0)
+        {
+            return;
+        }
+
+        if (!OverlayLayout.Subsection($"Panel Debug Log ({report.Count} lines)###atlas-report"))
+        {
+            return;
+        }
+
+        // Tall enough for the common report and no taller. A box sized to its content would put
+        // the settings a screen and a half down the page, which is the problem being fixed.
+        float height = ImGui.GetFrameHeightWithSpacing() * 9f;
+
+        if (!ImGui.BeginChild("atlas-check", new Vector2(0f, height), ImGuiChildFlags.Borders))
+        {
+            ImGui.EndChild();
+            return;
+        }
+
+        OverlayFonts.PushMono();
+        try
+        {
+            foreach (string line in report)
+            {
+                ImGui.TextWrapped(ImGuiText.Escape(line));
+            }
+        }
+        finally
+        {
+            OverlayFonts.PopMono();
+
+            // In a finally and unconditionally: EndChild pairs with BeginChild whatever it
+            // returned, and an exception between the two leaves ImGui's stack unbalanced.
+            ImGui.EndChild();
+        }
+    }
+
+    /// <summary>A warning about the settings, stepped in under what it is about.</summary>
+    /// <remarks>
+    /// The indent is <see cref="OverlayLayout.Step"/> rather than four spaces in the string,
+    /// which is what this page used to do in three places. A space is a glyph: it is a different
+    /// width in every face, it does not follow the text size, and it cannot line up with an
+    /// indent made any other way.
+    /// </remarks>
+    private static void Warn(string text)
+    {
+        float step = OverlayLayout.Step();
+        ImGui.Indent(step);
+        try
+        {
+            ImGuiText.Wrapped(WarnText, ImGuiText.Escape(text));
+        }
+        finally
+        {
+            ImGui.Unindent(step);
+        }
     }
 
     /// <summary>Writes down a change once nothing is being dragged or typed in.</summary>
@@ -260,16 +437,34 @@ public sealed class AtlasWindow
     /// </remarks>
     private static AtlasSettings Groups(AtlasSettings settings)
     {
-        ImGui.TextColored(DimText, "find the way to");
+        OverlayLayout.Note("A line is drawn across the atlas to the nearest map of every ticked group.");
 
-        if (!ImGui.BeginChild("atlas-groups", Vector2.Zero, ImGuiChildFlags.Borders))
+        // A TABLE, AND ONE ROW PER GROUP. Each group used to take two lines and sometimes
+        // three - the swatch and the tick, the hop box hung off a column stop, and under it a
+        // quiet line saying what the group matches on. Eleven groups is a scroll of
+        // twenty-odd lines for eleven ticks, and the rule under each one pushed the next
+        // group's swatch away from the one above it, so the column of colours read as a list
+        // of paragraphs rather than as a list.
+        //
+        // Real columns put the swatch, the tick and the distance each under their own on every
+        // row, whatever the name in between did - and "Quest" against "Where a route starts"
+        // is exactly the width difference a column stop cannot survive. The rule moves to the
+        // name's hover: it answers "why is that map not in this group", which is asked about
+        // one group at a time and never about eleven at once.
+        if (!ImGui.BeginTable(
+                "atlas-groups",
+                3,
+                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY))
         {
-            ImGui.EndChild();
             return settings;
         }
 
         try
         {
+            ImGui.TableSetupColumn("##colour");
+            ImGui.TableSetupColumn("##name", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("##hops");
+
             IReadOnlyList<AtlasGroup> groups = settings.Sorting;
             List<AtlasGroup>? edited = null;
 
@@ -282,12 +477,14 @@ public sealed class AtlasWindow
                 // while a checkbox is toggled - and written separately the second would be
                 // built from the unedited original and quietly undo the first.
                 AtlasGroup after = group;
+                ImGui.TableNextRow();
                 ImGui.PushID(i);
 
                 try
                 {
                     // The colour as a swatch rather than as its hex. It is what the group
                     // looks like on the atlas, and reading "#DB00E0" tells nobody that.
+                    ImGui.TableNextColumn();
                     Vector4 colour = ToVector(OverlaySettings.ParseColour(group.Colour));
                     if (ImGui.ColorEdit4(
                             "##colour", ref colour,
@@ -296,21 +493,25 @@ public sealed class AtlasWindow
                         after = after with { Colour = OverlaySettings.FormatColour(FromVector(colour)) };
                     }
 
-                    ImGui.SameLine();
-
+                    ImGui.TableNextColumn();
                     bool route = group.Route;
                     if (ImGui.Checkbox(group.Name, ref route))
                     {
                         after = after with { Route = route };
                     }
 
+                    // What the group is actually matched on. It is the answer to "why is that
+                    // map not in this group", and there is nowhere else to find it.
+                    OverlayLayout.Hint(Rule(group));
+
+                    // CLAIMED WHETHER OR NOT IT IS DRAWN. A row that skips its last cell leaves
+                    // the table one column short, and every row after it shifts - which is the
+                    // failure the marker list was rebuilt to stop.
+                    ImGui.TableNextColumn();
                     if (group.Route)
                     {
-                        ImGui.SameLine();
-                        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
-
                         int hops = group.MaxHops;
-                        if (ImGui.InputInt("maps away", ref hops, 1))
+                        if (OverlayLayout.Narrow.Number("maps away", ref hops, 1))
                         {
                             after = after with { MaxHops = Math.Max(0, hops) };
                         }
@@ -318,7 +519,7 @@ public sealed class AtlasWindow
                         if (group.MaxHops <= 0)
                         {
                             ImGui.SameLine();
-                            ImGui.TextColored(DimText, "(any distance)");
+                            ImGui.TextColored(DimText, "(any)");
                         }
                     }
 
@@ -326,11 +527,6 @@ public sealed class AtlasWindow
                     {
                         (edited ??= [.. groups])[i] = after;
                     }
-
-                    // What the group is actually matched on, small and underneath. It is the
-                    // answer to "why is that map not in this group", and there is nowhere
-                    // else to find it.
-                    ImGui.TextColored(DimText, "    " + Rule(group));
                 }
                 finally
                 {
@@ -342,7 +538,7 @@ public sealed class AtlasWindow
         }
         finally
         {
-            ImGui.EndChild();
+            ImGui.EndTable();
         }
     }
 
@@ -371,34 +567,6 @@ public sealed class AtlasWindow
         }
 
         return string.Join(", ", said);
-    }
-
-    /// <summary>Every biome the game numbers, each written in the colour it rings a map in.</summary>
-    /// <remarks>
-    /// Wrapped by hand rather than with the text wrapper, because each name is its own coloured
-    /// item and ImGui wraps within one - a row of thirteen items has to be broken between them.
-    /// </remarks>
-    private static void BiomeKey()
-    {
-        // Taken at the start of a line, where what is left to the right IS the content width.
-        float edge = ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X;
-        float gap = ImGui.GetStyle().ItemSpacing.X;
-
-        ImGui.TextColored(DimText, "    ");
-
-        foreach (AtlasBiome biome in AtlasBiomes.All.Values)
-        {
-            ImGui.SameLine(0f, gap);
-
-            if (ImGui.GetCursorPosX() + ImGui.CalcTextSize(biome.Name).X > edge)
-            {
-                ImGui.NewLine();
-                ImGui.TextColored(DimText, "    ");
-                ImGui.SameLine(0f, gap);
-            }
-
-            ImGui.TextColored(ToVector(biome.Colour), biome.Name);
-        }
     }
 
     /// <summary>An ImGui-packed colour as the four floats a picker wants.</summary>

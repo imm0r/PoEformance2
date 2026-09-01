@@ -49,6 +49,11 @@ public enum RuleFact
     NearestRareMonster,
     NearestUniqueMonster,
     NearestRareOrUniqueMonster,
+    LowestMonsterLifePercent,
+    LowestMagicMonsterLifePercent,
+    LowestRareMonsterLifePercent,
+    LowestUniqueMonsterLifePercent,
+    LowestMonsterLifePercentAtCursor,
 
     HasBuff,
     BuffTimeLeft,
@@ -162,6 +167,11 @@ public static class RuleFacts
         new(RuleFact.NearestRareMonster, "NearestRareMonster", FactShape.Number, FactArgument.None, "u", "Distance to the closest live rare."),
         new(RuleFact.NearestUniqueMonster, "NearestUniqueMonster", FactShape.Number, FactArgument.None, "u", "Distance to the closest live unique."),
         new(RuleFact.NearestRareOrUniqueMonster, "NearestRareOrUniqueMonster", FactShape.Number, FactArgument.None, "u", "Distance to the closest live rare or unique."),
+        new(RuleFact.LowestMonsterLifePercent, "LowestMonsterLifePercent", FactShape.Number, FactArgument.Distance, "%", "Life of the WEAKEST live monster within a radius of the player, as a share of its own pool - 'is anything in range nearly dead'. Nothing in range is no answer, so every comparison says no rather than reading as a monster at zero."),
+        new(RuleFact.LowestMagicMonsterLifePercent, "LowestMagicMonsterLifePercent", FactShape.Number, FactArgument.Distance, "%", "Life of the weakest live MAGIC monster within a radius of the player. Split from the others because a cull executes each rarity from a different share of its life - one threshold over every monster answers about whichever white monster happens to be weakest. No magic monster in range is no answer."),
+        new(RuleFact.LowestRareMonsterLifePercent, "LowestRareMonsterLifePercent", FactShape.Number, FactArgument.Distance, "%", "Life of the weakest live RARE monster within a radius of the player. No rare in range is no answer, so every comparison says no."),
+        new(RuleFact.LowestUniqueMonsterLifePercent, "LowestUniqueMonsterLifePercent", FactShape.Number, FactArgument.Distance, "%", "Life of the weakest live UNIQUE monster within a radius of the player - the boss threshold. No unique in range is no answer, so every comparison says no."),
+        new(RuleFact.LowestMonsterLifePercentAtCursor, "LowestMonsterLifePercentAtCursor", FactShape.Number, FactArgument.Distance, "%", "Life of the weakest live monster within a radius of where the CURSOR points - the question a skill aimed at something asks. No answer while the pointer is off the game.", AtCursor: true),
 
         new(RuleFact.HasBuff, "HasBuff", FactShape.Flag, FactArgument.Text, "", "A buff or debuff whose name contains this is on the player."),
         new(RuleFact.BuffTimeLeft, "BuffTimeLeft", FactShape.Number, FactArgument.Text, "s", "Seconds left on that buff. A buff nobody has is no answer, not zero."),
@@ -299,6 +309,11 @@ public static class RuleFacts
             RuleFact.MonsterCountAtCursor => state.MonsterCountAtCursor(leaf.Argument),
             RuleFact.RareOrUniqueCountAtCursor => state.RareOrUniqueCountAtCursor(leaf.Argument),
             RuleFact.NearestMonsterAtCursor => state.NearestMonsterAtCursor,
+            RuleFact.LowestMonsterLifePercent => state.LowestMonsterLifePercent(leaf.Argument),
+            RuleFact.LowestMagicMonsterLifePercent => state.LowestMagicMonsterLifePercent(leaf.Argument),
+            RuleFact.LowestRareMonsterLifePercent => state.LowestRareMonsterLifePercent(leaf.Argument),
+            RuleFact.LowestUniqueMonsterLifePercent => state.LowestUniqueMonsterLifePercent(leaf.Argument),
+            RuleFact.LowestMonsterLifePercentAtCursor => state.LowestMonsterLifePercentAtCursor(leaf.Argument),
 
             // Every flag, plus the interval fact. Asking a flag for a number is a caller
             // mistake rather than a state of the game, and the answer that keeps it quiet is

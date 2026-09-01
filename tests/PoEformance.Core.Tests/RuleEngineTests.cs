@@ -28,6 +28,10 @@ public class RuleEngineTests
             Profiles: [new RuleProfile("Default", [new RuleGroup("Group", rules) { InTown = true, InHideout = true }])])
         {
             MinInputGapMs = 0,
+
+            // Off for every test that is about something else: the spread is on by default, so
+            // an exact "fires again at 1000" would otherwise land inside a window and flake.
+            CooldownJitterMs = 0,
         }.Normalised();
 
     private static RuleEngine Engine(RuleSettings settings)
@@ -146,6 +150,126 @@ public class RuleEngineTests
         Assert.Single(engine.Evaluate(Playing(), 0).Inputs);
         Assert.Empty(engine.Evaluate(Playing(), 500).Inputs);
         Assert.Single(engine.Evaluate(Playing(), 1000).Inputs);
+    }
+
+    /// <summary>Settings whose pacing is the thing under test.</summary>
+    private static RuleSettings Paced(int jitterMs, int gapMs, params Rule[] rules)
+        => Profile(rules) with { MinInputGapMs = gapMs, CooldownJitterMs = jitterMs };
+
+    /// <summary>Runs the engine tick by tick and returns the gap between each firing.</summary>
+    /// <remarks>
+    /// A tick per millisecond, which is far faster than the reader ever runs and is the point:
+    /// the more often the cooldown is ASKED, the more chances a spread drawn per tick would
+    /// have to come up short. A wait that survives this survives the real loop.
+    /// </remarks>
+    private static List<long> Gaps(RuleSettings settings, int seed, int firings, long until)
+    {
+        var engine = new RuleEngine(new Random(seed));
+        engine.Configure(settings);
+
+        var gaps = new List<long>();
+        long? previous = null;
+
+        for (long now = 0; now <= until && gaps.Count < firings; now++)
+        {
+            if (engine.Evaluate(Playing(), now).Inputs.Count == 0)
+            {
+                continue;
+            }
+
+            if (previous is long last)
+            {
+                gaps.Add(now - last);
+            }
+
+            previous = now;
+        }
+
+        return gaps;
+    }
+
+    [Fact]
+    public void SpreadsACooldownSoTheCadenceIsNotExact()
+    {
+        // A rule whose condition holds all the time fires on its cooldown and nothing else, so
+        // an exact cooldown is a keystroke on the same beat for as long as the fight lasts.
+        List<long> gaps = Gaps(
+            Paced(jitterMs: 50, gapMs: 0, OneRule(RuleCondition.Of(RuleFact.InGame), Press(cooldown: 1000))),
+            seed: 20260831,
+            firings: 40,
+            until: 60_000);
+
+        Assert.Equal(40, gaps.Count);
+
+        // The window is the WIDTH of the setting, centred: 1000 with a spread of 50 is 975-1025.
+        Assert.All(gaps, gap => Assert.InRange(gap, 975, 1025));
+
+        // And it is actually varied rather than one value drawn once and reused.
+        Assert.True(gaps.Distinct().Count() >= 8, $"only {gaps.Distinct().Count()} distinct gaps");
+    }
+
+    [Fact]
+    public void TheSpreadIsDrawnPerFiringRatherThanPerTick()
+    {
+        // THE ONE THAT MATTERS, and the bug it catches looks like a working feature. Drawing
+        // the spread inside the comparison re-rolls it on every tick, so the wait ends at the
+        // first tick whose draw happens to be low - a thousand chances at the bottom of the
+        // window and one at the top. Every gap would come out near 975: still "random", still
+        // wrong, and now systematically FASTER than the cooldown somebody configured.
+        List<long> gaps = Gaps(
+            Paced(jitterMs: 50, gapMs: 0, OneRule(RuleCondition.Of(RuleFact.InGame), Press(cooldown: 1000))),
+            seed: 20260831,
+            firings: 40,
+            until: 60_000);
+
+        // Re-rolling would put the mean at the floor of the window instead of the middle.
+        double mean = gaps.Average();
+        Assert.InRange(mean, 990, 1010);
+
+        // And it would essentially never reach the top half.
+        Assert.Contains(gaps, gap => gap >= 1010);
+    }
+
+    [Fact]
+    public void AnExactCooldownIsRestoredByTurningTheSpreadOff()
+    {
+        List<long> gaps = Gaps(
+            Paced(jitterMs: 0, gapMs: 0, OneRule(RuleCondition.Of(RuleFact.InGame), Press(cooldown: 1000))),
+            seed: 1,
+            firings: 10,
+            until: 20_000);
+
+        Assert.All(gaps, gap => Assert.Equal(1000, gap));
+    }
+
+    [Fact]
+    public void ACooldownOfZeroIsNotGivenOneBySpreading()
+    {
+        // "As often as allowed" must stay that. A spread applied here would be the setting
+        // inventing a cooldown rather than varying one.
+        List<long> gaps = Gaps(
+            Paced(jitterMs: 50, gapMs: 0, OneRule(RuleCondition.Of(RuleFact.InGame), Press())),
+            seed: 7,
+            firings: 20,
+            until: 1_000);
+
+        Assert.All(gaps, gap => Assert.Equal(1, gap));
+    }
+
+    [Fact]
+    public void TheTypingFloorIsStaggeredButNeverCrossed()
+    {
+        // The gap is a safety floor, not a preference, so its spread only ever delays. It is
+        // spread at all because a rule with no cooldown of its own is paced by this and
+        // nothing else - which would put the exact regularity straight back.
+        List<long> gaps = Gaps(
+            Paced(jitterMs: 50, gapMs: 100, OneRule(RuleCondition.Of(RuleFact.InGame), Press())),
+            seed: 99,
+            firings: 30,
+            until: 20_000);
+
+        Assert.All(gaps, gap => Assert.InRange(gap, 100, 150));
+        Assert.True(gaps.Distinct().Count() >= 8, $"only {gaps.Distinct().Count()} distinct gaps");
     }
 
     [Fact]
