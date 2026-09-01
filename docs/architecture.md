@@ -347,6 +347,7 @@ PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action field
 PoEformance.App --record s.rec --hoverhunt    # + read the hovered-entity chain and the boss byte
 PoEformance.App --record s.rec --sweep        # + read four components nothing has a layout for
 PoEformance.App --record s.rec --glossary     # + find every loaded dat table and read the glossary
+PoEformance.App --record s.rec --tables       # + list them, with the row size each one reports
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
@@ -2175,6 +2176,33 @@ provide, and no test could see it — a recording holds only what was read, so t
 with the short cap could never have disagreed. The committed fixture is now the 2048 one, and
 the maximum is measured rather than assumed: `Flammability`, 1429 characters, with nothing
 coming back at the cap.
+
+### What the same walk says about the column widths
+
+Every dat-row offset in this project is arithmetic over a table of column widths, and that
+arithmetic had been confirmed on **three** tables — by harvesting rows out of a recording and
+checking their stride by hand. A loaded table reports its **own** row size, so one walk asks all
+of them at once, and `--tables` prints the answers.
+
+Over the 131 tables in that capture: 126 are in dat-schema, and **123 of them report exactly what
+the widths compute**, from `ModFamily`'s 8 bytes to `Mods`' 677. A width that is wrong for a
+common type could not survive that — one byte off on `bool` would move about ninety of these.
+
+The three that disagree are not the width table's fault, and the direction is the evidence:
+`EndgameMaps` computes 0xEF against the game's 0xF0, `AlternateTreeVersions` 0x1A against 0x26,
+`Mods` 0x285 against 0x2A5. All three have the **game bigger**, which is what a community schema
+that has not caught up with a patch looks like; five more loaded tables aren't in dat-schema at
+all. So don't compute an offset in those three from the column list — everything before the first
+missing column is right and everything after it is not, and a row size can't say where the break
+is. `Mods` is the one to watch: 16,679 rows, and it is what item modifiers hang off.
+
+**And an open question, stated as one.** The walk found 131 tables, and the four this project
+already reads rows from — `WorldAreas`, `MinimapIcons`, `NPCs`, `ItemVisualIdentity` — were not
+among them. Whether their records are absent from the file table or present with nothing at
+`RowStorePtr` cannot be answered from a recording, because the cheap walk reads a record's name
+only *after* the structural checks pass, so a record that fails leaves nothing to identify it by.
+That is what `--tables` names the refused `.dat` files for. Until someone runs it, read "131" as
+131 and not as "all of them".
 
 ### Prices — what the stash is worth
 

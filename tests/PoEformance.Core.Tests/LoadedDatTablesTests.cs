@@ -127,6 +127,30 @@ public class LoadedDatTablesTests
     }
 
     [Fact]
+    public void ASurveyAlsoNamesTheDatFilesThatAreNotTables()
+    {
+        // The cheap walk cannot say why a table is missing, because it reads a record's name
+        // only after the structural checks pass - so a record that fails leaves nothing behind
+        // to identify it by. This is the walk that names them, and the distinction it draws is
+        // the one that matters: a .dat file present but unparsed is a different finding from a
+        // .dat file that is not in the table at all.
+        OffsetSchema schema = RealSessionTests.Schema();
+        var game = new FakeDatTables(schema);
+        game.PlainFile("Art/Textures/Interface2/2DArt/UIImages/InGame/HUD/CharmBarBg.dds");
+        game.PlainFile("Data/Balance/NotParsedYet.dat");
+        game.Table("Data/Balance/KeywordPopups.dat", 0x48, Rows);
+
+        var tables = new LoadedDatTables(game.Memory, schema);
+        DatTableSurvey survey = tables.Survey(FakeDatTables.RootStatic);
+
+        Assert.Equal(3, survey.Records);
+        Assert.Equal("KeywordPopups", Assert.Single(survey.Tables).Facts.Name);
+
+        // The texture is not listed: it is not a .dat file, so it is not a missing table.
+        Assert.Equal(["Data/Balance/NotParsedYet.dat"], survey.Refused);
+    }
+
+    [Fact]
     public void ATableWithTheWrongRowSizeIsRefusedRatherThanRead()
     {
         // A column added by a patch moves every field after it, and the failure has no symptom:

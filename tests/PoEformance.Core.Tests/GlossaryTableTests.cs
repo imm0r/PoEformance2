@@ -82,6 +82,49 @@ public class GlossaryTableTests
     }
 
     [Fact]
+    public void TheGameConfirmsTheRowSizesTheSchemaDerived()
+    {
+        // THE WIDTH TABLE, CHECKED FROM THE OTHER SIDE. Every dat-row offset in the schema is
+        // arithmetic over a table of column widths, and that arithmetic was confirmed by hand on
+        // three tables' strides. A loaded table reports its own row size, so this capture holds
+        // the same check for 131 of them at once - and these three are the ones the schema
+        // declares a RowSize for and this session has loaded.
+        //
+        // BuffDefinitions matters most of the three: every offset on that row except Name was
+        // derived rather than observed, and none of them is on the drift report's chain, so the
+        // total agreeing is the only check those columns have.
+        using ReplayMemoryReader replay = Session();
+        OffsetSchema schema = RealSessionTests.Schema();
+
+        var tables = new LoadedDatTables(replay, schema);
+        tables.Read(replay.ResolvedStatics["FileRoot"]);
+
+        (string Table, string Struct)[] declared =
+        [
+            ("QuestFlags", "QuestFlagsRow"),
+            ("BuffDefinitions", "BuffDefinition"),
+            ("KeywordPopups", "KeywordPopupsRow"),
+        ];
+
+        foreach ((string table, string row) in declared)
+        {
+            LoadedDatTable loaded = Assert.Single(tables.FindAll(table));
+            Assert.Equal(schema.Structs[row].Constants["RowSize"], loaded.Facts.RowSize);
+        }
+
+        // AND THE FOUR THIS PROJECT READS ROWS FROM ARE NOT HERE, which is the open question
+        // rather than a bug: the walk found 131 tables and none of them is WorldAreas,
+        // MinimapIcons, NPCs or ItemVisualIdentity, and no recording can say whether their
+        // records are absent or merely unparsed - a record that fails the checks never has its
+        // name read. IF THIS EVER FAILS, the question has been answered: a capture found one of
+        // them, and the note on DatTable in the schema wants updating rather than this test.
+        foreach (string missing in (string[])["WorldAreas", "MinimapIcons", "NPCs", "ItemVisualIdentity"])
+        {
+            Assert.Empty(tables.FindAll(missing));
+        }
+    }
+
+    [Fact]
     public void AndTheRowsReadAsTheGlossary()
     {
         using ReplayMemoryReader replay = Session();

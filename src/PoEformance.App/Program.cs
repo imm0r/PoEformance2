@@ -260,6 +260,16 @@ internal static class Program
             recorder?.MarkFrame();
         }
 
+        if (options.ListTables)
+        {
+            RunTableList(
+                reader,
+                SchemaJson.Load(schemaPath),
+                result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
+                Console.Out);
+            recorder?.MarkFrame();
+        }
+
         // ── Auto-flask ───────────────────────────────────────────────────────
         // Two sources, deliberately kept apart: WHAT to do comes from our settings file,
         // WHICH KEY uses a flask comes from the GAME's own config. Assuming the key would
@@ -740,6 +750,65 @@ internal static class Program
                         ? $"    -> {key} = {popup.Term}"
                         : $"    -> {key} is not a row of this table");
             }
+        }
+    }
+
+    /// <summary>
+    /// Lists every dat table the game has loaded, and the .dat files that are not one.
+    /// </summary>
+    /// <remarks>
+    /// A TABLE REPORTS ITS OWN ROW SIZE, which is what makes this more than a listing: the row
+    /// store divides its rows by its by-Id index, so every line here is a number the game
+    /// computed. Checking those against the column widths in the schema is what turned a
+    /// three-table confirmation into a 123-table one - see the note above WorldAreaDat - and
+    /// re-running it after a patch is how the next disagreement gets found.
+    ///
+    /// The refused list is the open question in printable form. Four tables this tool reads rows
+    /// from were missing from the 131 a live walk found, and no recording can say why, because
+    /// a record that fails the checks never has its name read. This reads them.
+    /// </remarks>
+    private static void RunTableList(
+        IMemoryReader reader, OffsetSchema schema, ulong fileRootStatic, TextWriter output)
+    {
+        output.WriteLine();
+        if (fileRootStatic == 0)
+        {
+            output.WriteLine("tables    the FileRoot static did not resolve - no file table to walk.");
+            return;
+        }
+
+        var tables = new PoEformance.Game.Files.LoadedDatTables(reader, schema);
+        PoEformance.Game.Files.DatTableSurvey survey = tables.Survey(fileRootStatic);
+
+        output.WriteLine(
+            $"tables    {survey.Tables.Count} dat tables among {survey.Records} loaded files");
+
+        if (tables.LastError.Length > 0)
+        {
+            output.WriteLine($"          {tables.LastError}");
+        }
+
+        output.WriteLine();
+        foreach (PoEformance.Game.Files.LoadedDatTable table in survey.Tables
+                     .OrderBy(t => t.Facts.Name, StringComparer.OrdinalIgnoreCase))
+        {
+            output.WriteLine(
+                $"  {table.Facts.Name,-46} {table.Facts.Rows,7} rows of 0x{table.Facts.RowSize:X}");
+        }
+
+        output.WriteLine();
+        if (survey.Refused.Count == 0)
+        {
+            // Which is itself an answer: every .dat file in the table is a parsed table, so the
+            // ones missing from the list above are missing from the FILE TABLE, not unparsed.
+            output.WriteLine("          every .dat file in the table resolved as a table.");
+            return;
+        }
+
+        output.WriteLine($"          {survey.Refused.Count} .dat files did NOT resolve as tables:");
+        foreach (string path in survey.Refused.Order(StringComparer.OrdinalIgnoreCase))
+        {
+            output.WriteLine($"            {path}");
         }
     }
 
@@ -2859,6 +2928,7 @@ internal static class Program
         bool SweepComponents,
         bool DumpAnimations,
         bool ReadGlossary,
+        bool ListTables,
         IReadOnlyList<string> Peek,
         bool PeekWatch,
         string UpdateOutcome,
@@ -2872,7 +2942,7 @@ internal static class Program
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false;
-            bool sweep = false, glossary = false;
+            bool sweep = false, glossary = false, listTables = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -2985,6 +3055,14 @@ internal static class Program
                         glossary = true;
                         break;
 
+                    // The same walk, listing every table instead of reading one - and the .dat
+                    // files that did NOT resolve as tables, which is the open question: four
+                    // tables this tool reads rows from were missing from the 131 a live walk
+                    // found, and nothing recorded so far can say why.
+                    case "--tables":
+                        listTables = true;
+                        break;
+
                     // Takes a Cheat Engine pointer path as written - "+468C3A8,235C" - so a
                     // finding can be checked without transcribing it into an absolute address
                     // that stops meaning anything the moment the game restarts.
@@ -3028,7 +3106,7 @@ internal static class Program
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
                 debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep, animDump,
-                glossary, peek, peekWatch, updateOutcome, updatedVersion);
+                glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
     }
 }
