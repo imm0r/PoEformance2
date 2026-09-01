@@ -15,11 +15,15 @@ namespace PoEformance.Core.Tests;
 /// checks - so none of them could ever answer "is table X in this table at all". `--tables`
 /// reads the name of every record that is not a table, and this session holds 6913 of 6914.
 ///
-/// The answer is a limit: WorldAreas, MinimapIcons, NPCs and ItemVisualIdentity - the four
-/// tables this project already reads rows from - are in none of the 6913 names, in any spelling,
-/// while Stats, Mods, BaseItemTypes and QuestFlags all are. The client plainly has those four
-/// tables' rows, so it reaches them some other way, and the row-pointer route through a
-/// component stays the only known way to them.
+/// The answer is a FRACTION rather than a fact about any one table. 157 of the 6914 records are
+/// .dat files at all, against about 1020 PoE2 tables in the community schemas - fifteen per cent
+/// - so a table being absent is the ordinary case. WorldAreas, MinimapIcons, NPCs and
+/// ItemVisualIdentity, the four this project reads rows from, are in none of the 6913 names in
+/// any spelling, while Stats, Mods, BaseItemTypes and QuestFlags happen to be there; at that
+/// coverage, four named tables all missing is a coin flip and not a pattern, which is how it was
+/// first written up. The client plainly has those four tables' rows, so it reaches them some
+/// other way, and the row-pointer route through a component stays the only route to a table this
+/// walk does not turn up.
 ///
 /// SAID PRECISELY, THAT IS "NOT IN THE SIXTEEN BUCKETS WE WALK". BucketCount is 0x10 because
 /// GameHelper2 says so, and GameHelper2 is a PoE1 tool; nothing here has checked it against this
@@ -95,9 +99,13 @@ public class DatTableSurveyTests
             }
         }
 
-        // 6913 of 6914, which is what makes the absences below mean something: this is not a
-        // capture that only saw part of the table.
+        // 6913 of 6914, which is what makes the absences below mean anything at all: this is not
+        // a capture that only saw part of what it walked.
         Assert.Equal(6913, names.Count);
+
+        // AND THE NUMBER THAT PUTS THOSE ABSENCES IN PROPORTION: 157 .dat records against about
+        // 1020 PoE2 tables. Most tables are not here, so no single one being missing is a
+        // finding on its own.
         Assert.Equal(157, names.Count(n => n.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)));
 
         foreach (string table in (string[])["WorldAreas", "MinimapIcons", "NPCs", "ItemVisualIdentity"])
@@ -139,11 +147,13 @@ public class DatTableSurveyTests
             Assert.Equal(schema.Structs[row].Constants["RowSize"], loaded.Facts.RowSize);
         }
 
-        // The three that used to disagree with the computed widths, unchanged between captures.
-        // Two of them were OUR arithmetic - an interval column is two values and costs twice its
-        // type, and Mods has eight of them (Stat1Value..Stat8Value, a modifier's min and max
-        // roll) for exactly the 32 bytes that were missing. EndgameMaps' one byte is still
-        // unexplained. Frozen here because these are the game's numbers either way.
+        // The three that used to disagree with the computed widths, unchanged between captures
+        // and all three explained now. Two were OUR arithmetic - an interval column is two values
+        // and costs twice its type, and Mods has eight of them (Stat1Value..Stat8Value, a
+        // modifier's min and max roll) for exactly the 32 bytes that were missing. EndgameMaps'
+        // single byte is a trailing bool that poe-tool-dev's column list lacks and
+        // repoe-fork/dat-export's has. Frozen here because these are the game's numbers, which
+        // is what makes them worth checking a column list against.
         Assert.Equal(0x2A5, Assert.Single(tables.FindAll("Mods")).Facts.RowSize);
         Assert.Equal(0xF0, Assert.Single(tables.FindAll("EndgameMaps")).Facts.RowSize);
         Assert.Equal(0x26, Assert.Single(tables.FindAll("AlternateTreeVersions")).Facts.RowSize);

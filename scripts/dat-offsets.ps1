@@ -55,6 +55,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# One file with every table, which is why it is the default. It is not the only column list and
+# it is not always the most complete: measured against 134 loaded tables it agreed with the game
+# on 133, and the one it missed - EndgameMaps, short by a trailing bool - is right in
+# repoe-fork/dat-export's heuristic PoE2 schema, which is derived from the data itself
+# (current/poe2/heuristics/schema/graphql/<Table>.gql). Check that one when a table disagrees
+# with the row size the game reports; PoEformance.App --tables prints those.
 $SchemaUrl = 'https://github.com/poe-tool-dev/dat-schema/releases/download/latest/schema.min.json'
 $RepoRoot = Split-Path $PSScriptRoot -Parent
 
