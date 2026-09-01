@@ -365,6 +365,90 @@ public class EntityInspectorTests
         Assert.Contains("2 from StatsByBuffAndActions", view.StatsNote, StringComparison.Ordinal);
     }
 
+    /// <summary>A bag longer than the read is cut, and the cut is both said AND flagged.</summary>
+    /// <remarks>
+    /// THIS IS THE ONE THAT WAS NEARLY MISSED. A real character's StatsByBuffAndActions bag
+    /// measured 392 pairs against a cap of 256, so the list stopped 136 short - and a search
+    /// over what was read then answered "that stat is not on this entity" about a stat that
+    /// may simply have been off the end. The note said "(of 392)" the whole time; being told
+    /// in prose is not the same as the code knowing, which is why StatsCutShort exists.
+    ///
+    /// The cap is 1024 now, well past what a player carries, so this builds a bag past THAT
+    /// to prove the reporting still holds rather than that the number happens to be enough.
+    /// </remarks>
+    [Fact]
+    public void ABagLongerThanTheReadIsReportedAsCutShort()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Characters/Int/IntFourb", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Stats");
+
+        StructDef component = schema.Structs["Stats"];
+        StructDef internals = schema.Structs["StatsInternal"];
+        EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        ulong stats = placed.Components.Single(c => c.Name == "Stats").Address;
+
+        const ulong InternalAt = 0x3600_0000_0000;
+        const ulong PairsAt = 0x3600_0001_0000;
+        const int Pairs = 1500;
+
+        reader.Place(stats + (ulong)component.OffsetOf("StatsByBuffAndActions"), InternalAt);
+        reader.Place(InternalAt + (ulong)internals.OffsetOf("StatsVector"), PairsAt);
+        reader.Place(InternalAt + (ulong)internals.OffsetOf("StatsVectorLast"), PairsAt + (ulong)(Pairs * 8));
+
+        var block = new byte[Pairs * 8];
+        for (int i = 0; i < Pairs; i++)
+        {
+            BitConverter.TryWriteBytes(block.AsSpan(i * 8, 4), (uint)(1000 + i));
+            BitConverter.TryWriteBytes(block.AsSpan((i * 8) + 4, 4), i);
+        }
+
+        reader.Place(PairsAt, block);
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Equal(1024, view.Numbers.Count);
+        Assert.Contains("(of 1500)", view.StatsNote, StringComparison.Ordinal);
+        Assert.True(view.StatsCutShort, "a bag past the cap must say so where code can see it");
+    }
+
+    /// <summary>A bag the read covers is NOT flagged, or the warning becomes noise.</summary>
+    /// <remarks>
+    /// The half that keeps the flag worth having. A warning that shows on every entity is one
+    /// nobody reads by the time it matters - and it matters exactly once.
+    /// </remarks>
+    [Fact]
+    public void ABagThatFitsIsNotFlagged()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Characters/Int/IntFourb", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Stats");
+
+        StructDef component = schema.Structs["Stats"];
+        StructDef internals = schema.Structs["StatsInternal"];
+        EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        ulong stats = placed.Components.Single(c => c.Name == "Stats").Address;
+
+        const ulong InternalAt = 0x3700_0000_0000;
+        const ulong PairsAt = 0x3700_0001_0000;
+
+        // 392 - the size of the bag that started this, and now comfortably inside the read.
+        const int Pairs = 392;
+
+        reader.Place(stats + (ulong)component.OffsetOf("StatsByBuffAndActions"), InternalAt);
+        reader.Place(InternalAt + (ulong)internals.OffsetOf("StatsVector"), PairsAt);
+        reader.Place(InternalAt + (ulong)internals.OffsetOf("StatsVectorLast"), PairsAt + (ulong)(Pairs * 8));
+        reader.Place(PairsAt, new byte[Pairs * 8]);
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Equal(Pairs, view.Numbers.Count);
+        Assert.DoesNotContain("(of ", view.StatsNote, StringComparison.Ordinal);
+        Assert.False(view.StatsCutShort);
+    }
+
     /// <summary>One bag reached through two pointers is listed once, and said to be one.</summary>
     /// <remarks>
     /// A flame wall's two Stats pointers are the same address. Listed under both headings its
