@@ -132,6 +132,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private TrackerSettings _tracker = TrackerSettings.Default;
 
     /// <summary>
+    /// The game's own names for the kinds of ground, when the install could be read.
+    /// </summary>
+    /// <remarks>
+    /// Set once at startup rather than passed through the settings, because it is not a setting:
+    /// it is a table read out of the install, it cannot change while the game runs, and nothing
+    /// in the config window has any business editing it. Null is ordinary - see
+    /// GroundEffectTypeTable - and costs only the name on a debug label.
+    /// </remarks>
+    public GroundEffectTypeTable? GroundTypes
+    {
+        get => _groundDanger.GroundTypes;
+        set => _groundDanger.GroundTypes = value;
+    }
+
+    /// <summary>
     /// What the evasion warnings draw, and where their threats come from.
     /// </summary>
     /// <remarks>
