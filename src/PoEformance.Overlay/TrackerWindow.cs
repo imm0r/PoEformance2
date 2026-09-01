@@ -471,6 +471,19 @@ public sealed class TrackerWindow
             + " reaches zero a measured 0.38 s before it stops listing the effect. A third of"
             + " effects have no timer at all and simply show none.");
 
+        ImGui.SameLine();
+        bool names = settings.ShowGroundEffectNames;
+        if (OverlayLayout.Toggle("Name Beside Ring", ref names))
+        {
+            _write(settings with { ShowGroundEffectNames = names });
+        }
+
+        OverlayLayout.Hint(
+            "The game's own name for the kind of ground - \"Ignited Ground\", \"Sacred Ashes\" -"
+            + " written to the RIGHT of the ring so it does not cover the patch. It comes from"
+            + " the row index the component carries, resolved against the game's own table, so"
+            + " it is the phrase already on your screen rather than anything invented here.");
+
         bool labels = settings.ShowGroundEffectLabels;
         if (OverlayLayout.Toggle("Show Metadata Path", ref labels))
         {

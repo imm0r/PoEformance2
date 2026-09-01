@@ -263,6 +263,15 @@ public sealed record TrackerSettings(
     [property: JsonPropertyName("groundEffectUseGameRadius")] bool GroundEffectUseGameRadius = false,
     [property: JsonPropertyName("showGroundEffectTimer")] bool ShowGroundEffectTimer = true,
 
+    // The kind of ground, written beside the ring. ON by default, on the same reasoning the
+    // timer is: it only ever appears once somebody has switched the rings on, and a ring that
+    // says "Ignited Ground" is worth more than a ring that says nothing - the entity path this
+    // used to be the only alternative to is the same generic string on every ground effect in
+    // the game. Separate from ShowGroundEffectLabels, which is the DEBUG block underneath: that
+    // one prints the path, the entity id and the radius, and is for working out why a ring is
+    // where it is rather than for playing with.
+    [property: JsonPropertyName("showGroundEffectNames")] bool ShowGroundEffectNames = true,
+
     // The metadata path and the numbers under each ring. A DEBUG AID: it answers "which patch
     // is that ring on, and is one missing", which circles alone cannot. Off by default because
     // it writes a 56-character path under every effect on screen.
