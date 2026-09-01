@@ -372,6 +372,19 @@
           nowhere on the player's own screen, so without this a buff condition is written by
           guessing at a spelling. Cast the skill, then look here.
         -->
+        <!--
+          The status line beside the switches holds ONE tick, and a tick is 33 ms. With
+          several rules configured it is replaced faster than it can be read, so everything
+          actually asked of it - did that rule fire, when did it stop, was the cull aimed -
+          is a question about a few seconds ago that only a history can answer.
+        -->
+        <details id="rl-log-panel" class="rl-buffs rl-log">
+          <summary>Rule history <span id="rl-log-count" class="dim"></span></summary>
+          <p class="dim rl-buffs-hint">Newest first. A repeat collapses into a count, and the
+            engine pacing itself - a cooldown, the typing floor - is left out.</p>
+          <ul id="rl-log"></ul>
+        </details>
+
         <details id="rl-buffs-panel" class="rl-buffs">
           <summary>Buffs seen <span id="rl-buffs-count" class="dim"></span></summary>
           <p class="dim rl-buffs-hint">Click one to put its name in the buff field you last used.

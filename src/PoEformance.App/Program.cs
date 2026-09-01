@@ -2089,7 +2089,7 @@ internal static class Program
                             : null;
                     },
                     world.ReadHoveredNow,
-                    note => ruleEngine.Aimed(note, Environment.TickCount64)));
+                    (ruleId, note) => ruleEngine.Aimed(ruleId, note, Environment.TickCount64)));
 
                 return snapshot;
             },
@@ -2112,6 +2112,10 @@ internal static class Program
         overlay.EvasionStatus = () => evasionPlanner.LastTick.Reason;
         overlay.RuleStatus = () => ruleEngine.LastTick.Reason;
         overlay.AimStatus = () => ruleEngine.AimNote(Environment.TickCount64);
+
+        // Enough to fill the folded panel several times over without asking the log for a
+        // session's worth of history on every frame it happens to be open.
+        overlay.RuleHistory = () => ruleEngine.Log.Recent(60);
 
         // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
         // are decided once per read, so asking here would both cost a re-evaluation per frame
@@ -2255,11 +2259,13 @@ internal static class Program
     /// Where every outcome of an aim goes, so it can be read on the status page. The sequence
     /// finishes milliseconds AFTER the tick that started it, so there is no tick left to report
     /// through - which is why this is a callback rather than something on <see cref="RuleTick"/>.
+    /// Takes the rule's id: with several aiming rules configured, an outcome that does not say
+    /// WHOSE pointer missed is not one anybody can act on.
     /// </param>
     internal readonly record struct AimContext(
         Func<PoEformance.Features.AimPoint, (int X, int Y)?> Project,
         Func<ulong> Hovered,
-        Action<string> Note);
+        Action<string, string> Note);
 
     private static void Perform(PoEformance.Features.RuleTick tick, AimContext? aiming = null)
     {
@@ -2343,7 +2349,7 @@ internal static class Program
             // which is a different thing from the rule being wrong. Said out loud for exactly
             // that reason: a radius wider than the screen produces this every time, and it is
             // indistinguishable from a broken projection until something names it.
-            context.Note("the target is off screen");
+            context.Note(input.RuleId, "the target is off screen");
             return;
         }
 
@@ -2353,7 +2359,7 @@ internal static class Program
             context.Hovered,
             () => Perform(
                 new PoEformance.Features.RuleTick([], [], [input with { Aim = null }], string.Empty)),
-            context.Note);
+            note => context.Note(input.RuleId, note));
     }
 
     /// <summary>

@@ -545,6 +545,22 @@ pre#log {
 .rl-buffs li .rl-buff-name:hover { color: var(--accent); }
 .rl-buff-detail { font-size: 11px; white-space: nowrap; }
 
+/* One line per thing that happened: when, whose, what. Monospaced and fixed-width in the
+   first two columns so the eye can run down the ages and the rule names without them
+   shifting as the numbers grow - the list is redrawn once a second underneath the reader. */
+.rl-log li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 6px;
+  font: 11px/1.6 ui-monospace, Consolas, monospace;
+}
+
+.rl-log li > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rl-log .rl-log-age { color: var(--dim); text-align: right; }
+.rl-log .rl-log-rule { color: var(--dim); }
+.rl-log .rl-log-what { color: var(--ok); }
+.rl-log li.blocked .rl-log-what { color: var(--bad); }
+
 /* Two names per row: the readable one to find it by, the id underneath because that is what
    a rule actually matches. */
 .rl-buffs li .rl-buff-name { display: flex; flex-direction: column; gap: 0; }
