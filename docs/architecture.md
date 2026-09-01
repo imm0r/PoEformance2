@@ -346,6 +346,7 @@ PoEformance.App --record s.rec --questflags    # + read where a character's ques
 PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action fields (see below)
 PoEformance.App --record s.rec --hoverhunt    # + read the hovered-entity chain and the boss byte
 PoEformance.App --record s.rec --sweep        # + read four components nothing has a layout for
+PoEformance.App --record s.rec --inventories  # + read every inventory whole, hunting the tab's sort
 PoEformance.App --record s.rec --glossary     # + find every loaded dat table and read the glossary
 PoEformance.App --record s.rec --tables       # + list them, with the row size each one reports
 
