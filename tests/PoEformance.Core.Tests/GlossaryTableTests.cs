@@ -5,8 +5,8 @@ using PoEformance.Game.Files;
 namespace PoEformance.Core.Tests;
 
 /// <summary>
-/// The whole route from a static to the glossary, against the session that first ran it
-/// (<c>tests/fixtures/session-2026-08-glossary.rec</c>, 497 KB).
+/// The whole route from a static to the glossary, against a live client
+/// (<c>tests/fixtures/session-2026-08-glossary.rec</c>, 537 KB).
 /// </summary>
 /// <remarks>
 /// THE HOP THAT HAD NO FIXTURE. Every other recording in this repo walks the loaded-file table
@@ -21,6 +21,13 @@ namespace PoEformance.Core.Tests;
 /// dat-schema; here the client says 0x48 itself, because a row store divides its rows by its
 /// by-Id index and needs no schema to do it. If a patch adds a column, this test fails on the
 /// game's own arithmetic rather than on ours.
+///
+/// THE SECOND CAPTURE OF THE SAME SESSION, and the first one is gone rather than kept beside
+/// it. That one was taken while the reader still capped a definition at 512 characters, so 55
+/// of them were cut mid-word - and a recording holds only what was read, so no test on it could
+/// ever have seen the whole table. It is not a weaker fixture, it is a fixture of a bug. The
+/// counts here move with that: 328 distinct keys where the truncated capture showed 317, and
+/// 240 definitions with a percent where it showed 236.
 /// </remarks>
 public class GlossaryTableTests
 {
@@ -57,7 +64,7 @@ public class GlossaryTableTests
         IReadOnlyList<LoadedDatTable> loaded = tables.Read(replay.ResolvedStatics["FileRoot"]);
 
         Assert.Equal(string.Empty, tables.LastError);
-        Assert.Equal(6907, tables.RecordsWalked);
+        Assert.Equal(6908, tables.RecordsWalked);
         Assert.Equal(131, loaded.Count);
 
         LoadedDatTable found = Assert.Single(tables.FindAll(KeywordGlossary.TableName));
@@ -104,9 +111,14 @@ public class GlossaryTableTests
     public void TheMarkupNamesRowsOfTheSameTable()
     {
         // What the table is FOR, checked over all of it rather than over an example: a
-        // definition refers to other keywords, and those keywords are rows here. 313 of the 317
+        // definition refers to other keywords, and those keywords are rows here. 324 of the 328
         // distinct keys resolve; the four that do not are the game's own placeholders (DNT,
         // DNT-UNUSED) and two leftovers, which is data rather than a failed read.
+        //
+        // THE COUNT IS ALSO A TRUNCATION ALARM. It read 317 against the first capture, because
+        // a definition cut off at the reader's cap loses whatever markup its tail carried - so
+        // eleven references simply were not there. A number that drops is what a shortened
+        // string looks like from the outside.
         using ReplayMemoryReader replay = Session();
         OffsetSchema schema = RealSessionTests.Schema();
 
@@ -123,7 +135,7 @@ public class GlossaryTableTests
             }
         }
 
-        Assert.Equal(317, keys.Count);
+        Assert.Equal(328, keys.Count);
         Assert.Equal(4, keys.Count(key => glossary.Lookup(key) is null));
 
         Assert.StartsWith(
@@ -138,11 +150,12 @@ public class GlossaryTableTests
         // THE CHECK THAT WOULD HAVE CAUGHT THE BUG THIS FIXTURE FOUND. A raw UTF-16 pointer
         // carries no length, so a definition longer than the reader's cap is truncated rather
         // than refused - silently, and only in the wordiest rows. The first version of this
-        // reader capped at 512 and cut 56 of these definitions mid-word.
+        // reader capped at 512 and cut 55 of these definitions mid-word.
         //
         // A string that comes back at EXACTLY the cap is what that looks like from the inside,
-        // so the test is that none does. It cannot prove no text is longer than the cap in some
-        // future patch, which is the point: it fails when one is.
+        // so the test is that none does. It cannot prove nothing in some future patch is longer
+        // than 2048, which is exactly the point: it fails when something is, instead of the
+        // glossary quietly shortening it.
         using ReplayMemoryReader replay = Session();
         OffsetSchema schema = RealSessionTests.Schema();
 
@@ -150,8 +163,14 @@ public class GlossaryTableTests
         tables.Read(replay.ResolvedStatics["FileRoot"]);
         KeywordGlossary glossary = KeywordGlossary.Read(tables, replay, schema);
 
-        int longest = glossary.ById.Values.Max(e => e.Definition.Length);
-        Assert.InRange(longest, 512, 2047);
+        Assert.DoesNotContain(glossary.ById.Values, e => e.Definition.Length == 2048);
+
+        // The real maximum, now that a capture exists that does not cut it: Flammability, and
+        // it ends on its own full stop rather than mid-word.
+        KeywordPopup longest = glossary.ById.Values.MaxBy(e => e.Definition.Length);
+        Assert.Equal("Flammability", longest.Id);
+        Assert.Equal(1429, longest.Definition.Length);
+        Assert.EndsWith("lasting 8 seconds by default.", longest.Definition, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -169,7 +188,7 @@ public class GlossaryTableTests
         KeywordGlossary glossary = KeywordGlossary.Read(tables, replay, schema);
 
         Assert.Equal(
-            236,
+            240,
             glossary.ById.Values.Count(e => e.Definition.Contains('%', StringComparison.Ordinal)));
         Assert.DoesNotContain(
             glossary.ById.Values,

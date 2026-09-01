@@ -2163,10 +2163,18 @@ over dat-schema into the client's own number.
 **And it corrected the tool three times, all in the same direction.** The screenshot showed
 `+100%%`, so `Plain` collapsed a doubled percent — the raw column holds `+100%`, and the
 doubling was `ImGuiText.Escape` in our own drawing path. A bracket with no pipe was written down
-as a form "not seen in this table"; there are 859 of them. And the definition cap of 512
-characters silently truncated 56 rows, `Critical`'s ending mid-word. Every one of the three came
+as a form "not seen in this table"; there are 913 of them. And the definition cap of 512
+characters silently truncated 55 rows, `Critical`'s ending mid-word. Every one of the three came
 from reading the tool's own rendering as if it were the game's data — which is the failure this
 document's first rule is about, arriving in the one place that felt safe.
+
+**A cap that truncates is not a cosmetic bug**, and the second capture is what shows it: read at
+512, the table appears to refer to 317 keywords; read whole, it refers to 328. Eleven references
+lived in the tails that were being cut, so the feature was losing exactly the thing it exists to
+provide, and no test could see it — a recording holds only what was read, so the capture taken
+with the short cap could never have disagreed. The committed fixture is now the 2048 one, and
+the maximum is measured rather than assumed: `Flammability`, 1429 characters, with nothing
+coming back at the cap.
 
 ### Prices — what the stash is worth
 
