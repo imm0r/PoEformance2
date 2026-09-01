@@ -64,16 +64,17 @@ public static class AimSequence
     /// </param>
     /// <param name="act">What to do once the target is confirmed.</param>
     /// <param name="report">
-    /// Told how it went, on EVERY path including the one that worked. Success is reported for
+    /// Told how it went at EVERY step, including the ones that worked. Success is reported for
     /// the same reason the failures are: the only way to tell "the confirmation is rejecting
-    /// every aim" from "the rule never held" is to see the sequence say something.
+    /// every aim" from "the rule never held" is to see the sequence say something. Takes a
+    /// wording and a measurement, which end up in their own columns.
     /// </param>
     public static void Run(
         (int X, int Y) target,
         ulong expected,
         Func<ulong> hovered,
         Action act,
-        Action<string> report)
+        Action<string, string> report)
     {
         ArgumentNullException.ThrowIfNull(hovered);
         ArgumentNullException.ThrowIfNull(act);
@@ -81,7 +82,7 @@ public static class AimSequence
 
         if (Interlocked.CompareExchange(ref _running, 1, 0) != 0)
         {
-            report("skipped, still aiming at the last one");
+            report("skipped, still aiming at the last one", string.Empty);
             return;
         }
 
@@ -99,22 +100,28 @@ public static class AimSequence
         ulong expected,
         Func<ulong> hovered,
         Action act,
-        Action<string> report)
+        Action<string, string> report)
     {
         (int X, int Y)? was = InputSender.CursorAt();
         try
         {
             if (was is null)
             {
-                report("could not read where the pointer is");
+                report("could not read where the pointer is", string.Empty);
                 return;
             }
 
             if (!InputSender.MoveCursor(target.X, target.Y))
             {
-                report("could not move the pointer");
+                report("could not move the pointer", $"{target.X},{target.Y}");
                 return;
             }
+
+            // Its own line, and the pixel with it. Between the decision and the hover check
+            // sit two things that can each be wrong on their own - the projection that turned
+            // a world point into this pixel, and the pointer actually going there - and one
+            // line covering both cannot say which.
+            report("pointer moved", $"{target.X},{target.Y}");
 
             Thread.Sleep(SettleMs);
 
@@ -124,14 +131,17 @@ public static class AimSequence
                 // The honest outcome, and the one this exists to produce. Named rather than
                 // silent: "the cursor did not land" and "the rule never held" are different
                 // problems, and only one of them is fixed by changing the rule.
-                report(under == 0
-                    ? "the pointer landed on nothing"
-                    : "the pointer landed on something else");
+                //
+                // The detail carries what the game says IS hovered, which is the difference
+                // between "the projection is off by a little" and "it is off by a screen".
+                report(
+                    under == 0 ? "hover check: nothing there" : "hover check: something else",
+                    under == 0 ? $"wanted #{expected & 0xFFFFFFFF:x8}" : $"#{under & 0xFFFFFFFF:x8}");
                 return;
             }
 
+            report("hover check: confirmed", $"#{under & 0xFFFFFFFF:x8}");
             act();
-            report("on target");
         }
         finally
         {

@@ -3060,8 +3060,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        long now = Environment.TickCount64;
-
         // A fixed height with its own scrollbar rather than however tall the list happens to
         // be: this panel sits in a corner during a fight, and a section that grows with its
         // contents would push the switches under it off the screen after a busy pack.
@@ -3077,7 +3075,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         try
         {
-            if (!ImGui.BeginTable("##rulelogrows", 3, ImGuiTableFlags.SizingFixedFit))
+            if (!ImGui.BeginTable("##rulelogrows", 4, ImGuiTableFlags.SizingFixedFit))
             {
                 return;
             }
@@ -3088,7 +3086,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 {
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGuiText.Mono(Quiet, RuleLog.Age(now - entry.AtMs));
+                    ImGuiText.Mono(Quiet, entry.Clock);
 
                     ImGui.TableNextColumn();
 
@@ -3099,10 +3097,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     ImGui.TextUnformatted(entry.Rule);
 
                     ImGui.TableNextColumn();
-                    string what = entry.Count > 1 ? $"{entry.What}  x{entry.Count}" : entry.What;
-                    ImGui.PushStyleColor(ImGuiCol.Text, entry.Blocked ? Warning : OverlayInk.Good);
-                    ImGui.TextUnformatted(what);
+                    ImGui.PushStyleColor(ImGuiCol.Text, entry.Tone switch
+                    {
+                        RuleLogTone.Bad => Bad,
+                        RuleLogTone.Warning => Warning,
+                        _ => OverlayInk.Good,
+                    });
+                    ImGui.TextUnformatted(entry.What);
                     ImGui.PopStyleColor();
+
+                    // The measurement in the mono face, like every other figure in this window:
+                    // these are life totals and counts that change between frames, and a
+                    // proportional face makes the whole column twitch as they do.
+                    ImGui.TableNextColumn();
+                    ImGuiText.Mono(Measured, entry.Measured);
                 }
             }
             finally

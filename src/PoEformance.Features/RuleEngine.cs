@@ -27,11 +27,18 @@ public readonly record struct RuleSound(string RuleId, int Pitch, int Ms);
 /// produced by an engine that has no camera matrix and no window, so turning it into a place on
 /// screen belongs to the composition root - the same split the drawings already follow.
 /// </remarks>
+/// <param name="Describes">
+/// What this input is, in words, for the history. Carried on the decision because the engine is
+/// the only place that knows it - a flask slot resolved through the game's bindings, a key
+/// sequence, a named key - and an AIMED input is not logged where it is decided but where it is
+/// finally performed, several milliseconds later, by code that has only the codes.
+/// </param>
 public sealed record RuleInput(
     string RuleId,
     RuleEffectKind Kind,
     IReadOnlyList<ushort> Keys,
-    AimPoint? Aim = null);
+    AimPoint? Aim = null,
+    string Describes = "");
 
 /// <summary>Where an aiming input should point, and what it expects to find there.</summary>
 /// <param name="Address">
@@ -206,6 +213,38 @@ public sealed class RuleEngine
     public RuleLog Log { get; } = new();
 
     /// <summary>
+    /// How long after a cull to look at the target again.
+    /// </summary>
+    /// <remarks>
+    /// Long enough for the key to have reached the game, the skill to have travelled and the
+    /// next read to have landed - reads arrive every 33 ms, so this is a dozen of them. Too
+    /// short reports "unchanged" for a cull that was still in flight, which is the same wrong
+    /// answer as not checking at all. Too long and a monster that died to something else in
+    /// the meantime is credited to the cull; nothing here can tell those apart, which is why
+    /// the log says what it MEASURED rather than claiming the kill.
+    /// </remarks>
+    public const int CullCheckMs = 400;
+
+    /// <summary>What an aimed effect was pointed at, per rule, as of its decision.</summary>
+    private readonly Dictionary<string, AimedAt> _aimedAt = new(StringComparer.Ordinal);
+
+    private readonly Lock _watchGate = new();
+
+    private CullWatch? _watch;
+
+    /// <summary>A monster an effect aimed at, and the pool it had at that moment.</summary>
+    private readonly record struct AimedAt(ulong Address, int Life, int LifeMax, string Pool);
+
+    /// <summary>One outstanding "did that actually do anything" check.</summary>
+    /// <remarks>
+    /// ONE, not a queue, and that is a consequence rather than a simplification: the pointer
+    /// can only be in one place at a time, and the aim sequence DROPS anything that arrives
+    /// while it owns the cursor - so there is never a second cull in flight to check. If that
+    /// ever stops being true, this is the field that has to grow with it.
+    /// </remarks>
+    private readonly record struct CullWatch(string Rule, AimedAt Target, long DueAt);
+
+    /// <summary>
     /// Records what came of an aimed effect - including that it worked.
     /// </summary>
     /// <remarks>
@@ -219,13 +258,37 @@ public sealed class RuleEngine
     ///
     /// Volatile for the usual reason: written by the aim thread, read by whatever is drawing.
     /// </remarks>
-    public void Aimed(string ruleId, string outcome, long nowMs)
+    public void Aimed(string ruleId, string outcome, string detail, long nowMs)
     {
         _aim = new AimOutcome(outcome ?? string.Empty, nowMs);
 
         // Into the history too, under the rule's NAME - with six rules configured, "the
         // pointer landed on nothing" without saying whose pointer is a line you cannot act on.
-        Log.Acted(nowMs, Named(ruleId), outcome ?? string.Empty);
+        Log.Acted(Named(ruleId), outcome ?? string.Empty, detail ?? string.Empty);
+    }
+
+    /// <summary>
+    /// Told that an aimed effect actually fired, so the target can be looked at again after.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE STEP THAT CHECKS THE PREMISE. Everything before it - the target was under its
+    /// threshold, the pointer landed on it, the key went out - is the tool reporting on its own
+    /// behaviour. None of it says the cull WORKED, and the failure it cannot see is the one
+    /// worth seeing: a key that goes out at a confirmed target and changes nothing, because the
+    /// skill was on cooldown, out of mana, or not the skill on that key at all.
+    ///
+    /// Armed from the aim thread when the press goes out, resolved on a later tick by
+    /// <see cref="Verify"/> - the answer is in the next read, which this class does not perform.
+    /// </remarks>
+    public void Fired(string ruleId, long nowMs)
+    {
+        lock (_watchGate)
+        {
+            if (_aimedAt.TryGetValue(ruleId, out AimedAt target))
+            {
+                _watch = new CullWatch(Named(ruleId), target, nowMs + CullCheckMs);
+            }
+        }
     }
 
     /// <summary>The name of the rule with this id, or the id when nothing carries it.</summary>
@@ -354,12 +417,91 @@ public sealed class RuleEngine
         RuleTick tick = Decide(state, nowMs);
         LastTick = tick;
 
+        // AFTER the decision, so a cull and the check on the cull before it cannot land in the
+        // log out of order.
+        Verify(state, nowMs);
+
         // Alongside the decision rather than inside it, and computed on this thread rather than
         // when the overlay asks: the renderer draws far more often than a snapshot arrives, so
         // asking there would re-read the same facts sixty times a second - and the numbers on
         // the rings would be a different moment from the one the rule acted on.
         (LastPreview, LastPreviewFacts) = Previewed(state);
         return tick;
+    }
+
+    /// <summary>
+    /// Looks at the last culled target again, once enough time has passed to judge it.
+    /// </summary>
+    /// <remarks>
+    /// WHY LEAVING THE LIST IS THE DEATH SIGNAL, and why nothing here looks for a corpse. The
+    /// obvious design is to find the entity at zero life and call that dead. MEASURED against
+    /// the owner's full-map recording - 16,829 frames, 854 monsters, start to boss kill - a
+    /// monster is read at zero life exactly NEVER: all 854 of them left the entity list while
+    /// their last reading was still positive. There is no corpse to find.
+    ///
+    /// So the line says "killed", on the owner's call. In the abstract, leaving the list is
+    /// death OR the game dropping a distant entity - but not in this window: the target was
+    /// within the aim radius a few hundred milliseconds earlier, and nothing walks out of the
+    /// game's entity range in that time. Hedging here would have cost the feature its point,
+    /// since the reading it would hedge on is the one that means it worked.
+    ///
+    /// THE OUTCOME THIS EXISTS FOR is the third one. A key that goes out at a confirmed target
+    /// and changes nothing - wrong skill on that key, no mana, the skill on its own cooldown -
+    /// looks identical from every other line in the log to a cull that worked.
+    /// </remarks>
+    private void Verify(RuleState state, long nowMs)
+    {
+        CullWatch watch;
+        lock (_watchGate)
+        {
+            if (_watch is not CullWatch pending || nowMs < pending.DueAt)
+            {
+                return;
+            }
+
+            // Dropped rather than answered when the world went away underneath it: after a
+            // portal every monster is "gone", and reporting that as a cull would be the check
+            // inventing a result out of a loading screen.
+            _watch = null;
+            if (!state.InGame)
+            {
+                return;
+            }
+
+            watch = pending;
+        }
+
+        foreach (NearMonster monster in state.Monsters)
+        {
+            if (monster.Address != watch.Target.Address)
+            {
+                continue;
+            }
+
+            int before = watch.Target.Life;
+            if (monster.Life < before)
+            {
+                // A WARNING, not a success. The pointer landed, the key went out and the skill
+                // connected - so this is not the tool failing - but a cull is meant to kill,
+                // and a target still standing is not what was asked for. Green would hide it
+                // among the kills and red would read as broken; it is neither.
+                Log.Acted(
+                    watch.Rule,
+                    "target hurt, still alive",
+                    $"{before} -> {monster.Life} (-{before - monster.Life})   {monster.Pool}",
+                    RuleLogTone.Warning);
+                return;
+            }
+
+            // Bad, because this is a failure however green the rest of the trace was: the
+            // pointer was confirmed on the target and the key went out, and the monster is
+            // exactly as healthy as it was. An EVENT rather than a blocked state, so a cull
+            // failing this way twice in a row is two lines and not one.
+            Log.Acted(watch.Rule, "target unchanged", $"still {monster.Pool}", RuleLogTone.Bad);
+            return;
+        }
+
+        Log.Acted(watch.Rule, "target killed", $"was {watch.Target.Pool}");
     }
 
     /// <summary>What the rule being edited measures and asks, or nothing when nothing is edited.</summary>
@@ -503,7 +645,7 @@ public sealed class RuleEngine
             blocked.Add($"{rule.Name}: {why}");
             if (!routine)
             {
-                Log.Blocked(nowMs, rule.Name, why);
+                Log.Blocked(rule.Name, why);
             }
         }
 
@@ -550,7 +692,7 @@ public sealed class RuleEngine
         {
             _readyAt[key] = nowMs + Spread(effect.CooldownMs, settings.CooldownJitterMs);
             sounds.Add(new RuleSound(rule.Id, effect.Pitch, effect.SoundMs));
-            Log.Acted(nowMs, rule.Name, "sound");
+            Log.Acted(rule.Name, "sound", $"{effect.Pitch} Hz");
             return;
         }
 
@@ -579,16 +721,41 @@ public sealed class RuleEngine
             }
 
             aim = new AimPoint(target.WorldX, target.WorldY, target.WorldZ, target.Address);
+
+            // Step one of the cull trace, and the only step that can say WHAT was picked. The
+            // steps after it happen on the aim thread, several milliseconds later, and by then
+            // this monster is just an address.
+            Log.Acted(rule.Name, "target found", $"{Entity(target.Address)}  {target.Pool}");
+
+            lock (_watchGate)
+            {
+                _aimedAt[rule.Id] = new AimedAt(
+                    target.Address, target.Life, target.LifeMax, target.Pool);
+            }
         }
 
         _readyAt[key] = nowMs + Spread(effect.CooldownMs, settings.CooldownJitterMs);
         _inputReadyAt = nowMs + Stagger(settings.MinInputGapMs, settings.CooldownJitterMs);
-        inputs.Add(new RuleInput(rule.Id, effect.Kind, codes, aim));
+        inputs.Add(new RuleInput(rule.Id, effect.Kind, codes, aim, Did(effect)));
 
-        // "Sent" rather than "fired", because an aimed effect has not acted yet: the pointer
-        // still has to land and be confirmed, and its own outcome arrives as a second entry.
-        Log.Acted(nowMs, rule.Name, aim is null ? Did(effect) : $"{Did(effect)}, aiming");
+        // An AIMED effect has not acted yet - the pointer still has to land and be confirmed -
+        // so its press is logged by whoever performs it, in its place in the sequence. Logging
+        // it here put "KeyPress T" in the history BEFORE the hover check that decides whether
+        // the key goes out at all, which read as the steps happening in the wrong order.
+        if (aim is null)
+        {
+            Log.Acted(rule.Name, Did(effect));
+        }
     }
+
+    /// <summary>An entity address as the log shows it.</summary>
+    /// <remarks>
+    /// The low half only. It is an identifier to match lines against each other by - "is the
+    /// thing that died the thing we aimed at" - and sixteen hex digits of which the top eight
+    /// never vary between two entities in one session is a column nobody can scan.
+    /// </remarks>
+    private static string Entity(ulong address)
+        => $"#{address & 0xFFFFFFFF:x8}";
 
     /// <summary>What an effect does, short enough for a log column.</summary>
     private static string Did(RuleEffect effect) => effect.Kind switch

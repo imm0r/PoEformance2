@@ -170,7 +170,7 @@ public class RuleAimTests
 
         Assert.Equal(string.Empty, engine.AimNote(0));
 
-        engine.Aimed("power-siphon", "on target", 10_000);
+        engine.Aimed("power-siphon", "on target", string.Empty, 10_000);
 
         // The age is part of it: an outcome is an event, so a bare line cannot say whether it
         // is happening now or left over from the last map.

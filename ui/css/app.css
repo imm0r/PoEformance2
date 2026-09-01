@@ -8,6 +8,10 @@
   --accent: #c8a85a;
   --ok: #6fbf73;
   --bad: #d4645c;
+
+  /* The same amber the overlay paints a warning in (OverlayInk.Warn), so the two windows do
+     not disagree about what "it happened, but not the way it was meant to" looks like. */
+  --warn: #ffa34d;
 }
 
 * { box-sizing: border-box; }
@@ -550,16 +554,21 @@ pre#log {
    shifting as the numbers grow - the list is redrawn once a second underneath the reader. */
 .rl-log li {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1.2fr);
+  grid-template-columns: 74px minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
   gap: 6px;
   font: 11px/1.6 ui-monospace, Consolas, monospace;
 }
 
 .rl-log li > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rl-log .rl-log-age { color: var(--dim); text-align: right; }
+.rl-log .rl-log-clock { color: var(--dim); }
 .rl-log .rl-log-rule { color: var(--dim); }
-.rl-log .rl-log-what { color: var(--ok); }
-.rl-log li.blocked .rl-log-what { color: var(--bad); }
+.rl-log .rl-log-detail { color: var(--dim); }
+
+/* Three tones, not two. A cull that left its target hurt but alive is neither a success nor a
+   failure: green hides it among the kills, red reads as the tool being broken. */
+.rl-log li.good .rl-log-what { color: var(--ok); }
+.rl-log li.warning .rl-log-what { color: var(--warn); }
+.rl-log li.bad .rl-log-what { color: var(--bad); }
 
 /* Two names per row: the readable one to find it by, the id underneath because that is what
    a rule actually matches. */
