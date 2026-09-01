@@ -240,6 +240,13 @@ internal static class Program
                 RunComponentSweep(reader, worldSchema, gameStatesAddress, recorder);
             }
 
+            // The same reason again, for the stash: what SORT a tab is has never been read, so
+            // no recording in the repo holds the bytes that would say. See InventorySweep.
+            if (options.SweepInventories)
+            {
+                RunInventorySweep(reader, worldSchema, gameStatesAddress, recorder);
+            }
+
             if (options.DumpAnimations)
             {
                 RunAnimationDump(reader, worldSchema, gameStatesAddress, recorder);
@@ -1197,6 +1204,86 @@ internal static class Program
 
         PoEformance.Game.Diagnostics.ComponentSweep.Report(frames, schema, Console.Out);
     }
+
+    /// <summary>
+    /// Reads every inventory whole, live or out of a recording, and reports the candidates.
+    /// </summary>
+    /// <remarks>
+    /// A FRAME EVERY TWO SECONDS, not every tick like the component sweep. A stash of 140
+    /// inventories is 76 KB a frame at this window, and the thing being watched does not move:
+    /// a tab holds what it holds until somebody opens another one. Sampling at the hunt rate
+    /// would put a hundred megabytes of identical bytes in the recording that has to be uploaded.
+    /// </remarks>
+    private static void RunInventorySweep(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var sweep = new PoEformance.Game.Diagnostics.InventorySweep(reader, schema);
+        var frames = new List<PoEformance.Game.Diagnostics.InventorySweepFrame>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (sweep.SampleFrame(gameStatesStatic, (int)frame) is { } got)
+                {
+                    frames.Add(got);
+                }
+            }
+
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("inventory sweep - reading every inventory whole, to find what says");
+            Console.WriteLine("what SORT of tab it is.");
+            Console.WriteLine();
+            Console.WriteLine("  OPEN YOUR STASH AND CLICK THROUGH THE TABS while this runs. A tab the");
+            Console.WriteLine("  game has not been asked to load reads as empty from here, so the sweep");
+            Console.WriteLine("  is worth exactly as much of the stash as you visit.");
+            Console.WriteLine();
+            Console.WriteLine("  AND OPEN THE MERCHANT WINDOW ONCE. Its two shop pages are the only");
+            Console.WriteLine("  inventory sort this project can name for certain, so they are what any");
+            Console.WriteLine("  candidate is tested against - without them nothing here can be settled.");
+            Console.WriteLine();
+            Console.WriteLine("  Visit the specialised tabs you own - currency, essence, breach, maps -");
+            Console.WriteLine("  and a plain one, so there is something for a type to differ ACROSS.");
+            Console.WriteLine("  Any key to stop and report.");
+            Console.WriteLine();
+
+            int failures = 0, frame = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (sweep.SampleFrame(gameStatesStatic, frame++) is { } got)
+                {
+                    failures = 0;
+                    frames.Add(got);
+
+                    Console.WriteLine(
+                        $"  ... {frames.Count} frames; {got.Seen.Count} inventories, "
+                        + $"{got.Seen.Count(one => one.Items > 0)} loaded, "
+                        + $"{got.Seen.Count(one => PoEformance.Game.Diagnostics.InventorySweep.IsShop(one.Id))}"
+                        + " shop pages");
+                }
+                else
+                {
+                    failures++;
+                }
+
+                Thread.Sleep(InventorySampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.InventorySweep.Report(frames, Console.Out);
+    }
+
+    /// <summary>How long between inventory samples. See RunInventorySweep for why it is slow.</summary>
+    private const int InventorySampleMs = 2000;
 
     private static void RunActionHunt(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
@@ -3149,6 +3236,7 @@ internal static class Program
         bool HuntSkills,
         bool HuntHover,
         bool SweepComponents,
+        bool SweepInventories,
         bool DumpGroundTypes,
         bool DumpAnimations,
         bool ReadGlossary,
@@ -3167,6 +3255,7 @@ internal static class Program
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false;
             bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
+            var inventorySweep = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -3264,6 +3353,14 @@ internal static class Program
                         sweep = true;
                         break;
 
+                    // Reads every inventory WHOLE, hunting the field that says what sort of
+                    // tab it is. Like the hunts above it wants a person setting the situation up:
+                    // a tab the game has not been asked to load reads as empty, so the sweep is
+                    // worth only as much of the stash as somebody clicks through while it runs.
+                    case "--inventories":
+                        inventorySweep = true;
+                        break;
+
                     case "--groundtypes":
                         groundTypeDump = true;
                         break;
@@ -3334,7 +3431,7 @@ internal static class Program
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
                 debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep,
-                groundTypeDump, animDump,
+                inventorySweep, groundTypeDump, animDump,
                 glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
     }

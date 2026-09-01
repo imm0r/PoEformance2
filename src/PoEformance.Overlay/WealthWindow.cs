@@ -828,12 +828,16 @@ public sealed class WealthWindow
 
             // Said, because a list that drops rows without saying so is a list that lies - and
             // "my tab is missing" is otherwise indistinguishable from "the read missed it".
+            //
+            // "OR UNOPENED": the two are not the same and this line used to claim they were. A tab
+            // the game has not been asked to load holds nothing HERE while holding plenty in the
+            // account, and every other place in this tool that counts tabs says so.
             if (empty > 0)
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGui.TableNextColumn();
-                ImGui.TextColored(OverlayInk.Quiet, $"{empty} empty, not listed");
+                ImGui.TextColored(OverlayInk.Quiet, $"{empty} empty or unopened, not listed");
                 ImGui.TableNextColumn();
                 ImGui.TableNextColumn();
                 ImGui.TableNextColumn();
