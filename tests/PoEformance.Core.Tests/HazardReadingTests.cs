@@ -302,9 +302,12 @@ public class HazardReadingTests
         // The timer defaults ON, because a ring without it says no more than the old rules did.
         Assert.True(TrackerSettings.Default.ShowGroundEffectTimer);
 
-        // And the ring is sized from the game by default. That is the point of drawing it: a
-        // ring at a size somebody picked can never disagree with the patch it is drawn on, so
-        // it can never settle anything either.
-        Assert.True(TrackerSettings.Default.GroundEffectUseGameRadius);
+        // And the ring is NOT sized from the game any more. It was, while GroundEffect+0x38 was
+        // believed to be the patch's radius - the point being that a ring at a size somebody
+        // picked can never disagree with the patch it is drawn on, so it can never settle
+        // anything either. It has since been settled the other way: the slot reads the same
+        // 18.67 on every effect where it reads at all, and the reader rejected it on all 54
+        // readings of a map capture. A ring sized from it is a ring sized from a constant.
+        Assert.False(TrackerSettings.Default.GroundEffectUseGameRadius);
     }
 }

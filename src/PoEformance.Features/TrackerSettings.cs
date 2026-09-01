@@ -243,18 +243,24 @@ public sealed record TrackerSettings(
     [property: JsonPropertyName("groundDanger")] IReadOnlyList<GroundDangerRule>? GroundDanger = null,
     [property: JsonPropertyName("showGroundDanger")] bool ShowGroundDanger = true,
 
-    // ── The hazards the game names itself ────────────────────────────────────
+    // ── The ground decals the game marks ─────────────────────────────────────
     // Separate switches from the rules above, and separate on purpose: a rule matches a path
-    // somebody thought to type, while these two draw whatever CARRIES THE COMPONENT. That is
-    // the difference between a list to maintain and a fact, and it is why they can also show a
-    // countdown and a direction, which no rule could.
+    // somebody thought to type, while these two draw whatever CARRIES THE COMPONENT - which is
+    // "the server drew something on the floor here" and NOT "this hurts". They can show a
+    // countdown and a direction, which no rule could; they cannot claim danger, which a rule can.
     [property: JsonPropertyName("showGroundEffects")] bool ShowGroundEffects = false,
     [property: JsonPropertyName("groundEffectColour")] string GroundEffectColour = "#C8FF7A1E",
     // WORLD units, not screen pixels - the ring is a circle on the floor, projected, so it
-    // foreshortens and shrinks with the camera exactly as the ground does. Only used when the
-    // game's own candidate value is switched off or unreadable.
+    // foreshortens and shrinks with the camera exactly as the ground does.
     [property: JsonPropertyName("groundEffectRadius")] float GroundEffectRadius = 20f,
-    [property: JsonPropertyName("groundEffectUseGameRadius")] bool GroundEffectUseGameRadius = true,
+
+    // OFF BY DEFAULT NOW, and that is a correction. It defaulted on while GroundEffect+0x38 was
+    // believed to be the patch's radius; it is not. In a hideout it reads the same 18.67 on
+    // every effect, and in a map capture the reader rejected it on all 54 readings as not being
+    // a finite value in range. A number that exists in a hideout, is identical everywhere it
+    // does exist, and is absent in a map is not describing an area. Left switchable because the
+    // slot plainly holds something and somebody may yet work out what.
+    [property: JsonPropertyName("groundEffectUseGameRadius")] bool GroundEffectUseGameRadius = false,
     [property: JsonPropertyName("showGroundEffectTimer")] bool ShowGroundEffectTimer = true,
 
     // The metadata path and the numbers under each ring. A DEBUG AID: it answers "which patch
@@ -339,20 +345,20 @@ public sealed record TrackerSettings(
     /// <remarks>
     /// THE RULE WINS, and it took a screenshot to work out why round this way.
     ///
-    /// This started inverted, on the belief that a GroundEffect component is the game's own
-    /// answer to "is this dangerous ground" - so the pass that reads a radius out of memory
-    /// ought to beat a number somebody typed. That belief is wrong. The component marks a
-    /// SERVER-SPAWNED GROUND DECAL and says nothing about damage: in the sweep capture 5880 of
-    /// 5916 readings are in a HIDEOUT, where nothing damages anything, and the one path that
-    /// carries it is the engine's generic `VisibleServerGroundEffect`. A user screenshot
-    /// settled it - a ring drawn on an Abyssal Arsenal, a league object that does no damage.
+    /// This started inverted, on the argument that the component reads a real value out of the
+    /// game where a rule only carries a number somebody typed. The reason it is this way round
+    /// is not that the component knows less - it knows MORE, since +0x48 names the exact kind of
+    /// ground out of the game's own table. It is that a rule is an explicit instruction a person
+    /// wrote down, with a colour and a size they chose, and a tool that silently overrides one is
+    /// a tool whose settings cannot be trusted.
     ///
-    /// So the two passes are not "precise" and "typed". They answer different questions. The
-    /// component answers "the server put a decal here", which is the whole area's worth of
-    /// harmless glow. A rule answers "THIS one hurts", which is a claim only a person can make
-    /// because nothing in memory has been shown to carry it. An explicit rule therefore beats
-    /// the component, and overriding it - which is what this did for one commit - throws away
-    /// the only signal in the system that is about danger at all.
+    /// So the split is by AUTHORITY, not by accuracy: a rule wins where somebody wrote one, and
+    /// the component pass keeps everything else - which is nearly every ground effect, since a
+    /// rule has to be written one path at a time.
+    ///
+    /// (An earlier version of this comment justified the same behaviour by claiming the component
+    /// says nothing about damage. That was wrong - see GroundDangerLayer for how two mis-readings
+    /// produced it - but the behaviour it argued for is still right for the reason above.)
     ///
     /// Remembered sightings are refused by both: ground effects expire, so a ring on one is a
     /// ring around ground that is safe again.

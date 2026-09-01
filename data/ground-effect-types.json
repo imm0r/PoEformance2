@@ -1,0 +1,483 @@
+{
+  "comment": "The game's GroundEffectTypes table, vendored so a patch of ground can be NAMED and JUDGED without a Path of Exile install. The GroundEffect component carries only a row index (+0x48); this turns it into the game's own name, the buff that kind applies, the sentence the player reads while standing in it, and whether it hurts. HOW harm IS DECIDED, stated because it is a judgement and every judgement here should be inspectable - the why field carries it per row. It comes from BuffDefinitions.BuffCategory: category 2 is the debuff categories and every one of those rows describes itself as damage, a slow or a drain; category 1 grants something; category 18 is invisible and carries no description at all, and where such a row is one of the named ailment grounds (ignited, chilled, shocked, scorched, brittle, sapped, withered, quicksand, poison) it is harmful because the ailment is. Anything left is UNCLEAR rather than guessed: Smoke and the row literally called Unused say nothing, and Leyline cuts both ways - more spell damage while it drains your Ward. 44 harmful, 6 helpful, 3 unclear. WHY VENDORED WHEN THE INSTALL IS AUTHORITATIVE: without it the feature is dead on a machine that only replays a recording - which is every machine this project's tests run on - so the resolution could not be tested at all, only its failure modes. GroundEffectTypeTable prefers the install for the name and always takes harm and the description from here, because the install carries neither without a second and third table. A row this file does not know is reported as its number, never guessed. NOTE THAT HARM IS ABOUT THE TYPE, NOT THE MOMENT: an expired patch still reports harmful, which is correct - the countdown is what says whether it is still burning.",
+  "source": "repoe-fork/dat-export, current/poe2/heuristics/csv - GroundEffectTypes.csv, BuffDefinitions.csv",
+  "types": [
+    {
+      "row": 0,
+      "id": "IgnitedGround",
+      "buff": "Ignited Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 18, invisible and undescribed - it applies an ailment",
+      "description": ""
+    },
+    {
+      "row": 1,
+      "id": "ChilledGround",
+      "buff": "Chilled Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 18, invisible and undescribed - it applies an ailment",
+      "description": ""
+    },
+    {
+      "row": 2,
+      "id": "CausticCloud",
+      "buff": "Caustic Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Chaos Damage from standing in Caustic Ground"
+    },
+    {
+      "row": 3,
+      "id": "Tar",
+      "buff": "Tarred Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "Your movement speed is reduced while standing in tar"
+    },
+    {
+      "row": 4,
+      "id": "Smoke",
+      "buff": "",
+      "buffs": 1,
+      "harm": "unclear",
+      "why": "buff category 18 with no description to read",
+      "description": ""
+    },
+    {
+      "row": 5,
+      "id": "Desecration",
+      "buff": "Desecrated Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Chaos Damage while standing on Desecrated Ground"
+    },
+    {
+      "row": 6,
+      "id": "Consecration",
+      "buff": "Consecrated Ground",
+      "buffs": 2,
+      "harm": "helpful",
+      "why": "buff category 1 - grants something",
+      "description": "Grants Life Regeneration, and reduces the effect of Curses on you."
+    },
+    {
+      "row": 7,
+      "id": "ShockedGround",
+      "buff": "Shocked Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 18, invisible and undescribed - it applies an ailment",
+      "description": ""
+    },
+    {
+      "row": 8,
+      "id": "Vortex",
+      "buff": "Vortex",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking cold damage from a Vortex."
+    },
+    {
+      "row": 9,
+      "id": "Haste",
+      "buff": "Slipstream",
+      "buffs": 1,
+      "harm": "helpful",
+      "why": "buff category 1 - grants something",
+      "description": "You have increased Action Speed from the Slipstream."
+    },
+    {
+      "row": 10,
+      "id": "Sandstorm",
+      "buff": "Garukhan's Sandstorm",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical Damage over time."
+    },
+    {
+      "row": 11,
+      "id": "Blizzard",
+      "buff": "Snow Cloak",
+      "buffs": 2,
+      "harm": "helpful",
+      "why": "buff category 1 - grants something",
+      "description": "The snowstorm protects you. You have a chance to avoid damage while in it."
+    },
+    {
+      "row": 12,
+      "id": "Spores",
+      "buff": "Ground Spores",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical Damage while standing in Ground Spores"
+    },
+    {
+      "row": 13,
+      "id": "DevouringDarkness",
+      "buff": "Devouring Darkness",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical Damage over time."
+    },
+    {
+      "row": 14,
+      "id": "Quicksand",
+      "buff": "",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 18, invisible and undescribed - it applies an ailment",
+      "description": ""
+    },
+    {
+      "row": 15,
+      "id": "Blood",
+      "buff": "Boiling Blood",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical Damage over time"
+    },
+    {
+      "row": 16,
+      "id": "TemporalAnomaly",
+      "buff": "Temporal Anomaly",
+      "buffs": 2,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are being slowed by a temporal anomaly."
+    },
+    {
+      "row": 17,
+      "id": "OrionMeteor",
+      "buff": "Desolation of the Awakener",
+      "buffs": 2,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Fire Damage, Physical Damage, Chaos Damage, Lightning Damage, have reduced maximum Fire, Chaos, and Lightning Resistances, and cannot Recover Life or Energy Shield."
+    },
+    {
+      "row": 18,
+      "id": "CrownOfThorns",
+      "buff": "Sacred Ashes",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical and Fire Damage over time"
+    },
+    {
+      "row": 19,
+      "id": "VaalCloud",
+      "buff": "Corrupting Smoke",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical Damage over time"
+    },
+    {
+      "row": 20,
+      "id": "Profane",
+      "buff": "Profane Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are on an enemy's Profane Ground, lowering your resistances and making you easier to critically hit."
+    },
+    {
+      "row": 21,
+      "id": "ChaosOfferingOfJudgement",
+      "buff": "Offering Of Judgement",
+      "buffs": 2,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Chaos Damage Over Time"
+    },
+    {
+      "row": 22,
+      "id": "FireOfferingOfJudgement",
+      "buff": "Offering Of Judgement",
+      "buffs": 2,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Burning Damage"
+    },
+    {
+      "row": 23,
+      "id": "DespairBearGeyser",
+      "buff": "Weight of Despair",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical Damage over time and have reduced movement speed."
+    },
+    {
+      "row": 24,
+      "id": "Fungal",
+      "buff": "Fungal Ground",
+      "buffs": 2,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You deal less Damage due to enemy Fungal Ground."
+    },
+    {
+      "row": 25,
+      "id": "BestiarySpiderWeb",
+      "buff": "Venomous Web",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Chaos Damage over time and have reduced Movement Speed"
+    },
+    {
+      "row": 26,
+      "id": "Unused",
+      "buff": "Chilled Ground",
+      "buffs": 1,
+      "harm": "unclear",
+      "why": "buff category 18 with no description to read",
+      "description": ""
+    },
+    {
+      "row": 27,
+      "id": "Oil",
+      "buff": "Oiled Ground",
+      "buffs": 2,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "Movement speed [Slow|Slowed] and  inflicted with [Exposure|Fire Exposure]. [IgnitedGround|Ignited Ground] or [Detonator] Skills will [Ignite] the Oil."
+    },
+    {
+      "row": 28,
+      "id": "ScorchedGround",
+      "buff": "Scorched Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 18, invisible and undescribed - it applies an ailment",
+      "description": ""
+    },
+    {
+      "row": 29,
+      "id": "GravityWell",
+      "buff": "Gravity Well",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are slowed and taking Cold Damage over time."
+    },
+    {
+      "row": 30,
+      "id": "LightningVortex",
+      "buff": "Vortex",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking damage from a Lightning Vortex"
+    },
+    {
+      "row": 31,
+      "id": "BrittleGround",
+      "buff": "Brittle Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 18, invisible and undescribed - it applies an ailment",
+      "description": ""
+    },
+    {
+      "row": 32,
+      "id": "SappedGround",
+      "buff": "[DNT-UNUSED] Sapped Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 18, invisible and undescribed - it applies an ailment",
+      "description": ""
+    },
+    {
+      "row": 33,
+      "id": "Sludge",
+      "buff": "Vomitous Ooze",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical and Chaos damage over time, and have reduced Movement Speed"
+    },
+    {
+      "row": 34,
+      "id": "Sanctum",
+      "buff": "Enervation",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical Damage over time and your Resolve is being drained."
+    },
+    {
+      "row": 35,
+      "id": "SanctumFire",
+      "buff": "Burning Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "Debuff inflicts [Fire] damage over time"
+    },
+    {
+      "row": 36,
+      "id": "SanctumChaos",
+      "buff": "Caustic Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": ""
+    },
+    {
+      "row": 37,
+      "id": "LivingBlood",
+      "buff": "Living Blood",
+      "buffs": 2,
+      "harm": "helpful",
+      "why": "buff category 1 - grants something",
+      "description": ""
+    },
+    {
+      "row": 38,
+      "id": "FungalArtillery",
+      "buff": "Spore Cloud",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Chaos Damage over Time and have reduced movement speed."
+    },
+    {
+      "row": 39,
+      "id": "ChimeraCorrupted",
+      "buff": "[DNT-UNUSED] Corrupted Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking fire, lightning and chaos damage over time."
+    },
+    {
+      "row": 40,
+      "id": "Jagged",
+      "buff": "Jagged Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "Debuff [Slow|Slows] movement speed."
+    },
+    {
+      "row": 41,
+      "id": "Sulphite",
+      "buff": "Voltaxic Sulphite Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Lightning and Physical damage over time."
+    },
+    {
+      "row": 42,
+      "id": "PhysFireLifeRecover",
+      "buff": "Sundered Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Physical and Fire Damage and have reduced Life Recovery Rate"
+    },
+    {
+      "row": 43,
+      "id": "PoisonCloud",
+      "buff": "Poisonous Cloud",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 18, invisible and undescribed - it applies an ailment",
+      "description": ""
+    },
+    {
+      "row": 44,
+      "id": "SpiderWeb",
+      "buff": "Spider's Web",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You have reduced Movement Speed"
+    },
+    {
+      "row": 45,
+      "id": "ManaSiphoningGround",
+      "buff": "Mana Siphoning",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You are taking Lightning Damage over time and having Mana drained. You cannot recover Mana"
+    },
+    {
+      "row": 46,
+      "id": "GenericGroundEffect",
+      "buff": "Blackflame Ground",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": "You have no Life or Energy Shield Recovery"
+    },
+    {
+      "row": 47,
+      "id": "Oasis",
+      "buff": "Navira's Oasis",
+      "buffs": 1,
+      "harm": "helpful",
+      "why": "buff category 1 - grants something",
+      "description": "You gain [Flask] charges and have significant Life and Mana [Recoup]."
+    },
+    {
+      "row": 48,
+      "id": "ElementalShredGround",
+      "buff": "",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": ""
+    },
+    {
+      "row": 49,
+      "id": "WitheredGround",
+      "buff": "",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 18, invisible and undescribed - it applies an ailment",
+      "description": ""
+    },
+    {
+      "row": 50,
+      "id": "Briarpatch",
+      "buff": "",
+      "buffs": 1,
+      "harm": "harmful",
+      "why": "buff category 2 - the debuff categories, and the descriptions say so",
+      "description": ""
+    },
+    {
+      "row": 51,
+      "id": "FeatheredGround",
+      "buff": "Soaring Ground",
+      "buffs": 1,
+      "harm": "helpful",
+      "why": "buff category 1 - grants something",
+      "description": "You have increased [Evasion] Rating, deal increased damage while on Full Life, and have [Onslaught]."
+    },
+    {
+      "row": 52,
+      "id": "Leyline",
+      "buff": "Leyline",
+      "buffs": 1,
+      "harm": "unclear",
+      "why": "buff category 18 with no description to read",
+      "description": "You deal more [Spell] damage, but are constantly losing [Ward|Runic Ward] and cannot recover it."
+    }
+  ]
+}

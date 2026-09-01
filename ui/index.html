@@ -107,19 +107,15 @@
     -->
     <section class="card" id="ground">
       <h2>Dangerous ground</h2>
-      <p class="dim">A rule is how you say <em>this ground hurts</em>. Nothing found in the game's
-        memory has been shown to say that, so a rule you write is the only thing here that makes
-        the claim — and it always wins over the overlay's own ground rings.</p>
-      <!--
-        The correction that cost the most to learn, stated on the page because the column below
-        would otherwise be read as "the game marks the dangerous ones for you". It does not. See
-        the GroundEffect comment in schema/poe2.offsets.json for the measurement.
-      -->
-      <p class="dim">The <em>tagged</em> column below says the game attached a ground-decal
-        component — <strong>not</strong> that it does damage. In the recorded session 5880 of
-        5916 of those were in a <em>hideout</em>, and one turned out to be the glow under an
-        Abyssal Arsenal. Treat it as "there is something drawn on the floor here", which is what
-        makes it useful for finding paths worth a rule.</p>
+      <p class="dim">A rule is how you say <em>ring this ground, in this colour, at this size</em>.
+        Where you have written one it wins over the overlay's own ground rings — not because it
+        knows more, but because it is an instruction you gave, and a tool that overrides those
+        quietly is one whose settings cannot be trusted.</p>
+      <p class="dim">Ground the game itself marks is already ringed without any rule, and the
+        overlay can name it: the component carries a row of the game's own table, so the label
+        reads <em>IgnitedGround — Ignited Ground</em> rather than a metadata path. All 53 rows in
+        that table are real effect kinds. A rule is worth writing for ground the reader lists but
+        the game does <em>not</em> mark, and for when you want a particular colour or size.</p>
       <!--
         Stated on the page because it is invisible from it, and because somebody hunting for the
         burning ground a rare left behind will otherwise conclude the picker is broken. The
