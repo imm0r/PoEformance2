@@ -244,7 +244,8 @@ internal static class Program
             // no recording in the repo holds the bytes that would say. See InventorySweep.
             if (options.SweepInventories)
             {
-                RunInventorySweep(reader, worldSchema, gameStatesAddress, recorder);
+                RunInventorySweep(
+                    reader, worldSchema, gameStatesAddress, recorder, options.TabName);
             }
 
             if (options.DumpAnimations)
@@ -1215,7 +1216,11 @@ internal static class Program
     /// would put a hundred megabytes of identical bytes in the recording that has to be uploaded.
     /// </remarks>
     private static void RunInventorySweep(
-        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+        IMemoryReader reader,
+        OffsetSchema schema,
+        ulong gameStatesStatic,
+        RecordingMemoryReader? recorder,
+        string tabName)
     {
         var sweep = new PoEformance.Game.Diagnostics.InventorySweep(reader, schema);
         var frames = new List<PoEformance.Game.Diagnostics.InventorySweepFrame>();
@@ -1225,7 +1230,7 @@ internal static class Program
             for (uint frame = 0; frame < replay.FrameCount; frame++)
             {
                 replay.Seek(frame);
-                if (sweep.SampleFrame(gameStatesStatic, (int)frame) is { } got)
+                if (sweep.SampleFrame(gameStatesStatic, (int)frame, tabName) is { } got)
                 {
                     frames.Add(got);
                 }
@@ -1272,11 +1277,28 @@ internal static class Program
             Console.WriteLine("  Any key to stop and report.");
             Console.WriteLine();
 
+            // The name hunt is the only part of this that can settle the naming question outright,
+            // and it cannot run at all without a word only the player knows.
+            if (tabName.Length == 0)
+            {
+                Console.WriteLine("  NO --tabname GIVEN, so the name hunt is skipped. A stash tab's name is");
+                Console.WriteLine("  your own word - the tool cannot know one - and with one it walks out");
+                Console.WriteLine("  from the inventories looking for it, which either finds the path or");
+                Console.WriteLine("  shows there is none. Add:  --tabname <the name of a tab you own>");
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine($"  HUNTING FOR \"{tabName}\" from every inventory, every array slot and both");
+                Console.WriteLine("  server-data structs. OPEN THE TAB WITH THAT NAME while this runs.");
+                Console.WriteLine();
+            }
+
             int failures = 0, frame = 0;
             while (!KeyPressed() && failures < ActionHuntMostFailures)
             {
                 recorder?.MarkFrame();
-                if (sweep.SampleFrame(gameStatesStatic, frame++) is { } got)
+                if (sweep.SampleFrame(gameStatesStatic, frame++, tabName) is { } got)
                 {
                     failures = 0;
                     frames.Add(got);
@@ -3270,6 +3292,7 @@ internal static class Program
         bool HuntHover,
         bool SweepComponents,
         bool SweepInventories,
+        string TabName,
         bool DumpGroundTypes,
         bool DumpAnimations,
         bool ReadGlossary,
@@ -3289,6 +3312,7 @@ internal static class Program
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false;
             bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
             var inventorySweep = false;
+            string tabName = string.Empty;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -3394,6 +3418,14 @@ internal static class Program
                         inventorySweep = true;
                         break;
 
+                    // The one thing the tool cannot know and must be told: a stash tab's name is
+                    // the player's own word. Given one, the sweep walks outwards from the
+                    // inventories looking for it, and either produces a path or establishes that
+                    // there is none - see InventorySweep.Hunt.
+                    case "--tabname":
+                        tabName = Value(ref i) ?? string.Empty;
+                        break;
+
                     case "--groundtypes":
                         groundTypeDump = true;
                         break;
@@ -3464,7 +3496,7 @@ internal static class Program
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
                 debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep,
-                inventorySweep, groundTypeDump, animDump,
+                inventorySweep, tabName, groundTypeDump, animDump,
                 glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
     }

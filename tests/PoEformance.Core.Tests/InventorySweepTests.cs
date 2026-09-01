@@ -40,8 +40,93 @@ public class InventorySweepTests
     private static string Sweep(params InventoryObservation[] seen)
     {
         var writer = new StringWriter();
-        InventorySweep.Report([new InventorySweepFrame(0, seen)], writer);
+        InventorySweep.Report([new InventorySweepFrame(0, seen, [], true, [], false)], writer);
         return writer.ToString();
+    }
+
+    [Fact]
+    public void AListSearchTHATCouldNotRunSaysSoRatherThanReportingNone()
+    {
+        // THE MISTAKE THIS FLAG EXISTS FOR, pinned. A capture made by a build that never
+        // performed the read comes back with an empty list, and an empty list printed as "none"
+        // reads as an answer - which cost this line of work a whole round once already.
+        var writer = new StringWriter();
+        InventorySweep.Report(
+            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], false, [], false)], writer);
+
+        Assert.Contains("NOT SEARCHED", writer.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ACandidateHoldingTextIsReportedEvenWithNoPlausibleStride()
+    {
+        // The count rule can only ever REJECT, and a name list covering a different set of tabs
+        // than the inventories would fail it. Text is the evidence, so text alone is enough to
+        // be printed - and printed first, with the stars.
+        var writer = new StringWriter();
+        InventorySweep.Report(
+            [
+                new InventorySweepFrame(
+                    0,
+                    [Make(NormalId, (0x40, 1))],
+                    [new ParallelList("inner", 0x320, 0x7F00, 0, 0, ["breach"])],
+                    true,
+                    [],
+                    false),
+            ],
+            writer);
+
+        string said = writer.ToString();
+        Assert.Contains("*** inner +0x0320", said, StringComparison.Ordinal);
+        Assert.Contains("breach", said, StringComparison.Ordinal);
+        Assert.Contains("no plausible stride", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANameHuntNOBodyAskedForIsNotReportedAsHavingFoundNothing()
+    {
+        // The same distinction as NOT SEARCHED, for the one search that can settle the question:
+        // a run without --tabname cannot have found the name, and printing that as "not found"
+        // would turn a missing argument into evidence.
+        string said = Sweep(Make(NormalId, (0x40, 1)));
+
+        Assert.Contains("NOT HUNTED", said, StringComparison.Ordinal);
+        Assert.DoesNotContain("NOT FOUND", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANameHuntTHATRanAndFoundNothingSaysNOTFOUND()
+    {
+        // And the other side of it: hunted, empty, is a real negative result - the evidence that
+        // the name does not hang off the stash data - so it reads as one.
+        var writer = new StringWriter();
+        InventorySweep.Report(
+            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], true, [], true)], writer);
+
+        Assert.Contains("NOT FOUND", writer.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void APathToTheNameIsReportedWithTheHopsThatReachedIt()
+    {
+        // THE ANSWER, if there is one. The path is the deliverable - it is what a schema entry is
+        // written from - so it is printed whole rather than summarised.
+        var writer = new StringWriter();
+        InventorySweep.Report(
+            [
+                new InventorySweepFrame(
+                    0,
+                    [Make(NormalId, (0x40, 1))],
+                    [],
+                    true,
+                    [new NameHit("inv 42 +0x0F0 +0x018", 0x7F00, 0x18, "blaaaaffp4ff")],
+                    true),
+            ],
+            writer);
+
+        string said = writer.ToString();
+        Assert.Contains("inv 42 +0x0F0 +0x018", said, StringComparison.Ordinal);
+        Assert.Contains("blaaaaffp4ff", said, StringComparison.Ordinal);
     }
 
     [Fact]

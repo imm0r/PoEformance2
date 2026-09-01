@@ -39,8 +39,51 @@ public sealed record InventoryObservation(
     int Cells,
     byte[] Shared);
 
+/// <summary>
+/// A vector sitting beside PlayerInventories that could be the per-tab list.
+/// </summary>
+/// <param name="Where">Which struct it was found in - the outer server data, or the inner one.</param>
+/// <param name="Offset">Where in that struct the vector's two pointers are.</param>
+/// <param name="Stride">
+/// The element size that made its length divide into about one record per inventory, or 0 when
+/// none did. ZERO IS NOT A REJECTION - a candidate holding text is reported whatever its shape.
+/// </param>
+/// <param name="Count">How many elements that gives, or 0 with no stride.</param>
+/// <param name="Text">
+/// Any text found in its first few entries. THIS IS THE ANSWER when it holds a tab name: the
+/// names are the player's own words, so nothing but the real list can produce them.
+/// </param>
+public sealed record ParallelList(
+    string Where, int Offset, ulong First, int Stride, int Count, IReadOnlyList<string> Text);
+
+/// <summary>Where a tab's own name turned up, and how it was reached.</summary>
+/// <param name="Path">
+/// The hops from a named root - "inv 42 +0x0F0 +0x018". THIS IS THE DELIVERABLE: a path is a
+/// schema entry, and the whole question is whether one exists from the inventories at all.
+/// </param>
+/// <param name="At">The struct the string header sits in.</param>
+/// <param name="Offset">Where in that struct, so the path can be turned into offsets.</param>
+/// <param name="Text">What was read, to confirm it is the name and not a coincidence.</param>
+public sealed record NameHit(string Path, ulong At, int Offset, string Text);
+
 /// <summary>What one frame of the sweep saw.</summary>
-public sealed record InventorySweepFrame(int Frame, IReadOnlyList<InventoryObservation> Seen);
+/// <param name="Searched">
+/// Whether the server-data window could be read at all. FALSE AND EMPTY IS NOT NONE - a window
+/// nobody read has already been reported as "nothing found" once in this line of work, and the
+/// round it cost is the reason this flag exists rather than an inference from an empty list.
+/// </param>
+/// <param name="Hits">
+/// Every place a given tab name was reachable from the inventories or the server data. Empty
+/// when no name was given to look for - see <paramref name="Hunted"/>.
+/// </param>
+/// <param name="Hunted">Whether a name was given at all, for the same reason Searched exists.</param>
+public sealed record InventorySweepFrame(
+    int Frame,
+    IReadOnlyList<InventoryObservation> Seen,
+    IReadOnlyList<ParallelList> Lists,
+    bool Searched,
+    IReadOnlyList<NameHit> Hits,
+    bool Hunted);
 
 /// <summary>
 /// Reads every inventory whole, to find what says which SORT of tab it is.
@@ -166,7 +209,11 @@ public sealed class InventorySweep
     }
 
     /// <summary>Every inventory this frame, or null when the chain did not resolve.</summary>
-    public InventorySweepFrame? SampleFrame(ulong gameStatesStatic, int frame)
+    /// <param name="needle">
+    /// A tab name to hunt for, or empty. GIVEN BY THE PLAYER, because it has to be: the names are
+    /// their own words, so the tool cannot know one and cannot recognise one it has not been told.
+    /// </param>
+    public InventorySweepFrame? SampleFrame(ulong gameStatesStatic, int frame, string needle = "")
     {
         GameChainAddresses chain = GameChain.Resolve(_reader, _schema, gameStatesStatic);
         if (chain.AreaInstance == 0)
@@ -259,7 +306,292 @@ public sealed class InventorySweep
                 id, entry, _entry[..], at, _buffer[..got], columns, rows, cells, before));
         }
 
-        return new InventorySweepFrame(frame, seen);
+        var lists = new List<ParallelList>();
+        bool searched = Parallel("inner", holder, seen.Count, lists);
+        if (serverData != holder)
+        {
+            searched |= Parallel("outer", serverData, seen.Count, lists);
+        }
+
+        IReadOnlyList<NameHit> hits = Hunt(needle, seen, serverData, holder);
+        return new InventorySweepFrame(frame, seen, lists, searched, hits, needle.Length > 0);
+    }
+
+    /// <summary>How much of each struct the name hunt reads.</summary>
+    private const int HuntWindow = 0x100;
+
+    /// <summary>How many pointers deep the hunt follows.</summary>
+    /// <remarks>
+    /// Three, because a name hanging off an inventory would be at most a container and a record
+    /// away, and every extra hop multiplies the reads by the number of pointers in a struct.
+    /// </remarks>
+    private const int HuntDepth = 3;
+
+    /// <summary>How many structs the hunt may read, so a wide graph cannot fill the recording.</summary>
+    private const int MostNodes = 4000;
+
+    /// <summary>
+    /// Walks outwards from the inventories looking for a name the player supplied.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE SEARCH THAT CANNOT FOOL ANYBODY, and the reason it exists is that a player scanned
+    /// their own tab name in Cheat Engine and found it at exactly two addresses - so the string is
+    /// certainly in memory, and the only open question is whether anything ON THE STASH SIDE
+    /// points at it. Every other test in this file infers; this one either produces a path from an
+    /// inventory to the player's own word, or it does not.
+    ///
+    /// BOTH ANSWERS ARE WORTH THE CAPTURE. A path is the feature. No path, from the inventories,
+    /// from their array slots and from both server-data structs, three pointers deep, is the
+    /// evidence that the name is held UI-side only - which is what this project has believed for
+    /// several rounds now on the strength of an inference nobody tested.
+    ///
+    /// The needle is matched case-insensitively and as a SUBSTRING, so a player can pass part of a
+    /// name and so that the surrounding storage - a name inside a longer record string - still
+    /// registers rather than being missed on an exact-match rule.
+    /// </remarks>
+    private IReadOnlyList<NameHit> Hunt(
+        string needle, IReadOnlyList<InventoryObservation> seen, ulong serverData, ulong holder)
+    {
+        var hits = new List<NameHit>();
+        if (string.IsNullOrEmpty(needle))
+        {
+            return hits;
+        }
+
+        var visited = new HashSet<ulong>();
+        var queue = new Queue<(ulong At, int Size, string Path, int Depth)>();
+
+        void Push(ulong at, int size, string path, int depth)
+        {
+            if (depth > HuntDepth
+                || !MemoryReaderExtensions.IsPlausiblePointer(at)
+                || !visited.Add(at))
+            {
+                return;
+            }
+
+            queue.Enqueue((at, size, path, depth));
+        }
+
+        // The inventories FIRST, and their array slots with them. Breadth-first means everything
+        // one hop from a stash tab is read before anything one hop from the server struct, so the
+        // budget goes on the side of the graph the question is about.
+        foreach (InventoryObservation one in seen)
+        {
+            Push(one.Address, HuntWindow, $"inv {one.Id}", 0);
+            Push(one.Entry, EntryWindow, $"slot {one.Id}", 0);
+        }
+
+        Push(holder, ListSearch, "inner", 0);
+        Push(serverData, ListSearch, "outer", 0);
+
+        var window = new byte[ListSearch + TextProbe.HeaderSize];
+        var nodes = 0;
+
+        while (queue.Count > 0 && nodes < MostNodes && hits.Count < 32)
+        {
+            (ulong at, int size, string path, int depth) = queue.Dequeue();
+            nodes++;
+
+            // The ladder again: a read is all-or-nothing, so a window running off the end of a
+            // mapping takes nothing rather than the part that is there.
+            var got = 0;
+            foreach (int want in (int[])[size + TextProbe.HeaderSize, size, 0x80, 0x40])
+            {
+                if (want <= window.Length && _reader.TryRead(at, window.AsSpan(0, want)))
+                {
+                    got = want;
+                    break;
+                }
+            }
+
+            if (got == 0)
+            {
+                continue;
+            }
+
+            for (int row = 0; row + TextProbe.HeaderSize <= got; row += 8)
+            {
+                TextCandidate candidate = TextProbe.At(window.AsSpan(0, got), row);
+                string text = candidate.Shape switch
+                {
+                    TextShape.Inline => candidate.Text,
+                    TextShape.Heap =>
+                        _reader.ReadUnicodeString(candidate.Address, Math.Min(candidate.Length, 128)),
+                    _ => string.Empty,
+                };
+
+                if (text.Contains(needle, StringComparison.OrdinalIgnoreCase))
+                {
+                    hits.Add(new NameHit($"{path} +0x{row:X3}", at, row, text));
+                }
+            }
+
+            if (depth >= HuntDepth)
+            {
+                continue;
+            }
+
+            for (int row = 0; row + 8 <= got; row += 8)
+            {
+                Push(BitConverter.ToUInt64(window, row), HuntWindow, $"{path} +0x{row:X3}", depth + 1);
+            }
+        }
+
+        return hits;
+    }
+
+    /// <summary>How far into a server-data struct to look for a sibling vector.</summary>
+    /// <remarks>
+    /// PlayerInventories is at 0x320 and a list kept alongside it has no reason to be far off,
+    /// but "no reason to be" is a guess and this costs one read of one struct - not one per
+    /// inventory. Sixteen kilobytes is cheap enough that guessing narrower would be the
+    /// expensive choice.
+    /// </remarks>
+    public const int ListSearch = 0x4000;
+
+    /// <summary>
+    /// How much of a candidate's contents to scan for text.
+    /// </summary>
+    /// <remarks>
+    /// Enough for the first several records whatever their size, and no more: the question is
+    /// whether this list holds NAMES at all, which its head answers. Reading all of a 200-entry
+    /// vector to confirm what its first entries already said would multiply the capture for
+    /// nothing.
+    /// </remarks>
+    private const int Probe = 0x200;
+
+    /// <summary>How many distinct targets one struct may probe, so a bad window cannot run away.</summary>
+    private const int MostProbes = 512;
+
+    /// <summary>
+    /// Vectors beside PlayerInventories, and any TEXT their first entries hold.
+    /// </summary>
+    /// <remarks>
+    /// THE LAST PLACE THE ANSWER CAN BE, and the note at <c>StashReader.Read</c> has pointed at
+    /// it since before anybody looked: it says the tab NAMES live in a separate list matched to
+    /// the inventories by position. Nothing has ever gone to find that list. Everything else is
+    /// ruled out - see the Inventory comment in the schema.
+    ///
+    /// A COUNT ALONE PROVES NOTHING, WHICH IS WHY IT IS NOT THE FILTER. A struct this size holds
+    /// many pointer pairs that happen to divide evenly, and "a vector of about 200 things" is the
+    /// weak structural fingerprint this project keeps being burned by. Worse, it can only reject:
+    /// a name list covering a different set of tabs than the inventories - the stash ones only,
+    /// say - fails a count rule and is thrown away unlooked-at, which is the one outcome this
+    /// round cannot afford.
+    ///
+    /// So EVERY vector-shaped pair gets its contents read, and TEXT decides. The tab names are the
+    /// player's own words, so nothing but the real list can produce them; a stride and a count are
+    /// worked out afterwards, for reporting, and a candidate that has no plausible stride is still
+    /// reported when it holds names. What is bounded instead is the cost: distinct targets only,
+    /// <see cref="Probe"/> bytes of each, at most <see cref="MostProbes"/> per struct.
+    /// </remarks>
+    /// <returns>Whether the window could be read - see InventorySweepFrame.Searched.</returns>
+    private bool Parallel(string where, ulong at, int inventories, List<ParallelList> into)
+    {
+        if (!MemoryReaderExtensions.IsPlausiblePointer(at) || inventories <= 0)
+        {
+            return false;
+        }
+
+        // The same ladder the inventory read uses, and for the same two reasons: a read is
+        // all-or-nothing so a window running past the mapping takes nothing, and an older
+        // recording holds whatever the build of the day asked for.
+        var window = new byte[ListSearch];
+        var reach = 0;
+        foreach (int size in (int[])[ListSearch, 0x2000, 0x1000, 0x800])
+        {
+            if (_reader.TryRead(at, window.AsSpan(0, size)))
+            {
+                reach = size;
+                break;
+            }
+        }
+
+        if (reach == 0)
+        {
+            return false;
+        }
+
+        // One read per TARGET, not per offset that mentions it. A vector's pointers turn up
+        // repeatedly in a struct this size, and probing the same address ten times would spend
+        // the budget on one candidate.
+        var probed = new HashSet<ulong>();
+
+        for (int offset = 0; offset + 16 <= reach; offset += 8)
+        {
+            ulong first = BitConverter.ToUInt64(window, offset);
+            ulong last = BitConverter.ToUInt64(window, offset + 8);
+
+            if (!MemoryReaderExtensions.IsPlausiblePointer(first)
+                || last <= first
+                || last - first > 0x100000)
+            {
+                continue;
+            }
+
+            ulong span = last - first;
+            (int Stride, int Count) shape = Shape(span, inventories);
+
+            if (probed.Count >= MostProbes && shape.Stride == 0)
+            {
+                continue;
+            }
+
+            IReadOnlyList<string> text = [];
+            if (probed.Add(first) && probed.Count <= MostProbes)
+            {
+                text =
+                [
+                    .. _stash.StringsIn(first, 0, (int)Math.Min(span, Probe))
+                        .Select(one => one.Text)
+                        .Distinct()
+                        .Take(12),
+                ];
+            }
+
+            // Text is the answer; a plausible stride is only a lead. Anything with neither is
+            // one of the thousands of pointer pairs a struct this size holds, and saying so
+            // would bury the thing being looked for.
+            if (text.Count > 0 || shape.Stride != 0)
+            {
+                into.Add(new ParallelList(
+                    where, offset, first, shape.Stride, shape.Count, text));
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>Element sizes a record list plausibly uses.</summary>
+    private static readonly int[] Strides =
+        [8, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x40, 0x48, 0x50, 0x60, 0x80];
+
+    /// <summary>
+    /// The stride that makes a span into about one record per inventory, or nothing.
+    /// </summary>
+    /// <remarks>
+    /// Wide on purpose, and only ever a LEAD: a per-tab list might cover every inventory or only
+    /// the stash ones, so the range is generous and a miss here does not stop the candidate being
+    /// read - see the note on <c>Parallel</c>.
+    /// </remarks>
+    private static (int Stride, int Count) Shape(ulong span, int inventories)
+    {
+        foreach (int stride in Strides)
+        {
+            if (span % (ulong)stride != 0)
+            {
+                continue;
+            }
+
+            var count = (int)(span / (ulong)stride);
+            if (count >= inventories / 4 && count <= inventories * 2)
+            {
+                return (stride, count);
+            }
+        }
+
+        return (0, 0);
     }
 
     /// <summary>Whether an id is one of the Merchant's shop pages - the control group.</summary>
@@ -313,6 +645,8 @@ public sealed class InventorySweep
                 "  tested against a sort we know. Open the Merchant window once and sweep again.");
         }
 
+        DrawHits(best.Hits, best.Hunted, output);
+        DrawLists(best.Lists, best.Searched, output);
         DrawByShape("array slot", seen, one => one.EntryBytes, output);
         DrawByShape("inventory head", seen, one => one.Bytes, output);
         DrawByShape("before the inventory", seen, one => one.Shared, output);
@@ -320,6 +654,115 @@ public sealed class InventorySweep
         DrawCandidates("inventory head", seen, one => one.Bytes, Window, output);
         DrawCandidates("before the inventory", seen, one => one.Shared, SharedWindow, output);
         DrawInventories(seen, output);
+    }
+
+    /// <summary>
+    /// Where the player's own tab name was reachable from - the answer, if there is one.
+    /// </summary>
+    /// <remarks>
+    /// FIRST IN THE REPORT because it is the only part that settles anything. A path from an
+    /// inventory to a name is the feature; no path is the evidence for the conclusion this
+    /// project has been drawing without it.
+    /// </remarks>
+    private static void DrawHits(IReadOnlyList<NameHit> hits, bool hunted, TextWriter output)
+    {
+        output.WriteLine();
+        output.WriteLine("  the tab name, reached from the stash side:");
+
+        // The same distinction the rest of this report insists on: nobody looked is not nothing
+        // was there.
+        if (!hunted)
+        {
+            output.WriteLine("    NOT HUNTED - no name was given. Re-run with:");
+            output.WriteLine("      PoEformance.App --record inv.rec --inventories --tabname <a tab's name>");
+            return;
+        }
+
+        if (hits.Count == 0)
+        {
+            output.WriteLine("    NOT FOUND from any inventory, any array slot, or either server-data");
+            output.WriteLine("    struct, three pointers deep. The name is in memory - a string scan");
+            output.WriteLine("    finds it - so this says it does not hang off the stash data, and the");
+            output.WriteLine("    UI tree is where it lives.");
+            return;
+        }
+
+        foreach (NameHit hit in hits)
+        {
+            output.WriteLine($"    *** {hit.Path}  =  \"{hit.Text}\"   (0x{hit.At:X} +0x{hit.Offset:X})");
+        }
+    }
+
+    /// <summary>
+    /// The vectors sitting beside PlayerInventories, the ones carrying TEXT first.
+    /// </summary>
+    /// <remarks>
+    /// TEXT FIRST AND LOUDLY, because if the answer is here it is a tab name, and a tab name is
+    /// unmistakable: the player wrote it. Everything below the text is a lead at best - "a vector
+    /// of about the right length" is the weak structural fingerprint this project keeps being
+    /// burned by, and it is printed only so a person can point at one and say what it is.
+    /// </remarks>
+    private static void DrawLists(
+        IReadOnlyList<ParallelList> lists, bool searched, TextWriter output)
+    {
+        output.WriteLine();
+        output.WriteLine("  vectors beside PlayerInventories - THE TAB NAMES WOULD BE HERE:");
+
+        // NOT SEARCHED IS NOT NONE. This exact confusion has already cost a round in this line of
+        // work - a capture came back without the sweep in it and the report read as if the answer
+        // had been looked for and was absent. An empty list from a window nobody could read is
+        // silence, not a negative result.
+        if (!searched)
+        {
+            output.WriteLine("    NOT SEARCHED - the server-data struct could not be read in this");
+            output.WriteLine("    capture, so nothing here can be concluded either way.");
+            return;
+        }
+
+        if (lists.Count == 0)
+        {
+            output.WriteLine("    none - no pointer pair in either server-data struct leads to text");
+            output.WriteLine("    or to a plausible number of records. The list may not exist, or");
+            output.WriteLine("    may not hang off these two structs at all.");
+            return;
+        }
+
+        List<ParallelList> named = [.. lists.Where(list => list.Text.Count > 0)];
+
+        if (named.Count == 0)
+        {
+            output.WriteLine(
+                $"    {lists.Count} candidates by shape, NONE of them holding any text.");
+        }
+
+        foreach (ParallelList list in named)
+        {
+            output.WriteLine($"    *** {Line(list)}");
+            output.WriteLine($"        text: {string.Join(" | ", list.Text)}");
+        }
+
+        // The rest, compactly. A person reading this knows how many tabs they own, which is a
+        // fact no rule here has.
+        foreach (ParallelList list in lists.Where(list => list.Text.Count == 0).Take(24))
+        {
+            output.WriteLine($"    {Line(list)}");
+        }
+
+        int hidden = lists.Count(list => list.Text.Count == 0) - 24;
+        if (hidden > 0)
+        {
+            output.WriteLine($"    ...and {hidden} more without text.");
+        }
+    }
+
+    /// <summary>One candidate on one line - stride unknown reads as such rather than as zero.</summary>
+    private static string Line(ParallelList list)
+    {
+        string shape = list.Stride == 0
+            ? "no plausible stride"
+            : $"{list.Count} x 0x{list.Stride:X}";
+
+        return $"{list.Where} +0x{list.Offset:X4}  {shape}  at 0x{list.First:X}";
     }
 
     /// <summary>
