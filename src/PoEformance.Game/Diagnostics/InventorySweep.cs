@@ -13,7 +13,17 @@ namespace PoEformance.Game.Diagnostics;
 /// <param name="Address">The Inventory the slot points at.</param>
 /// <param name="Bytes">Its head, as far as the read got.</param>
 /// <param name="Columns">Its grid, so an entry can be recognised without its id.</param>
-/// <param name="Items">How many items were in it - 0 for a tab the game has not loaded.</param>
+/// <param name="Cells">
+/// How many slots its item list holds - 0 for a tab the game has not loaded.
+/// </param>
+/// <remarks>
+/// CELLS, NOT ITEMS, and the first run of this sweep called them items and was wrong: every
+/// number it printed was exactly columns times rows. The list is one slot per CELL, mostly null
+/// - see StashReader.Items, which deduplicates by item because a two-by-three piece of armour
+/// occupies six of them. Counting the real items would mean reading every slot, which is 4.6 KB
+/// per inventory against this whole window's 544, and it is not what the sweep is for. What the
+/// number is good for is telling a loaded tab from an unopened one, which it does exactly.
+/// </remarks>
 public sealed record InventoryObservation(
     int Id,
     ulong Entry,
@@ -22,7 +32,7 @@ public sealed record InventoryObservation(
     byte[] Bytes,
     int Columns,
     int Rows,
-    int Items);
+    int Cells);
 
 /// <summary>What one frame of the sweep saw.</summary>
 public sealed record InventorySweepFrame(int Frame, IReadOnlyList<InventoryObservation> Seen);
@@ -71,6 +81,16 @@ public sealed class InventorySweep
 
     /// <summary>One slot of the inventory array, whole.</summary>
     public const int EntryWindow = 0x18;
+
+    /// <summary>
+    /// The highest row number StashType has, so a type field cannot hold more than this.
+    /// </summary>
+    /// <remarks>
+    /// Twenty-five rows, NormalStash through RelicStash, read off the dat export rather than
+    /// guessed. It is the one hard bound the question has, and using it is the difference
+    /// between asking what a field HOLDS and asking merely how varied it is.
+    /// </remarks>
+    public const uint LastStashType = 24;
 
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
@@ -177,12 +197,12 @@ public sealed class InventorySweep
 
             ulong items = _reader.ReadPointer(at + (ulong)_itemList);
             ulong itemsEnd = _reader.ReadPointer(at + (ulong)_itemListLast);
-            int held = MemoryReaderExtensions.IsPlausiblePointer(items) && itemsEnd > items
+            int cells = MemoryReaderExtensions.IsPlausiblePointer(items) && itemsEnd > items
                 ? (int)Math.Min((long)(itemsEnd - items) / 8, StashReader.MostItems)
                 : 0;
 
             seen.Add(new InventoryObservation(
-                id, entry, _entry[..], at, _buffer[..], columns, rows, held));
+                id, entry, _entry[..], at, _buffer[..], columns, rows, cells));
         }
 
         return new InventorySweepFrame(frame, seen);
@@ -227,7 +247,7 @@ public sealed class InventorySweep
         output.WriteLine();
         output.WriteLine(
             $"inventory sweep - {frames.Count} frames, richest holds {seen.Count} inventories "
-            + $"({shops} shop pages, {seen.Count(one => one.Items > 0)} with items).");
+            + $"({shops} shop pages, {seen.Count(one => one.Cells > 0)} loaded).");
 
         if (shops < 2)
         {
@@ -248,11 +268,19 @@ public sealed class InventorySweep
     /// Every 4-byte field that could be a type, and whether the game agrees it is one.
     /// </summary>
     /// <remarks>
-    /// THREE CONDITIONS, ALL OF WHICH THE GAME SETTLES, because a structural fingerprint alone
+    /// FOUR CONDITIONS, ALL OF WHICH THE GAME SETTLES, because a structural fingerprint alone
     /// has fooled this project before - a plausible pointer and a unit-length row look like
-    /// anything. A type field must: take FEW values, since StashType has 25 rows; be the SAME on
-    /// both shop pages, which are the same sort by construction; and DIFFER on at least one
-    /// ordinary tab, or it is saying nothing about sort at all.
+    /// anything. A type field must: hold only values StashType has a row for, so 0 to 24; be the
+    /// SAME on both shop pages, which are the same sort by construction; DIFFER on at least one
+    /// ordinary tab, or it is saying nothing about sort; and not be half of an address.
+    ///
+    /// THE FIRST TWO OF THOSE ARE A CORRECTION. The first run tested how MANY distinct values a
+    /// field took rather than what those values WERE, which is a different and far weaker
+    /// question - and it let through sixty-odd offsets, almost all of them the upper halves of
+    /// 64-bit pointers. With two heap regions in play those halves take exactly two values
+    /// (0x38F and 0x390), pass a "few values" test perfectly, and agree across any two rows half
+    /// the time by chance. That is precisely the weak fingerprint CLAUDE.md warns about, arrived
+    /// at by writing a check that did not say what it was described as saying.
     ///
     /// Everything that survives is printed with its values, because the last step is somebody
     /// looking at whether "the currency tab and the essence tab differ" matches the tabs they own.
@@ -275,6 +303,7 @@ public sealed class InventorySweep
             uint? shop = null;
             var shopsAgree = true;
             var readable = 0;
+            var pointerHalf = false;
 
             foreach (InventoryObservation one in seen)
             {
@@ -282,6 +311,16 @@ public sealed class InventorySweep
                 if (bytes.Length < offset + 4)
                 {
                     continue;
+                }
+
+                // THE EIGHT BYTES THIS FIELD SITS INSIDE, on their natural alignment. If those
+                // read as an address then this "field" is half of one, and its upper half in
+                // particular takes one value per heap region - which is two, on this game.
+                int aligned = offset & ~7;
+                if (bytes.Length >= aligned + 8
+                    && MemoryReaderExtensions.IsPlausiblePointer(BitConverter.ToUInt64(bytes, aligned)))
+                {
+                    pointerHalf = true;
                 }
 
                 uint value = BitConverter.ToUInt32(bytes, offset);
@@ -301,10 +340,15 @@ public sealed class InventorySweep
                 shop ??= value;
             }
 
-            // A field every inventory agrees on says nothing about sort; one with a value per
-            // inventory is an id, an address or a count. StashType has 25 rows, so a type takes
-            // at most that many - and at least two, or the first rule would have caught it.
-            if (readable == 0 || values.Count < 2 || values.Count > 25)
+            // A field every inventory agrees on says nothing about sort. And the VALUES have to
+            // be ones StashType has a row for - which is the test this used to get wrong, by
+            // counting how many distinct values there were instead of looking at them.
+            if (readable == 0 || values.Count < 2 || pointerHalf)
+            {
+                continue;
+            }
+
+            if (values.Keys.Any(value => value > LastStashType))
             {
                 continue;
             }
@@ -340,25 +384,37 @@ public sealed class InventorySweep
     }
 
     /// <summary>The inventories themselves, so a candidate can be checked against known tabs.</summary>
+    /// <remarks>
+    /// The shop pages FIRST whatever their size, because they are the control group and the
+    /// reader's eye needs them next to an ordinary tab to judge any candidate at all.
+    /// </remarks>
     private static void DrawInventories(IReadOnlyList<InventoryObservation> seen, TextWriter output)
     {
         output.WriteLine();
-        output.WriteLine("  what was read (loaded ones first - an unopened tab holds nothing here):");
+        output.WriteLine("  what was read (cells, not items - the list is one slot per cell):");
 
-        foreach (InventoryObservation one in seen.OrderByDescending(one => one.Items).Take(40))
+        List<InventoryObservation> order =
+            [.. seen.OrderByDescending(one => IsShop(one.Id)).ThenByDescending(one => one.Cells)];
+
+        foreach (InventoryObservation one in order.Take(40))
         {
             output.WriteLine(
                 $"    id {one.Id.ToString(CultureInfo.InvariantCulture),12}  "
-                + $"{one.Columns,2}x{one.Rows,-2}  {one.Items,4} items  "
+                + $"{one.Columns,2}x{one.Rows,-2}  {one.Cells,4} cells  "
                 + $"slot +0x04={BitConverter.ToUInt32(one.EntryBytes, 4):X8}  "
                 + $"0x{one.Address:X}"
                 + (IsShop(one.Id) ? "   <- shop page" : string.Empty));
         }
 
-        int rest = seen.Count - Math.Min(40, seen.Count);
-        if (rest > 0)
+        // COUNTED, not assumed. This line used to say "all holding nothing" about rows it had
+        // never looked at, which is the same fault as the report it belongs to: an assertion
+        // written where a measurement was meant.
+        List<InventoryObservation> rest = [.. order.Skip(40)];
+        if (rest.Count > 0)
         {
-            output.WriteLine($"    ...and {rest} more, all holding nothing.");
+            int loaded = rest.Count(one => one.Cells > 0);
+            output.WriteLine(
+                $"    ...and {rest.Count} more, {loaded} of them loaded.");
         }
     }
 }

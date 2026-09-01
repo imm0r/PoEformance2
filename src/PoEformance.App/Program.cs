@@ -1242,6 +1242,23 @@ internal static class Program
             Console.WriteLine("inventory sweep - reading every inventory whole, to find what says");
             Console.WriteLine("what SORT of tab it is.");
             Console.WriteLine();
+
+            // SAID BEFORE A MINUTE IS SPENT, because this exact thing has already cost a round:
+            // the first capture was made without --record, the console report looked perfectly
+            // healthy, and the recording that was uploaded turned out to hold only the six
+            // fields the ordinary stash reader touches. A sweep whose entire purpose is to land
+            // in a file must not run silently when there is no file.
+            if (recorder is null)
+            {
+                Console.WriteLine("  *** NOT RECORDING. This sweep exists to put bytes nothing else reads");
+                Console.WriteLine("  *** into a --record file, so that they can be decoded afterwards. The");
+                Console.WriteLine("  *** report below is a summary; the BYTES are the deliverable, and");
+                Console.WriteLine("  *** without --record they are gone the moment this exits.");
+                Console.WriteLine("  ***");
+                Console.WriteLine("  *** Re-run as:  PoEformance.App --record inventories.rec --inventories");
+                Console.WriteLine();
+            }
+
             Console.WriteLine("  OPEN YOUR STASH AND CLICK THROUGH THE TABS while this runs. A tab the");
             Console.WriteLine("  game has not been asked to load reads as empty from here, so the sweep");
             Console.WriteLine("  is worth exactly as much of the stash as you visit.");
@@ -1266,7 +1283,7 @@ internal static class Program
 
                     Console.WriteLine(
                         $"  ... {frames.Count} frames; {got.Seen.Count} inventories, "
-                        + $"{got.Seen.Count(one => one.Items > 0)} loaded, "
+                        + $"{got.Seen.Count(one => one.Cells > 0)} loaded, "
                         + $"{got.Seen.Count(one => PoEformance.Game.Diagnostics.InventorySweep.IsShop(one.Id))}"
                         + " shop pages");
                 }
@@ -1280,6 +1297,22 @@ internal static class Program
         }
 
         PoEformance.Game.Diagnostics.InventorySweep.Report(frames, Console.Out);
+
+        // AND SAID AGAIN AFTERWARDS, with the number. A byte count is the one thing that can be
+        // checked before uploading a file: the sweep's own reads are 544 bytes an inventory, so
+        // a capture of a real stash is megabytes, and anything smaller means it did not land.
+        if (recorder is not null)
+        {
+            Console.WriteLine();
+            Console.WriteLine(
+                $"  recorded {recorder.RecordedBytes / 1024} KB in all this session"
+                + (recorder.ReachedSizeLimit ? " - THE SIZE CAP WAS REACHED, so the tail is missing." : "."));
+        }
+        else if (reader is not ReplayMemoryReader)
+        {
+            Console.WriteLine();
+            Console.WriteLine("  NOTHING WAS RECORDED - see the warning above. Re-run with --record.");
+        }
     }
 
     /// <summary>How long between inventory samples. See RunInventorySweep for why it is slow.</summary>
