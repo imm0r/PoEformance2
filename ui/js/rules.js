@@ -98,6 +98,14 @@ export class RulesPanel {
     note.title = view.loadNote ?? "";
     note.hidden = !view.loadNote;
 
+    // What the last aim did, which is never in the status: the pointer sequence finishes after
+    // the tick that started it. Carries its own age, so a line left over from the last fight
+    // cannot be mistaken for what is happening now.
+    const aim = $("rl-aim-note");
+    aim.textContent = view.aimNote ?? "";
+    aim.title = "The last effect that aimed at a monster before acting.";
+    aim.hidden = !view.aimNote;
+
     // Always, even mid-edit: it is a readout, it replaces no control, and a buff list that
     // froze while somebody was typing a buff name would be useless exactly when it is wanted.
     this.renderBuffs(view.buffs ?? [], view.buffRead ?? "");
@@ -845,12 +853,67 @@ export class RulesPanel {
       }
 
       fields.appendChild(this.cooldown(effect, change));
+      fields.appendChild(this.aim(effect, change));
       return fields;
     }
 
-    // Mouse and wheel: nothing to aim, so a cooldown is the only thing worth setting.
+    // Mouse and wheel: a cooldown, and the same aiming - a click is exactly the thing that
+    // wants the pointer put somewhere first.
     fields.appendChild(this.cooldown(effect, change));
+    fields.appendChild(this.aim(effect, change));
     return fields;
+  }
+
+  /**
+   * Where to put the pointer before acting.
+   *
+   * Off by default and hidden until it is switched on, because it is the one control here that
+   * takes the player's mouse - a row nobody asked for should not look like a row they have to
+   * think about. The radius and threshold only appear once a rarity is chosen.
+   */
+  aim(effect, change) {
+    const wrap = document.createElement("span");
+    wrap.className = "rl-pair";
+
+    const word = (value) => {
+      const span = document.createElement("span");
+      span.textContent = value;
+      return span;
+    };
+
+    const at = document.createElement("select");
+    for (const [value, text] of [
+      ["None", "where it is"],
+      ["AnyMonster", "any monster"],
+      ["Magic", "a magic monster"],
+      ["Rare", "a rare"],
+      ["Unique", "a unique"],
+    ]) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = text;
+      option.selected = value === (effect.aimAt ?? "None");
+      at.appendChild(option);
+    }
+
+    at.title = "Puts the pointer on a monster before acting, then puts it back. The press only "
+      + "happens if the game agrees that monster is under the pointer - so a miss costs a "
+      + "skipped cast, never one into empty floor.";
+    at.addEventListener("change", () => change({ aimAt: at.value }));
+
+    wrap.appendChild(word("Aim at"));
+    wrap.appendChild(at);
+
+    if ((effect.aimAt ?? "None") !== "None") {
+      wrap.appendChild(word("within"));
+      wrap.appendChild(this.number(effect.aimRadius ?? 1000, 1, 10000, 10, (v) => change({ aimRadius: v })));
+      wrap.appendChild(word("u, at or below"));
+      wrap.appendChild(this.number(
+        effect.aimAtOrBelowPercent ?? 100, 0, 100, 1, (v) => change({ aimAtOrBelowPercent: v })));
+      wrap.appendChild(word("%"));
+    }
+
+    return wrap;
   }
 
   cooldown(effect, change) {

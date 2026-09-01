@@ -2066,7 +2066,30 @@ internal static class Program
                         pointer),
                     Environment.TickCount64);
 
-                Perform(rules);
+                // The projection and the hover re-read, supplied here because this is the only
+                // place that has the camera matrix, the window and the reader all at once.
+                Perform(rules, new AimContext(
+                    aim =>
+                    {
+                        PoEformance.Overlay.ClientRect at =
+                            PoEformance.Overlay.GameWindowTracker.TryGet(gameWindow);
+                        if (!at.IsValid)
+                        {
+                            return null;
+                        }
+
+                        PoEformance.Game.World.ScreenPoint point =
+                            PoEformance.Game.World.WorldToScreen.Project(
+                                snapshot.Matrix, aim.X, aim.Y, aim.Z, at.Width, at.Height);
+
+                        // Client pixels are what the projection produces; the pointer is set in
+                        // SCREEN pixels, so the window's own origin has to be added back.
+                        return point.OnScreen
+                            ? (at.X + (int)point.X, at.Y + (int)point.Y)
+                            : null;
+                    },
+                    world.ReadHoveredNow,
+                    note => ruleEngine.Aimed(note, Environment.TickCount64)));
 
                 return snapshot;
             },
@@ -2087,6 +2110,8 @@ internal static class Program
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
         overlay.EvasionStatus = () => evasionPlanner.LastTick.Reason;
+        overlay.RuleStatus = () => ruleEngine.LastTick.Reason;
+        overlay.AimStatus = () => ruleEngine.AimNote(Environment.TickCount64);
 
         // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
         // are decided once per read, so asking here would both cost a re-evaluation per frame
@@ -2217,7 +2242,26 @@ internal static class Program
     /// Drawn effects are absent on purpose. They are not performed at all - the overlay reads
     /// the same tick's list and paints it.
     /// </remarks>
-    private static void Perform(PoEformance.Features.RuleTick tick)
+    /// <summary>
+    /// Where an aiming input has to be turned into a pixel, and by whom.
+    /// </summary>
+    /// <param name="Project">
+    /// A world point to a place on screen, or null when it is not on screen. Supplied by the
+    /// caller because the projection needs the camera matrix and the client rect, and the
+    /// engine that decided the aim has neither.
+    /// </param>
+    /// <param name="Hovered">Re-reads the game's hovered-entity slot, on demand.</param>
+    /// <param name="Note">
+    /// Where every outcome of an aim goes, so it can be read on the status page. The sequence
+    /// finishes milliseconds AFTER the tick that started it, so there is no tick left to report
+    /// through - which is why this is a callback rather than something on <see cref="RuleTick"/>.
+    /// </param>
+    internal readonly record struct AimContext(
+        Func<PoEformance.Features.AimPoint, (int X, int Y)?> Project,
+        Func<ulong> Hovered,
+        Action<string> Note);
+
+    private static void Perform(PoEformance.Features.RuleTick tick, AimContext? aiming = null)
     {
         foreach (PoEformance.Features.RuleSound sound in tick.Sounds)
         {
@@ -2226,6 +2270,15 @@ internal static class Program
 
         foreach (PoEformance.Features.RuleInput input in tick.Inputs)
         {
+            // An input that names a target does not act here: the pointer has to be placed and
+            // the landing confirmed first, and that waits on the game - which this thread, the
+            // reader loop, must not do. Handed to a sequence of its own instead.
+            if (input.Aim is PoEformance.Features.AimPoint aim && aiming is AimContext context)
+            {
+                Aim(input, aim, context);
+                continue;
+            }
+
             switch (input.Kind)
             {
                 case PoEformance.Features.RuleEffectKind.KeyPress:
@@ -2270,6 +2323,37 @@ internal static class Program
                     break;
             }
         }
+    }
+
+    /// <summary>Places the pointer on an aimed input's target, then performs it.</summary>
+    /// <remarks>
+    /// The act is the same switch the unaimed path runs, reached through a closure so the two
+    /// cannot drift apart: an aimed key press and a plain one must press the same key the same
+    /// way, and the only difference is where the pointer was standing.
+    /// </remarks>
+    private static void Aim(
+        PoEformance.Features.RuleInput input,
+        PoEformance.Features.AimPoint aim,
+        AimContext context)
+    {
+        if (context.Project(aim) is not (int x, int y))
+        {
+            // Off screen, so there is nothing to point at. The decision was sound - the monster
+            // is in range and under its threshold - it simply cannot be reached by a pointer,
+            // which is a different thing from the rule being wrong. Said out loud for exactly
+            // that reason: a radius wider than the screen produces this every time, and it is
+            // indistinguishable from a broken projection until something names it.
+            context.Note("the target is off screen");
+            return;
+        }
+
+        AimSequence.Run(
+            (x, y),
+            aim.Address,
+            context.Hovered,
+            () => Perform(
+                new PoEformance.Features.RuleTick([], [], [input with { Aim = null }], string.Empty)),
+            context.Note);
     }
 
     /// <summary>

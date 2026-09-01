@@ -75,6 +75,35 @@ public static partial class InputSender
     [LibraryImport("user32.dll")]
     private static partial uint MapVirtualKeyW(uint code, uint mapType);
 
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetCursorPos(int x, int y);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetCursorPos(out CursorPoint point);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct CursorPoint
+    {
+        public int X;
+        public int Y;
+    }
+
+    /// <summary>Where the pointer is, in screen pixels, or null when Windows would not say.</summary>
+    public static (int X, int Y)? CursorAt()
+        => GetCursorPos(out CursorPoint point) ? (point.X, point.Y) : null;
+
+    /// <summary>
+    /// Puts the pointer somewhere, in screen pixels.
+    /// </summary>
+    /// <remarks>
+    /// SetCursorPos rather than a SendInput move, and the difference matters here: a synthesised
+    /// move is a DELTA that the system's pointer acceleration then reshapes, so the cursor lands
+    /// somewhere near the intended pixel rather than on it. Aiming needs the pixel.
+    /// </remarks>
+    public static bool MoveCursor(int x, int y) => SetCursorPos(x, y);
+
     /// <summary>True when the given window is the one receiving keystrokes right now.</summary>
     /// <remarks>
     /// Deferred to the window tracker rather than asking Windows again here. The overlay
@@ -136,9 +165,12 @@ public static partial class InputSender
 
     /// <summary>Clicks a mouse button where the cursor already is.</summary>
     /// <remarks>
-    /// Where the cursor already is, and this layer never moves it. A tool that moves somebody's
-    /// pointer mid-fight is a tool they cannot aim with, and the rule engine has no notion of
-    /// a target to aim at.
+    /// Where the cursor already is. This used to say "and this layer never moves it", on the
+    /// grounds that a tool which moves somebody's pointer mid-fight is one they cannot aim
+    /// with, and that the rule engine had no notion of a target anyway. The second half stopped
+    /// being true - an effect can now name one, see <see cref="Features.AimPoint"/> - and the
+    /// first is answered by <see cref="AimSequence"/> rather than by refusing: the pointer is
+    /// taken for single-digit milliseconds and put back where it was.
     /// </remarks>
     public static void Click(bool left)
         => Send([Mouse(left ? MouseLeftDown : MouseRightDown), Mouse(left ? MouseLeftUp : MouseRightUp)]);

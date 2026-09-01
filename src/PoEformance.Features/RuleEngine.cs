@@ -1,3 +1,5 @@
+using PoEformance.Game.Components;
+
 namespace PoEformance.Features;
 
 /// <summary>Something a rule wants drawn this tick.</summary>
@@ -17,7 +19,27 @@ public readonly record struct RuleSound(string RuleId, int Pitch, int Ms);
 /// The virtual-key codes, already resolved - through the game's own bindings when the effect
 /// asked for a belt slot. Empty for a mouse or scroll effect.
 /// </param>
-public sealed record RuleInput(string RuleId, RuleEffectKind Kind, IReadOnlyList<ushort> Keys);
+/// <param name="Aim">
+/// Where to put the cursor before acting, or null to act where it already is.
+/// </param>
+/// <remarks>
+/// A WORLD POINT rather than a pixel, and that is what keeps the decision pure: this type is
+/// produced by an engine that has no camera matrix and no window, so turning it into a place on
+/// screen belongs to the composition root - the same split the drawings already follow.
+/// </remarks>
+public sealed record RuleInput(
+    string RuleId,
+    RuleEffectKind Kind,
+    IReadOnlyList<ushort> Keys,
+    AimPoint? Aim = null);
+
+/// <summary>Where an aiming input should point, and what it expects to find there.</summary>
+/// <param name="Address">
+/// The entity the cursor is meant to land on. Compared against what the game reports as
+/// hovered, so a cursor that missed - or that the player pulled away - aborts the press
+/// instead of casting at whatever is under the pointer. Never dereferenced.
+/// </param>
+public readonly record struct AimPoint(float X, float Y, float Z, ulong Address);
 
 /// <summary>What the engine decided on one tick, including why it decided nothing.</summary>
 /// <param name="Reason">
@@ -175,6 +197,50 @@ public sealed class RuleEngine
 
     private volatile string _loadNote = string.Empty;
 
+    /// <summary>What came of the last aimed effect, and when.</summary>
+    private sealed record AimOutcome(string What, long At);
+
+    private volatile AimOutcome? _aim;
+
+    /// <summary>
+    /// Records what came of an aimed effect - including that it worked.
+    /// </summary>
+    /// <remarks>
+    /// KEPT HERE rather than reported through the tick, because it does not happen on a tick.
+    /// Placing the pointer waits on the game, so it runs on a thread of its own and finishes
+    /// several milliseconds after the decision that started it; by then
+    /// <see cref="LastTick"/> has been replaced. Without somewhere to land, every outcome of
+    /// that sequence - the pointer missing, the player pulling it off, the target being off
+    /// screen - was reported to a callback that discarded it, which is the same silent failure
+    /// this engine reports "no key to press" to avoid.
+    ///
+    /// Volatile for the usual reason: written by the aim thread, read by whatever is drawing.
+    /// </remarks>
+    public void Aimed(string outcome, long nowMs)
+        => _aim = new AimOutcome(outcome ?? string.Empty, nowMs);
+
+    /// <summary>
+    /// The last aim outcome with its age, or empty when nothing has aimed yet.
+    /// </summary>
+    /// <remarks>
+    /// The AGE is the half that makes it readable. These outcomes are events rather than
+    /// states, so a bare line saying "the pointer landed on nothing" answers neither "is that
+    /// happening now" nor "is that left over from the last map" - and those want opposite
+    /// reactions.
+    /// </remarks>
+    public string AimNote(long nowMs)
+    {
+        if (_aim is not AimOutcome outcome)
+        {
+            return string.Empty;
+        }
+
+        long ago = Math.Max(0, nowMs - outcome.At);
+        return ago < 1000
+            ? $"{outcome.What} (just now)"
+            : $"{outcome.What} ({ago / 1000} s ago)";
+    }
+
     /// <summary>Tells the engine which key the game has bound to each flask slot.</summary>
     public void Bind(FlaskKeys keys)
     {
@@ -189,6 +255,7 @@ public sealed class RuleEngine
         _readyAt.Clear();
         _showUntil.Clear();
         _inputReadyAt = null;
+        _aim = null;
         LastTick = RuleTick.Nothing;
     }
 
@@ -454,10 +521,36 @@ public sealed class RuleEngine
             return;
         }
 
+        AimPoint? aim = null;
+        if (effect.Aims)
+        {
+            if (state.AimTarget(effect.AimRadius, Rarity(effect.AimAt), effect.AimAtOrBelowPercent)
+                is not NearMonster target)
+            {
+                // Reported and NOT stamped as acted, on the same argument as an unbound key: a
+                // rule whose aim spec disagrees with its own condition looks exactly like one
+                // that never holds, and the two want completely different fixes. Not stamping
+                // means the very next tick can act once something aimable appears.
+                blocked.Add($"{rule.Name}: nothing to aim at");
+                return;
+            }
+
+            aim = new AimPoint(target.WorldX, target.WorldY, target.WorldZ, target.Address);
+        }
+
         _readyAt[key] = nowMs + Spread(effect.CooldownMs, settings.CooldownJitterMs);
         _inputReadyAt = nowMs + Stagger(settings.MinInputGapMs, settings.CooldownJitterMs);
-        inputs.Add(new RuleInput(rule.Id, effect.Kind, codes));
+        inputs.Add(new RuleInput(rule.Id, effect.Kind, codes, aim));
     }
+
+    /// <summary>The rarity an aim spec names, or null for "any monster".</summary>
+    private static ItemRarity? Rarity(AimTarget aim) => aim switch
+    {
+        AimTarget.Magic => ItemRarity.Magic,
+        AimTarget.Rare => ItemRarity.Rare,
+        AimTarget.Unique => ItemRarity.Unique,
+        _ => null,
+    };
 
     /// <summary>
     /// Why input must not be synthesised right now, or null when it may be.

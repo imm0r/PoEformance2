@@ -164,7 +164,12 @@ public sealed record RulesView(
     /// <summary>What the file could not give us, or empty. Beside the status, not in it:
     /// the status is this tick's reason and changes every second, and a rule that was
     /// dropped at startup has to stay readable for longer than that.</summary>
-    [property: JsonPropertyName("loadNote")] string LoadNote = "")
+    [property: JsonPropertyName("loadNote")] string LoadNote = "",
+
+    /// <summary>What came of the last aimed effect, with its age, or empty. Its own field
+    /// for the same reason as the note above: an aim finishes on a thread of its own, after
+    /// the tick that started it, so it can never be part of a tick's reason.</summary>
+    [property: JsonPropertyName("aimNote")] string AimNote = "")
 {
     /// <summary>Builds the panel, including a text and a graph for every rule.</summary>
     public static RulesView Of(RuleEngine engine, string keySource, BuffWatch buffs, string reader = "")
@@ -193,7 +198,8 @@ public sealed record RulesView(
 
         return new RulesView(
             settings, engine.LastTick.Reason, engine.Acted, keySource, shapes, buffs.Seen,
-            buffs.LastRead, reader, engine.LoadNote);
+            buffs.LastRead, reader, engine.LoadNote,
+            engine.AimNote(Environment.TickCount64));
     }
 }
 

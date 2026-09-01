@@ -71,6 +71,23 @@ public enum KeySource
 /// Shortest gap between two firings of THIS effect. Ignored for drawing, which is not an
 /// event: text shows for as long as its condition holds.
 /// </param>
+/// <summary>What an aiming effect points the cursor at.</summary>
+/// <remarks>
+/// Spelled out per rarity rather than taking a number, on the same argument the cull facts
+/// follow: the game executes each rarity from a different share of its life, so a rule is
+/// almost always about one of them.
+/// </remarks>
+public enum AimTarget
+{
+    /// <summary>Do not touch the cursor. Every effect that existed before this one.</summary>
+    None,
+
+    AnyMonster,
+    Magic,
+    Rare,
+    Unique,
+}
+
 public sealed record RuleEffect(
     [property: JsonPropertyName("kind")] RuleEffectKind Kind = RuleEffectKind.Text,
     [property: JsonPropertyName("text")] string Text = "Triggered",
@@ -134,6 +151,31 @@ public sealed record RuleEffect(
     [JsonPropertyName("keys")]
     public string Keys { get; init; } = string.Empty;
 
+    /// <summary>
+    /// Which monster to put the cursor on before acting, or None to act where it already is.
+    /// </summary>
+    /// <remarks>
+    /// The half a threshold rule was missing for a skill that has to be POINTED at its target.
+    /// "A rare within range is nearly dead" is a fact about the area; a cull needs the cursor
+    /// on that rare, and until this existed the rule pressed its key at whatever happened to be
+    /// under the pointer.
+    /// </remarks>
+    [JsonPropertyName("aimAt")]
+    public AimTarget AimAt { get; init; } = AimTarget.None;
+
+    /// <summary>How far to look for something to aim at, in world units.</summary>
+    /// <remarks>
+    /// Its own number rather than the condition's, because the condition is a tree and nothing
+    /// in it says which leaf the effect belongs to. Set it to match the leaf that gates the
+    /// rule; where the two disagree the effect finds nothing and says so.
+    /// </remarks>
+    [JsonPropertyName("aimRadius")]
+    public double AimRadius { get; init; } = 1000;
+
+    /// <summary>Only aim at something at or below this share of its life. 0-100.</summary>
+    [JsonPropertyName("aimAtOrBelowPercent")]
+    public double AimAtOrBelowPercent { get; init; } = 100;
+
     /// <summary>Pitch of a sound cue, in hertz.</summary>
     [JsonPropertyName("pitch")]
     public int Pitch { get; init; } = 900;
@@ -186,7 +228,21 @@ public sealed record RuleEffect(
         // exception thrown out of the middle of a tick.
         Pitch = Math.Clamp(Pitch, 37, 32_767),
         SoundMs = Math.Clamp(SoundMs, 1, 5_000),
+
+        // A radius of 0 would find nothing and a threshold outside 0-100 cannot be met or can
+        // never be missed; both are how a hand-edited file quietly stops aiming.
+        AimRadius = Math.Clamp(AimRadius, 1, 10_000),
+        AimAtOrBelowPercent = Math.Clamp(AimAtOrBelowPercent, 0, 100),
     };
+
+    /// <summary>Whether this effect takes the cursor over before it acts.</summary>
+    /// <remarks>
+    /// Drawn effects are excluded whatever the field says: moving the player's mouse to put a
+    /// caption somewhere would be the tool reaching into the game to change something it was
+    /// only asked to describe.
+    /// </remarks>
+    [JsonIgnore]
+    public bool Aims => AimAt != AimTarget.None && Sends;
 }
 
 /// <summary>Turning the placeholders in an effect's text into what they stand for.</summary>
