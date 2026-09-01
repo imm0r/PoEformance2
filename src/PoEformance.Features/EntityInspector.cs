@@ -155,7 +155,19 @@ public sealed record EntityView(
     IReadOnlyList<TimedEffect>? Effects = null,
     string EffectsNote = "",
     IReadOnlyList<EntityStat>? Stats = null,
-    string StatsNote = "")
+    string StatsNote = "",
+
+    /// <summary>
+    /// Whether a stat bag held more pairs than were read.
+    /// </summary>
+    /// <remarks>
+    /// Carried as a FLAG and not only inside <see cref="StatsNote"/>, because the note is prose
+    /// and the thing that has to react to it is a search: over a truncated list, "no rows" is
+    /// not an answer, and only something the code can branch on can say so where somebody is
+    /// looking. The note read "(of 392)" while a search over the 256 that were read reported an
+    /// absence, and prose in the line above did not stop that being taken at face value.
+    /// </remarks>
+    bool StatsCutShort = false)
 {
     public static EntityView Empty { get; } = new(0, 0, string.Empty, [], [], 0, "nothing selected");
 
@@ -314,7 +326,7 @@ public sealed class EntityInspector
                     : "carries Buffs, with nothing on it";
         }
 
-        (List<EntityStat> numbers, string statsNote) = ReadStats(entity);
+        (List<EntityStat> numbers, string statsNote, bool cutShort) = ReadStats(entity);
 
         return new EntityView(
             entity.Address,
@@ -328,7 +340,8 @@ public sealed class EntityInspector
             effects,
             note,
             numbers,
-            statsNote);
+            statsNote,
+            cutShort);
     }
 
     /// <summary>
@@ -340,13 +353,13 @@ public sealed class EntityInspector
     /// must not turn into a gigabyte of reading - the cap is reported rather than hidden,
     /// since a truncated list that looks complete is the failure worth avoiding here.
     /// </remarks>
-    private (List<EntityStat> Stats, string Note) ReadStats(Entity entity)
+    private (List<EntityStat> Stats, string Note, bool CutShort) ReadStats(Entity entity)
     {
         var stats = new List<EntityStat>();
         ulong component = entity.Component("Stats");
         if (component == 0)
         {
-            return (stats, string.Empty);
+            return (stats, string.Empty, false);
         }
 
         // THE COMPONENT HOLDS NO PAIRS. It holds pointers to StatsInternal structures, and
@@ -357,6 +370,7 @@ public sealed class EntityInspector
         StructDef layout = _schema.Structs["Stats"];
         var notes = new List<string>();
         var read = new Dictionary<ulong, string>();
+        bool cutShort = false;
 
         foreach (string source in new[] { "StatsByBuffAndActions", "StatsByItems" })
         {
@@ -382,11 +396,12 @@ public sealed class EntityInspector
             }
 
             read[internals] = source;
-            (int taken, string note) = ReadPairs(internals, stats, source);
+            (int taken, string note, bool capped) = ReadPairs(internals, stats, source);
             notes.Add($"{taken} from {source}{note}");
+            cutShort |= capped;
         }
 
-        return (stats, $"carries Stats: {string.Join(", ", notes)}");
+        return (stats, $"carries Stats: {string.Join(", ", notes)}", cutShort);
     }
 
     /// <summary>Pulls the (id, value) pairs out of one StatsInternal, into <paramref name="into"/>.</summary>
@@ -396,39 +411,47 @@ public sealed class EntityInspector
     /// begin == end == null and means the entity has no stats from that source, which is not
     /// the same as a vector nobody could read - the two used to print the same sentence.
     /// </remarks>
-    private (int Taken, string Note) ReadPairs(ulong internals, List<EntityStat> into, string source)
+    private (int Taken, string Note, bool CutShort) ReadPairs(ulong internals, List<EntityStat> into, string source)
     {
-        const int MaxStats = 256;
+        // 1024 rather than 256, because 256 was under what a real character carries. A player's
+        // StatsByBuffAndActions bag measured 392 pairs, so the list stopped 136 short - and a
+        // search over what was read then answered "that stat is not on this entity" about a
+        // stat that may simply have been off the end. The note said "(of 392)" the whole time,
+        // which is the only reason it was caught; being told is not the same as it not
+        // happening. 1024 is 8 KB in one read, covers that bag two and a half times over, and
+        // still refuses a runaway pointer - the count guard above rejects anything past 65536
+        // before this cap is reached at all.
+        const int MaxStats = 1024;
         const int PairSize = 8;
 
         StructDef layout = _schema.Structs["StatsInternal"];
         if (!_reader.TryRead(internals + (ulong)layout.OffsetOf("StatsVector"), out ulong first)
             || !_reader.TryRead(internals + (ulong)layout.OffsetOf("StatsVectorLast"), out ulong last))
         {
-            return (0, " (unreadable)");
+            return (0, " (unreadable)", false);
         }
 
         if (first == 0 && last == 0)
         {
-            return (0, " (empty)");
+            return (0, " (empty)", false);
         }
 
         if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last < first)
         {
-            return (0, " (not a vector)");
+            return (0, " (not a vector)", false);
         }
 
         long count = (long)(last - first) / PairSize;
         if (count is < 0 or > 65536)
         {
-            return (0, $" ({count} pairs - not believable)");
+            return (0, $" ({count} pairs - not believable)", false);
         }
 
         int wanted = (int)Math.Min(count, MaxStats);
         byte[] block = new byte[wanted * PairSize];
         if (wanted > 0 && !_reader.TryRead(first, block))
         {
-            return (0, " (vector unreadable)");
+            return (0, " (vector unreadable)", false);
         }
 
         for (int i = 0; i < wanted; i++)
@@ -441,7 +464,7 @@ public sealed class EntityInspector
                 source));
         }
 
-        return (wanted, count > wanted ? $" (of {count})" : string.Empty);
+        return (wanted, count > wanted ? $" (of {count})" : string.Empty, count > wanted);
     }
 
     /// <summary>Counts every component name across a set of entities.</summary>

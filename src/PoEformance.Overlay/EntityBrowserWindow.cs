@@ -908,6 +908,17 @@ public sealed class EntityBrowserWindow
                 ImGui.TextColored(
                     showing.Count > 0 ? PathText : DimText,
                     $"  showing {showing.Count} of {view.Numbers.Count}");
+
+                // And when the read stopped short, say so HERE - beside the result somebody is
+                // about to draw a conclusion from. The note above already carries "(of 392)",
+                // and it was read past: over a truncated list an absence is not an answer, and
+                // the place to say that is where the absence is being looked at.
+                if (view.StatsCutShort)
+                {
+                    ImGui.TextColored(
+                        WarnText,
+                        "  the bag was longer than this read - nothing found here does NOT mean it is absent");
+                }
             }
 
             int column = 0;
