@@ -1,5 +1,25 @@
 namespace PoEformance.Features;
 
+/// <summary>How a log line reads at a glance.</summary>
+/// <remarks>
+/// THREE rather than two, and the middle one is the reason. A cull that left its target hurt
+/// but alive is not a failure - the pointer landed, the key went out, the skill connected - and
+/// it is not what was asked for either, because a cull is supposed to kill. Painted green it
+/// disappears into the successes; painted red it looks like the tool is broken. It is neither,
+/// and the owner asked for it to say so.
+/// </remarks>
+public enum RuleLogTone
+{
+    /// <summary>It did what it set out to do.</summary>
+    Good,
+
+    /// <summary>It happened, but not the way it was meant to.</summary>
+    Warning,
+
+    /// <summary>It did not happen, or it happened and achieved nothing.</summary>
+    Bad,
+}
+
 /// <summary>One thing a rule did, and how many times in a row it did it.</summary>
 /// <param name="At">
 /// The WALL clock, not the engine's. This started as an age - "4s ago" - which is the right
@@ -18,10 +38,10 @@ namespace PoEformance.Features;
 /// one line saying so; twenty lines would push everything else off the page, and the thing
 /// worth seeing in a log is almost always the line that is NOT repeating.
 /// </param>
-/// <param name="Blocked">
-/// Whether this is a reason nothing happened rather than something that did. Recorded rather
-/// than guessed from the wording: a reader that decides "no key to press" is a failure by
-/// looking for the word "no" is a reader that gets the next phrase wrong.
+/// <param name="Tone">
+/// How the line should read: it worked, it half worked, it failed. Recorded rather than guessed
+/// from the wording - a reader that decides "no key to press" is a failure by looking for the
+/// word "no" is a reader that gets the next phrase wrong.
 /// </param>
 public readonly record struct RuleLogEntry(
     DateTime At,
@@ -29,7 +49,7 @@ public readonly record struct RuleLogEntry(
     string What,
     string Detail,
     int Count,
-    bool Blocked)
+    RuleLogTone Tone)
 {
     /// <summary>The timestamp as the log shows it.</summary>
     /// <remarks>
@@ -122,14 +142,14 @@ public sealed class RuleLog
     }
 
     /// <summary>Records something a rule DID, with what it measured while doing it.</summary>
-    /// <param name="bad">
-    /// Whether the thing that happened was a failure. Separate from
-    /// <see cref="Blocked(string, string, string)"/>, which is about a state that HOLDS and so
-    /// is written only when it changes: an outcome that reads badly is still an event, and
-    /// suppressing the second identical one would hide a cull failing twice in a row - which is
-    /// precisely the shape of the problem worth catching.
+    /// <param name="tone">
+    /// How it went. An event may read badly without being a blocked STATE - see
+    /// <see cref="Blocked(string, string, string)"/>, which is written only when it changes:
+    /// suppressing the second identical failure would hide a cull failing twice in a row, which
+    /// is precisely the shape of the problem worth catching.
     /// </param>
-    public void Acted(string rule, string what, string detail = "", bool bad = false)
+    public void Acted(
+        string rule, string what, string detail = "", RuleLogTone tone = RuleLogTone.Good)
     {
         lock (_gate)
         {
@@ -138,7 +158,7 @@ public sealed class RuleLog
             // alternates between working and failing writes its failure once and then looks
             // permanently fixed.
             _blocked.Remove(rule);
-            Append(rule, what, detail, blocked: bad);
+            Append(rule, what, detail, tone);
         }
     }
 
@@ -153,7 +173,7 @@ public sealed class RuleLog
             }
 
             _blocked[rule] = why;
-            Append(rule, why, detail, blocked: true);
+            Append(rule, why, detail, RuleLogTone.Bad);
         }
     }
 
@@ -189,7 +209,7 @@ public sealed class RuleLog
     }
 
     /// <summary>Adds an entry, or bumps the one at the end when it says the same thing.</summary>
-    private void Append(string rule, string what, string detail, bool blocked)
+    private void Append(string rule, string what, string detail, RuleLogTone tone)
     {
         if (_entries.Count > 0)
         {
@@ -198,7 +218,7 @@ public sealed class RuleLog
             // The DETAIL has to match too, not just the wording. Two culls of two different
             // monsters both say "target found", and collapsing them would throw away the only
             // part that says they were different events.
-            if (last.Blocked == blocked
+            if (last.Tone == tone
                 && string.Equals(last.Rule, rule, StringComparison.Ordinal)
                 && string.Equals(last.What, what, StringComparison.Ordinal)
                 && string.Equals(last.Detail, detail, StringComparison.Ordinal))
@@ -211,7 +231,7 @@ public sealed class RuleLog
             }
         }
 
-        _entries.Add(new RuleLogEntry(_now(), rule, what, detail, 1, blocked));
+        _entries.Add(new RuleLogEntry(_now(), rule, what, detail, 1, tone));
 
         if (_entries.Count > Keep)
         {

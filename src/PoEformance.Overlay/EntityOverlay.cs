@@ -3097,7 +3097,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     ImGui.TextUnformatted(entry.Rule);
 
                     ImGui.TableNextColumn();
-                    ImGui.PushStyleColor(ImGuiCol.Text, entry.Blocked ? Warning : OverlayInk.Good);
+                    ImGui.PushStyleColor(ImGuiCol.Text, entry.Tone switch
+                    {
+                        RuleLogTone.Bad => Bad,
+                        RuleLogTone.Warning => Warning,
+                        _ => OverlayInk.Good,
+                    });
                     ImGui.TextUnformatted(entry.What);
                     ImGui.PopStyleColor();
 

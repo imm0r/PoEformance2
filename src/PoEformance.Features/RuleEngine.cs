@@ -433,17 +433,17 @@ public sealed class RuleEngine
     /// Looks at the last culled target again, once enough time has passed to judge it.
     /// </summary>
     /// <remarks>
-    /// WHY "GONE" IS THE DEATH SIGNAL, and why nothing here looks for a corpse. The obvious
-    /// design is to find the entity at zero life and call that dead. MEASURED against the
-    /// owner's full-map recording - 16,829 frames, 854 monsters, start to boss kill - a monster
-    /// is read at zero life exactly NEVER: all 854 of them left the entity list while their
-    /// last reading was still positive. There is no corpse to find, so leaving the list is the
-    /// only death signal this tool has.
+    /// WHY LEAVING THE LIST IS THE DEATH SIGNAL, and why nothing here looks for a corpse. The
+    /// obvious design is to find the entity at zero life and call that dead. MEASURED against
+    /// the owner's full-map recording - 16,829 frames, 854 monsters, start to boss kill - a
+    /// monster is read at zero life exactly NEVER: all 854 of them left the entity list while
+    /// their last reading was still positive. There is no corpse to find.
     ///
-    /// Which is why the wording stops short of claiming a kill. Leaving the list is death OR
-    /// the game dropping a distant entity, and nothing readable separates them - so the log
-    /// says what was measured and lets the reader draw the obvious conclusion about a monster
-    /// that was ten units away at four percent.
+    /// So the line says "killed", on the owner's call. In the abstract, leaving the list is
+    /// death OR the game dropping a distant entity - but not in this window: the target was
+    /// within the aim radius a few hundred milliseconds earlier, and nothing walks out of the
+    /// game's entity range in that time. Hedging here would have cost the feature its point,
+    /// since the reading it would hedge on is the one that means it worked.
     ///
     /// THE OUTCOME THIS EXISTS FOR is the third one. A key that goes out at a confirmed target
     /// and changes nothing - wrong skill on that key, no mana, the skill on its own cooldown -
@@ -481,22 +481,27 @@ public sealed class RuleEngine
             int before = watch.Target.Life;
             if (monster.Life < before)
             {
+                // A WARNING, not a success. The pointer landed, the key went out and the skill
+                // connected - so this is not the tool failing - but a cull is meant to kill,
+                // and a target still standing is not what was asked for. Green would hide it
+                // among the kills and red would read as broken; it is neither.
                 Log.Acted(
                     watch.Rule,
                     "target hurt, still alive",
-                    $"{before} -> {monster.Life} (-{before - monster.Life})   {monster.Pool}");
+                    $"{before} -> {monster.Life} (-{before - monster.Life})   {monster.Pool}",
+                    RuleLogTone.Warning);
                 return;
             }
 
-            // Marked bad, because this is a failure however green the rest of the trace was:
-            // the pointer was confirmed on the target and the key went out, and the monster is
+            // Bad, because this is a failure however green the rest of the trace was: the
+            // pointer was confirmed on the target and the key went out, and the monster is
             // exactly as healthy as it was. An EVENT rather than a blocked state, so a cull
             // failing this way twice in a row is two lines and not one.
-            Log.Acted(watch.Rule, "target unchanged", $"still {monster.Pool}", bad: true);
+            Log.Acted(watch.Rule, "target unchanged", $"still {monster.Pool}", RuleLogTone.Bad);
             return;
         }
 
-        Log.Acted(watch.Rule, "target gone", $"was {watch.Target.Pool}");
+        Log.Acted(watch.Rule, "target killed", $"was {watch.Target.Pool}");
     }
 
     /// <summary>What the rule being edited measures and asks, or nothing when nothing is edited.</summary>

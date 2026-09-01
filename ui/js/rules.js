@@ -241,7 +241,7 @@ export class RulesPanel {
 
     for (const line of log) {
       const item = document.createElement("li");
-      if (line.blocked) item.className = "blocked";
+      item.className = line.tone || "good";
 
       const clock = document.createElement("span");
       clock.className = "rl-log-clock";

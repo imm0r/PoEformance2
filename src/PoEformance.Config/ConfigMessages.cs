@@ -206,7 +206,14 @@ public sealed record RulesView(
         foreach (RuleLogEntry entry in engine.Log.Recent(120))
         {
             log.Add(new RuleLogLine(
-                entry.Clock, entry.Rule, entry.What, entry.Measured, entry.Blocked));
+                entry.Clock,
+                entry.Rule,
+                entry.What,
+                entry.Measured,
+
+                // Lowercased here so the page can use it as a class name directly rather than
+                // mapping three names to three classes on its own side.
+                entry.Tone.ToString().ToLowerInvariant()));
         }
 
         return new RulesView(
@@ -226,16 +233,16 @@ public sealed record RulesView(
 /// The measurement, with the repeat count already folded in. Composed on this side rather than
 /// in the page so the overlay and the config window cannot show the same entry two ways.
 /// </param>
-/// <param name="Blocked">
-/// Whether this line is a failure. Carried rather than left to the page to work out from the
-/// wording, for the same reason it is carried on the entry itself.
+/// <param name="Tone">
+/// "good", "warning" or "bad" - how the line reads. Carried rather than left to the page to
+/// work out from the wording, for the same reason it is carried on the entry itself.
 /// </param>
 public sealed record RuleLogLine(
     [property: JsonPropertyName("clock")] string Clock,
     [property: JsonPropertyName("rule")] string Rule,
     [property: JsonPropertyName("what")] string What,
     [property: JsonPropertyName("detail")] string Detail,
-    [property: JsonPropertyName("blocked")] bool Blocked);
+    [property: JsonPropertyName("tone")] string Tone);
 
 /// <summary>The two other ways of looking at one rule's condition.</summary>
 /// <remarks>

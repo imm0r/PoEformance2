@@ -70,7 +70,7 @@ public class RuleLogTests
         }
 
         RuleLogEntry entry = Assert.Single(log.Recent(10));
-        Assert.True(entry.Blocked);
+        Assert.Equal(RuleLogTone.Bad, entry.Tone);
         Assert.Equal(1, entry.Count);
 
         // Held, so it keeps the time it STARTED - which is what "since when has this been
@@ -129,11 +129,11 @@ public class RuleLogTests
         // would be one, and "it is still failing" would look like "it failed once, a while
         // ago" - the opposite of what the second failure means.
         RuleLog log = Ticking(new DateTime(2026, 9, 1, 14, 0, 0, DateTimeKind.Local));
-        log.Acted("Power Siphon", "target unchanged", "still 400/4000 10%", bad: true);
-        log.Acted("Power Siphon", "target unchanged", "still 400/4000 10%", bad: true);
+        log.Acted("Power Siphon", "target unchanged", "still 400/4000 10%", RuleLogTone.Bad);
+        log.Acted("Power Siphon", "target unchanged", "still 400/4000 10%", RuleLogTone.Bad);
 
         RuleLogEntry entry = Assert.Single(log.Recent(10));
-        Assert.True(entry.Blocked);
+        Assert.Equal(RuleLogTone.Bad, entry.Tone);
         Assert.Equal(2, entry.Count);
         Assert.Equal("still 400/4000 10%   x2", entry.Measured);
     }
@@ -198,11 +198,11 @@ public class RuleLogTests
         IReadOnlyList<RuleLogEntry> recent = engine.Log.Recent(10);
         Assert.Equal(2, recent.Count);
 
-        RuleLogEntry blocked = Assert.Single(recent, e => e.Blocked);
+        RuleLogEntry blocked = Assert.Single(recent, e => e.Tone == RuleLogTone.Bad);
         Assert.Equal("Power Siphon", blocked.Rule);
         Assert.Equal("no key to press", blocked.What);
 
-        RuleLogEntry acted = Assert.Single(recent, e => !e.Blocked);
+        RuleLogEntry acted = Assert.Single(recent, e => e.Tone != RuleLogTone.Bad);
         Assert.Equal("Spark", acted.Rule);
 
         // WHICH key, not just that something happened - with six rules that is the difference
@@ -235,7 +235,7 @@ public class RuleLogTests
 
         // It fired once and then sat on its cooldown for the rest - one entry, not thirty.
         RuleLogEntry entry = Assert.Single(engine.Log.Recent(10));
-        Assert.False(entry.Blocked);
+        Assert.Equal(RuleLogTone.Good, entry.Tone);
 
         // And the status line still says it, because that is what the status line is for.
         Assert.Contains("cooling down", engine.LastTick.Reason, StringComparison.Ordinal);
@@ -351,9 +351,9 @@ public class RuleLogTests
         engine.Evaluate(Around(), RuleEngine.CullCheckMs + 1);
 
         RuleLogEntry outcome = engine.Log.Recent(1)[0];
-        Assert.Equal("target gone", outcome.What);
+        Assert.Equal("target killed", outcome.What);
         Assert.Equal("was 400/4000 10%", outcome.Detail);
-        Assert.False(outcome.Blocked);
+        Assert.Equal(RuleLogTone.Good, outcome.Tone);
     }
 
     [Fact]
@@ -371,7 +371,7 @@ public class RuleLogTests
 
         RuleLogEntry outcome = engine.Log.Recent(1)[0];
         Assert.Equal("target unchanged", outcome.What);
-        Assert.True(outcome.Blocked);
+        Assert.Equal(RuleLogTone.Bad, outcome.Tone);
         Assert.Contains("400/4000", outcome.Detail, StringComparison.Ordinal);
     }
 
@@ -388,7 +388,10 @@ public class RuleLogTests
         RuleLogEntry outcome = engine.Log.Recent(1)[0];
         Assert.Equal("target hurt, still alive", outcome.What);
         Assert.Contains("400 -> 90 (-310)", outcome.Detail, StringComparison.Ordinal);
-        Assert.False(outcome.Blocked);
+
+        // Amber, not green. The tool did everything right and the monster is still standing,
+        // which is neither a success to hide among the kills nor a failure to alarm about.
+        Assert.Equal(RuleLogTone.Warning, outcome.Tone);
     }
 
     [Fact]
@@ -415,13 +418,13 @@ public class RuleLogTests
 
     /// <summary>Whether a line is the after-the-cull check reporting on its target.</summary>
     private static bool Verdict(RuleLogEntry entry)
-        => entry.What is "target gone" or "target unchanged" or "target hurt, still alive";
+        => entry.What is "target killed" or "target unchanged" or "target hurt, still alive";
 
     [Fact]
     public void AnAimThatWasNeverConfirmedIsNeverChecked()
     {
         // The check is armed by the PRESS, not by the decision. A rule that found a target and
-        // then had its pointer land on nothing has nothing to verify - reporting "target gone"
+        // then had its pointer land on nothing has nothing to verify - reporting a kill
         // for it would credit a cull that never happened.
         var engine = new RuleEngine(new Random(1));
         engine.Configure(Culling());
