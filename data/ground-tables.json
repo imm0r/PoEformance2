@@ -1,0 +1,14 @@
+{
+  "comment": "Column layout for the game's GroundEffectTypes table, which is where 'does this patch of ground hurt' is actually written down. The GroundEffect component in memory carries only a row index (+0x48); everything about what that row MEANS lives here. Damage is expressed as the BuffDefinitions the type applies - there is no hazard flag on the entity, which is why looking for one in memory kept coming back empty. The list is COMPLETE, all six columns, so the row size it computes (64 bytes) is a real check against the file rather than a partial guess: a truncated list would still read the front correctly but would disagree on size for a reason that says nothing.",
+  "source": "repoe-fork/dat-export, current/poe2/heuristics/schema/graphql/GroundEffectTypes.gql",
+  "tables": {
+    "GroundEffectTypes": [
+      { "name": "Id", "type": "string", "array": false },
+      { "name": "Unknown1", "type": "i32", "array": false },
+      { "name": "Unknown2", "type": "f32", "array": false },
+      { "name": "Stat", "type": "foreignrow", "array": false },
+      { "name": "BuffDefinition1", "type": "foreignrow", "array": false },
+      { "name": "BuffDefinition2", "type": "foreignrow", "array": false }
+    ]
+  }
+}

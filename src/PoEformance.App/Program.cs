@@ -246,6 +246,14 @@ internal static class Program
             }
         }
 
+        // Needs no game PROCESS at all - it reads the install - so it sits outside the block
+        // above, which is gated on being attached. Somebody diagnosing why their ground rings
+        // have no names should not have to launch the game to find out.
+        if (options.DumpGroundTypes)
+        {
+            RunGroundTypeDump();
+        }
+
         // ── Auto-flask ───────────────────────────────────────────────────────
         // Two sources, deliberately kept apart: WHAT to do comes from our settings file,
         // WHICH KEY uses a flask comes from the GAME's own config. Assuming the key would
@@ -868,6 +876,59 @@ internal static class Program
         PoEformance.Game.Diagnostics.HoverHunt.Report(samples, Console.Out);
     }
 
+    /// <summary>
+    /// Prints the game's GroundEffectTypes table, so a row index becomes a name.
+    /// </summary>
+    /// <remarks>
+    /// THE EXPERIMENT THIS WHOLE THREAD NEEDED, and it needs no game running and no fight to
+    /// survive - it reads the install. The GroundEffect component carries a row index at +0x48
+    /// and the sweep capture shows rows 12, 17 and 20; what those rows ARE has never been
+    /// readable, because the entity path is the same generic string on every ground effect on
+    /// file. This resolves them.
+    ///
+    /// THE BUFF COUNT IS THE POINT, not the name. Damage is a property of the type, expressed
+    /// as the BuffDefinitions the row carries - so a row with no buff at all cannot be doing
+    /// anything to anybody, and that is the first hard statement about hazards this project
+    /// will have made. It counts rather than judging: a shrine's ground applies a buff too.
+    ///
+    /// Prints the WHOLE table rather than the three observed rows. The observed three are from
+    /// one capture in one hideout; the rest of the table is what says whether those three are
+    /// the decorative corner of it, and that context costs one screenful.
+    /// </remarks>
+    private static void RunGroundTypeDump()
+    {
+        Console.WriteLine();
+        Console.WriteLine("ground effect types - the table that says what a patch of ground IS.");
+
+        PoEformance.Game.Files.GameFiles.OpenedFiles opened =
+            PoEformance.Game.Files.GameFiles.OpenOrSay(PoEformance.Game.Files.GameInstall.Find(null));
+        if (opened.Files is null)
+        {
+            Console.WriteLine($"  no install: {opened.Why}");
+            return;
+        }
+
+        PoEformance.Features.GroundEffectTypeTable table =
+            PoEformance.Features.GroundEffectTypeTable.Load(opened.Files, FindDataFile("ground-tables.json"));
+
+        Console.WriteLine($"  {table.Why}");
+        if (table.Rows == 0)
+        {
+            return;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("  row  buffs  stat  id");
+        foreach (PoEformance.Features.GroundEffectType type in table.All)
+        {
+            // The three the sweep capture actually observed, marked. Everything else is context
+            // for judging whether those three are the decorative end of the table.
+            string seen = type.Row is 12 or 17 or 20 ? " <- seen in the capture" : string.Empty;
+            Console.WriteLine(
+                $"  {type.Row,3}  {type.Buffs,5}  {(type.HasStat ? "yes " : "no  "),4}  {type.Id}{seen}");
+        }
+    }
+
     private static void RunComponentSweep(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
     {
@@ -1327,12 +1388,25 @@ internal static class Program
         // which the resident copy of a table does not carry. Opened once - they cannot change
         // while the game runs - and then only the flag set is re-read.
         handle.Stage = "parsing quest tables";
-        var quests = new PoEformance.Features.QuestWatch();
-        quests.Open(
+
+        // Opened ONCE and shared. Two features now read tables out of the install, and opening
+        // the archive twice would pay for the bundle index twice for no gain - it cannot change
+        // while the game runs.
+        PoEformance.Game.Files.GameFiles? installed =
             PoEformance.Game.Files.GameFiles.OpenOrSay(
-                PoEformance.Game.Files.GameInstall.Find(null)).Files,
-            FindDataFile("quest-tables.json"));
+                PoEformance.Game.Files.GameInstall.Find(null)).Files;
+
+        var quests = new PoEformance.Features.QuestWatch();
+        quests.Open(installed, FindDataFile("quest-tables.json"));
         Console.WriteLine($"quests   {quests.Opening}");
+
+        // What KIND each patch of dangerous-looking ground is. The entity path cannot say - every
+        // ground effect on file is the same generic VisibleServerGroundEffect - so the component
+        // carries a row index and the name lives in the game's own table. Missing is ordinary and
+        // costs only the name: the rings still draw.
+        PoEformance.Features.GroundEffectTypeTable groundTypes =
+            PoEformance.Features.GroundEffectTypeTable.Load(installed, FindDataFile("ground-tables.json"));
+        Console.WriteLine($"ground   {groundTypes.Why}");
 
         handle.Stage = "loading item names";
 
@@ -1895,6 +1969,7 @@ internal static class Program
                 FindDataFile("preload-alerts.starter.json")));
         overlay.PreloadListChanged = list => PoEformance.Features.PreloadAlertStore.Save(list);
         overlay.AttachQuests(quests);
+        overlay.GroundTypes = groundTypes;
         overlay.AttachTracker(tracker, writeTracker);
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
@@ -2754,6 +2829,7 @@ internal static class Program
         bool HuntSkills,
         bool HuntHover,
         bool SweepComponents,
+        bool DumpGroundTypes,
         bool DumpAnimations,
         IReadOnlyList<string> Peek,
         bool PeekWatch,
@@ -2768,7 +2844,7 @@ internal static class Program
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false;
-            bool sweep = false;
+            bool sweep = false, groundTypeDump = false;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -2866,6 +2942,10 @@ internal static class Program
                         sweep = true;
                         break;
 
+                    case "--groundtypes":
+                        groundTypeDump = true;
+                        break;
+
                     // Regenerates data/animations.tsv from the game. Not a hunt - nothing is
                     // being searched for any more - so it stops the moment the row array's base
                     // is confirmed rather than sampling for as long as somebody plays.
@@ -2915,7 +2995,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep, animDump,
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep, groundTypeDump, animDump,
                 peek, peekWatch, updateOutcome, updatedVersion);
         }
     }

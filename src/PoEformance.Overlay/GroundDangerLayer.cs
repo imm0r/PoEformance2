@@ -74,6 +74,15 @@ public sealed class GroundDangerLayer
     /// <summary>What to ring, and how. Shared with the tracker's other layers.</summary>
     public TrackerSettings Settings { get; set; } = TrackerSettings.Default;
 
+    /// <summary>The game's own names for the kinds of ground, when the install could be read.</summary>
+    /// <remarks>
+    /// Optional by design. Without it the label falls back to the entity path, which is where
+    /// this feature started and is still better than nothing; with it the label says what a
+    /// patch actually IS, because the path is the same generic string on every ground effect
+    /// the project has ever recorded.
+    /// </remarks>
+    public GroundEffectTypeTable? GroundTypes { get; set; }
+
     /// <summary>Draws a ring on every entity a rule is watching for.</summary>
     public void Draw(ImDrawListPtr draw, WorldSnapshot snapshot, int width, int height)
     {
@@ -389,8 +398,21 @@ public sealed class GroundDangerLayer
             System.Globalization.CultureInfo.InvariantCulture,
             $"#{entity.Id}  r={radius:0.##}  {(entity.GroundSeconds is { } left ? $"{left:0.0}s" : "no timer")}");
 
+        // WHAT KIND OF GROUND THIS IS, first, because it is the only line that varies: the path
+        // below it is the same generic string on every ground effect on file, so on a screen
+        // with three rings it distinguishes nothing. The buff count comes with it because that
+        // is where damage lives - a type applying no buff at all is doing nothing to anybody,
+        // which is the single most useful thing this label can say.
+        GroundEffectType? kind = GroundTypes?.Find(entity.GroundType);
+        string? type = kind is null
+            ? entity.GroundType is { } row ? $"type {row} - not in the table" : null
+            : $"{kind.Caption}  ({kind.Buffs} buff{(kind.Buffs == 1 ? string.Empty : "s")}"
+              + $"{(kind.HasStat ? ", a stat" : string.Empty)})";
+
+        string[] lines = type is null ? [entity.Path, detail] : [type, entity.Path, detail];
+
         var at = new Vector2(centre.X, bottom + LabelGap);
-        foreach (string line in (string[])[entity.Path, detail])
+        foreach (string line in lines)
         {
             Vector2 size = ImGui.CalcTextSize(line);
             var origin = new Vector2(at.X - (size.X / 2), at.Y);

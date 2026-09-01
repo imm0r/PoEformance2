@@ -297,7 +297,14 @@ public sealed record WorldEntity(
     float? GroundRadius = null,
 
     // The line this beam draws, or null when the entity is not one. See BeamLine.
-    BeamLine? Beam = null)
+    BeamLine? Beam = null,
+
+    // WHICH KIND of ground this is - a row of the game's own GroundEffectTypes table, or null
+    // when the entity is not a ground effect. The entity path cannot answer this: every ground
+    // effect on file carries the same generic VisibleServerGroundEffect. Resolving the row to a
+    // name (and to the buffs that decide whether it damages anybody) needs the game's data
+    // files, so it happens a layer up - see GroundEffectTypeTable.
+    int? GroundType = null)
 {
     /// <summary>Whether this comes from memory rather than from the game's current list.</summary>
     public bool IsRemembered => RememberedForMs is not null;
@@ -737,6 +744,7 @@ public sealed class WorldReader
     private readonly int _frustumPlanes;
     private readonly int _groundSeconds;
     private readonly int _groundRadius;
+    private readonly int _groundType;
     private readonly int _beamSource;
     private readonly int _beamTarget;
     private readonly int _areaHash;
@@ -818,6 +826,7 @@ public sealed class WorldReader
         // state that can be wrong than it could ever save.
         _groundSeconds = schema.Structs["GroundEffect"].OffsetOf("SecondsRemaining");
         _groundRadius = schema.Structs["GroundEffect"].OffsetOf("RadiusCandidate");
+        _groundType = schema.Structs["GroundEffect"].OffsetOf("TypeRow");
         _beamSource = schema.Structs["Beam"].OffsetOf("SourceX");
         _beamTarget = schema.Structs["Beam"].OffsetOf("TargetX");
         _areaHash = schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash");
@@ -899,6 +908,30 @@ public sealed class WorldReader
         }
 
         return float.IsFinite(radius) && radius is > 0 and <= 500 ? radius : null;
+    }
+
+    /// <summary>Which kind of ground this is, as a row of the game's GroundEffectTypes table.</summary>
+    /// <remarks>
+    /// The only field on this component that says anything about WHAT a patch is. Every ground
+    /// effect in every recording here carries the same generic entity path, so the path cannot
+    /// tell a burning patch from the glow under a league object - and damage is a property of
+    /// the type, written in the game's data files as the buffs that type applies, not as a flag
+    /// anywhere on the instance. See GroundEffect.TypeRow in the schema.
+    ///
+    /// The bound is a PLAUSIBILITY check and nothing more: a row index is small, so a value in
+    /// the millions says the read landed on something that is not one. Resolving it against the
+    /// real table - which is what says whether row 17 exists at all - happens in the Features
+    /// layer, where the game's files can be opened; this layer only carries the number.
+    /// </remarks>
+    private int? ReadGroundType(Entity entity)
+    {
+        ulong at = entity.Component("GroundEffect");
+        if (at == 0 || !_reader.TryRead(at + (ulong)_groundType, out uint row))
+        {
+            return null;
+        }
+
+        return row <= 65535 ? (int)row : null;
     }
 
     /// <summary>Both ends of this beam, or null if it is not one.</summary>
@@ -1407,7 +1440,8 @@ public sealed class WorldReader
                 IsGroundEffect: entity.Component("GroundEffect") != 0,
                 GroundSeconds: ReadGroundSeconds(entity),
                 GroundRadius: ReadGroundRadius(entity),
-                Beam: ReadBeam(entity));
+                Beam: ReadBeam(entity),
+                GroundType: ReadGroundType(entity));
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

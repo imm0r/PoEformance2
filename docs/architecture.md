@@ -347,6 +347,9 @@ PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action field
 PoEformance.App --record s.rec --hoverhunt    # + read the hovered-entity chain and the boss byte
 PoEformance.App --record s.rec --sweep        # + read four components nothing has a layout for
 
+# Reads the INSTALL, not the process - no game running, no fight to survive:
+PoEformance.App --groundtypes                 # what each ground-effect type row actually is
+
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
 PoEformance.App --peek "+468C3A8,235C" --peekwatch   # + print the slots that move
@@ -937,12 +940,29 @@ flag until the per-entity check shows it *moving* within a single entity's life,
 0.9. `+0x64` moves too. Checking for movement is what separates a property from running state, and
 it costs one pass over the capture.
 
-**Promoting it needs no new machinery.** `Files/DatFile.cs` already parses `.dat` and
-`Files/BundleIndex.cs` already opens the game's bundles — the tool reads the item art out of them
-today. Read `GroundEffectTypes.dat`, check it has more than 20 rows, and see whether rows 12, 17
-and 20 carry `Id`s that match what was observed. If they do, the `BuffDefinition` columns answer
-*does this ground damage me* outright, offline, for every ground effect in the game — and the
-feature stops depending on anyone typing a metadata path.
+**Promoting it needed no new machinery, and it is now built.** `Files/DatFile.cs` already parses
+`.dat` and `Files/BundleIndex.cs` already opens the game's bundles — the tool reads item art out of
+them today. `GroundEffectTypeTable` (Features) loads `GroundEffectTypes` through the same
+`QuestTables.Open` that loads the quest tables: it probes the paths a table can live at, parses,
+and checks the derived row size against what the column list computes, falling back to reading the
+`Id` column as text when the size disagrees. The column list is vendored in `data/ground-tables.json`
+and its offsets are **recomputed** from the widths, never stored — rows are packed, so a corrected
+width has to move every column after it.
+
+`WorldEntity.GroundType` carries the row; the overlay label resolves it to a name and shows how
+many `BuffDefinition` columns the row sets. **The buff count is the point, not the name**: damage
+is a property of the type expressed as the buffs it applies, so a row with no buff at all cannot be
+doing anything to anybody. It counts rather than judging — a shrine's ground applies a buff too.
+
+`--groundtypes` prints the whole table and marks the three rows the capture observed. It reads the
+**install**, so it needs no running game and no fight to survive — which is the first experiment in
+this entire thread that asks nothing of the person running it.
+
+**What is proven and what is not.** The memory half is measured: the row reaches the snapshot on
+all 5916 readings and holds still across every entity's whole life. The table half is tested only
+through its *failure* modes — no install, no layout, an unknown row — because this suite runs on
+Linux with no Path of Exile to read. Whether row 17 is called what the game calls it is settled by
+running `--groundtypes` once on a machine with the game on it, and by nothing in the test suite.
 
 The caveat that keeps this honest: the 18 map entities in the capture are long-lived (958–1415
 frames) and hold `+Infinity` in the countdown slot, so they look ambient as well. This capture may
