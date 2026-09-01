@@ -243,10 +243,10 @@ export class RulesPanel {
       const item = document.createElement("li");
       if (line.blocked) item.className = "blocked";
 
-      const age = document.createElement("span");
-      age.className = "rl-log-age";
-      age.textContent = line.ago;
-      item.appendChild(age);
+      const clock = document.createElement("span");
+      clock.className = "rl-log-clock";
+      clock.textContent = line.clock;
+      item.appendChild(clock);
 
       const rule = document.createElement("span");
       rule.className = "rl-log-rule";
@@ -256,9 +256,18 @@ export class RulesPanel {
 
       const what = document.createElement("span");
       what.className = "rl-log-what";
-      what.textContent = line.count > 1 ? `${line.what}  x${line.count}` : line.what;
-      what.title = what.textContent;
+      what.textContent = line.what;
+      what.title = line.what;
       item.appendChild(what);
+
+      // The measurement: which entity, what life, how many presses. Its own column because
+      // gluing it onto the wording made the interesting half - the numbers - the part that got
+      // cut off when a line was too long.
+      const detail = document.createElement("span");
+      detail.className = "rl-log-detail";
+      detail.textContent = line.detail;
+      detail.title = line.detail;
+      item.appendChild(detail);
 
       list.appendChild(item);
     }

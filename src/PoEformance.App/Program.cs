@@ -2089,7 +2089,14 @@ internal static class Program
                             : null;
                     },
                     world.ReadHoveredNow,
-                    (ruleId, note) => ruleEngine.Aimed(ruleId, note, Environment.TickCount64)));
+                    (ruleId, note, detail) =>
+                        ruleEngine.Aimed(ruleId, note, detail, Environment.TickCount64),
+                    (ruleId, what) =>
+                    {
+                        long at = Environment.TickCount64;
+                        ruleEngine.Aimed(ruleId, what, "sent", at);
+                        ruleEngine.Fired(ruleId, at);
+                    }));
 
                 return snapshot;
             },
@@ -2262,10 +2269,16 @@ internal static class Program
     /// Takes the rule's id: with several aiming rules configured, an outcome that does not say
     /// WHOSE pointer missed is not one anybody can act on.
     /// </param>
+    /// <param name="Fired">
+    /// Told when the key has actually gone out at a confirmed target, which is what arms the
+    /// engine's look at that monster a moment later. Separate from <paramref name="Note"/>
+    /// because it does more than write a line.
+    /// </param>
     internal readonly record struct AimContext(
         Func<PoEformance.Features.AimPoint, (int X, int Y)?> Project,
         Func<ulong> Hovered,
-        Action<string, string> Note);
+        Action<string, string, string> Note,
+        Action<string, string> Fired);
 
     private static void Perform(PoEformance.Features.RuleTick tick, AimContext? aiming = null)
     {
@@ -2349,7 +2362,7 @@ internal static class Program
             // which is a different thing from the rule being wrong. Said out loud for exactly
             // that reason: a radius wider than the screen produces this every time, and it is
             // indistinguishable from a broken projection until something names it.
-            context.Note(input.RuleId, "the target is off screen");
+            context.Note(input.RuleId, "the target is off screen", string.Empty);
             return;
         }
 
@@ -2357,9 +2370,19 @@ internal static class Program
             (x, y),
             aim.Address,
             context.Hovered,
-            () => Perform(
-                new PoEformance.Features.RuleTick([], [], [input with { Aim = null }], string.Empty)),
-            note => context.Note(input.RuleId, note));
+            () =>
+            {
+                Perform(
+                    new PoEformance.Features.RuleTick([], [], [input with { Aim = null }], string.Empty));
+
+                // Logged HERE rather than where the input was decided, which is the whole
+                // point of moving it: this line means the key actually went out, after the
+                // hover check said the pointer was on the right monster. At the decision it
+                // meant "will go out if everything after this works", and the two read
+                // identically in a log.
+                context.Fired(input.RuleId, input.Describes);
+            },
+            (note, detail) => context.Note(input.RuleId, note, detail));
     }
 
     /// <summary>

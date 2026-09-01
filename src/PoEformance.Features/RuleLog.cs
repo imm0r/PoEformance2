@@ -1,10 +1,17 @@
 namespace PoEformance.Features;
 
 /// <summary>One thing a rule did, and how many times in a row it did it.</summary>
-/// <param name="AtMs">
-/// On the engine's clock, not the wall's. Rendered as an AGE, which is what a log read during
-/// a fight is actually asked - "is that happening now or left over from the last pack" - and
-/// which needs no clock of its own to be testable.
+/// <param name="At">
+/// The WALL clock, not the engine's. This started as an age - "4s ago" - which is the right
+/// answer for one line on a status bar and the wrong one for a list: reading a sequence of
+/// steps means asking how far apart they were, and subtracting two ages in your head while
+/// both of them are counting up is not something anybody does. A timestamp also survives being
+/// screenshotted, which is how this log actually gets reported.
+/// </param>
+/// <param name="Detail">
+/// The measurement behind the line - which entity, what life, how many presses - kept in its
+/// own field rather than glued onto <paramref name="What"/> so it can have its own column.
+/// Empty where there is nothing to measure.
 /// </param>
 /// <param name="Count">
 /// How many identical entries this one stands for. A rule that fired twenty times in a row is
@@ -17,11 +24,26 @@ namespace PoEformance.Features;
 /// looking for the word "no" is a reader that gets the next phrase wrong.
 /// </param>
 public readonly record struct RuleLogEntry(
-    long AtMs,
+    DateTime At,
     string Rule,
     string What,
+    string Detail,
     int Count,
-    bool Blocked);
+    bool Blocked)
+{
+    /// <summary>The timestamp as the log shows it.</summary>
+    /// <remarks>
+    /// To the millisecond, and that is not decoration: the whole point of the cull trace is
+    /// that its steps happen within a few milliseconds of each other, so a stamp cut at the
+    /// second would print the entire sequence as one instant.
+    /// </remarks>
+    public string Clock => At.ToString("HH:mm:ss.fff", System.Globalization.CultureInfo.InvariantCulture);
+
+    /// <summary>The third column: the measurement, and how many times it repeated.</summary>
+    public string Measured => Count > 1
+        ? Detail.Length > 0 ? $"{Detail}   x{Count}" : $"x{Count}"
+        : Detail;
+}
 
 /// <summary>
 /// A rolling history of what the rules did, because the one-line status cannot hold it.
@@ -67,6 +89,26 @@ public sealed class RuleLog
 
     private readonly Lock _gate = new();
 
+    /// <summary>Where the timestamps come from.</summary>
+    /// <remarks>
+    /// Injected on the same argument as the engine's <see cref="Random"/>: a log that called
+    /// DateTime.Now itself would put the one thing a test needs to assert - the stamp - out of
+    /// the test's reach. Local rather than UTC, because this is read beside a wall clock.
+    /// </remarks>
+    private readonly Func<DateTime> _now;
+
+    public RuleLog()
+        : this(static () => DateTime.Now)
+    {
+    }
+
+    /// <summary>For tests: a clock whose readings are known in advance.</summary>
+    public RuleLog(Func<DateTime> now)
+    {
+        ArgumentNullException.ThrowIfNull(now);
+        _now = now;
+    }
+
     /// <summary>How many entries are held right now.</summary>
     public int Count
     {
@@ -79,8 +121,15 @@ public sealed class RuleLog
         }
     }
 
-    /// <summary>Records something a rule DID.</summary>
-    public void Acted(long nowMs, string rule, string what)
+    /// <summary>Records something a rule DID, with what it measured while doing it.</summary>
+    /// <param name="bad">
+    /// Whether the thing that happened was a failure. Separate from
+    /// <see cref="Blocked(string, string, string)"/>, which is about a state that HOLDS and so
+    /// is written only when it changes: an outcome that reads badly is still an event, and
+    /// suppressing the second identical one would hide a cull failing twice in a row - which is
+    /// precisely the shape of the problem worth catching.
+    /// </param>
+    public void Acted(string rule, string what, string detail = "", bool bad = false)
     {
         lock (_gate)
         {
@@ -89,12 +138,12 @@ public sealed class RuleLog
             // alternates between working and failing writes its failure once and then looks
             // permanently fixed.
             _blocked.Remove(rule);
-            Append(nowMs, rule, what, blocked: false);
+            Append(rule, what, detail, blocked: bad);
         }
     }
 
     /// <summary>Records why a rule did nothing - only when that reason has changed.</summary>
-    public void Blocked(long nowMs, string rule, string why)
+    public void Blocked(string rule, string why, string detail = "")
     {
         lock (_gate)
         {
@@ -104,7 +153,7 @@ public sealed class RuleLog
             }
 
             _blocked[rule] = why;
-            Append(nowMs, rule, why, blocked: true);
+            Append(rule, why, detail, blocked: true);
         }
     }
 
@@ -139,52 +188,30 @@ public sealed class RuleLog
         }
     }
 
-    /// <summary>How long ago something was, short enough to sit in a narrow column.</summary>
-    /// <remarks>
-    /// Shared so the overlay and the config window cannot drift into two vocabularies for the
-    /// same instant. Sub-second gets a decimal because that is the range these entries arrive
-    /// in - "0s" for everything inside a second would make a burst look simultaneous.
-    /// </remarks>
-    public static string Age(long ms)
-    {
-        if (ms < 0)
-        {
-            // A clock that went backwards, which is a test's clock rather than a real one.
-            ms = 0;
-        }
-
-        if (ms < 1000)
-        {
-            return $"{ms / 1000d:0.0}s";
-        }
-
-        if (ms < 60_000)
-        {
-            return $"{ms / 1000}s";
-        }
-
-        return ms < 3_600_000 ? $"{ms / 60_000}m" : $"{ms / 3_600_000}h";
-    }
-
     /// <summary>Adds an entry, or bumps the one at the end when it says the same thing.</summary>
-    private void Append(long nowMs, string rule, string what, bool blocked)
+    private void Append(string rule, string what, string detail, bool blocked)
     {
         if (_entries.Count > 0)
         {
             RuleLogEntry last = _entries[^1];
+
+            // The DETAIL has to match too, not just the wording. Two culls of two different
+            // monsters both say "target found", and collapsing them would throw away the only
+            // part that says they were different events.
             if (last.Blocked == blocked
                 && string.Equals(last.Rule, rule, StringComparison.Ordinal)
-                && string.Equals(last.What, what, StringComparison.Ordinal))
+                && string.Equals(last.What, what, StringComparison.Ordinal)
+                && string.Equals(last.Detail, detail, StringComparison.Ordinal))
             {
-                // The TIME moves to the newest occurrence, so the age answers "when did this
+                // The TIME moves to the newest occurrence, so the stamp answers "when did this
                 // last happen" rather than "when did this start" - which is what a line
-                // reading "fired x40" is being asked.
-                _entries[^1] = last with { AtMs = nowMs, Count = last.Count + 1 };
+                // reading "x40" is being asked.
+                _entries[^1] = last with { At = _now(), Count = last.Count + 1 };
                 return;
             }
         }
 
-        _entries.Add(new RuleLogEntry(nowMs, rule, what, 1, blocked));
+        _entries.Add(new RuleLogEntry(_now(), rule, what, detail, 1, blocked));
 
         if (_entries.Count > Keep)
         {

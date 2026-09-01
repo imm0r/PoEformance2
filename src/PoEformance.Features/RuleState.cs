@@ -442,7 +442,12 @@ public sealed record RuleState
                 // cursor put "on the monster" should land on, and it is the same height the
                 // overlay draws the bar at. WorldZ alone aims at the ground under it.
                 entity.HealthBarZ,
-                entity.Address));
+                entity.Address,
+                entity.Life.Current,
+
+                // The UNRESERVED pool, so this number and the percentage above share a
+                // denominator - see NearMonster.Pool.
+                entity.Life.Unreserved));
         }
 
         found.Sort(static (left, right) => left.Distance.CompareTo(right.Distance));
@@ -679,7 +684,22 @@ public readonly record struct NearMonster(
     float WorldY = 0,
     double? LifePercent = null,
     float WorldZ = 0,
-    ulong Address = 0);
+    ulong Address = 0,
+    int Life = 0,
+    int LifeMax = 0)
+{
+    /// <summary>Its pool as the log prints it - "1240/3600 34%", or empty when unread.</summary>
+    /// <remarks>
+    /// The DENOMINATOR is the unreserved pool, the same one <see cref="Vital.Percent"/>
+    /// divides by, and it is carried rather than recomputed for exactly that reason: printing
+    /// Max beside a percentage taken against Unreserved would show two numbers that do not
+    /// agree with each other, and the whole point of showing both is to be able to check one
+    /// against the other.
+    /// </remarks>
+    public string Pool => LifePercent is double percent && LifeMax > 0
+        ? $"{Life}/{LifeMax} {percent:0}%"
+        : string.Empty;
+}
 
 /// <summary>Where the mouse is, in the pixels the projection produces.</summary>
 /// <remarks>
