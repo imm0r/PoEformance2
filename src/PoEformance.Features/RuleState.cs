@@ -436,7 +436,13 @@ public sealed record RuleState
                 entity.Rarity,
                 entity.WorldX,
                 entity.WorldY,
-                percent < 0 ? null : percent));
+                percent < 0 ? null : percent,
+
+                // Where the health bar floats, not where the feet are: that is the point a
+                // cursor put "on the monster" should land on, and it is the same height the
+                // overlay draws the bar at. WorldZ alone aims at the ground under it.
+                entity.HealthBarZ,
+                entity.Address));
         }
 
         found.Sort(static (left, right) => left.Distance.CompareTo(right.Distance));
@@ -477,6 +483,53 @@ public sealed record RuleState
         }
 
         return total;
+    }
+
+    /// <summary>
+    /// The monster an aiming effect should put the cursor on, or null when there is none.
+    /// </summary>
+    /// <remarks>
+    /// STRONGEST FIRST, not weakest, and that is the owner's call rather than a default: with
+    /// two things under the threshold at once the rare is the one worth the cull, because the
+    /// white monster beside it dies to anything. Ties inside a rarity go to the lowest bar -
+    /// among equals, the one closest to dying is the one the cast is most likely to land on
+    /// before something else kills it.
+    ///
+    /// The threshold is repeated here rather than taken from the condition, and that is not
+    /// duplication for its own sake: a condition is a boolean TREE with no subject, so nothing
+    /// in it remembers WHICH monster made it true. An effect that has to point at something has
+    /// to choose it. The cost is that a spec which disagrees with its own condition finds
+    /// nothing - which shows up as a rule that fires and reports "nothing to aim at", not as a
+    /// key pressed at the wrong place.
+    /// </remarks>
+    public NearMonster? AimTarget(double distance, ItemRarity? only, double atOrBelowPercent)
+    {
+        NearMonster? best = null;
+        foreach (NearMonster monster in Monsters)
+        {
+            // Sorted nearest first, so the first one out of range ends the walk.
+            if (monster.Distance > distance)
+            {
+                break;
+            }
+
+            if (monster.Address == 0
+                || monster.LifePercent is not double life
+                || life > atOrBelowPercent
+                || (only is ItemRarity wanted && monster.Rarity != wanted))
+            {
+                continue;
+            }
+
+            if (best is not NearMonster held
+                || monster.Rarity > held.Rarity
+                || (monster.Rarity == held.Rarity && life < held.LifePercent))
+            {
+                best = monster;
+            }
+        }
+
+        return best;
     }
 
     /// <summary>The emptiest health bar within a radius of the player, of one rarity or of any.</summary>
@@ -606,12 +659,27 @@ public sealed record RuleState
 /// is sharper for this one than most: a monster recorded at 0 satisfies "below 35" and a rule
 /// meant to cull something nearly dead would fire on every monster the reader could not read.
 /// </param>
+/// <param name="WorldZ">
+/// Its height, for the one thing that needs to turn a monster back into a place ON SCREEN:
+/// aiming at it. Every other consumer here works in the XY plane.
+/// </param>
+/// <param name="Address">
+/// The entity address, and it is here for ONE purpose: comparing it against the address the
+/// game reports as hovered, to confirm that a cursor put on this monster actually landed.
+///
+/// A deliberate exception to the rule above, and narrow on purpose. It is never dereferenced -
+/// nothing reads through it, so a freed object cannot be followed - and the only operation
+/// performed on it is equality. That is what keeps the exception from becoming the door the
+/// type was shaped to close.
+/// </param>
 public readonly record struct NearMonster(
     double Distance,
     ItemRarity Rarity,
     float WorldX = 0,
     float WorldY = 0,
-    double? LifePercent = null);
+    double? LifePercent = null,
+    float WorldZ = 0,
+    ulong Address = 0);
 
 /// <summary>Where the mouse is, in the pixels the projection produces.</summary>
 /// <remarks>

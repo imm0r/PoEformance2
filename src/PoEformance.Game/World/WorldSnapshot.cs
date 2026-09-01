@@ -736,6 +736,25 @@ public sealed class WorldReader
 
     private readonly TerrainReader _terrain;
     private readonly MouseOverReader _mouseOver;
+
+    /// <summary>The last resolved InGameState, for a hover re-read between snapshots.</summary>
+    private ulong _lastInGameState;
+
+    /// <summary>
+    /// Asks the game again what the cursor is on, without taking a whole snapshot.
+    /// </summary>
+    /// <remarks>
+    /// Three reads, off the chain the last snapshot resolved. It exists for one caller: an
+    /// aiming effect that has just placed the pointer and needs to know whether it landed
+    /// before it presses anything. Reading the whole world for that would cost the reader
+    /// thread its cadence, and using the LAST snapshot's answer would be reading the slot as it
+    /// was before the pointer moved - which is the one reading guaranteed to be wrong.
+    ///
+    /// Answers 0 before any snapshot has resolved a chain, which is the same answer it gives
+    /// for "nothing hovered" and means the same thing to the only caller: do not press.
+    /// </remarks>
+    public ulong ReadHoveredNow()
+        => _lastInGameState == 0 ? 0 : _mouseOver.Read(_lastInGameState);
     private readonly int _playerInfo;
     private readonly int _serverData;
     private readonly int _awakeEntities;
@@ -1151,6 +1170,12 @@ public sealed class WorldReader
         // frustum above: a slot that is read every frame lands in a --record session frame by
         // frame, and this one was only settled because a capture finally contained it.
         ulong hovered = _mouseOver.Read(chain.InGameState);
+
+        // Kept so the slot can be asked again BETWEEN reads. An aiming effect places the
+        // pointer and has to know within a few milliseconds whether it landed, and waiting for
+        // the next snapshot would make the window tens of milliseconds - long enough for the
+        // player's own hand to pull it off target. See WorldReader.ReadHoveredNow.
+        _lastInGameState = chain.InGameState;
 
         // The map struct sits INLINE in AreaInstance: pass its address, not a pointer read
         // from it (its first field is the head, which is why reading it as a pointer works
