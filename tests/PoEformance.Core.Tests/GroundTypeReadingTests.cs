@@ -237,6 +237,67 @@ public class GroundTypeReadingTests
     }
 
     [Fact]
+    public void TheGroundTheCapturesShowedIsAllHarmful()
+    {
+        // Every row this project has actually met damages the player, and the game says so in its
+        // own words. That is the answer the whole thread was after, and it is the reason the
+        // "decorative decal" reading had to go.
+        GroundEffectTypeTable table = Shipped();
+
+        foreach (int row in (int[])[10, 12, 16, 17, 18, 20])
+        {
+            GroundEffectType? kind = table.Find(row);
+            Assert.NotNull(kind);
+            Assert.Equal(GroundHarm.Harmful, kind.Harm);
+        }
+
+        Assert.Equal("You are taking Physical and Fire Damage over time", table.Find(18)?.Says);
+    }
+
+    [Fact]
+    public void TheHelpfulGroundIsNotCalledHarmful()
+    {
+        // The other side, and the reason harm is three-valued rather than a bool. Consecration
+        // and an oasis sit in the same table as burning ground; ringing them in the danger colour
+        // would train somebody to ignore the colour.
+        GroundEffectTypeTable table = Shipped();
+
+        Assert.Equal(GroundHarm.Helpful, table.Find(6)?.Harm);   // Consecration
+        Assert.Equal(GroundHarm.Helpful, table.Find(9)?.Harm);   // Haste
+        Assert.Equal(GroundHarm.Helpful, table.Find(47)?.Harm);  // Oasis
+    }
+
+    [Fact]
+    public void WhatTheDataCannotSettleIsUnclearRatherThanSafe()
+    {
+        // UNCLEAR IS NOT HARMLESS. Three rows carry no description and no debuff category, so
+        // nothing in the data decides them - and the overlay draws those at full strength, on
+        // the principle that the one wrong answer worth avoiding is showing a hazard as safe.
+        GroundEffectTypeTable table = Shipped();
+
+        Assert.Equal(GroundHarm.Unclear, table.Find(4)?.Harm);   // Smoke
+        Assert.Equal(GroundHarm.Unclear, table.Find(26)?.Harm);  // the row called Unused
+        Assert.Equal(GroundHarm.Unclear, table.Find(52)?.Harm);  // Leyline, which cuts both ways
+
+        // And an unreadable word must land here too, never on "helpful".
+        Assert.Equal(GroundHarm.Unclear, new VendoredGroundType(0, "x", "", 0, "nonsense").AsHarm);
+        Assert.Equal(GroundHarm.Unclear, new VendoredGroundType(0, "x", "", 0).AsHarm);
+    }
+
+    [Fact]
+    public void TheWholeTableIsClassifiedAndTheReasonIsRecorded()
+    {
+        // A classification with no stated reason is an opinion. The data file carries a `why` on
+        // every row; this pins that the split is the measured one rather than drifting silently.
+        GroundEffectTypeTable table = Shipped();
+
+        Assert.Equal(53, table.Rows);
+        Assert.Equal(44, table.All.Count(t => t.Harm == GroundHarm.Harmful));
+        Assert.Equal(6, table.All.Count(t => t.Harm == GroundHarm.Helpful));
+        Assert.Equal(3, table.All.Count(t => t.Harm == GroundHarm.Unclear));
+    }
+
+    [Fact]
     public void EveryRowIsARealEffectKindThatAppliesABuff()
     {
         // The finding that reversed an earlier conclusion in this file's history: there is no

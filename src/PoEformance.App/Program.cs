@@ -1107,15 +1107,26 @@ internal static class Program
         }
 
         Console.WriteLine();
-        Console.WriteLine("  row  buffs  stat  id");
+        Console.WriteLine("  row  harm      id / buff                              what the game says");
         foreach (PoEformance.Features.GroundEffectType type in table.All)
         {
-            // The three the sweep capture actually observed, marked. Everything else is context
-            // for judging whether those three are the decorative end of the table.
-            string seen = type.Row is 10 or 12 or 16 or 17 or 18 or 20 ? "  <- seen in a capture" : string.Empty;
-            Console.WriteLine(
-                $"  {type.Row,3}  {type.Buffs,5}  {(type.HasStat ? "yes " : "no  "),4}  {type.Describe}{seen}");
+            // The rows the captures actually observed, marked - so a reader can see at a glance
+            // whether the ones this project has met are typical of the table or a corner of it.
+            string seen = type.Row is 10 or 12 or 16 or 17 or 18 or 20 ? " *" : "  ";
+            string harm = type.Harm switch
+            {
+                PoEformance.Features.GroundHarm.Harmful => "HURTS",
+                PoEformance.Features.GroundHarm.Helpful => "helps",
+                _ => "?",
+            };
+
+            Console.WriteLine($"{seen}{type.Row,3}  {harm,-8}  {type.Describe,-38}  {type.Says}");
         }
+
+        Console.WriteLine();
+        Console.WriteLine("  * = a row seen in one of this project's recordings.");
+        Console.WriteLine("  harm comes from the buff each row applies - see data/ground-effect-types.json,");
+        Console.WriteLine("  where every row carries the reason it was judged that way.");
     }
 
     private static void RunComponentSweep(

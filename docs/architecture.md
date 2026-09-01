@@ -907,13 +907,48 @@ no decorative row at all (row 26 is literally `Unused`). The rows the recordings
 **Profane Ground**.
 
 So carrying the component means the game considers the entity one of its ground-effect kinds. It
-still does **not** follow that every one damages the player — `Consecration` and `Haste` are in the
-same table — so the *buff a row applies* is what a consumer must look at.
+does **not** follow that every one damages the player — `Consecration` and `Haste` are in the same
+table — so the *buff a row applies* is what decides, and that is now resolved rather than left open.
 
-**The radius did not survive either**, and that finding is independent. `+0x38` reads the same
-`18.670750` on 94 % of readings where it reads at all, and the reader rejected it on **all 54**
-readings of the map capture. A number that is one constant where it exists and absent where it does
-not is not describing an area, so `GroundEffectUseGameRadius` now defaults **off**.
+#### Which ground hurts, from the game's own words
+
+`data/ground-effect-types.json` carries all 53 rows with a **harm** judgement and, where the buff
+has one, the sentence the game shows while somebody stands in it. The split is **44 harmful, 6
+helpful, 3 unclear**, and every row records *why* it was judged that way, because a classification
+with no stated reason is an opinion.
+
+The rule comes from `BuffDefinitions.BuffCategory`:
+
+| category | meaning | example |
+|---|---|---|
+| 2 | debuff — every one describes damage, a slow or a drain | *"You are taking Physical and Fire Damage over time"* |
+| 1 | grants something | Consecration, Haste, an oasis |
+| 18 | invisible, no description — the **ailment** grounds | Ignited, Chilled, Shocked, Scorched, Brittle, Sapped, Withered |
+
+Anything left over is **unclear**, not harmless: `Smoke`, the row literally called `Unused`, and
+`Leyline`, which cuts both ways — more spell damage while it drains your Ward. Unclear rows are
+drawn at **full strength**, and an unreadable word in the file falls to unclear too: the one wrong
+answer worth engineering against is showing a hazard as safe.
+
+The label leads with the game's own sentence, because no amount of reverse engineering was going to
+produce a better one than the game was already going to show. Helpful ground is dimmed rather than
+hidden — a screen where everything is equally red is a screen nobody reads.
+
+#### The size of a ground effect is still unknown
+
+`+0x38` was the candidate and it is dead. Reading the **raw bytes** rather than the filtered value —
+the check that should have come first — every ground entity in the map capture holds `0x4EC34228` =
+**1.638 × 10⁹**, and every one in the sweep capture holds `0x41955DB2` = **18.6707497**. Constant
+within a capture, different between them, and 1.6 billion is not a dimension under any reading. So
+it is neither a per-effect radius nor a global one; it looks like a shared constant of another kind
+— a time base, a seed, an id. `GroundEffectUseGameRadius` now defaults **off**.
+
+**Somebody else hit the same wall**, which is worth recording because it is the only independent
+data point this project has. A long-time PoE1 reverse engineer, asked about damaging ground, said
+they could reach the effect from the components but *had trouble with the area of effect*, and
+guessed that every entity is a square of always the same dimension. The constant-within-a-capture
+behaviour is consistent with that guess; **two different constants are not**. Nothing found so far
+carries the size, so the overlay draws a ring at a size the user picks.
 
 **They must not both fire on one entity, and for a while they did.** The two passes walk the same
 entity list and neither knew about the other. The shipped rule is spelled as the *exact* path that

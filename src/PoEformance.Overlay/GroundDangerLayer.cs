@@ -231,7 +231,16 @@ public sealed class GroundDangerLayer
                 continue;
             }
 
-            DrawRing(draw, new Vector2(at.X, at.Y), colour, entity.GroundSeconds);
+            // DIMMED WHERE THE GROUND DOES NOT HURT. Consecration, Haste and an oasis are in the
+            // same table as burning ground and are worth SEEING, not worth alarming about - and a
+            // screen where everything is equally red is a screen nobody reads. Unclear rows keep
+            // the full colour: the one wrong answer that could get somebody killed is drawing a
+            // hazard as though it were safe, so uncertainty resolves towards the warning.
+            uint ink = GroundTypes?.Find(entity.GroundType) is { Harm: GroundHarm.Helpful }
+                ? WithAlpha(colour, 0.45f)
+                : colour;
+
+            DrawRing(draw, new Vector2(at.X, at.Y), ink, entity.GroundSeconds);
 
             if (Settings.ShowGroundEffectLabels)
             {
@@ -409,7 +418,17 @@ public sealed class GroundDangerLayer
             ? entity.GroundType is { } row ? $"type {row} - not in the table" : null
             : kind.Describe;
 
-        string[] lines = type is null ? [entity.Path, detail] : [type, entity.Path, detail];
+        // THE GAME'S OWN SENTENCE, when the buff carries one: "You are taking Physical and Fire
+        // Damage over time". Already translated, already exact about the damage types, and
+        // better than anything this project could have written about the same patch of ground.
+        string? says = kind is { Says.Length: > 0 } named ? named.Says : null;
+
+        string[] lines = (type, says) switch
+        {
+            (null, _) => [entity.Path, detail],
+            (not null, null) => [type, entity.Path, detail],
+            _ => [type, says!, entity.Path, detail],
+        };
 
         var at = new Vector2(centre.X, bottom + LabelGap);
         foreach (string line in lines)

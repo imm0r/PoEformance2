@@ -4,18 +4,39 @@ using PoEformance.Game.Files;
 
 namespace PoEformance.Features;
 
+/// <summary>What a kind of ground does to whoever stands in it.</summary>
+public enum GroundHarm
+{
+    /// <summary>Nothing in the data settles it. Never drawn as safe OR as dangerous.</summary>
+    Unclear,
+
+    /// <summary>It damages, slows or drains. 44 of the table's 53 rows.</summary>
+    Harmful,
+
+    /// <summary>It grants something - Consecration, Haste, an oasis. Six rows.</summary>
+    Helpful,
+}
+
 /// <summary>One row of the game's GroundEffectTypes table.</summary>
 /// <param name="Row">The row index, which is what the component carries.</param>
 /// <param name="Id">The game's own name for this kind of ground.</param>
 /// <param name="Buffs">
-/// How many of the two BuffDefinition columns are set. THE CLOSEST THING TO AN ANSWER about
-/// damage that this table gives without a second lookup: a type that applies no buff at all
-/// cannot be doing anything to anybody, and a type that applies two is doing something twice.
-/// It does not say the buff is harmful - a shrine's ground applies a buff you want - so this
-/// counts rather than judges.
+/// How many of the two BuffDefinition columns are set. Kept for the diagnostic, and NOT a signal
+/// about damage - every one of the 53 rows applies at least one buff, so counting them
+/// discriminates nothing. That was the first idea and it was wrong; <paramref name="Harm"/> is
+/// the answer it was reaching for.
 /// </param>
-/// <param name="HasStat">Whether the row names a Stat, which is the other half of the same story.</param>
-public sealed record GroundEffectType(int Row, string Id, int Buffs, bool HasStat, string Buff = "")
+/// <param name="HasStat">
+/// Whether the row names a Stat. Only ever true when the row came from the INSTALL - and worth
+/// less than it looks: the Stat column resolves to names like `ground_fire_art_variation`, so it
+/// picks the visual, not the damage.
+/// </param>
+/// <param name="Buff">The name of the buff this kind applies, as the game shows it.</param>
+/// <param name="Harm">Whether standing in it hurts. See data/ground-effect-types.json for how.</param>
+/// <param name="Description">The game's own sentence about it, when the buff carries one.</param>
+public sealed record GroundEffectType(
+    int Row, string Id, int Buffs, bool HasStat, string Buff = "",
+    GroundHarm Harm = GroundHarm.Unclear, string Description = "")
 {
     /// <summary>What to show when the row is known: the game's name, else the bare index.</summary>
     public string Caption => Id.Length > 0 ? Id : $"type {Row}";
@@ -29,6 +50,17 @@ public sealed record GroundEffectType(int Row, string Id, int Buffs, bool HasSta
     /// "Sacred Ashes", which is the phrase on their own screen when they are standing in it.
     /// </remarks>
     public string Describe => Buff.Length > 0 && Buff != Id ? $"{Caption} - {Buff}" : Caption;
+
+    /// <summary>
+    /// The sentence the game itself shows while somebody stands in this, when there is one.
+    /// </summary>
+    /// <remarks>
+    /// THE MOST USEFUL STRING IN THE WHOLE CHAIN, and it costs nothing to carry: "You are taking
+    /// Physical and Fire Damage over time" is the game's own words, already translated, already
+    /// exact about which damage types. No amount of reverse engineering would have produced a
+    /// better sentence than the one the game was going to show anyway.
+    /// </remarks>
+    public string Says => Description;
 }
 
 /// <summary>The vendored copy of the table, for when there is no install to read.</summary>
@@ -41,7 +73,23 @@ public sealed record VendoredGroundType(
     [property: JsonPropertyName("row")] int Row,
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("buff")] string Buff,
-    [property: JsonPropertyName("buffs")] int Buffs);
+    [property: JsonPropertyName("buffs")] int Buffs,
+    [property: JsonPropertyName("harm")] string Harm = "",
+    [property: JsonPropertyName("description")] string Description = "")
+{
+    /// <summary>The harm word as the enum, defaulting to Unclear for anything unrecognised.</summary>
+    /// <remarks>
+    /// UNCLEAR IS THE FALLBACK ON PURPOSE. A typo in the file, or a word added later that this
+    /// build has never heard of, must not silently become "harmless" - that is the one wrong
+    /// answer that would get somebody killed rather than merely confused.
+    /// </remarks>
+    public GroundHarm AsHarm => Harm.ToLowerInvariant() switch
+    {
+        "harmful" => GroundHarm.Harmful,
+        "helpful" => GroundHarm.Helpful,
+        _ => GroundHarm.Unclear,
+    };
+}
 
 /// <summary>data/ground-effect-types.json as it sits on disk.</summary>
 public sealed class VendoredGroundTypes
@@ -78,18 +126,17 @@ public sealed partial class GroundTypeJsonContext : JsonSerializerContext;
 /// The game's GroundEffectTypes table, read out of the install.
 /// </summary>
 /// <remarks>
-/// WHY THIS EXISTS. The GroundEffect component says almost nothing: every ground effect in every
-/// recording this project has is the same generic entity path, `VisibleServerGroundEffect`, so
-/// the path cannot tell a burning patch from the glow under a league object. The one field that
-/// distinguishes them is a row index at +0x48 - constant on 72 of 72 entities across their whole
-/// lives - and the row it indexes is in the game's own data files, not in memory.
+/// WHY THIS EXISTS. The GroundEffect component says almost nothing on its own: every ground effect
+/// in every recording this project has is the same generic entity path,
+/// `VisibleServerGroundEffect`, so the path cannot tell burning ground from a consecrated patch.
+/// The one field that distinguishes them is a row index at +0x48, and the row it indexes lives in
+/// the game's own data files rather than in memory.
 ///
-/// WHAT THE ROW BUYS. `Id` names the kind of ground, which turns an overlay label from the
-/// useless generic path into something a person can act on. `BuffDefinition1` and
-/// `BuffDefinition2` are where damage actually lives: a ground effect hurts because of the buff
-/// its TYPE applies, which is why no amount of reading the component ever produced a hazard bit.
-/// Resolving those buffs to their own names is a further step and a further table; this one
-/// counts them, because "applies no buff at all" is already a strong statement and costs nothing.
+/// WHAT THE ROW BUYS, and it is the whole feature: the game's name for the kind of ground, the
+/// name of the buff it applies, the SENTENCE the game shows while somebody stands in it, and
+/// whether that sentence describes damage. Damage is a property of the type expressed as its
+/// buff - which is why no amount of reading the component itself ever produced a hazard bit, and
+/// is worth recording as the reason that search kept failing rather than as a dead end.
 ///
 /// LOADED THROUGH <see cref="QuestTables"/>, whose name is the only quest-specific thing about
 /// it: it takes a layout and a table name, probes the paths a table can live at, parses, and
@@ -220,7 +267,8 @@ public sealed class GroundEffectTypeTable
         {
             // HasStat is FALSE rather than unknown, and that is deliberate: the vendored file
             // does not carry the Stat column, so claiming one would be inventing a reading.
-            table._rows[row.Row] = new GroundEffectType(row.Row, row.Id, row.Buffs, false, row.Buff);
+            table._rows[row.Row] = new GroundEffectType(
+                row.Row, row.Id, row.Buffs, false, row.Buff, row.AsHarm, row.Description);
         }
 
         return table;
