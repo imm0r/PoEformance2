@@ -159,6 +159,33 @@ public class RuleAimTests
     }
 
     [Fact]
+    public void WhatTheAimDidIsKeptWhereSomethingCanShowIt()
+    {
+        // The half that was missing when this was first built: the sequence that places the
+        // pointer runs on its own thread and finishes AFTER the tick that started it, so every
+        // outcome it had - confirmed, missed, pulled away - was handed to a callback that threw
+        // it away. "It never fires" and "it aims and the confirmation rejects it" are different
+        // problems, and neither was visible anywhere.
+        var engine = new RuleEngine(new Random(1));
+
+        Assert.Equal(string.Empty, engine.AimNote(0));
+
+        engine.Aimed("on target", 10_000);
+
+        // The age is part of it: an outcome is an event, so a bare line cannot say whether it
+        // is happening now or left over from the last map.
+        Assert.Equal("on target (just now)", engine.AimNote(10_400));
+        Assert.Equal("on target (3 s ago)", engine.AimNote(13_500));
+
+        // And a clock that went backwards - which a test clock does - reads as "just now"
+        // rather than as a negative age.
+        Assert.Equal("on target (just now)", engine.AimNote(9_000));
+
+        engine.Forget();
+        Assert.Equal(string.Empty, engine.AimNote(20_000));
+    }
+
+    [Fact]
     public void AHandEditedAimSpecIsBroughtIntoRange()
     {
         RuleEffect wild = new RuleEffect(RuleEffectKind.KeyPress)

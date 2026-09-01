@@ -1339,6 +1339,23 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public Func<string>? EvasionStatus { get; set; }
 
+    /// <summary>Optional: which rules are acting, or why none is.</summary>
+    /// <remarks>
+    /// The same line the config window's rules tab shows, put where it can be read DURING a
+    /// map. That window is not open while somebody is playing, and a rule that quietly does
+    /// nothing - an unbound key, a cooldown, a condition that never holds - is a question asked
+    /// mid-fight rather than at a desk.
+    /// </remarks>
+    public Func<string>? RuleStatus { get; set; }
+
+    /// <summary>Optional: what came of the last effect that aimed at something.</summary>
+    /// <remarks>
+    /// Separate from <see cref="RuleStatus"/> because it is not part of any tick: placing the
+    /// pointer waits on the game and finishes after the decision that started it, so its
+    /// outcome - confirmed, landed on nothing, pulled away, off screen - arrives on its own.
+    /// </remarks>
+    public Func<string>? AimStatus { get; set; }
+
     /// <summary>
     /// Adds the interface browser, served by an inspector on the reader thread.
     /// </summary>
@@ -2641,6 +2658,24 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         DrawMeasuringControls(width, height);
     }
 
+    /// <summary>Shortens a value that would otherwise stretch the readout's second column.</summary>
+    /// <remarks>
+    /// By characters rather than by pixels, which is the crude version - but the table sizes
+    /// itself to its widest row, so the alternative is measuring text against a column that
+    /// does not exist until the row is in it. Never cuts a surrogate pair in half: a rule name
+    /// somebody put an emoji in would otherwise end in half a character.
+    /// </remarks>
+    private static string Clip(string value, int limit)
+    {
+        if (string.IsNullOrEmpty(value) || value.Length <= limit)
+        {
+            return value ?? string.Empty;
+        }
+
+        int cut = char.IsHighSurrogate(value[limit - 1]) ? limit - 1 : limit;
+        return string.Concat(value.AsSpan(0, cut), "...");
+    }
+
     /// <summary>A label and its value, as one row of the readout's two columns.</summary>
     /// <remarks>
     /// A TABLE rather than the padded strings this used to be - "area:     Clearfell" and
@@ -2898,6 +2933,23 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (EvasionStatus is not null)
             {
                 Row("evade", EvasionStatus(), OverlayInk.Accent);
+            }
+
+            if (RuleStatus is not null)
+            {
+                // Clipped, unlike its neighbours: this line names every rule that is acting AND
+                // every one that is blocked, so a profile with a dozen rules produces a
+                // sentence long enough to widen the whole window - in the corner of the screen,
+                // during a fight. The full text is on the rules tab.
+                Row("rules", Clip(RuleStatus(), 90), OverlayInk.Accent);
+            }
+
+            // Only once something has aimed. An event, not a state: before the first one there
+            // is nothing to say, and the row above already answers whether the engine is
+            // running at all.
+            if (AimStatus?.Invoke() is string aim && aim.Length > 0)
+            {
+                Row("aim", aim, OverlayInk.Accent);
             }
 
             // The summary stays here even though the full list is a page of its own: the

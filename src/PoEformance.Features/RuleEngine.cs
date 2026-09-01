@@ -197,6 +197,50 @@ public sealed class RuleEngine
 
     private volatile string _loadNote = string.Empty;
 
+    /// <summary>What came of the last aimed effect, and when.</summary>
+    private sealed record AimOutcome(string What, long At);
+
+    private volatile AimOutcome? _aim;
+
+    /// <summary>
+    /// Records what came of an aimed effect - including that it worked.
+    /// </summary>
+    /// <remarks>
+    /// KEPT HERE rather than reported through the tick, because it does not happen on a tick.
+    /// Placing the pointer waits on the game, so it runs on a thread of its own and finishes
+    /// several milliseconds after the decision that started it; by then
+    /// <see cref="LastTick"/> has been replaced. Without somewhere to land, every outcome of
+    /// that sequence - the pointer missing, the player pulling it off, the target being off
+    /// screen - was reported to a callback that discarded it, which is the same silent failure
+    /// this engine reports "no key to press" to avoid.
+    ///
+    /// Volatile for the usual reason: written by the aim thread, read by whatever is drawing.
+    /// </remarks>
+    public void Aimed(string outcome, long nowMs)
+        => _aim = new AimOutcome(outcome ?? string.Empty, nowMs);
+
+    /// <summary>
+    /// The last aim outcome with its age, or empty when nothing has aimed yet.
+    /// </summary>
+    /// <remarks>
+    /// The AGE is the half that makes it readable. These outcomes are events rather than
+    /// states, so a bare line saying "the pointer landed on nothing" answers neither "is that
+    /// happening now" nor "is that left over from the last map" - and those want opposite
+    /// reactions.
+    /// </remarks>
+    public string AimNote(long nowMs)
+    {
+        if (_aim is not AimOutcome outcome)
+        {
+            return string.Empty;
+        }
+
+        long ago = Math.Max(0, nowMs - outcome.At);
+        return ago < 1000
+            ? $"{outcome.What} (just now)"
+            : $"{outcome.What} ({ago / 1000} s ago)";
+    }
+
     /// <summary>Tells the engine which key the game has bound to each flask slot.</summary>
     public void Bind(FlaskKeys keys)
     {
@@ -211,6 +255,7 @@ public sealed class RuleEngine
         _readyAt.Clear();
         _showUntil.Clear();
         _inputReadyAt = null;
+        _aim = null;
         LastTick = RuleTick.Nothing;
     }
 

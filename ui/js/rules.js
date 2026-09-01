@@ -98,6 +98,14 @@ export class RulesPanel {
     note.title = view.loadNote ?? "";
     note.hidden = !view.loadNote;
 
+    // What the last aim did, which is never in the status: the pointer sequence finishes after
+    // the tick that started it. Carries its own age, so a line left over from the last fight
+    // cannot be mistaken for what is happening now.
+    const aim = $("rl-aim-note");
+    aim.textContent = view.aimNote ?? "";
+    aim.title = "The last effect that aimed at a monster before acting.";
+    aim.hidden = !view.aimNote;
+
     // Always, even mid-edit: it is a readout, it replaces no control, and a buff list that
     // froze while somebody was typing a buff name would be useless exactly when it is wanted.
     this.renderBuffs(view.buffs ?? [], view.buffRead ?? "");

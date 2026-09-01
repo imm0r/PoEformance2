@@ -63,7 +63,11 @@ public static class AimSequence
     /// must not touch anything the reader loop owns exclusively.
     /// </param>
     /// <param name="act">What to do once the target is confirmed.</param>
-    /// <param name="report">Told why nothing happened, when nothing did.</param>
+    /// <param name="report">
+    /// Told how it went, on EVERY path including the one that worked. Success is reported for
+    /// the same reason the failures are: the only way to tell "the confirmation is rejecting
+    /// every aim" from "the rule never held" is to see the sequence say something.
+    /// </param>
     public static void Run(
         (int X, int Y) target,
         ulong expected,
@@ -77,6 +81,7 @@ public static class AimSequence
 
         if (Interlocked.CompareExchange(ref _running, 1, 0) != 0)
         {
+            report("skipped, still aiming at the last one");
             return;
         }
 
@@ -126,6 +131,7 @@ public static class AimSequence
             }
 
             act();
+            report("on target");
         }
         finally
         {

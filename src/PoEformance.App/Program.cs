@@ -2088,7 +2088,8 @@ internal static class Program
                             ? (at.X + (int)point.X, at.Y + (int)point.Y)
                             : null;
                     },
-                    world.ReadHoveredNow));
+                    world.ReadHoveredNow,
+                    note => ruleEngine.Aimed(note, Environment.TickCount64)));
 
                 return snapshot;
             },
@@ -2109,6 +2110,8 @@ internal static class Program
         overlay.ReadStats = () => (feed.LastReadMilliseconds, feed.ReadCount, feed.FailureCount);
         overlay.FlaskStatus = () => autoFlask.LastTick.Reason;
         overlay.EvasionStatus = () => evasionPlanner.LastTick.Reason;
+        overlay.RuleStatus = () => ruleEngine.LastTick.Reason;
+        overlay.AimStatus = () => ruleEngine.AimNote(Environment.TickCount64);
 
         // The last EVALUATED tick, not a fresh one. The renderer redraws at VSync and the rules
         // are decided once per read, so asking here would both cost a re-evaluation per frame
@@ -2248,9 +2251,15 @@ internal static class Program
     /// engine that decided the aim has neither.
     /// </param>
     /// <param name="Hovered">Re-reads the game's hovered-entity slot, on demand.</param>
+    /// <param name="Note">
+    /// Where every outcome of an aim goes, so it can be read on the status page. The sequence
+    /// finishes milliseconds AFTER the tick that started it, so there is no tick left to report
+    /// through - which is why this is a callback rather than something on <see cref="RuleTick"/>.
+    /// </param>
     internal readonly record struct AimContext(
         Func<PoEformance.Features.AimPoint, (int X, int Y)?> Project,
-        Func<ulong> Hovered);
+        Func<ulong> Hovered,
+        Action<string> Note);
 
     private static void Perform(PoEformance.Features.RuleTick tick, AimContext? aiming = null)
     {
@@ -2331,7 +2340,10 @@ internal static class Program
         {
             // Off screen, so there is nothing to point at. The decision was sound - the monster
             // is in range and under its threshold - it simply cannot be reached by a pointer,
-            // which is a different thing from the rule being wrong.
+            // which is a different thing from the rule being wrong. Said out loud for exactly
+            // that reason: a radius wider than the screen produces this every time, and it is
+            // indistinguishable from a broken projection until something names it.
+            context.Note("the target is off screen");
             return;
         }
 
@@ -2341,7 +2353,7 @@ internal static class Program
             context.Hovered,
             () => Perform(
                 new PoEformance.Features.RuleTick([], [], [input with { Aim = null }], string.Empty)),
-            static _ => { });
+            context.Note);
     }
 
     /// <summary>
