@@ -302,6 +302,14 @@ public class HazardReadingTests
         // The timer defaults ON, because a ring without it says no more than the old rules did.
         Assert.True(TrackerSettings.Default.ShowGroundEffectTimer);
 
+        // So does the name, on the same reasoning: neither can appear until somebody has turned
+        // the rings on, and a ring that says "Ignited Ground" is worth more than a bare circle.
+        Assert.True(TrackerSettings.Default.ShowGroundEffectNames);
+
+        // The DEBUG block stays off. It prints the metadata path and the entity id, which is for
+        // working out why a ring is where it is, not for playing with.
+        Assert.False(TrackerSettings.Default.ShowGroundEffectLabels);
+
         // And the ring is NOT sized from the game any more. It was, while GroundEffect+0x38 was
         // believed to be the patch's radius - the point being that a ring at a size somebody
         // picked can never disagree with the patch it is drawn on, so it can never settle

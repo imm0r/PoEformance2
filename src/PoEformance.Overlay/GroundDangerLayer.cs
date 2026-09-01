@@ -242,6 +242,11 @@ public sealed class GroundDangerLayer
 
             DrawRing(draw, new Vector2(at.X, at.Y), ink, entity.GroundSeconds);
 
+            if (Settings.ShowGroundEffectNames && GroundTypes?.Find(entity.GroundType) is { } named)
+            {
+                DrawName(draw, ink, named);
+            }
+
             if (Settings.ShowGroundEffectLabels)
             {
                 DrawLabel(draw, new Vector2(at.X, at.Y), colour, entity, radius);
@@ -374,6 +379,51 @@ public sealed class GroundDangerLayer
             draw.AddText(centre - (size / 2), colour, text);
         }
     }
+
+    /// <summary>Writes the kind of ground BESIDE the ring, where it does not cover it.</summary>
+    /// <remarks>
+    /// BESIDE, NOT UNDER, and that is the whole difference from <see cref="DrawLabel"/>. This is
+    /// meant to be read while playing: text under a ring sits on the ground the ring is warning
+    /// about, which is exactly where the eye is going and exactly what must stay visible. Off to
+    /// the right of the ring's own bounding box, vertically centred on it, so the patch of floor
+    /// inside stays clear.
+    ///
+    /// ONE LINE, and the shortest useful one: the buff's name where there is one - "Ignited
+    /// Ground", "Sacred Ashes" - because that is the phrase already on the player's own screen.
+    /// The internal Id and the game's full sentence are both longer and both belong to the debug
+    /// block, which is a different switch.
+    ///
+    /// The ring's own colour, so a dimmed helpful patch gets dimmed text too and the pairing is
+    /// obvious without reading either.
+    /// </remarks>
+    private void DrawName(ImDrawListPtr draw, uint colour, GroundEffectType kind)
+    {
+        string text = kind.Buff.Length > 0 ? kind.Buff : kind.Caption;
+        if (text.Length == 0)
+        {
+            return;
+        }
+
+        float right = float.MinValue, top = float.MaxValue, bottom = float.MinValue;
+        foreach (Vector2 p in _ring)
+        {
+            right = Math.Max(right, p.X);
+            top = Math.Min(top, p.Y);
+            bottom = Math.Max(bottom, p.Y);
+        }
+
+        Vector2 size = ImGui.CalcTextSize(text);
+        var origin = new Vector2(right + NameGap, ((top + bottom) / 2f) - (size.Y / 2f));
+
+        // The same dark plate the debug label uses. Ground effects are bright by nature and this
+        // text lands beside one, where thin glyphs in the effect's own colour are unreadable.
+        draw.AddRectFilled(
+            origin - new Vector2(3, 1), origin + size + new Vector2(3, 1), LabelBackground);
+        draw.AddText(origin, colour, text);
+    }
+
+    /// <summary>Pixels between the ring's edge and the name written beside it.</summary>
+    private const float NameGap = 5f;
 
     /// <summary>
     /// Writes what the ring actually is, under it, for working out why it is where it is.
