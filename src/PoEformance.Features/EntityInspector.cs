@@ -70,6 +70,59 @@ public readonly record struct TimedEffect(string Name, float TimeLeft, float Tot
 /// </param>
 public readonly record struct EntityStat(uint Id, int Value, string Name = "", string Source = "");
 
+/// <summary>Narrowing a stat list to what somebody is looking for.</summary>
+/// <remarks>
+/// Here rather than in the window that draws the box, so it can be tested: a search that
+/// quietly fails to match is worse than no search at all. The list it narrows is the ANSWER TO
+/// "IS THIS STAT THERE", and a player who types a name, sees nothing and concludes the stat is
+/// absent has been misled by the tool - which is the one thing this browser must not do.
+/// </remarks>
+public static class EntityStats
+{
+    /// <summary>
+    /// The stats a search leaves, in the order they were read.
+    /// </summary>
+    /// <remarks>
+    /// Name, id AND value, because all three are things somebody arrives with: a name from the
+    /// game's Stats table, an id from a schema note, and a value off a tooltip they are trying
+    /// to find the source of.
+    ///
+    /// The ORDER is left alone. The list is grouped by which bag each stat came from, and the
+    /// same stat sits in both bags with different values - so sorting by anything would pull
+    /// that grouping apart and make every row ambiguous again.
+    /// </remarks>
+    public static List<EntityStat> Matching(IReadOnlyList<EntityStat> stats, string? search)
+    {
+        ArgumentNullException.ThrowIfNull(stats);
+
+        if (string.IsNullOrEmpty(search))
+        {
+            return [.. stats];
+        }
+
+        var found = new List<EntityStat>();
+        foreach (EntityStat stat in stats)
+        {
+            if (Matches(stat, search))
+            {
+                found.Add(stat);
+            }
+        }
+
+        return found;
+    }
+
+    private static bool Matches(EntityStat stat, string search)
+        => stat.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+           || Text(stat.Id).Contains(search, StringComparison.Ordinal)
+           || Text(stat.Value).Contains(search, StringComparison.Ordinal);
+
+    /// <summary>Invariant, so a search for "4000" matches on every machine's locale.</summary>
+    private static string Text<T>(T value)
+        where T : IFormattable
+        => value.ToString(null, System.Globalization.CultureInfo.InvariantCulture);
+}
+
 /// <summary>What the entity browser wants to see.</summary>
 /// <param name="Survey">
 /// Entities to count components across, for the one-shot survey. Supplied by the window

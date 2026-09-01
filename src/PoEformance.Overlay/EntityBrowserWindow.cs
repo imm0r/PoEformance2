@@ -53,6 +53,17 @@ public sealed class EntityBrowserWindow
     private ulong _selected;
     private string _filter = string.Empty;
 
+    /// <summary>
+    /// Narrows the stat list to what matches. Kept across selections, like <see cref="_open"/>.
+    /// </summary>
+    /// <remarks>
+    /// A player's stat bag runs to four hundred rows and the interesting one is a needle in it -
+    /// "is display_cull_rare_life_%_threshold there at all" took two passes by eye and still
+    /// did not settle it. Reading a wall of names is not a way to establish that something is
+    /// ABSENT, which is the half of the question this browser exists to answer.
+    /// </remarks>
+    private string _statFilter = string.Empty;
+
     /// <summary>Where the list ends and the components begin. Draggable; 0.4 was the old 360px.</summary>
     private readonly PaneSplit _split = new(0.4f);
     private int _surveySequence;
@@ -875,15 +886,33 @@ public sealed class EntityBrowserWindow
         // its own duration says so with a value in milliseconds against one of those.
         if (view.StatsNote.Length > 0)
         {
+            OverlayLayout.Search("##statfilter", "search stats by name, id or value...", ref _statFilter, 64);
+
             ImGui.TextColored(view.Numbers.Count > 0 ? PathText : DimText, ImGuiText.Escape(view.StatsNote));
 
             // Named where the game's own table has a name, three across when it does not -
             // a hundred unnamed ids is a wall of numbers and a hundred named ones is a list
             // worth reading, so the two want different shapes.
+            //
+            // Judged over ALL the stats rather than the matching ones, so the list does not
+            // change shape as somebody types - a search whose results reflow into three columns
+            // on one keystroke and back on the next is a search nobody can read.
             bool named = view.Numbers.Any(stat => stat.Name.Length > 0);
+
+            List<EntityStat> showing = EntityStats.Matching(view.Numbers, _statFilter);
+            if (_statFilter.Length > 0)
+            {
+                // The count, and it is the point rather than a nicety: an empty list under a
+                // search box says "no match", which is exactly the answer somebody hunting for
+                // a stat they cannot find needs to be able to trust.
+                ImGui.TextColored(
+                    showing.Count > 0 ? PathText : DimText,
+                    $"  showing {showing.Count} of {view.Numbers.Count}");
+            }
+
             int column = 0;
             string bag = string.Empty;
-            foreach (EntityStat stat in view.Numbers)
+            foreach (EntityStat stat in showing)
             {
                 // Grouped by which bag it came from, because the same stat is in both with
                 // different values - the sheet's mana is in one and a smaller number is in
@@ -913,6 +942,7 @@ public sealed class EntityBrowserWindow
             }
         }
     }
+
 
     /// <summary>
     /// What the entity is made of, and the four things that can be done to it.
