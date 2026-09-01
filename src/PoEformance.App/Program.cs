@@ -1091,12 +1091,14 @@ internal static class Program
             PoEformance.Game.Files.GameFiles.OpenOrSay(PoEformance.Game.Files.GameInstall.Find(null));
         if (opened.Files is null)
         {
-            Console.WriteLine($"  no install: {opened.Why}");
-            return;
+            // NOT a return. The vendored copy names every row without an install, and somebody
+            // running this on a replay machine wants the table just as much.
+            Console.WriteLine($"  no install ({opened.Why}) - falling back to the vendored copy");
         }
 
         PoEformance.Features.GroundEffectTypeTable table =
-            PoEformance.Features.GroundEffectTypeTable.Load(opened.Files, FindDataFile("ground-tables.json"));
+            PoEformance.Features.GroundEffectTypeTable.Load(
+                opened.Files, FindDataFile("ground-tables.json"), FindDataFile("ground-effect-types.json"));
 
         Console.WriteLine($"  {table.Why}");
         if (table.Rows == 0)
@@ -1110,9 +1112,9 @@ internal static class Program
         {
             // The three the sweep capture actually observed, marked. Everything else is context
             // for judging whether those three are the decorative end of the table.
-            string seen = type.Row is 12 or 17 or 20 ? " <- seen in the capture" : string.Empty;
+            string seen = type.Row is 10 or 12 or 16 or 17 or 18 or 20 ? "  <- seen in a capture" : string.Empty;
             Console.WriteLine(
-                $"  {type.Row,3}  {type.Buffs,5}  {(type.HasStat ? "yes " : "no  "),4}  {type.Id}{seen}");
+                $"  {type.Row,3}  {type.Buffs,5}  {(type.HasStat ? "yes " : "no  "),4}  {type.Describe}{seen}");
         }
     }
 
@@ -1592,7 +1594,8 @@ internal static class Program
         // carries a row index and the name lives in the game's own table. Missing is ordinary and
         // costs only the name: the rings still draw.
         PoEformance.Features.GroundEffectTypeTable groundTypes =
-            PoEformance.Features.GroundEffectTypeTable.Load(installed, FindDataFile("ground-tables.json"));
+            PoEformance.Features.GroundEffectTypeTable.Load(
+                installed, FindDataFile("ground-tables.json"), FindDataFile("ground-effect-types.json"));
         Console.WriteLine($"ground   {groundTypes.Why}");
 
         handle.Stage = "loading item names";

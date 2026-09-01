@@ -455,12 +455,11 @@ function describeSeen(seen) {
   const notes = [];
   if (seen.onScreen) notes.push("here now");
 
-  // TAGGED IS NOT DANGEROUS. The component means the server drew a decal here - 5880 of 5916
-  // sightings in the recorded session were in a hideout - so a row that read "the game marks
-  // this one as dangerous" would be telling somebody the opposite of what was measured. Your
-  // rule wins over the ring either way, so adding one is never wasted.
-  if (seen.hasComponent) notes.push("has a ground decal — that is not a claim about damage");
-  else notes.push("no decal — a rule is the only way it gets marked");
+  // The game marks it, so the overlay already rings it AND can name the kind out of the game's
+  // own table. A rule here is not wasted - it wins, and it is how a colour or size gets chosen -
+  // but it is not needed just to see the ground.
+  if (seen.hasComponent) notes.push("the game marks this one — already ringed and named");
+  else notes.push("the game does not mark it — a rule is the only way it gets ringed");
 
   if (seen.most > 1) notes.push(`up to ${seen.most} at once`);
   if (groundRules.some((r) => matchesRule(r, seen.path))) notes.push("a rule covers it");

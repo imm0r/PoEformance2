@@ -35,11 +35,12 @@ namespace PoEformance.Overlay;
 /// happened to carry. Two rings of different sizes on one patch, which is exactly the "I cannot
 /// tell what these circles are" this feature is supposed to end.
 ///
-/// THE RULE WINS. See TrackerSettings.ComponentShouldRing - and note that it was shipped the
-/// other way round for exactly one commit, on the belief that a GroundEffect component is the
-/// game's own answer to "is this dangerous ground". It is not. It marks a server-spawned ground
-/// DECAL and says nothing about damage, so a typed rule is the only thing in this system that
-/// makes a claim about danger at all.
+/// THE RULE WINS, and it is worth saying why that survived the correction below. The component
+/// identifies the KIND of ground precisely - better than any typed path can - so the first
+/// instinct was to let it win. But a rule is an explicit instruction somebody wrote down, with a
+/// colour and a size they chose, and silently overriding it is how a setting becomes a lie. The
+/// component pass keeps every entity no rule speaks for, which is nearly all of them. See
+/// TrackerSettings.ComponentShouldRing.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class GroundDangerLayer
@@ -162,26 +163,23 @@ public sealed class GroundDangerLayer
     /// Rings every entity the GAME calls a ground effect, and says how long it has left.
     /// </summary>
     /// <remarks>
-    /// WHAT THIS ACTUALLY MARKS, corrected after it was sold as something better than it is.
-    /// It rings every entity carrying a GroundEffect component - and that component means "the
-    /// server spawned a ground decal here", NOT "this ground damages you". The two were treated
-    /// as one thing for several commits, on nothing but the component's name.
+    /// WHAT THIS MARKS, after one wrong turn that is worth keeping on the record. It rings every
+    /// entity carrying a GroundEffect component, and the component means the game considers this
+    /// one of ITS OWN GROUND-EFFECT KINDS - Ignited Ground, Chilled Ground, Caustic Ground. The
+    /// row index at +0x48 names which, and every one of the table's 53 rows applies a buff.
     ///
-    /// The measurement that settles it: in the sweep capture 5880 of 5916 readings are in a
-    /// HIDEOUT, where nothing damages anything, and the single path carrying the component is
-    /// the engine's generic `VisibleServerGroundEffect`. A user screenshot showed the ring drawn
-    /// on an Abyssal Arsenal - a league object that does no damage at all.
+    /// THE WRONG TURN: this was briefly documented as "a decorative decal, nothing to do with
+    /// damage", on two pieces of evidence that both collapsed. A screenshot showed a ring on an
+    /// Abyssal Arsenal - but its countdown read 0.0 s, and by this project's own measurement a
+    /// countdown sits at 0.0 for 0.38 s after expiring, so it was a spent effect rather than a
+    /// harmless one. And 5880 of 5916 readings were attributed to a hideout - but those frames
+    /// carry area level 0 and area hash 0, which is a LOADING state where the name is still the
+    /// previous area's. They were never hideout decorations. Two mis-readings pointing the same
+    /// way felt like corroboration; neither was evidence.
     ///
-    /// So this is an AWARENESS layer, not a danger layer: it shows where the server has put
-    /// ground decals, which is genuinely useful for finding what to write a rule about, and is
-    /// why it stands aside wherever a rule already speaks. The rules are the only thing here
-    /// that claims anything about damage, because nothing found in memory has been shown to.
-    ///
-    /// A THIRD OF THEM HAVE NO NUMBER, and the ring is drawn anyway. 33 of the 72 entities held
-    /// NaN in the countdown slot for their whole life and 39 held a real one, with no entity
-    /// crossing between the two - so an absent timer is a kind of decal rather than a failed
-    /// read. Read that finding with the hideout caveat above: it describes the decorations in a
-    /// hideout, and almost nothing in the capture was ever in a fight.
+    /// A THIRD OF THEM HAVE NO NUMBER, and the ring is drawn anyway. 33 of 72 entities held NaN
+    /// in the countdown slot for their whole life and 39 held a real one, with no entity crossing
+    /// between the two - so an absent timer is a kind of effect rather than a failed read.
     ///
     /// THE TIMER READS 0.0 FOR A BEAT before the ring goes. That is not a rounding artefact -
     /// the game's countdown reaches zero a measured 0.38 s before it stops listing the entity.
@@ -400,14 +398,16 @@ public sealed class GroundDangerLayer
 
         // WHAT KIND OF GROUND THIS IS, first, because it is the only line that varies: the path
         // below it is the same generic string on every ground effect on file, so on a screen
-        // with three rings it distinguishes nothing. The buff count comes with it because that
-        // is where damage lives - a type applying no buff at all is doing nothing to anybody,
-        // which is the single most useful thing this label can say.
+        // with three rings it distinguishes nothing.
+        //
+        // THE BUFF NAME, NOT A BUFF COUNT. Counting them was the first idea and it discriminates
+        // nothing - every one of the table's 53 rows applies a buff - where the buff's NAME is
+        // the phrase on the player's own screen while they stand in it: "Ignited Ground",
+        // "Sacred Ashes". That is the difference between a debug aid and a readable one.
         GroundEffectType? kind = GroundTypes?.Find(entity.GroundType);
         string? type = kind is null
             ? entity.GroundType is { } row ? $"type {row} - not in the table" : null
-            : $"{kind.Caption}  ({kind.Buffs} buff{(kind.Buffs == 1 ? string.Empty : "s")}"
-              + $"{(kind.HasStat ? ", a stat" : string.Empty)})";
+            : kind.Describe;
 
         string[] lines = type is null ? [entity.Path, detail] : [type, entity.Path, detail];
 

@@ -1,0 +1,324 @@
+{
+  "comment": "The game's GroundEffectTypes table, vendored so a ground effect can be NAMED without a Path of Exile install. The GroundEffect component carries only a row index (+0x48); this turns it into the game's own name for the kind of ground, and the name of the buff that kind applies. WHY VENDORED WHEN THE INSTALL IS AUTHORITATIVE: without it the feature does nothing on a machine that is only replaying a recording - which is every machine this project's tests run on - so the resolution could not be tested at all, only its failure modes. GroundEffectTypeTable prefers the install and falls back to this, so a patch that adds rows is picked up on a real machine while a replay still gets names. A row this file does not know is reported as its number, never guessed. WHAT THE TABLE SETTLES: every one of the 53 rows is a real effect kind applying a real buff - Ignited Ground, Chilled Ground, Shocked Ground, Caustic Ground. There is no decorative row (26 is literally called Unused). So carrying a GroundEffect component means the game considers this one of its ground-effect kinds, which is the opposite of a conclusion this project briefly recorded after mis-reading a loading-screen area name as a hideout. See the GroundEffect comment in schema/poe2.offsets.json.",
+  "source": "repoe-fork/dat-export, current/poe2/heuristics/csv/GroundEffectTypes.csv and BuffDefinitions.csv",
+  "types": [
+    {
+      "row": 0,
+      "id": "IgnitedGround",
+      "buff": "Ignited Ground",
+      "buffs": 1
+    },
+    {
+      "row": 1,
+      "id": "ChilledGround",
+      "buff": "Chilled Ground",
+      "buffs": 1
+    },
+    {
+      "row": 2,
+      "id": "CausticCloud",
+      "buff": "Caustic Ground",
+      "buffs": 1
+    },
+    {
+      "row": 3,
+      "id": "Tar",
+      "buff": "Tarred Ground",
+      "buffs": 1
+    },
+    {
+      "row": 4,
+      "id": "Smoke",
+      "buff": "",
+      "buffs": 1
+    },
+    {
+      "row": 5,
+      "id": "Desecration",
+      "buff": "Desecrated Ground",
+      "buffs": 1
+    },
+    {
+      "row": 6,
+      "id": "Consecration",
+      "buff": "Consecrated Ground",
+      "buffs": 2
+    },
+    {
+      "row": 7,
+      "id": "ShockedGround",
+      "buff": "Shocked Ground",
+      "buffs": 1
+    },
+    {
+      "row": 8,
+      "id": "Vortex",
+      "buff": "Vortex",
+      "buffs": 1
+    },
+    {
+      "row": 9,
+      "id": "Haste",
+      "buff": "Slipstream",
+      "buffs": 1
+    },
+    {
+      "row": 10,
+      "id": "Sandstorm",
+      "buff": "Garukhan's Sandstorm",
+      "buffs": 1
+    },
+    {
+      "row": 11,
+      "id": "Blizzard",
+      "buff": "Snow Cloak",
+      "buffs": 2
+    },
+    {
+      "row": 12,
+      "id": "Spores",
+      "buff": "Ground Spores",
+      "buffs": 1
+    },
+    {
+      "row": 13,
+      "id": "DevouringDarkness",
+      "buff": "Devouring Darkness",
+      "buffs": 1
+    },
+    {
+      "row": 14,
+      "id": "Quicksand",
+      "buff": "",
+      "buffs": 1
+    },
+    {
+      "row": 15,
+      "id": "Blood",
+      "buff": "Boiling Blood",
+      "buffs": 1
+    },
+    {
+      "row": 16,
+      "id": "TemporalAnomaly",
+      "buff": "Temporal Anomaly",
+      "buffs": 2
+    },
+    {
+      "row": 17,
+      "id": "OrionMeteor",
+      "buff": "Desolation of the Awakener",
+      "buffs": 2
+    },
+    {
+      "row": 18,
+      "id": "CrownOfThorns",
+      "buff": "Sacred Ashes",
+      "buffs": 1
+    },
+    {
+      "row": 19,
+      "id": "VaalCloud",
+      "buff": "Corrupting Smoke",
+      "buffs": 1
+    },
+    {
+      "row": 20,
+      "id": "Profane",
+      "buff": "Profane Ground",
+      "buffs": 1
+    },
+    {
+      "row": 21,
+      "id": "ChaosOfferingOfJudgement",
+      "buff": "Offering Of Judgement",
+      "buffs": 2
+    },
+    {
+      "row": 22,
+      "id": "FireOfferingOfJudgement",
+      "buff": "Offering Of Judgement",
+      "buffs": 2
+    },
+    {
+      "row": 23,
+      "id": "DespairBearGeyser",
+      "buff": "Weight of Despair",
+      "buffs": 1
+    },
+    {
+      "row": 24,
+      "id": "Fungal",
+      "buff": "Fungal Ground",
+      "buffs": 2
+    },
+    {
+      "row": 25,
+      "id": "BestiarySpiderWeb",
+      "buff": "Venomous Web",
+      "buffs": 1
+    },
+    {
+      "row": 26,
+      "id": "Unused",
+      "buff": "Chilled Ground",
+      "buffs": 1
+    },
+    {
+      "row": 27,
+      "id": "Oil",
+      "buff": "Oiled Ground",
+      "buffs": 2
+    },
+    {
+      "row": 28,
+      "id": "ScorchedGround",
+      "buff": "Scorched Ground",
+      "buffs": 1
+    },
+    {
+      "row": 29,
+      "id": "GravityWell",
+      "buff": "Gravity Well",
+      "buffs": 1
+    },
+    {
+      "row": 30,
+      "id": "LightningVortex",
+      "buff": "Vortex",
+      "buffs": 1
+    },
+    {
+      "row": 31,
+      "id": "BrittleGround",
+      "buff": "Brittle Ground",
+      "buffs": 1
+    },
+    {
+      "row": 32,
+      "id": "SappedGround",
+      "buff": "[DNT-UNUSED] Sapped Ground",
+      "buffs": 1
+    },
+    {
+      "row": 33,
+      "id": "Sludge",
+      "buff": "Vomitous Ooze",
+      "buffs": 1
+    },
+    {
+      "row": 34,
+      "id": "Sanctum",
+      "buff": "Enervation",
+      "buffs": 1
+    },
+    {
+      "row": 35,
+      "id": "SanctumFire",
+      "buff": "Burning Ground",
+      "buffs": 1
+    },
+    {
+      "row": 36,
+      "id": "SanctumChaos",
+      "buff": "Caustic Ground",
+      "buffs": 1
+    },
+    {
+      "row": 37,
+      "id": "LivingBlood",
+      "buff": "Living Blood",
+      "buffs": 2
+    },
+    {
+      "row": 38,
+      "id": "FungalArtillery",
+      "buff": "Spore Cloud",
+      "buffs": 1
+    },
+    {
+      "row": 39,
+      "id": "ChimeraCorrupted",
+      "buff": "[DNT-UNUSED] Corrupted Ground",
+      "buffs": 1
+    },
+    {
+      "row": 40,
+      "id": "Jagged",
+      "buff": "Jagged Ground",
+      "buffs": 1
+    },
+    {
+      "row": 41,
+      "id": "Sulphite",
+      "buff": "Voltaxic Sulphite Ground",
+      "buffs": 1
+    },
+    {
+      "row": 42,
+      "id": "PhysFireLifeRecover",
+      "buff": "Sundered Ground",
+      "buffs": 1
+    },
+    {
+      "row": 43,
+      "id": "PoisonCloud",
+      "buff": "Poisonous Cloud",
+      "buffs": 1
+    },
+    {
+      "row": 44,
+      "id": "SpiderWeb",
+      "buff": "Spider's Web",
+      "buffs": 1
+    },
+    {
+      "row": 45,
+      "id": "ManaSiphoningGround",
+      "buff": "Mana Siphoning",
+      "buffs": 1
+    },
+    {
+      "row": 46,
+      "id": "GenericGroundEffect",
+      "buff": "Blackflame Ground",
+      "buffs": 1
+    },
+    {
+      "row": 47,
+      "id": "Oasis",
+      "buff": "Navira's Oasis",
+      "buffs": 1
+    },
+    {
+      "row": 48,
+      "id": "ElementalShredGround",
+      "buff": "",
+      "buffs": 1
+    },
+    {
+      "row": 49,
+      "id": "WitheredGround",
+      "buff": "",
+      "buffs": 1
+    },
+    {
+      "row": 50,
+      "id": "Briarpatch",
+      "buff": "",
+      "buffs": 1
+    },
+    {
+      "row": 51,
+      "id": "FeatheredGround",
+      "buff": "Soaring Ground",
+      "buffs": 1
+    },
+    {
+      "row": 52,
+      "id": "Leyline",
+      "buff": "Leyline",
+      "buffs": 1
+    }
+  ]
+}

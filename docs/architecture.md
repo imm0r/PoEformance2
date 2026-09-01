@@ -882,93 +882,38 @@ a feature built on a person describing something the game names itself. The rule
 they cover what the component does not: a Firewall or an ice crystal is a hostile effect wearing a
 monster's components and carries no `GroundEffect`.
 
-#### The component does not mean "dangerous", and that was the load-bearing mistake
+#### What the component means, and the wrong turn on the way to saying it
 
-Written first because it invalidates the confident paragraphs that follow it, which are kept as
-they were so the correction has something to correct.
+`GroundEffect` was first read as a hazard marker; then re-read as marking only a **decorative
+decal**, nothing to do with damage. The second reading was the wrong one, and both of its supports
+collapsed — which is the part worth keeping, because they collapsed for reasons this file already
+contained.
 
-`GroundEffect` was read as the game's own answer to *"is this ground dangerous"* — a claim that
-justified building a hazard layer on it, ranking it above the user's own rules, and treating
-`+0x38` as the radius of a burning patch. It says no such thing. It marks a **server-spawned
-ground decal**, and the single path carrying it in the capture is the engine's generic
-`VisibleServerGroundEffect`.
+1. A screenshot showed the ring on an **Abyssal Arsenal**. Its countdown read `0.0s` — and this
+   very document records that a countdown sits at 0.0 for a measured **0.38 s after expiring**.
+   That was a *spent* effect, not a harmless one.
+2. **5880 of 5916** readings were attributed to a hideout. Those frames carry area level **0** and
+   area hash **0** — a *loading* state in which the area **name** is still the previous area's.
+   They were never hideout decorations.
 
-**The measurement, which was available the whole time and never taken:** of 5916 component
-readings in `session-2026-08-sweep.rec`, **5880 are in a hideout** and 36 in a map. A hideout
-damages nobody. Every quantitative statement this file makes about "ground effects" — the 39/33
-timer split, the 59–104 s lifetimes, the 0.38 s despawn beat — describes *hideout decorations*.
-The despawn-beat finding survives (it is about how the engine delists an entity, which is
-area-independent); the ones that read as facts about hazards do not.
+Two mis-readings pointing the same way felt like corroboration. Neither was evidence, and the
+lesson is the cheaper of the two: **check the state you are attributing to before you attribute
+to it.** One glance at `AreaHash` would have stopped it.
 
-**The game settled it from the other side.** A screenshot of the overlay showed the ring drawn on
-an *Abyssal Arsenal* — a league object that does no damage — labelled `r=18.65`, the same constant
-every other one carries. Which brings the radius down too: across 5916 readings `+0x38` takes
-**three** values, 18.670750 (×5576), 18.664923 (×298) and 18.657303 (×42). A per-effect radius
-that is one constant on 94 % of readings is not describing individual areas.
+**What the game's own data says.** `GroundEffectTypes` has **53 rows**, every one a real effect
+kind applying a real buff — `IgnitedGround`, `ChilledGround`, `ShockedGround`, `CausticCloud` — and
+no decorative row at all (row 26 is literally `Unused`). The rows the recordings show resolve to
+**Spores**, **OrionMeteor** (*Desolation of the Awakener*), **CrownOfThorns** (*Sacred Ashes*) and
+**Profane Ground**.
 
-**What changed as a result.** A typed rule now beats the component ring, where for one commit it
-was the reverse. The two passes are not "precise" and "typed" — they answer different questions.
-The component answers *the server put a decal here*, which in a hideout is the furniture. A rule
-answers *this one hurts*, which is a claim only a person can make, because nothing found in memory
-has been shown to carry it. Overriding that threw away the only danger signal in the system.
+So carrying the component means the game considers the entity one of its ground-effect kinds. It
+still does **not** follow that every one damages the player — `Consecration` and `Haste` are in the
+same table — so the *buff a row applies* is what a consumer must look at.
 
-The ring keeps its job as an **awareness** layer: it marks decals nobody has described yet, which
-is exactly how you find a path worth writing a rule about. It stands aside wherever a rule speaks.
-
-**What is still needed:** a recording made in a map with real damaging ground in it. Thirty-six
-non-hideout readings cannot answer a single question about hazards, and no amount of re-reading
-this capture will change that.
-
-#### The game's own data files say where the answer lives
-
-The DAT schema (`repoe-fork/dat-export`, `current/poe2`) settles the *structure* even though no
-recording here settles the values:
-
-```
-GroundEffects      → GroundEffectTypesKey: GroundEffectTypes
-GroundEffectTypes  → Id, Stat, BuffDefinition1, BuffDefinition2
-```
-
-So **whether a patch of ground hurts is a property of its type**, expressed as the buffs that type
-applies. It is not a flag on the instance — which is why no amount of reading the component was
-ever going to produce one, and is worth writing down as the reason that search kept failing. What
-the component must carry instead is a way *back* to that row.
-
-**`+0x48` is the candidate**, and it now has the one property the search needed: a small integer
-taking 12, 17 and 20, **constant on 72 of 72 entities across their entire lives**. That is the
-signature of an immutable property. The two fields that looked like better separators are not:
-`+0x68` is zero on every hideout entity and non-zero on every map one — which reads as a hazard
-flag until the per-entity check shows it *moving* within a single entity's life, from 0 to about
-0.9. `+0x64` moves too. Checking for movement is what separates a property from running state, and
-it costs one pass over the capture.
-
-**Promoting it needed no new machinery, and it is now built.** `Files/DatFile.cs` already parses
-`.dat` and `Files/BundleIndex.cs` already opens the game's bundles — the tool reads item art out of
-them today. `GroundEffectTypeTable` (Features) loads `GroundEffectTypes` through the same
-`QuestTables.Open` that loads the quest tables: it probes the paths a table can live at, parses,
-and checks the derived row size against what the column list computes, falling back to reading the
-`Id` column as text when the size disagrees. The column list is vendored in `data/ground-tables.json`
-and its offsets are **recomputed** from the widths, never stored — rows are packed, so a corrected
-width has to move every column after it.
-
-`WorldEntity.GroundType` carries the row; the overlay label resolves it to a name and shows how
-many `BuffDefinition` columns the row sets. **The buff count is the point, not the name**: damage
-is a property of the type expressed as the buffs it applies, so a row with no buff at all cannot be
-doing anything to anybody. It counts rather than judging — a shrine's ground applies a buff too.
-
-`--groundtypes` prints the whole table and marks the three rows the capture observed. It reads the
-**install**, so it needs no running game and no fight to survive — which is the first experiment in
-this entire thread that asks nothing of the person running it.
-
-**What is proven and what is not.** The memory half is measured: the row reaches the snapshot on
-all 5916 readings and holds still across every entity's whole life. The table half is tested only
-through its *failure* modes — no install, no layout, an unknown row — because this suite runs on
-Linux with no Path of Exile to read. Whether row 17 is called what the game calls it is settled by
-running `--groundtypes` once on a machine with the game on it, and by nothing in the test suite.
-
-The caveat that keeps this honest: the 18 map entities in the capture are long-lived (958–1415
-frames) and hold `+Infinity` in the countdown slot, so they look ambient as well. This capture may
-contain no damaging ground at all, which is a second reason the recording above is still wanted.
+**The radius did not survive either**, and that finding is independent. `+0x38` reads the same
+`18.670750` on 94 % of readings where it reads at all, and the reader rejected it on **all 54**
+readings of the map capture. A number that is one constant where it exists and absent where it does
+not is not describing an area, so `GroundEffectUseGameRadius` now defaults **off**.
 
 **They must not both fire on one entity, and for a while they did.** The two passes walk the same
 entity list and neither knew about the other. The shipped rule is spelled as the *exact* path that
@@ -978,18 +923,48 @@ an X and a countdown, once as a flat pixel circle of whatever size the rule carr
 different sizes on one patch of fire, which is precisely the "I cannot tell what these circles are"
 the feature exists to end.
 
-The component pass now **owns** the entities it can identify: while it is on, the rules skip
-anything carrying a `GroundEffect`. It wins because it is the one that can say how big the patch
-is — it reads the radius out of the game, where a rule can only carry a number somebody typed. The
-refusal is keyed on the **switch**, not on what the other pass managed to draw: an entity it
-declines for a frame (its ring reaching behind the camera) would otherwise flip to a pixel circle
-and back as the camera turns, reading as a bug in both. Turn the component rings off and the rules
-take it back, because a switch that silently deleted coverage somebody wrote a rule for is the
-worse surprise.
+**A rule wins where somebody wrote one**, and the component pass keeps everything else — which is
+nearly every ground effect, since a rule has to be written one path at a time. This was shipped the
+other way round for exactly one commit, on the argument that the component reads a real value where
+a rule carries a typed number.
 
-The decision lives on `TrackerSettings.RulesShouldRing` rather than in the layer that draws, for a
-mundane but binding reason: the test project runs on Linux and cannot reference the Windows-only
-overlay, so a rule kept in the layer is a rule nothing can test.
+The reason it settled here is not that the component knows less. It knows **more**: `+0x48` names
+the exact kind of ground out of the game's own table, which no typed path can. It is that a rule is
+an explicit instruction a person wrote down, with a colour and a size they chose, and a tool that
+silently overrides one is a tool whose settings cannot be trusted. The split is by **authority**,
+not by accuracy — and the rule still only *matches*; nothing rewrites it.
+
+The decision lives on `TrackerSettings` rather than in the layer that draws, for a mundane but
+binding reason: the test project runs on Linux and cannot reference the Windows-only overlay, so a
+rule kept in the layer is a rule nothing can test.
+
+#### Naming the ground, without needing the game installed
+
+`GroundEffectTypeTable` resolves the row. It prefers the **install** — `Files/DatFile.cs` parses
+`.dat` and `Files/BundleIndex.cs` opens the bundles, and the column list is vendored in
+`data/ground-tables.json` with offsets *recomputed* from the widths, never stored. Confirmed on a
+real install: `data/balance/groundeffecttypes.datc64`, **53 rows of 64 bytes** — and 64 is exactly
+what the column list computes, which is the check that the layout is right.
+
+It falls back to `data/ground-effect-types.json`, which vendors the 53 rows from the same DAT
+export. That is what makes the feature work on a replay-only machine — every machine these tests
+run on — and it is why the resolution is *tested* rather than only its failure modes. A row neither
+source knows is reported as its number, never guessed.
+
+The label leads with the **buff name**, not a buff count: counting discriminates nothing, since all
+53 rows apply one, where the buff's name is the phrase on the player's own screen while they stand
+in it — `CrownOfThorns — Sacred Ashes`.
+
+`--groundtypes` prints the whole table and marks the rows the captures observed. It reads the
+install (or the vendored copy), so it needs no running game and no fight to survive. Distinct from
+`--glossary` and `--tables`, which read tables the game has already *loaded* off `FileRoot`: those
+need a process but no area; this one needs neither.
+
+**Why this is not a duplicate of `LoadedDatTables`.** The resident copy of a table carries the
+fixed-size rows and **not** the variable-length section — and `Id` is a string, which lives in
+exactly the half that is missing. That is why `DatFile` exists at all. The two do have a
+cross-check to offer each other: the resident table knows its own row count and row size, so a
+running game can confirm the 64 bytes without parsing a file.
 
 **The beam is drawn in full, and that is the point.** A ring on the beam entity's own position
 marks one end of a line up to 1116 world units long — worse than nothing, because it flags as

@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using PoEformance.Game.Files;
 
 namespace PoEformance.Features;
@@ -13,11 +15,64 @@ namespace PoEformance.Features;
 /// counts rather than judges.
 /// </param>
 /// <param name="HasStat">Whether the row names a Stat, which is the other half of the same story.</param>
-public sealed record GroundEffectType(int Row, string Id, int Buffs, bool HasStat)
+public sealed record GroundEffectType(int Row, string Id, int Buffs, bool HasStat, string Buff = "")
 {
     /// <summary>What to show when the row is known: the game's name, else the bare index.</summary>
     public string Caption => Id.Length > 0 ? Id : $"type {Row}";
+
+    /// <summary>
+    /// The readable line for a label: the kind, and what it puts on you.
+    /// </summary>
+    /// <remarks>
+    /// THE BUFF NAME IS THE USEFUL HALF and the Id is the searchable one, so both are shown. A
+    /// row called `CrownOfThorns` means nothing to a player; the buff it applies is called
+    /// "Sacred Ashes", which is the phrase on their own screen when they are standing in it.
+    /// </remarks>
+    public string Describe => Buff.Length > 0 && Buff != Id ? $"{Caption} - {Buff}" : Caption;
 }
+
+/// <summary>The vendored copy of the table, for when there is no install to read.</summary>
+/// <remarks>
+/// Its own record rather than reusing <see cref="GroundEffectType"/> because the file carries
+/// only what a name needs: the install has the Stat column and this does not, and a type built
+/// from here must not claim to know something it never read.
+/// </remarks>
+public sealed record VendoredGroundType(
+    [property: JsonPropertyName("row")] int Row,
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("buff")] string Buff,
+    [property: JsonPropertyName("buffs")] int Buffs);
+
+/// <summary>data/ground-effect-types.json as it sits on disk.</summary>
+public sealed class VendoredGroundTypes
+{
+    [JsonPropertyName("types")]
+    public List<VendoredGroundType> Types { get; init; } = [];
+
+    /// <summary>Reads the vendored rows, or null when the file is missing or unreadable.</summary>
+    public static VendoredGroundTypes? Load(string? path)
+    {
+        if (path is null || !File.Exists(path))
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize(
+                File.ReadAllText(path), GroundTypeJsonContext.Default.VendoredGroundTypes);
+        }
+        catch (Exception e) when (e is IOException or JsonException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+}
+
+/// <summary>Source-generated JSON, because the app ships Native AOT.</summary>
+[JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
+[JsonSerializable(typeof(VendoredGroundTypes))]
+public sealed partial class GroundTypeJsonContext : JsonSerializerContext;
 
 /// <summary>
 /// The game's GroundEffectTypes table, read out of the install.
@@ -115,31 +170,60 @@ public sealed class GroundEffectTypeTable
     /// </remarks>
     public string Why { get; }
 
-    /// <summary>Opens the table out of a game install, saying why when it cannot.</summary>
+    /// <summary>Reads the table, preferring the install and falling back to the vendored copy.</summary>
     /// <param name="files">The opened game archive, or null when there is no install.</param>
     /// <param name="layoutPath">Where data/ground-tables.json is.</param>
-    public static GroundEffectTypeTable Load(GameFiles? files, string? layoutPath)
+    /// <param name="vendoredPath">Where data/ground-effect-types.json is.</param>
+    /// <remarks>
+    /// THE INSTALL WINS WHEN THERE IS ONE, because it cannot go stale: a patch that adds a row
+    /// is in it the day it ships. The vendored copy exists so the feature is not dead on a
+    /// machine that only replays recordings - which is every machine the tests run on, and is
+    /// why the resolution can be tested at all rather than only its failure modes.
+    /// </remarks>
+    public static GroundEffectTypeTable Load(GameFiles? files, string? layoutPath, string? vendoredPath = null)
     {
-        if (files is null)
+        QuestTableLayouts? layouts = layoutPath is not null && File.Exists(layoutPath)
+            ? QuestTableLayouts.Load(layoutPath)
+            : null;
+
+        if (files is not null && layouts is not null)
         {
-            return None("no game install was opened, so ground effect types cannot be named");
+            // Id is the string column the fallback check reads. It is the only column here that
+            // CAN be checked from the bytes alone, which makes it the one worth naming.
+            (LoadedTable? table, string why) =
+                QuestTables.Open(files, layouts, Table, arrayColumn: null, "Id");
+            if (table is not null)
+            {
+                return new GroundEffectTypeTable(table, layouts, why);
+            }
+
+            return Vendored(vendoredPath, $"the install has no usable table ({why}); using the vendored copy");
         }
 
-        if (layoutPath is null || !File.Exists(layoutPath))
+        string reason = files is null
+            ? "no game install was opened"
+            : $"the column layout is missing or unreadable: {layoutPath ?? "(no path)"}";
+        return Vendored(vendoredPath, $"{reason}; using the vendored copy");
+    }
+
+    /// <summary>The table as this project ships it, when the install could not supply one.</summary>
+    private static GroundEffectTypeTable Vendored(string? path, string why)
+    {
+        VendoredGroundTypes? shipped = VendoredGroundTypes.Load(path);
+        if (shipped is null || shipped.Types.Count == 0)
         {
-            return None($"the column layout is missing: {layoutPath ?? "(no path)"}");
+            return None($"{why} - and {path ?? "(no path)"} is missing or empty, so nothing can be named");
         }
 
-        QuestTableLayouts? layouts = QuestTableLayouts.Load(layoutPath);
-        if (layouts is null)
+        var table = new GroundEffectTypeTable(null, null, $"{why}: {shipped.Types.Count} rows");
+        foreach (VendoredGroundType row in shipped.Types)
         {
-            return None($"{layoutPath} did not parse as a column layout");
+            // HasStat is FALSE rather than unknown, and that is deliberate: the vendored file
+            // does not carry the Stat column, so claiming one would be inventing a reading.
+            table._rows[row.Row] = new GroundEffectType(row.Row, row.Id, row.Buffs, false, row.Buff);
         }
 
-        // Id is the string column the fallback check reads. It is the only column here that CAN
-        // be checked from the bytes alone, which is exactly what makes it the one worth naming.
-        (LoadedTable? table, string why) = QuestTables.Open(files, layouts, Table, arrayColumn: null, "Id");
-        return table is null ? None(why) : new GroundEffectTypeTable(table, layouts, why);
+        return table;
     }
 
     /// <summary>The row the component pointed at, or null when it is not in the table.</summary>
