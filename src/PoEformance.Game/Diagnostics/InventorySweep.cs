@@ -67,6 +67,28 @@ public sealed record ParallelList(
 /// <param name="Text">What was read, to confirm it is the name and not a coincidence.</param>
 public sealed record NameHit(string Path, ulong At, int Offset, string Text);
 
+/// <summary>One entry of the tab array, and the name it leads to.</summary>
+/// <param name="Offset">Where in the block it sits, so a run can be turned into a base.</param>
+/// <param name="Record">The StashTabRecord it points at.</param>
+/// <param name="Name">The player's own word for this tab.</param>
+/// <param name="Filled">
+/// Whether the entry's vector has anything in it. EVERY ENTRY EVER EXAMINED BY HAND WAS EMPTY,
+/// so this column exists to find the first one that is not - what that vector holds is the open
+/// question, and guild tab contents have never been readable by any other route.
+/// </param>
+public sealed record StashTab(int Offset, ulong Record, string Name, bool Filled);
+
+/// <summary>The tab array as a whole.</summary>
+/// <param name="Block">What ServerDataStructure.TabRecords points at.</param>
+/// <param name="Offset">Where the run of entries starts inside it.</param>
+/// <param name="Count">How many entries long the run is, loaded or not.</param>
+/// <param name="Read">
+/// Whether the block could be read. FALSE AND EMPTY IS NOT NONE - the same distinction the rest
+/// of this report insists on, for the same reason.
+/// </param>
+public sealed record TabScan(
+    ulong Block, int Offset, int Count, IReadOnlyList<StashTab> Tabs, bool Read);
+
 /// <summary>What one frame of the sweep saw.</summary>
 /// <param name="Searched">
 /// Whether the server-data window could be read at all. FALSE AND EMPTY IS NOT NONE - a window
@@ -99,7 +121,8 @@ public sealed record InventorySweepFrame(
     IReadOnlyList<NameHit> Hits,
     bool Hunted,
     ulong ServerData,
-    ulong Holder);
+    ulong Holder,
+    TabScan? Tabs);
 
 /// <summary>
 /// Reads every inventory whole, to find what says which SORT of tab it is.
@@ -192,6 +215,8 @@ public sealed class InventorySweep
     private readonly int _rows;
     private readonly int _itemList;
     private readonly int _itemListLast;
+    private readonly int _tabRecords;
+    private readonly int _tabName;
 
     /// <summary>Where the slot's second, unnamed pointer sits. See SharedWindow.</summary>
     public const int SecondPointer = 0x10;
@@ -211,6 +236,8 @@ public sealed class InventorySweep
         _playerInfo = schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
         _serverDataPtr = schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr");
         _inventories = schema.Structs["ServerDataStructure"].OffsetOf("PlayerInventories");
+        _tabRecords = schema.Structs["ServerDataStructure"].OffsetOf("TabRecords");
+        _tabName = schema.Structs["StashTabRecord"].OffsetOf("Name");
 
         StructDef array = schema.Structs["InventoryArray"];
         _entrySize = (int)array.Constants["EntrySize"];
@@ -331,7 +358,193 @@ public sealed class InventorySweep
 
         IReadOnlyList<NameHit> hits = Hunt(needle, seen, serverData, holder);
         return new InventorySweepFrame(
-            frame, seen, lists, searched, hits, needle.Length > 0, serverData, holder);
+            frame, seen, lists, searched, hits, needle.Length > 0, serverData, holder,
+            ScanTabs(serverData));
+    }
+
+    /// <summary>How much of the tab block to take. The one entry ever seen sat at 0x3A90.</summary>
+    public const int TabWindow = 0x8000;
+
+    /// <summary>Bytes per entry - measured across three consecutive named entries.</summary>
+    public const int TabStride = 0x18;
+
+    /// <summary>Shortest run of named entries worth believing.</summary>
+    /// <remarks>
+    /// Four, because three pointers in a row that happen to look like an entry is a coincidence a
+    /// 32 KB window will produce several times over, and this project has been burned by exactly
+    /// that class of fingerprint. A run also has to be BOUNDED by named entries, so a stretch of
+    /// zeroed memory cannot be counted as a very long one.
+    /// </remarks>
+    public const int ShortestRun = 4;
+
+    /// <summary>How many names to read out of the best run.</summary>
+    private const int MostTabs = 512;
+
+    /// <summary>
+    /// Walks the whole tab array and reads every name in it.
+    /// </summary>
+    /// <remarks>
+    /// WHERE THE ARRAY STARTS IS NOT KNOWN, which is why this is a scan and not a read. The one
+    /// entry a pointer scan ever produced sat at 0x3A90 into the block, and 0x3A90 is not a
+    /// multiple of the 0x18 stride, so the base is somewhere else and has to be found.
+    ///
+    /// The expensive part is deliberately last. Deciding whether an offset LOOKS like an entry
+    /// costs nothing - the bytes are already in the window - so the shape filter runs over every
+    /// 8-aligned offset first, and only the best surviving run has its records actually read. A
+    /// filter that needed a read per candidate would be thousands of reads into a recording.
+    ///
+    /// Entries whose record pointer is null are kept INSIDE a run rather than ending it: a tab
+    /// the game has not loaded reads as zero, and the array does not stop at the first one. What
+    /// a run may not do is start or end on one, so a stretch of zeroed memory scores nothing.
+    /// </remarks>
+    private TabScan? ScanTabs(ulong serverData)
+    {
+        ulong block = _reader.ReadPointer(serverData + (ulong)_tabRecords);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(block))
+        {
+            return null;
+        }
+
+        var window = new byte[TabWindow];
+        var got = 0;
+        foreach (int size in (int[])[TabWindow, 0x4000, 0x2000, 0x1000])
+        {
+            if (_reader.TryRead(block, window.AsSpan(0, size)))
+            {
+                got = size;
+                break;
+            }
+        }
+
+        if (got == 0)
+        {
+            return new TabScan(block, 0, 0, [], Read: false);
+        }
+
+        // Entries sit 0x18 apart, and 0x18 is three qwords - so every run lives entirely in one
+        // of three alignments, and each can be walked independently.
+        var bestStart = -1;
+        var bestNamed = 0;
+        var bestLength = 0;
+
+        for (var phase = 0; phase < TabStride; phase += 8)
+        {
+            var runStart = -1;
+            var named = 0;
+            var lastNamed = -1;
+
+            for (int at = phase; at + TabStride <= got; at += TabStride)
+            {
+                EntryShape shape = Classify(window, at);
+
+                if (shape == EntryShape.Bad)
+                {
+                    Keep(runStart, lastNamed, named);
+                    runStart = -1;
+                    named = 0;
+                    lastNamed = -1;
+                    continue;
+                }
+
+                if (shape == EntryShape.Named)
+                {
+                    if (runStart < 0)
+                    {
+                        runStart = at;
+                    }
+
+                    named++;
+                    lastNamed = at;
+                }
+            }
+
+            Keep(runStart, lastNamed, named);
+        }
+
+        void Keep(int start, int last, int count)
+        {
+            // Trimmed to the named entries at each end, so trailing zeroes do not inflate it.
+            if (start < 0 || count < ShortestRun || count <= bestNamed)
+            {
+                return;
+            }
+
+            bestStart = start;
+            bestNamed = count;
+            bestLength = ((last - start) / TabStride) + 1;
+        }
+
+        if (bestStart < 0)
+        {
+            return new TabScan(block, 0, 0, [], Read: true);
+        }
+
+        var tabs = new List<StashTab>();
+        for (var i = 0; i < bestLength && tabs.Count < MostTabs; i++)
+        {
+            int at = bestStart + (i * TabStride);
+            ulong record = BitConverter.ToUInt64(window, at);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(record))
+            {
+                continue;
+            }
+
+            string name = _reader.ReadStdWString(record + (ulong)_tabName, 64);
+            if (name.Length == 0)
+            {
+                continue;
+            }
+
+            ulong first = BitConverter.ToUInt64(window, at + 8);
+            ulong last = BitConverter.ToUInt64(window, at + 0x10);
+            tabs.Add(new StashTab(at, record, name, Filled: first != 0 && last != first));
+        }
+
+        return new TabScan(block, bestStart, bestLength, tabs, Read: true);
+    }
+
+    /// <summary>What an offset looks like when read as an entry.</summary>
+    private enum EntryShape
+    {
+        /// <summary>Not an entry.</summary>
+        Bad,
+
+        /// <summary>All zeroes - a tab the game has not loaded. Allowed inside a run.</summary>
+        Blank,
+
+        /// <summary>A record pointer and a sane vector beside it.</summary>
+        Named,
+    }
+
+    /// <summary>Reads an offset as an entry, from bytes alone - no memory access.</summary>
+    private static EntryShape Classify(byte[] window, int at)
+    {
+        ulong record = BitConverter.ToUInt64(window, at);
+        ulong first = BitConverter.ToUInt64(window, at + 8);
+        ulong last = BitConverter.ToUInt64(window, at + 0x10);
+
+        if (record == 0 && first == 0 && last == 0)
+        {
+            return EntryShape.Blank;
+        }
+
+        if (!MemoryReaderExtensions.IsPlausiblePointer(record))
+        {
+            return EntryShape.Bad;
+        }
+
+        // The pair is a vector: empty on every entry examined so far, which means first == last,
+        // but a full one would have last above it. Both null is equally fine.
+        if (first == 0 && last == 0)
+        {
+            return EntryShape.Named;
+        }
+
+        return MemoryReaderExtensions.IsPlausiblePointer(first)
+               && MemoryReaderExtensions.IsPlausiblePointer(last)
+               && last >= first
+            ? EntryShape.Named
+            : EntryShape.Bad;
     }
 
     /// <summary>
@@ -723,6 +936,7 @@ public sealed class InventorySweep
                 "  tested against a sort we know. Open the Merchant window once and sweep again.");
         }
 
+        DrawTabs(best.Tabs, output);
         DrawHits(best.Hits, best.Hunted, output);
         DrawLists(best.Lists, best.Searched, output);
         DrawByShape("array slot", seen, one => one.EntryBytes, output);
@@ -732,6 +946,61 @@ public sealed class InventorySweep
         DrawCandidates("inventory head", seen, one => one.Bytes, Window, output);
         DrawCandidates("before the inventory", seen, one => one.Shared, SharedWindow, output);
         DrawInventories(seen, output);
+    }
+
+    /// <summary>
+    /// Every stash tab name the array holds - the point of the whole search.
+    /// </summary>
+    /// <remarks>
+    /// FIRST, because it is the only part of this report that is a feature rather than a lead.
+    /// The Filled column is the one open question left: every entry examined by hand had an empty
+    /// vector, and what a full one holds is unknown - guild tab contents have never been readable
+    /// by any route, and this array is the first thing in the project that reaches guild tabs.
+    /// </remarks>
+    private static void DrawTabs(TabScan? scan, TextWriter output)
+    {
+        output.WriteLine();
+        output.WriteLine("  stash tab names:");
+
+        if (scan is null)
+        {
+            output.WriteLine("    NOT REACHED - ServerDataStructure.TabRecords did not resolve.");
+            return;
+        }
+
+        if (!scan.Read)
+        {
+            output.WriteLine($"    NOT READ - the block at 0x{scan.Block:X} could not be read in");
+            output.WriteLine("    this capture, so nothing here can be concluded.");
+            return;
+        }
+
+        if (scan.Tabs.Count == 0)
+        {
+            output.WriteLine($"    none found in 0x{TabWindow:X} bytes at 0x{scan.Block:X}. Either the");
+            output.WriteLine("    array is further in than the window reaches, or its shape is not");
+            output.WriteLine($"    {TabStride:X} bytes of record pointer plus a vector.");
+            return;
+        }
+
+        int filled = scan.Tabs.Count(one => one.Filled);
+        output.WriteLine(
+            $"    {scan.Tabs.Count} named of {scan.Count} entries, at 0x{scan.Block:X}"
+            + $" +0x{scan.Offset:X} ({filled} with a non-empty vector).");
+        output.WriteLine();
+
+        foreach (StashTab tab in scan.Tabs)
+        {
+            output.WriteLine(
+                $"    +0x{tab.Offset:X4}  {(tab.Filled ? "*" : " ")} {tab.Name}");
+        }
+
+        if (filled == 0)
+        {
+            output.WriteLine();
+            output.WriteLine("    NO entry has a non-empty vector, so what that vector holds is still");
+            output.WriteLine("    unknown - see StashTabRecord in the schema.");
+        }
     }
 
     /// <summary>
