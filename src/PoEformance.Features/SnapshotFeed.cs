@@ -123,8 +123,25 @@ public sealed class SnapshotFeed : IDisposable
                 Volatile.Write(ref _latest, snapshot);
                 Interlocked.Increment(ref _readCount);
             }
-            catch (Exception exception) when (!_cancellation.IsCancellationRequested)
+            catch (Exception exception)
             {
+                // CAUGHT UNCONDITIONALLY, and the filter that used to be here was a crash. It
+                // read "when (!_cancellation.IsCancellationRequested)", so a read that threw at
+                // the instant shutdown was requested did not match, left Loop entirely, and went
+                // unhandled on a background thread - which takes the process down. Disposing the
+                // feed while a read is in flight is not an edge case; it is what shutdown IS, and
+                // a reader whose whole purpose is surviving stale pointers must not die of one
+                // arriving a millisecond late.
+                //
+                // The filter's intent survives below: nothing is recorded once cancellation is
+                // requested, because a failure caused by teardown is noise. The difference is
+                // that it is now a decision made INSIDE the handler rather than a condition on
+                // whether to handle at all.
+                if (_cancellation.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 // A read that throws must not end the feed. Pointers go stale on every zone
                 // change, and the correct response is to keep the last good snapshot and
                 // try again - a dead reader thread would be a far worse outcome than a
