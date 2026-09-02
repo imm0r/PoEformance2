@@ -40,7 +40,7 @@ public class InventorySweepTests
     private static string Sweep(params InventoryObservation[] seen)
     {
         var writer = new StringWriter();
-        InventorySweep.Report([new InventorySweepFrame(0, seen, [], true, [], false, 0x9000, 0x9100)], writer);
+        InventorySweep.Report([new InventorySweepFrame(0, seen, [], true, [], false, 0x9000, 0x9100, null)], writer);
         return writer.ToString();
     }
 
@@ -52,7 +52,7 @@ public class InventorySweepTests
         // reads as an answer - which cost this line of work a whole round once already.
         var writer = new StringWriter();
         InventorySweep.Report(
-            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], false, [], false, 0x9000, 0x9100)], writer);
+            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], false, [], false, 0x9000, 0x9100, null)], writer);
 
         Assert.Contains("NOT SEARCHED", writer.ToString(), StringComparison.Ordinal);
     }
@@ -74,7 +74,8 @@ public class InventorySweepTests
                     [],
                     false,
                     0x9000,
-                    0x9100),
+                    0x9100,
+                    null),
             ],
             writer);
 
@@ -126,7 +127,7 @@ public class InventorySweepTests
         // that is asserted here so it cannot quietly grow back into a conclusion.
         var writer = new StringWriter();
         InventorySweep.Report(
-            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], true, [], true, 0x9000, 0x9100)], writer);
+            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], true, [], true, 0x9000, 0x9100, null)], writer);
 
         string said = writer.ToString();
         Assert.Contains("NOT FOUND", said, StringComparison.Ordinal);
@@ -149,13 +150,95 @@ public class InventorySweepTests
                     [new NameHit("inv 42 +0x0F0 +0x018", 0x7F00, 0x18, "blaaaaffp4ff")],
                     true,
                     0x9000,
-                    0x9100),
+                    0x9100,
+                    null),
             ],
             writer);
 
         string said = writer.ToString();
         Assert.Contains("inv 42 +0x0F0 +0x018", said, StringComparison.Ordinal);
         Assert.Contains("blaaaaffp4ff", said, StringComparison.Ordinal);
+    }
+
+    /// <summary>A tab scan that found some names, for the report to render.</summary>
+    private static string Tabs(TabScan? scan)
+    {
+        var writer = new StringWriter();
+        InventorySweep.Report(
+            [
+                new InventorySweepFrame(
+                    0, [Make(NormalId, (0x40, 1))], [], true, [], false, 0x9000, 0x9100, scan),
+            ],
+            writer);
+        return writer.ToString();
+    }
+
+    [Fact]
+    public void ABlockTHATCouldNotBeReadIsNotReportedAsHavingNoTabs()
+    {
+        // The same distinction the whole report insists on, now for the tab array: a block nobody
+        // could read has not been shown to be empty.
+        string said = Tabs(new TabScan(0x7F00, 0, 0, [], Read: false));
+
+        Assert.Contains("NOT READ", said, StringComparison.Ordinal);
+        Assert.DoesNotContain("none found", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ATabRecordsPointerTHATDidNotResolveSaysSoRatherThanReportingNothing()
+    {
+        string said = Tabs(null);
+
+        Assert.Contains("NOT REACHED", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void EveryNameIsPrintedAndTheFilledOnesAreMarked()
+    {
+        // The Filled column is the open question - every entry examined by hand held an empty
+        // vector - so a full one has to be visible at a glance rather than counted by hand.
+        string said = Tabs(new TabScan(
+            0x7F00,
+            0x3A90,
+            3,
+            [
+                new StashTab(0x3A90, 0x8000, "getTheNameNO", Filled: false),
+                new StashTab(0x3AA8, 0x8100, "Armor I", Filled: true),
+                new StashTab(0x3AC0, 0x8200, "1", Filled: false),
+            ],
+            Read: true));
+
+        Assert.Contains("getTheNameNO", said, StringComparison.Ordinal);
+        Assert.Contains("* Armor I", said, StringComparison.Ordinal);
+        Assert.Contains("  1", said, StringComparison.Ordinal);
+        Assert.Contains("(1 with a non-empty vector)", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AllEmptyVectorsIsSaidOutLoudBecauseItIsTheOpenQuestion()
+    {
+        // Finding every name and no contents is a result, not a silence: it says the vector's
+        // meaning is still unknown, which is exactly what the schema records.
+        string said = Tabs(new TabScan(
+            0x7F00, 0, 1, [new StashTab(0, 0x8000, "curr", Filled: false)], Read: true));
+
+        Assert.Contains("NO entry has a non-empty vector", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AShortRunOfPlausiblePointersIsNotEnoughToBeAnArray()
+    {
+        // THE FINGERPRINT RULE, pinned as a bound rather than as behaviour: three qwords that
+        // happen to look like an entry is a coincidence a 32 KB window produces several times
+        // over, and this project has lost rounds to exactly that kind of evidence.
+        Assert.True(InventorySweep.ShortestRun >= 4);
+
+        // And the stride is the measured one, not a guess - three consecutive named entries at
+        // +0x3A90, +0x3AA8 and +0x3AC0 on a live client.
+        Assert.Equal(0x18, InventorySweep.TabStride);
+
+        // The window has to reach past the one entry a pointer scan ever produced.
+        Assert.True(InventorySweep.TabWindow > 0x3A90 + InventorySweep.TabStride);
     }
 
     [Fact]
