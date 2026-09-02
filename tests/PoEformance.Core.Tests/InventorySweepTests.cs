@@ -178,7 +178,7 @@ public class InventorySweepTests
     {
         // The same distinction the whole report insists on, now for the tab array: a block nobody
         // could read has not been shown to be empty.
-        string said = Tabs(new TabScan(0x7F00, 0, 0, [], Read: false));
+        string said = Tabs(new TabScan(0x7F00, 0, 0, [], 0, Read: false));
 
         Assert.Contains("NOT READ", said, StringComparison.Ordinal);
         Assert.DoesNotContain("none found", said, StringComparison.Ordinal);
@@ -206,6 +206,7 @@ public class InventorySweepTests
                 new StashTab(0x3AA8, 0x8100, "Armor I", Filled: true),
                 new StashTab(0x3AC0, 0x8200, "1", Filled: false),
             ],
+            0x8000,
             Read: true));
 
         Assert.Contains("getTheNameNO", said, StringComparison.Ordinal);
@@ -220,9 +221,36 @@ public class InventorySweepTests
         // Finding every name and no contents is a result, not a silence: it says the vector's
         // meaning is still unknown, which is exactly what the schema records.
         string said = Tabs(new TabScan(
-            0x7F00, 0, 1, [new StashTab(0, 0x8000, "curr", Filled: false)], Read: true));
+            0x7F00, 0, 1, [new StashTab(0, 0x8000, "curr", Filled: false)], 0x8000, Read: true));
 
         Assert.Contains("NO entry has a non-empty vector", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void NothingFoundNamesTheBytesActuallyREADRatherThanTheWindowSize()
+    {
+        // THE MISTAKE THIS PINS cost a live run. The scan asked for the whole window in one
+        // all-or-nothing read, fell back to a quarter of it when the block ended earlier, and
+        // then printed the window CONSTANT in its "nothing found" line - so the report described
+        // a search over 0x8000 bytes that had actually covered 0x2000, missing the one entry
+        // known to exist at +0x3A90 entirely.
+        //
+        // A reach that disagrees with the constant is exactly the case that has to read
+        // correctly, so the fake here is deliberately short.
+        string said = Tabs(new TabScan(0x7F00, 0, 0, [], 0x2000, Read: true));
+
+        Assert.Contains("0x2000 bytes readable", said, StringComparison.Ordinal);
+        Assert.DoesNotContain($"0x{InventorySweep.TabWindow:X} bytes", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheBlockIsReadInPiecesSmallEnoughToNotOvershootTheOneKnownEntry()
+    {
+        // A chunk has to divide the distance to the answer finely enough that a block ending
+        // just past it still yields it. 0x3A90 was reachable and 0x2000 was not - so a chunk
+        // that large can lose it again.
+        Assert.True(InventorySweep.TabChunk <= 0x1000);
+        Assert.Equal(0, InventorySweep.TabWindow % InventorySweep.TabChunk);
     }
 
     [Fact]
