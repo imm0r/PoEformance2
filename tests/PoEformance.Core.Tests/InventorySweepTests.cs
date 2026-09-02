@@ -40,7 +40,7 @@ public class InventorySweepTests
     private static string Sweep(params InventoryObservation[] seen)
     {
         var writer = new StringWriter();
-        InventorySweep.Report([new InventorySweepFrame(0, seen, [], true, [], false)], writer);
+        InventorySweep.Report([new InventorySweepFrame(0, seen, [], true, [], false, 0x9000, 0x9100)], writer);
         return writer.ToString();
     }
 
@@ -52,7 +52,7 @@ public class InventorySweepTests
         // reads as an answer - which cost this line of work a whole round once already.
         var writer = new StringWriter();
         InventorySweep.Report(
-            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], false, [], false)], writer);
+            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], false, [], false, 0x9000, 0x9100)], writer);
 
         Assert.Contains("NOT SEARCHED", writer.ToString(), StringComparison.Ordinal);
     }
@@ -72,7 +72,9 @@ public class InventorySweepTests
                     [new ParallelList("inner", 0x320, 0x7F00, 0, 0, ["breach"])],
                     true,
                     [],
-                    false),
+                    false,
+                    0x9000,
+                    0x9100),
             ],
             writer);
 
@@ -114,13 +116,21 @@ public class InventorySweepTests
     [Fact]
     public void ANameHuntTHATRanAndFoundNothingSaysNOTFOUND()
     {
-        // And the other side of it: hunted, empty, is a real negative result - the evidence that
-        // the name does not hang off the stash data - so it reads as one.
+        // And the other side of it: hunted and empty is a real result, so it says NOT FOUND rather
+        // than staying silent.
+        //
+        // WHAT IT IS NOT is evidence that the name is absent from the stash data, which is what
+        // this message used to claim outright. A live pointer scan then produced a working chain
+        // whose last hops are +0x3A90 then +0x8 - past the end of every window the hunt reads, so
+        // invisible to it at any depth. The wording now bounds the search instead of the game, and
+        // that is asserted here so it cannot quietly grow back into a conclusion.
         var writer = new StringWriter();
         InventorySweep.Report(
-            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], true, [], true)], writer);
+            [new InventorySweepFrame(0, [Make(NormalId, (0x40, 1))], [], true, [], true, 0x9000, 0x9100)], writer);
 
-        Assert.Contains("NOT FOUND", writer.ToString(), StringComparison.Ordinal);
+        string said = writer.ToString();
+        Assert.Contains("NOT FOUND", said, StringComparison.Ordinal);
+        Assert.Contains("NOT A NEGATIVE RESULT ABOUT THE GAME", said, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -137,7 +147,9 @@ public class InventorySweepTests
                     [],
                     true,
                     [new NameHit("inv 42 +0x0F0 +0x018", 0x7F00, 0x18, "blaaaaffp4ff")],
-                    true),
+                    true,
+                    0x9000,
+                    0x9100),
             ],
             writer);
 
