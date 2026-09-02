@@ -381,19 +381,31 @@ public sealed class InventorySweep
     /// </remarks>
     public const int TabChunk = 0x400;
 
-    /// <summary>Bytes per entry - measured across three consecutive named entries.</summary>
+    /// <summary>
+    /// The spacing three records were once seen at. AN OBSERVATION, NOT A FILTER.
+    /// </summary>
+    /// <remarks>
+    /// It used to be the filter, and that was three points with a line drawn through them. The
+    /// scan looked for runs of at least four entries shaped {record*, vector} 0x18 apart, and on
+    /// a live client with the whole block readable it found none - so the shape those three
+    /// happened to share does not generalise. The block is not even a tab array to begin with:
+    /// several unrelated vectors declared on the inner server-data struct have their storage
+    /// inside it, so it is an arena.
+    ///
+    /// What replaced it assumes no shape at all. Every pointer in the block is followed and kept
+    /// if it lands on a std::wstring - which is a thing that can be RECOGNISED rather than
+    /// guessed - and the spacing between the hits is then reported instead of required.
+    /// </remarks>
     public const int TabStride = 0x18;
 
-    /// <summary>Shortest run of named entries worth believing.</summary>
+    /// <summary>How many pointers out of the tab block may be followed.</summary>
     /// <remarks>
-    /// Four, because three pointers in a row that happen to look like an entry is a coincidence a
-    /// 32 KB window will produce several times over, and this project has been burned by exactly
-    /// that class of fingerprint. A run also has to be BOUNDED by named entries, so a stretch of
-    /// zeroed memory cannot be counted as a very long one.
+    /// The whole window is 0x1000 qwords, so this allows every one of them. Each costs a 0x28
+    /// read, and only pointers get one - the recorder collapses the repeats.
     /// </remarks>
-    public const int ShortestRun = 4;
+    private const int MostTabProbes = 0x1000;
 
-    /// <summary>How many names to read out of the best run.</summary>
+    /// <summary>How many names to keep.</summary>
     private const int MostTabs = 512;
 
     /// <summary>
@@ -441,131 +453,48 @@ public sealed class InventorySweep
             return new TabScan(block, 0, 0, [], 0, Read: false);
         }
 
-        // Entries sit 0x18 apart, and 0x18 is three qwords - so every run lives entirely in one
-        // of three alignments, and each can be walked independently.
-        var bestStart = -1;
-        var bestNamed = 0;
-        var bestLength = 0;
-
-        for (var phase = 0; phase < TabStride; phase += 8)
-        {
-            var runStart = -1;
-            var named = 0;
-            var lastNamed = -1;
-
-            for (int at = phase; at + TabStride <= got; at += TabStride)
-            {
-                EntryShape shape = Classify(window, at);
-
-                if (shape == EntryShape.Bad)
-                {
-                    Keep(runStart, lastNamed, named);
-                    runStart = -1;
-                    named = 0;
-                    lastNamed = -1;
-                    continue;
-                }
-
-                if (shape == EntryShape.Named)
-                {
-                    if (runStart < 0)
-                    {
-                        runStart = at;
-                    }
-
-                    named++;
-                    lastNamed = at;
-                }
-            }
-
-            Keep(runStart, lastNamed, named);
-        }
-
-        void Keep(int start, int last, int count)
-        {
-            // Trimmed to the named entries at each end, so trailing zeroes do not inflate it.
-            if (start < 0 || count < ShortestRun || count <= bestNamed)
-            {
-                return;
-            }
-
-            bestStart = start;
-            bestNamed = count;
-            bestLength = ((last - start) / TabStride) + 1;
-        }
-
-        if (bestStart < 0)
-        {
-            return new TabScan(block, 0, 0, [], got, Read: true);
-        }
-
+        // EVERY POINTER, NO ASSUMED SHAPE. A std::wstring can be RECOGNISED - a size and a
+        // capacity that agree, characters that read as text - so each pointer in the block is
+        // followed and kept when it lands on one. What the hits are spaced by is then an
+        // observation printed in the report, not a rule that had to be right in advance.
         var tabs = new List<StashTab>();
-        for (var i = 0; i < bestLength && tabs.Count < MostTabs; i++)
+        var probed = 0;
+
+        for (int at = 0; at + 8 <= got && probed < MostTabProbes && tabs.Count < MostTabs; at += 8)
         {
-            int at = bestStart + (i * TabStride);
             ulong record = BitConverter.ToUInt64(window, at);
             if (!MemoryReaderExtensions.IsPlausiblePointer(record))
             {
                 continue;
             }
 
+            probed++;
             string name = _reader.ReadStdWString(record + (ulong)_tabName, 64);
-            if (name.Length == 0)
+            if (name.Length == 0 || !TextProbe.LooksLikeText(name + "  "))
             {
                 continue;
             }
 
-            ulong first = BitConverter.ToUInt64(window, at + 8);
-            ulong last = BitConverter.ToUInt64(window, at + 0x10);
-            tabs.Add(new StashTab(at, record, name, Filled: first != 0 && last != first));
+            // The two qwords after a hit, IF they are there and look like a vector. Every entry
+            // examined by hand had an empty one; this is what would show the first that is not.
+            var filled = false;
+            if (at + 0x18 <= got)
+            {
+                ulong first = BitConverter.ToUInt64(window, at + 8);
+                ulong last = BitConverter.ToUInt64(window, at + 0x10);
+                filled = MemoryReaderExtensions.IsPlausiblePointer(first)
+                         && MemoryReaderExtensions.IsPlausiblePointer(last)
+                         && last > first;
+            }
+
+            tabs.Add(new StashTab(at, record, name, filled));
         }
 
-        return new TabScan(block, bestStart, bestLength, tabs, got, Read: true);
+        int first0 = tabs.Count > 0 ? tabs[0].Offset : 0;
+        return new TabScan(block, first0, tabs.Count, tabs, got, Read: true);
     }
 
-    /// <summary>What an offset looks like when read as an entry.</summary>
-    private enum EntryShape
-    {
-        /// <summary>Not an entry.</summary>
-        Bad,
 
-        /// <summary>All zeroes - a tab the game has not loaded. Allowed inside a run.</summary>
-        Blank,
-
-        /// <summary>A record pointer and a sane vector beside it.</summary>
-        Named,
-    }
-
-    /// <summary>Reads an offset as an entry, from bytes alone - no memory access.</summary>
-    private static EntryShape Classify(byte[] window, int at)
-    {
-        ulong record = BitConverter.ToUInt64(window, at);
-        ulong first = BitConverter.ToUInt64(window, at + 8);
-        ulong last = BitConverter.ToUInt64(window, at + 0x10);
-
-        if (record == 0 && first == 0 && last == 0)
-        {
-            return EntryShape.Blank;
-        }
-
-        if (!MemoryReaderExtensions.IsPlausiblePointer(record))
-        {
-            return EntryShape.Bad;
-        }
-
-        // The pair is a vector: empty on every entry examined so far, which means first == last,
-        // but a full one would have last above it. Both null is equally fine.
-        if (first == 0 && last == 0)
-        {
-            return EntryShape.Named;
-        }
-
-        return MemoryReaderExtensions.IsPlausiblePointer(first)
-               && MemoryReaderExtensions.IsPlausiblePointer(last)
-               && last >= first
-            ? EntryShape.Named
-            : EntryShape.Bad;
-    }
 
     /// <summary>
     /// How much of each struct the name hunt reads.
@@ -997,18 +926,40 @@ public sealed class InventorySweep
 
         if (scan.Tabs.Count == 0)
         {
-            output.WriteLine($"    none found in the 0x{scan.Reach:X} bytes readable at 0x{scan.Block:X}.");
-            output.WriteLine("    Either the");
-            output.WriteLine("    array is further in than the window reaches, or its shape is not");
-            output.WriteLine($"    {TabStride:X} bytes of record pointer plus a vector.");
+            output.WriteLine(
+                $"    none in the 0x{scan.Reach:X} bytes readable at 0x{scan.Block:X}: no pointer");
+            output.WriteLine("    in them leads to a std::wstring. The names are not in this block,");
+            output.WriteLine("    or they are further in than the window reaches.");
             return;
         }
 
         int filled = scan.Tabs.Count(one => one.Filled);
         output.WriteLine(
-            $"    {scan.Tabs.Count} named of {scan.Count} entries, at 0x{scan.Block:X}"
-            + $" +0x{scan.Offset:X} ({filled} with a non-empty vector),"
-            + $" in 0x{scan.Reach:X} readable bytes.");
+            $"    {scan.Tabs.Count} names at 0x{scan.Block:X}, first at +0x{scan.Offset:X},"
+            + $" in 0x{scan.Reach:X} readable bytes ({filled} followed by a non-empty vector).");
+
+        // THE SPACING IS THE FINDING, not an input. Assuming it was the mistake that made the
+        // previous scan report nothing at all, so it is counted here and left for a person to
+        // recognise: one gap repeating is an array and names its stride, a scatter is not.
+        var gaps = new Dictionary<int, int>();
+        for (var i = 1; i < scan.Tabs.Count; i++)
+        {
+            int gap = scan.Tabs[i].Offset - scan.Tabs[i - 1].Offset;
+            gaps[gap] = gaps.GetValueOrDefault(gap) + 1;
+        }
+
+        if (gaps.Count > 0)
+        {
+            output.WriteLine(
+                "    gaps between them: "
+                + string.Join(
+                    ", ",
+                    gaps.OrderByDescending(pair => pair.Value)
+                        .Take(6)
+                        .Select(pair => $"0x{pair.Key:X}x{pair.Value}"))
+                + (gaps.Count > 6 ? " ..." : string.Empty));
+        }
+
         output.WriteLine();
 
         foreach (StashTab tab in scan.Tabs)

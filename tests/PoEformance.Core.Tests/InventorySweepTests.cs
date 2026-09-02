@@ -212,7 +212,33 @@ public class InventorySweepTests
         Assert.Contains("getTheNameNO", said, StringComparison.Ordinal);
         Assert.Contains("* Armor I", said, StringComparison.Ordinal);
         Assert.Contains("  1", said, StringComparison.Ordinal);
-        Assert.Contains("(1 with a non-empty vector)", said, StringComparison.Ordinal);
+        Assert.Contains("(1 followed by a non-empty vector)", said, StringComparison.Ordinal);
+
+        // THE SPACING IS REPORTED, not required. Three names 0x18 apart give two gaps of 0x18,
+        // and printing that is what lets a person tell an array from a scatter - the judgement
+        // the scan used to make for them, wrongly.
+        Assert.Contains("gaps between them: 0x18x2", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ScatteredNamesReportTheirScatterRatherThanBeingDiscarded()
+    {
+        // The old scan required a run and so found nothing at all on a live client. Names at
+        // irregular offsets are still names; what changes is that the gaps say so.
+        string said = Tabs(new TabScan(
+            0x7F00,
+            0x40,
+            2,
+            [
+                new StashTab(0x40, 0x8000, "curr", Filled: false),
+                new StashTab(0x2C0, 0x8100, "ritu", Filled: false),
+            ],
+            0x8000,
+            Read: true));
+
+        Assert.Contains("curr", said, StringComparison.Ordinal);
+        Assert.Contains("ritu", said, StringComparison.Ordinal);
+        Assert.Contains("gaps between them: 0x280x1", said, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -254,19 +280,33 @@ public class InventorySweepTests
     }
 
     [Fact]
-    public void AShortRunOfPlausiblePointersIsNotEnoughToBeAnArray()
+    public void TheWindowReachesPastTheOneOffsetAPointerScanEverProduced()
     {
-        // THE FINGERPRINT RULE, pinned as a bound rather than as behaviour: three qwords that
-        // happen to look like an entry is a coincidence a 32 KB window produces several times
-        // over, and this project has lost rounds to exactly that kind of evidence.
-        Assert.True(InventorySweep.ShortestRun >= 4);
+        // 0x3A90 is where a live pointer scan put a record, so a window that stops before it
+        // cannot answer anything - and one that did exactly that has already been shipped once.
+        Assert.True(InventorySweep.TabWindow > 0x3A90 + InventorySweep.TabStride);
+    }
 
-        // And the stride is the measured one, not a guess - three consecutive named entries at
-        // +0x3A90, +0x3AA8 and +0x3AC0 on a live client.
+    [Fact]
+    public void TheStrideIsAnObservationAndNoLongerDecidesWhatCounts()
+    {
+        // THE CORRECTION, pinned so it cannot come back. Three records 0x18 apart were seen once,
+        // and that became a filter: runs of at least four entries shaped {record*, vector} at
+        // exactly 0x18. On a live client with the whole block readable it found NOTHING, so the
+        // shape those three shared does not generalise - three points with a line drawn through
+        // them. The block is not even a tab array: several unrelated vectors on the inner
+        // server-data struct have their storage inside it.
+        //
+        // The scan assumes no shape now. It follows pointers and keeps the ones landing on a
+        // std::wstring, which is recognisable rather than assumed, and REPORTS the spacing.
+        // 0x18 survives only as the number that observation produced.
         Assert.Equal(0x18, InventorySweep.TabStride);
 
-        // The window has to reach past the one entry a pointer scan ever produced.
-        Assert.True(InventorySweep.TabWindow > 0x3A90 + InventorySweep.TabStride);
+        // A run rule would be the old mistake returning, so there is nothing to configure.
+        Assert.DoesNotContain(
+            "ShortestRun",
+            typeof(InventorySweep).GetFields().Select(one => one.Name),
+            StringComparer.Ordinal);
     }
 
     [Fact]
