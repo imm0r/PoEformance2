@@ -50,8 +50,9 @@ public sealed record InventoryObservation(
 /// </param>
 /// <param name="Count">How many elements that gives, or 0 with no stride.</param>
 /// <param name="Text">
-/// Any text found in its first few entries. THIS IS THE ANSWER when it holds a tab name: the
-/// names are the player's own words, so nothing but the real list can produce them.
+/// Any text found in it, each entry prefixed with the offset it sat at so the gaps between them
+/// show the record size. THIS IS THE ANSWER when it holds a tab name: the names are the player's
+/// own words, so nothing but the real list can produce them.
 /// </param>
 public sealed record ParallelList(
     string Where, int Offset, ulong First, int Stride, int Count, IReadOnlyList<string> Text);
@@ -77,13 +78,28 @@ public sealed record NameHit(string Path, ulong At, int Offset, string Text);
 /// when no name was given to look for - see <paramref name="Hunted"/>.
 /// </param>
 /// <param name="Hunted">Whether a name was given at all, for the same reason Searched exists.</param>
+/// <param name="ServerData">
+/// The OUTER server-data struct - what ServerDataPtr points at.
+/// </param>
+/// <param name="Holder">
+/// The INNER one, which actually carries PlayerInventories.
+/// </param>
+/// <remarks>
+/// THE TWO ADDRESSES EXIST TO BE COMPARED AGAINST A CHAIN FOUND ELSEWHERE. A --peek of a real
+/// pointer path prints every hop; without these, deciding whether such a chain passes through the
+/// stash data means eyeballing whether its hops LOOK like the addresses the sweep printed, and
+/// two allocations on one heap page look exactly alike. Adjacency is the weak structural
+/// fingerprint this project keeps being burned by; an equality is not.
+/// </remarks>
 public sealed record InventorySweepFrame(
     int Frame,
     IReadOnlyList<InventoryObservation> Seen,
     IReadOnlyList<ParallelList> Lists,
     bool Searched,
     IReadOnlyList<NameHit> Hits,
-    bool Hunted);
+    bool Hunted,
+    ulong ServerData,
+    ulong Holder);
 
 /// <summary>
 /// Reads every inventory whole, to find what says which SORT of tab it is.
@@ -314,7 +330,8 @@ public sealed class InventorySweep
         }
 
         IReadOnlyList<NameHit> hits = Hunt(needle, seen, serverData, holder);
-        return new InventorySweepFrame(frame, seen, lists, searched, hits, needle.Length > 0);
+        return new InventorySweepFrame(
+            frame, seen, lists, searched, hits, needle.Length > 0, serverData, holder);
     }
 
     /// <summary>
@@ -686,6 +703,15 @@ public sealed class InventorySweep
         // below have to agree; when they do not, the exe is older than the report being read.
         output.WriteLine(
             "  searches in this build: grid shapes, sort candidates, parallel lists, NAME hunt.");
+
+        // THE ROOTS, PRINTED, so a chain found in Cheat Engine can be settled against them by
+        // equality rather than by how similar its addresses look. --peek lists every hop of a
+        // path; if one of them IS one of these, the path runs through the stash data, and if none
+        // is, it does not. Two objects a few kilobytes apart on one heap page are not related,
+        // however much the leading digits agree.
+        output.WriteLine(
+            $"  roots: server data (outer) 0x{best.ServerData:X}, inventory holder (inner) "
+            + $"0x{best.Holder:X}.");
 
         if (shops < 2)
         {
