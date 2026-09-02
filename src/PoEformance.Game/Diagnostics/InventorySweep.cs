@@ -317,18 +317,34 @@ public sealed class InventorySweep
         return new InventorySweepFrame(frame, seen, lists, searched, hits, needle.Length > 0);
     }
 
-    /// <summary>How much of each struct the name hunt reads.</summary>
-    private const int HuntWindow = 0x100;
+    /// <summary>
+    /// How much of each struct the name hunt reads.
+    /// </summary>
+    /// <remarks>
+    /// 0x400 BECAUSE 0x100 WAS MEASURABLY TOO NARROW, and it took a player's pointer scan to show
+    /// it. The chain found on a live client is [X + 0x1E0] -> [Y + 0x18] -> the characters: the
+    /// hop that reaches the record holding the name sits at 0x1E0, so a hunt reading 0x100 of X
+    /// would never see that pointer, never enqueue Y, and would have reported NOT FOUND - a clean,
+    /// confident, wrong negative, of exactly the kind the Searched and Hunted flags exist to
+    /// prevent and which a window size can produce just as easily.
+    ///
+    /// The node budget pays for it: 0x100 across 4000 structs and 0x400 across 1500 cost about the
+    /// same recording, and the reference the game handed over says the width matters more than the
+    /// breadth. Widening also matches the inventory window, so a struct read by both is one entry
+    /// in the recording rather than two.
+    /// </remarks>
+    public const int HuntWindow = 0x400;
 
     /// <summary>How many pointers deep the hunt follows.</summary>
     /// <remarks>
     /// Three, because a name hanging off an inventory would be at most a container and a record
     /// away, and every extra hop multiplies the reads by the number of pointers in a struct.
     /// </remarks>
-    private const int HuntDepth = 3;
+    public const int HuntDepth = 3;
 
     /// <summary>How many structs the hunt may read, so a wide graph cannot fill the recording.</summary>
-    private const int MostNodes = 4000;
+    /// <remarks>Traded down from 4000 when the window went from 0x100 to 0x400 - see HuntWindow.</remarks>
+    private const int MostNodes = 1500;
 
     /// <summary>
     /// Walks outwards from the inventories looking for a name the player supplied.
@@ -461,6 +477,16 @@ public sealed class InventorySweep
     /// </remarks>
     private const int Probe = 0x200;
 
+    /// <summary>
+    /// How much of a candidate that ALREADY showed text to read.
+    /// </summary>
+    /// <remarks>
+    /// Enough for a couple of hundred records of any plausible size. Only candidates that already
+    /// produced text get this, so it is spent on the handful worth spending it on rather than on
+    /// every pointer pair in a 16 KB struct.
+    /// </remarks>
+    private const int DeepProbe = 0x4000;
+
     /// <summary>How many distinct targets one struct may probe, so a bad window cannot run away.</summary>
     private const int MostProbes = 512;
 
@@ -541,12 +567,29 @@ public sealed class InventorySweep
             IReadOnlyList<string> text = [];
             if (probed.Add(first) && probed.Count <= MostProbes)
             {
+                // TWO STAGES, AND THE FIRST CAPTURE IS WHY. A 132-entry list of 0x10 records was
+                // found holding tab-like text, and the shallow probe had read 0x200 of it - the
+                // first 32 entries - so the name actually being hunted could not have been in
+                // what was looked at. A candidate that shows text has earned the whole read; the
+                // thousands that show none must never get it, which is what the cheap first pass
+                // is for.
+                IReadOnlyList<StashReader.FoundText> found =
+                    _stash.StringsIn(first, 0, (int)Math.Min(span, Probe));
+
+                if (found.Count > 0 && span > Probe)
+                {
+                    found = _stash.StringsIn(first, 0, (int)Math.Min(span, DeepProbe));
+                }
+
+                // WITH THE OFFSET, because it is what turns a list of words into a structure: the
+                // gaps between them are the record size, and reading that off is how the entry
+                // holding a name gets described without guessing a stride.
                 text =
                 [
-                    .. _stash.StringsIn(first, 0, (int)Math.Min(span, Probe))
-                        .Select(one => one.Text)
+                    .. found
+                        .Select(one => $"+0x{one.Offset:X3}={one.Text}")
                         .Distinct()
-                        .Take(12),
+                        .Take(24),
                 ];
             }
 
@@ -635,6 +678,15 @@ public sealed class InventorySweep
             $"inventory sweep - {frames.Count} frames, richest holds {seen.Count} inventories "
             + $"({shops} shop pages, {seen.Count(one => one.Cells > 0)} loaded).");
 
+        // WHAT THIS BINARY CAN LOOK FOR, named so a stale build is visible at a glance.
+        // A capture was once made with an older exe and read as a result: the two searches that
+        // would have answered the question were simply not in it, and their sections were absent
+        // rather than empty - which nobody notices, because a missing section looks like nothing
+        // more than a report that is shorter than you remembered. This line and the sections
+        // below have to agree; when they do not, the exe is older than the report being read.
+        output.WriteLine(
+            "  searches in this build: grid shapes, sort candidates, parallel lists, NAME hunt.");
+
         if (shops < 2)
         {
             // Said out loud, because the whole check below rests on it and its absence looks
@@ -680,10 +732,19 @@ public sealed class InventorySweep
 
         if (hits.Count == 0)
         {
-            output.WriteLine("    NOT FOUND from any inventory, any array slot, or either server-data");
-            output.WriteLine("    struct, three pointers deep. The name is in memory - a string scan");
-            output.WriteLine("    finds it - so this says it does not hang off the stash data, and the");
-            output.WriteLine("    UI tree is where it lives.");
+            // AND THIS IS NOT "THE NAME IS NOT THERE", which is what this said until a pointer
+            // scan showed otherwise. The hunt sees a bounded shape: HuntWindow bytes of each
+            // struct, HuntDepth hops, MostNodes structs. A live scan produced a real chain whose
+            // last hops are +0x3A90 then +0x8 - and 0x3A90 is past the end of every window this
+            // reads, so that chain is invisible here however deep the walk goes. An empty result
+            // bounds the search, not the game.
+            output.WriteLine(
+                $"    NOT FOUND within reach - {HuntWindow:X} bytes per struct, {HuntDepth} hops,");
+            output.WriteLine("    from the inventories, their array slots and both server-data structs.");
+            output.WriteLine("    THIS IS NOT A NEGATIVE RESULT ABOUT THE GAME: a chain hopping through a");
+            output.WriteLine("    far member - a live pointer scan found one at +0x3A90 - is outside this");
+            output.WriteLine("    window by construction. Follow such a chain with --peek instead, which");
+            output.WriteLine("    takes a Cheat Engine path as written and prints every hop.");
             return;
         }
 
