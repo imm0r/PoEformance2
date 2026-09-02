@@ -1518,6 +1518,10 @@
         "PlayerInventories": {
           "offset": "0x320", "type": "stdVector",
           "invariant": { "kind": "vectorSane", "elementSize": 24, "maxCount": 1024 }
+        },
+        "FriendsList": {
+          "offset": "0x2848", "type": "stdVector",
+          "comment": "NOT READ BY ANYTHING - recorded because it was identified, not because it is wanted. Found 2026-09 by the inventory sweep's parallel-list search, which was hunting a per-tab name list and turned this up instead: a vector of 0x10 records whose text is an account handle, a status message, a character name and a league. Confirmed against the game's Social panel, which shows exactly those four things for the same account. It sits on the OUTER server-data struct, the one ServerDataPtr points at, not on the inner one that carries PlayerInventories - the sweep labels the two and that label is the only reason the distinction survived. Its length tracks the friend count and merely happened to land near the inventory count on the day it was found, which is precisely why a count was never allowed to be the evidence for anything here."
         }
       }
     },
