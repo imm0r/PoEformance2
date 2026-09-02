@@ -82,12 +82,17 @@ public sealed record StashTab(int Offset, ulong Record, string Name, bool Filled
 /// <param name="Block">What ServerDataStructure.TabRecords points at.</param>
 /// <param name="Offset">Where the run of entries starts inside it.</param>
 /// <param name="Count">How many entries long the run is, loaded or not.</param>
+/// <param name="Reach">
+/// How many bytes of the block were ACTUALLY read. Reported rather than assumed: the first
+/// version of this printed the window CONSTANT in its "nothing found" line while the read had
+/// quietly taken a quarter of it, so the report described a search that never happened.
+/// </param>
 /// <param name="Read">
 /// Whether the block could be read. FALSE AND EMPTY IS NOT NONE - the same distinction the rest
 /// of this report insists on, for the same reason.
 /// </param>
 public sealed record TabScan(
-    ulong Block, int Offset, int Count, IReadOnlyList<StashTab> Tabs, bool Read);
+    ulong Block, int Offset, int Count, IReadOnlyList<StashTab> Tabs, int Reach, bool Read);
 
 /// <summary>What one frame of the sweep saw.</summary>
 /// <param name="Searched">
@@ -365,6 +370,17 @@ public sealed class InventorySweep
     /// <summary>How much of the tab block to take. The one entry ever seen sat at 0x3A90.</summary>
     public const int TabWindow = 0x8000;
 
+    /// <summary>
+    /// How much of the block is asked for at a time.
+    /// </summary>
+    /// <remarks>
+    /// Because a read is all-or-nothing. One request for the whole window comes back empty
+    /// whenever the block ends earlier, and a halving ladder in its place lands on a size that
+    /// stops short of the data - which is exactly what happened: 0x2000 was taken, the entry at
+    /// +0x3A90 was never in it, and the scan reported nothing found in a window it had not read.
+    /// </remarks>
+    public const int TabChunk = 0x400;
+
     /// <summary>Bytes per entry - measured across three consecutive named entries.</summary>
     public const int TabStride = 0x18;
 
@@ -405,20 +421,24 @@ public sealed class InventorySweep
             return null;
         }
 
+        // IN CHUNKS, NOT ALL AT ONCE, and the first version of this cost a whole live run. A read
+        // is all-or-nothing, so asking for 0x8000 of a block that ends earlier returns NOTHING -
+        // and the halving ladder that replaced it fell straight past the answer: the one entry
+        // known to exist sits at +0x3A90, which 0x2000 does not reach. The scan then reported
+        // finding nothing, in a window it had never read.
+        //
+        // Chunking takes as much as the mapping actually holds, whatever that is, and stops at
+        // the first chunk that is not there.
         var window = new byte[TabWindow];
         var got = 0;
-        foreach (int size in (int[])[TabWindow, 0x4000, 0x2000, 0x1000])
+        while (got < TabWindow && _reader.TryRead(block + (ulong)got, window.AsSpan(got, TabChunk)))
         {
-            if (_reader.TryRead(block, window.AsSpan(0, size)))
-            {
-                got = size;
-                break;
-            }
+            got += TabChunk;
         }
 
         if (got == 0)
         {
-            return new TabScan(block, 0, 0, [], Read: false);
+            return new TabScan(block, 0, 0, [], 0, Read: false);
         }
 
         // Entries sit 0x18 apart, and 0x18 is three qwords - so every run lives entirely in one
@@ -476,7 +496,7 @@ public sealed class InventorySweep
 
         if (bestStart < 0)
         {
-            return new TabScan(block, 0, 0, [], Read: true);
+            return new TabScan(block, 0, 0, [], got, Read: true);
         }
 
         var tabs = new List<StashTab>();
@@ -500,7 +520,7 @@ public sealed class InventorySweep
             tabs.Add(new StashTab(at, record, name, Filled: first != 0 && last != first));
         }
 
-        return new TabScan(block, bestStart, bestLength, tabs, Read: true);
+        return new TabScan(block, bestStart, bestLength, tabs, got, Read: true);
     }
 
     /// <summary>What an offset looks like when read as an entry.</summary>
@@ -977,7 +997,8 @@ public sealed class InventorySweep
 
         if (scan.Tabs.Count == 0)
         {
-            output.WriteLine($"    none found in 0x{TabWindow:X} bytes at 0x{scan.Block:X}. Either the");
+            output.WriteLine($"    none found in the 0x{scan.Reach:X} bytes readable at 0x{scan.Block:X}.");
+            output.WriteLine("    Either the");
             output.WriteLine("    array is further in than the window reaches, or its shape is not");
             output.WriteLine($"    {TabStride:X} bytes of record pointer plus a vector.");
             return;
@@ -986,7 +1007,8 @@ public sealed class InventorySweep
         int filled = scan.Tabs.Count(one => one.Filled);
         output.WriteLine(
             $"    {scan.Tabs.Count} named of {scan.Count} entries, at 0x{scan.Block:X}"
-            + $" +0x{scan.Offset:X} ({filled} with a non-empty vector).");
+            + $" +0x{scan.Offset:X} ({filled} with a non-empty vector),"
+            + $" in 0x{scan.Reach:X} readable bytes.");
         output.WriteLine();
 
         foreach (StashTab tab in scan.Tabs)
