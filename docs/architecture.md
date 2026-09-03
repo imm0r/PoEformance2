@@ -1753,6 +1753,33 @@ interesting part was not the feature:
   this feature: **a diagnostic that only covers the interesting failures is not a diagnostic**,
   because the boring ones are what actually happen.
 
+  **And the note it then printed named a mistake in the evidence, not in the code.** "no
+  ground-type files at +0x68 (element 0 of 5 is not a pointer)". Going back to the recording with
+  the terrain struct found by its OWN fields — tile counts at `+0x18`/`+0x20` agreeing with a
+  `0x38`-stride tile vector at `+0x28` — settles it: `+0x68` really is the list, in both areas
+  the recording holds, and **its first element is null**.
+
+  ```
+  +0x68  VECTOR 56 bytes  [0, ptr, ptr, ptr, ptr, ptr, ptr]
+                           ↑ blank   bone_fill … badlands
+  ```
+
+  A nibble of zero means **no ground type here** — the void around the playable area — and the
+  slot is a position in the list rather than a hole in it. The reader's "every element or none"
+  rule threw six good names away over one deliberate blank. Worth being precise about how that
+  got shipped: the six `.gt` pointers were found in the recording as a contiguous run 8 bytes
+  apart, and an older probe note said `+0x68` is "a vector of the area's ground-type files".
+  Those were two findings, joined by assumption — **the search for a vector header matching the
+  run came back EMPTY and that was noted and then written up as though it had matched.** The run
+  began at `+8` precisely because a null is not a pointer to a string.
+
+  Fixing it exposed a second thing, which is the more interesting one: **the blank would have
+  gutted the walkability check.** It covers the void, so it is walkable nowhere, so it satisfies
+  the "mostly not walkable" half for free — leaving a gate that only asks whether ANY type is
+  walkable. Half a check that always passes is most of the way to no check, so unnamed slots are
+  excluded from the spread, and a test puts the blank on one side of the map and a named,
+  fully-walkable type on the other to prove the gate still says no.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of

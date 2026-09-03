@@ -41,7 +41,12 @@ public class GroundReadTests
     /// </param>
     /// <param name="types">How many type pointers to place. Zero leaves the vector empty.</param>
     private static (FakeMemoryReader Reader, OffsetSchema Schema) Area(
-        long? landscapeBytes = null, int types = 2, bool namedFiles = true)
+        long? landscapeBytes = null,
+        int types = 2,
+        bool namedFiles = true,
+        bool leadingBlank = false,
+        int? leftType = null,
+        int? rightType = null)
     {
         OffsetSchema schema = RealSessionTests.Schema();
         StructDef area = schema.Structs["AreaInstance"];
@@ -52,6 +57,14 @@ public class GroundReadTests
         int rows = TilesY * TerrainGrid.CellsPerTile;
         int stride = (width + 1) / 2;
 
+        // With a blank first slot the two real types move up to 1 and 2, exactly as they do in
+        // a real area - a nibble indexes the list by position, so the blank shifts everything.
+        // The halves can also be given explicit types, which is how a test puts the BLANK on
+        // one side of the map and a named type on the other.
+        int blank = leadingBlank ? 1 : 0;
+        int left = leftType ?? blank;
+        int right = rightType ?? (1 + blank);
+
         var walkable = new byte[stride * rows];
         var landscape = new byte[stride * rows];
 
@@ -60,7 +73,7 @@ public class GroundReadTests
             for (int x = 0; x < width; x++)
             {
                 int index = (y * stride) + (x >> 1);
-                int type = x < width / 2 ? 0 : 1;
+                int type = x < width / 2 ? left : right;
                 landscape[index] |= (byte)((x & 1) == 0 ? type : type << 4);
 
                 if (x < width / 2)
@@ -87,11 +100,14 @@ public class GroundReadTests
         int typeFiles = terrain.OffsetOf("GroundTypeFiles");
         if (types > 0)
         {
-            var pointers = new byte[types * 8];
+            // EVERY REAL AREA STARTS ITS LIST WITH A NULL - three of them, in two recordings -
+            // and a nibble of zero therefore means "no ground type here". The fixture can lay
+            // the list out either way because that blank is what the reader used to reject.
+            var pointers = new byte[(types + blank) * 8];
             for (int i = 0; i < types; i++)
             {
                 ulong record = FirstType + ((ulong)i * 0x1000);
-                BitConverter.GetBytes(record).CopyTo(pointers, i * 8);
+                BitConverter.GetBytes(record).CopyTo(pointers, (i + blank) * 8);
 
                 // The path at +0x08, which is TgtFile's shape - the same one a tile uses, which
                 // is why the reader can share its struct and its cache.
@@ -179,7 +195,55 @@ public class GroundReadTests
         TerrainGrid grid = Read(fake, schema);
 
         Assert.Null(grid.Ground);
-        Assert.Contains("element 0 of 2 names no file", grid.GroundNote, StringComparison.Ordinal);
+        Assert.Contains("element 0 of 2 points at no readable file", grid.GroundNote, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ABlankFirstSlotIsAPositionInTheListRatherThanAHoleInIt()
+    {
+        // THE BUG THIS IS THE REGRESSION FOR, and it kept the feature off the map entirely.
+        // Every real area's list begins with a null - three of them across two recordings, the
+        // Titan Grotto's among them - and the reader threw the whole list away over it,
+        // reporting "element 0 of 5 is not a pointer". A nibble of zero means "no ground type
+        // here"; the slot is DATA. Keeping it is also what keeps the nibbles above it pointing
+        // at the right names, since a nibble indexes the list by position.
+        (FakeMemoryReader fake, OffsetSchema schema) = Area(leadingBlank: true);
+
+        TerrainGrid grid = Read(fake, schema);
+
+        Assert.NotNull(grid.Ground);
+        Assert.True(grid.Ground!.Trusted);
+        Assert.Equal(3, grid.Ground.Types.Count);
+        Assert.Equal(string.Empty, grid.Ground.Types[0]);
+        Assert.False(grid.Ground.Names(0));
+        Assert.Equal(Paths[0], grid.Ground.Types[1]);
+        Assert.Contains("2 ground types", grid.GroundNote, StringComparison.Ordinal);
+
+        // Two regions, not three: the blank names nothing, so there is nothing to write on it.
+        Assert.Equal(2, grid.GroundRegions.Count);
+        Assert.DoesNotContain(grid.GroundRegions, r => r.Path.Length == 0);
+    }
+
+    [Fact]
+    public void TheBlankSlotCannotSatisfyTheWalkabilityCheckOnItsOwn()
+    {
+        // A WEAKNESS FOUND WHILE FIXING THE ABOVE. The blank covers the void around the playable
+        // area, which is walkable nowhere - so counting it would satisfy the "mostly not
+        // walkable" half of the spread check for free, and the gate would be asking only whether
+        // ANY type is walkable. Here the only NAMED type is walkable everywhere, so the check
+        // must fail: half a check that always passes is most of the way to no check.
+        // The named type covers the walkable left half entirely - so the "mostly walkable" half
+        // of the check is satisfied - and the BLANK covers the unwalkable right half. Counting
+        // the blank would satisfy the other half and the gate would pass on nothing.
+        (FakeMemoryReader fake, OffsetSchema schema) = Area(
+            types: 1, leadingBlank: true, leftType: 1, rightType: 0);
+
+        TerrainGrid grid = Read(fake, schema);
+
+        Assert.NotNull(grid.Ground);
+        Assert.False(grid.Ground!.Trusted);
+        Assert.Contains("do not separate", grid.GroundNote, StringComparison.Ordinal);
+        Assert.Empty(grid.GroundRegions);
     }
 
     [Fact]

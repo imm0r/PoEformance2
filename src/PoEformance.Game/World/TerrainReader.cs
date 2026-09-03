@@ -170,8 +170,21 @@ public sealed class TerrainGrid
 
         bool[] walkable = WalkableTileMask();
         int wide = TilesX;
+
+        // THE BLANK SLOT IS NOT A REGION. Nibble zero means "no ground type here" - the void
+        // around the playable area, most of the grid - and it is kept in the list so the nibbles
+        // above it keep their names. A copy rather than a change to TileType, which stays the
+        // faithful index: "this tile has no type" and "this tile was not read" are different
+        // facts, and whatever comes next will want to tell them apart.
+        int[] named = new int[Ground.TileType.Length];
+        for (int i = 0; i < named.Length; i++)
+        {
+            int type = Ground.TileType[i];
+            named[i] = Ground.Names(type) ? type : -1;
+        }
+
         return TerrainRooms.Find(
-            [.. Ground.Types], Ground.TileType, wide, TilesY, (x, y) => walkable[(y * wide) + x]);
+            [.. Ground.Types], named, wide, TilesY, (x, y) => walkable[(y * wide) + x]);
     }
 
     private IReadOnlyList<TerrainRoom>? _groundRegions;
@@ -720,12 +733,26 @@ public sealed class TerrainReader
         }
 
         var paths = new List<string>((int)(bytes / 8));
+        int named = 0;
+
         for (int i = 0; i + 8 <= pointers.Length; i += 8)
         {
             ulong file = BitConverter.ToUInt64(pointers, i);
+
+            // A NULL SLOT IS DATA, not a hole - and reading it as a hole is what kept this
+            // feature off the map. Every area seen so far starts its list with one, and the
+            // landscape nibbles index the list by POSITION, so a nibble of zero means "no
+            // ground type here" rather than "the first type". Rejecting the list over it threw
+            // away six good names because of one deliberate blank.
+            if (file == 0)
+            {
+                paths.Add(string.Empty);
+                continue;
+            }
+
             if (!MemoryReaderExtensions.IsPlausiblePointer(file))
             {
-                _groundTypeNote = $"element {i / 8} of {bytes / 8} is not a pointer";
+                _groundTypeNote = $"element {i / 8} of {bytes / 8} is neither null nor a pointer";
                 return [];
             }
 
@@ -735,16 +762,24 @@ public sealed class TerrainReader
                 _tgtPaths[file] = read;
             }
 
-            // EVERY element or none. A list with a hole in it would silently shift every
-            // nibble above the hole onto the wrong name, which is the one failure mode a
-            // reader of an index table must not have.
+            // A POINTER THAT NAMES NOTHING is a different thing from a blank slot, and still a
+            // failure: the slot claims to hold a file and the read did not produce one, which
+            // is what a wrong path offset looks like. Kept in place rather than dropped either
+            // way, because dropping one would shift every nibble above it onto another's name.
             if (read.Length == 0)
             {
-                _groundTypeNote = $"element {i / 8} of {bytes / 8} names no file";
+                _groundTypeNote = $"element {i / 8} of {bytes / 8} points at no readable file";
                 return [];
             }
 
             paths.Add(read);
+            named++;
+        }
+
+        if (named == 0)
+        {
+            _groundTypeNote = $"{bytes / 8} slots, none of which names a file";
+            return [];
         }
 
         return paths;
