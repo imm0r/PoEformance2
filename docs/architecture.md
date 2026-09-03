@@ -1842,16 +1842,26 @@ interesting part was not the feature:
   and if one of those three bytes indexes `GroundTypeFiles` then a room's corner pattern is a
   stamp that could be searched for in the area's.
 
-  What is known so far says nothing either way, and saying so is the point: a probe sweep
-  happened to capture 42 consecutive corners from the start of each array, and they read
-  `byte0=1` (bone_fill) in the Badlands, `byte0=2` (vaal_building_inside) in the Vaal area,
-  `byte1=0` and `byte2=11` in both. Byte 0 is in range of each area's list and differs between
-  them; byte 2 is 11 against lists of seven and six, so it is not an index. But 42 adjacent
-  corners at an array's start are one uniform strip, and a constant over them is what almost any
-  field would give. `CornerProbe` reads the whole array instead — it fits under the recording cap
-  — and histograms all three lanes with every value counted, including the ones no list entry can
-  name. That last part is the lesson from the landscape grid rather than a precaution: folding
-  the unnameable values into one number is what left that verdict unactionable.
+  **And it is one.** Two complete arrays out of one recording - 5472 of 5472 corners over a 71x75
+  Archives area and 3721 of 3721 over a 60x60 Vaal area, not a sample - and byte 0 indexes
+  `GroundTypeFiles` on all four counts the landscape nibble failed:
+
+  - The range tracks the LIST LENGTH. Four slots, exactly the values 0-3; six slots, exactly 0-5.
+  - Every slot is used. Nothing is outside the list, either time.
+  - The proportions read as terrain: 83% `black_inside_wall` in an Archives interior, 90%
+    `vaal_building_inside` with slivers of water, street and bridge in the Vaal area.
+  - And drawn as characters it IS a map - a water course through a chamber of street and bridge
+    inside a field of building-inside. Connected regions, which is the one thing a mis-read field
+    cannot fake.
+
+  So the per-corner ground type is real and this is where it lives. `GridLandscapeData` was
+  credited with it and does not have it. Byte 1 is mostly zero with 16 and 32 appearing, which
+  look like flags; byte 2 takes only 3 and 11, and 11 is outside lists of four and six, so it is
+  not a `.gt` index.
+
+  What that opens is the room stamp, now well posed rather than hopeful: a room file carries a
+  ground type per corner of every slot, and the area carries one per tile corner. The two are the
+  same kind of thing for the first time.
 
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
