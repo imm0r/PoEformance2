@@ -1781,48 +1781,42 @@ interesting part was not the feature:
   fully-walkable type on the other to prove the gate still says no.
 
   **Then the gate did its job against the theory it was built for.** The Titan Grotto, list read
-  correctly this time: *"9190252 cells name a type beyond the 5 the area lists — the list and the
-  grid do not belong together"*. Not a rounding error, most of the grid. **A landscape nibble is
-  not an index into `GroundTypeFiles`**, and the connection the whole ground-type layer rests on
-  does not hold. Which is the check earning its keep twice over — the alternative was a map
-  labelled confidently and wrongly.
+  correctly this time: 9190252 of 9212535 cells carry a nibble beyond the five slots that area
+  lists — nearly the whole grid, not a rounding error. **A landscape nibble is not an index into
+  `GroundTypeFiles`**, and the connection the whole ground-type layer rests on does not hold.
+  Which is the check earning its keep — the alternative was a map labelled confidently and
+  wrongly.
 
-  What survives is worth keeping separate from what does not. `GroundTypeFiles` at `+0x68` IS
-  the area's `.gt` list, measured in two areas with readable names; its length varies per area
-  (7, 6, 5); the two grids are the same length; and the blank first slot is real. What is dead
-  is only the pairing. Note the shape of the disagreement: the list length varies per area while
-  the schema's July note says the nibbles run 0–5, which is what a FIXED terrain classification
-  looks like rather than a per-area index — but one number cannot settle that, so the verdict now
-  carries a histogram: every nibble value that occurs, how much ground it covers, and how much of
-  that is walkable. The walkable share is what gives an unnamed value meaning at all (whatever is
-  never walkable is the void or the abyss), and it is shown only when the reading failed, which
-  is the only time it is worth the space.
+  What survives is worth keeping separate from what does not. `GroundTypeFiles` at `+0x68` IS the
+  area's `.gt` list: three areas, readable names (`TitanEdge`, `abyss`, `TitanGrottoEntrance`,
+  `TitanWalkwayGround` are plainly the Grotto's own), a length that varies per area (7, 6, 5), a
+  real blank first slot, and a landscape grid exactly as long as the walkable one. What is dead
+  is only the pairing — and the value 5 is why: it dominates the Grotto AND opens the Badlands
+  landscape grid, in an area listing SEVEN slots. A value that tracked the list, index or
+  count-means-none sentinel, would differ between them. **5 is a fixed constant**, and the
+  "nibbles 0-5" in the July note is a fixed range rather than a per-area one.
 
-  **And the histogram settled what the verdict could not.** The Titan Grotto:
+  **So the ground-type layer came out again**, and what is left behind is the point of writing
+  this down. `GroundTypeFiles` stays in the schema, unread, because it is measured knowledge that
+  was expensive to get and the next person to wonder what `+0x68` is should find the answer
+  rather than the hunt. What `GridLandscapeData` actually MEANS is still unknown.
 
-  ```
-  5   9190252 cells   99.8% walkable   (beyond the list)
-  0     16022 cells    0.2% walkable   (blank slot)
-  4      1865 cells    0.0% walkable   TitanEdge
-  1      1627 cells    0.0% walkable   abyss
-  3      1400 cells    0.0% walkable   TitanGrottoEntrance
-  2      1369 cells    0.0% walkable   TitanWalkwayGround
-  ```
+  **Four mistakes in one feature, and the last one is the worst.** The probe note and a pointer
+  run were joined by an assumption. The blank first slot was read as a hole. The blank would have
+  gutted the walkability gate. And then: **the readout that was supposed to settle all of it was
+  printing garbage.** ImGui's text calls are printf underneath — `ImGuiText` says so in its own
+  header, and `Escape` exists for exactly this — and the histogram lines went to
+  `ImGui.TextColored` raw, full of `%`. Each row carried two percentages, coverage and
+  walkability; printf ate the first `% wa` as a conversion and rendered a hex float, so the
+  number left standing beside the word "walkable" was the COVERAGE share. Every per-value
+  walkable figure this feature ever displayed was a different number wearing its label, and the
+  conclusions drawn from them in the moment were wrong.
 
-  The list is right — those are plainly this area's own ground types, read out of `+0x68`. What
-  is wrong is the pairing, and **the value 5 is why**: it covers 99.76% of the grid here, and the
-  Badlands landscape grid in the third recording also begins with a run of nothing but 5s. Those
-  two areas list SEVEN and FIVE slots respectively, so a value that tracked the list — an index,
-  or a count-means-none sentinel — would differ between them. It does not. **5 is a fixed
-  constant**, which is what the schema's July note ("nibbles 0–5") was describing all along.
-
-  So the named types are tiny slivers on a background of 5, all four within a few hundred cells
-  of each other in size, and all of them unwalkable. What that leaves unanswered is whether 5
-  means "ordinary ground" or simply "unset", and the number that decides it was missing from the
-  readout: **the area's own walkable share**. "99.8% walkable" is the ordinary ground in an area
-  that is 99% walkable and a real finding in one that is 30%, and the first version printed the
-  rows without ever saying which. It now leads with the area's tiles and its overall share — and
-  with SLOTS rather than "named types", which the blank first entry made a lie by one.
+  The verdict itself survived only by luck of construction: the gates compute on the arrays, not
+  on the strings, so "9190252 cells beyond the list" was real and the theory is genuinely dead.
+  Had the gate been the thing reading those strings, this would have shipped. **A diagnostic is
+  code, and it needs the same suspicion as the thing it diagnoses** — the one place in this
+  project where a wrong number is guaranteed to be believed is the readout built to be trusted.
 
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
