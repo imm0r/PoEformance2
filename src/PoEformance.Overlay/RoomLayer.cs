@@ -87,6 +87,17 @@ public sealed class RoomLayer
     /// <summary>Rooms smaller than this are scenery and are left unnamed.</summary>
     public int MinTiles { get; set; } = RoomSettings.Default.MinTiles;
 
+    /// <summary>
+    /// A file placed more often than this in one area is a building block, not a place.
+    /// </summary>
+    /// <remarks>
+    /// The same bargain <see cref="TerrainLandmarks"/> makes with its four clusters, and the
+    /// reason it is the filter that works here: an area is built from one module repeated, so
+    /// nearly every room is the same size and a threshold in tiles is a cliff rather than a
+    /// slider - at nine tiles the map is solid text and at ten there are four labels left.
+    /// </remarks>
+    public int MaxPlacements { get; set; } = RoomSettings.Default.MaxPlacements;
+
     /// <summary>Only rooms whose name contains this, when it is set.</summary>
     public string Filter { get; set; } = string.Empty;
 
@@ -110,6 +121,7 @@ public sealed class RoomLayer
 
         Enabled = settings.Show;
         MinTiles = settings.MinTiles;
+        MaxPlacements = settings.MaxPlacements;
         Filter = settings.Filter;
 
         _picks.Clear();
@@ -145,7 +157,8 @@ public sealed class RoomLayer
             }
         }
 
-        return new RoomSettings(Enabled, MinTiles, Filter, picked.Count > 0 ? picked : null);
+        return new RoomSettings(
+            Enabled, MinTiles, Filter, picked.Count > 0 ? picked : null, MaxPlacements);
     }
 
     /// <summary>Writes the names onto the map, and answers the mouse over them.</summary>
@@ -171,31 +184,31 @@ public sealed class RoomLayer
         float dot = Style.Sized(StyleCatalogue.Keys.Room, 2.5f);
         Vector2 mouse = ImGui.GetMousePos();
 
-        // PROJECTED ONCE, then drawn once per piece of map that may be drawn on. An area has
-        // thousands of rooms and the pieces are re-entered for every one of them, so doing the
-        // projection inside that loop would repeat the whole area's arithmetic per piece - and
+        // PROJECTED ONCE, then packed, then drawn once per piece of map that may be drawn on.
+        // An area has thousands of rooms and the pieces are re-entered for every one of them, so
+        // projecting inside that loop would repeat the whole area's arithmetic per piece - and
         // the map's own bounds throw most of it away in the first pass anyway.
         _onScreen.Clear();
-        TerrainRoom? under = null;
-        float nearest = float.MaxValue;
-
-        // The cursor has to be ON the map for anything to be pointed at, and the map's own test
-        // is the one that knows about the game's interface: a label whose room sits at the edge
-        // can still run under the orbs, and a tooltip raised from there would describe a room
-        // the cursor is not on.
-        bool onMap = map.Contains(mouse);
+        _wanted.Clear();
 
         foreach (TerrainRoom room in terrain.Rooms)
         {
-            // THE FILTER THAT DOES THE WORK, and size is not it. An area's tile grid is a full
-            // rectangle while its walkable ground is a subset, so the buildings along the road,
-            // the sea beside them and the wall behind the fence are all rooms with names - and
-            // scenery blocks are LARGE, so a threshold in tiles keeps exactly the labels worth
-            // dropping. Ground somebody can stand on is what tells the two apart.
-            if (!room.IsWalkable
-                || room.Tiles < MinTiles
-                || (Filter.Length > 0
-                    && !room.Name.Contains(Filter, StringComparison.OrdinalIgnoreCase)))
+            // TWO FILTERS, and neither of them is size - see TerrainRoom for why an area built
+            // from one repeated module cannot be thinned by a threshold in tiles. Ground to
+            // stand on separates a room from the solid scenery around it; how often the file was
+            // placed separates a place from a building block.
+            //
+            // NONE OF WHICH APPLIES TO A ROOM SOMEBODY PINNED. Its name is on the map either way
+            // - the place layer draws it - so filtering it out here would only take away the
+            // cursor's hold on it, and with that the way to unpin it. Raising a filter would
+            // then strand a pin somebody has to hunt for a button to be rid of.
+            bool pinned = IsPicked(room);
+            if (!pinned
+                && (!room.IsWalkable
+                    || room.Placements > MaxPlacements
+                    || room.Tiles < MinTiles
+                    || (Filter.Length > 0
+                        && !room.Name.Contains(Filter, StringComparison.OrdinalIgnoreCase))))
             {
                 continue;
             }
@@ -211,22 +224,44 @@ public sealed class RoomLayer
 
             // Pinned rooms are left to the place layer, which draws them with a marker and
             // their route's colour. Drawing them here as well would put two names on one spot,
-            // one of them in the wrong colour - but they still answer the cursor, because
-            // unpinning one has to be possible where pinning it was.
-            _onScreen.Add(new OnScreen(room, at, label, size, IsPicked(room)));
+            // one of them in the wrong colour - but they are packed and hit-tested like any
+            // other, because a name IS written there and unpinning one has to be possible where
+            // pinning it was.
+            _onScreen.Add(new OnScreen(room, at, label, size, pinned));
+            _wanted.Add(new ScreenRect(label.X, label.Y, label.X + size.X, label.Y + size.Y));
+        }
+
+        // The rooms arrive rarest-first (TerrainRooms.Ranked), so a name that would land on one
+        // already written is the less informative of the two - which is what makes dropping it
+        // the right way round.
+        LabelPacking.Keep(_wanted, _kept);
+
+        TerrainRoom? under = null;
+        float nearest = float.MaxValue;
+
+        // The cursor has to be ON the map for anything to be pointed at, and the map's own test
+        // is the one that knows about the game's interface: a label whose room sits at the edge
+        // can still run under the orbs, and a tooltip raised from there would describe a room
+        // the cursor is not on.
+        bool onMap = map.Contains(mouse);
+
+        foreach (int index in _kept)
+        {
+            OnScreen shown = _onScreen[index];
 
             // The cursor is tested against the label as well as the dot, because the label is
-            // what the eye aims at - and ties go to the nearest DOT, so two rooms whose labels
-            // overlap resolve to the one actually being pointed at.
-            float away = Vector2.Distance(mouse, at);
+            // what the eye aims at - and ties go to the nearest DOT, so two rooms whose reach
+            // overlaps resolve to the one actually being pointed at. Only labels that SURVIVED
+            // the packing answer: one that was dropped is not on the screen to be pointed at.
+            float away = Vector2.Distance(mouse, shown.At);
             bool touching = away <= ReachPixels
-                || (mouse.X >= label.X - 3f && mouse.X <= label.X + size.X + 3f
-                    && mouse.Y >= label.Y - 1f && mouse.Y <= label.Y + size.Y + 1f);
+                || (mouse.X >= shown.Label.X - 3f && mouse.X <= shown.Label.X + shown.Size.X + 3f
+                    && mouse.Y >= shown.Label.Y - 1f && mouse.Y <= shown.Label.Y + shown.Size.Y + 1f);
 
             if (onMap && touching && away < nearest)
             {
                 nearest = away;
-                under = room;
+                under = shown.Room;
             }
         }
 
@@ -234,8 +269,9 @@ public sealed class RoomLayer
         {
             draw.PushClipRect(piece.TopLeft, piece.BottomRight, intersect_with_current_clip_rect: true);
 
-            foreach (OnScreen shown in _onScreen)
+            foreach (int index in _kept)
             {
+                OnScreen shown = _onScreen[index];
                 if (shown.Pinned)
                 {
                     continue;
@@ -263,9 +299,11 @@ public sealed class RoomLayer
     private readonly record struct OnScreen(
         TerrainRoom Room, Vector2 At, Vector2 Label, Vector2 Size, bool Pinned);
 
-    // Reused rather than built per frame: this is the one per-frame allocation the layer would
-    // otherwise make, and it would be made while the map is open and nothing else is.
+    // Reused rather than built per frame: these are the per-frame allocations the layer would
+    // otherwise make, and it would make them while the map is open and nothing else is.
     private readonly List<OnScreen> _onScreen = [];
+    private readonly List<ScreenRect> _wanted = [];
+    private readonly List<int> _kept = [];
 
     /// <summary>The tooltip, and the click that pins or unpins what it describes.</summary>
     /// <remarks>
@@ -284,6 +322,9 @@ public sealed class RoomLayer
             $"Tiles ({room.MinTileX},{room.MinTileY})-({room.MaxTileX},{room.MaxTileY})"
             + $"   {room.Tiles} across, {room.WalkableTiles} walkable"
             + $"   ground {terrain.HeightAt((int)room.GridX, (int)room.GridY):F0}",
+            room.Placements == 1
+                ? "Placed once in this area"
+                : $"Placed {room.Placements} times in this area",
             $"Centre ({room.GridX:F1}, {room.GridY:F1}) in grid cells",
             picked ? "Ctrl + click to unpin it" : "Ctrl + click to pin it, with a route",
         ];

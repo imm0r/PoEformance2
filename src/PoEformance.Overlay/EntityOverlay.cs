@@ -3339,6 +3339,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             if (_rooms.Enabled)
             {
+                // FIRST, because it is the one that does the work. An area is built from one
+                // module repeated, so the threshold in tiles below is a cliff rather than a
+                // slider - this is what separates a place from a building block.
+                int repeats = _rooms.MaxPlacements;
+                if (OverlayLayout.Slider("Named up to", ref repeats, 1, 40, "%d placements"))
+                {
+                    _rooms.MaxPlacements = repeats;
+                    SettingsChanged?.Invoke();
+                }
+
+                OverlayLayout.Hint(
+                    "A file placed eighty times in one area is a wall module, and labelling"
+                    + "\nall eighty buries the one room worth reading.");
+
                 int least = _rooms.MinTiles;
                 if (OverlayLayout.Slider("Smallest Room Named", ref least, 1, 32, "%d tiles"))
                 {

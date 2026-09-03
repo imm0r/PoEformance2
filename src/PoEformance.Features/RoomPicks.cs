@@ -22,16 +22,27 @@ public sealed record RoomSettings(
     [property: JsonPropertyName("minTiles")] int MinTiles = 2,
     [property: JsonPropertyName("filter")] string Filter = "",
     [property: JsonPropertyName("picked")]
-    IReadOnlyDictionary<string, IReadOnlyList<string>>? Picked = null)
+    IReadOnlyDictionary<string, IReadOnlyList<string>>? Picked = null,
+
+    // How often one file may be placed in an area before its name stops being worth writing.
+    // LAST in the list because it arrived last, and the positional order of a record is what a
+    // caller passing arguments by position depends on.
+    [property: JsonPropertyName("maxPlacements")] int MaxPlacements = 4)
 {
     /// <summary>
-    /// Off, and rooms of two tiles and up.
+    /// Off, rooms of two tiles and up, and files placed at most four times.
     /// </summary>
     /// <remarks>
     /// OFF because this writes a name on every room in the area, which is a great deal of text
     /// over the map and not what most people want most of the time - it is a thing reached for
     /// while working out a layout. Two tiles because a one-tile room is a piece of scenery: a
     /// rock, a rubble patch, a strip of wall, and there are hundreds of them.
+    ///
+    /// FOUR PLACEMENTS is the number that actually thins the map, and it is
+    /// <see cref="Game.World.TerrainLandmarks"/>'s own: a file placed more often than that is a
+    /// building block rather than a place. Size cannot do this job - an area is built from one
+    /// module repeated, so the threshold in tiles is a cliff rather than a slider, with a map of
+    /// solid text on one side of it and four labels on the other.
     /// </remarks>
     public static RoomSettings Default { get; } = new();
 
@@ -80,6 +91,10 @@ public sealed record RoomSettings(
             // Capped rather than merely floored: a threshold above the biggest room in the
             // area hides every label, which reads as the feature being broken.
             MinTiles = Math.Clamp(MinTiles, 1, 64),
+
+            // Up to a thousand, which is "no limit" for any area that exists - a cap that
+            // cannot be lifted would leave somebody working out a layout unable to see it.
+            MaxPlacements = Math.Clamp(MaxPlacements, 1, 1000),
             Filter = Filter ?? string.Empty,
         };
 }

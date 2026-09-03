@@ -22,6 +22,16 @@ namespace PoEformance.Game.World;
 /// (Building_Fill_03, TropicalCoast_Fill_01, BuildingWall_Cv_06) and are most of the labels on
 /// the map. Size cannot tell them apart from real rooms, because a scenery block is large.
 /// </param>
+/// <param name="Placements">
+/// How many separate rooms in this area were built from the same file.
+///
+/// WHAT SEPARATES A PLACE FROM A BUILDING BLOCK, and it is the lesson
+/// <see cref="TerrainLandmarks"/> already learned about tiles: a name that turns up in eighty
+/// places is a wall module, and labelling all eighty buries the one room worth reading. A name
+/// that turns up once or twice is a place - exit_01, an arena, the room a quest object sits in.
+/// Size cannot say this either way; an area is built from one module repeated, so nearly every
+/// room is the same handful of tiles across.
+/// </param>
 public sealed record TerrainRoom(
     ulong Id,
     string Path,
@@ -33,7 +43,8 @@ public sealed record TerrainRoom(
     int Tiles,
     float GridX,
     float GridY,
-    int WalkableTiles = 0)
+    int WalkableTiles = 0,
+    int Placements = 1)
 {
     /// <summary>True when there is ground in this room somebody could stand on.</summary>
     public bool IsWalkable => WalkableTiles > 0;
@@ -209,6 +220,41 @@ public static class TerrainRooms
                 break;
             }
         }
+
+        return Ranked(rooms);
+    }
+
+    /// <summary>
+    /// Fills in how often each file was placed, and puts the rooms worth reading first.
+    /// </summary>
+    /// <remarks>
+    /// A SECOND PASS because the answer is not known until the first one has finished: how many
+    /// times a file was placed is a fact about the whole area, and the fill meets its rooms one
+    /// at a time.
+    ///
+    /// The ORDER is the other half, and it exists for what draws these. Labels are packed
+    /// against each other - a name that would land on one already written is dropped - so the
+    /// order they are offered in decides which of two overlapping names survives. Rarest first,
+    /// then largest: a room whose file was placed once says more than one of eighty identical
+    /// wall modules, whatever their sizes, and among equals the bigger room is the one somebody
+    /// can see they are standing in.
+    /// </remarks>
+    private static List<TerrainRoom> Ranked(List<TerrainRoom> rooms)
+    {
+        var placements = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (TerrainRoom room in rooms)
+        {
+            placements[room.Path] = placements.GetValueOrDefault(room.Path) + 1;
+        }
+
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            rooms[i] = rooms[i] with { Placements = placements[rooms[i].Path] };
+        }
+
+        rooms.Sort(static (left, right) => left.Placements != right.Placements
+            ? left.Placements.CompareTo(right.Placements)
+            : right.Tiles.CompareTo(left.Tiles));
 
         return rooms;
     }
