@@ -1704,6 +1704,41 @@ interesting part was not the feature:
   room-FAMILY resolution — telling `AbyssTrail_Cnr_01` from `AbyssTrail_End_01` would then be a
   second step, off their grids and their connection counts.
 
+  **And the types answered no as well, which is the useful part.** All 20 of them came back as
+  tiny UTF-16 declarations naming no tile at all: a `.gt` is a NAMED GROUND TYPE
+  (`bone_fill.gt` is 46 bytes reading `BoneUpperFill` and four flags) and an `.et` is the
+  BOUNDARY between two of them, with a colour (`bones_abysswall.et` → `BonesAbyssWall #FFFFFFAA`,
+  `bone_fill.gt` on one side and `bone_abyss.gt` on the other). So the chain room→type→tile does
+  not exist, and the `.arm` route is closed for good — for the price of two clicks rather than
+  an evening, which is what the dump was for.
+
+  **What it opened instead is better than what it closed**, and three facts found separately met
+  at it: the room probe had recorded `TerrainMetadata+0x68` as "a vector of the area's
+  ground-type files"; the schema has carried `GridLandscapeData` since July as "static
+  terrain-type **nibbles 0–5**", a value per cell; and the type dump showed a `.gt` is a name.
+  Walking the vector's elements out of the third recording closed it: a Badlands area lists
+  **six** — `bone_fill`, `trims1`, `bone_abyss`, `badlands_noburrow`, `waypoint_ground`,
+  `badlands` — as eight-byte pointers 8 bytes apart, against the `0x30` stride every other `.gt`
+  reference in memory sits on, each pointing at a file object whose path is at `+0x08` like a
+  tile's `TgtFilePtr`. Six files against nibbles 0–5, arrived at from opposite ends. **A nibble
+  is an index into that list**, so the map can say what the ground IS — the abyss, the fill, the
+  waypoint — instead of naming the tile template that happens to draw it.
+
+  `TerrainGroundTypes` reads it and **refuses to be believed on its own say-so**, because a
+  wrong offset here would draw a plausible map of nonsense and nothing about it would look
+  wrong. Three gates, in order: the landscape buffer must be exactly as long as the walkable one
+  before a single nibble is read out of it with the walkable grid's packing (equal length is
+  what licenses the reinterpretation; a different length means something else is being read);
+  every nibble must index a file the area actually lists; and the types must **separate on
+  walkability** — an abyss walkable nowhere, a fill walkable nearly everywhere. That last one is
+  the gate with teeth, because a mis-read grid samples the same ground for every type and lands
+  them all on the area's average. `GroundRegions` is empty unless all three pass, so the refusal
+  lives at the source rather than in a flag a layer could forget to test.
+
+  The regions themselves come from `TerrainRooms.Find` unchanged — contiguous tiles sharing a
+  name is the same question the rooms ask, and it wants the same answer: a centroid to put a
+  label at, a size to drop the slivers by, rarest-first ordering for the packer.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of
