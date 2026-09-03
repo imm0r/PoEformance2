@@ -246,7 +246,7 @@ public sealed class TerrainGroundTypes
         return new TerrainGroundTypes(
             types, landscape, bytesPerRow, tileType, outOfRange, walkableCells, totalCells,
             Describe(types, outOfRange, walkableCells, totalCells, walkable is not null, spread),
-            Histogram(types, walkableCells, totalCells, walkable is not null))
+            Histogram(types, walkableCells, totalCells, walkable is not null, tilesX, tilesY))
         {
             Trusted = trusted,
         };
@@ -358,12 +358,16 @@ public sealed class TerrainGroundTypes
         IReadOnlyList<string> types,
         IReadOnlyList<long> walkable,
         IReadOnlyList<long> total,
-        bool haveWalkable)
+        bool haveWalkable,
+        int tilesX,
+        int tilesY)
     {
         long everything = 0;
-        foreach (long count in total)
+        long stood = 0;
+        for (int value = 0; value < total.Count; value++)
         {
-            everything += count;
+            everything += total[value];
+            stood += walkable[value];
         }
 
         if (everything == 0)
@@ -382,9 +386,28 @@ public sealed class TerrainGroundTypes
 
         order.Sort((left, right) => total[right].CompareTo(total[left]));
 
+        int named = 0;
+        foreach (string type in types)
+        {
+            if (type.Length > 0)
+            {
+                named++;
+            }
+        }
+
+        // THE AREA'S OWN WALKABLE SHARE, without which no row below it means anything. A value
+        // that is "99.8% walkable" says nothing until you know whether the area is 99% walkable
+        // or 30% - the first makes it the ordinary ground and the second makes it a finding. The
+        // first version of this printed the rows without it and left exactly that unanswerable.
+        //
+        // And SLOTS rather than "named types", which the first version called them: the list has
+        // a blank first entry, so the two numbers differ and printing one under the other's name
+        // is how a person reads five names into a list of four.
         var lines = new List<string>(order.Count + 1)
         {
-            $"{everything} cells, {types.Count} named types",
+            $"{everything} cells over {tilesX}x{tilesY} tiles, "
+            + (haveWalkable ? $"{stood * 100.0 / everything:F1}% walkable overall, " : string.Empty)
+            + $"{types.Count} slots ({named} named)",
         };
 
         foreach (int value in order)

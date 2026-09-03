@@ -1798,6 +1798,32 @@ interesting part was not the feature:
   never walkable is the void or the abyss), and it is shown only when the reading failed, which
   is the only time it is worth the space.
 
+  **And the histogram settled what the verdict could not.** The Titan Grotto:
+
+  ```
+  5   9190252 cells   99.8% walkable   (beyond the list)
+  0     16022 cells    0.2% walkable   (blank slot)
+  4      1865 cells    0.0% walkable   TitanEdge
+  1      1627 cells    0.0% walkable   abyss
+  3      1400 cells    0.0% walkable   TitanGrottoEntrance
+  2      1369 cells    0.0% walkable   TitanWalkwayGround
+  ```
+
+  The list is right — those are plainly this area's own ground types, read out of `+0x68`. What
+  is wrong is the pairing, and **the value 5 is why**: it covers 99.76% of the grid here, and the
+  Badlands landscape grid in the third recording also begins with a run of nothing but 5s. Those
+  two areas list SEVEN and FIVE slots respectively, so a value that tracked the list — an index,
+  or a count-means-none sentinel — would differ between them. It does not. **5 is a fixed
+  constant**, which is what the schema's July note ("nibbles 0–5") was describing all along.
+
+  So the named types are tiny slivers on a background of 5, all four within a few hundred cells
+  of each other in size, and all of them unwalkable. What that leaves unanswered is whether 5
+  means "ordinary ground" or simply "unset", and the number that decides it was missing from the
+  readout: **the area's own walkable share**. "99.8% walkable" is the ordinary ground in an area
+  that is 99% walkable and a real finding in one that is 30%, and the first version printed the
+  rows without ever saying which. It now leads with the area's tiles and its overall share — and
+  with SLOTS rather than "named types", which the blank first entry made a lie by one.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of

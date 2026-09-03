@@ -240,7 +240,12 @@ public class GroundTypeTests
         TerrainGroundTypes ground = Assert.IsType<TerrainGroundTypes>(
             TerrainGroundTypes.From(Types, landscape, stride, 8, 4, Walkable(8, 4, stride)));
 
-        Assert.Contains("2 named types", ground.Lines[0], StringComparison.Ordinal);
+        Assert.Contains("2 slots (2 named)", ground.Lines[0], StringComparison.Ordinal);
+
+        // AND THE AREA'S OWN SHARE, without which no row means anything: "99.8% walkable" is
+        // the ordinary ground in an area that is 99% walkable and a finding in one that is 30%.
+        Assert.Contains("8x4 tiles", ground.Lines[0], StringComparison.Ordinal);
+        Assert.Contains("% walkable overall", ground.Lines[0], StringComparison.Ordinal);
 
         string fill = Assert.Single(
             ground.Lines, line => line.Contains("bone_fill", StringComparison.Ordinal));
