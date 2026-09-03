@@ -2347,6 +2347,28 @@ internal static class Program
         overlay.Costs = costs;
         overlay.Coverage = coverage;
         overlay.Damage = damage;
+
+        // BEFORE AttachPreload, which is where the button that runs this is built. Only offered
+        // with an install to read: the rooms of an area are named in memory and placed nowhere
+        // this tool can see, so the files themselves are the last place that could say where
+        // each one sits - see RoomFiles for what the answer decides.
+        if (installed is not null)
+        {
+            overlay.LookInsideRooms = () => _ = Task.Run(() =>
+            {
+                try
+                {
+                    preload.Swept(PoEformance.Game.Diagnostics.RoomFiles.Describe(
+                        preload.All,
+                        path => PoEformance.Game.Files.GameArt.ReadRaw(installed, path)));
+                }
+                catch (Exception exception) when (exception is IOException or InvalidDataException)
+                {
+                    preload.Swept([exception.Message]);
+                }
+            });
+        }
+
         overlay.AttachPreload(
             preload,
             () => LookAtWhatLoaded(preloadArea),

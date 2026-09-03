@@ -30,6 +30,7 @@ public sealed class PreloadWindow
     private readonly PreloadWatch _watch;
     private readonly Action _lookAgain;
     private readonly Action _sweep;
+    private readonly Action? _rooms;
     private readonly Action _rulesChanged;
     private string _search = string.Empty;
     private string _said = string.Empty;
@@ -38,7 +39,13 @@ public sealed class PreloadWindow
     /// <param name="lookAgain">Runs the walk again, for when it needs forcing.</param>
     /// <param name="sweep">Looks for the count field instead of assuming one - see below.</param>
     /// <param name="rulesChanged">Writes down a rule somebody added from the raw list.</param>
-    public PreloadWindow(PreloadWatch watch, Action lookAgain, Action sweep, Action rulesChanged)
+    /// <param name="rooms">
+    /// Opens the area's ROOM files out of the game's own bundles and reports what is in them.
+    /// Optional, because it needs the game's files: without an install to read there is
+    /// nothing to offer, and a button that always answers "no files" is worse than no button.
+    /// </param>
+    public PreloadWindow(
+        PreloadWatch watch, Action lookAgain, Action sweep, Action rulesChanged, Action? rooms = null)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(lookAgain);
@@ -48,6 +55,7 @@ public sealed class PreloadWindow
         _lookAgain = lookAgain;
         _sweep = sweep;
         _rulesChanged = rulesChanged;
+        _rooms = rooms;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -93,6 +101,19 @@ public sealed class PreloadWindow
             if (ImGui.SmallButton("Find the Count Field"))
             {
                 _sweep();
+            }
+        }
+
+        // What the ROOMS of this area are made of, read out of the game's own bundles. Offered
+        // here because this list is where their names come from: memory says which rooms the
+        // area loaded and nothing more, so the files themselves are the only place left that
+        // could say where each one sits. See RoomFiles.
+        if (all.Count > 0 && _rooms is not null)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("Look Inside the Rooms"))
+            {
+                _rooms();
             }
         }
 
