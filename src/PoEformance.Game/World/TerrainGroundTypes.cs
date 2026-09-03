@@ -213,7 +213,7 @@ public sealed class TerrainGroundTypes
             }
         }
 
-        bool spread = Separates(walkableCells, totalCells);
+        bool spread = Separates(types, walkableCells, totalCells);
         bool trusted = outOfRange == 0 && walkable is not null && spread;
 
         return new TerrainGroundTypes(
@@ -224,6 +224,14 @@ public sealed class TerrainGroundTypes
         };
     }
 
+    /// <summary>True when this slot of the list names a file, rather than being a blank one.</summary>
+    /// <remarks>
+    /// Every area's list starts with a blank, and a landscape nibble of zero therefore means
+    /// "no ground type here". It is a position in the list rather than a hole in it, so it is
+    /// kept - dropping it would shift every nibble above it onto another type's name.
+    /// </remarks>
+    public bool Names(int type) => (uint)type < (uint)Types.Count && Types[type].Length > 0;
+
     /// <summary>
     /// Whether the types disagree about walkability enough to be real.
     /// </summary>
@@ -233,8 +241,14 @@ public sealed class TerrainGroundTypes
     /// on the area's average, which fails this; a correct one has the abyss at nearly nought
     /// and the fill at nearly one. Deliberately loose - it is a check against noise, not a
     /// measurement.
+    ///
+    /// THE BLANK SLOT IS EXCLUDED, and leaving it in would have quietly gutted this. It covers
+    /// the void outside the playable area, which is walkable nowhere - so it satisfies the
+    /// "mostly not" half for free, and the gate would then be asking only whether ANY type is
+    /// walkable. A check half of which passes by construction is most of the way to no check.
     /// </remarks>
-    private static bool Separates(IReadOnlyList<int> walkable, IReadOnlyList<int> total)
+    private static bool Separates(
+        IReadOnlyList<string> types, IReadOnlyList<int> walkable, IReadOnlyList<int> total)
     {
         const int Enough = 1024;   // a type covering less than two tiles says nothing either way
         bool high = false;
@@ -242,7 +256,7 @@ public sealed class TerrainGroundTypes
 
         for (int type = 0; type < total.Count; type++)
         {
-            if (total[type] < Enough)
+            if (total[type] < Enough || type >= types.Count || types[type].Length == 0)
             {
                 continue;
             }
@@ -263,6 +277,15 @@ public sealed class TerrainGroundTypes
         bool haveWalkable,
         bool spread)
     {
+        int named = 0;
+        foreach (string type in types)
+        {
+            if (type.Length > 0)
+            {
+                named++;
+            }
+        }
+
         if (outOfRange > 0)
         {
             return $"{outOfRange} cells name a type beyond the {types.Count} the area lists"
@@ -271,25 +294,26 @@ public sealed class TerrainGroundTypes
 
         if (!haveWalkable)
         {
-            return $"{types.Count} ground types, unchecked - no walkable grid to compare against";
+            return $"{named} ground types, unchecked - no walkable grid to compare against";
         }
 
         if (!spread)
         {
-            return $"{types.Count} ground types, but they do not separate on walkability"
+            return $"{named} ground types, but they do not separate on walkability"
                 + " - which is what a mis-read grid looks like";
         }
 
         int walkableTypes = 0;
         for (int type = 0; type < total.Count; type++)
         {
-            if (total[type] > 0 && walkable[type] > total[type] / 2)
+            if (type < types.Count && types[type].Length > 0
+                && total[type] > 0 && walkable[type] > total[type] / 2)
             {
                 walkableTypes++;
             }
         }
 
-        return $"{types.Count} ground types, {walkableTypes} of them ground you can stand on";
+        return $"{named} ground types, {walkableTypes} of them ground you can stand on";
     }
 
     /// <summary>The type's short name - its file stem, which is what a label has room for.</summary>
