@@ -203,7 +203,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _healthBars.Style = value;
             _projectiles.Style = value;
             _atlas.Style = value;
-            _ground.Style = value;
         }
     }
 
@@ -427,9 +426,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _roomWants = settings.RoomsOrDefault;
         _rooms?.Apply(_roomWants);
 
-        // No handover hole here, unlike the room layer above: the ground names need no route
-        // planner, so the layer exists from the start and takes the settings directly.
-        _ground.Apply(settings.GroundOrDefault);
 
         ApplyTerrainStyle(OverlaySettings.ParseColour(settings.TerrainColour), settings.TerrainThickness);
     }
@@ -495,7 +491,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // saving before the layer is attached must not write an empty pick list over a
             // file full of pinned rooms.
             Rooms = _rooms?.Saved() ?? basis.Rooms,
-            Ground = _ground.Saved(),
 
             // The page's switch is the live one where there is a page; before it is attached
             // the basis is what was read out of the file, and writing the default over it is
@@ -587,8 +582,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private PoiLayer? _poi;
     private RoomLayer? _rooms;
 
-    /// <summary>What the ground under the rooms IS. Always here - it needs nothing attached.</summary>
-    private readonly GroundLayer _ground = new();
     private RoutePlanner? _planner;
 
     /// <summary>
@@ -3447,53 +3440,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
-        {
-            bool ground = _ground.Enabled;
-            if (OverlayLayout.Toggle("Ground Types on the Map", ref ground))
-            {
-                _ground.Enabled = ground;
-                SettingsChanged?.Invoke();
-            }
-
-            OverlayLayout.Hint(
-                "What the ground IS rather than which file drew it - the abyss, the fill,"
-                + "\nthe waypoint - in the names the area itself lists.");
-
-            if (_ground.Enabled)
-            {
-                int least = _ground.MinTiles;
-                if (OverlayLayout.Slider("Smallest Patch Named", ref least, 1, 64, "%d tiles"))
-                {
-                    _ground.MinTiles = least;
-                    SettingsChanged?.Invoke();
-                }
-
-                OverlayLayout.Hint(
-                    "An area has a handful of ground types, so its patches are few and large."
-                    + "\nWhat this drops is the ragged edge where two of them meet.");
-
-                // WHY THERE IS NOTHING ON THE MAP, which without this line is indistinguishable
-                // from the feature being broken. WRITTEN OUT rather than hinted: OverlayLayout
-                // .Hint is a hover tooltip, and the first version put this in one - so the
-                // sentence that explains an empty map was itself invisible unless somebody
-                // happened to point at the right control. A diagnostic nobody can see is not a
-                // diagnostic.
-                if (_ground.Note.Length > 0)
-                {
-                    ImGuiText.Wrapped(Quiet, _ground.Note);
-                }
-
-                // AND WHAT THE GRID ACTUALLY HOLDS when the verdict was no. "9190252 cells name
-                // a type beyond the 5 the area lists" says the pairing is wrong and nothing
-                // about the values, which is the only thing that decides what to do next - so
-                // the histogram sits right under it, and only there.
-                foreach (string line in _ground.Diagnosis)
-                {
-                    ImGui.TextColored(Quiet, line);
-                }
-            }
-        }
-
         if (Noise is not null)
         {
             bool filtering = Noise.Enabled;
@@ -3737,10 +3683,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         //
         // Called whether or not it draws anything: the rooms somebody pinned are handed to the
         // place layer below, and it is this call that resolves them for the area.
-        // UNDER the room names, in draw order as in meaning: where both are on and two labels
-        // land on the same spot, the room's name is the more specific of the two and should be
-        // the one that stays legible.
-        _ground.DrawOnMap(draw, map, _snapshot, player);
 
         if (_rooms is not null)
         {

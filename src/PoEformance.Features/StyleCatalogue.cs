@@ -96,11 +96,6 @@ public static class StyleCatalogue
         // one layer instead of two.
         new("map.room", "Map", "Room name", StyleTraits.Colour | StyleTraits.Scale, Rgb(184, 208, 232, 210)),
 
-        // The ground types sit UNDER the room names in every sense: a room is a place and a
-        // ground type is what the place is made of, so this is quieter still and warmer, to be
-        // told apart from the room labels at a glance when both are on.
-        new("map.ground", "Map", "Ground type", StyleTraits.Colour | StyleTraits.Scale, Rgb(224, 190, 150, 190)),
-
         // The colour here is the HOT end of the ramp; the cool end is derived from it, so one
         // choice moves the whole scale rather than leaving somebody to match two ends by eye.
         // Scale sizes the patch, which is how a picture is made denser or airier.
@@ -196,7 +191,6 @@ public static class StyleCatalogue
         public const string Unwalked = "map.unwalked";
         public const string Heat = "map.heat";
         public const string Room = "map.room";
-        public const string Ground = "map.ground";
         public const string HealthBar = "healthbar";
         public const string HealthBarBack = "healthbar.back";
         public const string HealthBarShield = "healthbar.shield";
@@ -222,7 +216,7 @@ public static class StyleCatalogue
         /// <summary>All of them, for the test that keeps them honest.</summary>
         public static IReadOnlyList<string> All { get; } =
         [
-            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Heat, Room, Ground,
+            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Heat, Room,
             PreloadBannerBack, PreloadListBack, PreloadCard,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,
