@@ -635,7 +635,7 @@
     },
 
     "TileStruct": {
-      "comment": "0x38 bytes each, inside TileDetailsPtr. WARNING from the AHK port: the tile ARRAY index and the TileIdX sub-cell byte are different things - a case-insensitive variable collision between them once placed every landmark at the map origin.",
+      "comment": "0x38 bytes each, inside TileDetailsPtr. WARNING from the AHK port: the tile ARRAY index and the TileIdX sub-cell byte are different things - a case-insensitive variable collision between them once placed every landmark at the map origin. MEASURED ACROSS 2336 TILES of two areas (2026-09, RoomProbe windows in a recording), which is what the rest of the struct turns out to be: +0x00 is a pointer in every single tile and +0x08 in every one that names a file; +0x10, +0x18 and +0x20 are ONE INLINE std::vector - begin, end, capacity - carried by 889 of the 2336 and absent (all three zero) in the other 1447; +0x28 reads zero in all 2336. The vector holds 16-byte elements, 1 to 7 of them, each a pointer and a number, and every one of those pointers leads to an object of a SINGLE type (vtable module+0x345BF80, with a second vtable at its own +0x18 and an inline vector of its own at +0x20). What that object is remains open; what it is NOT is a room - no tile of the 2336 reaches a .arm file object through any slot, one hop, or the vector's contents.",
       "fields": {
         "SubTileDetailsPtr": { "offset": "0x00", "type": "ptr" },
         "TgtFilePtr": { "offset": "0x08", "type": "ptr" },

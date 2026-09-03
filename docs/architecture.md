@@ -1632,6 +1632,23 @@ interesting part was not the feature:
     cannot tell "no tile carries a room" from "no tile was looked at". Hence the probe's sixteen
     4 KiB windows: small enough to be kept, spread across the array, and the tiles it samples
     are drawn from them.
+
+  **What the second recording settled**, with those windows in it — 2336 tiles across two areas,
+  every slot, plus a hop: **no tile reaches a room**, by any slot, one hop out, or through the
+  contents of the vector it carries. That closes the obvious place and, more usefully, it
+  measured the rest of the tile struct, which had four unexplained slots: `+0x10`, `+0x18` and
+  `+0x20` are **one inline `std::vector`** — begin, end, capacity — carried by 889 of the 2336
+  tiles and all-zero in the other 1447; `+0x28` reads zero in every tile. The vector holds
+  16-byte `{object, number}` elements, one to seven of them, and every object shares a single
+  vtable. See `TileStruct` in the schema, which now records the census.
+
+  Finding that cost the probe a correction worth keeping: **it had been peeking `+0x10` as a
+  pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
+  whatever its elements happen to begin with, and never opens the array — so a whole level of
+  the struct was invisible in a probe designed to find exactly that kind of thing. It now tests
+  three consecutive slots for begin/end/capacity, and does so as an ADDITION to the ordinary
+  walk: three references in the right order satisfy that test by luck, and skipping the next two
+  slots on the guess would hide whatever they really are.
 - **A death is not a hit.** Damage taken is the same pool-difference measurement pointed at the
   player, and at zero life the pool reads as *unread* rather than empty — otherwise the whole
   pool is counted as one enormous hit on the way back in, and every death becomes the worst hit

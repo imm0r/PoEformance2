@@ -49,10 +49,29 @@ public sealed class RoomProbe
     /// <summary>How much of a vector's contents to look at. Its head, not the whole of it.</summary>
     private const int ElementBytes = 0x80;
 
-    /// <summary>Where the terrain struct has room for something nothing has named.</summary>
-    private const int TerrainGapFrom = 0x30;
+    /// <summary>
+    /// How much of an object an element points at to read.
+    /// </summary>
+    /// <remarks>
+    /// 0x60 covers the shape a recording showed these to have - two vtables, a reference, and
+    /// an inline vector of its own - and the read is worth making even when this run recognises
+    /// nothing in it, because it is what puts the object in the recording.
+    /// </remarks>
+    private const int ObjectBytes = 0x60;
 
-    private const int TerrainGapTo = 0xD0;
+    /// <summary>
+    /// How much of the terrain struct to walk.
+    /// </summary>
+    /// <remarks>
+    /// THE WHOLE OF IT, and it started as the gap between the tile vector at 0x28 and the grids
+    /// at 0xD0 - the one span nothing had claimed. That was reasoning from what is already
+    /// mapped, and the mapped part stops at 0x134: everything past it is as unexamined as the
+    /// gap was, and a rooms vector would be as much at home there. The whole struct costs 128
+    /// slots once per area, which is nothing beside reading the grid it describes.
+    /// </remarks>
+    private const int TerrainFrom = 0x00;
+
+    private const int TerrainTo = 0x400;
 
     /// <summary>A bound on the report, so a garbled read cannot fill the screen.</summary>
     private const int MostLines = 48;
@@ -120,8 +139,8 @@ public sealed class RoomProbe
 
         if (MemoryReaderExtensions.IsPlausiblePointer(terrainBase))
         {
-            lines.Add($"terrain 0x{terrainBase:X}  +0x{TerrainGapFrom:X}..0x{TerrainGapTo:X}");
-            Walk(lines, terrainBase, TerrainGapFrom, TerrainGapTo, loud: true);
+            lines.Add($"terrain 0x{terrainBase:X}  +0x{TerrainFrom:X}..0x{TerrainTo:X}");
+            Walk(lines, terrainBase, TerrainFrom, TerrainTo, loud: true);
         }
 
         if (MemoryReaderExtensions.IsPlausiblePointer(tileArray) && tiles > 0)
@@ -209,6 +228,28 @@ public sealed class RoomProbe
 
         for (int offset = 0; offset + 8 <= block.Length && lines.Count < MostLines; offset += 8)
         {
+            // AN INLINE VECTOR FIRST, because reading one as three separate pointers is what
+            // hid a whole level of the tile struct. Slots +0x10, +0x18 and +0x20 of a tile are
+            // begin, end and capacity - not three references - so peeking the value at +0x10
+            // classifies whatever the ELEMENTS happen to start with, and the array itself is
+            // never opened. 889 of 2336 tiles in a recording carry one.
+            if (offset + 24 <= block.Length
+                && TryInlineVector(block, offset, out ulong begin, out long span))
+            {
+                int slotAt = from + offset;
+                if (loud)
+                {
+                    lines.Add($"  +0x{slotAt:X2}  Vector inline, 0x{span:X} bytes at 0x{begin:X}");
+                }
+
+                // ADDED TO the ordinary walk rather than replacing it: three pointers in the
+                // right order are not proof of a vector - a struct holding two references and
+                // an array would satisfy it by luck - and skipping the next two slots on a
+                // guess would hide whatever they really are. The vector reading is extra, so a
+                // wrong guess costs a line and never an offset.
+                found += Contents(lines, begin, span, slotAt, loud);
+            }
+
             ulong value = BitConverter.ToUInt64(block, offset);
             if (!MemoryReaderExtensions.IsPlausiblePointer(value))
             {
@@ -246,6 +287,118 @@ public sealed class RoomProbe
             if (peek.Kind == TargetKind.Vector)
             {
                 found += Elements(lines, value, slot, loud);
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>
+    /// Whether three consecutive slots read as a std::vector laid out INLINE.
+    /// </summary>
+    /// <remarks>
+    /// begin, end, capacity - the shape MSVC gives a vector that is a FIELD rather than a thing
+    /// pointed at. The checks are what keep three unrelated pointers from reading as one: the
+    /// order has to hold, the span has to be a sane size, and it has to divide by eight, since
+    /// an array of anything this game stores is made of whole words.
+    /// </remarks>
+    private static bool TryInlineVector(byte[] block, int offset, out ulong begin, out long span)
+    {
+        begin = BitConverter.ToUInt64(block, offset);
+        ulong end = BitConverter.ToUInt64(block, offset + 8);
+        ulong capacity = BitConverter.ToUInt64(block, offset + 16);
+        span = 0;
+
+        if (!MemoryReaderExtensions.IsPlausiblePointer(begin)
+            || !MemoryReaderExtensions.IsPlausiblePointer(end)
+            || end < begin
+            || capacity < end)
+        {
+            return false;
+        }
+
+        span = (long)(end - begin);
+        return span > 0 && span <= 0x1_0000 && span % 8 == 0;
+    }
+
+    /// <summary>
+    /// Opens an array: its elements, and the objects they point at.
+    /// </summary>
+    /// <remarks>
+    /// TWO HOPS, and the second one is as much for the RECORDING as for the report. What a
+    /// tile's vector holds is one pointer and one number per 16 bytes, and every one of those
+    /// pointers leads to an object of a single type - so the object is the thing that could
+    /// carry a room, and it is exactly what a recording never contained, because nothing had
+    /// ever read it. Reading 0x60 of it puts it in the file whether or not this run recognises
+    /// anything in it.
+    /// </remarks>
+    private int Contents(List<string> lines, ulong begin, long span, int slot, bool loud)
+    {
+        var block = new byte[(int)Math.Min(ElementBytes, span)];
+        if (!_reader.TryRead(begin, block))
+        {
+            return 0;
+        }
+
+        int found = 0;
+        for (int offset = 0; offset + 8 <= block.Length && lines.Count < MostLines; offset += 8)
+        {
+            ulong value = BitConverter.ToUInt64(block, offset);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(value))
+            {
+                continue;
+            }
+
+            PeekResult peek = PointerPeek.Peek(_reader, value);
+            if (peek.Kind is TargetKind.WideText or TargetKind.Text)
+            {
+                string text = Describe(peek, value);
+                bool room = LooksLikeRoom(text);
+                found += room ? 1 : 0;
+
+                if (loud || room)
+                {
+                    lines.Add($"    +0x{slot:X2}[+0x{offset:X2}]  {text}");
+                }
+
+                continue;
+            }
+
+            if (peek.Kind != TargetKind.Structure)
+            {
+                continue;
+            }
+
+            // The object an element points at. Read whole - see the remarks above - and then
+            // asked whether anything it holds is text.
+            var inside = new byte[ObjectBytes];
+            if (!_reader.TryRead(value, inside))
+            {
+                continue;
+            }
+
+            for (int deep = 0; deep + 8 <= inside.Length && lines.Count < MostLines; deep += 8)
+            {
+                ulong held = BitConverter.ToUInt64(inside, deep);
+                if (!MemoryReaderExtensions.IsPlausiblePointer(held))
+                {
+                    continue;
+                }
+
+                PeekResult what = PointerPeek.Peek(_reader, held);
+                if (what.Kind is not (TargetKind.WideText or TargetKind.Text))
+                {
+                    continue;
+                }
+
+                string text = Describe(what, held);
+                bool room = LooksLikeRoom(text);
+                found += room ? 1 : 0;
+
+                if (loud || room)
+                {
+                    lines.Add($"      +0x{slot:X2}[+0x{offset:X2}]+0x{deep:X2}  {text}");
+                }
             }
         }
 
