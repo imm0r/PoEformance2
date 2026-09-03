@@ -42,6 +42,9 @@ public sealed record OverlaySettings(
     // keep-out zones, and null until somebody touches it, for exactly the same reasons.
     [property: JsonPropertyName("rooms")] RoomSettings? Rooms = null,
 
+    // What the ground under those rooms IS, which is a level above their file names. Its own
+    // object beside them, and null until touched, for the same reasons.
+    [property: JsonPropertyName("ground")] GroundSettings? Ground = null,
 
     // The projectile marks. On by default, because unlike the effect and terrain debug
     // layers this is a playing feature: it costs nothing extra to read - a projectile is
@@ -131,6 +134,8 @@ public sealed record OverlaySettings(
     /// <summary>What was decided about the room names, or the defaults.</summary>
     public RoomSettings RoomsOrDefault => Rooms ?? RoomSettings.Default;
 
+    /// <summary>What was decided about the ground-type names, or the defaults.</summary>
+    public GroundSettings GroundOrDefault => Ground ?? GroundSettings.Default;
 
     /// <summary>The hidden tab ids, empty until somebody hides one.</summary>
     public IReadOnlyList<string> HiddenTabsOrEmpty => HiddenTabs ?? [];
@@ -210,6 +215,7 @@ public sealed record OverlaySettings(
             // can still reach somebody who never opened the sliders.
             Interface = Interface?.Normalised(),
             Rooms = Rooms?.Normalised(),
+            Ground = Ground?.Normalised(),
 
             // Capped low: this thickens the line in TEXTURE pixels, and past a few the
             // outline stops being a boundary and becomes a filled shape.
