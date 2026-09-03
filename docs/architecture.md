@@ -1739,6 +1739,20 @@ interesting part was not the feature:
   name is the same question the rooms ask, and it wants the same answer: a centroid to put a
   label at, a size to drop the slivers by, rarest-first ordering for the packer.
 
+  **And then the first real area showed the gap in it.** The Titan Grotto drew nothing and said
+  nothing — an empty map with no explanation, which is precisely the confusion those three gates
+  exist to prevent, reintroduced one level ABOVE them. Two mistakes, and the second is the one
+  worth remembering. `OverlayLayout.Hint` is a **hover tooltip**, so the sentence explaining an
+  empty map was itself invisible unless somebody happened to point at the right control; that is
+  a five-minute fix. The real one: the reader gave up in four places with a bare `null`, so
+  `Ground` being null carried no reason at all — the checks were carefully designed to explain
+  themselves and the code that runs BEFORE them was not. Every refusal now names itself with its
+  numbers ("landscape 44160 bytes against walkable 42320 — not the same grid", "element 3 of 6
+  names no file"), the note lives on `TerrainGrid` rather than on the ground it may not have,
+  and it is written out on the switch panel and into `Describe()`. The lesson generalises past
+  this feature: **a diagnostic that only covers the interesting failures is not a diagnostic**,
+  because the boring ones are what actually happen.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of
