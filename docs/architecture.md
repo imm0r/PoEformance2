@@ -1863,6 +1863,20 @@ interesting part was not the feature:
   ground type per corner of every slot, and the area carries one per tile corner. The two are the
   same kind of thing for the first time.
 
+  **The ground-type layer is back, on the field that is measured.** Same layer, same two gates,
+  same flood fill into named blocks — a tile takes the type most of its four corners agree on, the
+  blank first slot is a position rather than a region, and nothing is drawn unless every corner
+  names a slot the list holds AND the types separate on walkability. What changed is the source
+  (`+0x50` byte 0 instead of a `GridLandscapeData` nibble), the scale (thousands of corners rather
+  than millions of cells, so the spread check's floor moved from 1024 to 64), and the readout: the
+  histogram now leads with the area's own walkable COUNT and carries no per-cent signs at all,
+  drawn through `ImGuiText.Mono` — which is `TextUnformatted` — rather than a printf call. Two
+  locks on one bug, because that bug printed a number under another number's name and was believed.
+
+  The one check that only the game can run is the walkability separation: `vaal_building_inside`
+  should be walkable nearly nowhere and `vaal_street` nearly everywhere. Offline the array says
+  the values form a map; in the game the gate says whether they form the RIGHT one.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of
