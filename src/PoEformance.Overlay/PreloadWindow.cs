@@ -31,6 +31,7 @@ public sealed class PreloadWindow
     private readonly Action _lookAgain;
     private readonly Action _sweep;
     private readonly Action? _rooms;
+    private readonly Action? _writeRooms;
     private readonly Action _rulesChanged;
     private string _search = string.Empty;
     private string _said = string.Empty;
@@ -44,8 +45,19 @@ public sealed class PreloadWindow
     /// Optional, because it needs the game's files: without an install to read there is
     /// nothing to offer, and a button that always answers "no files" is worse than no button.
     /// </param>
+    /// <param name="writeRooms">
+    /// Writes those files out whole, decoded, beside the loaded-file dumps. The readout says
+    /// what a room NAMES; the format - the grid's size, its alphabet, how it refers to the
+    /// ground types - is a question about the whole file, and nobody answers that at the
+    /// machine running the game.
+    /// </param>
     public PreloadWindow(
-        PreloadWatch watch, Action lookAgain, Action sweep, Action rulesChanged, Action? rooms = null)
+        PreloadWatch watch,
+        Action lookAgain,
+        Action sweep,
+        Action rulesChanged,
+        Action? rooms = null,
+        Action? writeRooms = null)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(lookAgain);
@@ -56,6 +68,7 @@ public sealed class PreloadWindow
         _sweep = sweep;
         _rulesChanged = rulesChanged;
         _rooms = rooms;
+        _writeRooms = writeRooms;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -114,6 +127,19 @@ public sealed class PreloadWindow
             if (ImGui.SmallButton("Look Inside the Rooms"))
             {
                 _rooms();
+            }
+        }
+
+        // And the whole of them, out to a file. The readout above is eight strings per room,
+        // which was enough to establish that a room is a grid of characters and nothing more;
+        // the dimensions, the alphabet and the way it names its ground types are questions
+        // about the whole file, and this is what carries one off the gaming machine.
+        if (all.Count > 0 && _writeRooms is not null)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("Write the Rooms Out"))
+            {
+                _writeRooms();
             }
         }
 

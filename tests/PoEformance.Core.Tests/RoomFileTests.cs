@@ -23,6 +23,9 @@ public class RoomFileTests
         "Art/Models/Terrain/Desert/Badlands/BoneFill_01.tmd",
     ];
 
+    /// <summary>An area hash, which is how the game and the dumps beside this one name one.</summary>
+    private const uint Area = 2117916152;
+
     private static byte[]? Nothing(string path) => null;
 
     [Fact]
@@ -155,4 +158,89 @@ public class RoomFileTests
         Assert.Equal(5, lines.Count);   // the count, three rooms, and the tail
         Assert.Contains("...and 17 more", lines[^1], StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void TheDumpCarriesEveryRoomWhole()
+    {
+        // ALL of them, and not the handful the readout opens: the variation between rooms is
+        // the evidence. A field constant across thirty-two files is a header; one that tracks
+        // the grid is a dimension - and neither is visible in a sample of six.
+        string[] many = [.. Enumerable.Range(0, 20).Select(i => $"Metadata/Terrain/X/Rooms/room_{i:00}.arm")];
+        string file = Temporary();
+
+        string? written = RoomFiles.Dump(
+            Area, many, room => Encoding.UTF8.GetBytes($"grid of {Name(room)}"), file);
+
+        Assert.Equal(file, written);
+        string text = File.ReadAllText(file);
+        foreach (string room in many)
+        {
+            Assert.Contains($"### {room}", text, StringComparison.Ordinal);
+            Assert.Contains($"grid of {Name(room)}", text, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void TheDumpDecodesUtf16RatherThanWritingNulsOut()
+    {
+        // The mistake this whole file exists around: a room is UTF-16, and writing its bytes
+        // out as if they were UTF-8 produces a page of NULs that reads as a broken dump rather
+        // than as a wrong decoder.
+        byte[] content = [.. new byte[] { 0xFF, 0xFE }, .. Encoding.Unicode.GetBytes("GroundType 0 = Sand\n")];
+        string file = Temporary();
+
+        RoomFiles.Dump(Area, Loaded, _ => content, file);
+
+        string text = File.ReadAllText(file);
+        Assert.Contains("GroundType 0 = Sand", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("\0", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ARoomTheBundlesLackIsMarkedRatherThanDroppedFromTheDump()
+    {
+        // A room that is missing and a room that is absent from the list want opposite next
+        // steps, and a dump that simply skips the first cannot tell them apart.
+        string file = Temporary();
+
+        RoomFiles.Dump(Area, Loaded, Nothing, file);
+
+        string text = File.ReadAllText(file);
+        Assert.Contains("BonePassage_Cnr_1.arm", text, StringComparison.Ordinal);
+        Assert.Contains("not in the bundles", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void OneUnreadableRoomDoesNotCostTheRest()
+    {
+        string file = Temporary();
+
+        RoomFiles.Dump(
+            Area,
+            Loaded,
+            room => room.Contains("ritualsite", StringComparison.Ordinal)
+                ? throw new InvalidDataException("bad chunk")
+                : Encoding.UTF8.GetBytes("grid"),
+            file);
+
+        string text = File.ReadAllText(file);
+        Assert.Contains("could not be read: bad chunk", text, StringComparison.Ordinal);
+        Assert.Contains("BonePassage_Cnr_1.arm", text, StringComparison.Ordinal);
+        Assert.Contains("grid", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void NoRoomsWritesNoFileAtAll()
+    {
+        // Rather than an empty document that looks like a failed read of a real area.
+        string file = Temporary();
+
+        Assert.Null(RoomFiles.Dump(Area, ["Metadata/Terrain/X/a.tdt"], Nothing, file));
+        Assert.False(File.Exists(file));
+    }
+
+    private static string Temporary()
+        => Path.Combine(Path.GetTempPath(), $"poef-rooms-{Guid.NewGuid():N}.txt");
+
+    private static string Name(string path) => path[(path.LastIndexOf('/') + 1)..];
 }

@@ -1669,6 +1669,20 @@ interesting part was not the feature:
   lesson is the one this file keeps relearning: **a check a wrong answer passes is worse than no
   check**, and it is worst when the wrong answer is the one that would close the question.
 
+  Corrected, it answered: a room is **UTF-16 text** holding a grid of characters, a list of
+  ground (`.gt`) and edge (`.et`) types, and `.ao` doodads with transform matrices — and NOT a
+  single `.tdt`. So a room does not name its tiles, and the grid is the thing that could place
+  one: the terrain struct's `+0x68` is that same list of `.gt` files for the whole area, and
+  `GridLandscapeData` is a nibble per cell in the range 0–5. Whether a room's grid can be
+  translated through its own `.gt` list into that nibble grid and searched for is the next
+  question, and it is a question about the WHOLE file — the grid's dimensions, its alphabet, how
+  a character maps to a type — which eight strings per room cannot answer. Hence "Write the
+  Rooms Out" beside the readout: `RoomFiles.Dump` decodes every `.arm` of the area into
+  `preloads/rooms-<area>.txt`, named to sit beside the `area-<area>.txt` the loaded-file list
+  already writes. All of them rather than one, because the variation between rooms is itself the
+  evidence — a field constant across thirty-two files is a header, and one that tracks the grid
+  is a dimension.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of

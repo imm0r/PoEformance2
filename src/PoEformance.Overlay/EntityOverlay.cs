@@ -779,6 +779,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public Action? LookInsideRooms { get; set; }
 
+    /// <summary>
+    /// Writes the area's room files out whole, decoded, when something can.
+    /// </summary>
+    /// <remarks>
+    /// Same rules as <see cref="LookInsideRooms"/>, including SET IT BEFORE
+    /// <see cref="AttachPreload"/>. Separate from it because the two answer different
+    /// questions: one says what a room names, and this is what a person reads the format out
+    /// of, on a machine that is not running the game.
+    /// </remarks>
+    public Action? WriteRoomsOut { get; set; }
+
     public void AttachPreload(
         PreloadWatch watch,
         Action lookAgain,
@@ -805,7 +816,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Area);
         var window = new PreloadWindow(
-            watch, lookAgain, sweep, () => PreloadListChanged?.Invoke(watch.Watching), LookInsideRooms);
+            watch,
+            lookAgain,
+            sweep,
+            () => PreloadListChanged?.Invoke(watch.Watching),
+            LookInsideRooms,
+            WriteRoomsOut);
         _tools.Add(
             20,
             "preload",
