@@ -1685,6 +1685,11 @@ internal static class Program
             // while the tool runs, and a flag fixed at construction would make that edit take a
             // restart to notice.
             ReadActions = evasionPlanner.Settings.NeedsActions,
+
+            // The hunt for the room level, which is reverse-engineering rather than a feature -
+            // so it rides with the rest of the measurements. Its point is the recording: the
+            // reads have to HAPPEN for the question to be answerable offline.
+            ProbeRooms = debug,
         };
         Console.WriteLine();
         Console.WriteLine(gameWindow != IntPtr.Zero

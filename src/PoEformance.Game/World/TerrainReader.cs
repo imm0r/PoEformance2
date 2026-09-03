@@ -43,12 +43,14 @@ public sealed class TerrainGrid
         byte[] cells, int bytesPerRow, int rows,
         long totalTilesX, long totalTilesY, TerrainHeightField? heights, string heightNote = "",
         IReadOnlyList<TerrainLandmark>? landmarks = null,
-        IReadOnlyList<TerrainRoom>? rooms = null)
+        IReadOnlyList<TerrainRoom>? rooms = null,
+        IReadOnlyList<string>? roomProbe = null)
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
         _landmarks = landmarks ?? [];
         _rooms = rooms ?? [];
+        RoomProbeLines = roomProbe ?? [];
         TilesX = (int)Math.Max(0, totalTilesX);
         TilesY = (int)Math.Max(0, totalTilesY);
         _heights = heights;
@@ -109,6 +111,17 @@ public sealed class TerrainGrid
     /// out of the entity list. See <see cref="TerrainRooms"/>.
     /// </remarks>
     public IReadOnlyList<TerrainRoom> Rooms => _rooms;
+
+    /// <summary>
+    /// What the hunt for the ROOM level found around one tile, when it was asked to look.
+    /// </summary>
+    /// <remarks>
+    /// Empty unless --debug asked for it. See <see cref="Diagnostics.RoomProbe"/>: the names
+    /// drawn on the map today are tiles, one level below the rooms the reference tool shows,
+    /// and this is the reads that would settle where the room level lives - carried on the grid
+    /// so the readout can show it and a recording can hold it.
+    /// </remarks>
+    public IReadOnlyList<string> RoomProbeLines { get; }
 
     /// <summary>
     /// Why the heights are, or are not, here.
@@ -521,7 +534,7 @@ public sealed class TerrainReader
         _walkable = null;
 
         return new TerrainGrid(
-            cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks, _rooms);
+            cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks, _rooms, _probe);
     }
 
     /// <summary>
@@ -542,6 +555,25 @@ public sealed class TerrainReader
 
     /// <summary>The rooms the same read found. See TerrainGrid.Rooms.</summary>
     private IReadOnlyList<TerrainRoom> _rooms = [];
+
+    /// <summary>
+    /// Whether to go looking for the ROOM level while the tiles are being read.
+    /// </summary>
+    /// <remarks>
+    /// Off unless asked, and asked by --debug. It is a walk of two neighbourhoods of memory
+    /// nothing else touches, which costs a couple of hundred small reads once per area - free
+    /// beside the terrain read itself, and pointless for anybody not chasing the offset. See
+    /// <see cref="Diagnostics.RoomProbe"/> for what it is chasing and why it must be RUN to be
+    /// answerable offline.
+    /// </remarks>
+    public bool ProbeRooms { get; set; }
+
+    /// <summary>What that probe found, or empty when it did not run.</summary>
+    private IReadOnlyList<string> _probe = [];
+
+    // The tile the probe looks at: the first one carrying a name, and what that name is.
+    private long _probeTile = -1;
+    private string _probeName = string.Empty;
 
     /// <summary>
     /// Names for particular tiles of the current area, keyed as the reference writes them.
@@ -575,6 +607,9 @@ public sealed class TerrainReader
     /// </remarks>
     private void ReadTilePaths(byte[] tiles, long count, long tilesX)
     {
+        _probeTile = -1;
+        _probeName = string.Empty;
+
         if (tilesX <= 0)
         {
             _landmarks = [];
@@ -626,6 +661,12 @@ public sealed class TerrainReader
 
             tilePath[i] = id;
             string path = paths[id];
+
+            if (_probeTile < 0)
+            {
+                _probeTile = i;
+                _probeName = path;
+            }
 
             // Only the tiles that could BE something are kept as records. A curated key needs
             // its sub-ids, so the filter has to let anything curated through as well.
@@ -679,6 +720,7 @@ public sealed class TerrainReader
         // unread, and keeping the last area's answers would put its rooms on this area's map.
         _landmarks = [];
         _rooms = [];
+        _probe = [];
 
         if (tilesX <= 0 || tilesY <= 0)
         {
@@ -713,6 +755,14 @@ public sealed class TerrainReader
         // The same buffer answers all three questions, so the places in the ground and the
         // rooms cost one pass over memory that has already been read.
         ReadTilePaths(tiles, count, tilesX);
+
+        // And, when somebody is chasing it, a look at the bytes around one tile for the level
+        // ABOVE it - see RoomProbe. Here because this is the one place holding both the terrain
+        // struct's address and the tile vector's, and after the pass that picked which tile.
+        _probe = ProbeRooms && _probeTile >= 0
+            ? new Diagnostics.RoomProbe(_reader).Probe(
+                terrainBase, first + (ulong)(_probeTile * TileEntrySize), _probeName)
+            : [];
 
         var heights = new float[count];
         for (long i = 0; i < count; i++)
