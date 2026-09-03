@@ -1544,6 +1544,21 @@ interesting part was not the feature:
   asking for: `TropicalCoast_*` sat over the beach and `Building*` over the houses. The labels
   land on the thing they name.
 
+  **And it killed the size threshold as an idea.** The second run showed a cliff: at nine tiles
+  the map was solid text, at ten there were four labels left. Nothing between the two pictures,
+  because there is nothing between them — an area is built from ONE module repeated, so nearly
+  every room is exactly nine tiles and a threshold in tiles is a step function at the module
+  size. What survives at ten is only what the flood fill glued together, two adjacent placements
+  of one file. Walkability did not save it either: `Building_Fill_*` went, but a `BuildingWall_*`
+  room is a piece of level, not a mesh — it holds the wall *and* the ground in front of it, so it
+  passes. What actually produces the soup is **repetition**, and the fix is the rule
+  `TerrainLandmarks` already uses on tiles: a file placed more than four times in one area is a
+  building block, not a place. `TerrainRoom.Placements` carries the count, and the rooms come out
+  of the reader **rarest first, then largest** — because the second rule is that labels are
+  packed against each other (`LabelPacking`): a name that would land on one already written is
+  dropped, so the offer order decides which of two overlapping names survives. Together they make
+  the density a function of the zoom rather than of a number somebody has to guess.
+
   A room is a **connected block of tiles sharing one file**, found by flood fill rather than by
   the pairwise clustering the boss arenas use. That is a cost decision and not a style one:
   clustering is quadratic in the tiles it is given, which is fine for the handful an arena name

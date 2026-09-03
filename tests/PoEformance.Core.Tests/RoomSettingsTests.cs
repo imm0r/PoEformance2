@@ -50,13 +50,23 @@ public class RoomSettingsTests
         Assert.Equal(expected, new RoomSettings(MinTiles: written).Normalised().MinTiles);
     }
 
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(4, 4)]
+    [InlineData(100000, 1000)]
+    public void HowOftenAFileMayBePlacedStaysInRange(int written, int expected)
+        => Assert.Equal(expected, new RoomSettings(MaxPlacements: written).Normalised().MaxPlacements);
+
     [Fact]
     public void TheDefaultsAreOffAndPastTheScenery()
     {
         // Off because this writes a name on every room in the area, and two tiles because a
-        // one-tile room is a rock or a strip of wall - there are hundreds of those.
+        // one-tile room is a rock or a strip of wall - there are hundreds of those. Four
+        // placements is TerrainLandmarks' own number, and it is the one that does the thinning:
+        // size cannot, because an area is built from one module repeated.
         Assert.False(RoomSettings.Default.Show);
         Assert.Equal(2, RoomSettings.Default.MinTiles);
+        Assert.Equal(4, RoomSettings.Default.MaxPlacements);
         Assert.Null(RoomSettings.Default.Picked);
     }
 
@@ -72,6 +82,7 @@ public class RoomSettingsTests
                 {
                     Show = true,
                     MinTiles = 4,
+                    MaxPlacements = 7,
                     Filter = "exit",
                     Picked = new Dictionary<string, IReadOnlyList<string>>
                     {
@@ -85,6 +96,7 @@ public class RoomSettingsTests
             RoomSettings read = OverlaySettingsStore.Load(path).RoomsOrDefault;
             Assert.True(read.Show);
             Assert.Equal(4, read.MinTiles);
+            Assert.Equal(7, read.MaxPlacements);
             Assert.Equal("exit", read.Filter);
             Assert.Equal(["Metadata/Terrain/X/exit_01.tdt@12,34"], read.In("G2_8"));
         }

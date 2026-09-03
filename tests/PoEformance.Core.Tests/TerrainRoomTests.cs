@@ -179,6 +179,60 @@ public class TerrainRoomTests
     }
 
     [Fact]
+    public void AFilePlacedOftenSaysSoOnEveryOneOfItsRooms()
+    {
+        // The filter that actually thins a map, and the lesson TerrainLandmarks already learned
+        // about tiles: a name in eighty places is a wall module, and labelling all eighty buries
+        // the one room worth reading. Size cannot say this - an area is built from one module
+        // repeated, so nearly every room is the same few tiles across.
+        List<TerrainRoom> rooms = TerrainRooms.Find(
+            [
+                .. Block(Rubble, 2, 2, 2, 2),
+                .. Block(Rubble, 20, 2, 2, 2),
+                .. Block(Rubble, 40, 2, 2, 2),
+                .. Block(Bridge, 2, 40, 2, 2),
+            ],
+            64,
+            64);
+
+        Assert.All(
+            rooms.Where(room => room.Name == "rubble_06"),
+            room => Assert.Equal(3, room.Placements));
+
+        Assert.Equal(1, rooms.Single(room => room.Name == "overlay_bridge_03").Placements);
+    }
+
+    [Fact]
+    public void TheRarestRoomsComeFirst()
+    {
+        // The order IS the priority: labels are packed against each other, so whichever room is
+        // offered first is the one that survives a collision. Rarest first, then largest.
+        List<TerrainRoom> rooms = TerrainRooms.Find(
+            [
+                .. Block(Rubble, 2, 2, 2, 2),
+                .. Block(Rubble, 20, 2, 2, 2),
+                .. Block(Bridge, 2, 40, 1, 1),
+            ],
+            64,
+            64);
+
+        Assert.Equal("overlay_bridge_03", rooms[0].Name);
+        Assert.Equal(1, rooms[0].Placements);
+    }
+
+    [Fact]
+    public void AmongEqualsTheBiggerRoomComesFirst()
+    {
+        // Both placed once, so the tie is broken by size: the bigger room is the one somebody
+        // can see they are standing in.
+        List<TerrainRoom> rooms = TerrainRooms.Find(
+            [.. Block(Rubble, 2, 2, 1, 1), .. Block(Bridge, 20, 20, 3, 3)], 64, 64);
+
+        Assert.Equal("overlay_bridge_03", rooms[0].Name);
+        Assert.Equal(9, rooms[0].Tiles);
+    }
+
+    [Fact]
     public void NoOpinionAboutWalkabilityCountsEveryTile()
     {
         // "No filter", never "hide everything". A caller that cannot answer the question - a
