@@ -1835,6 +1835,24 @@ interesting part was not the feature:
   code, and it needs the same suspicion as the thing it diagnoses** — the one place in this
   project where a wrong number is guaranteed to be believed is the readout built to be trusted.
 
+  **And a route that survives all of it, unproven.** RePoE's parser says a room slot carries a
+  ground type and a HEIGHT per corner — sw, se, ne, nw — and the terrain struct has an array at
+  `+0x50` of exactly `(tilesX+1) * (tilesY+1) * 3` bytes, three per tile CORNER. 21648 over an
+  87x81 area and 11163 over a 60x60, both exact. Two independent measurements of the same shape,
+  and if one of those three bytes indexes `GroundTypeFiles` then a room's corner pattern is a
+  stamp that could be searched for in the area's.
+
+  What is known so far says nothing either way, and saying so is the point: a probe sweep
+  happened to capture 42 consecutive corners from the start of each array, and they read
+  `byte0=1` (bone_fill) in the Badlands, `byte0=2` (vaal_building_inside) in the Vaal area,
+  `byte1=0` and `byte2=11` in both. Byte 0 is in range of each area's list and differs between
+  them; byte 2 is 11 against lists of seven and six, so it is not an index. But 42 adjacent
+  corners at an array's start are one uniform strip, and a constant over them is what almost any
+  field would give. `CornerProbe` reads the whole array instead — it fits under the recording cap
+  — and histograms all three lanes with every value counted, including the ones no list entry can
+  name. That last part is the lesson from the landscape grid rather than a precaution: folding
+  the unnameable values into one number is what left that verdict unactionable.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of
