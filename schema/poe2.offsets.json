@@ -523,8 +523,13 @@
           "invariant": { "kind": "vectorSane", "elementSize": 56, "maxCount": 16777216 },
           "comment": "StdVector<TileStructure>, each 0x38 bytes."
         },
+        "GroundTypeFiles": {
+          "offset": "0x68", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 64 },
+          "comment": "THE NAMES THE LANDSCAPE NIBBLES INDEX. Eight-byte pointers to file objects whose path is a stdWString at +0x08 - the same shape TileStruct.TgtFilePtr has, so TgtFile reads one. FOUND 2026-09 by the room probe as 'a vector of the area's ground-type files' and its elements walked out of tests recording 4d24fd2e: a Badlands area lists SIX - bone_fill, trims1, bone_abyss, badlands_noburrow, waypoint_ground, badlands - as pointers 8 bytes apart, against the 0x30 stride every other .gt reference in memory sits on. Six files against GridLandscapeData's documented nibbles 0-5, reached from opposite ends and never compared until now. A .gt is a NAMED ground type: the file itself is 46 bytes of UTF-16 reading 'BoneUpperFill' and four flags, which is what makes this worth reading at all - the map can say abyss or waypoint instead of naming the tile template that draws it. TerrainGroundTypes checks the pairing rather than assuming it: every nibble must index a file in this list, and the types must SEPARATE on walkability (an abyss walkable nowhere, a fill walkable nearly everywhere). A wrong list fails the first; noise fails the second."
+        },
         "GridWalkableData": { "offset": "0xD0", "type": "stdVector", "invariant": { "kind": "vectorSane", "elementSize": 1, "maxCount": 67108864 } },
-        "GridLandscapeData": { "offset": "0xE8", "type": "stdVector", "comment": "Static terrain-type nibbles 0-5. NOT fog-of-war." },
+        "GridLandscapeData": { "offset": "0xE8", "type": "stdVector", "comment": "Static terrain-type nibbles 0-5. NOT fog-of-war. Packed exactly as GridWalkableData is - two cells per byte, even x in the low nibble - which is established rather than assumed: the reader requires this buffer to be the SAME LENGTH as the walkable one before reading a single nibble out of it, since the two cover the same ground at the same row stride. A nibble is an index into GroundTypeFiles above." },
         "BytesPerRow": { "offset": "0x130", "type": "i32", "invariant": { "kind": "range", "min": 1, "max": 16384 } },
         "TileHeightMultiplier": { "offset": "0x134", "type": "i16" }
       }

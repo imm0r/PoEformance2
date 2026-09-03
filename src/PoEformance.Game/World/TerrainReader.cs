@@ -44,13 +44,15 @@ public sealed class TerrainGrid
         long totalTilesX, long totalTilesY, TerrainHeightField? heights, string heightNote = "",
         IReadOnlyList<TerrainLandmark>? landmarks = null,
         IReadOnlyList<TerrainRoom>? rooms = null,
-        IReadOnlyList<string>? roomProbe = null)
+        IReadOnlyList<string>? roomProbe = null,
+        TerrainGroundTypes? ground = null)
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
         _landmarks = landmarks ?? [];
         _rooms = rooms ?? [];
         RoomProbeLines = roomProbe ?? [];
+        Ground = ground;
         TilesX = (int)Math.Max(0, totalTilesX);
         TilesY = (int)Math.Max(0, totalTilesY);
         _heights = heights;
@@ -124,6 +126,46 @@ public sealed class TerrainGrid
     public IReadOnlyList<string> RoomProbeLines { get; }
 
     /// <summary>
+    /// What KIND of ground is under each tile, or null when it could not be read or believed.
+    /// </summary>
+    /// <remarks>
+    /// A LEVEL ABOVE THE TILE NAMES, and the one the room files pointed at without being able to
+    /// reach it themselves: a room declares its ground types and never its tiles, so the chain
+    /// room-to-tile died and this one - nibble to named type - took its place. See
+    /// <see cref="TerrainGroundTypes"/> for the two checks it has to survive first.
+    /// </remarks>
+    public TerrainGroundTypes? Ground { get; }
+
+    /// <summary>
+    /// The ground types as BLOCKS on the map, each under the name the area gave it.
+    /// </summary>
+    /// <remarks>
+    /// The same flood fill the rooms use, on the same tile grid, because it is the same shape of
+    /// question - contiguous tiles sharing a name - and the answer wants the same treatment:
+    /// a centroid to put a label at, a size to drop the specks by, and a count of how often the
+    /// name repeats so a type covering the whole area does not get labelled ninety times.
+    ///
+    /// Built lazily and once. Most areas are never asked, and flood-filling seven thousand tiles
+    /// for a layer nobody switched on is a cost paid on every zone change.
+    /// </remarks>
+    public IReadOnlyList<TerrainRoom> GroundRegions => _groundRegions ??= FindGroundRegions();
+
+    private IReadOnlyList<TerrainRoom> FindGroundRegions()
+    {
+        if (Ground is null || !Ground.Trusted || TilesX <= 0 || TilesY <= 0)
+        {
+            return [];
+        }
+
+        bool[] walkable = WalkableTileMask();
+        int wide = TilesX;
+        return TerrainRooms.Find(
+            [.. Ground.Types], Ground.TileType, wide, TilesY, (x, y) => walkable[(y * wide) + x]);
+    }
+
+    private IReadOnlyList<TerrainRoom>? _groundRegions;
+
+    /// <summary>
     /// Why the heights are, or are not, here.
     /// </summary>
     /// <remarks>
@@ -180,7 +222,19 @@ public sealed class TerrainGrid
         => (Width == StoredWidth && Height == StoredHeight
             ? $"{Width}x{Height}"
             : $"{Width}x{Height} (buffer {StoredWidth}x{StoredHeight})")
-           + DescribeRooms();
+           + DescribeRooms()
+           + DescribeGround();
+
+    /// <summary>
+    /// What the ground types came back as, INCLUDING when they came back untrusted.
+    /// </summary>
+    /// <remarks>
+    /// The note rather than a count, because the note is the finding. "Six types, four of them
+    /// ground you can stand on" and "six types, but they do not separate on walkability" are
+    /// the two answers that matter, and only the second is worth acting on.
+    /// </remarks>
+    private string DescribeGround()
+        => Ground is null ? string.Empty : $", ground: {Ground.Note}";
 
     /// <summary>
     /// How many rooms were found, and what the biggest one's file is called.
@@ -378,6 +432,8 @@ public sealed class TerrainReader
     private readonly IMemoryReader _reader;
     private readonly int _terrainMetadata;
     private readonly int _walkableData;
+    private readonly int _landscapeData;
+    private readonly int _groundTypeFiles;
     private readonly int _bytesPerRow;
     private readonly int _totalTilesX;
     private readonly int _totalTilesY;
@@ -419,6 +475,8 @@ public sealed class TerrainReader
 
         StructDef terrain = schema.Structs["TerrainMetadata"];
         _walkableData = terrain.OffsetOf("GridWalkableData");
+        _landscapeData = terrain.OffsetOf("GridLandscapeData");
+        _groundTypeFiles = terrain.OffsetOf("GroundTypeFiles");
         _bytesPerRow = terrain.OffsetOf("BytesPerRow");
         _totalTilesX = terrain.OffsetOf("TotalTilesX");
         _totalTilesY = terrain.OffsetOf("TotalTilesY");
@@ -531,10 +589,111 @@ public sealed class TerrainReader
         _walkable = new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY, heights: null);
 
         TerrainHeightField? heights = ReadTileHeights(terrainBase, tilesX, tilesY);
+
+        // AFTER the walkable grid exists, because the walkability is what checks it - see
+        // TerrainGroundTypes: a ground type that does not separate on walkability is a
+        // mis-read one, and there is nothing to compare against before this point.
+        TerrainGroundTypes? ground = ReadGroundTypes(terrainBase, cells.Length, stride, tilesX, tilesY);
         _walkable = null;
 
         return new TerrainGrid(
-            cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks, _rooms, _probe);
+            cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks, _rooms,
+            _probe, ground);
+    }
+
+    /// <summary>
+    /// What kind of ground is under each tile, in the names the area itself lists.
+    /// </summary>
+    /// <remarks>
+    /// TWO READS AND A REFUSAL. The vector at GroundTypeFiles names the types; the one at
+    /// GridLandscapeData says which of them covers each cell. The refusal is the important
+    /// part: the landscape buffer must be EXACTLY as long as the walkable one before a single
+    /// nibble is read out of it. The two grids cover the same ground at the same row stride, so
+    /// equal length is what licenses reading the second with the first's packing - and a
+    /// different length means something else is being read, which is worth abandoning rather
+    /// than reinterpreting. This project has a drawer full of plausible maps of nonsense.
+    /// </remarks>
+    private TerrainGroundTypes? ReadGroundTypes(
+        ulong terrainBase, int walkableBytes, int stride, long tilesX, long tilesY)
+    {
+        if (tilesX <= 0 || tilesY <= 0)
+        {
+            return null;
+        }
+
+        ulong first = _reader.ReadPointer(terrainBase + (ulong)_landscapeData);
+        ulong last = _reader.ReadPointer(terrainBase + (ulong)_landscapeData + 8);
+        if (first == 0 || last <= first || (long)(last - first) != walkableBytes)
+        {
+            return null;
+        }
+
+        IReadOnlyList<string> types = ReadGroundTypeFiles(terrainBase);
+        if (types.Count == 0)
+        {
+            return null;
+        }
+
+        var landscape = new byte[walkableBytes];
+        return _reader.TryRead(first, landscape)
+            ? TerrainGroundTypes.From(types, landscape, stride, (int)tilesX, (int)tilesY, _walkable)
+            : null;
+    }
+
+    /// <summary>The area's ground-type files, in the order the landscape nibbles index them.</summary>
+    /// <remarks>
+    /// Eight-byte pointers to file objects whose path sits at the same offset a tile's does -
+    /// so the same struct and the same cache serve both, and a type the tiles already named
+    /// costs no read at all.
+    /// </remarks>
+    private IReadOnlyList<string> ReadGroundTypeFiles(ulong terrainBase)
+    {
+        ulong first = _reader.ReadPointer(terrainBase + (ulong)_groundTypeFiles);
+        ulong last = _reader.ReadPointer(terrainBase + (ulong)_groundTypeFiles + 8);
+        if (first == 0 || last <= first)
+        {
+            return [];
+        }
+
+        long bytes = (long)(last - first);
+        if (bytes % 8 != 0 || bytes / 8 > TerrainGroundTypes.MostTypes)
+        {
+            return [];
+        }
+
+        var pointers = new byte[bytes];
+        if (!_reader.TryRead(first, pointers))
+        {
+            return [];
+        }
+
+        var paths = new List<string>((int)(bytes / 8));
+        for (int i = 0; i + 8 <= pointers.Length; i += 8)
+        {
+            ulong file = BitConverter.ToUInt64(pointers, i);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(file))
+            {
+                return [];
+            }
+
+            if (!_tgtPaths.TryGetValue(file, out string? read))
+            {
+                read = _reader.ReadStdWString(file + (ulong)_tgtPath, 128);
+                _tgtPaths[file] = read;
+            }
+
+            // EVERY element or none. A list with a hole in it would silently shift every
+            // nibble above the hole onto the wrong name, which is the one failure mode a
+            // reader of an index table must not have.
+            if (read.Length == 0)
+            {
+                return [];
+            }
+
+            paths.Add(read);
+        }
+
+        return paths;
     }
 
     /// <summary>
