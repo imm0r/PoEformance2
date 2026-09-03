@@ -208,6 +208,65 @@ public class GroundTypeTests
         Assert.Empty(grid.GroundRegions);
     }
 
+    [Fact]
+    public void EveryValueThatOccursIsCountedEvenBeyondTheList()
+    {
+        // WHAT THE VERDICT CANNOT SAY. A real area came back "9190252 cells name a type beyond
+        // the 5 the area lists" - which reports that the pairing is wrong and nothing at all
+        // about the values, and the values are the only thing that decides what to do next. Two
+        // named types here, and the grid also holds a 9: that 9 has to be visible as a 9.
+        byte[] landscape = Halves(8, 4, out int stride);
+        landscape[0] = 0x99;   // two cells of a value the list cannot name
+
+        TerrainGroundTypes ground = Assert.IsType<TerrainGroundTypes>(
+            TerrainGroundTypes.From(Types, landscape, stride, 8, 4, Walkable(8, 4, stride)));
+
+        Assert.Equal(2, ground.OutOfRange);
+        Assert.False(ground.Trusted);
+
+        string nine = Assert.Single(
+            ground.Lines, line => line.TrimStart().StartsWith("9 ", StringComparison.Ordinal));
+        Assert.Contains("2 cells", nine, StringComparison.Ordinal);
+        Assert.Contains("(beyond the list)", nine, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheHistogramNamesWhatItCanAndSaysSoWhenItCannot()
+    {
+        // The walkable share is what gives an unnamed value meaning without any names at all:
+        // whatever is never walkable is the void or the abyss.
+        byte[] landscape = Halves(8, 4, out int stride);
+
+        TerrainGroundTypes ground = Assert.IsType<TerrainGroundTypes>(
+            TerrainGroundTypes.From(Types, landscape, stride, 8, 4, Walkable(8, 4, stride)));
+
+        Assert.Contains("2 named types", ground.Lines[0], StringComparison.Ordinal);
+
+        string fill = Assert.Single(
+            ground.Lines, line => line.Contains("bone_fill", StringComparison.Ordinal));
+        Assert.Contains("100.0% walkable", fill, StringComparison.Ordinal);
+
+        string abyss = Assert.Single(
+            ground.Lines, line => line.Contains("bone_abyss", StringComparison.Ordinal));
+        Assert.Contains("0.0% walkable", abyss, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheBiggestValueIsListedFirst()
+    {
+        // The values covering a hundred cells between them are noise beside the one covering
+        // nine million, and a person reading this wants the shape of the grid at a glance.
+        byte[] landscape = Halves(8, 4, out int stride);
+        landscape[0] = 0x99;
+
+        TerrainGroundTypes ground = Assert.IsType<TerrainGroundTypes>(
+            TerrainGroundTypes.From(Types, landscape, stride, 8, 4, Walkable(8, 4, stride)));
+
+        // Line 0 is the total; the 9 covers two cells and must not be above the halves.
+        Assert.DoesNotContain("9 ", ground.Lines[1], StringComparison.Ordinal);
+        Assert.Contains("9 ", ground.Lines[^1], StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData("Metadata/Terrain/Desert/Badlands/bone_fill.gt", "bone_fill")]
     [InlineData("waypoint_ground.gt", "waypoint_ground")]

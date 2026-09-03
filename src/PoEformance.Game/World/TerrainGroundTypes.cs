@@ -40,10 +40,11 @@ public sealed class TerrainGroundTypes
         byte[] cells,
         int bytesPerRow,
         int[] tileType,
-        int outOfRange,
-        IReadOnlyList<int> walkableCells,
-        IReadOnlyList<int> totalCells,
-        string note)
+        long outOfRange,
+        IReadOnlyList<long> walkableCells,
+        IReadOnlyList<long> totalCells,
+        string note,
+        IReadOnlyList<string> lines)
     {
         Types = types;
         _cells = cells;
@@ -53,6 +54,7 @@ public sealed class TerrainGroundTypes
         WalkableCells = walkableCells;
         TotalCells = totalCells;
         Note = note;
+        Lines = lines;
     }
 
     /// <summary>The area's ground-type files, in the order the nibbles index them.</summary>
@@ -78,7 +80,23 @@ public sealed class TerrainGroundTypes
     /// lands here. Zero is the only passing answer, and a wrong offset cannot fake it for a
     /// whole area.
     /// </remarks>
-    public int OutOfRange { get; }
+    public long OutOfRange { get; }
+
+    /// <summary>
+    /// Every nibble value that occurs, with how much ground it covers and how much of that
+    /// can be stood on.
+    /// </summary>
+    /// <remarks>
+    /// WHAT A ONE-LINE VERDICT CANNOT SAY. "9190252 cells name a type beyond the 5 the area
+    /// lists" reports that the pairing is wrong and nothing whatever about the values, which is
+    /// the only thing that decides what to do next: a handful of small values means a FIXED
+    /// terrain classification, useful in itself and unrelated to the per-area .gt list; values
+    /// spread over all sixteen means something that is not a classification at all.
+    ///
+    /// The walkable share per value is what gives them meaning without any names: whatever the
+    /// value that is never walkable is, it is the void or the abyss.
+    /// </remarks>
+    public IReadOnlyList<string> Lines { get; }
 
     /// <summary>Walkable cells per type, and <see cref="TotalCells"/> beside it.</summary>
     /// <remarks>
@@ -88,10 +106,10 @@ public sealed class TerrainGroundTypes
     /// average instead, because it would be sampling the same ground at random. So the spread
     /// between the types is the evidence, not any one number.
     /// </remarks>
-    public IReadOnlyList<int> WalkableCells { get; }
+    public IReadOnlyList<long> WalkableCells { get; }
 
     /// <summary>How many cells each type covers at all.</summary>
-    public IReadOnlyList<int> TotalCells { get; }
+    public IReadOnlyList<long> TotalCells { get; }
 
     /// <summary>What the read found, and whether it can be believed. Never empty.</summary>
     public string Note { get; }
@@ -156,11 +174,17 @@ public sealed class TerrainGroundTypes
             return null;
         }
 
-        var counts = new int[types.Count];
-        var walkableCells = new int[types.Count];
-        var totalCells = new int[types.Count];
+        // ALL SIXTEEN VALUES A NIBBLE CAN HOLD, not just the ones the list has room for. The
+        // first version counted everything above the list as one number - "9190252 cells name a
+        // type beyond the 5 the area lists" - which says the pairing is wrong and nothing about
+        // what the values ARE. Whether they cluster in a small fixed range (a terrain class) or
+        // spread over all sixteen (something else entirely) is the whole question, and it costs
+        // one wider array to answer.
+        var counts = new long[MostTypes];
+        var walkableCells = new long[MostTypes];
+        var totalCells = new long[MostTypes];
         var tileType = new int[tilesX * tilesY];
-        int outOfRange = 0;
+        long outOfRange = 0;
 
         for (int tileY = 0; tileY < tilesY; tileY++)
         {
@@ -183,14 +207,14 @@ public sealed class TerrainGroundTypes
 
                         byte packed = landscape[index];
                         int nibble = (x & 1) == 0 ? packed & 0x0F : packed >> 4;
-                        if (nibble >= types.Count)
-                        {
-                            outOfRange++;
-                            continue;
-                        }
 
                         counts[nibble]++;
                         totalCells[nibble]++;
+                        if (nibble >= types.Count)
+                        {
+                            outOfRange++;
+                        }
+
                         if (walkable is not null && walkable.IsWalkable(x, y))
                         {
                             walkableCells[nibble]++;
@@ -198,14 +222,17 @@ public sealed class TerrainGroundTypes
                     }
                 }
 
+                // The value that covers most of the tile, WHATEVER it is - an index the list
+                // cannot name is still the honest answer for that tile, and Names() is what
+                // decides whether anything downstream can use it.
                 int best = -1;
-                int most = 0;
-                for (int type = 0; type < counts.Length; type++)
+                long most = 0;
+                for (int value = 0; value < counts.Length; value++)
                 {
-                    if (counts[type] > most)
+                    if (counts[value] > most)
                     {
-                        most = counts[type];
-                        best = type;
+                        most = counts[value];
+                        best = value;
                     }
                 }
 
@@ -218,7 +245,8 @@ public sealed class TerrainGroundTypes
 
         return new TerrainGroundTypes(
             types, landscape, bytesPerRow, tileType, outOfRange, walkableCells, totalCells,
-            Describe(types, outOfRange, walkableCells, totalCells, walkable is not null, spread))
+            Describe(types, outOfRange, walkableCells, totalCells, walkable is not null, spread),
+            Histogram(types, walkableCells, totalCells, walkable is not null))
         {
             Trusted = trusted,
         };
@@ -248,7 +276,7 @@ public sealed class TerrainGroundTypes
     /// walkable. A check half of which passes by construction is most of the way to no check.
     /// </remarks>
     private static bool Separates(
-        IReadOnlyList<string> types, IReadOnlyList<int> walkable, IReadOnlyList<int> total)
+        IReadOnlyList<string> types, IReadOnlyList<long> walkable, IReadOnlyList<long> total)
     {
         const int Enough = 1024;   // a type covering less than two tiles says nothing either way
         bool high = false;
@@ -271,9 +299,9 @@ public sealed class TerrainGroundTypes
 
     private static string Describe(
         IReadOnlyList<string> types,
-        int outOfRange,
-        IReadOnlyList<int> walkable,
-        IReadOnlyList<int> total,
+        long outOfRange,
+        IReadOnlyList<long> walkable,
+        IReadOnlyList<long> total,
         bool haveWalkable,
         bool spread)
     {
@@ -314,6 +342,67 @@ public sealed class TerrainGroundTypes
         }
 
         return $"{named} ground types, {walkableTypes} of them ground you can stand on";
+    }
+
+    /// <summary>
+    /// One line per nibble value that occurs: how much ground, how much of it walkable, what
+    /// the list calls it.
+    /// </summary>
+    /// <remarks>
+    /// Sorted by how much ground each covers, because the question this answers is what the
+    /// grid IS - and the values covering a hundred cells between them are noise beside the one
+    /// covering nine million. The walkable share is what gives an unnamed value meaning: a
+    /// value that is never walkable is the void or the abyss whatever the list says.
+    /// </remarks>
+    private static IReadOnlyList<string> Histogram(
+        IReadOnlyList<string> types,
+        IReadOnlyList<long> walkable,
+        IReadOnlyList<long> total,
+        bool haveWalkable)
+    {
+        long everything = 0;
+        foreach (long count in total)
+        {
+            everything += count;
+        }
+
+        if (everything == 0)
+        {
+            return [];
+        }
+
+        var order = new List<int>(MostTypes);
+        for (int value = 0; value < total.Count; value++)
+        {
+            if (total[value] > 0)
+            {
+                order.Add(value);
+            }
+        }
+
+        order.Sort((left, right) => total[right].CompareTo(total[left]));
+
+        var lines = new List<string>(order.Count + 1)
+        {
+            $"{everything} cells, {types.Count} named types",
+        };
+
+        foreach (int value in order)
+        {
+            string name = value < types.Count
+                ? (types[value].Length > 0 ? NameFor(types[value]) : "(blank slot)")
+                : "(beyond the list)";
+
+            string stand = haveWalkable
+                ? $"{walkable[value] * 100.0 / total[value],5:F1}% walkable"
+                : "walkability unknown";
+
+            lines.Add(
+                $"  {value,2}  {total[value],10} cells  {total[value] * 100.0 / everything,5:F1}%"
+                + $"  {stand}   {name}");
+        }
+
+        return lines;
     }
 
     /// <summary>The type's short name - its file stem, which is what a label has room for.</summary>
