@@ -24,6 +24,7 @@ public sealed class TerrainGrid
 
     private readonly TerrainHeightField? _heights;
     private readonly IReadOnlyList<TerrainLandmark> _landmarks;
+    private readonly IReadOnlyList<TerrainRoom> _rooms;
 
     public TerrainGrid(
         byte[] cells, int bytesPerRow, int rows,
@@ -41,11 +42,13 @@ public sealed class TerrainGrid
     public TerrainGrid(
         byte[] cells, int bytesPerRow, int rows,
         long totalTilesX, long totalTilesY, TerrainHeightField? heights, string heightNote = "",
-        IReadOnlyList<TerrainLandmark>? landmarks = null)
+        IReadOnlyList<TerrainLandmark>? landmarks = null,
+        IReadOnlyList<TerrainRoom>? rooms = null)
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
         _landmarks = landmarks ?? [];
+        _rooms = rooms ?? [];
         TilesX = (int)Math.Max(0, totalTilesX);
         TilesY = (int)Math.Max(0, totalTilesY);
         _heights = heights;
@@ -95,6 +98,17 @@ public sealed class TerrainGrid
     /// exists as an entity.
     /// </remarks>
     public IReadOnlyList<TerrainLandmark> Landmarks => _landmarks;
+
+    /// <summary>
+    /// The area's rooms - the blocks of tiles the game placed, each under its own file name.
+    /// </summary>
+    /// <remarks>
+    /// The layout in WORDS, beside the outline that draws it as a shape: which end holds the
+    /// exit, where the bridge is, which blob is the arena. Known from the moment the area
+    /// loads, for the same reason the landmarks are - it is read out of the ground rather than
+    /// out of the entity list. See <see cref="TerrainRooms"/>.
+    /// </remarks>
+    public IReadOnlyList<TerrainRoom> Rooms => _rooms;
 
     /// <summary>
     /// Why the heights are, or are not, here.
@@ -150,9 +164,39 @@ public sealed class TerrainGrid
 
     /// <summary>Describes the grid and any padding found, so a mismatch is visible.</summary>
     public string Describe()
-        => Width == StoredWidth && Height == StoredHeight
+        => (Width == StoredWidth && Height == StoredHeight
             ? $"{Width}x{Height}"
-            : $"{Width}x{Height} (buffer {StoredWidth}x{StoredHeight})";
+            : $"{Width}x{Height} (buffer {StoredWidth}x{StoredHeight})")
+           + DescribeRooms();
+
+    /// <summary>
+    /// How many rooms were found, and what the biggest one's file is called.
+    /// </summary>
+    /// <remarks>
+    /// The PATH rather than a count alone, and that is the whole reason this line exists: what
+    /// the game stores on a tile is a question only the game can answer, and the answer decides
+    /// what the room names on the map can ever say. One look at this row in the readout settles
+    /// it for an area - which beats reasoning about it from a reference project that reads a
+    /// different game's build.
+    /// </remarks>
+    private string DescribeRooms()
+    {
+        if (_rooms.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        TerrainRoom biggest = _rooms[0];
+        foreach (TerrainRoom room in _rooms)
+        {
+            if (room.Tiles > biggest.Tiles)
+            {
+                biggest = room;
+            }
+        }
+
+        return $", {_rooms.Count} rooms (biggest {biggest.Path} at {biggest.Tiles} tiles)";
+    }
 
     /// <summary>Takes the tile-derived size when it is smaller and plausible.</summary>
     private static int Fit(int stored, long tiles)
@@ -396,7 +440,7 @@ public sealed class TerrainReader
         TerrainHeightField? heights = ReadTileHeights(terrainBase, tilesX, tilesY);
 
         return new TerrainGrid(
-            cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks);
+            cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks, _rooms);
     }
 
     /// <summary>Why the last height read produced what it did. See TerrainGrid.HeightNote.</summary>
@@ -404,6 +448,9 @@ public sealed class TerrainReader
 
     /// <summary>What the last tile read found in the shape of the ground.</summary>
     private IReadOnlyList<TerrainLandmark> _landmarks = [];
+
+    /// <summary>The rooms the same read found. See TerrainGrid.Rooms.</summary>
+    private IReadOnlyList<TerrainRoom> _rooms = [];
 
     /// <summary>
     /// Names for particular tiles of the current area, keyed as the reference writes them.
@@ -415,7 +462,7 @@ public sealed class TerrainReader
     public IReadOnlyDictionary<string, string>? CuratedLandmarks { get; set; }
 
     /// <summary>
-    /// Reads every tile's file path and finds the places among them.
+    /// Reads every tile's file path, and from them the places and the rooms.
     /// </summary>
     /// <remarks>
     /// The tile buffer is already in hand from the heights, so the tile records themselves
@@ -423,19 +470,39 @@ public sealed class TerrainReader
     /// and reading a string for each would be a read per tile. They are deduplicated by the
     /// file pointer instead - an area is built from a few hundred distinct tiles, each used
     /// hundreds of times - which turns that into a few hundred reads, once per area.
+    ///
+    /// BOTH ANSWERS FROM ONE PASS, and they want the tiles differently. A landmark is one tile
+    /// that could BE something, so those are kept as records and only where the name or a
+    /// curated key says to. A ROOM is every tile, because a room is defined by which of its
+    /// neighbours carry the same file - so what the rooms need is not the records but an id
+    /// per tile, which is an int array rather than tens of thousands of objects.
+    ///
+    /// The rooms are found whether or not anything is drawing them, and that is deliberate:
+    /// the loop already looked up every tile's path, so what they add is an int store per tile
+    /// and a flood fill, once per area. Reading them on demand instead would mean the switch
+    /// did nothing until the next zone - a setting that appears not to work.
     /// </remarks>
-    private void ReadLandmarks(byte[] tiles, long count, long tilesX)
+    private void ReadTilePaths(byte[] tiles, long count, long tilesX)
     {
         if (tilesX <= 0)
         {
             _landmarks = [];
+            _rooms = [];
             return;
         }
 
         var found = new List<TerrainTile>();
 
+        // Path ids for the rooms: the file pointer's own dedup gives the STRING, and this
+        // gives it a small number the flood fill can compare without touching memory again.
+        var paths = new List<string>();
+        var ids = new Dictionary<ulong, int>();
+        var tilePath = new int[count];
+
         for (long i = 0; i < count; i++)
         {
+            tilePath[i] = -1;
+
             int at = (int)(i * TileEntrySize);
             ulong file = BitConverter.ToUInt64(tiles, at + _tgtFile);
             if (!MemoryReaderExtensions.IsPlausiblePointer(file))
@@ -443,16 +510,31 @@ public sealed class TerrainReader
                 continue;
             }
 
-            if (!_tgtPaths.TryGetValue(file, out string? path))
+            if (!ids.TryGetValue(file, out int id))
             {
-                path = _reader.ReadStdWString(file + (ulong)_tgtPath, 128);
-                _tgtPaths[file] = path;
+                if (!_tgtPaths.TryGetValue(file, out string? read))
+                {
+                    read = _reader.ReadStdWString(file + (ulong)_tgtPath, 128);
+                    _tgtPaths[file] = read;
+                }
+
+                id = -1;
+                if (read.Length > 0)
+                {
+                    id = paths.Count;
+                    paths.Add(read);
+                }
+
+                ids[file] = id;
             }
 
-            if (path.Length == 0)
+            if (id < 0)
             {
                 continue;
             }
+
+            tilePath[i] = id;
+            string path = paths[id];
 
             // Only the tiles that could BE something are kept as records. A curated key needs
             // its sub-ids, so the filter has to let anything curated through as well.
@@ -471,6 +553,7 @@ public sealed class TerrainReader
         }
 
         _landmarks = TerrainLandmarks.Find(found, CuratedLandmarks);
+        _rooms = TerrainRooms.Find(paths, tilePath, (int)tilesX, (int)(count / tilesX));
     }
 
     /// <summary>
@@ -493,7 +576,10 @@ public sealed class TerrainReader
     /// </remarks>
     private TerrainHeightField? ReadTileHeights(ulong terrainBase, long tilesX, long tilesY)
     {
+        // Cleared here rather than only on success: every early return below leaves the tiles
+        // unread, and keeping the last area's answers would put its rooms on this area's map.
         _landmarks = [];
+        _rooms = [];
 
         if (tilesX <= 0 || tilesY <= 0)
         {
@@ -525,9 +611,9 @@ public sealed class TerrainReader
             return null;
         }
 
-        // The same buffer answers both questions, so the places in the ground cost one pass
-        // over memory that has already been read.
-        ReadLandmarks(tiles, count, tilesX);
+        // The same buffer answers all three questions, so the places in the ground and the
+        // rooms cost one pass over memory that has already been read.
+        ReadTilePaths(tiles, count, tilesX);
 
         var heights = new float[count];
         for (long i = 0; i < count; i++)

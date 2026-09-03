@@ -50,6 +50,17 @@ public enum PoiKind
     /// becomes the label, which is usually more informative than a kind would be anyway.
     /// </remarks>
     Marked,
+
+    /// <summary>
+    /// A room of the area's layout that somebody pinned.
+    /// </summary>
+    /// <remarks>
+    /// Its own kind rather than <see cref="Marked"/>, which means the game marked something
+    /// this does not recognise. A room is the opposite case: nothing in the game marks it, the
+    /// tool knows exactly what it is, and a PERSON decided it was worth walking to. See
+    /// <see cref="TerrainRooms"/>.
+    /// </remarks>
+    Room,
 }
 
 /// <summary>

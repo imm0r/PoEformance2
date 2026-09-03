@@ -72,8 +72,19 @@ public sealed class PoiLayer
     [
         PoiKind.AreaTransition, PoiKind.Waypoint, PoiKind.Checkpoint,
         PoiKind.Mechanic, PoiKind.Shrine, PoiKind.Npc, PoiKind.Chest,
-        PoiKind.Quest, PoiKind.Marked, PoiKind.BossArena,
+        PoiKind.Quest, PoiKind.Marked, PoiKind.BossArena, PoiKind.Room,
     ];
+
+    /// <summary>
+    /// The rooms of the layout somebody pinned, which are places like any other.
+    /// </summary>
+    /// <remarks>
+    /// Handed in by the overlay rather than read from the terrain, because which rooms are
+    /// pinned is a decision <see cref="RoomLayer"/> owns - this only draws what it is given, in
+    /// the same pass as everything else, so a pinned room takes a route's colour and a marker
+    /// exactly as an exit does.
+    /// </remarks>
+    public IReadOnlyList<TerrainRoom> PickedRooms { get; set; } = [];
 
     /// <summary>Draw a name next to each marker.</summary>
     public bool ShowLabels { get; set; } = true;
@@ -223,6 +234,20 @@ public sealed class PoiLayer
                     landmark.Id, landmark.Name, landmark.Kind,
                     landmark.GridX * MapView.WorldToGrid, landmark.GridY * MapView.WorldToGrid,
                     terrain.HeightAt(landmark.GridX, landmark.GridY), string.Empty));
+            }
+
+            // The pinned rooms, on the same terms. No icon and no kind of their own beyond
+            // Room: what a room is called is the whole of what is known about it, which is
+            // also why the name comes straight from the file rather than being tidied.
+            if (DrawnKinds.Contains(PoiKind.Room))
+            {
+                foreach (TerrainRoom room in PickedRooms)
+                {
+                    places.Add(new Place(
+                        room.Id, room.Name, PoiKind.Room,
+                        room.GridX * MapView.WorldToGrid, room.GridY * MapView.WorldToGrid,
+                        terrain.HeightAt((int)room.GridX, (int)room.GridY), string.Empty));
+                }
             }
         }
 

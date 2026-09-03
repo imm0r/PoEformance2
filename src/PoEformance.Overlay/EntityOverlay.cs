@@ -423,6 +423,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _poi.ShowArrows = settings.PoiArrows;
         }
 
+        _roomWants = settings.RoomsOrDefault;
+        _rooms?.Apply(_roomWants);
+
         ApplyTerrainStyle(OverlaySettings.ParseColour(settings.TerrainColour), settings.TerrainThickness);
     }
 
@@ -482,6 +485,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
             PoiRoutes = _poi?.ShowRoutes ?? basis.PoiRoutes,
             PoiArrows = _poi?.ShowArrows ?? basis.PoiArrows,
+
+            // From the layer where there is one, and from what was loaded where there is not:
+            // saving before the layer is attached must not write an empty pick list over a
+            // file full of pinned rooms.
+            Rooms = _rooms?.Saved() ?? basis.Rooms,
 
             // The page's switch is the live one where there is a page; before it is attached
             // the basis is what was read out of the file, and writing the default over it is
@@ -571,7 +579,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
     private PoiLayer? _poi;
+    private RoomLayer? _rooms;
     private RoutePlanner? _planner;
+
+    /// <summary>
+    /// What the file said about the room names, until the layer exists to be told.
+    /// </summary>
+    /// <remarks>
+    /// The settings are read before the points of interest are attached, and the room layer
+    /// arrives with them - so what was loaded is remembered here and handed over on attach.
+    /// Same hole the stash switches fell into, kept shut the same way.
+    /// </remarks>
+    private RoomSettings _roomWants = RoomSettings.Default;
     private readonly RuleLayer _rules = new();
 
     /// <summary>What the rule engine decided to show this tick, or null when it is not wired.</summary>
@@ -1783,6 +1802,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             IconFor = _icons.TextureFor,
             Changed = () => SettingsChanged?.Invoke(),
         };
+
+        // Attached with the places rather than beside them: pinning a room is asking for a
+        // route to it, so the room layer wants the same planner and is useless without one.
+        _rooms = new RoomLayer(planner)
+        {
+            Style = _style,
+            Changed = () => SettingsChanged?.Invoke(),
+        };
+
+        // What the settings file said, which was read before this existed - the same handover
+        // the stash stores make, and for the same reason.
+        _rooms.Apply(_roomWants);
     }
 
     protected override Task PostInitialized()
@@ -3293,6 +3324,55 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             OverlayLayout.Hint("The picker for routing, in its own small window beside the map.");
         }
 
+        if (_rooms is not null)
+        {
+            bool naming = _rooms.Enabled;
+            if (OverlayLayout.Toggle("Room Names on the Map", ref naming))
+            {
+                _rooms.Enabled = naming;
+                SettingsChanged?.Invoke();
+            }
+
+            OverlayLayout.Hint(
+                "What the game itself calls each part of the layout, on the large map."
+                + "\nPoint at one for its file, and ctrl + click it to pin it with a route.");
+
+            if (_rooms.Enabled)
+            {
+                int least = _rooms.MinTiles;
+                if (OverlayLayout.Slider("Smallest Room Named", ref least, 1, 32, "%d tiles"))
+                {
+                    _rooms.MinTiles = least;
+                    SettingsChanged?.Invoke();
+                }
+
+                OverlayLayout.Hint("A one-tile room is a rock or a strip of wall, and there are hundreds.");
+
+                // On ENTER rather than per keystroke: every change here writes the settings
+                // file, and a filter typed a letter at a time would write it eight times.
+                string only = _rooms.Filter;
+                if (OverlayLayout.Search(
+                        "##rooms", "only rooms named...", ref only, 64,
+                        flags: ImGuiInputTextFlags.EnterReturnsTrue))
+                {
+                    _rooms.Filter = only;
+                    SettingsChanged?.Invoke();
+                }
+
+                // The way out of a pick that can no longer be seen. An endgame map is generated
+                // per instance, so a room pinned in one leaves a key that will never match a
+                // room again - invisible on the map, and still in the file.
+                // The ###id keeps the button ONE control while its label counts: ImGui takes a
+                // control's identity from its label, so a live number in one would make a new
+                // control every time it changed - and the click land on nothing.
+                if (_rooms.PinnedHere > 0
+                    && OverlayLayout.Actions($"Forget the {_rooms.PinnedHere} pinned here###forget-rooms") == 0)
+                {
+                    _rooms.Forget();
+                }
+            }
+        }
+
         if (Noise is not null)
         {
             bool filtering = Noise.Enabled;
@@ -3528,6 +3608,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 draw.AddCircle(
                     at, size, OverlayStyle.Faded(OutlineColour, fade), 10,
                     Style.Width(StyleCatalogue.Keys.DotOutline, 1f));
+            }
+        }
+
+        // Over the entity dots, because it is TEXT: a name half behind a monster dot is not a
+        // quieter name, it is an unreadable one. Under the places, which still win.
+        //
+        // Called whether or not it draws anything: the rooms somebody pinned are handed to the
+        // place layer below, and it is this call that resolves them for the area.
+        if (_rooms is not null)
+        {
+            _rooms.DrawOnMap(draw, map, _snapshot, player);
+
+            if (_poi is not null)
+            {
+                _poi.PickedRooms = _rooms.Picked;
             }
         }
 
