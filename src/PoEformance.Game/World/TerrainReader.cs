@@ -45,7 +45,8 @@ public sealed class TerrainGrid
         IReadOnlyList<TerrainLandmark>? landmarks = null,
         IReadOnlyList<TerrainRoom>? rooms = null,
         IReadOnlyList<string>? roomProbe = null,
-        TerrainGroundTypes? ground = null)
+        TerrainGroundTypes? ground = null,
+        string groundNote = "")
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
@@ -53,6 +54,13 @@ public sealed class TerrainGrid
         _rooms = rooms ?? [];
         RoomProbeLines = roomProbe ?? [];
         Ground = ground;
+
+        // The ground's own note when there IS a ground, and the reason there is not when there
+        // is not. NEVER EMPTY once a read has been attempted, because "nothing on the map" and
+        // "nothing was read" are the two answers a person has to tell apart, and the first
+        // version of this could only report the first - the four ways the read gives up all
+        // returned a bare null and the layer had nothing to show for any of them.
+        GroundNote = ground?.Note ?? groundNote;
         TilesX = (int)Math.Max(0, totalTilesX);
         TilesY = (int)Math.Max(0, totalTilesY);
         _heights = heights;
@@ -135,6 +143,9 @@ public sealed class TerrainGrid
     /// <see cref="TerrainGroundTypes"/> for the two checks it has to survive first.
     /// </remarks>
     public TerrainGroundTypes? Ground { get; }
+
+    /// <summary>What the ground read came back as, whether or not it came back with a ground.</summary>
+    public string GroundNote { get; }
 
     /// <summary>
     /// The ground types as BLOCKS on the map, each under the name the area gave it.
@@ -234,7 +245,7 @@ public sealed class TerrainGrid
     /// the two answers that matter, and only the second is worth acting on.
     /// </remarks>
     private string DescribeGround()
-        => Ground is null ? string.Empty : $", ground: {Ground.Note}";
+        => GroundNote.Length == 0 ? string.Empty : $", ground: {GroundNote}";
 
     /// <summary>
     /// How many rooms were found, and what the biggest one's file is called.
@@ -598,7 +609,7 @@ public sealed class TerrainReader
 
         return new TerrainGrid(
             cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks, _rooms,
-            _probe, ground);
+            _probe, ground, _groundNote);
     }
 
     /// <summary>
@@ -616,29 +627,64 @@ public sealed class TerrainReader
     private TerrainGroundTypes? ReadGroundTypes(
         ulong terrainBase, int walkableBytes, int stride, long tilesX, long tilesY)
     {
+        _groundNote = string.Empty;
+
         if (tilesX <= 0 || tilesY <= 0)
         {
+            _groundNote = "no tile count, so there is nothing to take a type per tile of";
             return null;
         }
 
         ulong first = _reader.ReadPointer(terrainBase + (ulong)_landscapeData);
         ulong last = _reader.ReadPointer(terrainBase + (ulong)_landscapeData + 8);
-        if (first == 0 || last <= first || (long)(last - first) != walkableBytes)
+        if (first == 0 || last <= first)
         {
+            _groundNote = "no landscape grid at GridLandscapeData";
+            return null;
+        }
+
+        // EVERY REFUSAL SAYS WHICH ONE, and with its numbers. The first version of this returned
+        // a bare null from four places, so "nothing on the map" could not be told from "nothing
+        // was read" - which is the exact failure the checks below exist to prevent, reintroduced
+        // one level up from them.
+        long landscapeBytes = (long)(last - first);
+        if (landscapeBytes != walkableBytes)
+        {
+            _groundNote = $"landscape {landscapeBytes} bytes against walkable {walkableBytes}"
+                + " - not the same grid, so its nibbles are not this one's cells";
             return null;
         }
 
         IReadOnlyList<string> types = ReadGroundTypeFiles(terrainBase);
         if (types.Count == 0)
         {
+            _groundNote = $"no ground-type files at +0x{_groundTypeFiles:X2} ({_groundTypeNote})";
             return null;
         }
 
         var landscape = new byte[walkableBytes];
-        return _reader.TryRead(first, landscape)
-            ? TerrainGroundTypes.From(types, landscape, stride, (int)tilesX, (int)tilesY, _walkable)
-            : null;
+        if (!_reader.TryRead(first, landscape))
+        {
+            _groundNote = $"landscape grid unreadable at {first:X} for {walkableBytes} bytes";
+            return null;
+        }
+
+        TerrainGroundTypes? ground = TerrainGroundTypes.From(
+            types, landscape, stride, (int)tilesX, (int)tilesY, _walkable);
+
+        if (ground is null)
+        {
+            _groundNote = $"{types.Count} ground types, which is not a count a nibble can index";
+        }
+
+        return ground;
     }
+
+    /// <summary>Why the last ground read produced what it did. See TerrainGrid.GroundNote.</summary>
+    private string _groundNote = string.Empty;
+
+    /// <summary>And why the type list itself came back empty, which is a level finer.</summary>
+    private string _groundTypeNote = string.Empty;
 
     /// <summary>The area's ground-type files, in the order the landscape nibbles index them.</summary>
     /// <remarks>
@@ -648,22 +694,28 @@ public sealed class TerrainReader
     /// </remarks>
     private IReadOnlyList<string> ReadGroundTypeFiles(ulong terrainBase)
     {
+        _groundTypeNote = string.Empty;
+
         ulong first = _reader.ReadPointer(terrainBase + (ulong)_groundTypeFiles);
         ulong last = _reader.ReadPointer(terrainBase + (ulong)_groundTypeFiles + 8);
         if (first == 0 || last <= first)
         {
+            _groundTypeNote = "empty vector";
             return [];
         }
 
         long bytes = (long)(last - first);
         if (bytes % 8 != 0 || bytes / 8 > TerrainGroundTypes.MostTypes)
         {
+            _groundTypeNote = $"{bytes} bytes, which is not 1 to {TerrainGroundTypes.MostTypes}"
+                + " pointers - so this is not the list";
             return [];
         }
 
         var pointers = new byte[bytes];
         if (!_reader.TryRead(first, pointers))
         {
+            _groundTypeNote = $"unreadable at {first:X}";
             return [];
         }
 
@@ -673,6 +725,7 @@ public sealed class TerrainReader
             ulong file = BitConverter.ToUInt64(pointers, i);
             if (!MemoryReaderExtensions.IsPlausiblePointer(file))
             {
+                _groundTypeNote = $"element {i / 8} of {bytes / 8} is not a pointer";
                 return [];
             }
 
@@ -687,6 +740,7 @@ public sealed class TerrainReader
             // reader of an index table must not have.
             if (read.Length == 0)
             {
+                _groundTypeNote = $"element {i / 8} of {bytes / 8} names no file";
                 return [];
             }
 

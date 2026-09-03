@@ -79,8 +79,10 @@ public sealed class GroundLayer
         ArgumentNullException.ThrowIfNull(player);
 
         // Kept even on the frames that draw nothing: "why is this empty" is answered by the
-        // note, and a note that only exists while the layer is on cannot answer it.
-        Note = snapshot.Terrain?.Ground?.Note ?? string.Empty;
+        // note, and a note that only exists while the layer is on cannot answer it. From the
+        // GRID rather than from the ground, because the ground is null exactly when the read
+        // gave up - which is the case most in need of an explanation.
+        Note = snapshot.Terrain?.GroundNote ?? string.Empty;
 
         if (!Enabled
             || !map.IsLargeMap

@@ -3473,12 +3473,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     + "\nWhat this drops is the ragged edge where two of them meet.");
 
                 // WHY THERE IS NOTHING ON THE MAP, which without this line is indistinguishable
-                // from the feature being broken. The read has two checks to survive and refuses
-                // to draw when either fails - so the note says which, in the one place somebody
-                // who just switched this on is already looking.
+                // from the feature being broken. WRITTEN OUT rather than hinted: OverlayLayout
+                // .Hint is a hover tooltip, and the first version put this in one - so the
+                // sentence that explains an empty map was itself invisible unless somebody
+                // happened to point at the right control. A diagnostic nobody can see is not a
+                // diagnostic.
                 if (_ground.Note.Length > 0)
                 {
-                    OverlayLayout.Hint(_ground.Note);
+                    ImGuiText.Wrapped(Quiet, _ground.Note);
                 }
             }
         }
