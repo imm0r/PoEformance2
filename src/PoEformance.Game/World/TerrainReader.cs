@@ -187,15 +187,24 @@ public sealed class TerrainGrid
         }
 
         TerrainRoom biggest = _rooms[0];
+        int walkable = 0;
         foreach (TerrainRoom room in _rooms)
         {
             if (room.Tiles > biggest.Tiles)
             {
                 biggest = room;
             }
+
+            if (room.IsWalkable)
+            {
+                walkable++;
+            }
         }
 
-        return $", {_rooms.Count} rooms (biggest {biggest.Path} at {biggest.Tiles} tiles)";
+        // BOTH counts, because their ratio is the thing worth seeing: most of an area is
+        // scenery, and a run where they are equal means the walkability test answered "yes"
+        // to everything - which is what a failed walkable read would look like.
+        return $", {_rooms.Count} rooms ({walkable} walkable, biggest {biggest.Path} at {biggest.Tiles} tiles)";
     }
 
     /// <summary>Takes the tile-derived size when it is smaller and plausible.</summary>
@@ -222,6 +231,70 @@ public sealed class TerrainGrid
         byte packed = _cells[index];
         return ((x & 1) == 0 ? packed & 0x0F : packed >> 4) != 0;
     }
+
+    /// <summary>
+    /// Which TILES hold ground that can be walked on, one flag each, row by row.
+    /// </summary>
+    /// <remarks>
+    /// WHAT SEPARATES A ROOM FROM THE SCENERY AROUND IT. An area's tile grid is a full
+    /// rectangle and the walkable grid is a subset of it, so most of what the game builds -
+    /// the buildings you walk past, the sea beside the road, the wall behind the fence - is
+    /// tiles you can never stand on. They carry names like any other room, and left unfiltered
+    /// they are most of the labels on the map.
+    ///
+    /// ONE PASS OVER THE PACKED BYTES, not a search per tile. Asking each tile in turn means
+    /// scanning its 529 cells and a blocked tile pays all of them, which on a large area is
+    /// tens of millions of nibble tests for a question the buffer answers in one sweep of
+    /// itself. Here a zero byte - both its cells solid, which is most of them - is skipped
+    /// whole, and every other byte marks the tile each of its two cells falls in. Exact, and
+    /// bounded by the buffer's size rather than by the area's tile count.
+    ///
+    /// The per-cell mapping is what keeps it exact. A byte holds two cells and a tile is 23
+    /// across, so every odd tile boundary lands mid-byte: cells 22 and 23 share a byte and
+    /// belong to different tiles. Marking "the tile this BYTE is in" would let a neighbour's
+    /// edge cell answer for this one.
+    /// </remarks>
+    public bool[] WalkableTileMask()
+    {
+        int tilesX = TilesX > 0 ? TilesX : Divided(Width);
+        int tilesY = TilesY > 0 ? TilesY : Divided(Height);
+        var mask = new bool[tilesX * tilesY];
+
+        // Padding is not walkable ground: the row stride is a byte count the game may round
+        // up, so the bytes past the area's own width are excluded rather than read.
+        int bytes = Math.Min((Width + 1) / 2, _bytesPerRow);
+
+        for (int y = 0; y < Height; y++)
+        {
+            int tileRow = (y / CellsPerTile) * tilesX;
+            int row = y * _bytesPerRow;
+
+            for (int b = 0; b < bytes; b++)
+            {
+                byte packed = _cells[row + b];
+                if (packed == 0)
+                {
+                    continue;
+                }
+
+                int x = b * 2;
+                if ((packed & 0x0F) != 0)
+                {
+                    mask[tileRow + (x / CellsPerTile)] = true;
+                }
+
+                if ((packed & 0xF0) != 0 && x + 1 < Width)
+                {
+                    mask[tileRow + ((x + 1) / CellsPerTile)] = true;
+                }
+            }
+        }
+
+        return mask;
+    }
+
+    /// <summary>How many tiles a run of cells spans, rounding up.</summary>
+    private static int Divided(int cells) => (cells + CellsPerTile - 1) / CellsPerTile;
 
     /// <summary>
     /// Marks the boundary between walkable ground and everything else.
@@ -437,11 +510,29 @@ public sealed class TerrainReader
         if (tilesY is < 1 or > 4096) { tilesY = 0; }
 
         LastError = string.Empty;
+
+        // A grid over the same buffer, purely so the tiles can be asked whether anything can
+        // be walked on inside them - which is what separates a room from the scenery ring
+        // around it. Built BEFORE the heights because the tile pass wants it, and it costs
+        // nothing: the constructor keeps the buffer by reference and computes four numbers.
+        _walkable = new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY, heights: null);
+
         TerrainHeightField? heights = ReadTileHeights(terrainBase, tilesX, tilesY);
+        _walkable = null;
 
         return new TerrainGrid(
             cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks, _rooms);
     }
+
+    /// <summary>
+    /// The area's walkability while its tiles are being grouped, and null the rest of the time.
+    /// </summary>
+    /// <remarks>
+    /// A field rather than an argument threaded through the height read, which is what sits
+    /// between the two and has no business knowing about it. Cleared as soon as the pass is
+    /// done, so nothing can come to depend on a half-built grid outliving it.
+    /// </remarks>
+    private TerrainGrid? _walkable;
 
     /// <summary>Why the last height read produced what it did. See TerrainGrid.HeightNote.</summary>
     private string _heightNote = string.Empty;
@@ -553,7 +644,15 @@ public sealed class TerrainReader
         }
 
         _landmarks = TerrainLandmarks.Find(found, CuratedLandmarks);
-        _rooms = TerrainRooms.Find(paths, tilePath, (int)tilesX, (int)(count / tilesX));
+
+        // The mask is built once and read per tile. Null when the walkable grid is not to
+        // hand, which counts every tile as walkable - see TerrainRooms.Find: no opinion has to
+        // mean no filter, never an empty map.
+        int wide = (int)tilesX;
+        bool[]? walkable = _walkable?.WalkableTileMask();
+        _rooms = TerrainRooms.Find(
+            paths, tilePath, wide, (int)(count / tilesX),
+            walkable is null ? null : (x, y) => walkable[(y * wide) + x]);
     }
 
     /// <summary>

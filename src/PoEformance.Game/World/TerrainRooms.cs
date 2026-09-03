@@ -12,6 +12,16 @@ namespace PoEformance.Game.World;
 /// <param name="Name">Its file name without the extension - what the label shows.</param>
 /// <param name="Tiles">How many tiles it covers. The one number that separates a room from a speck.</param>
 /// <param name="GridX">Centre of the block in grid cells, which is what the map projects.</param>
+/// <param name="WalkableTiles">
+/// How many of those tiles hold ground that can be walked on.
+///
+/// ZERO MEANS SCENERY, and that is the number that makes the names usable. An area's tile grid
+/// is a full rectangle while the walkable grid is a subset of it, so most of what the game
+/// builds is there to be looked at rather than entered - the buildings along the road, the sea
+/// beside them, the wall behind the fence. Those rooms have names like any other
+/// (Building_Fill_03, TropicalCoast_Fill_01, BuildingWall_Cv_06) and are most of the labels on
+/// the map. Size cannot tell them apart from real rooms, because a scenery block is large.
+/// </param>
 public sealed record TerrainRoom(
     ulong Id,
     string Path,
@@ -22,8 +32,12 @@ public sealed record TerrainRoom(
     int MaxTileY,
     int Tiles,
     float GridX,
-    float GridY)
+    float GridY,
+    int WalkableTiles = 0)
 {
+    /// <summary>True when there is ground in this room somebody could stand on.</summary>
+    public bool IsWalkable => WalkableTiles > 0;
+
     /// <summary>
     /// How a chosen room is written down, so the choice survives leaving the area.
     /// </summary>
@@ -80,8 +94,17 @@ public static class TerrainRooms
     /// <param name="tilePath">
     /// A path id per tile, row by row, or -1 where the tile names no file. Read only.
     /// </param>
+    /// <param name="tileWalkable">
+    /// Whether a tile holds ground that can be walked on, by tile coordinates.
+    ///
+    /// Optional, and what it decides is <see cref="TerrainRoom.WalkableTiles"/>. NOT SUPPLYING
+    /// IT COUNTS EVERY TILE AS WALKABLE rather than none: no opinion has to mean "no filter",
+    /// or a caller that cannot answer the question - a test, a page drawing the layout from
+    /// outside the game - would silently get an empty map.
+    /// </param>
     public static List<TerrainRoom> Find(
-        IReadOnlyList<string> paths, int[] tilePath, int tilesX, int tilesY)
+        IReadOnlyList<string> paths, int[] tilePath, int tilesX, int tilesY,
+        Func<int, int, bool>? tileWalkable = null)
     {
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(tilePath);
@@ -112,6 +135,7 @@ public static class TerrainRooms
             taken[start] = true;
 
             int tiles = 0;
+            int walkable = 0;
             long sumX = 0;
             long sumY = 0;
             int minX = int.MaxValue;
@@ -128,6 +152,14 @@ public static class TerrainRooms
                 tiles++;
                 sumX += x;
                 sumY += y;
+
+                // Counted per tile as the fill visits it, which is the only pass that knows
+                // which tiles this room owns - and every tile is visited exactly once.
+                if (tileWalkable is null || tileWalkable(x, y))
+                {
+                    walkable++;
+                }
+
                 minX = Math.Min(minX, x);
                 minY = Math.Min(minY, y);
                 maxX = Math.Max(maxX, x);
@@ -169,7 +201,8 @@ public static class TerrainRooms
                 maxY,
                 tiles,
                 Centre(sumX / (double)tiles),
-                Centre(sumY / (double)tiles)));
+                Centre(sumY / (double)tiles),
+                walkable));
 
             if (rooms.Count >= MaxRooms)
             {
@@ -181,7 +214,9 @@ public static class TerrainRooms
     }
 
     /// <summary>The same, from tile records - which is how a test says what it means.</summary>
-    public static List<TerrainRoom> Find(IReadOnlyList<TerrainTile> tiles, int tilesX, int tilesY)
+    public static List<TerrainRoom> Find(
+        IReadOnlyList<TerrainTile> tiles, int tilesX, int tilesY,
+        Func<int, int, bool>? tileWalkable = null)
     {
         ArgumentNullException.ThrowIfNull(tiles);
 
@@ -214,7 +249,7 @@ public static class TerrainRooms
             tilePath[(tile.Row * tilesX) + tile.Column] = id;
         }
 
-        return Find(paths, tilePath, tilesX, tilesY);
+        return Find(paths, tilePath, tilesX, tilesY, tileWalkable);
     }
 
     /// <summary>
