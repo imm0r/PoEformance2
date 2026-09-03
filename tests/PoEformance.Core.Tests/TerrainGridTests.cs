@@ -228,4 +228,68 @@ public class TerrainGridTests
         // ...and it is reported in GRID CELLS, because that is what the drawing works in.
         Assert.Equal(expectedLeanPixels * mask.Step, mask.LeanCells, 3);
     }
+
+    /// <summary>A grid of whole tiles with exactly one walkable cell, at the given coordinates.</summary>
+    private static TerrainGrid OneWalkableCell(int tilesX, int tilesY, int cellX, int cellY)
+    {
+        int width = tilesX * TerrainGrid.CellsPerTile;
+        int height = tilesY * TerrainGrid.CellsPerTile;
+        var rows = new string[height];
+        for (int y = 0; y < height; y++)
+        {
+            rows[y] = y == cellY
+                ? new string('#', cellX) + "." + new string('#', width - cellX - 1)
+                : new string('#', width);
+        }
+
+        return Grid(rows);
+    }
+
+    [Theory]
+    [InlineData(0, 0, 0)]
+    [InlineData(22, 22, 0)]     // the tile's last cell, at an odd x
+    [InlineData(23, 23, 3)]     // the NEXT tile's first cell - and the SAME byte as the one above
+    [InlineData(45, 45, 3)]
+    public void OneWalkableCellMarksItsOwnTileAndNoOther(int cellX, int cellY, int expected)
+    {
+        // The boundary cases are the point. A tile is 23 cells across and a byte holds two, so
+        // every odd tile boundary lands MID-BYTE: cells 22 and 23 share one byte and belong to
+        // different tiles. Marking "the tile this byte is in" would let a neighbour's edge cell
+        // answer for this one, which is why the sweep maps each NIBBLE to its own tile.
+        bool[] mask = OneWalkableCell(2, 2, cellX, cellY).WalkableTileMask();
+
+        Assert.Equal(4, mask.Length);
+        for (int tile = 0; tile < mask.Length; tile++)
+        {
+            Assert.Equal(tile == expected, mask[tile]);
+        }
+    }
+
+    [Fact]
+    public void AnAreaWithNothingWalkableMarksNothing()
+    {
+        // Which is a real state, not a broken read: an area that has not finished loading and
+        // a tile block of solid scenery both look exactly like this.
+        bool[] mask = Grid([.. Enumerable.Repeat(new string('#', 46), 46)]).WalkableTileMask();
+
+        Assert.Equal(4, mask.Length);
+        Assert.All(mask, walkable => Assert.False(walkable));
+    }
+
+    [Fact]
+    public void RowPaddingIsNotWalkableGround()
+    {
+        // The row stride is a byte count the game is free to round up, and the cells past the
+        // area's own width are whatever was in memory. Counting them would mark the last tile
+        // of every row as walkable on a map where it is not.
+        var cells = new byte[2 * TerrainGrid.CellsPerTile * 24];   // 24 bytes a row for 46 cells
+        for (int y = 0; y < 2 * TerrainGrid.CellsPerTile; y++)
+        {
+            cells[(y * 24) + 23] = 0xFF;   // cells 46 and 47: past the width, pure padding
+        }
+
+        bool[] mask = new TerrainGrid(cells, 24, 46, 2, 2, heights: null).WalkableTileMask();
+
+        Assert.All(mask, walkable => Assert.False(walkable));
+    }
 }

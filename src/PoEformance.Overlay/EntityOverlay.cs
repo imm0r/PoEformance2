@@ -3346,7 +3346,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     SettingsChanged?.Invoke();
                 }
 
-                OverlayLayout.Hint("A one-tile room is a rock or a strip of wall, and there are hundreds.");
+                OverlayLayout.Hint(
+                    "A one-tile room is a rock or a strip of wall, and there are hundreds."
+                    + "\nRooms with no ground to stand on are never named - the buildings and the"
+                    + "\nsea are tiles too, and they are most of what an area is built from.");
 
                 // On ENTER rather than per keystroke: every change here writes the settings
                 // file, and a filter typed a letter at a time would write it eight times.

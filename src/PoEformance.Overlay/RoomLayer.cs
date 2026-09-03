@@ -187,7 +187,13 @@ public sealed class RoomLayer
 
         foreach (TerrainRoom room in terrain.Rooms)
         {
-            if (room.Tiles < MinTiles
+            // THE FILTER THAT DOES THE WORK, and size is not it. An area's tile grid is a full
+            // rectangle while its walkable ground is a subset, so the buildings along the road,
+            // the sea beside them and the wall behind the fence are all rooms with names - and
+            // scenery blocks are LARGE, so a threshold in tiles keeps exactly the labels worth
+            // dropping. Ground somebody can stand on is what tells the two apart.
+            if (!room.IsWalkable
+                || room.Tiles < MinTiles
                 || (Filter.Length > 0
                     && !room.Name.Contains(Filter, StringComparison.OrdinalIgnoreCase)))
             {
@@ -276,7 +282,8 @@ public sealed class RoomLayer
         [
             room.Path,
             $"Tiles ({room.MinTileX},{room.MinTileY})-({room.MaxTileX},{room.MaxTileY})"
-            + $"   {room.Tiles} across   ground {terrain.HeightAt((int)room.GridX, (int)room.GridY):F0}",
+            + $"   {room.Tiles} across, {room.WalkableTiles} walkable"
+            + $"   ground {terrain.HeightAt((int)room.GridX, (int)room.GridY):F0}",
             $"Centre ({room.GridX:F1}, {room.GridY:F1}) in grid cells",
             picked ? "Ctrl + click to unpin it" : "Ctrl + click to pin it, with a route",
         ];

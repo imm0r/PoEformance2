@@ -143,4 +143,50 @@ public class TerrainRoomTests
     [Fact]
     public void AnAreaWithNoTileCountFindsNothing()
         => Assert.Empty(TerrainRooms.Find([Tile(Bridge, 1, 1)], 0, 0));
+
+    [Fact]
+    public void SceneryIsTheRoomWithNoGroundToStandOn()
+    {
+        // The distinction the labels live or die by. An area's tile grid is a full rectangle
+        // and its walkable ground a subset, so the buildings along the road and the sea beside
+        // them are rooms with names - and they are most of what an area is built from.
+        List<TerrainRoom> rooms = TerrainRooms.Find(
+            [.. Block(Bridge, 10, 10, 2, 2), .. Block(Rubble, 20, 20, 2, 2)],
+            64,
+            64,
+            (x, y) => x < 15);
+
+        TerrainRoom road = rooms.Single(room => room.Name == "overlay_bridge_03");
+        TerrainRoom scenery = rooms.Single(room => room.Name == "rubble_06");
+
+        Assert.Equal(4, road.WalkableTiles);
+        Assert.True(road.IsWalkable);
+        Assert.Equal(0, scenery.WalkableTiles);
+        Assert.False(scenery.IsWalkable);
+    }
+
+    [Fact]
+    public void ARoomIsWalkableWhenANYOfItsTilesIs()
+    {
+        // Not all of them: a room is a placed piece of level, and its own walls are inside it.
+        // Requiring every tile would drop the room the doorway is in.
+        TerrainRoom room = Assert.Single(TerrainRooms.Find(
+            [.. Block(Bridge, 10, 10, 3, 1)], 64, 64, (x, y) => x == 11));
+
+        Assert.Equal(3, room.Tiles);
+        Assert.Equal(1, room.WalkableTiles);
+        Assert.True(room.IsWalkable);
+    }
+
+    [Fact]
+    public void NoOpinionAboutWalkabilityCountsEveryTile()
+    {
+        // "No filter", never "hide everything". A caller that cannot answer the question - a
+        // test, a page drawing the layout from outside the game - must not silently get an
+        // empty map.
+        TerrainRoom room = Assert.Single(TerrainRooms.Find([.. Block(Bridge, 3, 3, 2, 2)], 32, 32));
+
+        Assert.Equal(room.Tiles, room.WalkableTiles);
+        Assert.True(room.IsWalkable);
+    }
 }

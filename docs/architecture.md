@@ -1527,6 +1527,23 @@ interesting part was not the feature:
   it IS; this writes the name on it, and ctrl + clicking one pins it as an ordinary place —
   marker, label, A\* route, exactly as an exit gets. Four things worth recording.
 
+  **Most of an area is scenery, and that is what decides which names are drawn.** The first run
+  in a real zone made it obvious: labels everywhere outside the drawn outline —
+  `Building_Fill_03`, `BuildingWall_Cv_06`, `TropicalCoast_Fill_01`. Nothing was wrong. The tile
+  grid is a full rectangle and `GridWalkableData` is a *subset* of it, so the buildings you walk
+  past, the sea beside them and the wall behind the fence are all tiles with names; the blue
+  outline is only the walkable part of the same rectangle. A size threshold cannot separate the
+  two, because a scenery block is large. Ground somebody can stand on can: each room counts how
+  many of its tiles hold a walkable cell (`TerrainGrid.HasWalkableTile`, scanned per cell with an
+  early exit — a byte holds two cells and a tile is 23 across, so every odd tile boundary lands
+  mid-byte and a byte-wise scan would let a neighbour's edge cell answer for this tile), and a
+  room with none is never named. **No opinion counts every tile as walkable rather than none** —
+  a caller that cannot answer must get no filter, not an empty map.
+
+  That first run also settled the projection for free, which is the kind of check this file keeps
+  asking for: `TropicalCoast_*` sat over the beach and `Building*` over the houses. The labels
+  land on the thing they name.
+
   A room is a **connected block of tiles sharing one file**, found by flood fill rather than by
   the pairwise clustering the boss arenas use. That is a cost decision and not a style one:
   clustering is quadratic in the tiles it is given, which is fine for the handful an arena name
