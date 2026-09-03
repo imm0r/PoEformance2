@@ -82,6 +82,45 @@ public class RoomFileTests
     }
 
     [Fact]
+    public void AUtf16FileIsNotMistakenForBinary()
+    {
+        // THE MISTAKE THIS FIXES, and it very nearly closed the question on nothing: decoding
+        // UTF-16 as UTF-8 puts a NUL between every letter, so a text file reads as binary AND
+        // every string in it hides from a search for ASCII. All 32 rooms of an area came back
+        // "binary, 0 mentions of .tdt", which is what the check produces whatever the file says.
+        byte[] content = Encoding.Unicode.GetBytes(
+            "Metadata/Terrain/Desert/Badlands/BoneFill_01.tdt\nMetadata/Terrain/X/BoneEdge_St_01.tdt\n");
+
+        IReadOnlyList<string> lines = RoomFiles.Describe(Loaded, _ => content, most: 1);
+
+        string room = Assert.Single(lines, line => line.Contains(".arm", StringComparison.Ordinal));
+        Assert.Contains("text (utf-16)", room, StringComparison.Ordinal);
+        Assert.Contains("2 mentions of .tdt", room, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void WhatAFileNamesIsReportedEvenWhenItNamesNoTiles()
+    {
+        // The payload once the tile question comes back no: a compiled format still carries the
+        // names of what it references, and which names those are decides where to look next.
+        byte[] content =
+        [
+            .. new byte[32],
+            .. Encoding.UTF8.GetBytes("GroundTypeReference"),
+            .. new byte[8],
+            .. Encoding.Unicode.GetBytes("Rooms/BonePassage/entry"),
+            .. new byte[16],
+        ];
+
+        IReadOnlyList<string> lines = RoomFiles.Describe(Loaded, _ => content, most: 1);
+
+        string room = Assert.Single(lines, line => line.Contains(".arm", StringComparison.Ordinal));
+        Assert.Contains("0 mentions of .tdt", room, StringComparison.Ordinal);
+        Assert.Contains("GroundTypeReference", room, StringComparison.Ordinal);
+        Assert.Contains("Rooms/BonePassage/entry", room, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ABinaryFileStillReportsTheTilePathsHiddenInIt()
     {
         // A compiled format can still carry its references as plain strings, and that would be
