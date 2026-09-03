@@ -30,8 +30,6 @@ public static class RoomFiles
     /// <summary>How many rooms to open. Enough to see a pattern, few enough to read.</summary>
     private const int MostRooms = 6;
 
-    /// <summary>How much of a file to show, when it turns out to be readable text.</summary>
-    private const int PreviewChars = 200;
 
     /// <summary>The extension the game gives a room.</summary>
     public const string RoomExtension = ".arm";
@@ -103,19 +101,113 @@ public static class RoomFiles
     /// </remarks>
     private static string Describe(byte[] content)
     {
-        string text = Encoding.UTF8.GetString(content);
-        bool readable = Printable(content);
-        int tiles = Mentions(text, TileExtension);
+        // BOTH ENCODINGS, and the first version of this only looked at one. Decoding UTF-16 as
+        // UTF-8 puts a NUL between every letter, which makes a text file read as binary AND
+        // hides every string in it from a search for ASCII - so "binary, 0 mentions of .tdt"
+        // came back for all 32 rooms and would have closed the question on an artefact of the
+        // check rather than on the file. A test a wrong answer passes is worse than none.
+        int tiles = Mentions(content, TileExtension);
+        IReadOnlyList<string> strings = Strings(content);
+        string shape = Shape(content);
 
-        string what = $"{content.Length} bytes, {(readable ? "text" : "binary")}"
-            + $", {tiles} mentions of {TileExtension}";
+        string what = $"{content.Length} bytes, {shape}, {tiles} mentions of {TileExtension}";
 
-        // The bytes themselves when they are text, and the first line of them when they are
-        // not - a preview of binary as characters is noise, and a length plus a verdict is
-        // what a person can act on.
-        return readable
-            ? $"{what}\n      {Preview(text)}"
-            : what + (tiles > 0 ? $"\n      {Preview(Readable(text))}" : string.Empty);
+        // WHAT IS ACTUALLY IN IT, which is the thing worth reporting when the answer is no.
+        // A room that does not name tiles still names something, and those names are the next
+        // question - so they are printed rather than summarised away.
+        return strings.Count == 0
+            ? what
+            : $"{what}\n      {string.Join("  |  ", strings)}";
+    }
+
+    /// <summary>Whether the bytes read as ASCII text, UTF-16 text, or neither.</summary>
+    private static string Shape(byte[] content)
+    {
+        int printable = 0;
+        int nulEven = 0;
+        for (int i = 0; i < content.Length; i++)
+        {
+            if (content[i] is >= 0x20 and < 0x7F or (byte)'\n' or (byte)'\r' or (byte)'\t')
+            {
+                printable++;
+            }
+            else if (content[i] == 0 && i % 2 == 1)
+            {
+                nulEven++;
+            }
+        }
+
+        if (printable * 10 >= content.Length * 9)
+        {
+            return "text";
+        }
+
+        // Every second byte a NUL, with the others printable, IS a UTF-16 file - and saying
+        // "binary" about one is how its contents stay invisible.
+        return printable + nulEven >= content.Length * 9 / 10 && nulEven > content.Length / 4
+            ? "text (utf-16)"
+            : "binary";
+    }
+
+    /// <summary>
+    /// The printable strings in a file, ASCII or UTF-16, longest first.
+    /// </summary>
+    /// <remarks>
+    /// This is the diagnostic's real payload once the tile question comes back no: a compiled
+    /// format still carries the names of what it references, and which names those are decides
+    /// where to look next. Longest first because a path is longer than a field name, and paths
+    /// are what this is hunting.
+    /// </remarks>
+    private static IReadOnlyList<string> Strings(byte[] content, int least = 6, int most = 8)
+    {
+        var found = new List<string>();
+        var run = new StringBuilder();
+
+        // ASCII runs.
+        foreach (byte value in content)
+        {
+            if (value is >= 0x20 and < 0x7F)
+            {
+                run.Append((char)value);
+                continue;
+            }
+
+            Keep();
+        }
+
+        Keep();
+
+        // UTF-16 runs: a printable byte followed by a NUL, repeatedly. BOTH ALIGNMENTS, because
+        // a string inside a compiled file sits wherever the writer put it - scanning only even
+        // offsets finds nothing at all in a file whose text happens to start on an odd one, and
+        // reports that as "no strings" rather than as "not looked at".
+        foreach (int start in (int[])[0, 1])
+        {
+            for (int i = start; i + 1 < content.Length; i += 2)
+            {
+                if (content[i] is >= 0x20 and < 0x7F && content[i + 1] == 0)
+                {
+                    run.Append((char)content[i]);
+                    continue;
+                }
+
+                Keep();
+            }
+
+            Keep();
+        }
+
+        return [.. found.Distinct(StringComparer.Ordinal).OrderByDescending(s => s.Length).Take(most)];
+
+        void Keep()
+        {
+            if (run.Length >= least)
+            {
+                found.Add(run.ToString());
+            }
+
+            run.Clear();
+        }
     }
 
     /// <summary>True when the bytes read as text rather than as a compiled file.</summary>
@@ -139,36 +231,24 @@ public static class RoomFiles
     }
 
     /// <summary>How often a string appears, which is what says the file references tiles.</summary>
-    private static int Mentions(string text, string what)
+    private static int Mentions(byte[] content, string what)
+        => Occurrences(content, Encoding.UTF8.GetBytes(what))
+           + Occurrences(content, Encoding.Unicode.GetBytes(what));
+
+    /// <summary>How often a byte sequence appears in another.</summary>
+    private static int Occurrences(byte[] content, byte[] pattern)
     {
         int count = 0;
-        int at = 0;
-        while ((at = text.IndexOf(what, at, StringComparison.OrdinalIgnoreCase)) >= 0)
+        for (int i = 0; i + pattern.Length <= content.Length; i++)
         {
-            count++;
-            at += what.Length;
+            if (content.AsSpan(i, pattern.Length).SequenceEqual(pattern))
+            {
+                count++;
+                i += pattern.Length - 1;
+            }
         }
 
         return count;
-    }
-
-    /// <summary>The printable runs of a binary file, which is where its paths would be.</summary>
-    private static string Readable(string text)
-    {
-        var kept = new StringBuilder();
-        foreach (char value in text)
-        {
-            kept.Append(value is >= ' ' and < (char)127 ? value : ' ');
-        }
-
-        return kept.ToString();
-    }
-
-    /// <summary>One line of a file, short enough to sit in a readout.</summary>
-    private static string Preview(string text)
-    {
-        string flat = text.ReplaceLineEndings(" | ").Trim();
-        return flat.Length <= PreviewChars ? flat : flat[..PreviewChars] + "...";
     }
 
     /// <summary>The file's own name, since the directory is the same for all of them.</summary>

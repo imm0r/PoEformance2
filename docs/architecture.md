@@ -1659,6 +1659,16 @@ interesting part was not the feature:
   one question that decides it, and it reports rather than parses: nobody here has seen one of
   these files, and the count of `.tdt` mentions in it is the whole answer.
 
+  Its first run in a real area produced "32 rooms, all binary, 0 mentions of `.tdt`" — **and
+  that answer was the check, not the file.** Decoding UTF-16 as UTF-8 puts a NUL between every
+  letter, which makes a text file read as binary and hides every string in it from a search for
+  ASCII: exactly those two symptoms, for all 32 files, whatever they actually contain. It now
+  counts both encodings, recognises UTF-16 as text, and prints the strings it finds — scanning
+  both byte alignments, because a string inside a compiled file sits wherever the writer put it
+  and an even-offset scan reports "no strings" for a file whose text starts on an odd one. The
+  lesson is the one this file keeps relearning: **a check a wrong answer passes is worse than no
+  check**, and it is worst when the wrong answer is the one that would close the question.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of
