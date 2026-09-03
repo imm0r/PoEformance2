@@ -72,6 +72,17 @@ public sealed class GroundLayer
     /// <summary>What the ground read came back as, for the readout. Empty when nothing was read.</summary>
     public string Note { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// What the landscape grid actually holds, when the reading could not be believed.
+    /// </summary>
+    /// <remarks>
+    /// ONLY WHEN IT FAILED, because that is the only time it is worth the space. A verdict says
+    /// the pairing is wrong; these say what the values ARE, which is the thing that decides what
+    /// to do about it - a handful of small ones is a fixed terrain classification, and sixteen
+    /// scattered ones is not a classification at all. See <see cref="TerrainGroundTypes.Lines"/>.
+    /// </remarks>
+    public IReadOnlyList<string> Diagnosis { get; private set; } = [];
+
     /// <summary>Writes the ground-type names onto the map.</summary>
     public void DrawOnMap(ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player)
     {
@@ -83,6 +94,7 @@ public sealed class GroundLayer
         // GRID rather than from the ground, because the ground is null exactly when the read
         // gave up - which is the case most in need of an explanation.
         Note = snapshot.Terrain?.GroundNote ?? string.Empty;
+        Diagnosis = snapshot.Terrain?.Ground is { Trusted: false } ground ? ground.Lines : [];
 
         if (!Enabled
             || !map.IsLargeMap

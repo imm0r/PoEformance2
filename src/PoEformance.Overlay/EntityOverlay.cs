@@ -3482,6 +3482,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 {
                     ImGuiText.Wrapped(Quiet, _ground.Note);
                 }
+
+                // AND WHAT THE GRID ACTUALLY HOLDS when the verdict was no. "9190252 cells name
+                // a type beyond the 5 the area lists" says the pairing is wrong and nothing
+                // about the values, which is the only thing that decides what to do next - so
+                // the histogram sits right under it, and only there.
+                foreach (string line in _ground.Diagnosis)
+                {
+                    ImGui.TextColored(Quiet, line);
+                }
             }
         }
 

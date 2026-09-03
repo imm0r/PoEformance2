@@ -1780,6 +1780,24 @@ interesting part was not the feature:
   excluded from the spread, and a test puts the blank on one side of the map and a named,
   fully-walkable type on the other to prove the gate still says no.
 
+  **Then the gate did its job against the theory it was built for.** The Titan Grotto, list read
+  correctly this time: *"9190252 cells name a type beyond the 5 the area lists — the list and the
+  grid do not belong together"*. Not a rounding error, most of the grid. **A landscape nibble is
+  not an index into `GroundTypeFiles`**, and the connection the whole ground-type layer rests on
+  does not hold. Which is the check earning its keep twice over — the alternative was a map
+  labelled confidently and wrongly.
+
+  What survives is worth keeping separate from what does not. `GroundTypeFiles` at `+0x68` IS
+  the area's `.gt` list, measured in two areas with readable names; its length varies per area
+  (7, 6, 5); the two grids are the same length; and the blank first slot is real. What is dead
+  is only the pairing. Note the shape of the disagreement: the list length varies per area while
+  the schema's July note says the nibbles run 0–5, which is what a FIXED terrain classification
+  looks like rather than a per-area index — but one number cannot settle that, so the verdict now
+  carries a histogram: every nibble value that occurs, how much ground it covers, and how much of
+  that is walkable. The walkable share is what gives an unnamed value meaning at all (whatever is
+  never walkable is the void or the abyss), and it is shown only when the reading failed, which
+  is the only time it is worth the space.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of
