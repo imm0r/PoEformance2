@@ -37,6 +37,9 @@ public static class RoomFiles
     /// <summary>The extension it gives a tile - what a room would be built from.</summary>
     public const string TileExtension = ".tdt";
 
+    /// <summary>The verdict that decides how a file is decoded, named so it cannot drift.</summary>
+    private const string Utf16 = "text (utf-16)";
+
     /// <summary>
     /// Describes the room files among a set of loaded paths.
     /// </summary>
@@ -120,6 +123,121 @@ public static class RoomFiles
             : $"{what}\n      {string.Join("  |  ", strings)}";
     }
 
+    /// <summary>
+    /// Every room file of an area, decoded, as one document.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THE READOUT CANNOT DO. A room turned out to be a grid of characters with a list of
+    /// ground and edge types beside it, and the diagnostic's eight longest strings are enough
+    /// to establish that and nothing more: the grid's dimensions, its alphabet and how it
+    /// refers to those types are all questions about the whole file. Reading one on the machine
+    /// running the game is not how anybody answers them - so this writes them out, the way the
+    /// loaded-file list already goes out, and the format can be worked out away from the game.
+    ///
+    /// ALL of them rather than one, because the variation between rooms is itself the evidence:
+    /// a field that is constant across thirty-two files is a header, and one that tracks the
+    /// grid's size is a dimension.
+    /// </remarks>
+    /// <returns>The file written, or null when it could not be.</returns>
+    public static string? Dump(
+        uint area, IEnumerable<string> loaded, Func<string, byte[]?> read, string? path = null)
+    {
+        ArgumentNullException.ThrowIfNull(loaded);
+        ArgumentNullException.ThrowIfNull(read);
+
+        List<string> rooms =
+            [.. loaded.Where(p => p.EndsWith(RoomExtension, StringComparison.OrdinalIgnoreCase)).Order(StringComparer.Ordinal)];
+
+        if (rooms.Count == 0)
+        {
+            return null;
+        }
+
+        var text = new StringBuilder();
+        text.AppendLine($"# area {area}");
+        text.AppendLine($"# {rooms.Count} room files");
+        text.AppendLine("#");
+
+        foreach (string room in rooms)
+        {
+            text.AppendLine();
+            text.AppendLine($"### {room}");
+
+            byte[]? content;
+            try
+            {
+                content = read(room);
+            }
+            catch (Exception exception) when (exception is IOException or InvalidDataException
+                or NotSupportedException or UnauthorizedAccessException)
+            {
+                // PER FILE, so one bad room does not cost the other thirty-one. The whole point
+                // of the dump is the variation between them.
+                text.AppendLine($"### could not be read: {exception.Message}");
+                continue;
+            }
+
+            if (content is null || content.Length == 0)
+            {
+                text.AppendLine("### not in the bundles");
+                continue;
+            }
+
+            // Once, and handed on: the shape test sweeps every byte, and these are the biggest
+            // files this tool opens.
+            string shape = Shape(content);
+            text.AppendLine($"### {content.Length} bytes, {shape}");
+            text.AppendLine(Decode(content, shape));
+        }
+
+        try
+        {
+            // Beside the loaded-file dump and named the same way, because they are two halves
+            // of one capture: area-<n>.txt says what loaded, rooms-<n>.txt says what is in it.
+            string file = path
+                ?? Path.Combine(AppContext.BaseDirectory, "preloads", $"rooms-{area}.txt");
+
+            string? folder = Path.GetDirectoryName(file);
+            if (folder is { Length: > 0 })
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            File.WriteAllText(file, text.ToString());
+            return file;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
+            or NotSupportedException or ArgumentException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// The file's own text, in whichever encoding it turned out to be written in.
+    /// </summary>
+    /// <remarks>
+    /// The byte-order mark decides where there is one, and the shape test decides otherwise -
+    /// getting this wrong is what produced a page of NULs and the conclusion that a text file
+    /// was binary.
+    /// </remarks>
+    private static string Decode(byte[] content, string shape)
+    {
+        if (content.Length >= 2 && content[0] == 0xFF && content[1] == 0xFE)
+        {
+            return Encoding.Unicode.GetString(content, 2, content.Length - 2);
+        }
+
+        if (content.Length >= 3 && content[0] == 0xEF && content[1] == 0xBB && content[2] == 0xBF)
+        {
+            return Encoding.UTF8.GetString(content, 3, content.Length - 3);
+        }
+
+        return shape == Utf16
+            ? Encoding.Unicode.GetString(content)
+            : Encoding.UTF8.GetString(content);
+    }
+
     /// <summary>Whether the bytes read as ASCII text, UTF-16 text, or neither.</summary>
     private static string Shape(byte[] content)
     {
@@ -145,7 +263,7 @@ public static class RoomFiles
         // Every second byte a NUL, with the others printable, IS a UTF-16 file - and saying
         // "binary" about one is how its contents stay invisible.
         return printable + nulEven >= content.Length * 9 / 10 && nulEven > content.Length / 4
-            ? "text (utf-16)"
+            ? Utf16
             : "binary";
     }
 
@@ -208,26 +326,6 @@ public static class RoomFiles
 
             run.Clear();
         }
-    }
-
-    /// <summary>True when the bytes read as text rather than as a compiled file.</summary>
-    /// <remarks>
-    /// Nine in ten printable, not all of them: PoE's text formats end lines with a mix of
-    /// terminators and carry the odd byte-order mark, and demanding purity would call every
-    /// one of them binary.
-    /// </remarks>
-    private static bool Printable(byte[] content)
-    {
-        int printable = 0;
-        foreach (byte value in content)
-        {
-            if (value is >= 0x20 and < 0x7F or (byte)'\n' or (byte)'\r' or (byte)'\t')
-            {
-                printable++;
-            }
-        }
-
-        return content.Length > 0 && printable * 10 >= content.Length * 9;
     }
 
     /// <summary>How often a string appears, which is what says the file references tiles.</summary>

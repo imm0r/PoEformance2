@@ -2367,6 +2367,27 @@ internal static class Program
                     preload.Swept([exception.Message]);
                 }
             });
+
+            // And the whole of them, decoded, beside the loaded-file dumps. The readout is
+            // eight strings per room, which cannot answer a question about the format itself.
+            overlay.WriteRoomsOut = () => _ = Task.Run(() =>
+            {
+                try
+                {
+                    string? written = PoEformance.Game.Diagnostics.RoomFiles.Dump(
+                        preload.Area,
+                        preload.All,
+                        path => PoEformance.Game.Files.GameArt.ReadRaw(installed, path));
+                    preload.Swept([
+                        written is null
+                            ? "could not write the rooms out"
+                            : $"rooms written to {written}"]);
+                }
+                catch (Exception exception) when (exception is IOException or InvalidDataException)
+                {
+                    preload.Swept([exception.Message]);
+                }
+            });
         }
 
         overlay.AttachPreload(
