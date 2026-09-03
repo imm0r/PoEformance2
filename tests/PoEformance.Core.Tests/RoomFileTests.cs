@@ -239,6 +239,140 @@ public class RoomFileTests
         Assert.False(File.Exists(file));
     }
 
+    /// <summary>
+    /// A room, in the format a real one turned out to have. Version 36 in UTF-16: a string table
+    /// naming an edge and a ground type, the room's own record, four side connections, a grid of
+    /// cells and length-prefixed doodads - and, across thirty-two real files, not one .tdt.
+    /// </summary>
+    private const string RealRoom = """
+        version 36
+        2
+        "Metadata/Terrain/Desert/Badlands/bones_edge.et"
+        "Metadata/Terrain/Desert/Badlands/bone_fill.gt"
+        7 1
+        1 1
+        ""
+        0 1
+        k 7 7 0 0 2 2 21 21 21 21 21 21 21 21 0 0 0 0 0 0 0 0 0 0
+        n n n n n n n
+        1
+        78 86 1 853.462 940.491 -1.28 0 0 -0.59 0.80 0 0 0 1 "Metadata/Terrain/Doodads/X/scatter01.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+        """;
+
+    [Fact]
+    public void TheTypesARoomDeclaresAreDumpedBesideIt()
+    {
+        // THE QUESTION THE SECOND PASS EXISTS FOR. Thirty-two rooms of one area named not a
+        // single tile between them - only their edge and ground types - so whether the layout
+        // can be recovered comes down to what one of THOSE contains.
+        string file = Temporary();
+        byte[] room = Encoding.Unicode.GetBytes(RealRoom);
+
+        RoomFiles.Dump(
+            Area,
+            Loaded,
+            asked => asked.EndsWith(".arm", StringComparison.Ordinal)
+                ? room
+                : Encoding.UTF8.GetBytes($"tiles of {Name(asked)}"),
+            file);
+
+        string text = File.ReadAllText(file);
+        Assert.Contains("2 type files declared by the rooms above", text, StringComparison.Ordinal);
+        Assert.Contains("### Metadata/Terrain/Desert/Badlands/bones_edge.et", text, StringComparison.Ordinal);
+        Assert.Contains("### Metadata/Terrain/Desert/Badlands/bone_fill.gt", text, StringComparison.Ordinal);
+        Assert.Contains("tiles of bones_edge.et", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheModelsARoomPlacesAreNotMistakenForTypes()
+    {
+        // A doodad line quotes a path too, and following those would open two hundred models
+        // instead of the two files that decide anything. The extension is what tells them apart.
+        string file = Temporary();
+
+        RoomFiles.Dump(
+            Area, Loaded, _ => Encoding.Unicode.GetBytes(RealRoom), file);
+
+        string text = File.ReadAllText(file);
+        Assert.Contains("2 type files declared", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("### Metadata/Terrain/Doodads/X/scatter01.ao", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("### Metadata/MiscellaneousObjects/Doodad", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ATypeIsOpenedOnceHoweverManyRoomsDeclareIt()
+    {
+        // Fourteen of thirty-two rooms declared the same ground type in a real area. Opening it
+        // fourteen times would bury the one copy worth reading.
+        string file = Temporary();
+        int reads = 0;
+
+        RoomFiles.Dump(
+            Area,
+            Loaded,
+            asked =>
+            {
+                if (asked.EndsWith(".gt", StringComparison.Ordinal))
+                {
+                    reads++;
+                }
+
+                return Encoding.Unicode.GetBytes(RealRoom);
+            },
+            file);
+
+        Assert.Equal(1, reads);
+    }
+
+    [Fact]
+    public void EveryFileReportsWhetherItNamesTiles()
+    {
+        // On the types as well as the rooms, because that is now where the answer would be.
+        string file = Temporary();
+
+        RoomFiles.Dump(
+            Area,
+            Loaded,
+            asked => asked.EndsWith(".arm", StringComparison.Ordinal)
+                ? Encoding.Unicode.GetBytes(RealRoom)
+                : Encoding.UTF8.GetBytes("Metadata/Terrain/Desert/Badlands/BoneFill_01.tdt\nBoneEdge_St_01.tdt\n"),
+            file);
+
+        string text = File.ReadAllText(file);
+        Assert.Contains("0 mentions of .tdt", text, StringComparison.Ordinal);   // the room
+        Assert.Contains("2 mentions of .tdt", text, StringComparison.Ordinal);   // the type
+    }
+
+    [Fact]
+    public void ATypeThatIsCompiledIsPreviewedRatherThanPouredIn()
+    {
+        // Nobody has seen one of these. Rendering a compiled file as characters is a page of
+        // noise that can break the document it lands in, and its head and its strings are what
+        // a format is actually read out of.
+        var compiled = new byte[4096];
+        Random.Shared.NextBytes(compiled);
+        compiled[0] = 0x47;
+        compiled[1] = 0x47;
+        Encoding.UTF8.GetBytes("BoneFill_01.tdt").CopyTo(compiled, 64);
+        string file = Temporary();
+
+        RoomFiles.Dump(
+            Area,
+            Loaded,
+            asked => asked.EndsWith(".arm", StringComparison.Ordinal)
+                ? Encoding.Unicode.GetBytes(RealRoom)
+                : compiled,
+            file);
+
+        string text = File.ReadAllText(file);
+        Assert.Contains("4096 bytes, binary, 1 mentions of .tdt", text, StringComparison.Ordinal);
+        Assert.Contains("0000  47 47", text, StringComparison.Ordinal);
+        Assert.Contains("BoneFill_01.tdt", text, StringComparison.Ordinal);
+
+        // Bounded: a preview of four kilobytes is not a preview.
+        Assert.DoesNotContain("0200  ", text, StringComparison.Ordinal);
+    }
+
     private static string Temporary()
         => Path.Combine(Path.GetTempPath(), $"poef-rooms-{Guid.NewGuid():N}.txt");
 

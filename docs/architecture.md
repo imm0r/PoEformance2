@@ -1683,6 +1683,27 @@ interesting part was not the feature:
   evidence — a field constant across thirty-two files is a header, and one that tracks the grid
   is a dimension.
 
+  **The `.arm` format, read off 32 real files.** UTF-16 text: `version <n>`, a length-prefixed
+  string table (the type files it uses, plus bare tags), a few header numbers, the room's own tag
+  (`""`, `"end"`, `"Underground_NS_01"`), then `k <W> <H> <four side values> …` — the room's
+  record — then those four side values again one per line, then the grid, one row per line, cells
+  being `n`, `s`, `f <index into the string table>` or `k <24 numbers>`, then length-prefixed
+  doodad placements. Two readings are settled rather than assumed: the four side values are
+  **connections** (a `_Cnr_` room has two, an `_End_` room one), and a doodad's leading integers
+  are **grid cells** — `853.462 / (250/23) = 78.52` against a written `78`, which is this
+  project's own `GridToWorld` constant and nothing else.
+
+  What it does NOT contain is a tile. Not one `.tdt` across all 32, in either encoding. A room
+  names only its edge and ground types, and **the reference offers no way round that**: `.arm`
+  appears nowhere in GameHelper2's `Radar.cs`, whose labels come from `TgtTilesLocations` — the
+  `.tgt`/`.tdt` tile names this tool already draws. The `.arm` route is ours, so it has to carry
+  itself. Which leaves one unread file type between here and a placement, so the dump follows the
+  types the rooms declare and writes those out too: 32 rooms yield exactly 19 of them, and
+  whether one lists its tiles decides the whole approach. Worth recording before it is answered:
+  `bone_fill.gt` is declared by 14 of the 32 and `bones_edge.et` by 10, so even a yes gives
+  room-FAMILY resolution — telling `AbyssTrail_Cnr_01` from `AbyssTrail_End_01` would then be a
+  second step, off their grids and their connection counts.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of

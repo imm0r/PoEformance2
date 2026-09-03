@@ -37,8 +37,26 @@ public static class RoomFiles
     /// <summary>The extension it gives a tile - what a room would be built from.</summary>
     public const string TileExtension = ".tdt";
 
+    /// <summary>
+    /// The extensions a room DOES name, which is why the dump follows them.
+    /// </summary>
+    /// <remarks>
+    /// Thirty-two rooms of one area named not a single tile between them. What each one names
+    /// instead is its edge type and its ground type - <c>bones_edge.et</c>, <c>bone_fill.gt</c> -
+    /// and those live in the same directories as the tiles do. So whether the layout can be
+    /// recovered comes down to whether one of THESE lists its tiles, and the cheapest way to
+    /// find out is to write them out beside the rooms that named them.
+    /// </remarks>
+    public static readonly string[] TypeExtensions = [".et", ".gt"];
+
     /// <summary>The verdict that decides how a file is decoded, named so it cannot drift.</summary>
     private const string Utf16 = "text (utf-16)";
+
+    /// <summary>How much of a file that is not text to show. Enough for a header and a magic.</summary>
+    private const int PreviewBytes = 512;
+
+    /// <summary>How many strings to list out of one that is not text. The names are the payload.</summary>
+    private const int PreviewStrings = 64;
 
     /// <summary>
     /// Describes the room files among a set of loaded paths.
@@ -137,6 +155,12 @@ public static class RoomFiles
     /// ALL of them rather than one, because the variation between rooms is itself the evidence:
     /// a field that is constant across thirty-two files is a header, and one that tracks the
     /// grid's size is a dimension.
+    ///
+    /// AND ONE LEVEL DEEPER, which is what the first dump turned out to need. Thirty-two rooms
+    /// named not a single tile between them - only their edge and ground types - so the chain
+    /// room-to-tile now hangs entirely on what one of THOSE contains. They are named right there
+    /// in the room text and read from the same bundles, so following them costs one pass and
+    /// settles the question either way.
     /// </remarks>
     /// <returns>The file written, or null when it could not be.</returns>
     public static string? Dump(
@@ -154,40 +178,30 @@ public static class RoomFiles
         }
 
         var text = new StringBuilder();
+        var referenced = new SortedSet<string>(StringComparer.Ordinal);
+
         text.AppendLine($"# area {area}");
         text.AppendLine($"# {rooms.Count} room files");
         text.AppendLine("#");
 
         foreach (string room in rooms)
         {
+            Append(room, referenced);
+        }
+
+        // The types the rooms named, in the same document. One file to send rather than two,
+        // because the question is the RELATION between them: which rooms declared this type,
+        // and does the type name the tiles they would not.
+        if (referenced.Count > 0)
+        {
             text.AppendLine();
-            text.AppendLine($"### {room}");
+            text.AppendLine($"# {referenced.Count} type files declared by the rooms above");
+            text.AppendLine("#");
 
-            byte[]? content;
-            try
+            foreach (string type in referenced)
             {
-                content = read(room);
+                Append(type, into: null);
             }
-            catch (Exception exception) when (exception is IOException or InvalidDataException
-                or NotSupportedException or UnauthorizedAccessException)
-            {
-                // PER FILE, so one bad room does not cost the other thirty-one. The whole point
-                // of the dump is the variation between them.
-                text.AppendLine($"### could not be read: {exception.Message}");
-                continue;
-            }
-
-            if (content is null || content.Length == 0)
-            {
-                text.AppendLine("### not in the bundles");
-                continue;
-            }
-
-            // Once, and handed on: the shape test sweeps every byte, and these are the biggest
-            // files this tool opens.
-            string shape = Shape(content);
-            text.AppendLine($"### {content.Length} bytes, {shape}");
-            text.AppendLine(Decode(content, shape));
         }
 
         try
@@ -211,6 +225,136 @@ public static class RoomFiles
         {
             return null;
         }
+
+        // One file into the document, and - when asked - what that file declares. Shared by both
+        // passes so a type file is reported exactly as a room is; the shapes differ and being
+        // able to compare them at a glance is the point.
+        void Append(string what, SortedSet<string>? into)
+        {
+            text.AppendLine();
+            text.AppendLine($"### {what}");
+
+            byte[]? content;
+            try
+            {
+                content = read(what);
+            }
+            catch (Exception exception) when (exception is IOException or InvalidDataException
+                or NotSupportedException or UnauthorizedAccessException)
+            {
+                // PER FILE, so one bad room does not cost the other thirty-one. The whole point
+                // of the dump is the variation between them.
+                text.AppendLine($"### could not be read: {exception.Message}");
+                return;
+            }
+
+            if (content is null || content.Length == 0)
+            {
+                text.AppendLine("### not in the bundles");
+                return;
+            }
+
+            // Once, and handed on: the shape test sweeps every byte, and these are the biggest
+            // files this tool opens.
+            string shape = Shape(content);
+
+            // THE NUMBER THE WHOLE EXERCISE TURNS ON, on every file rather than on the rooms
+            // alone: a type that names tiles closes the chain, and one that does not ends it.
+            text.AppendLine(
+                $"### {content.Length} bytes, {shape}, "
+                + $"{Mentions(content, TileExtension)} mentions of {TileExtension}");
+
+            if (shape == "binary")
+            {
+                // Not decoded. A compiled file rendered as characters is a page of noise that
+                // can break the document it lands in; its head and its strings are what a person
+                // reads a format out of.
+                text.AppendLine(Preview(content));
+                foreach (string found in Strings(content, most: PreviewStrings))
+                {
+                    text.AppendLine($"    {found}");
+                }
+
+                return;
+            }
+
+            string decoded = Decode(content, shape);
+            text.AppendLine(decoded);
+            if (into is not null)
+            {
+                References(decoded, into);
+            }
+        }
+    }
+
+    /// <summary>
+    /// The type files a room's own text declares, added to a set.
+    /// </summary>
+    /// <remarks>
+    /// From the QUOTED runs, because that is how the format writes a path and because a room's
+    /// doodad lines quote paths too - matching on the extension is what keeps the .ao models out
+    /// without needing to know where the string table ends.
+    /// </remarks>
+    private static void References(string text, SortedSet<string> into)
+    {
+        int at = 0;
+        while (at < text.Length)
+        {
+            int open = text.IndexOf('"', at);
+            if (open < 0)
+            {
+                return;
+            }
+
+            int close = text.IndexOf('"', open + 1);
+            if (close < 0)
+            {
+                return;
+            }
+
+            ReadOnlySpan<char> quoted = text.AsSpan(open + 1, close - open - 1);
+            foreach (string extension in TypeExtensions)
+            {
+                if (quoted.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+                {
+                    into.Add(quoted.ToString());
+                    break;
+                }
+            }
+
+            at = close + 1;
+        }
+    }
+
+    /// <summary>The head of a file that is not text, as hex and as characters.</summary>
+    private static string Preview(byte[] content)
+    {
+        int show = Math.Min(content.Length, PreviewBytes);
+        var preview = new StringBuilder(show * 4);
+
+        for (int row = 0; row < show; row += 16)
+        {
+            int width = Math.Min(16, show - row);
+            preview.Append("    ").Append(row.ToString("x4", System.Globalization.CultureInfo.InvariantCulture)).Append("  ");
+
+            for (int i = 0; i < 16; i++)
+            {
+                preview.Append(i < width
+                    ? content[row + i].ToString("x2", System.Globalization.CultureInfo.InvariantCulture)
+                    : "  ").Append(' ');
+            }
+
+            preview.Append(' ');
+            for (int i = 0; i < width; i++)
+            {
+                byte value = content[row + i];
+                preview.Append(value is >= 0x20 and < 0x7F ? (char)value : '.');
+            }
+
+            preview.AppendLine();
+        }
+
+        return preview.ToString();
     }
 
     /// <summary>
