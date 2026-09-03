@@ -90,6 +90,12 @@ public static class StyleCatalogue
         new("terrain.outline", "Map", "Area layout", Line, Rgb(150, 200, 255)),
         new("map.unwalked", "Map", "Still to walk", StyleTraits.Colour | StyleTraits.Scale, Rgb(120, 150, 190, 140)),
 
+        // The room names read AGAINST the layout rather than over it, so this is deliberately
+        // quieter than the outline it sits on. Scale sizes the dot at each room's centre; the
+        // name beside it takes this colour as well, which is what keeps a screen full of them
+        // one layer instead of two.
+        new("map.room", "Map", "Room name", StyleTraits.Colour | StyleTraits.Scale, Rgb(184, 208, 232, 210)),
+
         // The colour here is the HOT end of the ramp; the cool end is derived from it, so one
         // choice moves the whole scale rather than leaving somebody to match two ends by eye.
         // Scale sizes the patch, which is how a picture is made denser or airier.
@@ -184,6 +190,7 @@ public static class StyleCatalogue
         public const string Terrain = "terrain.outline";
         public const string Unwalked = "map.unwalked";
         public const string Heat = "map.heat";
+        public const string Room = "map.room";
         public const string HealthBar = "healthbar";
         public const string HealthBarBack = "healthbar.back";
         public const string HealthBarShield = "healthbar.shield";
@@ -209,7 +216,7 @@ public static class StyleCatalogue
         /// <summary>All of them, for the test that keeps them honest.</summary>
         public static IReadOnlyList<string> All { get; } =
         [
-            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Heat,
+            DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Heat, Room,
             PreloadBannerBack, PreloadListBack, PreloadCard,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,

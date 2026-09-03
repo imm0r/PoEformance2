@@ -38,6 +38,10 @@ public sealed record OverlaySettings(
     // where a release can correct it. See MapKeepOut - including why it is a setting at all.
     [property: JsonPropertyName("mapKeepOut")] MapKeepOut? MapKeepOut = null,
 
+    // The layout's room names, and which rooms somebody pinned - its own object beside the
+    // keep-out zones, and null until somebody touches it, for exactly the same reasons.
+    [property: JsonPropertyName("rooms")] RoomSettings? Rooms = null,
+
     // The projectile marks. On by default, because unlike the effect and terrain debug
     // layers this is a playing feature: it costs nothing extra to read - a projectile is
     // an entity the reader already walks past - and what it draws is small and brief.
@@ -123,6 +127,9 @@ public sealed record OverlaySettings(
     /// <summary>Where the game's interface is, as edited or as it ships.</summary>
     public MapKeepOut MapKeepOutOrDefault => MapKeepOut ?? Features.MapKeepOut.Default;
 
+    /// <summary>What was decided about the room names, or the defaults.</summary>
+    public RoomSettings RoomsOrDefault => Rooms ?? RoomSettings.Default;
+
     /// <summary>The hidden tab ids, empty until somebody hides one.</summary>
     public IReadOnlyList<string> HiddenTabsOrEmpty => HiddenTabs ?? [];
 
@@ -200,6 +207,7 @@ public sealed record OverlaySettings(
             // file gains no key, and the defaults keep coming from the code where a correction
             // can still reach somebody who never opened the sliders.
             Interface = Interface?.Normalised(),
+            Rooms = Rooms?.Normalised(),
 
             // Capped low: this thickens the line in TEXTURE pixels, and past a few the
             // outline stops being a boundary and becomes a filled shape.

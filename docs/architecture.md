@@ -1520,6 +1520,44 @@ interesting part was not the feature:
   the work — no marker in the overlay is either colour, so a blue-green wash is unmistakably
   ground rather than a thing standing on it. Plus a key in the map's corner, because the first
   question anybody asks of a coloured map is which of the two it is.
+- **Room names — the layout in words, from the same read that draws it as a shape.** The game
+  builds an area out of named room files and writes that name on every tile the room covers, so
+  the tile array already carries "exit_01", "overlay_bridge_03", "3open_01" long before anything
+  is standing in them. The terrain layer draws the area's outline and cannot say what any part of
+  it IS; this writes the name on it, and ctrl + clicking one pins it as an ordinary place —
+  marker, label, A\* route, exactly as an exit gets. Four things worth recording.
+
+  A room is a **connected block of tiles sharing one file**, found by flood fill rather than by
+  the pairwise clustering the boss arenas use. That is a cost decision and not a style one:
+  clustering is quadratic in the tiles it is given, which is fine for the handful an arena name
+  matches and not for an area's whole tile list; a fill over the grid is one pass whatever the
+  area's size. What it cannot separate is two placements of the same file that touch — they come
+  out as one room with twice the tiles, and the sub-ids that would tell them apart cost a second
+  pass to buy back a merged label on repeated scenery.
+
+  The rooms are found **whether or not anything draws them**, because the pass that reads tile
+  paths for the landmarks already runs: they add an int per tile and a fill, once per area.
+  Reading them on demand would mean the switch did nothing until the next zone.
+
+  The centroid sits at the **centre of the block, not its corner** — a tile is 23 cells across,
+  so anchoring on the mean tile index puts every name half a tile toward the map's origin, which
+  is the offset the AHK tool shipped and had to correct. Worth knowing when comparing numbers
+  against GameHelper2: its Radar reports a room's centroid on the corner convention, so its
+  figure is 11.5 cells short of this one on both axes.
+
+  And the **mouse**, which the overlay normally does not get: hovering is free, because
+  ClickableTransparentOverlay reads the cursor with `GetCursorPos` rather than from window
+  messages, so the position keeps arriving while the overlay is transparent to clicks. A click
+  is not free — button presses come from messages — so it asks for the mouse for exactly as long
+  as ctrl is held over a room, which is `WindowChrome`'s own trick applied to a map marker. Ctrl
+  is what keeps dragging and zooming the map untouched.
+
+  One thing this does NOT settle, and it is in the readout rather than in a theory: whether PoE2
+  spells those paths `.tdt` (as every curated landmark in `data/landmarks.json` does) or `.arm`
+  under a `Rooms/` directory (as GameHelper2's own tooltip shows in Act 2). Both are the same
+  field on the same tile struct, so the feature works either way — but the terrain row now prints
+  the room count and the biggest room's full path, so the question is answered by looking rather
+  than by arguing.
 - **A death is not a hit.** Damage taken is the same pool-difference measurement pointed at the
   player, and at zero life the pool reads as *unread* rather than empty — otherwise the whole
   pool is counted as one enormous hit on the way back in, and every death becomes the worst hit
