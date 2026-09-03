@@ -140,6 +140,62 @@ public class RoomProbeTests
     }
 
     [Fact]
+    public void AnInlineVectorIsOpenedRatherThanPeekedAsAPointer()
+    {
+        // THE MISTAKE THIS FIXES. A tile's +0x10, +0x18 and +0x20 are begin, end and capacity -
+        // one vector laid out as fields, not three references - so peeking the value at +0x10
+        // classifies whatever the elements happen to begin with and never opens the array. A
+        // recording put 889 tiles of 2336 in exactly this shape, all of them invisible.
+        const ulong elements = 0x7000_0000;
+        const ulong held = 0x7000_2000;
+
+        var memory = new FakeMemoryReader();
+        memory.Place(Tile, new byte[0x38]);
+        memory.Place(Tile + 0x10, elements);          // begin
+        memory.Place(Tile + 0x18, elements + 0x10);   // end - one 16-byte element
+        memory.Place(Tile + 0x20, elements + 0x10);   // capacity
+
+        // The element: an object and a number, which is the shape the game uses.
+        memory.Place(elements, new byte[0x20]);
+        memory.Place(elements, held);
+        memory.Place(elements + 0x08, 2L);
+
+        // The object, with the path where a file object keeps it.
+        memory.Place(held, new byte[0x60]);
+        memory.Place(Text, new byte[1024]);
+        memory.PlaceStdWString(held + 0x08, "Metadata/Terrain/X/Rooms/behind_a_vector.arm", Text);
+
+        IReadOnlyList<string> lines = new RoomProbe(memory).Probe(Terrain, Tile, "some.tdt");
+
+        Assert.Contains(lines, line => line.Contains("ROOM?", StringComparison.Ordinal)
+            && line.Contains("behind_a_vector", StringComparison.Ordinal));
+
+        // Both hops in the label, because "+0x10, element 0, +0x08" is the field this becomes.
+        Assert.Contains(lines, line => line.Contains("+0x10[+0x00]+0x08", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ThreePointersInOrderDoNotSwallowTheSlotsAfterThem()
+    {
+        // Three references in the right order satisfy the vector test by luck, and skipping the
+        // next two slots on that guess would hide whatever they really are - including the tile
+        // file itself, which is the one field already known to matter.
+        var memory = new FakeMemoryReader();
+        memory.Place(Tile, new byte[0x38]);
+        memory.Place(Tile + 0x00, Detail);            // could read as "begin"
+        memory.Place(Tile + 0x08, Detail + 0x100);    // "end"
+        memory.Place(Tile + 0x10, Detail + 0x200);    // "capacity"
+
+        memory.Place(Detail, new byte[0x40]);
+        memory.Place(Text, new byte[1024]);
+        memory.PlaceStdWString(Detail + 0x08, "Metadata/Terrain/X/Rooms/still_seen.arm", Text);
+
+        IReadOnlyList<string> lines = new RoomProbe(memory).Probe(Terrain, Tile, "some.tdt");
+
+        Assert.Contains(lines, line => line.Contains("still_seen", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void ManyTilesAreSampledAndTheAbsenceIsReported()
     {
         // ONE tile proves nothing, and that is exactly what the first recording could show:
