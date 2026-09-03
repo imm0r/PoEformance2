@@ -1584,12 +1584,31 @@ interesting part was not the feature:
   as ctrl is held over a room, which is `WindowChrome`'s own trick applied to a map marker. Ctrl
   is what keeps dragging and zooming the map untouched.
 
-  One thing this does NOT settle, and it is in the readout rather than in a theory: whether PoE2
-  spells those paths `.tdt` (as every curated landmark in `data/landmarks.json` does) or `.arm`
-  under a `Rooms/` directory (as GameHelper2's own tooltip shows in Act 2). Both are the same
-  field on the same tile struct, so the feature works either way — but the terrain row now prints
-  the room count and the biggest room's full path, so the question is answered by looking rather
-  than by arguing.
+  **And the readout answered the `.tdt` / `.arm` question: they are two LEVELS, not two
+  spellings.** The game assembles an area from rooms — files under `Rooms/`, ending `.arm`,
+  `overlay_bridge_03` and `exit_01` — and each room from tiles, files under `Tiles/`, ending
+  `.tdt`, `BuildingWall_OceanEdge_CcMM_02`. `TileStruct.TgtFilePtr` is the TILE's file by
+  definition, so what this draws is a materials list where the reference draws a floor plan.
+  Both tooltips say so outright once you put them side by side: `.../Act2/2_8/Rooms/Overlays/…`
+  over four-by-four tiles, `.../Maps/Port/Tiles/OceanEdge/…` over three-by-three.
+
+  Where the room level lives is not known, and `RoomProbe` is how it gets found rather than
+  guessed. Two places have room for an unaccounted pointer: the tile struct is 0x38 bytes with
+  0x00, 0x08, 0x30 and 0x34–0x36 mapped, leaving **0x10–0x2F** — four slots; and the terrain
+  struct has the tile vector at 0x28 and the grids at 0xD0/0xE8 with the span between them
+  untouched. Under `--debug` the probe walks both, classifies every plausible pointer with
+  `PointerPeek`, and follows anything structural ONE hop looking for wide text — because that is
+  the shape the tile's own name has (a pointer to a struct whose `+0x08` is a `std::wstring`).
+  A path under `Rooms/` or ending `.arm` is marked in the readout. Its real value is the
+  recording: **a recording can only contain reads the running build performed**, so a question
+  about bytes nothing reads was unanswerable offline — with the probe on, one session in one area
+  captures the whole neighbourhood of both structures.
+
+  It also cost a lesson worth keeping: the probe re-reads any text it finds instead of taking
+  `PointerPeek`'s summary, because that summary is trimmed at sixty characters — and the paths
+  being hunted run past it, so the extension falls off the end. A probe whose whole job is to
+  recognise `.arm` cannot read a string that stops before it, and the failure would have been
+  silent: the right answer on screen, unmarked.
 - **A death is not a hit.** Damage taken is the same pool-difference measurement pointed at the
   player, and at zero life the pool reads as *unread* rather than empty — otherwise the whole
   pool is counted as one enormous hit on the way back in, and every death becomes the worst hit

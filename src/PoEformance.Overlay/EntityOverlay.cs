@@ -3192,6 +3192,23 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Row("terrain", DescribeTerrain(), Measured, figure: true);
         }
 
+        // The hunt for the ROOM level, one line per pointer found around a tile. Only under
+        // --debug and only while it finds anything, because it is a question being worked on
+        // rather than a reading of the game: the names on the map today are TILES, one level
+        // below the rooms the reference tool shows, and these are the bytes that would say
+        // where the level above lives. A line marked ROOM? is the answer arriving.
+        if (_snapshot.Terrain is TerrainGrid probed && probed.RoomProbeLines.Count > 0)
+        {
+            foreach (string line in probed.RoomProbeLines)
+            {
+                Row(
+                    string.Empty,
+                    line,
+                    line.Contains("ROOM?", StringComparison.Ordinal) ? OverlayInk.Good : Measured,
+                    figure: true);
+            }
+        }
+
         // What the map is actually allowed to draw on, once the game's interface and any open
         // panel are taken out. The one line that separates "the projection is wrong" from "the
         // keep-out region ate the map", which look identical from a screenshot: a region in
