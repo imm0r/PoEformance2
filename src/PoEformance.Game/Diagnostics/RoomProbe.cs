@@ -46,6 +46,9 @@ public sealed class RoomProbe
     /// </remarks>
     private const int SecondHopBytes = 0x40;
 
+    /// <summary>How much of a vector's contents to look at. Its head, not the whole of it.</summary>
+    private const int ElementBytes = 0x80;
+
     /// <summary>Where the terrain struct has room for something nothing has named.</summary>
     private const int TerrainGapFrom = 0x30;
 
@@ -76,25 +79,54 @@ public sealed class RoomProbe
     }
 
     /// <summary>
-    /// Walks one tile entry and the terrain struct's unclaimed span, and says what is there.
+    /// Windows of the tile array that are read whole, spread evenly across it.
+    /// </summary>
+    /// <remarks>
+    /// THESE READS ARE FOR THE RECORDING, and the size is the whole point. A recording drops any
+    /// single read over 64 KiB, and the terrain pass reads the tile array in ONE go - 6075 tiles
+    /// of 0x38 is 340 KiB - so the array is exactly the thing a recording never contains. The
+    /// first attempt at answering this offline foundered on that: one tile in the file out of
+    /// six thousand, which cannot tell "no tile carries a room" from "no tile was looked at".
+    ///
+    /// Sixteen windows of four kilobytes is 64 KiB in total, each one small enough to be kept,
+    /// and each covering 73 consecutive tiles - so a recording gains a thousand tiles spread
+    /// across the whole area, and the sampling below draws from what it already read.
+    /// </remarks>
+    private const int Windows = 16;
+
+    private const int WindowBytes = 4096;
+
+    /// <summary>Tiles walked per window. Two is enough to notice a field every tile has.</summary>
+    private const int TilesPerWindow = 2;
+
+    /// <summary>
+    /// Walks the tile struct, the terrain struct's unclaimed span, and a sample of the array.
     /// </summary>
     /// <param name="terrainBase">The terrain struct, as a base address - it is inline.</param>
-    /// <param name="tileEntry">One tile's 0x38 bytes, by address.</param>
+    /// <param name="tileEntry">One tile's 0x38 bytes, by address, walked in full.</param>
     /// <param name="tileName">What that tile is called, so the report says which one it is.</param>
-    public IReadOnlyList<string> Probe(ulong terrainBase, ulong tileEntry, string tileName)
+    /// <param name="tileArray">The tile vector's first entry, for the sample. Optional.</param>
+    /// <param name="tiles">How many entries that vector holds.</param>
+    public IReadOnlyList<string> Probe(
+        ulong terrainBase, ulong tileEntry, string tileName, ulong tileArray = 0, long tiles = 0)
     {
         var lines = new List<string>();
 
         if (MemoryReaderExtensions.IsPlausiblePointer(tileEntry))
         {
             lines.Add($"tile 0x{tileEntry:X}  {tileName}");
-            Walk(lines, tileEntry, 0, TileEntrySize);
+            Walk(lines, tileEntry, 0, TileEntrySize, loud: true);
         }
 
         if (MemoryReaderExtensions.IsPlausiblePointer(terrainBase))
         {
             lines.Add($"terrain 0x{terrainBase:X}  +0x{TerrainGapFrom:X}..0x{TerrainGapTo:X}");
-            Walk(lines, terrainBase, TerrainGapFrom, TerrainGapTo);
+            Walk(lines, terrainBase, TerrainGapFrom, TerrainGapTo, loud: true);
+        }
+
+        if (MemoryReaderExtensions.IsPlausiblePointer(tileArray) && tiles > 0)
+        {
+            Sample(lines, tileArray, tiles);
         }
 
         if (lines.Count == 0)
@@ -105,15 +137,75 @@ public sealed class RoomProbe
         return lines;
     }
 
-    /// <summary>Classifies every pointer in a span, and follows the promising ones once more.</summary>
-    private void Walk(List<string> lines, ulong at, int from, int to)
+    /// <summary>
+    /// Reads windows of the tile array and walks a few tiles out of each, quietly.
+    /// </summary>
+    /// <remarks>
+    /// QUIETLY, because the point of the sample is the ABSENCE it can establish: one tile
+    /// proves nothing, and thirty-two tiles printing seven slots each would be two hundred
+    /// lines of the same shape. Only a room path is worth a line here; everything else is a
+    /// count at the end - which is the difference between "no tile carries a room" and "no tile
+    /// was looked at", and the reason the first recording could not settle anything.
+    /// </remarks>
+    private void Sample(List<string> lines, ulong tileArray, long tiles)
+    {
+        long span = tiles * TileEntrySize;
+        long step = Math.Max(WindowBytes, span / Windows);
+        int walked = 0;
+        int found = 0;
+
+        for (int window = 0; window < Windows; window++)
+        {
+            // Aligned to an entry, or every tile in the window would be read at an offset into
+            // its neighbour - which reads as a structure full of garbage rather than as a
+            // misalignment.
+            long at = window * step / TileEntrySize * TileEntrySize;
+            if (at + WindowBytes > span)
+            {
+                break;
+            }
+
+            // The window itself, read whole and thrown away: what it is for is the RECORDING.
+            var block = new byte[WindowBytes];
+            if (!_reader.TryRead(tileArray + (ulong)at, block))
+            {
+                continue;
+            }
+
+            for (int i = 0; i < TilesPerWindow; i++)
+            {
+                long inside = i * (WindowBytes / TilesPerWindow) / TileEntrySize * TileEntrySize;
+                walked++;
+                found += Walk(lines, tileArray + (ulong)(at + inside), 0, TileEntrySize, loud: false);
+            }
+        }
+
+        lines.Add(found > 0
+            ? $"{walked} tiles sampled across {Windows} windows - {found} room paths"
+            : $"{walked} tiles sampled across {Windows} windows - no room path in any slot");
+    }
+
+    /// <summary>
+    /// Classifies every pointer in a span, follows the promising ones, and counts room paths.
+    /// </summary>
+    /// <param name="loud">
+    /// Whether to report everything, or only what looks like a room. False for the sampled
+    /// tiles, where the finding is a COUNT and printing every slot of every one would bury it.
+    /// </param>
+    private int Walk(List<string> lines, ulong at, int from, int to, bool loud)
     {
         var block = new byte[to - from];
         if (!_reader.TryRead(at + (ulong)from, block))
         {
-            lines.Add($"  +0x{from:X2}  unreadable ({block.Length} bytes)");
-            return;
+            if (loud)
+            {
+                lines.Add($"  +0x{from:X2}  unreadable ({block.Length} bytes)");
+            }
+
+            return 0;
         }
+
+        int found = 0;
 
         for (int offset = 0; offset + 8 <= block.Length && lines.Count < MostLines; offset += 8)
         {
@@ -130,27 +222,46 @@ public sealed class RoomProbe
             }
 
             int slot = from + offset;
-            lines.Add($"  +0x{slot:X2}  {Describe(peek, value)}");
+            string line = Describe(peek, value);
+            bool room = LooksLikeRoom(line);
+            found += room ? 1 : 0;
+
+            if (loud || room)
+            {
+                lines.Add($"  +0x{slot:X2}  {line}");
+            }
 
             // One hop further, and only for the shape that could be carrying a name: a
             // pointer to a structure. Text found there is reported with BOTH offsets, because
             // "+0x10 then +0x08" is the field this would become.
             if (peek.Kind is TargetKind.Structure or TargetKind.Vector)
             {
-                Follow(lines, value, slot);
+                found += Follow(lines, value, slot, loud);
+            }
+
+            // A VECTOR's own bytes are a begin/end pair, so the thing worth looking at is not
+            // there at all - it is behind the begin pointer. The sub-tile details every tile
+            // carries are exactly this shape, and the first pass looked straight past their
+            // contents at the header holding them.
+            if (peek.Kind == TargetKind.Vector)
+            {
+                found += Elements(lines, value, slot, loud);
             }
         }
+
+        return found;
     }
 
     /// <summary>Looks one level inside a structure for the text it might be holding.</summary>
-    private void Follow(List<string> lines, ulong at, int slot)
+    private int Follow(List<string> lines, ulong at, int slot, bool loud)
     {
         var block = new byte[SecondHopBytes];
         if (!_reader.TryRead(at, block))
         {
-            return;
+            return 0;
         }
 
+        int found = 0;
         for (int offset = 0; offset + 8 <= block.Length && lines.Count < MostLines; offset += 8)
         {
             ulong value = BitConverter.ToUInt64(block, offset);
@@ -164,11 +275,68 @@ public sealed class RoomProbe
             // Only TEXT is reported from this depth. Every structure holds pointers to further
             // structures, and printing those turns one probe into a page of addresses that say
             // nothing - the string is the thing that would identify a room.
-            if (peek.Kind is TargetKind.WideText or TargetKind.Text)
+            if (peek.Kind is not (TargetKind.WideText or TargetKind.Text))
             {
-                lines.Add($"    +0x{slot:X2}+0x{offset:X2}  {Describe(peek, value)}");
+                continue;
+            }
+
+            string line = Describe(peek, value);
+            bool room = LooksLikeRoom(line);
+            found += room ? 1 : 0;
+
+            if (loud || room)
+            {
+                lines.Add($"    +0x{slot:X2}+0x{offset:X2}  {line}");
             }
         }
+
+        return found;
+    }
+
+    /// <summary>Looks at what a vector actually HOLDS, rather than at its begin/end pair.</summary>
+    private int Elements(List<string> lines, ulong vector, int slot, bool loud)
+    {
+        ulong begin = _reader.Read<ulong>(vector);
+        ulong end = _reader.Read<ulong>(vector + 8);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(begin) || end <= begin)
+        {
+            return 0;
+        }
+
+        // The head of it only. A vector can be an area's whole tile array, and reading one to
+        // look for a string in it would be reading the map twice per probe.
+        var block = new byte[(int)Math.Min(ElementBytes, (long)(end - begin))];
+        if (!_reader.TryRead(begin, block))
+        {
+            return 0;
+        }
+
+        int found = 0;
+        for (int offset = 0; offset + 8 <= block.Length && lines.Count < MostLines; offset += 8)
+        {
+            ulong value = BitConverter.ToUInt64(block, offset);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(value))
+            {
+                continue;
+            }
+
+            PeekResult peek = PointerPeek.Peek(_reader, value);
+            if (peek.Kind is not (TargetKind.WideText or TargetKind.Text))
+            {
+                continue;
+            }
+
+            string line = Describe(peek, value);
+            bool room = LooksLikeRoom(line);
+            found += room ? 1 : 0;
+
+            if (loud || room)
+            {
+                lines.Add($"    +0x{slot:X2}[+0x{offset:X2}]  {line}");
+            }
+        }
+
+        return found;
     }
 
     /// <summary>

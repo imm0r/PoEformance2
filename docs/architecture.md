@@ -1609,6 +1609,29 @@ interesting part was not the feature:
   being hunted run past it, so the extension falls off the end. A probe whose whole job is to
   recognise `.arm` cannot read a string that stops before it, and the failure would have been
   silent: the right answer on screen, unmarked.
+
+  **What the first recording settled** (Gallows/Act2/2_5, 2026-09), and it is worth having in
+  writing because two of the three answers close off an approach:
+
+  - The rooms are in memory and they are the layout in words: 23 of them for that one zone —
+    `Rooms/BonePassage/BonesEntrance_Cc_1.arm`, `Rooms/Fills/ritualsite_01.arm`,
+    `Rooms/Unique/bonesouter_landmark.arm`.
+  - **A room's name cannot be derived from its tiles.** Zero of those 23 share a stem with any
+    `.tdt` in the recording, and the directories say why: rooms live under the AREA
+    (`Gallows/Act2/2_5/Rooms/…`) while tiles live under the TILESET
+    (`Desert/Badlands/…`), shared by every zone built from it. The cheap answer is dead.
+  - **They arrive through the loaded-files table**, not through the terrain. Every one of the 42
+    pointers to a room object sits at a multiple of 0x18 from the next — `FileRecordSlot.Size` —
+    so what put them in the recording is the preload watcher walking the file table, and a room
+    object has `TgtFile`'s own shape (`+0x08` is the `std::wstring`). That means the room NAMES
+    of an area are already reachable today, stamped with the area-change counter; what is not
+    there is where each one sits.
+  - And the reason that recording could not settle where the room hangs off the terrain: **the
+    tile array never lands in a recording.** The terrain pass reads it in one 340 KiB go and a
+    recording drops any read over 64 KiB, so the file held exactly one tile out of 6075 — which
+    cannot tell "no tile carries a room" from "no tile was looked at". Hence the probe's sixteen
+    4 KiB windows: small enough to be kept, spread across the array, and the tiles it samples
+    are drawn from them.
 - **A death is not a hit.** Damage taken is the same pool-difference measurement pointed at the
   player, and at zero life the pool reads as *unread* rather than empty — otherwise the whole
   pool is counted as one enormous hit on the way back in, and every death becomes the worst hit

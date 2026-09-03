@@ -106,6 +106,77 @@ public class RoomProbeTests
         Assert.Equal("nothing to probe - no terrain or no tile", Assert.Single(lines));
     }
 
+    [Fact]
+    public void AVectorIsFollowedIntoWhatItHOLDS()
+    {
+        // The sub-tile details every tile carries are a vector, and the first pass looked
+        // straight past their contents at the begin/end pair holding them. A pointer to an
+        // array is not the array.
+        const ulong vector = 0x5000_0000;
+        const ulong elements = 0x5000_1000;
+
+        var memory = new FakeMemoryReader();
+        memory.Place(Tile, new byte[0x38]);
+        memory.Place(Tile + 0x10, vector);
+
+        // begin/end, bracketing something a plausible element size divides.
+        memory.Place(vector, elements);
+        memory.Place(vector + 8, elements + 0x40);
+
+        memory.Place(elements, new byte[0x80]);
+        memory.Place(elements + 0x18, Detail);
+        memory.Place(Detail, new byte[0x40]);
+        memory.Place(Text, new byte[1024]);
+        memory.PlaceStdWString(Detail + 0x08, "Metadata/Terrain/X/Rooms/inside_a_vector.arm", Text);
+
+        // The string is reached through the vector's ELEMENTS, so it is the element pointer
+        // that has to be peeked - which is why this fixture puts the path behind one.
+        memory.Place(elements + 0x20, Text);
+
+        IReadOnlyList<string> lines = new RoomProbe(memory).Probe(Terrain, Tile, "some.tdt");
+
+        Assert.Contains(lines, line => line.Contains("ROOM?", StringComparison.Ordinal)
+            && line.Contains("inside_a_vector", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ManyTilesAreSampledAndTheAbsenceIsReported()
+    {
+        // ONE tile proves nothing, and that is exactly what the first recording could show:
+        // a single entry out of six thousand cannot tell "no tile carries a room" from "no
+        // tile was looked at". The count is the finding.
+        const ulong array = 0x6000_0000;
+
+        var memory = new FakeMemoryReader();
+        memory.Place(array, new byte[0x38 * 4000]);
+
+        IReadOnlyList<string> lines = new RoomProbe(memory).Probe(0, 0, string.Empty, array, 4000);
+
+        string summary = Assert.Single(lines, line => line.Contains("sampled", StringComparison.Ordinal));
+        Assert.Contains("no room path in any slot", summary, StringComparison.Ordinal);
+        Assert.Contains("32 tiles", summary, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ARoomFoundInASampledTileIsStillReported()
+    {
+        // The sample is quiet about ordinary slots and never about this one: a hit is the whole
+        // reason it runs.
+        const ulong array = 0x6000_0000;
+
+        var memory = new FakeMemoryReader();
+        memory.Place(array, new byte[0x38 * 4000]);
+        memory.Place(array + 0x10, Detail);   // the first sampled tile, in the first window
+        memory.Place(Detail, new byte[0x40]);
+        memory.Place(Text, new byte[1024]);
+        memory.PlaceStdWString(Detail + 0x08, "Metadata/Terrain/X/Rooms/found_by_sampling.arm", Text);
+
+        IReadOnlyList<string> lines = new RoomProbe(memory).Probe(0, 0, string.Empty, array, 4000);
+
+        Assert.Contains(lines, line => line.Contains("found_by_sampling", StringComparison.Ordinal));
+        Assert.Contains(lines, line => line.Contains("1 room paths", StringComparison.Ordinal));
+    }
+
     [Theory]
     [InlineData("Metadata/Terrain/X/Rooms/Overlays/a.arm", true)]
     [InlineData("wide \"Metadata/Terrain/X/Rooms/y.arm\"", true)]

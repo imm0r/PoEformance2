@@ -761,7 +761,7 @@ public sealed class TerrainReader
         // struct's address and the tile vector's, and after the pass that picked which tile.
         _probe = ProbeRooms && _probeTile >= 0
             ? new Diagnostics.RoomProbe(_reader).Probe(
-                terrainBase, first + (ulong)(_probeTile * TileEntrySize), _probeName)
+                terrainBase, first + (ulong)(_probeTile * TileEntrySize), _probeName, first, count)
             : [];
 
         var heights = new float[count];
