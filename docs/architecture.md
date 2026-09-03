@@ -1642,8 +1642,25 @@ interesting part was not the feature:
   16-byte `{object, number}` elements, one to seven of them, and every object shares a single
   vtable. See `TileStruct` in the schema, which now records the census.
 
-  Finding that cost the probe a correction worth keeping: **it had been peeking `+0x10` as a
-  pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
+  **What the third recording settled, and it closes the terrain search.** With the probe opening
+  inline vectors, the terrain struct's first 0x400 bytes map out completely — and hold no room:
+  `+0x28` is the tile array, `+0x50` is 21648 bytes over an 87×81 area, which is exactly
+  `(87+1)×(81+1)×3` and so is per tile CORNER, and `+0x68` is a vector of the area's ground-type
+  files (`bone_fill.gt`, `waypoint_ground.gt`, …). Between the three recordings that is the tile
+  ruled out on 2336 samples and the terrain struct ruled out on its whole head, with every
+  pointer to a room object in all three sitting at a multiple of `0x18` — the file table, every
+  time. **The game does not appear to keep the room→position mapping anywhere this tool can
+  read.**
+
+  Which leaves the files themselves, and the machinery for that already exists: the loaded-files
+  table names the rooms of the current area, and `GameFiles` reads any path out of the game's
+  bundles. If a `.arm` says which TILES it is built from, the layout can be recovered without a
+  single new offset — rooms known, patterns known, tile grid already read. `RoomFiles` is the
+  one question that decides it, and it reports rather than parses: nobody here has seen one of
+  these files, and the count of `.tdt` mentions in it is the whole answer.
+
+  Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
+  `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of
   the struct was invisible in a probe designed to find exactly that kind of thing. It now tests
   three consecutive slots for begin/end/capacity, and does so as an ADDITION to the ordinary

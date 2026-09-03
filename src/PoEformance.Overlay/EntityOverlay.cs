@@ -765,6 +765,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// The shipped list, read on demand. Null means there is none to offer, and the editor then
     /// says what it said before anything shipped: build your own from the area tab.
     /// </param>
+    /// <summary>
+    /// Opens the area's room files out of the game's own bundles, when something can.
+    /// </summary>
+    /// <remarks>
+    /// Null unless the App attaches it, which it only does with an install to read. The overlay
+    /// has no business finding the game's files; what it owns is the button, and a button with
+    /// nothing behind it is simply not drawn. See RoomFiles for what the answer is for.
+    ///
+    /// SET IT BEFORE <see cref="AttachPreload"/>, which is where the window is built and where
+    /// this is read. Nothing enforces that, so it is written down here rather than discovered
+    /// as a button that never appears.
+    /// </remarks>
+    public Action? LookInsideRooms { get; set; }
+
     public void AttachPreload(
         PreloadWatch watch,
         Action lookAgain,
@@ -790,7 +804,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _tools.AsTabs(Area);
 
         var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Area);
-        var window = new PreloadWindow(watch, lookAgain, sweep, () => PreloadListChanged?.Invoke(watch.Watching));
+        var window = new PreloadWindow(
+            watch, lookAgain, sweep, () => PreloadListChanged?.Invoke(watch.Watching), LookInsideRooms);
         _tools.Add(
             20,
             "preload",
