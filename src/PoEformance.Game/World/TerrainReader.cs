@@ -379,6 +379,8 @@ public sealed class TerrainReader
     private readonly IMemoryReader _reader;
     private readonly int _terrainMetadata;
     private readonly int _walkableData;
+    private readonly int _cornerData;
+    private readonly int _groundTypeFiles;
     private readonly int _bytesPerRow;
     private readonly int _totalTilesX;
     private readonly int _totalTilesY;
@@ -420,6 +422,8 @@ public sealed class TerrainReader
 
         StructDef terrain = schema.Structs["TerrainMetadata"];
         _walkableData = terrain.OffsetOf("GridWalkableData");
+        _cornerData = terrain.OffsetOf("TileCornerData");
+        _groundTypeFiles = terrain.OffsetOf("GroundTypeFiles");
         _bytesPerRow = terrain.OffsetOf("BytesPerRow");
         _totalTilesX = terrain.OffsetOf("TotalTilesX");
         _totalTilesY = terrain.OffsetOf("TotalTilesY");
@@ -433,6 +437,66 @@ public sealed class TerrainReader
         _tileIdX = tile.OffsetOf("TileIdX");
         _tileIdY = tile.OffsetOf("TileIdY");
         _tgtPath = schema.Structs["TgtFile"].OffsetOf("TgtPath");
+    }
+
+    /// <summary>
+    /// The area's ground-type files, in the order an index into them would run.
+    /// </summary>
+    /// <remarks>
+    /// Eight-byte pointers to file objects whose path sits where a tile's does, so the same
+    /// struct and the same cache serve both. A NULL SLOT IS DATA: every area's list starts with
+    /// one, so it is kept in place - dropping it would shift every index above it onto another
+    /// type's name, which is the one failure a reader of an index table must not have.
+    ///
+    /// Read for the corner probe alone. Nothing on the map depends on it, and the theory it was
+    /// first read for - that a landscape nibble indexes it - is dead; see the schema.
+    /// </remarks>
+    private IReadOnlyList<string> ReadGroundTypeFiles(ulong terrainBase)
+    {
+        ulong first = _reader.ReadPointer(terrainBase + (ulong)_groundTypeFiles);
+        ulong last = _reader.ReadPointer(terrainBase + (ulong)_groundTypeFiles + 8);
+        if (first == 0 || last <= first)
+        {
+            return [];
+        }
+
+        long bytes = (long)(last - first);
+        if (bytes % 8 != 0 || bytes / 8 > 64)
+        {
+            return [];
+        }
+
+        var pointers = new byte[bytes];
+        if (!_reader.TryRead(first, pointers))
+        {
+            return [];
+        }
+
+        var paths = new List<string>((int)(bytes / 8));
+        for (int i = 0; i + 8 <= pointers.Length; i += 8)
+        {
+            ulong file = BitConverter.ToUInt64(pointers, i);
+            if (file == 0)
+            {
+                paths.Add(string.Empty);
+                continue;
+            }
+
+            if (!MemoryReaderExtensions.IsPlausiblePointer(file))
+            {
+                return [];
+            }
+
+            if (!_tgtPaths.TryGetValue(file, out string? read))
+            {
+                read = _reader.ReadStdWString(file + (ulong)_tgtPath, 128);
+                _tgtPaths[file] = read;
+            }
+
+            paths.Add(read);
+        }
+
+        return paths;
     }
 
     /// <summary>Tile-file paths are static game data; cache them by their pointer.</summary>
@@ -768,6 +832,19 @@ public sealed class TerrainReader
             ? new Diagnostics.RoomProbe(_reader).Probe(
                 terrainBase, first + (ulong)(_probeTile * TileEntrySize), _probeName, first, count)
             : [];
+
+        // And the corners beside it, which is a different question about the same area: whether
+        // any of the three bytes per tile corner indexes the ground-type list. See CornerProbe -
+        // it is the one route to placing a ROOM that has not been ruled out, and this is the
+        // measurement that decides it. Under --debug like the rest, and small enough to record.
+        if (ProbeRooms)
+        {
+            _probe = [.. _probe, .. new Diagnostics.CornerProbe(_reader).Probe(
+                terrainBase + (ulong)_cornerData,
+                (int)tilesX,
+                (int)tilesY,
+                ReadGroundTypeFiles(terrainBase))];
+        }
 
         var heights = new float[count];
         for (long i = 0; i < count; i++)

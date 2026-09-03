@@ -1683,15 +1683,32 @@ interesting part was not the feature:
   evidence — a field constant across thirty-two files is a header, and one that tracks the grid
   is a dimension.
 
-  **The `.arm` format, read off 32 real files.** UTF-16 text: `version <n>`, a length-prefixed
-  string table (the type files it uses, plus bare tags), a few header numbers, the room's own tag
-  (`""`, `"end"`, `"Underground_NS_01"`), then `k <W> <H> <four side values> …` — the room's
-  record — then those four side values again one per line, then the grid, one row per line, cells
-  being `n`, `s`, `f <index into the string table>` or `k <24 numbers>`, then length-prefixed
-  doodad placements. Two readings are settled rather than assumed: the four side values are
-  **connections** (a `_Cnr_` room has two, an `_End_` room one), and a doodad's leading integers
-  are **grid cells** — `853.462 / (250/23) = 78.52` against a written `78`, which is this
-  project's own `GridToWorld` constant and nothing else.
+  **The `.arm` format.** UTF-16 text: `version <n>`, a length-prefixed string table, a dimension
+  list, a number list, the room's own tag (`""`, `"end"`, `"Underground_NS_01"`), another number
+  list, the root SLOT, a variable block of `sum(numbers[0]) * 2` lines, a points-of-interest
+  block, the grid (one row per line, `root.height` rows of `root.width` cells, each `n`, `s`,
+  `o`, `f <string index>` or `k <24 numbers>`), and a second points-of-interest block holding the
+  doodads. A slot's 24 numbers are width, height, then FOUR EDGE TYPES as string indices in the
+  order n, w, s, e, then `exit`/`virtual_exit` per edge, then a ground type and a height per
+  CORNER (sw, se, ne, nw), then the slot's own tag and its origin corner. String indices are
+  1-based, 0 meaning none.
+
+  **That layout is RePoE's, not this project's** — `RePoE/poe/file/arm.py` in the repoe-fork,
+  which parses the format properly — and it corrects a reading taken off the files by eye and
+  written down here as settled. The eye version had the four edge indices as "connection counts",
+  the exits as edge lengths, the per-corner grounds and heights as "eight more numbers", and the
+  variable block as "the four sides again". The CONCLUSION drawn from it survives (a `_Cnr_` room
+  carries an edge type on two sides, an `_End_` room on one, because a side with an edge type is
+  a side that joins something) but the mechanism under it was invented. Reading a format off its
+  files is how you get a description that happens to fit the files you looked at. The one reading
+  that was independently anchored is the doodad's: its leading integers are **grid cells**,
+  `853.462 / (250/23) = 78.52` against a written `78`, which is this project's own `GridToWorld`
+  constant and nothing else.
+
+  A `.tdt` is small and binary by comparison (`RePoE/poe/file/tdt.py`): a version, a UTF-16
+  string blob, and then EITHER a parent `.tdt` plus a tag, OR a `.tgt` plus a tag. So the tile a
+  tile-struct names can inherit from another tile, and it carries a tag of its own that this tool
+  has never read.
 
   What it does NOT contain is a tile. Not one `.tdt` across all 32, in either encoding. A room
   names only its edge and ground types, and **the reference offers no way round that**: `.arm`
@@ -1817,6 +1834,24 @@ interesting part was not the feature:
   Had the gate been the thing reading those strings, this would have shipped. **A diagnostic is
   code, and it needs the same suspicion as the thing it diagnoses** — the one place in this
   project where a wrong number is guaranteed to be believed is the readout built to be trusted.
+
+  **And a route that survives all of it, unproven.** RePoE's parser says a room slot carries a
+  ground type and a HEIGHT per corner — sw, se, ne, nw — and the terrain struct has an array at
+  `+0x50` of exactly `(tilesX+1) * (tilesY+1) * 3` bytes, three per tile CORNER. 21648 over an
+  87x81 area and 11163 over a 60x60, both exact. Two independent measurements of the same shape,
+  and if one of those three bytes indexes `GroundTypeFiles` then a room's corner pattern is a
+  stamp that could be searched for in the area's.
+
+  What is known so far says nothing either way, and saying so is the point: a probe sweep
+  happened to capture 42 consecutive corners from the start of each array, and they read
+  `byte0=1` (bone_fill) in the Badlands, `byte0=2` (vaal_building_inside) in the Vaal area,
+  `byte1=0` and `byte2=11` in both. Byte 0 is in range of each area's list and differs between
+  them; byte 2 is 11 against lists of seven and six, so it is not an index. But 42 adjacent
+  corners at an array's start are one uniform strip, and a constant over them is what almost any
+  field would give. `CornerProbe` reads the whole array instead — it fits under the recording cap
+  — and histograms all three lanes with every value counted, including the ones no list entry can
+  name. That last part is the lesson from the landscape grid rather than a precaution: folding
+  the unnameable values into one number is what left that verdict unactionable.
 
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies

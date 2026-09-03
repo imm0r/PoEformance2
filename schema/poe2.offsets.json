@@ -523,6 +523,11 @@
           "invariant": { "kind": "vectorSane", "elementSize": 56, "maxCount": 16777216 },
           "comment": "StdVector<TileStructure>, each 0x38 bytes."
         },
+        "TileCornerData": {
+          "offset": "0x50", "type": "stdVector",
+          "invariant": { "kind": "vectorSane", "elementSize": 1, "maxCount": 16777216 },
+          "comment": "THREE BYTES PER TILE CORNER. Measured 2026-09: 21648 bytes over an 87x81 area, which is exactly (87+1)*(81+1)*3, and 11163 over a 60x60, exactly (60+1)*(61)*3 - so it is indexed by CORNER, one more than the tile count each way. Read only by CornerProbe under --debug, and only to answer one question: a room file carries a ground type and a HEIGHT per corner of every slot (RePoE/poe/file/arm.py), so if one of these three bytes indexes GroundTypeFiles then a room's corner pattern is a stamp that could be searched for in the area's - the one route to placing a room that three recordings did not rule out. What little has been seen says nothing yet: the 42 consecutive corners a probe sweep happened to capture read byte0=1 (bone_fill) in the Badlands and byte0=2 (vaal_building_inside) in a Vaal area, byte1=0 and byte2=11 in both, but 42 adjacent corners at the array\u0027s start are one uniform strip and prove nothing about the rest. The whole array is 21648 bytes, under the recording cap, so the histogram is the measurement that settles it."
+        },
         "GroundTypeFiles": {
           "offset": "0x68", "type": "stdVector",
           "invariant": { "kind": "vectorSane", "elementSize": 8, "maxCount": 64 },
