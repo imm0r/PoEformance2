@@ -458,7 +458,13 @@ public sealed class RoomProbe
 
         // The head of it only. A vector can be an area's whole tile array, and reading one to
         // look for a string in it would be reading the map twice per probe.
-        var block = new byte[(int)Math.Min(ElementBytes, (long)(end - begin))];
+        //
+        // UNSIGNED, because these are POINTERS. Compared as a long, a garbage pair spanning 2^63
+        // or more goes negative, and `new byte[negative]` is an OverflowException - the crash
+        // RoomPlacementProbe died of in the field, from the same arithmetic. Whether a heap
+        // happens to hold such a pair is a fact about the area, so this fails in one and not the
+        // next. Contents() above is safe only because its own guard demands span > 0.
+        var block = new byte[(int)Math.Min((ulong)ElementBytes, end - begin)];
         if (!_reader.TryRead(begin, block))
         {
             return 0;
