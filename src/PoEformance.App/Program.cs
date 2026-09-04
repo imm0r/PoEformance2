@@ -2372,63 +2372,78 @@ internal static class Program
         overlay.Coverage = coverage;
         overlay.Damage = damage;
 
+        // A DIAGNOSTIC BUTTON THAT CAN DO NOTHING VISIBLE IS WORSE THAN NO BUTTON, and all three
+        // of the ones below could. Each ran its work in a Task.Run whose catch named two
+        // exception types; anything else - a schema field that moved, a null, an overflow - left
+        // a faulted Task nobody observes and a panel that simply did not change. That is what
+        // "I press it and nothing happens" IS, and it cost a round of hunting the wrong thing.
+        //
+        // So every failure is reported in the panel, with its TYPE: "KeyNotFoundException:
+        // Schema struct 'TgtFile' has no field 'TgtPath'" says where to look, where a bare
+        // message often does not. And the press is acknowledged before the work starts, so a
+        // button that ran and found nothing can never look like a button that did not fire.
+        static void RunDiagnostic(
+            PoEformance.Features.PreloadWatch watch,
+            string doing,
+            Func<IReadOnlyList<string>> work)
+        {
+            watch.Swept([doing + "..."]);
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    watch.Swept(work());
+                }
+                catch (Exception exception)
+                {
+                    watch.Swept([$"{doing} failed - {exception.GetType().Name}: {exception.Message}"]);
+                }
+            });
+        }
+
         // BEFORE AttachPreload, which is where the button that runs this is built. Only offered
         // with an install to read: the rooms of an area are named in memory and placed nowhere
         // this tool can see, so the files themselves are the last place that could say where
         // each one sits - see RoomFiles for what the answer decides.
         if (installed is not null)
         {
-            overlay.LookInsideRooms = () => _ = Task.Run(() =>
-            {
-                try
-                {
-                    preload.Swept(PoEformance.Game.Diagnostics.RoomFiles.Describe(
-                        preload.All,
-                        path => PoEformance.Game.Files.GameArt.ReadRaw(installed, path)));
-                }
-                catch (Exception exception) when (exception is IOException or InvalidDataException)
-                {
-                    preload.Swept([exception.Message]);
-                }
-            });
+            overlay.LookInsideRooms = () => RunDiagnostic(
+                preload,
+                "looking inside the rooms",
+                () => PoEformance.Game.Diagnostics.RoomFiles.Describe(
+                    preload.All,
+                    path => PoEformance.Game.Files.GameArt.ReadRaw(installed, path)));
 
             // And the whole of them, decoded, beside the loaded-file dumps. The readout is
             // eight strings per room, which cannot answer a question about the format itself.
-            overlay.WriteRoomsOut = () => _ = Task.Run(() =>
-            {
-                try
+            overlay.WriteRoomsOut = () => RunDiagnostic(
+                preload,
+                "writing the rooms out",
+                () =>
                 {
                     string? written = PoEformance.Game.Diagnostics.RoomFiles.Dump(
                         preload.Area,
                         preload.All,
                         path => PoEformance.Game.Files.GameArt.ReadRaw(installed, path));
-                    preload.Swept([
+                    return [
                         written is null
                             ? "could not write the rooms out"
-                            : $"rooms written to {written}"]);
-                }
-                catch (Exception exception) when (exception is IOException or InvalidDataException)
-                {
-                    preload.Swept([exception.Message]);
-                }
-            });
+                            : $"rooms written to {written}"];
+                });
         }
 
         // NEEDS NO INSTALL, unlike the two above: it reads memory rather than the game's files,
         // so it is attached whether or not the bundles can be opened. The one thing it needs is
         // the loaded-file table, which is the very list this page is about.
-        overlay.HuntRoomPlacements = () => _ = Task.Run(() =>
+        overlay.HuntRoomPlacements = () => RunDiagnostic(preload, "hunting the placements", () =>
         {
-            try
+            if (fileRoot == 0)
             {
-                if (fileRoot == 0)
-                {
-                    preload.Swept(["placements: the FileRoot static did not resolve"]);
-                    return;
-                }
+                return ["placements: the FileRoot static did not resolve"];
+            }
 
-                PoEformance.Core.Diagnostics.GameChainAddresses chain =
-                    PoEformance.Core.Diagnostics.GameChain.Resolve(reader, schema, gameStatesStatic);
+            PoEformance.Core.Diagnostics.GameChainAddresses chain =
+                PoEformance.Core.Diagnostics.GameChain.Resolve(reader, schema, gameStatesStatic);
 
                 // THE ADDRESSES ARE THE SEARCH. Every loaded file has a record, and the walk
                 // gives its address - so the area's rooms become a set of known pointers that
@@ -2436,31 +2451,25 @@ internal static class Program
                 // BOTH SETS, and the second is what makes a miss mean anything: the rooms are
                 // what is searched for, and every file is what the control needs - the tiles
                 // refer to .tdt files, so proving the search's premise takes more than rooms.
-                var rooms = new Dictionary<ulong, string>();
-                var files = new Dictionary<ulong, string>();
-                foreach (ulong record in preloadReader.Records(fileRoot))
+            var rooms = new Dictionary<ulong, string>();
+            var files = new Dictionary<ulong, string>();
+            foreach (ulong record in preloadReader.Records(fileRoot))
+            {
+                string path = preloadReader.NameOf(record);
+                if (path.Length == 0)
                 {
-                    string path = preloadReader.NameOf(record);
-                    if (path.Length == 0)
-                    {
-                        continue;
-                    }
-
-                    files[record] = path;
-                    if (path.EndsWith(".arm", StringComparison.OrdinalIgnoreCase))
-                    {
-                        rooms[record] = path;
-                    }
+                    continue;
                 }
 
-                preload.Swept(
-                    new PoEformance.Game.Diagnostics.RoomPlacementProbe(reader, schema)
-                        .Probe(chain.AreaInstance, rooms, files));
+                files[record] = path;
+                if (path.EndsWith(".arm", StringComparison.OrdinalIgnoreCase))
+                {
+                    rooms[record] = path;
+                }
             }
-            catch (Exception exception) when (exception is IOException or InvalidOperationException)
-            {
-                preload.Swept([exception.Message]);
-            }
+
+            return new PoEformance.Game.Diagnostics.RoomPlacementProbe(reader, schema)
+                .Probe(chain.AreaInstance, rooms, files);
         });
 
         overlay.AttachPreload(

@@ -96,7 +96,16 @@ public sealed class RoomPlacementProbe
         _terrainMetadata = schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata");
         _tileDetails = schema.Structs["TerrainMetadata"].OffsetOf("TileDetailsPtr");
         _tgtFile = schema.Structs["TileStruct"].OffsetOf("TgtFilePtr");
-        _tgtPath = schema.Structs["TgtFile"].OffsetOf("TgtPath");
+
+        // OPTIONAL, unlike the three above, and that is deliberate. The path only answers the
+        // control's SECOND question - whether a file the pointer missed is in the table at all -
+        // so a schema without it should cost that refinement and not the whole hunt. Looked up
+        // defensively because OffsetOf throws, and a diagnostic that dies on a moved field
+        // presents as a button that does nothing, which is the exact failure this probe is for.
+        _tgtPath = schema.Structs.TryGetValue("TgtFile", out StructDef? tgt)
+                   && tgt.Field("TgtPath") is { } path
+            ? path.Offset
+            : -1;
     }
 
     /// <summary>
@@ -160,6 +169,11 @@ public sealed class RoomPlacementProbe
             if (files.ContainsKey(file))
             {
                 known++;
+                continue;
+            }
+
+            if (_tgtPath < 0)
+            {
                 continue;
             }
 
