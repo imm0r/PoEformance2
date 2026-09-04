@@ -77,6 +77,17 @@ public sealed class TerrainGroundTypes
         TotalCorners = totalCorners;
         Note = note;
         Lines = lines;
+
+        // LAST, because it is asked of the finished object: Names and Standable read the three
+        // lists assigned above. Computed once here rather than per call because the layer asks
+        // it for every tile in the area and the answer is a fact about the AREA.
+        bool any = false;
+        for (int type = 0; type < types.Count && !any; type++)
+        {
+            any = Names(type) && Standable(type);
+        }
+
+        AnyStandableNamed = any;
     }
 
     /// <summary>The area's ground-type files, in the order byte 0 indexes them.</summary>
@@ -316,6 +327,29 @@ public sealed class TerrainGroundTypes
         => (uint)type < (uint)TotalCorners.Count
            && TotalCorners[type] > 0
            && WalkableCorners[type] * 4 > TotalCorners[type];
+
+    /// <summary>True when at least one NAMED type in this area is ground you can stand on.</summary>
+    /// <remarks>
+    /// What decides whether walls and ceilings get named. False in an area whose floor carries the
+    /// game's unnamed slot - a Maelstrom - where a wall and an abyss are the whole of what there is
+    /// to say. See <see cref="WorthNaming"/>, which is where it is applied.
+    /// </remarks>
+    public bool AnyStandableNamed { get; }
+
+    /// <summary>
+    /// Whether a type is one this area should write on the map.
+    /// </summary>
+    /// <remarks>
+    /// THE WHOLE FILTER, IN ONE PLACE, and that is the point of it being here rather than in the
+    /// caller. Most of an area is scenery you cannot enter, so naming every wall patch buries the
+    /// labels worth reading; but a blanket filter empties the map in an area whose only named
+    /// types ARE walls. So the filter applies only when it leaves something behind.
+    ///
+    /// It lives on the ground rather than on the grid because a diagnostic that compares what the
+    /// map draws against what it could draw has to apply the SAME rule - and a rule copied into
+    /// two places is a comparison that can quietly stop being one.
+    /// </remarks>
+    public bool WorthNaming(int type) => Names(type) && (!AnyStandableNamed || Standable(type));
 
     /// <summary>
     /// Whether the types disagree about walkability enough to be real.

@@ -178,31 +178,21 @@ public sealed class TerrainGrid
             return ([], false);
         }
 
-        // WALLS AND CEILINGS ONLY WHEN THEY ARE WHAT IS LEFT. Most of an area is scenery you
-        // cannot enter, so naming every wall patch buries the handful of labels worth reading -
-        // the same thing that made the ROOM names unusable until they were filtered. But a
-        // blanket filter empties the map in a Maelstrom, where the floor carries the unnamed
-        // slot and the only NAMED types are a wall and an abyss: there, knowing which unenterable
-        // region is a fall and which is a wall is the whole of what this layer can say.
+        // WALLS AND CEILINGS ONLY WHEN THEY ARE WHAT IS LEFT - see TerrainGroundTypes.WorthNaming,
+        // which holds the rule so that the resolution probe can apply the same one instead of a
+        // copy of it.
         //
-        // So the filter applies only when it leaves something behind.
-        bool anyStandable = false;
-        for (int type = 0; type < Ground.Types.Count && !anyStandable; type++)
-        {
-            anyStandable = Ground.Names(type) && Ground.Standable(type);
-        }
-
         // THE BLANK SLOT IS NOT A REGION, because it has no name to write - not because it is
-        // empty ground. In that same Maelstrom the blank IS the floor, 635 of the area's 679
-        // walkable corners. It is real ground the game declined to name, it counts for every
-        // measurement (see TerrainGroundTypes.Separates), and only labelling it says nothing.
-        // A copy rather than a change to TileType, which stays the faithful index: "this tile
-        // has no NAMED type" and "this tile was not read" are different facts.
+        // empty ground. In a Maelstrom the blank IS the floor, 635 of the area's 679 walkable
+        // corners. It is real ground the game declined to name, it counts for every measurement
+        // (see TerrainGroundTypes.Separates), and only labelling it says nothing. A copy rather
+        // than a change to TileType, which stays the faithful index: "this tile has no NAMED
+        // type" and "this tile was not read" are different facts.
         int[] named = new int[Ground.TileType.Length];
         for (int i = 0; i < named.Length; i++)
         {
             int type = Ground.TileType[i];
-            named[i] = Ground.Names(type) && (!anyStandable || Ground.Standable(type)) ? type : -1;
+            named[i] = Ground.WorthNaming(type) ? type : -1;
         }
 
         bool[] walkable = WalkableTileMask();
@@ -210,10 +200,41 @@ public sealed class TerrainGrid
         return (
             TerrainRooms.Find(
                 [.. Ground.Types], named, wide, TilesY, (x, y) => walkable[(y * wide) + x]),
-            !anyStandable);
+            !Ground.AnyStandableNamed);
     }
 
     private (IReadOnlyList<TerrainRoom> Regions, bool Fallback)? _ground;
+
+    /// <summary>
+    /// What the per-tile majority costs, measured against the same map at corner resolution.
+    /// </summary>
+    /// <remarks>
+    /// See <see cref="Diagnostics.GroundResolutionProbe"/> for the question. Under --debug only,
+    /// like the other terrain probes, because it is a question being settled rather than a reading
+    /// of the game.
+    ///
+    /// CACHED ON THE THRESHOLD IT WAS ASKED WITH. Two flood fills over five times the area's cells
+    /// is not a per-frame cost, and the readout asks on every frame it is open; but the answer
+    /// genuinely changes when the smallest-patch slider moves, so keying the cache on anything less
+    /// would show a stale table beside a slider that appears to do nothing.
+    /// </remarks>
+    public IReadOnlyList<string> GroundResolution(int minTiles)
+    {
+        if (_resolution is { } done && done.MinTiles == minTiles)
+        {
+            return done.Lines;
+        }
+
+        bool[] walkable = WalkableTileMask();
+        int wide = TilesX;
+        IReadOnlyList<string> lines = Diagnostics.GroundResolutionProbe.Measure(
+            Ground, TilesX, TilesY, (x, y) => walkable[(y * wide) + x], minTiles);
+
+        _resolution = (minTiles, lines);
+        return lines;
+    }
+
+    private (int MinTiles, IReadOnlyList<string> Lines)? _resolution;
 
     /// <summary>
     /// Why the heights are, or are not, here.

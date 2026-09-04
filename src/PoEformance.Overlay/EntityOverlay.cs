@@ -3259,6 +3259,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     line.Contains("ROOM?", StringComparison.Ordinal) ? OverlayInk.Good : Measured,
                     figure: true);
             }
+
+            // And what the per-tile majority costs, beside it and behind the same --debug gate.
+            // The ground layer reduces each tile's four corners to one type while the game paints
+            // all four; this counts whether that ever DELETES a type from the map, which is the
+            // only way the reduction changes what a person reads. See GroundResolutionProbe.
+            //
+            // Asked with the layer's own threshold rather than a constant, because the answer is
+            // about the patches the map would keep and that is the number deciding which ones
+            // those are.
+            foreach (string line in probed.GroundResolution(_ground.MinTiles))
+            {
+                Row(
+                    string.Empty,
+                    line,
+                    line.Contains("NAMED NOWHERE TODAY", StringComparison.Ordinal)
+                        ? OverlayInk.Good
+                        : Measured,
+                    figure: true);
+            }
         }
 
         // What the map is actually allowed to draw on, once the game's interface and any open
