@@ -1701,6 +1701,14 @@ interesting part was not the feature:
   reads those fields, so the correction costs nothing and prevents the next person trusting a
   name that is wrong.
 
+  **And a renderer says what UNIT they are in.** `annalithic/poeterrain/Assets/ArmImportComponent.cs`
+  builds a mesh per slot with `x = sizeX * 3`, then treats `edgeLengthDown == x` as the special
+  case "the edge runs the whole way". So an edge length is measured in THIRDS OF A TILE, and 3 is
+  a full 1x1 edge - which is exactly why 3 dominates the dump: most slots are single tiles whose
+  edge spans them completely. Of the ten values seen, eight (3, 6, 9, 12, 15, 18, 21, 99) are
+  multiples of three, and the two that are not, 1 and 4, are transitions partway along a wider
+  slot. The correction is no longer only "these are not booleans"; the numbers are accounted for.
+
   Two parsers now AGREE on the corners, which is what makes the ground-stamp measurement above
   worth its verdict: RePoE puts `sw, se, ne, nw` at 14..17 with heights at 18..21, and
   `Arm.cs` reads `groundTypeDownLeft, DownRight, UpRight, UpLeft` then the four heights, at the
@@ -1724,6 +1732,29 @@ interesting part was not the feature:
   the corner array reports at those same corners. That would confirm the ground layer against the
   game's own FILES rather than only against walkability. Not built; recorded because it is the
   strongest check still available to that feature.
+
+  **A TILE IS PAINTED AS FOUR QUARTERS, ONE PER CORNER — the game does not take a majority.**
+  `ArmImportComponent.cs` is a renderer rather than a parser, and that is what makes it say
+  something the parsers cannot. Its `CreateMesh` builds a slot as a fan of triangles from the four
+  corners to a midpoint, and assigns the submeshes in order
+  `groundTypeDownLeft, DownRight, UpRight, UpLeft` — each QUARTER of a tile gets its own corner's
+  ground type. The next four submeshes are the four edges with the edge types, and where an edge
+  type is 0 it falls back to the adjacent corner's ground (`newSharedMats[4] = newSharedMats[0]`
+  and so on), which is what makes an unnamed edge invisible rather than blank.
+
+  That has a direct consequence for `TerrainGroundTypes`, which reduces a tile's four corners to a
+  MAJORITY before drawing. The majority is this project's invention, not the game's: the game
+  draws all four. Drawing at corner resolution would be closer to what the player sees, and the
+  data is already read - the reduction happens after the array is in hand. Not changed, because
+  nobody asked for it and the map layer is coarse anyway; recorded because "the four corners of a
+  tile disagree" is a fact about the terrain, not noise to be averaged away.
+
+  The same file also pins down `origin` with arithmetic instead of a name: a cell with
+  `origin == 1 || origin == 2` shifts by `-(sizeX - 1)` tiles and `origin == 2 || origin == 3` by
+  `-(sizeY - 1)`, so origin is WHICH CORNER of a multi-tile slot the grid cell anchors, numbered
+  round. And it closes the placement question a fourth time, by what it has to do rather than what
+  it says: to show a folder of rooms it lays them out in a ROW, `offset += sizeX * 3 + 3` per room.
+  A tool built to draw `.arm` files has no idea where they go either.
 
   **That layout is RePoE's, not this project's** — `RePoE/poe/file/arm.py` in the repoe-fork,
   which parses the format properly — and it corrects a reading taken off the files by eye and
