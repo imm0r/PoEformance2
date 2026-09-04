@@ -169,8 +169,12 @@ public class GroundReadTests
         Assert.Equal(Paths, grid.Ground.Types);
         Assert.Contains("2 ground types", grid.GroundNote, StringComparison.Ordinal);
 
-        // And the regions the map would label, from the same flood fill the rooms use.
-        Assert.Equal(2, grid.GroundRegions.Count);
+        // ONE region the map would label, not two. The fixture's left half is walkable and the
+        // right is not, so bone_abyss is the scenery of this little area and is dropped: walls
+        // and abysses are named only where nothing standable carries a name.
+        TerrainRoom only = Assert.Single(grid.GroundRegions);
+        Assert.Equal(Paths[0], only.Path);
+        Assert.False(grid.NamingUnstandableGround);
     }
 
     [Fact]
@@ -237,8 +241,10 @@ public class GroundReadTests
         Assert.Equal(Paths[0], grid.Ground.Types[1]);
         Assert.Contains("2 ground types", grid.GroundNote, StringComparison.Ordinal);
 
-        // Two regions, not three: the blank names nothing, so there is nothing to write on it.
-        Assert.Equal(2, grid.GroundRegions.Count);
+        // ONE region, not three. The blank names nothing, so nothing is written on it; and the
+        // unwalkable half is scenery beside a named type somebody can stand on, so it goes too.
+        TerrainRoom only = Assert.Single(grid.GroundRegions);
+        Assert.Equal(Paths[0], only.Path);
         Assert.DoesNotContain(grid.GroundRegions, r => r.Path.Length == 0);
     }
 

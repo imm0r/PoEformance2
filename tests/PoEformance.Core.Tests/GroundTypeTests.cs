@@ -166,7 +166,7 @@ public class GroundTypeTests
     /// </remarks>
     private const int MaelstromTiles = 20;
 
-    private static (byte[] Corners, TerrainGrid Walkable) Maelstrom()
+    private static (byte[] Corners, byte[] Cells, int Stride) Maelstrom()
     {
         // Square, and its own size rather than the shared fixture's: all THREE bands have to
         // clear the 64-corner floor the spread check ignores below, or the test would be
@@ -199,7 +199,7 @@ public class GroundTypeTests
             }
         }
 
-        return (corners, new TerrainGrid(cells, stride, Tiles * Cells, Tiles, Tiles));
+        return (corners, cells, stride);
     }
 
     [Fact]
@@ -216,7 +216,9 @@ public class GroundTypeTests
         // Correct because the walkable ground is PARTITIONED rather than shared out: noise would
         // have spread those 679 corners across the three values by coverage, and the names agree
         // with the physics - what the game calls a wall is walkable nowhere.
-        (byte[] corners, TerrainGrid walkable) = Maelstrom();
+        (byte[] corners, byte[] cells, int stride) = Maelstrom();
+        var walkable = new TerrainGrid(
+            cells, stride, MaelstromTiles * Cells, MaelstromTiles, MaelstromTiles);
 
         TerrainGroundTypes ground = Assert.IsType<TerrainGroundTypes>(TerrainGroundTypes.From(
             ["", "black_inside_wall.gt", "maelstrom_abyss.gt"],
@@ -312,23 +314,74 @@ public class GroundTypeTests
     }
 
     [Fact]
-    public void TheRegionsAreTheHalvesAndTheyCarryTheirNames()
+    public void AWallIsNotStandableJustBecauseSomeoneCanStandBesideIt()
     {
-        // The same flood fill the rooms use, on the same tile grid, because it is the same
-        // question - so a type that covers half the area comes back as ONE labelled block.
+        // THE FILTER THE OBVIOUS TEST CANNOT DO. TerrainRoom.IsWalkable asks whether a region
+        // holds ONE walkable tile, and a ground-type region hugs the floor for hundreds of tiles
+        // with walkable geometry that does not follow tile edges - so an abyss touching the floor
+        // anywhere passes it. The Maelstrom measures that leak: maelstrom_abyss has 44 walkable
+        // corners of 3561, one tile in eighty. Standable() asks for a quarter, over the whole
+        // area, so a wall stays a wall.
+        (byte[] corners, byte[] cells, int stride) = Maelstrom();
+        var walkable = new TerrainGrid(
+            cells, stride, MaelstromTiles * Cells, MaelstromTiles, MaelstromTiles);
+
+        TerrainGroundTypes ground = Assert.IsType<TerrainGroundTypes>(TerrainGroundTypes.From(
+            ["", "black_inside_wall.gt", "maelstrom_abyss.gt"],
+            corners, MaelstromTiles, MaelstromTiles, walkable));
+
+        Assert.True(ground.Standable(0));     // the blank slot IS the floor here
+        Assert.False(ground.Standable(1));
+        Assert.False(ground.Standable(2));
+
+        // And the sentence agrees with the test, which is the point of there being one bar:
+        // "0 of them" is what tells a person why the map is naming walls.
+        Assert.Contains("0 of them ground you can stand on", ground.Note, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void WallsAreNamedOnlyWhenNothingStandableIs()
+    {
+        // THE ANSWER TO "name walls and ceilings, if it is necessary". Necessary means: naming
+        // them is what is left. In the Maelstrom the floor carries the game's UNNAMED slot, so
+        // filtering to standable ground empties the map - and knowing which unenterable region
+        // is a fall and which is a wall is then the whole of what this layer can say.
+        (byte[] corners, byte[] cells, int stride) = Maelstrom();
+        TerrainGroundTypes ground = Assert.IsType<TerrainGroundTypes>(TerrainGroundTypes.From(
+            ["", "black_inside_wall.gt", "maelstrom_abyss.gt"], corners,
+            MaelstromTiles, MaelstromTiles,
+            new TerrainGrid(cells, stride, MaelstromTiles * Cells, MaelstromTiles, MaelstromTiles)));
+
+        var grid = new TerrainGrid(
+            cells, stride, MaelstromTiles * Cells, MaelstromTiles, MaelstromTiles,
+            heights: null, ground: ground);
+
+        Assert.True(grid.NamingUnstandableGround);
+        Assert.Equal(2, grid.GroundRegions.Count);
+        Assert.Contains(grid.GroundRegions, r => r.Path.Contains("wall", StringComparison.Ordinal));
+        Assert.Contains(grid.GroundRegions, r => r.Path.Contains("abyss", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void WhereSomethingStandableIsNamedTheWallsAreDropped()
+    {
+        // The other half of the same rule, and the one that thins a crowded map: an area is
+        // mostly scenery you cannot enter, so naming every wall patch buries the labels worth
+        // reading. Here the walkable half carries a NAMED type, so the unwalkable one goes.
         byte[] walkableCells = WalkableCells(out int stride);
         TerrainGroundTypes ground = Read(
             walkable: new TerrainGrid(walkableCells, stride, TilesY * Cells, TilesX, TilesY));
 
-        // The GRID is built over the walkable cells, which is what it is: the ground types ride
-        // alongside it rather than replacing it.
         var grid = new TerrainGrid(
             walkableCells, stride, TilesY * Cells, TilesX, TilesY, heights: null, ground: ground);
 
-        Assert.Equal(2, grid.GroundRegions.Count);
-        Assert.Contains(grid.GroundRegions, r => r.Path.EndsWith("bone_fill.gt", StringComparison.Ordinal));
-        Assert.Contains(grid.GroundRegions, r => r.Path.EndsWith("bone_abyss.gt", StringComparison.Ordinal));
-        Assert.All(grid.GroundRegions, r => Assert.Equal(TilesX / 2 * TilesY, r.Tiles));
+        Assert.False(grid.NamingUnstandableGround);
+
+        // One block, carrying its own name and its own half of the area - the flood fill is the
+        // same one the room names use, so a type covering half the map comes back as ONE region.
+        TerrainRoom only = Assert.Single(grid.GroundRegions);
+        Assert.EndsWith("bone_fill.gt", only.Path, StringComparison.Ordinal);
+        Assert.Equal(TilesX / 2 * TilesY, only.Tiles);
     }
 
     [Fact]

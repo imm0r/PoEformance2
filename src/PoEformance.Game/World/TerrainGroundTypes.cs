@@ -297,6 +297,26 @@ public sealed class TerrainGroundTypes
     /// </remarks>
     public bool Names(int type) => (uint)type < (uint)Types.Count && Types[type].Length > 0;
 
+    /// <summary>True when this type is ground somebody can actually stand on.</summary>
+    /// <remarks>
+    /// PER TYPE, over the whole area, at corner resolution - and that is the point. The obvious
+    /// test is <see cref="TerrainRoom.IsWalkable"/>, which asks whether a REGION holds one
+    /// walkable tile, and it is far too weak here: a ground-type region hugs the floor for
+    /// hundreds of tiles, and the walkable geometry does not follow tile edges, so an abyss that
+    /// touches the floor anywhere passes. The Maelstrom area measures that leak exactly -
+    /// maelstrom_abyss has 44 walkable corners out of 3561, which is one tile in eighty and
+    /// would have let the abyss through as standable ground.
+    ///
+    /// A QUARTER, and the bar is wide because the thing it separates is not close. The measured
+    /// values are 0 per cent for a wall, 1.2 for an abyss and 85 for a floor; anything between a
+    /// twentieth and four fifths divides them. A quarter keeps a real floor that happens to be
+    /// cluttered with props, which a half might drop.
+    /// </remarks>
+    public bool Standable(int type)
+        => (uint)type < (uint)TotalCorners.Count
+           && TotalCorners[type] > 0
+           && WalkableCorners[type] * 4 > TotalCorners[type];
+
     /// <summary>
     /// Whether the types disagree about walkability enough to be real.
     /// </summary>
@@ -397,11 +417,13 @@ public sealed class TerrainGroundTypes
                 + " - which is what a mis-read array looks like";
         }
 
+        // The same bar Standable() uses, because two definitions of "you can stand on it" is how
+        // a readout comes to disagree with the map it is explaining.
         int walkableTypes = 0;
         for (int type = 0; type < total.Count; type++)
         {
             if (type < types.Count && types[type].Length > 0
-                && total[type] > 0 && walkable[type] > total[type] / 2)
+                && total[type] > 0 && walkable[type] * 4 > total[type])
             {
                 walkableTypes++;
             }

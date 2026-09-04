@@ -159,37 +159,61 @@ public sealed class TerrainGrid
     /// Built lazily and once. Most areas are never asked, and flood-filling seven thousand tiles
     /// for a layer nobody switched on is a cost paid on every zone change.
     /// </remarks>
-    public IReadOnlyList<TerrainRoom> GroundRegions => _groundRegions ??= FindGroundRegions();
+    public IReadOnlyList<TerrainRoom> GroundRegions => (_ground ??= FindGroundRegions()).Regions;
 
-    private IReadOnlyList<TerrainRoom> FindGroundRegions()
+    /// <summary>
+    /// True when walls and abysses are being named because nothing standable was.
+    /// </summary>
+    /// <remarks>
+    /// Worth surfacing rather than leaving as a silent change of behaviour: the map looks
+    /// completely different in the two cases - floor names in one area, wall and abyss names in
+    /// the next - and without a sentence saying why, that reads as the feature being erratic.
+    /// </remarks>
+    public bool NamingUnstandableGround => (_ground ??= FindGroundRegions()).Fallback;
+
+    private (IReadOnlyList<TerrainRoom> Regions, bool Fallback) FindGroundRegions()
     {
         if (Ground is null || !Ground.Trusted || TilesX <= 0 || TilesY <= 0)
         {
-            return [];
+            return ([], false);
         }
 
-        bool[] walkable = WalkableTileMask();
-        int wide = TilesX;
+        // WALLS AND CEILINGS ONLY WHEN THEY ARE WHAT IS LEFT. Most of an area is scenery you
+        // cannot enter, so naming every wall patch buries the handful of labels worth reading -
+        // the same thing that made the ROOM names unusable until they were filtered. But a
+        // blanket filter empties the map in a Maelstrom, where the floor carries the unnamed
+        // slot and the only NAMED types are a wall and an abyss: there, knowing which unenterable
+        // region is a fall and which is a wall is the whole of what this layer can say.
+        //
+        // So the filter applies only when it leaves something behind.
+        bool anyStandable = false;
+        for (int type = 0; type < Ground.Types.Count && !anyStandable; type++)
+        {
+            anyStandable = Ground.Names(type) && Ground.Standable(type);
+        }
 
         // THE BLANK SLOT IS NOT A REGION, because it has no name to write - not because it is
-        // empty ground. In a Maelstrom area the blank IS the floor, 635 of the area's 679
-        // walkable corners, with the two NAMED types being a wall and an abyss. So it is real
-        // ground that the game declined to name, it counts for every measurement (see
-        // TerrainGroundTypes.Separates), and it is only labelling it that would say nothing.
+        // empty ground. In that same Maelstrom the blank IS the floor, 635 of the area's 679
+        // walkable corners. It is real ground the game declined to name, it counts for every
+        // measurement (see TerrainGroundTypes.Separates), and only labelling it says nothing.
         // A copy rather than a change to TileType, which stays the faithful index: "this tile
         // has no NAMED type" and "this tile was not read" are different facts.
         int[] named = new int[Ground.TileType.Length];
         for (int i = 0; i < named.Length; i++)
         {
             int type = Ground.TileType[i];
-            named[i] = Ground.Names(type) ? type : -1;
+            named[i] = Ground.Names(type) && (!anyStandable || Ground.Standable(type)) ? type : -1;
         }
 
-        return TerrainRooms.Find(
-            [.. Ground.Types], named, wide, TilesY, (x, y) => walkable[(y * wide) + x]);
+        bool[] walkable = WalkableTileMask();
+        int wide = TilesX;
+        return (
+            TerrainRooms.Find(
+                [.. Ground.Types], named, wide, TilesY, (x, y) => walkable[(y * wide) + x]),
+            !anyStandable);
     }
 
-    private IReadOnlyList<TerrainRoom>? _groundRegions;
+    private (IReadOnlyList<TerrainRoom> Regions, bool Fallback)? _ground;
 
     /// <summary>
     /// Why the heights are, or are not, here.

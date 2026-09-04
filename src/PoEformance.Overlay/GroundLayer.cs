@@ -25,6 +25,12 @@ namespace PoEformance.Overlay;
 /// layer took the index from a landscape nibble instead, which was wrong and shipped; the corner
 /// array is measured rather than supposed, and that class doc says on what.
 ///
+/// WALLS AND CEILINGS ONLY WHEN THEY ARE WHAT IS LEFT - see TerrainGrid.FindGroundRegions, which
+/// does the filtering so this draws what it is given. An area is mostly scenery you cannot enter,
+/// so naming every wall patch buries the labels worth reading; but an area whose floor carries
+/// the game's unnamed slot has nothing BUT walls and abysses to name, and there they are the
+/// whole of what this can say.
+///
 /// NO PINNING AND NO ROUTE, unlike <see cref="RoomLayer"/>. A ground type is not a destination;
 /// "the abyss" covers a third of the area and walking to its centroid means nothing. What this
 /// is for is reading the map, so it writes names and stops.
@@ -43,6 +49,9 @@ public sealed class GroundLayer
     private readonly List<int> _kept = [];
     private readonly List<(string Name, Vector2 Label, Vector2 Size)> _onScreen = [];
 
+    /// <summary>How often each type has been written this frame. Reused rather than rebuilt.</summary>
+    private readonly Dictionary<string, int> _written = new(StringComparer.Ordinal);
+
     /// <summary>How every drawn thing looks. Shared with the overlay, so one editor covers both.</summary>
     public OverlayStyle Style { get; set; } = new();
 
@@ -57,8 +66,26 @@ public sealed class GroundLayer
     /// than hundreds of room files, so its regions are few and large and their sizes actually
     /// spread - the specks a threshold drops are the one-tile slivers where two types meet,
     /// which is exactly what nobody wants named.
+    ///
+    /// It is the only filter this layer applies. Which TYPES are worth naming is decided one
+    /// level down, per area, off the measured walkable share - a question about the ground rather
+    /// than about the drawing.
     /// </remarks>
     public int MinTiles { get; set; } = GroundSettings.Default.MinTiles;
+
+    /// <summary>
+    /// How many times one ground type may be written on the map.
+    /// </summary>
+    /// <remarks>
+    /// THE FILTER THAT MATTERS MOST, and the one this layer shipped without. A ground type is not
+    /// a room: every region of it carries the SAME word, so the twentieth "maelstrom_abyss" adds
+    /// a position and no information, while costing the map its legibility. Size cannot thin them
+    /// because the pieces are not small - see GroundSettings for the screenshot that settled it.
+    ///
+    /// The regions arrive largest-first within a type (TerrainRooms.Ranked), so the ones kept are
+    /// the biggest - the places somebody can see they are standing in.
+    /// </remarks>
+    public int MaxPatches { get; set; } = GroundSettings.Default.MaxPatches;
 
     /// <summary>Takes the settings as they were loaded.</summary>
     public void Apply(GroundSettings settings)
@@ -66,10 +93,11 @@ public sealed class GroundLayer
         ArgumentNullException.ThrowIfNull(settings);
         Enabled = settings.Show;
         MinTiles = settings.MinTiles;
+        MaxPatches = settings.MaxPatches;
     }
 
     /// <summary>The settings as they stand now, for writing down.</summary>
-    public GroundSettings Saved() => new(Enabled, MinTiles);
+    public GroundSettings Saved() => new(Enabled, MinTiles, MaxPatches);
 
     /// <summary>What the ground read came back as, for the readout. Empty when nothing was read.</summary>
     public string Note { get; private set; } = string.Empty;
@@ -97,6 +125,15 @@ public sealed class GroundLayer
         // GRID rather than from the ground, because the ground is null exactly when the read
         // gave up - which is the case most in need of an explanation.
         Note = snapshot.Terrain?.GroundNote ?? string.Empty;
+
+        // WHY THE MAP LOOKS DIFFERENT HERE. Naming walls and abysses is the fallback for an area
+        // whose walkable ground carries no name, and without this sentence the switch between
+        // the two reads as the feature being erratic rather than as a decision.
+        if (snapshot.Terrain is { NamingUnstandableGround: true } && Note.Length > 0)
+        {
+            Note += " - and none of them is, so the walls and the abyss are named instead";
+        }
+
         Diagnosis = snapshot.Terrain?.Ground is { Trusted: false } ground ? ground.Lines : [];
 
         if (!Enabled
@@ -121,6 +158,7 @@ public sealed class GroundLayer
 
         _onScreen.Clear();
         _wanted.Clear();
+        _written.Clear();
 
         foreach (TerrainRoom region in regions)
         {
@@ -128,6 +166,19 @@ public sealed class GroundLayer
             {
                 continue;
             }
+
+            // COUNTED BEFORE THE PROJECTION, so the cap is a fact about the AREA rather than
+            // about where the map happens to be scrolled. Counting only what lands on screen
+            // would let the same type reappear as somebody pans, which reads as the setting not
+            // working.
+            ref int written = ref System.Runtime.InteropServices.CollectionsMarshal
+                .GetValueRefOrAddDefault(_written, region.Path, out _);
+            if (written >= MaxPatches)
+            {
+                continue;
+            }
+
+            written++;
 
             Vector2 at = map.Project(
                 region.GridX * MapView.WorldToGrid,
