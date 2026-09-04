@@ -171,11 +171,13 @@ public sealed class TerrainGrid
         bool[] walkable = WalkableTileMask();
         int wide = TilesX;
 
-        // THE BLANK SLOT IS NOT A REGION. A corner value of zero means "no ground type here" -
-        // the void around the playable area, most of the grid - and it is kept in the list so
-        // the values above it keep their names. A copy rather than a change to TileType, which
-        // stays the faithful index: "this tile has no type" and "this tile was not read" are
-        // different facts, and whatever comes next will want to tell them apart.
+        // THE BLANK SLOT IS NOT A REGION, because it has no name to write - not because it is
+        // empty ground. In a Maelstrom area the blank IS the floor, 635 of the area's 679
+        // walkable corners, with the two NAMED types being a wall and an abyss. So it is real
+        // ground that the game declined to name, it counts for every measurement (see
+        // TerrainGroundTypes.Separates), and it is only labelling it that would say nothing.
+        // A copy rather than a change to TileType, which stays the faithful index: "this tile
+        // has no NAMED type" and "this tile was not read" are different facts.
         int[] named = new int[Ground.TileType.Length];
         for (int i = 0; i < named.Length; i++)
         {

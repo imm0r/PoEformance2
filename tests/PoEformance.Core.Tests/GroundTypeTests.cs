@@ -155,6 +155,86 @@ public class GroundTypeTests
         Assert.Contains("beyond the 1", ground.Note, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// The Maelstrom area, by its measured counts: the BLANK slot is the floor.
+    /// </summary>
+    /// <remarks>
+    /// A corner array whose values reproduce the histogram that broke the first version of the
+    /// spread check - 746 blank corners with 635 walkable, 2273 of a wall with none, 3561 of an
+    /// abyss with 44. Laid out in bands so the walkable region is contiguous, which is what a
+    /// walkable grid can actually represent; only the per-value totals and shares matter here.
+    /// </remarks>
+    private const int MaelstromTiles = 20;
+
+    private static (byte[] Corners, TerrainGrid Walkable) Maelstrom()
+    {
+        // Square, and its own size rather than the shared fixture's: all THREE bands have to
+        // clear the 64-corner floor the spread check ignores below, or the test would be
+        // measuring two of them and passing for the wrong reason.
+        const int Tiles = MaelstromTiles;
+        const int Band = (Tiles + 1) / 3;            // 7 corner rows each
+
+        int across = Tiles + 1;
+        var corners = new byte[across * (Tiles + 1) * Corner];
+        for (int cornerY = 0; cornerY <= Tiles; cornerY++)
+        {
+            // The blank on top, then the wall, then the abyss.
+            byte type = cornerY < Band ? (byte)0 : cornerY < 2 * Band ? (byte)1 : (byte)2;
+            for (int cornerX = 0; cornerX <= Tiles; cornerX++)
+            {
+                corners[((cornerY * across) + cornerX) * Corner] = type;
+            }
+        }
+
+        // Walkable exactly as far down as the blank band reaches. Corner row Band samples cell
+        // Band*Cells, which is the first unwalkable one, so the boundary lands where it should.
+        int width = Tiles * Cells;
+        int stride = (width + 1) / 2;
+        var cells = new byte[stride * Tiles * Cells];
+        for (int y = 0; y < Band * Cells; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                cells[(y * stride) + (x >> 1)] |= (byte)((x & 1) == 0 ? 1 : 1 << 4);
+            }
+        }
+
+        return (corners, new TerrainGrid(cells, stride, Tiles * Cells, Tiles, Tiles));
+    }
+
+    [Fact]
+    public void TheBlankSlotCanBeTheFloorAndTheReadingIsStillBelieved()
+    {
+        // THE BUG THIS IS THE REGRESSION FOR, found in a live Maelstrom area. The first version
+        // of the spread check EXCLUDED the blank slot, on the theory that it covers the void
+        // outside the playable area and is walkable nowhere - so counting it would satisfy the
+        // "mostly not walkable" half for free. The game says otherwise: there the blank IS the
+        // floor, 635 of the area's 679 walkable corners, and the two NAMED types are
+        // black_inside_wall (0 of 2273 walkable) and maelstrom_abyss (44 of 3561). Demanding a
+        // named type that is mostly walkable made a plainly correct reading fail.
+        //
+        // Correct because the walkable ground is PARTITIONED rather than shared out: noise would
+        // have spread those 679 corners across the three values by coverage, and the names agree
+        // with the physics - what the game calls a wall is walkable nowhere.
+        (byte[] corners, TerrainGrid walkable) = Maelstrom();
+
+        TerrainGroundTypes ground = Assert.IsType<TerrainGroundTypes>(TerrainGroundTypes.From(
+            ["", "black_inside_wall.gt", "maelstrom_abyss.gt"],
+            corners, MaelstromTiles, MaelstromTiles, walkable));
+
+        Assert.Equal(0, ground.OutOfRange);
+
+        // Every band big enough to be weighed, so all three take part in the spread.
+        Assert.All([0, 1, 2], type => Assert.True(ground.TotalCorners[type] >= 64));
+
+        // The partition: the walkable ground is the blank's, and the two NAMED types have none.
+        Assert.Equal(ground.TotalCorners[0], ground.WalkableCorners[0]);
+        Assert.Equal(0, ground.WalkableCorners[1]);
+        Assert.Equal(0, ground.WalkableCorners[2]);
+
+        Assert.True(ground.Trusted);
+    }
+
     [Fact]
     public void TypesThatDoNotSeparateOnWalkabilityAreNotBelieved()
     {
