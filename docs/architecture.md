@@ -1689,9 +1689,41 @@ interesting part was not the feature:
   block, the grid (one row per line, `root.height` rows of `root.width` cells, each `n`, `s`,
   `o`, `f <string index>` or `k <24 numbers>`), and a second points-of-interest block holding the
   doodads. A slot's 24 numbers are width, height, then FOUR EDGE TYPES as string indices in the
-  order n, w, s, e, then `exit`/`virtual_exit` per edge, then a ground type and a height per
-  CORNER (sw, se, ne, nw), then the slot's own tag and its origin corner. String indices are
-  1-based, 0 meaning none.
+  order n, w, s, e, then EIGHT MORE per edge, then a ground type and a height per CORNER
+  (sw, se, ne, nw), then the slot's own tag and its origin corner. String indices are 1-based,
+  0 meaning none.
+
+  **Those eight are edge LENGTHS, not exits**, and that is a correction to RePoE rather than to
+  this project's eye-reading. `annalithic/poeformats/Arm.cs` names them `edgeLengthDown`,
+  `edgeLengthRight`, `edgeLengthUp`, `edgeLengthLeft` with an unknown between each; RePoE calls
+  them `exit` and `virtual_exit`. The files settle it: across one dump those positions hold 3
+  (8685 times), 9, 4, 21, 1, 6, 15, 12, 18 and 99. A boolean exit flag is 0 or 1. Nothing here
+  reads those fields, so the correction costs nothing and prevents the next person trusting a
+  name that is wrong.
+
+  Two parsers now AGREE on the corners, which is what makes the ground-stamp measurement above
+  worth its verdict: RePoE puts `sw, se, ne, nw` at 14..17 with heights at 18..21, and
+  `Arm.cs` reads `groundTypeDownLeft, DownRight, UpRight, UpLeft` then the four heights, at the
+  same positions. The field the measurement was taken on is confirmed independently of the
+  source it was read from. `Arm.cs` also shows the origin is only present above version 18, so
+  an old slot is 23 numbers rather than 24.
+
+  **AND A TILE DECLARES ITS OWN FOUR CORNER GROUNDS.** `annalithic/poeformats/Tdt.cs` reads a
+  `.tdt` as `inherits`, `tgt`, `feature`, four edge types, `sizeX`/`sizeY`, then
+  `groundTypeDownLeft, DownRight, UpRight, UpLeft` and eight edge distances - the same shape an
+  `.arm` slot has. So the area's per-corner array at `TerrainMetadata+0x50` is almost certainly
+  ASSEMBLED FROM THE TILES' own declarations, which explains where its values come from without
+  changing what they mean.
+
+  It also closes the tile-to-room direction for the third time and from a third source: a `.tdt`
+  names another `.tdt` (it can inherit), a `.tgt`, a feature, `.et` files and `.gt` files. No
+  `.arm`. RePoE's `tdt.py` said the same, and so did this project's own dumps.
+
+  What it OPENS is a check nobody has run: the tiles' declared corner grounds could be read out
+  of the bundles - the room dump already proves files can be opened - and compared against what
+  the corner array reports at those same corners. That would confirm the ground layer against the
+  game's own FILES rather than only against walkability. Not built; recorded because it is the
+  strongest check still available to that feature.
 
   **That layout is RePoE's, not this project's** — `RePoE/poe/file/arm.py` in the repoe-fork,
   which parses the format properly — and it corrects a reading taken off the files by eye and
@@ -1898,6 +1930,10 @@ interesting part was not the feature:
 
   The same diagram set adds two things worth keeping. A `.tgt` names `.mb`, `.tgm`, `.dds` and
   `.mat` files and **no room**, which closes the tile-to-room direction from the tile's side too.
+  A third source now says the same: `annalithic/poeformats/Tgt.cs` reads a `.tgt` as a version, a
+  `sizeX`/`sizeY`, a `tileMeshRoot`, an optional ground-mask `.dds`, a list of `.mat` materials and
+  a `sizeX * sizeY` table of material indices — geometry and materials, no room reference and no
+  ground types either. The ground types live one level up, in the `.tdt` that names the `.tgt`.
   And a `.rs` (Room Set) is a list of `.arm` files with a spawn weight and a set of allowed
   **rotations** - the dihedral group of order 8. A corner stamp would therefore have had to be
   searched in eight orientations over a two-value alphabet, which is worse than the verdict above
