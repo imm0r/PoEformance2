@@ -2096,6 +2096,38 @@ interesting part was not the feature:
   never read alike. Run it from the *Hunt the Placements* button beside the loaded-file list; it
   needs no install, only the table that page is already about.
 
+  **AND IT RAN, AND THE ANSWER IS NO.** A Steppe map, 2026-09:
+
+      placements: 211 .arm records, swept 32768 bytes of AreaInstance,
+        followed 693 pointers and 263 vectors
+        nothing refers to a room file - not by record address, not by path
+        control: 8 of 8 tile file pointers ARE record addresses - the search looks for the
+          right value, so a miss above is a real absence
+
+  Every part of that sentence is load-bearing, and each was earned separately. The CONTROL passes,
+  so the game does refer to files by the value being searched for. The counts are well UNDER both
+  caps - 693 of 4096 pointers, 263 of 512 vectors - so the sweep finished rather than running out
+  of budget, which two earlier runs had done while calling the result an absence anyway. And both
+  FORMS were searched, the record address and the UTF-16 path.
+
+  So: the first 32 KiB of `AreaInstance`, everything one hop from it, and every vector two hops
+  out, hold no reference to any of the area's 211 room files.
+
+  **What that does and does not settle.** It rules out `AreaInstance` as the holder, which was the
+  last structure with a plausible claim to it. It does NOT prove no structure anywhere holds one -
+  three hops are not covered, and a placement list hanging off the scene graph or a generation
+  manager would not be reached from here.
+
+  But put beside the file evidence it makes one explanation fit everything: **a room is a
+  GENERATION-TIME concept.** The layout generator places `.arm` rooms, bakes them into tiles, and
+  the runtime keeps the tiles. That is why the files carry no coordinates (five parsers), why no
+  tile names a room (three sources), why the `.rs` catalogue has spawn weights and rotations but no
+  positions - and why 211 room files are LOADED here while nothing points at one. They were needed
+  to build the area and nothing retained the association afterwards.
+
+  On that reading the room level is not hidden, it is gone by the time the tool can look. What the
+  map can show is the tile level, which is what it already shows.
+
   Meanwhile what stands is what the tool already draws — tile-block room names from
   `TerrainRooms`, which is more than the reference does automatically, and hand-curated
   `data/landmarks.json` entries, which is exactly the mechanism GameHelper2's `ImportantTgts`
