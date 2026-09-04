@@ -1907,9 +1907,25 @@ internal static class Program
                     var lines = new List<string>
                     {
                         $"counter static reads {counter}",
-                        $"{swept.Records} records read, {swept.Named} with a readable path"
-                            + (swept.Named == 0 ? "  <- the RECORD is wrong, not the count" : string.Empty),
+
+                        // SLOTS BEFORE RECORDS, because their difference is the diagnosis and
+                        // only the pair says which failure this is. No slots means the buckets
+                        // yielded nothing - the root or the bucket layout, and the count field
+                        // is irrelevant. Slots without records means the walk reached addresses
+                        // that could not be read. Records without names means the struct base
+                        // is wrong. The slot count was measured all along and never shown, so
+                        // this readout could contradict itself and did.
+                        $"{swept.Slots} slots walked, {swept.Records} records read,"
+                            + $" {swept.Named} with a readable path"
+                            + (swept.Slots == 0
+                                ? "  <- the buckets yielded nothing; the count field cannot be the problem"
+                                : swept.Named == 0 ? "  <- the RECORD is wrong, not the count" : string.Empty),
                     };
+
+                    if (preloadReader.LastError.Length > 0)
+                    {
+                        lines.Add(preloadReader.LastError);
+                    }
 
                     lines.AddRange(swept.Samples.Select(sample => $"    {sample}"));
 

@@ -147,10 +147,15 @@ public sealed class PreloadWindow
         }
 
         // AND THE OTHER DIRECTION: not what a room file says, but who in memory REFERS to one.
-        // This list is what makes that searchable at all - it hands over the ADDRESS of every
-        // room's record, so the hunt looks for a known value rather than for a shape that
+        // The file table is what makes that searchable at all - it hands over the ADDRESS of
+        // every room's record, so the hunt looks for a known value rather than for a shape that
         // resembles a room. See RoomPlacementProbe for why that distinction is the whole point.
-        if (all.Count > 0 && _huntPlacements is not null)
+        //
+        // NOT GATED ON THE LIST ABOVE, unlike its neighbours. Those read files this AREA loaded,
+        // so with no match there is nothing to open; this walks the whole table itself and works
+        // when the area match does not - which is precisely when somebody wants it. The probe
+        // reports its own emptiness in words, which beats a button that is not there.
+        if (_huntPlacements is not null)
         {
             ImGui.SameLine();
             if (ImGui.SmallButton("Hunt the Placements"))
