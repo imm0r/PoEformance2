@@ -1886,6 +1886,24 @@ interesting part was not the feature:
   slot tags name areas. The corner block is the only ground the file carries, and it was the one
   measured.
 
+  **And re-checked when a fuller spec turned up, because the first check had a hole in it.** A
+  community `.arm` diagram (2026-09) documents an optional **ground-override line** near the end
+  of a room — `(gridWidth-1) * (gridHeight-1)` string indices pointing at `.gt` files — which is a
+  SECOND per-corner ground source, and the verdict above had been recorded as closed while
+  measuring only the slots. Measured: the line exists in **5 of 63 rooms**, its lengths match the
+  formula exactly (24 for a 5x7, 360 for a 13x31, 4, 1), and its values are almost all zero.
+  `2_Badlands_N` is the only one with a pattern, `0` and `5` alternating. So at most one room
+  gains a two-value pattern: 11 of 63 becomes 12. The alphabet stays binary and the verdict
+  stands - now on a measurement that includes the field it had missed.
+
+  The same diagram set adds two things worth keeping. A `.tgt` names `.mb`, `.tgm`, `.dds` and
+  `.mat` files and **no room**, which closes the tile-to-room direction from the tile's side too.
+  And a `.rs` (Room Set) is a list of `.arm` files with a spawn weight and a set of allowed
+  **rotations** - the dihedral group of order 8. A corner stamp would therefore have had to be
+  searched in eight orientations over a two-value alphabet, which is worse than the verdict above
+  already assumed. `.rs` carries no coordinates, so it is a generation CATALOGUE and not a layout:
+  it cannot say where a room went.
+
   **So every route from a room FILE to a place is closed**: no tile or terrain-struct field
   reaches a room; `.arm` files name no `.tdt`; `.et`/`.gt` name no `.tdt` (RePoE's `tdt.py`: a
   `.tdt` names a parent `.tdt` or a `.tgt`, never an `.arm`); and the ground-corner join has too
