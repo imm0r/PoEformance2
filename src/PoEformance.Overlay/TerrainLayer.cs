@@ -51,7 +51,8 @@ public sealed class TerrainLayer : IDisposable
     private const int MaxTextureEdge = 2048;
 
     /// <summary>
-    /// How opaque the dark rim around the line is, out of 255.
+    /// How opaque the dark rim around the line is, out of 255 - or the line's own alpha,
+    /// whichever is less.
     /// </summary>
     /// <remarks>
     /// Just under half. The rim is there to separate the line from a ground that matches it,
@@ -59,6 +60,17 @@ public sealed class TerrainLayer : IDisposable
     /// already reads, a solid black rim would be the thing the eye lands on instead.
     /// </remarks>
     private const byte RimAlpha = 127;
+
+    /// <summary>
+    /// How far the rim reaches beyond the line, in texture pixels.
+    /// </summary>
+    /// <remarks>
+    /// Two, not one. On the large map a texture pixel is about a screen pixel, and the
+    /// renderer samples the texture bilinearly with no mipmaps - so a one-pixel rim was
+    /// smeared across its neighbours to a quarter of its opacity and could not be seen
+    /// against or beside the line at all. Two survives the filter as a visible edge.
+    /// </remarks>
+    private const int RimWidth = 2;
 
     private readonly Func<string, Image<Rgba32>, bool, IntPtr> _upload;
     private readonly Action<string> _release;
@@ -99,15 +111,31 @@ public sealed class TerrainLayer : IDisposable
     /// Outline colour, ABGR as ImGui packs it.
     /// </summary>
     /// <remarks>
-    /// A TINT applied at draw time, not baked into the texture: the image is white and the
-    /// quad is drawn through this, so changing the colour costs nothing and rebuilds
-    /// nothing. Thickness cannot work that way - it changes the pixels - so that one does
-    /// force a rebuild.
+    /// The HUE is a tint applied at draw time, not baked into the texture: the image is
+    /// white and the quad is drawn through this, so changing the colour costs nothing and
+    /// rebuilds nothing. Thickness cannot work that way - it changes the pixels - so that
+    /// one does force a rebuild.
+    ///
+    /// The ALPHA is baked, and changing it rebuilds too. Tinting multiplies alpha as well as
+    /// colour, so a half-transparent line tinted through the quad would take its rim down
+    /// with it - to a fifth, on a real style file - and the rim exists precisely for the
+    /// case where the line alone does not read. So the line's alpha goes into its own
+    /// pixels, the rim keeps its own, and the quad is tinted opaque. Alpha changes as often
+    /// as somebody drags the picker's alpha slider, which is not often.
     /// </remarks>
     public uint Colour
     {
         get => _colour;
-        set => _colour = value;
+        set
+        {
+            if (((value ^ _colour) & 0xFF00_0000) != 0)
+            {
+                _built = null;
+                _failure = null;
+            }
+
+            _colour = value;
+        }
     }
 
     /// <summary>Line width in texture pixels. Changing it rebuilds the texture.</summary>
@@ -233,10 +261,11 @@ public sealed class TerrainLayer : IDisposable
         Vector2 c = Corner(_coverX, _coverY);
         Vector2 d = Corner(0, _coverY);
 
+        // Opaque: the alpha is in the texture, see Colour.
         draw.AddImageQuad(
             _texture, a, b, c, d,
             new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1),
-            _colour);
+            _colour | 0xFF00_0000);
     }
 
     /// <summary>Turns the walkable grid into an outline texture, once per area.</summary>
@@ -267,10 +296,10 @@ public sealed class TerrainLayer : IDisposable
 
         using var image = new Image<Rgba32>(configuration, mask.Width, mask.Height);
 
-        // White where the boundary is, a dark rim one pixel around it, transparent
-        // everywhere else. The colour comes from the tint at draw time, so changing it costs
-        // nothing and rebuilds nothing - and because a tint MULTIPLIES, the rim's black stays
-        // black under every colour while its alpha still follows the line's own.
+        // White where the boundary is, a dark rim around it, transparent everywhere else.
+        // The hue comes from the tint at draw time, so changing it costs nothing and rebuilds
+        // nothing - and because a tint MULTIPLIES, the rim's black stays black under every
+        // colour. The alphas are in the pixels, for the reason given at Colour.
         //
         // The rim is in the texture rather than a second, wider quad underneath, which would
         // draw every pixel of the map twice per piece - and the pale line is not distinct
@@ -279,9 +308,13 @@ public sealed class TerrainLayer : IDisposable
 
         // With the rim off, the line's own pixels stand in for it: the test below then never
         // finds a rim pixel the line does not already cover, and no second buffer is built.
-        byte[] rim = _rim ? TerrainOutline.Rim(mask) : line;
-        var lit = new Rgba32(255, 255, 255, 255);
-        var dark = new Rgba32(0, 0, 0, RimAlpha);
+        byte[] rim = _rim ? TerrainOutline.Rim(mask, RimWidth) : line;
+
+        // The rim is never more solid than the line it serves: a faint line with a firm
+        // black edge reads as the edge, and the line becomes the thing that is hard to see.
+        byte lineAlpha = (byte)(_colour >> 24);
+        var lit = new Rgba32(255, 255, 255, lineAlpha);
+        var dark = new Rgba32(0, 0, 0, Math.Min(RimAlpha, lineAlpha));
         var clear = new Rgba32(0, 0, 0, 0);
         image.ProcessPixelRows(rows =>
         {

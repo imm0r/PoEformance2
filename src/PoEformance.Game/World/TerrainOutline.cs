@@ -108,61 +108,69 @@ public static class TerrainOutline
     }
 
     /// <summary>
-    /// The mask grown by one pixel on every side - the line plus a one-pixel rim around it.
+    /// The mask grown by <paramref name="pixels"/> on every side - the line plus a rim around it.
     /// </summary>
     /// <remarks>
     /// For a contrast rim: a single-colour line is invisible on any ground that happens to
     /// match it, and no colour is far from both a sunlit rock and a cave floor. A dark rim
-    /// one pixel wide is what makes the line readable on either; the drawing puts it under
-    /// the line by colouring these pixels dark where the line's own are not set.
+    /// is what makes the line readable on either; the drawing puts it under the line by
+    /// colouring these pixels dark where the line's own are not set.
     ///
     /// Grown from the WIDENED line rather than re-widened from the thin one, so it is the
-    /// same shape one pixel larger whatever the width - and symmetric, so the lean the line
+    /// same shape a little larger whatever the width - and symmetric, so the lean the line
     /// already reports still holds for the pair.
     ///
-    /// A 3x3 dilation done as two passes of three, which is the same result at six reads a
-    /// pixel instead of nine - and this runs over a texture of a few million pixels, once
-    /// per area, on the render thread.
+    /// A square dilation done as two passes, one along the rows and one down the columns,
+    /// which is the same result with work proportional to 2(2r+1) per SET pixel instead of
+    /// (2r+1)^2 - and the set pixels are a thin line through a texture of a few million,
+    /// built once per area on the render thread.
     /// </remarks>
-    public static byte[] Rim(OutlineMask mask)
+    public static byte[] Rim(OutlineMask mask, int pixels)
     {
         ArgumentNullException.ThrowIfNull(mask);
+        ArgumentOutOfRangeException.ThrowIfLessThan(pixels, 1);
 
         int width = mask.Width;
         int height = mask.Height;
         byte[] cells = mask.Cells;
 
-        // Horizontal pass: a pixel is set when it or either neighbour on the row is.
+        // Horizontal pass: each set source pixel marks the r pixels either side of it.
         var rows = new byte[cells.Length];
         for (int y = 0; y < height; y++)
         {
             int row = y * width;
             for (int x = 0; x < width; x++)
             {
-                int at = row + x;
-                if (cells[at] != 0
-                    || (x > 0 && cells[at - 1] != 0)
-                    || (x + 1 < width && cells[at + 1] != 0))
+                if (cells[row + x] == 0)
                 {
-                    rows[at] = 1;
+                    continue;
                 }
+
+                int from = Math.Max(0, x - pixels);
+                int to = Math.Min(width - 1, x + pixels);
+                rows.AsSpan(row + from, to - from + 1).Fill(1);
             }
         }
 
-        // Vertical pass over that, which completes the 3x3 neighbourhood.
+        // Vertical pass over that, which completes the square neighbourhood. Row-major
+        // again, marking the rows below and above a set pixel, so the memory access stays
+        // sequential instead of striding down a column.
         var rim = new byte[cells.Length];
         for (int y = 0; y < height; y++)
         {
             int row = y * width;
-            int above = row - width;
-            int below = row + width;
+            int firstRow = Math.Max(0, y - pixels);
+            int lastRow = Math.Min(height - 1, y + pixels);
             for (int x = 0; x < width; x++)
             {
-                if (rows[row + x] != 0
-                    || (y > 0 && rows[above + x] != 0)
-                    || (y + 1 < height && rows[below + x] != 0))
+                if (rows[row + x] == 0)
                 {
-                    rim[row + x] = 1;
+                    continue;
+                }
+
+                for (int ny = firstRow; ny <= lastRow; ny++)
+                {
+                    rim[(ny * width) + x] = 1;
                 }
             }
         }

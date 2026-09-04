@@ -40,6 +40,12 @@ public readonly record struct LayerStyle(
     public static LayerStyle Default => default;
 
     /// <summary>Whether it is drawn.</summary>
+    /// <remarks>
+    /// Ignored by the serialiser, as is <see cref="SaysNothing"/> below: both are derived, and
+    /// the source generator otherwise writes every readable property, so a style file carried
+    /// a <c>"Visible"</c> and a <c>"SaysNothing"</c> next to each entry that nothing reads back.
+    /// </remarks>
+    [JsonIgnore]
     public bool Visible => !Hidden;
 
     /// <summary>Whether this says anything at all.</summary>
@@ -49,6 +55,7 @@ public readonly record struct LayerStyle(
     /// thing and are not equal, so comparing records would call a hand-written empty entry a
     /// change and store it - which is the one thing the store exists to avoid.
     /// </remarks>
+    [JsonIgnore]
     public bool SaysNothing
         => !Hidden
             && Width <= 0f

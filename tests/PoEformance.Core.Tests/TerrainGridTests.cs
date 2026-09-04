@@ -151,16 +151,18 @@ public class TerrainGridTests
     }
 
     [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    public void TheRimIsExactlyOnePixelOnEachSideOfTheLine(int thickness)
+    [InlineData(1, 1)]
+    [InlineData(2, 1)]
+    [InlineData(3, 1)]
+    [InlineData(1, 2)]
+    [InlineData(2, 2)]
+    [InlineData(4, 3)]
+    public void TheRimReachesExactlySoFarOnEachSideOfTheLine(int thickness, int reach)
     {
         // The line is one colour and the ground under it is every colour, so on the ground
         // that matches it the line is not there at all. The rim is what fixes that, and it
-        // has to be ONE pixel on each side whatever the width: two would read as a second,
-        // black outline, and zero on one side (as re-widening an even width would give) puts
-        // the line off-centre in its own rim.
+        // has to reach the SAME distance on each side whatever the width: grown from the
+        // thin line again, an even width would have it one pixel off-centre in its own rim.
         var rows = new string[21];
         for (int y = 0; y < rows.Length; y++)
         {
@@ -168,9 +170,9 @@ public class TerrainGridTests
         }
 
         OutlineMask mask = TerrainOutline.Build(Grid(rows), maxEdge: 64, thickness);
-        byte[] rim = TerrainOutline.Rim(mask);
+        byte[] rim = TerrainOutline.Rim(mask, reach);
 
-        // Across the column: the line plus one on each side, and nothing else on the row.
+        // Across the column: the line plus the reach on each side, and nothing else.
         int lineWidth = 0;
         int rimWidth = 0;
         for (int x = 0; x < mask.Width; x++)
@@ -180,19 +182,19 @@ public class TerrainGridTests
         }
 
         Assert.Equal(thickness, lineWidth);
-        Assert.Equal(thickness + 2, rimWidth);
+        Assert.Equal(thickness + (2 * reach), rimWidth);
 
         // And pixel by pixel, against the definition: set exactly where a line pixel is
-        // within one step in any direction, including diagonally. The two-pass version has
+        // within the reach in any direction, including diagonally. The two-pass version has
         // to agree with the plain one everywhere, edges included.
         for (int y = 0; y < mask.Height; y++)
         {
             for (int x = 0; x < mask.Width; x++)
             {
                 bool near = false;
-                for (int dy = -1; dy <= 1 && !near; dy++)
+                for (int dy = -reach; dy <= reach && !near; dy++)
                 {
-                    for (int dx = -1; dx <= 1 && !near; dx++)
+                    for (int dx = -reach; dx <= reach && !near; dx++)
                     {
                         near = mask.IsSet(x + dx, y + dy);
                     }

@@ -286,6 +286,21 @@ public sealed record OverlaySettings(
         return (colour & 0x00FF_FFFF) | (alpha << 24);
     }
 
+    /// <summary>Writes an ImGui colour out as <c>#RRGGBB</c>, dropping the alpha.</summary>
+    /// <remarks>
+    /// For the configuration page, whose colour control is the browser's own and accepts
+    /// exactly six hex digits: handed eight, it silently shows black. The page cannot set
+    /// alpha, so it loses nothing it could have shown; a colour with alpha comes from the
+    /// in-game style editor, and it keeps it there.
+    /// </remarks>
+    public static string FormatPageColour(uint packed)
+    {
+        uint b = (packed >> 16) & 0xFF;
+        uint g = (packed >> 8) & 0xFF;
+        uint r = packed & 0xFF;
+        return $"#{r:X2}{g:X2}{b:X2}";
+    }
+
     /// <summary>Writes an ImGui colour back out as <c>#AARRGGBB</c>.</summary>
     /// <remarks>
     /// The other direction, for whatever a colour picker produced. Always eight digits: a
