@@ -129,9 +129,13 @@ public sealed class GroundLayer
         // WHY THE MAP LOOKS DIFFERENT HERE. Naming walls and abysses is the fallback for an area
         // whose walkable ground carries no name, and without this sentence the switch between
         // the two reads as the feature being erratic rather than as a decision.
+        //
+        // The CONSEQUENCE only. The note it is appended to already ends in "0 of them ground you
+        // can stand on", so a clause repeating the count read as "0 of them ... and none of them
+        // is" on screen - the same fact twice, which makes a reader look for the difference.
         if (snapshot.Terrain is { NamingUnstandableGround: true } && Note.Length > 0)
         {
-            Note += " - and none of them is, so the walls and the abyss are named instead";
+            Note += ", so the walls and the abyss are named instead";
         }
 
         Diagnosis = snapshot.Terrain?.Ground is { Trusted: false } ground ? ground.Lines : [];
