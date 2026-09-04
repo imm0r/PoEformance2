@@ -54,7 +54,8 @@ public class GroundReadTests
         bool namedFiles = true,
         bool leadingBlank = false,
         int? leftType = null,
-        int? rightType = null)
+        int? rightType = null,
+        bool walkableEverywhere = false)
     {
         OffsetSchema schema = RealSessionTests.Schema();
         StructDef area = schema.Structs["AreaInstance"];
@@ -74,9 +75,10 @@ public class GroundReadTests
         int right = rightType ?? (1 + blank);
 
         var walkable = new byte[stride * rows];
+        int walkableTo = walkableEverywhere ? width : width / 2;
         for (int y = 0; y < rows; y++)
         {
-            for (int x = 0; x < width / 2; x++)
+            for (int x = 0; x < walkableTo; x++)
             {
                 int index = (y * stride) + (x >> 1);
                 walkable[index] |= (byte)((x & 1) == 0 ? 1 : 1 << 4);
@@ -241,16 +243,41 @@ public class GroundReadTests
     }
 
     [Fact]
-    public void TheBlankSlotCannotSatisfyTheWalkabilityCheckOnItsOwn()
+    public void WhichSlotHoldsTheWalkableGroundIsNotAssumedInAdvance()
     {
-        // A WEAKNESS FOUND WHILE FIXING THE ABOVE. The blank covers the void around the playable
-        // area, which is walkable nowhere - so counting it would satisfy the "mostly not
-        // walkable" half of the spread check for free, and the gate would be asking only whether
-        // ANY type is walkable. The named type covers the walkable left half entirely, so the
-        // "mostly walkable" half is satisfied; the BLANK covers the unwalkable right half.
-        // Counting the blank would satisfy the other half and the gate would pass on nothing.
+        // THE SECOND BUG THE BLANK SLOT CAUSED, and the opposite of the first. The spread check
+        // used to EXCLUDE the blank, on the theory that it covers the void outside the playable
+        // area and is walkable nowhere - so counting it would satisfy the "mostly not walkable"
+        // half for free. A live Maelstrom area said otherwise: there the blank IS the floor, 635
+        // of the area's 679 walkable corners, and the two NAMED types are a wall (0 of 2273
+        // walkable) and an abyss (44 of 3561). A correct reading was rejected as a mis-read one.
+        //
+        // Here the named type holds the walkable half and the BLANK holds the unwalkable one -
+        // the Maelstrom the other way up. Either arrangement partitions the walkable ground, and
+        // the check has to believe both: what it tests is the spread, not which slot is which.
         (FakeMemoryReader fake, OffsetSchema schema) = Area(
             types: 1, leadingBlank: true, leftType: 1, rightType: 0);
+
+        TerrainGrid grid = Read(fake, schema);
+
+        Assert.NotNull(grid.Ground);
+        Assert.True(grid.Ground!.Trusted);
+        Assert.Equal(grid.Ground.TotalCorners[1], grid.Ground.WalkableCorners[1]);
+        Assert.Equal(0, grid.Ground.WalkableCorners[0]);
+
+        // One region, not two: the blank is real ground and counts for every measurement, but it
+        // has no name to write, so nothing is labelled on it.
+        TerrainRoom only = Assert.Single(grid.GroundRegions);
+        Assert.Equal(Paths[0], only.Path);
+    }
+
+    [Fact]
+    public void GroundThatDoesNotPartitionTheWalkableAreaIsNotBelieved()
+    {
+        // The check that has to keep working after the above: walkable EVERYWHERE puts both
+        // values at the area's average, which is what a field that is not the ground type looks
+        // like - it would sample the same ground at random and land every value in the same place.
+        (FakeMemoryReader fake, OffsetSchema schema) = Area(walkableEverywhere: true);
 
         TerrainGrid grid = Read(fake, schema);
 

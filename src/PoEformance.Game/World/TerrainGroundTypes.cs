@@ -124,10 +124,12 @@ public sealed class TerrainGroundTypes
     /// <summary>Walkable corners per value, with <see cref="TotalCorners"/> beside it.</summary>
     /// <remarks>
     /// THE SECOND CHECK, and the one a wrong reading cannot pass by luck. If byte 0 really names
-    /// the ground, the types must SEPARATE on walkability: an abyss is walkable nowhere and a
-    /// fill is walkable nearly everywhere. Noise would put every type at the area's average
-    /// instead, because it would be sampling the same ground at random. The SPREAD between the
-    /// types is the evidence, not any one number.
+    /// the ground, the values must PARTITION the walkable ground: a wall and an abyss are walkable
+    /// nowhere, and whatever is left holds nearly all of it. Noise would put every value at the
+    /// area's average instead, because it would be sampling the same ground at random. The SPREAD
+    /// between the extremes is the evidence, not any one number - and which value sits at which
+    /// end is not something to assume in advance. See <see cref="Separates"/> for the area that
+    /// taught that lesson.
     /// </remarks>
     public IReadOnlyList<long> WalkableCorners { get; }
 
@@ -285,9 +287,13 @@ public sealed class TerrainGroundTypes
 
     /// <summary>True when this slot of the list names a file, rather than being a blank one.</summary>
     /// <remarks>
-    /// Every area's list starts with a blank, and a corner value of zero therefore means "no
-    /// ground type here". It is a position in the list rather than a hole in it, so it is kept -
+    /// Every area's list starts with a blank, so a corner value of zero means the game gave that
+    /// ground NO NAME - which is not the same as no ground, and is the distinction that cost this
+    /// class a round. It is a position in the list rather than a hole in it, so it is kept:
     /// dropping it would shift every value above it onto another type's name.
+    ///
+    /// This says whether a value is worth WRITING on the map, and nothing more. It must not be
+    /// used to decide whether a value is worth measuring - see <see cref="Separates"/>.
     /// </remarks>
     public bool Names(int type) => (uint)type < (uint)Types.Count && Types[type].Length > 0;
 
@@ -295,15 +301,31 @@ public sealed class TerrainGroundTypes
     /// Whether the types disagree about walkability enough to be real.
     /// </summary>
     /// <remarks>
-    /// The bar is one type mostly walkable and another mostly not, among types big enough to mean
-    /// anything. A mis-read array samples the same ground for every type and lands them all on
-    /// the area's average, which fails this; a correct one has the abyss at nearly nought and the
-    /// fill at nearly one. Deliberately loose - a check against noise, not a measurement.
+    /// THE CLAIM BEING TESTED is that byte 0 names the ground, and the consequence is that the
+    /// values must PARTITION the walkable ground rather than share it out. A field that is not the
+    /// ground type gets the walkable corners in proportion to its coverage - every value at the
+    /// area's average - so the spread between the extremes is the evidence, and no one value's
+    /// number means anything on its own.
     ///
-    /// THE BLANK SLOT IS EXCLUDED, and leaving it in would quietly gut this. It covers the void
-    /// outside the playable area, which is walkable nowhere - so it satisfies the "mostly not"
-    /// half for free, and the gate would then be asking only whether ANY type is walkable. A
-    /// check half of which passes by construction is most of the way to no check.
+    /// THE BLANK SLOT COUNTS, and excluding it is the bug this is the fix for. The first version
+    /// left it out on the theory that it covers the void outside the playable area and is walkable
+    /// nowhere, so it would satisfy the "mostly not walkable" half for free. A Maelstrom area
+    /// settled that: 3 slots, values 0-2, nothing outside, and
+    ///
+    ///     0  (blank)              746 corners, 635 walkable
+    ///     1  black_inside_wall   2273 corners,   0 walkable
+    ///     2  maelstrom_abyss     3561 corners,  44 walkable
+    ///
+    /// The blank IS the floor there - 635 of the area's 679 walkable corners - and the two named
+    /// types are a wall and an abyss, walkable nowhere, exactly as their names say. Demanding a
+    /// NAMED type that is mostly walkable made a plainly correct reading fail. The blank is not
+    /// reliably walkable or unwalkable, so it hands neither half of this check to anyone.
+    ///
+    /// WHAT IT STILL CANNOT RULE OUT: a field that correlates with walkability without being the
+    /// ground type - the outermost ring of corners is unwalkable whatever it carries, so a value
+    /// confined to the area's edge would read as a clean zero. The volumes are what make that
+    /// implausible rather than this check, and the gate on <see cref="OutOfRange"/> is what makes
+    /// it implausible that the field is anything else at all. Both are needed; neither is enough.
     /// </remarks>
     private static bool Separates(
         IReadOnlyList<string> types, IReadOnlyList<long> walkable, IReadOnlyList<long> total)
@@ -312,22 +334,33 @@ public sealed class TerrainGroundTypes
         // the old cell-era threshold of 1024 would have silenced every type in a small area.
         // Sixty-four corners is about an eight-by-eight block of tiles - enough to mean something.
         const int Enough = 64;
-        bool high = false;
-        bool low = false;
+
+        // Far beyond sampling noise, which on thousands of corners is a fraction of a per cent,
+        // and beyond what a field merely CORRELATED with walkability would reach. An area whose
+        // ground is nearly all walkable - a town - cannot produce this spread and is reported
+        // unconfirmed rather than drawn, which is the honest answer there.
+        const double LeastSpread = 0.5;
+
+        double most = -1.0;
+        double least = 2.0;
 
         for (int type = 0; type < total.Count; type++)
         {
-            if (total[type] < Enough || type >= types.Count || types[type].Length == 0)
+            // Values past the end of the list are excluded because they are not slots; when there
+            // are any, OutOfRange has already killed the reading and this never decides anything.
+            if (total[type] < Enough || type >= types.Count)
             {
                 continue;
             }
 
             double share = walkable[type] / (double)total[type];
-            high |= share > 0.8;
-            low |= share < 0.2;
+            most = Math.Max(most, share);
+            least = Math.Min(least, share);
         }
 
-        return high && low;
+        // Fewer than two values big enough to count leaves most == least or worse, so a one-type
+        // area fails closed rather than passing on a spread of nothing.
+        return most - least >= LeastSpread;
     }
 
     private static string Describe(

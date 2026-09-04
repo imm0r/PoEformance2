@@ -1873,9 +1873,36 @@ interesting part was not the feature:
   drawn through `ImGuiText.Mono` — which is `TextUnformatted` — rather than a printf call. Two
   locks on one bug, because that bug printed a number under another number's name and was believed.
 
-  The one check that only the game can run is the walkability separation: `vaal_building_inside`
-  should be walkable nearly nowhere and `vaal_street` nearly everywhere. Offline the array says
-  the values form a map; in the game the gate says whether they form the RIGHT one.
+  The one check that only the game can run is the walkability separation, and running it found a
+  bug — **in the check, not in the reading**. A Maelstrom area, 69×93 tiles, 3 slots:
+
+  | value | corners | walkable | |
+  |---|---|---|---|
+  | 0 | 746 | **635** | *(blank slot)* |
+  | 1 | 2273 | 0 | `black_inside_wall` |
+  | 2 | 3561 | 44 | `maelstrom_abyss` |
+
+  The reading is plainly right: of the area's 679 walkable corners, **635 are in one value**, and
+  the two named types are a wall and an abyss with essentially none. Noise would have spread those
+  679 across the three by coverage — 77 / 235 / 367. And the names agree with the physics, which
+  is the game confirming itself.
+
+  It was rejected anyway, because `Separates` **excluded the blank slot**, on the belief that the
+  blank is the void outside the playable area and therefore walkable nowhere — so counting it
+  would satisfy the "mostly not walkable" half of the spread for free. Here the blank IS the
+  floor, and the gate was demanding a *named* type that is mostly walkable, which that area cannot
+  have.
+
+  **The blank slot means the game gave that ground no NAME, not that there is no ground.** The
+  check now spans every slot and asks only that the extremes differ by half — the walkable ground
+  must be *partitioned* rather than shared out — and which slot sits at which end is no longer
+  assumed. The blank is still excluded from *labelling*, since an empty path writes nothing, and
+  keeping those two decisions apart is the whole correction: real for measuring, not worth naming.
+
+  What it still cannot rule out is a field that correlates with walkability without being the
+  ground type — the outermost ring of corners is unwalkable whatever it carries. The volumes make
+  that implausible here, and the "nothing outside the list" gate makes it implausible that the
+  field is anything else at all. Both are needed; neither is enough alone.
 
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
