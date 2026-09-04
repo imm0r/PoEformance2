@@ -79,10 +79,14 @@ public sealed class RoomPlacementProbe
     /// <summary>Bytes in one TileStruct entry, as the terrain reader has it.</summary>
     private const int TileEntrySize = 0x38;
 
+    /// <summary>Longest tile path read for the control's second question. Same cap the reader uses.</summary>
+    private const int MostPathChars = 128;
+
     private readonly IMemoryReader _reader;
     private readonly int _terrainMetadata;
     private readonly int _tileDetails;
     private readonly int _tgtFile;
+    private readonly int _tgtPath;
 
     public RoomPlacementProbe(IMemoryReader reader, OffsetSchema schema)
     {
@@ -92,6 +96,7 @@ public sealed class RoomPlacementProbe
         _terrainMetadata = schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata");
         _tileDetails = schema.Structs["TerrainMetadata"].OffsetOf("TileDetailsPtr");
         _tgtFile = schema.Structs["TileStruct"].OffsetOf("TgtFilePtr");
+        _tgtPath = schema.Structs["TgtFile"].OffsetOf("TgtPath");
     }
 
     /// <summary>
@@ -108,6 +113,19 @@ public sealed class RoomPlacementProbe
     /// same table holds a record for, so those pointers are a reference the game demonstrably
     /// makes. If they ARE record addresses the search looks for the right kind of value and a
     /// miss is a real absence; if they are not, the premise is wrong and a miss means nothing.
+    ///
+    /// AND A FAILING CONTROL HAS TWO CAUSES, which the first version could not tell apart and
+    /// reported as one. "This tile's file pointer is not a record address I know" means either
+    /// the game refers to files by some other object - the interesting answer - OR the file
+    /// table walk simply never collected that record, which is a fact about THIS CODE and says
+    /// nothing whatever about the game. An area that lists 846 files where another listed 2573
+    /// makes the second cause very live, and announcing the first would be the same mistake this
+    /// whole probe exists to avoid, one level further up.
+    ///
+    /// So a failing pointer is asked a second question: is the tile's own PATH among the loaded
+    /// files? If it is, the file is in the table and the pointer is genuinely not its record
+    /// address. If it is not, the table is incomplete and the control proves nothing - the file
+    /// walk is what needs fixing before this search can be believed either way.
     /// </remarks>
     private string Control(ulong areaInstance, IReadOnlyDictionary<ulong, string> files)
     {
@@ -122,6 +140,13 @@ public sealed class RoomPlacementProbe
         int tiles = (int)Math.Min(ControlTiles, (long)(last - first) / TileEntrySize);
         int pointers = 0;
         int known = 0;
+        int listed = 0;
+        int unlisted = 0;
+        string missing = string.Empty;
+
+        // Built only when a pointer has already missed, because the by-path question is the
+        // second one and most runs never ask it. Ordinal because these are engine paths.
+        HashSet<string>? paths = null;
 
         for (int i = 0; i < tiles; i++)
         {
@@ -135,6 +160,28 @@ public sealed class RoomPlacementProbe
             if (files.ContainsKey(file))
             {
                 known++;
+                continue;
+            }
+
+            paths ??= new HashSet<string>(files.Values, StringComparer.OrdinalIgnoreCase);
+
+            string path = _reader.ReadStdWString(file + (ulong)_tgtPath, MostPathChars);
+            if (path.Length == 0)
+            {
+                continue;
+            }
+
+            if (paths.Contains(path))
+            {
+                listed++;
+            }
+            else
+            {
+                unlisted++;
+                if (missing.Length == 0)
+                {
+                    missing = path;
+                }
             }
         }
 
@@ -143,11 +190,25 @@ public sealed class RoomPlacementProbe
             return "  control: no tile carried a file pointer, so nothing was proved either way";
         }
 
-        return known > 0
-            ? $"  control: {known} of {pointers} tile file pointers ARE record addresses"
-                + " - the search looks for the right value, so a miss above is a real absence"
-            : $"  control: 0 of {pointers} tile file pointers are record addresses"
-                + " - the game refers to a file by some OTHER object, and this search cannot work";
+        if (known > 0)
+        {
+            return $"  control: {known} of {pointers} tile file pointers ARE record addresses"
+                + " - the search looks for the right value, so a miss above is a real absence";
+        }
+
+        // THE TABLE IS SHORT, and that is a bug here rather than a finding about the game. Said
+        // first because it disqualifies the other reading entirely: a file the walk never saw
+        // cannot demonstrate anything about how the game points at files.
+        if (unlisted > 0)
+        {
+            return $"  control: 0 of {pointers} are record addresses AND {unlisted} of their files"
+                + $" are not in the {files.Count} this run collected (e.g. {Short(missing)})"
+                + " - the FILE TABLE is short, so this search proves nothing until it is fixed";
+        }
+
+        return $"  control: 0 of {pointers} tile file pointers are record addresses, though all"
+            + " their files ARE loaded - the game refers to a file by some OTHER object,"
+            + " and this search cannot work";
     }
 
     /// <summary>
