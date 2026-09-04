@@ -141,6 +141,7 @@ public class OverlaySettingsRoundTripTests
             ShowTerrain: false,
             TerrainColour: "#112233",
             TerrainThickness: 3,
+            TerrainRim: false,
             HideNoise: false,
             RememberOutOfRange: false,
             ShowPoi: false,
@@ -316,6 +317,7 @@ public class OverlaySettingsMergeTests
             MinLootRarity = PoEformance.Game.Components.ItemRarity.Rare,
             TerrainColour = "#010203",
             TerrainThickness = 4,
+            TerrainRim = false,
             ShowTerrain = false,
         };
 
@@ -324,6 +326,7 @@ public class OverlaySettingsMergeTests
         Assert.Equal(PoEformance.Game.Components.ItemRarity.Rare, merged.MinLootRarity);
         Assert.Equal("#010203", merged.TerrainColour);
         Assert.Equal(4, merged.TerrainThickness);
+        Assert.False(merged.TerrainRim);
         Assert.False(merged.ShowTerrain);
     }
 
