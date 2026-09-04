@@ -1,4 +1,5 @@
 using PoEformance.Core.Memory;
+using PoEformance.Core.Schema;
 
 namespace PoEformance.Game.Diagnostics;
 
@@ -52,12 +53,81 @@ public sealed class RoomPlacementProbe
     /// <summary>Lines of hits to print before saying how many more there were.</summary>
     private const int MostHits = 24;
 
-    private readonly IMemoryReader _reader;
+    /// <summary>Tile entries to test as a control. A handful settles it either way.</summary>
+    private const int ControlTiles = 8;
 
-    public RoomPlacementProbe(IMemoryReader reader)
+    /// <summary>Bytes in one TileStruct entry, as the terrain reader has it.</summary>
+    private const int TileEntrySize = 0x38;
+
+    private readonly IMemoryReader _reader;
+    private readonly int _terrainMetadata;
+    private readonly int _tileDetails;
+    private readonly int _tgtFile;
+
+    public RoomPlacementProbe(IMemoryReader reader, OffsetSchema schema)
     {
         ArgumentNullException.ThrowIfNull(reader);
+        ArgumentNullException.ThrowIfNull(schema);
         _reader = reader;
+        _terrainMetadata = schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata");
+        _tileDetails = schema.Structs["TerrainMetadata"].OffsetOf("TileDetailsPtr");
+        _tgtFile = schema.Structs["TileStruct"].OffsetOf("TgtFilePtr");
+    }
+
+    /// <summary>
+    /// Whether the game refers to a file by the ADDRESS this search looks for.
+    /// </summary>
+    /// <remarks>
+    /// THE POSITIVE CONTROL, and the probe was worthless without it. A sweep that finds nothing
+    /// has two completely different meanings - "no room is referred to here" and "rooms are
+    /// referred to by something other than a record address" - and the first version reported
+    /// the first with no way of ruling out the second. It said "nothing refers to a room file"
+    /// as confidently as if it had checked.
+    ///
+    /// Tiles settle it. Every TileStruct carries TgtFilePtr to its own .tdt, which is a file the
+    /// same table holds a record for, so those pointers are a reference the game demonstrably
+    /// makes. If they ARE record addresses the search looks for the right kind of value and a
+    /// miss is a real absence; if they are not, the premise is wrong and a miss means nothing.
+    /// </remarks>
+    private string Control(ulong areaInstance, IReadOnlyDictionary<ulong, string> files)
+    {
+        ulong terrain = areaInstance + (ulong)_terrainMetadata;
+        ulong first = _reader.ReadPointer(terrain + (ulong)_tileDetails);
+        ulong last = _reader.ReadPointer(terrain + (ulong)_tileDetails + 8);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
+        {
+            return "  control: no tile vector, so nothing proves what a file reference looks like";
+        }
+
+        int tiles = (int)Math.Min(ControlTiles, (long)(last - first) / TileEntrySize);
+        int pointers = 0;
+        int known = 0;
+
+        for (int i = 0; i < tiles; i++)
+        {
+            ulong file = _reader.ReadPointer(first + (ulong)(i * TileEntrySize) + (ulong)_tgtFile);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(file))
+            {
+                continue;
+            }
+
+            pointers++;
+            if (files.ContainsKey(file))
+            {
+                known++;
+            }
+        }
+
+        if (pointers == 0)
+        {
+            return "  control: no tile carried a file pointer, so nothing was proved either way";
+        }
+
+        return known > 0
+            ? $"  control: {known} of {pointers} tile file pointers ARE record addresses"
+                + " - the search looks for the right value, so a miss above is a real absence"
+            : $"  control: 0 of {pointers} tile file pointers are record addresses"
+                + " - the game refers to a file by some OTHER object, and this search cannot work";
     }
 
     /// <summary>
@@ -68,7 +138,14 @@ public sealed class RoomPlacementProbe
     /// The .arm files of this area, by the ADDRESS of their FileRecord. That address is the
     /// thing being searched for, so this is the whole input that makes the search unambiguous.
     /// </param>
-    public IReadOnlyList<string> Probe(ulong areaInstance, IReadOnlyDictionary<ulong, string> rooms)
+    /// <param name="files">
+    /// EVERY loaded file by record address, for the control below - the tiles refer to .tdt
+    /// files, not to rooms, so proving the search's premise needs more than the rooms.
+    /// </param>
+    public IReadOnlyList<string> Probe(
+        ulong areaInstance,
+        IReadOnlyDictionary<ulong, string> rooms,
+        IReadOnlyDictionary<ulong, string>? files = null)
     {
         ArgumentNullException.ThrowIfNull(rooms);
 
@@ -139,6 +216,11 @@ public sealed class RoomPlacementProbe
             // probe that never ran, which is the failure the ground layer already paid for.
             lines.Add("  nothing refers to a room file - not by record address, not by path");
         }
+
+        // AND WHETHER THE MISS IS WORTH ANYTHING. Always, not only on a miss: a hit is worth
+        // more when the control agrees, and a control that fails while something was found is
+        // itself a finding about what was found.
+        lines.Add(Control(areaInstance, files ?? rooms));
 
         return lines;
     }
