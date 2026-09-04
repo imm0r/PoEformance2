@@ -1685,36 +1685,91 @@ interesting part was not the feature:
 
   **The `.arm` format.** UTF-16 text: `version <n>`, a length-prefixed string table, a dimension
   list, a number list, the room's own tag (`""`, `"end"`, `"Underground_NS_01"`), another number
-  list, the root SLOT, a variable block of `sum(numbers[0]) * 2` lines, a points-of-interest
-  block, the grid (one row per line, `root.height` rows of `root.width` cells, each `n`, `s`,
-  `o`, `f <string index>` or `k <24 numbers>`), and a second points-of-interest block holding the
-  doodads. A slot's 24 numbers are width, height, then FOUR EDGE TYPES as string indices in the
+  list, the root SLOT, a variable block of `sum(numbers) * 2` lines, several points-of-interest
+  blocks, the grid (one row per line, `root.height` rows of `root.width` cells, each `n`, `s`,
+  `o`, `f <string index>` or `k <24 numbers>`), and then doodads, decals, zones and more - see
+  the section list below. A slot's 24 numbers are width, height, then FOUR EDGE TYPES as string
+  indices in the
   order n, w, s, e, then EIGHT MORE per edge, then a ground type and a height per CORNER
   (sw, se, ne, nw), then the slot's own tag and its origin corner. String indices are 1-based,
   0 meaning none.
 
-  **Those eight are edge LENGTHS, not exits**, and that is a correction to RePoE rather than to
-  this project's eye-reading. `annalithic/poeformats/Arm.cs` names them `edgeLengthDown`,
-  `edgeLengthRight`, `edgeLengthUp`, `edgeLengthLeft` with an unknown between each; RePoE calls
-  them `exit` and `virtual_exit`. The files settle it: across one dump those positions hold 3
-  (8685 times), 9, 4, 21, 1, 6, 15, 12, 18 and 99. A boolean exit flag is 0 or 1. Nothing here
-  reads those fields, so the correction costs nothing and prevents the next person trusting a
-  name that is wrong.
+  **Those eight are FOUR PAIRS, one per edge, and they are not booleans. What the first of each
+  pair MEANS is not settled, and an earlier version of this paragraph said it was.**
 
-  **And a renderer says what UNIT they are in.** `annalithic/poeterrain/Assets/ArmImportComponent.cs`
-  builds a mesh per slot with `x = sizeX * 3`, then treats `edgeLengthDown == x` as the special
-  case "the edge runs the whole way". So an edge length is measured in THIRDS OF A TILE, and 3 is
-  a full 1x1 edge - which is exactly why 3 dominates the dump: most slots are single tiles whose
-  edge spans them completely. Of the ten values seen, eight (3, 6, 9, 12, 15, 18, 21, 99) are
-  multiples of three, and the two that are not, 1 and 4, are transitions partway along a wider
-  slot. The correction is no longer only "these are not booleans"; the numbers are accounted for.
+  What is measured, and is not in doubt: across one dump those positions hold 3 (8685 times), 9, 4,
+  21, 1, 6, 15, 12, 18 and 99. A boolean exit flag is 0 or 1, so whatever they are, they are not
+  that. All three parsers type them as integers rather than flags, so none of them claims otherwise.
 
-  Two parsers now AGREE on the corners, which is what makes the ground-stamp measurement above
-  worth its verdict: RePoE puts `sw, se, ne, nw` at 14..17 with heights at 18..21, and
-  `Arm.cs` reads `groundTypeDownLeft, DownRight, UpRight, UpLeft` then the four heights, at the
-  same positions. The field the measurement was taken on is confirmed independently of the
-  source it was read from. `Arm.cs` also shows the origin is only present above version 18, so
-  an old slot is 23 numbers rather than 24.
+  What is agreed STRUCTURE, by three parsers independently: eight numbers, grouped as four pairs in
+  the same cardinal order the edge types use, and only the FIRST of each pair is ever given a
+  meaning. `adamthedash/poe_data_tools` zips them `.tuples()` against `Direction::cardinal()`;
+  `annalithic/poeformats/Arm.cs` reads a named field and an unknown, alternating. Same shape, and
+  both leave the second element unexplained.
+
+  What is DISPUTED is the name of the first. RePoE and `poe_data_tools` call the pair
+  `exit`/`virtual_exit`; `Arm.cs` calls the first `edgeLengthDown`/`Right`/`Up`/`Left`. Two names
+  to one - but names are not evidence, and only one reading is load-bearing anywhere:
+  `annalithic/poeterrain/Assets/ArmImportComponent.cs` USES the value as a distance, building a mesh
+  with `x = sizeX * 3` and treating `edgeLength == x` as "the edge runs the whole way". That
+  accounts for the dump - 3 dominates because most slots are single tiles whose edge spans them
+  completely, and eight of the ten values (3, 6, 9, 12, 15, 18, 21, 99) are multiples of three,
+  the exceptions 1 and 4 being transitions partway along a wider slot.
+
+  **The two readings may not even conflict**: a position along an edge where an exit sits is also a
+  distance along that edge, and both would be measured in the same thirds-of-a-tile. Nothing here
+  reads these fields, so the question costs nothing to leave open - and leaving it open is the
+  honest state, which "not exits" was not.
+
+  THREE parsers now agree on the corners, which is what makes the ground-stamp measurement above
+  worth its verdict: RePoE puts `sw, se, ne, nw` at 14..17 with heights at 18..21; `Arm.cs` reads
+  `groundTypeDownLeft, DownRight, UpRight, UpLeft` then the four heights, at the same positions;
+  and `poe_data_tools` zips them against a named constant, `Direction::diagonals()`, which IS
+  `[SW, SE, NE, NW]`. Both the corner order and the edge order (`Direction::cardinal()` =
+  `[N, W, S, E]`) are now spelled out by a parser rather than inferred from field names. The field
+  the measurement was taken on is confirmed independently of the source it was read from.
+
+  Two small refinements from the same place: the four corner HEIGHTS are parsed signed while every
+  other number in the slot is unsigned, and the origin is optional - `Arm.cs` gates it on version
+  above 18, `poe_data_tools` simply reads it if present, so an old slot is 23 numbers rather than 24.
+
+  **AND THE ORIGIN IS A COMPASS CORNER, confirmed twice over from two directions.**
+  `poe_data_tools` resolves it as `Direction::diagonals()[origin]`, so 0-3 are SW, SE, NE, NW. The
+  renderer never says that and does not have to: `ArmImportComponent` shifts x by `-(sizeX - 1)`
+  for origin 1 or 2 and y by `-(sizeY - 1)` for 2 or 3 - which is exactly "the two EAST corners"
+  and "the two NORTH corners" under that mapping. A name from one source and arithmetic from
+  another, agreeing without either knowing about the other.
+
+  **THE SECTION LIST, from the only parser that reads the whole file.**
+  `adamthedash/poe_data_tools`' `arm/parser.rs` goes past the grid where the others stop, and it
+  corrects this file's own summary in two places. The tail is not "a second points-of-interest
+  block holding the doodads": after the grid come DOODADS, then doodad CONNECTIONS (`from`, `to`,
+  tag), DECALS (x, y, rotation, scale, an atlas file, a tag), BOSS LINES, ZONES, TAGS and finally
+  the ground-override grid. And the variable block before the grid is `sum(ALL the numbers) * 2`
+  entries, not the sum of the first - each an `.et` file index, an int and up to three bools.
+
+  The points-of-interest section is several GROUPS, and how many depends on the version: nine below
+  20, ten to 26, five to 29, six above. Each entry is `x`, `y`, a rotation and a tag.
+
+  The ground-override grid is confirmed a third time and exactly: `(height - 1) * (width - 1)`
+  string indices, optional, 1-based with 0 meaning none - the formula this project measured against
+  five of sixty-three rooms.
+
+  ZONES ARE NEW HERE AND WORTH KNOWING ABOUT: a room can declare NAMED RECTANGLES inside itself -
+  `name`, `x_min`, `y_min`, `x_max`, `y_max`, plus a teleport flag and an environment file above
+  version 35. That is the game naming a part of a room. It changes nothing about placement, because
+  the coordinates are room-local like everything else in the file, but it is the first per-part
+  naming any of these parsers has shown.
+
+  **AND THE FORMAT DRIFTS HARD ACROSS VERSIONS**, which is the practical warning to take from this
+  parser: it gates on version at a dozen points - the dimension line at 22 and 31, decals at 17,
+  doodad fields at 18, 23, 25, 34 and 36, zones at 27, 33 and 35, and at version 32 whole sections
+  switch from length-prefixed to `-1`-terminated. Any future reading of an `.arm` has to carry the
+  version, and a layout taken from one dump is a layout for that dump's version.
+
+  **A FIFTH SOURCE WITH NO PLACEMENT.** Nothing in the whole file carries a world position: the
+  most complete parser of the four reads zones, decals, doodads, connections, boss lines and tags,
+  and every coordinate in all of them is room-local.
 
   **AND A TILE DECLARES ITS OWN FOUR CORNER GROUNDS.** `annalithic/poeformats/Tdt.cs` reads a
   `.tdt` as `inherits`, `tgt`, `feature`, four edge types, `sizeX`/`sizeY`, then
