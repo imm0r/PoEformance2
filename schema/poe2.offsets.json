@@ -958,7 +958,7 @@
     },
 
     "LoadedFilesBucket": {
-      "comment": "One bucket. Data is a StdVector of FileRecordSlot; Capacity is one LESS than the real capacity, and is only read as a sanity gate - the vector's own first/last say how many there are.",
+      "comment": "One bucket. Data is a StdVector of FileRecordSlot, and the vector's own first/last say how many slots there are. CAPACITY IS NOT A COUNT AND NOTHING READS IT ANY MORE - it was believed to be one-less-than-capacity and was used as a sanity gate, and in 2026-09 that gate threw an intact table away whole. Measured live in a MapForge area, the sixteen buckets read -843513840, -843186160, -842858480 and on down: every value ending 0010 and stepping by a constant 0x50000, which is the low half of a POINTER, one allocation per bucket. Meanwhile every vector was perfect - (end-begin)/0x18 gave 990, 959, 927 slots, about fifteen thousand across the table. The gate refused anything not positive, so the walk reported \"no files matched this area\". WHY IT SURFACED WHEN IT DID: the sign of a pointer's low half is a coin flip per allocation, so the same build read this table an hour earlier in another session and nothing was patched. The bug had been latent since the walk was written. The field is left in the schema because DescribeBuckets prints it and printing it is how it was caught, but no walk gates on it - the vector's begin, end and slot count gate the data actually read.",
       "fields": {
         "Data": { "offset": "0x00", "type": "stdVector" },
         "Capacity": { "offset": "0x18", "type": "i32" }

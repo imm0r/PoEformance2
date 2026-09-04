@@ -625,9 +625,53 @@ public class PreloadNewestStampTests
         IReadOnlyList<string> lines = new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic);
 
         Assert.Contains($"root at {Root:X}", lines[0], StringComparison.Ordinal);
-        Assert.Contains("every bucket is empty", lines[^1], StringComparison.Ordinal);
+        Assert.Contains("no bucket holds slots", lines[^1], StringComparison.Ordinal);
         Assert.Contains(lines, l => l.Contains("bucket  0", StringComparison.Ordinal));
         Assert.Contains(lines, l => l.Contains("bucket 15", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ACapacityThatIsNotACountDoesNotThrowTheTableAway()
+    {
+        // THE LIVE BUG, and the worst kind: an intact table reported as "no files matched this
+        // area". The field at +0x18 is not a count. Measured in a MapForge area the sixteen
+        // buckets read -843513840, -843186160, -842858480 and on down - every value ending 0010,
+        // stepping by a constant 0x50000, which is the low half of a POINTER, one allocation per
+        // bucket. Every vector was perfect: (end-begin)/0x18 gave 990, 959 and 927 slots.
+        //
+        // The walk gated on capacity > 0 and threw all of it away. The sign of a pointer's low
+        // half is a coin flip per allocation, so the same build had read the same table an hour
+        // earlier; nothing was patched, and the bug had been latent since the walk was written.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 9),
+            ("Data/Balance/FlavourText.dat", 9));
+
+        // Whatever the fixture put there, make it the shape the game actually holds.
+        memory.Place(Root + (ulong)Schema().Structs["LoadedFilesBucket"].OffsetOf("Capacity"), -843513840);
+
+        var reader = new PreloadReader(memory, Schema());
+
+        Assert.Equal(["Data/Balance/BaseItemTypes.dat", "Data/Balance/FlavourText.dat"],
+            reader.Read(RootStatic, 9).OrderBy(p => p, StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void TheBucketReadoutDoesNotCallAFullBucketEmpty()
+    {
+        // MY OWN VERDICT, REFUTED BY ITS OWN ROWS. DescribeBuckets required a positive capacity
+        // before counting a bucket usable, so it printed "every bucket is empty" above sixteen
+        // rows each reporting nine hundred slots - in the diagnostic written to stop exactly
+        // that kind of line. A verdict its own evidence contradicts is worse than no verdict.
+        FakeMemoryReader memory = TableWith(("Data/Balance/BaseItemTypes.dat", 9));
+        memory.Place(Root + (ulong)Schema().Structs["LoadedFilesBucket"].OffsetOf("Capacity"), -843513840);
+
+        IReadOnlyList<string> lines = new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic);
+
+        Assert.DoesNotContain(lines, l => l.Contains("no bucket holds slots", StringComparison.Ordinal));
+        Assert.Contains(lines, l => l.Contains("buckets hold slots", StringComparison.Ordinal));
+
+        // And the oddity is still SAID, because printing it is how the field was caught.
+        Assert.Contains(lines, l => l.Contains("are not counts", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -642,8 +686,8 @@ public class PreloadNewestStampTests
 
         IReadOnlyList<string> lines = new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic);
 
-        Assert.Contains("buckets hold slots", lines[^1], StringComparison.Ordinal);
-        Assert.DoesNotContain("every bucket is empty", lines[^1], StringComparison.Ordinal);
+        Assert.Contains(lines, l => l.Contains("buckets hold slots", StringComparison.Ordinal));
+        Assert.DoesNotContain(lines, l => l.Contains("no bucket holds slots", StringComparison.Ordinal));
     }
 
     [Fact]
