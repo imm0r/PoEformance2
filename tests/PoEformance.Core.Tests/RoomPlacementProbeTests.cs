@@ -203,16 +203,24 @@ public class RoomPlacementProbeTests
         Assert.Contains("a real absence", lines[^1], StringComparison.Ordinal);
     }
 
-    [Fact]
-    public void TheControlSaysTheSearchCannotWorkWhenTilesPointElsewhere()
+    /// <summary>
+    /// A tile whose file pointer is NOT a record address, carrying a path of its own.
+    /// </summary>
+    /// <remarks>
+    /// The fixture both failing-control tests need, and the whole point of it is the last
+    /// argument: whether that path is among the loaded files decides WHICH failure it is, and
+    /// nothing else about the two cases differs.
+    /// </remarks>
+    private static IReadOnlyList<string> ControlWithTilePath(string path, params string[] loaded)
     {
-        // The answer that would explain a miss completely, and the one the probe could not give.
         OffsetSchema schema = RealSessionTests.Schema();
         ulong terrain = Area + (ulong)schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata");
         int tileVector = schema.Structs["TerrainMetadata"].OffsetOf("TileDetailsPtr");
         int tgtFile = schema.Structs["TileStruct"].OffsetOf("TgtFilePtr");
+        int tgtPath = schema.Structs["TgtFile"].OffsetOf("TgtPath");
 
         const ulong Tiles = 0x0000_0500_0040_0000;
+        const ulong PathData = 0x0000_0500_0060_0000;
 
         var tile = new byte[0x38];
         BitConverter.GetBytes(Decoy).CopyTo(tile, tgtFile);
@@ -222,10 +230,54 @@ public class RoomPlacementProbeTests
             .Place<ulong>(terrain + (ulong)tileVector, Tiles)
             .Place<ulong>(terrain + (ulong)tileVector + 8, Tiles + (ulong)tile.Length);
 
+        memory.PlaceStdWString(Decoy + (ulong)tgtPath, path, PathData);
+
+        // Addresses nothing points at, because what is being tested is the PATH lookup: if the
+        // record addresses were reachable the control would have passed on the first question.
+        var files = new Dictionary<ulong, string>(Rooms);
+        ulong at = 0x0000_0500_0070_0000;
+        foreach (string name in loaded)
+        {
+            files[at] = name;
+            at += 0x1000;
+        }
+
+        return new RoomPlacementProbe(memory, schema).Probe(Area, Rooms, files);
+    }
+
+    [Fact]
+    public void TheControlSaysTheSearchCannotWorkWhenTheFileIsLoadedButNotPointedAt()
+    {
+        // The answer that would explain a miss completely: the file IS in the table, so the
+        // table is not the problem - the game simply refers to it by something that is not its
+        // record address, and searching for record addresses cannot work here.
         IReadOnlyList<string> lines =
-            new RoomPlacementProbe(memory, schema).Probe(Area, Rooms);
+            ControlWithTilePath("Tiles/Steppe/Steppe_Fill_01.tdt", "Tiles/Steppe/Steppe_Fill_01.tdt");
 
         Assert.Contains("cannot work", lines[^1], StringComparison.Ordinal);
+        Assert.Contains("their files ARE loaded", lines[^1], StringComparison.Ordinal);
+        Assert.DoesNotContain("FILE TABLE is short", lines[^1], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AFileTheWalkNeverCollectedIsCalledAShortTableAndNotAFindingAboutTheGame()
+    {
+        // THE DISTINCTION THIS PROBE GOT WRONG IN THE FIELD. The control reported "the game
+        // refers to a file by some OTHER object" in an area listing 846 files where another had
+        // listed 2573 - a claim about the GAME resting on a table that may simply be missing the
+        // record. A file the walk never saw cannot demonstrate anything about how the game
+        // points at files, so this must read as a bug here rather than as a finding.
+        IReadOnlyList<string> lines =
+            ControlWithTilePath("Tiles/Steppe/Steppe_Fill_01.tdt", "Tiles/Elsewhere/Other.tdt");
+
+        Assert.Contains("FILE TABLE is short", lines[^1], StringComparison.Ordinal);
+        Assert.Contains("proves nothing", lines[^1], StringComparison.Ordinal);
+
+        // And it names the file it could not find, so the next question has somewhere to start.
+        Assert.Contains("Steppe_Fill_01.tdt", lines[^1], StringComparison.Ordinal);
+
+        // The conclusion it must NOT reach.
+        Assert.DoesNotContain("some OTHER object", lines[^1], StringComparison.Ordinal);
     }
 
     [Fact]
