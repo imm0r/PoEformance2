@@ -130,6 +130,15 @@ public sealed class RoomPlacementProbe
     /// the first with no way of ruling out the second. It said "nothing refers to a room file"
     /// as confidently as if it had checked.
     ///
+    /// WHAT IT ANSWERED, so nobody re-runs this expecting a different kind of result. A Steppe map,
+    /// 2026-09: 211 .arm records, 32768 bytes swept, 693 pointers and 263 vectors followed - both
+    /// well under their caps, so the sweep FINISHED - control 8 of 8, and nothing referring to a
+    /// room file by either form. AreaInstance is not the holder. Beside the file evidence (five
+    /// parsers, no coordinates anywhere) the reading that fits everything is that a room is a
+    /// GENERATION-TIME concept: the generator places rooms, bakes them into tiles, and nothing
+    /// retains the association - which is also why the files are loaded here and pointed at by
+    /// nothing. See docs/architecture.md.
+    ///
     /// Tiles settle it. Every TileStruct carries TgtFilePtr to its own .tdt, which is a file the
     /// same table holds a record for, so those pointers are a reference the game demonstrably
     /// makes. If they ARE record addresses the search looks for the right kind of value and a
