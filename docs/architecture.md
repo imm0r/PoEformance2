@@ -1744,10 +1744,26 @@ interesting part was not the feature:
 
   That has a direct consequence for `TerrainGroundTypes`, which reduces a tile's four corners to a
   MAJORITY before drawing. The majority is this project's invention, not the game's: the game
-  draws all four. Drawing at corner resolution would be closer to what the player sees, and the
-  data is already read - the reduction happens after the array is in hand. Not changed, because
-  nobody asked for it and the map layer is coarse anyway; recorded because "the four corners of a
-  tile disagree" is a fact about the terrain, not noise to be averaged away.
+  draws all four.
+
+  **What that reduction can cost is ONE thing, not a general loss of detail, and the difference is
+  the whole reason there is a probe rather than a change.** The ground layer writes a NAME AT A
+  POINT per region - no fill, no outline - so a boundary drawn half a tile more precisely would
+  move a label by a few pixels and change nothing a person could see. What a majority can do is
+  DELETE a type: a thin feature that never holds three of any tile's four corners is absorbed into
+  its neighbour, the region never forms, and the word is simply absent from the map. That is the
+  only way the reduction changes what the map SAYS.
+
+  Whether it ever happens is a question about real areas, not about the argument, so
+  `GroundResolutionProbe` counts it: how the four corners of each tile split, how many quarters the
+  majority overrules, and the regions each resolution would keep - ending in a row per type whose
+  count differs, marked `NAMED NOWHERE TODAY` where the tile side has none and the quarter side
+  has some. Under `--debug` beside the other terrain probes, and deliberately without a verdict.
+
+  It compares against **what the layer actually draws**, which is why
+  `TerrainGroundTypes.WorthNaming` exists: the walls-only-as-fallback rule used to live inside
+  `FindGroundRegions`, and a probe that re-implemented it would have been comparing the map against
+  a second opinion of the map. One rule, two callers.
 
   The same file also pins down `origin` with arithmetic instead of a name: a cell with
   `origin == 1 || origin == 2` shifts by `-(sizeX - 1)` tiles and `origin == 2 || origin == 3` by
