@@ -24,6 +24,15 @@ namespace PoEformance.Game.Diagnostics;
 /// takes, and for the same reason: a measurement that also concludes is a measurement nobody
 /// re-reads.
 ///
+/// WHAT IT ANSWERED THE FIRST TIME IT RAN, so nobody re-opens the question from the argument alone.
+/// A Titan Grotto abyss, 16983 tiles, at the most sensitive setting the layer has: 16078 tiles
+/// unanimous, 1492 of 67932 quarters overruled, 22 patches by tile against 23 by quarter, and NO
+/// type named nowhere. The single differing type was already on the map ten times. That area was
+/// picked because it looked like the thin-feature case - a walkway and an edge in a field 94 per
+/// cent abyss - and it was not one: 529 two-two tiles against 318 three-one says the boundaries
+/// there are straight, and a straight feature two corners wide keeps winning tiles. So the layer
+/// stays at tile resolution, and what would reopen it is a NAMED NOWHERE TODAY row somewhere else.
+///
 /// IT COMPARES AGAINST WHAT THE LAYER ACTUALLY DRAWS. The tile side runs the same flood fill over
 /// the same filter the map uses - <see cref="TerrainGroundTypes.WorthNaming"/>, which is on the
 /// ground object precisely so both callers share it. A probe that re-implemented the filter would

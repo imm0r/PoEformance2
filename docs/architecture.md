@@ -1820,6 +1820,32 @@ interesting part was not the feature:
   `FindGroundRegions`, and a probe that re-implemented it would have been comparing the map against
   a second opinion of the map. One rule, two callers.
 
+  **AND THE ANSWER, MEASURED, IS NO - DO NOT CHANGE THE LAYER.** A Titan Grotto abyss, 153x111
+  tiles, run at the most sensitive setting the layer has (smallest patch 1 tile, so nothing is
+  filtered out before the comparison):
+
+      ground resolution: 16983 tiles, 67932 quarters, 4 slots, smallest patch 1 tiles
+        corners per tile: 16078 agree, 318 three-one, 529 two-two, 58 two-one-one, 0 all four
+        the majority overrules 1492 of 67932 quarters
+        patches worth naming: 22 by tile, 23 by quarter
+        TitanWalkwayGround          10 by tile    11 by quarter
+
+  No `NAMED NOWHERE TODAY` row at all. One type differs and it is one that is ALREADY on the map
+  ten times over; the eleventh patch adds a position and no word. With `MaxPatches` at its default
+  of three, that eleventh patch is not even drawn. 94.7 per cent of tiles are unanimous and 2.2 per
+  cent of quarters are overruled.
+
+  **THIS WAS THE AREA PREDICTED TO SHOW SOMETHING**, which is what gives the negative its weight:
+  before the run, `TitanWalkwayGround` at 567 corners and `TitanEdge` at 444 in a field 94 per cent
+  abyss looked exactly like the thin-feature case the probe was built for. It is not, and the
+  numbers say why - `529` two-two tiles against `318` three-one means the boundaries here are
+  STRAIGHT rather than ragged, and a straight-edged feature two or more corners wide keeps winning
+  tiles. The majority only erases something thinner than that, and this walkway is not.
+
+  So the corner-resolution idea is measured and declined rather than merely unbuilt. What would
+  reopen it is a `NAMED NOWHERE TODAY` row in some other area, which is one glance at the readout
+  and needs no new code.
+
   The same file also pins down `origin` with arithmetic instead of a name: a cell with
   `origin == 1 || origin == 2` shifts by `-(sizeX - 1)` tiles and `origin == 2 || origin == 3` by
   `-(sizeY - 1)`, so origin is WHICH CORNER of a multi-tile slot the grid cell anchors, numbered
