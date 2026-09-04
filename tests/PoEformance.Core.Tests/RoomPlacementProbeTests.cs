@@ -172,6 +172,43 @@ public class RoomPlacementProbeTests
     }
 
     [Fact]
+    public void AVectorSpanningMoreThanHalfTheAddressSpaceIsRejectedAndNotAllocated()
+    {
+        // THE CRASH THIS PROBE ACTUALLY DIED OF IN THE FIELD, reported as
+        // "OverflowException: Arithmetic operation resulted in an overflow" and, before the
+        // buttons learned to report, as nothing happening at all.
+        //
+        // The span guard compared (long)(end - begin) against its cap. That subtraction is
+        // UNSIGNED, so a difference of 2^63 or more turns NEGATIVE on the cast - and a negative
+        // number is not greater than the cap, so the garbage triple sailed through the one check
+        // meant to stop it. The truncating (int) cast that followed could then be negative too,
+        // and `new byte[negative]` is an OverflowException.
+        //
+        // Nothing here is exotic: AreaInstance is swept as raw memory, so any three consecutive
+        // qwords may look like begin/end/capacity by accident, and whether one does is a fact
+        // about the area's heap. That is why this crashed in one area and not another.
+        const ulong Begin = 0x0000_0500_0080_0000;
+        const ulong Span = 0x8000_0000_FFFF_FFFF;
+
+        FakeMemoryReader memory = Instance(bytes =>
+        {
+            Put(bytes, 0x600, Begin);            // begin: a plausible pointer
+            Put(bytes, 0x608, Begin + Span);     // end: past it, as the guard demands
+            Put(bytes, 0x610, Begin + Span);     // capacity: no smaller than end
+        });
+
+        // The whole assertion is that this RETURNS. Every line of it was unreachable before.
+        IReadOnlyList<string> lines =
+            new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
+
+        Assert.Contains(lines, l => l.Contains("nothing refers to a room file", StringComparison.Ordinal));
+
+        // And it is REJECTED rather than read: a span of eight exabytes is not a vector, so it
+        // must not be counted as one either.
+        Assert.Contains("0 vectors", lines[0], StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void TheControlProvesTheSearchWhenTilesPointAtRecords()
     {
         // A tile carries TgtFilePtr to its own .tdt, which the same table holds a record for -

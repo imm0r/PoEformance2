@@ -146,7 +146,11 @@ public sealed class RoomPlacementProbe
             return "  control: no tile vector, so nothing proves what a file reference looks like";
         }
 
-        int tiles = (int)Math.Min(ControlTiles, (long)(last - first) / TileEntrySize);
+        // UNSIGNED for the same reason the vector span is, and this one FAILS QUIETLY rather than
+        // crashing: a signed cast of a huge pointer difference goes negative, the loop below then
+        // runs zero times, and the control reports "no tile carried a file pointer" - a verdict
+        // about the game produced by an arithmetic slip.
+        int tiles = (int)Math.Min((ulong)ControlTiles, (last - first) / TileEntrySize);
         int pointers = 0;
         int known = 0;
         int listed = 0;
@@ -390,7 +394,16 @@ public sealed class RoomPlacementProbe
         ref int more,
         int alreadyFound)
     {
-        const long MostSpan = 4L * 1024 * 1024;
+        // UNSIGNED, and that is the whole of a crash this probe died of in the field. The cap was
+        // a long and the span was compared as one - but end and begin are POINTERS, so their
+        // difference is unsigned and a garbage triple spanning 2^63 or more turns NEGATIVE on the
+        // cast. A negative number is not greater than the cap, so the one check meant to reject
+        // that triple waved it through, and the truncating cast below then asked for an array of
+        // negative length: "OverflowException: Arithmetic operation resulted in an overflow".
+        //
+        // Whether any three consecutive qwords in AreaInstance happen to look like this is a fact
+        // about the area's heap, which is why it crashed in one area and not the one before it.
+        const ulong MostSpan = 4UL * 1024 * 1024;
         int here = 0;
 
         for (int i = 0; i + 24 <= window.Length; i += 8)
@@ -407,14 +420,17 @@ public sealed class RoomPlacementProbe
             if (!MemoryReaderExtensions.IsPlausiblePointer(begin)
                 || end <= begin
                 || capacity < end
-                || (long)(end - begin) > MostSpan
+                || end - begin > MostSpan
                 || !followed.Add(begin))
             {
                 continue;
             }
 
             here++;
-            var elements = new byte[Math.Min(VectorBytes, (int)(end - begin))];
+
+            // Safe to narrow only because the span is now capped BEFORE the cast: the guard above
+            // proves it is between 1 and MostSpan, so this cannot be negative or truncate.
+            var elements = new byte[(int)Math.Min((ulong)VectorBytes, end - begin)];
             if (_reader.TryRead(begin, elements))
             {
                 Look(elements, begin, $"{via}+0x{i:X4} vector -> ", rooms, hits, ref more);
