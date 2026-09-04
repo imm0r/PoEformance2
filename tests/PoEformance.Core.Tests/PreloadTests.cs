@@ -613,6 +613,52 @@ public class PreloadNewestStampTests
     }
 
     [Fact]
+    public void TheBucketsAreShownWhenTheWalkReachesNothing()
+    {
+        // ONE LEVEL BELOW "no slots walked", which is itself three faults wearing one number:
+        // RecordsIn gives up on an unreadable capacity, on a begin that is not a pointer, and
+        // on a slot count of zero, and three of its four exits are silent. A root that resolves
+        // but holds no table is the live case, and sixteen empty buckets is what says so.
+        var memory = new FakeMemoryReader();
+        memory.Place(RootStatic, Root);
+
+        IReadOnlyList<string> lines = new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic);
+
+        Assert.Contains($"root at {Root:X}", lines[0], StringComparison.Ordinal);
+        Assert.Contains("every bucket is empty", lines[^1], StringComparison.Ordinal);
+        Assert.Contains(lines, l => l.Contains("bucket  0", StringComparison.Ordinal));
+        Assert.Contains(lines, l => l.Contains("bucket 15", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ABucketThatHoldsSlotsIsCountedAsUsable()
+    {
+        // The other side, so the verdict cannot be a constant: one full bucket among empties is
+        // a DIFFERENT fault from sixteen empties - a stride problem rather than a wrong root -
+        // and the summary has to tell them apart.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 9),
+            ("Data/Balance/FlavourText.dat", 9));
+
+        IReadOnlyList<string> lines = new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic);
+
+        Assert.Contains("buckets hold slots", lines[^1], StringComparison.Ordinal);
+        Assert.DoesNotContain("every bucket is empty", lines[^1], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ARootThatIsNotAPointerIsSaidRatherThanWalked()
+    {
+        var memory = new FakeMemoryReader();
+        memory.Place(RootStatic, 0UL);
+
+        Assert.Contains(
+            "not a pointer",
+            Assert.Single(new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic)),
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ASweepThatNeverStartedSaysSoRatherThanReturningZeros()
     {
         // "Walked and found nothing" and "never started" both came back as a row of zeros,

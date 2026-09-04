@@ -550,6 +550,62 @@ public sealed class PreloadReader
     }
 
     /// <summary>Every record a bucket points at, however many that turns out to be.</summary>
+    /// <summary>
+    /// What each of the sixteen buckets actually holds - the level below "no slots walked".
+    /// </summary>
+    /// <remarks>
+    /// THE SAME FAILURE ONE LEVEL DOWN. <see cref="RecordsIn"/> gives up in four places and
+    /// three of them are silent: an unreadable or non-positive capacity, a begin that is not a
+    /// pointer or an end at or before it, and a slot count of zero. So "0 slots walked" is
+    /// itself three different faults wearing one number, exactly as "no files matched" was.
+    ///
+    /// This prints the root and every bucket's three fields, so the answer is read rather than
+    /// inferred: sixteen empty buckets mean the root points at something that is not the table,
+    /// while one plausible bucket among empties means the stride is wrong. It reads 16 x 24
+    /// bytes and is meant to be pressed once.
+    /// </remarks>
+    public IReadOnlyList<string> DescribeBuckets(ulong fileRootStatic)
+    {
+        ulong root = _reader.ReadPointer(fileRootStatic);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(root))
+        {
+            return [$"the file root static at {fileRootStatic:X} holds {root:X}, which is not a pointer"];
+        }
+
+        var lines = new List<string>(_bucketCount + 2) { $"root at {root:X}, {_bucketCount} buckets of 0x{_bucketSize:X}" };
+        int usable = 0;
+
+        for (int b = 0; b < _bucketCount; b++)
+        {
+            ulong bucket = root + (ulong)(b * _bucketSize);
+            bool readCapacity = _reader.TryRead(bucket + (ulong)_bucketCapacity, out int capacity);
+            ulong first = _reader.ReadPointer(bucket);
+            ulong last = _reader.ReadPointer(bucket + sizeof(ulong));
+
+            long slots = MemoryReaderExtensions.IsPlausiblePointer(first) && last > first
+                ? (long)(last - first) / _slotSize
+                : 0;
+
+            if (readCapacity && capacity > 0 && slots > 0)
+            {
+                usable++;
+            }
+
+            lines.Add(
+                $"  bucket {b,2}  capacity {(readCapacity ? capacity.ToString(System.Globalization.CultureInfo.InvariantCulture) : "unreadable"),-10}"
+                + $"  begin {first:X16}  end {last:X16}  {slots} slots");
+        }
+
+        // THE VERDICT THE ROWS ADD UP TO, said rather than left to be counted by eye. Sixteen
+        // empty buckets is a different fault from one full bucket among fifteen empties, and a
+        // person reading sixteen hex rows at four in the morning should not have to spot it.
+        lines.Add(usable == 0
+            ? "  every bucket is empty - the root points at something that is not the file table"
+            : $"  {usable} of {_bucketCount} buckets hold slots");
+
+        return lines;
+    }
+
     private IEnumerable<ulong> RecordsIn(ulong bucket)
     {
         if (!_reader.TryRead(bucket + (ulong)_bucketCapacity, out int capacity) || capacity <= 0)
