@@ -172,6 +172,57 @@ public class RoomPlacementProbeTests
     }
 
     [Fact]
+    public void ASweepThatRanOutOfBudgetSaysSoAndDoesNotCallItsMissAnAbsence()
+    {
+        // THE VERDICT THIS PROBE OVERCLAIMED, twice in the same file and both times the same
+        // way. Its first run with a passing control reported "followed 512 pointers and 128
+        // vectors" - which were the two caps exactly - above a line calling the miss a real
+        // absence. The numbers were printed; the fact that they were LIMITS was not, so a miss
+        // in one eighth of the window read as a miss in the whole struct.
+        //
+        // A confirmed premise says the search looks for the right VALUE. It never says the
+        // search looked everywhere.
+        var window = new byte[RoomPlacementProbe.SweepBytes];
+
+        // Every slot an ascending plausible pointer, which makes consecutive triples read as
+        // begin/end/capacity - so it is the VECTOR cap that binds here, exactly as it did in the
+        // area that prompted this. The follow cap cannot bind any more by construction, which is
+        // the other half of the same fix; see the bound test below.
+        for (int at = 0; at + 8 <= window.Length; at += 8)
+        {
+            Put(window, at, 0x0000_0600_0000_0000 + ((ulong)at * 0x1000));
+        }
+
+        FakeMemoryReader memory = new FakeMemoryReader().Place(Area, window);
+
+        IReadOnlyList<string> lines =
+            new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
+
+        Assert.Contains(lines, l => l.Contains("STOPPED AT ITS LIMITS", StringComparison.Ordinal));
+
+        // The miss is stated as bounded rather than total.
+        Assert.Contains(lines, l => l.Contains("in what was reached", StringComparison.Ordinal));
+        Assert.DoesNotContain(
+            lines, l => l.Contains("nothing refers to a room file - not by", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void AnUntruncatedMissKeepsTheFullVerdict()
+    {
+        // THE OTHER HALF, without which the test above only proves the probe got quieter. A
+        // sweep that finished has every right to call its miss an absence, and the wording must
+        // still say so - otherwise the caveat is noise that a reader learns to skip.
+        FakeMemoryReader memory = Instance(_ => { });
+
+        IReadOnlyList<string> lines =
+            new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
+
+        Assert.Contains(
+            lines, l => l.Contains("nothing refers to a room file - not by", StringComparison.Ordinal));
+        Assert.DoesNotContain(lines, l => l.Contains("STOPPED AT ITS LIMITS", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void AVectorSpanningMoreThanHalfTheAddressSpaceIsRejectedAndNotAllocated()
     {
         // THE CRASH THIS PROBE ACTUALLY DIED OF IN THE FIELD, reported as
@@ -363,6 +414,12 @@ public class RoomPlacementProbeTests
     {
         // A window of nonsense is mostly plausible-looking pointers. Following every one turns
         // one probe into a walk of the heap, and a recording into something nobody can open.
+        //
+        // THE BOUND IS NOW THE WINDOW ITSELF, and this test changed with it. It used to assert
+        // that the follow cap was REACHED, which held only while the cap was 512 - one slot in
+        // eight - and that is precisely what made a miss look wider than it was. The cap is one
+        // per qword of the sweep now, so no window can drive it: a slot cannot be followed
+        // twice, so the sweep is bounded whether or not the guard ever fires.
         FakeMemoryReader memory = Instance(bytes =>
         {
             for (int at = 0; at + 8 <= bytes.Length; at += 8)
@@ -373,7 +430,10 @@ public class RoomPlacementProbeTests
 
         IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
 
-        Assert.Contains(
-            $"followed {RoomPlacementProbe.MostFollowed} pointers", lines[0], StringComparison.Ordinal);
+        int followed = int.Parse(
+            lines[0].Split("followed ")[1].Split(' ')[0],
+            System.Globalization.CultureInfo.InvariantCulture);
+
+        Assert.InRange(followed, 1, RoomPlacementProbe.MostFollowed);
     }
 }
