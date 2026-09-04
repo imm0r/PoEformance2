@@ -1904,6 +1904,34 @@ interesting part was not the feature:
   that implausible here, and the "nothing outside the list" gate makes it implausible that the
   field is anything else at all. Both are needed; neither is enough alone.
 
+  **Which types are worth naming, and how often.** Two rules, both learned from screenshots rather
+  than reasoned out in advance:
+
+  - **Walls and ceilings only when they are what is left.** Most of an area is scenery you cannot
+    enter, so naming every wall patch buries the labels worth reading — the same thing that made
+    the ROOM names unusable until they were filtered. But an area whose floor carries the game's
+    unnamed slot has nothing *but* walls and abysses to name, and there, which unenterable region
+    is a fall and which is a wall is the whole of what the layer can say. So the filter applies
+    only when it leaves something behind, and the readout says when it did not.
+
+    "Standable" is decided **per type**, over the whole area, at corner resolution — not by
+    `TerrainRoom.IsWalkable`, which asks whether a region holds *one* walkable tile. That is far
+    too weak here: a ground-type region hugs the floor for hundreds of tiles and the walkable
+    geometry does not follow tile edges, so an abyss touching the floor anywhere passes it. The
+    Maelstrom measures the leak exactly — `maelstrom_abyss` has 44 walkable corners of 3561. The
+    bar is a quarter, and it is wide because the thing it separates is not close: 0% for a wall,
+    1.2% for an abyss, 85% for a floor.
+
+  - **A type is written at most N times.** The layer shipped with one filter, on the reasoning
+    that an area holds a handful of ground types, so its regions must be few and large and a size
+    threshold would do the whole job. An Abyssal Depths screenshot killed that: two types, and
+    `maelstrom_abyss` written across the map roughly twenty times. **Few types does not mean few
+    regions** — one type winds through an area in dozens of separate pieces, every piece a label
+    carrying the same word, and size cannot thin pieces that are not small. The regions arrive
+    largest-first within a type, so the ones kept are the ones somebody can see they are standing
+    in. The default of three is a starting point, not a measurement; the only figure in hand is
+    the twenty that made the map unreadable.
+
   Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
   `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
   whatever its elements happen to begin with, and never opens the array — so a whole level of

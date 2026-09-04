@@ -3457,10 +3457,26 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             OverlayLayout.Hint(
                 "What the ground IS rather than which file drew it - the abyss, the fill,"
-                + "\nthe waypoint - in the names the area itself lists.");
+                + "\nthe waypoint - in the names the area itself lists."
+                + "\nGround you can stand on is named; walls and ceilings only in an area"
+                + "\nwhere nothing else carries a name.");
 
             if (_ground.Enabled)
             {
+                // FIRST, because it is the one that does the work - the same order the room
+                // names put their two filters in, and for the same reason. Every patch of one
+                // type carries the same word, so the twentieth adds a position and no meaning.
+                int repeats = _ground.MaxPatches;
+                if (OverlayLayout.Slider("Named up to", ref repeats, 1, 20, "%d patches"))
+                {
+                    _ground.MaxPatches = repeats;
+                    SettingsChanged?.Invoke();
+                }
+
+                OverlayLayout.Hint(
+                    "One type winds through an area in dozens of separate pieces, and each one"
+                    + "\nis a label carrying the same word. The biggest are kept.");
+
                 int least = _ground.MinTiles;
                 if (OverlayLayout.Slider("Smallest Patch Named", ref least, 1, 64, "%d tiles"))
                 {
@@ -3469,8 +3485,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 }
 
                 OverlayLayout.Hint(
-                    "An area has a handful of ground types, so its patches are few and large."
-                    + "\nWhat this drops is the ragged edge where two of them meet.");
+                    "What this drops is the ragged edge where two types meet."
+                    + "\nFew types does not mean few patches - size alone cannot thin them.");
 
                 // WHY THERE IS NOTHING ON THE MAP, which without this line is indistinguishable
                 // from the feature being broken. WRITTEN OUT rather than hinted: OverlayLayout
