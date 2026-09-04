@@ -105,6 +105,58 @@ public class RoomPlacementProbeTests
     }
 
     [Fact]
+    public void AVectorsELEMENTSAreReachedWhichIsTwoHopsOut()
+    {
+        // WHAT THE FIRST VERSION COULD NOT REACH, and the reason its miss was thin even once
+        // the control had earned it. A placement list is a vector hanging off a field, so its
+        // ELEMENTS are two hops from AreaInstance: field -> owner -> vector data. One hop saw
+        // the owner and stopped, which is exactly where the begin pointer lives and exactly
+        // one short of where the rooms would be.
+        //
+        // Followed by SHAPE - three slots reading begin, end, end-of-storage - but what is
+        // searched for at the other end is still a known record address, so a false triple
+        // costs one read and finds nothing.
+        var elements = new byte[0x80];
+        Put(elements, 0x10, FirstRoom);
+
+        var owner = new byte[0x200];
+        Put(owner, 0x40, Vector);                       // begin
+        Put(owner, 0x48, Vector + (ulong)elements.Length);   // end
+        Put(owner, 0x50, Vector + (ulong)elements.Length);   // end of storage
+
+        const ulong Owner = 0x0000_0500_0060_0000;
+        FakeMemoryReader memory = Instance(bytes => Put(bytes, 0x200, Owner))
+            .Place(Owner, owner)
+            .Place(Vector, elements);
+
+        IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
+
+        Assert.Contains(lines, l => l.Contains("vector ->", StringComparison.Ordinal)
+                                    && l.Contains("entrance.arm", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ThreeSlotsThatAreNotAVectorCostOneReadAndFindNothing()
+    {
+        // The guard on the shape test. Following a triple is a decision about WHERE TO READ,
+        // never about what was found - so a window full of plausible-looking triples must still
+        // produce no hits, or the probe would be back to matching shapes.
+        var owner = new byte[0x200];
+        for (int at = 0; at + 8 <= owner.Length; at += 8)
+        {
+            Put(owner, at, Decoy + (ulong)at);
+        }
+
+        const ulong Owner = 0x0000_0500_0060_0000;
+        FakeMemoryReader memory = Instance(bytes => Put(bytes, 0x200, Owner))
+            .Place(Owner, owner);
+
+        IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
+
+        Assert.Contains(lines, l => l.Contains("nothing refers to a room file", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void AMissIsWORTHLESSWithoutTheControlSayingTheSearchCouldHaveWorked()
     {
         // THE FLAW THE FIRST VERSION SHIPPED WITH, and it was found by running it: a sweep that
@@ -187,6 +239,7 @@ public class RoomPlacementProbeTests
 
         Assert.Contains($"swept {RoomPlacementProbe.SweepBytes} bytes", lines[0], StringComparison.Ordinal);
         Assert.Contains("followed 0 pointers", lines[0], StringComparison.Ordinal);
+        Assert.Contains("0 vectors", lines[0], StringComparison.Ordinal);
         Assert.Contains("2 .arm records", lines[0], StringComparison.Ordinal);
     }
 

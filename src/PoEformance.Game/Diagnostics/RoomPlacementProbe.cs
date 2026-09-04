@@ -35,11 +35,31 @@ namespace PoEformance.Game.Diagnostics;
 /// </remarks>
 public sealed class RoomPlacementProbe
 {
-    /// <summary>How much of AreaInstance to sweep. Its mapped fields end at 0x8C0.</summary>
-    public const int SweepBytes = 0x2000;
+    /// <summary>
+    /// How much of AreaInstance to sweep. Its mapped fields end at 0x8C0.
+    /// </summary>
+    /// <remarks>
+    /// WIDENED ONCE THE CONTROL EARNED IT. Eight kilobytes found nothing, and that was worth
+    /// nothing until the tile control proved the search looks for the right value - 8 of 8 tile
+    /// file pointers ARE record addresses. With the premise confirmed the miss became a real
+    /// absence, and widening became the next step rather than a guess. Still one read, and
+    /// still inside what a recording will hold.
+    /// </remarks>
+    public const int SweepBytes = 0x8000;
 
     /// <summary>How much to read at each followed pointer.</summary>
     private const int WindowBytes = 0x200;
+
+    /// <summary>How much of a vector's ELEMENTS to read. Bigger, because that is the payload.</summary>
+    /// <remarks>
+    /// A placement record plausibly carries a file pointer, tile coordinates, a size and a
+    /// rotation - call it 0x40 bytes - so four kilobytes covers the first sixty-odd placements
+    /// of an area. Finding ONE is the whole job; the rest follows from knowing where to look.
+    /// </remarks>
+    private const int VectorBytes = 0x1000;
+
+    /// <summary>How many vector-shaped triples to follow. Few exist; the cap is a guard.</summary>
+    public const int MostVectors = 128;
 
     /// <summary>
     /// How many pointers to follow. A guard on a garbage window, not a view about the struct.
@@ -48,7 +68,7 @@ public sealed class RoomPlacementProbe
     /// A window of nonsense is mostly plausible-looking pointers, and following every one turns
     /// one probe into a walk of the heap - and a recording into something nobody can open.
     /// </remarks>
-    public const int MostFollowed = 256;
+    public const int MostFollowed = 512;
 
     /// <summary>Lines of hits to print before saying how many more there were.</summary>
     private const int MostHits = 24;
@@ -170,9 +190,11 @@ public sealed class RoomPlacementProbe
         var hits = new List<string>();
         var followed = new HashSet<ulong>();
         int follows = 0;
+        int vectors = 0;
         int more = 0;
 
         Look(window, areaInstance, "", rooms, hits, ref more);
+        vectors += Vectors(window, "AreaInstance", rooms, followed, hits, ref more, vectors);
 
         for (int at = 0; at + 8 <= window.Length; at += 8)
         {
@@ -193,14 +215,23 @@ public sealed class RoomPlacementProbe
             var inner = new byte[WindowBytes];
             if (_reader.TryRead(target, inner))
             {
-                Look(inner, target, $"AreaInstance+0x{at:X4} -> ", rooms, hits, ref more);
+                string via = $"AreaInstance+0x{at:X4} -> ";
+                Look(inner, target, via, rooms, hits, ref more);
+
+                // AND ONE HOP FURTHER, but only through a VECTOR. A placement list is a vector
+                // hanging off a field, so its elements are two hops out and the first version
+                // could never reach them. Following every pointer at this depth instead would
+                // be sixteen thousand reads of the heap; following the triples that look like
+                // a vector is a handful, and it is the shape the thing being looked for HAS.
+                vectors += Vectors(
+                    inner, via.TrimEnd(' ', '-', '>'), rooms, followed, hits, ref more, vectors);
             }
         }
 
         var lines = new List<string>(hits.Count + 2)
         {
-            $"placements: {rooms.Count} .arm records, swept {SweepBytes} bytes of AreaInstance"
-            + $" and followed {follows} pointers",
+            $"placements: {rooms.Count} .arm records, swept {SweepBytes} bytes of AreaInstance,"
+            + $" followed {follows} pointers and {vectors} vectors",
         };
 
         lines.AddRange(hits);
@@ -262,6 +293,60 @@ public sealed class RoomPlacementProbe
                 Add(hits, ref more, $"  {via}+0x{i:X4}  the text \".arm\" at {at + (ulong)i:X}");
             }
         }
+    }
+
+    /// <summary>
+    /// Follows every vector-shaped triple in a window and searches its elements.
+    /// </summary>
+    /// <remarks>
+    /// THE SHAPE THE ANSWER WOULD HAVE. Three consecutive slots reading begin, end and
+    /// end-of-storage, with begin a plausible pointer, end past it and capacity no smaller - a
+    /// std::vector, which is how this game stores every list this project has ever found. That
+    /// is a structural fingerprint, and this file's own doc says what those are worth on their
+    /// own; it is used here only to decide WHERE TO READ, and what is searched for at the other
+    /// end is still a known record address. A false triple costs one read and finds nothing.
+    /// </remarks>
+    private int Vectors(
+        byte[] window,
+        string via,
+        IReadOnlyDictionary<ulong, string> rooms,
+        HashSet<ulong> followed,
+        List<string> hits,
+        ref int more,
+        int alreadyFound)
+    {
+        const long MostSpan = 4L * 1024 * 1024;
+        int here = 0;
+
+        for (int i = 0; i + 24 <= window.Length; i += 8)
+        {
+            if (alreadyFound + here >= MostVectors)
+            {
+                break;
+            }
+
+            ulong begin = BitConverter.ToUInt64(window, i);
+            ulong end = BitConverter.ToUInt64(window, i + 8);
+            ulong capacity = BitConverter.ToUInt64(window, i + 16);
+
+            if (!MemoryReaderExtensions.IsPlausiblePointer(begin)
+                || end <= begin
+                || capacity < end
+                || (long)(end - begin) > MostSpan
+                || !followed.Add(begin))
+            {
+                continue;
+            }
+
+            here++;
+            var elements = new byte[Math.Min(VectorBytes, (int)(end - begin))];
+            if (_reader.TryRead(begin, elements))
+            {
+                Look(elements, begin, $"{via}+0x{i:X4} vector -> ", rooms, hits, ref more);
+            }
+        }
+
+        return here;
     }
 
     private static void Add(List<string> hits, ref int more, string line)
