@@ -36,6 +36,7 @@ function renderState(s) {
       $("ov-terrain-colour").value = s.overlay.terrainColour;
       $("ov-terrain-thickness").value = s.overlay.terrainThickness;
       $("ov-terrain-thickness-value").textContent = s.overlay.terrainThickness;
+      $("ov-terrain-rim").checked = s.overlay.terrainRim;
     }
   }
 
@@ -119,11 +120,12 @@ function sendOverlay() {
       showTerrain: $("ov-terrain").checked,
       terrainColour: $("ov-terrain-colour").value,
       terrainThickness: Number($("ov-terrain-thickness").value),
+      terrainRim: $("ov-terrain-rim").checked,
     },
   });
 }
 
-for (const id of ["ov-loot", "ov-terrain", "ov-terrain-colour", "ov-terrain-thickness"]) {
+for (const id of ["ov-loot", "ov-terrain", "ov-terrain-colour", "ov-terrain-thickness", "ov-terrain-rim"]) {
   // Touching a control claims it, even before anything is sent: dragging a colour picker
   // fires "input" for a while before the "change" that commits it.
   $(id).addEventListener("input", () => (overlayEditingUntil = Date.now() + 1500));
@@ -132,6 +134,7 @@ for (const id of ["ov-loot", "ov-terrain", "ov-terrain-colour", "ov-terrain-thic
 $("ov-loot").addEventListener("change", sendOverlay);
 $("ov-terrain").addEventListener("change", sendOverlay);
 $("ov-terrain-colour").addEventListener("change", sendOverlay);
+$("ov-terrain-rim").addEventListener("change", sendOverlay);
 
 // On "change", not "input": dragging a slider fires continuously, and each thickness step
 // rebuilds the terrain texture on the render thread.
@@ -687,7 +690,7 @@ if (bridge.connected) {
     entityCount: 0,
     staticsFound: 0,
     staticsTotal: 6,
-    overlay: { minLootRarity: "Magic", showTerrain: true, terrainColour: "#96c8ff", terrainThickness: 1, terrain: "browser preview" },
+    overlay: { minLootRarity: "Magic", showTerrain: true, terrainColour: "#96c8ff", terrainThickness: 1, terrainRim: true, terrain: "browser preview" },
     autoFlask: {
       enabled: false,
       keySource: "Defaults - no host",

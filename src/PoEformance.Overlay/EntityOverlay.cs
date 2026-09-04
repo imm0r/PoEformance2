@@ -431,7 +431,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // planner, so the layer exists from the start and takes the settings directly.
         _ground.Apply(settings.GroundOrDefault);
 
-        ApplyTerrainStyle(OverlaySettings.ParseColour(settings.TerrainColour), settings.TerrainThickness);
+        ApplyTerrainStyle(
+            OverlaySettings.ParseColour(settings.TerrainColour), settings.TerrainThickness, settings.TerrainRim);
     }
 
     /// <summary>The settings as they stand now, for writing down.</summary>
@@ -2057,9 +2058,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     // either of them losing the other's value.
     private uint _terrainColour = 0xFF64C8FF;
     private int _terrainThickness = 1;
+    private bool _terrainRim = true;
 
-    /// <summary>Sets the layout's colour and line width. A colour of 0 keeps the current one.</summary>
-    public void ApplyTerrainStyle(uint colour, int thickness)
+    /// <summary>
+    /// Sets the layout's colour, line width and whether it has a dark rim. A colour of 0 keeps
+    /// the current one.
+    /// </summary>
+    public void ApplyTerrainStyle(uint colour, int thickness, bool rim)
     {
         if (colour != 0)
         {
@@ -2069,6 +2074,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         _terrainThickness = thickness;
         _terrain.Thickness = thickness;
+        _terrainRim = rim;
+        _terrain.Rim = rim;
     }
 
     /// <summary>

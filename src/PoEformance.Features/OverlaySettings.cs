@@ -15,6 +15,11 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("showTerrain")] bool ShowTerrain = true,
     [property: JsonPropertyName("terrainColour")] string TerrainColour = "#96C8FF",
     [property: JsonPropertyName("terrainThickness")] int TerrainThickness = 1,
+
+    // The dark rim around the layout's line. ON by default: the line is one colour, the
+    // ground under it is every colour, and without the rim it vanishes on whichever ground
+    // happens to match - see TerrainOutline.Rim.
+    [property: JsonPropertyName("terrainRim")] bool TerrainRim = true,
     [property: JsonPropertyName("hideNoise")] bool HideNoise = true,
     [property: JsonPropertyName("rememberOutOfRange")] bool RememberOutOfRange = true,
     [property: JsonPropertyName("showPoi")] bool ShowPoi = true,
@@ -189,6 +194,7 @@ public sealed record OverlaySettings(
             ShowTerrain = sent.ShowTerrain,
             TerrainColour = sent.TerrainColour,
             TerrainThickness = sent.TerrainThickness,
+            TerrainRim = sent.TerrainRim,
         };
     }
 

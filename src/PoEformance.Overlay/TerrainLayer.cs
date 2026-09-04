@@ -50,6 +50,16 @@ public sealed class TerrainLayer : IDisposable
     /// </remarks>
     private const int MaxTextureEdge = 2048;
 
+    /// <summary>
+    /// How opaque the dark rim around the line is, out of 255.
+    /// </summary>
+    /// <remarks>
+    /// Just under half. The rim is there to separate the line from a ground that matches it,
+    /// not to draw a second, black outline - on the parts of the map where the pale line
+    /// already reads, a solid black rim would be the thing the eye lands on instead.
+    /// </remarks>
+    private const byte RimAlpha = 127;
+
     private readonly Func<string, Image<Rgba32>, bool, IntPtr> _upload;
     private readonly Action<string> _release;
 
@@ -70,6 +80,7 @@ public sealed class TerrainLayer : IDisposable
     private float _lean;
     private uint _colour = 0xFF64C8FF;
     private int _thickness = 1;
+    private bool _rim = true;
 
     // Set once the layer has given up, so a failure is reported once rather than every frame.
     private string? _failure;
@@ -111,6 +122,24 @@ public sealed class TerrainLayer : IDisposable
                 _thickness = clamped;
                 _built = null;   // the pixels change, so the texture has to be made again
                 _failure = null; // and a previous failure deserves a fresh attempt
+            }
+        }
+    }
+
+    /// <summary>
+    /// Whether the line gets a dark, half-transparent rim one pixel wide. Changing it rebuilds
+    /// the texture, for the reason thickness does: the rim is pixels, not a tint.
+    /// </summary>
+    public bool Rim
+    {
+        get => _rim;
+        set
+        {
+            if (value != _rim)
+            {
+                _rim = value;
+                _built = null;
+                _failure = null;
             }
         }
     }
@@ -238,16 +267,31 @@ public sealed class TerrainLayer : IDisposable
 
         using var image = new Image<Rgba32>(configuration, mask.Width, mask.Height);
 
-        // White where the boundary is, transparent everywhere else. The colour comes from
-        // the tint at draw time, so changing it costs nothing and rebuilds nothing.
+        // White where the boundary is, a dark rim one pixel around it, transparent
+        // everywhere else. The colour comes from the tint at draw time, so changing it costs
+        // nothing and rebuilds nothing - and because a tint MULTIPLIES, the rim's black stays
+        // black under every colour while its alpha still follows the line's own.
+        //
+        // The rim is in the texture rather than a second, wider quad underneath, which would
+        // draw every pixel of the map twice per piece - and the pale line is not distinct
+        // from a sunlit rock without it, which is the difference between a map and nothing.
+        byte[] line = mask.Cells;
+
+        // With the rim off, the line's own pixels stand in for it: the test below then never
+        // finds a rim pixel the line does not already cover, and no second buffer is built.
+        byte[] rim = _rim ? TerrainOutline.Rim(mask) : line;
+        var lit = new Rgba32(255, 255, 255, 255);
+        var dark = new Rgba32(0, 0, 0, RimAlpha);
+        var clear = new Rgba32(0, 0, 0, 0);
         image.ProcessPixelRows(rows =>
         {
             for (int y = 0; y < mask.Height; y++)
             {
                 Span<Rgba32> row = rows.GetRowSpan(y);
-                for (int x = 0; x < mask.Width; x++)
+                int at = y * mask.Width;
+                for (int x = 0; x < mask.Width; x++, at++)
                 {
-                    row[x] = mask.IsSet(x, y) ? new Rgba32(255, 255, 255, 255) : new Rgba32(0, 0, 0, 0);
+                    row[x] = line[at] != 0 ? lit : rim[at] != 0 ? dark : clear;
                 }
             }
         });
