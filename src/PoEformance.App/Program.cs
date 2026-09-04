@@ -2390,6 +2390,45 @@ internal static class Program
             });
         }
 
+        // NEEDS NO INSTALL, unlike the two above: it reads memory rather than the game's files,
+        // so it is attached whether or not the bundles can be opened. The one thing it needs is
+        // the loaded-file table, which is the very list this page is about.
+        overlay.HuntRoomPlacements = () => _ = Task.Run(() =>
+        {
+            try
+            {
+                if (fileRoot == 0)
+                {
+                    preload.Swept(["placements: the FileRoot static did not resolve"]);
+                    return;
+                }
+
+                PoEformance.Core.Diagnostics.GameChainAddresses chain =
+                    PoEformance.Core.Diagnostics.GameChain.Resolve(reader, schema, gameStatesStatic);
+
+                // THE ADDRESSES ARE THE SEARCH. Every loaded file has a record, and the walk
+                // gives its address - so the area's rooms become a set of known pointers that
+                // nothing can match by accident. See RoomPlacementProbe.
+                var rooms = new Dictionary<ulong, string>();
+                foreach (ulong record in preloadReader.Records(fileRoot))
+                {
+                    string path = preloadReader.NameOf(record);
+                    if (path.EndsWith(".arm", StringComparison.OrdinalIgnoreCase))
+                    {
+                        rooms[record] = path;
+                    }
+                }
+
+                preload.Swept(
+                    new PoEformance.Game.Diagnostics.RoomPlacementProbe(reader)
+                        .Probe(chain.AreaInstance, rooms));
+            }
+            catch (Exception exception) when (exception is IOException or InvalidOperationException)
+            {
+                preload.Swept([exception.Message]);
+            }
+        });
+
         overlay.AttachPreload(
             preload,
             () => LookAtWhatLoaded(preloadArea),

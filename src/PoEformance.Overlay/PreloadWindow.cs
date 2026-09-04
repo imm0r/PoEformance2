@@ -32,6 +32,7 @@ public sealed class PreloadWindow
     private readonly Action _sweep;
     private readonly Action? _rooms;
     private readonly Action? _writeRooms;
+    private readonly Action? _huntPlacements;
     private readonly Action _rulesChanged;
     private string _search = string.Empty;
     private string _said = string.Empty;
@@ -57,7 +58,8 @@ public sealed class PreloadWindow
         Action sweep,
         Action rulesChanged,
         Action? rooms = null,
-        Action? writeRooms = null)
+        Action? writeRooms = null,
+        Action? huntPlacements = null)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(lookAgain);
@@ -69,6 +71,7 @@ public sealed class PreloadWindow
         _rulesChanged = rulesChanged;
         _rooms = rooms;
         _writeRooms = writeRooms;
+        _huntPlacements = huntPlacements;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -140,6 +143,19 @@ public sealed class PreloadWindow
             if (ImGui.SmallButton("Write the Rooms Out"))
             {
                 _writeRooms();
+            }
+        }
+
+        // AND THE OTHER DIRECTION: not what a room file says, but who in memory REFERS to one.
+        // This list is what makes that searchable at all - it hands over the ADDRESS of every
+        // room's record, so the hunt looks for a known value rather than for a shape that
+        // resembles a room. See RoomPlacementProbe for why that distinction is the whole point.
+        if (all.Count > 0 && _huntPlacements is not null)
+        {
+            ImGui.SameLine();
+            if (ImGui.SmallButton("Hunt the Placements"))
+            {
+                _huntPlacements();
             }
         }
 
