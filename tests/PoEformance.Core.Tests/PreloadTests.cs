@@ -571,6 +571,61 @@ public class PreloadNewestStampTests
         Assert.Contains("whole game", reader.LastError, StringComparison.Ordinal);
         Assert.DoesNotContain("moved", reader.LastError, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void ATableThatYieldsNoRecordsIsNotAMovedStampField()
+    {
+        // THE THIRD LIVE FAILURE, and it made the readout contradict itself in front of
+        // somebody: an area reported "the newest stamp is 0 but the counter says 4 - the stamp
+        // field has probably moved; try 'find the count field'", and the sweep it recommended
+        // then reported ZERO RECORDS READ. Both cannot be true. With no records there is no
+        // stamp to be at the wrong offset - the root or the bucket layout is wrong, one level
+        // above anything a count-field sweep can see, and the advice sent the search into the
+        // one place that could not hold the answer.
+        //
+        // The number that tells them apart was being counted and thrown away.
+        var memory = new FakeMemoryReader();
+        memory.Place(RootStatic, Root);          // a root that resolves, holding no buckets
+
+        var reader = new PreloadReader(memory, Schema());
+        Assert.Empty(reader.Read(RootStatic, 4));
+
+        Assert.Equal(0, reader.RecordsSeen);
+        Assert.Contains("no records at all", reader.LastError, StringComparison.Ordinal);
+        Assert.DoesNotContain("stamp field has probably moved", reader.LastError, StringComparison.Ordinal);
+        Assert.DoesNotContain("find the count field", reader.LastError, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RecordsSeenCountsWhatTheWalkReachedWhateverItHeld()
+    {
+        // The other side: records that ARE reached, whose stamps happen to read low. Here the
+        // moved-field advice is the right one, and it must survive the fix above.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 2),
+            ("Data/Balance/FlavourText.dat", 2));
+
+        var reader = new PreloadReader(memory, Schema());
+        reader.Read(RootStatic, 13);
+
+        Assert.Equal(2, reader.RecordsSeen);
+        Assert.Contains("moved", reader.LastError, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ASweepThatNeverStartedSaysSoRatherThanReturningZeros()
+    {
+        // "Walked and found nothing" and "never started" both came back as a row of zeros,
+        // which is the one confusion every diagnostic here has had to be taught not to make.
+        var memory = new FakeMemoryReader();
+        memory.Place(RootStatic, 0UL);
+
+        var reader = new PreloadReader(memory, Schema());
+        PreloadReader.PreloadSweep swept = reader.Sweep(RootStatic, 4);
+
+        Assert.Equal(0, swept.Slots);
+        Assert.Contains("did not resolve", reader.LastError, StringComparison.Ordinal);
+    }
 }
 /// <summary>
 /// Matching the curated list against what an area loaded.

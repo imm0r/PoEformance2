@@ -172,10 +172,13 @@ public sealed class PreloadReader
                 // fits that state perfectly and explains it completely wrongly, which is worse
                 // than saying nothing - so it only gets used when the counter agrees that the
                 // session really is that young.
-                LastError = Counter > _ignoreFirstAreas + 1
-                    ? $"the newest stamp in the table is {Newest} but the counter says {Counter} - "
-                        + "the stamp field has probably moved; try 'find the count field'"
-                    : $"only {Newest} areas loaded so far - the list is still the whole game";
+                LastError = RecordsSeen == 0
+                    ? "the walk reached no records at all - the file root or the bucket layout"
+                        + " is wrong, so the stamp offset is not the problem"
+                    : Counter > _ignoreFirstAreas + 1
+                        ? $"the newest stamp in the table is {Newest} but the counter says {Counter} - "
+                            + "the stamp field has probably moved; try 'find the count field'"
+                        : $"only {Newest} areas loaded so far - the list is still the whole game";
             }
 
             return found;
@@ -193,6 +196,19 @@ public sealed class PreloadReader
 
         return found;
     }
+
+    /// <summary>
+    /// How many records the last walk of the table saw at all, whatever they held.
+    /// </summary>
+    /// <remarks>
+    /// THE NUMBER THAT TELLS TWO FAILURES APART, and it was being computed and thrown away.
+    /// A newest stamp of zero has two completely different causes wanting opposite fixes: the
+    /// stamp sits at a different offset (records exist, their counts read wrong), or the walk
+    /// never reached a record at all (the root or the bucket layout is wrong, and the stamp
+    /// offset is irrelevant). Without this, both printed "the stamp field has probably moved"
+    /// and sent somebody to a sweep that cannot help.
+    /// </remarks>
+    public int RecordsSeen { get; private set; }
 
     /// <summary>The newest area-change stamp anywhere in the table - the current area's.</summary>
     public int Newest { get; private set; }
@@ -212,10 +228,12 @@ public sealed class PreloadReader
     private int HighestCount(ulong root)
     {
         int newest = 0;
+        RecordsSeen = 0;
         for (int b = 0; b < _bucketCount; b++)
         {
             foreach (ulong record in RecordsIn(root + (ulong)(b * _bucketSize)))
             {
+                RecordsSeen++;
                 if (_reader.TryRead(record + (ulong)_recordCount, out int loadedAt)
                     && loadedAt > newest && loadedAt < MostPlausibleCount)
                 {
@@ -343,9 +361,15 @@ public sealed class PreloadReader
         int records = 0;
         int named = 0;
 
+        // "Walked and found nothing" and "never started" both used to come back as a row of
+        // zeros, which is the one confusion every diagnostic in this project has had to be
+        // taught not to make.
+        LastError = string.Empty;
+
         ulong root = _reader.ReadPointer(fileRootStatic);
         if (!MemoryReaderExtensions.IsPlausiblePointer(root))
         {
+            LastError = "the file root did not resolve, so nothing was swept";
             return new PreloadSweep(0, 0, 0, [], [], [], _recordCount);
         }
 
