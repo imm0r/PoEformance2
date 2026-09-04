@@ -2433,10 +2433,20 @@ internal static class Program
                 // THE ADDRESSES ARE THE SEARCH. Every loaded file has a record, and the walk
                 // gives its address - so the area's rooms become a set of known pointers that
                 // nothing can match by accident. See RoomPlacementProbe.
+                // BOTH SETS, and the second is what makes a miss mean anything: the rooms are
+                // what is searched for, and every file is what the control needs - the tiles
+                // refer to .tdt files, so proving the search's premise takes more than rooms.
                 var rooms = new Dictionary<ulong, string>();
+                var files = new Dictionary<ulong, string>();
                 foreach (ulong record in preloadReader.Records(fileRoot))
                 {
                     string path = preloadReader.NameOf(record);
+                    if (path.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    files[record] = path;
                     if (path.EndsWith(".arm", StringComparison.OrdinalIgnoreCase))
                     {
                         rooms[record] = path;
@@ -2444,8 +2454,8 @@ internal static class Program
                 }
 
                 preload.Swept(
-                    new PoEformance.Game.Diagnostics.RoomPlacementProbe(reader)
-                        .Probe(chain.AreaInstance, rooms));
+                    new PoEformance.Game.Diagnostics.RoomPlacementProbe(reader, schema)
+                        .Probe(chain.AreaInstance, rooms, files));
             }
             catch (Exception exception) when (exception is IOException or InvalidOperationException)
             {

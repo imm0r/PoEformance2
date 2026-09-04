@@ -1,3 +1,4 @@
+using PoEformance.Core.Schema;
 using PoEformance.Game.Diagnostics;
 
 namespace PoEformance.Core.Tests;
@@ -43,7 +44,7 @@ public class RoomPlacementProbeTests
     {
         FakeMemoryReader memory = Instance(bytes => Put(bytes, 0x450, FirstRoom));
 
-        IReadOnlyList<string> lines = new RoomPlacementProbe(memory).Probe(Area, Rooms);
+        IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
 
         Assert.Contains(lines, l => l.Contains("+0x0450", StringComparison.Ordinal)
                                     && l.Contains("entrance.arm", StringComparison.Ordinal));
@@ -60,7 +61,7 @@ public class RoomPlacementProbeTests
         FakeMemoryReader memory = Instance(bytes => Put(bytes, 0x930, Vector))
             .Place(Vector, elements);
 
-        IReadOnlyList<string> lines = new RoomPlacementProbe(memory).Probe(Area, Rooms);
+        IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
 
         Assert.Contains(lines, l => l.Contains("AreaInstance+0x0930 -> +0x0018", StringComparison.Ordinal)
                                     && l.Contains("bones_fill_02.arm", StringComparison.Ordinal));
@@ -79,7 +80,7 @@ public class RoomPlacementProbeTests
         FakeMemoryReader memory = Instance(bytes => Put(bytes, 0x120, Decoy))
             .Place(Decoy, inline);
 
-        IReadOnlyList<string> lines = new RoomPlacementProbe(memory).Probe(Area, Rooms);
+        IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
 
         Assert.Contains(lines, l => l.Contains("the text \".arm\"", StringComparison.Ordinal));
     }
@@ -98,9 +99,81 @@ public class RoomPlacementProbeTests
             }
         });
 
-        IReadOnlyList<string> lines = new RoomPlacementProbe(memory).Probe(Area, Rooms);
+        IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
 
-        Assert.Contains("nothing refers to a room file", lines[^1], StringComparison.Ordinal);
+        Assert.Contains(lines, l => l.Contains("nothing refers to a room file", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void AMissIsWORTHLESSWithoutTheControlSayingTheSearchCouldHaveWorked()
+    {
+        // THE FLAW THE FIRST VERSION SHIPPED WITH, and it was found by running it: a sweep that
+        // finds nothing has two meanings - "no room is referred to here" and "rooms are referred
+        // to by something other than a record address" - and the probe reported the first with
+        // no way of ruling out the second. It said "nothing refers to a room file" as
+        // confidently as if it had checked. Every run now carries the control, hit or miss.
+        FakeMemoryReader memory = Instance(_ => { });
+
+        IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
+
+        Assert.Contains("control:", lines[^1], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheControlProvesTheSearchWhenTilesPointAtRecords()
+    {
+        // A tile carries TgtFilePtr to its own .tdt, which the same table holds a record for -
+        // so if that pointer IS a record address, the game refers to files by the value this
+        // search looks for, and a miss elsewhere is a real absence rather than a wrong premise.
+        OffsetSchema schema = RealSessionTests.Schema();
+        ulong terrain = Area + (ulong)schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata");
+        int tileVector = schema.Structs["TerrainMetadata"].OffsetOf("TileDetailsPtr");
+        int tgtFile = schema.Structs["TileStruct"].OffsetOf("TgtFilePtr");
+
+        const ulong Tiles = 0x0000_0500_0040_0000;
+        const ulong TileFile = 0x0000_0500_0050_0000;
+
+        var tile = new byte[0x38 * 2];
+        BitConverter.GetBytes(TileFile).CopyTo(tile, tgtFile);
+        BitConverter.GetBytes(TileFile).CopyTo(tile, 0x38 + tgtFile);
+
+        FakeMemoryReader memory = Instance(_ => { })
+            .Place(Tiles, tile)
+            .Place<ulong>(terrain + (ulong)tileVector, Tiles)
+            .Place<ulong>(terrain + (ulong)tileVector + 8, Tiles + (ulong)tile.Length);
+
+        var files = new Dictionary<ulong, string>(Rooms) { [TileFile] = "Tiles/Something.tdt" };
+
+        IReadOnlyList<string> lines =
+            new RoomPlacementProbe(memory, schema).Probe(Area, Rooms, files);
+
+        Assert.Contains("ARE record addresses", lines[^1], StringComparison.Ordinal);
+        Assert.Contains("a real absence", lines[^1], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheControlSaysTheSearchCannotWorkWhenTilesPointElsewhere()
+    {
+        // The answer that would explain a miss completely, and the one the probe could not give.
+        OffsetSchema schema = RealSessionTests.Schema();
+        ulong terrain = Area + (ulong)schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata");
+        int tileVector = schema.Structs["TerrainMetadata"].OffsetOf("TileDetailsPtr");
+        int tgtFile = schema.Structs["TileStruct"].OffsetOf("TgtFilePtr");
+
+        const ulong Tiles = 0x0000_0500_0040_0000;
+
+        var tile = new byte[0x38];
+        BitConverter.GetBytes(Decoy).CopyTo(tile, tgtFile);
+
+        FakeMemoryReader memory = Instance(_ => { })
+            .Place(Tiles, tile)
+            .Place<ulong>(terrain + (ulong)tileVector, Tiles)
+            .Place<ulong>(terrain + (ulong)tileVector + 8, Tiles + (ulong)tile.Length);
+
+        IReadOnlyList<string> lines =
+            new RoomPlacementProbe(memory, schema).Probe(Area, Rooms);
+
+        Assert.Contains("cannot work", lines[^1], StringComparison.Ordinal);
     }
 
     [Fact]
@@ -110,7 +183,7 @@ public class RoomPlacementProbeTests
         // cost a round on exactly that, refusing in four places with a bare null.
         FakeMemoryReader memory = Instance(_ => { });
 
-        IReadOnlyList<string> lines = new RoomPlacementProbe(memory).Probe(Area, Rooms);
+        IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
 
         Assert.Contains($"swept {RoomPlacementProbe.SweepBytes} bytes", lines[0], StringComparison.Ordinal);
         Assert.Contains("followed 0 pointers", lines[0], StringComparison.Ordinal);
@@ -126,7 +199,7 @@ public class RoomPlacementProbeTests
 
         Assert.Contains(
             "nothing to search for",
-            Assert.Single(new RoomPlacementProbe(memory).Probe(Area, new Dictionary<ulong, string>())),
+            Assert.Single(new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, new Dictionary<ulong, string>())),
             StringComparison.Ordinal);
     }
 
@@ -139,7 +212,7 @@ public class RoomPlacementProbeTests
 
         Assert.Contains(
             "unreadable",
-            Assert.Single(new RoomPlacementProbe(memory).Probe(Area, Rooms)),
+            Assert.Single(new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms)),
             StringComparison.Ordinal);
     }
 
@@ -156,7 +229,7 @@ public class RoomPlacementProbeTests
             }
         });
 
-        IReadOnlyList<string> lines = new RoomPlacementProbe(memory).Probe(Area, Rooms);
+        IReadOnlyList<string> lines = new RoomPlacementProbe(memory, RealSessionTests.Schema()).Probe(Area, Rooms);
 
         Assert.Contains(
             $"followed {RoomPlacementProbe.MostFollowed} pointers", lines[0], StringComparison.Ordinal);
