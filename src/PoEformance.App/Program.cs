@@ -1927,6 +1927,14 @@ internal static class Program
                         lines.Add(preloadReader.LastError);
                     }
 
+                    // ONLY WHEN THE WALK REACHED NOTHING, because that is the only time the
+                    // buckets themselves are the question. Sixteen hex rows under a working
+                    // table would be noise, and noise is how a real diagnostic stops being read.
+                    if (swept.Slots == 0)
+                    {
+                        lines.AddRange(preloadReader.DescribeBuckets(fileRoot));
+                    }
+
                     lines.AddRange(swept.Samples.Select(sample => $"    {sample}"));
 
                     lines.Add($"at the offset in use (+0x{swept.Chosen:X}) the records hold:");
