@@ -58,8 +58,15 @@ public sealed class RoomPlacementProbe
     /// </remarks>
     private const int VectorBytes = 0x1000;
 
-    /// <summary>How many vector-shaped triples to follow. Few exist; the cap is a guard.</summary>
-    public const int MostVectors = 128;
+    /// <summary>How many vector-shaped triples to follow. A guard, and it was binding.</summary>
+    /// <remarks>
+    /// RAISED FROM 128, which the first run with a positive control hit exactly. A cap meant as a
+    /// guard against a garbage window had become the thing deciding how much of the struct was
+    /// searched, and a miss under it says less than it appears to. 512 triples at
+    /// <see cref="VectorBytes"/> each is two megabytes of reads for a button somebody presses by
+    /// hand - and every one of those reads is far under what a recording holds per read.
+    /// </remarks>
+    public const int MostVectors = 512;
 
     /// <summary>
     /// How many pointers to follow. A guard on a garbage window, not a view about the struct.
@@ -67,8 +74,13 @@ public sealed class RoomPlacementProbe
     /// <remarks>
     /// A window of nonsense is mostly plausible-looking pointers, and following every one turns
     /// one probe into a walk of the heap - and a recording into something nobody can open.
+    ///
+    /// RAISED FROM 512, hit exactly on the first run whose control passed, which meant the sweep
+    /// reached one slot in eight and reported the miss as though it had covered the window. This
+    /// is now ONE PER QWORD of <see cref="SweepBytes"/> - a principled number rather than a round
+    /// one, since a slot that is not a pointer costs nothing and no slot can be followed twice.
     /// </remarks>
-    public const int MostFollowed = 512;
+    public const int MostFollowed = SweepBytes / 8;
 
     /// <summary>Lines of hits to print before saying how many more there were.</summary>
     private const int MostHits = 24;
@@ -136,7 +148,13 @@ public sealed class RoomPlacementProbe
     /// address. If it is not, the table is incomplete and the control proves nothing - the file
     /// walk is what needs fixing before this search can be believed either way.
     /// </remarks>
-    private string Control(ulong areaInstance, IReadOnlyDictionary<ulong, string> files)
+    /// <param name="truncated">
+    /// Whether the sweep hit a cap. A CONFIRMED PREMISE DOES NOT MAKE A TRUNCATED MISS COMPLETE,
+    /// and saying so was this line's own version of the mistake it exists to prevent: the control
+    /// proves the search looks for the right VALUE, never that it looked everywhere.
+    /// </param>
+    private string Control(
+        ulong areaInstance, IReadOnlyDictionary<ulong, string> files, bool truncated = false)
     {
         ulong terrain = areaInstance + (ulong)_terrainMetadata;
         ulong first = _reader.ReadPointer(terrain + (ulong)_tileDetails);
@@ -211,7 +229,10 @@ public sealed class RoomPlacementProbe
         if (known > 0)
         {
             return $"  control: {known} of {pointers} tile file pointers ARE record addresses"
-                + " - the search looks for the right value, so a miss above is a real absence";
+                + (truncated
+                    ? " - the search looks for the right value, but it stopped at its limits,"
+                        + " so a miss above is only a miss in what it reached"
+                    : " - the search looks for the right value, so a miss above is a real absence");
         }
 
         // THE TABLE IS SHORT, and that is a bug here rather than a finding about the game. Said
@@ -320,17 +341,34 @@ public sealed class RoomPlacementProbe
             lines.Add($"  and {more} more");
         }
 
+        // WHETHER THE SWEEP RAN OUT OF BUDGET, and it must be said rather than left to a reader
+        // who happens to know what the caps are. The first run to get a positive control
+        // reported "followed 512 pointers and 128 vectors" - which ARE the two caps exactly -
+        // above a line calling the miss a real absence. The numbers were printed and the fact
+        // they were limits was not, so the verdict read as covering the whole struct when it
+        // covered as much of it as the budget reached.
+        bool truncated = follows >= MostFollowed || vectors >= MostVectors;
+
         if (hits.Count == 0)
         {
             // THE MISS, WITH ITS NUMBERS. Without them this line is indistinguishable from a
             // probe that never ran, which is the failure the ground layer already paid for.
-            lines.Add("  nothing refers to a room file - not by record address, not by path");
+            lines.Add(truncated
+                ? "  nothing refers to a room file in what was reached - not by record address,"
+                    + " not by path"
+                : "  nothing refers to a room file - not by record address, not by path");
+        }
+
+        if (truncated)
+        {
+            lines.Add($"  STOPPED AT ITS LIMITS ({MostFollowed} pointers, {MostVectors} vectors)"
+                + " - the rest of the window was never followed");
         }
 
         // AND WHETHER THE MISS IS WORTH ANYTHING. Always, not only on a miss: a hit is worth
         // more when the control agrees, and a control that fails while something was found is
         // itself a finding about what was found.
-        lines.Add(Control(areaInstance, files ?? rooms));
+        lines.Add(Control(areaInstance, files ?? rooms, truncated));
 
         return lines;
     }
