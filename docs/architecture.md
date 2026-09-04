@@ -230,6 +230,12 @@ The workbench features are the product, in build order:
    one-off probe scripts as a class.
 5. **Drift scanner**: when an invariant fails, sweep the neighbourhood for candidate
    offsets that satisfy it. One generic tool instead of a new probe per incident.
+   *(Partly there, incident by incident: the camera matrix has `MatrixScan`, the
+   AreaInstance tail has `AreaInstanceHunt` — it finds the player slot, the entity maps
+   and the terrain struct by their shape and prints the delta they agree on — and a
+   static whose exact pattern a patch re-rolled has `fallbacks` in the schema, loosened
+   patterns whose hits are fingerprinted and printed with their bytes. All three run
+   from the drift report on the failure that calls for them.)*
 6. **Session recorder UI**: record, scrub, share.
 
 Overlays (radar, vitals, loot) build on the same snapshots afterwards; automation

@@ -50,8 +50,15 @@ public class DriftReportTests
 
         StructDef gs = schema.Structs["GameState"];
         fake.Place(GameStateAddr + (ulong)gs.OffsetOf("CurrentStateVecLast"), 0UL);
-        fake.Place(GameStateAddr + (ulong)gs.OffsetOf("States")
-            + (ulong)(gs.Constants["InGameStateIndex"] * gs.Constants["StateEntrySize"]), InGameStateAddr);
+
+        // Every state object exists, each at its own address - the array the GameStates
+        // fingerprint looks for - with the in-game one where the chain expects it.
+        long entrySize = gs.Constants["StateEntrySize"];
+        for (long i = 0; i < gs.Constants["TotalStates"]; i++)
+        {
+            fake.Place(GameStateAddr + (ulong)gs.OffsetOf("States") + (ulong)(i * entrySize),
+                i == gs.Constants["InGameStateIndex"] ? InGameStateAddr : 0x21_0000UL + (ulong)(i * 0x1000));
+        }
 
         StructDef igs = schema.Structs["InGameState"];
         fake.Place(InGameStateAddr + (ulong)igs.OffsetOf("AreaInstanceData"), AreaInstanceAddr);
@@ -85,7 +92,92 @@ public class DriftReportTests
         fake.Place(PlayerEntityAddr + 0x08, EntityDetailsAddr);
         fake.PlaceStdWString(EntityDetailsAddr + 0x08, "Metadata/Characters/Int/IntFour", 0x71_0000);
 
+        // The rest of the tail as the hunt recognises it: the awake map's sentinel and
+        // root, the sleeping map's sentinel, and the terrain struct pointing back at its
+        // owner. Placed so the stale-schema test below sees a complete wave, not one field.
+        StructDef map = schema.Structs["StdMap"];
+        StructDef node = schema.Structs["StdMapNode"];
+        ulong awake = AreaInstanceAddr + (ulong)ai.OffsetOf("AwakeEntities");
+        fake.Place(awake + (ulong)map.OffsetOf("Size"), 7L);
+        fake.Place(0x48_0000UL, new byte[0x30]);
+        fake.Place<byte>(0x48_0000UL + (ulong)node.OffsetOf("IsNil"), 1);
+        fake.Place(0x48_0000UL + (ulong)node.OffsetOf("Parent"), 0x48_1000UL);
+        fake.Place(0x48_1000UL, new byte[0x30]);
+        fake.Place(0x48_1000UL + (ulong)node.OffsetOf("ValueEntityPtr"), 0x48_2000UL);
+        fake.Place(0x48_2000UL + 0x08, 0x48_3000UL);
+        fake.PlaceStdWString(0x48_3000UL + 0x08, "Metadata/Monsters/Skeletons/SkeletonSoldier", 0x48_4000);
+        ulong sleeping = AreaInstanceAddr + (ulong)ai.OffsetOf("SleepingEntities");
+        fake.Place(sleeping + (ulong)map.OffsetOf("Head"), 0x48_5000UL);
+        fake.Place(sleeping + (ulong)map.OffsetOf("Size"), 0L);
+        fake.Place(0x48_5000UL, new byte[0x30]);
+        fake.Place<byte>(0x48_5000UL + (ulong)node.OffsetOf("IsNil"), 1);
+
+        StructDef terrain = schema.Structs["TerrainMetadata"];
+        ulong terrainAt = AreaInstanceAddr + (ulong)ai.OffsetOf("TerrainMetadata");
+        fake.Place(terrainAt, ModuleBase + 0x2000);
+        fake.Place(terrainAt + 8, AreaInstanceAddr);
+        fake.Place(terrainAt + (ulong)terrain.OffsetOf("TotalTilesX"), 39L);
+        fake.Place(terrainAt + (ulong)terrain.OffsetOf("TotalTilesY"), 45L);
+        fake.Place(terrainAt + (ulong)terrain.OffsetOf("TotalTilesPlusOneX"), 40L);
+        fake.Place(terrainAt + (ulong)terrain.OffsetOf("TotalTilesPlusOneX") + 8, 46L);
+
         return fake;
+    }
+
+    [Fact]
+    public void HealthyGame_PassesTheGameStatesFingerprint()
+    {
+        OffsetSchema schema = LoadSchema();
+        FakeMemoryReader fake = BuildHealthyGame(schema);
+
+        Assert.True(DriftReport.LooksLikeGameStates(fake, schema, ModuleBase + 0x3000));
+        Assert.False(DriftReport.LooksLikeGameStates(fake, schema, ModuleBase + 0x3008)); // a slot that holds nothing
+    }
+
+    [Fact]
+    public void OldSchema_AgainstNewGame_NamesTheWaveInTheReport()
+    {
+        // The follow-up to the alarm: the report does not stop at "these rows failed", it
+        // sweeps the struct and prints where the tail went. The stale schema is 8 bytes
+        // behind on every tail field, so the hunt must say +0x8 for each and as the consensus.
+        OffsetSchema current = LoadSchema();
+        FakeMemoryReader newGame = BuildHealthyGame(current);
+        OffsetSchema stale = SchemaJson.Load(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(StaleSchemaJson)));
+        var writer = new StringWriter();
+
+        DriftReport.Run(newGame, new PatternScanner(newGame), stale, writer, verbose: false);
+        string text = writer.ToString();
+
+        Assert.Contains("area instance hunt", text);
+        Assert.Contains("PlayerInfo        schema 0x598 -> found 0x5A0 (+0x8)", text);
+        Assert.Contains("AwakeEntities     schema 0x6D8 -> found 0x6E0 (+0x8)", text);
+        Assert.Contains("SleepingEntities  schema 0x6E8 -> found 0x6F0 (+0x8)", text);
+        Assert.Contains("TerrainMetadata   schema 0x8B8 -> found 0x8C0 (+0x8)", text);
+        Assert.Contains("the whole tail moved +0x8", text);
+    }
+
+    [Fact]
+    public void DriftedParentPointer_IsNamedInsteadOfBlamedOnTheFields()
+    {
+        // InGameState.AreaInstanceData one slot too low: the schema's slot reads a pointer
+        // to nothing in particular, every AreaInstance row fails, and the answer is the
+        // parent - which the report must say, offset and delta included.
+        OffsetSchema current = LoadSchema();
+        FakeMemoryReader game = BuildHealthyGame(current);
+        int areaOffset = current.Structs["InGameState"].OffsetOf("AreaInstanceData");
+        const ulong decoy = 0x41_0000;
+        game.Place(decoy + AreaInstanceHunt.WindowStart, new byte[AreaInstanceHunt.WindowEnd - AreaInstanceHunt.WindowStart]);
+        game.Place(decoy + (ulong)current.Structs["AreaInstance"].OffsetOf("CurrentAreaLevel"), 68);
+        game.Place(InGameStateAddr + (ulong)areaOffset, decoy);
+        game.Place(InGameStateAddr + (ulong)areaOffset + 8, AreaInstanceAddr);
+        var writer = new StringWriter();
+
+        DriftReportResult result = DriftReport.Run(game, new PatternScanner(game), current, writer, verbose: false);
+        string text = writer.ToString();
+
+        Assert.True(result.Failed > 0);
+        Assert.Contains($"parent: InGameState+0x{areaOffset + 8:X} (+0x8) -> 0x{AreaInstanceAddr:X} carries the AreaInstance fingerprints", text);
+        Assert.Contains("InGameState.AreaInstanceData drifted; fix that offset first", text);
     }
 
     [Fact]
@@ -168,8 +260,11 @@ public class DriftReportTests
         "AreaInstance": {
           "fields": {
             "CurrentAreaLevel": { "offset": "0xC4", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 100 } },
+            "Environments": { "offset": "0x4C0", "type": "ptr" },
             "PlayerInfo": { "offset": "0x598", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
-            "AwakeEntities": { "offset": "0x6D8", "type": "ptr", "invariant": { "kind": "nonNullPtr" } }
+            "AwakeEntities": { "offset": "0x6D8", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+            "SleepingEntities": { "offset": "0x6E8", "type": "ptr" },
+            "TerrainMetadata": { "offset": "0x8B8", "type": "ptr" }
           }
         },
         "WorldData": {
@@ -179,8 +274,26 @@ public class DriftReportTests
         },
         "LocalPlayerStruct": {
           "fields": {
+            "ServerDataPtr": { "offset": "0x00", "type": "ptr" },
             "LocalPlayerPtr": { "offset": "0x20", "type": "ptr",
               "invariant": { "kind": "stringContains", "needle": "Metadata/Characters", "hops": ["0x00", "0x08"], "stringAt": "0x08" } }
+          }
+        },
+        "StdMap": { "fields": { "Head": { "offset": "0x00", "type": "ptr" }, "Size": { "offset": "0x08", "type": "i64" } } },
+        "StdMapNode": {
+          "fields": {
+            "Parent": { "offset": "0x08", "type": "ptr" },
+            "IsNil": { "offset": "0x19", "type": "u8" },
+            "ValueEntityPtr": { "offset": "0x28", "type": "ptr" }
+          }
+        },
+        "Entity": { "fields": { "EntityDetailsPtr": { "offset": "0x08", "type": "ptr" } } },
+        "EntityDetails": { "fields": { "Path": { "offset": "0x08", "type": "stdWString" } } },
+        "TerrainMetadata": {
+          "fields": {
+            "TotalTilesX": { "offset": "0x18", "type": "i64" },
+            "TotalTilesY": { "offset": "0x20", "type": "i64" },
+            "TotalTilesPlusOneX": { "offset": "0x40", "type": "i64" }
           }
         }
       }
