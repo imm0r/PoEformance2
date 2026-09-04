@@ -799,6 +799,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public Action? WriteRoomsOut { get; set; }
 
+    /// <summary>
+    /// Searches memory for anything that REFERS to one of the area's room files.
+    /// </summary>
+    /// <remarks>
+    /// Same rules as the two above, including SET IT BEFORE <see cref="AttachPreload"/>. It is
+    /// the opposite direction to both: they read what a room file SAYS, and this asks who in
+    /// the game points AT one - which is the question that would place a room on the map.
+    /// Unlike them it needs no install, only the loaded-file table this page already walks.
+    /// </remarks>
+    public Action? HuntRoomPlacements { get; set; }
+
     public void AttachPreload(
         PreloadWatch watch,
         Action lookAgain,
@@ -830,7 +841,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             sweep,
             () => PreloadListChanged?.Invoke(watch.Watching),
             LookInsideRooms,
-            WriteRoomsOut);
+            WriteRoomsOut,
+            HuntRoomPlacements);
         _tools.Add(
             20,
             "preload",

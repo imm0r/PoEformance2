@@ -440,6 +440,19 @@ public sealed class PreloadReader
     /// would move separately - which is the failure this returns nothing for, silently, in
     /// front of somebody.
     /// </remarks>
+    /// <summary>
+    /// The path one record carries, for a caller walking <see cref="Records"/> by address.
+    /// </summary>
+    /// <remarks>
+    /// Exposed rather than duplicated, for the reason <see cref="Records"/> is public: the name
+    /// offset can drift, and a second copy of it would drift separately. Empty when the record
+    /// does not read as a path, which the caller decides what to do about.
+    /// </remarks>
+    public string NameOf(ulong record)
+        => MemoryReaderExtensions.IsPlausiblePointer(record)
+            ? _reader.ReadStdWString(record + (ulong)_recordName, LongestPath)
+            : string.Empty;
+
     public IEnumerable<ulong> Records(ulong fileRootStatic)
     {
         LastError = string.Empty;

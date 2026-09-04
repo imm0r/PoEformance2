@@ -1886,13 +1886,38 @@ interesting part was not the feature:
   slot tags name areas. The corner block is the only ground the file carries, and it was the one
   measured.
 
-  **So the `.arm` name cannot be attached to a place on the map by anything readable.** Every
-  route is now closed: no tile or terrain-struct field reaches a room; `.arm` files name no
-  `.tdt`; `.et`/`.gt` name no `.tdt`; and the ground-corner join has too little to say. What
-  stands is what the tool already draws — tile-block room names from `TerrainRooms`, which is more
-  than the reference does automatically, and hand-curated `data/landmarks.json` entries, which is
-  exactly the mechanism GameHelper2's `ImportantTgts` uses for the labels in the original
-  screenshot.
+  **So every route from a room FILE to a place is closed**: no tile or terrain-struct field
+  reaches a room; `.arm` files name no `.tdt`; `.et`/`.gt` name no `.tdt` (RePoE's `tdt.py`: a
+  `.tdt` names a parent `.tdt` or a `.tgt`, never an `.arm`); and the ground-corner join has too
+  little to say.
+
+  **What is left is the opposite direction, and it is a different kind of search.** Not "what does
+  a room file say", but "who in memory points AT one" — and the addresses are already in hand.
+  Every loaded file has a `FileRecord` in the table `PreloadReader` walks, and that walk yields
+  record **addresses**, not just paths. So the area's rooms are a set of perhaps thirty known
+  pointers, and anything referring to a placed room has to hold one of them, or the path itself.
+
+  That distinction is the whole point. The previous hunt (`RoomProbe`) asked whether a pointer
+  *looked* like it led to a room — a question about shape, and this file's own record says what
+  shape questions are worth here. `RoomPlacementProbe` asks whether a value **is the address of
+  `entrance.arm`'s record**, which nothing satisfies by accident.
+
+  It sweeps `AreaInstance`, which no probe had looked at: the schema maps seven fields between
+  `0xC4` and `0x8C0`, so most of it is unaccounted for, and the room hunt so far covered the tile
+  struct and the neighbourhood of `TerrainMetadata`. Every plausible pointer is followed one hop
+  and its target searched the same way, because a placement list is far likelier to hang off a
+  field than to sit inline. Both forms are searched for — a record address, and UTF-16 `.arm` text
+  — because which one the game uses is exactly what is unknown.
+
+  **A miss is reported with its numbers** (how far it swept, how many pointers it followed), for
+  the reason the ground layer already paid for once: "found nothing" and "looked nowhere" must
+  never read alike. Run it from the *Hunt the Placements* button beside the loaded-file list; it
+  needs no install, only the table that page is already about.
+
+  Meanwhile what stands is what the tool already draws — tile-block room names from
+  `TerrainRooms`, which is more than the reference does automatically, and hand-curated
+  `data/landmarks.json` entries, which is exactly the mechanism GameHelper2's `ImportantTgts`
+  uses for the labels in the original screenshot.
 
   **The ground-type layer is back, on the field that is measured.** Same layer, same two gates,
   same flood fill into named blocks — a tile takes the type most of its four corners agree on, the
