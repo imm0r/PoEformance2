@@ -106,6 +106,12 @@ public sealed class PreloadReader
     public string LastError { get; private set; } = string.Empty;
 
     /// <summary>How many slots were looked at last time. For judging the cost.</summary>
+    /// <remarks>
+    /// Slots that led to a RECORD, since the walk goes through <see cref="RecordsIn"/>, which
+    /// skips the empty ones - a hash table is mostly empty, and counting holes told nobody
+    /// anything. "Walked 4000 slots and matched nothing" now means four thousand real files
+    /// were looked at, which is the number that makes the sentence worth reading.
+    /// </remarks>
     public int SlotsWalked { get; private set; }
 
     /// <summary>
@@ -256,44 +262,20 @@ public sealed class PreloadReader
     public const int MostPlausibleCount = 100_000;
 
     /// <summary>Walks one bucket's vector, adding whatever belongs to this area.</summary>
+    /// <remarks>
+    /// THROUGH <see cref="RecordsIn"/> RATHER THAN BESIDE IT, and that is the root-cause fix for
+    /// the capacity bug rather than the bug itself. This method used to carry its own copy of the
+    /// whole vector walk - the same capacity gate, the same pointer checks, the same slot maths -
+    /// so removing the bad gate from RecordsIn fixed HighestCount and left this one still
+    /// throwing the table away. Two walkers of one structure means every fix has to be made
+    /// twice, and the second one is the one that gets forgotten. The file already says so on
+    /// <see cref="Records"/>: one walker rather than two.
+    /// </remarks>
     private void WalkBucket(ulong bucket, int areaChangeCount, HashSet<string> into)
     {
-        // From its own offset. Reading an int at the bucket's start would take the low half
-        // of the vector's FIRST POINTER and call it a capacity - which passes the check
-        // almost always, and would have made this gate meaningless rather than wrong-looking.
-        if (!_reader.TryRead(bucket + (ulong)_bucketCapacity, out int capacity) || capacity <= 0)
-        {
-            return;   // an empty bucket is ordinary, not a failure
-        }
-
-        ulong first = _reader.ReadPointer(bucket);
-        ulong last = _reader.ReadPointer(bucket + sizeof(ulong));
-
-        if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
-        {
-            return;
-        }
-
-        long slots = (long)(last - first) / _slotSize;
-        if (slots <= 0)
-        {
-            return;
-        }
-
-        if (slots > MostSlotsPerBucket)
-        {
-            LastError = $"a bucket claimed {slots} slots - the layout has drifted";
-            return;
-        }
-
-        for (long i = 0; i < slots; i++)
+        foreach (ulong record in RecordsIn(bucket))
         {
             SlotsWalked++;
-            ulong record = _reader.ReadPointer(first + (ulong)(i * _slotSize) + (ulong)_slotRecord);
-            if (!MemoryReaderExtensions.IsPlausiblePointer(record))
-            {
-                continue;   // an empty slot - a hash table is mostly empty
-            }
 
             if (!_reader.TryRead(record + (ulong)_recordCount, out int loadedAt) || loadedAt != areaChangeCount)
             {
@@ -572,8 +554,9 @@ public sealed class PreloadReader
             return [$"the file root static at {fileRootStatic:X} holds {root:X}, which is not a pointer"];
         }
 
-        var lines = new List<string>(_bucketCount + 2) { $"root at {root:X}, {_bucketCount} buckets of 0x{_bucketSize:X}" };
+        var lines = new List<string>(_bucketCount + 3) { $"root at {root:X}, {_bucketCount} buckets of 0x{_bucketSize:X}" };
         int usable = 0;
+        int odd = 0;
 
         for (int b = 0; b < _bucketCount; b++)
         {
@@ -586,9 +569,21 @@ public sealed class PreloadReader
                 ? (long)(last - first) / _slotSize
                 : 0;
 
-            if (readCapacity && capacity > 0 && slots > 0)
+            // SLOTS ALONE, because the capacity is not a count - see RecordsIn. Requiring it
+            // to be positive made this very readout print "every bucket is empty" above sixteen
+            // rows each reporting nine hundred slots: a verdict its own evidence refuted, in the
+            // diagnostic written to stop exactly that.
+            if (slots > 0)
             {
                 usable++;
+            }
+
+            // ONLY WHERE THERE IS SOMETHING TO CONTRADICT. An empty bucket reading zero is
+            // ordinary; a bucket holding nine hundred slots and claiming a negative capacity is
+            // the finding, and mixing the two in one count buries it.
+            if (slots > 0 && readCapacity && capacity <= 0)
+            {
+                odd++;
             }
 
             lines.Add(
@@ -600,19 +595,34 @@ public sealed class PreloadReader
         // empty buckets is a different fault from one full bucket among fifteen empties, and a
         // person reading sixteen hex rows at four in the morning should not have to spot it.
         lines.Add(usable == 0
-            ? "  every bucket is empty - the root points at something that is not the file table"
+            ? "  no bucket holds slots - the root points at something that is not the file table"
             : $"  {usable} of {_bucketCount} buckets hold slots");
+
+        // Said because it is the finding, not because anything depends on it: a capacity that
+        // cannot be a count is how this field was caught pretending to be one.
+        if (odd > 0)
+        {
+            lines.Add($"  {odd} capacities are not counts - that field is a pointer half, and nothing gates on it");
+        }
 
         return lines;
     }
 
     private IEnumerable<ulong> RecordsIn(ulong bucket)
     {
-        if (!_reader.TryRead(bucket + (ulong)_bucketCapacity, out int capacity) || capacity <= 0)
-        {
-            yield break;
-        }
-
+        // NO CAPACITY GATE, and its removal is the fix for a table thrown away whole. The field
+        // at +0x18 is not a count: measured live it reads -843513840, -843186160, -842858480 and
+        // on down, every value ending 0010 and stepping by a constant 0x50000 - the low half of
+        // a POINTER, one allocation per bucket. The old gate refused anything not positive, so
+        // sixteen intact buckets holding fifteen thousand slots became "no files matched".
+        //
+        // WHY IT WORKED UNTIL IT DID NOT: the sign of a pointer's low half is a coin flip per
+        // allocation. The same build read this table an hour earlier in another session; nothing
+        // was patched. The bug had been latent since the walk was written and was simply not hit.
+        //
+        // NOTHING IS LOST. The vector's own begin and end are what the walk actually uses, and
+        // they are checked below - a plausible begin, an end past it, a slot count in range.
+        // Those gate the data being read; the capacity gated a field nobody reads.
         ulong first = _reader.ReadPointer(bucket);
         ulong last = _reader.ReadPointer(bucket + sizeof(ulong));
         if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
