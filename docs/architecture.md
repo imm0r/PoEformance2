@@ -1859,9 +1859,40 @@ interesting part was not the feature:
   look like flags; byte 2 takes only 3 and 11, and 11 is outside lists of four and six, so it is
   not a `.gt` index.
 
-  What that opens is the room stamp, now well posed rather than hopeful: a room file carries a
-  ground type per corner of every slot, and the area carries one per tile corner. The two are the
-  same kind of thing for the first time.
+  What that opened was the room stamp, well posed rather than hopeful for the first time: a room
+  file carries a ground type per corner of every slot, and the area carries one per tile corner.
+  The two are finally the same kind of value.
+
+  **And measuring it first killed it, in fifteen minutes rather than a day.** The question a stamp
+  has to answer is whether a room's corner pattern is distinctive enough to search an area's array
+  for. Counted over 63 rooms in two areas, using RePoE's own field positions (`vals[14..17]` are
+  the corner ground string indices, sw/se/ne/nw, 1-based, 0 meaning none):
+
+  | | rooms | |
+  |---|---|---|
+  | no corner ground at all | **28** (44%) | nothing to stamp with |
+  | exactly **one** type | **24** (38%) | a constant block — matches anywhere that type is |
+  | two or more | **11** (17%) | the only ones with a pattern |
+
+  And the 11 are worthless for it: **every one uses the same pair**, `bone_abyss` and `bone_fill`.
+  That is a binary mask over a two-value alphabet, and a soft blob of roughly 4×4 corners will
+  match in many places across the thousands an area holds. One type, `world_map_underground`,
+  accounts for **8152 of 9112** corner uses — 89%. Both areas measure the same, so it is not an
+  area-specific accident. Worse, the 11 patterned rooms are `bones_fill_02`, `BonePassage_Cnr_4`
+  and their kind: fill and corner modules, not the rooms anybody wants named.
+
+  Checked before concluding, because measuring the wrong field is how a verdict goes wrong: the
+  grid's `f` cells name only `forcedblank` across both dumps, and slot edges name `.et` files and
+  slot tags name areas. The corner block is the only ground the file carries, and it was the one
+  measured.
+
+  **So the `.arm` name cannot be attached to a place on the map by anything readable.** Every
+  route is now closed: no tile or terrain-struct field reaches a room; `.arm` files name no
+  `.tdt`; `.et`/`.gt` name no `.tdt`; and the ground-corner join has too little to say. What
+  stands is what the tool already draws — tile-block room names from `TerrainRooms`, which is more
+  than the reference does automatically, and hand-curated `data/landmarks.json` entries, which is
+  exactly the mechanism GameHelper2's `ImportantTgts` uses for the labels in the original
+  screenshot.
 
   **The ground-type layer is back, on the field that is measured.** Same layer, same two gates,
   same flood fill into named blocks — a tile takes the type most of its four corners agree on, the
