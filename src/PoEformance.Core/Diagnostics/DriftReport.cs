@@ -133,7 +133,17 @@ public static class DriftReport
         }
 
         WalkChain(reader, schema, gameStatesStatic, Report,
-            (areaInstance, inGameState, areaOffset) => RunAreaInstanceHunt(reader, schema, output, areaInstance, inGameState, areaOffset));
+            (areaInstance, inGameState, areaOffset) => RunAreaInstanceHunt(reader, schema, output, areaInstance, inGameState, areaOffset),
+            (inGameState, worldOffset, areaInstance) => RunWorldDataHunt(reader, schema, output, inGameState, worldOffset, areaInstance),
+            (gameState, inGameState) => CaptureForOffline(reader, schema, gameState, inGameState));
+
+        // Which state the game says it is in, because every "not reachable" above reads
+        // the same whether an offset moved or the game is on the login screen - and this is
+        // the one line that separates the two.
+        GameChainAddresses chain = GameChain.Resolve(reader, schema, gameStatesStatic);
+        output.WriteLine(chain.State == GameStateKind.Unreadable
+            ? "  state   unreadable - the state stack's second-last entry is not a state pointer; the stack window is captured for offline reading"
+            : $"  state   {chain.State}");
 
         output.WriteLine($"  {passed} pass, {failed} FAIL, {skipped} skipped");
         return new DriftReportResult(statics, checks, passed, failed, skipped, GameStatesResolved: true);
@@ -342,6 +352,111 @@ public static class DriftReport
     }
 
     /// <summary>
+    /// How far around a failing InGameState slot the whole-object sweeps look. InGameState is
+    /// several kilobytes; this covers it from any of the slots the chain uses.
+    /// </summary>
+    private const int InGameStateSweep = 0x1000;
+
+    /// <summary>
+    /// When WorldData cannot be reached, find it by the one thing it is known to hold: at
+    /// <c>WorldAreaDetailsPtr</c> the address of the AreaInstance the world is drawing.
+    /// </summary>
+    /// <remarks>
+    /// Not the camera matrix, on purpose. The schema records at length why a structural
+    /// matrix check is the one fingerprint this project must not use again: the real matrix
+    /// fails a contiguous unit-row test at its true offset and a frustum plane passes it. The
+    /// back-reference is measured instead - equal to InGameState.AreaInstanceData in every
+    /// sampled frame of 21 of 22 committed recordings, the exception being a session that
+    /// changes area - and it needs the AreaInstance to be known, which is why this runs after
+    /// the AreaInstance side of the chain has been settled.
+    /// </remarks>
+    private static void RunWorldDataHunt(
+        IMemoryReader reader,
+        OffsetSchema schema,
+        TextWriter output,
+        ulong inGameState,
+        int worldOffset,
+        ulong areaInstance)
+    {
+        output.WriteLine("  world data hunt");
+        if (areaInstance == 0)
+        {
+            output.WriteLine("        needs a resolved AreaInstance to look for - none this run.");
+            return;
+        }
+
+        int areaDetails = schema.Structs["WorldData"].OffsetOf("WorldAreaDetailsPtr");
+        List<PointerCandidate> bases = PointerDriftScan.Scan(
+            reader, inGameState, worldOffset, radius: InGameStateSweep,
+            probe: candidate => reader.ReadPointer(candidate + (ulong)areaDetails) == areaInstance);
+        if (bases.Count == 0)
+        {
+            output.WriteLine($"        no slot in InGameState leads to a struct whose +0x{areaDetails:X} names AreaInstance 0x{areaInstance:X} (or the world is mid-transition).");
+            return;
+        }
+
+        foreach (PointerCandidate candidate in bases.Take(3))
+        {
+            string delta = candidate.Delta >= 0 ? $"+0x{candidate.Delta:X}" : $"-0x{-candidate.Delta:X}";
+            output.WriteLine($"        InGameState+0x{candidate.FieldOffset:X} ({delta}) -> 0x{candidate.Target:X} points back at the AreaInstance from +0x{areaDetails:X}");
+        }
+
+        output.WriteLine("        -> InGameState.WorldData drifted; the first row is the likeliest, and MatrixHunt on it settles the matrix.");
+    }
+
+    /// <summary>
+    /// Reads generous windows of the structs the chain walks, so a recording made on a build
+    /// that fails here contains enough to diagnose offline.
+    /// </summary>
+    /// <remarks>
+    /// The recording rule cuts both ways: a recording holds only the reads the session made,
+    /// so a session in which the chain broke used to record exactly the few slots it tried,
+    /// and the next question - "what IS at InGameState then?" - needed another attach. These
+    /// reads cost nothing a person would notice and turn a failing attach into a complete
+    /// dataset. Failures are expected and ignored: a window past the end of an allocation
+    /// simply reads short.
+    /// </remarks>
+    private static void CaptureForOffline(IMemoryReader reader, OffsetSchema schema, ulong gameState, ulong inGameState)
+    {
+        static void Window(IMemoryReader reader, ulong start, int length)
+        {
+            if (start == 0)
+            {
+                return;
+            }
+
+            var buffer = new byte[0x100];
+            for (int position = 0; position < length; position += buffer.Length)
+            {
+                int take = Math.Min(buffer.Length, length - position);
+                if (!reader.TryRead(start + (ulong)position, buffer.AsSpan(0, take)))
+                {
+                    // A chunk that fails is retried slot by slot, so the readable part of a
+                    // partly mapped window still lands in the recording.
+                    for (int slot = 0; slot < take; slot += 8)
+                    {
+                        reader.TryRead(start + (ulong)(position + slot), buffer.AsSpan(0, 8));
+                    }
+                }
+            }
+        }
+
+        Window(reader, gameState, 0x200);
+        Window(reader, inGameState, InGameStateSweep);
+
+        // The state stack, whose second-last entry names the state in force: the first
+        // patched recording read a non-pointer there, so the neighbourhood is worth keeping.
+        if (schema.Structs.TryGetValue("GameState", out StructDef? gs) && gs.Field("CurrentStateVecLast") is { } last)
+        {
+            ulong stackEnd = reader.ReadPointer(gameState + (ulong)last.Offset);
+            if (stackEnd > 0x100)
+            {
+                Window(reader, stackEnd - 0x100, 0x140);
+            }
+        }
+    }
+
+    /// <summary>
     /// When the AreaInstance rows fail, find the tail by fingerprint and say where it went.
     /// </summary>
     /// <remarks>
@@ -354,7 +469,9 @@ public static class DriftReport
     /// back-pointer. The report names the answer either way, so the person attaching after
     /// a patch reads the new offsets off the screen instead of hunting for them.
     /// </remarks>
-    private static void RunAreaInstanceHunt(
+    /// <returns>The AreaInstance the evidence points at - the schema's when its fingerprints
+    /// are inside it, the parent scan's best candidate otherwise, 0 when neither.</returns>
+    private static ulong RunAreaInstanceHunt(
         IMemoryReader reader,
         OffsetSchema schema,
         TextWriter output,
@@ -377,13 +494,13 @@ public static class DriftReport
                 output.WriteLine(wave == 0
                     ? "        -> every fingerprint sits at its schema offset; the tail did not move, look at the failing rows themselves."
                     : $"        -> the whole tail moved {(wave > 0 ? "+" : "-")}0x{Math.Abs(wave):X}; apply that to PlayerInfo, AwakeEntities, SleepingEntities, TerrainMetadata in the schema and re-run.");
-                return;
+                return areaInstance;
             }
 
             if (result.Found.Count > 0)
             {
                 output.WriteLine("        -> the fingerprints disagree or one is missing: a field was inserted INSIDE the tail, or the game is not in an area. Take each row on its own.");
-                return;
+                return areaInstance;
             }
 
             output.WriteLine("        no tail fingerprint anywhere in the struct - is this an AreaInstance at all?");
@@ -391,13 +508,23 @@ public static class DriftReport
 
         // Nothing inside fits (or there is no inside): ask whether the POINTER that led here
         // moved, by looking for a neighbour whose target carries the terrain back-pointer.
+        // Near first, because a small delta is the usual case; then the whole object, because
+        // the first patched recording (2026-09-05) showed a slot that had not moved a little
+        // but stopped being a pointer at all, and the answer to that is not within 0x40.
         List<PointerCandidate> bases = PointerDriftScan.Scan(
             reader, inGameState, areaOffset, radius: 0x40,
             probe: candidate => AreaInstanceHunt.LooksLikeAreaInstance(reader, schema, candidate));
         if (bases.Count == 0)
         {
-            output.WriteLine($"        parent: no slot near InGameState+0x{areaOffset:X} leads to an AreaInstance either (or the game is not in an area).");
-            return;
+            bases = PointerDriftScan.Scan(
+                reader, inGameState, areaOffset, radius: InGameStateSweep,
+                probe: candidate => AreaInstanceHunt.LooksLikeAreaInstance(reader, schema, candidate));
+        }
+
+        if (bases.Count == 0)
+        {
+            output.WriteLine($"        parent: no slot in InGameState (0x{Math.Max(0, areaOffset - InGameStateSweep):X}..0x{areaOffset + InGameStateSweep:X}) leads to an AreaInstance either (or the game is not in an area).");
+            return 0;
         }
 
         foreach (PointerCandidate candidate in bases.Take(3))
@@ -413,6 +540,7 @@ public static class DriftReport
         }
 
         output.WriteLine("        -> InGameState.AreaInstanceData drifted; fix that offset first, then re-read the tail rows above.");
+        return bases[0].Target;
     }
 
     /// <summary>
@@ -421,14 +549,18 @@ public static class DriftReport
     /// resolved base address (0 when a pointer on the way was null - the game may not be
     /// in an area, which the caller surfaces honestly rather than hiding).
     /// <paramref name="report"/> returns whether any row of that struct failed;
-    /// <paramref name="areaInstanceSuspect"/> runs when the AreaInstance side of the chain did.
+    /// <paramref name="areaInstanceSuspect"/> runs when the AreaInstance side of the chain did
+    /// and returns the AreaInstance it believes in; <paramref name="worldDataSuspect"/> runs when
+    /// WorldData did, given that AreaInstance; <paramref name="capture"/> runs after either.
     /// </summary>
     private static void WalkChain(
         IMemoryReader reader,
         OffsetSchema schema,
         ulong gameStatesStatic,
         Func<string, ulong, ulong, int, bool> report,
-        Action<ulong, ulong, int> areaInstanceSuspect)
+        Func<ulong, ulong, int, ulong> areaInstanceSuspect,
+        Action<ulong, int, ulong> worldDataSuspect,
+        Action<ulong, ulong> capture)
     {
         ulong gameState = reader.ReadPointer(gameStatesStatic);
         report("GameState", gameState, 0, -1);
@@ -455,7 +587,10 @@ public static class DriftReport
         // Pass the origin (parent + field offset) so a failing check can ask the far more
         // useful question: did the POINTER that led here drift, rather than the fields inside?
         bool areaFailed = report("AreaInstance", areaInstance, inGameState, areaOffset);
-        report("WorldData", worldData, inGameState, worldOffset);
+
+        // A null WorldData is a failure of the InGameState row that leads to it, not a
+        // "not reachable" - that row carries nonNullPtr - so it is caught on the row.
+        bool worldFailed = report("WorldData", worldData, inGameState, worldOffset) || worldData == 0;
 
         if (areaInstance != 0)
         {
@@ -468,9 +603,15 @@ public static class DriftReport
             areaFailed |= report("LocalPlayerStruct", playerInfo, 0, -1);
         }
 
-        if (areaFailed)
+        ulong believedArea = areaFailed ? areaInstanceSuspect(areaInstance, inGameState, areaOffset) : areaInstance;
+        if (worldFailed)
         {
-            areaInstanceSuspect(areaInstance, inGameState, areaOffset);
+            worldDataSuspect(inGameState, worldOffset, believedArea);
+        }
+
+        if (areaFailed || worldFailed)
+        {
+            capture(gameState, inGameState);
         }
     }
 }

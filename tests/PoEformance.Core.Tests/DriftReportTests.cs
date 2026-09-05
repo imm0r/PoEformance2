@@ -231,6 +231,45 @@ public class DriftReportTests
             c.StructName == "AreaInstance" && c.FieldName == "CurrentAreaLevel" && c.Outcome == CheckOutcome.Pass);
     }
 
+    [Fact]
+    public void ParentPointerFarAway_IsStillFound_ByTheWholeObjectSweep()
+    {
+        // The 2026-09-05 shape: the schema's slot is not off by a little, it is not a pointer
+        // at all, and the real one sits well outside the near radius.
+        OffsetSchema current = LoadSchema();
+        FakeMemoryReader game = BuildHealthyGame(current);
+        int areaOffset = current.Structs["InGameState"].OffsetOf("AreaInstanceData");
+        game.Place(InGameStateAddr + (ulong)areaOffset, 0x5D2DED757E4UL); // heap-range, unaligned, not a struct
+        game.Place(InGameStateAddr + (ulong)areaOffset + 0x200, AreaInstanceAddr);
+        var writer = new StringWriter();
+
+        DriftReport.Run(game, new PatternScanner(game), current, writer, verbose: false);
+        string text = writer.ToString();
+
+        Assert.Contains($"parent: InGameState+0x{areaOffset + 0x200:X} (+0x200) -> 0x{AreaInstanceAddr:X} carries the AreaInstance fingerprints", text);
+    }
+
+    [Fact]
+    public void NullWorldData_IsHuntedByItsBackReferenceToTheAreaInstance()
+    {
+        OffsetSchema current = LoadSchema();
+        FakeMemoryReader game = BuildHealthyGame(current);
+        int worldOffset = current.Structs["InGameState"].OffsetOf("WorldData");
+        int areaDetails = current.Structs["WorldData"].OffsetOf("WorldAreaDetailsPtr");
+        game.Place(InGameStateAddr + (ulong)worldOffset, 0UL);                  // the schema slot went null
+        game.Place(InGameStateAddr + (ulong)worldOffset + 0x48, WorldDataAddr); // the struct moved down the object
+        game.Place(WorldDataAddr + (ulong)areaDetails, AreaInstanceAddr);       // and still names its area
+        var writer = new StringWriter();
+
+        DriftReportResult result = DriftReport.Run(game, new PatternScanner(game), current, writer, verbose: false);
+        string text = writer.ToString();
+
+        Assert.Contains(result.Failures, f => f.StructName == "InGameState" && f.FieldName == "WorldData");
+        Assert.Contains("world data hunt", text);
+        Assert.Contains($"InGameState+0x{worldOffset + 0x48:X} (+0x48) -> 0x{WorldDataAddr:X} points back at the AreaInstance", text);
+        Assert.Contains("state   ", text);
+    }
+
     /// <summary>
     /// A minimal schema pinned to the PRE-2026-08 AreaInstance offsets (PlayerInfo 0x598,
     /// AwakeEntities 0x6D8, TerrainMetadata 0x8B8), everything else current. Used to prove
@@ -249,11 +288,12 @@ public class DriftReportTests
             "CurrentStateVecLast": { "offset": "0x10", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
             "States": { "offset": "0x48", "type": "ptr" }
           },
-          "consts": { "StateEntrySize": "0x10", "InGameStateIndex": "4" }
+          "consts": { "StateEntrySize": "0x10", "InGameStateIndex": "4", "TotalStates": "13" }
         },
         "InGameState": {
           "fields": {
             "AreaInstanceData": { "offset": "0x290", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+            "UiRootStructPtr": { "offset": "0x2F0", "type": "ptr" },
             "WorldData": { "offset": "0x368", "type": "ptr", "invariant": { "kind": "nonNullPtr" } }
           }
         },
