@@ -75,7 +75,14 @@
   "statics": {
     "GameStates": {
       "pattern": "48 39 2D ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 40 01 00 00",
-      "comment": "Root of everything: the game-state array."
+      "fallbacks": [
+        "48 39 ?? ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 40 01 00 00",
+        "48 39 2D ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 ?? ?? 00 00",
+        "48 39 ?? ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 ?? ?? 00 00",
+        "4C 39 ?? ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 ?? ?? 00 00",
+        "48 83 EC ?? 48 8B F1 33 ?? 48 39 ?? ^ ?? ?? ?? ??"
+      ],
+      "comment": "Root of everything: the game-state array. THE SITE, so the fallbacks make sense: `cmp [rip+X], rbp` (48 39 2D) - is the global null? - then `jnz` (0F 85) and `mov ecx, 0x140` (B9 40 01 00 00), the size of the GameState object about to be allocated. Two things there are the compiler's choice and a content patch re-rolls them: the REGISTER compared against (the 2D is rbp; 05/0D/15/1D/25/35/3D are the others, 4C 39 for r8-r15) and the ALLOCATION SIZE (a field added to GameState changes the 0x140). Each fallback wildcards one of those; the last is the function-prologue form the AHK tool fell back on (sub rsp / mov rsi,rcx / xor ebp,ebp / cmp). A fallback hit is believed only when what it resolves to leads to the state array (DriftReport.LooksLikeGameStates), and the report prints every hit with its bytes - the accepted one's bytes are the next primary pattern. MISSED 2026-09-04 (content patch): the exact pattern found nothing; whether a fallback recovers it is what the first attach on the new build will say."
     },
     "FileRoot": {
       "pattern": "48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 05 ^ ?? ?? ?? ?? 48 83 C4 28",
@@ -443,7 +450,7 @@
     },
 
     "AreaInstance": {
-      "comment": "DRIFT HISTORY, two waves so far: (1) +0x18 - PlayerInfo 0x580->0x598, TerrainMetadata 0x8A0->0x8B8; (2) 2026-08, owner-verified: +0x08 across the tail - PlayerInfo 0x598->0x5A0, AwakeEntities 0x6D8->0x6E0, SleepingEntities 0x6E8->0x6F0, TerrainMetadata 0x8B8->0x8C0 (a new 8-byte field was inserted below ~0x5A0). When ONE field here drifts, assume the whole tail moved by the same delta and check them all. Low fields (CurrentAreaLevel 0xC4, CurrentAreaHash 0x11C) did not move in either wave.",
+      "comment": "DRIFT HISTORY, two waves so far: (1) +0x18 - PlayerInfo 0x580->0x598, TerrainMetadata 0x8A0->0x8B8; (2) 2026-08, owner-verified: +0x08 across the tail - PlayerInfo 0x598->0x5A0, AwakeEntities 0x6D8->0x6E0, SleepingEntities 0x6E8->0x6F0, TerrainMetadata 0x8B8->0x8C0 (a new 8-byte field was inserted below ~0x5A0). When ONE field here drifts, assume the whole tail moved by the same delta and check them all. Low fields (CurrentAreaLevel 0xC4, CurrentAreaHash 0x11C) did not move in either wave. THE TOOL NOW DOES THAT CHECK ITSELF: when a row here or in LocalPlayerStruct fails, the drift report sweeps this struct for the tail's fingerprints (the player slot, the entity maps, the terrain struct with its back-pointer to this very address - see AreaInstanceHunt) and prints each one's new offset and the delta they agree on; if nothing inside fits, it asks whether InGameState.AreaInstanceData itself moved. Read the offsets off that block rather than probing by hand. The 2026-09-04 content patch is reported to have moved this struct again; nothing here is changed until a report from the patched game says by how much.",
       "fields": {
         "CurrentAreaLevel": {
           "offset": "0xC4", "type": "i32",

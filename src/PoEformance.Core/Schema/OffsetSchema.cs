@@ -54,11 +54,12 @@ public sealed class OffsetSchema
 /// </summary>
 public sealed class StaticAnchor
 {
-    public StaticAnchor(string name, string pattern, string? comment)
+    public StaticAnchor(string name, string pattern, string? comment, IReadOnlyList<string>? fallbacks = null)
     {
         Name = name;
         Pattern = pattern;
         Comment = comment;
+        Fallbacks = fallbacks ?? [];
     }
 
     public string Name { get; }
@@ -67,6 +68,22 @@ public sealed class StaticAnchor
     public string Pattern { get; }
 
     public string? Comment { get; }
+
+    /// <summary>
+    /// Looser patterns tried in order when <see cref="Pattern"/> misses or is ambiguous.
+    /// The <c>"fallbacks"</c> key.
+    /// </summary>
+    /// <remarks>
+    /// A pattern is a snapshot of one compiler output, and a content patch re-rolls it: the
+    /// register the compiler picked for a comparison, the size of an allocation next to it.
+    /// Each fallback wildcards one of those, so the same site is still found when only that
+    /// detail changed - and because a wildcard also matches other sites, a fallback never
+    /// resolves on its hit count alone. Every hit is offered as a candidate with its bytes,
+    /// and only a fingerprint check on what the hit resolves to can pick one. A hit that
+    /// resolves to the right thing is the answer; the bytes at its site are the new exact
+    /// pattern, ready to be written back as the primary.
+    /// </remarks>
+    public IReadOnlyList<string> Fallbacks { get; }
 }
 
 /// <summary>A struct layout: named fields at offsets, plus non-memory constants.</summary>
