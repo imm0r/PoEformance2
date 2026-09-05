@@ -29,7 +29,7 @@ public class VerticalSliceTests
             dir = dir.Parent;
         }
 
-        return SchemaJson.Load(Path.Combine(dir!.FullName, "schema", "poe2.offsets.json"));
+        return SchemaJson.Load(Path.Combine(dir!.FullName, "schema", "poe2.offsets.json")).AsOf(RealSessionTests.PrePatchEra);
     }
 
     /// <summary>Builds a fake process whose memory matches the schema's expectations.</summary>

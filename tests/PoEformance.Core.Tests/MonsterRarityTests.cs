@@ -34,7 +34,7 @@ public class MonsterRarityTests
         }
 
         Assert.NotNull(dir);
-        return SchemaJson.Load(Path.Combine(dir.FullName, "schema", "poe2.offsets.json"));
+        return SchemaJson.Load(Path.Combine(dir.FullName, "schema", "poe2.offsets.json")).AsOf(RealSessionTests.PrePatchEra);
     }
 
     [Theory]

@@ -149,11 +149,15 @@ public class DriftReportTests
         string text = writer.ToString();
 
         Assert.Contains("area instance hunt", text);
-        Assert.Contains("PlayerInfo        schema 0x598 -> found 0x5A0 (+0x8)", text);
-        Assert.Contains("AwakeEntities     schema 0x6D8 -> found 0x6E0 (+0x8)", text);
-        Assert.Contains("SleepingEntities  schema 0x6E8 -> found 0x6F0 (+0x8)", text);
-        Assert.Contains("TerrainMetadata   schema 0x8B8 -> found 0x8C0 (+0x8)", text);
-        Assert.Contains("the whole tail moved +0x8", text);
+        // The stale schema is the pre-2026-08 layout; the fake game is laid out at the
+        // CURRENT offsets, so the distance is whatever the two waves since add up to.
+        StructDef ai = current.Structs["AreaInstance"];
+        int wave = ai.OffsetOf("PlayerInfo") - 0x598;
+        Assert.Contains($"PlayerInfo        schema 0x598 -> found 0x{ai.OffsetOf("PlayerInfo"):X} (+0x{wave:X})", text);
+        Assert.Contains($"AwakeEntities     schema 0x6D8 -> found 0x{ai.OffsetOf("AwakeEntities"):X} (+0x{wave:X})", text);
+        Assert.Contains($"SleepingEntities  schema 0x6E8 -> found 0x{ai.OffsetOf("SleepingEntities"):X} (+0x{wave:X})", text);
+        Assert.Contains($"TerrainMetadata   schema 0x8B8 -> found 0x{ai.OffsetOf("TerrainMetadata"):X} (+0x{wave:X})", text);
+        Assert.Contains($"the whole tail moved +0x{wave:X}", text);
     }
 
     [Fact]
@@ -285,8 +289,8 @@ public class DriftReportTests
       "structs": {
         "GameState": {
           "fields": {
-            "CurrentStateVecLast": { "offset": "0x10", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
-            "States": { "offset": "0x48", "type": "ptr" }
+            "CurrentStateVecLast": { "offset": "0x18", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
+            "States": { "offset": "0x50", "type": "ptr" }
           },
           "consts": { "StateEntrySize": "0x10", "InGameStateIndex": "4", "TotalStates": "13" }
         },
@@ -299,7 +303,7 @@ public class DriftReportTests
         },
         "AreaInstance": {
           "fields": {
-            "CurrentAreaLevel": { "offset": "0xC4", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 100 } },
+            "CurrentAreaLevel": { "offset": "0xBC", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 100 } },
             "Environments": { "offset": "0x4C0", "type": "ptr" },
             "PlayerInfo": { "offset": "0x598", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
             "AwakeEntities": { "offset": "0x6D8", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },

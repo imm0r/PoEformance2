@@ -81,8 +81,26 @@ public class RealSessionTests
         }
     }
 
-    /// <summary>The shipped schema, for tests in sibling classes.</summary>
-    internal static OffsetSchema Schema() => LoadSchema();
+    /// <summary>
+    /// A moment before the 2026-09-04 content patch, which every fixture named 2026-08 or
+    /// 2026-09-0[1] predates. The schema as of then is the one those recordings were laid out
+    /// under - see <see cref="OffsetSchema.AsOf"/>.
+    /// </summary>
+    internal static readonly DateTime PrePatchEra = new(2026, 9, 1, 12, 0, 0, DateTimeKind.Utc);
+
+    /// <summary>
+    /// The shipped schema as it stood for the 2026-08 fixtures, for tests in sibling classes.
+    /// </summary>
+    /// <remarks>
+    /// Every test that replays a committed recording wants the layout its bytes were captured
+    /// under, and every synthetic test builds its fake from whatever offsets the schema hands
+    /// it, so the pre-patch era serves both. A test about the CURRENT client loads the schema
+    /// itself - see <see cref="PatchedSessionTests"/>.
+    /// </remarks>
+    internal static OffsetSchema Schema() => LoadSchema().AsOf(PrePatchEra);
+
+    /// <summary>The shipped schema for the current client.</summary>
+    internal static OffsetSchema CurrentSchema() => LoadSchema();
 
     private static OffsetSchema LoadSchema()
     {
@@ -121,7 +139,7 @@ public class RealSessionTests
     public void RealGameMemory_PassesEverySchemaInvariant()
     {
         ReplayMemoryReader replay = LoadSession();
-        OffsetSchema schema = LoadSchema();
+        OffsetSchema schema = Schema();
         var writer = new StringWriter();
 
         DriftReportResult result = DriftReport.Run(
@@ -138,7 +156,7 @@ public class RealSessionTests
     {
         // Each assertion below is one of the findings that cost a live debugging round.
         ReplayMemoryReader replay = LoadSession();
-        OffsetSchema schema = LoadSchema();
+        OffsetSchema schema = Schema();
 
         ulong gameState = replay.ReadPointer(replay.ResolvedStatics["GameStates"]);
         StructDef gs = schema.Structs["GameState"];
@@ -196,7 +214,7 @@ public class RealSessionTests
         // The int32-index fix: a real player carries a dozen-plus components, not the 3
         // that survived the int64 mis-read.
         var replay = ReplayMemoryReader.Load(File.OpenRead(PlayerFixturePath));
-        OffsetSchema schema = LoadSchema();
+        OffsetSchema schema = Schema();
         var chain = GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
 
         PoEformance.Game.Entities.Entity? player = new PoEformance.Game.Entities.EntityReader(replay, schema).Read(chain.PlayerEntity);
@@ -214,7 +232,7 @@ public class RealSessionTests
         // The entity map walked against real memory: a populated area, with the player
         // among the entities and monsters carrying real metadata paths and positions.
         var replay = ReplayMemoryReader.Load(File.OpenRead(SceneFixturePath));
-        OffsetSchema schema = LoadSchema();
+        OffsetSchema schema = Schema();
 
         PoEformance.Game.World.WorldSnapshot snapshot =
             new PoEformance.Game.World.WorldReader(replay, schema).Read(replay.ResolvedStatics["GameStates"]);

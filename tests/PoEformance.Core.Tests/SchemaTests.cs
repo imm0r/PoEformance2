@@ -22,6 +22,50 @@ public class SchemaTests
     }
 
     [Fact]
+    public void History_TurnsTheDriftRecordIntoTheOldLayout_ForADatedReplay()
+    {
+        // The drift the comments always narrated, applied: asked for a date before the
+        // 2026-09-04 patch, the schema hands back the offsets every 2026-08 fixture was
+        // captured under, and the current ones for any date after.
+        OffsetSchema current = SchemaJson.Load(SchemaPath);
+        OffsetSchema before = current.AsOf(new DateTime(2026, 9, 1, 0, 0, 0, DateTimeKind.Utc));
+        OffsetSchema after = current.AsOf(new DateTime(2026, 9, 5, 0, 0, 0, DateTimeKind.Utc));
+
+        Assert.Equal(0x48, before.Structs["GameState"].OffsetOf("States"));
+        Assert.Equal(0x10, before.Structs["GameState"].OffsetOf("CurrentStateVecLast"));
+        Assert.Equal(0x5A0, before.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
+        Assert.Equal(0x6E0, before.Structs["AreaInstance"].OffsetOf("AwakeEntities"));
+        Assert.Equal(0x8C0, before.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
+        Assert.Equal(0xC4, before.Structs["AreaInstance"].OffsetOf("CurrentAreaLevel"));
+        Assert.Equal(0x180, before.Structs["UiElementBase"].OffsetOf("Flags"));
+        Assert.Equal(0x3A8, before.Structs["MapUiElement"].OffsetOf("Zoom"));
+
+        Assert.Equal(current.Structs["GameState"].OffsetOf("States"), after.Structs["GameState"].OffsetOf("States"));
+        Assert.Equal(current.Structs["AreaInstance"].OffsetOf("PlayerInfo"), after.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
+
+        // Fields without history are the same object in every era; a struct with none is too.
+        Assert.Same(current.Structs["Entity"], before.Structs["Entity"]);
+        Assert.Equal(current.Structs["InGameState"].OffsetOf("AreaInstanceData"), before.Structs["InGameState"].OffsetOf("AreaInstanceData"));
+
+        // Fields stay sorted by offset after the rewrite, which OffsetOf does not need but the
+        // struct viewer does.
+        foreach (StructDef def in before.Structs.Values)
+        {
+            for (int i = 1; i < def.Fields.Count; i++)
+            {
+                Assert.True(def.Fields[i - 1].Offset <= def.Fields[i].Offset, $"{def.Name} is out of order");
+            }
+        }
+    }
+
+    [Fact]
+    public void History_RejectsAnEntryWithoutADate()
+    {
+        Assert.Throws<InvalidDataException>(() => SchemaJson.Load(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(
+            """{"version":1,"structs":{"S":{"fields":{"F":{"offset":"0x10","type":"i32","history":[{"offset":"0x08"}]}}}}}"""))));
+    }
+
+    [Fact]
     public void ShippedSchema_LoadsAndCarriesTheKnownAnchors()
     {
         OffsetSchema schema = SchemaJson.Load(SchemaPath);
@@ -31,16 +75,18 @@ public class SchemaTests
         Assert.Contains("GameStates", schema.Statics.Keys);
         Assert.Contains("GameCullSize", schema.Statics.Keys);
 
-        // Spot-check offsets against current ground truth: the AHK-tool port plus the
+        // Spot-check offsets against current ground truth: the AHK-tool port, the
         // owner-verified 2026-08 +0x08 AreaInstance wave (PlayerInfo 0x598 -> 0x5A0,
-        // AwakeEntities 0x6D8 -> 0x6E0, Terrain 0x8B8 -> 0x8C0).
+        // AwakeEntities 0x6D8 -> 0x6E0, Terrain 0x8B8 -> 0x8C0), and the 0.5.5 patch of
+        // 2026-09-04 (GameState +0x08 measured here; AreaInstance tail +0x10 per GameHelper2).
         Assert.Equal(0x290, schema.Structs["InGameState"].OffsetOf("AreaInstanceData"));
         // W2SMatrix: 0x1A8 -> 0x1A0, and briefly 0x11C in 2026-08 before the scene test
         // disproved it. = CameraStructure(0x98) + 0x108, per GameHelper2 and the AHK tool.
         Assert.Equal(0x1A0, schema.Structs["WorldData"].OffsetOf("W2SMatrix"));
-        Assert.Equal(0x5A0, schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
-        Assert.Equal(0x6E0, schema.Structs["AreaInstance"].OffsetOf("AwakeEntities"));
-        Assert.Equal(0x8C0, schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
+        Assert.Equal(0x50, schema.Structs["GameState"].OffsetOf("States"));
+        Assert.Equal(0x5B0, schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
+        Assert.Equal(0x6F0, schema.Structs["AreaInstance"].OffsetOf("AwakeEntities"));
+        Assert.Equal(0x8D0, schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
         Assert.Equal(0x8B0, schema.Structs["Actor"].OffsetOf("AnimationId"));
         Assert.Equal(0x69, schema.Structs["Targetable"].OffsetOf("IsTargetable"));
         Assert.Equal(0x21E0, schema.Structs["ServerDataOffsets"].OffsetOf("League"));
