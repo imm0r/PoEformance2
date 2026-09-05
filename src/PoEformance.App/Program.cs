@@ -127,6 +127,18 @@ internal static class Program
             foreach (ResolvedStatic resolved in result.Statics.Where(s => s.Found))
             {
                 recorder.NoteStatic(resolved.Name, resolved.Address);
+
+                // A static that only a fallback found is a schema edit waiting to happen, and
+                // the bytes it needs are on the console and nowhere else. The first patched
+                // recording (2026-09-05) carried the address and not the site, so which
+                // fallback hit and what the site reads had to be asked for again. Keep it.
+                if (resolved.ViaFallback && resolved.Candidates is { } candidates)
+                {
+                    foreach (StaticCandidate c in candidates.Where(c => c.Fingerprinted && c.Resolved == resolved.Address))
+                    {
+                        recorder.Note($"fallback:{resolved.Name}", $"{c.FallbackIndex} at {c.MatchAddress:X}: {c.SiteText()}");
+                    }
+                }
             }
         }
 
