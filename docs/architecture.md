@@ -236,6 +236,11 @@ The workbench features are the product, in build order:
    static whose exact pattern a patch re-rolled has `fallbacks` in the schema, loosened
    patterns whose hits are fingerprinted and printed with their bytes. All three run
    from the drift report on the failure that calls for them.)*
+
+   *A field's drift record is data too: a `history` list of `{until, offset}` entries,
+   and `OffsetSchema.AsOf(date)` hands back the layout of that day. A replay is dated, so
+   the fixtures captured before the 0.5.5 patch keep replaying with the offsets their
+   bytes were laid out under while the live game reads with the current ones.*
 6. **Session recorder UI**: record, scrub, share.
 
 Overlays (radar, vitals, loot) build on the same snapshots afterwards; automation

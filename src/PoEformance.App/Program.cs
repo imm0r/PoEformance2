@@ -163,7 +163,7 @@ internal static class Program
         // reads, so the projection can be verified offline from the recording.
         if (result.Statics.FirstOrDefault(s => s.Name == "GameStates")?.Found == true)
         {
-            OffsetSchema probeSchema = SchemaJson.Load(schemaPath);
+            OffsetSchema probeSchema = LoadSchema(schemaPath, reader);
             ulong gameStates = result.Statics.First(s => s.Name == "GameStates").Address;
             recorder?.MarkFrame();
             new PoEformance.Game.Diagnostics.PlayerProbe(reader, probeSchema).ProbeAndReport(gameStates, Console.Out);
@@ -192,7 +192,7 @@ internal static class Program
         if (gameStatesAddress != 0)
         {
             recorder?.MarkFrame();
-            OffsetSchema worldSchema = SchemaJson.Load(schemaPath);
+            OffsetSchema worldSchema = LoadSchema(schemaPath, reader);
             PoEformance.Game.World.WorldSnapshot snapshot = ReportWorldScan(reader, worldSchema, gameStatesAddress);
             belt = snapshot.FlaskBelt;
             recorder?.MarkFrame();
@@ -284,7 +284,7 @@ internal static class Program
         {
             RunGlossary(
                 reader,
-                SchemaJson.Load(schemaPath),
+                LoadSchema(schemaPath, reader),
                 result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
                 Console.Out);
             recorder?.MarkFrame();
@@ -294,7 +294,7 @@ internal static class Program
         {
             RunTableList(
                 reader,
-                SchemaJson.Load(schemaPath),
+                LoadSchema(schemaPath, reader),
                 result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
                 Console.Out);
             recorder?.MarkFrame();
@@ -408,7 +408,7 @@ internal static class Program
                 result.Statics.FirstOrDefault(s => s.Name == "TerrainRotatorHelper" && s.Found)?.Address ?? 0);
 
             RunOverlay(
-                reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow, cull, autoFlask,
+                reader, LoadSchema(schemaPath, reader), gameStatesAddress, gameWindow, cull, autoFlask,
                 ruleEngine, ruleHistory, buffWatch, groundWatch, evasionPlanner, rotation,
                 debug: options.Debug, settings: overlaySettings, handle: overlayHandle,
                 uiBrowser: options.ShowUiBrowser, updates: updates,
@@ -427,7 +427,7 @@ internal static class Program
             // this replaces never had an overlay, so the coupling was an accident of where
             // the code happened to sit, not a design.
             RunRulesWithoutOverlay(
-                reader, SchemaJson.Load(schemaPath), gameStatesAddress, gameWindow,
+                reader, LoadSchema(schemaPath, reader), gameStatesAddress, gameWindow,
                 autoFlask, ruleEngine, ruleHistory, buffWatch, groundWatch, overlayHandle,
                 configWindow);
         }
@@ -617,9 +617,25 @@ internal static class Program
     /// Loads the schema fresh from disk (so <c>--watch</c> picks up edits) and runs one
     /// report to the console via the Core engine.
     /// </summary>
-    private static DriftReportResult RunReportOnce(IMemoryReader reader, PatternScanner scanner, string schemaPath, RecordingMemoryReader? recorder, bool verbose)
+    /// <summary>
+    /// Loads the schema for what <paramref name="reader"/> is reading: the current layout for
+    /// a live game, the layout of the recording's day for a replay.
+    /// </summary>
+    /// <remarks>
+    /// A recording is dated and the schema carries its drift history, so a replay of a
+    /// session captured before a patch reads with the offsets its bytes were laid out under -
+    /// see <see cref="OffsetSchema.AsOf"/>. Without this, every fixture from before the 0.5.5
+    /// patch replays as a wall of drift.
+    /// </remarks>
+    private static OffsetSchema LoadSchema(string schemaPath, IMemoryReader reader)
     {
         OffsetSchema schema = SchemaJson.Load(schemaPath);
+        return reader is ReplayMemoryReader replay ? schema.AsOf(replay.CreatedUtc) : schema;
+    }
+
+    private static DriftReportResult RunReportOnce(IMemoryReader reader, PatternScanner scanner, string schemaPath, RecordingMemoryReader? recorder, bool verbose)
+    {
+        OffsetSchema schema = LoadSchema(schemaPath, reader);
         Console.WriteLine($"{schema.Structs.Count} structs, {schema.Statics.Count} statics, game version \"{schema.GameVersion}\"");
         Console.WriteLine();
         recorder?.MarkFrame();
@@ -2803,7 +2819,7 @@ internal static class Program
 
         // One reader for the window's whole life. The terrain grid is cached inside it, so
         // building a fresh one per request would re-read megabytes on every poll.
-        var worldReader = new PoEformance.Game.World.WorldReader(reader, SchemaJson.Load(schemaPath));
+        var worldReader = new PoEformance.Game.World.WorldReader(reader, LoadSchema(schemaPath, reader));
         PoEformance.Game.World.WorldSnapshot ReadSnapshot()
             => gameStatesAddress == 0
                 ? PoEformance.Game.World.WorldSnapshot.Empty
@@ -2816,7 +2832,7 @@ internal static class Program
             // every six hours and a moment.
             updates.Tick();
 
-            OffsetSchema schema = SchemaJson.Load(schemaPath);
+            OffsetSchema schema = LoadSchema(schemaPath, reader);
             PoEformance.Game.World.WorldSnapshot snapshot = ReadSnapshot();
             bool inGame = snapshot.InGame;
             int entityCount = snapshot.Entities.Count;

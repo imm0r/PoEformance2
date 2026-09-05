@@ -174,7 +174,31 @@ public static class SchemaJson
             }
         }
 
-        return new FieldDef(fieldName, offset, type, f.Comment, invariant, f.Struct, f.Inline ?? false, values);
+        List<FieldEra>? history = null;
+        if (f.History is { Length: > 0 })
+        {
+            history = new List<FieldEra>(f.History.Length);
+            foreach (EraDto era in f.History)
+            {
+                if (string.IsNullOrWhiteSpace(era.Until)
+                    || !DateTime.TryParse(era.Until, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out DateTime until))
+                {
+                    throw new InvalidDataException($"Field {where} has a history entry without a valid 'until' date: \"{era.Until}\".");
+                }
+
+                if (string.IsNullOrWhiteSpace(era.Offset))
+                {
+                    throw new InvalidDataException($"Field {where} has a history entry without an offset.");
+                }
+
+                history.Add(new FieldEra(until, checked((int)ParseNumber(era.Offset, structName, fieldName))));
+            }
+
+            // Oldest era first, whatever order the file lists them in: OffsetAsOf relies on it.
+            history.Sort((a, b) => a.Until.CompareTo(b.Until));
+        }
+
+        return new FieldDef(fieldName, offset, type, f.Comment, invariant, f.Struct, f.Inline ?? false, values, history);
     }
 
     private static Invariant ParseInvariant(string where, InvariantDto dto) => dto.Kind?.ToLowerInvariant() switch
@@ -300,6 +324,24 @@ public sealed class FieldDto
     /// <summary>What the field's numbers mean, keyed by the number as text ("0", "0x2").</summary>
     [JsonPropertyName("values")]
     public Dictionary<string, string>? Values { get; set; }
+
+    /// <summary>Where the field was in earlier clients, and until when.</summary>
+    [JsonPropertyName("history")]
+    public EraDto[]? History { get; set; }
+}
+
+public sealed class EraDto
+{
+    /// <summary>The patch date from which this offset no longer applied (ISO date, UTC).</summary>
+    [JsonPropertyName("until")]
+    public string? Until { get; set; }
+
+    [JsonPropertyName("offset")]
+    public string? Offset { get; set; }
+
+    /// <summary>Free text: which patch, how it was measured. Not parsed.</summary>
+    [JsonPropertyName("note")]
+    public string? Note { get; set; }
 }
 
 public sealed class InvariantDto

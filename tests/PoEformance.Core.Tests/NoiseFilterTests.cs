@@ -132,7 +132,7 @@ public class NoiseFilterInTheReadTests
         }
 
         Assert.NotNull(dir);
-        return PoEformance.Core.Schema.SchemaJson.Load(Path.Combine(dir.FullName, "schema", "poe2.offsets.json"));
+        return PoEformance.Core.Schema.SchemaJson.Load(Path.Combine(dir.FullName, "schema", "poe2.offsets.json")).AsOf(RealSessionTests.PrePatchEra);
     }
 
     private static WorldSnapshot Read(bool filtering)

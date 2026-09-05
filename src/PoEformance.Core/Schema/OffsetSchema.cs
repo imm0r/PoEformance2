@@ -44,7 +44,62 @@ public sealed class OffsetSchema
 
     /// <summary>Struct layouts, keyed by struct name.</summary>
     public IReadOnlyDictionary<string, StructDef> Structs { get; }
+
+    /// <summary>
+    /// The schema as it stood at <paramref name="when"/>: every field whose
+    /// <see cref="FieldDef.History"/> covers that moment takes the offset it had then.
+    /// </summary>
+    /// <remarks>
+    /// Recordings outlive the layouts they were made against. The 2026-09-04 content patch
+    /// moved GameState, AreaInstance and the UI tree, and every fixture committed before it
+    /// replays the OLD client - which is not a defect in the fixtures but the reason they
+    /// exist: they are the regression suite for the readers, and a reader that is right is
+    /// right against the layout the bytes were captured under. So the drift history the
+    /// comments always carried is now data the loader can act on: a replay is dated, the
+    /// schema is asked for that date, and the old client reads with the old offsets while the
+    /// live game reads with the current ones. Fields without history are the same in every
+    /// era, which is what an empty history means.
+    /// </remarks>
+    public OffsetSchema AsOf(DateTime when)
+    {
+        var structs = new Dictionary<string, StructDef>(Structs.Count);
+        foreach ((string name, StructDef def) in Structs)
+        {
+            List<FieldDef>? rewritten = null;
+            for (int i = 0; i < def.Fields.Count; i++)
+            {
+                FieldDef field = def.Fields[i];
+                int offset = field.OffsetAsOf(when);
+                if (offset == field.Offset)
+                {
+                    continue;
+                }
+
+                rewritten ??= [.. def.Fields];
+                rewritten[i] = field.WithOffset(offset);
+            }
+
+            if (rewritten is null)
+            {
+                structs[name] = def;
+                continue;
+            }
+
+            rewritten.Sort((a, b) => a.Offset.CompareTo(b.Offset));
+            structs[name] = new StructDef(def.Name, def.Comment, rewritten, def.Constants);
+        }
+
+        return new OffsetSchema(Version, GameVersion, Statics, structs);
+    }
 }
+
+/// <summary>
+/// One earlier value of a field's offset: it held until <see cref="Until"/>, when a patch
+/// moved it. The <c>"history"</c> entries of a field.
+/// </summary>
+/// <param name="Until">The first moment the offset no longer applied - the patch's date.</param>
+/// <param name="Offset">Where the field was before that.</param>
+public sealed record FieldEra(DateTime Until, int Offset);
 
 /// <summary>
 /// A pattern-scanned static address. The pattern uses the established convention:
@@ -148,7 +203,8 @@ public sealed class FieldDef
         Invariant? invariant,
         string? target = null,
         bool inline = false,
-        IReadOnlyDictionary<long, string>? values = null)
+        IReadOnlyDictionary<long, string>? values = null,
+        IReadOnlyList<FieldEra>? history = null)
     {
         Name = name;
         Offset = offset;
@@ -158,12 +214,43 @@ public sealed class FieldDef
         Target = target;
         Inline = inline;
         Values = values;
+        History = history ?? [];
     }
 
     public string Name { get; }
 
-    /// <summary>Byte offset from the struct base.</summary>
+    /// <summary>Byte offset from the struct base, in the current client.</summary>
     public int Offset { get; }
+
+    /// <summary>
+    /// Where this field sat in earlier clients, oldest era first. The <c>"history"</c> key.
+    /// </summary>
+    /// <remarks>
+    /// The drift record in a form <see cref="OffsetSchema.AsOf"/> can apply, so a recording
+    /// from before a patch still replays with the offsets its bytes were laid out under. Each
+    /// entry says where the field was and until when; the current <see cref="Offset"/> is
+    /// what came after the last of them.
+    /// </remarks>
+    public IReadOnlyList<FieldEra> History { get; }
+
+    /// <summary>The offset this field had at <paramref name="when"/>.</summary>
+    public int OffsetAsOf(DateTime when)
+    {
+        // Oldest first, so the first era still in force at that moment is the one.
+        foreach (FieldEra era in History)
+        {
+            if (when < era.Until)
+            {
+                return era.Offset;
+            }
+        }
+
+        return Offset;
+    }
+
+    /// <summary>A copy of this field at another offset, history and all.</summary>
+    public FieldDef WithOffset(int offset)
+        => new(Name, offset, Type, Comment, Invariant, Target, Inline, Values, History);
 
     public FieldType Type { get; }
 
