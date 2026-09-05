@@ -2824,8 +2824,15 @@ internal static class Program
                 Overlay: new PoEformance.Config.OverlayView(
                     overlay.MinLootRarity.ToString(),
                     overlay.ShowTerrain,
-                    overlay.TerrainColour,
-                    overlay.TerrainThickness,
+
+                    // What is DRAWN, once the overlay is up: the in-game style editor can
+                    // override the page's colour and width, and a page showing its own last
+                    // choice over a map plainly drawn in another colour is the page lying.
+                    // The next choice made here wins again - see ChooseTerrainStyle.
+                    overlayHandle.Overlay is PoEformance.Overlay.EntityOverlay drawn
+                        ? PoEformance.Features.OverlaySettings.FormatPageColour(drawn.TerrainColourInUse)
+                        : overlay.TerrainColour,
+                    overlayHandle.Overlay?.TerrainThicknessInUse ?? overlay.TerrainThickness,
                     overlay.TerrainRim,
                     DescribeTerrain(overlayHandle)),
                 Map: BuildMapView(snapshot, overlay.MinLootRarity),
@@ -3048,7 +3055,7 @@ internal static class Program
                     {
                         live.MinimumLootRarity = overlay.MinLootRarity;
                         live.ShowTerrain = overlay.ShowTerrain;
-                        live.ApplyTerrainStyle(
+                        live.ChooseTerrainStyle(
                             PoEformance.Features.OverlaySettings.ParseColour(overlay.TerrainColour),
                             overlay.TerrainThickness,
                             overlay.TerrainRim);

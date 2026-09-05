@@ -448,6 +448,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             MinLootRarity = MinimumLootRarity,
             ShowTerrain = ShowTerrain,
+
+            // The page's own choices, from where the page put them - NOT from the basis,
+            // which is the file as it was at start-up. Taken from there, every save the
+            // overlay made for one of its own switches wrote the start-up colour and width
+            // back over whatever the page had set since, and the next launch had lost them.
+            // In the page's six-digit form while it is opaque, which is all the page can make;
+            // the eight-digit form only for an alpha somebody wrote into the file by hand.
+            TerrainColour = (_terrainColour >> 24) == 0xFF
+                ? OverlaySettings.FormatPageColour(_terrainColour)
+                : OverlaySettings.FormatColour(_terrainColour),
+            TerrainThickness = _terrainThickness,
+            TerrainRim = _terrainRim,
             DotLabels = ShowLabels,
             HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
             HideBehindPanels = HideBehindPanels,
@@ -2077,6 +2089,37 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _terrainRim = rim;
         _terrain.Rim = rim;
     }
+
+    /// <summary>
+    /// What the configuration page chose for the layout: applied, and made to WIN.
+    /// </summary>
+    /// <remarks>
+    /// Two editors set the layout's colour and width - this page and the in-game style
+    /// editor - and the style used to win unconditionally, because it is the one somebody
+    /// chose deliberately. That held right up until somebody chose deliberately on the PAGE,
+    /// where every drag of the colour picker did nothing on screen and nothing said why: the
+    /// style file still carried a colour from weeks before. So the rule is now the ordinary
+    /// one, the last choice wins: choosing here clears the style's colour and width, and
+    /// choosing in the style editor overrides this again until the page is next used.
+    ///
+    /// The clearing is DEFERRED to the render thread. This is called from the config window's
+    /// thread, and the style is a plain dictionary the layers read every frame - writing it
+    /// from here would race those reads. A flag costs one volatile read a frame.
+    /// </remarks>
+    public void ChooseTerrainStyle(uint colour, int thickness, bool rim)
+    {
+        ApplyTerrainStyle(colour, thickness, rim);
+        Volatile.Write(ref _terrainStyleYields, true);
+    }
+
+    // Set by the page's thread, consumed on the render thread - see ChooseTerrainStyle.
+    private bool _terrainStyleYields;
+
+    /// <summary>The layout colour actually drawn, once the style has had its say.</summary>
+    public uint TerrainColourInUse => _terrain.Colour;
+
+    /// <summary>The layout line width actually drawn, once the style has had its say.</summary>
+    public int TerrainThicknessInUse => _terrain.Thickness;
 
     /// <summary>
     /// What the terrain layer holds, for the config page and the status window.
@@ -3740,10 +3783,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (ShowTerrain && Style.Visible(StyleCatalogue.Keys.Terrain) && _snapshot.Terrain is TerrainGrid terrain)
         {
             // The style wins where it says anything, and the settings page's colour and
-            // thickness stand where it does not. Two places can set this and only one of them
-            // was chosen deliberately, so the deliberate one goes on top rather than the two
-            // fighting over a field.
+            // thickness stand where it does not. Two places can set this, and the one used
+            // LAST is the deliberate one: the page clears the style's say when it is used
+            // (below), and the style editor's next edit puts it back.
             LayerStyle outline = Style[StyleCatalogue.Keys.Terrain];
+
+            // The page chose since the last frame, so the style's colour and width stand
+            // down - see ChooseTerrainStyle. Written down at once, or the old override would
+            // be back on the next launch.
+            if (Volatile.Read(ref _terrainStyleYields))
+            {
+                Volatile.Write(ref _terrainStyleYields, false);
+                if (!string.IsNullOrEmpty(outline.Colour) || outline.Width > 0f)
+                {
+                    outline = outline with { Colour = "", Width = 0f };
+                    Style.Set(StyleCatalogue.Keys.Terrain, outline);
+                    SaveStyle();
+                }
+            }
+
             _terrain.Colour = outline.ColourOr(_terrainColour);
             _terrain.Thickness = (int)outline.WidthOr(_terrainThickness);
 
