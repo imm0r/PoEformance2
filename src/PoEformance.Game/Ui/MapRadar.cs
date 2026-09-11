@@ -243,33 +243,27 @@ public sealed class MapRadarReader
     /// Addresses of the two map elements, or 0 when neither way of reaching them resolves.
     /// </summary>
     /// <remarks>
-    /// TWO ROUTES, and the bytes decide between them. The first is the map-parent chain this
-    /// tool confirmed in-game on 0.5.4: ImportantUiElements.MapParentPtr, then the two pointers
-    /// at +0x28/+0x30. The second is what GameHelper2 switched to in its 0.5.5 commit: child
+    /// TWO ROUTES, and the bytes decide between them. The first is the reference's 0.5.5 walk,
+    /// CONFIRMED against this client by tests/fixtures/session-2026-09-maphunt.rec: child
     /// ChildOfUiManager of the UI manager - which is a UiElement itself, Self and children and
-    /// all - then that element's children LargeMapChild and MiniMapChild. On the 0.5.5 client
-    /// the first route still resolves to two elements, but they read a zoom of exactly zero and
-    /// a full-screen size each, so resolving is not the same as being right. A route is
-    /// believed when the element it hands back carries a zoom in the game's range; failing
-    /// both, the first route's answer is returned as it always was, and the zoom's own fallback
-    /// keeps the projection finite.
+    /// all - then that element's children LargeMapChild and MiniMapChild. Those two are the
+    /// maps: the large one is positioned at the screen centre with no size of its own and a
+    /// (0, -20) resting shift, the minimap is 402x402 in the top-right corner, and their
+    /// visible bits swap when the large map opens. The second is the map-parent chain this
+    /// tool confirmed in-game on 0.5.4 - ImportantUiElements.MapParentPtr, then the two
+    /// pointers at +0x28/+0x30 - which on 0.5.5 still resolves to two elements, but to a
+    /// marker layer (their children are named after checkpoints) reading a full-screen size
+    /// and a zoom of exactly zero. Resolving is not the same as being right, so a route is
+    /// believed only when the element it hands back carries a zoom in the game's range; the
+    /// walk that fits the current client goes first because it costs the same and answers
+    /// in one try. Failing both, the map-parent chain's answer is returned as it always was,
+    /// and the zoom's own fallback keeps the projection finite.
     /// </remarks>
     public (ulong LargeMap, ulong MiniMap) Resolve(ulong uiRootStruct)
     {
         if (!MemoryReaderExtensions.IsPlausiblePointer(uiRootStruct))
         {
             return (0, 0);
-        }
-
-        (ulong LargeMap, ulong MiniMap) viaParent = (0, 0);
-        ulong parent = _reader.ReadPointer(uiRootStruct + (ulong)_mapParent);
-        if (MemoryReaderExtensions.IsPlausiblePointer(parent))
-        {
-            viaParent = (_reader.ReadPointer(parent + (ulong)_largeMap), _reader.ReadPointer(parent + (ulong)_miniMap));
-            if (CarriesAZoom(viaParent))
-            {
-                return viaParent;
-            }
         }
 
         ulong viewports = _viewportsChild >= 0 ? _elements.Child(uiRootStruct, _viewportsChild) : 0;
@@ -283,7 +277,10 @@ public sealed class MapRadarReader
             }
         }
 
-        return viaParent;
+        ulong parent = _reader.ReadPointer(uiRootStruct + (ulong)_mapParent);
+        return MemoryReaderExtensions.IsPlausiblePointer(parent)
+            ? (_reader.ReadPointer(parent + (ulong)_largeMap), _reader.ReadPointer(parent + (ulong)_miniMap))
+            : (0, 0);
     }
 
     /// <summary>Whether either element of a pair reads a zoom the game could mean.</summary>
