@@ -1605,6 +1605,13 @@
       }
     },
 
+    "LocalStatsComponent": {
+      "comment": "Component on an item carrying the item's OWN stats - what its mods came to, resolved by the game. Every flask and charm has one; nothing in either reference project has ever heard of it (GameHelper2 has no GameOffsets/Objects/Components/LocalStats.cs, and the AHK tool does not mention it), so it was found by listing an item's components in --flasks rather than copied. THE SAME PAIRS Mods.StatsFromMods gives, reached without going through the Mods component - read live 2026-09 off three belt items and decoded against what StatsFromMods said for each, exactly: a flask with (378, 22) and (1715, -15), one with (381, 27) and (383, 41), and a charm with a single (19752, 1). WHAT IT IS NOT is the resolved charge cost: -15 here is local_charges_used_+%, the INPUT to the tooltip's \"Consumes 8 of 60\", and 8 is nowhere on the item.",
+      "fields": {
+        "Stats": { "offset": "0x20", "type": "stdVector", "comment": "StdVector of StatPair - (stat row + 1, value), the same one-based key every StatPair in this game holds. Bounds check on the three above: 0x10 bytes for the two-stat flask, one 8-byte pair for the charm." }
+      }
+    },
+
     "ChargesInternal": {
       "comment": "The per-base-type descriptor a Charges component points at. EVERYTHING HERE IS A BASE VALUE - it carries the base type's numbers, never the item's own rolls, which is the single most important thing to know about this struct and cost a bug report to learn. Read live 2026-09 off three belt items at once (--flasks): a Simmering Lesser Life Flask of the Apprentice, a Mana Flask with +27% maximum charges, and a charm. EACH FIELD IS WRITTEN TWICE, as two identical int32s filling one qword, in all three - so a 4-byte read at either half gives the same answer and the pair is not (base, modified). Whatever the second copy is for, it is not the item's number.",
       "fields": {

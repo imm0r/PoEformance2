@@ -32,6 +32,19 @@ public sealed class FlaskProbe
     /// </remarks>
     private const int HuntBytes = 0x100;
 
+    /// <summary>And how far into each structure a component points at.</summary>
+    private const int FollowBytes = 0x80;
+
+    /// <summary>
+    /// Hits printed before the rest are counted instead.
+    /// </summary>
+    /// <remarks>
+    /// A small candidate is noisy once pointers are followed - 8 is one of the commonest
+    /// values in any heap - and a hundred lines of it would bury the one hit that matters.
+    /// The count still says how many there were.
+    /// </remarks>
+    private const int MostHits = 24;
+
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
     private readonly EntityReader _entities;
@@ -284,6 +297,14 @@ public sealed class FlaskProbe
         output.WriteLine("  The tooltip says the real ones: \"Consumes N of M Charges on use\". The hunt");
         output.WriteLine("  below says whether N and M are anywhere on the item; if they are in none of");
         output.WriteLine("  its components, the game computes them and the stats are the inputs.");
+        output.WriteLine();
+        output.WriteLine("  RUN THIS TWICE - once with the flask full, once after drinking from it.");
+        output.WriteLine("  Every slot holding the charge count is listed under \"control ok\" below, and");
+        output.WriteLine("  on a FULL flask the current count and the modified maximum are the same");
+        output.WriteLine("  number, so no single run can tell those two apart. Drink once and they");
+        output.WriteLine("  separate: the slot that DROPS is the current count, the one that STAYS is");
+        output.WriteLine("  the maximum this flask actually has. The addresses change between runs; the");
+        output.WriteLine("  offsets do not, and the offsets are the answer.");
 
         foreach (EquippedFlask flask in belt.Flasks)
         {
@@ -316,8 +337,13 @@ public sealed class FlaskProbe
 
             // The window starts at the component head and the marker sits on Current, so the
             // two fields already identified are visible and everything unclaimed is beside them.
+            //
+            // OUT TO +0x88, because the first run of this stopped at +0x48 and the hunt then
+            // found the charge count AGAIN at +0x58 - a field nothing maps, in the window's
+            // blind spot. Whatever that slot is, it is the best lead there is: see the note
+            // ReportChargeCost prints about telling it apart from Current.
             output.WriteLine($"    Charges 0x{component:X}  (Current at +0x{current:X})");
-            foreach (string line in AddressPeek.Describe(_reader, component + (ulong)current, component, current, 0x30))
+            foreach (string line in AddressPeek.Describe(_reader, component + (ulong)current, component, current, 0x70))
             {
                 output.WriteLine("    " + line);
             }
@@ -407,6 +433,13 @@ public sealed class FlaskProbe
             double scaled = from * (1.0 + (stat.Value / 100.0));
             wanted.Add((int)Math.Floor(scaled));
             wanted.Add((int)Math.Round(scaled, MidpointRounding.AwayFromZero));
+
+            // AND THE SAME NUMBER AT FINER GRANULARITY, which is not a wild guess about
+            // encodings: this game genuinely stores flask quantities in tenths - its own stat
+            // table has local_flask_deciseconds_to_recover. A cost the game keeps as 85 and
+            // renders as 8 would be invisible to a hunt that only asks for 8.
+            wanted.Add((int)Math.Round(scaled * 10, MidpointRounding.AwayFromZero));
+            wanted.Add((int)Math.Round(scaled * 100, MidpointRounding.AwayFromZero));
         }
 
         // The bases themselves are never the finding - they are what is already read.
@@ -451,33 +484,72 @@ public sealed class FlaskProbe
                 continue;
             }
 
-            for (int offset = 0; offset < HuntBytes; offset += 4)
+            Sweep(name, at, HuntBytes, wanted, control, hits, controls);
+
+            // ONE LEVEL DEEPER. A component is mostly pointers - LocalStats keeps the item's
+            // own stats in a vector hung off +0x20, not inline - so sweeping only the
+            // component bodies asks a narrower question than "is this number on this item".
+            for (int offset = 0; offset < HuntBytes; offset += 8)
             {
-                if (!_reader.TryRead(at + (ulong)offset, out int found))
+                ulong target = _reader.ReadPointer(at + (ulong)offset);
+
+                // Skip the module: every component starts with a vtable and carries more
+                // function pointers, and following those sweeps the game's own code for a
+                // number, which is all noise.
+                if (!MemoryReaderExtensions.IsPlausiblePointer(target)
+                    || (target >= _reader.ModuleBase && target < _reader.ModuleBase + _reader.ModuleSize))
                 {
                     continue;
                 }
 
-                if (wanted.Contains(found))
-                {
-                    hits.Add($"{name}+0x{offset:X} = {found}");
-                }
-                else if (found == control)
-                {
-                    controls.Add($"{name}+0x{offset:X}");
-                }
+                Sweep($"{name}+0x{offset:X}->", target, FollowBytes, wanted, control, hits, controls);
             }
         }
 
         output.WriteLine($"    hunt for {string.Join(", ", wanted)}");
         output.WriteLine(hits.Count == 0
-            ? "      NOWHERE on this item - so the game computes these, and the stats are the inputs."
-            : "      " + string.Join("  |  ", hits));
+            ? "      NOWHERE on this item, one level of pointers included."
+            : "      " + string.Join("  |  ", hits.Take(MostHits))
+                + (hits.Count > MostHits ? $"  (+{hits.Count - MostHits} more)" : string.Empty));
 
+        // COUNTED INDEPENDENTLY of the hits, which is a correction rather than a nicety: the
+        // first version reported a hit OR a control per slot, and on a full flask whose
+        // modified maximum equals its current charges the two are the SAME NUMBER - so the
+        // control read as failed while the hunt had in fact worked perfectly.
         output.WriteLine(controls.Count == 0
             ? $"      CONTROL FAILED: {control} charges is on this item and the hunt missed it,"
                 + " so read the line above as \"the hunt does not work\", not as an answer."
-            : $"      control ok: found the {control} charges it already holds at {string.Join(", ", controls)}");
+            : $"      control ok: found the {control} charges it already holds at"
+                + $" {string.Join(", ", controls.Take(MostHits))}");
+    }
+
+    /// <summary>Reads one region four bytes at a time, collecting whatever it was asked for.</summary>
+    private void Sweep(
+        string label,
+        ulong at,
+        int bytes,
+        IReadOnlyList<int> wanted,
+        int control,
+        List<string> hits,
+        List<string> controls)
+    {
+        for (int offset = 0; offset < bytes; offset += 4)
+        {
+            if (!_reader.TryRead(at + (ulong)offset, out int found))
+            {
+                continue;
+            }
+
+            if (wanted.Contains(found))
+            {
+                hits.Add($"{label}+0x{offset:X} = {found}");
+            }
+
+            if (found == control)
+            {
+                controls.Add($"{label}+0x{offset:X}");
+            }
+        }
     }
 
     /// <summary>The item's resolved stats - the inputs, if the cost turns out to be computed.</summary>
