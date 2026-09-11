@@ -32,6 +32,13 @@
       flask is switched on - it is off until you do, per belt slot.
 
 .EXAMPLE
+  .\scripts\run.ps1 -FlaskWatch
+      The flask report, then SAMPLE the belt while you drink. On a full flask the
+      current charge count and the flask's real maximum are the same number, so
+      no single reading tells the two apart - drink once and the slot that drops
+      is the count, the one that stays is the maximum. Any key stops it.
+
+.EXAMPLE
   .\scripts\run.ps1 -Keys
       Print what the game's own config file says about the flask keys, and what
       this reads out of it. Run this when a flask key does not behave.
@@ -47,6 +54,7 @@ param(
     [switch]$AutoFlask,
     [switch]$Keys,
     [switch]$Flasks,
+    [switch]$FlaskWatch,
     [switch]$Debug
 )
 
@@ -69,6 +77,7 @@ try {
     if ($AutoFlask) { $appArgs += '--autoflask' }
     if ($Keys)      { $appArgs += '--keys' }
     if ($Flasks)    { $appArgs += '--flasks' }
+    if ($FlaskWatch) { $appArgs += '--flaskwatch' }
     if ($Debug)     { $appArgs += '--debug' }
 
     dotnet run --project src/PoEformance.App -c Release -- @appArgs
