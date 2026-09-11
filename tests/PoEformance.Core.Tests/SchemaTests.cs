@@ -58,6 +58,30 @@ public class SchemaTests
         // red is the anchor doing its job, so it moves with the offset rather than being
         // loosened: a league that reads as nothing prices a stash against no economy at all.
         Assert.Equal(0x2160, schema.Structs["ServerDataOffsets"].OffsetOf("League"));
+
+        // The atlas, whose 0.5.5 drift is pinned here because EVERY ONE OF ITS WRONG ANSWERS
+        // READ AS A PLAUSIBLE ONE. Nothing threw, nothing came back zero, and the panel reported
+        // hundreds of maps throughout: they simply had no ids, a biome of 255, a state of
+        // Completed and no connections at all. Three independent moves, corrected off
+        // GameHelper2's ImportantUiElements.cs in 2026-09:
+        //
+        // The panel and the badge children are UiElements, so they took the same -0x18 tail shift
+        // UiElementBase.Flags took above and this schema had not carried over to them.
+        Assert.Equal(0x590, schema.Structs["AtlasPanel"].OffsetOf("ConnectionsVector"));
+        Assert.Equal(0x170, schema.Structs["AtlasNode"].Constants["BadgeContentId"]);
+        // The EndgameMaps row moved -0x10. The old +0x2A0 still holds a pointer - to the node's
+        // atlas-passive row - so the map-id walk never failed a check and returned nothing, while
+        // the two bytes landed in padding where 0xFF reads as a set CompletedBit.
+        Assert.Equal(0x290, schema.Structs["AtlasNodeData"].OffsetOf("MapDataPtr"));
+        Assert.Equal(0x2BE, schema.Structs["AtlasNodeData"].OffsetOf("BiomeId"));
+        Assert.Equal(0x2BF, schema.Structs["AtlasNodeData"].OffsetOf("StatusBits"));
+        // And this one is NOT a shift, which is why it is the dangerous one: +0x320 is still
+        // there and still holds a grid position, only a region-local one, so it reads as sane
+        // coordinates that the panel's atlas-wide edge table can never match. The node element's
+        // own tail did not move - its neighbours are the proof, and they are pinned for it.
+        Assert.Equal(0x310, schema.Structs["AtlasNode"].OffsetOf("GridPosition"));
+        Assert.Equal(0x350, schema.Structs["AtlasNode"].OffsetOf("ContentVector"));
+        Assert.Equal(0x368, schema.Structs["AtlasNode"].OffsetOf("BadgeVectorBegin"));
         Assert.Equal(0x10, schema.Structs["GameState"].Constants["StateEntrySize"]);
         Assert.Equal(4, schema.Structs["GameState"].Constants["InGameStateIndex"]);
 

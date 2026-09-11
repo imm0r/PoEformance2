@@ -1011,7 +1011,7 @@
     "AtlasPanel": {
       "comment": "The atlas panel is a fixed CHILD PATH from the game-UI root - 22, 0, 6 - and its children are the nodes, the you-are-here marker and the region buttons mixed together. They are told apart by the UiElement Flags word (0x180) with the visible bit (0x800) masked off, which acts as a type fingerprint. THE PATH IS CONFIRMED against a real session 2026-08 (tests/fixtures/session-2026-08-atlas-panel.rec, PanelSessionTests): with the atlas open it lands on a visible UiElement carrying dozens of 36x36 children at scattered positions, which is what the node list looks like. The FINGERPRINTS below are still unverified, ported from GameHelper2 (which credits yokkenUA's Atlas plugin). ITS OWN SIZE IS NOT THE SCREEN IT COVERS, and that cost a bug: UnscaledSize reads 3008x1600 with ScaleIndex 2, which scales BOTH axes by the height factor - 2707x1440 on a 3440x1440 window, leaving the right 733 pixels uncovered while the atlas is plainly drawn across them. Its children sit from -2629 to +877, far outside their parent, because the panel is a viewport onto a map that pans. Anything asking which screen the atlas covers must take the whole window; see PanelReader.WholeScreen. At 16:9 the same numbers overflow the width and the shortfall is invisible.",
       "fields": {
-        "ConnectionsVector": { "offset": "0x5A8", "type": "stdVector", "comment": "EVERY line on the atlas, once, on the PANEL - not a per-node neighbour list. Drift history: this project first read it at the same offset on each NODE element, where a node's own bytes occasionally pass for two pointers a small distance apart, so most nodes reported no connections at all and a few reported invented ones. The symptom was a route drawn to the right map by a way nobody can walk. Entries are 0x14 bytes: an unknown i32, then the source grid pair, then the target grid pair." }
+        "ConnectionsVector": { "offset": "0x590", "type": "stdVector", "comment": "EVERY line on the atlas, once, on the PANEL - not a per-node neighbour list. Entries are 0x14 bytes: an unknown i32, then the source grid pair, then the target grid pair. Drift history, TWO corrections deep. (1) This project first read it at the same offset on each NODE element, where a node's own bytes occasionally pass for two pointers a small distance apart, so most nodes reported no connections at all and a few reported invented ones - a route drawn to the right map by a way nobody can walk. (2) 0x5A8 -> 0x590 for 0.5.5. The panel is a UiElement and 0.5.5 shifted the UiElementBase tail by -0x18; this offset was ported from GameHelper2 before that patch and never got the shift, while UiElementBase.Flags in this same schema did. The symptom was clean and total: the two words at +0x5A8 no longer looked like a vector at all, so Lines() bailed and the Panel Debug Log said 'NO lines read off the panel'. Confirmed against GameHelper2's AtlasNodeConnectionsVectorOffset (ImportantUiElements.cs, 2026-09)." }
       },
       "consts": {
         "PathFromUiRoot0": "22",
@@ -1029,10 +1029,10 @@
     },
 
     "AtlasNode": {
-      "comment": "UNVERIFIED, same provenance as AtlasPanel. One node of the endgame atlas, which is a UiElement with its own data hanging off it. THE DATA IS NOT IN THE ELEMENT: the reference reads [node+0x10] (the children vector's first pointer) and then +0x20 into that, and the biome, status and map id live at the END of that chain, while the grid position sits on the element itself. Status is a bit field, not a number: 0x02 completed, 0x01 accessible, neither means locked.",
+      "comment": "One node of the endgame atlas, which is a UiElement with its own data hanging off it. THE DATA IS NOT IN THE ELEMENT: read [node+0x10] (the children vector's first pointer) and then +0x20 into that, and the biome, status and map id live at the END of that chain, while the grid position sits on the element itself. That two-hop chain is the one part of this block 0.5.5 did NOT move. Status is a bit field, not a number: 0x02 completed, 0x01 accessible, neither means locked. THE BADGE CONSTS BELONG TO THE BADGE CHILD, node[0][0][i], not to the node: BadgeContentId 0x188 -> 0x170 and BadgeContentName 0x290 -> 0x278 for 0.5.5, both the same -0x18 UiElementBase tail shift the panel's ConnectionsVector took, because a badge is a UiElement too. BadgeContentName is recorded and not read - this tool resolves names from ids through data/atlas-content.json, which is translated and editable; the game's own string is neither. Note which offsets did NOT move: ContentVector 0x350 and BadgeVector 0x368/0x370 are unchanged, so the node element's own tail did not shift and GridPosition's move is a different field rather than a shift.",
       "fields": {
-        "GridPosition": { "offset": "0x320", "type": "i32", "comment": "x here, y at +0x324. On the node ELEMENT, not on its data. The same offset on a region button is a row pointer, which is why the fingerprint has to be checked first." },
-        "ContentVector": { "offset": "0x350", "type": "stdVector", "comment": "Content tokens for a rendered node, four bytes each. Only a node the game has drawn has them." },
+        "GridPosition": { "offset": "0x310", "type": "i32", "comment": "x here, y at +0x314. On the node ELEMENT, not on its data. THE PAIR AT +0x320 IS A DECOY and this project read it for months: it is a grid position, it looks entirely sane, and it is only local to the node's generated region - so it never matches the atlas-wide coordinates the panel's connection edges are keyed by, and every node reported nought connections however well the edge table itself read. +0x310 is the atlas-wide one. Do not 'fix' this back by eyeballing which offset holds plausible numbers; both do. Confirmed against GameHelper2's AtlasNodeGridPositionOffset (ImportantUiElements.cs, 2026-09). The same offset on a region button is something else again, which is why the fingerprint has to be checked first." },
+        "ContentVector": { "offset": "0x350", "type": "stdVector", "comment": "Content of a node the game has actually drawn, as ALTERNATING u32 PAIRS - a stat-row id then its value - not as one packed word each. Reading it as packed words, which this project did, made every second entry a bare magnitude with no id and every other one an id with no magnitude. 0.5.5 left the offset alone and changed the contents, which is the drift that looks least like drift: the vector still reads, it still has a plausible length, and only the meanings are rubbish. See ContentTokenPairStride. The packing into (magnitude << 16 | id) now happens in the reader; see AtlasContentNames for what the halves mean." },
         "BadgeVectorBegin": { "offset": "0x368", "type": "ptr", "comment": "A vector of BYTES, one per badge, not of pointers: each is an EndgameMapContent ROW and the content id is the row plus 100. It is filled from the server's cell state rather than from the drawing, so it survives fog and culling - which is why it is worth having as well as the badge children." },
         "BadgeVectorEnd": { "offset": "0x370", "type": "ptr" }
       },
@@ -1042,8 +1042,10 @@
         "RitualModsChild": "0x3B8",
         "BadgeChild0": "0",
         "BadgeChild1": "0",
-        "BadgeContentId": "0x188",
+        "BadgeContentId": "0x170",
+        "BadgeContentName": "0x278",
         "BadgeRowToContentId": "100",
+        "ContentTokenPairStride": "2",
         "CompletedBit": "0x02",
         "AccessibleBit": "0x01"
       }
@@ -1078,12 +1080,11 @@
     },
 
     "AtlasNodeData": {
-      "comment": "UNVERIFIED, same provenance. What the two-hop chain off a node element leads to.",
+      "comment": "What the two-hop chain off a node element leads to. ALL THREE FIELDS MOVED -0x10 IN 0.5.5, which the reference records as the EndgameMaps row itself moving. The symptom was one this project saw and did not recognise, because nothing crashed and nothing read as zero: every map came back with no id, biome 255, and state Completed. The old +0x2A0 still holds a pointer - it now points at the node's ATLAS-PASSIVE row - so the map-id chain walked three hops without ever failing a plausibility check and returned an empty or generated-looking string; and 0x2CE/0x2CF landed in the tail padding, where 0xFF reads as a set CompletedBit. A whole atlas of finished maps is what a wrong offset looks like here, not a blank one. Confirmed against GameHelper2's AtlasNodeMapDataOffset / BiomeIdOffset / StatusByteOffset (ImportantUiElements.cs, 2026-09).",
       "fields": {
-        "MapDataPtr": { "offset": "0x2A0", "type": "ptr", "comment": "-> wrapper -> string header -> buffer: the locale-independent map id, e.g. MapUniqueReactor_04." },
-        "ContentName": { "offset": "0x290", "type": "stdWString" },
-        "BiomeId": { "offset": "0x2CE", "type": "u8" },
-        "StatusBits": { "offset": "0x2CF", "type": "u8" }
+        "MapDataPtr": { "offset": "0x290", "type": "ptr", "comment": "-> wrapper -> string header -> buffer: the locale-independent map id, e.g. MapUniqueReactor_04. The buffer is a bare wide string read to its terminator, not a std::wstring with a length." },
+        "BiomeId": { "offset": "0x2BE", "type": "u8" },
+        "StatusBits": { "offset": "0x2BF", "type": "u8" }
       }
     },
 

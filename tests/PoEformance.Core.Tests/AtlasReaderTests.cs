@@ -8,12 +8,13 @@ namespace PoEformance.Core.Tests;
 /// Reading the endgame atlas out of the interface, against a synthetic panel.
 /// </summary>
 /// <remarks>
-/// The offsets themselves are UNCONFIRMED - ported from GameHelper2 while the game was not
-/// available - and a fixture built from the schema follows the schema anywhere, so nothing
-/// here can vouch for a single address. What it does cover is the walk: that a child which is
-/// not a map is refused rather than parsed, that the status byte is read as the two bits it
-/// is, and that a length out of game memory cannot become a loop of any size it likes. Those
-/// are the parts that turn a wrong offset into a hang instead of an empty list.
+/// A FIXTURE BUILT FROM THE SCHEMA FOLLOWS THE SCHEMA ANYWHERE, so nothing here can vouch for
+/// a single address - the addresses are pinned in SchemaTests, where a change has to be argued
+/// for rather than merely made. What this covers is the walk: that a child which is not a map
+/// is refused rather than parsed, that the status byte is read as the two bits it is, that a
+/// length out of game memory cannot become a loop of any size it likes, and - since 0.5.5 - that
+/// the content vector is decoded as the pairs it holds. The last of those is the one a fixture
+/// CAN settle, because it is about the shape of the bytes rather than about where they live.
 /// </remarks>
 public class AtlasReaderTests
 {
@@ -395,5 +396,76 @@ public class AtlasReaderTests
 
         AtlasNode read = Assert.Single(ReaderFor(fake, schema).Read(UiRoot, new UiScale(2560, 1600, 0)));
         Assert.Equal([0x0065u, 0x006Cu], read.BadgeIds);
+    }
+
+    [Fact]
+    public void THEContentVectorIsPAIRSRatherThanOnePackedWordEach()
+    {
+        // The drift that looks least like drift, so this is the test that has to exist: the
+        // offset did not move and the vector still reads to a plausible length - only what is in
+        // it changed. A stat-row id, then its value, then the next pair.
+        OffsetSchema schema = LoadSchema();
+        StructDef node = schema.Structs["AtlasNode"];
+        (FakeMemoryReader fake, _) = Atlas(MapNodeFlags(schema), status: 0x01);
+
+        // 0x0963 is "additional Shrines", three of them, and 0x0069 an Expedition.
+        PlaceTokens(fake, schema, [0x0963, 3, 0x0069, 1]);
+
+        AtlasNode read = Assert.Single(ReaderFor(fake, schema).Read(UiRoot, new UiScale(2560, 1600, 0)));
+
+        // Packed the way the rest of the tool speaks: magnitude in SIXTY-FOURTHS in the high
+        // half, id in the low. 3 x 64 = 192 = 0xC0, which is the form AtlasContentNames decodes.
+        Assert.Equal([0x00C00963u, 0x00400069u], read.ContentTokens);
+        Assert.Equal(3u, PoEformance.Game.World.AtlasContentNames.MagnitudeOf(read.ContentTokens[0]));
+
+        // And the failure it replaces, stated so nobody reverts to it: read one word per content
+        // and the first entry keeps its id but loses its count, while the SECOND word - a bare 3
+        // - becomes a content in its own right. A map with two contents then lists three.
+        Assert.DoesNotContain(3u, read.ContentTokens);
+        Assert.Equal(2, read.ContentTokens.Count);
+    }
+
+    [Fact]
+    public void ANDANOddNumberOfThemIsNotAShortReadButTheWrongVector()
+    {
+        // Pairs cannot come out odd. A length that will not halve means whatever was found at
+        // that offset is not this vector, and half-decoding it would pair each value with the
+        // NEXT content's id - every number attached to the wrong name.
+        OffsetSchema schema = LoadSchema();
+        (FakeMemoryReader fake, _) = Atlas(MapNodeFlags(schema), status: 0x01);
+        PlaceTokens(fake, schema, [0x0963, 3, 0x0069]);
+
+        AtlasNode read = Assert.Single(ReaderFor(fake, schema).Read(UiRoot, new UiScale(2560, 1600, 0)));
+        Assert.Empty(read.ContentTokens);
+    }
+
+    [Fact]
+    public void ANDAValueTooBigToFitSaturatesRatherThanWrappingIntoTheId()
+    {
+        // The magnitude is scaled by 64 into a sixteen-bit half, so a value past 1023 overflows
+        // it. Left to wrap, the carry lands in the id and renames the content.
+        OffsetSchema schema = LoadSchema();
+        (FakeMemoryReader fake, _) = Atlas(MapNodeFlags(schema), status: 0x01);
+        PlaceTokens(fake, schema, [0x0963, 0xFFFF]);
+
+        AtlasNode read = Assert.Single(ReaderFor(fake, schema).Read(UiRoot, new UiScale(2560, 1600, 0)));
+        Assert.Equal(0x0963u, PoEformance.Game.World.AtlasContentNames.IdOf(Assert.Single(read.ContentTokens)));
+    }
+
+    /// <summary>Puts a content vector on the node, as the flat list of u32s that it is.</summary>
+    private static void PlaceTokens(FakeMemoryReader fake, OffsetSchema schema, uint[] words)
+    {
+        const ulong at = 0x90_0000;
+        int vector = schema.Structs["AtlasNode"].OffsetOf("ContentVector");
+
+        var bytes = new byte[words.Length * 4];
+        for (int i = 0; i < words.Length; i++)
+        {
+            BitConverter.TryWriteBytes(bytes.AsSpan(i * 4), words[i]);
+        }
+
+        fake.Place(at, bytes);
+        fake.Place(Node + (ulong)vector, at);
+        fake.Place(Node + (ulong)vector + 8, at + (ulong)bytes.Length);
     }
 }

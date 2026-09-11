@@ -61,11 +61,15 @@ public sealed record AtlasNode(
 /// </summary>
 /// <remarks>
 /// PORTED FROM GameHelper2's Atlas2 plugin and the ImportantUiElements that feed it, which in
-/// turn credit yokkenUA's Atlas plugin. NONE OF IT IS CONFIRMED against this client yet - it
-/// was written from the reference while the game was not available, so every offset in the
-/// schema's Atlas blocks is a hypothesis and the first live run should expect to correct some.
-/// <see cref="Describe"/> exists for exactly that: it reports what each step found so the
-/// broken step names itself, instead of the whole thing coming back empty.
+/// turn credit yokkenUA's Atlas plugin. Its offsets track that reference, re-checked against it
+/// for 0.5.5; what has NOT happened is a confirmation against this client, so treat the schema's
+/// Atlas blocks as the reference's best answer rather than as measured here.
+///
+/// <see cref="Describe"/> exists for that gap, and 0.5.5 is why it is not merely nice to have.
+/// Three offsets moved at once and not one of them failed: the panel still reported hundreds of
+/// maps, at plausible positions, with plausible flags - they just had no ids, a biome of 255, a
+/// state of Completed and no connections at all. Nothing here comes back empty when it is wrong,
+/// so a step that cannot say what it found is a step that cannot be debugged.
 ///
 /// The atlas is INTERFACE, not world. Its nodes are UiElements at a fixed child path, so this
 /// reads nothing while the panel is closed and costs nothing then either.
@@ -94,6 +98,18 @@ public sealed class AtlasReader
     /// <summary>And most contents on one node, which is the same guard on a different length.</summary>
     public const int MostContents = 64;
 
+    /// <summary>
+    /// How much of the edge table has to land on a map read for the two to count as agreeing.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately nowhere near either end. A correct read never reaches 100% - the atlas draws
+    /// lines to maps still under fog - and a wrong one lands at nought rather than merely low,
+    /// because two different coordinate systems do not overlap by accident. The gap between those
+    /// is wide enough that the exact number here does not matter, which is the point: a threshold
+    /// that has to be tuned is measuring something too weak to be worth checking.
+    /// </remarks>
+    public const int AgreeingShare = 50;
+
     private readonly IMemoryReader _reader;
     private readonly UiElementReader _elements;
 
@@ -115,6 +131,7 @@ public sealed class AtlasReader
     private readonly int[] _badgeChildPath;
     private readonly int _badgeContentId;
     private readonly uint _badgeRowToContentId;
+    private readonly int _tokenPair;
     private readonly int _dataStorage;
     private readonly int _data;
     private readonly int _completedBit;
@@ -160,6 +177,7 @@ public sealed class AtlasReader
         _badgeChildPath = [(int)node.Constants["BadgeChild0"], (int)node.Constants["BadgeChild1"]];
         _badgeContentId = (int)node.Constants["BadgeContentId"];
         _badgeRowToContentId = (uint)node.Constants["BadgeRowToContentId"];
+        _tokenPair = (int)node.Constants["ContentTokenPairStride"];
         _dataStorage = (int)node.Constants["DataStoragePtr"];
         _data = (int)node.Constants["DataPtr"];
         _completedBit = (int)node.Constants["CompletedBit"];
@@ -510,7 +528,23 @@ public sealed class AtlasReader
         }
     }
 
-    /// <summary>The contents that are just numbers in a vector.</summary>
+    /// <summary>
+    /// The contents that arrive as numbers, packed into the one word the rest of the tool speaks.
+    /// </summary>
+    /// <remarks>
+    /// PAIRS, NOT PACKED WORDS. The vector holds a stat-row id and then its value, two u32s per
+    /// content, and this folds them into magnitude-high-id-low itself. Read one word per content
+    /// instead - which this did - and every second entry is a bare magnitude with no id while the
+    /// one before it is an id stripped of its magnitude, so a map with two contents names one of
+    /// them and invents a number for it.
+    ///
+    /// This is the drift that looks least like drift, and the reason to say so here: the offset
+    /// did not move, the vector still reads, its length is still plausible, and only the meanings
+    /// are rubbish. Nothing fails - it just answers wrongly.
+    ///
+    /// ONE READ of the whole vector, like the edge table. It is a handful of entries, but this
+    /// runs for every node on the atlas and what memory reading costs is the call.
+    /// </remarks>
     private List<uint> Tokens(ulong element)
     {
         var tokens = new List<uint>();
@@ -522,18 +556,34 @@ public sealed class AtlasReader
             return tokens;
         }
 
-        long count = (long)(last - first) / 4;
-        if (count <= 0 || count > MostContents)
+        long span = (long)(last - first);
+        long count = span / 4;
+
+        // A count that cannot be halved is not a short read, it is the wrong vector: these come
+        // in pairs, so an odd one means whatever was found is not this.
+        if (span % 4 != 0 || count < _tokenPair || count > MostContents || count % _tokenPair != 0)
         {
             return tokens;
         }
 
-        for (long i = 0; i < count; i++)
+        var bytes = new byte[count * 4];
+        if (!_reader.TryRead(first, bytes))
         {
-            if (_reader.TryRead(first + (ulong)(i * 4), out uint token) && token != 0)
+            return tokens;
+        }
+
+        for (int i = 0; i + 1 < count; i += _tokenPair)
+        {
+            uint id = BitConverter.ToUInt32(bytes, i * 4) & 0xFFFF;
+            if (id == 0)
             {
-                tokens.Add(token);
+                continue;   // an empty slot rather than a content
             }
+
+            // Magnitudes are carried in sixty-fourths and the high half is sixteen bits wide, so
+            // a value the game could not have meant saturates instead of wrapping into the id.
+            ulong scaled = BitConverter.ToUInt32(bytes, (i + 1) * 4) * (ulong)World.AtlasContentNames.MagnitudeUnit;
+            tokens.Add(((uint)Math.Min(scaled, 0xFFFF) << 16) | id);
         }
 
         return tokens;
@@ -618,6 +668,9 @@ public sealed class AtlasReader
                 + $"{node.BadgeIds.Count} badges  {node.ContentTokens.Count} tokens");
         }
 
+        said.AddRange(Agreement(nodes, lines));
+        said.AddRange(Chain(nodes));
+
         // Even with the path right, the fingerprints can be the thing that is wrong - and then
         // the panel is found and nothing in it reads as a map. Say where else it could be.
         if (nodes.Count == 0)
@@ -626,6 +679,89 @@ public sealed class AtlasReader
         }
 
         return said;
+    }
+
+    /// <summary>
+    /// Whether the edge table and the grid field are keyed the same way.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE CHECK THE GAME ITSELF SETTLES, and it settles two offsets at once. The edges name
+    /// grid positions and the nodes carry grid positions, so if both are read from the right
+    /// place then nearly every place the table names is a map that was just read. If either is
+    /// wrong the overlap falls to nothing.
+    ///
+    /// It is worth having because BOTH WRONG ANSWERS LOOK RIGHT ON THEIR OWN. There is a second
+    /// pair of coordinates on a node, sixteen bytes past the one that counts, and it holds
+    /// perfectly sane small integers - it is just local to the node's generated region instead of
+    /// atlas-wide. Reading it produces a full list of maps at believable positions, with every
+    /// one of them reporting no connections, and nothing about either half looks broken. Only
+    /// putting them together does.
+    ///
+    /// Never 100%: the atlas draws lines to maps still under fog, and those have no element to be
+    /// found on, so a real read leaves some endpoints unmatched.
+    /// </remarks>
+    private static IEnumerable<string> Agreement(
+        List<AtlasNode> nodes, Dictionary<(int X, int Y), List<(int X, int Y)>> lines)
+    {
+        if (lines.Count == 0 || nodes.Count == 0)
+        {
+            yield break;
+        }
+
+        var grids = new HashSet<(int X, int Y)>(nodes.Count);
+        foreach (AtlasNode node in nodes)
+        {
+            grids.Add(node.Grid);
+        }
+
+        int landed = 0;
+        foreach ((int X, int Y) place in lines.Keys)
+        {
+            if (grids.Contains(place))
+            {
+                landed++;
+            }
+        }
+
+        int share = landed * 100 / lines.Count;
+        yield return $"{landed} of {lines.Count} line endpoints sit on a map that was read ({share}%)";
+        yield return share >= AgreeingShare
+            ? "    - the edge table and AtlasNode.GridPosition are keyed alike, so both are right"
+            : "    - FAR TOO FEW. Both read plausible numbers and they are not the same numbers, so"
+              + " one of AtlasPanel.ConnectionsVector and AtlasNode.GridPosition is off";
+    }
+
+    /// <summary>
+    /// The hops to a node's own data, for the read where the maps are there and say nothing.
+    /// </summary>
+    /// <remarks>
+    /// A BREAK HERE DOES NOT LOOK LIKE A BREAK. The two-hop chain and the fields at the end of it
+    /// are separate repairs, and when the fields are the ones that moved every pointer on the way
+    /// still resolves - so the maps read, and come back with no id, a biome of 255 and a state of
+    /// Completed, because the offsets landed in padding where 0xFF has the completed bit set. A
+    /// whole atlas of finished maps is what that looks like from the outside. Printing the hops
+    /// says which half to correct instead of leaving it to be swept for.
+    /// </remarks>
+    private IEnumerable<string> Chain(List<AtlasNode> nodes)
+    {
+        var nameless = nodes.FindAll(node => node.MapId.Length == 0);
+        if (nameless.Count == 0)
+        {
+            yield break;
+        }
+
+        yield return $"{nameless.Count} of {nodes.Count} read as maps but carry NO id - their chain:";
+        foreach (AtlasNode node in nameless.Take(3))
+        {
+            ulong storage = _reader.ReadPointer(node.Address + (ulong)_dataStorage);
+            ulong data = storage == 0 ? 0 : _reader.ReadPointer(storage + (ulong)_data);
+            ulong wrapper = data == 0 ? 0 : _reader.ReadPointer(data + (ulong)_mapData);
+            yield return $"    0x{node.Address:X} +0x{_dataStorage:X} -> 0x{storage:X}"
+                + $" +0x{_data:X} -> 0x{data:X} +0x{_mapData:X} -> 0x{wrapper:X}";
+        }
+
+        yield return "    a zero names the hop that broke; all of them set means the fields at the end"
+            + " moved and AtlasNodeData is what to correct";
     }
 
     /// <summary>
