@@ -185,6 +185,9 @@ public sealed class MapRadarReader
     private readonly int _shift;
     private readonly int _defaultShift;
     private readonly int _zoom;
+    private readonly int _viewportsChild;
+    private readonly int _largeViewport;
+    private readonly int _miniViewport;
 
     /// <summary>
     /// The minimap's diagonal, remembered for the large map, which cannot supply its own.
@@ -210,9 +213,47 @@ public sealed class MapRadarReader
         _shift = map.OffsetOf("Shift");
         _defaultShift = map.OffsetOf("DefaultShift");
         _zoom = map.OffsetOf("Zoom");
+        // Absent from schemas older than 0.5.5 - the frozen one the fixtures replay through -
+        // and then the map-parent chain is the only route, as it was on those clients.
+        if (schema.Structs.TryGetValue("MapViewports", out StructDef? viewports))
+        {
+            _viewportsChild = (int)viewports.Constants["ChildOfUiManager"];
+            _largeViewport = (int)viewports.Constants["LargeMapChild"];
+            _miniViewport = (int)viewports.Constants["MiniMapChild"];
+        }
+        else
+        {
+            _viewportsChild = -1;
+        }
     }
 
-    /// <summary>Addresses of the two map elements, or 0 when the chain does not resolve.</summary>
+    /// <summary>The smallest zoom the game could mean. Below it the field is not a zoom.</summary>
+    /// <remarks>
+    /// The value that made this necessary was 1E-44 - a denormal, which is what a zero-ish
+    /// dword reads as a float. It passed the old "greater than zero" test, and a zoom that small
+    /// puts every marker on one pixel, which from the outside looks like an overlay that draws
+    /// nothing. A real zoom is 0.5 to 1.5; anything under this is a wrong offset.
+    /// </remarks>
+    public const float LeastPlausibleZoom = 0.05f;
+
+    /// <summary>The largest zoom the game could mean.</summary>
+    public const float MostPlausibleZoom = 20f;
+
+    /// <summary>
+    /// Addresses of the two map elements, or 0 when neither way of reaching them resolves.
+    /// </summary>
+    /// <remarks>
+    /// TWO ROUTES, and the bytes decide between them. The first is the map-parent chain this
+    /// tool confirmed in-game on 0.5.4: ImportantUiElements.MapParentPtr, then the two pointers
+    /// at +0x28/+0x30. The second is what GameHelper2 switched to in its 0.5.5 commit: child
+    /// ChildOfUiManager of the UI manager - which is a UiElement itself, Self and children and
+    /// all - then that element's children LargeMapChild and MiniMapChild. On the 0.5.5 client
+    /// the first route still resolves to two elements, but they read a zoom of exactly zero and
+    /// a full-screen size each, so resolving is not the same as being right. A route is
+    /// believed when the element it hands back carries a zoom in the game's range; failing
+    /// both, the first route's answer is returned as it always was, and the zoom's own fallback
+    /// keeps the projection finite.
+    /// </remarks>
     public (ulong LargeMap, ulong MiniMap) Resolve(ulong uiRootStruct)
     {
         if (!MemoryReaderExtensions.IsPlausiblePointer(uiRootStruct))
@@ -220,12 +261,39 @@ public sealed class MapRadarReader
             return (0, 0);
         }
 
+        (ulong LargeMap, ulong MiniMap) viaParent = (0, 0);
         ulong parent = _reader.ReadPointer(uiRootStruct + (ulong)_mapParent);
-        return !MemoryReaderExtensions.IsPlausiblePointer(parent)
-            ? (0, 0)
-            : (_reader.ReadPointer(parent + (ulong)_largeMap),
-               _reader.ReadPointer(parent + (ulong)_miniMap));
+        if (MemoryReaderExtensions.IsPlausiblePointer(parent))
+        {
+            viaParent = (_reader.ReadPointer(parent + (ulong)_largeMap), _reader.ReadPointer(parent + (ulong)_miniMap));
+            if (CarriesAZoom(viaParent))
+            {
+                return viaParent;
+            }
+        }
+
+        ulong viewports = _viewportsChild >= 0 ? _elements.Child(uiRootStruct, _viewportsChild) : 0;
+        if (viewports != 0)
+        {
+            (ulong LargeMap, ulong MiniMap) viaPath =
+                (_elements.Child(viewports, _largeViewport), _elements.Child(viewports, _miniViewport));
+            if (CarriesAZoom(viaPath))
+            {
+                return viaPath;
+            }
+        }
+
+        return viaParent;
     }
+
+    /// <summary>Whether either element of a pair reads a zoom the game could mean.</summary>
+    private bool CarriesAZoom((ulong LargeMap, ulong MiniMap) maps)
+        => (maps.MiniMap != 0 && ZoomIsPlausible(maps.MiniMap))
+           || (maps.LargeMap != 0 && ZoomIsPlausible(maps.LargeMap));
+
+    private bool ZoomIsPlausible(ulong address)
+        => _reader.TryRead(address + (ulong)_zoom, out float zoom)
+           && zoom is >= LeastPlausibleZoom and <= MostPlausibleZoom;
 
     /// <summary>
     /// Builds the projectable view of whichever map is asked for, or null when unavailable.
@@ -311,6 +379,6 @@ public sealed class MapRadarReader
     private float ReadZoom(ulong address)
     {
         float zoom = _reader.Read<float>(address + (ulong)_zoom);
-        return zoom is > 0 and <= 20 ? zoom : 0.5f;
+        return zoom is >= LeastPlausibleZoom and <= MostPlausibleZoom ? zoom : 0.5f;
     }
 }

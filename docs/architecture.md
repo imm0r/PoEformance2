@@ -351,6 +351,7 @@ PoEformance.App --replay session.rec           # rerun against the capture, no g
 PoEformance.App --record s.rec --questflags    # + read where a character's quest flags could be
 PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action fields (see below)
 PoEformance.App --record s.rec --hoverhunt    # + read the hovered-entity chain and the boss byte
+PoEformance.App --record s.rec --maphunt      # + capture the map elements by every route, while you zoom and pan
 PoEformance.App --record s.rec --sweep        # + read four components nothing has a layout for
 PoEformance.App --record s.rec --inventories  # + read every inventory whole, hunting the tab's sort
 PoEformance.App --record s.rec --glossary     # + find every loaded dat table and read the glossary
