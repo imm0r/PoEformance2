@@ -583,10 +583,12 @@ public sealed class FlaskProbe
         int ownerEntity = _schema.Structs["Component"].OffsetOf("OwnerEntity");
 
         output.WriteLine();
-        output.WriteLine("  flask watch - DRINK A FLASK NOW, then press any key.");
-        output.WriteLine("  The slot that DROPS is the current count. One that STAYS while another drops");
-        output.WriteLine("  is this flask's real maximum, which is the number the belt display is missing.");
-        output.WriteLine("  A per-use cost does not move either, so it will be sitting beside one of them.");
+        output.WriteLine("  flask watch - USE A FLASK NOW, then press any key.");
+        output.WriteLine("  What this can answer: WHICH slots track the charge count. It cannot point at a");
+        output.WriteLine("  maximum or a per-use cost - those never move, and neither does every other");
+        output.WriteLine("  unchanging byte on the item, so \"the one that stays\" names nothing. Use the");
+        output.WriteLine("  hunt in the report above for a value that sits still; use this for one that");
+        output.WriteLine("  does not.");
         output.WriteLine();
 
         var watching = new Dictionary<string, Tracked>(StringComparer.Ordinal);
