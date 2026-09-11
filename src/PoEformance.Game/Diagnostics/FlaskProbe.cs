@@ -577,21 +577,44 @@ public sealed class FlaskProbe
         ArgumentNullException.ThrowIfNull(output);
         ArgumentNullException.ThrowIfNull(stop);
 
-        int current = _schema.Structs["ChargesComponent"].OffsetOf("Current");
+        StructDef charges = _schema.Structs["ChargesComponent"];
+        int internalPtr = charges.OffsetOf("ChargesInternalPtr");
 
-        var watching = new List<(int Slot, string Path, ulong At, int Slots, ulong?[] Last, AddressPeek.PeekWatchLog Log)>();
+        var watching = new List<(string Where, ulong At, int Slots, ulong?[] Last, AddressPeek.PeekWatchLog Log)>();
         foreach (EquippedFlask flask in Belt(gameStatesStatic))
         {
-            ulong component = _entities.Read(flask.Entity)?.Component("Charges") ?? 0;
-            if (component == 0)
+            Entity? item = _entities.Read(flask.Entity);
+            if (item is null)
             {
                 continue;
             }
 
-            // From the component head out past +0x58, which is the slot this exists to identify.
-            (ulong start, int slots, _) = AddressPeek.Window(component + (ulong)current, current, 0x70);
-            watching.Add((flask.Slot, Shorten(flask.Path), start, slots, AddressPeek.Sample(_reader, start, slots), new AddressPeek.PeekWatchLog()));
+            // EVERY PLACE THE NUMBER COULD BE, not just the component the count is read from.
+            // A layout from another project names a live ChargesPerUse beside a
+            // ChargesPerUseBase; those offsets do not fit this build, but the SHAPE is the
+            // lead - a modified value next to a base copy - and watching only Charges would
+            // miss it if it sits on any of the others.
+            foreach (string name in new[] { "Charges", "Flask", "LocalStats", "Usable" })
+            {
+                ulong at = item.Component(name);
+                if (MemoryReaderExtensions.IsPlausiblePointer(at))
+                {
+                    Add($"slot {flask.Slot} {name}", at, HuntBytes / 8);
+                }
+            }
+
+            // AND the descriptor behind the Charges component, as a CONTROL: if it really is
+            // shared per base type then drinking must not move a byte of it, and a run where it
+            // does says it is per-item after all - which would be the finding, not a nuisance.
+            ulong descriptor = _reader.ReadPointer(item.Component("Charges") + (ulong)internalPtr);
+            if (MemoryReaderExtensions.IsPlausiblePointer(descriptor))
+            {
+                Add($"slot {flask.Slot} ChargesInternal", descriptor, 0x40 / 8);
+            }
         }
+
+        void Add(string where, ulong at, int slots)
+            => watching.Add((where, at, slots, AddressPeek.Sample(_reader, at, slots), new AddressPeek.PeekWatchLog()));
 
         output.WriteLine();
         if (watching.Count == 0)
@@ -603,6 +626,8 @@ public sealed class FlaskProbe
         output.WriteLine("  flask watch - DRINK A FLASK NOW, then press any key.");
         output.WriteLine("  The slot that DROPS is the current count. One that STAYS while another drops");
         output.WriteLine("  is this flask's real maximum, which is the number the belt display is missing.");
+        output.WriteLine("  A per-use cost does not move either, so it will be sitting beside one of them.");
+        output.WriteLine("  ChargesInternal is the control: shared per base type, it should not move at all.");
         output.WriteLine();
 
         while (!stop())
@@ -611,26 +636,33 @@ public sealed class FlaskProbe
 
             for (int i = 0; i < watching.Count; i++)
             {
-                (int slot, string path, ulong at, int slots, ulong?[] last, AddressPeek.PeekWatchLog log) = watching[i];
+                (string where, ulong at, int slots, ulong?[] last, AddressPeek.PeekWatchLog log) = watching[i];
                 ulong?[] sample = AddressPeek.Sample(_reader, at, slots);
 
                 foreach (AddressPeek.SlotChange change in log.Observe(last, sample))
                 {
                     if (change.Print)
                     {
-                        output.WriteLine($"  slot {slot}  " + AddressPeek.Line(_reader, at + (ulong)(change.Slot * 8), at, change.Before, change.After));
+                        output.WriteLine($"  {where}  "
+                            + AddressPeek.Line(_reader, at + (ulong)(change.Slot * 8), at, change.Before, change.After));
                     }
                 }
 
-                watching[i] = (slot, path, at, slots, sample, log);
+                watching[i] = (where, at, slots, sample, log);
             }
         }
 
-        foreach ((int slot, string path, ulong at, _, _, AddressPeek.PeekWatchLog log) in watching)
+        foreach ((string where, ulong at, _, _, AddressPeek.PeekWatchLog log) in watching)
         {
+            IReadOnlyList<string> summary = log.Summary(at, at);
+            if (summary.Count == 0)
+            {
+                continue;
+            }
+
             output.WriteLine();
-            output.WriteLine($"  slot {slot}  {path}");
-            foreach (string line in log.Summary(at, at))
+            output.WriteLine($"  {where}");
+            foreach (string line in summary)
             {
                 output.WriteLine("  " + line);
             }
