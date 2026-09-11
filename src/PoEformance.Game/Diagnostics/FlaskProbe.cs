@@ -49,10 +49,39 @@ public sealed class FlaskProbe
         }
     }
 
+    /// <summary>
+    /// Walks the belt chain and prints what it found at each step.
+    /// </summary>
+    /// <remarks>
+    /// A MISSING SCHEMA FIELD IS A FINDING HERE, NOT A CRASH, and that is not a hypothetical
+    /// guard: this probe asked ServerDataStructure for a field that lives on
+    /// ServerDataOffsets, so <c>--flasks</c> died with an unhandled KeyNotFoundException after
+    /// three lines of output - in the one tool somebody reaches for when the schema is the
+    /// suspect. OffsetOf already throws with both struct and field named, which is exactly
+    /// the sentence worth printing, so the message is kept and the process is not.
+    ///
+    /// The probe still STOPS at that point rather than carrying on. Everything below a
+    /// missing offset reads through it, and a walk that printed plausible addresses derived
+    /// from a field the schema does not have would be worse than no walk at all.
+    /// </remarks>
     public void Report(ulong gameStatesStatic, TextWriter output)
     {
         ArgumentNullException.ThrowIfNull(output);
 
+        try
+        {
+            Walk(gameStatesStatic, output);
+        }
+        catch (KeyNotFoundException missing)
+        {
+            output.WriteLine($"  FAIL  {missing.Message}");
+            output.WriteLine("        The probe stops here - everything below this reads through");
+            output.WriteLine("        that offset. Fix it in schema/poe2.offsets.json and re-run.");
+        }
+    }
+
+    private void Walk(ulong gameStatesStatic, TextWriter output)
+    {
         output.WriteLine();
         output.WriteLine("flask probe");
 
@@ -80,8 +109,18 @@ public sealed class FlaskProbe
         // Is this really ServerData? The league name is a known field on the same base, so
         // a sane string here separates "wrong struct" from "right struct, drifted field" -
         // two failures that otherwise look identical.
-        int leagueOffset = _schema.Structs["ServerDataStructure"].OffsetOf("League");
-        string league = _reader.ReadStdWString(serverData + (ulong)leagueOffset);
+        //
+        // ON THE OUTER STRUCT. This asked ServerDataStructure - the INNER one, which the
+        // inventories are on and the league is not - and had therefore been throwing
+        // KeyNotFoundException before the probe printed a single flask. The schema records
+        // the same trap on the field itself, and StashReader and StashInspector both ask
+        // ServerDataOffsets; this was the one caller that did not.
+        //
+        // Read SHORT, for StashReader's reason: a league name is a few words, and a long
+        // read off a wrong base wanders into whatever follows and comes back looking like a
+        // league nobody has heard of rather than like nothing.
+        int leagueOffset = _schema.Structs["ServerDataOffsets"].OffsetOf("League");
+        string league = _reader.ReadStdWString(serverData + (ulong)leagueOffset, 64).Trim();
         output.WriteLine($"  league            \"{league}\"  (ServerData+0x{leagueOffset:X})"
             + (league.Length is > 0 and < 40 ? "  -> ServerData confirmed" : "  -> SUSPECT"));
 
