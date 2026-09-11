@@ -58,12 +58,15 @@ public readonly record struct ModMeaning(string Name, string Kind);
 /// league - so it is DATA, extracted from the game's own tables by the AHK tool's scripts and
 /// shipped here.
 ///
-/// THE STAT KEY IS A ROW INDEX, not an id. What memory holds is the row number in Stats.dat,
-/// which is why this table is keyed by number and why it has 27,000 entries: it has to cover
-/// every row, not just the ones an item can carry.
+/// THE STAT KEY IS A ROW NUMBER, not an id - which is why this table is keyed by number and why
+/// it has 27,000 entries: it has to cover every row, not just the ones an item can carry. It is
+/// the row number PLUS ONE, and <see cref="Stat"/> is where that is dealt with and explained.
 /// </remarks>
 public sealed class ItemNames
 {
+    /// <summary>What memory's key has to be shifted by to index the table. See <see cref="Stat"/>.</summary>
+    private const int TableOffset = 1;
+
     private readonly IReadOnlyDictionary<int, StatMeaning> _stats;
     private readonly IReadOnlyDictionary<string, ModMeaning> _mods;
     private readonly IReadOnlyDictionary<string, string> _bases;
@@ -92,9 +95,41 @@ public sealed class ItemNames
     public (int Stats, int Mods, int Bases, int Uniques) Counts
         => (_stats.Count, _mods.Count, _bases.Count, _uniques.Count);
 
-    /// <summary>What a stat row means. Unknown rows keep their number.</summary>
-    public StatMeaning Stat(int key)
-        => _stats.TryGetValue(key, out StatMeaning found) ? found : new StatMeaning($"stat #{key}", string.Empty, 0);
+    /// <summary>
+    /// What a stat means, from the key AS MEMORY HOLDS IT. Unknown keys keep their number.
+    /// </summary>
+    /// <remarks>
+    /// THE KEY IS ONE-BASED AND THE TABLE IS NOT, which is the whole reason this is not a plain
+    /// dictionary lookup. A StatPair in memory holds the Stats.dat row index PLUS ONE; the
+    /// shipped table is keyed by the row index itself, because that is what the extractor writes.
+    /// Reading one as the other is off by exactly one row - the worst kind of wrong, because
+    /// every line still reads like a real mod, just the neighbouring one.
+    ///
+    /// WHAT IT LOOKED LIKE: a Dense Medium Mana Flask of the Constant, whose two explicit mods
+    /// the game words "42% increased Recovery rate" and "25% increased Charges gained", listed
+    /// here as "+42 seconds of Recovery" and "25% increased Amount Recovered". Rows 18 and 382
+    /// against the correct 17 and 381: both still flask stats, both still plausible, both the
+    /// row after the right one. The mod NAMES were right throughout - they are keyed by the
+    /// mod's own id, which does not shift - so nothing about the item looked broken.
+    ///
+    /// The same shift is in <see cref="PoEformance.Game.Components.StatNames"/>, established
+    /// there against a live character sheet, and the AHK tool applies it too: "In-memory
+    /// StatPair keys are 1-based Stats.dat row indices" - ahk/TreeView_StatsFormatting.ahk,
+    /// ResolveStatDisplayName. Its stat_name_map.tsv is byte-identical to the table this file is
+    /// built from, so both tools index the same rows the same way.
+    ///
+    /// NOT A STALE TABLE, which is what it looked like first and reads the same from the symptom:
+    /// a league inserting one row near the front would put these two out by exactly one as well.
+    /// Three things rule it out. The AHK tool ships a BYTE-IDENTICAL stat table, applies the
+    /// shift, and words this flask the way the game does. All twelve of the live-verified
+    /// readings recorded in StatNames still land on their own rows in this file. And this lookup
+    /// has never applied the shift at all, so there was no working state for a patch to break.
+    /// Regenerating the tables would have changed nothing.
+    /// </remarks>
+    public StatMeaning Stat(int memoryKey)
+        => memoryKey >= TableOffset && _stats.TryGetValue(memoryKey - TableOffset, out StatMeaning found)
+            ? found
+            : new StatMeaning($"stat #{memoryKey}", string.Empty, 0);
 
     /// <summary>What a mod is called. Unknown mods keep their id, which is readable enough.</summary>
     public ModMeaning Mod(string? id)

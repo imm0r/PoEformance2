@@ -69,12 +69,42 @@ public class ItemNamesTests
 
         // Found by its id rather than hard-coding a row number, because the row numbers are
         // the game's and shift between leagues - which is exactly why they are data.
-        StatMeaning life = Enumerable.Range(0, 27_000)
+        StatMeaning life = Enumerable.Range(1, 27_000)
             .Select(names.Stat)
             .First(stat => stat.Id == "base_maximum_life" && stat.Text.Length > 0);
 
         Assert.Contains("79", life.Say(79));
         Assert.DoesNotContain("{", life.Say(79));
+    }
+
+    [Fact]
+    public void ANDTheKeyMemoryHoldsIsOneMoreThanTheRowItMeans()
+    {
+        // GROUND TRUTH OFF THE GAME'S OWN TOOLTIP, which is the only reference that can settle
+        // this: a Dense Medium Mana Flask of the Constant, whose two explicit mods the game
+        // words "42% increased Recovery rate" and "25% increased Charges gained". This tool
+        // read the same item as "+42 seconds of Recovery" and "25% increased Amount Recovered"
+        // - rows 18 and 382, the ones AFTER the right ones, because the key went into the table
+        // unshifted.
+        //
+        // That is what an off-by-one in this table looks like and why it survived so long: two
+        // flask stats on a flask, each with the item's own rolled number in it. Nothing about
+        // either line says "wrong row".
+        ItemNames names = Loaded();
+
+        Assert.Equal("42% increased Recovery rate", names.Stat(18).Say(42));
+        Assert.Equal("25% increased Charges gained", names.Stat(382).Say(25));
+
+        // The ids as well, because a wording can be shared between rows where an id cannot -
+        // and the ids are what a stat search matches on.
+        Assert.Equal("local_flask_recovery_speed_+%", names.Stat(18).Id);
+        Assert.Equal("local_charges_added_+%", names.Stat(382).Id);
+
+        // Both ends of the shift. Key 1 is the first row, and key 0 has no row to land on -
+        // shifting the other way would quietly read one off the front of the table.
+        Assert.Equal("level", names.Stat(1).Id);
+        Assert.Equal("stat #0", names.Stat(0).Id);
+        Assert.Equal("stat #-3", names.Stat(-3).Id);
     }
 
     [Fact]
@@ -102,9 +132,11 @@ public class ItemNamesTests
         ItemNames names = Loaded();
         var unfilled = new List<string>();
 
-        for (int row = 0; row < 27_000; row++)
+        // Keys, not rows: the lookup takes what memory holds, which is one-based. Walking from
+        // zero would ask for a row that is not there and skip the last one that is.
+        for (int key = 1; key <= 27_000; key++)
         {
-            StatMeaning stat = names.Stat(row);
+            StatMeaning stat = names.Stat(key);
             if (stat.Text.Length == 0)
             {
                 continue;
