@@ -37,9 +37,11 @@ public class DriftReportTests
     {
         var fake = new FakeMemoryReader { ModuleBase = ModuleBase };
 
-        // Module image: the GameStates pattern with a RIP disp landing on a static cell.
+        // Module image: the GameStates pattern with a RIP disp landing on a static cell. The
+        // allocator immediate is the 0.5.5 one (0x148) so that the PRIMARY pattern hits; with
+        // the pre-patch 0x140 the healthy game would only ever resolve through a fallback.
         var module = new byte[0x4000];
-        byte[] pattern = [0x48, 0x39, 0x2D, 0, 0, 0, 0, 0x0F, 0x85, 0x11, 0x22, 0x33, 0x44, 0xB9, 0x40, 0x01, 0x00, 0x00];
+        byte[] pattern = [0x48, 0x39, 0x2D, 0, 0, 0, 0, 0x0F, 0x85, 0x11, 0x22, 0x33, 0x44, 0xB9, 0x48, 0x01, 0x00, 0x00];
         const int instrOffset = 0x800;
         const int staticCell = 0x3000;
         pattern.CopyTo(module, instrOffset);
@@ -138,8 +140,9 @@ public class DriftReportTests
     public void OldSchema_AgainstNewGame_NamesTheWaveInTheReport()
     {
         // The follow-up to the alarm: the report does not stop at "these rows failed", it
-        // sweeps the struct and prints where the tail went. The stale schema is 8 bytes
-        // behind on every tail field, so the hunt must say +0x8 for each and as the consensus.
+        // sweeps the struct and prints where the tail went. The stale schema is the 2026-08
+        // layout, 0x10 bytes behind 0.5.5 on every tail field, so the hunt must say +0x10
+        // for each and as the consensus.
         OffsetSchema current = LoadSchema();
         FakeMemoryReader newGame = BuildHealthyGame(current);
         OffsetSchema stale = SchemaJson.Load(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(StaleSchemaJson)));
@@ -149,11 +152,11 @@ public class DriftReportTests
         string text = writer.ToString();
 
         Assert.Contains("area instance hunt", text);
-        Assert.Contains("PlayerInfo        schema 0x598 -> found 0x5A0 (+0x8)", text);
-        Assert.Contains("AwakeEntities     schema 0x6D8 -> found 0x6E0 (+0x8)", text);
-        Assert.Contains("SleepingEntities  schema 0x6E8 -> found 0x6F0 (+0x8)", text);
-        Assert.Contains("TerrainMetadata   schema 0x8B8 -> found 0x8C0 (+0x8)", text);
-        Assert.Contains("the whole tail moved +0x8", text);
+        Assert.Contains("PlayerInfo        schema 0x5A0 -> found 0x5B0 (+0x10)", text);
+        Assert.Contains("AwakeEntities     schema 0x6E0 -> found 0x6F0 (+0x10)", text);
+        Assert.Contains("SleepingEntities  schema 0x6F0 -> found 0x700 (+0x10)", text);
+        Assert.Contains("TerrainMetadata   schema 0x8C0 -> found 0x8D0 (+0x10)", text);
+        Assert.Contains("the whole tail moved +0x10", text);
     }
 
     [Fact]
@@ -205,8 +208,9 @@ public class DriftReportTests
     public void OldSchema_AgainstNewGame_FlagsExactlyTheDriftedFields()
     {
         // The real scenario: the game moved on (memory laid out at CURRENT offsets) but
-        // we hand the report a schema still using the PRE-2026-08 AreaInstance offsets.
-        // The report must fail precisely the fields that drifted, and pass the rest.
+        // we hand the report a schema still using the 2026-08 AreaInstance tail, one wave
+        // behind 0.5.5. The report must fail precisely the fields that drifted, and pass
+        // the rest.
         OffsetSchema current = LoadSchema();
         FakeMemoryReader newGame = BuildHealthyGame(current);
 
@@ -218,7 +222,7 @@ public class DriftReportTests
         Assert.True(result.GameStatesResolved); // statics unaffected
         Assert.True(result.Failed > 0);
 
-        // The alarm fires on EXACTLY the drifted fields. AwakeEntities (0x6D8 -> 0x6E0)
+        // The alarm fires on EXACTLY the drifted fields. AwakeEntities (0x6E0 -> 0x6F0)
         // reads nothing valid at its stale offset. PlayerInfo is an INLINE base, so a
         // stale PlayerInfo offset points the walk at the wrong bytes and the
         // LocalPlayerStruct rows fail directly (the string check can't find the player
@@ -278,15 +282,15 @@ public class DriftReportTests
     private const string StaleSchemaJson = """
     {
       "version": 1,
-      "gameVersion": "stale-pre-2026-08",
+      "gameVersion": "stale: the 2026-08 AreaInstance tail, one wave (+0x10) behind 0.5.5",
       "statics": {
-        "GameStates": { "pattern": "48 39 2D ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 40 01 00 00" }
+        "GameStates": { "pattern": "48 39 2D ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 48 01 00 00" }
       },
       "structs": {
         "GameState": {
           "fields": {
-            "CurrentStateVecLast": { "offset": "0x10", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
-            "States": { "offset": "0x48", "type": "ptr" }
+            "CurrentStateVecLast": { "offset": "0x18", "type": "ptr", "invariant": { "kind": "plausiblePtr" } },
+            "States": { "offset": "0x50", "type": "ptr" }
           },
           "consts": { "StateEntrySize": "0x10", "InGameStateIndex": "4", "TotalStates": "13" }
         },
@@ -299,12 +303,12 @@ public class DriftReportTests
         },
         "AreaInstance": {
           "fields": {
-            "CurrentAreaLevel": { "offset": "0xC4", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 100 } },
+            "CurrentAreaLevel": { "offset": "0xBC", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 100 } },
             "Environments": { "offset": "0x4C0", "type": "ptr" },
-            "PlayerInfo": { "offset": "0x598", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
-            "AwakeEntities": { "offset": "0x6D8", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
-            "SleepingEntities": { "offset": "0x6E8", "type": "ptr" },
-            "TerrainMetadata": { "offset": "0x8B8", "type": "ptr" }
+            "PlayerInfo": { "offset": "0x5A0", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+            "AwakeEntities": { "offset": "0x6E0", "type": "ptr", "invariant": { "kind": "nonNullPtr" } },
+            "SleepingEntities": { "offset": "0x6F0", "type": "ptr" },
+            "TerrainMetadata": { "offset": "0x8C0", "type": "ptr" }
           }
         },
         "WorldData": {
