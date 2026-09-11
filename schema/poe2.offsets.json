@@ -1598,7 +1598,7 @@
     },
 
     "ChargesComponent": {
-      "comment": "Component on a flask item: how many charges it holds and what a use costs. Together they answer the only question that matters before pressing the key - is this flask usable AT ALL. Confirmed identically by GameHelper2's ChargesOffsets and the AHK tool.",
+      "comment": "Component on a flask item: how many charges it holds and what a use costs. Together they answer the only question that matters before pressing the key - is this flask usable AT ALL. Confirmed identically by GameHelper2's ChargesOffsets and the AHK tool. THE COMPONENT IS 0x40 BYTES and the next one starts immediately after, which is worth knowing because a window wider than that reads somebody else's flask. Measured two ways that agree: a live window showed the whole layout repeating at +0x40 with a DIFFERENT owner entity at +0x48 where this one has its own at +0x08, and the belt's own Charges components sat exactly 0x40 apart. This corrected a wrong finding rather than confirming a guess - a charge count seen at +0x58 had been written up as an unmapped second field of the same flask, and it is the NEXT item's Current.",
       "fields": {
         "ChargesInternalPtr": { "offset": "0x10", "type": "ptr", "struct": "ChargesInternal", "comment": "-> ChargesInternal, which holds the per-use cost." },
         "Current": { "offset": "0x18", "type": "i32", "comment": "Charges the flask currently holds. Confirmed against three belt items whose counts the belt display and the game's own tooltip agree on." }
