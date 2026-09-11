@@ -8,8 +8,20 @@ namespace PoEformance.Game.Components;
 /// <param name="Slot">Belt slot 1-5.</param>
 /// <param name="Path">The item's metadata path - what kind of flask this is.</param>
 /// <param name="Charges">Charges currently held.</param>
-/// <param name="ChargesPerUse">What one use costs.</param>
-public readonly record struct EquippedFlask(int Slot, string Path, int Charges, int ChargesPerUse)
+/// <param name="ChargesPerUse">
+/// What one use costs, as the BASE type declares it. NOT what this particular flask costs: a
+/// roll of "15% reduced Charges per use" is not in here. See <see cref="FlaskBeltReader"/>.
+/// </param>
+/// <param name="Entity">
+/// The item entity, for anything that wants to read more off it - the same courtesy
+/// <see cref="Items.InspectedItem"/> extends. Zero when it was not recorded.
+/// </param>
+public readonly record struct EquippedFlask(
+    int Slot,
+    string Path,
+    int Charges,
+    int ChargesPerUse,
+    ulong Entity = 0)
 {
     /// <summary>
     /// True for a charm rather than a flask.
@@ -80,6 +92,22 @@ public sealed class FlaskBelt
 ///
 /// Charges then come from each flask item's Charges component, which points at a shared
 /// per-base-type descriptor holding the per-use cost.
+///
+/// THE PER-USE COST IS THE BASE ONE, and that is a known gap rather than a claim that it is
+/// right. Because ChargesInternal is shared by every item of a base type, a flask that rolled
+/// "15% reduced Charges per use" still reads its base 10 here while the game's own tooltip
+/// says "Consumes 8 of 60 Charges on use". So <see cref="EquippedFlask.CanUse"/> refuses a
+/// flask at 8 charges that the game would let you drink, and - for the "increased Charges per
+/// use" direction - would press one the game refuses.
+///
+/// WHERE THE MODIFIED NUMBER LIVES IS NOT KNOWN. Neither reference reads it: GameHelper2's
+/// ChargesOffsets and the AHK tool's PoE2Offsets.Charges both stop at exactly this pair of
+/// fields, so both carry the same gap. That is not evidence the game does not keep it - only
+/// that nobody has looked. Computing it here instead would mean reimplementing the game's own
+/// arithmetic over however many stats feed it, with a rounding rule nobody has established:
+/// the reported flask is 10 x 0.85 = 8.5 shown as 8, which rules out rounding up and leaves
+/// floor and half-to-even indistinguishable. FlaskProbe prints the three places the answer
+/// could be; see its ReportChargeCost.
 /// </remarks>
 public sealed class FlaskBeltReader
 {
@@ -317,7 +345,7 @@ public sealed class FlaskBeltReader
             }
 
             (int charges, int perUse) = ReadCharges(itemEntity);
-            flasks.Add(new EquippedFlask(slot, path, charges, perUse));
+            flasks.Add(new EquippedFlask(slot, path, charges, perUse, itemEntity));
         }
 
         flasks.Sort((a, b) => a.Slot.CompareTo(b.Slot));
