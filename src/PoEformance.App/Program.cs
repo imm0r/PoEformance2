@@ -209,14 +209,24 @@ internal static class Program
                 // "local_charges_used_+% -15" is the finding, "key 1715 -15" is homework.
                 // Loaded here rather than held, because this is the only path that wants them
                 // this early and it is opt-in.
-                new PoEformance.Game.Diagnostics.FlaskProbe(
-                        reader,
-                        worldSchema,
-                        PoEformance.Game.Items.ItemNames.Load(
-                            FindDataFile("item-stats.json"),
-                            FindDataFile("item-names.json")))
-                    .Report(gameStatesAddress, Console.Out);
+                var flasks = new PoEformance.Game.Diagnostics.FlaskProbe(
+                    reader,
+                    worldSchema,
+                    PoEformance.Game.Items.ItemNames.Load(
+                        FindDataFile("item-stats.json"),
+                        FindDataFile("item-names.json")));
+
+                flasks.Report(gameStatesAddress, Console.Out);
                 recorder?.MarkFrame();
+
+                // The interactive half, and the only way to tell a current charge count from a
+                // maximum: on a full flask they are the same number at every offset that holds
+                // either. Drinking separates them, so this samples while somebody does.
+                if (options.WatchFlasks)
+                {
+                    flasks.Watch(gameStatesAddress, Console.Out, KeyPressed);
+                    recorder?.MarkFrame();
+                }
             }
 
             // Opt-in, because it reads a couple of hundred kilobytes it has no other use for.
@@ -3511,6 +3521,7 @@ internal static class Program
         bool ShowConfig,
         bool AutoFlask,
         bool ProbeFlasks,
+        bool WatchFlasks,
         bool ProbeKeys,
         bool Debug,
         bool ShowUiBrowser,
@@ -3538,6 +3549,7 @@ internal static class Program
             string updateOutcome = string.Empty, updatedVersion = string.Empty;
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
+            var watchFlasks = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false, mapHunt = false;
             bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
@@ -3595,6 +3607,12 @@ internal static class Program
                         break;
                     case "--flasks":
                         probeFlasks = true;
+                        break;
+                    case "--flaskwatch":
+                        // Implies --flasks: the watch is only readable next to the report that
+                        // says which offsets are already named.
+                        probeFlasks = true;
+                        watchFlasks = true;
                         break;
                     case "--keys":
                         probeKeys = true;
@@ -3730,7 +3748,7 @@ internal static class Program
             }
 
             return new CliOptions(
-                schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
+                schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, watchFlasks, probeKeys,
                 debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, mapHunt, sweep,
                 inventorySweep, tabName, groundTypeDump, animDump,
                 glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);

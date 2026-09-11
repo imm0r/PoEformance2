@@ -1601,7 +1601,10 @@
       "comment": "Component on a flask item: how many charges it holds and what a use costs. Together they answer the only question that matters before pressing the key - is this flask usable AT ALL. Confirmed identically by GameHelper2's ChargesOffsets and the AHK tool.",
       "fields": {
         "ChargesInternalPtr": { "offset": "0x10", "type": "ptr", "struct": "ChargesInternal", "comment": "-> ChargesInternal, which holds the per-use cost." },
-        "Current": { "offset": "0x18", "type": "i32", "comment": "Charges the flask currently holds." }
+        "Current": { "offset": "0x18", "type": "i32", "comment": "Charges the flask currently holds. Confirmed against three belt items whose counts the belt display and the game's own tooltip agree on." }
+      },
+      "rejected": {
+        "comment": "A LAYOUT FROM ANOTHER PROJECT, TESTED AND REJECTED - kept because rediscovering that it does not fit is the expensive part. It reads: MaxCharges 0x10, CurrentCharges 0x14, ChargesPerUse 0x18, ChargesPerUseBase 0x1C, all int, all on the Charges component. On THIS build it does not survive contact: +0x10 here holds a pointer (0x598F25B23D0 on a live Life Flask, the ChargesInternal this component follows), so reading it as two ints gives 4066059216 and 1432 where the game says 60 and 60. Moved onto ChargesInternal instead it ALMOST works, and that is the trap: the Life Flask reads 60/60 there and matches, because its base maximum, its real maximum and its current charges are all 60 - it has no max-charge mod and it was full. The Mana Flask settles it. Same offsets read 70 and 70 where the game says 88 and 88, because 70 is the BASE maximum and the +27% is not applied in that struct. One flask would have confirmed a wrong layout; two rejected it. WHAT IS WORTH KEEPING is the field list rather than the offsets: a live ChargesPerUse sitting beside a ChargesPerUseBase says the game does hold a modified per-use cost somewhere next to a base copy, which is the thing this project has been unable to find. It is not at these offsets on this build."
       }
     },
 

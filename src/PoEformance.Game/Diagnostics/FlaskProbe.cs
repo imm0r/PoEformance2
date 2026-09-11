@@ -298,13 +298,12 @@ public sealed class FlaskProbe
         output.WriteLine("  below says whether N and M are anywhere on the item; if they are in none of");
         output.WriteLine("  its components, the game computes them and the stats are the inputs.");
         output.WriteLine();
-        output.WriteLine("  RUN THIS TWICE - once with the flask full, once after drinking from it.");
-        output.WriteLine("  Every slot holding the charge count is listed under \"control ok\" below, and");
-        output.WriteLine("  on a FULL flask the current count and the modified maximum are the same");
-        output.WriteLine("  number, so no single run can tell those two apart. Drink once and they");
-        output.WriteLine("  separate: the slot that DROPS is the current count, the one that STAYS is");
-        output.WriteLine("  the maximum this flask actually has. The addresses change between runs; the");
-        output.WriteLine("  offsets do not, and the offsets are the answer.");
+        output.WriteLine("  ONE READING CANNOT TELL A COUNT FROM A MAXIMUM. Every slot holding the charge");
+        output.WriteLine("  count is listed under \"control ok\" below, and on a FULL flask the current");
+        output.WriteLine("  count and the flask's real maximum are the same number - so they read");
+        output.WriteLine("  identically however long you stare at them. Drinking separates them in one");
+        output.WriteLine("  action: run --flaskwatch, drink, and the slot that DROPS is the count while");
+        output.WriteLine("  one that STAYS is the maximum.");
 
         foreach (EquippedFlask flask in belt.Flasks)
         {
@@ -550,6 +549,140 @@ public sealed class FlaskProbe
                 controls.Add($"{label}+0x{offset:X}");
             }
         }
+    }
+
+    /// <summary>
+    /// Samples every flask's Charges component while somebody drinks, and prints what moved.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE QUESTION A SINGLE READING CANNOT ANSWER. The charge count turns up at more than
+    /// one offset in the Charges component - Current at +0x18, and something nothing maps at
+    /// +0x58 - and on a FULL flask the current count and the flask's real maximum are the same
+    /// number, so every slot holding either reads identically. No amount of staring at one
+    /// snapshot separates them.
+    ///
+    /// Drinking separates them in one action: the current count drops, a maximum does not. So
+    /// this is the <c>--peekwatch</c> protocol aimed at the belt - "do the thing in the game and
+    /// the slots that moved will print" - and it replaces asking somebody to run the report
+    /// twice and diff two walls of hex by eye, which is what this needed before and is a
+    /// miserable way to answer a question.
+    ///
+    /// THE ADDRESSES ARE RESOLVED ONCE and then sampled, deliberately: re-walking the belt every
+    /// tick would cost an entity read per flask per sample, and the components do not move while
+    /// the items sit in the belt. What DOES invalidate them is rearranging the belt, so a read
+    /// that starts failing is reported rather than silently counted as "no change".
+    /// </remarks>
+    public void Watch(ulong gameStatesStatic, TextWriter output, Func<bool> stop, int sampleMs = 100)
+    {
+        ArgumentNullException.ThrowIfNull(output);
+        ArgumentNullException.ThrowIfNull(stop);
+
+        StructDef charges = _schema.Structs["ChargesComponent"];
+        int internalPtr = charges.OffsetOf("ChargesInternalPtr");
+
+        var watching = new List<(string Where, ulong At, int Slots, ulong?[] Last, AddressPeek.PeekWatchLog Log)>();
+        foreach (EquippedFlask flask in Belt(gameStatesStatic))
+        {
+            Entity? item = _entities.Read(flask.Entity);
+            if (item is null)
+            {
+                continue;
+            }
+
+            // EVERY PLACE THE NUMBER COULD BE, not just the component the count is read from.
+            // A layout from another project names a live ChargesPerUse beside a
+            // ChargesPerUseBase; those offsets do not fit this build, but the SHAPE is the
+            // lead - a modified value next to a base copy - and watching only Charges would
+            // miss it if it sits on any of the others.
+            foreach (string name in new[] { "Charges", "Flask", "LocalStats", "Usable" })
+            {
+                ulong at = item.Component(name);
+                if (MemoryReaderExtensions.IsPlausiblePointer(at))
+                {
+                    Add($"slot {flask.Slot} {name}", at, HuntBytes / 8);
+                }
+            }
+
+            // AND the descriptor behind the Charges component, as a CONTROL: if it really is
+            // shared per base type then drinking must not move a byte of it, and a run where it
+            // does says it is per-item after all - which would be the finding, not a nuisance.
+            ulong descriptor = _reader.ReadPointer(item.Component("Charges") + (ulong)internalPtr);
+            if (MemoryReaderExtensions.IsPlausiblePointer(descriptor))
+            {
+                Add($"slot {flask.Slot} ChargesInternal", descriptor, 0x40 / 8);
+            }
+        }
+
+        void Add(string where, ulong at, int slots)
+            => watching.Add((where, at, slots, AddressPeek.Sample(_reader, at, slots), new AddressPeek.PeekWatchLog()));
+
+        output.WriteLine();
+        if (watching.Count == 0)
+        {
+            output.WriteLine("  flask watch: no flask with a Charges component - nothing to sample.");
+            return;
+        }
+
+        output.WriteLine("  flask watch - DRINK A FLASK NOW, then press any key.");
+        output.WriteLine("  The slot that DROPS is the current count. One that STAYS while another drops");
+        output.WriteLine("  is this flask's real maximum, which is the number the belt display is missing.");
+        output.WriteLine("  A per-use cost does not move either, so it will be sitting beside one of them.");
+        output.WriteLine("  ChargesInternal is the control: shared per base type, it should not move at all.");
+        output.WriteLine();
+
+        while (!stop())
+        {
+            Thread.Sleep(sampleMs);
+
+            for (int i = 0; i < watching.Count; i++)
+            {
+                (string where, ulong at, int slots, ulong?[] last, AddressPeek.PeekWatchLog log) = watching[i];
+                ulong?[] sample = AddressPeek.Sample(_reader, at, slots);
+
+                foreach (AddressPeek.SlotChange change in log.Observe(last, sample))
+                {
+                    if (change.Print)
+                    {
+                        output.WriteLine($"  {where}  "
+                            + AddressPeek.Line(_reader, at + (ulong)(change.Slot * 8), at, change.Before, change.After));
+                    }
+                }
+
+                watching[i] = (where, at, slots, sample, log);
+            }
+        }
+
+        foreach ((string where, ulong at, _, _, AddressPeek.PeekWatchLog log) in watching)
+        {
+            IReadOnlyList<string> summary = log.Summary(at, at);
+            if (summary.Count == 0)
+            {
+                continue;
+            }
+
+            output.WriteLine();
+            output.WriteLine($"  {where}");
+            foreach (string line in summary)
+            {
+                output.WriteLine("  " + line);
+            }
+        }
+    }
+
+    /// <summary>The belt, or nothing when the chain does not reach it.</summary>
+    private IReadOnlyList<EquippedFlask> Belt(ulong gameStatesStatic)
+    {
+        GameChainAddresses chain = GameChain.Resolve(_reader, _schema, gameStatesStatic);
+        if (!chain.InGame)
+        {
+            return [];
+        }
+
+        ulong localPlayerStruct = chain.AreaInstance + (ulong)_schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
+        ulong serverData = _reader.ReadPointer(
+            localPlayerStruct + (ulong)_schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr"));
+
+        return new FlaskBeltReader(_reader, _schema).Read(serverData).Flasks;
     }
 
     /// <summary>The item's resolved stats - the inputs, if the cost turns out to be computed.</summary>
