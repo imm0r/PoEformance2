@@ -3,6 +3,7 @@ using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Game.Components;
 using PoEformance.Game.Entities;
+using PoEformance.Game.Items;
 
 namespace PoEformance.Game.Diagnostics;
 
@@ -25,14 +26,27 @@ public sealed class FlaskProbe
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
     private readonly EntityReader _entities;
+    private readonly ItemReader? _items;
 
-    public FlaskProbe(IMemoryReader reader, OffsetSchema schema)
+    public FlaskProbe(IMemoryReader reader, OffsetSchema schema, ItemNames? names = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
         _reader = reader;
         _schema = schema;
         _entities = new EntityReader(reader, schema);
+
+        // A diagnostic is what somebody runs when the schema is the suspect, so it must not be
+        // the thing that dies of it. ItemReader wants a dozen item structs; without them the
+        // rest of this probe - the whole belt walk, which needs none of them - still reports.
+        try
+        {
+            _items = new ItemReader(reader, schema, names ?? ItemNames.Empty);
+        }
+        catch (KeyNotFoundException)
+        {
+            _items = null;
+        }
     }
 
     public void Report(ulong gameStatesStatic, TextWriter output)
@@ -178,6 +192,125 @@ public sealed class FlaskProbe
 
             output.WriteLine($"    slot {flask.Slot}  {flask.Charges,4}/{flask.ChargesPerUse,-4} charges"
                 + $"  {usability,-24}  {Shorten(flask.Path)}");
+        }
+
+        ReportChargeCost(belt, output);
+    }
+
+    /// <summary>
+    /// Prints the three places a flask's MODIFIED per-use cost could be.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THIS IS FOR. The per-use cost printed above is the BASE one - ChargesInternal is
+    /// shared by every item of a base type, so a flask that rolled "15% reduced Charges per
+    /// use" still reads its base 10 while the game's own tooltip says "Consumes 8 of 60
+    /// Charges on use". Auto-flask's usability gate is built on that number, so it refuses a
+    /// flask at 8 charges the game would let you drink.
+    ///
+    /// NEITHER REFERENCE ANSWERS WHERE THE REAL NUMBER IS. GameHelper2's ChargesOffsets and
+    /// the AHK tool's PoE2Offsets.Charges both stop at the same two fields this reader uses.
+    /// The absence of an answer there is not evidence of absence in the game, so this prints
+    /// the three places it could be and lets the game settle it:
+    ///
+    ///   1. the item's COMPONENTS, in case one nobody reads owns the answer;
+    ///   2. windows of the Charges component and of ChargesInternal, where the number would
+    ///      appear as an i32 beside the ones already identified;
+    ///   3. the item's resolved STATS, which are the inputs if it turns out to be computed.
+    ///
+    /// Read it with the flask's own tooltip open. "Consumes N of M Charges on use" is the
+    /// answer; the only question is whether N is in one of these windows or in none of them.
+    /// Both flasks matter, not just the modded one: the same base with and without the mod
+    /// settles whether ChargesInternal is shared at all.
+    /// </remarks>
+    private void ReportChargeCost(FlaskBelt belt, TextWriter output)
+    {
+        StructDef charges = _schema.Structs["ChargesComponent"];
+        int internalPtr = charges.OffsetOf("ChargesInternalPtr");
+        int current = charges.OffsetOf("Current");
+        int perUse = _schema.Structs["ChargesInternal"].OffsetOf("PerUseCharges");
+
+        output.WriteLine();
+        output.WriteLine("  per-use cost - the number above is the BASE, not this flask's");
+        output.WriteLine("  The game's tooltip says the real one: \"Consumes N of M Charges on use\". If N");
+        output.WriteLine("  is in a window below, that slot is the field to read. If N is in none of them,");
+        output.WriteLine("  the game computes it and the stats are the inputs.");
+
+        foreach (EquippedFlask flask in belt.Flasks)
+        {
+            output.WriteLine();
+            output.WriteLine($"  slot {flask.Slot}  {Shorten(flask.Path)}  entity 0x{flask.Entity:X}");
+
+            if (flask.Entity == 0)
+            {
+                output.WriteLine("    the item entity was not recorded - nothing further to read.");
+                continue;
+            }
+
+            Entity? item = _entities.Read(flask.Entity);
+            if (item is null)
+            {
+                output.WriteLine("    the item entity no longer reads - the belt moved under us.");
+                continue;
+            }
+
+            // Sorted, because the set is the finding and an unstable order makes two runs
+            // impossible to compare.
+            output.WriteLine($"    components  {string.Join(", ", item.Components.Keys.Order(StringComparer.Ordinal))}");
+
+            ulong component = item.Component("Charges");
+            if (component == 0)
+            {
+                output.WriteLine("    no Charges component - this one holds none.");
+                continue;
+            }
+
+            // The window starts at the component head and the marker sits on Current, so the
+            // two fields already identified are visible and everything unclaimed is beside them.
+            output.WriteLine($"    Charges 0x{component:X}  (Current at +0x{current:X})");
+            foreach (string line in AddressPeek.Describe(_reader, component + (ulong)current, component, current, 0x30))
+            {
+                output.WriteLine("    " + line);
+            }
+
+            ulong internals = _reader.ReadPointer(component + (ulong)internalPtr);
+            if (MemoryReaderExtensions.IsPlausiblePointer(internals))
+            {
+                output.WriteLine($"    ChargesInternal 0x{internals:X}  (PerUseCharges at +0x{perUse:X})");
+                foreach (string line in AddressPeek.Describe(_reader, internals + (ulong)perUse, internals, perUse, 0x30))
+                {
+                    output.WriteLine("    " + line);
+                }
+            }
+
+            ReportItemStats(flask.Entity, output);
+        }
+    }
+
+    /// <summary>The item's resolved stats - the inputs, if the cost turns out to be computed.</summary>
+    /// <remarks>
+    /// The game's OWN answer for what the mods came to, not a recomputation, which is why it
+    /// is worth printing even though it is not the cost itself. A flask carrying
+    /// "15% reduced Charges per use" shows up here as local_charges_used_+% = -15.
+    /// </remarks>
+    private void ReportItemStats(ulong entity, TextWriter output)
+    {
+        if (_items is null)
+        {
+            output.WriteLine("    stats: the schema has no item structs, so they cannot be read.");
+            return;
+        }
+
+        InspectedItem item = _items.Read(entity);
+        if (item.Stats.Count == 0)
+        {
+            output.WriteLine("    stats: none resolved.");
+            return;
+        }
+
+        output.WriteLine("    stats");
+        foreach (ItemStat stat in item.Stats)
+        {
+            output.WriteLine($"      key {stat.Key,-6} {stat.Value,6}  {stat.Id}");
         }
     }
 

@@ -205,7 +205,16 @@ internal static class Program
 
             if (options.ProbeFlasks)
             {
-                new PoEformance.Game.Diagnostics.FlaskProbe(reader, worldSchema)
+                // The tables so the flask's own stats print as names rather than row numbers -
+                // "local_charges_used_+% -15" is the finding, "key 1715 -15" is homework.
+                // Loaded here rather than held, because this is the only path that wants them
+                // this early and it is opt-in.
+                new PoEformance.Game.Diagnostics.FlaskProbe(
+                        reader,
+                        worldSchema,
+                        PoEformance.Game.Items.ItemNames.Load(
+                            FindDataFile("item-stats.json"),
+                            FindDataFile("item-names.json")))
                     .Report(gameStatesAddress, Console.Out);
                 recorder?.MarkFrame();
             }
