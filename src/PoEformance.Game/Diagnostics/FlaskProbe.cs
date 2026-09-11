@@ -577,96 +577,141 @@ public sealed class FlaskProbe
         ArgumentNullException.ThrowIfNull(output);
         ArgumentNullException.ThrowIfNull(stop);
 
-        StructDef charges = _schema.Structs["ChargesComponent"];
-        int internalPtr = charges.OffsetOf("ChargesInternalPtr");
-
-        var watching = new List<(string Where, ulong At, int Slots, ulong?[] Last, AddressPeek.PeekWatchLog Log)>();
-        foreach (EquippedFlask flask in Belt(gameStatesStatic))
-        {
-            Entity? item = _entities.Read(flask.Entity);
-            if (item is null)
-            {
-                continue;
-            }
-
-            // EVERY PLACE THE NUMBER COULD BE, not just the component the count is read from.
-            // A layout from another project names a live ChargesPerUse beside a
-            // ChargesPerUseBase; those offsets do not fit this build, but the SHAPE is the
-            // lead - a modified value next to a base copy - and watching only Charges would
-            // miss it if it sits on any of the others.
-            foreach (string name in new[] { "Charges", "Flask", "LocalStats", "Usable" })
-            {
-                ulong at = item.Component(name);
-                if (MemoryReaderExtensions.IsPlausiblePointer(at))
-                {
-                    Add($"slot {flask.Slot} {name}", at, HuntBytes / 8);
-                }
-            }
-
-            // AND the descriptor behind the Charges component, as a CONTROL: if it really is
-            // shared per base type then drinking must not move a byte of it, and a run where it
-            // does says it is per-item after all - which would be the finding, not a nuisance.
-            ulong descriptor = _reader.ReadPointer(item.Component("Charges") + (ulong)internalPtr);
-            if (MemoryReaderExtensions.IsPlausiblePointer(descriptor))
-            {
-                Add($"slot {flask.Slot} ChargesInternal", descriptor, 0x40 / 8);
-            }
-        }
-
-        void Add(string where, ulong at, int slots)
-            => watching.Add((where, at, slots, AddressPeek.Sample(_reader, at, slots), new AddressPeek.PeekWatchLog()));
+        int ownerEntity = _schema.Structs["Component"].OffsetOf("OwnerEntity");
 
         output.WriteLine();
-        if (watching.Count == 0)
-        {
-            output.WriteLine("  flask watch: no flask with a Charges component - nothing to sample.");
-            return;
-        }
-
         output.WriteLine("  flask watch - DRINK A FLASK NOW, then press any key.");
         output.WriteLine("  The slot that DROPS is the current count. One that STAYS while another drops");
         output.WriteLine("  is this flask's real maximum, which is the number the belt display is missing.");
         output.WriteLine("  A per-use cost does not move either, so it will be sitting beside one of them.");
-        output.WriteLine("  ChargesInternal is the control: shared per base type, it should not move at all.");
         output.WriteLine();
+
+        var watching = new Dictionary<string, Tracked>(StringComparer.Ordinal);
 
         while (!stop())
         {
             Thread.Sleep(sampleMs);
 
-            for (int i = 0; i < watching.Count; i++)
+            // RE-RESOLVED EVERY TICK, keyed by belt slot rather than held as an address. The
+            // first version of this resolved once and sampled fixed addresses, on the stated
+            // assumption that components do not move while the items sit in the belt - and a
+            // live run refuted it within a second: component vtables flipped between two
+            // values, and the LIFE flask's window began reporting the MANA flask's numbers.
+            // The objects are freed and reallocated under the watch. --peekwatch already says
+            // why and already does this: "a window pinned to where it used to be would keep
+            // reporting 'nothing changed' about somebody else's memory".
+            foreach (EquippedFlask flask in Belt(gameStatesStatic))
             {
-                (string where, ulong at, int slots, ulong?[] last, AddressPeek.PeekWatchLog log) = watching[i];
-                ulong?[] sample = AddressPeek.Sample(_reader, at, slots);
-
-                foreach (AddressPeek.SlotChange change in log.Observe(last, sample))
+                if (_entities.Read(flask.Entity) is not { } item)
                 {
-                    if (change.Print)
-                    {
-                        output.WriteLine($"  {where}  "
-                            + AddressPeek.Line(_reader, at + (ulong)(change.Slot * 8), at, change.Before, change.After));
-                    }
+                    continue;
                 }
 
-                watching[i] = (where, at, slots, sample, log);
+                // EVERY PLACE THE NUMBER COULD BE, not just the component the count is read
+                // from. A layout from another project names a live ChargesPerUse beside a
+                // ChargesPerUseBase; those offsets do not fit this build, but the SHAPE is the
+                // lead - a modified value next to a base copy - and watching only Charges
+                // would miss it if it sits on any of the others.
+                foreach (string name in new[] { "Charges", "Flask", "LocalStats", "Usable" })
+                {
+                    Track($"slot {flask.Slot} {name}", item.Component(name), flask.Entity);
+                }
             }
         }
 
-        foreach ((string where, ulong at, _, _, AddressPeek.PeekWatchLog log) in watching)
+        foreach ((string where, Tracked tracked) in watching.OrderBy(one => one.Key, StringComparer.Ordinal))
         {
-            IReadOnlyList<string> summary = log.Summary(at, at);
+            IReadOnlyList<string> summary = tracked.Log.Summary(tracked.At, tracked.At);
             if (summary.Count == 0)
             {
                 continue;
             }
 
             output.WriteLine();
-            output.WriteLine($"  {where}");
+            output.WriteLine($"  {where}{(tracked.Restarts > 0 ? $"  (the object was replaced {tracked.Restarts}x under the watch)" : string.Empty)}");
             foreach (string line in summary)
             {
                 output.WriteLine("  " + line);
             }
         }
+
+        void Track(string where, ulong at, ulong entity)
+        {
+            // IDENTITY, NOT JUST AN ADDRESS THAT STILL READS. A pooled slot can be handed to
+            // another entity's component of the same class between two samples - the schema
+            // says exactly that on Component.OwnerEntity: "the address one cell past a
+            // component is a DIFFERENT entity's component of the same class". So the owner has
+            // to still be this flask before a sample means anything.
+            if (!MemoryReaderExtensions.IsPlausiblePointer(at)
+                || _reader.ReadPointer(at + (ulong)ownerEntity) != entity)
+            {
+                return;
+            }
+
+            ulong?[] sample = AddressPeek.Sample(_reader, at, Extent(at) / 8);
+
+            if (!watching.TryGetValue(where, out Tracked? tracked) || tracked.At != at)
+            {
+                // A different object: start over rather than diff across two of them, which is
+                // what turned a whole run into nonsense.
+                watching[where] = new Tracked(at, sample, tracked is null ? 0 : tracked.Restarts + 1);
+                return;
+            }
+
+            foreach (AddressPeek.SlotChange change in tracked.Log.Observe(tracked.Last, sample))
+            {
+                if (change.Print)
+                {
+                    output.WriteLine($"  {where}  "
+                        + AddressPeek.Line(_reader, at + (ulong)(change.Slot * 8), at, change.Before, change.After));
+                }
+            }
+
+            tracked.Last = sample;
+        }
+    }
+
+    /// <summary>One watched component, and what it last looked like.</summary>
+    private sealed class Tracked(ulong at, ulong?[] last, int restarts)
+    {
+        public ulong At { get; } = at;
+
+        public ulong?[] Last { get; set; } = last;
+
+        /// <summary>How often this slot was handed a different object - noise, made countable.</summary>
+        public int Restarts { get; } = restarts;
+
+        public AddressPeek.PeekWatchLog Log { get; } = new();
+    }
+
+    /// <summary>
+    /// How far a component reaches before the pool hands the space to the next one.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED RATHER THAN ASSUMED. Components are pooled head to tail, so a fixed window
+    /// spills into a neighbour and reports its changes as this flask's - which is what a
+    /// 0x100 window did on the first live run: a "change" at Charges+0xD0 was another item's
+    /// ChargesInternal pointer. Every component starts with a StaticPtr that fingerprints its
+    /// TYPE and is identical across instances, so the next place that same value appears is
+    /// the next instance, and that is where this one ends. No guess about struct sizes.
+    /// </remarks>
+    private int Extent(ulong at, int most = 0x100)
+    {
+        ulong type = _reader.ReadPointer(at);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(type))
+        {
+            return most;
+        }
+
+        for (int offset = 8; offset < most; offset += 8)
+        {
+            if (_reader.ReadPointer(at + (ulong)offset) == type)
+            {
+                return offset;
+            }
+        }
+
+        return most;
     }
 
     /// <summary>The belt, or nothing when the chain does not reach it.</summary>
