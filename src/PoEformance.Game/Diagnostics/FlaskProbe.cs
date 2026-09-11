@@ -49,6 +49,7 @@ public sealed class FlaskProbe
     private readonly OffsetSchema _schema;
     private readonly EntityReader _entities;
     private readonly ItemReader? _items;
+    private readonly ItemNames _names;
 
     public FlaskProbe(IMemoryReader reader, OffsetSchema schema, ItemNames? names = null)
     {
@@ -57,13 +58,14 @@ public sealed class FlaskProbe
         _reader = reader;
         _schema = schema;
         _entities = new EntityReader(reader, schema);
+        _names = names ?? ItemNames.Empty;
 
         // A diagnostic is what somebody runs when the schema is the suspect, so it must not be
         // the thing that dies of it. ItemReader wants a dozen item structs; without them the
         // rest of this probe - the whole belt walk, which needs none of them - still reports.
         try
         {
-            _items = new ItemReader(reader, schema, names ?? ItemNames.Empty);
+            _items = new ItemReader(reader, schema, _names);
         }
         catch (KeyNotFoundException)
         {
@@ -147,7 +149,7 @@ public sealed class FlaskProbe
             + (league.Length is > 0 and < 40 ? "  -> ServerData confirmed" : "  -> SUSPECT"));
 
         // There are two server-data structs; the inventories live on the inner one.
-        var belts = new FlaskBeltReader(_reader, _schema);
+        var belts = new FlaskBeltReader(_reader, _schema, _names);
         ulong inner = belts.ResolveServerDataStructure(serverData);
         output.WriteLine($"  serverDataStruct  0x{inner:X}"
             + (inner == serverData ? "  (direct)" : $"  (via +0x{_schema.Structs["ServerDataOffsets"].OffsetOf("PlayerServerData"):X} hop)"));
@@ -251,7 +253,12 @@ public sealed class FlaskProbe
                 ? "charm (self-triggering)"
                 : flask.CanUse ? "usable" : "NOT usable";
 
-            output.WriteLine($"    slot {flask.Slot}  {flask.Charges,4}/{flask.ChargesPerUse,-4} charges"
+            // BOTH NUMBERS, because the flask's own are computed and the base ones are what
+            // memory holds: printing them side by side is what makes a wrong computation
+            // visible here rather than silently wrong in the belt display.
+            output.WriteLine($"    slot {flask.Slot}  {flask.Charges,4}/{flask.MaxCharges,-4}"
+                + $" {flask.ChargesPerUse,3} per use"
+                + $"  (base {flask.BaseMaxCharges}, {flask.BaseChargesPerUse} per use)"
                 + $"  {usability,-24}  {Shorten(flask.Path)}");
         }
 
@@ -337,10 +344,12 @@ public sealed class FlaskProbe
             // The window starts at the component head and the marker sits on Current, so the
             // two fields already identified are visible and everything unclaimed is beside them.
             //
-            // OUT TO +0x88, because the first run of this stopped at +0x48 and the hunt then
-            // found the charge count AGAIN at +0x58 - a field nothing maps, in the window's
-            // blind spot. Whatever that slot is, it is the best lead there is: see the note
-            // ReportChargeCost prints about telling it apart from Current.
+            // OUT TO +0x88, which is PAST THE END OF THE COMPONENT ON PURPOSE. It is 0x40
+            // bytes and the next one starts right there, so the window shows the neighbour
+            // too - and showing it is what corrected a wrong lead. A charge count found at
+            // +0x58 was written up here as an unmapped second field of this flask; widening
+            // the window put the whole layout on screen twice, with a DIFFERENT owner entity
+            // at +0x48 where this one has its own at +0x08. It was the next item's Current.
             output.WriteLine($"    Charges 0x{component:X}  (Current at +0x{current:X})");
             foreach (string line in AddressPeek.Describe(_reader, component + (ulong)current, component, current, 0x70))
             {
@@ -555,11 +564,12 @@ public sealed class FlaskProbe
     /// Samples every flask's Charges component while somebody drinks, and prints what moved.
     /// </summary>
     /// <remarks>
-    /// THE ONE QUESTION A SINGLE READING CANNOT ANSWER. The charge count turns up at more than
-    /// one offset in the Charges component - Current at +0x18, and something nothing maps at
-    /// +0x58 - and on a FULL flask the current count and the flask's real maximum are the same
-    /// number, so every slot holding either reads identically. No amount of staring at one
-    /// snapshot separates them.
+    /// THE ONE QUESTION A SINGLE READING CANNOT ANSWER. On a FULL flask the current count and
+    /// the flask's real maximum are the same number, so any slot holding either reads
+    /// identically - and no amount of staring at one snapshot separates them.
+    ///
+    /// This used to say the count turns up at +0x58 as well, "a field nothing maps". It does
+    /// not: the component is 0x40 bytes and +0x58 is the NEXT one, belonging to another item.
     ///
     /// Drinking separates them in one action: the current count drops, a maximum does not. So
     /// this is the <c>--peekwatch</c> protocol aimed at the belt - "do the thing in the game and
@@ -580,10 +590,12 @@ public sealed class FlaskProbe
         int ownerEntity = _schema.Structs["Component"].OffsetOf("OwnerEntity");
 
         output.WriteLine();
-        output.WriteLine("  flask watch - DRINK A FLASK NOW, then press any key.");
-        output.WriteLine("  The slot that DROPS is the current count. One that STAYS while another drops");
-        output.WriteLine("  is this flask's real maximum, which is the number the belt display is missing.");
-        output.WriteLine("  A per-use cost does not move either, so it will be sitting beside one of them.");
+        output.WriteLine("  flask watch - USE A FLASK NOW, then press any key.");
+        output.WriteLine("  What this can answer: WHICH slots track the charge count. It cannot point at a");
+        output.WriteLine("  maximum or a per-use cost - those never move, and neither does every other");
+        output.WriteLine("  unchanging byte on the item, so \"the one that stays\" names nothing. Use the");
+        output.WriteLine("  hunt in the report above for a value that sits still; use this for one that");
+        output.WriteLine("  does not.");
         output.WriteLine();
 
         var watching = new Dictionary<string, Tracked>(StringComparer.Ordinal);
@@ -691,21 +703,40 @@ public sealed class FlaskProbe
     /// MEASURED RATHER THAN ASSUMED. Components are pooled head to tail, so a fixed window
     /// spills into a neighbour and reports its changes as this flask's - which is what a
     /// 0x100 window did on the first live run: a "change" at Charges+0xD0 was another item's
-    /// ChargesInternal pointer. Every component starts with a StaticPtr that fingerprints its
-    /// TYPE and is identical across instances, so the next place that same value appears is
-    /// the next instance, and that is where this one ends. No guess about struct sizes.
+    /// ChargesInternal pointer.
+    ///
+    /// FOUND BY THE OWNER, not by the head. A first attempt looked for the component's own
+    /// StaticPtr to reappear, on the reasoning that pooled instances of one class share it -
+    /// and a live Charges component disproved it: the next instance began at +0x40 with a
+    /// DIFFERENT value in its first slot, while the rest of the layout repeated exactly.
+    /// What does repeat reliably is the second field. Every component carries its owner
+    /// entity at +0x08, so the next place a plausible pointer to a DIFFERENT entity sits one
+    /// slot after a plausible head is the next component, and that is where this one ends.
+    ///
+    /// It read 0x40 for the Charges component, against belt addresses 0x40 apart. That is a
+    /// measurement agreeing with a second measurement, which is the only kind worth having
+    /// here: it is also what corrected "+0x58 holds the charge count too" into "+0x58 is the
+    /// next item's Current".
     /// </remarks>
     private int Extent(ulong at, int most = 0x100)
     {
-        ulong type = _reader.ReadPointer(at);
-        if (!MemoryReaderExtensions.IsPlausiblePointer(type))
+        int owner = _schema.Structs["Component"].OffsetOf("OwnerEntity");
+        ulong mine = _reader.ReadPointer(at + (ulong)owner);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(mine))
         {
             return most;
         }
 
-        for (int offset = 8; offset < most; offset += 8)
+        // From 0x10: no component is two slots long, and starting at 8 would find this
+        // component's own owner field and call it the neighbour.
+        for (int offset = 0x10; offset + owner < most; offset += 8)
         {
-            if (_reader.ReadPointer(at + (ulong)offset) == type)
+            ulong head = _reader.ReadPointer(at + (ulong)offset);
+            ulong next = _reader.ReadPointer(at + (ulong)(offset + owner));
+
+            if (MemoryReaderExtensions.IsPlausiblePointer(head)
+                && MemoryReaderExtensions.IsPlausiblePointer(next)
+                && next != mine)
             {
                 return offset;
             }
@@ -727,7 +758,7 @@ public sealed class FlaskProbe
         ulong serverData = _reader.ReadPointer(
             localPlayerStruct + (ulong)_schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr"));
 
-        return new FlaskBeltReader(_reader, _schema).Read(serverData).Flasks;
+        return new FlaskBeltReader(_reader, _schema, _names).Read(serverData).Flasks;
     }
 
     /// <summary>The item's resolved stats - the inputs, if the cost turns out to be computed.</summary>

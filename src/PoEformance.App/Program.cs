@@ -1774,7 +1774,20 @@ internal static class Program
         PoEformance.Game.Components.AnimationNames animationNames =
             PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"));
 
-        var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation)
+        handle.Stage = "loading item names";
+
+        // HELD RATHER THAN BUILT INLINE, because the stash is no longer the only reader: the
+        // rates page names the rows its index has never heard of from the same table, the world
+        // reader resolves a flask's charge stats out of it, and loading five thousand entries
+        // again to answer the same questions would be silly. LOADED HERE, before the world
+        // reader, because that is now one of the readers that needs it - a flask's charge
+        // numbers are computed from three stat rows this table supplies by id.
+        PoEformance.Game.Items.ItemNames itemNames = PoEformance.Game.Items.ItemNames.Load(
+            FindDataFile("item-stats.json"),
+            FindDataFile("item-names.json"),
+            FindDataFile("unique_ivi_name_map.tsv"));
+
+        var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation, itemNames)
         {
             // Names for tiles somebody has described. Missing is fine: the boss arenas are
             // found from the shape of the ground either way, this only names them.
@@ -1861,16 +1874,6 @@ internal static class Program
         // of. Without it every ground effect counts as harmful - the safe direction, and wrong for
         // the six rows that grant something.
         evasionPlanner.GroundTypes = groundTypes;
-
-        handle.Stage = "loading item names";
-
-        // HELD RATHER THAN BUILT INLINE, because the stash is no longer the only reader: the
-        // rates page names the rows its index has never heard of from the same table, and loading
-        // five thousand entries a second time to answer the same questions would be silly.
-        PoEformance.Game.Items.ItemNames itemNames = PoEformance.Game.Items.ItemNames.Load(
-            FindDataFile("item-stats.json"),
-            FindDataFile("item-names.json"),
-            FindDataFile("unique_ivi_name_map.tsv"));
 
         var stash = new PoEformance.Features.StashInspector(reader, schema, gameStatesStatic, itemNames);
 
@@ -3217,7 +3220,13 @@ internal static class Program
                 ThresholdPercent: slot.ThresholdPercent,
                 Key: PoEformance.Features.FlaskKeyBindings.Describe(key),
                 Item: equipped is { } item ? ShortItemName(item.Path) : string.Empty,
-                Charges: equipped is { } charges ? $"{charges.Charges}/{charges.ChargesPerUse}" : string.Empty,
+                // "60/60 - 8 per use" rather than "60/10". The old form put the current count
+                // beside the per-use cost with a slash between them, which reads as a fraction
+                // and was taken for one: it was reported as "60 of max 60" when the 10 was the
+                // cost. Both numbers are this flask's now, not the base type's.
+                Charges: equipped is { } charges
+                    ? $"{charges.Charges}/{charges.MaxCharges} - {charges.ChargesPerUse} per use"
+                    : string.Empty,
                 IsCharm: equipped?.IsCharm ?? false));
         }
 

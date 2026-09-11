@@ -815,7 +815,11 @@ public sealed class WorldReader
     /// them the map is drawn from tile-level heights, which is a coarser correction rather
     /// than none.
     /// </param>
-    public WorldReader(IMemoryReader reader, OffsetSchema schema, TerrainRotationTables rotation = default)
+    public WorldReader(
+        IMemoryReader reader,
+        OffsetSchema schema,
+        TerrainRotationTables rotation = default,
+        Items.ItemNames? names = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
@@ -828,7 +832,10 @@ public sealed class WorldReader
         _life = new LifeReader(reader, schema);
         _buffs = new BuffsReader(reader, schema);
         _actions = new ActionReader(reader, schema);
-        _flasks = new FlaskBeltReader(reader, schema);
+        // The stat table so a flask's charge numbers come out as the game's, not the base
+        // type's - the belt reader computes them and needs three stat rows by id. Without it
+        // every flask reports its base cost, which is what this did before.
+        _flasks = new FlaskBeltReader(reader, schema, names);
         _groundItems = new GroundItemReader(reader, schema);
         _mapIcons = new MinimapIconReader(reader, schema);
         _areas = new WorldAreaReader(reader, schema);
