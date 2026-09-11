@@ -238,15 +238,27 @@ public class MapRadarTests
     }
 
     [Fact]
-    public void Resolve_KeepsTheMapParentChain_WhileItCarriesAZoom()
+    public void Resolve_PrefersTheReferenceRoute_WhenBothCarryAZoom()
     {
-        // The 0.5.4 shape, and the one every committed recording holds: the first route is
-        // believed on its own evidence and the second is never walked.
+        // The route confirmed on the current client goes first; the map-parent chain is
+        // only asked when the viewports do not answer.
         OffsetSchema schema = RealSessionTests.LiveSchema();
         BuildUi(schema, out FakeMemoryReader fake);
         PlaceMap(fake, schema, MiniMap, relX: 100, relY: 50, sizeX: 400, sizeY: 300, zoom: 0.6f);
         PlaceViewportRoute(fake, schema);
         PlaceMap(fake, schema, MiniViewport, relX: 0, relY: 0, sizeX: 400, sizeY: 300, zoom: 1.2f);
+
+        Assert.Equal((LargeViewport, MiniViewport), new MapRadarReader(fake, schema).Resolve(UiRoot));
+    }
+
+    [Fact]
+    public void Resolve_KeepsTheMapParentChain_WhenTheManagerHasNoViewports()
+    {
+        // The 0.5.4 shape, and the one every committed recording holds: the manager is not
+        // walked as an element there, so the map-parent chain answers on its own evidence.
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        BuildUi(schema, out FakeMemoryReader fake);
+        PlaceMap(fake, schema, MiniMap, relX: 100, relY: 50, sizeX: 400, sizeY: 300, zoom: 0.6f);
 
         Assert.Equal((LargeMap, MiniMap), new MapRadarReader(fake, schema).Resolve(UiRoot));
     }

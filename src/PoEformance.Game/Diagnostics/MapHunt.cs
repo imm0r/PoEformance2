@@ -156,11 +156,13 @@ public sealed class MapHunt
 
         var candidates = new List<MapCandidate>();
 
-        // Route 1: the chain this schema walks.
+        // Route 1: the chain this schema walked until 0.5.5. The container itself is captured
+        // without following its children - the two named pointers ARE its first children,
+        // and one capture of each under its schema name is clearer than two under both.
         ulong parent = _reader.ReadPointer(manager + (ulong)_mapParent);
         if (MemoryReaderExtensions.IsPlausiblePointer(parent))
         {
-            Examine("MapParentPtr", parent, candidates, depth: 0);
+            Examine("MapParentPtr", parent, candidates, depth: 0, follow: false);
             Examine("MapParentPtr.LargeMapPtr", _reader.ReadPointer(parent + (ulong)_largeMap), candidates, depth: 1);
             Examine("MapParentPtr.MiniMapPtr", _reader.ReadPointer(parent + (ulong)_miniMap), candidates, depth: 1);
         }
@@ -178,7 +180,7 @@ public sealed class MapHunt
         ulong viewports = _viewportsChild >= 0 ? _elements.Child(manager, _viewportsChild) : 0;
         if (viewports != 0)
         {
-            Examine($"UiManager/{_viewportsChild}", viewports, candidates, depth: 0);
+            Examine($"UiManager/{_viewportsChild}", viewports, candidates, depth: 0, follow: false);
             Examine($"UiManager/{_viewportsChild}/{_largeViewport}", _elements.Child(viewports, _largeViewport), candidates, depth: 1);
             Examine($"UiManager/{_viewportsChild}/{_miniViewport}", _elements.Child(viewports, _miniViewport), candidates, depth: 1);
         }
@@ -186,8 +188,8 @@ public sealed class MapHunt
         return new MapHuntSample(manager, managerChildren, candidates);
     }
 
-    /// <summary>Captures one element and, one level down, its first children.</summary>
-    private void Examine(string route, ulong address, List<MapCandidate> into, int depth)
+    /// <summary>Captures one element and, unless told not to, its first children one level down.</summary>
+    private void Examine(string route, ulong address, List<MapCandidate> into, int depth, bool follow = true)
     {
         if (!_elements.IsUiElement(address))
         {
@@ -231,7 +233,7 @@ public sealed class MapHunt
             ZoomLike(read),
             read));
 
-        if (depth < 2)
+        if (follow && depth < 2)
         {
             for (int i = 0; i < Math.Min(ChildrenToFollow, children.Count); i++)
             {
