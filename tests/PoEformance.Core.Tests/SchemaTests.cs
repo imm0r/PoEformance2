@@ -53,7 +53,11 @@ public class SchemaTests
         Assert.Equal(0x390, schema.Structs["MapUiElement"].OffsetOf("Zoom"));
         Assert.Equal(0x8B0, schema.Structs["Actor"].OffsetOf("AnimationId"));
         Assert.Equal(0x69, schema.Structs["Targetable"].OffsetOf("IsTargetable"));
-        Assert.Equal(0x21E0, schema.Structs["ServerDataOffsets"].OffsetOf("League"));
+        // 0x21E0 until some time before 2026-09, when three --flasks runs read it as an empty
+        // string while every other link in the same chain read perfectly. This assertion going
+        // red is the anchor doing its job, so it moves with the offset rather than being
+        // loosened: a league that reads as nothing prices a stash against no economy at all.
+        Assert.Equal(0x2160, schema.Structs["ServerDataOffsets"].OffsetOf("League"));
         Assert.Equal(0x10, schema.Structs["GameState"].Constants["StateEntrySize"]);
         Assert.Equal(4, schema.Structs["GameState"].Constants["InGameStateIndex"]);
 
