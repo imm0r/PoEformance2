@@ -475,6 +475,20 @@ public sealed class UiTreeReader
             frame.Visible && (flags & _flagIsVisible) != 0);
     }
 
+    /// <summary>The item slot's entity, or 0 when the slot holds nothing that could be one.</summary>
+    /// <remarks>
+    /// Gated on looking like a pointer at all, because on the 0.5.5 client the slot is not
+    /// zero on elements that are not item slots: session-2026-09-browser.rec reads 0x6,
+    /// UTF-16 fragments and a float's upper half there on a third of the interface root's
+    /// children. A browser row that printed those as items would be lying, and anything
+    /// that followed them would read garbage.
+    /// </remarks>
+    private ulong ItemOf(ulong address)
+    {
+        ulong item = _reader.ReadPointer(address + (ulong)_itemPtr);
+        return MemoryReaderExtensions.IsPlausiblePointer(item) ? item : 0;
+    }
+
     private UiNode Build(ulong address, ulong parent, int index, Frame frame, UiScale scale)
     {
         Geometry geometry = ReadGeometry(address, parent, frame, scale);
@@ -494,7 +508,7 @@ public sealed class UiTreeReader
             geometry.Flags,
             geometry.ScaleIndex,
             geometry.Multiplier,
-            _reader.ReadPointer(address + (ulong)_itemPtr),
+            ItemOf(address),
             frame.Depth,
             index,
             Children(address));
