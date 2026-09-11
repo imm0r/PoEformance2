@@ -31,16 +31,26 @@ public class SchemaTests
         Assert.Contains("GameStates", schema.Statics.Keys);
         Assert.Contains("GameCullSize", schema.Statics.Keys);
 
-        // Spot-check offsets against current ground truth: the AHK-tool port plus the
+        // Spot-check offsets against current ground truth: the AHK-tool port, the
         // owner-verified 2026-08 +0x08 AreaInstance wave (PlayerInfo 0x598 -> 0x5A0,
-        // AwakeEntities 0x6D8 -> 0x6E0, Terrain 0x8B8 -> 0x8C0).
+        // AwakeEntities 0x6D8 -> 0x6E0, Terrain 0x8B8 -> 0x8C0), and the 0.5.5 patch of
+        // 2026-09-04, which moved the AreaInstance tail by a further +0x10 and its head
+        // by -8 (PlayerInfo 0x5B0, AwakeEntities 0x6F0, Terrain 0x8D0, hash 0x114).
         Assert.Equal(0x290, schema.Structs["InGameState"].OffsetOf("AreaInstanceData"));
         // W2SMatrix: 0x1A8 -> 0x1A0, and briefly 0x11C in 2026-08 before the scene test
         // disproved it. = CameraStructure(0x98) + 0x108, per GameHelper2 and the AHK tool.
         Assert.Equal(0x1A0, schema.Structs["WorldData"].OffsetOf("W2SMatrix"));
-        Assert.Equal(0x5A0, schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
-        Assert.Equal(0x6E0, schema.Structs["AreaInstance"].OffsetOf("AwakeEntities"));
-        Assert.Equal(0x8C0, schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
+        Assert.Equal(0x5B0, schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
+        Assert.Equal(0x6F0, schema.Structs["AreaInstance"].OffsetOf("AwakeEntities"));
+        Assert.Equal(0x8D0, schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
+        Assert.Equal(0x114, schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash"));
+        // The same patch grew GameState by an SRWLOCK at +0x08: the state array and the
+        // stack's end pointer both sit eight bytes further on.
+        Assert.Equal(0x50, schema.Structs["GameState"].OffsetOf("States"));
+        Assert.Equal(0x18, schema.Structs["GameState"].OffsetOf("CurrentStateVecLast"));
+        // And shifted the UiElementBase tail by -0x18, the map's fields with it.
+        Assert.Equal(0x168, schema.Structs["UiElementBase"].OffsetOf("Flags"));
+        Assert.Equal(0x390, schema.Structs["MapUiElement"].OffsetOf("Zoom"));
         Assert.Equal(0x8B0, schema.Structs["Actor"].OffsetOf("AnimationId"));
         Assert.Equal(0x69, schema.Structs["Targetable"].OffsetOf("IsTargetable"));
         Assert.Equal(0x21E0, schema.Structs["ServerDataOffsets"].OffsetOf("League"));

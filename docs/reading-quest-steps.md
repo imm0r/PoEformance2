@@ -48,7 +48,7 @@ Seven hops from a pattern-scanned static to a `std::vector`.
       │  *
       ▼
   AreaInstance
-      │  + 0x5A0         ← PlayerInfo. INLINE LocalPlayerStruct, whose ServerDataPtr is +0x00,
+      │  + 0x5B0         ← PlayerInfo. INLINE LocalPlayerStruct, whose ServerDataPtr is +0x00,
       │  *                  so the qword here IS ServerData. Do not add a second dereference.
       ▼
   ServerData
@@ -65,22 +65,27 @@ Seven hops from a pattern-scanned static to a `std::vector`.
   the records
 ```
 
-**`GameState + 0x88` is not a magic number.** `GameState.States` is at `0x48` and is an *inline*
-array of `StateEntrySize = 0x10` entries whose first field is the state object's pointer;
-`InGameStateIndex` is `4`. So `0x48 + 4 * 0x10 = 0x88`. Dereferencing `States` as if it were a
+**`GameState + 0x90` is not a magic number.** `GameState.States` is at `0x50` (it was `0x48`
+until the 0.5.5 patch of 2026-09-04 put an SRWLOCK at `+0x08`) and is an *inline* array of
+`StateEntrySize = 0x10` entries whose first field is the state object's pointer;
+`InGameStateIndex` is `4`. So `0x50 + 4 * 0x10 = 0x90`. Dereferencing `States` as if it were a
 pointer to the array is a mistake this project already made — it reads a state object's own
-first qword as if it were the array base.
+first qword as if it were the array base. Reading the array eight bytes early is the newer
+one: it lands on every entry's *second* qword, which still looks like a list of distinct
+pointers and leads somewhere that is not InGameState.
 
-**`AreaInstance + 0x5A0` is the one hop that is not a hop.** `PlayerInfo` is an inline
+**`AreaInstance + 0x5B0` is the one hop that is not a hop.** `PlayerInfo` is an inline
 `LocalPlayerStruct`, not a pointer to one. Its `ServerDataPtr` field is at `+0x00`, so the qword
-at `0x5A0` is already the ServerData address. Adding a dereference here validates as a struct
+at `0x5B0` is already the ServerData address. Adding a dereference here validates as a struct
 base (it *is* one), so the mistake does not announce itself — it shows up two hops later as the
 player chain "breaking".
 
 All of these live in `schema/poe2.offsets.json` and are hot-reloadable with `--watch`. The
-`AreaInstance` block carries drift history: `PlayerInfo` has moved twice
-(`0x580 → 0x598 → 0x5A0`), and **when one field in that struct drifts, the whole tail moved by
-the same delta** — check them all rather than patching one.
+`AreaInstance` block carries drift history: `PlayerInfo` has moved three times
+(`0x580 → 0x598 → 0x5A0 → 0x5B0`), and **when one field in that struct drifts, expect the
+whole tail to have moved by the same delta** — check them all rather than patching one. The
+0.5.5 wave is the caveat: its head moved by −8 while its tail moved by +0x10, so the delta is
+per region, not per struct.
 
 ## 1.2 The bitset
 

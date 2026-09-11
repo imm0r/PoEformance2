@@ -1,4 +1,14 @@
 {
+  // FROZEN COPY - DO NOT EDIT. This is schema/poe2.offsets.json as it stood on 2026-09-11,
+  // BEFORE the 0.5.5 (2026-09-04 content patch) offsets went in: the layout every committed
+  // recording under tests/fixtures was captured in. A recording holds only the reads the
+  // build that made it performed, at the offsets that build had, so a replay of those files
+  // is only answerable in this layout - the live schema, one drift wave on, asks them for
+  // addresses they never captured. RealSessionTests.Schema() loads this; the shipped file is
+  // RealSessionTests.LiveSchema(). Recordings made against the 0.5.5 client do not belong
+  // with this file.
+  //
+  // Everything below is the original file verbatim, comments included.
   // PoEformance offset schema for Path of Exile 2.
   //
   // This file IS the reverse-engineering knowledge of the project. Offsets are data,
@@ -61,7 +71,7 @@
   //
   // AtlasWatch.Hovered stands: PoE2 still keeps no hovered-UiElement slot. For "is the cursor
   // on an inventory item", the answer remains the geometric one - descend the UI tree to what
-  // contains the cursor, then UiElementBase.ItemPtr (+0x4F8 until 0.5.5, +0x4E0 since).
+  // contains the cursor, then UiElement.ItemPtr at +0x4F8.
   //
   // WHAT THIS PARAGRAPH DOES NOT COVER, and was read as covering for months: the hovered
   // ENTITY. That one the game does keep, at InGameState+0x300 -> +0x3F0 -> +0xA8, and it was
@@ -70,20 +80,19 @@
   // exists. A negative result is about the thing it tested; say which thing.
 
   "version": 1,
-  "gameVersion": "0.5.5 (2026-09-04 content patch: GameState, AreaInstance, UiElementBase and MapUiElement re-based 2026-09-11 by owner, agreeing with GameHelper2 main a99b8ba; earlier: AreaInstance +0x08 wave 2026-08; base port: AHK tool v0.45.13.298, 2026-07)",
+  "gameVersion": "0.5.x (AreaInstance tail re-verified 2026-08 by owner: +0x08 wave; base port: AHK tool v0.45.13.298, 2026-07)",
 
   "statics": {
     "GameStates": {
-      "pattern": "48 39 2D ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 48 01 00 00",
+      "pattern": "48 39 2D ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 40 01 00 00",
       "fallbacks": [
-        "48 39 2D ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B F8 48 89 44 24 50",
-        "48 39 ?? ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 48 01 00 00",
+        "48 39 ?? ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 40 01 00 00",
         "48 39 2D ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 ?? ?? 00 00",
         "48 39 ?? ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 ?? ?? 00 00",
         "4C 39 ?? ^ ?? ?? ?? ?? 0F 85 ?? ?? ?? ?? B9 ?? ?? 00 00",
         "48 83 EC ?? 48 8B F1 33 ?? 48 39 ?? ^ ?? ?? ?? ??"
       ],
-      "comment": "Root of everything: the game-state array. THE SITE, so the fallbacks make sense: `cmp [rip+X], rbp` (48 39 2D) - is the global null? - then `jnz` (0F 85) and `mov ecx, 0x140` (B9 40 01 00 00), the size of the GameState object about to be allocated. Two things there are the compiler's choice and a content patch re-rolls them: the REGISTER compared against (the 2D is rbp; 05/0D/15/1D/25/35/3D are the others, 4C 39 for r8-r15) and the ALLOCATION SIZE (a field added to GameState changes the 0x140). Each fallback wildcards one of those; the last is the function-prologue form the AHK tool fell back on (sub rsp / mov rsi,rcx / xor ebp,ebp / cmp). A fallback hit is believed only when what it resolves to leads to the state array (DriftReport.LooksLikeGameStates), and the report prints every hit with its bytes - the accepted one's bytes are the next primary pattern. MISSED 2026-09-04 (content patch): the exact pattern found nothing. RECOVERED BY A FALLBACK on 2026-09-05 (tests/fixtures/session-2026-09-patch.rec): the static it resolves leads to a state array, and InGameState is still entry 4. Which fallback hit and the bytes at the site were printed to the console and not kept; recordings made since carry them as a fallback: note. RE-ANCHORED 2026-09-11: the allocation size is 0x148 now (GameState grew by eight bytes - an SRWLOCK at +0x08, which is also why its fields moved), so the primary carries `B9 48 01 00 00`. The first fallback is GameHelper2's own 0.5.5 answer to the same break: wildcard the immediate entirely and extend PAST the call (`E8 rel32` / `mov rdi, rax` / `mov [rsp+0x50], rax`) to keep the site unique, which survives the next size change without an edit here."
+      "comment": "Root of everything: the game-state array. THE SITE, so the fallbacks make sense: `cmp [rip+X], rbp` (48 39 2D) - is the global null? - then `jnz` (0F 85) and `mov ecx, 0x140` (B9 40 01 00 00), the size of the GameState object about to be allocated. Two things there are the compiler's choice and a content patch re-rolls them: the REGISTER compared against (the 2D is rbp; 05/0D/15/1D/25/35/3D are the others, 4C 39 for r8-r15) and the ALLOCATION SIZE (a field added to GameState changes the 0x140). Each fallback wildcards one of those; the last is the function-prologue form the AHK tool fell back on (sub rsp / mov rsi,rcx / xor ebp,ebp / cmp). A fallback hit is believed only when what it resolves to leads to the state array (DriftReport.LooksLikeGameStates), and the report prints every hit with its bytes - the accepted one's bytes are the next primary pattern. MISSED 2026-09-04 (content patch): the exact pattern found nothing. RECOVERED BY A FALLBACK on 2026-09-05 (tests/fixtures/session-2026-09-patch.rec): the static it resolves leads to a state array with ten of thirteen states allocated, all distinct, and InGameState is still entry 4. Which fallback hit and the bytes at the site were printed to the console and not kept, so the primary is not re-anchored yet; recordings made since carry them as a fallback: note."
     },
     "FileRoot": {
       "pattern": "48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B 05 ^ ?? ?? ?? ?? 48 83 C4 28",
@@ -112,10 +121,10 @@
       "comment": "The static GameStates pointer dereferences to this.",
       "fields": {
         "CurrentStateVecLast": {
-          "offset": "0x18", "type": "ptr", "invariant": { "kind": "plausiblePtr" },
-          "comment": "End pointer of the state STACK. The state in force is the SECOND-last entry (end - 0x10), not the last - GameHelper2 reads it that way and the last slot is not the active one. This is the LAST half of the std::vector GameHelper2 calls CurrentStatePtr (begin at +0x10, end at +0x18). DRIFT 2026-09-04 (0.5.5): 0x10 -> 0x18. Eight bytes went in at +0x08 - an SRWLOCK, per the owner's reading - and pushed the vector and the state array down by eight; the same growth is what changed the allocator's immediate from 0x140 to 0x148 and killed the static pattern. The first patched recording read a non-pointer at the old 0x10 - 0x10, which was this: at 0x10 sits the vector's BEGIN now."
+          "offset": "0x10", "type": "ptr", "invariant": { "kind": "plausiblePtr" },
+          "comment": "End pointer of the state STACK. The state in force is the SECOND-last entry (end - 0x10), not the last - GameHelper2 reads it that way and the last slot is not the active one."
         },
-        "States": { "offset": "0x50", "type": "ptr", "comment": "Array of TotalStates entries, StateEntrySize apart; each entry starts with the state object's pointer. Index InGameStateIndex is the one the overlay may draw over. DRIFT 2026-09-04 (0.5.5): 0x48 -> 0x50, the same eight bytes as CurrentStateVecLast. MEASURED on tests/fixtures/session-2026-09-patch.rec (PatchedSessionTests): read at the old 0x48 + 16i, the patched client gave a ZERO at 0x48 and ten distinct non-null values at 0x58..0x108 - under this layout those are the SECOND qword of entries 0..11, so a fingerprint that counts distinct pointers passed on the wrong half of every entry, and the 'InGameState' it handed on was entry 3's second half. That is where the unaligned value at InGameState+0x290 came from. The recording never read 0x50 + 16i or 0x18, so it confirms nothing about this layout; the owner's list and GameHelper2 a99b8ba do." }
+        "States": { "offset": "0x48", "type": "ptr", "comment": "Array of TotalStates entries, StateEntrySize apart; each entry starts with the state object's pointer. Index InGameStateIndex is the one the overlay may draw over." }
       },
       "consts": {
         "StateEntrySize": "0x10",
@@ -130,7 +139,7 @@
         "AreaInstanceData": {
           "offset": "0x290", "type": "ptr",
           "invariant": { "kind": "nonNullPtr" },
-          "comment": "Null while not in an area; nonNullPtr is only meaningful in-game. Re-confirmed 0x290 in the 2026-08 check (an older external baseline had 0x288). NOT MOVED BY THE 2026-09-04 PATCH, as far as anything shows: GameHelper2's 0.5.5 InGameStateOffset keeps 0x290, and the owner's 2026-09-11 list does not touch this struct. The suspicion recorded here on 2026-09-05 - the first patched recording reading 0x5D2DED757E4 in this slot, a heap-range value that is not 8-byte aligned, with WorldData and both UI roots null in the same frame - is EXPLAINED and withdrawn: that build resolved InGameState from GameState.States at the old 0x48, which in the patched client is eight bytes before the array, so what it read as entry 4 was entry 3's second qword and the object it then read +0x290 from was never InGameState (PatchedSessionTests). The whole-InGameState sweep the report gained from that scare stays; it is the right tool the next time this slot really moves."
+          "comment": "Null while not in an area; nonNullPtr is only meaningful in-game. Re-confirmed 0x290 in the 2026-08 check (an older external baseline had 0x288). SUSPECT SINCE THE 2026-09-04 PATCH: the first patched recording reads 0x5D2DED757E4 here - a heap-range value that is not 8-byte aligned, so not a pointer to anything - with WorldData (0x368) and both UI roots null in the same frame. Whether that session was in an area is not known, so this is a question and not yet a drift: the report now sweeps the whole InGameState for an AreaInstance by fingerprint and captures the object for offline reading, and the next in-area recording answers it."
         },
         "UiRootStructPtr": { "offset": "0x2F0", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "KB/M UI manager (UserInterface_MouseAndKeyboard)." },
         "MouseOverHostPtr": {
@@ -204,7 +213,7 @@
     //     upstream applies exists to scale the WINDOW diagonal down, so it would shrink
     //     everything twice.
     "ImportantUiElements": {
-      "comment": "Relative to the KB/M UiRootStructPtr (= ReadPtr(InGameState + 0x2F0)). Controller mode uses a different layout. NOT RE-BASED FOR 0.5.5 (2026-09-04), and this is a known gap rather than a verified stay: GameHelper2's a99b8ba moved LeftPanelPtr 0x6D8 -> 0x6D0, RightPanelPtr 0x6E0 -> 0x6D8 and MapParentPtr 0x7C8 -> 0x7C0 (all -8) and left the others; the owner's 2026-09-11 list did not cover this struct, so those three are left at their 0.5.4 values until a recording or the owner says otherwise. MapParentPtr is the one the map radar stands on - if the radar draws nothing after the patch, try 0x7C0 first.",
+      "comment": "Relative to the KB/M UiRootStructPtr (= ReadPtr(InGameState + 0x2F0)). Controller mode uses a different layout.",
       "fields": {
         "ChatParentPtr": { "offset": "0x640", "type": "ptr" },
         "LeftPanelPtr": { "offset": "0x6D8", "type": "ptr", "comment": "UNVERIFIED, from GameHelper2's ImportantUiElementsOffsets. Whichever left-side panel is open - character, skills, quests. Null while none is, so this is BOTH the address and half the answer; the other half is that the element it points at is only visible while its panel is showing." },
@@ -235,24 +244,23 @@
     },
 
     "UiElementBase": {
-      "comment": "CONFIRMED IN-GAME 2026-08: the map radar built on this walk places dots exactly where the owner's production AHK tool does, which exercises the parent chain, both scale factors and the visibility rule end to end. Fields every UiElement has. Base UI resolution is 2560x1600: every position and size here is in THAT space and must be scaled to the window (see UiScale). DRIFT 2026-09-04 (0.5.5), owner-verified 2026-09-11 and agreeing with GameHelper2 main a99b8ba: the HEAD is untouched (Vtable, Self, Childrens, ParentPtr 0xB8) and the whole TAIL from RelativePosition on moved by a uniform -0x18 - 0x18 bytes left the object somewhere between ParentPtr and RelativePosition. PositionModifier is the one row where the OLD value in this file was wrong rather than drifted: 0x0F0 came from GameHelper2's 0.5.4 struct, which had been stale since its initial commit put it at 0x120, and this tool never depended on it being right (it only matters for children carrying ShouldModifyPos). The tail is treated as ONE wave: when one of its rows fails, expect them all to have moved by the same delta.",
+      "comment": "CONFIRMED IN-GAME 2026-08: the map radar built on this walk places dots exactly where the owner's production AHK tool does, which exercises the parent chain, both scale factors and the visibility rule end to end. Fields every UiElement has. Offsets are the PoE2 0.5.x set verified by the AHK tool; they agree with GameHelper2's UiElementBaseOffset.cs everywhere except StringIdPtr, which drifted 0x140 -> 0x098 in PoE2 and would read the text/font-style field at the old offset. Base UI resolution is 2560x1600: every position and size here is in THAT space and must be scaled to the window (see UiScale).",
       "fields": {
         "Self": { "offset": "0x008", "type": "ptr", "comment": "Points at the element ITSELF - *(this+0x08) == this is a cheap validity check before trusting any other field." },
         "ChildrenFirst": { "offset": "0x010", "type": "ptr", "comment": "StdVector begin: array of child UiElement pointers." },
         "ChildrenLast": { "offset": "0x018", "type": "ptr", "comment": "StdVector end; child count = (Last - First) / 8." },
-        "StringIdPtr": { "offset": "0x098", "type": "ptr", "comment": "StdWString - the element's identifier (\"life_orb\", \"InventoryPanel\"). CONFIRMED IN-GAME 2026-08 through this tool's own interface browser (the HUD and its named children were read from here), and it sits in the head of the object, BELOW ParentPtr, which the 0.5.5 wave left alone - so it is NOT moved with the tail. GameHelper2 reads its id from a DIFFERENT slot, 0x140 in 0.5.4 and 0x128 in 0.5.5 (its tail shift applied), and both tools worked against the same 0.5.4 client, so the element appears to carry the id twice. 0x128 is therefore the fallback to try first if this slot ever stops naming the HUD. 0x0F8 is the text style, and was the id's slot in 0.4.x." },
+        "StringIdPtr": { "offset": "0x098", "type": "ptr", "comment": "StdWString - the element's identifier (\"life_orb\", \"InventoryPanel\"). PoE2 0.5.x; 0x140 is the stale 0.4.x layout and 0x0F8 is the text style." },
         "ParentPtr": { "offset": "0x0B8", "type": "ptr", "comment": "Parent element - the chain walked to turn a relative position into an absolute one." },
-        "PositionModifier": { "offset": "0x108", "type": "f32", "comment": "StdTuple2D<float>, y at +0x10C. Added to the PARENT position, but only when the CHILD's ShouldModifyPos flag is set. 0.5.5: 0x120 -> 0x108 (NOT from 0x0F0 - see the struct comment)." },
-        "RelativePosition": { "offset": "0x100", "type": "f32", "comment": "StdTuple2D<float>, y at +0x104. Position relative to the parent, in the 2560x1600 UI space. 0.5.5: 0x118 -> 0x100." },
-        "LocalScaleMultiplier": { "offset": "0x118", "type": "f32", "comment": "Extra scale this element applies. When it differs from the parent's, the accumulated position must be CONVERTED between the two scale spaces. 0.5.5: 0x130 -> 0x118." },
-        "Flags": { "offset": "0x168", "type": "u32", "comment": "Bit 10 = ShouldModifyPos, bit 11 = IsVisible. Visibility is only meaningful with the whole parent chain visible too. 0.5.5: 0x180 -> 0x168." },
-        "ScaleIndex": { "offset": "0x172", "type": "u8", "comment": "Selects which scale pair applies: 1 -> (v1,v1), 2 -> (v2,v2), 3 -> (v1,v2), anything else -> unscaled. 0.5.5: 0x18A -> 0x172." },
-        "UnscaledSize": { "offset": "0x270", "type": "f32", "comment": "StdTuple2D<float>, y at +0x274. Size in UI space, scaled the same way as the position. 0.5.5: 0x288 -> 0x270." },
-        "BackgroundColor": { "offset": "0x28C", "type": "u32", "comment": "Packed colour, per GameHelper2 (the border colour sits four bytes before it). Nothing here reads it; recorded because it moved with the tail (0.5.5: 0x2A4 -> 0x28C) and is one more row for a drift check to agree on." },
-        "ItemPtr": { "offset": "0x4E0", "type": "ptr", "comment": "The item entity held by an inventory/stash slot element, 0 elsewhere. UNVERIFIED AT THIS VALUE: 0x4F8 was verified live on a hovered Rare (0.5.4); 0x4E0 is that plus the tail's -0x18, on the assumption that nothing else changed between UnscaledSize and here. The first hovered item after the patch settles it - if the price-on-hover badge is silent, this row is the first suspect." },
-        "TextPtr": { "offset": "0x378", "type": "ptr", "comment": "StdWString - the text the element DISPLAYS. The identifying field for every widget whose StringId is empty (skill-bar slots, loot labels, dialogue rows), which is most of them: a UI browser without it shows a tree of blanks. AHK-verified live 2026-06-14 at 0x390. UNVERIFIED AT THIS VALUE: 0x378 is 0x390 plus the tail's -0x18, the same shift MapUiElement.Shift took at 0x368 -> 0x350 eight bytes below it, so the assumption is short; the UI browser showing text again is the confirmation." },
-        "TextStylePtr": { "offset": "0x0F8", "type": "ptr", "comment": "StdWString - font style descriptor (\"Normal\", \"PathOfExile.Panel.Title\"). Named here because 0x0F8 is where StringIdPtr sat in 0.4.x, so a browser reading the old layout shows these as ids - the mistake this field makes obvious instead of puzzling. NOT RE-CHECKED for 0.5.5: it lies between ParentPtr (unchanged) and RelativePosition (moved), which is exactly where the 0x18 bytes left, so it may have moved by up to 0x18 or not at all. Only the browser reads it." },
-        "FontNamePtr": { "offset": "0x0C8", "type": "ptr", "comment": "StdWString - font family (\"Fontin\", \"Fontin Smallcaps\"). Same caveat as TextStylePtr: in the gap where the 0.5.5 removal happened, not re-checked." }
+        "PositionModifier": { "offset": "0x0F0", "type": "f32", "comment": "StdTuple2D<float>, y at +0x0F4. Added to the PARENT position, but only when the CHILD's ShouldModifyPos flag is set." },
+        "RelativePosition": { "offset": "0x118", "type": "f32", "comment": "StdTuple2D<float>, y at +0x11C. Position relative to the parent, in the 2560x1600 UI space." },
+        "LocalScaleMultiplier": { "offset": "0x130", "type": "f32", "comment": "Extra scale this element applies. When it differs from the parent's, the accumulated position must be CONVERTED between the two scale spaces." },
+        "Flags": { "offset": "0x180", "type": "u32", "comment": "Bit 10 = ShouldModifyPos, bit 11 = IsVisible. Visibility is only meaningful with the whole parent chain visible too." },
+        "ScaleIndex": { "offset": "0x18A", "type": "u8", "comment": "Selects which scale pair applies: 1 -> (v1,v1), 2 -> (v2,v2), 3 -> (v1,v2), anything else -> unscaled." },
+        "UnscaledSize": { "offset": "0x288", "type": "f32", "comment": "StdTuple2D<float>, y at +0x28C. Size in UI space, scaled the same way as the position." },
+        "ItemPtr": { "offset": "0x4F8", "type": "ptr", "comment": "The item entity held by an inventory/stash slot element, 0 elsewhere." },
+        "TextPtr": { "offset": "0x390", "type": "ptr", "comment": "StdWString - the text the element DISPLAYS. The identifying field for every widget whose StringId is empty (skill-bar slots, loot labels, dialogue rows), which is most of them: a UI browser without it shows a tree of blanks. AHK-verified live 2026-06-14." },
+        "TextStylePtr": { "offset": "0x0F8", "type": "ptr", "comment": "StdWString - font style descriptor (\"Normal\", \"PathOfExile.Panel.Title\"). Named here because 0x0F8 is where StringIdPtr sat in 0.4.x, so a browser reading the old layout shows these as ids - the mistake this field makes obvious instead of puzzling." },
+        "FontNamePtr": { "offset": "0x0C8", "type": "ptr", "comment": "StdWString - font family (\"Fontin\", \"Fontin Smallcaps\")." }
       },
       "consts": {
         "BaseResolutionX": "2560",
@@ -282,24 +290,17 @@
     },
 
     "MapUiElement": {
-      "comment": "CONFIRMED IN-GAME 2026-08 via the map radar - dots track the map at every zoom level. A map-type UiElement: UiElementBase at 0x000, then its own fields. Matches GameHelper2 MapUiElement.cs. PoE2 4.5.x shifted all three by -0x38 when UiElementBase shrank (the old Zoom at 0x3E0 read 0.000). 0.5.5 (2026-09-04) shifted them again, by the base's -0x18: the map's own fields ride on the base's tail, so a UiElementBase wave is always a MapUiElement wave too.",
+      "comment": "CONFIRMED IN-GAME 2026-08 via the map radar - dots track the map at every zoom level. A map-type UiElement: UiElementBase at 0x000, then its own fields. Matches GameHelper2 MapUiElement.cs. PoE2 4.5.x shifted all three by -0x38 when UiElementBase shrank (the old Zoom at 0x3E0 read 0.000).",
       "fields": {
-        "Shift": { "offset": "0x350", "type": "f32", "comment": "StdTuple2D<float> - how far the user/game has shifted the map centre; y at +0x354. 0.5.5: 0x368 -> 0x350." },
-        "DefaultShift": { "offset": "0x358", "type": "f32", "comment": "StdTuple2D<float> - resting offset, (0, -20) in PoE2; y at +0x35C. 0.5.5: 0x370 -> 0x358." },
-        "Zoom": { "offset": "0x390", "type": "f32", "comment": "Current zoom, normally 0.5 - 1.5. THE value the world-to-screen projection cannot know about. 0.5.5: 0x3A8 -> 0x390." }
-      }
-    },
-
-    "SkillTreeNodeUiElement": {
-      "comment": "A passive-tree node element: UiElementBase at 0x000, then a pointer to the node's skill record. Ported from GameHelper2 SkillTreeNodeUiElement.cs for the record only - nothing here reads it (in 0.5.x the per-node pointers read null from the tree panel, see BigPanels). Behind SkillInfo: +0x08 -> the PassiveSkills.dat row, whose +0x30 is the u16 graph id.",
-      "fields": {
-        "SkillInfo": { "offset": "0x2A0", "type": "ptr", "comment": "0.5.5: 0x2B8 -> 0x2A0, the base's -0x18 wave." }
+        "Shift": { "offset": "0x368", "type": "f32", "comment": "StdTuple2D<float> - how far the user/game has shifted the map centre; y at +0x36C." },
+        "DefaultShift": { "offset": "0x370", "type": "f32", "comment": "StdTuple2D<float> - resting offset, (0, -20) in PoE2; y at +0x374." },
+        "Zoom": { "offset": "0x3A8", "type": "f32", "comment": "Current zoom, normally 0.5 - 1.5. THE value the world-to-screen projection cannot know about." }
       }
     },
 
     "WorldData": {
       "fields": {
-        "WorldAreaDetailsPtr": { "offset": "0x98", "type": "ptr", "invariant": { "kind": "nonNullPtr" }, "comment": "WHAT IT POINTS AT IS THE AREA INSTANCE ITSELF, measured 2026-08: the value here equals InGameState.AreaInstanceData in every sampled frame of 21 of the 22 committed recordings. So WorldAreaDetails is not a separate object and its RowPtr (0xA0 then, 0x98 since 0.5.5) is AreaInstance+RowPtr - the WorldAreas.dat row is reachable from either side, which is worth knowing when one of the two chains is unreadable. THE EXCEPTION IS THE ONE SESSION THAT CHANGES AREA (session-2026-08-actions.rec: 26 frames agreeing, 37 not), and it is the expected one rather than a counter-example - WorldData survives an area change while AreaInstance is rebuilt, so the two disagree across a transition. Anything comparing them has to tolerate that, and anything wanting 'the area the world is currently drawing' should prefer this one." },
+        "WorldAreaDetailsPtr": { "offset": "0x98", "type": "ptr", "invariant": { "kind": "nonNullPtr" }, "comment": "WHAT IT POINTS AT IS THE AREA INSTANCE ITSELF, measured 2026-08: the value here equals InGameState.AreaInstanceData in every sampled frame of 21 of the 22 committed recordings. So WorldAreaDetails is not a separate object and its RowPtr(0xA0) is AreaInstance+0xA0 - the WorldAreas.dat row is reachable from either side, which is worth knowing when one of the two chains is unreadable. THE EXCEPTION IS THE ONE SESSION THAT CHANGES AREA (session-2026-08-actions.rec: 26 frames agreeing, 37 not), and it is the expected one rather than a counter-example - WorldData survives an area change while AreaInstance is rebuilt, so the two disagree across a transition. Anything comparing them has to tolerate that, and anything wanting 'the area the world is currently drawing' should prefer this one." },
         "CameraStructure": { "offset": "0x98", "type": "ptr", "comment": "INLINE camera struct base - do NOT dereference. GameHelper2's WorldDataOffset declares WorldAreaDetailsPtr and CameraStructurePtr at the SAME offset 0x98, the second as an inline struct, and its CameraStructure puts WorldToScreenMatrix at +0x108: 0x98 + 0x108 = WorldData+0x1A0, which is exactly the offset the AHK tool uses. (This field read 0xA0 before, arriving at the same 0x1A0 via +0x100; 0x98 is the referenced value.) No invariant: whatever floats sit here would validate anything." },
         "W2SMatrix": {
           "offset": "0x1A0", "type": "mat4x4",
@@ -326,7 +327,7 @@
     "WorldAreaDetails": {
       "comment": "Reached through WorldData.WorldAreaDetailsPtr (0x98). TWO hops, not one: WorldData -> WorldAreaDetails -> the WorldAreas.dat ROW. Ported from the AHK tool, which uses exactly this chain in game.",
       "fields": {
-        "RowPtr": { "offset": "0x98", "type": "ptr", "struct": "WorldAreaDat", "invariant": { "kind": "nonNullPtr" }, "comment": "The WorldAreas.dat row for the area currently loaded. 0.5.5 (2026-09-04): 0xA0 -> 0x98. Since WorldAreaDetails IS the AreaInstance (see WorldData.WorldAreaDetailsPtr), this is the same eight bytes that took CurrentAreaLevel 0xC4 -> 0xBC and CurrentAreaHash 0x11C -> 0x114 - the early region of AreaInstance lost a qword." }
+        "RowPtr": { "offset": "0xA0", "type": "ptr", "struct": "WorldAreaDat", "invariant": { "kind": "nonNullPtr" }, "comment": "The WorldAreas.dat row for the area currently loaded." }
       }
     },
 
@@ -459,28 +460,28 @@
     },
 
     "AreaInstance": {
-      "comment": "DRIFT HISTORY, two waves so far: (1) +0x18 - PlayerInfo 0x580->0x598, TerrainMetadata 0x8A0->0x8B8; (2) 2026-08, owner-verified: +0x08 across the tail - PlayerInfo 0x598->0x5A0, AwakeEntities 0x6D8->0x6E0, SleepingEntities 0x6E8->0x6F0, TerrainMetadata 0x8B8->0x8C0 (a new 8-byte field was inserted below ~0x5A0). When ONE field here drifts, assume the whole tail moved by the same delta and check them all. Low fields (CurrentAreaLevel 0xC4, CurrentAreaHash 0x11C) did not move in either wave. THE TOOL NOW DOES THAT CHECK ITSELF: when a row here or in LocalPlayerStruct fails, the drift report sweeps this struct for the tail's fingerprints (the player slot, the entity maps, the terrain struct with its back-pointer to this very address - see AreaInstanceHunt) and prints each one's new offset and the delta they agree on; if nothing inside fits, it asks whether InGameState.AreaInstanceData itself moved. Read the offsets off that block rather than probing by hand. (3) 2026-09-04 (0.5.5), owner-verified 2026-09-11 and agreeing with GameHelper2 main a99b8ba: the struct split IN TWO DIRECTIONS, which the 'one delta for the whole struct' rule above does not cover and the hunt's agreement check would report as disagreement. The EARLY region lost eight bytes - WorldAreaDetails.RowPtr 0xA0 -> 0x98, CurrentAreaLevel 0xC4 -> 0xBC, CurrentAreaHash 0x11C -> 0x114 - and the LATE region gained 0x10: PlayerInfo 0x5A0 -> 0x5B0, AwakeEntities 0x6E0 -> 0x6F0, SleepingEntities 0x6F0 -> 0x700, TerrainMetadata 0x8C0 -> 0x8D0. Environments (0x4C0) sits between the two and did not move. So this wave is NOT one number: read each region's delta separately.",
+      "comment": "DRIFT HISTORY, two waves so far: (1) +0x18 - PlayerInfo 0x580->0x598, TerrainMetadata 0x8A0->0x8B8; (2) 2026-08, owner-verified: +0x08 across the tail - PlayerInfo 0x598->0x5A0, AwakeEntities 0x6D8->0x6E0, SleepingEntities 0x6E8->0x6F0, TerrainMetadata 0x8B8->0x8C0 (a new 8-byte field was inserted below ~0x5A0). When ONE field here drifts, assume the whole tail moved by the same delta and check them all. Low fields (CurrentAreaLevel 0xC4, CurrentAreaHash 0x11C) did not move in either wave. THE TOOL NOW DOES THAT CHECK ITSELF: when a row here or in LocalPlayerStruct fails, the drift report sweeps this struct for the tail's fingerprints (the player slot, the entity maps, the terrain struct with its back-pointer to this very address - see AreaInstanceHunt) and prints each one's new offset and the delta they agree on; if nothing inside fits, it asks whether InGameState.AreaInstanceData itself moved. Read the offsets off that block rather than probing by hand. The 2026-09-04 content patch is reported to have moved this struct again; nothing here is changed until a report from the patched game says by how much.",
       "fields": {
         "CurrentAreaLevel": {
-          "offset": "0xBC", "type": "i32",
+          "offset": "0xC4", "type": "i32",
           "invariant": { "kind": "range", "min": 0, "max": 100 },
-          "comment": "Monster level of the current area. 0.5.5: 0xC4 -> 0xBC (early region -8)."
+          "comment": "Monster level of the current area."
         },
-        "CurrentAreaHash": { "offset": "0x114", "type": "u32", "comment": "Instance hash - changes on every area transition; used as the per-area reset signal all over the tool. 0.5.5: 0x11C -> 0x114 (early region -8)." },
-        "Environments": { "offset": "0x4C0", "type": "ptr", "comment": "std::vector of i32 Environments.dat keys, begin pointer. 0x4C0 in GameHelper2's 0.5.5 struct, where its 0.5.4 struct said 0x4C8 - so it sits between the early region (-8) and the late one (+0x10) and the two deltas cancel here, or it never moved; either way 0x4C0 is the value both the reference and the owner's 2026-09-11 list agree on. Still not read by anything, and not verified against a recording." },
+        "CurrentAreaHash": { "offset": "0x11C", "type": "u32", "comment": "Instance hash - changes on every area transition; used as the per-area reset signal all over the tool." },
+        "Environments": { "offset": "0x4C0", "type": "ptr", "comment": "UNVERIFIED since the 2026-08 +0x08 wave - sits between the stable low fields and the shifted tail; if the insertion point is below 0x4C0 this is 0x4C8 now. Confirm via the drift report before use." },
         "PlayerInfo": {
-          "offset": "0x5B0", "type": "ptr",
-          "comment": "INLINE LocalPlayerStruct base - do NOT dereference: the value AT this address is already ServerDataPtr (+0x00); LocalPlayerPtr is +0x20 (abs 0x5D0). Proven by the first live run 2026-08: dereferencing here validated ServerData as a struct base and the player chain 'broke'. Drift history: 0x580 -> 0x598 -> 0x5A0 (+0x08 wave) -> 0x5B0 (0.5.5, late region +0x10). The invariants live on the LocalPlayerStruct rows."
+          "offset": "0x5A0", "type": "ptr",
+          "comment": "INLINE LocalPlayerStruct base - do NOT dereference: the value AT this address is already ServerDataPtr (+0x00); LocalPlayerPtr is +0x20 (abs 0x5C0). Proven by the first live run 2026-08: dereferencing here validated ServerData as a struct base and the player chain 'broke'. Drift history: 0x580 -> 0x598 -> 0x5A0 (+0x08 wave). The invariants live on the LocalPlayerStruct rows."
         },
         "AwakeEntities": {
-          "offset": "0x6F0", "type": "ptr",
+          "offset": "0x6E0", "type": "ptr",
           "invariant": { "kind": "nonNullPtr" },
-          "comment": "EntityListStruct: AwakeEntities std::map head is its first field (+0x00). Was 0x6D8, then 0x6E0 (2026-08 +0x08 wave), now 0x6F0 (0.5.5, late region +0x10)."
+          "comment": "EntityListStruct: AwakeEntities std::map head is its first field (+0x00). Was 0x6D8 (2026-08 +0x08 wave)."
         },
-        "SleepingEntities": { "offset": "0x700", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "The second std::map of the EntityListStruct, AwakeEntities + 0x10. Was 0x6E8, then 0x6F0 (2026-08 +0x08 wave), now 0x700 (0.5.5, late region +0x10 - not listed by the owner or the reference separately, it follows AwakeEntities by construction)." },
+        "SleepingEntities": { "offset": "0x6F0", "type": "ptr", "invariant": { "kind": "plausiblePtr" }, "comment": "Was 0x6E8 (2026-08 +0x08 wave)." },
         "TerrainMetadata": {
-          "offset": "0x8D0", "type": "ptr",
-          "comment": "TerrainStruct (was 0x8A0, then 0x8B8, then 0x8C0 - 2026-08 +0x08 wave - now 0x8D0, 0.5.5 late region +0x10). Source: GameHelper2 AreaInstanceOffsets.cs. NOTE: unlike most ptr fields this is an inline struct base in some builds - treat as base address, not pointer, when reading TerrainMetadata fields. INLINE IS THE CASE HERE, and the recordings say so outright: the eight bytes at 0x8C0 hold a MODULE address, which is a vtable and not a heap pointer, and the very next slot holds this AreaInstance's own address - a back-pointer to the owner, where GameHelper2's TerrainStruct has an unnamed field at +0x08."
+          "offset": "0x8C0", "type": "ptr",
+          "comment": "TerrainStruct (was 0x8A0, then 0x8B8, now 0x8C0 - 2026-08 +0x08 wave). Source: GameHelper2 AreaInstanceOffsets.cs. NOTE: unlike most ptr fields this is an inline struct base in some builds - treat as base address, not pointer, when reading TerrainMetadata fields. INLINE IS THE CASE HERE, and the recordings say so outright: the eight bytes at 0x8C0 hold a MODULE address, which is a vtable and not a heap pointer, and the very next slot holds this AreaInstance's own address - a back-pointer to the owner, where GameHelper2's TerrainStruct has an unnamed field at +0x08."
         }
       }
     },
@@ -1613,17 +1614,17 @@
     },
 
     "UiElement": {
-      "comment": "Game UI tree node. Scale conversion is per-element: v1 = (clientW - 2*cull)/2560, v2 = clientH/1600; ScaleIndex picks the pair, times LocalScaleMultiplier. Sanity-clamp everything - a mis-resolved GameCullSize or drifted ScaleIndex silently poisons every rect. THE OLDER, SMALLER TWIN OF UiElementBase: nothing in the code reads this struct any more (every reader takes UiElementBase), and it is kept in step with it only so that the two never disagree. Anyone adding a row should add it to UiElementBase instead.",
+      "comment": "Game UI tree node. Scale conversion is per-element: v1 = (clientW - 2*cull)/2560, v2 = clientH/1600; ScaleIndex picks the pair, times LocalScaleMultiplier. Sanity-clamp everything - a mis-resolved GameCullSize or drifted ScaleIndex silently poisons every rect.",
       "fields": {
         "Self": { "offset": "0x08", "type": "ptr" },
         "Children": { "offset": "0x10", "type": "stdVector" },
-        "StringId": { "offset": "0x98", "type": "stdWString", "comment": "Was 0x140 in the 0.4 layout - the 0.5 client moved it. Unchanged by 0.5.5 (head of the object)." },
-        "LocalScaleMultiplier": { "offset": "0x118", "type": "f32", "comment": "Sanitize: accept 0.2..5.0, else treat as 1.0. 0.5.5: 0x130 -> 0x118." },
-        "Flags": { "offset": "0x168", "type": "u32", "comment": "Visibility bit lives here. 0.5.5: 0x180 -> 0x168." },
-        "ScaleIndex": { "offset": "0x172", "type": "u8", "comment": "Unknown index falls back to uniform scale. 0.5.5: 0x18A -> 0x172." },
+        "StringId": { "offset": "0x98", "type": "stdWString", "comment": "Was 0x140 in the 0.4 layout - the 0.5 client moved it." },
+        "LocalScaleMultiplier": { "offset": "0x130", "type": "f32", "comment": "Sanitize: accept 0.2..5.0, else treat as 1.0." },
+        "Flags": { "offset": "0x180", "type": "u32", "comment": "Visibility bit lives here." },
+        "ScaleIndex": { "offset": "0x18A", "type": "u8", "comment": "0.4-era offset; may have drifted in 0.5 - unknown index falls back to uniform scale." },
         "ItemPtr": {
-          "offset": "0x4E0", "type": "ptr",
-          "comment": "Item-slot elements: direct pointer to the item ENTITY. Source: coussiraty/CoreExile2 InventoryAdapters.cs (ItemPointerOffset = 0x4F8); verified live on a hovered Rare in 0.5.4. 0x4E0 is the tail's -0x18 applied, UNVERIFIED - see UiElementBase.ItemPtr. Powers price-on-hover and ritual badges."
+          "offset": "0x4F8", "type": "ptr",
+          "comment": "Item-slot elements: direct pointer to the item ENTITY. Source: coussiraty/CoreExile2 InventoryAdapters.cs (ItemPointerOffset = 0x4F8); verified live on a hovered Rare. Powers price-on-hover and ritual badges."
         }
       }
     }
