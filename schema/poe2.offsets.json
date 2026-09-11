@@ -1606,9 +1606,10 @@
     },
 
     "ChargesInternal": {
-      "comment": "The shared per-base-type descriptor a Charges component points at.",
+      "comment": "The per-base-type descriptor a Charges component points at. EVERYTHING HERE IS A BASE VALUE - it carries the base type's numbers, never the item's own rolls, which is the single most important thing to know about this struct and cost a bug report to learn. Read live 2026-09 off three belt items at once (--flasks): a Simmering Lesser Life Flask of the Apprentice, a Mana Flask with +27% maximum charges, and a charm. EACH FIELD IS WRITTEN TWICE, as two identical int32s filling one qword, in all three - so a 4-byte read at either half gives the same answer and the pair is not (base, modified). Whatever the second copy is for, it is not the item's number.",
       "fields": {
-        "PerUseCharges": { "offset": "0x18", "type": "i32", "comment": "Cost of one use. A flask with fewer charges than this cannot be used." }
+        "MaxCharges": { "offset": "0x10", "type": "i32", "comment": "How many charges the BASE TYPE holds. 60 on a Lesser Life Flask whose tooltip says \"of 60 Charges\", 40 on a charm sitting full at 40, and 70 on a Mana Flask carrying local_max_charges_+% = 27 and sitting full at 88 - which is where the base-ness of this struct shows: 88 is the item's real maximum and it is NOT here. Not wired into the belt reader on purpose: a second base-valued number on the display would mislead the same way PerUseCharges does until the modified values are found." },
+        "PerUseCharges": { "offset": "0x18", "type": "i32", "comment": "Cost of one use, again for the BASE TYPE. A flask with fewer charges than this cannot be used - but the flask's OWN cost is what decides that, and it is not here: the Apprentice flask above reads 10 with local_charges_used_+% = -15 on it, against a tooltip saying \"Consumes 8 of 60 Charges on use\". Where the 8 lives is still open; the item carries Flask and LocalStats components that nothing reads yet, and neither GameHelper2 nor the AHK tool has offsets for either. See FlaskProbe.ReportChargeCost." }
       }
     },
 
