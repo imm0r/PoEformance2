@@ -210,7 +210,7 @@
         "LeftPanelPtr": { "offset": "0x6D0", "type": "ptr", "comment": "0.5.5: 0x6D8 -> 0x6D0, per GameHelper2; positive confirmation pending (see the struct comment). Whichever left-side panel is open - character, skills, quests. Null while none is, so this is BOTH the address and half the answer; the other half is that the element it points at is only visible while its panel is showing." },
         "RightPanelPtr": { "offset": "0x6D8", "type": "ptr", "comment": "0.5.5: 0x6E0 -> 0x6D8, per GameHelper2; the old slot is shown NOT to be an element in session-2026-09-live.rec. CONFIRMED at 0x6E0 against a 0.5.4 session 2026-08 (tests/fixtures/session-2026-08-panel.rec, PanelSessionTests): with the inventory open it resolved to a UiElement whose visibility walk says showing, while LeftPanelPtr is null and the tree and world map are present but hidden. The right-side one: inventory, stash, a vendor. Its EXTENT is still unknown - that recording predates the position/size read, and PoE2 lays the inventory out across the screen down to the hotbar rather than as a side column, so a fresh capture is what settles whether the element carries its own size or has to be measured from its children (see PanelReader.Where)." },
         "PassiveSkillTreePanel": { "offset": "0x730", "type": "ptr", "comment": "Unchanged by 0.5.5: still resolves to a self-pointing element in session-2026-09-live.rec." },
-        "MapParentPtr": { "offset": "0x7C0", "type": "ptr", "comment": "0.5.5: 0x7C8 -> 0x7C0, per GameHelper2. The old slot's target is proven NOT to be a MapParentStruct in session-2026-09-live.rec (packed integers where LargeMapPtr/MiniMapPtr sit); the new one is unread there. The map radar stands on this row." },
+        "MapParentPtr": { "offset": "0x7C0", "type": "ptr", "comment": "0.5.5: 0x7C8 -> 0x7C0, per GameHelper2. The old slot's target is proven NOT to be a MapParentStruct in session-2026-09-live.rec (packed integers where LargeMapPtr/MiniMapPtr sit). CONFIRMED AN ELEMENT at 0x7C0 in session-2026-09-panels.rec - Self points at itself, and its +0x28/+0x30 lead to two more elements - but those two are NOT the maps (see MapParentStruct), and the reference itself no longer follows this pointer to the maps. So the slot is right and the road past it is not; the radar's second route (MapViewports) is what the reference walks instead." },
         "WorldMapPanelPtr": { "offset": "0x988", "type": "ptr", "comment": "From GameHelper2, unchanged by 0.5.5; resolves to a self-pointing element in session-2026-09-live.rec. The world-travel map - the act screens, not the endgame atlas, which is its own panel at a child path." },
         "ControllerModeMapParentPtr": { "offset": "0xAA8", "type": "ptr" }
       }
@@ -264,10 +264,20 @@
     },
 
     "MapParentStruct": {
-      "comment": "Children of MapParentPtr, read from the cache location inside the struct.",
+      "comment": "Children of MapParentPtr, read from the cache location inside the struct - i.e. MapParentPtr's target is a UiElement and these are the first two entries of its inline child cache. CONFIRMED on 0.5.4 (the radar drew on them). ON 0.5.5 THIS CHAIN RESOLVES AND IS WRONG: in tests/fixtures/session-2026-09-panels.rec both pointers lead to UiElements, but each reads a full-screen UnscaledSize, a zoom of 0 at every candidate offset, and the two objects sit 0x2E0 bytes apart - too small to hold a field at 0x390. GameHelper2's 0.5.5 commit dropped this chain for the child path in MapViewports; MapRadarReader now tries both and believes whichever hands back an element with a zoom in range. Kept because it is still what 0.5.4 recordings replay through, and because the hunt captures it.",
       "fields": {
         "LargeMapPtr": { "offset": "0x28", "type": "ptr" },
         "MiniMapPtr": { "offset": "0x30", "type": "ptr" }
+      }
+    },
+
+    "MapViewports": {
+      "comment": "GameHelper2's 0.5.5 way to the two map elements, ported 2026-09-11 UNVERIFIED against this client: the KB/M UI manager (InGameState.UiRootStructPtr) is itself a UiElement - session-2026-09-panels.rec reads its Self pointing at itself and 124 children, with the HUD at child 97 - and its child ChildOfUiManager is the map container, whose children LargeMapChild and MiniMapChild are the large map and minimap VIEWPORTS. Whether those viewports are the map elements (Shift, DefaultShift, Zoom) or containers with the map element beneath is exactly what --maphunt records; nothing in the committed recordings has read child 6.",
+      "fields": {},
+      "consts": {
+        "ChildOfUiManager": "6",
+        "LargeMapChild": "0",
+        "MiniMapChild": "1"
       }
     },
 
@@ -282,7 +292,7 @@
     },
 
     "MapUiElement": {
-      "comment": "CONFIRMED IN-GAME 2026-08 via the map radar - dots track the map at every zoom level. A map-type UiElement: UiElementBase at 0x000, then its own fields. Matches GameHelper2 MapUiElement.cs. PoE2 4.5.x shifted all three by -0x38 when UiElementBase shrank (the old Zoom at 0x3E0 read 0.000). 0.5.5 (2026-09-04) shifted them again, by the base's -0x18: the map's own fields ride on the base's tail, so a UiElementBase wave is always a MapUiElement wave too.",
+      "comment": "CONFIRMED IN-GAME 2026-08 via the map radar - dots track the map at every zoom level. A map-type UiElement: UiElementBase at 0x000, then its own fields. Matches GameHelper2 MapUiElement.cs. PoE2 4.5.x shifted all three by -0x38 when UiElementBase shrank (the old Zoom at 0x3E0 read 0.000). 0.5.5 (2026-09-04) shifted them again, by the base's -0x18: the map's own fields ride on the base's tail, so a UiElementBase wave is always a MapUiElement wave too. NOT YET CONFIRMED ON 0.5.5, and the first evidence is against the CHAIN rather than these numbers: the elements MapParentStruct reaches read 0 at 0x350, 0x358 and 0x390 (session-2026-09-panels.rec) and are only 0x2E0 apart, so they cannot be MapUiElements at all - see MapViewports for the reference's new route, and --maphunt for the capture that settles both the route and these three offsets. Until then the radar's zoom falls back to 0.5 rather than the 1E-44 that put every marker on one pixel.",
       "fields": {
         "Shift": { "offset": "0x350", "type": "f32", "comment": "StdTuple2D<float> - how far the user/game has shifted the map centre; y at +0x354. 0.5.5: 0x368 -> 0x350." },
         "DefaultShift": { "offset": "0x358", "type": "f32", "comment": "StdTuple2D<float> - resting offset, (0, -20) in PoE2; y at +0x35C. 0.5.5: 0x370 -> 0x358." },

@@ -247,6 +247,13 @@ internal static class Program
                 RunHoverHunt(reader, worldSchema, gameStatesAddress, recorder);
             }
 
+            // The map elements, both ways of reaching them, captured whole - the question the
+            // 0.5.5 patch left open and no recording could answer. See MapHunt.
+            if (options.HuntMap)
+            {
+                RunMapHunt(reader, worldSchema, gameStatesAddress, recorder);
+            }
+
             if (options.SweepComponents)
             {
                 RunComponentSweep(reader, worldSchema, gameStatesAddress, recorder);
@@ -1082,6 +1089,67 @@ internal static class Program
         }
 
         PoEformance.Game.Diagnostics.HoverHunt.Report(samples, Console.Out);
+    }
+
+    /// <summary>
+    /// Captures the map elements by both routes while the person works the map. See MapHunt.
+    /// </summary>
+    private static void RunMapHunt(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var hunt = new PoEformance.Game.Diagnostics.MapHunt(reader, schema);
+        var samples = new List<PoEformance.Game.Diagnostics.MapHuntSample>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    samples.Add(sample);
+                }
+            }
+
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("map hunt - capturing the map elements by every route, bytes and all.");
+            Console.WriteLine("  WORK THE MAP WHILE THIS RUNS: zoom the minimap in and out, drag it, open the");
+            Console.WriteLine("  large map, zoom and drag that too, close it. The zoom is found by what MOVES -");
+            Console.WriteLine("  a value that never changes cannot be told from furniture.");
+            Console.WriteLine("  Any key to stop and report.");
+            Console.WriteLine();
+
+            int failures = 0, ticks = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    failures = 0;
+                    samples.Add(sample);
+                }
+                else
+                {
+                    failures++;
+                }
+
+                if (++ticks % 100 == 0 && samples.Count > 0)
+                {
+                    Console.WriteLine($"  ... {samples.Count} frames, {samples[^1].Candidates.Count} elements each");
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.MapHunt.Report(samples, Console.Out);
     }
 
     /// <summary>
@@ -3442,6 +3510,7 @@ internal static class Program
         bool HuntActions,
         bool HuntSkills,
         bool HuntHover,
+        bool HuntMap,
         bool SweepComponents,
         bool SweepInventories,
         string TabName,
@@ -3461,7 +3530,7 @@ internal static class Program
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
-            bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false;
+            bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false, mapHunt = false;
             bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
             var inventorySweep = false;
             string tabName = string.Empty;
@@ -3552,6 +3621,12 @@ internal static class Program
                     // others because it wants a person deliberately pointing at things.
                     case "--hoverhunt":
                         hoverHunt = true;
+                        break;
+
+                    // The map elements every way they can be reached, bytes and all - see
+                    // MapHunt. It wants the person zooming and panning the map while it runs.
+                    case "--maphunt":
+                        mapHunt = true;
                         break;
 
                     // The components neither reference has a layout for. Blind, because there
@@ -3647,7 +3722,7 @@ internal static class Program
 
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep,
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, mapHunt, sweep,
                 inventorySweep, tabName, groundTypeDump, animDump,
                 glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
