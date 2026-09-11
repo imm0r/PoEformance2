@@ -49,6 +49,7 @@ public sealed class FlaskProbe
     private readonly OffsetSchema _schema;
     private readonly EntityReader _entities;
     private readonly ItemReader? _items;
+    private readonly ItemNames _names;
 
     public FlaskProbe(IMemoryReader reader, OffsetSchema schema, ItemNames? names = null)
     {
@@ -57,13 +58,14 @@ public sealed class FlaskProbe
         _reader = reader;
         _schema = schema;
         _entities = new EntityReader(reader, schema);
+        _names = names ?? ItemNames.Empty;
 
         // A diagnostic is what somebody runs when the schema is the suspect, so it must not be
         // the thing that dies of it. ItemReader wants a dozen item structs; without them the
         // rest of this probe - the whole belt walk, which needs none of them - still reports.
         try
         {
-            _items = new ItemReader(reader, schema, names ?? ItemNames.Empty);
+            _items = new ItemReader(reader, schema, _names);
         }
         catch (KeyNotFoundException)
         {
@@ -147,7 +149,7 @@ public sealed class FlaskProbe
             + (league.Length is > 0 and < 40 ? "  -> ServerData confirmed" : "  -> SUSPECT"));
 
         // There are two server-data structs; the inventories live on the inner one.
-        var belts = new FlaskBeltReader(_reader, _schema);
+        var belts = new FlaskBeltReader(_reader, _schema, _names);
         ulong inner = belts.ResolveServerDataStructure(serverData);
         output.WriteLine($"  serverDataStruct  0x{inner:X}"
             + (inner == serverData ? "  (direct)" : $"  (via +0x{_schema.Structs["ServerDataOffsets"].OffsetOf("PlayerServerData"):X} hop)"));
@@ -251,7 +253,12 @@ public sealed class FlaskProbe
                 ? "charm (self-triggering)"
                 : flask.CanUse ? "usable" : "NOT usable";
 
-            output.WriteLine($"    slot {flask.Slot}  {flask.Charges,4}/{flask.ChargesPerUse,-4} charges"
+            // BOTH NUMBERS, because the flask's own are computed and the base ones are what
+            // memory holds: printing them side by side is what makes a wrong computation
+            // visible here rather than silently wrong in the belt display.
+            output.WriteLine($"    slot {flask.Slot}  {flask.Charges,4}/{flask.MaxCharges,-4}"
+                + $" {flask.ChargesPerUse,3} per use"
+                + $"  (base {flask.BaseMaxCharges}, {flask.BaseChargesPerUse} per use)"
                 + $"  {usability,-24}  {Shorten(flask.Path)}");
         }
 
@@ -751,7 +758,7 @@ public sealed class FlaskProbe
         ulong serverData = _reader.ReadPointer(
             localPlayerStruct + (ulong)_schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr"));
 
-        return new FlaskBeltReader(_reader, _schema).Read(serverData).Flasks;
+        return new FlaskBeltReader(_reader, _schema, _names).Read(serverData).Flasks;
     }
 
     /// <summary>The item's resolved stats - the inputs, if the cost turns out to be computed.</summary>

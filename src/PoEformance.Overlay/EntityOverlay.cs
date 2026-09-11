@@ -3060,7 +3060,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Row(
                     "belt",
                     string.Join("   ", belt.Flasks.Select(f =>
-                        $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}"
+                        $"{f.Slot}:{f.Charges}/{f.MaxCharges}"
                         + (f.IsCharm ? " (charm)" : f.CanUse ? string.Empty : " (empty)"))),
                     figure: true);
             }
