@@ -38,6 +38,7 @@ public enum RuleFact
 
     MonsterCount,
     MonsterCountWithin,
+    MonsterCountInSight,
     MonsterCountAtCursor,
     RareMonsterCount,
     UniqueMonsterCount,
@@ -156,6 +157,7 @@ public static class RuleFacts
 
         new(RuleFact.MonsterCount, "MonsterCount", FactShape.Number, FactArgument.None, "", "Live monsters ANYWHERE the game is listing them - a bubble a long way past the screen, not what is in range of a skill. For that use MonsterCountWithin."),
         new(RuleFact.MonsterCountWithin, "MonsterCountWithin", FactShape.Number, FactArgument.Distance, "", "Live monsters within a radius of the player, in world units. For scale, MEASURED over a recorded map rather than guessed: the furthest monster still on screen is typically around 1000 away and reaches 1800, and nothing closer than about 700 has ever been off screen. So roughly 1000 is a screen, and a few hundred is the area around you. Switch on 'Show ranges in game' and the radius is drawn on the ground - that settles it faster than any number here."),
+        new(RuleFact.MonsterCountInSight, "MonsterCountInSight", FactShape.Number, FactArgument.Distance, "", "Live monsters within a radius that the player can actually reach in a straight line - MonsterCountWithin minus everything standing behind a wall. The condition an autocast rule usually wants: within the radius and behind scenery, a pack still spends the mana and the wall still takes the skill. Sight is worked out from the area's WALKABLE grid, because the game exposes no separate what-can-be-seen map, so it is conservative in one direction: a chasm or a ledge cannot be walked across either, and a monster on the far side of one counts as hidden even though a projectile would reach it. No answer at all - not 0 - while the terrain is still loading, which on a large map takes a while."),
         new(RuleFact.MonsterCountAtCursor, "MonsterCountAtCursor", FactShape.Number, FactArgument.Distance, "", "Live monsters within a radius of where the CURSOR points, in world units - the question a skill placed where you aim actually asks. Answers 0 while the pointer is off the game.", AtCursor: true),
         new(RuleFact.RareMonsterCount, "RareMonsterCount", FactShape.Number, FactArgument.None, "", "Live rare monsters anywhere the game is listing them."),
         new(RuleFact.UniqueMonsterCount, "UniqueMonsterCount", FactShape.Number, FactArgument.None, "", "Live unique monsters anywhere the game is listing them."),
@@ -305,6 +307,7 @@ public static class RuleFacts
             RuleFact.FlaskCharges => state.FlaskCharges(Slot(leaf)),
 
             RuleFact.MonsterCountWithin => state.MonsterCountWithin(leaf.Argument),
+            RuleFact.MonsterCountInSight => state.MonsterCountInSight(leaf.Argument),
             RuleFact.RareOrUniqueCountWithin => state.RareOrUniqueCountWithin(leaf.Argument),
             RuleFact.MonsterCountAtCursor => state.MonsterCountAtCursor(leaf.Argument),
             RuleFact.RareOrUniqueCountAtCursor => state.RareOrUniqueCountAtCursor(leaf.Argument),

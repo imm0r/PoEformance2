@@ -371,6 +371,64 @@ public sealed class TerrainGrid
     }
 
     /// <summary>
+    /// Whether an unbroken run of walkable cells joins two cells - line of sight, near enough.
+    /// </summary>
+    /// <remarks>
+    /// Bresenham over the walkable grid, which is the reference's own technique: GameHelper2's
+    /// Radar walks exactly this line (its LineWalker) to decide when it can skip pathfinding,
+    /// and it decodes the same nibbles this class does - 0 blocked, 1-5 walkable.
+    ///
+    /// WHAT THIS IS NOT, and the limit is worth stating because it is invisible from the
+    /// result: the game has no readable "can this be seen" grid, so WALKABILITY is standing in
+    /// for sight. The two agree on the case that matters - a wall blocks both - and part ways
+    /// on ground that cannot be stood on but can be shot across. A chasm, a ledge, a gap over
+    /// water all read as blocked here, so a monster on the far side of one reads as out of
+    /// sight when a projectile would have reached it. That is the conservative direction: the
+    /// failure is a skill not cast, never a skill cast into a wall.
+    ///
+    /// BOTH ENDS ARE TESTED, like the reference. A point is not a body, and the game does not
+    /// let anything stand inside a wall, so the cells under the player and under a monster are
+    /// walkable in practice; excluding them would be a tolerance invented to fix a problem
+    /// nothing has shown.
+    /// </remarks>
+    public bool IsClearLine(int x0, int y0, int x1, int y1)
+    {
+        int dx = Math.Abs(x1 - x0);
+        int dy = Math.Abs(y1 - y0);
+        int stepX = x0 < x1 ? 1 : -1;
+        int stepY = y0 < y1 ? 1 : -1;
+        int error = dx - dy;
+
+        int x = x0;
+        int y = y0;
+        while (true)
+        {
+            if (!IsWalkable(x, y))
+            {
+                return false;
+            }
+
+            if (x == x1 && y == y1)
+            {
+                return true;
+            }
+
+            int doubled = error * 2;
+            if (doubled > -dy)
+            {
+                error -= dy;
+                x += stepX;
+            }
+
+            if (doubled < dx)
+            {
+                error += dx;
+                y += stepY;
+            }
+        }
+    }
+
+    /// <summary>
     /// Which TILES hold ground that can be walked on, one flag each, row by row.
     /// </summary>
     /// <remarks>
