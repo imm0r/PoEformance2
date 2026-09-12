@@ -90,7 +90,30 @@ public sealed class PlayerSkills
     /// <summary>How far into an ActiveSkills row the name is looked for when it is not where the schema says.</summary>
     public const int NameHuntBytes = 0x40;
 
+    /// <summary>How much of a GrantedEffects row is searched for its reference to the ActiveSkills row.</summary>
+    /// <remarks>
+    /// BYTE BY BYTE, not in eights: dat columns are packed, so a row reference sits wherever
+    /// the columns before it end - 0x4F and 0x57 are the two the witnesses name - and an
+    /// aligned scan would step over it.
+    /// </remarks>
+    public const int RowHuntBytes = 0x100;
+
+    /// <summary>How many strings, and how many references, the survey of a row quotes.</summary>
+    private const int SurveyMost = 6;
+
+    /// <summary>How long a quoted string in the survey may be before it is cut.</summary>
+    private const int SurveyCut = 24;
+
     private const long Never = long.MinValue;
+
+    /// <summary>How much a reading of a pointer can be trusted, most first. See <see cref="ReadingOf"/>.</summary>
+    private const int Certain = 3;
+    private const int Provisional = 2;
+    private const int Bare = 1;
+    private const int Nothing = 0;
+
+    /// <summary>What one pointer proved to lead to.</summary>
+    private readonly record struct Reading(SkillIdentity Who, int Strength, string How);
 
     private readonly IMemoryReader _reader;
     private readonly int _table;
@@ -110,6 +133,8 @@ public sealed class PlayerSkills
     private ulong _actor;
     private long _readAt = Never;
     private string _route = "no row reached";
+    private ulong _surveyed;
+    private string _survey = string.Empty;
 
     public PlayerSkills(IMemoryReader reader, OffsetSchema schema)
     {
@@ -290,22 +315,28 @@ public sealed class PlayerSkills
         }
     }
 
-    /// <summary>The skill's dat row, reached whichever way reaches it; otherwise the object itself.</summary>
+    /// <summary>
+    /// The skill's dat row, reached whichever way reaches it; otherwise the object itself.
+    /// </summary>
+    /// <remarks>
+    /// THE STRONGEST READING WINS, not the first: the known places and then every pointer in
+    /// the object are read, and a reading that found the name where the schema puts it ends
+    /// the search, while a weaker one - a name hunted for in the row, or an id alone - is kept
+    /// only until something better turns up. The third run in game is why: the row at the
+    /// per-level field begins with an id, and a hunt for its name found another id further in
+    /// ("StormCloud" as "QuakeSlam"), which was taken for a name and ended the search before
+    /// the row could be read as the GrantedEffects row it is.
+    /// </remarks>
     private SkillIdentity Identify(ulong details)
     {
-        if (Resolve(_reader.ReadPointer(details + (ulong)_datRow), out SkillIdentity who, out string how))
+        Reading best = default;
+
+        if (Consider(_reader.ReadPointer(details + (ulong)_datRow), $"+0x{_datRow:X}", ref best)
+            || Consider(_reader.ReadPointer(details + (ulong)_perLevel), $"+0x{_perLevel:X}", ref best))
         {
-            _route = $"+0x{_datRow:X} {how}";
-            return who;
+            return Settle(best);
         }
 
-        if (Resolve(_reader.ReadPointer(details + (ulong)_perLevel), out who, out how))
-        {
-            _route = $"+0x{_perLevel:X} {how}";
-            return who;
-        }
-
-        // Neither known place: any pointer in the object that is a row, or leads to one.
         Span<byte> block = stackalloc byte[HuntBytes];
         if (_reader.TryRead(details, block))
         {
@@ -316,92 +347,246 @@ public sealed class PlayerSkills
                     continue;
                 }
 
-                ulong pointer = BinaryPrimitives.ReadUInt64LittleEndian(block[at..]);
-                if (Resolve(pointer, out who, out how))
+                if (Consider(BinaryPrimitives.ReadUInt64LittleEndian(block[at..]), $"hunted +0x{at:X}", ref best))
                 {
-                    _route = $"hunted +0x{at:X} {how}";
-                    return who;
+                    break;
                 }
             }
         }
 
-        return new SkillIdentity(details, string.Empty, string.Empty);
+        return best.Strength == Nothing
+            ? new SkillIdentity(details, string.Empty, string.Empty)
+            : Settle(best);
+    }
+
+    /// <summary>Reads a pointer and keeps the reading when it beats the best so far. True when it ends the search.</summary>
+    private bool Consider(ulong pointer, string place, ref Reading best)
+    {
+        Reading reading = ReadingOf(pointer);
+        if (reading.Strength > best.Strength)
+        {
+            best = reading with { How = $"{place} {reading.How}" };
+        }
+
+        return best.Strength == Certain;
+    }
+
+    private SkillIdentity Settle(Reading best)
+    {
+        _route = best.How;
+        return best.Who;
     }
 
     /// <summary>
     /// What a pointer leads to, read as whichever row it proves to be - see the remarks on the
-    /// class for the order, and why a nameless ActiveSkills reading comes last.
+    /// class for the order. A name found where the schema puts it makes the reading certain;
+    /// a name hunted for in the row, or no name at all, leaves it provisional.
     /// </summary>
-    private bool Resolve(ulong pointer, out SkillIdentity who, out string how)
+    private Reading ReadingOf(ulong pointer)
     {
-        who = default;
-        how = string.Empty;
         if (!MemoryReaderExtensions.IsPlausiblePointer(pointer))
         {
-            return false;
+            return default;
         }
 
         bool isRow = ActiveSkillRow(pointer, out SkillIdentity asRow, out int nameAt);
-        if (isRow && asRow.HasName)
+        if (isRow && nameAt == _displayedName)
         {
-            who = asRow;
-            how = Described("row", nameAt);
-            return true;
+            return new Reading(asRow, Certain, "row");
         }
 
-        if (GrantedEffectsRow(pointer, out who, out int column, out nameAt))
+        if (GrantedEffectsRow(pointer, out SkillIdentity who, out int column))
         {
-            how = Described($"granted row then +0x{column:X}", nameAt);
-            return true;
+            return new Reading(who, Certain, $"granted row then +0x{column:X}");
         }
 
-        if (GrantedEffectsRow(_reader.ReadPointer(pointer + (ulong)_grantedEffect), out who, out column, out nameAt))
+        if (GrantedEffectsRow(_reader.ReadPointer(pointer + (ulong)_grantedEffect), out who, out column))
         {
-            how = Described($"per-level row then +0x{column:X}", nameAt);
-            return true;
+            return new Reading(who, Certain, $"per-level row then +0x{column:X}");
         }
 
-        if (isRow)
+        if (isRow && nameAt >= 0)
         {
-            who = asRow;
-            how = "row (no name)";
-            return true;
+            return new Reading(asRow, Provisional, $"row, name at +0x{nameAt:X}");
         }
 
-        return false;
+        return isRow ? new Reading(asRow, Bare, "row (no name)") : default;
     }
 
-    /// <summary>The reading, with where the name was when it was not where the schema puts it.</summary>
-    private string Described(string reading, int nameAt)
-        => nameAt < 0 ? $"{reading} (no name)"
-            : nameAt == _displayedName ? reading
-            : $"{reading}, name at +0x{nameAt:X}";
-
-    /// <summary>A GrantedEffects row - one with an id - whose ActiveSkill column reaches an ActiveSkills row.</summary>
-    private bool GrantedEffectsRow(ulong granted, out SkillIdentity who, out int column, out int nameAt)
+    /// <summary>
+    /// A GrantedEffects row - one with an id - whose ActiveSkill column reaches an ActiveSkills
+    /// row with its name where the schema puts it. The two columns the witnesses name are tried
+    /// first, then the whole row, byte by byte.
+    /// </summary>
+    private bool GrantedEffectsRow(ulong granted, out SkillIdentity who, out int column)
     {
         who = default;
         column = 0;
-        nameAt = -1;
         if (!RowId(granted, out _))
         {
             return false;
         }
 
-        if (ActiveSkillRow(_reader.ReadPointer(granted + (ulong)_activeSkill), out who, out nameAt))
+        if (NamedActiveSkillRow(_reader.ReadPointer(granted + (ulong)_activeSkill), out who))
         {
             column = _activeSkill;
             return true;
         }
 
-        if (ActiveSkillRow(_reader.ReadPointer(granted + (ulong)_activeSkillPerReference), out who, out nameAt))
+        if (NamedActiveSkillRow(_reader.ReadPointer(granted + (ulong)_activeSkillPerReference), out who))
         {
             column = _activeSkillPerReference;
             return true;
         }
 
+        Span<byte> row = stackalloc byte[RowHuntBytes];
+        if (!_reader.TryRead(granted, row))
+        {
+            return false;
+        }
+
+        for (int at = 8; at + 8 <= RowHuntBytes; at++)
+        {
+            if (at == _activeSkill || at == _activeSkillPerReference)
+            {
+                continue;
+            }
+
+            ulong pointer = BinaryPrimitives.ReadUInt64LittleEndian(row[at..]);
+            if (pointer != granted && NamedActiveSkillRow(pointer, out who))
+            {
+                column = at;
+                return true;
+            }
+        }
+
         return false;
     }
+
+    /// <summary>An ActiveSkills row beyond doubt: an id first, and a name where the schema puts it.</summary>
+    private bool NamedActiveSkillRow(ulong row, out SkillIdentity who)
+    {
+        who = default;
+        if (!MemoryReaderExtensions.IsPlausiblePointer(row) || !RowId(row, out string id))
+        {
+            return false;
+        }
+
+        string name = RowText(row + (ulong)_displayedName, LongestName);
+        if (name.Length == 0)
+        {
+            return false;
+        }
+
+        who = new SkillIdentity(row, id, name);
+        return true;
+    }
+
+    /// <summary>
+    /// What the pointers of a skill object and of its first row lead to, quoted - for the readout.
+    /// </summary>
+    /// <remarks>
+    /// THE LAYOUT, READ OFF THE SCREEN. Every reading above is a guess the game confirms or
+    /// refuses, and a refusal says nothing about what is there instead; this does. For the
+    /// object: each pointer that leads to a row with an id, with the id. For the first such
+    /// row: each string it holds, and each pointer in it that leads to a row with an id, with
+    /// that row's name where the schema puts it. Byte by byte for the references, as columns
+    /// are packed. Cached per object, since it is asked every tick and answers once.
+    /// </remarks>
+    public string SurveyOf(ulong details)
+    {
+        if (details == _surveyed)
+        {
+            return _survey;
+        }
+
+        _surveyed = details;
+        _survey = details == 0 ? string.Empty : Survey(details);
+        return _survey;
+    }
+
+    private string Survey(ulong details)
+    {
+        Span<byte> block = stackalloc byte[HuntBytes];
+        if (!_reader.TryRead(details, block))
+        {
+            return "object unreadable";
+        }
+
+        var text = new System.Text.StringBuilder("object:");
+        ulong firstRow = 0;
+        int firstAt = -1;
+        for (int at = 0; at + 8 <= HuntBytes; at += 8)
+        {
+            ulong pointer = BinaryPrimitives.ReadUInt64LittleEndian(block[at..]);
+            if (RowId(pointer, out string id))
+            {
+                text.Append(" +0x").Append(at.ToString("X", System.Globalization.CultureInfo.InvariantCulture))
+                    .Append("→\"").Append(Cut(id)).Append('"');
+                if (firstRow == 0)
+                {
+                    firstRow = pointer;
+                    firstAt = at;
+                }
+            }
+        }
+
+        if (firstRow == 0)
+        {
+            return text.Append(" no row").ToString();
+        }
+
+        Span<byte> row = stackalloc byte[RowHuntBytes];
+        if (!_reader.TryRead(firstRow, row))
+        {
+            return text.Append("  row unreadable").ToString();
+        }
+
+        text.Append("  row@+0x").Append(firstAt.ToString("X", System.Globalization.CultureInfo.InvariantCulture)).Append(": str");
+        int quoted = 0;
+        for (int at = 0; at + 8 <= RowHuntBytes && quoted < SurveyMost; at += 8)
+        {
+            ulong pointer = BinaryPrimitives.ReadUInt64LittleEndian(row[at..]);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(pointer))
+            {
+                continue;
+            }
+
+            string value = _reader.ReadUnicodeString(pointer, LongestName).Trim();
+            if (LooksLikeAName(value) || LooksLikeAnId(value))
+            {
+                text.Append(" +0x").Append(at.ToString("X", System.Globalization.CultureInfo.InvariantCulture))
+                    .Append(" \"").Append(Cut(value)).Append('"');
+                quoted++;
+            }
+        }
+
+        text.Append("; ref");
+        int referenced = 0;
+        for (int at = 8; at + 8 <= RowHuntBytes && referenced < SurveyMost; at++)
+        {
+            ulong pointer = BinaryPrimitives.ReadUInt64LittleEndian(row[at..]);
+            if (pointer == firstRow || !RowId(pointer, out string id))
+            {
+                continue;
+            }
+
+            text.Append(" +0x").Append(at.ToString("X", System.Globalization.CultureInfo.InvariantCulture))
+                .Append("→\"").Append(Cut(id)).Append('"');
+            string name = RowText(pointer + (ulong)_displayedName, LongestName);
+            if (name.Length > 0)
+            {
+                text.Append("(\"").Append(Cut(name)).Append("\")");
+            }
+
+            referenced++;
+        }
+
+        return text.ToString();
+    }
+
+    private static string Cut(string value)
+        => value.Length <= SurveyCut ? value : string.Concat(value.AsSpan(0, SurveyCut - 1), "…");
 
     /// <summary>
     /// Whether this is a row with an id, and what it says: the id, and the name where the

@@ -113,6 +113,53 @@ public class PlayerSkillsTests
     }
 
     [Fact]
+    public void AGrantedEffectsRowIsSearchedForItsReference_AndASecondIdInItIsNotAName()
+    {
+        // What the third run in game showed: the row at the per-level field begins with an id,
+        // its ActiveSkill reference sits at neither column the witnesses name, and further in
+        // there is a second id-shaped string ("StormCloud" as "QuakeSlam"). The reference is
+        // found byte by byte, and the name it reaches - where the schema puts it - beats the
+        // string a hunt for a name would have settled for.
+        OffsetSchema schema = Schema();
+        PlayerSkills skills = Read(
+            schema,
+            new SkillTableFixture.Skill(
+                Spark, "spark", "Spark", SkillTableFixture.Route.GrantedEffectsRowWithColumnElsewhere));
+
+        Assert.Equal(1, skills.Named);
+        Assert.Equal("spark", skills.IdentityOf(Spark).Id);
+        Assert.Equal("Spark", skills.IdentityOf(Spark).Name);
+        Assert.Equal(Spark, skills.ByName("Spark"));
+
+        int perLevel = schema.Structs["ActiveSkillDetails"].OffsetOf("GrantedEffectsPerLevelDatRow");
+        Assert.Equal(
+            $"{Hex(perLevel)} granted row then {Hex(SkillTableFixture.ColumnElsewhereAt)}", skills.RouteNote);
+    }
+
+    [Fact]
+    public void TheSurveyQuotesWhatTheObjectAndItsRowLeadTo()
+    {
+        // The layout read off the screen: which of the object's pointers reach a row and what
+        // id it carries, then the strings in that row and the rows it refers to, each with its
+        // name where the schema puts it.
+        OffsetSchema schema = Schema();
+        PlayerSkills skills = Read(
+            schema,
+            new SkillTableFixture.Skill(
+                Spark, "spark", "Spark", SkillTableFixture.Route.GrantedEffectsRowWithColumnElsewhere));
+
+        string survey = skills.SurveyOf(Spark);
+
+        int perLevel = schema.Structs["ActiveSkillDetails"].OffsetOf("GrantedEffectsPerLevelDatRow");
+        Assert.StartsWith($"object: {Hex(perLevel)}→\"sparkPlayer\"", survey, StringComparison.Ordinal);
+        Assert.Contains($"row@{Hex(perLevel)}: str +0x0 \"sparkPlayer\" {Hex(SkillTableFixture.DecoyAt)} \"QuakeSlam\"", survey, StringComparison.Ordinal);
+        Assert.Contains($"ref {Hex(SkillTableFixture.ColumnElsewhereAt)}→\"spark\"(\"Spark\")", survey, StringComparison.Ordinal);
+
+        Assert.Same(survey, skills.SurveyOf(Spark));           // asked every tick, answered once
+        Assert.Equal(string.Empty, skills.SurveyOf(0));
+    }
+
+    [Fact]
     public void TheRowIsHuntedForWhenNeitherKnownPlaceHoldsIt()
     {
         // A row's fingerprint - a first field that reaches a plain id - is what a search of

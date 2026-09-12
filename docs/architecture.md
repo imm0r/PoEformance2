@@ -2393,10 +2393,17 @@ interesting part was not the feature:
     actually resolve a name through is GrantedEffectsPerLevel, then GrantedEffects, then its
     ActiveSkill column - on which the two disagree by eight bytes (dat-schema's widths compute
     0x4F, GameHelper2 reads 0x57). Every step is verified by the dat-row fingerprint (a first
-    field that reaches a plain id like "spark"), the direct field, the chain at either column
-    and a search of the object are tried in that order, and the readout names the route that
-    answered. The row is also the figure's key, because the actor's objects may not outlive an
-    area and a dat row does.
+    field that reaches a plain id like "spark"); the direct field, the per-level field and a
+    search of the object are tried in that order, each pointer read as whichever row it proves
+    to be, and the STRONGEST reading wins rather than the first - a name found where the schema
+    puts it is certain, a name hunted for in the row is provisional, an id alone is bare. That
+    ranking was bought in game too: the row at the per-level field began with an id and a hunt
+    for its name found a second id further in ("StormCloud" as "QuakeSlam"), which ended the
+    search before the row could be read as the GrantedEffects row it is. The readout names the
+    reading that answered, and a second row surveys the first slot's object and its row - every
+    string, every reference to a row with an id - so the layout can be read off the screen
+    instead of inferred from a refusal. The dat row is also the figure's key, because the actor's
+    objects may not outlive an area and a dat row does.
   - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
     the minimap lives under must never come back as a piece of interface — that would take the
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while
