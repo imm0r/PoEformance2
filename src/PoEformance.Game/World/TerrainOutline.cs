@@ -25,6 +25,19 @@ public sealed record OutlineMask(byte[] Cells, int Width, int Height, int Step, 
 }
 
 /// <summary>
+/// The walkable floor at a coarse step, ready to be drawn as a sheet under the outline.
+/// </summary>
+/// <param name="Coverage">One byte per pixel, 0 to 255: how much of the pixel is floor.</param>
+/// <param name="Source">
+/// Per pixel, the index - into a grid of this same width - of the coarse cell whose ground
+/// landed in it, or -1 where none did. NOT the pixel's own index: a cell is displaced by its
+/// height in the picture, and whoever asks whether the ground has been walked has to ask
+/// about where the ground is, not where the picture shows it. See TerrainOutline.Floor.
+/// </param>
+/// <param name="Step">Grid cells to a side of one pixel.</param>
+public sealed record FloorPlan(byte[] Coverage, int[] Source, int Width, int Height, int Step);
+
+/// <summary>
 /// Reduces a walkable grid to a drawable outline.
 /// </summary>
 /// <remarks>
@@ -108,35 +121,45 @@ public static class TerrainOutline
     }
 
     /// <summary>
-    /// How much of each of the outline's pixels is walkable floor, 0 to 255.
+    /// The walkable floor as a picture of its own, <paramref name="step"/> cells to a pixel.
     /// </summary>
     /// <remarks>
     /// The FILL under the line: the floor as a sheet, the way the game's own map draws the
-    /// parts it has revealed. On the same pixels as <paramref name="mask"/>, at the same step
-    /// and with the same height displacement, so the sheet ends exactly where the line is
-    /// drawn - built at a different resolution or a different height, it would peel away
-    /// from its own edge on every slope.
+    /// parts it has revealed. Displaced by height exactly as the line's cells are, so the
+    /// sheet ends where the line is drawn - at a different height it would peel away from
+    /// its own edge on every slope.
     ///
-    /// A COVERAGE rather than a flag, because a pixel at a thinning step of two holds four
-    /// cells and the edge of the floor runs through some of them. Counting gives those pixels
-    /// a proportionate alpha, which is the edge anti-aliased for nothing; a flag would give
-    /// them the full sheet and grow the floor by up to a pixel all round.
+    /// A COVERAGE rather than a flag, because a pixel holds several cells and the edge of the
+    /// floor runs through some of them. Counting gives those pixels a proportionate alpha,
+    /// which is the edge anti-aliased for nothing; a flag would give them the full sheet and
+    /// grow the floor by up to a pixel all round.
+    ///
+    /// And per pixel, WHERE THE GROUND CAME FROM: the coarse cell, at the same step, that the
+    /// cells landing in the pixel belong to. The fill retreats as the map is walked, and
+    /// "walked" is recorded against the ground's own position while the picture shows the
+    /// ground displaced by its height - on a hill those are tens of cells apart, and a hole
+    /// looked up at the picture's position would open beside the player rather than around
+    /// them. The first cell to land in a pixel names it; where cells of two heights share one,
+    /// that is a pixel's worth of error along a cliff, which nobody can see.
     ///
     /// Every walkable cell is visited, where the outline visits only the boundary, and the
     /// height lookup is the expensive part of a visit. Without sub-tile heights every cell of
     /// a tile has the tile's height, so it is looked up once per tile per row there and only
     /// per cell where the slope inside a tile is actually known. Once per area, on the render
-    /// thread, like the outline it belongs to.
+    /// thread, like the outline.
     /// </remarks>
-    public static byte[] Fill(TerrainGrid grid, OutlineMask mask, bool isoHeightShift)
+    public static FloorPlan Floor(TerrainGrid grid, int step, bool isoHeightShift)
     {
         ArgumentNullException.ThrowIfNull(grid);
-        ArgumentNullException.ThrowIfNull(mask);
+        ArgumentOutOfRangeException.ThrowIfLessThan(step, 1);
 
-        int step = mask.Step;
-        int width = mask.Width;
-        int height = mask.Height;
+        // Rounded UP, unlike the outline's thinning: the last partial column of cells is
+        // floor too, and a sheet that stopped a few cells short of the wall would show it.
+        int width = Math.Max(1, (grid.Width + step - 1) / step);
+        int height = Math.Max(1, (grid.Height + step - 1) / step);
         var counts = new ushort[width * height];
+        var source = new int[width * height];
+        Array.Fill(source, -1);
 
         bool perCell = isoHeightShift && grid.HasSubTileHeights;
         bool perTile = isoHeightShift && !perCell && grid.HasHeights;
@@ -145,6 +168,7 @@ public static class TerrainOutline
         {
             int shift = 0;
             int tileEnd = -1;
+            int fromRow = (y / step) * width;
             for (int x = 0; x < grid.Width; x++)
             {
                 if (!grid.IsWalkable(x, y))
@@ -173,9 +197,20 @@ public static class TerrainOutline
 
                 int bx = sx / step;
                 int by = sy / step;
-                if (bx < width && by < height)
+                if (bx >= width || by >= height)
                 {
-                    counts[(by * width) + bx]++;
+                    continue;
+                }
+
+                int at = (by * width) + bx;
+                if (counts[at] != ushort.MaxValue)
+                {
+                    counts[at]++;
+                }
+
+                if (source[at] < 0)
+                {
+                    source[at] = fromRow + (x / step);
                 }
             }
         }
@@ -193,7 +228,7 @@ public static class TerrainOutline
             }
         }
 
-        return coverage;
+        return new FloorPlan(coverage, source, width, height, step);
     }
 
     /// <summary>

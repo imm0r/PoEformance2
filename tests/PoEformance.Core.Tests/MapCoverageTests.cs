@@ -573,4 +573,61 @@ public class StillToWalkTests
         Assert.False(coverage.StillToWalk(int.MaxValue, 5));
         Assert.False(coverage.StillToWalk(5, int.MaxValue));
     }
+
+    [Fact]
+    public void WhatHasBeenSeenIsSaidSo_AndEveryChangeCounts()
+    {
+        // The floor fill asks two things of the coverage: whether a cell has been looked at -
+        // reachable or not, because the fill covers every walkable cell and has to retreat
+        // from every one passed - and whether anything changed since it last drew, without
+        // walking the grid each frame to find out.
+        var coverage = new MapCoverage(MapCoverage.Immediate);
+        TerrainGrid grid = Everything(400, 200);
+        int before = coverage.Version;
+
+        coverage.Look(At(grid, 20, 100));
+        int arrived = coverage.Version;
+        Assert.NotEqual(before, arrived);
+
+        // Underfoot and out to the edge of the disc: seen. Just past it: not yet.
+        int cx = 20 / MapCoverage.CoarseStep;
+        int cy = 100 / MapCoverage.CoarseStep;
+        Assert.True(coverage.Seen(cx, cy));
+        Assert.True(coverage.Seen(cx + MapCoverage.SeeRadius, cy));
+        Assert.False(coverage.Seen(cx + MapCoverage.SeeRadius + 2, cy));
+
+        // Standing still changes nothing, and says so - a picture need not be rebuilt for it.
+        coverage.Look(At(grid, 20, 100));
+        Assert.Equal(arrived, coverage.Version);
+
+        // A few steps forward does both.
+        coverage.Look(At(grid, 20 + (4 * MapCoverage.CoarseStep), 100));
+        Assert.NotEqual(arrived, coverage.Version);
+        Assert.True(coverage.Seen(cx + MapCoverage.SeeRadius + 2, cy));
+
+        // Outside the grid is not seen, and not an error.
+        Assert.False(coverage.Seen(-1, cy));
+        Assert.False(coverage.Seen(cx, int.MaxValue));
+    }
+
+    [Fact]
+    public void TheCoverageSaysWhichGridItIsMeasuring()
+    {
+        // Between areas the coverage may still hold the last one, and a hole cut from another
+        // map's walk is worse than no hole - so whoever draws from it asks first.
+        var coverage = new MapCoverage(MapCoverage.Immediate);
+        TerrainGrid grid = Everything(400, 200);
+        Assert.False(coverage.Fits(grid));
+
+        coverage.Look(At(grid, 20, 100));
+        Assert.True(coverage.Fits(grid));
+        Assert.False(coverage.Fits(Everything(200, 200)));
+
+        // A new area is a change too, before a single step is taken in it.
+        int before = coverage.Version;
+        coverage.Look(At(Everything(200, 200), 100, 100, area: 2));
+        Assert.NotEqual(before, coverage.Version);
+        Assert.True(coverage.Fits(Everything(200, 200)));
+        Assert.False(coverage.Fits(grid));
+    }
 }
