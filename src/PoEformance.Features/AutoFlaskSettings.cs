@@ -9,13 +9,21 @@ namespace PoEformance.Features;
 /// <param name="Vital">Which pool its threshold watches.</param>
 /// <param name="ThresholdPercent">Fires at or below this fill level of the USABLE pool.</param>
 /// <param name="TriggerBuff">Fire on this buff or debuff instead of a threshold, if set.</param>
+/// <param name="SkipWhileActive">
+/// Hold off while this flask's own effect is still running.
+/// </param>
+/// <param name="EmergencyPercent">
+/// Fire anyway at or below this fill level, even while the effect is running. 0 is off.
+/// </param>
 public sealed record FlaskSlotSettings(
     [property: JsonPropertyName("slot")] int Slot,
     [property: JsonPropertyName("enabled")] bool Enabled,
     [property: JsonPropertyName("vital")] VitalKind Vital,
     [property: JsonPropertyName("thresholdPercent")] int ThresholdPercent,
     [property: JsonPropertyName("cooldownMs")] int CooldownMs = 1500,
-    [property: JsonPropertyName("triggerBuff")] string TriggerBuff = "");
+    [property: JsonPropertyName("triggerBuff")] string TriggerBuff = "",
+    [property: JsonPropertyName("skipWhileActive")] bool SkipWhileActive = true,
+    [property: JsonPropertyName("emergencyPercent")] int EmergencyPercent = 0);
 
 /// <summary>Everything the user can decide about auto-flask.</summary>
 /// <remarks>
@@ -75,6 +83,12 @@ public sealed record AutoFlaskSettings(
                 // for the rest of the session.
                 CooldownMs = Math.Clamp(source.CooldownMs, 0, 60_000),
                 TriggerBuff = source.TriggerBuff ?? string.Empty,
+
+                // 0 means off, so the range starts there rather than at 1. NOT clamped to sit
+                // under the threshold, even though a value above it makes the skip moot: that
+                // is a coherent way to say "never hold off on this slot", and silently moving
+                // a number somebody typed is worse than letting it mean what it says.
+                EmergencyPercent = Math.Clamp(source.EmergencyPercent, 0, 100),
             });
         }
 
@@ -116,6 +130,8 @@ public sealed record AutoFlaskSettings(
                 Enabled = slot.Enabled && key != 0,
                 Slot = slot.Slot,
                 TriggerBuff = slot.TriggerBuff,
+                SkipWhileActive = slot.SkipWhileActive,
+                EmergencyPercent = slot.EmergencyPercent,
             });
         }
 

@@ -20,6 +20,12 @@ public sealed record ConfigRequest(
 /// Charms sit in the same belt but the game triggers them itself, so a rule on that slot
 /// could never do anything. The page says so rather than letting one be armed silently.
 /// </param>
+/// <param name="CooldownMs">
+/// Carried even though the page does not edit it, and that is load-bearing: the page posts
+/// the whole slot back on every change, so a setting missing from this view is a setting that
+/// comes back from deserialisation as its default. It used to be missing, and a cooldown
+/// hand-edited into the file was silently reset by ticking any box on the page.
+/// </param>
 public sealed record FlaskSlotView(
     [property: JsonPropertyName("slot")] int Slot,
     [property: JsonPropertyName("enabled")] bool Enabled,
@@ -28,7 +34,11 @@ public sealed record FlaskSlotView(
     [property: JsonPropertyName("key")] string Key,
     [property: JsonPropertyName("item")] string Item,
     [property: JsonPropertyName("charges")] string Charges,
-    [property: JsonPropertyName("isCharm")] bool IsCharm);
+    [property: JsonPropertyName("isCharm")] bool IsCharm,
+    [property: JsonPropertyName("cooldownMs")] int CooldownMs = 1500,
+    [property: JsonPropertyName("triggerBuff")] string TriggerBuff = "",
+    [property: JsonPropertyName("skipWhileActive")] bool SkipWhileActive = true,
+    [property: JsonPropertyName("emergencyPercent")] int EmergencyPercent = 0);
 
 /// <summary>The auto-flask panel: the master switch, the slots, and why nothing fired.</summary>
 /// <param name="KeySource">
