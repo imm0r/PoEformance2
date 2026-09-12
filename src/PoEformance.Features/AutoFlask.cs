@@ -47,8 +47,35 @@ public sealed record FlaskRule(
     /// The real charge saver. A cooldown is a guess at the duration; the buff is the fact,
     /// and duration varies with the flask's modifiers. Only meaningful with a
     /// <see cref="Slot"/>.
+    ///
+    /// SWITCHABLE, because the premise underneath it - buff running means recovery running -
+    /// is a property of ordinary flasks rather than a law. A flask carrying
+    /// "Effect is not removed when Unreserved Mana is Filled" keeps its buff long after the
+    /// recovery has finished, so for that slot an active buff says nothing about whether the
+    /// flask is doing anything, and holding off on it is a lockout bought for nothing.
     /// </remarks>
     public bool SkipWhileActive { get; init; } = true;
+
+    /// <summary>
+    /// Fire at or below this fill level even while the effect is running. 0 is off.
+    /// </summary>
+    /// <remarks>
+    /// THE FLOOR UNDER THE CHARGE SAVING, and it exists because
+    /// <see cref="SkipWhileActive"/> can be right about the flask and still wrong about the
+    /// situation: a pool falling faster than the flask refills it is exactly when the skip
+    /// holds hardest and exactly when holding off is worst. On a build where mana IS the
+    /// effective life pool, that window is lethal rather than inconvenient.
+    ///
+    /// Overrides the ACTIVE-BUFF gate alone. Not the cooldown - which is what stops a belt
+    /// draining in a second - and not the charge check, since the game ignores a press it
+    /// has no charges for. Narrow on purpose: an emergency is a reason to skip one guard,
+    /// not to remove the rest.
+    ///
+    /// Threshold-triggered rules only. A rule that fires on a debuff has no reading to
+    /// compare against, and the "no reading" sentinel would otherwise clear this gate every
+    /// single time.
+    /// </remarks>
+    public int EmergencyPercent { get; init; }
 
     /// <summary>
     /// Fire when a buff or debuff whose name contains this is present, instead of on a
@@ -63,7 +90,13 @@ public sealed record FlaskRule(
 }
 
 /// <summary>A flask the engine decided to use, and the reading that triggered it.</summary>
-public sealed record FlaskUse(FlaskRule Rule, int Percent);
+/// <param name="Emergency">
+/// Whether it fired THROUGH the active-effect gate rather than with it open. Worth carrying
+/// to the status line: "it fired" and "it fired because the pool was low enough to override
+/// the hold-off" are different events, and only the second one says the emergency threshold
+/// is earning its place.
+/// </param>
+public sealed record FlaskUse(FlaskRule Rule, int Percent, bool Emergency = false);
 
 /// <summary>What the engine did on one tick, including why it did nothing.</summary>
 /// <param name="Reason">
@@ -237,8 +270,18 @@ public sealed class AutoFlask
                 }
             }
 
-            // The flask is already doing its job - a charge spent here buys nothing.
-            if (rule.SkipWhileActive && rule.Slot > 0 && buffs.IsFlaskActive(rule.Slot))
+            // Low enough that holding off is the bigger risk - see FlaskRule.EmergencyPercent.
+            // Guarded on a real reading: a buff-triggered rule carries -1, which would clear
+            // every emergency gate there is.
+            bool emergency = percent >= 0
+                && rule.EmergencyPercent > 0
+                && percent <= rule.EmergencyPercent;
+
+            // The flask is already doing its job - a charge spent here buys nothing. Which
+            // holds for an ordinary flask and is an assumption rather than a fact: the
+            // emergency threshold is the way out when the pool is falling anyway, and
+            // SkipWhileActive the way out when the buff never meant recovery to begin with.
+            if (rule.SkipWhileActive && !emergency && rule.Slot > 0 && buffs.IsFlaskActive(rule.Slot))
             {
                 blocked.Add($"{rule.Name}: already active");
                 continue;
@@ -275,13 +318,17 @@ public sealed class AutoFlask
             }
 
             _lastUsed[rule.Name] = nowMs;
-            used.Add(new FlaskUse(rule, percent));
+            used.Add(new FlaskUse(rule, percent, emergency));
         }
 
         if (used.Count > 0)
         {
             return new FlaskTick(used, string.Join(", ", used.Select(u =>
-                u.Percent < 0 ? $"{u.Rule.Name} (buff)" : $"{u.Rule.Name} at {u.Percent}%")));
+                u.Percent < 0
+                    ? $"{u.Rule.Name} (buff)"
+                    : u.Emergency
+                        ? $"{u.Rule.Name} at {u.Percent}% (emergency)"
+                        : $"{u.Rule.Name} at {u.Percent}%")));
         }
 
         return new FlaskTick([], blocked.Count > 0 ? string.Join(", ", blocked) : Describe(pools));

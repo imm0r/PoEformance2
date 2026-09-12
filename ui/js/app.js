@@ -188,6 +188,11 @@ function renderFlasks(af) {
     tr.appendChild(cell(equipped(slot)));
     tr.appendChild(cell(vitalPicker(slot, locked)));
     tr.appendChild(cell(thresholdInput(slot, locked)));
+    tr.appendChild(cell(checkbox(
+      slot.skipWhileActive !== false,
+      locked,
+      (on) => update(slot.slot, { skipWhileActive: on }))));
+    tr.appendChild(cell(emergencyInput(slot, locked)));
     tr.appendChild(cell(keyLabel(slot)));
     rows.appendChild(tr);
   }
@@ -249,6 +254,27 @@ function thresholdInput(slot, disabled) {
   return input;
 }
 
+/**
+ * The fill level below which the hold-off is overridden. 0 is off.
+ *
+ * Starts at 0 rather than 1, unlike the threshold above it, because "off" has to be
+ * expressible - this is a guard somebody opts into, not one they tune down to nothing.
+ */
+function emergencyInput(slot, disabled) {
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = 0;
+  input.max = 100;
+  input.value = slot.emergencyPercent ?? 0;
+  input.disabled = disabled;
+  input.title = "0 is off. Fires even while the flask's own effect is still running.";
+  // On "change" for the same reason the threshold is: a half-typed "1" on the way to "15"
+  // would otherwise be saved as a real emergency level.
+  input.addEventListener("change", () =>
+    update(slot.slot, { emergencyPercent: Number(input.value) }));
+  return input;
+}
+
 function keyLabel(slot) {
   if (slot.isCharm) return text("self-triggering", "af-empty");
   if (slot.key === "unbound") return text("unbound", "bad");
@@ -264,7 +290,16 @@ function update(slot, change) {
   });
 }
 
-/** Posts settings to the host, stripped down to what the settings record actually holds. */
+/**
+ * Posts settings to the host, as the settings record actually holds them.
+ *
+ * EVERY FIELD, and that is a fix rather than a style. This used to send four of them, so a
+ * value the page has no control over - the per-slot cooldown, a trigger buff, and now the
+ * hold-off and its emergency level - was absent from the payload and came back out of
+ * deserialisation as its DEFAULT. Hand-edit a cooldown in the file, tick any box on this
+ * page, and the cooldown was silently gone. Sending a field the page does not edit costs
+ * nothing; dropping one costs whatever somebody typed into the file.
+ */
 function send(af) {
   bridge.send({
     type: "setFlaskSettings",
@@ -275,6 +310,10 @@ function send(af) {
         enabled: s.enabled,
         vital: s.vital,
         thresholdPercent: s.thresholdPercent,
+        cooldownMs: s.cooldownMs,
+        triggerBuff: s.triggerBuff,
+        skipWhileActive: s.skipWhileActive,
+        emergencyPercent: s.emergencyPercent,
       })),
     },
   });

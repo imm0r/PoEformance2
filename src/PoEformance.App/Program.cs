@@ -3231,7 +3231,14 @@ internal static class Program
                 Charges: equipped is { } charges
                     ? $"{charges.Charges}/{charges.MaxCharges} - {charges.ChargesPerUse} per use"
                     : string.Empty,
-                IsCharm: equipped?.IsCharm ?? false));
+                IsCharm: equipped?.IsCharm ?? false,
+
+                // Passed through so the page can post them back untouched - see the view's
+                // own note on why a missing field is a setting that quietly resets.
+                CooldownMs: slot.CooldownMs,
+                TriggerBuff: slot.TriggerBuff,
+                SkipWhileActive: slot.SkipWhileActive,
+                EmergencyPercent: slot.EmergencyPercent));
         }
 
         return new PoEformance.Config.AutoFlaskView(

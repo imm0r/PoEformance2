@@ -354,4 +354,113 @@ public class AutoFlaskTests
         // Both still count as belt contents - their charges are worth knowing either way.
         Assert.True(FlaskBeltReader.IsFlask("Metadata/Items/Flasks/FourCharm6"));
     }
+
+
+    // ── the hold-off, and the ways out of it ─────────────────────────────────────
+
+    [Fact]
+    public void TheHoldOffCanBeSwitchedOffPerSlot()
+    {
+        // It used to be hard-coded on, and the premise underneath it - buff running means
+        // recovery running - is a property of ordinary flasks rather than a law. A flask
+        // carrying "Effect is not removed when Unreserved Mana is Filled" keeps its buff long
+        // after it has stopped refilling anything, and holding off on that is a lockout
+        // bought for nothing.
+        var held = new FlaskRule("mana", VitalKind.Mana, 50, Key: 0x32, CooldownMs: 0) { Slot = 2 };
+        var free = held with { SkipWhileActive = false };
+
+        Vitals low = Pools(mana: 20);
+
+        Assert.Empty(Engine(held).Evaluate(low, true, 1_000, FlaskBuff(2)).Used);
+        Assert.Single(Engine(free).Evaluate(low, true, 1_000, FlaskBuff(2)).Used);
+    }
+
+    [Fact]
+    public void TheEmergencyLevelFiresThroughTheHoldOff()
+    {
+        // The floor under the charge saving. The skip can be right about the flask and still
+        // wrong about the situation: a pool falling faster than the flask refills it is
+        // exactly when the hold-off bites hardest.
+        var rule = new FlaskRule("mana", VitalKind.Mana, 50, Key: 0x32, CooldownMs: 0)
+        {
+            Slot = 2,
+            EmergencyPercent = 25,
+        };
+
+        AutoFlask engine = Engine(rule);
+
+        // Under the threshold but above the emergency: the hold-off still wins, which is the
+        // charge saving doing its job.
+        Assert.Empty(engine.Evaluate(Pools(mana: 40), true, 1_000, FlaskBuff(2)).Used);
+
+        // At or below it, the flask goes out despite its own effect running.
+        FlaskTick fired = engine.Evaluate(Pools(mana: 25), true, 2_000, FlaskBuff(2));
+        FlaskUse use = Assert.Single(fired.Used);
+        Assert.True(use.Emergency);
+
+        // And the status line says WHICH of the two happened - "it fired" and "it fired
+        // through the hold-off" want different reactions.
+        Assert.Contains("emergency", fired.Reason, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheEmergencyLevelOverridesTheHoldOffAndNothingElse()
+    {
+        // Narrow on purpose. An emergency is a reason to skip one guard, not to remove the
+        // rest: the cooldown is what stops a belt draining in a second, and a press the game
+        // has no charges for does nothing anyway.
+        var rule = new FlaskRule("mana", VitalKind.Mana, 50, Key: 0x32, CooldownMs: 5_000)
+        {
+            Slot = 2,
+            EmergencyPercent = 40,
+        };
+
+        AutoFlask engine = Engine(rule);
+        Vitals dire = Pools(mana: 5);
+
+        Assert.Single(engine.Evaluate(dire, true, 1_000, FlaskBuff(2)).Used);
+
+        // Still cooling down, emergency or not.
+        Assert.Empty(engine.Evaluate(dire, true, 2_000, FlaskBuff(2)).Used);
+
+        // And no charges is still no charges.
+        FlaskBelt dry = Belt(new EquippedFlask(2, "Metadata/Items/Flasks/X", Charges: 1, ChargesPerUse: 10));
+        Assert.Empty(engine.Evaluate(dire, true, 9_000, FlaskBuff(2), dry).Used);
+    }
+
+    [Fact]
+    public void ABuffTriggeredRuleIsNeverTreatedAsAnEmergency()
+    {
+        // The trap under this feature. A buff-triggered rule carries -1 for "no reading", and
+        // a naive "percent <= emergency" reads -1 as lower than anything - so every such rule
+        // would clear the hold-off on every tick, for a pool nobody measured.
+        var rule = new FlaskRule("bleed", VitalKind.Life, 100, Key: 0x33, CooldownMs: 0)
+        {
+            Slot = 3,
+            TriggerBuff = "bleeding",
+            EmergencyPercent = 20,
+        };
+
+        var bleeding = new ActiveBuffs(
+        [
+            new ActiveBuff("bleeding", 5f, 5f, 0, 0, IsFlask: false),
+            new ActiveBuff("flask_effect_life", 4f, 5f, 0, 3, IsFlask: true),
+        ]);
+
+        FlaskTick tick = Engine(rule).Evaluate(Pools(), true, 1_000, bleeding);
+
+        Assert.Empty(tick.Used);
+        Assert.Contains("already active", tick.Reason, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AnEmergencyOfZeroIsOff()
+    {
+        // 0 has to mean off rather than "at or below zero", which nothing ever reaches but
+        // which would read as a configured guard.
+        var rule = new FlaskRule("mana", VitalKind.Mana, 50, Key: 0x32, CooldownMs: 0) { Slot = 2 };
+
+        Assert.Equal(0, rule.EmergencyPercent);
+        Assert.Empty(Engine(rule).Evaluate(Pools(mana: 1), true, 1_000, FlaskBuff(2)).Used);
+    }
 }

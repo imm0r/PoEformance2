@@ -61,7 +61,10 @@
       <table id="af-slots">
         <thead>
           <tr>
-            <th>On</th><th>Slot</th><th>Equipped</th><th>Watches</th><th>Below</th><th>Key</th>
+            <th>On</th><th>Slot</th><th>Equipped</th><th>Watches</th><th>Below</th>
+            <th title="Hold off while this flask's own effect is still running. Switch it off for a flask whose effect outlasts its recovery - one carrying &quot;Effect is not removed when Unreserved Mana is Filled&quot; keeps the buff long after it has stopped refilling anything, and the hold-off then buys nothing.">Wait</th>
+            <th title="Fire anyway at or below this fill level, even while the effect is running. 0 is off. The floor under the charge saving: a pool falling faster than the flask refills it is exactly when the hold-off bites hardest and exactly when it is most dangerous. Overrides only the hold-off - never the cooldown.">Emergency</th>
+            <th>Key</th>
           </tr>
         </thead>
         <tbody id="af-rows"></tbody>
