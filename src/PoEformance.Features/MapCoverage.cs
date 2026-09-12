@@ -120,6 +120,17 @@ public sealed class MapCoverage
 
     private int _version;
 
+    /// <summary>
+    /// What the last change of area did: resumed, or started fresh and why.
+    /// </summary>
+    /// <remarks>
+    /// For the readout, after a map came back from a town visit with its walk forgotten.
+    /// There are three ways a resume can fail - the hash is new, the area was evicted, or the
+    /// grid does not fit the one remembered - and from the screen they are the same thing. This
+    /// says which, with both sizes when it is the fit.
+    /// </remarks>
+    public string LastSwitch { get; private set; } = string.Empty;
+
     /// <summary>Whether the reachable region has been worked out yet.</summary>
     /// <remarks>
     /// Worth saying out loud, because the percentage means something different before and
@@ -184,9 +195,19 @@ public sealed class MapCoverage
 
         if (_remembered.TryGetValue(hash, out Area? known) && known.Fits(grid))
         {
+            // The grid on offer is the newer read of the same area, and may know its tile
+            // counts where the first one did not - see Fits. Kept, so the walkability asked
+            // of it from here on is the trimmed one.
+            known.Adopt(grid);
+            LastSwitch = $"resumed 0x{hash:X8} with {known.Seen} cells seen";
             _here = known;
             return known;
         }
+
+        LastSwitch = known is null
+            ? $"fresh 0x{hash:X8}, never here before"
+            : $"fresh 0x{hash:X8}: remembered {known.Width}x{known.Height} coarse, this grid is"
+              + $" {grid.StoredWidth / CoarseStep}x{grid.StoredHeight / CoarseStep}";
 
         var fresh = new Area(hash, grid);
         _remembered[hash] = fresh;
@@ -207,7 +228,7 @@ public sealed class MapCoverage
     /// <summary>One area's visited map and the region it is measured against.</summary>
     private sealed class Area
     {
-        private readonly TerrainGrid _grid;
+        private TerrainGrid _grid;
         private readonly bool[] _seen;
         private readonly int _width;
         private readonly int _height;
@@ -232,8 +253,17 @@ public sealed class MapCoverage
         {
             Hash = hash;
             _grid = grid;
-            _width = Math.Max(1, grid.Width / CoarseStep);
-            _height = Math.Max(1, grid.Height / CoarseStep);
+
+            // Laid out over the BUFFER the game holds, padding included, not over the width
+            // trimmed to the tile counts. The buffer is the same every time the area is read;
+            // the trimmed width is not - the terrain is read once per area, that read can land
+            // before the game has written the tile counts, and the next read after a trip to
+            // town then comes back a strip narrower. A layout that followed the trim could not
+            // be resumed across that, and a map came back from town with its walk forgotten.
+            // The padding cells are never walkable (see TerrainGrid.IsWalkable), so they cost
+            // a few empty columns and count for nothing.
+            _width = Math.Max(1, grid.StoredWidth / CoarseStep);
+            _height = Math.Max(1, grid.StoredHeight / CoarseStep);
             _seen = new bool[_width * _height];
 
             for (int y = 0; y < _height; y++)
@@ -273,9 +303,18 @@ public sealed class MapCoverage
         internal bool WasSeen(int x, int y)
             => (uint)x < (uint)_width && (uint)y < (uint)_height && _seen[(y * _width) + x];
 
-        /// <summary>Whether this belongs to the grid on offer - a size change means a new area.</summary>
+        /// <summary>
+        /// Whether this belongs to the grid on offer - a change of BUFFER size means a new area.
+        /// </summary>
+        /// <remarks>
+        /// The buffer's size and not the trimmed width, for the reason given at the constructor:
+        /// the same area reads back with the same buffer and not always with the same trim.
+        /// </remarks>
         internal bool Fits(TerrainGrid grid)
-            => grid.Width / CoarseStep == _width && grid.Height / CoarseStep == _height;
+            => grid.StoredWidth / CoarseStep == _width && grid.StoredHeight / CoarseStep == _height;
+
+        /// <summary>Takes the newer read of the same area, so later questions go to it.</summary>
+        internal void Adopt(TerrainGrid grid) => _grid = grid;
 
         /// <summary>
         /// Cells of the region that have been seen.
