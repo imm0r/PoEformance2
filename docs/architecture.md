@@ -2397,13 +2397,16 @@ interesting part was not the feature:
     search of the object are tried in that order, each pointer read as whichever row it proves
     to be, and the STRONGEST reading wins rather than the first - a name found where the schema
     puts it is certain, a name hunted for in the row is provisional, an id alone is bare. That
-    ranking was bought in game too: the row at the per-level field began with an id and a hunt
-    for its name found a second id further in ("StormCloud" as "QuakeSlam"), which ended the
-    search before the row could be read as the GrantedEffects row it is. The readout names the
-    reading that answered, and a second row surveys the first slot's object and its row - every
-    string, every reference to a row with an id - so the layout can be read off the screen
-    instead of inferred from a refusal. The dat row is also the figure's key, because the actor's
-    objects may not outlive an area and a dat row does.
+    ranking was bought in game too: the pointer at the references' per-level field (+0x48) led
+    to a row that began with an id, a hunt for its name found a second id further in
+    ("StormCloud" as "QuakeSlam"), and that reading ended the search sixteen bytes short of the
+    per-level row, which 0.5.5 had moved to +0x58 - where the search found it once weaker
+    readings stopped ending it, and where the schema now puts it, with what +0x48 holds instead
+    recorded beside it. The readout names the reading that answered, and a second row surveys
+    the first slot's object and its row - every string, every reference to a row with an id -
+    so the layout can be read off the screen instead of inferred from a refusal. The dat row is
+    also the figure's key, because the actor's objects may not outlive an area and a dat row
+    does.
   - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
     the minimap lives under must never come back as a piece of interface — that would take the
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while

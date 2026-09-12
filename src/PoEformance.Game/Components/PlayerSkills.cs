@@ -35,24 +35,27 @@ public readonly record struct SkillIdentity(ulong Key, string Id, string Name)
 /// and the AHK tool's ReadPlayerSkills both walk it) and which the schema records proven in
 /// place by content: 42 entries, 10/10 valid detail pointers.
 ///
-/// THE NAME IS IN A DAT ROW, and reaching the row is the part that needed settling - twice.
-/// Both references name a direct pointer to the ActiveSkills.dat row on the skill object and
-/// neither USES it; in game (0.5.5, 2026-09-12) it reached a row for none of 49 skills. What
-/// both resolve a name through is the GrantedEffectsPerLevel row on the object, whose first
-/// column is the GrantedEffects row, whose ActiveSkill column is the ActiveSkills row - and
-/// the second run in game found the pointer at that place leading to a row that BEGINS WITH AN
-/// ID, which a per-level row does not: so it is a GrantedEffects row (or the ActiveSkills row
-/// itself), one hop shorter than the references say. Hence <see cref="Resolve"/>, which reads a
-/// pointer as whichever of the three rows it proves to be, from the most telling reading to the
-/// least: an ActiveSkills row with its name, a GrantedEffects row whose ActiveSkill column
+/// THE NAME IS IN A DAT ROW, and reaching the row is the part that needed settling - over four
+/// runs in game (0.5.5, 2026-09-12). Both references name a direct pointer to the
+/// ActiveSkills.dat row on the skill object and neither USES it; in game it reached a row for
+/// none of 49 skills. What both resolve a name through is the GrantedEffectsPerLevel row on the
+/// object, whose first column is the GrantedEffects row, whose ActiveSkill column is the
+/// ActiveSkills row - and where the references had that field (+0x48) the game now keeps a
+/// pointer to a DIFFERENT id-first row ("StormCloud"), which passed the fingerprint for a row
+/// of the skill's, and a second id in it for the skill's name, until readings were ranked; the
+/// per-level row had moved to +0x58, where the search of the object found it and where the
+/// schema now puts it (its comment carries the evidence). Hence <see cref="ReadingOf"/>, which
+/// reads a pointer as whichever of the three rows it proves to be, from the most telling reading
+/// to the least: an ActiveSkills row with its name, a GrantedEffects row whose ActiveSkill column
 /// reaches one (at either of the two columns the witnesses disagree on - dat-schema's widths
-/// compute 0x4F, GameHelper2 reads 0x57), a per-level row whose GrantedEffect does, and last
-/// an ActiveSkills row without a name. EVERY STEP IS VERIFIED BY CONTENT: a dat row's first
-/// field is a pointer to its id string - the rule <c>ItemReader</c> and <c>ActionReader</c>
-/// already rest on - so a pointer is a row only when that first field reaches a short plain
-/// identifier. The direct field, the per-level field and then any pointer in the object's
-/// first 0x100 bytes are tried in that order, and the reading that answered is reported, so
-/// the next drift names itself in the readout instead of reading as a panel nobody opened.
+/// compute 0x4F, GameHelper2 reads 0x57 - or, failing both, wherever in the row a reference to
+/// one sits), a per-level row whose GrantedEffect does, and last an ActiveSkills row without a
+/// name. EVERY STEP IS VERIFIED BY CONTENT: a dat row's first field is a pointer to its id
+/// string - the rule <c>ItemReader</c> and <c>ActionReader</c> already rest on - so a pointer is
+/// a row only when that first field reaches a short plain identifier. The direct field, the
+/// per-level field and then any pointer in the object's first 0x100 bytes are tried in that
+/// order, and the reading that answered is reported, so the next drift names itself in the
+/// readout instead of reading as a panel nobody opened.
 ///
 /// THE KEY IS THE DAT ROW, NOT THE OBJECT, where it was reached: the skill objects are the
 /// actor's, and whether they outlive an area change is not established, while a dat row is the
@@ -323,9 +326,10 @@ public sealed class PlayerSkills
     /// the object are read, and a reading that found the name where the schema puts it ends
     /// the search, while a weaker one - a name hunted for in the row, or an id alone - is kept
     /// only until something better turns up. The third run in game is why: the row at the
-    /// per-level field begins with an id, and a hunt for its name found another id further in
-    /// ("StormCloud" as "QuakeSlam"), which was taken for a name and ended the search before
-    /// the row could be read as the GrantedEffects row it is.
+    /// references' per-level field (+0x48) begins with an id, and a hunt for its name found
+    /// another id further in ("StormCloud" as "QuakeSlam"), which was taken for a name and
+    /// ended the search sixteen bytes short of the per-level row, which 0.5.5 had moved to
+    /// +0x58. The schema carries the new place now; the search stays for the next move.
     /// </remarks>
     private SkillIdentity Identify(ulong details)
     {

@@ -18,21 +18,37 @@ namespace PoEformance.Overlay;
 /// until the panel is opened again. Written short (54k rather than 53.838), because an icon is
 /// sixty pixels wide and a glance is all it gets.
 ///
-/// AT THE FOOT OF THE ICON, inside it, where it collides with neither the mouse glyphs the game
-/// draws above the top row nor the key labels it draws below the bottom one. The plate and the
-/// figures face are the flask figure's, and for its reasons.
+/// IN THE ICON'S TOP-RIGHT CORNER, inside it, as a badge. The first build set it at the foot,
+/// centred, to keep clear of the mouse glyphs the game draws above the top row and the key
+/// labels it draws below the bottom one - but both of those sit OUTSIDE the icon, so nothing
+/// inside it is contested, and after a look in game the corner was preferred: it leaves the
+/// icon's picture readable under it and reads as a count does elsewhere in the interface. The
+/// plate and the figures face are the flask figure's, and for its reasons.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class SkillDpsLayer
 {
-    /// <summary>How tall the figure's line is, as a share of the icon's height.</summary>
-    private const float FigureShare = 0.3f;
+    /// <summary>How tall the figure's line is, as a share of the icon's height - the flask figure's share.</summary>
+    /// <remarks>
+    /// Three tenths read too small in game beside the flask figure, which is four tenths of its
+    /// slot; the same four tenths here puts a three-glyph figure ("77k") at the flask digit's
+    /// size. A skill icon is square, though, and a four-glyph figure ("538k", "1.2M") at this
+    /// height would run past the icon's left edge into the neighbour's corner, so the width caps
+    /// what the share asks for - see <see cref="Draw"/>. The style's scale multiplies the share,
+    /// up to that same cap.
+    /// </remarks>
+    private const float FigureShare = 0.4f;
 
     /// <summary>Smallest the figure is drawn, whatever the icon and the scale come to.</summary>
     private const float SmallestFigure = 9f;
 
-    /// <summary>How far the figure's ink stands off the icon's bottom edge, as a share of its size.</summary>
-    private const float Inset = 0.35f;
+    /// <summary>
+    /// How far the figure's ink stands off the icon's right and top edges, as shares of its
+    /// size - each the plate's own reach that way plus the same clearance, so the plate sits an
+    /// even distance inside the corner.
+    /// </summary>
+    private const float InsetBeside = 0.34f;
+    private const float InsetAbove = 0.26f;
 
     /// <summary>How far the plate reaches beyond the ink, as shares of the figure's size.</summary>
     private const float PlateBeside = 0.22f;
@@ -87,19 +103,27 @@ public sealed class SkillDpsLayer
             }
 
             string text = ShortFigure.Format(figure);
+            float widePerSize = ImGui.CalcTextSize(text).X / natural;
+
+            // As tall as the share says and no wider than the icon allows: the ink stands off
+            // the right edge by its inset, and the same clearance is kept from the left edge,
+            // so a figure that would not fit between the two is drawn smaller rather than over
+            // the neighbouring icon's corner. "77k" comes out at the share; "538k" a shade under.
             float size = MathF.Max(
                 SmallestFigure,
-                Style.Sized(StyleCatalogue.Keys.SkillDps, slot.Where.Height * FigureShare));
+                MathF.Min(
+                    Style.Sized(StyleCatalogue.Keys.SkillDps, slot.Where.Height * FigureShare),
+                    slot.Where.Width / (widePerSize + (2f * InsetBeside))));
             float scale = size / natural;
 
-            float wide = ImGui.CalcTextSize(text).X * scale;
+            float wide = widePerSize * size;
             float top = inkTop * scale;
             float tall = inkHeight * scale;
 
-            // The line's origin, placed so that the INK sits just above the icon's foot.
+            // The line's origin, placed so that the INK sits in the icon's top-right corner.
             var at = new Vector2(
-                slot.Where.Left + ((slot.Where.Width - wide) / 2f),
-                slot.Where.Bottom - (size * Inset) - tall - top);
+                slot.Where.Right - (size * InsetBeside) - wide,
+                slot.Where.Top + (size * InsetAbove) - top);
 
             if (plate != 0)
             {

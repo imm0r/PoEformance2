@@ -93,10 +93,10 @@ public class PlayerSkillsTests
     [Fact]
     public void AGrantedEffectsRowWhereThePerLevelRowWasSaidToBeIsReadAsOne()
     {
-        // What the second run in game showed: the pointer at the per-level field leads to a
-        // row that begins with an id, which a per-level row does not. Read as the GrantedEffects
-        // row it is, its ActiveSkill column reaches the name - rather than its id passing for
-        // the skill's and its second column for a name.
+        // What the second run in game was read as: the pointer at the per-level field leads to
+        // a row that begins with an id, which a per-level row does not. Read as a GrantedEffects
+        // row, its ActiveSkill column reaches the name - rather than its id passing for the
+        // skill's and its second column for a name.
         OffsetSchema schema = Schema();
         PlayerSkills skills = Read(
             schema,
@@ -115,9 +115,9 @@ public class PlayerSkillsTests
     [Fact]
     public void AGrantedEffectsRowIsSearchedForItsReference_AndASecondIdInItIsNotAName()
     {
-        // What the third run in game showed: the row at the per-level field begins with an id,
-        // its ActiveSkill reference sits at neither column the witnesses name, and further in
-        // there is a second id-shaped string ("StormCloud" as "QuakeSlam"). The reference is
+        // What the third run in game was read as: the row at the per-level field begins with an
+        // id, its ActiveSkill reference sits at neither column the witnesses name, and further
+        // in there is a second id-shaped string ("StormCloud" as "QuakeSlam"). The reference is
         // found byte by byte, and the name it reaches - where the schema puts it - beats the
         // string a hunt for a name would have settled for.
         OffsetSchema schema = Schema();
@@ -173,6 +173,41 @@ public class PlayerSkillsTests
         Assert.Equal(1, skills.Named);
         Assert.Equal("Spark", skills.IdentityOf(Spark).Name);
         Assert.Equal($"hunted {Hex(SkillTableFixture.HuntedAt)} row", skills.RouteNote);
+    }
+
+    [Fact]
+    public void ADecoyAtTheKnownPlaceDoesNotEndTheHunt()
+    {
+        // What the fourth run in game showed, and what the ranking is for: the field the schema
+        // names holds a pointer to an id-first row of something else, with a second id further
+        // in and no reference to an ActiveSkills row anywhere - a provisional reading - while
+        // the per-level row sits where nothing names it. The search goes on past the decoy, the
+        // certain reading wins, and neither the decoy's id nor its second id is the skill's.
+        OffsetSchema schema = Schema();
+        PlayerSkills skills = Read(
+            schema,
+            new SkillTableFixture.Skill(
+                Spark, "spark", "Spark", SkillTableFixture.Route.PerLevelRowHuntedPastADecoy));
+
+        Assert.Equal(1, skills.Named);
+        Assert.Equal("spark", skills.IdentityOf(Spark).Id);
+        Assert.Equal("Spark", skills.IdentityOf(Spark).Name);
+        Assert.Equal(Spark, skills.ByName("Spark"));
+        Assert.Equal(0UL, skills.ByName("QuakeSlam"));
+
+        int column = schema.Structs["GrantedEffectsDat"].OffsetOf("ActiveSkill");
+        Assert.Equal(
+            $"hunted {Hex(SkillTableFixture.HuntedAt)} per-level row then {Hex(column)}", skills.RouteNote);
+
+        // The survey shows the decoy for what it is - the object's one id-first row, holding a
+        // second id and no reference - which is how the game's layout was read off the screen.
+        int perLevel = schema.Structs["ActiveSkillDetails"].OffsetOf("GrantedEffectsPerLevelDatRow");
+        string survey = skills.SurveyOf(Spark);
+        Assert.StartsWith($"object: {Hex(perLevel)}→\"StormCloud\"", survey, StringComparison.Ordinal);
+        Assert.EndsWith(
+            $"row@{Hex(perLevel)}: str +0x0 \"StormCloud\" {Hex(SkillTableFixture.DecoyAt)} \"QuakeSlam\"; ref",
+            survey,
+            StringComparison.Ordinal);
     }
 
     [Fact]
