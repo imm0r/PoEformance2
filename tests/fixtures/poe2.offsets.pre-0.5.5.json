@@ -289,6 +289,29 @@
       }
     },
 
+    "SkillBarSlot": {
+      "comment": "Frozen copy for the pre-0.5.5 recordings: the skill pointer at the place the AHK tool measured it live, before the base's tail moved. See the shipped schema for the full note.",
+      "fields": {
+        "ActiveSkillPtr": { "offset": "0x2F0", "type": "ptr" }
+      },
+      "consts": {
+        "ActiveSkillPtrBeforeShift": "0x2F0"
+      }
+    },
+
+    "SkillPanel": {
+      "comment": "Frozen copy for the pre-0.5.5 recordings, which hold no Skills panel: the same path and bound as the shipped schema, so the reader constructs.",
+      "fields": {},
+      "consts": {
+        "ListPath0": "2",
+        "ListPath1": "0",
+        "ListPath2": "1",
+        "ListPath3": "1",
+        "ListPath4": "0",
+        "MostRows": "512"
+      }
+    },
+
     "MapUiElement": {
       "comment": "CONFIRMED IN-GAME 2026-08 via the map radar - dots track the map at every zoom level. A map-type UiElement: UiElementBase at 0x000, then its own fields. Matches GameHelper2 MapUiElement.cs. PoE2 4.5.x shifted all three by -0x38 when UiElementBase shrank (the old Zoom at 0x3E0 read 0.000).",
       "fields": {
@@ -955,6 +978,7 @@
       "comment": "What one granted skill is. Same provenance as ActiveSkillStructure (GameHelper2 + AHK tool, agreeing). CastType IS THE SAME ENUM AnimationId CARRIES while that skill is being cast - the AHK drift log observed 299 SparkAdditive, 472 Flamewall, 474 OrbOfStorms as live player AnimationIds, and all three are rows of data/animations.tsv. That identity is what answers 'which skill is casting right now' without an action pointer: match AnimationId against the player's own CastTypes. The action hunt prints that match as a live cross-check, which doubles as the first in-game verification of these two structs.",
       "fields": {
         "UseStage": { "offset": "0x08", "type": "i32" },
+        "ActiveSkillsDatPtr": { "offset": "0x20", "type": "ptr", "comment": "Frozen copy: the same place as in the shipped schema; nothing in the recordings reaches it." },
         "CastType": {
           "offset": "0x0C", "type": "i32",
           "comment": "READ ZERO ON EVERY ENTRY of a real 41-skill player table (2026-08-29, session-2026-08-actions.rec), so this offset is either wrong for PoE2 or these are the granted effects the reference itself skips - GameHelper2 discards entries whose UnknownIdAndEquipmentInfo >> 0x10 is below 0x8000 as having 'no usecase'. The three cast types the player demonstrably used that session (474 OrbOfStorms, 299 SparkAdditive, 472 Flamewall, all read live from AnimationId) appear NOWHERE in the first 0x100 bytes of any entry, which is the finding: the wider search that would settle it needs a recording made by a build that reads the whole block, and this one only read four bytes here. Until then Actor.CurrentSkillPtr identifies a cast without this table at all. --skillhunt NOW SEARCHES FOR THIS FIELD BY WHAT IT CONTAINS rather than by where a reference put it: while a skill is being cast the actor's AnimationId IS that skill's cast type, so it scans every entry's first 0x100 for the live animation id and keeps the offsets that hit exactly ONE entry. Over several different skills one offset should be left standing."

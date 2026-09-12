@@ -291,6 +291,29 @@
       }
     },
 
+    "SkillBarSlot": {
+      "comment": "One slot of the skill bar - HUD > HUDRight > skills_bar in the game's own hud.ui, its visible, icon-sized (about 64x64 UI units) direct children; the hidden ones of the same size are the other weapon set's duplicates. UiElementBase at 0x000, then the skill it shows: a direct pointer to the ActiveSkillDetails object in Actor.ActiveSkills, which is what makes slot -> skill a pointer compare rather than an icon match. Source: the AHK tool's SkillBarReader, whose Skill<->Slot probe confirmed 0x2F0 live on 2026-06-21 on every visible slot. THAT WAS BEFORE 0.5.5 moved the base's tail down by 0x18 (RelativePosition 0x118 -> 0x100, ItemPtr 0x4F8 -> 0x4E0), so the field is declared at the shifted place and the reader VERIFIES BY CONTENT which of the two holds a pointer that is in the actor's skill table - see SkillBarReader, which reports the one it matched. Not yet confirmed in game at either.",
+      "fields": {
+        "ActiveSkillPtr": { "offset": "0x2D8", "type": "ptr", "comment": "0x2F0 minus the 0.5.5 tail shift. The reader falls back to ActiveSkillPtrBeforeShift when this one matches no skill." }
+      },
+      "consts": {
+        "ActiveSkillPtrBeforeShift": "0x2F0"
+      }
+    },
+
+    "SkillPanel": {
+      "comment": "The Skills window (the gem panel, HUD skill_panel_button), which is the only place the game writes a skill's DPS - as the TEXT 'DPS: 53.838' on a row element - so it is read from there. Reached through ImportantUiElements.LeftPanelPtr while it is the open left panel. The rows hang under a list found from the panel by the child path below, read off this tool's own interface browser (2026-09, 0.5.5): the DPS text of the Spark row sat at [47][2][0][1][1][0][135][0][9][2] from the UI root, i.e. panel > [2][0][1][1][0] = the list, [135] = the row, [0] = its header (ten children: four frames, the icon, the name, 'Level:', the level, a frame, and the block whose child [2] is the DPS text). A PATH IS A GUESS THE READER CHECKS: the list it reaches must have a visible row carrying a DPS text, else the panel is searched for one - see SkillPanelReader.",
+      "fields": {},
+      "consts": {
+        "ListPath0": "2",
+        "ListPath1": "0",
+        "ListPath2": "1",
+        "ListPath3": "1",
+        "ListPath4": "0",
+        "MostRows": "512"
+      }
+    },
+
     "MapUiElement": {
       "comment": "CONFIRMED IN-GAME 2026-08 via the map radar - dots track the map at every zoom level. A map-type UiElement: UiElementBase at 0x000, then its own fields. Matches GameHelper2 MapUiElement.cs. PoE2 4.5.x shifted all three by -0x38 when UiElementBase shrank (the old Zoom at 0x3E0 read 0.000). 0.5.5 (2026-09-04) shifted them again, by the base's -0x18: the map's own fields ride on the base's tail, so a UiElementBase wave is always a MapUiElement wave too. CONFIRMED ON 0.5.5 as far as a capture can - session-2026-09-maphunt.rec, on the elements MapViewports reaches: the large map carries (0, -20) at 0x358 and nothing else in its window does, which pins DefaultShift and with it the layout; 0x350 reads (0, 0) and 0x390 reads 0.500 on both maps. WHAT THAT CAPTURE DID NOT SHOW is either of those two MOVING: over 508 frames in which the person was asked to zoom and drag both maps, Shift stayed (0, 0) and Zoom stayed 0.5 on both elements, and no other float in 0x340-0x3A0 changed while the large map's own position did. So either this client offers no map zoom and no drag, or they live elsewhere; the projection uses the 0.5 it reads, which is also what its fallback would use, so the radar is right either way until a zoom is seen to change. (The first 0.5.5 evidence was against the CHAIN rather than these numbers: the elements MapParentStruct reaches read 0 here and are only 0x2E0 apart, session-2026-09-panels.rec.)",
       "fields": {
@@ -964,6 +987,10 @@
       "comment": "What one granted skill is. Same provenance as ActiveSkillStructure (GameHelper2 + AHK tool, agreeing). CastType IS THE SAME ENUM AnimationId CARRIES while that skill is being cast - the AHK drift log observed 299 SparkAdditive, 472 Flamewall, 474 OrbOfStorms as live player AnimationIds, and all three are rows of data/animations.tsv. That identity is what answers 'which skill is casting right now' without an action pointer: match AnimationId against the player's own CastTypes. The action hunt prints that match as a live cross-check, which doubles as the first in-game verification of these two structs.",
       "fields": {
         "UseStage": { "offset": "0x08", "type": "i32" },
+        "ActiveSkillsDatPtr": {
+          "offset": "0x20", "type": "ptr",
+          "comment": "-> the skill's row in ActiveSkills.dat, per GameHelper2 Actor.cs and the AHK tool's PoE2Offsets (which carries it 'currently unused'). READ BY PlayerSkills AND VERIFIED BY CONTENT rather than trusted: a dat row's first field is a pointer to its id string, so the row is accepted only when that first field reaches a short plain identifier ('spark', 'orb_of_storms'). Wanted as the LASTING KEY for a skill - the skill objects are the actor's and whether they outlive an area is not established, while a dat row is the same for the life of the process - and the id it yields is what the skills readout prints."
+        },
         "CastType": {
           "offset": "0x0C", "type": "i32",
           "comment": "READ ZERO ON EVERY ENTRY of a real 41-skill player table (2026-08-29, session-2026-08-actions.rec), so this offset is either wrong for PoE2 or these are the granted effects the reference itself skips - GameHelper2 discards entries whose UnknownIdAndEquipmentInfo >> 0x10 is below 0x8000 as having 'no usecase'. The three cast types the player demonstrably used that session (474 OrbOfStorms, 299 SparkAdditive, 472 Flamewall, all read live from AnimationId) appear NOWHERE in the first 0x100 bytes of any entry, which is the finding: the wider search that would settle it needs a recording made by a build that reads the whole block, and this one only read four bytes here. Until then Actor.CurrentSkillPtr identifies a cast without this table at all. --skillhunt NOW SEARCHES FOR THIS FIELD BY WHAT IT CONTAINS rather than by where a reference put it: while a skill is being cast the actor's AnimationId IS that skill's cast type, so it scans every entry's first 0x100 for the live animation id and keeps the offsets that hit exactly ONE entry. Over several different skills one offset should be left standing."
