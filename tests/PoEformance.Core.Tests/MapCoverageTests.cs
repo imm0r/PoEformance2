@@ -677,8 +677,13 @@ public class StillToWalkTests
         coverage.Look(At(Everything(400, 200), 20, 100, area: 1));
         Assert.Equal("fresh 0x00000001, never here before", coverage.LastSwitch);
 
-        // The same hash over a buffer of another size is a different area wearing its number.
+        // Away, and back under the same hash but over a buffer of another size: a different
+        // area wearing the first one's number. (Back is the point - while the area stays the
+        // same there is no switch at all, and the note stays what it was.)
+        coverage.Look(At(Everything(200, 200), 20, 100, area: 2));
+        Assert.Equal("fresh 0x00000002, never here before", coverage.LastSwitch);
+
         coverage.Look(At(Everything(200, 200), 20, 100, area: 1));
-        Assert.StartsWith("fresh 0x00000001: remembered 100x50 coarse, this grid is 50x50", coverage.LastSwitch, StringComparison.Ordinal);
+        Assert.Equal("fresh 0x00000001: remembered 100x50 coarse, this grid is 50x50", coverage.LastSwitch);
     }
 }
