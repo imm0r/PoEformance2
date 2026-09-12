@@ -3029,10 +3029,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // against the whole grid reads as a few per cent on a finished map.
             if (Coverage is MapCoverage walked && walked.Measuring)
             {
+                // With what the last change of area did - resumed, or fresh and why - because a
+                // map that comes back from town with its walk forgotten looks exactly like one
+                // that was never walked, and only this line tells the two apart.
                 Row(
                     "walked",
                     $"{walked.Percent:F0}%   ({walked.SeenCells} of {walked.ReachableCells})"
-                    + (walked.RegionKnown ? string.Empty : "   - still working out what is reachable"),
+                    + (walked.RegionKnown ? string.Empty : "   - still working out what is reachable")
+                    + $"   {walked.LastSwitch}",
                     Measured,
                     figure: true);
             }

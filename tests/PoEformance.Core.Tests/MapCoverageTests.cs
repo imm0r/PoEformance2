@@ -630,4 +630,60 @@ public class StillToWalkTests
         Assert.True(coverage.Fits(Everything(200, 200)));
         Assert.False(coverage.Fits(grid));
     }
+
+    [Fact]
+    public void ComingBackFindsTheWalkAgain_EvenWhenTheFirstReadHadNoTileCounts()
+    {
+        // The terrain is read once per area, and that read can land before the game has written
+        // the tile counts - the grid then keeps the buffer's padded width for the whole visit.
+        // Back from town it is read again, tile counts and all, a strip narrower. A resume that
+        // compared the trimmed widths took that for a different area and started the map over,
+        // which is how a cleared map came back from town filled in again. The buffer is the same
+        // both times, so the buffer is what has to be compared.
+        const int width = 400;
+        const int height = 200;
+        int bytesPerRow = (width + 1) / 2;
+        var cells = new byte[bytesPerRow * height];
+        Array.Fill(cells, (byte)0x11);
+
+        var padded = new TerrainGrid(cells, bytesPerRow, height);
+        var trimmed = new TerrainGrid(
+            cells, bytesPerRow, height, width / TerrainGrid.CellsPerTile, height / TerrainGrid.CellsPerTile);
+        Assert.NotEqual(padded.Width, trimmed.Width);
+
+        var coverage = new MapCoverage(MapCoverage.Immediate);
+        coverage.Look(At(padded, 20, 100, area: 1));
+        Assert.True(coverage.Seen(5, 25));
+        Assert.StartsWith("fresh", coverage.LastSwitch, StringComparison.Ordinal);
+
+        // To town, and back through the portal - far from where the walk began, so the disc
+        // around the return point cannot account for what was seen before.
+        coverage.Look(At(Everything(200, 200), 100, 100, area: 2));
+        coverage.Look(At(trimmed, 300, 100, area: 1));
+
+        Assert.StartsWith("resumed", coverage.LastSwitch, StringComparison.Ordinal);
+        Assert.True(coverage.Seen(5, 25));
+        Assert.True(coverage.Fits(trimmed));
+        Assert.True(coverage.Fits(padded));
+    }
+
+    [Fact]
+    public void TheReadoutSaysWhyAnAreaStartedFresh()
+    {
+        // Three failures to resume look the same on the map. The note tells them apart, and
+        // for the one that is about size it gives both sizes.
+        var coverage = new MapCoverage(MapCoverage.Immediate);
+
+        coverage.Look(At(Everything(400, 200), 20, 100, area: 1));
+        Assert.Equal("fresh 0x00000001, never here before", coverage.LastSwitch);
+
+        // Away, and back under the same hash but over a buffer of another size: a different
+        // area wearing the first one's number. (Back is the point - while the area stays the
+        // same there is no switch at all, and the note stays what it was.)
+        coverage.Look(At(Everything(200, 200), 20, 100, area: 2));
+        Assert.Equal("fresh 0x00000002, never here before", coverage.LastSwitch);
+
+        coverage.Look(At(Everything(200, 200), 20, 100, area: 1));
+        Assert.Equal("fresh 0x00000001: remembered 100x50 coarse, this grid is 50x50", coverage.LastSwitch);
+    }
 }
