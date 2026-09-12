@@ -9,15 +9,18 @@ namespace PoEformance.Game.Components;
 /// What identifies the skill ACROSS the objects that carry it: its ActiveSkills.dat row where
 /// that could be reached, otherwise the skill object itself. See <see cref="PlayerSkills"/>.
 /// </param>
-/// <param name="Id">The dat row's id - "spark", "orb_of_storms" - or empty when the row was not reached.</param>
+/// <param name="Id">The dat row's id - "spark", "orb_of_storms" - or empty when no row was reached.</param>
 /// <param name="Name">
 /// The dat row's DisplayedName - "Spark", in the client's language - or empty. What the Skills
 /// panel prints on the skill's row, and so the join to it.
 /// </param>
 public readonly record struct SkillIdentity(ulong Key, string Id, string Name)
 {
-    /// <summary>Whether the lasting key was reached, rather than the object standing in for it.</summary>
+    /// <summary>Whether a row was reached, rather than the object standing in for it.</summary>
     public bool IsLasting => Id.Length > 0;
+
+    /// <summary>Whether the row also yielded the name the panel prints.</summary>
+    public bool HasName => Name.Length > 0;
 }
 
 /// <summary>
@@ -32,19 +35,24 @@ public readonly record struct SkillIdentity(ulong Key, string Id, string Name)
 /// and the AHK tool's ReadPlayerSkills both walk it) and which the schema records proven in
 /// place by content: 42 entries, 10/10 valid detail pointers.
 ///
-/// THE NAME IS IN A DAT ROW, and reaching the row is the part that needed settling. Both
-/// references name a direct pointer to the ActiveSkills.dat row on the skill object and
+/// THE NAME IS IN A DAT ROW, and reaching the row is the part that needed settling - twice.
+/// Both references name a direct pointer to the ActiveSkills.dat row on the skill object and
 /// neither USES it; in game (0.5.5, 2026-09-12) it reached a row for none of 49 skills. What
-/// both references actually resolve a name through is the GrantedEffectsPerLevel row on the
-/// object, whose first column is the GrantedEffects row, whose ActiveSkill column is the
-/// ActiveSkills row - and there the two witnesses disagree on the column by eight bytes
-/// (dat-schema's widths compute 0x4F, GameHelper2 reads 0x57; see the schema's dat-layout
-/// note). So EVERY STEP IS VERIFIED BY CONTENT rather than trusted: a dat row's first field is
-/// a pointer to its id string - the rule <c>ItemReader</c> and <c>ActionReader</c> already rest
-/// on - so a pointer is a row only when that first field reaches a short plain identifier, and
-/// the direct field, then the chain at either column, then any pointer in the object's first
-/// 0x100 bytes are tried in that order. Which one answered is reported, so the next drift names
-/// itself in the readout instead of reading as a panel nobody opened.
+/// both resolve a name through is the GrantedEffectsPerLevel row on the object, whose first
+/// column is the GrantedEffects row, whose ActiveSkill column is the ActiveSkills row - and
+/// the second run in game found the pointer at that place leading to a row that BEGINS WITH AN
+/// ID, which a per-level row does not: so it is a GrantedEffects row (or the ActiveSkills row
+/// itself), one hop shorter than the references say. Hence <see cref="Resolve"/>, which reads a
+/// pointer as whichever of the three rows it proves to be, from the most telling reading to the
+/// least: an ActiveSkills row with its name, a GrantedEffects row whose ActiveSkill column
+/// reaches one (at either of the two columns the witnesses disagree on - dat-schema's widths
+/// compute 0x4F, GameHelper2 reads 0x57), a per-level row whose GrantedEffect does, and last
+/// an ActiveSkills row without a name. EVERY STEP IS VERIFIED BY CONTENT: a dat row's first
+/// field is a pointer to its id string - the rule <c>ItemReader</c> and <c>ActionReader</c>
+/// already rest on - so a pointer is a row only when that first field reaches a short plain
+/// identifier. The direct field, the per-level field and then any pointer in the object's
+/// first 0x100 bytes are tried in that order, and the reading that answered is reported, so
+/// the next drift names itself in the readout instead of reading as a panel nobody opened.
 ///
 /// THE KEY IS THE DAT ROW, NOT THE OBJECT, where it was reached: the skill objects are the
 /// actor's, and whether they outlive an area change is not established, while a dat row is the
@@ -66,11 +74,21 @@ public sealed class PlayerSkills
     /// <summary>Longest id accepted from a dat row. The real ones are a few words joined by underscores.</summary>
     private const int LongestId = 64;
 
-    /// <summary>Longest displayed name accepted. "Cast on Critical Strike" is twenty-three.</summary>
+    /// <summary>Longest displayed name accepted where the schema puts it. "Cast on Critical Strike" is twenty-three.</summary>
     private const int LongestName = 64;
+
+    /// <summary>
+    /// Longest name accepted when it has to be looked for in the row - shorter, because the
+    /// column after the name is the description, a sentence, and the bound is what keeps a
+    /// short one from passing for a name.
+    /// </summary>
+    private const int LongestHuntedName = 40;
 
     /// <summary>How much of a skill object is searched for its row when the known places fail.</summary>
     public const int HuntBytes = 0x100;
+
+    /// <summary>How far into an ActiveSkills row the name is looked for when it is not where the schema says.</summary>
+    public const int NameHuntBytes = 0x40;
 
     private const long Never = long.MinValue;
 
@@ -85,7 +103,6 @@ public sealed class PlayerSkills
     private readonly int _activeSkillPerReference;
     private readonly int _displayedName;
     private readonly byte[] _entries;
-    private readonly string _noteDirect;
 
     private Dictionary<ulong, SkillIdentity> _known = [];
     private Dictionary<ulong, SkillIdentity> _spare = [];
@@ -117,19 +134,21 @@ public sealed class PlayerSkills
 
         _displayedName = schema.Structs["ActiveSkillsDat"].OffsetOf("DisplayedName");
         _entries = new byte[MostEntries * _entrySize];
-        _noteDirect = $"row at +0x{_datRow:X}";
     }
 
     /// <summary>How many skills the table holds, as last read.</summary>
     public int Count => _known.Count;
 
-    /// <summary>How many of them reached their dat row, and so have an id, a name and a lasting key.</summary>
+    /// <summary>How many of them reached a dat row, and so have an id and a lasting key.</summary>
+    public int Keyed { get; private set; }
+
+    /// <summary>How many of them also have the name the panel prints.</summary>
     public int Named { get; private set; }
 
     /// <summary>Bumped whenever the set of skills changes, so a reader keyed on it can notice.</summary>
     public int Version { get; private set; }
 
-    /// <summary>How the last row was reached, for the readouts - or that none was.</summary>
+    /// <summary>How the last row was reached and read, for the readouts - or that none was.</summary>
     public string RouteNote => _route;
 
     /// <summary>Whether this address is one of the player's skill objects.</summary>
@@ -196,6 +215,7 @@ public sealed class PlayerSkills
 
         Dictionary<ulong, SkillIdentity> next = _spare;
         next.Clear();
+        int keyed = 0;
         int named = 0;
         bool changed = false;
 
@@ -216,6 +236,11 @@ public sealed class PlayerSkills
             next[details] = who;
             if (who.IsLasting)
             {
+                keyed++;
+            }
+
+            if (who.HasName)
+            {
                 named++;
             }
         }
@@ -224,6 +249,7 @@ public sealed class PlayerSkills
 
         _spare = _known;
         _known = next;
+        Keyed = keyed;
         Named = named;
         if (changed)
         {
@@ -248,6 +274,7 @@ public sealed class PlayerSkills
             Version++;
         }
 
+        Keyed = 0;
         Named = 0;
     }
 
@@ -256,7 +283,7 @@ public sealed class PlayerSkills
         _byName.Clear();
         foreach ((ulong details, SkillIdentity who) in _known)
         {
-            if (who.Name.Length > 0)
+            if (who.HasName)
             {
                 _byName.TryAdd(who.Name, details);
             }
@@ -266,15 +293,15 @@ public sealed class PlayerSkills
     /// <summary>The skill's dat row, reached whichever way reaches it; otherwise the object itself.</summary>
     private SkillIdentity Identify(ulong details)
     {
-        if (ActiveSkillRow(_reader.ReadPointer(details + (ulong)_datRow), out SkillIdentity who))
+        if (Resolve(_reader.ReadPointer(details + (ulong)_datRow), out SkillIdentity who, out string how))
         {
-            _route = _noteDirect;
+            _route = $"+0x{_datRow:X} {how}";
             return who;
         }
 
-        if (ThroughGrantedEffects(_reader.ReadPointer(details + (ulong)_perLevel), out who, out int column))
+        if (Resolve(_reader.ReadPointer(details + (ulong)_perLevel), out who, out how))
         {
-            _route = $"via +0x{_perLevel:X} then +0x{column:X}";
+            _route = $"+0x{_perLevel:X} {how}";
             return who;
         }
 
@@ -284,21 +311,15 @@ public sealed class PlayerSkills
         {
             for (int at = 0; at + 8 <= HuntBytes; at += 8)
             {
-                ulong pointer = BinaryPrimitives.ReadUInt64LittleEndian(block[at..]);
-                if (!MemoryReaderExtensions.IsPlausiblePointer(pointer))
+                if (at == _datRow || at == _perLevel)
                 {
                     continue;
                 }
 
-                if (ActiveSkillRow(pointer, out who))
+                ulong pointer = BinaryPrimitives.ReadUInt64LittleEndian(block[at..]);
+                if (Resolve(pointer, out who, out how))
                 {
-                    _route = $"hunted: row at +0x{at:X}";
-                    return who;
-                }
-
-                if (ThroughGrantedEffects(pointer, out who, out column))
-                {
-                    _route = $"hunted: via +0x{at:X} then +0x{column:X}";
+                    _route = $"hunted +0x{at:X} {how}";
                     return who;
                 }
             }
@@ -307,48 +328,123 @@ public sealed class PlayerSkills
         return new SkillIdentity(details, string.Empty, string.Empty);
     }
 
-    /// <summary>Whether this is an ActiveSkills row - one whose first field reaches an id - and what it says.</summary>
-    private bool ActiveSkillRow(ulong row, out SkillIdentity who)
+    /// <summary>
+    /// What a pointer leads to, read as whichever row it proves to be - see the remarks on the
+    /// class for the order, and why a nameless ActiveSkills reading comes last.
+    /// </summary>
+    private bool Resolve(ulong pointer, out SkillIdentity who, out string how)
     {
-        if (!RowId(row, out string id))
+        who = default;
+        how = string.Empty;
+        if (!MemoryReaderExtensions.IsPlausiblePointer(pointer))
         {
-            who = default;
             return false;
         }
 
-        who = new SkillIdentity(row, id, RowText(row + (ulong)_displayedName));
-        return true;
+        bool isRow = ActiveSkillRow(pointer, out SkillIdentity asRow, out int nameAt);
+        if (isRow && asRow.HasName)
+        {
+            who = asRow;
+            how = Described("row", nameAt);
+            return true;
+        }
+
+        if (GrantedEffectsRow(pointer, out who, out int column, out nameAt))
+        {
+            how = Described($"granted row then +0x{column:X}", nameAt);
+            return true;
+        }
+
+        if (GrantedEffectsRow(_reader.ReadPointer(pointer + (ulong)_grantedEffect), out who, out column, out nameAt))
+        {
+            how = Described($"per-level row then +0x{column:X}", nameAt);
+            return true;
+        }
+
+        if (isRow)
+        {
+            who = asRow;
+            how = "row (no name)";
+            return true;
+        }
+
+        return false;
     }
 
-    /// <summary>The ActiveSkills row behind a GrantedEffectsPerLevel row, at whichever column holds it.</summary>
-    private bool ThroughGrantedEffects(ulong perLevel, out SkillIdentity who, out int column)
+    /// <summary>The reading, with where the name was when it was not where the schema puts it.</summary>
+    private string Described(string reading, int nameAt)
+        => nameAt < 0 ? $"{reading} (no name)"
+            : nameAt == _displayedName ? reading
+            : $"{reading}, name at +0x{nameAt:X}";
+
+    /// <summary>A GrantedEffects row - one with an id - whose ActiveSkill column reaches an ActiveSkills row.</summary>
+    private bool GrantedEffectsRow(ulong granted, out SkillIdentity who, out int column, out int nameAt)
     {
         who = default;
         column = 0;
-        if (!MemoryReaderExtensions.IsPlausiblePointer(perLevel))
-        {
-            return false;
-        }
-
-        ulong granted = _reader.ReadPointer(perLevel + (ulong)_grantedEffect);
+        nameAt = -1;
         if (!RowId(granted, out _))
         {
             return false;
         }
 
-        if (ActiveSkillRow(_reader.ReadPointer(granted + (ulong)_activeSkill), out who))
+        if (ActiveSkillRow(_reader.ReadPointer(granted + (ulong)_activeSkill), out who, out nameAt))
         {
             column = _activeSkill;
             return true;
         }
 
-        if (ActiveSkillRow(_reader.ReadPointer(granted + (ulong)_activeSkillPerReference), out who))
+        if (ActiveSkillRow(_reader.ReadPointer(granted + (ulong)_activeSkillPerReference), out who, out nameAt))
         {
             column = _activeSkillPerReference;
             return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Whether this is a row with an id, and what it says: the id, and the name where the
+    /// schema puts it or, failing that, wherever in the row's first bytes a name-shaped string
+    /// hangs. <paramref name="nameAt"/> says which, or -1 for none.
+    /// </summary>
+    private bool ActiveSkillRow(ulong row, out SkillIdentity who, out int nameAt)
+    {
+        nameAt = -1;
+        if (!RowId(row, out string id))
+        {
+            who = default;
+            return false;
+        }
+
+        string name = RowText(row + (ulong)_displayedName, LongestName);
+        if (name.Length > 0)
+        {
+            nameAt = _displayedName;
+        }
+        else
+        {
+            for (int at = 8; at < NameHuntBytes && name.Length == 0; at += 8)
+            {
+                if (at == _displayedName)
+                {
+                    continue;
+                }
+
+                name = RowText(row + (ulong)at, LongestHuntedName);
+                if (name.Length > 0 && !string.Equals(name, id, StringComparison.Ordinal))
+                {
+                    nameAt = at;
+                }
+                else
+                {
+                    name = string.Empty;
+                }
+            }
+        }
+
+        who = new SkillIdentity(row, id, name);
+        return true;
     }
 
     /// <summary>A dat row's fingerprint: its first field is a pointer to a short plain id.</summary>
@@ -370,8 +466,8 @@ public sealed class PlayerSkills
         return LooksLikeAnId(id);
     }
 
-    /// <summary>A string column's text, or empty when it does not read as a name.</summary>
-    private string RowText(ulong column)
+    /// <summary>A string column's text, trimmed, or empty when it does not read as a name.</summary>
+    private string RowText(ulong column, int longest)
     {
         ulong text = _reader.ReadPointer(column);
         if (!MemoryReaderExtensions.IsPlausiblePointer(text))
@@ -379,8 +475,8 @@ public sealed class PlayerSkills
             return string.Empty;
         }
 
-        string name = _reader.ReadUnicodeString(text, LongestName);
-        return LooksLikeAName(name) ? name : string.Empty;
+        string name = _reader.ReadUnicodeString(text, longest + 1).Trim();
+        return name.Length <= longest && LooksLikeAName(name) ? name : string.Empty;
     }
 
     /// <summary>The shape of a dat id: short, ASCII, letters and digits joined by underscores.</summary>
@@ -407,10 +503,10 @@ public sealed class PlayerSkills
         return true;
     }
 
-    /// <summary>The shape of a displayed name: short, printable, with a letter in it. Any language.</summary>
+    /// <summary>The shape of a displayed name: printable, with a letter in it. Any language.</summary>
     private static bool LooksLikeAName(string text)
     {
-        if (text.Length is 0 or > LongestName)
+        if (text.Length == 0)
         {
             return false;
         }

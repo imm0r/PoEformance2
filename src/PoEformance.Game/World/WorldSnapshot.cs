@@ -766,10 +766,12 @@ public sealed class WorldReader
     private int _notedMatched = -1;
     private int _notedSkills = -1;
     private int _notedDps = -1;
+    private int _notedKeyed = -1;
     private int _notedNamed = -1;
     private string _notedBar = string.Empty;
     private string _notedRoute = string.Empty;
     private string _notedPanel = string.Empty;
+    private SkillIdentity _notedFirst;
 
     /// <summary>
     /// The child path to the atlas panel, for finding the screen its furniture hangs on.
@@ -1726,16 +1728,23 @@ public sealed class WorldReader
     private string SkillsNote(IReadOnlyList<SkillSlotOnScreen> slots)
     {
         int matched = 0;
+        SkillIdentity first = default;
         foreach (SkillSlotOnScreen slot in slots)
         {
             if (slot.Skill != 0)
             {
+                if (matched == 0)
+                {
+                    first = _skills.IdentityOf(slot.Skill);
+                }
+
                 matched++;
             }
         }
 
         if (slots.Count == _notedSlots && matched == _notedMatched && _skills.Count == _notedSkills
-            && _skills.Named == _notedNamed && _skillPanel.Dps.Count == _notedDps
+            && _skills.Keyed == _notedKeyed && _skills.Named == _notedNamed
+            && _skillPanel.Dps.Count == _notedDps && first == _notedFirst
             && ReferenceEquals(_skillBar.SkillOffsetNote, _notedBar)
             && ReferenceEquals(_skills.RouteNote, _notedRoute)
             && ReferenceEquals(_skillPanel.Note, _notedPanel))
@@ -1746,14 +1755,23 @@ public sealed class WorldReader
         _notedSlots = slots.Count;
         _notedMatched = matched;
         _notedSkills = _skills.Count;
+        _notedKeyed = _skills.Keyed;
         _notedNamed = _skills.Named;
         _notedDps = _skillPanel.Dps.Count;
+        _notedFirst = first;
         _notedBar = _skillBar.SkillOffsetNote;
         _notedRoute = _skills.RouteNote;
         _notedPanel = _skillPanel.Note;
+
+        // The first slot's skill spelled out - id and name as read - because "named" alone
+        // cannot say whether the name that was read is the one the panel prints.
+        string sample = matched == 0
+            ? string.Empty
+            : $"   first slot: \"{first.Id}\" as \"{first.Name}\"";
+
         _skillsNote =
             $"{slots.Count} slots, {matched} with a skill ({_notedBar})"
-            + $"   table {_skills.Count} ({_notedNamed} named, {_notedRoute})"
+            + $"   table {_skills.Count} ({_notedKeyed} keyed, {_notedNamed} named, {_notedRoute}){sample}"
             + $"   dps for {_notedDps}   panel: {_notedPanel}";
         return _skillsNote;
     }
