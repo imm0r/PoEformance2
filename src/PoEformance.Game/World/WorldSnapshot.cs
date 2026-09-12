@@ -767,6 +767,7 @@ public sealed class WorldReader
     // from strings the readers keep, so a reference compare is enough to know.
     private string _skillsNote = string.Empty;
     private int _notedSlots = -1;
+    private ScreenRect _notedWhere;
     private int _notedMatched = -1;
     private int _notedSkills = -1;
     private int _notedDps = -1;
@@ -1761,9 +1762,10 @@ public sealed class WorldReader
             }
         }
 
+        ScreenRect where = slots.Count == 0 ? default : slots[0].Where;
         if (slots.Count == _notedSlots && matched == _notedMatched && _skills.Count == _notedSkills
             && _skills.Keyed == _notedKeyed && _skills.Named == _notedNamed
-            && _skillPanel.Dps.Count == _notedDps && first == _notedFirst
+            && _skillPanel.Dps.Count == _notedDps && first == _notedFirst && where == _notedWhere
             && ReferenceEquals(_skillBar.SkillOffsetNote, _notedBar)
             && ReferenceEquals(_skills.RouteNote, _notedRoute)
             && ReferenceEquals(_skillPanel.Note, _notedPanel))
@@ -1778,18 +1780,25 @@ public sealed class WorldReader
         _notedNamed = _skills.Named;
         _notedDps = _skillPanel.Dps.Count;
         _notedFirst = first;
+        _notedWhere = where;
         _notedBar = _skillBar.SkillOffsetNote;
         _notedRoute = _skills.RouteNote;
         _notedPanel = _skillPanel.Note;
 
         // The first slot's skill spelled out - id and name as read - because "named" alone
-        // cannot say whether the name that was read is the one the panel prints.
+        // cannot say whether the name that was read is the one the panel prints. And the first
+        // slot's rectangle in window pixels, which is what the figure is placed against.
         string sample = matched == 0
             ? string.Empty
             : $"   first slot: \"{first.Id}\" as \"{first.Name}\"";
+        string placed = slots.Count == 0
+            ? string.Empty
+            : string.Create(
+                System.Globalization.CultureInfo.InvariantCulture,
+                $"   first slot at {where.Left:0},{where.Top:0} {where.Width:0}×{where.Height:0} px");
 
         _skillsNote =
-            $"{slots.Count} slots, {matched} with a skill ({_notedBar})"
+            $"{slots.Count} slots, {matched} with a skill ({_notedBar}){placed}"
             + $"   table {_skills.Count} ({_notedKeyed} keyed, {_notedNamed} named, {_notedRoute}){sample}"
             + $"   dps for {_notedDps}   panel: {_notedPanel}";
         return _skillsNote;

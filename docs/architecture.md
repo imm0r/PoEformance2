@@ -2376,9 +2376,17 @@ interesting part was not the feature:
   - **And the skill bar, where the game's own number is a text on another panel.** A skill's
     DPS is written by the game in exactly one place, the Skills window, as "DPS: 53.838" on
     that skill's row - not on the skill object, not in the actor, nowhere a reader can ask
-    without the panel. So `SkillPanelReader` reads it there, while the panel is open, and
-    remembers it; what the bar shows is as fresh as the last look at the panel, and says so in
-    its readout. The bar itself is `HUD > HUDRight > skills_bar` in the game's hud.ui, its
+    without the panel. So `SkillPanelReader` reads it there and remembers it - and reads the
+    rows on while the panel is SHUT, off the list it found while the panel was open or off a
+    shut panel the left-panel pointer still names (by the path only, never a search: that
+    pointer may as well name the character sheet). That is an experiment with a readout, not a
+    claim: the readout says how many rows still read, quotes the first row's text, and counts
+    whether the text CHANGED while hidden and when. Changed means live figures for free;
+    unchanged means the snapshot it always was, now recovered after a restart of the tool
+    without opening the panel once. A hidden reading that parses to nothing or to zero is not
+    remembered, in case a shut panel blanks its rows. Opening another left panel no longer
+    throws the Skills list away - a panel without a list leaves the kept one alone. The bar
+    itself is `HUD > HUDRight > skills_bar` in the game's hud.ui, its
     slots the showing, slot-sized children, and each slot carries the ADDRESS of the skill
     object it shows - which the AHK tool's probe found at +0x2F0 before 0.5.5 moved the base's
     tail. `SkillBarReader` settles that by content against `Actor.ActiveSkills` (PlayerSkills):
