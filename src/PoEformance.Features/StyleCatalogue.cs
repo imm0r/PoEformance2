@@ -147,6 +147,12 @@ public static class StyleCatalogue
         // hidden, the figure stands on the flask with just its edge.
         new("flask.uses.plate", "Flasks", "Backing under the figure", StyleTraits.Colour, Rgb(20, 22, 26, 180)),
 
+        // ── The skill bar ───────────────────────────────────────────────────
+        // Each skill's DPS, as the Skills panel last showed it, written short on the skill's
+        // icon. The same pair as the flask figure, for the same reasons.
+        new("skill.dps", "Skills", "DPS on a skill", StyleTraits.Colour | StyleTraits.Scale, Rgb(255, 255, 255, 240)),
+        new("skill.dps.plate", "Skills", "Backing under the DPS", StyleTraits.Colour, Rgb(20, 22, 26, 180)),
+
         // ── What the area loaded ────────────────────────────────────────────
         // The card and the list have separate backings because they are read at different
         // moments: the card interrupts on the way in, while the list sits there while you
@@ -217,6 +223,8 @@ public static class StyleCatalogue
         public const string ProjectileTrail = "projectile.trail";
         public const string FlaskUses = "flask.uses";
         public const string FlaskUsesPlate = "flask.uses.plate";
+        public const string SkillDps = "skill.dps";
+        public const string SkillDpsPlate = "skill.dps.plate";
         public const string PreloadBannerBack = "preload.banner.back";
         public const string PreloadListBack = "preload.list.back";
         public const string PreloadCard = "preload.card";
@@ -240,7 +248,7 @@ public static class StyleCatalogue
             PreloadBannerBack, PreloadListBack, PreloadCard,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,
-            ProjectileMine, ProjectileOther, ProjectileTrail, FlaskUses, FlaskUsesPlate,
+            ProjectileMine, ProjectileOther, ProjectileTrail, FlaskUses, FlaskUsesPlate, SkillDps, SkillDpsPlate,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];
     }
@@ -270,10 +278,10 @@ public static class StyleCatalogue
         public static readonly string[] Atlas = ["The atlas"];
 
         /// <summary>
-        /// On the combat page, beside the projectile switches - and the belt with them, being
-        /// the other thing drawn about a fight rather than about a place.
+        /// On the combat page, beside the projectile switches - and the belt and the skill bar
+        /// with them, being the other things drawn about a fight rather than about a place.
         /// </summary>
-        public static readonly string[] Projectiles = ["Projectiles", "Flasks"];
+        public static readonly string[] Projectiles = ["Projectiles", "Flasks", "Skills"];
 
         /// <summary>
         /// Everything drawn on the game world itself - the markers, the routes, the layout,

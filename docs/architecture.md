@@ -2373,6 +2373,23 @@ interesting part was not the feature:
     atlas: the serif's figures are old-style, and two flasks side by side showed a 6 standing
     above a 7. The digit's INK is what is centred on the slot, from the zero's glyph box,
     because a line of text keeps room above and below that no digit uses.
+  - **And the skill bar, where the game's own number is a text on another panel.** A skill's
+    DPS is written by the game in exactly one place, the Skills window, as "DPS: 53.838" on
+    that skill's row - not on the skill object, not in the actor, nowhere a reader can ask
+    without the panel. So `SkillPanelReader` reads it there, while the panel is open, and
+    remembers it; what the bar shows is as fresh as the last look at the panel, and says so in
+    its readout. The bar itself is `HUD > HUDRight > skills_bar` in the game's hud.ui, its
+    slots the showing, slot-sized children, and each slot carries the ADDRESS of the skill
+    object it shows - which the AHK tool's probe found at +0x2F0 before 0.5.5 moved the base's
+    tail. `SkillBarReader` settles that by content against `Actor.ActiveSkills` (PlayerSkills):
+    the offset that yields a pointer in the player's table is the right one, and the readout
+    names it. The join row-to-slot is the same idea run the other way: a row is expected to
+    carry the same address on itself, its header or the header's children, and it is hunted
+    for at the slot's offset first and then through the first 0x600 bytes of each, against the
+    same table - with the place it turned up reported, so a failed join reads as "skill at
+    none" rather than as a panel nobody opened. Figures are keyed by the skill's ActiveSkills.dat
+    row where the two hops to it verify (the row's first field reaches a plain id like
+    "spark"), because the actor's objects may not outlive an area and a dat row does.
   - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
     the minimap lives under must never come back as a piece of interface — that would take the
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while

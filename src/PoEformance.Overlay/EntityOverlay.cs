@@ -205,6 +205,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _atlas.Style = value;
             _ground.Style = value;
             _flaskUses.Style = value;
+            _skillDps.Style = value;
         }
     }
 
@@ -674,6 +675,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly BeamLayer _beams = new();
     private readonly StatusIconLayer _statusIcons = new();
     private readonly FlaskUsesLayer _flaskUses = new();
+    private readonly SkillDpsLayer _skillDps = new();
     private readonly AimLayer _aim = new();
 
     /// <summary>The evasion warnings. Not one of the tracker's - it has its own settings file.</summary>
@@ -2482,6 +2484,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (_snapshot.InGame && width > 0 && height > 0)
         {
             _flaskUses.Draw(ImGui.GetBackgroundDrawList(), _snapshot);
+            _skillDps.Draw(ImGui.GetBackgroundDrawList(), _snapshot);
         }
 
         // OUTSIDE the marker gate above, which only lets things through in a hostile area.
@@ -3107,6 +3110,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             else
             {
                 Row("belt", "not read - run with --flasks for the chain", Bad);
+            }
+
+            // Both halves of the figure on a skill icon, and the join between them: how many
+            // slots the bar shows and where their skill pointer was matched, how big the skill
+            // table is, and what the Skills panel has yielded so far.
+            if (_snapshot.SkillsReadout.Length > 0)
+            {
+                Row("skills", _snapshot.SkillsReadout, figure: true);
             }
 
             if (FlaskStatus is not null)

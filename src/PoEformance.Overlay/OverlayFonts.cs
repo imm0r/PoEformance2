@@ -58,17 +58,18 @@ public static class OverlayFonts
     private static ImFontPtr _figures;
     private static bool _haveFigures;
 
-    /// <summary>The digits, as the glyph range ImGui takes: inclusive pairs, zero-terminated.</summary>
+    /// <summary>What a figure is written with, as the glyph range ImGui takes: inclusive pairs, zero-terminated.</summary>
     /// <remarks>
     /// ON THE PINNED HEAP, because ImGui keeps the POINTER for as long as the font lives rather
     /// than a copy of the list - an ordinary array would be a range that moves under it on the
-    /// next collection. Digits only, since that is all the figures face is asked for, and it
-    /// keeps ten large glyphs out of an atlas that would otherwise carry ninety-five.
+    /// next collection. The ten digits, the point, and the k, M and B a short count ends in
+    /// (see <c>ShortFigure</c>): fourteen large glyphs, where the whole face would put
+    /// ninety-five in the atlas.
     /// </remarks>
-    private static readonly ushort[] Digits = PinnedDigits();
+    private static readonly ushort[] Figures = PinnedFigures();
 
-    /// <summary>The glyph range for <see cref="RebuiltFigures"/>'s font: the ten digits.</summary>
-    public static IntPtr DigitRange => Marshal.UnsafeAddrOfPinnedArrayElement(Digits, 0);
+    /// <summary>The glyph range for <see cref="RebuiltFigures"/>'s font.</summary>
+    public static IntPtr DigitRange => Marshal.UnsafeAddrOfPinnedArrayElement(Figures, 0);
 
     /// <summary>Says the atlas was rebuilt and which font came out of it as the heading.</summary>
     /// <remarks>
@@ -247,8 +248,9 @@ public static class OverlayFonts
     /// <remarks>
     /// A pair like the monospace's, and for a caller that draws with a draw list rather than
     /// through widgets: what it wants from the push is <c>ImGui.GetFont()</c> and the measuring
-    /// that goes with it, and it draws the text itself at the size it needs. Only the digits are
-    /// in this face - anything else drawn while it is pushed comes out as the missing-glyph mark.
+    /// that goes with it, and it draws the text itself at the size it needs. Only a figure's
+    /// characters are in this face - anything else drawn while it is pushed comes out as the
+    /// missing-glyph mark.
     /// </remarks>
     public static void PushFigures()
     {
@@ -267,11 +269,20 @@ public static class OverlayFonts
         }
     }
 
-    private static ushort[] PinnedDigits()
+    private static ushort[] PinnedFigures()
     {
-        ushort[] range = GC.AllocateArray<ushort>(3, pinned: true);
-        range[0] = '0';
-        range[1] = '9';
+        // Ascending, as ImGui's own ranges are: '.', '0'-'9', 'B', 'M', 'k'.
+        ushort[] range = GC.AllocateArray<ushort>(11, pinned: true);
+        range[0] = '.';
+        range[1] = '.';
+        range[2] = '0';
+        range[3] = '9';
+        range[4] = 'B';
+        range[5] = 'B';
+        range[6] = 'M';
+        range[7] = 'M';
+        range[8] = 'k';
+        range[9] = 'k';
         return range;
     }
 }

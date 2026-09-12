@@ -447,10 +447,27 @@ public sealed record WorldSnapshot(
 
     // Where the belt's slots are drawn on the HUD, each with the item it holds - so a number
     // can be written on a flask. Joined against FlaskBelt on the item entity. See FlaskBarReader.
-    IReadOnlyList<FlaskSlotOnScreen>? FlaskSlots = null)
+    IReadOnlyList<FlaskSlotOnScreen>? FlaskSlots = null,
+
+    // Where the skill bar's slots are drawn and which skill each shows, and the DPS the Skills
+    // panel last showed per skill - so a figure can be written on a skill's icon. Joined on
+    // SkillSlotOnScreen.Key. See SkillBarReader and SkillPanelReader; the note is for the readout.
+    IReadOnlyList<SkillSlotOnScreen>? SkillSlots = null,
+    IReadOnlyDictionary<ulong, int>? SkillDps = null,
+    string? SkillsNote = null)
 {
     /// <summary>The belt's slots on screen, empty when the bar is not - or was not read.</summary>
     public IReadOnlyList<FlaskSlotOnScreen> FlaskSlotsOnScreen => FlaskSlots ?? [];
+
+    /// <summary>The skill bar's slots on screen, empty when the bar is not - or was not read.</summary>
+    public IReadOnlyList<SkillSlotOnScreen> SkillSlotsOnScreen => SkillSlots ?? [];
+
+    /// <summary>The DPS last read off the Skills panel, by the skill's lasting key. Empty until it was opened.</summary>
+    public IReadOnlyDictionary<ulong, int> SkillDpsByKey
+        => SkillDps ?? System.Collections.ObjectModel.ReadOnlyDictionary<ulong, int>.Empty;
+
+    /// <summary>What the skill readers found, in a line - for the status readout.</summary>
+    public string SkillsReadout => SkillsNote ?? string.Empty;
 
     /// <summary>The parts of the game's interface on screen, empty when none were read.</summary>
     /// <remarks>
@@ -737,6 +754,21 @@ public sealed class WorldReader
     private readonly InterfaceReader _hud;
     private readonly FlaskBarReader _flaskBar;
 
+    /// <summary>The skill bar, the Skills panel and the table that joins them. See each.</summary>
+    private readonly PlayerSkills _skills;
+    private readonly SkillBarReader _skillBar;
+    private readonly SkillPanelReader _skillPanel;
+
+    // The skills line of the readout, rebuilt only when what it says changes: it is composed
+    // from strings the readers keep, so a reference compare is enough to know.
+    private string _skillsNote = string.Empty;
+    private int _notedSlots = -1;
+    private int _notedMatched = -1;
+    private int _notedSkills = -1;
+    private int _notedDps = -1;
+    private string _notedBar = string.Empty;
+    private string _notedPanel = string.Empty;
+
     /// <summary>
     /// The child path to the atlas panel, for finding the screen its furniture hangs on.
     /// </summary>
@@ -851,6 +883,9 @@ public sealed class WorldReader
         _panels = new PanelReader(reader, schema, _uiElements);
         _hud = new InterfaceReader(reader, schema, _uiElements);
         _flaskBar = new FlaskBarReader(reader, schema, _uiElements);
+        _skills = new PlayerSkills(reader, schema);
+        _skillBar = new SkillBarReader(reader, schema, _uiElements);
+        _skillPanel = new SkillPanelReader(reader, schema, _uiElements);
 
         StructDef atlasPanel = schema.Structs["AtlasPanel"];
         _atlasPath =
@@ -1570,6 +1605,7 @@ public sealed class WorldReader
         MapView? miniMap = null;
         IReadOnlyList<InterfacePart> hud = [];
         IReadOnlyList<FlaskSlotOnScreen> flaskSlots = [];
+        IReadOnlyList<SkillSlotOnScreen> skillSlots = [];
         if (scale is UiScale viewport && chain.UiRoot != 0)
         {
             // Order matters: reading the minimap first is what leaves its diagonal cached
@@ -1597,7 +1633,16 @@ public sealed class WorldReader
             // for the number written on it. From the HUD the reader just resolved, so a HUD
             // that was not found costs no search here either.
             flaskSlots = _flaskBar.Read(_hud.Element, viewport, nowMs);
+
+            // The skill bar's slots the same way, matched against the player's skill table -
+            // which is refreshed here, on its own clock, from the actor read above.
+            _skills.Refresh(localPlayer?.Component("Actor") ?? 0, nowMs);
+            skillSlots = _skillBar.Read(_hud.Element, viewport, nowMs, _skills);
         }
+
+        // The Skills panel's rows, while it is open: each skill's DPS, remembered against the
+        // skill. Needs no viewport - it reads text, not places - so it sits outside the block.
+        _skillPanel.Read(chain.UiRoot, nowMs, _skills);
 
         // Which panels are in the way and where, from the same interface root that was just
         // resolved. Read every tick rather than on an interval: a panel opens and shuts between
@@ -1669,7 +1714,43 @@ public sealed class WorldReader
             hud,
             frustum,
             hovered,
-            flaskSlots);
+            flaskSlots,
+            skillSlots,
+            _skillPanel.Dps,
+            SkillsNote(skillSlots));
+    }
+
+    /// <summary>The skills line of the readout, from the readers' own notes.</summary>
+    private string SkillsNote(IReadOnlyList<SkillSlotOnScreen> slots)
+    {
+        int matched = 0;
+        foreach (SkillSlotOnScreen slot in slots)
+        {
+            if (slot.Skill != 0)
+            {
+                matched++;
+            }
+        }
+
+        if (slots.Count == _notedSlots && matched == _notedMatched && _skills.Count == _notedSkills
+            && _skillPanel.Dps.Count == _notedDps
+            && ReferenceEquals(_skillBar.SkillOffsetNote, _notedBar)
+            && ReferenceEquals(_skillPanel.Note, _notedPanel))
+        {
+            return _skillsNote;
+        }
+
+        _notedSlots = slots.Count;
+        _notedMatched = matched;
+        _notedSkills = _skills.Count;
+        _notedDps = _skillPanel.Dps.Count;
+        _notedBar = _skillBar.SkillOffsetNote;
+        _notedPanel = _skillPanel.Note;
+        _skillsNote =
+            $"{slots.Count} slots, {matched} with a skill ({_notedBar})"
+            + $"   table {_skills.Count} ({_skills.Named} named)"
+            + $"   dps for {_notedDps}   panel: {_notedPanel}";
+        return _skillsNote;
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>
