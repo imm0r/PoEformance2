@@ -2383,13 +2383,20 @@ interesting part was not the feature:
     object it shows - which the AHK tool's probe found at +0x2F0 before 0.5.5 moved the base's
     tail. `SkillBarReader` settles that by content against `Actor.ActiveSkills` (PlayerSkills):
     the offset that yields a pointer in the player's table is the right one, and the readout
-    names it. The join row-to-slot is the same idea run the other way: a row is expected to
-    carry the same address on itself, its header or the header's children, and it is hunted
-    for at the slot's offset first and then through the first 0x600 bytes of each, against the
-    same table - with the place it turned up reported, so a failed join reads as "skill at
-    none" rather than as a panel nobody opened. Figures are keyed by the skill's ActiveSkills.dat
-    row where the two hops to it verify (the row's first field reaches a plain id like
-    "spark"), because the actor's objects may not outlive an area and a dat row does.
+    names it. The join row-to-slot was first tried the same way - a row carrying the same
+    address on itself, its header or the header's children, hunted for at the slot's offset and
+    then through the first 0x600 bytes of each - and the first run in game answered "skill at
+    none": the rows carry no such pointer. So the join is BY NAME: the row prints the skill's
+    displayed name, and `PlayerSkills` reads that name off every skill object's ActiveSkills.dat
+    row. Reaching the row was its own lesson: both references name a direct pointer on the
+    object and neither uses it, and in game it reached a row for none of 49 skills; what they
+    actually resolve a name through is GrantedEffectsPerLevel, then GrantedEffects, then its
+    ActiveSkill column - on which the two disagree by eight bytes (dat-schema's widths compute
+    0x4F, GameHelper2 reads 0x57). Every step is verified by the dat-row fingerprint (a first
+    field that reaches a plain id like "spark"), the direct field, the chain at either column
+    and a search of the object are tried in that order, and the readout names the route that
+    answered. The row is also the figure's key, because the actor's objects may not outlive an
+    area and a dat row does.
   - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
     the minimap lives under must never come back as a piece of interface — that would take the
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while

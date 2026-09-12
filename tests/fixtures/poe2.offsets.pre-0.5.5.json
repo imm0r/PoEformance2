@@ -989,6 +989,32 @@
       }
     },
 
+    "GrantedEffectsPerLevelDat": {
+      "comment": "Frozen copy for the pre-0.5.5 recordings, which reach no dat row: the same layout as the shipped schema, so PlayerSkills constructs.",
+      "fields": {
+        "GrantedEffect": { "offset": "0x00", "type": "ptr" }
+      }
+    },
+
+    "GrantedEffectsDat": {
+      "comment": "Frozen copy, see the shipped schema.",
+      "fields": {
+        "Id": { "offset": "0x00", "type": "ptr" },
+        "ActiveSkill": { "offset": "0x4F", "type": "ptr" }
+      },
+      "consts": {
+        "ActiveSkillPerGameHelper2": "0x57"
+      }
+    },
+
+    "ActiveSkillsDat": {
+      "comment": "Frozen copy, see the shipped schema.",
+      "fields": {
+        "Id": { "offset": "0x00", "type": "ptr" },
+        "DisplayedName": { "offset": "0x08", "type": "ptr" }
+      }
+    },
+
     "LoadedFilesRoot": {
       "comment": "What the FileRoot static points at: an ARRAY of BucketCount buckets, each BucketSize apart. GameHelper2's LoadedFilesRootObject, whose TotalCount is 0x10. The name says hash map and the layout says otherwise - each bucket is a plain vector with a capacity beside it, so walking one needs no hashing.",
       "fields": {},

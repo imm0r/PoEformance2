@@ -989,7 +989,7 @@
         "UseStage": { "offset": "0x08", "type": "i32" },
         "ActiveSkillsDatPtr": {
           "offset": "0x20", "type": "ptr",
-          "comment": "-> the skill's row in ActiveSkills.dat, per GameHelper2 Actor.cs and the AHK tool's PoE2Offsets (which carries it 'currently unused'). READ BY PlayerSkills AND VERIFIED BY CONTENT rather than trusted: a dat row's first field is a pointer to its id string, so the row is accepted only when that first field reaches a short plain identifier ('spark', 'orb_of_storms'). Wanted as the LASTING KEY for a skill - the skill objects are the actor's and whether they outlive an area is not established, while a dat row is the same for the life of the process - and the id it yields is what the skills readout prints."
+          "comment": "-> the skill's row in ActiveSkills.dat, per GameHelper2 Actor.cs and the AHK tool's PoE2Offsets (which carries it 'currently unused' - and that is the tell). READ BY PlayerSkills AND VERIFIED BY CONTENT rather than trusted: a dat row's first field is a pointer to its id string, so the row is accepted only when that first field reaches a short plain identifier ('spark', 'orb_of_storms'). IN GAME 2026-09-12 (0.5.5) IT REACHED NONE: 49 skill objects, 0 rows through this field, so it is tried first and the row is then reached the way both references actually resolve a name - GrantedEffectsPerLevelDatRow, then the GrantedEffects row, then its ActiveSkill column - and failing that hunted for in the object's first 0x100 bytes by the same fingerprint. Wanted as the LASTING KEY for a skill - the skill objects are the actor's and whether they outlive an area is not established, while a dat row is the same for the life of the process - and for its DisplayedName, which is what joins a skill to the Skills panel's rows."
         },
         "CastType": {
           "offset": "0x0C", "type": "i32",
@@ -998,6 +998,32 @@
         "GrantedEffectsPerLevelDatRow": { "offset": "0x48", "type": "ptr", "comment": "-> the skill's GrantedEffectsPerLevel row; the reference resolves the skill NAME through it." },
         "TotalUses": { "offset": "0xE4", "type": "i32" },
         "TotalCooldownTimeInMs": { "offset": "0xE8", "type": "i32" }
+      }
+    },
+
+    "GrantedEffectsPerLevelDat": {
+      "comment": "One row of GrantedEffectsPerLevel.dat as the game holds it in memory - what ActiveSkillDetails.GrantedEffectsPerLevelDatRow points at. Its first column is the GrantedEffect row reference, and a row reference is the ROW POINTER first (see the dat-layout note above), which is also how both references read it: AHK PoE2Offsets GrantedEffectsPerLevelDat.GrantedEffectDatPtr 0x00.",
+      "fields": {
+        "GrantedEffect": { "offset": "0x00", "type": "ptr" }
+      }
+    },
+
+    "GrantedEffectsDat": {
+      "comment": "One row of GrantedEffects.dat. Id is the first column - a pointer to the id string, 'SparkPlayer' - which is the fingerprint PlayerSkills uses to know it is holding a row at all. ActiveSkill is the row reference dat-schema's widths put at 0x4F, by the same arithmetic that reproduces 134 loaded tables' row sizes, where GameHelper2 (GrantedEffectsDatOffset.cs) and the AHK tool copying it read 0x57 - the position the old 'table first, row second' rule would give. PlayerSkills tries the computed one and then the reference's and takes whichever reaches an ActiveSkills row; the skills readout says which.",
+      "fields": {
+        "Id": { "offset": "0x00", "type": "ptr" },
+        "ActiveSkill": { "offset": "0x4F", "type": "ptr" }
+      },
+      "consts": {
+        "ActiveSkillPerGameHelper2": "0x57"
+      }
+    },
+
+    "ActiveSkillsDat": {
+      "comment": "One row of ActiveSkills.dat: Id ('spark') and then DisplayedName ('Spark', in the client's language), both pointers to wide strings - the AHK tool's ActiveSkillsDat map has the same two. DisplayedName is the join between a skill object and the Skills panel's rows, which print exactly it.",
+      "fields": {
+        "Id": { "offset": "0x00", "type": "ptr" },
+        "DisplayedName": { "offset": "0x08", "type": "ptr" }
       }
     },
 

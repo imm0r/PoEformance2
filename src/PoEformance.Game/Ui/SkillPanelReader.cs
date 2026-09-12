@@ -150,15 +150,18 @@ public static class DpsText
 /// with a DPS text on it - and failing that the panel is searched for such a list, once, so a
 /// patch that moves the list costs a search rather than a silence.
 ///
-/// WHICH SKILL A ROW IS FOR is the question that decides everything, and it is answered by
-/// POINTER rather than by name: the skill bar's slots carry the address of the skill object they
-/// show (see SkillBarReader), and a row built for the same skill is expected to carry the same
-/// address somewhere on itself, its header or one of the header's children - the icon being the
-/// likeliest, as the slot is an icon too. It is FOUND BY CONTENT: first at the slot's own offset
-/// on each of those elements, then anywhere in the first 0x600 bytes of each, against the set
-/// of the player's skill objects. Where it turned up becomes the rule for the rows after it and
-/// is reported, so a join that failed says so in the readout rather than looking like a panel
-/// that was never opened.
+/// WHICH SKILL A ROW IS FOR is the question that decides everything, and it has two answers,
+/// tried in order. By POINTER: the skill bar's slots carry the address of the skill object they
+/// show (see SkillBarReader), and a row built for the same skill might carry the same address
+/// on itself, its header or one of the header's children. It is looked for BY CONTENT - at the
+/// slot's own offset on each of those elements, then anywhere in the first 0x600 bytes of each,
+/// against the set of the player's skill objects - and where it turns up becomes the rule for
+/// the rows after it. IN GAME IT TURNED UP NOWHERE (0.5.5, 2026-09-12: four rows, no pointer
+/// within 0x600 bytes of any of them), which is why the second answer exists. By NAME: the row
+/// prints the skill's displayed name, the skill's dat row carries exactly that string, and
+/// PlayerSkills reads it for every skill object - so the name on the row names the object.
+/// Both are reported, so a join that failed says so in the readout rather than looking like a
+/// panel that was never opened.
 ///
 /// REMEMBERED BY THE SKILL'S LASTING KEY, see <see cref="PlayerSkills"/>, and published as a
 /// dictionary that is replaced rather than changed once handed out, so a snapshot holding it
@@ -216,6 +219,8 @@ public sealed class SkillPanelReader
     private string _ruleNote = "none";
     private string _note = "not seen yet";
     private int _notedRows = -1;
+    private int _notedByPointer = -1;
+    private int _notedByName = -1;
     private int _notedDps = -1;
     private string _notedRule = string.Empty;
 
@@ -226,6 +231,7 @@ public sealed class SkillPanelReader
         public ulong Name;
         public ulong Dps;
         public ulong Skill;
+        public bool ByName;
         public int Hunts;
         public int HuntedVersion = -1;
         public string LastName = string.Empty;
@@ -305,16 +311,19 @@ public sealed class SkillPanelReader
         _skillsVersion = skills.Version;
 
         ulong list = ResolveList(panel, nowMs);
-        int read = list == 0 ? 0 : ReadRows(list, skills);
+        (int read, int byPointer, int byName) = list == 0 ? (0, 0, 0) : ReadRows(list, skills);
 
-        if (read != _notedRows || _dps.Count != _notedDps || !ReferenceEquals(_ruleNote, _notedRule))
+        if (read != _notedRows || byPointer != _notedByPointer || byName != _notedByName
+            || _dps.Count != _notedDps || !ReferenceEquals(_ruleNote, _notedRule))
         {
             _notedRows = read;
+            _notedByPointer = byPointer;
+            _notedByName = byName;
             _notedDps = _dps.Count;
             _notedRule = _ruleNote;
             _note = list == 0
                 ? $"open ({_panelName}), no rows found"
-                : $"{read} rows read, skill at {_ruleNote}";
+                : $"{read} rows read, {byPointer} by pointer ({_ruleNote}), {byName} by name";
         }
     }
 
@@ -429,10 +438,15 @@ public sealed class SkillPanelReader
         return 0;
     }
 
-    /// <summary>Reads every showing row: its DPS, and which skill it is for. Returns how many were read.</summary>
-    private int ReadRows(ulong list, PlayerSkills skills)
+    /// <summary>
+    /// Reads every showing row: its DPS, and which skill it is for. Returns how many were read
+    /// and how many were matched each way.
+    /// </summary>
+    private (int Read, int ByPointer, int ByName) ReadRows(ulong list, PlayerSkills skills)
     {
         int read = 0;
+        int byPointer = 0;
+        int byName = 0;
         foreach (ulong row in _elements.Children(list, _mostRows))
         {
             if (!_elements.IsShowingItself(row))
@@ -458,12 +472,14 @@ public sealed class SkillPanelReader
             {
                 parts.LastName = name;
                 parts.Skill = 0;
+                parts.ByName = false;
                 parts.Hunts = 0;
             }
 
             if (parts.Skill != 0 && !skills.Contains(parts.Skill))
             {
                 parts.Skill = 0;
+                parts.ByName = false;
                 parts.Hunts = 0;
             }
 
@@ -473,18 +489,39 @@ public sealed class SkillPanelReader
                 parts.Hunts = parts.HuntedVersion == skills.Version ? parts.Hunts + 1 : 1;
                 parts.HuntedVersion = skills.Version;
                 parts.Skill = Hunt(row, parts, skills);
+                parts.ByName = false;
+            }
+
+            // The name, where no pointer answered: the row prints the skill's displayed name,
+            // and the skill's dat row spells it the same.
+            if (parts.Skill == 0 && name.Length > 0)
+            {
+                parts.Skill = skills.ByName(name);
+                parts.ByName = parts.Skill != 0;
             }
 
             int? dps = DpsText.Parse(_reader.ReadStdWString(parts.Dps + (ulong)_text));
             read++;
 
-            if (parts.Skill != 0 && dps is int value)
+            if (parts.Skill != 0)
             {
-                Remember(skills.KeyOf(parts.Skill), value);
+                if (parts.ByName)
+                {
+                    byName++;
+                }
+                else
+                {
+                    byPointer++;
+                }
+
+                if (dps is int value)
+                {
+                    Remember(skills.KeyOf(parts.Skill), value);
+                }
             }
         }
 
-        return read;
+        return (read, byPointer, byName);
     }
 
     /// <summary>Finds a row's header, its name text and its DPS text - once per row.</summary>
