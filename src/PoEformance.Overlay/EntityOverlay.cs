@@ -3820,7 +3820,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _terrain.Colour = outline.ColourOr(_terrainColour);
             _terrain.Thickness = (int)outline.WidthOr(_terrainThickness);
 
-            _terrain.Draw(draw, map, terrain, new Vector3(player.WorldX, player.WorldY, player.TerrainHeight));
+            _terrain.Draw(draw, map, terrain, new Vector3(player.WorldX, player.WorldY, player.TerrainHeight), Coverage);
         }
 
         // Over the layout and under the markers: it is context for where to go next, and a

@@ -58,61 +58,12 @@ public sealed record TerrainPicture(byte[] Pixels, int Width, int Height)
     }
 
     /// <summary>
-    /// Divides two colours by their shared envelope, so that ONE tint can draw both.
+    /// Colours the outline: the line over its rim, on a clear ground.
     /// </summary>
     /// <remarks>
-    /// The quad is drawn through a single colour, which multiplies every texel. That was
-    /// simply the line's colour while there was only a line; with a fill of its own colour
-    /// under it, neither colour can be the tint - a navy fill drawn through a pale-grey tint
-    /// is not navy. But a multiplication is exact when it is undone: take the tint as the
-    /// channel-wise MAXIMUM of the two, bake each colour as its ratio to that, and the
-    /// multiplication puts both back to within a rounding of eight bits. What it costs is
-    /// that a colour change now rebuilds the picture, which the page sends once per pick
-    /// rather than once per drag of the picker.
-    ///
-    /// Alphas pass through untouched: they are the line's and the fill's own, and the tint
-    /// is opaque.
-    /// </remarks>
-    /// <param name="line">The line's colour, ABGR as ImGui packs it.</param>
-    /// <param name="fill">
-    /// The fill's colour, with its opacity for alpha. Left out of the envelope when that
-    /// alpha is zero, so a switched-off fill cannot darken the line.
-    /// </param>
-    public static (uint Tint, uint Line, uint Fill) Split(uint line, uint fill)
-    {
-        bool filled = (fill >> 24) != 0;
-        uint tint = 0xFF00_0000;
-        uint bakedLine = line & 0xFF00_0000;
-        uint bakedFill = fill & 0xFF00_0000;
-
-        for (int shift = 0; shift < 24; shift += 8)
-        {
-            uint l = (line >> shift) & 0xFF;
-            uint f = filled ? (fill >> shift) & 0xFF : 0;
-            uint top = Math.Max(l, f);
-            tint |= top << shift;
-            if (top == 0)
-            {
-                continue;
-            }
-
-            bakedLine |= (((l * 255) + (top / 2)) / top) << shift;
-            bakedFill |= (((f * 255) + (top / 2)) / top) << shift;
-        }
-
-        return (tint, bakedLine, bakedFill);
-    }
-
-    /// <summary>
-    /// Colours the outline: the line over a rim over the fill, on a clear ground.
-    /// </summary>
-    /// <remarks>
-    /// The rim is drawn only where there is NO fill. It exists to separate the line from a
-    /// ground that happens to match it, and inside the outline the fill IS the ground - a
-    /// dark sheet a pale line already reads against, where a second dark band along the
-    /// line's inner edge would draw a shadow the game's own map does not have. Outside, the
-    /// world is the ground and the rim does its old job. With the fill off this is the rim
-    /// everywhere, exactly as before.
+    /// The line is meant to be drawn through a tint, so it is handed in as the colour the
+    /// texels should hold - white, ordinarily - with the alpha it is to keep. The rim is black
+    /// whatever the tint, because a tint multiplies.
     ///
     /// The rim is never more solid than the line it serves: a faint line with a firm black
     /// edge reads as the edge, and the line becomes the thing that is hard to see.
@@ -122,31 +73,20 @@ public sealed record TerrainPicture(byte[] Pixels, int Width, int Height)
     /// The line grown by the rim's reach - or the line itself when there is to be no rim,
     /// which the line's own pixels then cover entirely.
     /// </param>
-    /// <param name="fill">How much of each pixel is floor, 0 to 255, or null for no fill.</param>
-    /// <param name="line">The line's baked colour and alpha, ABGR.</param>
-    /// <param name="fillColour">The fill's baked colour, and its alpha at full coverage, ABGR.</param>
+    /// <param name="line">The line's texel colour and alpha, ABGR as ImGui packs it.</param>
     /// <param name="rimAlpha">The rim's alpha, before the line's caps it.</param>
-    public static TerrainPicture Paint(
-        OutlineMask mask, byte[] rim, byte[]? fill, uint line, uint fillColour, byte rimAlpha)
+    public static TerrainPicture Paint(OutlineMask mask, byte[] rim, uint line, byte rimAlpha)
     {
         ArgumentNullException.ThrowIfNull(mask);
         ArgumentNullException.ThrowIfNull(rim);
 
         int count = mask.Width * mask.Height;
         ArgumentOutOfRangeException.ThrowIfNotEqual(rim.Length, count);
-        if (fill is not null)
-        {
-            ArgumentOutOfRangeException.ThrowIfNotEqual(fill.Length, count);
-        }
 
         byte lineR = (byte)line;
         byte lineG = (byte)(line >> 8);
         byte lineB = (byte)(line >> 16);
         byte lineA = (byte)(line >> 24);
-        byte fillR = (byte)fillColour;
-        byte fillG = (byte)(fillColour >> 8);
-        byte fillB = (byte)(fillColour >> 16);
-        int fillA = (byte)(fillColour >> 24);
         byte rimA = Math.Min(rimAlpha, lineA);
 
         byte[] cells = mask.Cells;
@@ -159,25 +99,12 @@ public sealed record TerrainPicture(byte[] Pixels, int Width, int Height)
                 pixels[at + 1] = lineG;
                 pixels[at + 2] = lineB;
                 pixels[at + 3] = lineA;
-                continue;
             }
-
-            int cover = fill is null ? 0 : fill[i];
-            if (cover == 0)
+            else if (rim[i] != 0)
             {
-                // The rim is black, which a cleared array already is.
-                if (rim[i] != 0)
-                {
-                    pixels[at + 3] = rimA;
-                }
-
-                continue;
+                // Black, which a cleared array already is.
+                pixels[at + 3] = rimA;
             }
-
-            pixels[at] = fillR;
-            pixels[at + 1] = fillG;
-            pixels[at + 2] = fillB;
-            pixels[at + 3] = (byte)(((fillA * cover) + 127) / 255);
         }
 
         return new TerrainPicture(pixels, mask.Width, mask.Height);
@@ -235,7 +162,7 @@ public sealed record TerrainPicture(byte[] Pixels, int Width, int Height)
                 }
 
                 // The colour of the premultiplied average, made straight again: the summed
-                // weighted colour over the summed weight. Rounded, not truncated - a dark fill
+                // weighted colour over the summed weight. Rounded, not truncated - a dark rim
                 // is a small number to begin with.
                 int half = sumA / 2;
                 int to = ((oy * width) + ox) * 4;

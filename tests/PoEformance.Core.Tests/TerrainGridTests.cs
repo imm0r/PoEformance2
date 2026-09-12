@@ -242,12 +242,12 @@ public class TerrainGridTests
     }
 
     [Fact]
-    public void TheFillIsEveryWalkableCell_WallsIncludedInNothing()
+    public void TheFloorIsEveryWalkableCell_AndKnowsWhereEachPixelCameFrom()
     {
         // The floor as a sheet under the line: the whole of the floor, the ring beside the wall
         // as much as the middle - the line is drawn over it, not instead of it - and none of the
         // rock. Drawn on the walls too it would be a sheet over the whole map, which is what the
-        // outline exists to avoid.
+        // outline exists to avoid. And on flat ground a pixel's ground is its own cell.
         TerrainGrid grid = Grid(
             "#####",
             "#...#",
@@ -255,43 +255,52 @@ public class TerrainGridTests
             "#...#",
             "#####");
 
-        OutlineMask mask = TerrainOutline.Build(grid, maxEdge: 64);
-        byte[] fill = TerrainOutline.Fill(grid, mask, isoHeightShift: false);
-        byte At(int x, int y) => fill[(y * mask.Width) + x];
+        FloorPlan floor = TerrainOutline.Floor(grid, step: 1, isoHeightShift: false);
+        int At(int x, int y) => (y * floor.Width) + x;
 
-        Assert.Equal(mask.Cells.Length, fill.Length);
-        Assert.Equal(255, At(2, 2));   // the middle
-        Assert.Equal(255, At(1, 1));   // the ring, where the line also is
-        Assert.Equal(0, At(0, 0));     // the wall
-        Assert.Equal(0, At(4, 2));
+        Assert.Equal(grid.Width, floor.Width);
+        Assert.Equal(255, floor.Coverage[At(2, 2)]);   // the middle
+        Assert.Equal(255, floor.Coverage[At(1, 1)]);   // the ring, where the line also is
+        Assert.Equal(0, floor.Coverage[At(0, 0)]);     // the wall
+        Assert.Equal(0, floor.Coverage[At(4, 2)]);
+
+        Assert.Equal(At(2, 2), floor.Source[At(2, 2)]);
+        Assert.Equal(-1, floor.Source[At(0, 0)]);
     }
 
     [Fact]
-    public void AThinnedPixelIsAsMuchFloorAsItHolds()
+    public void ACoarsePixelIsAsMuchFloorAsItHolds()
     {
-        // At a thinning step of two a pixel holds four cells, and the floor's edge runs through
-        // some of them. Counted, those pixels get a proportionate alpha - the edge anti-aliased
-        // for nothing. Flagged, they would get the full sheet and grow the floor by up to a
-        // pixel on every side.
+        // At a step of two a pixel holds four cells, and the floor's edge runs through some of
+        // them. Counted, those pixels get a proportionate alpha - the edge anti-aliased for
+        // nothing. Flagged, they would get the full sheet and grow the floor by up to a pixel
+        // on every side. Five cells wide, so the last column is a partial pixel that is still
+        // drawn rather than dropped.
         TerrainGrid grid = Grid(
-            "...#",
-            "..##");
+            "...#.",
+            "..##.");
 
-        OutlineMask mask = TerrainOutline.Build(grid, maxEdge: 2);
-        Assert.Equal(2, mask.Step);
+        FloorPlan floor = TerrainOutline.Floor(grid, step: 2, isoHeightShift: false);
 
-        byte[] fill = TerrainOutline.Fill(grid, mask, isoHeightShift: false);
-
-        Assert.Equal(255, fill[0]);   // four of four
-        Assert.Equal(64, fill[1]);    // one of four
+        Assert.Equal(3, floor.Width);
+        Assert.Equal(1, floor.Height);
+        Assert.Equal(255, floor.Coverage[0]);   // four of four
+        Assert.Equal(64, floor.Coverage[1]);    // one of four
+        Assert.Equal(128, floor.Coverage[2]);   // two of four: the column, plus the padding cell
+        Assert.Equal(2, floor.Source[2]);
     }
 
     [Fact]
-    public void TheFillMovesWithTheLine()
+    public void TheFloorMovesWithTheLine_AndRemembersWhereItStood()
     {
         // The sheet and its edge have to be displaced by the same heights, or on every slope
         // the sheet peels away from the line drawn around it. Same grid as the line's own
         // height test: one raised tile in a walkable field.
+        //
+        // And a displaced pixel has to know which cell it shows, because "has this been walked"
+        // is recorded against the cell and asked of the pixel - on a hill the two are tens of
+        // cells apart, and a hole looked up at the pixel's own position would open beside the
+        // player rather than around them.
         int cells = TerrainGrid.CellsPerTile;
         int width = 2 * cells;
         int stride = (width + 1) / 2;
@@ -305,20 +314,25 @@ public class TerrainGridTests
         Assert.True(shift < 0);
 
         OutlineMask mask = TerrainOutline.Build(grid, maxEdge: 4096, thickness: 1, isoHeightShift: true);
-        byte[] flat = TerrainOutline.Fill(grid, mask, isoHeightShift: false);
-        byte[] shifted = TerrainOutline.Fill(grid, mask, isoHeightShift: true);
+        FloorPlan flat = TerrainOutline.Floor(grid, step: 1, isoHeightShift: false);
+        FloorPlan shifted = TerrainOutline.Floor(grid, step: 1, isoHeightShift: true);
+        int At(int x, int y) => (y * shifted.Width) + x;
 
         // Flat, the corner is floor like everything else. Shifted, the raised tile's corner
         // cell has moved its own height away - and nothing has moved INTO the corner, so the
         // picture is clear there, exactly where the line is clear too.
-        Assert.Equal(255, flat[0]);
-        Assert.Equal(0, shifted[0]);
+        Assert.Equal(255, flat.Coverage[At(0, 0)]);
+        Assert.Equal(0, shifted.Coverage[At(0, 0)]);
         Assert.False(mask.IsSet(0, 0));
-        Assert.Equal(255, shifted[(-shift * mask.Width) + -shift]);
 
-        // And the far corner is flat ground, which does not move.
+        // Where it landed, the pixel is floor - and names the corner cell as its ground.
+        Assert.Equal(255, shifted.Coverage[At(-shift, -shift)]);
+        Assert.Equal(At(0, 0), shifted.Source[At(-shift, -shift)]);
+
+        // And the far corner is flat ground, which does not move and is its own ground.
         int far = width - 1;
-        Assert.Equal(255, shifted[(far * mask.Width) + far]);
+        Assert.Equal(255, shifted.Coverage[At(far, far)]);
+        Assert.Equal(At(far, far), shifted.Source[At(far, far)]);
     }
 
     [Theory]
