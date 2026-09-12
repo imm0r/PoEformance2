@@ -2350,6 +2350,19 @@ interesting part was not the feature:
     The index is a first guess, verified against the id; a miss falls back to a scan of the
     root's children. The address is cached and re-checked each frame (it must still answer to
     `"HUD"`), so an area change or a patch costs one scan rather than a wrong answer.
+  - **The same measurement, used the other way round: writing ON the HUD.** The number of uses
+    left on each flask (charges over the cost of one, the figure the game keeps for its tooltip)
+    is drawn on the flask's own slot, and the slot is found the way the HUD was — by asking the
+    tree. The browser shows `HUDLeft` → `flask_bar` under the HUD, and under the bar nothing is
+    named: two unnamed wrappers each holding a 58×115 slot, three charm slots, a few decorations.
+    What a slot has instead of a name is the item in it, at `UiElementBase.ItemPtr`, so
+    `FlaskBarReader` takes as a slot whatever under the bar points at an item, and the overlay
+    joins that item against the belt's `EquippedFlask.Entity` — the same entity, read from the
+    inventory side. An index would have been the fragile choice again, and a slot that has an
+    item is exactly the one that needs a number. The search is repeated every two seconds
+    because an EMPTY slot points at nothing and so is invisible to it; a flask equipped
+    mid-map would otherwise wait for the next area. Charms are left alone on purpose: the game
+    prints their charges itself, and a second number beside its own reads as a disagreement.
   - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
     the minimap lives under must never come back as a piece of interface — that would take the
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while

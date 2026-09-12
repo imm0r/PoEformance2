@@ -56,6 +56,16 @@ public readonly record struct EquippedFlask(
     /// status readout claim uses that never happened. See the gate in AutoFlask.
     /// </remarks>
     public bool CanUse => ChargesPerUse > 0 && Charges >= ChargesPerUse;
+
+    /// <summary>
+    /// How many times this flask can be used before it is empty.
+    /// </summary>
+    /// <remarks>
+    /// Whole uses, because a flask does not trigger on a partial one - see <see cref="CanUse"/>.
+    /// Zero when the cost is unknown, which is the honest count rather than a division by
+    /// nothing: a flask whose cost could not be read cannot be said to have any.
+    /// </remarks>
+    public int Uses => ChargesPerUse > 0 ? Charges / ChargesPerUse : 0;
 }
 
 /// <summary>The flask belt, indexed by slot.</summary>

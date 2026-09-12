@@ -101,6 +101,7 @@ public sealed class UiElementReader
     private readonly int _flags;
     private readonly int _scaleIndex;
     private readonly int _unscaledSize;
+    private readonly int _itemPtr;
     private readonly uint _flagShouldModifyPos;
     private readonly uint _flagIsVisible;
     private readonly int _maxDepth;
@@ -123,6 +124,7 @@ public sealed class UiElementReader
         _flags = ui.OffsetOf("Flags");
         _scaleIndex = ui.OffsetOf("ScaleIndex");
         _unscaledSize = ui.OffsetOf("UnscaledSize");
+        _itemPtr = ui.OffsetOf("ItemPtr");
         _flagShouldModifyPos = (uint)ui.Constants["FlagShouldModifyPos"];
         _flagIsVisible = (uint)ui.Constants["FlagIsVisible"];
         _maxDepth = (int)ui.Constants["MaxParentChainDepth"];
@@ -350,6 +352,24 @@ public sealed class UiElementReader
             order?.Add(address);
             address = _reader.ReadPointer(address + (ulong)_parent);
         }
+    }
+
+    /// <summary>The item entity a slot element holds, or 0 for none.</summary>
+    /// <remarks>
+    /// Zero is the ordinary answer: most elements are not slots, and a slot can be empty. What
+    /// makes it worth a method is what a non-zero answer identifies - an inventory slot, a belt
+    /// slot - without a name or an index: a slot IS whatever points at an item. A value that is
+    /// not a plausible pointer counts as none rather than being handed on to be read through.
+    /// </remarks>
+    public ulong ItemOf(ulong address)
+    {
+        if (!IsUiElement(address))
+        {
+            return 0;
+        }
+
+        ulong item = _reader.ReadPointer(address + (ulong)_itemPtr);
+        return MemoryReaderExtensions.IsPlausiblePointer(item) ? item : 0;
     }
 
     /// <summary>Reads the element's child pointers.</summary>

@@ -443,8 +443,15 @@ public sealed record WorldSnapshot(
     // The entity under the cursor, as the GAME has it, or 0 for none. An address rather than a
     // WorldEntity: join it against Entities on Address when a caller wants the rest. Zero is
     // the normal answer on most frames - the cursor is usually over floor. See MouseOverReader.
-    ulong Hovered = 0)
+    ulong Hovered = 0,
+
+    // Where the belt's slots are drawn on the HUD, each with the item it holds - so a number
+    // can be written on a flask. Joined against FlaskBelt on the item entity. See FlaskBarReader.
+    IReadOnlyList<FlaskSlotOnScreen>? FlaskSlots = null)
 {
+    /// <summary>The belt's slots on screen, empty when the bar is not - or was not read.</summary>
+    public IReadOnlyList<FlaskSlotOnScreen> FlaskSlotsOnScreen => FlaskSlots ?? [];
+
     /// <summary>The parts of the game's interface on screen, empty when none were read.</summary>
     /// <remarks>
     /// Empty is an ordinary answer and does NOT mean the HUD is gone: a diagnostic run with no
@@ -728,6 +735,7 @@ public sealed class WorldReader
 
     /// <summary>Where the game's own interface is, measured part by part every tick.</summary>
     private readonly InterfaceReader _hud;
+    private readonly FlaskBarReader _flaskBar;
 
     /// <summary>
     /// The child path to the atlas panel, for finding the screen its furniture hangs on.
@@ -842,6 +850,7 @@ public sealed class WorldReader
         _uiElements = new UiElementReader(reader, schema);
         _panels = new PanelReader(reader, schema, _uiElements);
         _hud = new InterfaceReader(reader, schema, _uiElements);
+        _flaskBar = new FlaskBarReader(reader, schema, _uiElements);
 
         StructDef atlasPanel = schema.Structs["AtlasPanel"];
         _atlasPath =
@@ -1560,6 +1569,7 @@ public sealed class WorldReader
         MapView? largeMap = null;
         MapView? miniMap = null;
         IReadOnlyList<InterfacePart> hud = [];
+        IReadOnlyList<FlaskSlotOnScreen> flaskSlots = [];
         if (scale is UiScale viewport && chain.UiRoot != 0)
         {
             // Order matters: reading the minimap first is what leaves its diagonal cached
@@ -1582,6 +1592,11 @@ public sealed class WorldReader
             _uiElements.AndAncestors(mini, notThese);
 
             hud = _hud.Read(chain.UiRoot, viewport, notThese);
+
+            // The belt's slots, under the same interface element: where each flask is drawn,
+            // for the number written on it. From the HUD the reader just resolved, so a HUD
+            // that was not found costs no search here either.
+            flaskSlots = _flaskBar.Read(_hud.Element, viewport, nowMs);
         }
 
         // Which panels are in the way and where, from the same interface root that was just
@@ -1653,7 +1668,8 @@ public sealed class WorldReader
             playerLevel,
             hud,
             frustum,
-            hovered);
+            hovered,
+            flaskSlots);
     }
 
     /// <summary>How many names are worth remembering before starting over.</summary>
