@@ -84,6 +84,32 @@ public sealed class PatternScanner
         return MemoryReaderExtensions.IsPlausiblePointer(target) ? target : 0;
     }
 
+    /// <summary>
+    /// The bytes of the cached module image at <paramref name="address"/>, or an empty array
+    /// when the range is not inside the image.
+    /// </summary>
+    /// <remarks>
+    /// For showing a match site as it actually is. When a loosened pattern finds the place a
+    /// patch changed, these bytes ARE the new exact pattern, and printing them is what turns
+    /// "fallback 2 hit" into a schema edit instead of a Ghidra session.
+    /// </remarks>
+    public byte[] BytesAt(ulong address, int length)
+    {
+        byte[]? image = EnsureImage();
+        if (image is null || length <= 0 || address < _reader.ModuleBase)
+        {
+            return [];
+        }
+
+        ulong offset = address - _reader.ModuleBase;
+        if (offset + (ulong)length > (ulong)image.Length)
+        {
+            return [];
+        }
+
+        return image.AsSpan((int)offset, length).ToArray();
+    }
+
     /// <summary>Copies the module image out of the target once. Null when unattached.</summary>
     private byte[]? EnsureImage()
     {

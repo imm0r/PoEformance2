@@ -150,6 +150,61 @@ public class TerrainGridTests
         Assert.Equal(expectedWidth, width);
     }
 
+    [Theory]
+    [InlineData(1, 1)]
+    [InlineData(2, 1)]
+    [InlineData(3, 1)]
+    [InlineData(1, 2)]
+    [InlineData(2, 2)]
+    [InlineData(4, 3)]
+    public void TheRimReachesExactlySoFarOnEachSideOfTheLine(int thickness, int reach)
+    {
+        // The line is one colour and the ground under it is every colour, so on the ground
+        // that matches it the line is not there at all. The rim is what fixes that, and it
+        // has to reach the SAME distance on each side whatever the width: grown from the
+        // thin line again, an even width would have it one pixel off-centre in its own rim.
+        var rows = new string[21];
+        for (int y = 0; y < rows.Length; y++)
+        {
+            rows[y] = new string('#', 10) + "." + new string('#', 10);
+        }
+
+        OutlineMask mask = TerrainOutline.Build(Grid(rows), maxEdge: 64, thickness);
+        byte[] rim = TerrainOutline.Rim(mask, reach);
+
+        // Across the column: the line plus the reach on each side, and nothing else.
+        int lineWidth = 0;
+        int rimWidth = 0;
+        for (int x = 0; x < mask.Width; x++)
+        {
+            lineWidth += mask.IsSet(x, 10) ? 1 : 0;
+            rimWidth += rim[(10 * mask.Width) + x] != 0 ? 1 : 0;
+        }
+
+        Assert.Equal(thickness, lineWidth);
+        Assert.Equal(thickness + (2 * reach), rimWidth);
+
+        // And pixel by pixel, against the definition: set exactly where a line pixel is
+        // within the reach in any direction, including diagonally. The two-pass version has
+        // to agree with the plain one everywhere, edges included.
+        for (int y = 0; y < mask.Height; y++)
+        {
+            for (int x = 0; x < mask.Width; x++)
+            {
+                bool near = false;
+                for (int dy = -reach; dy <= reach && !near; dy++)
+                {
+                    for (int dx = -reach; dx <= reach && !near; dx++)
+                    {
+                        near = mask.IsSet(x + dx, y + dy);
+                    }
+                }
+
+                Assert.Equal(near, rim[(y * mask.Width) + x] != 0);
+            }
+        }
+    }
+
     [Fact]
     public void TheHeightShiftMovesACellInThePicture_AndOnlyWhenAskedFor()
     {
@@ -184,6 +239,100 @@ public class TerrainGridTests
         int far = width - 1;
         Assert.True(flatDrawn.IsSet(far, far));
         Assert.True(shifted.IsSet(far, far));
+    }
+
+    [Fact]
+    public void TheFloorIsEveryWalkableCell_AndKnowsWhereEachPixelCameFrom()
+    {
+        // The floor as a sheet under the line: the whole of the floor, the ring beside the wall
+        // as much as the middle - the line is drawn over it, not instead of it - and none of the
+        // rock. Drawn on the walls too it would be a sheet over the whole map, which is what the
+        // outline exists to avoid. And on flat ground a pixel's ground is its own cell.
+        TerrainGrid grid = Grid(
+            "#####",
+            "#...#",
+            "#...#",
+            "#...#",
+            "#####");
+
+        FloorPlan floor = TerrainOutline.Floor(grid, step: 1, isoHeightShift: false);
+        int At(int x, int y) => (y * floor.Width) + x;
+
+        Assert.Equal(grid.Width, floor.Width);
+        Assert.Equal(255, floor.Coverage[At(2, 2)]);   // the middle
+        Assert.Equal(255, floor.Coverage[At(1, 1)]);   // the ring, where the line also is
+        Assert.Equal(0, floor.Coverage[At(0, 0)]);     // the wall
+        Assert.Equal(0, floor.Coverage[At(4, 2)]);
+
+        Assert.Equal(At(2, 2), floor.Source[At(2, 2)]);
+        Assert.Equal(-1, floor.Source[At(0, 0)]);
+    }
+
+    [Fact]
+    public void ACoarsePixelIsAsMuchFloorAsItHolds()
+    {
+        // At a step of two a pixel holds four cells, and the floor's edge runs through some of
+        // them. Counted, those pixels get a proportionate alpha - the edge anti-aliased for
+        // nothing. Flagged, they would get the full sheet and grow the floor by up to a pixel
+        // on every side. Five cells wide, so the last column is a partial pixel that is still
+        // drawn rather than dropped.
+        TerrainGrid grid = Grid(
+            "...#.",
+            "..##.");
+
+        FloorPlan floor = TerrainOutline.Floor(grid, step: 2, isoHeightShift: false);
+
+        Assert.Equal(3, floor.Width);
+        Assert.Equal(1, floor.Height);
+        Assert.Equal(255, floor.Coverage[0]);   // four of four
+        Assert.Equal(64, floor.Coverage[1]);    // one of four
+        Assert.Equal(128, floor.Coverage[2]);   // two of four: the column, plus the padding cell
+        Assert.Equal(2, floor.Source[2]);
+    }
+
+    [Fact]
+    public void TheFloorMovesWithTheLine_AndRemembersWhereItStood()
+    {
+        // The sheet and its edge have to be displaced by the same heights, or on every slope
+        // the sheet peels away from the line drawn around it. Same grid as the line's own
+        // height test: one raised tile in a walkable field.
+        //
+        // And a displaced pixel has to know which cell it shows, because "has this been walked"
+        // is recorded against the cell and asked of the pixel - on a hill the two are tens of
+        // cells apart, and a hole looked up at the pixel's own position would open beside the
+        // player rather than around them.
+        int cells = TerrainGrid.CellsPerTile;
+        int width = 2 * cells;
+        int stride = (width + 1) / 2;
+
+        var packed = new byte[stride * width];
+        Array.Fill(packed, (byte)0x11);
+        var heights = new float[] { -242f, 0f, 0f, 0f };
+        var grid = new TerrainGrid(packed, stride, width, 2, 2, heights);
+
+        int shift = grid.IsoHeightShift(0, 0);
+        Assert.True(shift < 0);
+
+        OutlineMask mask = TerrainOutline.Build(grid, maxEdge: 4096, thickness: 1, isoHeightShift: true);
+        FloorPlan flat = TerrainOutline.Floor(grid, step: 1, isoHeightShift: false);
+        FloorPlan shifted = TerrainOutline.Floor(grid, step: 1, isoHeightShift: true);
+        int At(int x, int y) => (y * shifted.Width) + x;
+
+        // Flat, the corner is floor like everything else. Shifted, the raised tile's corner
+        // cell has moved its own height away - and nothing has moved INTO the corner, so the
+        // picture is clear there, exactly where the line is clear too.
+        Assert.Equal(255, flat.Coverage[At(0, 0)]);
+        Assert.Equal(0, shifted.Coverage[At(0, 0)]);
+        Assert.False(mask.IsSet(0, 0));
+
+        // Where it landed, the pixel is floor - and names the corner cell as its ground.
+        Assert.Equal(255, shifted.Coverage[At(-shift, -shift)]);
+        Assert.Equal(At(0, 0), shifted.Source[At(-shift, -shift)]);
+
+        // And the far corner is flat ground, which does not move and is its own ground.
+        int far = width - 1;
+        Assert.Equal(255, shifted.Coverage[At(far, far)]);
+        Assert.Equal(At(far, far), shifted.Source[At(far, far)]);
     }
 
     [Theory]
@@ -318,5 +467,69 @@ public class TerrainGridTests
 
         Assert.True(grid.IsClearLine(0, 0, 0, 0));
         Assert.False(grid.IsClearLine(1, 0, 1, 0));
+    }
+
+    /// <summary>A grid of whole tiles with exactly one walkable cell, at the given coordinates.</summary>
+    private static TerrainGrid OneWalkableCell(int tilesX, int tilesY, int cellX, int cellY)
+    {
+        int width = tilesX * TerrainGrid.CellsPerTile;
+        int height = tilesY * TerrainGrid.CellsPerTile;
+        var rows = new string[height];
+        for (int y = 0; y < height; y++)
+        {
+            rows[y] = y == cellY
+                ? new string('#', cellX) + "." + new string('#', width - cellX - 1)
+                : new string('#', width);
+        }
+
+        return Grid(rows);
+    }
+
+    [Theory]
+    [InlineData(0, 0, 0)]
+    [InlineData(22, 22, 0)]     // the tile's last cell, at an odd x
+    [InlineData(23, 23, 3)]     // the NEXT tile's first cell - and the SAME byte as the one above
+    [InlineData(45, 45, 3)]
+    public void OneWalkableCellMarksItsOwnTileAndNoOther(int cellX, int cellY, int expected)
+    {
+        // The boundary cases are the point. A tile is 23 cells across and a byte holds two, so
+        // every odd tile boundary lands MID-BYTE: cells 22 and 23 share one byte and belong to
+        // different tiles. Marking "the tile this byte is in" would let a neighbour's edge cell
+        // answer for this one, which is why the sweep maps each NIBBLE to its own tile.
+        bool[] mask = OneWalkableCell(2, 2, cellX, cellY).WalkableTileMask();
+
+        Assert.Equal(4, mask.Length);
+        for (int tile = 0; tile < mask.Length; tile++)
+        {
+            Assert.Equal(tile == expected, mask[tile]);
+        }
+    }
+
+    [Fact]
+    public void AnAreaWithNothingWalkableMarksNothing()
+    {
+        // Which is a real state, not a broken read: an area that has not finished loading and
+        // a tile block of solid scenery both look exactly like this.
+        bool[] mask = Grid([.. Enumerable.Repeat(new string('#', 46), 46)]).WalkableTileMask();
+
+        Assert.Equal(4, mask.Length);
+        Assert.All(mask, walkable => Assert.False(walkable));
+    }
+
+    [Fact]
+    public void RowPaddingIsNotWalkableGround()
+    {
+        // The row stride is a byte count the game is free to round up, and the cells past the
+        // area's own width are whatever was in memory. Counting them would mark the last tile
+        // of every row as walkable on a map where it is not.
+        var cells = new byte[2 * TerrainGrid.CellsPerTile * 24];   // 24 bytes a row for 46 cells
+        for (int y = 0; y < 2 * TerrainGrid.CellsPerTile; y++)
+        {
+            cells[(y * 24) + 23] = 0xFF;   // cells 46 and 47: past the width, pure padding
+        }
+
+        bool[] mask = new TerrainGrid(cells, 24, 46, 2, 2, heights: null).WalkableTileMask();
+
+        Assert.All(mask, walkable => Assert.False(walkable));
     }
 }

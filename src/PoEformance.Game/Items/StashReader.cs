@@ -46,11 +46,31 @@ public sealed record StashInventory(
     IReadOnlyList<StashedItem> Items,
     bool Loaded = true)
 {
-    /// <summary>A name to show when the tab's own is not known.</summary>
+    /// <summary>
+    /// A name to show when the tab's own is not known.
+    /// </summary>
+    /// <remarks>
+    /// THE TOP BIT OF AN ID IS A MARK, NOT PART OF A NUMBER. Two entries in the list carry ids
+    /// 0x80000000 and 0x80000001, which read as a signed i32 are -2147483648 and -2147483647 -
+    /// and were shown as "Stash tab -2147483648", a number that says nothing and looks like a
+    /// read gone wrong. Bit 31 marks the category; the low bits are its own index, 0 and 1.
+    ///
+    /// THEY ARE THE MERCHANT'S SHOP PAGES, and the game settled it rather than a theory did
+    /// (2026-09, owner's screenshot): the Merchant window's Shop section holds exactly two pages,
+    /// and selecting id 0x80000001 here shows the same 55 items the game draws in the second one.
+    /// They also read as EMPTY until that window has been opened once - the same rule as an
+    /// unopened stash tab, which is why they first appeared as two empty tabs with absurd numbers.
+    ///
+    /// Only the NAME is decided here. <see cref="KindOf"/> still calls them stash tabs, which for
+    /// counting is right - items listed for sale are still the player's, and these two hold 12 div
+    /// worth - and changing it would change what <c>StashInspector.Count</c> treats as having seen
+    /// a stash.
+    /// </remarks>
     public string Called => Kind switch
     {
         InventoryKind.Backpack => "Backpack",
         InventoryKind.Equipped => $"Equipped ({Id})",
+        _ when Id < 0 => $"Shop tab {(Id & int.MaxValue) + 1}",
         _ => $"Stash tab {Id}",
     };
 }

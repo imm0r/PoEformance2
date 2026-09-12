@@ -571,6 +571,151 @@ public class PreloadNewestStampTests
         Assert.Contains("whole game", reader.LastError, StringComparison.Ordinal);
         Assert.DoesNotContain("moved", reader.LastError, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void ATableThatYieldsNoRecordsIsNotAMovedStampField()
+    {
+        // THE THIRD LIVE FAILURE, and it made the readout contradict itself in front of
+        // somebody: an area reported "the newest stamp is 0 but the counter says 4 - the stamp
+        // field has probably moved; try 'find the count field'", and the sweep it recommended
+        // then reported ZERO RECORDS READ. Both cannot be true. With no records there is no
+        // stamp to be at the wrong offset - the root or the bucket layout is wrong, one level
+        // above anything a count-field sweep can see, and the advice sent the search into the
+        // one place that could not hold the answer.
+        //
+        // The number that tells them apart was being counted and thrown away.
+        var memory = new FakeMemoryReader();
+        memory.Place(RootStatic, Root);          // a root that resolves, holding no buckets
+
+        var reader = new PreloadReader(memory, Schema());
+        Assert.Empty(reader.Read(RootStatic, 4));
+
+        Assert.Equal(0, reader.RecordsSeen);
+        Assert.Contains("no records at all", reader.LastError, StringComparison.Ordinal);
+        Assert.DoesNotContain("stamp field has probably moved", reader.LastError, StringComparison.Ordinal);
+        Assert.DoesNotContain("find the count field", reader.LastError, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RecordsSeenCountsWhatTheWalkReachedWhateverItHeld()
+    {
+        // The other side: records that ARE reached, whose stamps happen to read low. Here the
+        // moved-field advice is the right one, and it must survive the fix above.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 2),
+            ("Data/Balance/FlavourText.dat", 2));
+
+        var reader = new PreloadReader(memory, Schema());
+        reader.Read(RootStatic, 13);
+
+        Assert.Equal(2, reader.RecordsSeen);
+        Assert.Contains("moved", reader.LastError, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheBucketsAreShownWhenTheWalkReachesNothing()
+    {
+        // ONE LEVEL BELOW "no slots walked", which is itself three faults wearing one number:
+        // RecordsIn gives up on an unreadable capacity, on a begin that is not a pointer, and
+        // on a slot count of zero, and three of its four exits are silent. A root that resolves
+        // but holds no table is the live case, and sixteen empty buckets is what says so.
+        var memory = new FakeMemoryReader();
+        memory.Place(RootStatic, Root);
+
+        IReadOnlyList<string> lines = new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic);
+
+        Assert.Contains($"root at {Root:X}", lines[0], StringComparison.Ordinal);
+        Assert.Contains("no bucket holds slots", lines[^1], StringComparison.Ordinal);
+        Assert.Contains(lines, l => l.Contains("bucket  0", StringComparison.Ordinal));
+        Assert.Contains(lines, l => l.Contains("bucket 15", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ACapacityThatIsNotACountDoesNotThrowTheTableAway()
+    {
+        // THE LIVE BUG, and the worst kind: an intact table reported as "no files matched this
+        // area". The field at +0x18 is not a count. Measured in a MapForge area the sixteen
+        // buckets read -843513840, -843186160, -842858480 and on down - every value ending 0010,
+        // stepping by a constant 0x50000, which is the low half of a POINTER, one allocation per
+        // bucket. Every vector was perfect: (end-begin)/0x18 gave 990, 959 and 927 slots.
+        //
+        // The walk gated on capacity > 0 and threw all of it away. The sign of a pointer's low
+        // half is a coin flip per allocation, so the same build had read the same table an hour
+        // earlier; nothing was patched, and the bug had been latent since the walk was written.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 9),
+            ("Data/Balance/FlavourText.dat", 9));
+
+        // Whatever the fixture put there, make it the shape the game actually holds.
+        memory.Place(Root + (ulong)Schema().Structs["LoadedFilesBucket"].OffsetOf("Capacity"), -843513840);
+
+        var reader = new PreloadReader(memory, Schema());
+
+        Assert.Equal(["Data/Balance/BaseItemTypes.dat", "Data/Balance/FlavourText.dat"],
+            reader.Read(RootStatic, 9).OrderBy(p => p, StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void TheBucketReadoutDoesNotCallAFullBucketEmpty()
+    {
+        // MY OWN VERDICT, REFUTED BY ITS OWN ROWS. DescribeBuckets required a positive capacity
+        // before counting a bucket usable, so it printed "every bucket is empty" above sixteen
+        // rows each reporting nine hundred slots - in the diagnostic written to stop exactly
+        // that kind of line. A verdict its own evidence contradicts is worse than no verdict.
+        FakeMemoryReader memory = TableWith(("Data/Balance/BaseItemTypes.dat", 9));
+        memory.Place(Root + (ulong)Schema().Structs["LoadedFilesBucket"].OffsetOf("Capacity"), -843513840);
+
+        IReadOnlyList<string> lines = new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic);
+
+        Assert.DoesNotContain(lines, l => l.Contains("no bucket holds slots", StringComparison.Ordinal));
+        Assert.Contains(lines, l => l.Contains("buckets hold slots", StringComparison.Ordinal));
+
+        // And the oddity is still SAID, because printing it is how the field was caught.
+        Assert.Contains(lines, l => l.Contains("are not counts", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ABucketThatHoldsSlotsIsCountedAsUsable()
+    {
+        // The other side, so the verdict cannot be a constant: one full bucket among empties is
+        // a DIFFERENT fault from sixteen empties - a stride problem rather than a wrong root -
+        // and the summary has to tell them apart.
+        FakeMemoryReader memory = TableWith(
+            ("Data/Balance/BaseItemTypes.dat", 9),
+            ("Data/Balance/FlavourText.dat", 9));
+
+        IReadOnlyList<string> lines = new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic);
+
+        Assert.Contains(lines, l => l.Contains("buckets hold slots", StringComparison.Ordinal));
+        Assert.DoesNotContain(lines, l => l.Contains("no bucket holds slots", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ARootThatIsNotAPointerIsSaidRatherThanWalked()
+    {
+        var memory = new FakeMemoryReader();
+        memory.Place(RootStatic, 0UL);
+
+        Assert.Contains(
+            "not a pointer",
+            Assert.Single(new PreloadReader(memory, Schema()).DescribeBuckets(RootStatic)),
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ASweepThatNeverStartedSaysSoRatherThanReturningZeros()
+    {
+        // "Walked and found nothing" and "never started" both came back as a row of zeros,
+        // which is the one confusion every diagnostic here has had to be taught not to make.
+        var memory = new FakeMemoryReader();
+        memory.Place(RootStatic, 0UL);
+
+        var reader = new PreloadReader(memory, Schema());
+        PreloadReader.PreloadSweep swept = reader.Sweep(RootStatic, 4);
+
+        Assert.Equal(0, swept.Slots);
+        Assert.Contains("did not resolve", reader.LastError, StringComparison.Ordinal);
+    }
 }
 /// <summary>
 /// Matching the curated list against what an area loaded.

@@ -50,7 +50,18 @@ public static class SchemaJson
                 throw new InvalidDataException($"Static '{name}' pattern has no '^' RIP marker.");
             }
 
-            statics[name] = new StaticAnchor(name, s.Pattern, s.Comment);
+            var fallbacks = new List<string>(s.Fallbacks?.Length ?? 0);
+            foreach (string fallback in s.Fallbacks ?? [])
+            {
+                if (string.IsNullOrWhiteSpace(fallback) || !fallback.Contains('^'))
+                {
+                    throw new InvalidDataException($"Static '{name}' has a fallback pattern without a '^' RIP marker: \"{fallback}\".");
+                }
+
+                fallbacks.Add(fallback);
+            }
+
+            statics[name] = new StaticAnchor(name, s.Pattern, s.Comment, fallbacks);
         }
 
         var structs = new Dictionary<string, StructDef>();
@@ -244,6 +255,9 @@ public sealed class StaticDto
 {
     [JsonPropertyName("pattern")]
     public string? Pattern { get; set; }
+
+    [JsonPropertyName("fallbacks")]
+    public string[]? Fallbacks { get; set; }
 
     [JsonPropertyName("comment")]
     public string? Comment { get; set; }

@@ -219,6 +219,34 @@ public class SnapshotFeedTests
     }
 
     [Fact]
+    public void DisposingWhileEveryReadThrowsDoesNotTakeTheProcessDown()
+    {
+        // THE CRASH THIS PINS was live for as long as the catch carried a filter reading
+        // "when (!_cancellation.IsCancellationRequested)". A read that threw at the instant
+        // shutdown was requested did not match it, so it was never caught at all: it left Loop,
+        // reached the top of a background thread, and killed the process. CI found it as a test
+        // host crash after 898 unrelated tests had passed, which is what a race looks like from
+        // the outside - and it is not confined to tests, since disposing the feed while a read is
+        // in flight is simply what shutdown is.
+        //
+        // Throw on EVERY read and dispose while they are in flight, repeatedly, so the window the
+        // filter left open is actually aimed at rather than waited for.
+        for (var attempt = 0; attempt < 50; attempt++)
+        {
+            var feed = new SnapshotFeed(
+                _ => throw new InvalidOperationException("the entity map moved"),
+                TimeSpan.FromMilliseconds(1));
+
+            WaitFor(() => feed.FailureCount >= 1, "nothing failed");
+            feed.Dispose();
+        }
+
+        // Reaching here at all is the assertion - the old code took the test host with it - but
+        // an explicit one says so to anyone reading a green run.
+        Assert.True(true);
+    }
+
+    [Fact]
     public void NothingHasThrownReadsAsNothingRatherThanAsAnEmptyMessage()
     {
         using var feed = new SnapshotFeed(_ => SnapshotWith(1), TimeSpan.FromMilliseconds(5));

@@ -3,6 +3,7 @@ using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Game.Components;
 using PoEformance.Game.Entities;
+using PoEformance.Game.Items;
 
 namespace PoEformance.Game.Diagnostics;
 
@@ -22,23 +23,89 @@ namespace PoEformance.Game.Diagnostics;
 /// </remarks>
 public sealed class FlaskProbe
 {
+    /// <summary>How far into each component the value hunt looks.</summary>
+    /// <remarks>
+    /// A component is a handful of fields behind a vtable, and the ones already mapped put
+    /// everything interesting inside the first few dozen bytes - Charges ends at +0x40. Far
+    /// enough to cover an unmapped one, short enough that eight components a flask stay a
+    /// few hundred reads rather than a scan.
+    /// </remarks>
+    private const int HuntBytes = 0x100;
+
+    /// <summary>And how far into each structure a component points at.</summary>
+    private const int FollowBytes = 0x80;
+
+    /// <summary>
+    /// Hits printed before the rest are counted instead.
+    /// </summary>
+    /// <remarks>
+    /// A small candidate is noisy once pointers are followed - 8 is one of the commonest
+    /// values in any heap - and a hundred lines of it would bury the one hit that matters.
+    /// The count still says how many there were.
+    /// </remarks>
+    private const int MostHits = 24;
+
     private readonly IMemoryReader _reader;
     private readonly OffsetSchema _schema;
     private readonly EntityReader _entities;
+    private readonly ItemReader? _items;
+    private readonly ItemNames _names;
 
-    public FlaskProbe(IMemoryReader reader, OffsetSchema schema)
+    public FlaskProbe(IMemoryReader reader, OffsetSchema schema, ItemNames? names = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
         _reader = reader;
         _schema = schema;
         _entities = new EntityReader(reader, schema);
+        _names = names ?? ItemNames.Empty;
+
+        // A diagnostic is what somebody runs when the schema is the suspect, so it must not be
+        // the thing that dies of it. ItemReader wants a dozen item structs; without them the
+        // rest of this probe - the whole belt walk, which needs none of them - still reports.
+        try
+        {
+            _items = new ItemReader(reader, schema, _names);
+        }
+        catch (KeyNotFoundException)
+        {
+            _items = null;
+        }
     }
 
+    /// <summary>
+    /// Walks the belt chain and prints what it found at each step.
+    /// </summary>
+    /// <remarks>
+    /// A MISSING SCHEMA FIELD IS A FINDING HERE, NOT A CRASH, and that is not a hypothetical
+    /// guard: this probe asked ServerDataStructure for a field that lives on
+    /// ServerDataOffsets, so <c>--flasks</c> died with an unhandled KeyNotFoundException after
+    /// three lines of output - in the one tool somebody reaches for when the schema is the
+    /// suspect. OffsetOf already throws with both struct and field named, which is exactly
+    /// the sentence worth printing, so the message is kept and the process is not.
+    ///
+    /// The probe still STOPS at that point rather than carrying on. Everything below a
+    /// missing offset reads through it, and a walk that printed plausible addresses derived
+    /// from a field the schema does not have would be worse than no walk at all.
+    /// </remarks>
     public void Report(ulong gameStatesStatic, TextWriter output)
     {
         ArgumentNullException.ThrowIfNull(output);
 
+        try
+        {
+            Walk(gameStatesStatic, output);
+        }
+        catch (KeyNotFoundException missing)
+        {
+            output.WriteLine($"  FAIL  {missing.Message}");
+            output.WriteLine("        The probe stops here - everything below this reads through");
+            output.WriteLine("        that offset. Fix it in schema/poe2.offsets.json and re-run.");
+        }
+    }
+
+    private void Walk(ulong gameStatesStatic, TextWriter output)
+    {
         output.WriteLine();
         output.WriteLine("flask probe");
 
@@ -66,13 +133,23 @@ public sealed class FlaskProbe
         // Is this really ServerData? The league name is a known field on the same base, so
         // a sane string here separates "wrong struct" from "right struct, drifted field" -
         // two failures that otherwise look identical.
-        int leagueOffset = _schema.Structs["ServerDataStructure"].OffsetOf("League");
-        string league = _reader.ReadStdWString(serverData + (ulong)leagueOffset);
+        //
+        // ON THE OUTER STRUCT. This asked ServerDataStructure - the INNER one, which the
+        // inventories are on and the league is not - and had therefore been throwing
+        // KeyNotFoundException before the probe printed a single flask. The schema records
+        // the same trap on the field itself, and StashReader and StashInspector both ask
+        // ServerDataOffsets; this was the one caller that did not.
+        //
+        // Read SHORT, for StashReader's reason: a league name is a few words, and a long
+        // read off a wrong base wanders into whatever follows and comes back looking like a
+        // league nobody has heard of rather than like nothing.
+        int leagueOffset = _schema.Structs["ServerDataOffsets"].OffsetOf("League");
+        string league = _reader.ReadStdWString(serverData + (ulong)leagueOffset, 64).Trim();
         output.WriteLine($"  league            \"{league}\"  (ServerData+0x{leagueOffset:X})"
             + (league.Length is > 0 and < 40 ? "  -> ServerData confirmed" : "  -> SUSPECT"));
 
         // There are two server-data structs; the inventories live on the inner one.
-        var belts = new FlaskBeltReader(_reader, _schema);
+        var belts = new FlaskBeltReader(_reader, _schema, _names);
         ulong inner = belts.ResolveServerDataStructure(serverData);
         output.WriteLine($"  serverDataStruct  0x{inner:X}"
             + (inner == serverData ? "  (direct)" : $"  (via +0x{_schema.Structs["ServerDataOffsets"].OffsetOf("PlayerServerData"):X} hop)"));
@@ -176,9 +253,542 @@ public sealed class FlaskProbe
                 ? "charm (self-triggering)"
                 : flask.CanUse ? "usable" : "NOT usable";
 
-            output.WriteLine($"    slot {flask.Slot}  {flask.Charges,4}/{flask.ChargesPerUse,-4} charges"
+            // BOTH NUMBERS, because the flask's own are computed and the base ones are what
+            // memory holds: printing them side by side is what makes a wrong computation
+            // visible here rather than silently wrong in the belt display.
+            output.WriteLine($"    slot {flask.Slot}  {flask.Charges,4}/{flask.MaxCharges,-4}"
+                + $" {flask.ChargesPerUse,3} per use"
+                + $"  (base {flask.BaseMaxCharges}, {flask.BaseChargesPerUse} per use)"
                 + $"  {usability,-24}  {Shorten(flask.Path)}");
         }
+
+        ReportChargeCost(belt, output);
+    }
+
+    /// <summary>
+    /// Prints the three places a flask's MODIFIED per-use cost could be.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THIS IS FOR. Everything in ChargesInternal is a BASE value - the base type's
+    /// numbers, never the item's own rolls. A flask that rolled "15% reduced Charges per use"
+    /// still reads its base 10 while the game's tooltip says "Consumes 8 of 60 Charges on
+    /// use", and a flask with +27% maximum charges reads its base 70 while sitting full at 88.
+    /// Auto-flask's usability gate is built on the per-use number, so it refuses a flask at 8
+    /// charges the game would let you drink.
+    ///
+    /// NEITHER REFERENCE ANSWERS WHERE THE REAL NUMBERS ARE. GameHelper2's ChargesOffsets and
+    /// the AHK tool's PoE2Offsets.Charges both stop at the same two fields the belt reader
+    /// uses, and neither project has ever heard of the Flask or LocalStats components at all.
+    /// The absence of an answer there is not evidence of absence in the game, so this looks:
+    ///
+    ///   1. the item's COMPONENTS, which is what named Flask and LocalStats in the first place;
+    ///   2. windows of Charges, ChargesInternal, and those two unread components;
+    ///   3. a HUNT for the modified numbers by value, across every component the item has -
+    ///      see <see cref="ReportValueHunt"/>, which is what finds the field wherever it is;
+    ///   4. the item's resolved STATS, which are the inputs if it turns out to be computed.
+    ///
+    /// Read it with the flask's own tooltip open: "Consumes N of M Charges on use" is the
+    /// answer, and the hunt says whether N and M are anywhere on the item.
+    /// </remarks>
+    private void ReportChargeCost(FlaskBelt belt, TextWriter output)
+    {
+        StructDef charges = _schema.Structs["ChargesComponent"];
+        int internalPtr = charges.OffsetOf("ChargesInternalPtr");
+        int current = charges.OffsetOf("Current");
+        StructDef internals = _schema.Structs["ChargesInternal"];
+        int perUse = internals.OffsetOf("PerUseCharges");
+        int maxCharges = internals.OffsetOf("MaxCharges");
+
+        output.WriteLine();
+        output.WriteLine("  charge costs - the numbers above are the BASE TYPE's, not this flask's");
+        output.WriteLine("  The tooltip says the real ones: \"Consumes N of M Charges on use\". The hunt");
+        output.WriteLine("  below says whether N and M are anywhere on the item; if they are in none of");
+        output.WriteLine("  its components, the game computes them and the stats are the inputs.");
+        output.WriteLine();
+        output.WriteLine("  ONE READING CANNOT TELL A COUNT FROM A MAXIMUM. Every slot holding the charge");
+        output.WriteLine("  count is listed under \"control ok\" below, and on a FULL flask the current");
+        output.WriteLine("  count and the flask's real maximum are the same number - so they read");
+        output.WriteLine("  identically however long you stare at them. Drinking separates them in one");
+        output.WriteLine("  action: run --flaskwatch, drink, and the slot that DROPS is the count while");
+        output.WriteLine("  one that STAYS is the maximum.");
+
+        foreach (EquippedFlask flask in belt.Flasks)
+        {
+            output.WriteLine();
+            output.WriteLine($"  slot {flask.Slot}  {Shorten(flask.Path)}  entity 0x{flask.Entity:X}");
+
+            if (flask.Entity == 0)
+            {
+                output.WriteLine("    the item entity was not recorded - nothing further to read.");
+                continue;
+            }
+
+            Entity? item = _entities.Read(flask.Entity);
+            if (item is null)
+            {
+                output.WriteLine("    the item entity no longer reads - the belt moved under us.");
+                continue;
+            }
+
+            // Sorted, because the set is the finding and an unstable order makes two runs
+            // impossible to compare.
+            output.WriteLine($"    components  {string.Join(", ", item.Components.Keys.Order(StringComparer.Ordinal))}");
+
+            ulong component = item.Component("Charges");
+            if (component == 0)
+            {
+                output.WriteLine("    no Charges component - this one holds none.");
+                continue;
+            }
+
+            // The window starts at the component head and the marker sits on Current, so the
+            // two fields already identified are visible and everything unclaimed is beside them.
+            //
+            // OUT TO +0x88, which is PAST THE END OF THE COMPONENT ON PURPOSE. It is 0x40
+            // bytes and the next one starts right there, so the window shows the neighbour
+            // too - and showing it is what corrected a wrong lead. A charge count found at
+            // +0x58 was written up here as an unmapped second field of this flask; widening
+            // the window put the whole layout on screen twice, with a DIFFERENT owner entity
+            // at +0x48 where this one has its own at +0x08. It was the next item's Current.
+            output.WriteLine($"    Charges 0x{component:X}  (Current at +0x{current:X})");
+            foreach (string line in AddressPeek.Describe(_reader, component + (ulong)current, component, current, 0x70))
+            {
+                output.WriteLine("    " + line);
+            }
+
+            int baseMax = 0;
+            int basePerUse = 0;
+            ulong descriptor = _reader.ReadPointer(component + (ulong)internalPtr);
+            if (MemoryReaderExtensions.IsPlausiblePointer(descriptor))
+            {
+                baseMax = _reader.Read<int>(descriptor + (ulong)maxCharges);
+                basePerUse = _reader.Read<int>(descriptor + (ulong)perUse);
+
+                output.WriteLine($"    ChargesInternal 0x{descriptor:X}"
+                    + $"  (MaxCharges {baseMax} at +0x{maxCharges:X}, PerUseCharges {basePerUse} at +0x{perUse:X})");
+                foreach (string line in AddressPeek.Describe(_reader, descriptor + (ulong)perUse, descriptor, perUse, 0x30))
+                {
+                    output.WriteLine("    " + line);
+                }
+            }
+
+            // The two the component walk named and nothing in either reference has ever read.
+            // Whole windows rather than a hunt, because an unmapped struct is worth looking at
+            // even once the hunt says the number is not in it.
+            foreach (string unread in new[] { "Flask", "LocalStats" })
+            {
+                ulong at = item.Component(unread);
+                if (at == 0)
+                {
+                    continue;
+                }
+
+                output.WriteLine($"    {unread} 0x{at:X}  (nothing maps this yet)");
+                foreach (string line in AddressPeek.Describe(_reader, at, at, 0, 0x60))
+                {
+                    output.WriteLine("    " + line);
+                }
+            }
+
+            IReadOnlyList<ItemStat> stats = ReportItemStats(flask.Entity, output);
+
+            // The current charge count is the CONTROL: it is a number this walk already read,
+            // it lives at Charges+0x18, and that is inside the range the hunt sweeps. So a hunt
+            // that cannot find it is broken, and says so in its own output rather than
+            // reporting a confident "nowhere" that would send somebody down the wrong path.
+            ReportValueHunt(item, Wanted(basePerUse, baseMax, stats), flask.Charges, output);
+        }
+    }
+
+    /// <summary>
+    /// The numbers a modified flask WOULD hold, to hunt the item for.
+    /// </summary>
+    /// <remarks>
+    /// NOT A CLAIM ABOUT THE GAME'S ARITHMETIC, and that distinction is what makes this
+    /// acceptable where computing the cost for display would not be. These are values to LOOK
+    /// FOR: a wrong one costs a missed hit, never a wrong answer, and the memory decides.
+    ///
+    /// Both roundings go in for the same reason. The one sample in hand is 10 x 0.85 = 8.5
+    /// shown as 8, which rules out rounding up and leaves floor and half-to-even
+    /// indistinguishable - so the hunt asks for both and reports which one is actually there.
+    /// </remarks>
+    private static IReadOnlyList<int> Wanted(int basePerUse, int baseMax, IReadOnlyList<ItemStat> stats)
+    {
+        var wanted = new SortedSet<int>();
+        foreach (ItemStat stat in stats)
+        {
+            // Matched on the stat id's shape rather than on a table of them, because the point
+            // is coverage of whatever a flask happens to carry.
+            (int from, bool percent) = stat.Id switch
+            {
+                var id when id.Contains("charges_used", StringComparison.Ordinal) => (basePerUse, true),
+                var id when id.Contains("extra_max_charges", StringComparison.Ordinal) => (baseMax, false),
+                var id when id.Contains("max_charges", StringComparison.Ordinal) => (baseMax, true),
+                _ => (0, false),
+            };
+
+            if (from <= 0)
+            {
+                continue;
+            }
+
+            if (!percent)
+            {
+                wanted.Add(from + stat.Value);
+                continue;
+            }
+
+            double scaled = from * (1.0 + (stat.Value / 100.0));
+            wanted.Add((int)Math.Floor(scaled));
+            wanted.Add((int)Math.Round(scaled, MidpointRounding.AwayFromZero));
+
+            // AND THE SAME NUMBER AT FINER GRANULARITY, which is not a wild guess about
+            // encodings: this game genuinely stores flask quantities in tenths - its own stat
+            // table has local_flask_deciseconds_to_recover. A cost the game keeps as 85 and
+            // renders as 8 would be invisible to a hunt that only asks for 8.
+            wanted.Add((int)Math.Round(scaled * 10, MidpointRounding.AwayFromZero));
+            wanted.Add((int)Math.Round(scaled * 100, MidpointRounding.AwayFromZero));
+        }
+
+        // The bases themselves are never the finding - they are what is already read.
+        wanted.Remove(basePerUse);
+        wanted.Remove(baseMax);
+        return [.. wanted];
+    }
+
+    /// <summary>
+    /// Hunts every component of the item for the values asked for.
+    /// </summary>
+    /// <remarks>
+    /// THE PART THAT ANSWERS THE QUESTION WHEREVER THE FIELD TURNS OUT TO BE. Dumping windows
+    /// only helps for a struct somebody already suspects; this asks "is this number anywhere on
+    /// this item", which is the actual question and does not need the answer guessed first.
+    ///
+    /// Four-byte reads on a four-byte stride, so a value straddling the middle of a qword is
+    /// found too - ChargesInternal writes every field as two int32s in one qword, so that is
+    /// not a hypothetical shape here.
+    ///
+    /// IT CARRIES ITS OWN CONTROL, because the dangerous answer here is the confident negative.
+    /// "NOWHERE on this item" is what would send somebody off to reimplement the game's
+    /// arithmetic, and a hunt that quietly found nothing - wrong range, wrong stride, a
+    /// component list that came back empty - produces exactly that sentence. So a value this
+    /// walk has ALREADY read, at an offset inside the swept range, goes in beside the ones
+    /// being looked for, and a run that misses it says the hunt is broken instead.
+    /// </remarks>
+    private void ReportValueHunt(Entity item, IReadOnlyList<int> wanted, int control, TextWriter output)
+    {
+        if (wanted.Count == 0)
+        {
+            output.WriteLine("    hunt: nothing to look for - no charge-modifying stat on this one.");
+            return;
+        }
+
+        var hits = new List<string>();
+        var controls = new List<string>();
+        foreach ((string name, ulong at) in item.Components.OrderBy(one => one.Key, StringComparer.Ordinal))
+        {
+            if (!MemoryReaderExtensions.IsPlausiblePointer(at))
+            {
+                continue;
+            }
+
+            Sweep(name, at, HuntBytes, wanted, control, hits, controls);
+
+            // ONE LEVEL DEEPER. A component is mostly pointers - LocalStats keeps the item's
+            // own stats in a vector hung off +0x20, not inline - so sweeping only the
+            // component bodies asks a narrower question than "is this number on this item".
+            for (int offset = 0; offset < HuntBytes; offset += 8)
+            {
+                ulong target = _reader.ReadPointer(at + (ulong)offset);
+
+                // Skip the module: every component starts with a vtable and carries more
+                // function pointers, and following those sweeps the game's own code for a
+                // number, which is all noise.
+                if (!MemoryReaderExtensions.IsPlausiblePointer(target)
+                    || (target >= _reader.ModuleBase && target < _reader.ModuleBase + _reader.ModuleSize))
+                {
+                    continue;
+                }
+
+                Sweep($"{name}+0x{offset:X}->", target, FollowBytes, wanted, control, hits, controls);
+            }
+        }
+
+        output.WriteLine($"    hunt for {string.Join(", ", wanted)}");
+        output.WriteLine(hits.Count == 0
+            ? "      NOWHERE on this item, one level of pointers included."
+            : "      " + string.Join("  |  ", hits.Take(MostHits))
+                + (hits.Count > MostHits ? $"  (+{hits.Count - MostHits} more)" : string.Empty));
+
+        // COUNTED INDEPENDENTLY of the hits, which is a correction rather than a nicety: the
+        // first version reported a hit OR a control per slot, and on a full flask whose
+        // modified maximum equals its current charges the two are the SAME NUMBER - so the
+        // control read as failed while the hunt had in fact worked perfectly.
+        output.WriteLine(controls.Count == 0
+            ? $"      CONTROL FAILED: {control} charges is on this item and the hunt missed it,"
+                + " so read the line above as \"the hunt does not work\", not as an answer."
+            : $"      control ok: found the {control} charges it already holds at"
+                + $" {string.Join(", ", controls.Take(MostHits))}");
+    }
+
+    /// <summary>Reads one region four bytes at a time, collecting whatever it was asked for.</summary>
+    private void Sweep(
+        string label,
+        ulong at,
+        int bytes,
+        IReadOnlyList<int> wanted,
+        int control,
+        List<string> hits,
+        List<string> controls)
+    {
+        for (int offset = 0; offset < bytes; offset += 4)
+        {
+            if (!_reader.TryRead(at + (ulong)offset, out int found))
+            {
+                continue;
+            }
+
+            if (wanted.Contains(found))
+            {
+                hits.Add($"{label}+0x{offset:X} = {found}");
+            }
+
+            if (found == control)
+            {
+                controls.Add($"{label}+0x{offset:X}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Samples every flask's Charges component while somebody drinks, and prints what moved.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE QUESTION A SINGLE READING CANNOT ANSWER. On a FULL flask the current count and
+    /// the flask's real maximum are the same number, so any slot holding either reads
+    /// identically - and no amount of staring at one snapshot separates them.
+    ///
+    /// This used to say the count turns up at +0x58 as well, "a field nothing maps". It does
+    /// not: the component is 0x40 bytes and +0x58 is the NEXT one, belonging to another item.
+    ///
+    /// Drinking separates them in one action: the current count drops, a maximum does not. So
+    /// this is the <c>--peekwatch</c> protocol aimed at the belt - "do the thing in the game and
+    /// the slots that moved will print" - and it replaces asking somebody to run the report
+    /// twice and diff two walls of hex by eye, which is what this needed before and is a
+    /// miserable way to answer a question.
+    ///
+    /// THE ADDRESSES ARE RESOLVED ONCE and then sampled, deliberately: re-walking the belt every
+    /// tick would cost an entity read per flask per sample, and the components do not move while
+    /// the items sit in the belt. What DOES invalidate them is rearranging the belt, so a read
+    /// that starts failing is reported rather than silently counted as "no change".
+    /// </remarks>
+    public void Watch(ulong gameStatesStatic, TextWriter output, Func<bool> stop, int sampleMs = 100)
+    {
+        ArgumentNullException.ThrowIfNull(output);
+        ArgumentNullException.ThrowIfNull(stop);
+
+        int ownerEntity = _schema.Structs["Component"].OffsetOf("OwnerEntity");
+
+        output.WriteLine();
+        output.WriteLine("  flask watch - USE A FLASK NOW, then press any key.");
+        output.WriteLine("  What this can answer: WHICH slots track the charge count. It cannot point at a");
+        output.WriteLine("  maximum or a per-use cost - those never move, and neither does every other");
+        output.WriteLine("  unchanging byte on the item, so \"the one that stays\" names nothing. Use the");
+        output.WriteLine("  hunt in the report above for a value that sits still; use this for one that");
+        output.WriteLine("  does not.");
+        output.WriteLine();
+
+        var watching = new Dictionary<string, Tracked>(StringComparer.Ordinal);
+
+        while (!stop())
+        {
+            Thread.Sleep(sampleMs);
+
+            // RE-RESOLVED EVERY TICK, keyed by belt slot rather than held as an address. The
+            // first version of this resolved once and sampled fixed addresses, on the stated
+            // assumption that components do not move while the items sit in the belt - and a
+            // live run refuted it within a second: component vtables flipped between two
+            // values, and the LIFE flask's window began reporting the MANA flask's numbers.
+            // The objects are freed and reallocated under the watch. --peekwatch already says
+            // why and already does this: "a window pinned to where it used to be would keep
+            // reporting 'nothing changed' about somebody else's memory".
+            foreach (EquippedFlask flask in Belt(gameStatesStatic))
+            {
+                if (_entities.Read(flask.Entity) is not { } item)
+                {
+                    continue;
+                }
+
+                // EVERY PLACE THE NUMBER COULD BE, not just the component the count is read
+                // from. A layout from another project names a live ChargesPerUse beside a
+                // ChargesPerUseBase; those offsets do not fit this build, but the SHAPE is the
+                // lead - a modified value next to a base copy - and watching only Charges
+                // would miss it if it sits on any of the others.
+                foreach (string name in new[] { "Charges", "Flask", "LocalStats", "Usable" })
+                {
+                    Track($"slot {flask.Slot} {name}", item.Component(name), flask.Entity);
+                }
+            }
+        }
+
+        foreach ((string where, Tracked tracked) in watching.OrderBy(one => one.Key, StringComparer.Ordinal))
+        {
+            IReadOnlyList<string> summary = tracked.Log.Summary(tracked.At, tracked.At);
+            if (summary.Count == 0)
+            {
+                continue;
+            }
+
+            output.WriteLine();
+            output.WriteLine($"  {where}{(tracked.Restarts > 0 ? $"  (the object was replaced {tracked.Restarts}x under the watch)" : string.Empty)}");
+            foreach (string line in summary)
+            {
+                output.WriteLine("  " + line);
+            }
+        }
+
+        void Track(string where, ulong at, ulong entity)
+        {
+            // IDENTITY, NOT JUST AN ADDRESS THAT STILL READS. A pooled slot can be handed to
+            // another entity's component of the same class between two samples - the schema
+            // says exactly that on Component.OwnerEntity: "the address one cell past a
+            // component is a DIFFERENT entity's component of the same class". So the owner has
+            // to still be this flask before a sample means anything.
+            if (!MemoryReaderExtensions.IsPlausiblePointer(at)
+                || _reader.ReadPointer(at + (ulong)ownerEntity) != entity)
+            {
+                return;
+            }
+
+            ulong?[] sample = AddressPeek.Sample(_reader, at, Extent(at) / 8);
+
+            if (!watching.TryGetValue(where, out Tracked? tracked) || tracked.At != at)
+            {
+                // A different object: start over rather than diff across two of them, which is
+                // what turned a whole run into nonsense.
+                watching[where] = new Tracked(at, sample, tracked is null ? 0 : tracked.Restarts + 1);
+                return;
+            }
+
+            foreach (AddressPeek.SlotChange change in tracked.Log.Observe(tracked.Last, sample))
+            {
+                if (change.Print)
+                {
+                    output.WriteLine($"  {where}  "
+                        + AddressPeek.Line(_reader, at + (ulong)(change.Slot * 8), at, change.Before, change.After));
+                }
+            }
+
+            tracked.Last = sample;
+        }
+    }
+
+    /// <summary>One watched component, and what it last looked like.</summary>
+    private sealed class Tracked(ulong at, ulong?[] last, int restarts)
+    {
+        public ulong At { get; } = at;
+
+        public ulong?[] Last { get; set; } = last;
+
+        /// <summary>How often this slot was handed a different object - noise, made countable.</summary>
+        public int Restarts { get; } = restarts;
+
+        public AddressPeek.PeekWatchLog Log { get; } = new();
+    }
+
+    /// <summary>
+    /// How far a component reaches before the pool hands the space to the next one.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED RATHER THAN ASSUMED. Components are pooled head to tail, so a fixed window
+    /// spills into a neighbour and reports its changes as this flask's - which is what a
+    /// 0x100 window did on the first live run: a "change" at Charges+0xD0 was another item's
+    /// ChargesInternal pointer.
+    ///
+    /// FOUND BY THE OWNER, not by the head. A first attempt looked for the component's own
+    /// StaticPtr to reappear, on the reasoning that pooled instances of one class share it -
+    /// and a live Charges component disproved it: the next instance began at +0x40 with a
+    /// DIFFERENT value in its first slot, while the rest of the layout repeated exactly.
+    /// What does repeat reliably is the second field. Every component carries its owner
+    /// entity at +0x08, so the next place a plausible pointer to a DIFFERENT entity sits one
+    /// slot after a plausible head is the next component, and that is where this one ends.
+    ///
+    /// It read 0x40 for the Charges component, against belt addresses 0x40 apart. That is a
+    /// measurement agreeing with a second measurement, which is the only kind worth having
+    /// here: it is also what corrected "+0x58 holds the charge count too" into "+0x58 is the
+    /// next item's Current".
+    /// </remarks>
+    private int Extent(ulong at, int most = 0x100)
+    {
+        int owner = _schema.Structs["Component"].OffsetOf("OwnerEntity");
+        ulong mine = _reader.ReadPointer(at + (ulong)owner);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(mine))
+        {
+            return most;
+        }
+
+        // From 0x10: no component is two slots long, and starting at 8 would find this
+        // component's own owner field and call it the neighbour.
+        for (int offset = 0x10; offset + owner < most; offset += 8)
+        {
+            ulong head = _reader.ReadPointer(at + (ulong)offset);
+            ulong next = _reader.ReadPointer(at + (ulong)(offset + owner));
+
+            if (MemoryReaderExtensions.IsPlausiblePointer(head)
+                && MemoryReaderExtensions.IsPlausiblePointer(next)
+                && next != mine)
+            {
+                return offset;
+            }
+        }
+
+        return most;
+    }
+
+    /// <summary>The belt, or nothing when the chain does not reach it.</summary>
+    private IReadOnlyList<EquippedFlask> Belt(ulong gameStatesStatic)
+    {
+        GameChainAddresses chain = GameChain.Resolve(_reader, _schema, gameStatesStatic);
+        if (!chain.InGame)
+        {
+            return [];
+        }
+
+        ulong localPlayerStruct = chain.AreaInstance + (ulong)_schema.Structs["AreaInstance"].OffsetOf("PlayerInfo");
+        ulong serverData = _reader.ReadPointer(
+            localPlayerStruct + (ulong)_schema.Structs["LocalPlayerStruct"].OffsetOf("ServerDataPtr"));
+
+        return new FlaskBeltReader(_reader, _schema, _names).Read(serverData).Flasks;
+    }
+
+    /// <summary>The item's resolved stats - the inputs, if the cost turns out to be computed.</summary>
+    /// <remarks>
+    /// The game's OWN answer for what the mods came to, not a recomputation, which is why it
+    /// is worth printing even though it is not the cost itself. A flask carrying
+    /// "15% reduced Charges per use" shows up here as local_charges_used_+% = -15.
+    /// </remarks>
+    private IReadOnlyList<ItemStat> ReportItemStats(ulong entity, TextWriter output)
+    {
+        if (_items is null)
+        {
+            output.WriteLine("    stats: the schema has no item structs, so they cannot be read.");
+            return [];
+        }
+
+        InspectedItem item = _items.Read(entity);
+        if (item.Stats.Count == 0)
+        {
+            output.WriteLine("    stats: none resolved.");
+            return item.Stats;
+        }
+
+        output.WriteLine("    stats");
+        foreach (ItemStat stat in item.Stats)
+        {
+            output.WriteLine($"      key {stat.Key,-6} {stat.Value,6}  {stat.Id}");
+        }
+
+        return item.Stats;
     }
 
 

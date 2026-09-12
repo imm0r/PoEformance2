@@ -83,6 +83,8 @@ public sealed class UiTreeReader
     private readonly int _scaleIndex;
     private readonly int _unscaledSize;
     private readonly int _itemPtr;
+    private readonly int _entityDetails;
+    private readonly int _detailsPath;
     private readonly uint _flagShouldModifyPos;
     private readonly uint _flagIsVisible;
     private readonly int _maxDepth;
@@ -108,6 +110,8 @@ public sealed class UiTreeReader
         _scaleIndex = ui.OffsetOf("ScaleIndex");
         _unscaledSize = ui.OffsetOf("UnscaledSize");
         _itemPtr = ui.OffsetOf("ItemPtr");
+        _entityDetails = schema.Structs["Entity"].OffsetOf("EntityDetailsPtr");
+        _detailsPath = schema.Structs["EntityDetails"].OffsetOf("Path");
         _flagShouldModifyPos = (uint)ui.Constants["FlagShouldModifyPos"];
         _flagIsVisible = (uint)ui.Constants["FlagIsVisible"];
         _maxDepth = (int)ui.Constants["MaxParentChainDepth"];
@@ -475,6 +479,34 @@ public sealed class UiTreeReader
             frame.Visible && (flags & _flagIsVisible) != 0);
     }
 
+    /// <summary>The item slot's entity, or 0 when the slot holds nothing that is one.</summary>
+    /// <remarks>
+    /// Gated on the target being an ITEM ENTITY, not merely on looking like a pointer, because
+    /// on the 0.5.5 client the slot is neither zero nor garbage-only on elements that are not
+    /// item slots: session-2026-09-browser.rec reads 0x6, UTF-16 fragments and a float's upper
+    /// half there on a third of the interface root's children, and session-2026-09-text.rec
+    /// reads a perfectly plausible heap pointer there on a text label. A browser row that
+    /// printed those as items would be lying. The check is two reads and a short string, paid
+    /// only for values that pass the pointer test, on the nodes the browser is showing.
+    /// </remarks>
+    private ulong ItemOf(ulong address)
+    {
+        ulong item = _reader.ReadPointer(address + (ulong)_itemPtr);
+        if (!MemoryReaderExtensions.IsPlausiblePointer(item))
+        {
+            return 0;
+        }
+
+        ulong details = _reader.ReadPointer(item + (ulong)_entityDetails);
+        return MemoryReaderExtensions.IsPlausiblePointer(details)
+               && _reader.ReadStdWString(details + (ulong)_detailsPath, ItemPathPrefix.Length).StartsWith(ItemPathPrefix, StringComparison.Ordinal)
+            ? item
+            : 0;
+    }
+
+    /// <summary>What every item entity's metadata path begins with.</summary>
+    private const string ItemPathPrefix = "Metadata/Items/";
+
     private UiNode Build(ulong address, ulong parent, int index, Frame frame, UiScale scale)
     {
         Geometry geometry = ReadGeometry(address, parent, frame, scale);
@@ -494,7 +526,7 @@ public sealed class UiTreeReader
             geometry.Flags,
             geometry.ScaleIndex,
             geometry.Multiplier,
-            _reader.ReadPointer(address + (ulong)_itemPtr),
+            ItemOf(address),
             frame.Depth,
             index,
             Children(address));

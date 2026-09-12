@@ -188,4 +188,104 @@ public class MapRadarTests
         Assert.Equal((0UL, 0UL), reader.Resolve(UiRoot));
         Assert.Null(reader.Read(UiRoot, new UiScale(2560, 1600, 0), largeMap: true));
     }
+
+    // ── The second route: the reference's 0.5.5 walk from the UI manager ──────────────
+
+    private const ulong Viewports = 0x64_0000;
+    private const ulong LargeViewport = 0x65_0000;
+    private const ulong MiniViewport = 0x66_0000;
+    private const ulong ManagerChildren = 0x67_0000;
+    private const ulong ViewportChildren = 0x68_0000;
+
+    /// <summary>Makes the UI manager an element whose child 6 holds the two viewports.</summary>
+    private static void PlaceViewportRoute(FakeMemoryReader fake, OffsetSchema schema)
+    {
+        StructDef ui = schema.Structs["UiElementBase"];
+        StructDef route = schema.Structs["MapViewports"];
+        int slot = (int)route.Constants["ChildOfUiManager"];
+
+        fake.Place(UiRoot + (ulong)ui.OffsetOf("Self"), UiRoot);
+        fake.Place(ManagerChildren, new byte[8 * (slot + 1)]);
+        fake.Place(ManagerChildren + (ulong)(8 * slot), Viewports);
+        fake.Place(UiRoot + (ulong)ui.OffsetOf("ChildrenFirst"), ManagerChildren);
+        fake.Place(UiRoot + (ulong)ui.OffsetOf("ChildrenLast"), ManagerChildren + (ulong)(8 * (slot + 1)));
+
+        fake.Place(Viewports, new byte[0x300]);
+        fake.Place(Viewports + (ulong)ui.OffsetOf("Self"), Viewports);
+        fake.Place(ViewportChildren, new byte[16]);
+        fake.Place(ViewportChildren + (ulong)(8 * route.Constants["LargeMapChild"]), LargeViewport);
+        fake.Place(ViewportChildren + (ulong)(8 * route.Constants["MiniMapChild"]), MiniViewport);
+        fake.Place(Viewports + (ulong)ui.OffsetOf("ChildrenFirst"), ViewportChildren);
+        fake.Place(Viewports + (ulong)ui.OffsetOf("ChildrenLast"), ViewportChildren + 16);
+    }
+
+    [Fact]
+    public void Resolve_TakesTheReferenceRoute_WhenTheMapParentChainHandsBackNoZoom()
+    {
+        // The 0.5.5 shape: MapParentPtr still leads to two elements, but they read a zoom of
+        // zero - so they are not believed, and the manager's child 6 is asked instead.
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        BuildUi(schema, out FakeMemoryReader fake);
+        PlaceMap(fake, schema, LargeMap, relX: 0, relY: 0, sizeX: 3822, sizeY: 1600, zoom: 0f);
+        PlaceMap(fake, schema, MiniMap, relX: 0, relY: 0, sizeX: 3822, sizeY: 1600, zoom: 0f);
+        PlaceViewportRoute(fake, schema);
+        PlaceMap(fake, schema, LargeViewport, relX: 1280, relY: 800, sizeX: 0, sizeY: 0, zoom: 0.9f);
+        PlaceMap(fake, schema, MiniViewport, relX: 100, relY: 50, sizeX: 400, sizeY: 300, zoom: 0.6f);
+
+        var reader = new MapRadarReader(fake, schema);
+        Assert.Equal((LargeViewport, MiniViewport), reader.Resolve(UiRoot));
+        Assert.Equal(0.6f, reader.Read(UiRoot, new UiScale(2560, 1600, 0), largeMap: false)!.Value.Zoom, 3);
+    }
+
+    [Fact]
+    public void Resolve_PrefersTheReferenceRoute_WhenBothCarryAZoom()
+    {
+        // The route confirmed on the current client goes first; the map-parent chain is
+        // only asked when the viewports do not answer.
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        BuildUi(schema, out FakeMemoryReader fake);
+        PlaceMap(fake, schema, MiniMap, relX: 100, relY: 50, sizeX: 400, sizeY: 300, zoom: 0.6f);
+        PlaceViewportRoute(fake, schema);
+        PlaceMap(fake, schema, MiniViewport, relX: 0, relY: 0, sizeX: 400, sizeY: 300, zoom: 1.2f);
+
+        Assert.Equal((LargeViewport, MiniViewport), new MapRadarReader(fake, schema).Resolve(UiRoot));
+    }
+
+    [Fact]
+    public void Resolve_KeepsTheMapParentChain_WhenTheManagerHasNoViewports()
+    {
+        // The 0.5.4 shape, and the one every committed recording holds: the manager is not
+        // walked as an element there, so the map-parent chain answers on its own evidence.
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        BuildUi(schema, out FakeMemoryReader fake);
+        PlaceMap(fake, schema, MiniMap, relX: 100, relY: 50, sizeX: 400, sizeY: 300, zoom: 0.6f);
+
+        Assert.Equal((LargeMap, MiniMap), new MapRadarReader(fake, schema).Resolve(UiRoot));
+    }
+
+    [Fact]
+    public void Resolve_FallsBackToTheMapParentChain_WhenNeitherRouteCarriesAZoom()
+    {
+        // Nothing to believe: the answer is the old one, and the zoom's own fallback keeps the
+        // projection finite rather than putting every marker on one pixel.
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        BuildUi(schema, out FakeMemoryReader fake);
+        PlaceMap(fake, schema, MiniMap, relX: 0, relY: 0, sizeX: 400, sizeY: 300, zoom: 0f);
+
+        var reader = new MapRadarReader(fake, schema);
+        Assert.Equal((LargeMap, MiniMap), reader.Resolve(UiRoot));
+        Assert.Equal(0.5f, reader.Read(UiRoot, new UiScale(2560, 1600, 0), largeMap: false)!.Value.Zoom, 3);
+    }
+
+    [Fact]
+    public void Zoom_ADenormalIsNotAZoom()
+    {
+        // 1E-44 is what the 0.5.5 client reads at the old offset: greater than zero, so the old
+        // test let it through, and every marker landed on the map centre.
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        BuildUi(schema, out FakeMemoryReader fake);
+        PlaceMap(fake, schema, MiniMap, relX: 0, relY: 0, sizeX: 400, sizeY: 300, zoom: 1E-44f);
+
+        Assert.Equal(0.5f, new MapRadarReader(fake, schema).Read(UiRoot, new UiScale(2560, 1600, 0), false)!.Value.Zoom, 3);
+    }
 }

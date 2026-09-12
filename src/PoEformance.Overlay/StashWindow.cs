@@ -811,9 +811,16 @@ public sealed class StashWindow
 
             // Said, because a list that leaves rows out without saying so is a list that lies -
             // and "my tab is missing" is otherwise indistinguishable from "the read missed it".
+            //
+            // "OR UNOPENED", because they are not the same thing and this line used to claim they
+            // were. A tab the game has not been asked to load holds nothing HERE while holding
+            // plenty in the account, and everywhere else in this tool that distinction is made
+            // carefully - the header two lines up spells it out. The shop tabs are the case that
+            // proved it: they read as two empty tabs until the Merchant window was opened once,
+            // and then as 71 and 55 items worth 12 div.
             if (hidden > 0)
             {
-                ImGui.TextColored(DimText, $"{hidden} empty, not listed");
+                ImGui.TextColored(DimText, $"{hidden} empty or unopened, not listed");
             }
         }
         finally

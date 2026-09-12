@@ -31,19 +31,57 @@ public class SchemaTests
         Assert.Contains("GameStates", schema.Statics.Keys);
         Assert.Contains("GameCullSize", schema.Statics.Keys);
 
-        // Spot-check offsets against current ground truth: the AHK-tool port plus the
+        // Spot-check offsets against current ground truth: the AHK-tool port, the
         // owner-verified 2026-08 +0x08 AreaInstance wave (PlayerInfo 0x598 -> 0x5A0,
-        // AwakeEntities 0x6D8 -> 0x6E0, Terrain 0x8B8 -> 0x8C0).
+        // AwakeEntities 0x6D8 -> 0x6E0, Terrain 0x8B8 -> 0x8C0), and the 0.5.5 patch of
+        // 2026-09-04, which moved the AreaInstance tail by a further +0x10 and its head
+        // by -8 (PlayerInfo 0x5B0, AwakeEntities 0x6F0, Terrain 0x8D0, hash 0x114).
         Assert.Equal(0x290, schema.Structs["InGameState"].OffsetOf("AreaInstanceData"));
         // W2SMatrix: 0x1A8 -> 0x1A0, and briefly 0x11C in 2026-08 before the scene test
         // disproved it. = CameraStructure(0x98) + 0x108, per GameHelper2 and the AHK tool.
         Assert.Equal(0x1A0, schema.Structs["WorldData"].OffsetOf("W2SMatrix"));
-        Assert.Equal(0x5A0, schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
-        Assert.Equal(0x6E0, schema.Structs["AreaInstance"].OffsetOf("AwakeEntities"));
-        Assert.Equal(0x8C0, schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
+        Assert.Equal(0x5B0, schema.Structs["AreaInstance"].OffsetOf("PlayerInfo"));
+        Assert.Equal(0x6F0, schema.Structs["AreaInstance"].OffsetOf("AwakeEntities"));
+        Assert.Equal(0x8D0, schema.Structs["AreaInstance"].OffsetOf("TerrainMetadata"));
+        Assert.Equal(0x114, schema.Structs["AreaInstance"].OffsetOf("CurrentAreaHash"));
+        // The same patch grew GameState by an SRWLOCK at +0x08: the state array and the
+        // stack's end pointer both sit eight bytes further on.
+        Assert.Equal(0x50, schema.Structs["GameState"].OffsetOf("States"));
+        Assert.Equal(0x18, schema.Structs["GameState"].OffsetOf("CurrentStateVecLast"));
+        // And shifted the UiElementBase tail by -0x18, the map's fields with it.
+        Assert.Equal(0x168, schema.Structs["UiElementBase"].OffsetOf("Flags"));
+        Assert.Equal(0x390, schema.Structs["MapUiElement"].OffsetOf("Zoom"));
         Assert.Equal(0x8B0, schema.Structs["Actor"].OffsetOf("AnimationId"));
         Assert.Equal(0x69, schema.Structs["Targetable"].OffsetOf("IsTargetable"));
-        Assert.Equal(0x21E0, schema.Structs["ServerDataOffsets"].OffsetOf("League"));
+        // 0x21E0 until some time before 2026-09, when three --flasks runs read it as an empty
+        // string while every other link in the same chain read perfectly. This assertion going
+        // red is the anchor doing its job, so it moves with the offset rather than being
+        // loosened: a league that reads as nothing prices a stash against no economy at all.
+        Assert.Equal(0x2160, schema.Structs["ServerDataOffsets"].OffsetOf("League"));
+
+        // The atlas, whose 0.5.5 drift is pinned here because EVERY ONE OF ITS WRONG ANSWERS
+        // READ AS A PLAUSIBLE ONE. Nothing threw, nothing came back zero, and the panel reported
+        // hundreds of maps throughout: they simply had no ids, a biome of 255, a state of
+        // Completed and no connections at all. Three independent moves, corrected off
+        // GameHelper2's ImportantUiElements.cs in 2026-09:
+        //
+        // The panel and the badge children are UiElements, so they took the same -0x18 tail shift
+        // UiElementBase.Flags took above and this schema had not carried over to them.
+        Assert.Equal(0x590, schema.Structs["AtlasPanel"].OffsetOf("ConnectionsVector"));
+        Assert.Equal(0x170, schema.Structs["AtlasNode"].Constants["BadgeContentId"]);
+        // The EndgameMaps row moved -0x10. The old +0x2A0 still holds a pointer - to the node's
+        // atlas-passive row - so the map-id walk never failed a check and returned nothing, while
+        // the two bytes landed in padding where 0xFF reads as a set CompletedBit.
+        Assert.Equal(0x290, schema.Structs["AtlasNodeData"].OffsetOf("MapDataPtr"));
+        Assert.Equal(0x2BE, schema.Structs["AtlasNodeData"].OffsetOf("BiomeId"));
+        Assert.Equal(0x2BF, schema.Structs["AtlasNodeData"].OffsetOf("StatusBits"));
+        // And this one is NOT a shift, which is why it is the dangerous one: +0x320 is still
+        // there and still holds a grid position, only a region-local one, so it reads as sane
+        // coordinates that the panel's atlas-wide edge table can never match. The node element's
+        // own tail did not move - its neighbours are the proof, and they are pinned for it.
+        Assert.Equal(0x310, schema.Structs["AtlasNode"].OffsetOf("GridPosition"));
+        Assert.Equal(0x350, schema.Structs["AtlasNode"].OffsetOf("ContentVector"));
+        Assert.Equal(0x368, schema.Structs["AtlasNode"].OffsetOf("BadgeVectorBegin"));
         Assert.Equal(0x10, schema.Structs["GameState"].Constants["StateEntrySize"]);
         Assert.Equal(4, schema.Structs["GameState"].Constants["InGameStateIndex"]);
 

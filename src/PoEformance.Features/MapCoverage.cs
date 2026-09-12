@@ -93,6 +93,33 @@ public sealed class MapCoverage
     /// </remarks>
     public bool StillToWalk(int coarseX, int coarseY) => _here?.StillToWalk(coarseX, coarseY) ?? false;
 
+    /// <summary>
+    /// Whether a coarse cell has been within sight - reachable or not.
+    /// </summary>
+    /// <remarks>
+    /// The other question the seen map answers, and the one the floor fill asks: not "is there
+    /// ground left to cover" but "has this ground been looked at". No region filter, because
+    /// the fill is drawn over every walkable cell and has to retreat from every one the player
+    /// has passed, whether or not the flood thinks they could get there. Read across threads
+    /// like <see cref="StillToWalk"/>, and safe for the same reason.
+    /// </remarks>
+    public bool Seen(int coarseX, int coarseY) => _here?.WasSeen(coarseX, coarseY) ?? false;
+
+    /// <summary>Whether the area being measured is the one this grid describes.</summary>
+    public bool Fits(TerrainGrid grid) => grid is not null && (_here?.Fits(grid) ?? false);
+
+    /// <summary>
+    /// Changes whenever a cell is newly seen or the area changes.
+    /// </summary>
+    /// <remarks>
+    /// So a picture built from <see cref="Seen"/> can tell that it is stale without walking
+    /// the grid every frame to find out. A count rather than a flag, because two pictures may
+    /// be watching and a flag cleared by one would be missed by the other.
+    /// </remarks>
+    public int Version => Volatile.Read(ref _version);
+
+    private int _version;
+
     /// <summary>Whether the reachable region has been worked out yet.</summary>
     /// <remarks>
     /// Worth saying out loud, because the percentage means something different before and
@@ -121,7 +148,10 @@ public sealed class MapCoverage
             Y: (int)(player.WorldY / MapView.WorldToGrid) / CoarseStep);
 
         Area area = Switch(snapshot.AreaHash, grid, at);
-        area.Saw(at);
+        if (area.Saw(at))
+        {
+            Interlocked.Increment(ref _version);
+        }
     }
 
     /// <summary>Puts everything back, as if the session had just started.</summary>
@@ -130,6 +160,7 @@ public sealed class MapCoverage
         _remembered.Clear();
         _order.Clear();
         _here = null;
+        Interlocked.Increment(ref _version);
     }
 
     /// <summary>
@@ -147,6 +178,9 @@ public sealed class MapCoverage
         {
             return current;
         }
+
+        // Any change of area is a change of what has been seen, resumed or fresh.
+        Interlocked.Increment(ref _version);
 
         if (_remembered.TryGetValue(hash, out Area? known) && known.Fits(grid))
         {
@@ -235,6 +269,10 @@ public sealed class MapCoverage
             return region[index] && !_seen[index];
         }
 
+        /// <summary>Within sight at some point, whether or not it can be reached.</summary>
+        internal bool WasSeen(int x, int y)
+            => (uint)x < (uint)_width && (uint)y < (uint)_height && _seen[(y * _width) + x];
+
         /// <summary>Whether this belongs to the grid on offer - a size change means a new area.</summary>
         internal bool Fits(TerrainGrid grid)
             => grid.Width / CoarseStep == _width && grid.Height / CoarseStep == _height;
@@ -262,12 +300,13 @@ public sealed class MapCoverage
             }
         }
 
-        /// <summary>Marks everything within sight of a coarse cell.</summary>
-        internal void Saw((int X, int Y) at)
+        /// <summary>Marks everything within sight of a coarse cell. True when anything was new.</summary>
+        internal bool Saw((int X, int Y) at)
         {
             TakeTheRegionIfItIsReady();
 
             bool[]? region = _region;
+            bool anything = false;
 
             for (int dy = -SeeRadius; dy <= SeeRadius; dy++)
             {
@@ -290,6 +329,7 @@ public sealed class MapCoverage
                     {
                         _seen[index] = true;
                         _seenCount++;
+                        anything = true;
 
                         if (region is not null && region[index])
                         {
@@ -298,6 +338,8 @@ public sealed class MapCoverage
                     }
                 }
             }
+
+            return anything;
         }
 
         /// <summary>

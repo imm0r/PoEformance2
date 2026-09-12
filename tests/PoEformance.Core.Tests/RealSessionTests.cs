@@ -81,10 +81,29 @@ public class RealSessionTests
         }
     }
 
-    /// <summary>The shipped schema, for tests in sibling classes.</summary>
-    internal static OffsetSchema Schema() => LoadSchema();
+    /// <summary>
+    /// The schema the committed recordings were MADE with, for tests in sibling classes.
+    /// </summary>
+    /// <remarks>
+    /// Not the shipped schema. A recording holds only the reads the build that made it
+    /// performed, at the offsets that build had, so a replay can only be asked questions in
+    /// that layout: every fixture under tests/fixtures predates the 0.5.5 patch of
+    /// 2026-09-04, which moved GameState, the AreaInstance tail and the UiElement tail, and
+    /// replaying them through the shipped schema reads addresses the files never captured.
+    /// The layout they were captured in is frozen in tests/fixtures/poe2.offsets.pre-0.5.5.json
+    /// and this loads that. A fixture made after the patch needs a loader of its own -
+    /// <see cref="LiveSchema"/> while the shipped file still describes the client it was
+    /// made against, a further frozen copy once it does not.
+    /// </remarks>
+    internal static OffsetSchema Schema() => Load(Path.Combine("tests", "fixtures", RecordedSchemaFile));
 
-    private static OffsetSchema LoadSchema()
+    /// <summary>The shipped schema - the layout of the CURRENT client, not of the recordings.</summary>
+    internal static OffsetSchema LiveSchema() => Load(Path.Combine("schema", "poe2.offsets.json"));
+
+    /// <summary>The frozen pre-0.5.5 schema every committed recording replays against.</summary>
+    internal const string RecordedSchemaFile = "poe2.offsets.pre-0.5.5.json";
+
+    private static OffsetSchema Load(string relativePath)
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
         while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "schema", "poe2.offsets.json")))
@@ -92,7 +111,7 @@ public class RealSessionTests
             dir = dir.Parent;
         }
 
-        return SchemaJson.Load(Path.Combine(dir!.FullName, "schema", "poe2.offsets.json"));
+        return SchemaJson.Load(Path.Combine(dir!.FullName, relativePath));
     }
 
     private static ReplayMemoryReader LoadSession() => ReplayMemoryReader.Load(File.OpenRead(FixturePath));
@@ -121,7 +140,7 @@ public class RealSessionTests
     public void RealGameMemory_PassesEverySchemaInvariant()
     {
         ReplayMemoryReader replay = LoadSession();
-        OffsetSchema schema = LoadSchema();
+        OffsetSchema schema = Schema();
         var writer = new StringWriter();
 
         DriftReportResult result = DriftReport.Run(
@@ -138,7 +157,7 @@ public class RealSessionTests
     {
         // Each assertion below is one of the findings that cost a live debugging round.
         ReplayMemoryReader replay = LoadSession();
-        OffsetSchema schema = LoadSchema();
+        OffsetSchema schema = Schema();
 
         ulong gameState = replay.ReadPointer(replay.ResolvedStatics["GameStates"]);
         StructDef gs = schema.Structs["GameState"];
@@ -196,7 +215,7 @@ public class RealSessionTests
         // The int32-index fix: a real player carries a dozen-plus components, not the 3
         // that survived the int64 mis-read.
         var replay = ReplayMemoryReader.Load(File.OpenRead(PlayerFixturePath));
-        OffsetSchema schema = LoadSchema();
+        OffsetSchema schema = Schema();
         var chain = GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
 
         PoEformance.Game.Entities.Entity? player = new PoEformance.Game.Entities.EntityReader(replay, schema).Read(chain.PlayerEntity);
@@ -214,7 +233,7 @@ public class RealSessionTests
         // The entity map walked against real memory: a populated area, with the player
         // among the entities and monsters carrying real metadata paths and positions.
         var replay = ReplayMemoryReader.Load(File.OpenRead(SceneFixturePath));
-        OffsetSchema schema = LoadSchema();
+        OffsetSchema schema = Schema();
 
         PoEformance.Game.World.WorldSnapshot snapshot =
             new PoEformance.Game.World.WorldReader(replay, schema).Read(replay.ResolvedStatics["GameStates"]);

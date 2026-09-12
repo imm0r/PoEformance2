@@ -97,6 +97,28 @@ public class StashReaderTests
         Assert.Equal("Stash tab 143", tab.Called);
     }
 
+    [Theory]
+    [InlineData(unchecked((int)0x80000000), "Shop tab 1")]
+    [InlineData(unchecked((int)0x80000001), "Shop tab 2")]
+    public void ASHOPPageIsNamedFromItsLowBitsRatherThanItsSignedId(int id, string called)
+    {
+        // BIT 31 IS A MARK, NOT PART OF A NUMBER. The Merchant window's two shop pages carry
+        // 0x80000000 and 0x80000001, which as a signed i32 read as -2147483648 and -2147483647 -
+        // and the list showed "Stash tab -2147483648", which says nothing and looks exactly like
+        // a read that has gone wrong. Confirmed against the game 2026-09: the Shop section holds
+        // two pages, and 0x80000001 draws the same 55 items the second one does.
+        OffsetSchema schema = Schema();
+        FakeMemoryReader fake = Stash(schema, id, [(0, 0, 1, 1, 0)]);
+
+        StashInventory tab = Assert.Single(new StashReader(fake, schema).Read(ServerData));
+
+        Assert.Equal(called, tab.Called);
+
+        // Still a stash for COUNTING: items listed for sale are the player's, and the two hold
+        // real money. Only the name is decided by the top bit - see StashInventory.Called.
+        Assert.Equal(InventoryKind.Stash, tab.Kind);
+    }
+
     [Fact]
     public void WHENTheLeagueIsNotWhereTheSchemaSaysTheStructIsSweptForIt()
     {

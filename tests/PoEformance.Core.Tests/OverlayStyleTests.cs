@@ -117,6 +117,10 @@ public class OverlayStyleTests
 
         Assert.Equal(0x80u, (packed >> 24) & 0xFF);
         Assert.Equal("#8096C8FF", OverlaySettings.FormatColour(packed));
+
+        // ...except on the way to the configuration page, whose colour control takes six
+        // digits and shows black for eight.
+        Assert.Equal("#96C8FF", OverlaySettings.FormatPageColour(packed));
     }
 
     [Fact]
@@ -344,6 +348,12 @@ public class OverlayStyleStoreTests
 
             Assert.Contains("poi.shrine", text, StringComparison.Ordinal);
             Assert.DoesNotContain("poi.breach", text, StringComparison.Ordinal);
+
+            // Nor the derived properties: the source generator writes every readable one
+            // unless told otherwise, and a file that says "Visible": true beside "hidden":
+            // false invites somebody to edit the one that is never read.
+            Assert.DoesNotContain("Visible", text, StringComparison.Ordinal);
+            Assert.DoesNotContain("SaysNothing", text, StringComparison.Ordinal);
         }
         finally
         {

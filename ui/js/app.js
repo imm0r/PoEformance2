@@ -36,6 +36,10 @@ function renderState(s) {
       $("ov-terrain-colour").value = s.overlay.terrainColour;
       $("ov-terrain-thickness").value = s.overlay.terrainThickness;
       $("ov-terrain-thickness-value").textContent = s.overlay.terrainThickness;
+      $("ov-terrain-rim").checked = s.overlay.terrainRim;
+      $("ov-terrain-fill-colour").value = s.overlay.terrainFillColour;
+      $("ov-terrain-fill").value = s.overlay.terrainFillOpacity;
+      $("ov-terrain-fill-value").textContent = `${s.overlay.terrainFillOpacity} %`;
     }
   }
 
@@ -119,11 +123,15 @@ function sendOverlay() {
       showTerrain: $("ov-terrain").checked,
       terrainColour: $("ov-terrain-colour").value,
       terrainThickness: Number($("ov-terrain-thickness").value),
+      terrainRim: $("ov-terrain-rim").checked,
+      terrainFillColour: $("ov-terrain-fill-colour").value,
+      terrainFillOpacity: Number($("ov-terrain-fill").value),
     },
   });
 }
 
-for (const id of ["ov-loot", "ov-terrain", "ov-terrain-colour", "ov-terrain-thickness"]) {
+for (const id of ["ov-loot", "ov-terrain", "ov-terrain-colour", "ov-terrain-thickness", "ov-terrain-rim",
+  "ov-terrain-fill-colour", "ov-terrain-fill"]) {
   // Touching a control claims it, even before anything is sent: dragging a colour picker
   // fires "input" for a while before the "change" that commits it.
   $(id).addEventListener("input", () => (overlayEditingUntil = Date.now() + 1500));
@@ -132,12 +140,19 @@ for (const id of ["ov-loot", "ov-terrain", "ov-terrain-colour", "ov-terrain-thic
 $("ov-loot").addEventListener("change", sendOverlay);
 $("ov-terrain").addEventListener("change", sendOverlay);
 $("ov-terrain-colour").addEventListener("change", sendOverlay);
+$("ov-terrain-rim").addEventListener("change", sendOverlay);
 
 // On "change", not "input": dragging a slider fires continuously, and each thickness step
 // rebuilds the terrain texture on the render thread.
 $("ov-terrain-thickness").addEventListener("input", () =>
   ($("ov-terrain-thickness-value").textContent = $("ov-terrain-thickness").value));
 $("ov-terrain-thickness").addEventListener("change", sendOverlay);
+
+// The fill's colour and opacity are baked into the same texture, so they too go on "change".
+$("ov-terrain-fill-colour").addEventListener("change", sendOverlay);
+$("ov-terrain-fill").addEventListener("input", () =>
+  ($("ov-terrain-fill-value").textContent = `${$("ov-terrain-fill").value} %`));
+$("ov-terrain-fill").addEventListener("change", sendOverlay);
 
 // ── Auto flask ─────────────────────────────────────────────────────────────
 
@@ -687,7 +702,7 @@ if (bridge.connected) {
     entityCount: 0,
     staticsFound: 0,
     staticsTotal: 6,
-    overlay: { minLootRarity: "Magic", showTerrain: true, terrainColour: "#96c8ff", terrainThickness: 1, terrain: "browser preview" },
+    overlay: { minLootRarity: "Magic", showTerrain: true, terrainColour: "#dce3ea", terrainThickness: 1, terrainRim: true, terrainFillColour: "#0b1b2b", terrainFillOpacity: 70, terrain: "browser preview" },
     autoFlask: {
       enabled: false,
       keySource: "Defaults - no host",

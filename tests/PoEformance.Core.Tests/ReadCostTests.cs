@@ -19,17 +19,8 @@ namespace PoEformance.Core.Tests;
 /// </remarks>
 public class ReadCostTests
 {
-    private static OffsetSchema Schema()
-    {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "schema", "poe2.offsets.json")))
-        {
-            dir = dir.Parent;
-        }
-
-        Assert.NotNull(dir);
-        return SchemaJson.Load(Path.Combine(dir.FullName, "schema", "poe2.offsets.json"));
-    }
+    // Replays 2026-08 recordings, so it reads them in the layout they were made in.
+    private static OffsetSchema Schema() => RealSessionTests.Schema();
 
     private static WorldSnapshot Read()
     {

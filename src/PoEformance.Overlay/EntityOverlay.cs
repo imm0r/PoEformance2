@@ -203,6 +203,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _healthBars.Style = value;
             _projectiles.Style = value;
             _atlas.Style = value;
+            _ground.Style = value;
         }
     }
 
@@ -423,7 +424,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _poi.ShowArrows = settings.PoiArrows;
         }
 
-        ApplyTerrainStyle(OverlaySettings.ParseColour(settings.TerrainColour), settings.TerrainThickness);
+        _roomWants = settings.RoomsOrDefault;
+        _rooms?.Apply(_roomWants);
+
+        // No handover hole here, unlike the room layer above: the ground names need no route
+        // planner, so the layer exists from the start and takes the settings directly.
+        _ground.Apply(settings.GroundOrDefault);
+
+        ApplyTerrainStyle(
+            OverlaySettings.ParseColour(settings.TerrainColour), settings.TerrainThickness, settings.TerrainRim,
+            OverlaySettings.ParseColour(settings.TerrainFillColour), settings.TerrainFillOpacity);
     }
 
     /// <summary>The settings as they stand now, for writing down.</summary>
@@ -439,6 +449,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             MinLootRarity = MinimumLootRarity,
             ShowTerrain = ShowTerrain,
+
+            // The page's own choices, from where the page put them - NOT from the basis,
+            // which is the file as it was at start-up. Taken from there, every save the
+            // overlay made for one of its own switches wrote the start-up colour and width
+            // back over whatever the page had set since, and the next launch had lost them.
+            // In the page's six-digit form while it is opaque, which is all the page can make;
+            // the eight-digit form only for an alpha somebody wrote into the file by hand.
+            TerrainColour = (_terrainColour >> 24) == 0xFF
+                ? OverlaySettings.FormatPageColour(_terrainColour)
+                : OverlaySettings.FormatColour(_terrainColour),
+            TerrainThickness = _terrainThickness,
+            TerrainRim = _terrainRim,
+            TerrainFillColour = OverlaySettings.FormatPageColour(_terrainFillColour),
+            TerrainFillOpacity = _terrainFillOpacity,
             DotLabels = ShowLabels,
             HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
             HideBehindPanels = HideBehindPanels,
@@ -482,6 +506,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
             PoiRoutes = _poi?.ShowRoutes ?? basis.PoiRoutes,
             PoiArrows = _poi?.ShowArrows ?? basis.PoiArrows,
+
+            // From the layer where there is one, and from what was loaded where there is not:
+            // saving before the layer is attached must not write an empty pick list over a
+            // file full of pinned rooms.
+            Rooms = _rooms?.Saved() ?? basis.Rooms,
+            Ground = _ground.Saved(),
 
             // The page's switch is the live one where there is a page; before it is attached
             // the basis is what was read out of the file, and writing the default over it is
@@ -571,7 +601,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
     private PoiLayer? _poi;
+    private RoomLayer? _rooms;
+
+    /// <summary>What the ground under the rooms IS. Always here - it needs nothing attached.</summary>
+    private readonly GroundLayer _ground = new();
     private RoutePlanner? _planner;
+
+    /// <summary>
+    /// What the file said about the room names, until the layer exists to be told.
+    /// </summary>
+    /// <remarks>
+    /// The settings are read before the points of interest are attached, and the room layer
+    /// arrives with them - so what was loaded is remembered here and handed over on attach.
+    /// Same hole the stash switches fell into, kept shut the same way.
+    /// </remarks>
+    private RoomSettings _roomWants = RoomSettings.Default;
     private readonly RuleLayer _rules = new();
 
     /// <summary>What the rule engine decided to show this tick, or null when it is not wired.</summary>
@@ -746,6 +790,42 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// The shipped list, read on demand. Null means there is none to offer, and the editor then
     /// says what it said before anything shipped: build your own from the area tab.
     /// </param>
+    /// <summary>
+    /// Opens the area's room files out of the game's own bundles, when something can.
+    /// </summary>
+    /// <remarks>
+    /// Null unless the App attaches it, which it only does with an install to read. The overlay
+    /// has no business finding the game's files; what it owns is the button, and a button with
+    /// nothing behind it is simply not drawn. See RoomFiles for what the answer is for.
+    ///
+    /// SET IT BEFORE <see cref="AttachPreload"/>, which is where the window is built and where
+    /// this is read. Nothing enforces that, so it is written down here rather than discovered
+    /// as a button that never appears.
+    /// </remarks>
+    public Action? LookInsideRooms { get; set; }
+
+    /// <summary>
+    /// Writes the area's room files out whole, decoded, when something can.
+    /// </summary>
+    /// <remarks>
+    /// Same rules as <see cref="LookInsideRooms"/>, including SET IT BEFORE
+    /// <see cref="AttachPreload"/>. Separate from it because the two answer different
+    /// questions: one says what a room names, and this is what a person reads the format out
+    /// of, on a machine that is not running the game.
+    /// </remarks>
+    public Action? WriteRoomsOut { get; set; }
+
+    /// <summary>
+    /// Searches memory for anything that REFERS to one of the area's room files.
+    /// </summary>
+    /// <remarks>
+    /// Same rules as the two above, including SET IT BEFORE <see cref="AttachPreload"/>. It is
+    /// the opposite direction to both: they read what a room file SAYS, and this asks who in
+    /// the game points AT one - which is the question that would place a room on the map.
+    /// Unlike them it needs no install, only the loaded-file table this page already walks.
+    /// </remarks>
+    public Action? HuntRoomPlacements { get; set; }
+
     public void AttachPreload(
         PreloadWatch watch,
         Action lookAgain,
@@ -771,7 +851,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _tools.AsTabs(Area);
 
         var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Area);
-        var window = new PreloadWindow(watch, lookAgain, sweep, () => PreloadListChanged?.Invoke(watch.Watching));
+        var window = new PreloadWindow(
+            watch,
+            lookAgain,
+            sweep,
+            () => PreloadListChanged?.Invoke(watch.Watching),
+            LookInsideRooms,
+            WriteRoomsOut,
+            HuntRoomPlacements);
         _tools.Add(
             20,
             "preload",
@@ -1783,6 +1870,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             IconFor = _icons.TextureFor,
             Changed = () => SettingsChanged?.Invoke(),
         };
+
+        // Attached with the places rather than beside them: pinning a room is asking for a
+        // route to it, so the room layer wants the same planner and is useless without one.
+        _rooms = new RoomLayer(planner)
+        {
+            Style = _style,
+            Changed = () => SettingsChanged?.Invoke(),
+        };
+
+        // What the settings file said, which was read before this existed - the same handover
+        // the stash stores make, and for the same reason.
+        _rooms.Apply(_roomWants);
     }
 
     protected override Task PostInitialized()
@@ -1972,11 +2071,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     // What the settings page asked for, kept so the style can override it per frame without
     // either of them losing the other's value.
-    private uint _terrainColour = 0xFF64C8FF;
+    private uint _terrainColour = OverlaySettings.ParseColour(OverlaySettings.Default.TerrainColour);
     private int _terrainThickness = 1;
+    private bool _terrainRim = true;
 
-    /// <summary>Sets the layout's colour and line width. A colour of 0 keeps the current one.</summary>
-    public void ApplyTerrainStyle(uint colour, int thickness)
+    // The fill's colour and its opacity, kept APART as the page holds them: packed into one
+    // alpha and unpacked again, 70 comes back as 69, and the slider creeps on every save.
+    private uint _terrainFillColour = OverlaySettings.ParseColour(OverlaySettings.Default.TerrainFillColour);
+    private int _terrainFillOpacity = OverlaySettings.Default.TerrainFillOpacity;
+
+    /// <summary>
+    /// Sets the layout's colour, line width, whether it has a dark rim, and the floor's fill.
+    /// A colour of 0 keeps the current one.
+    /// </summary>
+    public void ApplyTerrainStyle(uint colour, int thickness, bool rim, uint fillColour, int fillOpacity)
     {
         if (colour != 0)
         {
@@ -1984,9 +2092,49 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _terrain.Colour = colour;
         }
 
+        if (fillColour != 0)
+        {
+            _terrainFillColour = fillColour;
+        }
+
         _terrainThickness = thickness;
         _terrain.Thickness = thickness;
+        _terrainRim = rim;
+        _terrain.Rim = rim;
+        _terrainFillOpacity = fillOpacity;
+        _terrain.Fill = OverlaySettings.WithOpacity(_terrainFillColour, fillOpacity);
     }
+
+    /// <summary>
+    /// What the configuration page chose for the layout: applied, and made to WIN.
+    /// </summary>
+    /// <remarks>
+    /// Two editors set the layout's colour and width - this page and the in-game style
+    /// editor - and the style used to win unconditionally, because it is the one somebody
+    /// chose deliberately. That held right up until somebody chose deliberately on the PAGE,
+    /// where every drag of the colour picker did nothing on screen and nothing said why: the
+    /// style file still carried a colour from weeks before. So the rule is now the ordinary
+    /// one, the last choice wins: choosing here clears the style's colour and width, and
+    /// choosing in the style editor overrides this again until the page is next used.
+    ///
+    /// The clearing is DEFERRED to the render thread. This is called from the config window's
+    /// thread, and the style is a plain dictionary the layers read every frame - writing it
+    /// from here would race those reads. A flag costs one volatile read a frame.
+    /// </remarks>
+    public void ChooseTerrainStyle(uint colour, int thickness, bool rim, uint fillColour, int fillOpacity)
+    {
+        ApplyTerrainStyle(colour, thickness, rim, fillColour, fillOpacity);
+        Volatile.Write(ref _terrainStyleYields, true);
+    }
+
+    // Set by the page's thread, consumed on the render thread - see ChooseTerrainStyle.
+    private bool _terrainStyleYields;
+
+    /// <summary>The layout colour actually drawn, once the style has had its say.</summary>
+    public uint TerrainColourInUse => _terrain.Colour;
+
+    /// <summary>The layout line width actually drawn, once the style has had its say.</summary>
+    public int TerrainThicknessInUse => _terrain.Thickness;
 
     /// <summary>
     /// What the terrain layer holds, for the config page and the status window.
@@ -2927,7 +3075,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Row(
                     "belt",
                     string.Join("   ", belt.Flasks.Select(f =>
-                        $"{f.Slot}:{f.Charges}/{f.ChargesPerUse}"
+                        $"{f.Slot}:{f.Charges}/{f.MaxCharges}"
                         + (f.IsCharm ? " (charm)" : f.CanUse ? string.Empty : " (empty)"))),
                     figure: true);
             }
@@ -3161,6 +3309,42 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Row("terrain", DescribeTerrain(), Measured, figure: true);
         }
 
+        // The hunt for the ROOM level, one line per pointer found around a tile. Only under
+        // --debug and only while it finds anything, because it is a question being worked on
+        // rather than a reading of the game: the names on the map today are TILES, one level
+        // below the rooms the reference tool shows, and these are the bytes that would say
+        // where the level above lives. A line marked ROOM? is the answer arriving.
+        if (_snapshot.Terrain is TerrainGrid probed && probed.RoomProbeLines.Count > 0)
+        {
+            foreach (string line in probed.RoomProbeLines)
+            {
+                Row(
+                    string.Empty,
+                    line,
+                    line.Contains("ROOM?", StringComparison.Ordinal) ? OverlayInk.Good : Measured,
+                    figure: true);
+            }
+
+            // And what the per-tile majority costs, beside it and behind the same --debug gate.
+            // The ground layer reduces each tile's four corners to one type while the game paints
+            // all four; this counts whether that ever DELETES a type from the map, which is the
+            // only way the reduction changes what a person reads. See GroundResolutionProbe.
+            //
+            // Asked with the layer's own threshold rather than a constant, because the answer is
+            // about the patches the map would keep and that is the number deciding which ones
+            // those are.
+            foreach (string line in probed.GroundResolution(_ground.MinTiles))
+            {
+                Row(
+                    string.Empty,
+                    line,
+                    line.Contains("NAMED NOWHERE TODAY", StringComparison.Ordinal)
+                        ? OverlayInk.Good
+                        : Measured,
+                    figure: true);
+            }
+        }
+
         // What the map is actually allowed to draw on, once the game's interface and any open
         // panel are taken out. The one line that separates "the projection is wrong" from "the
         // keep-out region ate the map", which look identical from a screenshot: a region in
@@ -3291,6 +3475,141 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
 
             OverlayLayout.Hint("The picker for routing, in its own small window beside the map.");
+        }
+
+        if (_rooms is not null)
+        {
+            bool naming = _rooms.Enabled;
+            if (OverlayLayout.Toggle("Room Names on the Map", ref naming))
+            {
+                _rooms.Enabled = naming;
+                SettingsChanged?.Invoke();
+            }
+
+            OverlayLayout.Hint(
+                "What the game itself calls each part of the layout, on the large map."
+                + "\nPoint at one for its file, and ctrl + click it to pin it with a route.");
+
+            if (_rooms.Enabled)
+            {
+                // FIRST, because it is the one that does the work. An area is built from one
+                // module repeated, so the threshold in tiles below is a cliff rather than a
+                // slider - this is what separates a place from a building block.
+                int repeats = _rooms.MaxPlacements;
+                if (OverlayLayout.Slider("Named up to", ref repeats, 1, 40, "%d placements"))
+                {
+                    _rooms.MaxPlacements = repeats;
+                    SettingsChanged?.Invoke();
+                }
+
+                OverlayLayout.Hint(
+                    "A file placed eighty times in one area is a wall module, and labelling"
+                    + "\nall eighty buries the one room worth reading.");
+
+                int least = _rooms.MinTiles;
+                if (OverlayLayout.Slider("Smallest Room Named", ref least, 1, 32, "%d tiles"))
+                {
+                    _rooms.MinTiles = least;
+                    SettingsChanged?.Invoke();
+                }
+
+                OverlayLayout.Hint(
+                    "A one-tile room is a rock or a strip of wall, and there are hundreds."
+                    + "\nRooms with no ground to stand on are never named - the buildings and the"
+                    + "\nsea are tiles too, and they are most of what an area is built from.");
+
+                // On ENTER rather than per keystroke: every change here writes the settings
+                // file, and a filter typed a letter at a time would write it eight times.
+                string only = _rooms.Filter;
+                if (OverlayLayout.Search(
+                        "##rooms", "only rooms named...", ref only, 64,
+                        flags: ImGuiInputTextFlags.EnterReturnsTrue))
+                {
+                    _rooms.Filter = only;
+                    SettingsChanged?.Invoke();
+                }
+
+                // The way out of a pick that can no longer be seen. An endgame map is generated
+                // per instance, so a room pinned in one leaves a key that will never match a
+                // room again - invisible on the map, and still in the file.
+                // The ###id keeps the button ONE control while its label counts: ImGui takes a
+                // control's identity from its label, so a live number in one would make a new
+                // control every time it changed - and the click land on nothing.
+                if (_rooms.PinnedHere > 0
+                    && OverlayLayout.Actions($"Forget the {_rooms.PinnedHere} pinned here###forget-rooms") == 0)
+                {
+                    _rooms.Forget();
+                }
+            }
+        }
+
+        {
+            bool ground = _ground.Enabled;
+            if (OverlayLayout.Toggle("Ground Types on the Map", ref ground))
+            {
+                _ground.Enabled = ground;
+                SettingsChanged?.Invoke();
+            }
+
+            OverlayLayout.Hint(
+                "What the ground IS rather than which file drew it - the abyss, the fill,"
+                + "\nthe waypoint - in the names the area itself lists."
+                + "\nGround you can stand on is named; walls and ceilings only in an area"
+                + "\nwhere nothing else carries a name.");
+
+            if (_ground.Enabled)
+            {
+                // FIRST, because it is the one that does the work - the same order the room
+                // names put their two filters in, and for the same reason. Every patch of one
+                // type carries the same word, so the twentieth adds a position and no meaning.
+                int repeats = _ground.MaxPatches;
+                if (OverlayLayout.Slider("Named up to", ref repeats, 1, 20, "%d patches"))
+                {
+                    _ground.MaxPatches = repeats;
+                    SettingsChanged?.Invoke();
+                }
+
+                OverlayLayout.Hint(
+                    "One type winds through an area in dozens of separate pieces, and each one"
+                    + "\nis a label carrying the same word. The biggest are kept.");
+
+                int least = _ground.MinTiles;
+                if (OverlayLayout.Slider("Smallest Patch Named", ref least, 1, 64, "%d tiles"))
+                {
+                    _ground.MinTiles = least;
+                    SettingsChanged?.Invoke();
+                }
+
+                OverlayLayout.Hint(
+                    "What this drops is the ragged edge where two types meet."
+                    + "\nFew types does not mean few patches - size alone cannot thin them.");
+
+                // WHY THERE IS NOTHING ON THE MAP, which without this line is indistinguishable
+                // from the feature being broken. WRITTEN OUT rather than hinted: OverlayLayout
+                // .Hint is a hover tooltip, and the first version put this in one - so the
+                // sentence that explains an empty map was itself invisible unless somebody
+                // happened to point at the right control. A diagnostic nobody can see is not a
+                // diagnostic.
+                if (_ground.Note.Length > 0)
+                {
+                    ImGuiText.Wrapped(Quiet, ImGuiText.Escape(_ground.Note));
+                }
+
+                // AND WHAT THE ARRAY ACTUALLY HOLDS when the verdict was no. A one-line verdict
+                // says the pairing is wrong and nothing about the values, which is the only
+                // thing that decides what to do next - so the histogram sits right under it,
+                // and only there.
+                //
+                // ImGuiText.Mono rather than ImGui.TextColored, and the reason is the whole
+                // history of this feature: TextColored is printf, the first histogram went to
+                // it raw with two per-cent signs per row, and printf ate one of them and left
+                // the OTHER number standing under its label. Mono is TextUnformatted, so a row
+                // is drawn as written - and a table of figures wants the mono face anyway.
+                foreach (string line in _ground.Diagnosis)
+                {
+                    ImGuiText.Mono(Quiet, line);
+                }
+            }
         }
 
         if (Noise is not null)
@@ -3479,14 +3798,29 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (ShowTerrain && Style.Visible(StyleCatalogue.Keys.Terrain) && _snapshot.Terrain is TerrainGrid terrain)
         {
             // The style wins where it says anything, and the settings page's colour and
-            // thickness stand where it does not. Two places can set this and only one of them
-            // was chosen deliberately, so the deliberate one goes on top rather than the two
-            // fighting over a field.
+            // thickness stand where it does not. Two places can set this, and the one used
+            // LAST is the deliberate one: the page clears the style's say when it is used
+            // (below), and the style editor's next edit puts it back.
             LayerStyle outline = Style[StyleCatalogue.Keys.Terrain];
+
+            // The page chose since the last frame, so the style's colour and width stand
+            // down - see ChooseTerrainStyle. Written down at once, or the old override would
+            // be back on the next launch.
+            if (Volatile.Read(ref _terrainStyleYields))
+            {
+                Volatile.Write(ref _terrainStyleYields, false);
+                if (!string.IsNullOrEmpty(outline.Colour) || outline.Width > 0f)
+                {
+                    outline = outline with { Colour = "", Width = 0f };
+                    Style.Set(StyleCatalogue.Keys.Terrain, outline);
+                    SaveStyle();
+                }
+            }
+
             _terrain.Colour = outline.ColourOr(_terrainColour);
             _terrain.Thickness = (int)outline.WidthOr(_terrainThickness);
 
-            _terrain.Draw(draw, map, terrain, new Vector3(player.WorldX, player.WorldY, player.TerrainHeight));
+            _terrain.Draw(draw, map, terrain, new Vector3(player.WorldX, player.WorldY, player.TerrainHeight), Coverage);
         }
 
         // Over the layout and under the markers: it is context for where to go next, and a
@@ -3528,6 +3862,27 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 draw.AddCircle(
                     at, size, OverlayStyle.Faded(OutlineColour, fade), 10,
                     Style.Width(StyleCatalogue.Keys.DotOutline, 1f));
+            }
+        }
+
+        // Over the entity dots, because it is TEXT: a name half behind a monster dot is not a
+        // quieter name, it is an unreadable one. Under the places, which still win.
+        //
+        // Called whether or not it draws anything: the rooms somebody pinned are handed to the
+        // place layer below, and it is this call that resolves them for the area.
+        //
+        // UNDER the room names, in draw order as in meaning: where both are on and two labels
+        // land on the same spot, the room's name is the more specific of the two and should be
+        // the one that stays legible.
+        _ground.DrawOnMap(draw, map, _snapshot, player);
+
+        if (_rooms is not null)
+        {
+            _rooms.DrawOnMap(draw, map, _snapshot, player);
+
+            if (_poi is not null)
+            {
+                _poi.PickedRooms = _rooms.Picked;
             }
         }
 

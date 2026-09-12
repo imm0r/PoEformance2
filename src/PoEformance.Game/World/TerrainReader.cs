@@ -24,6 +24,7 @@ public sealed class TerrainGrid
 
     private readonly TerrainHeightField? _heights;
     private readonly IReadOnlyList<TerrainLandmark> _landmarks;
+    private readonly IReadOnlyList<TerrainRoom> _rooms;
 
     public TerrainGrid(
         byte[] cells, int bytesPerRow, int rows,
@@ -41,11 +42,25 @@ public sealed class TerrainGrid
     public TerrainGrid(
         byte[] cells, int bytesPerRow, int rows,
         long totalTilesX, long totalTilesY, TerrainHeightField? heights, string heightNote = "",
-        IReadOnlyList<TerrainLandmark>? landmarks = null)
+        IReadOnlyList<TerrainLandmark>? landmarks = null,
+        IReadOnlyList<TerrainRoom>? rooms = null,
+        IReadOnlyList<string>? roomProbe = null,
+        TerrainGroundTypes? ground = null,
+        string groundNote = "")
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
         _landmarks = landmarks ?? [];
+        _rooms = rooms ?? [];
+        RoomProbeLines = roomProbe ?? [];
+        Ground = ground;
+
+        // The ground's own note when there IS a ground, and the reason there is not when there
+        // is not. NEVER EMPTY once a read has been attempted, because "nothing on the map" and
+        // "nothing was read" are the two answers a person has to tell apart, and the first
+        // version of this could only report the first - the four ways the read gives up all
+        // returned a bare null and the layer had nothing to show for any of them.
+        GroundNote = ground?.Note ?? groundNote;
         TilesX = (int)Math.Max(0, totalTilesX);
         TilesY = (int)Math.Max(0, totalTilesY);
         _heights = heights;
@@ -95,6 +110,131 @@ public sealed class TerrainGrid
     /// exists as an entity.
     /// </remarks>
     public IReadOnlyList<TerrainLandmark> Landmarks => _landmarks;
+
+    /// <summary>
+    /// The area's rooms - the blocks of tiles the game placed, each under its own file name.
+    /// </summary>
+    /// <remarks>
+    /// The layout in WORDS, beside the outline that draws it as a shape: which end holds the
+    /// exit, where the bridge is, which blob is the arena. Known from the moment the area
+    /// loads, for the same reason the landmarks are - it is read out of the ground rather than
+    /// out of the entity list. See <see cref="TerrainRooms"/>.
+    /// </remarks>
+    public IReadOnlyList<TerrainRoom> Rooms => _rooms;
+
+    /// <summary>
+    /// What the hunt for the ROOM level found around one tile, when it was asked to look.
+    /// </summary>
+    /// <remarks>
+    /// Empty unless --debug asked for it. See <see cref="Diagnostics.RoomProbe"/>: the names
+    /// drawn on the map today are tiles, one level below the rooms the reference tool shows,
+    /// and this is the reads that would settle where the room level lives - carried on the grid
+    /// so the readout can show it and a recording can hold it.
+    /// </remarks>
+    public IReadOnlyList<string> RoomProbeLines { get; }
+
+    /// <summary>
+    /// What KIND of ground is under each tile, or null when it could not be read or believed.
+    /// </summary>
+    /// <remarks>
+    /// A LEVEL ABOVE THE TILE NAMES, and the one the room files pointed at without being able to
+    /// reach it themselves: a room declares its ground types and never its tiles, so the chain
+    /// room-to-tile died and this one - tile corner to named type - took its place. See
+    /// <see cref="TerrainGroundTypes"/> for the two checks it has to survive first.
+    /// </remarks>
+    public TerrainGroundTypes? Ground { get; }
+
+    /// <summary>What the ground read came back as, whether or not it came back with a ground.</summary>
+    public string GroundNote { get; }
+
+    /// <summary>
+    /// The ground types as BLOCKS on the map, each under the name the area gave it.
+    /// </summary>
+    /// <remarks>
+    /// The same flood fill the rooms use, on the same tile grid, because it is the same shape of
+    /// question - contiguous tiles sharing a name - and the answer wants the same treatment:
+    /// a centroid to put a label at, a size to drop the specks by, and a count of how often the
+    /// name repeats so a type covering the whole area does not get labelled ninety times.
+    ///
+    /// Built lazily and once. Most areas are never asked, and flood-filling seven thousand tiles
+    /// for a layer nobody switched on is a cost paid on every zone change.
+    /// </remarks>
+    public IReadOnlyList<TerrainRoom> GroundRegions => (_ground ??= FindGroundRegions()).Regions;
+
+    /// <summary>
+    /// True when walls and abysses are being named because nothing standable was.
+    /// </summary>
+    /// <remarks>
+    /// Worth surfacing rather than leaving as a silent change of behaviour: the map looks
+    /// completely different in the two cases - floor names in one area, wall and abyss names in
+    /// the next - and without a sentence saying why, that reads as the feature being erratic.
+    /// </remarks>
+    public bool NamingUnstandableGround => (_ground ??= FindGroundRegions()).Fallback;
+
+    private (IReadOnlyList<TerrainRoom> Regions, bool Fallback) FindGroundRegions()
+    {
+        if (Ground is null || !Ground.Trusted || TilesX <= 0 || TilesY <= 0)
+        {
+            return ([], false);
+        }
+
+        // WALLS AND CEILINGS ONLY WHEN THEY ARE WHAT IS LEFT - see TerrainGroundTypes.WorthNaming,
+        // which holds the rule so that the resolution probe can apply the same one instead of a
+        // copy of it.
+        //
+        // THE BLANK SLOT IS NOT A REGION, because it has no name to write - not because it is
+        // empty ground. In a Maelstrom the blank IS the floor, 635 of the area's 679 walkable
+        // corners. It is real ground the game declined to name, it counts for every measurement
+        // (see TerrainGroundTypes.Separates), and only labelling it says nothing. A copy rather
+        // than a change to TileType, which stays the faithful index: "this tile has no NAMED
+        // type" and "this tile was not read" are different facts.
+        int[] named = new int[Ground.TileType.Length];
+        for (int i = 0; i < named.Length; i++)
+        {
+            int type = Ground.TileType[i];
+            named[i] = Ground.WorthNaming(type) ? type : -1;
+        }
+
+        bool[] walkable = WalkableTileMask();
+        int wide = TilesX;
+        return (
+            TerrainRooms.Find(
+                [.. Ground.Types], named, wide, TilesY, (x, y) => walkable[(y * wide) + x]),
+            !Ground.AnyStandableNamed);
+    }
+
+    private (IReadOnlyList<TerrainRoom> Regions, bool Fallback)? _ground;
+
+    /// <summary>
+    /// What the per-tile majority costs, measured against the same map at corner resolution.
+    /// </summary>
+    /// <remarks>
+    /// See <see cref="Diagnostics.GroundResolutionProbe"/> for the question. Under --debug only,
+    /// like the other terrain probes, because it is a question being settled rather than a reading
+    /// of the game.
+    ///
+    /// CACHED ON THE THRESHOLD IT WAS ASKED WITH. Two flood fills over five times the area's cells
+    /// is not a per-frame cost, and the readout asks on every frame it is open; but the answer
+    /// genuinely changes when the smallest-patch slider moves, so keying the cache on anything less
+    /// would show a stale table beside a slider that appears to do nothing.
+    /// </remarks>
+    public IReadOnlyList<string> GroundResolution(int minTiles)
+    {
+        if (_resolution is { } done && done.MinTiles == minTiles)
+        {
+            return done.Lines;
+        }
+
+        bool[] walkable = WalkableTileMask();
+        int wide = TilesX;
+        IReadOnlyList<string> lines = Diagnostics.GroundResolutionProbe.Measure(
+            Ground, TilesX, TilesY, (x, y) => walkable[(y * wide) + x], minTiles);
+
+        _resolution = (minTiles, lines);
+        return lines;
+    }
+
+    private (int MinTiles, IReadOnlyList<string> Lines)? _resolution;
 
     /// <summary>
     /// Why the heights are, or are not, here.
@@ -150,9 +290,60 @@ public sealed class TerrainGrid
 
     /// <summary>Describes the grid and any padding found, so a mismatch is visible.</summary>
     public string Describe()
-        => Width == StoredWidth && Height == StoredHeight
+        => (Width == StoredWidth && Height == StoredHeight
             ? $"{Width}x{Height}"
-            : $"{Width}x{Height} (buffer {StoredWidth}x{StoredHeight})";
+            : $"{Width}x{Height} (buffer {StoredWidth}x{StoredHeight})")
+           + DescribeRooms()
+           + DescribeGround();
+
+    /// <summary>
+    /// What the ground types came back as, INCLUDING when they came back untrusted.
+    /// </summary>
+    /// <remarks>
+    /// The note rather than a count, because the note is the finding. "Six types, four of them
+    /// ground you can stand on" and "six types, but they do not separate on walkability" are
+    /// the two answers that matter, and only the second is worth acting on.
+    /// </remarks>
+    private string DescribeGround()
+        => GroundNote.Length == 0 ? string.Empty : $", ground: {GroundNote}";
+
+    /// <summary>
+    /// How many rooms were found, and what the biggest one's file is called.
+    /// </summary>
+    /// <remarks>
+    /// The PATH rather than a count alone, and that is the whole reason this line exists: what
+    /// the game stores on a tile is a question only the game can answer, and the answer decides
+    /// what the room names on the map can ever say. One look at this row in the readout settles
+    /// it for an area - which beats reasoning about it from a reference project that reads a
+    /// different game's build.
+    /// </remarks>
+    private string DescribeRooms()
+    {
+        if (_rooms.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        TerrainRoom biggest = _rooms[0];
+        int walkable = 0;
+        foreach (TerrainRoom room in _rooms)
+        {
+            if (room.Tiles > biggest.Tiles)
+            {
+                biggest = room;
+            }
+
+            if (room.IsWalkable)
+            {
+                walkable++;
+            }
+        }
+
+        // BOTH counts, because their ratio is the thing worth seeing: most of an area is
+        // scenery, and a run where they are equal means the walkability test answered "yes"
+        // to everything - which is what a failed walkable read would look like.
+        return $", {_rooms.Count} rooms ({walkable} walkable, biggest {biggest.Path} at {biggest.Tiles} tiles)";
+    }
 
     /// <summary>Takes the tile-derived size when it is smaller and plausible.</summary>
     private static int Fit(int stored, long tiles)
@@ -238,6 +429,70 @@ public sealed class TerrainGrid
     }
 
     /// <summary>
+    /// Which TILES hold ground that can be walked on, one flag each, row by row.
+    /// </summary>
+    /// <remarks>
+    /// WHAT SEPARATES A ROOM FROM THE SCENERY AROUND IT. An area's tile grid is a full
+    /// rectangle and the walkable grid is a subset of it, so most of what the game builds -
+    /// the buildings you walk past, the sea beside the road, the wall behind the fence - is
+    /// tiles you can never stand on. They carry names like any other room, and left unfiltered
+    /// they are most of the labels on the map.
+    ///
+    /// ONE PASS OVER THE PACKED BYTES, not a search per tile. Asking each tile in turn means
+    /// scanning its 529 cells and a blocked tile pays all of them, which on a large area is
+    /// tens of millions of nibble tests for a question the buffer answers in one sweep of
+    /// itself. Here a zero byte - both its cells solid, which is most of them - is skipped
+    /// whole, and every other byte marks the tile each of its two cells falls in. Exact, and
+    /// bounded by the buffer's size rather than by the area's tile count.
+    ///
+    /// The per-cell mapping is what keeps it exact. A byte holds two cells and a tile is 23
+    /// across, so every odd tile boundary lands mid-byte: cells 22 and 23 share a byte and
+    /// belong to different tiles. Marking "the tile this BYTE is in" would let a neighbour's
+    /// edge cell answer for this one.
+    /// </remarks>
+    public bool[] WalkableTileMask()
+    {
+        int tilesX = TilesX > 0 ? TilesX : Divided(Width);
+        int tilesY = TilesY > 0 ? TilesY : Divided(Height);
+        var mask = new bool[tilesX * tilesY];
+
+        // Padding is not walkable ground: the row stride is a byte count the game may round
+        // up, so the bytes past the area's own width are excluded rather than read.
+        int bytes = Math.Min((Width + 1) / 2, _bytesPerRow);
+
+        for (int y = 0; y < Height; y++)
+        {
+            int tileRow = (y / CellsPerTile) * tilesX;
+            int row = y * _bytesPerRow;
+
+            for (int b = 0; b < bytes; b++)
+            {
+                byte packed = _cells[row + b];
+                if (packed == 0)
+                {
+                    continue;
+                }
+
+                int x = b * 2;
+                if ((packed & 0x0F) != 0)
+                {
+                    mask[tileRow + (x / CellsPerTile)] = true;
+                }
+
+                if ((packed & 0xF0) != 0 && x + 1 < Width)
+                {
+                    mask[tileRow + ((x + 1) / CellsPerTile)] = true;
+                }
+            }
+        }
+
+        return mask;
+    }
+
+    /// <summary>How many tiles a run of cells spans, rounding up.</summary>
+    private static int Divided(int cells) => (cells + CellsPerTile - 1) / CellsPerTile;
+
+    /// <summary>
     /// Marks the boundary between walkable ground and everything else.
     /// </summary>
     /// <remarks>
@@ -300,12 +555,24 @@ public sealed class TerrainReader
     /// <summary>Largest sub-tile height array worth believing. A tile is 23x23 = 529 cells.</summary>
     private const int MaxSubHeightBytes = 2048;
 
+    /// <summary>
+    /// Largest tile-corner array worth reading - three bytes over roughly 1180x1180 tiles.
+    /// </summary>
+    /// <remarks>
+    /// The array's exact size is checked against the tile counts, which is the identification;
+    /// this is the guard for both of them being wrong TOGETHER, since they come out of the same
+    /// struct. The biggest area measured is 21648 bytes, so nothing real is near this.
+    /// </remarks>
+    private const int MaxCornerBytes = 4 * 1024 * 1024;
+
     /// <summary>Distinct tile templates read per area, as a guard rather than a real bound.</summary>
     private const int MaxSubTemplates = 4096;
 
     private readonly IMemoryReader _reader;
     private readonly int _terrainMetadata;
     private readonly int _walkableData;
+    private readonly int _cornerData;
+    private readonly int _groundTypeFiles;
     private readonly int _bytesPerRow;
     private readonly int _totalTilesX;
     private readonly int _totalTilesY;
@@ -347,6 +614,8 @@ public sealed class TerrainReader
 
         StructDef terrain = schema.Structs["TerrainMetadata"];
         _walkableData = terrain.OffsetOf("GridWalkableData");
+        _cornerData = terrain.OffsetOf("TileCornerData");
+        _groundTypeFiles = terrain.OffsetOf("GroundTypeFiles");
         _bytesPerRow = terrain.OffsetOf("BytesPerRow");
         _totalTilesX = terrain.OffsetOf("TotalTilesX");
         _totalTilesY = terrain.OffsetOf("TotalTilesY");
@@ -360,6 +629,100 @@ public sealed class TerrainReader
         _tileIdX = tile.OffsetOf("TileIdX");
         _tileIdY = tile.OffsetOf("TileIdY");
         _tgtPath = schema.Structs["TgtFile"].OffsetOf("TgtPath");
+    }
+
+    /// <summary>
+    /// The area's ground-type files, in the order an index into them would run.
+    /// </summary>
+    /// <remarks>
+    /// Eight-byte pointers to file objects whose path sits where a tile's does, so the same
+    /// struct and the same cache serve both. A NULL SLOT IS DATA: every area's list starts with
+    /// one, so it is kept in place - dropping it would shift every index above it onto another
+    /// type's name, which is the one failure a reader of an index table must not have.
+    ///
+    /// Read ONCE PER AREA and kept in <see cref="_groundTypes"/>, because two things want it -
+    /// the corner probe under --debug and the ground layer's own read - and the second must not
+    /// pay for the first being on.
+    ///
+    /// EVERY REFUSAL SAYS WHICH ONE, in <see cref="_groundTypeNote"/>. Four bare nulls out of
+    /// this method once made "nothing on the map" indistinguishable from "nothing was read",
+    /// which is the failure the checks themselves exist to prevent, reintroduced one level up.
+    /// </remarks>
+    private IReadOnlyList<string> ReadGroundTypeFiles(ulong terrainBase)
+    {
+        _groundTypeNote = string.Empty;
+
+        ulong first = _reader.ReadPointer(terrainBase + (ulong)_groundTypeFiles);
+        ulong last = _reader.ReadPointer(terrainBase + (ulong)_groundTypeFiles + 8);
+        if (first == 0 || last <= first)
+        {
+            _groundTypeNote = "empty vector";
+            return [];
+        }
+
+        long bytes = (long)(last - first);
+        if (bytes % 8 != 0 || bytes / 8 > TerrainGroundTypes.MostTypes)
+        {
+            _groundTypeNote = $"{bytes} bytes, which is not 1 to {TerrainGroundTypes.MostTypes}"
+                + " pointers - so this is not the list";
+            return [];
+        }
+
+        var pointers = new byte[bytes];
+        if (!_reader.TryRead(first, pointers))
+        {
+            _groundTypeNote = $"unreadable at {first:X}";
+            return [];
+        }
+
+        var paths = new List<string>((int)(bytes / 8));
+        int named = 0;
+
+        for (int i = 0; i + 8 <= pointers.Length; i += 8)
+        {
+            ulong file = BitConverter.ToUInt64(pointers, i);
+            if (file == 0)
+            {
+                paths.Add(string.Empty);
+                continue;
+            }
+
+            if (!MemoryReaderExtensions.IsPlausiblePointer(file))
+            {
+                _groundTypeNote = $"element {i / 8} of {bytes / 8} is neither null nor a pointer";
+                return [];
+            }
+
+            if (!_tgtPaths.TryGetValue(file, out string? read))
+            {
+                read = _reader.ReadStdWString(file + (ulong)_tgtPath, 128);
+                _tgtPaths[file] = read;
+            }
+
+            // A POINTER THAT NAMES NOTHING is a different thing from a blank slot, and still a
+            // failure: the slot claims to hold a file and the read did not produce one, which
+            // is what a wrong path offset looks like. Kept in place rather than dropped either
+            // way, because dropping one would shift every value above it onto another's name.
+            if (read.Length == 0)
+            {
+                _groundTypeNote = $"element {i / 8} of {bytes / 8} points at no readable file";
+                return [];
+            }
+
+            paths.Add(read);
+            named++;
+        }
+
+        // A list of nothing but blanks is not a list. Every slot being null reads as a perfectly
+        // valid vector to every check above it, and would then have the layer name every corner
+        // "no type" and call the area read.
+        if (named == 0)
+        {
+            _groundTypeNote = $"{bytes / 8} slots, none of which names a file";
+            return [];
+        }
+
+        return paths;
     }
 
     /// <summary>Tile-file paths are static game data; cache them by their pointer.</summary>
@@ -451,17 +814,155 @@ public sealed class TerrainReader
         if (tilesY is < 1 or > 4096) { tilesY = 0; }
 
         LastError = string.Empty;
+
+        // A grid over the same buffer, purely so the tiles can be asked whether anything can
+        // be walked on inside them - which is what separates a room from the scenery ring
+        // around it. Built BEFORE the heights because the tile pass wants it, and it costs
+        // nothing: the constructor keeps the buffer by reference and computes four numbers.
+        _walkable = new TerrainGrid(cells, stride, (int)rows, tilesX, tilesY, heights: null);
+
+        // Once per area, before anything that wants it: the corner probe under --debug and the
+        // ground read below are the same question asked twice, and the file paths behind this
+        // are a read apiece.
+        _groundTypes = ReadGroundTypeFiles(terrainBase);
+
         TerrainHeightField? heights = ReadTileHeights(terrainBase, tilesX, tilesY);
 
+        // AFTER the walkable grid exists, because the walkability is what checks it - see
+        // TerrainGroundTypes: a ground type that does not separate on walkability is a
+        // mis-read one, and there is nothing to compare against before this point.
+        TerrainGroundTypes? ground = ReadGroundTypes(terrainBase, tilesX, tilesY);
+        _walkable = null;
+
         return new TerrainGrid(
-            cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks);
+            cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks, _rooms,
+            _probe, ground, _groundNote);
     }
+
+    /// <summary>
+    /// What kind of ground is under each tile, in the names the area itself lists.
+    /// </summary>
+    /// <remarks>
+    /// TWO READS AND A REFUSAL. The vector at GroundTypeFiles names the types; the array at
+    /// TileCornerData says which of them covers each tile corner, in its first of three bytes.
+    /// The refusal is the important part: the corner array must be EXACTLY
+    /// <c>(tilesX+1) * (tilesY+1) * 3</c> bytes before a single value is read out of it. That
+    /// size is the whole identification - it is what tied this array to a room file's per-corner
+    /// ground types in the first place - and an array of another size is a different thing being
+    /// read, which is worth abandoning rather than reinterpreting. This project has a drawer full
+    /// of plausible maps of nonsense, one of them built on the landscape grid this replaced.
+    /// </remarks>
+    private TerrainGroundTypes? ReadGroundTypes(ulong terrainBase, long tilesX, long tilesY)
+    {
+        _groundNote = string.Empty;
+
+        if (tilesX <= 0 || tilesY <= 0)
+        {
+            _groundNote = "no tile count, so there is nothing to take a type per tile of";
+            return null;
+        }
+
+        if (_groundTypes.Count == 0)
+        {
+            _groundNote = $"no ground-type files at +0x{_groundTypeFiles:X2} ({_groundTypeNote})";
+            return null;
+        }
+
+        ulong first = _reader.ReadPointer(terrainBase + (ulong)_cornerData);
+        ulong last = _reader.ReadPointer(terrainBase + (ulong)_cornerData + 8);
+        if (first == 0 || last <= first)
+        {
+            _groundNote = "no corner array at TileCornerData";
+            return null;
+        }
+
+        long size = (long)(last - first);
+        long wanted = (tilesX + 1) * (tilesY + 1) * TerrainGroundTypes.BytesPerCorner;
+
+        // A cap on top of the exact size, because the size is computed from the TILE COUNTS and
+        // those are read out of the same struct. A drifted offset can put both of them wrong
+        // together and then ask for a fifty-megabyte allocation that matches perfectly. The
+        // biggest area measured is 21648 bytes, so this is two hundred times the real thing.
+        if (size > MaxCornerBytes)
+        {
+            _groundNote = $"corner array is {size} bytes, past the {MaxCornerBytes} cap";
+            return null;
+        }
+
+        if (size != wanted)
+        {
+            _groundNote = $"corner array is {size} bytes against {wanted} for"
+                + $" {tilesX + 1}x{tilesY + 1} corners - not that array";
+            return null;
+        }
+
+        var corners = new byte[size];
+        if (!_reader.TryRead(first, corners))
+        {
+            _groundNote = $"corner array unreadable at {first:X} for {size} bytes";
+            return null;
+        }
+
+        TerrainGroundTypes? ground = TerrainGroundTypes.From(
+            _groundTypes, corners, (int)tilesX, (int)tilesY, _walkable);
+
+        if (ground is null)
+        {
+            _groundNote = $"{_groundTypes.Count} ground types over {tilesX}x{tilesY} tiles,"
+                + " which is not a shape this array can be";
+        }
+
+        return ground;
+    }
+
+    /// <summary>Why the last ground read produced what it did. See TerrainGrid.GroundNote.</summary>
+    private string _groundNote = string.Empty;
+
+    /// <summary>And why the type list itself came back empty, which is a level finer.</summary>
+    private string _groundTypeNote = string.Empty;
+
+    /// <summary>The current area's ground-type files, read once per area.</summary>
+    private IReadOnlyList<string> _groundTypes = [];
+
+
+
+    /// <summary>
+    /// The area's walkability while its tiles are being grouped, and null the rest of the time.
+    /// </summary>
+    /// <remarks>
+    /// A field rather than an argument threaded through the height read, which is what sits
+    /// between the two and has no business knowing about it. Cleared as soon as the pass is
+    /// done, so nothing can come to depend on a half-built grid outliving it.
+    /// </remarks>
+    private TerrainGrid? _walkable;
 
     /// <summary>Why the last height read produced what it did. See TerrainGrid.HeightNote.</summary>
     private string _heightNote = string.Empty;
 
     /// <summary>What the last tile read found in the shape of the ground.</summary>
     private IReadOnlyList<TerrainLandmark> _landmarks = [];
+
+    /// <summary>The rooms the same read found. See TerrainGrid.Rooms.</summary>
+    private IReadOnlyList<TerrainRoom> _rooms = [];
+
+    /// <summary>
+    /// Whether to go looking for the ROOM level while the tiles are being read.
+    /// </summary>
+    /// <remarks>
+    /// Off unless asked, and asked by --debug. It is a walk of two neighbourhoods of memory
+    /// nothing else touches, which costs a couple of hundred small reads once per area - free
+    /// beside the terrain read itself, and pointless for anybody not chasing the offset. See
+    /// <see cref="Diagnostics.RoomProbe"/> for what it is chasing and why it must be RUN to be
+    /// answerable offline.
+    /// </remarks>
+    public bool ProbeRooms { get; set; }
+
+    /// <summary>What that probe found, or empty when it did not run.</summary>
+    private IReadOnlyList<string> _probe = [];
+
+    // The tile the probe looks at: the first one carrying a name, and what that name is.
+    private long _probeTile = -1;
+    private string _probeName = string.Empty;
 
     /// <summary>
     /// Names for particular tiles of the current area, keyed as the reference writes them.
@@ -473,7 +974,7 @@ public sealed class TerrainReader
     public IReadOnlyDictionary<string, string>? CuratedLandmarks { get; set; }
 
     /// <summary>
-    /// Reads every tile's file path and finds the places among them.
+    /// Reads every tile's file path, and from them the places and the rooms.
     /// </summary>
     /// <remarks>
     /// The tile buffer is already in hand from the heights, so the tile records themselves
@@ -481,19 +982,42 @@ public sealed class TerrainReader
     /// and reading a string for each would be a read per tile. They are deduplicated by the
     /// file pointer instead - an area is built from a few hundred distinct tiles, each used
     /// hundreds of times - which turns that into a few hundred reads, once per area.
+    ///
+    /// BOTH ANSWERS FROM ONE PASS, and they want the tiles differently. A landmark is one tile
+    /// that could BE something, so those are kept as records and only where the name or a
+    /// curated key says to. A ROOM is every tile, because a room is defined by which of its
+    /// neighbours carry the same file - so what the rooms need is not the records but an id
+    /// per tile, which is an int array rather than tens of thousands of objects.
+    ///
+    /// The rooms are found whether or not anything is drawing them, and that is deliberate:
+    /// the loop already looked up every tile's path, so what they add is an int store per tile
+    /// and a flood fill, once per area. Reading them on demand instead would mean the switch
+    /// did nothing until the next zone - a setting that appears not to work.
     /// </remarks>
-    private void ReadLandmarks(byte[] tiles, long count, long tilesX)
+    private void ReadTilePaths(byte[] tiles, long count, long tilesX)
     {
+        _probeTile = -1;
+        _probeName = string.Empty;
+
         if (tilesX <= 0)
         {
             _landmarks = [];
+            _rooms = [];
             return;
         }
 
         var found = new List<TerrainTile>();
 
+        // Path ids for the rooms: the file pointer's own dedup gives the STRING, and this
+        // gives it a small number the flood fill can compare without touching memory again.
+        var paths = new List<string>();
+        var ids = new Dictionary<ulong, int>();
+        var tilePath = new int[count];
+
         for (long i = 0; i < count; i++)
         {
+            tilePath[i] = -1;
+
             int at = (int)(i * TileEntrySize);
             ulong file = BitConverter.ToUInt64(tiles, at + _tgtFile);
             if (!MemoryReaderExtensions.IsPlausiblePointer(file))
@@ -501,15 +1025,36 @@ public sealed class TerrainReader
                 continue;
             }
 
-            if (!_tgtPaths.TryGetValue(file, out string? path))
+            if (!ids.TryGetValue(file, out int id))
             {
-                path = _reader.ReadStdWString(file + (ulong)_tgtPath, 128);
-                _tgtPaths[file] = path;
+                if (!_tgtPaths.TryGetValue(file, out string? read))
+                {
+                    read = _reader.ReadStdWString(file + (ulong)_tgtPath, 128);
+                    _tgtPaths[file] = read;
+                }
+
+                id = -1;
+                if (read.Length > 0)
+                {
+                    id = paths.Count;
+                    paths.Add(read);
+                }
+
+                ids[file] = id;
             }
 
-            if (path.Length == 0)
+            if (id < 0)
             {
                 continue;
+            }
+
+            tilePath[i] = id;
+            string path = paths[id];
+
+            if (_probeTile < 0)
+            {
+                _probeTile = i;
+                _probeName = path;
             }
 
             // Only the tiles that could BE something are kept as records. A curated key needs
@@ -529,6 +1074,15 @@ public sealed class TerrainReader
         }
 
         _landmarks = TerrainLandmarks.Find(found, CuratedLandmarks);
+
+        // The mask is built once and read per tile. Null when the walkable grid is not to
+        // hand, which counts every tile as walkable - see TerrainRooms.Find: no opinion has to
+        // mean no filter, never an empty map.
+        int wide = (int)tilesX;
+        bool[]? walkable = _walkable?.WalkableTileMask();
+        _rooms = TerrainRooms.Find(
+            paths, tilePath, wide, (int)(count / tilesX),
+            walkable is null ? null : (x, y) => walkable[(y * wide) + x]);
     }
 
     /// <summary>
@@ -551,7 +1105,11 @@ public sealed class TerrainReader
     /// </remarks>
     private TerrainHeightField? ReadTileHeights(ulong terrainBase, long tilesX, long tilesY)
     {
+        // Cleared here rather than only on success: every early return below leaves the tiles
+        // unread, and keeping the last area's answers would put its rooms on this area's map.
         _landmarks = [];
+        _rooms = [];
+        _probe = [];
 
         if (tilesX <= 0 || tilesY <= 0)
         {
@@ -583,9 +1141,30 @@ public sealed class TerrainReader
             return null;
         }
 
-        // The same buffer answers both questions, so the places in the ground cost one pass
-        // over memory that has already been read.
-        ReadLandmarks(tiles, count, tilesX);
+        // The same buffer answers all three questions, so the places in the ground and the
+        // rooms cost one pass over memory that has already been read.
+        ReadTilePaths(tiles, count, tilesX);
+
+        // And, when somebody is chasing it, a look at the bytes around one tile for the level
+        // ABOVE it - see RoomProbe. Here because this is the one place holding both the terrain
+        // struct's address and the tile vector's, and after the pass that picked which tile.
+        _probe = ProbeRooms && _probeTile >= 0
+            ? new Diagnostics.RoomProbe(_reader).Probe(
+                terrainBase, first + (ulong)(_probeTile * TileEntrySize), _probeName, first, count)
+            : [];
+
+        // And the corners beside it: the raw counts for all THREE bytes per tile corner, where
+        // the ground layer reads only byte 0. See CornerProbe - it is what identified byte 0 in
+        // the first place, and what the other two hold is still open. Under --debug like the
+        // rest, and small enough to record.
+        if (ProbeRooms)
+        {
+            _probe = [.. _probe, .. new Diagnostics.CornerProbe(_reader).Probe(
+                terrainBase + (ulong)_cornerData,
+                (int)tilesX,
+                (int)tilesY,
+                _groundTypes)];
+        }
 
         var heights = new float[count];
         for (long i = 0; i < count; i++)

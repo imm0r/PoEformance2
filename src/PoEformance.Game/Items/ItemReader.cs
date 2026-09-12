@@ -26,7 +26,10 @@ public enum ModSlot
 public sealed record ItemMod(string Id, string Name, string Kind, ModSlot Slot, IReadOnlyList<int> Rolls);
 
 /// <summary>One of an item's resolved stats, and what it says.</summary>
-/// <param name="Key">The row in the game's stat table - what memory actually holds.</param>
+/// <param name="Key">
+/// What memory actually holds: the game's stat row index, ONE-BASED. The shipped table is keyed
+/// zero-based, so this is not an index into it - see <see cref="ItemNames.Stat"/>.
+/// </param>
 /// <param name="Id">The stat's own name.</param>
 /// <param name="Value">How much of it.</param>
 /// <param name="Said">The game's wording with the number in it, or the id when there is none.</param>

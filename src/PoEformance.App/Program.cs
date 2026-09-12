@@ -127,6 +127,18 @@ internal static class Program
             foreach (ResolvedStatic resolved in result.Statics.Where(s => s.Found))
             {
                 recorder.NoteStatic(resolved.Name, resolved.Address);
+
+                // A static that only a fallback found is a schema edit waiting to happen, and
+                // the bytes it needs are on the console and nowhere else. The first patched
+                // recording (2026-09-05) carried the address and not the site, so which
+                // fallback hit and what the site reads had to be asked for again. Keep it.
+                if (resolved.ViaFallback && resolved.Candidates is { } candidates)
+                {
+                    foreach (StaticCandidate c in candidates.Where(c => c.Fingerprinted && c.Resolved == resolved.Address))
+                    {
+                        recorder.Note($"fallback:{resolved.Name}", $"{c.FallbackIndex} at {c.MatchAddress:X}: {c.SiteText()}");
+                    }
+                }
             }
         }
 
@@ -193,9 +205,28 @@ internal static class Program
 
             if (options.ProbeFlasks)
             {
-                new PoEformance.Game.Diagnostics.FlaskProbe(reader, worldSchema)
-                    .Report(gameStatesAddress, Console.Out);
+                // The tables so the flask's own stats print as names rather than row numbers -
+                // "local_charges_used_+% -15" is the finding, "key 1715 -15" is homework.
+                // Loaded here rather than held, because this is the only path that wants them
+                // this early and it is opt-in.
+                var flasks = new PoEformance.Game.Diagnostics.FlaskProbe(
+                    reader,
+                    worldSchema,
+                    PoEformance.Game.Items.ItemNames.Load(
+                        FindDataFile("item-stats.json"),
+                        FindDataFile("item-names.json")));
+
+                flasks.Report(gameStatesAddress, Console.Out);
                 recorder?.MarkFrame();
+
+                // The interactive half, and the only way to tell a current charge count from a
+                // maximum: on a full flask they are the same number at every offset that holds
+                // either. Drinking separates them, so this samples while somebody does.
+                if (options.WatchFlasks)
+                {
+                    flasks.Watch(gameStatesAddress, Console.Out, KeyPressed);
+                    recorder?.MarkFrame();
+                }
             }
 
             // Opt-in, because it reads a couple of hundred kilobytes it has no other use for.
@@ -235,9 +266,24 @@ internal static class Program
                 RunHoverHunt(reader, worldSchema, gameStatesAddress, recorder);
             }
 
+            // The map elements, both ways of reaching them, captured whole - the question the
+            // 0.5.5 patch left open and no recording could answer. See MapHunt.
+            if (options.HuntMap)
+            {
+                RunMapHunt(reader, worldSchema, gameStatesAddress, recorder);
+            }
+
             if (options.SweepComponents)
             {
                 RunComponentSweep(reader, worldSchema, gameStatesAddress, recorder);
+            }
+
+            // The same reason again, for the stash: what SORT a tab is has never been read, so
+            // no recording in the repo holds the bytes that would say. See InventorySweep.
+            if (options.SweepInventories)
+            {
+                RunInventorySweep(
+                    reader, worldSchema, gameStatesAddress, recorder, options.TabName);
             }
 
             if (options.DumpAnimations)
@@ -798,10 +844,11 @@ internal static class Program
             output.WriteLine($"          {tables.LastError}");
         }
 
-        // THE NUMBER EVERYTHING ABOVE IS SCALED BY. Sixteen buckets is a constant ported from a
-        // PoE1 tool, and if it is too small then every count here is a fraction and "not in the
-        // file table" only ever meant "not in the part we look at". No recording can check it -
-        // nothing has ever read past the last bucket - so it is checked here, where the game is.
+        // THE NUMBER EVERYTHING ABOVE IS SCALED BY. If sixteen buckets were too small then every
+        // count here is a fraction and "not in the file table" only ever meant "not in the part
+        // we look at". No recording can check it - nothing had ever read past the last bucket -
+        // so it is checked here, where the game is. It came back clean on 2026-09-01; printed
+        // every run because the answer belongs to a build rather than to the game forever.
         int beyond = new PoEformance.Game.World.PreloadReader(reader, schema)
             .BucketsBeyondTheCount(fileRootStatic);
 
@@ -1064,6 +1111,67 @@ internal static class Program
     }
 
     /// <summary>
+    /// Captures the map elements by both routes while the person works the map. See MapHunt.
+    /// </summary>
+    private static void RunMapHunt(
+        IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
+    {
+        var hunt = new PoEformance.Game.Diagnostics.MapHunt(reader, schema);
+        var samples = new List<PoEformance.Game.Diagnostics.MapHuntSample>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    samples.Add(sample);
+                }
+            }
+
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("map hunt - capturing the map elements by every route, bytes and all.");
+            Console.WriteLine("  WORK THE MAP WHILE THIS RUNS: zoom the minimap in and out, drag it, open the");
+            Console.WriteLine("  large map, zoom and drag that too, close it. The zoom is found by what MOVES -");
+            Console.WriteLine("  a value that never changes cannot be told from furniture.");
+            Console.WriteLine("  Any key to stop and report.");
+            Console.WriteLine();
+
+            int failures = 0, ticks = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (hunt.SampleFrame(gameStatesStatic) is { } sample)
+                {
+                    failures = 0;
+                    samples.Add(sample);
+                }
+                else
+                {
+                    failures++;
+                }
+
+                if (++ticks % 100 == 0 && samples.Count > 0)
+                {
+                    Console.WriteLine($"  ... {samples.Count} frames, {samples[^1].Candidates.Count} elements each");
+                }
+
+                Thread.Sleep(ActionSampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.MapHunt.Report(samples, Console.Out);
+    }
+
+    /// <summary>
     /// Prints the game's GroundEffectTypes table, so a row index becomes a name.
     /// </summary>
     /// <remarks>
@@ -1197,6 +1305,140 @@ internal static class Program
 
         PoEformance.Game.Diagnostics.ComponentSweep.Report(frames, schema, Console.Out);
     }
+
+    /// <summary>
+    /// Reads every inventory whole, live or out of a recording, and reports the candidates.
+    /// </summary>
+    /// <remarks>
+    /// A FRAME EVERY TWO SECONDS, not every tick like the component sweep. A stash of 140
+    /// inventories is 76 KB a frame at this window, and the thing being watched does not move:
+    /// a tab holds what it holds until somebody opens another one. Sampling at the hunt rate
+    /// would put a hundred megabytes of identical bytes in the recording that has to be uploaded.
+    /// </remarks>
+    private static void RunInventorySweep(
+        IMemoryReader reader,
+        OffsetSchema schema,
+        ulong gameStatesStatic,
+        RecordingMemoryReader? recorder,
+        string tabName)
+    {
+        var sweep = new PoEformance.Game.Diagnostics.InventorySweep(reader, schema);
+        var frames = new List<PoEformance.Game.Diagnostics.InventorySweepFrame>();
+
+        if (reader is ReplayMemoryReader replay)
+        {
+            for (uint frame = 0; frame < replay.FrameCount; frame++)
+            {
+                replay.Seek(frame);
+                if (sweep.SampleFrame(gameStatesStatic, (int)frame, tabName) is { } got)
+                {
+                    frames.Add(got);
+                }
+            }
+
+            if (replay.FrameCount > 0)
+            {
+                replay.Seek((uint)(replay.FrameCount - 1));
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("inventory sweep - reading every inventory whole, to find what says");
+            Console.WriteLine("what SORT of tab it is.");
+            Console.WriteLine();
+
+            // SAID BEFORE A MINUTE IS SPENT, because this exact thing has already cost a round:
+            // the first capture was made without --record, the console report looked perfectly
+            // healthy, and the recording that was uploaded turned out to hold only the six
+            // fields the ordinary stash reader touches. A sweep whose entire purpose is to land
+            // in a file must not run silently when there is no file.
+            if (recorder is null)
+            {
+                Console.WriteLine("  *** NOT RECORDING. This sweep exists to put bytes nothing else reads");
+                Console.WriteLine("  *** into a --record file, so that they can be decoded afterwards. The");
+                Console.WriteLine("  *** report below is a summary; the BYTES are the deliverable, and");
+                Console.WriteLine("  *** without --record they are gone the moment this exits.");
+                Console.WriteLine("  ***");
+                Console.WriteLine("  *** Re-run as:  PoEformance.App --record inventories.rec --inventories");
+                Console.WriteLine();
+            }
+
+            Console.WriteLine("  OPEN YOUR STASH AND CLICK THROUGH THE TABS while this runs. A tab the");
+            Console.WriteLine("  game has not been asked to load reads as empty from here, so the sweep");
+            Console.WriteLine("  is worth exactly as much of the stash as you visit.");
+            Console.WriteLine();
+            Console.WriteLine("  AND OPEN THE MERCHANT WINDOW ONCE. Its two shop pages are the only");
+            Console.WriteLine("  inventory sort this project can name for certain, so they are what any");
+            Console.WriteLine("  candidate is tested against - without them nothing here can be settled.");
+            Console.WriteLine();
+            Console.WriteLine("  Visit the specialised tabs you own - currency, essence, breach, maps -");
+            Console.WriteLine("  and a plain one, so there is something for a type to differ ACROSS.");
+            Console.WriteLine("  Any key to stop and report.");
+            Console.WriteLine();
+
+            // The name hunt is the only part of this that can settle the naming question outright,
+            // and it cannot run at all without a word only the player knows.
+            if (tabName.Length == 0)
+            {
+                Console.WriteLine("  NO --tabname GIVEN, so the name hunt is skipped. A stash tab's name is");
+                Console.WriteLine("  your own word - the tool cannot know one - and with one it walks out");
+                Console.WriteLine("  from the inventories looking for it, which either finds the path or");
+                Console.WriteLine("  shows there is none. Add:  --tabname <the name of a tab you own>");
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine($"  HUNTING FOR \"{tabName}\" from every inventory, every array slot and both");
+                Console.WriteLine("  server-data structs. OPEN THE TAB WITH THAT NAME while this runs.");
+                Console.WriteLine();
+            }
+
+            int failures = 0, frame = 0;
+            while (!KeyPressed() && failures < ActionHuntMostFailures)
+            {
+                recorder?.MarkFrame();
+                if (sweep.SampleFrame(gameStatesStatic, frame++, tabName) is { } got)
+                {
+                    failures = 0;
+                    frames.Add(got);
+
+                    Console.WriteLine(
+                        $"  ... {frames.Count} frames; {got.Seen.Count} inventories, "
+                        + $"{got.Seen.Count(one => one.Cells > 0)} loaded, "
+                        + $"{got.Seen.Count(one => PoEformance.Game.Diagnostics.InventorySweep.IsShop(one.Id))}"
+                        + " shop pages");
+                }
+                else
+                {
+                    failures++;
+                }
+
+                Thread.Sleep(InventorySampleMs);
+            }
+        }
+
+        PoEformance.Game.Diagnostics.InventorySweep.Report(frames, Console.Out);
+
+        // AND SAID AGAIN AFTERWARDS, with the number. A byte count is the one thing that can be
+        // checked before uploading a file: the sweep's own reads are 544 bytes an inventory, so
+        // a capture of a real stash is megabytes, and anything smaller means it did not land.
+        if (recorder is not null)
+        {
+            Console.WriteLine();
+            Console.WriteLine(
+                $"  recorded {recorder.RecordedBytes / 1024} KB in all this session"
+                + (recorder.ReachedSizeLimit ? " - THE SIZE CAP WAS REACHED, so the tail is missing." : "."));
+        }
+        else if (reader is not ReplayMemoryReader)
+        {
+            Console.WriteLine();
+            Console.WriteLine("  NOTHING WAS RECORDED - see the warning above. Re-run with --record.");
+        }
+    }
+
+    /// <summary>How long between inventory samples. See RunInventorySweep for why it is slow.</summary>
+    private const int InventorySampleMs = 2000;
 
     private static void RunActionHunt(
         IMemoryReader reader, OffsetSchema schema, ulong gameStatesStatic, RecordingMemoryReader? recorder)
@@ -1532,7 +1774,20 @@ internal static class Program
         PoEformance.Game.Components.AnimationNames animationNames =
             PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"));
 
-        var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation)
+        handle.Stage = "loading item names";
+
+        // HELD RATHER THAN BUILT INLINE, because the stash is no longer the only reader: the
+        // rates page names the rows its index has never heard of from the same table, the world
+        // reader resolves a flask's charge stats out of it, and loading five thousand entries
+        // again to answer the same questions would be silly. LOADED HERE, before the world
+        // reader, because that is now one of the readers that needs it - a flask's charge
+        // numbers are computed from three stat rows this table supplies by id.
+        PoEformance.Game.Items.ItemNames itemNames = PoEformance.Game.Items.ItemNames.Load(
+            FindDataFile("item-stats.json"),
+            FindDataFile("item-names.json"),
+            FindDataFile("unique_ivi_name_map.tsv"));
+
+        var world = new PoEformance.Game.World.WorldReader(reader, schema, rotation, itemNames)
         {
             // Names for tiles somebody has described. Missing is fine: the boss arenas are
             // found from the shape of the ground either way, this only names them.
@@ -1542,6 +1797,11 @@ internal static class Program
             // while the tool runs, and a flag fixed at construction would make that edit take a
             // restart to notice.
             ReadActions = evasionPlanner.Settings.NeedsActions,
+
+            // The hunt for the room level, which is reverse-engineering rather than a feature -
+            // so it rides with the rest of the measurements. Its point is the recording: the
+            // reads have to HAPPEN for the question to be answerable offline.
+            ProbeRooms = debug,
         };
         Console.WriteLine();
         Console.WriteLine(gameWindow != IntPtr.Zero
@@ -1614,16 +1874,6 @@ internal static class Program
         // of. Without it every ground effect counts as harmful - the safe direction, and wrong for
         // the six rows that grant something.
         evasionPlanner.GroundTypes = groundTypes;
-
-        handle.Stage = "loading item names";
-
-        // HELD RATHER THAN BUILT INLINE, because the stash is no longer the only reader: the
-        // rates page names the rows its index has never heard of from the same table, and loading
-        // five thousand entries a second time to answer the same questions would be silly.
-        PoEformance.Game.Items.ItemNames itemNames = PoEformance.Game.Items.ItemNames.Load(
-            FindDataFile("item-stats.json"),
-            FindDataFile("item-names.json"),
-            FindDataFile("unique_ivi_name_map.tsv"));
 
         var stash = new PoEformance.Features.StashInspector(reader, schema, gameStatesStatic, itemNames);
 
@@ -1759,9 +2009,33 @@ internal static class Program
                     var lines = new List<string>
                     {
                         $"counter static reads {counter}",
-                        $"{swept.Records} records read, {swept.Named} with a readable path"
-                            + (swept.Named == 0 ? "  <- the RECORD is wrong, not the count" : string.Empty),
+
+                        // SLOTS BEFORE RECORDS, because their difference is the diagnosis and
+                        // only the pair says which failure this is. No slots means the buckets
+                        // yielded nothing - the root or the bucket layout, and the count field
+                        // is irrelevant. Slots without records means the walk reached addresses
+                        // that could not be read. Records without names means the struct base
+                        // is wrong. The slot count was measured all along and never shown, so
+                        // this readout could contradict itself and did.
+                        $"{swept.Slots} slots walked, {swept.Records} records read,"
+                            + $" {swept.Named} with a readable path"
+                            + (swept.Slots == 0
+                                ? "  <- the buckets yielded nothing; the count field cannot be the problem"
+                                : swept.Named == 0 ? "  <- the RECORD is wrong, not the count" : string.Empty),
                     };
+
+                    if (preloadReader.LastError.Length > 0)
+                    {
+                        lines.Add(preloadReader.LastError);
+                    }
+
+                    // ONLY WHEN THE WALK REACHED NOTHING, because that is the only time the
+                    // buckets themselves are the question. Sixteen hex rows under a working
+                    // table would be noise, and noise is how a real diagnostic stops being read.
+                    if (swept.Slots == 0)
+                    {
+                        lines.AddRange(preloadReader.DescribeBuckets(fileRoot));
+                    }
 
                     lines.AddRange(swept.Samples.Select(sample => $"    {sample}"));
 
@@ -2199,6 +2473,107 @@ internal static class Program
         overlay.Costs = costs;
         overlay.Coverage = coverage;
         overlay.Damage = damage;
+
+        // A DIAGNOSTIC BUTTON THAT CAN DO NOTHING VISIBLE IS WORSE THAN NO BUTTON, and all three
+        // of the ones below could. Each ran its work in a Task.Run whose catch named two
+        // exception types; anything else - a schema field that moved, a null, an overflow - left
+        // a faulted Task nobody observes and a panel that simply did not change. That is what
+        // "I press it and nothing happens" IS, and it cost a round of hunting the wrong thing.
+        //
+        // So every failure is reported in the panel, with its TYPE: "KeyNotFoundException:
+        // Schema struct 'TgtFile' has no field 'TgtPath'" says where to look, where a bare
+        // message often does not. And the press is acknowledged before the work starts, so a
+        // button that ran and found nothing can never look like a button that did not fire.
+        static void RunDiagnostic(
+            PoEformance.Features.PreloadWatch watch,
+            string doing,
+            Func<IReadOnlyList<string>> work)
+        {
+            watch.Swept([doing + "..."]);
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    watch.Swept(work());
+                }
+                catch (Exception exception)
+                {
+                    watch.Swept([$"{doing} failed - {exception.GetType().Name}: {exception.Message}"]);
+                }
+            });
+        }
+
+        // BEFORE AttachPreload, which is where the button that runs this is built. Only offered
+        // with an install to read: the rooms of an area are named in memory and placed nowhere
+        // this tool can see, so the files themselves are the last place that could say where
+        // each one sits - see RoomFiles for what the answer decides.
+        if (installed is not null)
+        {
+            overlay.LookInsideRooms = () => RunDiagnostic(
+                preload,
+                "looking inside the rooms",
+                () => PoEformance.Game.Diagnostics.RoomFiles.Describe(
+                    preload.All,
+                    path => PoEformance.Game.Files.GameArt.ReadRaw(installed, path)));
+
+            // And the whole of them, decoded, beside the loaded-file dumps. The readout is
+            // eight strings per room, which cannot answer a question about the format itself.
+            overlay.WriteRoomsOut = () => RunDiagnostic(
+                preload,
+                "writing the rooms out",
+                () =>
+                {
+                    string? written = PoEformance.Game.Diagnostics.RoomFiles.Dump(
+                        preload.Area,
+                        preload.All,
+                        path => PoEformance.Game.Files.GameArt.ReadRaw(installed, path));
+                    return [
+                        written is null
+                            ? "could not write the rooms out"
+                            : $"rooms written to {written}"];
+                });
+        }
+
+        // NEEDS NO INSTALL, unlike the two above: it reads memory rather than the game's files,
+        // so it is attached whether or not the bundles can be opened. The one thing it needs is
+        // the loaded-file table, which is the very list this page is about.
+        overlay.HuntRoomPlacements = () => RunDiagnostic(preload, "hunting the placements", () =>
+        {
+            if (fileRoot == 0)
+            {
+                return ["placements: the FileRoot static did not resolve"];
+            }
+
+            PoEformance.Core.Diagnostics.GameChainAddresses chain =
+                PoEformance.Core.Diagnostics.GameChain.Resolve(reader, schema, gameStatesStatic);
+
+                // THE ADDRESSES ARE THE SEARCH. Every loaded file has a record, and the walk
+                // gives its address - so the area's rooms become a set of known pointers that
+                // nothing can match by accident. See RoomPlacementProbe.
+                // BOTH SETS, and the second is what makes a miss mean anything: the rooms are
+                // what is searched for, and every file is what the control needs - the tiles
+                // refer to .tdt files, so proving the search's premise takes more than rooms.
+            var rooms = new Dictionary<ulong, string>();
+            var files = new Dictionary<ulong, string>();
+            foreach (ulong record in preloadReader.Records(fileRoot))
+            {
+                string path = preloadReader.NameOf(record);
+                if (path.Length == 0)
+                {
+                    continue;
+                }
+
+                files[record] = path;
+                if (path.EndsWith(".arm", StringComparison.OrdinalIgnoreCase))
+                {
+                    rooms[record] = path;
+                }
+            }
+
+            return new PoEformance.Game.Diagnostics.RoomPlacementProbe(reader, schema)
+                .Probe(chain.AreaInstance, rooms, files);
+        });
+
         overlay.AttachPreload(
             preload,
             () => LookAtWhatLoaded(preloadArea),
@@ -2551,8 +2926,18 @@ internal static class Program
                 Overlay: new PoEformance.Config.OverlayView(
                     overlay.MinLootRarity.ToString(),
                     overlay.ShowTerrain,
-                    overlay.TerrainColour,
-                    overlay.TerrainThickness,
+
+                    // What is DRAWN, once the overlay is up: the in-game style editor can
+                    // override the page's colour and width, and a page showing its own last
+                    // choice over a map plainly drawn in another colour is the page lying.
+                    // The next choice made here wins again - see ChooseTerrainStyle.
+                    overlayHandle.Overlay is PoEformance.Overlay.EntityOverlay drawn
+                        ? PoEformance.Features.OverlaySettings.FormatPageColour(drawn.TerrainColourInUse)
+                        : overlay.TerrainColour,
+                    overlayHandle.Overlay?.TerrainThicknessInUse ?? overlay.TerrainThickness,
+                    overlay.TerrainRim,
+                    overlay.TerrainFillColour,
+                    overlay.TerrainFillOpacity,
                     DescribeTerrain(overlayHandle)),
                 Map: BuildMapView(snapshot, overlay.MinLootRarity),
 
@@ -2774,9 +3159,12 @@ internal static class Program
                     {
                         live.MinimumLootRarity = overlay.MinLootRarity;
                         live.ShowTerrain = overlay.ShowTerrain;
-                        live.ApplyTerrainStyle(
+                        live.ChooseTerrainStyle(
                             PoEformance.Features.OverlaySettings.ParseColour(overlay.TerrainColour),
-                            overlay.TerrainThickness);
+                            overlay.TerrainThickness,
+                            overlay.TerrainRim,
+                            PoEformance.Features.OverlaySettings.ParseColour(overlay.TerrainFillColour),
+                            overlay.TerrainFillOpacity);
                     }
 
                     SaveWarning(
@@ -2836,7 +3224,13 @@ internal static class Program
                 ThresholdPercent: slot.ThresholdPercent,
                 Key: PoEformance.Features.FlaskKeyBindings.Describe(key),
                 Item: equipped is { } item ? ShortItemName(item.Path) : string.Empty,
-                Charges: equipped is { } charges ? $"{charges.Charges}/{charges.ChargesPerUse}" : string.Empty,
+                // "60/60 - 8 per use" rather than "60/10". The old form put the current count
+                // beside the per-use cost with a slash between them, which reads as a fraction
+                // and was taken for one: it was reported as "60 of max 60" when the 10 was the
+                // cost. Both numbers are this flask's now, not the base type's.
+                Charges: equipped is { } charges
+                    ? $"{charges.Charges}/{charges.MaxCharges} - {charges.ChargesPerUse} per use"
+                    : string.Empty,
                 IsCharm: equipped?.IsCharm ?? false));
         }
 
@@ -3140,6 +3534,7 @@ internal static class Program
         bool ShowConfig,
         bool AutoFlask,
         bool ProbeFlasks,
+        bool WatchFlasks,
         bool ProbeKeys,
         bool Debug,
         bool ShowUiBrowser,
@@ -3148,7 +3543,10 @@ internal static class Program
         bool HuntActions,
         bool HuntSkills,
         bool HuntHover,
+        bool HuntMap,
         bool SweepComponents,
+        bool SweepInventories,
+        string TabName,
         bool DumpGroundTypes,
         bool DumpAnimations,
         bool ReadGlossary,
@@ -3164,9 +3562,12 @@ internal static class Program
             string updateOutcome = string.Empty, updatedVersion = string.Empty;
             bool watch = false, verbose = false, overlay = false, config = false;
             bool autoFlask = false, probeFlasks = false, probeKeys = false, debug = false;
+            var watchFlasks = false;
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
-            bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false;
+            bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false, mapHunt = false;
             bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
+            var inventorySweep = false;
+            string tabName = string.Empty;
             List<string> peek = [];
 
             // An option that takes a value must not be handed the NEXT OPTION as that value.
@@ -3220,6 +3621,12 @@ internal static class Program
                     case "--flasks":
                         probeFlasks = true;
                         break;
+                    case "--flaskwatch":
+                        // Implies --flasks: the watch is only readable next to the report that
+                        // says which offsets are already named.
+                        probeFlasks = true;
+                        watchFlasks = true;
+                        break;
                     case "--keys":
                         probeKeys = true;
                         break;
@@ -3256,12 +3663,34 @@ internal static class Program
                         hoverHunt = true;
                         break;
 
+                    // The map elements every way they can be reached, bytes and all - see
+                    // MapHunt. It wants the person zooming and panning the map while it runs.
+                    case "--maphunt":
+                        mapHunt = true;
+                        break;
+
                     // The components neither reference has a layout for. Blind, because there
                     // is nothing to verify against - see ComponentSweep. Like the hunts above
                     // it wants a person putting the situation on screen: a ground effect, a
                     // beam, a totem running out.
                     case "--sweep":
                         sweep = true;
+                        break;
+
+                    // Reads every inventory WHOLE, hunting the field that says what sort of
+                    // tab it is. Like the hunts above it wants a person setting the situation up:
+                    // a tab the game has not been asked to load reads as empty, so the sweep is
+                    // worth only as much of the stash as somebody clicks through while it runs.
+                    case "--inventories":
+                        inventorySweep = true;
+                        break;
+
+                    // The one thing the tool cannot know and must be told: a stash tab's name is
+                    // the player's own word. Given one, the sweep walks outwards from the
+                    // inventories looking for it, and either produces a path or establishes that
+                    // there is none - see InventorySweep.Hunt.
+                    case "--tabname":
+                        tabName = Value(ref i) ?? string.Empty;
                         break;
 
                     case "--groundtypes":
@@ -3332,9 +3761,9 @@ internal static class Program
             }
 
             return new CliOptions(
-                schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, probeKeys,
-                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, sweep,
-                groundTypeDump, animDump,
+                schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, watchFlasks, probeKeys,
+                debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, mapHunt, sweep,
+                inventorySweep, tabName, groundTypeDump, animDump,
                 glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
     }

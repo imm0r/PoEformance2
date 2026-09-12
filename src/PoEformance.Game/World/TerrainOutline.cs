@@ -25,6 +25,19 @@ public sealed record OutlineMask(byte[] Cells, int Width, int Height, int Step, 
 }
 
 /// <summary>
+/// The walkable floor at a coarse step, ready to be drawn as a sheet under the outline.
+/// </summary>
+/// <param name="Coverage">One byte per pixel, 0 to 255: how much of the pixel is floor.</param>
+/// <param name="Source">
+/// Per pixel, the index - into a grid of this same width - of the coarse cell whose ground
+/// landed in it, or -1 where none did. NOT the pixel's own index: a cell is displaced by its
+/// height in the picture, and whoever asks whether the ground has been walked has to ask
+/// about where the ground is, not where the picture shows it. See TerrainOutline.Floor.
+/// </param>
+/// <param name="Step">Grid cells to a side of one pixel.</param>
+public sealed record FloorPlan(byte[] Coverage, int[] Source, int Width, int Height, int Step);
+
+/// <summary>
 /// Reduces a walkable grid to a drawable outline.
 /// </summary>
 /// <remarks>
@@ -105,6 +118,188 @@ public static class TerrainOutline
         float lean = Math.Clamp(thickness, 1, 8) % 2 == 0 ? 0.5f * step : 0f;
 
         return new OutlineMask(Widen(cells, width, height, thickness), width, height, step, lean);
+    }
+
+    /// <summary>
+    /// The walkable floor as a picture of its own, <paramref name="step"/> cells to a pixel.
+    /// </summary>
+    /// <remarks>
+    /// The FILL under the line: the floor as a sheet, the way the game's own map draws the
+    /// parts it has revealed. Displaced by height exactly as the line's cells are, so the
+    /// sheet ends where the line is drawn - at a different height it would peel away from
+    /// its own edge on every slope.
+    ///
+    /// A COVERAGE rather than a flag, because a pixel holds several cells and the edge of the
+    /// floor runs through some of them. Counting gives those pixels a proportionate alpha,
+    /// which is the edge anti-aliased for nothing; a flag would give them the full sheet and
+    /// grow the floor by up to a pixel all round.
+    ///
+    /// And per pixel, WHERE THE GROUND CAME FROM: the coarse cell, at the same step, that the
+    /// cells landing in the pixel belong to. The fill retreats as the map is walked, and
+    /// "walked" is recorded against the ground's own position while the picture shows the
+    /// ground displaced by its height - on a hill those are tens of cells apart, and a hole
+    /// looked up at the picture's position would open beside the player rather than around
+    /// them. The first cell to land in a pixel names it; where cells of two heights share one,
+    /// that is a pixel's worth of error along a cliff, which nobody can see.
+    ///
+    /// Every walkable cell is visited, where the outline visits only the boundary, and the
+    /// height lookup is the expensive part of a visit. Without sub-tile heights every cell of
+    /// a tile has the tile's height, so it is looked up once per tile per row there and only
+    /// per cell where the slope inside a tile is actually known. Once per area, on the render
+    /// thread, like the outline.
+    /// </remarks>
+    public static FloorPlan Floor(TerrainGrid grid, int step, bool isoHeightShift)
+    {
+        ArgumentNullException.ThrowIfNull(grid);
+        ArgumentOutOfRangeException.ThrowIfLessThan(step, 1);
+
+        // Rounded UP, unlike the outline's thinning: the last partial column of cells is
+        // floor too, and a sheet that stopped a few cells short of the wall would show it.
+        int width = Math.Max(1, (grid.Width + step - 1) / step);
+        int height = Math.Max(1, (grid.Height + step - 1) / step);
+        var counts = new ushort[width * height];
+        var source = new int[width * height];
+        Array.Fill(source, -1);
+
+        bool perCell = isoHeightShift && grid.HasSubTileHeights;
+        bool perTile = isoHeightShift && !perCell && grid.HasHeights;
+
+        for (int y = 0; y < grid.Height; y++)
+        {
+            int shift = 0;
+            int tileEnd = -1;
+            int fromRow = (y / step) * width;
+            for (int x = 0; x < grid.Width; x++)
+            {
+                if (!grid.IsWalkable(x, y))
+                {
+                    continue;
+                }
+
+                if (perCell)
+                {
+                    shift = grid.IsoHeightShift(x, y);
+                }
+                else if (perTile && x >= tileEnd)
+                {
+                    shift = grid.IsoHeightShift(x, y);
+                    tileEnd = ((x / TerrainGrid.CellsPerTile) + 1) * TerrainGrid.CellsPerTile;
+                }
+
+                // Displaced exactly as the outline's cells are, and dropped at the picture's
+                // edge for the same reason - see Build.
+                int sx = x - shift;
+                int sy = y - shift;
+                if (sx < 0 || sy < 0)
+                {
+                    continue;
+                }
+
+                int bx = sx / step;
+                int by = sy / step;
+                if (bx >= width || by >= height)
+                {
+                    continue;
+                }
+
+                int at = (by * width) + bx;
+                if (counts[at] != ushort.MaxValue)
+                {
+                    counts[at]++;
+                }
+
+                if (source[at] < 0)
+                {
+                    source[at] = fromRow + (x / step);
+                }
+            }
+        }
+
+        // Cells from two heights can land in one pixel where the ground steps up, so the
+        // count can exceed a full block; a pixel is never more than entirely floor.
+        int full = step * step;
+        var coverage = new byte[counts.Length];
+        for (int i = 0; i < counts.Length; i++)
+        {
+            int count = counts[i];
+            if (count != 0)
+            {
+                coverage[i] = (byte)Math.Min(255, ((count * 255) + (full / 2)) / full);
+            }
+        }
+
+        return new FloorPlan(coverage, source, width, height, step);
+    }
+
+    /// <summary>
+    /// The mask grown by <paramref name="pixels"/> on every side - the line plus a rim around it.
+    /// </summary>
+    /// <remarks>
+    /// For a contrast rim: a single-colour line is invisible on any ground that happens to
+    /// match it, and no colour is far from both a sunlit rock and a cave floor. A dark rim
+    /// is what makes the line readable on either; the drawing puts it under the line by
+    /// colouring these pixels dark where the line's own are not set.
+    ///
+    /// Grown from the WIDENED line rather than re-widened from the thin one, so it is the
+    /// same shape a little larger whatever the width - and symmetric, so the lean the line
+    /// already reports still holds for the pair.
+    ///
+    /// A square dilation done as two passes, one along the rows and one down the columns,
+    /// which is the same result with work proportional to 2(2r+1) per SET pixel instead of
+    /// (2r+1)^2 - and the set pixels are a thin line through a texture of a few million,
+    /// built once per area on the render thread.
+    /// </remarks>
+    public static byte[] Rim(OutlineMask mask, int pixels)
+    {
+        ArgumentNullException.ThrowIfNull(mask);
+        ArgumentOutOfRangeException.ThrowIfLessThan(pixels, 1);
+
+        int width = mask.Width;
+        int height = mask.Height;
+        byte[] cells = mask.Cells;
+
+        // Horizontal pass: each set source pixel marks the r pixels either side of it.
+        var rows = new byte[cells.Length];
+        for (int y = 0; y < height; y++)
+        {
+            int row = y * width;
+            for (int x = 0; x < width; x++)
+            {
+                if (cells[row + x] == 0)
+                {
+                    continue;
+                }
+
+                int from = Math.Max(0, x - pixels);
+                int to = Math.Min(width - 1, x + pixels);
+                rows.AsSpan(row + from, to - from + 1).Fill(1);
+            }
+        }
+
+        // Vertical pass over that, which completes the square neighbourhood. Row-major
+        // again, marking the rows below and above a set pixel, so the memory access stays
+        // sequential instead of striding down a column.
+        var rim = new byte[cells.Length];
+        for (int y = 0; y < height; y++)
+        {
+            int row = y * width;
+            int firstRow = Math.Max(0, y - pixels);
+            int lastRow = Math.Min(height - 1, y + pixels);
+            for (int x = 0; x < width; x++)
+            {
+                if (rows[row + x] == 0)
+                {
+                    continue;
+                }
+
+                for (int ny = firstRow; ny <= lastRow; ny++)
+                {
+                    rim[(ny * width) + x] = 1;
+                }
+            }
+        }
+
+        return rim;
     }
 
     /// <summary>

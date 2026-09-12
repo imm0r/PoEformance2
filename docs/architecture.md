@@ -230,6 +230,12 @@ The workbench features are the product, in build order:
    one-off probe scripts as a class.
 5. **Drift scanner**: when an invariant fails, sweep the neighbourhood for candidate
    offsets that satisfy it. One generic tool instead of a new probe per incident.
+   *(Partly there, incident by incident: the camera matrix has `MatrixScan`, the
+   AreaInstance tail has `AreaInstanceHunt` — it finds the player slot, the entity maps
+   and the terrain struct by their shape and prints the delta they agree on — and a
+   static whose exact pattern a patch re-rolled has `fallbacks` in the schema, loosened
+   patterns whose hits are fingerprinted and printed with their bytes. All three run
+   from the drift report on the failure that calls for them.)*
 6. **Session recorder UI**: record, scrub, share.
 
 Overlays (radar, vitals, loot) build on the same snapshots afterwards; automation
@@ -345,7 +351,9 @@ PoEformance.App --replay session.rec           # rerun against the capture, no g
 PoEformance.App --record s.rec --questflags    # + read where a character's quest flags could be
 PoEformance.App --record s.rec --actionhunt    # + hunt the Actor's action fields (see below)
 PoEformance.App --record s.rec --hoverhunt    # + read the hovered-entity chain and the boss byte
+PoEformance.App --record s.rec --maphunt      # + capture the map elements by every route, while you zoom and pan
 PoEformance.App --record s.rec --sweep        # + read four components nothing has a layout for
+PoEformance.App --record s.rec --inventories  # + read every inventory whole, hunting the tab's sort
 PoEformance.App --record s.rec --glossary     # + find every loaded dat table and read the glossary
 PoEformance.App --record s.rec --tables       # + list them, with the row size each one reports
 
@@ -1519,6 +1527,695 @@ interesting part was not the feature:
   the work — no marker in the overlay is either colour, so a blue-green wash is unmistakably
   ground rather than a thing standing on it. Plus a key in the map's corner, because the first
   question anybody asks of a coloured map is which of the two it is.
+- **Room names — the layout in words, from the same read that draws it as a shape.** The game
+  builds an area out of named room files and writes that name on every tile the room covers, so
+  the tile array already carries "exit_01", "overlay_bridge_03", "3open_01" long before anything
+  is standing in them. The terrain layer draws the area's outline and cannot say what any part of
+  it IS; this writes the name on it, and ctrl + clicking one pins it as an ordinary place —
+  marker, label, A\* route, exactly as an exit gets. Four things worth recording.
+
+  **Most of an area is scenery, and that is what decides which names are drawn.** The first run
+  in a real zone made it obvious: labels everywhere outside the drawn outline —
+  `Building_Fill_03`, `BuildingWall_Cv_06`, `TropicalCoast_Fill_01`. Nothing was wrong. The tile
+  grid is a full rectangle and `GridWalkableData` is a *subset* of it, so the buildings you walk
+  past, the sea beside them and the wall behind the fence are all tiles with names; the blue
+  outline is only the walkable part of the same rectangle. A size threshold cannot separate the
+  two, because a scenery block is large. Ground somebody can stand on can: each room counts how
+  many of its tiles hold a walkable cell (`TerrainGrid.HasWalkableTile`, scanned per cell with an
+  early exit — a byte holds two cells and a tile is 23 across, so every odd tile boundary lands
+  mid-byte and a byte-wise scan would let a neighbour's edge cell answer for this tile), and a
+  room with none is never named. **No opinion counts every tile as walkable rather than none** —
+  a caller that cannot answer must get no filter, not an empty map.
+
+  That first run also settled the projection for free, which is the kind of check this file keeps
+  asking for: `TropicalCoast_*` sat over the beach and `Building*` over the houses. The labels
+  land on the thing they name.
+
+  **And it killed the size threshold as an idea.** The second run showed a cliff: at nine tiles
+  the map was solid text, at ten there were four labels left. Nothing between the two pictures,
+  because there is nothing between them — an area is built from ONE module repeated, so nearly
+  every room is exactly nine tiles and a threshold in tiles is a step function at the module
+  size. What survives at ten is only what the flood fill glued together, two adjacent placements
+  of one file. Walkability did not save it either: `Building_Fill_*` went, but a `BuildingWall_*`
+  room is a piece of level, not a mesh — it holds the wall *and* the ground in front of it, so it
+  passes. What actually produces the soup is **repetition**, and the fix is the rule
+  `TerrainLandmarks` already uses on tiles: a file placed more than four times in one area is a
+  building block, not a place. `TerrainRoom.Placements` carries the count, and the rooms come out
+  of the reader **rarest first, then largest** — because the second rule is that labels are
+  packed against each other (`LabelPacking`): a name that would land on one already written is
+  dropped, so the offer order decides which of two overlapping names survives. Together they make
+  the density a function of the zoom rather than of a number somebody has to guess.
+
+  A room is a **connected block of tiles sharing one file**, found by flood fill rather than by
+  the pairwise clustering the boss arenas use. That is a cost decision and not a style one:
+  clustering is quadratic in the tiles it is given, which is fine for the handful an arena name
+  matches and not for an area's whole tile list; a fill over the grid is one pass whatever the
+  area's size. What it cannot separate is two placements of the same file that touch — they come
+  out as one room with twice the tiles, and the sub-ids that would tell them apart cost a second
+  pass to buy back a merged label on repeated scenery.
+
+  The rooms are found **whether or not anything draws them**, because the pass that reads tile
+  paths for the landmarks already runs: they add an int per tile and a fill, once per area.
+  Reading them on demand would mean the switch did nothing until the next zone.
+
+  The centroid sits at the **centre of the block, not its corner** — a tile is 23 cells across,
+  so anchoring on the mean tile index puts every name half a tile toward the map's origin, which
+  is the offset the AHK tool shipped and had to correct. Worth knowing when comparing numbers
+  against GameHelper2: its Radar reports a room's centroid on the corner convention, so its
+  figure is 11.5 cells short of this one on both axes.
+
+  And the **mouse**, which the overlay normally does not get: hovering is free, because
+  ClickableTransparentOverlay reads the cursor with `GetCursorPos` rather than from window
+  messages, so the position keeps arriving while the overlay is transparent to clicks. A click
+  is not free — button presses come from messages — so it asks for the mouse for exactly as long
+  as ctrl is held over a room, which is `WindowChrome`'s own trick applied to a map marker. Ctrl
+  is what keeps dragging and zooming the map untouched.
+
+  **And the readout answered the `.tdt` / `.arm` question: they are two LEVELS, not two
+  spellings.** The game assembles an area from rooms — files under `Rooms/`, ending `.arm`,
+  `overlay_bridge_03` and `exit_01` — and each room from tiles, files under `Tiles/`, ending
+  `.tdt`, `BuildingWall_OceanEdge_CcMM_02`. `TileStruct.TgtFilePtr` is the TILE's file by
+  definition, so what this draws is a materials list where the reference draws a floor plan.
+  Both tooltips say so outright once you put them side by side: `.../Act2/2_8/Rooms/Overlays/…`
+  over four-by-four tiles, `.../Maps/Port/Tiles/OceanEdge/…` over three-by-three.
+
+  Where the room level lives is not known, and `RoomProbe` is how it gets found rather than
+  guessed. Two places have room for an unaccounted pointer: the tile struct is 0x38 bytes with
+  0x00, 0x08, 0x30 and 0x34–0x36 mapped, leaving **0x10–0x2F** — four slots; and the terrain
+  struct has the tile vector at 0x28 and the grids at 0xD0/0xE8 with the span between them
+  untouched. Under `--debug` the probe walks both, classifies every plausible pointer with
+  `PointerPeek`, and follows anything structural ONE hop looking for wide text — because that is
+  the shape the tile's own name has (a pointer to a struct whose `+0x08` is a `std::wstring`).
+  A path under `Rooms/` or ending `.arm` is marked in the readout. Its real value is the
+  recording: **a recording can only contain reads the running build performed**, so a question
+  about bytes nothing reads was unanswerable offline — with the probe on, one session in one area
+  captures the whole neighbourhood of both structures.
+
+  It also cost a lesson worth keeping: the probe re-reads any text it finds instead of taking
+  `PointerPeek`'s summary, because that summary is trimmed at sixty characters — and the paths
+  being hunted run past it, so the extension falls off the end. A probe whose whole job is to
+  recognise `.arm` cannot read a string that stops before it, and the failure would have been
+  silent: the right answer on screen, unmarked.
+
+  **What the first recording settled** (Gallows/Act2/2_5, 2026-09), and it is worth having in
+  writing because two of the three answers close off an approach:
+
+  - The rooms are in memory and they are the layout in words: 23 of them for that one zone —
+    `Rooms/BonePassage/BonesEntrance_Cc_1.arm`, `Rooms/Fills/ritualsite_01.arm`,
+    `Rooms/Unique/bonesouter_landmark.arm`.
+  - **A room's name cannot be derived from its tiles.** Zero of those 23 share a stem with any
+    `.tdt` in the recording, and the directories say why: rooms live under the AREA
+    (`Gallows/Act2/2_5/Rooms/…`) while tiles live under the TILESET
+    (`Desert/Badlands/…`), shared by every zone built from it. The cheap answer is dead.
+  - **They arrive through the loaded-files table**, not through the terrain. Every one of the 42
+    pointers to a room object sits at a multiple of 0x18 from the next — `FileRecordSlot.Size` —
+    so what put them in the recording is the preload watcher walking the file table, and a room
+    object has `TgtFile`'s own shape (`+0x08` is the `std::wstring`). That means the room NAMES
+    of an area are already reachable today, stamped with the area-change counter; what is not
+    there is where each one sits.
+  - And the reason that recording could not settle where the room hangs off the terrain: **the
+    tile array never lands in a recording.** The terrain pass reads it in one 340 KiB go and a
+    recording drops any read over 64 KiB, so the file held exactly one tile out of 6075 — which
+    cannot tell "no tile carries a room" from "no tile was looked at". Hence the probe's sixteen
+    4 KiB windows: small enough to be kept, spread across the array, and the tiles it samples
+    are drawn from them.
+
+  **What the second recording settled**, with those windows in it — 2336 tiles across two areas,
+  every slot, plus a hop: **no tile reaches a room**, by any slot, one hop out, or through the
+  contents of the vector it carries. That closes the obvious place and, more usefully, it
+  measured the rest of the tile struct, which had four unexplained slots: `+0x10`, `+0x18` and
+  `+0x20` are **one inline `std::vector`** — begin, end, capacity — carried by 889 of the 2336
+  tiles and all-zero in the other 1447; `+0x28` reads zero in every tile. The vector holds
+  16-byte `{object, number}` elements, one to seven of them, and every object shares a single
+  vtable. See `TileStruct` in the schema, which now records the census.
+
+  **What the third recording settled, and it closes the terrain search.** With the probe opening
+  inline vectors, the terrain struct's first 0x400 bytes map out completely — and hold no room:
+  `+0x28` is the tile array, `+0x50` is 21648 bytes over an 87×81 area, which is exactly
+  `(87+1)×(81+1)×3` and so is per tile CORNER, and `+0x68` is a vector of the area's ground-type
+  files (`bone_fill.gt`, `waypoint_ground.gt`, …). Between the three recordings that is the tile
+  ruled out on 2336 samples and the terrain struct ruled out on its whole head, with every
+  pointer to a room object in all three sitting at a multiple of `0x18` — the file table, every
+  time. **The game does not appear to keep the room→position mapping anywhere this tool can
+  read.**
+
+  Which leaves the files themselves, and the machinery for that already exists: the loaded-files
+  table names the rooms of the current area, and `GameFiles` reads any path out of the game's
+  bundles. If a `.arm` says which TILES it is built from, the layout can be recovered without a
+  single new offset — rooms known, patterns known, tile grid already read. `RoomFiles` is the
+  one question that decides it, and it reports rather than parses: nobody here has seen one of
+  these files, and the count of `.tdt` mentions in it is the whole answer.
+
+  Its first run in a real area produced "32 rooms, all binary, 0 mentions of `.tdt`" — **and
+  that answer was the check, not the file.** Decoding UTF-16 as UTF-8 puts a NUL between every
+  letter, which makes a text file read as binary and hides every string in it from a search for
+  ASCII: exactly those two symptoms, for all 32 files, whatever they actually contain. It now
+  counts both encodings, recognises UTF-16 as text, and prints the strings it finds — scanning
+  both byte alignments, because a string inside a compiled file sits wherever the writer put it
+  and an even-offset scan reports "no strings" for a file whose text starts on an odd one. The
+  lesson is the one this file keeps relearning: **a check a wrong answer passes is worse than no
+  check**, and it is worst when the wrong answer is the one that would close the question.
+
+  Corrected, it answered: a room is **UTF-16 text** holding a grid of characters, a list of
+  ground (`.gt`) and edge (`.et`) types, and `.ao` doodads with transform matrices — and NOT a
+  single `.tdt`. So a room does not name its tiles, and the grid is the thing that could place
+  one: the terrain struct's `+0x68` is that same list of `.gt` files for the whole area, and
+  `GridLandscapeData` is a nibble per cell in the range 0–5. Whether a room's grid can be
+  translated through its own `.gt` list into that nibble grid and searched for is the next
+  question, and it is a question about the WHOLE file — the grid's dimensions, its alphabet, how
+  a character maps to a type — which eight strings per room cannot answer. Hence "Write the
+  Rooms Out" beside the readout: `RoomFiles.Dump` decodes every `.arm` of the area into
+  `preloads/rooms-<area>.txt`, named to sit beside the `area-<area>.txt` the loaded-file list
+  already writes. All of them rather than one, because the variation between rooms is itself the
+  evidence — a field constant across thirty-two files is a header, and one that tracks the grid
+  is a dimension.
+
+  **The `.arm` format.** UTF-16 text: `version <n>`, a length-prefixed string table, a dimension
+  list, a number list, the room's own tag (`""`, `"end"`, `"Underground_NS_01"`), another number
+  list, the root SLOT, a variable block of `sum(numbers) * 2` lines, several points-of-interest
+  blocks, the grid (one row per line, `root.height` rows of `root.width` cells, each `n`, `s`,
+  `o`, `f <string index>` or `k <24 numbers>`), and then doodads, decals, zones and more - see
+  the section list below. A slot's 24 numbers are width, height, then FOUR EDGE TYPES as string
+  indices in the
+  order n, w, s, e, then EIGHT MORE per edge, then a ground type and a height per CORNER
+  (sw, se, ne, nw), then the slot's own tag and its origin corner. String indices are 1-based,
+  0 meaning none.
+
+  **Those eight are FOUR PAIRS, one per edge, and they are not booleans. What the first of each
+  pair MEANS is not settled, and an earlier version of this paragraph said it was.**
+
+  What is measured, and is not in doubt: across one dump those positions hold 3 (8685 times), 9, 4,
+  21, 1, 6, 15, 12, 18 and 99. A boolean exit flag is 0 or 1, so whatever they are, they are not
+  that. All three parsers type them as integers rather than flags, so none of them claims otherwise.
+
+  What is agreed STRUCTURE, by three parsers independently: eight numbers, grouped as four pairs in
+  the same cardinal order the edge types use, and only the FIRST of each pair is ever given a
+  meaning. `adamthedash/poe_data_tools` zips them `.tuples()` against `Direction::cardinal()`;
+  `annalithic/poeformats/Arm.cs` reads a named field and an unknown, alternating. Same shape, and
+  both leave the second element unexplained.
+
+  What is DISPUTED is the name of the first. RePoE and `poe_data_tools` call the pair
+  `exit`/`virtual_exit`; `Arm.cs` calls the first `edgeLengthDown`/`Right`/`Up`/`Left`. Two names
+  to one - but names are not evidence, and only one reading is load-bearing anywhere:
+  `annalithic/poeterrain/Assets/ArmImportComponent.cs` USES the value as a distance, building a mesh
+  with `x = sizeX * 3` and treating `edgeLength == x` as "the edge runs the whole way". That
+  accounts for the dump - 3 dominates because most slots are single tiles whose edge spans them
+  completely, and eight of the ten values (3, 6, 9, 12, 15, 18, 21, 99) are multiples of three,
+  the exceptions 1 and 4 being transitions partway along a wider slot.
+
+  **The two readings may not even conflict**: a position along an edge where an exit sits is also a
+  distance along that edge, and both would be measured in the same thirds-of-a-tile. Nothing here
+  reads these fields, so the question costs nothing to leave open - and leaving it open is the
+  honest state, which "not exits" was not.
+
+  THREE parsers now agree on the corners, which is what makes the ground-stamp measurement above
+  worth its verdict: RePoE puts `sw, se, ne, nw` at 14..17 with heights at 18..21; `Arm.cs` reads
+  `groundTypeDownLeft, DownRight, UpRight, UpLeft` then the four heights, at the same positions;
+  and `poe_data_tools` zips them against a named constant, `Direction::diagonals()`, which IS
+  `[SW, SE, NE, NW]`. Both the corner order and the edge order (`Direction::cardinal()` =
+  `[N, W, S, E]`) are now spelled out by a parser rather than inferred from field names. The field
+  the measurement was taken on is confirmed independently of the source it was read from.
+
+  Two small refinements from the same place: the four corner HEIGHTS are parsed signed while every
+  other number in the slot is unsigned, and the origin is optional - `Arm.cs` gates it on version
+  above 18, `poe_data_tools` simply reads it if present, so an old slot is 23 numbers rather than 24.
+
+  **AND THE ORIGIN IS A COMPASS CORNER, confirmed twice over from two directions.**
+  `poe_data_tools` resolves it as `Direction::diagonals()[origin]`, so 0-3 are SW, SE, NE, NW. The
+  renderer never says that and does not have to: `ArmImportComponent` shifts x by `-(sizeX - 1)`
+  for origin 1 or 2 and y by `-(sizeY - 1)` for 2 or 3 - which is exactly "the two EAST corners"
+  and "the two NORTH corners" under that mapping. A name from one source and arithmetic from
+  another, agreeing without either knowing about the other.
+
+  **THE SECTION LIST, from the only parser that reads the whole file.**
+  `adamthedash/poe_data_tools`' `arm/parser.rs` goes past the grid where the others stop, and it
+  corrects this file's own summary in two places. The tail is not "a second points-of-interest
+  block holding the doodads": after the grid come DOODADS, then doodad CONNECTIONS (`from`, `to`,
+  tag), DECALS (x, y, rotation, scale, an atlas file, a tag), BOSS LINES, ZONES, TAGS and finally
+  the ground-override grid. And the variable block before the grid is `sum(ALL the numbers) * 2`
+  entries, not the sum of the first - each an `.et` file index, an int and up to three bools.
+
+  The points-of-interest section is several GROUPS, and how many depends on the version: nine below
+  20, ten to 26, five to 29, six above. Each entry is `x`, `y`, a rotation and a tag.
+
+  The ground-override grid is confirmed a third time and exactly: `(height - 1) * (width - 1)`
+  string indices, optional, 1-based with 0 meaning none - the formula this project measured against
+  five of sixty-three rooms.
+
+  ZONES ARE NEW HERE AND WORTH KNOWING ABOUT: a room can declare NAMED RECTANGLES inside itself -
+  `name`, `x_min`, `y_min`, `x_max`, `y_max`, plus a teleport flag and an environment file above
+  version 35. That is the game naming a part of a room. It changes nothing about placement, because
+  the coordinates are room-local like everything else in the file, but it is the first per-part
+  naming any of these parsers has shown.
+
+  **AND THE FORMAT DRIFTS HARD ACROSS VERSIONS**, which is the practical warning to take from this
+  parser: it gates on version at a dozen points - the dimension line at 22 and 31, decals at 17,
+  doodad fields at 18, 23, 25, 34 and 36, zones at 27, 33 and 35, and at version 32 whole sections
+  switch from length-prefixed to `-1`-terminated. Any future reading of an `.arm` has to carry the
+  version, and a layout taken from one dump is a layout for that dump's version.
+
+  **A FIFTH SOURCE WITH NO PLACEMENT.** Nothing in the whole file carries a world position: the
+  most complete parser of the four reads zones, decals, doodads, connections, boss lines and tags,
+  and every coordinate in all of them is room-local.
+
+  **AND A TILE DECLARES ITS OWN FOUR CORNER GROUNDS.** `annalithic/poeformats/Tdt.cs` reads a
+  `.tdt` as `inherits`, `tgt`, `feature`, four edge types, `sizeX`/`sizeY`, then
+  `groundTypeDownLeft, DownRight, UpRight, UpLeft` and eight edge distances - the same shape an
+  `.arm` slot has. So the area's per-corner array at `TerrainMetadata+0x50` is almost certainly
+  ASSEMBLED FROM THE TILES' own declarations, which explains where its values come from without
+  changing what they mean.
+
+  It also closes the tile-to-room direction for the third time and from a third source: a `.tdt`
+  names another `.tdt` (it can inherit), a `.tgt`, a feature, `.et` files and `.gt` files. No
+  `.arm`. RePoE's `tdt.py` said the same, and so did this project's own dumps.
+
+  What it OPENS is a check nobody has run: the tiles' declared corner grounds could be read out
+  of the bundles - the room dump already proves files can be opened - and compared against what
+  the corner array reports at those same corners. That would confirm the ground layer against the
+  game's own FILES rather than only against walkability. Not built; recorded because it is the
+  strongest check still available to that feature.
+
+  **A TILE IS PAINTED AS FOUR QUARTERS, ONE PER CORNER — the game does not take a majority.**
+  `ArmImportComponent.cs` is a renderer rather than a parser, and that is what makes it say
+  something the parsers cannot. Its `CreateMesh` builds a slot as a fan of triangles from the four
+  corners to a midpoint, and assigns the submeshes in order
+  `groundTypeDownLeft, DownRight, UpRight, UpLeft` — each QUARTER of a tile gets its own corner's
+  ground type. The next four submeshes are the four edges with the edge types, and where an edge
+  type is 0 it falls back to the adjacent corner's ground (`newSharedMats[4] = newSharedMats[0]`
+  and so on), which is what makes an unnamed edge invisible rather than blank.
+
+  That has a direct consequence for `TerrainGroundTypes`, which reduces a tile's four corners to a
+  MAJORITY before drawing. The majority is this project's invention, not the game's: the game
+  draws all four.
+
+  **What that reduction can cost is ONE thing, not a general loss of detail, and the difference is
+  the whole reason there is a probe rather than a change.** The ground layer writes a NAME AT A
+  POINT per region - no fill, no outline - so a boundary drawn half a tile more precisely would
+  move a label by a few pixels and change nothing a person could see. What a majority can do is
+  DELETE a type: a thin feature that never holds three of any tile's four corners is absorbed into
+  its neighbour, the region never forms, and the word is simply absent from the map. That is the
+  only way the reduction changes what the map SAYS.
+
+  Whether it ever happens is a question about real areas, not about the argument, so
+  `GroundResolutionProbe` counts it: how the four corners of each tile split, how many quarters the
+  majority overrules, and the regions each resolution would keep - ending in a row per type whose
+  count differs, marked `NAMED NOWHERE TODAY` where the tile side has none and the quarter side
+  has some. Under `--debug` beside the other terrain probes, and deliberately without a verdict.
+
+  It compares against **what the layer actually draws**, which is why
+  `TerrainGroundTypes.WorthNaming` exists: the walls-only-as-fallback rule used to live inside
+  `FindGroundRegions`, and a probe that re-implemented it would have been comparing the map against
+  a second opinion of the map. One rule, two callers.
+
+  **AND THE ANSWER, MEASURED, IS NO - DO NOT CHANGE THE LAYER.** A Titan Grotto abyss, 153x111
+  tiles, run at the most sensitive setting the layer has (smallest patch 1 tile, so nothing is
+  filtered out before the comparison):
+
+      ground resolution: 16983 tiles, 67932 quarters, 4 slots, smallest patch 1 tiles
+        corners per tile: 16078 agree, 318 three-one, 529 two-two, 58 two-one-one, 0 all four
+        the majority overrules 1492 of 67932 quarters
+        patches worth naming: 22 by tile, 23 by quarter
+        TitanWalkwayGround          10 by tile    11 by quarter
+
+  No `NAMED NOWHERE TODAY` row at all. One type differs and it is one that is ALREADY on the map
+  ten times over; the eleventh patch adds a position and no word. With `MaxPatches` at its default
+  of three, that eleventh patch is not even drawn. 94.7 per cent of tiles are unanimous and 2.2 per
+  cent of quarters are overruled.
+
+  **THIS WAS THE AREA PREDICTED TO SHOW SOMETHING**, which is what gives the negative its weight:
+  before the run, `TitanWalkwayGround` at 567 corners and `TitanEdge` at 444 in a field 94 per cent
+  abyss looked exactly like the thin-feature case the probe was built for. It is not, and the
+  numbers say why - `529` two-two tiles against `318` three-one means the boundaries here are
+  STRAIGHT rather than ragged, and a straight-edged feature two or more corners wide keeps winning
+  tiles. The majority only erases something thinner than that, and this walkway is not.
+
+  So the corner-resolution idea is measured and declined rather than merely unbuilt. What would
+  reopen it is a `NAMED NOWHERE TODAY` row in some other area, which is one glance at the readout
+  and needs no new code.
+
+  The same file also pins down `origin` with arithmetic instead of a name: a cell with
+  `origin == 1 || origin == 2` shifts by `-(sizeX - 1)` tiles and `origin == 2 || origin == 3` by
+  `-(sizeY - 1)`, so origin is WHICH CORNER of a multi-tile slot the grid cell anchors, numbered
+  round. And it closes the placement question a fourth time, by what it has to do rather than what
+  it says: to show a folder of rooms it lays them out in a ROW, `offset += sizeX * 3 + 3` per room.
+  A tool built to draw `.arm` files has no idea where they go either.
+
+  **That layout is RePoE's, not this project's** — `RePoE/poe/file/arm.py` in the repoe-fork,
+  which parses the format properly — and it corrects a reading taken off the files by eye and
+  written down here as settled. The eye version had the four edge indices as "connection counts",
+  the exits as edge lengths, the per-corner grounds and heights as "eight more numbers", and the
+  variable block as "the four sides again". The CONCLUSION drawn from it survives (a `_Cnr_` room
+  carries an edge type on two sides, an `_End_` room on one, because a side with an edge type is
+  a side that joins something) but the mechanism under it was invented. Reading a format off its
+  files is how you get a description that happens to fit the files you looked at. The one reading
+  that was independently anchored is the doodad's: its leading integers are **grid cells**,
+  `853.462 / (250/23) = 78.52` against a written `78`, which is this project's own `GridToWorld`
+  constant and nothing else.
+
+  A `.tdt` is small and binary by comparison (`RePoE/poe/file/tdt.py`): a version, a UTF-16
+  string blob, and then EITHER a parent `.tdt` plus a tag, OR a `.tgt` plus a tag. So the tile a
+  tile-struct names can inherit from another tile, and it carries a tag of its own that this tool
+  has never read.
+
+  What it does NOT contain is a tile. Not one `.tdt` across all 32, in either encoding. A room
+  names only its edge and ground types, and **the reference offers no way round that**: `.arm`
+  appears nowhere in GameHelper2's `Radar.cs`, whose labels come from `TgtTilesLocations` — the
+  `.tgt`/`.tdt` tile names this tool already draws. The `.arm` route is ours, so it has to carry
+  itself. Which leaves one unread file type between here and a placement, so the dump follows the
+  types the rooms declare and writes those out too: 32 rooms yield exactly 19 of them, and
+  whether one lists its tiles decides the whole approach. Worth recording before it is answered:
+  `bone_fill.gt` is declared by 14 of the 32 and `bones_edge.et` by 10, so even a yes gives
+  room-FAMILY resolution — telling `AbyssTrail_Cnr_01` from `AbyssTrail_End_01` would then be a
+  second step, off their grids and their connection counts.
+
+  **And the types answered no as well, which is the useful part.** All 20 of them came back as
+  tiny UTF-16 declarations naming no tile at all: a `.gt` is a NAMED GROUND TYPE
+  (`bone_fill.gt` is 46 bytes reading `BoneUpperFill` and four flags) and an `.et` is the
+  BOUNDARY between two of them, with a colour (`bones_abysswall.et` → `BonesAbyssWall #FFFFFFAA`,
+  `bone_fill.gt` on one side and `bone_abyss.gt` on the other). So the chain room→type→tile does
+  not exist, and the `.arm` route is closed for good — for the price of two clicks rather than
+  an evening, which is what the dump was for.
+
+  **What it opened instead is better than what it closed**, and three facts found separately met
+  at it: the room probe had recorded `TerrainMetadata+0x68` as "a vector of the area's
+  ground-type files"; the schema has carried `GridLandscapeData` since July as "static
+  terrain-type **nibbles 0–5**", a value per cell; and the type dump showed a `.gt` is a name.
+  Walking the vector's elements out of the third recording closed it: a Badlands area lists
+  **six** — `bone_fill`, `trims1`, `bone_abyss`, `badlands_noburrow`, `waypoint_ground`,
+  `badlands` — as eight-byte pointers 8 bytes apart, against the `0x30` stride every other `.gt`
+  reference in memory sits on, each pointing at a file object whose path is at `+0x08` like a
+  tile's `TgtFilePtr`. Six files against nibbles 0–5, arrived at from opposite ends. **A nibble
+  is an index into that list**, so the map can say what the ground IS — the abyss, the fill, the
+  waypoint — instead of naming the tile template that happens to draw it.
+
+  `TerrainGroundTypes` reads it and **refuses to be believed on its own say-so**, because a
+  wrong offset here would draw a plausible map of nonsense and nothing about it would look
+  wrong. Three gates, in order: the landscape buffer must be exactly as long as the walkable one
+  before a single nibble is read out of it with the walkable grid's packing (equal length is
+  what licenses the reinterpretation; a different length means something else is being read);
+  every nibble must index a file the area actually lists; and the types must **separate on
+  walkability** — an abyss walkable nowhere, a fill walkable nearly everywhere. That last one is
+  the gate with teeth, because a mis-read grid samples the same ground for every type and lands
+  them all on the area's average. `GroundRegions` is empty unless all three pass, so the refusal
+  lives at the source rather than in a flag a layer could forget to test.
+
+  The regions themselves come from `TerrainRooms.Find` unchanged — contiguous tiles sharing a
+  name is the same question the rooms ask, and it wants the same answer: a centroid to put a
+  label at, a size to drop the slivers by, rarest-first ordering for the packer.
+
+  **And then the first real area showed the gap in it.** The Titan Grotto drew nothing and said
+  nothing — an empty map with no explanation, which is precisely the confusion those three gates
+  exist to prevent, reintroduced one level ABOVE them. Two mistakes, and the second is the one
+  worth remembering. `OverlayLayout.Hint` is a **hover tooltip**, so the sentence explaining an
+  empty map was itself invisible unless somebody happened to point at the right control; that is
+  a five-minute fix. The real one: the reader gave up in four places with a bare `null`, so
+  `Ground` being null carried no reason at all — the checks were carefully designed to explain
+  themselves and the code that runs BEFORE them was not. Every refusal now names itself with its
+  numbers ("landscape 44160 bytes against walkable 42320 — not the same grid", "element 3 of 6
+  names no file"), the note lives on `TerrainGrid` rather than on the ground it may not have,
+  and it is written out on the switch panel and into `Describe()`. The lesson generalises past
+  this feature: **a diagnostic that only covers the interesting failures is not a diagnostic**,
+  because the boring ones are what actually happen.
+
+  **And the note it then printed named a mistake in the evidence, not in the code.** "no
+  ground-type files at +0x68 (element 0 of 5 is not a pointer)". Going back to the recording with
+  the terrain struct found by its OWN fields — tile counts at `+0x18`/`+0x20` agreeing with a
+  `0x38`-stride tile vector at `+0x28` — settles it: `+0x68` really is the list, in both areas
+  the recording holds, and **its first element is null**.
+
+  ```
+  +0x68  VECTOR 56 bytes  [0, ptr, ptr, ptr, ptr, ptr, ptr]
+                           ↑ blank   bone_fill … badlands
+  ```
+
+  A nibble of zero means **no ground type here** — the void around the playable area — and the
+  slot is a position in the list rather than a hole in it. The reader's "every element or none"
+  rule threw six good names away over one deliberate blank. Worth being precise about how that
+  got shipped: the six `.gt` pointers were found in the recording as a contiguous run 8 bytes
+  apart, and an older probe note said `+0x68` is "a vector of the area's ground-type files".
+  Those were two findings, joined by assumption — **the search for a vector header matching the
+  run came back EMPTY and that was noted and then written up as though it had matched.** The run
+  began at `+8` precisely because a null is not a pointer to a string.
+
+  Fixing it exposed a second thing, which is the more interesting one: **the blank would have
+  gutted the walkability check.** It covers the void, so it is walkable nowhere, so it satisfies
+  the "mostly not walkable" half for free — leaving a gate that only asks whether ANY type is
+  walkable. Half a check that always passes is most of the way to no check, so unnamed slots are
+  excluded from the spread, and a test puts the blank on one side of the map and a named,
+  fully-walkable type on the other to prove the gate still says no.
+
+  **Then the gate did its job against the theory it was built for.** The Titan Grotto, list read
+  correctly this time: 9190252 of 9212535 cells carry a nibble beyond the five slots that area
+  lists — nearly the whole grid, not a rounding error. **A landscape nibble is not an index into
+  `GroundTypeFiles`**, and the connection the whole ground-type layer rests on does not hold.
+  Which is the check earning its keep — the alternative was a map labelled confidently and
+  wrongly.
+
+  What survives is worth keeping separate from what does not. `GroundTypeFiles` at `+0x68` IS the
+  area's `.gt` list: three areas, readable names (`TitanEdge`, `abyss`, `TitanGrottoEntrance`,
+  `TitanWalkwayGround` are plainly the Grotto's own), a length that varies per area (7, 6, 5), a
+  real blank first slot, and a landscape grid exactly as long as the walkable one. What is dead
+  is only the pairing — and the value 5 is why: it dominates the Grotto AND opens the Badlands
+  landscape grid, in an area listing SEVEN slots. A value that tracked the list, index or
+  count-means-none sentinel, would differ between them. **5 is a fixed constant**, and the
+  "nibbles 0-5" in the July note is a fixed range rather than a per-area one.
+
+  **So the ground-type layer came out again**, and what is left behind is the point of writing
+  this down. `GroundTypeFiles` stays in the schema, unread, because it is measured knowledge that
+  was expensive to get and the next person to wonder what `+0x68` is should find the answer
+  rather than the hunt. What `GridLandscapeData` actually MEANS is still unknown.
+
+  **Four mistakes in one feature, and the last one is the worst.** The probe note and a pointer
+  run were joined by an assumption. The blank first slot was read as a hole. The blank would have
+  gutted the walkability gate. And then: **the readout that was supposed to settle all of it was
+  printing garbage.** ImGui's text calls are printf underneath — `ImGuiText` says so in its own
+  header, and `Escape` exists for exactly this — and the histogram lines went to
+  `ImGui.TextColored` raw, full of `%`. Each row carried two percentages, coverage and
+  walkability; printf ate the first `% wa` as a conversion and rendered a hex float, so the
+  number left standing beside the word "walkable" was the COVERAGE share. Every per-value
+  walkable figure this feature ever displayed was a different number wearing its label, and the
+  conclusions drawn from them in the moment were wrong.
+
+  The verdict itself survived only by luck of construction: the gates compute on the arrays, not
+  on the strings, so "9190252 cells beyond the list" was real and the theory is genuinely dead.
+  Had the gate been the thing reading those strings, this would have shipped. **A diagnostic is
+  code, and it needs the same suspicion as the thing it diagnoses** — the one place in this
+  project where a wrong number is guaranteed to be believed is the readout built to be trusted.
+
+  **And a route that survives all of it, unproven.** RePoE's parser says a room slot carries a
+  ground type and a HEIGHT per corner — sw, se, ne, nw — and the terrain struct has an array at
+  `+0x50` of exactly `(tilesX+1) * (tilesY+1) * 3` bytes, three per tile CORNER. 21648 over an
+  87x81 area and 11163 over a 60x60, both exact. Two independent measurements of the same shape,
+  and if one of those three bytes indexes `GroundTypeFiles` then a room's corner pattern is a
+  stamp that could be searched for in the area's.
+
+  **And it is one.** Two complete arrays out of one recording - 5472 of 5472 corners over a 71x75
+  Archives area and 3721 of 3721 over a 60x60 Vaal area, not a sample - and byte 0 indexes
+  `GroundTypeFiles` on all four counts the landscape nibble failed:
+
+  - The range tracks the LIST LENGTH. Four slots, exactly the values 0-3; six slots, exactly 0-5.
+  - Every slot is used. Nothing is outside the list, either time.
+  - The proportions read as terrain: 83% `black_inside_wall` in an Archives interior, 90%
+    `vaal_building_inside` with slivers of water, street and bridge in the Vaal area.
+  - And drawn as characters it IS a map - a water course through a chamber of street and bridge
+    inside a field of building-inside. Connected regions, which is the one thing a mis-read field
+    cannot fake.
+
+  So the per-corner ground type is real and this is where it lives. `GridLandscapeData` was
+  credited with it and does not have it. Byte 1 is mostly zero with 16 and 32 appearing, which
+  look like flags; byte 2 takes only 3 and 11, and 11 is outside lists of four and six, so it is
+  not a `.gt` index.
+
+  What that opened was the room stamp, well posed rather than hopeful for the first time: a room
+  file carries a ground type per corner of every slot, and the area carries one per tile corner.
+  The two are finally the same kind of value.
+
+  **And measuring it first killed it, in fifteen minutes rather than a day.** The question a stamp
+  has to answer is whether a room's corner pattern is distinctive enough to search an area's array
+  for. Counted over 63 rooms in two areas, using RePoE's own field positions (`vals[14..17]` are
+  the corner ground string indices, sw/se/ne/nw, 1-based, 0 meaning none):
+
+  | | rooms | |
+  |---|---|---|
+  | no corner ground at all | **28** (44%) | nothing to stamp with |
+  | exactly **one** type | **24** (38%) | a constant block — matches anywhere that type is |
+  | two or more | **11** (17%) | the only ones with a pattern |
+
+  And the 11 are worthless for it: **every one uses the same pair**, `bone_abyss` and `bone_fill`.
+  That is a binary mask over a two-value alphabet, and a soft blob of roughly 4×4 corners will
+  match in many places across the thousands an area holds. One type, `world_map_underground`,
+  accounts for **8152 of 9112** corner uses — 89%. Both areas measure the same, so it is not an
+  area-specific accident. Worse, the 11 patterned rooms are `bones_fill_02`, `BonePassage_Cnr_4`
+  and their kind: fill and corner modules, not the rooms anybody wants named.
+
+  Checked before concluding, because measuring the wrong field is how a verdict goes wrong: the
+  grid's `f` cells name only `forcedblank` across both dumps, and slot edges name `.et` files and
+  slot tags name areas. The corner block is the only ground the file carries, and it was the one
+  measured.
+
+  **And re-checked when a fuller spec turned up, because the first check had a hole in it.** A
+  community `.arm` diagram (2026-09) documents an optional **ground-override line** near the end
+  of a room — `(gridWidth-1) * (gridHeight-1)` string indices pointing at `.gt` files — which is a
+  SECOND per-corner ground source, and the verdict above had been recorded as closed while
+  measuring only the slots. Measured: the line exists in **5 of 63 rooms**, its lengths match the
+  formula exactly (24 for a 5x7, 360 for a 13x31, 4, 1), and its values are almost all zero.
+  `2_Badlands_N` is the only one with a pattern, `0` and `5` alternating. So at most one room
+  gains a two-value pattern: 11 of 63 becomes 12. The alphabet stays binary and the verdict
+  stands - now on a measurement that includes the field it had missed.
+
+  The same diagram set adds two things worth keeping. A `.tgt` names `.mb`, `.tgm`, `.dds` and
+  `.mat` files and **no room**, which closes the tile-to-room direction from the tile's side too.
+  A third source now says the same: `annalithic/poeformats/Tgt.cs` reads a `.tgt` as a version, a
+  `sizeX`/`sizeY`, a `tileMeshRoot`, an optional ground-mask `.dds`, a list of `.mat` materials and
+  a `sizeX * sizeY` table of material indices — geometry and materials, no room reference and no
+  ground types either. The ground types live one level up, in the `.tdt` that names the `.tgt`.
+  And a `.rs` (Room Set) is a list of `.arm` files with a spawn weight and a set of allowed
+  **rotations** - the dihedral group of order 8. A corner stamp would therefore have had to be
+  searched in eight orientations over a two-value alphabet, which is worse than the verdict above
+  already assumed. `.rs` carries no coordinates, so it is a generation CATALOGUE and not a layout:
+  it cannot say where a room went.
+
+  **So every route from a room FILE to a place is closed**: no tile or terrain-struct field
+  reaches a room; `.arm` files name no `.tdt`; `.et`/`.gt` name no `.tdt` (RePoE's `tdt.py`: a
+  `.tdt` names a parent `.tdt` or a `.tgt`, never an `.arm`); and the ground-corner join has too
+  little to say.
+
+  **What is left is the opposite direction, and it is a different kind of search.** Not "what does
+  a room file say", but "who in memory points AT one" — and the addresses are already in hand.
+  Every loaded file has a `FileRecord` in the table `PreloadReader` walks, and that walk yields
+  record **addresses**, not just paths. So the area's rooms are a set of perhaps thirty known
+  pointers, and anything referring to a placed room has to hold one of them, or the path itself.
+
+  That distinction is the whole point. The previous hunt (`RoomProbe`) asked whether a pointer
+  *looked* like it led to a room — a question about shape, and this file's own record says what
+  shape questions are worth here. `RoomPlacementProbe` asks whether a value **is the address of
+  `entrance.arm`'s record**, which nothing satisfies by accident.
+
+  It sweeps `AreaInstance`, which no probe had looked at: the schema maps seven fields between
+  `0xC4` and `0x8C0`, so most of it is unaccounted for, and the room hunt so far covered the tile
+  struct and the neighbourhood of `TerrainMetadata`. Every plausible pointer is followed one hop
+  and its target searched the same way, because a placement list is far likelier to hang off a
+  field than to sit inline. Both forms are searched for — a record address, and UTF-16 `.arm` text
+  — because which one the game uses is exactly what is unknown.
+
+  **A miss is reported with its numbers** (how far it swept, how many pointers it followed), for
+  the reason the ground layer already paid for once: "found nothing" and "looked nowhere" must
+  never read alike. Run it from the *Hunt the Placements* button beside the loaded-file list; it
+  needs no install, only the table that page is already about.
+
+  **AND IT RAN, AND THE ANSWER IS NO.** A Steppe map, 2026-09:
+
+      placements: 211 .arm records, swept 32768 bytes of AreaInstance,
+        followed 693 pointers and 263 vectors
+        nothing refers to a room file - not by record address, not by path
+        control: 8 of 8 tile file pointers ARE record addresses - the search looks for the
+          right value, so a miss above is a real absence
+
+  Every part of that sentence is load-bearing, and each was earned separately. The CONTROL passes,
+  so the game does refer to files by the value being searched for. The counts are well UNDER both
+  caps - 693 of 4096 pointers, 263 of 512 vectors - so the sweep finished rather than running out
+  of budget, which two earlier runs had done while calling the result an absence anyway. And both
+  FORMS were searched, the record address and the UTF-16 path.
+
+  So: the first 32 KiB of `AreaInstance`, everything one hop from it, and every vector two hops
+  out, hold no reference to any of the area's 211 room files.
+
+  **What that does and does not settle.** It rules out `AreaInstance` as the holder, which was the
+  last structure with a plausible claim to it. It does NOT prove no structure anywhere holds one -
+  three hops are not covered, and a placement list hanging off the scene graph or a generation
+  manager would not be reached from here.
+
+  But put beside the file evidence it makes one explanation fit everything: **a room is a
+  GENERATION-TIME concept.** The layout generator places `.arm` rooms, bakes them into tiles, and
+  the runtime keeps the tiles. That is why the files carry no coordinates (five parsers), why no
+  tile names a room (three sources), why the `.rs` catalogue has spawn weights and rotations but no
+  positions - and why 211 room files are LOADED here while nothing points at one. They were needed
+  to build the area and nothing retained the association afterwards.
+
+  On that reading the room level is not hidden, it is gone by the time the tool can look. What the
+  map can show is the tile level, which is what it already shows.
+
+  Meanwhile what stands is what the tool already draws — tile-block room names from
+  `TerrainRooms`, which is more than the reference does automatically, and hand-curated
+  `data/landmarks.json` entries, which is exactly the mechanism GameHelper2's `ImportantTgts`
+  uses for the labels in the original screenshot.
+
+  **The ground-type layer is back, on the field that is measured.** Same layer, same two gates,
+  same flood fill into named blocks — a tile takes the type most of its four corners agree on, the
+  blank first slot is a position rather than a region, and nothing is drawn unless every corner
+  names a slot the list holds AND the types separate on walkability. What changed is the source
+  (`+0x50` byte 0 instead of a `GridLandscapeData` nibble), the scale (thousands of corners rather
+  than millions of cells, so the spread check's floor moved from 1024 to 64), and the readout: the
+  histogram now leads with the area's own walkable COUNT and carries no per-cent signs at all,
+  drawn through `ImGuiText.Mono` — which is `TextUnformatted` — rather than a printf call. Two
+  locks on one bug, because that bug printed a number under another number's name and was believed.
+
+  The one check that only the game can run is the walkability separation, and running it found a
+  bug — **in the check, not in the reading**. A Maelstrom area, 69×93 tiles, 3 slots:
+
+  | value | corners | walkable | |
+  |---|---|---|---|
+  | 0 | 746 | **635** | *(blank slot)* |
+  | 1 | 2273 | 0 | `black_inside_wall` |
+  | 2 | 3561 | 44 | `maelstrom_abyss` |
+
+  The reading is plainly right: of the area's 679 walkable corners, **635 are in one value**, and
+  the two named types are a wall and an abyss with essentially none. Noise would have spread those
+  679 across the three by coverage — 77 / 235 / 367. And the names agree with the physics, which
+  is the game confirming itself.
+
+  It was rejected anyway, because `Separates` **excluded the blank slot**, on the belief that the
+  blank is the void outside the playable area and therefore walkable nowhere — so counting it
+  would satisfy the "mostly not walkable" half of the spread for free. Here the blank IS the
+  floor, and the gate was demanding a *named* type that is mostly walkable, which that area cannot
+  have.
+
+  **The blank slot means the game gave that ground no NAME, not that there is no ground.** The
+  check now spans every slot and asks only that the extremes differ by half — the walkable ground
+  must be *partitioned* rather than shared out — and which slot sits at which end is no longer
+  assumed. The blank is still excluded from *labelling*, since an empty path writes nothing, and
+  keeping those two decisions apart is the whole correction: real for measuring, not worth naming.
+
+  What it still cannot rule out is a field that correlates with walkability without being the
+  ground type — the outermost ring of corners is unwalkable whatever it carries. The volumes make
+  that implausible here, and the "nothing outside the list" gate makes it implausible that the
+  field is anything else at all. Both are needed; neither is enough alone.
+
+  **Which types are worth naming, and how often.** Two rules, both learned from screenshots rather
+  than reasoned out in advance:
+
+  - **Walls and ceilings only when they are what is left.** Most of an area is scenery you cannot
+    enter, so naming every wall patch buries the labels worth reading — the same thing that made
+    the ROOM names unusable until they were filtered. But an area whose floor carries the game's
+    unnamed slot has nothing *but* walls and abysses to name, and there, which unenterable region
+    is a fall and which is a wall is the whole of what the layer can say. So the filter applies
+    only when it leaves something behind, and the readout says when it did not.
+
+    "Standable" is decided **per type**, over the whole area, at corner resolution — not by
+    `TerrainRoom.IsWalkable`, which asks whether a region holds *one* walkable tile. That is far
+    too weak here: a ground-type region hugs the floor for hundreds of tiles and the walkable
+    geometry does not follow tile edges, so an abyss touching the floor anywhere passes it. The
+    Maelstrom measures the leak exactly — `maelstrom_abyss` has 44 walkable corners of 3561. The
+    bar is a quarter, and it is wide because the thing it separates is not close: 0% for a wall,
+    1.2% for an abyss, 85% for a floor.
+
+  - **A type is written at most N times.** The layer shipped with one filter, on the reasoning
+    that an area holds a handful of ground types, so its regions must be few and large and a size
+    threshold would do the whole job. An Abyssal Depths screenshot killed that: two types, and
+    `maelstrom_abyss` written across the map roughly twenty times. **Few types does not mean few
+    regions** — one type winds through an area in dozens of separate pieces, every piece a label
+    carrying the same word, and size cannot thin pieces that are not small. The regions arrive
+    largest-first within a type, so the ones kept are the ones somebody can see they are standing
+    in. The default of three is a starting point, not a measurement; the only figure in hand is
+    the twenty that made the map unreadable.
+
+  Finding the inline vector cost the probe a correction worth keeping: **it had been peeking
+  `+0x10` as a pointer.** Reading a vector that is laid out as FIELDS rather than pointed at classifies
+  whatever its elements happen to begin with, and never opens the array — so a whole level of
+  the struct was invisible in a probe designed to find exactly that kind of thing. It now tests
+  three consecutive slots for begin/end/capacity, and does so as an ADDITION to the ordinary
+  walk: three references in the right order satisfy that test by luck, and skipping the next two
+  slots on the guess would hide whatever they really are.
 - **A death is not a hit.** Damage taken is the same pool-difference measurement pointed at the
   player, and at zero life the pool reads as *unread* rather than empty — otherwise the whole
   pool is counted as one enormous hit on the way back in, and every death becomes the worst hit
@@ -2327,22 +3024,39 @@ it reports its own row size, and `--tables` prints it.
 found 134 tables among 6,914 files, and **157 of those records are `.dat` files at all — against
 about 1,020 PoE2 tables** in the community schemas. Fifteen per cent.
 
-So a table being absent is the ordinary case. `WorldAreas`, `MinimapIcons`, `NPCs` and
-`ItemVisualIdentity` — the four this project reads rows from — are in none of the 6,913 record
-names `--tables` reads, in any spelling, while `Stats`, `Mods`, `BaseItemTypes` and `QuestFlags`
-happen to be there. That was first written up here as a *pattern*, which it isn't: at 15%
-coverage, four named tables all missing is a coin flip.
+`WorldAreas`, `MinimapIcons`, `NPCs` and `ItemVisualIdentity` — the four this project reads rows
+from — are in none of the 6,913 record names `--tables` reads, in any spelling, while `Stats`,
+`Mods`, `BaseItemTypes` and `QuestFlags` are. **Confirmed from the row side too**, so it isn't a
+name that failed to read: the same capture holds MinimapIcons *rows* — `Waypoint`, `StashPlayer`,
+`MapDevice`, 159 and 154 row-widths apart on the 0x26 grid — and no record the walk accepts
+brackets them. The table is in memory and out of the walk's reach at once.
 
-**Two things could produce that fraction, and nothing here can tell them apart.** The table may
-genuinely track only what the resource loader pulls in — it is mostly art, 1,219 `.tok` and 903
-`.ao` to its 157 `.dat` — or our walk may be seeing a slice of it. `BucketCount` is `0x10`
-**because GameHelper2 says so, and GameHelper2 is a PoE1 tool**; nothing here has ever checked it
-against Path of Exile 2, and if the real count is larger then every walk of this table has been
-partial and every absence only means we didn't look. No recording can settle it: not one fixture
-holds a single byte past the last bucket, because nothing has ever read there. So
-`PreloadReader.BucketsBeyondTheCount` probes the slots past the end and `--tables` prints whether
-any looks like a bucket. Until that runs, don't plan on finding a particular table this way — the
-row-pointer route through a component is the only route to one the walk doesn't turn up.
+**What that split is not is a story about which tables get loaded.** All eight are core tables the
+client can't start without — which is exactly why the QuestFlags hunt never had trouble reading
+its table. An earlier draft here called the four absences a coin flip at 15% coverage; that was
+worse than wrong, because the four *present* ones were picked because they were visible in the
+listing. A sample chosen after the fact says nothing.
+
+**Two explanations stood, and one is now out.** Either the table tracks only what the resource
+loader pulls in — it is mostly art, 1,219 `.tok` and 903 `.ao` to its 157 `.dat` — or our walk was
+seeing a slice of a larger table.
+
+This document argued for the slice, twice and wrongly. First on a fact: it said `BucketCount` is
+`0x10` "because GameHelper2 says so, and GameHelper2 is a PoE1 tool". **GameHelper2 is a PoE2
+tool** — its `GameOffsets/GameProcessName.cs` maps every process name it knows to "Path of Exile
+2", and this document's own first rule calls it "a working tool against the same game". So
+`TotalCount = 0x10` was a PoE2 number all along, not a PoE1 one carried over. Then on the
+reasoning: with that invented doubt in hand, the slice became "the more economical reading" — it
+was economical with a fact nobody had checked.
+
+**The probe has run.** `PreloadReader.BucketsBeyondTheCount` on a live client, 2026-09-01: nothing
+past the last bucket looks like one, and `--tables` says so on every run. Sixteen buckets is the
+whole table, and coverage is not why anything is missing from it.
+
+What's left is the resource-loader explanation — and with it the question of **why four core
+tables travel through the loader and four don't**, which is now the thing to answer rather than a
+rival to weigh. Either way, don't plan on finding a particular table this way: the row-pointer
+route through a component is the only route to one the walk doesn't turn up.
 
 And being on it is not being parsed: 23 of those 157 have nothing usable at `RowStorePtr`,
 `GrantedEffectsPerLevel` and `Languages` among them. A table can be present and rowless, which
