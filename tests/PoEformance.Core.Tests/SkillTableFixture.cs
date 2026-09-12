@@ -23,6 +23,7 @@ internal static class SkillTableFixture
     private const ulong Rows = 0x0000_0500_3000_0000;
     private const ulong Granted = 0x0000_0500_3100_0000;
     private const ulong PerLevel = 0x0000_0500_3200_0000;
+    private const ulong Decoys = 0x0000_0500_3300_0000;
     private const ulong Texts = 0x0000_0500_4000_0000;
 
     /// <summary>Longer than anything a reader asks for, so a string read never runs off the end.</summary>
@@ -58,12 +59,20 @@ internal static class SkillTableFixture
         /// <summary>
         /// The same, with the ActiveSkill reference at <see cref="ColumnElsewhereAt"/> rather than at
         /// either column the witnesses name, and a second id-shaped string in the row at
-        /// <see cref="DecoyAt"/> - the shape the third run in game showed.
+        /// <see cref="DecoyAt"/> - the shape the third run in game was read as.
         /// </summary>
         GrantedEffectsRowWithColumnElsewhere,
 
         /// <summary>A direct pointer at <see cref="HuntedAt"/>, where no known place holds one.</summary>
         Hunted,
+
+        /// <summary>
+        /// The per-level row at <see cref="HuntedAt"/>, and at the field the schema names a DECOY:
+        /// an id-first row with a second id-shaped string at <see cref="DecoyAt"/> and no reference
+        /// to an ActiveSkills row anywhere in it - what the fourth run in game found at the
+        /// references' place once 0.5.5 had moved the field.
+        /// </summary>
+        PerLevelRowHuntedPastADecoy,
 
         /// <summary>Direct, to a row whose name sits at <see cref="NameElsewhereAt"/> rather than the schema's column.</summary>
         NameElsewhere,
@@ -181,6 +190,21 @@ internal static class SkillTableFixture
                 case Route.Hunted:
                     fake.Place<ulong>(skill.Details + HuntedAt, row);
                     break;
+                case Route.PerLevelRowHuntedPastADecoy:
+                {
+                    // The decoy as the game had it: an id of its own first, a second id further
+                    // in where a hunt for a name finds it, and nothing else in the row.
+                    ulong decoy = Decoys + (ulong)(i * 0x100);
+                    PlaceText(fake, text + 0xC00, "QuakeSlam");
+                    PlaceText(fake, text + 0xE00, "StormCloud");
+                    fake.Place(decoy, new byte[Game.Components.PlayerSkills.RowHuntBytes]);
+                    fake.Place<ulong>(decoy, text + 0xE00);
+                    fake.Place<ulong>(decoy + DecoyAt, text + 0xC00);
+                    fake.Place<ulong>(skill.Details + (ulong)perLevel, decoy);
+                    fake.Place<ulong>(skill.Details + HuntedAt, level);
+                    break;
+                }
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(skills), skill.Via, "no such route");
             }
