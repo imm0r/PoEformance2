@@ -277,11 +277,17 @@ public static class StyleCatalogue
         /// <summary>On the atlas page.</summary>
         public static readonly string[] Atlas = ["The atlas"];
 
+        /// <summary>On the combat page, beside the projectile switches.</summary>
+        public static readonly string[] Projectiles = ["Projectiles"];
+
         /// <summary>
-        /// On the combat page, beside the projectile switches - and the belt and the skill bar
-        /// with them, being the other things drawn about a fight rather than about a place.
+        /// On the combat page, each under its own switch. The two figures written on the HUD
+        /// used to share the projectiles' style tab, which hid their on/off - the tick of a
+        /// colour row on a tab named after something else - so each has a tab of its own now,
+        /// with the switch at the top and these rows under it.
         /// </summary>
-        public static readonly string[] Projectiles = ["Projectiles", "Flasks", "Skills"];
+        public static readonly string[] Flasks = ["Flasks"];
+        public static readonly string[] Skills = ["Skills"];
 
         /// <summary>
         /// Everything drawn on the game world itself - the markers, the routes, the layout,
@@ -321,7 +327,7 @@ public static class StyleCatalogue
 
         /// <summary>Every page's claim, for the test that keeps the mapping complete.</summary>
         public static IEnumerable<string> All()
-            => Area.Concat(Atlas).Concat(Projectiles).Concat(Markers);
+            => Area.Concat(Atlas).Concat(Projectiles).Concat(Flasks).Concat(Skills).Concat(Markers);
     }
 
     /// <summary>The entry for a key, or null when there is none.</summary>

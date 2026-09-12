@@ -2417,7 +2417,10 @@ interesting part was not the feature:
     the first slot's object and its row - every string, every reference to a row with an id -
     so the layout can be read off the screen instead of inferred from a refusal. The dat row is
     also the figure's key, because the actor's objects may not outlive an area and a dat row
-    does.
+    does. Both HUD figures have a tab of their own on the Combat page (`FigureTab`, "Belt" and
+    "Skill bar"): a master switch that IS the style entry's own hidden flag, shown where the
+    feature lives rather than as a second flag, a sentence on what the figure is and how fresh
+    it can be, the live status line, and the style rows under it.
   - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
     the minimap lives under must never come back as a piece of interface — that would take the
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while
