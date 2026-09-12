@@ -1,4 +1,5 @@
 using PoEformance.Game.Components;
+using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
 namespace PoEformance.Features;
@@ -200,6 +201,55 @@ public sealed record RuleState
     public int RareOrUniqueCountWithin(double distance) => CountWithin(distance, RareOrUnique);
 
     /// <summary>
+    /// How many live monsters are within a distance AND have unbroken ground to them.
+    /// </summary>
+    /// <remarks>
+    /// The question an autocast rule is really asking. A pack on the other side of a wall is
+    /// within the radius and within nothing else: the skill goes off, the mana goes, and the
+    /// wall takes it. Counting only what can be reached is what stops a rule firing into
+    /// scenery for as long as the player stands near it.
+    ///
+    /// NULL, NOT ZERO, when the terrain has not loaded - which is the one place this parts
+    /// company with the other counts. They answer 0 because an empty room is a real reading;
+    /// here 0 would claim the view is blocked to everything when the truth is that the map is
+    /// missing. The difference only shows on a rule written the other way round -
+    /// "MonsterCountInSight &lt; 1" as a stand-still condition - and there a confident 0 during
+    /// the first minute of a map is a rule acting on a guess.
+    /// </remarks>
+    public int? MonsterCountInSight(double distance)
+    {
+        if (Terrain is not TerrainGrid grid || PlayerAt is not (float px, float py))
+        {
+            return null;
+        }
+
+        (int fromX, int fromY) = Cell(px, py);
+        int total = 0;
+        foreach (NearMonster monster in Monsters)
+        {
+            // Sorted nearest first, so the first one out of range ends it - and that bound is
+            // what keeps this cheap: the lines walked are only the ones inside the radius, each
+            // at most radius/10.87 cells long.
+            if (monster.Distance > distance)
+            {
+                break;
+            }
+
+            (int toX, int toY) = Cell(monster.WorldX, monster.WorldY);
+            if (grid.IsClearLine(fromX, fromY, toX, toY))
+            {
+                total++;
+            }
+        }
+
+        return total;
+    }
+
+    /// <summary>The grid cell a world point falls in.</summary>
+    private static (int X, int Y) Cell(float worldX, float worldY)
+        => ((int)(worldX / MapView.WorldToGrid), (int)(worldY / MapView.WorldToGrid));
+
+    /// <summary>
     /// Where on the ground the cursor is pointing, or null when it is not over the game.
     /// </summary>
     /// <remarks>
@@ -209,6 +259,28 @@ public sealed record RuleState
     /// is rather than where the floor is.
     /// </remarks>
     public (float X, float Y)? CursorGround { get; init; }
+
+    /// <summary>Where the player stands, for the facts that measure from them in WORLD space.</summary>
+    /// <remarks>
+    /// <see cref="NearMonster.Distance"/> already answers "how far", so nothing needed this
+    /// until a fact had to draw a LINE between two absolute points.
+    /// </remarks>
+    public (float X, float Y)? PlayerAt { get; init; }
+
+    /// <summary>
+    /// The area's walkable grid, or null while it is still loading.
+    /// </summary>
+    /// <remarks>
+    /// A rule holding terrain looks like the state following something back into memory, and it
+    /// is not: this grid is read ONCE per area and is immutable afterwards - see
+    /// <see cref="TerrainGrid"/> - so what is held here is a snapshot of the same kind as
+    /// everything else on this sheet, just a large one that did not have to be copied.
+    ///
+    /// Null is a real state and a common one. Terrain populates after the area loads and on a
+    /// large map that can take a minute, so every fact built on this has to answer "I cannot
+    /// tell" rather than "nothing is in the way".
+    /// </remarks>
+    public TerrainGrid? Terrain { get; init; }
 
     /// <summary>
     /// How many live monsters are within a radius of where the CURSOR is pointing.
@@ -378,6 +450,8 @@ public sealed record RuleState
             Buffs = snapshot.PlayerBuffs,
             Belt = snapshot.FlaskBelt,
             CursorGround = OnGround(snapshot, player, pointer),
+            PlayerAt = player is WorldEntity at ? (at.WorldX, at.WorldY) : null,
+            Terrain = snapshot.Terrain,
             Monsters = NearbyMonsters(snapshot, player),
         };
     }

@@ -228,4 +228,95 @@ public class TerrainGridTests
         // ...and it is reported in GRID CELLS, because that is what the drawing works in.
         Assert.Equal(expectedLeanPixels * mask.Step, mask.LeanCells, 3);
     }
+
+    [Fact]
+    public void AClearLineNeedsEveryCellBetweenToBeWalkable()
+    {
+        // Line of sight, as near as this game lets it be answered: the reference's own
+        // technique (GameHelper2's Radar walks exactly this line over the same nibbles).
+        TerrainGrid grid = Grid(
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "..........");
+
+        Assert.True(grid.IsClearLine(0, 0, 9, 4));
+        Assert.True(grid.IsClearLine(9, 4, 0, 0));
+    }
+
+    [Fact]
+    public void AWallBetweenThemBreaksIt()
+    {
+        TerrainGrid grid = Grid(
+            "....#.....",
+            "....#.....",
+            "....#.....",
+            "....#.....",
+            "....#.....");
+
+        // Across the wall, both ways round - the walk is symmetric or it is wrong.
+        Assert.False(grid.IsClearLine(0, 2, 9, 2));
+        Assert.False(grid.IsClearLine(9, 2, 0, 2));
+
+        // Along the same side of it, untouched.
+        Assert.True(grid.IsClearLine(0, 0, 3, 4));
+        Assert.True(grid.IsClearLine(5, 0, 9, 4));
+    }
+
+    [Fact]
+    public void AGapInTheWallIsSeenThrough()
+    {
+        // The case that says the walk really follows the line rather than testing a box
+        // around it: one open cell, and only the lines that pass through it are clear.
+        TerrainGrid grid = Grid(
+            "....#.....",
+            "....#.....",
+            ".........#",
+            "....#.....",
+            "....#.....");
+
+        Assert.True(grid.IsClearLine(0, 2, 8, 2));
+        Assert.False(grid.IsClearLine(0, 0, 9, 0));
+    }
+
+    [Fact]
+    public void BothEndsAreTested()
+    {
+        // Like the reference. A monster standing on ground that reads solid - over a gap,
+        // inside scenery - is not in sight, and neither is anything measured from a player
+        // whose own cell is solid. Excluding the ends would be a tolerance invented for a
+        // problem nothing has shown.
+        TerrainGrid grid = Grid(
+            "#....",
+            ".....",
+            "....#");
+
+        Assert.False(grid.IsClearLine(0, 0, 4, 1));
+        Assert.False(grid.IsClearLine(0, 1, 4, 2));
+        Assert.True(grid.IsClearLine(0, 1, 4, 1));
+    }
+
+    [Fact]
+    public void ALineThatLeavesTheGridIsBlocked()
+    {
+        // Same rule IsWalkable follows. A line that leaves the map is blocked rather than
+        // running off the end of the buffer.
+        TerrainGrid grid = Grid(
+            ".....",
+            ".....");
+
+        Assert.False(grid.IsClearLine(0, 0, 40, 0));
+        Assert.False(grid.IsClearLine(0, 0, 0, -5));
+    }
+
+    [Fact]
+    public void OneCellIsAlwaysItsOwnAnswer()
+    {
+        TerrainGrid grid = Grid(
+            ".#");
+
+        Assert.True(grid.IsClearLine(0, 0, 0, 0));
+        Assert.False(grid.IsClearLine(1, 0, 1, 0));
+    }
 }
