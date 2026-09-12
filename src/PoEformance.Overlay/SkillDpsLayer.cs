@@ -24,6 +24,14 @@ namespace PoEformance.Overlay;
 /// inside it is contested, and after a look in game the corner was preferred: it leaves the
 /// icon's picture readable under it and reads as a count does elsewhere in the interface. The
 /// plate and the figures face are the flask figure's, and for its reasons.
+///
+/// THE SLOT ELEMENT IS THE ICON, measured rather than assumed (2026-09-12, 0.5.5): when the
+/// figure kept landing short of the corner, the slots' rectangles were drawn on screen for a
+/// round, and the frames fell exactly on the icons' own borders. So the figure is placed
+/// against the element's rectangle with no allowance for a frame or an inset, and what looked
+/// like a misplacement was the figure's width: at four tenths of a 58-pixel icon a three-glyph
+/// figure spans most of it, which is why the plate now meets the corner with no clearance.
+/// The frames are gone again; the interface browser draws any element's rectangle on request.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class SkillDpsLayer
@@ -74,30 +82,7 @@ public sealed class SkillDpsLayer
 
         IReadOnlyList<SkillSlotOnScreen> slots = snapshot.SkillSlotsOnScreen;
         IReadOnlyDictionary<ulong, int> dps = snapshot.SkillDpsByKey;
-        if (slots.Count == 0)
-        {
-            return;
-        }
-
-        // The slot rectangles as the tool has them, so a screenshot shows whether they sit on
-        // the icons the game draws: the figure is placed against these, and a figure that lands
-        // short of the corner is either the placing or the rectangle - which is a question no
-        // amount of moving the figure answers. Two pixels wide in a colour the game's frames do
-        // not use, because a one-pixel line that fell on an icon's own border went unseen.
-        if (Style.Visible(StyleCatalogue.Keys.SkillSlots))
-        {
-            uint frame = Style.Colour(StyleCatalogue.Keys.SkillSlots);
-            float thickness = Style.Width(StyleCatalogue.Keys.SkillSlots, 2f);
-            foreach (SkillSlotOnScreen slot in slots)
-            {
-                draw.AddRect(
-                    new Vector2(slot.Where.Left, slot.Where.Top),
-                    new Vector2(slot.Where.Right, slot.Where.Bottom),
-                    frame, 0f, ImDrawFlags.None, thickness);
-            }
-        }
-
-        if (dps.Count == 0)
+        if (slots.Count == 0 || dps.Count == 0)
         {
             return;
         }

@@ -152,12 +152,6 @@ public static class StyleCatalogue
         // icon. The same pair as the flask figure, for the same reasons.
         new("skill.dps", "Skills", "DPS on a skill", StyleTraits.Colour | StyleTraits.Scale, Rgb(255, 255, 255, 240)),
         new("skill.dps.plate", "Skills", "Backing under the DPS", StyleTraits.Colour, Rgb(20, 22, 26, 180)),
-        // The slot rectangles as the tool reads them off the interface - a measuring aid that
-        // lives with the figure it places, because the question it answers is about the
-        // figure: a DPS that lands short of the icon's corner is either the placing or the
-        // rectangle, and the frame says which. Magenta, which nothing on the skill bar is: a
-        // pale blue line on the icons' own borders was not noticed. Hide it once settled.
-        new("skill.slots", "Skills", "Slot frames, as the tool reads them", Line, Rgb(255, 64, 255, 220)),
 
         // ── What the area loaded ────────────────────────────────────────────
         // The card and the list have separate backings because they are read at different
@@ -231,7 +225,6 @@ public static class StyleCatalogue
         public const string FlaskUsesPlate = "flask.uses.plate";
         public const string SkillDps = "skill.dps";
         public const string SkillDpsPlate = "skill.dps.plate";
-        public const string SkillSlots = "skill.slots";
         public const string PreloadBannerBack = "preload.banner.back";
         public const string PreloadListBack = "preload.list.back";
         public const string PreloadCard = "preload.card";
@@ -255,8 +248,7 @@ public static class StyleCatalogue
             PreloadBannerBack, PreloadListBack, PreloadCard,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,
-            ProjectileMine, ProjectileOther, ProjectileTrail, FlaskUses, FlaskUsesPlate,
-            SkillDps, SkillDpsPlate, SkillSlots,
+            ProjectileMine, ProjectileOther, ProjectileTrail, FlaskUses, FlaskUsesPlate, SkillDps, SkillDpsPlate,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];
     }
