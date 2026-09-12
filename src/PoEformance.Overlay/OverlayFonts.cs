@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using ImGuiNET;
 
@@ -25,6 +26,12 @@ namespace PoEformance.Overlay;
 /// is also the face somebody reads an address out of and types back in, where 0/O and 1/l have
 /// to be different shapes - see <see cref="ImGuiText.Mono(string)"/> for where it is used.
 ///
+/// A FOURTH, the monospace again at a display size and holding only the digits, for figures
+/// written on the GAME rather than in a window - the count on a flask. The monospace, because
+/// its digits are lining: the serif's are old-style, where a 6 stands taller than a 7, and two
+/// flasks side by side showed exactly that. The display size, because such a figure is drawn at
+/// two or three times the text size, and a glyph magnified that far is a soft one.
+///
 /// THE POINTERS ARE ONLY VALID BETWEEN REBUILDS. The atlas is cleared and rebuilt whenever the
 /// text size changes (see <c>EntityOverlay.WearASerif</c>), which invalidates every ImFontPtr
 /// handed out before it. That is safe here only because of WHEN it happens: the rebuild runs on
@@ -34,10 +41,34 @@ namespace PoEformance.Overlay;
 [SupportedOSPlatform("windows")]
 public static class OverlayFonts
 {
+    /// <summary>Pixels the display figures are rasterised at.</summary>
+    /// <remarks>
+    /// FIXED rather than derived from the text size, because what these figures are drawn on
+    /// is the game's own interface: a flask slot is 115 units tall whatever the text size is
+    /// set to, so the figure follows the window, not the setting. Forty-eight sits a little
+    /// above the figure on a 1440-pixel-tall window, which makes that window and every smaller
+    /// one a slight downscale - sharp - and leaves only 4K magnifying, by about a third.
+    /// </remarks>
+    public const int FigureSize = 48;
+
     private static ImFontPtr _heading;
     private static bool _have;
     private static ImFontPtr _mono;
     private static bool _haveMono;
+    private static ImFontPtr _figures;
+    private static bool _haveFigures;
+
+    /// <summary>The digits, as the glyph range ImGui takes: inclusive pairs, zero-terminated.</summary>
+    /// <remarks>
+    /// ON THE PINNED HEAP, because ImGui keeps the POINTER for as long as the font lives rather
+    /// than a copy of the list - an ordinary array would be a range that moves under it on the
+    /// next collection. Digits only, since that is all the figures face is asked for, and it
+    /// keeps ten large glyphs out of an atlas that would otherwise carry ninety-five.
+    /// </remarks>
+    private static readonly ushort[] Digits = PinnedDigits();
+
+    /// <summary>The glyph range for <see cref="RebuiltFigures"/>'s font: the ten digits.</summary>
+    public static IntPtr DigitRange => Marshal.UnsafeAddrOfPinnedArrayElement(Digits, 0);
 
     /// <summary>Says the atlas was rebuilt and which font came out of it as the heading.</summary>
     /// <remarks>
@@ -64,6 +95,13 @@ public static class OverlayFonts
         _haveMono = true;
     }
 
+    /// <summary>The same, for the display figures - the monospace at <see cref="FigureSize"/>.</summary>
+    public static void RebuiltFigures(ImFontPtr figures)
+    {
+        _figures = figures;
+        _haveFigures = true;
+    }
+
     /// <summary>Says there is no face beyond the body one, so everything falls back to it.</summary>
     /// <remarks>
     /// The honest state rather than an assumption: the fonts come from the machine's own
@@ -75,6 +113,7 @@ public static class OverlayFonts
     {
         _have = false;
         _haveMono = false;
+        _haveFigures = false;
     }
 
     /// <summary>Whether a heading face is available at all.</summary>
@@ -82,6 +121,9 @@ public static class OverlayFonts
 
     /// <summary>Whether a monospaced face is available at all.</summary>
     public static bool HasMono => _haveMono;
+
+    /// <summary>Whether the display figures are available at all.</summary>
+    public static bool HasFigures => _haveFigures;
 
     /// <summary>Draws whatever the callback draws in the heading face.</summary>
     /// <remarks>
@@ -199,5 +241,37 @@ public static class OverlayFonts
         {
             ImGui.PopFont();
         }
+    }
+
+    /// <summary>Sets the display figures as the face, until <see cref="PopFigures"/>.</summary>
+    /// <remarks>
+    /// A pair like the monospace's, and for a caller that draws with a draw list rather than
+    /// through widgets: what it wants from the push is <c>ImGui.GetFont()</c> and the measuring
+    /// that goes with it, and it draws the text itself at the size it needs. Only the digits are
+    /// in this face - anything else drawn while it is pushed comes out as the missing-glyph mark.
+    /// </remarks>
+    public static void PushFigures()
+    {
+        if (_haveFigures)
+        {
+            ImGui.PushFont(_figures);
+        }
+    }
+
+    /// <summary>Undoes exactly one <see cref="PushFigures"/>.</summary>
+    public static void PopFigures()
+    {
+        if (_haveFigures)
+        {
+            ImGui.PopFont();
+        }
+    }
+
+    private static ushort[] PinnedDigits()
+    {
+        ushort[] range = GC.AllocateArray<ushort>(3, pinned: true);
+        range[0] = '0';
+        range[1] = '9';
+        return range;
     }
 }
