@@ -42,19 +42,22 @@ public sealed class SkillDpsLayer
     /// <summary>Smallest the figure is drawn, whatever the icon and the scale come to.</summary>
     private const float SmallestFigure = 9f;
 
+    /// <summary>How far the plate reaches beyond the ink, as shares of the figure's size.</summary>
+    /// <remarks>
+    /// Less than the flask figure's plate wears, because this one is a badge: two looks in game
+    /// asked for the figure further into the corner, and at four tenths of a 58-pixel icon the
+    /// only room left to move into was the plate's own padding.
+    /// </remarks>
+    private const float PlateBeside = 0.11f;
+    private const float PlateAbove = 0.12f;
+    private const float PlateRounding = 0.2f;
+
     /// <summary>
     /// How far the figure's ink stands off the icon's right and top edges, as shares of its
-    /// size - each the plate's own reach that way plus a hair of clearance, so the plate sits
-    /// in the corner rather than near it. A look in game asked for it tighter than the first
-    /// build's even margin.
+    /// size: exactly the plate's reach that way, so the plate's corner IS the icon's corner.
     /// </summary>
-    private const float InsetBeside = 0.24f;
-    private const float InsetAbove = 0.16f;
-
-    /// <summary>How far the plate reaches beyond the ink, as shares of the figure's size.</summary>
-    private const float PlateBeside = 0.22f;
-    private const float PlateAbove = 0.14f;
-    private const float PlateRounding = 0.2f;
+    private const float InsetBeside = PlateBeside;
+    private const float InsetAbove = PlateAbove;
 
     /// <summary>How every drawn thing looks. Shared with the overlay; also where this is switched off.</summary>
     public OverlayStyle Style { get; set; } = new();
@@ -79,11 +82,12 @@ public sealed class SkillDpsLayer
         // The slot rectangles as the tool has them, so a screenshot shows whether they sit on
         // the icons the game draws: the figure is placed against these, and a figure that lands
         // short of the corner is either the placing or the rectangle - which is a question no
-        // amount of moving the figure answers.
+        // amount of moving the figure answers. Two pixels wide in a colour the game's frames do
+        // not use, because a one-pixel line that fell on an icon's own border went unseen.
         if (Style.Visible(StyleCatalogue.Keys.SkillSlots))
         {
             uint frame = Style.Colour(StyleCatalogue.Keys.SkillSlots);
-            float thickness = Style.Width(StyleCatalogue.Keys.SkillSlots, 1f);
+            float thickness = Style.Width(StyleCatalogue.Keys.SkillSlots, 2f);
             foreach (SkillSlotOnScreen slot in slots)
             {
                 draw.AddRect(

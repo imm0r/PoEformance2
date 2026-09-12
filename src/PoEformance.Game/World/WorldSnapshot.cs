@@ -1797,10 +1797,12 @@ public sealed class WorldReader
                 System.Globalization.CultureInfo.InvariantCulture,
                 $"   first slot at {where.Left:0},{where.Top:0} {where.Width:0}×{where.Height:0} px");
 
+        // The panel's state before the table's: the line runs off a narrow window's right edge,
+        // and the panel is the part that changes while somebody is watching.
         _skillsNote =
             $"{slots.Count} slots, {matched} with a skill ({_notedBar}){placed}"
-            + $"   table {_skills.Count} ({_notedKeyed} keyed, {_notedNamed} named, {_notedRoute}){sample}"
-            + $"   dps for {_notedDps}   panel: {_notedPanel}";
+            + $"   dps for {_notedDps}   panel: {_notedPanel}"
+            + $"   table {_skills.Count} ({_notedKeyed} keyed, {_notedNamed} named, {_notedRoute}){sample}";
         return _skillsNote;
     }
 

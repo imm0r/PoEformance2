@@ -155,8 +155,9 @@ public static class StyleCatalogue
         // The slot rectangles as the tool reads them off the interface - a measuring aid that
         // lives with the figure it places, because the question it answers is about the
         // figure: a DPS that lands short of the icon's corner is either the placing or the
-        // rectangle, and the frame says which. Hide it once that is settled.
-        new("skill.slots", "Skills", "Slot frames, as the tool reads them", Line, Rgb(89, 179, 255, 200)),
+        // rectangle, and the frame says which. Magenta, which nothing on the skill bar is: a
+        // pale blue line on the icons' own borders was not noticed. Hide it once settled.
+        new("skill.slots", "Skills", "Slot frames, as the tool reads them", Line, Rgb(255, 64, 255, 220)),
 
         // ── What the area loaded ────────────────────────────────────────────
         // The card and the list have separate backings because they are read at different
