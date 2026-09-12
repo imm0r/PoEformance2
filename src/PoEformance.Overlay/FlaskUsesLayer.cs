@@ -27,6 +27,12 @@ namespace PoEformance.Overlay;
 /// CHARMS ARE LEFT ALONE. They arrive through the same belt and the same bar, but the game
 /// prints their charges itself, and a second number beside the game's own would read as a
 /// disagreement.
+///
+/// ON A PLATE, the same one the room names stand on. The first build set the figure pale with
+/// a dark edge and nothing else, and the edge was not enough: what is under the figure is
+/// whatever colour the flask is, and a life flask's glare swallowed the pale digit. The plate
+/// has a style key of its own, so how much of the flask shows through is the user's to set,
+/// and a belt of dark flasks can hide it outright.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class FlaskUsesLayer
@@ -41,6 +47,17 @@ public sealed class FlaskUsesLayer
 
     /// <summary>Smallest the figure is drawn, whatever the slot and the scale come to.</summary>
     private const float SmallestFigure = 10f;
+
+    /// <summary>How far the plate reaches beyond the figure, beside it and above and below, as shares of its size.</summary>
+    /// <remarks>
+    /// More beside than above: a line of text already carries room for ascenders and
+    /// descenders that a digit does not use, so the plate would look tall before it looked wide.
+    /// </remarks>
+    private const float PlateBeside = 0.2f;
+    private const float PlateAbove = 0.02f;
+
+    /// <summary>The plate's corner radius, as a share of the figure's size.</summary>
+    private const float PlateRounding = 0.2f;
 
     /// <summary>How every drawn thing looks. Shared with the overlay.</summary>
     /// <remarks>
@@ -69,7 +86,17 @@ public sealed class FlaskUsesLayer
 
         uint colour = Style.Colour(StyleCatalogue.Keys.FlaskUses);
         uint empty = Empty(colour);
+        uint plate = Style.Visible(StyleCatalogue.Keys.FlaskUsesPlate)
+            ? Style.Colour(StyleCatalogue.Keys.FlaskUsesPlate)
+            : 0;
+
+        // In the heading face where the machine has one: the figure is drawn at two or three
+        // times the interface's text size, and a glyph rasterised larger is magnified less on
+        // the way there, which is the difference between a soft digit and a sharp one. ImGui
+        // measures in whatever font is pushed, so the measuring happens inside the pair too.
+        OverlayFonts.PushHeading();
         ImFontPtr font = ImGui.GetFont();
+        float natural = ImGui.GetFontSize();
 
         foreach (FlaskSlotOnScreen slot in slots)
         {
@@ -85,15 +112,21 @@ public sealed class FlaskUsesLayer
                 SmallestFigure,
                 Style.Sized(StyleCatalogue.Keys.FlaskUses, slot.Where.Height * FigureShare));
 
-            // Measured at the interface's size and scaled, which is what ImGui offers without
-            // pushing a font - a bitmap face scales linearly anyway.
-            Vector2 extent = ImGui.CalcTextSize(text) * (size / ImGui.GetFontSize());
+            Vector2 extent = ImGui.CalcTextSize(text) * (size / natural);
             var at = new Vector2(
                 slot.Where.Left + ((slot.Where.Width - extent.X) / 2f),
                 slot.Where.Top + ((slot.Where.Height - extent.Y) / 2f));
 
+            if (plate != 0)
+            {
+                var reach = new Vector2(size * PlateBeside, size * PlateAbove);
+                draw.AddRectFilled(at - reach, at + extent + reach, plate, size * PlateRounding);
+            }
+
             Written(draw, font, at, text, size, uses > 0 ? colour : empty);
         }
+
+        OverlayFonts.PopHeading();
     }
 
     /// <summary>The belt's flask with this item, or null when the belt does not list it.</summary>

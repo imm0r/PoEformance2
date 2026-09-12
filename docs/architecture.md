@@ -2366,7 +2366,9 @@ interesting part was not the feature:
     children that churn (one under a charm slot sat at a different address on each of three
     looks), and a search per loss would be a search per tick the day one of them carries an
     item. Charms are left alone on purpose: the game prints their charges itself, and a second
-    number beside its own reads as a disagreement.
+    number beside its own reads as a disagreement. The figure stands on the same plate the
+    room names use, with a style key of its own for how much flask shows through: the first
+    build trusted a dark edge alone, and a life flask's glare swallowed the pale digit.
   - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
     the minimap lives under must never come back as a piece of interface — that would take the
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while
