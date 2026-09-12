@@ -155,9 +155,12 @@ public class SkillPanelReaderTests
         Assert.Equal(UiTree.At(List), reader.Element);
         Assert.Equal("SkillPanel", reader.PanelName);
 
-        // Where the pointer was found: on the icon, the header's fifth child, at the slot's offset.
+        // Where the pointer was found: on the icon, the header's fifth child, at the slot's
+        // offset - and the names as the rows spell them, quoted, for the readout.
         int at = schema.Structs["SkillBarSlot"].OffsetOf("ActiveSkillPtr");
-        Assert.Equal($"2 rows read, 2 by pointer (header child 4+0x{at:X}), 0 by name", reader.Note);
+        Assert.Equal(
+            $"2 rows read, 2 by pointer (header child 4+0x{at:X}), 0 by name; rows \"Spark\" \"Orb of Storms\"",
+            reader.Note);
     }
 
     [Fact]
@@ -165,16 +168,17 @@ public class SkillPanelReaderTests
     {
         // What the game turned out to do: no skill pointer anywhere on a row. The row prints
         // the skill's displayed name, the skill's dat row spells it the same, and that is the
-        // join - reported as such.
+        // join - reported as such. The spaces the interface pads a text with do not count.
         OffsetSchema schema = Schema();
         (UiTree tree, PlayerSkills skills) = Window(schema, pointerAt: NoPointer);
+        PlaceText(tree, schema, SparkRow + 7, " Spark ");
         SkillPanelReader reader = Reader(tree, schema);
 
         reader.Read(UiTree.At(Root), 0, skills);
 
         Assert.Equal(53838, reader.Dps[skills.KeyOf(Spark)]);
         Assert.Equal(77522, reader.Dps[skills.KeyOf(Orb)]);
-        Assert.Equal("2 rows read, 0 by pointer (none), 2 by name", reader.Note);
+        Assert.Equal("2 rows read, 0 by pointer (none), 2 by name; rows \" Spark \" \"Orb of Storms\"", reader.Note);
     }
 
     [Fact]

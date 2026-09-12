@@ -218,11 +218,17 @@ public sealed class SkillPanelReader
     private int _ruleOffset;
     private string _ruleNote = "none";
     private string _note = "not seen yet";
+    private string _rowNames = string.Empty;
     private int _notedRows = -1;
     private int _notedByPointer = -1;
     private int _notedByName = -1;
     private int _notedDps = -1;
     private string _notedRule = string.Empty;
+    private string _notedRowNames = string.Empty;
+    private readonly List<string> _names = [];
+
+    /// <summary>How many of the rows' names the readout quotes.</summary>
+    private const int NamesQuoted = 4;
 
     /// <summary>What was found on one row, kept so a refresh costs two string reads and not a search.</summary>
     private sealed class Row
@@ -313,17 +319,28 @@ public sealed class SkillPanelReader
         ulong list = ResolveList(panel, nowMs);
         (int read, int byPointer, int byName) = list == 0 ? (0, 0, 0) : ReadRows(list, skills);
 
+        // The names as the rows spell them, quoted, so a readout shows a stray space or a
+        // marker the game put in the text - the difference between a name that matches and
+        // one that only looks as if it should.
+        string rowNames = _names.Count == 0 ? string.Empty : "\"" + string.Join("\" \"", _names) + "\"";
+        if (!string.Equals(rowNames, _rowNames, StringComparison.Ordinal))
+        {
+            _rowNames = rowNames;
+        }
+
         if (read != _notedRows || byPointer != _notedByPointer || byName != _notedByName
-            || _dps.Count != _notedDps || !ReferenceEquals(_ruleNote, _notedRule))
+            || _dps.Count != _notedDps || !ReferenceEquals(_ruleNote, _notedRule)
+            || !ReferenceEquals(_rowNames, _notedRowNames))
         {
             _notedRows = read;
             _notedByPointer = byPointer;
             _notedByName = byName;
             _notedDps = _dps.Count;
             _notedRule = _ruleNote;
+            _notedRowNames = _rowNames;
             _note = list == 0
                 ? $"open ({_panelName}), no rows found"
-                : $"{read} rows read, {byPointer} by pointer ({_ruleNote}), {byName} by name";
+                : $"{read} rows read, {byPointer} by pointer ({_ruleNote}), {byName} by name; rows {_rowNames}";
         }
     }
 
@@ -447,6 +464,7 @@ public sealed class SkillPanelReader
         int read = 0;
         int byPointer = 0;
         int byName = 0;
+        _names.Clear();
         foreach (ulong row in _elements.Children(list, _mostRows))
         {
             if (!_elements.IsShowingItself(row))
@@ -493,15 +511,21 @@ public sealed class SkillPanelReader
             }
 
             // The name, where no pointer answered: the row prints the skill's displayed name,
-            // and the skill's dat row spells it the same.
+            // and the skill's dat row spells it the same - give or take the spaces the
+            // interface pads a text with, which the trim is for.
             if (parts.Skill == 0 && name.Length > 0)
             {
-                parts.Skill = skills.ByName(name);
+                ReadOnlySpan<char> trimmed = name.AsSpan().Trim();
+                parts.Skill = skills.ByName(trimmed.Length == name.Length ? name : trimmed.ToString());
                 parts.ByName = parts.Skill != 0;
             }
 
             int? dps = DpsText.Parse(_reader.ReadStdWString(parts.Dps + (ulong)_text));
             read++;
+            if (_names.Count < NamesQuoted)
+            {
+                _names.Add(name);
+            }
 
             if (parts.Skill != 0)
             {
