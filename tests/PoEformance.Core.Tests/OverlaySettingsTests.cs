@@ -142,6 +142,8 @@ public class OverlaySettingsRoundTripTests
             TerrainColour: "#112233",
             TerrainThickness: 3,
             TerrainRim: false,
+            TerrainFillColour: "#102030",
+            TerrainFillOpacity: 35,
             HideNoise: false,
             RememberOutOfRange: false,
             ShowPoi: false,
@@ -318,6 +320,8 @@ public class OverlaySettingsMergeTests
             TerrainColour = "#010203",
             TerrainThickness = 4,
             TerrainRim = false,
+            TerrainFillColour = "#040506",
+            TerrainFillOpacity = 15,
             ShowTerrain = false,
         };
 
@@ -327,7 +331,34 @@ public class OverlaySettingsMergeTests
         Assert.Equal("#010203", merged.TerrainColour);
         Assert.Equal(4, merged.TerrainThickness);
         Assert.False(merged.TerrainRim);
+        Assert.Equal("#040506", merged.TerrainFillColour);
+        Assert.Equal(15, merged.TerrainFillOpacity);
         Assert.False(merged.ShowTerrain);
+    }
+
+    [Fact]
+    public void TheFillStaysAPercentageOfAColour()
+    {
+        // The page's slider says 0 to 100 and the file can say anything; a colour that does not
+        // parse falls back rather than drawing a fill of nothing in particular.
+        PoEformance.Features.OverlaySettings tooMuch = (PoEformance.Features.OverlaySettings.Default with
+        {
+            TerrainFillOpacity = 140,
+            TerrainFillColour = "navy",
+        }).Normalised();
+
+        Assert.Equal(100, tooMuch.TerrainFillOpacity);
+        Assert.Equal(PoEformance.Features.OverlaySettings.Default.TerrainFillColour, tooMuch.TerrainFillColour);
+        Assert.Equal(0, (PoEformance.Features.OverlaySettings.Default with { TerrainFillOpacity = -5 }).Normalised().TerrainFillOpacity);
+
+        // Packed for the overlay: the colour's own bytes under an alpha that is the percentage,
+        // rounded - so the default's 70 is 179 of 255, not 178.
+        uint packed = PoEformance.Features.OverlaySettings.Default.TerrainFillPacked;
+        Assert.Equal(179u, packed >> 24);
+        Assert.Equal(
+            PoEformance.Features.OverlaySettings.ParseColour("#0B1B2B") & 0x00FF_FFFF,
+            packed & 0x00FF_FFFF);
+        Assert.Equal(0u, PoEformance.Features.OverlaySettings.WithOpacity(0xFFFFFFFFu, 0) >> 24);
     }
 
     [Fact]

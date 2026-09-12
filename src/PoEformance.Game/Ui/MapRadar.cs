@@ -127,6 +127,20 @@ public readonly record struct MapView(
         => Zoom > 0 ? (float)(Diagonal * Math.Cos(CameraAngle) * Zoom / ScaleBase) : 0f;
 
     /// <summary>
+    /// How long one grid cell's EDGE is on this map, in pixels.
+    /// </summary>
+    /// <remarks>
+    /// Not the same number as <see cref="PixelsPerGridCell"/>, which is the horizontal extent
+    /// of a step. A unit step along either grid axis projects to (cos, -sin) or (-cos, -sin)
+    /// in the transform below, and both of those have length ONE times the scale - the cell
+    /// is a rhombus on screen whose sides are this long. It is what a texture stretched over
+    /// the grid is sampled at, so it is the figure that says whether a texel is bigger or
+    /// smaller than a screen pixel.
+    /// </remarks>
+    public float PixelsPerCellEdge
+        => Zoom > 0 ? Diagonal * Zoom / ScaleBase : 0f;
+
+    /// <summary>
     /// Projects a world position onto this map, relative to the player.
     /// </summary>
     /// <remarks>

@@ -108,6 +108,95 @@ public static class TerrainOutline
     }
 
     /// <summary>
+    /// How much of each of the outline's pixels is walkable floor, 0 to 255.
+    /// </summary>
+    /// <remarks>
+    /// The FILL under the line: the floor as a sheet, the way the game's own map draws the
+    /// parts it has revealed. On the same pixels as <paramref name="mask"/>, at the same step
+    /// and with the same height displacement, so the sheet ends exactly where the line is
+    /// drawn - built at a different resolution or a different height, it would peel away
+    /// from its own edge on every slope.
+    ///
+    /// A COVERAGE rather than a flag, because a pixel at a thinning step of two holds four
+    /// cells and the edge of the floor runs through some of them. Counting gives those pixels
+    /// a proportionate alpha, which is the edge anti-aliased for nothing; a flag would give
+    /// them the full sheet and grow the floor by up to a pixel all round.
+    ///
+    /// Every walkable cell is visited, where the outline visits only the boundary, and the
+    /// height lookup is the expensive part of a visit. Without sub-tile heights every cell of
+    /// a tile has the tile's height, so it is looked up once per tile per row there and only
+    /// per cell where the slope inside a tile is actually known. Once per area, on the render
+    /// thread, like the outline it belongs to.
+    /// </remarks>
+    public static byte[] Fill(TerrainGrid grid, OutlineMask mask, bool isoHeightShift)
+    {
+        ArgumentNullException.ThrowIfNull(grid);
+        ArgumentNullException.ThrowIfNull(mask);
+
+        int step = mask.Step;
+        int width = mask.Width;
+        int height = mask.Height;
+        var counts = new ushort[width * height];
+
+        bool perCell = isoHeightShift && grid.HasSubTileHeights;
+        bool perTile = isoHeightShift && !perCell && grid.HasHeights;
+
+        for (int y = 0; y < grid.Height; y++)
+        {
+            int shift = 0;
+            int tileEnd = -1;
+            for (int x = 0; x < grid.Width; x++)
+            {
+                if (!grid.IsWalkable(x, y))
+                {
+                    continue;
+                }
+
+                if (perCell)
+                {
+                    shift = grid.IsoHeightShift(x, y);
+                }
+                else if (perTile && x >= tileEnd)
+                {
+                    shift = grid.IsoHeightShift(x, y);
+                    tileEnd = ((x / TerrainGrid.CellsPerTile) + 1) * TerrainGrid.CellsPerTile;
+                }
+
+                // Displaced exactly as the outline's cells are, and dropped at the picture's
+                // edge for the same reason - see Build.
+                int sx = x - shift;
+                int sy = y - shift;
+                if (sx < 0 || sy < 0)
+                {
+                    continue;
+                }
+
+                int bx = sx / step;
+                int by = sy / step;
+                if (bx < width && by < height)
+                {
+                    counts[(by * width) + bx]++;
+                }
+            }
+        }
+
+        // Cells from two heights can land in one pixel where the ground steps up, so the
+        // count can exceed a full block; a pixel is never more than entirely floor.
+        int full = step * step;
+        var coverage = new byte[counts.Length];
+        for (int i = 0; i < counts.Length; i++)
+        {
+            int count = counts[i];
+            if (count != 0)
+            {
+                coverage[i] = (byte)Math.Min(255, ((count * 255) + (full / 2)) / full);
+            }
+        }
+
+        return coverage;
+    }
+
+    /// <summary>
     /// The mask grown by <paramref name="pixels"/> on every side - the line plus a rim around it.
     /// </summary>
     /// <remarks>
