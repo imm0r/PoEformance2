@@ -455,7 +455,8 @@ public sealed record WorldSnapshot(
     IReadOnlyList<SkillSlotOnScreen>? SkillSlots = null,
     IReadOnlyDictionary<ulong, int>? SkillDps = null,
     string? SkillsNote = null,
-    string? SkillsSurvey = null)
+    string? SkillsSurvey = null,
+    string? SkillsPanel = null)
 {
     /// <summary>The belt's slots on screen, empty when the bar is not - or was not read.</summary>
     public IReadOnlyList<FlaskSlotOnScreen> FlaskSlotsOnScreen => FlaskSlots ?? [];
@@ -472,6 +473,12 @@ public sealed record WorldSnapshot(
 
     /// <summary>What the first slot's skill object and its row hold, quoted - for the status readout.</summary>
     public string SkillsSurveyReadout => SkillsSurvey ?? string.Empty;
+
+    /// <summary>
+    /// The Skills panel's own state, on its own: read, shut, or never opened - what the skill
+    /// bar's tab shows beside its switch, where the whole skills line would be noise.
+    /// </summary>
+    public string SkillsPanelReadout => SkillsPanel ?? string.Empty;
 
     /// <summary>The parts of the game's interface on screen, empty when none were read.</summary>
     /// <remarks>
@@ -1727,7 +1734,8 @@ public sealed class WorldReader
             skillSlots,
             _skillPanel.Dps,
             SkillsNote(skillSlots),
-            SkillsSurvey(skillSlots));
+            SkillsSurvey(skillSlots),
+            _skillPanel.Note);
     }
 
     /// <summary>The survey of the first slot's skill object, or nothing while no slot has one.</summary>

@@ -2579,6 +2579,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _tools.Add(
                 36, "projectiles-style", "How projectiles look", styles.Draw, styles.Idle,
                 page: Combat);
+
+            // The two figures written on the HUD, a tab each: the switch somebody looks for
+            // on this page, and the figure's looks under it. See FigureTab for why the switch
+            // is the style's own rather than a flag of its own.
+            var belt = new FigureTab(
+                Style, SaveStyle, StyleCatalogue.Keys.FlaskUses, "Uses Left on the Flasks",
+                FigureTab.BeltExplanation, StyleCatalogue.Homes.Flasks, FigureTab.BeltStatus);
+            _tools.Add(37, "belt", "Belt", () => belt.Draw(_snapshot), belt.Idle, page: Combat);
+
+            var skillBar = new FigureTab(
+                Style, SaveStyle, StyleCatalogue.Keys.SkillDps, "DPS on the Skill Bar",
+                FigureTab.SkillBarExplanation, StyleCatalogue.Homes.Skills, FigureTab.SkillBarStatus);
+            _tools.Add(38, "skillbar", "Skill bar", () => skillBar.Draw(_snapshot), skillBar.Idle, page: Combat);
         }
 
         // The same first-use registration, and for the same reason: the two callbacks it needs
