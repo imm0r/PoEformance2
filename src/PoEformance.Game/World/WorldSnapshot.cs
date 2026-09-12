@@ -454,7 +454,8 @@ public sealed record WorldSnapshot(
     // SkillSlotOnScreen.Key. See SkillBarReader and SkillPanelReader; the note is for the readout.
     IReadOnlyList<SkillSlotOnScreen>? SkillSlots = null,
     IReadOnlyDictionary<ulong, int>? SkillDps = null,
-    string? SkillsNote = null)
+    string? SkillsNote = null,
+    string? SkillsSurvey = null)
 {
     /// <summary>The belt's slots on screen, empty when the bar is not - or was not read.</summary>
     public IReadOnlyList<FlaskSlotOnScreen> FlaskSlotsOnScreen => FlaskSlots ?? [];
@@ -468,6 +469,9 @@ public sealed record WorldSnapshot(
 
     /// <summary>What the skill readers found, in a line - for the status readout.</summary>
     public string SkillsReadout => SkillsNote ?? string.Empty;
+
+    /// <summary>What the first slot's skill object and its row hold, quoted - for the status readout.</summary>
+    public string SkillsSurveyReadout => SkillsSurvey ?? string.Empty;
 
     /// <summary>The parts of the game's interface on screen, empty when none were read.</summary>
     /// <remarks>
@@ -1721,7 +1725,22 @@ public sealed class WorldReader
             flaskSlots,
             skillSlots,
             _skillPanel.Dps,
-            SkillsNote(skillSlots));
+            SkillsNote(skillSlots),
+            SkillsSurvey(skillSlots));
+    }
+
+    /// <summary>The survey of the first slot's skill object, or nothing while no slot has one.</summary>
+    private string SkillsSurvey(IReadOnlyList<SkillSlotOnScreen> slots)
+    {
+        foreach (SkillSlotOnScreen slot in slots)
+        {
+            if (slot.Skill != 0)
+            {
+                return _skills.SurveyOf(slot.Skill);
+            }
+        }
+
+        return string.Empty;
     }
 
     /// <summary>The skills line of the readout, from the readers' own notes.</summary>

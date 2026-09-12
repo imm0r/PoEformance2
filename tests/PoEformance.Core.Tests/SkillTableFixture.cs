@@ -34,6 +34,12 @@ internal static class SkillTableFixture
     /// <summary>Where an ActiveSkills row keeps its name when it is not where the schema says.</summary>
     public const int NameElsewhereAt = 0x18;
 
+    /// <summary>Where a GrantedEffects row keeps its ActiveSkill reference when it is at neither known column.</summary>
+    public const int ColumnElsewhereAt = 0x63;
+
+    /// <summary>Where such a row holds a second id-shaped string, which is not a name.</summary>
+    public const int DecoyAt = 0x38;
+
     /// <summary>How a skill object leads to its dat row.</summary>
     public enum Route
     {
@@ -48,6 +54,13 @@ internal static class SkillTableFixture
 
         /// <summary>A GrantedEffects row where the references say the per-level row is - one hop shorter.</summary>
         GrantedEffectsRowInPlaceOfPerLevel,
+
+        /// <summary>
+        /// The same, with the ActiveSkill reference at <see cref="ColumnElsewhereAt"/> rather than at
+        /// either column the witnesses name, and a second id-shaped string in the row at
+        /// <see cref="DecoyAt"/> - the shape the third run in game showed.
+        /// </summary>
+        GrantedEffectsRowWithColumnElsewhere,
 
         /// <summary>A direct pointer at <see cref="HuntedAt"/>, where no known place holds one.</summary>
         Hunted,
@@ -124,9 +137,9 @@ internal static class SkillTableFixture
             PlaceText(fake, text + 0x400, skill.Name);
             PlaceText(fake, text + 0x800, skill.Id + "Player");
 
-            // The rows exist as wholes too, for the name search, under the fields placed after.
-            fake.Place(row, new byte[Game.Components.PlayerSkills.NameHuntBytes]);
-            fake.Place(granted, new byte[0x80]);
+            // The rows exist as wholes too, for the searches, under the fields placed after.
+            fake.Place(row, new byte[Game.Components.PlayerSkills.RowHuntBytes]);
+            fake.Place(granted, new byte[Game.Components.PlayerSkills.RowHuntBytes]);
             fake.Place(level, new byte[0x40]);
 
             // The ActiveSkills row: id, then displayed name. The GrantedEffects row: its own id,
@@ -136,9 +149,19 @@ internal static class SkillTableFixture
             int nameAt = skill.Via == Route.NameElsewhere ? NameElsewhereAt : displayedName;
             fake.Place<ulong>(row + (ulong)nameAt, skill.Name.Length > 0 ? text + 0x400 : 0UL);
             fake.Place<ulong>(granted, text + 0x800);
-            fake.Place<ulong>(
-                granted + (ulong)(skill.Via == Route.ThroughGrantedEffectsPerReference ? activeSkillPerReference : activeSkill),
-                row);
+            int column = skill.Via switch
+            {
+                Route.ThroughGrantedEffectsPerReference => activeSkillPerReference,
+                Route.GrantedEffectsRowWithColumnElsewhere => ColumnElsewhereAt,
+                _ => activeSkill,
+            };
+            fake.Place<ulong>(granted + (ulong)column, row);
+            if (skill.Via == Route.GrantedEffectsRowWithColumnElsewhere)
+            {
+                PlaceText(fake, text + 0xC00, "QuakeSlam");
+                fake.Place<ulong>(granted + DecoyAt, text + 0xC00);
+            }
+
             fake.Place<ulong>(level + (ulong)grantedEffect, granted);
 
             switch (skill.Via)
@@ -152,6 +175,7 @@ internal static class SkillTableFixture
                     fake.Place<ulong>(skill.Details + (ulong)perLevel, level);
                     break;
                 case Route.GrantedEffectsRowInPlaceOfPerLevel:
+                case Route.GrantedEffectsRowWithColumnElsewhere:
                     fake.Place<ulong>(skill.Details + (ulong)perLevel, granted);
                     break;
                 case Route.Hunted:

@@ -3120,6 +3120,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Row("skills", _snapshot.SkillsReadout, figure: true);
             }
 
+            // The layout as read, for the first slot's skill: what the object's pointers lead
+            // to and what its row holds. A refusal above says what is not there; this says
+            // what is.
+            if (_snapshot.SkillsSurveyReadout.Length > 0)
+            {
+                Row("skillrow", _snapshot.SkillsSurveyReadout, figure: true);
+            }
+
             if (FlaskStatus is not null)
             {
                 Row("flask", FlaskStatus(), OverlayInk.Accent);
