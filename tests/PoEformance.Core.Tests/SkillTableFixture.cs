@@ -10,21 +10,48 @@ namespace PoEformance.Core.Tests;
 /// <remarks>
 /// Through the schema rather than with constants, for the reason <see cref="UiTree"/> gives.
 /// Shared between the table's own tests and the two readers that match pointers against it.
+///
+/// Each skill's dat row is reachable the way the test asks - straight from the object, through
+/// the GrantedEffectsPerLevel chain at either column, only by a search of the object, or not at
+/// all - because which way the game offers is exactly what the reader has to settle.
 /// </remarks>
 internal static class SkillTableFixture
 {
-    /// <summary>Where the table's entries are laid, well away from anything a UiTree places.</summary>
+    /// <summary>Where the table's parts are laid, well away from anything a UiTree places.</summary>
     private const ulong Entries = 0x0000_0500_1000_0000;
     private const ulong Rows = 0x0000_0500_3000_0000;
+    private const ulong Granted = 0x0000_0500_3100_0000;
+    private const ulong PerLevel = 0x0000_0500_3200_0000;
     private const ulong Texts = 0x0000_0500_4000_0000;
 
     /// <summary>Longer than anything a reader asks for, so a string read never runs off the end.</summary>
     private const int TextBytes = 512;
 
+    /// <summary>Where a skill object keeps its row pointer when it has to be hunted for.</summary>
+    public const int HuntedAt = 0x38;
+
+    /// <summary>How a skill object leads to its dat row.</summary>
+    public enum Route
+    {
+        /// <summary>The direct pointer the references name and do not use.</summary>
+        Direct,
+
+        /// <summary>GrantedEffectsPerLevel, then GrantedEffects, then the computed ActiveSkill column.</summary>
+        ThroughGrantedEffects,
+
+        /// <summary>The same chain, with the ActiveSkill column where GameHelper2 reads it.</summary>
+        ThroughGrantedEffectsPerReference,
+
+        /// <summary>A direct pointer at <see cref="HuntedAt"/>, where no known place holds one.</summary>
+        Hunted,
+    }
+
     /// <summary>One skill as the table would hold it.</summary>
     /// <param name="Details">The skill object's address - what a slot or a row points at.</param>
-    /// <param name="Id">The dat row's id, or empty for a skill whose row is not reachable.</param>
-    public readonly record struct Skill(ulong Details, string Id);
+    /// <param name="Id">The dat row's id, or empty for a skill whose row is not reachable at all.</param>
+    /// <param name="Name">The dat row's DisplayedName - what the Skills panel prints.</param>
+    /// <param name="Via">How the object leads to the row.</param>
+    public readonly record struct Skill(ulong Details, string Id, string Name = "", Route Via = Route.Direct);
 
     /// <summary>
     /// Places an actor whose ActiveSkills vector holds these skills, and returns the actor.
@@ -39,7 +66,15 @@ internal static class SkillTableFixture
         StructDef entry = schema.Structs["ActiveSkillStructure"];
         int entrySize = (int)entry.Constants["Size"];
         int detailsAt = entry.OffsetOf("ActiveSkillPtr");
-        int datRow = schema.Structs["ActiveSkillDetails"].OffsetOf("ActiveSkillsDatPtr");
+
+        StructDef details = schema.Structs["ActiveSkillDetails"];
+        int datRow = details.OffsetOf("ActiveSkillsDatPtr");
+        int perLevel = details.OffsetOf("GrantedEffectsPerLevelDatRow");
+        int grantedEffect = schema.Structs["GrantedEffectsPerLevelDat"].OffsetOf("GrantedEffect");
+        StructDef grantedDat = schema.Structs["GrantedEffectsDat"];
+        int activeSkill = grantedDat.OffsetOf("ActiveSkill");
+        int activeSkillPerReference = (int)grantedDat.Constants["ActiveSkillPerGameHelper2"];
+        int displayedName = schema.Structs["ActiveSkillsDat"].OffsetOf("DisplayedName");
 
         fake.Place<ulong>(actor + (ulong)table, Entries);
         fake.Place<ulong>(actor + (ulong)(table + 8), Entries + (ulong)(skills.Length * entrySize));
@@ -61,22 +96,59 @@ internal static class SkillTableFixture
         for (int i = 0; i < skills.Length; i++)
         {
             Skill skill = skills[i];
+
+            // The object exists as a whole first, so a search of it reads, and so the two
+            // known places read as nothing rather than as unplaced memory.
+            fake.Place(skill.Details, new byte[Game.Components.PlayerSkills.HuntBytes]);
             if (skill.Id.Length == 0)
             {
-                fake.Place<ulong>(skill.Details + (ulong)datRow, 0UL);
                 continue;
             }
 
             ulong row = Rows + (ulong)(i * 0x100);
-            ulong text = Texts + (ulong)(i * 0x400);
-            fake.Place<ulong>(skill.Details + (ulong)datRow, row);
-            fake.Place<ulong>(row, text);
+            ulong granted = Granted + (ulong)(i * 0x100);
+            ulong level = PerLevel + (ulong)(i * 0x100);
+            ulong text = Texts + (ulong)(i * 0x1000);
 
-            var bytes = new byte[TextBytes];
-            Encoding.Unicode.GetBytes(skill.Id).CopyTo(bytes, 0);
-            fake.Place(text, bytes);
+            PlaceText(fake, text, skill.Id);
+            PlaceText(fake, text + 0x400, skill.Name);
+            PlaceText(fake, text + 0x800, skill.Id + "Player");
+
+            // The ActiveSkills row: id, then displayed name. The GrantedEffects row: its own id,
+            // and the ActiveSkills row at the column the route says. The per-level row: the
+            // GrantedEffects row first.
+            fake.Place<ulong>(row, text);
+            fake.Place<ulong>(row + (ulong)displayedName, skill.Name.Length > 0 ? text + 0x400 : 0UL);
+            fake.Place<ulong>(granted, text + 0x800);
+            fake.Place<ulong>(
+                granted + (ulong)(skill.Via == Route.ThroughGrantedEffectsPerReference ? activeSkillPerReference : activeSkill),
+                row);
+            fake.Place<ulong>(level + (ulong)grantedEffect, granted);
+
+            switch (skill.Via)
+            {
+                case Route.Direct:
+                    fake.Place<ulong>(skill.Details + (ulong)datRow, row);
+                    break;
+                case Route.ThroughGrantedEffects:
+                case Route.ThroughGrantedEffectsPerReference:
+                    fake.Place<ulong>(skill.Details + (ulong)perLevel, level);
+                    break;
+                case Route.Hunted:
+                    fake.Place<ulong>(skill.Details + HuntedAt, row);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(skills), skill.Via, "no such route");
+            }
         }
 
         return actor;
+    }
+
+    private static void PlaceText(FakeMemoryReader fake, ulong at, string text)
+    {
+        var bytes = new byte[TextBytes];
+        Encoding.Unicode.GetBytes(text).CopyTo(bytes, 0);
+        fake.Place(at, bytes);
     }
 }

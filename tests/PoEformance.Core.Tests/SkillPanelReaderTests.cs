@@ -32,6 +32,9 @@ public class SkillPanelReaderTests
 
     private static OffsetSchema Schema() => RealSessionTests.LiveSchema();
 
+    /// <summary>Where a row's icon keeps no pointer at all - the case the game turned out to be.</summary>
+    private const int NoPointer = -1;
+
     private static (UiTree Tree, PlayerSkills Skills) Window(
         OffsetSchema schema, bool open = true, bool onThePath = true, int? pointerAt = null)
     {
@@ -80,8 +83,8 @@ public class SkillPanelReaderTests
 
         SkillTableFixture.Place(
             tree.Reader, schema, Actor,
-            new SkillTableFixture.Skill(Spark, "spark"),
-            new SkillTableFixture.Skill(Orb, "orb_of_storms"));
+            new SkillTableFixture.Skill(Spark, "spark", "Spark"),
+            new SkillTableFixture.Skill(Orb, "orb_of_storms", "Orb of Storms"));
         var skills = new PlayerSkills(tree.Reader, schema);
         skills.Refresh(Actor, 0);
 
@@ -123,7 +126,10 @@ public class SkillPanelReaderTests
         tree.Add(text, parent: block, text: dps, size: new Vector2(95, 29));
         tree.Add(row + 17, parent: block, visible: false);
 
-        tree.Reader.Place<ulong>(UiTree.At(icon) + (ulong)pointerAt, skill);
+        if (pointerAt != NoPointer)
+        {
+            tree.Reader.Place<ulong>(UiTree.At(icon) + (ulong)pointerAt, skill);
+        }
     }
 
     private static SkillPanelReader Reader(UiTree tree, OffsetSchema schema)
@@ -148,11 +154,27 @@ public class SkillPanelReaderTests
         Assert.Equal(77522, reader.Dps[skills.KeyOf(Orb)]);
         Assert.Equal(UiTree.At(List), reader.Element);
         Assert.Equal("SkillPanel", reader.PanelName);
-        Assert.Contains("2 rows read", reader.Note, StringComparison.Ordinal);
 
         // Where the pointer was found: on the icon, the header's fifth child, at the slot's offset.
         int at = schema.Structs["SkillBarSlot"].OffsetOf("ActiveSkillPtr");
-        Assert.Contains($"header child 4+0x{at:X}", reader.Note, StringComparison.Ordinal);
+        Assert.Equal($"2 rows read, 2 by pointer (header child 4+0x{at:X}), 0 by name", reader.Note);
+    }
+
+    [Fact]
+    public void ARowWithNoPointerIsMatchedByItsName()
+    {
+        // What the game turned out to do: no skill pointer anywhere on a row. The row prints
+        // the skill's displayed name, the skill's dat row spells it the same, and that is the
+        // join - reported as such.
+        OffsetSchema schema = Schema();
+        (UiTree tree, PlayerSkills skills) = Window(schema, pointerAt: NoPointer);
+        SkillPanelReader reader = Reader(tree, schema);
+
+        reader.Read(UiTree.At(Root), 0, skills);
+
+        Assert.Equal(53838, reader.Dps[skills.KeyOf(Spark)]);
+        Assert.Equal(77522, reader.Dps[skills.KeyOf(Orb)]);
+        Assert.Equal("2 rows read, 0 by pointer (none), 2 by name", reader.Note);
     }
 
     [Fact]

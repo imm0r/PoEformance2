@@ -766,7 +766,9 @@ public sealed class WorldReader
     private int _notedMatched = -1;
     private int _notedSkills = -1;
     private int _notedDps = -1;
+    private int _notedNamed = -1;
     private string _notedBar = string.Empty;
+    private string _notedRoute = string.Empty;
     private string _notedPanel = string.Empty;
 
     /// <summary>
@@ -1733,8 +1735,9 @@ public sealed class WorldReader
         }
 
         if (slots.Count == _notedSlots && matched == _notedMatched && _skills.Count == _notedSkills
-            && _skillPanel.Dps.Count == _notedDps
+            && _skills.Named == _notedNamed && _skillPanel.Dps.Count == _notedDps
             && ReferenceEquals(_skillBar.SkillOffsetNote, _notedBar)
+            && ReferenceEquals(_skills.RouteNote, _notedRoute)
             && ReferenceEquals(_skillPanel.Note, _notedPanel))
         {
             return _skillsNote;
@@ -1743,12 +1746,14 @@ public sealed class WorldReader
         _notedSlots = slots.Count;
         _notedMatched = matched;
         _notedSkills = _skills.Count;
+        _notedNamed = _skills.Named;
         _notedDps = _skillPanel.Dps.Count;
         _notedBar = _skillBar.SkillOffsetNote;
+        _notedRoute = _skills.RouteNote;
         _notedPanel = _skillPanel.Note;
         _skillsNote =
             $"{slots.Count} slots, {matched} with a skill ({_notedBar})"
-            + $"   table {_skills.Count} ({_skills.Named} named)"
+            + $"   table {_skills.Count} ({_notedNamed} named, {_notedRoute})"
             + $"   dps for {_notedDps}   panel: {_notedPanel}";
         return _skillsNote;
     }
