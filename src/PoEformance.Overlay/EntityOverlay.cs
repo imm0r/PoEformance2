@@ -2022,7 +2022,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>
-    /// Loads the body face at two sizes and, if the machine has one, a face for figures.
+    /// Loads the body face at two sizes and, if the machine has one, a face for figures - that
+    /// one at two sizes as well.
     /// </summary>
     /// <remarks>
     /// ALL OF THEM IN ONE DELEGATE, because the library clears the whole atlas before calling it
@@ -2067,6 +2068,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (mono is not null)
             {
                 OverlayFonts.RebuiltMono(io.Fonts.AddFontFromFileTTF(mono, size, config, english));
+
+                // The same face once more, large and holding only the digits, for the figures
+                // written on the game itself. See OverlayFonts.FigureSize for why that size is
+                // not a multiple of the text size like the heading's.
+                OverlayFonts.RebuiltFigures(io.Fonts.AddFontFromFileTTF(
+                    mono, OverlayFonts.FigureSize, config, OverlayFonts.DigitRange));
             }
         });
     }

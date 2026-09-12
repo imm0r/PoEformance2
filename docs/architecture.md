@@ -2368,7 +2368,11 @@ interesting part was not the feature:
     item. Charms are left alone on purpose: the game prints their charges itself, and a second
     number beside its own reads as a disagreement. The figure stands on the same plate the
     room names use, with a style key of its own for how much flask shows through: the first
-    build trusted a dark edge alone, and a life flask's glare swallowed the pale digit.
+    build trusted a dark edge alone, and a life flask's glare swallowed the pale digit. And it
+    is set in the monospace, loaded once more at a display size with only the digits in the
+    atlas: the serif's figures are old-style, and two flasks side by side showed a 6 standing
+    above a 7. The digit's INK is what is centred on the slot, from the zero's glyph box,
+    because a line of text keeps room above and below that no digit uses.
   - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
     the minimap lives under must never come back as a piece of interface — that would take the
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while

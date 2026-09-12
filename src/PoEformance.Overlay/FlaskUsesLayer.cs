@@ -33,28 +33,29 @@ namespace PoEformance.Overlay;
 /// whatever colour the flask is, and a life flask's glare swallowed the pale digit. The plate
 /// has a style key of its own, so how much of the flask shows through is the user's to set,
 /// and a belt of dark flasks can hide it outright.
+///
+/// IN THE FIGURES FACE, not the serif. The second build drew the digit in the heading face for
+/// sharpness, and two flasks side by side showed a 6 standing above a 7: the serif's figures
+/// are old-style, each with its own height. The monospace's are lining, and OverlayFonts loads
+/// it once more at a display size for exactly this, so the figure is sharp as well as level.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class FlaskUsesLayer
 {
-    /// <summary>How tall the figure is, as a share of the slot's height.</summary>
+    /// <summary>How tall the figure's line is, as a share of the slot's height.</summary>
     /// <remarks>
-    /// About a third: large enough to be read from the middle of the screen at a glance, and
-    /// small enough that the flask's own picture and its liquid level stay legible around it.
-    /// The style's scale multiplies it.
+    /// Four tenths: a third was asked to be a touch bigger after a look in game, and at this
+    /// the digit is read from the middle of the screen while the flask's own picture still
+    /// shows around it. The style's scale multiplies it.
     /// </remarks>
-    private const float FigureShare = 0.34f;
+    private const float FigureShare = 0.4f;
 
     /// <summary>Smallest the figure is drawn, whatever the slot and the scale come to.</summary>
     private const float SmallestFigure = 10f;
 
-    /// <summary>How far the plate reaches beyond the figure, beside it and above and below, as shares of its size.</summary>
-    /// <remarks>
-    /// More beside than above: a line of text already carries room for ascenders and
-    /// descenders that a digit does not use, so the plate would look tall before it looked wide.
-    /// </remarks>
-    private const float PlateBeside = 0.2f;
-    private const float PlateAbove = 0.02f;
+    /// <summary>How far the plate reaches beyond the digit's ink, beside it and above and below, as shares of the figure's size.</summary>
+    private const float PlateBeside = 0.22f;
+    private const float PlateAbove = 0.14f;
 
     /// <summary>The plate's corner radius, as a share of the figure's size.</summary>
     private const float PlateRounding = 0.2f;
@@ -90,13 +91,26 @@ public sealed class FlaskUsesLayer
             ? Style.Colour(StyleCatalogue.Keys.FlaskUsesPlate)
             : 0;
 
-        // In the heading face where the machine has one: the figure is drawn at two or three
-        // times the interface's text size, and a glyph rasterised larger is magnified less on
-        // the way there, which is the difference between a soft digit and a sharp one. ImGui
-        // measures in whatever font is pushed, so the measuring happens inside the pair too.
-        OverlayFonts.PushHeading();
+        // In the figures face: lining digits, so a 6 and a 7 on neighbouring flasks stand at
+        // the same height - the serif's are old-style and put one above the other - and
+        // rasterised near the size they are drawn at, so they come out sharp. ImGui measures
+        // in whatever font is pushed, so the measuring happens inside the pair too.
+        OverlayFonts.PushFigures();
         ImFontPtr font = ImGui.GetFont();
         float natural = ImGui.GetFontSize();
+
+        // Where a digit's ink sits in its line. The line keeps room above and below that no
+        // digit uses, so centring the LINE puts every figure high on its slot and its plate low
+        // on the figure; the ink is centred instead. Taken from the zero, which in a lining
+        // face stands exactly where the other nine do.
+        ImFontGlyphPtr zero = font.FindGlyph('0');
+        float inkTop = zero.Y0;
+        float inkHeight = zero.Y1 - zero.Y0;
+        if (inkHeight <= 0f)
+        {
+            inkTop = 0f;
+            inkHeight = natural;
+        }
 
         foreach (FlaskSlotOnScreen slot in slots)
         {
@@ -111,22 +125,29 @@ public sealed class FlaskUsesLayer
             float size = MathF.Max(
                 SmallestFigure,
                 Style.Sized(StyleCatalogue.Keys.FlaskUses, slot.Where.Height * FigureShare));
+            float scale = size / natural;
 
-            Vector2 extent = ImGui.CalcTextSize(text) * (size / natural);
+            float wide = ImGui.CalcTextSize(text).X * scale;
+            float top = inkTop * scale;
+            float tall = inkHeight * scale;
+
+            // The line's origin, placed so that the INK is centred on the slot.
             var at = new Vector2(
-                slot.Where.Left + ((slot.Where.Width - extent.X) / 2f),
-                slot.Where.Top + ((slot.Where.Height - extent.Y) / 2f));
+                slot.Where.Left + ((slot.Where.Width - wide) / 2f),
+                slot.Where.Top + ((slot.Where.Height - tall) / 2f) - top);
 
             if (plate != 0)
             {
+                var ink = new Vector2(at.X, at.Y + top);
                 var reach = new Vector2(size * PlateBeside, size * PlateAbove);
-                draw.AddRectFilled(at - reach, at + extent + reach, plate, size * PlateRounding);
+                draw.AddRectFilled(
+                    ink - reach, ink + new Vector2(wide, tall) + reach, plate, size * PlateRounding);
             }
 
             Written(draw, font, at, text, size, uses > 0 ? colour : empty);
         }
 
-        OverlayFonts.PopHeading();
+        OverlayFonts.PopFigures();
     }
 
     /// <summary>The belt's flask with this item, or null when the belt does not list it.</summary>
