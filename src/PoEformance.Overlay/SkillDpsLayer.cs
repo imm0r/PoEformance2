@@ -44,11 +44,12 @@ public sealed class SkillDpsLayer
 
     /// <summary>
     /// How far the figure's ink stands off the icon's right and top edges, as shares of its
-    /// size - each the plate's own reach that way plus the same clearance, so the plate sits an
-    /// even distance inside the corner.
+    /// size - each the plate's own reach that way plus a hair of clearance, so the plate sits
+    /// in the corner rather than near it. A look in game asked for it tighter than the first
+    /// build's even margin.
     /// </summary>
-    private const float InsetBeside = 0.34f;
-    private const float InsetAbove = 0.26f;
+    private const float InsetBeside = 0.24f;
+    private const float InsetAbove = 0.16f;
 
     /// <summary>How far the plate reaches beyond the ink, as shares of the figure's size.</summary>
     private const float PlateBeside = 0.22f;
@@ -70,7 +71,29 @@ public sealed class SkillDpsLayer
 
         IReadOnlyList<SkillSlotOnScreen> slots = snapshot.SkillSlotsOnScreen;
         IReadOnlyDictionary<ulong, int> dps = snapshot.SkillDpsByKey;
-        if (slots.Count == 0 || dps.Count == 0)
+        if (slots.Count == 0)
+        {
+            return;
+        }
+
+        // The slot rectangles as the tool has them, so a screenshot shows whether they sit on
+        // the icons the game draws: the figure is placed against these, and a figure that lands
+        // short of the corner is either the placing or the rectangle - which is a question no
+        // amount of moving the figure answers.
+        if (Style.Visible(StyleCatalogue.Keys.SkillSlots))
+        {
+            uint frame = Style.Colour(StyleCatalogue.Keys.SkillSlots);
+            float thickness = Style.Width(StyleCatalogue.Keys.SkillSlots, 1f);
+            foreach (SkillSlotOnScreen slot in slots)
+            {
+                draw.AddRect(
+                    new Vector2(slot.Where.Left, slot.Where.Top),
+                    new Vector2(slot.Where.Right, slot.Where.Bottom),
+                    frame, 0f, ImDrawFlags.None, thickness);
+            }
+        }
+
+        if (dps.Count == 0)
         {
             return;
         }

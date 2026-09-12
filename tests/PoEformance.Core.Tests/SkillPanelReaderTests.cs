@@ -182,8 +182,11 @@ public class SkillPanelReaderTests
     }
 
     [Fact]
-    public void WhatWasReadStandsWhileThePanelIsShut_AndNothingIsWalked()
+    public void TheRowsAreStillReadWhileThePanelIsShut_AndTheNoteSaysHowTheTextBehaves()
     {
+        // The experiment: the list found while the panel was open is read on after it shuts.
+        // Text that stands still is the snapshot it always was; text that moves is a live
+        // figure, and either way the note says which, with the first row's text to check by.
         OffsetSchema schema = Schema();
         (UiTree tree, PlayerSkills skills) = Window(schema);
         SkillPanelReader reader = Reader(tree, schema);
@@ -193,14 +196,104 @@ public class SkillPanelReaderTests
         int flags = schema.Structs["UiElementBase"].OffsetOf("Flags");
         tree.Reader.Place<uint>(UiTree.At(Panel) + (ulong)flags, 0u);
 
-        long before = tree.Reader.Reads;
+        reader.Read(UiTree.At(Root), 1, skills);                // the shutting is read at once
+        Assert.Same(remembered, reader.Dps);                    // nothing changed, nothing republished
+        Assert.Equal(
+            "\"SkillPanel\" hidden; 2 rows still read, first \"DPS: 53.838\", text unchanged since it shut 0 s ago",
+            reader.Note);
+
+        PlaceText(tree, schema, SparkDps, "DPS: 61.250");
+        reader.Read(UiTree.At(Root), 1 + SkillPanelReader.RefreshMs - 1, skills);
+        Assert.Same(remembered, reader.Dps);                    // within the pause, not looked at
+
+        reader.Read(UiTree.At(Root), 61_000, skills);
+        Assert.Equal(61250, reader.Dps[skills.KeyOf(Spark)]);
+        Assert.Equal(77522, reader.Dps[skills.KeyOf(Orb)]);
+        Assert.Equal(
+            "\"SkillPanel\" hidden; 2 rows still read, first \"DPS: 61.250\", text changed 1× while hidden, last 0 s ago",
+            reader.Note);
+    }
+
+    [Fact]
+    public void AShutPanelThePointerStillNamesIsReadByThePath_NotSearched()
+    {
+        // After a restart of the tool nothing is kept; if the pointer still names the shut
+        // panel, the path is tried on it and the figures come back without the panel being
+        // opened. A panel whose list is off the path is left for an opening: the pointer may
+        // as well name the character sheet, and that is not worth a search twice a second.
+        OffsetSchema schema = Schema();
+        (UiTree tree, PlayerSkills skills) = Window(schema, open: false);
+        SkillPanelReader reader = Reader(tree, schema);
+
+        reader.Read(UiTree.At(Root), 0, skills);
+
+        Assert.Equal(53838, reader.Dps[skills.KeyOf(Spark)]);
+        Assert.Equal(77522, reader.Dps[skills.KeyOf(Orb)]);
+        Assert.Equal(UiTree.At(List), reader.Element);
+        Assert.Equal(
+            "\"SkillPanel\" hidden; 2 rows still read, first \"DPS: 53.838\", text unchanged since first read 0 s ago",
+            reader.Note);
+
+        (UiTree offPath, PlayerSkills offPathSkills) = Window(schema, open: false, onThePath: false);
+        SkillPanelReader unsearched = Reader(offPath, schema);
+        unsearched.Read(UiTree.At(Root), 0, offPathSkills);
+        Assert.Empty(unsearched.Dps);
+        Assert.Equal(0UL, unsearched.Element);
+        Assert.Equal("\"SkillPanel\" hidden; no list kept", unsearched.Note);
+    }
+
+    [Fact]
+    public void AnotherLeftPanelLeavesTheKeptListAlone_AndThePointerStateIsNamed()
+    {
+        // The left panel is also the character sheet: opening it used to throw the Skills list
+        // away. Now the rows are read on from where they were found, and the note says what
+        // the pointer names meanwhile - another panel, or nothing at all.
+        OffsetSchema schema = Schema();
+        (UiTree tree, PlayerSkills skills) = Window(schema);
+        SkillPanelReader reader = Reader(tree, schema);
+        reader.Read(UiTree.At(Root), 0, skills);
+        IReadOnlyDictionary<ulong, int> remembered = reader.Dps;
+
+        int flags = schema.Structs["UiElementBase"].OffsetOf("Flags");
+        int leftPanel = schema.Structs["ImportantUiElements"].OffsetOf("LeftPanelPtr");
+        tree.Reader.Place<uint>(UiTree.At(Panel) + (ulong)flags, 0u);
+        tree.Add(200, parent: Root, stringId: "CharacterPanel", size: new Vector2(900, 1400));
+        tree.Reader.Place<ulong>(UiTree.At(Root) + (ulong)leftPanel, UiTree.At(200));
+
+        reader.Read(UiTree.At(Root), SkillPanelReader.RefreshMs, skills);
+        Assert.Same(remembered, reader.Dps);
+        Assert.Equal(UiTree.At(List), reader.Element);
+        Assert.StartsWith(
+            "\"CharacterPanel\" open, no rows on it; 2 rows still read, first \"DPS: 53.838\", text unchanged since it shut",
+            reader.Note,
+            StringComparison.Ordinal);
+
+        tree.Reader.Place<ulong>(UiTree.At(Root) + (ulong)leftPanel, 0UL);
+        reader.Read(UiTree.At(Root), 2 * SkillPanelReader.RefreshMs, skills);
+        Assert.StartsWith("pointer null; 2 rows still read", reader.Note, StringComparison.Ordinal);
+        Assert.Same(remembered, reader.Dps);
+    }
+
+    [Fact]
+    public void AZeroReadOffAShutPanelIsNotRemembered()
+    {
+        // In case a shut panel blanks its rows: a figure that parses to nothing or to zero
+        // while hidden leaves the remembered one standing, and still counts as a change.
+        OffsetSchema schema = Schema();
+        (UiTree tree, PlayerSkills skills) = Window(schema);
+        SkillPanelReader reader = Reader(tree, schema);
+        reader.Read(UiTree.At(Root), 0, skills);
+
+        int flags = schema.Structs["UiElementBase"].OffsetOf("Flags");
+        tree.Reader.Place<uint>(UiTree.At(Panel) + (ulong)flags, 0u);
+        PlaceText(tree, schema, SparkDps, "DPS: 0");
+        PlaceText(tree, schema, OrbDps, "DPS: -");
+
         reader.Read(UiTree.At(Root), SkillPanelReader.RefreshMs, skills);
 
-        Assert.Same(remembered, reader.Dps);
-
-        // The pointer, the panel's validity and its chain of visible bits - a dozen at most,
-        // and no row, no text.
-        Assert.True(tree.Reader.Reads - before < 12, $"{tree.Reader.Reads - before} reads on a shut panel");
+        Assert.Equal(53838, reader.Dps[skills.KeyOf(Spark)]);
+        Assert.Equal(77522, reader.Dps[skills.KeyOf(Orb)]);
+        Assert.Contains("text changed 2× while hidden", reader.Note, StringComparison.Ordinal);
     }
 
     [Fact]

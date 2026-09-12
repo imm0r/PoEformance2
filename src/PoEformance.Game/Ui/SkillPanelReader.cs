@@ -137,10 +137,21 @@ public static class DpsText
 /// </summary>
 /// <remarks>
 /// THE PANEL IS THE ONLY SOURCE. The game computes a skill's DPS for the Skills window and the
-/// gem tooltip and writes it nowhere else - not on the skill object, not in the actor - so it is
-/// read as the TEXT it is: a row per skill, with "DPS: 53.838" on it. That fixes what the
-/// feature can and cannot do: the figure is as fresh as the last time the panel was open, and
-/// it is remembered so the bar keeps showing it after the panel shuts.
+/// gem tooltip and writes it nowhere else that either reference or this tool has found - not on
+/// the skill object, not in the actor - so it is read as the TEXT it is: a row per skill, with
+/// "DPS: 53.838" on it, and remembered so the bar keeps showing it after the panel shuts.
+///
+/// THE ROWS ARE READ WHILE THE PANEL IS SHUT TOO, which is an experiment with a readout rather
+/// than a claim. The first build read them only while the panel was open, so a figure was as
+/// fresh as the last look at the panel and a restart of the tool showed nothing until the panel
+/// was opened once - and whether the game keeps a hidden panel's text current is a question only
+/// the game can answer. So the list found while the panel was open is kept, its rows are read on
+/// the same clock while it is shut, a shut panel the pointer still names is tried by the path
+/// (not searched: the pointer may as well name the character sheet), and the readout says what
+/// was found: how many rows still read, the first row's text, and whether the text CHANGED while
+/// hidden and when. Changed means live figures for free; unchanged means the snapshot it always
+/// was, now recovered after a restart without opening the panel. A hidden reading that parses to
+/// nothing or to zero is not remembered, in case a shut panel blanks its rows.
 ///
 /// WHERE THE ROWS ARE, from this tool's own interface browser (0.5.5): the panel is the open
 /// left panel, ImportantUiElements.LeftPanelPtr, and its rows hang under a list at a child path
@@ -227,8 +238,24 @@ public sealed class SkillPanelReader
     private string _notedRowNames = string.Empty;
     private readonly List<string> _names = [];
 
+    // The shut panel's experiment: when the rows were last read open, when they were first read
+    // shut without ever having been open, how often their text changed while shut and when last,
+    // and the first row's text as it stands - all for the readout.
+    private bool _wasOpen;
+    private long _lastOpenMs = Never;
+    private long _firstHiddenMs = Never;
+    private long _hiddenChangedAt = Never;
+    private int _hiddenChanges;
+    private string _firstDps = string.Empty;
+    private ulong _searchedPanel;
+    private ulong _namedPanel;
+    private string _named = string.Empty;
+
     /// <summary>How many of the rows' names the readout quotes.</summary>
     private const int NamesQuoted = 4;
+
+    /// <summary>How much of the first row's text the readout quotes.</summary>
+    private const int TextQuoted = 24;
 
     /// <summary>What was found on one row, kept so a refresh costs two string reads and not a search.</summary>
     private sealed class Row
@@ -241,6 +268,7 @@ public sealed class SkillPanelReader
         public int Hunts;
         public int HuntedVersion = -1;
         public string LastName = string.Empty;
+        public string LastDps = string.Empty;
         public List<ulong> HeaderChildren = [];
     }
 
@@ -287,7 +315,8 @@ public sealed class SkillPanelReader
     public string Note => _note;
 
     /// <summary>
-    /// Reads the rows when the panel is open and the clock says so. Otherwise what was read stands.
+    /// Reads the rows when the clock says so: off the open panel, or off the kept list while the
+    /// panel is shut. Otherwise what was read stands.
     /// </summary>
     /// <param name="uiRoot">The interface root the left panel pointer hangs off.</param>
     /// <param name="nowMs">A monotonic clock, for pacing the reads.</param>
@@ -302,22 +331,35 @@ public sealed class SkillPanelReader
         }
 
         ulong panel = _reader.ReadPointer(uiRoot + (ulong)_leftPanel);
-        if (!_elements.IsUiElement(panel) || !_elements.IsVisible(panel))
-        {
-            _refreshedAt = Never;
-            return;
-        }
+        bool element = _elements.IsUiElement(panel);
+        bool open = element && _elements.IsVisible(panel);
 
-        if (_refreshedAt != Never && nowMs - _refreshedAt < RefreshMs && skills.Version == _skillsVersion)
+        // On the clock, when the table changes, and the moment the panel opens or shuts.
+        if (_refreshedAt != Never && nowMs - _refreshedAt < RefreshMs
+            && skills.Version == _skillsVersion && open == _wasOpen)
         {
             return;
         }
 
         _refreshedAt = nowMs;
         _skillsVersion = skills.Version;
+        _wasOpen = open;
 
-        ulong list = ResolveList(panel, nowMs);
-        (int read, int byPointer, int byName) = list == 0 ? (0, 0, 0) : ReadRows(list, skills);
+        ulong list = open ? ResolveList(panel, nowMs, search: true) : 0;
+        if (list != 0)
+        {
+            ReadOpen(list, nowMs, skills);
+            return;
+        }
+
+        ReadShut(panel, element, open, nowMs, skills);
+    }
+
+    /// <summary>The rows off the open panel, and the note that says how they were joined.</summary>
+    private void ReadOpen(ulong list, long nowMs, PlayerSkills skills)
+    {
+        _lastOpenMs = nowMs;
+        (int read, int byPointer, int byName) = ReadRows(list, skills, nowMs, hidden: false);
 
         // The names as the rows spell them, quoted, so a readout shows a stray space or a
         // marker the game put in the text - the difference between a name that matches and
@@ -338,29 +380,102 @@ public sealed class SkillPanelReader
             _notedDps = _dps.Count;
             _notedRule = _ruleNote;
             _notedRowNames = _rowNames;
-            _note = list == 0
-                ? $"open ({_panelName}), no rows found"
-                : $"{read} rows read, {byPointer} by pointer ({_ruleNote}), {byName} by name; rows {_rowNames}";
+            _note = $"{read} rows read, {byPointer} by pointer ({_ruleNote}), {byName} by name; rows {_rowNames}";
         }
     }
 
-    /// <summary>The list, from the cache, from the path, or from a search of the panel.</summary>
-    private ulong ResolveList(ulong panel, long nowMs)
+    /// <summary>
+    /// The rows off the kept list while the panel is shut - or while another left panel is
+    /// open in its place - and the note that says what the pointer names and how the text behaves.
+    /// </summary>
+    private void ReadShut(ulong panel, bool element, bool open, long nowMs, PlayerSkills skills)
     {
-        if (_list != 0 && _panel == panel && _elements.IsUiElement(_list))
+        ulong list = _list;
+        if (list != 0 && !_elements.IsUiElement(list))
         {
-            return _list;
+            Forget();
+            list = 0;
         }
 
-        if (_panel != panel)
+        // After a restart nothing is kept, but the pointer may still name the shut panel: the
+        // path is tried on it, and only the path - the pointer may as well name the character
+        // sheet, and a search of that twice a second is a walk of a panel per tick for nothing.
+        if (list == 0 && element && !open)
         {
-            _panel = panel;
-            _panelName = NameOf(panel);
-            _searchedAt = Never;
+            list = ResolveList(panel, nowMs, search: false);
         }
 
-        _list = 0;
-        _rows.Clear();
+        int read = 0;
+        if (list != 0)
+        {
+            if (_lastOpenMs == Never && _firstHiddenMs == Never)
+            {
+                _firstHiddenMs = nowMs;
+            }
+
+            (read, _, _) = ReadRows(list, skills, nowMs, hidden: true);
+        }
+
+        if (panel != _namedPanel)
+        {
+            _namedPanel = panel;
+            _named = NameOf(panel);
+        }
+
+        string where = panel == 0 ? "pointer null"
+            : !element ? "pointer not an element"
+            : open ? $"\"{_named}\" open, no rows on it"
+            : $"\"{_named}\" hidden";
+
+        string rows;
+        if (list == 0)
+        {
+            rows = "no list kept";
+        }
+        else
+        {
+            string text = _hiddenChanges > 0
+                ? $"changed {_hiddenChanges}× while hidden, last {Age(nowMs - _hiddenChangedAt)} ago"
+                : _lastOpenMs != Never
+                    ? $"unchanged since it shut {Age(nowMs - _lastOpenMs)} ago"
+                    : $"unchanged since first read {Age(nowMs - _firstHiddenMs)} ago";
+            rows = $"{read} rows still read, first \"{_firstDps}\", text {text}";
+        }
+
+        string note = $"{where}; {rows}";
+        if (!string.Equals(note, _note, StringComparison.Ordinal))
+        {
+            _note = note;
+        }
+    }
+
+    private static string Age(long ms)
+    {
+        long seconds = Math.Max(0, ms) / 1000;
+        return seconds < 60
+            ? seconds.ToString(CultureInfo.InvariantCulture) + " s"
+            : (seconds / 60).ToString(CultureInfo.InvariantCulture) + " min";
+    }
+
+    /// <summary>
+    /// The list, from the cache, from the path, or - when asked - from a search of the panel.
+    /// </summary>
+    /// <remarks>
+    /// A panel WITHOUT a list leaves the kept one alone: the left panel is also the character
+    /// sheet and the quest log, and opening one of those used to throw the Skills list away,
+    /// which is the list the shut-panel reading lives on.
+    /// </remarks>
+    private ulong ResolveList(ulong panel, long nowMs, bool search)
+    {
+        if (_list != 0 && _panel == panel)
+        {
+            if (_elements.IsUiElement(_list))
+            {
+                return _list;
+            }
+
+            Forget();
+        }
 
         ulong guess = panel;
         foreach (int step in _listPath)
@@ -372,22 +487,37 @@ public sealed class SkillPanelReader
             }
         }
 
-        if (guess != 0 && LooksLikeTheList(guess))
+        ulong found = guess != 0 && LooksLikeTheList(guess) ? guess : 0;
+        if (found == 0 && search)
         {
-            _list = guess;
-            return _list;
+            // Searching the same panel twice a second for a list it does not have would be a
+            // walk of a panel per tick; another panel is searched at once.
+            if (_searchedPanel == panel && _searchedAt != Never && nowMs - _searchedAt < SearchAgainMs)
+            {
+                return 0;
+            }
+
+            _searchedPanel = panel;
+            _searchedAt = nowMs;
+            found = Search(panel);
         }
 
-        // The left panel is also the character sheet and the quest log, and searching those
-        // twice a second for a list they do not have would be a walk of a panel per tick.
-        if (_searchedAt != Never && nowMs - _searchedAt < SearchAgainMs)
+        if (found != 0 && (found != _list || panel != _panel))
         {
-            return 0;
+            _panel = panel;
+            _panelName = NameOf(panel);
+            _list = found;
+            _rows.Clear();
         }
 
-        _searchedAt = nowMs;
-        _list = Search(panel);
-        return _list;
+        return found;
+    }
+
+    /// <summary>Drops the kept list, when it stopped being an element.</summary>
+    private void Forget()
+    {
+        _list = 0;
+        _rows.Clear();
     }
 
     /// <summary>Whether an element's visible children are rows: one of the first few carries a DPS text.</summary>
@@ -459,7 +589,11 @@ public sealed class SkillPanelReader
     /// Reads every showing row: its DPS, and which skill it is for. Returns how many were read
     /// and how many were matched each way.
     /// </summary>
-    private (int Read, int ByPointer, int ByName) ReadRows(ulong list, PlayerSkills skills)
+    /// <param name="hidden">
+    /// Whether the panel is shut: then a change of a row's text is the experiment's finding and
+    /// is counted, and a figure is remembered only when it is a positive number.
+    /// </param>
+    private (int Read, int ByPointer, int ByName) ReadRows(ulong list, PlayerSkills skills, long nowMs, bool hidden)
     {
         int read = 0;
         int byPointer = 0;
@@ -520,7 +654,27 @@ public sealed class SkillPanelReader
                 parts.ByName = parts.Skill != 0;
             }
 
-            int? dps = DpsText.Parse(_reader.ReadStdWString(parts.Dps + (ulong)_text));
+            string dpsText = _reader.ReadStdWString(parts.Dps + (ulong)_text);
+            if (!string.Equals(dpsText, parts.LastDps, StringComparison.Ordinal))
+            {
+                // Counted from the second reading of a row on: the first only establishes
+                // what the text was. A change seen while the panel is shut is the finding.
+                if (hidden && parts.LastDps.Length > 0)
+                {
+                    _hiddenChanges++;
+                    _hiddenChangedAt = nowMs;
+                }
+
+                parts.LastDps = dpsText;
+            }
+
+            if (read == 0)
+            {
+                ReadOnlySpan<char> shown = dpsText.AsSpan().Trim();
+                _firstDps = shown.Length <= TextQuoted ? shown.ToString() : string.Concat(shown[..(TextQuoted - 1)], "…");
+            }
+
+            int? dps = DpsText.Parse(dpsText);
             read++;
             if (_names.Count < NamesQuoted)
             {
@@ -538,7 +692,7 @@ public sealed class SkillPanelReader
                     byPointer++;
                 }
 
-                if (dps is int value)
+                if (dps is int value && (!hidden || value > 0))
                 {
                     Remember(skills.KeyOf(parts.Skill), value);
                 }
