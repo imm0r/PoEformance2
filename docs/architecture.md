@@ -2361,8 +2361,12 @@ interesting part was not the feature:
     inventory side. An index would have been the fragile choice again, and a slot that has an
     item is exactly the one that needs a number. The search is repeated every two seconds
     because an EMPTY slot points at nothing and so is invisible to it; a flask equipped
-    mid-map would otherwise wait for the next area. Charms are left alone on purpose: the game
-    prints their charges itself, and a second number beside its own reads as a disagreement.
+    mid-map would otherwise wait for the next area. A remembered slot that stops being an
+    element is dropped until that clock brings it back, not searched for at once: the bar has
+    children that churn (one under a charm slot sat at a different address on each of three
+    looks), and a search per loss would be a search per tick the day one of them carries an
+    item. Charms are left alone on purpose: the game prints their charges itself, and a second
+    number beside its own reads as a disagreement.
   - **The maps are excluded by address.** Whatever the tree turns out to look like, an element
     the minimap lives under must never come back as a piece of interface — that would take the
     minimap out of the region it is meant to be drawn ON, and the radar would stop working while

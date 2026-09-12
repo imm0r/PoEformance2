@@ -116,6 +116,42 @@ public class FlaskBarReaderTests
     }
 
     [Fact]
+    public void ASlotThatStopsBeingAnElementIsDropped_AndSearchedForOnTheClockNotOnTheSpot()
+    {
+        // The bar has children that come and go - the browser caught one under a charm slot at
+        // a different address on each look - and were the loss of any remembered element to
+        // send the whole search round, such a child carrying an item would have it run every
+        // tick. So a dead slot is dropped, and the clock brings it back.
+        OffsetSchema schema = Schema();
+        (UiTree tree, ulong hud) = Belt(schema);
+        FlaskBarReader reader = Reader(tree, schema);
+        Assert.Equal(2, reader.Read(hud, Window(), 0).Count);
+
+        // The first slot's memory stops saying it is an element.
+        ulong self = UiTree.At(5) + (ulong)schema.Structs["UiElementBase"].OffsetOf("Self");
+        tree.Reader.Place<ulong>(self, 0UL);
+
+        long before = tree.Reader.Reads;
+        IReadOnlyList<FlaskSlotOnScreen> slots = reader.Read(hud, Window(), 100);
+        long dyingTick = tree.Reader.Reads - before;
+
+        before = tree.Reader.Reads;
+        reader.Read(hud, Window(), 200);
+        long settledTick = tree.Reader.Reads - before;
+
+        Assert.Equal(Mana, Assert.Single(slots).Item);
+
+        // One read more than the settled tick after it - the read that found the slot dead -
+        // and not a walk of the bar, which would be dozens.
+        Assert.Equal(settledTick + 1, dyingTick);
+
+        // An element again, it is found when the clock says so and not before.
+        tree.Reader.Place<ulong>(self, UiTree.At(5));
+        Assert.Single(reader.Read(hud, Window(), FlaskBarReader.SearchAgainMs - 1));
+        Assert.Equal(2, reader.Read(hud, Window(), FlaskBarReader.SearchAgainMs).Count);
+    }
+
+    [Fact]
     public void NothingWhileTheBarIsHidden_OrThereIsNoInterface()
     {
         // A loading screen, a hidden interface, a state without a HUD: no slot, and no search
