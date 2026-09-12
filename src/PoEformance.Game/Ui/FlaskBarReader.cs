@@ -27,10 +27,15 @@ public readonly record struct FlaskSlotOnScreen(ulong Element, ulong Item, Scree
 /// it must still be an element and still say "flask_bar" - and the slot elements found under
 /// it are kept, since a slot is the same element for the life of the HUD whatever goes in and
 /// out of it. What is read per tick is what changes: each slot's item, its own visibility, and
-/// where it is. A slot that stops being an element sends the whole search round again, which
-/// is how a rebuilt HUD is noticed; and the search is repeated every couple of seconds anyway,
-/// because a slot that was EMPTY when it ran points at nothing and so was never found - a flask
-/// equipped in a map would otherwise go without its number until the next area.
+/// where it is. The search itself runs on a clock, every couple of seconds, for two reasons. A
+/// slot that was EMPTY when it ran points at nothing and so was never found - a flask equipped
+/// in a map would otherwise go without its number until the next area. And a slot that STOPS
+/// being an element is dropped until the clock brings it back, not searched for on the spot:
+/// the bar has children that come and go (the browser caught one under a charm slot at a
+/// different address on each of three looks), and had the loss of any remembered element sent
+/// the search round, one such child carrying an item would have it run every tick. A rebuilt
+/// interface is noticed sooner anyway, through a new HUD element or a bar that no longer
+/// answers to its name, either of which forgets everything and searches at once.
 ///
 /// TWO LEVELS UNDER THE BAR AND NO FURTHER, for the reason InterfaceReader goes one under the
 /// HUD: that is where the browser found the slots, and a deeper walk every few seconds would
@@ -55,6 +60,9 @@ public sealed class FlaskBarReader
     /// <summary>Most children looked at, at each level. A bound on a count read out of memory.</summary>
     private const int MostChildren = 64;
 
+    /// <summary>The search clock before the first search under a bar.</summary>
+    private const long Never = long.MinValue;
+
     private readonly IMemoryReader _reader;
     private readonly UiElementReader _elements;
     private readonly int _stringId;
@@ -62,7 +70,7 @@ public sealed class FlaskBarReader
 
     private ulong _hud;
     private ulong _bar;
-    private long _searchedAt = long.MinValue;
+    private long _searchedAt = Never;
 
     public FlaskBarReader(IMemoryReader reader, OffsetSchema schema, UiElementReader elements)
     {
@@ -91,16 +99,24 @@ public sealed class FlaskBarReader
             return [];
         }
 
-        if (_slots.Count == 0 || nowMs - _searchedAt >= SearchAgainMs || !StillElements())
+        // Checked against the clock alone, never against the count: a bar with nothing found
+        // under it - no flask equipped, or the item pointer drifted - would otherwise be
+        // searched every tick for as long as it stays that way.
+        if (_searchedAt == Never || nowMs - _searchedAt >= SearchAgainMs)
         {
             Find(bar, nowMs);
+        }
+        else
+        {
+            DropTheDead();
         }
 
         var found = new List<FlaskSlotOnScreen>(_slots.Count);
         foreach ((ulong parent, ulong element) in _slots)
         {
             // Its own bit is enough: the bar's whole chain was checked above, and every slot
-            // hangs one or two levels under it.
+            // hangs one or two levels under it. That it IS still an element was settled by
+            // the search or the cull just before.
             if (!_elements.IsShowingItself(element))
             {
                 continue;
@@ -189,18 +205,20 @@ public sealed class FlaskBarReader
         }
     }
 
-    /// <summary>Whether every remembered slot is still an element at all.</summary>
-    private bool StillElements()
+    /// <summary>Forgets any remembered slot that is no longer an element, until the next search.</summary>
+    /// <remarks>
+    /// One read per slot - the same read a search would open with - so a tick on which a slot
+    /// dies costs that one read more than a settled one, and not a walk of the bar.
+    /// </remarks>
+    private void DropTheDead()
     {
-        foreach ((_, ulong element) in _slots)
+        for (int i = _slots.Count - 1; i >= 0; i--)
         {
-            if (!_elements.IsUiElement(element))
+            if (!_elements.IsUiElement(_slots[i].Element))
             {
-                return false;
+                _slots.RemoveAt(i);
             }
         }
-
-        return true;
     }
 
     private void Forget()
@@ -208,7 +226,7 @@ public sealed class FlaskBarReader
         _hud = 0;
         _bar = 0;
         _slots.Clear();
-        _searchedAt = long.MinValue;
+        _searchedAt = Never;
     }
 
     /// <summary>An element's StringId, or empty when it has none or is not an element.</summary>

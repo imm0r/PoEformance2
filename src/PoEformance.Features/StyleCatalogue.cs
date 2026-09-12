@@ -141,6 +141,11 @@ public static class StyleCatalogue
         // takes the interface's own "bad" ink instead, which is not offered here because it is
         // the one colour that has to mean the same thing everywhere it appears.
         new("flask.uses", "Flasks", "Uses left on a flask", StyleTraits.Colour | StyleTraits.Scale, Rgb(255, 255, 255, 240)),
+        // The plate under the figure, the same one the room names stand on: what is under the
+        // figure is whatever colour the flask is, and a pale digit on a life flask's glare was
+        // not readable with an edge alone. Its alpha is how much of the flask shows through;
+        // hidden, the figure stands on the flask with just its edge.
+        new("flask.uses.plate", "Flasks", "Backing under the figure", StyleTraits.Colour, Rgb(20, 22, 26, 180)),
 
         // ── What the area loaded ────────────────────────────────────────────
         // The card and the list have separate backings because they are read at different
@@ -211,6 +216,7 @@ public static class StyleCatalogue
         public const string ProjectileOther = "projectile.other";
         public const string ProjectileTrail = "projectile.trail";
         public const string FlaskUses = "flask.uses";
+        public const string FlaskUsesPlate = "flask.uses.plate";
         public const string PreloadBannerBack = "preload.banner.back";
         public const string PreloadListBack = "preload.list.back";
         public const string PreloadCard = "preload.card";
@@ -234,7 +240,7 @@ public static class StyleCatalogue
             PreloadBannerBack, PreloadListBack, PreloadCard,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,
-            ProjectileMine, ProjectileOther, ProjectileTrail, FlaskUses,
+            ProjectileMine, ProjectileOther, ProjectileTrail, FlaskUses, FlaskUsesPlate,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];
     }
