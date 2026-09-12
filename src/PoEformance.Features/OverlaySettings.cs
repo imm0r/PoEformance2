@@ -13,13 +13,20 @@ namespace PoEformance.Features;
 public sealed record OverlaySettings(
     [property: JsonPropertyName("minLootRarity")] ItemRarity MinLootRarity,
     [property: JsonPropertyName("showTerrain")] bool ShowTerrain = true,
-    [property: JsonPropertyName("terrainColour")] string TerrainColour = "#96C8FF",
+    [property: JsonPropertyName("terrainColour")] string TerrainColour = "#DCE3EA",
     [property: JsonPropertyName("terrainThickness")] int TerrainThickness = 1,
 
     // The dark rim around the layout's line. ON by default: the line is one colour, the
     // ground under it is every colour, and without the rim it vanishes on whichever ground
     // happens to match - see TerrainOutline.Rim.
     [property: JsonPropertyName("terrainRim")] bool TerrainRim = true,
+
+    // The floor between the lines, as a translucent sheet of its own colour under them. The
+    // defaults are the game's own look for the parts of the map it has revealed - dark navy
+    // under a pale edge - so the unrevealed layout reads as more of the same map rather than
+    // as a tangle of lines beside it. Opacity is a percentage; zero is no fill.
+    [property: JsonPropertyName("terrainFillColour")] string TerrainFillColour = "#0B1B2B",
+    [property: JsonPropertyName("terrainFillOpacity")] int TerrainFillOpacity = 70,
     [property: JsonPropertyName("hideNoise")] bool HideNoise = true,
     [property: JsonPropertyName("rememberOutOfRange")] bool RememberOutOfRange = true,
     [property: JsonPropertyName("showPoi")] bool ShowPoi = true,
@@ -195,6 +202,8 @@ public sealed record OverlaySettings(
             TerrainColour = sent.TerrainColour,
             TerrainThickness = sent.TerrainThickness,
             TerrainRim = sent.TerrainRim,
+            TerrainFillColour = sent.TerrainFillColour,
+            TerrainFillOpacity = sent.TerrainFillOpacity,
         };
     }
 
@@ -215,6 +224,8 @@ public sealed record OverlaySettings(
         {
             MinLootRarity = rarity,
             TerrainColour = ParseColour(TerrainColour) == 0 ? Default.TerrainColour : TerrainColour,
+            TerrainFillColour = ParseColour(TerrainFillColour) == 0 ? Default.TerrainFillColour : TerrainFillColour,
+            TerrainFillOpacity = Math.Clamp(TerrainFillOpacity, 0, 100),
 
             // Left null when it is null, rather than filled in with the defaults: an untouched
             // file gains no key, and the defaults keep coming from the code where a correction
@@ -285,6 +296,22 @@ public sealed record OverlaySettings(
         uint alpha = (uint)Math.Clamp(((colour >> 24) & 0xFF) * by, 0f, 255f);
         return (colour & 0x00FF_FFFF) | (alpha << 24);
     }
+
+    /// <summary>The colour with its alpha SET to a percentage, whatever alpha it carried.</summary>
+    /// <remarks>
+    /// For the fill, whose page control is a six-digit picker beside an opacity slider: the
+    /// colour never carries an alpha of its own, so there is nothing to scale and the slider
+    /// is the whole answer. Rounded, so 70 comes back as 70 rather than 69.
+    /// </remarks>
+    public static uint WithOpacity(uint colour, int percent)
+    {
+        uint alpha = (uint)((Math.Clamp(percent, 0, 100) * 255 + 50) / 100);
+        return (colour & 0x00FF_FFFF) | (alpha << 24);
+    }
+
+    /// <summary>The fill as the overlay takes it: colour and opacity in one ABGR value.</summary>
+    [JsonIgnore]
+    public uint TerrainFillPacked => WithOpacity(ParseColour(TerrainFillColour), TerrainFillOpacity);
 
     /// <summary>Writes an ImGui colour out as <c>#RRGGBB</c>, dropping the alpha.</summary>
     /// <remarks>

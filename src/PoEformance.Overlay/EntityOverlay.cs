@@ -432,7 +432,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _ground.Apply(settings.GroundOrDefault);
 
         ApplyTerrainStyle(
-            OverlaySettings.ParseColour(settings.TerrainColour), settings.TerrainThickness, settings.TerrainRim);
+            OverlaySettings.ParseColour(settings.TerrainColour), settings.TerrainThickness, settings.TerrainRim,
+            OverlaySettings.ParseColour(settings.TerrainFillColour), settings.TerrainFillOpacity);
     }
 
     /// <summary>The settings as they stand now, for writing down.</summary>
@@ -460,6 +461,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 : OverlaySettings.FormatColour(_terrainColour),
             TerrainThickness = _terrainThickness,
             TerrainRim = _terrainRim,
+            TerrainFillColour = OverlaySettings.FormatPageColour(_terrainFillColour),
+            TerrainFillOpacity = _terrainFillOpacity,
             DotLabels = ShowLabels,
             HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
             HideBehindPanels = HideBehindPanels,
@@ -2068,15 +2071,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     // What the settings page asked for, kept so the style can override it per frame without
     // either of them losing the other's value.
-    private uint _terrainColour = 0xFF64C8FF;
+    private uint _terrainColour = OverlaySettings.ParseColour(OverlaySettings.Default.TerrainColour);
     private int _terrainThickness = 1;
     private bool _terrainRim = true;
 
+    // The fill's colour and its opacity, kept APART as the page holds them: packed into one
+    // alpha and unpacked again, 70 comes back as 69, and the slider creeps on every save.
+    private uint _terrainFillColour = OverlaySettings.ParseColour(OverlaySettings.Default.TerrainFillColour);
+    private int _terrainFillOpacity = OverlaySettings.Default.TerrainFillOpacity;
+
     /// <summary>
-    /// Sets the layout's colour, line width and whether it has a dark rim. A colour of 0 keeps
-    /// the current one.
+    /// Sets the layout's colour, line width, whether it has a dark rim, and the floor's fill.
+    /// A colour of 0 keeps the current one.
     /// </summary>
-    public void ApplyTerrainStyle(uint colour, int thickness, bool rim)
+    public void ApplyTerrainStyle(uint colour, int thickness, bool rim, uint fillColour, int fillOpacity)
     {
         if (colour != 0)
         {
@@ -2084,10 +2092,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _terrain.Colour = colour;
         }
 
+        if (fillColour != 0)
+        {
+            _terrainFillColour = fillColour;
+        }
+
         _terrainThickness = thickness;
         _terrain.Thickness = thickness;
         _terrainRim = rim;
         _terrain.Rim = rim;
+        _terrainFillOpacity = fillOpacity;
+        _terrain.Fill = OverlaySettings.WithOpacity(_terrainFillColour, fillOpacity);
     }
 
     /// <summary>
@@ -2106,9 +2121,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// thread, and the style is a plain dictionary the layers read every frame - writing it
     /// from here would race those reads. A flag costs one volatile read a frame.
     /// </remarks>
-    public void ChooseTerrainStyle(uint colour, int thickness, bool rim)
+    public void ChooseTerrainStyle(uint colour, int thickness, bool rim, uint fillColour, int fillOpacity)
     {
-        ApplyTerrainStyle(colour, thickness, rim);
+        ApplyTerrainStyle(colour, thickness, rim, fillColour, fillOpacity);
         Volatile.Write(ref _terrainStyleYields, true);
     }
 

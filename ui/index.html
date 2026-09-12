@@ -89,14 +89,23 @@
       </div>
       <div class="cfg-row">
         <label for="ov-terrain-colour">Outline colour</label>
-        <input type="color" id="ov-terrain-colour" value="#96C8FF">
+        <input type="color" id="ov-terrain-colour" value="#DCE3EA">
         <label for="ov-terrain-thickness">Thickness</label>
         <input type="range" id="ov-terrain-thickness" min="1" max="6" step="1" value="1">
         <span id="ov-terrain-thickness-value" class="dim">1</span>
       </div>
       <div class="cfg-row">
-        <label><input type="checkbox" id="ov-terrain-rim"> Dark rim around the outline, so it
-          reads on bright ground too</label>
+        <label for="ov-terrain-fill-colour">Floor fill</label>
+        <input type="color" id="ov-terrain-fill-colour" value="#0B1B2B">
+        <label for="ov-terrain-fill">Opacity</label>
+        <input type="range" id="ov-terrain-fill" min="0" max="100" step="5" value="70">
+        <span id="ov-terrain-fill-value" class="dim">70 %</span>
+      </div>
+      <p class="dim">The floor between the walls as a translucent sheet, the way the game draws
+        the parts of the map it has revealed. Zero opacity draws the outline alone.</p>
+      <div class="cfg-row">
+        <label><input type="checkbox" id="ov-terrain-rim"> Dark rim along the outside of the
+          outline, so it reads on bright ground too</label>
       </div>
       <p class="dim">Terrain: <span id="ov-terrain-state">–</span> — it loads well after the
         area does, so "loading" right after a portal is normal.</p>

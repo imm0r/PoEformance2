@@ -2936,6 +2936,8 @@ internal static class Program
                         : overlay.TerrainColour,
                     overlayHandle.Overlay?.TerrainThicknessInUse ?? overlay.TerrainThickness,
                     overlay.TerrainRim,
+                    overlay.TerrainFillColour,
+                    overlay.TerrainFillOpacity,
                     DescribeTerrain(overlayHandle)),
                 Map: BuildMapView(snapshot, overlay.MinLootRarity),
 
@@ -3160,7 +3162,9 @@ internal static class Program
                         live.ChooseTerrainStyle(
                             PoEformance.Features.OverlaySettings.ParseColour(overlay.TerrainColour),
                             overlay.TerrainThickness,
-                            overlay.TerrainRim);
+                            overlay.TerrainRim,
+                            PoEformance.Features.OverlaySettings.ParseColour(overlay.TerrainFillColour),
+                            overlay.TerrainFillOpacity);
                     }
 
                     SaveWarning(

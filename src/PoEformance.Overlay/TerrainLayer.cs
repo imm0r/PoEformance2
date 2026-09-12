@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
+using PoEformance.Features;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 using SixLabors.ImageSharp;
@@ -9,7 +10,8 @@ using SixLabors.ImageSharp.PixelFormats;
 namespace PoEformance.Overlay;
 
 /// <summary>
-/// Draws the area's layout on the game's own map - the walls the map has not revealed yet.
+/// Draws the area's layout on the game's own map - the walls the map has not revealed yet,
+/// and the floor between them.
 /// </summary>
 /// <remarks>
 /// ONE TEXTURED QUAD, and the shape of it follows from the map transform:
@@ -24,23 +26,30 @@ namespace PoEformance.Overlay;
 /// correction is exact per cell. A mesh of height-carrying corners was tried first and is
 /// strictly worse: thousands of projections a frame, and only exact at the corners.
 ///
+/// The texture is kept at SEVERAL SIZES, and which one is drawn depends on the map. The
+/// renderer has no mipmaps, so on a map where a texel is smaller than a pixel the sampler
+/// skips texels, and a one-texel line becomes a row of dashes - which is what the minimap
+/// showed, and what looked like the line "going under" on some ground. See TerrainPicture:
+/// the coarser sizes are the same picture properly averaged down, and the draw picks the one
+/// whose texel is nearest a pixel. Still one quad per piece; only the handle changes.
+///
 /// This is deliberately NOT how the AHK tool does it. That one composites GDI bitmaps with
 /// rotated blits and a scroll cache, an effort that took its frame cost from 55 ms to 8 ms -
 /// and every bit of which exists because AutoHotkey has no GPU to hand the transform to.
 /// Porting that machinery here would be porting the workaround, not the feature.
 ///
-/// The texture is built once per area on the render thread. It is a few megabytes of
+/// The textures are built once per area on the render thread. It is a few megabytes of
 /// byte-per-cell work; an area change already costs a loading screen, so the frame it lands
 /// on is not one anybody is looking at.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class TerrainLayer : IDisposable
 {
-    /// <summary>The key the overlay's texture cache stores this under.</summary>
+    /// <summary>The key the overlay's texture cache stores this under, with the level appended.</summary>
     private const string TextureKey = "poeformance.terrain";
 
     /// <summary>
-    /// Largest texture edge.
+    /// Largest texture edge of the finest level.
     /// </summary>
     /// <remarks>
     /// 2048 rather than a GPU's limit, for two reasons. The map it is drawn on is a few
@@ -49,6 +58,17 @@ public sealed class TerrainLayer : IDisposable
     /// a picture nobody can tell apart from this one.
     /// </remarks>
     private const int MaxTextureEdge = 2048;
+
+    /// <summary>
+    /// How many sizes of the picture are kept, the finest included.
+    /// </summary>
+    /// <remarks>
+    /// Four reaches an eighth of the size, which covers a texel of a fifth of a pixel - past
+    /// anything a map zoomed all the way out has shown. Each level past the first costs a
+    /// quarter of the one before, so all of them together are a third more than the first
+    /// alone.
+    /// </remarks>
+    private const int Levels = 4;
 
     /// <summary>
     /// How opaque the dark rim around the line is, out of 255 - or the line's own alpha,
@@ -72,27 +92,45 @@ public sealed class TerrainLayer : IDisposable
     /// </remarks>
     private const int RimWidth = 2;
 
+    /// <summary>One uploaded size of the picture, and how many grid cells it spans.</summary>
+    /// <remarks>
+    /// The span is the texel count times the texel's size in cells, padding included - NOT
+    /// the grid's size. A coarser level is rounded up to whole texels, and its last texel
+    /// really does reach past the grid; drawn over the grid's own extent it would be
+    /// squeezed by that much, an error invisible at the near corner and a texel at the far.
+    /// </remarks>
+    private readonly record struct Level(IntPtr Texture, int Width, int Height, float CoverX, float CoverY);
+
     private readonly Func<string, Image<Rgba32>, bool, IntPtr> _upload;
     private readonly Action<string> _release;
 
     private TerrainGrid? _built;
-    private IntPtr _texture;
-    private int _textureWidth;
-    private int _textureHeight;
+    private Level[] _levels = [];
 
-    // How much of the grid the texture actually covers. Thinning floors the pixel count, so
-    // on a large area this is a cell or two short of the grid - and stretching the image over
+    // Grid cells per texel of the finest level. Thinning floors the pixel count, so on a
+    // large area the finest level is a cell or two short of the grid - and stretching it over
     // the full width instead would shift it by that much.
-    private int _coverX = 1;
-    private int _coverY = 1;
+    private int _step = 1;
 
     // How far the drawn line sits from the boundary it describes, in grid cells - see
     // OutlineMask.LeanCells. Subtracted from the mesh's own position, which is the only
     // place it can be corrected without changing what the texture's pixels mean.
     private float _lean;
-    private uint _colour = 0xFF64C8FF;
+
+    // The colour the quad is drawn through: the envelope of the line's and the fill's, see
+    // TerrainPicture.Split. Opaque; the alphas are in the pixels.
+    private uint _tint = 0xFFFF_FFFF;
+
+    private uint _colour = OverlaySettings.ParseColour(OverlaySettings.Default.TerrainColour);
+    private uint _fill = OverlaySettings.Default.TerrainFillPacked;
     private int _thickness = 1;
     private bool _rim = true;
+
+    // What the last draw measured, for the readout: it is the one place the question "is a
+    // texel smaller than a pixel here" can be answered, since it depends on the map's zoom.
+    private float _texelPixels;
+    private int _level;
+    private bool _onLargeMap;
 
     // Set once the layer has given up, so a failure is reported once rather than every frame.
     private string? _failure;
@@ -108,33 +146,57 @@ public sealed class TerrainLayer : IDisposable
     }
 
     /// <summary>
-    /// Outline colour, ABGR as ImGui packs it.
+    /// Outline colour, ABGR as ImGui packs it. Changing it rebuilds the texture.
     /// </summary>
     /// <remarks>
-    /// The HUE is a tint applied at draw time, not baked into the texture: the image is
-    /// white and the quad is drawn through this, so changing the colour costs nothing and
-    /// rebuilds nothing. Thickness cannot work that way - it changes the pixels - so that
-    /// one does force a rebuild.
+    /// The hue used to be a tint applied at draw time, free to change; the fill is what ended
+    /// that. The quad is drawn through ONE colour and the fill has a colour of its own, so
+    /// both are baked as ratios of a shared envelope and the envelope is the tint - see
+    /// TerrainPicture.Split. A colour change therefore rebuilds, as thickness always has; the
+    /// page sends a colour once per pick, not per drag, so that is a rebuild per decision.
     ///
-    /// The ALPHA is baked, and changing it rebuilds too. Tinting multiplies alpha as well as
-    /// colour, so a half-transparent line tinted through the quad would take its rim down
-    /// with it - to a fifth, on a real style file - and the rim exists precisely for the
-    /// case where the line alone does not read. So the line's alpha goes into its own
-    /// pixels, the rim keeps its own, and the quad is tinted opaque. Alpha changes as often
-    /// as somebody drags the picker's alpha slider, which is not often.
+    /// The ALPHA is baked as well, and always was. Tinting multiplies alpha as well as colour,
+    /// so a half-transparent line tinted through the quad would take its rim down with it -
+    /// to a fifth, on a real style file - and the rim exists precisely for the case where the
+    /// line alone does not read. So the line's alpha goes into its own pixels, the rim keeps
+    /// its own, and the quad is tinted opaque.
     /// </remarks>
     public uint Colour
     {
         get => _colour;
         set
         {
-            if (((value ^ _colour) & 0xFF00_0000) != 0)
+            if (value != _colour)
             {
+                _colour = value;
                 _built = null;
                 _failure = null;
             }
+        }
+    }
 
-            _colour = value;
+    /// <summary>
+    /// The floor's fill: its colour, with its opacity for alpha. Zero alpha is no fill.
+    /// Changing it rebuilds the texture.
+    /// </summary>
+    /// <remarks>
+    /// The floor as a translucent sheet under the line, the way the game's own map draws
+    /// the parts it has revealed - a dark sheet with a pale edge. It is what makes the layout
+    /// read as ROOMS rather than as a tangle of lines, and it is unmistakably a different
+    /// thing from the game's unfilled wall markings on the minimap. It also survives being
+    /// drawn small in a way no line can: an area averages down to the same area.
+    /// </remarks>
+    public uint Fill
+    {
+        get => _fill;
+        set
+        {
+            if (value != _fill)
+            {
+                _fill = value;
+                _built = null;
+                _failure = null;
+            }
         }
     }
 
@@ -155,8 +217,8 @@ public sealed class TerrainLayer : IDisposable
     }
 
     /// <summary>
-    /// Whether the line gets a dark, half-transparent rim one pixel wide. Changing it rebuilds
-    /// the texture, for the reason thickness does: the rim is pixels, not a tint.
+    /// Whether the line gets a dark, half-transparent rim on the side facing the world.
+    /// Changing it rebuilds the texture, for the reason thickness does: the rim is pixels.
     /// </summary>
     public bool Rim
     {
@@ -190,7 +252,7 @@ public sealed class TerrainLayer : IDisposable
 
         if (!ReferenceEquals(_built, grid))
         {
-            // Building uploads a texture through the renderer, which is the one thing here
+            // Building uploads textures through the renderer, which is the one thing here
             // that can fail for reasons this code does not control - a driver, an allocator,
             // an image too large for something downstream. This runs on the RENDER thread,
             // where an escaping exception ends the process: that is how a split image buffer
@@ -204,15 +266,21 @@ public sealed class TerrainLayer : IDisposable
             {
                 _failure = exception.Message;
                 _built = grid;
-                _texture = IntPtr.Zero;
+                _levels = [];
                 Console.Error.WriteLine($"terrain layer disabled: {exception.Message}");
             }
         }
 
-        if (_texture == IntPtr.Zero)
+        if (_levels.Length == 0)
         {
             return;
         }
+
+        // The size whose texel is nearest a screen pixel on THIS map - the minimap and the
+        // large map differ by the map's zoom, and the zoom changes under the mouse wheel.
+        _texelPixels = map.PixelsPerCellEdge * _step;
+        _level = TerrainPicture.LevelFor(_texelPixels, _levels.Length);
+        _onLargeMap = map.IsLargeMap;
 
         // Clipped to the parts of the map that may be drawn on, so a grid larger than the
         // minimap does not spill the level layout across the whole screen - and so the outline
@@ -225,7 +293,7 @@ public sealed class TerrainLayer : IDisposable
         foreach (ScreenRect piece in map.Uncovered)
         {
             draw.PushClipRect(piece.TopLeft, piece.BottomRight, intersect_with_current_clip_rect: true);
-            DrawQuad(draw, map, grid, player);
+            DrawQuad(draw, map, grid, player, _levels[_level]);
             draw.PopClipRect();
         }
     }
@@ -246,41 +314,50 @@ public sealed class TerrainLayer : IDisposable
     /// ground: the displacement supplies each wall's height, and this supplies the "minus the
     /// player's" half of the difference.
     /// </remarks>
-    private void DrawQuad(ImDrawListPtr draw, MapView map, TerrainGrid grid, Vector3 player)
+    private void DrawQuad(ImDrawListPtr draw, MapView map, TerrainGrid grid, Vector3 player, Level level)
     {
         // Without heights nothing was displaced, so the map is drawn at the player's own
         // elevation - flat, exactly as it was before any of this existed.
         float height = grid.HasHeights ? 0f : player.Z;
 
-        Vector2 Corner(int gx, int gy) => map.Project(
+        Vector2 Corner(float gx, float gy) => map.Project(
             (gx - _lean) * MapView.WorldToGrid, (gy - _lean) * MapView.WorldToGrid, height,
             player.X, player.Y, player.Z);
 
-        Vector2 a = Corner(0, 0);
-        Vector2 b = Corner(_coverX, 0);
-        Vector2 c = Corner(_coverX, _coverY);
-        Vector2 d = Corner(0, _coverY);
+        Vector2 a = Corner(0f, 0f);
+        Vector2 b = Corner(level.CoverX, 0f);
+        Vector2 c = Corner(level.CoverX, level.CoverY);
+        Vector2 d = Corner(0f, level.CoverY);
 
-        // Opaque: the alpha is in the texture, see Colour.
+        // Through the envelope of the two colours, opaque: the alphas are in the texture and
+        // the colours come back out of the multiplication - see Colour.
         draw.AddImageQuad(
-            _texture, a, b, c, d,
+            level.Texture, a, b, c, d,
             new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1),
-            _colour | 0xFF00_0000);
+            _tint);
     }
 
-    /// <summary>Turns the walkable grid into an outline texture, once per area.</summary>
+    /// <summary>Turns the walkable grid into the outline's textures, once per area.</summary>
     private void Build(TerrainGrid grid)
     {
         _built = grid;
-        if (_texture != IntPtr.Zero)
-        {
-            _release(TextureKey);
-            _texture = IntPtr.Zero;
-        }
+        ReleaseTextures();
 
         // Thin rather than refuse: a grid wider than a GPU will take still has a layout
         // worth seeing, and it is drawn a few hundred pixels across regardless.
         OutlineMask mask = TerrainOutline.Build(grid, MaxTextureEdge, _thickness, isoHeightShift: true);
+        byte[] line = mask.Cells;
+
+        // With the rim off, the line's own pixels stand in for it: the painter then never
+        // finds a rim pixel the line does not already cover, and no second buffer is built.
+        byte[] rim = _rim ? TerrainOutline.Rim(mask, RimWidth) : line;
+
+        // The floor, only when it is to be drawn: it is the one pass here that visits every
+        // cell rather than the boundary.
+        byte[]? fill = (_fill >> 24) == 0 ? null : TerrainOutline.Fill(grid, mask, isoHeightShift: true);
+
+        (uint tint, uint lineBaked, uint fillBaked) = TerrainPicture.Split(_colour, _fill);
+        TerrainPicture picture = TerrainPicture.Paint(mask, rim, fill, lineBaked, fillBaked, RimAlpha);
 
         // CONTIGUOUS on purpose, and this is not a preference. ImageSharp splits anything
         // past a few megabytes across several buffers, and the renderer uploads a texture
@@ -294,63 +371,80 @@ public sealed class TerrainLayer : IDisposable
         Configuration configuration = Configuration.Default.Clone();
         configuration.PreferContiguousImageBuffers = true;
 
-        using var image = new Image<Rgba32>(configuration, mask.Width, mask.Height);
-
-        // White where the boundary is, a dark rim around it, transparent everywhere else.
-        // The hue comes from the tint at draw time, so changing it costs nothing and rebuilds
-        // nothing - and because a tint MULTIPLIES, the rim's black stays black under every
-        // colour. The alphas are in the pixels, for the reason given at Colour.
-        //
-        // The rim is in the texture rather than a second, wider quad underneath, which would
-        // draw every pixel of the map twice per piece - and the pale line is not distinct
-        // from a sunlit rock without it, which is the difference between a map and nothing.
-        byte[] line = mask.Cells;
-
-        // With the rim off, the line's own pixels stand in for it: the test below then never
-        // finds a rim pixel the line does not already cover, and no second buffer is built.
-        byte[] rim = _rim ? TerrainOutline.Rim(mask, RimWidth) : line;
-
-        // The rim is never more solid than the line it serves: a faint line with a firm
-        // black edge reads as the edge, and the line becomes the thing that is hard to see.
-        byte lineAlpha = (byte)(_colour >> 24);
-        var lit = new Rgba32(255, 255, 255, lineAlpha);
-        var dark = new Rgba32(0, 0, 0, Math.Min(RimAlpha, lineAlpha));
-        var clear = new Rgba32(0, 0, 0, 0);
-        image.ProcessPixelRows(rows =>
+        var levels = new List<Level>(Levels);
+        int cellsPerTexel = mask.Step;
+        for (int level = 0; level < Levels; level++)
         {
-            for (int y = 0; y < mask.Height; y++)
-            {
-                Span<Rgba32> row = rows.GetRowSpan(y);
-                int at = y * mask.Width;
-                for (int x = 0; x < mask.Width; x++, at++)
-                {
-                    row[x] = line[at] != 0 ? lit : rim[at] != 0 ? dark : clear;
-                }
-            }
-        });
+            using var image = Image.LoadPixelData<Rgba32>(configuration, picture.Pixels, picture.Width, picture.Height);
 
-        _texture = _upload(TextureKey, image, false);
-        _textureWidth = mask.Width;
-        _textureHeight = mask.Height;
-        _coverX = Math.Min(grid.Width, mask.Width * mask.Step);
-        _coverY = Math.Min(grid.Height, mask.Height * mask.Step);
+            // The key in a local, not inline: a test reads every upload call out of the source
+            // by regex to check the sRGB flag, and it deliberately stops at a nested bracket.
+            string key = KeyOf(level);
+            IntPtr texture = _upload(key, image, false);
+            levels.Add(new Level(
+                texture, picture.Width, picture.Height,
+                picture.Width * cellsPerTexel, picture.Height * cellsPerTexel));
+
+            // A picture already down to a texel has nothing left to halve.
+            if (level + 1 == Levels || (picture.Width <= 1 && picture.Height <= 1))
+            {
+                break;
+            }
+
+            picture = picture.Halved();
+            cellsPerTexel *= 2;
+        }
+
+        _levels = [.. levels];
+        _step = mask.Step;
         _lean = mask.LeanCells;
+        _tint = tint;
     }
 
-    /// <summary>The texture's size, or why there is none - for the readouts.</summary>
+    private static string KeyOf(int level) => $"{TextureKey}.{level}";
+
+    /// <summary>
+    /// Drops every level's texture, whether or not it was uploaded: the renderer ignores a
+    /// key it does not hold, and a build that failed halfway leaves the early levels behind.
+    /// </summary>
+    private void ReleaseTextures()
+    {
+        for (int level = 0; level < Levels; level++)
+        {
+            _release(KeyOf(level));
+        }
+
+        _levels = [];
+    }
+
+    /// <summary>The textures' sizes and which one the map gets, or why there is none - for the readouts.</summary>
+    /// <remarks>
+    /// The pixels-per-texel figure is the measurement behind the levels: below one, the
+    /// finest picture would be skipping texels on this map. It is only known once the map has
+    /// been drawn on, since it depends on that map's zoom.
+    /// </remarks>
     public string Describe()
-        => _failure is not null ? $"failed: {_failure}"
-            : _texture == IntPtr.Zero ? "none"
-            : $"{_textureWidth}x{_textureHeight}";
+    {
+        if (_failure is not null)
+        {
+            return $"failed: {_failure}";
+        }
+
+        if (_levels.Length == 0)
+        {
+            return "none";
+        }
+
+        Level finest = _levels[0];
+        string sizes = $"{finest.Width}x{finest.Height} in {_levels.Length} levels";
+        return _texelPixels > 0f
+            ? $"{sizes}, {_texelPixels:F2} px/texel on the {(_onLargeMap ? "large map" : "minimap")} -> level {_level}"
+            : $"{sizes}, not drawn yet";
+    }
 
     public void Dispose()
     {
-        if (_texture != IntPtr.Zero)
-        {
-            _release(TextureKey);
-            _texture = IntPtr.Zero;
-        }
-
+        ReleaseTextures();
         _built = null;
     }
 }

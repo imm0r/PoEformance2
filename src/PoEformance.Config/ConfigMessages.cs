@@ -54,6 +54,8 @@ public sealed record OverlayView(
     [property: JsonPropertyName("terrainColour")] string TerrainColour,
     [property: JsonPropertyName("terrainThickness")] int TerrainThickness,
     [property: JsonPropertyName("terrainRim")] bool TerrainRim,
+    [property: JsonPropertyName("terrainFillColour")] string TerrainFillColour,
+    [property: JsonPropertyName("terrainFillOpacity")] int TerrainFillOpacity,
     [property: JsonPropertyName("terrain")] string Terrain);
 
 /// <summary>One marker on the page's map, in outline-pixel coordinates.</summary>
