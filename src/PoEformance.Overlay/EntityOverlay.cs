@@ -204,6 +204,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _projectiles.Style = value;
             _atlas.Style = value;
             _ground.Style = value;
+            _flaskUses.Style = value;
         }
     }
 
@@ -672,6 +673,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>The boss beams, drawn as the lines they occupy. See BeamLayer.</summary>
     private readonly BeamLayer _beams = new();
     private readonly StatusIconLayer _statusIcons = new();
+    private readonly FlaskUsesLayer _flaskUses = new();
     private readonly AimLayer _aim = new();
 
     /// <summary>The evasion warnings. Not one of the tracker's - it has its own settings file.</summary>
@@ -2467,6 +2469,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
+        // On the game's own HUD rather than in the world, so it stands behind none of the gate
+        // above: a town has flasks too, and an open panel leaves the belt on screen. It goes
+        // away with the bar, which the reader stops reporting while the interface hides it.
+        if (_snapshot.InGame && width > 0 && height > 0)
+        {
+            _flaskUses.Draw(ImGui.GetBackgroundDrawList(), _snapshot);
+        }
+
         // OUTSIDE the marker gate above, which only lets things through in a hostile area.
         // The atlas is opened from a hideout at least as often as from a map, and it draws
         // over the game's own panel rather than over the world - so the reasons that gate
@@ -3076,11 +3086,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // is not running, when it actually means a read gave up.
             if (_snapshot.FlaskBelt is FlaskBelt belt && !belt.IsUnknown)
             {
+                // With the slots the HUD shows, because the number on a flask needs both halves
+                // and "no number" does not say which one is missing.
+                int onScreen = _snapshot.FlaskSlotsOnScreen.Count;
                 Row(
                     "belt",
                     string.Join("   ", belt.Flasks.Select(f =>
                         $"{f.Slot}:{f.Charges}/{f.MaxCharges}"
-                        + (f.IsCharm ? " (charm)" : f.CanUse ? string.Empty : " (empty)"))),
+                        + (f.IsCharm ? " (charm)" : f.CanUse ? string.Empty : " (empty)")))
+                    + (onScreen > 0 ? $"   {onScreen} slots on the HUD" : "   (flask bar not on screen)"),
                     figure: true);
             }
             else

@@ -52,10 +52,15 @@ internal sealed class UiTree
         byte scaleIndex = 2,
         float multiplier = 1f,
         Vector2 positionModifier = default,
+        ulong itemPtr = 0,
         params int[] children)
     {
         ArgumentNullException.ThrowIfNull(children);
         ulong address = At(index);
+
+        // The item a slot element holds. Placed for every element, zero included, so a reader
+        // asking a non-slot gets an answer rather than unplaced memory.
+        _fake.Place<ulong>(address + (ulong)_ui.OffsetOf("ItemPtr"), itemPtr);
 
         _fake.Place<ulong>(address + (ulong)_ui.OffsetOf("Self"), address);
         _fake.Place<ulong>(address + (ulong)_ui.OffsetOf("ParentPtr"), parent >= 0 ? At(parent) : 0UL);

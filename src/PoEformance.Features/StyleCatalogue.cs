@@ -135,6 +135,13 @@ public static class StyleCatalogue
         new("projectile.chaos", "Projectiles", "Chaos trail", StyleTraits.Colour, Rgb(166, 122, 255)),
         new("projectile.physical", "Projectiles", "Physical trail", StyleTraits.Colour, Rgb(214, 214, 214)),
 
+        // ── The belt ────────────────────────────────────────────────────────
+        // The figure written on each flask: how many uses it has left. Scale sizes it against
+        // the slot. The colour is the figure's while there is a use in the flask; an empty one
+        // takes the interface's own "bad" ink instead, which is not offered here because it is
+        // the one colour that has to mean the same thing everywhere it appears.
+        new("flask.uses", "Flasks", "Uses left on a flask", StyleTraits.Colour | StyleTraits.Scale, Rgb(255, 255, 255, 240)),
+
         // ── What the area loaded ────────────────────────────────────────────
         // The card and the list have separate backings because they are read at different
         // moments: the card interrupts on the way in, while the list sits there while you
@@ -203,6 +210,7 @@ public static class StyleCatalogue
         public const string ProjectileMine = "projectile.mine";
         public const string ProjectileOther = "projectile.other";
         public const string ProjectileTrail = "projectile.trail";
+        public const string FlaskUses = "flask.uses";
         public const string PreloadBannerBack = "preload.banner.back";
         public const string PreloadListBack = "preload.list.back";
         public const string PreloadCard = "preload.card";
@@ -226,7 +234,7 @@ public static class StyleCatalogue
             PreloadBannerBack, PreloadListBack, PreloadCard,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,
-            ProjectileMine, ProjectileOther, ProjectileTrail,
+            ProjectileMine, ProjectileOther, ProjectileTrail, FlaskUses,
             AidCentre, AidGround, AidHealthbar, AidLink, AidSelected, AidHovered,
         ];
     }
@@ -255,8 +263,11 @@ public static class StyleCatalogue
         /// <summary>On the atlas page.</summary>
         public static readonly string[] Atlas = ["The atlas"];
 
-        /// <summary>On the combat page, beside the projectile switches.</summary>
-        public static readonly string[] Projectiles = ["Projectiles"];
+        /// <summary>
+        /// On the combat page, beside the projectile switches - and the belt with them, being
+        /// the other thing drawn about a fight rather than about a place.
+        /// </summary>
+        public static readonly string[] Projectiles = ["Projectiles", "Flasks"];
 
         /// <summary>
         /// Everything drawn on the game world itself - the markers, the routes, the layout,
