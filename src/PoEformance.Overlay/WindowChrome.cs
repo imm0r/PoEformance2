@@ -194,6 +194,22 @@ public sealed class WindowChrome
         Vector2 size = ImGui.GetWindowSize();
         _seen[id] = (at, size);
 
+        // NOT ON THE FRAME THE WINDOW APPEARS. ImGui hides a new window for one frame to
+        // measure it - Begin still returns true, so this still runs - sizes it to its content
+        // so far, which is nothing, so the style's minimum, and applies a pivoted position only
+        // from the next frame on (imgui.cpp 1.91.6, Begin: "Hide new windows for one frame
+        // until they calculate their size", and window_pos_with_pivot requiring
+        // HiddenFramesCannotSkipItems == 0). So on this one frame the window stands at last
+        // session's top-left at a fraction of its size, and settling THAT moved every window
+        // anchored at the bottom or the right in by its own height or width: the two
+        // auto-fitting panels crept up the screen a little on every launch. Nothing is tracked
+        // from here either - with no standing anchor, the next frame asserts the saved rule,
+        // by then with the pivot honoured and the real size known.
+        if (ImGui.IsWindowAppearing())
+        {
+            return;
+        }
+
         Vector2 view = ImGui.GetIO().DisplaySize;
         if (view.X <= 0 || view.Y <= 0)
         {
