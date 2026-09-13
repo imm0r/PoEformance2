@@ -530,6 +530,34 @@ public class AtlasViewTests
     }
 
     [Fact]
+    public void WHATTheGameSaysItDoesNotShowIsNotShown()
+    {
+        // Badge 0x006e is a developer's placeholder - "[DNT] Breach City - Not Shown to
+        // Players", described as "DNT No visual identity = not shown" - and it went onto four
+        // maps of a real atlas, in the same plate as everything the game does mean to say.
+        AtlasNode node = Node(0, 0, badges: [0x006E]);
+
+        Assert.Empty(AtlasWatch.Words(node, LoadedContents()));
+
+        // The row is still IN the table, so the id is recognised rather than reported as one
+        // nothing has heard of - it is the drawing that skips it.
+        Assert.NotNull(LoadedContents().Badge(0x006E));
+    }
+
+    [Fact]
+    public void ANDTheMarkIsTheBracketRatherThanTheLettersDNT()
+    {
+        // The game has used "[UNUSED]" and bare brackets for the same thing, and no real
+        // content has ever begun with one. Matching "DNT" would leave those drawn.
+        Assert.True(AtlasWatch.Placeholder("[DNT] Breach City - Not Shown to Players"));
+        Assert.True(AtlasWatch.Placeholder("[UNUSED] Something"));
+        Assert.False(AtlasWatch.Placeholder("Breach"));
+        Assert.False(AtlasWatch.Placeholder("Area contains Abysses"));
+        Assert.False(AtlasWatch.Placeholder(string.Empty));
+        Assert.False(AtlasWatch.Placeholder(null));
+    }
+
+    [Fact]
     public void ANDDropsTheWordingWhenItOnlyRepeatsTheLine()
     {
         // Which is the usual case for an effect: its label IS its description, so keeping both

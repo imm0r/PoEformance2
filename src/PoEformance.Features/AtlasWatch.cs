@@ -672,6 +672,13 @@ public sealed class AtlasWatch
     /// tooltip - the name of the thing - and its high half is a category tag rather than a
     /// magnitude. Only the effect lines beneath it count anything, and only the ones whose
     /// wording has somewhere to put a number.
+    ///
+    /// AND WHAT THE GAME SAYS IT DOES NOT SHOW, this does not show either. One row of that table
+    /// is a developer's placeholder - "[DNT] Breach City - Not Shown to Players", described as
+    /// "DNT No visual identity = not shown" - and it went straight onto four maps of a real
+    /// atlas, in the same plate as everything the game does mean to say. The row is KEPT, so its
+    /// id stays known rather than being reported as one nothing has heard of; it is the drawing
+    /// that skips it. See <see cref="Placeholder"/>.
     /// </remarks>
     public static IReadOnlyList<AtlasSaid> Words(AtlasNode node, AtlasContentNames contents)
     {
@@ -702,7 +709,7 @@ public sealed class AtlasWatch
 
         void Add(AtlasContent content, string word)
         {
-            if (word.Length == 0)
+            if (word.Length == 0 || Placeholder(word))
             {
                 return;
             }
@@ -729,6 +736,28 @@ public sealed class AtlasWatch
             said.Add(new AtlasSaid(word, detail, content.Icon));
         }
     }
+
+    /// <summary>
+    /// Whether a content's wording is a placeholder rather than something to show a player.
+    /// </summary>
+    /// <remarks>
+    /// A SQUARE BRACKET AT THE FRONT IS THE GAME'S OWN MARK for a row that is not finished
+    /// content: "[DNT] Breach City - Not Shown to Players" in the content table, "[DNT-UNUSED]
+    /// Vastiri Outpost" and "[DNT] Ship" among the map names. DNT is "do not translate", which
+    /// is how a string that never reaches a player is flagged for the translators - and a
+    /// string the translators are told to leave alone is a string nobody meant to be read.
+    ///
+    /// Matched on the BRACKET rather than on the letters DNT, because the bracket is the part
+    /// that is consistent: the game has used "[UNUSED]" and bare "[...]" for the same thing, and
+    /// a real content has never begun with one. It is deliberately not matched on the
+    /// description, which says useful things about real content in every other row.
+    ///
+    /// Only the DRAWING is spared it. The table keeps the row, so the id is still recognised -
+    /// dropping it would turn a known-and-hidden content into an unknown one, which is the state
+    /// this project reports as something worth investigating.
+    /// </remarks>
+    public static bool Placeholder(string? word)
+        => word is { Length: > 0 } && word[0] == '[';
 
     /// <summary>
     /// A route's grid positions turned into screen ones, BROKEN wherever a step is missing.
