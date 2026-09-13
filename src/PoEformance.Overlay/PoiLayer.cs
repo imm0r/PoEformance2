@@ -386,12 +386,57 @@ public sealed class PoiLayer
 
             if (ShowLabels && map.IsLargeMap)
             {
-                draw.AddText(
-                    at + new Vector2(size + 3f, -7f),
-                    OverlayStyle.Faded(Style[StyleCatalogue.Keys.PlaceLabel].ColourOr(chosen), fade),
-                    place.Name);
+                Vector2 label = at + new Vector2(size + 3f, -7f);
+                uint ink = OverlayStyle.Faded(
+                    Style[StyleCatalogue.Keys.PlaceLabel].ColourOr(chosen), fade);
+                draw.AddText(label, ink, place.Name);
+                Unrecognised(draw, label, ink, glyph, place);
             }
         }
+    }
+
+    /// <summary>
+    /// What the GAME calls a marker this cannot classify, beside its label.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE MARKER THAT CANNOT ANSWER FOR ITSELF. Every other shape says what it is by
+    /// being that shape; the unrecognised one says only "the game marked this and I do not
+    /// know what it is" - and gave no way to find out, because the icon name it failed to
+    /// recognise was read, used, and then dropped. Three of these turned up in one small area
+    /// with nothing to go on but their positions.
+    ///
+    /// The name is what the KEYWORDS ARE MATCHED AGAINST - see PoiGlyphs.FromName - so it is
+    /// drawn raw, joined words and all, rather than spaced out for reading. Spacing it would
+    /// show something subtly different from what the matching actually sees, which on the one
+    /// screen somebody is using to work out why a marker went unrecognised is the wrong
+    /// difference to introduce.
+    ///
+    /// ONLY on the unrecognised ones. A chest that draws as a chest has already said
+    /// everything its icon name would, and forty of these down a map is a wall of file names.
+    /// </remarks>
+    private static void Unrecognised(
+        ImDrawListPtr draw, Vector2 label, uint ink, PoiGlyph glyph, Place place)
+    {
+        if (glyph != PoiGlyph.Marker || place.Icon.Length == 0)
+        {
+            return;
+        }
+
+        // Skip it when the label IS the icon name: an entity with no name of its own already
+        // falls back to the spaced-out form of exactly this string, and printing both makes
+        // the map say the same thing twice.
+        if (string.Equals(place.Name, PointsOfInterest.Readable(place.Icon), StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        // Quieter than the name, because it is what the tool knows rather than what the thing
+        // is called - and in brackets, so it reads as machinery rather than as part of a name.
+        // The ink already carries the marker's own fade, so this only takes it down further.
+        draw.AddText(
+            label + new Vector2(ImGui.CalcTextSize(place.Name).X + 5f, 0f),
+            OverlayStyle.Faded(ink, 0.65f),
+            $"[{place.Icon}]");
     }
 
     /// <summary>

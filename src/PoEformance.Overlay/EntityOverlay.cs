@@ -33,6 +33,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly IntPtr _gameWindow;
     private readonly int _cull;
     private WorldSnapshot _snapshot = WorldSnapshot.Empty;
+
+    /// <summary>The icon names the classifier gave up on, collected for later. See the type.</summary>
+    private readonly UnrecognisedMarkers _unrecognised = new();
     private ClientRect _tracked;
     private readonly TerrainLayer _terrain;
     private readonly IconCache _icons;
@@ -1012,7 +1015,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             page: Markers,
             pageLabel: "Markers");
 
-        _tools.Add(66, "markers-places", "Map & Places", places.Draw, places.Idle, page: Markers);
+        _tools.Add(
+            66,
+            "markers-places",
+            "Map & Places",
+            () =>
+            {
+                // On THIS tab, because the unrecognised marker whose row is on it is what the
+                // collected names are about - and a file nothing mentions is a file nobody
+                // opens. One line, and only once there is something in it to open.
+                DrawCollectedNames();
+                places.Draw();
+            },
+            places.Idle,
+            page: Markers);
         _tools.Add(67, "markers-health", "Health Bars", health.Draw, health.Idle, page: Markers);
         _tools.Add(68, "markers-aids", "Measuring Aids", aids.Draw, aids.Idle, page: Markers);
 
@@ -1021,6 +1037,34 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             _tools.Show("style");
         }
+    }
+
+    /// <summary>
+    /// How many icon names the classifier gave up on, and where they were written.
+    /// </summary>
+    /// <remarks>
+    /// The collecting happens whether or not anybody reads this - see
+    /// <see cref="UnrecognisedMarkers"/> - so this is only the part that says it is happening.
+    /// Without it the file is a secret, and a secret file is one nobody sends on when they ask
+    /// why a marker is a question mark.
+    /// </remarks>
+    private void DrawCollectedNames()
+    {
+        int names = _unrecognised.Count;
+        if (names == 0)
+        {
+            return;
+        }
+
+        ImGuiText.Wrapped(
+            OverlayInk.Quiet,
+            names == 1
+                ? "1 icon name the marker rules do not recognise has been collected, with an"
+                    + " example path for it:"
+                : $"{names} icon names the marker rules do not recognise have been collected,"
+                    + " with an example path for each:");
+        ImGuiText.Mono(OverlayInk.Quiet, UnrecognisedMarkers.LogPath);
+        ImGui.Separator();
     }
 
     /// <summary>
@@ -2387,6 +2431,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         _viewport = (width, height);
         _snapshot = _snapshotSource(new UiScale(width, height, _cull));
+
+        // HERE rather than where the markers are drawn, because the markers are only walked
+        // while a map is open - and an icon name nobody can classify is worth catching whether
+        // or not somebody happened to have the map up when they walked past it.
+        _unrecognised.Note(_snapshot);
 
         // Where the game's panels are, handed to the windows so one lying over an open panel can
         // take itself off screen until it is not. Published every frame including the empty
