@@ -152,9 +152,9 @@ public class OverlayStyleTests
         // They are NOT equal - the zero value's strings are null and a written one's are
         // empty - and treating that difference as a change is how an entry that says nothing
         // ends up stored, pinning a default that was never chosen.
-        Assert.True(new LayerStyle(Colour: "", Icon: "").SaysNothing);
+        Assert.True(new LayerStyle(Colour: "", Plate: "").SaysNothing);
         Assert.True(default(LayerStyle).SaysNothing);
-        Assert.NotEqual(default, new LayerStyle(Colour: "", Icon: ""));
+        Assert.NotEqual(default, new LayerStyle(Colour: "", Plate: ""));
     }
 }
 
@@ -308,11 +308,87 @@ public class OverlayStyleStoreTests
     private static string TempPath()
         => Path.Combine(Path.GetTempPath(), $"poeformance-style-{Guid.NewGuid():N}.json");
 
+    /// <summary>
+    /// A style file written before icons became sheet cells still loads - all of it.
+    /// </summary>
+    /// <remarks>
+    /// THE WHOLE REASON THE NEW FIELD HAS A NEW KEY. Icons used to be file paths stored under
+    /// <c>"icon"</c>. Reusing that name for the cell number would ask the deserialiser to read
+    /// a string into an int, which throws - and the file is read in ONE go, so the throw is
+    /// caught by the store's own guard and the answer is an empty style. Every colour, width
+    /// and size in it would be gone, silently, on the first run of the new build; the icon
+    /// would be the only thing anybody expected to lose.
+    ///
+    /// Under a new key the stale string is simply an unknown property, which the deserialiser
+    /// ignores. The icon goes back to the built-in shape, which is the loss that was signed up
+    /// for, and nothing else moves.
+    /// </remarks>
+    [Fact]
+    public void AStyleFileFromBeforeTheSheetKeepsEverythingButItsIcons()
+    {
+        string path = TempPath();
+        try
+        {
+            File.WriteAllText(
+                path,
+                """
+                {
+                  "entity.monster.rare": {
+                    "hidden": false,
+                    "colour": "#FF00FF",
+                    "width": 0,
+                    "scale": 1.5,
+                    "icon": "C:\\pictures\\rare.png"
+                  },
+                  "route.2": { "hidden": true, "width": 3.5 }
+                }
+                """);
+
+            OverlayStyle loaded = OverlayStyleStore.Load(path);
+
+            // The icon is the only casualty.
+            Assert.Equal(0, loaded["entity.monster.rare"].IconTile);
+            Assert.False(loaded["entity.monster.rare"].HasIcon);
+
+            // Everything else survived, which is the point.
+            Assert.Equal("#FF00FF", loaded["entity.monster.rare"].Colour);
+            Assert.Equal(1.5f, loaded["entity.monster.rare"].Scale);
+            Assert.False(loaded.Visible("route.2"));
+            Assert.Equal(3.5f, loaded.Width("route.2", 1f));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    /// <summary>
+    /// Cell zero is "no icon", so an untouched entry cannot acquire the sheet's first picture.
+    /// </summary>
+    /// <remarks>
+    /// Counted from one for exactly this: the all-zero LayerStyle is reachable through a
+    /// dictionary miss, an omitted JSON key and an uninitialised slot alike, and counted from
+    /// zero every one of those would mean "draw cell 0". The symptom would be every marker
+    /// nobody ever configured quietly wearing the same icon.
+    /// </remarks>
+    [Fact]
+    public void ADefaultEntryHasNoIconRatherThanTheFirstOne()
+    {
+        Assert.False(default(LayerStyle).HasIcon);
+        Assert.True(default(LayerStyle).SaysNothing);
+
+        // And the first cell of the sheet is still reachable - it is cell one.
+        var first = new LayerStyle(IconTile: 1);
+        Assert.True(first.HasIcon);
+        Assert.Equal(0, first.IconIndex);
+        Assert.False(first.SaysNothing);
+    }
+
     [Fact]
     public void WhatWasChangedComesBack()
     {
         var wanted = new OverlayStyle();
-        wanted.Set("entity.monster.rare", new LayerStyle(Colour: "#FF00FF", Scale: 1.5f, Icon: "rare.png"));
+        wanted.Set("entity.monster.rare", new LayerStyle(Colour: "#FF00FF", Scale: 1.5f, IconTile: 42));
         wanted.Set("route.2", new LayerStyle(Hidden: true, Width: 3.5f));
 
         string path = TempPath();
@@ -322,7 +398,7 @@ public class OverlayStyleStoreTests
             OverlayStyle loaded = OverlayStyleStore.Load(path);
 
             Assert.Equal(wanted.Changed, loaded.Changed);
-            Assert.Equal("rare.png", loaded["entity.monster.rare"].Icon);
+            Assert.Equal(42, loaded["entity.monster.rare"].IconTile);
             Assert.False(loaded.Visible("route.2"));
             Assert.Equal(3.5f, loaded.Width("route.2", 1f));
         }

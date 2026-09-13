@@ -45,13 +45,18 @@ public sealed class IconCache : IDisposable
     /// Largest edge for a SHEET, whose tiles are addressed by coordinate.
     /// </summary>
     /// <remarks>
-    /// High enough that no ordinary sheet is resized at all, and that is the whole requirement
-    /// rather than a preference about detail. A tile is picked out with texture coordinates
-    /// derived from a tile size in PIXELS, so a sheet that was shrunk on the way in has a grid
-    /// that no longer matches the number it is being cut up by - every icon drawn lands part
-    /// way between two of them. The reference's own sheet is 256x3392, well inside this.
+    /// NOT A PREFERENCE ABOUT DETAIL - it has to be larger than the sheet, or the sheet is
+    /// wrong. A tile is picked out with texture coordinates derived from a tile size in
+    /// PIXELS, so a sheet shrunk on the way in has a grid that no longer matches the number
+    /// it is being cut up by, and every icon drawn lands part way between two of them.
+    ///
+    /// This used to be 4096, which was comfortably clear of the 256x3392 sheet the reference
+    /// ships and 832 pixels short of ours: <c>assets/icons.png</c> is 896x4928, so at the old
+    /// limit it arrived scaled to 745x4096 and its 64-pixel cells measured 53.2. Raised to the
+    /// 8192 that every D3D11 feature level guarantees, which is the next real ceiling rather
+    /// than one picked to fit today's file by a margin somebody has to notice again later.
     /// </remarks>
-    public const int MaxSheetEdge = 4096;
+    public const int MaxSheetEdge = 8192;
 
     /// <summary>
     /// Whether a picture is handed to the renderer as an sRGB texture. It is not, and the
@@ -100,6 +105,10 @@ public sealed class IconCache : IDisposable
     private readonly Dictionary<string, string> _keys = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _missingBuiltIn = new(StringComparer.OrdinalIgnoreCase);
 
+    // The sheet, once. See Sheet() for why this is a field rather than a lookup.
+    private Picture _sheet;
+    private bool _sheetAsked;
+
     public IconCache(Func<string, Image<Rgba32>, bool, IntPtr> upload, Action<string> release)
     {
         ArgumentNullException.ThrowIfNull(upload);
@@ -110,11 +119,6 @@ public sealed class IconCache : IDisposable
 
     /// <summary>Where the files are looked for, and what has already been given up on.</summary>
     public IconFiles Files { get; } = new();
-
-    /// <summary>
-    /// The texture for a path, or <see cref="IntPtr.Zero"/> when there is none to draw.
-    /// </summary>
-    public IntPtr TextureFor(string? path) => PictureFor(path, MaxEdge).Texture;
 
     /// <summary>
     /// The picture for a path at a given size limit, or an empty one when there is none.
@@ -170,6 +174,36 @@ public sealed class IconCache : IDisposable
     /// namespace and folder and would have to be repeated - and silently rewritten - every
     /// time either moved.
     /// </remarks>
+    /// <summary>
+    /// The sprite sheet every marker and status icon is cut from, or an empty picture.
+    /// </summary>
+    /// <remarks>
+    /// ONE CALL FOR THE WHOLE TOOL, so nothing can load the sheet at a second size limit and
+    /// end up with a grid that disagrees with everybody else's - the limit is part of the
+    /// cache key, so two callers asking differently get two textures.
+    ///
+    /// HELD IN A FIELD rather than looked up, and that is not premature. This is asked once
+    /// PER MARKER PER FRAME - every entity dot and every landmark on the map - and the lookup
+    /// underneath it builds its cache key by interpolating a string. At a hundred markers and
+    /// sixty frames that is six thousand throwaway strings a second to arrive at the same
+    /// texture handle every time.
+    ///
+    /// Empty when the resource did not ship, and every caller falls back to the built-in
+    /// shape for that, exactly as they did for a missing file. The empty answer is remembered
+    /// too - <see cref="BuiltIn"/> already refuses to go looking again, and this saves even
+    /// the call.
+    /// </remarks>
+    public Picture Sheet()
+    {
+        if (!_sheetAsked)
+        {
+            _sheetAsked = true;
+            _sheet = BuiltIn(IconSheet.Resource, MaxSheetEdge);
+        }
+
+        return _sheet;
+    }
+
     public Picture BuiltIn(string name, int maxEdge)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -294,6 +328,11 @@ public sealed class IconCache : IDisposable
         _textures.Clear();
         _keys.Clear();
         _missingBuiltIn.Clear();
+
+        // The held sheet points at a texture that has just been released, so it has to go with
+        // them - kept, it would hand every marker a handle the renderer no longer knows.
+        _sheet = default;
+        _sheetAsked = false;
         Files.Forget();
     }
 

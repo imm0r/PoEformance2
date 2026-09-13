@@ -39,6 +39,23 @@ public sealed class StatusIconLayer
     private const float SmallestIcon = 8f;
 
     /// <summary>
+    /// How big an icon is drawn at a scale of one, in screen pixels.
+    /// </summary>
+    /// <remarks>
+    /// NOT THE SHEET'S CELL SIZE, and that distinction was learned by getting it wrong. The
+    /// size a buff icon is drawn over a monster's head is a question about the SCREEN - how
+    /// much of it a row of icons may take - and the cell size is a question about the picture
+    /// they are cut from. They were the same number only because the sheet somebody chose
+    /// happened to be on a 32-pixel grid, which is what the tile setting defaulted to.
+    ///
+    /// Tying the two together meant that moving to the sheet that ships, whose cells are 64,
+    /// silently doubled every icon on screen - each rule's scale still reading 1.00 while the
+    /// row took twice the space. 32 keeps what was there before the sheet changed; a rule's
+    /// own scale is how one is made bigger.
+    /// </remarks>
+    private const float IconAtScaleOne = 32f;
+
+    /// <summary>
     /// How much of the disc is left showing around the icon, per side.
     /// </summary>
     /// <remarks>
@@ -53,10 +70,11 @@ public sealed class StatusIconLayer
     /// <summary>What to draw and how. Shared with the tracker's other layers.</summary>
     public TrackerSettings Settings { get; set; } = TrackerSettings.Default;
 
-    /// <summary>Where the icon sheet is loaded from, when one was chosen.</summary>
+    /// <summary>Where the icon sheet comes from.</summary>
     /// <remarks>
     /// The overlay's own cache rather than one of this layer's: a texture per class is a texture
-    /// uploaded twice, and the cache is also where the reason a file did not load is reported.
+    /// uploaded twice, and every other thing that draws from the sheet reads it through the same
+    /// cache, so there is one copy of it on the card.
     /// </remarks>
     public IconCache? Icons { get; set; }
 
@@ -71,12 +89,10 @@ public sealed class StatusIconLayer
             return;
         }
 
-        // Read once for the whole frame rather than per icon: the sheet is one file, and
+        // Read once for the whole frame rather than per icon: the sheet is one texture, and
         // asking the cache sixty times a second for each of a dozen icons is the same answer
         // through a dictionary lookup every time.
-        IconCache.Picture sheet = Icons is null || settings.IconSheet.Length == 0
-            ? default
-            : Icons.PictureFor(settings.IconSheet, IconCache.MaxSheetEdge);
+        IconCache.Picture sheet = Icons?.Sheet() ?? default;
 
         uint shadow = ImGui.ColorConvertFloat4ToU32(new Vector4(0f, 0f, 0f, settings.ShadowAlpha));
         uint barBack = OverlaySettings.ParseColour(settings.BarBackColour);
@@ -145,14 +161,13 @@ public sealed class StatusIconLayer
             return;
         }
 
-        float tile = Settings.IconTile;
         float gap = layout.Gap;
 
         float total = 0f;
         Span<float> sizes = stackalloc float[hits.Count];
         for (int i = 0; i < hits.Count; i++)
         {
-            sizes[i] = Math.Max(SmallestIcon, tile * Math.Max(0.2f, hits[i].Rule.IconScale));
+            sizes[i] = Math.Max(SmallestIcon, IconAtScaleOne * Math.Max(0.2f, hits[i].Rule.IconScale));
             total += sizes[i] + (i < hits.Count - 1 ? gap : 0f);
         }
 
@@ -171,7 +186,7 @@ public sealed class StatusIconLayer
 
             if (sheet.Ready)
             {
-                (Vector2 uv0, Vector2 uv1) = TileUv(hit.Rule, sheet, tile);
+                (Vector2 uv0, Vector2 uv1) = TileUv(hit.Rule, sheet);
                 Vector2 inset = size * IconInset;
                 draw.AddImage(sheet.Texture, pen + inset, end - inset, uv0, uv1);
             }
@@ -266,27 +281,16 @@ public sealed class StatusIconLayer
     }
 
     /// <summary>
-    /// The texture coordinates of one tile of the sheet.
+    /// The texture coordinates of the cell a rule points at.
     /// </summary>
     /// <remarks>
-    /// Clamped to the sheet's own grid rather than trusted: a coordinate saved against a taller
-    /// sheet, or typed by hand, otherwise samples past the edge - which draws whatever the
-    /// sampler decides to repeat rather than an obviously wrong icon.
+    /// Through the shared cut rather than its own arithmetic, so a rule and a marker pointing at
+    /// the same cell cannot end up sampling it differently. The clamping that used to live here
+    /// lives there.
     /// </remarks>
-    private static (Vector2 Uv0, Vector2 Uv1) TileUv(StatusIconRule rule, IconCache.Picture sheet, float tile)
-    {
-        float across = tile / sheet.Width;
-        float down = tile / sheet.Height;
-
-        int columns = Math.Max(1, (int)(sheet.Width / tile));
-        int rows = Math.Max(1, (int)(sheet.Height / tile));
-
-        var uv0 = new Vector2(
-            Math.Clamp(rule.IconColumn, 0, columns - 1) * across,
-            Math.Clamp(rule.IconRow, 0, rows - 1) * down);
-
-        return (uv0, uv0 + new Vector2(across, down));
-    }
+    private static (Vector2 Uv0, Vector2 Uv1) TileUv(StatusIconRule rule, IconCache.Picture sheet)
+        => SheetIcon.Uv(
+            IconSheet.IndexOf(rule.IconColumn, rule.IconRow, sheet.Width, sheet.Height), sheet);
 
     /// <summary>Writes the same text four ways around, so it survives a bright background.</summary>
     /// <remarks>

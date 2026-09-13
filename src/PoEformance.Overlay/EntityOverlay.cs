@@ -854,7 +854,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // two of them on screen at once. See ToolTabs.AsTabs for when each shape is right.
         _tools.AsTabs(Area);
 
-        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Area);
+        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Area, _icons.Sheet);
         var window = new PreloadWindow(
             watch,
             lookAgain,
@@ -992,10 +992,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // own furniture - which is the question somebody arrives at this page with.
         _tools.AsTabs(Markers);
 
-        var entities = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerEntities);
-        var places = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerPlaces);
-        var health = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerHealth);
-        var aids = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerAids);
+        var entities = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerEntities, _icons.Sheet);
+        var places = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerPlaces, _icons.Sheet);
+        var health = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerHealth, _icons.Sheet);
+        var aids = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.MarkerAids, _icons.Sheet);
 
         _tools.Add(
             65,
@@ -1059,9 +1059,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Tracker = changed;
                 saved(changed);
             },
-            () => Tracker.IconSheet.Length == 0
-                ? default
-                : _icons.PictureFor(Tracker.IconSheet, IconCache.MaxSheetEdge),
+            _icons.Sheet,
             () => Animations);
 
         _tools.Add(
@@ -1590,7 +1588,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // The atlas's plate, web and route colours, between the filters and the ritual line
         // that draws onto it.
-        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Atlas);
+        var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Atlas, _icons.Sheet);
         _tools.Add(
             42, "atlas-style", "Visual Style", styles.Draw, styles.Idle,
             page: Atlas, pageLabel: "Atlas");
@@ -1934,7 +1932,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             Style = _style,
             Chrome = Chrome,
-            IconFor = _icons.TextureFor,
+            SheetFor = _icons.Sheet,
             Changed = () => SettingsChanged?.Invoke(),
         };
 
@@ -2286,8 +2284,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Draws a marker's own picture where one was chosen, and says whether it did.
     /// </summary>
     /// <remarks>
-    /// False means "draw it the ordinary way", which covers both no icon and an icon that
-    /// could not be loaded. Those are deliberately the same answer: a marker whose file went
+    /// False means "draw it the ordinary way", which covers both no cell chosen and a sheet
+    /// that did not ship. Those are deliberately the same answer: a marker whose picture is
     /// missing has to still be a marker, because its absence reads as nothing being there.
     /// </remarks>
     /// <param name="fade">
@@ -2297,25 +2295,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private bool DrawIcon(ImDrawListPtr draw, string key, Vector2 at, float radius, float fade = 1f)
     {
         LayerStyle style = Style[key];
-        IntPtr texture = _icons.TextureFor(style.Icon);
-        if (texture == IntPtr.Zero)
-        {
-            return false;
-        }
 
         // Untinted unless a colour was CHOSEN, rather than tinted with the catalogue's
-        // default. Somebody supplying their own picture supplied its colours too, and
-        // multiplying a finished icon by the red that ordinary monsters happen to default to
-        // would make every custom icon look broken. Choosing a colour still tints - which is
-        // what makes one white shape serve every rarity.
-        draw.AddImage(
-            texture,
+        // default. The sheet's art carries its own colours, and multiplying a finished icon by
+        // the red that ordinary monsters happen to default to would make every one of them
+        // look broken. Choosing a colour still tints - which is what makes one white shape
+        // serve every rarity.
+        return SheetIcon.Draw(
+            draw,
+            _icons.Sheet(),
+            style,
             at - new Vector2(radius, radius),
             at + new Vector2(radius, radius),
-            Vector2.Zero,
-            Vector2.One,
             OverlayStyle.Faded(style.ColourOr(0xFFFFFFFF), fade));
-        return true;
     }
 
     /// <summary>How solid a marker is drawn, which is how it says whether it is a sighting.</summary>
@@ -2646,7 +2638,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 35, "projectiles", "Projectiles", () => made.DrawTab(_snapshot), page: Combat);
 
             // The marks' and trails' colours, folded under the switches they belong to.
-            var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Projectiles);
+            var styles = new StyleRows(Style, SaveStyle, StyleCatalogue.Homes.Projectiles, _icons.Sheet);
             _tools.Add(
                 36, "projectiles-style", "How projectiles look", styles.Draw, styles.Idle,
                 page: Combat);
@@ -2656,12 +2648,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // is the style's own rather than a flag of its own.
             var belt = new FigureTab(
                 Style, SaveStyle, StyleCatalogue.Keys.FlaskUses, "Uses Left on the Flasks",
-                FigureTab.BeltExplanation, StyleCatalogue.Homes.Flasks, FigureTab.BeltStatus);
+                FigureTab.BeltExplanation, StyleCatalogue.Homes.Flasks, FigureTab.BeltStatus, _icons.Sheet);
             _tools.Add(37, "belt", "Belt", () => belt.Draw(_snapshot), belt.Idle, page: Combat);
 
             var skillBar = new FigureTab(
                 Style, SaveStyle, StyleCatalogue.Keys.SkillDps, "DPS on the Skill Bar",
-                FigureTab.SkillBarExplanation, StyleCatalogue.Homes.Skills, FigureTab.SkillBarStatus);
+                FigureTab.SkillBarExplanation, StyleCatalogue.Homes.Skills, FigureTab.SkillBarStatus, _icons.Sheet);
             _tools.Add(38, "skillbar", "Skill bar", () => skillBar.Draw(_snapshot), skillBar.Idle, page: Combat);
         }
 
@@ -3973,17 +3965,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 continue;
             }
 
-            Vector2 at = map.Project(
+            Vector2 projected = map.Project(
                 entity.WorldX, entity.WorldY, entity.TerrainHeight,
                 player.WorldX, player.WorldY, player.TerrainHeight);
 
-            if (!map.Contains(at))
+            // On the map it is drawn where it is; off it, pinned to the frame on the bearing
+            // it lies along - or dropped, when edge indicators are off for this map.
+            if (MapEdge.Place(
+                    Style, map, projected, Style.Sized(key, radius * SizeFor(entity)), FadeFor(entity))
+                is not (Vector2 at, float size, float fade))
             {
                 continue;
             }
 
-            float size = Style.Sized(key, radius * SizeFor(entity));
-            float fade = FadeFor(entity);
             if (!DrawIcon(draw, key, at, size, fade))
             {
                 draw.AddCircleFilled(at, size, OverlayStyle.Faded(Style.Colour(key), fade));

@@ -101,9 +101,9 @@ The **Tracker** tab (Combat page) carries the three features ported from the Gam
 [`hyper911/Tracker-GH2`](https://github.com/hyper911/Tracker-GH2): lines from the player to
 unique/rare/magic monsters, rings around the ground effects you name by metadata path, and
 buff/debuff icons over the player and over rare-or-better monsters — each with its stack count
-and a timer bar drawn from the game's own remaining and total duration. The icon sheet is a PNG
-of your own choosing (any tile grid; the tab has a picker); without one each effect is drawn as
-its coloured disc with its caption on it. The monster half is the one setting that costs a read
+and a timer bar drawn from the game's own remaining and total duration. The icons come from the
+sheet that ships with the tool — the same one the map markers are cut from — and the tab has a
+picker for it. The monster half is the one setting that costs a read
 per monster, so it is off until switched on and takes its cost with it when switched off.
 
 The config window has a **Map** tab showing the same layout at a readable size, with the
