@@ -361,19 +361,28 @@ public sealed class PoiLayer
             uint chosen = routed ? RouteColour(place.Id) : ColourFor(glyph);
             uint colour = OverlayStyle.Faded(chosen, fade);
 
-            // Three answers in order of who asked for them: the cell somebody CHOSE, then the
-            // game's own icon for a marker nothing here could classify, then the shape. The
+            // Three answers in order of how much each KNOWS: the game's own icon for a marker
+            // nothing here could classify, then the cell somebody chose, then the shape. The
             // last is also what a sheet that did not ship falls back to - a marker that
             // vanished because its picture was missing would read as there being nothing
             // there, which is the one thing a map must never say by accident.
             //
-            // Untinted unless a colour was chosen: the sheet's art carries its own colours,
-            // and multiplying a finished icon by this glyph's default would look broken.
+            // THE GAME'S ANSWER GOES FIRST, and only on the unrecognised row - everywhere else
+            // GameIcon is 0 and a chosen cell wins as it always did. The row is "I do not know
+            // what this is", so an icon chosen on it is a stand-in for the unknown, and being
+            // able to name the picture is no longer not knowing. The stand-in keeps the names
+            // that have no cell, which is the sharper job for it: it then marks the markers
+            // that really are a mystery instead of marking all of them alike.
+            //
+            // Untinted unless a colour was chosen - ColourOr reads the row's OWN colour, not
+            // the catalogue's, so this is white until somebody sets one. The sheet's art
+            // carries its own colours and multiplying it by a default would look broken; a
+            // colour somebody did set was set to make these stand out, and still does.
             LayerStyle chosenStyle = Style[key];
             Vector2 corner = new(size, size);
             uint tint = OverlayStyle.Faded(chosenStyle.ColourOr(0xFFFFFFFF), fade);
-            if (!SheetIcon.Draw(draw, sheet, chosenStyle, at - corner, at + corner, tint)
-                && !SheetIcon.Tile(draw, sheet, GameIcon(glyph, place), at - corner, at + corner, tint))
+            if (!SheetIcon.Tile(draw, sheet, GameIcon(glyph, place), at - corner, at + corner, tint)
+                && !SheetIcon.Draw(draw, sheet, chosenStyle, at - corner, at + corner, tint))
             {
                 PoiGlyphPainter.Draw(draw, at, size, colour, glyph, Style.Width(key, 0f));
             }
@@ -411,8 +420,15 @@ public sealed class PoiLayer
     /// was no shape worth having, and touches nothing that was already working.
     ///
     /// 0 for everything else, including a name no cell carries - about half the sheet is not
-    /// in the icon set at all - and those go on drawing as the question mark and go on being
-    /// collected by UnrecognisedMarkers.
+    /// in the icon set at all - and those fall through to whatever was chosen for the
+    /// unrecognised row, or to the shape, and go on being collected by UnrecognisedMarkers.
+    ///
+    /// WHY THIS BEATS A CHOSEN CELL, which nothing else does. It cost an evening to find:
+    /// somebody had set the unrecognised row to a question mark to spot these more easily,
+    /// which is exactly what a person who cares about them would do - and that choice then
+    /// stood in front of the answer, so the feature was invisible to the one person looking
+    /// hardest. An icon on that row is a stand-in for "unknown", and this is the thing that
+    /// says it is no longer unknown.
     /// </remarks>
     private static int GameIcon(PoiGlyph glyph, Place place)
         => glyph == PoiGlyph.Marker ? IconNames.CellFor(place.Icon) : 0;
