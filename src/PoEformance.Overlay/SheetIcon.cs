@@ -51,13 +51,25 @@ internal static class SheetIcon
     /// </remarks>
     public static bool Draw(
         ImDrawListPtr draw, IconCache.Picture sheet, LayerStyle style, Vector2 min, Vector2 max, uint tint)
+        => Tile(draw, sheet, style.IconTile, min, max, tint);
+
+    /// <summary>
+    /// Draws a cell counted from ONE, and says whether it drew anything. 0 draws nothing.
+    /// </summary>
+    /// <remarks>
+    /// Counted from one because that is what a cell number means everywhere it is stored or
+    /// shown - a style file, the picker's caption, the name table - and the single subtraction
+    /// to the zero-based texture arithmetic lives here rather than at each call.
+    /// </remarks>
+    public static bool Tile(
+        ImDrawListPtr draw, IconCache.Picture sheet, int tile, Vector2 min, Vector2 max, uint tint)
     {
-        if (!style.HasIcon || !sheet.Ready)
+        if (tile <= 0 || !sheet.Ready)
         {
             return false;
         }
 
-        (Vector2 uv0, Vector2 uv1) = Uv(style.IconIndex, sheet);
+        (Vector2 uv0, Vector2 uv1) = Uv(tile - 1, sheet);
         draw.AddImage(sheet.Texture, min, max, uv0, uv1, tint);
         return true;
     }

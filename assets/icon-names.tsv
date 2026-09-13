@@ -3,7 +3,8 @@
 #
 # NOT hand-written and NOT complete - written by scripts/name-icon-cells.py, which
 # explains how the matching works and what it refuses to guess at.
-# 524 of 1050 occupied cells are named.
+# 578 of 1050 occupied cells are named.
+1	MyPlayer
 2	PartyMember
 3	OtherPlayer
 4	NPC
@@ -24,6 +25,7 @@
 23	LabyrinthDoor
 24	VaalSideArea
 25	LabyrinthEnchant
+26	LabyrinthGoldKey
 33	PCMapArrow
 34	BestiaryBloodAlter
 35	BestiaryRareMonster
@@ -79,6 +81,8 @@
 196	BlightCore
 198	BlightSpawner
 199	RewardBlight
+200	BlightPath
+201	BlightPathInactive
 202	BlightBoss
 203	BlightPortalFire
 204	BlightPortalCold
@@ -94,12 +98,20 @@
 503	HarvestSeedCache
 504	HarvestOshabiBoss
 505	HarvestCollectorNeutral
+506	HarvestCollectorPurple
 507	HarvestCollectorBlue
 508	HarvestCollectorYellow
 509	HarvestCondenserNeutral
+510	HarvestCondenserPurple
+511	HarvestCondenserBlue
+512	HarvestCondenserYellow
 513	HarvestStanchionNeutral
+514	HarvestStanchionPurple
+515	HarvestStanchionBlue
 517	HarvestDisperserNeutral
+518	HarvestDisperserPurple
 519	HarvestDisperserBlue
+520	HarvestDisperserYellow
 521	HarvestHorticraftingStation
 536	HeistSumgglersCache
 538	HeistSpottedMiniBoss
@@ -119,6 +131,8 @@
 580	ExpeditionChest2
 581	ExpeditionChest3
 582	ExpeditionBoss
+583	ExpeditionRegularMonster
+584	ExpeditionLeagueSpecificMonster
 585	ExpeditionEliteMonster
 586	ExpeditionCavernEntrance
 587	HellscapePaleBoss
@@ -159,10 +173,19 @@
 626	CheckpointNotActive
 627	MillerActive
 628	MillerInactive
+629	CroneActive
+630	CroneInactive
+631	MudBurrowerActive
 632	MudBurrowerInactive
+633	RustObeliskActive
+634	RustObeliskInactive
+635	HusbandActive
+636	HusbandInactive
 637	WifeActive
 638	WifeInactive
+639	CrowbellActive
 640	CrowbellInactive
+641	ExecutionerActive
 642	ExecutionerInactive
 643	GargoyleActive
 644	GargoyleInactive
@@ -170,21 +193,28 @@
 646	CountInactive
 647	RathbreakerActive
 648	RathbreakerInactive
+649	BalbalaActive
 650	BalbalaInactive
 651	GateMechanismActive
 652	GateMechanismInactive
 653	LimActive
 654	LimInactive
+655	PerennialHumanActive
 656	PerennialHumanInactive
 657	KabalaActive
 658	KabalaInactive
+659	BeetleBossActive
 660	BeetleBossInactive
+661	ForsakenSonActive
 662	ForsakenSonInactive
+663	MastodonActive
 664	MastodonInactive
 665	TitanRuneActive
 666	TitanRuneInactive
 668	TitanHandInactive
+669	TitanActive
 670	TitanInactive
+671	TorGulActive
 672	TorGulInactive
 673	RudjaActive
 674	RudjaInactive
@@ -217,8 +247,16 @@
 701	SandsweptMarshCorpseSecretActive
 702	SandsweptMarshCorpseSecretInactive
 703	RootdredgeBossActive
+704	RootdredgeBossInactive
+705	SilverbackBlackfistBossActive
+706	SilverbackBlackfistBossInactive
+707	SnakePitBossActive
+708	SnakePitBossInactive
+709	XyclucianBossActive
+710	XyclucianBossInactive
 711	BlackjawBossActive
 712	BlackjawBossInactive
+713	ZicoatlBossActive
 714	ZicoatlBossInactive
 715	IgnagdukBossActive
 716	IgnagdukBossInactive
@@ -288,11 +326,20 @@
 780	ShrineInactive
 781	UltimatumRewardChestActive
 782	UltimatumRewardChestInactive
+783	MournersPathVaseLandmarkActive
 784	MournersPathVaseLandmarkInactive
+785	MastodonBadlandsEffigyLandmarkActive
 786	MastodonBadlandsEffigyLandmarkInactive
+787	OldForestWitchHutLandmarkActive
+788	OldForestWitchHutLandmarkInactive
 789	LostCityOfKethShrineLandmarkActive
 790	LostCityOfKethShrineLandmarkInactive
+791	KethSanctumSacrophagusLandmarkActive
 792	KethSanctumSacrophagusLandmarkInactive
+793	BurialSpiresCorpsesLandmarkActive
+794	BurialSpiresCorpsesLandmarkInactive
+795	MudBurrowsEggLandmarkActive
+796	MudBurrowsEggLandmarkInactive
 797	GrimTangleBossActive
 798	GrimTangleBossInactive
 799	GraveyardBossActive
@@ -303,6 +350,7 @@
 804	RareMonsterDead
 805	UniqueMonsterAlive
 806	UniqueMonsterDead
+807	TombWraithLandmarkActive
 808	TombWraithLandmarkInactive
 809	FarmlandsUnasHutLandmarkActive
 810	FarmlandsUnasHutLandmarkInactive
@@ -314,6 +362,7 @@
 816	RuneMarkersInactive
 817	BossSummoningLocationActive
 818	BossSummoningLocationInactive
+819	CastawayGoldPileActive
 820	CastawayGoldPileInactive
 821	GenericUtilityIcon
 822	IsleOfKinBossActive
@@ -335,6 +384,7 @@
 838	FragementedMirror
 839	Recombinator
 840	G2_8ForgottenHollowActive
+841	G2_8ForgottenHollowInactive
 842	G2_10_1FaridunWarCacheActive
 843	G2_10_1FaridunWarCacheInactive
 844	G2_7TitanSwordActive
@@ -346,10 +396,13 @@
 850	G4_5_2GoddessOfJusticeLandmarkActive
 851	G4_5_2GoddessOfJusticeLandmarkInactive
 852	UniqueStrongboxEtchedBeetle
+853	G4_2_1_BoatLandmarkActive
 854	G4_2_1_BoatLandmarkInactive
 858	G4_4_2_Encounter_ValakoTribeActive
 859	G4_4_2_Encounter_ValakoTribeInactive
 861	G4_4_2_Encounter_TasalioTribeInactive
+863	G4_4_2_Encounter_NgamahuTribeInactive
+864	G4_4_2BossActive
 865	G4_4_2BossInactive
 866	G4_4_1WaterfallLandmarkActive
 867	G4_4_1WaterfallLandmarkInactive
@@ -400,6 +453,7 @@
 913	G4_7_NestInactive
 914	G4_7_ImpaledKaruiActive
 915	G4_7_ImpaledKaruiInactive
+916	G4_10_BossActive
 917	G4_10_BossInactive
 918	G4_11_1b_MedicineWomanActive
 919	G4_11_1b_MedicineWomanInactive

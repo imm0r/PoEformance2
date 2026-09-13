@@ -23,9 +23,53 @@ namespace PoEformance.Overlay;
 internal static class IconNames
 {
     private static readonly Dictionary<int, string> ByCell = Load();
+    private static readonly Dictionary<string, int> ByName = Reverse(ByCell);
 
     /// <summary>How many cells have a name.</summary>
     public static int Count => ByCell.Count;
+
+    /// <summary>
+    /// The cell a game icon name belongs to, counted from ONE, or 0 when nothing carries it.
+    /// </summary>
+    /// <remarks>
+    /// THE GAME'S NAME AND THE CELL'S NAME ARE THE SAME STRING, which is the whole reason this
+    /// direction is worth having. An entity's MinimapIcon component names its icon out of
+    /// MinimapIcons.dat - "StoryGlyph", "CorruptionAltarActive" - and the art for that icon is
+    /// published as Art/2DArt/minimap/player/&lt;that name&gt;.webp, which is where the table's
+    /// names came from. So a marker nothing here can classify can still be drawn as exactly
+    /// the picture the game draws for it, without anybody adding a keyword for it first.
+    ///
+    /// Matched case-insensitively for the usual reason and no measured one: the names line up
+    /// exactly in every case seen, and a table regenerated from differently-cased file names
+    /// would silently stop matching, which costs a lookup to insure against.
+    /// </remarks>
+    public static int CellFor(string name)
+        => !string.IsNullOrEmpty(name) && ByName.TryGetValue(name, out int cell) ? cell : 0;
+
+    /// <summary>
+    /// The table read backwards, name to cell.
+    /// </summary>
+    /// <remarks>
+    /// Built once rather than searched, because this runs per unrecognised marker per frame.
+    ///
+    /// A DUPLICATE NAME KEEPS THE LOWER CELL. It cannot happen with a generated table - each
+    /// icon file claims one cell - and if a hand-edited one ever carries the same name twice,
+    /// answering with the first is stable across runs, where TryAdd's opposite would depend on
+    /// file order.
+    /// </remarks>
+    private static Dictionary<string, int> Reverse(Dictionary<int, string> byCell)
+    {
+        var byName = new Dictionary<string, int>(byCell.Count, StringComparer.OrdinalIgnoreCase);
+        foreach ((int cell, string name) in byCell)
+        {
+            if (!byName.TryGetValue(name, out int seen) || cell < seen)
+            {
+                byName[name] = cell;
+            }
+        }
+
+        return byName;
+    }
 
     /// <summary>The name of a cell, counted from ONE, or empty when it has none.</summary>
     public static string For(int cell)

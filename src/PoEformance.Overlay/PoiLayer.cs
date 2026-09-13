@@ -361,20 +361,19 @@ public sealed class PoiLayer
             uint chosen = routed ? RouteColour(place.Id) : ColourFor(glyph);
             uint colour = OverlayStyle.Faded(chosen, fade);
 
-            // A chosen cell of the sheet instead of the shape, and the SHAPE when none was
-            // chosen or the sheet did not ship - a marker that vanished because its picture
-            // was missing would read as there being nothing there.
+            // Three answers in order of who asked for them: the cell somebody CHOSE, then the
+            // game's own icon for a marker nothing here could classify, then the shape. The
+            // last is also what a sheet that did not ship falls back to - a marker that
+            // vanished because its picture was missing would read as there being nothing
+            // there, which is the one thing a map must never say by accident.
             //
             // Untinted unless a colour was chosen: the sheet's art carries its own colours,
             // and multiplying a finished icon by this glyph's default would look broken.
             LayerStyle chosenStyle = Style[key];
-            if (!SheetIcon.Draw(
-                    draw,
-                    sheet,
-                    chosenStyle,
-                    at - new Vector2(size, size),
-                    at + new Vector2(size, size),
-                    OverlayStyle.Faded(chosenStyle.ColourOr(0xFFFFFFFF), fade)))
+            Vector2 corner = new(size, size);
+            uint tint = OverlayStyle.Faded(chosenStyle.ColourOr(0xFFFFFFFF), fade);
+            if (!SheetIcon.Draw(draw, sheet, chosenStyle, at - corner, at + corner, tint)
+                && !SheetIcon.Tile(draw, sheet, GameIcon(glyph, place), at - corner, at + corner, tint))
             {
                 PoiGlyphPainter.Draw(draw, at, size, colour, glyph, Style.Width(key, 0f));
             }
@@ -394,6 +393,29 @@ public sealed class PoiLayer
             }
         }
     }
+
+    /// <summary>
+    /// The sheet cell holding the game's own icon for a marker this cannot classify.
+    /// </summary>
+    /// <remarks>
+    /// THE NAME THAT FAILED THE KEYWORDS IS ALSO THE CELL'S NAME. An entity's MinimapIcon
+    /// component names its icon out of MinimapIcons.dat, and the sheet's cells were named from
+    /// art files published under those same names - so the marker the rules gave up on can
+    /// still be drawn as the picture the game itself draws for it. It stops being a question
+    /// mark without anybody adding a keyword for it, which is the cheapest classification
+    /// there is: the game already did it.
+    ///
+    /// ONLY the unrecognised ones, deliberately. A chest drawn as a chest is a shape that says
+    /// "container" across a whole map at a glance, and trading the shapes for the game's art
+    /// would give back exactly the map the game already draws. This fills the hole where there
+    /// was no shape worth having, and touches nothing that was already working.
+    ///
+    /// 0 for everything else, including a name no cell carries - about half the sheet is not
+    /// in the icon set at all - and those go on drawing as the question mark and go on being
+    /// collected by UnrecognisedMarkers.
+    /// </remarks>
+    private static int GameIcon(PoiGlyph glyph, Place place)
+        => glyph == PoiGlyph.Marker ? IconNames.CellFor(place.Icon) : 0;
 
     /// <summary>
     /// What the GAME calls a marker this cannot classify, beside its label.
