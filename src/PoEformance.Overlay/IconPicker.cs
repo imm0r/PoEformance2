@@ -12,9 +12,9 @@ namespace PoEformance.Overlay;
 /// ONE PICKER FOR EVERY CHOOSER. The marker rows and the status-icon rules both pick a cell off
 /// the same sheet, and two grids would be two places to fix when the sheet grows a row.
 ///
-/// CLIPPED RATHER THAN DRAWN WHOLE, which is not a refinement. The sheet holds 1050 cells; an
-/// image button each is 1050 draw calls and 1050 ImGui IDs hashed, every frame the popup is
-/// open, for the two dozen rows anybody can see. Only the rows the scroll position actually
+/// CLIPPED RATHER THAN DRAWN WHOLE, which is not a refinement. The sheet is 14 by 77, so the
+/// grid has 1078 places in it; an image button each is 1078 draw calls and 1078 ImGui IDs
+/// hashed, every frame the popup is open, for the dozen rows anybody can see. Only the rows the scroll position actually
 /// exposes are built, with an empty box standing in for the ones above and below so the
 /// scrollbar still measures the whole grid. The cost is what is visible rather than what
 /// exists, and it stays that way if the sheet doubles.
@@ -32,6 +32,15 @@ internal static class IconPicker
     /// <summary>The choice was "no icon".</summary>
     public const int None = 0;
 
+    /// <summary>Smallest a cell is shrunk to when the grid will not otherwise fit.</summary>
+    /// <remarks>
+    /// Below this the art stops being distinguishable and the picker stops being a picker, so
+    /// it is a floor rather than "whatever fits": on a screen too narrow even for this, the
+    /// last column is clipped again - which is at least the failure somebody can see and work
+    /// around, rather than a grid of identical smudges.
+    /// </remarks>
+    private const float SmallestCell = 16f;
+
     /// <summary>How big one cell is drawn in the grid.</summary>
     /// <remarks>
     /// Larger than the markers themselves, because this is the one place the art is being READ
@@ -40,8 +49,8 @@ internal static class IconPicker
     /// </remarks>
     private const float CellSize = 32f;
 
-    /// <summary>How many cells fit across the popup before it wraps.</summary>
-    private const int Across = 14;
+    /// <summary>How many rows of cells the popup shows before it scrolls.</summary>
+    private const int VisibleRows = 12;
 
     /// <summary>
     /// Draws the grid, and returns the cell chosen - counted from ONE, as a style stores it.
@@ -77,14 +86,54 @@ internal static class IconPicker
 
         ImGui.Separator();
 
-        float spacing = ImGui.GetStyle().ItemSpacing.X;
-        var size = new Vector2(CellSize, CellSize);
+        ImGuiStylePtr style = ImGui.GetStyle();
+
+        // THE GRID IS THE SHEET'S GRID. Laid out at a width of its own, a picker row stops
+        // being a sheet row - and the tooltip on each cell reports the column and row it sits
+        // at ON THE SHEET, which would then disagree with where it sits in front of you. They
+        // happened to be the same number, which is the kind of agreement that holds until
+        // somebody widens the sheet.
+        int across = columns;
+        int rows = (count + across - 1) / across;
+
+        // Only when there is actually something to scroll: a sheet short enough to fit would
+        // otherwise carry a strip of empty space down its right-hand side.
+        float bar = rows > VisibleRows ? style.ScrollbarSize : 0f;
+
+        // EVERYTHING THAT IS NOT PICTURE, and getting this list wrong is what sent the last
+        // column off the edge of the box:
+        //
+        //  - A CELL IS WIDER THAN ITS PICTURE. An image button insets the image by the frame
+        //    padding, so it occupies the picture plus that padding on BOTH sides. Fourteen of
+        //    them counted as bare pictures come out a whole column too narrow.
+        //  - THE SCROLLBAR IS INSIDE THE CHILD. Not asked for on top, it is drawn over the
+        //    last column instead of beside it.
+        //  - The gaps go BETWEEN the cells, so there is one fewer of them than there are cells.
+        //  - The child has padding of its own, on both sides.
+        float furniture = (style.WindowPadding.X * 2f) + bar
+            + ((across - 1) * style.ItemSpacing.X) + (across * style.FramePadding.X * 2f);
+
+        // AND IT HAS TO FIT ON THE SCREEN. A row of the grid is as wide as the sheet is,
+        // however large the interface is set, so on a narrow screen at a big text size the
+        // furniture alone can grow past what is there - and a box wider than the viewport is clipped by the viewport instead,
+        // which is the same last-column-cut-in-half with a different cause. The pictures shrink
+        // rather than the grid losing a column: the grid IS the sheet's, and a row that stopped
+        // being a sheet row would put every tooltip's column number somewhere else.
+        float room = ImGui.GetMainViewport().WorkSize.X - (style.WindowPadding.X * 4f);
+        float picture = Math.Clamp((room - furniture) / across, SmallestCell, CellSize);
+
+        var size = new Vector2(picture, picture);
+        float step = picture + (style.FramePadding.Y * 2f) + style.ItemSpacing.Y;
+        float content = (across * (picture + (style.FramePadding.X * 2f)))
+            + ((across - 1) * style.ItemSpacing.X);
 
         // Sized to the grid rather than left to ImGui: a child sized from its contents is as
-        // tall as 75 rows, which is a popup taller than the screen.
+        // tall as 77 rows, which is a popup taller than the screen.
         if (!ImGui.BeginChild(
                 "##cells",
-                new Vector2((Across * (CellSize + spacing)) + spacing, CellSize * 12f),
+                new Vector2(
+                    content + (style.WindowPadding.X * 2f) + bar,
+                    (VisibleRows * step) + (style.WindowPadding.Y * 2f)),
                 ImGuiChildFlags.None))
         {
             ImGui.EndChild();
@@ -93,12 +142,6 @@ internal static class IconPicker
 
         try
         {
-            int rows = (count + Across - 1) / Across;
-
-            // The button's own frame padding is part of what a row occupies, so the step is
-            // measured rather than assumed to be the cell - out by those few pixels, the
-            // placeholders drift from the real rows and the grid scrolls past its own end.
-            float step = CellSize + (ImGui.GetStyle().FramePadding.Y * 2f) + ImGui.GetStyle().ItemSpacing.Y;
             float scroll = ImGui.GetScrollY();
             float visible = ImGui.GetWindowSize().Y;
 
@@ -114,9 +157,9 @@ internal static class IconPicker
 
             for (int row = first; row < last; row++)
             {
-                for (int column = 0; column < Across; column++)
+                for (int column = 0; column < across; column++)
                 {
-                    int index = (row * Across) + column;
+                    int index = (row * across) + column;
                     if (index >= count)
                     {
                         break;
