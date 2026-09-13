@@ -2881,6 +2881,17 @@ is one short row in the art the game already uses.
   one layer down, because the reader published strings. A content now travels as its line, its
   fuller wording and its art name — with the wording dropped where it only repeats the line,
   which is the usual case for an effect and never the case for a badge.
+- **AND ONLY WHERE THE GAME IS NOT ALREADY DRAWING ONE, which is the whole worth of the
+  feature.** The first build of this drew a picture on every node with content — including the
+  hundreds the game is painting itself, where it already draws the same icon with a tooltip
+  saying the same words. That is a copy a few pixels lower, and it was rightly asked what it was
+  for. What the game *cannot* draw is a node it is not showing: out in the fog, or scrolled far
+  enough that it stops painting them. There a picture is the only thing saying what is in a map,
+  and that is where ours goes — which is what yokkenUA's plugin does, and why its icons appear
+  out over the unexplored sea. The bit is the element's own `IsVisible` (0x800), and it costs
+  nothing: `ReadSiblings` already reads the flags word to decide whether a child takes its
+  parent's position modifier, and was throwing the rest of it away. It now returns a `Placed`
+  record — position, size, and whether the game is drawing it — instead of a pair.
 
 #### Names out of the bundle index — the half of `_.index.bin` nothing read
 
@@ -2892,11 +2903,15 @@ there. The answer was in the file the whole time, in the compressed blob of spel
 the end, which this project skipped on the grounds that "nothing here browses".
 
 - **`BundleIndex.Look` takes the whole list of names at once**, and that shape is the point:
-  unpacking the blob is tens of megabytes and walking it is half a million paths, so per-name it
-  would be unusable and once per session it is unnoticeable. It runs on a background task; until
-  it lands a name simply has no picture.
-- **Nothing is allocated for a path that is not wanted.** Turning half a million paths into
-  strings to compare them would cost more than the walk. A path is assembled into one reused
+  a real install measures **4,261,026 files in 62,275 bundles**, so the blob spelling them out is
+  tens of megabytes and the walk is four million paths — per-name it would be unusable, once per
+  session it is unnoticeable. It runs on a background task; until it lands a name simply has no
+  picture. The blob is released when the walk finishes: holding it for a session that will not ask
+  twice is tens of megabytes of nothing. (This was first written expecting "half a million" paths,
+  an estimate carried over from the older game; the first real install said eight times that,
+  which is why the figure is now measured and printed rather than assumed.)
+- **Nothing is allocated for a path that is not wanted.** Turning four million paths into
+  strings to compare them would cost far more than the walk. A path is assembled into one reused
   buffer, its name is hashed where it lies, and only a hit becomes a string.
 - **The encoding is prefix-compressed and stateful.** A word of nought flips between collecting
   prefixes and emitting paths — and clears the prefixes when it turns collection *on* — while any

@@ -23,7 +23,8 @@ public class AtlasViewTests
         AtlasNodeState state = AtlasNodeState.Locked,
         (int X, int Y)[]? joined = null,
         uint[]? badges = null,
-        uint[]? tokens = null)
+        uint[]? tokens = null,
+        bool shown = false)
         => new(
             Index: (x * 100) + y,
             Address: 0x1000,
@@ -36,7 +37,8 @@ public class AtlasViewTests
             Screen: new Vector2(x * 100, y * 100),
             Size: new Vector2(40, 20),
             BadgeIds: badges ?? [],
-            ContentTokens: tokens ?? []);
+            ContentTokens: tokens ?? [],
+            Shown: shown);
 
     private static readonly Dictionary<(int X, int Y), IReadOnlyList<AtlasSaid>> NoWords = [];
 
@@ -352,9 +354,9 @@ public class AtlasViewTests
         AtlasNode here = Node(0, 0) with { Address = 0x1000 };
         AtlasNode gone = Node(1, 0) with { Address = 0x2000 };
 
-        var placed = new Dictionary<ulong, (Vector2 Position, Vector2 Size)>
+        var placed = new Dictionary<ulong, Placed>
         {
-            [0x1000] = (new Vector2(500, 600), new Vector2(40, 20)),
+            [0x1000] = new Placed(new Vector2(500, 600), new Vector2(40, 20), Shown: true),
         };
 
         AtlasNode kept = Assert.Single(AtlasWatch.Live([here, gone], placed));
@@ -527,6 +529,46 @@ public class AtlasViewTests
         Assert.Equal("Breach", said.Text);
         Assert.Equal("Area contains an Otherworldly Breach", said.Detail);
         Assert.Equal("AtlasIconContentBreach", said.Icon);
+    }
+
+    [Fact]
+    public void WHETHERTheGameIsDrawingANodeItselfReachesTheDrawing()
+    {
+        // The whole worth of the content pictures hangs on this. On a node the game is painting,
+        // it draws its own icon with its own tooltip saying the same words, so ours is a copy a
+        // few pixels lower - the first build of this shipped exactly that. The drawing needs to
+        // know which nodes those are, so the flag travels with the position: it changes as the
+        // atlas is scrolled and as fog lifts, at the same rate.
+        Assert.True(Assert.Single(Compose([Node(0, 0, shown: true)]).Marks).Shown);
+        Assert.False(Assert.Single(Compose([Node(0, 0)]).Marks).Shown);
+    }
+
+    [Fact]
+    public void WHATTheGameSaysItDoesNotShowIsNotShown()
+    {
+        // Badge 0x006e is a developer's placeholder - "[DNT] Breach City - Not Shown to
+        // Players", described as "DNT No visual identity = not shown" - and it went onto four
+        // maps of a real atlas, in the same plate as everything the game does mean to say.
+        AtlasNode node = Node(0, 0, badges: [0x006E]);
+
+        Assert.Empty(AtlasWatch.Words(node, LoadedContents()));
+
+        // The row is still IN the table, so the id is recognised rather than reported as one
+        // nothing has heard of - it is the drawing that skips it.
+        Assert.NotNull(LoadedContents().Badge(0x006E));
+    }
+
+    [Fact]
+    public void ANDTheMarkIsTheBracketRatherThanTheLettersDNT()
+    {
+        // The game has used "[UNUSED]" and bare brackets for the same thing, and no real
+        // content has ever begun with one. Matching "DNT" would leave those drawn.
+        Assert.True(AtlasWatch.Placeholder("[DNT] Breach City - Not Shown to Players"));
+        Assert.True(AtlasWatch.Placeholder("[UNUSED] Something"));
+        Assert.False(AtlasWatch.Placeholder("Breach"));
+        Assert.False(AtlasWatch.Placeholder("Area contains Abysses"));
+        Assert.False(AtlasWatch.Placeholder(string.Empty));
+        Assert.False(AtlasWatch.Placeholder(null));
     }
 
     [Fact]

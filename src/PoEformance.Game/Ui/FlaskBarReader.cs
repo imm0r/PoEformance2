@@ -123,7 +123,7 @@ public sealed class FlaskBarReader
             }
 
             if (!_elements.ReadSiblings(parent, [element], scale).TryGetValue(
-                    element, out (Vector2 Position, Vector2 Size) box))
+                    element, out Placed box))
             {
                 continue;
             }

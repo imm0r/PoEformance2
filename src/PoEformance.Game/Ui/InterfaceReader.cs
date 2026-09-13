@@ -198,8 +198,7 @@ public sealed class InterfaceReader
         // One walk of the chain above for all of them rather than one per child - the same
         // saving PanelReader makes, and the difference between measuring the interface every
         // tick and measuring it occasionally.
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed =
-            _elements.ReadSiblings(container, children, scale);
+        Dictionary<ulong, Placed> placed = _elements.ReadSiblings(container, children, scale);
 
         foreach (ulong child in children)
         {
@@ -245,11 +244,11 @@ public sealed class InterfaceReader
     /// </remarks>
     private (ScreenRect Where, PanelExtent From) Measure(
         ulong part,
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed,
+        Dictionary<ulong, Placed> placed,
         UiScale scale,
         IReadOnlyCollection<ulong> notThese)
     {
-        if (placed.TryGetValue(part, out (Vector2 Position, Vector2 Size) own)
+        if (placed.TryGetValue(part, out Placed own)
             && Measurable(own.Position, own.Size))
         {
             return (Rect(own.Position, own.Size), PanelExtent.Element);
@@ -266,7 +265,7 @@ public sealed class InterfaceReader
         float right = float.MinValue;
         float bottom = float.MinValue;
 
-        foreach ((ulong child, (Vector2 position, Vector2 size)) in
+        foreach ((ulong child, (Vector2 position, Vector2 size, _)) in
                  _elements.ReadSiblings(part, inside, scale))
         {
             if (notThese.Contains(child) || !Measurable(position, size)

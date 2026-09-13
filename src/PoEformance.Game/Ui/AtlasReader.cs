@@ -54,7 +54,12 @@ public sealed record AtlasNode(
     Vector2 Screen,
     Vector2 Size,
     IReadOnlyList<uint> BadgeIds,
-    IReadOnlyList<uint> ContentTokens);
+    IReadOnlyList<uint> ContentTokens,
+
+    // Whether the game is painting this node itself. FALSE is the interesting one: the node is
+    // placed and readable and the game is choosing not to show it - fog, or scrolled far out -
+    // which is exactly where an overlay has something to add rather than a copy to make.
+    bool Shown = false);
 
 /// <summary>
 /// Reads the endgame atlas out of the game's interface.
@@ -243,7 +248,7 @@ public sealed class AtlasReader
         // Every node is a child of the one panel, so where they are drawn is read for all of
         // them at once - the chain above the panel is identical for each and re-walking it per
         // node is most of what reading an atlas would otherwise cost.
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed =
+        Dictionary<ulong, Placed> placed =
             _elements.ReadSiblings(panel, children, scale);
 
         // And the same for the lines: they are ONE table on the panel, so this is a single
@@ -356,7 +361,7 @@ public sealed class AtlasReader
     /// tick and the caller has the panel already, so resolving it again here would be three
     /// child reads a tick to arrive at an address that was passed over.
     /// </remarks>
-    public Dictionary<ulong, (Vector2 Position, Vector2 Size)> Where(ulong panel, UiScale scale)
+    public Dictionary<ulong, Placed> Where(ulong panel, UiScale scale)
         => panel == 0
             ? []
             : _elements.ReadSiblings(panel, _elements.Children(panel, MostNodes), scale);
@@ -365,7 +370,7 @@ public sealed class AtlasReader
     private AtlasNode? Node(
         int index,
         ulong element,
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed,
+        Dictionary<ulong, Placed> placed,
         Dictionary<(int X, int Y), List<(int X, int Y)>> lines)
     {
         if (!MemoryReaderExtensions.IsPlausiblePointer(element) || !IsMapNode(element))
@@ -396,7 +401,7 @@ public sealed class AtlasReader
         int gridX = _reader.Read<int>(element + (ulong)_grid);
         int gridY = _reader.Read<int>(element + (ulong)_grid + 4);
 
-        placed.TryGetValue(element, out (Vector2 Position, Vector2 Size) drawn);
+        placed.TryGetValue(element, out Placed drawn);
 
         return new AtlasNode(
             index,

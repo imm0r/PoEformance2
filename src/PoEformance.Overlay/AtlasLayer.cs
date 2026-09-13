@@ -98,6 +98,12 @@ public sealed class AtlasLayer
     /// under a map name, which is taller than the map's own node and pushes into the next one;
     /// the same three as icons is one short row, and it is the row the game itself draws, so it
     /// is read without reading. What has no picture keeps its line, so nothing is lost.
+    ///
+    /// ONLY WHERE THE GAME IS NOT ALREADY DRAWING ONE - see <see cref="AtlasMark.Shown"/>. On a
+    /// node the game is painting, ours is a second picture of the same thing a few pixels lower,
+    /// with a tooltip saying the same words; the first build of this shipped exactly that and it
+    /// was worth nothing. What the game cannot draw is a node it is not showing, out in the fog,
+    /// and there a picture is the only thing saying what is in the map.
     /// </remarks>
     public bool Icons { get; set; } = true;
 
@@ -474,7 +480,7 @@ public sealed class AtlasLayer
 
         foreach (AtlasSaid line in mark.Contents)
         {
-            if (Drawn(line))
+            if (Drawn(mark, line))
             {
                 continue;
             }
@@ -519,9 +525,12 @@ public sealed class AtlasLayer
     /// </summary>
     /// <remarks>
     /// Asked twice per content per frame - once to lay the row out, once to skip the line - and
-    /// both answers must agree, or a content is either drawn twice or not at all.
+    /// both answers must agree, or a content is either drawn twice or not at all. Which is why
+    /// the node's own state is part of the question rather than checked separately: on a node
+    /// the game is drawing there is no picture of ours, so every content keeps its line.
     /// </remarks>
-    private bool Drawn(AtlasSaid said) => Picture(said.Icon) != IntPtr.Zero;
+    private bool Drawn(AtlasMark mark, AtlasSaid said)
+        => !mark.Shown && Picture(said.Icon) != IntPtr.Zero;
 
     /// <summary>The picture for an art name, asked at most once a frame per name.</summary>
     private IntPtr Picture(string name)
@@ -555,7 +564,7 @@ public sealed class AtlasLayer
     /// </remarks>
     private float DrawArt(ImDrawListPtr draw, AtlasMark mark, float top, float font, float alpha, Vector2 cursor)
     {
-        if (!Icons || Art is null)
+        if (!Icons || Art is null || mark.Shown)
         {
             return top;
         }

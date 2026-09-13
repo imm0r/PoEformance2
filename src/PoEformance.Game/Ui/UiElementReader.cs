@@ -87,6 +87,25 @@ public sealed record UiElement(
 /// Visibility is likewise not a single flag: an element is visible only if every ancestor is
 /// too, so a panel being closed hides its whole subtree without touching their flags.
 /// </remarks>
+/// <summary>Where one child of a panel is, and whether the game is drawing it.</summary>
+/// <remarks>
+/// A RECORD RATHER THAN THE PAIR IT USED TO BE, and the third field is why: the flags word is
+/// read anyway, to decide whether the child takes its parent's position modifier, and the visible
+/// bit was being read and thrown away in the same breath. Anything wanting to know whether the
+/// game draws a thing had to read the same word again.
+///
+/// The atlas is what wanted it: an overlay's own icon on a node the game is already drawing is a
+/// duplicate of the game's, in a worse place - what is worth drawing is the node the game is NOT
+/// drawing, out in the fog, where nothing else says what is there.
+/// </remarks>
+/// <param name="Position">Top-left in window pixels.</param>
+/// <param name="Size">Width and height in window pixels.</param>
+/// <param name="Shown">
+/// Whether the element's own visible bit is set - the game paints it. FALSE is the interesting
+/// one: the element exists and is placed, and the game is choosing not to show it.
+/// </param>
+public readonly record struct Placed(Vector2 Position, Vector2 Size, bool Shown);
+
 public sealed class UiElementReader
 {
     private readonly IMemoryReader _reader;
@@ -160,13 +179,13 @@ public sealed class UiElementReader
     /// modifier, its scale space - is read once here. What remains per child is its own
     /// relative position, flags, scale and size.
     /// </remarks>
-    /// <returns>Position and size in window pixels, by child address. Missing for a bad one.</returns>
-    public Dictionary<ulong, (Vector2 Position, Vector2 Size)> ReadSiblings(
+    /// <returns>Where each child is and whether it is drawn, by address. Missing for a bad one.</returns>
+    public Dictionary<ulong, Placed> ReadSiblings(
         ulong parent, IReadOnlyList<ulong> children, UiScale scale)
     {
         ArgumentNullException.ThrowIfNull(children);
 
-        var placed = new Dictionary<ulong, (Vector2, Vector2)>(children.Count);
+        var placed = new Dictionary<ulong, Placed>(children.Count);
         if (!IsUiElement(parent))
         {
             return placed;
@@ -204,9 +223,10 @@ public sealed class UiElementReader
 
             Vector2 size = ReadVector2(child + (ulong)_unscaledSize);
 
-            placed[child] = (
+            placed[child] = new Placed(
                 new Vector2((unscaled.X * childW) + scale.Cull, unscaled.Y * childH),
-                new Vector2(size.X * childW, size.Y * childH));
+                new Vector2(size.X * childW, size.Y * childH),
+                (flags & _flagIsVisible) != 0);
         }
 
         return placed;

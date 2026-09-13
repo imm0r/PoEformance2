@@ -62,6 +62,16 @@ public readonly record struct AtlasSaid(string Text, string Detail = "", string 
 /// Which biome the map is in, as the game numbers them, or <see cref="AtlasBiomes.None"/> when
 /// there is none to draw. See <see cref="AtlasBiomes"/> for why that is not nought.
 /// </param>
+/// <param name="Shown">
+/// Whether the GAME is painting this node itself.
+/// </param>
+/// <remarks>
+/// <see cref="Shown"/> is what stops the content pictures being a copy. The game draws its own
+/// icon on every node it is showing, with its own tooltip saying the same words - so drawing ours
+/// there adds a second picture of the same thing, slightly lower. What it cannot draw is a node
+/// it is not showing: out in the fog, or scrolled far enough out that it stops painting them.
+/// That is where a picture is the only thing saying what is in a map, and it is where ours goes.
+/// </remarks>
 public sealed record AtlasMark(
     (int X, int Y) Grid,
     Vector2 Where,
@@ -74,7 +84,8 @@ public sealed record AtlasMark(
     int Hops,
     int? Rating = null,
     int BestRating = 0,
-    int Biome = AtlasBiomes.None);
+    int Biome = AtlasBiomes.None,
+    bool Shown = false);
 
 /// <summary>
 /// What the atlas looks like right now. Immutable, published whole, drawn as-is.
@@ -360,7 +371,7 @@ public sealed class AtlasWatch
 
         // WHERE the maps are, every tick, because that is the half that changes while somebody
         // drags the atlas about.
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed = _atlas.Where(panel, scale);
+        Dictionary<ulong, Placed> placed = _atlas.Where(panel, scale);
 
         if (placed.Count == 0)
         {
@@ -422,7 +433,7 @@ public sealed class AtlasWatch
     /// </remarks>
     public static List<AtlasNode> Live(
         IReadOnlyList<AtlasNode> studied,
-        IReadOnlyDictionary<ulong, (Vector2 Position, Vector2 Size)> placed)
+        IReadOnlyDictionary<ulong, Placed> placed)
     {
         ArgumentNullException.ThrowIfNull(studied);
         ArgumentNullException.ThrowIfNull(placed);
@@ -430,9 +441,12 @@ public sealed class AtlasWatch
         var live = new List<AtlasNode>(studied.Count);
         foreach (AtlasNode node in studied)
         {
-            if (placed.TryGetValue(node.Address, out (Vector2 Position, Vector2 Size) now))
+            if (placed.TryGetValue(node.Address, out Placed now))
             {
-                live.Add(node with { Screen = now.Position, Size = now.Size });
+                // Shown comes from the LIVE read rather than from the studied one, with the
+                // position: whether the game is drawing a node changes as the atlas is scrolled
+                // and as fog lifts, which is exactly the rate the position changes at.
+                live.Add(node with { Screen = now.Position, Size = now.Size, Shown = now.Shown });
             }
         }
 
@@ -539,7 +553,8 @@ public sealed class AtlasWatch
                 // draw nothing, while a scale in force and no value on this map means the map
                 // is UNRATED and should say so. Without this they are the same null.
                 settings.Ratings ? grouping.BestRating : 0,
-                settings.Biomes ? node.Biome : AtlasBiomes.None));
+                settings.Biomes ? node.Biome : AtlasBiomes.None,
+                node.Shown));
         }
 
         return new AtlasView(
@@ -672,6 +687,13 @@ public sealed class AtlasWatch
     /// tooltip - the name of the thing - and its high half is a category tag rather than a
     /// magnitude. Only the effect lines beneath it count anything, and only the ones whose
     /// wording has somewhere to put a number.
+    ///
+    /// AND WHAT THE GAME SAYS IT DOES NOT SHOW, this does not show either. One row of that table
+    /// is a developer's placeholder - "[DNT] Breach City - Not Shown to Players", described as
+    /// "DNT No visual identity = not shown" - and it went straight onto four maps of a real
+    /// atlas, in the same plate as everything the game does mean to say. The row is KEPT, so its
+    /// id stays known rather than being reported as one nothing has heard of; it is the drawing
+    /// that skips it. See <see cref="Placeholder"/>.
     /// </remarks>
     public static IReadOnlyList<AtlasSaid> Words(AtlasNode node, AtlasContentNames contents)
     {
@@ -702,7 +724,7 @@ public sealed class AtlasWatch
 
         void Add(AtlasContent content, string word)
         {
-            if (word.Length == 0)
+            if (word.Length == 0 || Placeholder(word))
             {
                 return;
             }
@@ -729,6 +751,28 @@ public sealed class AtlasWatch
             said.Add(new AtlasSaid(word, detail, content.Icon));
         }
     }
+
+    /// <summary>
+    /// Whether a content's wording is a placeholder rather than something to show a player.
+    /// </summary>
+    /// <remarks>
+    /// A SQUARE BRACKET AT THE FRONT IS THE GAME'S OWN MARK for a row that is not finished
+    /// content: "[DNT] Breach City - Not Shown to Players" in the content table, "[DNT-UNUSED]
+    /// Vastiri Outpost" and "[DNT] Ship" among the map names. DNT is "do not translate", which
+    /// is how a string that never reaches a player is flagged for the translators - and a
+    /// string the translators are told to leave alone is a string nobody meant to be read.
+    ///
+    /// Matched on the BRACKET rather than on the letters DNT, because the bracket is the part
+    /// that is consistent: the game has used "[UNUSED]" and bare "[...]" for the same thing, and
+    /// a real content has never begun with one. It is deliberately not matched on the
+    /// description, which says useful things about real content in every other row.
+    ///
+    /// Only the DRAWING is spared it. The table keeps the row, so the id is still recognised -
+    /// dropping it would turn a known-and-hidden content into an unknown one, which is the state
+    /// this project reports as something worth investigating.
+    /// </remarks>
+    public static bool Placeholder(string? word)
+        => word is { Length: > 0 } && word[0] == '[';
 
     /// <summary>
     /// A route's grid positions turned into screen ones, BROKEN wherever a step is missing.
