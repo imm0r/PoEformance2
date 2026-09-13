@@ -31,3 +31,8 @@ Thumbs.db
 recordings/
 *.rec
 !tests/fixtures/*.rec
+
+# Somebody else's game art. scripts\fetch-minimap-icons.ps1 rebuilds this folder
+# from data/minimap-icons.urls.txt, so the recipe is committed and the 2.6 MB of
+# icons are not.
+/assets/minimap-icons/
