@@ -31,6 +31,11 @@ public static class IconSheet
     /// </summary>
     public const string Resource = "icons.png";
 
+    /// <summary>
+    /// The table naming the sheet's cells, matched against the end of the resource name.
+    /// </summary>
+    public const string NameTable = "icon-names.tsv";
+
     /// <summary>One cell's edge, in sheet pixels. See the measurement in the type remarks.</summary>
     public const int Tile = 64;
 

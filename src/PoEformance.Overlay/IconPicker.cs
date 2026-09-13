@@ -53,6 +53,17 @@ internal static class IconPicker
     private const int VisibleRows = 12;
 
     /// <summary>
+    /// What is being searched for, while a picker is open.
+    /// </summary>
+    /// <remarks>
+    /// One field for the whole tool, which is safe because ImGui allows one popup at a time -
+    /// the same reasoning the style rows' path box is written up under. It deliberately SURVIVES
+    /// the popup closing: picking two markers out of the same family means typing the same word
+    /// twice otherwise.
+    /// </remarks>
+    private static string _search = string.Empty;
+
+    /// <summary>
     /// Draws the grid, and returns the cell chosen - counted from ONE, as a style stores it.
     /// </summary>
     /// <remarks>
@@ -80,11 +91,42 @@ internal static class IconPicker
         }
 
         ImGui.SameLine();
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 10f);
+        ImGui.InputTextWithHint("###find", "find by name...", ref _search, 64);
+
+        ImGui.SameLine();
+        string standing = currentTile > 0 ? IconNames.For(currentTile) : string.Empty;
         ImGuiText.Wrapped(
             OverlayInk.Quiet,
-            currentTile > 0 ? $"cell {currentTile} of {count}" : $"{count} to choose from");
+            currentTile > 0
+                ? standing.Length > 0 ? $"{standing} - cell {currentTile}" : $"cell {currentTile} of {count}"
+                : $"{count} to choose from, {IconNames.Count} named");
 
         ImGui.Separator();
+
+        // THE SEARCH REARRANGES THE GRID rather than greying cells out. A name matches maybe a
+        // dozen of a thousand, and left in place those dozen are a dozen rows apart - which is
+        // a list you still have to scroll to read, for a question you asked to avoid scrolling.
+        // Filtered, the answers are the first row.
+        int[]? found = null;
+        if (!string.IsNullOrWhiteSpace(_search))
+        {
+            var hits = new List<int>();
+            for (int i = 0; i < count; i++)
+            {
+                if (IconNames.Matches(i + 1, _search))
+                {
+                    hits.Add(i);
+                }
+            }
+
+            found = [.. hits];
+            if (found.Length == 0)
+            {
+                ImGuiText.Wrapped(OverlayInk.Quiet, $"nothing named like \"{_search}\".");
+                return chosen;
+            }
+        }
 
         ImGuiStylePtr style = ImGui.GetStyle();
 
@@ -94,7 +136,8 @@ internal static class IconPicker
         // happened to be the same number, which is the kind of agreement that holds until
         // somebody widens the sheet.
         int across = columns;
-        int rows = (count + across - 1) / across;
+        int shown = found?.Length ?? count;
+        int rows = (shown + across - 1) / across;
 
         // Only when there is actually something to scroll: a sheet short enough to fit would
         // otherwise carry a strip of empty space down its right-hand side.
@@ -159,11 +202,13 @@ internal static class IconPicker
             {
                 for (int column = 0; column < across; column++)
                 {
-                    int index = (row * across) + column;
-                    if (index >= count)
+                    int at = (row * across) + column;
+                    if (at >= shown)
                     {
                         break;
                     }
+
+                    int index = found is null ? at : found[at];
 
                     if (column > 0)
                     {
@@ -207,7 +252,14 @@ internal static class IconPicker
 
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip($"cell {index + 1}  (column {index % columns}, row {index / columns})");
+            // The NAME first where there is one, because that is what somebody came to read;
+            // the cell number stays because half the sheet has no name and the number is what
+            // those cells are known by.
+            string name = IconNames.For(index + 1);
+            ImGui.SetTooltip(
+                name.Length > 0
+                    ? $"{name}\ncell {index + 1}  (column {index % columns}, row {index / columns})"
+                    : $"cell {index + 1}  (column {index % columns}, row {index / columns})");
         }
 
         return pressed;
