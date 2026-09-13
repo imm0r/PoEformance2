@@ -27,6 +27,44 @@ public class PoiGlyphTests
     public void TheGamesOwnNameForTheMarkerDecides(string icon, PoiGlyph expected)
         => Assert.Equal(expected, PoiGlyphs.For(icon, PoiKind.Marked));
 
+    /// <summary>
+    /// A name none of the keywords match falls through to the unrecognised marker.
+    /// </summary>
+    /// <remarks>
+    /// WHICH IS NOT A FAILURE, and the list below is why the map now prints the game's icon
+    /// name beside that marker. These are real things, found in one small area in a single
+    /// run - named, marked by the game, and matching not one of the thirteen keywords
+    /// PoiGlyphs knows. The old behaviour drew a bare question mark and dropped the name, so
+    /// there was no way to learn which keyword was missing short of reading memory by hand.
+    ///
+    /// The list is DELIBERATELY the awkward cases rather than nonsense strings: a test that
+    /// only proved "Xyzzy" is unrecognised would pass forever and teach nobody anything. When
+    /// one of these does get a keyword, this test fails and says so - which is the moment to
+    /// move that line up to the table above rather than to loosen this one.
+    /// </remarks>
+    [Theory]
+    [InlineData("GuildStash")]
+    [InlineData("Stash")]
+    [InlineData("Hideout")]
+    public void ANameNoKeywordMatchesStaysUnrecognised(string icon)
+        => Assert.Equal(PoiGlyph.Marker, PoiGlyphs.For(icon, PoiKind.Marked));
+
+    /// <summary>
+    /// An entity with no name of its own is labelled with its icon name already.
+    /// </summary>
+    /// <remarks>
+    /// Which is the case the map has to SKIP when it prints the icon name beside an
+    /// unrecognised marker: printing both would say the same thing twice, once spaced out and
+    /// once not. The two forms differ only by the spacing, so comparing them is how the
+    /// drawing code tells that case apart - see PoiLayer.Unrecognised.
+    /// </remarks>
+    [Fact]
+    public void TheReadableIconNameIsTheLabelWhenNothingElseIs()
+    {
+        Assert.Equal("Guild Stash", PointsOfInterest.Readable("GuildStash"));
+        Assert.NotEqual("GuildStash", PointsOfInterest.Readable("GuildStash"));
+    }
+
     [Fact]
     public void TheNameBeatsTheKindWhereTheyDisagree()
     {
