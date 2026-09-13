@@ -534,9 +534,14 @@ public sealed class StyleRows
             ImGui.OpenPopup("icon");
         }
 
+        // The name where the sheet has one for this cell, because "cell 588" is not something
+        // anybody recognises a second time - see IconNames, and why half of them have none.
+        string named = wanted.HasIcon ? IconNames.For(wanted.IconTile) : string.Empty;
         OverlayLayout.Hint(
             wanted.HasIcon
-                ? $"Drawn as cell {wanted.IconTile} of the icon sheet."
+                ? named.Length > 0
+                    ? $"Drawn as {named} (cell {wanted.IconTile} of the icon sheet)."
+                    : $"Drawn as cell {wanted.IconTile} of the icon sheet."
                 : "Draw a picture from the icon sheet instead of the built-in shape.");
 
         if (!ImGui.BeginPopup("icon"))

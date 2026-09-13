@@ -33,5 +33,8 @@
          name, and a linked file's generated name is derived from its path outside the project
          directory, which is neither stable nor predictable. -->
     <EmbeddedResource Include="..\..\assets\icons.png" LogicalName="PoEformance.Overlay.assets.icons.png" />
+    <!-- The names for its cells travel WITH it. Kept apart they can be separated, and a
+         name table that does not match the sheet it names is worse than none. -->
+    <EmbeddedResource Include="..\..\assets\icon-names.tsv" LogicalName="PoEformance.Overlay.assets.icon-names.tsv" />
   </ItemGroup>
 </Project>
