@@ -4171,6 +4171,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return false;
         }
 
+        // A thing the game says is not in the world. THE SAME OMISSION AS THE LINE ABOVE, found
+        // the same way and two months later: IsPlace has refused these since the Lurking
+        // Creature was drawn in an empty map, and the dots never asked.
+        //
+        // What that cost: a quest NPC the game spawns once at a player's FIRST Vaal chest and
+        // never again stayed in the entity list afterwards - awake, positioned, carrying the
+        // game's own NPC minimap icon - and a dot stood in front of every Vaal chest for the
+        // rest of the character's life. Replaying the capture of it settled where to look:
+        // the reader had it right all along, present=False and isPlace=False on both that NPC
+        // and the Lurking Creature, so nothing was wrong upstream of here.
+        //
+        // Only places can reach this. Present is read for an entity that is a point of
+        // interest and neither a monster nor a chest - on those two the same byte answers a
+        // different question - so everything else carries null and is unaffected.
+        if (entity.Present == false)
+        {
+            return false;
+        }
+
         // Your own flame wall is not a dot. Only FRIENDLY effects get this far - the reader
         // drops the hostile ones - and it keeps them deliberately, because whose side a thing
         // is on is a fact while whether to draw it is a preference. This is where that
