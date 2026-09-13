@@ -102,8 +102,7 @@ public class UiElementReaderTests
         }
 
         var reader = new UiElementReader(fake, schema);
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> together =
-            reader.ReadSiblings(Panel, children, scale);
+        Dictionary<ulong, Placed> together = reader.ReadSiblings(Panel, children, scale);
 
         Assert.Equal(children.Length, together.Count);
 
@@ -112,6 +111,13 @@ public class UiElementReaderTests
             UiElement one = reader.Read(child, scale, withStringId: false)!;
             Assert.Equal(one.Position, together[child].Position);
             Assert.Equal(one.Size, together[child].Size);
+
+            // And whether the game is drawing it, which the sibling read used to know and
+            // throw away: it reads the flags word for the position modifier either way.
+            // Against the element's OWN bit rather than against UiElement.Visible, which walks
+            // the ancestors as well - those are two different questions and this is the one the
+            // sibling read can answer without re-walking the chain it just walked once.
+            Assert.Equal(reader.IsShowingItself(child), together[child].Shown);
         }
     }
 
@@ -128,7 +134,7 @@ public class UiElementReaderTests
         PlaceElement(fake, schema, Leaf, parent: Panel, relX: 5, relY: 7);
 
         var reader = new UiElementReader(fake, schema);
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed =
+        Dictionary<ulong, Placed> placed =
             reader.ReadSiblings(Panel, [Leaf, 0xDEAD_BEEF], new UiScale(2560, 1600, 0));
 
         Assert.Single(placed);

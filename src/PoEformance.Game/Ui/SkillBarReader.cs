@@ -146,14 +146,13 @@ public sealed class SkillBarReader
             return _last;
         }
 
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed =
-            _elements.ReadSiblings(bar, _candidates, scale);
+        Dictionary<ulong, Placed> placed = _elements.ReadSiblings(bar, _candidates, scale);
 
         var slots = new List<SkillSlotOnScreen>(_candidates.Count);
         int matched = 0;
         foreach (ulong slot in _candidates)
         {
-            if (!placed.TryGetValue(slot, out (Vector2 Position, Vector2 Size) box))
+            if (!placed.TryGetValue(slot, out Placed box))
             {
                 continue;
             }

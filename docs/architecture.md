@@ -2881,6 +2881,17 @@ is one short row in the art the game already uses.
   one layer down, because the reader published strings. A content now travels as its line, its
   fuller wording and its art name — with the wording dropped where it only repeats the line,
   which is the usual case for an effect and never the case for a badge.
+- **AND ONLY WHERE THE GAME IS NOT ALREADY DRAWING ONE, which is the whole worth of the
+  feature.** The first build of this drew a picture on every node with content — including the
+  hundreds the game is painting itself, where it already draws the same icon with a tooltip
+  saying the same words. That is a copy a few pixels lower, and it was rightly asked what it was
+  for. What the game *cannot* draw is a node it is not showing: out in the fog, or scrolled far
+  enough that it stops painting them. There a picture is the only thing saying what is in a map,
+  and that is where ours goes — which is what yokkenUA's plugin does, and why its icons appear
+  out over the unexplored sea. The bit is the element's own `IsVisible` (0x800), and it costs
+  nothing: `ReadSiblings` already reads the flags word to decide whether a child takes its
+  parent's position modifier, and was throwing the rest of it away. It now returns a `Placed`
+  record — position, size, and whether the game is drawing it — instead of a pair.
 
 #### Names out of the bundle index — the half of `_.index.bin` nothing read
 

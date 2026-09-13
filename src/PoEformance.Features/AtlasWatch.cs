@@ -62,6 +62,16 @@ public readonly record struct AtlasSaid(string Text, string Detail = "", string 
 /// Which biome the map is in, as the game numbers them, or <see cref="AtlasBiomes.None"/> when
 /// there is none to draw. See <see cref="AtlasBiomes"/> for why that is not nought.
 /// </param>
+/// <param name="Shown">
+/// Whether the GAME is painting this node itself.
+/// </param>
+/// <remarks>
+/// <see cref="Shown"/> is what stops the content pictures being a copy. The game draws its own
+/// icon on every node it is showing, with its own tooltip saying the same words - so drawing ours
+/// there adds a second picture of the same thing, slightly lower. What it cannot draw is a node
+/// it is not showing: out in the fog, or scrolled far enough out that it stops painting them.
+/// That is where a picture is the only thing saying what is in a map, and it is where ours goes.
+/// </remarks>
 public sealed record AtlasMark(
     (int X, int Y) Grid,
     Vector2 Where,
@@ -74,7 +84,8 @@ public sealed record AtlasMark(
     int Hops,
     int? Rating = null,
     int BestRating = 0,
-    int Biome = AtlasBiomes.None);
+    int Biome = AtlasBiomes.None,
+    bool Shown = false);
 
 /// <summary>
 /// What the atlas looks like right now. Immutable, published whole, drawn as-is.
@@ -360,7 +371,7 @@ public sealed class AtlasWatch
 
         // WHERE the maps are, every tick, because that is the half that changes while somebody
         // drags the atlas about.
-        Dictionary<ulong, (Vector2 Position, Vector2 Size)> placed = _atlas.Where(panel, scale);
+        Dictionary<ulong, Placed> placed = _atlas.Where(panel, scale);
 
         if (placed.Count == 0)
         {
@@ -422,7 +433,7 @@ public sealed class AtlasWatch
     /// </remarks>
     public static List<AtlasNode> Live(
         IReadOnlyList<AtlasNode> studied,
-        IReadOnlyDictionary<ulong, (Vector2 Position, Vector2 Size)> placed)
+        IReadOnlyDictionary<ulong, Placed> placed)
     {
         ArgumentNullException.ThrowIfNull(studied);
         ArgumentNullException.ThrowIfNull(placed);
@@ -430,9 +441,12 @@ public sealed class AtlasWatch
         var live = new List<AtlasNode>(studied.Count);
         foreach (AtlasNode node in studied)
         {
-            if (placed.TryGetValue(node.Address, out (Vector2 Position, Vector2 Size) now))
+            if (placed.TryGetValue(node.Address, out Placed now))
             {
-                live.Add(node with { Screen = now.Position, Size = now.Size });
+                // Shown comes from the LIVE read rather than from the studied one, with the
+                // position: whether the game is drawing a node changes as the atlas is scrolled
+                // and as fog lifts, which is exactly the rate the position changes at.
+                live.Add(node with { Screen = now.Position, Size = now.Size, Shown = now.Shown });
             }
         }
 
@@ -539,7 +553,8 @@ public sealed class AtlasWatch
                 // draw nothing, while a scale in force and no value on this map means the map
                 // is UNRATED and should say so. Without this they are the same null.
                 settings.Ratings ? grouping.BestRating : 0,
-                settings.Biomes ? node.Biome : AtlasBiomes.None));
+                settings.Biomes ? node.Biome : AtlasBiomes.None,
+                node.Shown));
         }
 
         return new AtlasView(

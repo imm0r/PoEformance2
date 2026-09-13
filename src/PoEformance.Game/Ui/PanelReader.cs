@@ -451,7 +451,7 @@ public sealed class PanelReader
         float right = float.MinValue;
         float bottom = float.MinValue;
 
-        foreach ((ulong child, (Vector2 position, Vector2 size)) in
+        foreach ((ulong child, (Vector2 position, Vector2 size, _)) in
                  _elements.ReadSiblings(element, children, scale))
         {
             if (!Measurable(position, size) || !_elements.IsShowingItself(child))
