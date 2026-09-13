@@ -8,23 +8,22 @@ namespace PoEformance.Features;
 /// game's own art name - "AtlasIconContentBreach" - because that is all any published version
 /// of this table has: the game's table holds the whole path in its icon column, and every
 /// project that has republished it kept the last part and shipped extracted pictures alongside.
-/// So the folder has to come from somewhere else, and there are two somewheres:
 ///
-/// A FOLDER SOMEBODY FILLED, first, because it always works. Drop
-/// <c>AtlasIconContentBreach.png</c> into it and that is the breach icon, no install required,
-/// no lookup that can fail. It is also the escape hatch for anything the install cannot give
-/// up, and the only route on a machine where the game is not installed.
+/// SO THE INSTALL IS ASKED WHAT IT CALLS ITS OWN FILES. The index's blob of spelled-out paths
+/// holds every one of them; walking it once turns a name into a path, for whatever the current
+/// patch happens to be. That is the whole point: no folder list kept by hand, nothing to correct
+/// when a league moves a file, and nobody has to install a pile of extracted pictures. See
+/// <c>BundleIndex.Look</c> for what that walk costs and why it takes the whole list at once.
 ///
-/// THE INSTALL, second, and only where a folder from <see cref="Places"/> turns out to hold the
-/// name. Those folders are PROPOSALS: each is tried against the game's own index, which either
-/// has the file or does not, so nothing here is drawn on a guess - a wrong folder is a lookup
-/// that finds nothing and a content that keeps its written line. What that buys is art that is
-/// always the current patch's and that nobody has to install.
+/// A FOLDER SOMEBODY FILLED comes FIRST all the same, and it is not vestigial: it works with no
+/// install at all, it is how a picture the install will not give up gets drawn anyway, and it is
+/// the one way to override what the game ships. Drop <c>AtlasIconContentBreach.png</c> in and
+/// that is the breach icon.
 ///
 /// NEVER BLOCKS AND NEVER THROWS. It is asked while a frame is being drawn, several times per
-/// map, so every answer is a dictionary hit after the first: a name that has been found is a
-/// path, a name that is being looked for is empty, and a name that came to nothing is empty
-/// forever after. The art store behind it does its unpacking on its own threads.
+/// map, so every answer is a dictionary hit: the walk happens once on a background task, and
+/// until it comes back a name simply has no picture and its content draws as words. The art
+/// store behind it does its unpacking on its own threads too.
 /// </remarks>
 public sealed class AtlasArt
 {
@@ -59,8 +58,26 @@ public sealed class AtlasArt
     /// </remarks>
     public ItemArtStore? Store { get; set; }
 
-    /// <summary>Folders inside the install to try, in order. See the class remarks.</summary>
-    public IReadOnlyList<string> Places { get; set; } = [];
+    /// <summary>
+    /// What the install calls the files whose names are handed to it, or null when there is no
+    /// install to ask.
+    /// </summary>
+    /// <remarks>
+    /// Handed in rather than reached for, because opening an install belongs to whoever owns
+    /// this machine's copy of the game - and because a walk of half a million paths must be
+    /// something a test can stand in for with a dictionary.
+    /// </remarks>
+    public Func<IReadOnlyCollection<string>, Dictionary<string, string>>? Names { get; set; }
+
+    /// <summary>
+    /// Every art name that will ever be asked for, so the install is walked ONCE.
+    /// </summary>
+    /// <remarks>
+    /// The walk is the expensive part - the blob of paths unpacks to tens of megabytes - so
+    /// asking per name would pay it per name. Set this to the whole list the data knows about
+    /// and the first question answers all of them.
+    /// </remarks>
+    public IReadOnlyCollection<string> Wanted { get; set; } = [];
 
     /// <summary>How it is going: pictures in hand, out of the names asked for.</summary>
     /// <remarks>
@@ -142,6 +159,13 @@ public sealed class AtlasArt
             _found.Clear();
             _asked.Clear();
             _dropped = null;
+
+            // The install's answer goes too, so this also covers the game having been patched
+            // under a running tool. Clearing the flag as well is what lets a new walk start; a
+            // walk already in flight then runs alongside it and whichever lands last wins, which
+            // costs one wasted walk in the moment nobody will hit twice.
+            _paths = null;
+            _walking = false;
         }
     }
 
@@ -198,29 +222,76 @@ public sealed class AtlasArt
         return listed;
     }
 
-    /// <summary>What the install has for this name, under whichever proposed folder holds it.</summary>
+    /// <summary>What the install has for this name, once it has said where its art lives.</summary>
     /// <remarks>
-    /// EVERY FOLDER IS ASKED EVERY TIME until one answers, and that is cheaper than it reads:
-    /// the store remembers both its hits and its misses, so after the first frame this is one
-    /// dictionary lookup per folder. Stopping early on the first miss would be wrong anyway -
-    /// a miss and a not-yet-unpacked look the same from here.
+    /// The walk is asked for on the FIRST question and never again, on a background task - it is
+    /// tens of megabytes unpacked and half a million paths, which is not something to do on the
+    /// thread drawing frames. Until it comes back this answers nothing and the content draws as
+    /// words, which is the same thing that happens on a machine with no install.
     /// </remarks>
     private string Unpacked(string name)
     {
-        if (Store is not { } store || Places.Count == 0)
+        if (Store is not { } store)
         {
             return string.Empty;
         }
 
-        foreach (string place in Places)
+        Dictionary<string, string>? paths = Asked();
+        return paths is not null && paths.TryGetValue(name, out string? path)
+            ? store.Local(path)
+            : string.Empty;
+    }
+
+    // What the install calls each wanted name, once the walk has finished. Null until then.
+    private Dictionary<string, string>? _paths;
+    private bool _walking;
+
+    /// <summary>
+    /// The install's answer, starting the one walk that produces it if nobody has yet.
+    /// </summary>
+    /// <remarks>
+    /// A FLAG RATHER THAN A TASK KEPT AROUND. Nothing waits for this and nothing cancels it: the
+    /// question is asked again on the next frame anyway, so the only thing needed is that the
+    /// walk is not started twice.
+    /// </remarks>
+    private Dictionary<string, string>? Asked()
+    {
+        lock (_gate)
         {
-            string local = store.Local($"{place.TrimEnd('/', '\\')}/{name}");
-            if (local.Length > 0)
+            if (_paths is not null)
             {
-                return local;
+                return _paths;
             }
+
+            if (_walking || Names is null || Wanted.Count == 0)
+            {
+                return null;
+            }
+
+            _walking = true;
         }
 
-        return string.Empty;
+        _ = Task.Run(() =>
+        {
+            Dictionary<string, string> found;
+            try
+            {
+                found = Names?.Invoke(Wanted) ?? [];
+            }
+            catch (Exception exception) when (exception is IOException or InvalidDataException
+                                                 or UnauthorizedAccessException or NotSupportedException)
+            {
+                // An install being patched under us, or one this cannot unpack. Either way the
+                // pictures do not arrive and the atlas keeps its words - worth not crashing over.
+                found = [];
+            }
+
+            lock (_gate)
+            {
+                _paths = found;
+            }
+        });
+
+        return null;
     }
 }

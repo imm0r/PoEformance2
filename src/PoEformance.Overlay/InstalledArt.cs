@@ -27,21 +27,19 @@ public static class InstalledArt
     /// </summary>
     /// <param name="gameFolder">Where the game is, or null to go looking for it.</param>
     /// <param name="describe">Told what was opened, or why nothing was.</param>
-    public static Func<string, byte[]?>? Source(string? gameFolder = null, Action<string>? describe = null)
+    /// <summary>
+    /// How to get one picture out of an install that is already open.
+    /// </summary>
+    /// <remarks>
+    /// TAKES THE OPEN INSTALL RATHER THAN OPENING ONE, which it used to do. Opening decompresses
+    /// the bundle index - tens of megabytes and a moment of work - and by the time this is wanted
+    /// the app has an install open anyway, for the quest tables, the ground-effect names and
+    /// (now) for asking what the game calls its own art files. Four features, one open.
+    /// </remarks>
+    public static Func<string, byte[]?> From(GameFiles files)
     {
-        string? folder = GameInstall.Find(gameFolder);
-        if (folder is null)
-        {
-            describe?.Invoke("item art: no Path of Exile 2 install found, so pictures can only come from poe2db");
-            return null;
-        }
-
-        // The reason comes back with the answer, because "could not read its packed files" is
-        // four different failures wearing one sentence and none of them can be acted on.
-        GameFiles.OpenedFiles opened = GameFiles.OpenOrSay(folder);
-        describe?.Invoke($"item art: {opened.Why}");
-
-        return opened.Files is { } files ? path => Encode(GameArt.Read(files, path)) : null;
+        ArgumentNullException.ThrowIfNull(files);
+        return path => Encode(GameArt.Read(files, path));
     }
 
     /// <summary>Turns decoded pixels into a picture file, or null when there were none.</summary>

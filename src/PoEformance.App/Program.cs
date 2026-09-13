@@ -1838,9 +1838,26 @@ internal static class Program
         // up, and THAT stays off until somebody turns it on: nothing else here talks to the
         // network while playing.
         handle.Stage = "opening the game's art bundle";
+        // THE ONE OPEN OF THE INSTALL, moved up here from further down the file. It was opened
+        // twice: once inside the art reader and once for the quest and ground tables, each paying
+        // for the bundle index - and a third reader has since arrived, the one that asks what the
+        // game CALLS its own art files. It cannot change while the game runs, so one open serves
+        // all of them.
+        handle.Stage = "opening the game's own files";
+        PoEformance.Game.Files.GameFiles.OpenedFiles opening =
+            PoEformance.Game.Files.GameFiles.OpenOrSay(
+                PoEformance.Game.Files.GameInstall.Find(null));
+        PoEformance.Game.Files.GameFiles? installed = opening.Files;
+        Console.WriteLine($"install  {opening.Why}");
+
+        // Each item's own picture. The item carries the PATH of its art, and that file is in
+        // the game's own packed bundles - so the install is read for it, which needs nobody's
+        // permission and works offline. poe2db is the fallback for whatever that cannot give
+        // up, and THAT stays off until somebody turns it on: nothing else here talks to the
+        // network while playing.
         using var itemArt = new PoEformance.Features.ItemArtStore
         {
-            Install = PoEformance.Overlay.InstalledArt.Source(describe: Console.WriteLine),
+            Install = installed is null ? null : PoEformance.Overlay.InstalledArt.From(installed),
         };
 
         // The quest tables come out of the INSTALL, not out of memory: a quest state is an
@@ -1848,13 +1865,6 @@ internal static class Program
         // which the resident copy of a table does not carry. Opened once - they cannot change
         // while the game runs - and then only the flag set is re-read.
         handle.Stage = "parsing quest tables";
-
-        // Opened ONCE and shared. Two features now read tables out of the install, and opening
-        // the archive twice would pay for the bundle index twice for no gain - it cannot change
-        // while the game runs.
-        PoEformance.Game.Files.GameFiles? installed =
-            PoEformance.Game.Files.GameFiles.OpenOrSay(
-                PoEformance.Game.Files.GameInstall.Find(null)).Files;
 
         var quests = new PoEformance.Features.QuestWatch();
         quests.Open(installed, FindDataFile("quest-tables.json"));
@@ -1950,11 +1960,13 @@ internal static class Program
         atlas.RitualWorth = atlas.Settings.Worth;
 
         // What a map contains, drawn as the game's own pictures. Shares the stash's art store,
-        // so one cache on disk serves both and a picture is unpacked once.
+        // so one cache on disk serves both and a picture is unpacked once - and asks the install
+        // itself where that art lives, rather than being told by a list somebody maintains.
         var atlasArt = new PoEformance.Features.AtlasArt
         {
             Store = itemArt,
-            Places = atlasContents.Places,
+            Wanted = atlasContents.Icons,
+            Names = installed is { } named ? named.Look : null,
         };
 
         // And the entity browser, which is the shortest route to something not yet
