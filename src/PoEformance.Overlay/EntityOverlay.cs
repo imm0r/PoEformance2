@@ -1058,8 +1058,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         ImGuiText.Wrapped(
             OverlayInk.Quiet,
-            $"{names} icon name{(names == 1 ? string.Empty : "s")} the marker rules do not"
-            + " recognise have been collected, with an example path for each:");
+            names == 1
+                ? "1 icon name the marker rules do not recognise has been collected, with an"
+                    + " example path for it:"
+                : $"{names} icon names the marker rules do not recognise have been collected,"
+                    + " with an example path for each:");
         ImGuiText.Mono(OverlayInk.Quiet, UnrecognisedMarkers.LogPath);
         ImGui.Separator();
     }

@@ -92,7 +92,7 @@ public class UnrecognisedMarkerTests
             Assert.Equal(0, log.Note(seen));
             Assert.Equal(0, log.Note(With(Marked(9, "GuildStash", "Metadata/Somewhere/Else", PoiKind.Marked))));
 
-            Assert.Single(File.ReadLines(file).Where(l => l.Length > 0 && l[0] != '#'));
+            Assert.Single(File.ReadLines(file), l => l.Length > 0 && l[0] != '#');
         }
         finally
         {

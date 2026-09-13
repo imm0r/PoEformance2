@@ -159,7 +159,7 @@ public class MapEdgeTests
     {
         foreach (string key in new[] { StyleCatalogue.Keys.EdgeSmall, StyleCatalogue.Keys.EdgeLarge })
         {
-            StyleEntry entry = Assert.Single(StyleCatalogue.Entries.Where(e => e.Key == key));
+            StyleEntry entry = Assert.Single(StyleCatalogue.Entries, e => e.Key == key);
             Assert.Equal("Map", entry.Group);
             Assert.True(entry.Traits.HasFlag(StyleTraits.Scale));
         }
