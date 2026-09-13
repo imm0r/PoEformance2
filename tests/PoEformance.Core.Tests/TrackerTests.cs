@@ -355,18 +355,18 @@ public class TrackerTests
         Assert.Empty((TrackerSettings.Default with { MonsterStatus = [] }).MonsterStatusOrDefault);
     }
 
-    /// <summary>What a hand-edited file cannot do, however it is written.</summary>
+    /// <summary>Every value a frame divides by or scales with survives a hand-edited file.</summary>
     /// <remarks>
-    /// The tile size is a DIVISOR in the texture-coordinate arithmetic, so a zero in the file
-    /// is not a bad-looking icon - it is a division by zero on the render thread, which ends
-    /// the frame and, reported once, the session's usefulness.
+    /// A rule's SCALE is still a multiplier the render thread trusts, and a settings file is a
+    /// text file somebody can put anything in. The sheet's own tile size used to be here too
+    /// and is not any more: it is a constant now rather than a setting, which is one fewer
+    /// number that can arrive as a zero and divide by it on the render thread.
     /// </remarks>
     [Fact]
     public void NormalisingKeepsEveryValueSomethingCanBeDrawnFrom()
     {
         TrackerSettings wild = TrackerSettings.Default with
         {
-            IconTile = 0,
             ShadowAlpha = 40f,
             ShadowSize = 9,
             MonsterStatus = [new StatusIconRule("", "unnamed"), new StatusIconRule("shocked", IconScale: 900f)],
@@ -375,7 +375,6 @@ public class TrackerTests
 
         TrackerSettings safe = wild.Normalised();
 
-        Assert.True(safe.IconTile > 0);
         Assert.Equal(1f, safe.ShadowAlpha);
         Assert.Equal(2, safe.ShadowSize);
         Assert.Empty(safe.GroundDangerOrDefault);
@@ -396,7 +395,6 @@ public class TrackerTests
             {
                 Lines = new MonsterLineSettings(Unique: true, UniqueColour: "#80FF0000"),
                 ShowMonsterStatus = true,
-                IconSheet = "sheets/status.png",
                 MonsterStatus = [new StatusIconRule("shocked", "Shocked", IconColumn: 3, IconRow: 7)],
             };
 
@@ -406,7 +404,6 @@ public class TrackerTests
             Assert.True(read.LinesOrDefault.Unique);
             Assert.Equal("#80FF0000", read.LinesOrDefault.UniqueColour);
             Assert.True(read.ShowMonsterStatus);
-            Assert.Equal("sheets/status.png", read.IconSheet);
 
             StatusIconRule rule = Assert.Single(read.MonsterStatusOrDefault);
             Assert.Equal(3, rule.IconColumn);

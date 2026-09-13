@@ -103,8 +103,18 @@ public sealed record GroundDangerRule(
 /// </remarks>
 /// <param name="Name">Part of the game's own buff name. Empty matches nothing.</param>
 /// <param name="Label">What to call it on screen when there is no icon to draw.</param>
-/// <param name="IconColumn">Column in the icon sheet, counted in tiles from the left.</param>
-/// <param name="IconRow">Row in the icon sheet, counted in tiles from the top.</param>
+/// <param name="IconColumn">
+/// Column in <see cref="IconSheet"/>, counted in cells from the left.
+/// </param>
+/// <param name="IconRow">
+/// Row in <see cref="IconSheet"/>, counted in cells from the top.
+/// <para>
+/// A column and a row rather than the single cell number a marker stores, because zero is a
+/// real answer here: a rule that has never been given an icon is drawn as its coloured disc
+/// with its caption, and <see cref="StatusIconRule.Enabled"/> already carries "is this on".
+/// A marker has no such flag, which is why it counts its cell from one instead.
+/// </para>
+/// </param>
 public sealed record StatusIconRule(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("label")] string Label = "",
@@ -290,8 +300,6 @@ public sealed record TrackerSettings(
     [property: JsonPropertyName("monsterLayout")] StatusIconLayout? MonsterLayout = null,
     [property: JsonPropertyName("playerLayout")] StatusIconLayout? PlayerLayout = null,
     [property: JsonPropertyName("layoutChosen")] bool LayoutChosen = false,
-    [property: JsonPropertyName("iconSheet")] string IconSheet = "",
-    [property: JsonPropertyName("iconTile")] int IconTile = 32,
     [property: JsonPropertyName("shadowAlpha")] float ShadowAlpha = 0.5f,
     [property: JsonPropertyName("shadowSize")] int ShadowSize = 1,
     [property: JsonPropertyName("barBackColour")] string BarBackColour = "#AA000000",
@@ -428,8 +436,6 @@ public sealed record TrackerSettings(
         MonsterStatus = Cleaned(MonsterStatus),
         PlayerStatus = Cleaned(PlayerStatus),
 
-        // Never zero: the icon sheet's tile size is a DIVISOR in the UV arithmetic.
-        IconTile = Math.Clamp(IconTile, 1, 512),
         ShadowAlpha = Math.Clamp(ShadowAlpha, 0f, 1f),
         ShadowSize = Math.Clamp(ShadowSize, 0, 2),
         Aim = Aim?.Normalised(),

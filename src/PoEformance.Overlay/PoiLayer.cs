@@ -44,14 +44,14 @@ public sealed class PoiLayer
     public WindowChrome Chrome { get; set; } = new();
 
     /// <summary>
-    /// Finds the texture for a chosen picture, or zero when the shape should be drawn.
+    /// The icon sheet markers are cut from, or an empty picture when the shapes should be drawn.
     /// </summary>
     /// <remarks>
     /// Handed in rather than owned, for the same reason the terrain layer's upload is: this
     /// class projects and draws, and it has no business holding a texture cache. Unset by
     /// default, which draws the shapes - so nothing here depends on a renderer existing.
     /// </remarks>
-    public Func<string, IntPtr>? IconFor { get; set; }
+    public Func<IconCache.Picture>? SheetFor { get; set; }
 
     // Which colour each destination holds. Kept BY ADDRESS rather than by position, so
     // removing one route leaves the others' colours alone - a colour that moved when a
@@ -308,16 +308,15 @@ public sealed class PoiLayer
     {
         float radius = map.IsLargeMap ? 5f : 3.5f;
 
+        // Once for the whole list rather than once per marker: the sheet is one texture and
+        // cannot change between two markers of the same frame.
+        IconCache.Picture sheet = SheetFor?.Invoke() ?? default;
+
         foreach (Place place in places)
         {
-            Vector2 at = map.Project(
+            Vector2 projected = map.Project(
                 place.WorldX, place.WorldY, place.Height,
                 player.WorldX, player.WorldY, player.TerrainHeight);
-
-            if (!map.Contains(at))
-            {
-                continue;
-            }
 
             // A shape per kind of place, because at this size the silhouette is what carries
             // the meaning - the entity dots are circles, and a marker has to be told apart
@@ -347,25 +346,35 @@ public sealed class PoiLayer
             // can no longer promise is that nobody has been there since, and a dimmer marker
             // is that difference said without taking the landmark off the map.
             bool routed = _planner.IsTarget(place.Id);
-            float fade = place.Remembered ? OverlayStyle.RememberedAlpha : 1f;
+            float remembered = place.Remembered ? OverlayStyle.RememberedAlpha : 1f;
+
+            // On the map it is drawn where it is; off it, pinned to the frame on the bearing it
+            // lies along - or dropped, when edge indicators are off for this map. A landmark is
+            // what this is most worth doing for: an exit outside the minimap is exactly the
+            // thing somebody is looking for a direction to.
+            if (MapEdge.Place(Style, map, projected, Style.Sized(key, radius), remembered)
+                is not (Vector2 at, float size, float fade))
+            {
+                continue;
+            }
+
             uint chosen = routed ? RouteColour(place.Id) : ColourFor(glyph);
             uint colour = OverlayStyle.Faded(chosen, fade);
-            float size = Style.Sized(key, radius);
 
-            // A chosen picture instead of the shape, and the SHAPE when there is none or it
-            // could not be loaded - a marker that vanished because a file moved would read as
-            // there being nothing there.
-            IntPtr icon = IconFor?.Invoke(Style[key].Icon) ?? IntPtr.Zero;
-            if (icon != IntPtr.Zero)
-            {
-                // Untinted unless a colour was chosen: somebody supplying a picture supplied
-                // its colours, and multiplying it by this glyph's default would look broken.
-                draw.AddImage(
-                    icon, at - new Vector2(size, size), at + new Vector2(size, size),
-                    Vector2.Zero, Vector2.One,
-                    OverlayStyle.Faded(Style[key].ColourOr(0xFFFFFFFF), fade));
-            }
-            else
+            // A chosen cell of the sheet instead of the shape, and the SHAPE when none was
+            // chosen or the sheet did not ship - a marker that vanished because its picture
+            // was missing would read as there being nothing there.
+            //
+            // Untinted unless a colour was chosen: the sheet's art carries its own colours,
+            // and multiplying a finished icon by this glyph's default would look broken.
+            LayerStyle chosenStyle = Style[key];
+            if (!SheetIcon.Draw(
+                    draw,
+                    sheet,
+                    chosenStyle,
+                    at - new Vector2(size, size),
+                    at + new Vector2(size, size),
+                    OverlayStyle.Faded(chosenStyle.ColourOr(0xFFFFFFFF), fade)))
             {
                 PoiGlyphPainter.Draw(draw, at, size, colour, glyph, Style.Width(key, 0f));
             }

@@ -57,6 +57,7 @@ public sealed class FigureTab
     /// <param name="explanation">What the figure is, in a sentence or two.</param>
     /// <param name="groups">The catalogue groups drawn under the switch.</param>
     /// <param name="status">The status line, from the snapshot, every frame the tab is open.</param>
+    /// <param name="sheet">The icon sheet the rows preview their chosen cells from.</param>
     public FigureTab(
         OverlayStyle style,
         Action save,
@@ -64,7 +65,8 @@ public sealed class FigureTab
         string title,
         string explanation,
         string[] groups,
-        Func<WorldSnapshot, string> status)
+        Func<WorldSnapshot, string> status,
+        Func<IconCache.Picture> sheet)
     {
         ArgumentNullException.ThrowIfNull(style);
         ArgumentNullException.ThrowIfNull(save);
@@ -79,7 +81,7 @@ public sealed class FigureTab
         _title = title;
         _explanation = explanation;
         _status = status;
-        _rows = new StyleRows(style, save, groups);
+        _rows = new StyleRows(style, save, groups, sheet);
     }
 
     /// <summary>Draws the tab: the switch, the words, the status line, the rows.</summary>

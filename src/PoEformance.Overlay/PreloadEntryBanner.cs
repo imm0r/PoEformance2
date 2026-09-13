@@ -160,7 +160,7 @@ public sealed class PreloadEntryBanner
         string names = string.Join(Separator, saying.Select(entry => entry.Shown));
         float centre = width / 2f;
 
-        IconCache.Picture picture = PlateFor(style.Icon);
+        IconCache.Picture picture = PlateFor(style.Plate);
 
         if (picture.Ready)
         {

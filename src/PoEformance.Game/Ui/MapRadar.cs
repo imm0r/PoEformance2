@@ -87,6 +87,76 @@ public readonly record struct MapView(
             : new ScreenRect(-100_000f, -100_000f, 100_000f, 100_000f);
 
     /// <summary>
+    /// Where a point that missed this map meets its edge, or null when it did not miss it.
+    /// </summary>
+    /// <remarks>
+    /// WHAT AN EDGE INDICATOR IS FOR. A minimap shows a circle a few hundred world units
+    /// across, and the thing worth knowing about - the rare pack, the chest, the exit - is
+    /// usually outside it. Dropped, as every marker outside the map was, the map says "there is
+    /// nothing in that direction", which is the one thing it must never say by accident. Pinned
+    /// to the edge, it says "that way, further than this map reaches", which is the true answer
+    /// and the one somebody is steering by.
+    ///
+    /// ON THE LINE FROM THE CENTRE rather than clamped per axis. Clamping X and Y separately
+    /// puts everything beyond a corner INTO that corner, so three things in three different
+    /// directions stack on one point and the direction - the only thing an edge marker carries
+    /// - is lost. Scaling the whole offset by whichever axis runs out first keeps the bearing
+    /// exact: the marker sits where a line drawn from the player to the thing would cross the
+    /// frame.
+    ///
+    /// The inset pulls it back inside by the marker's own radius. Placed exactly on the edge, a
+    /// marker is drawn half outside the map it belongs to - which over the minimap means half
+    /// of it is painted on the game.
+    ///
+    /// Null when the point is already on the map, so a caller reads it as "nothing special to
+    /// do here" and draws where it meant to. Null too when the map has no measured rectangle:
+    /// that map accepts every point, so nothing is ever outside it to pin.
+    /// </remarks>
+    public Vector2? EdgeFor(Vector2 point, float inset = 0f)
+    {
+        if (Width <= 0 || Height <= 0 || Contains(point))
+        {
+            return null;
+        }
+
+        ScreenRect rect = Rectangle;
+        var centre = new Vector2((rect.Left + rect.Right) * 0.5f, (rect.Top + rect.Bottom) * 0.5f);
+
+        // Half the frame, less the room the marker needs. Never past the middle: on a map
+        // narrower than the marker the inset would otherwise turn the rectangle inside out.
+        float halfWide = Math.Max(1f, (Width * 0.5f) - inset);
+        float halfTall = Math.Max(1f, (Height * 0.5f) - inset);
+
+        Vector2 offset = point - centre;
+        if (Math.Abs(offset.X) < 0.0001f && Math.Abs(offset.Y) < 0.0001f)
+        {
+            return null;   // the centre itself is never outside, but a zero offset has no bearing
+        }
+
+        // Whichever axis runs out of room first is the edge this bearing crosses.
+        float reach = float.PositiveInfinity;
+        if (Math.Abs(offset.X) > 0.0001f)
+        {
+            reach = Math.Min(reach, halfWide / Math.Abs(offset.X));
+        }
+
+        if (Math.Abs(offset.Y) > 0.0001f)
+        {
+            reach = Math.Min(reach, halfTall / Math.Abs(offset.Y));
+        }
+
+        // Already nearer than the frame on both axes means it missed the map through the
+        // keep-out region rather than through the rectangle - the interface is over it. There
+        // is no edge of the FRAME to pin such a point to, so it stays dropped.
+        if (reach >= 1f)
+        {
+            return null;
+        }
+
+        return centre + (offset * reach);
+    }
+
+    /// <summary>
     /// The same map, told which parts of the screen it must keep off.
     /// </summary>
     /// <remarks>

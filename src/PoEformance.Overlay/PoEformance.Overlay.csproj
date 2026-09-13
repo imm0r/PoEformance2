@@ -27,5 +27,11 @@
        ships before the art does and degrades to text until it lands. -->
   <ItemGroup>
     <EmbeddedResource Include="assets\*.png" />
+    <!-- The icon sheet lives at the repository root because it is the project's art rather
+         than the overlay's, and it is linked here rather than copied so the 4.9 MB exists
+         once. LogicalName is pinned: IconCache.BuiltIn matches on the END of the resource
+         name, and a linked file's generated name is derived from its path outside the project
+         directory, which is neither stable nor predictable. -->
+    <EmbeddedResource Include="..\..\assets\icons.png" LogicalName="PoEformance.Overlay.assets.icons.png" />
   </ItemGroup>
 </Project>

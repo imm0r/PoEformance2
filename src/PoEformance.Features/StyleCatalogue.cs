@@ -106,6 +106,18 @@ public static class StyleCatalogue
         // Scale sizes the patch, which is how a picture is made denser or airier.
         new("map.heat", "Map", "Heat map", StyleTraits.Colour | StyleTraits.Scale, Rgb(255, 80, 40, 190)),
 
+        // EDGE INDICATORS, one entry per map, and the tick is the switch. Two rather than one
+        // because the two maps are looked at for different things: the large map is a plan and
+        // usually wants them off, the minimap is a compass and is where they earn their place.
+        //
+        // NO COLOUR OF THEIR OWN, deliberately. An edge marker keeps the colour and the icon of
+        // the thing it stands for, because what it is saying is "THAT is over there" - given a
+        // colour of its own it would say only "something is over there", which the direction
+        // already said. Scale is here because a pinned marker sits on the frame among the
+        // game's own furniture, where it often wants to be smaller than one on open map.
+        new("map.edge.small", "Map", "Edge indicators (minimap)", StyleTraits.Scale, Rgb(255, 255, 255)),
+        new("map.edge.large", "Map", "Edge indicators (large map)", StyleTraits.Scale, Rgb(255, 255, 255)),
+
         // ── Health bars ─────────────────────────────────────────────────────
         // The BAR takes its colour from the monster's rarity entry above, so that one choice
         // covers the dot and the bar together. What is here is everything the rarity cannot
@@ -166,7 +178,11 @@ public static class StyleCatalogue
         // ONE plate rather than three. There used to be one per weight, back when an entry's
         // colour came from a weight; entries now carry their own colour, so what is left for the
         // catalogue is the card's plate itself - its icon, and how wide it is drawn.
-        new("preload.card", "What the area loaded", "Card Scale", Marker, Rgb(255, 217, 102)),
+        // A PLATE rather than an icon: this one is drawn across the top of the screen, so it
+        // takes a picture file with proportions of its own rather than a cell off the 64-pixel
+        // marker sheet, which stretched that wide is a smear.
+        new("preload.card", "What the area loaded", "Card Scale",
+            StyleTraits.Colour | StyleTraits.Scale | StyleTraits.Plate, Rgb(255, 217, 102)),
 
         // ── The atlas ───────────────────────────────────────────────────────
         // A map's own colour comes from the GROUP it is in, and that is set beside the group
@@ -215,6 +231,8 @@ public static class StyleCatalogue
         public const string Heat = "map.heat";
         public const string Room = "map.room";
         public const string Ground = "map.ground";
+        public const string EdgeSmall = "map.edge.small";
+        public const string EdgeLarge = "map.edge.large";
         public const string HealthBar = "healthbar";
         public const string HealthBarBack = "healthbar.back";
         public const string HealthBarShield = "healthbar.shield";
@@ -390,6 +408,15 @@ public static class StyleCatalogue
         ProjectileElement.Physical => "projectile.physical",
         _ => "",
     };
+
+    /// <summary>
+    /// Which edge-indicator switch a map is under.
+    /// </summary>
+    /// <remarks>
+    /// Here rather than in the overlay that draws them, so it can be held to a test without a
+    /// renderer - and so there is one answer rather than one per layer that pins a marker.
+    /// </remarks>
+    public static string EdgeKey(bool largeMap) => largeMap ? Keys.EdgeLarge : Keys.EdgeSmall;
 
     /// <summary>The key for a place's shape.</summary>
     public static string ForGlyph(PoEformance.Game.World.PoiGlyph glyph)

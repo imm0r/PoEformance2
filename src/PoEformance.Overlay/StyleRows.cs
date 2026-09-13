@@ -26,39 +26,74 @@ namespace PoEformance.Overlay;
 /// Over the game rather than in the configuration window, because a colour is chosen by
 /// LOOKING at it - on the map, among the other markers, at the size it will actually be. A
 /// picker in another window is a picker you use once and then go and check.
+///
+/// THE ROW LEADS WITH WHAT THE THING LOOKS LIKE. The preview cell draws the marker as it is
+/// actually drawn on the map - the chosen sheet cell if there is one, the built-in shape if
+/// there is not, in the row's own colour and at its own size - so picking an icon is answered
+/// on the spot instead of by closing the window and going to look. That is also why the icon
+/// button carries the cell rather than the word "Icon": a row that has been given a picture
+/// says so by showing it.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class StyleRows
 {
     private static readonly Vector4 DimText = OverlayInk.Quiet;
 
+    /// <summary>What a row is made of: on, colour, preview and name, icon, size, reset.</summary>
+    private const int Columns = 6;
+
+    /// <summary>The preview and icon cells' edge, in ems of the current font.</summary>
+    /// <remarks>
+    /// In ems rather than pixels so the rows keep their proportions when the overlay font is
+    /// scaled, which it is - the tool is used at 1080p and at 4K.
+    /// </remarks>
+    private const float CellEms = 1.6f;
+
+    /// <summary>How far one press of + or - moves a size, as a fraction of the ordinary one.</summary>
+    /// <remarks>
+    /// Five per cent: small enough that the steppers are how a size is TUNED rather than a
+    /// coarse switch, and large enough that holding one gets somewhere. The slider is gone
+    /// from this row because a drag in a table cell is a drag in a column two characters wide.
+    /// </remarks>
+    private const float SizeStep = 0.05f;
+
     private readonly OverlayStyle _style;
     private readonly Action _save;
     private readonly string[] _groups;
+    private readonly Func<IconCache.Picture> _sheet;
 
     /// <summary>
-    /// The path being typed, while an icon popup is open.
+    /// The path being typed, while a plate popup is open.
     /// </summary>
     /// <remarks>
     /// One field for every row, which is safe because ImGui allows one popup at a time: opening
     /// another closes the first. The "which row is editing" flag this used to sit beside is
     /// gone with it - the popup's own open state is that flag, kept where ImGui keeps it.
     /// </remarks>
-    private string _iconPath = string.Empty;
+    private string _platePath = string.Empty;
+
+    /// <summary>The size the Apply button would set on every row of the page, as a percentage.</summary>
+    private int _setAll = 100;
 
     // Something changed and has not been written down yet - see Settle.
     private bool _unsaved;
 
     /// <param name="save">Writes the style down. Called when a change has SETTLED, not per frame.</param>
     /// <param name="groups">The catalogue groups this block shows, in display order.</param>
-    public StyleRows(OverlayStyle style, Action save, string[] groups)
+    /// <param name="sheet">
+    /// The icon sheet the rows draw their previews from. Asked per frame rather than held,
+    /// because the cache can be told to forget everything and hand back new textures.
+    /// </param>
+    public StyleRows(OverlayStyle style, Action save, string[] groups, Func<IconCache.Picture> sheet)
     {
         ArgumentNullException.ThrowIfNull(style);
         ArgumentNullException.ThrowIfNull(save);
         ArgumentNullException.ThrowIfNull(groups);
+        ArgumentNullException.ThrowIfNull(sheet);
         _style = style;
         _save = save;
         _groups = groups;
+        _sheet = sheet;
     }
 
     /// <summary>
@@ -73,7 +108,7 @@ public sealed class StyleRows
     /// changed, so it moved everything after it on some rows and not others.
     ///
     /// Real columns hold. They also make the SHAPE of the list legible: a row with no size
-    /// slider now has an empty cell where the sliders are, which reads as "this one has no
+    /// stepper now has an empty cell where the steppers are, which reads as "this one has no
     /// size" instead of as a row that stops early.
     ///
     /// ONE TABLE FOR EVERY GROUP ON THE PAGE, not one per group. Column widths are measured per
@@ -83,7 +118,9 @@ public sealed class StyleRows
     /// </remarks>
     public void Draw()
     {
-        // Sizes are per column and the name takes the slack, so the sliders sit at the same x
+        DrawSetAllLine();
+
+        // Sizes are per column and the name takes the slack, so the steppers sit at the same x
         // whatever the longest name in the list happens to be.
         if (!ImGui.BeginTable(
                 "##style-rows",
@@ -99,8 +136,8 @@ public sealed class StyleRows
             ImGui.TableSetupColumn("##on");
             ImGui.TableSetupColumn("##colour");
             ImGui.TableSetupColumn("##name", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("##size");
             ImGui.TableSetupColumn("##icon");
+            ImGui.TableSetupColumn("##size");
             ImGui.TableSetupColumn("##reset");
 
             foreach (string group in _groups)
@@ -141,8 +178,53 @@ public sealed class StyleRows
         Settle();
     }
 
-    /// <summary>What a row is made of: on, colour, name, size, icon, reset.</summary>
-    private const int Columns = 6;
+    /// <summary>
+    /// The one control that sets every size on the page at once.
+    /// </summary>
+    /// <remarks>
+    /// Because the answer to "these are all too small" is one decision and forty adjustments.
+    /// It only touches the rows that HAVE a size - a line has a width and no scale, and setting
+    /// its size to 130% would be setting a field nothing reads.
+    /// </remarks>
+    private void DrawSetAllLine()
+    {
+        StyleEntry[] sizeable = Sizeable();
+        if (sizeable.Length == 0)
+        {
+            return;
+        }
+
+        ImGui.TextColored(DimText, "Set all sizes");
+        ImGui.SameLine();
+
+        ImGui.SetNextItemWidth(ImGui.GetFontSize() * 5f);
+        ImGui.InputInt("###setall", ref _setAll, 5);
+        _setAll = Math.Clamp(_setAll, 30, 400);
+        OverlayLayout.Hint("Per cent of each thing's ordinary size. 100 puts them back.");
+
+        ImGui.SameLine();
+        if (ImGui.SmallButton("Apply"))
+        {
+            float scale = _setAll / 100f;
+            foreach (StyleEntry entry in sizeable)
+            {
+                // Exactly what the row's own stepper stores, zero included: at 100% this
+                // CLEARS the scale rather than pinning it, so a default corrected in a later
+                // release still reaches somebody who pressed Apply once.
+                _style.Set(entry.Key, _style[entry.Key] with { Scale = Near(scale, 1f) ? 0f : scale });
+            }
+
+            Changed();
+        }
+
+        ImGui.Separator();
+    }
+
+    /// <summary>The entries on this page that have a size to set.</summary>
+    private StyleEntry[] Sizeable()
+        => [.. StyleCatalogue.Entries
+            .Where(entry => _groups.Contains(entry.Group, StringComparer.Ordinal))
+            .Where(entry => entry.Traits.HasFlag(StyleTraits.Scale))];
 
     /// <summary>
     /// The global changed-count and its reset, for the one page that shows every leftover.
@@ -209,7 +291,7 @@ public sealed class StyleRows
         }
     }
 
-    /// <summary>One drawn thing, as one row of the table: on, colour, name, size, icon, reset.</summary>
+    /// <summary>One drawn thing, as one row: on, colour, preview and name, icon, size, reset.</summary>
     /// <remarks>
     /// EVERY CELL IS CLAIMED even when the entry has nothing to put in it, because a table lays
     /// out by cell and a skipped one shifts everything after it into the wrong column. An entry
@@ -248,26 +330,22 @@ public sealed class StyleRows
         }
 
         ImGui.TableNextColumn();
-
-        // A marker's shape, at the size it is drawn on the large map, in the chosen colour, in
-        // front of the name like an icon in a list. The row otherwise says "Breach" and a
-        // swatch, which is the two things somebody reading it already knows.
-        if (PreviewGlyph(entry.Key) is PoiGlyph glyph)
-        {
-            Preview(glyph, style.ColourOr(entry.Fallback), style.Sized(6f), style.WidthOr(0f));
-            ImGui.SameLine();
-        }
-
+        DrawPreview(entry, style);
+        ImGui.SameLine();
         ImGui.TextUnformatted(entry.Label);
-
-        ImGui.TableNextColumn();
-        wanted = DrawSizes(entry, wanted);
 
         ImGui.TableNextColumn();
         if (entry.Traits.HasFlag(StyleTraits.Icon))
         {
-            wanted = DrawIcon(entry, wanted);
+            wanted = DrawIcon(wanted);
         }
+        else if (entry.Traits.HasFlag(StyleTraits.Plate))
+        {
+            wanted = DrawPlate(wanted);
+        }
+
+        ImGui.TableNextColumn();
+        wanted = DrawSizes(entry, wanted);
 
         // ITS OWN COLUMN, so a row that has been changed does not push its neighbours' controls
         // sideways. Shown only when there is something to unset, so an untouched list is a list
@@ -295,26 +373,104 @@ public sealed class StyleRows
     }
 
     /// <summary>
-    /// The size and line-width sliders, in the row's own size cell.
+    /// What the thing looks like on the map, in front of its name.
     /// </summary>
     /// <remarks>
-    /// BOTH IN ONE CELL, because they are one question - how big is it drawn - asked two ways
-    /// for two kinds of thing. A marker gets a scale, a line gets a width, and a few get both;
-    /// giving each its own column would leave one of them empty on nearly every row.
+    /// THE CHOSEN CELL WHEN THERE IS ONE, and the built-in shape when there is not - which is
+    /// exactly what the map does, so the row and the map cannot disagree. This is the half of
+    /// "show me what I picked" that matters: the icon button says WHICH cell, this says what
+    /// the marker will actually look like once its colour and size are applied to it.
+    ///
+    /// Its own space is claimed on the line first, because ImGui lays out from what a widget
+    /// SAYS it occupies rather than from what was painted - without the claim the shape paints
+    /// over the next row's text.
+    /// </remarks>
+    private void DrawPreview(StyleEntry entry, LayerStyle style)
+    {
+        float box = ImGui.GetFontSize() * CellEms;
+        Vector2 at = ImGui.GetCursorScreenPos();
+        ImGui.Dummy(new Vector2(box, box));
+
+        uint colour = style.ColourOr(entry.Fallback);
+        ImDrawListPtr draw = ImGui.GetWindowDrawList();
+
+        // Inset a little, so a square icon does not touch the row above and below.
+        float pad = box * 0.1f;
+        if (SheetIcon.Draw(
+                draw,
+                _sheet(),
+                style,
+                at + new Vector2(pad, pad),
+                at + new Vector2(box - pad, box - pad),
+                string.IsNullOrEmpty(style.Colour) ? 0xFFFFFFFF : colour))
+        {
+            return;
+        }
+
+        if (PreviewGlyph(entry.Key) is PoiGlyph glyph)
+        {
+            PoiGlyphPainter.Draw(
+                draw,
+                at + new Vector2(box / 2f, box / 2f),
+                Math.Min(style.Sized(6f), box / 2f),
+                colour,
+                glyph,
+                style.WidthOr(0f));
+        }
+    }
+
+    /// <summary>
+    /// The size steppers, in the row's own size cell.
+    /// </summary>
+    /// <remarks>
+    /// A NUMBER WITH TWO BUTTONS rather than a slider, because a slider inside a table cell is
+    /// a drag across a column two characters wide: the value jumps, and putting it back means
+    /// another jump. Per cent of the ordinary size rather than pixels, because what the scale
+    /// multiplies is NOT one number - a marker's base is a few pixels, the atlas entry's is
+    /// derived from the node width, the flask figure's from the slot height - so an absolute
+    /// pixel value here would mean something different on every row.
+    ///
+    /// A line's WIDTH keeps its slider, and shares this cell: it is a genuine pixel count with
+    /// a small range, and it is on a handful of rows rather than all of them.
     /// </remarks>
     private static LayerStyle DrawSizes(StyleEntry entry, LayerStyle wanted)
     {
         if (entry.Traits.HasFlag(StyleTraits.Scale))
         {
-            // Starts at the ordinary size rather than at zero, so dragging it is an
+            // Starts at the ordinary size rather than at zero, so stepping it is an
             // adjustment from what is on screen rather than from nothing.
             float scale = wanted.Scale > 0f ? wanted.Scale : 1f;
-            if (OverlayLayout.Narrow.Slider("###scale", ref scale, 0.3f, 4f, "x%.2f"))
+
+            if (ImGui.SmallButton("-"))
             {
-                wanted = wanted with { Scale = Math.Abs(scale - 1f) < 0.001f ? 0f : scale };
+                scale -= SizeStep;
             }
 
-            OverlayLayout.Hint("How big the marker is drawn, against its ordinary size.");
+            ImGui.SameLine();
+
+            // TextUnformatted rather than Text, so the per cent sign is a per cent sign: the
+            // formatting calls hand the string to printf, where it would start a conversion
+            // specifier - see ImGuiText. Unformatted takes no format string, so it needs no
+            // doubling either, and a doubled one here would print two of them.
+            ImGui.TextUnformatted($"{scale * 100f,3:0}%");
+            ImGui.SameLine();
+
+            if (ImGui.SmallButton("+"))
+            {
+                scale += SizeStep;
+            }
+
+            OverlayLayout.Hint("How big it is drawn, against its ordinary size.");
+
+            scale = Math.Clamp(scale, 0.3f, 4f);
+
+            // Stored as zero at the ordinary size rather than as 1.0, so the entry says
+            // nothing and a default corrected in a later release still reaches you.
+            float stored = Near(scale, 1f) ? 0f : scale;
+            if (!Near(stored, wanted.Scale))
+            {
+                wanted = wanted with { Scale = stored };
+            }
 
             if (entry.Traits.HasFlag(StyleTraits.Width))
             {
@@ -341,32 +497,99 @@ public sealed class StyleRows
         return wanted;
     }
 
+    /// <summary>Two sizes that are the same size, to within what a stepper can express.</summary>
+    private static bool Near(float a, float b) => Math.Abs(a - b) < 0.001f;
 
-    /// <summary>The icon box: a path to a picture to draw instead of the built-in shape.</summary>
+    /// <summary>
+    /// The icon button: the chosen cell of the sheet, and the picker behind it.
+    /// </summary>
     /// <remarks>
-    /// Behind a button rather than always on screen, because it is the least-used of these by
-    /// a wide margin and a text field per row would triple the window for it.
+    /// THE BUTTON IS THE ICON. A row that has been given a picture shows it here rather than
+    /// saying "Icon *", which is the difference between reading the list and decoding it.
+    ///
+    /// A POPUP for the grid rather than something that unfolds in place: in a table a cell has
+    /// one column's width, and the grid is fourteen cells across. Unfolded in the cell it would
+    /// push that column wide for every other row in the list.
     /// </remarks>
-    private LayerStyle DrawIcon(StyleEntry entry, LayerStyle wanted)
+    private LayerStyle DrawIcon(LayerStyle wanted)
     {
-        bool has = !string.IsNullOrEmpty(wanted.Icon);
+        IconCache.Picture sheet = _sheet();
+        float box = ImGui.GetFontSize() * CellEms;
 
-        // A POPUP, not a field that unfolds in place. In a table a cell has one column's width,
-        // and a file path is longer than any column here would ever be - unfolded in the cell it
-        // either squeezed to nothing or pushed the column wide for every other row in the list.
-        // A popup floats over the table at whatever width it needs and takes none of it.
-        if (ImGui.SmallButton(has ? "Icon *" : "Icon"))
+        bool pressed;
+        if (wanted.HasIcon && sheet.Ready)
         {
-            _iconPath = wanted.Icon ?? string.Empty;
+            (Vector2 uv0, Vector2 uv1) = SheetIcon.Uv(wanted.IconIndex, sheet);
+            pressed = ImGui.ImageButton(
+                "###icon", sheet.Texture, new Vector2(box, box), uv0, uv1,
+                new Vector4(0f, 0f, 0f, 0f), Vector4.One);
+        }
+        else
+        {
+            pressed = ImGui.SmallButton("Icon");
+        }
+
+        if (pressed)
+        {
             ImGui.OpenPopup("icon");
         }
 
         OverlayLayout.Hint(
-            has
-                ? $"Drawn as {Path.GetFileName(wanted.Icon)} instead of the built-in shape."
-                : "Draw a picture instead of the built-in shape.");
+            wanted.HasIcon
+                ? $"Drawn as cell {wanted.IconTile} of the icon sheet."
+                : "Draw a picture from the icon sheet instead of the built-in shape.");
 
         if (!ImGui.BeginPopup("icon"))
+        {
+            return wanted;
+        }
+
+        try
+        {
+            int chosen = IconPicker.Draw(sheet, wanted.IconTile);
+            if (chosen != IconPicker.Unchanged)
+            {
+                wanted = wanted with { IconTile = chosen };
+                ImGui.CloseCurrentPopup();
+            }
+        }
+        finally
+        {
+            ImGui.EndPopup();
+        }
+
+        return wanted;
+    }
+
+    /// <summary>
+    /// The plate box: a path to a picture to draw behind something drawn large.
+    /// </summary>
+    /// <remarks>
+    /// STILL A PATH, where the markers are not, and the difference is the size it is drawn at.
+    /// A plate is most of the screen wide with proportions of its own to keep; a cell off the
+    /// 64-pixel sheet stretched that far is a smear. So this one keeps a file, and with it the
+    /// one failure mode the markers no longer have - the file can be gone, which draws the
+    /// plate that shipped.
+    ///
+    /// Behind a button rather than always on screen, because it is on exactly one row and a
+    /// text field per row would widen the column for all of them.
+    /// </remarks>
+    private LayerStyle DrawPlate(LayerStyle wanted)
+    {
+        bool has = !string.IsNullOrEmpty(wanted.Plate);
+
+        if (ImGui.SmallButton(has ? "Plate *" : "Plate"))
+        {
+            _platePath = wanted.Plate ?? string.Empty;
+            ImGui.OpenPopup("plate");
+        }
+
+        OverlayLayout.Hint(
+            has
+                ? $"Drawn on {Path.GetFileName(wanted.Plate)} instead of the one that ships."
+                : "Draw this on a picture of your own instead of the one that ships.");
+
+        if (!ImGui.BeginPopup("plate"))
         {
             return wanted;
         }
@@ -377,19 +600,19 @@ public sealed class StyleRows
             // box asked to fill "what is left" inside one has nothing to measure against.
             ImGui.SetNextItemWidth(ImGui.GetFontSize() * 24f);
             ImGui.InputTextWithHint(
-                "###iconpath", "a .png next to the tool, or a full path...", ref _iconPath, 512);
+                "###platepath", "a .png next to the tool, or a full path...", ref _platePath, 512);
 
-            OverlayLayout.Note("A .png next to the tool, or any full path. Missing files draw the shape.");
+            OverlayLayout.Note("A .png next to the tool, or any full path. Missing files draw the one that ships.");
 
             int pressed = OverlayLayout.Actions("Use", "None");
             if (pressed == 0)
             {
-                wanted = wanted with { Icon = _iconPath.Trim() };
+                wanted = wanted with { Plate = _platePath.Trim() };
                 ImGui.CloseCurrentPopup();
             }
             else if (pressed == 1)
             {
-                wanted = wanted with { Icon = string.Empty };
+                wanted = wanted with { Plate = string.Empty };
                 ImGui.CloseCurrentPopup();
             }
         }
@@ -419,18 +642,5 @@ public sealed class StyleRows
         }
 
         return null;
-    }
-
-    /// <summary>Draws a marker where a row's text would go, at the size it is really drawn.</summary>
-    private static void Preview(PoiGlyph glyph, uint colour, float radius, float width)
-    {
-        // Its own space claimed on the line, so the shape does not paint over the next row's
-        // text - ImGui lays out from what a widget SAYS it occupies, not from what was drawn.
-        Vector2 at = ImGui.GetCursorScreenPos();
-        float box = Math.Max(16f, (radius * 2f) + 4f);
-        ImGui.Dummy(new Vector2(box, box));
-
-        PoiGlyphPainter.Draw(
-            ImGui.GetWindowDrawList(), at + new Vector2(box / 2f, box / 2f), radius, colour, glyph, width);
     }
 }

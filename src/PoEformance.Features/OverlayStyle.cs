@@ -24,17 +24,42 @@ namespace PoEformance.Features;
 /// </param>
 /// <param name="Width">Line thickness in pixels, for the things drawn as lines. 0 for the usual.</param>
 /// <param name="Scale">How much bigger or smaller than its ordinary size. 0 for the usual.</param>
-/// <param name="Icon">
-/// A file to draw instead of the built-in shape. Empty for the shape. This is the one setting
-/// that can fail at RUNTIME rather than at load - the file may be gone, or not an image - so
-/// whoever draws it falls back to the shape rather than to nothing.
+/// <param name="IconTile">
+/// Which cell of <see cref="IconSheet"/> to draw instead of the built-in shape, COUNTED FROM
+/// ONE, with zero meaning no icon.
+/// <para>
+/// Counted from one so that zero can go on meaning "not changed", which the type's own remarks
+/// above explain is load-bearing here. Counted from zero, the all-zero value would mean cell 0,
+/// and every marker nobody ever gave an icon would quietly acquire the first one on the sheet.
+/// </para>
+/// <para>
+/// This replaced a FILE PATH, and the old <c>icon</c> key is deliberately not reused. A
+/// settings file written by an older build has a string under that name, and reading a string
+/// into an int throws - which, with the whole file deserialised in one go, would discard every
+/// colour and size in it rather than just the icon. Under a new key the stale string is ignored,
+/// the rest of the entry survives, and the marker falls back to its built-in shape until
+/// somebody picks a cell.
+/// </para>
+/// </param>
+/// <param name="Plate">
+/// A picture file to draw BEHIND something drawn large, like the alert banner across the top
+/// of the screen. Empty for the one that ships.
+/// <para>
+/// Not the same thing as <paramref name="IconTile"/>, and it has its own field because sharing
+/// one is what made this confusing in the first place. A marker is a few pixels across and
+/// comes off a 64-pixel grid; a banner plate is most of the screen wide and has proportions of
+/// its own to keep. A sheet cell stretched to that width is a smear, so the plate stays a file
+/// - which also means it is still the one setting here that can fail at RUNTIME rather than at
+/// load, and whoever draws it falls back to the shipped plate rather than to nothing.
+/// </para>
 /// </param>
 public readonly record struct LayerStyle(
     [property: JsonPropertyName("hidden")] bool Hidden = false,
     [property: JsonPropertyName("colour")] string Colour = "",
     [property: JsonPropertyName("width")] float Width = 0f,
     [property: JsonPropertyName("scale")] float Scale = 0f,
-    [property: JsonPropertyName("icon")] string Icon = "")
+    [property: JsonPropertyName("iconTile")] int IconTile = 0,
+    [property: JsonPropertyName("plate")] string Plate = "")
 {
     /// <summary>Draw it, as it comes.</summary>
     public static LayerStyle Default => default;
@@ -61,7 +86,8 @@ public readonly record struct LayerStyle(
             && Width <= 0f
             && Scale <= 0f
             && string.IsNullOrEmpty(Colour)
-            && string.IsNullOrEmpty(Icon);
+            && IconTile <= 0
+            && string.IsNullOrEmpty(Plate);
 
     /// <summary>The colour to use, falling back to a default when none was chosen.</summary>
     public uint ColourOr(uint fallback)
@@ -75,6 +101,14 @@ public readonly record struct LayerStyle(
 
     /// <summary>The size to use, with the scale applied.</summary>
     public float Sized(float baseSize) => baseSize * (Scale > 0f ? Scale : 1f);
+
+    /// <summary>Whether a sheet cell was picked for this.</summary>
+    [JsonIgnore]
+    public bool HasIcon => IconTile > 0;
+
+    /// <summary>The sheet cell to draw, counted from zero. Only meaningful when <see cref="HasIcon"/>.</summary>
+    [JsonIgnore]
+    public int IconIndex => IconTile - 1;
 }
 
 /// <summary>What a style key controls, so an editor can offer the right things.</summary>
@@ -86,6 +120,9 @@ public enum StyleTraits
     Width = 2,
     Scale = 4,
     Icon = 8,
+
+    /// <summary>A picture file behind something drawn large. See <see cref="LayerStyle.Plate"/>.</summary>
+    Plate = 16,
 }
 
 /// <summary>One thing the overlay draws, and what can be changed about it.</summary>

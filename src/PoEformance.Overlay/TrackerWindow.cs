@@ -742,7 +742,7 @@ public sealed class TrackerWindow
         // rows in a stack read as one that lost its order, and a hairline does not say where
         // one subject ends.
         OverlayLayout.Group("The Icon Sheet");
-        DrawSheet(settings);
+        DrawSheet();
 
         OverlayLayout.Group("Where the Rows Sit");
         DrawLayout(settings);
@@ -757,49 +757,27 @@ public sealed class TrackerWindow
             rules => settings with { MonsterStatus = rules });
     }
 
-    /// <summary>The sheet path, and what actually loaded from it.</summary>
-    private void DrawSheet(TrackerSettings settings)
+    /// <summary>What the icons are cut from, now that it is not a choice.</summary>
+    /// <remarks>
+    /// A LINE OF TEXT WHERE A PATH AND A TILE SIZE USED TO BE. The sheet ships inside the
+    /// build, so there is nothing to point at and nothing to measure - and with it went the two
+    /// ways this page used to be wrong: a path to a file that had moved, and a tile size that
+    /// did not divide the sheet, which put every icon part way between two of them.
+    /// </remarks>
+    private void DrawSheet()
     {
-        string path = settings.IconSheet;
-        if (OverlayLayout.Input("Icon Sheet", ref path, 512))
-        {
-            _write(settings with { IconSheet = path });
-        }
-
-        OverlayLayout.Next();
-        int tile = settings.IconTile;
-        if (OverlayLayout.Narrow.Number("tile", ref tile, 8))
-        {
-            _write(settings with { IconTile = Math.Clamp(tile, 1, 512) });
-        }
-
-        if (settings.IconSheet.Length == 0)
-        {
-            OverlayLayout.Note("No sheet - each effect is drawn as its coloured disc with its own caption.");
-            return;
-        }
-
         IconCache.Picture sheet = _sheet();
         if (!sheet.Ready)
         {
-            OverlayLayout.Warning("That file did not load - see the Appearance tab for the reason.");
+            OverlayLayout.Warning(
+                $"{IconSheet.Resource} did not ship with this build - each effect is drawn as its"
+                + " coloured disc with its own caption.");
             return;
         }
 
-        int columns = Math.Max(1, sheet.Width / settings.IconTile);
-        int rows = Math.Max(1, sheet.Height / settings.IconTile);
         OverlayLayout.Note(
-            $"Loaded {sheet.Width}x{sheet.Height}, which is {columns} x {rows} tiles of {settings.IconTile}px.");
-
-        // A sheet that is not a whole number of tiles across is the symptom BOTH of a wrong
-        // tile size and of a sheet so large it was shrunk on the way in - and either way every
-        // icon lands part way between two of them, which reads as the coordinates being wrong.
-        if (sheet.Width % settings.IconTile != 0 || sheet.Height % settings.IconTile != 0)
-        {
-            OverlayLayout.Warning(
-                $"Not a whole number of {settings.IconTile}px tiles - either the tile size is wrong,"
-                + $" or the sheet is over {IconCache.MaxSheetEdge}px and was shrunk to fit.");
-        }
+            $"{IconSheet.CountIn(sheet.Width, sheet.Height)} icons, {IconSheet.Tile}px each, from"
+            + $" the sheet that ships with the tool. Click a rule's tile to change it.");
     }
 
     /// <summary>Where the rows sit, and the profiles that put them there.</summary>
@@ -1012,7 +990,7 @@ public sealed class TrackerWindow
                         }
 
                         ImGui.TableNextColumn();
-                        DrawTilePreview(settings, rule);
+                        DrawTilePreview(rule);
 
                         ImGui.TableNextColumn();
                         if (ImGui.SmallButton(_picking == key ? "picking" : "pick"))
@@ -1079,7 +1057,7 @@ public sealed class TrackerWindow
                 continue;
             }
 
-            if (PickTile(settings, rules[i]) is StatusIconRule picked)
+            if (PickTile(rules[i]) is StatusIconRule picked)
             {
                 rules[i] = picked;
                 _picking = string.Empty;
@@ -1101,8 +1079,8 @@ public sealed class TrackerWindow
         }
     }
 
-    /// <summary>The tile a rule is pointing at, at a size a row can hold.</summary>
-    private void DrawTilePreview(TrackerSettings settings, StatusIconRule rule)
+    /// <summary>The cell a rule is pointing at, at a size a row can hold.</summary>
+    private void DrawTilePreview(StatusIconRule rule)
     {
         IconCache.Picture sheet = _sheet();
         if (!sheet.Ready)
@@ -1111,10 +1089,9 @@ public sealed class TrackerWindow
             return;
         }
 
-        float across = (float)settings.IconTile / sheet.Width;
-        float down = (float)settings.IconTile / sheet.Height;
-        var uv0 = new Vector2(Math.Max(0, rule.IconColumn) * across, Math.Max(0, rule.IconRow) * down);
-        ImGui.Image(sheet.Texture, new Vector2(18f, 18f), uv0, uv0 + new Vector2(across, down));
+        (Vector2 uv0, Vector2 uv1) = SheetIcon.Uv(
+            IconSheet.IndexOf(rule.IconColumn, rule.IconRow, sheet.Width, sheet.Height), sheet);
+        ImGui.Image(sheet.Texture, new Vector2(18f, 18f), uv0, uv1);
 
         if (ImGui.IsItemHovered())
         {
@@ -1124,54 +1101,41 @@ public sealed class TrackerWindow
     }
 
     /// <summary>
-    /// The whole sheet, to click a tile out of. Returns the rule with the clicked tile on it.
+    /// The grid of cells, to click one out of. Returns the rule with the clicked cell on it.
     /// </summary>
     /// <remarks>
-    /// A SCROLLING CHILD rather than the sheet drawn straight into the tab: a status icon sheet
-    /// is a tall strip - the reference's is 256 wide and 3392 down - and drawn at its own size
-    /// it would be a tab nobody can reach the bottom of.
+    /// THE SHARED PICKER rather than this tab's own, which used to draw the whole sheet into a
+    /// scrolling child and work out which tile a click landed on. That was fine for a strip
+    /// 256 wide; the sheet that ships is 896x4928, and an image that size is 17 MB of vertex
+    /// work every frame the panel is open to show two dozen rows. It also meant two places
+    /// knew how to cut the sheet up, and only one of them was ever fixed.
+    ///
+    /// The picker counts cells from ONE, the way a marker's style stores them, and a rule
+    /// stores a column and a row - so the number is converted here rather than either side
+    /// being bent to the other. Zero from the picker means "no icon", which for a rule is the
+    /// first cell going back to being the default; a rule says whether it draws an icon
+    /// through Enabled and its caption, not through a sentinel.
     /// </remarks>
-    private StatusIconRule? PickTile(TrackerSettings settings, StatusIconRule rule)
+    private StatusIconRule? PickTile(StatusIconRule rule)
     {
         IconCache.Picture sheet = _sheet();
         if (!sheet.Ready)
         {
-            ImGui.TextColored(WarnText, "there is no icon sheet to pick from - set one above.");
+            ImGui.TextColored(WarnText, $"{IconSheet.Resource} did not ship with this build.");
             return null;
         }
 
-        ImGui.TextColored(DimText, "click a tile:");
-        if (!ImGui.BeginChild("##picker", new Vector2(0f, 260f), ImGuiChildFlags.Borders))
+        ImGui.TextColored(DimText, "click a cell:");
+
+        int current = IconSheet.IndexOf(rule.IconColumn, rule.IconRow, sheet.Width, sheet.Height) + 1;
+        int chosen = IconPicker.Draw(sheet, current);
+        if (chosen == IconPicker.Unchanged)
         {
-            ImGui.EndChild();
             return null;
         }
 
-        StatusIconRule? picked = null;
-        try
-        {
-            Vector2 origin = ImGui.GetCursorScreenPos();
-            ImGui.Image(sheet.Texture, new Vector2(sheet.Width, sheet.Height));
-
-            if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
-            {
-                Vector2 clicked = ImGui.GetMousePos() - origin;
-                int columns = Math.Max(1, sheet.Width / settings.IconTile);
-                int rows = Math.Max(1, sheet.Height / settings.IconTile);
-
-                picked = rule with
-                {
-                    IconColumn = Math.Clamp((int)(clicked.X / settings.IconTile), 0, columns - 1),
-                    IconRow = Math.Clamp((int)(clicked.Y / settings.IconTile), 0, rows - 1),
-                };
-            }
-        }
-        finally
-        {
-            ImGui.EndChild();
-        }
-
-        return picked;
+        (int column, int row) = IconSheet.CellAt(Math.Max(0, chosen - 1), sheet.Width, sheet.Height);
+        return rule with { IconColumn = column, IconRow = row };
     }
 
     /// <summary>
