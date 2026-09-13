@@ -214,6 +214,23 @@ public class AtlasGroupTests
     }
 
     [Fact]
+    public void HOWFarThePointersReachTreatsZeroAsUnsetAndSaysNoLimitWithALessThan()
+    {
+        // The same trap as the text size, with the opposite failure: zero taken literally is
+        // "reaches nothing", which is a pointer that never appears - and zero is what a record
+        // default, a missing key and a hand-edited file all produce. So no limit is spelled as
+        // a negative, which nothing writes by accident.
+        Assert.Equal(AtlasSettings.UsualRange, AtlasSettings.Default.Reach);
+        Assert.Equal(AtlasSettings.UsualRange, new AtlasSettings(PointerRange: 0f).Reach);
+        Assert.Equal(2.5f, new AtlasSettings(PointerRange: 2.5f).Reach);
+        Assert.Equal(0f, new AtlasSettings(PointerRange: -1f).Reach);
+
+        // And a number from outside the range is brought back into it rather than obeyed - a
+        // thousand screens is no limit written the slow way.
+        Assert.Equal(AtlasSettings.FurthestRange, new AtlasSettings(PointerRange: 1000f).Reach);
+    }
+
+    [Fact]
     public void SETTINGSSurviveBeingWrittenAndReadBack()
     {
         string path = Path.Combine(Path.GetTempPath(), $"atlas-{Guid.NewGuid():N}.json");

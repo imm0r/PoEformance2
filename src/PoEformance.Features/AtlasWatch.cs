@@ -7,6 +7,36 @@ using PoEformance.Game.World;
 
 namespace PoEformance.Features;
 
+/// <summary>
+/// One thing a map contains, as the game words it.
+/// </summary>
+/// <remarks>
+/// THREE FIELDS RATHER THAN A STRING, and the two extra ones are what the atlas was missing.
+/// The line drawn on a node is a name - "Breach" - and a name is the least of what the game
+/// knows: it also has the sentence explaining what a breach does to the area, and the art it
+/// draws for it in its own interface. Both were read out of <c>atlas-content.json</c> and then
+/// thrown away one layer later, because the reader published words.
+///
+/// So a content is carried whole from here on. What is DRAWN is still <see cref="Text"/>; the
+/// other two are what the overlay reaches for when the cursor stops on a map, and when it can
+/// find the picture the game uses.
+/// </remarks>
+/// <param name="Text">The line to draw, with the node's own number already written into it.</param>
+/// <param name="Detail">
+/// The game's fuller sentence, or empty when it says nothing the text does not. An effect line
+/// IS the sentence, so only a named badge usually carries one.
+/// </param>
+/// <param name="Icon">
+/// The game's own art name for it, without a folder or an extension - "AtlasIconContentBreach".
+/// Empty when the data has none. It is a NAME, not a path: where the picture for it is found is
+/// the overlay's business, not the reader's.
+/// </param>
+public readonly record struct AtlasSaid(string Text, string Detail = "", string Icon = "")
+{
+    /// <summary>Reads as its text, so anything that only wants the line still gets it.</summary>
+    public override string ToString() => Text;
+}
+
 /// <summary>One map on the atlas, with everything the drawing needs already worked out.</summary>
 /// <param name="Where">Its centre on the screen, in pixels.</param>
 /// <param name="Name">What to call it - the game's name, or its raw id when it is new.</param>
@@ -39,7 +69,7 @@ public sealed record AtlasMark(
     string Name,
     AtlasNodeState State,
     AtlasGroup? Group,
-    IReadOnlyList<string> Contents,
+    IReadOnlyList<AtlasSaid> Contents,
     IReadOnlyList<IReadOnlyList<Vector2>> Route,
     int Hops,
     int? Rating = null,
@@ -139,7 +169,7 @@ public sealed class AtlasWatch
     // The slow half's answers, kept between reads: what each node IS, and how to get to it.
     private IReadOnlyList<AtlasNode> _studied = [];
     private AtlasRoutes _routes = AtlasRoutes.None;
-    private readonly Dictionary<(int X, int Y), IReadOnlyList<string>> _said = [];
+    private readonly Dictionary<(int X, int Y), IReadOnlyList<AtlasSaid>> _said = [];
     private long _studiedAt;
     private int _studiedCount = -1;
 
@@ -427,7 +457,7 @@ public sealed class AtlasWatch
         AtlasSettings settings,
         AtlasGrouping grouping,
         AtlasRoutes routes,
-        IReadOnlyDictionary<(int X, int Y), IReadOnlyList<string>> words,
+        IReadOnlyDictionary<(int X, int Y), IReadOnlyList<AtlasSaid>> words,
         Vector2 cursor = default)
     {
         ArgumentNullException.ThrowIfNull(live);
@@ -499,7 +529,7 @@ public sealed class AtlasWatch
                 name,
                 node.State,
                 group,
-                settings.Contents && words.TryGetValue(node.Grid, out IReadOnlyList<string>? said) ? said : [],
+                settings.Contents && words.TryGetValue(node.Grid, out IReadOnlyList<AtlasSaid>? said) ? said : [],
                 route,
                 hops,
                 settings.Ratings ? grouping.Rated(node.MapId) : null,
@@ -643,31 +673,60 @@ public sealed class AtlasWatch
     /// magnitude. Only the effect lines beneath it count anything, and only the ones whose
     /// wording has somewhere to put a number.
     /// </remarks>
-    public static IReadOnlyList<string> Words(AtlasNode node, AtlasContentNames contents)
+    public static IReadOnlyList<AtlasSaid> Words(AtlasNode node, AtlasContentNames contents)
     {
         ArgumentNullException.ThrowIfNull(node);
         ArgumentNullException.ThrowIfNull(contents);
 
-        var said = new List<string>();
+        var said = new List<AtlasSaid>();
 
         foreach (uint raw in node.BadgeIds)
         {
-            Add(contents.Badge(raw)?.Label);
+            // Label rather than Say: see the badge paragraph above. Its high half is a
+            // category tag, and writing that into a "{0}" would number the thing with it.
+            if (contents.Badge(raw) is { } badge)
+            {
+                Add(badge, badge.Label);
+            }
         }
 
         foreach (uint raw in node.ContentTokens)
         {
-            Add(contents.Effect(raw)?.Say(raw));
+            if (contents.Effect(raw) is { } effect)
+            {
+                Add(effect, effect.Say(raw));
+            }
         }
 
         return said;
 
-        void Add(string? word)
+        void Add(AtlasContent content, string word)
         {
-            if (!string.IsNullOrEmpty(word) && !said.Contains(word, StringComparer.OrdinalIgnoreCase))
+            if (word.Length == 0)
             {
-                said.Add(word);
+                return;
             }
+
+            // A plain loop rather than Exists with a lambda: this runs for every content of
+            // every node on a full atlas, and the lambda would capture `word` into a fresh
+            // closure each time round.
+            foreach (AtlasSaid already in said)
+            {
+                if (already.Text.Equals(word, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+            }
+
+            // THE DETAIL IS DROPPED WHEN IT REPEATS THE LINE, which is the usual case for an
+            // effect: its label IS its description, so carrying both would put the same
+            // sentence twice in a tooltip. A badge is the other way round - "Breach" against
+            // "Area contains an Otherworldly Breach" - and that pair is the whole point.
+            string detail = content.Description.Equals(word, StringComparison.OrdinalIgnoreCase)
+                ? string.Empty
+                : content.Description;
+
+            said.Add(new AtlasSaid(word, detail, content.Icon));
         }
     }
 

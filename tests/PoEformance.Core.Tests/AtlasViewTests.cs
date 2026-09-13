@@ -38,21 +38,46 @@ public class AtlasViewTests
             BadgeIds: badges ?? [],
             ContentTokens: tokens ?? []);
 
-    private static readonly Dictionary<(int X, int Y), IReadOnlyList<string>> NoWords = [];
+    private static readonly Dictionary<(int X, int Y), IReadOnlyList<AtlasSaid>> NoWords = [];
+
+    /// <summary>
+    /// Just the lines a content list would draw.
+    /// </summary>
+    /// <remarks>
+    /// A content carries its description and its art name as well now, and almost every test
+    /// here is about WHICH LINES come out and in what order. Comparing whole records would
+    /// spell all three into every expectation and hide the one field being tested.
+    /// </remarks>
+    private static string[] Texts(IReadOnlyList<AtlasSaid> said)
+        => [.. said.Select(one => one.Text)];
 
     private static AtlasGrouping Grouping(params AtlasGroup[] groups)
         => new(groups, AtlasMapNames.Empty);
+
+    /// <summary>
+    /// The settings these tests compose against unless one of them says otherwise.
+    /// </summary>
+    /// <remarks>
+    /// NOT the shipped default, and deliberately: a map here is Locked unless a test says
+    /// otherwise - that is the state most of an atlas is in - while the shipped settings hide
+    /// unreachable maps, so every test about search, ratings, the web or hovering would be
+    /// composing against an empty view and passing for the wrong reason.
+    ///
+    /// What the shipped default actually does is one test of its own, below, which is where a
+    /// change to it should be argued with rather than in thirty unrelated expectations.
+    /// </remarks>
+    private static readonly AtlasSettings Showing = new(HideUnreachable: false);
 
     private static AtlasView Compose(
         IReadOnlyList<AtlasNode> live,
         AtlasSettings? settings = null,
         AtlasGrouping? grouping = null,
         AtlasRoutes? routes = null,
-        Dictionary<(int X, int Y), IReadOnlyList<string>>? words = null,
+        Dictionary<(int X, int Y), IReadOnlyList<AtlasSaid>>? words = null,
         Vector2 cursor = default)
         => AtlasWatch.Compose(
             live,
-            settings ?? AtlasSettings.Default,
+            settings ?? Showing,
             grouping ?? AtlasGrouping.None,
             routes ?? AtlasRoutes.None,
             words ?? NoWords,
@@ -70,12 +95,34 @@ public class AtlasViewTests
     }
 
     [Fact]
+    public void OUTOfTheBoxTheAtlasShowsWhatCanBeRunAndWhatWasAskedFor()
+    {
+        // THE SHIPPED DEFAULT, pinned here because it is a judgement rather than a mechanism.
+        // Most of an atlas is maps with no way to them and maps already finished - hundreds of
+        // each - and drawn, they bury the dozen that can actually be entered. So both are off
+        // by default, and what is left on screen is what can be run plus whatever routing was
+        // asked to point at.
+        AtlasNode open = Node(0, 0, "MapAugury", AtlasNodeState.Open);
+        AtlasNode locked = Node(1, 0, "MapArroyo", AtlasNodeState.Locked);
+        AtlasNode done = Node(2, 0, "MapBluff", AtlasNodeState.Completed);
+
+        AtlasView view = AtlasWatch.Compose(
+            [open, locked, done], AtlasSettings.Default, AtlasGrouping.None, AtlasRoutes.None, NoWords);
+
+        Assert.Equal("MapAugury", Assert.Single(view.Marks).MapId);
+
+        // And all three are still COUNTED, so the settings page can say how much was hidden
+        // rather than leaving an empty atlas looking like a failed read.
+        Assert.Equal(3, view.Total);
+    }
+
+    [Fact]
     public void AFinishedMapIsLeftOutUNLESSSomethingIsRoutingToIt()
     {
         AtlasNode done = Node(1, 1, state: AtlasNodeState.Completed);
 
         Assert.Empty(Compose([done]).Marks);
-        Assert.Single(Compose([done], new AtlasSettings(HideCompleted: false)).Marks);
+        Assert.Single(Compose([done], Showing with { HideCompleted = false }).Marks);
     }
 
     [Fact]
@@ -212,12 +259,12 @@ public class AtlasViewTests
         AtlasNode[] live = [Node(0, 0, "MapAugury"), Node(1, 0, "MapArroyo")];
 
         // With no name table the label falls back to the id, which is what gets searched.
-        AtlasView found = Compose(live, new AtlasSettings(Search: "arroyo"), new AtlasGrouping([], names));
+        AtlasView found = Compose(live, Showing with { Search = "arroyo" }, new AtlasGrouping([], names));
         Assert.Equal("MapArroyo", Assert.Single(found.Marks).MapId);
 
         // Whitespace is not a search. Trimming it here is what stops a stray space in the box
         // from emptying the atlas.
-        Assert.Equal(2, Compose(live, new AtlasSettings(Search: "   ")).Marks.Count);
+        Assert.Equal(2, Compose(live, Showing with { Search = "   " }).Marks.Count);
     }
 
     [Fact]
@@ -228,7 +275,7 @@ public class AtlasViewTests
         AtlasNode left = Node(0, 0, joined: [(1, 0)]);
         AtlasNode right = Node(1, 0, joined: [(0, 0)]);
 
-        AtlasView view = Compose([left, right], new AtlasSettings(Web: true));
+        AtlasView view = Compose([left, right], Showing with { Web = true });
 
         Assert.Single(view.Web);
         Assert.Empty(Compose([left, right]).Web);
@@ -238,7 +285,7 @@ public class AtlasViewTests
     public void ANDALineToSomewhereNotDrawnIsNotDrawnEither()
     {
         AtlasNode alone = Node(0, 0, joined: [(9, 9)]);
-        Assert.Empty(Compose([alone], new AtlasSettings(Web: true)).Web);
+        Assert.Empty(Compose([alone], Showing with { Web = true }).Web);
     }
 
     [Fact]
@@ -285,7 +332,7 @@ public class AtlasViewTests
         var grouping = new AtlasGrouping([], LoadedNames(), ratings);
 
         AtlasMark mark = Assert.Single(
-            Compose([Node(0, 0, "MapAugury")], new AtlasSettings(Ratings: false), grouping).Marks);
+            Compose([Node(0, 0, "MapAugury")], Showing with { Ratings = false }, grouping).Marks);
 
         Assert.Null(mark.Rating);
 
@@ -329,8 +376,8 @@ public class AtlasViewTests
             new ScreenRect(100, 100, 140, 120), AtlasWatch.Hovered([node], new Vector2(120, 110)));
         Assert.Null(AtlasWatch.Hovered([node], new Vector2(300, 110)));
 
-        Assert.True(Compose([node], new AtlasSettings(), cursor: new Vector2(120, 110)).Hovering);
-        Assert.False(Compose([node], new AtlasSettings(), cursor: new Vector2(300, 110)).Hovering);
+        Assert.True(Compose([node], Showing, cursor: new Vector2(120, 110)).Hovering);
+        Assert.False(Compose([node], Showing, cursor: new Vector2(300, 110)).Hovering);
     }
 
     [Fact]
@@ -341,7 +388,7 @@ public class AtlasViewTests
         // everything is the fallback the overlay reaches for when it cannot find that part.
         // Deciding it here would take that choice away from the only thread that has both the
         // atlas view and the interface parts in the same frame.
-        AtlasView view = Compose([Node(1, 1)], new AtlasSettings(), cursor: new Vector2(120, 110));
+        AtlasView view = Compose([Node(1, 1)], Showing, cursor: new Vector2(120, 110));
 
         Assert.True(view.Hovering);
         Assert.True(view.Anything);
@@ -356,7 +403,7 @@ public class AtlasViewTests
         AtlasNode finished = Node(1, 1, state: AtlasNodeState.Completed);
 
         AtlasView view = Compose(
-            [shown, finished], new AtlasSettings(HideCompleted: true), cursor: new Vector2(120, 110));
+            [shown, finished], Showing with { HideCompleted = true }, cursor: new Vector2(120, 110));
 
         Assert.Single(view.Marks);          // the finished one is hidden, as asked
         Assert.True(view.Hovering);         // and hovering it is still noticed
@@ -368,7 +415,7 @@ public class AtlasViewTests
         // Nought is "not asked yet", not a position. Taken literally it sits inside whatever
         // node happens to be drawn at the top-left, and the atlas would report a hover forever.
         Assert.Null(AtlasWatch.Hovered([Node(0, 0)], default));
-        Assert.False(Compose([Node(0, 0)], new AtlasSettings()).Hovering);
+        Assert.False(Compose([Node(0, 0)], Showing).Hovering);
     }
 
     [Fact]
@@ -379,7 +426,7 @@ public class AtlasViewTests
         // leave the overlay unable to tell "not hovering" from "hovering, told not to care".
         AtlasNode node = Node(1, 1);
         Assert.True(
-            Compose([node], new AtlasSettings(HideOnHover: false), cursor: new Vector2(120, 110))
+            Compose([node], Showing with { HideOnHover = false }, cursor: new Vector2(120, 110))
                 .Hovering);
     }
 
@@ -393,8 +440,8 @@ public class AtlasViewTests
         AtlasNode shown = Node(0, 0, joined: [(1, 0)]);
         AtlasNode finished = Node(1, 0, state: AtlasNodeState.Completed, joined: [(0, 0)]);
 
-        Assert.Single(Compose([shown, finished], new AtlasSettings(Web: true, HideCompleted: false)).Web);
-        Assert.Empty(Compose([shown, finished], new AtlasSettings(Web: true, HideCompleted: true)).Web);
+        Assert.Single(Compose([shown, finished], Showing with { Web = true, HideCompleted = false }).Web);
+        Assert.Empty(Compose([shown, finished], Showing with { Web = true, HideCompleted = true }).Web);
     }
 
     [Fact]
@@ -405,10 +452,10 @@ public class AtlasViewTests
         AtlasNode augury = Node(0, 0, mapId: "MapAugury", joined: [(1, 0)]);
         AtlasNode ravine = Node(1, 0, mapId: "MapRavine", joined: [(0, 0)]);
 
-        var searched = new AtlasSettings(Web: true, Search: "Augury");
+        var searched = Showing with { Web = true, Search = "Augury" };
         var grouping = new AtlasGrouping([], AtlasMapNames.Empty);
 
-        Assert.Single(Compose([augury, ravine], new AtlasSettings(Web: true), grouping).Web);
+        Assert.Single(Compose([augury, ravine], Showing with { Web = true }, grouping).Web);
         Assert.Empty(Compose([augury, ravine], searched, grouping).Web);
     }
 
@@ -421,9 +468,9 @@ public class AtlasViewTests
 
         // 0x0065 is Breach in both tables.
         AtlasNode node = Node(0, 0, badges: [0x0065], tokens: [0x0065]);
-        IReadOnlyList<string> said = AtlasWatch.Words(node, contents);
+        IReadOnlyList<AtlasSaid> said = AtlasWatch.Words(node, contents);
 
-        Assert.Equal(["Breach"], said);
+        Assert.Equal(["Breach"], Texts(said));
     }
 
     [Fact]
@@ -436,9 +483,9 @@ public class AtlasViewTests
         AtlasContentNames contents = LoadedContents();
 
         AtlasNode node = Node(0, 0, tokens: [0x00C0_0963, 0x0040_6872]);
-        IReadOnlyList<string> said = AtlasWatch.Words(node, contents);
+        IReadOnlyList<AtlasSaid> said = AtlasWatch.Words(node, contents);
 
-        Assert.Equal(["Contains 3 additional Shrines", "Area contains Abysses"], said);
+        Assert.Equal(["Contains 3 additional Shrines", "Area contains Abysses"], Texts(said));
     }
 
     [Fact]
@@ -447,9 +494,9 @@ public class AtlasViewTests
         // Which is why the de-duplication is on the finished words: on the id alone, the
         // second of these would be dropped as a repeat of the first.
         AtlasNode node = Node(0, 0, tokens: [0x0040_0963, 0x00C0_0963]);
-        IReadOnlyList<string> said = AtlasWatch.Words(node, LoadedContents());
+        IReadOnlyList<AtlasSaid> said = AtlasWatch.Words(node, LoadedContents());
 
-        Assert.Equal(["Contains 1 additional Shrines", "Contains 3 additional Shrines"], said);
+        Assert.Equal(["Contains 1 additional Shrines", "Contains 3 additional Shrines"], Texts(said));
     }
 
     [Fact]
@@ -458,7 +505,7 @@ public class AtlasViewTests
         // A badge's high half is a category tag, not a magnitude - the same content id with the
         // tag on it is the same content, and reading the tag as a number would say so twice.
         AtlasNode node = Node(0, 0, badges: [0x0068, 0x0002_0068]);
-        Assert.Equal(["Ritual"], AtlasWatch.Words(node, LoadedContents()));
+        Assert.Equal(["Ritual"], Texts(AtlasWatch.Words(node, LoadedContents())));
     }
 
     [Fact]
@@ -469,12 +516,41 @@ public class AtlasViewTests
     }
 
     [Fact]
+    public void ACONTENTCarriesItsPictureAndItsFullWordingAsWellAsItsLine()
+    {
+        // Both were read out of the data file and thrown away one layer down, because the
+        // reader published words. The line is what gets DRAWN; the other two are what makes an
+        // icon explain itself and a short badge name mean something under the pointer.
+        AtlasNode node = Node(0, 0, badges: [0x0065]);
+        AtlasSaid said = Assert.Single(AtlasWatch.Words(node, LoadedContents()));
+
+        Assert.Equal("Breach", said.Text);
+        Assert.Equal("Area contains an Otherworldly Breach", said.Detail);
+        Assert.Equal("AtlasIconContentBreach", said.Icon);
+    }
+
+    [Fact]
+    public void ANDDropsTheWordingWhenItOnlyRepeatsTheLine()
+    {
+        // Which is the usual case for an effect: its label IS its description, so keeping both
+        // would put the same sentence twice into one tooltip.
+        AtlasNode node = Node(0, 0, tokens: [0x0040_6872]);
+        AtlasSaid said = Assert.Single(AtlasWatch.Words(node, LoadedContents()));
+
+        Assert.Equal("Area contains Abysses", said.Text);
+        Assert.Equal(string.Empty, said.Detail);
+    }
+
+    [Fact]
     public void CONTENTSCanBeTurnedOffWithoutTurningOffTheAtlas()
     {
-        var words = new Dictionary<(int X, int Y), IReadOnlyList<string>> { [(0, 0)] = ["Breach"] };
+        var words = new Dictionary<(int X, int Y), IReadOnlyList<AtlasSaid>>
+        {
+            [(0, 0)] = [new AtlasSaid("Breach")],
+        };
 
-        Assert.Equal(["Breach"], Compose([Node(0, 0)], words: words).Marks[0].Contents);
-        Assert.Empty(Compose([Node(0, 0)], new AtlasSettings(Contents: false), words: words).Marks[0].Contents);
+        Assert.Equal(["Breach"], Texts(Compose([Node(0, 0)], words: words).Marks[0].Contents));
+        Assert.Empty(Compose([Node(0, 0)], Showing with { Contents = false }, words: words).Marks[0].Contents);
     }
 
     [Fact]

@@ -1502,12 +1502,75 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _ruleFacts = facts;
     }
 
-    public void AttachAtlas(AtlasWatch watch, Action<AtlasSettings> saved, bool visible = false)
+    /// <summary>
+    /// What the cursor is resting on over the atlas, said in the game's own words.
+    /// </summary>
+    /// <remarks>
+    /// THE PICTURES ARE WHY THIS EXISTS. A written line answers for itself; a 20-pixel icon
+    /// does not, until somebody has learnt what the game's art for a Delirium mirror looks
+    /// like - and the wording that would teach them is already loaded, sitting unused next to
+    /// the picture's name.
+    ///
+    /// Only what the line does not already say: an effect IS its sentence, so it gets a tooltip
+    /// only where the icon replaced the words entirely.
+    /// </remarks>
+    private static void Explain(AtlasSaid? said)
+    {
+        if (said is not { } content || (content.Text.Length == 0 && content.Detail.Length == 0))
+        {
+            return;
+        }
+
+        if (!ImGui.BeginTooltip())
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TextUnformatted(ImGuiText.Escape(content.Text));
+
+            if (content.Detail.Length > 0)
+            {
+                ImGui.Separator();
+
+                // Wrapped, because a content's description is a whole sentence and a few of
+                // them are two - unwrapped, one of those is a tooltip as wide as the screen.
+                ImGui.PushTextWrapPos(ImGui.GetFontSize() * 22f);
+                try
+                {
+                    ImGui.TextUnformatted(ImGuiText.Escape(content.Detail));
+                }
+                finally
+                {
+                    ImGui.PopTextWrapPos();
+                }
+            }
+        }
+        finally
+        {
+            ImGui.EndTooltip();
+        }
+    }
+
+    /// <param name="art">
+    /// Where the pictures for what a map contains come from, or null to draw them as words.
+    /// </param>
+    public void AttachAtlas(
+        AtlasWatch watch, Action<AtlasSettings> saved, bool visible = false, AtlasArt? art = null)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(saved);
         _atlasWatch = watch;
-        var window = new AtlasWindow(watch, saved);
+        var window = new AtlasWindow(watch, saved, art);
+
+        if (art is not null)
+        {
+            // Bound ONCE rather than per frame. It is called several times for every map on
+            // screen, so a lambda built each frame would be an allocation per frame for a
+            // lookup that is two dictionary hits.
+            _atlas.Art = name => _icons.PictureFor(art.File(name), IconCache.MaxEdge).Texture;
+        }
 
         // THE MASTER SWITCH AND THE READ BELONG TO THE PAGE, not to any one of its four tools -
         // see ToolTabs.Lead. The switch decides whether the other three do anything at all, and
@@ -2500,6 +2563,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             AtlasSettings drawing = _atlasWatch.Settings;
             _atlas.ShowNames = drawing.Names;
             _atlas.TextScale = drawing.Writing;
+            _atlas.Icons = drawing.Icons;
+            _atlas.Pointers = drawing.Pointers;
+            _atlas.PointerRange = drawing.Reach;
 
             // The atlas is drawn across the whole window with the game's own interface painted
             // over it, exactly as the large map is - so the web, the routes and the labels get
@@ -2537,6 +2603,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             if (!drawing.HideOnHover || !view.Hovering || _atlasHover.Found)
             {
                 _atlas.Draw(ImGui.GetBackgroundDrawList(), view);
+
+                // The tooltip is raised HERE rather than inside the layer, because a tooltip is
+                // an ImGui window and the layer draws into the background list - one opened from
+                // in there would be built in the middle of somebody else's frame.
+                Explain(_atlas.Told);
             }
 
             // After the atlas, so a route runs OVER the map labels it passes rather than under
