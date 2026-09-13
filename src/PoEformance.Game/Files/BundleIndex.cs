@@ -14,7 +14,7 @@ public readonly record struct FileSpot(int Bundle, int At, int Size);
 /// 64-bit hash of each path, and keeps the spelled-out paths in a separate compressed blob at
 /// the end. So finding <c>art/2ditems/weapons/bow.dds</c> means hashing it and looking the hash
 /// up, and the path blob is not touched at all. That is the difference between answering in
-/// microseconds and unpacking a list of half a million file names first.
+/// microseconds and unpacking a list of four million file names first.
 ///
 /// WHICH LEAVES ONE QUESTION IT CANNOT ANSWER, and that is why the blob is read after all: a
 /// hash lookup needs the WHOLE path, and half the data this tool ships knows only what a file is
@@ -58,8 +58,13 @@ public sealed class BundleIndex
     private readonly (int At, int Size)[] _folders;
 
     // The compressed blob of spelled-out paths - a whole bundle of its own, sitting after the
-    // directory array. Kept because it is the only place the game says what its files are CALLED.
-    private readonly byte[] _named;
+    // directory array. The only place the game says what its files are CALLED, and the only
+    // mutable thing here: it is DROPPED once walked. On a real install it is tens of megabytes,
+    // and a session that has had its answer will not ask again.
+    private byte[] _named;
+
+    // How big it was, kept after it goes so the install can still say what it was holding.
+    private readonly int _namedBytes;
 
     private BundleIndex(
         string[] bundles,
@@ -74,6 +79,7 @@ public sealed class BundleIndex
         _murmur = murmur;
         _folders = folders;
         _named = named;
+        _namedBytes = named.Length;
         Stride = stride;
     }
 
@@ -105,8 +111,13 @@ public sealed class BundleIndex
     /// </remarks>
     public int Stride { get; }
 
-    /// <summary>Whether this index can say what its files are CALLED, not just where they are.</summary>
-    public bool Named => _named.Length > 0 && _folders.Length > 0;
+    /// <summary>Whether this index can still say what its files are CALLED, not just where they are.</summary>
+    /// <remarks>
+    /// Goes FALSE once <see cref="Look"/> has walked, because the blob it needs is released then.
+    /// That is the bargain the contract already asked for - every name in one call - written into
+    /// the type rather than left as advice.
+    /// </remarks>
+    public bool Named => Volatile.Read(ref _named).Length > 0 && _folders.Length > 0;
 
     /// <summary>
     /// What this index is, in one line: how much is in it, how it is hashed, and whether it can
@@ -120,7 +131,13 @@ public sealed class BundleIndex
     /// </remarks>
     public string Says
         => $"{Count} files, {Bundles.Count} bundles, {Hashing}"
-           + (Named ? $", names at a {Stride}-byte stride" : ", no names");
+           + (_namedBytes == 0 ? ", no names"
+               : Named ? $", names at a {Stride}-byte stride ({Megabytes(_namedBytes)} packed)"
+               : $", names read and released ({Megabytes(_namedBytes)} freed)");
+
+    /// <summary>A byte count as something a person reads, for the one line that reports it.</summary>
+    private static string Megabytes(int bytes)
+        => (bytes / (1024.0 * 1024.0)).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture) + " MB";
 
     /// <summary>
     /// Reads the index out of the decompressed content of <c>_.index.bin</c>.
@@ -296,13 +313,18 @@ public sealed class BundleIndex
     /// every path spelled out - which is this. Walk it once and the guessing is over for good,
     /// and it is right again by itself the next time the game patches.
     ///
-    /// EXPENSIVE ONCE, so it takes the whole list rather than one name: unpacking the blob is
-    /// tens of megabytes and walking it is half a million paths. Called on a background thread,
-    /// asked for everything at once, and then never again for the rest of the session.
+    /// EXPENSIVE ONCE, so it takes the whole list rather than one name: a real PoE2 install
+    /// measures 4,261,026 files in 62,275 bundles, and the blob spelling all of those out is
+    /// tens of megabytes even compressed. Called on a background thread, asked for everything at
+    /// once, and then never again - the blob is RELEASED when the walk finishes, because holding
+    /// it for a session that will not ask twice is tens of megabytes of nothing.
     ///
-    /// NOTHING IS ALLOCATED FOR A PATH THAT IS NOT WANTED. Half a million paths turned into
-    /// strings to compare them would be worse than the walk itself, so a path is assembled into
-    /// a reused buffer, its name is hashed where it lies, and only a hit becomes a string.
+    /// NOTHING IS ALLOCATED FOR A PATH THAT IS NOT WANTED. Four million paths turned into strings
+    /// to compare them would be far worse than the walk itself, so a path is assembled into a
+    /// reused buffer, its name is hashed where it lies, and only a hit becomes a string.
+    ///
+    /// The count came as a surprise worth recording: this was written expecting "half a million",
+    /// an estimate carried over from the older game, and the real number is eight times that.
     ///
     /// The encoding is the reference's: a word of nought flips between collecting prefixes and
     /// emitting paths (and clears the prefixes when it turns collection ON), and any other word
@@ -353,7 +375,8 @@ public sealed class BundleIndex
             return found;
         }
 
-        BundleFile? blob = BundleFile.Open(_named);
+        byte[] packed = Volatile.Read(ref _named);
+        BundleFile? blob = BundleFile.Open(packed);
         byte[]? paths = blob?.Read(decompress);
         if (paths is null)
         {
@@ -361,6 +384,13 @@ public sealed class BundleIndex
         }
 
         Walk(paths, asked, found);
+
+        // DROPPED, now that it has been read. It is tens of megabytes of compressed path text
+        // that only this walk ever wanted, and a session gets one walk: everything that needs a
+        // name asks in the same call, which is what the contract above says anyway. Exchanged
+        // rather than assigned because the walk runs on a background thread while whatever
+        // reports the install's state reads Named from another.
+        Interlocked.Exchange(ref _named, []);
         return found;
     }
 

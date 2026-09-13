@@ -193,9 +193,10 @@ public sealed class GameFiles
     /// from publish only the last part of what the game's own table holds - so a folder list had
     /// to be kept by hand, and it was wrong the moment a patch moved something.
     ///
-    /// EXPENSIVE, ONCE, OFF THE DRAWING THREAD. See <see cref="BundleIndex.Look"/>: the blob of
-    /// spelled-out paths is tens of megabytes unpacked and half a million paths to walk, so this
-    /// takes the whole list of names at once and is called from a background task.
+    /// EXPENSIVE, ONCE, OFF THE DRAWING THREAD. See <see cref="BundleIndex.Look"/>: a real
+    /// install is over four million files, so the blob spelling them out is tens of megabytes and
+    /// the walk is four million paths. This takes the whole list of names at once, is called from
+    /// a background task, and the blob is released when it finishes.
     /// </remarks>
     public Dictionary<string, string> Look(IReadOnlyCollection<string>? names)
         => Index.Look(_decompress, names);

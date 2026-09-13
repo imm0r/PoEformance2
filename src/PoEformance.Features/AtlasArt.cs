@@ -64,7 +64,7 @@ public sealed class AtlasArt
     /// </summary>
     /// <remarks>
     /// Handed in rather than reached for, because opening an install belongs to whoever owns
-    /// this machine's copy of the game - and because a walk of half a million paths must be
+    /// this machine's copy of the game - and because a walk of four million paths must be
     /// something a test can stand in for with a dictionary.
     /// </remarks>
     public Func<IReadOnlyCollection<string>, Dictionary<string, string>>? Names { get; set; }
@@ -149,23 +149,35 @@ public sealed class AtlasArt
     /// asked once and missed is remembered for the rest of the session, and dropping the files
     /// in appears to do nothing until the tool is restarted.
     ///
-    /// The install's answers go too. They are cached on disk by the store, so re-asking is
-    /// cheap - and the reason to press this is usually that something about the art changed.
+    /// THE INSTALL'S ANSWER IS KEPT, and that is a deliberate narrowing of what this button used
+    /// to claim. The walk releases the blob it read - tens of megabytes that a second walk would
+    /// have to re-read the whole index to rebuild - so there is one walk per session, and a
+    /// button that quietly produced no pictures at all would be worse than one that only does
+    /// what its name says. A patched game is a restarted tool anyway: the install is opened once,
+    /// when the tool starts.
     /// </remarks>
     public void LookAgain()
     {
         lock (_gate)
         {
-            _found.Clear();
             _asked.Clear();
             _dropped = null;
 
-            // The install's answer goes too, so this also covers the game having been patched
-            // under a running tool. Clearing the flag as well is what lets a new walk start; a
-            // walk already in flight then runs alongside it and whichever lands last wins, which
-            // costs one wasted walk in the moment nobody will hit twice.
-            _paths = null;
-            _walking = false;
+            // Only what the FOLDER answered is forgotten. An install path already resolved is
+            // still the right path, and dropping it would ask the store to unpack it again.
+            var kept = new List<string>();
+            foreach ((string name, string file) in _found)
+            {
+                if (_paths is null || !_paths.ContainsKey(name))
+                {
+                    kept.Add(name);
+                }
+            }
+
+            foreach (string name in kept)
+            {
+                _found.Remove(name);
+            }
         }
     }
 
@@ -225,9 +237,9 @@ public sealed class AtlasArt
     /// <summary>What the install has for this name, once it has said where its art lives.</summary>
     /// <remarks>
     /// The walk is asked for on the FIRST question and never again, on a background task - it is
-    /// tens of megabytes unpacked and half a million paths, which is not something to do on the
-    /// thread drawing frames. Until it comes back this answers nothing and the content draws as
-    /// words, which is the same thing that happens on a machine with no install.
+    /// tens of megabytes unpacked and over four million paths, which is not something to do on
+    /// the thread drawing frames. Until it comes back this answers nothing and the content draws
+    /// as words, which is the same thing that happens on a machine with no install.
     /// </remarks>
     private string Unpacked(string name)
     {

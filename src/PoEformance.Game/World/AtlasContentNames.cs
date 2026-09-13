@@ -73,8 +73,8 @@ public sealed class AtlasContentNames
         _tokens = tokens;
 
         // The art names, gathered while the tables are in hand. A content with no picture named
-        // is left out rather than carried as an empty string: what asks for this is a lookup of
-        // half a million paths, and an empty name matches the ones with no name at all.
+        // is left out rather than carried as an empty string: what asks for this is a walk of
+        // four million paths, and an empty name matches the ones with no name at all.
         var icons = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (IReadOnlyDictionary<uint, AtlasContent> table in new[] { badges, effects, tokens })
         {

@@ -323,10 +323,45 @@ public class BundleIndexTests
     {
         // The data spells these the way the game's own table does - "AtlasIconContentBreach" -
         // while the paths in the index are all lower case. Matching them literally finds none.
+        // A fresh index per question, because one index answers once - see below.
+        Assert.Single(WithNames(20).Look(Packed.AsIs, ["ATLASICONCONTENTBREACH"]));
+        Assert.Single(WithNames(20).Look(Packed.AsIs, ["atlasiconcontentbreach"]));
+    }
+
+    [Fact]
+    public void ONEIndexAnswersOnceAndThenLetsTheBlobGo()
+    {
+        // On a real install the spelled-out paths are tens of megabytes of compressed text that
+        // only this walk ever wants - held for a session that has had its answer, they are tens
+        // of megabytes of nothing. So the walk releases them, which is the contract the method
+        // already asked for written into the type: everything that needs a name asks in the same
+        // call.
+        BundleIndex index = WithNames(20);
+        Assert.True(index.Named);
+        Assert.Contains("packed", index.Says, StringComparison.Ordinal);
+
+        Assert.Single(index.Look(Packed.AsIs, ["AtlasIconContentBreach"]));
+
+        Assert.False(index.Named);
+        Assert.Empty(index.Look(Packed.AsIs, ["Bow"]));
+
+        // And it says so rather than reading like an index that never had names at all - those
+        // are two different states and only one of them is worth investigating.
+        Assert.Contains("read and released", index.Says, StringComparison.Ordinal);
+        Assert.DoesNotContain("no names", index.Says, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANDAskingForNothingDoesNotSpendTheOneWalk()
+    {
+        // A session that never opens the atlas asks for no names, and must not thereby lose the
+        // ability to answer when it finally does.
         BundleIndex index = WithNames(20);
 
-        Assert.Single(index.Look(Packed.AsIs, ["ATLASICONCONTENTBREACH"]));
-        Assert.Single(index.Look(Packed.AsIs, ["atlasiconcontentbreach"]));
+        Assert.Empty(index.Look(Packed.AsIs, []));
+        Assert.True(index.Named);
+
+        Assert.Single(index.Look(Packed.AsIs, ["AtlasIconContentBreach"]));
     }
 
     [Fact]
