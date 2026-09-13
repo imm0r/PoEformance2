@@ -1,6 +1,7 @@
 using System.Runtime.Versioning;
 using PoEformance.Features;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -105,9 +106,38 @@ public sealed class IconCache : IDisposable
     private readonly Dictionary<string, string> _keys = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _missingBuiltIn = new(StringComparer.OrdinalIgnoreCase);
 
+    private readonly List<string> _problems = [];
+
     // The sheet, once. See Sheet() for why this is a field rather than a lookup.
     private Picture _sheet;
     private bool _sheetAsked;
+
+    /// <summary>
+    /// How pictures are decoded, which is CONTIGUOUS and that is not a preference.
+    /// </summary>
+    /// <remarks>
+    /// THE RENDERER UPLOADS A TEXTURE BY TAKING THE IMAGE'S SINGLE PIXEL SPAN, and for an
+    /// image ImageSharp has split across several buffers that span does not exist. Past a few
+    /// megabytes the default allocator splits every time: measured here, 896x1024 arrives whole
+    /// and 896x2048 does not, so the 896x4928 icon sheet never had a chance.
+    ///
+    /// What it looks like when this is wrong is the reason it is worth this much comment. The
+    /// renderer answers with "Make sure to initialize MemoryAllocator.Default!", which names
+    /// neither the cause nor the fix - and every icon silently goes back to its built-in shape,
+    /// which is exactly what choosing no icon looks like. <see cref="TerrainLayer"/> learned
+    /// the same thing the same way, on the first area whose terrain was large enough to split.
+    ///
+    /// A cloned configuration rather than the global default: the renderer loads its own images
+    /// through that, and this is not the place to change how they are allocated.
+    /// </remarks>
+    private static readonly Configuration Contiguous = Contiguously();
+
+    private static Configuration Contiguously()
+    {
+        Configuration configuration = Configuration.Default.Clone();
+        configuration.PreferContiguousImageBuffers = true;
+        return configuration;
+    }
 
     public IconCache(Func<string, Image<Rgba32>, bool, IntPtr> upload, Action<string> release)
     {
@@ -119,6 +149,17 @@ public sealed class IconCache : IDisposable
 
     /// <summary>Where the files are looked for, and what has already been given up on.</summary>
     public IconFiles Files { get; } = new();
+
+    /// <summary>
+    /// Pictures that loaded and still could not be made into a texture.
+    /// </summary>
+    /// <remarks>
+    /// ITS OWN LIST rather than <see cref="IconFiles.Problems"/>, for the same reason a missing
+    /// resource has one: nothing here is about a path somebody typed, so putting it among those
+    /// would send them looking for a file they never chose. This is the tool failing to upload
+    /// a picture it decoded perfectly well.
+    /// </remarks>
+    public IReadOnlyList<string> Problems => _problems;
 
     /// <summary>
     /// The picture for a path at a given size limit, or an empty one when there is none.
@@ -255,7 +296,8 @@ public sealed class IconCache : IDisposable
                 return default;
             }
 
-            using Image<Rgba32> image = Image.Load<Rgba32>(stream);
+            using Image<Rgba32> image =
+                Image.Load<Rgba32>(new DecoderOptions { Configuration = Contiguous }, stream);
             return Upload(cached, image, maxEdge);
         }
         catch (Exception exception) when (
@@ -278,7 +320,8 @@ public sealed class IconCache : IDisposable
                 return default;
             }
 
-            using Image<Rgba32> image = Image.Load<Rgba32>(file);
+            using Image<Rgba32> image =
+                Image.Load<Rgba32>(new DecoderOptions { Configuration = Contiguous }, file);
             Files.Worked(path);
             return Upload($"{maxEdge}|{path}", image, maxEdge);
         }
@@ -316,6 +359,24 @@ public sealed class IconCache : IDisposable
             }));
         }
 
+        // THE RENDERER'S PRECONDITION, CHECKED RATHER THAN DISCOVERED. Uploading takes the
+        // image's single pixel span, and for a split image there is none - the renderer answers
+        // that with a bare Exception saying "Make sure to initialize MemoryAllocator.Default!",
+        // which names neither the cause nor the fix and is not one of the types the load sites
+        // above catch. Asking first turns an escaping exception on the render thread into a
+        // picture that did not load, which every caller already knows how to draw.
+        //
+        // Contiguous should have seen to it, so reaching here means something it does not cover
+        // - and the one thing worse than this failing is it failing silently, which is what
+        // sent somebody looking through the icon code for a whole afternoon.
+        if (!image.DangerousTryGetSinglePixelMemory(out _))
+        {
+            _problems.Add(
+                $"{cached}: {image.Width}x{image.Height} did not decode into one buffer, so it"
+                + " cannot be uploaded as a texture.");
+            return default;
+        }
+
         string key = $"poeformance.icon.{_keys.Count}.{maxEdge}";
         _keys[cached] = key;
         return new Picture(_upload(key, image, Srgb), image.Width, image.Height);
@@ -328,6 +389,7 @@ public sealed class IconCache : IDisposable
         _textures.Clear();
         _keys.Clear();
         _missingBuiltIn.Clear();
+        _problems.Clear();
 
         // The held sheet points at a texture that has just been released, so it has to go with
         // them - kept, it would hand every marker a handle the renderer no longer knows.
