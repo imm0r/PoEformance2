@@ -121,11 +121,10 @@ public class AtlasArtTests : IDisposable
     }
 
     [Fact]
-    public void WITHNoFoldersProposedTheInstallIsNeverAsked()
+    public void WITHNoInstallToAskTheFolderIsAllThereIs()
     {
-        // The shipped data proposes none, because the path the game keeps this art under is not
-        // in any published copy of the table - only the name is. So the install half sits there
-        // doing nothing until somebody fills them in, and doing nothing must not cost anything.
+        // On a machine with no game installed there is nothing to walk, and that must cost
+        // nothing rather than throwing or asking the network.
         var asked = new List<string>();
         using var store = new ItemArtStore(
             folder: _folder,
@@ -139,5 +138,65 @@ public class AtlasArtTests : IDisposable
 
         Assert.Equal(string.Empty, art.File("AtlasIconContentBreach"));
         Assert.Empty(asked);
+    }
+
+    [Fact]
+    public async Task THEInstallIsWalkedOnceForTheWholeListRatherThanOncePerName()
+    {
+        // The walk unpacks tens of megabytes of path text: per name it would be unusable, which
+        // is why the list of every name goes in and a table of paths comes back.
+        var walks = new List<int>();
+
+        // An install that holds one of the two pictures. Both halves have to work for a name to
+        // become a file: the walk says where the art lives, and the store unpacks it from there.
+        using var store = new ItemArtStore(folder: Path.Combine(_folder, "unpacked"))
+        {
+            Install = path => path.Contains("breach", StringComparison.OrdinalIgnoreCase)
+                ? [0x89, 0x50, 0x4E, 0x47]
+                : null,
+        };
+
+        var art = new AtlasArt
+        {
+            Folder = Path.Combine(_folder, "empty"),
+            Store = store,
+            Wanted = ["AtlasIconContentBreach", "AtlasIconContentRitual"],
+            Names = wanted =>
+            {
+                walks.Add(wanted.Count);
+                return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["AtlasIconContentBreach"] = "art/2dart/uiimages/ingame/atlasiconcontentbreach.dds",
+                };
+            },
+        };
+
+        // Nothing on the first frame: the walk is started on a background thread and a content
+        // draws as words until it lands. Asking again in the meantime must not start a second.
+        Assert.Equal(string.Empty, art.File("AtlasIconContentBreach"));
+        Assert.Equal(string.Empty, art.File("AtlasIconContentRitual"));
+
+        await Settled(() => walks.Count > 0);
+
+        Assert.Equal([2], walks);
+
+        // The store then unpacks it on its own thread, and the name finally has a file.
+        await Settled(() => art.File("AtlasIconContentBreach").Length > 0);
+
+        // And a name the walk did not place stays unanswered rather than resolving to something
+        // wrong - and does not start a second walk looking for it.
+        Assert.Equal(string.Empty, art.File("AtlasIconContentRitual"));
+        Assert.Equal([2], walks);
+    }
+
+    /// <summary>Waits for a background walk to land, or gives up so a broken one fails loudly.</summary>
+    private static async Task Settled(Func<bool> done)
+    {
+        for (int tries = 0; tries < 100 && !done(); tries++)
+        {
+            await Task.Delay(10);
+        }
+
+        Assert.True(done(), "the walk never landed");
     }
 }

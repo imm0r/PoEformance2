@@ -2853,7 +2853,7 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   accessible frontier, which is scattered over the whole atlas, so a map on the far side of the
   world is routinely three hops away.
 
-##### The content pictures — a name where the game has a path
+##### The content pictures — asking the install what it calls its own files
 
 `data/atlas-content.json` gives every content the game's own art name — `AtlasIconContentBreach` —
 and nothing until now read that field. Drawing them is worth it for one reason: three contents is
@@ -2863,25 +2863,57 @@ is one short row in the art the game already uses.
 - **The name is all any published copy of this table has.** The game's `EndgameMapContent` holds
   the whole path in its icon column; GameHelper2's Atlas plugin kept the last part of it and
   shipped extracted PNGs, the AHK tool before this took its copy from there, and so did this
-  file. So the folder is genuinely missing rather than merely unread, and it cannot be invented:
-  the bundle index is keyed by a hash of the whole path, so a wrong folder finds nothing and
-  there is no way to search by basename.
-- **So there are two sources, and the honest one is first.** A folder somebody fills
-  (`config/atlas-icons/<name>.png`) always works, needs no install, and is the only route on a
-  machine without the game. Behind it, the folders listed under `"art"` in
-  `data/atlas-content.json` are tried against the install's own index — each is a PROPOSAL that
-  the index either has or does not, so nothing is drawn on a guess and a right folder found later
-  can be added without a rebuild. The shipped list is EMPTY, which is what "we do not know this"
-  looks like as data.
+  file. A first attempt at this shipped a list of candidate folders in the data file, tried
+  against the index — honest, but a list somebody has to maintain and one a patch can falsify.
+- **The install knows, so the install is asked.** The index's blob of spelled-out paths holds
+  every file the game has; walking it once turns a name into a path for whatever the current
+  patch is. No folder list, nothing to correct when a league moves a file, no extracted pictures
+  to install. See **Names out of the bundle index** below for what that walk is.
+- **A folder somebody fills still comes first** (`config/atlas-icons/<name>.png`). It is not
+  vestigial: it works with no install at all, it is how a picture the install will not give up
+  gets drawn anyway, and it is the only way to override what the game ships.
 - **A content drawn as words looks exactly like the switch not working**, so the settings line
-  says which it is: how many of the names asked for have a picture, and where to put them when
-  none do. "Asked" rather than "missing" because the store answers "still unpacking" and "nowhere"
-  with the same empty string, and only one of those two is worth reporting as a failure.
+  says which it is: how many of the names asked for have a picture, and — when none do — that
+  the install is where these come from. "Asked" rather than "missing" because the store answers
+  "still unpacking" and "nowhere" with the same empty string, and only one of those is a failure.
 - **The tooltip is the reason the wording is carried at all.** A picture does not say what it
   means until you have learnt it, and the game's sentence for it was being loaded and thrown away
   one layer down, because the reader published strings. A content now travels as its line, its
   fuller wording and its art name — with the wording dropped where it only repeats the line,
   which is the usual case for an effect and never the case for a badge.
+
+#### Names out of the bundle index — the half of `_.index.bin` nothing read
+
+The index is a table of hashes: a file is found by hashing its WHOLE path. That is the right
+trade for reading art the game points at by path, and it cannot answer the other question — "what
+is the path of the file called `AtlasIconContentBreach`" — at all. Hashes cannot be searched by
+name, and a folder cannot be guessed: a wrong one is indistinguishable from a file that is not
+there. The answer was in the file the whole time, in the compressed blob of spelled-out paths at
+the end, which this project skipped on the grounds that "nothing here browses".
+
+- **`BundleIndex.Look` takes the whole list of names at once**, and that shape is the point:
+  unpacking the blob is tens of megabytes and walking it is half a million paths, so per-name it
+  would be unusable and once per session it is unnoticeable. It runs on a background task; until
+  it lands a name simply has no picture.
+- **Nothing is allocated for a path that is not wanted.** Turning half a million paths into
+  strings to compare them would cost more than the walk. A path is assembled into one reused
+  buffer, its name is hashed where it lies, and only a hit becomes a string.
+- **The encoding is prefix-compressed and stateful.** A word of nought flips between collecting
+  prefixes and emitting paths — and clears the prefixes when it turns collection *on* — while any
+  other word is a ONE-BASED index into those prefixes followed by a NUL-terminated tail; an index
+  past the end means no prefix. Taken from poe-bundle-lib, which reads real installs, and
+  cross-read against the format write-up at poe-tool-dev/ggpk.discussion.
+- **The directory record is TWENTY bytes, and this project's comment said twenty-four for
+  months.** Four fields — a 64-bit hash and three 32-bit numbers — are twenty; a C# struct of
+  them measures twenty-four once the runtime pads it, so a reference reading the array as a raw
+  span of that struct *appears* to say the file is padded. Nothing depended on it while the paths
+  went unread, which is exactly how a wrong number survives in a comment. The reader now takes
+  nobody's word for it: it tries both and keeps whichever leaves a readable bundle header behind,
+  which is decisive because the wrong stride misses by four bytes per directory — megabytes — and
+  it reports which one the install used rather than leaving the answer in prose.
+- **An index with no names in it still opens.** Every index this project read until now was one:
+  the walk is an extra, and asking a nameless index for a name answers nothing rather than
+  throwing.
 
 #### The ritual line — the one place this tool contains a game's RNG
 

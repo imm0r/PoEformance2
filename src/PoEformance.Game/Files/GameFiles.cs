@@ -46,7 +46,7 @@ public sealed class GameFiles
     public BundleIndex Index { get; }
 
     /// <summary>What was opened, for a window to show.</summary>
-    public string Describe => $"{_archive.Describe} - {Index.Count} files, {Index.Bundles.Count} bundles, {Index.Hashing}";
+    public string Describe => $"{_archive.Describe} - {Index.Says}";
 
     /// <summary>
     /// What opening an install came to - and when it did not, how far it got.
@@ -182,6 +182,23 @@ public sealed class GameFiles
 
     /// <summary>Whether a path is in the install at all, without unpacking anything.</summary>
     public bool Has(string? path) => Index.Find(path) is not null;
+
+    /// <summary>
+    /// The whole path of each file whose NAME is asked for - what the game calls it, found in
+    /// the install rather than written down anywhere here.
+    /// </summary>
+    /// <remarks>
+    /// THE ANSWER TO "WHERE DOES THIS ART LIVE", which nothing in this tool could say before.
+    /// Half the data shipped here carries a name and not a path, because the tables it comes
+    /// from publish only the last part of what the game's own table holds - so a folder list had
+    /// to be kept by hand, and it was wrong the moment a patch moved something.
+    ///
+    /// EXPENSIVE, ONCE, OFF THE DRAWING THREAD. See <see cref="BundleIndex.Look"/>: the blob of
+    /// spelled-out paths is tens of megabytes unpacked and half a million paths to walk, so this
+    /// takes the whole list of names at once and is called from a background task.
+    /// </remarks>
+    public Dictionary<string, string> Look(IReadOnlyCollection<string>? names)
+        => Index.Look(_decompress, names);
 
     /// <summary>
     /// A bundle's chunk table, opened once and kept.

@@ -621,9 +621,10 @@ public sealed class AtlasWindow
     /// </summary>
     /// <remarks>
     /// BECAUSE A CONTENT DRAWN AS WORDS LOOKS EXACTLY LIKE THE SWITCH NOT WORKING. The pictures
-    /// come from a folder somebody fills or out of the installed game, and on a machine where
-    /// neither has them the honest report is "none found, here is where they would go" - not
-    /// silence, which is what sends somebody looking for a bug in the drawing.
+    /// come out of the installed game - which is asked what it calls its own art files, so
+    /// nothing here is a list anybody maintains - and on a machine with no install there is
+    /// nothing to find. The honest report is which of those it is, not silence, which is what
+    /// sends somebody looking for a bug in the drawing.
     /// </remarks>
     private string Pictures()
     {
@@ -639,9 +640,10 @@ public sealed class AtlasWindow
         }
 
         return found == 0
-            ? $"  None of the {asked} so far have a picture - put them in {_art.Folder} as"
-              + " <name>.png, named as data/atlas-content.json spells them."
-            : $"  {found} of {asked} have one.";
+            ? $"  None of the {asked} so far - the installed game is where these come from, so"
+              + " with no install to read they stay as words. A folder of your own also works:"
+              + $" {_art.Folder}, as <name>.png named the way data/atlas-content.json spells it."
+            : $"  {found} of {asked} have one, straight out of the install.";
     }
 
     /// <summary>How a group decides what belongs to it, in words.</summary>

@@ -61,7 +61,17 @@ internal static class Packed
     /// game does it: the root's path is empty, so its stored hash is that function's value for
     /// the empty string, and the two functions have different ones.
     /// </param>
-    public static byte[] Index(string[] bundles, Entry[] files, bool murmur = true)
+    /// <param name="paths">
+    /// The spelled-out paths, from <see cref="Paths"/>, or null for an index that carries none.
+    /// </param>
+    /// <param name="stride">
+    /// How many bytes one directory record takes. Twenty is what the fields add up to;
+    /// twenty-four is what a C# struct of them measures once the runtime has padded it, which is
+    /// what a reference reading the array as a raw span appears to say the file uses. Both are
+    /// written here because the reader is supposed to tell them apart by itself.
+    /// </param>
+    public static byte[] Index(
+        string[] bundles, Entry[] files, bool murmur = true, byte[]? paths = null, int stride = 20)
     {
         using var stream = new MemoryStream();
         using var write = new BinaryWriter(stream);
@@ -84,14 +94,64 @@ internal static class Packed
             write.Write(file.Size);
         }
 
-        // One directory record, the root. TWENTY-FOUR bytes: its four fields add up to twenty
-        // and the runtime pads the struct out to its alignment, which is really in the file.
+        // One directory record, the root: a hash, where its slice of the spelled-out paths
+        // starts, how long it is, and how long it is with its subdirectories. Twenty bytes of
+        // fields - written at either stride, because which one the game uses is the thing the
+        // reader works out for itself.
         write.Write(1);
         write.Write(murmur ? 0xF42A94E69CFF42FEul : 0x07E47507B4A92E53ul);
         write.Write(0);
-        write.Write(0);
-        write.Write(0);
-        write.Write(0);
+        write.Write(paths?.Length ?? 0);
+        write.Write(paths?.Length ?? 0);
+        if (stride > 20)
+        {
+            write.Write(new byte[stride - 20]);
+        }
+
+        // The spelled-out paths, as a bundle of their own at the very end. An index without one
+        // is what a reader that only ever looked things up by hash leaves behind, and it still
+        // has to open.
+        if (paths is not null)
+        {
+            write.Write(Bundle(paths, chunkSize: Math.Max(1, paths.Length)));
+        }
+
+        return stream.ToArray();
+    }
+
+    /// <summary>
+    /// Writes the spelled-out paths the way the index carries them.
+    /// </summary>
+    /// <remarks>
+    /// From the format's own description rather than from the reader: a word of nought flips
+    /// between collecting prefixes and emitting paths - and the section starts with one, so the
+    /// first flip turns collecting ON - while any other word is a ONE-BASED index into the
+    /// prefixes collected so far, followed by a NUL-terminated tail. A word pointing past the
+    /// end of that list means the tail stands on its own.
+    /// </remarks>
+    /// <param name="bases">The prefixes, each one whole (this writer gives them no prefixes of their own).</param>
+    /// <param name="made">Each path to emit: which prefix it starts with, or -1 for none, and its tail.</param>
+    public static byte[] Paths(string[] bases, (int Base, string Tail)[] made)
+    {
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        write.Write(0);   // flips collecting ON, and clears whatever was collected
+        for (int i = 0; i < bases.Length; i++)
+        {
+            // Past the end of the list as it stands, so the prefix is taken as standing alone.
+            write.Write(i + 1);
+            write.Write(Encoding.UTF8.GetBytes(bases[i]));
+            write.Write((byte)0);
+        }
+
+        write.Write(0);   // and OFF again: what follows is paths rather than prefixes
+        foreach ((int prefix, string tail) in made)
+        {
+            write.Write(prefix < 0 ? bases.Length + 1 : prefix + 1);
+            write.Write(Encoding.UTF8.GetBytes(tail));
+            write.Write((byte)0);
+        }
 
         return stream.ToArray();
     }

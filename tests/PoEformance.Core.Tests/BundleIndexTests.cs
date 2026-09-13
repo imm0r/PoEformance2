@@ -19,8 +19,19 @@ namespace PoEformance.Core.Tests;
 /// </remarks>
 public class BundleIndexTests
 {
-    /// <summary>A directory record, which is padded out to twenty-four rather than its twenty of fields.</summary>
-    private const int RootRecord = 24;
+    /// <summary>
+    /// A directory record: a hash and three numbers, and twenty bytes of them.
+    /// </summary>
+    /// <remarks>
+    /// It said twenty-FOUR here until the reader learned to read the paths, on the belief that
+    /// the file carries the padding a C# struct of those four fields would have. It does not:
+    /// the format write-up and a second implementation that reads real installs both say twenty,
+    /// and what a reference appeared to say came from its reading the array as a raw span of a
+    /// padded struct. Nothing depended on it while the paths went unread, which is how a wrong
+    /// number sat in a comment for months. The reader no longer takes anyone's word for it - see
+    /// <see cref="BundleIndex.Stride"/> - and this is what <see cref="Packed.Index"/> writes.
+    /// </remarks>
+    private const int RootRecord = 20;
 
     /// <summary>A file record: a hash and three numbers.</summary>
     private const int FileRecord = 20;
@@ -258,5 +269,109 @@ public class BundleIndexTests
         Assert.Null(read.Index);
         Assert.Contains("DEADBEEFDEADBEEF", read.Why, StringComparison.Ordinal);
         Assert.Contains("neither Murmur2-64A nor FNV-1a", read.Why, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// An index carrying the spelled-out paths, at whichever directory-record stride is asked for.
+    /// </summary>
+    /// <remarks>
+    /// The paths are written with a shared prefix on purpose: that is how the game stores them
+    /// and it is the half of the encoding that a reader can get wrong while still producing
+    /// plausible-looking strings.
+    /// </remarks>
+    private static BundleIndex WithNames(int stride)
+    {
+        byte[] paths = Packed.Paths(
+            ["art/2ditems/weapons/", "art/2dart/uiimages/ingame/"],
+            [
+                (0, "bow.dds"),
+                (0, "quiver.dds"),
+                (1, "atlasiconcontentbreach.dds"),
+                (-1, "data/mods.dat64"),
+            ]);
+
+        BundleIndex.Parsed read = BundleIndex.Read(
+            Packed.Index(["bundle-a"], Some, murmur: true, paths: paths, stride: stride));
+
+        Assert.NotNull(read.Index);
+        return read.Index!;
+    }
+
+    [Theory]
+    [InlineData(20)]
+    [InlineData(24)]
+    public void THENamesAreReadWhicheverSizeTheDirectoryRecordsTurnOutToBe(int stride)
+    {
+        // WHICH ONE THE GAME USES IS NOT SETTLED BY READING ABOUT IT. The format write-up says
+        // twenty; a reference reading the array as a span of a padded struct says twenty-four.
+        // So the reader tries both and keeps whichever leaves a readable bundle behind, and
+        // this pins that it really does work either way rather than by luck on one of them.
+        BundleIndex index = WithNames(stride);
+
+        Assert.True(index.Named);
+        Assert.Equal(stride, index.Stride);
+
+        Dictionary<string, string> found = index.Look(Packed.AsIs, ["AtlasIconContentBreach"]);
+
+        Assert.Equal(
+            "art/2dart/uiimages/ingame/atlasiconcontentbreach.dds",
+            found["AtlasIconContentBreach"]);
+    }
+
+    [Fact]
+    public void ANDANameIsFoundWhateverCaseItIsAskedFor()
+    {
+        // The data spells these the way the game's own table does - "AtlasIconContentBreach" -
+        // while the paths in the index are all lower case. Matching them literally finds none.
+        BundleIndex index = WithNames(20);
+
+        Assert.Single(index.Look(Packed.AsIs, ["ATLASICONCONTENTBREACH"]));
+        Assert.Single(index.Look(Packed.AsIs, ["atlasiconcontentbreach"]));
+    }
+
+    [Fact]
+    public void ANDTheWholeListIsAnsweredInOneWalk()
+    {
+        // Asked one at a time this would decompress tens of megabytes per name, which is why
+        // the whole list goes in at once.
+        BundleIndex index = WithNames(20);
+
+        Dictionary<string, string> found = index.Look(
+            Packed.AsIs, ["Bow", "Quiver", "Mods", "NothingLikeThis"]);
+
+        Assert.Equal("art/2ditems/weapons/bow.dds", found["Bow"]);
+        Assert.Equal("art/2ditems/weapons/quiver.dds", found["Quiver"]);
+
+        // A path with no prefix reads the same as one with, and the name is what is left after
+        // the last slash and before the last dot.
+        Assert.Equal("data/mods.dat64", found["Mods"]);
+
+        // A name the install does not have is ABSENT rather than empty: the caller can then
+        // tell "there is no such art" from "here it is", and say so.
+        Assert.False(found.ContainsKey("NothingLikeThis"));
+    }
+
+    [Fact]
+    public void ANDAnIndexWithNoNamesInItStillOpens()
+    {
+        // Which is every index this project read until now: nothing looked at the paths, so an
+        // index cut off after the directory records was perfectly usable. It still is - the
+        // names are an extra, and asking for one answers nothing rather than throwing.
+        BundleIndex index = Built();
+
+        Assert.False(index.Named);
+        Assert.Empty(index.Look(Packed.AsIs, ["Bow"]));
+    }
+
+    [Fact]
+    public void ANDNothingIsWalkedForAnEmptyRequest()
+    {
+        // The walk is the expensive thing here, and "no names wanted" is what every session
+        // that never opens the atlas asks for.
+        BundleIndex index = WithNames(20);
+
+        Assert.Empty(index.Look(Packed.AsIs, []));
+        Assert.Empty(index.Look(Packed.AsIs, null));
+        Assert.Empty(index.Look(Packed.AsIs, ["", "   "]));
     }
 }
