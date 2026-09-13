@@ -1931,11 +1931,16 @@ internal static class Program
         PoEformance.Game.World.AtlasMapNames mapNames =
             PoEformance.Game.World.AtlasMapNames.Load(FindDataFile("atlas-maps.json"));
 
+        // Loaded once and read twice, for the same reason as the map names: the atlas reads the
+        // meanings out of it and the pictures read where their art lives out of the same file.
+        PoEformance.Game.World.AtlasContentNames atlasContents =
+            PoEformance.Game.World.AtlasContentNames.Load(FindDataFile("atlas-content.json"));
+
         var atlas = new PoEformance.Features.AtlasWatch(
             reader,
             schema,
             gameStatesStatic,
-            PoEformance.Game.World.AtlasContentNames.Load(FindDataFile("atlas-content.json")),
+            atlasContents,
             mapNames,
             PoEformance.Game.World.AtlasRatings.Load(FindDataFile("atlas-ratings.json"), mapNames))
         {
@@ -1943,6 +1948,14 @@ internal static class Program
             Ritual = ritual,
         };
         atlas.RitualWorth = atlas.Settings.Worth;
+
+        // What a map contains, drawn as the game's own pictures. Shares the stash's art store,
+        // so one cache on disk serves both and a picture is unpacked once.
+        var atlasArt = new PoEformance.Features.AtlasArt
+        {
+            Store = itemArt,
+            Places = atlasContents.Places,
+        };
 
         // And the entity browser, which is the shortest route to something not yet
         // understood: the game names every component an entity carries, and most of them
@@ -2409,7 +2422,8 @@ internal static class Program
         overlay.ShowCalibration = debug;
         overlay.ShowWorldDots = debug;
         overlay.AttachUiBrowser(uiTree, uiBrowser);
-        overlay.AttachAtlas(atlas, changed => PoEformance.Features.AtlasStore.Save(changed));
+        overlay.AttachAtlas(
+            atlas, changed => PoEformance.Features.AtlasStore.Save(changed), art: atlasArt);
         overlay.AttachStash(
             stash,
             itemArt,

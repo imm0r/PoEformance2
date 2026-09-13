@@ -2821,6 +2821,67 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   never carries a count.
 - **The composition is a pure function.** Everything that can be got wrong is a decision rather
   than an address, and none of it is reachable through a live read.
+- **What is hidden by default is the whole difference between a readable atlas and a wall.**
+  Finished maps and maps with no way to them are hundreds each; the maps that can actually be
+  entered are a dozen. Both are off by default, so what is on screen is what can be run plus
+  whatever routing was asked to point at — the same judgement yokkenUA's Atlas plugin arrives at,
+  which hides a third category (maps available *now*) on top. The safety that makes this
+  defensible rather than reckless is that hiding happens AFTER the routing question, so the maps
+  somebody asked for are never the ones hidden, and that every map is still COUNTED: an empty
+  atlas says "1281 read, 12 drawn" rather than looking like a failed read.
+- **A distance belongs to the route, not to the map's name.** How many maps away a target is used
+  to be appended to the label — "The Copper Citadel (3)" — which made the plate wider by however
+  many digits the number happened to have, so the name slid sideways under its own node as you
+  ran towards it, and read as though the map were called that. It is a tab off the plate's LEFT
+  edge now, with an arrow pointing at the name; the rating pill stays on the right, because "how
+  far" and "is it worth it" are different questions and a row of two numbers reads as one.
+- **Two routes on one connection have to interleave, or the later one erases the earlier.**
+  Everything reachable from one accessible map leaves it the same way, so routes share their
+  first steps constantly — and direction chevrons drawn at a fixed spacing land on the same
+  pixels, leaving whichever route drew last looking like the only route there. Counting how many
+  routes use each stretch BEFORE any of them draws, and giving each an offset within the gap,
+  makes a shared stretch show every colour on it. The stretch is keyed by its two endpoints
+  exactly rather than approximately: both routes took the position from the same table, so the
+  copies are bit-identical.
+- **An off-screen target needs a pointer, and the range is measured in SCREENS.** Most of what a
+  route leads to is off the screen, where the line says only that something is out there. A pill
+  on the edge in its direction says which group and how many maps away — one per group, the
+  nearest, because ten unrun uniques in the same direction is one question and not ten. Two
+  things keep it honest: no route behind it, no pointer (a target the atlas cannot currently
+  reach is an arrow towards somewhere you cannot walk — the reference records the same trap), and
+  the reach is counted per axis in screenfuls rather than in hops. Hops are counted from the
+  accessible frontier, which is scattered over the whole atlas, so a map on the far side of the
+  world is routinely three hops away.
+
+##### The content pictures — a name where the game has a path
+
+`data/atlas-content.json` gives every content the game's own art name — `AtlasIconContentBreach` —
+and nothing until now read that field. Drawing them is worth it for one reason: three contents is
+three lines of text under a map name, taller than the node itself, where the same three as icons
+is one short row in the art the game already uses.
+
+- **The name is all any published copy of this table has.** The game's `EndgameMapContent` holds
+  the whole path in its icon column; GameHelper2's Atlas plugin kept the last part of it and
+  shipped extracted PNGs, the AHK tool before this took its copy from there, and so did this
+  file. So the folder is genuinely missing rather than merely unread, and it cannot be invented:
+  the bundle index is keyed by a hash of the whole path, so a wrong folder finds nothing and
+  there is no way to search by basename.
+- **So there are two sources, and the honest one is first.** A folder somebody fills
+  (`config/atlas-icons/<name>.png`) always works, needs no install, and is the only route on a
+  machine without the game. Behind it, the folders listed under `"art"` in
+  `data/atlas-content.json` are tried against the install's own index — each is a PROPOSAL that
+  the index either has or does not, so nothing is drawn on a guess and a right folder found later
+  can be added without a rebuild. The shipped list is EMPTY, which is what "we do not know this"
+  looks like as data.
+- **A content drawn as words looks exactly like the switch not working**, so the settings line
+  says which it is: how many of the names asked for have a picture, and where to put them when
+  none do. "Asked" rather than "missing" because the store answers "still unpacking" and "nowhere"
+  with the same empty string, and only one of those two is worth reporting as a failure.
+- **The tooltip is the reason the wording is carried at all.** A picture does not say what it
+  means until you have learnt it, and the game's sentence for it was being loaded and thrown away
+  one layer down, because the reader published strings. A content now travels as its line, its
+  fuller wording and its art name — with the wording dropped where it only repeats the line,
+  which is the usual case for an effect and never the case for a badge.
 
 #### The ritual line — the one place this tool contains a game's RNG
 

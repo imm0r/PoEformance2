@@ -35,7 +35,7 @@ public class AtlasBiomeTests
             settings ?? AtlasSettings.Default,
             AtlasGrouping.None,
             AtlasRoutes.None,
-            new Dictionary<(int X, int Y), IReadOnlyList<string>>());
+            new Dictionary<(int X, int Y), IReadOnlyList<AtlasSaid>>());
 
     [Fact]
     public void THEBiomeReachesTheDrawing()

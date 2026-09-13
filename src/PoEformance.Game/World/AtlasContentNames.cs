@@ -66,18 +66,40 @@ public sealed class AtlasContentNames
     private AtlasContentNames(
         IReadOnlyDictionary<uint, AtlasContent> badges,
         IReadOnlyDictionary<uint, AtlasContent> effects,
-        IReadOnlyDictionary<uint, AtlasContent> tokens)
+        IReadOnlyDictionary<uint, AtlasContent> tokens,
+        IReadOnlyList<string> places)
     {
         _badges = badges;
         _effects = effects;
         _tokens = tokens;
+        Places = places;
     }
 
     /// <summary>Nothing known, which is what a missing file leaves.</summary>
     public static AtlasContentNames Empty { get; } = new(
         new Dictionary<uint, AtlasContent>(),
         new Dictionary<uint, AtlasContent>(),
-        new Dictionary<uint, AtlasContent>());
+        new Dictionary<uint, AtlasContent>(),
+        []);
+
+    /// <summary>
+    /// Folders in the game's own packed files where a content's picture may live.
+    /// </summary>
+    /// <remarks>
+    /// AN <see cref="AtlasContent.Icon"/> IS A NAME AND NOT A PATH, which is a gap rather than
+    /// a choice: the icon column of the game's <c>EndgameMapContent</c> table holds the whole
+    /// path, and every project that has published this data - GameHelper2's Atlas plugin, the
+    /// tool before this one, and so this file - kept only the last part of it and shipped
+    /// extracted pictures instead. So the name is all there is, and the folder it sits in has
+    /// to be supplied.
+    ///
+    /// THEY ARE PROPOSALS, NOT KNOWLEDGE, and that is why they are DATA rather than a constant
+    /// in the code. Every one of them is tried against the install's own index, which either
+    /// has the file or does not - so a wrong folder costs a failed lookup and draws nothing,
+    /// and a right one can be added to the file by whoever finds it without a rebuild. That is
+    /// the same bargain the offsets file makes.
+    /// </remarks>
+    public IReadOnlyList<string> Places { get; }
 
     /// <summary>How many meanings are known, across all three tables.</summary>
     public int Count => _badges.Count + _effects.Count + _tokens.Count;
@@ -151,7 +173,8 @@ public sealed class AtlasContentNames
             return new AtlasContentNames(
                 Table(file.Badges),
                 Table(file.Effects),
-                Words(file.LegacyTokens));
+                Words(file.LegacyTokens),
+                file.Art ?? []);
         }
         catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
         {
@@ -212,6 +235,10 @@ public sealed class AtlasContentFile
 
     [JsonPropertyName("legacyTokens")]
     public Dictionary<string, string>? LegacyTokens { get; set; }
+
+    /// <summary>Where in the install to look for the pictures. See <see cref="AtlasContentNames.Places"/>.</summary>
+    [JsonPropertyName("art")]
+    public string[]? Art { get; set; }
 }
 
 /// <summary>One entry of it.</summary>

@@ -28,17 +28,20 @@ public sealed class AtlasWindow
 
     private readonly AtlasWatch _watch;
     private readonly Action<AtlasSettings> _save;
+    private readonly AtlasArt? _art;
 
     // Something was changed and not yet written down. See where it is written, below.
     private bool _unsaved;
 
     /// <param name="save">Writes the settings down, so a change survives a restart.</param>
-    public AtlasWindow(AtlasWatch watch, Action<AtlasSettings> save)
+    /// <param name="art">Where the content pictures come from, for the line that says how it went.</param>
+    public AtlasWindow(AtlasWatch watch, Action<AtlasSettings> save, AtlasArt? art = null)
     {
         ArgumentNullException.ThrowIfNull(watch);
         ArgumentNullException.ThrowIfNull(save);
         _watch = watch;
         _save = save;
+        _art = art;
     }
 
     /// <summary>Draws the tab's content.</summary>
@@ -108,6 +111,11 @@ public sealed class AtlasWindow
             changed = changed with { Names = names };
         }
 
+        OverlayLayout.Hint(
+            "The game names a map only when the cursor is on it. With this off, what is in each"
+            + " one and the routes are still drawn - which is the view for hunting one kind of"
+            + " map rather than reading the atlas.");
+
         OverlayLayout.Cell(1);
 
         bool contents = settings.Contents;
@@ -116,6 +124,10 @@ public sealed class AtlasWindow
             changed = changed with { Contents = contents };
         }
 
+        OverlayLayout.Hint(
+            "Breaches, expeditions, rituals, bosses - what the game has rolled into each map,"
+            + " under its name.");
+
         OverlayLayout.Cell(2);
 
         bool web = settings.Web;
@@ -123,6 +135,11 @@ public sealed class AtlasWindow
         {
             changed = changed with { Web = web };
         }
+
+        OverlayLayout.Hint(
+            "A faint line along every link between two drawn maps. It is what a route follows,"
+            + " and on a full atlas it is a great many lines - off unless the shape of the web"
+            + " is the question.");
 
         bool ratings = settings.Ratings;
         if (OverlayLayout.Toggle("Map Ratings", ref ratings))
@@ -149,6 +166,19 @@ public sealed class AtlasWindow
         // settings page, permanently, for a question asked once. The colours are on the atlas
         // where they are used; a legend in the settings is a reference table nobody was reading.
         OverlayLayout.Hint("The ring around each name says what terrain the map is.");
+
+        OverlayLayout.Cell(2);
+
+        bool icons = settings.Icons;
+        if (OverlayLayout.Toggle("As Pictures", ref icons))
+        {
+            changed = changed with { Icons = icons };
+        }
+
+        OverlayLayout.Hint(
+            "Draw what is in a map as the game's own icons in one row, instead of a line of"
+            + " words each. Anything with no picture keeps its line, so nothing is lost."
+            + Pictures());
 
         // A name in the file that matches no map is a rating that silently never appears, which
         // is indistinguishable from having forgotten to write it. Named here, it is a typo.
@@ -244,6 +274,40 @@ public sealed class AtlasWindow
         }
 
         changed = Groups(changed);
+
+        // UNDER the groups rather than above them, because it is about what the groups DO once
+        // they are ticked: the list is what somebody came here to edit, and a pair of switches
+        // sitting on top of it would push the thing being edited down the page.
+        OverlayLayout.Group("Off the Screen");
+
+        bool pointers = settings.Pointers;
+        if (OverlayLayout.Toggle("Point at Targets off the Screen", ref pointers))
+        {
+            changed = changed with { Pointers = pointers };
+        }
+
+        OverlayLayout.Hint(
+            "Most of what a route leads to is off the screen, and a line running off the edge"
+            + " says only that something is out there. This pins a marker to the edge in its"
+            + " direction, naming the map and how many away it is - the nearest one of each"
+            + " group, so ten unrun uniques are one marker rather than ten.");
+
+        if (pointers)
+        {
+            float reach = settings.Reach;
+            if (OverlayLayout.Slider("Reaching", ref reach, 0f, AtlasSettings.FurthestRange, Reach(reach)))
+            {
+                // Nought is "never chosen" in the settings, so "no limit" is written as a
+                // negative - see AtlasSettings.Reach. Dragging to the bottom means no limit.
+                changed = changed with { PointerRange = reach <= 0f ? -1f : reach };
+            }
+
+            OverlayLayout.Hint(
+                "How far off the screen a marker may point, counted in screenfuls. Measured on"
+                + " the screen rather than in maps because hops are counted from wherever you"
+                + " can start now, and those are scattered over the whole atlas - so a map on"
+                + " the far side of the world is routinely three hops away.");
+        }
 
         Apply(settings, changed);
     }
@@ -540,6 +604,44 @@ public sealed class AtlasWindow
         {
             ImGui.EndTable();
         }
+    }
+
+    /// <summary>
+    /// How the reach reads on its own slider - in screenfuls, or as no limit at the bottom.
+    /// </summary>
+    /// <remarks>
+    /// A format string rather than a number written beside it, because the slider draws its own
+    /// value: given "%.1f" it says "0.0" at the bottom, which reads as "reaches nothing" when
+    /// it means the opposite.
+    /// </remarks>
+    private static string Reach(float screens) => screens <= 0f ? "no limit" : "%.1f screens";
+
+    /// <summary>
+    /// How the hunt for the content pictures is going, said plainly.
+    /// </summary>
+    /// <remarks>
+    /// BECAUSE A CONTENT DRAWN AS WORDS LOOKS EXACTLY LIKE THE SWITCH NOT WORKING. The pictures
+    /// come from a folder somebody fills or out of the installed game, and on a machine where
+    /// neither has them the honest report is "none found, here is where they would go" - not
+    /// silence, which is what sends somebody looking for a bug in the drawing.
+    /// </remarks>
+    private string Pictures()
+    {
+        if (_art is null)
+        {
+            return string.Empty;
+        }
+
+        (int found, int asked) = _art.Tally;
+        if (asked == 0)
+        {
+            return "  Open the atlas to find out how many pictures are to hand.";
+        }
+
+        return found == 0
+            ? $"  None of the {asked} so far have a picture - put them in {_art.Folder} as"
+              + " <name>.png, named as data/atlas-content.json spells them."
+            : $"  {found} of {asked} have one.";
     }
 
     /// <summary>How a group decides what belongs to it, in words.</summary>

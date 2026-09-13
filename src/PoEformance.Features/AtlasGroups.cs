@@ -244,12 +244,29 @@ public sealed class AtlasGrouping
 /// ABSENT means "never chosen" and takes the shipped list; EMPTY means "group nothing" and is
 /// honoured - the same rule the preload rules follow, for the same reason.
 /// </param>
+/// <param name="Icons">
+/// Draw what is in a map as the game's own pictures where there are any, instead of a line of
+/// words each. See <see cref="AtlasArt"/> for where the pictures come from.
+/// </param>
+/// <param name="Pointers">
+/// Pin a marker to the screen's edge for a routing target that is off it, naming the map and how
+/// many maps away it is, in its group's colour.
+/// </param>
+/// <param name="PointerRange">
+/// How far off the screen those markers may reach, in screenfuls. 0 for no limit.
+/// </param>
 public sealed record AtlasSettings(
     [property: JsonPropertyName("enabled")] bool Enabled = true,
     [property: JsonPropertyName("names")] bool Names = true,
     [property: JsonPropertyName("contents")] bool Contents = true,
     [property: JsonPropertyName("hideCompleted")] bool HideCompleted = true,
-    [property: JsonPropertyName("hideUnreachable")] bool HideUnreachable = false,
+
+    // ON, unlike everything else that hides things here, and it took looking at somebody
+    // else's atlas overlay to see why. A map with no way there is one you cannot run, and
+    // there are hundreds of them: left drawn, the atlas is a wall of names in which the
+    // dozen maps you can actually enter are invisible. What routing points at stays drawn
+    // whatever this says, so the maps you asked to be shown are exactly the ones on screen.
+    [property: JsonPropertyName("hideUnreachable")] bool HideUnreachable = true,
     [property: JsonPropertyName("web")] bool Web = false,
     [property: JsonPropertyName("hideOnHover")] bool HideOnHover = true,
     [property: JsonPropertyName("ratings")] bool Ratings = true,
@@ -257,8 +274,38 @@ public sealed record AtlasSettings(
     [property: JsonPropertyName("search")] string Search = "",
     [property: JsonPropertyName("textScale")] float TextScale = 0f,
     [property: JsonPropertyName("ritualWorth")] IReadOnlyDictionary<string, int>? RitualWorth = null,
-    [property: JsonPropertyName("groups")] IReadOnlyList<AtlasGroup>? Groups = null)
+    [property: JsonPropertyName("groups")] IReadOnlyList<AtlasGroup>? Groups = null,
+    [property: JsonPropertyName("icons")] bool Icons = true,
+    [property: JsonPropertyName("pointers")] bool Pointers = true,
+    [property: JsonPropertyName("pointerRange")] float PointerRange = 0f)
 {
+    /// <summary>The furthest a pointer may reach when nobody has said, and the most it may.</summary>
+    /// <remarks>
+    /// FIVE SCREENS, which is a judgement rather than a measurement: far enough to reach the
+    /// next cluster or two, short enough that a pointer is never aimed at the other side of the
+    /// world. The reference settled on the same number by playing with it.
+    /// </remarks>
+    public const float UsualRange = 5f;
+
+    public const float FurthestRange = 30f;
+
+    /// <summary>
+    /// How far the pointers reach, with zero meaning "never chosen" rather than "no limit".
+    /// </summary>
+    /// <remarks>
+    /// The same rule as the text size above, and for the same reason: zero arrives from a
+    /// record default, an omitted key and a hand-edited file alike, none of which went through
+    /// a constructor. Taken literally it would be no limit at all, which is the one setting
+    /// that makes the pointers useless - so "no limit" is spelled as a negative number, which
+    /// nothing produces by accident.
+    /// </remarks>
+    public float Reach => PointerRange switch
+    {
+        0f => UsualRange,
+        < 0f => 0f,
+        _ => Math.Min(PointerRange, FurthestRange),
+    };
+
     /// <summary>The smallest and largest writing worth allowing.</summary>
     /// <remarks>
     /// A range rather than a free number because this reaches drawing code through a settings
