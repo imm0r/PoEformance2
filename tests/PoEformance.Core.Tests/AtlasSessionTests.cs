@@ -142,6 +142,38 @@ public class AtlasSessionTests
     }
 
     [Fact]
+    public void TheAtlasRowSweepFindsTheTableAndTheOneRowThisCaptureCanOffer()
+    {
+        // THE BASELINE A FRESH CAPTURE WILL BE COMPARED AGAINST, and the reason the sweep had to
+        // be written before the capture rather than after: this recording holds the row for ONE
+        // node, because the build that made it read +0x2A0 on two. The sweep is what puts the
+        // other thousand into the next one.
+        //
+        // What is real here is the table and the arithmetic. EndgameMapAtlas names itself, states
+        // 1242 rows of 0x121, and that is exactly what dat-schema computes for its 30 columns - so
+        // every column offset the probe uses rests on the game's own number.
+        using ReplayMemoryReader replay = Load();
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        (AtlasReader atlas, ulong uiRoot) = Attach(replay);
+
+        string said = string.Join('\n', new AtlasRowProbe(replay, schema).Probe(atlas.Read(uiRoot, Viewport)
+            .ConvertAll(node => new ProbedNode(node.Index, node.Address, node.MapId))));
+
+        Assert.Contains(
+            "table \"Data/Balance/EndgameMapAtlas.dat\": 1242 rows of 0x121, computed 0x121 - AGREE",
+            said,
+            StringComparison.Ordinal);
+
+        // And the one row, which is a PATH position: a passive whose name is a [DNT] placeholder
+        // and not a single one of the columns worth showing anybody. That is what makes the sweep
+        // worth taking - one sparse row is no basis for concluding the columns are always empty.
+        Assert.Contains("1 with a readable atlas row", said, StringComparison.Ordinal);
+        Assert.Contains("AtlasOutsideFortressPath72", said, StringComparison.Ordinal);
+        Assert.Contains("0 carry a MapObjective", said, StringComparison.Ordinal);
+        Assert.Contains("Stats        none", said, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ANDWorldAreasStillKeepsItsNameWhereThisToolReadsIt()
     {
         // The other half of that: the published note said a name column moved to +0x32 and that
