@@ -75,13 +75,6 @@ public sealed class AtlasNodeProbe
     /// <summary>Most badge children walked under one node - the reader's own guard, repeated.</summary>
     private const int MostContents = 64;
 
-    /// <summary>Longest string taken seriously behind one of these pointers.</summary>
-    /// <remarks>
-    /// The packed badge form ("[DeadlyMapBoss|Deadly Map Boss]") is the longest of them and
-    /// fits twice over. A cap matters because the pointer may not be one.
-    /// </remarks>
-    private const int MostChars = 96;
-
     /// <summary>Bytes of a dat row's head to read. Far enough past 0x32 to show its neighbours.</summary>
     private const int RowHeadBytes = 0x48;
 
@@ -217,7 +210,7 @@ public sealed class AtlasNodeProbe
         // the grid pair is here at +0x310 with the decoy 0x10 past it, and so is the other end of
         // POE2Radar's reading - element+0x300 is data+0x2A0 while the two allocations stay 0x60
         // apart, which this window is where anybody would notice stopped being true.
-        said.AddRange(Block("node", node.Element, _grid - 0x30, _grid + 0x28));
+        said.AddRange(ProbeBytes.Block(_reader, _tables, "node", node.Element, _grid - 0x30, _grid + 0x28));
         said.AddRange(Badges(node.Element, ref badges));
         return said;
     }
@@ -235,7 +228,7 @@ public sealed class AtlasNodeProbe
 
         // Read as a block so the whole tail is in the recording: when these move again they move
         // together, and the answer is then in a file somebody already has.
-        said.AddRange(Block("data", data, _mapData - 0x10, _status + 0x11));
+        said.AddRange(ProbeBytes.Block(_reader, _tables, "data", data, _mapData - 0x10, _status + 0x11));
         return said;
     }
 
@@ -291,13 +284,13 @@ public sealed class AtlasNodeProbe
         said.Add($"    +0x{_passivesRef:X2} Passives -> 0x{inner:X}"
             + $"  {PointerPeek.Peek(_reader, inner, _tables, innerTable).Summary}");
 
-        said.Add($"      +0x{_rowId:X2} Id   -> {Text(inner + (ulong)_rowId)}");
-        said.Add($"      +0x{_rowIcon:X2} Icon -> {Text(inner + (ulong)_rowIcon)}");
+        said.Add($"      +0x{_rowId:X2} Id   -> {ProbeBytes.Text(_reader, inner + (ulong)_rowId)}");
+        said.Add($"      +0x{_rowIcon:X2} Icon -> {ProbeBytes.Text(_reader, inner + (ulong)_rowIcon)}");
         said.Add(_reader.TryRead(inner + (ulong)_rowGraphId, out ushort graph)
             ? $"      +0x{_rowGraphId:X2} GraphId {graph}"
             : $"      +0x{_rowGraphId:X2} GraphId unreadable");
-        said.Add($"      +0x{_rowName:X2} Name -> {Text(inner + (ulong)_rowName)}");
-        said.AddRange(Block("row", inner, 0, RowHeadBytes));
+        said.Add($"      +0x{_rowName:X2} Name -> {ProbeBytes.Text(_reader, inner + (ulong)_rowName)}");
+        said.AddRange(ProbeBytes.Block(_reader, _tables, "row", inner, 0, RowHeadBytes));
         return said;
     }
 
@@ -326,70 +319,18 @@ public sealed class AtlasNodeProbe
             badges++;
             _reader.TryRead(badge + (ulong)_badgeContentId, out uint id);
             said.Add($"  badge 0x{badge:X}  +0x{_badgeContentId:X} id 0x{id:X8}");
-            said.Add($"    +0x{_badgeContentName:X} -> {Text(badge + (ulong)_badgeContentName)}  <- holds the name on 0.5.5");
-            said.Add($"    +0x{_badgeContentNameGh:X} -> {Text(badge + (ulong)_badgeContentNameGh)}  <- GameHelper2's slot, null on 0.5.5");
+            said.Add($"    +0x{_badgeContentName:X} -> {ProbeBytes.Text(_reader, badge + (ulong)_badgeContentName)}  <- holds the name on 0.5.5");
+            said.Add($"    +0x{_badgeContentNameGh:X} -> {ProbeBytes.Text(_reader, badge + (ulong)_badgeContentNameGh)}  <- GameHelper2's slot, null on 0.5.5");
 
             // Both slots in one span, whichever order the schema puts them in - one capture that
             // moved them would otherwise print a window with the interesting half outside it.
-            said.AddRange(Block(
+            said.AddRange(ProbeBytes.Block(
+                _reader,
+                _tables,
                 "badge",
                 badge,
                 Math.Min(_badgeContentName, _badgeContentNameGh) - 0x08,
                 Math.Max(_badgeContentName, _badgeContentNameGh) + 0x10));
-        }
-
-        return said;
-    }
-
-    /// <summary>A pointer slot read as the wide string it might be pointing at.</summary>
-    private string Text(ulong slot)
-    {
-        ulong at = _reader.ReadPointer(slot);
-        if (!MemoryReaderExtensions.IsPlausiblePointer(at))
-        {
-            return $"0x{at:X} (not a pointer)";
-        }
-
-        string text = _reader.ReadUnicodeString(at, MostChars);
-        return text.Length > 0 ? $"0x{at:X} \"{text}\"" : $"0x{at:X} (no text there)";
-    }
-
-    /// <summary>
-    /// A span of an object, one line per eight-byte slot, and whatever each slot points at.
-    /// </summary>
-    /// <remarks>
-    /// ONE read for the whole span rather than one per slot. That is the cheaper shape, and it
-    /// is the useful one: a recording then holds the span CONTIGUOUSLY, so a field nobody has
-    /// noticed yet can be found in it later without the build that would otherwise be needed to
-    /// read it.
-    /// </remarks>
-    private List<string> Block(string label, ulong at, int from, int to)
-    {
-        var said = new List<string>();
-
-        int start = Math.Max(from, 0) & ~7;
-        int length = ((to - start + 7) & ~7) + 8;
-        var block = new byte[length];
-        if (!_reader.TryRead(at + (ulong)start, block))
-        {
-            said.Add($"    {label} +0x{start:X3}..+0x{start + length:X3} unreadable");
-            return said;
-        }
-
-        said.Add($"    {label} +0x{start:X3}..+0x{start + length:X3}");
-        for (int offset = 0; offset + 8 <= length; offset += 8)
-        {
-            ulong raw = BinaryPrimitives.ReadUInt64LittleEndian(block.AsSpan(offset));
-            string note = string.Empty;
-            if (MemoryReaderExtensions.IsPlausiblePointer(raw))
-            {
-                ulong following = offset + 16 <= length
-                    ? BinaryPrimitives.ReadUInt64LittleEndian(block.AsSpan(offset + 8))
-                    : 0;
-                note = PointerPeek.Peek(_reader, raw, _tables, following).Summary;
-            }
-
-            said.Add($"      +0x{start + offset:X3}  {raw:X16}  {note}");
         }
 
         return said;

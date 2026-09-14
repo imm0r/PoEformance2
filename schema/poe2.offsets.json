@@ -481,14 +481,35 @@
     // is the trap: it POINTS AT a Chests row but is not one, and checking it against that
     // table lands on offsets that are not even column boundaries.
     "WorldAreaDat": {
-      "comment": "A row of WorldAreas.dat: what KIND of area this is. There is no IsHideout field - the reference derives it from the Id containing 'hideout' but not 'map', because hideout areas are named that way and map areas are not.",
+      "comment": "A row of WorldAreas.dat: what KIND of area this is. THE FIRST FIVE COLUMNS ARE MEASURED (Id and Name confirmed on 0.5.5 in four recordings, including the atlas capture where the row behind MapRugosa reads \"Rugosa\" at +0x08); EVERYTHING FROM 0xDC DOWN IS COMPUTED AND UNREAD - dat-schema's 80 PoE2 columns, arithmetic per the note above, and nothing has ever looked at those bytes in this game. They are here because they are what a tool would need to stop carrying data/atlas-maps.json: IsUniqueMapArea is that file's type, IsHideout and Tags are where its tags would have to come from. WorldAreaRowProbe reads them and prints the measured row size beside ComputedRowSize - if those two disagree, a column width is wrong and every offset past the disagreement is rubbish, which is the first thing to check before believing any of this. An older note here said there is no IsHideout field and that the reference derives it from the Id containing 'hideout'; dat-schema lists one at 0x12A, so that note described a gap in our knowledge rather than in the table.",
       "fields": {
         "IdPtr": { "offset": "0x00", "type": "ptr", "comment": "Wide string, e.g. G1_2, MapRiverhold, HideoutFelled." },
-        "NamePtr": { "offset": "0x08", "type": "ptr", "comment": "Wide string, the display name." },
+        "NamePtr": { "offset": "0x08", "type": "ptr", "comment": "Wide string, the display name. LOCALISED - \"Rugosa\", and whatever the client's language says. The id above is the key; this is only ever a label." },
         "Act": { "offset": "0x10", "type": "i32", "invariant": { "kind": "range", "min": 0, "max": 20 } },
         "IsTown": { "offset": "0x14", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 } },
-        "HasWaypoint": { "offset": "0x15", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 } }
+        "HasWaypoint": { "offset": "0x15", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 1 } },
+        "IsMapArea": { "offset": "0xDC", "type": "u8", "comment": "CANDIDATE, computed from dat-schema and read only by WorldAreaRowProbe." },
+        "IsHideout": { "offset": "0x12A", "type": "u8", "comment": "CANDIDATE, same. The field the comment above said did not exist." },
+        "TagsArray": { "offset": "0x133", "type": "ptr", "comment": "CANDIDATE, same: the Tags column, an ARRAY of foreign references into Tags.dat - sixteen bytes here and sixteen per entry (row then table). Whether those two qwords are a count and a pointer or a begin and an end is not settled in this project, so the probe prints the pair raw and both readings. The question this answers is whether the game's own tags carry what data/atlas-maps.json calls lineage, arbiter, traverse and the rest, or whether those are editorial and have to stay in a file." },
+        "IsUniqueMapArea": { "offset": "0x18B", "type": "u8", "comment": "CANDIDATE, same. This is what data/atlas-maps.json calls type: unique, on 23 of its 440 maps." }
+      },
+      "consts": { "ComputedRowSize": "0x2E0" }
+    },
+
+    "EndgameMapsRow": {
+      "comment": "A row of EndgameMaps.dat - the ROLLED map behind an atlas node, reached through AtlasNodeData.MapDataPtr. The table states 173 rows of 0xF1 and dat-schema computes 0xF1 for its 29 columns, so the arithmetic and the game agree here (measured 2026-09-14). Column 0 is the WorldAreas reference, which is why the map-id chain is three hops: this row, then that row, then its Id string.",
+      "fields": {
+        "WorldAreaRef": { "offset": "0x00", "type": "ptr", "comment": "WorldArea -> WorldAreas. Sixteen bytes: the row here, the table it belongs to at +0x08 - which is how the table gets NAMED rather than assumed, and where WorldAreaRowProbe gets the measured row size from." }
       }
+    },
+
+    "TagsRow": {
+      "comment": "A row of Tags.dat, which is what a WorldAreas Tags entry points at. Computed from dat-schema's five PoE2 columns (Id, HASH32, DisplayString, an array, UiHints) and read only by WorldAreaRowProbe. The Id is the engine name - the thing worth keying on if the game's tags turn out to carry what this tool needs; DisplayString is a label and may be empty.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr" },
+        "DisplayStringPtr": { "offset": "0x0C", "type": "ptr" }
+      },
+      "consts": { "EntrySize": "0x10" }
     },
 
     "AreaInstance": {
