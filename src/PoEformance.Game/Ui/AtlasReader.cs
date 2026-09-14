@@ -148,6 +148,7 @@ public sealed class AtlasReader
     private readonly int _status;
 
     private readonly AtlasNodeProbe _probe;
+    private readonly WorldAreaRowProbe _areas;
 
     public AtlasReader(IMemoryReader reader, OffsetSchema schema, UiElementReader elements)
     {
@@ -196,6 +197,7 @@ public sealed class AtlasReader
         _status = data.OffsetOf("StatusBits");
 
         _probe = new AtlasNodeProbe(reader, schema, elements);
+        _areas = new WorldAreaRowProbe(reader, schema);
     }
 
     /// <summary>The atlas panel, or zero when it is not there - which is most of the time.</summary>
@@ -685,8 +687,13 @@ public sealed class AtlasReader
         // this same client, and a claim about bytes no build touches can never be checked
         // against a recording - so the probe touches them, once, where a person is already
         // looking. See AtlasNodeProbe for which claims are open.
-        said.AddRange(_probe.Probe(
-            nodes.ConvertAll(node => new ProbedNode(node.Index, node.Address, node.MapId))));
+        List<ProbedNode> probed = nodes.ConvertAll(
+            node => new ProbedNode(node.Index, node.Address, node.MapId));
+        said.AddRange(_probe.Probe(probed));
+
+        // And one hop past that: the WorldAreas row each map sits on, which is where the data
+        // this tool carries in a file would have to come from instead. See WorldAreaRowProbe.
+        said.AddRange(_areas.Probe(probed));
 
         // Even with the path right, the fingerprints can be the thing that is wrong - and then
         // the panel is found and nothing in it reads as a map. Say where else it could be.
