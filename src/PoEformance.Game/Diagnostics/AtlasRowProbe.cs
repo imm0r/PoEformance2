@@ -52,8 +52,14 @@ public sealed class AtlasRowProbe
     /// <summary>Bytes one array entry takes: a row reference followed by its table.</summary>
     private const int EntrySize = 0x10;
 
+    /// <summary>Most distinct sentences listed. The vocabularies behind these ids are tiny.</summary>
+    private const int MostSentences = 24;
+
     private readonly IMemoryReader _reader;
     private readonly DatTableShape? _tables;
+
+    /// <summary>Resolved string columns, by the row they came from. See <see cref="Id"/>.</summary>
+    private readonly Dictionary<(ulong Row, int Column), string> _strings = [];
 
     private readonly int _dataStorage;
     private readonly int _data;
@@ -231,12 +237,23 @@ public sealed class AtlasRowProbe
     }
 
     /// <summary>The columns themselves: the distribution over every row, then a few in full.</summary>
+    /// <remarks>
+    /// THE TEXTS ARE READ FOR EVERY ROW, not only for the few printed whole, and that is a fix
+    /// rather than a flourish. The first capture of this sweep read the ids everywhere and the
+    /// TEXT only for six arbitrary rows - which happened to be six path positions carrying no
+    /// objective at all - so the recording came back with every objective id and not one of the
+    /// sentences behind them. A recording holds only the reads its build performed, so "read it
+    /// where it is interesting" has to mean everywhere the column is set.
+    /// It costs almost nothing because the referenced rows REPEAT: 113 positions share seven
+    /// objectives, so the cache turns that into seven reads.
+    /// </remarks>
     private List<string> Columns(Dictionary<ulong, List<string>> rows)
     {
         var said = new List<string>();
         var passives = new Dictionary<string, int>(StringComparer.Ordinal);
         var objectives = new Dictionary<string, int>(StringComparer.Ordinal);
         var subTrees = new Dictionary<string, int>(StringComparer.Ordinal);
+        var sentences = new Dictionary<string, int>(StringComparer.Ordinal);
         int withObjective = 0, withBlocked = 0, withStats = 0;
 
         foreach (ulong row in rows.Keys.Take(MostRows))
@@ -252,6 +269,8 @@ public sealed class AtlasRowProbe
             {
                 objectives[objective] = objectives.GetValueOrDefault(objective) + 1;
                 withObjective++;
+                Sentence(sentences, $"{objective} / objective", Id(row + (ulong)_objective, _objectiveText));
+                Sentence(sentences, $"{objective} / completion", Id(row + (ulong)_objective, _completionText));
             }
 
             string subTree = Id(row + (ulong)_subTree, _subTreeId);
@@ -260,9 +279,17 @@ public sealed class AtlasRowProbe
                 subTrees[subTree] = subTrees.GetValueOrDefault(subTree) + 1;
             }
 
-            if (Id(row + (ulong)_blocked, _stringId).Length > 0)
+            string blocked = Id(row + (ulong)_blocked, _stringId);
+            if (blocked.Length > 0)
             {
                 withBlocked++;
+                Sentence(sentences, $"{blocked} / blocked", Id(row + (ulong)_blocked, _stringText));
+            }
+
+            string extra = Id(row + (ulong)_clientString, _stringId);
+            if (extra.Length > 0)
+            {
+                Sentence(sentences, $"{extra} / clientString", Id(row + (ulong)_clientString, _stringText));
             }
 
             if (Count(row + (ulong)_stats) > 0)
@@ -279,8 +306,24 @@ public sealed class AtlasRowProbe
         said.AddRange(Top("MapObjective", objectives));
         said.AddRange(Top("SubTree", subTrees));
 
-        // And a few rows whole, because a count says how often and never what.
-        foreach ((ulong row, List<string> maps) in rows.Take(MostDetailed))
+        // The sentences themselves, which is the half a count can never stand in for: whether
+        // these columns hold something a person could read, or only more engine ids.
+        if (sentences.Count > 0)
+        {
+            said.Add($"  {sentences.Count} distinct strings behind those ids:");
+            foreach ((string what, int count) in sentences.OrderByDescending(pair => pair.Value).Take(MostSentences))
+            {
+                said.Add($"      {count,5}x  {what}");
+            }
+        }
+
+        // And a few rows whole, because a count says how often and never what. The ones carrying
+        // something come FIRST - taking whatever the dictionary happened to yield first is what
+        // sent the last capture back with six empty path positions and no sentences at all.
+        foreach ((ulong row, List<string> maps) in rows
+            .OrderByDescending(pair => Id(pair.Key + (ulong)_objective, _objectiveId).Length > 0)
+            .ThenByDescending(pair => Id(pair.Key + (ulong)_blocked, _stringId).Length > 0)
+            .Take(MostDetailed))
         {
             said.Add($"  row 0x{row:X}  {maps.Count} node(s), e.g. {(maps[0].Length > 0 ? maps[0] : "(no id)")}");
             said.Add($"    Passives     {ProbeBytes.Text(_reader, Ref(row + (ulong)_passives) + (ulong)_passiveId)}"
@@ -348,13 +391,43 @@ public sealed class AtlasRowProbe
     /// <summary>The row half of a dat foreign reference.</summary>
     private ulong Ref(ulong at) => _reader.ReadPointer(at);
 
-    /// <summary>A string column of the row a reference points at, empty when it points nowhere.</summary>
+    /// <summary>
+    /// A string column of the row a reference points at, empty when it points nowhere.
+    /// </summary>
+    /// <remarks>
+    /// CACHED BY (ROW, COLUMN) because the referenced rows repeat heavily - hundreds of positions
+    /// resolve to seven objectives and six blocked messages - and a dat row never changes while
+    /// the game runs. Without it, reading the sentences everywhere would cost a read per position
+    /// instead of a read per distinct string.
+    /// </remarks>
     private string Id(ulong reference, int column)
     {
         ulong row = _reader.ReadPointer(reference);
-        return MemoryReaderExtensions.IsPlausiblePointer(row)
-            ? _reader.ReadUnicodeString(_reader.ReadPointer(row + (ulong)column), MostChars)
-            : string.Empty;
+        if (!MemoryReaderExtensions.IsPlausiblePointer(row))
+        {
+            return string.Empty;
+        }
+
+        if (_strings.TryGetValue((row, column), out string? found))
+        {
+            return found;
+        }
+
+        string text = _reader.ReadUnicodeString(_reader.ReadPointer(row + (ulong)column), MostChars);
+        _strings[(row, column)] = text;
+        return text;
+    }
+
+    /// <summary>Records one sentence under the id it belongs to, when there is one.</summary>
+    private static void Sentence(Dictionary<string, int> into, string what, string text)
+    {
+        if (text.Length == 0)
+        {
+            return;
+        }
+
+        string key = $"{what}: \"{text}\"";
+        into[key] = into.GetValueOrDefault(key) + 1;
     }
 
     /// <summary>The same, printed the way the other probes print a string slot.</summary>
