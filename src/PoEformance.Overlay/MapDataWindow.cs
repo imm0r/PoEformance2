@@ -106,13 +106,14 @@ public sealed class MapDataWindow
             "every name the two share is identical",
             $"{report.NamesDiffer} names differ between the game and the file");
 
-        // NOT a verdict: the unique flags disagreeing is a known, deliberate state. Six ids are
-        // what the switch to the game's flag moves, and calling that a fault would be wrong.
+        // NOT a verdict: the unique flags disagreeing is a known, deliberate state. The game's
+        // column is the one in force, so this is a list of maps the file would have grouped
+        // wrongly - and colouring it as a fault would say the opposite.
         ImGui.TextColored(
-            report.UniqueDiffers == 0 ? GoodText : WarnText,
-            report.UniqueDiffers == 0
-                ? "    the unique flag agrees everywhere"
-                : $"  ~ the unique flag differs on {report.UniqueDiffers} - these follow the game");
+            report.UniqueFromGame ? GoodText : WarnText,
+            report.UniqueFromGame
+                ? $"  OK  unique comes from the game (IsUniqueMapArea); {report.UniqueDiffers} differ from the file"
+                : $"  ..  unique still comes from the file - the table has not been read; {report.UniqueDiffers} would move");
 
         foreach (RatingRow rating in report.Ratings.Where(r => !r.Resolves))
         {
@@ -123,8 +124,8 @@ public sealed class MapDataWindow
         {
             ImGui.TextColored(
                 DimText,
-                $"      {row.Id}: game says {(row.GameUnique ? "unique" : "ordinary")},"
-                + $" file says {(row.FileUnique ? "unique" : "ordinary")}");
+                $"      {row.Id}: {(row.GameUnique ? "unique" : "ordinary")}"
+                + $" - the file said {(row.FileUnique ? "unique" : "ordinary")}");
         }
     }
 
@@ -182,15 +183,12 @@ public sealed class MapDataWindow
                 ImGui.TableNextColumn();
                 Cell(row.InFile ? row.FileName : "-", row.Name is Agreement.Differ or Agreement.GameOnly);
 
+                // What is in force, not which source won: a person reading this row wants to know
+                // whether the tool treats the map as unique, and the disagreement is the colour.
                 ImGui.TableNextColumn();
-                string unique = row.Unique switch
-                {
-                    Agreement.Differ => row.GameUnique ? "game" : "file",
-                    Agreement.Agree when row.GameUnique => "yes",
-                    _ => string.Empty,
-                };
-
-                ImGui.TextColored(row.Unique == Agreement.Differ ? WarnText : DimText, unique);
+                ImGui.TextColored(
+                    row.Unique == Agreement.Differ ? WarnText : DimText,
+                    report.UniqueNow(row) ? "yes" : string.Empty);
 
                 ImGui.TableNextColumn();
                 ImGui.TextColored(DimText, row.Rating?.ToString() ?? string.Empty);

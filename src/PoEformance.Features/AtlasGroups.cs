@@ -28,7 +28,13 @@ namespace PoEformance.Features;
 /// <param name="Colour"><c>#RRGGBB</c> or <c>#AARRGGBB</c>, as everywhere else in the settings.</param>
 /// <param name="Tag">A tag from the game's data. Empty for a group that names its maps instead.</param>
 /// <param name="Maps">Map ids belonging to this group, whatever their tags say.</param>
-/// <param name="Unique">Match every unique map. The catch-all the ordinary maps fall past.</param>
+/// <param name="Unique">
+/// Match every unique map. The catch-all the ordinary maps fall past.
+///
+/// THE GAME DECIDES which those are - WorldAreas.IsUniqueMapArea, once the table has been read;
+/// see <see cref="AtlasMapNames.LearnUnique"/>. data/atlas-maps.json's own column disagrees on six
+/// ids in both directions and is kept only to be compared against.
+/// </param>
 /// <param name="Route">Draw the way there from wherever you can start now.</param>
 /// <param name="MaxHops">
 /// How far away is still worth routing to. Zero means no limit; a route across half an atlas is
@@ -146,6 +152,9 @@ public sealed class AtlasGrouping
 
     private readonly AtlasRatings _ratings;
 
+    /// <summary>Which version of the map table the cached decisions were taken against.</summary>
+    private int _revision;
+
     public AtlasGrouping(IReadOnlyList<AtlasGroup> groups, AtlasMapNames names, AtlasRatings? ratings = null)
     {
         ArgumentNullException.ThrowIfNull(groups);
@@ -178,7 +187,17 @@ public sealed class AtlasGrouping
             return null;
         }
 
-        if (_decided.TryGetValue(mapId, out AtlasGroup? remembered))
+        // THE CACHE OUTLIVES THE FACTS IT WAS BUILT ON, otherwise. The unique flag comes from the
+        // game's own table, which is only reachable through an atlas node - so it arrives AFTER
+        // the first few reads have already decided, and cached, that six maps belong where the
+        // file put them. One int compare per lookup buys the correction; the clear happens once.
+        int revision = _names.Revision;
+        if (revision != _revision)
+        {
+            _revision = revision;
+            _decided.Clear();
+        }
+        else if (_decided.TryGetValue(mapId, out AtlasGroup? remembered))
         {
             return remembered;
         }
