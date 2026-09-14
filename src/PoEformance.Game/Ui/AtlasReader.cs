@@ -1,6 +1,7 @@
 using System.Numerics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
+using PoEformance.Game.Diagnostics;
 
 namespace PoEformance.Game.Ui;
 
@@ -146,6 +147,8 @@ public sealed class AtlasReader
     private readonly int _biome;
     private readonly int _status;
 
+    private readonly AtlasNodeProbe _probe;
+
     public AtlasReader(IMemoryReader reader, OffsetSchema schema, UiElementReader elements)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -191,6 +194,8 @@ public sealed class AtlasReader
         _mapData = data.OffsetOf("MapDataPtr");
         _biome = data.OffsetOf("BiomeId");
         _status = data.OffsetOf("StatusBits");
+
+        _probe = new AtlasNodeProbe(reader, schema, elements);
     }
 
     /// <summary>The atlas panel, or zero when it is not there - which is most of the time.</summary>
@@ -675,6 +680,13 @@ public sealed class AtlasReader
 
         said.AddRange(Agreement(nodes, lines));
         said.AddRange(Chain(nodes));
+
+        // The fields NOTHING here reads, read anyway. They are claims by other projects about
+        // this same client, and a claim about bytes no build touches can never be checked
+        // against a recording - so the probe touches them, once, where a person is already
+        // looking. See AtlasNodeProbe for which claims are open.
+        said.AddRange(_probe.Probe(
+            nodes.ConvertAll(node => new ProbedNode(node.Index, node.Address, node.MapId))));
 
         // Even with the path right, the fingerprints can be the thing that is wrong - and then
         // the panel is found and nothing in it reads as a map. Say where else it could be.
