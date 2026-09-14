@@ -1151,6 +1151,17 @@
         // rule says uncompleted: judge over completed nodes too and MarkerUnique looks like
         // content, because a claimed hideout and a finished unique both read bare. They do keep
         // their rolled content, so a bare node is not simply a node the game stopped filling.
+        // THE HIDEOUT CASE IS CONSUMPTION RATHER THAN COMPLETION, per the owner who plays it: a
+        // claimable hideout is finished by killing everything in it, that unlocks the hideout
+        // CATEGORY for the character, and a category can only ever be earned once. So the marker
+        // is not hidden on a run node - the claimable is SPENT. The captures agree and go further:
+        // MapHideoutFelled_Claimable reads Completed and bare in session-2026-09-atlas.rec and is
+        // then absent from both later captures entirely, while Canal and Limestone keep their
+        // markers throughout. Absence is weaker evidence than presence - the node could have been
+        // outside those reads - so "spent claimables leave the atlas" is consistent and NOT
+        // established. WHETHER THE UNIQUES WORK THE SAME WAY IS UNKNOWN: they behave identically
+        // in every capture, and nobody has checked whether that is the same mechanic or two
+        // mechanics that look alike. Do not write it down as one until somebody has.
         // NONE OF THE FOUR HAS A NAME at BadgeContentName - the slot that holds "Powerful Map
         // Boss" for content id 0x00020064, which is the same 0x0002 category, is NULL on all of
         // them. So these ids can GROUP an atlas with no file at all and cannot LABEL one.

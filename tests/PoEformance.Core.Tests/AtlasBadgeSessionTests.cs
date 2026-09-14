@@ -30,7 +30,10 @@ namespace PoEformance.Core.Tests;
 /// that decides whether the rule works at all: the claimed MapHideoutFelled_Claimable carries
 /// nothing while five unclaimed Canal hideouts carry 0x203E9, and every Completed unique reads
 /// bare beside its Locked twin. Judge the badges over completed nodes too and the unique marker
-/// looks like content.
+/// looks like content. For the hideouts the reason is CONSUMPTION rather than completion -
+/// finishing a claimable unlocks that hideout category for the character, once and for good - so
+/// the claimable is spent rather than merely run. The uniques behave the same way; whether it is
+/// the same mechanic is unknown and deliberately not written down as though it were.
 ///
 /// Run over three captures on purpose. One capture cannot tell a stable badge from a map that
 /// happens to have one node, and the atlas is re-rolled between them - so an id that holds in all
