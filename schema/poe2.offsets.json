@@ -1169,8 +1169,24 @@
         // NONE OF THE FOUR HAS A NAME at BadgeContentName - the slot that holds "Powerful Map
         // Boss" for content id 0x00020064, which is the same 0x0002 category, is NULL on all of
         // them. So these ids can GROUP an atlas with no file at all and cannot LABEL one.
-        "MarkerQuest": "0x20000",
-        "MarkerClaimableHideout": "0x203E9",
+        // TWO OF THE NAMES WERE WRONG AND THE MISTAKE IS INSTRUCTIVE. MarkerGate was called
+        // MarkerQuest and MarkerClaimable was called MarkerClaimableHideout, on three captures
+        // where the first sat only on *_Quest maps and the second only on MapHideout*_Claimable -
+        // with, the tests said, ZERO false positives. A fourth capture broke both: 0x20000 turned
+        // up on ExpeditionSubArea_MedvedBoss and 0x203E9 on four ExpeditionLogBook_* areas. The
+        // three captures simply contained no Expedition nodes, so "nothing else carries it" was a
+        // fact about the captures and not about the game - the same trap this file warns about for
+        // reference projects, sprung on our own recordings. What survives is the direction that
+        // was actually checkable: every *_Quest node carries 0x20000 and every *_Claimable node
+        // carries 0x203E9. The converse never was.
+        // WHAT THEY ARE, as far as measurement goes: the *_Quest maps carrying 0x20000 sit on
+        // atlas positions whose passives are AtlasRedLock1, AtlasRedLock2, AtlasYellowLock1 and
+        // AtlasYellowLock2 - the tier LOCKS - so gate is the best-supported word and the
+        // Expedition boss fits it. 0x203E9 is carried by claimable hideouts and Expedition
+        // logbooks alike, both areas entered once for a one-off reward; that is a description of
+        // the membership rather than a meaning, and it is deliberately left at that.
+        "MarkerGate": "0x20000",
+        "MarkerClaimable": "0x203E9",
         "MarkerUnique": "0x203EB",
         "MarkerUniqueOther": "0x203EA"
       }

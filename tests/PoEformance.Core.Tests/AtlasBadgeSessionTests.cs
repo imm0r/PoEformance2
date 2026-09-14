@@ -8,7 +8,7 @@ using PoEformance.Game.World;
 namespace PoEformance.Core.Tests;
 
 /// <summary>
-/// What the icons over the atlas actually are, across all THREE real 0.5.5 captures.
+/// What the icons over the atlas actually are, across all FIVE real 0.5.5 captures.
 /// </summary>
 /// <remarks>
 /// THE QUESTION THIS ANSWERS was put the obvious way round: the game draws an icon over many maps
@@ -20,11 +20,22 @@ namespace PoEformance.Core.Tests;
 /// MapPit reads eight distinct badge sets in one capture - so no property of the MAP can be read
 /// off them, and a tags column least of all.
 ///
-/// EXACTLY FOUR are the map, the same four on every capture, and nothing else ever qualifies:
-///   0x00020000  the QUEST marker, on the _Quest maps and on nothing else
-///   0x000203E9  the CLAIMABLE HIDEOUT
+/// FOUR are the map, on every capture:
+///   0x00020000  a GATE. Its carriers sit on atlas positions whose passives are AtlasRedLock1/2
+///               and AtlasYellowLock1/2 - the tier locks - and one Expedition boss sub-area.
+///   0x000203E9  claimable hideouts AND Expedition logbooks, which is a membership rather than
+///               a meaning, and is left as one.
 ///   0x000203EB  a UNIQUE map
 ///   0x000203EA  a second unique marker, only ever on MapUniqueMerchant03_Raft
+///
+/// TWO OF THOSE NAMES WERE WRONG UNTIL THE FOURTH CAPTURE, and the way they were wrong is the
+/// reason this class now runs over every fixture there is. On the first three, 0x20000 sat only on
+/// *_Quest maps and 0x203E9 only on MapHideout*_Claimable - and these tests asserted, and passed,
+/// that NOTHING ELSE carried them. Then a capture with Expedition nodes showed 0x20000 on
+/// ExpeditionSubArea_MedvedBoss and 0x203E9 on four ExpeditionLogBook_* areas. The three captures
+/// had simply never contained one. "Nothing else carries it" was a fact about the recordings, not
+/// about the game, and only the other direction - every *_Quest node carries 0x20000, every
+/// *_Claimable carries 0x203E9 - was ever checkable. That is what is asserted now.
 ///
 /// AND A COMPLETED NODE DROPS ITS MARKER, which is the part that cannot be guessed and the part
 /// that decides whether the rule works at all: the claimed MapHideoutFelled_Claimable carries
@@ -41,10 +52,10 @@ namespace PoEformance.Core.Tests;
 /// </remarks>
 public class AtlasBadgeSessionTests
 {
-    /// <summary>The quest marker - the exclamation mark the game draws over a quest map.</summary>
-    private const uint Quest = 0x0002_0000;
+    /// <summary>A gate. Named for the AtlasRedLock/AtlasYellowLock passives its carriers sit on.</summary>
+    private const uint Gate = 0x0002_0000;
 
-    /// <summary>The claimable hideout, which is what data/atlas-maps.json tags "hideout".</summary>
+    /// <summary>Claimable hideouts and Expedition logbooks alike. See the class remarks.</summary>
     private const uint Claimable = 0x0002_03E9;
 
     /// <summary>A unique map.</summary>
@@ -53,11 +64,21 @@ public class AtlasBadgeSessionTests
     /// <summary>The second unique marker. Only one map has ever shown it.</summary>
     private const uint UniqueOther = 0x0002_03EA;
 
+    /// <summary>
+    /// EVERY capture, and the two at the end are why the class remarks read as they do.
+    /// </summary>
+    /// <remarks>
+    /// The first three were the whole evidence once, and on them two of these markers looked
+    /// exclusive to one kind of map. They are not; those three simply held no Expedition node.
+    /// Leaving a fixture out of this list is how that mistake was made, so new captures go in.
+    /// </remarks>
     public static TheoryData<string> Captures =>
     [
         "session-2026-09-atlas.rec",
         "session-2026-09-worldareas.rec",
         "session-2026-09-catalogue.rec",
+        "session-2026-09-atlasrows.rec",
+        "session-2026-09-atlastext.rec",
     ];
 
     private static DirectoryInfo Root
@@ -113,37 +134,57 @@ public class AtlasBadgeSessionTests
 
     [Theory]
     [MemberData(nameof(Captures))]
-    public void TheQuestMarkerIsABadgeAndItIsExactlyTheQuestMaps(string fixture)
+    public void EveryQuestMapCarriesTheGateMarker(string fixture)
     {
-        // The reading that turns "the game shows an exclamation mark" into something readable.
-        // Both halves are needed: every live _Quest node carries it, and NO other node does - a
-        // marker merely common on quest maps would pass the first check alone.
+        // ONE DIRECTION ONLY, and the missing half is the point. This used to assert that no other
+        // node carries it, which held on three captures and was refuted by the fourth - see the
+        // class remarks. A capture with no _Quest node at all is fine and says nothing either way.
         using ReplayMemoryReader replay = Load(fixture);
-        List<AtlasNode> nodes = Nodes(replay);
 
-        List<AtlasNode> quests = [.. Live(nodes).Where(n => n.MapId.EndsWith("_Quest", StringComparison.Ordinal))];
-        Assert.NotEmpty(quests);
-        Assert.All(quests, node => Assert.Contains(Quest, node.BadgeIds));
-        Assert.DoesNotContain(
-            nodes,
-            node => node.BadgeIds.Contains(Quest) && !node.MapId.EndsWith("_Quest", StringComparison.Ordinal));
+        List<AtlasNode> quests = [.. Live(Nodes(replay)).Where(n => n.MapId.EndsWith("_Quest", StringComparison.Ordinal))];
+        Assert.All(quests, node => Assert.Contains(Gate, node.BadgeIds));
     }
 
     [Theory]
     [MemberData(nameof(Captures))]
-    public void TheClaimableHideoutIsOneToo(string fixture)
+    public void AndTheGateMarkerIsNotConfinedToThem(string fixture)
     {
-        // Same shape, and it matters more than the quest one: this is the only curated tag in
-        // data/atlas-maps.json that the game turns out to mark on the node itself.
+        // The refutation, kept as a test so the narrower claim cannot creep back: every carrier is
+        // either a _Quest map or an Expedition sub-area, and at least one capture has the latter.
         using ReplayMemoryReader replay = Load(fixture);
-        List<AtlasNode> nodes = Nodes(replay);
+        List<AtlasNode> carrying = [.. Nodes(replay).Where(n => n.BadgeIds.Contains(Gate))];
 
-        List<AtlasNode> claimables = [.. Live(nodes).Where(n => n.MapId.Contains("Hideout", StringComparison.Ordinal))];
-        Assert.NotEmpty(claimables);
+        Assert.All(carrying, node => Assert.True(
+            node.MapId.EndsWith("_Quest", StringComparison.Ordinal)
+                || node.MapId.StartsWith("Expedition", StringComparison.Ordinal),
+            $"{node.MapId} carries the gate marker and is neither a _Quest map nor an Expedition area"));
+    }
+
+    [Theory]
+    [MemberData(nameof(Captures))]
+    public void EveryClaimableHideoutCarriesTheClaimableMarker(string fixture)
+    {
+        // Again one direction. The other was refuted by four ExpeditionLogBook_* areas carrying
+        // the same marker, so what it means is wider than the hideouts that first showed it.
+        using ReplayMemoryReader replay = Load(fixture);
+
+        List<AtlasNode> claimables = [.. Live(Nodes(replay)).Where(n => n.MapId.Contains("Hideout", StringComparison.Ordinal))];
         Assert.All(claimables, node => Assert.Contains(Claimable, node.BadgeIds));
-        Assert.DoesNotContain(
-            nodes,
-            node => node.BadgeIds.Contains(Claimable) && !node.MapId.Contains("Hideout", StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [MemberData(nameof(Captures))]
+    public void AndTheClaimableMarkerCoversExpeditionLogbooksToo(string fixture)
+    {
+        // The refutation as a test. Both kinds are areas entered once for a one-off reward, which
+        // is a description of who carries it and deliberately not a claim about what it means.
+        using ReplayMemoryReader replay = Load(fixture);
+        List<AtlasNode> carrying = [.. Nodes(replay).Where(n => n.BadgeIds.Contains(Claimable))];
+
+        Assert.All(carrying, node => Assert.True(
+            node.MapId.Contains("Hideout", StringComparison.Ordinal)
+                || node.MapId.StartsWith("ExpeditionLogBook", StringComparison.Ordinal),
+            $"{node.MapId} carries the claimable marker and is neither a hideout nor a logbook"));
     }
 
     [Theory]
@@ -158,7 +199,7 @@ public class AtlasBadgeSessionTests
 
         List<AtlasNode> done = [.. nodes.Where(n => n.State == AtlasNodeState.Completed)];
         Assert.NotEmpty(done);
-        foreach (uint marker in new[] { Quest, Claimable, Unique, UniqueOther })
+        foreach (uint marker in new[] { Gate, Claimable, Unique, UniqueOther })
         {
             Assert.DoesNotContain(done, node => node.BadgeIds.Contains(marker));
         }
@@ -169,21 +210,30 @@ public class AtlasBadgeSessionTests
 
     [Theory]
     [MemberData(nameof(Captures))]
-    public void TheProbeFindsExactlyThoseFourWithoutBeingToldWhichIdsToLookFor(string fixture)
+    public void NothingOutsideTheKnownFourIsEverStable(string fixture)
     {
         // The probe carries no list of special ids - it measures "every uncompleted node of every
-        // map that carries this carries it" and reports whatever passes. That the same four come
-        // out on all three captures, and nothing else ever does, is what says the rule is the
-        // right one; it is also what will surface a marker a later league adds with no edit here.
+        // map that carries this carries it" and reports whatever passes. The invariant worth
+        // asserting is therefore NOT that all four turn up in every capture; a capture with no
+        // unique node on screen has nothing to say about the unique markers, and demanding it
+        // repeats the mistake in the class remarks. What holds everywhere is the other way round:
+        // whatever DOES come out stable is one of the four, so a fifth would fail here and be
+        // found rather than quietly assumed away.
         using ReplayMemoryReader replay = Load(fixture);
-        string said = Probe(replay, Nodes(replay));
+        List<AtlasNode> nodes = Nodes(replay);
+        string said = Probe(replay, nodes);
 
-        foreach (uint id in new[] { Quest, Claimable, Unique, UniqueOther })
-        {
-            Assert.Contains("STABLE", LineFor(said, id), StringComparison.Ordinal);
-        }
+        uint[] known = [Gate, Claimable, Unique, UniqueOther];
+        List<string> stable = [.. said.Split('\n').Where(line => line.Contains("STABLE", StringComparison.Ordinal))];
+        Assert.NotEmpty(stable);
+        Assert.All(stable, line => Assert.Contains(
+            known,
+            id => line.Contains($"0x{id:X8}", StringComparison.Ordinal)));
 
-        Assert.Equal(4, said.Split('\n').Count(line => line.Contains("STABLE", StringComparison.Ordinal)));
+        // Deliberately NOT asserted: that a marker present in a capture is stable in it. It often
+        // is not - 0x203E9 appears in session-2026-09-atlastext.rec without qualifying - and the
+        // whole lesson of this class is that a capture answers only what it happens to contain.
+        Assert.NotEmpty(nodes);
     }
 
     [Theory]
@@ -198,11 +248,10 @@ public class AtlasBadgeSessionTests
         List<AtlasNode> nodes = Nodes(replay);
 
         List<AtlasNode> marked = [.. nodes.Where(n => n.BadgeIds.Contains(Unique) || n.BadgeIds.Contains(UniqueOther))];
-        Assert.NotEmpty(marked);
         Assert.All(marked, node => Assert.Contains("Unique", node.MapId, StringComparison.Ordinal));
 
+        // Conditional on the capture having the node at all - see NothingOutsideTheKnownFourIsEverStable.
         List<AtlasNode> reactor = [.. Live(nodes).Where(n => n.MapId == "MapUniqueReactor_04")];
-        Assert.NotEmpty(reactor);
         Assert.All(reactor, node =>
         {
             Assert.DoesNotContain(Unique, node.BadgeIds);
@@ -250,7 +299,7 @@ public class AtlasBadgeSessionTests
         using ReplayMemoryReader replay = Load("session-2026-09-catalogue.rec");
         string said = Probe(replay, Nodes(replay));
 
-        int at = said.IndexOf($"0x{Quest:X8}", StringComparison.Ordinal);
+        int at = said.IndexOf($"0x{Gate:X8}", StringComparison.Ordinal);
         string block = said[at..];
         int next = block.IndexOf("\n  0x", StringComparison.Ordinal);
         block = next > 0 ? block[..next] : block;
