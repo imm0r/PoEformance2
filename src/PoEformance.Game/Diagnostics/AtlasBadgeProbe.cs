@@ -33,10 +33,11 @@ namespace PoEformance.Game.Diagnostics;
 /// and every Completed unique reads bare beside its Locked twin. Counting completed nodes would
 /// therefore report the unique marker as content, which is the wrong answer arrived at honestly.
 ///
-/// For the hideouts that is CONSUMPTION and not merely completion - finishing a claimable unlocks
-/// the hideout category for the character, and a category can only be earned once - so the marker
-/// is gone because the claimable is spent. Whether the uniques work the same way is unknown; they
-/// only behave the same. See the AtlasNode marker consts in the schema.
+/// And the marker is the NODE rather than the entitlement, which the game mechanic disguises:
+/// finishing a claimable hideout unlocks that category for the character once and for good, so
+/// "the marker means this hideout is still unclaimed" is the natural guess and it is wrong. The
+/// owner already held Canal and Limestone when the last capture was taken, and six Canal
+/// claimables in it are still marked. Running THAT node is what clears it.
 ///
 /// It costs almost nothing: the badge ids come from the reader, which has just read them, and the
 /// only memory this touches is one badge child per DISTINCT id - a handful of reads, not a
