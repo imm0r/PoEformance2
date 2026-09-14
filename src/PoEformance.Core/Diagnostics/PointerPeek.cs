@@ -106,7 +106,10 @@ public static class PointerPeek
     /// <summary>Most rows a table is believed to have. Beyond this the containers are garbage.</summary>
     private const long MostRows = 2_000_000;
 
-    /// <summary>And the biggest row. WorldAreas' 0x300 is the largest this game is known to have.</summary>
+    /// <summary>
+    /// And the biggest row. WorldAreas' 0x2E0 is the largest this game is known to have -
+    /// measured off the table itself in 2026-09, where an older note here guessed 0x300.
+    /// </summary>
     private const int LargestRow = 0x1000;
 
     /// <summary>Longest table path taken seriously.</summary>
