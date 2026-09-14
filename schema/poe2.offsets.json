@@ -1133,7 +1133,31 @@
         "BadgeRowToContentId": "100",
         "ContentTokenPairStride": "2",
         "CompletedBit": "0x02",
-        "AccessibleBit": "0x01"
+        "AccessibleBit": "0x01",
+
+        // ── FOUR BADGES MARK THE MAP; EVERY OTHER BADGE MARKS THE ROLL ──
+        // MEASURED over three whole captures (session-2026-09-{atlas,worldareas,catalogue}.rec,
+        // 2026-09-14, AtlasBadgeSessionTests). The question was whether the icon the game draws
+        // over a node could supply what data/atlas-maps.json calls tags, and the answer is mostly
+        // no and precisely yes: most badges are the node's CONTENT and move between nodes of the
+        // same map - MapPit reads EIGHT distinct badge sets across its nodes in one capture, so
+        // nothing per-MAP can be read off them. Exactly these four behave the other way, on all
+        // three captures, and no other id ever does.
+        // THE TEST IS COMPUTED, NOT LISTED: a badge marks the map when every UNCOMPLETED node of
+        // every map carrying it carries it. AtlasBadgeProbe applies that rule and reports whatever
+        // passes, so a marker a later league adds turns up without this list being edited - these
+        // consts are the answer, not the question.
+        // A COMPLETED NODE DROPS ITS MARKER, without exception on any capture. That is why the
+        // rule says uncompleted: judge over completed nodes too and MarkerUnique looks like
+        // content, because a claimed hideout and a finished unique both read bare. They do keep
+        // their rolled content, so a bare node is not simply a node the game stopped filling.
+        // NONE OF THE FOUR HAS A NAME at BadgeContentName - the slot that holds "Powerful Map
+        // Boss" for content id 0x00020064, which is the same 0x0002 category, is NULL on all of
+        // them. So these ids can GROUP an atlas with no file at all and cannot LABEL one.
+        "MarkerQuest": "0x20000",
+        "MarkerClaimableHideout": "0x203E9",
+        "MarkerUnique": "0x203EB",
+        "MarkerUniqueOther": "0x203EA"
       }
     },
 

@@ -12,7 +12,23 @@ namespace PoEformance.Game.Diagnostics;
 /// reader does not decode, so taking its record would tie a diagnostic to the shape of the
 /// thing it is meant to check.
 /// </remarks>
-public readonly record struct ProbedNode(int Index, ulong Element, string MapId);
+/// <param name="BadgeIds">
+/// The badge ids the reader already resolved for this node, when the caller has them. Passed in
+/// rather than re-read because <see cref="AtlasBadgeProbe"/> needs them for EVERY node and
+/// walking a thousand nodes' children a second time would double the cost of a read the reader
+/// just performed. Empty means "not supplied", which that probe reports rather than assumes.
+/// </param>
+/// <param name="Completed">
+/// Whether the map has been run. It belongs here because a COMPLETED NODE DROPS ITS MARKER -
+/// measured on all three captures - so a badge's behaviour can only be judged over the nodes
+/// that still show one. See <see cref="AtlasBadgeProbe"/>.
+/// </param>
+public readonly record struct ProbedNode(
+    int Index,
+    ulong Element,
+    string MapId,
+    IReadOnlyList<uint>? BadgeIds = null,
+    bool Completed = false);
 
 /// <summary>
 /// Reads the parts of an atlas node NOTHING ELSE READS, so that a recording can settle them.

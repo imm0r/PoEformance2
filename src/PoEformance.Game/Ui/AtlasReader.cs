@@ -149,6 +149,7 @@ public sealed class AtlasReader
 
     private readonly AtlasNodeProbe _probe;
     private readonly WorldAreaRowProbe _areas;
+    private readonly AtlasBadgeProbe _badges;
 
     public AtlasReader(IMemoryReader reader, OffsetSchema schema, UiElementReader elements)
     {
@@ -198,6 +199,7 @@ public sealed class AtlasReader
 
         _probe = new AtlasNodeProbe(reader, schema, elements);
         _areas = new WorldAreaRowProbe(reader, schema);
+        _badges = new AtlasBadgeProbe(reader, schema, elements);
     }
 
     /// <summary>The atlas panel, or zero when it is not there - which is most of the time.</summary>
@@ -688,12 +690,17 @@ public sealed class AtlasReader
         // against a recording - so the probe touches them, once, where a person is already
         // looking. See AtlasNodeProbe for which claims are open.
         List<ProbedNode> probed = nodes.ConvertAll(
-            node => new ProbedNode(node.Index, node.Address, node.MapId));
+            node => new ProbedNode(
+                node.Index, node.Address, node.MapId, node.BadgeIds, node.State == AtlasNodeState.Completed));
         said.AddRange(_probe.Probe(probed));
 
         // And one hop past that: the WorldAreas row each map sits on, which is where the data
         // this tool carries in a file would have to come from instead. See WorldAreaRowProbe.
         said.AddRange(_areas.Probe(probed));
+
+        // The badges the same way: which of them mark the MAP rather than the roll, which is the
+        // other place the file's curated words could come from. See AtlasBadgeProbe.
+        said.AddRange(_badges.Probe(probed));
 
         // Even with the path right, the fingerprints can be the thing that is wrong - and then
         // the panel is found and nothing in it reads as a map. Say where else it could be.
