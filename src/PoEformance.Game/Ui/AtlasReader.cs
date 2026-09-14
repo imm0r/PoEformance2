@@ -150,6 +150,7 @@ public sealed class AtlasReader
     private readonly AtlasNodeProbe _probe;
     private readonly WorldAreaRowProbe _areas;
     private readonly AtlasBadgeProbe _badges;
+    private readonly AtlasRowProbe _rows;
 
     public AtlasReader(IMemoryReader reader, OffsetSchema schema, UiElementReader elements)
     {
@@ -200,6 +201,7 @@ public sealed class AtlasReader
         _probe = new AtlasNodeProbe(reader, schema, elements);
         _areas = new WorldAreaRowProbe(reader, schema);
         _badges = new AtlasBadgeProbe(reader, schema, elements);
+        _rows = new AtlasRowProbe(reader, schema);
     }
 
     /// <summary>The atlas panel, or zero when it is not there - which is most of the time.</summary>
@@ -701,6 +703,11 @@ public sealed class AtlasReader
         // The badges the same way: which of them mark the MAP rather than the roll, which is the
         // other place the file's curated words could come from. See AtlasBadgeProbe.
         said.AddRange(_badges.Probe(probed));
+
+        // And the content row behind every node rather than behind one. See AtlasRowProbe: what
+        // the single sample says about the Passives column cannot be checked without the sweep,
+        // and the objective text beside it is the half worth showing somebody.
+        said.AddRange(_rows.Probe(probed));
 
         // Even with the path right, the fingerprints can be the thing that is wrong - and then
         // the panel is found and nothing in it reads as a map. Say where else it could be.

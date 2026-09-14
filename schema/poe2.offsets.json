@@ -1215,10 +1215,60 @@
     },
 
     "EndgameMapAtlasRow": {
-      "comment": "A row of EndgameMapAtlas.dat - one NODE of the atlas as the game's content defines it, reached through AtlasNodeData.AtlasRowPtr. The table names itself and reports 1242 rows of 0x121, which is exactly what dat-schema computes for its 30 columns; that agreement is what says the column arithmetic below is right rather than plausible. Only the first column is read here, because it is the one that leads somewhere this tool wanted to go. The rest, for whoever needs it next: Map (EndgameMaps) at +0x10, Biome (EndgameMapBiomes) at +0x24, Stats at +0x48 and StatValues at +0x58 - the node's own content, as against the rolled map's.",
+      "comment": "A row of EndgameMapAtlas.dat - one POSITION on the endgame atlas as the game's content defines it, reached through AtlasNodeData.AtlasRowPtr. The table names itself and reports 1242 rows of 0x121, exactly what dat-schema computes for its 30 columns; that agreement is what says the arithmetic below is right rather than plausible, and it is the same agreement WorldAreas (0x2E0) and EndgameMaps (0xF1) give. WHAT THIS TABLE IS was got wrong twice before it was got right, so the reasoning is written down. It is NOT the Atlas Skills tree, though two of its columns reach into one: SubTree points at AtlasPassiveSkillSubTrees, whose UI_Image, UI_Background, IllustrationX/Y and CounterX/CounterY are plainly the circular panels and their 9/19-style counters on that screen. That pair is what made the skill-tree reading tempting. The other twenty-eight columns settle it the other way - Map, Biome, BiomeGroundType, MapPin (with a separate pin for unavailable/available/active/failed/complete), MapDecoration1 and 2, MapObjective, Quest, BlockedMessage, and a self-reference at +0xBB that is presumably how positions link to each other. Those describe a place on a map, not a node in a passive tree. WHAT THE Passives LINK MEANS IS STILL UNKNOWN. One sample exists - MapRugosa's position points at AtlasOutsideFortressPath72, a PATH node, the anonymous filler kind whose name is a [DNT] placeholder because nothing displays it - and one sample cannot say whether that holds across the atlas or whether +0x2A0 even reaches this table on most nodes. AtlasRowProbe sweeps it for exactly that reason.",
       "fields": {
-        "PassivesRef": { "offset": "0x00", "type": "ptr", "comment": "Passives -> PassiveSkills. A 16-byte foreign reference, so the row is here and its table at +0x08 - which is how the table got named instead of guessed." }
-      }
+        "PassivesRef": { "offset": "0x00", "type": "ptr", "comment": "Passives -> PassiveSkills. A 16-byte foreign reference, so the row is here and its table at +0x08 - which is how the table got named instead of guessed." },
+        "MapRef": { "offset": "0x10", "type": "ptr", "comment": "Map -> EndgameMaps, an ARRAY (count then pointer, like WorldAreaDat.TagsArray): which maps can roll at this position. Not read yet - the rolled map comes off the node's own MapDataPtr, and this is the set it was drawn from." },
+        "BiomeRef": { "offset": "0x24", "type": "ptr", "comment": "Biome -> EndgameMapBiomes, an array. AtlasNodeData.BiomeId is the byte the tool reads instead; this is the content-side definition." },
+        "StatsRef": { "offset": "0x48", "type": "ptr", "comment": "Stats -> Stats, an array, paired with StatValues below. What this POSITION grants, as against what the rolled map does." },
+        "StatValuesArray": { "offset": "0x58", "type": "ptr", "comment": "StatValues, an i32 array running parallel to StatsRef." },
+        "MapPinRef": { "offset": "0x68", "type": "ptr", "comment": "MapPin -> EndgameMapPins, which carries five separate pin animations - unavailable, available, active, failed, complete. The game's own answer to 'what icon belongs on this node in this state'." },
+        "BlockedMessageRef": { "offset": "0x7C", "type": "ptr", "comment": "BlockedMessage -> ClientStrings2: why this position cannot be entered, in the client's language. Worth reading precisely because a tool cannot invent it." },
+        "SubTreeRef": { "offset": "0x8F", "type": "ptr", "comment": "SubTree -> AtlasPassiveSkillSubTrees. The link to the Atlas Skills screen; see the struct comment for why that does not make this table a skill tree." },
+        "MapObjectiveRef": { "offset": "0xA7", "type": "ptr", "comment": "MapObjective -> EndgameMapObjectives, which holds ObjectiveText and CompletionText. The most promising column here for anything that wants to SHOW something: what this node wants of you, written by the game and localised by it." },
+        "QuestRef": { "offset": "0xF3", "type": "ptr", "comment": "Quest -> Quest. A second, independent route to the quest marker the badge 0x20000 already names - see the AtlasNode marker consts." },
+        "ClientStringRef": { "offset": "0x10D", "type": "ptr", "comment": "A second ClientStrings2 reference, unnamed in dat-schema. Read by the probe because an unnamed column with a string behind it is cheap to look at and impossible to guess." }
+      },
+      "consts": { "ComputedRowSize": "0x121" }
+    },
+
+    "EndgameMapObjectivesRow": {
+      "comment": "A row of EndgameMapObjectives.dat, reached through EndgameMapAtlasRow.MapObjectiveRef. Five columns, computed to 0x30 - NOT yet checked against a table that states its own size, so treat these as arithmetic until AtlasRowProbe brings back a capture that names the table. The draw here is ObjectiveText and CompletionText: the game's own words for what a node asks of a player, in whatever language the client runs.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr" },
+        "ObjectiveTextPtr": { "offset": "0x08", "type": "ptr" },
+        "CompletionTextPtr": { "offset": "0x10", "type": "ptr" },
+        "ContentIconPtr": { "offset": "0x18", "type": "ptr" }
+      },
+      "consts": { "ComputedRowSize": "0x30" }
+    },
+
+    "ClientStrings2Row": {
+      "comment": "A row of ClientStrings2.dat - the game's localised UI strings, reached from EndgameMapAtlasRow.BlockedMessageRef and ClientStringRef. Computed to 0x34 over seven columns and unverified against a live table, same caveat as EndgameMapObjectivesRow. Id is the engine key and Text the sentence a player sees.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr" },
+        "TextPtr": { "offset": "0x08", "type": "ptr" }
+      },
+      "consts": { "ComputedRowSize": "0x34" }
+    },
+
+    "AtlasSubTreeRow": {
+      "comment": "A row of AtlasPassiveSkillSubTrees.dat - one of the circular panels on the ATLAS SKILLS screen, reached through EndgameMapAtlasRow.SubTreeRef. Computed to 0x74 over fourteen columns, unverified live. This struct is here for identification rather than for use: UI_Image, UI_Background and the Illustration/Counter coordinates are what identify the panels a player sees, and reading the Id is how a capture can say which sub-tree an atlas position belongs to. THE SKILL TREE ITSELF IS NOT READ BY ANYTHING and would be its own piece of work - the tree's own panel, its nodes, which of them are allocated, and the stats behind each. Worth doing: its notables are real content (\"Evolving Throngs: Adaptation\", a choice of two bonuses applying to level 70+ areas), and PassiveSkillVariants is probably how those two options are modelled. Nothing here gets that; this only names the panel.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr" },
+        "UiImagePtr": { "offset": "0x08", "type": "ptr" },
+        "UiBackgroundPtr": { "offset": "0x10", "type": "ptr" },
+        "DescriptionPtr": { "offset": "0x6C", "type": "ptr" }
+      },
+      "consts": { "ComputedRowSize": "0x74" }
+    },
+
+    "StatsRow": {
+      "comment": "A row of Stats.dat, reached through EndgameMapAtlasRow.StatsRef. Only the Id is wanted: a stat id like map_pack_size_+% is what turns a bare StatValues number into something readable, and this project already carries a stat-name map for the same job elsewhere (data/stat_name_map.tsv). Computed 0x6A over its columns, unverified live.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr" }
+      },
+      "consts": { "ComputedRowSize": "0x6A" }
     },
 
     "PassiveSkillsRow": {
