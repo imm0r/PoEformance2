@@ -196,6 +196,16 @@ public sealed class AtlasWatch
     private float _cursorX;
     private float _cursorY;
 
+    /// <summary>
+    /// WorldAreas read from the game, which is what data/atlas-maps.json would have to stop being.
+    /// </summary>
+    /// <remarks>
+    /// Built on the check rather than on the tick, and once per session: the table is reachable
+    /// only through an atlas node (see WorldAreaCatalogue) and never moves afterwards. Nothing
+    /// draws from it yet - it reports itself beside the file so the difference can be judged.
+    /// </remarks>
+    private readonly WorldAreaCatalogue _catalogue;
+
     public AtlasWatch(
         IMemoryReader reader,
         OffsetSchema schema,
@@ -210,6 +220,7 @@ public sealed class AtlasWatch
         _schema = schema;
         _gameStatesStatic = gameStatesStatic;
         _atlas = new AtlasReader(reader, schema, new UiElementReader(reader, schema));
+        _catalogue = new WorldAreaCatalogue(reader, schema);
         _contents = contents ?? AtlasContentNames.Empty;
         Names = names ?? AtlasMapNames.Empty;
         Ratings = ratings ?? AtlasRatings.Empty;
@@ -636,12 +647,43 @@ public sealed class AtlasWatch
                 return [chain.InGame ? "the UI root did not resolve" : "not in an area - the atlas is read from the interface"];
             }
 
-            return _atlas.Describe(chain.UiRoot, scale);
+            var said = new List<string>(_atlas.Describe(chain.UiRoot, scale));
+            said.AddRange(Catalogue(scale, chain.UiRoot));
+            return said;
         }
         catch (Exception exception)
         {
             return [$"the check itself failed: {exception.Message}"];
         }
+    }
+
+    /// <summary>
+    /// The whole WorldAreas table, read through the first node that names it.
+    /// </summary>
+    /// <remarks>
+    /// On the check because that is where a person is asking, and because the table is worth a
+    /// few hundred reads once rather than none at all on the drawing path. It stays read for the
+    /// session - a dat table is loaded once and never freed - so a second check costs nothing.
+    /// </remarks>
+    private IReadOnlyList<string> Catalogue(UiScale scale, ulong uiRoot)
+    {
+        if (_catalogue.Table is null)
+        {
+            // The nodes the last tick studied, when there are any: a second full read of the
+            // panel here would cost as much as the walk it is only meant to start.
+            IReadOnlyList<AtlasNode> nodes = _studied.Count > 0 ? _studied : _atlas.Read(uiRoot, scale);
+            foreach (AtlasNode node in nodes)
+            {
+                if (node.MapId.Length > 0 && _catalogue.ReadFromNode(node.Address))
+                {
+                    break;
+                }
+            }
+        }
+
+        var said = new List<string> { string.Empty };
+        said.AddRange(_catalogue.Describe(Names));
+        return said;
     }
 
     /// <summary>
