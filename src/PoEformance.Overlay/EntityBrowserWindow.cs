@@ -424,6 +424,18 @@ public sealed class EntityBrowserWindow
             _ => string.Empty,
         };
 
+        // THE ROW THAT IS IN THE LIST AND NOWHERE ELSE. The game keeps listing some things it
+        // has stopped putting in the world - a quest NPC spawned once at a player's first Vaal
+        // chest is still there, fully formed, for the rest of that character's life - and
+        // nothing else on the row hints at it: it is awake, positioned, carries the game's own
+        // minimap icon, and is indistinguishable from an NPC actually standing in front of you.
+        //
+        // Worth a word precisely because the overlay now DROPS these, and a browser that shows
+        // a thing the map does not, with no reason given, is the next hour somebody spends on
+        // a bug that is not one. "absent" rather than "ghost": the other words on this row -
+        // opened, closed, remembered - say what state the thing is in, not what to make of it.
+        string absent = entity.Present == false ? "  absent" : string.Empty;
+
         // Said out loud, because this row's numbers are a RECORDING and its address no longer
         // points at anything: clicking it draws a route to where the thing was, which is
         // useful, while taking it apart in the dissector reads whatever now sits at that
@@ -432,7 +444,7 @@ public sealed class EntityBrowserWindow
             ? $"  remembered {since / 1000}s"
             : string.Empty;
 
-        return life + shield + chest + remembered;
+        return life + shield + chest + absent + remembered;
     }
 
     private void DrawList(List<WorldEntity> listed, WorldEntity? player)
