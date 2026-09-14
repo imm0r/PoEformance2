@@ -31,16 +31,33 @@ public sealed class AtlasRatings
 {
     private readonly IReadOnlyDictionary<string, int> _byId;
 
-    private AtlasRatings(IReadOnlyDictionary<string, int> byId, IReadOnlyList<string> unmatched, int best)
+    private AtlasRatings(
+        IReadOnlyDictionary<string, int> byId,
+        IReadOnlyList<string> unmatched,
+        int best,
+        IReadOnlyList<RatedName> wanted)
     {
         _byId = byId;
         Unmatched = unmatched;
         Best = best;
+        Wanted = wanted;
     }
 
     /// <summary>Nothing rated, which is what a missing file leaves.</summary>
     public static AtlasRatings Empty { get; } =
-        new(new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase), [], 0);
+        new(new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase), [], 0, []);
+
+    /// <summary>
+    /// Every line of the file as written, with the ids each resolved to.
+    /// </summary>
+    /// <remarks>
+    /// KEPT SO THE RESOLUTION CAN BE SHOWN, not merely performed. <see cref="Unmatched"/> already
+    /// named the lines that resolved to nothing, but not what the others landed on - and the
+    /// question worth answering before this file's name column is touched is exactly that: which
+    /// ratings hang on which map, and how many hang on a name that only data/atlas-maps.json
+    /// supplies. See MapDataReport.
+    /// </remarks>
+    public IReadOnlyList<RatedName> Wanted { get; }
 
     /// <summary>How many map ids carry a rating.</summary>
     public int Count => _byId.Count;
@@ -121,6 +138,7 @@ public sealed class AtlasRatings
 
         var byId = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         var unmatched = new List<string>();
+        var wanted = new List<RatedName>(byName.Count);
         int best = 0;
 
         foreach ((string name, int rating) in byName)
@@ -128,6 +146,7 @@ public sealed class AtlasRatings
             if (!idsByName.TryGetValue(name.Trim(), out List<string>? ids))
             {
                 unmatched.Add(name);
+                wanted.Add(new RatedName(name, rating, []));
                 continue;
             }
 
@@ -136,13 +155,21 @@ public sealed class AtlasRatings
                 byId[mapId] = rating;
             }
 
+            wanted.Add(new RatedName(name, rating, [.. ids]));
             best = Math.Max(best, rating);
         }
 
         unmatched.Sort(StringComparer.OrdinalIgnoreCase);
-        return new AtlasRatings(byId, unmatched, best);
+        wanted.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Name, b.Name));
+        return new AtlasRatings(byId, unmatched, best, wanted);
     }
 }
+
+/// <summary>One line of the ratings file, and the map ids it resolved to.</summary>
+/// <param name="Name">The display name as written in the file.</param>
+/// <param name="Rating">What it was rated.</param>
+/// <param name="Ids">Every map id carrying that name. EMPTY means the line resolved to nothing.</param>
+public sealed record RatedName(string Name, int Rating, IReadOnlyList<string> Ids);
 
 /// <summary>The shape of the file on disk: a flat name-to-rating table under one key.</summary>
 /// <remarks>

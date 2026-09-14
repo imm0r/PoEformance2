@@ -556,6 +556,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     // The tools something elsewhere in the overlay jumps to by name.
     private const string UiBrowserTab = "uibrowser";
     private const string DissectorTab = "dissector";
+    private const string MapDataTab = "map-data";
 
     /// <summary>
     /// The pages that hold more than one tool.
@@ -1643,6 +1644,34 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         _atlas.Style = _style;
+    }
+
+    /// <summary>
+    /// Adds the map-data reconciliation: what the game says about every map beside what the
+    /// files say.
+    /// </summary>
+    /// <remarks>
+    /// ON THE INSPECT PAGE and not the atlas one, deliberately. The atlas page is for playing -
+    /// what to draw, where to walk - and this answers a question about the TOOL: whether the
+    /// values it is about to start reading out of memory agree with the ones it has been
+    /// shipping, and what would break if the file were cut. That belongs beside the browsers.
+    ///
+    /// Takes the report and a writer rather than the watch, so nothing here reads memory and the
+    /// app keeps the decision about where a saved file lands.
+    /// </remarks>
+    public void AttachMapData(Func<MapDataReport> report, Func<string, string> save, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(report);
+        ArgumentNullException.ThrowIfNull(save);
+
+        var window = new MapDataWindow(report, save);
+        _tools.Add(
+            105, MapDataTab, "Map Data", window.DrawTab,
+            page: Entities, pageLabel: EntitiesLabel);
+        if (visible)
+        {
+            _tools.Show(MapDataTab);
+        }
     }
 
     /// <summary>

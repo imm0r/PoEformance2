@@ -53,28 +53,65 @@ public sealed record AtlasMapInfo(string Name, bool Unique, IReadOnlyList<string
 /// atlas will therefore be labelled in English while the game beneath it is not - a real
 /// limitation, and the reason to look for the name on the node itself later. Being keyed by id
 /// is what makes that a change of one method rather than of every group.
+///
+/// THE UNIQUE FLAG NO LONGER COMES FROM HERE once the game has been asked. WorldAreas.dat carries
+/// IsUniqueMapArea, it was measured against all 442 rows, and it disagrees with this file on six
+/// ids in both directions - so the game's column is the one in force and this file's is kept only
+/// to be compared against. See <see cref="LearnUnique"/>, and MapDataReport for the comparison.
 /// </remarks>
 public sealed class AtlasMapNames
 {
-    private readonly IReadOnlyDictionary<string, AtlasMapInfo> _maps;
+    /// <summary>What the file says. Never changes, so the report can still show it.</summary>
+    private readonly IReadOnlyDictionary<string, AtlasMapInfo> _file;
 
-    private AtlasMapNames(IReadOnlyDictionary<string, AtlasMapInfo> maps) => _maps = maps;
+    /// <summary>What is IN FORCE. The same object as the file until the game corrects it.</summary>
+    private IReadOnlyDictionary<string, AtlasMapInfo> _live;
+
+    private int _revision;
+
+    private AtlasMapNames(IReadOnlyDictionary<string, AtlasMapInfo> maps)
+    {
+        _file = maps;
+        _live = maps;
+    }
 
     /// <summary>Nothing known, which is what a missing file leaves.</summary>
-    public static AtlasMapNames Empty { get; } = new(new Dictionary<string, AtlasMapInfo>(StringComparer.OrdinalIgnoreCase));
+    /// <remarks>
+    /// A FRESH ONE EACH TIME, not a singleton, and that stopped being a detail the moment
+    /// <see cref="LearnUnique"/> existed: a shared instance that anything can teach is one that
+    /// carries a client's table into every other holder of it, tests included. Nothing compares
+    /// these by reference, and the allocation is an empty dictionary on a construction path.
+    /// </remarks>
+    public static AtlasMapNames Empty => new(new Dictionary<string, AtlasMapInfo>(StringComparer.OrdinalIgnoreCase));
 
-    /// <summary>How many maps are described.</summary>
-    public int Count => _maps.Count;
+    /// <summary>How many maps the FILE describes.</summary>
+    public int Count => _file.Count;
 
     /// <summary>
-    /// Every map, by id. For anything that has to go the other way - name to id.
+    /// Every map the FILE lists, by id. For anything that has to go the other way - name to id.
     /// </summary>
     /// <remarks>
     /// Exposed rather than offering a name lookup here, because a name is not a key: several
     /// ids share one, and the caller has to decide what that means for it. The ratings want all
     /// of them; something else might want the first.
+    ///
+    /// THE FILE, deliberately, and not what <see cref="Of"/> answers. The two part company once
+    /// the game has spoken, and the callers of this one - the ratings' name lookup, and the report
+    /// that compares the two sources - both want the file's word specifically. A reconciliation
+    /// built on a table that had already been corrected would report that everything agrees.
     /// </remarks>
-    public IReadOnlyDictionary<string, AtlasMapInfo> All => _maps;
+    public IReadOnlyDictionary<string, AtlasMapInfo> All => _file;
+
+    /// <summary>
+    /// How many times the game has corrected this file. Nought means the file alone is in force.
+    /// </summary>
+    /// <remarks>
+    /// A version rather than a flag, so anything CACHING an answer from <see cref="Of"/> can tell
+    /// that its cache is stale without being told. <see cref="AtlasGrouping"/> is the one that
+    /// needs it: it decides a map's group once per id and would otherwise keep a decision taken
+    /// before the game was asked, for the whole session.
+    /// </remarks>
+    public int Revision => Volatile.Read(ref _revision);
 
     /// <summary>
     /// What is known about a map id, or <see cref="AtlasMapInfo.Unknown"/> when it is new.
@@ -82,9 +119,70 @@ public sealed class AtlasMapNames
     /// <remarks>
     /// Never null. A league adds maps this file has not heard of, and the answer to that is a
     /// node drawn with its raw id rather than a node missing from the atlas.
+    ///
+    /// ONE LOOKUP, not two, which is why <see cref="LearnUnique"/> merges up front rather than
+    /// consulting the game's table here: this is asked for every node of a few-hundred-node atlas
+    /// on every read, and the merge happens once in a session.
     /// </remarks>
     public AtlasMapInfo Of(string? mapId)
-        => mapId is { Length: > 0 } && _maps.TryGetValue(mapId, out AtlasMapInfo? found) ? found : AtlasMapInfo.Unknown;
+        => mapId is { Length: > 0 } && Volatile.Read(ref _live).TryGetValue(mapId, out AtlasMapInfo? found)
+            ? found
+            : AtlasMapInfo.Unknown;
+
+    /// <summary>
+    /// Takes the game's own IsUniqueMapArea for every area it lists, and returns how many maps
+    /// that moved.
+    /// </summary>
+    /// <remarks>
+    /// WHY THE GAME WINS. Both columns were read over the whole 442-row table and they disagree on
+    /// six ids in both directions: the game calls ExpeditionLeagueBoss, RitualLeagueBoss,
+    /// MapVoidReliquary and Map_HildaCampsite unique where the file does not, and calls
+    /// MapUniqueInitialTower and MapUniqueReactor_04 ordinary where the file says unique. The file
+    /// is a hand-maintained port; the column is what the client itself decides with. There is no
+    /// version of this where the hand-maintained copy is the better source.
+    ///
+    /// NAMES AND TAGS ARE LEFT ALONE. The names in the table are in the CLIENT'S language and this
+    /// file's are English on purpose - the ratings resolve through them - and the tags share no
+    /// vocabulary with the curated words at all. Only the flag that was measured to be better moves.
+    ///
+    /// AN AREA THE FILE HAS NEVER HEARD OF still gets an entry, with no name and no tags, so that
+    /// a new league's unique map falls into the unique group instead of past it. Its name stays
+    /// empty, so <see cref="Called"/> goes on showing the raw id and it is still visible as new.
+    /// </remarks>
+    /// <param name="areas">WorldAreas as read from memory, or empty when it has not been.</param>
+    public int LearnUnique(IReadOnlyDictionary<string, WorldArea> areas)
+    {
+        ArgumentNullException.ThrowIfNull(areas);
+
+        if (areas.Count == 0)
+        {
+            return 0;
+        }
+
+        var live = new Dictionary<string, AtlasMapInfo>(_file.Count, StringComparer.OrdinalIgnoreCase);
+        int moved = 0;
+        foreach ((string id, AtlasMapInfo info) in _file)
+        {
+            bool unique = areas.TryGetValue(id, out WorldArea? area) ? area.IsUnique : info.Unique;
+            live[id] = unique == info.Unique ? info : info with { Unique = unique };
+            moved += unique == info.Unique ? 0 : 1;
+        }
+
+        foreach ((string id, WorldArea area) in areas)
+        {
+            if (area.IsUnique && !live.ContainsKey(id))
+            {
+                live[id] = new AtlasMapInfo(string.Empty, true, []);
+                moved++;
+            }
+        }
+
+        // Published even when nothing moved: the revision is what says the game HAS been asked,
+        // and a client where the two happen to agree is not a client where nothing was learned.
+        Volatile.Write(ref _live, live);
+        Interlocked.Increment(ref _revision);
+        return moved;
+    }
 
     /// <summary>The name to show for a map: the known one, or its raw id when it is new.</summary>
     /// <remarks>

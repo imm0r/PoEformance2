@@ -184,12 +184,33 @@ public sealed class AtlasWatch
     private long _studiedAt;
     private int _studiedCount = -1;
 
+    /// <summary>
+    /// Every map id this session has actually seen on an atlas, which only ever grows.
+    /// </summary>
+    /// <remarks>
+    /// NOT the last study's nodes, which is what this used to be reported from. A study replaces
+    /// the node list wholesale, so "seen on the atlas" meant "on screen a third of a second ago"
+    /// and the report's column shrank again the moment somebody scrolled away. The difference
+    /// between "the file lists it" and "this session met it" needs the accumulation.
+    /// </remarks>
+    private readonly HashSet<string> _seen = new(StringComparer.OrdinalIgnoreCase);
+
     // The one-shot check, as a sequence number rather than a queued command - the same trick
     // the interface browser uses. A flag would be re-served every tick; a queue would need
     // draining, ordering and a lifetime for one button.
     private int _checkWanted;
     private int _checkServed;
     private IReadOnlyList<string> _checked = [];
+
+    /// <summary>
+    /// The map data as the game has it beside the files, published for the interface.
+    /// </summary>
+    /// <remarks>
+    /// Rebuilt whenever the catalogue changes - which is once a session - and otherwise handed
+    /// out unchanged, so the tab that draws it costs nothing per frame. Immutable, so it crosses
+    /// from this thread to the drawing one without a lock.
+    /// </remarks>
+    private MapDataReport _mapData = MapDataReport.Empty;
 
     private IReadOnlyDictionary<string, int> _ritualWorth = new Dictionary<string, int>();
 
@@ -200,11 +221,30 @@ public sealed class AtlasWatch
     /// WorldAreas read from the game, which is what data/atlas-maps.json would have to stop being.
     /// </summary>
     /// <remarks>
-    /// Built on the check rather than on the tick, and once per session: the table is reachable
-    /// only through an atlas node (see WorldAreaCatalogue) and never moves afterwards. Nothing
-    /// draws from it yet - it reports itself beside the file so the difference can be judged.
+    /// Read ONCE PER SESSION, on the first study that can reach it: the table is reachable only
+    /// through an atlas node (see WorldAreaCatalogue) and never moves afterwards.
+    ///
+    /// ON THE READING PATH, not only on the check button, which is a deliberate change. The unique
+    /// flag in force now comes from this table (AtlasMapNames.LearnUnique), and a correction that
+    /// only happens when somebody presses a diagnostic button is a correction that never happens.
+    /// The cost is one fourteen-block read of half a megabyte plus its strings, once, against an
+    /// atlas study that reads an id, a connection list and two content vectors per node every
+    /// third of a second - so it is less than one study, and then it is nothing for the session.
     /// </remarks>
     private readonly WorldAreaCatalogue _catalogue;
+
+    /// <summary>
+    /// How many studies may try to reach the WorldAreas table before the session gives up.
+    /// </summary>
+    /// <remarks>
+    /// A budget rather than a retry, because there are only two outcomes: the chain works and the
+    /// first candidate node settles it, or the offsets are wrong and EVERY node fails the same
+    /// way. The second must not cost a few hundred pointer reads every third of a second forever.
+    /// The check button still walks every node, which is where a person is asking why.
+    /// </remarks>
+    private const int CatalogueTries = 8;
+
+    private int _catalogueTries = CatalogueTries;
 
     public AtlasWatch(
         IMemoryReader reader,
@@ -225,6 +265,10 @@ public sealed class AtlasWatch
         Names = names ?? AtlasMapNames.Empty;
         Ratings = ratings ?? AtlasRatings.Empty;
         _grouping = new AtlasGrouping(_settings.Sorting, Names, Ratings);
+
+        // Before any atlas has been seen the report is the files alone, which is the honest
+        // starting state: it says what is shipped and that nothing has been read yet.
+        _mapData = MapDataReport.Build(null, Names, Ratings);
     }
 
     /// <summary>The map names in force, kept so settings can be replaced without them.</summary>
@@ -282,6 +326,9 @@ public sealed class AtlasWatch
 
     /// <summary>What the last check made of each step of the walk. Empty until one is asked for.</summary>
     public IReadOnlyList<string> Checked => Volatile.Read(ref _checked);
+
+    /// <summary>What the game says about every map, beside what the files say.</summary>
+    public MapDataReport MapData => Volatile.Read(ref _mapData);
 
     /// <summary>
     /// Asks for one account of the read, served on the next tick.
@@ -661,25 +708,39 @@ public sealed class AtlasWatch
     /// The whole WorldAreas table, read through the first node that names it.
     /// </summary>
     /// <remarks>
-    /// On the check because that is where a person is asking, and because the table is worth a
-    /// few hundred reads once rather than none at all on the drawing path. It stays read for the
-    /// session - a dat table is loaded once and never freed - so a second check costs nothing.
+    /// The study reads this by itself now (see <see cref="Learn"/>); what is left here is the
+    /// EXHAUSTIVE attempt, which is what a person pressing the button is asking for. The study
+    /// gives up after one candidate node because a failing chain fails on all of them, and this is
+    /// where that assumption gets tested against every node on the atlas.
     /// </remarks>
     private IReadOnlyList<string> Catalogue(UiScale scale, ulong uiRoot)
     {
-        if (_catalogue.Table is null)
+        // The nodes the last tick studied, when there are any: a second full read of the panel
+        // here would cost as much as the walk it is only meant to start.
+        IReadOnlyList<AtlasNode> nodes = _studied.Count > 0 ? _studied : _atlas.Read(uiRoot, scale);
+        if (_catalogue.All.Count == 0)
         {
-            // The nodes the last tick studied, when there are any: a second full read of the
-            // panel here would cost as much as the walk it is only meant to start.
-            IReadOnlyList<AtlasNode> nodes = _studied.Count > 0 ? _studied : _atlas.Read(uiRoot, scale);
             foreach (AtlasNode node in nodes)
             {
                 if (node.MapId.Length > 0 && _catalogue.ReadFromNode(node.Address))
                 {
+                    Names.LearnUnique(_catalogue.All);
                     break;
                 }
             }
         }
+
+        // Republished on every check, not only on the first: a check can be pressed with the atlas
+        // scrolled somewhere the study path has not published from yet.
+        foreach (AtlasNode node in nodes)
+        {
+            if (node.MapId.Length > 0)
+            {
+                _seen.Add(node.MapId);
+            }
+        }
+
+        Republish();
 
         var said = new List<string> { string.Empty };
         said.AddRange(_catalogue.Describe(Names));
@@ -701,12 +762,67 @@ public sealed class AtlasWatch
         _studiedAt = nowMs;
         _routes = AtlasRoutes.From(live);
 
+        bool fresh = false;
         _said.Clear();
         foreach (AtlasNode node in live)
         {
             _said[node.Grid] = Words(node, _contents);
+            if (node.MapId.Length > 0)
+            {
+                fresh |= _seen.Add(node.MapId);
+            }
+        }
+
+        // The report is rebuilt only when something in it changed - the table arriving, or a map
+        // scrolled into view for the first time. Four hundred rows and eighty ratings are not a
+        // thing to build three times a second for an atlas nobody moved.
+        if (Learn(live) || fresh)
+        {
+            Republish();
         }
     }
+
+    /// <summary>
+    /// Reads WorldAreas once and hands the game's unique flag to the map table.
+    /// </summary>
+    /// <remarks>
+    /// ONE CANDIDATE NODE PER STUDY, not all of them. A node carrying a map id either resolves its
+    /// EndgameMaps row or the chain is wrong, and if the chain is wrong the next node fails
+    /// identically - so walking the rest buys nothing and costs four pointer reads each.
+    /// </remarks>
+    /// <returns>Whether the table was read on this pass.</returns>
+    private bool Learn(IReadOnlyList<AtlasNode> live)
+    {
+        if (_catalogueTries <= 0 || _catalogue.All.Count > 0)
+        {
+            return false;
+        }
+
+        foreach (AtlasNode node in live)
+        {
+            if (node.MapId.Length == 0)
+            {
+                continue;
+            }
+
+            // Spent HERE rather than on entry, so a study that read no map ids at all - which is
+            // what a wrong node fingerprint looks like - does not burn the budget on nothing.
+            _catalogueTries--;
+            if (!_catalogue.ReadFromNode(node.Address))
+            {
+                return false;
+            }
+
+            Names.LearnUnique(_catalogue.All);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Publishes the game-against-file report for the interface to draw.</summary>
+    private void Republish()
+        => Volatile.Write(ref _mapData, MapDataReport.Build(_catalogue, Names, Ratings, _seen));
 
     private void Forget()
     {

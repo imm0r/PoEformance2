@@ -136,8 +136,9 @@ public class WorldAreaCatalogueSessionTests
     {
         // Six ids, both directions, and the direction is the interesting half: four areas the
         // game marks unique are ordinary in the file (three of them league bosses, which the file
-        // groups by tag instead), and two the file marks unique are ordinary in the game. Pinned
-        // because switching the type over to memory would move exactly these six between groups.
+        // groups by tag instead), and two the file marks unique are ordinary in the game. THE GAME
+        // IS THE SOURCE NOW - AtlasMapNames.LearnUnique - so this pins which maps that moved, and
+        // a client where the list stops being these six is a client where something changed.
         using ReplayMemoryReader replay = Load();
         WorldAreaCatalogue catalogue = Read(replay);
         AtlasMapNames file = Curated();
@@ -155,7 +156,7 @@ public class WorldAreaCatalogueSessionTests
         Assert.False(Assert.IsType<WorldArea>(catalogue.Of("MapUniqueInitialTower")).IsUnique);
 
         Assert.Contains(
-            "THE UNIQUE FLAG DISAGREES on 6",
+            "the unique flag differs on 6",
             string.Join('\n', catalogue.Describe(file)),
             StringComparison.Ordinal);
     }

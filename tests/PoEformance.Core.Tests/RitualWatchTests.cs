@@ -61,10 +61,14 @@ public class RitualWatchTests
         // The game tests a field on the map's own row for this; the reference falls back to the
         // same categories by tag, which is what is available here. All three are ordinary maps
         // by state - nothing but the category tells them apart.
+        // NOT MapUniqueReactor_04, which reads as unique in data/atlas-maps.json and ORDINARY in
+        // the game's own IsUniqueMapArea - one of the six ids the two sources part company on, and
+        // therefore the one example here that would have stopped meaning what it says the moment
+        // the table was read. See AtlasUniqueTests.
         AtlasNode[] atlas =
         [
             Node(0, 0, "MapAugury", AtlasNodeState.Open),                     // ordinary
-            Node(1, 0, "MapUniqueReactor_04", AtlasNodeState.Open),           // unique
+            Node(1, 0, "ExpeditionLogBook_Heath", AtlasNodeState.Open),       // unique
             Node(2, 0, "MapLostTowers", AtlasNodeState.Open),                 // tower
             Node(3, 0, "MapHideoutCanal_Claimable", AtlasNodeState.Open),     // hideout
         ];

@@ -42,16 +42,17 @@ public sealed record WorldArea(
 /// rows repeat across the table (every map carries "map"), so they are resolved once and cached
 /// by address.
 ///
-/// WHAT IT DOES NOT DO is replace the file, and the walk is what settled that rather than left it
-/// open. <see cref="Describe"/> reports what it read beside what data/atlas-maps.json says, and
-/// over all 442 rows (tests/fixtures/session-2026-09-catalogue.rec) the two part company in three
-/// different ways: the NAMES agree 439 of 440 and the one difference is a trailing space, so names
-/// can come from here; the UNIQUE flag disagrees on six ids in both directions, so it is close but
-/// not the file's column; and the TAGS share no vocabulary at all - the game says map, map_tower,
-/// dungeon, pinnacle_boss and biomes, while the file says expedition, arbiter, quest, boss,
-/// lineage. The curated words are not derivable from this table, so the file shrinks to them
-/// rather than disappearing. See WorldAreaDat in the schema, where each of those is written down
-/// with its counts.
+/// WHAT IT DOES NOT DO is replace the file WHOLE, and the walk is what settled that rather than
+/// left it open. <see cref="Describe"/> reports what it read beside what data/atlas-maps.json says,
+/// and over all 442 rows (tests/fixtures/session-2026-09-catalogue.rec) the two part company in
+/// three different ways: the NAMES agree 439 of 440 and the one difference is a trailing space, so
+/// names can come from here; the UNIQUE flag disagrees on six ids in both directions, and the
+/// disagreement is the file's fault rather than the column's - IsUniqueMapArea is now the flag in
+/// force, see AtlasMapNames.LearnUnique; and the TAGS share no vocabulary at all - the game says
+/// map, map_tower, dungeon, pinnacle_boss and biomes, while the file says expedition, arbiter,
+/// quest, boss, lineage. The curated words are not derivable from this table, so the file shrinks
+/// to them rather than disappearing. See WorldAreaDat in the schema, where each of those is
+/// written down with its counts.
 /// </remarks>
 public sealed class WorldAreaCatalogue
 {
@@ -407,9 +408,12 @@ public sealed class WorldAreaCatalogue
 
         yield return $"    {missing} of its ids are not in the table";
         yield return $"    {names} names differ (expected off an English client: 0)";
+        // NOT a complaint either. IsUniqueMapArea is the column in force (AtlasMapNames.LearnUnique)
+        // and the file's is kept to be compared against, so this counts how many maps the file
+        // would have grouped wrongly - six, on the client this was measured on.
         yield return uniques == 0
-            ? "    the unique flag agrees everywhere - IsUniqueMapArea can replace it"
-            : $"    THE UNIQUE FLAG DISAGREES on {uniques} - IsUniqueMapArea is not that column";
+            ? "    the unique flag agrees everywhere - the file's column costs nothing either way"
+            : $"    the unique flag differs on {uniques} - IsUniqueMapArea wins, and those are the maps it moves";
 
         if (curated.Count == 0)
         {

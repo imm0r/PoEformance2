@@ -491,7 +491,7 @@
         "IsMapArea": { "offset": "0xDC", "type": "u8", "comment": "MEASURED over the whole table: 190 of 442 rows, including every claimable-hideout map - so it means 'an area you run', not 'an area on the atlas'. Not one of those 190 also reads IsHideout, which is the pair of readings that says both bytes are their own columns." },
         "IsHideout": { "offset": "0x12A", "type": "u8", "comment": "MEASURED over the whole table and IT WORKS - 83 of 442 rows, disjoint from the 190 IsMapArea rows. It was reported from a live run as broken, on the evidence that the hideout maps ON THE ATLAS all read 0; they do, and the column is still right. The claimable is a MAP you run and the hideout it grants is a SEPARATE ROW that no atlas node points at, so a walk of the table is the only thing that can see both: MapHideoutCanal_Claimable reads IsMapArea 1 / IsHideout 0 and HideoutCanal reads 0 / 1, and the two are both called \"Canal Hideout\". That pair is pinned in WorldAreaCatalogueSessionTests. NOTE for anything that wants to use it: data/atlas-maps.json's \"hideout\" tag is on the seven CLAIMABLES, which is the other meaning - it is not this column under another name." },
         "TagsArray": { "offset": "0x133", "type": "ptr", "comment": "MEASURED, and the reading is (COUNT, POINTER) - not a begin/end pair: MapPrecursorTowerSwamp holds 3 at +0x133 and a pointer at +0x13B, and the three entries 0x10 apart resolve to Tags rows \"map\", \"map_tower\" and \"swamp_biome\". THE WHOLE VOCABULARY IS NOW KNOWN, over all 442 rows: 17 words, and they are mechanical rather than editorial - map (153), area_with_water (75), map_tower (11), has_forest_biome_monsters (9), has_mountain_biome_monsters (7), dungeon (6), has_grass_biome_monsters (5), has_desert/swamp_biome_monsters (2 each), pinnacle_boss (2), has_water_biome_monsters, frost_shrine and the five *_biome tags (1 each). THIS IS WHY data/atlas-maps.json CANNOT SIMPLY GO AWAY: not one of the words that file groups the atlas by - expedition, arbiter, quest, boss, lineage, traverse, breach, craft, ritual, hideout - exists here, and even the one near-miss is not a match. The file's \"tower\" (8 maps) and the game's \"map_tower\" (11) overlap on 7: MapAlpineRidge, MapBluff, MapMesa and MapSwampTower carry map_tower and no file tag, while MapPrecursorTowerMountain is a Precursor Tower by name that carries mountain_biome and NO map_tower. Deriving the file's tags from this column would therefore both add and drop maps." },
-        "IsUniqueMapArea": { "offset": "0x18B", "type": "u8", "comment": "MEASURED over the whole table: 25 of 442 rows. This is nearly what data/atlas-maps.json calls type: unique - on 440 shared ids the two DISAGREE ON SIX, in both directions, which is the reason to count rather than to swap one for the other. Game-unique and file-ordinary: ExpeditionLeagueBoss, RitualLeagueBoss, MapVoidReliquary, Map_HildaCampsite (the file groups the first two by tag instead). File-unique and game-ordinary: MapUniqueInitialTower, MapUniqueReactor_04. Those six are exactly the maps that would change group if anything switched the type over to memory." }
+        "IsUniqueMapArea": { "offset": "0x18B", "type": "u8", "comment": "MEASURED over the whole table: 25 of 442 rows. This is nearly what data/atlas-maps.json calls type: unique - on 440 shared ids the two DISAGREE ON SIX, in both directions, which is the reason to count rather than to swap one for the other. Game-unique and file-ordinary: ExpeditionLeagueBoss, RitualLeagueBoss, MapVoidReliquary, Map_HildaCampsite (the file groups the first two by tag instead). File-unique and game-ordinary: MapUniqueInitialTower, MapUniqueReactor_04. Those six are exactly the maps that would change group if anything switched the type over to memory. 2026-09-14: IT IS NOW THE COLUMN IN FORCE. AtlasMapNames.LearnUnique takes this over the file's type the first time an atlas study reaches the table, and both things that ask whether a map is unique - the atlas grouping's catch-all, and the rule that a ritual line may never take a unique map - follow it. The file's column is KEPT so the two can go on being compared: Inspect -> Map Data shows the disagreement, and a client where it stops being six is a client where something changed. The six move like this: ExpeditionLeagueBoss, MapVoidReliquary and Map_HildaCampsite join the unique group, RitualLeagueBoss is claimed by the Ritual group first (which names it outright), and MapUniqueInitialTower and MapUniqueReactor_04 leave - the two whose ids say \"Unique\" in them, which is why a NAME is not a source." }
       },
       "consts": { "ComputedRowSize": "0x2E0" }
     },
@@ -1169,8 +1169,24 @@
         // NONE OF THE FOUR HAS A NAME at BadgeContentName - the slot that holds "Powerful Map
         // Boss" for content id 0x00020064, which is the same 0x0002 category, is NULL on all of
         // them. So these ids can GROUP an atlas with no file at all and cannot LABEL one.
-        "MarkerQuest": "0x20000",
-        "MarkerClaimableHideout": "0x203E9",
+        // TWO OF THE NAMES WERE WRONG AND THE MISTAKE IS INSTRUCTIVE. MarkerGate was called
+        // MarkerQuest and MarkerClaimable was called MarkerClaimableHideout, on three captures
+        // where the first sat only on *_Quest maps and the second only on MapHideout*_Claimable -
+        // with, the tests said, ZERO false positives. A fourth capture broke both: 0x20000 turned
+        // up on ExpeditionSubArea_MedvedBoss and 0x203E9 on four ExpeditionLogBook_* areas. The
+        // three captures simply contained no Expedition nodes, so "nothing else carries it" was a
+        // fact about the captures and not about the game - the same trap this file warns about for
+        // reference projects, sprung on our own recordings. What survives is the direction that
+        // was actually checkable: every *_Quest node carries 0x20000 and every *_Claimable node
+        // carries 0x203E9. The converse never was.
+        // WHAT THEY ARE, as far as measurement goes: the *_Quest maps carrying 0x20000 sit on
+        // atlas positions whose passives are AtlasRedLock1, AtlasRedLock2, AtlasYellowLock1 and
+        // AtlasYellowLock2 - the tier LOCKS - so gate is the best-supported word and the
+        // Expedition boss fits it. 0x203E9 is carried by claimable hideouts and Expedition
+        // logbooks alike, both areas entered once for a one-off reward; that is a description of
+        // the membership rather than a meaning, and it is deliberately left at that.
+        "MarkerGate": "0x20000",
+        "MarkerClaimable": "0x203E9",
         "MarkerUnique": "0x203EB",
         "MarkerUniqueOther": "0x203EA"
       }

@@ -195,13 +195,13 @@ public class WorldAreaCatalogueTests
         var catalogue = new WorldAreaCatalogue(fake, schema);
         Assert.True(catalogue.ReadFromNode(Node), catalogue.LastError);
 
-        // The reading that would quietly break a group: the file calls the tower unique and the
-        // table does not. Counting it is what turns "IsUniqueMapArea is the type column" from a
-        // hope into something the next capture can refute.
+        // The reading that decides a group: the file calls the tower unique and the table does
+        // not. The table wins (AtlasMapNames.LearnUnique), so counting it is how a client where
+        // the file is further out of date than six maps announces itself.
         string said = string.Join('\n', catalogue.Describe(Curated(
             """{"maps":{"MapLostTowers":{"name":"Lost Towers","type":"unique"}}}""")));
 
-        Assert.Contains("THE UNIQUE FLAG DISAGREES on 1", said, StringComparison.Ordinal);
+        Assert.Contains("the unique flag differs on 1", said, StringComparison.Ordinal);
     }
 
     [Fact]
