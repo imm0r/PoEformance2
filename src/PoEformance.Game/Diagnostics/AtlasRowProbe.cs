@@ -55,6 +55,12 @@ public sealed class AtlasRowProbe
     /// <summary>Most distinct sentences listed. The vocabularies behind these ids are tiny.</summary>
     private const int MostSentences = 24;
 
+    /// <summary>Bytes of a referenced row's head read as a block, so a wrong offset stays diagnosable.</summary>
+    private const int RowHeadBytes = 0x40;
+
+    /// <summary>The same for a PassiveSkills row, whose Name sits out at 0x32.</summary>
+    private const int PassiveHeadBytes = 0x48;
+
     private readonly IMemoryReader _reader;
     private readonly DatTableShape? _tables;
 
@@ -74,6 +80,12 @@ public sealed class AtlasRowProbe
     private readonly int _quest;
     private readonly int _clientString;
     private readonly long _rowSize;
+
+    private readonly long _passiveRowSize;
+    private readonly long _objectiveRowSize;
+    private readonly long _stringRowSize;
+    private readonly long _subTreeRowSize;
+    private readonly long _statRowSize;
 
     private readonly int _passiveId;
     private readonly int _passiveName;
@@ -126,6 +138,15 @@ public sealed class AtlasRowProbe
         _stringText = text.OffsetOf("TextPtr");
         _subTreeId = subTree.OffsetOf("IdPtr");
         _statId = stat.OffsetOf("IdPtr");
+
+        // The sizes those rows' columns were computed against. A table that states a different
+        // one makes every offset into it wrong, and that is worth learning from the capture
+        // rather than from a sentence that reads like nonsense.
+        _passiveRowSize = passive.Constants["ComputedRowSize"];
+        _objectiveRowSize = objective.Constants["ComputedRowSize"];
+        _stringRowSize = text.Constants["ComputedRowSize"];
+        _subTreeRowSize = subTree.Constants["ComputedRowSize"];
+        _statRowSize = stat.Constants["ComputedRowSize"];
     }
 
     /// <summary>Everything the sweep found, distribution first and samples after.</summary>
@@ -190,8 +211,70 @@ public sealed class AtlasRowProbe
         }
 
         said.AddRange(Table(table, rows.Count));
+        said.AddRange(Referenced(rows));
         said.AddRange(Spread(rows));
         said.AddRange(Columns(rows));
+        return said;
+    }
+
+    /// <summary>
+    /// Makes the tables BEHIND this one name themselves, so their column arithmetic is checked
+    /// rather than hoped for.
+    /// </summary>
+    /// <remarks>
+    /// EndgameMapAtlas states its own size and agrees with dat-schema, which is what licenses the
+    /// offsets into it. Nothing licensed the offsets into the rows it POINTS AT - EndgameMapObjectives
+    /// at 0x30, ClientStrings2 at 0x34, AtlasPassiveSkillSubTrees at 0x74 were arithmetic and
+    /// nothing more, so a text read out of them would have been believed on no evidence. Every
+    /// dat foreign reference carries its table at +0x08, so each of these can be asked the same
+    /// question, once, for the price of one read.
+    ///
+    /// The head of each row is read as a BLOCK for the same reason the other probes do it: if a
+    /// size DISAGREES, the bytes needed to find the real offsets are already in the recording and
+    /// the next question needs no new build.
+    /// </remarks>
+    private List<string> Referenced(Dictionary<ulong, List<string>> rows)
+    {
+        var said = new List<string> { "  the tables it points AT, named by their own reference:" };
+        (string What, int At, long Computed, int Head)[] wanted =
+        [
+            ("Passives", _passives, _passiveRowSize, PassiveHeadBytes),
+            ("MapObjective", _objective, _objectiveRowSize, RowHeadBytes),
+            ("BlockedMessage", _blocked, _stringRowSize, RowHeadBytes),
+            ("SubTree", _subTree, _subTreeRowSize, RowHeadBytes),
+            ("Stats", _stats + 8, _statRowSize, RowHeadBytes),
+        ];
+
+        foreach ((string what, int at, long computed, int head) in wanted)
+        {
+            // The first row that actually sets this column. A column nothing sets cannot name its
+            // table, and saying so is the honest outcome rather than a blank line.
+            ulong found = 0, table = 0;
+            foreach (ulong row in rows.Keys)
+            {
+                ulong reference = _reader.ReadPointer(row + (ulong)at);
+                if (MemoryReaderExtensions.IsPlausiblePointer(reference))
+                {
+                    found = reference;
+                    table = _reader.ReadPointer(row + (ulong)at + 8);
+                    break;
+                }
+            }
+
+            if (found == 0)
+            {
+                said.Add($"    {what,-14} no row on this atlas sets it, so it names no table here");
+                continue;
+            }
+
+            said.Add(_tables is { } shape && PointerPeek.DescribeTable(_reader, table, shape) is { } facts
+                ? $"    {what,-14} \"{facts.Path}\": {facts.Rows} rows of 0x{facts.RowSize:X}, computed 0x{computed:X}"
+                    + $" - {(facts.RowSize == computed ? "AGREE" : "DISAGREE, so the columns read out of it are wrong")}"
+                : $"    {what,-14} row 0x{found:X}, but its table half 0x{table:X} does not describe a dat table");
+
+            said.AddRange(ProbeBytes.Block(_reader, _tables, $"    {what}", found, 0, head));
+        }
+
         return said;
     }
 

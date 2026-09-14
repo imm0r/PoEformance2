@@ -1277,8 +1277,9 @@
         "IdPtr": { "offset": "0x00", "type": "ptr", "comment": "Wide string, the passive's engine id: \"AtlasOutsideFort\". Stable across clients and languages, which is what to match on." },
         "IconPtr": { "offset": "0x08", "type": "ptr", "comment": "Icon_DDSFile. Empty on the one node measured, which is what POE2Radar saw as an art path on nodes that have one." },
         "GraphId": { "offset": "0x30", "type": "u16", "comment": "PassiveSkillGraphId - a small stable number for the passive (861 on the measured node). Worth more than the row ADDRESS that POE2Radar keys node types on: a pointer's low bits are only stable within one run of the game." },
-        "NamePtr": { "offset": "0x32", "type": "ptr", "comment": "Wide string, the displayed name - \"[DNT] Atlas Outside Path\". Unaligned because a dat row packs its columns; [DNT] is GGG's own do-not-translate marker, so this one is an internal label rather than something a player is shown." }
-      }
+        "NamePtr": { "offset": "0x32", "type": "ptr", "comment": "Wide string, the displayed name - \"[DNT] Atlas Outside Path\". Unaligned because a dat row packs its columns; [DNT] is GGG's own do-not-translate marker, so this one is an internal label rather than something a player is shown. Every atlas position sampled so far reads a [DNT] name here while its Id is meaningful, so key on the Id." }
+      },
+      "consts": { "ComputedRowSize": "0x1E7" }
     },
 
     "Chest": {

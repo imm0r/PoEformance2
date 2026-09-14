@@ -134,6 +134,25 @@ public class AtlasRowSessionTests
     }
 
     [Fact]
+    public void EveryReferencedTableIsAskedToNameItselfRatherThanTakenOnTrust()
+    {
+        // EndgameMapAtlas states its own size and agrees with the arithmetic, which is what
+        // licenses reading columns out of it. NOTHING licensed the columns of the rows it points
+        // AT - the objective and client-string offsets were arithmetic and no more - so each
+        // reference is now asked the same question. On this capture the table halves were never
+        // read, so the honest answer is that they do not describe a table; what matters is that
+        // the probe ASKS, because a capture with them settles four row sizes at once.
+        using ReplayMemoryReader replay = Load();
+        string said = Probe(replay);
+
+        Assert.Contains("the tables it points AT, named by their own reference:", said, StringComparison.Ordinal);
+        foreach (string what in new[] { "Passives", "MapObjective", "BlockedMessage", "SubTree", "Stats" })
+        {
+            Assert.Contains($"    {what}", said, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
     public void TheRowsPrintedInFullAreTheONESCARRYINGSomethingRatherThanWhicheverCameFirst()
     {
         // The defect this capture exposed, pinned so it cannot come back: the detail block used to
@@ -142,10 +161,12 @@ public class AtlasRowSessionTests
         using ReplayMemoryReader replay = Load();
         string said = Probe(replay);
 
-        int first = said.IndexOf("  row 0x", StringComparison.Ordinal);
+        // A detail line starts a line with exactly two spaces; the table-naming section indents
+        // four and also says "row 0x", which is why this anchors on the newline.
+        int first = said.IndexOf("\n  row 0x", StringComparison.Ordinal);
         Assert.True(first >= 0, "the probe printed no row in full");
 
-        string block = said[first..];
+        string block = said[(first + 1)..];
         int next = block.IndexOf("\n  row 0x", StringComparison.Ordinal);
         block = next > 0 ? block[..next] : block;
 
