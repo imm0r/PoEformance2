@@ -124,7 +124,10 @@ public class AtlasRowSessionTests
         using ReplayMemoryReader replay = Load();
         string said = Probe(replay);
 
-        Assert.Contains("113 carry a MapObjective, 365 a BlockedMessage, 0 at least one Stat", said, StringComparison.Ordinal);
+        // 454 of 547 carry a Stat, and the first reading of this line said NONE did - the count
+        // was read through a pointer validator, which returns 0 for any small number. Pinned at
+        // the real figure so the bug cannot come back quietly.
+        Assert.Contains("113 carry a MapObjective, 365 a BlockedMessage, 454 at least one Stat", said, StringComparison.Ordinal);
         Assert.Contains("7 distinct objectives, 4 distinct sub-trees", said, StringComparison.Ordinal);
 
         foreach (string id in new[] { "Incursion", "Abyss", "Breach", "Delirium" })
