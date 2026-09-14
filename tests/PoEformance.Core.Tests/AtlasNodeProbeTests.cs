@@ -11,8 +11,8 @@ namespace PoEformance.Core.Tests;
 /// NOTHING HERE CAN VOUCH FOR AN ADDRESS, and that is not what it is for: a fixture built from
 /// the schema follows the schema anywhere, so this would pass with every candidate offset wrong.
 /// What it covers is that the probe ASKS - that both badge strings are read rather than only the
-/// one this tool uses, that the type row is followed through its own first pointer to all three
-/// candidate columns, and that a slot which is not a pointer is reported instead of dereferenced.
+/// one this tool uses, that the node's atlas row is followed through its Passives column into the
+/// passive's own columns, and that a slot which is not a pointer is reported rather than followed.
 /// A probe that quietly reads nothing would leave the next recording as empty as the last one,
 /// which is the failure this whole diagnostic exists to prevent.
 /// </remarks>
@@ -58,7 +58,8 @@ public class AtlasNodeProbeTests
         StructDef ui = schema.Structs["UiElementBase"];
         StructDef node = schema.Structs["AtlasNode"];
         StructDef data = schema.Structs["AtlasNodeData"];
-        StructDef row = schema.Structs["AtlasMapRow"];
+        StructDef atlasRow = schema.Structs["EndgameMapAtlasRow"];
+        StructDef row = schema.Structs["PassiveSkillsRow"];
 
         int self = ui.OffsetOf("Self");
         int first = ui.OffsetOf("ChildrenFirst");
@@ -76,8 +77,8 @@ public class AtlasNodeProbeTests
         }
 
         // The node's child array and its data pointer share the same block - the two-hop chain
-        // reads +0x20 into the very array the children live in, which is what makes the node
-        // element and its data one object rather than two.
+        // reads +0x20 into the very array the children live in, which is why the element and its
+        // data read as one object. In the game they sit 0x60 apart; nothing here depends on that.
         Element(Node, Storage, Child);
         fake.Place(Storage + (ulong)(int)node.Constants["DataPtr"], Data);
         Element(Child, Child + 0x800, Holder);
@@ -87,26 +88,27 @@ public class AtlasNodeProbeTests
         fake.Place(Data + (ulong)data.OffsetOf("BiomeId"), (byte)4);
         fake.Place(Data + (ulong)data.OffsetOf("StatusBits"), (byte)0x13);
 
-        Fill(fake, Node + (ulong)((int)node.Constants["MapRowPtr"] - 0x20), 0x60);
+        Fill(fake, Node + (ulong)(node.OffsetOf("GridPosition") - 0x30), 0x60);
         if (withRow)
         {
-            fake.Place(Node + (ulong)(int)node.Constants["MapRowPtr"], Row);
+            fake.Place(Data + (ulong)data.OffsetOf("AtlasRowPtr"), Row);
             Fill(fake, Row, 0x10);
-            fake.Place(Row, Inner);
+            fake.Place(Row + (ulong)atlasRow.OffsetOf("PassivesRef"), Inner);
             Fill(fake, Inner, 0x50);
             fake.Place(Inner + (ulong)row.OffsetOf("IdPtr"), Text(fake, Strings, "AtlasNodeWhite"));
-            fake.Place(Inner + (ulong)row.OffsetOf("ArtPtr"), Text(fake, Strings + 0x1000, "Art/2DArt/node.dds"));
+            fake.Place(Inner + (ulong)row.OffsetOf("IconPtr"), Text(fake, Strings + 0x1000, "Art/2DArt/node.dds"));
+            fake.Place(Inner + (ulong)row.OffsetOf("GraphId"), (ushort)861);
             fake.Place(Inner + (ulong)row.OffsetOf("NamePtr"), Text(fake, Strings + 0x2000, "[DNT] District B"));
         }
 
-        Fill(fake, Badge + (ulong)((int)node.Constants["BadgeContentName"] - 8), 0x90);
+        Fill(fake, Badge + (ulong)((int)node.Constants["BadgeContentNameGameHelper"] - 8), 0x90);
         fake.Place(Badge + (ulong)(int)node.Constants["BadgeContentId"], 0x0002_0064u);
         fake.Place(
             Badge + (ulong)(int)node.Constants["BadgeContentName"],
-            Text(fake, Strings + 0x3000, "Powerful Map Boss"));
+            Text(fake, Strings + 0x3000, "[DeadlyMapBoss|Deadly Map Boss]"));
         fake.Place(
-            Badge + (ulong)(int)node.Constants["BadgeContentStr"],
-            Text(fake, Strings + 0x4000, "[DeadlyMapBoss|Deadly Map Boss]"));
+            Badge + (ulong)(int)node.Constants["BadgeContentNameGameHelper"],
+            Text(fake, Strings + 0x4000, "Powerful Map Boss"));
 
         return (fake, schema);
     }
@@ -131,13 +133,14 @@ public class AtlasNodeProbeTests
     }
 
     [Fact]
-    public void FollowsTheTypeRowToAllThreeColumns()
+    public void FollowsTheAtlasRowToThePassiveAndItsColumns()
     {
         (FakeMemoryReader fake, OffsetSchema schema) = Fixture();
         string said = Run(fake, schema);
 
         Assert.Contains("\"AtlasNodeWhite\"", said, StringComparison.Ordinal);
         Assert.Contains("\"Art/2DArt/node.dds\"", said, StringComparison.Ordinal);
+        Assert.Contains("GraphId 861", said, StringComparison.Ordinal);
         Assert.Contains("\"[DNT] District B\"", said, StringComparison.Ordinal);
     }
 
