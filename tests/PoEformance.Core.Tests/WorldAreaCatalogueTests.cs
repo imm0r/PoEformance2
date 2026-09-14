@@ -27,6 +27,9 @@ public class WorldAreaCatalogueTests
     private const ulong Tags = 0xC0_0000;
     private const ulong Strings = 0xD0_0000;
 
+    /// <summary>The shipped schema, loaded once. Shared because several probe tests want it.</summary>
+    public static OffsetSchema Schema { get; } = LoadSchema();
+
     private static OffsetSchema LoadSchema()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);

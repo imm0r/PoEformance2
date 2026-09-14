@@ -42,12 +42,16 @@ public sealed record WorldArea(
 /// rows repeat across the table (every map carries "map"), so they are resolved once and cached
 /// by address.
 ///
-/// WHAT IT DOES NOT DO YET is replace the file. <see cref="Describe"/> reports what it read
-/// beside what data/atlas-maps.json says, because the two disagree in a way that matters: the
-/// game tags a tower "map_tower" but tags a citadel nothing at all, while the file calls that
-/// citadel "arbiter". Whether the curated words can be dropped, derived or have to stay is a
-/// question the difference report answers, and it should be answered before anything draws from
-/// here.
+/// WHAT IT DOES NOT DO is replace the file, and the walk is what settled that rather than left it
+/// open. <see cref="Describe"/> reports what it read beside what data/atlas-maps.json says, and
+/// over all 442 rows (tests/fixtures/session-2026-09-catalogue.rec) the two part company in three
+/// different ways: the NAMES agree 439 of 440 and the one difference is a trailing space, so names
+/// can come from here; the UNIQUE flag disagrees on six ids in both directions, so it is close but
+/// not the file's column; and the TAGS share no vocabulary at all - the game says map, map_tower,
+/// dungeon, pinnacle_boss and biomes, while the file says expedition, arbiter, quest, boss,
+/// lineage. The curated words are not derivable from this table, so the file shrinks to them
+/// rather than disappearing. See WorldAreaDat in the schema, where each of those is written down
+/// with its counts.
 /// </remarks>
 public sealed class WorldAreaCatalogue
 {
@@ -257,9 +261,9 @@ public sealed class WorldAreaCatalogue
 
     /// <summary>The Tags column: a count, then a pointer at the entries.</summary>
     /// <remarks>
-    /// Measured, not assumed - see WorldAreaDat.TagsArray. Every area carries "map", so the tag
-    /// rows repeat across the whole table and are worth caching by address: 442 areas resolve to
-    /// a few dozen distinct tags.
+    /// Measured, not assumed - see WorldAreaDat.TagsArray. The tag rows repeat heavily across the
+    /// table and are worth caching by address: 442 areas resolve to SEVENTEEN distinct tags, and
+    /// "map" alone accounts for 153 of the references.
     /// </remarks>
     private List<string> Tags(ReadOnlySpan<byte> row)
     {

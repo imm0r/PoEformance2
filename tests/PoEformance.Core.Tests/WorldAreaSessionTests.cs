@@ -22,7 +22,9 @@ namespace PoEformance.Core.Tests;
 ///   claimable hideout, so the curated file's arbiter, quest and hideout are not in there.
 /// - IsHideout stays unsettled, deliberately: every sampled row is a map area and reads 0,
 ///   which a correct column and a misplaced one do alike. The test says that rather than
-///   pretending the zero means something.
+///   pretending the zero means something. A later capture walked the whole table and settled it
+///   - the column is right - see WorldAreaCatalogueSessionTests. This one is kept as it was,
+///   because six sampled maps genuinely could not tell the two apart.
 /// </remarks>
 public class WorldAreaSessionTests
 {
