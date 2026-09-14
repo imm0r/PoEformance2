@@ -236,16 +236,19 @@ public sealed class AtlasRowProbe
     private List<string> Referenced(Dictionary<ulong, List<string>> rows)
     {
         var said = new List<string> { "  the tables it points AT, named by their own reference:" };
-        (string What, int At, long Computed, int Head)[] wanted =
+        (string What, int At, long Computed, int Head, bool Array)[] wanted =
         [
-            ("Passives", _passives, _passiveRowSize, PassiveHeadBytes),
-            ("MapObjective", _objective, _objectiveRowSize, RowHeadBytes),
-            ("BlockedMessage", _blocked, _stringRowSize, RowHeadBytes),
-            ("SubTree", _subTree, _subTreeRowSize, RowHeadBytes),
-            ("Stats", _stats + 8, _statRowSize, RowHeadBytes),
+            ("Passives", _passives, _passiveRowSize, PassiveHeadBytes, false),
+            ("MapObjective", _objective, _objectiveRowSize, RowHeadBytes, false),
+            ("BlockedMessage", _blocked, _stringRowSize, RowHeadBytes, false),
+            ("SubTree", _subTree, _subTreeRowSize, RowHeadBytes, false),
+
+            // An ARRAY column is a count then a pointer at the entries, and each ENTRY is the
+            // reference - so its table sits at entries+8, not eight bytes past the column.
+            ("Stats", _stats + 8, _statRowSize, RowHeadBytes, true),
         ];
 
-        foreach ((string what, int at, long computed, int head) in wanted)
+        foreach ((string what, int at, long computed, int head, bool array) in wanted)
         {
             // The first row that actually sets this column. A column nothing sets cannot name its
             // table, and saying so is the honest outcome rather than a blank line.
@@ -256,7 +259,7 @@ public sealed class AtlasRowProbe
                 if (MemoryReaderExtensions.IsPlausiblePointer(reference))
                 {
                     found = reference;
-                    table = _reader.ReadPointer(row + (ulong)at + 8);
+                    table = _reader.ReadPointer(array ? reference + 8 : row + (ulong)at + 8);
                     break;
                 }
             }
@@ -520,9 +523,14 @@ public sealed class AtlasRowProbe
             : "(no row)";
 
     /// <summary>The count half of a dat array column, guarded against a number out of memory.</summary>
+    /// <remarks>
+    /// READ RAW, NOT AS A POINTER, and that distinction cost a finding. ReadPointer returns 0 for
+    /// anything outside the heap range, so a count of 3 came back as 0 and the probe reported "no
+    /// row carries a Stat" over hundreds of rows - while the block read beside it plainly showed
+    /// three of them (map_abyss_chance_to_be_ulaman_+%, map_abyss_chance_to_be_kurgal_+%,
+    /// map_atlas_node_has_abyss). A count is a small number by nature; reading one through a
+    /// pointer validator can only ever say no.
+    /// </remarks>
     private long Count(ulong at)
-    {
-        ulong count = _reader.ReadPointer(at);
-        return count is 0 or > MostStats ? 0 : (long)count;
-    }
+        => _reader.TryRead(at, out ulong count) && count is > 0 and <= MostStats ? (long)count : 0;
 }
