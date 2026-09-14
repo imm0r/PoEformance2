@@ -2436,6 +2436,7 @@ internal static class Program
         overlay.AttachUiBrowser(uiTree, uiBrowser);
         overlay.AttachAtlas(
             atlas, changed => PoEformance.Features.AtlasStore.Save(changed), art: atlasArt);
+        overlay.AttachMapData(() => atlas.MapData, SaveMapData);
         overlay.AttachStash(
             stash,
             itemArt,
@@ -3539,6 +3540,32 @@ internal static class Program
     /// repository both work - and a missing file is a path, not an exception, because every
     /// caller of this treats absence as "do without".
     /// </remarks>
+    /// <summary>
+    /// Writes the map-data report beside the exe and says where it went.
+    /// </summary>
+    /// <remarks>
+    /// Beside the exe rather than under data/: this is something the tool PRODUCED for a person
+    /// to read, not something it ships and loads back. Overwritten each time, because the useful
+    /// comparison is against a copy somebody deliberately kept, not against a directory of
+    /// timestamps nobody prunes.
+    ///
+    /// Never throws. It is a button on an overlay: a read-only directory or a file someone left
+    /// open in a spreadsheet is a sentence on screen, not a crash mid-session.
+    /// </remarks>
+    private static string SaveMapData(string text)
+    {
+        string path = Path.Combine(AppContext.BaseDirectory, "map-data.tsv");
+        try
+        {
+            File.WriteAllText(path, text);
+            return $"saved to {path}";
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            return $"could not save: {exception.Message}";
+        }
+    }
+
     private static string FindDataFile(string name)
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

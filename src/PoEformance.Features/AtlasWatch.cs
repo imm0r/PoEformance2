@@ -191,6 +191,16 @@ public sealed class AtlasWatch
     private int _checkServed;
     private IReadOnlyList<string> _checked = [];
 
+    /// <summary>
+    /// The map data as the game has it beside the files, published for the interface.
+    /// </summary>
+    /// <remarks>
+    /// Rebuilt whenever the catalogue changes - which is once a session - and otherwise handed
+    /// out unchanged, so the tab that draws it costs nothing per frame. Immutable, so it crosses
+    /// from this thread to the drawing one without a lock.
+    /// </remarks>
+    private MapDataReport _mapData = MapDataReport.Empty;
+
     private IReadOnlyDictionary<string, int> _ritualWorth = new Dictionary<string, int>();
 
     private float _cursorX;
@@ -225,6 +235,10 @@ public sealed class AtlasWatch
         Names = names ?? AtlasMapNames.Empty;
         Ratings = ratings ?? AtlasRatings.Empty;
         _grouping = new AtlasGrouping(_settings.Sorting, Names, Ratings);
+
+        // Before any atlas has been seen the report is the files alone, which is the honest
+        // starting state: it says what is shipped and that nothing has been read yet.
+        _mapData = MapDataReport.Build(null, Names, Ratings);
     }
 
     /// <summary>The map names in force, kept so settings can be replaced without them.</summary>
@@ -282,6 +296,9 @@ public sealed class AtlasWatch
 
     /// <summary>What the last check made of each step of the walk. Empty until one is asked for.</summary>
     public IReadOnlyList<string> Checked => Volatile.Read(ref _checked);
+
+    /// <summary>What the game says about every map, beside what the files say.</summary>
+    public MapDataReport MapData => Volatile.Read(ref _mapData);
 
     /// <summary>
     /// Asks for one account of the read, served on the next tick.
@@ -667,11 +684,11 @@ public sealed class AtlasWatch
     /// </remarks>
     private IReadOnlyList<string> Catalogue(UiScale scale, ulong uiRoot)
     {
+        // The nodes the last tick studied, when there are any: a second full read of the panel
+        // here would cost as much as the walk it is only meant to start.
+        IReadOnlyList<AtlasNode> nodes = _studied.Count > 0 ? _studied : _atlas.Read(uiRoot, scale);
         if (_catalogue.Table is null)
         {
-            // The nodes the last tick studied, when there are any: a second full read of the
-            // panel here would cost as much as the walk it is only meant to start.
-            IReadOnlyList<AtlasNode> nodes = _studied.Count > 0 ? _studied : _atlas.Read(uiRoot, scale);
             foreach (AtlasNode node in nodes)
             {
                 if (node.MapId.Length > 0 && _catalogue.ReadFromNode(node.Address))
@@ -680,6 +697,17 @@ public sealed class AtlasWatch
                 }
             }
         }
+
+        // Republished on every check, not only on the first: the catalogue itself is read once,
+        // but WHICH map ids have been seen on an atlas grows as somebody scrolls around, and that
+        // column is the difference between "the file lists it" and "this session met it".
+        Volatile.Write(
+            ref _mapData,
+            MapDataReport.Build(
+                _catalogue,
+                Names,
+                Ratings,
+                [.. nodes.Select(node => node.MapId).Where(id => id.Length > 0)]));
 
         var said = new List<string> { string.Empty };
         said.AddRange(_catalogue.Describe(Names));
