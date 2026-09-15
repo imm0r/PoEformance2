@@ -11,10 +11,11 @@ namespace PoEformance.Core.Tests;
 /// Which maps count as unique, now that the GAME answers it rather than data/atlas-maps.json.
 /// </summary>
 /// <remarks>
-/// WHY THE SOURCE CHANGED. WorldAreas.dat carries IsUniqueMapArea, and read over the whole 442-row
-/// table it disagrees with the shipped file on five of the atlas's own maps IN BOTH DIRECTIONS.
-/// The file is a hand-maintained port of that table; the column is what the client itself decides
-/// with. There is no version of this where the hand-maintained copy is the better source.
+/// WHY THE SOURCE CHANGED, AND WHY IT IS THE ONLY ONE NOW. WorldAreas.dat carries IsUniqueMapArea,
+/// and read over the whole 442-row table it disagreed with the shipped file on five of the atlas's
+/// own maps IN BOTH DIRECTIONS. The file was a hand-maintained port of that table; the column is
+/// what the client itself decides with. Its "type": "unique" key has since been removed, so NOTHING
+/// is unique until LearnUnique has run - and these tests are what say the difference is real.
 ///
 /// WHAT IT CHANGES. Two things ask whether a map is unique, and both of them reach it through
 /// AtlasMapNames.Of: the atlas grouping's catch-all group, and the rule that a ritual line may
@@ -26,14 +27,26 @@ namespace PoEformance.Core.Tests;
 /// </remarks>
 public class AtlasUniqueTests
 {
-    /// <summary>The ids the two sources part company on, measured over all 442 rows.</summary>
+    /// <summary>
+    /// Every map the game calls unique, of the 173 the atlas can hold. Measured over all 442 rows.
+    /// </summary>
     /// <remarks>
-    /// ExpeditionLeagueBoss was a fifth until data/atlas-maps.json was cut to the 173 maps the
-    /// atlas can actually hold. It is not in EndgameMaps.dat, so the file no longer makes a claim
-    /// about it and there is nothing left to disagree with - the GAME still calls it unique.
+    /// THE DRIFT DETECTOR, now that there is no file column to compare against. A patch that moves
+    /// IsUniqueMapArea, or a league that adds a unique map, changes this list and fails the test
+    /// that pins it - which is the whole reason to write it out rather than assert a count.
+    ///
+    /// The last two are why a NAME is not a source: their ids say "Unique" and the game does not.
     /// </remarks>
     private static readonly string[] GameSaysUnique =
-        ["RitualLeagueBoss", "MapVoidReliquary", "Map_HildaCampsite"];
+    [
+        "ExpeditionLogBook_Heath", "MapUniqueCastaway", "MapUniqueLake", "MapUniqueMegalith",
+        "MapUniqueMerchant01_Chimeral", "MapUniqueMerchant01_Oasis", "MapUniqueMerchant01_Sandswept",
+        "MapUniqueMerchant02_Crimson", "MapUniqueMerchant02_Farmland",
+        "MapUniqueMerchant03_Beach", "MapUniqueMerchant03_Raft", "MapUniqueMerchant03_Tropical",
+        "MapUniqueReactor_01", "MapUniqueReactor_02", "MapUniqueReactor_03",
+        "MapUniqueSelenite", "MapUniqueUntaintedParadise", "MapUniqueVault", "MapUniqueWildwood",
+        "MapVoidReliquary", "Map_HildaCampsite", "RitualLeagueBoss",
+    ];
 
     private static readonly string[] GameSaysOrdinary =
         ["MapUniqueInitialTower", "MapUniqueReactor_04"];
@@ -68,33 +81,39 @@ public class AtlasUniqueTests
     }
 
     [Fact]
-    public void TheGamesFlagReplacesTheFilesInBothDirections()
+    public void NothingIsUniqueUntilTheGameHasBeenAsked()
     {
+        // The file no longer carries a "type" key, so a freshly loaded one says nothing about any
+        // map. That is not "they are all ordinary" - it is "nobody has looked", and Revision is
+        // what tells the two apart.
         AtlasMapNames names = Names();
+
         Assert.Equal(0, names.Revision);
-        Assert.True(names.Of("MapUniqueReactor_04").Unique, "the file's word, before the game is asked");
+        Assert.DoesNotContain(names.All.Values, info => info.Unique);
+        Assert.False(names.Of("MapUniqueReactor_04").Unique);
         Assert.False(names.Of("MapVoidReliquary").Unique);
 
         int moved = names.LearnUnique(Areas(("MapUniqueReactor_04", false), ("MapVoidReliquary", true)));
 
-        Assert.Equal(2, moved);
+        Assert.Equal(1, moved);
         Assert.False(names.Of("MapUniqueReactor_04").Unique);
         Assert.True(names.Of("MapVoidReliquary").Unique);
         Assert.Equal(1, names.Revision);
     }
 
     [Fact]
-    public void ANDWhatTheFileSaidIsStillThereToBeComparedAgainst()
+    public void ANDTheFilesOWNENTRIESAreNotRewrittenByIt()
     {
-        // The report's whole job. Correcting the table in place would make it announce that the
-        // two sources agree everywhere, which is the one answer it must never be able to give.
+        // All is the shipped file, unchanged, and it has to stay that way: the ratings resolve
+        // their names through it, and the report's "what does the file carry" column is it.
         AtlasMapNames names = Names();
         int before = names.Count;
 
-        names.LearnUnique(Areas(("MapUniqueReactor_04", false), ("MapUnheardOf", true)));
+        names.LearnUnique(Areas(("MapLostTowers", true), ("MapUnheardOf", true)));
 
-        Assert.True(names.All["MapUniqueReactor_04"].Unique);
         Assert.Equal(before, names.Count);
+        Assert.DoesNotContain(names.All.Values, info => info.Unique);
+        Assert.Equal("Lost Towers", names.All["MapLostTowers"].Name);
         Assert.DoesNotContain("MapUnheardOf", names.All.Keys, StringComparer.OrdinalIgnoreCase);
     }
 
@@ -155,17 +174,17 @@ public class AtlasUniqueTests
     {
         // THE BUG THIS EXISTS FOR. The table is reachable only through an atlas node, so it
         // arrives AFTER the first reads have already decided - and cached, for the session - that
-        // five maps belong where the file put them.
+        // no map is unique, because the file says nothing about it.
         AtlasMapNames names = Names();
         var grouping = new AtlasGrouping(DefaultAtlasGroups.Groups, names);
 
-        Assert.Equal("Unique maps", grouping.Of("MapUniqueReactor_04")?.Name);
         Assert.Null(grouping.Of("MapVoidReliquary"));
+        Assert.Null(grouping.Of("MapUniqueCastaway"));
 
-        names.LearnUnique(Areas(("MapUniqueReactor_04", false), ("MapVoidReliquary", true)));
+        names.LearnUnique(Areas(("MapVoidReliquary", true), ("MapUniqueCastaway", true)));
 
-        Assert.Null(grouping.Of("MapUniqueReactor_04"));
         Assert.Equal("Unique maps", grouping.Of("MapVoidReliquary")?.Name);
+        Assert.Equal("Unique maps", grouping.Of("MapUniqueCastaway")?.Name);
     }
 
     [Fact]
@@ -180,8 +199,10 @@ public class AtlasUniqueTests
             Node(1, 0, "MapUniqueReactor_04"),
         ];
 
-        Assert.Equal([(1, 0)], RitualWatch.Blocked(atlas, names));
-        Assert.Equal([(0, 0)], RitualWatch.Startable(atlas, names));
+        // Neither is blocked while nothing has been read - which is the state a line planned before
+        // the atlas was ever opened would be planned in.
+        Assert.Empty(RitualWatch.Blocked(atlas, names));
+        Assert.Equal([(0, 0), (1, 0)], RitualWatch.Startable(atlas, names));
 
         names.LearnUnique(Areas(("MapUniqueReactor_04", false), ("MapVoidReliquary", true)));
 
@@ -190,43 +211,42 @@ public class AtlasUniqueTests
     }
 
     [Fact]
-    public void AgainstTheRealTableExactlyFiveMapsMoveAndTheyAreTheOnesMeasured()
+    public void AgainstTheRealTableTheUniqueMapsAreExactlyTheseAndTheFileSaysNothing()
     {
-        // The same five the report names, taken here through the switch itself rather than through
-        // the comparison - so the two cannot drift apart without one of them failing.
+        // THE DRIFT DETECTOR. With no file column left, this is what notices a patch moving
+        // IsUniqueMapArea: the ids are written out rather than counted, so a change names itself.
         AtlasMapNames names = Names();
         WorldAreaCatalogue catalogue = Catalogue();
 
         int moved = names.LearnUnique(catalogue.All);
 
-        // EIGHT ANSWERS CHANGE, not five, and the split is the interesting part. Five are
-        // CORRECTIONS to maps the file makes a claim about. Three are ADDITIONS - areas the game
-        // calls unique that the file no longer lists at all, because cutting it to the atlas's own
-        // 173 took them: ExpeditionLeagueBoss, MapUniqueFreight_ and MapUniqueMerchant04_PirateShip.
-        // None of the three is in EndgameMaps.dat, so no atlas node can carry them and nothing ever
-        // asks; they are entered anyway because the same rule is what makes a NEW league's unique
-        // map fall into the unique group before anybody edits a file.
-        Assert.Equal(8, moved);
-        Assert.All(
-            new[] { "ExpeditionLeagueBoss", "MapUniqueFreight_", "MapUniqueMerchant04_PirateShip" },
-            id =>
-            {
-                Assert.DoesNotContain(id, names.All.Keys, StringComparer.OrdinalIgnoreCase);
-                Assert.True(names.Of(id).Unique, id);
-            });
+        // TWENTY-FIVE, which is every unique area the table has: 22 of them are maps the file
+        // lists, and three are areas it does not - ExpeditionLeagueBoss, MapUniqueFreight_ and
+        // MapUniqueMerchant04_PirateShip - because cutting the file to the atlas's own 173 took
+        // them. None of the three is in EndgameMaps.dat, so no atlas node can carry them and
+        // nothing ever asks; they are entered anyway because the same rule is what makes a NEW
+        // league's unique map fall into the unique group before anybody edits a file.
+        Assert.Equal(25, moved);
         Assert.Equal(1, names.Revision);
+
         Assert.All(GameSaysUnique, id => Assert.True(names.Of(id).Unique, id));
         Assert.All(GameSaysOrdinary, id => Assert.False(names.Of(id).Unique, id));
-        Assert.All(GameSaysUnique, id => Assert.False(names.All[id].Unique, id));
-        Assert.All(GameSaysOrdinary, id => Assert.True(names.All[id].Unique, id));
+
+        // Every unique map of the 173, written out - not a count, so a change names itself.
+        Assert.Equal(
+            GameSaysUnique.Order(StringComparer.Ordinal),
+            names.All.Keys.Where(id => names.Of(id).Unique).Order(StringComparer.Ordinal));
+
+        // And the file itself still claims nothing.
+        Assert.DoesNotContain(names.All.Values, info => info.Unique);
     }
 
     [Fact]
-    public void ANDTheThreeThatGainItJoinTheUniqueGroupWhileTheTwoThatLoseItLeave()
+    public void ANDTheyAreDrawnAsUniqueWhileTheTwoTheGameCallsOrdinaryAreNot()
     {
-        // What the change is actually FOR. Three maps start being drawn as unique and two stop,
-        // and the two that stop are the ones whose ids say "Unique" in them - which is exactly
-        // why the file had them wrong and why a name is not a source.
+        // What the change is actually FOR. The two the game calls ordinary are the ones whose ids
+        // say "Unique" in them - which is exactly why the file had them wrong and why a name is
+        // not a source.
         AtlasMapNames names = Names();
         var grouping = new AtlasGrouping(DefaultAtlasGroups.Groups, names);
 
@@ -257,10 +277,10 @@ public class AtlasUniqueTests
         MapDataReport after = MapDataReport.Build(catalogue, names, ratings);
 
         Assert.True(after.UniqueFromGame);
-        Assert.Equal(5, after.UniqueDiffers);
-        Assert.True(after.UniqueNow(after.Maps.Single(row => row.Id == "MapVoidReliquary")));
-        Assert.False(after.UniqueNow(after.Maps.Single(row => row.Id == "MapUniqueReactor_04")));
-        Assert.Contains("unique in force\tgame", after.ToText(), StringComparison.Ordinal);
+        Assert.Equal(25, after.Uniques);
+        Assert.True(after.Maps.Single(row => row.Id == "MapVoidReliquary").GameUnique);
+        Assert.False(after.Maps.Single(row => row.Id == "MapUniqueReactor_04").GameUnique);
+        Assert.Contains("unique read from the game\tTrue", after.ToText(), StringComparison.Ordinal);
     }
 
     /// <summary>The real 442-row table, off the committed capture.</summary>

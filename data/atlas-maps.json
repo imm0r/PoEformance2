@@ -55,7 +55,6 @@
     },
     "ExpeditionLogBook_Heath": {
       "name": "Moor of Fallen Skies",
-      "type": "unique",
       "tags": ["expedition"]
     },
     "ExpeditionLogBook_Peninsula": {
@@ -473,85 +472,65 @@
       "tags": ["quest"]
     },
     "MapUniqueCastaway": {
-      "name": "Castaway",
-      "type": "unique"
+      "name": "Castaway"
     },
     "MapUniqueInitialTower": {
       "name": "Precursor Tower",
-      "type": "unique",
       "tags": ["tower"]
     },
     "MapUniqueLake": {
-      "name": "The Fractured Lake",
-      "type": "unique"
+      "name": "The Fractured Lake"
     },
     "MapUniqueMegalith": {
-      "name": "The Ezomyte Megaliths",
-      "type": "unique"
+      "name": "The Ezomyte Megaliths"
     },
     "MapUniqueMerchant01_Chimeral": {
-      "name": "Merchant's Campsite",
-      "type": "unique"
+      "name": "Merchant's Campsite"
     },
     "MapUniqueMerchant01_Oasis": {
-      "name": "Jado's Campsite",
-      "type": "unique"
+      "name": "Jado's Campsite"
     },
     "MapUniqueMerchant01_Sandswept": {
-      "name": "Merchant's Campsite",
-      "type": "unique"
+      "name": "Merchant's Campsite"
     },
     "MapUniqueMerchant02_Crimson": {
-      "name": "Merchant's Campsite",
-      "type": "unique"
+      "name": "Merchant's Campsite"
     },
     "MapUniqueMerchant02_Farmland": {
-      "name": "Merchant's Campsite",
-      "type": "unique"
+      "name": "Merchant's Campsite"
     },
     "MapUniqueMerchant03_Beach": {
-      "name": "Moment of Zen",
-      "type": "unique"
+      "name": "Moment of Zen"
     },
     "MapUniqueMerchant03_Raft": {
-      "name": "Moment of Zen",
-      "type": "unique"
+      "name": "Moment of Zen"
     },
     "MapUniqueMerchant03_Tropical": {
-      "name": "Moment of Zen",
-      "type": "unique"
+      "name": "Moment of Zen"
     },
     "MapUniqueReactor_01": {
-      "name": "Western Gateway",
-      "type": "unique"
+      "name": "Western Gateway"
     },
     "MapUniqueReactor_02": {
-      "name": "Ancient Gateway",
-      "type": "unique"
+      "name": "Ancient Gateway"
     },
     "MapUniqueReactor_03": {
-      "name": "Eastern Gateway",
-      "type": "unique"
+      "name": "Eastern Gateway"
     },
     "MapUniqueReactor_04": {
-      "name": "Site of the Chosen",
-      "type": "unique"
+      "name": "Site of the Chosen"
     },
     "MapUniqueSelenite": {
-      "name": "The Silent Cave",
-      "type": "unique"
+      "name": "The Silent Cave"
     },
     "MapUniqueUntaintedParadise": {
-      "name": "Untainted Paradise",
-      "type": "unique"
+      "name": "Untainted Paradise"
     },
     "MapUniqueVault": {
-      "name": "Vaults of Kamasa",
-      "type": "unique"
+      "name": "Vaults of Kamasa"
     },
     "MapUniqueWildwood": {
-      "name": "The Viridian Wildwood",
-      "type": "unique"
+      "name": "The Viridian Wildwood"
     },
     "MapVaalCity": {
       "name": "Vaal City"

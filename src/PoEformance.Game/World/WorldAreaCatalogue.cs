@@ -44,15 +44,14 @@ public sealed record WorldArea(
 ///
 /// WHAT IT DOES NOT DO is replace the file WHOLE, and the walk is what settled that rather than
 /// left it open. <see cref="Describe"/> reports what it read beside what data/atlas-maps.json says,
-/// and over all 442 rows (tests/fixtures/session-2026-09-catalogue.rec) the two part company in
-/// three different ways: the NAMES agree 439 of 440 and the one difference is a trailing space, so
-/// names can come from here; the UNIQUE flag disagrees on six ids in both directions, and the
-/// disagreement is the file's fault rather than the column's - IsUniqueMapArea is now the flag in
-/// force, see AtlasMapNames.LearnUnique; and the TAGS share no vocabulary at all - the game says
-/// map, map_tower, dungeon, pinnacle_boss and biomes, while the file says expedition, arbiter,
-/// quest, boss, lineage. The curated words are not derivable from this table, so the file shrinks
-/// to them rather than disappearing. See WorldAreaDat in the schema, where each of those is
-/// written down with its counts.
+/// and over all 442 rows (tests/fixtures/session-2026-09-catalogue.rec) the two parted company in
+/// three different ways. The NAMES agree, so names can come from here. The UNIQUE flag disagreed on
+/// five of the atlas's own maps in both directions, and that argument is OVER: IsUniqueMapArea won,
+/// the file's "type" key has been removed, and there is nothing left here to compare - see
+/// AtlasMapNames.LearnUnique. The TAGS share no vocabulary at all - the game says map, map_tower,
+/// dungeon, pinnacle_boss and biomes, while the file says expedition, arbiter, quest, boss,
+/// lineage - and those curated words are the only reason the file still exists. See WorldAreaDat in
+/// the schema, where each of those is written down with its counts.
 /// </remarks>
 public sealed class WorldAreaCatalogue
 {
@@ -311,10 +310,10 @@ public sealed class WorldAreaCatalogue
     /// What the table holds, and where it differs from the file this tool ships.
     /// </summary>
     /// <remarks>
-    /// The difference is the point rather than the catalogue: whether data/atlas-maps.json can go
-    /// away is exactly the question of what it says that the table does not. Names and the unique
-    /// flag are compared per id; tags are compared as vocabularies, because the two do not use the
-    /// same words and counting per map would only report that.
+    /// The difference is the point rather than the catalogue: what the file still has to say is
+    /// exactly what the table does not. Names are compared per id; tags are compared as
+    /// vocabularies, because the two do not use the same words and counting per map would only
+    /// report that. Unique is not compared at all any more - the file stopped carrying it.
     /// </remarks>
     public IReadOnlyList<string> Describe(AtlasMapNames file)
     {
@@ -375,7 +374,7 @@ public sealed class WorldAreaCatalogue
     {
         yield return $"  against data/atlas-maps.json ({file.Count} entries):";
 
-        int missing = 0, names = 0, uniques = 0;
+        int missing = 0, names = 0;
         var curated = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         foreach ((string id, AtlasMapInfo info) in file.All)
         {
@@ -392,11 +391,6 @@ public sealed class WorldAreaCatalogue
                 names++;
             }
 
-            if (info.Unique != area.IsUnique)
-            {
-                uniques++;
-            }
-
             foreach (string tag in info.Tags)
             {
                 if (!area.Tags.Contains(tag, StringComparer.OrdinalIgnoreCase))
@@ -408,13 +402,6 @@ public sealed class WorldAreaCatalogue
 
         yield return $"    {missing} of its ids are not in the table";
         yield return $"    {names} names differ (expected off an English client: 0)";
-        // NOT a complaint either. IsUniqueMapArea is the column in force (AtlasMapNames.LearnUnique)
-        // and the file's is kept to be compared against, so this counts how many maps the file
-        // would have grouped wrongly - six, on the client this was measured on.
-        yield return uniques == 0
-            ? "    the unique flag agrees everywhere - the file's column costs nothing either way"
-            : $"    the unique flag differs on {uniques} - IsUniqueMapArea wins, and those are the maps it moves";
-
         if (curated.Count == 0)
         {
             yield return "    every tag the file carries is in the table too - the file has nothing left to say";

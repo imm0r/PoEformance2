@@ -65,6 +65,8 @@ public sealed class EndgameMapCatalogue
     private readonly DatTableShape? _tables;
 
     private readonly int _worldAreaRef;
+    private readonly int _contentSetRef;
+    private readonly int _contentSetId;
     private readonly int _areaId;
 
     private readonly int _dataStorage;
@@ -72,6 +74,8 @@ public sealed class EndgameMapCatalogue
     private readonly int _mapData;
 
     private Dictionary<string, int> _maps = new(StringComparer.OrdinalIgnoreCase);
+    private Dictionary<string, string> _contentSets = new(StringComparer.OrdinalIgnoreCase);
+    private SortedSet<string> _categories = new(StringComparer.Ordinal);
 
     public EndgameMapCatalogue(IMemoryReader reader, OffsetSchema schema)
     {
@@ -80,7 +84,10 @@ public sealed class EndgameMapCatalogue
         _reader = reader;
         _tables = DatTableShape.From(schema);
 
-        _worldAreaRef = schema.Structs["EndgameMapsRow"].OffsetOf("WorldAreaRef");
+        StructDef endgame = schema.Structs["EndgameMapsRow"];
+        _worldAreaRef = endgame.OffsetOf("WorldAreaRef");
+        _contentSetRef = endgame.OffsetOf("MapContentSetRef");
+        _contentSetId = schema.Structs["EndgameMapContentSetRow"].OffsetOf("IdPtr");
         _areaId = schema.Structs["WorldAreaDat"].OffsetOf("IdPtr");
 
         StructDef node = schema.Structs["AtlasNode"];
@@ -105,6 +112,23 @@ public sealed class EndgameMapCatalogue
 
     /// <summary>How many rows named an area at all. Fewer than the table's rows means gaps.</summary>
     public int RowsNamed { get; private set; }
+
+    /// <summary>
+    /// What CATEGORY the game puts each map in - "CorruptedMap", "BreachTowerBoss" - by map id.
+    /// </summary>
+    /// <remarks>
+    /// THE GAME'S OWN VERSION OF THE CURATED TAGS, and the reason to read it: data/atlas-maps.json
+    /// carries 53 entries of hand-written words because nothing in WorldAreas said what kind of map
+    /// anything is. EndgameMapContentSet does, in the client's own vocabulary, and the JS reference
+    /// classifies nodes by exactly this string instead of shipping a list.
+    ///
+    /// SPARSE ON PURPOSE. Only some maps have a set - 131 of 173 on the capture this was measured
+    /// against - so a map missing from here is an ordinary one, not a failed read.
+    /// </remarks>
+    public IReadOnlyDictionary<string, string> ContentSets => _contentSets;
+
+    /// <summary>The distinct category names, for saying how coarse the classification is.</summary>
+    public IReadOnlyCollection<string> Categories => _categories;
 
     /// <summary>Why the last read found nothing, when it did.</summary>
     public string LastError { get; private set; } = string.Empty;
@@ -201,6 +225,12 @@ public sealed class EndgameMapCatalogue
         var maps = new Dictionary<string, int>((int)facts.Rows, StringComparer.OrdinalIgnoreCase);
         int rowsNamed = 0;
 
+        // The content-set rows repeat hard - five distinct rows across 131 maps on the capture this
+        // was measured against - so the string behind one is read once per ROW ADDRESS.
+        var sets = new Dictionary<ulong, string>();
+        var contentSets = new Dictionary<string, string>((int)facts.Rows, StringComparer.OrdinalIgnoreCase);
+        var categories = new SortedSet<string>(StringComparer.Ordinal);
+
         var block = new byte[RowsPerRead * (int)facts.RowSize];
         for (long first = 0; first < facts.Rows; first += RowsPerRead)
         {
@@ -233,10 +263,30 @@ public sealed class EndgameMapCatalogue
 
                 maps[id] = maps.GetValueOrDefault(id) + 1;
                 rowsNamed++;
+
+                ulong set = BinaryPrimitives.ReadUInt64LittleEndian(row[_contentSetRef..]);
+                if (!MemoryReaderExtensions.IsPlausiblePointer(set))
+                {
+                    continue; // an ordinary map, which most of them are
+                }
+
+                if (!sets.TryGetValue(set, out string? category))
+                {
+                    category = Text(_reader.ReadPointer(set + (ulong)_contentSetId));
+                    sets[set] = category;
+                }
+
+                if (category.Length > 0)
+                {
+                    contentSets[id] = category;
+                    categories.Add(category);
+                }
             }
         }
 
         _maps = maps;
+        _contentSets = contentSets;
+        _categories = categories;
         RowsNamed = rowsNamed;
         if (maps.Count == 0)
         {
@@ -281,6 +331,11 @@ public sealed class EndgameMapCatalogue
 
         said.Add($"  data/atlas-maps.json lists {file.Count}; {shared} of this table's maps are in it,"
             + $" and {file.Count - shared} of its entries are not atlas maps at all");
+
+        said.Add(_categories.Count == 0
+            ? "  no content-set categories read - the referenced rows are not in this capture"
+            : $"  {_contentSets.Count} maps carry one of {_categories.Count} content-set categories:"
+              + $" {string.Join(", ", _categories)}");
 
         // The rows naming the same area twice are worth seeing: they are the difference between
         // "173 maps" and "173 rows", and nothing else says which of the two the number is.

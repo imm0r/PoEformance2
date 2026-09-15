@@ -110,18 +110,18 @@ public class MapDataReportTests
     }
 
     [Fact]
-    public void TheFiveUniqueDisagreementsAreCountedAndNamed()
+    public void UniqueIsReportedAsTheGamesAnswerRatherThanAsAComparison()
     {
-        // The decision the owner took - unique follows the game - moves exactly these five.
-        // ExpeditionLeagueBoss was a sixth until the file was cut to the atlas's own maps: it is
-        // not in EndgameMaps.dat, so the file no longer claims anything about it and there is
-        // nothing left to disagree with. The game still calls it unique.
+        // There is nothing left to compare. The file's "type": "unique" key was removed once the
+        // game's IsUniqueMapArea was in force, so this column is simply what the table says - 25
+        // of its 442 areas - and the two ids whose names promise otherwise are the check worth
+        // keeping, because they are why the hand-kept copy was wrong.
         MapDataReport report = Build();
 
-        Assert.Equal(5, report.UniqueDiffers);
-        Assert.Equal(
-            ["MapUniqueInitialTower", "MapUniqueReactor_04", "MapVoidReliquary", "Map_HildaCampsite", "RitualLeagueBoss"],
-            report.Maps.Where(row => row.Unique == Agreement.Differ).Select(row => row.Id).Order(StringComparer.Ordinal));
+        Assert.Equal(25, report.Uniques);
+        Assert.True(report.Maps.Single(row => row.Id == "MapVoidReliquary").GameUnique);
+        Assert.False(report.Maps.Single(row => row.Id == "MapUniqueInitialTower").GameUnique);
+        Assert.False(report.Maps.Single(row => row.Id == "MapUniqueReactor_04").GameUnique);
     }
 
     [Fact]
@@ -180,7 +180,10 @@ public class MapDataReportTests
         Assert.Contains("# ratings\t83\tunresolved\t0\tneeding the file\t0", text, StringComparison.Ordinal);
         Assert.Contains("id\tgame name\tfile name\tname\t", text, StringComparison.Ordinal);
         Assert.Contains("MapUniqueReactor_04\t", text, StringComparison.Ordinal);
-        Assert.Contains("\tDiffer\t", text, StringComparison.Ordinal);
+        // GameOnly, not Differ: after the cut the two sources agree on every name they share, and
+        // the 269 areas only the game has are what the column reports instead.
+        Assert.Contains("\tGameOnly\t", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("\tDiffer\t", text, StringComparison.Ordinal);
 
         // One line per map between the two section headers. Counted by position rather than by
         // what an id looks like: barely a third begin with "Map" and the rest are Expedition,

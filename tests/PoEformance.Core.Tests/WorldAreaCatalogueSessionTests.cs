@@ -15,7 +15,7 @@ namespace PoEformance.Core.Tests;
 /// maps and could only say that the columns are reachable; this one walks all 442 rows, so every
 /// claim the file makes can be checked against the table rather than against six of it.
 ///
-/// The answer is: names yes, the unique flag ALMOST, the tags NO.
+/// The answer is: names yes, the unique flag YES and now exclusively, the tags NO.
 ///
 /// - 442 of 442 rows decode, which is the whole table. The file is now 173 entries, because it was
 ///   cut to the maps EndgameMaps.dat says the atlas can actually hold; this table is every AREA in
@@ -25,9 +25,9 @@ namespace PoEformance.Core.Tests;
 ///   the hideout it grants is a SEPARATE ROW that reads the other way round. Both are in the
 ///   table, both are called "Canal Hideout", and only the ids tell them apart - which is exactly
 ///   what the earlier capture guessed and could not prove.
-/// - IsUniqueMapArea and the file disagree on FIVE of the atlas's maps, so it is not quite the
-///   column the file's type: unique was built from - and the GAME now wins. Counted rather than
-///   waved away, because it is the one column a switch to memory silently changed.
+/// - IsUniqueMapArea disagreed with the file's type: unique on FIVE of the atlas's maps, in both
+///   directions. The game won and the file's key was removed, so the comparison is gone and what
+///   is pinned here is the table's own count instead.
 /// - the tag VOCABULARIES barely overlap. The game's 17 words are mechanical - map, biome,
 ///   dungeon, pinnacle_boss - and the file's grouping words (expedition, arbiter, quest, boss,
 ///   lineage, traverse, breach, craft, ritual) are in none of them. The file cannot be deleted
@@ -134,39 +134,27 @@ public class WorldAreaCatalogueSessionTests
     }
 
     [Fact]
-    public void TheUniqueFlagIsNotQuiteWhatTheFileCallsUnique()
+    public void TheUniqueFlagIsTheOnlySourceThereIsNow()
     {
-        // Five ids, both directions, and the direction is the interesting half: three areas the
-        // game marks unique are ordinary in the file, and two the file marks unique are ordinary
-        // in the game. THE GAME IS THE SOURCE NOW - AtlasMapNames.LearnUnique - so this pins which
-        // maps moved, and a client where the list stops being these five is one where something
-        // changed.
+        // WHAT THIS USED TO BE: a comparison, counting the five of the atlas's maps where
+        // IsUniqueMapArea and data/atlas-maps.json's "type": "unique" disagreed IN BOTH
+        // DIRECTIONS. The game won that argument and the file's key was removed, so there is
+        // nothing left to compare - and what is worth pinning instead is the table's own answer.
         //
-        // IT WAS SIX. ExpeditionLeagueBoss was the sixth and is not in EndgameMaps.dat, so it left
-        // with the other 266 when the file was cut to the maps the atlas can hold. Nothing about
-        // the game changed; the file stopped making a claim about an area no atlas node carries.
+        // The two below are why: their ids say "Unique" and the game says otherwise, which is
+        // exactly how a hand-kept copy goes wrong and why a NAME is not a source.
         using ReplayMemoryReader replay = Load();
         WorldAreaCatalogue catalogue = Read(replay);
         AtlasMapNames file = Curated();
 
-        List<string> differs = [.. file.All
-            .Where(pair => catalogue.Of(pair.Key) is { } area && area.IsUnique != pair.Value.Unique)
-            .Select(pair => pair.Key)
-            .Order(StringComparer.Ordinal)];
-
-        Assert.Equal(
-            ["MapUniqueInitialTower", "MapUniqueReactor_04", "MapVoidReliquary", "Map_HildaCampsite", "RitualLeagueBoss"],
-            differs);
-
-        // The sixth is still in the TABLE and still unique there - only the file's claim about it
-        // went away, which is what says the cut removed an entry rather than a fact.
+        Assert.Equal(25, catalogue.All.Values.Count(area => area.IsUnique));
         Assert.True(Assert.IsType<WorldArea>(catalogue.Of("ExpeditionLeagueBoss")).IsUnique);
         Assert.False(Assert.IsType<WorldArea>(catalogue.Of("MapUniqueInitialTower")).IsUnique);
+        Assert.False(Assert.IsType<WorldArea>(catalogue.Of("MapUniqueReactor_04")).IsUnique);
 
-        Assert.Contains(
-            "the unique flag differs on 5",
-            string.Join('\n', catalogue.Describe(file)),
-            StringComparison.Ordinal);
+        // And the file claims nothing at all, so Describe has stopped offering the comparison.
+        Assert.DoesNotContain(file.All.Values, info => info.Unique);
+        Assert.DoesNotContain("unique flag", string.Join('\n', catalogue.Describe(file)), StringComparison.Ordinal);
     }
 
     [Fact]

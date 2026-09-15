@@ -23,6 +23,11 @@ public enum Agreement
 
 /// <summary>One map, as the game has it and as the shipped files have it.</summary>
 /// <param name="Id">The engine id, which is the key on both sides.</param>
+/// <param name="GameUnique">
+/// WorldAreas.IsUniqueMapArea. There is no file column beside it any more: data/atlas-maps.json's
+/// "type": "unique" was removed once the game's answer was in force, so there is nothing to
+/// compare and this is simply what is true.
+/// </param>
 /// <param name="GameName">The name from WorldAreas, TRIMMED - one row ends in a space.</param>
 /// <param name="FileName">The name from data/atlas-maps.json.</param>
 /// <param name="GameTags">The game's own tag ids - map, map_tower, swamp_biome.</param>
@@ -40,7 +45,6 @@ public sealed record MapDataRow(
     bool InGame,
     bool InFile,
     bool GameUnique,
-    bool FileUnique,
     IReadOnlyList<string> GameTags,
     IReadOnlyList<string> FileTags,
     int? Rating,
@@ -52,9 +56,6 @@ public sealed record MapDataRow(
         InGame && GameName.Length > 0,
         InFile && FileName.Length > 0,
         string.Equals(GameName, FileName, StringComparison.OrdinalIgnoreCase));
-
-    /// <summary>How the two unique flags compare. Only meaningful where both sources have the map.</summary>
-    public Agreement Unique => Compare(InGame, InFile, GameUnique == FileUnique);
 
     /// <summary>
     /// Whether losing data/atlas-maps.json would cost this map its rating.
@@ -100,13 +101,16 @@ public sealed record RatingRow(string Name, int Rating, IReadOnlyList<string> Id
 /// report answers, per rating, whether the game supplies the same name - and therefore whether the
 /// line could survive the file being cut.
 ///
+/// UNIQUE IS NO LONGER A COMPARISON, because there is nothing left to compare it with: the file's
+/// "type": "unique" key was removed once the game's IsUniqueMapArea was in force. What the report
+/// shows now is what is true, and whether the table it comes from has been read yet.
+///
 /// IT IS BUILT ON THE READER THREAD AND PUBLISHED WHOLE. Everything here is immutable, so the
 /// interface can read a finished report without locking and without touching the catalogue.
 /// </remarks>
 /// <param name="UniqueFromGame">
-/// Whether the game's own IsUniqueMapArea is the flag IN FORCE, which it is once the table has
-/// been read. Until then the file's column still decides, and the rows where the two differ are a
-/// list of maps that are about to move rather than of maps that have.
+/// Whether WorldAreas has been read, which is what makes the unique column mean anything. Until
+/// then nothing is unique - not because the maps are ordinary, but because nobody has asked.
 /// </param>
 /// <param name="AtlasMaps">
 /// How many DISTINCT maps EndgameMaps.dat names - the real size of the atlas's map pool. Nought
@@ -131,12 +135,8 @@ public sealed record MapDataReport(
     /// <summary>Maps where a name exists on both sides and they differ.</summary>
     public int NamesDiffer => Count(row => row.Name == Agreement.Differ);
 
-    /// <summary>Maps where the unique flags disagree - the six this project measured.</summary>
-    /// <remarks>
-    /// NOT A FAULT COUNT. The game's column is the one in force, so this is the list of maps whose
-    /// grouping the file would have got wrong, and it is expected to be six rather than nought.
-    /// </remarks>
-    public int UniqueDiffers => Count(row => row.Unique == Agreement.Differ);
+    /// <summary>How many maps the game calls unique. Nought until the table has been read.</summary>
+    public int Uniques => Count(row => row.GameUnique);
 
     /// <summary>Ratings that resolved to no map at all. A typo, or a renamed map.</summary>
     public int RatingsUnresolved => Ratings.Count(rating => !rating.Resolves);
@@ -158,18 +158,6 @@ public sealed record MapDataReport(
     /// </remarks>
     public int NotAtlasMaps => AtlasMaps == 0 ? 0 : Count(row => row.InFile && !row.AtlasMap);
 
-    /// <summary>
-    /// Whether a map counts as unique RIGHT NOW, by whichever source is in force.
-    /// </summary>
-    /// <remarks>
-    /// Here rather than on the row, because the row holds both answers and only the report knows
-    /// which of them the rest of the tool is acting on.
-    /// </remarks>
-    public bool UniqueNow(MapDataRow row)
-    {
-        ArgumentNullException.ThrowIfNull(row);
-        return UniqueFromGame && row.InGame ? row.GameUnique : row.FileUnique;
-    }
 
     /// <summary>
     /// Builds the report from what the game said and what the files say.
@@ -214,7 +202,6 @@ public sealed record MapDataReport(
                 inGame,
                 inFile,
                 inGame && area!.IsUnique,
-                inFile && info!.Unique,
                 inGame ? area!.Tags : [],
                 inFile ? info!.Tags : [],
                 ratings.Of(id),
@@ -262,15 +249,15 @@ public sealed record MapDataReport(
             .Append("\tin game\t").Append(InGame)
             .Append("\tin file\t").Append(InFile)
             .Append("\tnames differ\t").Append(NamesDiffer)
-            .Append("\tunique differs\t").Append(UniqueDiffers)
-            .Append("\tunique in force\t").Append(UniqueFromGame ? "game" : "file").Append('\n');
+            .Append("\tunique\t").Append(Uniques)
+            .Append("\tunique read from the game\t").Append(UniqueFromGame).Append('\n');
         text.Append("# ratings\t").Append(Ratings.Count)
             .Append("\tunresolved\t").Append(RatingsUnresolved)
             .Append("\tneeding the file\t").Append(RatingsNeedingTheFile).Append('\n');
         text.Append("# atlas maps\t").Append(AtlasMaps)
             .Append("\tfile entries that are not atlas maps\t").Append(NotAtlasMaps).Append('\n');
 
-        text.Append("\nid\tgame name\tfile name\tname\tgame unique\tfile unique\tunique")
+        text.Append("\nid\tgame name\tfile name\tname\tunique")
             .Append("\tgame tags\tfile tags\trating\ton atlas\tatlas map\n");
         foreach (MapDataRow row in Maps)
         {
@@ -279,8 +266,6 @@ public sealed record MapDataReport(
                 .Append(row.FileName).Append('\t')
                 .Append(row.Name).Append('\t')
                 .Append(row.InGame ? row.GameUnique.ToString() : "-").Append('\t')
-                .Append(row.InFile ? row.FileUnique.ToString() : "-").Append('\t')
-                .Append(row.Unique).Append('\t')
                 .Append(string.Join(',', row.GameTags)).Append('\t')
                 .Append(string.Join(',', row.FileTags)).Append('\t')
                 .Append(row.Rating?.ToString() ?? string.Empty).Append('\t')

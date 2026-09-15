@@ -61,10 +61,11 @@ public class RitualWatchTests
         // The game tests a field on the map's own row for this; the reference falls back to the
         // same categories by tag, which is what is available here. All three are ordinary maps
         // by state - nothing but the category tells them apart.
-        // NOT MapUniqueReactor_04, which reads as unique in data/atlas-maps.json and ORDINARY in
-        // the game's own IsUniqueMapArea - one of the six ids the two sources part company on, and
-        // therefore the one example here that would have stopped meaning what it says the moment
-        // the table was read. See AtlasUniqueTests.
+        //
+        // UNIQUE COMES FROM THE GAME, so it has to be asked before it can be tested. The file's
+        // "type" key was removed when IsUniqueMapArea became the only source, which means a
+        // freshly loaded table calls nothing unique - and a version of this test that skipped the
+        // LearnUnique below would pass for the wrong reason, with the unique node simply unknown.
         AtlasNode[] atlas =
         [
             Node(0, 0, "MapAugury", AtlasNodeState.Open),                     // ordinary
@@ -73,7 +74,15 @@ public class RitualWatchTests
             Node(3, 0, "MapHideoutCanal_Claimable", AtlasNodeState.Open),     // hideout
         ];
 
-        HashSet<(int X, int Y)> blocked = RitualWatch.Blocked(atlas, Names());
+        AtlasMapNames names = Names();
+        Assert.DoesNotContain((1, 0), RitualWatch.Blocked(atlas, names));
+
+        names.LearnUnique(new Dictionary<string, WorldArea>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["ExpeditionLogBook_Heath"] = new("ExpeditionLogBook_Heath", string.Empty, true, false, true, []),
+        });
+
+        HashSet<(int X, int Y)> blocked = RitualWatch.Blocked(atlas, names);
 
         Assert.DoesNotContain((0, 0), blocked);
         Assert.Contains((1, 0), blocked);
