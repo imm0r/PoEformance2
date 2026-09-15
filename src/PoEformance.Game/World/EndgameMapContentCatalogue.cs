@@ -377,7 +377,17 @@ public sealed class EndgameMapContentCatalogue
     public static string AsTheFileWouldWriteIt(string text)
         => string.Join(' ', Files.KeywordGlossary.Plain(text).Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
 
-    /// <summary>Whether a row plus 100 is the badge the file calls by that number.</summary>
+    /// <summary>
+    /// Whether a row plus 100 is the badge the FILE calls by that number.
+    /// </summary>
+    /// <remarks>
+    /// AGAINST file.Badges AND NEVER file.Badge(), which is a distinction that cost a whole report.
+    /// The lookup answers with whatever is IN FORCE - which, once the learning has run, is this very
+    /// table - so a comparison built on it compares the game against itself and agrees perfectly:
+    /// "the file has 69; 70 of them are a row+100, 70 agree on the name and 70 on the sentence", on
+    /// a file that has 69 entries and disagrees about six of them. A check a wrong value passes is
+    /// worse than no check, and this one passed because it had stopped reading the file at all.
+    /// </remarks>
     private IEnumerable<string> Badges(AtlasContentNames file)
     {
         int matched = 0;
@@ -386,7 +396,7 @@ public sealed class EndgameMapContentCatalogue
         var differs = new List<MapContentRow>();
         foreach (MapContentRow row in _rows)
         {
-            if (file.Badge((uint)row.Index + BadgeIdBase) is not { } badge)
+            if (!file.Badges.TryGetValue((uint)row.Index + BadgeIdBase, out AtlasContent badge))
             {
                 continue;
             }
@@ -420,7 +430,7 @@ public sealed class EndgameMapContentCatalogue
             + $" {named} agree on the name and {worded} on the sentence";
         foreach (MapContentRow row in differs.Take(8))
         {
-            AtlasContent badge = file.Badge((uint)row.Index + BadgeIdBase)!.Value;
+            AtlasContent badge = file.Badges[(uint)row.Index + BadgeIdBase];
             yield return $"      0x{row.Index + BadgeIdBase:X} {row.Id}";
             yield return $"        file: \"{badge.Name}\" / {badge.Description}";
             yield return $"        game: \"{row.Name}\" / {AsTheFileWouldWriteIt(row.Description)}";
@@ -433,7 +443,7 @@ public sealed class EndgameMapContentCatalogue
 
         // The rows the file has never heard of are the other direction, and the reason to read the
         // table at all: an id the game knows and the shipped file does not is a gap, not a mismatch.
-        var unknown = _rows.Where(row => file.Badge((uint)row.Index + BadgeIdBase) is null).ToList();
+        var unknown = _rows.Where(row => !file.Badges.ContainsKey((uint)row.Index + BadgeIdBase)).ToList();
         yield return unknown.Count == 0
             ? "    every row is in the file"
             : $"    {unknown.Count} rows the file does not name, first few:";
@@ -616,7 +626,7 @@ public sealed class EndgameMapContentCatalogue
     {
         var pathed = _rows.Where(row => row.IconPath.Length > 0).ToList();
         int agreeing = pathed.Count(row =>
-            file.Badge((uint)row.Index + BadgeIdBase) is { } badge
+            file.Badges.TryGetValue((uint)row.Index + BadgeIdBase, out AtlasContent badge)
             && string.Equals(badge.Icon, ArtName(row.IconPath), StringComparison.OrdinalIgnoreCase));
 
         yield return $"  icons: {pathed.Count} of {_rows.Count} rows carry a whole art path,"
@@ -629,7 +639,9 @@ public sealed class EndgameMapContentCatalogue
         // The other direction is the interesting one: a row the game gives NO picture for, that the
         // file names an icon for anyway, is a name from somewhere other than this table.
         var invented = _rows
-            .Where(row => row.IconPath.Length == 0 && file.Badge((uint)row.Index + BadgeIdBase) is { Icon.Length: > 0 })
+            .Where(row => row.IconPath.Length == 0
+                && file.Badges.TryGetValue((uint)row.Index + BadgeIdBase, out AtlasContent badge)
+                && badge.Icon.Length > 0)
             .ToList();
         if (invented.Count > 0)
         {
@@ -637,7 +649,7 @@ public sealed class EndgameMapContentCatalogue
             foreach (MapContentRow row in invented.Take(4))
             {
                 yield return $"      0x{row.Index + BadgeIdBase:X} {row.Id} -> file says"
-                    + $" \"{file.Badge((uint)row.Index + BadgeIdBase)!.Value.Icon}\"";
+                    + $" \"{file.Badges[(uint)row.Index + BadgeIdBase].Icon}\"";
             }
         }
     }

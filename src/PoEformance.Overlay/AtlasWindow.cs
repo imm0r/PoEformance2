@@ -370,77 +370,10 @@ public sealed class AtlasWindow
             _watch.CheckTheRead();
         }
 
-        OverlayLayout.Hint("Open the atlas first - it reads nothing while the panel is shut.");
-
-        DrawReport();
-    }
-
-    /// <summary>
-    /// What the last check said, in a box of its own.
-    /// </summary>
-    /// <remarks>
-    /// A REPORT, NOT PART OF THE PAGE. It is twenty-odd lines of addresses, flag words, child
-    /// paths and counts, and it used to be printed straight into the settings as ordinary quiet
-    /// text - so pressing the button pushed every switch on the page down by a screenful, and
-    /// what came back read as though the tool had started explaining itself unprompted. In its
-    /// own bordered, scrolling box it is an answer that appeared next to the question, and the
-    /// page underneath it does not move.
-    ///
-    /// IN THE MONO FACE, and that is not decoration. Nearly every line here is a figure -
-    /// "0x31936412410", "0x5026F3  x1", "child path 24, 2  -  1373 children" - which is what
-    /// the mono face exists for in this tool. It also fixes the indentation for free: the
-    /// report is built in the game layer, where there is no ImGui and no way to ask for an
-    /// indent, so it steps its sub-lines in with four spaces. In a proportional face those four
-    /// spaces are four of the narrowest glyph there is and the nesting barely shows; in a
-    /// fixed-width one they are exactly four characters, on every line, and the tree is legible.
-    ///
-    /// Wrapped rather than clipped, because a few lines are whole sentences of prose that would
-    /// otherwise run off the right edge with no way to read the end of them.
-    ///
-    /// AND FOLDED, because it never went away. The box appears the moment the button is pressed
-    /// and then stays for the rest of the session - nine lines of addresses above every tab on
-    /// the page, long after the one question it answered was answered. Folded it costs a line,
-    /// and the line says a report is there.
-    /// </remarks>
-    private void DrawReport()
-    {
-        IReadOnlyList<string> report = _watch.Checked;
-        if (report.Count == 0)
-        {
-            return;
-        }
-
-        if (!OverlayLayout.Subsection($"Panel Debug Log ({report.Count} lines)###atlas-report"))
-        {
-            return;
-        }
-
-        // Tall enough for the common report and no taller. A box sized to its content would put
-        // the settings a screen and a half down the page, which is the problem being fixed.
-        float height = ImGui.GetFrameHeightWithSpacing() * 9f;
-
-        if (!ImGui.BeginChild("atlas-check", new Vector2(0f, height), ImGuiChildFlags.Borders))
-        {
-            ImGui.EndChild();
-            return;
-        }
-
-        OverlayFonts.PushMono();
-        try
-        {
-            foreach (string line in report)
-            {
-                ImGui.TextWrapped(ImGuiText.Escape(line));
-            }
-        }
-        finally
-        {
-            OverlayFonts.PopMono();
-
-            // In a finally and unconditionally: EndChild pairs with BeginChild whatever it
-            // returned, and an exception between the two leaves ImGui's stack unbalanced.
-            ImGui.EndChild();
-        }
+        OverlayLayout.Hint("Open the atlas first - it reads nothing while the panel is shut."
+            + (_watch.Checked.Count > 0
+                ? $" The last check wrote {_watch.Checked.Count} lines - they are on the Debug Log tab."
+                : string.Empty));
     }
 
     /// <summary>A warning about the settings, stepped in under what it is about.</summary>

@@ -1638,6 +1638,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             42, "atlas-style", "Visual Style", styles.Draw, styles.Idle,
             page: Atlas, pageLabel: "Atlas");
 
+        // LAST, and a tab rather than the nine-row box it used to be drawn in under the filters.
+        // The check's report is eight hundred lines now - every repeated map row, every content the
+        // file disagrees with, every effect id with the game's own name for it - and nine rows of
+        // that, unresizable, is a worse answer than none. It is also a diagnostic rather than a
+        // setting, so it goes at the end where nobody lands on it by accident.
+        var log = new AtlasLogWindow(() => watch.Checked);
+        _tools.Add(
+            49, "atlas-log", "Debug Log", log.DrawTab,
+            page: Atlas, pageLabel: "Atlas",
+            live: () => watch.Checked.Count > 0 ? $"Debug Log ({watch.Checked.Count})###atlas-log" : "Debug Log###atlas-log");
+
         if (visible)
         {
             _tools.Show("atlas");
