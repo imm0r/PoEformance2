@@ -17,14 +17,17 @@ namespace PoEformance.Core.Tests;
 /// a row called "Atlas", which is the atlas itself. Reading that file as "the atlas maps" has
 /// quietly shaped this project since the file was ported from GameHelper2 under that name.
 ///
-/// WHAT IS PROVED HERE AND WHAT IS NOT, because the difference matters and a test that blurred it
-/// would be worse than none. The TABLE is confirmed on three separate 0.5.5 captures: every one of
-/// them reaches "Data/Balance/EndgameMaps.dat" off an atlas node and it reports 173 rows of 0xF1.
-/// Its ROWS are in none of them, because the builds that made those captures never read the row
-/// block - and a recording can only contain reads the running build actually performed. So the
-/// content tests below SKIP rather than pass vacuously: Holds() answers false for everything while
-/// nothing is read, and a test resting on that would confirm itself. They become real checks the
-/// moment a capture taken with this walker is dropped into the fixture list.
+/// SETTLED, AGAINST THE GAME. Four separate 0.5.5 captures reach "Data/Balance/EndgameMaps.dat" off
+/// an atlas node and all four report 173 rows of 0xF1; the newest of them
+/// (session-2026-09-endgamemaps.rec) was taken with this walker in place and carries the row block,
+/// so the rows themselves are here: 173 rows naming 173 DIFFERENT areas. Against the file's 440
+/// entries, 267 are areas the atlas can never send anybody to.
+///
+/// THE CHECK THAT COULD HAVE REFUTED IT PASSED. 140 map ids were read off real atlas nodes in that
+/// capture and every single one is in the table - the only direction that can test it, because an
+/// id on a node IS an atlas map whatever any file says. The three earlier captures still run the
+/// table-identity check: "the table is 173 rows" is a claim about the GAME, and one recording can
+/// only ever be a claim about that recording.
 /// </remarks>
 public class EndgameMapSessionTests
 {
@@ -37,6 +40,7 @@ public class EndgameMapSessionTests
     /// </remarks>
     private static readonly string[] Captures =
     [
+        "session-2026-09-endgamemaps.rec",
         "session-2026-09-catalogue.rec",
         "session-2026-09-atlas.rec",
     ];
@@ -98,6 +102,7 @@ public class EndgameMapSessionTests
         => ReplayMemoryReader.Load(File.OpenRead(Path.Combine(Root.FullName, "tests", "fixtures", fixture)));
 
     [Theory]
+    [InlineData("session-2026-09-endgamemaps.rec")]
     [InlineData("session-2026-09-catalogue.rec")]
     [InlineData("session-2026-09-atlas.rec")]
     [InlineData("session-2026-09-atlasrows.rec")]
@@ -134,21 +139,22 @@ public class EndgameMapSessionTests
     }
 
     [Fact]
-    public void TheRowsAreNotInAnyCaptureYetAndTheWalkSaysSoPlainly()
+    public void TheWalkReadsEveryRowAndEachOneNamesADifferentArea()
     {
-        // THE HONEST STATE, pinned so it cannot be mistaken for a working walk. None of the builds
-        // that made these captures read the row block, so nothing can be read out of them - and
-        // this test FAILS the moment a capture does carry the rows, which is exactly when the
-        // skipped tests below should be turned on and this one deleted.
-        using ReplayMemoryReader replay = Load("session-2026-09-catalogue.rec");
-        EndgameMapCatalogue catalogue = Read(replay, out _);
-
-        Assert.Empty(catalogue.Maps);
-        Assert.Equal(0, catalogue.RowsNamed);
-        Assert.Contains("none of them names an area", catalogue.LastError, StringComparison.Ordinal);
+        // 173 rows, 173 areas, none repeated - so "173 rows" and "173 maps" are the same number
+        // here, which is not something a table has to do and therefore worth asserting rather
+        // than assuming. Maps counts rows per area precisely so a client where they diverge says so.
+        (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
+        using (replay)
+        {
+            Assert.Equal(173, endgame.RowsNamed);
+            Assert.Equal(173, endgame.Maps.Count);
+            Assert.Empty(endgame.LastError);
+            Assert.All(endgame.Maps.Values, rows => Assert.Equal(1, rows));
+        }
     }
 
-    [Fact(Skip = "needs a capture carrying the EndgameMaps ROWS. The table is reached and names itself - 173 rows of 0xF1 - in every committed capture, but a recording holds only the reads its build made, and none of those builds walked it. Take a fresh --record with this walker in place, add it to Captures, and delete this Skip.")]
+    [Fact]
     public void EveryMapItNamesIsOneWorldAreasAlsoHas()
     {
         (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
@@ -172,7 +178,7 @@ public class EndgameMapSessionTests
         }
     }
 
-    [Fact(Skip = "needs a capture carrying the EndgameMaps ROWS. The table is reached and names itself - 173 rows of 0xF1 - in every committed capture, but a recording holds only the reads its build made, and none of those builds walked it. Take a fresh --record with this walker in place, add it to Captures, and delete this Skip.")]
+    [Fact]
     public void EveryMapASessionSawOnTheAtlasIsInIt()
     {
         // GROUND TRUTH, and the only direction that can refute the table: an id read off a real
@@ -189,7 +195,7 @@ public class EndgameMapSessionTests
         }
     }
 
-    [Fact(Skip = "needs a capture carrying the EndgameMaps ROWS. The table is reached and names itself - 173 rows of 0xF1 - in every committed capture, but a recording holds only the reads its build made, and none of those builds walked it. Take a fresh --record with this walker in place, add it to Captures, and delete this Skip.")]
+    [Fact]
     public void ThingsThatAreObviouslyNotAtlasMapsAreNotInIt()
     {
         (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
@@ -204,7 +210,7 @@ public class EndgameMapSessionTests
         }
     }
 
-    [Fact(Skip = "needs a capture carrying the EndgameMaps ROWS. The table is reached and names itself - 173 rows of 0xF1 - in every committed capture, but a recording holds only the reads its build made, and none of those builds walked it. Take a fresh --record with this walker in place, add it to Captures, and delete this Skip.")]
+    [Fact]
     public void ItSaysHowMuchOfTheFileIsNotAboutTheAtlasAtAll()
     {
         (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
@@ -213,19 +219,49 @@ public class EndgameMapSessionTests
             string said = string.Join('\n', endgame.Describe(Names()));
 
             Assert.Contains("\"Data/Balance/EndgameMaps.dat\", 173 rows", said, StringComparison.Ordinal);
-            Assert.Contains("are not atlas maps at all", said, StringComparison.Ordinal);
+            Assert.Contains(
+                "data/atlas-maps.json lists 440; 173 of this table's maps are in it, and 267 of its"
+                + " entries are not atlas maps at all",
+                said,
+                StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void TheReportCountsTheSameThingTheTabShows()
+    {
+        // The number a person reads off Inspect -> Map Data, pinned where it is computed. 267 of
+        // the file's 440 entries describe somewhere the atlas cannot reach - which is the whole
+        // finding, in one integer.
+        (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
+        using (replay)
+        {
+            AtlasMapNames names = Names();
+            var areas = new WorldAreaCatalogue(replay, RealSessionTests.LiveSchema());
+            MapDataReport report = MapDataReport.Build(
+                areas, names, AtlasRatings.Empty, onAtlas: null, endgame: endgame);
+
+            Assert.Equal(173, report.AtlasMaps);
+            Assert.Equal(267, report.NotAtlasMaps);
+            Assert.Equal(440, report.InFile);
+            Assert.Contains("# atlas maps\t173\tfile entries that are not atlas maps\t267",
+                report.ToText(), StringComparison.Ordinal);
+
+            // Every rated map had better be one the atlas can send you to, or a rating is advice
+            // about a hideout.
+            Assert.True(report.Maps.Single(row => row.Id == "MapSunTemple").AtlasMap);
+            Assert.False(report.Maps.Single(row => row.Id == "G_login").AtlasMap);
         }
     }
 
     /// <summary>
-    /// The first capture whose rows actually read, or a skip saying none does yet.
+    /// The first capture whose rows actually read.
     /// </summary>
     /// <remarks>
-    /// SKIPPED RATHER THAN PASSING. With nothing read, Maps is empty and Holds answers false for
-    /// everything - so every assertion above would hold for the wrong reason. A skipped test says
-    /// "not answered"; a green one would say "answered, and the answer is yes". xunit 2.9 has no
-    /// dynamic skip, so the callers carry the reason on the attribute and this throws if one of
-    /// them ever runs without a capture behind it.
+    /// IT THROWS RATHER THAN RETURNING AN EMPTY ONE. With nothing read, Maps is empty and Holds
+    /// answers false for everything - so every assertion resting on it would hold for the wrong
+    /// reason, and a green test would say "answered, and the answer is yes". A capture whose build
+    /// did not walk the table can only ever say "not answered", and this is where that is caught.
     /// </remarks>
     private static (EndgameMapCatalogue Catalogue, ReplayMemoryReader Replay, IReadOnlyList<AtlasNode> Nodes) Walked()
     {
@@ -247,8 +283,8 @@ public class EndgameMapSessionTests
         }
 
         throw new InvalidOperationException(
-            "no committed capture carries the EndgameMaps ROWS. Every test reaching this is marked Skip"
-            + " for that reason; if one is not, its Skip was removed before a capture was added to"
-            + " Captures.");
+            "no capture in Captures carries the EndgameMaps ROWS. A recording holds only the reads its"
+            + " build performed, so a capture taken before this walker existed reaches the table and"
+            + " stops there. Take a fresh --record with the atlas open and add it to Captures.");
     }
 }
