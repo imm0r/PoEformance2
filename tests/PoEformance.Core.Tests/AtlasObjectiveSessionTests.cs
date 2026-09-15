@@ -2,6 +2,7 @@ using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Features;
+using PoEformance.Game.Components;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
@@ -169,7 +170,18 @@ public class AtlasObjectiveSessionTests
                 schema,
                 replay.ResolvedStatics["GameStates"],
                 AtlasContentNames.Load(Path.Combine(Root.FullName, "data", "atlas-content.json")),
-                AtlasMapNames.Load(Path.Combine(Root.FullName, "data", "atlas-maps.json")));
+                AtlasMapNames.Load(Path.Combine(Root.FullName, "data", "atlas-maps.json")),
+                ratings: null,
+
+                // THE SHIPPED TABLE, so the check has something to compare the install against.
+                statDescriptions: StatDescriptions.Load(
+                    Path.Combine(Root.FullName, "data", "stat_desc_map.tsv")));
+
+            // AND THE INSTALL IN FRONT OF IT, which is the shape a machine with the game has and
+            // the one this test did NOT have when it was first written: with no install-backed
+            // table the sentences block returns a single line and never reaches its comparison.
+            // That is the same gap that let the crash above ship - a branch nothing ran.
+            watch.LearnStatDescriptions(StatDescriptions.FromInstall(FakeInstall.Open()));
 
             watch.CheckTheRead();
             watch.Service(new UiScale(3440, 1440, 0), 0);
@@ -184,6 +196,16 @@ public class AtlasObjectiveSessionTests
             // And it really did reach the block that crashed, rather than bailing out earlier.
             Assert.Contains(said, line => line.StartsWith("NODE MECHANICS", StringComparison.Ordinal));
             Assert.Contains(said, line => line.Contains("Ritual", StringComparison.Ordinal));
+
+            // THE SENTENCES BLOCK ON ITS LIVE BRANCH TOO - install in force, shipped table behind
+            // it, comparison actually run. Without the LearnStatDescriptions above this block
+            // returns one line and proves nothing about the code a real session runs.
+            Assert.Contains(said, line => line.StartsWith("STAT SENTENCES", StringComparison.Ordinal));
+            Assert.Contains(said, line => line.Contains(".csd files", StringComparison.Ordinal));
+            Assert.Contains(said, line => line.Contains("compared against", StringComparison.Ordinal));
+
+            // AND THE TOKENS BLOCK, which is the last of the three and the one the crash hid.
+            Assert.Contains(said, line => line.StartsWith("NODE TOKENS", StringComparison.Ordinal));
         }
     }
 
