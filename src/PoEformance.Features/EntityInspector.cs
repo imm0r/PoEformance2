@@ -319,8 +319,12 @@ public sealed class EntityInspector
         }
 
         _statTries--;
+
+        // ONE WALK, EVERY TABLE THAT COMES OFF IT. The walk is the expensive part - eight thousand
+        // records - and reading a second table out of the result costs only that table's own rows.
+        PoEformance.Game.Files.LoadedDatTables walked = Walked();
         PoEformance.Game.Components.StatTable? table = PoEformance.Game.Components.StatTable.From(
-            Walked(), _reader, _schema);
+            walked, _reader, _schema);
 
         _statNames.Learn(table);
 
@@ -328,7 +332,15 @@ public sealed class EntityInspector
         // same way and drift the same way - item-stats.json is the 2.6 MB cousin of the file this
         // walk exists to get in front of - so there is no reason for them to keep believing a row
         // number this session has already corrected.
-        _itemNames?.Learn(table);
+        // AND THE BASE TYPES OFF THE SAME WALK. Read whole rather than a row at a time, because an
+        // item names itself by PATH and a path cannot be looked up without having seen them all;
+        // it happens here, once, on the thread that was already walking. Only when something
+        // shares this session's item tables - otherwise five thousand rows are read for nobody.
+        // The null-conditional short-circuits its ARGUMENTS too, so with nothing to hand it to,
+        // the five thousand rows are never read at all.
+        _itemNames?.Learn(
+            table,
+            baseItems: PoEformance.Game.Items.BaseItemTable.From(walked, _reader, _schema));
     }
 
     private PoEformance.Game.Files.LoadedDatTables Walked()
