@@ -217,6 +217,70 @@ public class StatTableSessionTests
     }
 
     [Fact]
+    public void THEFileNoLongerAnswersOverTheGameAndSaysAnotherContentsWords()
+    {
+        // MEASURED ON A LIVE ATLAS, 2026-09-15, and it is the reason the file dropped to last.
+        // Three of the ninety tokens on screen were answered by data/atlas-content.json with
+        // ANOTHER CONTENT'S sentence and another content's icon: its ids for these are two rows
+        // short, so a Delirium node read "Ritual Altars" under a Ritual symbol. The file carries
+        // the same five contents twice at two different shifts, which is what an export spanning
+        // two client versions leaves behind - and no reading of the file could have shown it.
+        (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
+        using (replay)
+        {
+            AtlasContentNames names = AtlasContentNames.Load(
+                Path.Combine(Root.FullName, "data", "atlas-content.json"));
+            names.Learn(contents.Rows, contents.BadgeIdBase, contents.StatTokenBase);
+
+            // THE FAULT ITSELF, pinned rather than described: with nothing but the file, these are
+            // the wrong words, and each is a real sentence about a real content - just not this one.
+            Assert.Equal("Ritual Altars", Assert.NotNull(names.Effect(26739)).Description);
+            Assert.Equal("Vaal Beacons", Assert.NotNull(names.Effect(26740)).Description);
+            Assert.Equal("Area contains Breaches", Assert.NotNull(names.Effect(26741)).Description);
+
+            names.LearnStats(
+                StatTable.Over(replay, Assert.IsType<DatTableFacts>(contents.StatsTable), RealSessionTests.LiveSchema()),
+                StatDescriptions.Load(Path.Combine(Root.FullName, "data", "stat_desc_map.tsv")),
+                contents.StatTokenBase);
+
+            // AND THE GAME SETTLES IT. Each token now reads as the stat the game says it is.
+            Assert.Equal("Area contains a Mirror of Delirium", Assert.NotNull(names.Effect(26739)).Description);
+            Assert.Equal("Area contains Abysses", Assert.NotNull(names.Effect(26740)).Description);
+            Assert.Equal("Area contains Ritual Altars", Assert.NotNull(names.Effect(26741)).Description);
+
+            // THE ICON GOES WITH IT, and empty is the right answer rather than a poor one: the id
+            // was stale, so its picture was stale too - that is how a Delirium node came to wear a
+            // Ritual symbol. No symbol beats a confident wrong one.
+            Assert.Equal(string.Empty, Assert.NotNull(names.Effect(26739)).Icon);
+        }
+    }
+
+    [Fact]
+    public void ANDTheFileStillAnswersWhereTheGameHasNothingToSay()
+    {
+        // The other half of the same change, and the reason the file was demoted rather than
+        // deleted: a token the game names but has no sentence for keeps the file's words.
+        (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
+        using (replay)
+        {
+            AtlasContentNames names = AtlasContentNames.Load(
+                Path.Combine(Root.FullName, "data", "atlas-content.json"));
+            names.Learn(contents.Rows, contents.BadgeIdBase, contents.StatTokenBase);
+            names.LearnStats(
+                StatTable.Over(replay, Assert.IsType<DatTableFacts>(contents.StatsTable), RealSessionTests.LiveSchema()),
+                StatDescriptions.Load(Path.Combine(Root.FullName, "data", "stat_desc_map.tsv")),
+                contents.StatTokenBase);
+
+            // 0x6157 is not a Stats row this capture can name, so the file is all there is.
+            Assert.Contains(" ", Assert.NotNull(names.Effect(0x6157)).Label, StringComparison.Ordinal);
+
+            // AND A CONTENT THE GAME SUPPLIED STILL WINS OUTRIGHT, which is the layer the
+            // measurement left alone: it describes what the NODE carries, not just the stat.
+            Assert.Equal("Area contains an Otherworldly Breach", Assert.NotNull(names.Effect(24062)).Description);
+        }
+    }
+
+    [Fact]
     public void ANDAMultiStatSentenceIsLeftOutRatherThanHalfFilled()
     {
         // The game writes one sentence for a GROUP of stats - "Damage Gained as Fire on {0} Heat
