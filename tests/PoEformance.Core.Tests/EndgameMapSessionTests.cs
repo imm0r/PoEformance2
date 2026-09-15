@@ -17,11 +17,13 @@ namespace PoEformance.Core.Tests;
 /// a row called "Atlas", which is the atlas itself. Reading that file as "the atlas maps" has
 /// quietly shaped this project since the file was ported from GameHelper2 under that name.
 ///
-/// SETTLED, AGAINST THE GAME. Four separate 0.5.5 captures reach "Data/Balance/EndgameMaps.dat" off
-/// an atlas node and all four report 173 rows of 0xF1; the newest of them
-/// (session-2026-09-endgamemaps.rec) was taken with this walker in place and carries the row block,
-/// so the rows themselves are here: 173 rows naming 173 DIFFERENT areas. Against the file's 440
-/// entries, 267 are areas the atlas can never send anybody to.
+/// SETTLED, AGAINST THE GAME, AND ACTED ON. Four separate 0.5.5 captures reach
+/// "Data/Balance/EndgameMaps.dat" off an atlas node and all four report 173 rows of 0xF1; the
+/// newest of them (session-2026-09-endgamemaps.rec) was taken with this walker in place and carries
+/// the row block, so the rows themselves are here: 173 rows naming 173 DIFFERENT areas. The file
+/// was 440 entries of which 267 were areas the atlas can never send anybody to, and has been cut to
+/// exactly those 173 - so the nine ids below are now absent from BOTH sides rather than present in
+/// one of them.
 ///
 /// THE CHECK THAT COULD HAVE REFUTED IT PASSED. 140 map ids were read off real atlas nodes in that
 /// capture and every single one is in the table - the only direction that can test it, because an
@@ -35,8 +37,9 @@ public class EndgameMapSessionTests
     /// Captures that reach the table, newest first. The walk runs against the first that has rows.
     /// </summary>
     /// <remarks>
-    /// A LIST rather than one name, so a fresh capture turns the skipped tests on by being added
-    /// here instead of by anything being rewritten.
+    /// A LIST rather than one name: a capture taken before this walker existed reaches the table
+    /// and stops there, so the row-reading tests run against the first entry that actually carries
+    /// the block, and a fresh capture is added rather than swapped in.
     /// </remarks>
     private static readonly string[] Captures =
     [
@@ -45,7 +48,7 @@ public class EndgameMapSessionTests
         "session-2026-09-atlas.rec",
     ];
 
-    /// <summary>Areas plainly in the file that the atlas can never send anybody to.</summary>
+    /// <summary>Areas that were plainly in the file and that the atlas can never send anybody to.</summary>
     private static readonly string[] NotAtlasMaps =
     [
         "G_login",              // the login screen
@@ -113,7 +116,7 @@ public class EndgameMapSessionTests
         // reference, so ONE atlas node is the whole prerequisite. What it leads to is 173 rows -
         // against the 442 of WorldAreas, which is the file this project has been calling the atlas.
         //
-        // Three captures rather than one because "the table is 173 rows" is a claim about the
+        // Four captures rather than one because "the table is 173 rows" is a claim about the
         // GAME, and one recording can only ever be a claim about that recording.
         using ReplayMemoryReader replay = Load(fixture);
         EndgameMapCatalogue catalogue = Read(replay, out _);
@@ -196,16 +199,19 @@ public class EndgameMapSessionTests
     }
 
     [Fact]
-    public void ThingsThatAreObviouslyNotAtlasMapsAreNotInIt()
+    public void ThingsThatAreObviouslyNotAtlasMapsAreInNeitherTheTableNorTheFile()
     {
+        // These nine are what made the misnaming visible, and they used to be IN the file - that
+        // was the point of this test. They are gone from it now, so it checks both halves: the
+        // table never named them, and the file has stopped doing so.
         (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
         using (replay)
         {
             AtlasMapNames file = Names();
             foreach (string id in NotAtlasMaps)
             {
-                Assert.True(file.All.ContainsKey(id), $"{id} should be in the file - that is the point");
                 Assert.False(endgame.Holds(id), $"{id} is not an atlas map and EndgameMaps should not name it");
+                Assert.DoesNotContain(id, file.All.Keys, StringComparer.OrdinalIgnoreCase);
             }
         }
     }
@@ -220,7 +226,7 @@ public class EndgameMapSessionTests
 
             Assert.Contains("\"Data/Balance/EndgameMaps.dat\", 173 rows", said, StringComparison.Ordinal);
             Assert.Contains(
-                "data/atlas-maps.json lists 440; 173 of this table's maps are in it, and 267 of its"
+                "data/atlas-maps.json lists 173; 173 of this table's maps are in it, and 0 of its"
                 + " entries are not atlas maps at all",
                 said,
                 StringComparison.Ordinal);
@@ -230,27 +236,45 @@ public class EndgameMapSessionTests
     [Fact]
     public void TheReportCountsTheSameThingTheTabShows()
     {
-        // The number a person reads off Inspect -> Map Data, pinned where it is computed. 267 of
-        // the file's 440 entries describe somewhere the atlas cannot reach - which is the whole
-        // finding, in one integer.
-        (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
+        // The number a person reads off Inspect -> Map Data, pinned where it is computed.
+        (EndgameMapCatalogue endgame, ReplayMemoryReader replay, IReadOnlyList<AtlasNode> nodes) = Walked();
         using (replay)
         {
             AtlasMapNames names = Names();
+
+            // READ FROM A NODE, not merely constructed. Without the walk the catalogue is empty and
+            // the report's union is the file alone - every count below still holds, which is what
+            // makes leaving it out a mistake that hides rather than fails.
             var areas = new WorldAreaCatalogue(replay, RealSessionTests.LiveSchema());
+            foreach (AtlasNode node in nodes)
+            {
+                if (node.MapId.Length > 0 && areas.ReadFromNode(node.Address))
+                {
+                    break;
+                }
+            }
+
+            Assert.Equal(442, areas.All.Count);
             MapDataReport report = MapDataReport.Build(
                 areas, names, AtlasRatings.Empty, onAtlas: null, endgame: endgame);
 
+            // NOUGHT is the finished state, and it is the number to watch from here: every entry
+            // the file still carries is a map the atlas can reach. It went 267 -> 0 by the file
+            // being cut, and it goes back above nought the moment a league adds an area somebody
+            // writes into the file that EndgameMaps does not name.
             Assert.Equal(173, report.AtlasMaps);
-            Assert.Equal(267, report.NotAtlasMaps);
-            Assert.Equal(440, report.InFile);
-            Assert.Contains("# atlas maps\t173\tfile entries that are not atlas maps\t267",
+            Assert.Equal(0, report.NotAtlasMaps);
+            Assert.Equal(173, report.InFile);
+            Assert.Contains("# atlas maps\t173\tfile entries that are not atlas maps\t0",
                 report.ToText(), StringComparison.Ordinal);
 
             // Every rated map had better be one the atlas can send you to, or a rating is advice
-            // about a hideout.
+            // about a hideout. G_login is still a ROW here - the union includes everything the game
+            // knows - it simply is not a map and no longer pretends to be one in a file.
             Assert.True(report.Maps.Single(row => row.Id == "MapSunTemple").AtlasMap);
-            Assert.False(report.Maps.Single(row => row.Id == "G_login").AtlasMap);
+            MapDataRow login = report.Maps.Single(row => row.Id == "G_login");
+            Assert.False(login.AtlasMap);
+            Assert.False(login.InFile);
         }
     }
 

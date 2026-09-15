@@ -44,10 +44,21 @@ public sealed record AtlasMapInfo(string Name, bool Unique, IReadOnlyList<string
 /// on a German client every one of those groups matches nothing. The id is the same on every
 /// client, so the grouping here holds whatever language the game is in.
 ///
-/// Ported from GameHelper2's WorldAreaTags.json, which is extracted from WorldAreas.dat: 176
-/// atlas areas, 23 of them unique, 57 carrying a tag. The bigger WorldAreaNames.tsv beside it
-/// adds 264 campaign zones and hubs that cannot appear on an atlas, so this is deliberately the
-/// smaller of the two files.
+/// WHAT IT IS NOW, AND WHAT IT WAS. It is the 173 maps EndgameMaps.dat says the atlas can actually
+/// hold. It used to be 440 entries, ported from GameHelper2 under a name that made a claim the data
+/// did not support: that port is WorldAreas.dat with tags added, and WorldAreas is EVERY AREA THE
+/// GAME HAS - 83 personal hideouts, 123 campaign zones, 16 Sanctum floors, the login screen, the
+/// character-select screen, a row called NULL, and a row called "Atlas", which is the atlas itself.
+/// Two hundred and sixty-seven of the 440 were places no atlas node can point at. They are gone.
+///
+/// NOTHING IN WorldAreas COULD HAVE SEPARATED THEM, which is why this took a second table rather
+/// than a filter: measured against 106 ids read off real atlas nodes, the Map* prefix misses every
+/// Expedition logbook and the game's own "map" tag misses sixteen of them. See EndgameMapCatalogue.
+///
+/// WHAT IS LEFT IS WHAT MEMORY DOES NOT SUPPLY: the English name, which the ratings resolve
+/// through (the game's own names are translated, so they cannot be that lookup), and the 53
+/// entries carrying curated words - expedition, arbiter, tower, lineage, traverse, breach, quest,
+/// boss, hideout, craft, ritual - which share no vocabulary with the game's mechanical tags.
 ///
 /// THE NAMES ARE ENGLISH, always, because that is what the table holds. On a German client the
 /// atlas will therefore be labelled in English while the game beneath it is not - a real

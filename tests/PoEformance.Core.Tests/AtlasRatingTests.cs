@@ -31,14 +31,18 @@ public class AtlasRatingTests
     [Fact]
     public void ANAMEIsResolvedToEVERYIdThatCarriesIt()
     {
-        // Several maps share a name - three different ids are all "Abyssal Depths" - and rating
-        // the name means rating all of them, which is what somebody writing one line meant.
+        // Several maps share a name - six different ids are all "Precursor Tower" - and rating the
+        // name means rating all of them, which is what somebody writing one line meant.
+        //
+        // "Abyssal Depths" was the example until the file was cut to the maps the atlas can hold:
+        // its three ids are Abyss_Depths1/2/3, which are not in EndgameMaps.dat and so went with
+        // the other 266. The point is unchanged and the shipped data still demonstrates it.
         AtlasMapNames names = Names();
-        var wanted = new Dictionary<string, int> { ["Abyssal Depths"] = 7 };
+        var wanted = new Dictionary<string, int> { ["Precursor Tower"] = 7 };
 
         AtlasRatings ratings = AtlasRatings.Resolve(wanted, names);
 
-        int carrying = names.All.Count(map => map.Value.Name == "Abyssal Depths");
+        int carrying = names.All.Count(map => map.Value.Name == "Precursor Tower");
         Assert.True(carrying > 1, "the fixture needs a shared name to be about anything");
         Assert.Equal(carrying, ratings.Count);
     }

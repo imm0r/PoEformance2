@@ -84,7 +84,11 @@ public class AtlasGroupTests
         int tagged = towers.Count(id => names.Of(id).Tagged("tower"));
         Assert.Equal(1, tagged);
 
-        Assert.True(names.Of("MapPrecursorTower").Tagged("tower"));
+        // A biome variant rather than the bare MapPrecursorTower, which was the example here until
+        // the file was cut to the maps the atlas can actually hold: that id is the TEMPLATE row and
+        // is not in EndgameMaps.dat, so nothing can ever put it on an atlas. The five biome
+        // variants are what rolls, and they make the same point.
+        Assert.True(names.Of("MapPrecursorTowerSwamp").Tagged("tower"));
 
         AtlasGrouping grouping = Shipped();
         foreach (string id in towers)
@@ -92,7 +96,7 @@ public class AtlasGroupTests
             Assert.Equal("Towers", grouping.Of(id)?.Name);
         }
 
-        Assert.NotEqual("Towers", grouping.Of("MapPrecursorTower")?.Name);
+        Assert.NotEqual("Towers", grouping.Of("MapPrecursorTowerSwamp")?.Name);
     }
 
     [Fact]

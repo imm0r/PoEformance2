@@ -17,15 +17,17 @@ namespace PoEformance.Core.Tests;
 ///
 /// The answer is: names yes, the unique flag ALMOST, the tags NO.
 ///
-/// - 442 of 442 rows decode, which is the whole table and two more than the file's 440 entries.
+/// - 442 of 442 rows decode, which is the whole table. The file is now 173 entries, because it was
+///   cut to the maps EndgameMaps.dat says the atlas can actually hold; this table is every AREA in
+///   the game, which is what made "atlas-maps" a misnomer for as long as it was a copy of it.
 /// - IsHideout IS the hideout column, and this is the reading that settles the owner's report
 ///   that it "does not work". The claimable-hideout MAP reads IsMapArea and not IsHideout, while
 ///   the hideout it grants is a SEPARATE ROW that reads the other way round. Both are in the
 ///   table, both are called "Canal Hideout", and only the ids tell them apart - which is exactly
 ///   what the earlier capture guessed and could not prove.
-/// - IsUniqueMapArea and the file disagree on SIX ids, so it is not quite the column the file's
-///   type: unique was built from. Counted rather than waved away, because it is the one column
-///   a switch to memory would silently change.
+/// - IsUniqueMapArea and the file disagree on FIVE of the atlas's maps, so it is not quite the
+///   column the file's type: unique was built from - and the GAME now wins. Counted rather than
+///   waved away, because it is the one column a switch to memory silently changed.
 /// - the tag VOCABULARIES barely overlap. The game's 17 words are mechanical - map, biome,
 ///   dungeon, pinnacle_boss - and the file's grouping words (expedition, arbiter, quest, boss,
 ///   lineage, traverse, breach, craft, ritual) are in none of them. The file cannot be deleted
@@ -134,11 +136,15 @@ public class WorldAreaCatalogueSessionTests
     [Fact]
     public void TheUniqueFlagIsNotQuiteWhatTheFileCallsUnique()
     {
-        // Six ids, both directions, and the direction is the interesting half: four areas the
-        // game marks unique are ordinary in the file (three of them league bosses, which the file
-        // groups by tag instead), and two the file marks unique are ordinary in the game. THE GAME
-        // IS THE SOURCE NOW - AtlasMapNames.LearnUnique - so this pins which maps that moved, and
-        // a client where the list stops being these six is a client where something changed.
+        // Five ids, both directions, and the direction is the interesting half: three areas the
+        // game marks unique are ordinary in the file, and two the file marks unique are ordinary
+        // in the game. THE GAME IS THE SOURCE NOW - AtlasMapNames.LearnUnique - so this pins which
+        // maps moved, and a client where the list stops being these five is one where something
+        // changed.
+        //
+        // IT WAS SIX. ExpeditionLeagueBoss was the sixth and is not in EndgameMaps.dat, so it left
+        // with the other 266 when the file was cut to the maps the atlas can hold. Nothing about
+        // the game changed; the file stopped making a claim about an area no atlas node carries.
         using ReplayMemoryReader replay = Load();
         WorldAreaCatalogue catalogue = Read(replay);
         AtlasMapNames file = Curated();
@@ -149,14 +155,16 @@ public class WorldAreaCatalogueSessionTests
             .Order(StringComparer.Ordinal)];
 
         Assert.Equal(
-            ["ExpeditionLeagueBoss", "MapUniqueInitialTower", "MapUniqueReactor_04", "MapVoidReliquary", "Map_HildaCampsite", "RitualLeagueBoss"],
+            ["MapUniqueInitialTower", "MapUniqueReactor_04", "MapVoidReliquary", "Map_HildaCampsite", "RitualLeagueBoss"],
             differs);
 
+        // The sixth is still in the TABLE and still unique there - only the file's claim about it
+        // went away, which is what says the cut removed an entry rather than a fact.
         Assert.True(Assert.IsType<WorldArea>(catalogue.Of("ExpeditionLeagueBoss")).IsUnique);
         Assert.False(Assert.IsType<WorldArea>(catalogue.Of("MapUniqueInitialTower")).IsUnique);
 
         Assert.Contains(
-            "the unique flag differs on 6",
+            "the unique flag differs on 5",
             string.Join('\n', catalogue.Describe(file)),
             StringComparison.Ordinal);
     }
@@ -203,9 +211,13 @@ public class WorldAreaCatalogueSessionTests
         HashSet<string> written = [.. file.All.Where(pair => pair.Value.Tagged("tower")).Select(pair => pair.Key)];
 
         Assert.Equal(11, said.Count);
-        Assert.Equal(8, written.Count);
+        Assert.Equal(7, written.Count);
+
+        // MapPrecursorTower joined the four the table tags and the file does not, for a different
+        // reason than they have: it is the template row the five biome variants roll from, it is
+        // not in EndgameMaps.dat, and so it went when the file was cut to the atlas's own maps.
         Assert.Equal(
-            ["MapAlpineRidge", "MapBluff", "MapMesa", "MapSwampTower"],
+            ["MapAlpineRidge", "MapBluff", "MapMesa", "MapPrecursorTower", "MapSwampTower"],
             said.Except(written).Order(StringComparer.Ordinal).ToArray());
         Assert.Equal(["MapPrecursorTowerMountain"], written.Except(said).ToArray());
     }
@@ -215,9 +227,13 @@ public class WorldAreaCatalogueSessionTests
     {
         // The column the switch to memory is actually FOR - on a German client the file's English
         // names are wrong on every row, and this one reads whatever the client says. On this
-        // English capture it agrees with the file 439 times out of 440, and the one exception is
-        // not a disagreement about the name: the game's own string ends in a space. Anything that
-        // reads names from here trims them.
+        // English capture the two now agree on ALL 173, and the file no longer carries an id the
+        // table has never heard of.
+        //
+        // BOTH NUMBERS IMPROVED BY SUBTRACTION, which is worth saying so nobody reads it as a fix.
+        // The file used to be 440 entries and disagreed on P2_3 while carrying KaruiBossShowcase
+        // and KaruiShowcase, which the table does not have. All three were campaign or showcase
+        // areas; cutting the file to the 173 maps the atlas can actually hold took them with it.
         using ReplayMemoryReader replay = Load();
         WorldAreaCatalogue catalogue = Read(replay);
         AtlasMapNames file = Curated();
@@ -228,13 +244,14 @@ public class WorldAreaCatalogueSessionTests
                 && !string.Equals(pair.Value.Name, area.Name, StringComparison.OrdinalIgnoreCase))
             .Select(pair => pair.Key)];
 
-        Assert.Equal(["P2_3"], differs);
+        Assert.Equal(173, file.Count);
+        Assert.Empty(differs);
+        Assert.DoesNotContain(file.All, pair => catalogue.Of(pair.Key) is null);
+
+        // THE TRAILING SPACE IS STILL REAL and still has to be trimmed by anything reading names
+        // from here - it is simply no longer visible through the file, because P2_3 is a campaign
+        // zone. Asserted off the TABLE so the knowledge does not leave with the entry.
         Assert.Equal("Sel Khari Sanctuary ", Assert.IsType<WorldArea>(catalogue.Of("P2_3")).Name);
         Assert.Equal("Sel Khari Sanctuary", catalogue.Of("P2_3")!.Name.Trim());
-
-        // Two ids the file carries that the table does not - showcase areas pulled since the file
-        // was extracted. Nothing on an atlas points at them, so nothing loses a name.
-        List<string> missing = [.. file.All.Where(pair => catalogue.Of(pair.Key) is null).Select(pair => pair.Key).Order(StringComparer.Ordinal)];
-        Assert.Equal(["KaruiBossShowcase", "KaruiShowcase"], missing);
     }
 }
