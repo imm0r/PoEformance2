@@ -147,6 +147,47 @@ public class AtlasObjectiveSessionTests
     }
 
     [Fact]
+    public void THECheckRunsToTheENDOnAnAtlasThatHostsMechanics()
+    {
+        // THE TEST THAT WAS MISSING, and its absence shipped a crash. Everything else here
+        // exercises the CATALOGUE; nothing ran Check itself, and Check is the only caller of the
+        // block that summarises it. That block asked a dictionary of (int, string, string) for
+        // GetValueOrDefault - whose default carries NULL strings - so the first node that hosted
+        // anything dereferenced null and the whole check came back as one line:
+        //
+        //   the check itself failed: Object reference not set to an instance of an object.
+        //
+        // On every real atlas, because every real atlas has a mechanic somewhere. A unit test of
+        // the reader could not have caught it; only running the thing the button runs could.
+        ReplayMemoryReader replay = ReplayMemoryReader.Load(
+            File.OpenRead(Path.Combine(Root.FullName, "tests", "fixtures", "session-2026-09-mapcontent.rec")));
+        using (replay)
+        {
+            OffsetSchema schema = RealSessionTests.LiveSchema();
+            var watch = new AtlasWatch(
+                replay,
+                schema,
+                replay.ResolvedStatics["GameStates"],
+                AtlasContentNames.Load(Path.Combine(Root.FullName, "data", "atlas-content.json")),
+                AtlasMapNames.Load(Path.Combine(Root.FullName, "data", "atlas-maps.json")));
+
+            watch.CheckTheRead();
+            watch.Service(new UiScale(3440, 1440, 0), 0);
+
+            IReadOnlyList<string> said = watch.Checked;
+            Assert.NotEmpty(said);
+
+            // THE ALARM, worded so it cannot pass by accident: whatever else the check says, it
+            // must not say that it fell over.
+            Assert.DoesNotContain(said, line => line.Contains("the check itself failed", StringComparison.Ordinal));
+
+            // And it really did reach the block that crashed, rather than bailing out earlier.
+            Assert.Contains(said, line => line.StartsWith("NODE MECHANICS", StringComparison.Ordinal));
+            Assert.Contains(said, line => line.Contains("Ritual", StringComparison.Ordinal));
+        }
+    }
+
+    [Fact]
     public void ANODEWithNoObjectiveIsTheOrdinaryCase()
     {
         (List<AtlasNode> nodes, AtlasObjectiveCatalogue objectives, ReplayMemoryReader replay) =

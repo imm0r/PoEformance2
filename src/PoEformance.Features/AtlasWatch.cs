@@ -842,9 +842,21 @@ public sealed class AtlasWatch
                 continue;
             }
 
-            (int count, string icon, string words) = hosting.GetValueOrDefault(found.Id);
-            hosting[found.Id] = (count + 1, found.Icon.Length > 0 ? found.Icon : icon,
-                words.Length > 0 ? words : found.Words);
+            // NOT GetValueOrDefault, AND THAT IS THE WHOLE OF A BUG THIS SHIPPED WITH. The default
+            // of a tuple carrying strings is (0, null, null), so the first node that hosted
+            // anything dereferenced a null and the check died with "Object reference not set" -
+            // on every real atlas, because every real atlas has a mechanic somewhere.
+            if (!hosting.TryGetValue(found.Id, out (int Nodes, string Icon, string Words) had))
+            {
+                had = (0, string.Empty, string.Empty);
+            }
+
+            // First non-empty wins, the same rule the rest of this project keeps: a row that has
+            // already answered is not replaced, so the report reads the same on every run.
+            hosting[found.Id] = (
+                had.Nodes + 1,
+                had.Icon.Length > 0 ? had.Icon : found.Icon,
+                had.Words.Length > 0 ? had.Words : found.Words);
         }
 
         if (hosting.Count == 0)
