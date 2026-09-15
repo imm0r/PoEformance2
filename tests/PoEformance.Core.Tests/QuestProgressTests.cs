@@ -207,6 +207,38 @@ public class QuestProgressTests
     }
 
     [Fact]
+    public void AnIntervalColumnIsTwoValuesWideAndAnArrayOfThemIsStillAReference()
+    {
+        // MEASURED AGAINST THE CLIENT, and it is what a missing rule costs. Mods computed 0x295
+        // over its columns against the 0x2B5 its own loader reports, and the thirty-two byte gap
+        // was first written down as columns nobody had carried. It was not: Mods has eight
+        // interval columns, Stat1Value through Stat8Value, and an interval is a RANGE - two i32
+        // where a plain one costs four. Eight times four is the whole difference.
+        //
+        // The rule holds on every table whose size is known rather than only on the one it
+        // explains: Quest 119, QuestStates 208, QuestFlags 12, BaseItemTypes 360 and ItemClasses
+        // 150 carry no interval and are unchanged by it.
+        Assert.Equal(4, new DatColumn("Plain", "i32", false).Width);
+        Assert.Equal(8, new DatColumn("Range", "i32", false) { Interval = true }.Width);
+
+        // A list of ranges is still a count and an offset: the doubling is of the stored value,
+        // not of the reference to a list of them.
+        Assert.Equal(
+            DatColumns.ArrayWidth,
+            new DatColumn("Ranges", "i32", true) { Interval = true }.Width);
+
+        // Eight of them beside a plain row: 8 + 8*8 against 8 + 8*4.
+        List<DatColumn> stats = [new("Id", "string", false)];
+        for (int i = 0; i < 8; i++)
+        {
+            stats.Add(new DatColumn($"Stat{i}Value", "i32", false) { Interval = true });
+        }
+
+        Assert.Equal(72, DatColumns.Layout(stats));
+        Assert.Equal(40, DatColumns.Layout([.. stats.Select(one => new DatColumn(one.Name, one.Type, one.Array))]));
+    }
+
+    [Fact]
     public void AnUnpricedTypeAbandonsTheLayoutRatherThanLeavingAHole()
     {
         // Every offset after an unknown width is a guess, and a guess that looks like an
