@@ -828,6 +828,9 @@ public sealed class AtlasWatch
         said.Add(string.Empty);
         said.AddRange(Mechanics(nodes));
         said.Add(string.Empty);
+        said.AddRange(new Game.Diagnostics.BossTierProbe(_reader, _schema).Probe(
+            [.. nodes.Select(node => (node.Address, node.MapId, node.BadgeIds))]));
+        said.Add(string.Empty);
         said.AddRange(Tokens(nodes));
         return said;
     }

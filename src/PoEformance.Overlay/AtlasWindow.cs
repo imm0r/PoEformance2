@@ -169,8 +169,16 @@ public sealed class AtlasWindow
 
         OverlayLayout.Cell(2);
 
+        // THE LABEL SAYS WHAT THE SWITCH IS DOING, not what turning it on would do. "As Pictures"
+        // left the off state unnamed, so a node showing words read as the feature being broken
+        // rather than as the setting being off.
+        //
+        // AFTER ### IS THE IDENTITY, and it has to be there: ImGui keys a widget by its label, so
+        // a label that changes with the state is a different widget every time it is clicked.
         bool icons = settings.Icons;
-        if (OverlayLayout.Toggle("As Pictures", ref icons))
+        if (OverlayLayout.Toggle(
+            (icons ? "Node mechanic: icon" : "Node mechanic: text") + "###atlas-as-pictures",
+            ref icons))
         {
             changed = changed with { Icons = icons };
         }
