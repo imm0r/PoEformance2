@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
@@ -139,6 +140,62 @@ public class EndgameMapSessionTests
 
         Assert.NotNull(catalogue.Table);
         Assert.DoesNotContain("0x0 does not read", catalogue.LastError, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TheContentSetColumnPointsAtOneTablesRowGrid()
+    {
+        // STRUCTURE RATHER THAN STRINGS, which is what makes this checkable at all right now: the
+        // referenced rows are outside the block read, so no capture carries the category NAMES yet.
+        // What a capture does carry is the pointers, and rows of one table lie on that table's
+        // grid - so the handful the column resolves to must all be a multiple of 0x19 apart, which
+        // is the row size dat-schema computes for EndgameMapContentSet's three columns. A column
+        // pointing at the wrong thing does not land on one table's grid five times over.
+        using ReplayMemoryReader replay = Load("session-2026-09-endgamemaps.rec");
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        EndgameMapCatalogue catalogue = Read(replay, out _);
+
+        DatTableFacts facts = Assert.IsType<DatTableFacts>(catalogue.Table);
+        var block = new byte[facts.Rows * facts.RowSize];
+        Assert.True(replay.TryRead(facts.RowsBegin, block.AsSpan()));
+
+        int at = schema.Structs["EndgameMapsRow"].OffsetOf("MapContentSetRef");
+        long size = schema.Structs["EndgameMapContentSetRow"].Constants["ComputedRowSize"];
+        Assert.Equal(0x19, size);
+
+        List<ulong> rows = [];
+        for (int i = 0; i < facts.Rows; i++)
+        {
+            ulong set = BinaryPrimitives.ReadUInt64LittleEndian(block.AsSpan((i * (int)facts.RowSize) + at));
+            if (MemoryReaderExtensions.IsPlausiblePointer(set) && !rows.Contains(set))
+            {
+                rows.Add(set);
+            }
+        }
+
+        Assert.Equal(5, rows.Count);
+        ulong first = rows.Min();
+        Assert.All(rows, row => Assert.Equal(0UL, (row - first) % (ulong)size));
+    }
+
+    [Fact]
+    public void ANDTheCategoryNamesAreNotInAnyCaptureYet()
+    {
+        // The honest state, pinned so it cannot be mistaken for a working read. The pointers are
+        // there and land on the grid above; the rows they point at were never read by the build
+        // that made this capture, and a recording holds only the reads its build performed. This
+        // test FAILS the moment a capture carries them, which is when the categories can be
+        // asserted by name instead.
+        (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
+        using (replay)
+        {
+            Assert.Empty(endgame.Categories);
+            Assert.Empty(endgame.ContentSets);
+            Assert.Contains(
+                "no content-set categories read - the referenced rows are not in this capture",
+                string.Join('\n', endgame.Describe(Names())),
+                StringComparison.Ordinal);
+        }
     }
 
     [Fact]
