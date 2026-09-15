@@ -180,6 +180,13 @@ public sealed class AtlasWindow
             + " words each. Anything with no picture keeps its line, so nothing is lost."
             + Pictures());
 
+        // WHERE THE WORDS COME FROM, and it needs saying because the two sources look identical on
+        // screen. A badge reads the same whether the game supplied it or the shipped file did -
+        // right up to the handful where the file is wrong, which is exactly the case nobody would
+        // spot. Measured once: the file had a badge carrying another badge's text, three contents
+        // missing, and every high effect id five tokens stale, so Water read as Desert.
+        OverlayLayout.Hint($"Names come from {_watch.ContentSource}.");
+
         // A name in the file that matches no map is a rating that silently never appears, which
         // is indistinguishable from having forgotten to write it. Named here, it is a typo.
         //

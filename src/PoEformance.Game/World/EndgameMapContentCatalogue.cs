@@ -110,6 +110,7 @@ public sealed class EndgameMapContentCatalogue
     private readonly int _visual;
     private readonly int _visualId;
     private readonly int _visualIcon;
+    private readonly int _statId;
 
     private List<MapContentRow> _rows = [];
 
@@ -127,6 +128,8 @@ public sealed class EndgameMapContentCatalogue
         _name = content.OffsetOf("NamePtr");
         _visual = content.OffsetOf("VisualIdentityRef");
         BadgeIdBase = (uint)content.Constants["BadgeIdBase"];
+        StatTokenBase = (uint)content.Constants["StatTokenBase"];
+        _statId = schema.Structs["StatsRow"].OffsetOf("IdPtr");
 
         StructDef art = schema.Structs["EndgameMapContentVisualIdentityRow"];
         _visualId = art.OffsetOf("IdPtr");
@@ -135,6 +138,25 @@ public sealed class EndgameMapContentCatalogue
 
     /// <summary>What a row's index is added to before it is a badge id. See AtlasNode.BadgeVectorBegin.</summary>
     public uint BadgeIdBase { get; }
+
+    /// <summary>
+    /// What a STAT's row index is added to before it is the token a node carries. One.
+    /// </summary>
+    /// <remarks>
+    /// THE OFF-BY-ONE THAT MADE THE FIRST VERSION OF THIS DO NOTHING, and it was invisible because
+    /// everything still read and every number still looked plausible: the learnt effects were filed
+    /// under the row index, the nodes ask with the index plus one, and so not one lookup ever hit.
+    ///
+    /// The six biomes prove the direction rather than merely suggesting it. Those contents grant
+    /// stat indices 25861..25866; real nodes carry tokens 25862..25867, and 25861 appears on no
+    /// node in any of four captures. Across all 83 stats these contents grant, 61 turn up as token
+    /// s+1 and 15 as token s - and those 15 are exactly the ones whose neighbour is also granted,
+    /// which is overlap, not counter-evidence.
+    /// </remarks>
+    public uint StatTokenBase { get; }
+
+    /// <summary>The token a node would carry for a stat this walk resolved to <paramref name="index"/>.</summary>
+    public uint TokenFor(long index) => (uint)index + StatTokenBase;
 
     /// <summary>What the table said about itself, or null when it has not been read.</summary>
     public DatTableFacts? Table { get; private set; }
@@ -422,6 +444,11 @@ public sealed class EndgameMapContentCatalogue
     }
 
     /// <summary>Whether the file's effect ids are the stat rows these contents grant.</summary>
+    /// <remarks>
+    /// COMPARED AS TOKENS, because that is what a lookup is given. The stat's row index plus one is
+    /// the number a node carries, and measuring the file against the raw index instead reports a
+    /// drift one short of the real one - which is how a +5 came back as a +4.
+    /// </remarks>
     private IEnumerable<string> Effects(AtlasContentNames file)
     {
         var granted = new HashSet<long>();
@@ -429,7 +456,7 @@ public sealed class EndgameMapContentCatalogue
         {
             foreach (long stat in row.Stats)
             {
-                granted.Add(stat);
+                granted.Add(TokenFor(stat));
             }
         }
 
@@ -454,6 +481,46 @@ public sealed class EndgameMapContentCatalogue
         {
             yield return $"    {hits} are, shifted by {shift:+#;-#;0} - which is what a stale index looks like"
                 + " after the game inserted rows above them";
+        }
+
+        foreach (string line in EveryFileId(file, shift))
+        {
+            yield return line;
+        }
+    }
+
+    /// <summary>
+    /// What the game calls the stat behind each of the file's effect ids, and behind the drifted one.
+    /// </summary>
+    /// <remarks>
+    /// THE PER-ENTRY ANSWER, where the shift above is only the population's. A shift found over 43
+    /// ids says nothing about any ONE of them, and most of the file's entries name stats no map
+    /// content grants - so they can neither confirm nor deny it from the contents alone. Their own
+    /// Stats row can: if the file's id lands on a stat whose engine name matches its sentence, that
+    /// entry is still right; if the name at id+shift matches instead, that one has drifted too.
+    /// This is the table somebody reads to correct the file entry by entry rather than in bulk.
+    /// </remarks>
+    private IEnumerable<string> EveryFileId(AtlasContentNames file, int shift)
+    {
+        uint[] ids = [.. file.Effects.Keys.Order()];
+        if (ids.Length == 0 || StatsTable is null)
+        {
+            yield break;
+        }
+
+        IReadOnlyDictionary<uint, string> here = NameStats(ids);
+        IReadOnlyDictionary<uint, string> there = shift == 0
+            ? here
+            : NameStats(ids.Select(id => (uint)(id + shift)));
+
+        yield return $"    what the game calls each of the file's {ids.Length} effect ids, and the one"
+            + $" {shift:+#;-#;0} from it:";
+        foreach (uint id in ids)
+        {
+            string mine = here.GetValueOrDefault(id, "-");
+            string drifted = shift == 0 ? string.Empty : $"   {id + shift} = {there.GetValueOrDefault((uint)(id + shift), "-")}";
+            yield return $"      {id,6} = {mine}{drifted}"
+                + $"   \"{file.Effects[id].Description}\"";
         }
     }
 
@@ -481,6 +548,55 @@ public sealed class EndgameMapContentCatalogue
         }
 
         return best;
+    }
+
+    /// <summary>
+    /// What the game calls the stats behind a set of node tokens - <c>map_extra_shrines</c> and the like.
+    /// </summary>
+    /// <remarks>
+    /// THE ONLY THING THAT CAN SETTLE THE FILE'S REMAINING EFFECT IDS, and it needs no particular
+    /// state in the game: an effect id IS a Stats row, so reading that row's own id says which stat
+    /// the number means on THIS client. Comparing the id the file expects against the id the game
+    /// has at that row is what turns "probably drifted like the others" into a measurement, one
+    /// entry at a time - and for the many tokens the file has never heard of, a name beats a number.
+    ///
+    /// ONE ROW PER TOKEN ASKED FOR, not a walk of the table: Stats has 27281 rows and reading every
+    /// id would be twenty-seven thousand string reads for the eighty a session actually sees.
+    /// </remarks>
+    /// <param name="tokens">The raw tokens, or their masked ids; both are accepted.</param>
+    public IReadOnlyDictionary<uint, string> NameStats(IEnumerable<uint> tokens)
+    {
+        ArgumentNullException.ThrowIfNull(tokens);
+
+        var named = new Dictionary<uint, string>();
+        if (StatsTable is not { } stats || stats.RowSize <= 0)
+        {
+            return named;
+        }
+
+        foreach (uint raw in tokens)
+        {
+            uint token = AtlasContentNames.IdOf(raw);
+            if (named.ContainsKey(token) || token < StatTokenBase)
+            {
+                continue;
+            }
+
+            long index = token - StatTokenBase;
+            if (index >= stats.Rows)
+            {
+                continue;   // a token past the end of the table is not a stat on this client
+            }
+
+            string id = Text(_reader.ReadPointer(
+                stats.RowsBegin + (ulong)(index * stats.RowSize) + (ulong)_statId));
+            if (id.Length > 0)
+            {
+                named[token] = id;
+            }
+        }
+
+        return named;
     }
 
     /// <summary>The last part of an art path, which is the name every published copy kept.</summary>

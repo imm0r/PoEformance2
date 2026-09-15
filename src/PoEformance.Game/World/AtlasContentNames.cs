@@ -222,7 +222,11 @@ public sealed class AtlasContentNames
     /// confirmed 2026-09-15 on 67 of the 70 rows by name as well as by number), and a content has
     /// no magnitude of its own, so name and sentence transfer without interpretation.
     ///
-    /// AN EFFECT IS TAKEN ONLY WHERE IT CANNOT BE AMBIGUOUS, which is the conservative half of this
+    /// AN EFFECT IS FILED UNDER THE TOKEN, NOT UNDER THE ROW INDEX, which is the correction this
+    /// method needed most: a node's token is the stat's row index PLUS ONE, so filing by index
+    /// produced a table every lookup missed while every number in it looked right.
+    ///
+    /// AND IT IS TAKEN ONLY WHERE IT CANNOT BE AMBIGUOUS, which is the conservative half of this
     /// and deliberately leaves value on the table. Three conditions, all measured rather than
     /// assumed: the stat is granted by exactly ONE row, that row grants only that stat, and the
     /// row's sentence contains NO NUMBER. The first two are because a shared stat belongs to no one
@@ -240,8 +244,13 @@ public sealed class AtlasContentNames
     /// </remarks>
     /// <param name="rows">EndgameMapContent, in table order.</param>
     /// <param name="badgeIdBase">What a row's index is added to. 100, from the schema.</param>
+    /// <param name="statTokenBase">
+    /// What a STAT's row index is added to before it is the token a node carries. One - see
+    /// <see cref="EndgameMapContentCatalogue.StatTokenBase"/>, and note that the first version of
+    /// this passed nothing and filed every effect one short, so none of them ever answered.
+    /// </param>
     /// <returns>How many meanings the game supplied, badges and effects together.</returns>
-    public int Learn(IReadOnlyList<MapContentRow> rows, uint badgeIdBase)
+    public int Learn(IReadOnlyList<MapContentRow> rows, uint badgeIdBase, uint statTokenBase)
     {
         ArgumentNullException.ThrowIfNull(rows);
         if (rows.Count == 0)
@@ -283,7 +292,7 @@ public sealed class AtlasContentNames
                 continue;   // shared, compound, or carrying a number whose owner is unsettled
             }
 
-            effects[(uint)row.Stats[0]] = new AtlasContent(string.Empty, words, icon);
+            effects[(uint)row.Stats[0] + statTokenBase] = new AtlasContent(string.Empty, words, icon);
             effectCount++;
         }
 

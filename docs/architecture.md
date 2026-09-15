@@ -2779,7 +2779,7 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   `WaterBiome`, `MountainBiome`, `GrassBiome`, `ForestBiome`, `SwampBiome`, `DesertBiome` in that
   order, exactly ids 0–5. That check used to cite `data/atlas-content.json` and the citation was
   wrong: the file holds five of those effects, not six, and they run Mountain→Desert, because its
-  ids are four `Stats` rows lower than this client's. The order held; the evidence for it did not.
+  ids are five tokens lower than this client's. The order held; the evidence for it did not.
   Two colours are deliberately NOT the reference's, both because this is a two-pixel ring on a
   dark plate where the reference has a coloured background: Swamp carried byte-for-byte the same
   blue as Water there, and Forest at 0.0/0.266/0.097 cannot be seen at all. An id past the end of
@@ -2860,19 +2860,26 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
 
 `data/atlas-content.json` was measured against the table it came from (`EndgameMapContent`, 70 rows,
 `tests/fixtures/session-2026-09-mapcontent.rec`) and both guesses about its numbering turned out
-right: a **badge id is a content row plus 100**, and an **effect id is a `Stats.dat` row index**.
-Confirmed by the wording rather than by the arithmetic — row 0 is `PowerfulMapBoss` and badge `0x64`
-says "Powerful Map Boss"; the sentence the game attaches to a stat is the sentence the file files
-under that number.
+right: a **badge id is a content row plus 100**, and an **effect id is a `Stats.dat` row — plus
+one**. Confirmed by the wording rather than by the arithmetic — row 0 is `PowerfulMapBoss` and badge
+`0x64` says "Powerful Map Boss"; the sentence the game attaches to a stat is the sentence the file
+files under that number.
+
+**The "plus one" is not a detail and it was got wrong first.** The six biome contents grant stat
+indices 25861–25866; real nodes carry tokens 25862–**25867**, and 25861 appears on no node in any of
+four captures while 25867 — which no content grants — appears on several. Across all 83 granted
+stats, 61 turn up as `s+1` and 15 as `s`, and those 15 are exactly the ones whose neighbour is also
+granted. The first version of the learning filed effects by row index, so it answered **no lookup at
+all** while every number in the table still looked right.
 
 The same measurement found four faults nothing but the game could have shown, so `AtlasContentNames`
 now **learns** from the table the moment an atlas is read and keeps the file behind it:
 
-- **Stale effect ids, which is the one that was visibly wrong.** A stat id is a *position*, so the
-  four rows the game inserted between 19545 and 24104 moved every later one. The file's biome block
-  sits at 25858–25862 where this client's is 25861–25866 — a **Water** tablet effect was reading as
-  **Swamp**, Mountain as Desert, and Grass, Forest, Swamp and Desert were not in the file at all.
-  A file of indices into a table the game renumbers cannot stay right; reading the table can.
+- **Stale effect ids, which is the one that was visibly wrong.** An effect id is a *position*, so
+  rows the game inserted between tokens 19546 and 24109 moved every later one. The file's biome
+  block sits at 25858–25862 where this client's tokens are 25862–25867 — a **Water** tablet effect
+  was reading as **Desert**, and the other five biomes had no words at all. A file of indices into a
+  table the game renumbers cannot stay right; reading the table can.
 - **A badge carrying another badge's text.** `0x8C` held `0x71`'s wording word for word, so
   "Behemoth's Bounty" showed as "Monstrous Treasure".
 - **Sentences with a clause missing.** The game separates a content's clauses with newlines; the
@@ -2880,12 +2887,15 @@ now **learns** from the table the moment an atlas is read and keeps the file beh
 - **Three contents absent** — AbyssDepths, AbyssFissure, Wildwood.
 
 **What is deliberately NOT taken is the interesting half.** A badge transfers whole, because a
-content has no magnitude of its own. An effect is taken only where it cannot be ambiguous: the stat
-is granted by exactly one row, that row grants only that stat, and the sentence contains no number.
+content has no magnitude of its own. An effect is filed under the **token** — the row index plus one
+— and taken only where it cannot be ambiguous: the stat is granted by exactly one row, that row
+grants only that stat, and the sentence contains no number.
 The first two are because a *shared* stat belongs to no one content — 4679 is granted by three rows
 with three different sentences. The third is the honest gap: the file writes `{0}` and substitutes
-the node's magnitude, the row writes the content's own amount, and which is right per effect has not
-been settled. Holing the digits reproduces the file exactly for "Area has 2 additional random
+the node's magnitude, the row writes the content's own amount. **The magnitude is the node's** —
+token 2403 ("additional Shrines") arrives on real nodes carrying 1, 2 *and* 3, which a fixed amount
+in a row cannot do — but which effects have a magnitude at all, and which numbers in a sentence are
+the magnitude rather than part of the wording, is not settled. Holing the digits reproduces the file exactly for "Area has 2 additional random
 Waystone Modifiers" — and would print "+100 to Monster Level" for Irradiated the moment a token
 arrives as a binary effect. So 22 of the 83 stats are taken and the numeric ones stay with the file.
 

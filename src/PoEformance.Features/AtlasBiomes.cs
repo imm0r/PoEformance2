@@ -17,9 +17,9 @@ public sealed record AtlasBiome(string Name, uint Colour);
 ///
 /// THAT USED TO CITE data/atlas-content.json AND THE CITATION WAS WRONG, which is worth keeping
 /// because the conclusion was right anyway. The file holds FIVE of those effects, not six, and
-/// they run Mountain to Desert rather than Water to Desert - its ids are four Stats rows lower
-/// than the current client's, so its "Swamp" entry is the game's Water. The order held; the
-/// evidence for it did not.
+/// they run Mountain to Desert rather than Water to Desert - its ids are five tokens lower than
+/// the current client's, so its "Desert" entry is the game's Water. The order held; the evidence
+/// for it did not.
 ///
 /// TWO COLOURS ARE NOT THE REFERENCE'S, and both for the same reason - this is drawn as a
 /// two-pixel ring on a dark plate, where the reference draws it on a coloured background:
