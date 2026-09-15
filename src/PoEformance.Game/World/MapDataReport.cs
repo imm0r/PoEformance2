@@ -29,6 +29,10 @@ public enum Agreement
 /// <param name="FileTags">The curated words - tower, arbiter, expedition.</param>
 /// <param name="Rating">What data/atlas-ratings.json says, once resolved through the file.</param>
 /// <param name="OnAtlas">Whether a node with this id was seen on the atlas this session.</param>
+/// <param name="AtlasMap">
+/// Whether EndgameMaps.dat names this area at all - which is what makes it a map the atlas can
+/// send anybody to, as against one of the 269 areas the file carries that it cannot.
+/// </param>
 public sealed record MapDataRow(
     string Id,
     string GameName,
@@ -40,7 +44,8 @@ public sealed record MapDataRow(
     IReadOnlyList<string> GameTags,
     IReadOnlyList<string> FileTags,
     int? Rating,
-    bool OnAtlas)
+    bool OnAtlas,
+    bool AtlasMap = false)
 {
     /// <summary>How the two names compare.</summary>
     public Agreement Name => Compare(
@@ -103,11 +108,16 @@ public sealed record RatingRow(string Name, int Rating, IReadOnlyList<string> Id
 /// been read. Until then the file's column still decides, and the rows where the two differ are a
 /// list of maps that are about to move rather than of maps that have.
 /// </param>
+/// <param name="AtlasMaps">
+/// How many DISTINCT maps EndgameMaps.dat names - the real size of the atlas's map pool. Nought
+/// until that table has been read.
+/// </param>
 public sealed record MapDataReport(
     IReadOnlyList<MapDataRow> Maps,
     IReadOnlyList<RatingRow> Ratings,
     string Source,
-    bool UniqueFromGame = false)
+    bool UniqueFromGame = false,
+    int AtlasMaps = 0)
 {
     /// <summary>Nothing read yet, which is what a session before the first atlas gets.</summary>
     public static MapDataReport Empty { get; } = new([], [], "the atlas has not been read yet");
@@ -138,6 +148,17 @@ public sealed record MapDataReport(
     public bool Anything => Maps.Count > 0 || Ratings.Count > 0;
 
     /// <summary>
+    /// Entries the file carries that the atlas can never send anybody to.
+    /// </summary>
+    /// <remarks>
+    /// THE NUMBER THAT NAMES THE MISTAKE. data/atlas-maps.json is a copy of WorldAreas with tags
+    /// added, and WorldAreas is every area in the game - so most of what the file calls an atlas
+    /// map is a hideout, a campaign zone, a Sanctum floor or the login screen. Nought while
+    /// EndgameMaps has not been read, which is not the same as "there are none".
+    /// </remarks>
+    public int NotAtlasMaps => AtlasMaps == 0 ? 0 : Count(row => row.InFile && !row.AtlasMap);
+
+    /// <summary>
     /// Whether a map counts as unique RIGHT NOW, by whichever source is in force.
     /// </summary>
     /// <remarks>
@@ -157,11 +178,16 @@ public sealed record MapDataReport(
     /// <param name="names">data/atlas-maps.json.</param>
     /// <param name="ratings">data/atlas-ratings.json, already resolved.</param>
     /// <param name="onAtlas">Map ids seen as a node this session. Ids only, never names.</param>
+    /// <param name="endgame">
+    /// EndgameMaps.dat, or null before it has been read. This is the table that says which areas
+    /// are ATLAS maps - data/atlas-maps.json never could, because it is a copy of WorldAreas.
+    /// </param>
     public static MapDataReport Build(
         WorldAreaCatalogue? catalogue,
         AtlasMapNames names,
         AtlasRatings ratings,
-        IReadOnlyCollection<string>? onAtlas = null)
+        IReadOnlyCollection<string>? onAtlas = null,
+        EndgameMapCatalogue? endgame = null)
     {
         ArgumentNullException.ThrowIfNull(names);
         ArgumentNullException.ThrowIfNull(ratings);
@@ -192,7 +218,8 @@ public sealed record MapDataReport(
                 inGame ? area!.Tags : [],
                 inFile ? info!.Tags : [],
                 ratings.Of(id),
-                seen.Contains(id)));
+                seen.Contains(id),
+                endgame?.Holds(id) ?? false));
         }
 
         // A rating survives the file only if the GAME supplies the same name for one of the ids it
@@ -211,7 +238,12 @@ public sealed record MapDataReport(
             ? $"\"{table.Path}\", {table.Rows} rows of 0x{table.RowSize:X}"
             : catalogue?.LastError is { Length: > 0 } why ? why : "the WorldAreas table has not been read";
 
-        return new MapDataReport(maps, rows, source, names.Revision > 0);
+        if (endgame?.Table is { } endgameTable)
+        {
+            source += $"   +   \"{endgameTable.Path}\", {endgameTable.Rows} rows";
+        }
+
+        return new MapDataReport(maps, rows, source, names.Revision > 0, endgame?.Maps.Count ?? 0);
     }
 
     /// <summary>
@@ -235,9 +267,11 @@ public sealed record MapDataReport(
         text.Append("# ratings\t").Append(Ratings.Count)
             .Append("\tunresolved\t").Append(RatingsUnresolved)
             .Append("\tneeding the file\t").Append(RatingsNeedingTheFile).Append('\n');
+        text.Append("# atlas maps\t").Append(AtlasMaps)
+            .Append("\tfile entries that are not atlas maps\t").Append(NotAtlasMaps).Append('\n');
 
         text.Append("\nid\tgame name\tfile name\tname\tgame unique\tfile unique\tunique")
-            .Append("\tgame tags\tfile tags\trating\ton atlas\n");
+            .Append("\tgame tags\tfile tags\trating\ton atlas\tatlas map\n");
         foreach (MapDataRow row in Maps)
         {
             text.Append(row.Id).Append('\t')
@@ -250,7 +284,8 @@ public sealed record MapDataReport(
                 .Append(string.Join(',', row.GameTags)).Append('\t')
                 .Append(string.Join(',', row.FileTags)).Append('\t')
                 .Append(row.Rating?.ToString() ?? string.Empty).Append('\t')
-                .Append(row.OnAtlas).Append('\n');
+                .Append(row.OnAtlas).Append('\t')
+                .Append(row.AtlasMap).Append('\n');
         }
 
         text.Append("\nrating\tvalue\tresolves to\tgame supplies the name\n");

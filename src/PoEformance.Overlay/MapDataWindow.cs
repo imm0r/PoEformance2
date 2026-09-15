@@ -38,6 +38,7 @@ public sealed class MapDataWindow
 
     private string _search = string.Empty;
     private bool _differencesOnly;
+    private bool _atlasOnly;
     private string _saved = string.Empty;
 
     /// <param name="report">The published report, read fresh each frame.</param>
@@ -89,7 +90,18 @@ public sealed class MapDataWindow
     /// </remarks>
     private static void Reconciliation(MapDataReport report)
     {
-        ImGui.TextColored(DimText, $"{report.InGame} maps in the game, {report.InFile} in the file");
+        ImGui.TextColored(DimText, $"{report.InGame} areas in the game, {report.InFile} in the file");
+
+        // THE LINE THAT NAMES THE OLDEST MISTAKE HERE. data/atlas-maps.json is a copy of
+        // WorldAreas, which is every AREA in the game - so most of what it calls an atlas map is a
+        // hideout, a campaign zone, a Sanctum floor or the login screen. EndgameMaps is the table
+        // that knows the difference, and until it has been read this says so rather than guessing.
+        ImGui.TextColored(
+            report.AtlasMaps == 0 ? WarnText : GoodText,
+            report.AtlasMaps == 0
+                ? "  ..  EndgameMaps has not been read - nothing here knows which areas are atlas maps"
+                : $"  OK  {report.AtlasMaps} of them are ATLAS maps (EndgameMaps.dat);"
+                  + $" {report.NotAtlasMaps} file entries are not");
 
         Verdict(
             report.RatingsUnresolved == 0,
@@ -140,6 +152,8 @@ public sealed class MapDataWindow
         ImGui.InputTextWithHint("###map-data-find", "find by id or name...", ref _search, SearchLength);
         ImGui.SameLine();
         ImGui.Checkbox("differences only", ref _differencesOnly);
+        ImGui.SameLine();
+        ImGui.Checkbox("atlas maps only", ref _atlasOnly);
 
         string find = _search.Trim();
         List<MapDataRow> rows = [.. report.Maps.Where(row => Shows(row, find))];
@@ -147,7 +161,7 @@ public sealed class MapDataWindow
 
         if (!ImGui.BeginTable(
                 "##map-data-rows",
-                7,
+                8,
                 ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY
                     | ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.Resizable))
         {
@@ -156,6 +170,7 @@ public sealed class MapDataWindow
 
         try
         {
+            ImGui.TableSetupColumn("atlas");
             ImGui.TableSetupColumn("id", ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableSetupColumn("name (game)", ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableSetupColumn("name (file)", ImGuiTableColumnFlags.WidthStretch);
@@ -169,6 +184,21 @@ public sealed class MapDataWindow
             foreach (MapDataRow row in rows.Take(MostRows))
             {
                 ImGui.TableNextRow();
+
+                // The atlas column FIRST, because it is the one that says whether the rest of the
+                // row is about the atlas at all. A hideout's name agreeing with the file is true
+                // and beside the point.
+                ImGui.TableNextColumn();
+                ImGui.TextColored(row.AtlasMap ? GoodText : DimText, row.AtlasMap ? "map" : string.Empty);
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(row.AtlasMap
+                        ? "EndgameMaps.dat names this area - the atlas can send you here"
+                        : report.AtlasMaps == 0
+                            ? "EndgameMaps has not been read yet, so nothing is known either way"
+                            : "not in EndgameMaps.dat - a hideout, campaign zone, scene or the like");
+                }
+
                 ImGui.TableNextColumn();
                 ImGui.TextColored(row.OnAtlas ? OverlayInk.Name : DimText, row.Id);
                 if (ImGui.IsItemHovered())
@@ -214,6 +244,11 @@ public sealed class MapDataWindow
 
     private bool Shows(MapDataRow row, string find)
     {
+        if (_atlasOnly && !row.AtlasMap)
+        {
+            return false;
+        }
+
         if (_differencesOnly && row.Name != Agreement.Differ && row.Unique != Agreement.Differ
             && row.Name is not (Agreement.GameOnly or Agreement.FileOnly))
         {
