@@ -126,10 +126,14 @@ public static class DefaultAtlasGroups
             "MapUberBoss_IronCitadel_Quest", "MapUberBoss_StoneCitadel_Quest",
         ]),
 
-        // League hubs reached from the atlas rather than from a map device.
+        // League hubs reached from the atlas rather than from a map device. Abyss_Hub and
+        // IncursionHub USED TO BE LISTED HERE beside the two below, and both were dead: neither is
+        // in EndgameMaps.dat, so no atlas node can ever carry those ids and the entries could only
+        // ever match nothing. They were invisible while data/atlas-maps.json still held every area
+        // in the game, which is exactly the kind of thing cutting it to the real 173 surfaces.
         new("Ritual", "#4000F4", Maps: ["MapUberBoss_Ritual", "RitualLeagueBoss"]),
-        new("Abyss", "#26FF00", Maps: ["Abyss_Hub", "Abyss_Pinnacle"]),
-        new("Temple", "#DEA700", Maps: ["IncursionHub", "IncursionHubEndgame"]),
+        new("Abyss", "#26FF00", Maps: ["Abyss_Pinnacle"]),
+        new("Temple", "#DEA700", Maps: ["IncursionHubEndgame"]),
 
         // Everything else the game calls unique. Last, so the named groups above keep theirs.
         new("Unique maps", "#FF8F00", Unique: true),

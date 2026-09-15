@@ -79,38 +79,48 @@ public class MapDataReportTests
     [Fact]
     public void ItHoldsEveryMapEitherSideKnows()
     {
-        // 442 rows in the game, 440 in the file, and the union is what a reconciliation needs: a
+        // 442 areas in the game, 173 in the file, and the union is what a reconciliation needs: a
         // map missing from one side has to be a ROW saying so, not a gap nobody looks at.
+        //
+        // THE UNION IS NOW THE TABLE. It was 444 - the file carried two showcase ids WorldAreas has
+        // never had - and cutting the file to the 173 maps EndgameMaps.dat names took both with
+        // them. Every entry the file still has is an area the game really holds.
         MapDataReport report = Build();
 
         Assert.Equal(442, report.InGame);
-        Assert.Equal(440, report.InFile);
-        Assert.Equal(444, report.Maps.Count);
+        Assert.Equal(173, report.InFile);
+        Assert.Equal(442, report.Maps.Count);
         Assert.Contains("\"Data/Balance/WorldAreas.dat\", 442 rows of 0x2E0", report.Source, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void TheNamesAgreeAndTheTrailingSpaceIsNotCountedAsADisagreement()
+    public void TheNamesAgreeAndTheTrailingSpaceIsStillTrimmed()
     {
-        // P2_3 reads "Sel Khari Sanctuary " in the game. Trimming it is the difference between
-        // "one name differs" and "none do", and a report that cried wolf on it would be ignored.
+        // P2_3 reads "Sel Khari Sanctuary " in the game, and the trimming is why no name is ever
+        // reported as differing over a space. It is a campaign zone, so since the file was cut to
+        // the atlas's 173 maps it appears here as a GameOnly row - the trim still has to happen,
+        // and this is where it is checked.
         MapDataReport report = Build();
 
         Assert.Equal(0, report.NamesDiffer);
         MapDataRow p2 = report.Maps.Single(row => row.Id == "P2_3");
         Assert.Equal("Sel Khari Sanctuary", p2.GameName);
-        Assert.Equal(Agreement.Agree, p2.Name);
+        Assert.Equal(Agreement.GameOnly, p2.Name);
+        Assert.False(p2.InFile);
     }
 
     [Fact]
-    public void TheSixUniqueDisagreementsAreCountedAndNamed()
+    public void TheFiveUniqueDisagreementsAreCountedAndNamed()
     {
-        // The decision the owner took - unique follows the game - moves exactly these six.
+        // The decision the owner took - unique follows the game - moves exactly these five.
+        // ExpeditionLeagueBoss was a sixth until the file was cut to the atlas's own maps: it is
+        // not in EndgameMaps.dat, so the file no longer claims anything about it and there is
+        // nothing left to disagree with. The game still calls it unique.
         MapDataReport report = Build();
 
-        Assert.Equal(6, report.UniqueDiffers);
+        Assert.Equal(5, report.UniqueDiffers);
         Assert.Equal(
-            ["ExpeditionLeagueBoss", "MapUniqueInitialTower", "MapUniqueReactor_04", "MapVoidReliquary", "Map_HildaCampsite", "RitualLeagueBoss"],
+            ["MapUniqueInitialTower", "MapUniqueReactor_04", "MapVoidReliquary", "Map_HildaCampsite", "RitualLeagueBoss"],
             report.Maps.Where(row => row.Unique == Agreement.Differ).Select(row => row.Id).Order(StringComparer.Ordinal));
     }
 
@@ -154,7 +164,7 @@ public class MapDataReportTests
         MapDataReport report = MapDataReport.Build(null, names, Ratings(names));
 
         Assert.Equal(0, report.InGame);
-        Assert.Equal(440, report.InFile);
+        Assert.Equal(173, report.InFile);
         Assert.Contains("has not been read", report.Source, StringComparison.Ordinal);
         Assert.All(report.Maps, row => Assert.Equal(Agreement.FileOnly, row.Name));
     }
@@ -166,21 +176,21 @@ public class MapDataReportTests
         // so a saved file says what it is without being opened next to the tool that made it.
         string text = Build().ToText();
 
-        Assert.Contains("# maps\t444\tin game\t442\tin file\t440", text, StringComparison.Ordinal);
+        Assert.Contains("# maps\t442\tin game\t442\tin file\t173", text, StringComparison.Ordinal);
         Assert.Contains("# ratings\t83\tunresolved\t0\tneeding the file\t0", text, StringComparison.Ordinal);
         Assert.Contains("id\tgame name\tfile name\tname\t", text, StringComparison.Ordinal);
         Assert.Contains("MapUniqueReactor_04\t", text, StringComparison.Ordinal);
         Assert.Contains("\tDiffer\t", text, StringComparison.Ordinal);
 
         // One line per map between the two section headers. Counted by position rather than by
-        // what an id looks like: only 155 of them begin with "Map" and the rest are Expedition,
+        // what an id looks like: barely a third begin with "Map" and the rest are Expedition,
         // Hideout, G1_ and the like, which is what the first version of this assertion missed.
         string[] lines = text.Split('\n');
         int maps = Array.FindIndex(lines, line => line.StartsWith("id\tgame name", StringComparison.Ordinal));
         int ratings = Array.FindIndex(lines, line => line.StartsWith("rating\tvalue", StringComparison.Ordinal));
         Assert.True(maps > 0 && ratings > maps, "the export is missing one of its section headers");
 
-        Assert.Equal(444, lines[(maps + 1)..ratings].Count(line => line.Contains('\t', StringComparison.Ordinal)));
+        Assert.Equal(442, lines[(maps + 1)..ratings].Count(line => line.Contains('\t', StringComparison.Ordinal)));
         Assert.Equal(83, lines[(ratings + 1)..].Count(line => line.Contains('\t', StringComparison.Ordinal)));
     }
 }
