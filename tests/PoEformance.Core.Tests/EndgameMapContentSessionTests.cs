@@ -448,6 +448,36 @@ public class EndgameMapContentSessionTests
     }
 
     [Fact]
+    public void THEReportSTILLComparesTheFileAfterTheLearningHasRun()
+    {
+        // A CHECK A WRONG VALUE PASSES IS WORSE THAN NO CHECK, and this one passed for a whole day
+        // because it had stopped reading the file. Describe asked file.Badge(), which answers with
+        // whatever is IN FORCE - so once the learning ran it compared the game against itself and
+        // reported "the file has 69; 70 of them are a row+100, 70 agree on the name and 70 on the
+        // sentence" about a file with 69 entries that disagrees on six of them.
+        //
+        // The live and the file views must therefore both be exercised here: the numbers after
+        // learning have to be the SAME as the numbers before it.
+        (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
+        using (replay)
+        {
+            AtlasContentNames names = File();
+            string[] before = [.. contents.Describe(names)];
+
+            names.Learn(contents.Rows, contents.BadgeIdBase, contents.StatTokenBase);
+            string[] after = [.. contents.Describe(names)];
+
+            // Only the one line that reports which source is in force may differ.
+            Assert.Equal(
+                before.Where(line => !line.Contains("shipped file is still in force", StringComparison.Ordinal)),
+                after.Where(line => !line.Contains("IN FORCE:", StringComparison.Ordinal)));
+
+            Assert.Contains(before, line => line.Contains("67 of them are a row+100", StringComparison.Ordinal));
+            Assert.Contains(after, line => line.Contains("67 of them are a row+100", StringComparison.Ordinal));
+        }
+    }
+
+    [Fact]
     public void AStringIsReadInStepsSoALongOneDoesNotCOMEBACKSHORTER()
     {
         // THE TRAP, pinned because it produced a wrong FINDING rather than a failed read.
