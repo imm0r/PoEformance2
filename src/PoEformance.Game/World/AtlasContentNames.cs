@@ -83,6 +83,11 @@ public sealed class AtlasContentNames
     private IReadOnlyCollection<string> _icons;
     private int _revision;
 
+    // The effects the GAME supplied, apart from the merged table above, because a lookup has to
+    // tell them from the file's - see Effect for what mixing the two cost.
+    private IReadOnlyDictionary<uint, AtlasContent> _learntEffects =
+        new Dictionary<uint, AtlasContent>();
+
     // The last resort behind both tables: the game's Stats.dat, and the game's own sentence for
     // each stat in it. Set together or not at all - one without the other answers nothing.
     private Components.StatTable? _stats;
@@ -209,22 +214,38 @@ public sealed class AtlasContentNames
     public AtlasContent? Badge(uint raw) => Look(Volatile.Read(ref _badges), raw);
 
     /// <summary>
-    /// What a content token means, from the contents, the file, or the game's stat description.
+    /// What a content token means: the game's content, then the game's stat, then the file.
     /// </summary>
     /// <remarks>
-    /// THREE LAYERS, NARROWEST FIRST. A content this project learnt off EndgameMapContent knows the
-    /// whole thing - name, sentence, art - and is the best answer. The file comes next. And behind
-    /// both sits the game's own description of the STAT the token names, which reaches the ones
-    /// neither of the others ever could: on the 0.5.5 capture the atlas showed 90 distinct tokens,
-    /// of which 21 had words and 61 have a stat description - so 40 lines that were bare numbers.
+    /// THREE LAYERS, AND THE FILE IS THE LAST OF THEM. A content learnt off EndgameMapContent knows
+    /// the whole thing - name, sentence, art - and is the best answer. Behind it, the game's own
+    /// description of the STAT the token names. The file answers only where neither can.
     ///
-    /// LAST rather than first, because a description describes the STAT while the other two
-    /// describe the CONTENT, and the content is what a node carries. "Area contains an additional
-    /// Strongbox" is the stat; "Monstrous Treasure - contains many extra Strongboxes with monsters
-    /// waiting in ambush" is the content. Where both exist the content is the one a player sees.
+    /// IT USED TO SIT SECOND, AND THAT WAS WRONG IN A WAY ONLY THE GAME COULD SHOW. Measured on a
+    /// live 0.5.5 atlas (2026-09-15), three of the ninety tokens on screen were being answered by
+    /// the file with ANOTHER CONTENT'S text and another content's icon: the file files
+    /// <c>map_atlas_node_has_delirium</c> under "Ritual Altars" with a Ritual symbol,
+    /// <c>..._has_abyss</c> under "Vaal Beacons" with an Incursion symbol, and
+    /// <c>..._has_ritual</c> under "Area contains Breaches" with a Breach symbol. Its ids for those
+    /// are two rows short; fourteen others in it are stale by five. The file even carries the same
+    /// five contents TWICE, at two different shifts, which is what an export spanning two client
+    /// versions leaves behind.
+    ///
+    /// SO THE ARGUMENT FOR PUTTING IT SECOND DOES NOT SURVIVE THE MEASUREMENT. That argument was
+    /// that a file entry describes the CONTENT where a stat description describes only the STAT -
+    /// "Area contains an additional Strongbox" against "Monstrous Treasure, contains many extra
+    /// Strongboxes with monsters waiting in ambush" - and it still holds for a content the game
+    /// itself supplied, which is why that layer is untouched and still first. It does not hold for
+    /// a file of ids into a table the game renumbers: a richer sentence about the WRONG content is
+    /// not richer, and the icon makes it look deliberate.
+    ///
+    /// WHAT THE FILE STILL BUYS is the tokens the game names but has no sentence for. Those keep
+    /// their words; they simply no longer outrank the game where the game has spoken.
     /// </remarks>
     public AtlasContent? Effect(uint raw)
-        => Look(Volatile.Read(ref _effects), raw) ?? FromTheStat(raw);
+        => Look(Volatile.Read(ref _learntEffects), raw)
+           ?? FromTheStat(raw)
+           ?? Look(_fileEffects, raw);
 
     /// <summary>The game's sentence for the stat a token names, when nothing closer knows it.</summary>
     private AtlasContent? FromTheStat(uint raw)
@@ -321,6 +342,11 @@ public sealed class AtlasContentNames
         var badges = new Dictionary<uint, AtlasContent>(_fileBadges);
         var effects = new Dictionary<uint, AtlasContent>(_fileEffects);
 
+        // KEPT APART from the merged table, because Effect has to be able to ask "did the GAME say
+        // this" rather than "does some table say this". Merged, a stale file entry is
+        // indistinguishable from a learnt one and answers in front of the game - see Effect.
+        var learnt = new Dictionary<uint, AtlasContent>();
+
         // Which rows grant a stat, so a shared one can be told from a content's own.
         var owners = new Dictionary<long, int>();
         foreach (MapContentRow row in rows)
@@ -352,7 +378,9 @@ public sealed class AtlasContentNames
                 continue;   // shared, compound, or carrying a number whose owner is unsettled
             }
 
-            effects[(uint)row.Stats[0] + statTokenBase] = new AtlasContent(string.Empty, words, icon);
+            var told = new AtlasContent(string.Empty, words, icon);
+            effects[(uint)row.Stats[0] + statTokenBase] = told;
+            learnt[(uint)row.Stats[0] + statTokenBase] = told;
             effectCount++;
         }
 
@@ -366,6 +394,7 @@ public sealed class AtlasContentNames
 
         Volatile.Write(ref _badges, badges);
         Volatile.Write(ref _effects, effects);
+        Volatile.Write(ref _learntEffects, learnt);
         Volatile.Write(ref _icons, icons);
         Interlocked.Increment(ref _revision);
         return badgeCount + effectCount;
