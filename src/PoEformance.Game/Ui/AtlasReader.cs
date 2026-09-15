@@ -57,6 +57,13 @@ public sealed record AtlasNode(
     IReadOnlyList<uint> BadgeIds,
     IReadOnlyList<uint> ContentTokens,
 
+    // WHAT THE BADGE ITSELF SAYS, by masked id, where it says anything. Measured 2026-09-14 and
+    // acted on 2026-09-15: the badge child carries its own string, and it says MORE than the id
+    // can. Id 0x64 is the generic "Powerful Map Boss"; the string on a citadel's badge reads
+    // "[DeadlyMapBoss|Deadly Map Boss]", which is a different content with a different icon in
+    // the game's own tooltip. Keeping only the id loses the tier, silently.
+    IReadOnlyDictionary<uint, string>? BadgeWords = null,
+
     // Whether the game is painting this node itself. FALSE is the interesting one: the node is
     // placed and readable and the game is choosing not to show it - fog, or scrolled far out -
     // which is exactly where an overlay has something to add rather than a copy to make.
@@ -136,6 +143,16 @@ public sealed class AtlasReader
     private readonly int _badgeEnd;
     private readonly int[] _badgeChildPath;
     private readonly int _badgeContentId;
+
+    /// <summary>How long a badge's own string is read as. The longest in the game is far under it.</summary>
+    /// <remarks>
+    /// NINETY-SIX, the size AtlasRowProbe reads at, so a capture taken by any build of this
+    /// project can answer it: ReadUnicodeString halves its request until one succeeds, and a
+    /// replay only answers the sizes that were recorded.
+    /// </remarks>
+    private const int BadgeChars = 96;
+
+    private readonly int _badgeContentName;
     private readonly uint _badgeRowToContentId;
     private readonly int _tokenPair;
     private readonly int _dataStorage;
@@ -187,6 +204,7 @@ public sealed class AtlasReader
         _badgeEnd = node.OffsetOf("BadgeVectorEnd");
         _badgeChildPath = [(int)node.Constants["BadgeChild0"], (int)node.Constants["BadgeChild1"]];
         _badgeContentId = (int)node.Constants["BadgeContentId"];
+        _badgeContentName = (int)node.Constants["BadgeContentName"];
         _badgeRowToContentId = (uint)node.Constants["BadgeRowToContentId"];
         _tokenPair = (int)node.Constants["ContentTokenPairStride"];
         _dataStorage = (int)node.Constants["DataStoragePtr"];
@@ -413,6 +431,7 @@ public sealed class AtlasReader
         int gridY = _reader.Read<int>(element + (ulong)_grid + 4);
 
         placed.TryGetValue(element, out Placed drawn);
+        (List<uint> Ids, Dictionary<uint, string> Words) badges = Badges(element);
 
         return new AtlasNode(
             index,
@@ -424,8 +443,9 @@ public sealed class AtlasReader
             lines.TryGetValue((gridX, gridY), out List<(int X, int Y)>? joined) ? joined : [],
             drawn.Position,
             drawn.Size,
-            Badges(element),
-            Tokens(element));
+            badges.Ids,
+            Tokens(element),
+            badges.Words);
     }
 
     /// <summary>Whether a panel child is a map rather than a marker or a region button.</summary>
@@ -493,9 +513,10 @@ public sealed class AtlasReader
     /// do - divides its length by eight, so a node with fewer than eight badges reported none
     /// at all, and one with more read whatever was at the front of the buffer as an address.
     /// </remarks>
-    private List<uint> Badges(ulong element)
+    private (List<uint> Ids, Dictionary<uint, string> Words) Badges(ulong element)
     {
         var ids = new List<uint>();
+        var words = new Dictionary<uint, string>();
 
         ulong first = _reader.ReadPointer(element + (ulong)_badgeBegin);
         ulong last = _reader.ReadPointer(element + (ulong)_badgeEnd);
@@ -523,13 +544,30 @@ public sealed class AtlasReader
 
         foreach (ulong badge in _elements.Children(holder, MostContents))
         {
-            if (_reader.TryRead(badge + (ulong)_badgeContentId, out uint id) && id != 0)
+            if (!_reader.TryRead(badge + (ulong)_badgeContentId, out uint id) || id == 0)
             {
-                Keep(id);
+                continue;
+            }
+
+            Keep(id);
+
+            // AND WHAT IT CALLS ITSELF. Only the child carries this - a badge that arrived as a
+            // bare id in the vector has no element to ask - so the word is kept beside the id
+            // rather than instead of it.
+            ulong at = _reader.ReadPointer(badge + (ulong)_badgeContentName);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(at))
+            {
+                continue;
+            }
+
+            string word = _reader.ReadUnicodeString(at, BadgeChars);
+            if (word.Length > 0)
+            {
+                words.TryAdd(World.AtlasContentNames.IdOf(id), word);
             }
         }
 
-        return ids;
+        return (ids, words);
 
         // On the id ALONE, not on the whole word: the same content arrives from the vector as
         // a bare id and from a child with a category tag above it, and comparing the words

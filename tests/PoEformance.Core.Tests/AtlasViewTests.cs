@@ -438,6 +438,42 @@ public class AtlasViewTests
     }
 
     [Fact]
+    public void ABADGESOwnWordsBeatTheGenericNameItsIdCarries()
+    {
+        // MEASURED ON A LIVE ATLAS, and it is the answer to a question three other tables did not
+        // hold. The game draws a GOLD "Powerful Map Boss" and a RED "Deadly Map Boss" with two
+        // different tooltips - but both nodes carry badge id 0x64, whose content row is named
+        // "Powerful Map Boss". The tier is in the BADGE ELEMENT'S OWN STRING, which reads
+        // "[DeadlyMapBoss|Deadly Map Boss]" in the game's packed markup.
+        //
+        // The schema had this written down a day before anyone looked: "it says MORE than the id
+        // can, and the tier it names is lost the moment the id is all that is kept". It was.
+        AtlasNode node = Node(1, 1, badges: [0x64]) with
+        {
+            BadgeWords = new Dictionary<uint, string> { [0x64] = "[DeadlyMapBoss|Deadly Map Boss]" },
+        };
+
+        AtlasSaid said = Assert.Single(AtlasWatch.Words(node, LoadedContents()));
+
+        // THE MARKUP IS STRIPPED, the same as everywhere else the game's strings are shown.
+        Assert.Equal("Deadly Map Boss", said.Text);
+
+        // AND THE ID'S OWN SENTENCE STAYS AS THE DETAIL, so the name gets more specific and
+        // nothing is traded away for it.
+        Assert.Equal("Area contains a Powerful Map Boss", said.Detail);
+    }
+
+    [Fact]
+    public void ANDWithoutOneTheIdStillNamesIt()
+    {
+        // The ordinary case: most badges arrive as a bare id from the vector, with no element to
+        // ask, and the content table is all there is. Nothing changes for them.
+        AtlasSaid said = Assert.Single(AtlasWatch.Words(Node(1, 1, badges: [0x64]), LoadedContents()));
+
+        Assert.Equal("Powerful Map Boss", said.Text);
+    }
+
+    [Fact]
     public void ANDANodeTheGAMEIsNotPaintingIsNotAHoverAtAll()
     {
         // REPORTED FROM A LIVE CLIENT, and it blanked the overlay exactly where the overlay was
