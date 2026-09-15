@@ -3,6 +3,7 @@ using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Game.Diagnostics;
 using PoEformance.Game.Ui;
+using PoEformance.Game.World;
 
 namespace PoEformance.Core.Tests;
 
@@ -55,6 +56,22 @@ public class AtlasRowSessionTests
 
             Assert.NotNull(dir);
             return Path.Combine(dir.FullName, "tests", "fixtures", "session-2026-09-atlasrows.rec");
+        }
+    }
+
+    /// <summary>The repository root, for the one test that reads a shipped data file too.</summary>
+    private static DirectoryInfo Root
+    {
+        get
+        {
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+            {
+                dir = dir.Parent;
+            }
+
+            Assert.NotNull(dir);
+            return dir;
         }
     }
 
@@ -175,5 +192,105 @@ public class AtlasRowSessionTests
 
         Assert.Contains("MapObjective 0x", block, StringComparison.Ordinal);
         Assert.DoesNotContain("MapObjective 0x0 (not a pointer)", block, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Whether the atlas passives could supply data/atlas-maps.json's curated tags. They cannot.
+    /// </summary>
+    /// <remarks>
+    /// THE SECOND HYPOTHESIS THIS PROJECT TESTED AND LOST, after EndgameMapContentSet. The passive
+    /// ids read like the curated vocabulary - AtlasWallTower, AtlasLeagueBreachHubNode,
+    /// AtlasQuestVaalVault - which is exactly why it was worth measuring rather than assuming.
+    ///
+    /// A PASSIVE DESCRIBES A POSITION, NOT A MAP, and three numbers settle it. All 547 ids are
+    /// DISTINCT across 547 nodes - they are numbered per position (AtlasWallTower1..5,
+    /// AtlasInsideFortressWhite89) rather than naming a kind. Only 103 map ids ever reach one at
+    /// all. And 76 of those 103 sit on SEVERAL, from unrelated families at once: MapOrnateChambers
+    /// appears on eleven, spanning path filler, a Breach host and three tier regions.
+    ///
+    /// So the same map is whatever the position it happens to occupy is, which is the one shape a
+    /// per-map tag cannot be read out of.
+    /// </remarks>
+    [Fact]
+    public void ThePassivesDescribeAPositionAndCannotSupplyTheCuratedTags()
+    {
+        using ReplayMemoryReader replay = Load();
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        Dictionary<string, HashSet<string>> byMap = PassivesByMap(replay, schema);
+
+        Assert.Equal(103, byMap.Count);
+        Assert.Equal(76, byMap.Count(pair => pair.Value.Count > 1));
+        Assert.True(byMap["MapOrnateChambers"].Count >= 10, "one map, many unrelated positions");
+
+        // AND THE TAGS THAT MATTER REACH NOTHING AT ALL. Expedition is the biggest curated group
+        // in the file, seventeen maps, and not one of them is ever on a node that has a passive.
+        AtlasMapNames file = AtlasMapNames.Load(Path.Combine(Root.FullName, "data", "atlas-maps.json"));
+        foreach (string tag in (string[])["expedition", "hideout", "ritual"])
+        {
+            Assert.All(
+                file.All.Where(pair => pair.Value.Tagged(tag)).Select(pair => pair.Key),
+                id => Assert.False(byMap.ContainsKey(id), $"{tag}: {id}"));
+        }
+    }
+
+    /// <summary>Every atlas passive id each map id was ever seen sitting on.</summary>
+    private static Dictionary<string, HashSet<string>> PassivesByMap(ReplayMemoryReader replay, OffsetSchema schema)
+    {
+        GameChainAddresses chain = GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
+        StructDef node = schema.Structs["AtlasNode"];
+        int storageAt = (int)node.Constants["DataStoragePtr"];
+        int dataAt = (int)node.Constants["DataPtr"];
+        int rowAt = schema.Structs["AtlasNodeData"].OffsetOf("AtlasRowPtr");
+        int passivesAt = schema.Structs["EndgameMapAtlasRow"].OffsetOf("PassivesRef");
+        int idAt = schema.Structs["PassiveSkillsRow"].OffsetOf("IdPtr");
+
+        var ids = new Dictionary<ulong, string>();
+        var byMap = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (AtlasNode found in new AtlasReader(replay, schema, new UiElementReader(replay, schema))
+            .Read(chain.UiRoot, new UiScale(3440, 1440, 0)))
+        {
+            if (found.MapId.Length == 0)
+            {
+                continue;
+            }
+
+            ulong storage = replay.ReadPointer(found.Address + (ulong)storageAt);
+            ulong data = MemoryReaderExtensions.IsPlausiblePointer(storage)
+                ? replay.ReadPointer(storage + (ulong)dataAt)
+                : 0;
+            ulong row = MemoryReaderExtensions.IsPlausiblePointer(data)
+                ? replay.ReadPointer(data + (ulong)rowAt)
+                : 0;
+            ulong passive = MemoryReaderExtensions.IsPlausiblePointer(row)
+                ? replay.ReadPointer(row + (ulong)passivesAt)
+                : 0;
+
+            if (!MemoryReaderExtensions.IsPlausiblePointer(passive))
+            {
+                continue;
+            }
+
+            if (!ids.TryGetValue(passive, out string? id))
+            {
+                id = replay.ReadUnicodeString(replay.ReadPointer(passive + (ulong)idAt), 160);
+                ids[passive] = id;
+            }
+
+            if (id.Length == 0)
+            {
+                continue;
+            }
+
+            if (!byMap.TryGetValue(found.MapId, out HashSet<string>? seen))
+            {
+                seen = new HashSet<string>(StringComparer.Ordinal);
+                byMap[found.MapId] = seen;
+            }
+
+            seen.Add(id);
+        }
+
+        return byMap;
     }
 }

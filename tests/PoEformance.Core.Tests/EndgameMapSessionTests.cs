@@ -31,6 +31,13 @@ namespace PoEformance.Core.Tests;
 /// id on a node IS an atlas map whatever any file says. The three earlier captures still run the
 /// table-identity check: "the table is 173 rows" is a claim about the GAME, and one recording can
 /// only ever be a claim about that recording.
+///
+/// AND ONE HYPOTHESIS DIED HERE, which is the other reason these tests are worth reading. The
+/// MapContentSet column was expected to be the game's own version of data/atlas-maps.json's curated
+/// tags. It is not. Its five values - All, DisallowAll, IrradiatedOnly, IrradiatedAndPowerfulBossOnly,
+/// QuestAreaOnly - are about WHICH CONTENT MAY ROLL on a map, a different axis entirely, and "All"
+/// alone covers 107 of the 173 including 91 with no curated tag at all. The tests below say so in
+/// numbers rather than leaving the name to suggest otherwise.
 /// </remarks>
 public class EndgameMapSessionTests
 {
@@ -44,6 +51,7 @@ public class EndgameMapSessionTests
     /// </remarks>
     private static readonly string[] Captures =
     [
+        "session-2026-09-contentset.rec",
         "session-2026-09-endgamemaps.rec",
         "session-2026-09-catalogue.rec",
         "session-2026-09-atlas.rec",
@@ -145,12 +153,13 @@ public class EndgameMapSessionTests
     [Fact]
     public void TheContentSetColumnPointsAtOneTablesRowGrid()
     {
-        // STRUCTURE RATHER THAN STRINGS, which is what makes this checkable at all right now: the
-        // referenced rows are outside the block read, so no capture carries the category NAMES yet.
-        // What a capture does carry is the pointers, and rows of one table lie on that table's
-        // grid - so the handful the column resolves to must all be a multiple of 0x19 apart, which
-        // is the row size dat-schema computes for EndgameMapContentSet's three columns. A column
-        // pointing at the wrong thing does not land on one table's grid five times over.
+        // STRUCTURE RATHER THAN STRINGS, and worth keeping now that the names are readable too:
+        // this is the check that confirmed the column BEFORE any capture carried them. Rows of one
+        // table lie on that table's grid, so the handful the column resolves to must all be a
+        // multiple of 0x19 apart - the row size dat-schema computes for EndgameMapContentSet's
+        // three columns. A column pointing at the wrong thing does not land on one table's grid
+        // five times over. It runs against the older capture on purpose: the pointers are all it
+        // needs, and that is the point.
         using ReplayMemoryReader replay = Load("session-2026-09-endgamemaps.rec");
         OffsetSchema schema = RealSessionTests.LiveSchema();
         EndgameMapCatalogue catalogue = Read(replay, out _);
@@ -179,22 +188,75 @@ public class EndgameMapSessionTests
     }
 
     [Fact]
-    public void ANDTheCategoryNamesAreNotInAnyCaptureYet()
+    public void ANDTheCategoriesAreAboutWHATCANROLLRatherThanWhatKindOfMapItIs()
     {
-        // The honest state, pinned so it cannot be mistaken for a working read. The pointers are
-        // there and land on the grid above; the rows they point at were never read by the build
-        // that made this capture, and a recording holds only the reads its build performed. This
-        // test FAILS the moment a capture carries them, which is when the categories can be
-        // asserted by name instead.
+        // THE HYPOTHESIS THIS REFUTES, which is the reason to write the names down. The column was
+        // read expecting the game's own version of data/atlas-maps.json's curated tags - a coarser
+        // "expedition / tower / arbiter". It is not a coarser version of that. It is a DIFFERENT
+        // AXIS: which content may roll on the map. "Irradiated" is the corruption mechanic, not a
+        // kind of map, and "All" is the default that 107 of the 173 carry.
         (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
         using (replay)
         {
-            Assert.Empty(endgame.Categories);
-            Assert.Empty(endgame.ContentSets);
-            Assert.Contains(
-                "no content-set categories read - the referenced rows are not in this capture",
-                string.Join('\n', endgame.Describe(Names())),
-                StringComparison.Ordinal);
+            Assert.Equal(
+                ["All", "DisallowAll", "IrradiatedAndPowerfulBossOnly", "IrradiatedOnly", "QuestAreaOnly"],
+                endgame.Categories.Order(StringComparer.Ordinal));
+            Assert.Equal(131, endgame.ContentSets.Count);
+            Assert.Equal("All", endgame.ContentSets["MapAugury"]);
+            Assert.Equal("IrradiatedOnly", endgame.ContentSets["ExpeditionLogBook_Atoll"]);
+        }
+    }
+
+    [Fact]
+    public void ANDTheyCannotStandInForTheCuratedTags()
+    {
+        // MEASURED RATHER THAN CONCLUDED FROM THE NAMES. "All" holds the towers, the lineage maps
+        // and the one craft map - and 91 ordinary maps with no curated tag at all, which is what
+        // makes it a default rather than a classification. Nothing could read a tag out of it.
+        (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
+        using (replay)
+        {
+            AtlasMapNames file = Names();
+            string[] all = [.. endgame.ContentSets.Where(pair => pair.Value == "All").Select(pair => pair.Key)];
+
+            Assert.Equal(107, all.Length);
+            Assert.Equal(91, all.Count(id => file.Of(id).Tags.Count == 0));
+            Assert.All(
+                file.All.Where(pair => pair.Value.Tagged("tower")).Select(pair => pair.Key),
+                id => Assert.Equal("All", endgame.ContentSets[id]));
+
+            // And six curated tags have no category behind them AT ALL - hideout, quest and ritual
+            // never reach one, so a third of the file's words are invisible from here.
+            foreach (string tag in (string[])["hideout", "quest", "ritual"])
+            {
+                Assert.All(
+                    file.All.Where(pair => pair.Value.Tagged(tag)).Select(pair => pair.Key),
+                    id => Assert.False(endgame.ContentSets.ContainsKey(id), $"{tag}: {id}"));
+            }
+        }
+    }
+
+    [Fact]
+    public void WHATTheyDOSayIsThatAnIrradiatedOnlyMapIsAlwaysASpecialOne()
+    {
+        // The one direction that holds, kept because a one-way implication is still a fact. Every
+        // map the game restricts to Irradiated content carries a curated tag - eleven Expedition
+        // logbooks and one Breach tower - and so does every IrradiatedAndPowerfulBossOnly one.
+        // That is not enough to derive a tag, but it is enough to notice an untagged map appearing
+        // in either category, which would mean the file has fallen behind.
+        (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
+        using (replay)
+        {
+            AtlasMapNames file = Names();
+            string[] restricted =
+            [
+                .. endgame.ContentSets
+                    .Where(pair => pair.Value is "IrradiatedOnly" or "IrradiatedAndPowerfulBossOnly")
+                    .Select(pair => pair.Key),
+            ];
+
+            Assert.Equal(16, restricted.Length);
+            Assert.All(restricted, id => Assert.NotEmpty(file.Of(id).Tags));
         }
     }
 
