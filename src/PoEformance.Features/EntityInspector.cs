@@ -221,16 +221,35 @@ public sealed class EntityInspector
     private IReadOnlyList<ComponentTally> _lastSurvey = [];
     private int _lastSurveyed;
 
+    /// <summary>
+    /// How many serviced requests may try to reach Stats.dat before the session gives up.
+    /// </summary>
+    /// <remarks>
+    /// A budget rather than a retry, for the reason AtlasWatch keeps one: there are two outcomes -
+    /// the walk finds the table on the first attempt, or the offsets are wrong and every attempt
+    /// fails identically. The second must not cost eight thousand records on every service.
+    /// </remarks>
+    private const int StatTries = 4;
+
+    private readonly ulong _fileRoot;
+    private int _statTries = StatTries;
+
+    /// <param name="fileRootStatic">
+    /// Where the loader's file list hangs, or zero where nothing resolved it. That walk is the only
+    /// route to Stats.dat that needs nothing on screen - see <see cref="LearnStatNames"/>.
+    /// </param>
     public EntityInspector(
         IMemoryReader reader,
         OffsetSchema schema,
-        PoEformance.Game.Components.StatNames? statNames = null)
+        PoEformance.Game.Components.StatNames? statNames = null,
+        ulong fileRootStatic = 0)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
         _statNames = statNames ?? PoEformance.Game.Components.StatNames.Empty;
         _reader = reader;
         _schema = schema;
+        _fileRoot = fileRootStatic;
         _entities = new EntityReader(reader, schema);
         _buffs = new PoEformance.Game.Components.BuffsReader(reader, schema);
     }
@@ -254,6 +273,8 @@ public sealed class EntityInspector
             return;
         }
 
+        LearnStatNames();
+
         try
         {
             Volatile.Write(ref _view, Build(request));
@@ -264,6 +285,41 @@ public sealed class EntityInspector
             // makes a failed read ordinary rather than exceptional.
             Volatile.Write(ref _view, View with { Status = $"read failed: {exception.Message}" });
         }
+    }
+
+    /// <summary>
+    /// Walks the loader's file list once, to put the game's own Stats.dat in front of the file.
+    /// </summary>
+    /// <remarks>
+    /// WHY IT IS WORTH A WALK OF EIGHT THOUSAND RECORDS. data/stat_name_map.tsv is keyed by row
+    /// index and a stat id is a POSITION, so a league that inserts a row moves every name after it.
+    /// Measured 2026-09-15: of the 148 rows a capture could name, ten agreed with the file and 135
+    /// did not, the first disagreement at index 4678 - just above the highest reading anyone had
+    /// ever verified. This browser is where somebody reads a stat id to work out what a component
+    /// is, so a confidently wrong name here is the expensive kind.
+    ///
+    /// ONCE PER SESSION AND ON THE READER THREAD, with a budget rather than a retry: the walk
+    /// either finds the table or the offsets are wrong, and the second case must not cost eight
+    /// thousand records on every service. It runs on the first serviced request rather than at
+    /// construction, so a session that never opens this browser never pays for it at all.
+    /// </remarks>
+    private void LearnStatNames()
+    {
+        if (_statTries <= 0 || _fileRoot == 0 || _statNames.FromGame)
+        {
+            return;
+        }
+
+        _statTries--;
+        _statNames.Learn(PoEformance.Game.Components.StatTable.From(
+            Walked(), _reader, _schema));
+    }
+
+    private PoEformance.Game.Files.LoadedDatTables Walked()
+    {
+        var tables = new PoEformance.Game.Files.LoadedDatTables(_reader, _schema);
+        tables.Read(_fileRoot);
+        return tables;
     }
 
     private EntityView Build(EntityRequest request)

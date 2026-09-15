@@ -1952,7 +1952,12 @@ internal static class Program
             gameStatesStatic,
             atlasContents,
             mapNames,
-            PoEformance.Game.World.AtlasRatings.Load(FindDataFile("atlas-ratings.json"), mapNames))
+            PoEformance.Game.World.AtlasRatings.Load(FindDataFile("atlas-ratings.json"), mapNames),
+
+            // The game's own sentence per stat, behind both content tables. Keyed by the stat's
+            // NAME rather than by a row index, so it does not go wrong when the game inserts a row -
+            // the index half of that join comes out of memory. See StatDescriptions.
+            PoEformance.Game.Components.StatDescriptions.Load(FindDataFile("stat_desc_map.tsv")))
         {
             Settings = PoEformance.Features.AtlasStore.Load(),
             Ritual = ritual,
@@ -1966,16 +1971,44 @@ internal static class Program
         {
             Store = itemArt,
             Wanted = atlasContents.Icons,
-            Names = installed is { } named ? named.Look : null,
+            Names = installed is null ? null : WalkTheInstall,
         };
+
+        // ONE WALK, TWO ANSWERS, and that is not a tidy-up: the index spells its four million paths
+        // out once per session and releases them, so a second walk finds nothing - not an error,
+        // an EMPTY answer, which reads as "the install has no such file". Both questions that need
+        // the walk are therefore asked in the same call. See GameFiles.Names.
+        //
+        // The second of them replaces data/stat_desc_map.tsv with the game's own .csd files, which
+        // is what makes that export a fallback rather than the source. It lands here because this
+        // is where the walk happens: on AtlasArt's background task, the first time the atlas is
+        // drawn, which is also the first moment anything wants a sentence for a token.
+        Dictionary<string, string> WalkTheInstall(IReadOnlyCollection<string> wanted)
+        {
+            PoEformance.Game.Files.BundleIndex.WalkedNames walked = installed!.Names(
+                wanted,
+                PoEformance.Game.Files.StatDescriptionFiles.Folder,
+                PoEformance.Game.Files.StatDescriptionFiles.Extension);
+
+            atlas.LearnStatDescriptions(
+                PoEformance.Game.Components.StatDescriptions.FromInstall(installed, walked.Inside));
+            return walked.Paths;
+        }
 
         // And the entity browser, which is the shortest route to something not yet
         // understood: the game names every component an entity carries, and most of them
         // still have nothing reading them.
         // With the game's own names for the stat ids, when the table is next to the binary.
         // Missing is fine - the ids still read, they are just numbers then.
+        // WITH FileRoot, so the browser can put the game's own Stats.dat in front of the file.
+        // stat_name_map.tsv is keyed by row index and a stat id is a POSITION, so a league that
+        // inserts a row moves every name after it: measured 2026-09-15, ten of 148 rows still
+        // agreed and the first disagreement was at index 4678. See StatTable.
         var entityParts = new PoEformance.Features.EntityInspector(
-            reader, schema, PoEformance.Game.Components.StatNames.Load(FindDataFile("stat_name_map.tsv")));
+            reader,
+            schema,
+            PoEformance.Game.Components.StatNames.Load(FindDataFile("stat_name_map.tsv")),
+            fileRoot);
 
         // Finding a way across the area is a search over millions of cells - measured at about
         // 1.8 seconds right across a real map - so it runs on the thread pool and the renderer

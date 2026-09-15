@@ -272,13 +272,33 @@ public sealed class AtlasWatch
     /// </remarks>
     private readonly EndgameMapContentCatalogue _mapContent;
 
+    /// <summary>
+    /// The game's own sentence per stat, for the tokens no content and no file names.
+    /// </summary>
+    /// <remarks>
+    /// KEYED BY THE STAT'S NAME rather than by a row index, so it does not go wrong when the game
+    /// inserts a row - it goes out of date only when GGG rewords something. The index half of the
+    /// join comes out of memory.
+    ///
+    /// NOT READONLY, because the better source arrives late. The install's own .csd files say this
+    /// without any export in the way, but reading them costs the one walk of the index's spelled-out
+    /// paths - which happens on a background thread, well after this is built. So it starts as the
+    /// shipped table and is replaced by <see cref="LearnStatDescriptions"/> when the install answers.
+    /// </remarks>
+    private Game.Components.StatDescriptions _statDescriptions;
+
+    /// <summary>What was shipped, kept after the install replaces it so the two can be compared.</summary>
+    /// <remarks>See <see cref="Game.Components.StatDescriptions.Against"/> for why that comparison IS the check.</remarks>
+    private readonly Game.Components.StatDescriptions _shippedDescriptions;
+
     public AtlasWatch(
         IMemoryReader reader,
         OffsetSchema schema,
         ulong gameStatesStatic,
         AtlasContentNames? contents = null,
         AtlasMapNames? names = null,
-        AtlasRatings? ratings = null)
+        AtlasRatings? ratings = null,
+        Game.Components.StatDescriptions? statDescriptions = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
@@ -290,6 +310,8 @@ public sealed class AtlasWatch
         _endgame = new EndgameMapCatalogue(reader, schema);
         _mapContent = new EndgameMapContentCatalogue(reader, schema);
         _contents = contents ?? AtlasContentNames.Empty;
+        _statDescriptions = statDescriptions ?? Game.Components.StatDescriptions.Empty;
+        _shippedDescriptions = _statDescriptions;
         Names = names ?? AtlasMapNames.Empty;
         Ratings = ratings ?? AtlasRatings.Empty;
         _grouping = new AtlasGrouping(_settings.Sorting, Names, Ratings);
@@ -781,7 +803,40 @@ public sealed class AtlasWatch
         said.Add(string.Empty);
         said.AddRange(_mapContent.Describe(_contents));
         said.Add(string.Empty);
+        said.AddRange(Sentences());
+        said.Add(string.Empty);
         said.AddRange(Tokens(nodes));
+        return said;
+    }
+
+    /// <summary>
+    /// Where the stat sentences came from, and - on a machine with both - whether the two agree.
+    /// </summary>
+    /// <remarks>
+    /// THE ONLY CHECK THE READER CAN HAVE. Nothing in this project has an install to parse, so the
+    /// .csd reader cannot be measured against the game from a test: a recording holds memory reads,
+    /// not files. What a machine with the game DOES have is the same sentences by two completely
+    /// separate routes - this reader over the install, and data/stat_desc_map.tsv, which a Python
+    /// tool built from files a third tool unpacked. Where those two agree, both are right about the
+    /// format; where they differ, the difference is printed, because a tally cannot say which of
+    /// them is wrong.
+    /// </remarks>
+    private IReadOnlyList<string> Sentences()
+    {
+        Game.Components.StatDescriptions lines = Volatile.Read(ref _statDescriptions);
+        var said = new List<string> { $"STAT SENTENCES - from {lines.Source}" };
+
+        if (!lines.FromGame)
+        {
+            // Three different states behind one line, and the first is not a fault: the install is
+            // read on the walk that also finds the atlas art, so before the atlas has been DRAWN
+            // there is simply nothing to report yet.
+            said.Add("  the install's own .csd files have not been read - either the atlas has not"
+                + " been drawn yet, or there is no game folder to read them from");
+            return said;
+        }
+
+        said.AddRange(lines.Against(_shippedDescriptions));
         return said;
     }
 
@@ -862,8 +917,58 @@ public sealed class AtlasWatch
             return false;
         }
 
-        return _contents.Revision == 0
+        // TWO REASONS TO RUN, and only one of them is the first time. The other is a better set of
+        // stat sentences arriving from the install after this has already learnt once - see
+        // LearnStatDescriptions - which has to be re-applied or it would sit unused until a restart.
+        bool first = _contents.Revision == 0;
+        bool better = Interlocked.Exchange(ref _freshDescriptions, 0) != 0;
+        if (!first && !better)
+        {
+            return false;
+        }
+
+        // AND THE STAT SENTENCES BEHIND BOTH TABLES. The Stats table travels with the content rows -
+        // a content's Stats array is a dat foreign reference - so it costs nothing extra here, and
+        // it reaches the tokens neither table knows: 90 distinct tokens on the 0.5.5 capture, 21
+        // with words, 61 with a stat description.
+        if (_mapContent.StatsTable is { } stats)
+        {
+            _contents.LearnStats(
+                Game.Components.StatTable.Over(_reader, stats, _schema),
+                Volatile.Read(ref _statDescriptions),
+                _mapContent.StatTokenBase);
+        }
+
+        return first
             && _contents.Learn(_mapContent.Rows, _mapContent.BadgeIdBase, _mapContent.StatTokenBase) > 0;
+    }
+
+    // Set when a better set of sentences has been handed in and not yet applied. An int rather than
+    // a bool so the reader thread can take it and clear it in one go.
+    private int _freshDescriptions;
+
+    /// <summary>
+    /// Takes the game's own stat sentences, read from the install rather than from the export.
+    /// </summary>
+    /// <remarks>
+    /// ARRIVES LATE AND FROM ANOTHER THREAD. Reading the install's .csd files costs the one walk of
+    /// the index's spelled-out paths - four million of them - so it happens on a background task
+    /// long after this was built and possibly after the contents have already been learnt. Both
+    /// cases are handled: the table is swapped here, and the flag makes the next reader pass apply
+    /// it. Nothing is read from memory on this thread.
+    ///
+    /// An empty table is ignored rather than installed, so a machine with no install keeps the
+    /// shipped export instead of losing its sentences to a failed walk.
+    /// </remarks>
+    public void LearnStatDescriptions(Game.Components.StatDescriptions? descriptions)
+    {
+        if (descriptions is not { Count: > 0 })
+        {
+            return;
+        }
+
+        Volatile.Write(ref _statDescriptions, descriptions);
+        Interlocked.Exchange(ref _freshDescriptions, 1);
     }
 
     /// <summary>
@@ -882,7 +987,10 @@ public sealed class AtlasWatch
             : $"data/atlas-content.json ({_contents.Count} entries) - the game's own table would not read:"
               + $" {(_mapContent.LastError.Length > 0 ? _mapContent.LastError : "no reason given")}"
         : $"the game ({_contents.LearntBadges} badges and {_contents.LearntEffects} effects from"
-          + $" EndgameMapContent), with data/atlas-content.json behind it";
+          + $" EndgameMapContent), then data/atlas-content.json"
+          + (_contents.StatSentences > 0
+              ? $", then {Volatile.Read(ref _statDescriptions).Source}"
+              : ", and no stat descriptions at all");
 
     /// <summary>
     /// Takes the slow half again: what each node is, and every route across the atlas.
