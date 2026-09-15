@@ -5,7 +5,15 @@ namespace PoEformance.Game.World;
 
 /// <summary>What is known about one map on the atlas, beyond what the node itself says.</summary>
 /// <param name="Name">The name the game shows for it, in English.</param>
-/// <param name="Unique">Whether it is a unique map rather than one of the ordinary ones.</param>
+/// <param name="Unique">
+/// Whether it is a unique map rather than one of the ordinary ones.
+///
+/// THE GAME'S ANSWER, ALWAYS. data/atlas-maps.json used to carry a "type": "unique" key and no
+/// longer does: WorldAreas.IsUniqueMapArea is what the client itself decides with, the hand-kept
+/// copy disagreed with it on five of the atlas's own maps, and keeping a redundant column would
+/// only have given it somewhere to drift. So this is false on a freshly loaded file and is filled
+/// in by <see cref="AtlasMapNames.LearnUnique"/> the first time an atlas read reaches the table.
+/// </param>
 /// <param name="Tags">
 /// What KIND of map it is - "tower", "arbiter", "expedition", "lineage", "breach", "ritual",
 /// "boss", "traverse", "quest". This is what grouping is built on, and it comes from the game's
@@ -55,20 +63,17 @@ public sealed record AtlasMapInfo(string Name, bool Unique, IReadOnlyList<string
 /// than a filter: measured against 106 ids read off real atlas nodes, the Map* prefix misses every
 /// Expedition logbook and the game's own "map" tag misses sixteen of them. See EndgameMapCatalogue.
 ///
-/// WHAT IS LEFT IS WHAT MEMORY DOES NOT SUPPLY: the English name, which the ratings resolve
-/// through (the game's own names are translated, so they cannot be that lookup), and the 53
-/// entries carrying curated words - expedition, arbiter, tower, lineage, traverse, breach, quest,
-/// boss, hideout, craft, ritual - which share no vocabulary with the game's mechanical tags.
+/// WHAT IS LEFT IS WHAT MEMORY DOES NOT SUPPLY, and nothing else. The English name, which the
+/// ratings resolve through (the game's own names are translated, so they cannot be that lookup),
+/// and the 53 entries carrying curated words - expedition, arbiter, tower, lineage, traverse,
+/// breach, quest, boss, hideout, craft, ritual - which share no vocabulary with the game's
+/// mechanical tags. The "type": "unique" key went too: memory supplies that one, and a
+/// hand-maintained copy of a column the client owns is only somewhere for it to drift.
 ///
 /// THE NAMES ARE ENGLISH, always, because that is what the table holds. On a German client the
 /// atlas will therefore be labelled in English while the game beneath it is not - a real
 /// limitation, and the reason to look for the name on the node itself later. Being keyed by id
 /// is what makes that a change of one method rather than of every group.
-///
-/// THE UNIQUE FLAG NO LONGER COMES FROM HERE once the game has been asked. WorldAreas.dat carries
-/// IsUniqueMapArea, it was measured against all 442 rows, and it disagrees with this file on six
-/// ids in both directions - so the game's column is the one in force and this file's is kept only
-/// to be compared against. See <see cref="LearnUnique"/>, and MapDataReport for the comparison.
 /// </remarks>
 public sealed class AtlasMapNames
 {
@@ -107,14 +112,13 @@ public sealed class AtlasMapNames
     /// of them; something else might want the first.
     ///
     /// THE FILE, deliberately, and not what <see cref="Of"/> answers. The two part company once
-    /// the game has spoken, and the callers of this one - the ratings' name lookup, and the report
-    /// that compares the two sources - both want the file's word specifically. A reconciliation
-    /// built on a table that had already been corrected would report that everything agrees.
+    /// the game has spoken: this one is the shipped names and tags, unchanged, which is what the
+    /// ratings' name lookup and the report's "what does the file carry" column both need.
     /// </remarks>
     public IReadOnlyDictionary<string, AtlasMapInfo> All => _file;
 
     /// <summary>
-    /// How many times the game has corrected this file. Nought means the file alone is in force.
+    /// How many times the game has been asked. Nought means nothing is known to be unique yet.
     /// </summary>
     /// <remarks>
     /// A version rather than a flag, so anything CACHING an answer from <see cref="Of"/> can tell
@@ -145,16 +149,18 @@ public sealed class AtlasMapNames
     /// that moved.
     /// </summary>
     /// <remarks>
-    /// WHY THE GAME WINS. Both columns were read over the whole 442-row table and they disagree on
-    /// six ids in both directions: the game calls ExpeditionLeagueBoss, RitualLeagueBoss,
-    /// MapVoidReliquary and Map_HildaCampsite unique where the file does not, and calls
-    /// MapUniqueInitialTower and MapUniqueReactor_04 ordinary where the file says unique. The file
-    /// is a hand-maintained port; the column is what the client itself decides with. There is no
-    /// version of this where the hand-maintained copy is the better source.
+    /// WHY THE GAME WINS, AND WHY IT IS THE ONLY SOURCE NOW. Both columns were read over the whole
+    /// 442-row table and they disagreed on five of the atlas's own maps IN BOTH DIRECTIONS: the game
+    /// called RitualLeagueBoss, MapVoidReliquary and Map_HildaCampsite unique where the file did
+    /// not, and called MapUniqueInitialTower and MapUniqueReactor_04 ordinary where the file said
+    /// unique - the last two being the ones whose ids have "Unique" in them, which is exactly why a
+    /// name is not a source. The file was a hand-maintained port; the column is what the client
+    /// itself decides with. Its "type" key has since been removed, so NOTHING is unique until this
+    /// has run.
     ///
     /// NAMES AND TAGS ARE LEFT ALONE. The names in the table are in the CLIENT'S language and this
     /// file's are English on purpose - the ratings resolve through them - and the tags share no
-    /// vocabulary with the curated words at all. Only the flag that was measured to be better moves.
+    /// vocabulary with the curated words at all. Only the flag the file no longer carries is set.
     ///
     /// AN AREA THE FILE HAS NEVER HEARD OF still gets an entry, with no name and no tags, so that
     /// a new league's unique map falls into the unique group instead of past it. Its name stays
@@ -233,10 +239,9 @@ public sealed class AtlasMapNames
             var built = new Dictionary<string, AtlasMapInfo>(StringComparer.OrdinalIgnoreCase);
             foreach ((string id, AtlasMapEntry entry) in file.Maps)
             {
-                built[id] = new AtlasMapInfo(
-                    entry.Name ?? string.Empty,
-                    string.Equals(entry.Type, "unique", StringComparison.OrdinalIgnoreCase),
-                    entry.Tags ?? []);
+                // UNIQUE IS NOT READ FROM HERE. The file's "type": "unique" key is gone - the
+                // game's own IsUniqueMapArea is what decides, and LearnUnique fills this in.
+                built[id] = new AtlasMapInfo(entry.Name ?? string.Empty, false, entry.Tags ?? []);
             }
 
             return new AtlasMapNames(built);
@@ -255,14 +260,17 @@ public sealed class AtlasMapFile
     public Dictionary<string, AtlasMapEntry>? Maps { get; set; }
 }
 
-/// <summary>One map in it. Type and tags are left out when there is nothing to say.</summary>
+/// <summary>
+/// One map in it: an English name, and the curated tags when there are any.
+/// </summary>
+/// <remarks>
+/// NO "type" KEY, and an old file still loads - an unmapped JSON property is ignored, so a copy
+/// carrying the key this used to read simply has it skipped rather than failing to parse.
+/// </remarks>
 public sealed class AtlasMapEntry
 {
     [JsonPropertyName("name")]
     public string? Name { get; set; }
-
-    [JsonPropertyName("type")]
-    public string? Type { get; set; }
 
     [JsonPropertyName("tags")]
     public List<string>? Tags { get; set; }

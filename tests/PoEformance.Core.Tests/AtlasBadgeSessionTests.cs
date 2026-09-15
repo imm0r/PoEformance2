@@ -238,12 +238,12 @@ public class AtlasBadgeSessionTests
 
     [Theory]
     [MemberData(nameof(Captures))]
-    public void TheUniqueMarkersSideWithTheGamesOwnFlagRatherThanWithTheFile(string fixture)
+    public void TheUniqueMarkersSideWithTheGamesOwnFlag(string fixture)
     {
-        // A free check on the six ids where IsUniqueMapArea and data/atlas-maps.json disagree.
-        // MapUniqueReactor_04 is one of the two the FILE calls unique and the TABLE does not - and
+        // A free THIRD reading of the ids where IsUniqueMapArea and the old file column disagreed.
+        // MapUniqueReactor_04 is one of the two the file called unique and the table does not - and
         // it sits on the atlas, uncompleted, carrying no unique marker. So the badge agrees with
-        // the table. That is one of the six settled by a third, independent reading.
+        // the table, which is what settled the argument before the file's column was removed.
         using ReplayMemoryReader replay = Load(fixture);
         List<AtlasNode> nodes = Nodes(replay);
 
@@ -258,10 +258,10 @@ public class AtlasBadgeSessionTests
             Assert.DoesNotContain(UniqueOther, node.BadgeIds);
         });
 
-        AtlasMapInfo said = AtlasMapNames
-            .Load(Path.Combine(Root.FullName, "data", "atlas-maps.json"))
-            .Of("MapUniqueReactor_04");
-        Assert.True(said.Unique, "the file no longer calls MapUniqueReactor_04 unique, so this check is stale");
+        // The file used to be checked here too, to show that the badge sided with the TABLE
+        // against it. That comparison is gone with the file's "type" key - IsUniqueMapArea is the
+        // only source now - and the reading above stands on its own: the game draws no unique
+        // marker on a map the table calls ordinary.
     }
 
     [Theory]

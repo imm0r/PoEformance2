@@ -36,7 +36,11 @@ public class AtlasGroupTests
 
         Assert.Equal("Lost Towers", names.Called("MapLostTowers"));
         Assert.Equal("The Copper Citadel", names.Called("MapUberBoss_CopperCitadel"));
-        Assert.True(names.Of("ExpeditionLogBook_Heath").Unique);
+
+        // NOT a unique assertion any more. The file stopped carrying "type": "unique" when the
+        // game's IsUniqueMapArea became the only source, so a freshly loaded one says nothing
+        // about it - see AtlasUniqueTests, where that is checked against the real table.
+        Assert.False(names.Of("ExpeditionLogBook_Heath").Unique);
     }
 
     [Fact]
@@ -161,12 +165,25 @@ public class AtlasGroupTests
     [Fact]
     public void THEUniqueCatchAllTakesWhateverTheNamedGroupsLeft()
     {
-        AtlasGrouping grouping = Shipped();
+        // ASKED OF THE GAME FIRST, because the file no longer answers it. Both ids read as
+        // ordinary out of data/atlas-maps.json now - the "type" key is gone - so a grouping built
+        // before LearnUnique has run puts neither anywhere, which is what the first two lines say.
+        AtlasMapNames names = Names();
+        var grouping = new AtlasGrouping(DefaultAtlasGroups.Groups, names);
 
-        // Site of the Chosen is unique and in no named group, so it lands in the catch-all.
-        Assert.Equal("Unique maps", grouping.Of("MapUniqueReactor_04")?.Name);
+        Assert.Null(grouping.Of("MapUniqueLake"));
+        Assert.Equal("Progression", grouping.Of("MapUniqueReactor_01")?.Name);
 
-        // The gateways are unique too, and they are Progression first.
+        names.LearnUnique(new Dictionary<string, WorldArea>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["MapUniqueLake"] = new("MapUniqueLake", string.Empty, true, false, true, []),
+            ["MapUniqueReactor_01"] = new("MapUniqueReactor_01", string.Empty, true, false, true, []),
+        });
+
+        // The Fractured Lake is unique and in no named group, so it lands in the catch-all.
+        Assert.Equal("Unique maps", grouping.Of("MapUniqueLake")?.Name);
+
+        // The gateway is unique too, and it is Progression first - the order is the decision.
         Assert.Equal("Progression", grouping.Of("MapUniqueReactor_01")?.Name);
     }
 

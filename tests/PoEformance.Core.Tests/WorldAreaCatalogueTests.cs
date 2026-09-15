@@ -168,13 +168,15 @@ public class WorldAreaCatalogueTests
         var catalogue = new WorldAreaCatalogue(fake, schema);
         Assert.True(catalogue.ReadFromNode(Node), catalogue.LastError);
 
-        // A file that agrees about the tower's name and unique flag, calls it a tower the way
-        // the game does, and carries one word the game has never heard of.
+        // A file that agrees about the tower's name, calls it a tower the way the game does, and
+        // carries one word the game has never heard of. It says nothing about unique: that key was
+        // removed from data/atlas-maps.json once IsUniqueMapArea became the only source, so there
+        // is no longer a comparison to make and Describe stopped offering one.
         string said = string.Join('\n', catalogue.Describe(Curated(
             """
             {"maps":{
               "MapLostTowers":{"name":"Lost Towers","tags":["map_tower"]},
-              "MapUniqueLake":{"name":"The Fractured Lake","type":"unique","tags":["arbiter"]}
+              "MapUniqueLake":{"name":"The Fractured Lake","tags":["arbiter"]}
             }}
             """)));
 
@@ -183,25 +185,9 @@ public class WorldAreaCatalogueTests
         Assert.Contains("map_tower", said, StringComparison.Ordinal);
         Assert.Contains("0 of its ids are not in the table", said, StringComparison.Ordinal);
         Assert.Contains("0 names differ", said, StringComparison.Ordinal);
-        Assert.Contains("the unique flag agrees everywhere", said, StringComparison.Ordinal);
+        Assert.DoesNotContain("unique flag", said, StringComparison.Ordinal);
         Assert.Contains("tags the file carries that the table does not", said, StringComparison.Ordinal);
         Assert.Contains("arbiter", said, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void AndSaysSoWhenTheFileAndTheTableDisagreeAboutUnique()
-    {
-        (FakeMemoryReader fake, OffsetSchema schema) = Fixture();
-        var catalogue = new WorldAreaCatalogue(fake, schema);
-        Assert.True(catalogue.ReadFromNode(Node), catalogue.LastError);
-
-        // The reading that decides a group: the file calls the tower unique and the table does
-        // not. The table wins (AtlasMapNames.LearnUnique), so counting it is how a client where
-        // the file is further out of date than six maps announces itself.
-        string said = string.Join('\n', catalogue.Describe(Curated(
-            """{"maps":{"MapLostTowers":{"name":"Lost Towers","type":"unique"}}}""")));
-
-        Assert.Contains("the unique flag differs on 1", said, StringComparison.Ordinal);
     }
 
     [Fact]

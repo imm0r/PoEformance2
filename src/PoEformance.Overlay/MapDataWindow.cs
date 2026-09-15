@@ -22,7 +22,7 @@ namespace PoEformance.Overlay;
 /// </remarks>
 public sealed class MapDataWindow
 {
-    /// <summary>Rows drawn before the list is cut short. The table is 444 rows.</summary>
+    /// <summary>Rows drawn before the list is cut short. The union is 442 rows.</summary>
     private const int MostRows = 2048;
 
     /// <summary>Longest search text taken. A map id is well under this.</summary>
@@ -118,27 +118,19 @@ public sealed class MapDataWindow
             "every name the two share is identical",
             $"{report.NamesDiffer} names differ between the game and the file");
 
-        // NOT a verdict: the unique flags disagreeing is a known, deliberate state. The game's
-        // column is the one in force, so this is a list of maps the file would have grouped
-        // wrongly - and colouring it as a fault would say the opposite.
+        // NOT a verdict either way: there is nothing left to compare. The file's "type": "unique"
+        // key is gone, so this says what is true and whether the table it comes from has been read.
         ImGui.TextColored(
             report.UniqueFromGame ? GoodText : WarnText,
             report.UniqueFromGame
-                ? $"  OK  unique comes from the game (IsUniqueMapArea); {report.UniqueDiffers} differ from the file"
-                : $"  ..  unique still comes from the file - the table has not been read; {report.UniqueDiffers} would move");
+                ? $"  OK  {report.Uniques} unique maps, from the game (WorldAreas.IsUniqueMapArea)"
+                : "  ..  WorldAreas has not been read - nothing is known to be unique yet");
 
         foreach (RatingRow rating in report.Ratings.Where(r => !r.Resolves))
         {
             ImGui.TextColored(BadText, $"      \"{rating.Name}\" ({rating.Rating}) matches no map");
         }
 
-        foreach (MapDataRow row in report.Maps.Where(r => r.Unique == Agreement.Differ))
-        {
-            ImGui.TextColored(
-                DimText,
-                $"      {row.Id}: {(row.GameUnique ? "unique" : "ordinary")}"
-                + $" - the file said {(row.FileUnique ? "unique" : "ordinary")}");
-        }
     }
 
     /// <summary>One line, green when it holds and red when it does not.</summary>
@@ -213,12 +205,8 @@ public sealed class MapDataWindow
                 ImGui.TableNextColumn();
                 Cell(row.InFile ? row.FileName : "-", row.Name is Agreement.Differ or Agreement.GameOnly);
 
-                // What is in force, not which source won: a person reading this row wants to know
-                // whether the tool treats the map as unique, and the disagreement is the colour.
                 ImGui.TableNextColumn();
-                ImGui.TextColored(
-                    row.Unique == Agreement.Differ ? WarnText : DimText,
-                    report.UniqueNow(row) ? "yes" : string.Empty);
+                ImGui.TextColored(DimText, row.GameUnique ? "yes" : string.Empty);
 
                 ImGui.TableNextColumn();
                 ImGui.TextColored(DimText, row.Rating?.ToString() ?? string.Empty);
@@ -249,8 +237,9 @@ public sealed class MapDataWindow
             return false;
         }
 
-        if (_differencesOnly && row.Name != Agreement.Differ && row.Unique != Agreement.Differ
-            && row.Name is not (Agreement.GameOnly or Agreement.FileOnly))
+        // The name is the only field with two sources left to disagree, so it is the only one a
+        // "differences" filter can be about.
+        if (_differencesOnly && row.Name is not (Agreement.Differ or Agreement.GameOnly or Agreement.FileOnly))
         {
             return false;
         }
