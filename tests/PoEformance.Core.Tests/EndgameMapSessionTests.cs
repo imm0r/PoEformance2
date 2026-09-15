@@ -51,6 +51,7 @@ public class EndgameMapSessionTests
     /// </remarks>
     private static readonly string[] Captures =
     [
+        "session-2026-09-mapcontent.rec",
         "session-2026-09-contentset.rec",
         "session-2026-09-endgamemaps.rec",
         "session-2026-09-catalogue.rec",
@@ -261,26 +262,25 @@ public class EndgameMapSessionTests
     }
 
     [Fact]
-    public void ThirteenMapsCarryAContentArrayAndTHISCaptureCannotFollowOne()
+    public void ThirteenMapsCarryAContentArrayAndTheWalkFollowsOneToItsTable()
     {
-        // WHAT A COMMITTED RECORDING CAN AND CANNOT SETTLE, in one test, because getting this
-        // backwards has cost this project a whole round before. The MapContent column is a dat
-        // ARRAY - a count and a pointer - and both of those sit INSIDE the row bytes this capture
-        // holds, so the count is answerable here and is thirteen. The entries the pointer leads to
-        // were never read by the build that recorded this, so the table behind them is not in the
-        // file and no re-reading of the fixture will produce it.
+        // THIRTEEN IS ENOUGH, which is the thing this was uncertain about: the MapContent column
+        // is on 13 of the 173 rows, so a walk that gave up after the first few would find none.
+        // Striding the whole table finds one and the table it points at comes free with it.
         //
-        // The test pins both halves on purpose. A capture taken with EndgameMapContentCatalogue in
-        // place will make the second half wrong, and that is exactly when this should fail: it is
-        // the reminder to move the assertion rather than a claim that the route does not work.
+        // This test used to assert the opposite half - that the capture of the day held the count
+        // but not the entries behind it, because the build that recorded it had no reason to read
+        // them. That was true of that recording and is the rule worth remembering: a recording
+        // holds only the reads its build performed. session-2026-09-mapcontent.rec was taken with
+        // this walker in place, so the entries are here and the assertion has moved.
         (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
         using (replay)
         {
             Assert.Equal(173, endgame.Maps.Count);
             Assert.Equal(13, endgame.ContentArrays);
 
-            Assert.Equal(0UL, endgame.ContentTable);
-            Assert.Empty(endgame.ContentTableRoute);
+            Assert.NotEqual(0UL, endgame.ContentTable);
+            Assert.Equal("EndgameMaps.MapContent", endgame.ContentTableRoute);
         }
     }
 
