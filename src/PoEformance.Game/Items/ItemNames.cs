@@ -78,6 +78,7 @@ public sealed class ItemNames
     // thread installs them while the interface may be asking.
     private Components.StatTable? _live;
     private Components.StatDescriptions? _sentences;
+    private BaseItemTable? _baseItems;
 
     private ItemNames(
         IReadOnlyDictionary<int, StatMeaning> stats,
@@ -186,7 +187,11 @@ public sealed class ItemNames
     /// </remarks>
     /// <param name="table">The game's Stats.dat, or null to leave what is there.</param>
     /// <param name="sentences">The game's stat descriptions, or null to leave what is there.</param>
-    public void Learn(Components.StatTable? table = null, Components.StatDescriptions? sentences = null)
+    /// <param name="baseItems">The game's BaseItemTypes.dat, or null to leave what is there.</param>
+    public void Learn(
+        Components.StatTable? table = null,
+        Components.StatDescriptions? sentences = null,
+        BaseItemTable? baseItems = null)
     {
         if (table is not null)
         {
@@ -196,6 +201,11 @@ public sealed class ItemNames
         if (sentences is { Count: > 0 })
         {
             Volatile.Write(ref _sentences, sentences);
+        }
+
+        if (baseItems is { Named: > 0 })
+        {
+            Volatile.Write(ref _baseItems, baseItems);
         }
     }
 
@@ -222,7 +232,13 @@ public sealed class ItemNames
                     ? $"data/item-stats.json ({_worded.Count} sentences, re-keyed by stat id)"
                     : "nowhere";
 
-            return $"names from {names}; sentences from {words}";
+            string kinds = Volatile.Read(ref _baseItems) is { Named: > 0 } types
+                ? $"the game ({types.Named} of {types.Facts.Rows} rows of BaseItemTypes.dat)"
+                : _bases.Count > 0
+                    ? $"data/item-names.json ({_bases.Count} base types)"
+                    : "nowhere";
+
+            return $"names from {names}; sentences from {words}; base types from {kinds}";
         }
     }
 
@@ -242,6 +258,16 @@ public sealed class ItemNames
         if (path is not { Length: > 0 })
         {
             return string.Empty;
+        }
+
+        // THE GAME FIRST, and here that is a completeness fix rather than a correctness one. A
+        // base type is keyed by its own metadata path, which the game does not renumber, so the
+        // shipped list does not go WRONG the way the row-keyed stat tables did - it goes SHORT.
+        // The live client carries 5496 rows against the file's 5055, and every one of those four
+        // hundred odd came out as the tail of its own path.
+        if (Volatile.Read(ref _baseItems)?.Of(path) is { Length: > 0 } named)
+        {
+            return named;
         }
 
         if (_bases.TryGetValue(path, out string? known))

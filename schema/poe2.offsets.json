@@ -1315,11 +1315,20 @@
     },
 
     "StatsRow": {
-      "comment": "A row of Stats.dat, reached through EndgameMapAtlasRow.StatsRef. Only the Id is wanted: a stat id like map_pack_size_+% is what turns a bare StatValues number into something readable, and this project already carries a stat-name map for the same job elsewhere (data/stat_name_map.tsv). Computed 0x6A over its columns, unverified live.",
+      "comment": "A row of Stats.dat, reached through EndgameMapAtlasRow.StatsRef. Only the Id is wanted: a stat id like map_pack_size_+% is what turns a bare StatValues number into something readable, and this project already carries a stat-name map for the same job elsewhere (data/stat_name_map.tsv). Computed 0x6A over its columns, and VERIFIED LIVE 2026-09-15: the loader's own file table reports Stats.dat as 27281 rows of 106 bytes, which is that 0x6A exactly. The sentence that stood here for a season said 'unverified live'; it is verified now, by the same walk that measures BaseItemTypesRow below.",
       "fields": {
         "IdPtr": { "offset": "0x00", "type": "ptr" }
       },
       "consts": { "ComputedRowSize": "0x6A" }
+    },
+
+    "BaseItemTypesRow": {
+      "comment": "A row of BaseItemTypes.dat - what an item's metadata path is CALLED. Id is the path itself ('Metadata/Items/Currency/CurrencyWeaponQuality') and Name is the words on the item ('Blacksmith's Whetstone'), which is exactly the pair data/item-names.json ships 5055 of. THE LAYOUT IS NOT GUESSED AND NOT MERELY COMPUTED: the columns come from poe-tool-dev/dat-schema (validFor 2, the PoE2 entry), priced with the width table scripts/dat-offsets.ps1 verified, and they sum to 0x168 - which is BYTE FOR BYTE what the loader's own file table reports for this table on a live 0.5.5 client (5496 rows of 360, session-2026-09-tables-055.rec). A computed size agreeing with the client's is the strongest check available without the game running, because every column in front of Name has to be right for the total to land. WHAT THE SAME MEASUREMENT REFUSED, and it is why Mods is not here beside it: the schema computes 0x295 for Mods and the client says 0x2B5, thirty-two bytes more - two columns nobody has written down. The mod NAME sits at +0x62 by that reckoning, deep enough that a gap in front of it would point the offset at nothing, so Mods stays unread until the difference is found. Same state data/quest-tables.json records for Quest, and for the same reason.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr" },
+        "NamePtr": { "offset": "0x20", "type": "ptr" }
+      },
+      "consts": { "ComputedRowSize": "0x168" }
     },
 
     "PassiveSkillsRow": {
