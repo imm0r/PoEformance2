@@ -474,6 +474,57 @@ public class AtlasViewTests
     }
 
     [Fact]
+    public void ANDAStringTheDrawingRefusesNeverCostsTheIdItsOwnLine()
+    {
+        // REPORTED FROM A LIVE CLIENT, ONE MERGE AFTER THE STRING WENT IN: the Deadly boss was
+        // named correctly and every ORDINARY Powerful Map Boss node went blank - no name, no
+        // picture, nothing at all where the atlas had named the same content since the table was
+        // first read.
+        //
+        // The cause was the shape of the preference rather than the string. Offering the badge's
+        // own words RETURNED on them, so a word the drawing refuses - one the game marks as a
+        // placeholder with a leading bracket, which is also what a string truncated mid-markup
+        // looks like - took the id's label down with it. The string is an improvement on the
+        // label, so it is offered; when it is not taken, the label is still there.
+        //
+        // No committed capture could have caught this: the string is read off the badge CHILD and
+        // every fixture was taken by a build that read that slot for a node or two, so the replays
+        // all agreed that nothing was lost. See BADGE NAMES in the atlas check, which asks it
+        // where it can be answered.
+        AtlasNode refused = Node(1, 1, badges: [0x64]) with
+        {
+            BadgeWords = new Dictionary<uint, string> { [0x64] = "[DeadlyMapBoss|Deadly Map Bo" },
+        };
+
+        AtlasSaid said = Assert.Single(AtlasWatch.Words(refused, LoadedContents()));
+        Assert.Equal("Powerful Map Boss", said.Text);
+        Assert.Equal("AtlasIconContentMapBoss", said.Icon);
+    }
+
+    [Fact]
+    public void ANDAStringTheNodeAlreadyCarriesCostsItNothingEither()
+    {
+        // The other refusal, and the one that is only visible when the two names DIFFER: the
+        // badge's string repeats a line the node already carries, so the copy is dropped - but
+        // the id underneath it names something the node has NOT said yet, and that line is owed.
+        // Asserting this with both names equal would prove nothing, because then the right answer
+        // is one line either way and the broken shape passes too.
+        AtlasNode twice = Node(1, 1, badges: [0x64]) with
+        {
+            BadgeWords = new Dictionary<uint, string> { [0x64] = "Complete all Ritual Altars" },
+        };
+
+        var objective = new AtlasObjective("Ritual", "Complete all Ritual Altars", "AtlasIconContentRitual");
+
+        IReadOnlyList<AtlasSaid> said = AtlasWatch.Words(twice, LoadedContents(), objective);
+
+        Assert.Equal(2, said.Count);
+        Assert.Equal("Complete all Ritual Altars", said[0].Text);
+        Assert.Equal("Powerful Map Boss", said[1].Text);
+        Assert.Equal("AtlasIconContentMapBoss", said[1].Icon);
+    }
+
+    [Fact]
     public void ANDANodeTheGAMEIsNotPaintingIsNotAHoverAtAll()
     {
         // REPORTED FROM A LIVE CLIENT, and it blanked the overlay exactly where the overlay was

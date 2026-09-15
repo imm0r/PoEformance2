@@ -244,6 +244,10 @@ public sealed class AtlasWatch
     /// </remarks>
     private const int CatalogueTries = 8;
 
+    /// <summary>How many distinct badge strings the check spells out before the block is noise.</summary>
+    /// <remarks>Sixty-nine badges exist, so this shows every one an atlas can hold and then stops.</remarks>
+    private const int MostBadgeStrings = 80;
+
     private int _catalogueTries = CatalogueTries;
 
     /// <summary>
@@ -828,10 +832,88 @@ public sealed class AtlasWatch
         said.Add(string.Empty);
         said.AddRange(Mechanics(nodes));
         said.Add(string.Empty);
+        said.AddRange(BadgeNames(nodes));
+        said.Add(string.Empty);
         said.AddRange(new Game.Diagnostics.BossTierProbe(_reader, _schema).Probe(
             [.. nodes.Select(node => (node.Address, node.MapId, node.BadgeIds))]));
         said.Add(string.Empty);
         said.AddRange(Tokens(nodes));
+        return said;
+    }
+
+    /// <summary>
+    /// What each badge calls ITSELF, beside what its id is called, and whether the two agree.
+    /// </summary>
+    /// <remarks>
+    /// THIS EXISTS BECAUSE A COMMITTED CAPTURE CANNOT ANSWER IT. The badge's own string is read
+    /// off the badge CHILD, and every capture in tests/fixtures was taken by a build that read
+    /// that slot for a handful of nodes at most - so a replay reports one or two strings where a
+    /// running game has hundreds. When the drawing went blank on nodes that had always been
+    /// named, the fixtures said "nothing lost" and were right about themselves and useless about
+    /// the game. This line puts the question where it can be answered.
+    ///
+    /// THE COLUMN THAT MATTERS IS THE LAST ONE. A string the drawing REFUSES - one the game
+    /// marks as a placeholder with a leading bracket, which is also what a string truncated
+    /// mid-markup looks like - is the case that used to cost the node its line entirely.
+    /// </remarks>
+    private IReadOnlyList<string> BadgeNames(IReadOnlyList<AtlasNode> nodes)
+    {
+        var told = new Dictionary<(uint Id, string Word), int>();
+        int carrying = 0;
+        foreach (AtlasNode node in nodes)
+        {
+            if (node.BadgeWords is not { Count: > 0 } words)
+            {
+                continue;
+            }
+
+            carrying++;
+            foreach ((uint id, string word) in words)
+            {
+                told.TryGetValue((id, word), out int had);
+                told[(id, word)] = had + 1;
+            }
+        }
+
+        if (told.Count == 0)
+        {
+            return
+            [
+                "BADGE NAMES - no badge named itself; only a badge that hangs off the node as a"
+                    + " CHILD has a string, and a bare id from the vector has nothing to ask",
+            ];
+        }
+
+        var said = new List<string>
+        {
+            $"BADGE NAMES - {carrying} nodes carry {told.Count} distinct badge strings"
+                + " (the id's own label is in brackets where the two differ)",
+        };
+
+        IEnumerable<KeyValuePair<(uint Id, string Word), int>> ordered = told
+            .OrderBy(one => one.Key.Id)
+            .ThenBy(one => one.Key.Word, StringComparer.Ordinal);
+
+        foreach (((uint id, string word), int count) in ordered.Take(MostBadgeStrings))
+        {
+            string plain = EndgameMapContentCatalogue.AsTheFileWouldWriteIt(word);
+            string label = _contents.Badge(id)?.Label ?? string.Empty;
+
+            string against = label.Length == 0
+                ? "  [the id names nothing - the string is all this node has]"
+                : label.Equals(plain, StringComparison.OrdinalIgnoreCase)
+                    ? string.Empty
+                    : $"  [id says \"{label}\"]";
+
+            said.Add($"  0x{id:X4} {count,4}x  \"{plain}\"{against}"
+                + (Placeholder(plain) ? "  REFUSED - drawn as nothing, the id's label is used instead" : string.Empty));
+        }
+
+        if (told.Count > MostBadgeStrings)
+        {
+            said.Add($"  ... and {told.Count - MostBadgeStrings} more");
+        }
+
         return said;
     }
 
@@ -1249,15 +1331,17 @@ public sealed class AtlasWatch
                 ? EndgameMapContentCatalogue.AsTheFileWouldWriteIt(own)
                 : string.Empty;
 
-            if (told.Length > 0)
-            {
-                Add(badge ?? new AtlasContent(told, string.Empty, string.Empty), told);
-                continue;
-            }
-
+            // AND IT IS AN IMPROVEMENT ON THE ID'S LABEL, NEVER A REPLACEMENT FOR IT. The first
+            // cut of this returned early on the string alone, so a badge whose string the drawing
+            // REFUSES - one the game marks as a placeholder, or one whose line the node already
+            // carries - lost the id's own name as well, and a Powerful Map Boss that had been
+            // named since the table was first read went blank. The string is offered; if it is
+            // not taken, the id still names the node exactly as it did before any of this.
+            //
             // Label rather than Say: see the badge paragraph above. Its high half is a
             // category tag, and writing that into a "{0}" would number the thing with it.
-            if (badge is { } named)
+            if ((told.Length == 0 || !Add(badge ?? new AtlasContent(told, string.Empty, string.Empty), told))
+                && badge is { } named)
             {
                 Add(named, named.Label);
             }
@@ -1273,11 +1357,14 @@ public sealed class AtlasWatch
 
         return said;
 
-        void Add(AtlasContent content, string word)
+        // WHETHER IT TOOK THE WORD, because a caller with a second word to offer has to know.
+        // A badge has two names for the same thing - its own string and its id's label - and
+        // the fallback between them is only correct if the refusal is visible.
+        bool Add(AtlasContent content, string word)
         {
             if (word.Length == 0 || Placeholder(word))
             {
-                return;
+                return false;
             }
 
             // A plain loop rather than Exists with a lambda: this runs for every content of
@@ -1287,7 +1374,7 @@ public sealed class AtlasWatch
             {
                 if (already.Text.Equals(word, StringComparison.OrdinalIgnoreCase))
                 {
-                    return;
+                    return false;
                 }
             }
 
@@ -1300,6 +1387,7 @@ public sealed class AtlasWatch
                 : content.Description;
 
             said.Add(new AtlasSaid(word, detail, content.Icon));
+            return true;
         }
     }
 
