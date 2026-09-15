@@ -45,13 +45,19 @@ public readonly record struct AtlasContent(string Name, string Description, stri
 /// <remarks>
 /// DATA, not code, for the same reason the landmark names and the offsets are: which id is
 /// "Breach" is knowledge about a game that changes every league, and it belongs in a file that
-/// can be corrected without a rebuild. Ported from GameHelper2's AtlasMapNodeContent - 69
-/// badges, 43 effects and 41 older tokens, all 112 of its entries.
+/// can be corrected without a rebuild. Ported from GameHelper2's AtlasMapNodeContent.
 ///
-/// THREE TABLES, kept apart because the game keeps them apart. Badges hang off the node as
-/// objects, effects arrive as tokens in a vector, and the legacy tokens are the ones an older
-/// client wrote. An id can appear in two of them with different wording - 0x6157 does - so
-/// merging them would relabel one of the two.
+/// TWO TABLES, kept apart because the game keeps them apart. Badges hang off the node as
+/// objects and effects arrive as tokens in a vector. An id can appear in both with different
+/// wording - 0x6157 is the badge "Grand Mirror" and the effect "Contains a reflection of the
+/// Map Boss" - so merging them would relabel one of the two.
+///
+/// A THIRD TABLE USED TO SIT BESIDE THEM and was removed once it was measured rather than
+/// assumed: 41 "legacy tokens" carried over from an older client, read as a fallback behind
+/// the effects. Every one of their ids was already an effect and not one of the 41 lines
+/// differed from the effect's own wording by a character, so the fallback could not fire for
+/// any id the game can produce. Dead by construction, not by coincidence - which is the only
+/// reason it was safe to delete without a capture to check it against.
 ///
 /// A LOOKUP MASKS THE ID. Only the low sixteen bits identify the content; the high word carries
 /// a magnitude ("3 additional Shrines") and, on some tokens, flags. So the number on the node
@@ -61,22 +67,19 @@ public sealed class AtlasContentNames
 {
     private readonly IReadOnlyDictionary<uint, AtlasContent> _badges;
     private readonly IReadOnlyDictionary<uint, AtlasContent> _effects;
-    private readonly IReadOnlyDictionary<uint, AtlasContent> _tokens;
 
     private AtlasContentNames(
         IReadOnlyDictionary<uint, AtlasContent> badges,
-        IReadOnlyDictionary<uint, AtlasContent> effects,
-        IReadOnlyDictionary<uint, AtlasContent> tokens)
+        IReadOnlyDictionary<uint, AtlasContent> effects)
     {
         _badges = badges;
         _effects = effects;
-        _tokens = tokens;
 
         // The art names, gathered while the tables are in hand. A content with no picture named
         // is left out rather than carried as an empty string: what asks for this is a walk of
         // four million paths, and an empty name matches the ones with no name at all.
         var icons = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (IReadOnlyDictionary<uint, AtlasContent> table in new[] { badges, effects, tokens })
+        foreach (IReadOnlyDictionary<uint, AtlasContent> table in new[] { badges, effects })
         {
             foreach (AtlasContent content in table.Values)
             {
@@ -92,7 +95,6 @@ public sealed class AtlasContentNames
 
     /// <summary>Nothing known, which is what a missing file leaves.</summary>
     public static AtlasContentNames Empty { get; } = new(
-        new Dictionary<uint, AtlasContent>(),
         new Dictionary<uint, AtlasContent>(),
         new Dictionary<uint, AtlasContent>());
 
@@ -112,8 +114,8 @@ public sealed class AtlasContentNames
     /// </remarks>
     public IReadOnlyCollection<string> Icons { get; }
 
-    /// <summary>How many meanings are known, across all three tables.</summary>
-    public int Count => _badges.Count + _effects.Count + _tokens.Count;
+    /// <summary>How many meanings are known, across both tables.</summary>
+    public int Count => _badges.Count + _effects.Count;
 
     /// <summary>What identifies a content: the low half of whatever the node carried.</summary>
     public static uint IdOf(uint raw) => raw & 0xFFFF;
@@ -152,8 +154,8 @@ public sealed class AtlasContentNames
     /// <summary>What a badge id means, or null when this table has never heard of it.</summary>
     public AtlasContent? Badge(uint raw) => Look(_badges, raw);
 
-    /// <summary>What a content token means, effects first and the older wording behind it.</summary>
-    public AtlasContent? Effect(uint raw) => Look(_effects, raw) ?? Look(_tokens, raw);
+    /// <summary>What a content token means, or null when the effect table has never heard of it.</summary>
+    public AtlasContent? Effect(uint raw) => Look(_effects, raw);
 
     private static AtlasContent? Look(IReadOnlyDictionary<uint, AtlasContent> table, uint raw)
         => table.TryGetValue(IdOf(raw), out AtlasContent found) ? found : null;
@@ -181,10 +183,7 @@ public sealed class AtlasContentNames
                 return Empty;
             }
 
-            return new AtlasContentNames(
-                Table(file.Badges),
-                Table(file.Effects),
-                Words(file.LegacyTokens));
+            return new AtlasContentNames(Table(file.Badges), Table(file.Effects));
         }
         catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
         {
@@ -212,21 +211,6 @@ public sealed class AtlasContentNames
         return built;
     }
 
-    /// <summary>The same, for the older table that is a bare id-to-line map.</summary>
-    private static Dictionary<uint, AtlasContent> Words(Dictionary<string, string>? entries)
-    {
-        var built = new Dictionary<uint, AtlasContent>();
-        foreach ((string key, string line) in entries ?? [])
-        {
-            if (Parse(key) is uint id)
-            {
-                built[id] = new AtlasContent(string.Empty, line, string.Empty);
-            }
-        }
-
-        return built;
-    }
-
     private static uint? Parse(string key)
     {
         string text = key.StartsWith("0x", StringComparison.OrdinalIgnoreCase) ? key[2..] : key;
@@ -242,9 +226,6 @@ public sealed class AtlasContentFile
 
     [JsonPropertyName("effects")]
     public Dictionary<string, AtlasContentEntry>? Effects { get; set; }
-
-    [JsonPropertyName("legacyTokens")]
-    public Dictionary<string, string>? LegacyTokens { get; set; }
 }
 
 /// <summary>One entry of it.</summary>

@@ -6,9 +6,8 @@ namespace PoEformance.Core.Tests;
 /// Turning the numbers on an atlas node into something readable.
 /// </summary>
 /// <remarks>
-/// The shipped table is ported from GameHelper2 - all 112 of its entries - and like every
-/// other piece of game knowledge here it is DATA: a league renames things, and correcting a
-/// line should not need a rebuild.
+/// The shipped table is ported from GameHelper2 and, like every other piece of game knowledge
+/// here, it is DATA: a league renames things, and correcting a line should not need a rebuild.
 /// </remarks>
 public class AtlasContentTests
 {
@@ -118,9 +117,30 @@ public class AtlasContentTests
     [Fact]
     public void THEShippedTableIsTheWholeReference()
     {
-        // 69 badges, 43 effects, 41 older tokens: every entry the reference carries. A count
-        // here is what catches an extraction that quietly dropped half a table.
-        Assert.Equal(69 + 43 + 41, Loaded().Count);
+        // 69 badges and 43 effects. A count here is what catches an extraction that quietly
+        // dropped half a table.
+        Assert.Equal(69 + 43, Loaded().Count);
+    }
+
+    [Fact]
+    public void ANDTheLegacyTokensItDroppedCouldNotHaveNamedAnything()
+    {
+        // WHY 41 ENTRIES WERE DELETED RATHER THAN KEPT IN CASE. The file used to carry a third
+        // table, "legacyTokens", read as a fallback BEHIND the effects. Every one of its ids
+        // was already an effect, and none of its 41 lines differed from the effect's own
+        // wording, so the fallback was unreachable for every id in it - not unlikely to fire,
+        // unable to.
+        //
+        // The test that says so cannot be written against the removed table, so it is written
+        // against what the table claimed: the ids it covered still resolve, and they resolve to
+        // the wording it would have supplied. If a future edit drops one of these from the
+        // effects, this fails - which is the only thing the deleted table was ever protecting.
+        AtlasContentNames names = Loaded();
+
+        Assert.Equal("Contains 3 additional Shrines", Assert.NotNull(names.Effect(0x00C00963u)).Say(0x00C00963u));
+        Assert.Equal("Map Boss drops a Unique item", Assert.NotNull(names.Effect(0x127Bu)).Label);
+        Assert.Equal("Breach Hive Fortress", Assert.NotNull(names.Effect(0x3A5Eu)).Label);
+        Assert.Equal("Area contains Breaches", Assert.NotNull(names.Effect(0x6875u)).Label);
     }
 
     [Fact]
