@@ -37,6 +37,24 @@ public readonly record struct AtlasSaid(string Text, string Detail = "", string 
     public override string ToString() => Text;
 }
 
+/// <summary>A badge string the drawing would not take, and what it fell back to.</summary>
+/// <remarks>
+/// WHY THIS IS WORTH CARRYING. A badge has two names for the same thing - its own string and its
+/// id's label - and the drawing prefers the string. When the string is turned away the id still
+/// names the node, but the turning away itself is invisible on screen: the node simply reads as
+/// it always did. That is the right behaviour and the wrong diagnostic, because the shape that
+/// shipped in between dropped BOTH names and left the node blank, and nothing in the running tool
+/// could say whether the case had even occurred. Now it can.
+/// </remarks>
+/// <param name="Id">The badge, masked the way the tables are keyed.</param>
+/// <param name="Word">What the badge called itself, markup already stripped.</param>
+/// <param name="Instead">The id's own label, which is what the node ends up showing.</param>
+/// <param name="Marked">
+/// True when the game marks the word as a placeholder - a leading bracket, which is also what a
+/// string cut off mid-markup looks like. False when the node already carried that line.
+/// </param>
+public readonly record struct AtlasRefusal(uint Id, string Word, string Instead, bool Marked);
+
 /// <summary>One map on the atlas, with everything the drawing needs already worked out.</summary>
 /// <param name="Where">Its centre on the screen, in pixels.</param>
 /// <param name="Name">What to call it - the game's name, or its raw id when it is new.</param>
@@ -247,6 +265,10 @@ public sealed class AtlasWatch
     /// <summary>How many distinct badge strings the check spells out before the block is noise.</summary>
     /// <remarks>Sixty-nine badges exist, so this shows every one an atlas can hold and then stops.</remarks>
     private const int MostBadgeStrings = 80;
+
+    /// <summary>How many nodes that carry ids and still say nothing are spelled out.</summary>
+    /// <remarks>Enough to see whether they share a badge; a full atlas would bury the line.</remarks>
+    private const int MostSilentNodes = 16;
 
     private int _catalogueTries = CatalogueTries;
 
@@ -834,10 +856,78 @@ public sealed class AtlasWatch
         said.Add(string.Empty);
         said.AddRange(BadgeNames(nodes));
         said.Add(string.Empty);
+        said.AddRange(Silence(nodes));
+        said.Add(string.Empty);
         said.AddRange(new Game.Diagnostics.BossTierProbe(_reader, _schema).Probe(
             [.. nodes.Select(node => (node.Address, node.MapId, node.BadgeIds))]));
         said.Add(string.Empty);
         said.AddRange(Tokens(nodes));
+        return said;
+    }
+
+    /// <summary>
+    /// Which nodes end up with NOTHING to say, and every badge string the drawing turned away.
+    /// </summary>
+    /// <remarks>
+    /// THE QUESTION THIS ANSWERS IS "WHY IS THAT NODE BLANK", and it was asked from a live client
+    /// with no way to answer it. A blank node is not ambiguous once the pipeline is laid out: the
+    /// study writes words for EVERY node it reads and the drawing only ever shows a subset of
+    /// those, so a node with nothing on it is a node whose words came back empty - never a node
+    /// the study skipped, never a stale position. So the two things worth counting are the nodes
+    /// that came back empty and the strings that were turned away on the way there.
+    ///
+    /// EMPTY IS ONLY A FAULT WHEN THE NODE CARRIED SOMETHING. Most of the atlas is maps with no
+    /// content at all, and those are silent because there is nothing to say; a node that carries
+    /// badges or tokens and STILL says nothing is the one to look at, so the two are counted
+    /// apart rather than summed into a number that is alarming and meaningless.
+    /// </remarks>
+    private IReadOnlyList<string> Silence(IReadOnlyList<AtlasNode> nodes)
+    {
+        var refused = new List<AtlasRefusal>();
+        var mute = new List<AtlasNode>();
+        int quiet = 0;
+
+        foreach (AtlasNode node in nodes)
+        {
+            if (Words(node, _contents, _objectives.For(node.Address), refused).Count > 0)
+            {
+                continue;
+            }
+
+            if (node.BadgeIds.Count == 0 && node.ContentTokens.Count == 0)
+            {
+                quiet++;
+                continue;
+            }
+
+            mute.Add(node);
+        }
+
+        var said = new List<string>
+        {
+            $"NODE WORDS - {nodes.Count} nodes: {quiet} carry nothing and are silent for it,"
+                + $" {mute.Count} carry ids and STILL say nothing, {refused.Count} badge strings were turned away",
+        };
+
+        foreach (AtlasRefusal one in refused.Take(MostBadgeStrings))
+        {
+            said.Add($"  refused 0x{one.Id:X4} \"{one.Word}\" - "
+                + (one.Marked ? "the game marks it as a placeholder" : "the node already carries that line")
+                + (one.Instead.Length > 0 ? $", so the id's \"{one.Instead}\" is shown" : ", and the id names nothing"));
+        }
+
+        foreach (AtlasNode node in mute.Take(MostSilentNodes))
+        {
+            said.Add($"  silent  {(node.MapId.Length > 0 ? node.MapId : $"node {node.Index}"),-38}"
+                + $" badges [{string.Join(" ", node.BadgeIds.Select(id => $"0x{id:X}"))}]"
+                + $" tokens [{string.Join(" ", node.ContentTokens.Select(id => $"0x{id:X}"))}]");
+        }
+
+        if (mute.Count > MostSilentNodes)
+        {
+            said.Add($"  ... and {mute.Count - MostSilentNodes} more that carry ids and say nothing");
+        }
+
         return said;
     }
 
@@ -1301,8 +1391,16 @@ public sealed class AtlasWatch
     /// link from the node to its objective row, which carries the path. See
     /// <see cref="AtlasObjectiveCatalogue"/> for why that link had to be read rather than guessed.
     /// </remarks>
+    /// <param name="refused">
+    /// Where to note a badge string the drawing would not take, or null to note none. NULL ON THE
+    /// STUDY PASS, which is the only caller that runs per node per tick: the collector exists for
+    /// the check, and a refusal is rare enough that the null test is not on any path that matters.
+    /// </param>
     public static IReadOnlyList<AtlasSaid> Words(
-        AtlasNode node, AtlasContentNames contents, AtlasObjective? objective = null)
+        AtlasNode node,
+        AtlasContentNames contents,
+        AtlasObjective? objective = null,
+        ICollection<AtlasRefusal>? refused = null)
     {
         ArgumentNullException.ThrowIfNull(node);
         ArgumentNullException.ThrowIfNull(contents);
@@ -1340,8 +1438,18 @@ public sealed class AtlasWatch
             //
             // Label rather than Say: see the badge paragraph above. Its high half is a
             // category tag, and writing that into a "{0}" would number the thing with it.
-            if ((told.Length == 0 || !Add(badge ?? new AtlasContent(told, string.Empty, string.Empty), told))
-                && badge is { } named)
+            if (told.Length > 0 && Add(badge ?? new AtlasContent(told, string.Empty, string.Empty), told))
+            {
+                continue;
+            }
+
+            if (told.Length > 0)
+            {
+                refused?.Add(new AtlasRefusal(
+                    AtlasContentNames.IdOf(raw), told, badge?.Label ?? string.Empty, Placeholder(told)));
+            }
+
+            if (badge is { } named)
             {
                 Add(named, named.Label);
             }
