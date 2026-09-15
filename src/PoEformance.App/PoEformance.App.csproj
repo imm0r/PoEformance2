@@ -44,7 +44,14 @@
     -->
     <None Include="..\..\data\*.json" Link="data\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <!-- .tsv too: the unique-name table is not JSON, and a glob that misses it ships a
-         release where every unique is nameless - the same way data\ was missed once before. -->
+         release where every unique is nameless - the same way data\ was missed once before.
+
+         THE GLOB STAYS BROAD AND THE RULE IS ON THE DIRECTORY: data\ holds what the tool
+         LOADS, and nothing else. It did not for a while - six generated name maps sat there
+         read by nothing at all and rode along in every download, 1.5 MB of it - and the fix
+         was to move them rather than to narrow this, because a list of names here is a list
+         somebody forgets to add to, which is the very bug the line above remembers. They are
+         in tools\extracted\ now; DataFilesTests holds the rule both ways round. -->
     <None Include="..\..\data\*.tsv" Link="data\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <!--
       And the Oodle library, which is the one thing here that goes BESIDE THE EXE rather than
