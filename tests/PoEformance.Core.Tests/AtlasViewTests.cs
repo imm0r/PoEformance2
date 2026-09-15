@@ -372,7 +372,9 @@ public class AtlasViewTests
         // in it - and every label and line here would be drawn across it. The RECTANGLE rather
         // than a yes, because the overlay now keeps off that panel instead of switching itself
         // off, and where the node is drawn is where the panel comes up.
-        AtlasNode node = Node(1, 1);   // drawn at 100,100, forty by twenty
+        // SHOWN, because that is the only case a panel exists for: the game puts a panel over a
+        // node it is PAINTING, and over one it is not there is nothing to keep off.
+        AtlasNode node = Node(1, 1, shown: true);   // drawn at 100,100, forty by twenty
 
         Assert.Equal(
             new ScreenRect(100, 100, 140, 120), AtlasWatch.Hovered([node], new Vector2(120, 110)));
@@ -390,7 +392,7 @@ public class AtlasViewTests
         // everything is the fallback the overlay reaches for when it cannot find that part.
         // Deciding it here would take that choice away from the only thread that has both the
         // atlas view and the interface parts in the same frame.
-        AtlasView view = Compose([Node(1, 1)], Showing, cursor: new Vector2(120, 110));
+        AtlasView view = Compose([Node(1, 1, shown: true)], Showing, cursor: new Vector2(120, 110));
 
         Assert.True(view.Hovering);
         Assert.True(view.Anything);
@@ -401,8 +403,11 @@ public class AtlasViewTests
     {
         // The game shows its panel over a map whether or not this overlay chose to label it,
         // and it is the OTHER maps' labels and lines that would be drawn across it.
-        AtlasNode shown = Node(3, 3);
-        AtlasNode finished = Node(1, 1, state: AtlasNodeState.Completed);
+        // BOTH PAINTED BY THE GAME. What this is about is a map the OVERLAY hides, not one the
+        // GAME is not drawing - the two look alike in a fixture and are opposites in the thing
+        // being tested: the game still puts its panel over a map this tool chose not to label.
+        AtlasNode shown = Node(3, 3, shown: true);
+        AtlasNode finished = Node(1, 1, state: AtlasNodeState.Completed, shown: true);
 
         AtlasView view = Compose(
             [shown, finished], Showing with { HideCompleted = true }, cursor: new Vector2(120, 110));
@@ -426,10 +431,35 @@ public class AtlasViewTests
         // The setting decides what to do when the game's panel cannot be measured, which is a
         // question about the interface rather than about the atlas. Folding it in here would
         // leave the overlay unable to tell "not hovering" from "hovering, told not to care".
-        AtlasNode node = Node(1, 1);
+        AtlasNode node = Node(1, 1, shown: true);
         Assert.True(
             Compose([node], Showing with { HideOnHover = false }, cursor: new Vector2(120, 110))
                 .Hovering);
+    }
+
+    [Fact]
+    public void ANDANodeTheGAMEIsNotPaintingIsNotAHoverAtAll()
+    {
+        // REPORTED FROM A LIVE CLIENT, and it blanked the overlay exactly where the overlay was
+        // the only thing on screen. The answer here feeds a fallback that hides everything on a
+        // frame where the game's hover panel cannot be measured - and over a node the game is not
+        // painting there is no panel to measure, ever, because the game puts none up. So hovering
+        // a fogged node blanked the whole atlas, for good, with nothing to say why.
+        //
+        // The symptom named the cause: the content pictures sit just BELOW the plate, so their
+        // outer rim is outside the node's rectangle and read normally, and a few pixels further
+        // in everything vanished.
+        //
+        // NOT THE SAME QUESTION as the test above it. There a map is hidden by the OVERLAY while
+        // the game still paints it - the panel exists and must be kept off. Here the GAME is not
+        // painting it, so there is nothing to keep off and nothing to hide from.
+        AtlasNode fogged = Node(1, 1);
+
+        Assert.Null(AtlasWatch.Hovered([fogged], new Vector2(120, 110)));
+        Assert.False(Compose([fogged], Showing, cursor: new Vector2(120, 110)).Hovering);
+
+        // And the same node, once the game IS drawing it, is a hover again.
+        Assert.NotNull(AtlasWatch.Hovered([fogged with { Shown = true }], new Vector2(120, 110)));
     }
 
     [Fact]

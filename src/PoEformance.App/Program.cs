@@ -1985,8 +1985,17 @@ internal static class Program
         // drawn, which is also the first moment anything wants a sentence for a token.
         Dictionary<string, string> WalkTheInstall(IReadOnlyCollection<string> wanted)
         {
+            // WHAT IS WANTED IS READ AGAIN HERE, not taken as handed in, and that is a fault this
+            // had. AtlasArt.Wanted is set once at start-up and holds the collection the FILE named;
+            // every art name the game supplies afterwards - a badge row's own picture, a league
+            // mechanic's - lands in a NEW set that the old reference never sees. So the index was
+            // asked for the shipped names and nothing else, and a name only the game knows was
+            // never looked up at all. One walk, so there is no second chance to ask.
+            var asking = new HashSet<string>(wanted, StringComparer.OrdinalIgnoreCase);
+            asking.UnionWith(atlasContents.Icons);
+
             PoEformance.Game.Files.BundleIndex.WalkedNames walked = installed!.Names(
-                wanted,
+                asking,
                 PoEformance.Game.Files.StatDescriptionFiles.Folder,
                 PoEformance.Game.Files.StatDescriptionFiles.Extension);
 

@@ -704,9 +704,18 @@ public sealed class AtlasWatch
     /// Here that descent is one step: every map is a child of the one panel and its rectangle
     /// was read this tick anyway, so this is a walk of a list that already exists.
     ///
-    /// Against ALL the maps rather than the drawn ones. The game shows its panel over a map
-    /// whether or not this overlay chose to label it, and the labels and lines of OTHER maps
-    /// are what would be drawn across it.
+    /// Against every map this overlay LABELS rather than every map there is: the game shows its
+    /// panel over a map whether or not this overlay chose to label it, and the labels and lines
+    /// of OTHER maps are what would be drawn across it.
+    ///
+    /// BUT ONLY WHERE THE GAME IS PAINTING THE NODE, and that qualification is a bug this had.
+    /// The answer feeds a fallback that BLANKS the overlay on a frame where the game's hover
+    /// panel cannot be measured - and over a node the game is not drawing there is no panel to
+    /// measure, ever, because the game puts none up. So hovering a fogged node blanked the whole
+    /// overlay, on exactly the nodes where the overlay is the only thing on screen. Reported from
+    /// a live client: the content pictures sit just below the plate, so their outer rim is
+    /// OUTSIDE the node's rectangle and reads normally, and a few pixels further in everything
+    /// vanishes. Nothing to keep off means nothing to hide from.
     ///
     /// THE RECTANGLE RATHER THAN A YES, because what is done with the answer has changed: the
     /// overlay used to switch itself off and now keeps off the panel the game put up. Where the
@@ -726,7 +735,8 @@ public sealed class AtlasWatch
 
         foreach (AtlasNode node in live)
         {
-            if (node.Size.X > 0 && node.Size.Y > 0
+            if (node.Shown
+                && node.Size.X > 0 && node.Size.Y > 0
                 && cursor.X >= node.Screen.X && cursor.X <= node.Screen.X + node.Size.X
                 && cursor.Y >= node.Screen.Y && cursor.Y <= node.Screen.Y + node.Size.Y)
             {
@@ -1091,11 +1101,18 @@ public sealed class AtlasWatch
         foreach (AtlasNode node in live)
         {
             _said[node.Grid] = Words(node, _contents, _objectives.For(node.Address));
+
             if (node.MapId.Length > 0)
             {
                 fresh |= _seen.Add(node.MapId);
             }
         }
+
+        // THE MECHANIC PICTURES HAVE TO BE ASKED FOR, and they come from a table nothing else
+        // reads - so without this the install is never asked where they live and they never
+        // arrive. Only AtlasIconContentAbyssalDepths is actually missed today (the other seven
+        // are named by the shipped file too), which is exactly why it would not have been noticed.
+        _contents.LearnArt(_objectives.Art());
 
         // The report is rebuilt only when something in it changed - the table arriving, or a map
         // scrolled into view for the first time. Four hundred rows and eighty ratings are not a

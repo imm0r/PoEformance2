@@ -211,80 +211,8 @@ public class StatDescriptionFilesTests
         Assert.False(lines.FromGame);
     }
 
-    /// <summary>An install in memory, which is as close to the real thing as this can get.</summary>
-    private sealed class Fake : IGameArchive
-    {
-        private readonly Dictionary<string, byte[]> _files = new(StringComparer.OrdinalIgnoreCase);
-
-        public bool Ready => true;
-
-        public string Describe => "a made-up install";
-
-        public void Add(string path, byte[] bytes) => _files[path] = bytes;
-
-        public byte[]? Read(string path) => _files.GetValueOrDefault(path);
-
-        public byte[]? Read(string path, int at, int length)
-            => !_files.TryGetValue(path, out byte[]? bytes) || at < 0 || length < 0
-               || at + (long)length > bytes.Length
-                ? null
-                : bytes[at..(at + length)];
-    }
-
-    /// <summary>The general file, which is the one whose wordings win.</summary>
-    private const string GeneralCsd = """
-        description
-        	1 map_num_extra_shrines
-        		1 1 "Area contains an additional Shrine"
-        description
-        	1 base_maximum_life
-        		1 # "{0} to maximum Life"
-        description
-        	2 heat_consumption_amount heat_extra
-        		1 # "Damage Gained as Fire on {0} Heat Consumption@{1}%"
-        """;
-
-    /// <summary>A specific file, which says something else about a stat the general one covers.</summary>
-    private const string SkillsCsd = """
-        description
-        	1 map_num_extra_shrines
-        		1 1 "this skill's own wording, which must not win"
-        description
-        	1 skill_only_stat
-        		1 # "Skill does {0} things"
-        """;
-
-    private static byte[] Utf16(string text)
-        => [.. Encoding.Unicode.GetPreamble(), .. Encoding.Unicode.GetBytes(text)];
-
-    /// <summary>An install holding two .csd files, spelled-out paths and all.</summary>
-    private static GameFiles Install()
-    {
-        byte[] general = Utf16(GeneralCsd);
-        byte[] skills = Utf16(SkillsCsd);
-
-        var content = new byte[8192];
-        general.CopyTo(content, 0);
-        skills.CopyTo(content, 4096);
-
-        var archive = new Fake();
-        archive.Add("data.bundle.bin", Packed.Bundle(content, chunkSize: 512));
-        archive.Add("_.index.bin", Packed.Bundle(
-            Packed.Index(
-                ["data"],
-                [
-                    new("data/statdescriptions/stat_descriptions.csd", 0, 0, general.Length),
-                    new("data/statdescriptions/skills/skill_stat_descriptions.csd", 0, 4096, skills.Length),
-                ],
-                paths: Packed.Paths(
-                    ["data/statdescriptions/"],
-                    [(0, "stat_descriptions.csd"), (0, "skills/skill_stat_descriptions.csd")])),
-            chunkSize: 512));
-
-        GameFiles? files = GameFiles.Open(archive, Packed.AsIs);
-        Assert.NotNull(files);
-        return files!;
-    }
+    /// <summary>The install every test below reads, built by <see cref="FakeInstall"/>.</summary>
+    private static GameFiles Install() => Assert.IsType<GameFiles>(FakeInstall.Open());
 
     [Fact]
     public void ANINSTALLSaysWhatItsStatsMeanWithoutAnyExportInBetween()

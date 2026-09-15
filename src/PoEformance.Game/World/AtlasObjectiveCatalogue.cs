@@ -91,6 +91,25 @@ public sealed class AtlasObjectiveCatalogue
     public int Known => _rows.Count;
 
     /// <summary>
+    /// Every art name met so far, so the install can be asked where those pictures live.
+    /// </summary>
+    /// <remarks>
+    /// These names come from a table that is not a content table, so nothing else knows about
+    /// them - and a name the index walk is never asked for is a picture that never arrives. See
+    /// <see cref="AtlasContentNames.LearnArt"/>, which is where they go.
+    /// </remarks>
+    public IEnumerable<string> Art()
+    {
+        foreach (AtlasObjective one in _rows.Values)
+        {
+            if (one.Icon.Length > 0)
+            {
+                yield return one.Icon;
+            }
+        }
+    }
+
+    /// <summary>
     /// The objective a node hosts, or null where it hosts none.
     /// </summary>
     /// <remarks>

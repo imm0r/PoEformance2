@@ -311,6 +311,50 @@ public sealed class AtlasContentNames
         => LearnContents(rows, badgeIdBase, statTokenBase);
 
     /// <summary>
+    /// Takes an art name from somewhere that is not a content table, so the install is asked for it.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THIS IS FOR: a node's league mechanic names its picture through EndgameMapObjectives,
+    /// which is not a content table and so never reached <see cref="Icons"/> - and a name that is
+    /// not in that set is a name the index walk never looks up, which is a picture that silently
+    /// never arrives. Measured on a live 0.5.5 atlas: of the eight mechanics the game names art
+    /// for, seven happen to be named by the shipped file as well and AtlasIconContentAbyssalDepths
+    /// is not. Two nodes, and nothing on screen to tell them from a mechanic with no art at all.
+    ///
+    /// ADDED TO rather than rebuilt, the same rule <see cref="Learn"/> keeps: a name already turned
+    /// into a path must not be taken away by a later call.
+    ///
+    /// THE WALK STILL HAPPENS ONCE, so a name first met AFTER it has run cannot be resolved this
+    /// session. That is the index's own contract rather than a limit of this - see BundleIndex.Names.
+    /// </remarks>
+    /// <returns>Whether anything was added, so a caller can skip publishing for nothing.</returns>
+    public bool LearnArt(IEnumerable<string>? names)
+    {
+        if (names is null)
+        {
+            return false;
+        }
+
+        var icons = new HashSet<string>(Volatile.Read(ref _icons), StringComparer.OrdinalIgnoreCase);
+        int had = icons.Count;
+        foreach (string name in names)
+        {
+            if (name is { Length: > 0 })
+            {
+                icons.Add(name);
+            }
+        }
+
+        if (icons.Count == had)
+        {
+            return false;
+        }
+
+        Volatile.Write(ref _icons, icons);
+        return true;
+    }
+
+    /// <summary>
     /// Puts the game's stat descriptions behind both tables, for the tokens neither knows.
     /// </summary>
     /// <remarks>
