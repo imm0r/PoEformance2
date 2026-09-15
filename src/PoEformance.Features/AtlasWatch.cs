@@ -259,6 +259,19 @@ public sealed class AtlasWatch
     /// </remarks>
     private readonly EndgameMapCatalogue _endgame;
 
+    /// <summary>
+    /// What a map's contents are called - EndgameMapContent.dat, the table behind
+    /// <c>data/atlas-content.json</c>.
+    /// </summary>
+    /// <remarks>
+    /// RIDES THE WALK ABOVE FOR NOTHING. The EndgameMaps stride passes both columns that reach this
+    /// table, so the address is already in hand by the time that walk finishes; reading it is one
+    /// more table and no more searching. It is the last piece of shipped atlas knowledge that
+    /// nothing has measured against the client - see EndgameMapContentCatalogue for what the badge
+    /// ids and the effect ids are predicted to be, and what would refute each.
+    /// </remarks>
+    private readonly EndgameMapContentCatalogue _mapContent;
+
     public AtlasWatch(
         IMemoryReader reader,
         OffsetSchema schema,
@@ -275,6 +288,7 @@ public sealed class AtlasWatch
         _atlas = new AtlasReader(reader, schema, new UiElementReader(reader, schema));
         _catalogue = new WorldAreaCatalogue(reader, schema);
         _endgame = new EndgameMapCatalogue(reader, schema);
+        _mapContent = new EndgameMapContentCatalogue(reader, schema);
         _contents = contents ?? AtlasContentNames.Empty;
         Names = names ?? AtlasMapNames.Empty;
         Ratings = ratings ?? AtlasRatings.Empty;
@@ -746,6 +760,8 @@ public sealed class AtlasWatch
             }
         }
 
+        LearnContents();
+
         // Republished on every check, not only on the first: a check can be pressed with the atlas
         // scrolled somewhere the study path has not published from yet.
         foreach (AtlasNode node in nodes)
@@ -762,7 +778,25 @@ public sealed class AtlasWatch
         said.AddRange(_catalogue.Describe(Names));
         said.Add(string.Empty);
         said.AddRange(_endgame.Describe(Names));
+        said.Add(string.Empty);
+        said.AddRange(_mapContent.Describe(_contents));
         return said;
+    }
+
+    /// <summary>
+    /// Reads EndgameMapContent, once, off the table the EndgameMaps walk picked up.
+    /// </summary>
+    /// <remarks>
+    /// NO NODE OF ITS OWN and no budget: the address comes from the map walk rather than from the
+    /// atlas, so trying it again on another node would re-read the same pointer. Once that walk has
+    /// an address this either reads the table or says why, and either way it is over.
+    /// </remarks>
+    private void LearnContents()
+    {
+        if (_endgame.ContentTable != 0)
+        {
+            _mapContent.Read(_endgame.ContentTable);
+        }
     }
 
     /// <summary>
@@ -832,6 +866,7 @@ public sealed class AtlasWatch
             // column 0 holds the WorldAreas row and ITS table. One chain, two tables, and the
             // second is the one that says which of the first's 442 areas the atlas can reach.
             bool endgame = _endgame.ReadFromNode(node.Address);
+            LearnContents();
             if (!_catalogue.ReadFromNode(node.Address))
             {
                 return endgame;

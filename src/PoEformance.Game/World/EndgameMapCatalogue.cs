@@ -55,6 +55,9 @@ public sealed class EndgameMapCatalogue
     /// <summary>Longest string taken seriously behind an id.</summary>
     private const int MostChars = 96;
 
+    /// <summary>Most entries a content array may claim. A guard on a count that comes from memory.</summary>
+    private const int MostEntries = 64;
+
     /// <summary>
     /// Smallest row this walks. Column 0 is a sixteen-byte foreign reference, and a table whose
     /// rows cannot hold one is not this table however confidently it named itself.
@@ -67,6 +70,8 @@ public sealed class EndgameMapCatalogue
     private readonly int _worldAreaRef;
     private readonly int _contentSetRef;
     private readonly int _contentSetId;
+    private readonly int _contentSetContent;
+    private readonly int _mapContent;
     private readonly int _areaId;
 
     private readonly int _dataStorage;
@@ -87,7 +92,11 @@ public sealed class EndgameMapCatalogue
         StructDef endgame = schema.Structs["EndgameMapsRow"];
         _worldAreaRef = endgame.OffsetOf("WorldAreaRef");
         _contentSetRef = endgame.OffsetOf("MapContentSetRef");
-        _contentSetId = schema.Structs["EndgameMapContentSetRow"].OffsetOf("IdPtr");
+        _mapContent = endgame.OffsetOf("MapContentArray");
+
+        StructDef set = schema.Structs["EndgameMapContentSetRow"];
+        _contentSetId = set.OffsetOf("IdPtr");
+        _contentSetContent = set.OffsetOf("ContentArray");
         _areaId = schema.Structs["WorldAreaDat"].OffsetOf("IdPtr");
 
         StructDef node = schema.Structs["AtlasNode"];
@@ -129,6 +138,28 @@ public sealed class EndgameMapCatalogue
 
     /// <summary>The distinct category names, for saying how coarse the classification is.</summary>
     public IReadOnlyCollection<string> Categories => _categories;
+
+    /// <summary>
+    /// The EndgameMapContent TABLE, picked up in passing, or zero when no row offered one.
+    /// </summary>
+    /// <remarks>
+    /// FREE, WHICH IS WHY IT IS HERE AND NOT IN ITS OWN WALK. Both columns that reach that table
+    /// are already under this walk's eye - a map row's own MapContent array, and the content-set
+    /// row this reads the category off - and either entry carries the table at its +0x08. So the
+    /// address costs one array read on the first row that has one, against a second full stride of
+    /// the table or a walk of eight thousand loader records.
+    ///
+    /// THIRTEEN MAPS HAVE THE MAP-SIDE ARRAY and 131 reach a content set, so the fallback is the
+    /// likelier of the two to answer; both are tried because which one a session reaches depends on
+    /// which corner of the atlas somebody happened to scroll past.
+    /// </remarks>
+    public ulong ContentTable { get; private set; }
+
+    /// <summary>Which column gave <see cref="ContentTable"/>, for a report that has to say how.</summary>
+    public string ContentTableRoute { get; private set; } = string.Empty;
+
+    /// <summary>How many map rows carry a content array at all. Thirteen of 173, measured.</summary>
+    public int ContentArrays { get; private set; }
 
     /// <summary>Why the last read found nothing, when it did.</summary>
     public string LastError { get; private set; } = string.Empty;
@@ -224,6 +255,7 @@ public sealed class EndgameMapCatalogue
         var named = new Dictionary<ulong, string>();
         var maps = new Dictionary<string, int>((int)facts.Rows, StringComparer.OrdinalIgnoreCase);
         int rowsNamed = 0;
+        int contentArrays = 0;
 
         // The content-set rows repeat hard - five distinct rows across 131 maps on the capture this
         // was measured against - so the string behind one is read once per ROW ADDRESS.
@@ -264,6 +296,20 @@ public sealed class EndgameMapCatalogue
                 maps[id] = maps.GetValueOrDefault(id) + 1;
                 rowsNamed++;
 
+                // Counted on every row and FOLLOWED on at most one. The count is what says how
+                // reachable the content table is from the map side at all - it is thirteen rows of
+                // 173 - and it comes out of bytes already in hand; the pointer behind it is a read.
+                (ulong contents, ulong entries) = ArrayAt(row, _mapContent);
+                if (contents is > 0 and <= MostEntries && MemoryReaderExtensions.IsPlausiblePointer(entries))
+                {
+                    contentArrays++;
+                    if (ContentTable == 0 && TableOfFirstEntry(contents, entries) is { } fromMap)
+                    {
+                        ContentTable = fromMap;
+                        ContentTableRoute = "EndgameMaps.MapContent";
+                    }
+                }
+
                 ulong set = BinaryPrimitives.ReadUInt64LittleEndian(row[_contentSetRef..]);
                 if (!MemoryReaderExtensions.IsPlausiblePointer(set))
                 {
@@ -274,6 +320,14 @@ public sealed class EndgameMapCatalogue
                 {
                     category = Text(_reader.ReadPointer(set + (ulong)_contentSetId));
                     sets[set] = category;
+
+                    // Only on a row not seen before, so the fallback costs one read per CATEGORY -
+                    // five of them - rather than one per map that has a category.
+                    if (ContentTable == 0 && TableInArray(set + (ulong)_contentSetContent) is { } fromSet)
+                    {
+                        ContentTable = fromSet;
+                        ContentTableRoute = "EndgameMapContentSet.Content";
+                    }
                 }
 
                 if (category.Length > 0)
@@ -288,12 +342,43 @@ public sealed class EndgameMapCatalogue
         _contentSets = contentSets;
         _categories = categories;
         RowsNamed = rowsNamed;
+        ContentArrays = contentArrays;
         if (maps.Count == 0)
         {
             LastError = $"{facts.Label} reports {facts.Rows} rows and none of them names an area";
         }
 
         return maps.Count > 0;
+    }
+
+    /// <summary>A dat array sitting in row bytes already read: the count, then the entries pointer.</summary>
+    private static (ulong Count, ulong Entries) ArrayAt(ReadOnlySpan<byte> row, int at)
+        => row.Length < at + 16
+            ? (0, 0)
+            : (BinaryPrimitives.ReadUInt64LittleEndian(row[at..]),
+               BinaryPrimitives.ReadUInt64LittleEndian(row[(at + 8)..]));
+
+    /// <summary>The same array, when it belongs to a row this walk only has the address of.</summary>
+    private ulong? TableInArray(ulong array)
+        => TableOfFirstEntry(_reader.ReadPointer(array), _reader.ReadPointer(array + 8));
+
+    /// <summary>
+    /// The TABLE half of a dat array's first entry - the half that names itself.
+    /// </summary>
+    /// <remarks>
+    /// An entry of an array of foreign references is the same sixteen bytes as a plain one: the
+    /// ROW at +0x00 and the TABLE at +0x08. Only the table is wanted here, because a table can be
+    /// walked in full while a row is one map's worth of it.
+    /// </remarks>
+    private ulong? TableOfFirstEntry(ulong count, ulong entries)
+    {
+        if (count is 0 or > MostEntries || !MemoryReaderExtensions.IsPlausiblePointer(entries))
+        {
+            return null;
+        }
+
+        ulong table = _reader.ReadPointer(entries + 8);
+        return MemoryReaderExtensions.IsPlausiblePointer(table) ? table : null;
     }
 
     private string Text(ulong at)
@@ -336,6 +421,11 @@ public sealed class EndgameMapCatalogue
             ? "  no content-set categories read - the referenced rows are not in this capture"
             : $"  {_contentSets.Count} maps carry one of {_categories.Count} content-set categories:"
               + $" {string.Join(", ", _categories)}");
+
+        said.Add(ContentTable == 0
+            ? $"  {ContentArrays} maps carry a content array, and none of them yielded a table"
+            : $"  {ContentArrays} maps carry a content array; EndgameMapContent is at"
+              + $" 0x{ContentTable:X} via {ContentTableRoute}");
 
         // The rows naming the same area twice are worth seeing: they are the difference between
         // "173 maps" and "173 rows", and nothing else says which of the two the number is.

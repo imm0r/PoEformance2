@@ -6,9 +6,8 @@ namespace PoEformance.Core.Tests;
 /// Turning the numbers on an atlas node into something readable.
 /// </summary>
 /// <remarks>
-/// The shipped table is ported from GameHelper2 - all 112 of its entries - and like every
-/// other piece of game knowledge here it is DATA: a league renames things, and correcting a
-/// line should not need a rebuild.
+/// The shipped table is ported from GameHelper2 and, like every other piece of game knowledge
+/// here, it is DATA: a league renames things, and correcting a line should not need a rebuild.
 /// </remarks>
 public class AtlasContentTests
 {
@@ -118,9 +117,66 @@ public class AtlasContentTests
     [Fact]
     public void THEShippedTableIsTheWholeReference()
     {
-        // 69 badges, 43 effects, 41 older tokens: every entry the reference carries. A count
-        // here is what catches an extraction that quietly dropped half a table.
-        Assert.Equal(69 + 43 + 41, Loaded().Count);
+        // 69 badges and 43 effects. A count here is what catches an extraction that quietly
+        // dropped half a table.
+        Assert.Equal(69 + 43, Loaded().Count);
+    }
+
+    [Fact]
+    public void ANDTheLegacyTokensItDroppedCouldNotHaveNamedAnything()
+    {
+        // WHY 41 ENTRIES WERE DELETED RATHER THAN KEPT IN CASE. The file used to carry a third
+        // table, "legacyTokens", read as a fallback BEHIND the effects. Every one of its ids
+        // was already an effect, and none of its 41 lines differed from the effect's own
+        // wording, so the fallback was unreachable for every id in it - not unlikely to fire,
+        // unable to.
+        //
+        // The test that says so cannot be written against the removed table, so it is written
+        // against what the table claimed: the ids it covered still resolve, and they resolve to
+        // the wording it would have supplied. If a future edit drops one of these from the
+        // effects, this fails - which is the only thing the deleted table was ever protecting.
+        AtlasContentNames names = Loaded();
+
+        Assert.Equal("Contains 3 additional Shrines", Assert.NotNull(names.Effect(0x00C00963u)).Say(0x00C00963u));
+        Assert.Equal("Map Boss drops a Unique item", Assert.NotNull(names.Effect(0x127Bu)).Label);
+        Assert.Equal("Breach Hive Fortress", Assert.NotNull(names.Effect(0x3A5Eu)).Label);
+        Assert.Equal("Area contains Breaches", Assert.NotNull(names.Effect(0x6875u)).Label);
+    }
+
+    [Fact]
+    public void SIXTYSEVENOfTheBadgeIdsAreConsecutiveWhichIsWhatARowIndexLooksLike()
+    {
+        // THE PREMISE OF THE ONLY UNMEASURED THING LEFT IN THIS FILE, pinned on the file side where
+        // it costs nothing. If badge ids are EndgameMapContent row indices plus 100 - which is what
+        // AtlasNode.BadgeVectorBegin says the game does with that table - then the file's ids have
+        // to be a run of consecutive numbers starting at 100, and they are: 0x64..0xA6 with no gap.
+        //
+        // The two that are NOT in that run are the interesting ones and are named here rather than
+        // waved at. 0x3E8 and 0x6157 would be rows 900 and 24819 of a table nothing that small, and
+        // 0x6157 is ALSO one of the file's effects with the same sentence - so if the effect ids
+        // turn out to be Stats rows, those two were filed under the wrong heading by the port.
+        uint[] ids = [.. Loaded().Badges.Keys.Order()];
+
+        uint[] run = [.. ids.Where(id => id is >= 0x64 and <= 0xA6)];
+        Assert.Equal(67, run.Length);
+        Assert.Equal(Enumerable.Range(0x64, 67).Select(id => (uint)id), run);
+
+        Assert.Equal<uint[]>([0x3E8, 0x6157], [.. ids.Where(id => id is < 0x64 or > 0xA6)]);
+        Assert.Contains(0x6157u, Loaded().Effects.Keys);
+    }
+
+    [Fact]
+    public void ANDTheEffectIdsAreNowhereNearThatRunButAreInStatsRange()
+    {
+        // The other half of the same premise: the effects cannot be the same table's rows. They run
+        // 1240..26741 against a badge run that ends at 166, and Stats.dat has 27281 rows - which is
+        // what makes "an effect id is a Stats row index" the hypothesis worth a capture.
+        uint[] ids = [.. Loaded().Effects.Keys.Order()];
+
+        Assert.Equal(43, ids.Length);
+        Assert.Equal(1240u, ids[0]);
+        Assert.Equal(26741u, ids[^1]);
+        Assert.DoesNotContain(ids, id => id is >= 0x64 and <= 0xA6);
     }
 
     [Fact]

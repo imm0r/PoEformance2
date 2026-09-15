@@ -2869,6 +2869,12 @@ is one short row in the art the game already uses.
   every file the game has; walking it once turns a name into a path for whatever the current
   patch is. No folder list, nothing to correct when a league moves a file, no extracted pictures
   to install. See **Names out of the bundle index** below for what that walk is.
+- **There is a second place the path could come from, and it is now wired but unproven.**
+  `EndgameMapContentCatalogue` follows a content row's `VisualIdentity` reference into
+  `EndgameMapContentVisualIdentity`, whose `AtlasIcon` column holds the whole path rather than its
+  last part. That route did not exist when the bundle walk was built, because nothing here had
+  reached `EndgameMapContent` at all. No capture has come back with those strings yet, so this is
+  a read waiting on a recording, not a working alternative — the bundle index stays the answer.
 - **A folder somebody fills still comes first** (`config/atlas-icons/<name>.png`). It is not
   vestigial: it works with no install at all, it is how a picture the install will not give up
   gets drawn anyway, and it is the only way to override what the game ships.
