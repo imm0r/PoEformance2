@@ -338,20 +338,72 @@ public sealed class BundleIndex
     /// <returns>Each name that was found, against its whole path. Names not in the install are absent.</returns>
     public Dictionary<string, string> Look(
         Func<ReadOnlyMemory<byte>, int, byte[]?> decompress, IReadOnlyCollection<string>? wanted)
+        => Names(decompress, wanted, null).Paths;
+
+    /// <summary>
+    /// Every path inside a folder, which is the question <see cref="Look"/> cannot answer.
+    /// </summary>
+    /// <remarks>
+    /// LOOK MATCHES A NAME; THIS MATCHES A PLACE - "where is AtlasIconContentBreach" against "what
+    /// is in Data/StatDescriptions". The second is the only way to read a set of files whose names
+    /// nobody knows in advance, and the stat descriptions are exactly that: a tree of .csd files
+    /// whose membership is a thing the install says rather than a list this project could carry.
+    ///
+    /// SPENDS THE SAME ONE WALK, so a session that wants both answers asks for both in the same
+    /// call - see <see cref="Names"/>, which is what this and Look are each half of.
+    /// </remarks>
+    /// <param name="decompress">How to undo Oodle - the same one the bundles are read with.</param>
+    /// <param name="folder">A path prefix, e.g. <c>Data/StatDescriptions/</c>.</param>
+    /// <param name="extension">What a kept path must end with, e.g. <c>.csd</c>.</param>
+    public List<string> Under(
+        Func<ReadOnlyMemory<byte>, int, byte[]?> decompress, string? folder, string? extension = null)
+        => Names(decompress, null, folder, extension).Inside;
+
+    /// <summary>What one walk of the spelled-out paths came to.</summary>
+    /// <param name="Paths">Each wanted NAME, against the whole path it was found at.</param>
+    /// <param name="Inside">Every path in the wanted folder, in the order the walk met them.</param>
+    public readonly record struct WalkedNames(Dictionary<string, string> Paths, List<string> Inside);
+
+    /// <summary>
+    /// Both name questions at once, because the index answers them once per session.
+    /// </summary>
+    /// <remarks>
+    /// WHY THE TWO ARE ONE CALL. The blob is DROPPED when the walk finishes - tens of megabytes of
+    /// compressed path text that only a walk ever wanted - so whichever question was asked second
+    /// would come back empty. Not wrong-looking: EMPTY, which reads as "the install has no such
+    /// file" and is the kind of quiet wrong answer this project has already paid for. Taking both
+    /// questions together makes that impossible to write by accident.
+    ///
+    /// It is also simply cheaper: assembling four million paths is the whole expense, and testing
+    /// each assembled one twice is nothing next to assembling it.
+    ///
+    /// NOTHING IS WALKED FOR NOTHING. With neither a name nor a folder asked for, this returns
+    /// empty without touching the blob, so the walk is still there for whoever does have a question.
+    /// </remarks>
+    /// <param name="decompress">How to undo Oodle - the same one the bundles are read with.</param>
+    /// <param name="wanted">Names without a folder or an extension, or null. Case does not matter.</param>
+    /// <param name="folder">A path prefix, e.g. <c>Data/StatDescriptions/</c>, or null.</param>
+    /// <param name="extension">What a path in that folder must end with, e.g. <c>.csd</c>.</param>
+    public WalkedNames Names(
+        Func<ReadOnlyMemory<byte>, int, byte[]?> decompress,
+        IReadOnlyCollection<string>? wanted,
+        string? folder,
+        string? extension = null)
     {
         ArgumentNullException.ThrowIfNull(decompress);
 
         var found = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        if (!Named || wanted is not { Count: > 0 })
+        var inside = new List<string>();
+        if (!Named)
         {
-            return found;
+            return new WalkedNames(found, inside);
         }
 
         // What is being looked for, by the hash of its name, so a path can be tested without
         // being spelled out. A name appearing twice in the list is one entry, which is why the
         // hit is confirmed against the name itself rather than trusted from the hash.
         var asked = new Dictionary<ulong, List<string>>();
-        foreach (string name in wanted)
+        foreach (string name in wanted ?? [])
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -370,9 +422,13 @@ public sealed class BundleIndex
             }
         }
 
-        if (asked.Count == 0)
+        byte[] starts = string.IsNullOrWhiteSpace(folder)
+            ? [] : System.Text.Encoding.UTF8.GetBytes(folder);
+        byte[] ends = System.Text.Encoding.UTF8.GetBytes(extension ?? string.Empty);
+
+        if (asked.Count == 0 && starts.Length == 0)
         {
-            return found;
+            return new WalkedNames(found, inside);
         }
 
         byte[] packed = Volatile.Read(ref _named);
@@ -380,25 +436,61 @@ public sealed class BundleIndex
         byte[]? paths = blob?.Read(decompress);
         if (paths is null)
         {
-            return found;
+            return new WalkedNames(found, inside);
         }
 
-        Walk(paths, asked, found);
+        Walk(paths, path =>
+        {
+            if (asked.Count > 0)
+            {
+                Keep(path, asked, found);
+            }
 
-        // DROPPED, now that it has been read. It is tens of megabytes of compressed path text
-        // that only this walk ever wanted, and a session gets one walk: everything that needs a
-        // name asks in the same call, which is what the contract above says anyway. Exchanged
-        // rather than assigned because the walk runs on a background thread while whatever
-        // reports the install's state reads Named from another.
+            if (starts.Length > 0
+                && path.Length >= starts.Length + ends.Length
+                && path[..starts.Length].SequenceEqual(starts, CaseBlind)
+                && path[^ends.Length..].SequenceEqual(ends, CaseBlind))
+            {
+                inside.Add(System.Text.Encoding.UTF8.GetString(path));
+            }
+        });
+
+        // DROPPED, now that it has been read. Tens of megabytes of compressed path text that only
+        // a walk ever wanted, and a session gets one. Exchanged rather than assigned because the
+        // walk runs on a background thread while whatever reports the install's state reads Named
+        // from another.
         Interlocked.Exchange(ref _named, []);
-        return found;
+        return new WalkedNames(found, inside);
+    }
+
+    /// <summary>Bytes compared as ASCII letters without regard to case, which is how paths differ.</summary>
+    private static readonly CaseBlindBytes CaseBlind = new();
+
+    private sealed class CaseBlindBytes : IEqualityComparer<byte>
+    {
+        public bool Equals(byte left, byte right) => Lower(left) == Lower(right);
+
+        public int GetHashCode(byte one) => Lower(one);
+
+        private static byte Lower(byte one) => one is >= (byte)'A' and <= (byte)'Z' ? (byte)(one + 32) : one;
     }
 
     /// <summary>How long a path may be while this still assembles it. Anything longer is not one.</summary>
     private const int LongestPath = 1024;
 
-    /// <summary>Walks every spelled-out path, keeping the ones asked for.</summary>
-    private void Walk(byte[] paths, Dictionary<ulong, List<string>> asked, Dictionary<string, string> found)
+    /// <summary>What a walk does with each spelled-out path it assembles.</summary>
+    /// <remarks>
+    /// A delegate rather than a fixed job, because there are two: LOOK asks "is this one of these
+    /// names" and UNDER asks "is this inside this folder". Both want the same four million paths
+    /// assembled the same way, and the assembly is the expensive half.
+    ///
+    /// Its own type rather than Action, because the path is a span over a reused buffer - it must
+    /// not escape the call, and a generic Action cannot take one.
+    /// </remarks>
+    private delegate void OnPath(ReadOnlySpan<byte> path);
+
+    /// <summary>Walks every spelled-out path, handing each to <paramref name="keep"/>.</summary>
+    private void Walk(byte[] paths, OnPath keep)
     {
         var whole = new byte[LongestPath];
         var prefixes = new List<byte[]>();
@@ -460,7 +552,7 @@ public sealed class BundleIndex
                     continue;
                 }
 
-                Keep(path, asked, found);
+                keep(path);
             }
         }
     }

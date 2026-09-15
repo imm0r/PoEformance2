@@ -282,12 +282,15 @@ public class BundleIndexTests
     private static BundleIndex WithNames(int stride)
     {
         byte[] paths = Packed.Paths(
-            ["art/2ditems/weapons/", "art/2dart/uiimages/ingame/"],
+            ["art/2ditems/weapons/", "art/2dart/uiimages/ingame/", "data/statdescriptions/"],
             [
                 (0, "bow.dds"),
                 (0, "quiver.dds"),
                 (1, "atlasiconcontentbreach.dds"),
                 (-1, "data/mods.dat64"),
+                (2, "stat_descriptions.csd"),
+                (2, "skills/skill_stat_descriptions.csd"),
+                (2, "notes.txt"),
             ]);
 
         BundleIndex.Parsed read = BundleIndex.Read(
@@ -408,5 +411,74 @@ public class BundleIndexTests
         Assert.Empty(index.Look(Packed.AsIs, []));
         Assert.Empty(index.Look(Packed.AsIs, null));
         Assert.Empty(index.Look(Packed.AsIs, ["", "   "]));
+    }
+
+    [Fact]
+    public void AFOLDERIsTheOtherQuestionAndTheIndexCanAnswerIt()
+    {
+        // LOOK MATCHES A NAME, UNDER MATCHES A PLACE. "Where is AtlasIconContentBreach" needs the
+        // first; "which .csd files does this install have" needs the second, and nothing could ask
+        // it before - a set of files whose names nobody knows in advance cannot be looked up by
+        // name, and cannot be guessed at either.
+        BundleIndex index = WithNames(20);
+
+        List<string> found = index.Under(Packed.AsIs, "data/statdescriptions/", ".csd");
+
+        Assert.Equal(
+            [
+                "data/statdescriptions/stat_descriptions.csd",
+                "data/statdescriptions/skills/skill_stat_descriptions.csd",
+            ],
+            found);
+
+        // BOTH ENDS MATCH, so the .txt sitting in the same folder is not one of them.
+        Assert.DoesNotContain(found, path => path.EndsWith(".txt", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ANDCaseDoesNotMatterAtEitherEnd()
+    {
+        // The game writes its paths in mixed case and the index stores them lowercased, the same
+        // way a name does - so a folder spelled as the game spells it must still match.
+        Assert.Equal(2, WithNames(20).Under(Packed.AsIs, "Data/StatDescriptions/", ".CSD").Count);
+
+        // And an empty suffix takes everything in the folder, the .txt included.
+        Assert.Equal(3, WithNames(20).Under(Packed.AsIs, "data/statdescriptions/").Count);
+    }
+
+    [Fact]
+    public void BOTHQuestionsFitInTheOneWalkThereIs()
+    {
+        // THE REASON THIS METHOD EXISTS. The blob is released when a walk finishes, so asking the
+        // two questions separately means whichever went second gets an EMPTY answer - not an
+        // error, an empty one, which reads as "the install has no such file". Both go in together.
+        BundleIndex index = WithNames(20);
+
+        BundleIndex.WalkedNames walked = index.Names(
+            Packed.AsIs, ["AtlasIconContentBreach"], "data/statdescriptions/", ".csd");
+
+        Assert.Equal(
+            "art/2dart/uiimages/ingame/atlasiconcontentbreach.dds",
+            walked.Paths["AtlasIconContentBreach"]);
+        Assert.Equal(2, walked.Inside.Count);
+
+        // And that really was ONE walk: there is nothing left to ask with.
+        Assert.False(index.Named);
+    }
+
+    [Fact]
+    public void ANDAFolderNobodyAskedForDoesNotSpendTheWalkEither()
+    {
+        // Same rule as an empty name list, for the same reason - a session with neither question
+        // must still be able to answer the one it has not asked yet.
+        BundleIndex index = WithNames(20);
+
+        Assert.Empty(index.Under(Packed.AsIs, null));
+        Assert.Empty(index.Under(Packed.AsIs, "   ", ".csd"));
+        Assert.Empty(index.Names(Packed.AsIs, [], null).Inside);
+        Assert.True(index.Named);
+
+        Assert.Equal(2, index.Under(Packed.AsIs, "data/statdescriptions/", ".csd").Count);
+        Assert.False(index.Named);
     }
 }

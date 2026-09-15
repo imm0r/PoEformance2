@@ -1971,8 +1971,29 @@ internal static class Program
         {
             Store = itemArt,
             Wanted = atlasContents.Icons,
-            Names = installed is { } named ? named.Look : null,
+            Names = installed is null ? null : WalkTheInstall,
         };
+
+        // ONE WALK, TWO ANSWERS, and that is not a tidy-up: the index spells its four million paths
+        // out once per session and releases them, so a second walk finds nothing - not an error,
+        // an EMPTY answer, which reads as "the install has no such file". Both questions that need
+        // the walk are therefore asked in the same call. See GameFiles.Names.
+        //
+        // The second of them replaces data/stat_desc_map.tsv with the game's own .csd files, which
+        // is what makes that export a fallback rather than the source. It lands here because this
+        // is where the walk happens: on AtlasArt's background task, the first time the atlas is
+        // drawn, which is also the first moment anything wants a sentence for a token.
+        Dictionary<string, string> WalkTheInstall(IReadOnlyCollection<string> wanted)
+        {
+            PoEformance.Game.Files.BundleIndex.WalkedNames walked = installed!.Names(
+                wanted,
+                PoEformance.Game.Files.StatDescriptionFiles.Folder,
+                PoEformance.Game.Files.StatDescriptionFiles.Extension);
+
+            atlas.LearnStatDescriptions(
+                PoEformance.Game.Components.StatDescriptions.FromInstall(installed, walked.Inside));
+            return walked.Paths;
+        }
 
         // And the entity browser, which is the shortest route to something not yet
         // understood: the game names every component an entity carries, and most of them

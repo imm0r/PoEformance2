@@ -202,6 +202,31 @@ public sealed class GameFiles
         => Index.Look(_decompress, names);
 
     /// <summary>
+    /// Every file in a folder, which is the question <see cref="Look"/> cannot answer.
+    /// </summary>
+    /// <remarks>
+    /// The same walk and the same cost as Look, and it spends the same one: a set of files whose
+    /// names nobody knows in advance - the stat descriptions are a tree of .csd files, and which
+    /// ones are in it is a thing the install says. Anything wanting BOTH answers must ask through
+    /// <see cref="Names"/>, or the second question gets an empty one.
+    /// </remarks>
+    public List<string> Under(string? folder, string? extension = null)
+        => Index.Under(_decompress, folder, extension);
+
+    /// <summary>
+    /// Both name questions in one walk, which is the only way to have both answered.
+    /// </summary>
+    /// <remarks>
+    /// THE INDEX SPELLS ITS PATHS OUT ONCE A SESSION and releases them afterwards, so <see
+    /// cref="Look"/> and <see cref="Under"/> are two halves of one budget rather than two calls.
+    /// This tool wants both halves - where the atlas art lives, and which .csd files the install
+    /// has - so it asks for them together. See <see cref="BundleIndex.Names"/>.
+    /// </remarks>
+    public BundleIndex.WalkedNames Names(
+        IReadOnlyCollection<string>? wanted, string? folder, string? extension = null)
+        => Index.Names(_decompress, wanted, folder, extension);
+
+    /// <summary>
     /// A bundle's chunk table, opened once and kept.
     /// </summary>
     /// <remarks>
