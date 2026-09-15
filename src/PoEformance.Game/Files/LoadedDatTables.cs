@@ -106,7 +106,15 @@ public sealed class LoadedDatTables
     /// things (session-2026-09-tables.rec, DatTableSurveyTests). Those four are in none of the
     /// 6913 names it read, in any spelling - so within the sixteen buckets this walk covers they
     /// are simply not there, and the row-pointer route through a component stays the only known
-    /// way to them. Sixteen is itself a ported constant nothing has checked, which is why that
+    /// way to them.
+    ///
+    /// ON 0.5.5 IT IS SIX, AND THEY ARE EVERY TABLE THE ATLAS WORK USES: WorldAreas, EndgameMaps,
+    /// EndgameMapAtlas, EndgameMapContentSet, Tags and PassiveSkills are all absent from the 153
+    /// this walk finds among 8165 records, while their own neighbours - EndgameMapPins,
+    /// EndgameMapDecorations, EndgameMapNodeStats - come back fine. So the dat foreign reference
+    /// is not a shortcut those readers take; it is the only route there is. See
+    /// DatTableSurvey055Tests, and note the corollary: an address inside one of the six, or in the
+    /// gaps around them, cannot be named by this walk however carefully it is asked. Sixteen is itself a ported constant nothing has checked, which is why that
     /// sentence says "within" rather than "at all"; see PreloadReader.BucketsBeyondTheCount. And
     /// 23 records DO call themselves .dat files while having nothing usable at RowStorePtr,
     /// GrantedEffectsPerLevel and Languages among them - so being in the table and being parsed

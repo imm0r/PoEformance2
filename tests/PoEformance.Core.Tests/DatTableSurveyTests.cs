@@ -20,6 +20,10 @@ namespace PoEformance.Core.Tests;
 /// this project reads rows from, are in none of the 6913 names in any spelling, while Stats,
 /// Mods, BaseItemTypes and QuestFlags are.
 ///
+/// THIS CAPTURE IS PRE-0.5.5 and so can only speak for that build. The same walk on the current
+/// client is DatTableSurvey055Tests, where the absent set has grown to SIX and covers every table
+/// the atlas work reaches by dat foreign reference.
+///
 /// THAT SPLIT IS NOT ABOUT WHICH TABLES ARE LOADED. All eight are core tables the client cannot
 /// start without - which is why the QuestFlags hunt never once had trouble reading its table. An
 /// earlier version of this comment called the four absences a coin flip at 15% coverage; that was
