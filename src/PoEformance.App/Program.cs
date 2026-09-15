@@ -1952,7 +1952,12 @@ internal static class Program
             gameStatesStatic,
             atlasContents,
             mapNames,
-            PoEformance.Game.World.AtlasRatings.Load(FindDataFile("atlas-ratings.json"), mapNames))
+            PoEformance.Game.World.AtlasRatings.Load(FindDataFile("atlas-ratings.json"), mapNames),
+
+            // The game's own sentence per stat, behind both content tables. Keyed by the stat's
+            // NAME rather than by a row index, so it does not go wrong when the game inserts a row -
+            // the index half of that join comes out of memory. See StatDescriptions.
+            PoEformance.Game.Components.StatDescriptions.Load(FindDataFile("stat_desc_map.tsv")))
         {
             Settings = PoEformance.Features.AtlasStore.Load(),
             Ritual = ritual,

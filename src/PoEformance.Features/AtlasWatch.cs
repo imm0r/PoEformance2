@@ -272,13 +272,24 @@ public sealed class AtlasWatch
     /// </remarks>
     private readonly EndgameMapContentCatalogue _mapContent;
 
+    /// <summary>
+    /// The game's own sentence per stat, for the tokens no content and no file names.
+    /// </summary>
+    /// <remarks>
+    /// A FILE, and deliberately so: it is keyed by the stat's NAME rather than by a row index, so
+    /// it does not go wrong when the game inserts a row - it goes out of date only when GGG rewords
+    /// something. The index half of the join comes out of memory.
+    /// </remarks>
+    private readonly Game.Components.StatDescriptions _statDescriptions;
+
     public AtlasWatch(
         IMemoryReader reader,
         OffsetSchema schema,
         ulong gameStatesStatic,
         AtlasContentNames? contents = null,
         AtlasMapNames? names = null,
-        AtlasRatings? ratings = null)
+        AtlasRatings? ratings = null,
+        Game.Components.StatDescriptions? statDescriptions = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
@@ -290,6 +301,7 @@ public sealed class AtlasWatch
         _endgame = new EndgameMapCatalogue(reader, schema);
         _mapContent = new EndgameMapContentCatalogue(reader, schema);
         _contents = contents ?? AtlasContentNames.Empty;
+        _statDescriptions = statDescriptions ?? Game.Components.StatDescriptions.Empty;
         Names = names ?? AtlasMapNames.Empty;
         Ratings = ratings ?? AtlasRatings.Empty;
         _grouping = new AtlasGrouping(_settings.Sorting, Names, Ratings);
@@ -862,8 +874,24 @@ public sealed class AtlasWatch
             return false;
         }
 
-        return _contents.Revision == 0
-            && _contents.Learn(_mapContent.Rows, _mapContent.BadgeIdBase, _mapContent.StatTokenBase) > 0;
+        if (_contents.Revision != 0)
+        {
+            return false;
+        }
+
+        // AND THE STAT SENTENCES BEHIND BOTH TABLES. The Stats table travels with the content rows -
+        // a content's Stats array is a dat foreign reference - so it costs nothing extra here, and
+        // it reaches the tokens neither table knows: 90 distinct tokens on the 0.5.5 capture, 21
+        // with words, 61 with a stat description.
+        if (_mapContent.StatsTable is { } stats)
+        {
+            _contents.LearnStats(
+                Game.Components.StatTable.Over(_reader, stats, _schema),
+                _statDescriptions,
+                _mapContent.StatTokenBase);
+        }
+
+        return _contents.Learn(_mapContent.Rows, _mapContent.BadgeIdBase, _mapContent.StatTokenBase) > 0;
     }
 
     /// <summary>
@@ -882,7 +910,10 @@ public sealed class AtlasWatch
             : $"data/atlas-content.json ({_contents.Count} entries) - the game's own table would not read:"
               + $" {(_mapContent.LastError.Length > 0 ? _mapContent.LastError : "no reason given")}"
         : $"the game ({_contents.LearntBadges} badges and {_contents.LearntEffects} effects from"
-          + $" EndgameMapContent), with data/atlas-content.json behind it";
+          + $" EndgameMapContent), then data/atlas-content.json"
+          + (_contents.StatSentences > 0
+              ? $", then the game's own sentence for the stat ({_contents.StatSentences} known)"
+              : ", and no stat descriptions - data/stat_desc_map.tsv is missing or empty");
 
     /// <summary>
     /// Takes the slow half again: what each node is, and every route across the atlas.

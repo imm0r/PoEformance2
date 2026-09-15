@@ -83,6 +83,12 @@ public sealed class AtlasContentNames
     private IReadOnlyCollection<string> _icons;
     private int _revision;
 
+    // The last resort behind both tables: the game's Stats.dat, and the game's own sentence for
+    // each stat in it. Set together or not at all - one without the other answers nothing.
+    private Components.StatTable? _stats;
+    private Components.StatDescriptions? _descriptions;
+    private uint _statTokenBase = 1;
+
     private AtlasContentNames(
         IReadOnlyDictionary<uint, AtlasContent> badges,
         IReadOnlyDictionary<uint, AtlasContent> effects)
@@ -202,8 +208,38 @@ public sealed class AtlasContentNames
     /// <summary>What a badge id means, or null when this table has never heard of it.</summary>
     public AtlasContent? Badge(uint raw) => Look(Volatile.Read(ref _badges), raw);
 
-    /// <summary>What a content token means, or null when the effect table has never heard of it.</summary>
-    public AtlasContent? Effect(uint raw) => Look(Volatile.Read(ref _effects), raw);
+    /// <summary>
+    /// What a content token means, from the contents, the file, or the game's stat description.
+    /// </summary>
+    /// <remarks>
+    /// THREE LAYERS, NARROWEST FIRST. A content this project learnt off EndgameMapContent knows the
+    /// whole thing - name, sentence, art - and is the best answer. The file comes next. And behind
+    /// both sits the game's own description of the STAT the token names, which reaches the ones
+    /// neither of the others ever could: on the 0.5.5 capture the atlas showed 90 distinct tokens,
+    /// of which 21 had words and 61 have a stat description - so 40 lines that were bare numbers.
+    ///
+    /// LAST rather than first, because a description describes the STAT while the other two
+    /// describe the CONTENT, and the content is what a node carries. "Area contains an additional
+    /// Strongbox" is the stat; "Monstrous Treasure - contains many extra Strongboxes with monsters
+    /// waiting in ambush" is the content. Where both exist the content is the one a player sees.
+    /// </remarks>
+    public AtlasContent? Effect(uint raw)
+        => Look(Volatile.Read(ref _effects), raw) ?? FromTheStat(raw);
+
+    /// <summary>The game's sentence for the stat a token names, when nothing closer knows it.</summary>
+    private AtlasContent? FromTheStat(uint raw)
+    {
+        if (Volatile.Read(ref _stats) is not { } stats || Volatile.Read(ref _descriptions) is not { } lines)
+        {
+            return null;
+        }
+
+        // The token is the stat's row index plus one - the same shift StatNames applies, and the
+        // reason this asks StatTable for index rather than handing it the token.
+        string? id = stats.Of((long)IdOf(raw) - _statTokenBase);
+        string? words = lines.Of(id);
+        return words is { Length: > 0 } ? new AtlasContent(string.Empty, words, string.Empty) : null;
+    }
 
     private static AtlasContent? Look(IReadOnlyDictionary<uint, AtlasContent> table, uint raw)
         => table.TryGetValue(IdOf(raw), out AtlasContent found) ? found : null;
@@ -251,6 +287,30 @@ public sealed class AtlasContentNames
     /// </param>
     /// <returns>How many meanings the game supplied, badges and effects together.</returns>
     public int Learn(IReadOnlyList<MapContentRow> rows, uint badgeIdBase, uint statTokenBase)
+        => LearnContents(rows, badgeIdBase, statTokenBase);
+
+    /// <summary>
+    /// Puts the game's stat descriptions behind both tables, for the tokens neither knows.
+    /// </summary>
+    /// <remarks>
+    /// BOTH OR NEITHER: the table turns a token into a stat id and the descriptions turn that id
+    /// into a sentence, so one without the other is a chain with a link missing. Passing either as
+    /// null, or an empty description file, clears the layer rather than half-arming it.
+    /// </remarks>
+    public void LearnStats(
+        Components.StatTable? stats, Components.StatDescriptions? descriptions, uint statTokenBase)
+    {
+        _statTokenBase = statTokenBase;
+        bool both = stats is not null && descriptions is { Count: > 0 };
+        Volatile.Write(ref _stats, both ? stats : null);
+        Volatile.Write(ref _descriptions, both ? descriptions : null);
+        Interlocked.Increment(ref _revision);
+    }
+
+    /// <summary>How many stat sentences stand behind the two tables, or zero where none do.</summary>
+    public int StatSentences => Volatile.Read(ref _descriptions)?.Count ?? 0;
+
+    private int LearnContents(IReadOnlyList<MapContentRow> rows, uint badgeIdBase, uint statTokenBase)
     {
         ArgumentNullException.ThrowIfNull(rows);
         if (rows.Count == 0)

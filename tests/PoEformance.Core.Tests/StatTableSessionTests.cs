@@ -179,6 +179,60 @@ public class StatTableSessionTests
     }
 
     [Fact]
+    public void THEStatDescriptionsReachWhatNeitherTableKnows()
+    {
+        // THE THIRD LAYER, and the numbers that justify it. The atlas showed 90 distinct tokens on
+        // this capture; the contents and the file together name 21 of them, and the game's own stat
+        // descriptions reach 61. So forty lines that were bare numbers become sentences - and they
+        // are the game's own words for the stat the token actually names, not a guess at it.
+        (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
+        using (replay)
+        {
+            StatDescriptions lines = StatDescriptions.Load(
+                Path.Combine(Root.FullName, "data", "stat_desc_map.tsv"));
+            Assert.True(lines.Count > 15000, $"only {lines.Count} sentences loaded");
+
+            AtlasContentNames names = AtlasContentNames.Load(
+                Path.Combine(Root.FullName, "data", "atlas-content.json"));
+            names.Learn(contents.Rows, contents.BadgeIdBase, contents.StatTokenBase);
+
+            // A token no content grants and the file never had: today a number, now a sentence.
+            const uint PackSize = 1029;
+            Assert.Null(names.Effect(PackSize));
+
+            names.LearnStats(
+                StatTable.Over(replay, Assert.IsType<DatTableFacts>(contents.StatsTable), RealSessionTests.LiveSchema()),
+                lines,
+                contents.StatTokenBase);
+
+            Assert.Equal("{0}% increased Pack Size", Assert.NotNull(names.Effect(PackSize)).Description);
+            Assert.Equal(
+                "Area contains an additional Strongbox",
+                Assert.NotNull(names.Effect(2402)).Description);
+
+            // AND IT STAYS LAST. A content the walk learnt keeps its own wording, because that
+            // describes what the NODE carries where the stat describes only the stat.
+            Assert.Equal("Area contains an Otherworldly Breach", Assert.NotNull(names.Effect(24062)).Description);
+        }
+    }
+
+    [Fact]
+    public void ANDAMultiStatSentenceIsLeftOutRatherThanHalfFilled()
+    {
+        // The game writes one sentence for a GROUP of stats - "Damage Gained as Fire on {0} Heat
+        // Consumption@{1}%" covers three - and a token carries one stat's value, so filling such a
+        // line would print a sentence about numbers nobody has. They are dropped and counted.
+        StatDescriptions lines = StatDescriptions.Load(
+            Path.Combine(Root.FullName, "data", "stat_desc_map.tsv"));
+
+        Assert.True(lines.Grouped > 1000, $"only {lines.Grouped} were grouped");
+        Assert.Null(lines.Of("active_skill_all_damage_%_as_fire_if_heat_is_consumed"));
+
+        // And a missing file is not an error: the tokens stay numbers, which is where they started.
+        Assert.Equal(0, StatDescriptions.Load("nowhere/at/all.tsv").Count);
+    }
+
+    [Fact]
     public void ARowPastTheEndOfTheTableIsNothingRatherThanAGuess()
     {
         (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
