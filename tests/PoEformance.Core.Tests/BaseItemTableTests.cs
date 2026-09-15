@@ -46,11 +46,11 @@ public class BaseItemTableTests
         // for BaseItemTypes sum to 0x168 under the widths scripts/dat-offsets.ps1 verified; the
         // client's own loader reports 5496 rows of 360 bytes. They agree exactly.
         //
-        // The same measurement on Mods does NOT: 0x295 computed against 0x2B5 reported, thirty-two
-        // bytes of columns nobody has written down. The mod name sits at +0x62 by that reckoning,
-        // far enough in that a gap ahead of it would point the offset at nothing - so Mods is not
-        // read, and this test is here to say that the difference between the two was measured
-        // rather than assumed.
+        // The same measurement on Mods did NOT agree at first - 0x295 computed against 0x2B5
+        // reported - and the answer was not missing columns but a missing WIDTH RULE: its eight
+        // interval columns are ranges, two values each, which is the thirty-two bytes exactly.
+        // See DatColumn.Interval. Mods is readable with that rule and is simply not read HERE,
+        // because this reader is BaseItemTypes' and reading it is a change of its own.
         using ReplayMemoryReader replay = ReplayMemoryReader.Load(File.OpenRead(
             Path.Combine(Root.FullName, "tests", "fixtures", "session-2026-09-tables-055.rec")));
 
@@ -115,9 +115,11 @@ public class BaseItemTableTests
     [Fact]
     public void ANDATableWhoseRowsAreTheWrongWidthIsRefusedRatherThanRead()
     {
-        // The Mods case, in miniature. A stride that is not this table's turns every offset into
-        // a read of whatever happens to be there, and "whatever happens to be there" is the one
-        // answer this project treats as worse than none.
+        // A stride that is not this table's turns every offset into a read of whatever happens to
+        // be there, and "whatever happens to be there" is the one answer this project treats as
+        // worse than none. The gate is on the number the CLIENT reports, so it holds whether the
+        // mismatch is a wrong table, a patched layout or - as with Mods - an arithmetic of ours
+        // that was one rule short.
         OffsetSchema schema = RealSessionTests.LiveSchema();
 
         Assert.Null(BaseItemTable.Over(

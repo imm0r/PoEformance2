@@ -10,8 +10,29 @@ public sealed record DatColumn(string Name, string Type, bool Array)
     /// <summary>Where this column starts in a row. Filled in by the layout pass.</summary>
     public int Offset { get; set; }
 
+    /// <summary>
+    /// Whether this column is a RANGE, which the schema stores as two values of its own type.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED, AND IT COST A TABLE BEFORE IT WAS FOUND. Mods computed 0x295 over its columns
+    /// against the 0x2B5 the client's own loader reports, and the gap was written down here as
+    /// "thirty-two bytes of columns nobody has carried". It was not: Mods has eight interval
+    /// columns - Stat1Value through Stat8Value, i32 each - and eight times the four extra bytes
+    /// of a second i32 is exactly the thirty-two. The columns were all there; the width rule was
+    /// short one case.
+    ///
+    /// CHECKED AGAINST EVERY TABLE WHOSE SIZE IS KNOWN, which is what makes it a rule rather
+    /// than an arithmetic that happens to close one gap: Quest 119, QuestStates 208, QuestFlags
+    /// 12, BaseItemTypes 360 and ItemClasses 150 carry no interval column and are unchanged;
+    /// Mods carries eight and lands on 693 exactly. Six tables, one rule, no exceptions.
+    ///
+    /// An ARRAY of intervals is still an array - a count and an offset - so the doubling applies
+    /// to the stored value and not to the reference to a list of them.
+    /// </remarks>
+    public bool Interval { get; init; }
+
     /// <summary>How wide it is.</summary>
-    public int Width => Array ? DatColumns.ArrayWidth : DatColumns.WidthOf(Type);
+    public int Width => Array ? DatColumns.ArrayWidth : DatColumns.WidthOf(Type) * (Interval ? 2 : 1);
 }
 
 /// <summary>
