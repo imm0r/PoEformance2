@@ -212,6 +212,12 @@ public sealed class EntityInspector
     private readonly EntityReader _entities;
     private readonly PoEformance.Game.Components.BuffsReader _buffs;
     private readonly PoEformance.Game.Components.StatNames _statNames;
+
+    // Given the SAME table this walk was paying for anyway. The item readers key their stats by
+    // the same row index off the same Stats.dat, and they had no route to it at all - so the
+    // choice was a second walk of eight thousand records or one line here. Null when nothing
+    // shares this session's item tables, which is every test that builds a browser on its own.
+    private readonly PoEformance.Game.Items.ItemNames? _itemNames;
     private readonly OffsetSchema _schema;
 
     private EntityRequest _request = EntityRequest.Idle;
@@ -242,11 +248,13 @@ public sealed class EntityInspector
         IMemoryReader reader,
         OffsetSchema schema,
         PoEformance.Game.Components.StatNames? statNames = null,
-        ulong fileRootStatic = 0)
+        ulong fileRootStatic = 0,
+        PoEformance.Game.Items.ItemNames? itemNames = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
         _statNames = statNames ?? PoEformance.Game.Components.StatNames.Empty;
+        _itemNames = itemNames;
         _reader = reader;
         _schema = schema;
         _fileRoot = fileRootStatic;
@@ -311,8 +319,16 @@ public sealed class EntityInspector
         }
 
         _statTries--;
-        _statNames.Learn(PoEformance.Game.Components.StatTable.From(
-            Walked(), _reader, _schema));
+        PoEformance.Game.Components.StatTable? table = PoEformance.Game.Components.StatTable.From(
+            Walked(), _reader, _schema);
+
+        _statNames.Learn(table);
+
+        // The same table, handed on rather than walked for twice. The item tables index stats the
+        // same way and drift the same way - item-stats.json is the 2.6 MB cousin of the file this
+        // walk exists to get in front of - so there is no reason for them to keep believing a row
+        // number this session has already corrected.
+        _itemNames?.Learn(table);
     }
 
     private PoEformance.Game.Files.LoadedDatTables Walked()

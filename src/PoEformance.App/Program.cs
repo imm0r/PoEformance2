@@ -1999,8 +1999,16 @@ internal static class Program
                 PoEformance.Game.Files.StatDescriptionFiles.Folder,
                 PoEformance.Game.Files.StatDescriptionFiles.Extension);
 
-            atlas.LearnStatDescriptions(
-                PoEformance.Game.Components.StatDescriptions.FromInstall(installed, walked.Inside));
+            PoEformance.Game.Components.StatDescriptions said =
+                PoEformance.Game.Components.StatDescriptions.FromInstall(installed, walked.Inside);
+
+            atlas.LearnStatDescriptions(said);
+
+            // AND THE ITEM TABLES TAKE THE SAME SENTENCES, which costs nothing here because they
+            // have already been read. They were keyed by row index inside item-stats.json and are
+            // keyed by stat id here, which is the half of the join that survives a patch: the
+            // browser's walk supplies the row-to-id half. See ItemNames.Learn.
+            itemNames.Learn(sentences: said);
             return walked.Paths;
         }
 
@@ -2017,7 +2025,11 @@ internal static class Program
             reader,
             schema,
             PoEformance.Game.Components.StatNames.Load(FindDataFile("stat_name_map.tsv")),
-            fileRoot);
+            fileRoot,
+
+            // The item tables ride along on the walk this browser was paying for anyway:
+            // item-stats.json is keyed by the same row index and drifts the same way.
+            itemNames);
 
         // Finding a way across the area is a search over millions of cells - measured at about
         // 1.8 seconds right across a real map - so it runs on the thread pool and the renderer
