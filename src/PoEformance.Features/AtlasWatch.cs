@@ -1234,11 +1234,32 @@ public sealed class AtlasWatch
 
         foreach (uint raw in node.BadgeIds)
         {
+            AtlasContent? badge = contents.Badge(raw);
+
+            // WHAT THE BADGE CALLS ITSELF COMES FIRST, and it is not a second way to say what the
+            // id says - it says MORE. Id 0x64 is the generic "Powerful Map Boss"; the string on a
+            // citadel's badge reads "Deadly Map Boss", which the game draws with its own RED
+            // symbol and its own tooltip, and which its glossary calls a specific Powerful boss
+            // that drops pinnacle access. Keeping only the id lost that tier silently, on 394 of
+            // this capture's nodes.
+            //
+            // The id's OWN words stay as the detail, so nothing is traded away: the name gets
+            // more specific and the sentence under it is unchanged.
+            string told = node.BadgeWords is { } words && words.TryGetValue(AtlasContentNames.IdOf(raw), out string? own)
+                ? EndgameMapContentCatalogue.AsTheFileWouldWriteIt(own)
+                : string.Empty;
+
+            if (told.Length > 0)
+            {
+                Add(badge ?? new AtlasContent(told, string.Empty, string.Empty), told);
+                continue;
+            }
+
             // Label rather than Say: see the badge paragraph above. Its high half is a
             // category tag, and writing that into a "{0}" would number the thing with it.
-            if (contents.Badge(raw) is { } badge)
+            if (badge is { } named)
             {
-                Add(badge, badge.Label);
+                Add(named, named.Label);
             }
         }
 
