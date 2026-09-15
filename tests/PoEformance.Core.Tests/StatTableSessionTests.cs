@@ -8,22 +8,33 @@ using PoEformance.Game.World;
 namespace PoEformance.Core.Tests;
 
 /// <summary>
-/// The shipped stat table against the game's own, and why the file has to go.
+/// The shipped stat table against the game's own.
 /// </summary>
 /// <remarks>
-/// THE PROJECT PREDICTED THIS AND COULD NOT SETTLE IT. StatNames records that every live-verified
-/// reading of the stat shift lies between 1 and 2034, with one at 4290, and says in as many words
-/// that beyond that it is EXTRAPOLATION: "a high id can be off by a different amount than a low
-/// one, and nothing here would say so". This is the measurement that says so.
+/// WHAT THIS CAUGHT, and it is the reason the reader beside it exists. data/stat_name_map.tsv is
+/// keyed by Stats.dat ROW INDEX, and an index is a position: a league that inserts a row moves
+/// every name after it. The copy this project shipped had been extracted in June, and measured
+/// against the running client in September, TEN of the 148 rows a capture covers still agreed. The
+/// first disagreement was at index 4678.
 ///
-/// TEN OF 148 AGREE. Reading the ids the game holds at the rows a capture covers, the first
-/// disagreement is at index 4678 - just above the highest reading anybody had checked, which is
-/// exactly why the file looked sound for so long. Every verification was below the break.
+/// 4678 IS THE POINT. StatNames records that every live-verified reading of the off-by-one lies
+/// between 1 and 2034, with one at 4290, and says in as many words that beyond that it is
+/// EXTRAPOLATION - "a high id can be off by a different amount than a low one, and nothing here
+/// would say so". Every check anybody had ever made lay below the break, which is exactly why the
+/// file looked sound while the entity browser named half the table wrongly.
 ///
-/// AND IT IS DRIFT RATHER THAN A DIFFERENT KEYING, which matters because those look identical from
-/// one wrong name: 134 of the file's names are still in the game's table, moved by 1, 2, 3, 6, 7 or
-/// 9 rows. Several insertions at several points, which is precisely the shape StatNames warned a
-/// single measured shift could not capture.
+/// IT IS NOT UNFIXABLE, AND A WRONG CONCLUSION IS RECORDED HERE ON PURPOSE. Two regenerations in a
+/// row still disagreed, and that was read as the two tables being NUMBERED differently - which
+/// would have meant no export could ever agree. Both of those exports had been pointed at a stale
+/// CSV dump. Corrected, the file matches the client exactly: 27281 rows against 27281, and all 148
+/// the capture names. The conclusion was reached from two measurements that were both real and both
+/// of the wrong thing.
+///
+/// SO THE CASE FOR READING MEMORY IS THE NARROWER ONE. Not "the file cannot agree" - it can, and
+/// does. It is that the file only agrees while somebody remembers to re-export it, and when it
+/// stops agreeing nothing says so: the names stay plausible, just one row off. The game's own table
+/// needs no remembering. THE TEST BELOW IS NOW THE ALARM: it asserts that the two agree, so the
+/// day the client moves and the export does not, it says so out loud.
 /// </remarks>
 public class StatTableSessionTests
 {
@@ -69,6 +80,18 @@ public class StatTableSessionTests
         return (contents, replay);
     }
 
+    /// <summary>Every row of Stats.dat, so a sweep covers the table rather than one corner of it.</summary>
+    private static List<uint> EveryRow()
+    {
+        var asked = new List<uint>(27281);
+        for (uint token = 1; token < 27281; token++)
+        {
+            asked.Add(token);
+        }
+
+        return asked;
+    }
+
     private static Dictionary<long, string> ShippedNames()
     {
         var file = new Dictionary<long, string>();
@@ -90,98 +113,52 @@ public class StatTableSessionTests
     }
 
     [Fact]
-    public void THEShippedTableIsSTALEAndTheGameSaysWhere()
+    public void THEShippedTableAndTheGameAgreeExactly()
     {
-        // THE MEASUREMENT. Not "a name looks odd" - the ids the game holds at the rows this capture
-        // covers, against the file, one row at a time.
+        // THE ALARM. It passes today because the file was re-exported from the current client, and
+        // it is meant to fail the day that stops being true - which is the failure nobody could see
+        // before, because a stale name is a real stat's name, just the wrong one.
         (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
         using (replay)
         {
             Dictionary<long, string> file = ShippedNames();
-            Assert.Equal(27000, file.Count);
 
-            // Every row the capture can name. NameStats reads one row per id asked for, so this is
-            // whatever the atlas work happened to touch - a sample of the table, not a walk of it.
-            var asked = new List<uint>();
-            for (uint token = 1; token < 27281; token++)
-            {
-                asked.Add(token);
-            }
+            // SAME HEIGHT, which is the cheapest half of the check and the one that caught the last
+            // bad export: 27000 extracted against 27281 loaded said the two could not line up.
+            Assert.Equal(contents.StatsTable!.Rows, file.Count);
 
-            IReadOnlyDictionary<uint, string> game = contents.NameStats(asked);
-            Assert.NotEmpty(game);
-
-            int same = 0;
-            int differs = 0;
-            long firstDrift = long.MaxValue;
-            foreach ((uint token, string name) in game)
+            var wrong = new List<string>();
+            int checked_ = 0;
+            foreach ((uint token, string name) in contents.NameStats(EveryRow()))
             {
                 long index = token - contents.StatTokenBase;
                 if (!file.TryGetValue(index, out string? mine))
                 {
+                    wrong.Add($"row {index}: the file has no entry, the game says {name}");
                     continue;
                 }
 
-                if (mine == name)
+                checked_++;
+                if (mine != name)
                 {
-                    same++;
-                    continue;
-                }
-
-                differs++;
-                firstDrift = Math.Min(firstDrift, index);
-            }
-
-            // The shape of the answer rather than its exact numbers, because the sample depends on
-            // what the atlas work asked for and that will change: most of what is covered disagrees.
-            Assert.True(differs > same * 5, $"same {same}, differs {differs}");
-
-            // AND WHERE IT BREAKS, which is the part that matters: above the highest reading the
-            // shift was ever verified at. StatNames names 4290 as the top of its evidence.
-            Assert.InRange(firstDrift, 4291, 5000);
-        }
-    }
-
-    [Fact]
-    public void ANDTheFilesNamesAreSTILLThereJustMovedByDifferentAmounts()
-    {
-        // A DIFFERENT KEYING AND A DRIFT LOOK IDENTICAL from one wrong name, so this separates
-        // them: if the file's entries were simply mis-keyed, one shift would put them all right.
-        // They are found at several different distances, which is several insertions.
-        (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
-        using (replay)
-        {
-            Dictionary<long, string> file = ShippedNames();
-            var asked = new List<uint>();
-            for (uint token = 1; token < 27281; token++)
-            {
-                asked.Add(token);
-            }
-
-            var whereTheGameHasIt = new Dictionary<string, long>(StringComparer.Ordinal);
-            foreach ((uint token, string name) in contents.NameStats(asked))
-            {
-                whereTheGameHasIt.TryAdd(name, token - contents.StatTokenBase);
-            }
-
-            var distances = new HashSet<long>();
-            foreach ((long index, string mine) in file)
-            {
-                if (whereTheGameHasIt.TryGetValue(mine, out long at) && at != index)
-                {
-                    distances.Add(at - index);
+                    wrong.Add($"row {index}: file {mine}, game {name}");
                 }
             }
 
-            // Several distinct distances, all forward: rows were inserted, never removed.
-            Assert.True(distances.Count >= 3, $"distances: {string.Join(", ", distances.Order())}");
-            Assert.All(distances, by => Assert.True(by > 0, $"moved backwards by {by}"));
+            // Every row the capture can name, not a sample of them: NameStats reads one row per id
+            // asked for, and it was asked for the whole table.
+            Assert.True(checked_ > 100, $"only {checked_} rows were nameable - the capture is thin");
+            Assert.Empty(wrong);
         }
     }
 
     [Fact]
     public void STATNAMESPrefersTheGameAndSaysSo()
     {
+        // AND THE TWO SOURCES AGREE, which is what makes this a check on the READER rather than on
+        // the file. The names come out of an export somebody generated from the game's own data by
+        // a completely different route - unpacked files, a Python tool - so the reader landing on
+        // the same string for the same row is two independent paths meeting.
         (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
         using (replay)
         {
@@ -189,21 +166,14 @@ public class StatTableSessionTests
             Assert.False(names.FromGame);
             Assert.Contains("stat_name_map.tsv", names.Source, StringComparison.Ordinal);
 
-            // The file's answer for a drifted id, before the game is put in front of it.
             const uint Water = 25862;   // the token a node carries for the Water biome stat
-            Assert.Equal("map_faridun_city_biome", names.Of(Water));
+            Assert.Equal("map_water_biome", names.Of(Water));
 
-            // StatTable is reached through the loader's file table in the tool; this capture only
-            // holds the atlas route to the same table, so the facts come from there and the READER
-            // is what is under test.
-            var live = Assert.IsType<DatTableFacts>(contents.StatsTable);
-            names.Learn(Table(replay, live));
+            names.Learn(Table(replay, Assert.IsType<DatTableFacts>(contents.StatsTable)));
 
             Assert.True(names.FromGame);
             Assert.Contains("the game", names.Source, StringComparison.Ordinal);
             Assert.Equal("map_water_biome", names.Of(Water));
-
-            // And a low id, where the file was right all along, stays right.
             Assert.Equal("map_item_drop_rarity_+%", names.Of(1240));
         }
     }

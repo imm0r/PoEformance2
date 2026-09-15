@@ -51,18 +51,20 @@ namespace PoEformance.Game.Components;
 /// and is either drift of exactly that kind or a stat that is genuinely there for reasons
 /// nobody has chased.
 ///
-/// AND THE DRIFT ABOVE 4290 IS NOW MEASURED RATHER THAN FEARED, 2026-09-15. Reading the ids the
+/// AND THE DRIFT ABOVE 4290 WAS MEASURED, 2026-09-15, rather than left feared. Reading the ids the
 /// game itself holds (tests/fixtures/session-2026-09-statnames.rec, StatTableSessionTests): of the
-/// rows a capture covers, TEN agree with the shipped file and 135 do not, and the first
-/// disagreement is at index 4678 - just above 4290, the highest reading anybody had checked. Every
-/// verification lay below the break, which is exactly why the file looked sound. 134 of its names
-/// are still in the game's table, moved by 1, 2, 3, 6, 7 or 9 rows: several insertions at several
-/// points, which is the shape a single measured shift cannot capture.
+/// 148 rows a capture covers, the June extract still agreed on TEN, and the first disagreement was
+/// at index 4678 - just above 4290, the highest reading anybody had checked. Every verification lay
+/// below the break, which is why the file looked sound while half the table named the wrong stat.
+///
+/// RE-EXPORTED FROM THE CURRENT CLIENT IT AGREES EXACTLY - 27281 rows against 27281, all 148 of
+/// them. So the file is fixable and was simply old. What it is not is self-maintaining: it is right
+/// only while somebody remembers, and when it stops being right nothing says so, because a stale
+/// name is a real stat's name one row along.
 ///
 /// SO THE GAME ANSWERS FIRST NOW. StatTable reads a row's id out of Stats.dat, Learn puts it in
 /// front of this file, and Source says which of the two spoke. The file stays behind it for a
-/// session that never reaches the table - and stays stale, which the wording of Source says out
-/// loud rather than leaving somebody to find out from a name that looks fine.
+/// session that never reaches the table.
 ///
 /// A name is a LABEL and never a fact: an id with no row is left as its number rather than
 /// guessed at, and the table drifts with the game, so a name that stops making sense means
@@ -106,7 +108,7 @@ public sealed class StatNames
     public string Source => Volatile.Read(ref _live) is { } live
         ? $"the game ({live.Facts.Rows} rows of Stats.dat, {live.Named} read so far)"
         : _names.Count > 0
-            ? $"data/stat_name_map.tsv ({_names.Count} entries) - STALE above row 4678 on 0.5.5"
+            ? $"data/stat_name_map.tsv ({_names.Count} entries) - right only while somebody re-exports it"
             : "nowhere - no file and the game's table has not been reached";
 
     /// <summary>
