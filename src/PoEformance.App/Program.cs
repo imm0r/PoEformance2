@@ -1974,8 +1974,15 @@ internal static class Program
         // still have nothing reading them.
         // With the game's own names for the stat ids, when the table is next to the binary.
         // Missing is fine - the ids still read, they are just numbers then.
+        // WITH FileRoot, so the browser can put the game's own Stats.dat in front of the file.
+        // stat_name_map.tsv is keyed by row index and a stat id is a POSITION, so a league that
+        // inserts a row moves every name after it: measured 2026-09-15, ten of 148 rows still
+        // agreed and the first disagreement was at index 4678. See StatTable.
         var entityParts = new PoEformance.Features.EntityInspector(
-            reader, schema, PoEformance.Game.Components.StatNames.Load(FindDataFile("stat_name_map.tsv")));
+            reader,
+            schema,
+            PoEformance.Game.Components.StatNames.Load(FindDataFile("stat_name_map.tsv")),
+            fileRoot);
 
         // Finding a way across the area is a search over millions of cells - measured at about
         // 1.8 seconds right across a real map - so it runs on the thread pool and the renderer

@@ -51,6 +51,19 @@ namespace PoEformance.Game.Components;
 /// and is either drift of exactly that kind or a stat that is genuinely there for reasons
 /// nobody has chased.
 ///
+/// AND THE DRIFT ABOVE 4290 IS NOW MEASURED RATHER THAN FEARED, 2026-09-15. Reading the ids the
+/// game itself holds (tests/fixtures/session-2026-09-statnames.rec, StatTableSessionTests): of the
+/// rows a capture covers, TEN agree with the shipped file and 135 do not, and the first
+/// disagreement is at index 4678 - just above 4290, the highest reading anybody had checked. Every
+/// verification lay below the break, which is exactly why the file looked sound. 134 of its names
+/// are still in the game's table, moved by 1, 2, 3, 6, 7 or 9 rows: several insertions at several
+/// points, which is the shape a single measured shift cannot capture.
+///
+/// SO THE GAME ANSWERS FIRST NOW. StatTable reads a row's id out of Stats.dat, Learn puts it in
+/// front of this file, and Source says which of the two spoke. The file stays behind it for a
+/// session that never reaches the table - and stays stale, which the wording of Source says out
+/// loud rather than leaving somebody to find out from a name that looks fine.
+///
 /// A name is a LABEL and never a fact: an id with no row is left as its number rather than
 /// guessed at, and the table drifts with the game, so a name that stops making sense means
 /// the table needs extracting again, not that the reading is wrong.
@@ -60,20 +73,67 @@ public sealed class StatNames
     /// <summary>What memory's id has to be shifted by to index the table. See the remarks.</summary>
     private const uint TableOffset = 1;
 
-    public static StatNames Empty { get; } = new([]);
+    /// <summary>Nothing known, which is what a missing file leaves.</summary>
+    /// <remarks>
+    /// A FRESH ONE EVERY TIME rather than a shared singleton, now that <see cref="Learn"/> exists:
+    /// a session with no data file still learns from the game, and a shared Empty would carry one
+    /// session's table into everything else holding the same instance.
+    /// </remarks>
+    public static StatNames Empty => new([]);
 
     private readonly Dictionary<uint, string> _names;
 
+    // The game's own table, once something has walked the loader's file list to it. Volatile
+    // because the reader thread sets it while the interface is drawing names out of the file.
+    private StatTable? _live;
+
     private StatNames(Dictionary<uint, string> names) => _names = names;
 
-    /// <summary>How many names were loaded.</summary>
+    /// <summary>How many names the FILE holds.</summary>
     public int Count => _names.Count;
 
+    /// <summary>Whether the game's own table is answering, rather than the shipped file.</summary>
+    public bool FromGame => Volatile.Read(ref _live) is not null;
+
+    /// <summary>
+    /// Where a name comes from, for an interface that has to say which.
+    /// </summary>
+    /// <remarks>
+    /// The two are indistinguishable on screen until one of them is wrong, and the one that is
+    /// wrong is wrong PLAUSIBLY - a neighbouring stat, never a blank. So the source is said out
+    /// loud rather than left to be worked out from a name that looks fine.
+    /// </remarks>
+    public string Source => Volatile.Read(ref _live) is { } live
+        ? $"the game ({live.Facts.Rows} rows of Stats.dat, {live.Named} read so far)"
+        : _names.Count > 0
+            ? $"data/stat_name_map.tsv ({_names.Count} entries) - STALE above row 4678 on 0.5.5"
+            : "nowhere - no file and the game's table has not been reached";
+
+    /// <summary>
+    /// Puts the game's own Stats.dat in front of the file.
+    /// </summary>
+    /// <remarks>
+    /// IN FRONT OF rather than instead of, so a session that never reaches the table is no worse
+    /// off than before. Which of the two answered is what <see cref="Source"/> says.
+    /// </remarks>
+    public void Learn(StatTable? table) => Volatile.Write(ref _live, table);
+
     /// <summary>The game's name for a stat id as it appears IN MEMORY, or null.</summary>
+    /// <remarks>
+    /// THE KEY IS ONE-BASED AND THE TABLE IS NOT - see the remarks on the class. The shift is
+    /// applied here and nowhere else, so the live table and the file are indexed the same way.
+    /// </remarks>
     public string? Of(uint memoryId)
-        => memoryId >= TableOffset && _names.TryGetValue(memoryId - TableOffset, out string? name)
-            ? name
-            : null;
+    {
+        if (memoryId < TableOffset)
+        {
+            return null;
+        }
+
+        uint index = memoryId - TableOffset;
+        return Volatile.Read(ref _live)?.Of(index)
+            ?? (_names.TryGetValue(index, out string? name) ? name : null);
+    }
 
     /// <summary>Loads the TSV. A missing file is not an error - the ids still read.</summary>
     public static StatNames Load(string? path)
