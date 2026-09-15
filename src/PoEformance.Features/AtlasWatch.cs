@@ -246,6 +246,19 @@ public sealed class AtlasWatch
 
     private int _catalogueTries = CatalogueTries;
 
+    /// <summary>
+    /// Which maps the atlas can actually hold - EndgameMaps.dat, 173 rows against WorldAreas' 442.
+    /// </summary>
+    /// <remarks>
+    /// THE TABLE data/atlas-maps.json SHOULD HAVE BEEN. That file is a copy of WorldAreas, which is
+    /// every area in the game - hideouts, campaign zones, Sanctum floors, the login screen - and
+    /// nothing in it separates the ones an atlas can send anybody to. This is the table that does,
+    /// and it rides the same node and the same chain as the WorldAreas walk: the node's data block
+    /// holds its row at +0x290 and the TABLE at +0x298, so reaching it costs one more read than
+    /// reaching the row that was being read anyway. See EndgameMapCatalogue.
+    /// </remarks>
+    private readonly EndgameMapCatalogue _endgame;
+
     public AtlasWatch(
         IMemoryReader reader,
         OffsetSchema schema,
@@ -261,6 +274,7 @@ public sealed class AtlasWatch
         _gameStatesStatic = gameStatesStatic;
         _atlas = new AtlasReader(reader, schema, new UiElementReader(reader, schema));
         _catalogue = new WorldAreaCatalogue(reader, schema);
+        _endgame = new EndgameMapCatalogue(reader, schema);
         _contents = contents ?? AtlasContentNames.Empty;
         Names = names ?? AtlasMapNames.Empty;
         Ratings = ratings ?? AtlasRatings.Empty;
@@ -718,15 +732,17 @@ public sealed class AtlasWatch
         // The nodes the last tick studied, when there are any: a second full read of the panel
         // here would cost as much as the walk it is only meant to start.
         IReadOnlyList<AtlasNode> nodes = _studied.Count > 0 ? _studied : _atlas.Read(uiRoot, scale);
-        if (_catalogue.All.Count == 0)
+        foreach (AtlasNode node in nodes)
         {
-            foreach (AtlasNode node in nodes)
+            if (node.MapId.Length == 0 || (_catalogue.All.Count > 0 && _endgame.Maps.Count > 0))
             {
-                if (node.MapId.Length > 0 && _catalogue.ReadFromNode(node.Address))
-                {
-                    Names.LearnUnique(_catalogue.All);
-                    break;
-                }
+                continue;
+            }
+
+            _endgame.ReadFromNode(node.Address);
+            if (_catalogue.ReadFromNode(node.Address))
+            {
+                Names.LearnUnique(_catalogue.All);
             }
         }
 
@@ -744,6 +760,8 @@ public sealed class AtlasWatch
 
         var said = new List<string> { string.Empty };
         said.AddRange(_catalogue.Describe(Names));
+        said.Add(string.Empty);
+        said.AddRange(_endgame.Describe(Names));
         return said;
     }
 
@@ -793,7 +811,7 @@ public sealed class AtlasWatch
     /// <returns>Whether the table was read on this pass.</returns>
     private bool Learn(IReadOnlyList<AtlasNode> live)
     {
-        if (_catalogueTries <= 0 || _catalogue.All.Count > 0)
+        if (_catalogueTries <= 0 || (_catalogue.All.Count > 0 && _endgame.Maps.Count > 0))
         {
             return false;
         }
@@ -808,9 +826,15 @@ public sealed class AtlasWatch
             // Spent HERE rather than on entry, so a study that read no map ids at all - which is
             // what a wrong node fingerprint looks like - does not burn the budget on nothing.
             _catalogueTries--;
+
+            // BOTH TABLES OFF THE SAME NODE, because they are the same four reads: the node's data
+            // block holds the EndgameMaps row at +0x290 and its TABLE at +0x298, and the row's own
+            // column 0 holds the WorldAreas row and ITS table. One chain, two tables, and the
+            // second is the one that says which of the first's 442 areas the atlas can reach.
+            bool endgame = _endgame.ReadFromNode(node.Address);
             if (!_catalogue.ReadFromNode(node.Address))
             {
-                return false;
+                return endgame;
             }
 
             Names.LearnUnique(_catalogue.All);
@@ -822,7 +846,7 @@ public sealed class AtlasWatch
 
     /// <summary>Publishes the game-against-file report for the interface to draw.</summary>
     private void Republish()
-        => Volatile.Write(ref _mapData, MapDataReport.Build(_catalogue, Names, Ratings, _seen));
+        => Volatile.Write(ref _mapData, MapDataReport.Build(_catalogue, Names, Ratings, _seen, _endgame));
 
     private void Forget()
     {
