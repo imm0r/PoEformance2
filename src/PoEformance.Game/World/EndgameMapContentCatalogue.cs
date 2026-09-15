@@ -71,14 +71,34 @@ public sealed class EndgameMapContentCatalogue
     /// <summary>Rows read per call. This table is small, so one block is the whole of it.</summary>
     private const int RowsPerRead = 64;
 
-    /// <summary>Longest string taken seriously. The sentences are long; the paths are longer.</summary>
-    private const int MostChars = 160;
+    /// <summary>Longest string taken seriously, across however many steps it takes.</summary>
+    private const int MostChars = 512;
+
+    /// <summary>
+    /// How much of a string is asked for at once, and the number is not arbitrary.
+    /// </summary>
+    /// <remarks>
+    /// A BIGGER REQUEST CAN RETURN LESS TEXT, which is the trap this exists to avoid.
+    /// ReadUnicodeString halves its request until a read succeeds, so against a REPLAY that
+    /// recorded 160 characters, asking for 512 fails, 256 fails, and 128 succeeds - the larger ask
+    /// yields a string a third shorter than the smaller one would have. Two of the 70 descriptions
+    /// on the 0.5.5 capture came back cut mid-markup that way ("Rogue Exiles are [Sp"), which
+    /// compares unequal to the shipped file and reads as the GAME disagreeing rather than as the
+    /// read falling short.
+    ///
+    /// So the first step is exactly what the committed recordings hold, and a client with more to
+    /// give simply gets asked again. 160 is that size.
+    /// </remarks>
+    private const int StepChars = 160;
 
     /// <summary>Most stats one content may grant. A guard on a count that comes from memory.</summary>
     private const int MostStats = 64;
 
     /// <summary>Bytes of one entry of an array of foreign references: the row, then its table.</summary>
     private const ulong EntrySize = 16;
+
+    /// <summary>How far either way <see cref="Drift"/> looks for a stale stat index.</summary>
+    private const int DriftWindow = 8;
 
     private readonly IMemoryReader _reader;
     private readonly DatTableShape? _tables;
@@ -260,8 +280,36 @@ public sealed class EndgameMapContentCatalogue
         return stats;
     }
 
+    /// <summary>One string, in steps, so a long one is not paid for by a short read. See <see cref="StepChars"/>.</summary>
     private string Text(ulong at)
-        => MemoryReaderExtensions.IsPlausiblePointer(at) ? _reader.ReadUnicodeString(at, MostChars) : string.Empty;
+    {
+        if (!MemoryReaderExtensions.IsPlausiblePointer(at))
+        {
+            return string.Empty;
+        }
+
+        string first = _reader.ReadUnicodeString(at, StepChars);
+
+        // Short of the step means the terminator was inside it, which is the usual case and the
+        // whole string. Only a full step is ambiguous, and only that asks again.
+        if (first.Length < StepChars)
+        {
+            return first;
+        }
+
+        var built = new System.Text.StringBuilder(first);
+        for (int taken = StepChars; taken < MostChars; taken += StepChars)
+        {
+            string next = _reader.ReadUnicodeString(at + ((ulong)taken * sizeof(char)), StepChars);
+            built.Append(next);
+            if (next.Length < StepChars)
+            {
+                break;
+            }
+        }
+
+        return built.ToString();
+    }
 
     /// <summary>
     /// What the table holds, and how much of data/atlas-content.json it could replace.
@@ -283,18 +331,37 @@ public sealed class EndgameMapContentCatalogue
             said.Add($"  {LastError}");
         }
 
+        said.Add(file.Revision == 0
+            ? "  the shipped file is still in force - nothing has been learnt from this table yet"
+            : $"  IN FORCE: {file.LearntBadges} badges and {file.LearntEffects} effects from the game,"
+              + " the file behind them. Everything below compares the FILE against the game.");
+
         said.AddRange(Badges(file));
         said.AddRange(Effects(file));
         said.AddRange(Icons(file));
         return said;
     }
 
+    /// <summary>
+    /// The game's wording as the file would have written it: markup out, one space between words.
+    /// </summary>
+    /// <remarks>
+    /// BOTH HALVES ARE NEEDED AND EACH WAS LEARNT THE HARD WAY. The game writes "[Biome|Water]",
+    /// so comparing raw text against a file that ships the display half disagrees on every line
+    /// that mentions anything - 60 of 67 rows "differed" until this was stripped. And the game
+    /// separates a content's clauses with NEWLINES where the published copies joined them with a
+    /// space, which is a difference in punctuation rather than in wording.
+    /// </remarks>
+    public static string AsTheFileWouldWriteIt(string text)
+        => string.Join(' ', Files.KeywordGlossary.Plain(text).Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+
     /// <summary>Whether a row plus 100 is the badge the file calls by that number.</summary>
     private IEnumerable<string> Badges(AtlasContentNames file)
     {
         int matched = 0;
+        int named = 0;
         int worded = 0;
-        var missing = new List<string>();
+        var differs = new List<MapContentRow>();
         foreach (MapContentRow row in _rows)
         {
             if (file.Badge((uint)row.Index + BadgeIdBase) is not { } badge)
@@ -303,13 +370,21 @@ public sealed class EndgameMapContentCatalogue
             }
 
             matched++;
-            if (string.Equals(badge.Name, row.Name, StringComparison.Ordinal)
-                && string.Equals(badge.Description, row.Description, StringComparison.Ordinal))
+            bool sameName = string.Equals(badge.Name, row.Name, StringComparison.Ordinal);
+            bool sameWords = string.Equals(
+                AsTheFileWouldWriteIt(badge.Description),
+                AsTheFileWouldWriteIt(row.Description),
+                StringComparison.Ordinal);
+
+            named += sameName ? 1 : 0;
+            worded += sameWords ? 1 : 0;
+            if (!sameName || !sameWords)
             {
-                worded++;
+                differs.Add(row);
             }
         }
 
+        var missing = new List<string>();
         foreach ((uint id, AtlasContent _) in file.Badges)
         {
             long index = id - (long)BadgeIdBase;
@@ -320,7 +395,15 @@ public sealed class EndgameMapContentCatalogue
         }
 
         yield return $"  badges: the file has {file.Badges.Count}; {matched} of them are a row+{BadgeIdBase},"
-            + $" and {worded} of those agree on BOTH the name and the sentence";
+            + $" {named} agree on the name and {worded} on the sentence";
+        foreach (MapContentRow row in differs.Take(8))
+        {
+            AtlasContent badge = file.Badge((uint)row.Index + BadgeIdBase)!.Value;
+            yield return $"      0x{row.Index + BadgeIdBase:X} {row.Id}";
+            yield return $"        file: \"{badge.Name}\" / {badge.Description}";
+            yield return $"        game: \"{row.Name}\" / {AsTheFileWouldWriteIt(row.Description)}";
+        }
+
         if (missing.Count > 0)
         {
             yield return $"    {missing.Count} the rule does not reach: {string.Join(", ", missing.Order(StringComparer.Ordinal))}";
@@ -359,21 +442,87 @@ public sealed class EndgameMapContentCatalogue
         int found = file.Effects.Keys.Count(id => granted.Contains(id));
         yield return $"  effects: the file has {file.Effects.Count}; \"{stats.Path}\" holds {stats.Rows} rows"
             + $" and these contents grant {granted.Count} distinct ones";
-        yield return $"    {found} of the file's effect ids are among them"
+        yield return $"    {found} of the file's effect ids are among them as they stand"
             + (found == 0 ? " - so an effect id is NOT one of these stat rows" : string.Empty);
+
+        // THE DRIFT IS FOUND RATHER THAN ASSUMED. A stat index is a POSITION, so inserting rows
+        // moves every later one - and a file built against an older client keeps the old numbers.
+        // Trying a window of shifts is what turned "9 of 43, could be chance" into a measurement:
+        // a wrong shift finds nothing, and the right one finds more than no shift at all.
+        (int shift, int hits) = Drift(file, granted);
+        if (shift != 0)
+        {
+            yield return $"    {hits} are, shifted by {shift:+#;-#;0} - which is what a stale index looks like"
+                + " after the game inserted rows above them";
+        }
+    }
+
+    /// <summary>The shift that makes most of the file's effect ids land on a granted stat.</summary>
+    /// <remarks>
+    /// A SMALL WINDOW ON PURPOSE. Wide enough to find an insertion of a few rows, narrow enough
+    /// that it cannot wander until something lines up: a table of 27281 rows will eventually agree
+    /// with anything, and a "best shift" found over hundreds would be numerology rather than drift.
+    /// </remarks>
+    private static (int Shift, int Hits) Drift(AtlasContentNames file, HashSet<long> granted)
+    {
+        (int Shift, int Hits) best = (0, file.Effects.Keys.Count(id => granted.Contains(id)));
+        for (int shift = -DriftWindow; shift <= DriftWindow; shift++)
+        {
+            if (shift == 0)
+            {
+                continue;
+            }
+
+            int hits = file.Effects.Keys.Count(id => granted.Contains(id + shift));
+            if (hits > best.Hits)
+            {
+                best = (shift, hits);
+            }
+        }
+
+        return best;
+    }
+
+    /// <summary>The last part of an art path, which is the name every published copy kept.</summary>
+    public static string ArtName(string path)
+    {
+        int slash = path.LastIndexOf('/');
+        return slash >= 0 ? path[(slash + 1)..] : path;
     }
 
     /// <summary>What the art rows add to the names the file ships.</summary>
+    /// <remarks>
+    /// THE FILE'S ICON IS THE PATH'S LAST SEGMENT AND NOT THE ART ROW'S OWN ID, which is worth
+    /// saying because the two are different words: the row calls itself "Breach" and its path ends
+    /// "AtlasIconContentBreach", and the file ships the second. So this compares the segment.
+    /// </remarks>
     private IEnumerable<string> Icons(AtlasContentNames file)
     {
-        int pathed = _rows.Count(row => row.IconPath.Length > 0);
-        int knownToFile = _rows.Count(row => row.Icon.Length > 0 && file.Icons.Contains(row.Icon));
+        var pathed = _rows.Where(row => row.IconPath.Length > 0).ToList();
+        int agreeing = pathed.Count(row =>
+            file.Badge((uint)row.Index + BadgeIdBase) is { } badge
+            && string.Equals(badge.Icon, ArtName(row.IconPath), StringComparison.OrdinalIgnoreCase));
 
-        yield return $"  icons: {pathed} rows carry a whole art path, and {knownToFile} of their art ids"
-            + " are names the file already ships";
-        foreach (MapContentRow row in _rows.Where(row => row.IconPath.Length > 0).Take(3))
+        yield return $"  icons: {pathed.Count} of {_rows.Count} rows carry a whole art path,"
+            + $" and {agreeing} of those end in the very name the file ships";
+        foreach (MapContentRow row in pathed.Take(3))
         {
-            yield return $"      {row.Icon} -> {row.IconPath}";
+            yield return $"      {row.Id} -> {row.IconPath}";
+        }
+
+        // The other direction is the interesting one: a row the game gives NO picture for, that the
+        // file names an icon for anyway, is a name from somewhere other than this table.
+        var invented = _rows
+            .Where(row => row.IconPath.Length == 0 && file.Badge((uint)row.Index + BadgeIdBase) is { Icon.Length: > 0 })
+            .ToList();
+        if (invented.Count > 0)
+        {
+            yield return $"    {invented.Count} rows have no art path at all, yet the file names an icon for them:";
+            foreach (MapContentRow row in invented.Take(4))
+            {
+                yield return $"      0x{row.Index + BadgeIdBase:X} {row.Id} -> file says"
+                    + $" \"{file.Badge((uint)row.Index + BadgeIdBase)!.Value.Icon}\"";
+            }
         }
     }
 }

@@ -10,10 +10,16 @@ public sealed record AtlasBiome(string Name, uint Colour);
 /// </summary>
 /// <remarks>
 /// FROM THE REFERENCE, which ships this table as <c>Plugins/Atlas2/json/biome.json</c> - the ids
-/// are the game's own and there is nothing to derive them from. Their order is confirmed by the
-/// game's own data from the other side: the six "Also counts as a ... Area" tablet effects in
-/// <c>data/atlas-content.json</c> run Water, Mountain, Grass, Forest, Swamp, Desert, which is
-/// exactly ids 0 to 5 here.
+/// are the game's own and there is nothing to derive them from. Their order is confirmed from the
+/// other side BY THE GAME, 2026-09-15: rows 53 to 58 of EndgameMapContent are WaterBiome,
+/// MountainBiome, GrassBiome, ForestBiome, SwampBiome and DesertBiome, in that order, each saying
+/// "Also counts as a ... Area" (tests/fixtures/session-2026-09-mapcontent.rec).
+///
+/// THAT USED TO CITE data/atlas-content.json AND THE CITATION WAS WRONG, which is worth keeping
+/// because the conclusion was right anyway. The file holds FIVE of those effects, not six, and
+/// they run Mountain to Desert rather than Water to Desert - its ids are four Stats rows lower
+/// than the current client's, so its "Swamp" entry is the game's Water. The order held; the
+/// evidence for it did not.
 ///
 /// TWO COLOURS ARE NOT THE REFERENCE'S, and both for the same reason - this is drawn as a
 /// two-pixel ring on a dark plate, where the reference draws it on a coloured background:

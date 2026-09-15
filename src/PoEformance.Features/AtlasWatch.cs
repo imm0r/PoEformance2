@@ -790,13 +790,22 @@ public sealed class AtlasWatch
     /// NO NODE OF ITS OWN and no budget: the address comes from the map walk rather than from the
     /// atlas, so trying it again on another node would re-read the same pointer. Once that walk has
     /// an address this either reads the table or says why, and either way it is over.
+    ///
+    /// AND THE TABLE GOES STRAIGHT INTO THE NAMES. data/atlas-content.json is the fallback now, not
+    /// the answer: measured against this table it had a badge carrying another badge's text, four
+    /// sentences with a clause missing, three contents absent, and every high effect id stale by
+    /// four Stats rows - a Water biome reading as Swamp. See AtlasContentNames.Learn for what is
+    /// taken from the game and what is deliberately left with the file.
     /// </remarks>
-    private void LearnContents()
+    /// <returns>Whether this pass replaced anything.</returns>
+    private bool LearnContents()
     {
-        if (_endgame.ContentTable != 0)
+        if (_endgame.ContentTable == 0 || !_mapContent.Read(_endgame.ContentTable))
         {
-            _mapContent.Read(_endgame.ContentTable);
+            return false;
         }
+
+        return _contents.Revision == 0 && _contents.Learn(_mapContent.Rows, _mapContent.BadgeIdBase) > 0;
     }
 
     /// <summary>
@@ -814,6 +823,11 @@ public sealed class AtlasWatch
         _studiedAt = nowMs;
         _routes = AtlasRoutes.From(live);
 
+        // BEFORE THE WORDS, not after, and the order is the point: Learn is what replaces the
+        // shipped content table with the game's own, so a study that learnt on this pass would
+        // otherwise spend the whole of it showing the wording it just corrected.
+        bool learnt = Learn(live);
+
         bool fresh = false;
         _said.Clear();
         foreach (AtlasNode node in live)
@@ -828,7 +842,7 @@ public sealed class AtlasWatch
         // The report is rebuilt only when something in it changed - the table arriving, or a map
         // scrolled into view for the first time. Four hundred rows and eighty ratings are not a
         // thing to build three times a second for an atlas nobody moved.
-        if (Learn(live) || fresh)
+        if (learnt || fresh)
         {
             Republish();
         }
@@ -866,7 +880,11 @@ public sealed class AtlasWatch
             // column 0 holds the WorldAreas row and ITS table. One chain, two tables, and the
             // second is the one that says which of the first's 442 areas the atlas can reach.
             bool endgame = _endgame.ReadFromNode(node.Address);
-            LearnContents();
+
+            // Not folded into the line above: the content table comes OFF that walk, so it has to
+            // be tried after it and whether or not the map ids themselves came back.
+            endgame |= LearnContents();
+
             if (!_catalogue.ReadFromNode(node.Address))
             {
                 return endgame;
