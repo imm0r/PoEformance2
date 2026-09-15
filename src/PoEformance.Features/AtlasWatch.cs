@@ -273,6 +273,16 @@ public sealed class AtlasWatch
     private readonly EndgameMapContentCatalogue _mapContent;
 
     /// <summary>
+    /// Which league mechanic sits on a node, and the picture the game puts on it.
+    /// </summary>
+    /// <remarks>
+    /// THE ONLY SOURCE OF A CONTENT PICTURE THAT IS NOT A TABLE OF IDS. See
+    /// <see cref="AtlasObjectiveCatalogue"/>: it follows the game's own link from the node to its
+    /// objective row, which is what a table of ids cannot do once the game renumbers.
+    /// </remarks>
+    private readonly AtlasObjectiveCatalogue _objectives;
+
+    /// <summary>
     /// The game's own sentence per stat, for the tokens no content and no file names.
     /// </summary>
     /// <remarks>
@@ -309,6 +319,7 @@ public sealed class AtlasWatch
         _catalogue = new WorldAreaCatalogue(reader, schema);
         _endgame = new EndgameMapCatalogue(reader, schema);
         _mapContent = new EndgameMapContentCatalogue(reader, schema);
+        _objectives = new AtlasObjectiveCatalogue(reader, schema);
         _contents = contents ?? AtlasContentNames.Empty;
         _statDescriptions = statDescriptions ?? Game.Components.StatDescriptions.Empty;
         _shippedDescriptions = _statDescriptions;
@@ -805,7 +816,58 @@ public sealed class AtlasWatch
         said.Add(string.Empty);
         said.AddRange(Sentences());
         said.Add(string.Empty);
+        said.AddRange(Mechanics(nodes));
+        said.Add(string.Empty);
         said.AddRange(Tokens(nodes));
+        return said;
+    }
+
+    /// <summary>
+    /// Which league mechanic each node hosts, and whether the game named a picture for it.
+    /// </summary>
+    /// <remarks>
+    /// THE COVERAGE QUESTION, and it is the one the committed captures cannot answer. A recording
+    /// holds only the reads its build performed, so the fixtures resolve two of the eight
+    /// objective ids and read the rest as nothing - enough to settle that the column IS the icon,
+    /// not enough to say how many nodes end up with a picture. This line says it on a machine with
+    /// the game running, which is the only place the question can be put.
+    /// </remarks>
+    private IReadOnlyList<string> Mechanics(IReadOnlyList<AtlasNode> nodes)
+    {
+        var hosting = new SortedDictionary<string, (int Nodes, string Icon, string Words)>(StringComparer.Ordinal);
+        foreach (AtlasNode node in nodes)
+        {
+            if (_objectives.For(node.Address) is not { } found)
+            {
+                continue;
+            }
+
+            (int count, string icon, string words) = hosting.GetValueOrDefault(found.Id);
+            hosting[found.Id] = (count + 1, found.Icon.Length > 0 ? found.Icon : icon,
+                words.Length > 0 ? words : found.Words);
+        }
+
+        if (hosting.Count == 0)
+        {
+            return
+            [
+                "NODE MECHANICS - none on screen; a node reaches one only through its atlas row,"
+                    + " and most positions host nothing",
+            ];
+        }
+
+        int drawn = hosting.Values.Count(one => one.Icon.Length > 0);
+        var said = new List<string>
+        {
+            $"NODE MECHANICS - {hosting.Values.Sum(one => one.Nodes)} nodes over {hosting.Count} mechanics,"
+                + $" {drawn} of which the game named a picture for",
+        };
+
+        foreach ((string id, (int count, string icon, string words)) in hosting)
+        {
+            said.Add($"  {id,-14} {count,4} nodes  {(icon.Length > 0 ? icon : "- no art named"),-28} {words}");
+        }
+
         return said;
     }
 
@@ -1016,7 +1078,7 @@ public sealed class AtlasWatch
         _said.Clear();
         foreach (AtlasNode node in live)
         {
-            _said[node.Grid] = Words(node, _contents);
+            _said[node.Grid] = Words(node, _contents, _objectives.For(node.Address));
             if (node.MapId.Length > 0)
             {
                 fresh |= _seen.Add(node.MapId);
@@ -1114,12 +1176,29 @@ public sealed class AtlasWatch
     /// id stays known rather than being reported as one nothing has heard of; it is the drawing
     /// that skips it. See <see cref="Placeholder"/>.
     /// </remarks>
-    public static IReadOnlyList<AtlasSaid> Words(AtlasNode node, AtlasContentNames contents)
+    /// <param name="node">The node, as the last study read it.</param>
+    /// <param name="contents">What the ids mean.</param>
+    /// <param name="objective">
+    /// The league mechanic the game says this node hosts, or null for the many that host none.
+    /// </param>
+    /// <remarks>
+    /// THE OBJECTIVE GOES FIRST AND IT IS THE ONLY LINE HERE WITH A PICTURE OF THE GAME'S OWN
+    /// CHOOSING. Everything else names its art through a table of ids; this follows the game's
+    /// link from the node to its objective row, which carries the path. See
+    /// <see cref="AtlasObjectiveCatalogue"/> for why that link had to be read rather than guessed.
+    /// </remarks>
+    public static IReadOnlyList<AtlasSaid> Words(
+        AtlasNode node, AtlasContentNames contents, AtlasObjective? objective = null)
     {
         ArgumentNullException.ThrowIfNull(node);
         ArgumentNullException.ThrowIfNull(contents);
 
         var said = new List<AtlasSaid>();
+
+        if (objective is { } mechanic && mechanic.Words.Length > 0)
+        {
+            Add(new AtlasContent(string.Empty, mechanic.Words, mechanic.Icon), mechanic.Words);
+        }
 
         foreach (uint raw in node.BadgeIds)
         {
