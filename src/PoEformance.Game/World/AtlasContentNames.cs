@@ -117,6 +117,12 @@ public sealed class AtlasContentNames
     /// <summary>How many meanings are known, across both tables.</summary>
     public int Count => _badges.Count + _effects.Count;
 
+    /// <summary>Every badge the file names, for anything measuring the file against the game.</summary>
+    public IReadOnlyDictionary<uint, AtlasContent> Badges => _badges;
+
+    /// <summary>Every effect it names, likewise. Keyed by the masked id, not by what a node carries.</summary>
+    public IReadOnlyDictionary<uint, AtlasContent> Effects => _effects;
+
     /// <summary>What identifies a content: the low half of whatever the node carried.</summary>
     public static uint IdOf(uint raw) => raw & 0xFFFF;
 

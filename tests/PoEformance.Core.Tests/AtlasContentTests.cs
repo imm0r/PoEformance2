@@ -144,6 +144,42 @@ public class AtlasContentTests
     }
 
     [Fact]
+    public void SIXTYSEVENOfTheBadgeIdsAreConsecutiveWhichIsWhatARowIndexLooksLike()
+    {
+        // THE PREMISE OF THE ONLY UNMEASURED THING LEFT IN THIS FILE, pinned on the file side where
+        // it costs nothing. If badge ids are EndgameMapContent row indices plus 100 - which is what
+        // AtlasNode.BadgeVectorBegin says the game does with that table - then the file's ids have
+        // to be a run of consecutive numbers starting at 100, and they are: 0x64..0xA6 with no gap.
+        //
+        // The two that are NOT in that run are the interesting ones and are named here rather than
+        // waved at. 0x3E8 and 0x6157 would be rows 900 and 24819 of a table nothing that small, and
+        // 0x6157 is ALSO one of the file's effects with the same sentence - so if the effect ids
+        // turn out to be Stats rows, those two were filed under the wrong heading by the port.
+        uint[] ids = [.. Loaded().Badges.Keys.Order()];
+
+        uint[] run = [.. ids.Where(id => id is >= 0x64 and <= 0xA6)];
+        Assert.Equal(67, run.Length);
+        Assert.Equal(Enumerable.Range(0x64, 67).Select(id => (uint)id), run);
+
+        Assert.Equal<uint[]>([0x3E8, 0x6157], [.. ids.Where(id => id is < 0x64 or > 0xA6)]);
+        Assert.Contains(0x6157u, Loaded().Effects.Keys);
+    }
+
+    [Fact]
+    public void ANDTheEffectIdsAreNowhereNearThatRunButAreInStatsRange()
+    {
+        // The other half of the same premise: the effects cannot be the same table's rows. They run
+        // 1240..26741 against a badge run that ends at 166, and Stats.dat has 27281 rows - which is
+        // what makes "an effect id is a Stats row index" the hypothesis worth a capture.
+        uint[] ids = [.. Loaded().Effects.Keys.Order()];
+
+        Assert.Equal(43, ids.Length);
+        Assert.Equal(1240u, ids[0]);
+        Assert.Equal(26741u, ids[^1]);
+        Assert.DoesNotContain(ids, id => id is >= 0x64 and <= 0xA6);
+    }
+
+    [Fact]
     public void ANDTheLabelPrefersTheNameOverTheSentence()
     {
         AtlasContentNames names = Loaded();

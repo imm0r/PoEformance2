@@ -261,6 +261,30 @@ public class EndgameMapSessionTests
     }
 
     [Fact]
+    public void ThirteenMapsCarryAContentArrayAndTHISCaptureCannotFollowOne()
+    {
+        // WHAT A COMMITTED RECORDING CAN AND CANNOT SETTLE, in one test, because getting this
+        // backwards has cost this project a whole round before. The MapContent column is a dat
+        // ARRAY - a count and a pointer - and both of those sit INSIDE the row bytes this capture
+        // holds, so the count is answerable here and is thirteen. The entries the pointer leads to
+        // were never read by the build that recorded this, so the table behind them is not in the
+        // file and no re-reading of the fixture will produce it.
+        //
+        // The test pins both halves on purpose. A capture taken with EndgameMapContentCatalogue in
+        // place will make the second half wrong, and that is exactly when this should fail: it is
+        // the reminder to move the assertion rather than a claim that the route does not work.
+        (EndgameMapCatalogue endgame, ReplayMemoryReader replay, _) = Walked();
+        using (replay)
+        {
+            Assert.Equal(173, endgame.Maps.Count);
+            Assert.Equal(13, endgame.ContentArrays);
+
+            Assert.Equal(0UL, endgame.ContentTable);
+            Assert.Empty(endgame.ContentTableRoute);
+        }
+    }
+
+    [Fact]
     public void TheWalkReadsEveryRowAndEachOneNamesADifferentArea()
     {
         // 173 rows, 173 areas, none repeated - so "173 rows" and "173 maps" are the same number

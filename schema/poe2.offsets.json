@@ -510,9 +510,32 @@
       "comment": "A row of EndgameMapContentSet.dat - the CATEGORY a map belongs to in the game's own content vocabulary, reached through EndgameMapsRow.MapContentSetRef. Computed from dat-schema's three PoE2 columns (Id string, Content foreignrow array, a trailing bool) at 0x19, and that size is CONFIRMED without reading a byte of it: the five distinct rows the 173 EndgameMaps rows point at lie at deltas 0, 25, 75, 100 and 125 - every one a multiple of 25 = 0x19. Five categories over 131 maps is the shape of a classification rather than of noise. The Id is the engine name and the thing to key on; what the strings actually say is unread until a capture carries them, though the JS reference (Itzjomofosho/jmrpoe2-scripts) reports values like \"CorruptedMap\" and \"BreachTowerBoss\".",
       "fields": {
         "IdPtr": { "offset": "0x00", "type": "ptr" },
-        "ContentArray": { "offset": "0x08", "type": "ptr", "comment": "Content -> EndgameMapContent, an array. What every map of this category carries. Not read yet." }
+        "ContentArray": { "offset": "0x08", "type": "ptr", "comment": "Content -> EndgameMapContent, an array (count at +0x08, entries at +0x10) of 16-byte foreign references. What every map of this category carries. THE SECOND ROUTE TO THE EndgameMapContent TABLE, and the reason it is worth having beside EndgameMapsRow.MapContentArray: the content-set rows are reached by 131 of the 173 maps, where the map-side array is on THIRTEEN, so a session that reads any map at all almost certainly has one of these in hand. Either route gives the table at the entry's +0x08; EndgameMapContentCatalogue tries the map side first and falls back here." }
       },
       "consts": { "ComputedRowSize": "0x19" }
+    },
+
+    "EndgameMapContentRow": {
+      "comment": "A row of EndgameMapContent.dat - ONE KIND OF CONTENT a map or a node can carry ('Breach', 'Powerful Map Boss'), reached through EndgameMapsRow.MapContentArray or EndgameMapContentSetRow.ContentArray. Computed from dat-schema's nine PoE2 columns at 0x5D. WHAT IT IS FOR: this is where data/atlas-content.json could come from. That file ships 69 badges and 43 effects by hand, ported from GameHelper2, and its badge ids are 0x64..0xA6 - SIXTY-SEVEN CONSECUTIVE NUMBERS, which is what a row index plus a constant looks like. The constant is written down in AtlasNode.BadgeVectorBegin: the badge vector holds one BYTE per badge and 'the content id is the row plus 100', and 100 is 0x64. So badge id 0x64 should be row 0 of this table, 0xA6 should be row 66, and Name/Description on those rows should be the file's own words. Two of the file's badges do NOT fit that rule - 0x3E8 and 0x6157, which would be rows 900 and 24819 - and 0x6157 is ALSO one of its effects, so those two are the ones to watch: the effect ids run 1240..26741, which is the range of Stats.dat's 27281 rows rather than of this table's. THE TEST IS THE SAME CAPTURE FOR BOTH, because this row carries a Stats array: resolving those entries to row INDICES (DatTableFacts.IndexOf, no string read needed) says whether an effect id is a Stats row index, while the row's own position says whether a badge id is this row plus 100. Neither is believed here yet - both are hypotheses with a measurement attached.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr", "comment": "The engine name, e.g. Breach. Not translated, which is what makes it the thing to key on." },
+        "StatsArray": { "offset": "0x08", "type": "ptr", "comment": "Stats -> Stats.dat, an array (count at +0x08, entries at +0x10) of 16-byte foreign references: WHAT THIS CONTENT GRANTS. The candidate answer to where the file's 43 effect ids come from - they are 1240..26741 and Stats has 27281 rows." },
+        "StatValuesArray": { "offset": "0x18", "type": "ptr", "comment": "The numbers for the stats above, an array of i32. Not read yet - the magnitude a node shows comes off the node's own token, not from here." },
+        "DescriptionPtr": { "offset": "0x28", "type": "ptr", "comment": "The sentence: 'Area contains an Otherworldly Breach'. The file's own description field for a badge is this shape, which is what makes the comparison meaningful rather than a coincidence of wording." },
+        "NamePtr": { "offset": "0x30", "type": "ptr", "comment": "The short name: 'Breach'. Empty on the entries the file records with no name." },
+        "MapObjectiveRef": { "offset": "0x3C", "type": "ptr", "comment": "MapObjective -> EndgameMapObjectives, which holds the ObjectiveText and CompletionText a node shows. Not read here; see EndgameMapAtlasRow.MapObjectiveRef, where the same table is reached from the node side." },
+        "VisualIdentityRef": { "offset": "0x4C", "type": "ptr", "comment": "VisualIdentity -> EndgameMapContentVisualIdentity (row here, table at +0x54). THE ICON, and the one that could close a gap this project wrote down and could not fill: data/atlas-content.json carries an art NAME ('AtlasIconContentBreach') where what is wanted is a PATH, because every project that published this data kept only the last part of it. The referenced row holds the whole path." }
+      },
+      "consts": { "ComputedRowSize": "0x5D", "BadgeIdBase": "100" }
+    },
+
+    "EndgameMapContentVisualIdentityRow": {
+      "comment": "A row of EndgameMapContentVisualIdentity.dat, reached through EndgameMapContentRow.VisualIdentityRef. Four columns computed to 0x28, unverified against a table that states its own size. Only the first two are wanted: the Id is what data/atlas-content.json calls the icon, and AtlasIcon is the whole path that file does not have.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr" },
+        "AtlasIconPtr": { "offset": "0x08", "type": "ptr", "comment": "The full art path, as against the Id's last-part-only name." }
+      },
+      "consts": { "ComputedRowSize": "0x28" }
     },
 
     "TagsRow": {
