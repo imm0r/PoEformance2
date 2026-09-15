@@ -780,6 +780,63 @@ public sealed class AtlasWatch
         said.AddRange(_endgame.Describe(Names));
         said.Add(string.Empty);
         said.AddRange(_mapContent.Describe(_contents));
+        said.Add(string.Empty);
+        said.AddRange(Tokens(nodes));
+        return said;
+    }
+
+    /// <summary>
+    /// Every effect token the atlas is actually showing, with the game's own name for its stat.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER DIRECTION FROM Describe, and the one that says how big the gap is. That compares
+    /// the FILE against the table; this asks what the NODES are carrying, which is the only list
+    /// that matters to somebody looking at the screen. On the captures so far the atlas shows about
+    /// ninety distinct tokens and the file names six of them - so the bare numbers are the normal
+    /// case rather than the exception, and every one of them has a stat id behind it.
+    /// </remarks>
+    private IReadOnlyList<string> Tokens(IReadOnlyList<AtlasNode> nodes)
+    {
+        // Distinct ids with the magnitudes seen for each: an id carrying several is the proof that
+        // the number belongs to the TOKEN rather than to the content, and it is free to collect.
+        var magnitudes = new Dictionary<uint, SortedSet<uint>>();
+        foreach (AtlasNode node in nodes)
+        {
+            foreach (uint raw in node.ContentTokens)
+            {
+                uint id = AtlasContentNames.IdOf(raw);
+                if (!magnitudes.TryGetValue(id, out SortedSet<uint>? seen))
+                {
+                    seen = [];
+                    magnitudes[id] = seen;
+                }
+
+                seen.Add(AtlasContentNames.MagnitudeOf(raw));
+            }
+        }
+
+        if (magnitudes.Count == 0)
+        {
+            return ["NODE TOKENS - none on screen; the atlas shows these only for nodes it has drawn"];
+        }
+
+        IReadOnlyDictionary<uint, string> stats = _mapContent.NameStats(magnitudes.Keys);
+        int known = magnitudes.Keys.Count(id => _contents.Effect(id) is not null);
+
+        var said = new List<string>
+        {
+            $"NODE TOKENS - {magnitudes.Count} distinct ids on screen, {known} of which have words;"
+                + $" {stats.Count} resolve to a stat id",
+            $"  {magnitudes.Count(pair => pair.Value.Count > 1)} carry MORE THAN ONE magnitude, which is"
+                + " what says the number belongs to the token",
+        };
+
+        foreach ((uint id, SortedSet<uint> seen) in magnitudes.OrderBy(pair => pair.Key))
+        {
+            said.Add($"  {id,6} x{string.Join("/", seen),-12} {stats.GetValueOrDefault(id, "-"),-44}"
+                + $" {_contents.Effect(id)?.Description ?? string.Empty}");
+        }
+
         return said;
     }
 
@@ -805,8 +862,27 @@ public sealed class AtlasWatch
             return false;
         }
 
-        return _contents.Revision == 0 && _contents.Learn(_mapContent.Rows, _mapContent.BadgeIdBase) > 0;
+        return _contents.Revision == 0
+            && _contents.Learn(_mapContent.Rows, _mapContent.BadgeIdBase, _mapContent.StatTokenBase) > 0;
     }
+
+    /// <summary>
+    /// Where the words on the atlas are coming from: the game, or the shipped file.
+    /// </summary>
+    /// <remarks>
+    /// WORTH A LINE OF ITS OWN because the two look identical on screen. A badge reads the same
+    /// whether it came from EndgameMapContent or from data/atlas-content.json - right up to the
+    /// handful where the file is wrong, which is exactly the case nobody would notice. This says
+    /// which is in force, so "the file is stale again" is a thing somebody can see rather than
+    /// something they find out three leagues later.
+    /// </remarks>
+    public string ContentSource => _contents.Revision == 0
+        ? _mapContent.Table is null
+            ? $"data/atlas-content.json ({_contents.Count} entries) - the atlas has not been read yet"
+            : $"data/atlas-content.json ({_contents.Count} entries) - the game's own table would not read:"
+              + $" {(_mapContent.LastError.Length > 0 ? _mapContent.LastError : "no reason given")}"
+        : $"the game ({_contents.LearntBadges} badges and {_contents.LearntEffects} effects from"
+          + $" EndgameMapContent), with data/atlas-content.json behind it";
 
     /// <summary>
     /// Takes the slow half again: what each node is, and every route across the atlas.

@@ -19,17 +19,23 @@ namespace PoEformance.Core.Tests;
 /// "the row plus 100". Row 0 of EndgameMapContent is PowerfulMapBoss and badge 0x64 is "Powerful
 /// Map Boss"; row 1 is Breach and 0x65 is "Breach"; 66 of the 67 agree on the name outright.
 ///
-/// AN EFFECT ID IS A Stats.dat ROW INDEX. Predicted because the file's effect ids run 1240..26741
-/// and Stats has 27281 rows, and confirmed the only way that can be confirmed: the SENTENCE the
-/// game attaches to the stat is the sentence the file attaches to the id. It is not a coincidence
-/// of ranges - 43 ids drawn at random from 27281 rows would be expected to hit the 83 these
-/// contents grant about a tenth of the time, and this hits fourteen.
+/// AN EFFECT ID IS A Stats.dat ROW - PLUS ONE. Predicted because the file's effect ids run
+/// 1240..26741 and Stats has 27281 rows, and confirmed the only way that can be confirmed: the
+/// SENTENCE the game attaches to the stat is the sentence the file attaches to the id. It is not a
+/// coincidence of ranges - 43 ids drawn at random from 27281 rows would be expected to hit the 83
+/// these contents grant about a tenth of the time, and this hits fourteen.
+///
+/// THE "PLUS ONE" IS NOT A DETAIL, and it was got wrong first. A node's token is the stat's row
+/// index plus one: the six biome contents grant 25861..25866 and real nodes carry 25862..25867,
+/// with 25861 on no node in any of four captures and 25867 - granted by nothing - on several. The
+/// first version of the learning filed effects by row index, so it answered no lookup at all while
+/// every number in the table still looked right.
 ///
 /// AND THE FILE IS WRONG IN WAYS THAT ONLY THE GAME COULD HAVE SHOWN. Its high effect ids are stale
-/// by FOUR rows, so a Water biome reads as Swamp and a Mountain as Desert on the current client;
-/// one badge carries another badge's text entirely; four sentences dropped the game's first line;
-/// three contents are missing; and 53 of its icon names name no art the game has. Every one of
-/// those is a thing the tool has been quietly showing.
+/// by FIVE tokens, so a Water biome reads as Desert on the current client and the other five have
+/// no words at all; one badge carries another badge's text entirely; four sentences dropped a
+/// clause of the game's wording; three contents are missing; and 53 of its icon names name no art
+/// the game has. Every one of those is a thing the tool has been quietly showing.
 /// </remarks>
 public class EndgameMapContentSessionTests
 {
@@ -227,52 +233,70 @@ public class EndgameMapContentSessionTests
     }
 
     [Fact]
-    public void BUTTheFilesHighEffectIdsAreStaleByFourRows()
+    public void ATOKENISTheStatsRowIndexPLUSONE()
     {
-        // WHAT A STALE INDEX LOOKS LIKE, and why this is a live fault rather than a curiosity. A
-        // stat id is a POSITION in Stats.dat, so rows inserted above one move it. Somewhere between
-        // 19545 and 24104 the game gained four rows, and the file kept the old numbers - so the
-        // biome effects are all four too low.
+        // THE OFF-BY-ONE, and the six biomes settle it because they are consecutive. The contents
+        // grant stat indices 25861..25866; the tokens real nodes carry are 25862..25867, and 25861
+        // appears on NO node in any of four captures while 25867 - which no content grants - appears
+        // on several. A shift of nothing cannot produce that; a shift of one does.
         //
-        // The consequence is exact and user-visible: a node's token for the WATER biome is 25861 on
-        // this client, the file says 25861 is "Also counts as a Swamp Area", and the tool shows
-        // Swamp. Mountain shows as Desert. The other four biomes are not in the file at all.
+        // It is written down because the first version of the learning filed effects by row index
+        // and so answered no lookup at all, with every number in the table still looking right.
+        (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
+        using (replay)
+        {
+            Assert.Equal(1u, contents.StatTokenBase);
+
+            MapContentRow water = Assert.Single(contents.Rows, row => row.Id == "WaterBiome");
+            Assert.Equal([25861L], water.Stats);
+            Assert.Equal(25862u, contents.TokenFor(water.Stats[0]));
+        }
+    }
+
+    [Fact]
+    public void BUTTheFilesHighEffectIdsAreStaleByFiveTokens()
+    {
+        // WHAT A STALE ID LOOKS LIKE, and why this is a live fault rather than a curiosity. An
+        // effect id is a POSITION in Stats.dat, so rows inserted above one move it. Somewhere
+        // between 19546 and 24109 the game gained rows, and the file kept the old numbers - so its
+        // biome block sits at 25858..25862 where this client's tokens are 25862..25867.
+        //
+        // The consequence is exact and user-visible: a node's token for WATER is 25862, the file
+        // says 25862 is "Also counts as a Desert Area", and the tool shows Desert. The other five
+        // biomes are not in the file at any token it would be asked with.
         (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
         using (replay)
         {
             AtlasContentNames file = File();
-            (string Content, uint Stat, string Biome)[] biomes =
+            (string Content, uint Token, string Biome)[] biomes =
             [
-                ("WaterBiome", 25861, "Water"),
-                ("MountainBiome", 25862, "Mountain"),
-                ("GrassBiome", 25863, "Grass"),
-                ("ForestBiome", 25864, "Forest"),
-                ("SwampBiome", 25865, "Swamp"),
-                ("DesertBiome", 25866, "Desert"),
+                ("WaterBiome", 25862, "Water"),
+                ("MountainBiome", 25863, "Mountain"),
+                ("GrassBiome", 25864, "Grass"),
+                ("ForestBiome", 25865, "Forest"),
+                ("SwampBiome", 25866, "Swamp"),
+                ("DesertBiome", 25867, "Desert"),
             ];
 
-            foreach ((string content, uint stat, string biome) in biomes)
+            foreach ((string content, uint token, string biome) in biomes)
             {
                 MapContentRow row = Assert.Single(contents.Rows, row => row.Id == content);
-                Assert.Equal([(long)stat], row.Stats);
+                Assert.Equal(token, contents.TokenFor(row.Stats[0]));
                 Assert.Equal($"Also counts as a {biome} Area", EndgameMapContentCatalogue.AsTheFileWouldWriteIt(row.Description));
 
-                // The file has the same sentence FOUR rows lower - for five of the six. Water falls
-                // off the bottom of its run entirely, which is the other half of the same drift:
-                // the file's biome block is 25858..25862 where the game's is 25861..25866.
+                // The file has the same sentence FIVE tokens lower - for five of the six. Water
+                // falls off the bottom of the file's run entirely.
                 Assert.Equal(
                     biome == "Water" ? null : $"Also counts as a {biome} Area",
-                    file.Effect(stat - 4)?.Description);
+                    file.Effect(token - 5)?.Description);
             }
 
-            // And what the tool shows today for the two the file does reach unshifted: the wrong
-            // biome. The remaining four are not in the file at any id, so they show as nothing.
-            Assert.Equal("Also counts as a Swamp Area", Assert.NotNull(file.Effect(25861)).Description);
+            // And what the tool shows today for the one token the file does reach: the wrong biome.
             Assert.Equal("Also counts as a Desert Area", Assert.NotNull(file.Effect(25862)).Description);
-            Assert.Null(file.Effect(25863));
-            Assert.Null(file.Effect(25864));
-            Assert.Null(file.Effect(25865));
-            Assert.Null(file.Effect(25866));
+            foreach (uint token in (uint[])[25863, 25864, 25865, 25866, 25867])
+            {
+                Assert.Null(file.Effect(token));
+            }
         }
     }
 
@@ -280,14 +304,14 @@ public class EndgameMapContentSessionTests
     public void ANDTheDriftIsFoundByLookingRatherThanByBeingTold()
     {
         // The report has to say this by itself, because the next client will drift again and nobody
-        // will be looking for it. Trying a window of shifts turns "9 of 43 match, which could be
-        // chance" into "14 match at +4, which is not" - and a wrong shift finds fewer, not more.
+        // will be looking for it. Trying a window of shifts turns "4 of 43 match, which could be
+        // chance" into "14 match at +5, which is not" - and a wrong shift finds fewer, not more.
         (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
         using (replay)
         {
             string[] said = [.. contents.Describe(File())];
-            Assert.Contains(said, line => line.Contains("shifted by +4", StringComparison.Ordinal));
-            Assert.Contains(said, line => line.Contains("9 of the file's effect ids", StringComparison.Ordinal));
+            Assert.Contains(said, line => line.Contains("shifted by +5", StringComparison.Ordinal));
+            Assert.Contains(said, line => line.Contains("4 of the file's effect ids", StringComparison.Ordinal));
         }
     }
 
@@ -353,7 +377,7 @@ public class EndgameMapContentSessionTests
             AtlasContentNames names = File();
             Assert.Equal(0, names.Revision);
 
-            Assert.True(names.Learn(contents.Rows, contents.BadgeIdBase) > 0);
+            Assert.True(names.Learn(contents.Rows, contents.BadgeIdBase, contents.StatTokenBase) > 0);
             Assert.Equal(1, names.Revision);
             Assert.Equal(70, names.LearntBadges);
 
@@ -371,13 +395,15 @@ public class EndgameMapContentSessionTests
                 "Contains 2 additional Shrines Shrines release an Azmeri Spirit when activated",
                 Assert.NotNull(names.Badge(0x75)).Description);
 
-            // And the biomes, which were the live fault: 25861 said Swamp and means Water.
-            Assert.Equal("Also counts as a Water Area", Assert.NotNull(names.Effect(25861)).Description);
-            Assert.Equal("Also counts as a Mountain Area", Assert.NotNull(names.Effect(25862)).Description);
-            Assert.Equal("Also counts as a Grass Area", Assert.NotNull(names.Effect(25863)).Description);
-            Assert.Equal("Also counts as a Forest Area", Assert.NotNull(names.Effect(25864)).Description);
-            Assert.Equal("Also counts as a Swamp Area", Assert.NotNull(names.Effect(25865)).Description);
-            Assert.Equal("Also counts as a Desert Area", Assert.NotNull(names.Effect(25866)).Description);
+            // And the biomes, which were the live fault: token 25862 said Desert and means Water.
+            // Keyed by the TOKEN a node carries, which is the stat's row index plus one - filing
+            // them by the index is what made the first version of this answer nothing at all.
+            Assert.Equal("Also counts as a Water Area", Assert.NotNull(names.Effect(25862)).Description);
+            Assert.Equal("Also counts as a Mountain Area", Assert.NotNull(names.Effect(25863)).Description);
+            Assert.Equal("Also counts as a Grass Area", Assert.NotNull(names.Effect(25864)).Description);
+            Assert.Equal("Also counts as a Forest Area", Assert.NotNull(names.Effect(25865)).Description);
+            Assert.Equal("Also counts as a Swamp Area", Assert.NotNull(names.Effect(25866)).Description);
+            Assert.Equal("Also counts as a Desert Area", Assert.NotNull(names.Effect(25867)).Description);
 
             // The FILE view is untouched, because that is what a comparison against the game needs.
             Assert.Equal("Monstrous Treasure", names.Badges[0x8C].Name);
@@ -404,20 +430,20 @@ public class EndgameMapContentSessionTests
         using (replay)
         {
             AtlasContentNames names = File();
-            names.Learn(contents.Rows, contents.BadgeIdBase);
+            names.Learn(contents.Rows, contents.BadgeIdBase, contents.StatTokenBase);
 
             Assert.Equal(22, names.LearntEffects);
 
-            // Shared between three rows: the file's generic wording survives.
-            Assert.Equal("Contains {0} additional Essence", Assert.NotNull(names.Effect(4679)).Description);
+            // SHARED, so nothing is learnt for it: stat 4679 (token 4680) is granted by three rows
+            // with three different sentences. The file's own 4679 entry is left standing, and it is
+            // filed under an id no node asks with - which is the drift, not this rule.
+            Assert.Null(names.Effect(4680));
 
-            // A number in the sentence: left with the file, which holes it correctly already.
-            Assert.Equal(
-                "Area has {0} additional random Waystone Modifiers",
-                Assert.NotNull(names.Effect(4738)).Description);
-
-            // And one the file never had and the game cannot unambiguously give: still nothing.
-            Assert.Null(names.Effect(24062));
+            // A NUMBER IN THE SENTENCE, so Irradiated is not learnt either and its token has no
+            // words at all. Breach is the neighbour and IS learnt, which is the check that this
+            // test is looking at the right token rather than at an empty table.
+            Assert.Null(names.Effect(24063));
+            Assert.Equal("Area contains an Otherworldly Breach", Assert.NotNull(names.Effect(24062)).Description);
         }
     }
 
