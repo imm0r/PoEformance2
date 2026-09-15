@@ -68,17 +68,26 @@ public sealed class ItemNames
     private const int TableOffset = 1;
 
     private readonly IReadOnlyDictionary<int, StatMeaning> _stats;
+    private readonly IReadOnlyDictionary<string, StatMeaning> _worded;
     private readonly IReadOnlyDictionary<string, ModMeaning> _mods;
     private readonly IReadOnlyDictionary<string, string> _bases;
     private readonly IReadOnlyDictionary<string, string> _uniques;
 
+    // The game's own halves of the join, handed in after construction because they arrive from
+    // two different places at two different moments - see Learn. Volatile because the reader
+    // thread installs them while the interface may be asking.
+    private Components.StatTable? _live;
+    private Components.StatDescriptions? _sentences;
+
     private ItemNames(
         IReadOnlyDictionary<int, StatMeaning> stats,
+        IReadOnlyDictionary<string, StatMeaning> worded,
         IReadOnlyDictionary<string, ModMeaning> mods,
         IReadOnlyDictionary<string, string> bases,
         IReadOnlyDictionary<string, string> uniques)
     {
         _stats = stats;
+        _worded = worded;
         _mods = mods;
         _bases = bases;
         _uniques = uniques;
@@ -87,6 +96,7 @@ public sealed class ItemNames
     /// <summary>Nothing known, which is what a missing file leaves.</summary>
     public static ItemNames Empty { get; } = new(
         new Dictionary<int, StatMeaning>(),
+        new Dictionary<string, StatMeaning>(StringComparer.Ordinal),
         new Dictionary<string, ModMeaning>(StringComparer.OrdinalIgnoreCase),
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
         new Dictionary<string, string>(StringComparer.Ordinal));
@@ -127,9 +137,94 @@ public sealed class ItemNames
     /// Regenerating the tables would have changed nothing.
     /// </remarks>
     public StatMeaning Stat(int memoryKey)
-        => memoryKey >= TableOffset && _stats.TryGetValue(memoryKey - TableOffset, out StatMeaning found)
+    {
+        if (memoryKey < TableOffset)
+        {
+            return new StatMeaning($"stat #{memoryKey}", string.Empty, 0);
+        }
+
+        int row = memoryKey - TableOffset;
+
+        // THE GAME'S OWN TABLE ANSWERS FIRST, and on this table that is a correctness fix rather
+        // than a tidiness one. item-stats.json is keyed by ROW INDEX, and an index is a position:
+        // measured 2026-09-15 against the 148 rows a capture could name, ten agreed with the
+        // shipped table and 135 did not, the first disagreement at index 4678 - just above the
+        // highest reading anyone had ever verified, which is exactly why the file looked sound.
+        // A wrong answer here is a plausible one, a neighbouring stat rather than a blank.
+        if (Volatile.Read(ref _live)?.Of(row) is { Length: > 0 } id)
+        {
+            // AND THE WORDING IS LOOKED UP BY THE ID, never by the row, whichever side supplies
+            // it. That is what lets the file keep contributing after the indexes have drifted:
+            // its sentences are still right, it is only their numbering that went stale, so they
+            // are re-keyed onto the one thing the game does not renumber.
+            if (Volatile.Read(ref _sentences)?.Of(id) is { Length: > 0 } said)
+            {
+                // The game's .csd keeps only single-stat lines, so the hole is always {0}.
+                return new StatMeaning(id, said, 0);
+            }
+
+            return _worded.TryGetValue(id, out StatMeaning known) && known.Text.Length > 0
+                ? known with { Id = id }
+                : new StatMeaning(id, string.Empty, 0);
+        }
+
+        return _stats.TryGetValue(row, out StatMeaning found)
             ? found
             : new StatMeaning($"stat #{memoryKey}", string.Empty, 0);
+    }
+
+    /// <summary>
+    /// Puts the game's own tables in front of the shipped ones, one half at a time.
+    /// </summary>
+    /// <remarks>
+    /// TWO HALVES FROM TWO PLACES AT TWO MOMENTS, which is why each is taken on its own and a
+    /// null leaves the other alone. Stats.dat is reached by a walk of the loader's file list -
+    /// the entity browser already pays for that walk once a session, so this rides along rather
+    /// than adding a second - and the sentences come off the install's own .csd files, on the
+    /// background task that walks the bundle index. Neither knows about the other, and a session
+    /// that gets only one is better off than a session that gets neither.
+    /// </remarks>
+    /// <param name="table">The game's Stats.dat, or null to leave what is there.</param>
+    /// <param name="sentences">The game's stat descriptions, or null to leave what is there.</param>
+    public void Learn(Components.StatTable? table = null, Components.StatDescriptions? sentences = null)
+    {
+        if (table is not null)
+        {
+            Volatile.Write(ref _live, table);
+        }
+
+        if (sentences is { Count: > 0 })
+        {
+            Volatile.Write(ref _sentences, sentences);
+        }
+    }
+
+    /// <summary>
+    /// Where a stat's name and sentence are coming from, for an interface that has to say which.
+    /// </summary>
+    /// <remarks>
+    /// SAID OUT LOUD for the same reason StatNames says it: the two are indistinguishable on
+    /// screen until one of them is wrong, and the one that is wrong is wrong plausibly.
+    /// </remarks>
+    public string StatSource
+    {
+        get
+        {
+            string names = Volatile.Read(ref _live) is { } live
+                ? $"the game ({live.Facts.Rows} rows of Stats.dat, {live.Named} read so far)"
+                : _stats.Count > 0
+                    ? $"data/item-stats.json ({_stats.Count} rows) - right only while somebody re-exports it"
+                    : "nowhere";
+
+            string words = Volatile.Read(ref _sentences) is { Count: > 0 } said
+                ? said.Source
+                : _worded.Count > 0
+                    ? $"data/item-stats.json ({_worded.Count} sentences, re-keyed by stat id)"
+                    : "nowhere";
+
+            return $"names from {names}; sentences from {words}";
+        }
+    }
 
     /// <summary>What a mod is called. Unknown mods keep their id, which is readable enough.</summary>
     public ModMeaning Mod(string? id)
@@ -186,6 +281,7 @@ public sealed class ItemNames
     public static ItemNames Load(string? statsPath, string? namesPath, string? uniquesPath = null)
     {
         var stats = new Dictionary<int, StatMeaning>();
+        var worded = new Dictionary<string, StatMeaning>(StringComparer.Ordinal);
         var mods = new Dictionary<string, ModMeaning>(StringComparer.OrdinalIgnoreCase);
         var bases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var uniques = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -198,9 +294,22 @@ public sealed class ItemNames
                 ItemStatFile? file = JsonSerializer.Deserialize(stream, ItemNameJsonContext.Default.ItemStatFile);
                 foreach ((string key, ItemStatEntry entry) in file?.Stats ?? [])
                 {
-                    if (int.TryParse(key, out int row))
+                    if (!int.TryParse(key, out int row))
                     {
-                        stats[row] = new StatMeaning(entry.Id ?? string.Empty, entry.Text ?? string.Empty, entry.Argument);
+                        continue;
+                    }
+
+                    var meaning = new StatMeaning(
+                        entry.Id ?? string.Empty, entry.Text ?? string.Empty, entry.Argument);
+                    stats[row] = meaning;
+
+                    // THE SAME ROWS FILED UNDER THE ONE KEY A PATCH DOES NOT MOVE. The file's
+                    // numbering goes stale; its sentences do not, so they are kept reachable by
+                    // id for the rows the game itself can name. First wins, which only matters
+                    // for the handful of ids the export lists twice.
+                    if (meaning.Id.Length > 0 && meaning.Text.Length > 0)
+                    {
+                        worded.TryAdd(meaning.Id, meaning);
                     }
                 }
             }
@@ -245,7 +354,7 @@ public sealed class ItemNames
             return Empty;
         }
 
-        return new ItemNames(stats, mods, bases, uniques);
+        return new ItemNames(stats, worded, mods, bases, uniques);
     }
 }
 

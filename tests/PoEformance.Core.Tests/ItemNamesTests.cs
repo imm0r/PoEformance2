@@ -1,4 +1,10 @@
+using PoEformance.Core.Diagnostics;
+using PoEformance.Core.Memory;
+using PoEformance.Core.Schema;
+using PoEformance.Game.Components;
 using PoEformance.Game.Items;
+using PoEformance.Game.Ui;
+using PoEformance.Game.World;
 
 namespace PoEformance.Core.Tests;
 
@@ -27,6 +33,120 @@ public class ItemNamesTests
     private static ItemNames Loaded()
         => ItemNames.Load(
             DataFile("item-stats.json"), DataFile("item-names.json"), DataFile("unique_ivi_name_map.tsv"));
+
+    /// <summary>
+    /// The game's own Stats.dat off a committed capture, reached the way the atlas reaches it.
+    /// </summary>
+    /// <remarks>
+    /// The same route StatTableSessionTests takes and for the same reason: a content row's Stats
+    /// array is a dat foreign reference, so the table travels with it and needs no file-table
+    /// walk - and no capture holds both that walk and these rows, because a recording answers
+    /// only the reads its build performed.
+    /// </remarks>
+    private static (StatTable Table, ReplayMemoryReader Replay) GameTable()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+        {
+            dir = dir.Parent;
+        }
+
+        Assert.NotNull(dir);
+        ReplayMemoryReader replay = ReplayMemoryReader.Load(File.OpenRead(
+            Path.Combine(dir!.FullName, "tests", "fixtures", "session-2026-09-statnames.rec")));
+
+        OffsetSchema schema = RealSessionTests.LiveSchema();
+        GameChainAddresses chain = GameChain.Resolve(replay, schema, replay.ResolvedStatics["GameStates"]);
+
+        var endgame = new EndgameMapCatalogue(replay, schema);
+        var contents = new EndgameMapContentCatalogue(replay, schema);
+        foreach (AtlasNode node in new AtlasReader(replay, schema, new UiElementReader(replay, schema))
+            .Read(chain.UiRoot, new UiScale(3440, 1440, 0)))
+        {
+            if (node.MapId.Length > 0 && endgame.ReadFromNode(node.Address))
+            {
+                break;
+            }
+        }
+
+        Assert.True(contents.Read(endgame.ContentTable), contents.LastError);
+        return (
+            Assert.IsType<StatTable>(StatTable.Over(
+                replay, Assert.IsType<DatTableFacts>(contents.StatsTable), schema)),
+            replay);
+    }
+
+    [Fact]
+    public void THEGAMESOwnRowNumberingBeatsTheShippedOnesAndTheFileStillSuppliesTheWords()
+    {
+        // MEASURED, NOT CONSTRUCTED, and it is the whole case for this change. Row 25861 of the
+        // game's Stats.dat is map_water_biome. item-stats.json calls that row
+        // map_faridun_city_biome and words it "Map also counts as a Faridun City Map" - a
+        // different biome, stated with total confidence, on an item somebody is pricing.
+        //
+        // The file is not junk, it is MISNUMBERED: it has map_water_biome seven rows earlier, at
+        // 25854, with exactly the right sentence. So the row number comes from the game and the
+        // sentence is looked up by the ID, and the two halves together are right where neither
+        // was alone. Nothing in the file could have revealed this - it reads perfectly.
+        const int Row = 25861;
+        const int MemoryKey = Row + 1;
+
+        ItemNames names = Loaded();
+
+        // What it said before any of this, and still says with no game to ask.
+        Assert.Equal("map_faridun_city_biome", names.Stat(MemoryKey).Id);
+
+        (StatTable table, ReplayMemoryReader replay) = GameTable();
+        using (replay)
+        {
+            Assert.Equal("map_water_biome", table.Of(Row));
+
+            names.Learn(table);
+
+            StatMeaning said = names.Stat(MemoryKey);
+            Assert.Equal("map_water_biome", said.Id);
+
+            // THE SENTENCE CAME OUT OF THE FILE, seven rows from where the row lookup would have
+            // found it, because it was fetched by name. This is the line that says the file is
+            // still pulling its weight rather than being switched off.
+            Assert.Equal("Map also counts as a Water Map", said.Text);
+        }
+    }
+
+    [Fact]
+    public void ANDTheGAMESOwnSentenceBeatsTheFilesWhenThereIsOne()
+    {
+        (StatTable table, ReplayMemoryReader replay) = GameTable();
+        using (replay)
+        {
+            ItemNames names = Loaded();
+            names.Learn(table, StatDescriptions.Load(DataFile("stat_desc_map.tsv")));
+
+            // The export of the game's own .csd files stands in for the install here, which is
+            // the only thing available without one - StatDescriptions.Against says the same.
+            StatMeaning said = names.Stat(25862);
+            Assert.Equal("map_water_biome", said.Id);
+            Assert.Contains("Water", said.Text, StringComparison.Ordinal);
+
+            Assert.Contains("the game (", names.StatSource, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void ANDWithoutTheGAMEEverythingReadsExactlyAsItDidBefore()
+    {
+        // The other half of "in front of rather than instead of": a session that never reaches
+        // the table - no install, no walk, a capture that cannot answer - is no worse off.
+        ItemNames names = Loaded();
+
+        Assert.Equal("map_faridun_city_biome", names.Stat(25862).Id);
+        Assert.Contains("item-stats.json", names.StatSource, StringComparison.Ordinal);
+
+        // And a null leaves what is there alone rather than clearing it, because the two halves
+        // arrive from two places and whichever lands second must not undo the first.
+        names.Learn(null, null);
+        Assert.Equal("map_faridun_city_biome", names.Stat(25862).Id);
+    }
 
     [Fact]
     public void THEShippedTablesCoverWhatAnItemCanCarry()
