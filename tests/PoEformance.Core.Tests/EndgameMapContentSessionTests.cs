@@ -342,6 +342,86 @@ public class EndgameMapContentSessionTests
     }
 
     [Fact]
+    public void LEARNINGFromTheTableFixesEveryFaultTheFileHad()
+    {
+        // THE POINT OF ALL OF IT. Each of these is a thing the tool showed before this capture, and
+        // every one is fixed by reading the table rather than by editing the file - which is what
+        // makes it stay fixed when the game renumbers Stats again next patch.
+        (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
+        using (replay)
+        {
+            AtlasContentNames names = File();
+            Assert.Equal(0, names.Revision);
+
+            Assert.True(names.Learn(contents.Rows, contents.BadgeIdBase) > 0);
+            Assert.Equal(1, names.Revision);
+            Assert.Equal(70, names.LearntBadges);
+
+            // The badge that carried another badge's text.
+            Assert.Equal("Behemoth's Bounty", Assert.NotNull(names.Badge(0x8C)).Name);
+            Assert.Equal("Map Boss drops a Unique item", Assert.NotNull(names.Badge(0x8C)).Description);
+
+            // The three contents the file had never heard of.
+            Assert.Equal("Abyssal Depths", Assert.NotNull(names.Badge(0xA7)).Name);
+            Assert.Equal("Abyssal Fissure", Assert.NotNull(names.Badge(0xA8)).Name);
+            Assert.Equal("Viridian Wildwood", Assert.NotNull(names.Badge(0xA9)).Name);
+
+            // The sentence that shipped with its opening clause missing.
+            Assert.Equal(
+                "Contains 2 additional Shrines Shrines release an Azmeri Spirit when activated",
+                Assert.NotNull(names.Badge(0x75)).Description);
+
+            // And the biomes, which were the live fault: 25861 said Swamp and means Water.
+            Assert.Equal("Also counts as a Water Area", Assert.NotNull(names.Effect(25861)).Description);
+            Assert.Equal("Also counts as a Mountain Area", Assert.NotNull(names.Effect(25862)).Description);
+            Assert.Equal("Also counts as a Grass Area", Assert.NotNull(names.Effect(25863)).Description);
+            Assert.Equal("Also counts as a Forest Area", Assert.NotNull(names.Effect(25864)).Description);
+            Assert.Equal("Also counts as a Swamp Area", Assert.NotNull(names.Effect(25865)).Description);
+            Assert.Equal("Also counts as a Desert Area", Assert.NotNull(names.Effect(25866)).Description);
+
+            // The FILE view is untouched, because that is what a comparison against the game needs.
+            Assert.Equal("Monstrous Treasure", names.Badges[0x8C].Name);
+        }
+    }
+
+    [Fact]
+    public void ANDItLeavesTheAmbiguousEffectsAlone()
+    {
+        // THE CONSERVATIVE HALF, spelled out because leaving value on the table has to be a choice
+        // somebody can find. 22 of the 83 stats these contents grant are taken; the rest are held
+        // back for reasons that are measured rather than cautious:
+        //
+        //   - a SHARED stat belongs to no one content. 4679 is granted by three rows with three
+        //     different sentences, so taking one would relabel the other two;
+        //   - a stat from a row that grants SEVERAL is one component of that row's wording, not
+        //     the whole of it;
+        //   - and a sentence with a NUMBER in it has an unsettled owner. The file writes "{0}" and
+        //     substitutes the node's magnitude; the row writes the content's own amount. Holing the
+        //     digits reproduces the file exactly for "Area has 2 additional random Waystone
+        //     Modifiers" - and would print "+100 to Monster Level" for Irradiated the moment a
+        //     token arrives as a binary effect. Nothing measured says which, so neither is done.
+        (EndgameMapContentCatalogue contents, ReplayMemoryReader replay) = Walked();
+        using (replay)
+        {
+            AtlasContentNames names = File();
+            names.Learn(contents.Rows, contents.BadgeIdBase);
+
+            Assert.Equal(22, names.LearntEffects);
+
+            // Shared between three rows: the file's generic wording survives.
+            Assert.Equal("Contains {0} additional Essence", Assert.NotNull(names.Effect(4679)).Description);
+
+            // A number in the sentence: left with the file, which holes it correctly already.
+            Assert.Equal(
+                "Area has {0} additional random Waystone Modifiers",
+                Assert.NotNull(names.Effect(4738)).Description);
+
+            // And one the file never had and the game cannot unambiguously give: still nothing.
+            Assert.Null(names.Effect(24062));
+        }
+    }
+
+    [Fact]
     public void AStringIsReadInStepsSoALongOneDoesNotCOMEBACKSHORTER()
     {
         // THE TRAP, pinned because it produced a wrong FINDING rather than a failed read.

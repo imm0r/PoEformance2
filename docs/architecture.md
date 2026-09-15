@@ -2775,8 +2775,11 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   switched on quietly hides the thing the map IS. The reference draws its biome border outside
   its plate for its own reasons and that geometry solves this: the ring sits clear of the group's
   border with no overlap. The id→colour table is ported from `Plugins/Atlas2/json/biome.json` and
-  cross-checked from the other side — the six "Also counts as a … Area" tablet effects in
-  `data/atlas-content.json` run Water, Mountain, Grass, Forest, Swamp, Desert, exactly ids 0–5.
+  cross-checked from the other side — rows 53–58 of the game's own `EndgameMapContent` are
+  `WaterBiome`, `MountainBiome`, `GrassBiome`, `ForestBiome`, `SwampBiome`, `DesertBiome` in that
+  order, exactly ids 0–5. That check used to cite `data/atlas-content.json` and the citation was
+  wrong: the file holds five of those effects, not six, and they run Mountain→Desert, because its
+  ids are four `Stats` rows lower than this client's. The order held; the evidence for it did not.
   Two colours are deliberately NOT the reference's, both because this is a two-pixel ring on a
   dark plate where the reference has a coloured background: Swamp carried byte-for-byte the same
   blue as Water there, and Forest at 0.0/0.266/0.097 cannot be seen at all. An id past the end of
@@ -2853,6 +2856,39 @@ Ported from GameHelper2's Atlas2. It is the exception to the paragraph above: it
   accessible frontier, which is scattered over the whole atlas, so a map on the far side of the
   world is routinely three hops away.
 
+##### The content words — the file is the fallback, the game is the answer
+
+`data/atlas-content.json` was measured against the table it came from (`EndgameMapContent`, 70 rows,
+`tests/fixtures/session-2026-09-mapcontent.rec`) and both guesses about its numbering turned out
+right: a **badge id is a content row plus 100**, and an **effect id is a `Stats.dat` row index**.
+Confirmed by the wording rather than by the arithmetic — row 0 is `PowerfulMapBoss` and badge `0x64`
+says "Powerful Map Boss"; the sentence the game attaches to a stat is the sentence the file files
+under that number.
+
+The same measurement found four faults nothing but the game could have shown, so `AtlasContentNames`
+now **learns** from the table the moment an atlas is read and keeps the file behind it:
+
+- **Stale effect ids, which is the one that was visibly wrong.** A stat id is a *position*, so the
+  four rows the game inserted between 19545 and 24104 moved every later one. The file's biome block
+  sits at 25858–25862 where this client's is 25861–25866 — a **Water** tablet effect was reading as
+  **Swamp**, Mountain as Desert, and Grass, Forest, Swamp and Desert were not in the file at all.
+  A file of indices into a table the game renumbers cannot stay right; reading the table can.
+- **A badge carrying another badge's text.** `0x8C` held `0x71`'s wording word for word, so
+  "Behemoth's Bounty" showed as "Monstrous Treasure".
+- **Sentences with a clause missing.** The game separates a content's clauses with newlines; the
+  published copies joined them with a space and on four of them dropped the opening clause.
+- **Three contents absent** — AbyssDepths, AbyssFissure, Wildwood.
+
+**What is deliberately NOT taken is the interesting half.** A badge transfers whole, because a
+content has no magnitude of its own. An effect is taken only where it cannot be ambiguous: the stat
+is granted by exactly one row, that row grants only that stat, and the sentence contains no number.
+The first two are because a *shared* stat belongs to no one content — 4679 is granted by three rows
+with three different sentences. The third is the honest gap: the file writes `{0}` and substitutes
+the node's magnitude, the row writes the content's own amount, and which is right per effect has not
+been settled. Holing the digits reproduces the file exactly for "Area has 2 additional random
+Waystone Modifiers" — and would print "+100 to Monster Level" for Irradiated the moment a token
+arrives as a binary effect. So 22 of the 83 stats are taken and the numeric ones stay with the file.
+
 ##### The content pictures — asking the install what it calls its own files
 
 `data/atlas-content.json` gives every content the game's own art name — `AtlasIconContentBreach` —
@@ -2869,12 +2905,14 @@ is one short row in the art the game already uses.
   every file the game has; walking it once turns a name into a path for whatever the current
   patch is. No folder list, nothing to correct when a league moves a file, no extracted pictures
   to install. See **Names out of the bundle index** below for what that walk is.
-- **There is a second place the path could come from, and it is now wired but unproven.**
-  `EndgameMapContentCatalogue` follows a content row's `VisualIdentity` reference into
-  `EndgameMapContentVisualIdentity`, whose `AtlasIcon` column holds the whole path rather than its
-  last part. That route did not exist when the bundle walk was built, because nothing here had
-  reached `EndgameMapContent` at all. No capture has come back with those strings yet, so this is
-  a read waiting on a recording, not a working alternative — the bundle index stays the answer.
+- **The game holds the path too, and now says so.** `EndgameMapContentCatalogue` follows a content
+  row's `VisualIdentity` reference into `EndgameMapContentVisualIdentity`, whose `AtlasIcon` column
+  is the whole path — and it is the file's name with a directory in front of it: 13 of the 16 rows
+  that have a path end in exactly the word the file ships. The other 54 rows have **no** art path
+  at all, and the file names icons for 53 of them anyway (`AtlasMasteryBiome`, `Hunter`) — PoE1
+  words, not this game's. So the bundle index stays the answer for now, because it covers the rows
+  the game gives no path for; what the table adds is a way to check it and three names the file
+  never had.
 - **A folder somebody fills still comes first** (`config/atlas-icons/<name>.png`). It is not
   vestigial: it works with no install at all, it is how a picture the install will not give up
   gets drawn anyway, and it is the only way to override what the game ships.

@@ -331,6 +331,11 @@ public sealed class EndgameMapContentCatalogue
             said.Add($"  {LastError}");
         }
 
+        said.Add(file.Revision == 0
+            ? "  the shipped file is still in force - nothing has been learnt from this table yet"
+            : $"  IN FORCE: {file.LearntBadges} badges and {file.LearntEffects} effects from the game,"
+              + " the file behind them. Everything below compares the FILE against the game.");
+
         said.AddRange(Badges(file));
         said.AddRange(Effects(file));
         said.AddRange(Icons(file));
