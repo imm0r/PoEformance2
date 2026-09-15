@@ -525,6 +525,62 @@ public class AtlasViewTests
     }
 
     [Fact]
+    public void ANDEachRefusalSaysWHICHRuleTurnedTheStringAway()
+    {
+        // BECAUSE THE TWO REFUSALS ARE INVISIBLE ON SCREEN AND NOT THE SAME FAULT. Once the id's
+        // label is the fallback, a turned-away string looks exactly like a node that never had
+        // one - which is right for the player and useless for working out what the game sent. A
+        // placeholder means the string arrived damaged or marked; a duplicate means the node was
+        // already saying it. Only the first is a reason to go back to the memory read.
+        var refused = new List<AtlasRefusal>();
+
+        AtlasNode marked = Node(1, 1, badges: [0x64]) with
+        {
+            BadgeWords = new Dictionary<uint, string> { [0x64] = "[DeadlyMapBoss|Deadly Map Bo" },
+        };
+
+        AtlasNode already = Node(2, 2, badges: [0x64]) with
+        {
+            BadgeWords = new Dictionary<uint, string> { [0x64] = "Complete all Ritual Altars" },
+        };
+
+        AtlasWatch.Words(marked, LoadedContents(), refused: refused);
+        AtlasWatch.Words(
+            already,
+            LoadedContents(),
+            new AtlasObjective("Ritual", "Complete all Ritual Altars", "AtlasIconContentRitual"),
+            refused);
+
+        Assert.Equal(2, refused.Count);
+
+        Assert.True(refused[0].Marked);
+        Assert.Equal(0x64u, refused[0].Id);
+        Assert.Equal("Powerful Map Boss", refused[0].Instead);
+
+        Assert.False(refused[1].Marked);
+        Assert.Equal("Complete all Ritual Altars", refused[1].Word);
+    }
+
+    [Fact]
+    public void ANDNOTHINGISNotedWhenTheStringIsTaken()
+    {
+        // The ordinary case must stay quiet, or the count is a measure of how many badges have
+        // strings rather than of how many went wrong - and a number that is never zero is a
+        // number nobody reads.
+        var refused = new List<AtlasRefusal>();
+
+        AtlasNode taken = Node(1, 1, badges: [0x64]) with
+        {
+            BadgeWords = new Dictionary<uint, string> { [0x64] = "[DeadlyMapBoss|Deadly Map Boss]" },
+        };
+
+        AtlasWatch.Words(taken, LoadedContents(), refused: refused);
+        AtlasWatch.Words(Node(2, 2, badges: [0x64]), LoadedContents(), refused: refused);
+
+        Assert.Empty(refused);
+    }
+
+    [Fact]
     public void ANDANodeTheGAMEIsNotPaintingIsNotAHoverAtAll()
     {
         // REPORTED FROM A LIVE CLIENT, and it blanked the overlay exactly where the overlay was
