@@ -39,6 +39,12 @@ namespace PoEformance.Game.Entities;
 /// The most-referenced ones are league bases (AbyssMonsterBase, SanctumMonsterBase,
 /// UltimatumMonsterBase), which is what makes this the interesting column despite that.
 /// </param>
+/// <param name="AoFiles">
+/// The monster's Animated Object files, which is where everything about how it LOOKS begins -
+/// its animation controller, its attached objects, its effect packs. Null from the shipped
+/// export, which does not carry the column; filled when the install's own table is read. The
+/// files themselves are text and <see cref="Files.AnimatedObject"/> reads them.
+/// </param>
 public sealed record MonsterVariety(
     [property: JsonPropertyName("name")] string? Name = null,
     [property: JsonPropertyName("type")] int Type = 0,
@@ -65,7 +71,8 @@ public sealed record MonsterVariety(
     [property: JsonPropertyName("mods")] IReadOnlyList<int>? Mods = null,
     [property: JsonPropertyName("mods2")] IReadOnlyList<int>? Mods2 = null,
     [property: JsonPropertyName("specialMods")] IReadOnlyList<int>? SpecialMods = null,
-    [property: JsonPropertyName("inherits")] IReadOnlyList<string>? Inherits = null)
+    [property: JsonPropertyName("inherits")] IReadOnlyList<string>? Inherits = null,
+    [property: JsonPropertyName("ao")] IReadOnlyList<string>? AoFiles = null)
 {
     /// <summary>How many skills the game grants this monster.</summary>
     /// <remarks>
