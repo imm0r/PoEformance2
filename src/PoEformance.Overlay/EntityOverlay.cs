@@ -2047,7 +2047,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         IReadOnlyList<string>? columns = null,
         bool rail = true,
         bool visible = false,
-        Func<string, byte[]?>? install = null)
+        Func<string, byte[]?>? readFile = null)
     {
         var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences)
         {
@@ -2057,7 +2057,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // the terrain layer. The install is handed in because this class does not have one;
             // without it the book simply shows no model, which is the ordinary case on a machine
             // that has the tool and not the game.
-            Model = new MonsterPortrait(install, Upload, key => RemoveImage(key)),
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key)),
         };
 
         window.Show(columns, rail);

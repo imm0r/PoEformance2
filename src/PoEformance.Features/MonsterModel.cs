@@ -127,7 +127,13 @@ public static class MonsterModels
         MaterialFile paint = Read(read, MaterialFile.Bare(material), MaterialFile.Read);
         GamePicture? skin = null;
 
-        if (paint.Albedo is { Length: > 0 } texture && read(texture) is { Length: > 0 } bytes)
+        // THROUGH ReadRaw AND NOT A BARE READ. A texture in this game is one of three things and
+        // only the third is a .dds as it stands: it may be a SIGNPOST - a star and the path of the
+        // file that really holds it - or it may sit behind a compressed header. Decoding a plain
+        // read handles the third and silently fails the other two, which shows as a monster with a
+        // mesh and no colour and says nothing about why.
+        if (paint.Albedo is { Length: > 0 } texture
+            && GameArt.ReadRaw(read, texture) is { Length: > 0 } bytes)
         {
             skin = GameArt.Decode(bytes);
         }
