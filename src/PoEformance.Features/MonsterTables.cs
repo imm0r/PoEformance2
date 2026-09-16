@@ -209,6 +209,19 @@ public sealed class MonsterTables
     /// ON THE MODIFIER IDS AND NOT THEIR STAT LISTS, deliberately: the export reads four of the
     /// eight stat slots (see <see cref="StatSlots"/>), so a monster whose modifier uses the upper
     /// four disagrees here for a reason that is this reader being MORE complete.
+    ///
+    /// AND SEPARATELY ON THE NAMES THE ROW NUMBERS RESOLVE TO, which is a different question with a
+    /// much worse answer. The first live run made the gap plain: every used subset matched the
+    /// export exactly - 185 tags, 1214 types, 37 blood types, 19 resistance profiles - and that
+    /// proves nothing about the numbering, because a table whose rows have SHIFTED still has 185
+    /// of them in use. Tags had grown from 1327 rows to 1339 between the export and that client;
+    /// appended, every number still means what it meant, and inserted, every tag on every monster
+    /// silently became a different tag.
+    ///
+    /// So where the two agree on the row NUMBERS a monster carries, the names those numbers reach
+    /// are compared - and only there, so that a monster which really did gain a tag is not counted
+    /// as a table that moved. A count here above zero means a reference table has been renumbered,
+    /// which is the one finding in this report that is nobody's stale export.
     /// </remarks>
     public static IReadOnlyList<string> Against(MonsterVarieties read, MonsterVarieties? shipped)
     {
@@ -221,6 +234,7 @@ public sealed class MonsterTables
 
         var only = new List<string>();
         var differ = new List<string>();
+        var renumbered = new List<string>();
         var shared = 0;
 
         foreach ((string path, MonsterVariety one) in read.All)
@@ -242,6 +256,11 @@ public sealed class MonsterTables
             {
                 differ.Add(path);
             }
+
+            if (Renumbered(read, shipped, one, had) is { Length: > 0 } moved)
+            {
+                renumbered.Add($"{path}: {moved}");
+            }
         }
 
         var lines = new List<string>
@@ -249,7 +268,18 @@ public sealed class MonsterTables
             $"  against data/monster-varieties.json: {shared} of {read.Count} paths in both,"
             + $" {only.Count} only in the install, {shipped.Count - shared} only in the export,"
             + $" {differ.Count} of the shared ones differ on name, type or skill count",
+
+            renumbered.Count == 0
+                ? "  and every row number the two share resolves to the same name - no reference"
+                  + " table has been renumbered"
+                : $"  AND {renumbered.Count} share a row number that resolves to a DIFFERENT name -"
+                  + " a reference table has been renumbered, which is not a stale export",
         };
+
+        foreach (string moved in renumbered.Take(8))
+        {
+            lines.Add($"    {moved}");
+        }
 
         // EIGHT RATHER THAN FOUR, because four was not enough to see the shape: the first live run
         // reported nine differences and showed four, two of which were the same trailing-space
@@ -273,6 +303,80 @@ public sealed class MonsterTables
         static string Show(MonsterVariety one)
             => $"name {(one.Name is { Length: > 0 } named ? named : "-")}, type {one.Type}, {one.SkillCount} skills";
     }
+
+    /// <summary>
+    /// Where the same row number reaches a different name in the two tables, or empty.
+    /// </summary>
+    /// <remarks>
+    /// COMPARED ONLY WHERE THE ROW NUMBERS THEMSELVES AGREE, which is what makes this mean
+    /// anything. A monster that really did gain a tag carries a different list of numbers, and
+    /// counting that as a renumbering would bury the one case this is for under the ordinary churn
+    /// of a patch. Where the numbers are identical, any difference in what they resolve to can
+    /// only be the table behind them having moved.
+    /// </remarks>
+    private static string Renumbered(
+        MonsterVarieties read, MonsterVarieties shipped, MonsterVariety one, MonsterVariety had)
+    {
+        var moved = new List<string>();
+
+        string blood = read.BloodName(one);
+        string was = shipped.BloodName(had);
+        if (one.Blood == had.Blood && blood.Length > 0 && was.Length > 0 && blood != was)
+        {
+            moved.Add($"blood #{one.Blood} is {blood} here and {was} there");
+        }
+
+        if (Same(one.Tags, had.Tags))
+        {
+            Differs(moved, "tags", read.TagsOf(one), shipped.TagsOf(had));
+        }
+
+        if (Same(one.Effects, had.Effects))
+        {
+            Differs(moved, "skills", read.Skills(one), shipped.Skills(had));
+        }
+
+        return string.Join("; ", moved);
+    }
+
+    /// <summary>
+    /// Records a difference between two name lists, ignoring wherever either side has no name.
+    /// </summary>
+    /// <remarks>
+    /// A NAME AGAINST A ROW NUMBER IS NOT EVIDENCE OF ANYTHING. The resolvers hand back "#1" for a
+    /// row they cannot name, so an export built without its reference tables - which is a real
+    /// state, they were each optional - would report every monster it has as renumbered. That is a
+    /// check whose alarm fires on the one thing it is not about. Only two different NAMES for the
+    /// same row can be a table that moved.
+    /// </remarks>
+    private static void Differs(
+        List<string> moved, string what, IEnumerable<string> here, IEnumerable<string> there)
+    {
+        string[] now = [.. here];
+        string[] was = [.. there];
+        if (now.Length != was.Length)
+        {
+            return;
+        }
+
+        var seen = new List<string>();
+        for (var i = 0; i < now.Length; i++)
+        {
+            if (!now[i].StartsWith('#') && !was[i].StartsWith('#') && now[i] != was[i])
+            {
+                seen.Add($"{now[i]} here and {was[i]} there");
+            }
+        }
+
+        if (seen.Count > 0)
+        {
+            moved.Add($"{what} {string.Join(", ", seen.Take(3))}");
+        }
+    }
+
+    /// <summary>Whether two row lists hold the same numbers in the same order.</summary>
+    private static bool Same(IReadOnlyList<int>? one, IReadOnlyList<int>? other)
+        => (one ?? []).SequenceEqual(other ?? []);
 
     private static (LoadedTable? Table, string Why) Optional(
         GameFiles files, QuestTableLayouts layouts, string table, string? arrayColumn, List<string> said)
