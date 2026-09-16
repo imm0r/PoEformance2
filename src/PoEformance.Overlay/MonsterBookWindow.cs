@@ -875,6 +875,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         Identity(all, one);
         ImGui.Separator();
 
+        Portrait(one);
         Figures(one);
         Type(all, one);
         Words("Tags", all.TagsOf(one));
@@ -882,6 +883,67 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         Mods(all, one, said);
         Words("Built on", one.Inherits ?? []);
     }
+
+    /// <summary>
+    /// The monster's model, in the top right of the detail pane.
+    /// </summary>
+    /// <remarks>
+    /// PLACED RATHER THAN FLOWED, because ImGui has no text flow: the picture is set at an
+    /// absolute spot and the cursor is put back where it was, so everything after it draws down
+    /// the left as though the picture were not there. That works because the block beside it is a
+    /// column of key and value - Figures is the narrowest thing in the pane - and it is why the
+    /// picture goes HERE rather than under the identity block, where the long lists would run
+    /// beneath it.
+    ///
+    /// AND IT GIVES THE WIDTH BACK WHEN THERE IS NOT ENOUGH. Below a pane width where the picture
+    /// and a readable column both fit, there is no picture at all - this window is read while
+    /// playing, over a game that wants the screen, and a portrait that squeezed the numbers into
+    /// two characters would be the wrong trade every time.
+    /// </remarks>
+    private void Portrait(MonsterVariety one)
+    {
+        if (Model is not { Possible: true } model)
+        {
+            return;
+        }
+
+        float wide = ImGui.GetContentRegionAvail().X;
+        float side = MathF.Min(MonsterPortrait.Size, wide * PortraitShare);
+        if (side < LeastPortrait || wide - side < LeastColumn)
+        {
+            return;
+        }
+
+        Vector2 was = ImGui.GetCursorPos();
+        ImGui.SetCursorPos(was with { X = was.X + wide - side });
+
+        model.Draw(one, _chosen, side);
+
+        // BACK TO WHERE THE PANE WAS, and to the TOP of it: the picture is taller than the
+        // figures beside it, and leaving the cursor under it would push every later section down
+        // by the height of a picture that is off to one side.
+        ImGui.SetCursorPos(was);
+    }
+
+    /// <summary>How much of the pane's width the picture may take.</summary>
+    private const float PortraitShare = 0.42f;
+
+    /// <summary>Below this the picture is not worth the width it costs.</summary>
+    private const float LeastPortrait = 110f;
+
+    /// <summary>And this much has to be left for the figures beside it.</summary>
+    private const float LeastColumn = 260f;
+
+    /// <summary>
+    /// Draws the monster's model, or null where the overlay did not wire one up.
+    /// </summary>
+    /// <remarks>
+    /// SET FROM OUTSIDE rather than made here, because it needs the install to read and the
+    /// renderer to upload to, and this window has neither - see EntityOverlay.AttachMonsterBook.
+    /// Null is the ordinary case on a machine with no game installed, and the pane simply has no
+    /// picture in it.
+    /// </remarks>
+    public MonsterPortrait? Model { get; set; }
 
     private void Identity(MonsterVarieties all, MonsterVariety one)
     {

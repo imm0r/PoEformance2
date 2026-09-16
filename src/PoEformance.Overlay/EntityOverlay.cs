@@ -2044,11 +2044,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// a stronger reason - see <see cref="StatSentences"/>, which changes mid-session.
     /// </remarks>
     public void AttachMonsterBook(
-        IReadOnlyList<string>? columns = null, bool rail = true, bool visible = false)
+        IReadOnlyList<string>? columns = null,
+        bool rail = true,
+        bool visible = false,
+        Func<string, byte[]?>? install = null)
     {
         var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences)
         {
             Changed = () => SettingsChanged?.Invoke(),
+
+            // THE SAME PAIR EVERY PICTURE IN THIS OVERLAY IS MADE WITH - see the icon cache and
+            // the terrain layer. The install is handed in because this class does not have one;
+            // without it the book simply shows no model, which is the ordinary case on a machine
+            // that has the tool and not the game.
+            Model = new MonsterPortrait(install, Upload, key => RemoveImage(key)),
         };
 
         window.Show(columns, rail);
