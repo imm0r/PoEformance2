@@ -27,7 +27,7 @@ namespace PoEformance.Features;
 /// background walk well after start-up - which is why <see cref="Of"/> takes them and why the
 /// caller rebuilds when they change.
 /// </remarks>
-public sealed class MonsterBook
+public sealed class MonsterBook : IQuerySource
 {
     /// <summary>The headings the column chooser groups the columns under.</summary>
     private const string Named = "What it is";
@@ -38,6 +38,8 @@ public sealed class MonsterBook
 
     private readonly string[] _find;
     private readonly Dictionary<string, int> _rows;
+    private readonly Dictionary<string, Held> _held;
+    private readonly Dictionary<string, int> _numbers;
 
     private MonsterBook(
         ColumnStore store,
@@ -46,7 +48,9 @@ public sealed class MonsterBook
         string[] find,
         Dictionary<string, int> rows,
         string[] groups,
-        bool[] shown)
+        bool[] shown,
+        Dictionary<string, Held> held,
+        Dictionary<string, int> numbers)
     {
         Store = store;
         Paths = paths;
@@ -55,10 +59,25 @@ public sealed class MonsterBook
         Shown = shown;
         _find = find;
         _rows = rows;
+        _held = held;
+        _numbers = numbers;
+
+        Fields = [.. held.Keys.Order(StringComparer.Ordinal), .. numbers.Keys.Order(StringComparer.Ordinal)];
     }
 
     /// <summary>A book with no monsters in it.</summary>
-    public static MonsterBook Empty { get; } = new(ColumnStore.Empty, [], [], [], [], [], []);
+    public static MonsterBook Empty { get; } = new(
+        ColumnStore.Empty, [], [], [], [], [], [], [], []);
+
+    /// <summary>
+    /// Every field a query may name, for whatever offers them to somebody typing.
+    /// </summary>
+    /// <remarks>
+    /// SPELT THE WAY A QUERY SPELLS THEM - lower case, no spaces - which is not always how the
+    /// column header says it: a column called "atk spd" is asked for as "atkspd", because a space
+    /// separates two terms and always will.
+    /// </remarks>
+    public IReadOnlyList<string> Fields { get; }
 
     /// <summary>The columns, in the order they are drawn.</summary>
     public ColumnStore Store { get; }
@@ -163,6 +182,14 @@ public sealed class MonsterBook
         Filling built = Column("base", Named, ColumnShape.Text);
         Filling quest = Column("quest", Named, ColumnShape.Row);
 
+        // THE MULTI-VALUED FIELDS, which are the ones a facet rail is worth having for: a monster
+        // carries up to sixty-seven skills, ten tags and seven modifiers, and none of that fits in
+        // a column. The single-valued ones are gathered off the finished columns below, so that
+        // adding a column adds a field to the query without anybody wiring one up.
+        var byTag = new Gather(count);
+        var bySkill = new Gather(count);
+        var byMod = new Gather(count);
+
         var text = new StringBuilder(512);
         var at = 0;
 
@@ -177,12 +204,12 @@ public sealed class MonsterBook
 
             // SEARCHED ACROSS EVERYTHING RESOLVED, not only the name: somebody looking up which
             // monsters cast a skill, or carry a tag, is asking the question this book exists for.
-            int carried = Add(text, table.TagsOf(one));
-            Add(text, table.Skills(one));
-            int profiles = Add(text, table.ResistancesOf(one));
+            int carried = Add(text, table.TagsOf(one), byTag, at);
+            Add(text, table.Skills(one), bySkill, at);
+            int profiles = Add(text, table.ResistancesOf(one), null, at);
             text.Append(' ').Append(table.BloodName(one));
 
-            int carriedMods = Modifiers(table, one, said, text);
+            int carriedMods = Modifiers(table, one, said, text, byMod, at);
 
             // The two things the table says with a FLAG rather than with a column, so that typing
             // "boss" finds the bosses. There is no other way to ask this list for them.
@@ -244,6 +271,38 @@ public sealed class MonsterBook
 
         ColumnStore store = ColumnStore.Of([.. filling.Select(one => one.Done())]);
 
+        var held = new Dictionary<string, Held>(StringComparer.Ordinal)
+        {
+            [Key("tag")] = byTag.Done(),
+            [Key("skill")] = bySkill.Done(),
+            [Key("mod")] = byMod.Done(),
+        };
+
+        var numbers = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        // EVERY COLUMN BECOMES A FIELD, off the finished store rather than out of a second list to
+        // keep in step: a column of words is something to match, a column of numbers is something
+        // to compare, and a column added next year is both without anybody remembering to say so.
+        for (var column = 0; column < store.Columns.Length; column++)
+        {
+            DataColumn one = store.Columns[column];
+            string key = Key(one.Name);
+
+            if (one.Number.Length > 0)
+            {
+                numbers[key] = column;
+                continue;
+            }
+
+            var gather = new Gather(count);
+            for (var row = 0; row < count; row++)
+            {
+                gather.Add(row, one.Text[row]);
+            }
+
+            held[key] = gather.Done();
+        }
+
         return new MonsterBook(
             store,
             paths,
@@ -251,7 +310,144 @@ public sealed class MonsterBook
             find,
             rows,
             [.. filling.Select(one => one.Group)],
-            [.. filling.Select(one => one.Start)]);
+            [.. filling.Select(one => one.Start)],
+            held,
+            numbers);
+    }
+
+    /// <summary>How many rows there are. What <see cref="IQuerySource"/> means by it.</summary>
+    int IQuerySource.Rows => Count;
+
+    /// <summary>The rows whose searchable text holds this word.</summary>
+    public void Words(string word, RowSet into)
+    {
+        ArgumentNullException.ThrowIfNull(into);
+
+        string looking = (word ?? string.Empty).ToLowerInvariant();
+        if (looking.Length == 0)
+        {
+            into.All();
+            return;
+        }
+
+        for (var row = 0; row < _find.Length; row++)
+        {
+            if (_find[row].Contains(looking, StringComparison.Ordinal))
+            {
+                into.Add(row);
+            }
+        }
+    }
+
+    /// <summary>
+    /// The rows where a field holds a value, or false where there is no such field.
+    /// </summary>
+    /// <remarks>
+    /// MATCHED AS A SUBSTRING AND NOT EXACTLY, which is a decision about who is typing. The values
+    /// in these fields are the game's own ids - MeleeAtAnimationSpeed, MonsterAttackBlock30Bypass15
+    /// - and nobody knows them by heart; "skill:fire" finding every skill with fire in its name is
+    /// the useful reading, and the facet rail is where an exact value gets clicked rather than
+    /// typed. Several values matching is a union: they are all "this field holding that".
+    /// </remarks>
+    public bool Value(string field, string value, RowSet into)
+    {
+        ArgumentNullException.ThrowIfNull(into);
+
+        if (!_held.TryGetValue(Key(field ?? string.Empty), out Held? held))
+        {
+            return false;
+        }
+
+        string looking = (value ?? string.Empty).ToLowerInvariant();
+
+        for (var at = 0; at < held.Lower.Length; at++)
+        {
+            if (held.Lower[at].Contains(looking, StringComparison.Ordinal))
+            {
+                into.Or(held.Rows[at]);
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>The rows where a field's number is in a range, or false where there is none.</summary>
+    public bool Number(string field, double least, double most, RowSet into)
+    {
+        ArgumentNullException.ThrowIfNull(into);
+
+        if (!_numbers.TryGetValue(Key(field ?? string.Empty), out int column))
+        {
+            return false;
+        }
+
+        double[] numbers = Store.Columns[column].Number;
+        for (var row = 0; row < numbers.Length; row++)
+        {
+            if (numbers[row] >= least && numbers[row] <= most)
+            {
+                into.Add(row);
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// The rows a query matches.
+    /// </summary>
+    /// <remarks>
+    /// A SET PER CALL, which is 344 bytes over this table and is the simple thing: a keystroke makes
+    /// one, counts the facets against it and drops it. What must not be made per call is one per
+    /// facet VALUE, and that is what <see cref="RowSet.CountAnd"/> is for.
+    /// </remarks>
+    /// <returns>Null where the query names something this table has not got, and says what.</returns>
+    public RowSet? Matching(QueryTerm? query, out string error)
+    {
+        var rows = new RowSet(Count);
+        return ColumnQuery.Run(query, this, rows, out error) ? rows : null;
+    }
+
+    /// <summary>
+    /// What a field holds within a set of rows, and how many rows each of its values covers.
+    /// </summary>
+    /// <remarks>
+    /// COUNTED AGAINST THE WHOLE CURRENT FILTER rather than against everything except this field's
+    /// own part of it. The two readings differ: the other one lets somebody pick several values of
+    /// one field as alternatives, and this one reads every click as a further narrowing. This is the
+    /// one that matches the grammar - two terms side by side mean BOTH - and a rail that narrowed
+    /// while the text it writes widened would be two filters wearing one coat.
+    ///
+    /// SO A ZERO IS WORTH SHOWING, dim. "There are no casters left in this set" is an answer, and a
+    /// rail that hides what it cannot offer makes it look like the field does not exist.
+    /// </remarks>
+    public void Facets(RowSet within, string field, List<Facet> into, int most = 0)
+    {
+        ArgumentNullException.ThrowIfNull(within);
+        ArgumentNullException.ThrowIfNull(into);
+        into.Clear();
+
+        if (!_held.TryGetValue(Key(field ?? string.Empty), out Held? held))
+        {
+            return;
+        }
+
+        for (var at = 0; at < held.Values.Length; at++)
+        {
+            into.Add(new Facet(held.Values[at], within.CountAnd(held.Rows[at])));
+        }
+
+        // MOST FIRST, because a rail shows a dozen of the five thousand skills and the useful dozen
+        // is the one the rows in front of somebody actually carry. Ties break on the name, so the
+        // order does not shuffle about as the filter moves.
+        into.Sort(static (left, right) => right.Count != left.Count
+            ? right.Count.CompareTo(left.Count)
+            : string.Compare(left.Value, right.Value, StringComparison.OrdinalIgnoreCase));
+
+        if (most > 0 && into.Count > most)
+        {
+            into.RemoveRange(most, into.Count - most);
+        }
     }
 
     /// <summary>
@@ -343,28 +539,43 @@ public sealed class MonsterBook
     /// that this is written for.
     /// </remarks>
     private static int Modifiers(
-        MonsterVarieties table, MonsterVariety one, StatDescriptions? said, StringBuilder text)
-        => Slot(table, one.Mods, said, text)
-            + Slot(table, one.Mods2, said, text)
-            + Slot(table, one.SpecialMods, said, text);
+        MonsterVarieties table,
+        MonsterVariety one,
+        StatDescriptions? said,
+        StringBuilder text,
+        Gather into,
+        int row)
+        => Slot(table, one.Mods, said, text, into, row)
+            + Slot(table, one.Mods2, said, text, into, row)
+            + Slot(table, one.SpecialMods, said, text, into, row);
 
     private static int Slot(
-        MonsterVarieties table, IReadOnlyList<int>? rows, StatDescriptions? said, StringBuilder text)
+        MonsterVarieties table,
+        IReadOnlyList<int>? rows,
+        StatDescriptions? said,
+        StringBuilder text,
+        Gather into,
+        int row)
     {
         if (rows is null)
         {
             return 0;
         }
 
-        foreach (int row in rows)
+        foreach (int at in rows)
         {
-            if (table.Modifier(row) is not { } mod)
+            if (table.Modifier(at) is not { } mod)
             {
-                text.Append(' ').Append(Numbered(row));
+                // NAMED BY ITS NUMBER WHERE IT RESOLVES TO NOTHING, and indexed under that name -
+                // so "which monsters carry a modifier this build cannot name" is a question the
+                // query can answer, rather than a gap it hides.
+                text.Append(' ').Append(Numbered(at));
+                into.Add(row, Numbered(at));
                 continue;
             }
 
             text.Append(' ').Append(mod.Id);
+            into.Add(row, mod.Id);
 
             foreach (ModifierStat stat in mod.Stats ?? [])
             {
@@ -375,13 +586,14 @@ public sealed class MonsterBook
         return rows.Count;
     }
 
-    /// <summary>Writes each of them into the searchable text, and says how many there were.</summary>
-    private static int Add(StringBuilder text, IEnumerable<string> said)
+    /// <summary>Writes each of them into the searchable text and the index, and counts them.</summary>
+    private static int Add(StringBuilder text, IEnumerable<string> said, Gather? into, int row)
     {
         var count = 0;
         foreach (string one in said)
         {
             text.Append(' ').Append(one);
+            into?.Add(row, one);
             count++;
         }
 
@@ -389,6 +601,69 @@ public sealed class MonsterBook
     }
 
     private static string Numbered(int row) => "#" + row.ToString(CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// A field's spelling as a query spells it: lower case, and no spaces.
+    /// </summary>
+    /// <remarks>
+    /// A SPACE SEPARATES TWO TERMS AND ALWAYS WILL, so a column called "atk spd" cannot be named in
+    /// a query as its header spells it. Rather than rename the columns to suit the parser - the
+    /// header is what somebody reads, the query is what they type - both ends normalise, and
+    /// "atkspd", "Atk Spd" and "ATKSPD" all reach the same column.
+    /// </remarks>
+    private static string Key(string name)
+    {
+        Span<char> made = name.Length <= 64 ? stackalloc char[name.Length] : new char[name.Length];
+        var at = 0;
+
+        foreach (char one in name)
+        {
+            if (!char.IsWhiteSpace(one))
+            {
+                made[at++] = char.ToLowerInvariant(one);
+            }
+        }
+
+        return new string(made[..at]);
+    }
+
+    /// <summary>Every value a field holds, and which rows hold each of them.</summary>
+    /// <param name="Values">The values as the table spells them, for showing.</param>
+    /// <param name="Lower">The same, lowercased once, for matching.</param>
+    /// <param name="Rows">Which rows carry each value.</param>
+    private sealed record Held(string[] Values, string[] Lower, RowSet[] Rows);
+
+    /// <summary>Collects a field's values while the table is walked.</summary>
+    private sealed class Gather(int rows)
+    {
+        private readonly Dictionary<string, int> _ids = new(StringComparer.OrdinalIgnoreCase);
+        private readonly List<string> _values = [];
+        private readonly List<RowSet> _rows = [];
+
+        public void Add(int row, string? value)
+        {
+            if (value is not { Length: > 0 })
+            {
+                return;
+            }
+
+            if (!_ids.TryGetValue(value, out int id))
+            {
+                id = _values.Count;
+                _ids[value] = id;
+                _values.Add(value);
+                _rows.Add(new RowSet(rows));
+            }
+
+            _rows[id].Add(row);
+        }
+
+        public Held Done()
+            => new(
+                [.. _values],
+                [.. _values.Select(one => one.ToLowerInvariant())],
+                [.. _rows]);
+    }
 
     /// <summary>
     /// One column being filled in, so that the build loop reads as a list of facts.

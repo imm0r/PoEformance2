@@ -520,6 +520,19 @@ Each stage is useful shipped alone, and each one is a commit somebody can review
    had to be taken away from: `poise` is 0.05 on 2618 of 2733 rows, so a bar scaled at its p90
    fills for 96% of the table — the same wall of bars, reached from the other side.
 3. **Index, facet rail, query grammar with completion.** The comparative jobs arrive here.
+   **Half built** — everything that is not drawing: `RowSet` (the bitsets), `ColumnQuery` (the
+   grammar, hand-written for the AOT reason `RuleExpression` gives), and `MonsterBook` as an
+   `IQuerySource` with facet counting over ten fields. `tag:undead life>200`, `skill:fire`,
+   `(tag:undead or tag:beast) life>300` and `not boss` all answer today; nothing draws them yet.
+   The rail and the query box wait for a look at stage 2 on a real client, because they are what
+   replaces its range chips and there is no sense designing that twice.
+
+   One thing this stage settled that the round-trip test could not: **`life>500` was quietly
+   meaning `life>=500`**. It was built as `500 + double.Epsilon`, and Epsilon is the smallest
+   denormal — adding it to 500 gives back exactly 500. The writer wrote `>=`, the reader read
+   `>=`, and the two agreed with each other all the way. On `life>100` that is **984 rows**, every
+   monster sitting exactly on the baseline. Open bounds are now part of the term, and the check is
+   no longer "does it round-trip" but "does it differ from `>=` by exactly the rows on the bound".
 4. **Pin and compare.**
 5. **The live tie-in** — area facet, row → screen, screen → row.
 6. **A second consumer**, to prove the engine is one: the Entity Browser's survey (`PerSnapshot`),
