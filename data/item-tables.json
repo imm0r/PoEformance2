@@ -1,0 +1,557 @@
+{
+  "comment": "Column order of the three tables a unique item's NAME is joined out of, from poe-tool-dev/dat-schema (PoE2 entries; its CI republishes schema.min.json on every commit). Offsets are NOT stored - they are arithmetic over the widths in DatColumns, and recomputing them is what keeps this honest when a width is corrected; the interval rule that cost Mods a whole table is one such correction. THE JOIN: UniqueStashLayout carries a WordsKey and an ItemVisualIdentityKey, Words holds the unique's name as Text, and ItemVisualIdentity's Id is the key the game exposes on the item itself at Base+0x30 - which is why the name is reached this way round rather than from the metadata path, and why a German client still prices its uniques in English. IsAlternateArt breaks the tie where two layout rows name one art. WHAT IS NOT VERIFIED HERE, said plainly: none of these three is in the loader's file table, so unlike BaseItemTypes and Mods their row size cannot be checked against a running client. The check is the FILE's own row size, which a .dat declares by where it puts its separator, and it happens at runtime against a real install - LoadedTable.Agrees, and the readout says which way it went. The sizes these columns compute are UniqueStashLayout 83 (0x53), Words 64 (0x40), ItemVisualIdentity 968 (0x3C8).",
+  "source": "poe-tool-dev/dat-schema, release latest, read 2026-09-16",
+  "tables": {
+    "UniqueStashLayout": [
+      {
+        "name": "WordsKey",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "ItemVisualIdentityKey",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "UniqueStashTypesKey",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_3",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_4",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "OverrideWidth",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "OverrideHeight",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "ShowIfEmptyChallengeLeague",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "ShowIfEmptyStandard",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "RenamedVersion",
+        "type": "row",
+        "array": false
+      },
+      {
+        "name": "BaseVersion",
+        "type": "row",
+        "array": false
+      },
+      {
+        "name": "IsAlternateArt",
+        "type": "bool",
+        "array": false
+      }
+    ],
+    "Words": [
+      {
+        "name": "Wordlist",
+        "type": "enumrow",
+        "array": false
+      },
+      {
+        "name": "Text",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "SpawnWeight_Tags",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "SpawnWeight_Values",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "HASH32",
+        "type": "u32",
+        "array": false
+      },
+      {
+        "name": "Text2",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Inflection",
+        "type": "string",
+        "array": false
+      }
+    ],
+    "ItemVisualIdentity": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "DDSFile",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "AOFile",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "InventorySoundEffect",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "HASH16",
+        "type": "u16",
+        "array": false
+      },
+      {
+        "name": "AOFile2",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "MarauderSMFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "RangerSMFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "WitchSMFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "DuelistDexSMFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "TemplarSMFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "ShadowSMFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "ScionSMFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "MarauderShape",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "RangerShape",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "WitchShape",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "DuelistShape",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "TemplarShape",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "ShadowShape",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "ScionShape",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "TwoHandSoundType",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_21",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Pickup_AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "SMFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "Identify_AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "EPKFile",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Corrupt_AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "IsAlternateArt",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_28",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CreateCorruptedJewelAchievementItem",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "AnimationLocation",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_31",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_32",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_33",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_34",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_35",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_36",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_37",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_38",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_39",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_40",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_41",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_42",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "IsAtlasOfWorldsMapIcon",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "IsTier16Icon",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_45",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_46",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_47",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_48",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_49",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_50",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_51",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_52",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_53",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_54",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_55",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_56",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_57",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_58",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_59",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_60",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_61",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_62",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_63",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Composition",
+        "type": "enumrow",
+        "array": false
+      },
+      {
+        "name": "UniqueStat1",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "UniqueStat2",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "UniqueStat3",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "UniqueStat4",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_69",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_70",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_71",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_72",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_73",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_74",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "AudioEvent",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_76",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_77",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_78",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_79",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_80",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_81",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_82",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "CharacterSkin",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "OneHandSoundType",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "DropSoundEffect",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Animation",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "ShieldHeldAnimatedObject",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "SheathAnimatedObject",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_89",
+        "type": "bool",
+        "array": false
+      }
+    ]
+  }
+}
