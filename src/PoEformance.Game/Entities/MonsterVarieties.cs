@@ -95,6 +95,30 @@ public sealed record ModifierStat(
         ? Min.ToString(System.Globalization.CultureInfo.InvariantCulture)
         : $"{Min.ToString(System.Globalization.CultureInfo.InvariantCulture)}"
           + $"-{Max.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+
+    /// <summary>
+    /// This stat as the game words it, or null where the game words it not at all.
+    /// </summary>
+    /// <remarks>
+    /// NULL RATHER THAN THE RAW FACT, so the caller can tell the two apart and draw them
+    /// differently - a sentence belongs in the body face and "monster_base_block_% 30" belongs in
+    /// the mono one. Returning the id dressed as prose would make an unworded stat look like a
+    /// worded one.
+    ///
+    /// WHAT THE COVERAGE ACTUALLY IS, measured over the shipped tables rather than assumed: 67 of
+    /// the 122 distinct stats these modifiers set have a sentence, which is 116 of the 295 lines
+    /// drawn. The other 55 are engine-internal - i_am_boss_of_tier, shock_art_variation,
+    /// stance_movement_speed_+%_final - and the game shows no wording for them either, so the raw
+    /// fact IS the answer there rather than a gap waiting to be filled.
+    ///
+    /// HOLE ZERO, and that is by construction rather than by hope: StatDescriptions keeps only the
+    /// blocks that cover ONE stat, and a lone stat fills the first hole. Its loader drops every row
+    /// whose arg_index is not zero for the same reason.
+    /// </remarks>
+    public string? Worded(Components.StatDescriptions? sentences)
+        => sentences?.Of(Stat) is { Length: > 0 } template
+            ? Components.StatDescriptions.Fill(template, 0, Min, Max)
+            : null;
 }
 
 /// <summary>What one of a monster's modifier rows is called, and what it does.</summary>
@@ -205,6 +229,46 @@ public sealed class MonsterVarieties
     /// <summary>How many monsters the table knows.</summary>
     public int Count => _byPath.Count;
 
+    /// <summary>
+    /// The same table assembled from somewhere other than the shipped file.
+    /// </summary>
+    /// <remarks>
+    /// FOR THE INSTALL, which is the source that cannot go stale: the export here is a snapshot of
+    /// one patch and the game's own .dat files ARE the patch. What is assembled has to be identical
+    /// in shape, because everything downstream - the browser, the reference book, the tests - is
+    /// written against these dictionaries and not against a file format. See Features/MonsterTables
+    /// for the reader that fills them.
+    ///
+    /// THE KEYING IS DONE HERE rather than by the caller, and that is the point of it being a
+    /// factory. <see cref="Same"/> and OrdinalIgnoreCase are what make a path off a live entity
+    /// find its row; a caller that built its own dictionary would have to know both, and the one
+    /// that forgot would produce a table that looks full and answers nothing.
+    /// </remarks>
+    public static MonsterVarieties From(
+        IEnumerable<KeyValuePair<string, MonsterVariety>> monsters,
+        IReadOnlyDictionary<int, string> skills,
+        IReadOnlyDictionary<int, ModifierMeaning> modifiers,
+        IReadOnlyDictionary<int, string> tags,
+        IReadOnlyDictionary<int, MonsterKind> types,
+        IReadOnlyDictionary<int, string> blood,
+        IReadOnlyDictionary<int, string> resistances,
+        string generated)
+    {
+        ArgumentNullException.ThrowIfNull(monsters);
+
+        var byPath = new Dictionary<string, MonsterVariety>(StringComparer.OrdinalIgnoreCase);
+        foreach ((string id, MonsterVariety one) in monsters)
+        {
+            if (Same(id) is { Length: > 0 } key)
+            {
+                byPath[key] = one;
+            }
+        }
+
+        return new MonsterVarieties(
+            byPath, skills, modifiers, tags, types, blood, resistances, generated);
+    }
+
     /// <summary>Reads the table, or returns <see cref="Empty"/> when it cannot.</summary>
     /// <remarks>Never throws. Without it the entity browser shows paths, as it always did.</remarks>
     public static MonsterVarieties Load(string? path)
@@ -288,6 +352,19 @@ public sealed class MonsterVarieties
             return Empty;
         }
     }
+
+    /// <summary>
+    /// Every monster the table knows, by the path it is keyed on.
+    /// </summary>
+    /// <remarks>
+    /// FOR READING THE TABLE RATHER THAN QUERYING IT. Everything else here answers a question
+    /// about one entity that is in front of the player - <see cref="Find"/> takes the path off
+    /// something on screen. A reference book is the other way round: nothing is in front of
+    /// anybody, and the whole table is the subject. Handed out as the dictionary rather than
+    /// copied, because two and a half thousand rows re-enumerated per keystroke is the cost a
+    /// search box pays if this makes a list every time it is asked.
+    /// </remarks>
+    public IReadOnlyDictionary<string, MonsterVariety> All => _byPath;
 
     /// <summary>What the table says about the thing at this path, or null.</summary>
     public MonsterVariety? Find(string? entityPath)

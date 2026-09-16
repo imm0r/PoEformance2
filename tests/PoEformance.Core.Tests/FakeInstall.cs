@@ -75,6 +75,33 @@ internal static class FakeInstall
         return GameFiles.Open(archive, Packed.AsIs);
     }
 
+    /// <summary>
+    /// An install holding exactly these files, under a real index.
+    /// </summary>
+    /// <remarks>
+    /// For the readers that ask for a path BY NAME rather than walking for it - GameFiles.Has and
+    /// Read are a hash lookup - so the spelled-out path list the walk needs is not built here.
+    /// <see cref="Open"/> is the one that needs it, and says why.
+    /// </remarks>
+    public static GameFiles? Of(params (string Path, byte[] Content)[] files)
+    {
+        ArgumentNullException.ThrowIfNull(files);
+
+        var content = new List<byte>();
+        var entries = new List<Packed.Entry>();
+
+        foreach ((string path, byte[] bytes) in files)
+        {
+            entries.Add(new Packed.Entry(path, 0, content.Count, bytes.Length));
+            content.AddRange(bytes);
+        }
+
+        var archive = new Archive();
+        archive.Add("data.bundle.bin", Packed.Bundle([.. content], chunkSize: 4096));
+        archive.Add("_.index.bin", Packed.Bundle(Packed.Index(["data"], [.. entries]), chunkSize: 4096));
+        return GameFiles.Open(archive, Packed.AsIs);
+    }
+
     /// <summary>The archive under it: a dictionary of paths, read whole or in ranges.</summary>
     private sealed class Archive : IGameArchive
     {

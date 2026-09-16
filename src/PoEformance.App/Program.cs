@@ -2567,6 +2567,43 @@ internal static class Program
         overlay.Monsters = PoEformance.Game.Entities.MonsterVarieties.Load(
             FindDataFile("monster-varieties.json"));
 
+        // And what the game says each of a monster's modifier stats DOES, taken from the atlas's
+        // copy rather than loaded a second time. It owns the upgrade: the shipped export until the
+        // background walk reads the install's own .csd files, and the game's own afterwards. Asked
+        // per frame, because that swap happens long after this line runs.
+        overlay.StatSentences = () => atlas.StatSentences;
+
+        // THE INSTALL'S OWN MONSTER TABLES, which replace the export above when they read. Off the
+        // thread pool for one measured reason: this parses eight .dat files, and Mods alone is
+        // sixteen thousand rows of six hundred and ninety-three bytes - file work, on the thread
+        // that must not be slow, at the moment somebody is waiting for a window to appear.
+        //
+        // ASSIGNED AND NOT MERGED. The two tables are the same 2733 monsters read two different
+        // ways, so merging them would only hide which one is in force - and MonsterTables.Say
+        // prints how far the install and the export agree, which is the check. On failure nothing
+        // is assigned at all and the export simply stays.
+        if (installed is not null)
+        {
+            PoEformance.Game.Entities.MonsterVarieties exported = overlay.Monsters;
+            _ = Task.Run(() =>
+            {
+                PoEformance.Features.MonsterTables read = PoEformance.Features.MonsterTables.Read(
+                    installed,
+                    PoEformance.Features.QuestTableLayouts.Load(FindDataFile("monster-tables.json")),
+                    exported);
+
+                foreach (string line in read.Say)
+                {
+                    Console.WriteLine(line);
+                }
+
+                if (read.FromGame)
+                {
+                    overlay.Monsters = read.Table;
+                }
+            });
+        }
+
         overlay.Costs = costs;
         overlay.Coverage = coverage;
         overlay.Damage = damage;
@@ -2688,6 +2725,7 @@ internal static class Program
         overlay.AttachTracker(tracker, writeTracker);
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
+        overlay.AttachMonsterBook();
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

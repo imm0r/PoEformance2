@@ -322,7 +322,43 @@ public static class StatDescriptionFiles
             return null;
         }
 
-        return Plain(line[(first + 1)..last]);
+        // Unwrapped before the brackets are stripped, because the wrapper is the outer one: a
+        // tag's body may itself hold [Code|Display] markup.
+        return Plain(Unwrap(line[(first + 1)..last]));
+    }
+
+    /// <summary>
+    /// The sentence inside a <c>&lt;tag&gt;{{...}}</c> wrapper, or the text unchanged.
+    /// </summary>
+    /// <remarks>
+    /// A COLOUR, NOT A WORDING. The game marks a few lines for a different ink by wrapping the
+    /// whole sentence - <c>&lt;enchanted&gt;{{Monsters grant {0}% increased Experience}}</c> - and
+    /// nothing here draws in that ink, so the wrapper is furniture on the way to a reader. Left in,
+    /// it is printed: that stat is carried by seven monster modifiers, and the line they showed
+    /// read as broken markup rather than as a sentence.
+    ///
+    /// MEASURED BEFORE IT WAS WRITTEN, because a rule this cheap is also cheap to get wrong: 79 of
+    /// the export's 16802 templates carry the wrapper and ALL 79 are the whole template, one tag
+    /// (<c>enchanted</c> on 78, <c>nemesismod</c> on one). The 33 other rows with angle brackets are
+    /// a different markup - <c>&lt;&lt;ExpedRuneFire&gt;&gt; Fire Rune</c>, a sprite rather than a
+    /// wrapper - and they have no braces, which is why this matches on the pair and not on the tag.
+    /// </remarks>
+    public static string Unwrap(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+
+        if (text.Length < 5 || text[0] != '<' || !text.EndsWith("}}", StringComparison.Ordinal))
+        {
+            return text;
+        }
+
+        int close = text.IndexOf('>', 1);
+        if (close < 2 || !text.AsSpan(close + 1).StartsWith("{{", StringComparison.Ordinal))
+        {
+            return text;
+        }
+
+        return text[(close + 3)..^2];
     }
 
     /// <summary>

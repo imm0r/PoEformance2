@@ -120,6 +120,58 @@ public sealed class StatDescriptions
         => statId is { Length: > 0 } && _lines.TryGetValue(statId, out string? line) ? line : null;
 
     /// <summary>
+    /// One argument's hole in a template filled in, in every spelling the game writes it.
+    /// </summary>
+    /// <remarks>
+    /// THE PLACEHOLDERS CARRY A FORMAT, and that is the part that is easy to miss. <c>{0:+d}</c>
+    /// means show the sign - it is how "+79 to maximum Life" gets its plus - and replacing the
+    /// bare <c>{0}</c> alone leaves the line reading as though the table had no entry for it.
+    /// Measured over the 16802-row export: 11501 holes are written <c>{0}</c>, 1038 <c>{0:+d}</c>,
+    /// 37 <c>{0:d}</c>, and 148 leave the index out altogether as <c>{}</c> or <c>{:+d}</c> - so
+    /// four of those five spellings are ones a reader would otherwise see raw.
+    ///
+    /// ONLY THIS ARGUMENT'S HOLE IS FILLED. A line built from two stats keeps the other's marker,
+    /// because a caller holds one value, and guessing at the second would put this number in the
+    /// wrong half of somebody else's sentence.
+    ///
+    /// A TEMPLATE WITH NO HOLE COMES BACK UNCHANGED, which is right rather than a shortfall:
+    /// "Maim on Hit" is the whole sentence for a flag, and the game shows no number for it either.
+    /// </remarks>
+    /// <param name="template">The wording, as <see cref="Of"/> hands it out.</param>
+    /// <param name="argument">Which hole this value fills. Zero for a single-stat line.</param>
+    /// <param name="min">The value, or the low end of one that rolls.</param>
+    /// <param name="max">The same number again where it does not roll.</param>
+    public static string Fill(string template, int argument, int min, int max)
+    {
+        ArgumentNullException.ThrowIfNull(template);
+
+        string plain = min == max
+            ? min.ToString(System.Globalization.CultureInfo.InvariantCulture)
+
+            // A DASH BETWEEN A NEGATIVE MINIMUM AND ITS MAXIMUM READS AS A SUBTRACTION: "(-20-20)"
+            // is not a range anybody can parse back. Those few are spelled out instead.
+            : min < 0
+                ? $"({min} to {max})"
+                : $"({min}-{max})";
+
+        string signed = min >= 0 ? "+" + plain : plain;
+
+        string filled = Put(
+            template, argument.ToString(System.Globalization.CultureInfo.InvariantCulture), plain, signed);
+
+        // The game also writes the FIRST hole without its index, and that hole is argument zero.
+        return argument == 0 ? Put(filled, string.Empty, plain, signed) : filled;
+    }
+
+    /// <summary>Every spelling of one hole, replaced. The bare form first; none contains another.</summary>
+    private static string Put(string template, string index, string plain, string signed)
+        => template
+            .Replace($"{{{index}}}", plain, StringComparison.Ordinal)
+            .Replace($"{{{index}:+d}}", signed, StringComparison.Ordinal)
+            .Replace($"{{{index}:d}}", plain, StringComparison.Ordinal)
+            .Replace($"{{{index}:-d}}", plain, StringComparison.Ordinal);
+
+    /// <summary>
     /// How this table compares with another, which is the only check there is without the game.
     /// </summary>
     /// <remarks>
@@ -215,7 +267,11 @@ public sealed class StatDescriptions
                     continue;
                 }
 
-                lines[parts[0]] = parts[1];
+                // Unwrapped HERE TOO and not only on the install's side, because the two are
+                // compared against each other - see Against. A wrapper stripped on one route and
+                // left on the other would turn 79 rows the two agree about into 79 disagreements,
+                // and the check that exists to find drift would be reporting its own tidy-up.
+                lines[parts[0]] = StatDescriptionFiles.Unwrap(parts[1]);
             }
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
