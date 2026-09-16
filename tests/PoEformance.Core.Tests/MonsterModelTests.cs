@@ -172,6 +172,74 @@ public class MonsterModelTests
         Assert.Contains("no SkinMesh", said.Why, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// A texture reached through a signpost is still found.
+    /// </summary>
+    /// <remarks>
+    /// THE CASE A PLAIN READ LOSES. A texture in this game is one of three things and only the
+    /// third is a .dds as it stands: a file whose content is a star and a path points at the one
+    /// that really holds the picture, and another kind sits behind a compressed header. Decoding
+    /// a bare read handles the third and silently fails the other two - a monster with a mesh and
+    /// no colour, with nothing anywhere saying why.
+    ///
+    /// THE SAMPLE THIS WAS FIRST CHECKED AGAINST WAS A PLAIN .dds, which is exactly the case that
+    /// proves nothing. GameArt has followed both hops since it was written for item icons; the
+    /// monster walk was calling past it.
+    /// </remarks>
+    [Fact]
+    public void ATextureBehindASignpostIsFollowed()
+    {
+        var install = Install();
+
+        // The material's texture is now a signpost at the path the material names.
+        install.Files["art/skin.dds"] = Encoding.ASCII.GetBytes("*art/real.dds");
+        install.Files["art/real.dds"] = Dds();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.True(said.Ready);
+        Assert.NotNull(said.Skin);
+        Assert.True(said.Skin!.Value.Ready);
+    }
+
+    /// <summary>And a texture that is simply there is found the same way.</summary>
+    [Fact]
+    public void APlainTextureIsStillFound()
+    {
+        var install = Install();
+        install.Files["art/skin.dds"] = Dds();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.True(said.Ready);
+        Assert.NotNull(said.Skin);
+    }
+
+    /// <summary>The smallest uncompressed DDS the decoder accepts: 4x4, one colour.</summary>
+    private static byte[] Dds()
+    {
+        var file = new byte[128 + (4 * 4 * 4)];
+        "DDS "u8.CopyTo(file);
+
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(4), 124);          // header size
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(8), 0x0000100F);   // caps|height|width|pitch|pixelformat
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(12), 4);           // height
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(16), 4);           // width
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(20), 16);          // pitch
+
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(76), 32);          // pixel format size
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(80), 0x41);        // rgb | alpha
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(88), 32);          // bits per pixel
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(92), 0x00FF0000);  // red
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(96), 0x0000FF00);  // green
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(100), 0x000000FF); // blue
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(104), 0xFF000000); // alpha
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(108), 0x1000);     // caps: texture
+
+        Array.Fill(file, (byte)0xC0, 128, 4 * 4 * 4);
+        return file;
+    }
+
     /// <summary>A monster with no texture still has a mesh, and is drawn plain.</summary>
     [Fact]
     public void AMissingTextureCostsTheColourAndNotThePicture()

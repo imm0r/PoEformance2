@@ -1933,7 +1933,7 @@ internal static class Program
         // network while playing.
         using var itemArt = new PoEformance.Features.ItemArtStore
         {
-            Install = installed is null ? null : PoEformance.Overlay.InstalledArt.From(installed),
+            Install = installed is null ? null : PoEformance.Overlay.InstalledArt.Pictures(installed),
         };
 
         // The quest tables come out of the INSTALL, not out of memory: a quest state is an
@@ -2801,10 +2801,14 @@ internal static class Program
         overlay.AttachTracker(tracker, writeTracker);
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
+        // THE INSTALL'S OWN BYTES, and not InstalledArt.Pictures - which has this same signature
+        // and returns a PNG. It decodes a .dds and re-encodes it, so an .ao gives null - and
+        // every monster reports having no model. A delegate type says nothing about what the bytes
+        // MEAN; this one has to be the file as the bundle holds it.
         overlay.AttachMonsterBook(
             settings.MonsterColumns,
             settings.MonsterRail,
-            install: installed is null ? null : PoEformance.Overlay.InstalledArt.From(installed));
+            readFile: installed is null ? null : installed.Read);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

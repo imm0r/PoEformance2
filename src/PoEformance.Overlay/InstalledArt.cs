@@ -36,7 +36,21 @@ public static class InstalledArt
     /// the app has an install open anyway, for the quest tables, the ground-effect names and
     /// (now) for asking what the game calls its own art files. Four features, one open.
     /// </remarks>
-    public static Func<string, byte[]?> From(GameFiles files)
+    /// <summary>
+    /// A PICTURE out of the install, encoded as a PNG - NOT the file's own bytes.
+    /// </summary>
+    /// <remarks>
+    /// NAMED FOR WHAT IT RETURNS, because the name it had - From - said nothing, and the signature
+    /// says less: <c>Func&lt;string, byte[]?&gt;</c> is also the shape of "read me that file", and
+    /// this is not that. It decodes a .dds and re-encodes it, so an .ao, a .sm or a .mat all come
+    /// back null.
+    ///
+    /// THAT COST A ROUND. The monster portrait was wired to this because the signature matched,
+    /// and every monster in the book reported having no model - a true message about an empty read,
+    /// for a reason nothing in the type system could show. Anything wanting the file as the bundle
+    /// holds it wants <see cref="GameFiles.Read"/>.
+    /// </remarks>
+    public static Func<string, byte[]?> Pictures(GameFiles files)
     {
         ArgumentNullException.ThrowIfNull(files);
         return path => Encode(GameArt.Read(files, path));

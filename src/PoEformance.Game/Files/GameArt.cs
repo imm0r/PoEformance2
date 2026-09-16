@@ -70,8 +70,22 @@ public static class GameArt
     /// </summary>
     /// <remarks>Separate from decoding so that what the install holds can be checked on its own.</remarks>
     public static byte[]? ReadRaw(GameFiles? files, string? artPath)
+        => files is null ? null : ReadRaw(files.Read, artPath);
+
+    /// <summary>
+    /// The same, through a read function rather than an open install.
+    /// </summary>
+    /// <remarks>
+    /// FOR CALLERS THAT ALREADY READ THROUGH A FUNCTION, of which the monster model walk is one -
+    /// and it was calling <see cref="Decode"/> on a bare read, which is this method without the
+    /// two hops that matter. A texture that is a signpost, or one behind a compressed header,
+    /// comes back as no picture: a monster with a mesh and no colour, and nothing anywhere saying
+    /// why. The sample it was checked against happened to be a plain .dds, which is exactly the
+    /// case that proves nothing.
+    /// </remarks>
+    public static byte[]? ReadRaw(Func<string, byte[]?>? read, string? artPath)
     {
-        if (files is null || string.IsNullOrWhiteSpace(artPath))
+        if (read is null || string.IsNullOrWhiteSpace(artPath))
         {
             return null;
         }
@@ -80,7 +94,7 @@ public static class GameArt
 
         for (int hop = 0; hop < MostHops; hop++)
         {
-            byte[]? found = files.Read(path);
+            byte[]? found = read(path);
             if (found is null)
             {
                 return null;
