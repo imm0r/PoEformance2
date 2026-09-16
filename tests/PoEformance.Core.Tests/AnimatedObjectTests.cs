@@ -478,6 +478,92 @@ public class AnimatedObjectTests
         Assert.Empty(AoSurvey.Names(string.Empty));
     }
 
+    /// <summary>
+    /// A value may be written under its <c>=</c> instead of after it, for any of the three openers.
+    /// </summary>
+    /// <remarks>
+    /// EVERY REMAINING FAULT OF THE SECOND REAL SURVEY WAS THIS - 26 files, all reading "not an
+    /// entry in AnimatedRender", and the files say why: the "=" ends its line and the payload
+    /// opens the next one. The first fix covered a brace, which was the shape in front of me at
+    /// the time; a quote does the same and was left out, so the rule is written once for all
+    /// three rather than a third time when the next one turns up.
+    /// </remarks>
+    [Theory]
+    [InlineData("'{ \"passes\": [] }'", AoValueKind.Payload)]
+    [InlineData("\"Art/Models/x.sm\"", AoValueKind.Quoted)]
+    [InlineData("{ Play(\"a/b.ao\"); }", AoValueKind.Script)]
+    public void AValueMayOpenOnTheLineAfterItsEquals(string value, AoValueKind kind)
+    {
+        AnimatedObject ao = AnimatedObject.Parse(
+            $"version 3\nAnimatedRender\n{{\n\tRenderPasses = \n\t{value}\n\tafter = 1\n}}");
+
+        Assert.Empty(ao.Faults);
+
+        AoStruct block = Assert.Single(ao.Structs);
+        Assert.Equal(2, block.Entries.Count);
+        Assert.Equal("RenderPasses", block.Entries[0].Key);
+        Assert.Equal(kind, block.Entries[0].Kind);
+
+        // And the entry after it is still the outer struct's, which is what would break quietly.
+        Assert.Equal("after", block.Entries[1].Key);
+    }
+
+    /// <summary>
+    /// A bare word on the next line is NOT a value - it is the next entry.
+    /// </summary>
+    /// <remarks>
+    /// The other half of the rule above, and the reason it is limited to the three openers: an
+    /// unquoted value really is the rest of its own line, so reaching onto the next one would
+    /// swallow whatever is there.
+    /// </remarks>
+    [Fact]
+    public void AnEmptyValueDoesNotEatTheNextEntry()
+    {
+        AnimatedObject ao = AnimatedObject.Parse("version 3\nFoo\n{\n\tempty = \n\tnext = 2\n}");
+
+        Assert.Empty(ao.Faults);
+        AoStruct block = Assert.Single(ao.Structs);
+        Assert.Equal(["empty", "next"], block.Entries.Select(one => one.Key));
+        Assert.Equal(string.Empty, block.Entries[0].Value);
+        Assert.Equal("2", block.Entries[1].Value);
+    }
+
+    /// <summary>
+    /// A quoted value may carry a socket name before its path - and a path may contain a space.
+    /// </summary>
+    /// <remarks>
+    /// TWO SHAPES, AND THE SECOND RULES OUT THE OBVIOUS READING OF THE FIRST. Every attachment in
+    /// the game names a socket and then a file inside one pair of quotes, so taking the value
+    /// whole asks for a path no install has - the second survey found 1852 of 3262 files, and the
+    /// 2289 attachments were failing as a body. But splitting on whitespace and keeping the
+    /// path-shaped pieces destroys "Audio/Sound Effects/…", which is a real folder: every .ogg in
+    /// a ten-file sample vanished at once when that was tried.
+    ///
+    /// So the rule is the slash: a socket is a bone or a slot and never has one, and everything
+    /// from the first word that does belongs to the file. The remark on the old filter claimed
+    /// "no spaces in it" while the code never checked, and making the code agree with the comment
+    /// is what surfaced the second shape - the comment was wrong about the game and the code had
+    /// been right by omission.
+    /// </remarks>
+    [Theory]
+    [InlineData(
+        "eye_L Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao",
+        "Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao")]
+    [InlineData(
+        "<root> Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/Armour.ao",
+        "Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/Armour.ao")]
+    [InlineData(
+        "Audio/Sound Effects/MonsterSounds/MudBurrower/BodyBarrierIdle.loop.ogg",
+        "Audio/Sound Effects/MonsterSounds/MudBurrower/BodyBarrierIdle.loop.ogg")]
+    [InlineData("Art/Models/X/Textures/S.mat:0", "Art/Models/X/Textures/S.mat:0")]
+    [InlineData("grp_head false aux_target_head_01 aux_target_head_02", "")]
+    [InlineData("0 0 -9.35201", "")]
+    [InlineData("aux_target_head_01", "")]
+    [InlineData("true", "")]
+    [InlineData("", "")]
+    public void APathStartsAtTheFirstWordWithASlashInIt(string value, string path)
+        => Assert.Equal(path, AoSurvey.Path(value));
+
     /// <summary>Walking a struct's entries reaches the children too, in file order.</summary>
     [Fact]
     public void WalkingReachesTheChildren()

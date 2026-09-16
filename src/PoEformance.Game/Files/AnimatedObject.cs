@@ -509,8 +509,46 @@ internal sealed class AoScanner(string text)
         }
 
         SkipSpaces();
+        Wrapped();
         (string value, AoValueKind kind) = Value();
         return new AoEntry(key, value, kind, []);
+    }
+
+    /// <summary>
+    /// Steps over the line break where a value is written under its <c>=</c> rather than after it.
+    /// </summary>
+    /// <remarks>
+    /// EVERY REMAINING FAULT OF THE SECOND REAL SURVEY WAS THIS - 26 files, all of them reading
+    /// "not an entry in AnimatedRender", and the files say why:
+    ///
+    ///     RenderPasses =
+    ///     '{
+    ///         "passes": [ …
+    ///
+    /// The "=" ends its line and the payload opens the next one. The first fix for this only
+    /// covered a brace, which was the shape that happened to be in front of me; a quote does the
+    /// same thing and was left out. So the rule is written once, for all three openers, rather
+    /// than a third time when the next one turns up.
+    ///
+    /// ONLY FOR AN OPENER, never for a bare word or a number: an unquoted value really is the rest
+    /// of its line, and reaching onto the next one would swallow the entry after it.
+    /// </remarks>
+    private void Wrapped()
+    {
+        if (!Done && _text[_at] is not ('\n' or '\r'))
+        {
+            return;
+        }
+
+        int was = _at;
+        SkipTrivia();
+
+        if (!Done && _text[_at] is '\'' or '"' or '{')
+        {
+            return;
+        }
+
+        _at = was;
     }
 
     /// <summary>The four spellings a value comes in. See <see cref="AoValueKind"/>.</summary>
