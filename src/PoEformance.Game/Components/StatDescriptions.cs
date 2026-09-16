@@ -36,12 +36,15 @@ public sealed class StatDescriptions
     public static StatDescriptions Empty => new([], 0, "nothing - no stat descriptions were read");
 
     private readonly Dictionary<string, string> _lines;
+    private readonly HashSet<string> _shared;
 
-    private StatDescriptions(Dictionary<string, string> lines, int grouped, string source)
+    private StatDescriptions(
+        Dictionary<string, string> lines, int grouped, string source, HashSet<string>? shared = null)
     {
         _lines = lines;
         Grouped = grouped;
         Source = source;
+        _shared = shared ?? [];
     }
 
     /// <summary>How many sentences are known.</summary>
@@ -91,7 +94,8 @@ public sealed class StatDescriptions
         }
 
         var lines = new Dictionary<string, string>(blocks.Count, StringComparer.Ordinal);
-        int grouped = 0;
+        var shared = new HashSet<string>(StringComparer.Ordinal);
+
         foreach ((string stat, StatDescription block) in blocks)
         {
             if (block.Stats.Count == 1)
@@ -100,18 +104,39 @@ public sealed class StatDescriptions
             }
             else
             {
-                grouped++;
+                // KEPT BY NAME THOUGH THE SENTENCE IS DROPPED, so that a caller can tell the two
+                // ways of having no wording apart: a stat the game words as part of a group, and a
+                // stat the game does not word at all. Those are different findings - the first is
+                // reachable by a caller that holds every value in the group, the second is
+                // engine-internal and never had a sentence to find.
+                shared.Add(stat);
             }
         }
 
         return new StatDescriptions(
             lines,
-            grouped,
-            $"the game's own .csd files ({lines.Count} sentences, {grouped} dropped as multi-stat)")
+            shared.Count,
+            $"the game's own .csd files ({lines.Count} sentences, {shared.Count} dropped as multi-stat)",
+            shared)
         {
             FromGame = true,
         };
     }
+
+    /// <summary>
+    /// Whether the game words this stat only as part of a group, so no sentence was kept.
+    /// </summary>
+    /// <remarks>
+    /// ANSWERED BY BOTH ROUTES, which was worth checking rather than assuming: the TSV's fourth
+    /// column is the group, written as the comma-separated ids that share the template, so the
+    /// export carries the same fact the install does. <see cref="Load"/> was already reading it to
+    /// decide what to drop and simply was not keeping the names.
+    ///
+    /// SO A "NO" MEANS NO on either route, and the distinction it buys is the useful one: a stat
+    /// with no sentence anywhere is engine bookkeeping that never had one, while a stat that is
+    /// only worded as part of a group is reachable by a caller holding every value in that group.
+    /// </remarks>
+    public bool Shared(string? statId) => statId is { Length: > 0 } && _shared.Contains(statId);
 
     /// <summary>
     /// The sentence for a stat id, with <c>{0}</c> where its value goes, or null.
@@ -245,7 +270,7 @@ public sealed class StatDescriptions
         }
 
         var lines = new Dictionary<string, string>(StringComparer.Ordinal);
-        int grouped = 0;
+        var shared = new HashSet<string>(StringComparer.Ordinal);
         try
         {
             foreach (string line in File.ReadLines(path))
@@ -261,9 +286,13 @@ public sealed class StatDescriptions
                     continue;
                 }
 
+                // THE TWO REASONS COINCIDE EXACTLY on the 0.5.5 export - 1257 rows belong to a
+                // multi-stat group, and the 661 of them that fill a hole other than the first are
+                // a subset of those, with no row dropped for the index alone. So the name is kept
+                // under one heading rather than two: the game words this stat only in company.
                 if (parts[2] != "0" || parts[3].Contains(',', StringComparison.Ordinal))
                 {
-                    grouped++;
+                    shared.Add(parts[0]);
                     continue;
                 }
 
@@ -281,8 +310,9 @@ public sealed class StatDescriptions
 
         return new StatDescriptions(
             lines,
-            grouped,
+            shared.Count,
             $"data/{Path.GetFileName(path)} ({lines.Count} sentences)"
-            + " - right only while somebody re-exports it");
+            + " - right only while somebody re-exports it",
+            shared);
     }
 }

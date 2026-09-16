@@ -2725,7 +2725,7 @@ internal static class Program
         overlay.AttachTracker(tracker, writeTracker);
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
-        overlay.AttachMonsterBook(settings.MonsterColumns);
+        overlay.AttachMonsterBook(settings.MonsterColumns, settings.MonsterRail);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

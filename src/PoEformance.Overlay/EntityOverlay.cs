@@ -480,6 +480,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             MonsterColumns = _monsterBook?.Columns is { Count: > 0 } columns
                 ? columns
                 : basis.MonsterColumns,
+            MonsterRail = _monsterBook?.RailOpen ?? basis.MonsterRail,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -2042,14 +2043,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// look exactly like a build with no table at all. The stat sentences are read the same way for
     /// a stronger reason - see <see cref="StatSentences"/>, which changes mid-session.
     /// </remarks>
-    public void AttachMonsterBook(IReadOnlyList<string>? columns = null, bool visible = false)
+    public void AttachMonsterBook(
+        IReadOnlyList<string>? columns = null, bool rail = true, bool visible = false)
     {
         var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences)
         {
             Changed = () => SettingsChanged?.Invoke(),
         };
 
-        window.Show(columns);
+        window.Show(columns, rail);
         _monsterBook = window;
 
         _tools.Add(
