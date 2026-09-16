@@ -92,6 +92,52 @@ public sealed class SkinnedMesh
     /// <summary>How many triangles the mesh holds.</summary>
     public int Triangles => Indices.Length / 3;
 
+    /// <summary>
+    /// A mesh assembled from geometry rather than read from a file.
+    /// </summary>
+    /// <remarks>
+    /// FOR TESTING THE RENDERER, which needs shapes whose answers are known in advance - a post
+    /// four times longer than it is wide, two quads at different depths. Those cannot be carved
+    /// out of a real monster, and building a whole .smd byte by byte to describe one would test
+    /// the reader rather than the drawing.
+    ///
+    /// NO SKIN, because nothing that uses this needs one: the bones and weights come back empty
+    /// and a still picture does not read them.
+    /// </remarks>
+    public static SkinnedMesh Of(
+        Vector3[] positions, Vector3[] normals, int[] indices, Vector3 least, Vector3 most)
+    {
+        ArgumentNullException.ThrowIfNull(positions);
+        ArgumentNullException.ThrowIfNull(normals);
+        ArgumentNullException.ThrowIfNull(indices);
+
+        if (normals.Length != positions.Length)
+        {
+            throw new ArgumentException("one normal per position", nameof(normals));
+        }
+
+        foreach (int one in indices)
+        {
+            if (one < 0 || one >= positions.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(indices), "an index points at no vertex");
+            }
+        }
+
+        return new SkinnedMesh
+        {
+            Positions = positions,
+            Normals = normals,
+            Coordinates = new Vector2[positions.Length],
+            Bones = [],
+            Weights = [],
+            Indices = indices,
+            Shapes = [new MeshShape("shape 0", 0, indices.Length)],
+            Least = least,
+            Most = most,
+        };
+    }
+
     /// <summary>Reads one out of an open install, by the path a <c>.sm</c> named.</summary>
     public static SkinnedMesh Read(GameFiles? files, string? path)
         => files is null || string.IsNullOrWhiteSpace(path)
