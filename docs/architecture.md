@@ -241,6 +241,43 @@ The workbench features are the product, in build order:
 Overlays (radar, vitals, loot) build on the same snapshots afterwards; automation
 comes last.
 
+## The monster's model: five files, four formats
+
+The Monster Book draws a monster's 3D model. Getting there is a chain, and each hop is a
+different file format out of the game's own bundles:
+
+```
+MonsterVarieties.AOFiles          a path, from the install's table (the export lacks the column)
+  └─ .ao    text, key = value     AnimatedObject   → SkinMesh.skin names a .sm
+      └─ .sm    text, keyword+values  MeshManifest → names a .smd and a .mat
+          ├─ .smd   binary            SkinnedMesh  → the triangles
+          └─ .mat   JSON              MaterialFile → names a .dds
+              └─ .dds  BC1/BC3        GameArt      → already decoded, for item icons
+```
+
+`MonsterModels.Of` walks all of it and hands back geometry plus texture; `MeshPicture` draws
+that to a `GamePicture` **on the processor**, because ImGui has no 3D pipeline and a mesh has
+to become a texture before it can appear. That choice is also what makes the renderer testable:
+its output is an array a test can measure, where a D3D11 renderer could only be judged from a
+screenshot on a machine with the game.
+
+Four things here cost time to rediscover, so they are written down:
+
+- **`extends` carries no extension.** The game writes `extends "Metadata/Parent"` while an
+  attached object carries its `.ao` in full. The first survey asked for 3231 files and found
+  1687 because of this.
+- **An attachment names a socket AND a file in one pair of quotes** — `"eye_L Metadata/…/x.ao"`.
+  Splitting on whitespace is the obvious fix and it is wrong: `Audio/Sound Effects/…` is a real
+  folder. The rule is the first word containing a slash.
+- **The `extends` chain is not optional.** Nine of ten monsters carry their own `SkinMesh`;
+  `BoneRabbleJaguar` carries none and its model is two hops away. The nearer file wins.
+- **A model stands along negative Z.** Read `y` as up and the monster lies on its face; drop the
+  sign and it hangs upside down. Both produce a picture.
+
+The format diagrams are [poe_data_tools/FORMATS.md](https://github.com/adamthedash/poe_data_tools/blob/master/FORMATS.md);
+`ggpk.exposed/poe2/<path>` serves the game's own files over HTTP, which is how these readers were
+checked against real data on a machine with no install. `--aodump` surveys the `.ao` graph.
+
 ## Deployment
 
 Native AOT (`PublishAot=true` on App), AOT/trim analyzers on everywhere so
