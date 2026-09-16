@@ -31,33 +31,6 @@ namespace PoEformance.Overlay;
 /// </remarks>
 public sealed class MonsterPortrait
 {
-    /// <summary>
-    /// The sizes a model is ever drawn at, in pixels each way.
-    /// </summary>
-    /// <remarks>
-    /// A LADDER RATHER THAN THE PANE'S OWN WIDTH, and that is the whole reason it exists. Dragging
-    /// a pane's edge changes its width on every frame; a render tied to it would redraw the mesh
-    /// for each of those, at a new size, which also throws away the canvas each time. Rungs are
-    /// crossed rarely, ImGui scales the quad between them for nothing, and a size that changes
-    /// perhaps twice during a resize costs two redraws instead of sixty.
-    ///
-    /// THEY DOUBLE-ISH ON PURPOSE, so that stepping down one rung while dragging (see
-    /// <see cref="Draw"/>) roughly quarters the work rather than shaving a little off it.
-    /// </remarks>
-    public static readonly int[] Steps = [256, 384, 512, 768, 1024, 1536, MeshPicture.Widest];
-
-    /// <summary>The default cap, and the smallest a cap may be set to.</summary>
-    /// <remarks>
-    /// 768 MEASURED AGAINST A REAL RIG: 8.0 ms a frame while turning, beside an overlay frame of
-    /// about 10. One rung up is 12.5 and two is 25.1, which a drag cannot keep up with - so this
-    /// is the largest that stays smooth, and the setting exists for people whose processor or
-    /// patience differs. See OverlaySettings.MonsterModelSize.
-    /// </remarks>
-    public const int Usual = 768;
-
-    /// <inheritdoc cref="Usual"/>
-    public const int Smallest = 256;
-
     /// <summary>How far the mouse drags to turn the model once around.</summary>
     public const float Sweep = 360f;
 
@@ -71,7 +44,7 @@ public sealed class MonsterPortrait
     /// <summary>The id ImGui knows the picture by, which is what makes it something to grab.</summary>
     private const string Grip = "##monster-model";
 
-    private readonly int _most;
+    private readonly PictureLadder _sizes;
     private readonly Func<string, byte[]?>? _install;
     private readonly Func<string, Image<Rgba32>, bool, IntPtr>? _upload;
     private readonly Action<string>? _release;
@@ -108,27 +81,24 @@ public sealed class MonsterPortrait
     /// <param name="install">How to read a file out of the game, or null where there is none.</param>
     /// <param name="upload">Hands pixels to the renderer and gives back a handle.</param>
     /// <param name="release">Gives a handle back.</param>
-    /// <param name="most">The biggest the model may be drawn, each way. Snapped to a rung of <see cref="Steps"/>.</param>
+    /// <param name="most">The biggest the model may be drawn, each way. See <see cref="PictureLadder"/>.</param>
     public MonsterPortrait(
         Func<string, byte[]?>? install,
         Func<string, Image<Rgba32>, bool, IntPtr>? upload,
         Action<string>? release,
-        int most = Usual)
+        int most = PictureLadder.Usual)
     {
         _install = install;
         _upload = upload;
         _release = release;
-
-        // SNAPPED AT THE DOOR, so that every size used afterwards is a rung and stepping down one
-        // while dragging is a lookup rather than arithmetic on a number that might sit between two.
-        _most = Rung(Math.Clamp(most, Smallest, MeshPicture.Widest));
+        _sizes = new PictureLadder(most);
     }
 
     /// <summary>Whether a picture could be drawn at all - an install and a renderer.</summary>
     public bool Possible => _install is not null && _upload is not null;
 
     /// <summary>The biggest the model will be drawn, each way.</summary>
-    public int Most => _most;
+    public int Most => _sizes.Most;
 
     /// <summary>Whether the grid the model stands on is drawn. On, because it is what makes a turn legible.</summary>
     public bool Ground { get; set; } = true;
@@ -154,7 +124,7 @@ public sealed class MonsterPortrait
 
         // The size is settled BEFORE the picture is taken, because what it is drawn at follows what
         // it will be shown at - and that is only known once the pane's width is.
-        float side = Math.Clamp(wide, 64f, _most);
+        float side = Math.Clamp(wide, 64f, _sizes.Most);
         Finished(side);
 
         if (_texture == IntPtr.Zero)
@@ -349,38 +319,7 @@ public sealed class MonsterPortrait
 
     /// <summary>What the model is drawn at: the rung that covers the pane, lowered while dragging.</summary>
     private int Wanted(float side)
-    {
-        int rung = Rung((int)MathF.Ceiling(side));
-        return _held ? Down(rung) : rung;
-    }
-
-    /// <summary>The smallest rung that covers what is asked for, never above the cap.</summary>
-    private int Rung(int want)
-    {
-        foreach (int step in Steps)
-        {
-            if (step >= want)
-            {
-                return Math.Min(step, _most);
-            }
-        }
-
-        return _most;
-    }
-
-    /// <summary>One rung down, or the bottom one.</summary>
-    private static int Down(int from)
-    {
-        for (int at = Steps.Length - 1; at > 0; at--)
-        {
-            if (Steps[at] <= from)
-            {
-                return Steps[at - 1];
-            }
-        }
-
-        return Steps[0];
-    }
+        => _held ? _sizes.Dragging(side) : _sizes.For(side);
 
     /// <summary>The buffers for one size, kept until the size changes.</summary>
     /// <remarks>
