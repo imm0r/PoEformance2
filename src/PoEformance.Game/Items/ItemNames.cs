@@ -19,29 +19,16 @@ public readonly record struct StatMeaning(string Id, string Text, int Argument)
     /// somebody reverse-engineering, which is what this tool is for.
     /// </remarks>
     public string Say(int value)
-    {
-        if (Text.Length == 0)
-        {
-            return $"{Id} {value}";
-        }
+        => Text.Length == 0
 
-        // Only this stat's own placeholder is filled. A line built from two stats keeps the
-        // other's marker, because guessing at it would put this number in the wrong half.
-        //
-        // THE PLACEHOLDERS CARRY A FORMAT: "{0:+d}" means show the sign, which is how "+79 to
-        // maximum Life" gets its plus. Replacing the bare "{0}" alone leaves a thousand of the
-        // game's own lines untouched and reading as though the table were missing them.
-        string plain = $"{{{Argument}}}";
-        if (Text.Contains(plain, StringComparison.Ordinal))
-        {
-            return Text.Replace(plain, value.ToString(), StringComparison.Ordinal);
-        }
+            // FALLS BACK TO THE ID rather than to nothing, as the remarks say.
+            ? $"{Id} {value}"
 
-        return Text
-            .Replace($"{{{Argument}:+d}}", value >= 0 ? $"+{value}" : value.ToString(), StringComparison.Ordinal)
-            .Replace($"{{{Argument}:d}}", value.ToString(), StringComparison.Ordinal)
-            .Replace($"{{{Argument}:-d}}", value.ToString(), StringComparison.Ordinal);
-    }
+            // The placeholders and their formats are Components.StatDescriptions.Fill's subject
+            // now, because a second caller arrived - the monster book fills the same holes from a
+            // modifier's own [min, max] pair - and two copies of a rule about "{0:+d}" is two
+            // places for the next spelling the game uses to be missing from one of them.
+            : Components.StatDescriptions.Fill(Text, Argument, value, value);
 }
 
 /// <summary>What one mod is called.</summary>

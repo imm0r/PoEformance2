@@ -95,6 +95,30 @@ public sealed record ModifierStat(
         ? Min.ToString(System.Globalization.CultureInfo.InvariantCulture)
         : $"{Min.ToString(System.Globalization.CultureInfo.InvariantCulture)}"
           + $"-{Max.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+
+    /// <summary>
+    /// This stat as the game words it, or null where the game words it not at all.
+    /// </summary>
+    /// <remarks>
+    /// NULL RATHER THAN THE RAW FACT, so the caller can tell the two apart and draw them
+    /// differently - a sentence belongs in the body face and "monster_base_block_% 30" belongs in
+    /// the mono one. Returning the id dressed as prose would make an unworded stat look like a
+    /// worded one.
+    ///
+    /// WHAT THE COVERAGE ACTUALLY IS, measured over the shipped tables rather than assumed: 67 of
+    /// the 122 distinct stats these modifiers set have a sentence, which is 116 of the 295 lines
+    /// drawn. The other 55 are engine-internal - i_am_boss_of_tier, shock_art_variation,
+    /// stance_movement_speed_+%_final - and the game shows no wording for them either, so the raw
+    /// fact IS the answer there rather than a gap waiting to be filled.
+    ///
+    /// HOLE ZERO, and that is by construction rather than by hope: StatDescriptions keeps only the
+    /// blocks that cover ONE stat, and a lone stat fills the first hole. Its loader drops every row
+    /// whose arg_index is not zero for the same reason.
+    /// </remarks>
+    public string? Worded(Components.StatDescriptions? sentences)
+        => sentences?.Of(Stat) is { Length: > 0 } template
+            ? Components.StatDescriptions.Fill(template, 0, Min, Max)
+            : null;
 }
 
 /// <summary>What one of a monster's modifier rows is called, and what it does.</summary>

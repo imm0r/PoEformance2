@@ -1,4 +1,5 @@
 using PoEformance.Features;
+using PoEformance.Game.Components;
 using PoEformance.Game.Entities;
 
 namespace PoEformance.Core.Tests;
@@ -32,6 +33,26 @@ public sealed class MonsterVarietiesTests
 
         _shipped = MonsterVarieties.Load(Path.Combine(dir!.FullName, "data", "monster-varieties.json"));
         return _shipped;
+    }
+
+    private static StatDescriptions? _shippedSentences;
+
+    /// <summary>The shipped stat wordings, which are the other half of a readable modifier.</summary>
+    private static StatDescriptions Sentences()
+    {
+        if (_shippedSentences is not null)
+        {
+            return _shippedSentences;
+        }
+
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "data", "stat_desc_map.tsv")))
+        {
+            dir = dir.Parent;
+        }
+
+        _shippedSentences = StatDescriptions.Load(Path.Combine(dir!.FullName, "data", "stat_desc_map.tsv"));
+        return _shippedSentences;
     }
 
     private static IReadOnlyList<string> Captured(string name)
@@ -308,6 +329,99 @@ public sealed class MonsterVarietiesTests
 
         Assert.Equal(["#7", "#11"], none.Skills(one));
         Assert.Equal(0, none.NamedSkills);
+    }
+
+    [Fact]
+    public void AMODIFIERSaysWhatItDoesInTheGamesOwnWords()
+    {
+        // WHAT THE REFERENCE BOOK ACTUALLY SHOWS. "30  monster_base_block_%" is a fact and not a
+        // sentence, and the join that turns it into one is the stat's own id - which the game does
+        // not renumber - rather than a row index. See StatDescriptions for why that is the half of
+        // the chain that survives a patch.
+        MonsterVarieties table = Shipped();
+        StatDescriptions said = Sentences();
+
+        MonsterVariety? shield = table.Find(
+            "Metadata/Monsters/BloodBathers/BloodBatherShield/BloodBatherShield");
+        Assert.NotNull(shield);
+
+        ModifierMeaning block = Assert.Single(
+            table.Modifiers(shield), one => one.Id == "MonsterAttackBlock30Bypass15");
+
+        Assert.Equal(
+            ["30% Chance to Block Attack Damage", "You take 15% of damage from Blocked Hits"],
+            (block.Stats ?? []).Select(one => one.Worded(said)));
+
+        // AND AN UNWORDED STAT ANSWERS NULL rather than a sentence built out of its id. 55 of the
+        // 122 stats these modifiers set are engine-internal - the game shows no wording for them
+        // either - so the caller draws the raw fact, and it has to be able to tell which it holds.
+        MonsterVariety? zombie = table.Find("Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium");
+        Assert.NotNull(zombie);
+
+        ModifierStat stance = Assert.Single(
+            table.Modifiers(zombie)
+                .Single(one => one.Id == "StanceMovementSpeed300")
+                .Stats ?? []);
+
+        Assert.Equal("stance_movement_speed_+%_final", stance.Stat);
+        Assert.Null(stance.Worded(said));
+    }
+
+    [Fact]
+    public void ANDTheWrapperTheGameColoursAWordingWithIsNotPartOfIt()
+    {
+        // END TO END over the shipped tables, because this one only shows up with real data in it:
+        // the wording for this stat arrives as "<enchanted>{{Monsters grant {0}% increased
+        // Experience}}", which is a COLOUR rather than a sentence. Left in, the line every map
+        // boss draws reads as broken markup. See StatDescriptionFiles.Unwrap.
+        MonsterVarieties table = Shipped();
+        MonsterVariety? boss = table.Find("Metadata/Monsters/Quadrilla/IcyQuadrillaBossStandalone");
+        Assert.NotNull(boss);
+
+        ModifierStat experience = Assert.Single(
+            table.Modifiers(boss).SelectMany(one => one.Stats ?? []),
+            one => one.Stat == "monster_slain_experience_+%");
+
+        Assert.Equal("Monsters grant 6000% increased Experience", experience.Worded(Sentences()));
+    }
+
+    [Fact]
+    public void ANDHOWMANYOfThoseStatsTheGameHasWordsForIsMeasuredRatherThanAssumed()
+    {
+        // A NUMBER TO NOTICE A CHANGE IN, not a target. The book draws a sentence where the game
+        // has one and the raw fact where it does not, so this says which half is which: 67 of the
+        // 122 distinct stats these modifiers set are worded, and walked per MONSTER rather than per
+        // modifier - which is what somebody actually reads, since a modifier carried by fifteen
+        // monsters is fifteen lines - that is 926 of 3812. The unworded rest are engine-internal:
+        // i_am_boss_of_tier, shock_art_variation, stance_movement_speed_+%_final, which alone
+        // accounts for 87 of the modifier table's entries. So a DROP here means this tool lost
+        // sentences it had, not that GGG stopped writing them.
+        MonsterVarieties table = Shipped();
+        StatDescriptions said = Sentences();
+
+        var distinct = new HashSet<string>(StringComparer.Ordinal);
+        var worded = new HashSet<string>(StringComparer.Ordinal);
+        var lines = 0;
+        var wordedLines = 0;
+
+        foreach ((string _, MonsterVariety one) in table.All)
+        {
+            foreach (ModifierStat stat in table.Modifiers(one).SelectMany(mod => mod.Stats ?? []))
+            {
+                lines++;
+                distinct.Add(stat.Stat);
+                if (stat.Worded(said) is { Length: > 0 })
+                {
+                    wordedLines++;
+                    worded.Add(stat.Stat);
+                }
+            }
+        }
+
+        Assert.Equal(122, distinct.Count);
+        Assert.Equal(67, worded.Count);
+        Assert.Equal(3812, lines);
+        Assert.Equal(926, wordedLines);
     }
 
     [Fact]

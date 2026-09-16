@@ -148,6 +148,100 @@ public class StatDescriptionFilesTests
     }
 
     [Fact]
+    public void AWRAPPEDSentenceIsTheSentenceInsideTheWrapper()
+    {
+        // A COLOUR, NOT A WORDING. The game marks a few lines for a different ink by wrapping the
+        // whole sentence, and nothing in this tool draws in that ink - so left in, the wrapper is
+        // printed. The stat below is carried by seven monster modifiers, and the line they drew
+        // read as broken markup rather than as a sentence.
+        Assert.Equal(
+            "Monsters grant {0}% increased Experience",
+            StatDescriptionFiles.Unwrap("<enchanted>{{Monsters grant {0}% increased Experience}}"));
+
+        // THE OTHER ANGLE-BRACKET MARKUP IS NOT THIS ONE and must survive: 33 rows of the export
+        // spell a sprite as <<Name>>, with no braces at all. Matching on the tag rather than on
+        // the brace pair would eat the name off every one of them.
+        Assert.Equal("<<ExpedRuneFire>> Fire Rune", StatDescriptionFiles.Unwrap("<<ExpedRuneFire>> Fire Rune"));
+
+        Assert.Equal("nothing to unwrap", StatDescriptionFiles.Unwrap("nothing to unwrap"));
+        Assert.Equal("<half>{{open", StatDescriptionFiles.Unwrap("<half>{{open"));
+        Assert.Equal("<>{{empty tag}}", StatDescriptionFiles.Unwrap("<>{{empty tag}}"));
+    }
+
+    [Fact]
+    public void ANDTheSameWrapperComesOffBothRoutes()
+    {
+        // BOTH OR NEITHER, because the two are compared against each other - see Against. A
+        // wrapper stripped on the install's side and left on the export's would turn 79 rows the
+        // two agree about into 79 disagreements, and the check that exists to find GGG's rewordings
+        // would spend its output reporting this tidy-up instead.
+        StatDescription block = Assert.Single(StatDescriptionFiles.Parse("""
+            description
+            	1 monster_slain_experience_+%
+            		1 # "<enchanted>{{Monsters grant {0}% increased Experience}}"
+            """));
+
+        Assert.Equal("Monsters grant {0}% increased Experience", block.Template);
+
+        string file = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(
+                file,
+                "# a stand-in for data/stat_desc_map.tsv\n"
+                + "monster_slain_experience_+%\t<enchanted>{{Monsters grant {0}% increased Experience}}"
+                + "\t0\tmonster_slain_experience_+%\n");
+
+            Assert.Equal(
+                "Monsters grant {0}% increased Experience",
+                StatDescriptions.Load(file).Of("monster_slain_experience_+%"));
+        }
+        finally
+        {
+            File.Delete(file);
+        }
+    }
+
+    [Fact]
+    public void AHOLEIsFilledInEverySpellingTheGameWritesIt()
+    {
+        // THE PLACEHOLDERS CARRY A FORMAT and the bare one is only the commonest. Counted over the
+        // 16802-row export: 11501 holes are "{0}", 1038 "{0:+d}", 37 "{0:d}", and 148 leave the
+        // index out. Filling the bare one alone leaves four spellings on screen as themselves.
+        Assert.Equal("30% increased Stealth", StatDescriptions.Fill("{0}% increased Stealth", 0, 30, 30));
+        Assert.Equal("+3 metres to Melee Strike Range", StatDescriptions.Fill("{0:+d} metres to Melee Strike Range", 0, 3, 3));
+        Assert.Equal("-3 metres", StatDescriptions.Fill("{0:+d} metres", 0, -3, -3));
+        Assert.Equal("7 things", StatDescriptions.Fill("{0:d} things", 0, 7, 7));
+        Assert.Equal("7 things", StatDescriptions.Fill("{:d} things", 0, 7, 7));
+        Assert.Equal("7 things", StatDescriptions.Fill("{} things", 0, 7, 7));
+        Assert.Equal("+7 things", StatDescriptions.Fill("{:+d} things", 0, 7, 7));
+
+        // A TEMPLATE WITH NO HOLE IS THE WHOLE SENTENCE, not a shortfall: "Maim on Hit" is what
+        // the game shows for a flag, and it shows no number for it either.
+        Assert.Equal("Maim on Hit", StatDescriptions.Fill("Maim on Hit", 0, 1, 1));
+
+        // ONLY THIS ARGUMENT'S HOLE. The other stat's marker stays, because a caller holding one
+        // value that filled both would put this number in the wrong half of the sentence.
+        Assert.Equal("5 of {1}", StatDescriptions.Fill("{0} of {1}", 0, 5, 5));
+        Assert.Equal("{0} of 5", StatDescriptions.Fill("{0} of {1}", 1, 5, 5));
+    }
+
+    [Fact]
+    public void ANDAValueThatRollsIsWrittenAsTheRangeItIs()
+    {
+        Assert.Equal(
+            "(30-50)% increased Stun Duration on you",
+            StatDescriptions.Fill("{0}% increased Stun Duration on you", 0, 30, 50));
+
+        // A DASH BETWEEN A NEGATIVE MINIMUM AND ITS MAXIMUM READS AS A SUBTRACTION - "(-20-20)" is
+        // not a range anybody can parse back - so those are spelled out instead.
+        Assert.Equal("(-20 to 20)% more", StatDescriptions.Fill("{0}% more", 0, -20, 20));
+
+        // The sign goes outside the range rather than inside it.
+        Assert.Equal("+(3-5) metres", StatDescriptions.Fill("{0:+d} metres", 0, 3, 5));
+    }
+
+    [Fact]
     public void ANDItIsStrippedOnTheWayOutOfTheParserToo()
     {
         Assert.Equal(

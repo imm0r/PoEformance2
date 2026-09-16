@@ -728,6 +728,29 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     private MonsterVarieties _monsters = MonsterVarieties.Empty;
 
+    /// <summary>
+    /// Where the game's own sentence for a stat comes from, asked per frame.
+    /// </summary>
+    /// <remarks>
+    /// A CALLBACK RATHER THAN A VALUE, because this one changes mid-session and the other tables
+    /// here do not. The sentences start as the shipped export and are replaced by the install's own
+    /// .csd files on a background walk that finishes long after start-up - AtlasWatch owns that
+    /// upgrade and <c>AtlasWatch.StatSentences</c> is what this is normally pointed at, so there is
+    /// one answer to "what does this stat say" rather than one per window.
+    /// </remarks>
+    public Func<Game.Components.StatDescriptions>? StatSentences { get; set; }
+
+    /// <summary>
+    /// What stands in when nothing has been wired up.
+    /// </summary>
+    /// <remarks>
+    /// HELD rather than fetched, and that is not a micro-optimisation: StatDescriptions.Empty is a
+    /// property that builds a NEW instance per call, and the book notices a different table by
+    /// REFERENCE - so a fresh Empty each frame would have it rebuild all 2733 rows, every frame,
+    /// on exactly the machines that have no sentences to show for it.
+    /// </remarks>
+    private readonly Game.Components.StatDescriptions _noSentences = Game.Components.StatDescriptions.Empty;
+
     // The trails belong to the LAYER's question rather than the reader's, so they are kept
     // here: a projectile's path across the screen is something only a thing that sees every
     // snapshot in order can assemble, and the reader hands out one snapshot at a time.
@@ -2006,11 +2029,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     ///
     /// The table is read through a callback rather than captured: <see cref="Monsters"/> is set by
     /// whoever wires this up and the Attach calls have no fixed order, so a captured Empty would
-    /// look exactly like a build with no table at all.
+    /// look exactly like a build with no table at all. The stat sentences are read the same way for
+    /// a stronger reason - see <see cref="StatSentences"/>, which changes mid-session.
     /// </remarks>
     public void AttachMonsterBook(bool visible = false)
     {
-        var window = new MonsterBookWindow(() => Monsters);
+        var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences);
         _tools.Add(
             91, "monster-book", "Monster Book", window.DrawTab,
             page: Entities, pageLabel: EntitiesLabel);

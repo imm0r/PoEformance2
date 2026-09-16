@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using System.Text;
 using ImGuiNET;
 using PoEformance.Features;
+using PoEformance.Game.Components;
 using PoEformance.Game.Entities;
 
 namespace PoEformance.Overlay;
@@ -40,7 +41,7 @@ namespace PoEformance.Overlay;
 /// filtered when the text changes, and re-sorted only when ImGui says its columns are dirty.
 /// </remarks>
 [SupportedOSPlatform("windows")]
-public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
+public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDescriptions> sentences)
 {
     /// <summary>How long a search string may be.</summary>
     private const uint SearchLength = 96;
@@ -61,6 +62,9 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
 
     /// <summary>The table the book was built from, to notice when a different one arrives.</summary>
     private MonsterVarieties _of = MonsterVarieties.Empty;
+
+    /// <summary>And the sentences it was built with, which arrive later than the table does.</summary>
+    private StatDescriptions _said = StatDescriptions.Empty;
 
     private List<Entry> _book = [];
     private List<Entry> _shown = [];
@@ -87,7 +91,8 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
     public void DrawTab()
     {
         MonsterVarieties all = table();
-        Read(all);
+        StatDescriptions said = sentences();
+        Read(all, said);
 
         if (_book.Count == 0)
         {
@@ -95,7 +100,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
             return;
         }
 
-        Header(all);
+        Header(all, said);
         Filter();
 
         float left = _split.Left();
@@ -110,7 +115,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
 
         if (ImGui.BeginChild("##monster-detail", new Vector2(0f, 0f), ImGuiChildFlags.Borders))
         {
-            Detail(all);
+            Detail(all, said);
         }
 
         ImGui.EndChild();
@@ -123,15 +128,22 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
     /// COMPARED BY REFERENCE and not by count: the table is loaded at start-up today and will be
     /// read from the install later, and two different tables can perfectly well hold the same
     /// number of monsters. A count would keep showing the old one.
+    ///
+    /// THE SENTENCES ARE PART OF THAT KEY because they are part of the searchable text, and they
+    /// arrive LATE - the install's own wordings land on a background walk well after start-up. A
+    /// book keyed on the monster table alone would keep the text it built from the shipped export
+    /// for the rest of the session, so searching for "Block" would find nothing on exactly the
+    /// machines that can word it best.
     /// </remarks>
-    private void Read(MonsterVarieties all)
+    private void Read(MonsterVarieties all, StatDescriptions said)
     {
-        if (ReferenceEquals(_of, all))
+        if (ReferenceEquals(_of, all) && ReferenceEquals(_said, said))
         {
             return;
         }
 
         _of = all;
+        _said = said;
 
         var book = new List<Entry>(all.Count);
         var text = new StringBuilder(512);
@@ -156,7 +168,21 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
             foreach (int row in Rows(one))
             {
                 mods++;
-                text.Append(' ').Append(all.Modifier(row)?.Id ?? Row(row));
+                if (all.Modifier(row) is not { } mod)
+                {
+                    text.Append(' ').Append(Row(row));
+                    continue;
+                }
+
+                text.Append(' ').Append(mod.Id);
+
+                // AND WHAT THE GAME SAYS THE MODIFIER DOES, not only what it is called. Nobody
+                // searches for "MonsterAttackBlock30Bypass15"; they search for "block", and that
+                // word is in the sentence rather than in the id.
+                foreach (ModifierStat stat in mod.Stats ?? [])
+                {
+                    text.Append(' ').Append(stat.Worded(said) ?? stat.Stat);
+                }
             }
 
             // The words the table says with a FLAG rather than with a column, so that typing
@@ -200,7 +226,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
         }
     }
 
-    private void Header(MonsterVarieties all)
+    private void Header(MonsterVarieties all, StatDescriptions said)
     {
         float room = OverlayLayout.ButtonRoom("Copy list");
         if (OverlayLayout.Search(
@@ -237,6 +263,16 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
         {
             ImGui.SameLine();
             ImGui.TextDisabled($"  |  exported {ImGuiText.Escape(made)}");
+        }
+
+        // WHICH SENTENCES ARE IN FORCE, on hover rather than on the line, the same fact
+        // AtlasWatch.ContentSource reports and for the same reason: the install's own wordings and
+        // a six-month-old export look identical on screen right up to the handful GGG has reworded.
+        ImGui.SameLine();
+        ImGui.TextDisabled($"  |  {said.Count.ToString(CultureInfo.InvariantCulture)} stat wordings");
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(ImGuiText.Escape(said.Source));
         }
     }
 
@@ -402,7 +438,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
         });
     }
 
-    private void Detail(MonsterVarieties all)
+    private void Detail(MonsterVarieties all, StatDescriptions said)
     {
         if (_chosen.Length == 0 || all.Find(_chosen) is not { } one)
         {
@@ -417,7 +453,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
         Type(all, one);
         Words("Tags", all.TagsOf(one));
         Words("Skills", all.Skills(one));
-        Mods(all, one);
+        Mods(all, one, said);
         Words("Built on", one.Inherits ?? []);
     }
 
@@ -608,7 +644,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
     /// simply be missing, and a book that then showed four of a monster's seven modifiers would
     /// look complete and be wrong. The seven is what somebody comes here to count.
     /// </remarks>
-    private static void Mods(MonsterVarieties all, MonsterVariety one)
+    private static void Mods(MonsterVarieties all, MonsterVariety one, StatDescriptions said)
     {
         int[] rows = [.. Rows(one)];
         if (rows.Length == 0)
@@ -641,15 +677,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
                 {
                     foreach (ModifierStat stat in mod.Stats ?? [])
                     {
-                        // TextUnformatted, through the mono helper, and that is not a style
-                        // choice: 207 of these stat ids carry a PERCENT SIGN - maim_on_hit_%,
-                        // monster_damage_+%_final_vs_monsters - and ImGui's Text calls are
-                        // printf. Drawn with one of those, "%_f" is a conversion that reads an
-                        // argument nobody passed and eats the characters after it. See ImGuiText.
-                        //
-                        // The stat's own id for now. Turning it into the sentence the game shows
-                        // needs the stat descriptions, which this tool already reads for items.
-                        ImGuiText.Mono($"{stat.Range,10}  {stat.Stat}");
+                        Stat(stat, said);
                     }
                 }
                 finally
@@ -661,6 +689,37 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table)
         finally
         {
             ImGui.Unindent();
+        }
+    }
+
+    /// <summary>
+    /// One stat a modifier sets: the sentence the game words it with, or the raw fact.
+    /// </summary>
+    /// <remarks>
+    /// THE RAW FACT IS NEVER LOST, it moves to the tooltip. A sentence is what somebody reads and
+    /// the id is what they search for, cite and check an export against - "30  monster_base_block_%"
+    /// is the thing that can be looked up, and dropping it the moment a wording exists would make
+    /// this book less useful to the person most likely to open it.
+    ///
+    /// MONO AND TextUnformatted FOR THE RAW LINE, and that is not a style choice: 207 of these stat
+    /// ids carry a PERCENT SIGN - maim_on_hit_%, monster_damage_+%_final_vs_monsters - and ImGui's
+    /// Text calls are printf. Drawn with one of those, "%_f" is a conversion that reads an argument
+    /// nobody passed and eats the characters behind it. See ImGuiText.
+    /// </remarks>
+    private static void Stat(ModifierStat stat, StatDescriptions said)
+    {
+        string raw = $"{stat.Range,10}  {stat.Stat}";
+
+        if (stat.Worded(said) is not { Length: > 0 } sentence)
+        {
+            ImGuiText.Mono(raw);
+            return;
+        }
+
+        ImGui.TextUnformatted(sentence);
+        if (ImGui.IsItemHovered())
+        {
+            ImGuiText.MonoTooltip(raw);
         }
     }
 

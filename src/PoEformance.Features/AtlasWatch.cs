@@ -1231,6 +1231,20 @@ public sealed class AtlasWatch
     }
 
     /// <summary>
+    /// The stat sentences in force - the install's own where it answered, the export's otherwise.
+    /// </summary>
+    /// <remarks>
+    /// READABLE FROM OUTSIDE BECAUSE THE UPGRADE IS ALREADY ARRANGED HERE, and arranging it twice
+    /// is how two parts of one tool end up disagreeing about what a stat says. The install's .csd
+    /// files are read once, on the background walk this class already pays for, and
+    /// <see cref="LearnStatDescriptions"/> is where the better table lands. A second reader of the
+    /// same sentences - the monster book words a modifier's stats exactly as the atlas words a
+    /// node's - would otherwise hold the shipped export for the whole session while this one holds
+    /// the game's, and the difference between them is precisely the wordings GGG has since changed.
+    /// </remarks>
+    public Game.Components.StatDescriptions StatSentences => Volatile.Read(ref _statDescriptions);
+
+    /// <summary>
     /// Where the words on the atlas are coming from: the game, or the shipped file.
     /// </summary>
     /// <remarks>

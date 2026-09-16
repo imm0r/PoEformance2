@@ -2567,6 +2567,12 @@ internal static class Program
         overlay.Monsters = PoEformance.Game.Entities.MonsterVarieties.Load(
             FindDataFile("monster-varieties.json"));
 
+        // And what the game says each of a monster's modifier stats DOES, taken from the atlas's
+        // copy rather than loaded a second time. It owns the upgrade: the shipped export until the
+        // background walk reads the install's own .csd files, and the game's own afterwards. Asked
+        // per frame, because that swap happens long after this line runs.
+        overlay.StatSentences = () => atlas.StatSentences;
+
         overlay.Costs = costs;
         overlay.Coverage = coverage;
         overlay.Damage = damage;
