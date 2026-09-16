@@ -88,9 +88,21 @@ public sealed class MonsterTables
     {
         MonsterVarieties standing = shipped ?? MonsterVarieties.Empty;
 
-        if (files is null || layouts is null)
+        // THE TWO WAYS OF HAVING NOTHING TO READ ARE SAID APART, because this whole reader is
+        // diagnosed from these lines and they point at different things: no install is a machine
+        // without the game beside it, and no layouts is data/monster-tables.json missing from a
+        // build that has one. "No install" printed on a machine that plainly has one is the kind
+        // of line that sends somebody looking in the wrong place.
+        if (files is null)
         {
             return new MonsterTables(standing, ["monsters: no install to read, so the shipped table stands"]);
+        }
+
+        if (layouts is null)
+        {
+            return new MonsterTables(
+                standing,
+                ["monsters: data/monster-tables.json did not load, so the shipped table stands"]);
         }
 
         var said = new List<string>();
@@ -114,7 +126,12 @@ public sealed class MonsterTables
         (LoadedTable? blood, _) = Optional(files, layouts, "BloodTypes", null, said);
         (LoadedTable? tags, _) = Optional(files, layouts, "Tags", null, said);
         (LoadedTable? effects, _) = Optional(files, layouts, "GrantedEffects", null, said);
-        (LoadedTable? mods, _) = Optional(files, layouts, "Mods", "Families", said);
+
+        // NO ARRAY COLUMN MEASURED ON Mods, and that is not an omission: nothing here reads an
+        // array out of it - the stat slots and their intervals are all scalars - so the word order
+        // it would establish is never used, and establishing it costs a scan of the widest table
+        // in the set, sixteen thousand rows of six hundred and ninety-three bytes.
+        (LoadedTable? mods, _) = Optional(files, layouts, "Mods", null, said);
         (LoadedTable? stats, _) = Optional(files, layouts, "Stats", null, said);
 
         var at = new Where(layouts);

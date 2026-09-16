@@ -343,6 +343,19 @@ public class MonsterTablesTests
     }
 
     [Fact]
+    public void ANDAMissingLayoutFileDoesNotReportAMissingInstall()
+    {
+        // TWO DIFFERENT THINGS TO GO AND LOOK AT. This reader is diagnosed entirely from those
+        // lines, and "no install to read" printed on a machine that plainly has the game beside it
+        // sends somebody hunting the bundles when what is missing is a file in the build.
+        MonsterTables read = MonsterTables.Read(FakeInstall.Of(), null, null);
+
+        Assert.False(read.FromGame);
+        Assert.Contains(read.Say, line => line.Contains("monster-tables.json", StringComparison.Ordinal));
+        Assert.DoesNotContain(read.Say, line => line.Contains("no install", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void THEEXPORTIsTheOtherCheckAndTheReportSaysHowFarTheyAgree()
     {
         // TWO ROUTES TO THE SAME 2733 MONSTERS - a Python tool over hand-exported CSVs and this
