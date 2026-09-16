@@ -23,6 +23,7 @@ public sealed record AoRead(string Path, AnimatedObject Object, int Depth);
 /// <param name="Extensions">Every file extension referenced from a value, to how often.</param>
 /// <param name="Animations">What the animation entries' values were, to how often.</param>
 /// <param name="Faults">The parse faults, with the file that produced each.</param>
+/// <param name="CutShort">Whether the walk hit <see cref="AoSurvey.MostFiles"/> and stopped.</param>
 public sealed record AoSurveyResult(
     int Monsters,
     int WithFiles,
@@ -33,7 +34,8 @@ public sealed record AoSurveyResult(
     IReadOnlyDictionary<string, int> Keys,
     IReadOnlyDictionary<string, int> Extensions,
     IReadOnlyDictionary<string, int> Animations,
-    IReadOnlyList<string> Faults)
+    IReadOnlyList<string> Faults,
+    bool CutShort = false)
 {
     /// <summary>Nothing walked - no install, or no monster names a file.</summary>
     public static AoSurveyResult Nothing { get; }
@@ -77,6 +79,19 @@ public static class AoSurvey
 
     /// <summary>How many faults are kept. Past this the count is what matters, not the text.</summary>
     public const int MostFaults = 40;
+
+    /// <summary>
+    /// How many distinct files are read before the walk stops.
+    /// </summary>
+    /// <remarks>
+    /// A CAP AND NOT A HOPE, because the shape of what is being walked is the thing nobody knows
+    /// yet: effects attach effects, and following attached_object six deep across 2733 monsters
+    /// could be five thousand files or fifty thousand. Somebody is going to run this once on
+    /// their own machine to answer a question, and a diagnostic that might take an hour is one
+    /// they stop rather than finish. When the cap is reached the report says so, so a number
+    /// that was cut short cannot be read as the whole table.
+    /// </remarks>
+    public const int MostFiles = 20_000;
 
     /// <summary>The entry keys whose values are another .ao to follow. From the format diagram.</summary>
     private static readonly string[] Follows =
@@ -139,7 +154,7 @@ public static class AoSurvey
             }
         }
 
-        while (queue.Count > 0)
+        while (queue.Count > 0 && asked < MostFiles)
         {
             (string path, int depth) = queue.Dequeue();
             if (path.Length == 0 || !seen.Add(path))
@@ -204,7 +219,8 @@ public static class AoSurvey
         }
 
         return new AoSurveyResult(
-            monsters, withFiles, asked, read, clean, structs, keys, extensions, animations, faults);
+            monsters, withFiles, asked, read, clean, structs, keys, extensions, animations, faults,
+            CutShort: asked >= MostFiles && queue.Count > 0);
     }
 
     /// <summary>
@@ -313,6 +329,16 @@ public static class AoSurvey
             $"ao  {Say(result.Monsters)} monsters, {Say(result.WithFiles)} naming a file;"
             + $" {Say(result.Asked)} files asked for, {Say(result.Read)} read,"
             + $" {Say(result.Clean)} of those with no parse fault");
+
+        // A CUT-SHORT WALK IS NOT A SMALLER ANSWER TO THE SAME QUESTION, so it is said before the
+        // numbers rather than under them: the counts are then a sample of the graph, and the
+        // breadth-first order means a sample weighted towards what the monsters name directly.
+        if (result.CutShort)
+        {
+            output.WriteLine(
+                $"    STOPPED AT {Say(MostFiles)} FILES - the counts below are a sample of the"
+                + " graph, not all of it.");
+        }
 
         // FIRST, BECAUSE IT DECIDES WHETHER THE REST MEANS ANYTHING. A survey where most files
         // faulted is measuring this reader against the real format, not the game against a
