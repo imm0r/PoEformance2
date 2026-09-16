@@ -143,11 +143,49 @@ public sealed record AnimatedObject(
     public static AnimatedObject Read(byte[]? content)
         => content is not { Length: > 0 } ? None : Parse(StatDescriptionFiles.Decode(content));
 
-    /// <summary>Reads one out of an open install, by path. Null install or missing file gives None.</summary>
+    /// <summary>
+    /// Reads one out of an open install, by path. Null install or missing file gives None.
+    /// </summary>
+    /// <remarks>
+    /// AN EXTENSION IS ADDED WHERE THERE IS NONE, and this was measured rather than guessed: the
+    /// first survey over a real install asked for 3231 files and found 1687, and what was missing
+    /// was the whole inheritance chain. The game writes an extends line WITHOUT the extension -
+    ///
+    ///     extends "Metadata/Monsters/Skeletons/Basic/SkeletonBasic"
+    ///     extends "Metadata/Parent"
+    ///
+    /// - while an attached_object carries its ".ao" in full. Half of every walk was landing on
+    /// nothing, and the half it lost was the base files, where what monsters have in COMMON lives.
+    ///
+    /// THE PATH AS WRITTEN IS STILL TRIED FIRST, so nothing that used to resolve stops resolving:
+    /// this only adds a second attempt where the first found nothing and the name carries no
+    /// extension at all. An index lookup is a hash of the path, so the failed attempt is free.
+    /// </remarks>
     public static AnimatedObject Read(GameFiles? files, string? path)
-        => files is null || string.IsNullOrWhiteSpace(path)
-            ? None
-            : Read(files.Read(path.Replace('\\', '/').Trim()));
+    {
+        if (files is null || string.IsNullOrWhiteSpace(path))
+        {
+            return None;
+        }
+
+        string said = path.Replace('\\', '/').Trim();
+        if (files.Read(said) is { Length: > 0 } content)
+        {
+            return Read(content);
+        }
+
+        return Bare(said) ? Read(files.Read(said + Suffix)) : None;
+    }
+
+    /// <summary>What an .ao file is called, for the paths the game writes without one.</summary>
+    public const string Suffix = ".ao";
+
+    /// <summary>Whether a path's last segment carries no extension at all.</summary>
+    private static bool Bare(string path)
+    {
+        int slash = path.LastIndexOf('/');
+        return path.IndexOf('.', slash + 1) < 0;
+    }
 
     /// <summary>Reads the text of one. Public so the parser can be tested without an install.</summary>
     public static AnimatedObject Parse(string? text)
@@ -213,7 +251,7 @@ internal sealed class AoScanner(string text)
                 continue;
             }
 
-            if (Struct(client: false) is { } read)
+            if (Struct(client: false, structs) is { } read)
             {
                 structs.Add(read);
                 continue;
@@ -301,7 +339,7 @@ internal sealed class AoScanner(string text)
                 return;
             }
 
-            if (Struct(client: true) is { } read)
+            if (Struct(client: true, into) is { } read)
             {
                 into.Add(read);
                 continue;
@@ -312,7 +350,13 @@ internal sealed class AoScanner(string text)
     }
 
     /// <summary>A <c>Name { … }</c> block. The brace may sit on the name's line or the next.</summary>
-    private AoStruct? Struct(bool client)
+    /// <param name="client">Whether this sits inside the file's client block.</param>
+    /// <param name="inside">
+    /// Where a struct found INSIDE this one is put - flat beside it rather than under it, the same
+    /// way a client block's structs are. It lands in the list before its parent does, because the
+    /// parent is not finished until its closing brace; nothing reads these in order.
+    /// </param>
+    private AoStruct? Struct(bool client, List<AoStruct> inside)
     {
         SkipTrivia();
 
@@ -353,9 +397,94 @@ internal sealed class AoScanner(string text)
             }
 
             int indent = Column();
+            if (Entry() is { } entry)
+            {
+                flat.Add((indent, entry));
+                continue;
+            }
+
+            // A BRACE WHERE AN ENTRY WAS EXPECTED, which the first survey over a real install
+            // turned up on 40 of 1687 files - every one of its faults this same shape. Two things
+            // produce it and both are honoured here rather than one of them being picked:
+            //
+            //   1. A VALUE WHOSE BRACE IS ON THE NEXT LINE. "key =" reads as an entry with an
+            //      empty native value, and the "{" then has no key in front of it. The script
+            //      belongs to that entry, so it is attached to it.
+            //   2. A STRUCT INSIDE A STRUCT. "Sub {" reads as a key with no "=" after it, and the
+            //      brace is the block's own. It joins the file's struct list, the way the ones in
+            //      a client block do.
+            //
+            // Neither reference describes either, which is what the fault was for: they are what
+            // the files say and the diagram does not. Anything that is still neither keeps its
+            // fault, so a third shape cannot hide inside the fix for the first two.
+            if (!Done && _text[_at] == '{')
+            {
+                if (flat.Count > 0 && flat[^1].Entry is { Kind: AoValueKind.Native, Value.Length: 0 })
+                {
+                    (int at, AoEntry waiting) = flat[^1];
+                    flat[^1] = (at, waiting with { Value = Script(), Kind = AoValueKind.Script });
+                    continue;
+                }
+
+                if (Nested(client) is { } inner)
+                {
+                    inside.Add(inner);
+                    continue;
+                }
+            }
+
+            Fault($"not an entry in {name}", TakeLine());
+        }
+
+        return new AoStruct(name, Nest(flat), client);
+    }
+
+    /// <summary>
+    /// A struct written inside another, read from its opening brace back.
+    /// </summary>
+    /// <remarks>
+    /// THE NAME WAS ALREADY EATEN by the entry attempt that failed, so it is recovered from the
+    /// text rather than re-read: everything from the start of this line up to the brace. Reading
+    /// it forwards would mean un-consuming a token, which this scanner cannot do.
+    /// </remarks>
+    private AoStruct? Nested(bool client)
+    {
+        int line = _text.LastIndexOf('\n', Math.Max(0, _at - 1)) + 1;
+        string name = _text[line.._at].Trim();
+
+        if (name.Length == 0 || !char.IsLetter(name[0]))
+        {
+            return null;
+        }
+
+        foreach (char c in name)
+        {
+            if (char.IsWhiteSpace(c))
+            {
+                return null;
+            }
+        }
+
+        _at++;
+        var flat = new List<(int Indent, AoEntry Entry)>();
+        while (true)
+        {
+            SkipTrivia();
+            if (Done)
+            {
+                Fault($"nested struct {name} never closed", string.Empty);
+                break;
+            }
+
+            if (Take('}'))
+            {
+                break;
+            }
+
+            int indent = Column();
             if (Entry() is not { } entry)
             {
-                Fault($"not an entry in {name}", TakeLine());
+                Fault($"not an entry in nested {name}", TakeLine());
                 continue;
             }
 
