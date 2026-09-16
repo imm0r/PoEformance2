@@ -1,0 +1,1600 @@
+{
+  "comment": "NOT LOADED BY ANYTHING YET, which is why it sits in tools/extracted/ rather than in data/: that directory holds what the tool LOADS and DataFilesTests enforces it both ways. This is the vendored groundwork for reading the monster tables out of the install; it moves to data/ in the same change as the reader that opens it. Column order of the tables a monster is described by, from poe-tool-dev/dat-schema (PoE2 entries; its CI republishes schema.min.json on every commit). Offsets are NOT stored - they are arithmetic over the widths in DatColumns, and Mods is why that matters: its eight Stat*Value columns are INTERVALS, two values each, and pricing them as one put the whole table thirty-two bytes short. WHY THE INSTALL: measured against a live 0.5.5 client, the loader's file table names 153 tables and FIVE of these are not among them - MonsterVarieties, MonsterTypes, BloodTypes, Tags and GrantedEffects. Only MonsterResistances (22 rows of 520) and Mods (16784 of 693) are, and both agree with the sizes computed here, which is the one cross-check the client can give. The rest are checked against the FILE's own row size at runtime - LoadedTable.Agrees. THE JOIN, all of it inside MonsterVarieties: MonsterType -> MonsterTypes (-> MonsterResistances), BloodType -> BloodTypes, Tags -> Tags (whose DisplayString is the human-readable name the shipped export never carried), GrantedEffects -> GrantedEffects for the skills, and five separate mod arrays - Mods, Mods2, Special_Mods, Part1_Mods, Part2_Mods, Endgame_Mods - into Mods, whose Stat1..Stat8 reach Stats for the stat id and whose Stat*Value intervals carry the min and max. A stat id is what the install's .csd files turn into a sentence, which is what makes a monster mod readable rather than a number. Computed sizes: MonsterVarieties 1030 (0x406), MonsterTypes 50 (0x32), MonsterResistances 520 (0x208), BloodTypes 116 (0x74), Tags 44 (0x2C), GrantedEffects 297 (0x129), Mods 693 (0x2B5), Stats 106 (0x6A).",
+  "source": "poe-tool-dev/dat-schema, release latest, read 2026-09-16",
+  "tables": {
+    "MonsterVarieties": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "MonsterType",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MovementSpeed",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "ObjectSize",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MinimumAttackDistance",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MaximumAttackDistance",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "ACTFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "AOFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "BaseMonsterTypeIndex",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Mods",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_10",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_11",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_12",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "ModelSizeMultiplier",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_14",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_15",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "WeaponSoundType",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_17",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_18",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Tags",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "ExperienceMultiplier",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_21",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "MinAgroRange",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MaxAgroRange",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "SpotlightColour1",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "SpotlightColour2",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "SpotlightColour3",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "GrantedEffects",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "AISFile",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Mods2",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Stance",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "BloodType",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Name",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "DamageMultiplier",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "LifeMultiplier",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "AttackSpeed",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Weapon1_ItemVisualIdentity",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Weapon2_ItemVisualIdentity",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Back_ItemVisualIdentity",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MainHand_ItemClass",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "OffHand_ItemClass",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Helmet_ItemVisualIdentity",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_42",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "KillSpecificMonsterCount_AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Special_Mods",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "KillRare_AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_46",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_47",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_48",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_49",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_50",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_51",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_52",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "HASH16",
+        "type": "u16",
+        "array": false
+      },
+      {
+        "name": "column_54",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_55",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "KillWhileOnslaughtIsActive_AchievementItem",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MonsterSegment",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MonsterArmour",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "KillWhileTalismanIsActive_AchievementItem",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Part1_Mods",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Part2_Mods",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Endgame_Mods",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_63",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_64",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_65",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_66",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "MultiPartAchievements",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_68",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "SinkAnimation_AOFile",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_70",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_71",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_72",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_73",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_74",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_75",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_76",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_77",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "SinkEffect",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_79",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MonsterConditionalEffectPack",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_81",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_82",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_83",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_84",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_85",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_86",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_87",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_88",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_89",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_90",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "InheritsFrom",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_92",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_93",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "BossHealthBar",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "TauntGrantedEffect",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_96",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_97",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_98",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_99",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_100",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_101",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_102",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "Questflag",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_104",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "column_105",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "column_106",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_107",
+        "type": "array",
+        "array": true
+      },
+      {
+        "name": "column_108",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_109",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "PoiseThreshold",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "AttackCrit",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "column_112",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_113",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_114",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_115",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_116",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MonsterCategory",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "AggroAudio",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_119",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_120",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_121",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_122",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_123",
+        "type": "array",
+        "array": true
+      },
+      {
+        "name": "column_124",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_125",
+        "type": "array",
+        "array": true
+      },
+      {
+        "name": "column_126",
+        "type": "string",
+        "array": false
+      }
+    ],
+    "MonsterTypes": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_1",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "IsSummoned",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "Armour",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Evasion",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "EnergyShieldFromLife",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "DamageSpread",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MonsterResistances",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_8",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_9",
+        "type": "i32",
+        "array": false
+      }
+    ],
+    "MonsterResistances": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Fire1",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_2",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Fire2",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_4",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Fire3",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_6",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Fire4",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Fire5",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Cold1",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_10",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Cold2",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_12",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Cold3",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_14",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Cold4",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Cold5",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Lightning1",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_18",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Lightning2",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_20",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Lightning3",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_22",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Lightning4",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Lightning5",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Chaos1",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_26",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Chaos2",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_28",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Chaos3",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_30",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Chaos4",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Chaos5",
+        "type": "i32",
+        "array": true
+      }
+    ],
+    "BloodTypes": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "GroundEffect",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Visual",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "VisualMoving",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_4",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "column_5",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "column_6",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "DeathEffect",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_8",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "CorpseExplodeEffect",
+        "type": "foreignrow",
+        "array": false
+      }
+    ],
+    "Tags": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "HASH32",
+        "type": "u32",
+        "array": false
+      },
+      {
+        "name": "DisplayString",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_3",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "UiHints",
+        "type": "string",
+        "array": false
+      }
+    ],
+    "GrantedEffects": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "IsSupport",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "AllowedActiveSkillTypes",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "SupportGemLetter",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "AddedActiveSkillTypes",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "ExcludedActiveSkillTypes",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "SupportsGemsOnly",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "HASH32",
+        "type": "u32",
+        "array": false
+      },
+      {
+        "name": "CannotBeSupported",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "LifeLeech",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "CastTime",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "ActiveSkill",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "IgnoreMinionTypes",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CooldownNotRecoverDuringActive",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "AddedMinionActiveSkillTypes",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Animation",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MultiPartAchievement",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_17",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "RegularVariant",
+        "type": "row",
+        "array": false
+      },
+      {
+        "name": "column_19",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "SkillID",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_21",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_22",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_23",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "StatSet",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "AdditionalStatSets",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Audio",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "CostTypes",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_28",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_29",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_30",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "SupportWeaponRestrictions",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_32",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "MinionType",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_34",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "column_35",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "column_36",
+        "type": "i32",
+        "array": false
+      }
+    ],
+    "Mods": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "HASH16",
+        "type": "u16",
+        "array": false
+      },
+      {
+        "name": "ModType",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Level",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat1",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Stat2",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Stat3",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Stat4",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Domain",
+        "type": "enumrow",
+        "array": false
+      },
+      {
+        "name": "Name",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "GenerationType",
+        "type": "enumrow",
+        "array": false
+      },
+      {
+        "name": "Families",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Stat1Value",
+        "type": "i32",
+        "array": false,
+        "interval": true
+      },
+      {
+        "name": "Stat2Value",
+        "type": "i32",
+        "array": false,
+        "interval": true
+      },
+      {
+        "name": "Stat3Value",
+        "type": "i32",
+        "array": false,
+        "interval": true
+      },
+      {
+        "name": "Stat4Value",
+        "type": "i32",
+        "array": false,
+        "interval": true
+      },
+      {
+        "name": "SpawnWeight_Tags",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_17",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Tags",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "GrantedEffectsPerLevel",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "AuraFlags",
+        "type": "enumrow",
+        "array": true
+      },
+      {
+        "name": "column_21",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "MonsterMetadata",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "MonsterKillAchievements",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "ChestModType",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Stat5Value",
+        "type": "i32",
+        "array": false,
+        "interval": true
+      },
+      {
+        "name": "Stat5",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "FullAreaClear_AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "GenerationWeight_Tags",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "GenerationWeight_Values",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "ModifyMapsAchievements",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Stat6Value",
+        "type": "i32",
+        "array": false,
+        "interval": true
+      },
+      {
+        "name": "Stat6",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MaxLevel",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_35",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CraftingItemClassRestrictions",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "MonsterOnDeath",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_38",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "HeistAchievements",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Stat7Value",
+        "type": "i32",
+        "array": false,
+        "interval": true
+      },
+      {
+        "name": "Stat7",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Stat8",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Stat8Value",
+        "type": "i32",
+        "array": false,
+        "interval": true
+      },
+      {
+        "name": "InfluenceType",
+        "type": "enumrow",
+        "array": false
+      },
+      {
+        "name": "ImplicitTags",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "HasHardmodeStatValues",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "Stat1MinHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat1MaxHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat2MinHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat2MaxHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat3MinHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat3MaxHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat4MinHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat4MaxHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat5MinHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat5MaxHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat6MinHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat6MaxHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat7MinHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat7MaxHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat8MinHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Stat8MaxHardmode",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "BuffTemplate",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "ArchnemesisMinionMod",
+        "type": "row",
+        "array": false
+      },
+      {
+        "name": "HASH32",
+        "type": "u32",
+        "array": false
+      },
+      {
+        "name": "BuffTemplate2",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "column_67",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_68",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "RadiusJewelType",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "IsEssenceOnlyModifier",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "SpawnLevel_Override",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "SpawnWeight_Values",
+        "type": "i32",
+        "array": true
+      }
+    ],
+    "Stats": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "IsPublic",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "IsLocal",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "IsWeaponLocal",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "Semantic",
+        "type": "enumrow",
+        "array": false
+      },
+      {
+        "name": "IsParty",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "IsVirtual",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "MainHandAlias_Stat",
+        "type": "row",
+        "array": false
+      },
+      {
+        "name": "OffHandAlias_Stat",
+        "type": "row",
+        "array": false
+      },
+      {
+        "name": "IsProxied",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "HASH32",
+        "type": "u32",
+        "array": false
+      },
+      {
+        "name": "BelongsActiveSkills",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "Category",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_13",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "IsApplyDamageFunctionStat",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "IsScalable",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "ContextFlags",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "DotFlag",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "WeaponHandCheck",
+        "type": "bool",
+        "array": false
+      }
+    ]
+  }
+}
