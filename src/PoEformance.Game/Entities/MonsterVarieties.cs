@@ -229,6 +229,46 @@ public sealed class MonsterVarieties
     /// <summary>How many monsters the table knows.</summary>
     public int Count => _byPath.Count;
 
+    /// <summary>
+    /// The same table assembled from somewhere other than the shipped file.
+    /// </summary>
+    /// <remarks>
+    /// FOR THE INSTALL, which is the source that cannot go stale: the export here is a snapshot of
+    /// one patch and the game's own .dat files ARE the patch. What is assembled has to be identical
+    /// in shape, because everything downstream - the browser, the reference book, the tests - is
+    /// written against these dictionaries and not against a file format. See Features/MonsterTables
+    /// for the reader that fills them.
+    ///
+    /// THE KEYING IS DONE HERE rather than by the caller, and that is the point of it being a
+    /// factory. <see cref="Same"/> and OrdinalIgnoreCase are what make a path off a live entity
+    /// find its row; a caller that built its own dictionary would have to know both, and the one
+    /// that forgot would produce a table that looks full and answers nothing.
+    /// </remarks>
+    public static MonsterVarieties From(
+        IEnumerable<KeyValuePair<string, MonsterVariety>> monsters,
+        IReadOnlyDictionary<int, string> skills,
+        IReadOnlyDictionary<int, ModifierMeaning> modifiers,
+        IReadOnlyDictionary<int, string> tags,
+        IReadOnlyDictionary<int, MonsterKind> types,
+        IReadOnlyDictionary<int, string> blood,
+        IReadOnlyDictionary<int, string> resistances,
+        string generated)
+    {
+        ArgumentNullException.ThrowIfNull(monsters);
+
+        var byPath = new Dictionary<string, MonsterVariety>(StringComparer.OrdinalIgnoreCase);
+        foreach ((string id, MonsterVariety one) in monsters)
+        {
+            if (Same(id) is { Length: > 0 } key)
+            {
+                byPath[key] = one;
+            }
+        }
+
+        return new MonsterVarieties(
+            byPath, skills, modifiers, tags, types, blood, resistances, generated);
+    }
+
     /// <summary>Reads the table, or returns <see cref="Empty"/> when it cannot.</summary>
     /// <remarks>Never throws. Without it the entity browser shows paths, as it always did.</remarks>
     public static MonsterVarieties Load(string? path)

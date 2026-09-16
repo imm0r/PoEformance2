@@ -259,10 +259,14 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             + $"  |  {all.NamedSkills.ToString(CultureInfo.InvariantCulture)} named skills"
             + $"  |  {all.NamedTags.ToString(CultureInfo.InvariantCulture)} named tags");
 
+        // WHERE THE TABLE ITSELF CAME FROM, which is now two possible answers rather than one: the
+        // shipped export writes the date it was built, and the install's own tables say so in
+        // words. A stale export and a live read look identical on screen otherwise, and the way an
+        // export fails is that a league's new monsters simply have no name.
         if (all.Generated is { Length: > 0 } made)
         {
             ImGui.SameLine();
-            ImGui.TextDisabled($"  |  exported {ImGuiText.Escape(made)}");
+            ImGui.TextDisabled($"  |  table: {ImGuiText.Escape(made)}");
         }
 
         // WHICH SENTENCES ARE IN FORCE, on hover rather than on the line, the same fact
@@ -509,7 +513,9 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         // table carries no copy of that one - the flag's own state is read from the game at
         // runtime, by QuestWatch - so naming it from here would mean inventing the name. What it
         // does say is worth showing: the 68 monsters that carry one are the campaign bosses.
-        if (one.Quest != 0)
+        // GREATER THAN ZERO, not merely non-zero: the install route spells "no quest flag" as -1,
+        // because zero is a row of QuestFlags like any other. The export spells it as zero.
+        if (one.Quest > 0)
         {
             Pair("quest flag", $"row {one.Quest.ToString(CultureInfo.InvariantCulture)}");
         }

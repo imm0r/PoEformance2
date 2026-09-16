@@ -32,15 +32,55 @@ public enum ArrayOrder
 /// </remarks>
 public readonly record struct DatReference(ulong First, ulong Second)
 {
-    /// <summary>The value a null reference carries in both halves.</summary>
+    /// <summary>
+    /// What the FILE writes in a reference that names nothing.
+    /// </summary>
+    /// <remarks>
+    /// 0xFEFEFEFE, COMPARED AS 32 BITS, from the format's reference implementation rather than
+    /// from the shape of the bytes: poe-dat-viewer reads a foreign key as
+    /// <c>struct { size_t rid; size_t unknown; }</c>, takes the row from the FIRST word with a
+    /// 32-bit read, and calls it null when that read is 0xFEFEFEFE. The second word it ignores
+    /// entirely. Low 32 bits rather than all 64, so this holds whether the game pads the upper
+    /// half with 0xFE or with zeros.
+    ///
+    /// WHAT WAS HERE BEFORE was 0xFFFFFFFF and ulong.MaxValue, neither of which the game writes -
+    /// so <see cref="IsNothing"/> never fired once, and a null was refused only because
+    /// 0xFEFEFEFEFEFEFEFE is larger than any table's row count. That holds wherever the bound IS
+    /// the target table's row count and breaks the moment it is not: <see cref="RowIn"/> then
+    /// falls through to the second word, and a zero there makes an unset column read as ROW ZERO.
+    /// Row zero of BloodTypes is "Blood", which 1092 monsters really do carry - so the wrong
+    /// answer is not only silent but the commonest right one.
+    /// </remarks>
+    public const uint Null = 0xFEFE_FEFE;
+
+    /// <summary>
+    /// What the second half holds when a reference has no second half.
+    /// </summary>
+    /// <remarks>
+    /// NOT A VALUE THE GAME WRITES - see <see cref="Null"/> for that one. This is the filler
+    /// <see cref="DatFile.References"/> puts in the unused half of an eight-byte array element,
+    /// which is a string offset rather than a foreign key.
+    /// </remarks>
     public const ulong Nothing = ulong.MaxValue;
 
-    /// <summary>True when neither half names anything.</summary>
-    public bool IsNothing => First is Nothing or 0xFFFF_FFFF && Second is Nothing or 0xFFFF_FFFF;
+    /// <summary>True when this reference names nothing.</summary>
+    public bool IsNothing => (uint)First == Null;
 
-    /// <summary>Whichever half is a row of a table with this many rows, or -1.</summary>
+    /// <summary>
+    /// Whichever half is a row of a table with this many rows, or -1.
+    /// </summary>
+    /// <remarks>
+    /// A NULL IS REFUSED BEFORE EITHER HALF IS TRIED, which is the whole reason
+    /// <see cref="IsNothing"/> had to be right. The first word is the row - the reference says so
+    /// - and the second is tried only behind it, as a hedge from before that was known.
+    /// </remarks>
     public int RowIn(long rows)
     {
+        if (IsNothing)
+        {
+            return -1;
+        }
+
         if (First < (ulong)rows)
         {
             return (int)First;
@@ -310,6 +350,22 @@ public sealed class DatFile
     {
         int at = At(row, offset, 4);
         return at < 0 ? 0 : BinaryPrimitives.ReadInt32LittleEndian(_bytes.AsSpan(at));
+    }
+
+    /// <summary>
+    /// A 32-bit FLOAT column, which is not an int column read leniently.
+    /// </summary>
+    /// <remarks>
+    /// THE BITS ARE NOT THE NUMBER. 0.05f is 0x3D4CCCCD, so a float column read through
+    /// <see cref="I32"/> comes back as 1028443341 - a value that is plainly wrong and, worse,
+    /// plausible-looking in a column nobody has a expectation for. MonsterVarieties has two of
+    /// these: AttackCrit, whose 0/1/2 would read as 0 and 1065353216, and PoiseThreshold, whose
+    /// real values are 0.05, 0.055, 0.065 and 0.25.
+    /// </remarks>
+    public float F32(int row, int offset)
+    {
+        int at = At(row, offset, 4);
+        return at < 0 ? 0f : BinaryPrimitives.ReadSingleLittleEndian(_bytes.AsSpan(at));
     }
 
     /// <summary>A 64-bit column.</summary>
