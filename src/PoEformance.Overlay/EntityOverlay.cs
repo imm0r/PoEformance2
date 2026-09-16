@@ -473,6 +473,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             HideBehindPanels = HideBehindPanels,
             HideWindowsBehindPanels = HideWindowsBehindPanels,
             MapKeepOut = KeepOut,
+
+            // FROM THE WINDOW WHERE THERE IS ONE, and from the file where there is not: a build
+            // that never attached the book must not write an empty list over what somebody chose
+            // in a build that did.
+            MonsterColumns = _monsterBook?.Columns is { Count: > 0 } columns
+                ? columns
+                : basis.MonsterColumns,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -606,6 +613,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private DamageWindow? _damageWindow;
     private UiBrowserWindow? _uiBrowser;
     private DissectorWindow? _dissector;
+
+    /// <summary>Kept so the settings file can be told which columns it is showing.</summary>
+    private MonsterBookWindow? _monsterBook;
     private PoiLayer? _poi;
     private RoomLayer? _rooms;
 
@@ -2032,9 +2042,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// look exactly like a build with no table at all. The stat sentences are read the same way for
     /// a stronger reason - see <see cref="StatSentences"/>, which changes mid-session.
     /// </remarks>
-    public void AttachMonsterBook(bool visible = false)
+    public void AttachMonsterBook(IReadOnlyList<string>? columns = null, bool visible = false)
     {
-        var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences);
+        var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences)
+        {
+            Changed = () => SettingsChanged?.Invoke(),
+        };
+
+        window.Show(columns);
+        _monsterBook = window;
+
         _tools.Add(
             91, "monster-book", "Monster Book", window.DrawTab,
             page: Entities, pageLabel: EntitiesLabel);
