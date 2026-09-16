@@ -261,9 +261,13 @@ to become a texture before it can appear. That choice is also what makes the ren
 its output is an array a test can measure, where a D3D11 renderer could only be judged from a
 screenshot on a machine with the game.
 
-The portrait can be **turned with the mouse**, which is `MonsterPortrait` holding a turn and a
-tilt and redrawing when either moves. Six things here cost time to rediscover, so they are
-written down:
+The portrait is **turned by dragging, zoomed on the wheel, and reset by double-clicking**, and it
+stands on a grid that turns with it. `MonsterPortrait` holds the turn, tilt and zoom and redraws
+whenever one of them moves — which is per frame during a drag, and is what makes the numbers
+below matter. How big it may be drawn is `monsterModelSize` in the settings, default 768; the
+portrait steps one rung **down** the size ladder while a drag is in progress and back up on
+release, so a high setting is paid for only when holding still. Eight things here cost time to
+rediscover, so they are written down:
 
 - **`extends` carries no extension.** The game writes `extends "Metadata/Parent"` while an
   attached object carries its `.ao` in full. The first survey asked for 3231 files and found
@@ -287,6 +291,25 @@ written down:
   redrew per frame that was 1.1 MB a frame — 67 MB/s and 13 gen-2 collections per second of
   turning. `MeshPicture.Canvas` lends one pair to the caller; measured, that also took the draw
   itself from 5.4 ms to 3.1 ms, so the garbage cost more to make than to collect.
+- **The cost grows with the AREA, not the edge.** Per frame while turning, on a real rig:
+  256 → 1.9 ms, 384 → 3.0, 512 → 4.3, 768 → 8.0, 1024 → 12.5, 1536 → 25.1. That is why the size
+  is a ladder of rungs rather than the pane's own width — a pane being dragged wider would
+  otherwise redraw the mesh on every frame, at a new size, discarding the canvas each time — and
+  why stepping one rung down during a drag roughly quarters the work instead of shaving a little
+  off it.
+- **The floor goes at `Most.Z`, and a hair below it.** A model runs along negative z with its
+  head at the far end, so the feet are the end *nearest zero*; read the other way the grid is
+  drawn across the monster's scalp. And placed at exactly `Most.Z` it shares a depth with the
+  soles, so the depth test keeps whichever arrived first — the floor — and grid lines cut across
+  the feet. `MeshPicture.Under` is the clearance. A post standing on its end never shows this,
+  because pixel centres either side of an edge never interpolate to equal depths; it takes a
+  model with a flat sole, which is why the test grew one.
+- **A monster drawn in plain ink now says which way its colour went missing.** The fallback is a
+  pale warm grey all but indistinguishable from bare skin, so *"is this one missing its texture"*
+  was a question no screenshot could answer — it was asked from the live client and could only be
+  settled by reading code. `MonsterModel.Paint` carries the reason, and the last of them is not a
+  failure at all: a mesh with no texture coordinates has a perfectly good texture and no way to
+  look it up, which is the expected state of a bare body whose clothes are attached objects.
 
 The format diagrams are [poe_data_tools/FORMATS.md](https://github.com/adamthedash/poe_data_tools/blob/master/FORMATS.md);
 `ggpk.exposed/poe2/<path>` serves the game's own files over HTTP, which is how these readers were

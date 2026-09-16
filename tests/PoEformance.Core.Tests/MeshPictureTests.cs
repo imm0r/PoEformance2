@@ -275,6 +275,156 @@ public class MeshPictureTests
     public void DrawingWithoutACanvasSaysSo()
         => Assert.Throws<ArgumentNullException>(() => MeshPicture.Of(SkinnedMesh.None, canvas: null!));
 
+    /// <summary>Zooming in paints more of the model, and a runaway wheel stops at the clamp.</summary>
+    /// <remarks>
+    /// THE CLAMP IS THE HALF WORTH HAVING. Pulling back only wastes frame, but pushing in makes
+    /// every triangle cover more pixels - a mesh magnified far enough is a handful of triangles
+    /// painting the whole buffer over and over, and a wheel has no end to it.
+    /// </remarks>
+    [Fact]
+    public void ZoomingInFillsMoreOfTheFrameAndStopsAtTheClamp()
+    {
+        (int Top, int Foot, int Left, int Right, int Lit) fitted
+            = Silhouette(MeshPicture.Of(Post(crossbar: true), 200));
+        (int Top, int Foot, int Left, int Right, int Lit) close
+            = Silhouette(MeshPicture.Of(Post(crossbar: true), 200, zoom: 2f));
+
+        Assert.True(close.Lit > fitted.Lit, $"zoomed in lit {close.Lit} against {fitted.Lit} fitted");
+        Assert.True(close.Right - close.Left > fitted.Right - fitted.Left, "and should be wider");
+
+        Assert.Equal(
+            Silhouette(MeshPicture.Of(Post(), 200, zoom: MeshPicture.Furthest)),
+            Silhouette(MeshPicture.Of(Post(), 200, zoom: 1000f)));
+
+        Assert.Equal(
+            Silhouette(MeshPicture.Of(Post(), 200, zoom: MeshPicture.Nearest)),
+            Silhouette(MeshPicture.Of(Post(), 200, zoom: -50f)));
+    }
+
+    /// <summary>
+    /// The ground is drawn only when asked, and is edge on at a level view.
+    /// </summary>
+    /// <remarks>
+    /// EDGE ON IS RIGHT RATHER THAN BROKEN, and worth pinning down so nobody "fixes" it: a floor
+    /// seen from its own height is a line. Counting the ROWS it adds is what tells the two apart -
+    /// a level view touches one or two, a tilted one opens the floor out over dozens.
+    /// </remarks>
+    [Fact]
+    public void TheGroundIsDrawnOnlyWhenAskedAndIsEdgeOnAtALevelView()
+    {
+        GamePicture bare = MeshPicture.Of(Post(), 200);
+
+        (int Pixels, int Rows) level = Extra(bare, MeshPicture.Of(Post(), 200, ground: true));
+        (int Pixels, int Rows) tilted = Extra(
+            bare, MeshPicture.Of(Post(), 200, tilt: 0.6f, ground: true));
+
+        Assert.Equal((0, 0), Extra(bare, MeshPicture.Of(Post(), 200)));
+        Assert.True(level.Pixels > 0, "asking for the ground should draw something");
+        Assert.True(level.Rows <= 3, $"a level view should see the floor edge on and saw {level.Rows} rows");
+        Assert.True(tilted.Rows > 20, $"a tilted view should open the floor out and saw {tilted.Rows} rows");
+    }
+
+    /// <summary>
+    /// The model is never painted over by the floor it stands on.
+    /// </summary>
+    /// <remarks>
+    /// THE CASE THAT BREAKS IT IS THE SOLE OF THE FOOT. The floor sits at the model's own lowest
+    /// point, so drawn exactly there it shares a depth with the lowest triangles - and a depth
+    /// test that keeps the first arrival keeps the FLOOR, which draws grid lines across a
+    /// monster's feet. MeshPicture.Under is the hair of clearance that settles it, and this is
+    /// what notices if it is ever removed.
+    ///
+    /// A MODEL WITH A FLAT SOLE IS WHAT IT TAKES TO SHOW IT, which the first version of this test
+    /// did not have. A post standing on its end meets the floor along one edge, and the pixel
+    /// centres either side of that edge interpolate to depths that are never exactly equal - so it
+    /// passed with the clearance removed and proved nothing. A quad LYING IN the foot plane is
+    /// coplanar with the floor over its whole area, which is the ordinary shape of a base or a
+    /// shadow plate, and every pixel of it is a tie.
+    ///
+    /// LOOKING DOWN ON PURPOSE: from below the floor is genuinely between the eye and the model
+    /// and covering it is then correct, so the assertion would be wrong at a negative tilt.
+    /// </remarks>
+    [Fact]
+    public void TheModelIsNeverPaintedOverByTheFloorItStandsOn()
+    {
+        GamePicture bare = MeshPicture.Of(Soled(), 200, tilt: 0.5f);
+        GamePicture floored = MeshPicture.Of(Soled(), 200, tilt: 0.5f, ground: true);
+
+        var over = 0;
+        for (var at = 0; at < bare.Rgba.Length; at += 4)
+        {
+            // Only where the model itself was drawn. The floor may paint the background freely,
+            // which is the entire point of it.
+            if (bare.Rgba[at + 3] == 0)
+            {
+                continue;
+            }
+
+            if (bare.Rgba[at] != floored.Rgba[at]
+                || bare.Rgba[at + 1] != floored.Rgba[at + 1]
+                || bare.Rgba[at + 2] != floored.Rgba[at + 2])
+            {
+                over++;
+            }
+        }
+
+        Assert.Equal(0, over);
+    }
+
+    /// <summary>The floor stays inside the frame at the steepest tilt the portrait allows.</summary>
+    /// <remarks>
+    /// A SQUARE SEEN AT AN ANGLE SHOWS ITS DIAGONAL, which is where a floor sized off the model's
+    /// own footprint ran off both edges - a skeleton is 154 across and 189 high, so a footprint
+    /// floor was wider than the frame the camera fitted. The portrait clamps tilt to a third of a
+    /// turn either way, so those are the two angles that have to hold.
+    /// </remarks>
+    [Theory]
+    [InlineData(1.047f)]
+    [InlineData(-1.047f)]
+    public void TheFloorStaysInsideTheFrameAtTheSteepestTilt(float tilt)
+    {
+        const int Side = 240;
+        (int Top, int Foot, int Left, int Right, int Lit) seen
+            = Silhouette(MeshPicture.Of(Post(crossbar: true), Side, tilt: tilt, ground: true));
+
+        Assert.True(seen.Lit > 0, "nothing was drawn at all");
+        Assert.True(seen.Top > 0 && seen.Foot < Side - 1, $"the floor spills top or bottom: {seen}");
+        Assert.True(seen.Left > 0 && seen.Right < Side - 1, $"the floor spills left or right: {seen}");
+    }
+
+    /// <summary>Where and how much two pictures of the same model differ.</summary>
+    private static (int Pixels, int Rows) Extra(GamePicture bare, GamePicture floored)
+    {
+        var pixels = 0;
+        var rows = 0;
+
+        for (var y = 0; y < bare.Height; y++)
+        {
+            var any = false;
+            for (var x = 0; x < bare.Width; x++)
+            {
+                int at = (((y * bare.Width) + x) * 4);
+                if (bare.Rgba[at] == floored.Rgba[at]
+                    && bare.Rgba[at + 1] == floored.Rgba[at + 1]
+                    && bare.Rgba[at + 2] == floored.Rgba[at + 2]
+                    && bare.Rgba[at + 3] == floored.Rgba[at + 3])
+                {
+                    continue;
+                }
+
+                pixels++;
+                any = true;
+            }
+
+            if (any)
+            {
+                rows++;
+            }
+        }
+
+        return (pixels, rows);
+    }
+
     /// <summary>How many bytes differ, because a failure wants a count rather than two arrays.</summary>
     private static int Differing(byte[] one, byte[] other)
     {
@@ -406,6 +556,37 @@ public class MeshPictureTests
             // Only on the upper half - the end away from zero, which is the model's head.
             Quad(-20f, 20f, -36f, -30f);
         }
+
+        return Built(places, indices);
+    }
+
+    /// <summary>
+    /// A post standing on a flat base, the base lying exactly in the plane the ground is drawn on.
+    /// </summary>
+    /// <remarks>
+    /// COPLANAR ON PURPOSE. The base sits at the box's own Most.Z, which is where the floor goes,
+    /// so every pixel of it is at the same depth as the floor under it - the tie that decides
+    /// whether a monster's feet come out with grid lines across them. Real monsters carry shapes
+    /// like this; a post on its end does not.
+    /// </remarks>
+    private static SkinnedMesh Soled()
+    {
+        var places = new List<Vector3>();
+        var indices = new List<int>();
+
+        int at = places.Count;
+        places.Add(new Vector3(-5f, 0f, -40f));
+        places.Add(new Vector3(5f, 0f, -40f));
+        places.Add(new Vector3(5f, 0f, 0f));
+        places.Add(new Vector3(-5f, 0f, 0f));
+        indices.AddRange([at, at + 1, at + 2, at, at + 2, at + 3]);
+
+        at = places.Count;
+        places.Add(new Vector3(-8f, -8f, 0f));
+        places.Add(new Vector3(8f, -8f, 0f));
+        places.Add(new Vector3(8f, 8f, 0f));
+        places.Add(new Vector3(-8f, 8f, 0f));
+        indices.AddRange([at, at + 1, at + 2, at, at + 2, at + 3]);
 
         return Built(places, indices);
     }

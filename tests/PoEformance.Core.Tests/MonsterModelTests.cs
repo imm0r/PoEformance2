@@ -276,6 +276,71 @@ public class MonsterModelTests
         Assert.Contains(drawn.Rgba, one => one != 0);
     }
 
+    /// <summary>
+    /// A monster drawn in plain ink says WHICH of the ways its colour went missing.
+    /// </summary>
+    /// <remarks>
+    /// ASKED FROM THE LIVE CLIENT AND UNANSWERABLE FROM THE PICTURE, which is why this exists. A
+    /// model with no texture on it is drawn in a pale warm grey that is all but indistinguishable
+    /// from bare skin, so "is this monster missing its texture, or is it just pale" could only be
+    /// settled by reading code. Every step of the walk already knew; not one of them said.
+    ///
+    /// THE LAST CASE IS THE ONE THAT IS NOT A FAILURE, and the reason the answers are separate
+    /// strings rather than a flag. A mesh with no texture coordinates has a perfectly good texture
+    /// and no way to look it up - the expected state of a bare body whose clothes are attached
+    /// objects - and calling that "the file would not read" sends somebody hunting for a file that
+    /// is not missing.
+    /// </remarks>
+    [Fact]
+    public void PlainInkSaysWhichWayTheColourWentMissing()
+    {
+        var whole = Install();
+        whole.Files["art/skin.dds"] = Dds();
+        Assert.Equal(string.Empty, Paint(whole));
+        Assert.True(MonsterModels.Of(whole.Read, Named("body.ao")).Painted);
+
+        var noMaterial = Install();
+        noMaterial.Files["art/mesh.sm"] = Encoding.UTF8.GetBytes(
+            "version 6\nSkinnedMeshData \"art/rig.smd\"\nMaterials 0\nBoundingBox -1 -1 -1 1 1 1\n");
+        Assert.Contains("names a material", Paint(noMaterial), StringComparison.Ordinal);
+
+        var noMatFile = Install();
+        noMatFile.Files.Remove("art/paint.mat");
+        Assert.Contains("material did not read", Paint(noMatFile), StringComparison.Ordinal);
+
+        // A material that reads perfectly well and carries only a normal map, in the game's own
+        // normal-map slot: there is nothing here to paint a monster with, and drawing the normal
+        // map instead would make it lilac - a shading bug to look at, hunted in the renderer.
+        // The SLOT has to be wrong too, not just the file name: the slot outranks the name, so a
+        // normal map filed under AlbedoTransparency_TEX is still the answer and this test passed
+        // for the wrong reason until it said so.
+        var noColour = Install();
+        noColour.Files["art/paint.mat"] = Mat("art/skin_normal.dds", slot: "NormalGloss_TEX");
+        Assert.Contains("no colour texture", Paint(noColour), StringComparison.Ordinal);
+
+        var noTexture = Install();
+        noTexture.Files.Remove("art/skin.dds");
+        Assert.Contains("texture did not read", Paint(noTexture), StringComparison.Ordinal);
+
+        var rubbish = Install();
+        rubbish.Files["art/skin.dds"] = Encoding.ASCII.GetBytes("not a texture at all");
+        Assert.Contains("did not decode", Paint(rubbish), StringComparison.Ordinal);
+
+        var unmapped = Install();
+        unmapped.Files["art/skin.dds"] = Dds();
+        unmapped.Files["art/rig.smd"] = Smd(coordinated: false);
+        Assert.Contains("no texture coordinates", Paint(unmapped), StringComparison.Ordinal);
+
+        // And it is NOT reported as a missing file: the texture was found, decoded and kept.
+        MonsterModel bare = MonsterModels.Of(unmapped.Read, Named("body.ao"));
+        Assert.NotNull(bare.Skin);
+        Assert.False(bare.Painted);
+        Assert.Equal(string.Empty, bare.Why);
+    }
+
+    private static string Paint(Fake install)
+        => MonsterModels.Of(install.Read, Named("body.ao")).Paint;
+
     private static MonsterVariety Named(string path)
         => new(Name: "test", AoFiles: [path]);
 
@@ -330,11 +395,21 @@ public class MonsterModelTests
         $"version 6\nSkinnedMeshData \"{geometry}\"\nMaterials 1\n\t\"{material}\" 1\n"
         + "BoundingBox -1 -1 -1 1 1 1\n");
 
-    private static byte[] Mat(string texture) => Encoding.UTF8.GetBytes(
-        $$"""{"graphinstances":[{"custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"{{texture}}"}]}]}]}""");
+    /// <param name="slot">
+    /// The game's own name for what the texture is FOR. It decides, and outranks the file name -
+    /// a normal map sitting in the albedo slot is still what the material says to paint with.
+    /// </param>
+    private static byte[] Mat(string texture, string slot = "AlbedoTransparency_TEX")
+        => Encoding.UTF8.GetBytes(
+            $$"""{"graphinstances":[{"custom_parameters":[{"name":"{{slot}}","parameters":[{"path":"{{texture}}"}]}]}]}""");
 
     /// <summary>The smallest mesh the reader accepts: two triangles over four vertices.</summary>
-    private static byte[] Smd()
+    /// <param name="coordinated">
+    /// False writes every texture coordinate as zero, which is the shape a mesh with no
+    /// coordinates really takes - the slots exist and hold nothing. The layout is unchanged, so
+    /// this differs from a coordinated mesh in the one way that matters and in no other.
+    /// </param>
+    private static byte[] Smd(bool coordinated = true)
     {
         var file = new List<byte>();
         void U8(int v) => file.Add((byte)v);
@@ -366,7 +441,7 @@ public class MonsterModelTests
             F32(x); F32(y); F32(z);
             U8(0); U8(0); U8(127); U8(0);
             U8(127); U8(0); U8(0); U8(0);
-            F16(0.25f); F16(0.75f);
+            F16(coordinated ? 0.25f : 0f); F16(coordinated ? 0.75f : 0f);
             U8(1); U8(0); U8(0); U8(0);
             U8(255); U8(0); U8(0); U8(0);
         }

@@ -93,6 +93,39 @@ public sealed class SkinnedMesh
     public int Triangles => Indices.Length / 3;
 
     /// <summary>
+    /// Whether the mesh carries texture coordinates worth looking anything up with.
+    /// </summary>
+    /// <remarks>
+    /// ALL-ZERO IS THE SHAPE THIS TAKES, not an absent array: a mesh whose vertex format omits
+    /// coordinates still gets one of them per vertex, every entry (0,0). Painting from that gives
+    /// every triangle the SAME corner texel - a monster in one flat colour lifted from an
+    /// arbitrary place, which looks deliberate and is not.
+    ///
+    /// IT LIVES HERE RATHER THAN IN THE RENDERER because it is a fact about the mesh, and because
+    /// two callers now need it: the renderer, to decide whether to sample, and the model walk, to
+    /// say WHY a monster came out unpainted. Answering that was guesswork from a screenshot while
+    /// only the renderer knew.
+    ///
+    /// Walked rather than cached: it is asked once per drawing, not per pixel, and a cached flag
+    /// on a type built three different ways is a field that can disagree with the array beside it.
+    /// </remarks>
+    public bool Coordinated
+    {
+        get
+        {
+            foreach (Vector2 one in Coordinates)
+            {
+                if (one != Vector2.Zero)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
     /// A mesh assembled from geometry rather than read from a file.
     /// </summary>
     /// <remarks>
