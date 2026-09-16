@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.Versioning;
-using System.Text;
 using ImGuiNET;
 using PoEformance.Features;
 using PoEformance.Game.Components;
@@ -35,15 +34,16 @@ namespace PoEformance.Overlay;
 /// wrong. Crit is the trap in that set - it holds 0, 1 or 2 and is a KIND, not a chance - so it is
 /// never drawn with a percent sign.
 ///
-/// THE TEXT EVERY ROW IS SEARCHED BY IS BUILT ONCE PER TABLE, not once per keystroke. Joining
-/// tags, skills and modifier ids for 2733 monsters is real work; done per frame it is work behind
-/// a search box, which is where a tool starts to feel slow. It is built when the table arrives,
-/// filtered when the text changes, and re-sorted only when ImGui says its columns are dirty.
+/// THE TEXT EVERY ROW IS SEARCHED BY, AND EVERY NUMBER IT PRINTS, IS BUILT ONCE PER TABLE. Joining
+/// tags, skills and modifier ids for 2733 monsters is real work; done per frame it is work behind a
+/// search box, which is where a tool starts to feel slow. So is formatting a cell: this window used
+/// to submit fifteen hundred rows to show forty, which is some seven thousand strings built and
+/// thrown away every frame. <see cref="MonsterBook"/> does both once, when the table arrives.
 ///
-/// WHAT THIS WINDOW CANNOT DO, and what would replace it: six columns of a table holding some two
-/// hundred thousand facts answer "what is this one" and nothing of the form "which of these".
-/// docs/reading-big-tables.md is the design for the viewer that does - and for why the row cap
-/// below, the per-frame formatting and the substring search all go with it.
+/// WHAT IS STILL MISSING, so that nobody has to rediscover it: six columns of a table holding some
+/// two hundred thousand facts answer "what is this one" and nothing of the form "which of these".
+/// docs/reading-big-tables.md is the design for the viewer that does - facets, a query grammar and
+/// a comparison of pinned rows - and this window is its first stage.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDescriptions> sentences)
@@ -51,19 +51,8 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// <summary>How long a search string may be.</summary>
     private const uint SearchLength = 96;
 
-    /// <summary>
-    /// How many rows are drawn at once.
-    /// </summary>
-    /// <remarks>
-    /// CAPPED rather than clipped with ImGuiListClipper, the same call AtlasLogWindow and
-    /// IconPicker made: these bindings reach the clipper through a raw pointer and a matching
-    /// Destroy, which is a lifetime to get right in code that cannot be run on this machine.
-    /// Fifteen hundred rows of a filtered list is already more than anybody scrolls, and the
-    /// search is the real navigation here.
-    /// </remarks>
-    private const int MostRows = 1500;
-
     private readonly PaneSplit _split = new(0.46f);
+    private readonly DataGrid _grid = new();
 
     /// <summary>The table the book was built from, to notice when a different one arrives.</summary>
     private MonsterVarieties _of = MonsterVarieties.Empty;
@@ -71,26 +60,25 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// <summary>And the sentences it was built with, which arrive later than the table does.</summary>
     private StatDescriptions _said = StatDescriptions.Empty;
 
-    private List<Entry> _book = [];
-    private List<Entry> _shown = [];
+    private MonsterBook _page = MonsterBook.Empty;
+
+    /// <summary>Which rows the search leaves, as row numbers into the book.</summary>
+    private readonly List<int> _shown = [];
+
     private string _search = string.Empty;
     private string _chosen = string.Empty;
+
+    /// <summary>The selected row, or -1. Kept beside the path so the grid can mark it.</summary>
+    private int _chosenRow = -1;
 
     /// <summary>The filter has to run again - the table changed, or somebody typed.</summary>
     private bool _refilter = true;
 
-    /// <summary>The list has to be put back in order - it was just rebuilt.</summary>
-    private bool _resort = true;
+    /// <summary>What the grid asks about a row it is drawing. Made once - see <see cref="Grid"/>.</summary>
+    private Func<int, Vector4?>? _ink;
 
-    /// <summary>One monster as the list shows it, with everything it is searched by worked out.</summary>
-    private readonly record struct Entry(
-        string Path,
-        MonsterVariety One,
-        string Name,
-        string Kind,
-        int Skills,
-        int Mods,
-        string Find);
+    /// <summary>And what a tooltip on that row says.</summary>
+    private Func<int, string>? _hover;
 
     /// <summary>Draws the tab.</summary>
     public void DrawTab()
@@ -99,7 +87,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         StatDescriptions said = sentences();
         Read(all, said);
 
-        if (_book.Count == 0)
+        if (_page.Count == 0)
         {
             ImGui.TextDisabled("No monster table loaded - see data/monster-varieties.json.");
             return;
@@ -111,7 +99,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         float left = _split.Left();
         if (ImGui.BeginChild("##monster-list", new Vector2(left, 0f), ImGuiChildFlags.Borders))
         {
-            List();
+            Grid();
         }
 
         ImGui.EndChild();
@@ -127,12 +115,12 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     }
 
     /// <summary>
-    /// Turns the table into rows, once.
+    /// Works the table into columns, once.
     /// </summary>
     /// <remarks>
-    /// COMPARED BY REFERENCE and not by count: the table is loaded at start-up today and will be
-    /// read from the install later, and two different tables can perfectly well hold the same
-    /// number of monsters. A count would keep showing the old one.
+    /// COMPARED BY REFERENCE and not by count: the table is loaded at start-up today and read from
+    /// the install a moment later, and two different tables can perfectly well hold the same number
+    /// of monsters. A count would keep showing the old one.
     ///
     /// THE SENTENCES ARE PART OF THAT KEY because they are part of the searchable text, and they
     /// arrive LATE - the install's own wordings land on a background walk well after start-up. A
@@ -149,86 +137,17 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
 
         _of = all;
         _said = said;
+        _page = MonsterBook.Of(all, said);
 
-        var book = new List<Entry>(all.Count);
-        var text = new StringBuilder(512);
+        // THE SELECTION FOLLOWS THE PATH AND NOT THE ROW NUMBER. A new table is a different set of
+        // rows in a different order, so the row somebody had chosen is very likely a different
+        // monster in it - and the path is the one identity that survives a rebuild.
+        _chosenRow = _page.Row(_chosen);
 
-        foreach ((string path, MonsterVariety one) in all.All)
-        {
-            string name = one.Name is { Length: > 0 } named ? named : Tail(path);
-            MonsterKind? kind = all.Kind(one);
-            string type = kind?.Id is { Length: > 0 } called ? called : Row(one.Type);
-
-            text.Clear();
-            text.Append(path).Append(' ').Append(name).Append(' ').Append(type);
-
-            // SEARCHED ACROSS EVERYTHING RESOLVED, not only the name: somebody looking up which
-            // monsters cast a skill, or carry a tag, is asking the question this book exists for.
-            Add(text, all.TagsOf(one));
-            Add(text, all.Skills(one));
-            Add(text, all.ResistancesOf(one));
-            text.Append(' ').Append(all.BloodName(one));
-
-            int mods = 0;
-            foreach (int row in Rows(one))
-            {
-                mods++;
-                if (all.Modifier(row) is not { } mod)
-                {
-                    text.Append(' ').Append(Row(row));
-                    continue;
-                }
-
-                text.Append(' ').Append(mod.Id);
-
-                // AND WHAT THE GAME SAYS THE MODIFIER DOES, not only what it is called. Nobody
-                // searches for "MonsterAttackBlock30Bypass15"; they search for "block", and that
-                // word is in the sentence rather than in the id.
-                foreach (ModifierStat stat in mod.Stats ?? [])
-                {
-                    text.Append(' ').Append(stat.Worded(said) ?? stat.Stat);
-                }
-            }
-
-            // The words the table says with a FLAG rather than with a column, so that typing
-            // "boss" finds the bosses. There is no other way to ask this list for them.
-            if (one.Boss)
-            {
-                text.Append(" boss");
-            }
-
-            if (kind is { Summoned: true })
-            {
-                text.Append(" summoned");
-            }
-
-            book.Add(new Entry(
-                path, one, name, type, one.SkillCount, mods, text.ToString().ToLowerInvariant()));
-        }
-
-        // BY NAME BEFORE ANYBODY HAS CLICKED A HEADER. The dictionary hands these out in its own
-        // order, and ImGui has no sort specs to offer until the header row has been drawn once -
-        // so without this the first frame of a freshly loaded table is 2733 monsters in hash
-        // order, which reads as a broken list rather than as an unsorted one.
-        book.Sort(static (left, right) =>
-            string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase) is var said and not 0
-                ? said
-                : string.CompareOrdinal(left.Path, right.Path));
-
-        _book = book;
-
-        // Filtered here rather than on the next frame, so the count in the header is the count
-        // of what is in the list underneath it from the very first frame.
+        // Filtered here rather than on the next frame, so the count in the header is the count of
+        // what is in the list underneath it from the very first frame.
         _refilter = true;
         Filter();
-    }
-
-    private static void Add(StringBuilder text, IEnumerable<string> said)
-    {
-        foreach (string one in said)
-        {
-            text.Append(' ').Append(one);
-        }
     }
 
     private void Header(MonsterVarieties all, StatDescriptions said)
@@ -248,9 +167,13 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         if (ImGui.Button("Copy list"))
         {
             // WHAT IS ON SCREEN and not the whole table: a filtered list is the answer somebody
-            // worked out, and pasting it into a conversation about it is what this is for.
+            // worked out, and pasting it into a conversation about it is what this is for. In the
+            // order the grid has it, so that a sort by life copies out sorted by life.
+            DataColumn[] columns = _page.Store.Columns;
             ImGui.SetClipboardText(string.Join(
-                '\n', _shown.Select(row => $"{row.Path}\t{row.Name}\t{row.Kind}")));
+                '\n',
+                _shown.Select(row =>
+                    $"{_page.Paths[row]}\t{columns[0].Text[row]}\t{columns[1].Text[row]}")));
         }
 
         if (ImGui.IsItemHovered())
@@ -293,158 +216,39 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         }
 
         _refilter = false;
+        _page.Filter(_search, _shown);
 
-        string looking = _search.Trim().ToLowerInvariant();
-        var shown = new List<Entry>(_book.Count);
-
-        foreach (Entry row in _book)
-        {
-            if (looking.Length == 0 || row.Find.Contains(looking, StringComparison.Ordinal))
-            {
-                shown.Add(row);
-            }
-        }
-
-        _shown = shown;
-        _resort = true;
-    }
-
-    private void List()
-    {
-        if (!ImGui.BeginTable(
-                "##monsters",
-                6,
-                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY
-                    | ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.Resizable
-                    | ImGuiTableFlags.Sortable))
-        {
-            return;
-        }
-
-        try
-        {
-            ImGui.TableSetupColumn(
-                "name", ImGuiTableColumnFlags.WidthStretch | ImGuiTableColumnFlags.DefaultSort);
-            ImGui.TableSetupColumn("type", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("life");
-            ImGui.TableSetupColumn("dmg");
-            ImGui.TableSetupColumn("skills");
-            ImGui.TableSetupColumn("mods");
-            ImGui.TableSetupScrollFreeze(0, 1);
-            ImGui.TableHeadersRow();
-
-            Sort();
-
-            foreach (Entry row in _shown.Take(MostRows))
-            {
-                Draw(row);
-            }
-        }
-        finally
-        {
-            // In a finally and unconditionally: EndTable pairs with BeginTable whatever it
-            // returned, and an exception between the two leaves ImGui's stack unbalanced.
-            ImGui.EndTable();
-        }
-
-        if (_shown.Count > MostRows)
-        {
-            string more = (_shown.Count - MostRows).ToString(CultureInfo.InvariantCulture);
-            ImGui.TextColored(OverlayInk.Warn, $"...and {more} more - narrow the search");
-        }
-    }
-
-    private void Draw(Entry row)
-    {
-        ImGui.TableNextRow();
-        ImGui.TableNextColumn();
-
-        // ###path rather than a bare label: two monsters may well share a name - the table has
-        // nineteen called "Skeletal Warrior" - and an id built from the label would make them
-        // one selectable as far as ImGui is concerned.
-        if (row.One.Boss)
-        {
-            ImGui.PushStyleColor(ImGuiCol.Text, OverlayInk.Name);
-        }
-
-        if (ImGui.Selectable(
-                $"{row.Name}###monster-{row.Path}",
-                string.Equals(row.Path, _chosen, StringComparison.Ordinal),
-                ImGuiSelectableFlags.SpanAllColumns))
-        {
-            _chosen = row.Path;
-        }
-
-        if (row.One.Boss)
-        {
-            ImGui.PopStyleColor();
-        }
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip(ImGuiText.Escape(row.Path));
-        }
-
-        ImGui.TableNextColumn();
-        ImGui.TextDisabled(ImGuiText.Escape(row.Kind));
-        ImGui.TableNextColumn();
-        ImGui.TextUnformatted(Percent(row.One.Life));
-        ImGui.TableNextColumn();
-        ImGui.TextUnformatted(Percent(row.One.Damage));
-        ImGui.TableNextColumn();
-        ImGui.TextDisabled(row.Skills.ToString(CultureInfo.InvariantCulture));
-        ImGui.TableNextColumn();
-        ImGui.TextDisabled(row.Mods.ToString(CultureInfo.InvariantCulture));
+        // The grid sorts what it is given, and it has just been given a different list.
+        _grid.Resort();
     }
 
     /// <summary>
-    /// Re-orders the shown rows when a column header has been clicked.
+    /// The list, drawn by a grid that knows nothing about monsters.
     /// </summary>
     /// <remarks>
-    /// ONLY WHEN ImGui SAYS SO, or when the filter has just produced a new list. Sorting a list
-    /// that is already sorted, sixty times a second, is the kind of cost that never shows up in
-    /// a profile as one thing and is free to avoid.
+    /// THE TWO THINGS THE GRID CANNOT WORK OUT FOR ITSELF are handed to it here: which rows are
+    /// bosses - a flag the table carries that no column shows - and that hovering a row should
+    /// print its path, which is this table's own key and the string somebody came to copy.
+    ///
+    /// KEPT IN FIELDS rather than written at the call, because a lambda written there is a new
+    /// delegate every frame. They read <see cref="_page"/> when they are called rather than
+    /// closing over the book that existed when they were made, so a table that arrives later is
+    /// picked up without rebuilding them.
     /// </remarks>
-    private unsafe void Sort()
+    private void Grid()
     {
-        // ImGui hands back a null pointer until the header row has been drawn and somebody has
-        // chosen a column, so the wrapper cannot be trusted without checking the pointer it wraps.
-        ImGuiTableSortSpecsPtr specs = ImGui.TableGetSortSpecs();
-        if (specs.NativePtr == null || specs.SpecsCount == 0)
+        _ink ??= row => _page.Boss[row] ? OverlayInk.Name : null;
+        _hover ??= row => _page.Paths[row];
+
+        int chosen = _grid.Draw("##monsters", _page.Store, _shown, _chosenRow, _ink, _hover);
+
+        if (chosen == _chosenRow)
         {
             return;
         }
 
-        if (!specs.SpecsDirty && !_resort)
-        {
-            return;
-        }
-
-        specs.SpecsDirty = false;
-        _resort = false;
-
-        ImGuiTableColumnSortSpecsPtr by = specs.Specs;
-        bool up = by.SortDirection == ImGuiSortDirection.Ascending;
-        int column = by.ColumnIndex;
-
-        _shown.Sort((left, right) =>
-        {
-            int said = column switch
-            {
-                1 => string.Compare(left.Kind, right.Kind, StringComparison.OrdinalIgnoreCase),
-                2 => left.One.Life.CompareTo(right.One.Life),
-                3 => left.One.Damage.CompareTo(right.One.Damage),
-                4 => left.Skills.CompareTo(right.Skills),
-                5 => left.Mods.CompareTo(right.Mods),
-                _ => string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase),
-            };
-
-            // Ties break on the path, which is unique - so a sort by type puts each type's
-            // monsters in one fixed order rather than in whatever order the comparison left them.
-            return (up ? said : -said) is var order and not 0
-                ? order
-                : string.CompareOrdinal(left.Path, right.Path);
-        });
+        _chosenRow = chosen;
+        _chosen = chosen >= 0 && chosen < _page.Paths.Length ? _page.Paths[chosen] : string.Empty;
     }
 
     private void Detail(MonsterVarieties all, StatDescriptions said)

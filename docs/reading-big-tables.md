@@ -334,12 +334,26 @@ off — the table can be ten times the size and cost the same.
 A bar drawn into the cell rect with `AddRectFilled` behind right-aligned text. Two decisions worth
 recording:
 
-**Length is the percentile, not the value.** These distributions are heavy-tailed — `AttackSpeed`
-runs 0..7170 around a median of 1500 — and a bar scaled linearly to the maximum makes every
-ordinary row a stub and answers nothing. A percentile bar answers *"is this high, for a monster"*,
-which is the question somebody scanning a column actually has, and **the number is printed beside
-it**, so the magnitude is never lost. Where a linear reading is wanted, the view carries a toggle
-for linear-clamped-at-p99; the default is percentile.
+**Length is the value against a scale of p90 — and this paragraph used to say percentile.** It was
+changed by measuring the export rather than by arguing, which is worth recording as much as the
+answer is:
+
+| scaling | where the middle 80% of `life` sits | what breaks |
+| --- | --- | --- |
+| to the maximum | 4% – 10% of the bar | every ordinary row is a stub; one boss is full |
+| by percentile rank | 0% – 100% by construction | **the ties decide everything** |
+| **to p90, clamped** | **40% – 100%** | 8% of rows pin full and need the mark |
+
+The middle option is the one that looks obviously right and is not. These columns are tie-heavy:
+984 of 2733 monsters have exactly 100 life, 2023 share one aggro range, 1816 share one model size.
+Rank the ties and a value one step above the mode jumps from 0.40 of the bar to 0.78 — a difference
+of fifteen units drawn as half the width, while the difference between 135 and 500 is drawn as
+almost none.
+
+So: linear below p90, full and **marked** above it, and the number always printed beside the bar.
+Equal values look equal, which is the truth about a table where a third of the rows agree; a ratio
+below the scale is still a ratio; and the 8% that overflow are the rows somebody then reads the
+number of. `ColumnSpread` carries the measurements and the reasoning.
 
 **Colour is not part of it.** The bar is one colour (`OverlayInk.Chrome`, under the text), because
 of rule 1. Colour in the grid means `boss` (`OverlayInk.Name`, as today), `unresolved`
@@ -475,8 +489,17 @@ window in the overlay.
 
 Each stage is useful shipped alone, and each one is a commit somebody can review.
 
-1. **Store + clipped grid + encoded cells.** Removes the 1500 cap, removes the per-frame
-   allocations, adds the bars. No new concepts for the user; the window just gets better.
+1. ~~**Store + clipped grid + encoded cells.**~~ **Built** — `ColumnStore`, `ColumnSpread` and
+   `MonsterBook` in `Features`, `DataGrid` in `Overlay`, and `MonsterBookWindow` reduced to the
+   monster-specific half. The 1500-row cap and the per-frame formatting are gone, and what the
+   columns measure out to is:
+
+   | column | full bar at (p90) | median | largest | rows over the scale |
+   | --- | --- | --- | --- | --- |
+   | life | 250% | 115% | 2600% | 227 (8%) |
+   | dmg | 250% | 115% | 1000% | 269 (10%) |
+   | skills | 17 | 3 | 67 | 260 (10%) |
+   | mods | 2 | 1 | 8 | 207 (8%) |
 2. **Column chooser, multi-sort, header spreads, saved views.** Density, still no new vocabulary.
 3. **Index, facet rail, query grammar with completion.** The comparative jobs arrive here.
 4. **Pin and compare.**
