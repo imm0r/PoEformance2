@@ -42,6 +42,20 @@ public sealed class MonsterPortrait
     /// <summary>How far the mouse drags to turn the model once around.</summary>
     public const float Sweep = 360f;
 
+    /// <summary>The id ImGui knows the picture by, which is what makes it something to grab.</summary>
+    private const string Grip = "##monster-model";
+
+    /// <summary>
+    /// The buffers every redraw works in, made once.
+    /// </summary>
+    /// <remarks>
+    /// ONE PER PORTRAIT AND NOT ONE PER FRAME. A drag redraws on every frame the cursor moves, and
+    /// a fresh pair of buffers at this size is 1.1 MB of large-object heap each time - measured at
+    /// 67 MB and thirteen gen-2 collections for one second of turning, which the overlay would
+    /// show as a stutter in the thing being turned. See <see cref="MeshPicture.Canvas"/>.
+    /// </remarks>
+    private readonly MeshPicture.Canvas _canvas = new(Size);
+
     private readonly Func<string, byte[]?>? _install;
     private readonly Func<string, Image<Rgba32>, bool, IntPtr>? _upload;
     private readonly Action<string>? _release;
@@ -106,23 +120,45 @@ public sealed class MonsterPortrait
         }
 
         float side = Math.Clamp(wide, 64f, Size);
-        ImGui.Image(_texture, new Vector2(side, side));
 
-        // DRAGGED ON THE PICTURE ITSELF, which is where somebody reaches for it. The item is the
-        // image just drawn, so this has to come straight after it.
-        if (ImGui.IsItemActive() && ImGui.IsMouseDragging(ImGuiMouseButton.Left))
+        // A BUTTON WITH THE PICTURE PAINTED INTO IT, AND NOT ImGui.Image. An image is an item with
+        // NO ID, and ImGui only hands the hover to an item that has one - imgui.cpp's ItemHoverable
+        // reads "if (id != 0) SetHoveredID(id)". Two bugs came out of that one fact, and both were
+        // reported from the live client:
+        //
+        //   - IsItemActive compares g.ActiveId against the item's id, so after an image it is
+        //     NEVER true and the drag below was unreachable code that read as though it worked.
+        //   - With the hover left unclaimed, the sections drawn AFTER this took the click instead.
+        //     OverlayLayout.Subsection passes SpanAvailWidth, so a header's hit box runs the whole
+        //     width of the pane and straight across the picture: trying to turn the monster
+        //     collapsed "Type" instead. A claimed id is also what fixes that, through the guard
+        //     "if (g.HoveredId != 0 && g.HoveredId != id) return false" the headers then meet.
+        ImGui.InvisibleButton(Grip, new Vector2(side, side));
+        ImGui.GetWindowDrawList().AddImage(_texture, ImGui.GetItemRectMin(), ImGui.GetItemRectMax());
+
+        // HELD RATHER THAN HOVERED, so the model keeps turning when the drag runs off the edge of
+        // it - which it does constantly, because the picture is small and a full turn is 360 px.
+        bool held = ImGui.IsItemActive();
+        if (held && ImGui.IsMouseDragging(ImGuiMouseButton.Left))
         {
             Vector2 moved = ImGui.GetIO().MouseDelta;
             _turn -= moved.X / Sweep * MathF.Tau;
             _tilt = Math.Clamp(_tilt + (moved.Y / Sweep * MathF.Tau), -MathF.PI / 3f, MathF.PI / 3f);
         }
 
-        if (ImGui.IsItemHovered())
+        if (!ImGui.IsItemHovered())
+        {
+            return;
+        }
+
+        // Not while it is being turned: the hint is for somebody who has not yet noticed that the
+        // picture moves, and leaving it up trails a label through the gesture it describes.
+        if (!held)
         {
             ImGui.SetTooltip("Drag to turn. Double-click to face front again.");
         }
 
-        if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
         {
             _turn = 0f;
             _tilt = 0f;
@@ -211,7 +247,9 @@ public sealed class MonsterPortrait
     {
         try
         {
-            GamePicture drawn = MeshPicture.Of(_model.Mesh, Size, _turn, _tilt, default, _model.Skin);
+            // The canvas lends its pixels rather than giving them, and LoadPixelData below copies
+            // them into the image straight away - so nothing here outlives the next redraw.
+            GamePicture drawn = MeshPicture.Of(_model.Mesh, _canvas, _turn, _tilt, default, _model.Skin);
             if (!drawn.Ready)
             {
                 Why = "the model drew nothing";

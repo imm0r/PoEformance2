@@ -217,6 +217,84 @@ public class MeshPictureTests
         Assert.NotEqual(Middle(MeshPicture.Of(Coated(0.25f), 64, skin: halves)), Middle(below));
     }
 
+    /// <summary>
+    /// A canvas drawn into twice shows the second monster, not the second over the first.
+    /// </summary>
+    /// <remarks>
+    /// THE TEST THAT EARNS THE CANVAS, and the one thing reuse can get wrong that allocating never
+    /// could. The pixels a mesh does not cover are precisely where the last drawing shows through,
+    /// so what breaks it is a big model followed by a smaller one - or by none, which takes the
+    /// early way out before a triangle is ever looked at. Both are ordinary in the book, where one
+    /// portrait draws whichever row somebody clicks next.
+    ///
+    /// AGAINST FRESH BUFFERS RATHER THAN AGAINST A CONSTANT, so the test says what it means:
+    /// reusing a canvas is INDISTINGUISHABLE from not reusing one. A check that only counted lit
+    /// pixels would pass on a picture with the last monster still standing behind this one.
+    /// </remarks>
+    [Fact]
+    public void ACanvasKeepsNothingOfTheMonsterBeforeIt()
+    {
+        const int Side = 96;
+        var canvas = new MeshPicture.Canvas(Side);
+
+        // Something tall and wide first, so there is as much as possible to leave behind.
+        MeshPicture.Of(Post(crossbar: true), canvas);
+
+        foreach (SkinnedMesh next in new[] { Single(near: true), SkinnedMesh.None, Post() })
+        {
+            byte[] reused = [.. MeshPicture.Of(next, canvas).Rgba];
+            byte[] fresh = MeshPicture.Of(next, Side).Rgba;
+
+            Assert.Equal(0, Differing(fresh, reused));
+        }
+    }
+
+    /// <summary>A canvas draws what buffers of its own would, turn and tilt and skin alike.</summary>
+    [Fact]
+    public void ACanvasDrawsWhatTheAllocatingWayDraws()
+    {
+        GamePicture sheet = Halved();
+        var canvas = new MeshPicture.Canvas(64);
+
+        GamePicture lent = MeshPicture.Of(Coated(), canvas, 0.6f, -0.3f, skin: sheet);
+        GamePicture made = MeshPicture.Of(Coated(), 64, 0.6f, -0.3f, skin: sheet);
+
+        Assert.Equal(0, Differing(made.Rgba, lent.Rgba));
+    }
+
+    /// <summary>A canvas clamps its size the same way the size taken by value is clamped.</summary>
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(-4, 1)]
+    [InlineData(999_999, MeshPicture.Widest)]
+    public void ACanvasClampsItsSizeToo(int asked, int given)
+        => Assert.Equal(given, new MeshPicture.Canvas(asked).Size);
+
+    /// <summary>No canvas is a mistake in the caller, not a picture of nothing.</summary>
+    [Fact]
+    public void DrawingWithoutACanvasSaysSo()
+        => Assert.Throws<ArgumentNullException>(() => MeshPicture.Of(SkinnedMesh.None, canvas: null!));
+
+    /// <summary>How many bytes differ, because a failure wants a count rather than two arrays.</summary>
+    private static int Differing(byte[] one, byte[] other)
+    {
+        if (one.Length != other.Length)
+        {
+            return Math.Max(one.Length, other.Length);
+        }
+
+        var apart = 0;
+        for (var at = 0; at < one.Length; at++)
+        {
+            if (one[at] != other[at])
+            {
+                apart++;
+            }
+        }
+
+        return apart;
+    }
+
     private static byte Channel(GamePicture said, int part)
         => said.Rgba[((((said.Height / 2) * said.Width) + (said.Width / 2)) * 4) + part];
 

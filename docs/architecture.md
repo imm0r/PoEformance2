@@ -261,7 +261,9 @@ to become a texture before it can appear. That choice is also what makes the ren
 its output is an array a test can measure, where a D3D11 renderer could only be judged from a
 screenshot on a machine with the game.
 
-Four things here cost time to rediscover, so they are written down:
+The portrait can be **turned with the mouse**, which is `MonsterPortrait` holding a turn and a
+tilt and redrawing when either moves. Six things here cost time to rediscover, so they are
+written down:
 
 - **`extends` carries no extension.** The game writes `extends "Metadata/Parent"` while an
   attached object carries its `.ao` in full. The first survey asked for 3231 files and found
@@ -273,6 +275,18 @@ Four things here cost time to rediscover, so they are written down:
   `BoneRabbleJaguar` carries none and its model is two hops away. The nearer file wins.
 - **A model stands along negative Z.** Read `y` as up and the monster lies on its face; drop the
   sign and it hangs upside down. Both produce a picture.
+- **`ImGui.Image` cannot be grabbed, and does not defend its own pixels.** An image is an item
+  with no ID, and `ItemHoverable` only claims the hover `if (id != 0)`. So `IsItemActive()` is
+  never true after one — a drag written against an image is dead code that reads as working —
+  and, with the hover unclaimed, whatever is drawn afterwards takes the click instead. Here that
+  was `OverlayLayout.Subsection`, whose `SpanAvailWidth` hit box runs the full width of the pane
+  and straight across the picture: turning the monster collapsed *Type*. An `InvisibleButton`
+  with the picture painted into it fixes both, because both come from the missing ID.
+- **A per-frame redraw made the buffers matter.** At 384 square the pixels and the depth buffer
+  are 576 KB each, both over the 85 KB that sends an array to the large object heap. Once a drag
+  redrew per frame that was 1.1 MB a frame — 67 MB/s and 13 gen-2 collections per second of
+  turning. `MeshPicture.Canvas` lends one pair to the caller; measured, that also took the draw
+  itself from 5.4 ms to 3.1 ms, so the garbage cost more to make than to collect.
 
 The format diagrams are [poe_data_tools/FORMATS.md](https://github.com/adamthedash/poe_data_tools/blob/master/FORMATS.md);
 `ggpk.exposed/poe2/<path>` serves the game's own files over HTTP, which is how these readers were
