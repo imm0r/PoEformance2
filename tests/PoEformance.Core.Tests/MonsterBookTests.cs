@@ -1,4 +1,5 @@
 using PoEformance.Features;
+using PoEformance.Game.Components;
 using PoEformance.Game.Entities;
 
 namespace PoEformance.Core.Tests;
@@ -397,6 +398,195 @@ public class MonsterBookTests
         // life multiplier in the table is several times the value at which the bar fills.
         Assert.True(spread.Most / spread.Scale > 4d, $"{spread.Most} against a scale of {spread.Scale}");
         Assert.True(spread.Over > 0, "and something is above the scale, or there was nothing to clamp");
+    }
+
+    /// <summary>
+    /// The three ways a modifier stat line can end up on screen, counted against the shipped pair.
+    /// </summary>
+    /// <remarks>
+    /// THIS TEST IS THE MEASUREMENT ITSELF, kept so that it cannot quietly stop being true. The
+    /// question it settles is whether supporting multi-stat group wordings would be worth building,
+    /// and the answer the numbers give is no: 5 lines of 295. What is actually missing is 174 lines
+    /// the game words NOWHERE - neither singly nor in company - so no amount of reading the game's
+    /// files would produce a sentence for them, and writing one here would be inventing game text.
+    ///
+    /// LOCKED TO THE EXPORT AND NOT TO AN EXACT TOTAL, because a re-export moves every count. What
+    /// the assertions pin is the SHAPE of the split, which is what the decision rests on.
+    /// </remarks>
+    [Fact]
+    public void GroupWordingsWouldRepayAlmostNothing()
+    {
+        MonsterVarieties table = Shipped();
+        MonsterBook book = MonsterBook.Of(table, Sentences());
+
+        MonsterBook.Wordings count = book.Worded;
+
+        Assert.Equal(count.Lines, count.Worded + count.Shared + count.Silent);
+        Assert.True(count.Lines > 200, $"the export should carry modifier stats, and carries {count.Lines}");
+
+        // The finding, as a rule rather than as a number: what the game words only in company is a
+        // rounding error beside what it does not word at all.
+        Assert.True(
+            count.Shared * 20 < count.Silent,
+            $"{count.Shared} group-worded against {count.Silent} silent - the case for group"
+            + " wordings would be back on the table");
+    }
+
+    /// <summary>
+    /// The shipped TSV knows which stats the game words only in company, the same as the install.
+    /// </summary>
+    /// <remarks>
+    /// WRITTEN BECAUSE THE OPPOSITE WAS ASSUMED AND WAS WRONG. The export was taken to have thrown
+    /// the grouping away, which would have made the split above unmeasurable without the game
+    /// installed. Its fourth column is the group, spelled as the comma-separated ids that share the
+    /// template, and Load was already reading it to decide what to drop.
+    /// </remarks>
+    [Fact]
+    public void TheExportSaysWhichStatsAreOnlyWordedInCompany()
+    {
+        StatDescriptions said = Sentences();
+
+        Assert.True(said.Grouped > 0, "the export should drop the multi-stat lines, and dropped none");
+
+        // A stat that IS grouped: one of the three the monster table actually runs into.
+        Assert.True(said.Shared("bleed_on_hit_with_attacks_%"));
+        Assert.Null(said.Of("bleed_on_hit_with_attacks_%"));
+
+        // A stat with a sentence of its own is not grouped, and one the game never words is neither.
+        Assert.False(said.Shared("monster_base_type_attack_cast_speed_+%_and_damage_-%_final"));
+        Assert.False(said.Shared("stance_movement_speed_+%_final"));
+        Assert.Null(said.Of("stance_movement_speed_+%_final"));
+        Assert.False(said.Shared(null));
+    }
+
+    /// <summary>
+    /// The stance column and the Stance* modifiers are two unrelated uses of one word.
+    /// </summary>
+    /// <remarks>
+    /// THE JOIN SOMEBODY WILL REACH FOR, and it does not hold. "stance4" beside a modifier called
+    /// StanceMovementSpeed192 reads like a key and its row; it is not one, and the cheapest proof is
+    /// that hundreds of monsters with no stance value at all carry a Stance* modifier anyway.
+    /// </remarks>
+    [Fact]
+    public void AStanceValueIsNotAStanceModifier()
+    {
+        MonsterVarieties table = Shipped();
+
+        var orphans = 0;
+        foreach (MonsterVariety one in table.All.Values)
+        {
+            if (one.Stance is { Length: > 0 })
+            {
+                continue;
+            }
+
+            foreach (int at in Rows(one))
+            {
+                if (table.Modifier(at)?.Id.StartsWith("Stance", StringComparison.Ordinal) == true)
+                {
+                    orphans++;
+                    break;
+                }
+            }
+        }
+
+        Assert.True(
+            orphans > 100,
+            $"only {orphans} monsters carry a Stance* modifier with an empty stance column - if that"
+            + " ever reaches zero the two might be the same thing after all");
+    }
+
+    /// <summary>
+    /// A resistance profile name says whether it is a resistance or a WEAKNESS, and which element.
+    /// </summary>
+    [Theory]
+    [InlineData("MinorColdResist", "Cold", "Minor", false)]
+    [InlineData("MajorFireResist", "Fire", "Major", false)]
+    [InlineData("MinorLightningVuln", "Lightning", "Minor", true)]
+    [InlineData("MajorColdVuln", "Cold", "Major", true)]
+    [InlineData("MinorAllElementalResists", "AllElemental", "Minor", false)]
+    [InlineData("MajorAllElementalResists", "AllElemental", "Major", false)]
+    public void AProfileNameSaysWhichWayItPoints(
+        string name, string element, string strength, bool vulnerable)
+    {
+        ResistanceName said = Assert.NotNull(ResistanceName.Read(name));
+
+        Assert.Equal(element, said.Element);
+        Assert.Equal(strength, said.Strength);
+        Assert.Equal(vulnerable, said.Vulnerable);
+    }
+
+    /// <summary>
+    /// A name that says neither comes back null rather than being sorted into a heading by guess.
+    /// </summary>
+    [Theory]
+    [InlineData("MinionLowAll")]
+    [InlineData("MinionFire")]
+    [InlineData("MinionCold")]
+    [InlineData("MinionLightning")]
+    [InlineData("#42")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void AProfileNameThatSaysNeitherIsLeftAlone(string? name)
+        => Assert.Null(ResistanceName.Read(name));
+
+    /// <summary>
+    /// Every profile the shipped table hands out is either read or deliberately left alone.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE THAT WOULD CATCH A SILENT LOSS. A parser that stopped reading "Vuln" would not throw
+    /// - it would quietly move every vulnerability under the heading that says the opposite. This
+    /// counts both sides against the real table, so the day a league adds a profile shaped
+    /// differently, the number moves here rather than on somebody's screen.
+    /// </remarks>
+    [Fact]
+    public void EveryProfileInTheTableIsEitherReadOrLeftAlone()
+    {
+        MonsterVarieties table = Shipped();
+
+        var read = 0;
+        var weak = 0;
+        var alone = 0;
+        foreach (MonsterVariety one in table.All.Values)
+        {
+            foreach (string name in table.ResistancesOf(one))
+            {
+                if (ResistanceName.Read(name) is not { } said)
+                {
+                    alone++;
+                    continue;
+                }
+
+                read++;
+                if (said.Vulnerable)
+                {
+                    weak++;
+                }
+            }
+        }
+
+        Assert.True(read > 0, "no profile name read at all");
+        Assert.True(weak > 0, "not one vulnerability found - the Vuln half of the split is dead");
+        Assert.True(
+            read > alone,
+            $"{alone} profiles left alone against {read} read - the naming has changed shape");
+    }
+
+    /// <summary>The shipped wordings, beside the shipped table.</summary>
+    private static StatDescriptions Sentences()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "data", "stat_desc_map.tsv")))
+        {
+            dir = dir.Parent;
+        }
+
+        Assert.NotNull(dir);
+        StatDescriptions said = StatDescriptions.Load(
+            Path.Combine(dir!.FullName, "data", "stat_desc_map.tsv"));
+
+        Assert.True(said.Count > 1000, $"the export should hold the wordings, and holds {said.Count}");
+        return said;
     }
 
     /// <summary>The shipped export, found by walking up to the repository root.</summary>

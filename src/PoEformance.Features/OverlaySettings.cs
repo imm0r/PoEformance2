@@ -138,7 +138,13 @@ public sealed record OverlaySettings(
     // one release would then show a different set of columns the next. The order they are drawn in
     // is not kept: that is the table's own, and ImGui already remembers what has been dragged
     // where. See MonsterBookWindow.
-    [property: JsonPropertyName("monsterColumns")] IReadOnlyList<string>? MonsterColumns = null)
+    [property: JsonPropertyName("monsterColumns")] IReadOnlyList<string>? MonsterColumns = null,
+
+    // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
+    // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
+    // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants
+    // the rest of it. Nothing is lost by folding it away; what it clicks is written into the query.
+    [property: JsonPropertyName("monsterRail")] bool MonsterRail = true)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>

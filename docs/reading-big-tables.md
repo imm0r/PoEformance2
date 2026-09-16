@@ -557,6 +557,59 @@ engine bent, the engine was wrong, and better to find that out on a table we alr
 
 ---
 
+## What the live client changed, after stage 3
+
+Three panes wide enough to read are most of a monitor, and this window is read **while playing**.
+That is not something a screenshot on a build machine can show, and it is the one finding from the
+first session on the real client that changed the design rather than the code:
+
+- **The rail folds away.** It is a button beside the query box, and the choice is remembered in
+  `overlay.json`. Nothing is lost by folding it, and that is a property of the design rather than
+  a concession: everything the rail does is written into the query, so a folded rail leaves a
+  window that filters exactly as well, only through typing. See rule 3 — the information is still
+  there, it is just not on screen at once.
+- **Resistances and vulnerabilities are not one list.** The profile names carry it — `MinorColdVuln`
+  is a WEAKNESS to cold and `MajorFireResist` is not — so the detail pane splits them, and the
+  weaknesses are drawn in the warning colour. Four of the nineteen profiles (`MinionLowAll`,
+  `MinionFire`, `MinionCold`, `MinionLightning`) say neither, and they keep their own spelling under
+  a heading that claims nothing rather than being sorted by guess. `ResistanceName` reads the name
+  and nothing else: each profile also holds 32 numeric tier columns whose meaning this data does not
+  settle, and reading the name is not a step towards reading those.
+- **`stance` is an animation name.** It was read as a code to decode; it is free text out of the
+  monster's `.ao` files, which is why four rows read `TwoHandMace`, `left`, `right` and `default`
+  beside the 618 reading `stance1`–`stance8`. There is no `Stances` table in the game's schema to
+  join it against. And the `Stance*` **modifiers** are not it: 287 of the 2111 monsters with an
+  empty stance column carry one anyway, and `stance2` alone spreads over 53 different ones.
+
+### The unworded modifiers, measured rather than assumed
+
+The last of the five was *"a few of these modifier lines we could surely already translate"*. The
+answer is a count, and the count says **no**, for a reason worth keeping:
+
+| | lines | distinct stats |
+| --- | --- | --- |
+| worded by the game | 116 | |
+| worded **only as part of a multi-stat group** | 5 | 3 |
+| worded **nowhere at all** | 174 | 52 |
+
+Supporting group wordings is buildable — a modifier holds every value in the group, so it could
+fill every hole — and it would repay **5 lines of 295**. What is actually missing is the 174, and
+for those there is no sentence in the game's files to find: they appear in `stat_name_map.tsv` and
+not in `stat_desc_map.tsv`, singly or in company. Writing one would be inventing game text.
+
+Half the gap is **one stat**: `stance_movement_speed_+%_final`, on 87 lines, running −90 to +590.
+The rest is a long tail of engine bookkeeping — `cant_touch_this`, `dont_be_pushy`,
+`is_rate_limited_daemon` — plus a handful that clearly mean something to a player and still have no
+wording (`monster_dropped_item_rarity_+%` on 8 lines, up to +9500 on the pinnacle boss).
+
+This measurement also corrected a wrong belief that had been written down as a comment: the shipped
+TSV was taken to have thrown the grouping away, so that the split could only be measured with the
+game installed. Its fourth column **is** the group, and `StatDescriptions.Load` was already reading
+it to decide what to drop — it simply was not keeping the names. `GroupWordingsWouldRepayAlmostNothing`
+and `TheExportSaysWhichStatsAreOnlyWordedInCompany` keep both facts from quietly expiring.
+
+---
+
 ## Where this design stops working
 
 Worth writing down now, so nobody rediscovers it as a bug:

@@ -105,6 +105,29 @@ public sealed class MonsterBook : IQuerySource
     public int Count => Paths.Length;
 
     /// <summary>
+    /// How the modifier lines in this table divide up between worded and not.
+    /// </summary>
+    /// <remarks>
+    /// COUNTED OVER DISTINCT MODIFIER ROWS rather than per monster: one modifier sits on hundreds
+    /// of them, and counting it once per monster would say more about how common a modifier is
+    /// than about how much of the table can be read.
+    ///
+    /// THE POINT OF SPLITTING "NOT WORDED" IN TWO. A stat the game words only as part of a group
+    /// could be worded here - a modifier holds every value in its own group, which is exactly what
+    /// the single-stat rule assumes a caller does not have. A stat with no sentence anywhere is
+    /// engine-internal and never had one. The first is work worth doing and the second is not, and
+    /// one number for both says which is which to nobody.
+    /// </remarks>
+    /// <param name="Lines">Stat lines over every modifier row something points at.</param>
+    /// <param name="Worded">Those the game has a sentence for.</param>
+    /// <param name="Shared">Those the game words only as part of a multi-stat group.</param>
+    /// <param name="Silent">Those with no sentence anywhere - the engine's own bookkeeping.</param>
+    public readonly record struct Wordings(int Lines, int Worded, int Shared, int Silent);
+
+    /// <summary>How much of this table's modifier text can be read - see <see cref="Wordings"/>.</summary>
+    public Wordings Worded { get; private init; }
+
+    /// <summary>
     /// Works the table into columns. Never throws, and an empty table gives an empty book.
     /// </summary>
     /// <param name="table">What was read, whether from the install or from the export.</param>
@@ -190,6 +213,10 @@ public sealed class MonsterBook : IQuerySource
         var bySkill = new Gather(count);
         var byMod = new Gather(count);
 
+        // WHICH MODIFIER ROWS THE TABLE ACTUALLY USES, so the wording count below is over each of
+        // them once. The same modifier sits on hundreds of monsters.
+        var seen = new HashSet<int>();
+
         var text = new StringBuilder(512);
         var at = 0;
 
@@ -209,7 +236,7 @@ public sealed class MonsterBook : IQuerySource
             int profiles = Add(text, table.ResistancesOf(one), null, at);
             text.Append(' ').Append(table.BloodName(one));
 
-            int carriedMods = Modifiers(table, one, said, text, byMod, at);
+            int carriedMods = Modifiers(table, one, said, text, byMod, at, seen);
 
             // The two things the table says with a FLAG rather than with a column, so that typing
             // "boss" finds the bosses. There is no other way to ask this list for them.
@@ -312,7 +339,10 @@ public sealed class MonsterBook : IQuerySource
             [.. filling.Select(one => one.Group)],
             [.. filling.Select(one => one.Start)],
             held,
-            numbers);
+            numbers)
+        {
+            Worded = Counted(table, said, seen),
+        };
     }
 
     /// <summary>How many rows there are. What <see cref="IQuerySource"/> means by it.</summary>
@@ -481,10 +511,11 @@ public sealed class MonsterBook : IQuerySource
         StatDescriptions? said,
         StringBuilder text,
         Gather into,
-        int row)
-        => Slot(table, one.Mods, said, text, into, row)
-            + Slot(table, one.Mods2, said, text, into, row)
-            + Slot(table, one.SpecialMods, said, text, into, row);
+        int row,
+        HashSet<int> seen)
+        => Slot(table, one.Mods, said, text, into, row, seen)
+            + Slot(table, one.Mods2, said, text, into, row, seen)
+            + Slot(table, one.SpecialMods, said, text, into, row, seen);
 
     private static int Slot(
         MonsterVarieties table,
@@ -492,7 +523,8 @@ public sealed class MonsterBook : IQuerySource
         StatDescriptions? said,
         StringBuilder text,
         Gather into,
-        int row)
+        int row,
+        HashSet<int> seen)
     {
         if (rows is null)
         {
@@ -501,6 +533,8 @@ public sealed class MonsterBook : IQuerySource
 
         foreach (int at in rows)
         {
+            seen.Add(at);
+
             if (table.Modifier(at) is not { } mod)
             {
                 // NAMED BY ITS NUMBER WHERE IT RESOLVES TO NOTHING, and indexed under that name -
@@ -521,6 +555,35 @@ public sealed class MonsterBook : IQuerySource
         }
 
         return rows.Count;
+    }
+
+    /// <summary>
+    /// Counts how much of the modifier text the game can actually word - see <see cref="Wordings"/>.
+    /// </summary>
+    private static Wordings Counted(MonsterVarieties table, StatDescriptions? said, HashSet<int> rows)
+    {
+        var lines = 0;
+        var worded = 0;
+        var shared = 0;
+
+        foreach (int row in rows)
+        {
+            foreach (ModifierStat stat in table.Modifier(row)?.Stats ?? [])
+            {
+                lines++;
+
+                if (stat.Worded(said) is { Length: > 0 })
+                {
+                    worded++;
+                }
+                else if (said?.Shared(stat.Stat) == true)
+                {
+                    shared++;
+                }
+            }
+        }
+
+        return new Wordings(lines, worded, shared, lines - worded - shared);
     }
 
     /// <summary>Writes each of them into the searchable text and the index, and counts them.</summary>

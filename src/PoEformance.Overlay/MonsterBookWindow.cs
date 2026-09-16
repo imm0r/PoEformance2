@@ -86,6 +86,11 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// <summary>The box's background while the query does not read. Dark enough to type on.</summary>
     private static readonly Vector4 Wrong = new(0.32f, 0.11f, 0.11f, 1f);
 
+    /// <summary>Scratch for <see cref="Resistances"/>, held so the pane does not allocate per frame.</summary>
+    private static readonly List<string> _resists = [];
+    private static readonly List<string> _weak = [];
+    private static readonly List<string> _quiet = [];
+
     private readonly PaneSplit _rail = new(0.2f);
     private readonly PaneSplit _split = new(0.46f);
     private readonly DataGrid _grid = new();
@@ -120,6 +125,18 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
 
     /// <summary>Which columns are on, by store column number.</summary>
     private bool[] _visible = [];
+
+    /// <summary>
+    /// Whether the facet rail has a pane of its own.
+    /// </summary>
+    /// <remarks>
+    /// IT COSTS WIDTH, AND WIDTH IS THE SCARCE THING HERE. This window is read WHILE PLAYING, over
+    /// a game that wants the screen - and three panes wide enough to read every column is most of
+    /// a monitor. So the rail folds away, the setting is remembered, and what is left is the two
+    /// panes the window had before: the list and the detail. Nothing is lost by folding it, because
+    /// everything the rail does is written into the query, which stays.
+    /// </remarks>
+    private bool _railOpen = true;
 
     /// <summary>
     /// The columns somebody chose, BY NAME, or null while the defaults stand.
@@ -157,13 +174,17 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     public IReadOnlyList<string> Columns
         => [.. _columns.Select(one => _page.Store.Columns[one].Name)];
 
-    /// <summary>Told when somebody changes which columns show, so the choice can be kept.</summary>
+    /// <summary>Whether the facet rail has a pane, for whoever writes the settings file.</summary>
+    public bool RailOpen => _railOpen;
+
+    /// <summary>Told when somebody changes the layout, so the choice can be kept.</summary>
     public Action? Changed { get; set; }
 
-    /// <summary>Puts back the columns a settings file remembered. Null leaves the defaults.</summary>
-    public void Show(IReadOnlyList<string>? columns)
+    /// <summary>Puts back what a settings file remembered. Nulls leave the defaults.</summary>
+    public void Show(IReadOnlyList<string>? columns, bool? rail = null)
     {
         _wanted = columns is { Count: > 0 } ? columns : null;
+        _railOpen = rail ?? _railOpen;
         Layout();
     }
 
@@ -183,15 +204,18 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         Header(all, said);
         Filter();
 
-        float rail = _rail.Left();
-        if (ImGui.BeginChild("##monster-rail", new Vector2(rail, 0f), ImGuiChildFlags.Borders))
+        if (_railOpen)
         {
-            Rail();
+            float rail = _rail.Left();
+            if (ImGui.BeginChild("##monster-rail", new Vector2(rail, 0f), ImGuiChildFlags.Borders))
+            {
+                Rail();
+            }
+
+            ImGui.EndChild();
+
+            _rail.Bar();
         }
-
-        ImGui.EndChild();
-
-        _rail.Bar();
 
         float left = _split.Left();
         if (ImGui.BeginChild("##monster-list", new Vector2(left, 0f), ImGuiChildFlags.Borders))
@@ -309,7 +333,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// </remarks>
     private void Header(MonsterVarieties all, StatDescriptions said)
     {
-        float room = OverlayLayout.ButtonRoom("Copy list", "Columns");
+        float room = OverlayLayout.ButtonRoom("Copy list", "Columns", "Facets");
         bool wrong = _error.Length > 0;
 
         if (wrong)
@@ -333,6 +357,21 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         if (wrong)
         {
             ImGui.PopStyleColor();
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Facets"))
+        {
+            _railOpen = !_railOpen;
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                _railOpen
+                    ? "Fold the facet rail away. Nothing is lost - what it clicked is in the query."
+                    : "Show the facet rail: what the rows that are left are made of.");
         }
 
         ImGui.SameLine();
@@ -391,10 +430,63 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         ImGui.TextDisabled($"  |  {said.Count.ToString(CultureInfo.InvariantCulture)} stat wordings");
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip(ImGuiText.Escape(said.Source));
+            Wordings(said);
         }
 
         Caret(box, below);
+    }
+
+    /// <summary>
+    /// How much of this table's modifier text the game can actually word, and why the rest is not.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED HERE BECAUSE THIS IS WHERE SOMEBODY IS LOOKING AT IT. A modifier that shows as
+    /// "-50 monster_slain_flask_charges_granted_+%" reads as a gap in the tool, and the useful
+    /// question is which KIND of gap: a stat the game words only as part of a group, which a
+    /// modifier could fill because it holds every value in that group; or a stat with no sentence
+    /// anywhere, which is engine bookkeeping and never had one. The first is work worth doing.
+    ///
+    /// BOTH SOURCES ANSWER IT - see <see cref="StatDescriptions.Shared"/>, which was the thing
+    /// worth checking rather than assuming: the export's fourth column is the group, so a machine
+    /// with no install reads the same split as one with it. The line still says which file is in
+    /// force, because a reworded sentence is a different question from a missing one.
+    /// </remarks>
+    private void Wordings(StatDescriptions said)
+    {
+        if (!ImGui.BeginTooltip())
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TextUnformatted(said.Source);
+
+            MonsterBook.Wordings count = _page.Worded;
+            if (count.Lines == 0)
+            {
+                return;
+            }
+
+            ImGui.Separator();
+            ImGui.TextUnformatted(
+                $"{count.Worded} of {count.Lines} modifier stat lines in this table are worded.");
+
+            if (count.Shared > 0)
+            {
+                ImGui.TextColored(
+                    OverlayInk.Warn,
+                    $"{count.Shared} more are worded by the game only as part of a multi-stat"
+                    + " group, which this build drops.");
+            }
+
+            ImGui.TextDisabled(
+                $"{count.Silent} have no sentence anywhere - the engine's own bookkeeping.");
+        }
+        finally
+        {
+            ImGui.EndTooltip();
+        }
     }
 
     /// <summary>Points at the character the query stopped reading at, and says why.</summary>
@@ -887,9 +979,30 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             // invented for it and no label that would read as one.
             Pair("crit kind", Count(one.Crit));
 
+            // THE NAME OF AN ANIMATION, NOT A CODE TO BE DECODED, and the column says so itself:
+            // beside the 618 rows reading "stance2" through "stance8" sit four reading
+            // "TwoHandMace", "left", "right" and "default". It is free text out of the monster's
+            // own .ao files, there is no Stances table in the game's schema to join it against,
+            // and nothing in the data says what "stance2" looks like. So it is labelled for what
+            // it is rather than dressed up as something a reader should be able to work out.
+            //
+            // AND THE Stance* MODIFIERS ARE NOT IT, which is the join somebody will reach for
+            // next: 287 of the 2111 monsters with an EMPTY stance field carry one anyway, and the
+            // 468 rows reading "stance2" spread over 53 different Stance* modifiers. They are two
+            // unrelated uses of one word - the modifier is a movement-speed multiplier, this is
+            // which animation set the model plays.
             if (one.Stance is { Length: > 0 } stance)
             {
-                Pair("stance", stance);
+                Pair("animation stance", stance);
+
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(
+                        "What the monster's own animation files call this pose. The game ships no"
+                        + " table that translates it, and the column is free text - four monsters"
+                        + " carry names like 'TwoHandMace' and 'left' instead of a number."
+                        + " Empty on 2111 of 2733 rows.");
+                }
             }
         }
         finally
@@ -926,18 +1039,73 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             Pair("damage spread", Percent(kind.Spread));
             Pair("summoned", kind.Summoned ? "yes" : "no");
 
-            string[] resists = [.. all.ResistancesOf(one)];
-            if (resists.Length > 0)
-            {
-                // PROFILE NAMES AND NOT PERCENTAGES: each profile holds 32 numeric columns of
-                // tiers that the export does not settle the meaning of, so the set is named
-                // rather than valued. MonsterKind says so at length.
-                Pair("resistances", string.Join(", ", resists));
-            }
+            Resistances(all, one);
         }
         finally
         {
             ImGui.Unindent();
+        }
+    }
+
+    /// <summary>
+    /// What the type resists, and - separately - what it is WEAK to.
+    /// </summary>
+    /// <remarks>
+    /// THE TWO REVERSE WHAT A READER SHOULD DO, so they cannot share a heading. A monster carrying
+    /// MinorColdVuln takes MORE cold damage, and listing that beside MajorFireResist under one word
+    /// called "resistances" tells somebody the opposite of what is true. The names say which is
+    /// which - see <see cref="ResistanceName"/>, and note that four of the nineteen profiles say
+    /// neither, so they keep their own spelling under a heading that claims nothing.
+    ///
+    /// STILL NAMES AND NOT PERCENTAGES. Each profile also holds 32 numeric columns of tiers whose
+    /// meaning this data does not settle; reading the NAME is not a step towards reading those.
+    /// </remarks>
+    private static void Resistances(MonsterVarieties all, MonsterVariety one)
+    {
+        // REUSED RATHER THAN ALLOCATED: the pane redraws every frame while a row stays picked, and
+        // a monster carries at most a handful of profiles, so three lists that never grow again
+        // after the first draw cost nothing. ImGui draws on one thread, which is what makes this
+        // safe to hold in statics.
+        List<string> resists = _resists;
+        List<string> weak = _weak;
+        List<string> quiet = _quiet;
+        resists.Clear();
+        weak.Clear();
+        quiet.Clear();
+
+        foreach (string name in all.ResistancesOf(one))
+        {
+            if (ResistanceName.Read(name) is not { } said)
+            {
+                quiet.Add(name);
+                continue;
+            }
+
+            (said.Vulnerable ? weak : resists).Add(said.Said);
+        }
+
+        if (resists.Count > 0)
+        {
+            Pair("resists", string.Join(", ", resists));
+        }
+
+        if (weak.Count > 0)
+        {
+            ImGui.TextDisabled("vulnerable to");
+            OverlayLayout.ToColumn();
+            ImGui.TextColored(OverlayInk.Warn, ImGuiText.Escape(string.Join(", ", weak)));
+        }
+
+        if (quiet.Count > 0)
+        {
+            Pair("resistance profile", string.Join(", ", quiet));
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(
+                    "These profiles carry neither 'Resist' nor 'Vuln' in their name, so which way"
+                    + " they point is not something the table says.");
+            }
         }
     }
 
