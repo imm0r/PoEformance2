@@ -186,6 +186,28 @@ public class MonsterModelTests
         Assert.Equal(string.Empty, said.Why);
     }
 
+    /// <summary>
+    /// A monster row becomes pixels - the whole chain, end to end.
+    /// </summary>
+    /// <remarks>
+    /// THE ONLY THING BETWEEN THIS AND THE SCREEN IS PLACEMENT. Every reader has its own tests and
+    /// the renderer has its own, but nothing until here says the pieces fit: that what the walk
+    /// hands back is what the renderer can draw. The two halves were written a day apart against
+    /// different files, which is exactly when an interface drifts.
+    /// </remarks>
+    [Fact]
+    public void AMonsterRowBecomesAPicture()
+    {
+        MonsterModel model = MonsterModels.Of(Install().Read, Named("body.ao"));
+        Assert.True(model.Ready);
+
+        GamePicture drawn = MeshPicture.Of(model.Mesh, 64, 0f, 0f, default, model.Skin);
+
+        Assert.True(drawn.Ready);
+        Assert.Equal(64, drawn.Width);
+        Assert.Contains(drawn.Rgba, one => one != 0);
+    }
+
     private static MonsterVariety Named(string path)
         => new(Name: "test", AoFiles: [path]);
 

@@ -2801,7 +2801,10 @@ internal static class Program
         overlay.AttachTracker(tracker, writeTracker);
         overlay.AttachDissector(structures);
         overlay.AttachEntityBrowser(entityParts);
-        overlay.AttachMonsterBook(settings.MonsterColumns, settings.MonsterRail);
+        overlay.AttachMonsterBook(
+            settings.MonsterColumns,
+            settings.MonsterRail,
+            install: installed is null ? null : PoEformance.Overlay.InstalledArt.From(installed));
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read
