@@ -131,7 +131,14 @@ public sealed record OverlaySettings(
     // Which stretch both wealth views report on, in minutes. One setting for the two of them:
     // two figures on screen labelled differently and answering the same question is how
     // somebody ends up believing the smaller one.
-    [property: JsonPropertyName("wealthWindowMinutes")] int WealthWindowMinutes = 60)
+    [property: JsonPropertyName("wealthWindowMinutes")] int WealthWindowMinutes = 60,
+
+    // Which columns the monster book shows, BY NAME and null until somebody changes them. By name
+    // because a column added anywhere but the end shifts every number after it, and a view saved
+    // one release would then show a different set of columns the next. The order they are drawn in
+    // is not kept: that is the table's own, and ImGui already remembers what has been dragged
+    // where. See MonsterBookWindow.
+    [property: JsonPropertyName("monsterColumns")] IReadOnlyList<string>? MonsterColumns = null)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>

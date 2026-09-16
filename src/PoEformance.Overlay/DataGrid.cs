@@ -31,18 +31,50 @@ namespace PoEformance.Overlay;
 /// categories, never amounts. Two encodings for one meaning is how a dense table stops being
 /// readable at a glance, because the reader has to learn which of them to believe.
 /// </remarks>
+/// <param name="Ink">A colour for a row's first cell, where it has one.</param>
+/// <param name="Hover">What a tooltip on a row says. Only asked for the row under the cursor.</param>
+/// <param name="Ranged">A drag across a column's histogram, as the values it picked out.</param>
+/// <param name="Cleared">A right-click on a histogram, which throws that column's range away.</param>
+public sealed record DataGridHooks(
+    Func<int, Vector4?>? Ink = null,
+    Func<int, string>? Hover = null,
+    Action<int, double, double>? Ranged = null,
+    Action<int>? Cleared = null);
+
 [SupportedOSPlatform("windows")]
 public sealed class DataGrid
 {
     private const ImGuiTableFlags Flags =
         ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY
-        | ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.Resizable | ImGuiTableFlags.Sortable;
+        | ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.Resizable | ImGuiTableFlags.Sortable
+        | ImGuiTableFlags.SortMulti;
 
     /// <summary>How wide the mark on a bar that has run past its scale is.</summary>
     private const float Mark = 2f;
 
+    /// <summary>How tall the histogram under a column's name is, in multiples of the text height.</summary>
+    private const float PlotLines = 0.9f;
+
+    /// <summary>How many columns a sort may be made of.</summary>
+    /// <remarks>
+    /// FOUR, which is more than anybody holds in their head at once and is bounded so that the
+    /// comparison can read out of two fixed arrays rather than out of ImGui's own memory - a sort
+    /// comparison runs thousands of times and has no business touching the UI library at all.
+    /// </remarks>
+    private const int MostSorts = 4;
+
+    private readonly int[] _by = new int[MostSorts];
+    private readonly bool[] _up = new bool[MostSorts];
+    private readonly Comparison<int> _compare;
+
+    private ColumnStore _store = ColumnStore.Empty;
+    private int _sorts;
+    private int _first;
+
     /// <summary>The list has to be put back in order - it was just refiltered or rebuilt.</summary>
     private bool _resort = true;
+
+    public DataGrid() => _compare = Compare;
 
     /// <summary>Says the row list has changed underneath, so the next draw re-sorts it.</summary>
     public void Resort() => _resort = true;
@@ -51,42 +83,47 @@ public sealed class DataGrid
     /// Draws the rows named in <paramref name="rows"/> and returns what is selected after it.
     /// </summary>
     /// <param name="id">The table's ImGui id.</param>
-    /// <param name="store">The columns to draw.</param>
+    /// <param name="store">Every column there is.</param>
+    /// <param name="columns">Which of them to draw, in order. The first one carries the selection.</param>
     /// <param name="rows">Which rows, in which order. SORTED IN PLACE when a header is clicked.</param>
     /// <param name="chosen">The selected row, or -1. Returned unchanged when nothing is clicked.</param>
-    /// <param name="ink">A colour for a row's first cell, where it has one.</param>
-    /// <param name="hover">What a tooltip on a row says. Only called for the row under the cursor.</param>
+    /// <param name="ranges">The ranges in force, so the histograms can show what they picked.</param>
+    /// <param name="hooks">What the grid cannot work out for itself.</param>
     public int Draw(
         string id,
         ColumnStore store,
+        IReadOnlyList<int> columns,
         List<int> rows,
         int chosen,
-        Func<int, Vector4?>? ink = null,
-        Func<int, string>? hover = null)
+        IReadOnlyList<ColumnRange> ranges,
+        DataGridHooks? hooks = null)
     {
         ArgumentNullException.ThrowIfNull(store);
+        ArgumentNullException.ThrowIfNull(columns);
         ArgumentNullException.ThrowIfNull(rows);
+        ArgumentNullException.ThrowIfNull(ranges);
 
-        if (store.Columns.Length == 0)
+        if (columns.Count == 0 || store.Columns.Length == 0)
         {
             return chosen;
         }
 
-        if (!ImGui.BeginTable(id, store.Columns.Length, Flags))
+        if (!ImGui.BeginTable(id, columns.Count, Flags))
         {
             return chosen;
         }
 
         try
         {
-            for (var at = 0; at < store.Columns.Length; at++)
+            for (var at = 0; at < columns.Count; at++)
             {
-                DataColumn column = store.Columns[at];
+                DataColumn column = store.Columns[columns[at]];
 
-                // TEXT STRETCHES AND NUMBERS DO NOT: a name is as long as it is, and a column of
-                // figures wants to be exactly wide enough for the widest of them.
-                bool words = column.Shape == ColumnShape.Text;
-                ImGuiTableColumnFlags flags = words
+                // PROSE STRETCHES AND EVERYTHING ELSE DOES NOT: a name is as long as it is, while a
+                // column of figures, or of one short word out of a handful, wants to be exactly
+                // wide enough for the widest of them and no wider.
+                bool stretch = column.Shape == ColumnShape.Text;
+                ImGuiTableColumnFlags flags = stretch
                     ? ImGuiTableColumnFlags.WidthStretch
                     : ImGuiTableColumnFlags.WidthFixed;
 
@@ -99,7 +136,7 @@ public sealed class DataGrid
                 // ever sees the rows on screen, so left to fit its own content a column is sized to
                 // forty rows of two thousand. The width is the widest cell the COLUMN holds, which
                 // the store worked out when it was built, or the header and its sort arrow.
-                if (words)
+                if (stretch)
                 {
                     ImGui.TableSetupColumn(column.Name, flags);
                 }
@@ -114,14 +151,14 @@ public sealed class DataGrid
             }
 
             ImGui.TableSetupScrollFreeze(0, 1);
-            ImGui.TableHeadersRow();
+            Headers(store, columns, ranges, hooks);
 
             // AFTER THE HEADER ROW, because ImGui has no sort specs to offer until it has been
             // drawn once - and before the body, so the first frame of a new list is in order
             // rather than in whatever order the dictionary handed it over in.
-            Sort(store, rows);
+            Sort(store, columns, rows);
 
-            return Body(store, rows, chosen, ink, hover);
+            return Body(store, columns, rows, chosen, hooks);
         }
         finally
         {
@@ -131,8 +168,129 @@ public sealed class DataGrid
         }
     }
 
+    /// <summary>
+    /// The header row: each column's name, and under it the shape of what is in it.
+    /// </summary>
+    /// <remarks>
+    /// DRAWN OUT RATHER THAN TableHeadersRow, which draws the names and nothing else. What the
+    /// histogram adds is the question a column of figures cannot answer on its own - not "how much
+    /// is this one" but "how much is there, and where does this sit in it" - for one line of
+    /// vertical space across the whole table.
+    ///
+    /// AND IT IS THE FILTER. Dragging across it picks a range of values out, which is the one
+    /// interaction here somebody finds by accident rather than by being told; the bins it picked
+    /// stay lit afterwards, so the header says what the table is currently hiding.
+    /// </remarks>
+    private static void Headers(
+        ColumnStore store, IReadOnlyList<int> columns, IReadOnlyList<ColumnRange> ranges, DataGridHooks? hooks)
+    {
+        float plot = ImGui.GetTextLineHeight() * PlotLines;
+        ImGui.TableNextRow(
+            ImGuiTableRowFlags.Headers,
+            ImGui.GetTextLineHeight() + plot + (ImGui.GetStyle().CellPadding.Y * 2f));
+
+        for (var at = 0; at < columns.Count; at++)
+        {
+            ImGui.TableNextColumn();
+            int index = columns[at];
+
+            // BY STORE COLUMN AND NOT BY POSITION: hiding a column shifts every position after it,
+            // and an id built from the position would hand one column's drag state to another.
+            ImGui.PushID(index);
+
+            try
+            {
+                ImGui.TableHeader(store.Columns[index].Name);
+                Histogram(store.Columns[index], index, ranges, hooks, plot);
+            }
+            finally
+            {
+                ImGui.PopID();
+            }
+        }
+    }
+
+    /// <summary>The column's distribution, drawn small, and the drag that filters by it.</summary>
+    private static void Histogram(
+        DataColumn column, int index, IReadOnlyList<ColumnRange> ranges, DataGridHooks? hooks, float plot)
+    {
+        ColumnSpread spread = column.Spread;
+        float room = ImGui.GetContentRegionAvail().X;
+
+        if (spread.Bins.Length == 0 || spread.Tallest <= 0 || room < 4f)
+        {
+            ImGui.Dummy(new Vector2(1f, plot));
+            return;
+        }
+
+        ImGui.InvisibleButton("##plot", new Vector2(room, plot));
+
+        Vector2 at = ImGui.GetItemRectMin();
+        Vector2 size = ImGui.GetItemRectSize();
+
+        // WHILE THE DRAG IS HAPPENING AND NOT WHEN IT ENDS, so the count under the table moves with
+        // the cursor. Filtering 2733 rows is a scan of strings that are already built; done once a
+        // frame during a drag it costs less than the frame it is drawn in.
+        bool dragging = ImGui.IsItemActive() && size.X > 0f;
+        if (dragging && hooks?.Ranged is { } ranged)
+        {
+            float from = (ImGui.GetIO().MouseClickedPos[0].X - at.X) / size.X;
+            float to = (ImGui.GetMousePos().X - at.X) / size.X;
+            (double least, double most) = spread.Range(from, to);
+            ranged(index, least, most);
+        }
+
+        // A RIGHT-CLICK THROWS IT AWAY, because the only other way out of a range somebody set by
+        // accident is to drag the whole width back, and that is not obvious either.
+        if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+        {
+            hooks?.Cleared?.Invoke(index);
+        }
+
+        (double from2, double to2) = Picked(ranges, index);
+
+        ImDrawListPtr draw = ImGui.GetWindowDrawList();
+        uint dim = ImGui.GetColorU32(OverlayInk.Chrome);
+        uint lit = ImGui.GetColorU32(OverlayInk.Accent);
+        float step = size.X / spread.Bins.Length;
+
+        for (var bin = 0; bin < spread.Bins.Length; bin++)
+        {
+            float tall = (float)spread.Bins[bin] / spread.Tallest;
+            float left = at.X + (bin * step);
+
+            // AT LEAST A PIXEL TALL FOR A BIN THAT HOLDS ANYTHING. A bar rounded away to nothing
+            // says the same as an empty bin, and "no monster is like this" is a different fact
+            // from "three are".
+            float high = Math.Max(spread.Bins[bin] > 0 ? 1f : 0f, size.Y * tall);
+
+            draw.AddRectFilled(
+                new Vector2(left, at.Y + size.Y - high),
+                new Vector2(left + Math.Max(1f, step - 1f), at.Y + size.Y),
+                spread.Inside(bin, from2, to2) ? lit : dim);
+        }
+    }
+
+    /// <summary>The range in force on a column, or one that takes everything.</summary>
+    private static (double Least, double Most) Picked(IReadOnlyList<ColumnRange> ranges, int column)
+    {
+        for (var at = 0; at < ranges.Count; at++)
+        {
+            if (ranges[at].Column == column)
+            {
+                return (ranges[at].Least, ranges[at].Most);
+            }
+        }
+
+        return (double.NegativeInfinity, double.NegativeInfinity);
+    }
+
     private static int Body(
-        ColumnStore store, List<int> rows, int chosen, Func<int, Vector4?>? ink, Func<int, string>? hover)
+        ColumnStore store,
+        IReadOnlyList<int> columns,
+        List<int> rows,
+        int chosen,
+        DataGridHooks? hooks)
     {
         // THE ROW HEIGHT ImGui ACTUALLY LAYS OUT, which is not GetTextLineHeightWithSpacing: a table
         // row is one line of text with the cell padding above and below it, while that call adds
@@ -170,14 +328,16 @@ public sealed class DataGrid
 
             try
             {
-                Vector4? tint = ink?.Invoke(row);
+                Vector4? tint = hooks?.Ink?.Invoke(row);
                 if (tint is { } colour)
                 {
                     ImGui.PushStyleColor(ImGuiCol.Text, colour);
                 }
 
                 if (ImGui.Selectable(
-                        store.Columns[0].Text[row], row == chosen, ImGuiSelectableFlags.SpanAllColumns))
+                        store.Columns[columns[0]].Text[row],
+                        row == chosen,
+                        ImGuiSelectableFlags.SpanAllColumns))
                 {
                     chosen = row;
                 }
@@ -187,15 +347,15 @@ public sealed class DataGrid
                     ImGui.PopStyleColor();
                 }
 
-                if (hover is not null && ImGui.IsItemHovered())
+                if (hooks?.Hover is { } hover && ImGui.IsItemHovered())
                 {
                     Tip(hover(row));
                 }
 
-                for (var column = 1; column < store.Columns.Length; column++)
+                for (var column = 1; column < columns.Count; column++)
                 {
                     ImGui.TableNextColumn();
-                    Cell(store.Columns[column], row, fill, over);
+                    Cell(store.Columns[columns[column]], row, fill, over);
                 }
             }
             finally
@@ -327,7 +487,7 @@ public sealed class DataGrid
     /// already sorted, sixty times a second, is the kind of cost that never shows up in a profile
     /// as one thing and is free to avoid.
     /// </remarks>
-    private unsafe void Sort(ColumnStore store, List<int> rows)
+    private unsafe void Sort(ColumnStore store, IReadOnlyList<int> columns, List<int> rows)
     {
         // ImGui hands back a null pointer until the header row has been drawn and somebody has
         // chosen a column, so the wrapper cannot be trusted without checking the pointer it wraps.
@@ -345,24 +505,48 @@ public sealed class DataGrid
         specs.SpecsDirty = false;
         _resort = false;
 
-        ImGuiTableColumnSortSpecsPtr by = specs.Specs;
-        bool up = by.SortDirection == ImGuiSortDirection.Ascending;
-        DataColumn sortBy = store.Columns[Math.Clamp(by.ColumnIndex, 0, store.Columns.Length - 1)];
-        DataColumn first = store.Columns[0];
+        // COPIED OUT OF ImGui BEFORE THE SORT, not read during it. The comparison runs tens of
+        // thousands of times and has no business reaching into the UI library, and the specs are a
+        // pointer into memory ImGui owns and rewrites.
+        _store = store;
+        _sorts = Math.Min(specs.SpecsCount, MostSorts);
+        _first = columns[0];
 
-        rows.Sort((left, right) =>
+        for (var at = 0; at < _sorts; at++)
         {
-            int said = sortBy.Compare(left, right);
+            ImGuiTableColumnSortSpecs one = specs.NativePtr->Specs[at];
+
+            // THE SPEC NAMES A POSITION IN THE TABLE, and the table is whatever subset of columns
+            // is showing - so it has to be mapped back to the column the store knows. Without this,
+            // hiding a column silently re-points every sort after it.
+            _by[at] = columns[Math.Clamp(one.ColumnIndex, 0, columns.Count - 1)];
+            _up[at] = one.SortDirection == ImGuiSortDirection.Ascending;
+        }
+
+        rows.Sort(_compare);
+    }
+
+    /// <summary>
+    /// Two rows, against every column the sort is made of and then against the ones it is not.
+    /// </summary>
+    /// <remarks>
+    /// TIES BREAK THE SAME WAY WHICHEVER WAY THE SORT RUNS - on the leading column and then on the
+    /// row number, which is unique. Sorting by type then puts each type's monsters in one fixed
+    /// order rather than in whatever order the comparison happened to leave them, and a list that
+    /// reshuffles its ties every time it is re-sorted is a list nobody can keep their place in.
+    /// </remarks>
+    private int Compare(int left, int right)
+    {
+        for (var at = 0; at < _sorts; at++)
+        {
+            int said = _store.Columns[_by[at]].Compare(left, right);
             if (said != 0)
             {
-                return up ? said : -said;
+                return _up[at] ? said : -said;
             }
+        }
 
-            // TIES BREAK THE SAME WAY WHICHEVER WAY THE SORT RUNS, on the first column and then on
-            // the row number, which is unique. A sort by type then puts each type's monsters in one
-            // fixed order rather than in whatever order the comparison happened to leave them.
-            said = first.Compare(left, right);
-            return said != 0 ? said : left.CompareTo(right);
-        });
+        int last = _store.Columns[_first].Compare(left, right);
+        return last != 0 ? last : left.CompareTo(right);
     }
 }

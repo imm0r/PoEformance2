@@ -500,7 +500,25 @@ Each stage is useful shipped alone, and each one is a commit somebody can review
    | dmg | 250% | 115% | 1000% | 269 (10%) |
    | skills | 17 | 3 | 67 | 260 (10%) |
    | mods | 2 | 1 | 8 | 207 (8%) |
-2. **Column chooser, multi-sort, header spreads, saved views.** Density, still no new vocabulary.
+2. ~~**Column chooser, multi-sort, header spreads, saved views.**~~ **Built** — 29 columns grouped
+   under five headings, six of them on by default; sorting on up to four columns at once; a
+   histogram under every column's name that a drag filters by. Two deviations from what this
+   section had promised, both deliberate:
+
+   - **The drag writes its own range, not a query.** There is no query box until stage 3, so a
+     range lives in the window as a `ColumnRange` and shows as a chip that drops it. Stage 3 folds
+     the two into one filter tree; until then the chips are the only thing on screen saying the
+     table is hiding rows, which is why they print the numbers rather than only a colour.
+   - **The view is remembered, not named.** Which columns show is kept in `overlay.json` by NAME
+     (a column added mid-list would shift every number), and ImGui already keeps its own column
+     widths and sort. Named views wait for stage 3, when there is a query to name along with them.
+
+   The binning was measured the way the bar's scale was, and needed two rules the obvious version
+   has not got: **whole numbers get whole bins** (24 bins over a column running 0–8 leaves 18 of
+   them empty), and **no bin narrower than the column's own step** (damage spread only ever holds
+   multiples of ten, so 16 bins of 2 leave 12 empty). It also turned up a second column the bar
+   had to be taken away from: `poise` is 0.05 on 2618 of 2733 rows, so a bar scaled at its p90
+   fills for 96% of the table — the same wall of bars, reached from the other side.
 3. **Index, facet rail, query grammar with completion.** The comparative jobs arrive here.
 4. **Pin and compare.**
 5. **The live tie-in** — area facet, row → screen, screen → row.

@@ -29,6 +29,13 @@ namespace PoEformance.Features;
 /// </remarks>
 public sealed class MonsterBook
 {
+    /// <summary>The headings the column chooser groups the columns under.</summary>
+    private const string Named = "What it is";
+    private const string Figures = "Figures";
+    private const string Defence = "Defence";
+    private const string Reach = "Reach";
+    private const string Carries = "What it carries";
+
     private readonly string[] _find;
     private readonly Dictionary<string, int> _rows;
 
@@ -37,17 +44,21 @@ public sealed class MonsterBook
         string[] paths,
         bool[] boss,
         string[] find,
-        Dictionary<string, int> rows)
+        Dictionary<string, int> rows,
+        string[] groups,
+        bool[] shown)
     {
         Store = store;
         Paths = paths;
         Boss = boss;
+        Groups = groups;
+        Shown = shown;
         _find = find;
         _rows = rows;
     }
 
     /// <summary>A book with no monsters in it.</summary>
-    public static MonsterBook Empty { get; } = new(ColumnStore.Empty, [], [], [], []);
+    public static MonsterBook Empty { get; } = new(ColumnStore.Empty, [], [], [], [], [], []);
 
     /// <summary>The columns, in the order they are drawn.</summary>
     public ColumnStore Store { get; }
@@ -57,6 +68,19 @@ public sealed class MonsterBook
 
     /// <summary>Which rows the game gives the boss health bar to. True on 363 rows of the export.</summary>
     public bool[] Boss { get; }
+
+    /// <summary>Which heading each column is offered under, for the chooser. One per column.</summary>
+    public string[] Groups { get; }
+
+    /// <summary>
+    /// Which columns a table starts with, before anybody has chosen. One per column.
+    /// </summary>
+    /// <remarks>
+    /// THE SIX THE WINDOW ALWAYS HAD. Twenty-nine columns are available and a table that opened
+    /// with all of them would be unreadable and would answer nothing - the point of the chooser is
+    /// that somebody adds the two they are asking about today, not that everything is on at once.
+    /// </remarks>
+    public bool[] Shown { get; }
 
     /// <summary>How many monsters it holds.</summary>
     public int Count => Paths.Length;
@@ -79,16 +103,65 @@ public sealed class MonsterBook
         var find = new string[count];
         var rows = new Dictionary<string, int>(count, StringComparer.OrdinalIgnoreCase);
 
-        var name = new string[count];
-        var kind = new string[count];
-        var life = new double[count];
-        var lifeText = new string[count];
-        var damage = new double[count];
-        var damageText = new string[count];
-        var skills = new double[count];
-        var skillsText = new string[count];
-        var mods = new double[count];
-        var modsText = new string[count];
+        var filling = new List<Filling>(32);
+        Filling Column(string label, string group, ColumnShape shape = ColumnShape.Magnitude,
+            string unit = "", bool shown = false)
+        {
+            var one = new Filling(label, group, shape, unit, count, shown);
+            filling.Add(one);
+            return one;
+        }
+
+        // THE UNITS ARE THE ONES 2733 ROWS SETTLE AND NO OTHERS. Life, damage, experience and model
+        // size sit around 100 and are percentages of the base for the level. Attack speed, movement
+        // speed, the ranges and poise plainly are not, and naming a unit this table cannot prove is
+        // how a display ends up confidently wrong - MonsterVariety's own remarks settle each one.
+        //
+        // WHAT A FULL BAR MEANS, measured over the export rather than chosen: life and damage fill
+        // at 250%, skills at 17, modifiers at 2 - each the column's own ninetieth percentile, with
+        // 8% to 10% of rows above it and marked. See ColumnSpread for why that scale and not the
+        // two that look more obvious.
+        Filling name = Column("name", Named, ColumnShape.Text, shown: true);
+        Filling kind = Column("type", Named, ColumnShape.Text, shown: true);
+        Filling life = Column("life", Figures, unit: "%", shown: true);
+        Filling damage = Column("dmg", Figures, unit: "%", shown: true);
+        Filling skills = Column("skills", Carries, shown: true);
+        Filling mods = Column("mods", Carries, shown: true);
+
+        Filling xp = Column("xp", Figures, unit: "%");
+        Filling model = Column("model", Figures, unit: "%");
+        Filling poise = Column("poise", Figures);
+        Filling size = Column("size", Figures);
+
+        // CRIT IS A KIND AND NOT A CHANCE - 0, 1 or 2 across the whole table, 98% of them 0 - so it
+        // is a column that sorts and prints and is never drawn with a bar. See ColumnShape.
+        Filling crit = Column("crit", Figures, ColumnShape.Kind);
+
+        // ARMOUR AND ITS THREE NEIGHBOURS LIVE ON THE TYPE, not on the monster: MonsterVarieties has
+        // a MonsterArmour column of its own and it is filled on 16 rows of 2734. A monster whose
+        // type row does not resolve gets a BLANK rather than a zero, because "the table cannot say"
+        // and "no armour" are different answers and 56% of the types in use really do say zero.
+        Filling armour = Column("armour", Defence, unit: "%");
+        Filling evasion = Column("evasion", Defence, unit: "%");
+        Filling shield = Column("es", Defence, unit: "%");
+        Filling spread = Column("spread", Defence, unit: "%");
+        Filling resists = Column("resists", Defence);
+        Filling summoned = Column("summoned", Defence, ColumnShape.Label);
+
+        Filling speed = Column("speed", Reach);
+        Filling swing = Column("atk spd", Reach);
+        Filling nearest = Column("atk min", Reach);
+        Filling furthest = Column("atk max", Reach);
+        Filling notices = Column("aggro min", Reach);
+        Filling chases = Column("aggro max", Reach);
+
+        Filling tags = Column("tags", Carries);
+        Filling blood = Column("blood", Carries, ColumnShape.Label);
+
+        Filling stance = Column("stance", Named, ColumnShape.Label);
+        Filling bossy = Column("boss", Named, ColumnShape.Label);
+        Filling built = Column("base", Named, ColumnShape.Text);
+        Filling quest = Column("quest", Named, ColumnShape.Row);
 
         var text = new StringBuilder(512);
         var at = 0;
@@ -104,12 +177,12 @@ public sealed class MonsterBook
 
             // SEARCHED ACROSS EVERYTHING RESOLVED, not only the name: somebody looking up which
             // monsters cast a skill, or carry a tag, is asking the question this book exists for.
-            Add(text, table.TagsOf(one));
+            int carried = Add(text, table.TagsOf(one));
             Add(text, table.Skills(one));
-            Add(text, table.ResistancesOf(one));
+            int profiles = Add(text, table.ResistancesOf(one));
             text.Append(' ').Append(table.BloodName(one));
 
-            int carried = Modifiers(table, one, said, text);
+            int carriedMods = Modifiers(table, one, said, text);
 
             // The two things the table says with a FLAG rather than with a column, so that typing
             // "boss" finds the bosses. There is no other way to ask this list for them.
@@ -128,38 +201,57 @@ public sealed class MonsterBook
             find[at] = text.ToString().ToLowerInvariant();
             rows[path] = at;
 
-            name[at] = called;
-            kind[at] = typed;
-            life[at] = one.Life;
-            lifeText[at] = Percent(one.Life);
-            damage[at] = one.Damage;
-            damageText[at] = Percent(one.Damage);
-            skills[at] = one.SkillCount;
-            skillsText[at] = Plain(one.SkillCount);
-            mods[at] = carried;
-            modsText[at] = Plain(carried);
+            name.Words(at, called);
+            kind.Words(at, typed);
+            life.Percent(at, one.Life);
+            damage.Percent(at, one.Damage);
+            skills.Count(at, one.SkillCount);
+            mods.Count(at, carriedMods);
+
+            xp.Percent(at, one.Xp);
+            model.Percent(at, one.ModelSize);
+            poise.Number(at, one.Poise, one.Poise.ToString("0.##", CultureInfo.InvariantCulture));
+            size.Count(at, one.Size);
+            crit.Count(at, one.Crit);
+
+            armour.Percent(at, type?.Armour);
+            evasion.Percent(at, type?.Evasion);
+            shield.Percent(at, type?.EnergyShield);
+            spread.Percent(at, type?.Spread);
+            resists.Count(at, profiles);
+            summoned.Words(at, type is { Summoned: true } ? "summoned" : string.Empty);
+
+            speed.Count(at, one.Speed);
+            swing.Count(at, one.AttackSpeed);
+            nearest.Count(at, one.MinAttack);
+            furthest.Count(at, one.MaxAttack);
+            notices.Count(at, one.MinAggro);
+            chases.Count(at, one.MaxAggro);
+
+            tags.Count(at, carried);
+            blood.Words(at, table.BloodName(one));
+
+            stance.Words(at, one.Stance);
+            bossy.Words(at, one.Boss ? "boss" : string.Empty);
+            built.Words(at, one.Base is { Length: > 0 } was ? Tail(was) : string.Empty);
+
+            // GREATER THAN ZERO, not merely non-zero: the install route spells "no quest flag" as
+            // -1 because zero is a row of QuestFlags like any other, and the export spells it as 0.
+            quest.Number(at, one.Quest, one.Quest > 0 ? Numbered(one.Quest) : string.Empty);
 
             at++;
         }
 
-        // THE UNITS ARE THE ONES 2733 ROWS SETTLE AND NO OTHERS. Life and damage sit around 100
-        // and are percentages of the base for the level; a count of skills or modifiers is a
-        // count. Every other figure this table carries is left to the detail pane, where it can
-        // be labelled honestly rather than squeezed into a header.
-        //
-        // WHAT A FULL BAR MEANS, measured over the export rather than chosen: life and damage fill
-        // at 250%, skills at 17, modifiers at 2 - each the column's own ninetieth percentile, with
-        // 8% to 10% of rows above it and marked. See ColumnSpread for why that scale and not the
-        // two that look more obvious.
-        ColumnStore store = ColumnStore.Of(
-            DataColumn.Words("name", name),
-            DataColumn.Words("type", kind),
-            DataColumn.Magnitudes("life", "%", life, lifeText),
-            DataColumn.Magnitudes("dmg", "%", damage, damageText),
-            DataColumn.Magnitudes("skills", string.Empty, skills, skillsText),
-            DataColumn.Magnitudes("mods", string.Empty, mods, modsText));
+        ColumnStore store = ColumnStore.Of([.. filling.Select(one => one.Done())]);
 
-        return new MonsterBook(store, paths, boss, find, rows);
+        return new MonsterBook(
+            store,
+            paths,
+            boss,
+            find,
+            rows,
+            [.. filling.Select(one => one.Group)],
+            [.. filling.Select(one => one.Start)]);
     }
 
     /// <summary>
@@ -184,20 +276,60 @@ public sealed class MonsterBook
     /// INTO A LIST THE CALLER KEEPS, so that typing does not allocate a new list per keystroke -
     /// after the first few it is holding the capacity it needs and the loop only writes.
     /// </remarks>
-    public void Filter(string? search, List<int> into)
+    public void Filter(string? search, List<int> into) => Filter(search, null, into);
+
+    /// <summary>
+    /// Fills <paramref name="into"/> with the rows that match the text AND every range.
+    /// </summary>
+    /// <remarks>
+    /// EVERY RANGE, not any: two ranges are two questions asked at once - "the fast ones that also
+    /// hit hard" - and a filter that widened as more were added would answer neither.
+    ///
+    /// A RANGE ON A COLUMN OF WORDS IS IGNORED rather than refused. The only way to get one is to
+    /// drag across a histogram, and a column of words has none to drag across - so the case means
+    /// the caller has kept a range past the column being hidden or the table being rebuilt, which
+    /// is not worth throwing over.
+    /// </remarks>
+    public void Filter(string? search, IReadOnlyList<ColumnRange>? ranges, List<int> into)
     {
         ArgumentNullException.ThrowIfNull(into);
         into.Clear();
 
         string looking = (search ?? string.Empty).Trim().ToLowerInvariant();
+        DataColumn[] columns = Store.Columns;
 
         for (var row = 0; row < _find.Length; row++)
         {
-            if (looking.Length == 0 || _find[row].Contains(looking, StringComparison.Ordinal))
+            if (looking.Length > 0 && !_find[row].Contains(looking, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (Inside(columns, ranges, row))
             {
                 into.Add(row);
             }
         }
+    }
+
+    private static bool Inside(DataColumn[] columns, IReadOnlyList<ColumnRange>? ranges, int row)
+    {
+        for (var at = 0; at < (ranges?.Count ?? 0); at++)
+        {
+            ColumnRange range = ranges![at];
+            if (range.Column < 0 || range.Column >= columns.Length)
+            {
+                continue;
+            }
+
+            double[] numbers = columns[range.Column].Number;
+            if (numbers.Length > 0 && !range.Holds(numbers[row]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -243,20 +375,85 @@ public sealed class MonsterBook
         return rows.Count;
     }
 
-    private static void Add(StringBuilder text, IEnumerable<string> said)
+    /// <summary>Writes each of them into the searchable text, and says how many there were.</summary>
+    private static int Add(StringBuilder text, IEnumerable<string> said)
     {
+        var count = 0;
         foreach (string one in said)
         {
             text.Append(' ').Append(one);
+            count++;
         }
+
+        return count;
     }
 
-    private static string Percent(int value)
-        => value.ToString(CultureInfo.InvariantCulture) + "%";
-
-    private static string Plain(int value) => value.ToString(CultureInfo.InvariantCulture);
-
     private static string Numbered(int row) => "#" + row.ToString(CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// One column being filled in, so that the build loop reads as a list of facts.
+    /// </summary>
+    /// <remarks>
+    /// TWENTY-NINE COLUMNS IS FIFTY-EIGHT ARRAYS otherwise, declared and passed and kept in step by
+    /// hand - and the way that goes wrong is silent: one of them drifts by a row, and a monster is
+    /// drawn with the next one's numbers. Here a column is one object, named once and written once
+    /// per row, so a column that is declared and never filled is a null the first draw trips over
+    /// rather than a plausible wrong answer.
+    /// </remarks>
+    private sealed class Filling(
+        string label, string group, ColumnShape shape, string unit, int rows, bool shown)
+    {
+        private readonly double[] _number =
+            shape is ColumnShape.Text or ColumnShape.Label ? [] : new double[rows];
+
+        private readonly string[] _text = new string[rows];
+
+        /// <summary>Which heading the chooser offers this column under.</summary>
+        public string Group { get; } = group;
+
+        /// <summary>Whether a table that nobody has configured starts with it.</summary>
+        public bool Start { get; } = shown;
+
+        public void Words(int row, string? text) => _text[row] = text ?? string.Empty;
+
+        public void Count(int row, int value)
+        {
+            _number[row] = value;
+            _text[row] = value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// A percentage, or a blank where there is nothing to say.
+        /// </summary>
+        /// <remarks>
+        /// A BLANK IS NOT A ZERO, and the defence columns are why: 56% of the types in use really do
+        /// carry no armour, so zero is a real and common answer - while a monster whose type row
+        /// does not resolve at all has no answer. Printed the same, the second would be read as the
+        /// first on every row of a table that had lost its MonsterTypes.
+        /// </remarks>
+        public void Percent(int row, int? value)
+        {
+            _number[row] = value ?? 0;
+            _text[row] = value is { } got
+                ? got.ToString(CultureInfo.InvariantCulture) + "%"
+                : string.Empty;
+        }
+
+        public void Number(int row, double value, string text)
+        {
+            _number[row] = value;
+            _text[row] = text;
+        }
+
+        public DataColumn Done() => shape switch
+        {
+            ColumnShape.Text => DataColumn.Words(label, _text),
+            ColumnShape.Label => DataColumn.Labels(label, _text),
+            ColumnShape.Kind => DataColumn.Codes(label, _number, _text),
+            ColumnShape.Row => DataColumn.RowNumbers(label, _number, _text),
+            _ => DataColumn.Magnitudes(label, unit, _number, _text),
+        };
+    }
 
     /// <summary>The last part of a metadata path, for the many monsters the game never names.</summary>
     private static string Tail(string path)

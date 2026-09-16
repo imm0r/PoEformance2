@@ -97,6 +97,141 @@ public class MonsterBookTests
     }
 
     [Fact]
+    public void WholeNumbersGetWholeBinsAndNothingIsBinnedAway()
+    {
+        // The modifier column's shape: 0 to 8, and twenty-four bins over it would leave eighteen
+        // of them holding nothing - a comb, read as structure that is not there.
+        double[] mods = [.. Enumerable.Range(0, 900).Select(at => (double)(at % 9))];
+        ColumnSpread spread = ColumnSpread.Of(mods);
+
+        Assert.True(spread.Width >= 1d, $"bin width {spread.Width} is narrower than the column's own step");
+        Assert.Equal(9, spread.Bins.Length);
+        Assert.Equal(900, spread.Bins.Sum());
+
+        // The damage-spread column's shape: only ever multiples of ten. Binned in twos, twelve of
+        // sixteen bins can never hold anything.
+        double[] tens = [.. Enumerable.Range(0, 400).Select(at => (double)(at % 4 * 10))];
+        ColumnSpread step = ColumnSpread.Of(tens);
+
+        Assert.Equal(10d, step.Width);
+        Assert.Equal(400, step.Bins.Sum());
+        Assert.DoesNotContain(0, step.Bins);
+    }
+
+    [Fact]
+    public void AColumnMostOfWhoseRowsWouldBeFullEarnsNoBars()
+    {
+        // Poise, as the export actually holds it: 2618 rows at 0.05 and a tail to 0.25. Scaled at
+        // its own p90 that is a full bar on ninety-six percent of the table.
+        var poise = new double[2733];
+        Array.Fill(poise, 0.05d);
+        for (var at = 0; at < 115; at++)
+        {
+            poise[at] = 0.05d + (0.001d * at);
+        }
+
+        ColumnSpread spread = ColumnSpread.Of(poise);
+
+        Assert.Equal(0d, spread.Scale);
+        Assert.Equal(0f, spread.Bar(0.25d));
+
+        // The histogram is kept all the same: what is really in the column is still worth seeing.
+        Assert.NotEmpty(spread.Bins);
+        Assert.Equal(2733, spread.Bins.Sum());
+    }
+
+    [Fact]
+    public void ADragAcrossTheHistogramOpensOutAtBothEnds()
+    {
+        double[] values = [.. Enumerable.Range(0, 1000).Select(at => (double)at)];
+        ColumnSpread spread = ColumnSpread.Of(values);
+
+        (double all, double allMost) = spread.Range(0d, 1d);
+        Assert.Equal(0d, all);
+        Assert.Equal(999d, allMost);
+
+        // THE RIGHT-HAND BIN HOLDS THE TAIL the histogram stops short of - it ends at p99, not at
+        // the largest value - so a drag into it has to reach the top of the column. Snapped to the
+        // edge of the picture instead, selecting the last bar would drop the very rows it looks
+        // like it is selecting.
+        (double top, double topMost) = spread.Range(0.99d, 1d);
+        Assert.Equal(999d, topMost);
+        Assert.True(top < 999d, "the last bin should be a range and not one value");
+
+        // And a drag that starts at the left edge reaches the bottom of the column.
+        (double low, _) = spread.Range(0d, 0.1d);
+        Assert.Equal(0d, low);
+    }
+
+    [Fact]
+    public void EveryRangeHasToHold()
+    {
+        MonsterVarieties table = Shipped();
+        MonsterBook book = MonsterBook.Of(table, null);
+        var rows = new List<int>();
+
+        int life = Index(book, "life");
+        int skills = Index(book, "skills");
+
+        book.Filter(null, [new ColumnRange(life, 200d, double.MaxValue)], rows);
+        int tanky = rows.Count;
+        Assert.InRange(tanky, 1, book.Count - 1);
+
+        book.Filter(null, [new ColumnRange(skills, 10d, double.MaxValue)], rows);
+        int busy = rows.Count;
+        Assert.InRange(busy, 1, book.Count - 1);
+
+        // TWO RANGES ARE TWO QUESTIONS ASKED AT ONCE - "the tanky ones that also have a lot of
+        // skills" - so the answer can only be smaller than either.
+        book.Filter(
+            null,
+            [new ColumnRange(life, 200d, double.MaxValue), new ColumnRange(skills, 10d, double.MaxValue)],
+            rows);
+
+        Assert.True(rows.Count <= Math.Min(tanky, busy), $"{rows.Count} is more than {tanky} and {busy}");
+
+        foreach (int row in rows)
+        {
+            MonsterVariety one = Assert.IsType<MonsterVariety>(table.Find(book.Paths[row]));
+            Assert.True(one.Life >= 200, book.Paths[row]);
+            Assert.True(one.SkillCount >= 10, book.Paths[row]);
+        }
+
+        // A range on a column of words is ignored rather than refused - see MonsterBook.Filter.
+        book.Filter(null, [new ColumnRange(Index(book, "name"), 5d, 6d)], rows);
+        Assert.Equal(book.Count, rows.Count);
+    }
+
+    [Fact]
+    public void EveryColumnIsOfferedSomewhereAndSixStartShowing()
+    {
+        MonsterVarieties table = Shipped();
+        MonsterBook book = MonsterBook.Of(table, null);
+
+        Assert.Equal(book.Store.Columns.Length, book.Groups.Length);
+        Assert.Equal(book.Store.Columns.Length, book.Shown.Length);
+        Assert.True(book.Store.Columns.Length > 20, $"only {book.Store.Columns.Length} columns to choose from");
+
+        foreach (string group in book.Groups)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(group));
+        }
+
+        // The six the window always had. A table that opened with all twenty-nine would be
+        // unreadable, and the chooser exists so that somebody adds the two they are asking about.
+        Assert.Equal(6, book.Shown.Count(one => one));
+        Assert.True(book.Shown[0], "the first column carries the selection and cannot be hidden");
+
+        // Every column's text is filled for every row: a column declared and never written would
+        // be a null the first draw trips over.
+        foreach (DataColumn column in book.Store.Columns)
+        {
+            Assert.Equal(book.Count, column.Text.Length);
+            Assert.All(column.Text, Assert.NotNull);
+        }
+    }
+
+    [Fact]
     public void AColumnKnowsItsWidestCell()
     {
         // What a clipped table cannot fit a column to: only forty rows are ever submitted, so the
@@ -266,6 +401,20 @@ public class MonsterBookTests
 
     private static DataColumn Column(MonsterBook book, string name)
         => Assert.Single(book.Store.Columns, one => string.Equals(one.Name, name, StringComparison.Ordinal));
+
+    private static int Index(MonsterBook book, string name)
+    {
+        for (var at = 0; at < book.Store.Columns.Length; at++)
+        {
+            if (string.Equals(book.Store.Columns[at].Name, name, StringComparison.Ordinal))
+            {
+                return at;
+            }
+        }
+
+        Assert.Fail($"the book has no column called {name}");
+        return -1;
+    }
 
     /// <summary>A monster that carries a tag worth searching for, and the tag.</summary>
     private static (string Path, string Tag) FirstTag(MonsterVarieties table)

@@ -3,8 +3,19 @@ namespace PoEformance.Features;
 /// <summary>What a column's values ARE, which is what decides how they may be drawn.</summary>
 public enum ColumnShape
 {
-    /// <summary>Words. Sorted as text, never encoded.</summary>
+    /// <summary>Words as long as they happen to be - a name, a path. Sorted as text, never encoded.</summary>
     Text,
+
+    /// <summary>
+    /// A short word out of a small set: a blood type, a stance, "boss".
+    /// </summary>
+    /// <remarks>
+    /// APART FROM Text ONLY FOR THE WIDTH. Both sort as text and neither is ever encoded, but a
+    /// name has to stretch to whatever the longest one is while "boss" wants five characters and no
+    /// more. One shape for both, and a table with six word columns showing gives half its width to
+    /// four of them that never needed it.
+    /// </remarks>
+    Label,
 
     /// <summary>
     /// A quantity, where more of it means more of something. The only shape that earns a bar.
@@ -124,13 +135,11 @@ public sealed class DataColumn
     /// <summary>The longest cell in the column, which is what it has to be wide enough for.</summary>
     public string Widest { get; } = string.Empty;
 
-    /// <summary>A column of words.</summary>
-    public static DataColumn Words(string name, string[] text)
-    {
-        ArgumentNullException.ThrowIfNull(text);
-        return new DataColumn(
-            name, ColumnShape.Text, string.Empty, text, NoNumbers, NoBars, Rank(text), ColumnSpread.Empty);
-    }
+    /// <summary>A column of words, as wide as its longest.</summary>
+    public static DataColumn Words(string name, string[] text) => Said(name, ColumnShape.Text, text);
+
+    /// <summary>A column of short words out of a small set.</summary>
+    public static DataColumn Labels(string name, string[] text) => Said(name, ColumnShape.Label, text);
 
     /// <summary>A column of quantities, which earns a bar if it is spread at all.</summary>
     public static DataColumn Magnitudes(string name, string unit, double[] number, string[] text)
@@ -168,12 +177,29 @@ public sealed class DataColumn
             ? _order[left].CompareTo(_order[right])
             : Number.Length > 0 ? Number[left].CompareTo(Number[right]) : 0;
 
+    private static DataColumn Said(string name, ColumnShape shape, string[] text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        return new DataColumn(
+            name, shape, string.Empty, text, NoNumbers, NoBars, Rank(text), ColumnSpread.Empty);
+    }
+
+    /// <summary>
+    /// A column of numbers that is measured but never encoded.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED ALL THE SAME, which is not a contradiction: what a bar would say about a kind or a
+    /// row number is false, and what a HISTOGRAM says about them is true and useful. The crit column
+    /// holds 0, 1 and 2 with 98% of the table on 0, and being able to see that - and to drag out the
+    /// 53 rows that are not - is exactly what somebody opens this column for. Whether a bar is drawn
+    /// is <see cref="Encoded"/>, which asks about the bars and not about the spread.
+    /// </remarks>
     private static DataColumn Plain(string name, ColumnShape shape, double[] number, string[] text)
     {
         ArgumentNullException.ThrowIfNull(number);
         ArgumentNullException.ThrowIfNull(text);
         Same(number.Length, text.Length, name);
-        return new DataColumn(name, shape, string.Empty, text, number, NoBars, NoOrder, ColumnSpread.Empty);
+        return new DataColumn(name, shape, string.Empty, text, number, NoBars, NoOrder, ColumnSpread.Of(number));
     }
 
     private static void Same(int numbers, int strings, string name)
@@ -209,6 +235,21 @@ public sealed class DataColumn
 
         return order;
     }
+}
+
+/// <summary>
+/// A range one column's values have to fall in for a row to be shown.
+/// </summary>
+/// <remarks>
+/// WHAT A DRAG ACROSS A HISTOGRAM LEAVES BEHIND, and deliberately a value range rather than the
+/// two bins it was drawn from: the bins are a picture of the column and they change with it, while
+/// "life between 120 and 260" still means the same thing after a patch has moved the distribution
+/// under it.
+/// </remarks>
+public readonly record struct ColumnRange(int Column, double Least, double Most)
+{
+    /// <summary>Whether a value is inside it.</summary>
+    public bool Holds(double value) => value >= Least && value <= Most;
 }
 
 /// <summary>

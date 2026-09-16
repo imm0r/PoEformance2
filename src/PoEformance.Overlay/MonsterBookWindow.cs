@@ -65,6 +65,25 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// <summary>Which rows the search leaves, as row numbers into the book.</summary>
     private readonly List<int> _shown = [];
 
+    /// <summary>Which columns are on, as store column numbers, in the order they are drawn.</summary>
+    private readonly List<int> _columns = [];
+
+    /// <summary>The ranges dragged out of the histograms. Every one of them has to hold.</summary>
+    private readonly List<ColumnRange> _ranges = [];
+
+    /// <summary>Which columns are on, by store column number.</summary>
+    private bool[] _visible = [];
+
+    /// <summary>
+    /// The columns somebody chose, BY NAME, or null while the defaults stand.
+    /// </summary>
+    /// <remarks>
+    /// BY NAME AND NOT BY NUMBER, because this is what gets written to the settings file and read
+    /// back a release later: a column added anywhere but the end shifts every number after it, and
+    /// a saved view would then quietly show a different set of columns than the one it saved.
+    /// </remarks>
+    private IReadOnlyList<string>? _wanted;
+
     private string _search = string.Empty;
     private string _chosen = string.Empty;
 
@@ -74,11 +93,22 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// <summary>The filter has to run again - the table changed, or somebody typed.</summary>
     private bool _refilter = true;
 
-    /// <summary>What the grid asks about a row it is drawing. Made once - see <see cref="Grid"/>.</summary>
-    private Func<int, Vector4?>? _ink;
+    /// <summary>What the grid asks of this window. Made once - see <see cref="Grid"/>.</summary>
+    private DataGridHooks? _hooks;
 
-    /// <summary>And what a tooltip on that row says.</summary>
-    private Func<int, string>? _hover;
+    /// <summary>Which columns are showing, by name, for whoever writes the settings file.</summary>
+    public IReadOnlyList<string> Columns
+        => [.. _columns.Select(one => _page.Store.Columns[one].Name)];
+
+    /// <summary>Told when somebody changes which columns show, so the choice can be kept.</summary>
+    public Action? Changed { get; set; }
+
+    /// <summary>Puts back the columns a settings file remembered. Null leaves the defaults.</summary>
+    public void Show(IReadOnlyList<string>? columns)
+    {
+        _wanted = columns is { Count: > 0 } ? columns : null;
+        Layout();
+    }
 
     /// <summary>Draws the tab.</summary>
     public void DrawTab()
@@ -144,15 +174,60 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         // monster in it - and the path is the one identity that survives a rebuild.
         _chosenRow = _page.Row(_chosen);
 
+        // THE RANGES DO NOT SURVIVE, deliberately. A range is a pair of numbers that only means
+        // anything against the distribution it was dragged out of, and a new table is a new
+        // distribution - so keeping them would leave the list filtered by something nobody can see
+        // the reason for any more. The columns DO survive: "show me armour" means the same thing
+        // whatever the table says about it.
+        _ranges.Clear();
+        Layout();
+    }
+
+    /// <summary>Works out which columns are on, from what was chosen or from the defaults.</summary>
+    private void Layout()
+    {
+        DataColumn[] all = _page.Store.Columns;
+        _visible = new bool[all.Length];
+
+        for (var at = 0; at < all.Length; at++)
+        {
+            _visible[at] = _wanted is null
+                ? _page.Shown[at]
+                : _wanted.Contains(all[at].Name);
+        }
+
+        // THE FIRST COLUMN IS NOT OPTIONAL: it carries the row's selectable, so a table without it
+        // is a table nothing can be picked out of.
+        if (all.Length > 0)
+        {
+            _visible[0] = true;
+        }
+
+        Rebuild();
+
         // Filtered here rather than on the next frame, so the count in the header is the count of
         // what is in the list underneath it from the very first frame.
         _refilter = true;
         Filter();
     }
 
+    private void Rebuild()
+    {
+        _columns.Clear();
+        for (var at = 0; at < _visible.Length; at++)
+        {
+            if (_visible[at])
+            {
+                _columns.Add(at);
+            }
+        }
+
+        _grid.Resort();
+    }
+
     private void Header(MonsterVarieties all, StatDescriptions said)
     {
-        float room = OverlayLayout.ButtonRoom("Copy list");
+        float room = OverlayLayout.ButtonRoom("Copy list", "Columns");
         if (OverlayLayout.Search(
                 "###monster-find",
                 "name, path, type, tag, skill, modifier...",
@@ -162,6 +237,21 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         {
             _refilter = true;
         }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Columns"))
+        {
+            ImGui.OpenPopup("##monster-columns");
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                $"Which of the {_page.Store.Columns.Length} columns the table shows."
+                + " Drag across a column's histogram to filter by it; right-click one to undo that.");
+        }
+
+        Chooser();
 
         ImGui.SameLine();
         if (ImGui.Button("Copy list"))
@@ -206,7 +296,136 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         {
             ImGui.SetTooltip(ImGuiText.Escape(said.Source));
         }
+
+        Chips();
     }
+
+    /// <summary>
+    /// Which columns show, grouped the way somebody would look for them.
+    /// </summary>
+    /// <remarks>
+    /// GROUPED AND NOT LISTED. Twenty-nine names in the order the store happens to hold them is a
+    /// list nobody reads to the end; "Defence" with five things under it is one somebody can find
+    /// armour in. The groups come from the book rather than from here, because what a column IS is
+    /// a fact about the monster table and not about this popup.
+    /// </remarks>
+    private void Chooser()
+    {
+        if (!ImGui.BeginPopup("##monster-columns"))
+        {
+            return;
+        }
+
+        try
+        {
+            DataColumn[] all = _page.Store.Columns;
+            var drawn = 0;
+
+            foreach (string group in Groups())
+            {
+                if (drawn > 0)
+                {
+                    ImGui.Separator();
+                }
+
+                ImGui.TextDisabled(group);
+
+                for (var at = 0; at < all.Length; at++)
+                {
+                    if (!string.Equals(_page.Groups[at], group, StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    // THE FIRST COLUMN IS SHOWN AS FIXED rather than as a checkbox that refuses to
+                    // clear - a control that does nothing when clicked is worse than no control.
+                    if (at == 0)
+                    {
+                        ImGui.TextDisabled($"{all[at].Name} (always)");
+                        continue;
+                    }
+
+                    bool on = _visible[at];
+                    if (ImGui.Checkbox(all[at].Name, ref on))
+                    {
+                        _visible[at] = on;
+                        Rebuild();
+                        _wanted = Columns;
+                        Changed?.Invoke();
+                    }
+                }
+
+                drawn++;
+            }
+        }
+        finally
+        {
+            ImGui.EndPopup();
+        }
+    }
+
+    /// <summary>The group headings, once each, in the order the columns first use them.</summary>
+    private IEnumerable<string> Groups()
+    {
+        var said = new List<string>(8);
+        foreach (string group in _page.Groups)
+        {
+            if (!said.Contains(group))
+            {
+                said.Add(group);
+            }
+        }
+
+        return said;
+    }
+
+    /// <summary>
+    /// The ranges in force, each one a button that throws it away.
+    /// </summary>
+    /// <remarks>
+    /// WRITTEN OUT IN NUMBERS, because a lit run of bins in a column header says THAT the table is
+    /// filtered and not by how much - and a range somebody dragged by accident, on a column they
+    /// have since hidden, is otherwise a table that has quietly lost rows with nothing on screen
+    /// saying so.
+    /// </remarks>
+    private void Chips()
+    {
+        if (_ranges.Count == 0)
+        {
+            return;
+        }
+
+        for (var at = 0; at < _ranges.Count; at++)
+        {
+            ColumnRange range = _ranges[at];
+            if (range.Column < 0 || range.Column >= _page.Store.Columns.Length)
+            {
+                continue;
+            }
+
+            DataColumn column = _page.Store.Columns[range.Column];
+            if (at > 0)
+            {
+                ImGui.SameLine();
+            }
+
+            string label =
+                $"{column.Name} {Figure(range.Least, column.Unit)}-{Figure(range.Most, column.Unit)}  x";
+
+            if (ImGui.SmallButton($"{label}###range-{range.Column}"))
+            {
+                Clear(range.Column);
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Click to drop this range.");
+            }
+        }
+    }
+
+    private static string Figure(double value, string unit)
+        => value.ToString("0.##", CultureInfo.InvariantCulture) + unit;
 
     private void Filter()
     {
@@ -216,10 +435,49 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         }
 
         _refilter = false;
-        _page.Filter(_search, _shown);
+        _page.Filter(_search, _ranges, _shown);
 
         // The grid sorts what it is given, and it has just been given a different list.
         _grid.Resort();
+    }
+
+    /// <summary>Takes a range a drag picked out, replacing whatever that column had.</summary>
+    private void Range(int column, double least, double most)
+    {
+        for (var at = 0; at < _ranges.Count; at++)
+        {
+            if (_ranges[at].Column != column)
+            {
+                continue;
+            }
+
+            // WHILE THE DRAG IS HAPPENING this runs every frame, so an unchanged range must not
+            // cost a refilter - the list would be rebuilt sixty times a second for nothing.
+            if (_ranges[at].Least.Equals(least) && _ranges[at].Most.Equals(most))
+            {
+                return;
+            }
+
+            _ranges[at] = new ColumnRange(column, least, most);
+            _refilter = true;
+            return;
+        }
+
+        _ranges.Add(new ColumnRange(column, least, most));
+        _refilter = true;
+    }
+
+    private void Clear(int column)
+    {
+        for (var at = 0; at < _ranges.Count; at++)
+        {
+            if (_ranges[at].Column == column)
+            {
+                _ranges.RemoveAt(at);
+                _refilter = true;
+                return;
+            }
+        }
     }
 
     /// <summary>
@@ -237,10 +495,14 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// </remarks>
     private void Grid()
     {
-        _ink ??= row => _page.Boss[row] ? OverlayInk.Name : null;
-        _hover ??= row => _page.Paths[row];
+        _hooks ??= new DataGridHooks(
+            Ink: row => _page.Boss[row] ? OverlayInk.Name : null,
+            Hover: row => _page.Paths[row],
+            Ranged: Range,
+            Cleared: Clear);
 
-        int chosen = _grid.Draw("##monsters", _page.Store, _shown, _chosenRow, _ink, _hover);
+        int chosen = _grid.Draw(
+            "##monsters", _page.Store, _columns, _shown, _chosenRow, _ranges, _hooks);
 
         if (chosen == _chosenRow)
         {
