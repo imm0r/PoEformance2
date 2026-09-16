@@ -143,6 +143,143 @@ public static class ColumnQuery
     /// <summary>How deep the brackets may go.</summary>
     private const int MostDepth = 16;
 
+    /// <summary>
+    /// A field name as a query names it: lower case, and no spaces.
+    /// </summary>
+    /// <remarks>
+    /// A SPACE SEPARATES TWO TERMS AND ALWAYS WILL, so a column headed "atk spd" cannot be named in
+    /// a query the way its header spells it. Rather than rename the columns to suit the parser -
+    /// the header is what somebody reads, the query is what they type - both ends normalise here,
+    /// and "atkspd", "Atk Spd" and "ATKSPD" all reach the same column.
+    /// </remarks>
+    public static string Field(string? name)
+    {
+        if (name is not { Length: > 0 })
+        {
+            return string.Empty;
+        }
+
+        Span<char> made = name.Length <= 64 ? stackalloc char[name.Length] : new char[name.Length];
+        var at = 0;
+
+        foreach (char one in name)
+        {
+            if (!char.IsWhiteSpace(one))
+            {
+                made[at++] = char.ToLowerInvariant(one);
+            }
+        }
+
+        return new string(made[..at]);
+    }
+
+    /// <summary>
+    /// The query with this field and value added, or taken back out if it was already there.
+    /// </summary>
+    /// <remarks>
+    /// WHAT A CLICK IN THE FACET RAIL DOES, and the reason the rail and the box are one filter
+    /// rather than two: the click does not keep a list of its own anywhere, it edits the text.
+    /// Whatever it produces, somebody can read, change by hand, and clear by emptying the box.
+    ///
+    /// ONLY THE TOP LEVEL IS TOUCHED. A query somebody has written brackets and an "or" into means
+    /// something particular, and a click that reached inside it to add a term would change what
+    /// they wrote rather than adding to it. So a click adds one more thing that must ALSO hold -
+    /// "(tag:undead or tag:beast)" and a click on caster gives "(tag:undead or tag:beast)
+    /// tag:caster" - and only ever removes a term that is sitting at the top by itself.
+    /// </remarks>
+    public static string Toggle(string? query, string field, string value)
+    {
+        List<QueryTerm>? terms = Top(query);
+        if (terms is null)
+        {
+            return query ?? string.Empty;
+        }
+
+        string key = Field(field);
+        int at = terms.FindIndex(one => Says(one, key, value));
+
+        if (at >= 0)
+        {
+            terms.RemoveAt(at);
+        }
+        else
+        {
+            terms.Add(new QueryTerm { Kind = QueryKind.Value, Field = key, Text = value });
+        }
+
+        return Rebuild(terms);
+    }
+
+    /// <summary>The query with this field held to a range, replacing whatever range it had.</summary>
+    /// <remarks>What a drag across a column's histogram does. See <see cref="Toggle"/>.</remarks>
+    public static string Ranged(string? query, string field, double least, double most)
+    {
+        List<QueryTerm>? terms = Top(query);
+        if (terms is null)
+        {
+            return query ?? string.Empty;
+        }
+
+        string key = Field(field);
+        terms.RemoveAll(one => one.Kind == QueryKind.Number && string.Equals(Field(one.Field), key, StringComparison.Ordinal));
+
+        terms.Add(new QueryTerm
+        {
+            Kind = QueryKind.Number,
+            Field = key,
+            Least = Math.Min(least, most),
+            Most = Math.Max(least, most),
+        });
+
+        return Rebuild(terms);
+    }
+
+    /// <summary>The query with every top-level term naming this field taken out.</summary>
+    public static string Drop(string? query, string field)
+    {
+        List<QueryTerm>? terms = Top(query);
+        if (terms is null)
+        {
+            return query ?? string.Empty;
+        }
+
+        string key = Field(field);
+        terms.RemoveAll(one => one.Kind is QueryKind.Value or QueryKind.Number
+            && string.Equals(Field(one.Field), key, StringComparison.Ordinal));
+
+        return Rebuild(terms);
+    }
+
+    /// <summary>Whether a term sitting at the top of the query says exactly this.</summary>
+    public static bool Holds(QueryTerm? term, string field, string value)
+    {
+        string key = Field(field);
+        foreach (QueryTerm one in Conjuncts(term))
+        {
+            if (Says(one, key, value))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>The range a top-level term puts on this field, where one does.</summary>
+    public static (double Least, double Most)? RangeOf(QueryTerm? term, string field)
+    {
+        string key = Field(field);
+        foreach (QueryTerm one in Conjuncts(term))
+        {
+            if (one.Kind == QueryKind.Number && string.Equals(Field(one.Field), key, StringComparison.Ordinal))
+            {
+                return (one.Least, one.Most);
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>Turns text into a query, or says where it stopped making sense.</summary>
     public static QueryResult Parse(string? text)
     {
@@ -285,6 +422,40 @@ public static class ColumnQuery
 
         return true;
     }
+
+    /// <summary>
+    /// The query's top-level terms, ready to be edited, or null where it cannot be read.
+    /// </summary>
+    /// <remarks>
+    /// NULL FOR A QUERY THAT DOES NOT PARSE, and every caller hands the text straight back when it
+    /// gets one. Somebody halfway through typing has a broken query on screen most of the time, and
+    /// a facet click that silently rewrote it into something that parses would throw away what they
+    /// were in the middle of writing.
+    /// </remarks>
+    private static List<QueryTerm>? Top(string? query)
+    {
+        QueryResult parsed = Parse(query);
+        return !parsed.Ok && parsed.Error.Length > 0 ? null : Conjuncts(parsed.Term);
+    }
+
+    private static List<QueryTerm> Conjuncts(QueryTerm? term) => term switch
+    {
+        null => [],
+        { Kind: QueryKind.All } => [.. term.Children],
+        _ => [term],
+    };
+
+    private static string Rebuild(List<QueryTerm> terms) => terms.Count switch
+    {
+        0 => string.Empty,
+        1 => Write(terms[0]),
+        _ => Write(new QueryTerm { Kind = QueryKind.All, Children = terms }),
+    };
+
+    private static bool Says(QueryTerm term, string field, string value)
+        => term.Kind == QueryKind.Value
+            && string.Equals(Field(term.Field), field, StringComparison.Ordinal)
+            && string.Equals(term.Text, value, StringComparison.OrdinalIgnoreCase);
 
     private static void Write(QueryTerm term, StringBuilder text, bool inside)
     {
@@ -587,12 +758,17 @@ public static class ColumnQuery
         /// What may be part of a word.
         /// </summary>
         /// <remarks>
-        /// UNDERSCORES AND SLASHES AND DOTS BELONG TO WORDS, because the things somebody searches
-        /// for in this table are written with them: monster_base_block_%, Metadata/Monsters/Zombie,
-        /// atk spd. The percent sign too - 207 of the stat ids carry one.
+        /// UNDERSCORES AND SLASHES BELONG TO WORDS, because the things somebody searches for in this
+        /// table are written with them: monster_base_block_%, Metadata/Monsters/Zombie. The percent
+        /// sign too - 207 of the stat ids carry one.
+        ///
+        /// AND THE HASH, which is not decoration: a modifier row that resolves to nothing is indexed
+        /// under its own row number as "#4211", and a click on it in the facet rail writes
+        /// "mod:#4211" into the box. Without this, the rail could offer a value the parser could not
+        /// read back - which is the one way these two views of the filter could disagree.
         /// </remarks>
         private static bool Part(char one)
-            => char.IsLetterOrDigit(one) || one is '_' or '/' or '-' or '\'' or '%' or '+';
+            => char.IsLetterOrDigit(one) || one is '_' or '/' or '-' or '\'' or '%' or '+' or '#';
 
         private string Compare()
         {

@@ -71,8 +71,9 @@ public class MonsterBookTests
     {
         DataColumn words = DataColumn.Words("name", ["Skeletal Warrior", "Zombie", "skeletal warrior"]);
 
-        // The table has nineteen monsters called "Skeletal Warrior". Ranked by position rather
-        // than densely, each would sort differently and the grid's own tie-break would never run.
+        // Ranked by position rather than densely, rows sharing a name would each sort differently
+        // and the grid's own tie-break would never run - see HowManyMonstersShareAName for how
+        // much of this table that is.
         Assert.Equal(0, words.Compare(0, 2));
         Assert.True(words.Compare(0, 1) < 0);
         Assert.True(words.Compare(1, 2) > 0);
@@ -168,26 +169,16 @@ public class MonsterBookTests
     {
         MonsterVarieties table = Shipped();
         MonsterBook book = MonsterBook.Of(table, null);
-        var rows = new List<int>();
 
-        int life = Index(book, "life");
-        int skills = Index(book, "skills");
-
-        book.Filter(null, [new ColumnRange(life, 200d, double.MaxValue)], rows);
-        int tanky = rows.Count;
+        int tanky = Rows(book, "life>=200").Count;
         Assert.InRange(tanky, 1, book.Count - 1);
 
-        book.Filter(null, [new ColumnRange(skills, 10d, double.MaxValue)], rows);
-        int busy = rows.Count;
+        int busy = Rows(book, "skills>=10").Count;
         Assert.InRange(busy, 1, book.Count - 1);
 
         // TWO RANGES ARE TWO QUESTIONS ASKED AT ONCE - "the tanky ones that also have a lot of
         // skills" - so the answer can only be smaller than either.
-        book.Filter(
-            null,
-            [new ColumnRange(life, 200d, double.MaxValue), new ColumnRange(skills, 10d, double.MaxValue)],
-            rows);
-
+        List<int> rows = Rows(book, "life>=200 skills>=10");
         Assert.True(rows.Count <= Math.Min(tanky, busy), $"{rows.Count} is more than {tanky} and {busy}");
 
         foreach (int row in rows)
@@ -196,10 +187,6 @@ public class MonsterBookTests
             Assert.True(one.Life >= 200, book.Paths[row]);
             Assert.True(one.SkillCount >= 10, book.Paths[row]);
         }
-
-        // A range on a column of words is ignored rather than refused - see MonsterBook.Filter.
-        book.Filter(null, [new ColumnRange(Index(book, "name"), 5d, 6d)], rows);
-        Assert.Equal(book.Count, rows.Count);
     }
 
     [Fact]
@@ -229,6 +216,41 @@ public class MonsterBookTests
             Assert.Equal(book.Count, column.Text.Length);
             Assert.All(column.Text, Assert.NotNull);
         }
+    }
+
+    [Fact]
+    public void HowManyMonstersShareAName()
+    {
+        // WHY EVERY ROW GETS ITS OWN ID, measured rather than asserted - which is the whole reason
+        // this test exists. The comment this replaces said the table held "nineteen monsters called
+        // Skeletal Warrior"; it holds exactly ONE, and searching for that name on a live client
+        // returns six rows across three different names. The number had been carried from comment
+        // to comment without anybody counting, which is how a justification outlives its fact.
+        //
+        // The real figures are far stronger than the invented one, so the rule stands: over the
+        // shipped export 2225 of 2709 named rows share a name, 510 names repeat, and "Daemon" is on
+        // 305 rows. Asserted loosely, because the export is regenerated from a live install and a
+        // test that pinned the exact counts would fail on patch day for no reason at all.
+        MonsterVarieties table = Shipped();
+
+        var byName = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach ((_, MonsterVariety one) in table.All)
+        {
+            if (one.Name is { Length: > 0 } named)
+            {
+                byName[named] = byName.GetValueOrDefault(named) + 1;
+            }
+        }
+
+        Assert.Equal(1, byName.GetValueOrDefault("Skeletal Warrior"));
+
+        int repeated = byName.Values.Count(count => count > 1);
+        int rows = byName.Values.Where(count => count > 1).Sum();
+        int worst = byName.Values.Max();
+
+        Assert.True(repeated > 100, $"only {repeated} names repeat, so the rule may not be needed");
+        Assert.True(rows > 1000, $"only {rows} rows share a name");
+        Assert.True(worst > 100, $"the commonest name is on only {worst} rows");
     }
 
     [Fact]
@@ -319,19 +341,16 @@ public class MonsterBookTests
     {
         MonsterVarieties table = Shipped();
         MonsterBook book = MonsterBook.Of(table, null);
-        var rows = new List<int>();
 
-        book.Filter(null, rows);
-        Assert.Equal(book.Count, rows.Count);
-
-        book.Filter("   ", rows);
-        Assert.Equal(book.Count, rows.Count);
+        Assert.Equal(book.Count, Rows(book, null).Count);
+        Assert.Equal(book.Count, Rows(book, "   ").Count);
 
         // A tag a real monster really carries, taken out of the table rather than assumed - the
         // export is regenerated from a live install, so a hard-coded one would be a test that
-        // fails on patch day for no reason.
+        // fails on patch day for no reason. Typed as a bare word, which is what a search box has
+        // always meant and still does.
         (string path, string tag) = FirstTag(table);
-        book.Filter(tag, rows);
+        List<int> rows = Rows(book, tag);
 
         Assert.Contains(book.Row(path), rows);
 
@@ -348,15 +367,13 @@ public class MonsterBookTests
     {
         MonsterVarieties table = Shipped();
         MonsterBook book = MonsterBook.Of(table, null);
-        var rows = new List<int>();
 
         // "boss" is a flag on the row rather than a column or a tag, so without the word being
         // written into the searchable text there is no way whatever to ask this list for them.
         int boss = Array.IndexOf(book.Boss, true);
         Assert.True(boss >= 0, "the export should carry bosses, and carries none");
 
-        book.Filter("boss", rows);
-        Assert.Contains(boss, rows);
+        Assert.Contains(boss, Rows(book, "boss"));
     }
 
     [Fact]
@@ -397,6 +414,20 @@ public class MonsterBookTests
 
         Assert.True(table.Count > 2000, $"the export should hold the whole table, and holds {table.Count}");
         return table;
+    }
+
+    /// <summary>The rows a query leaves, which is the one way the window filters.</summary>
+    private static List<int> Rows(MonsterBook book, string? query)
+    {
+        QueryResult parsed = ColumnQuery.Parse(query);
+        Assert.Equal(string.Empty, parsed.Error);
+
+        RowSet rows = Assert.IsType<RowSet>(book.Matching(parsed.Term, out string error));
+        Assert.Equal(string.Empty, error);
+
+        var into = new List<int>();
+        rows.CopyTo(into);
+        return into;
     }
 
     private static DataColumn Column(MonsterBook book, string name)

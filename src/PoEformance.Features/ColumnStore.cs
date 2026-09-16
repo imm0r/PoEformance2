@@ -61,9 +61,9 @@ public sealed class DataColumn
 
     /// <summary>Dense rank of each row's text, so sorting words compares ints.</summary>
     /// <remarks>
-    /// DENSE, so that equal text really is equal. Ranked by position instead, the nineteen
-    /// monsters called "Skeletal Warrior" would each get a different rank and the grid's own
-    /// tie-break - which puts them in a fixed, meaningful order - would never run.
+    /// DENSE, so that equal text really is equal. Ranked by position instead, the 305 monsters the
+    /// export calls "Daemon" would each get a different rank, and the grid's own tie-break - which
+    /// puts them in a fixed, meaningful order - would never run for any of them.
     /// </remarks>
     private readonly int[] _order;
 

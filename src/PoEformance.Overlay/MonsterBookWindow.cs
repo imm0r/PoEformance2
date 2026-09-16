@@ -40,19 +40,58 @@ namespace PoEformance.Overlay;
 /// to submit fifteen hundred rows to show forty, which is some seven thousand strings built and
 /// thrown away every frame. <see cref="MonsterBook"/> does both once, when the table arrives.
 ///
-/// WHAT IS STILL MISSING, so that nobody has to rediscover it: six columns of a table holding some
-/// two hundred thousand facts answer "what is this one" and nothing of the form "which of these".
-/// docs/reading-big-tables.md is the design for the viewer that does - facets, a query grammar and
-/// a comparison of pinned rows - and this window is its first stage.
+/// THREE PANES AND ONE FILTER. The rail on the left says what the rows that are left are made of
+/// and narrows them by a click; the query box says the same thing in words; a drag across a
+/// column's histogram says it in numbers. None of the three keeps any state of its own - all of
+/// them edit the query TEXT, and everything else on screen is read back out of it. That is why the
+/// ticks in the rail move when the text is edited by hand, and why emptying the box clears
+/// everything at once: there is nowhere else for a filter to hide.
+///
+/// WHAT IS STILL MISSING, so that nobody has to rediscover it: a comparison of several pinned
+/// monsters, and the tie to what is on screen in the game right now. Both are in
+/// docs/reading-big-tables.md, stages four and five.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDescriptions> sentences)
 {
-    /// <summary>How long a search string may be.</summary>
-    private const uint SearchLength = 96;
+    /// <summary>How long a query may be. Shorter than the parser's own limit, on purpose.</summary>
+    private const uint QueryLength = 256;
 
+    /// <summary>How many of a field's values the rail offers.</summary>
+    /// <remarks>
+    /// TWELVE OF FIVE THOUSAND, and which twelve is the whole point: the rail counts every value
+    /// against the rows that are left and shows the commonest, so the skills it offers are the ones
+    /// the monsters in front of somebody actually cast. A list of all of them would be a scrollbar.
+    /// </remarks>
+    private const int MostFacets = 12;
+
+    /// <summary>
+    /// The fields the rail offers, and what it calls them.
+    /// </summary>
+    /// <remarks>
+    /// NOT EVERY FIELD A QUERY CAN NAME. A rail is for the questions with a handful of answers
+    /// worth clicking - which tag, which type, which skill - and "name" has 994 distinct values
+    /// over 2733 rows, which is a list of the table rather than a way into it. Those are still
+    /// searchable by typing; they are just not worth a column of clicks.
+    /// </remarks>
+    private static readonly (string Label, string Field)[] Rails =
+    [
+        ("Tags", "tag"),
+        ("Types", "type"),
+        ("Skills", "skill"),
+        ("Modifiers", "mod"),
+        ("Blood", "blood"),
+    ];
+
+    /// <summary>The box's background while the query does not read. Dark enough to type on.</summary>
+    private static readonly Vector4 Wrong = new(0.32f, 0.11f, 0.11f, 1f);
+
+    private readonly PaneSplit _rail = new(0.2f);
     private readonly PaneSplit _split = new(0.46f);
     private readonly DataGrid _grid = new();
+
+    /// <summary>What each of the rail's fields holds within the rows that are left.</summary>
+    private readonly Dictionary<string, List<Facet>> _facets = new(StringComparer.Ordinal);
 
     /// <summary>The table the book was built from, to notice when a different one arrives.</summary>
     private MonsterVarieties _of = MonsterVarieties.Empty;
@@ -68,7 +107,15 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// <summary>Which columns are on, as store column numbers, in the order they are drawn.</summary>
     private readonly List<int> _columns = [];
 
-    /// <summary>The ranges dragged out of the histograms. Every one of them has to hold.</summary>
+    /// <summary>
+    /// The ranges the query puts on columns, worked out from it rather than kept beside it.
+    /// </summary>
+    /// <remarks>
+    /// DERIVED AND NEVER STORED, which is what makes the histogram and the box one filter instead
+    /// of two. A drag writes "life 120..260" into the query; this reads it back out so the bins can
+    /// be lit. Deleting the text by hand clears the shading, because there is nothing else holding
+    /// it - and that is the property the whole design asks for.
+    /// </remarks>
     private readonly List<ColumnRange> _ranges = [];
 
     /// <summary>Which columns are on, by store column number.</summary>
@@ -84,8 +131,18 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// </remarks>
     private IReadOnlyList<string>? _wanted;
 
-    private string _search = string.Empty;
+    private string _query = string.Empty;
     private string _chosen = string.Empty;
+
+    /// <summary>The query as a tree, or null while it takes everything.</summary>
+    private QueryTerm? _term;
+
+    /// <summary>Why the query does not read, and which character it gave up on.</summary>
+    private string _error = string.Empty;
+    private int _errorAt;
+
+    /// <summary>Which rows the query leaves, as a set - what the rail counts against.</summary>
+    private RowSet? _matched;
 
     /// <summary>The selected row, or -1. Kept beside the path so the grid can mark it.</summary>
     private int _chosenRow = -1;
@@ -125,6 +182,16 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
 
         Header(all, said);
         Filter();
+
+        float rail = _rail.Left();
+        if (ImGui.BeginChild("##monster-rail", new Vector2(rail, 0f), ImGuiChildFlags.Borders))
+        {
+            Rail();
+        }
+
+        ImGui.EndChild();
+
+        _rail.Bar();
 
         float left = _split.Left();
         if (ImGui.BeginChild("##monster-list", new Vector2(left, 0f), ImGuiChildFlags.Borders))
@@ -225,17 +292,47 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         _grid.Resort();
     }
 
+    /// <summary>
+    /// The query box, what is wrong with it, and the two buttons.
+    /// </summary>
+    /// <remarks>
+    /// STILL A SEARCH BOX TO ANYBODY WHO WANTS ONE. A bare word is a term of the grammar, so typing
+    /// "undead" does exactly what it always did; tag:undead and life&gt;200 are there for whoever
+    /// wants them. That is deliberate and it is the reason the grammar was written the way it was:
+    /// a viewer that has to be learned before it answers anything gets opened once.
+    ///
+    /// AND WHAT IS WRONG IS SHOWN WHERE IT IS WRONG. Halfway through typing a query is a broken
+    /// query, so the box goes red and a caret points at the character the parser gave up on rather
+    /// than the list simply emptying. The rows on screen are left ALONE while it is broken: they
+    /// are the last answer somebody got, and blanking them for each keystroke of a longer query is
+    /// how a search box starts to feel like it is fighting back.
+    /// </remarks>
     private void Header(MonsterVarieties all, StatDescriptions said)
     {
         float room = OverlayLayout.ButtonRoom("Copy list", "Columns");
+        bool wrong = _error.Length > 0;
+
+        if (wrong)
+        {
+            ImGui.PushStyleColor(ImGuiCol.FrameBg, Wrong);
+        }
+
         if (OverlayLayout.Search(
                 "###monster-find",
-                "name, path, type, tag, skill, modifier...",
-                ref _search,
-                SearchLength,
+                "undead  ·  tag:undead life>200  ·  skill:fire  ·  not boss",
+                ref _query,
+                QueryLength,
                 room))
         {
             _refilter = true;
+        }
+
+        Vector2 box = ImGui.GetItemRectMin();
+        float below = ImGui.GetItemRectSize().Y;
+
+        if (wrong)
+        {
+            ImGui.PopStyleColor();
         }
 
         ImGui.SameLine();
@@ -297,7 +394,143 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             ImGui.SetTooltip(ImGuiText.Escape(said.Source));
         }
 
-        Chips();
+        Caret(box, below);
+    }
+
+    /// <summary>Points at the character the query stopped reading at, and says why.</summary>
+    private void Caret(Vector2 box, float below)
+    {
+        if (_error.Length == 0)
+        {
+            return;
+        }
+
+        // COUNTED FROM 1, which is what the parser hands back so that this can exist at all. A
+        // column of zero is a fault the table found rather than the text - an unknown field name -
+        // and there is nothing under the box to point at.
+        if (_errorAt > 0)
+        {
+            int at = Math.Clamp(_errorAt - 1, 0, _query.Length);
+            float x = box.X + ImGui.GetStyle().FramePadding.X + ImGui.CalcTextSize(_query[..at]).X;
+
+            ImGui.GetWindowDrawList().AddText(
+                new Vector2(x, box.Y + below - (ImGui.GetFontSize() * 0.25f)),
+                ImGui.GetColorU32(OverlayInk.Warn),
+                "^");
+        }
+
+        ImGui.TextColored(OverlayInk.Warn, ImGuiText.Escape(_error));
+    }
+
+    /// <summary>
+    /// The facet rail: what the rows that are left are made of, and a click to narrow them.
+    /// </summary>
+    /// <remarks>
+    /// EVERY COUNT IS AGAINST THE ROWS THAT ARE LEFT, so the rail answers "what is in this set"
+    /// rather than "what is in the table". Click a value and it is added to the query as one more
+    /// thing that must hold; click it again and it comes back out. Nothing is stored here - the
+    /// tick beside a value is read back out of the query text, which is why editing that text by
+    /// hand moves the ticks.
+    ///
+    /// A ZERO IS SHOWN, DIM, rather than hidden. "There are no casters left in this set" is an
+    /// answer somebody came for, and a rail that drops what it cannot offer looks like a rail that
+    /// has lost the field.
+    /// </remarks>
+    private void Rail()
+    {
+        if (_matched is null)
+        {
+            ImGui.TextDisabled("Nothing counted yet.");
+            return;
+        }
+
+        for (var at = 0; at < Rails.Length; at++)
+        {
+            (string label, string field) = Rails[at];
+            if (!_facets.TryGetValue(field, out List<Facet>? facets) || facets.Count == 0)
+            {
+                continue;
+            }
+
+            // The first two open, the rest shut: five fields of twelve values each is sixty lines,
+            // and the ones somebody opens are the ones they are asking about.
+            if (!OverlayLayout.Subsection(label, openByDefault: at < 2))
+            {
+                continue;
+            }
+
+            ImGui.Indent();
+
+            try
+            {
+                foreach (Facet facet in facets)
+                {
+                    Value(field, facet);
+                }
+            }
+            finally
+            {
+                ImGui.Unindent();
+            }
+        }
+    }
+
+    private void Value(string field, Facet facet)
+    {
+        bool on = ColumnQuery.Holds(_term, field, facet.Value);
+        string count = facet.Count.ToString(CultureInfo.InvariantCulture);
+
+        float room = ImGui.GetContentRegionAvail().X;
+        float wide = ImGui.CalcTextSize(count).X + ImGui.GetStyle().ItemSpacing.X;
+        bool quiet = facet.Count == 0 && !on;
+
+        // BY VALUE AND NOT BY POSITION: the rail is re-counted and re-ordered on every keystroke,
+        // so a row's place in it is not its identity and an id built from one would hand a click
+        // to whatever has moved into that slot.
+        ImGui.PushID(facet.Value);
+
+        try
+        {
+            if (quiet)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, OverlayInk.Quiet);
+            }
+
+            if (ImGui.Selectable(
+                    facet.Value,
+                    on,
+                    ImGuiSelectableFlags.None,
+                    new Vector2(MathF.Max(1f, room - wide), 0f)))
+            {
+                _query = ColumnQuery.Toggle(_query, field, facet.Value);
+                _refilter = true;
+            }
+
+            if (quiet)
+            {
+                ImGui.PopStyleColor();
+            }
+
+            // The whole value on hover, because a rail is narrow and these are the game's own ids.
+            if (ImGui.IsItemHovered() && ImGui.BeginTooltip())
+            {
+                try
+                {
+                    ImGui.TextUnformatted($"{field}:{facet.Value}");
+                }
+                finally
+                {
+                    ImGui.EndTooltip();
+                }
+            }
+
+            ImGui.SameLine();
+            ImGui.TextDisabled(count);
+        }
+        finally
+        {
+            ImGui.PopID();
+        }
     }
 
     /// <summary>
@@ -379,54 +612,6 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         return said;
     }
 
-    /// <summary>
-    /// The ranges in force, each one a button that throws it away.
-    /// </summary>
-    /// <remarks>
-    /// WRITTEN OUT IN NUMBERS, because a lit run of bins in a column header says THAT the table is
-    /// filtered and not by how much - and a range somebody dragged by accident, on a column they
-    /// have since hidden, is otherwise a table that has quietly lost rows with nothing on screen
-    /// saying so.
-    /// </remarks>
-    private void Chips()
-    {
-        if (_ranges.Count == 0)
-        {
-            return;
-        }
-
-        for (var at = 0; at < _ranges.Count; at++)
-        {
-            ColumnRange range = _ranges[at];
-            if (range.Column < 0 || range.Column >= _page.Store.Columns.Length)
-            {
-                continue;
-            }
-
-            DataColumn column = _page.Store.Columns[range.Column];
-            if (at > 0)
-            {
-                ImGui.SameLine();
-            }
-
-            string label =
-                $"{column.Name} {Figure(range.Least, column.Unit)}-{Figure(range.Most, column.Unit)}  x";
-
-            if (ImGui.SmallButton($"{label}###range-{range.Column}"))
-            {
-                Clear(range.Column);
-            }
-
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip("Click to drop this range.");
-            }
-        }
-    }
-
-    private static string Figure(double value, string unit)
-        => value.ToString("0.##", CultureInfo.InvariantCulture) + unit;
-
     private void Filter()
     {
         if (!_refilter)
@@ -435,49 +620,123 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         }
 
         _refilter = false;
-        _page.Filter(_search, _ranges, _shown);
 
-        // The grid sorts what it is given, and it has just been given a different list.
-        _grid.Resort();
-    }
+        QueryResult parsed = ColumnQuery.Parse(_query);
+        _error = parsed.Error;
+        _errorAt = parsed.Column;
 
-    /// <summary>Takes a range a drag picked out, replacing whatever that column had.</summary>
-    private void Range(int column, double least, double most)
-    {
-        for (var at = 0; at < _ranges.Count; at++)
+        // A BROKEN QUERY LEAVES THE LAST ANSWER ON SCREEN. Every query is broken while it is being
+        // typed - "tag:" is halfway to something - and a list that emptied at each of those
+        // keystrokes would flicker through nothing on the way to every answer.
+        if (_error.Length > 0)
         {
-            if (_ranges[at].Column != column)
-            {
-                continue;
-            }
-
-            // WHILE THE DRAG IS HAPPENING this runs every frame, so an unchanged range must not
-            // cost a refilter - the list would be rebuilt sixty times a second for nothing.
-            if (_ranges[at].Least.Equals(least) && _ranges[at].Most.Equals(most))
-            {
-                return;
-            }
-
-            _ranges[at] = new ColumnRange(column, least, most);
-            _refilter = true;
             return;
         }
 
-        _ranges.Add(new ColumnRange(column, least, most));
+        _term = parsed.Term;
+
+        // AND A FIELD THE TABLE HAS NOT GOT IS THE TABLE'S ANSWER, not the parser's: "bogus:thing"
+        // reads perfectly well and only this table can say there is no such column.
+        RowSet? rows = _page.Matching(_term, out string why);
+        if (rows is null)
+        {
+            _error = why;
+            _errorAt = 0;
+            return;
+        }
+
+        _matched = rows;
+        rows.CopyTo(_shown);
+
+        // The grid sorts what it is given, and it has just been given a different list.
+        _grid.Resort();
+
+        Ranges();
+        Counted();
+    }
+
+    /// <summary>Reads the query's ranges back out, so the histograms can light what it picked.</summary>
+    private void Ranges()
+    {
+        _ranges.Clear();
+        DataColumn[] columns = _page.Store.Columns;
+
+        for (var at = 0; at < columns.Length; at++)
+        {
+            if (ColumnQuery.RangeOf(_term, columns[at].Name) is { } range)
+            {
+                _ranges.Add(new ColumnRange(at, range.Least, range.Most));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Counts every value of every field the rail offers, against the rows that are left.
+    /// </summary>
+    /// <remarks>
+    /// ONLY WHEN THE FILTER MOVES, never per frame. Five fields is some nine thousand values, and
+    /// each one is an AND of two bitsets and a popcount - well under a millisecond all told, and
+    /// still not something to do sixty times a second for a rail nobody is looking at.
+    ///
+    /// INTO LISTS THAT ARE KEPT, so a keystroke re-counts rather than re-allocates.
+    /// </remarks>
+    private void Counted()
+    {
+        if (_matched is null)
+        {
+            return;
+        }
+
+        foreach ((_, string field) in Rails)
+        {
+            if (!_facets.TryGetValue(field, out List<Facet>? into))
+            {
+                into = [];
+                _facets[field] = into;
+            }
+
+            _page.Facets(_matched, field, into, MostFacets);
+        }
+    }
+
+    /// <summary>Takes a range a drag picked out, by writing it into the query.</summary>
+    /// <remarks>
+    /// THIS RUNS EVERY FRAME WHILE THE DRAG IS HAPPENING, which is what makes the list move with
+    /// the cursor - so a range that has not changed must cost nothing. Comparing the text it would
+    /// produce is the cheapest way to ask, and it is exact.
+    /// </remarks>
+    private void Range(int column, double least, double most)
+    {
+        if (column < 0 || column >= _page.Store.Columns.Length)
+        {
+            return;
+        }
+
+        string made = ColumnQuery.Ranged(_query, _page.Store.Columns[column].Name, least, most);
+        if (string.Equals(made, _query, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _query = made;
         _refilter = true;
     }
 
     private void Clear(int column)
     {
-        for (var at = 0; at < _ranges.Count; at++)
+        if (column < 0 || column >= _page.Store.Columns.Length)
         {
-            if (_ranges[at].Column == column)
-            {
-                _ranges.RemoveAt(at);
-                _refilter = true;
-                return;
-            }
+            return;
         }
+
+        string made = ColumnQuery.Drop(_query, _page.Store.Columns[column].Name);
+        if (string.Equals(made, _query, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _query = made;
+        _refilter = true;
     }
 
     /// <summary>

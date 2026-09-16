@@ -506,9 +506,9 @@ Each stage is useful shipped alone, and each one is a commit somebody can review
    section had promised, both deliberate:
 
    - **The drag writes its own range, not a query.** There is no query box until stage 3, so a
-     range lives in the window as a `ColumnRange` and shows as a chip that drops it. Stage 3 folds
-     the two into one filter tree; until then the chips are the only thing on screen saying the
-     table is hiding rows, which is why they print the numbers rather than only a colour.
+     range lives in the window as a `ColumnRange` and shows as a chip that drops it. *(Stage 3
+     folded both into the query text and the chips are gone — the box now says `life 120..260`
+     where a chip used to.)*
    - **The view is remembered, not named.** Which columns show is kept in `overlay.json` by NAME
      (a column added mid-list would shift every number), and ImGui already keeps its own column
      widths and sort. Named views wait for stage 3, when there is a query to name along with them.
@@ -519,13 +519,26 @@ Each stage is useful shipped alone, and each one is a commit somebody can review
    multiples of ten, so 16 bins of 2 leave 12 empty). It also turned up a second column the bar
    had to be taken away from: `poise` is 0.05 on 2618 of 2733 rows, so a bar scaled at its p90
    fills for 96% of the table — the same wall of bars, reached from the other side.
-3. **Index, facet rail, query grammar with completion.** The comparative jobs arrive here.
-   **Half built** — everything that is not drawing: `RowSet` (the bitsets), `ColumnQuery` (the
-   grammar, hand-written for the AOT reason `RuleExpression` gives), and `MonsterBook` as an
-   `IQuerySource` with facet counting over ten fields. `tag:undead life>200`, `skill:fire`,
-   `(tag:undead or tag:beast) life>300` and `not boss` all answer today; nothing draws them yet.
-   The rail and the query box wait for a look at stage 2 on a real client, because they are what
-   replaces its range chips and there is no sense designing that twice.
+3. ~~**Index, facet rail, query grammar with completion.**~~ **Built.** `RowSet` (the bitsets),
+   `ColumnQuery` (the grammar, hand-written for the AOT reason `RuleExpression` gives), `MonsterBook`
+   as an `IQuerySource` with facet counting, and the three-pane window: rail, query box, grid.
+
+   **The property the whole thing rests on: nothing keeps a filter but the text.** The rail's ticks,
+   the lit histogram bins and the row list are all read back out of the query, and every way of
+   narrowing — a click in the rail, a drag on a histogram, typing — edits that one string. So
+   editing the text by hand moves the ticks, and emptying the box clears everything at once,
+   because there is nowhere else for a filter to hide. A click only ever adds or removes a term at
+   the **top level**: `(tag:undead or tag:beast)` stays bracketed and the click lands beside it,
+   rather than reaching inside something somebody wrote deliberately.
+
+   Two things it does that the plan did not name. A query that **does not parse leaves the previous
+   rows on screen** — every query is broken while it is being typed, and a list that emptied at each
+   of those keystrokes would flicker through nothing on the way to every answer; the box goes red
+   and a caret points at the character instead. And a **click that would rewrite an unparseable
+   query does nothing**, because somebody halfway through typing has not asked for their text to be
+   reformatted.
+
+   Completion of field names is still to do; the rail covers the discovery it was meant for.
 
    One thing this stage settled that the round-trip test could not: **`life>500` was quietly
    meaning `life>=500`**. It was built as `500 + double.Epsilon`, and Epsilon is the smallest

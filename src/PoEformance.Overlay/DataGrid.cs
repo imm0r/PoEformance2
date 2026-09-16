@@ -320,10 +320,11 @@ public sealed class DataGrid
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
 
-            // PUSHED BY ROW NUMBER rather than built into the label. Two monsters may well share a
-            // name - the table has nineteen called "Skeletal Warrior" - and a label alone would
-            // make them one selectable as far as ImGui is concerned. It also means no string is
-            // built per row per frame, which is the whole point of the store.
+            // PUSHED BY ROW NUMBER rather than built into the label, because ImGui keys a
+            // selectable on its label and a shared name would make several rows one item. That is
+            // not a rare case here: over the shipped export, 2225 of the 2709 named rows share a
+            // name with at least one other, 510 names occur more than once, and "Daemon" is on 305
+            // rows. It also means no string is built per row per frame, which is the store's point.
             ImGui.PushID(row);
 
             try
