@@ -304,6 +304,14 @@ rediscover, so they are written down:
   the feet. `MeshPicture.Under` is the clearance. A post standing on its end never shows this,
   because pixel centres either side of an edge never interpolate to equal depths; it takes a
   model with a flat sole, which is why the test grew one.
+- **The picture follows the words; it does not hug the right edge.** It used to take half the pane
+  and sit flush right, which on a 1030-pixel pane meant a 515-pixel picture with about 300 pixels
+  of nothing between it and text that wanted 210 — the pane paid for the empty middle *and* for
+  the picture, so the window had to be dragged far wider than its content needed. `PortraitFit`
+  now gives the picture everything the words did not take: the same 1030 yields 766. The column is
+  **measured**, not reserved — an ImGui group around the sections reports the true extent, used a
+  frame later, because the picture has to be placed before the words are drawn. A ceiling of half
+  the pane stops one long modifier line deciding how big a monster's portrait comes out.
 - **A monster drawn in plain ink now says which way its colour went missing.** The fallback is a
   pale warm grey all but indistinguishable from bare skin, so *"is this one missing its texture"*
   was a question no screenshot could answer — it was asked from the live client and could only be

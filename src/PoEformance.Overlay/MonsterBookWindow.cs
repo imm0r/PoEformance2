@@ -876,12 +876,32 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         ImGui.Separator();
 
         Portrait(one);
-        Figures(one);
-        Type(all, one);
-        Words("Tags", all.TagsOf(one));
-        Words("Skills", all.Skills(one));
-        Mods(all, one, said);
-        Words("Built on", one.Inherits ?? []);
+
+        // MEASURED AS ONE BLOCK, so the picture beside it knows how much room the words actually
+        // want. A group is ImGui's own way to ask that: everything between these two calls counts
+        // as a single item afterwards, and its rectangle is the bounding box of the lot. Nothing
+        // here wraps - every section is BulletText, which simply runs on - so the box is the truth
+        // rather than a guess at it.
+        ImGui.BeginGroup();
+        try
+        {
+            Figures(one);
+            Type(all, one);
+            Words("Tags", all.TagsOf(one));
+            Words("Skills", all.Skills(one));
+            Mods(all, one, said);
+            Words("Built on", one.Inherits ?? []);
+        }
+        finally
+        {
+            ImGui.EndGroup();
+        }
+
+        // A FRAME BEHIND, which is the only order available: the picture is placed before the
+        // words are drawn, because it has to sit beside their FIRST line rather than under their
+        // last. Opening a section is one frame at the old width and then right - nobody sees it,
+        // and the alternative is drawing the words twice.
+        _column = ImGui.GetItemRectSize().X;
     }
 
     /// <summary>
@@ -907,27 +927,17 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             return;
         }
 
-        // THREE LIMITS, AND THE SMALLEST OF THEM WINS. The cap somebody set, the share of the pane
-        // a picture may take, and whatever is left after the figures beside it keep their column.
-        //
-        // THE THIRD ONE USED TO BE A REFUSAL RATHER THAN A LIMIT, which is a worse answer: below a
-        // pane width the picture vanished entirely instead of becoming the largest that still fits.
-        // Raising the share moved that cliff outwards, so panes that had a small portrait would
-        // have lost it. Shrinking is the honest response to a narrow pane; disappearing is for
-        // when there is genuinely no room, which LeastPortrait still decides.
-        float wide = ImGui.GetContentRegionAvail().X;
-        float side = MathF.Min(
-            model.Most, MathF.Min(wide * PortraitShare, wide - LeastColumn));
-
-        if (side < LeastPortrait)
+        // THE SUM IS NOT DONE HERE, on purpose - see PortraitFit, and the cap of zero that got
+        // itself shipped by living on this side of the line where no test could reach it.
+        if (PortraitFit.Of(ImGui.GetContentRegionAvail().X, _column, model.Most) is not { Shown: true } fit)
         {
             return;
         }
 
         Vector2 was = ImGui.GetCursorPos();
-        ImGui.SetCursorPos(was with { X = was.X + wide - side });
+        ImGui.SetCursorPos(was with { X = was.X + fit.Left });
 
-        model.Draw(one, _chosen, side);
+        model.Draw(one, _chosen, fit.Side);
 
         // BACK TO WHERE THE PANE WAS, and to the TOP of it: the picture is taller than the
         // figures beside it, and leaving the cursor under it would push every later section down
@@ -935,22 +945,16 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         ImGui.SetCursorPos(was);
     }
 
-    /// <summary>How much of the pane's width the picture may take.</summary>
+    /// <summary>
+    /// How wide the words beside the picture were last frame.
+    /// </summary>
     /// <remarks>
-    /// HALF, because the block beside it is the narrowest in the pane. Figures is two short
-    /// columns - a word and a number - and every longer section below it, the tags and the skills
-    /// and the modifiers, runs the full width UNDER the picture rather than beside it. So the
-    /// width this leaves only has to hold the narrow block, and <see cref="LeastColumn"/> is what
-    /// guards that. It was 0.42 while the picture was capped at 384 and the share never bound;
-    /// with the cap a setting, this is the limit somebody meets first.
+    /// MEASURED RATHER THAN RESERVED, which is the whole point. A fixed column is either too wide
+    /// for a monster with short names - the gap somebody has to drag the window wider to afford -
+    /// or too narrow for one with long ones. What the words want is a question ImGui can answer
+    /// exactly, once they have been drawn; see the group in <see cref="Detail"/>.
     /// </remarks>
-    private const float PortraitShare = 0.5f;
-
-    /// <summary>Below this the picture is not worth the width it costs.</summary>
-    private const float LeastPortrait = 110f;
-
-    /// <summary>And this much is always left for the figures beside it, whatever that costs the picture.</summary>
-    private const float LeastColumn = 260f;
+    private float _column;
 
     /// <summary>
     /// Draws the monster's model, or null where the overlay did not wire one up.
