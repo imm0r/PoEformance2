@@ -359,6 +359,8 @@ PoEformance.App --record s.rec --tables       # + list them, with the row size e
 
 # Reads the INSTALL, not the process - no game running, no fight to survive:
 PoEformance.App --groundtypes                 # what each ground-effect type row actually is
+PoEformance.App --aodump                      # survey every monster's .ao files: what is IN them
+PoEformance.App --aodump "Skeletal Warrior"   # + one monster's files in full, structs and entries
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"

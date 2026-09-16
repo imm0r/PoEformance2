@@ -463,7 +463,12 @@ public sealed class MonsterTables
                 Mods: List(file, row, at.Of("MonsterVarieties", "Mods"), rows.Mods),
                 Mods2: List(file, row, at.Of("MonsterVarieties", "Mods2"), rows.Mods),
                 SpecialMods: List(file, row, at.Of("MonsterVarieties", "Special_Mods"), rows.Mods),
-                Inherits: Paths(file, row, at.Of("MonsterVarieties", "InheritsFrom")));
+                Inherits: Paths(file, row, at.Of("MonsterVarieties", "InheritsFrom")),
+
+                // THE SAME SHAPE AS InheritsFrom - a string array - and read with the same helper.
+                // The shipped export does not carry this column, so this is the one field on a
+                // monster that is filled only when the install's own table is read.
+                AoFiles: Paths(file, row, at.Of("MonsterVarieties", "AOFiles")));
         }
 
         return byPath;

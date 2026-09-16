@@ -302,6 +302,12 @@ internal static class Program
             RunGroundTypeDump();
         }
 
+        // The same kind of thing and for the same reason - the install, no process. See RunAoDump.
+        if (options.DumpAo is { } wanted)
+        {
+            RunAoDump(wanted);
+        }
+
         // OUTSIDE the block above on purpose. Everything in it hangs off the game state, and
         // the loaded-file table does not: it hangs off FileRoot, so the tables are there at the
         // login screen, before any area exists. That is also what makes them worth having -
@@ -1190,6 +1196,76 @@ internal static class Program
     /// one capture in one hideout; the rest of the table is what says whether those three are
     /// the decorative corner of it, and that context costs one screenful.
     /// </remarks>
+    /// <summary>
+    /// Walks the .ao files the monsters name and reports what is in them.
+    /// </summary>
+    /// <remarks>
+    /// READS THE INSTALL AND NEEDS NO PROCESS, like the ground types above and unlike the two
+    /// after them. The .ao files sit in the bundles whether or not the game is running.
+    ///
+    /// THIS IS A MEASUREMENT, and the two things it is measuring are written down on AoSurvey:
+    /// whether any picture is reachable from a monster, and what "stance2" is. Neither can be
+    /// settled on a machine without the game - no .ao file exists in this repository - so the
+    /// reader was written against a format diagram and a prototype parser, and the FAULT COUNT
+    /// in the output is the first thing to read. Thousands of faults means the reader is wrong
+    /// and the rest of the numbers are about the reader rather than about the game.
+    /// </remarks>
+    /// <param name="match">A monster name or path to look at in full, or empty to survey all.</param>
+    private static void RunAoDump(string match)
+    {
+        Console.WriteLine();
+        Console.WriteLine("animated objects - what a monster is made of, out of the install's own .ao files.");
+
+        PoEformance.Game.Files.GameFiles.OpenedFiles opened =
+            PoEformance.Game.Files.GameFiles.OpenOrSay(PoEformance.Game.Files.GameInstall.Find(null));
+        if (opened.Files is null)
+        {
+            // A RETURN, unlike the ground types: there is no vendored copy of anything here and
+            // the shipped monster export does not carry the AOFiles column, so without an install
+            // there is not a single path to ask for.
+            Console.WriteLine($"  no install ({opened.Why}) - nothing to read.");
+            return;
+        }
+
+        PoEformance.Features.MonsterTables read = PoEformance.Features.MonsterTables.Read(
+            opened.Files,
+            PoEformance.Features.QuestTableLayouts.Load(FindDataFile("monster-tables.json")),
+            PoEformance.Game.Entities.MonsterVarieties.Load(FindDataFile("monster-varieties.json")));
+
+        foreach (string line in read.Say)
+        {
+            Console.WriteLine($"  {line}");
+        }
+
+        if (!read.FromGame)
+        {
+            Console.WriteLine("  the install's own monster table did not read, so no .ao paths are known.");
+            return;
+        }
+
+        // The full dump is kept only when one monster was asked for. Over the whole table it
+        // would be every struct of every file, which is not something anybody reads.
+        List<PoEformance.Game.Diagnostics.AoRead>? keep = match.Length > 0 ? [] : null;
+
+        PoEformance.Game.Diagnostics.AoSurveyResult survey =
+            PoEformance.Game.Diagnostics.AoSurvey.Read(opened.Files, read.Table, match, keep);
+
+        Console.WriteLine();
+        PoEformance.Game.Diagnostics.AoSurvey.Report(survey, Console.Out);
+
+        if (keep is { Count: > 0 })
+        {
+            Console.WriteLine();
+            Console.WriteLine($"  the files behind \"{match}\", in full:");
+            PoEformance.Game.Diagnostics.AoSurvey.Detail(keep, Console.Out);
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("  Read the fault count first: this reader has never seen a real .ao file.");
+        Console.WriteLine("  Then \"referenced file types\" - a .dds there means a picture is reachable,");
+        Console.WriteLine("  and \"animation names\" says whether the Stance column resolves to anything.");
+    }
+
     private static void RunGroundTypeDump()
     {
         Console.WriteLine();
@@ -3717,6 +3793,7 @@ internal static class Program
         string TabName,
         bool DumpGroundTypes,
         bool DumpAnimations,
+        string? DumpAo,
         bool ReadGlossary,
         bool ListTables,
         IReadOnlyList<string> Peek,
@@ -3734,6 +3811,7 @@ internal static class Program
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false, mapHunt = false;
             bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
+            string? aoDump = null;
             var inventorySweep = false;
             string tabName = string.Empty;
             List<string> peek = [];
@@ -3865,6 +3943,17 @@ internal static class Program
                         groundTypeDump = true;
                         break;
 
+                    // Reads the monsters' own .ao files out of the install and says what is in
+                    // them. Takes an optional monster name or path, which switches it from a
+                    // survey of the whole table to a full dump of that one - and the survey is
+                    // what it is for: whether a picture is reachable and what "stance2" is.
+                    // Empty string means all, which is why this is a string? and not a bool.
+                    case "--aodump":
+                        aoDump = i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)
+                            ? Value(ref i)
+                            : string.Empty;
+                        break;
+
                     // Regenerates data/animations.tsv from the game. Not a hunt - nothing is
                     // being searched for any more - so it stops the moment the row array's base
                     // is confirmed rather than sampling for as long as somebody plays.
@@ -3931,7 +4020,7 @@ internal static class Program
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, watchFlasks, probeKeys,
                 debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, mapHunt, sweep,
-                inventorySweep, tabName, groundTypeDump, animDump,
+                inventorySweep, tabName, groundTypeDump, animDump, aoDump,
                 glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
     }
