@@ -277,11 +277,20 @@ public static class AoSurvey
     {
         ArgumentNullException.ThrowIfNull(entry);
 
+        // A QUOTED VALUE IS NOT ONE THING. Every attached_object in the game names a SOCKET and
+        // then a file, both inside the one pair of quotes:
+        //
+        //     attached_object = "eye_L Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao"
+        //
+        // Taken whole, that is a path no install has, and the second survey asked for 3262 files
+        // and found 1852 - the 2289 attachments were failing as a body. The remark on Looks said
+        // "no spaces in it" while the code never checked, which is the shape of mistake that
+        // survives review: the comment was right and the code was not.
         if (entry.Kind == AoValueKind.Quoted)
         {
-            if (Looks(entry.Value))
+            if (Path(entry.Value) is { Length: > 0 } one && Looks(one))
             {
-                yield return entry.Value;
+                yield return one;
             }
 
             yield break;
@@ -477,7 +486,60 @@ public static class AoSurvey
         }
     }
 
-    /// <summary>Whether a string is plausibly a path: it has an extension and no spaces in it.</summary>
+    /// <summary>
+    /// The path inside a quoted value, which may have a socket name in front of it.
+    /// </summary>
+    /// <remarks>
+    /// FROM THE FIRST WORD THAT HAS A SLASH IN IT, TO THE END - a rule with exactly two shapes to
+    /// satisfy, and it is the second that rules out the obvious one:
+    ///
+    ///     "eye_L Metadata/Effects/…/eye_glow.ao"                  socket, then a path
+    ///     "Audio/Sound Effects/…/BodyBarrierIdle.loop.ogg"        one path, WITH A SPACE IN IT
+    ///
+    /// Splitting on whitespace and keeping the path-shaped pieces handles the first and destroys
+    /// the second: "Audio/Sound" and "Effects/…/…ogg" are two halves of one name. A socket is
+    /// never a path - every one in the data is a bone or a slot, eye_L, hip_jntBnd, &lt;root&gt; -
+    /// so the slash is what separates them, and everything past it belongs to the file.
+    ///
+    /// THE COMMENT HERE USED TO SAY "no spaces in it" while the code never checked, and making
+    /// the code agree with it is what turned up the second shape: every .ogg in the sample
+    /// disappeared at once. The comment was wrong about the game, and the code had been right by
+    /// omission.
+    /// </remarks>
+    public static string Path(string? value)
+    {
+        if (value is not { Length: > 0 })
+        {
+            return string.Empty;
+        }
+
+        var from = 0;
+        while (from < value.Length)
+        {
+            int space = value.IndexOf(' ', from);
+            int end = space < 0 ? value.Length : space;
+
+            if (value.AsSpan(from, end - from).Contains('/'))
+            {
+                return value[from..].Trim();
+            }
+
+            if (space < 0)
+            {
+                break;
+            }
+
+            from = space + 1;
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>Whether a string is plausibly a path: it has a folder and an extension.</summary>
+    /// <remarks>
+    /// NO RULE ABOUT SPACES, deliberately - see <see cref="Path"/>. "Audio/Sound Effects/…" is a
+    /// real folder in the game and a check for whitespace here silently drops every sound file.
+    /// </remarks>
     private static bool Looks(string said)
         => said.Length is > 3 and < 512
             && said.Contains('/', StringComparison.Ordinal)
