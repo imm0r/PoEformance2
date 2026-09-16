@@ -24,12 +24,18 @@ namespace PoEformance.Features;
 /// against a real install at runtime. <see cref="Say"/> reports which way it went per table, so a
 /// layout that has stopped fitting says so rather than producing a table of rubbish.
 ///
-/// AND THE SHIPPED EXPORT IS THE OTHER CHECK. Two entirely separate routes to the same 2733
-/// monsters - a Python tool over hand-exported CSVs, and this reader over the install's own bytes
-/// - agreeing is the strongest evidence available that either is right, which is exactly the
-/// argument <see cref="Game.Components.StatDescriptions.Against"/> makes for the stat wordings.
-/// <see cref="Against"/> reports it rather than asserting it: this runs on somebody's machine
-/// during a league, and an install that has moved on from the export is the expected case.
+/// ALL EIGHT AGREED on a live 0.5.5 client, 2026-09-16 - see data/monster-tables.json, which
+/// carries the row counts. That is what the five install-only layouts had been waiting for.
+///
+/// AND THE SHIPPED EXPORT IS THE OTHER CHECK. Two entirely separate routes to the same monsters -
+/// a Python tool over hand-exported CSVs, and this reader over the install's own bytes - agreeing
+/// is the strongest evidence available that either is right, which is exactly the argument
+/// <see cref="Game.Components.StatDescriptions.Against"/> makes for the stat wordings. On that
+/// same run: 2792 monsters here against the export's 2733, with 59 the export never knew about,
+/// NONE lost, and 9 of the 2733 shared paths differing on name, type or skill count - the export
+/// being out of date rather than either being wrong. <see cref="Against"/> reports it rather than
+/// asserting it: this runs on somebody's machine during a league, and an install that has moved on
+/// from the export is the expected case.
 /// </remarks>
 public sealed class MonsterTables
 {
@@ -203,6 +209,19 @@ public sealed class MonsterTables
     /// ON THE MODIFIER IDS AND NOT THEIR STAT LISTS, deliberately: the export reads four of the
     /// eight stat slots (see <see cref="StatSlots"/>), so a monster whose modifier uses the upper
     /// four disagrees here for a reason that is this reader being MORE complete.
+    ///
+    /// AND SEPARATELY ON THE NAMES THE ROW NUMBERS RESOLVE TO, which is a different question with a
+    /// much worse answer. The first live run made the gap plain: every used subset matched the
+    /// export exactly - 185 tags, 1214 types, 37 blood types, 19 resistance profiles - and that
+    /// proves nothing about the numbering, because a table whose rows have SHIFTED still has 185
+    /// of them in use. Tags had grown from 1327 rows to 1339 between the export and that client;
+    /// appended, every number still means what it meant, and inserted, every tag on every monster
+    /// silently became a different tag.
+    ///
+    /// So where the two agree on the row NUMBERS a monster carries, the names those numbers reach
+    /// are compared - and only there, so that a monster which really did gain a tag is not counted
+    /// as a table that moved. A count here above zero means a reference table has been renumbered,
+    /// which is the one finding in this report that is nobody's stale export.
     /// </remarks>
     public static IReadOnlyList<string> Against(MonsterVarieties read, MonsterVarieties? shipped)
     {
@@ -215,6 +234,7 @@ public sealed class MonsterTables
 
         var only = new List<string>();
         var differ = new List<string>();
+        var renumbered = new List<string>();
         var shared = 0;
 
         foreach ((string path, MonsterVariety one) in read.All)
@@ -236,6 +256,11 @@ public sealed class MonsterTables
             {
                 differ.Add(path);
             }
+
+            if (Renumbered(read, shipped, one, had) is { Length: > 0 } moved)
+            {
+                renumbered.Add($"{path}: {moved}");
+            }
         }
 
         var lines = new List<string>
@@ -243,9 +268,24 @@ public sealed class MonsterTables
             $"  against data/monster-varieties.json: {shared} of {read.Count} paths in both,"
             + $" {only.Count} only in the install, {shipped.Count - shared} only in the export,"
             + $" {differ.Count} of the shared ones differ on name, type or skill count",
+
+            renumbered.Count == 0
+                ? "  and every row number the two share resolves to the same name - no reference"
+                  + " table has been renumbered"
+                : $"  AND {renumbered.Count} share a row number that resolves to a DIFFERENT name -"
+                  + " a reference table has been renumbered, which is not a stale export",
         };
 
-        foreach (string path in differ.Take(4))
+        foreach (string moved in renumbered.Take(8))
+        {
+            lines.Add($"    {moved}");
+        }
+
+        // EIGHT RATHER THAN FOUR, because four was not enough to see the shape: the first live run
+        // reported nine differences and showed four, two of which were the same trailing-space
+        // fault. A drift that moved a column would report thousands, and eight is still a line
+        // somebody reads rather than a wall they scroll past.
+        foreach (string path in differ.Take(8))
         {
             MonsterVariety got = read.Find(path)!;
             MonsterVariety had = shipped.Find(path)!;
@@ -263,6 +303,80 @@ public sealed class MonsterTables
         static string Show(MonsterVariety one)
             => $"name {(one.Name is { Length: > 0 } named ? named : "-")}, type {one.Type}, {one.SkillCount} skills";
     }
+
+    /// <summary>
+    /// Where the same row number reaches a different name in the two tables, or empty.
+    /// </summary>
+    /// <remarks>
+    /// COMPARED ONLY WHERE THE ROW NUMBERS THEMSELVES AGREE, which is what makes this mean
+    /// anything. A monster that really did gain a tag carries a different list of numbers, and
+    /// counting that as a renumbering would bury the one case this is for under the ordinary churn
+    /// of a patch. Where the numbers are identical, any difference in what they resolve to can
+    /// only be the table behind them having moved.
+    /// </remarks>
+    private static string Renumbered(
+        MonsterVarieties read, MonsterVarieties shipped, MonsterVariety one, MonsterVariety had)
+    {
+        var moved = new List<string>();
+
+        string blood = read.BloodName(one);
+        string was = shipped.BloodName(had);
+        if (one.Blood == had.Blood && blood.Length > 0 && was.Length > 0 && blood != was)
+        {
+            moved.Add($"blood #{one.Blood} is {blood} here and {was} there");
+        }
+
+        if (Same(one.Tags, had.Tags))
+        {
+            Differs(moved, "tags", read.TagsOf(one), shipped.TagsOf(had));
+        }
+
+        if (Same(one.Effects, had.Effects))
+        {
+            Differs(moved, "skills", read.Skills(one), shipped.Skills(had));
+        }
+
+        return string.Join("; ", moved);
+    }
+
+    /// <summary>
+    /// Records a difference between two name lists, ignoring wherever either side has no name.
+    /// </summary>
+    /// <remarks>
+    /// A NAME AGAINST A ROW NUMBER IS NOT EVIDENCE OF ANYTHING. The resolvers hand back "#1" for a
+    /// row they cannot name, so an export built without its reference tables - which is a real
+    /// state, they were each optional - would report every monster it has as renumbered. That is a
+    /// check whose alarm fires on the one thing it is not about. Only two different NAMES for the
+    /// same row can be a table that moved.
+    /// </remarks>
+    private static void Differs(
+        List<string> moved, string what, IEnumerable<string> here, IEnumerable<string> there)
+    {
+        string[] now = [.. here];
+        string[] was = [.. there];
+        if (now.Length != was.Length)
+        {
+            return;
+        }
+
+        var seen = new List<string>();
+        for (var i = 0; i < now.Length; i++)
+        {
+            if (!now[i].StartsWith('#') && !was[i].StartsWith('#') && now[i] != was[i])
+            {
+                seen.Add($"{now[i]} here and {was[i]} there");
+            }
+        }
+
+        if (seen.Count > 0)
+        {
+            moved.Add($"{what} {string.Join(", ", seen.Take(3))}");
+        }
+    }
+
+    /// <summary>Whether two row lists hold the same numbers in the same order.</summary>
+    private static bool Same(IReadOnlyList<int>? one, IReadOnlyList<int>? other)
+        => (one ?? []).SequenceEqual(other ?? []);
 
     private static (LoadedTable? Table, string Why) Optional(
         GameFiles files, QuestTableLayouts layouts, string table, string? arrayColumn, List<string> said)
@@ -297,7 +411,7 @@ public sealed class MonsterTables
 
         for (int row = 0; row < file.Rows; row++)
         {
-            string id = file.Text(row, at.Of("MonsterVarieties", "Id"));
+            string id = Words(file, row, at.Of("MonsterVarieties", "Id"));
 
             // "Any" IS A SENTINEL AND NOT A MONSTER - the one Id in the table that is not a
             // metadata path, and one no entity could ever carry.
@@ -306,8 +420,8 @@ public sealed class MonsterTables
                 continue;
             }
 
-            string name = file.Text(row, at.Of("MonsterVarieties", "Name"));
-            string built = file.Text(row, at.Of("MonsterVarieties", "BaseMonsterTypeIndex"));
+            string name = Words(file, row, at.Of("MonsterVarieties", "Name"));
+            string built = Words(file, row, at.Of("MonsterVarieties", "BaseMonsterTypeIndex"));
 
             byPath[id] = new MonsterVariety(
 
@@ -338,7 +452,7 @@ public sealed class MonsterTables
                 // which is also what refuses a row number that table cannot hold.
                 Quest: Row(file.Reference(row, at.Of("MonsterVarieties", "Questflag")), int.MaxValue),
                 Poise: file.F32(row, at.Of("MonsterVarieties", "PoiseThreshold")),
-                Stance: Empty(file.Text(row, at.Of("MonsterVarieties", "Stance"))),
+                Stance: Empty(Words(file, row, at.Of("MonsterVarieties", "Stance"))),
                 Boss: file.Bool(row, at.Of("MonsterVarieties", "BossHealthBar")),
 
                 // A base equal to the monster's own id says nothing, which is why the export
@@ -372,7 +486,7 @@ public sealed class MonsterTables
                 continue;
             }
 
-            string id = types.File.Text(row, at.Of("MonsterTypes", "Id"));
+            string id = Words(types.File, row, at.Of("MonsterTypes", "Id"));
             if (id.Length == 0)
             {
                 continue;
@@ -416,7 +530,7 @@ public sealed class MonsterTables
                 continue;
             }
 
-            string id = mods.File.Text(row, at.Of("Mods", "Id"));
+            string id = Words(mods.File, row, at.Of("Mods", "Id"));
             if (id.Length == 0)
             {
                 continue;
@@ -431,7 +545,7 @@ public sealed class MonsterTables
                     continue;
                 }
 
-                string stat = stats.File.Text(statRow, at.Of("Stats", "Id"));
+                string stat = Words(stats.File, statRow, at.Of("Stats", "Id"));
                 if (stat.Length == 0)
                 {
                     continue;
@@ -513,7 +627,7 @@ public sealed class MonsterTables
                 continue;
             }
 
-            if (table.File.Text(row, idAt) is { Length: > 0 } id)
+            if (Words(table.File, row, idAt) is { Length: > 0 } id)
             {
                 named[row] = id;
             }
@@ -549,11 +663,24 @@ public sealed class MonsterTables
 
         string[] paths = [.. file
             .References(row, offset, elementWidth: 8)
-            .Select(one => file.TextAt(one.First))
+            .Select(one => file.TextAt(one.First).Trim())
             .Where(one => one.Length > 0)];
 
         return paths.Length > 0 ? paths : null;
     }
+
+    /// <summary>
+    /// A text column, trimmed.
+    /// </summary>
+    /// <remarks>
+    /// THE GAME'S OWN DATA HAS TRAILING SPACES IN IT, which is not a guess: read against a live
+    /// 0.5.5 install, two of the nine monsters this route and the export disagree about are
+    /// "Gulzal, the Living Furnace " - the difference is one space at the end, and the export's
+    /// generator trims where this did not. A trailing space carries nothing and costs plenty: it
+    /// is invisible on screen, it breaks a sort, it breaks a search for the name somebody can see,
+    /// and it reports a difference between two tables that hold the same name.
+    /// </remarks>
+    private static string Words(DatFile file, int row, int offset) => file.Text(row, offset).Trim();
 
     private static string? Empty(string text) => text.Length > 0 ? text : null;
 
