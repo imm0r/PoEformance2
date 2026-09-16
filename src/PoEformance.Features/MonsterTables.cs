@@ -24,12 +24,18 @@ namespace PoEformance.Features;
 /// against a real install at runtime. <see cref="Say"/> reports which way it went per table, so a
 /// layout that has stopped fitting says so rather than producing a table of rubbish.
 ///
-/// AND THE SHIPPED EXPORT IS THE OTHER CHECK. Two entirely separate routes to the same 2733
-/// monsters - a Python tool over hand-exported CSVs, and this reader over the install's own bytes
-/// - agreeing is the strongest evidence available that either is right, which is exactly the
-/// argument <see cref="Game.Components.StatDescriptions.Against"/> makes for the stat wordings.
-/// <see cref="Against"/> reports it rather than asserting it: this runs on somebody's machine
-/// during a league, and an install that has moved on from the export is the expected case.
+/// ALL EIGHT AGREED on a live 0.5.5 client, 2026-09-16 - see data/monster-tables.json, which
+/// carries the row counts. That is what the five install-only layouts had been waiting for.
+///
+/// AND THE SHIPPED EXPORT IS THE OTHER CHECK. Two entirely separate routes to the same monsters -
+/// a Python tool over hand-exported CSVs, and this reader over the install's own bytes - agreeing
+/// is the strongest evidence available that either is right, which is exactly the argument
+/// <see cref="Game.Components.StatDescriptions.Against"/> makes for the stat wordings. On that
+/// same run: 2792 monsters here against the export's 2733, with 59 the export never knew about,
+/// NONE lost, and 9 of the 2733 shared paths differing on name, type or skill count - the export
+/// being out of date rather than either being wrong. <see cref="Against"/> reports it rather than
+/// asserting it: this runs on somebody's machine during a league, and an install that has moved on
+/// from the export is the expected case.
 /// </remarks>
 public sealed class MonsterTables
 {
@@ -245,7 +251,11 @@ public sealed class MonsterTables
             + $" {differ.Count} of the shared ones differ on name, type or skill count",
         };
 
-        foreach (string path in differ.Take(4))
+        // EIGHT RATHER THAN FOUR, because four was not enough to see the shape: the first live run
+        // reported nine differences and showed four, two of which were the same trailing-space
+        // fault. A drift that moved a column would report thousands, and eight is still a line
+        // somebody reads rather than a wall they scroll past.
+        foreach (string path in differ.Take(8))
         {
             MonsterVariety got = read.Find(path)!;
             MonsterVariety had = shipped.Find(path)!;
@@ -297,7 +307,7 @@ public sealed class MonsterTables
 
         for (int row = 0; row < file.Rows; row++)
         {
-            string id = file.Text(row, at.Of("MonsterVarieties", "Id"));
+            string id = Words(file, row, at.Of("MonsterVarieties", "Id"));
 
             // "Any" IS A SENTINEL AND NOT A MONSTER - the one Id in the table that is not a
             // metadata path, and one no entity could ever carry.
@@ -306,8 +316,8 @@ public sealed class MonsterTables
                 continue;
             }
 
-            string name = file.Text(row, at.Of("MonsterVarieties", "Name"));
-            string built = file.Text(row, at.Of("MonsterVarieties", "BaseMonsterTypeIndex"));
+            string name = Words(file, row, at.Of("MonsterVarieties", "Name"));
+            string built = Words(file, row, at.Of("MonsterVarieties", "BaseMonsterTypeIndex"));
 
             byPath[id] = new MonsterVariety(
 
@@ -338,7 +348,7 @@ public sealed class MonsterTables
                 // which is also what refuses a row number that table cannot hold.
                 Quest: Row(file.Reference(row, at.Of("MonsterVarieties", "Questflag")), int.MaxValue),
                 Poise: file.F32(row, at.Of("MonsterVarieties", "PoiseThreshold")),
-                Stance: Empty(file.Text(row, at.Of("MonsterVarieties", "Stance"))),
+                Stance: Empty(Words(file, row, at.Of("MonsterVarieties", "Stance"))),
                 Boss: file.Bool(row, at.Of("MonsterVarieties", "BossHealthBar")),
 
                 // A base equal to the monster's own id says nothing, which is why the export
@@ -372,7 +382,7 @@ public sealed class MonsterTables
                 continue;
             }
 
-            string id = types.File.Text(row, at.Of("MonsterTypes", "Id"));
+            string id = Words(types.File, row, at.Of("MonsterTypes", "Id"));
             if (id.Length == 0)
             {
                 continue;
@@ -416,7 +426,7 @@ public sealed class MonsterTables
                 continue;
             }
 
-            string id = mods.File.Text(row, at.Of("Mods", "Id"));
+            string id = Words(mods.File, row, at.Of("Mods", "Id"));
             if (id.Length == 0)
             {
                 continue;
@@ -431,7 +441,7 @@ public sealed class MonsterTables
                     continue;
                 }
 
-                string stat = stats.File.Text(statRow, at.Of("Stats", "Id"));
+                string stat = Words(stats.File, statRow, at.Of("Stats", "Id"));
                 if (stat.Length == 0)
                 {
                     continue;
@@ -513,7 +523,7 @@ public sealed class MonsterTables
                 continue;
             }
 
-            if (table.File.Text(row, idAt) is { Length: > 0 } id)
+            if (Words(table.File, row, idAt) is { Length: > 0 } id)
             {
                 named[row] = id;
             }
@@ -549,11 +559,24 @@ public sealed class MonsterTables
 
         string[] paths = [.. file
             .References(row, offset, elementWidth: 8)
-            .Select(one => file.TextAt(one.First))
+            .Select(one => file.TextAt(one.First).Trim())
             .Where(one => one.Length > 0)];
 
         return paths.Length > 0 ? paths : null;
     }
+
+    /// <summary>
+    /// A text column, trimmed.
+    /// </summary>
+    /// <remarks>
+    /// THE GAME'S OWN DATA HAS TRAILING SPACES IN IT, which is not a guess: read against a live
+    /// 0.5.5 install, two of the nine monsters this route and the export disagree about are
+    /// "Gulzal, the Living Furnace " - the difference is one space at the end, and the export's
+    /// generator trims where this did not. A trailing space carries nothing and costs plenty: it
+    /// is invisible on screen, it breaks a sort, it breaks a search for the name somebody can see,
+    /// and it reports a difference between two tables that hold the same name.
+    /// </remarks>
+    private static string Words(DatFile file, int row, int offset) => file.Text(row, offset).Trim();
 
     private static string? Empty(string text) => text.Length > 0 ? text : null;
 

@@ -70,7 +70,11 @@ public class MonsterTablesTests
         monsters
             .Text(0, At(layouts, "MonsterVarieties", "Id"), "Any")
             .Text(1, At(layouts, "MonsterVarieties", "Id"), "Metadata/Monsters/Test/Shieldbearer")
-            .Text(1, At(layouts, "MonsterVarieties", "Name"), "Test Shieldbearer")
+
+            // WITH A TRAILING SPACE, because the game's own data has them: read against a live
+            // 0.5.5 install, "Gulzal, the Living Furnace " is spelled exactly that way and it was
+            // two of the nine monsters this route and the export disagreed about.
+            .Text(1, At(layouts, "MonsterVarieties", "Name"), "Test Shieldbearer ")
             .Text(1, At(layouts, "MonsterVarieties", "BaseMonsterTypeIndex"), "Metadata/Monsters/Test/Base")
             .Text(1, At(layouts, "MonsterVarieties", "Stance"), "stance2")
             .Reference(1, At(layouts, "MonsterVarieties", "MonsterType"), 1)
