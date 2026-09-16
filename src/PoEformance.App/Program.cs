@@ -2004,6 +2004,22 @@ internal static class Program
 
             atlas.LearnStatDescriptions(said);
 
+            // AND THE UNIQUES, off the same background task and for the same reason: three tables
+            // out of the install, joined, which is file work rather than memory work and has no
+            // business on the reader thread. It needs no part of the walk above - a path lookup is
+            // a hash, not a spell-out - so it rides here purely because this is the thread that is
+            // already allowed to be slow. See Features/UniqueNames for why the install at all:
+            // none of its three tables is in the loader's file table, so the route that reached
+            // BaseItemTypes and Mods does not reach them.
+            PoEformance.Features.UniqueNames joined = PoEformance.Features.UniqueNames.Read(
+                installed, PoEformance.Features.QuestTableLayouts.Load(FindDataFile("item-tables.json")));
+
+            itemNames.Learn(uniques: joined.ByArt);
+            foreach (string line in joined.Say)
+            {
+                Console.WriteLine(line);
+            }
+
             // AND THE ITEM TABLES TAKE THE SAME SENTENCES, which costs nothing here because they
             // have already been read. They were keyed by row index inside item-stats.json and are
             // keyed by stat id here, which is the half of the join that survives a patch: the

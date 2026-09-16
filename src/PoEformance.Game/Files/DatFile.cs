@@ -290,6 +290,21 @@ public sealed class DatFile
         return offset + width <= RowSize && at + width <= _bytes.Length ? at : -1;
     }
 
+    /// <summary>
+    /// A one-byte column, which is what the schema's <c>bool</c> is.
+    /// </summary>
+    /// <remarks>
+    /// NOT I32 WITH A MASK, and the difference is a real read off the end of a row rather than a
+    /// nicety: UniqueStashLayout is 83 bytes and its IsAlternateArt sits at +0x52, the LAST byte -
+    /// so four bytes there reach into the row after it, and At would refuse the read and hand back
+    /// a zero that reads exactly like "no". A column this narrow needs a width this narrow.
+    /// </remarks>
+    public bool Bool(int row, int offset)
+    {
+        int at = At(row, offset, 1);
+        return at >= 0 && _bytes[at] != 0;
+    }
+
     /// <summary>A 32-bit column.</summary>
     public int I32(int row, int offset)
     {

@@ -81,6 +81,11 @@ public sealed class ItemNames
     private BaseItemTable? _baseItems;
     private ModTable? _modNames;
 
+    // A plain map rather than a reader, because the three tables it is joined out of are read
+    // from the INSTALL and that machinery lives a layer up - see Features/UniqueNames. What
+    // crosses down here is the answer, which needs nothing from that layer to be useful.
+    private IReadOnlyDictionary<string, string>? _liveUniques;
+
     private ItemNames(
         IReadOnlyDictionary<int, StatMeaning> stats,
         IReadOnlyDictionary<string, StatMeaning> worded,
@@ -190,11 +195,16 @@ public sealed class ItemNames
     /// <param name="sentences">The game's stat descriptions, or null to leave what is there.</param>
     /// <param name="baseItems">The game's BaseItemTypes.dat, or null to leave what is there.</param>
     /// <param name="modNames">The game's Mods.dat, or null to leave what is there.</param>
+    /// <param name="uniques">
+    /// Art id to unique name, joined out of the install's own tables, or null to leave what is
+    /// there. A map rather than a reader because that join happens a layer up.
+    /// </param>
     public void Learn(
         Components.StatTable? table = null,
         Components.StatDescriptions? sentences = null,
         BaseItemTable? baseItems = null,
-        ModTable? modNames = null)
+        ModTable? modNames = null,
+        IReadOnlyDictionary<string, string>? uniques = null)
     {
         if (table is not null)
         {
@@ -214,6 +224,11 @@ public sealed class ItemNames
         if (modNames is { Named: > 0 })
         {
             Volatile.Write(ref _modNames, modNames);
+        }
+
+        if (uniques is { Count: > 0 })
+        {
+            Volatile.Write(ref _liveUniques, uniques);
         }
     }
 
@@ -252,8 +267,14 @@ public sealed class ItemNames
                     ? $"data/item-names.json ({_mods.Count} mods)"
                     : "nowhere";
 
+            string art = Volatile.Read(ref _liveUniques) is { Count: > 0 } joined
+                ? $"the install ({joined.Count} uniques)"
+                : _uniques.Count > 0
+                    ? $"data/unique_ivi_name_map.tsv ({_uniques.Count} uniques)"
+                    : "nowhere";
+
             return $"names from {names}; sentences from {words}; base types from {kinds};"
-                + $" affixes from {affixes}";
+                + $" affixes from {affixes}; uniques from {art}";
         }
     }
 
@@ -325,7 +346,22 @@ public sealed class ItemNames
     /// extracted - the item keeps its base name rather than acquiring a wrong one.
     /// </remarks>
     public string Unique(string? iviId)
-        => iviId is { Length: > 0 } && _uniques.TryGetValue(iviId, out string? known) ? known : string.Empty;
+    {
+        if (iviId is not { Length: > 0 })
+        {
+            return string.Empty;
+        }
+
+        // The install first, for the same reason as the base types and the mods: the key is the
+        // art's own id, which the game does not renumber, so the shipped map does not go wrong -
+        // it goes short, by exactly the uniques a league has added since it was exported.
+        if (Volatile.Read(ref _liveUniques)?.TryGetValue(iviId, out string? live) == true)
+        {
+            return live;
+        }
+
+        return _uniques.TryGetValue(iviId, out string? known) ? known : string.Empty;
+    }
 
     /// <summary>
     /// Loads the tables, or returns <see cref="Empty"/> when they are missing or unreadable.
