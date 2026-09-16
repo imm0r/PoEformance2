@@ -311,6 +311,63 @@ public sealed class MonsterVarietiesTests
     }
 
     [Fact]
+    public void EVERYROWNUMBERInTheTableResolvesToSomething()
+    {
+        // THE REFERENCE BOOK'S WHOLE PREMISE, measured rather than hoped for. Seven columns here
+        // hold row numbers into other tables - type, blood, tags, effects, mods, mods2 and
+        // specialMods - and a book that names six of them and prints "#4211" for the seventh is
+        // not a book. Every one of them lands: 2733 types, 2733 bloods, 21133 tags, 15836 skills
+        // and 2530 modifiers, none missing.
+        //
+        // IT IS ALSO THE GUARD FOR WHAT COMES NEXT. The export is to be replaced by a read of the
+        // install's own files, where a table can simply be absent - and the symptom of that is
+        // not a crash. It is a book quietly one column shorter, which nobody notices.
+        MonsterVarieties table = Shipped();
+
+        var missing = new List<string>();
+        var seen = 0;
+
+        foreach ((string path, MonsterVariety one) in table.All)
+        {
+            seen += 2 + (one.Tags?.Count ?? 0) + (one.Effects?.Count ?? 0)
+                + (one.Mods?.Count ?? 0) + (one.Mods2?.Count ?? 0) + (one.SpecialMods?.Count ?? 0);
+
+            if (table.Kind(one) is null)
+            {
+                missing.Add($"{path}: type #{one.Type}");
+            }
+
+            if (table.BloodName(one).Length == 0)
+            {
+                missing.Add($"{path}: blood #{one.Blood}");
+            }
+
+            // The resolvers hand back "#row" for anything they cannot name - see Skills and
+            // TagsOf - so that spelling IS the report, and there is nothing else to compare to.
+            missing.AddRange(table.TagsOf(one).Where(Unresolved).Select(row => $"{path}: tag {row}"));
+            missing.AddRange(table.Skills(one).Where(Unresolved).Select(row => $"{path}: skill {row}"));
+
+            // Modifiers is the one resolver that DROPS what it cannot name, so counting what it
+            // yields against what the columns hold is the only way to see a gap from out here.
+            int carried = (one.Mods?.Count ?? 0) + (one.Mods2?.Count ?? 0) + (one.SpecialMods?.Count ?? 0);
+            int named = table.Modifiers(one).Count();
+            if (named != carried)
+            {
+                missing.Add($"{path}: {carried - named} of {carried} modifiers");
+            }
+        }
+
+        // A FLOOR, so that an empty table cannot satisfy this by having nothing to fail on -
+        // which is exactly the check that is worse than no check at all.
+        Assert.True(seen > 40_000, $"only {seen} references were checked, so this proved nothing");
+        Assert.True(
+            missing.Count == 0,
+            $"{missing.Count} references resolve to nothing, e.g. {string.Join("; ", missing.Take(8))}");
+
+        static bool Unresolved(string named) => named.StartsWith('#');
+    }
+
+    [Fact]
     public void EVERYCOLUMNTheGeneratorKeepsSurvivesTheRoundTrip()
     {
         // WHAT THIS CATCHES: a column quietly lost between the generator and here. Renaming a

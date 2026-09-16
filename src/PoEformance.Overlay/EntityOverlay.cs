@@ -1995,6 +1995,32 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>
+    /// Adds the monster reference book - the whole table, rather than the thing in front of you.
+    /// </summary>
+    /// <remarks>
+    /// BESIDE THE BROWSER AND NOT INSIDE IT, because it asks the opposite question. The browser
+    /// starts from an entity on screen and looks up what the table says about it; the book starts
+    /// from the table and lets somebody read it - which monsters cast this skill, what a boss
+    /// carries, what "AbyssMonsterBase" is built on. Nothing has to be in the area for it to work,
+    /// so it does not take the inspector and can be attached on its own.
+    ///
+    /// The table is read through a callback rather than captured: <see cref="Monsters"/> is set by
+    /// whoever wires this up and the Attach calls have no fixed order, so a captured Empty would
+    /// look exactly like a build with no table at all.
+    /// </remarks>
+    public void AttachMonsterBook(bool visible = false)
+    {
+        var window = new MonsterBookWindow(() => Monsters);
+        _tools.Add(
+            91, "monster-book", "Monster Book", window.DrawTab,
+            page: Entities, pageLabel: EntitiesLabel);
+        if (visible)
+        {
+            _tools.Show("monster-book");
+        }
+    }
+
+    /// <summary>
     /// Adds the map's points of interest and the route to a chosen one.
     /// </summary>
     /// <remarks>

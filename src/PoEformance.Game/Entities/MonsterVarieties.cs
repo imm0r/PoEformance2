@@ -289,6 +289,19 @@ public sealed class MonsterVarieties
         }
     }
 
+    /// <summary>
+    /// Every monster the table knows, by the path it is keyed on.
+    /// </summary>
+    /// <remarks>
+    /// FOR READING THE TABLE RATHER THAN QUERYING IT. Everything else here answers a question
+    /// about one entity that is in front of the player - <see cref="Find"/> takes the path off
+    /// something on screen. A reference book is the other way round: nothing is in front of
+    /// anybody, and the whole table is the subject. Handed out as the dictionary rather than
+    /// copied, because two and a half thousand rows re-enumerated per keystroke is the cost a
+    /// search box pays if this makes a list every time it is asked.
+    /// </remarks>
+    public IReadOnlyDictionary<string, MonsterVariety> All => _byPath;
+
     /// <summary>What the table says about the thing at this path, or null.</summary>
     public MonsterVariety? Find(string? entityPath)
     {
