@@ -23,6 +23,10 @@ public sealed record AoRead(string Path, AnimatedObject Object, int Depth);
 /// <param name="Extensions">Every file extension referenced from a value, to how often.</param>
 /// <param name="Animations">What the animation entries' values were, to how often.</param>
 /// <param name="Faults">The parse faults, with the file that produced each.</param>
+/// <param name="Inside">
+/// For a few files of each referenced type, what THAT file turned out to reference - see
+/// <see cref="AoSurvey.Peek"/>. It is the hop the .ao files cannot answer about themselves.
+/// </param>
 /// <param name="CutShort">Whether the walk hit <see cref="AoSurvey.MostFiles"/> and stopped.</param>
 public sealed record AoSurveyResult(
     int Monsters,
@@ -35,12 +39,13 @@ public sealed record AoSurveyResult(
     IReadOnlyDictionary<string, int> Extensions,
     IReadOnlyDictionary<string, int> Animations,
     IReadOnlyList<string> Faults,
+    IReadOnlyList<string> Inside,
     bool CutShort = false)
 {
     /// <summary>Nothing walked - no install, or no monster names a file.</summary>
     public static AoSurveyResult Nothing { get; }
         = new(0, 0, 0, 0, 0, new Dictionary<string, int>(), new Dictionary<string, int>(),
-            new Dictionary<string, int>(), new Dictionary<string, int>(), []);
+            new Dictionary<string, int>(), new Dictionary<string, int>(), [], []);
 }
 
 /// <summary>
@@ -124,6 +129,7 @@ public static class AoSurvey
         var extensions = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         var animations = new Dictionary<string, int>(StringComparer.Ordinal);
         var faults = new List<string>();
+        var samples = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var queue = new Queue<(string Path, int Depth)>();
@@ -195,18 +201,53 @@ public static class AoSurvey
                 Note(structs, block.Name);
                 Note(keys, $"{block.Name}.{entry.Key}");
 
-                // THE ANIMATION'S VALUE IS ITS NAME, which is the whole reason the Stance question
-                // is being asked here. Its CHILDREN are keyframes keyed by time - those are not
-                // names and would swamp the count.
-                if (string.Equals(entry.Key, "animation", StringComparison.Ordinal)
-                    && entry.Value is { Length: > 0 })
+                // THE NAMES ARE IN THE PAYLOAD, which the first survey got wrong. It counted the
+                // value of an "animation" entry and found eight names over the whole install -
+                // that key is rare. What a monster's animations are actually called is inside the
+                // JSON of an "animations" entry, thousands of them:
+                //
+                //     animations = '[ { "name": "attack_long_sword_shield_01a", "events": [ …
+                //
+                // Eight names was not a finding about the game. It was a finding about which key
+                // was being read, and it is the count the Stance question turns on.
+                if (entry.Value is { Length: > 0 })
                 {
-                    Note(animations, entry.Value);
+                    if (string.Equals(entry.Key, "animation", StringComparison.Ordinal))
+                    {
+                        Note(animations, entry.Value);
+                    }
+                    else if (entry.Kind == AoValueKind.Payload)
+                    {
+                        foreach (string name in Names(entry.Value))
+                        {
+                            Note(animations, name);
+                        }
+                    }
                 }
 
                 foreach (string reference in Referenced(entry))
                 {
-                    Note(extensions, Extension(reference));
+                    string extension = Extension(reference);
+                    Note(extensions, extension);
+
+                    // A FEW OF EACH TYPE, kept so the next hop can be looked at in the same run.
+                    // Not the .ao files - those are walked properly above, and peeking at one
+                    // would report what this reader already read.
+                    if (extension.Length > 0
+                        && !string.Equals(extension, AnimatedObject.Suffix, StringComparison.Ordinal))
+                    {
+                        if (!samples.TryGetValue(extension, out List<string>? into))
+                        {
+                            into = [];
+                            samples[extension] = into;
+                        }
+
+                        string bare = Bare(reference);
+                        if (into.Count < PeekEach && !into.Contains(bare, StringComparer.OrdinalIgnoreCase))
+                        {
+                            into.Add(bare);
+                        }
+                    }
 
                     if (depth < MostHops
                         && reference.EndsWith(".ao", StringComparison.OrdinalIgnoreCase)
@@ -220,6 +261,7 @@ public static class AoSurvey
 
         return new AoSurveyResult(
             monsters, withFiles, asked, read, clean, structs, keys, extensions, animations, faults,
+            Peek(files, samples),
             CutShort: asked >= MostFiles && queue.Count > 0);
     }
 
@@ -274,16 +316,202 @@ public static class AoSurvey
         }
     }
 
+    /// <summary>How many files of each referenced type are opened to see what is in them.</summary>
+    public const int PeekEach = 3;
+
+    /// <summary>
+    /// Opens a few of the files the .ao files POINT AT, and says what those point at in turn.
+    /// </summary>
+    /// <remarks>
+    /// THE HOP THE FIRST SURVEY COULD NOT MAKE, and the one the picture question turns on. That
+    /// run reported thirteen referenced file types and not one .dds among them, which reads like
+    /// "there is no texture" and is not what it says: a skin names a MESH and a MATERIAL -
+    ///
+    ///     skin      = "Art/Models/MONSTERS/BasicSkeleton/BasicSkeletonVar.sm"
+    ///     HipsShape = "Art/Models/…/Textures/ExpeditionSkeleton.mat:0"
+    ///
+    /// - and where the texture is named is inside one of those, which the .ao files cannot say.
+    ///
+    /// NOTHING IS ASSUMED ABOUT THEIR FORMAT. These are opened as bytes, decoded the way the
+    /// game's text files are, and scanned for anything shaped like a path. A binary file decodes
+    /// to rubbish and simply yields nothing, which is itself the finding: it means the next hop
+    /// needs a real reader rather than a scan. What comes back is reported by extension, so the
+    /// answer is a count rather than an opinion.
+    /// </remarks>
+    /// <param name="files">The open install.</param>
+    /// <param name="samples">A few paths of each type, as the walk collected them.</param>
+    public static IReadOnlyList<string> Peek(
+        GameFiles? files, IReadOnlyDictionary<string, List<string>>? samples)
+    {
+        if (files is null || samples is null || samples.Count == 0)
+        {
+            return [];
+        }
+
+        var said = new List<string>();
+        foreach ((string extension, List<string> paths) in samples.OrderBy(one => one.Key, StringComparer.Ordinal))
+        {
+            var found = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var opened = 0;
+            var text = 0;
+
+            foreach (string path in paths)
+            {
+                if (files.Read(path) is not { Length: > 0 } content)
+                {
+                    continue;
+                }
+
+                opened++;
+                string read = Files.StatDescriptionFiles.Decode(content);
+                var any = false;
+                foreach (string reference in Strings(read))
+                {
+                    any = true;
+                    Note(found, Extension(reference));
+                }
+
+                if (any)
+                {
+                    text++;
+                }
+            }
+
+            if (opened == 0)
+            {
+                continue;
+            }
+
+            said.Add(
+                found.Count == 0
+                    ? $"      {extension,-8} {opened} opened, nothing path-shaped inside"
+                        + " - binary, or it names nothing"
+                    : $"      {extension,-8} {opened} opened, {text} with paths inside -> "
+                        + string.Join(
+                            "  ",
+                            found.OrderByDescending(one => one.Value)
+                                .Take(6)
+                                .Select(one => $"{one.Key}:{Say(one.Value)}")));
+        }
+
+        return said;
+    }
+
+    /// <summary>
+    /// Anything inside a file that looks like a path, whatever the file's format.
+    /// </summary>
+    /// <remarks>
+    /// RUNS OF PRINTABLE CHARACTERS rather than quoted strings, because a quote is a text-format
+    /// habit and the next hop may not be one. A run is broken by anything unprintable, which is
+    /// what makes this work on a binary file that happens to store its paths as plain bytes -
+    /// and yield nothing at all on one that does not, which is the honest answer in that case.
+    /// </remarks>
+    private static IEnumerable<string> Strings(string content)
+    {
+        var from = -1;
+        for (var at = 0; at <= content.Length; at++)
+        {
+            char c = at < content.Length ? content[at] : '\0';
+            bool part = c is (>= (char)0x20 and < (char)0x7F) && c != '"' && c != ' ';
+
+            if (part)
+            {
+                if (from < 0)
+                {
+                    from = at;
+                }
+
+                continue;
+            }
+
+            if (from >= 0)
+            {
+                string said = content[from..at];
+                if (Looks(said))
+                {
+                    yield return said;
+                }
+
+                from = -1;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Every <c>"name": "…"</c> in a payload, which is what an animation is called.
+    /// </summary>
+    /// <remarks>
+    /// SCANNED RATHER THAN DESERIALISED, and not only because this ships AOT. The payloads are
+    /// described as JSON-LIKE, which is not the same as JSON - one of them held a backslash-escaped
+    /// quote in the middle of a value in the sample this was written against - and a parser that
+    /// threw on the first payload it disliked would lose every name in that file. A scan takes what
+    /// it recognises and steps over what it does not, which is the right failure for a measurement.
+    /// </remarks>
+    public static IEnumerable<string> Names(string payload)
+    {
+        ArgumentNullException.ThrowIfNull(payload);
+
+        const string Key = "\"name\"";
+        int at = payload.IndexOf(Key, StringComparison.Ordinal);
+        while (at >= 0)
+        {
+            int colon = at + Key.Length;
+            while (colon < payload.Length && (payload[colon] == ' ' || payload[colon] == '\t'))
+            {
+                colon++;
+            }
+
+            if (colon < payload.Length && payload[colon] == ':')
+            {
+                int open = payload.IndexOf('"', colon + 1);
+                int shut = open < 0 ? -1 : payload.IndexOf('"', open + 1);
+                if (open >= 0 && shut > open)
+                {
+                    yield return payload[(open + 1)..shut];
+                    at = payload.IndexOf(Key, shut, StringComparison.Ordinal);
+                    continue;
+                }
+            }
+
+            at = payload.IndexOf(Key, at + Key.Length, StringComparison.Ordinal);
+        }
+    }
+
     /// <summary>Whether a string is plausibly a path: it has an extension and no spaces in it.</summary>
     private static bool Looks(string said)
         => said.Length is > 3 and < 512
             && said.Contains('/', StringComparison.Ordinal)
             && Extension(said).Length > 1;
 
-    /// <summary>The extension, lowercased, or empty. Only the part after the LAST dot.</summary>
-    private static string Extension(string path)
+    /// <summary>
+    /// The extension, lowercased, or empty. Only the part after the LAST dot.
+    /// </summary>
+    /// <remarks>
+    /// A TRAILING ":n" IS CUT OFF FIRST, which the first survey over a real install is what found:
+    /// a skin names one material per shape, and it names it with an index -
+    ///
+    ///     HipsShape = "Art/Models/…/Textures/ExpeditionSkeleton.mat:0"
+    ///
+    /// - so the text after the last dot was "mat:0", the colon is not alphanumeric, and every one
+    /// of them was thrown away as not-a-path. The survey reported 16 .mat references beside 1683
+    /// .sm, while the detail dump of a single monster showed fourteen materials on one mesh. The
+    /// count was not small, it was a filter measuring itself.
+    ///
+    /// THE INDEX IS NOT PART OF THE FILE NAME - it selects within the file - so cutting it is also
+    /// what makes the path readable, which is what the next hop will need.
+    /// </remarks>
+    public static string Extension(string path)
     {
+        ArgumentNullException.ThrowIfNull(path);
+
+        int colon = path.LastIndexOf(':');
         int dot = path.LastIndexOf('.');
+        if (colon > dot && dot >= 0 && Digits(path, colon + 1))
+        {
+            path = path[..colon];
+        }
+
+        dot = path.LastIndexOf('.');
         if (dot < 0 || dot == path.Length - 1 || path.Length - dot > 8)
         {
             return string.Empty;
@@ -298,6 +526,35 @@ public static class AoSurvey
         }
 
         return path[dot..].ToLowerInvariant();
+    }
+
+    /// <summary>The path with any ":n" selector taken off, which is the file it names.</summary>
+    public static string Bare(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        int colon = path.LastIndexOf(':');
+        return colon > path.LastIndexOf('.') && colon >= 0 && Digits(path, colon + 1)
+            ? path[..colon]
+            : path;
+    }
+
+    private static bool Digits(string said, int from)
+    {
+        if (from >= said.Length)
+        {
+            return false;
+        }
+
+        for (int at = from; at < said.Length; at++)
+        {
+            if (!char.IsAsciiDigit(said[at]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static bool Hits(string path, string? name, string match)
@@ -353,6 +610,18 @@ public static class AoSurvey
         }
 
         Table(output, "referenced file types", result.Extensions, most);
+
+        // DIRECTLY UNDER THE TYPES THEY ARE ABOUT, because the two are one question: what the .ao
+        // files name, and what those files name in turn. A .dds that appears only here is still a
+        // .dds that a monster leads to.
+        if (result.Inside.Count > 0)
+        {
+            output.WriteLine("    and what a few of each of those hold:");
+            foreach (string line in result.Inside)
+            {
+                output.WriteLine(line);
+            }
+        }
         Table(output, "struct types", result.Structs, most);
         Table(output, "animation names", result.Animations, most);
         Table(output, "entry keys", result.Keys, most);

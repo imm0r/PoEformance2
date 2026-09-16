@@ -381,6 +381,103 @@ public class AnimatedObjectTests
         Assert.Contains("nothing to walk", said.ToString(), StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// The two shapes a real install turned up that neither reference describes.
+    /// </summary>
+    /// <remarks>
+    /// EVERY FAULT OF THE FIRST REAL SURVEY WAS THIS, 40 of 1687 files and all one message: a line
+    /// beginning with a brace where an entry was expected. Two things produce it and the output
+    /// could not say which, so both are read rather than one being picked:
+    ///
+    ///   1. A value whose brace is on the NEXT line. The key reads as an entry with an empty
+    ///      native value and the brace is then orphaned; the script belongs to that entry.
+    ///   2. A struct inside a struct, which only the client block was known to do.
+    ///
+    /// The entry AFTER the nested block is the part that would break quietly: it belongs to the
+    /// outer struct, and a reader that swallowed the block without finding its close would put
+    /// that entry, and every one after it, somewhere else.
+    /// </remarks>
+    [Fact]
+    public void ABraceOnItsOwnLineIsEitherAScriptOrANestedStruct()
+    {
+        AnimatedObject ao = AnimatedObject.Parse("""
+            version 3
+            AnimationController
+            {
+            	on_death =
+            	{
+            		PlayEffect("Metadata/Effects/x.ao");
+            		if (a) { b(); }
+            	}
+            	after_script = 1
+            }
+
+            AnimatedRender
+            {
+            	Sub {
+            		x = 1
+            	}
+            	after_block = 2
+            }
+            """);
+
+        Assert.Empty(ao.Faults);
+
+        AoStruct controller = Assert.Single(ao.Named("AnimationController"));
+        AoEntry script = controller.Entries[0];
+        Assert.Equal("on_death", script.Key);
+        Assert.Equal(AoValueKind.Script, script.Kind);
+        Assert.Contains("PlayEffect", script.Value, StringComparison.Ordinal);
+        Assert.Contains("if (a) { b(); }", script.Value, StringComparison.Ordinal);
+        Assert.Equal("after_script", controller.Entries[1].Key);
+
+        // The nested block stands beside its parent, and what followed it stayed with the parent.
+        Assert.Equal("x", Assert.Single(Assert.Single(ao.Named("Sub")).Entries).Key);
+        Assert.Equal("after_block", Assert.Single(Assert.Single(ao.Named("AnimatedRender")).Entries).Key);
+    }
+
+    /// <summary>
+    /// A material is named with an index after its extension, and that is not part of the name.
+    /// </summary>
+    /// <remarks>
+    /// THE FIRST SURVEY COUNTED 16 MATERIALS BESIDE 1683 MESHES, and one monster's dump showed
+    /// fourteen materials on a single mesh. The count was not small - the filter was throwing
+    /// them away, because the text after the last dot was "mat:0" and a colon is not a letter.
+    /// A number the filter produced about itself is the worst kind: it looks like data.
+    /// </remarks>
+    [Theory]
+    [InlineData("Art/Models/X/Textures/ExpeditionSkeleton.mat:0", ".mat", "Art/Models/X/Textures/ExpeditionSkeleton.mat")]
+    [InlineData("Art/Models/X/Textures/S.mat:12", ".mat", "Art/Models/X/Textures/S.mat")]
+    [InlineData("Art/Models/X/BasicSkeleton.sm", ".sm", "Art/Models/X/BasicSkeleton.sm")]
+    [InlineData("Metadata/Monsters/Foo/Bar.ao", ".ao", "Metadata/Monsters/Foo/Bar.ao")]
+    public void AnIndexAfterTheExtensionIsNotPartOfIt(string path, string extension, string bare)
+    {
+        Assert.Equal(extension, AoSurvey.Extension(path));
+        Assert.Equal(bare, AoSurvey.Bare(path));
+    }
+
+    /// <summary>
+    /// An animation's name lives inside the payload, not in the rare "animation" entry.
+    /// </summary>
+    /// <remarks>
+    /// THE FIRST SURVEY FOUND EIGHT NAMES over a whole install, which is not a fact about the game
+    /// - it is a fact about which key was read. The names are in the JSON of an "animations"
+    /// entry, thousands of them, and that count is what the Stance question turns on.
+    /// </remarks>
+    [Fact]
+    public void AnimationNamesComeOutOfThePayload()
+    {
+        const string Payload =
+            """[ { "name": "attack_01a", "events": [] }, { "name" : "death_bwd_01", "x": 1 } ]""";
+
+        Assert.Equal(["attack_01a", "death_bwd_01"], AoSurvey.Names(Payload));
+
+        // A payload that is cut off, or is not JSON at all, yields what it can and never throws.
+        Assert.Empty(AoSurvey.Names("""[ { "name": """));
+        Assert.Empty(AoSurvey.Names("nothing here"));
+        Assert.Empty(AoSurvey.Names(string.Empty));
+    }
+
     /// <summary>Walking a struct's entries reaches the children too, in file order.</summary>
     [Fact]
     public void WalkingReachesTheChildren()
