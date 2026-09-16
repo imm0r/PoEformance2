@@ -70,7 +70,11 @@ public class MonsterTablesTests
         monsters
             .Text(0, At(layouts, "MonsterVarieties", "Id"), "Any")
             .Text(1, At(layouts, "MonsterVarieties", "Id"), "Metadata/Monsters/Test/Shieldbearer")
-            .Text(1, At(layouts, "MonsterVarieties", "Name"), "Test Shieldbearer")
+
+            // WITH A TRAILING SPACE, because the game's own data has them: read against a live
+            // 0.5.5 install, "Gulzal, the Living Furnace " is spelled exactly that way and it was
+            // two of the nine monsters this route and the export disagreed about.
+            .Text(1, At(layouts, "MonsterVarieties", "Name"), "Test Shieldbearer ")
             .Text(1, At(layouts, "MonsterVarieties", "BaseMonsterTypeIndex"), "Metadata/Monsters/Test/Base")
             .Text(1, At(layouts, "MonsterVarieties", "Stance"), "stance2")
             .Reference(1, At(layouts, "MonsterVarieties", "MonsterType"), 1)
@@ -385,5 +389,74 @@ public class MonsterTablesTests
         Assert.Contains("1 only in the export", report, StringComparison.Ordinal);
         Assert.Contains("1 of the shared ones differ", report, StringComparison.Ordinal);
         Assert.Contains("Metadata/Monsters/Test/Bare", report, StringComparison.Ordinal);
+
+        // The two agree on every row number they share, so nothing behind those numbers has moved.
+        Assert.Contains("no reference table has been renumbered", report, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANDARenumberedReferenceTableIsTheOneFindingThatIsNotAStaleExport()
+    {
+        // THE GAP THE FIRST LIVE RUN MADE PLAIN. Every used subset matched the export exactly -
+        // 185 tags, 1214 types, 37 blood types - and that proves nothing about the NUMBERING: a
+        // table whose rows have shifted still has 185 of them in use. Tags had grown from 1327
+        // rows to 1339 between the export and that client. Appended, every number still means what
+        // it meant; inserted, every tag on every monster silently became a different tag, and not
+        // one count in the report would move.
+        //
+        // So the export below carries the SAME row numbers and different names behind them, which
+        // is exactly what an inserted row looks like from here.
+        QuestTableLayouts layouts = Layouts();
+        MonsterTables installed = MonsterTables.Read(Install(layouts), layouts, MonsterVarieties.Empty);
+
+        MonsterVariety shieldbearer = installed.Table.Find("Metadata/Monsters/Test/Shieldbearer")!;
+        var shipped = MonsterVarieties.From(
+            [new("Metadata/Monsters/Test/Shieldbearer", shieldbearer)],
+            new Dictionary<int, string> { [1] = "MeleeAtAnimationSpeed" },
+            new Dictionary<int, ModifierMeaning>(),
+
+            // One row inserted above them: tag 0 and tag 2 now reach the names that used to sit
+            // one place earlier. The COUNT is unchanged, which is the whole trap.
+            new Dictionary<int, string> { [0] = "beast", [2] = "undead" },
+            new Dictionary<int, MonsterKind>(),
+            new Dictionary<int, string> { [1] = "Blood" },
+            new Dictionary<int, string>(),
+            "a test");
+
+        string report = string.Join("\n", MonsterTables.Against(installed.Table, shipped));
+
+        // Not a stale export: the two agree on name, type and skill count throughout.
+        Assert.Contains("0 of the shared ones differ on name", report, StringComparison.Ordinal);
+
+        Assert.Contains("a reference table has been renumbered", report, StringComparison.Ordinal);
+        Assert.Contains("tags undead here and beast there, zombie here and undead there", report, StringComparison.Ordinal);
+        Assert.Contains("blood #1 is RotBlood here and Blood there", report, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANDAnExportWithNoNamesAtAllIsNotARenumberedTable()
+    {
+        // THE ALARM THAT MUST NOT FIRE. The resolvers hand back "#1" for a row they cannot name,
+        // and an export built without its reference tables is a real state - each one was optional
+        // in the generator. Counting a name against a row number as a renumbering would report
+        // every monster in such an export, which is the check firing on the one thing it is not
+        // about. This is how the check was first written, and this fixture is what caught it.
+        QuestTableLayouts layouts = Layouts();
+        MonsterTables installed = MonsterTables.Read(Install(layouts), layouts, MonsterVarieties.Empty);
+
+        MonsterVariety shieldbearer = installed.Table.Find("Metadata/Monsters/Test/Shieldbearer")!;
+        var bare = MonsterVarieties.From(
+            [new("Metadata/Monsters/Test/Shieldbearer", shieldbearer)],
+            new Dictionary<int, string>(),
+            new Dictionary<int, ModifierMeaning>(),
+            new Dictionary<int, string>(),
+            new Dictionary<int, MonsterKind>(),
+            new Dictionary<int, string>(),
+            new Dictionary<int, string>(),
+            "a test");
+
+        Assert.Contains(
+            MonsterTables.Against(installed.Table, bare),
+            line => line.Contains("no reference table has been renumbered", StringComparison.Ordinal));
     }
 }
