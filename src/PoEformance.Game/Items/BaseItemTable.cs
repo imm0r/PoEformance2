@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
@@ -17,8 +18,9 @@ namespace PoEformance.Game.Items;
 /// KEYED BY THE PATH, WHICH IS WHY THE WHOLE TABLE IS READ AT ONCE and StatTable's row-at-a-time
 /// cache would not do. A stat arrives as a row NUMBER, so that reader can answer one row and
 /// forget the rest; an item arrives as a PATH, and finding the row a path is on means having
-/// looked at all of them. So this is a single pass, once, and never again - about eleven thousand
-/// string reads for five and a half thousand rows, on the thread that asked for it.
+/// looked at all of them. So this is a single pass, once, and never again - and the rows come
+/// over in blocks rather than field by field, which turns eleven thousand round trips into about
+/// thirty. See DatRows.
 ///
 /// AND THAT IS WHY IT IS NOT A DRIFT FIX. The path does not renumber the way a stat row does:
 /// item-names.json is keyed by the path itself, so it goes stale by OMISSION rather than by
@@ -39,15 +41,6 @@ public sealed class BaseItemTable
 
     /// <summary>Longest path or name taken seriously. The longest in the game is well under this.</summary>
     private const int MostChars = 128;
-
-    /// <summary>
-    /// A bound on how many rows are walked, so a table that is not this one cannot cost the world.
-    /// </summary>
-    /// <remarks>
-    /// The live client has 5496. Twice that leaves room for a league to add to it and still stops
-    /// a wrong RowsBegin from reading until something falls over.
-    /// </remarks>
-    private const int MostRows = 20_000;
 
     private readonly Dictionary<string, string> _names;
 
@@ -107,41 +100,45 @@ public sealed class BaseItemTable
         // layout about to be used is not the layout of the table in front of it, and reading Name
         // at +0x20 of the wrong stride is how a project ends up with plausible nonsense rather
         // than an error. It is the check that kept Mods out - see BaseItemTypesRow.
-        if (facts.RowSize != size || facts.Rows <= 0 || facts.Rows > MostRows)
+        if (facts.RowSize != size)
         {
             return null;
         }
 
         var names = new Dictionary<string, string>((int)facts.Rows, StringComparer.OrdinalIgnoreCase);
-        for (long index = 0; index < facts.Rows; index++)
-        {
-            ulong at = facts.RowsBegin + (ulong)(index * size);
 
-            ulong idPtr = reader.ReadPointer(at + (ulong)idAt);
+        // IN BLOCKS RATHER THAN FIELD BY FIELD: the rows are contiguous, so one read carries a
+        // hundred and eighty of them and the pointers are picked out in this process. See DatRows.
+        DatRows.Walk(reader, facts, (_, bytes) =>
+        {
+            // THE NAME POINTER FIRST, so a row with nothing to call itself costs no string read
+            // at all - and a row with a path and no name is kept OUT rather than stored empty,
+            // because the caller's fallback turns a path into something readable and an empty
+            // string here would beat that fallback to the answer and show nothing.
+            ulong namePtr = BinaryPrimitives.ReadUInt64LittleEndian(bytes[nameAt..]);
+            if (!MemoryReaderExtensions.IsPlausiblePointer(namePtr))
+            {
+                return;
+            }
+
+            string name = reader.ReadUnicodeString(namePtr, MostChars);
+            if (name.Length == 0)
+            {
+                return;
+            }
+
+            ulong idPtr = BinaryPrimitives.ReadUInt64LittleEndian(bytes[idAt..]);
             if (!MemoryReaderExtensions.IsPlausiblePointer(idPtr))
             {
-                continue;
+                return;
             }
 
             string path = reader.ReadUnicodeString(idPtr, MostChars);
-            if (path.Length == 0)
-            {
-                continue;
-            }
-
-            ulong namePtr = reader.ReadPointer(at + (ulong)nameAt);
-            string name = MemoryReaderExtensions.IsPlausiblePointer(namePtr)
-                ? reader.ReadUnicodeString(namePtr, MostChars)
-                : string.Empty;
-
-            // A row with a path and no name is kept OUT rather than stored empty: the caller's
-            // fallback turns a path into something readable, and an empty string here would beat
-            // that fallback to the answer and show nothing at all.
-            if (name.Length > 0)
+            if (path.Length > 0)
             {
                 names[path] = name;
             }
-        }
+        });
 
         // NOTHING READ IS NOT AN EMPTY TABLE, it is a table that could not be read - a replay
         // whose build never touched these rows looks exactly like this - and handing back an

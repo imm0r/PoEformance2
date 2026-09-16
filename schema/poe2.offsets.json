@@ -1331,6 +1331,16 @@
       "consts": { "ComputedRowSize": "0x168" }
     },
 
+    "ModsRow": {
+      "comment": "A row of Mods.dat - what an affix is CALLED and whether it is a prefix or a suffix, which is the pair data/item-names.json ships 6567 of. THIS TABLE WAS ALMOST WRITTEN OFF. Priced without the interval rule its columns summed to 0x295 against the 0x2B5 the client's own loader reports, and that gap was recorded here as columns nobody had carried. It was eight INTERVAL columns - Stat1Value through Stat8Value, a range stored as two i32 - which is the thirty-two bytes exactly; see DatColumn.Interval, where the rule is checked against every table whose size is known. With them priced the row sums to 0x2B5 and every column in front of Name has to be right for that to happen, which is the same agreement that qualified BaseItemTypesRow. GenerationType is 1 prefix, 2 suffix, 3 unique and nothing else is given a kind - checked against the export rather than assumed: all 6567 mods it kept are one of those three, and the ten thousand rows of type 3 with no name at all are what it dropped. 16784 rows on 0.5.5, 6470 of them named.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr" },
+        "NamePtr": { "offset": "0x62", "type": "ptr" },
+        "GenerationType": { "offset": "0x6A", "type": "i32" }
+      },
+      "consts": { "ComputedRowSize": "0x2B5" }
+    },
+
     "PassiveSkillsRow": {
       "comment": "A row of PassiveSkills.dat - the ATLAS PASSIVE a node carries, reached through EndgameMapAtlasRow.PassivesRef. IT IS NOT A WorldAreas ROW, and settling that was the whole point of reading it: chickyd3v/POE2Radar calls this AtlasMapRow, documents it as a WorldAreas row and concludes from it that 'the name moved to +0x32 and +0x08 is an art path now'. Measured 2026-09-14 in tests/fixtures/session-2026-09-atlas.rec, three ways that agree: the table object at the reference's +0x08 states its own path as \"Data/Balance/PassiveSkills.dat\" and PointerPeek numbers the row (8197 of 9731); the row reads Id \"AtlasOutsideFortressPath72\" at +0x00, 861 at +0x30 and \"[DNT] Atlas Outside Path\" at +0x32; and the community dat-schema computes PassiveSkills' PoE2 columns as Id 0x00, Icon_DDSFile 0x08, Stats 0x10, Stat1..4Value 0x20, PassiveSkillGraphId 0x30, Name 0x32 - the same places. So POE2Radar's two observations are both right about THIS table and neither says anything about WorldAreas, where the name is still at +0x08 - on the very same capture, the WorldAreas row behind MapRugosa reads \"Rugosa\" there. Row size computes to 0x1E7 over 70 columns; the offsets below are arithmetic, not reverse engineering - scripts/dat-offsets.ps1 -Table PassiveSkills prints the lot.",
       "fields": {
