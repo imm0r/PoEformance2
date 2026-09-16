@@ -17,9 +17,11 @@ namespace PoEformance.Game.Files;
 /// it fill the frame, is the far side hidden behind the near one. Every one of those is a
 /// question about a number, which is what this project keeps asking for.
 ///
-/// AND IT IS FAST ENOUGH BECAUSE IT IS NOT PER FRAME. A monster is drawn once when it is picked
-/// and again when somebody turns it; the mesh is a few thousand triangles and the frame is a few
-/// hundred pixels square. This is not a renderer competing with a GPU, it is a portrait painter.
+/// AND IT IS PER FRAME WHILE SOMEBODY IS TURNING IT, which it was once written not to be. Dragging
+/// a model redraws it on every frame the cursor moves: measured at 384 square against a real rig of
+/// 4322 triangles with a 512 square skin, that is 4.1 ms of processor per frame - affordable beside
+/// an overlay frame of about 6 ms, and only while the button is down. What it is NOT affordable
+/// with is a fresh pair of buffers each time; see <see cref="Canvas"/>.
 ///
 /// THE MODEL STANDS ALONG NEGATIVE Z, which is measured rather than assumed: BasicSkeleton's box
 /// runs x ±77, y ±14.5, z -189 to -0.4, so the long axis is z, the feet are at the end nearest
@@ -36,7 +38,42 @@ public static class MeshPicture
     public const float Fill = 0.86f;
 
     /// <summary>
-    /// Draws the mesh, turned about its up axis by <paramref name="turn"/> radians.
+    /// The two buffers a drawing works in, kept so that turning a model does not throw them away.
+    /// </summary>
+    /// <remarks>
+    /// THIS EXISTS BECAUSE THE NUMBER WAS MEASURED RATHER THAN ASSUMED. At 384 square the pixels
+    /// come to 576 KB and the depth buffer to another 576 KB, and both are over the 85 KB that
+    /// sends an array to the LARGE OBJECT HEAP. Allocating a pair per call cost nothing while a
+    /// model was drawn once per monster picked; the moment a drag redraws it per frame the same
+    /// code threw away 1.1 MB a frame - 67 MB and thirteen gen-2 collections per SECOND of
+    /// turning, which is a stutter in the overlay rather than a number in a profiler. One canvas
+    /// held by the caller costs that 1.1 MB once.
+    ///
+    /// THE PIXELS ARE LENT, NOT GIVEN. The picture handed back points into this canvas, so it is
+    /// good only until the next drawing into the same one. That suits the caller it was made for -
+    /// the portrait copies the pixels into a texture and is done with them - and it is why the
+    /// allocating overload is still the one a test should reach for.
+    /// </remarks>
+    public sealed class Canvas
+    {
+        /// <param name="size">How many pixels each way, clamped to <see cref="Widest"/>.</param>
+        public Canvas(int size)
+        {
+            Size = Math.Clamp(size, 1, Widest);
+            Pixels = new byte[Size * Size * 4];
+            Depth = new float[Size * Size];
+        }
+
+        /// <summary>How many pixels each way this canvas draws.</summary>
+        public int Size { get; }
+
+        internal byte[] Pixels { get; }
+
+        internal float[] Depth { get; }
+    }
+
+    /// <summary>
+    /// Draws the mesh into buffers of its own, turned about its up axis by <paramref name="turn"/>.
     /// </summary>
     /// <param name="mesh">What to draw. An empty one gives an empty picture.</param>
     /// <param name="size">How many pixels each way.</param>
@@ -54,9 +91,35 @@ public static class MeshPicture
         float tilt = 0f,
         Vector3 ink = default,
         GamePicture? skin = null)
+        => Of(mesh, new Canvas(size), turn, tilt, ink, skin);
+
+    /// <summary>
+    /// Draws the mesh into a canvas the caller keeps, for anything that draws it more than once.
+    /// </summary>
+    /// <param name="mesh">What to draw. An empty one gives an empty picture.</param>
+    /// <param name="canvas">Where to draw. Its pixels are overwritten, and lent out - see <see cref="Canvas"/>.</param>
+    /// <param name="turn">Rotation about the model's up axis, in radians.</param>
+    /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
+    /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
+    /// <param name="skin">The monster's own colour texture, or null to draw it in <paramref name="ink"/>.</param>
+    public static GamePicture Of(
+        SkinnedMesh? mesh,
+        Canvas canvas,
+        float turn = 0f,
+        float tilt = 0f,
+        Vector3 ink = default,
+        GamePicture? skin = null)
     {
-        size = Math.Clamp(size, 1, Widest);
-        var pixels = new byte[size * size * 4];
+        ArgumentNullException.ThrowIfNull(canvas);
+
+        int size = canvas.Size;
+        byte[] pixels = canvas.Pixels;
+
+        // CLEARED HERE AND NOT WHERE THE TRIANGLES START, because every way out of this method
+        // returns these pixels. A canvas coming back for its second monster would otherwise show
+        // the first one wherever the second draws nothing - and the emptier the mesh, the more of
+        // the previous monster is left standing.
+        Array.Clear(pixels);
 
         if (mesh is not { Ready: true })
         {
@@ -91,7 +154,7 @@ public static class MeshPicture
         float scale = size * Fill / reach;
         float half = size * 0.5f;
 
-        var depth = new float[size * size];
+        float[] depth = canvas.Depth;
         Array.Fill(depth, float.MaxValue);
 
         // The light sits over the viewer's shoulder, which is the one placement that never leaves
