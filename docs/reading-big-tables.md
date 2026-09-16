@@ -29,6 +29,13 @@ columns sits this:
 | Distinct stats those modifiers set | **122**, of which **67** have a sentence the game words |
 | Bosses | **363** · placeholder-named rows **24** · rows with a distinct base **2191** |
 
+Every number there is the **shipped export's**, because that is what is committed and what the
+tests can be run against. None of them is a constant: a live 0.5.5 client read in
+[#368](https://github.com/imm0r/PoEformance2/pull/368) holds **2792** monsters and **1339** tag
+rows, and the next patch will hold something else again. So nothing below is sized at compile
+time — the store measures the table it is handed, and where a figure appears in this document it
+is an illustration of the arithmetic rather than a dimension to code against.
+
 Call it **sixty to eighty facts per monster, two hundred thousand facts in the table**. Six
 columns show 0.1% of it. Everything else is one click and one scroll away in a detail pane, which
 is fine for *"what is this"* and useless for *"which of these"*.
