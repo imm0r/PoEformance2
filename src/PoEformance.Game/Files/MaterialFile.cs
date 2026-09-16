@@ -104,20 +104,28 @@ public sealed class MaterialFile
     /// picks within the file. It is cut here so every caller does not have to remember.
     /// </remarks>
     public static MaterialFile Read(GameFiles? files, string? path)
+        => files is null || string.IsNullOrWhiteSpace(path) ? None : Read(files.Read(Bare(path)));
+
+    /// <summary>
+    /// A material path with any <c>:n</c> selector taken off - the file it actually names.
+    /// </summary>
+    /// <remarks>
+    /// PUBLIC BECAUSE THE INSTALL IS NOT THE ONLY CALLER. Anything reading these files through a
+    /// function rather than through <see cref="GameFiles"/> needs the same rule, and a second copy
+    /// of it is a second place to forget the colon - which fails by finding nothing, silently.
+    /// </remarks>
+    public static string Bare(string? path)
     {
-        if (files is null || string.IsNullOrWhiteSpace(path))
+        if (path is not { Length: > 0 })
         {
-            return None;
+            return string.Empty;
         }
 
         string said = path.Replace('\\', '/').Trim();
         int colon = said.LastIndexOf(':');
-        if (colon > said.LastIndexOf('.') && colon >= 0 && Digits(said, colon + 1))
-        {
-            said = said[..colon];
-        }
-
-        return Read(files.Read(said));
+        return colon > said.LastIndexOf('.') && colon >= 0 && Digits(said, colon + 1)
+            ? said[..colon]
+            : said;
     }
 
     /// <summary>Reads a file's bytes, sharing the decode with the game's other text files.</summary>
