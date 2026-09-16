@@ -340,7 +340,8 @@ public sealed class EntityInspector
         // the five thousand rows are never read at all.
         _itemNames?.Learn(
             table,
-            baseItems: PoEformance.Game.Items.BaseItemTable.From(walked, _reader, _schema));
+            baseItems: PoEformance.Game.Items.BaseItemTable.From(walked, _reader, _schema),
+            modNames: PoEformance.Game.Items.ModTable.From(walked, _reader, _schema));
     }
 
     private PoEformance.Game.Files.LoadedDatTables Walked()

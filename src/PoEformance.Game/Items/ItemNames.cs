@@ -79,6 +79,7 @@ public sealed class ItemNames
     private Components.StatTable? _live;
     private Components.StatDescriptions? _sentences;
     private BaseItemTable? _baseItems;
+    private ModTable? _modNames;
 
     private ItemNames(
         IReadOnlyDictionary<int, StatMeaning> stats,
@@ -188,10 +189,12 @@ public sealed class ItemNames
     /// <param name="table">The game's Stats.dat, or null to leave what is there.</param>
     /// <param name="sentences">The game's stat descriptions, or null to leave what is there.</param>
     /// <param name="baseItems">The game's BaseItemTypes.dat, or null to leave what is there.</param>
+    /// <param name="modNames">The game's Mods.dat, or null to leave what is there.</param>
     public void Learn(
         Components.StatTable? table = null,
         Components.StatDescriptions? sentences = null,
-        BaseItemTable? baseItems = null)
+        BaseItemTable? baseItems = null,
+        ModTable? modNames = null)
     {
         if (table is not null)
         {
@@ -206,6 +209,11 @@ public sealed class ItemNames
         if (baseItems is { Named: > 0 })
         {
             Volatile.Write(ref _baseItems, baseItems);
+        }
+
+        if (modNames is { Named: > 0 })
+        {
+            Volatile.Write(ref _modNames, modNames);
         }
     }
 
@@ -238,15 +246,37 @@ public sealed class ItemNames
                     ? $"data/item-names.json ({_bases.Count} base types)"
                     : "nowhere";
 
-            return $"names from {names}; sentences from {words}; base types from {kinds}";
+            string affixes = Volatile.Read(ref _modNames) is { Named: > 0 } affixTable
+                ? $"the game ({affixTable.Named} of {affixTable.Facts.Rows} rows of Mods.dat)"
+                : _mods.Count > 0
+                    ? $"data/item-names.json ({_mods.Count} mods)"
+                    : "nowhere";
+
+            return $"names from {names}; sentences from {words}; base types from {kinds};"
+                + $" affixes from {affixes}";
         }
     }
 
     /// <summary>What a mod is called. Unknown mods keep their id, which is readable enough.</summary>
     public ModMeaning Mod(string? id)
-        => id is { Length: > 0 } && _mods.TryGetValue(id, out ModMeaning found)
+    {
+        if (id is not { Length: > 0 })
+        {
+            return new ModMeaning(string.Empty, string.Empty);
+        }
+
+        // The game first, for the same reason as the base types: a mod is keyed by its own id,
+        // which the game does not renumber, so the shipped list does not go wrong - it goes short
+        // the moment a league adds an affix.
+        if (Volatile.Read(ref _modNames)?.Of(id) is { } live)
+        {
+            return new ModMeaning(live.Name, live.Kind);
+        }
+
+        return _mods.TryGetValue(id, out ModMeaning found)
             ? found
             : new ModMeaning(string.Empty, string.Empty);
+    }
 
     /// <summary>What an item's base type is called - "Advanced Dualstring Bow".</summary>
     /// <remarks>

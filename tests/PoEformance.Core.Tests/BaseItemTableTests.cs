@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
@@ -89,17 +90,23 @@ public class BaseItemTableTests
             ("Metadata/Items/Currency/CurrencyMagicQuality", "Arcanist's Etcher"),
         ];
 
+        // ONE CONTIGUOUS BLOCK, because that is what a dat table is - RowsBegin plus index times
+        // RowSize, no padding - and it is what lets DatRows carry a hundred and eighty rows per
+        // read. Placing the fields separately would test a fixture rather than the reader.
+        var block = new byte[rows.Length * RowSize];
         for (int index = 0; index < rows.Length; index++)
         {
-            ulong at = RowsBegin + (ulong)(index * RowSize);
+            int at = index * RowSize;
             ulong pathAt = 0x3_0000_0000 + (ulong)(index * 0x200);
             ulong wordsAt = 0x4_0000_0000 + (ulong)(index * 0x200);
 
             PlaceWide(reader, pathAt, rows[index].Path);
             PlaceWide(reader, wordsAt, rows[index].Name);
-            reader.Place(at + (ulong)idAt, pathAt);
-            reader.Place(at + (ulong)nameAt, wordsAt);
+            BinaryPrimitives.WriteUInt64LittleEndian(block.AsSpan(at + idAt), pathAt);
+            BinaryPrimitives.WriteUInt64LittleEndian(block.AsSpan(at + nameAt), wordsAt);
         }
+
+        reader.Place(RowsBegin, block);
 
         BaseItemTable table = Assert.IsType<BaseItemTable>(BaseItemTable.Over(
             reader,
@@ -143,8 +150,12 @@ public class BaseItemTableTests
         var reader = new FakeMemoryReader();
         PlaceWide(reader, 0x3_0000_0000, Path);
         PlaceWide(reader, 0x4_0000_0000, "A Name Only The Game Has");
-        reader.Place(RowsBegin + (ulong)schema.Structs["BaseItemTypesRow"].OffsetOf("IdPtr"), 0x3_0000_0000UL);
-        reader.Place(RowsBegin + (ulong)schema.Structs["BaseItemTypesRow"].OffsetOf("NamePtr"), 0x4_0000_0000UL);
+        var block = new byte[RowSize];
+        BinaryPrimitives.WriteUInt64LittleEndian(
+            block.AsSpan(schema.Structs["BaseItemTypesRow"].OffsetOf("IdPtr")), 0x3_0000_0000UL);
+        BinaryPrimitives.WriteUInt64LittleEndian(
+            block.AsSpan(schema.Structs["BaseItemTypesRow"].OffsetOf("NamePtr")), 0x4_0000_0000UL);
+        reader.Place(RowsBegin, block);
 
         ItemNames names = ItemNames.Load(
             DataFile("item-stats.json"), DataFile("item-names.json"), DataFile("unique_ivi_name_map.tsv"));
