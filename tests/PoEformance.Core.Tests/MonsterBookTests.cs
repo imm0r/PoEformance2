@@ -71,8 +71,9 @@ public class MonsterBookTests
     {
         DataColumn words = DataColumn.Words("name", ["Skeletal Warrior", "Zombie", "skeletal warrior"]);
 
-        // The table has nineteen monsters called "Skeletal Warrior". Ranked by position rather
-        // than densely, each would sort differently and the grid's own tie-break would never run.
+        // Ranked by position rather than densely, rows sharing a name would each sort differently
+        // and the grid's own tie-break would never run - see HowManyMonstersShareAName for how
+        // much of this table that is.
         Assert.Equal(0, words.Compare(0, 2));
         Assert.True(words.Compare(0, 1) < 0);
         Assert.True(words.Compare(1, 2) > 0);
@@ -229,6 +230,41 @@ public class MonsterBookTests
             Assert.Equal(book.Count, column.Text.Length);
             Assert.All(column.Text, Assert.NotNull);
         }
+    }
+
+    [Fact]
+    public void HowManyMonstersShareAName()
+    {
+        // WHY EVERY ROW GETS ITS OWN ID, measured rather than asserted - which is the whole reason
+        // this test exists. The comment this replaces said the table held "nineteen monsters called
+        // Skeletal Warrior"; it holds exactly ONE, and searching for that name on a live client
+        // returns six rows across three different names. The number had been carried from comment
+        // to comment without anybody counting, which is how a justification outlives its fact.
+        //
+        // The real figures are far stronger than the invented one, so the rule stands: over the
+        // shipped export 2225 of 2709 named rows share a name, 510 names repeat, and "Daemon" is on
+        // 305 rows. Asserted loosely, because the export is regenerated from a live install and a
+        // test that pinned the exact counts would fail on patch day for no reason at all.
+        MonsterVarieties table = Shipped();
+
+        var byName = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach ((_, MonsterVariety one) in table.All)
+        {
+            if (one.Name is { Length: > 0 } named)
+            {
+                byName[named] = byName.GetValueOrDefault(named) + 1;
+            }
+        }
+
+        Assert.Equal(1, byName.GetValueOrDefault("Skeletal Warrior"));
+
+        int repeated = byName.Values.Count(count => count > 1);
+        int rows = byName.Values.Where(count => count > 1).Sum();
+        int worst = byName.Values.Max();
+
+        Assert.True(repeated > 100, $"only {repeated} names repeat, so the rule may not be needed");
+        Assert.True(rows > 1000, $"only {rows} rows share a name");
+        Assert.True(worst > 100, $"the commonest name is on only {worst} rows");
     }
 
     [Fact]
