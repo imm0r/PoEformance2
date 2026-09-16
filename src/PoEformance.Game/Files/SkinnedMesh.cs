@@ -104,8 +104,19 @@ public sealed class SkinnedMesh
     /// NO SKIN, because nothing that uses this needs one: the bones and weights come back empty
     /// and a still picture does not read them.
     /// </remarks>
+    /// <param name="positions">The vertices.</param>
+    /// <param name="normals">One per position.</param>
+    /// <param name="indices">Three per triangle, each inside the vertex count.</param>
+    /// <param name="least">The low corner of the box the camera is placed from.</param>
+    /// <param name="most">The high corner.</param>
+    /// <param name="coordinates">Texture coordinates, or null for a mesh with no skin.</param>
     public static SkinnedMesh Of(
-        Vector3[] positions, Vector3[] normals, int[] indices, Vector3 least, Vector3 most)
+        Vector3[] positions,
+        Vector3[] normals,
+        int[] indices,
+        Vector3 least,
+        Vector3 most,
+        Vector2[]? coordinates = null)
     {
         ArgumentNullException.ThrowIfNull(positions);
         ArgumentNullException.ThrowIfNull(normals);
@@ -128,7 +139,7 @@ public sealed class SkinnedMesh
         {
             Positions = positions,
             Normals = normals,
-            Coordinates = new Vector2[positions.Length],
+            Coordinates = coordinates ?? new Vector2[positions.Length],
             Bones = [],
             Weights = [],
             Indices = indices,

@@ -166,6 +166,108 @@ public class MeshPictureTests
         Assert.Equal(Silhouette(start), Silhouette(whole));
     }
 
+    /// <summary>
+    /// A skin is sampled where the mesh has coordinates, and ignored where it has none.
+    /// </summary>
+    /// <remarks>
+    /// THE SECOND HALF IS THE ONE WORTH HAVING. A mesh with no texture coordinates has all of them
+    /// at zero, so sampling it paints every triangle with ONE corner pixel of the texture - a
+    /// monster in a flat colour taken from an arbitrary place, which looks deliberate and is not.
+    /// Falling back to the grey is both honest and obviously a fall-back.
+    /// </remarks>
+    [Fact]
+    public void ASkinIsUsedOnlyWhereThereAreCoordinatesToUseIt()
+    {
+        GamePicture red = Sheet(220, 30, 30);
+
+        // The post carries no coordinates, so the skin cannot be looked up and is left alone.
+        Assert.Equal(
+            Middle(MeshPicture.Of(Post(), 64)),
+            Middle(MeshPicture.Of(Post(), 64, skin: red)));
+
+        // Given coordinates, the same mesh takes the skin's colour instead of the ink.
+        GamePicture plain = MeshPicture.Of(Coated(), 64);
+        GamePicture skinned = MeshPicture.Of(Coated(), 64, skin: red);
+
+        Assert.NotEqual(Middle(plain), Middle(skinned));
+        Assert.True(
+            Channel(skinned, 0) > Channel(skinned, 1) * 2,
+            "a red skin should come out red, and came out "
+                + $"{Channel(skinned, 0)},{Channel(skinned, 1)},{Channel(skinned, 2)}");
+    }
+
+    /// <summary>
+    /// The game's texture coordinates run NEGATIVE, and are wrapped rather than clamped.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED ON THE REAL MESH: BasicSkeleton's coordinates run -0.997 to -0.002. A sampler that
+    /// clamped instead of wrapping would paint every monster with the single row of texels along
+    /// one edge of its texture - one colour, no pattern, and no error anywhere.
+    /// </remarks>
+    [Fact]
+    public void ANegativeCoordinateWrapsRatherThanClamping()
+    {
+        // A sheet whose halves differ, sampled at -0.25, which wraps to 0.75 - the far half.
+        GamePicture halves = Halved();
+
+        GamePicture below = MeshPicture.Of(Coated(-0.25f), 64, skin: halves);
+        GamePicture above = MeshPicture.Of(Coated(0.75f), 64, skin: halves);
+
+        Assert.Equal(Middle(below), Middle(above));
+        Assert.NotEqual(Middle(MeshPicture.Of(Coated(0.25f), 64, skin: halves)), Middle(below));
+    }
+
+    private static byte Channel(GamePicture said, int part)
+        => said.Rgba[((((said.Height / 2) * said.Width) + (said.Width / 2)) * 4) + part];
+
+    /// <summary>A texture of one colour.</summary>
+    private static GamePicture Sheet(byte red, byte green, byte blue)
+    {
+        var pixels = new byte[8 * 8 * 4];
+        for (var one = 0; one < 8 * 8; one++)
+        {
+            pixels[(one * 4) + 0] = red;
+            pixels[(one * 4) + 1] = green;
+            pixels[(one * 4) + 2] = blue;
+            pixels[(one * 4) + 3] = 255;
+        }
+
+        return new GamePicture(8, 8, pixels);
+    }
+
+    /// <summary>A texture whose lower half differs from its upper one.</summary>
+    private static GamePicture Halved()
+    {
+        var pixels = new byte[8 * 8 * 4];
+        for (var y = 0; y < 8; y++)
+        {
+            for (var x = 0; x < 8; x++)
+            {
+                int at = ((y * 8) + x) * 4;
+                pixels[at] = (byte)(y < 4 ? 40 : 230);
+                pixels[at + 1] = pixels[at];
+                pixels[at + 2] = pixels[at];
+                pixels[at + 3] = 255;
+            }
+        }
+
+        return new GamePicture(8, 8, pixels);
+    }
+
+    /// <summary>A quad facing the viewer, with every corner at the same texture coordinate.</summary>
+    private static SkinnedMesh Coated(float v = 0.5f)
+    {
+        var places = new List<Vector3>();
+        var indices = new List<int>();
+        Quad(places, indices, near: true);
+
+        SkinnedMesh bare = Built(places, indices, Least, Most);
+        var spots = new Vector2[bare.Positions.Length];
+        Array.Fill(spots, new Vector2(0.5f, v));
+
+        return SkinnedMesh.Of(bare.Positions, bare.Normals, bare.Indices, Least, Most, spots);
+    }
+
     private static (int Top, int Foot, int Left, int Right, int Lit) Silhouette(GamePicture said)
     {
         int top = -1, foot = -1, left = said.Width, right = -1, lit = 0;

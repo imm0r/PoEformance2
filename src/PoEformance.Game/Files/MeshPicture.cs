@@ -42,9 +42,18 @@ public static class MeshPicture
     /// <param name="size">How many pixels each way.</param>
     /// <param name="turn">Rotation about the model's up axis, in radians.</param>
     /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
-    /// <param name="ink">The colour to shade with, as red, green and blue in 0..1.</param>
+    /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
+    /// <param name="skin">
+    /// The monster's own colour texture, or null to draw it in <paramref name="ink"/>. What
+    /// <see cref="MaterialFile.Albedo"/> names, decoded by <see cref="GameArt"/>.
+    /// </param>
     public static GamePicture Of(
-        SkinnedMesh? mesh, int size, float turn = 0f, float tilt = 0f, Vector3 ink = default)
+        SkinnedMesh? mesh,
+        int size,
+        float turn = 0f,
+        float tilt = 0f,
+        Vector3 ink = default,
+        GamePicture? skin = null)
     {
         size = Math.Clamp(size, 1, Widest);
         var pixels = new byte[size * size * 4];
@@ -89,8 +98,15 @@ public static class MeshPicture
         // a face black: anything pointing at the camera is lit.
         Vector3 lamp = Vector3.Normalize(new Vector3(-0.35f, -0.55f, -0.75f));
 
+        // The skin is only usable if it decoded AND the mesh carries coordinates to look it up
+        // with. A mesh with no texture coordinates has all of them at zero, which would paint
+        // every triangle with one corner pixel of the texture - a monster in a flat colour taken
+        // from an arbitrary place, which is worse than the honest grey.
+        GamePicture? usable = skin is { Ready: true } && Coordinated(mesh) ? skin : null;
+
         Span<Vector3> corner = stackalloc Vector3[3];
         Span<Vector3> facing = stackalloc Vector3[3];
+        Span<Vector2> onSkin = stackalloc Vector2[3];
 
         for (var one = 0; one + 2 < mesh.Indices.Length; one += 3)
         {
@@ -105,9 +121,10 @@ public static class MeshPicture
                     place.Z);
 
                 facing[part] = Vector3.TransformNormal(mesh.Normals[point], view);
+                onSkin[part] = mesh.Coordinates[point];
             }
 
-            Triangle(pixels, depth, size, corner, facing, lamp, ink);
+            Triangle(pixels, depth, size, corner, facing, onSkin, lamp, ink, usable);
         }
 
         return new GamePicture(size, size, pixels);
@@ -133,8 +150,10 @@ public static class MeshPicture
         int size,
         ReadOnlySpan<Vector3> corner,
         ReadOnlySpan<Vector3> facing,
+        ReadOnlySpan<Vector2> onSkin,
         Vector3 lamp,
-        Vector3 ink)
+        Vector3 ink,
+        GamePicture? skin)
     {
         float area = Cross(corner[0], corner[1], corner[2]);
         if (MathF.Abs(area) < 1e-6f)
@@ -182,12 +201,62 @@ public static class MeshPicture
                 float lit = MathF.Abs(Vector3.Dot(normal, lamp));
                 float shade = 0.22f + (0.78f * lit);
 
-                pixels[(at * 4) + 0] = Byte(ink.X * shade);
-                pixels[(at * 4) + 1] = Byte(ink.Y * shade);
-                pixels[(at * 4) + 2] = Byte(ink.Z * shade);
+                Vector3 colour = ink;
+                if (skin is { } sheet)
+                {
+                    // AFFINE INTERPOLATION IS EXACT HERE. The projection is orthographic, so a
+                    // coordinate across the triangle really is linear in screen space - the
+                    // perspective correction a game renderer needs would be dividing by a w that
+                    // is always one.
+                    Vector2 spot = (first * onSkin[0]) + (second * onSkin[1]) + (third * onSkin[2]);
+                    colour = Sample(sheet, spot);
+                }
+
+                pixels[(at * 4) + 0] = Byte(colour.X * shade);
+                pixels[(at * 4) + 1] = Byte(colour.Y * shade);
+                pixels[(at * 4) + 2] = Byte(colour.Z * shade);
                 pixels[(at * 4) + 3] = 255;
             }
         }
+    }
+
+    /// <summary>Whether the mesh carries texture coordinates worth looking anything up with.</summary>
+    private static bool Coordinated(SkinnedMesh mesh)
+    {
+        foreach (Vector2 one in mesh.Coordinates)
+        {
+            if (one != Vector2.Zero)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// One texel, nearest neighbour, wrapped.
+    /// </summary>
+    /// <remarks>
+    /// THE GAME'S V RUNS NEGATIVE - the skeleton's coordinates measured -0.997 to -0.002 - so a
+    /// reader that clamped instead of wrapping would paint every monster with the single row of
+    /// texels along one edge. Wrapping costs one floor and handles both signs.
+    ///
+    /// NEAREST AND NOT BILINEAR, because the texture is 512 square and the picture is a few
+    /// hundred: the sampling is a shrink, where filtering buys blur rather than detail. It is the
+    /// obvious thing to improve if a monster ever looks noisy.
+    /// </remarks>
+    private static Vector3 Sample(GamePicture skin, Vector2 spot)
+    {
+        float u = spot.X - MathF.Floor(spot.X);
+        float v = spot.Y - MathF.Floor(spot.Y);
+
+        int x = Math.Clamp((int)(u * skin.Width), 0, skin.Width - 1);
+        int y = Math.Clamp((int)(v * skin.Height), 0, skin.Height - 1);
+        int at = ((y * skin.Width) + x) * 4;
+
+        return new Vector3(
+            skin.Rgba[at] / 255f, skin.Rgba[at + 1] / 255f, skin.Rgba[at + 2] / 255f);
     }
 
     /// <summary>Twice the signed area of a triangle, flattened onto the screen.</summary>
