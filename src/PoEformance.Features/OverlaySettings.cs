@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PoEformance.Game.Components;
+using PoEformance.Game.Files;
 
 namespace PoEformance.Features;
 
@@ -154,7 +155,7 @@ public sealed record OverlaySettings(
     // draws; somebody with the room and the processor to spare can raise it, and somebody playing
     // on a laptop can drop it. See MonsterPortrait, which also steps DOWN one size while the
     // model is being dragged, so a high setting costs its full price only when holding still.
-    [property: JsonPropertyName("monsterModelSize")] int MonsterModelSize = 768)
+    [property: JsonPropertyName("monsterModelSize")] int MonsterModelSize = PictureLadder.Usual)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>

@@ -6,6 +6,7 @@ using PoEformance.Core.Diagnostics;
 using PoEformance.Features;
 using PoEformance.Game.Components;
 using PoEformance.Game.Entities;
+using PoEformance.Game.Files;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
@@ -2048,7 +2049,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         bool rail = true,
         bool visible = false,
         Func<string, byte[]?>? readFile = null,
-        int modelSize = MonsterPortrait.Usual)
+        int modelSize = PictureLadder.Usual)
     {
         var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences)
         {
