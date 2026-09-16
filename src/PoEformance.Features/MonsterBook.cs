@@ -273,9 +273,9 @@ public sealed class MonsterBook : IQuerySource
 
         var held = new Dictionary<string, Held>(StringComparer.Ordinal)
         {
-            [Key("tag")] = byTag.Done(),
-            [Key("skill")] = bySkill.Done(),
-            [Key("mod")] = byMod.Done(),
+            [ColumnQuery.Field("tag")] = byTag.Done(),
+            [ColumnQuery.Field("skill")] = bySkill.Done(),
+            [ColumnQuery.Field("mod")] = byMod.Done(),
         };
 
         var numbers = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -286,7 +286,7 @@ public sealed class MonsterBook : IQuerySource
         for (var column = 0; column < store.Columns.Length; column++)
         {
             DataColumn one = store.Columns[column];
-            string key = Key(one.Name);
+            string key = ColumnQuery.Field(one.Name);
 
             if (one.Number.Length > 0)
             {
@@ -353,7 +353,7 @@ public sealed class MonsterBook : IQuerySource
     {
         ArgumentNullException.ThrowIfNull(into);
 
-        if (!_held.TryGetValue(Key(field ?? string.Empty), out Held? held))
+        if (!_held.TryGetValue(ColumnQuery.Field(field ?? string.Empty), out Held? held))
         {
             return false;
         }
@@ -376,7 +376,7 @@ public sealed class MonsterBook : IQuerySource
     {
         ArgumentNullException.ThrowIfNull(into);
 
-        if (!_numbers.TryGetValue(Key(field ?? string.Empty), out int column))
+        if (!_numbers.TryGetValue(ColumnQuery.Field(field ?? string.Empty), out int column))
         {
             return false;
         }
@@ -427,7 +427,7 @@ public sealed class MonsterBook : IQuerySource
         ArgumentNullException.ThrowIfNull(into);
         into.Clear();
 
-        if (!_held.TryGetValue(Key(field ?? string.Empty), out Held? held))
+        if (!_held.TryGetValue(ColumnQuery.Field(field ?? string.Empty), out Held? held))
         {
             return;
         }
@@ -464,69 +464,6 @@ public sealed class MonsterBook : IQuerySource
         => MonsterVarieties.Same(path) is { Length: > 0 } key && _rows.TryGetValue(key, out int row)
             ? row
             : -1;
-
-    /// <summary>
-    /// Fills <paramref name="into"/> with the rows that match, in table order.
-    /// </summary>
-    /// <remarks>
-    /// INTO A LIST THE CALLER KEEPS, so that typing does not allocate a new list per keystroke -
-    /// after the first few it is holding the capacity it needs and the loop only writes.
-    /// </remarks>
-    public void Filter(string? search, List<int> into) => Filter(search, null, into);
-
-    /// <summary>
-    /// Fills <paramref name="into"/> with the rows that match the text AND every range.
-    /// </summary>
-    /// <remarks>
-    /// EVERY RANGE, not any: two ranges are two questions asked at once - "the fast ones that also
-    /// hit hard" - and a filter that widened as more were added would answer neither.
-    ///
-    /// A RANGE ON A COLUMN OF WORDS IS IGNORED rather than refused. The only way to get one is to
-    /// drag across a histogram, and a column of words has none to drag across - so the case means
-    /// the caller has kept a range past the column being hidden or the table being rebuilt, which
-    /// is not worth throwing over.
-    /// </remarks>
-    public void Filter(string? search, IReadOnlyList<ColumnRange>? ranges, List<int> into)
-    {
-        ArgumentNullException.ThrowIfNull(into);
-        into.Clear();
-
-        string looking = (search ?? string.Empty).Trim().ToLowerInvariant();
-        DataColumn[] columns = Store.Columns;
-
-        for (var row = 0; row < _find.Length; row++)
-        {
-            if (looking.Length > 0 && !_find[row].Contains(looking, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            if (Inside(columns, ranges, row))
-            {
-                into.Add(row);
-            }
-        }
-    }
-
-    private static bool Inside(DataColumn[] columns, IReadOnlyList<ColumnRange>? ranges, int row)
-    {
-        for (var at = 0; at < (ranges?.Count ?? 0); at++)
-        {
-            ColumnRange range = ranges![at];
-            if (range.Column < 0 || range.Column >= columns.Length)
-            {
-                continue;
-            }
-
-            double[] numbers = columns[range.Column].Number;
-            if (numbers.Length > 0 && !range.Holds(numbers[row]))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     /// <summary>
     /// Walks a monster's three modifier columns, counting every row and naming the ones it can.
@@ -601,31 +538,6 @@ public sealed class MonsterBook : IQuerySource
     }
 
     private static string Numbered(int row) => "#" + row.ToString(CultureInfo.InvariantCulture);
-
-    /// <summary>
-    /// A field's spelling as a query spells it: lower case, and no spaces.
-    /// </summary>
-    /// <remarks>
-    /// A SPACE SEPARATES TWO TERMS AND ALWAYS WILL, so a column called "atk spd" cannot be named in
-    /// a query as its header spells it. Rather than rename the columns to suit the parser - the
-    /// header is what somebody reads, the query is what they type - both ends normalise, and
-    /// "atkspd", "Atk Spd" and "ATKSPD" all reach the same column.
-    /// </remarks>
-    private static string Key(string name)
-    {
-        Span<char> made = name.Length <= 64 ? stackalloc char[name.Length] : new char[name.Length];
-        var at = 0;
-
-        foreach (char one in name)
-        {
-            if (!char.IsWhiteSpace(one))
-            {
-                made[at++] = char.ToLowerInvariant(one);
-            }
-        }
-
-        return new string(made[..at]);
-    }
 
     /// <summary>Every value a field holds, and which rows hold each of them.</summary>
     /// <param name="Values">The values as the table spells them, for showing.</param>

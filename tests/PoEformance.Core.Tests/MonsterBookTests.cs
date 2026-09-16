@@ -169,26 +169,16 @@ public class MonsterBookTests
     {
         MonsterVarieties table = Shipped();
         MonsterBook book = MonsterBook.Of(table, null);
-        var rows = new List<int>();
 
-        int life = Index(book, "life");
-        int skills = Index(book, "skills");
-
-        book.Filter(null, [new ColumnRange(life, 200d, double.MaxValue)], rows);
-        int tanky = rows.Count;
+        int tanky = Rows(book, "life>=200").Count;
         Assert.InRange(tanky, 1, book.Count - 1);
 
-        book.Filter(null, [new ColumnRange(skills, 10d, double.MaxValue)], rows);
-        int busy = rows.Count;
+        int busy = Rows(book, "skills>=10").Count;
         Assert.InRange(busy, 1, book.Count - 1);
 
         // TWO RANGES ARE TWO QUESTIONS ASKED AT ONCE - "the tanky ones that also have a lot of
         // skills" - so the answer can only be smaller than either.
-        book.Filter(
-            null,
-            [new ColumnRange(life, 200d, double.MaxValue), new ColumnRange(skills, 10d, double.MaxValue)],
-            rows);
-
+        List<int> rows = Rows(book, "life>=200 skills>=10");
         Assert.True(rows.Count <= Math.Min(tanky, busy), $"{rows.Count} is more than {tanky} and {busy}");
 
         foreach (int row in rows)
@@ -197,10 +187,6 @@ public class MonsterBookTests
             Assert.True(one.Life >= 200, book.Paths[row]);
             Assert.True(one.SkillCount >= 10, book.Paths[row]);
         }
-
-        // A range on a column of words is ignored rather than refused - see MonsterBook.Filter.
-        book.Filter(null, [new ColumnRange(Index(book, "name"), 5d, 6d)], rows);
-        Assert.Equal(book.Count, rows.Count);
     }
 
     [Fact]
@@ -355,19 +341,16 @@ public class MonsterBookTests
     {
         MonsterVarieties table = Shipped();
         MonsterBook book = MonsterBook.Of(table, null);
-        var rows = new List<int>();
 
-        book.Filter(null, rows);
-        Assert.Equal(book.Count, rows.Count);
-
-        book.Filter("   ", rows);
-        Assert.Equal(book.Count, rows.Count);
+        Assert.Equal(book.Count, Rows(book, null).Count);
+        Assert.Equal(book.Count, Rows(book, "   ").Count);
 
         // A tag a real monster really carries, taken out of the table rather than assumed - the
         // export is regenerated from a live install, so a hard-coded one would be a test that
-        // fails on patch day for no reason.
+        // fails on patch day for no reason. Typed as a bare word, which is what a search box has
+        // always meant and still does.
         (string path, string tag) = FirstTag(table);
-        book.Filter(tag, rows);
+        List<int> rows = Rows(book, tag);
 
         Assert.Contains(book.Row(path), rows);
 
@@ -384,15 +367,13 @@ public class MonsterBookTests
     {
         MonsterVarieties table = Shipped();
         MonsterBook book = MonsterBook.Of(table, null);
-        var rows = new List<int>();
 
         // "boss" is a flag on the row rather than a column or a tag, so without the word being
         // written into the searchable text there is no way whatever to ask this list for them.
         int boss = Array.IndexOf(book.Boss, true);
         Assert.True(boss >= 0, "the export should carry bosses, and carries none");
 
-        book.Filter("boss", rows);
-        Assert.Contains(boss, rows);
+        Assert.Contains(boss, Rows(book, "boss"));
     }
 
     [Fact]
@@ -433,6 +414,20 @@ public class MonsterBookTests
 
         Assert.True(table.Count > 2000, $"the export should hold the whole table, and holds {table.Count}");
         return table;
+    }
+
+    /// <summary>The rows a query leaves, which is the one way the window filters.</summary>
+    private static List<int> Rows(MonsterBook book, string? query)
+    {
+        QueryResult parsed = ColumnQuery.Parse(query);
+        Assert.Equal(string.Empty, parsed.Error);
+
+        RowSet rows = Assert.IsType<RowSet>(book.Matching(parsed.Term, out string error));
+        Assert.Equal(string.Empty, error);
+
+        var into = new List<int>();
+        rows.CopyTo(into);
+        return into;
     }
 
     private static DataColumn Column(MonsterBook book, string name)

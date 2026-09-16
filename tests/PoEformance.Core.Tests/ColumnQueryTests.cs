@@ -126,6 +126,116 @@ public class ColumnQueryTests
     }
 
     [Fact]
+    public void AFacetClickAddsATermAndClickingAgainTakesItBack()
+    {
+        string once = ColumnQuery.Toggle("life>200", "tag", "undead");
+        Assert.Equal("life>200 tag:undead", once);
+        Assert.True(ColumnQuery.Holds(ColumnQuery.Parse(once).Term, "tag", "undead"));
+
+        string off = ColumnQuery.Toggle(once, "tag", "undead");
+        Assert.Equal("life>200", off);
+        Assert.False(ColumnQuery.Holds(ColumnQuery.Parse(off).Term, "tag", "undead"));
+
+        // An empty box is where most clicks land, and it has to come out as a whole query.
+        Assert.Equal("tag:undead", ColumnQuery.Toggle("", "tag", "undead"));
+        Assert.Equal(string.Empty, ColumnQuery.Toggle("tag:undead", "tag", "undead"));
+
+        // Spelt however the caller spells it, matched however the query spells it.
+        Assert.True(ColumnQuery.Holds(ColumnQuery.Parse("TAG:Undead").Term, "tag", "undead"));
+    }
+
+    [Fact]
+    public void AClickNeverRewritesWhatSomebodyIsStillTyping()
+    {
+        // HALFWAY THROUGH A QUERY IS THE NORMAL STATE OF A SEARCH BOX. A click that "helpfully"
+        // rebuilt this into something that parses would throw away what was being written.
+        const string Broken = "tag:undead (life>";
+
+        Assert.Equal(Broken, ColumnQuery.Toggle(Broken, "tag", "beast"));
+        Assert.Equal(Broken, ColumnQuery.Ranged(Broken, "life", 1d, 2d));
+        Assert.Equal(Broken, ColumnQuery.Drop(Broken, "tag"));
+    }
+
+    [Fact]
+    public void ADragReplacesTheRangeItSetLastTime()
+    {
+        string first = ColumnQuery.Ranged("tag:undead", "life", 120d, 260d);
+        Assert.Equal("tag:undead life 120..260", first);
+
+        // Dragging again on the same column is a new range, not a second one that also has to hold.
+        string second = ColumnQuery.Ranged(first, "life", 300d, 900d);
+        Assert.Equal("tag:undead life 300..900", second);
+
+        Assert.Equal((300d, 900d), ColumnQuery.RangeOf(ColumnQuery.Parse(second).Term, "life"));
+        Assert.Null(ColumnQuery.RangeOf(ColumnQuery.Parse(second).Term, "dmg"));
+
+        // A different column is a second question, so it stands beside the first.
+        string both = ColumnQuery.Ranged(second, "dmg", 50d, 80d);
+        Assert.Equal("tag:undead life 300..900 dmg 50..80", both);
+
+        Assert.Equal("tag:undead dmg 50..80", ColumnQuery.Drop(both, "life"));
+    }
+
+    [Fact]
+    public void WhatSomebodyBracketedStaysBracketed()
+    {
+        // ONLY THE TOP LEVEL IS EDITED. Reaching inside the brackets would change what was written
+        // rather than adding to it - the click means "and also this".
+        string added = ColumnQuery.Toggle("tag:undead or tag:beast", "tag", "caster");
+        Assert.Equal("(tag:undead or tag:beast) tag:caster", added);
+
+        QueryResult parsed = ColumnQuery.Parse(added);
+        Assert.True(parsed.Ok, parsed.Error);
+
+        // The term inside the brackets is not a top-level term, so the rail does not see it as
+        // ticked and a click on it adds rather than removes.
+        Assert.False(ColumnQuery.Holds(parsed.Term, "tag", "undead"));
+        Assert.True(ColumnQuery.Holds(parsed.Term, "tag", "caster"));
+        Assert.Null(ColumnQuery.RangeOf(ColumnQuery.Parse("(life 1..2 or dmg 3..4) tag:x").Term, "life"));
+    }
+
+    [Fact]
+    public void AFacetClickMeansWhatTheRailSaidItWould()
+    {
+        // THE PROPERTY THE WHOLE "TWO VIEWS OF ONE FILTER" IDEA RESTS ON: the rail says a value
+        // would leave N rows, the click writes text into the box, and the text has to leave those
+        // same N rows. Checked against the count the rail itself would have shown.
+        MonsterVarieties table = Shipped();
+        MonsterBook book = MonsterBook.Of(table, null);
+
+        RowSet within = Assert.IsType<RowSet>(book.Matching(ColumnQuery.Parse("life>200").Term, out _));
+
+        var facets = new List<Facet>();
+        book.Facets(within, "tag", facets, 5);
+        Assert.NotEmpty(facets);
+
+        foreach (Facet facet in facets)
+        {
+            string clicked = ColumnQuery.Toggle("life>200", "tag", facet.Value);
+            QueryResult parsed = ColumnQuery.Parse(clicked);
+            Assert.True(parsed.Ok, $"'{clicked}' would not read back: {parsed.Error}");
+
+            RowSet after = Assert.IsType<RowSet>(book.Matching(parsed.Term, out string error));
+            Assert.Equal(string.Empty, error);
+            Assert.Equal(facet.Count, after.Count);
+        }
+    }
+
+    [Fact]
+    public void AModifierWithNoNameCanStillBeClicked()
+    {
+        // A modifier row that resolves to nothing is indexed as "#4211", and the rail offers it like
+        // any other value - so the parser has to be able to read it back. Without '#' as part of a
+        // word, the rail could offer something the box could not hold.
+        string clicked = ColumnQuery.Toggle("", "mod", "#4211");
+        Assert.Equal("mod:#4211", clicked);
+
+        QueryResult parsed = ColumnQuery.Parse(clicked);
+        Assert.True(parsed.Ok, parsed.Error);
+        Assert.True(ColumnQuery.Holds(parsed.Term, "mod", "#4211"));
+    }
+
+    [Fact]
     public void GreaterThanIsNotAtLeast()
     {
         MonsterVarieties table = Shipped();
