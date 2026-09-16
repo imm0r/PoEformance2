@@ -144,7 +144,17 @@ public sealed record OverlaySettings(
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
     // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants
     // the rest of it. Nothing is lost by folding it away; what it clicks is written into the query.
-    [property: JsonPropertyName("monsterRail")] bool MonsterRail = true)
+    [property: JsonPropertyName("monsterRail")] bool MonsterRail = true,
+
+    // How big the monster's model may be drawn, in pixels each way. A SETTING and not a constant
+    // because the cost is the caller's to spend and it is not linear: the work grows with the
+    // AREA, so measured against a real rig, 384 costs 3.0 ms a frame while turning, 768 costs 8.0
+    // and 1536 costs 25.1 - the last being past what a drag can keep up with. 768 is the default
+    // because it is the largest that still turns smoothly beside everything else the overlay
+    // draws; somebody with the room and the processor to spare can raise it, and somebody playing
+    // on a laptop can drop it. See MonsterPortrait, which also steps DOWN one size while the
+    // model is being dragged, so a high setting costs its full price only when holding still.
+    [property: JsonPropertyName("monsterModelSize")] int MonsterModelSize = 768)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>

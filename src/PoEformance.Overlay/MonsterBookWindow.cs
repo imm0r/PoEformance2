@@ -907,9 +907,19 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             return;
         }
 
+        // THREE LIMITS, AND THE SMALLEST OF THEM WINS. The cap somebody set, the share of the pane
+        // a picture may take, and whatever is left after the figures beside it keep their column.
+        //
+        // THE THIRD ONE USED TO BE A REFUSAL RATHER THAN A LIMIT, which is a worse answer: below a
+        // pane width the picture vanished entirely instead of becoming the largest that still fits.
+        // Raising the share moved that cliff outwards, so panes that had a small portrait would
+        // have lost it. Shrinking is the honest response to a narrow pane; disappearing is for
+        // when there is genuinely no room, which LeastPortrait still decides.
         float wide = ImGui.GetContentRegionAvail().X;
-        float side = MathF.Min(MonsterPortrait.Size, wide * PortraitShare);
-        if (side < LeastPortrait || wide - side < LeastColumn)
+        float side = MathF.Min(
+            model.Most, MathF.Min(wide * PortraitShare, wide - LeastColumn));
+
+        if (side < LeastPortrait)
         {
             return;
         }
@@ -926,12 +936,20 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     }
 
     /// <summary>How much of the pane's width the picture may take.</summary>
-    private const float PortraitShare = 0.42f;
+    /// <remarks>
+    /// HALF, because the block beside it is the narrowest in the pane. Figures is two short
+    /// columns - a word and a number - and every longer section below it, the tags and the skills
+    /// and the modifiers, runs the full width UNDER the picture rather than beside it. So the
+    /// width this leaves only has to hold the narrow block, and <see cref="LeastColumn"/> is what
+    /// guards that. It was 0.42 while the picture was capped at 384 and the share never bound;
+    /// with the cap a setting, this is the limit somebody meets first.
+    /// </remarks>
+    private const float PortraitShare = 0.5f;
 
     /// <summary>Below this the picture is not worth the width it costs.</summary>
     private const float LeastPortrait = 110f;
 
-    /// <summary>And this much has to be left for the figures beside it.</summary>
+    /// <summary>And this much is always left for the figures beside it, whatever that costs the picture.</summary>
     private const float LeastColumn = 260f;
 
     /// <summary>

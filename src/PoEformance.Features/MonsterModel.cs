@@ -11,12 +11,17 @@ namespace PoEformance.Features;
 /// <param name="Mesh_">The <c>.sm</c> that named the geometry, for the report.</param>
 /// <param name="Material">The <c>.mat</c> path that was used, for the report.</param>
 /// <param name="Why">Where the walk stopped, or empty where it did not.</param>
+/// <param name="Paint">
+/// Why the monster is drawn in plain ink, or empty where its own texture is on it. A separate
+/// answer from <paramref name="Why"/>: a model can be found in full and still have no colour.
+/// </param>
 public sealed record MonsterModel(
     SkinnedMesh Mesh,
     GamePicture? Skin,
     string Mesh_,
     string Material,
-    string Why)
+    string Why,
+    string Paint = "")
 {
     /// <summary>Nothing found.</summary>
     public static MonsterModel None { get; }
@@ -24,6 +29,9 @@ public sealed record MonsterModel(
 
     /// <summary>Whether there is a model to draw.</summary>
     public bool Ready => Mesh.Ready;
+
+    /// <summary>Whether the monster is wearing its own texture rather than plain ink.</summary>
+    public bool Painted => Paint.Length == 0 && Skin is { Ready: true };
 }
 
 /// <summary>
@@ -124,21 +132,62 @@ public static class MonsterModels
             ? found.Material
             : manifest.Materials.FirstOrDefault(said => said.Length > 0) ?? string.Empty;
 
+        (GamePicture? skin, string paint) = Painted(read, mesh, material);
+        return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint);
+    }
+
+    /// <summary>
+    /// The monster's colour texture, and - when there is none - which of the ways it can be
+    /// missing this one is.
+    /// </summary>
+    /// <remarks>
+    /// THE REASON IS THE POINT, not a nicety. A monster drawn without its texture comes out in a
+    /// pale warm grey that is all but indistinguishable from bare skin, so "is this monster
+    /// untextured or is it just pale" is a question a picture CANNOT answer - it was asked from
+    /// the live client and could only be settled by reading code. Everything needed to answer it
+    /// passes through here and used to be thrown away.
+    ///
+    /// THE COORDINATES ARE CHECKED LAST AND SEPARATELY, because a mesh can have a perfectly good
+    /// texture and no way to look it up. That is the expected state of a bare body whose clothes
+    /// are attached objects, and it is a different answer from "the file would not read".
+    /// </remarks>
+    private static (GamePicture? Skin, string Why) Painted(
+        Func<string, byte[]?> read, SkinnedMesh mesh, string material)
+    {
+        if (material.Length == 0)
+        {
+            return (null, "neither the .ao nor the .sm names a material");
+        }
+
         MaterialFile paint = Read(read, MaterialFile.Bare(material), MaterialFile.Read);
-        GamePicture? skin = null;
+        if (!paint.Ready)
+        {
+            return (null, $"the material did not read: {MaterialFile.Bare(material)}");
+        }
+
+        if (paint.Albedo is not { Length: > 0 } texture)
+        {
+            return (null, "the material names no colour texture");
+        }
 
         // THROUGH ReadRaw AND NOT A BARE READ. A texture in this game is one of three things and
         // only the third is a .dds as it stands: it may be a SIGNPOST - a star and the path of the
         // file that really holds it - or it may sit behind a compressed header. Decoding a plain
         // read handles the third and silently fails the other two, which shows as a monster with a
         // mesh and no colour and says nothing about why.
-        if (paint.Albedo is { Length: > 0 } texture
-            && GameArt.ReadRaw(read, texture) is { Length: > 0 } bytes)
+        if (GameArt.ReadRaw(read, texture) is not { Length: > 0 } bytes)
         {
-            skin = GameArt.Decode(bytes);
+            return (null, $"the texture did not read: {texture}");
         }
 
-        return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty);
+        if (GameArt.Decode(bytes) is not { Ready: true } skin)
+        {
+            return (null, $"the texture did not decode: {texture}");
+        }
+
+        return mesh.Coordinated
+            ? (skin, string.Empty)
+            : (skin, "the mesh carries no texture coordinates, so the texture cannot be applied");
     }
 
     /// <summary>

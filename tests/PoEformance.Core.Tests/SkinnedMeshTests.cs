@@ -183,6 +183,40 @@ public class SkinnedMeshTests
     private const int VertexBufferStarts = 32 + 13 + 8 + (2 * 8) + (2 * 3 * 2);
 
     /// <summary>What follows the vertex buffer: the four bytes, the name table, and the tail.</summary>
+    /// <summary>
+    /// A mesh that can be painted is told from one that cannot.
+    /// </summary>
+    /// <remarks>
+    /// ANY ONE COORDINATE IS ENOUGH, and that is the case worth pinning. A mesh with no
+    /// coordinates does not have an absent array - it has a full one of zeroes, because the vertex
+    /// format still reserves the slot - so the question is "are they ALL zero", not "is the array
+    /// there". A check that looked only at the first vertex would call a real mesh uncoordinated
+    /// whenever its first corner happened to sit at the texture's origin, which is a place real
+    /// corners sit.
+    ///
+    /// WHAT RIDES ON IT: the renderer skips the texture when this is false, and the model walk
+    /// reports it as the reason a monster came out in plain ink. Answering it wrongly either
+    /// paints every triangle with one corner texel, or sends somebody looking for a missing file.
+    /// </remarks>
+    [Fact]
+    public void AMeshThatCanBePaintedIsToldFromOneThatCannot()
+    {
+        Vector3[] places = [new(0f, 0f, 0f), new(1f, 0f, 0f), new(0f, 1f, 0f)];
+        Vector3[] facing = [Vector3.UnitZ, Vector3.UnitZ, Vector3.UnitZ];
+        int[] indices = [0, 1, 2];
+
+        SkinnedMesh Made(Vector2[]? spots)
+            => SkinnedMesh.Of(places, facing, indices, Vector3.Zero, Vector3.One, spots);
+
+        Assert.False(Made(null).Coordinated, "no coordinates at all");
+        Assert.False(Made(new Vector2[3]).Coordinated, "an array of zeroes is no coordinates");
+        Assert.False(SkinnedMesh.None.Coordinated, "and nothing at all carries nothing");
+
+        Assert.True(
+            Made([Vector2.Zero, Vector2.Zero, new Vector2(0f, 0.5f)]).Coordinated,
+            "one corner away from the origin is a mesh that can be painted");
+    }
+
     private static int AfterVertices(string[] names)
         => 4 + (names.Length * 4) + names.Sum(one => one.Length * 2) + 4 + (7 * 4);
 

@@ -34,8 +34,36 @@ public static class MeshPicture
     /// <remarks>A cap rather than a hope: the size reaches this from a caller, and the buffers are square.</remarks>
     public const int Widest = 2048;
 
-    /// <summary>How much of the frame the model fills, leaving a margin around it.</summary>
+    /// <summary>How much of the frame the model fills at rest, leaving a margin around it.</summary>
     public const float Fill = 0.86f;
+
+    /// <summary>The furthest out a zoom may pull, and the closest it may push.</summary>
+    /// <remarks>
+    /// CLAMPED IN THE RENDERER RATHER THAN TRUSTED FROM THE CALLER, because the cost of a zoom is
+    /// not symmetric: pulling back only wastes frame, while pushing in makes each triangle cover
+    /// more pixels, and a mesh magnified far enough is a handful of triangles painting the whole
+    /// buffer over and over. Six is already closer than any monster needs.
+    /// </remarks>
+    public const float Nearest = 0.4f;
+
+    /// <inheritdoc cref="Nearest"/>
+    public const float Furthest = 6f;
+
+    /// <summary>How many squares across the ground grid is drawn.</summary>
+    public const int Squares = 10;
+
+    /// <summary>How far the ground grid reaches, as a share of what the camera fitted.</summary>
+    /// <remarks>
+    /// CHOSEN BY LOOKING, because "does the floor fit in the frame" is a question about a picture.
+    /// A square seen at 45 degrees shows its DIAGONAL, so the usable share is roughly this times
+    /// 2 times root 2 - at 0.35 that is 0.99 of what the camera fitted, which lands just inside
+    /// the frame at the steepest tilt the portrait allows.
+    /// </remarks>
+    public const float Floor = 0.35f;
+
+    /// <summary>How far under the feet the ground sits, as a share of the model's height.</summary>
+    /// <remarks>Enough to settle the depth test, far too little to look like the monster floats.</remarks>
+    public const float Under = 0.002f;
 
     /// <summary>
     /// The two buffers a drawing works in, kept so that turning a model does not throw them away.
@@ -84,14 +112,18 @@ public static class MeshPicture
     /// The monster's own colour texture, or null to draw it in <paramref name="ink"/>. What
     /// <see cref="MaterialFile.Albedo"/> names, decoded by <see cref="GameArt"/>.
     /// </param>
+    /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
+    /// <param name="ground">Whether to draw the grid the model stands on.</param>
     public static GamePicture Of(
         SkinnedMesh? mesh,
         int size,
         float turn = 0f,
         float tilt = 0f,
         Vector3 ink = default,
-        GamePicture? skin = null)
-        => Of(mesh, new Canvas(size), turn, tilt, ink, skin);
+        GamePicture? skin = null,
+        float zoom = 1f,
+        bool ground = false)
+        => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, ground);
 
     /// <summary>
     /// Draws the mesh into a canvas the caller keeps, for anything that draws it more than once.
@@ -102,13 +134,17 @@ public static class MeshPicture
     /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
     /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
     /// <param name="skin">The monster's own colour texture, or null to draw it in <paramref name="ink"/>.</param>
+    /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
+    /// <param name="ground">Whether to draw the grid the model stands on.</param>
     public static GamePicture Of(
         SkinnedMesh? mesh,
         Canvas canvas,
         float turn = 0f,
         float tilt = 0f,
         Vector3 ink = default,
-        GamePicture? skin = null)
+        GamePicture? skin = null,
+        float zoom = 1f,
+        bool ground = false)
     {
         ArgumentNullException.ThrowIfNull(canvas);
 
@@ -151,7 +187,7 @@ public static class MeshPicture
             // monster is drawn upside down, which is a picture and is the wrong one.
             * Matrix4x4.CreateRotationX(-MathF.PI / 2f);
 
-        float scale = size * Fill / reach;
+        float scale = size * Fill * Math.Clamp(zoom, Nearest, Furthest) / reach;
         float half = size * 0.5f;
 
         float[] depth = canvas.Depth;
@@ -161,11 +197,17 @@ public static class MeshPicture
         // a face black: anything pointing at the camera is lit.
         Vector3 lamp = Vector3.Normalize(new Vector3(-0.35f, -0.55f, -0.75f));
 
+        // BEFORE THE MESH, so the model's own depth test hides whatever runs behind it. Painting
+        // the floor afterwards would need a second rule about what may cover what; a depth buffer
+        // already has one.
+        if (ground)
+        {
+            Ground(pixels, depth, size, mesh, view, scale, half);
+        }
+
         // The skin is only usable if it decoded AND the mesh carries coordinates to look it up
-        // with. A mesh with no texture coordinates has all of them at zero, which would paint
-        // every triangle with one corner pixel of the texture - a monster in a flat colour taken
-        // from an arbitrary place, which is worse than the honest grey.
-        GamePicture? usable = skin is { Ready: true } && Coordinated(mesh) ? skin : null;
+        // with - see SkinnedMesh.Coordinated for what an uncoordinated mesh would paint.
+        GamePicture? usable = skin is { Ready: true } && mesh.Coordinated ? skin : null;
 
         Span<Vector3> corner = stackalloc Vector3[3];
         Span<Vector3> facing = stackalloc Vector3[3];
@@ -283,18 +325,124 @@ public static class MeshPicture
         }
     }
 
-    /// <summary>Whether the mesh carries texture coordinates worth looking anything up with.</summary>
-    private static bool Coordinated(SkinnedMesh mesh)
+    /// <summary>
+    /// The grid the model stands on, drawn on the plane under its feet.
+    /// </summary>
+    /// <remarks>
+    /// THE FEET ARE AT Most.Z AND NOT Least.Z. A model runs along negative z with its head at the
+    /// far end - BasicSkeleton's box is z -189 to -0.4 - so the floor is the end NEAREST zero.
+    /// Reading it the other way draws the grid across the monster's scalp, which is a picture and
+    /// is the wrong one.
+    ///
+    /// IT IS EDGE ON AT A LEVEL VIEW, and that is right rather than broken. A floor seen from its
+    /// own height is a line; tilting down opens it out. It is what makes a turn legible - a bare
+    /// model rotating against nothing gives the eye no fixed thing to measure against.
+    ///
+    /// DEPTH IS WRITTEN, so the model occludes the part of the floor behind it without anybody
+    /// deciding an order. The far half of the grid disappearing behind a monster's legs is the
+    /// whole reason it reads as a floor and not as wallpaper.
+    /// </remarks>
+    private static void Ground(
+        byte[] pixels, float[] depth, int size, SkinnedMesh mesh,
+        Matrix4x4 view, float scale, float half)
     {
-        foreach (Vector2 one in mesh.Coordinates)
+        Vector3 middle = (mesh.Least + mesh.Most) * 0.5f;
+        Vector3 span = Vector3.Abs(mesh.Most - mesh.Least);
+
+        // MEASURED OFF THE SAME SIDE THE CAMERA IS, and not off the footprint. A floor sized to a
+        // monster's own width is wider than the frame for anything tall - a skeleton is 154 across
+        // and 189 high, so the camera fits 189 and a footprint-sized floor runs off both edges.
+        // Tying it to what the camera fitted keeps the floor inside the picture at every tilt,
+        // and still gives a rat a small one and a boss a big one.
+        float reach = MathF.Max(span.X, MathF.Max(span.Y, span.Z)) * Floor;
+        if (reach <= 0f)
         {
-            if (one != Vector2.Zero)
-            {
-                return true;
-            }
+            return;
         }
 
-        return false;
+        // A HAIR BELOW THE FEET AND NOT EXACTLY AT THEM. Most.Z is where the lowest triangle sits,
+        // so a floor drawn at it is at the SAME depth as the sole - and the depth test keeps
+        // whichever got there first, which is the floor. The symptom is grid lines cutting across
+        // a monster's feet. Below means a LARGER z, because the model runs along negative z with
+        // its head at the far end.
+        float floor = mesh.Most.Z + (span.Z * Under);
+        float step = reach * 2f / Squares;
+
+        // Dim enough to stay behind the monster rather than compete with it, and the two middle
+        // lines lighter so there is something to read the turn against.
+        var faint = new Vector3(0.26f, 0.25f, 0.22f);
+        var axis = new Vector3(0.46f, 0.44f, 0.38f);
+
+        for (var i = 0; i <= Squares; i++)
+        {
+            float at = -reach + (i * step);
+            Vector3 ink = i == Squares / 2 ? axis : faint;
+
+            Line(
+                pixels, depth, size, view, scale, half,
+                new Vector3(middle.X + at, middle.Y - reach, floor),
+                new Vector3(middle.X + at, middle.Y + reach, floor),
+                ink);
+
+            Line(
+                pixels, depth, size, view, scale, half,
+                new Vector3(middle.X - reach, middle.Y + at, floor),
+                new Vector3(middle.X + reach, middle.Y + at, floor),
+                ink);
+        }
+    }
+
+    /// <summary>One straight line of the grid, depth-tested like everything else.</summary>
+    /// <remarks>
+    /// STEPPED ALONG THE LONGER SIDE, which is what keeps a line solid at every angle: walking x
+    /// on a line that is mostly vertical leaves a dotted one, and the grid turns with the model so
+    /// every line is every angle in turn.
+    /// </remarks>
+    private static void Line(
+        byte[] pixels, float[] depth, int size,
+        Matrix4x4 view, float scale, float half,
+        Vector3 from, Vector3 to, Vector3 ink)
+    {
+        Vector3 a = Screen(from, view, scale, half);
+        Vector3 b = Screen(to, view, scale, half);
+
+        float run = MathF.Max(MathF.Abs(b.X - a.X), MathF.Abs(b.Y - a.Y));
+        var steps = (int)MathF.Ceiling(run);
+        if (steps <= 0)
+        {
+            return;
+        }
+
+        for (var i = 0; i <= steps; i++)
+        {
+            Vector3 place = Vector3.Lerp(a, b, (float)i / steps);
+            var x = (int)place.X;
+            var y = (int)place.Y;
+
+            if (x < 0 || y < 0 || x >= size || y >= size)
+            {
+                continue;
+            }
+
+            int spot = (y * size) + x;
+            if (place.Z >= depth[spot])
+            {
+                continue;
+            }
+
+            depth[spot] = place.Z;
+            pixels[(spot * 4) + 0] = Byte(ink.X);
+            pixels[(spot * 4) + 1] = Byte(ink.Y);
+            pixels[(spot * 4) + 2] = Byte(ink.Z);
+            pixels[(spot * 4) + 3] = 255;
+        }
+    }
+
+    /// <summary>A point in the model's own space, put where it lands on the picture.</summary>
+    private static Vector3 Screen(Vector3 place, Matrix4x4 view, float scale, float half)
+    {
+        Vector3 seen = Vector3.Transform(place, view);
+        return new Vector3((seen.X * scale) + half, (seen.Y * scale) + half, seen.Z);
     }
 
     /// <summary>
