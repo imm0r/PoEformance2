@@ -39,6 +39,11 @@ namespace PoEformance.Overlay;
 /// tags, skills and modifier ids for 2733 monsters is real work; done per frame it is work behind
 /// a search box, which is where a tool starts to feel slow. It is built when the table arrives,
 /// filtered when the text changes, and re-sorted only when ImGui says its columns are dirty.
+///
+/// WHAT THIS WINDOW CANNOT DO, and what would replace it: six columns of a table holding some two
+/// hundred thousand facts answer "what is this one" and nothing of the form "which of these".
+/// docs/reading-big-tables.md is the design for the viewer that does - and for why the row cap
+/// below, the per-frame formatting and the substring search all go with it.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDescriptions> sentences)
