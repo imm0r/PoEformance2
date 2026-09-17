@@ -393,15 +393,43 @@ rule ignored, and it cost two bugs:
 Where the two disagreed, the parser was right twice and `FORMATS.md` wrong once — its nine-byte
 file header is eight, which the parser also says.
 
-**Still open:** whether the bundled layout (v8+) holds the same tracks. poe_data_tools parses the
-bundle as a container and stops, so its parser does not say, and unpacking one needs Oodle, which
-needs the game. `--astdump` now unpacks the *smallest* animation of every rig and walks it as its
-header's track count, reporting whether the two lengths agree — so one run on a machine with the
-game settles it.
+**And the last open question is answered.** Whether the bundled layout (v8+) holds the *same* tracks
+as the loose one was a guess: poe_data_tools parses the bundle as a container and stops, so its
+parser does not say, and unpacking one needs Oodle, which needs the game. `--astdump` unpacks the
+*smallest* animation of every rig and walks it as its header's track count. On a real install:
+
+```
+ALL 1628 THAT CAN BE CHECKED TILE THEIR TRACK REGION EXACTLY
+AND ALL 1559 UNPACK INTO TRACKS - one animation from each rig, walked as its
+header's track count, coming to exactly the bytes it claimed.
+```
+
+1559 is 1628 minus the 69 pre-8 rigs, which keep their frames loose and need no unpacking. So the
+two layouts differ in **where** the frames are kept and in nothing else, and the `.ast` format is
+read end to end: bone tree, lights, animation headers across six versions, and keyframes.
+
+The run also re-proved the pre-8 walk sideways. Reading those 69 rigs added 176 animations — and
+exactly 176 framerate rows and 176 kind-byte rows, landing entirely on the values already there.
+**No new framerate, no new kind byte.** A drifted track walk would have sprayed nonsense into both
+tables, which is precisely what the earlier broken version did.
 
 The survey counts a file it cannot check apart from one that passes, which it did not at first:
 "all 1613 tile exactly" included 69 files with no track region to tile, because nought equals
 nought. `AstSurvey.Checkable` is that gate, and the headline's denominator is what could be checked.
+
+**What the fixed survey then measured**, over 2792 monsters and 1628 rigs — all 1628 read, none
+failing:
+
+| | before the fixes | after |
+|---|---|---|
+| rigs read of those asked | 1615 of 1628 | **1628 of 1628** |
+| distinct framerates | 25 — including 0, 191, 232, 250 | **6** — 30, 60, 24, 120, 100, 240 |
+| distinct kind bytes | 24 | **3** — `0x6c`, `0x6e`, `0x6f` |
+
+The nonsense columns were entirely the pre-8 drift, and the three kind bytes left are the three the
+format is described as having. The run also **retired a caveat**: of the 1559 rigs whose arithmetic
+can be checked, 19 are version 9 and one is version 10, and all of them tile — so the animation
+header's version gates are measured for every version this reader walks, not the diagram's word.
 
 The format diagrams are [poe_data_tools/FORMATS.md](https://github.com/adamthedash/poe_data_tools/blob/master/FORMATS.md);
 `ggpk.exposed/poe2/<path>` serves the game's own files over HTTP, which is how these readers were

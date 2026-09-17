@@ -453,9 +453,10 @@ public static class AstSurvey
             }
         }
 
-        // THE OTHER HALF OF THE ANSWER, and until this runs it is a guess. The offsets tiling says
-        // the frames are WHERE the headers say; this says they are WHAT a track is - unpacked and
-        // walked as the header's own number of tracks, coming to exactly the length it claimed.
+        // THE OTHER HALF OF THE ANSWER. The offsets tiling says the frames are WHERE the headers
+        // say; this says they are WHAT a track is - unpacked and walked as the header's own number
+        // of tracks, coming to exactly the length it claimed. It ran, over 1559 rigs, and they all
+        // do; it stays because a patch that changed the format would show here first.
         if (result.Unpacked > 0)
         {
             output.WriteLine(
