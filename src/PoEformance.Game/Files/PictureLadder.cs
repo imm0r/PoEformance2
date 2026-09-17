@@ -24,10 +24,11 @@ namespace PoEformance.Game.Files;
 /// </remarks>
 public sealed class PictureLadder
 {
-    /// <summary>The default cap: the largest rung that still turns smoothly.</summary>
+    /// <summary>The default cap on what TURNING the model may cost, as a size.</summary>
     /// <remarks>
     /// MEASURED, at 8.0 ms a frame while turning against an overlay frame of about 10. One rung
-    /// up is 12.5 and two is 25.1, which a drag cannot keep up with. See OverlaySettings.
+    /// up is 12.5 and two is 25.1, which a drag cannot keep up with. It is not a cap on how big
+    /// the picture may BE - see <see cref="For"/>. See also OverlaySettings.
     /// </remarks>
     public const int Usual = 768;
 
@@ -47,10 +48,26 @@ public sealed class PictureLadder
     public int Most { get; }
 
     /// <summary>What to draw at for a picture shown this wide, never above the cap.</summary>
-    public int For(float side) => Math.Min(Snap(Asked(side)), Most);
+    /// <remarks>
+    /// THE CAP DOES NOT APPLY HERE, and that is what the measurement actually said. What was
+    /// measured is the cost of a frame WHILE TURNING - 8.0 ms at 768, 25.1 at 1536 - and a cost
+    /// per frame only matters when there are frames: at rest the picture is drawn ONCE, when the
+    /// monster changes or the drag ends, and one 25 ms frame is not something anybody sees. A cap
+    /// on the resting size buys nothing and shows as a picture that stops growing with its pane,
+    /// which is what it was reported as.
+    /// </remarks>
+    public int For(float side) => Snap(Asked(side));
 
-    /// <summary>The same, one rung lower: what a model being dragged is drawn at.</summary>
-    public int Dragging(float side) => Down(For(side));
+    /// <summary>
+    /// What a model being dragged is drawn at: capped, and then one rung lower.
+    /// </summary>
+    /// <remarks>
+    /// BOTH, because this is the only place the frame cost is paid. The cap is somebody's answer
+    /// to "how much processor may turning this cost", and the rung below it is the four-times
+    /// discount that makes the drag itself smooth; the sharp picture comes back the moment the
+    /// button is let go.
+    /// </remarks>
+    public int Dragging(float side) => Down(Math.Min(For(side), Most));
 
     /// <summary>The smallest rung at or above what is asked for, or the top one.</summary>
     public static int Snap(int want)

@@ -124,7 +124,10 @@ public sealed class MonsterPortrait
 
         // The size is settled BEFORE the picture is taken, because what it is drawn at follows what
         // it will be shown at - and that is only known once the pane's width is.
-        float side = Math.Clamp(wide, 64f, _sizes.Most);
+        // TO THE RENDERER'S OWN LIMIT AND NOT TO THE CAP. The cap says what TURNING may cost; it
+        // said nothing about how big the picture may be, and clamping the shown size to it was a
+        // picture that stopped growing with its pane however far the boundary was dragged.
+        float side = Math.Clamp(wide, 64f, MeshPicture.Widest);
         Finished(side);
 
         if (_texture == IntPtr.Zero)

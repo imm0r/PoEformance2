@@ -264,9 +264,11 @@ screenshot on a machine with the game.
 The portrait is **turned by dragging, zoomed on the wheel, and reset by double-clicking**, and it
 stands on a grid that turns with it. `MonsterPortrait` holds the turn, tilt and zoom and redraws
 whenever one of them moves — which is per frame during a drag, and is what makes the numbers
-below matter. How big it may be drawn is `monsterModelSize` in the settings, default 768; the
-portrait steps one rung **down** the size ladder while a drag is in progress and back up on
-release, so a high setting is paid for only when holding still.
+below matter. At rest it follows its pane up to what the renderer will draw; `monsterModelSize`
+(default 768) caps what **turning** it may cost, and the portrait steps one rung *down* from that
+cap while a drag is in progress. A single draw is cheap even at the top — 5.3 ms at 768, 15.3 at
+1536, 26.3 at 2048 — so the cap has no business binding the resting size, which it used to, and
+showed as a picture that would not grow with its pane.
 
 It lives in a **pane of its own**, on the far right, folded away by the `Model` button and
 remembered as `monsterModel` — the same button-and-setting pair as the facet rail, and a third
