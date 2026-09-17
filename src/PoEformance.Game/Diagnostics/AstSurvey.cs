@@ -73,6 +73,13 @@ public readonly record struct AstSpread(int Least, int Middle, int Most, long To
 /// <param name="Bones">How many bones a rig has.</param>
 /// <param name="Hung">How many animations a rig carries.</param>
 /// <param name="Keyframes">What every rig's keyframes come to unpacked, in bytes.</param>
+/// <param name="Unpacked">
+/// How many rigs had one animation's frames actually unpacked and walked as tracks.
+/// </param>
+/// <param name="Framed">
+/// And how many of those came to exactly the length their header claimed - see
+/// <see cref="AnimationSkeleton.Walk"/>. That is the open question about the bundled layout.
+/// </param>
 /// <param name="Faults">Files that did not read or did not add up, with what was wrong.</param>
 /// <param name="CutShort">Whether a cap stopped the walk - see <see cref="AstSurvey.MostSkeletons"/>.</param>
 public sealed record AstSurveyResult(
@@ -91,6 +98,8 @@ public sealed record AstSurveyResult(
     AstSpread Bones,
     AstSpread Hung,
     long Keyframes,
+    int Unpacked,
+    int Framed,
     IReadOnlyList<string> Faults,
     bool CutShort = false)
 {
@@ -98,7 +107,7 @@ public sealed record AstSurveyResult(
     public static AstSurveyResult Nothing { get; }
         = new(0, 0, 0, 0, 0, 0, 0, new Dictionary<string, int>(), new Dictionary<string, int>(),
             new Dictionary<string, int>(), new Dictionary<string, int>(), new Dictionary<string, int>(),
-            default, default, 0, []);
+            default, default, 0, 0, 0, []);
 }
 
 /// <summary>
@@ -221,6 +230,8 @@ public static class AstSurvey
         var read = 0;
         var tiled = 0;
         var unproven = 0;
+        var unpacked = 0;
+        var framed = 0;
 
         foreach ((string path, string key) in wanted)
         {
@@ -285,12 +296,42 @@ public static class AstSurvey
                 Note(kinds, "0x" + move.Kind.ToString("x2", CultureInfo.InvariantCulture));
                 Note(animations, move.Name);
             }
+
+            // ONE ANIMATION PER RIG, UNPACKED AND WALKED. Whether the bundled layout holds the same
+            // tracks as the loose one is the one thing about this format that could not be settled
+            // without the game - so it is settled here, once per file, on the smallest animation
+            // there is. A whole rig would be twelve megabytes through Oodle for an answer that one
+            // walk gives; the smallest is usually a few kilobytes.
+            if (one.Loose || Smallest(one) is not { Length: > 0 } tried)
+            {
+                continue;
+            }
+
+            byte[]? frames = one.Tracks(tried, files.Unpack);
+            if (frames is null)
+            {
+                continue;
+            }
+
+            unpacked++;
+            if (AnimationSkeleton.Walk(frames, tried.Tracks, one.Version) == frames.Length)
+            {
+                framed++;
+            }
+            else if (faults.Count < MostFaults)
+            {
+                faults.Add(Fault(
+                    path,
+                    one,
+                    $"\"{tried.Name}\" unpacked to {Say(frames.Length)} bytes, which do not walk as"
+                    + $" {Say(tried.Tracks)} tracks"));
+            }
         }
 
         return new AstSurveyResult(
             walk.Monsters, walk.Read, naming, asked, read, tiled, unproven,
             named, versions, rates, kinds, animations,
-            AstSpread.Of(bones), AstSpread.Of(hung), keyframes, faults,
+            AstSpread.Of(bones), AstSpread.Of(hung), keyframes, unpacked, framed, faults,
             CutShort: walk.CutShort || asked >= MostSkeletons);
     }
 
@@ -331,6 +372,15 @@ public static class AstSurvey
         if (one.TrackBytes == 0)
         {
             return "no keyframes to account for";
+        }
+
+        // BELOW VERSION 8 THE FRAMES ARE INTERLEAVED WITH THE HEADERS, so there is no region for
+        // offsets to chain across and this check does not apply. What replaces it is stricter and
+        // the reader has already made it: a file of that layout only reads at all if the walk ends
+        // on its last byte, which means every track of every animation was sized correctly.
+        if (one.Loose)
+        {
+            return string.Empty;
         }
 
         var cursor = 0;
@@ -401,6 +451,26 @@ public static class AstSurvey
                     $"     {Say(result.Unproven)} more read but have NOTHING TO CHECK - no animation"
                     + " headers, or no keyframes. They are not evidence either way; see the faults.");
             }
+        }
+
+        // THE OTHER HALF OF THE ANSWER, and until this runs it is a guess. The offsets tiling says
+        // the frames are WHERE the headers say; this says they are WHAT a track is - unpacked and
+        // walked as the header's own number of tracks, coming to exactly the length it claimed.
+        if (result.Unpacked > 0)
+        {
+            output.WriteLine(
+                result.Framed == result.Unpacked
+                    ? $"     AND ALL {Say(result.Unpacked)} UNPACK INTO TRACKS - one animation from"
+                        + " each rig, walked as its header's track count, coming to exactly the"
+                        + " bytes it claimed. The bundled layout holds what the loose one does."
+                    : $"     {Say(result.Framed)} of {Say(result.Unpacked)} unpacked into tracks."
+                        + " The rest are in the faults - the bundled layout is NOT what was assumed.");
+        }
+        else if (result.Read > result.Unproven)
+        {
+            output.WriteLine(
+                "     Nothing was unpacked, so whether the bundles hold tracks is still open."
+                + " That needs Oodle, which needs the game.");
         }
 
         if (result.Faults.Count > 0)
@@ -491,6 +561,28 @@ public static class AstSurvey
     /// </remarks>
     public static bool Checkable(AnimationSkeleton? one)
         => one is { Ready: true, Animations.Count: > 0 } && one.TrackBytes > 0;
+
+    /// <summary>
+    /// The animation with the fewest bytes of frames, which is the cheapest one to unpack.
+    /// </summary>
+    /// <remarks>
+    /// SMALLEST RATHER THAN FIRST, because the first is often the biggest: rigs list their
+    /// animations alphabetically and <c>arm_slam_01</c> is 148,980 bytes where an idle pose is a
+    /// few hundred. Over an install that is the difference between a minute and ten.
+    /// </remarks>
+    private static SkeletonAnimation Smallest(AnimationSkeleton one)
+    {
+        var best = default(SkeletonAnimation);
+        foreach (SkeletonAnimation move in one.Animations)
+        {
+            if (move.Length > 0 && (best.Length == 0 || move.Length < best.Length))
+            {
+                best = move;
+            }
+        }
+
+        return best;
+    }
 
     /// <summary>One fault line, with the file's version on it.</summary>
     /// <remarks>

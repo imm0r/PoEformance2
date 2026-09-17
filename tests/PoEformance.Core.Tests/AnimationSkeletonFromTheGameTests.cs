@@ -44,14 +44,20 @@ public class AnimationSkeletonFromTheGameTests
     private const string Lit = "ballexplode-light.ast";
 
     /// <summary>
-    /// Art/Models/MONSTERS/animatedweapon/rig.ast - a version 7 rig, cut off after its bones.
+    /// Art/Models/MONSTERS/animatedweapon/rig.ast - a version 7 rig, its first three animations.
     /// </summary>
     /// <remarks>
-    /// THE BONES ARE ALL THAT IS KEPT because the bones are all that is read. The real file is
-    /// 276,698 bytes of inline keyframes; 400 carries its three bones and the beginning of the
-    /// first animation header, which is exactly as far as this reader is willing to go.
+    /// THE ONE FIXTURE HERE THAT IS NOT BYTE-FOR-BYTE THE GAME'S, and it is worth saying exactly
+    /// how. The real file is 276,698 bytes across 142 animations; this is the first 6087 of them,
+    /// which ends cleanly after attack1_claw's last track, with TWO BYTES EDITED - the animation
+    /// count at offset 3, from 142 to 3. Nothing else is touched.
+    ///
+    /// The edit is what makes the file self-consistent, and self-consistency is the whole test:
+    /// below version 8 a skeleton only reads if the walk lands on the last byte of the file, so a
+    /// plain truncation would fail for being truncated rather than pass for being read. Every byte
+    /// the track walk actually steps over is the game's own.
     /// </remarks>
-    private const string Old = "animatedweapon-v7.bones.ast";
+    private const string Old = "animatedweapon-v7.three.ast";
 
     /// <summary>What the file says about itself, measured before any of this was written.</summary>
     private const int Bones = 49;
@@ -226,37 +232,72 @@ public class AnimationSkeletonFromTheGameTests
     }
 
     /// <summary>
-    /// A real version 7 rig gives up its bones and refuses to guess at its animations.
+    /// A real version 7 rig reads its animations out of the frames interleaved with them.
     /// </summary>
     /// <remarks>
-    /// THE FILE CLAIMS 142 ANIMATIONS AND THIS READER RETURNS NONE, on purpose. Their headers are
-    /// perfectly readable - hunting them by hand in the real 276 KB file finds all 142, at the
-    /// layout this reader already implements - but between one and the next sit that animation's
-    /// own keyframes, at a length no field has been shown to give: 1539, 2727, 1283, 1539, on an
-    /// unchanging three tracks. Striding over them blind is what a survey of the install caught,
-    /// as framerates of 191 and 232 and a spray of one-off kind bytes.
+    /// WHAT MAKES THIS PASS IS THE LAST BYTE. Below version 8 there is no bundle and no offsets:
+    /// each animation header is followed by one track per bone, and a track's own size is six
+    /// counts inside it. So the only way to reach the second animation is to have sized every
+    /// track of the first correctly, and the only way to reach the end of the file is to have
+    /// sized all of them. The reader refuses a file whose walk lands anywhere else - which is a
+    /// stricter statement than the tiling check the newer files get, not a weaker one.
     ///
-    /// SO THE ASSERTION IS THAT IT SAYS SO. An empty list with a reason can be acted on; a list of
-    /// plausible rubbish is indistinguishable from data until somebody tries to play it.
+    /// THIS REPLACED A REFUSAL. The stride was hunted for as a field and was not one, so these
+    /// files' animation lists were not read at all; poe_data_tools' own parser is where the shape
+    /// came from, and measuring it here against two real rigs - 276,698 bytes and 382,590, to the
+    /// byte - is what made it safe to use.
     /// </remarks>
     [Fact]
-    public void ARealOldRigGivesUpItsBonesAndRefusesItsAnimations()
+    public void ARealOldRigReadsItsInterleavedAnimations()
     {
         AnimationSkeleton said = Rig(Old);
 
         Assert.True(said.Ready, said.Why);
         Assert.Equal(7, said.Version);
+        Assert.Empty(said.Why);
 
         // Read at version 12's stride these come back as float data; the older bone is a byte
         // shorter, and all three names being real is what says the gate is honoured.
-        Assert.Equal(3, said.Bones.Count);
         Assert.Equal(["root", "R_Weapon", "L_Weapon"], said.Bones.Select(one => one.Name));
 
-        Assert.Empty(said.Animations);
-        Assert.Contains("version 7", said.Why, StringComparison.Ordinal);
+        Assert.Equal(3, said.Animations.Count);
+        Assert.Equal(
+            ["attack1_2hsword", "attack1_bow", "attack1_claw"],
+            said.Animations.Select(one => one.Name));
+        Assert.All(said.Animations, one => Assert.Equal(30, one.Rate));
+        Assert.All(said.Animations, one => Assert.Equal(said.Bones.Count, one.Tracks));
 
-        // And the survey must not count it as proof of anything.
-        Assert.False(AstSurvey.Checkable(said));
-        Assert.NotEmpty(AstSurvey.Tiling(said));
+        // The frames are in the file as they are, so they come back without an Oodle in sight -
+        // the one layout this project can hand real keyframes to a machine that has no game.
+        Assert.True(said.Loose);
+        byte[]? frames = said.Tracks(said.Animations[0], (_, _) => null);
+        Assert.NotNull(frames);
+        Assert.Equal(said.Animations[0].Length, frames.Length);
+
+        // And the survey counts it, because there was something to check and it checked out.
+        Assert.True(AstSurvey.Checkable(said));
+        Assert.Equal(string.Empty, AstSurvey.Tiling(said));
+    }
+
+    /// <summary>
+    /// A version 7 rig whose walk would end early is refused rather than half-believed.
+    /// </summary>
+    /// <remarks>
+    /// THE ASSERTION THAT GIVES THE ONE ABOVE ITS MEANING. Landing on the end of the file is only
+    /// evidence if landing elsewhere is a failure - so this takes the same real bytes, tells the
+    /// header there are two animations instead of three, and requires the reader to notice that
+    /// the third animation's frames are left over.
+    /// </remarks>
+    [Fact]
+    public void ARealOldRigThatDoesNotAccountForItsFileIsRefused()
+    {
+        byte[] file = File.ReadAllBytes(
+            Path.Combine(DirectoryHolding("tests"), "tests", "fixtures", Old));
+        file[3] = 2;
+
+        AnimationSkeleton said = AnimationSkeleton.Read(file);
+
+        Assert.False(said.Ready);
+        Assert.Contains("drifted", said.Why, StringComparison.Ordinal);
     }
 }

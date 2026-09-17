@@ -16,8 +16,15 @@ public readonly record struct SkeletonBone(string Name, int Sibling, int Child, 
 /// <param name="Parent">What it blends from, on the few that name one. Usually empty.</param>
 /// <param name="Tracks">How many bones it moves. One per bone, on every file seen.</param>
 /// <param name="Rate">Frames per second - 30 or 60 on the rig measured.</param>
-/// <param name="Kind">A byte the format has not been shown to explain. Only 0x6c, 0x6e and 0x6f occur.</param>
-/// <param name="At">Where this animation's keyframes start, in the UNPACKED track region.</param>
+/// <param name="Kind">
+/// A byte nobody has explained - poe_data_tools calls it <c>unk2</c> and so may this. Only 0x6c,
+/// 0x6e and 0x6f occur on a file that reads properly, which is itself a check on the walk.
+/// </param>
+/// <param name="At">
+/// Where this animation's keyframes start. From version 8 that is an offset into the UNPACKED track
+/// region; before it, the frames sit in the file itself and this is a byte offset into that. Either
+/// way <see cref="AnimationSkeleton.Tracks"/> takes it and hands back the bytes.
+/// </param>
 /// <param name="Length">And how many bytes of it there are.</param>
 public readonly record struct SkeletonAnimation(
     string Name, string Parent, int Tracks, int Rate, int Kind, int At, int Length);
@@ -40,10 +47,20 @@ public readonly record struct SkeletonAnimation(
 ///     8 bytes     version, bones, ?, animations (U16), ?, ?, lights
 ///     per bone    sibling U8, child U8, 4x4 matrix (16 F32, row-major), name length U8,
 ///                 one more U8 from version 8, then the name          (fixed part = 68 at v12)
-///     per light   name length U8, 59 more bytes of light, then the name       (fixed part = 60)
+///     per light   name length U8, 51 bytes, 4 more from version 7, 4 more from version 9,
+///                 then the name                                      (fixed part = 60 at v12)
 ///     per anim    tracks U8, ? U8, framerate U8, kind U8, ? U8 (v10+), name length U8,
-///                 parent name length U8 (v11+), offset U32 and length U32 (v8+), both names
-///     the rest    a standard bundle - see BundleFile - holding every animation's keyframes
+///                 parent name length U8 (v11+), offset U32 and length U32 (v8+), both names,
+///                 then BELOW VERSION 8 one track per bone, in line    (fixed part = 15 at v12)
+///     per track   ? U8, bone U32, then counts of scales, rotations, positions and three more
+///                 groups (U32 each), one more U32 from version 10, then the frames themselves:
+///                 4 floats per scale and position, 5 per rotation
+///     the rest    from version 8, a standard bundle - see BundleFile - of every animation's frames
+///
+/// THE LAYOUT IS poe_data_tools' OWN PARSER, checked against this project's measurements rather
+/// than taken on trust - crates/poe_data_tools-lib/src/file_parsers/ast/. Where the two disagreed
+/// the parser was right twice and the FORMATS.md diagram in the same repository was wrong once: the
+/// diagram's nine-byte file header is eight, which the parser also says.
 ///
 /// MEASURED AGAINST Art/Models/MONSTERS/BasicSkeleton/rig.ast, WHICH IS VERSION 12, and the
 /// published diagram at poe_data_tools/FORMATS.md was right in outline and wrong by one byte at
@@ -62,21 +79,21 @@ public readonly record struct SkeletonAnimation(
 /// THE LIGHTS WERE FOUND BY A SURVEY OF THE INSTALL AND NOT BY READING. BasicSkeleton carries none,
 /// so a reader that walked straight from the bones to the animations read it perfectly and drifted
 /// on every rig that has one - fifteen of them, all with <c>lights = 1</c>, and the giveaway was a
-/// fault whose "animation name" contained <c>PointLightShape1</c>. The 60 bytes are measured the
-/// way the bone's 68 were: it is the only length that makes the animation headers after them read,
-/// and with it four rigs across versions 11 and 12 account for their bundles exactly.
+/// fault whose "animation name" contained <c>PointLightShape1</c>.
 ///
 /// AND THE LIGHT IS ANIMATED, which is the part nothing here arranges: <c>Tracks</c> on every
 /// animation equals BONES PLUS LIGHTS - 9 on an eight-bone rig with one light, 116 on TitanBoss's
 /// 115 - so the count in the header is a second, independent statement that the lights were walked.
 ///
-/// BEFORE VERSION 8 THE KEYFRAMES SIT BETWEEN THE HEADERS. There is no bundle and there are no
-/// offsets; each animation is followed by its own frames, and how many bytes of them follows no
-/// field found so far - measured on a real version 7 rig, the blocks run 1539, 2727, 1283, 1539 at
-/// an unchanging three tracks. So the animation list is NOT WALKED below version 8: the bones are
-/// read and believed, and <see cref="Why"/> says why the list is empty. Walking it anyway is what
-/// the install survey caught - names picked out of float data, framerates of 191 and 232, and a
-/// spray of kind bytes that only ever takes three values on a file that is read properly.
+/// BEFORE VERSION 8 THE KEYFRAMES SIT BETWEEN THE HEADERS, interleaved with them: each animation is
+/// followed by one TRACK PER BONE, and a track says its own size - a count of scales, of rotations,
+/// of positions and of three more groups, then that many fixed-width frames. That is why no single
+/// length field could be found for the block: there are seven, and they are inside it.
+///
+/// SO THERE IS NO REGION FOR OFFSETS TO CHAIN ACROSS BELOW VERSION 8, and the check that replaces
+/// tiling is stronger: the walk must land EXACTLY on the end of the file. It does, on both real old
+/// rigs measured - 276,698 bytes of an animatedweapon and 382,590 of a blackguard, to the byte,
+/// across 142 and 13 animations. A file that does not is drifted and is refused.
 /// </remarks>
 public sealed class AnimationSkeleton
 {
@@ -100,6 +117,8 @@ public sealed class AnimationSkeleton
     public const int OffsetsFrom = 8;
 
     private readonly BundleFile? _tracks;
+    private readonly byte[]? _inline;
+    private readonly int _inlineBytes;
 
     private AnimationSkeleton()
     {
@@ -143,7 +162,17 @@ public sealed class AnimationSkeleton
     public int TracksAt { get; private init; } = -1;
 
     /// <summary>How many bytes the keyframes come to once unpacked.</summary>
-    public int TrackBytes => _tracks?.Uncompressed ?? 0;
+    public int TrackBytes => _tracks?.Uncompressed ?? _inlineBytes;
+
+    /// <summary>
+    /// Whether the frames are in the file as they are, rather than in a bundle needing Oodle.
+    /// </summary>
+    /// <remarks>
+    /// Below version 8 they are, which is the one place this reader can hand back real keyframes
+    /// on a machine that has the files and not the game. <see cref="Tracks"/> ignores the
+    /// decompressor it is given in that case.
+    /// </remarks>
+    public bool Loose => _tracks is null && _inline is not null;
 
     /// <summary>
     /// What could not be read, or empty where everything could.
@@ -174,7 +203,22 @@ public sealed class AnimationSkeleton
     /// </remarks>
     public byte[]? Tracks(
         SkeletonAnimation one, Func<ReadOnlyMemory<byte>, int, byte[]?> decompress)
-        => _tracks?.Read(one.At, one.Length, decompress);
+    {
+        if (_tracks is not null)
+        {
+            return _tracks.Read(one.At, one.Length, decompress);
+        }
+
+        // BELOW VERSION 8 THERE IS NOTHING TO UNPACK. The frames are in the file as they are, so
+        // the decompressor is not wanted - and the one caller that has no Oodle can still read
+        // these. The offsets are into the file rather than into a track region; see the remarks.
+        if (_inline is null || one.At < 0 || one.Length < 0 || one.At + one.Length > _inline.Length)
+        {
+            return null;
+        }
+
+        return _inline[one.At..(one.At + one.Length)];
+    }
 
     /// <summary>Reads one out of an open install.</summary>
     public static AnimationSkeleton Read(GameFiles? files, string? path)
@@ -217,7 +261,7 @@ public sealed class AnimationSkeleton
         var lit = new string[lights];
         for (var one = 0; one < lights; one++)
         {
-            if (Light(span, ref at) is not { } name)
+            if (Light(span, ref at, version) is not { } name)
             {
                 return Fault($"light {one} of {lights} ran off the end at byte {at}", version);
             }
@@ -225,23 +269,9 @@ public sealed class AnimationSkeleton
             lit[one] = name;
         }
 
-        // THE BONES ARE BELIEVED AND THE ANIMATIONS ARE NOT, on a layout whose stride between
-        // headers is the keyframes themselves. Reading on regardless is not a smaller answer to
-        // the same question - it is 142 names picked out of float data, which a survey counts as
-        // findings about the game.
-        if (version < OffsetsFrom)
-        {
-            return new AnimationSkeleton(null)
-            {
-                Version = version,
-                Lights = lit,
-                Bones = bones,
-                Why = $"version {version} keeps its keyframes between the animation headers, and"
-                    + " that stride has not been measured - the bones are read, the animations are not",
-            };
-        }
-
         var hung = new SkeletonAnimation[animations];
+        long inline = 0;
+
         for (var one = 0; one < animations; one++)
         {
             if (Animation(span, ref at, version) is not { } move)
@@ -249,7 +279,48 @@ public sealed class AnimationSkeleton
                 return Fault($"animation {one} of {animations} ran off the end at byte {at}", version);
             }
 
+            // BELOW VERSION 8 THE FRAMES ARE HERE, between this header and the next, so walking
+            // them is not optional - it is the only way to find the next header. What comes back
+            // is where they sit in the FILE, which is what Tracks slices below.
+            if (version < OffsetsFrom)
+            {
+                int from = at;
+                for (var track = 0; track < move.Tracks; track++)
+                {
+                    if (!Track(span, ref at, version))
+                    {
+                        return Fault(
+                            $"animation {one}'s track {track} of {move.Tracks} ran off the end"
+                            + $" at byte {at}",
+                            version);
+                    }
+                }
+
+                move = move with { At = from, Length = at - from };
+                inline += move.Length;
+            }
+
             hung[one] = move;
+        }
+
+        // AND THE WALK HAS TO LAND ON THE END OF THE FILE. There is no track region for offsets to
+        // chain across below version 8, so this is what takes tiling's place - and it is a stricter
+        // statement, because every track of every animation had to be sized right to arrive here.
+        // Both real old rigs measured land on it exactly: 276,698 bytes and 382,590.
+        if (version < OffsetsFrom)
+        {
+            return at == file.Length
+                ? new AnimationSkeleton(file, (int)Math.Min(inline, int.MaxValue))
+                {
+                    Version = version,
+                    Lights = lit,
+                    Bones = bones,
+                    Animations = hung,
+                    TracksAt = HeaderBytes,
+                }
+                : Fault(
+                    $"the walk ended at byte {at} of {file.Length}, so it drifted somewhere",
+                    version);
         }
 
         // THE TAIL IS A BUNDLE, and an .ast that has run out of file by here is one with no
@@ -270,6 +341,14 @@ public sealed class AnimationSkeleton
         : this()
         => _tracks = tracks;
 
+    /// <summary>The pre-8 shape: the frames are in the file, so the file is what is kept.</summary>
+    private AnimationSkeleton(byte[] file, int bytes)
+        : this()
+    {
+        _inline = file;
+        _inlineBytes = bytes;
+    }
+
     /// <summary>
     /// A view of the file from a given byte on, which is what the bundle reads its ranges through.
     /// </summary>
@@ -289,30 +368,118 @@ public sealed class AnimationSkeleton
             : null;
 
     /// <summary>
+    /// Walks a block of keyframes as so many tracks, and says how many bytes they came to.
+    /// </summary>
+    /// <param name="frames">The keyframes - unpacked, for a file that keeps them in a bundle.</param>
+    /// <param name="tracks">How many to expect, which the animation's own header says.</param>
+    /// <param name="version">The file's version, which decides one field in a track header.</param>
+    /// <returns>How many bytes the tracks took, or -1 where they did not fit.</returns>
+    /// <remarks>
+    /// THE OPEN QUESTION THIS EXISTS TO SETTLE. Below version 8 the frames sit in the file and are
+    /// walked as tracks, measured against two real rigs. From version 8 they sit in an embedded
+    /// bundle, and whether THAT holds the same track structures is a guess: poe_data_tools parses
+    /// the bundle as a container and stops, so its parser does not say, and unpacking one needs
+    /// Oodle, which needs the game. The check is the same shape as everything else here - walk the
+    /// unpacked bytes as the header's number of tracks and see whether they come to exactly the
+    /// length the header claimed. Nothing arranges that agreement if the guess is wrong.
+    /// </remarks>
+    public static int Walk(ReadOnlySpan<byte> frames, int tracks, int version)
+    {
+        if (tracks < 0)
+        {
+            return -1;
+        }
+
+        var at = 0;
+        for (var one = 0; one < tracks; one++)
+        {
+            if (!Track(frames, ref at, version))
+            {
+                return -1;
+            }
+        }
+
+        return at;
+    }
+
+    /// <summary>
+    /// Steps over one track - a bone's keyframes - and says whether it fitted.
+    /// </summary>
+    /// <remarks>
+    /// A TRACK SAYS ITS OWN SIZE, which is why no single length field could be found for the block
+    /// of frames below version 8: there are seven of them and they are inside it. The header is a
+    /// byte, the bone this track moves, and six counts - scales, rotations, positions and three
+    /// groups nobody has named - with one more U32 from version 10. Then that many frames: four
+    /// floats for a scale or a position, FIVE for a rotation, which is a quaternion and the time it
+    /// happens at.
+    ///
+    /// THE COUNTS ARE THE CHECK. Sized wrongly they walk off the end of the file almost at once; on
+    /// the two real old rigs measured, every track of every animation lands the walk on the last
+    /// byte of the file, and the numbers are the shape a rig ought to have - scale keyframes always
+    /// 2, rotations 79 on a 60fps attack and 31 on a 30fps one, leaf bones at the minimum.
+    ///
+    /// THIS ONLY STEPS OVER THEM. Playing an animation wants the floats, and reading them here
+    /// would mean holding every keyframe of every animation of every rig a survey opens.
+    /// <see cref="Tracks"/> hands back the bytes for the one animation somebody asks for.
+    /// </remarks>
+    private static bool Track(ReadOnlySpan<byte> file, ref int at, int version)
+    {
+        int fixedPart = 1 + (7 * 4) + (version >= 10 ? 4 : 0);
+        if (at + fixedPart > file.Length)
+        {
+            return false;
+        }
+
+        // Past the leading byte and the bone index, six counts, each of frames of a known width.
+        long bytes = 0;
+        ReadOnlySpan<int> widths = [4, 5, 4, 4, 5, 4];
+        for (var one = 0; one < widths.Length; one++)
+        {
+            uint frames = BinaryPrimitives.ReadUInt32LittleEndian(file[(at + 5 + (one * 4))..]);
+            bytes += (long)frames * widths[one] * sizeof(float);
+        }
+
+        long end = at + (long)fixedPart + bytes;
+        if (end > file.Length)
+        {
+            return false;
+        }
+
+        at = (int)end;
+        return true;
+    }
+
+    /// <summary>
     /// One light's name, or null where the file ends inside the record.
     /// </summary>
     /// <remarks>
-    /// SIXTY BYTES AND THEN THE NAME, and the sixty were measured rather than derived: it is the
-    /// only length under which four real rigs - two at version 11, two at 12 - read their animation
-    /// headers and account for their embedded bundles to the byte. What is IN them is a colour, a
-    /// radius and a great deal of zero, and none of it is wanted here; the rig's geometry is the
+    /// SIXTY BYTES AT VERSION 12, and the sixty were measured before they were read anywhere: it is
+    /// the only length under which four real rigs - two at version 11, two at 12 - read their
+    /// animation headers and account for their embedded bundles to the byte. What is IN them is a
+    /// colour, a radius and a great deal of zero, none of it wanted here; the rig's geometry is the
     /// bones, and the light matters to this reader only because it is in the way.
     ///
-    /// NO VERSION GATE, deliberately. Every file seen with a light is 11 or 12, so there is nothing
-    /// to say about 9 or 10 and inventing a gate for them would be the diagram's mistake repeated.
-    /// A file where this is wrong runs off the end or fails its track arithmetic, loudly.
+    /// THE GATES CAME LATER AND CORRECTED A GUESS. This said "no version gate, deliberately" on the
+    /// grounds that every file seen with a light was 11 or 12, so a gate for 9 or 10 would be
+    /// invented. That reasoning was sound and the conclusion was wrong - poe_data_tools' parser
+    /// splits the record at exactly those two places, 51 bytes then 4 from version 7 then 4 more
+    /// from 9, and an old rig with a light would have been read four or eight bytes short.
+    /// ABSENCE OF A COUNTEREXAMPLE IN WHAT WAS LOOKED AT IS NOT ABSENCE IN THE GAME, which is the
+    /// same lesson this project's own notes open with.
     /// </remarks>
-    private static string? Light(ReadOnlySpan<byte> file, ref int at)
+    private static string? Light(ReadOnlySpan<byte> file, ref int at, int version)
     {
-        const int FixedPart = 60;
+        // Fifty-one bytes of it always, four more from version 7 and four more again from 9, which
+        // makes 60 on the versions a light has ever been seen on.
+        int fixedPart = 1 + 51 + (version >= 7 ? 4 : 0) + (version >= 9 ? 4 : 0);
 
-        if (at + FixedPart > file.Length)
+        if (at + fixedPart > file.Length)
         {
             return null;
         }
 
         int length = file[at];
-        at += FixedPart;
+        at += fixedPart;
 
         if (at + length > file.Length)
         {

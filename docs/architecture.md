@@ -366,13 +366,38 @@ the reader was right about BasicSkeleton and wrong about the game.
   the tell was a fault whose "animation name" contained `PointLightShape1`. The game says so twice:
   every animation's track count is *bones plus lights*, so a light is animated like a joint.
   `tests/fixtures/ballexplode-light.ast` is one of them, whole, at 1827 bytes.
-- **Before version 8 the keyframes sit between the headers**, with no bundle and no offsets, at a
-  stride no field has been shown to give (1539, 2727, 1283, 1539 on a real v7 rig at an unchanging
-  three tracks). So `AnimationSkeleton` reads those files' bones and **refuses their animation
-  list**, saying why in `Why`. Walking it anyway is what produced framerates of 191 and 232 and
-  twenty-one one-off kind bytes in the survey — float data read as names and numbers, which in a
-  report is indistinguishable from findings about the game. 69 of 1628 files are affected;
-  versions 11 and 12 are 94% and both are measured.
+- **Before version 8 the keyframes sit between the headers**, with no bundle and no offsets. The
+  stride was hunted for as a length field and is not one: each animation is followed by one **track
+  per bone**, and a track carries *six counts* — scales, rotations, positions and three unnamed
+  groups — then that many fixed-width frames. Four floats for a scale or a position, **five for a
+  rotation**, which is a quaternion and the time it happens at.
+
+So there is no region for offsets to chain across below version 8, and what replaces the tiling
+check is stricter: **the walk must land exactly on the last byte of the file**, which means every
+track of every animation was sized right. Two real old rigs do, to the byte — 276,698 and 382,590.
+
+### Reading the reference properly
+
+`AnimationSkeleton`'s layout now comes from
+[poe_data_tools' own `.ast` parser](https://github.com/adamthedash/poe_data_tools/blob/master/crates/poe_data_tools-lib/src/file_parsers/ast/parser.rs),
+checked against this project's measurements rather than taken on trust. **Only `FORMATS.md` from
+that repository had been read before, not the parser beside it** — which is this repo's own opening
+rule ignored, and it cost two bugs:
+
+- the light record has **two version gates** (51 bytes, +4 from v7, +4 from v9). The reader
+  hardcoded 60 with a remark arguing that a gate for 9 or 10 would be *invented* — sound reasoning,
+  wrong conclusion. Absence of a counterexample in 76 sampled rigs is not absence in the game.
+- the pre-8 stride was declared unmeasurable and those animation lists were refused. The parser had
+  it: it is the track structure above.
+
+Where the two disagreed, the parser was right twice and `FORMATS.md` wrong once — its nine-byte
+file header is eight, which the parser also says.
+
+**Still open:** whether the bundled layout (v8+) holds the same tracks. poe_data_tools parses the
+bundle as a container and stops, so its parser does not say, and unpacking one needs Oodle, which
+needs the game. `--astdump` now unpacks the *smallest* animation of every rig and walks it as its
+header's track count, reporting whether the two lengths agree — so one run on a machine with the
+game settles it.
 
 The survey counts a file it cannot check apart from one that passes, which it did not at first:
 "all 1613 tile exactly" included 69 files with no track region to tile, because nought equals

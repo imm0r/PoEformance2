@@ -278,5 +278,41 @@ public class AstSurveyTests
             Bones: AstSpread.Of([49]),
             Hung: AstSpread.Of([252]),
             Keyframes: 11_954_976,
+            Unpacked: 0,
+            Framed: 0,
             Faults: []);
+
+    /// <summary>
+    /// A block of keyframes walks as tracks when it is one, and refuses when it is not.
+    /// </summary>
+    /// <remarks>
+    /// THE CHECK THAT ANSWERS THE LAST OPEN QUESTION, once somebody with the game runs it. Below
+    /// version 8 the frames are in the file and this walk is proven against two real rigs; from
+    /// version 8 they are in a bundle that needs Oodle, and whether THAT holds the same tracks is
+    /// a guess. The survey unpacks one animation per rig and asks this - and the answer is only
+    /// worth having if a block that is NOT tracks fails it, which is the second half below.
+    /// </remarks>
+    [Fact]
+    public void KeyframesWalkAsTracksOrTheyDoNot()
+    {
+        // One track: a byte, the bone, six counts, then 2 scales, 3 rotations and 2 positions.
+        byte[] one = Packed.Frames([(0, 2, 3, 2)], version: 12);
+        Assert.Equal(one.Length, AnimationSkeleton.Walk(one, 1, 12));
+
+        // Two of them, which is what an animation over two bones looks like.
+        byte[] two = Packed.Frames([(0, 2, 3, 2), (1, 2, 31, 31)], version: 12);
+        Assert.Equal(two.Length, AnimationSkeleton.Walk(two, 2, 12));
+
+        // ASKED FOR THE WRONG NUMBER, the walk does not come to the block's length - which is what
+        // makes the survey's comparison meaningful rather than automatic.
+        Assert.NotEqual(two.Length, AnimationSkeleton.Walk(two, 1, 12));
+        Assert.Equal(-1, AnimationSkeleton.Walk(two, 3, 12));
+
+        // AND A BLOCK OF NOTHING PARSES AS A TRACK OF NOTHING, which is the sharp edge here: 64
+        // zero bytes are a well-formed header claiming no frames at all, so the walk succeeds and
+        // comes to 33. It is the COMPARISON WITH THE BLOCK'S LENGTH that rejects it, not the walk -
+        // which is why the survey asks whether the two are equal rather than whether it parsed.
+        Assert.Equal(33, AnimationSkeleton.Walk(new byte[64], 1, 12));
+        Assert.NotEqual(64, AnimationSkeleton.Walk(new byte[64], 1, 12));
+    }
 }

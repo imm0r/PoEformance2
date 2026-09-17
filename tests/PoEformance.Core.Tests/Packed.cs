@@ -67,12 +67,18 @@ internal static class Packed
     /// sixty bytes plus its name - the record that, unwalked, put every animation header after it
     /// into the wrong place on fifteen of the install's rigs.
     /// </param>
+    /// <param name="frames">
+    /// Below version 8 only: one list of tracks per animation, each track being the bone it moves
+    /// and how many scale, rotation and position keyframes it carries. These are written IN LINE
+    /// after their animation's name, which is where that layout keeps them.
+    /// </param>
     public static byte[] Skeleton(
         (string Name, int Sibling, int Child, float Z)[] bones,
         (string Name, string Parent, int Tracks, int Rate, int Kind, int At, int Length)[] animations,
         byte[]? tail = null,
         int version = 12,
-        string[]? lights = null)
+        string[]? lights = null,
+        (int Bone, int Scales, int Rotations, int Positions)[][]? frames = null)
     {
         using var stream = new MemoryStream();
         using var write = new BinaryWriter(stream);
@@ -111,12 +117,14 @@ internal static class Packed
         {
             byte[] said = Encoding.ASCII.GetBytes(lamp);
 
-            // The name's length, then fifty-nine bytes of colour, radius and zero, then the name.
+            // The name's length, 51 bytes of colour and radius and zero, 4 more from version 7 and
+            // 4 more again from 9, then the name.
             write.Write((byte)said.Length);
-            write.Write(new byte[59]);
+            write.Write(new byte[51 + (version >= 7 ? 4 : 0) + (version >= 9 ? 4 : 0)]);
             write.Write(said);
         }
 
+        var hung = 0;
         foreach ((string name, string parent, int tracks, int rate, int kind, int at, int length) in animations)
         {
             byte[] called = Encoding.ASCII.GetBytes(name);
@@ -145,11 +153,56 @@ internal static class Packed
 
             write.Write(called);
             write.Write(from);
+
+            // BELOW VERSION 8 THE FRAMES FOLLOW THE NAME, in line, which is why there is no bundle
+            // at the end of one of those files and no offsets in its headers.
+            if (frames is not null && hung < frames.Length)
+            {
+                write.Write(Frames(frames[hung], version));
+            }
+
+            hung++;
         }
 
         if (tail is { Length: > 0 })
         {
             write.Write(tail);
+        }
+
+        write.Flush();
+        return stream.ToArray();
+    }
+
+    /// <summary>
+    /// Writes one animation's keyframes: a track per bone, each saying its own size.
+    /// </summary>
+    /// <remarks>
+    /// THE SHAPE THAT WAS HUNTED FOR AS A STRIDE AND IS NOT ONE. A track is a byte, the bone it
+    /// moves, and six counts - then that many frames, four floats for a scale or a position and
+    /// FIVE for a rotation, which is a quaternion and the time it happens at.
+    /// </remarks>
+    public static byte[] Frames(
+        (int Bone, int Scales, int Rotations, int Positions)[] tracks, int version = 12)
+    {
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        foreach ((int bone, int scales, int rotations, int positions) in tracks)
+        {
+            write.Write((byte)0);
+            write.Write(bone);
+            write.Write(scales);
+            write.Write(rotations);
+            write.Write(positions);
+            write.Write(0);
+            write.Write(0);
+            write.Write(0);
+            if (version >= 10)
+            {
+                write.Write(0);
+            }
+
+            write.Write(new byte[((scales * 4) + (rotations * 5) + (positions * 4)) * sizeof(float)]);
         }
 
         write.Flush();
