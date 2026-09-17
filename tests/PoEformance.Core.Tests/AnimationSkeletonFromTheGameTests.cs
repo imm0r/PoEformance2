@@ -32,6 +32,27 @@ public class AnimationSkeletonFromTheGameTests
     /// <summary>Art/Models/MONSTERS/BasicSkeleton/rig.ast, cut off after the bundle's chunk table.</summary>
     private const string Fixture = "basicskeleton-rig.headers.ast";
 
+    /// <summary>
+    /// A version 11 particle rig WITH A LIGHT IN IT, whole - all 1827 bytes of it.
+    /// </summary>
+    /// <remarks>
+    /// Art/particles/monster_particles/Act2_FOUR/MastadonBoss/models/necromancer_ball_explode.
+    /// Kept whole because it is smaller than this comment's share of the repository, and because
+    /// the keyframes being present means the bundle's declared size is a real number to check the
+    /// one animation's offsets against rather than a truncation artefact.
+    /// </remarks>
+    private const string Lit = "ballexplode-light.ast";
+
+    /// <summary>
+    /// Art/Models/MONSTERS/animatedweapon/rig.ast - a version 7 rig, cut off after its bones.
+    /// </summary>
+    /// <remarks>
+    /// THE BONES ARE ALL THAT IS KEPT because the bones are all that is read. The real file is
+    /// 276,698 bytes of inline keyframes; 400 carries its three bones and the beginning of the
+    /// first animation header, which is exactly as far as this reader is willing to go.
+    /// </remarks>
+    private const string Old = "animatedweapon-v7.bones.ast";
+
     /// <summary>What the file says about itself, measured before any of this was written.</summary>
     private const int Bones = 49;
 
@@ -52,9 +73,9 @@ public class AnimationSkeletonFromTheGameTests
         return dir.FullName;
     }
 
-    private static AnimationSkeleton Rig()
+    private static AnimationSkeleton Rig(string which = Fixture)
         => AnimationSkeleton.Read(
-            File.ReadAllBytes(Path.Combine(DirectoryHolding("tests"), "tests", "fixtures", Fixture)));
+            File.ReadAllBytes(Path.Combine(DirectoryHolding("tests"), "tests", "fixtures", which)));
 
     /// <summary>The real file walks, and comes out with the bones and animations it claims.</summary>
     [Fact]
@@ -66,7 +87,11 @@ public class AnimationSkeletonFromTheGameTests
         Assert.Equal(12, said.Version);
         Assert.Equal(Bones, said.Bones.Count);
         Assert.Equal(Animations, said.Animations.Count);
-        Assert.Equal(0, said.Lights);
+
+        // NO LIGHT ON THIS ONE, which is exactly why it could not catch the light bug on its own -
+        // see ARealRigWithALightInItReadsPastIt. Worth asserting so the pair reads as deliberate.
+        Assert.Empty(said.Lights);
+        Assert.Equal(Bones, said.Animations[0].Tracks);
     }
 
     /// <summary>
@@ -162,5 +187,76 @@ public class AnimationSkeletonFromTheGameTests
         // FOUR OF 252 NAME A PARENT, which is the field a reader could drop and still walk every
         // other file in the install perfectly - see AnimationSkeleton's own remarks.
         Assert.Equal(4, said.Animations.Count(one => one.Parent.Length > 0));
+    }
+
+    /// <summary>
+    /// A real rig with a light in it reads past the light and accounts for its bundle exactly.
+    /// </summary>
+    /// <remarks>
+    /// THIS FILE IS HERE BECAUSE BasicSkeleton COULD NOT CATCH THE BUG. It has no light, so a
+    /// reader that walked straight from the bones to the animations passed every assertion above
+    /// while being wrong about fifteen of the install's rigs. A survey of the whole game found
+    /// them; this fixture is so that finding cannot be lost again.
+    ///
+    /// THE TRACK COUNT IS THE INDEPENDENT WITNESS. Eight bones, one light, and every animation
+    /// header says NINE tracks - the game animates the light like a joint, and nothing in this
+    /// reader produces that agreement.
+    /// </remarks>
+    [Fact]
+    public void ARealRigWithALightInItReadsPastIt()
+    {
+        AnimationSkeleton said = Rig(Lit);
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal(11, said.Version);
+        Assert.Equal(8, said.Bones.Count);
+        Assert.Equal(["PointLightShape1"], said.Lights);
+
+        Assert.Single(said.Animations);
+        SkeletonAnimation only = said.Animations[0];
+        Assert.Equal("animate", only.Name);
+        Assert.Equal(30, only.Rate);
+        Assert.Equal(0x6f, only.Kind);
+        Assert.Equal(said.Bones.Count + said.Lights.Count, only.Tracks);
+
+        // And the arithmetic closes on a file whose keyframes are actually present.
+        Assert.Equal(string.Empty, AstSurvey.Tiling(said));
+        Assert.Equal(3945, said.TrackBytes);
+        Assert.Equal(3945, only.At + only.Length);
+    }
+
+    /// <summary>
+    /// A real version 7 rig gives up its bones and refuses to guess at its animations.
+    /// </summary>
+    /// <remarks>
+    /// THE FILE CLAIMS 142 ANIMATIONS AND THIS READER RETURNS NONE, on purpose. Their headers are
+    /// perfectly readable - hunting them by hand in the real 276 KB file finds all 142, at the
+    /// layout this reader already implements - but between one and the next sit that animation's
+    /// own keyframes, at a length no field has been shown to give: 1539, 2727, 1283, 1539, on an
+    /// unchanging three tracks. Striding over them blind is what a survey of the install caught,
+    /// as framerates of 191 and 232 and a spray of one-off kind bytes.
+    ///
+    /// SO THE ASSERTION IS THAT IT SAYS SO. An empty list with a reason can be acted on; a list of
+    /// plausible rubbish is indistinguishable from data until somebody tries to play it.
+    /// </remarks>
+    [Fact]
+    public void ARealOldRigGivesUpItsBonesAndRefusesItsAnimations()
+    {
+        AnimationSkeleton said = Rig(Old);
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal(7, said.Version);
+
+        // Read at version 12's stride these come back as float data; the older bone is a byte
+        // shorter, and all three names being real is what says the gate is honoured.
+        Assert.Equal(3, said.Bones.Count);
+        Assert.Equal(["root", "R_Weapon", "L_Weapon"], said.Bones.Select(one => one.Name));
+
+        Assert.Empty(said.Animations);
+        Assert.Contains("version 7", said.Why, StringComparison.Ordinal);
+
+        // And the survey must not count it as proof of anything.
+        Assert.False(AstSurvey.Checkable(said));
+        Assert.NotEmpty(AstSurvey.Tiling(said));
     }
 }

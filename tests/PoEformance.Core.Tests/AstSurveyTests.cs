@@ -103,15 +103,61 @@ public class AstSurveyTests
         Assert.Contains("900", wrong, StringComparison.Ordinal);
     }
 
-    /// <summary>A skeleton with no animations and no keyframes has nothing to disagree about.</summary>
+    /// <summary>
+    /// A skeleton with nothing hung on it does NOT tile - there was nothing to tile.
+    /// </summary>
+    /// <remarks>
+    /// THIS TEST USED TO ASSERT THE OPPOSITE, and asserting the opposite is what let a survey of
+    /// the whole install report "ALL 1613 TILE THEIR TRACK REGION EXACTLY" with sixty-nine of them
+    /// having no track region at all. Nought equals nought is true and it is not evidence: those
+    /// files are version 6 and 7, whose animation lists this reader will not walk, and counting
+    /// them as passes put them behind the one number the feature is supposed to rest on.
+    ///
+    /// The honest answer is a reason, and a column of its own in the report - see Checkable.
+    /// </remarks>
     [Fact]
-    public void ASkeletonWithNothingHungOnItTiles()
+    public void ASkeletonWithNothingHungOnItProvesNothing()
     {
         AnimationSkeleton said = AnimationSkeleton.Read(
             Packed.Skeleton([("root_jntBnd", 255, 255, 0f)], []));
 
         Assert.True(said.Ready);
+        Assert.False(AstSurvey.Checkable(said));
+        Assert.NotEmpty(AstSurvey.Tiling(said));
+    }
+
+    /// <summary>Animations with no keyframes behind them prove nothing either.</summary>
+    [Fact]
+    public void AnimationsWithNoKeyframesBehindThemProveNothing()
+    {
+        AnimationSkeleton said = AnimationSkeleton.Read(
+            Packed.Skeleton(
+                [("root_jntBnd", 255, 255, 0f)],
+                [("walk_01", string.Empty, 1, 30, 0x6c, 0, 400)]));
+
+        Assert.True(said.Ready);
+        Assert.Equal(0, said.TrackBytes);
+        Assert.False(AstSurvey.Checkable(said));
+        Assert.Contains("no keyframes", AstSurvey.Tiling(said), StringComparison.Ordinal);
+    }
+
+    /// <summary>A light between the bones and the animations does not disturb the arithmetic.</summary>
+    [Fact]
+    public void ARigWithALightStillTiles()
+    {
+        AnimationSkeleton said = AnimationSkeleton.Read(
+            Packed.Skeleton(
+                [("root", 255, 255, 0f)],
+                [
+                    ("start", string.Empty, 2, 30, 0x6f, 0, 400),
+                    ("idle", string.Empty, 2, 30, 0x6e, 400, 500),
+                ],
+                Packed.Bundle(new byte[900], chunkSize: 64),
+                lights: ["minisun_pointlightShape"]));
+
+        Assert.True(AstSurvey.Checkable(said));
         Assert.Equal(string.Empty, AstSurvey.Tiling(said));
+        Assert.Equal(["minisun_pointlightShape"], said.Lights);
     }
 
     /// <summary>Nothing read is a reason rather than a pass, which is the direction that matters.</summary>
@@ -182,7 +228,7 @@ public class AstSurveyTests
     {
         var clean = new StringWriter();
         AstSurvey.Report(Surveyed(read: 186, tiled: 186), clean);
-        Assert.Contains("ALL 186 TILE", clean.ToString(), StringComparison.Ordinal);
+        Assert.Contains("ALL 186 THAT CAN BE CHECKED TILE", clean.ToString(), StringComparison.Ordinal);
 
         var messy = new StringWriter();
         AstSurvey.Report(Surveyed(read: 186, tiled: 140), messy);
@@ -192,8 +238,30 @@ public class AstSurveyTests
         Assert.DoesNotContain("ALL", told, StringComparison.Ordinal);
     }
 
-    /// <summary>A result with nothing in it but the two counts the headline needs.</summary>
-    private static AstSurveyResult Surveyed(int read, int tiled)
+    /// <summary>
+    /// Files with nothing to check are counted apart from the ones that tile, and named as such.
+    /// </summary>
+    /// <remarks>
+    /// THE HEADLINE'S DENOMINATOR IS WHAT COULD BE CHECKED. A run of 1615 files where 69 have no
+    /// track region and 1546 tile must not read as "1546 of 1615" - that invites the reader to
+    /// hunt 69 failures that do not exist - nor as "ALL 1615", which is the overstatement this
+    /// whole change exists to remove. It reads as all 1546 that can be checked, and 69 more that
+    /// cannot, on their own line.
+    /// </remarks>
+    [Fact]
+    public void FilesWithNothingToCheckAreCountedApart()
+    {
+        var wrote = new StringWriter();
+        AstSurvey.Report(Surveyed(read: 1615, tiled: 1546, unproven: 69), wrote);
+
+        string told = wrote.ToString();
+        Assert.Contains("ALL 1546 THAT CAN BE CHECKED TILE", told, StringComparison.Ordinal);
+        Assert.Contains("69 more read but have NOTHING TO CHECK", told, StringComparison.Ordinal);
+        Assert.DoesNotContain("1546 of 1615", told, StringComparison.Ordinal);
+    }
+
+    /// <summary>A result with nothing in it but the counts the headline needs.</summary>
+    private static AstSurveyResult Surveyed(int read, int tiled, int unproven = 0)
         => new(
             Monsters: 2733,
             Files: 4102,
@@ -201,6 +269,7 @@ public class AstSurveyTests
             Asked: read,
             Read: read,
             Tiled: tiled,
+            Unproven: unproven,
             Named: new Dictionary<string, int> { ["ClientAnimationController.skeleton"] = read },
             Versions: new Dictionary<string, int> { ["12"] = read },
             Rates: new Dictionary<string, int>(),

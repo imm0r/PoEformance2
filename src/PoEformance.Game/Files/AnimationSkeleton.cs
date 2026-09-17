@@ -39,7 +39,8 @@ public readonly record struct SkeletonAnimation(
 ///
 ///     8 bytes     version, bones, ?, animations (U16), ?, ?, lights
 ///     per bone    sibling U8, child U8, 4x4 matrix (16 F32, row-major), name length U8,
-///                 one more U8 from version 8, then the name
+///                 one more U8 from version 8, then the name          (fixed part = 68 at v12)
+///     per light   name length U8, 59 more bytes of light, then the name       (fixed part = 60)
 ///     per anim    tracks U8, ? U8, framerate U8, kind U8, ? U8 (v10+), name length U8,
 ///                 parent name length U8 (v11+), offset U32 and length U32 (v8+), both names
 ///     the rest    a standard bundle - see BundleFile - holding every animation's keyframes
@@ -58,10 +59,24 @@ public readonly record struct SkeletonAnimation(
 ///   - that bundle's own payload size plus its header is exactly the bytes left in the file.
 /// Any one of those could be a coincidence. Three cannot.
 ///
-/// EVERY VERSION BUT 12 IS THE DIAGRAM'S WORD AND NOT A MEASUREMENT. The gates below - a byte from
-/// version 8, another from 10, another from 11 - reproduce the 15-byte animation header that was
-/// counted on the real file, which is some evidence they are right; it is not the same as having
-/// read one. A file that does not walk cleanly says so in <see cref="Why"/> rather than throwing.
+/// THE LIGHTS WERE FOUND BY A SURVEY OF THE INSTALL AND NOT BY READING. BasicSkeleton carries none,
+/// so a reader that walked straight from the bones to the animations read it perfectly and drifted
+/// on every rig that has one - fifteen of them, all with <c>lights = 1</c>, and the giveaway was a
+/// fault whose "animation name" contained <c>PointLightShape1</c>. The 60 bytes are measured the
+/// way the bone's 68 were: it is the only length that makes the animation headers after them read,
+/// and with it four rigs across versions 11 and 12 account for their bundles exactly.
+///
+/// AND THE LIGHT IS ANIMATED, which is the part nothing here arranges: <c>Tracks</c> on every
+/// animation equals BONES PLUS LIGHTS - 9 on an eight-bone rig with one light, 116 on TitanBoss's
+/// 115 - so the count in the header is a second, independent statement that the lights were walked.
+///
+/// BEFORE VERSION 8 THE KEYFRAMES SIT BETWEEN THE HEADERS. There is no bundle and there are no
+/// offsets; each animation is followed by its own frames, and how many bytes of them follows no
+/// field found so far - measured on a real version 7 rig, the blocks run 1539, 2727, 1283, 1539 at
+/// an unchanging three tracks. So the animation list is NOT WALKED below version 8: the bones are
+/// read and believed, and <see cref="Why"/> says why the list is empty. Walking it anyway is what
+/// the install survey caught - names picked out of float data, framerates of 191 and 232, and a
+/// spray of kind bytes that only ever takes three values on a file that is read properly.
 /// </remarks>
 public sealed class AnimationSkeleton
 {
@@ -75,12 +90,22 @@ public sealed class AnimationSkeleton
     /// <summary>The value a sibling or child index takes when there is none.</summary>
     public const int NoBone = 255;
 
+    /// <summary>
+    /// The first version that keeps its keyframes in a bundle, with offsets into it.
+    /// </summary>
+    /// <remarks>
+    /// AND THEREFORE THE FIRST THIS READS ANIMATIONS FROM AT ALL - see the remarks on the type.
+    /// Below it the frames sit between the headers at a stride nothing has been shown to give.
+    /// </remarks>
+    public const int OffsetsFrom = 8;
+
     private readonly BundleFile? _tracks;
 
     private AnimationSkeleton()
     {
         Bones = [];
         Animations = [];
+        Lights = [];
     }
 
     /// <summary>Nothing read.</summary>
@@ -104,8 +129,15 @@ public sealed class AnimationSkeleton
     /// <summary>Every animation hung on this skeleton.</summary>
     public IReadOnlyList<SkeletonAnimation> Animations { get; private init; }
 
-    /// <summary>How many lights the file carries. Zero on every monster rig seen.</summary>
-    public int Lights { get; private init; }
+    /// <summary>
+    /// What the rig's lights are called - <c>PointLightShape1</c> and the like.
+    /// </summary>
+    /// <remarks>
+    /// A LIGHT IS PART OF THE RIG, not decoration beside it: every animation's track count is
+    /// bones plus lights, so the game animates a light exactly as it animates a joint. Most
+    /// monsters have none; the ones that glow have one.
+    /// </remarks>
+    public IReadOnlyList<string> Lights { get; private init; }
 
     /// <summary>Where the embedded bundle of keyframes begins, or -1 where there is none.</summary>
     public int TracksAt { get; private init; } = -1;
@@ -113,7 +145,14 @@ public sealed class AnimationSkeleton
     /// <summary>How many bytes the keyframes come to once unpacked.</summary>
     public int TrackBytes => _tracks?.Uncompressed ?? 0;
 
-    /// <summary>Why nothing was read, or empty where something was.</summary>
+    /// <summary>
+    /// What could not be read, or empty where everything could.
+    /// </summary>
+    /// <remarks>
+    /// NOT ONLY SET ON A FAILURE. A file below version 8 reads its bones perfectly and its
+    /// animation list not at all, and this is where it says so - so a caller that finds no
+    /// animations can tell "this rig has none" from "this reader cannot walk this layout".
+    /// </remarks>
     public string Why { get; private init; } = string.Empty;
 
     /// <summary>Whether there is a skeleton here.</summary>
@@ -175,6 +214,33 @@ public sealed class AnimationSkeleton
             bones[one] = bone;
         }
 
+        var lit = new string[lights];
+        for (var one = 0; one < lights; one++)
+        {
+            if (Light(span, ref at) is not { } name)
+            {
+                return Fault($"light {one} of {lights} ran off the end at byte {at}", version);
+            }
+
+            lit[one] = name;
+        }
+
+        // THE BONES ARE BELIEVED AND THE ANIMATIONS ARE NOT, on a layout whose stride between
+        // headers is the keyframes themselves. Reading on regardless is not a smaller answer to
+        // the same question - it is 142 names picked out of float data, which a survey counts as
+        // findings about the game.
+        if (version < OffsetsFrom)
+        {
+            return new AnimationSkeleton(null)
+            {
+                Version = version,
+                Lights = lit,
+                Bones = bones,
+                Why = $"version {version} keeps its keyframes between the animation headers, and"
+                    + " that stride has not been measured - the bones are read, the animations are not",
+            };
+        }
+
         var hung = new SkeletonAnimation[animations];
         for (var one = 0; one < animations; one++)
         {
@@ -193,7 +259,7 @@ public sealed class AnimationSkeleton
         return new AnimationSkeleton(tracks)
         {
             Version = version,
-            Lights = lights,
+            Lights = lit,
             Bones = bones,
             Animations = hung,
             TracksAt = tracks is null ? -1 : at,
@@ -221,6 +287,42 @@ public sealed class AnimationSkeleton
         => (at, length) => at >= 0 && length >= 0 && from + at + (long)length <= file.Length
             ? file[(from + at)..(from + at + length)]
             : null;
+
+    /// <summary>
+    /// One light's name, or null where the file ends inside the record.
+    /// </summary>
+    /// <remarks>
+    /// SIXTY BYTES AND THEN THE NAME, and the sixty were measured rather than derived: it is the
+    /// only length under which four real rigs - two at version 11, two at 12 - read their animation
+    /// headers and account for their embedded bundles to the byte. What is IN them is a colour, a
+    /// radius and a great deal of zero, and none of it is wanted here; the rig's geometry is the
+    /// bones, and the light matters to this reader only because it is in the way.
+    ///
+    /// NO VERSION GATE, deliberately. Every file seen with a light is 11 or 12, so there is nothing
+    /// to say about 9 or 10 and inventing a gate for them would be the diagram's mistake repeated.
+    /// A file where this is wrong runs off the end or fails its track arithmetic, loudly.
+    /// </remarks>
+    private static string? Light(ReadOnlySpan<byte> file, ref int at)
+    {
+        const int FixedPart = 60;
+
+        if (at + FixedPart > file.Length)
+        {
+            return null;
+        }
+
+        int length = file[at];
+        at += FixedPart;
+
+        if (at + length > file.Length)
+        {
+            return null;
+        }
+
+        string name = Text(file.Slice(at, length));
+        at += length;
+        return name;
+    }
 
     /// <summary>One bone record, or null where the file ends inside it.</summary>
     private static SkeletonBone? Bone(ReadOnlySpan<byte> file, ref int at, int version)
