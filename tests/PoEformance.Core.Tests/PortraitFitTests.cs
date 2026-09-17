@@ -35,26 +35,33 @@ public class PortraitFitTests
 
         Assert.True(fit.Shown);
 
-        // EVERYTHING THE WORDS DID NOT NEED, which at this pane is 766 - two short of the cap, and
-        // no loss at all: the ladder rounds 766 UP to 768 to draw at, so the only difference is
-        // that ImGui shows it two pixels smaller. The old rule handed back 515.
-        Assert.Equal(Pane - PortraitFit.LeastColumn - PortraitFit.Gutter, fit.Side);
+        // The full cap, because 1030 less the 210 the words wanted and the gutter is more than
+        // 768. The old rule handed back 515 here, hard against the right edge.
+        Assert.Equal(PictureLadder.Usual, fit.Side);
         Assert.True(fit.Side > Pane * 0.5f, "and more than the half-a-pane rule it replaces");
-        Assert.Equal(PictureLadder.Usual, new PictureLadder().For(fit.Side));
 
-        // Where it starts: the column it left for the words, plus the gutter. The column is
-        // floored, so a monster with short names still gets the floor rather than 210.
-        Assert.Equal(PortraitFit.LeastColumn + PortraitFit.Gutter, fit.Left);
+        // Where it starts: exactly where the words ended, plus the gutter. What the words
+        // measured IS the column - a minimum imposed on top of a real measurement would only put
+        // the gap back in a smaller size.
+        Assert.Equal(210f, fit.Column);
+        Assert.Equal(210f + PortraitFit.Gutter, fit.Left);
     }
 
-    /// <summary>A wider column pushes the picture along, and it is the words that decide.</summary>
+    /// <summary>
+    /// The column is what the words measured - no more, and no less.
+    /// </summary>
+    /// <remarks>
+    /// THE NARROW CASE IS THE ONE THAT MATTERS. These sections often want only about 150 pixels,
+    /// and a minimum imposed on a real measurement is just the reported gap again in a smaller
+    /// size. Zero is the frame before anything has been measured, and only that.
+    /// </remarks>
     [Theory]
     [InlineData(0f, PortraitFit.LeastColumn)]
-    [InlineData(100f, PortraitFit.LeastColumn)]
+    [InlineData(150f, 150f)]
     [InlineData(PortraitFit.LeastColumn, PortraitFit.LeastColumn)]
     [InlineData(400f, 400f)]
     [InlineData(600f, 600f)]
-    public void TheColumnIsWhatTheWordsMeasuredWithAFloor(float words, float column)
+    public void TheColumnIsWhatTheWordsMeasured(float words, float column)
     {
         PortraitFit fit = PortraitFit.Of(pane: 1400f, words: words, most: PictureLadder.Usual);
 

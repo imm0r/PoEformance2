@@ -1036,7 +1036,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// </remarks>
     private static void Figures(MonsterVariety one)
     {
-        if (!OverlayLayout.Subsection("Figures", openByDefault: true))
+        if (!OverlayLayout.Subsection("Figures", openByDefault: true, wide: false))
         {
             return;
         }
@@ -1100,7 +1100,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         MonsterKind? kind = all.Kind(one);
         string called = kind?.Id is { Length: > 0 } named ? named : Row(one.Type);
 
-        if (!OverlayLayout.Subsection($"Type - {called}", openByDefault: true))
+        if (!OverlayLayout.Subsection($"Type - {called}", openByDefault: true, wide: false))
         {
             return;
         }
@@ -1201,7 +1201,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             return;
         }
 
-        if (!OverlayLayout.Subsection($"{what} ({all.Length.ToString(CultureInfo.InvariantCulture)})"))
+        if (!OverlayLayout.Subsection($"{what} ({all.Length.ToString(CultureInfo.InvariantCulture)})", wide: false))
         {
             return;
         }
@@ -1240,7 +1240,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             return;
         }
 
-        if (!OverlayLayout.Subsection($"Modifiers ({rows.Length.ToString(CultureInfo.InvariantCulture)})"))
+        if (!OverlayLayout.Subsection($"Modifiers ({rows.Length.ToString(CultureInfo.InvariantCulture)})", wide: false))
         {
             return;
         }

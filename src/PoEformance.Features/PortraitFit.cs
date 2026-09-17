@@ -29,7 +29,12 @@ public readonly record struct PortraitFit(float Column, float Left, float Side, 
     /// <summary>Below this the picture is not worth the width it costs.</summary>
     public const float LeastPortrait = 110f;
 
-    /// <summary>The narrowest the words' column is ever taken to be, before anything is measured.</summary>
+    /// <summary>What the words are assumed to want before they have been measured.</summary>
+    /// <remarks>
+    /// GENEROUS ON PURPOSE, because it is wrong in only one direction for only one frame: too
+    /// wide costs a picture that is briefly smaller than it could be, too narrow draws the words
+    /// across it.
+    /// </remarks>
     public const float LeastColumn = 240f;
 
     /// <summary>
@@ -65,8 +70,13 @@ public readonly record struct PortraitFit(float Column, float Left, float Side, 
             return None;
         }
 
-        float measured = float.IsFinite(words) ? MathF.Max(words, 0f) : 0f;
-        float column = Math.Clamp(measured, LeastColumn, MathF.Max(pane * MostColumn, LeastColumn));
+        // A FALLBACK, NOT A FLOOR. Once the words have been measured their own width IS the
+        // answer, and forcing a minimum on it just puts the gap back in a smaller size: these
+        // sections often want only about 150. LeastColumn is for the one frame before anything
+        // has been measured, where a guess that is too wide costs nothing and one that is too
+        // narrow draws the words over the picture.
+        float measured = float.IsFinite(words) && words > 0f ? words : LeastColumn;
+        float column = MathF.Min(measured, MathF.Max(pane * MostColumn, LeastColumn));
         float side = MathF.Min(most, pane - column - Gutter);
 
         return side < LeastPortrait ? None : new PortraitFit(column, column + Gutter, side, true);

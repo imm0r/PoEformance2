@@ -183,14 +183,30 @@ public static class OverlayLayout
     /// to overrule.
     /// </param>
     /// <returns>Whether it is open, and so whether to draw its contents.</returns>
-    public static bool Subsection(string label, bool openByDefault = false)
+    /// <param name="wide">
+    /// Whether the whole row is the header, or only the words in it.
+    /// </param>
+    /// <remarks>
+    /// WIDE IS A DECISION ABOUT MEASUREMENT AS WELL AS ABOUT CLICKING, which is not obvious and
+    /// cost a round to find. SpanAvailWidth sets the header's RECTANGLE to the full width of the
+    /// pane - imgui_widgets.cpp gives it <c>WorkRect.Max.x</c> - and EndGroup then takes the
+    /// larger of the cursor's reach and THE LAST ITEM'S RECTANGLE (the #7543 workaround). So a
+    /// group of sections ending in a wide header measures as the whole pane, whatever its words
+    /// actually take. Anything laid out beside such a group has to pass false here.
+    ///
+    /// It is also the flag whose hit box runs under whatever is drawn beside the section - which
+    /// is a separate problem, already solved by claiming the hover first, but narrow headers do
+    /// not have it at all.
+    /// </remarks>
+    public static bool Subsection(string label, bool openByDefault = false, bool wide = true)
     {
         ArgumentException.ThrowIfNullOrEmpty(label);
 
         ImGui.SetNextItemOpen(openByDefault, ImGuiCond.FirstUseEver);
         return ImGui.TreeNodeEx(
             label,
-            ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.SpanAvailWidth);
+            ImGuiTreeNodeFlags.NoTreePushOnOpen
+                | (wide ? ImGuiTreeNodeFlags.SpanAvailWidth : ImGuiTreeNodeFlags.SpanTextWidth));
     }
 
     /// <summary>
