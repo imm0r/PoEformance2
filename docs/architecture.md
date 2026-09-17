@@ -358,6 +358,26 @@ name's own length plus 68 across all 49 bones. `tests/fixtures/basicskeleton-rig
 that file with its keyframes cut off — 14 KB of real game bytes that still carry the bundle's own
 statement of what it unpacks to, which is what the offsets are checked against.
 
+**A survey of a real install then found two things one file could not.** Both are the same shape:
+the reader was right about BasicSkeleton and wrong about the game.
+
+- **Lights sit between the bones and the animations**, 60 bytes plus a name. BasicSkeleton has
+  none, so walking straight past them read it perfectly and drifted on all fifteen rigs that glow —
+  the tell was a fault whose "animation name" contained `PointLightShape1`. The game says so twice:
+  every animation's track count is *bones plus lights*, so a light is animated like a joint.
+  `tests/fixtures/ballexplode-light.ast` is one of them, whole, at 1827 bytes.
+- **Before version 8 the keyframes sit between the headers**, with no bundle and no offsets, at a
+  stride no field has been shown to give (1539, 2727, 1283, 1539 on a real v7 rig at an unchanging
+  three tracks). So `AnimationSkeleton` reads those files' bones and **refuses their animation
+  list**, saying why in `Why`. Walking it anyway is what produced framerates of 191 and 232 and
+  twenty-one one-off kind bytes in the survey — float data read as names and numbers, which in a
+  report is indistinguishable from findings about the game. 69 of 1628 files are affected;
+  versions 11 and 12 are 94% and both are measured.
+
+The survey counts a file it cannot check apart from one that passes, which it did not at first:
+"all 1613 tile exactly" included 69 files with no track region to tile, because nought equals
+nought. `AstSurvey.Checkable` is that gate, and the headline's denominator is what could be checked.
+
 The format diagrams are [poe_data_tools/FORMATS.md](https://github.com/adamthedash/poe_data_tools/blob/master/FORMATS.md);
 `ggpk.exposed/poe2/<path>` serves the game's own files over HTTP, which is how these readers were
 checked against real data on a machine with no install. `--aodump` surveys the `.ao` graph and

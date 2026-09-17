@@ -61,6 +61,10 @@ public readonly record struct AstSpread(int Least, int Middle, int Most, long To
 /// <param name="Asked">How many distinct <c>.ast</c> files were asked for.</param>
 /// <param name="Read">How many of those the install had and this reader walked.</param>
 /// <param name="Tiled">Of those, how many tile their track region exactly - see <see cref="AstSurvey.Tiling"/>.</param>
+/// <param name="Unproven">
+/// How many were read but have no track region to check - see <see cref="AstSurvey.Checkable"/>.
+/// Counted apart from <paramref name="Tiled"/> because they are not evidence of anything.
+/// </param>
 /// <param name="Named">Struct and key that named a skeleton, to how many times.</param>
 /// <param name="Versions">File version, to how many files carried it.</param>
 /// <param name="Rates">Framerate, to how many animations run at it.</param>
@@ -78,6 +82,7 @@ public sealed record AstSurveyResult(
     int Asked,
     int Read,
     int Tiled,
+    int Unproven,
     IReadOnlyDictionary<string, int> Named,
     IReadOnlyDictionary<string, int> Versions,
     IReadOnlyDictionary<string, int> Rates,
@@ -91,7 +96,7 @@ public sealed record AstSurveyResult(
 {
     /// <summary>Nothing walked - no install, or no monster reaches a skeleton.</summary>
     public static AstSurveyResult Nothing { get; }
-        = new(0, 0, 0, 0, 0, 0, new Dictionary<string, int>(), new Dictionary<string, int>(),
+        = new(0, 0, 0, 0, 0, 0, 0, new Dictionary<string, int>(), new Dictionary<string, int>(),
             new Dictionary<string, int>(), new Dictionary<string, int>(), new Dictionary<string, int>(),
             default, default, 0, []);
 }
@@ -215,6 +220,7 @@ public static class AstSurvey
         var asked = 0;
         var read = 0;
         var tiled = 0;
+        var unproven = 0;
 
         foreach ((string path, string key) in wanted)
         {
@@ -225,11 +231,21 @@ public static class AstSurvey
 
             asked++;
             AnimationSkeleton one = AnimationSkeleton.Read(files, path);
+
+            // THE VERSION IS TALLIED EVEN WHERE THE WALK FAILED, because it is the first thing to
+            // look at when it did: fifteen faults that turn out to share a version are one bug,
+            // and fifteen spread evenly are fifteen. A fault keeps the version where it got that
+            // far, so this is only blank on a file too short to have one.
+            if (one.Version > 0)
+            {
+                Note(versions, Say(one.Version));
+            }
+
             if (!one.Ready)
             {
                 if (faults.Count < MostFaults)
                 {
-                    faults.Add($"{path}: {(one.Why.Length > 0 ? one.Why : "the install has no such file")}");
+                    faults.Add(Fault(path, one, one.Why.Length > 0 ? one.Why : "the install has no such file"));
                 }
 
                 continue;
@@ -238,7 +254,6 @@ public static class AstSurvey
             read++;
             keep?.Add(new AstRead(path, one, key));
 
-            Note(versions, Say(one.Version));
             bones.Add(one.Bones.Count);
             hung.Add(one.Animations.Count);
             keyframes += one.TrackBytes;
@@ -248,9 +263,20 @@ public static class AstSurvey
             {
                 tiled++;
             }
-            else if (faults.Count < MostFaults)
+            else
             {
-                faults.Add($"{path}: {wrong}");
+                // NOT A FAULT AND NOT A PASS where there was nothing to check. It read; there is
+                // simply no arithmetic in it to do, so it gets its own column rather than being
+                // counted as either. Everything else here is a file that did not add up.
+                if (!Checkable(one))
+                {
+                    unproven++;
+                }
+
+                if (faults.Count < MostFaults)
+                {
+                    faults.Add(Fault(path, one, wrong));
+                }
             }
 
             foreach (SkeletonAnimation move in one.Animations)
@@ -262,7 +288,7 @@ public static class AstSurvey
         }
 
         return new AstSurveyResult(
-            walk.Monsters, walk.Read, naming, asked, read, tiled,
+            walk.Monsters, walk.Read, naming, asked, read, tiled, unproven,
             named, versions, rates, kinds, animations,
             AstSpread.Of(bones), AstSpread.Of(hung), keyframes, faults,
             CutShort: walk.CutShort || asked >= MostSkeletons);
@@ -284,12 +310,27 @@ public static class AstSurvey
     /// and no others - forty kilobytes out of twelve megabytes. A region that did not tile would
     /// mean unpacking the lot.
     /// </remarks>
-    /// <returns>Empty where it tiles, otherwise what did not add up.</returns>
+    /// <returns>Empty where it tiles, otherwise what did not add up or could not be checked.</returns>
     public static string Tiling(AnimationSkeleton? one)
     {
         if (one is not { Ready: true })
         {
             return "nothing read";
+        }
+
+        // A CHECK THAT PASSES ON A FILE IT CANNOT SEE IS WORSE THAN NO CHECK, and this one used to.
+        // A rig with no animation headers and no keyframes satisfied "the headers cover as much as
+        // the bundle holds" at nought equals nought - so every version 6 and 7 file in the install,
+        // whose list this reader will not walk, counted towards ALL TILE EXACTLY. Sixty-nine files
+        // reported as proof of an arithmetic nothing had performed on them.
+        if (one.Animations.Count == 0)
+        {
+            return one.Why.Length > 0 ? one.Why : "no animation headers to account for";
+        }
+
+        if (one.TrackBytes == 0)
+        {
+            return "no keyframes to account for";
         }
 
         var cursor = 0;
@@ -341,20 +382,38 @@ public static class AstSurvey
         // a run where it is not makes the rest of the numbers a description of a bug.
         if (result.Read > 0)
         {
+            // THE DENOMINATOR IS WHAT COULD BE CHECKED, not what was read. Counting a file with no
+            // track region as tiling is how a headline comes to rest on files nothing verified.
+            int could = result.Read - result.Unproven;
             output.WriteLine(
-                result.Tiled == result.Read
-                    ? $"     ALL {Say(result.Read)} TILE THEIR TRACK REGION EXACTLY - every animation's"
-                        + " frames are a contiguous range, and the headers account for the bundle exactly."
-                    : $"     {Say(result.Tiled)} of {Say(result.Read)} tile their track region exactly."
-                        + " The rest are in the faults below, and are the thing to look at.");
+                could == 0
+                    ? $"     NONE of the {Say(result.Read)} read has a track region to check."
+                    : result.Tiled == could
+                        ? $"     ALL {Say(could)} THAT CAN BE CHECKED TILE THEIR TRACK REGION EXACTLY -"
+                            + " every animation's frames are a contiguous range, and the headers"
+                            + " account for the bundle exactly."
+                        : $"     {Say(result.Tiled)} of {Say(could)} tile their track region exactly."
+                            + " The rest are in the faults below, and are the thing to look at.");
+
+            if (result.Unproven > 0)
+            {
+                output.WriteLine(
+                    $"     {Say(result.Unproven)} more read but have NOTHING TO CHECK - no animation"
+                    + " headers, or no keyframes. They are not evidence either way; see the faults.");
+            }
         }
 
         if (result.Faults.Count > 0)
         {
-            output.WriteLine($"     {Say(result.Faults.Count)} files did not read or did not add up. First few:");
-            foreach (string fault in result.Faults.Take(8))
+            output.WriteLine($"     {Say(result.Faults.Count)} files did not read, did not add up, or could not be checked:");
+            foreach (string fault in result.Faults.Take(12))
             {
                 output.WriteLine($"       ! {fault}");
+            }
+
+            if (result.Faults.Count > 12)
+            {
+                output.WriteLine($"       … and {Say(result.Faults.Count - 12)} more");
             }
         }
 
@@ -386,7 +445,7 @@ public static class AstSurvey
             output.WriteLine();
             output.WriteLine(
                 $"  {one.Path}   (version {Say(skeleton.Version)}, {Say(skeleton.Bones.Count)} bones,"
-                + $" {Say(skeleton.Animations.Count)} animations, {Say(skeleton.Lights)} lights)");
+                + $" {Say(skeleton.Animations.Count)} animations, {Say(skeleton.Lights.Count)} lights)");
             output.WriteLine($"    named by {one.Named}");
             output.WriteLine(
                 $"    keyframes at byte {Say(skeleton.TracksAt)}, {Bytes(skeleton.TrackBytes)} unpacked"
@@ -421,6 +480,26 @@ public static class AstSurvey
             }
         }
     }
+
+    /// <summary>
+    /// Whether there is a track region to check at all.
+    /// </summary>
+    /// <remarks>
+    /// THE GATE THAT KEEPS <see cref="Tiling"/> HONEST in the counting. A file this says no to is
+    /// not a file that failed - it is one the check has nothing to say about, and the two belong
+    /// in different columns of the report or the headline is a number about the wrong thing.
+    /// </remarks>
+    public static bool Checkable(AnimationSkeleton? one)
+        => one is { Ready: true, Animations.Count: > 0 } && one.TrackBytes > 0;
+
+    /// <summary>One fault line, with the file's version on it.</summary>
+    /// <remarks>
+    /// THE VERSION IS ON EVERY LINE because that is what the first survey could not say. It
+    /// reported fifteen faults and six versions and left no way to tell whether they were the
+    /// same finding; they were two, and reading the files by hand is what separated them.
+    /// </remarks>
+    private static string Fault(string path, AnimationSkeleton one, string why)
+        => one.Version > 0 ? $"{path} (v{Say(one.Version)}): {why}" : $"{path}: {why}";
 
     /// <summary>A name to print, which on a drifted walk may be empty or rubbish.</summary>
     private static string Called(string name) => name.Length > 0 ? name : "an unnamed animation";

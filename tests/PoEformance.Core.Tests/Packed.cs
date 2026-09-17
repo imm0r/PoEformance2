@@ -62,11 +62,17 @@ internal static class Packed
     /// <param name="animations">Each animation's header, offsets included.</param>
     /// <param name="tail">The bundle of keyframes, from <see cref="Bundle"/>, or null for none.</param>
     /// <param name="version">The file version. 12 is what PoE 2 ships.</param>
+    /// <param name="lights">
+    /// What the rig's lights are called. A light sits between the bones and the animations and is
+    /// sixty bytes plus its name - the record that, unwalked, put every animation header after it
+    /// into the wrong place on fifteen of the install's rigs.
+    /// </param>
     public static byte[] Skeleton(
         (string Name, int Sibling, int Child, float Z)[] bones,
         (string Name, string Parent, int Tracks, int Rate, int Kind, int At, int Length)[] animations,
         byte[]? tail = null,
-        int version = 12)
+        int version = 12,
+        string[]? lights = null)
     {
         using var stream = new MemoryStream();
         using var write = new BinaryWriter(stream);
@@ -77,7 +83,7 @@ internal static class Packed
         write.Write((ushort)animations.Length);
         write.Write((byte)0);
         write.Write((byte)0);
-        write.Write((byte)0);                       // lights
+        write.Write((byte)(lights?.Length ?? 0));
 
         foreach ((string name, int sibling, int child, float z) in bones)
         {
@@ -98,6 +104,16 @@ internal static class Packed
                 write.Write((byte)0);
             }
 
+            write.Write(said);
+        }
+
+        foreach (string lamp in lights ?? [])
+        {
+            byte[] said = Encoding.ASCII.GetBytes(lamp);
+
+            // The name's length, then fifty-nine bytes of colour, radius and zero, then the name.
+            write.Write((byte)said.Length);
+            write.Write(new byte[59]);
             write.Write(said);
         }
 

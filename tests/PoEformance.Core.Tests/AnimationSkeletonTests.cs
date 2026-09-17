@@ -163,6 +163,78 @@ public class AnimationSkeletonTests
         Assert.Equal(frames[400..], said.Tracks(said.Animations[1], Packed.AsIs));
     }
 
+    /// <summary>
+    /// A light between the bones and the animations is walked past, and comes back named.
+    /// </summary>
+    /// <remarks>
+    /// THE BUG THE INSTALL SURVEY FOUND, and the reason it took a survey to find it: BasicSkeleton
+    /// carries no light, so a reader that walked straight from the bones to the animations read the
+    /// one file it was written against perfectly and drifted on every rig that glows. Fifteen of
+    /// them, all with lights = 1, and the tell was a fault whose "animation name" held
+    /// PointLightShape1 - the light's own name, read as though it were an animation's.
+    ///
+    /// Note the TRACK COUNT below. It is bones plus lights, which is the game's own second
+    /// statement that a light is animated like a joint - and a reader that skipped the record
+    /// would still get the animations right while leaving that count unexplained.
+    /// </remarks>
+    [Fact]
+    public void ALightBetweenTheBonesAndTheAnimationsIsWalkedPast()
+    {
+        AnimationSkeleton said = AnimationSkeleton.Read(
+            Packed.Skeleton(
+                [("root", 255, 1, 0f), ("aux_mid", 255, 255, -10f)],
+                [("animate", string.Empty, 3, 30, 0x6f, 0, 400)],
+                Packed.Bundle(new byte[400], chunkSize: 64),
+                lights: ["PointLightShape1"]));
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal(2, said.Bones.Count);
+        Assert.Equal(["PointLightShape1"], said.Lights);
+
+        // The animation after it reads, which is the whole point - an unwalked light puts this
+        // name, rate and offset sixty-odd bytes out and hands back float data as a string.
+        Assert.Single(said.Animations);
+        Assert.Equal("animate", said.Animations[0].Name);
+        Assert.Equal(30, said.Animations[0].Rate);
+        Assert.Equal(0x6f, said.Animations[0].Kind);
+        Assert.Equal(said.Bones.Count + said.Lights.Count, said.Animations[0].Tracks);
+    }
+
+    /// <summary>
+    /// Below version 8 the bones are read and the animations are refused, with a reason.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER THING THE SURVEY FOUND, and the harder one: those files keep their keyframes
+    /// BETWEEN the animation headers rather than in a bundle, so there is no stride from one header
+    /// to the next that anything has been shown to give - measured on a real version 7 rig the
+    /// blocks run 1539, 2727, 1283, 1539 at an unchanging three tracks.
+    ///
+    /// SO NOT READING THEM IS THE FEATURE. Walking on regardless is what produced framerates of
+    /// 191 and 232 and twenty-one one-off kind bytes in a survey of the install - names and numbers
+    /// lifted out of float data, indistinguishable in a report from findings about the game.
+    /// </remarks>
+    [Fact]
+    public void BeforeVersionEightTheAnimationsAreRefusedRatherThanGuessed()
+    {
+        AnimationSkeleton said = AnimationSkeleton.Read(
+            Packed.Skeleton(
+                [("root", 255, 1, 0f), ("R_Weapon", 255, 255, -5f)],
+                [("attack1_2hsword", string.Empty, 3, 30, 0x6f, 0, 0)],
+                tail: null,
+                version: 7));
+
+        // The bones ARE believed: they read the same before version 8 as after, bar one byte, and
+        // the survey found their names printable across every old file in the install.
+        Assert.True(said.Ready);
+        Assert.Equal(7, said.Version);
+        Assert.Equal(2, said.Bones.Count);
+        Assert.Equal("R_Weapon", said.Bones[1].Name);
+
+        Assert.Empty(said.Animations);
+        Assert.Contains("version 7", said.Why, StringComparison.Ordinal);
+        Assert.Contains("not been measured", said.Why, StringComparison.Ordinal);
+    }
+
     /// <summary>A file with no bundle behind it is a skeleton with no keyframes, not a broken one.</summary>
     [Fact]
     public void ASkeletonWithNoKeyframesIsStillASkeleton()
@@ -210,32 +282,33 @@ public class AnimationSkeletonTests
     /// An older version is read to the older layout, byte for byte.
     /// </summary>
     /// <remarks>
-    /// NOT MEASURED, AND THE TEST SAYS SO. Only version 12 was read off a real file; the gates for
-    /// 8, 10 and 11 come from the published diagram. What this pins is that the reader HONOURS
-    /// them - that a version 7 file is walked with a 67-byte bone and a 6-byte animation header
-    /// rather than the 68 and 15 that 12 uses - so if the diagram is ever corrected, exactly one
-    /// place changes and this test fails loudly instead of the reader drifting quietly.
+    /// THE BONE IS ONE BYTE SHORTER BEFORE VERSION 8, and that is what this pins: a 67-byte fixed
+    /// part rather than 68. It shows as a name, because a bone read at the wrong stride puts the
+    /// next one's length byte inside a matrix - so a readable second name over a file built to the
+    /// older layout is the whole assertion.
+    ///
+    /// THE ANIMATION GATES FOR 10 AND 11 ARE STILL THE DIAGRAM'S WORD. Version 11 is now measured
+    /// - 366 files of the install read and account for their bundles under it - and 9 and 10 are
+    /// not, being 18 files and 1. They are read the same way and would fail the track arithmetic
+    /// loudly if the extra byte were wrong, which is the honest state of it.
     /// </remarks>
     [Fact]
     public void AnOlderVersionIsReadToTheOlderLayout()
     {
         AnimationSkeleton said = AnimationSkeleton.Read(
             Packed.Skeleton(
-                [("root_jntBnd", 255, 255, 0f)],
-                [("walk_01", "ignored", 1, 30, 0x6c, 0, 0)],
+                [("root_jntBnd", 255, 1, 0f), ("hip_jntBnd", 255, 255, -97.55f)],
+                [],
                 tail: null,
                 version: 7));
 
         Assert.True(said.Ready);
         Assert.Equal(7, said.Version);
+
+        // The SECOND name is the one that moves: read at version 12's stride, this comes back as
+        // whatever bytes sit one past the end of the first bone's record.
         Assert.Equal("root_jntBnd", said.Bones[0].Name);
-
-        Assert.Single(said.Animations);
-        Assert.Equal("walk_01", said.Animations[0].Name);
-
-        // Before version 8 there are no offsets in the header and before 11 no parent name, so a
-        // v7 file cannot carry either however the fixture was asked to build it.
-        Assert.Equal(string.Empty, said.Animations[0].Parent);
-        Assert.Equal(0, said.Animations[0].At);
+        Assert.Equal("hip_jntBnd", said.Bones[1].Name);
+        Assert.Equal(-97.55f, said.Bones[1].Bind.M43, 3);
     }
 }
