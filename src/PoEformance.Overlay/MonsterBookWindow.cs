@@ -91,8 +91,11 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     private static readonly List<string> _weak = [];
     private static readonly List<string> _quiet = [];
 
-    private readonly PaneSplit _rail = new(0.2f);
-    private readonly PaneSplit _split = new(0.46f);
+    private readonly PaneSplit _rail = new(0.2f, "rail");
+    private readonly PaneSplit _split = new(0.46f, "list");
+
+    /// <summary>Where the detail pane ends and the model's begins. Of the room those two share.</summary>
+    private readonly PaneSplit _model = new(0.58f, "model");
     private readonly DataGrid _grid = new();
 
     /// <summary>What each of the rail's fields holds within the rows that are left.</summary>
@@ -139,6 +142,26 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     private bool _railOpen = true;
 
     /// <summary>
+    /// Whether the monster's model has a pane of its own.
+    /// </summary>
+    /// <remarks>
+    /// A PANE RATHER THAN A CORNER OF THE DETAIL ONE, which is what it was first. A picture placed
+    /// inside a column of text has to be told how much room the words want, and ImGui has no text
+    /// flow to ask - so it was measured, and every way of measuring it was wrong in its own way:
+    /// the section headers' hit boxes stole the drag, a group containing one measured as the whole
+    /// pane, and the width the lists reported moved the picture whenever one was opened. A pane
+    /// has no column to measure and nothing to sit beside.
+    ///
+    /// AND IT IS A CHILD WINDOW, which settles the hit tests by construction rather than by
+    /// submission order: ImGui's ItemHoverable begins with "if (g.HoveredWindow != window) return
+    /// false", so nothing in the detail pane can reach into this one however wide it spans.
+    ///
+    /// ON BY DEFAULT for the reason the rail is - a pane nobody knows about is a pane nobody opens
+    /// - and folded away by the same button-and-setting pair when the width is wanted elsewhere.
+    /// </remarks>
+    private bool _modelOpen = true;
+
+    /// <summary>
     /// The columns somebody chose, BY NAME, or null while the defaults stand.
     /// </summary>
     /// <remarks>
@@ -177,14 +200,18 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// <summary>Whether the facet rail has a pane, for whoever writes the settings file.</summary>
     public bool RailOpen => _railOpen;
 
+    /// <summary>And whether the model does.</summary>
+    public bool ModelOpen => _modelOpen;
+
     /// <summary>Told when somebody changes the layout, so the choice can be kept.</summary>
     public Action? Changed { get; set; }
 
     /// <summary>Puts back what a settings file remembered. Nulls leave the defaults.</summary>
-    public void Show(IReadOnlyList<string>? columns, bool? rail = null)
+    public void Show(IReadOnlyList<string>? columns, bool? rail = null, bool? model = null)
     {
         _wanted = columns is { Count: > 0 } ? columns : null;
         _railOpen = rail ?? _railOpen;
+        _modelOpen = model ?? _modelOpen;
         Layout();
     }
 
@@ -227,12 +254,58 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
 
         _split.Bar();
 
-        if (ImGui.BeginChild("##monster-detail", new Vector2(0f, 0f), ImGuiChildFlags.Borders))
+        // THE DETAIL PANE GIVES UP WIDTH ONLY WHEN THE MODEL IS SHOWING. With the model folded
+        // away it takes the rest, exactly as it did before there was a model at all.
+        float detail = _modelOpen ? _model.Left() : 0f;
+        if (ImGui.BeginChild("##monster-detail", new Vector2(detail, 0f), ImGuiChildFlags.Borders))
         {
             Detail(all, said);
         }
 
         ImGui.EndChild();
+
+        if (!_modelOpen)
+        {
+            return;
+        }
+
+        _model.Bar();
+
+        if (ImGui.BeginChild("##monster-model", new Vector2(0f, 0f), ImGuiChildFlags.Borders))
+        {
+            Portrait(all);
+        }
+
+        ImGui.EndChild();
+    }
+
+    /// <summary>
+    /// The monster's model, filling its own pane.
+    /// </summary>
+    /// <remarks>
+    /// A SQUARE FITTED TO THE SMALLER SIDE, because the picture is square and a pane is not: fitting
+    /// it to the width alone would run a tall model off the bottom of a short pane, and there is no
+    /// scrolling to rescue it - the drag that turns the model would fight the one that scrolls.
+    /// </remarks>
+    private void Portrait(MonsterVarieties all)
+    {
+        // NOT Possible: the portrait says that itself, and better - it knows whether what is
+        // missing is the install or the renderer. Only a viewer that was never wired up at all is
+        // this method's to answer for.
+        if (Model is not { } model)
+        {
+            ImGui.TextDisabled("No model viewer attached.");
+            return;
+        }
+
+        if (_chosen.Length == 0 || all.Find(_chosen) is not { } one)
+        {
+            ImGui.TextDisabled("Choose a monster on the left.");
+            return;
+        }
+
+        Vector2 room = ImGui.GetContentRegionAvail();
+        model.Draw(one, _chosen, MathF.Min(room.X, room.Y));
     }
 
     /// <summary>
@@ -333,7 +406,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// </remarks>
     private void Header(MonsterVarieties all, StatDescriptions said)
     {
-        float room = OverlayLayout.ButtonRoom("Copy list", "Columns", "Facets");
+        float room = OverlayLayout.ButtonRoom("Copy list", "Columns", "Model", "Facets");
         bool wrong = _error.Length > 0;
 
         if (wrong)
@@ -372,6 +445,21 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
                 _railOpen
                     ? "Fold the facet rail away. Nothing is lost - what it clicked is in the query."
                     : "Show the facet rail: what the rows that are left are made of.");
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Model"))
+        {
+            _modelOpen = !_modelOpen;
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                _modelOpen
+                    ? "Fold the model away and give its width back to the rest."
+                    : "Show the monster's own 3D model, read out of the game's files.");
         }
 
         ImGui.SameLine();
@@ -875,86 +963,18 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         Identity(all, one);
         ImGui.Separator();
 
-        Portrait(one);
-
-        // MEASURED AS ONE BLOCK, so the picture beside it knows how much room the words actually
-        // want. A group is ImGui's own way to ask that: everything between these two calls counts
-        // as a single item afterwards, and its rectangle is the bounding box of the lot. Nothing
-        // here wraps - every section is BulletText, which simply runs on - so the box is the truth
-        // rather than a guess at it.
-        ImGui.BeginGroup();
-        try
-        {
-            Figures(one);
-            Type(all, one);
-            Words("Tags", all.TagsOf(one));
-            Words("Skills", all.Skills(one));
-            Mods(all, one, said);
-            Words("Built on", one.Inherits ?? []);
-        }
-        finally
-        {
-            ImGui.EndGroup();
-        }
-
-        // A FRAME BEHIND, which is the only order available: the picture is placed before the
-        // words are drawn, because it has to sit beside their FIRST line rather than under their
-        // last. Opening a section is one frame at the old width and then right - nobody sees it,
-        // and the alternative is drawing the words twice.
-        _column = ImGui.GetItemRectSize().X;
+        // NOTHING IS PLACED BESIDE ANYTHING HERE ANY MORE, and that is the whole of what the model
+        // pane bought. The picture used to sit in this pane's top right, which meant this method
+        // had to know how wide the words below would come out BEFORE drawing them - a question
+        // ImGui cannot answer in the right order, and every approximation of it was wrong in its
+        // own way. The sections are simply a column again.
+        Figures(one);
+        Type(all, one);
+        Words("Tags", all.TagsOf(one));
+        Words("Skills", all.Skills(one));
+        Mods(all, one, said);
+        Words("Built on", one.Inherits ?? []);
     }
-
-    /// <summary>
-    /// The monster's model, in the top right of the detail pane.
-    /// </summary>
-    /// <remarks>
-    /// PLACED RATHER THAN FLOWED, because ImGui has no text flow: the picture is set at an
-    /// absolute spot and the cursor is put back where it was, so everything after it draws down
-    /// the left as though the picture were not there. That works because the block beside it is a
-    /// column of key and value - Figures is the narrowest thing in the pane - and it is why the
-    /// picture goes HERE rather than under the identity block, where the long lists would run
-    /// beneath it.
-    ///
-    /// AND IT GIVES THE WIDTH BACK WHEN THERE IS NOT ENOUGH. Below a pane width where the picture
-    /// and a readable column both fit, there is no picture at all - this window is read while
-    /// playing, over a game that wants the screen, and a portrait that squeezed the numbers into
-    /// two characters would be the wrong trade every time.
-    /// </remarks>
-    private void Portrait(MonsterVariety one)
-    {
-        if (Model is not { Possible: true } model)
-        {
-            return;
-        }
-
-        // THE SUM IS NOT DONE HERE, on purpose - see PortraitFit, and the cap of zero that got
-        // itself shipped by living on this side of the line where no test could reach it.
-        if (PortraitFit.Of(ImGui.GetContentRegionAvail().X, _column, model.Most) is not { Shown: true } fit)
-        {
-            return;
-        }
-
-        Vector2 was = ImGui.GetCursorPos();
-        ImGui.SetCursorPos(was with { X = was.X + fit.Left });
-
-        model.Draw(one, _chosen, fit.Side);
-
-        // BACK TO WHERE THE PANE WAS, and to the TOP of it: the picture is taller than the
-        // figures beside it, and leaving the cursor under it would push every later section down
-        // by the height of a picture that is off to one side.
-        ImGui.SetCursorPos(was);
-    }
-
-    /// <summary>
-    /// How wide the words beside the picture were last frame.
-    /// </summary>
-    /// <remarks>
-    /// MEASURED RATHER THAN RESERVED, which is the whole point. A fixed column is either too wide
-    /// for a monster with short names - the gap somebody has to drag the window wider to afford -
-    /// or too narrow for one with long ones. What the words want is a question ImGui can answer
-    /// exactly, once they have been drawn; see the group in <see cref="Detail"/>.
-    /// </remarks>
-    private float _column;
 
     /// <summary>
     /// Draws the monster's model, or null where the overlay did not wire one up.
@@ -1036,7 +1056,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// </remarks>
     private static void Figures(MonsterVariety one)
     {
-        if (!OverlayLayout.Subsection("Figures", openByDefault: true, wide: false))
+        if (!OverlayLayout.Subsection("Figures", openByDefault: true))
         {
             return;
         }
@@ -1100,7 +1120,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         MonsterKind? kind = all.Kind(one);
         string called = kind?.Id is { Length: > 0 } named ? named : Row(one.Type);
 
-        if (!OverlayLayout.Subsection($"Type - {called}", openByDefault: true, wide: false))
+        if (!OverlayLayout.Subsection($"Type - {called}", openByDefault: true))
         {
             return;
         }
@@ -1201,7 +1221,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             return;
         }
 
-        if (!OverlayLayout.Subsection($"{what} ({all.Length.ToString(CultureInfo.InvariantCulture)})", wide: false))
+        if (!OverlayLayout.Subsection($"{what} ({all.Length.ToString(CultureInfo.InvariantCulture)})"))
         {
             return;
         }
@@ -1240,7 +1260,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             return;
         }
 
-        if (!OverlayLayout.Subsection($"Modifiers ({rows.Length.ToString(CultureInfo.InvariantCulture)})", wide: false))
+        if (!OverlayLayout.Subsection($"Modifiers ({rows.Length.ToString(CultureInfo.InvariantCulture)})"))
         {
             return;
         }

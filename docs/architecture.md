@@ -266,8 +266,18 @@ stands on a grid that turns with it. `MonsterPortrait` holds the turn, tilt and 
 whenever one of them moves — which is per frame during a drag, and is what makes the numbers
 below matter. How big it may be drawn is `monsterModelSize` in the settings, default 768; the
 portrait steps one rung **down** the size ladder while a drag is in progress and back up on
-release, so a high setting is paid for only when holding still. Eight things here cost time to
-rediscover, so they are written down:
+release, so a high setting is paid for only when holding still.
+
+It lives in a **pane of its own**, on the far right, folded away by the `Model` button and
+remembered as `monsterModel` — the same button-and-setting pair as the facet rail, and a third
+`PaneSplit` for the boundary. That is worth a paragraph because it replaced four rounds of trying
+to put it *inside* the detail pane: a picture placed in a column of text has to know how wide the
+words will come out before they are drawn, ImGui has no text flow to answer that, and every
+approximation of it failed differently — the section headers' hit boxes stole the drag, a group
+containing one measured as the whole pane, and the width the lists reported moved the picture
+whenever one was opened. A pane has no column to measure, and being a child window it settles the
+hit tests by construction: `ItemHoverable` begins with `if (g.HoveredWindow != window) return
+false`. Eight things here cost time to rediscover, so they are written down:
 
 - **`extends` carries no extension.** The game writes `extends "Metadata/Parent"` while an
   attached object carries its `.ao` in full. The first survey asked for 3231 files and found
@@ -304,22 +314,18 @@ rediscover, so they are written down:
   the feet. `MeshPicture.Under` is the clearance. A post standing on its end never shows this,
   because pixel centres either side of an edge never interpolate to equal depths; it takes a
   model with a flat sole, which is why the test grew one.
-- **The picture follows the words; it does not hug the right edge.** It used to take half the pane
-  and sit flush right, which on a 1030-pixel pane meant a 515-pixel picture with about 300 pixels
-  of nothing between it and text that wanted 210 — the pane paid for the empty middle *and* for
-  the picture, so the window had to be dragged far wider than its content needed. `PortraitFit`
-  now gives the picture everything the words did not take. The column is **measured**, not
-  reserved — an ImGui group around the sections reports the extent, used a frame later, because
-  the picture has to be placed before the words are drawn. A ceiling of half the pane stops one
-  long modifier line deciding how big a monster's portrait comes out.
-- **A group containing a `SpanAvailWidth` header measures as the whole pane.** This one shipped,
-  and it put the gap straight back. `EndGroup` takes `ImMax(CursorMaxPos, LastItemData.Rect.Max)`
-  — the *last item's* rectangle, a workaround for tables undershooting (ocornut/imgui#7543) — and
-  `SpanAvailWidth` sets a tree node's rectangle to `WorkRect.Max.x`, the full width. So a group of
-  sections ending in a collapsed header reports the pane's width whatever its words take. Only the
-  rectangle lies: `ItemSize` is given `text_width` and tracks the truth. `OverlayLayout.Subsection`
-  now takes `wide: false`, which switches to `SpanTextWidth` — and that flag's narrow hit box is
-  also the one that never reaches under whatever is drawn beside the section.
+- **A group containing a `SpanAvailWidth` header measures as the whole pane.** Nothing measures a
+  group here any more, but the trap is still in `OverlayLayout.Subsection` for the next caller who
+  tries. `EndGroup` takes `ImMax(CursorMaxPos, LastItemData.Rect.Max)` — the *last item's*
+  rectangle, a workaround for tables undershooting (ocornut/imgui#7543) — and `SpanAvailWidth`
+  sets a tree node's rectangle to `WorkRect.Max.x`, the full width. So a group of sections ending
+  in a collapsed header reports the pane's width whatever its words take. Only the rectangle lies:
+  `ItemSize` is given `text_width` and tracks the truth.
+- **Two `PaneSplit`s in one window need two names.** The grip's id was the literal `"##pane-split"`
+  for every instance, so both splitters in the monster book had the *same* ImGui id — and
+  `IsItemActive()` only asks whether `g.ActiveId` equals the last item's id. Dragging the rail's
+  boundary made the list's boundary report itself active too, and both moved by the same delta.
+  It reads as a mysterious layout jump rather than as an id collision.
 - **A monster drawn in plain ink now says which way its colour went missing.** The fallback is a
   pale warm grey all but indistinguishable from bare skin, so *"is this one missing its texture"*
   was a question no screenshot could answer — it was asked from the live client and could only be

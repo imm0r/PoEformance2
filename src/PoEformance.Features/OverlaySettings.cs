@@ -147,6 +147,11 @@ public sealed record OverlaySettings(
     // the rest of it. Nothing is lost by folding it away; what it clicks is written into the query.
     [property: JsonPropertyName("monsterRail")] bool MonsterRail = true,
 
+    // And whether the monster's model has a pane of its own. ON for the reason the rail is: a
+    // pane nobody knows about is a pane nobody opens. It costs width, which is the scarce thing
+    // in this window, so it folds away by the same button-and-setting pair.
+    [property: JsonPropertyName("monsterModel")] bool MonsterModel = true,
+
     // How big the monster's model may be drawn, in pixels each way. A SETTING and not a constant
     // because the cost is the caller's to spend and it is not linear: the work grows with the
     // AREA, so measured against a real rig, 384 costs 3.0 ms a frame while turning, 768 costs 8.0
