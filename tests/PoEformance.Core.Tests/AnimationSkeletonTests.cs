@@ -358,10 +358,12 @@ public class AnimationSkeletonTests
     /// next one's length byte inside a matrix - so a readable second name over a file built to the
     /// older layout is the whole assertion.
     ///
-    /// THE ANIMATION GATES FOR 10 AND 11 ARE STILL THE DIAGRAM'S WORD. Version 11 is now measured
-    /// - 366 files of the install read and account for their bundles under it - and 9 and 10 are
-    /// not, being 18 files and 1. They are read the same way and would fail the track arithmetic
-    /// loudly if the extra byte were wrong, which is the honest state of it.
+    /// AND THE ANIMATION GATES ARE NO LONGER THE DIAGRAM'S WORD, which a survey of a real install
+    /// settled after this was first written: of the 1559 rigs whose track arithmetic can be checked,
+    /// 1167 are version 12, 372 are 11, NINETEEN ARE 9 AND ONE IS 10 - and every one of them tiles.
+    /// A wrong extra byte at 10, or a wrong offset field at 9, scatters those offsets; they chain.
+    /// So the four versions this reader walks animations for are all measured, and the gates below
+    /// are what makes that one code path serve them.
     /// </remarks>
     [Fact]
     public void AnOlderVersionIsReadToTheOlderLayout()

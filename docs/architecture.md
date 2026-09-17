@@ -403,6 +403,20 @@ The survey counts a file it cannot check apart from one that passes, which it di
 "all 1613 tile exactly" included 69 files with no track region to tile, because nought equals
 nought. `AstSurvey.Checkable` is that gate, and the headline's denominator is what could be checked.
 
+**What the fixed survey then measured**, over 2792 monsters and 1628 rigs — all 1628 read, none
+failing:
+
+| | before the fixes | after |
+|---|---|---|
+| rigs read of those asked | 1615 of 1628 | **1628 of 1628** |
+| distinct framerates | 25 — including 0, 191, 232, 250 | **6** — 30, 60, 24, 120, 100, 240 |
+| distinct kind bytes | 24 | **3** — `0x6c`, `0x6e`, `0x6f` |
+
+The nonsense columns were entirely the pre-8 drift, and the three kind bytes left are the three the
+format is described as having. The run also **retired a caveat**: of the 1559 rigs whose arithmetic
+can be checked, 19 are version 9 and one is version 10, and all of them tile — so the animation
+header's version gates are measured for every version this reader walks, not the diagram's word.
+
 The format diagrams are [poe_data_tools/FORMATS.md](https://github.com/adamthedash/poe_data_tools/blob/master/FORMATS.md);
 `ggpk.exposed/poe2/<path>` serves the game's own files over HTTP, which is how these readers were
 checked against real data on a machine with no install. `--aodump` surveys the `.ao` graph and
