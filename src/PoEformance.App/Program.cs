@@ -308,6 +308,12 @@ internal static class Program
             RunAoDump(wanted);
         }
 
+        // And the hop after it: the skeletons those .ao files name. See RunAstDump.
+        if (options.DumpAst is { } rig)
+        {
+            RunAstDump(rig);
+        }
+
         // OUTSIDE the block above on purpose. Everything in it hangs off the game state, and
         // the loaded-file table does not: it hangs off FileRoot, so the tables are there at the
         // login screen, before any area exists. That is also what makes them worth having -
@@ -1264,6 +1270,78 @@ internal static class Program
         Console.WriteLine("  Read the fault count first: this reader has never seen a real .ao file.");
         Console.WriteLine("  Then \"referenced file types\" - a .dds there means a picture is reachable,");
         Console.WriteLine("  and \"animation names\" says whether the Stance column resolves to anything.");
+    }
+
+    /// <summary>
+    /// Reads the skeletons the monsters' .ao files name and reports what is in them.
+    /// </summary>
+    /// <remarks>
+    /// THE MEASUREMENT BEFORE THE FEATURE. A moving monster in the Monster Book is a week of work
+    /// if the game's files support it and a dead end if they do not, and this is the run that says
+    /// which - the same order that settled .ao and .smd, and the same order that not taking would
+    /// have cost a week each time.
+    ///
+    /// THREE NUMBERS DECIDE IT, and they are on AstSurvey in full: whether monsters reach a
+    /// skeleton at all and through what, whether anything but version 12 is shipped, and whether
+    /// the animation offsets tile their track region. That last one is the whole of it. A region
+    /// that tiles means one animation's keyframes are a contiguous range, which is what makes
+    /// playing a walk cycle forty kilobytes of work instead of twelve megabytes.
+    ///
+    /// NEEDS THE INSTALL AND NOT THE GAME, like --aodump: the files are in the bundles whether or
+    /// not anybody is playing.
+    /// </remarks>
+    /// <param name="match">A monster name or path to read in full, or empty to survey all.</param>
+    private static void RunAstDump(string match)
+    {
+        Console.WriteLine();
+        Console.WriteLine("animation skeletons - the bones and the animation list, out of the install's .ast files.");
+
+        PoEformance.Game.Files.GameFiles.OpenedFiles opened =
+            PoEformance.Game.Files.GameFiles.OpenOrSay(PoEformance.Game.Files.GameInstall.Find(null));
+        if (opened.Files is null)
+        {
+            Console.WriteLine($"  no install ({opened.Why}) - nothing to read.");
+            return;
+        }
+
+        PoEformance.Features.MonsterTables read = PoEformance.Features.MonsterTables.Read(
+            opened.Files,
+            PoEformance.Features.QuestTableLayouts.Load(FindDataFile("monster-tables.json")),
+            PoEformance.Game.Entities.MonsterVarieties.Load(FindDataFile("monster-varieties.json")));
+
+        foreach (string line in read.Say)
+        {
+            Console.WriteLine($"  {line}");
+        }
+
+        if (!read.FromGame)
+        {
+            Console.WriteLine("  the install's own monster table did not read, so no .ao paths are known.");
+            return;
+        }
+
+        // ONLY FOR ONE MONSTER. A kept skeleton holds its whole file - unpacking an animation
+        // later reads back through those bytes - so keeping the install's worth would be every
+        // rig's keyframes in memory at once, which is gigabytes for a list nobody reads.
+        List<PoEformance.Game.Diagnostics.AstRead>? keep = match.Length > 0 ? [] : null;
+
+        PoEformance.Game.Diagnostics.AstSurveyResult survey =
+            PoEformance.Game.Diagnostics.AstSurvey.Read(opened.Files, read.Table, match, keep);
+
+        Console.WriteLine();
+        PoEformance.Game.Diagnostics.AstSurvey.Report(survey, Console.Out);
+
+        if (keep is { Count: > 0 })
+        {
+            Console.WriteLine();
+            Console.WriteLine($"  the skeletons behind \"{match}\", in full:");
+            PoEformance.Game.Diagnostics.AstSurvey.Detail(keep, Console.Out);
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("  Read the tiling line first: it is the one thing playback depends on.");
+        Console.WriteLine("  Then \"file versions\" - anything but 12 is a layout this reader has never seen,");
+        Console.WriteLine("  and \"how a skeleton is named\" says whether one sample file was typical.");
     }
 
     private static void RunGroundTypeDump()
@@ -3803,6 +3881,7 @@ internal static class Program
         bool DumpGroundTypes,
         bool DumpAnimations,
         string? DumpAo,
+        string? DumpAst,
         bool ReadGlossary,
         bool ListTables,
         IReadOnlyList<string> Peek,
@@ -3820,7 +3899,7 @@ internal static class Program
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false, mapHunt = false;
             bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
-            string? aoDump = null;
+            string? aoDump = null, astDump = null;
             var inventorySweep = false;
             string tabName = string.Empty;
             List<string> peek = [];
@@ -3963,6 +4042,15 @@ internal static class Program
                             : string.Empty;
                         break;
 
+                    // The hop after --aodump: the .ast files those .ao files name, which is where
+                    // the bones and the animation list are. Same shape and for the same reason -
+                    // a name switches it from a survey to one monster's skeletons in full.
+                    case "--astdump":
+                        astDump = i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)
+                            ? Value(ref i)
+                            : string.Empty;
+                        break;
+
                     // Regenerates data/animations.tsv from the game. Not a hunt - nothing is
                     // being searched for any more - so it stops the moment the row array's base
                     // is confirmed rather than sampling for as long as somebody plays.
@@ -4029,7 +4117,7 @@ internal static class Program
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, watchFlasks, probeKeys,
                 debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, mapHunt, sweep,
-                inventorySweep, tabName, groundTypeDump, animDump, aoDump,
+                inventorySweep, tabName, groundTypeDump, animDump, aoDump, astDump,
                 glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
     }

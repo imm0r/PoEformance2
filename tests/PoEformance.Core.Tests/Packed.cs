@@ -50,6 +50,96 @@ internal static class Packed
         return stream.ToArray();
     }
 
+    /// <summary>
+    /// Writes an <c>.ast</c> the way the format lays one out, so the reader can walk it back.
+    /// </summary>
+    /// <remarks>
+    /// FROM THE LAYOUT AND NOT FROM THE READER, like everything else here. The layout itself was
+    /// measured off a real rig - see AnimationSkeleton - and what this pins is that the reader
+    /// agrees with what was written down, which is the half a synthetic fixture can prove.
+    /// </remarks>
+    /// <param name="bones">Each bone's name, its sibling and child indices, and its resting height.</param>
+    /// <param name="animations">Each animation's header, offsets included.</param>
+    /// <param name="tail">The bundle of keyframes, from <see cref="Bundle"/>, or null for none.</param>
+    /// <param name="version">The file version. 12 is what PoE 2 ships.</param>
+    public static byte[] Skeleton(
+        (string Name, int Sibling, int Child, float Z)[] bones,
+        (string Name, string Parent, int Tracks, int Rate, int Kind, int At, int Length)[] animations,
+        byte[]? tail = null,
+        int version = 12)
+    {
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        write.Write((byte)version);
+        write.Write((byte)bones.Length);
+        write.Write((byte)7);                       // the byte at offset 2 nobody has explained
+        write.Write((ushort)animations.Length);
+        write.Write((byte)0);
+        write.Write((byte)0);
+        write.Write((byte)0);                       // lights
+
+        foreach ((string name, int sibling, int child, float z) in bones)
+        {
+            write.Write((byte)sibling);
+            write.Write((byte)child);
+
+            // An identity matrix with the bone's resting place in the last row, which is where a
+            // row-major 4x4 keeps its translation.
+            for (var cell = 0; cell < 16; cell++)
+            {
+                write.Write(cell switch { 0 or 5 or 10 or 15 => 1f, 14 => z, _ => 0f });
+            }
+
+            byte[] said = Encoding.ASCII.GetBytes(name);
+            write.Write((byte)said.Length);
+            if (version >= 8)
+            {
+                write.Write((byte)0);
+            }
+
+            write.Write(said);
+        }
+
+        foreach ((string name, string parent, int tracks, int rate, int kind, int at, int length) in animations)
+        {
+            byte[] called = Encoding.ASCII.GetBytes(name);
+            byte[] from = version >= 11 ? Encoding.ASCII.GetBytes(parent) : [];
+
+            write.Write((byte)tracks);
+            write.Write((byte)0);
+            write.Write((byte)rate);
+            write.Write((byte)kind);
+            if (version >= 10)
+            {
+                write.Write((byte)0);
+            }
+
+            write.Write((byte)called.Length);
+            if (version >= 11)
+            {
+                write.Write((byte)from.Length);
+            }
+
+            if (version >= 8)
+            {
+                write.Write(at);
+                write.Write(length);
+            }
+
+            write.Write(called);
+            write.Write(from);
+        }
+
+        if (tail is { Length: > 0 })
+        {
+            write.Write(tail);
+        }
+
+        write.Flush();
+        return stream.ToArray();
+    }
+
     /// <summary>One file's place in the index.</summary>
     public sealed record Entry(string Path, int Bundle, int At, int Size);
 

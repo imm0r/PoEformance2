@@ -335,9 +335,33 @@ false`. Eight things here cost time to rediscover, so they are written down:
   failure at all: a mesh with no texture coordinates has a perfectly good texture and no way to
   look it up, which is the expected state of a bare body whose clothes are attached objects.
 
+### The skeleton, and whether a monster can move
+
+`AnimationSkeleton` reads the `.ast` a monster's `.ao` names under
+`ClientAnimationController { skeleton = … }`: the bone tree with each bone's resting place, and one
+header per animation saying what it is called, how fast it runs and where its keyframes are. The
+keyframes themselves are a **bundle embedded in the same file**, so unpacking one animation is a
+ranged read through `BundleFile` and needs Oodle — which is why `Tracks` takes the decompressor as
+an argument instead of reaching for one.
+
+Three things settled that container, and none of them is arranged by the reader: the animation
+offsets chain end to end across all 252 headers; the last one's end is exactly the size the embedded
+bundle declares (11,954,976 on BasicSkeleton's rig); and that bundle's payload plus its header is
+exactly the bytes left in the file. `AstSurvey.Tiling` is that check, and `--astdump` runs it over
+every rig the monsters reach — it is the number to read first, because a region that tiles is what
+makes playing one animation a forty-kilobyte read instead of a twelve-megabyte one.
+
+The published diagram gives the file header as nine bytes. **It is eight.** Read as nine, every
+bone's name lands inside the next bone's matrix, which looks like a mangled string rather than like
+an off-by-one; what settled it was measuring name-to-name spacing on the real file, always the
+name's own length plus 68 across all 49 bones. `tests/fixtures/basicskeleton-rig.headers.ast` is
+that file with its keyframes cut off — 14 KB of real game bytes that still carry the bundle's own
+statement of what it unpacks to, which is what the offsets are checked against.
+
 The format diagrams are [poe_data_tools/FORMATS.md](https://github.com/adamthedash/poe_data_tools/blob/master/FORMATS.md);
 `ggpk.exposed/poe2/<path>` serves the game's own files over HTTP, which is how these readers were
-checked against real data on a machine with no install. `--aodump` surveys the `.ao` graph.
+checked against real data on a machine with no install. `--aodump` surveys the `.ao` graph and
+`--astdump` the skeletons it leads to.
 
 ## Deployment
 
@@ -459,6 +483,8 @@ PoEformance.App --record s.rec --tables       # + list them, with the row size e
 PoEformance.App --groundtypes                 # what each ground-effect type row actually is
 PoEformance.App --aodump                      # survey every monster's .ao files: what is IN them
 PoEformance.App --aodump "Skeletal Warrior"   # + one monster's files in full, structs and entries
+PoEformance.App --astdump                     # survey the skeletons those .ao files name: bones and animations
+PoEformance.App --astdump "Skeletal Warrior"  # + one monster's rig in full, every bone and every animation
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"

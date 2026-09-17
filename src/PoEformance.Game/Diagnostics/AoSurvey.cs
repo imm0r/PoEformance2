@@ -113,11 +113,18 @@ public static class AoSurvey
     /// Only monsters whose path or name contains this, or null for all of them.
     /// </param>
     /// <param name="keep">Files whose full read is kept for printing, or null to keep none.</param>
+    /// <param name="each">
+    /// Called with every file as it is read, or null. It is the same news as <paramref name="keep"/>
+    /// and the reason for both is MEMORY: keeping the walk is 20,000 parsed files at once, which is
+    /// fine for the one monster the detail dump prints and is most of a gigabyte over the install.
+    /// A survey that only wants to TALLY something out of each file takes it here and holds nothing.
+    /// </param>
     public static AoSurveyResult Read(
         GameFiles? files,
         MonsterVarieties? table,
         string? match = null,
-        List<AoRead>? keep = null)
+        List<AoRead>? keep = null,
+        Action<AoRead>? each = null)
     {
         if (files is null || table is null || table.Count == 0)
         {
@@ -185,7 +192,12 @@ public static class AoSurvey
                 faults.Add($"{path}: {ao.Faults[0]}");
             }
 
-            keep?.Add(new AoRead(path, ao, depth));
+            if (keep is not null || each is not null)
+            {
+                var one = new AoRead(path, ao, depth);
+                keep?.Add(one);
+                each?.Invoke(one);
+            }
 
             foreach (string extends in ao.Extends)
             {
