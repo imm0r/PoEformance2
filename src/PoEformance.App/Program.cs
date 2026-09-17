@@ -1339,9 +1339,10 @@ internal static class Program
         }
 
         Console.WriteLine();
-        Console.WriteLine("  Read the tiling line first: it is the one thing playback depends on.");
-        Console.WriteLine("  Then \"file versions\" - anything but 12 is a layout this reader has never seen,");
-        Console.WriteLine("  and \"how a skeleton is named\" says whether one sample file was typical.");
+        Console.WriteLine("  Read the two capitalised lines first: together they are the whole format.");
+        Console.WriteLine("  The first says the frames are WHERE the headers claim, the second that they");
+        Console.WriteLine("  are WHAT a track is. Versions 6, 7, 9, 10, 11 and 12 have all been read and");
+        Console.WriteLine("  checked over a real install; a version outside that list would be new.");
     }
 
     private static void RunGroundTypeDump()
