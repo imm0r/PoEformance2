@@ -183,30 +183,26 @@ public static class OverlayLayout
     /// to overrule.
     /// </param>
     /// <returns>Whether it is open, and so whether to draw its contents.</returns>
-    /// <param name="wide">
-    /// Whether the whole row is the header, or only the words in it.
-    /// </param>
     /// <remarks>
-    /// WIDE IS A DECISION ABOUT MEASUREMENT AS WELL AS ABOUT CLICKING, which is not obvious and
-    /// cost a round to find. SpanAvailWidth sets the header's RECTANGLE to the full width of the
-    /// pane - imgui_widgets.cpp gives it <c>WorkRect.Max.x</c> - and EndGroup then takes the
-    /// larger of the cursor's reach and THE LAST ITEM'S RECTANGLE (the #7543 workaround). So a
-    /// group of sections ending in a wide header measures as the whole pane, whatever its words
-    /// actually take. Anything laid out beside such a group has to pass false here.
+    /// THE WHOLE ROW IS THE HEADER, which is what SpanAvailWidth buys: a click anywhere along it
+    /// folds the section, rather than only one on the arrow and its label.
     ///
-    /// It is also the flag whose hit box runs under whatever is drawn beside the section - which
-    /// is a separate problem, already solved by claiming the hover first, but narrow headers do
-    /// not have it at all.
+    /// DO NOT PUT ONE OF THESE INSIDE A GROUP YOU INTEND TO MEASURE. SpanAvailWidth sets the
+    /// header's RECTANGLE to the full width of the pane - imgui_widgets.cpp gives it
+    /// <c>WorkRect.Max.x</c> - and EndGroup takes the larger of the cursor's reach and THE LAST
+    /// ITEM'S RECTANGLE (the #7543 workaround), so such a group measures as the whole pane
+    /// whatever its words take. That cost a round in the monster book, where a picture was being
+    /// placed from the measurement; the picture has a pane of its own now and nothing is measured,
+    /// but the trap is still here for the next caller who tries.
     /// </remarks>
-    public static bool Subsection(string label, bool openByDefault = false, bool wide = true)
+    public static bool Subsection(string label, bool openByDefault = false)
     {
         ArgumentException.ThrowIfNullOrEmpty(label);
 
         ImGui.SetNextItemOpen(openByDefault, ImGuiCond.FirstUseEver);
         return ImGui.TreeNodeEx(
             label,
-            ImGuiTreeNodeFlags.NoTreePushOnOpen
-                | (wide ? ImGuiTreeNodeFlags.SpanAvailWidth : ImGuiTreeNodeFlags.SpanTextWidth));
+            ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.SpanAvailWidth);
     }
 
     /// <summary>

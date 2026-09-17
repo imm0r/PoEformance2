@@ -482,6 +482,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 ? columns
                 : basis.MonsterColumns,
             MonsterRail = _monsterBook?.RailOpen ?? basis.MonsterRail,
+            MonsterModel = _monsterBook?.ModelOpen ?? basis.MonsterModel,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -2047,6 +2048,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachMonsterBook(
         IReadOnlyList<string>? columns = null,
         bool rail = true,
+        bool model = true,
         bool visible = false,
         Func<string, byte[]?>? readFile = null,
         int modelSize = PictureLadder.Usual)
@@ -2062,7 +2064,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize),
         };
 
-        window.Show(columns, rail);
+        window.Show(columns, rail, model);
         _monsterBook = window;
 
         _tools.Add(

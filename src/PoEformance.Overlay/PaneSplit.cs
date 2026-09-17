@@ -19,9 +19,24 @@ namespace PoEformance.Overlay;
 /// is written down, but how the space inside it is dealt this hour is a working adjustment,
 /// like a scroll position.
 /// </remarks>
+/// <param name="share">How much of the width the left pane starts with.</param>
+/// <param name="name">
+/// What tells this boundary from the others in the same window.
+/// </param>
+/// <remarks>
+/// THE NAME IS NOT DECORATION, and leaving it out was a real bug. Every splitter used to submit
+/// its grip as the literal "##pane-split", so two of them in one window got the SAME ImGui id -
+/// and IsItemActive() only ever asks whether g.ActiveId equals the last item's id. Dragging the
+/// facet rail's boundary therefore made the LIST's boundary report itself active too, and both
+/// moved by the same delta. It is the kind of fault that reads as a mysterious layout jump rather
+/// than as an id collision, and a third pane would have made it a three-way one.
+/// </remarks>
 [SupportedOSPlatform("windows")]
-public sealed class PaneSplit(float share)
+public sealed class PaneSplit(float share, string name = "pane")
 {
+    /// <summary>This boundary's own id, built once rather than per frame.</summary>
+    private readonly string _grip = $"##split-{name}";
+
     /// <summary>How far the boundary can be pushed toward either edge.</summary>
     /// <remarks>
     /// Neither pane may vanish: a pane dragged to nothing takes its own grip's context with
@@ -50,7 +65,7 @@ public sealed class PaneSplit(float share)
 
         float grip = MathF.Max(6f, ImGui.GetFontSize() * 0.45f);
         float height = MathF.Max(1f, ImGui.GetContentRegionAvail().Y);
-        ImGui.InvisibleButton("##pane-split", new Vector2(grip, height));
+        ImGui.InvisibleButton(_grip, new Vector2(grip, height));
 
         bool held = ImGui.IsItemActive();
         bool hovered = ImGui.IsItemHovered();

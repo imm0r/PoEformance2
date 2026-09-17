@@ -2808,6 +2808,7 @@ internal static class Program
         overlay.AttachMonsterBook(
             settings.MonsterColumns,
             settings.MonsterRail,
+            settings.MonsterModel,
             readFile: installed is null ? null : installed.Read,
             modelSize: settings.MonsterModelSize);
         overlay.AttachPointsOfInterest(route);
