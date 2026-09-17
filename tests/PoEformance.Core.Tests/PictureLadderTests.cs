@@ -66,23 +66,39 @@ public class PictureLadderTests
     [InlineData(500, 512)]
     [InlineData(PictureLadder.Usual, PictureLadder.Usual)]
 
-    // Past the DEFAULT ladder's own cap, so these are the cap rather than the next rung up. The
-    // uncapped behaviour is in DraggingDrawsOneRungLower, which builds a ladder to the top.
-    [InlineData(769, PictureLadder.Usual)]
-    [InlineData(5000, PictureLadder.Usual)]
+    // PAST THE CAP AND STILL CLIMBING, which is the point: the cap is on what TURNING may cost,
+    // and at rest there is one frame to pay for. Clamping here was a picture that stopped growing
+    // with its pane however far the boundary was dragged.
+    [InlineData(769, 1024)]
+    [InlineData(5000, MeshPicture.Widest)]
     public void APictureIsDrawnAtTheRungThatCoversIt(float side, int drawn)
         => Assert.Equal(drawn, new PictureLadder().For(side));
 
-    /// <summary>Nothing is ever drawn above the cap, whatever width is asked for.</summary>
+    /// <summary>
+    /// The cap binds a DRAG and nothing else.
+    /// </summary>
+    /// <remarks>
+    /// WHAT WAS MEASURED WAS A COST PER FRAME - 8.0 ms at 768, 25.1 at 1536 - and a cost per frame
+    /// only matters where there are frames. Turning is where they are; at rest the picture is drawn
+    /// once, when the monster changes or the drag ends. So the cap is the answer to "how much
+    /// processor may turning this cost", and applying it at rest bought nothing and showed as a
+    /// picture that would not grow with its pane.
+    /// </remarks>
     [Fact]
-    public void TheCapIsNeverExceeded()
+    public void TheCapBindsADragAndNothingElse()
     {
         var small = new PictureLadder(PictureLadder.Smallest);
+        var middling = new PictureLadder(512);
 
-        foreach (float side in new[] { 1f, 300f, 1000f, 9000f })
+        foreach (float side in new[] { 300f, 1000f, 9000f })
         {
-            Assert.Equal(PictureLadder.Smallest, small.For(side));
-            Assert.True(new PictureLadder(512).For(side) <= 512);
+            Assert.True(small.Dragging(side) <= PictureLadder.Smallest, "a drag stays under the cap");
+            Assert.True(middling.Dragging(side) <= 512, "and under a larger one");
+
+            // At rest the two ladders agree with each other and with the ladder that has no cap
+            // worth speaking of: what is asked for is what is drawn.
+            Assert.Equal(PictureLadder.Snap((int)side), small.For(side));
+            Assert.Equal(small.For(side), middling.For(side));
         }
     }
 

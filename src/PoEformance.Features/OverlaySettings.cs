@@ -152,14 +152,21 @@ public sealed record OverlaySettings(
     // in this window, so it folds away by the same button-and-setting pair.
     [property: JsonPropertyName("monsterModel")] bool MonsterModel = true,
 
-    // How big the monster's model may be drawn, in pixels each way. A SETTING and not a constant
-    // because the cost is the caller's to spend and it is not linear: the work grows with the
-    // AREA, so measured against a real rig, 384 costs 3.0 ms a frame while turning, 768 costs 8.0
-    // and 1536 costs 25.1 - the last being past what a drag can keep up with. 768 is the default
-    // because it is the largest that still turns smoothly beside everything else the overlay
-    // draws; somebody with the room and the processor to spare can raise it, and somebody playing
-    // on a laptop can drop it. See MonsterPortrait, which also steps DOWN one size while the
-    // model is being dragged, so a high setting costs its full price only when holding still.
+    // How much TURNING the monster's model may cost, said as a size in pixels each way. NOT a cap
+    // on how big the picture may be: at rest it follows its pane up to what the renderer will
+    // draw, because at rest there is one frame to pay for and a single draw is cheap even at the
+    // top - measured against a real rig, 768 takes 5.3 ms, 1536 takes 15.3, and 2048 takes 26.3,
+    // which is one hitch of about a frame and a half when the monster changes.
+    //
+    // A DRAG IS WHERE FRAMES ARE, and there the work grows with the AREA: 384 costs 3.0 ms a
+    // frame, 768 costs 8.0, 1536 costs 25.1 - the last past what a drag can keep up with. So this
+    // caps the drag, and MonsterPortrait steps one rung DOWN from it while the button is held; the
+    // sharp picture comes back the moment it is let go. 768 is the default because it is the
+    // largest that still turns smoothly beside everything else the overlay draws.
+    //
+    // IT ALSO SETS THE MEMORY CEILING indirectly, through the size the picture rests at: the
+    // canvas is pixels and depth together, 4.5 MB at 768 and 32 MB at 2048, held only while a
+    // pane that big is open.
     [property: JsonPropertyName("monsterModelSize")] int MonsterModelSize = PictureLadder.Usual)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>

@@ -1028,11 +1028,11 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             ImGui.TextColored(OverlayInk.Name, "boss");
         }
 
-        Pair("blood", Named(all.BloodName(one), one.Blood));
+        Pair("blood", Named(all.BloodName(one), one.Blood), IdentityEms);
 
         if (one.Base is { Length: > 0 } built)
         {
-            Pair("base", built);
+            Pair("base", built, IdentityEms);
         }
 
         // A ROW NUMBER WITH NO NAME HERE, on purpose. The column holds a QuestFlags row and this
@@ -1043,7 +1043,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         // because zero is a row of QuestFlags like any other. The export spells it as zero.
         if (one.Quest > 0)
         {
-            Pair("quest flag", $"row {one.Quest.ToString(CultureInfo.InvariantCulture)}");
+            Pair("quest flag", $"row {one.Quest.ToString(CultureInfo.InvariantCulture)}", IdentityEms);
         }
     }
 
@@ -1335,7 +1335,10 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     private static IEnumerable<int> Rows(MonsterVariety one)
         => (one.Mods ?? []).Concat(one.Mods2 ?? []).Concat(one.SpecialMods ?? []);
 
-    private static void Pair(string what, string said)
+    /// <param name="ems">
+    /// How wide the label column is, or zero for the one the figures use.
+    /// </param>
+    private static void Pair(string what, string said, float ems = 0f)
     {
         if (said.Length == 0)
         {
@@ -1343,9 +1346,30 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         }
 
         ImGui.TextDisabled(what);
-        OverlayLayout.ToColumn();
+
+        if (ems > 0f)
+        {
+            OverlayLayout.ToColumn(ems);
+        }
+        else
+        {
+            OverlayLayout.ToColumn();
+        }
+
         ImGui.TextUnformatted(said);
     }
+
+    /// <summary>How wide the identity block's label column is, in ems.</summary>
+    /// <remarks>
+    /// NARROWER THAN THE FIGURES BELOW IT, because its labels are: "blood", "base" and "quest
+    /// flag" against "movement speed" and "energy shield". One column for both put a hand's width
+    /// of nothing after a five-letter word, which is what was reported. The separator between the
+    /// two blocks is what makes two columns read as deliberate rather than as a misalignment.
+    ///
+    /// ToColumn only ever pushes right, so a label longer than this simply takes the room it
+    /// needs - the number is a wish, not a clip.
+    /// </remarks>
+    private const float IdentityEms = 7f;
 
     /// <summary>A name with its row number kept beside it, or the bare row when there is no name.</summary>
     /// <remarks>
