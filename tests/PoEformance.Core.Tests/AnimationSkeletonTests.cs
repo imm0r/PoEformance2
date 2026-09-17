@@ -201,38 +201,109 @@ public class AnimationSkeletonTests
     }
 
     /// <summary>
-    /// Below version 8 the bones are read and the animations are refused, with a reason.
+    /// An older light is four bytes shorter, and the walk after it says so.
     /// </summary>
     /// <remarks>
-    /// THE OTHER THING THE SURVEY FOUND, and the harder one: those files keep their keyframes
-    /// BETWEEN the animation headers rather than in a bundle, so there is no stride from one header
-    /// to the next that anything has been shown to give - measured on a real version 7 rig the
-    /// blocks run 1539, 2727, 1283, 1539 at an unchanging three tracks.
+    /// NOT MEASURED AGAINST THE GAME, AND THE TEST SAYS SO. The light record grows twice - 51 bytes
+    /// always, four more from version 7, four more again from 9 - which is poe_data_tools' parser's
+    /// word. Every light-bearing rig this project has looked at is version 11 or 12, where all
+    /// three apply and the record is 60; 76 sampled rigs turned up no older one with a light.
     ///
-    /// SO NOT READING THEM IS THE FEATURE. Walking on regardless is what produced framerates of
-    /// 191 and 232 and twenty-one one-off kind bytes in a survey of the install - names and numbers
-    /// lifted out of float data, indistinguishable in a report from findings about the game.
+    /// SO WHAT THIS PINS IS THAT THE READER HONOURS THE GATE rather than that the game needs it -
+    /// the same standing as AnOlderVersionIsReadToTheOlderLayout below. It matters because the
+    /// earlier version of this reader hardcoded 60 with a remark arguing that a gate would be
+    /// invented, and a version 7 rig with a light would have been read four bytes short: the
+    /// animation after it comes back as float data, quietly, which is how this class of bug has
+    /// twice reached a release here.
     /// </remarks>
     [Fact]
-    public void BeforeVersionEightTheAnimationsAreRefusedRatherThanGuessed()
+    public void AnOlderLightIsShorterAndTheWalkAfterItSaysSo()
+    {
+        AnimationSkeleton said = AnimationSkeleton.Read(
+            Packed.Skeleton(
+                [("root", 255, 255, 0f)],
+                [("animate", string.Empty, 2, 30, 0x6f, 0, 0)],
+                tail: null,
+                version: 7,
+                lights: ["PointLightShape1"],
+                frames: [[(0, 2, 4, 4), (1, 2, 4, 4)]]));
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal(["PointLightShape1"], said.Lights);
+
+        // THE ANIMATION IS THE ASSERTION. Read the light at version 12's 60 bytes and this name
+        // starts four bytes late, so it comes back as whatever follows - and the walk then misses
+        // the end of the file, which is what turns a silent drift into a refusal.
+        Assert.Single(said.Animations);
+        Assert.Equal("animate", said.Animations[0].Name);
+        Assert.Equal(30, said.Animations[0].Rate);
+    }
+
+    /// <summary>
+    /// Below version 8 each animation is followed by its own frames, and the walk steps over them.
+    /// </summary>
+    /// <remarks>
+    /// A TRACK SAYS ITS OWN SIZE, which is what was missing when this layout was hunted for as a
+    /// single stride and refused for not having one: the block is six counts and their frames, not
+    /// a length. The fixture below gives two animations different frame counts on purpose, because
+    /// a reader that used a fixed size would read the first perfectly and then drift.
+    /// </remarks>
+    [Fact]
+    public void BeforeVersionEightTheFramesSitBetweenTheHeaders()
     {
         AnimationSkeleton said = AnimationSkeleton.Read(
             Packed.Skeleton(
                 [("root", 255, 1, 0f), ("R_Weapon", 255, 255, -5f)],
-                [("attack1_2hsword", string.Empty, 3, 30, 0x6f, 0, 0)],
+                [
+                    ("attack1_2hsword", string.Empty, 2, 30, 0x6f, 0, 0),
+                    ("whirl_sword_sword", string.Empty, 2, 60, 0x6c, 0, 0),
+                ],
                 tail: null,
-                version: 7));
+                version: 7,
+                frames: [[(0, 2, 31, 31), (1, 2, 2, 2)], [(0, 2, 8, 8), (1, 2, 79, 4)]]));
 
-        // The bones ARE believed: they read the same before version 8 as after, bar one byte, and
-        // the survey found their names printable across every old file in the install.
-        Assert.True(said.Ready);
+        Assert.True(said.Ready, said.Why);
         Assert.Equal(7, said.Version);
-        Assert.Equal(2, said.Bones.Count);
         Assert.Equal("R_Weapon", said.Bones[1].Name);
 
-        Assert.Empty(said.Animations);
-        Assert.Contains("version 7", said.Why, StringComparison.Ordinal);
-        Assert.Contains("not been measured", said.Why, StringComparison.Ordinal);
+        // THE SECOND NAME IS THE ONE THAT MOVES. Step over the first animation's frames wrongly
+        // and this comes back as float data - which is exactly what shipped before.
+        Assert.Equal(2, said.Animations.Count);
+        Assert.Equal("whirl_sword_sword", said.Animations[1].Name);
+        Assert.Equal(60, said.Animations[1].Rate);
+
+        // The offsets point into the file, and the two blocks are DIFFERENT SIZES - which is the
+        // thing a fixed stride cannot do. The second starts after the first ends, with the second
+        // animation's own header and name in between.
+        Assert.True(said.Loose);
+        Assert.NotEqual(said.Animations[0].Length, said.Animations[1].Length);
+        Assert.True(
+            said.Animations[1].At > said.Animations[0].At + said.Animations[0].Length,
+            "the second animation's frames start after the first animation's end");
+        Assert.Equal(
+            said.Animations[0].Length + said.Animations[1].Length, said.TrackBytes);
+    }
+
+    /// <summary>A pre-8 walk that does not end on the file's last byte is refused.</summary>
+    /// <remarks>
+    /// THE CHECK THAT REPLACES TILING, and the reason the test above means anything: there is no
+    /// track region for offsets to chain across below version 8, so what says the walk was right
+    /// is that it consumed the file exactly. Trailing bytes mean a track was sized wrongly.
+    /// </remarks>
+    [Fact]
+    public void APreEightWalkThatMissesTheEndOfTheFileIsRefused()
+    {
+        byte[] whole = Packed.Skeleton(
+            [("root", 255, 255, 0f)],
+            [("walk_01", string.Empty, 1, 30, 0x6c, 0, 0)],
+            tail: null,
+            version: 7,
+            frames: [[(0, 2, 4, 4)]]);
+
+        AnimationSkeleton said = AnimationSkeleton.Read([.. whole, .. new byte[8]]);
+
+        Assert.False(said.Ready);
+        Assert.Contains("drifted", said.Why, StringComparison.Ordinal);
     }
 
     /// <summary>A file with no bundle behind it is a skeleton with no keyframes, not a broken one.</summary>

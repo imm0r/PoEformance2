@@ -45,6 +45,18 @@ public sealed class GameFiles
     /// <summary>What is in which bundle.</summary>
     public BundleIndex Index { get; }
 
+    /// <summary>
+    /// How this install undoes Oodle - the same one its bundles are read with.
+    /// </summary>
+    /// <remarks>
+    /// EXPOSED FOR THE BUNDLES INSIDE FILES, which this type knows nothing about: an .ast keeps its
+    /// keyframes in a bundle of its own, embedded in the file, and unpacking one needs the same
+    /// decompressor without going through the index. Whoever opened the install chose it - a test
+    /// may have handed in one that does not compress at all - so reaching for Oodle directly would
+    /// quietly read a different install than the one in hand.
+    /// </remarks>
+    public Func<ReadOnlyMemory<byte>, int, byte[]?> Unpack => _decompress;
+
     /// <summary>What was opened, for a window to show.</summary>
     public string Describe => $"{_archive.Describe} - {Index.Says}";
 
