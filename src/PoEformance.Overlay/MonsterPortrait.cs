@@ -119,6 +119,7 @@ public sealed class MonsterPortrait
     private float _frame;
     private bool _playing = true;
     private string _stillWhy = string.Empty;
+    private string _cost = string.Empty;
     private Vector3[] _posed = [];
     private Vector3[] _posedNormals = [];
 
@@ -204,6 +205,7 @@ public sealed class MonsterPortrait
                 _loading is { IsCompleted: false }
                     ? "reading the model…"
                     : Why.Length > 0 ? ImGuiText.Escape(Why) : "no model");
+            Cost();
             return;
         }
 
@@ -234,26 +236,62 @@ public sealed class MonsterPortrait
 
         _held = held;
 
-        if (!ImGui.IsItemHovered())
+        // EVERYTHING THAT ASKS ABOUT "THE ITEM" ASKS BEFORE THE LINE BELOW IS DRAWN, because ImGui
+        // answers for the last item submitted and that would then be the line: the wheel's owner
+        // is claimed on the picture, not on a string of text.
+        if (ImGui.IsItemHovered())
         {
+            Wheel();
+
+            // Not while it is being turned: the hint is for somebody who has not yet noticed that
+            // the picture moves, and leaving it up trails a label through the gesture it describes.
+            if (!held)
+            {
+                ImGui.SetTooltip(Hint());
+            }
+
+            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+            {
+                _turn = 0f;
+                _tilt = 0f;
+                _zoom = 1f;
+            }
+        }
+
+        Cost();
+    }
+
+    /// <summary>The line under the picture: what this monster cost to read, and the animation on it.</summary>
+    /// <remarks>
+    /// ASKED FOR FROM THE LIVE CLIENT after the first half hour of watching animations. A bundled
+    /// rig holds up to twelve megabytes of keyframes and the book has 2792 rows, so "what did that
+    /// click just read" is a fair question, and the walk already knew the answer. Under the picture
+    /// rather than in the tooltip, so it is read without hovering.
+    /// </remarks>
+    private void Cost()
+    {
+        if (_cost.Length > 0)
+        {
+            ImGui.TextDisabled(_cost);
+        }
+    }
+
+    /// <summary>Rebuilds the line: once when a model lands and once when its keyframes do, not per frame.</summary>
+    private void Costed()
+    {
+        if (_model.Files == 0)
+        {
+            _cost = string.Empty;
             return;
         }
 
-        Wheel();
-
-        // Not while it is being turned: the hint is for somebody who has not yet noticed that the
-        // picture moves, and leaving it up trails a label through the gesture it describes.
-        if (!held)
+        string said = $"read {ByteCount.Said(_model.Bytes)} in {_model.Files} file{(_model.Files == 1 ? string.Empty : "s")}";
+        if (_tracks is { Ready: true } tracks)
         {
-            ImGui.SetTooltip(Hint());
+            said += $" · keyframes {ByteCount.Said(tracks.Bytes)}";
         }
 
-        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-        {
-            _turn = 0f;
-            _tilt = 0f;
-            _zoom = 1f;
-        }
+        _cost = said;
     }
 
     /// <summary>
@@ -311,6 +349,7 @@ public sealed class MonsterPortrait
         _frame = 0f;
         _tracks = null;
         _stillWhy = string.Empty;
+        Costed();
 
         IReadOnlyList<SkeletonAnimation> moves = _model.Rig.Animations;
         if (which < 0 || which >= moves.Count)
@@ -418,6 +457,7 @@ public sealed class MonsterPortrait
         _chosen = -1;
         _frame = 0f;
         _stillWhy = string.Empty;
+        _cost = string.Empty;
         _drawnFrame = float.NaN;
         _drawnAnimation = -1;
     }
@@ -467,6 +507,7 @@ public sealed class MonsterPortrait
             _shown = string.Empty;
             _drawnTurn = float.NaN;
             Rigged();
+            Costed();
         }
 
         if (!_model.Ready)
@@ -559,13 +600,16 @@ public sealed class MonsterPortrait
         {
             _tracks = tracks;
             _stillWhy = string.Empty;
-            return;
+        }
+        else
+        {
+            _tracks = null;
+            _stillWhy = tracks is null
+                ? done.IsCompletedSuccessfully ? "the keyframes did not unpack" : Said(done.Exception)
+                : tracks.Why.Length > 0 ? tracks.Why : "the keyframes did not read as tracks";
         }
 
-        _tracks = null;
-        _stillWhy = tracks is null
-            ? done.IsCompletedSuccessfully ? "the keyframes did not unpack" : Said(done.Exception)
-            : tracks.Why.Length > 0 ? tracks.Why : "the keyframes did not read as tracks";
+        Costed();
     }
 
     /// <summary>Moves the animation on by however long the last frame took.</summary>

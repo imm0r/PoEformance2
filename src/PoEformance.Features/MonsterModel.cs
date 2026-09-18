@@ -51,6 +51,18 @@ public sealed record MonsterModel(
 
     /// <summary>Whether there is a skeleton with animations on it that fits this mesh.</summary>
     public bool Moves => Move.Length == 0 && Rig.Ready && Rig.Animations.Count > 0;
+
+    /// <summary>How many bytes the walk read out of the install for this monster, over every file it touched.</summary>
+    /// <remarks>
+    /// COUNTED, NOT ESTIMATED: every file goes through one function and it adds up what came back.
+    /// The .ao files and what they extend, the manifest, the geometry, the material, the texture and
+    /// the signpost it may sit behind, the skeleton - and nothing that was asked for and not there.
+    /// It is what one click in the book costs, and the pane says so under the picture.
+    /// </remarks>
+    public long Bytes { get; init; }
+
+    /// <summary>How many files those bytes came out of.</summary>
+    public int Files { get; init; }
 }
 
 /// <summary>
@@ -123,34 +135,35 @@ public static class MonsterModels
             };
         }
 
-        if (Skinned(read, named) is not { } found)
+        // COUNTED AS THEY ARE READ, through the one function everything below reads with, so a
+        // file the walk asks for is a file the count saw - the signpost a texture may sit behind
+        // included, which GameArt follows on its own. A file that was not there comes back null
+        // and counts for nothing.
+        var tally = new Tally(read);
+        Func<string, byte[]?> counted = tally.Read;
+
+        if (Skinned(counted, named) is not { } found)
         {
-            return MonsterModel.None with { Why = "no SkinMesh anywhere in the .ao files or what they extend" };
+            return tally.Failed("no SkinMesh anywhere in the .ao files or what they extend");
         }
 
-        MeshManifest manifest = Read(read, found.Mesh, MeshManifest.Read);
+        MeshManifest manifest = Read(counted, found.Mesh, MeshManifest.Read);
         if (!manifest.Ready)
         {
-            return MonsterModel.None with
-            {
-                Mesh_ = found.Mesh,
-                Why = $"the mesh manifest did not read: {found.Mesh}",
-            };
+            return tally.Failed($"the mesh manifest did not read: {found.Mesh}", found.Mesh);
         }
 
-        SkinnedMesh mesh = Read(read, manifest.Geometry, SkinnedMesh.Read);
+        SkinnedMesh mesh = Read(counted, manifest.Geometry, SkinnedMesh.Read);
         if (!mesh.Ready)
         {
             // THE FILE IS NAMED FIRST AND THE READER'S REASON SECOND. A reader answers about the
             // bytes it was handed and says things like "nothing to read", which is true and
             // useless one layer up: a picture that does not appear looks the same whichever file
             // was missing, so the message has to say which.
-            return MonsterModel.None with
-            {
-                Mesh_ = manifest.Geometry,
-                Why = $"the geometry did not read: {manifest.Geometry}"
+            return tally.Failed(
+                $"the geometry did not read: {manifest.Geometry}"
                     + (mesh.Why.Length > 0 ? $" - {mesh.Why}" : string.Empty),
-            };
+                manifest.Geometry);
         }
 
         // THE .ao's MATERIAL WINS WHERE THERE IS ONE. The manifest names a default for the mesh
@@ -160,15 +173,45 @@ public static class MonsterModels
             ? found.Material
             : manifest.Materials.FirstOrDefault(said => said.Length > 0) ?? string.Empty;
 
-        (GamePicture? skin, string paint) = Painted(read, mesh, material);
-        (AnimationSkeleton rig, string move) = Rigged(read, found.Skeleton, mesh);
+        (GamePicture? skin, string paint) = Painted(counted, mesh, material);
+        (AnimationSkeleton rig, string move) = Rigged(counted, found.Skeleton, mesh);
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
         {
             Rig = rig,
             Rig_ = found.Skeleton,
             Move = move,
+            Bytes = tally.Bytes,
+            Files = tally.Files,
         };
+    }
+
+    /// <summary>Reads through another function and adds up what comes back.</summary>
+    private sealed class Tally
+    {
+        private readonly Func<string, byte[]?> _read;
+
+        public Tally(Func<string, byte[]?> read) => _read = read;
+
+        public long Bytes { get; private set; }
+
+        public int Files { get; private set; }
+
+        public byte[]? Read(string path)
+        {
+            byte[]? said = _read(path);
+            if (said is not null)
+            {
+                Bytes += said.Length;
+                Files++;
+            }
+
+            return said;
+        }
+
+        /// <summary>A model that was not found, still carrying what was read looking for it.</summary>
+        public MonsterModel Failed(string why, string mesh = "")
+            => MonsterModel.None with { Mesh_ = mesh, Why = why, Bytes = Bytes, Files = Files };
     }
 
     /// <summary>

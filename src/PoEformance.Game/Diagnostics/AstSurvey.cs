@@ -139,8 +139,6 @@ public static class AstSurvey
     /// <summary>What a skeleton file is called.</summary>
     public const string Suffix = ".ast";
 
-    private static readonly string[] Units = ["KB", "MB", "GB", "TB"];
-
     /// <summary>How many faults are kept. Past this the count is what matters, not the text.</summary>
     public const int MostFaults = 40;
 
@@ -630,26 +628,8 @@ public static class AstSurvey
         }
     }
 
-    /// <summary>A byte count a person can read at a glance.</summary>
-    public static string Bytes(long count)
-    {
-        if (count < 1024)
-        {
-            return string.Create(CultureInfo.InvariantCulture, $"{count} B");
-        }
-
-        double size = count;
-        foreach (string unit in Units)
-        {
-            size /= 1024d;
-            if (size < 1024d || string.Equals(unit, Units[^1], StringComparison.Ordinal))
-            {
-                return string.Create(CultureInfo.InvariantCulture, $"{size:F1} {unit}");
-            }
-        }
-
-        return string.Create(CultureInfo.InvariantCulture, $"{count} B");
-    }
+    /// <summary>A byte count a person can read at a glance. See <see cref="ByteCount"/>, which the model pane shares.</summary>
+    public static string Bytes(long count) => ByteCount.Said(count);
 
     private static string Say(int value) => value.ToString(CultureInfo.InvariantCulture);
 }
