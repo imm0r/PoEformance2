@@ -413,6 +413,59 @@ exactly 176 framerate rows and 176 kind-byte rows, landing entirely on the value
 **No new framerate, no new kind byte.** A drifted track walk would have sprayed nonsense into both
 tables, which is precisely what the earlier broken version did.
 
+### Playing it
+
+`AnimationTracks` reads one animation's keyframes and samples them; `SkeletonPose` composes the
+bone tree and skins the mesh; `MonsterPortrait` plays the result in the model pane with a combo
+of the rig's animations (`idle_01` first, where the rig has one) and a Play/Pause button.
+
+What the floats mean was **measured over 985 tracks of two real rigs**, because every convention
+here has a plausible wrong twin: the time is the *first* float of a key and counts in *frames*
+(0 violations); a rotation is `(t, x, y, z, w)` with **w last** and unit length (0 violations — and
+w-first has the *same* length, which is why a magnitude check cannot tell them apart); a position
+**replaces** the bind translation rather than adding to it (33 of 43 tracks start exactly on their
+bind offset, the other ten are bones the animation genuinely moves). The three unnamed groups are
+not part of the pose: two never occur, the third is a constant per *bone*.
+
+**The bind matrices are parent-relative.** A thigh's bind translation is `(52.01, 0, 0)`, a foot's
+`(19.37, 0, 0)` — bone lengths along a local axis. So the pose is the difference of two
+compositions down one tree: `bindModel = bind * bindModel(parent)` once; `world = local * world(parent)`
+per frame; `skin = inverse(bindModel) * world`. Row vectors throughout, as the file stores them.
+
+**A vertex's four bone bytes index the skeleton directly.** Nothing in the chain `.ao → .sm → .smd`
+carries any other bone list — poe_data_tools' smd parser reads shape names, a box and counts from
+the header, four bone bytes and four weights from a vertex, and no palette anywhere; a version 4
+`.sm` has no BoneGroups at all and skins regardless. That is an argument from there being nothing
+else rather than a measurement, so `MonsterModels` tests it against every real mesh somebody opens:
+a highest weighted bone at or past the rig's count refuses to animate and says why in the tooltip.
+
+**The tests are arranged so that a wrong order fails them**, since a wrong order also produces
+matrices. Four mistakes were put back and each fails a test — child and parent swapped, the bind
+read as model space, a quaternion with w first, and a *sibling read as a child*. That last one is
+remarkably quiet: one root, reach 190 units against 174, depth 14 against 9, and the bone-length
+check cannot see it because it compares against the parent the same walk chose. What catches it is
+the game's own naming — mirrored bones `jnt_Leg_l_02` / `jnt_Leg_r_02` must hang off mirrored
+parents. 11 of 11 pairs on the real rig, 8 of 11 with siblings read as children.
+
+Skinning is checked with synthetic vertices on the real 43-bone `flinch` rig: a vertex sitting on a
+bone and bound wholly to it must land exactly where that bone's world matrix went, at rest and at
+three frames; a half-and-half vertex must be the weighted mean; nothing moves at rest. Two mistakes
+put back — the inverse bind forgotten, positions transformed without their translation — each fail
+tests. A third, weights not divided by 255, fails nothing because it changes nothing: the blend is
+normalised by the summed weight at the end, so the scale of a weight cancels. That is the code
+being robust rather than the tests being blind, and it is written here so nobody adds a test for it.
+
+**Playing costs what dragging costs**, and is paid for the same way: the picture is drawn one rung
+of `PictureLadder` lower for as long as it moves, because thirty full-size rasterisations a second
+is what the still renderer was never sized for. Stop it and the next frame is full size again. The
+keyframes for the chosen animation are unpacked on a task, one animation at a time — a bundled rig
+holds twelve megabytes of them and the one being played is tens of kilobytes. Pre-8 rigs keep their
+frames loose and play without Oodle; rigs from 8 up need the install's own, which
+`EntityOverlay.AttachMonsterBook` is now handed as `unpack`.
+
+The camera stays fitted to the bind pose's box while the model moves. Refitting it to the posed
+vertices every frame would make the picture breathe as the monster raised an arm.
+
 The survey counts a file it cannot check apart from one that passes, which it did not at first:
 "all 1613 tile exactly" included 69 files with no track region to tile, because nought equals
 nought. `AstSurvey.Checkable` is that gate, and the headline's denominator is what could be checked.

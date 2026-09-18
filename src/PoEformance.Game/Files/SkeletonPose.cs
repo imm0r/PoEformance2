@@ -181,6 +181,105 @@ public sealed class SkeletonPose
     }
 
     /// <summary>
+    /// The highest bone a mesh's vertices are weighted to, or -1 where none are.
+    /// </summary>
+    /// <remarks>
+    /// THE CHECK THAT A VERTEX'S BONE BYTES INDEX THE SKELETON, made on the machine that has the
+    /// files because no machine without them can. Nothing in the chain from .ao to .smd carries
+    /// any bone list but the skeleton's - poe_data_tools' smd parser reads shape names, a box and
+    /// counts from the header and four bone bytes with four weights from a vertex, and no palette
+    /// anywhere - so the bytes can only index the rig. A mesh whose highest weighted bone is past
+    /// the rig's count says otherwise, and the model then refuses to animate and says why.
+    /// </remarks>
+    public static int Highest(SkinnedMesh? mesh)
+    {
+        if (mesh is null)
+        {
+            return -1;
+        }
+
+        var most = -1;
+        int count = Math.Min(mesh.Bones.Length, mesh.Weights.Length);
+        for (var one = 0; one < count; one++)
+        {
+            if (mesh.Weights[one] > 0)
+            {
+                most = Math.Max(most, mesh.Bones[one]);
+            }
+        }
+
+        return most;
+    }
+
+    /// <summary>
+    /// Moves a mesh's vertices to where the last pose put their bones.
+    /// </summary>
+    /// <param name="mesh">The mesh, in its bind pose, with four bones and four weights a vertex.</param>
+    /// <param name="positions">Where each vertex ends up. As long as the mesh has vertices.</param>
+    /// <param name="normals">Which way each vertex faces afterwards. The same length.</param>
+    /// <remarks>
+    /// LINEAR BLEND SKINNING, WHICH IS WHAT FOUR WEIGHTS SUMMING TO 255 MEANS: each bone's skin
+    /// matrix moves the vertex on its own, and the results are mixed in the weights' proportion.
+    /// The weights are bytes out of 255 rather than floats, so a fully bound vertex is (255,0,0,0)
+    /// and a joint's blend is something like (128,127,0,0).
+    ///
+    /// A NORMAL IS TURNED AND NOT MOVED - TransformNormal drops the translation - and is then made
+    /// unit length again, because a blend of two unit vectors is shorter than one and the shading
+    /// reads that as darker. A vertex with no weight at all is left where the file put it.
+    ///
+    /// A BONE PAST THE RIG IS SKIPPED, not thrown on: this runs on the draw thread thirty times a
+    /// second over every vertex of the model, and <see cref="Highest"/> is where a mesh that does
+    /// not fit its rig is meant to be caught, once, with a reason.
+    /// </remarks>
+    public void Move(SkinnedMesh? mesh, Span<Vector3> positions, Span<Vector3> normals)
+    {
+        if (mesh is not { Ready: true })
+        {
+            return;
+        }
+
+        int count = Math.Min(mesh.Positions.Length, Math.Min(positions.Length, normals.Length));
+        int bones = _skin.Length;
+
+        for (var one = 0; one < count; one++)
+        {
+            Vector3 at = mesh.Positions[one];
+            Vector3 facing = one < mesh.Normals.Length ? mesh.Normals[one] : Vector3.UnitZ;
+
+            var moved = Vector3.Zero;
+            var turned = Vector3.Zero;
+            var weight = 0f;
+
+            int slot = one * 4;
+            for (var part = 0; part < 4 && slot + part < mesh.Weights.Length; part++)
+            {
+                byte heavy = mesh.Weights[slot + part];
+                int bone = mesh.Bones[slot + part];
+                if (heavy == 0 || bone >= bones)
+                {
+                    continue;
+                }
+
+                float share = heavy / 255f;
+                moved += Vector3.Transform(at, _skin[bone]) * share;
+                turned += Vector3.TransformNormal(facing, _skin[bone]) * share;
+                weight += share;
+            }
+
+            if (weight <= 0f)
+            {
+                positions[one] = at;
+                normals[one] = facing;
+                continue;
+            }
+
+            positions[one] = moved / weight;
+            float length = turned.Length();
+            normals[one] = length > 1e-6f ? turned / length : facing;
+        }
+    }
+
+    /// <summary>
     /// Puts the skeleton back in its bind pose, where every skin matrix is the identity.
     /// </summary>
     public void AtRest()
