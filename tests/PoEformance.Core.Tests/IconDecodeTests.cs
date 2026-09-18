@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using PoEformance.Game.Files;
 
 namespace PoEformance.Core.Tests;
 
@@ -17,12 +18,15 @@ namespace PoEformance.Core.Tests;
 /// <c>Exception("Make sure to initialize MemoryAllocator.Default!")</c>, which names neither the
 /// cause nor the fix.
 ///
-/// It has now cost this project twice. The terrain mask hit it first and took the whole tool down
-/// on the first area large enough to split; the icon sheet hit it second, and because the icon
+/// It has now cost this project three times. The terrain mask hit it first and took the whole tool
+/// down on the first area large enough to split; the icon sheet hit it second, and because the icon
 /// path falls back to the built-in shape, the symptom was every icon silently going back to how it
 /// looks when no icon is chosen - a change that had passed a green build, a green test suite and a
-/// green AOT publish. Nothing in this repo said a word about it either time, which is what this
-/// test is for.
+/// green AOT publish. The monster portrait hit it third, UNDER THIS VERY TEST: its upload is spelt
+/// <c>_upload!(</c>, the file filter below looked for <c>_upload(</c>, and so the one file that
+/// later broke was the one file never opened. Half an hour of animation played fine one rung down,
+/// and the Pause button - which goes back up to the rung that covers the pane - killed the viewer
+/// until the app was restarted.
 /// </remarks>
 public class IconDecodeTests
 {
@@ -53,6 +57,14 @@ public class IconDecodeTests
     private static readonly Regex Decodes =
         new(@"Image\.(?:Load|LoadPixelData)<Rgba32>\((?<args>[^()]*)\)", RegexOptions.Compiled);
 
+    /// <summary>A file that hands a picture to the renderer.</summary>
+    /// <remarks>
+    /// WITH THE BANG OPTIONAL, because that is the hole the portrait fell through: a delegate
+    /// held in a nullable field is called as <c>_upload!(</c>, and a filter on <c>_upload(</c> is
+    /// a filter that skips every such file. <see cref="IconColourTests"/> matches the same way.
+    /// </remarks>
+    private static readonly Regex Uploads = new(@"_upload!?\(", RegexOptions.Compiled);
+
     [Fact]
     public void EVERYPictureIsDecodedIntoOneBufferTheRendererCanUpload()
     {
@@ -67,7 +79,7 @@ public class IconDecodeTests
             // textures and re-encodes them straight to a PNG on disk, which never touches a
             // Direct3D device and is under no such constraint; requiring it there would be
             // cargo, and cargo is what a check stops being read for.
-            if (!source.Contains("_upload(", StringComparison.Ordinal))
+            if (!Uploads.IsMatch(source))
             {
                 continue;
             }
@@ -78,10 +90,12 @@ public class IconDecodeTests
             }
         }
 
-        // The icon cache's two - a resource and a file - and the terrain mask's one. A floor
-        // rather than an exact number, so a fourth picture does not fail this; a RENAME, which
-        // would leave the check matching nothing and passing, does.
-        Assert.True(found.Count >= 3, $"found {found.Count} decode calls in {OverlaySources}, expected at least 3");
+        // The icon cache's two - a resource and a file - the terrain mask's one and the monster
+        // portrait's one. A floor rather than an exact number, so a fifth picture does not fail
+        // this; a RENAME, which would leave the check matching nothing and passing, does. (The
+        // terrain floor is not among them: it builds its image with new Image and checks the
+        // single span itself before writing into it.)
+        Assert.True(found.Count >= 4, $"found {found.Count} decode calls in {OverlaySources}, expected at least 4");
 
         foreach ((string file, string args) in found)
         {
@@ -99,15 +113,45 @@ public class IconDecodeTests
     }
 
     [Fact]
-    public void ANDBothPlacesAskForAContiguousBuffer()
+    public void ANDEveryPlaceAsksForAContiguousBuffer()
     {
         // The configurations above are allowed to be named, so what the names MEAN has to be
         // checked too - otherwise a configuration that never sets the flag passes.
-        foreach (string file in new[] { "IconCache.cs", "TerrainLayer.cs" })
+        foreach (string file in new[] { "IconCache.cs", "TerrainLayer.cs", "TerrainFloor.cs", "MonsterPortrait.cs" })
         {
             string source = File.ReadAllText(Path.Combine(OverlaySources, file));
             Assert.Contains("PreferContiguousImageBuffers = true", source, StringComparison.Ordinal);
         }
+    }
+
+    /// <summary>
+    /// The portrait rests on rungs past the size where this matters, and plays on one under it.
+    /// </summary>
+    /// <remarks>
+    /// WHICH IS WHY IT SHOWED UP AS A PAUSE BUTTON THAT BROKE THE VIEWER. An animation is drawn
+    /// one rung down under the usual cap - 512 px, one megabyte - and half an hour of it uploads
+    /// fine. Pause goes back up to the rung that covers the pane, and on a pane wider than 1024 px
+    /// that is 1536 or 2048: nine and sixteen megabytes, which ImageSharp 3.1.12 splits into
+    /// four-megabyte pool blocks. Measured on every rung rather than read off a diagram: with the
+    /// default configuration each rung up to 1024 arrives whole and both above it arrive split,
+    /// and with the flag all seven arrive whole. So the flag is load-bearing on exactly the two
+    /// rungs a paused portrait can rest on, and on none a playing one is drawn at.
+    /// </remarks>
+    [Fact]
+    public void ThePortraitRestsPastTheSizeWhereItMattersAndPlaysUnderIt()
+    {
+        const long PoolBlock = 4L * 1024 * 1024;
+        var ladder = new PictureLadder();
+
+        // Playing under the usual cap never reaches the threshold, however wide the pane is.
+        long playing = Bytes(ladder.Dragging(MeshPicture.Widest));
+        Assert.True(playing <= PoolBlock, $"playing draws {playing} bytes, which is past the pool block");
+
+        // Paused on a pane wider than 1024 px it is over it - which is the report exactly.
+        Assert.True(Bytes(ladder.For(1025f)) > PoolBlock);
+        Assert.True(Bytes(ladder.For(MeshPicture.Widest)) > PoolBlock);
+
+        static long Bytes(int rung) => (long)rung * rung * 4;
     }
 
     /// <summary>

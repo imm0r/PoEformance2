@@ -59,6 +59,29 @@ public sealed class MonsterPortrait
     /// <summary>The id ImGui knows the picture by, which is what makes it something to grab.</summary>
     private const string Grip = "##monster-model";
 
+    /// <summary>
+    /// How the picture is handed to the renderer, which is CONTIGUOUS and that is not a preference.
+    /// </summary>
+    /// <remarks>
+    /// THE RENDERER UPLOADS A TEXTURE BY TAKING THE IMAGE'S SINGLE PIXEL SPAN, and ImageSharp's
+    /// default allocator splits anything over its four-megabyte pool block across several buffers,
+    /// for which that span does not exist. Measured on every rung of the ladder: up to 1024 px,
+    /// which is exactly four megabytes, the picture arrives whole; at 1536 and 2048 it arrives
+    /// split; with this configuration all seven arrive whole. <see cref="IconCache"/> and
+    /// <see cref="TerrainLayer"/> learned the same thing the same way.
+    ///
+    /// HOW IT SHOWED UP HERE IS WORTH WRITING DOWN, because it hid for half an hour at a time. An
+    /// animation is drawn one rung down, which under the usual cap is 512 px and one megabyte, so
+    /// playing never split. Pausing goes back up to the rung that covers the pane, and on a pane
+    /// wider than 1024 px that is a split image: the upload threw, the picture was dropped, and
+    /// with it the controls that could have started the animation again - the viewer was gone
+    /// until the app was restarted. The guard test that pins this rule had filtered its files on
+    /// the spelling "_upload(", and this class writes "_upload!(".
+    ///
+    /// A cloned configuration rather than the global default, for the reason IconCache gives.
+    /// </remarks>
+    private static readonly Configuration Contiguous = Contiguously();
+
     private readonly PictureLadder _sizes;
     private readonly Func<string, byte[]?>? _install;
     private readonly Func<ReadOnlyMemory<byte>, int, byte[]?>? _unpack;
@@ -96,6 +119,7 @@ public sealed class MonsterPortrait
     private float _frame;
     private bool _playing = true;
     private string _stillWhy = string.Empty;
+    private string _cost = string.Empty;
     private Vector3[] _posed = [];
     private Vector3[] _posedNormals = [];
 
@@ -169,16 +193,21 @@ public sealed class MonsterPortrait
         float side = Math.Clamp(wide, 64f, MeshPicture.Widest);
         Finished(side);
 
+        // THE CONTROLS COME BEFORE THE QUESTION OF WHETHER THERE IS A PICTURE, so that a picture
+        // which would not upload - it happened, at the rung Pause returns to - leaves the button
+        // that plays it again, one rung down, and not only the reason. They draw nothing while
+        // there is no skeleton to control, which is every frame the model is still loading.
+        Controls(side);
+
         if (_texture == IntPtr.Zero)
         {
             ImGui.TextDisabled(
                 _loading is { IsCompleted: false }
                     ? "reading the model…"
                     : Why.Length > 0 ? ImGuiText.Escape(Why) : "no model");
+            Cost();
             return;
         }
-
-        Controls(side);
 
         // A BUTTON WITH THE PICTURE PAINTED INTO IT, AND NOT ImGui.Image. An image is an item with
         // NO ID, and ImGui only hands the hover to an item that has one - imgui.cpp's ItemHoverable
@@ -207,26 +236,62 @@ public sealed class MonsterPortrait
 
         _held = held;
 
-        if (!ImGui.IsItemHovered())
+        // EVERYTHING THAT ASKS ABOUT "THE ITEM" ASKS BEFORE THE LINE BELOW IS DRAWN, because ImGui
+        // answers for the last item submitted and that would then be the line: the wheel's owner
+        // is claimed on the picture, not on a string of text.
+        if (ImGui.IsItemHovered())
         {
+            Wheel();
+
+            // Not while it is being turned: the hint is for somebody who has not yet noticed that
+            // the picture moves, and leaving it up trails a label through the gesture it describes.
+            if (!held)
+            {
+                ImGui.SetTooltip(Hint());
+            }
+
+            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+            {
+                _turn = 0f;
+                _tilt = 0f;
+                _zoom = 1f;
+            }
+        }
+
+        Cost();
+    }
+
+    /// <summary>The line under the picture: what this monster cost to read, and the animation on it.</summary>
+    /// <remarks>
+    /// ASKED FOR FROM THE LIVE CLIENT after the first half hour of watching animations. A bundled
+    /// rig holds up to twelve megabytes of keyframes and the book has 2792 rows, so "what did that
+    /// click just read" is a fair question, and the walk already knew the answer. Under the picture
+    /// rather than in the tooltip, so it is read without hovering.
+    /// </remarks>
+    private void Cost()
+    {
+        if (_cost.Length > 0)
+        {
+            ImGui.TextDisabled(_cost);
+        }
+    }
+
+    /// <summary>Rebuilds the line: once when a model lands and once when its keyframes do, not per frame.</summary>
+    private void Costed()
+    {
+        if (_model.Files == 0)
+        {
+            _cost = string.Empty;
             return;
         }
 
-        Wheel();
-
-        // Not while it is being turned: the hint is for somebody who has not yet noticed that the
-        // picture moves, and leaving it up trails a label through the gesture it describes.
-        if (!held)
+        string said = $"read {ByteCount.Said(_model.Bytes)} in {_model.Files} file{(_model.Files == 1 ? string.Empty : "s")}";
+        if (_tracks is { Ready: true } tracks)
         {
-            ImGui.SetTooltip(Hint());
+            said += $" · keyframes {ByteCount.Said(tracks.Bytes)}";
         }
 
-        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-        {
-            _turn = 0f;
-            _tilt = 0f;
-            _zoom = 1f;
-        }
+        _cost = said;
     }
 
     /// <summary>
@@ -284,6 +349,7 @@ public sealed class MonsterPortrait
         _frame = 0f;
         _tracks = null;
         _stillWhy = string.Empty;
+        Costed();
 
         IReadOnlyList<SkeletonAnimation> moves = _model.Rig.Animations;
         if (which < 0 || which >= moves.Count)
@@ -391,6 +457,7 @@ public sealed class MonsterPortrait
         _chosen = -1;
         _frame = 0f;
         _stillWhy = string.Empty;
+        _cost = string.Empty;
         _drawnFrame = float.NaN;
         _drawnAnimation = -1;
     }
@@ -440,6 +507,7 @@ public sealed class MonsterPortrait
             _shown = string.Empty;
             _drawnTurn = float.NaN;
             Rigged();
+            Costed();
         }
 
         if (!_model.Ready)
@@ -532,13 +600,16 @@ public sealed class MonsterPortrait
         {
             _tracks = tracks;
             _stillWhy = string.Empty;
-            return;
+        }
+        else
+        {
+            _tracks = null;
+            _stillWhy = tracks is null
+                ? done.IsCompletedSuccessfully ? "the keyframes did not unpack" : Said(done.Exception)
+                : tracks.Why.Length > 0 ? tracks.Why : "the keyframes did not read as tracks";
         }
 
-        _tracks = null;
-        _stillWhy = tracks is null
-            ? done.IsCompletedSuccessfully ? "the keyframes did not unpack" : Said(done.Exception)
-            : tracks.Why.Length > 0 ? tracks.Why : "the keyframes did not read as tracks";
+        Costed();
     }
 
     /// <summary>Moves the animation on by however long the last frame took.</summary>
@@ -595,6 +666,21 @@ public sealed class MonsterPortrait
     /// <summary>Draws the mesh - posed, where an animation is loaded - and hands the pixels to the renderer.</summary>
     private void Render(int size, bool posed)
     {
+        // WHAT IS BEING DRAWN IS REMEMBERED WHETHER OR NOT IT CAN BE SHOWN. A picture that fails
+        // to upload is dropped and its reason shown, and the next frame would otherwise find
+        // nothing recorded, draw the same picture again and fail again - 25 ms a frame at the top
+        // rung, for as long as the reason stands. Recorded first, a failure holds still until
+        // something moves, and the check in Finished then tries again on its own.
+        _shown = _wanted;
+        _drawnTurn = _turn;
+        _drawnTilt = _tilt;
+        _drawnZoom = _zoom;
+        _drawnSize = size;
+        _drawnGround = Ground;
+        _drawnPosed = posed;
+        _drawnFrame = _frame;
+        _drawnAnimation = _chosen;
+
         try
         {
             // The canvas lends its pixels rather than giving them, and LoadPixelData below copies
@@ -620,23 +706,13 @@ public sealed class MonsterPortrait
                 return;
             }
 
-            using var image = Image.LoadPixelData<Rgba32>(drawn.Rgba, drawn.Width, drawn.Height);
+            using var image = Image.LoadPixelData<Rgba32>(Contiguous, drawn.Rgba, drawn.Width, drawn.Height);
 
             // A NEW KEY EACH TIME, because the renderer caches by key and the pixels change on
             // every turn - reusing one hands back the picture from the first frame forever.
             Drop();
             _key = $"poeformance.monster.{_keys++}";
             _texture = _upload!(_key, image, false);
-
-            _shown = _wanted;
-            _drawnTurn = _turn;
-            _drawnTilt = _tilt;
-            _drawnZoom = _zoom;
-            _drawnSize = size;
-            _drawnGround = Ground;
-            _drawnPosed = posed;
-            _drawnFrame = _frame;
-            _drawnAnimation = _chosen;
             Why = string.Empty;
         }
         catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
@@ -661,4 +737,11 @@ public sealed class MonsterPortrait
 
     private static string Said(AggregateException? fault)
         => fault?.InnerException?.Message ?? fault?.Message ?? "the model could not be read";
+
+    private static Configuration Contiguously()
+    {
+        Configuration configuration = Configuration.Default.Clone();
+        configuration.PreferContiguousImageBuffers = true;
+        return configuration;
+    }
 }

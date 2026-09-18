@@ -153,6 +153,60 @@ public class MonsterModelTests
     }
 
     /// <summary>
+    /// What the walk read is added up file by file, and a file that was not there counts for nothing.
+    /// </summary>
+    /// <remarks>
+    /// AGAINST A TALLY OF ITS OWN: the test wraps the fake install's read and adds up what it hands
+    /// back, so the model's number is checked against what the walk actually asked for rather than
+    /// against a sum somebody worked out by hand from the fixture - which would be the fixture
+    /// checked against itself the moment the walk asked for one file more.
+    /// </remarks>
+    [Fact]
+    public void WhatWasReadIsCounted()
+    {
+        var install = Install();
+        var bytes = 0L;
+        var files = 0;
+        byte[]? Counting(string path)
+        {
+            byte[]? said = install.Read(path);
+            if (said is not null)
+            {
+                bytes += said.Length;
+                files++;
+            }
+
+            return said;
+        }
+
+        MonsterModel said = MonsterModels.Of(Counting, Named("body.ao"));
+
+        Assert.True(said.Ready);
+        Assert.Equal(bytes, said.Bytes);
+        Assert.Equal(files, said.Files);
+        Assert.True(said.Files >= 4, $"the chain is at least .ao, .sm, .smd and .mat, not {said.Files} files");
+        Assert.True(said.Bytes > 0);
+
+        // A texture that is not there is asked for and not counted: one file fewer, still a model.
+        var bare = Install();
+        bare.Files.Remove("art/skin.dds");
+        MonsterModel unpainted = MonsterModels.Of(bare.Read, Named("body.ao"));
+        Assert.True(unpainted.Ready);
+        Assert.Equal(said.Files - 1, unpainted.Files);
+
+        // And a walk that stops early still says what it read on the way there.
+        var noManifest = Install();
+        noManifest.Files.Remove("art/mesh.sm");
+        MonsterModel stopped = MonsterModels.Of(noManifest.Read, Named("body.ao"));
+        Assert.False(stopped.Ready);
+        Assert.Equal(1, stopped.Files);
+        Assert.Equal(install.Files["body.ao"].Length, stopped.Bytes);
+
+        Assert.Equal(0, MonsterModel.None.Files);
+        Assert.Equal(0L, MonsterModel.None.Bytes);
+    }
+
+    /// <summary>
     /// A file that extends itself does not hang the walk.
     /// </summary>
     /// <remarks>

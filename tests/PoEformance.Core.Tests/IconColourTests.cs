@@ -42,8 +42,14 @@ public class IconColourTests
     /// allow them would match half the file when somebody adds one. If that changes, this stops
     /// finding the calls and the count check below fails - which is the intended failure, and
     /// louder than quietly matching nothing.
+    ///
+    /// THE OPTIONAL BANG IS NOT OPTIONAL. The portrait's upload is written <c>_upload!(</c>, with
+    /// the null-forgiving operator between the name and the bracket, and a pattern without it
+    /// walked straight past that call site. The sibling check in <see cref="IconDecodeTests"/>
+    /// filtered its files on the same spelling, so it never opened MonsterPortrait.cs at all - and
+    /// the one decode in this layer without a contiguous configuration shipped under a green suite.
     /// </remarks>
-    private static readonly Regex Uploads = new(@"_upload\((?<args>[^()]*)\)", RegexOptions.Compiled);
+    private static readonly Regex Uploads = new(@"_upload!?\((?<args>[^()]*)\)", RegexOptions.Compiled);
 
     [Fact]
     public void EVERYPictureIsUploadedInTheFormatTheSwapChainDrawsIn()
@@ -59,10 +65,11 @@ public class IconColourTests
             }
         }
 
-        // Both of them: the icons and the terrain mask. Written as a floor rather than an exact
-        // number so adding a third picture does not fail this, but a RENAME - which would leave
-        // the check matching nothing at all and passing - does.
-        Assert.True(found.Count >= 2, $"found {found.Count} upload calls in {OverlaySources}, expected at least 2");
+        // All four: the icons, the terrain mask, the terrain floor and the monster portrait.
+        // Written as a floor rather than an exact number so adding a fifth picture does not fail
+        // this, but a RENAME - which would leave the check matching nothing at all and passing -
+        // does.
+        Assert.True(found.Count >= 4, $"found {found.Count} upload calls in {OverlaySources}, expected at least 4");
 
         foreach ((string file, string flag) in found)
         {

@@ -67,6 +67,10 @@ public sealed class AnimationTracks
     /// <summary>The last time any key sits at, which is the animation's length in frames.</summary>
     public float Frames { get; private init; }
 
+    /// <summary>How many bytes of keyframes these came out of, loose from the file or unpacked from the bundle.</summary>
+    /// <remarks>The line under the model pane says it, beside what the model itself cost to read.</remarks>
+    public int Bytes { get; private init; }
+
     /// <summary>Why nothing was read, or empty where something was.</summary>
     public string Why { get; private init; } = string.Empty;
 
@@ -180,7 +184,7 @@ public sealed class AnimationTracks
             at = TrackEnd(frames, at, track, version);
         }
 
-        return new AnimationTracks(keys, found) { Frames = last };
+        return new AnimationTracks(keys, found) { Frames = last, Bytes = frames.Length };
     }
 
     /// <summary>Where one track's keys end, the unnamed groups included.</summary>

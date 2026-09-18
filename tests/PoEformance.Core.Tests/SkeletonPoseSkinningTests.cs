@@ -174,6 +174,19 @@ public class SkeletonPoseSkinningTests
         Assert.Equal(-1, SkeletonPose.Highest(null));
     }
 
+    /// <summary>The tracks know how many bytes of keyframes they came out of, for the line that says so.</summary>
+    [Fact]
+    public void TheTracksKnowTheirSize()
+    {
+        (AnimationSkeleton rig, _, AnimationTracks tracks) = Ready();
+        byte[]? frames = rig.Tracks(rig.Animations[0], (_, _) => null);
+
+        Assert.NotNull(frames);
+        Assert.True(frames.Length > 0);
+        Assert.Equal(frames.Length, tracks.Bytes);
+        Assert.Equal(0, AnimationTracks.None.Bytes);
+    }
+
     /// <summary>
     /// The renderer draws posed vertices where it is told, and the bind pose where it is not.
     /// </summary>
