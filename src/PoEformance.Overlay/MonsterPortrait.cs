@@ -59,6 +59,29 @@ public sealed class MonsterPortrait
     /// <summary>The id ImGui knows the picture by, which is what makes it something to grab.</summary>
     private const string Grip = "##monster-model";
 
+    /// <summary>
+    /// How the picture is handed to the renderer, which is CONTIGUOUS and that is not a preference.
+    /// </summary>
+    /// <remarks>
+    /// THE RENDERER UPLOADS A TEXTURE BY TAKING THE IMAGE'S SINGLE PIXEL SPAN, and ImageSharp's
+    /// default allocator splits anything over its four-megabyte pool block across several buffers,
+    /// for which that span does not exist. Measured on every rung of the ladder: up to 1024 px,
+    /// which is exactly four megabytes, the picture arrives whole; at 1536 and 2048 it arrives
+    /// split; with this configuration all seven arrive whole. <see cref="IconCache"/> and
+    /// <see cref="TerrainLayer"/> learned the same thing the same way.
+    ///
+    /// HOW IT SHOWED UP HERE IS WORTH WRITING DOWN, because it hid for half an hour at a time. An
+    /// animation is drawn one rung down, which under the usual cap is 512 px and one megabyte, so
+    /// playing never split. Pausing goes back up to the rung that covers the pane, and on a pane
+    /// wider than 1024 px that is a split image: the upload threw, the picture was dropped, and
+    /// with it the controls that could have started the animation again - the viewer was gone
+    /// until the app was restarted. The guard test that pins this rule had filtered its files on
+    /// the spelling "_upload(", and this class writes "_upload!(".
+    ///
+    /// A cloned configuration rather than the global default, for the reason IconCache gives.
+    /// </remarks>
+    private static readonly Configuration Contiguous = Contiguously();
+
     private readonly PictureLadder _sizes;
     private readonly Func<string, byte[]?>? _install;
     private readonly Func<ReadOnlyMemory<byte>, int, byte[]?>? _unpack;
@@ -169,6 +192,12 @@ public sealed class MonsterPortrait
         float side = Math.Clamp(wide, 64f, MeshPicture.Widest);
         Finished(side);
 
+        // THE CONTROLS COME BEFORE THE QUESTION OF WHETHER THERE IS A PICTURE, so that a picture
+        // which would not upload - it happened, at the rung Pause returns to - leaves the button
+        // that plays it again, one rung down, and not only the reason. They draw nothing while
+        // there is no skeleton to control, which is every frame the model is still loading.
+        Controls(side);
+
         if (_texture == IntPtr.Zero)
         {
             ImGui.TextDisabled(
@@ -177,8 +206,6 @@ public sealed class MonsterPortrait
                     : Why.Length > 0 ? ImGuiText.Escape(Why) : "no model");
             return;
         }
-
-        Controls(side);
 
         // A BUTTON WITH THE PICTURE PAINTED INTO IT, AND NOT ImGui.Image. An image is an item with
         // NO ID, and ImGui only hands the hover to an item that has one - imgui.cpp's ItemHoverable
@@ -595,6 +622,21 @@ public sealed class MonsterPortrait
     /// <summary>Draws the mesh - posed, where an animation is loaded - and hands the pixels to the renderer.</summary>
     private void Render(int size, bool posed)
     {
+        // WHAT IS BEING DRAWN IS REMEMBERED WHETHER OR NOT IT CAN BE SHOWN. A picture that fails
+        // to upload is dropped and its reason shown, and the next frame would otherwise find
+        // nothing recorded, draw the same picture again and fail again - 25 ms a frame at the top
+        // rung, for as long as the reason stands. Recorded first, a failure holds still until
+        // something moves, and the check in Finished then tries again on its own.
+        _shown = _wanted;
+        _drawnTurn = _turn;
+        _drawnTilt = _tilt;
+        _drawnZoom = _zoom;
+        _drawnSize = size;
+        _drawnGround = Ground;
+        _drawnPosed = posed;
+        _drawnFrame = _frame;
+        _drawnAnimation = _chosen;
+
         try
         {
             // The canvas lends its pixels rather than giving them, and LoadPixelData below copies
@@ -620,23 +662,13 @@ public sealed class MonsterPortrait
                 return;
             }
 
-            using var image = Image.LoadPixelData<Rgba32>(drawn.Rgba, drawn.Width, drawn.Height);
+            using var image = Image.LoadPixelData<Rgba32>(Contiguous, drawn.Rgba, drawn.Width, drawn.Height);
 
             // A NEW KEY EACH TIME, because the renderer caches by key and the pixels change on
             // every turn - reusing one hands back the picture from the first frame forever.
             Drop();
             _key = $"poeformance.monster.{_keys++}";
             _texture = _upload!(_key, image, false);
-
-            _shown = _wanted;
-            _drawnTurn = _turn;
-            _drawnTilt = _tilt;
-            _drawnZoom = _zoom;
-            _drawnSize = size;
-            _drawnGround = Ground;
-            _drawnPosed = posed;
-            _drawnFrame = _frame;
-            _drawnAnimation = _chosen;
             Why = string.Empty;
         }
         catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
@@ -661,4 +693,11 @@ public sealed class MonsterPortrait
 
     private static string Said(AggregateException? fault)
         => fault?.InnerException?.Message ?? fault?.Message ?? "the model could not be read";
+
+    private static Configuration Contiguously()
+    {
+        Configuration configuration = Configuration.Default.Clone();
+        configuration.PreferContiguousImageBuffers = true;
+        return configuration;
+    }
 }
