@@ -178,7 +178,7 @@ public class MeshPictureTests
     [Fact]
     public void ASkinIsUsedOnlyWhereThereAreCoordinatesToUseIt()
     {
-        GamePicture red = Sheet(220, 30, 30);
+        Mipmaps red = Sheet(220, 30, 30);
 
         // The post carries no coordinates, so the skin cannot be looked up and is left alone.
         Assert.Equal(
@@ -208,13 +208,95 @@ public class MeshPictureTests
     public void ANegativeCoordinateWrapsRatherThanClamping()
     {
         // A sheet whose halves differ, sampled at -0.25, which wraps to 0.75 - the far half.
-        GamePicture halves = Halved();
+        Mipmaps halves = Halved();
 
         GamePicture below = MeshPicture.Of(Coated(-0.25f), 64, skin: halves);
         GamePicture above = MeshPicture.Of(Coated(0.75f), 64, skin: halves);
 
         Assert.Equal(Middle(below), Middle(above));
         Assert.NotEqual(Middle(MeshPicture.Of(Coated(0.25f), 64, skin: halves)), Middle(below));
+    }
+
+    /// <summary>
+    /// A finely patterned skin shrunk onto a small picture comes out as its average, not as grain.
+    /// </summary>
+    /// <remarks>
+    /// THE TEST FOR THE REPORT FROM THE LIVE CLIENT: "grisselig", like poor reception. A skin of
+    /// alternating black and white texels is the harshest case of detail below the pixel - every
+    /// pixel of the quad covers several of each - and a sampler that picks one texel per pixel
+    /// paints it as noise, black or white by whichever texel the pixel centre happened to land on.
+    /// Read from the right level, every pixel is the same grey, because the average of that
+    /// pattern is the same everywhere.
+    ///
+    /// THE SPREAD IS THE ASSERTION, not the grey itself: the shade the quad is lit at multiplies
+    /// the colour, so the value is what it is, but every covered pixel must have the SAME one. One
+    /// texel picked per pixel puts the spread at the whole range.
+    /// </remarks>
+    [Fact]
+    public void AFinelyPatternedSkinShrunkComesOutEvenRatherThanGrainy()
+    {
+        GamePicture drawn = MeshPicture.Of(Papered(), 64, skin: Checkered(256));
+
+        (byte least, byte most, int covered) = Spread(drawn);
+        Assert.True(covered > 500, $"the quad should cover most of the picture and covered {covered} pixels");
+        Assert.True(
+            most - least <= 6,
+            $"the shrunk checkerboard came out between {least} and {most}, which is grain rather than its average");
+        Assert.True(least > 20, $"and the average of black and white is a grey, not {least}");
+    }
+
+    /// <summary>A skin magnified onto a big picture is smooth across a texel, not blocky.</summary>
+    /// <remarks>
+    /// THE OTHER END OF THE SAME CHANGE. Reading the level nearest a pixel's own size is a shrink's
+    /// answer; a two-by-two skin on a quad forty pixels across is a magnification, and there the
+    /// texels themselves are what a nearest read shows - four flat blocks with hard edges. Read
+    /// bilinearly the quad runs smoothly from one texel's colour to the next, which a count of the
+    /// values it takes tells apart: four blocks are four values, a ramp is dozens.
+    /// </remarks>
+    [Fact]
+    public void AMagnifiedSkinIsSmoothAcrossATexel()
+    {
+        GamePicture drawn = MeshPicture.Of(Papered(), 64, skin: Checkered(2));
+
+        var values = new HashSet<byte>();
+        for (var at = 0; at < drawn.Rgba.Length; at += 4)
+        {
+            if (drawn.Rgba[at + 3] != 0)
+            {
+                values.Add(drawn.Rgba[at]);
+            }
+        }
+
+        Assert.True(values.Count > 12, $"a magnified texel should ramp and took {values.Count} values");
+    }
+
+    /// <summary>The levels halve down to one texel, each the average of the four above it.</summary>
+    [Fact]
+    public void TheLevelsHalveDownToOneTexelAndAverage()
+    {
+        // Four by two, red running 0, 40, 80, 120 along the top row and 200 across the bottom one.
+        var rgba = new byte[4 * 2 * 4];
+        for (var x = 0; x < 4; x++)
+        {
+            rgba[x * 4] = (byte)(x * 40);
+            rgba[(4 + x) * 4] = 200;
+        }
+
+        Mipmaps? levels = Mipmaps.Of(new GamePicture(4, 2, rgba));
+        Assert.NotNull(levels);
+        Assert.Equal(3, levels.Count);
+        Assert.Equal((2, 1), (levels[1].Width, levels[1].Height));
+        Assert.Equal((1, 1), (levels[2].Width, levels[2].Height));
+
+        // (0 + 40 + 200 + 200) / 4 and (80 + 120 + 200 + 200) / 4, then the two of those.
+        Assert.Equal(110, levels[1].Rgba[0]);
+        Assert.Equal(150, levels[1].Rgba[4]);
+        Assert.Equal(130, levels[2].Rgba[0]);
+
+        // A level past the last is the last, and nothing makes no levels.
+        Assert.Same(levels[2].Rgba, levels[99].Rgba);
+        Assert.Null(Mipmaps.Of(null));
+        Assert.Null(Mipmaps.Of(new GamePicture(0, 0, [])));
     }
 
     /// <summary>
@@ -253,7 +335,7 @@ public class MeshPictureTests
     [Fact]
     public void ACanvasDrawsWhatTheAllocatingWayDraws()
     {
-        GamePicture sheet = Halved();
+        Mipmaps sheet = Halved();
         var canvas = new MeshPicture.Canvas(64);
 
         GamePicture lent = MeshPicture.Of(Coated(), canvas, 0.6f, -0.3f, skin: sheet);
@@ -371,25 +453,117 @@ public class MeshPictureTests
         Assert.Equal(0, over);
     }
 
-    /// <summary>The floor stays inside the frame at the steepest tilt the portrait allows.</summary>
+    /// <summary>
+    /// The floor runs off the frame at the steepest tilt, and has faded to nothing by the time it gets there.
+    /// </summary>
     /// <remarks>
-    /// A SQUARE SEEN AT AN ANGLE SHOWS ITS DIAGONAL, which is where a floor sized off the model's
-    /// own footprint ran off both edges - a skeleton is 154 across and 189 high, so a footprint
-    /// floor was wider than the frame the camera fitted. The portrait clamps tilt to a third of a
-    /// turn either way, so those are the two angles that have to hold.
+    /// THE OPPOSITE OF WHAT THIS TEST FIRST PINNED. The floor used to be sized to stay inside the
+    /// frame at every tilt, and it was reported from the live client as a small plate turning with
+    /// the model rather than a floor it stands on. Now it runs off the frame, and what is pinned
+    /// instead is the fade: nothing solid on the frame's own border, and stronger near the middle
+    /// than out by the edge, so the floor ends in air and never in a hard line. The portrait clamps
+    /// tilt to a third of a turn either way, so those are the two angles that have to hold.
     /// </remarks>
     [Theory]
     [InlineData(1.047f)]
     [InlineData(-1.047f)]
-    public void TheFloorStaysInsideTheFrameAtTheSteepestTilt(float tilt)
+    public void TheFloorRunsOffTheFrameAndFadesOutBeforeIt(float tilt)
     {
         const int Side = 240;
-        (int Top, int Foot, int Left, int Right, int Lit) seen
-            = Silhouette(MeshPicture.Of(Post(crossbar: true), Side, tilt: tilt, ground: true));
+        GamePicture bare = MeshPicture.Of(Post(crossbar: true), Side, tilt: tilt);
+        GamePicture floored = MeshPicture.Of(Post(crossbar: true), Side, tilt: tilt, ground: true);
 
-        Assert.True(seen.Lit > 0, "nothing was drawn at all");
-        Assert.True(seen.Top > 0 && seen.Foot < Side - 1, $"the floor spills top or bottom: {seen}");
-        Assert.True(seen.Left > 0 && seen.Right < Side - 1, $"the floor spills left or right: {seen}");
+        // The floor is broad, and reaches the bottom of the frame rather than stopping short.
+        (int Pixels, int Rows) extra = Extra(bare, floored);
+        Assert.True(extra.Pixels > 500, $"the floor should be broad and added {extra.Pixels} pixels");
+        Assert.True(Silhouette(floored).Foot >= Side - 3, "the floor should run to the frame's edge");
+
+        var border = 0;
+        var near = 0;
+        var far = 0;
+        float radius = Side * 0.5f;
+        for (var y = 0; y < Side; y++)
+        {
+            for (var x = 0; x < Side; x++)
+            {
+                int at = ((y * Side) + x) * 4;
+                byte alpha = floored.Rgba[at + 3];
+                if (bare.Rgba[at + 3] != 0 || alpha == 0)
+                {
+                    continue;
+                }
+
+                if (x == 0 || y == 0 || x == Side - 1 || y == Side - 1)
+                {
+                    border = Math.Max(border, alpha);
+                }
+
+                float dx = x + 0.5f - radius;
+                float dy = y + 0.5f - radius;
+                float away = MathF.Sqrt((dx * dx) + (dy * dy)) / radius;
+                if (away < 0.4f)
+                {
+                    near = Math.Max(near, alpha);
+                }
+                else if (away > 0.85f)
+                {
+                    far = Math.Max(far, alpha);
+                }
+            }
+        }
+
+        Assert.True(border <= 8, $"the floor reaches the frame's border at alpha {border}");
+        Assert.True(near > 200, $"the floor should be solid near the middle, not {near}");
+        Assert.True(near > far, $"and fade outwards, but is {near} near the middle against {far} by the edge");
+    }
+
+    /// <summary>Zooming keeps whatever is under the pointer under it.</summary>
+    /// <remarks>
+    /// THE MAP'S RULE, checked on the picture rather than on the formula: the corner of the
+    /// crossbar is put under the pointer, the zoom doubles towards it, and the corner has to be
+    /// drawn where it was to within a pixel. The same zoom into the middle moves it a long way,
+    /// which is what shows the check can fail.
+    /// </remarks>
+    [Fact]
+    public void ZoomingKeepsWhatIsUnderThePointerUnderIt()
+    {
+        const int Side = 200;
+        (int Top, int Foot, int Left, int Right, int Lit) fitted
+            = Silhouette(MeshPicture.Of(Post(crossbar: true), Side));
+
+        var pointer = new Vector2((fitted.Left + 0.5f) / Side, (fitted.Top + 0.5f) / Side);
+        Vector2 pan = MeshPicture.Panned(Vector2.Zero, pointer, 1f, 2f);
+        (int Top, int Foot, int Left, int Right, int Lit) closer
+            = Silhouette(MeshPicture.Of(Post(crossbar: true), Side, zoom: 2f, pan: pan));
+
+        Assert.InRange(closer.Top, fitted.Top - 1, fitted.Top + 1);
+        Assert.InRange(closer.Left, fitted.Left - 1, fitted.Left + 1);
+
+        (int Top, int Foot, int Left, int Right, int Lit) middle
+            = Silhouette(MeshPicture.Of(Post(crossbar: true), Side, zoom: 2f));
+        Assert.True(
+            Math.Abs(middle.Top - fitted.Top) > 5,
+            "zooming into the middle should have moved the corner, or this proves nothing");
+    }
+
+    /// <summary>Pulling back with the pointer in a corner cannot carry the model out of the frame.</summary>
+    [Fact]
+    public void PullingBackTowardsACornerKeepsTheModelInTheFrame()
+    {
+        Vector2 pan = Vector2.Zero;
+        var zoom = 1f;
+        for (var notch = 0; notch < 12; notch++)
+        {
+            float next = Math.Max(zoom / 1.18f, MeshPicture.Nearest);
+            pan = MeshPicture.Panned(pan, Vector2.Zero, zoom, next);
+            zoom = next;
+        }
+
+        Assert.Equal(MeshPicture.Nearest, zoom);
+        Assert.True(Silhouette(MeshPicture.Of(Post(crossbar: true), 200, zoom: zoom, pan: pan)).Lit > 0);
+
+        // And a pointer that is not a number is taken as the middle rather than believed.
+        Assert.Equal(Vector2.Zero, MeshPicture.Panned(Vector2.Zero, new Vector2(float.NaN), 1f, 2f));
     }
 
     /// <summary>Where and how much two pictures of the same model differ.</summary>
@@ -449,7 +623,7 @@ public class MeshPictureTests
         => said.Rgba[((((said.Height / 2) * said.Width) + (said.Width / 2)) * 4) + part];
 
     /// <summary>A texture of one colour.</summary>
-    private static GamePicture Sheet(byte red, byte green, byte blue)
+    private static Mipmaps Sheet(byte red, byte green, byte blue)
     {
         var pixels = new byte[8 * 8 * 4];
         for (var one = 0; one < 8 * 8; one++)
@@ -460,11 +634,11 @@ public class MeshPictureTests
             pixels[(one * 4) + 3] = 255;
         }
 
-        return new GamePicture(8, 8, pixels);
+        return Levelled(new GamePicture(8, 8, pixels));
     }
 
     /// <summary>A texture whose lower half differs from its upper one.</summary>
-    private static GamePicture Halved()
+    private static Mipmaps Halved()
     {
         var pixels = new byte[8 * 8 * 4];
         for (var y = 0; y < 8; y++)
@@ -479,7 +653,68 @@ public class MeshPictureTests
             }
         }
 
-        return new GamePicture(8, 8, pixels);
+        return Levelled(new GamePicture(8, 8, pixels));
+    }
+
+    /// <summary>A texture of alternating black and white texels, this many each way.</summary>
+    private static Mipmaps Checkered(int side)
+    {
+        var pixels = new byte[side * side * 4];
+        for (var y = 0; y < side; y++)
+        {
+            for (var x = 0; x < side; x++)
+            {
+                int at = ((y * side) + x) * 4;
+                byte tone = (x + y) % 2 == 0 ? (byte)0 : (byte)255;
+                pixels[at] = tone;
+                pixels[at + 1] = tone;
+                pixels[at + 2] = tone;
+                pixels[at + 3] = 255;
+            }
+        }
+
+        return Levelled(new GamePicture(side, side, pixels));
+    }
+
+    private static Mipmaps Levelled(GamePicture top)
+    {
+        Mipmaps? levels = Mipmaps.Of(top);
+        Assert.NotNull(levels);
+        return levels;
+    }
+
+    /// <summary>The least and most red over the covered pixels, and how many there are.</summary>
+    private static (byte Least, byte Most, int Covered) Spread(GamePicture drawn)
+    {
+        byte least = 255;
+        byte most = 0;
+        var covered = 0;
+        for (var at = 0; at < drawn.Rgba.Length; at += 4)
+        {
+            if (drawn.Rgba[at + 3] == 0)
+            {
+                continue;
+            }
+
+            covered++;
+            least = Math.Min(least, drawn.Rgba[at]);
+            most = Math.Max(most, drawn.Rgba[at]);
+        }
+
+        return (least, most, covered);
+    }
+
+    /// <summary>A quad facing the viewer with the whole skin laid across it once, corner to corner.</summary>
+    private static SkinnedMesh Papered()
+    {
+        var places = new List<Vector3>();
+        var indices = new List<int>();
+        Quad(places, indices, near: true);
+
+        SkinnedMesh bare = Built(places, indices, Least, Most);
+        Vector2[] spots = [new(0f, 0f), new(1f, 0f), new(1f, 1f), new(0f, 1f)];
+
+        return SkinnedMesh.Of(bare.Positions, bare.Normals, bare.Indices, Least, Most, spots);
     }
 
     /// <summary>A quad facing the viewer, with every corner at the same texture coordinate.</summary>

@@ -7,7 +7,7 @@ namespace PoEformance.Features;
 /// A monster's model, gathered from the five files it takes to draw one.
 /// </summary>
 /// <param name="Mesh">The geometry, or <see cref="SkinnedMesh.None"/> where none was found.</param>
-/// <param name="Skin">The colour texture, or null to draw the mesh plain.</param>
+/// <param name="Skin">The colour texture with its halved levels, or null to draw the mesh plain.</param>
 /// <param name="Mesh_">The <c>.sm</c> that named the geometry, for the report.</param>
 /// <param name="Material">The <c>.mat</c> path that was used, for the report.</param>
 /// <param name="Why">Where the walk stopped, or empty where it did not.</param>
@@ -17,7 +17,7 @@ namespace PoEformance.Features;
 /// </param>
 public sealed record MonsterModel(
     SkinnedMesh Mesh,
-    GamePicture? Skin,
+    Mipmaps? Skin,
     string Mesh_,
     string Material,
     string Why,
@@ -31,7 +31,7 @@ public sealed record MonsterModel(
     public bool Ready => Mesh.Ready;
 
     /// <summary>Whether the monster is wearing its own texture rather than plain ink.</summary>
-    public bool Painted => Paint.Length == 0 && Skin is { Ready: true };
+    public bool Painted => Paint.Length == 0 && Skin is not null;
 
     /// <summary>The skeleton the monster's .ao names, or <see cref="AnimationSkeleton.None"/>.</summary>
     public AnimationSkeleton Rig { get; init; } = AnimationSkeleton.None;
@@ -173,7 +173,7 @@ public static class MonsterModels
             ? found.Material
             : manifest.Materials.FirstOrDefault(said => said.Length > 0) ?? string.Empty;
 
-        (GamePicture? skin, string paint) = Painted(counted, mesh, material);
+        (Mipmaps? skin, string paint) = Painted(counted, mesh, material);
         (AnimationSkeleton rig, string move) = Rigged(counted, found.Skeleton, mesh);
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
@@ -269,7 +269,7 @@ public static class MonsterModels
     /// texture and no way to look it up. That is the expected state of a bare body whose clothes
     /// are attached objects, and it is a different answer from "the file would not read".
     /// </remarks>
-    private static (GamePicture? Skin, string Why) Painted(
+    private static (Mipmaps? Skin, string Why) Painted(
         Func<string, byte[]?> read, SkinnedMesh mesh, string material)
     {
         if (material.Length == 0)
@@ -298,7 +298,10 @@ public static class MonsterModels
             return (null, $"the texture did not read: {texture}");
         }
 
-        if (GameArt.Decode(bytes) is not { Ready: true } skin)
+        // THE LEVELS ARE BUILT HERE, ON THE LOAD'S TASK, and not where the picture is drawn: a
+        // boss's skin is 2048 square, and halving it down is a pass over sixteen megabytes that
+        // belongs beside the bundle reads it follows rather than on the frame that first draws it.
+        if (Mipmaps.Of(GameArt.Decode(bytes)) is not { } skin)
         {
             return (null, $"the texture did not decode: {texture}");
         }

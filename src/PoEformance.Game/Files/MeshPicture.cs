@@ -23,6 +23,13 @@ namespace PoEformance.Game.Files;
 /// an overlay frame of about 6 ms, and only while the button is down. What it is NOT affordable
 /// with is a fresh pair of buffers each time; see <see cref="Canvas"/>.
 ///
+/// THE SKIN IS READ TRILINEARLY, from the level of <see cref="Mipmaps"/> whose texels are about a
+/// pixel across, and that roughly doubles what a textured pixel costs: a quad filling the whole
+/// frame with a 2048 square skin measured 9.0 ms a frame at 384 square against 4.8 with the
+/// one-texel read it replaced, and 25.7 against 16.1 at 768. A real rig covers about a third of
+/// the frame. What the one-texel read cost instead was a monster drawn as grain - see Mipmaps for
+/// the report - and a picture that is wrong is not cheap at any price.
+///
 /// THE MODEL STANDS ALONG NEGATIVE Z, which is measured rather than assumed: BasicSkeleton's box
 /// runs x ±77, y ±14.5, z -189 to -0.4, so the long axis is z, the feet are at the end nearest
 /// zero and the head is at -189. Read with y as the up axis a skeleton comes out lying on its
@@ -49,17 +56,25 @@ public static class MeshPicture
     /// <inheritdoc cref="Nearest"/>
     public const float Furthest = 6f;
 
-    /// <summary>How many squares across the ground grid is drawn.</summary>
-    public const int Squares = 10;
-
-    /// <summary>How far the ground grid reaches, as a share of what the camera fitted.</summary>
+    /// <summary>How many squares of the ground the model's longest side spans.</summary>
     /// <remarks>
-    /// CHOSEN BY LOOKING, because "does the floor fit in the frame" is a question about a picture.
-    /// A square seen at 45 degrees shows its DIAGONAL, so the usable share is roughly this times
-    /// 2 times root 2 - at 0.35 that is 0.99 of what the camera fitted, which lands just inside
-    /// the frame at the steepest tilt the portrait allows.
+    /// THE SQUARES SCALE WITH THE MONSTER, so a rat and a boss both stand on squares that suit
+    /// them - the count the first floor had, which was ten across a floor 0.7 of the model wide.
     /// </remarks>
-    public const float Floor = 0.35f;
+    public const int Squares = 14;
+
+    /// <summary>How far the ground reaches from the model's centre, as a multiple of what the camera fitted.</summary>
+    /// <remarks>
+    /// FAR ENOUGH TO RUN OFF THE FRAME AT EVERY ZOOM AND PAN, which is what makes it read as a
+    /// floor and not as a plate the monster stands on. The first cut reached 0.35 of the model and
+    /// sat inside the frame at every tilt, and it was reported from the live client as "not right,
+    /// not intuitive": a small rhombus turning with the model. Pulled back to the furthest zoom the
+    /// frame shows 2.9 of what the camera fitted, and the pan may carry the centre a further 0.17
+    /// of that, so two covers it. What a line beyond the frame costs is one clip - see Line - and
+    /// the floor fades to nothing at the frame's edge regardless, so it ends in air rather than in
+    /// a hard line wherever the frame happens to cut it.
+    /// </remarks>
+    public const float Floor = 2f;
 
     /// <summary>How far under the feet the ground sits, as a share of the model's height.</summary>
     /// <remarks>Enough to settle the depth test, far too little to look like the monster floats.</remarks>
@@ -109,21 +124,24 @@ public static class MeshPicture
     /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
     /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
     /// <param name="skin">
-    /// The monster's own colour texture, or null to draw it in <paramref name="ink"/>. What
-    /// <see cref="MaterialFile.Albedo"/> names, decoded by <see cref="GameArt"/>.
+    /// The monster's own colour texture with its levels, or null to draw it in <paramref name="ink"/>.
+    /// What <see cref="MaterialFile.Albedo"/> names, decoded by <see cref="GameArt"/> and halved
+    /// down by <see cref="Mipmaps"/>.
     /// </param>
     /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
     /// <param name="ground">Whether to draw the grid the model stands on.</param>
+    /// <param name="pan">Where the model's centre sits, as a share of the picture off its middle, right and down. See <see cref="Panned"/>.</param>
     public static GamePicture Of(
         SkinnedMesh? mesh,
         int size,
         float turn = 0f,
         float tilt = 0f,
         Vector3 ink = default,
-        GamePicture? skin = null,
+        Mipmaps? skin = null,
         float zoom = 1f,
-        bool ground = false)
-        => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, ground);
+        bool ground = false,
+        Vector2 pan = default)
+        => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, ground, pan);
 
     /// <summary>
     /// Draws the mesh into a canvas the caller keeps, for anything that draws it more than once.
@@ -133,19 +151,21 @@ public static class MeshPicture
     /// <param name="turn">Rotation about the model's up axis, in radians.</param>
     /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
     /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
-    /// <param name="skin">The monster's own colour texture, or null to draw it in <paramref name="ink"/>.</param>
+    /// <param name="skin">The monster's own colour texture with its levels, or null to draw it in <paramref name="ink"/>.</param>
     /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
     /// <param name="ground">Whether to draw the grid the model stands on.</param>
+    /// <param name="pan">Where the model's centre sits, as a share of the picture off its middle, right and down. See <see cref="Panned"/>.</param>
     public static GamePicture Of(
         SkinnedMesh? mesh,
         Canvas canvas,
         float turn = 0f,
         float tilt = 0f,
         Vector3 ink = default,
-        GamePicture? skin = null,
+        Mipmaps? skin = null,
         float zoom = 1f,
-        bool ground = false)
-        => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, ground);
+        bool ground = false,
+        Vector2 pan = default)
+        => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, ground, pan);
 
     /// <summary>
     /// Draws the mesh with its vertices somewhere other than the file put them - posed.
@@ -157,9 +177,10 @@ public static class MeshPicture
     /// <param name="turn">Rotation about the model's up axis, in radians.</param>
     /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
     /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
-    /// <param name="skin">The monster's own colour texture, or null to draw it in <paramref name="ink"/>.</param>
+    /// <param name="skin">The monster's own colour texture with its levels, or null to draw it in <paramref name="ink"/>.</param>
     /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
     /// <param name="ground">Whether to draw the grid the model stands on.</param>
+    /// <param name="pan">Where the model's centre sits, as a share of the picture off its middle, right and down. See <see cref="Panned"/>.</param>
     /// <remarks>
     /// THE CAMERA STAYS ON THE BIND POSE'S BOX, deliberately. An animation moves vertices outside
     /// the box the file wrote - a raised arm, a lunge - and refitting the view to them every frame
@@ -178,9 +199,10 @@ public static class MeshPicture
         float turn = 0f,
         float tilt = 0f,
         Vector3 ink = default,
-        GamePicture? skin = null,
+        Mipmaps? skin = null,
         float zoom = 1f,
-        bool ground = false)
+        bool ground = false,
+        Vector2 pan = default)
     {
         ArgumentNullException.ThrowIfNull(canvas);
 
@@ -230,7 +252,15 @@ public static class MeshPicture
             * Matrix4x4.CreateRotationX(-MathF.PI / 2f);
 
         float scale = size * Fill * Math.Clamp(zoom, Nearest, Furthest) / reach;
-        float half = size * 0.5f;
+
+        // THE MIDDLE OF THE PICTURE IS WHERE THE MODEL'S CENTRE LANDS, moved by the pan - a share
+        // of the picture rather than pixels, so the same pan draws the same view on every rung.
+        if (!float.IsFinite(pan.X) || !float.IsFinite(pan.Y))
+        {
+            pan = default;
+        }
+
+        Vector2 centre = new Vector2(size * 0.5f) + (pan * size);
 
         float[] depth = canvas.Depth;
         Array.Fill(depth, float.MaxValue);
@@ -244,12 +274,12 @@ public static class MeshPicture
         // already has one.
         if (ground)
         {
-            Ground(pixels, depth, size, mesh, view, scale, half);
+            Ground(pixels, depth, size, mesh, view, scale, centre);
         }
 
         // The skin is only usable if it decoded AND the mesh carries coordinates to look it up
         // with - see SkinnedMesh.Coordinated for what an uncoordinated mesh would paint.
-        GamePicture? usable = skin is { Ready: true } && mesh.Coordinated ? skin : null;
+        Mipmaps? usable = skin is not null && mesh.Coordinated ? skin : null;
 
         Span<Vector3> corner = stackalloc Vector3[3];
         Span<Vector3> facing = stackalloc Vector3[3];
@@ -263,8 +293,8 @@ public static class MeshPicture
                 Vector3 place = Vector3.Transform(positions[point], view);
 
                 corner[part] = new Vector3(
-                    (place.X * scale) + half,
-                    (place.Y * scale) + half,
+                    (place.X * scale) + centre.X,
+                    (place.Y * scale) + centre.Y,
                     place.Z);
 
                 facing[part] = Vector3.TransformNormal(normals[point], view);
@@ -275,6 +305,52 @@ public static class MeshPicture
         }
 
         return new GamePicture(size, size, pixels);
+    }
+
+    /// <summary>
+    /// Where the model's centre goes so that the point under the pointer stays put across a zoom.
+    /// </summary>
+    /// <param name="pan">The pan the picture was drawn with.</param>
+    /// <param name="pointer">Where the pointer is, as a share of the picture from its top left corner.</param>
+    /// <param name="from">The zoom the picture was drawn at.</param>
+    /// <param name="to">The zoom it is about to be drawn at.</param>
+    /// <remarks>
+    /// ZOOMING INTO THE MIDDLE WAS THE ONE THING REPORTED AGAINST THE WHEEL: a monster's head is
+    /// never in the middle, so the way to look at it closely was to zoom past it and lose it. This
+    /// is the map's rule instead - whatever is under the pointer stays under it, so pushing in on
+    /// the head lands on the head.
+    ///
+    /// THE ARITHMETIC IS ONE LINE. A model point lands at 0.5 + pan + k m, where k grows with the
+    /// zoom, so keeping the point under the pointer p where it is while k becomes k f puts the new
+    /// pan at (p - 0.5)(1 - f) + f pan. It is HERE RATHER THAN IN THE PORTRAIT for the reason
+    /// PictureLadder gives: the overlay cannot be tested, and a sign wrong in this is a zoom that
+    /// runs away from the pointer instead of towards it.
+    ///
+    /// CLAMPED SO THE MODEL CANNOT BE LOST. Pulling back with the pointer in a corner would
+    /// otherwise drag the model into that corner and out of the frame; the centre may go no
+    /// further off the middle than half of what the model's box spans on the picture, so the box
+    /// always reaches the middle - and at the closest zoom that is exactly far enough to bring the
+    /// top of the head there.
+    /// </remarks>
+    public static Vector2 Panned(Vector2 pan, Vector2 pointer, float from, float to)
+    {
+        if (!float.IsFinite(pointer.X) || !float.IsFinite(pointer.Y))
+        {
+            pointer = new Vector2(0.5f);
+        }
+
+        if (!float.IsFinite(pan.X) || !float.IsFinite(pan.Y))
+        {
+            pan = default;
+        }
+
+        from = float.IsFinite(from) ? Math.Clamp(from, Nearest, Furthest) : 1f;
+        to = float.IsFinite(to) ? Math.Clamp(to, Nearest, Furthest) : 1f;
+        float grew = to / from;
+
+        Vector2 moved = ((pointer - new Vector2(0.5f)) * (1f - grew)) + (pan * grew);
+        float most = 0.5f * Fill * to;
+        return new Vector2(Math.Clamp(moved.X, -most, most), Math.Clamp(moved.Y, -most, most));
     }
 
     /// <summary>
@@ -300,13 +376,15 @@ public static class MeshPicture
         ReadOnlySpan<Vector2> onSkin,
         Vector3 lamp,
         Vector3 ink,
-        GamePicture? skin)
+        Mipmaps? skin)
     {
         float area = Cross(corner[0], corner[1], corner[2]);
         if (MathF.Abs(area) < 1e-6f)
         {
             return;
         }
+
+        float level = skin is null ? 0f : Level(corner, onSkin, area, skin);
 
         int least = Math.Max(0, (int)MathF.Floor(Min3(corner[0].X, corner[1].X, corner[2].X)));
         int most = Math.Min(size - 1, (int)MathF.Ceiling(Max3(corner[0].X, corner[1].X, corner[2].X)));
@@ -349,14 +427,14 @@ public static class MeshPicture
                 float shade = 0.22f + (0.78f * lit);
 
                 Vector3 colour = ink;
-                if (skin is { } sheet)
+                if (skin is not null)
                 {
                     // AFFINE INTERPOLATION IS EXACT HERE. The projection is orthographic, so a
                     // coordinate across the triangle really is linear in screen space - the
                     // perspective correction a game renderer needs would be dividing by a w that
                     // is always one.
                     Vector2 spot = (first * onSkin[0]) + (second * onSkin[1]) + (third * onSkin[2]);
-                    colour = Sample(sheet, spot);
+                    colour = Sample(skin, spot, level);
                 }
 
                 pixels[(at * 4) + 0] = Byte(colour.X * shade);
@@ -386,21 +464,21 @@ public static class MeshPicture
     /// </remarks>
     private static void Ground(
         byte[] pixels, float[] depth, int size, SkinnedMesh mesh,
-        Matrix4x4 view, float scale, float half)
+        Matrix4x4 view, float scale, Vector2 centre)
     {
         Vector3 middle = (mesh.Least + mesh.Most) * 0.5f;
         Vector3 span = Vector3.Abs(mesh.Most - mesh.Least);
 
-        // MEASURED OFF THE SAME SIDE THE CAMERA IS, and not off the footprint. A floor sized to a
-        // monster's own width is wider than the frame for anything tall - a skeleton is 154 across
-        // and 189 high, so the camera fits 189 and a footprint-sized floor runs off both edges.
-        // Tying it to what the camera fitted keeps the floor inside the picture at every tilt,
-        // and still gives a rat a small one and a boss a big one.
-        float reach = MathF.Max(span.X, MathF.Max(span.Y, span.Z)) * Floor;
-        if (reach <= 0f)
+        // MEASURED OFF THE SAME SIDE THE CAMERA IS, and not off the footprint, so that the squares
+        // suit the monster: a rat gets small ones and a boss big ones, and the same count across.
+        float fitted = MathF.Max(span.X, MathF.Max(span.Y, span.Z));
+        if (fitted <= 0f)
         {
             return;
         }
+
+        float reach = fitted * Floor;
+        float step = fitted / Squares;
 
         // A HAIR BELOW THE FEET AND NOT EXACTLY AT THEM. Most.Z is where the lowest triangle sits,
         // so a floor drawn at it is at the SAME depth as the sole - and the depth test keeps
@@ -408,56 +486,124 @@ public static class MeshPicture
         // a monster's feet. Below means a LARGER z, because the model runs along negative z with
         // its head at the far end.
         float floor = mesh.Most.Z + (span.Z * Under);
-        float step = reach * 2f / Squares;
 
-        // Dim enough to stay behind the monster rather than compete with it, and the two middle
-        // lines lighter so there is something to read the turn against.
+        // THE FLOOR'S DEPTH IS THE PLANE'S AT THE PIXEL'S CENTRE, not the depth of wherever a
+        // step along a line happened to land inside the pixel. The model's own depth is taken at
+        // pixel centres, and a floor sampled half a pixel off has, at a steep tilt, a depth that
+        // differs by more than the hair of clearance under the feet: measured, 24 pixels of a flat
+        // sole lost to the floor the moment the lines were stepped from a different start. A
+        // plane's depth on the screen is affine, so three points of it give the whole thing.
+        Plane plane = Plane.Through(
+            Screen(new Vector3(middle.X, middle.Y, floor), view, scale, centre),
+            Screen(new Vector3(middle.X + 1f, middle.Y, floor), view, scale, centre),
+            Screen(new Vector3(middle.X, middle.Y + 1f, floor), view, scale, centre));
+
+        // Dim enough to stay behind the monster rather than compete with it, and the two lines
+        // through the middle lighter so there is something to read the turn against.
         var faint = new Vector3(0.26f, 0.25f, 0.22f);
         var axis = new Vector3(0.46f, 0.44f, 0.38f);
 
-        for (var i = 0; i <= Squares; i++)
+        var lines = (int)MathF.Floor(reach / step);
+        for (int i = -lines; i <= lines; i++)
         {
-            float at = -reach + (i * step);
-            Vector3 ink = i == Squares / 2 ? axis : faint;
+            float at = i * step;
+            Vector3 ink = i == 0 ? axis : faint;
 
             Line(
-                pixels, depth, size, view, scale, half,
+                pixels, depth, size, view, scale, centre, plane,
                 new Vector3(middle.X + at, middle.Y - reach, floor),
                 new Vector3(middle.X + at, middle.Y + reach, floor),
                 ink);
 
             Line(
-                pixels, depth, size, view, scale, half,
+                pixels, depth, size, view, scale, centre, plane,
                 new Vector3(middle.X - reach, middle.Y + at, floor),
                 new Vector3(middle.X + reach, middle.Y + at, floor),
                 ink);
         }
     }
 
-    /// <summary>One straight line of the grid, depth-tested like everything else.</summary>
+    /// <summary>The depth of a plane across the picture, as the affine function of the pixel it is.</summary>
+    /// <param name="AlongX">How much deeper it gets per pixel to the right.</param>
+    /// <param name="AlongY">How much deeper it gets per pixel down.</param>
+    /// <param name="At">Its depth at the picture's top left corner.</param>
+    /// <param name="Known">False where the plane is edge-on and has no one depth per pixel.</param>
+    private readonly record struct Plane(float AlongX, float AlongY, float At, bool Known)
+    {
+        /// <summary>The plane through three points already on the picture, with their depths.</summary>
+        public static Plane Through(Vector3 origin, Vector3 alongX, Vector3 alongY)
+        {
+            float e1x = alongX.X - origin.X;
+            float e1y = alongX.Y - origin.Y;
+            float e2x = alongY.X - origin.X;
+            float e2y = alongY.Y - origin.Y;
+            float d1 = alongX.Z - origin.Z;
+            float d2 = alongY.Z - origin.Z;
+
+            // The same two-by-two solve as Level's: edge-on, the two edges are parallel on the
+            // picture and there is nothing to solve.
+            float det = (e1x * e2y) - (e1y * e2x);
+            if (MathF.Abs(det) < 1e-9f)
+            {
+                return default;
+            }
+
+            float alongScreenX = ((e2y * d1) - (e1y * d2)) / det;
+            float alongScreenY = ((e1x * d2) - (e2x * d1)) / det;
+            float at = origin.Z - (alongScreenX * origin.X) - (alongScreenY * origin.Y);
+            return new Plane(alongScreenX, alongScreenY, at, true);
+        }
+
+        /// <summary>The depth at a pixel's centre, or the depth handed in where the plane is edge-on.</summary>
+        public float Deep(int x, int y, float sampled)
+            => Known ? (AlongX * (x + 0.5f)) + (AlongY * (y + 0.5f)) + At : sampled;
+    }
+
+    /// <summary>One straight line of the grid, depth-tested like everything else and fading out towards the frame's edge.</summary>
     /// <remarks>
     /// STEPPED ALONG THE LONGER SIDE, which is what keeps a line solid at every angle: walking x
     /// on a line that is mostly vertical leaves a dotted one, and the grid turns with the model so
     /// every line is every angle in turn.
+    ///
+    /// CLIPPED TO THE FRAME BEFORE IT IS STEPPED. The floor runs to twice what the camera fitted,
+    /// and at the closest zoom a line of it is thousands of pixels long with a few dozen of them
+    /// in the frame; the parametric clip finds those few dozen for four divisions, where stepping
+    /// the whole line and testing each pixel was most of the floor's cost spent off the picture.
+    ///
+    /// FADED WITH DISTANCE FROM THE FRAME'S MIDDLE, to nothing at the frame's own edge, so the
+    /// floor ends in air wherever the frame cuts it and never in a hard line. In the picture's own
+    /// space rather than the model's, which is what keeps the fade the same at every zoom and pan:
+    /// the floor is always a disc that fills the frame, whatever part of the model is in it. The
+    /// fourth power keeps it solid over most of that disc and lets go in the last stretch.
     /// </remarks>
     private static void Line(
         byte[] pixels, float[] depth, int size,
-        Matrix4x4 view, float scale, float half,
+        Matrix4x4 view, float scale, Vector2 centre, Plane plane,
         Vector3 from, Vector3 to, Vector3 ink)
     {
-        Vector3 a = Screen(from, view, scale, half);
-        Vector3 b = Screen(to, view, scale, half);
+        Vector3 a = Screen(from, view, scale, centre);
+        Vector3 b = Screen(to, view, scale, centre);
 
-        float run = MathF.Max(MathF.Abs(b.X - a.X), MathF.Abs(b.Y - a.Y));
+        var t0 = 0f;
+        var t1 = 1f;
+        if (!Clip(a.X, b.X - a.X, size, ref t0, ref t1) || !Clip(a.Y, b.Y - a.Y, size, ref t0, ref t1))
+        {
+            return;
+        }
+
+        Vector3 start = Vector3.Lerp(a, b, t0);
+        Vector3 end = Vector3.Lerp(a, b, t1);
+        float run = MathF.Max(MathF.Abs(end.X - start.X), MathF.Abs(end.Y - start.Y));
         var steps = (int)MathF.Ceiling(run);
         if (steps <= 0)
         {
             return;
         }
 
+        float radius = size * 0.5f;
         for (var i = 0; i <= steps; i++)
         {
-            Vector3 place = Vector3.Lerp(a, b, (float)i / steps);
+            Vector3 place = Vector3.Lerp(start, end, (float)i / steps);
             var x = (int)place.X;
             var y = (int)place.Y;
 
@@ -466,50 +612,195 @@ public static class MeshPicture
                 continue;
             }
 
-            int spot = (y * size) + x;
-            if (place.Z >= depth[spot])
+            float dx = place.X - radius;
+            float dy = place.Y - radius;
+            float away = ((dx * dx) + (dy * dy)) / (radius * radius);
+            float fade = 1f - (away * away);
+            if (fade <= 0f)
             {
                 continue;
             }
 
-            depth[spot] = place.Z;
+            int spot = (y * size) + x;
+            float deep = plane.Deep(x, y, place.Z);
+            if (deep >= depth[spot])
+            {
+                continue;
+            }
+
+            depth[spot] = deep;
             pixels[(spot * 4) + 0] = Byte(ink.X);
             pixels[(spot * 4) + 1] = Byte(ink.Y);
             pixels[(spot * 4) + 2] = Byte(ink.Z);
-            pixels[(spot * 4) + 3] = 255;
+            pixels[(spot * 4) + 3] = Byte(fade);
         }
     }
 
+    /// <summary>Narrows a segment's parameter range to where one axis lies inside the frame; false where none of it does.</summary>
+    private static bool Clip(float start, float delta, int size, ref float t0, ref float t1)
+    {
+        if (MathF.Abs(delta) < 1e-6f)
+        {
+            return start >= 0f && start < size;
+        }
+
+        float enter = -start / delta;
+        float leave = (size - start) / delta;
+        if (enter > leave)
+        {
+            (enter, leave) = (leave, enter);
+        }
+
+        t0 = MathF.Max(t0, enter);
+        t1 = MathF.Min(t1, leave);
+        return t0 <= t1;
+    }
+
     /// <summary>A point in the model's own space, put where it lands on the picture.</summary>
-    private static Vector3 Screen(Vector3 place, Matrix4x4 view, float scale, float half)
+    private static Vector3 Screen(Vector3 place, Matrix4x4 view, float scale, Vector2 centre)
     {
         Vector3 seen = Vector3.Transform(place, view);
-        return new Vector3((seen.X * scale) + half, (seen.Y * scale) + half, seen.Z);
+        return new Vector3((seen.X * scale) + centre.X, (seen.Y * scale) + centre.Y, seen.Z);
     }
 
     /// <summary>
-    /// One texel, nearest neighbour, wrapped.
+    /// Which level of the skin a triangle reads, as a number that may fall between two of them.
+    /// </summary>
+    /// <remarks>
+    /// ONE NUMBER PER TRIANGLE, AND THAT IS EXACT HERE rather than an approximation: the projection
+    /// is orthographic and the coordinates are interpolated linearly, so how many texels one pixel
+    /// steps across is the same at every pixel of the triangle. A game renderer works it out per
+    /// pixel because perspective changes it across a face; this one has no perspective.
+    ///
+    /// THE LONGER OF THE TWO STEPS DECIDES, as a graphics card's sampler does. A face seen nearly
+    /// edge-on steps across many texels in one screen direction and few in the other, and the
+    /// level that suits the short step is grain along the long one. Blur along the short step is
+    /// the price, and it is the cheaper of the two.
+    /// </remarks>
+    private static float Level(
+        ReadOnlySpan<Vector3> corner, ReadOnlySpan<Vector2> onSkin, float area, Mipmaps skin)
+    {
+        // The two edges out of the first corner, on the screen and on the skin.
+        float e1x = corner[1].X - corner[0].X;
+        float e1y = corner[1].Y - corner[0].Y;
+        float e2x = corner[2].X - corner[0].X;
+        float e2y = corner[2].Y - corner[0].Y;
+        Vector2 d1 = onSkin[1] - onSkin[0];
+        Vector2 d2 = onSkin[2] - onSkin[0];
+
+        // How the coordinate changes per pixel to the right and per pixel down: the two-by-two
+        // solve of "the gradient along each edge is that edge's change", whose determinant is the
+        // area already in hand. In texels, so that the answer is a count of them.
+        float wide = skin.Top.Width;
+        float high = skin.Top.Height;
+        float ux = ((e2y * d1.X) - (e1y * d2.X)) / area * wide;
+        float vx = ((e2y * d1.Y) - (e1y * d2.Y)) / area * high;
+        float uy = ((e1x * d2.X) - (e2x * d1.X)) / area * wide;
+        float vy = ((e1x * d2.Y) - (e2x * d1.Y)) / area * high;
+
+        float longest = MathF.Max((ux * ux) + (vx * vx), (uy * uy) + (vy * vy));
+
+        // Under one texel a pixel is a magnification, and the top level read bilinearly is right;
+        // the same branch takes anything that is not a number, which degenerate coordinates give.
+        return longest > 1f ? MathF.Min(0.5f * MathF.Log2(longest), skin.Count - 1) : 0f;
+    }
+
+    /// <summary>
+    /// The skin's colour at a point, read from the level the triangle asked for.
+    /// </summary>
+    /// <remarks>
+    /// BILINEAR WITHIN A LEVEL AND LINEAR BETWEEN TWO, which a graphics card calls trilinear.
+    /// Nearest neighbour was the first cut, on the argument that a shrink gains nothing from
+    /// filtering - true of a shrink by two, and grain at a shrink by ten, which is what a boss's
+    /// skin is at portrait size. With the levels doing the shrinking, the read within a level is
+    /// near enough one texel per pixel, and there bilinear is the difference between texels and a
+    /// surface. The blend between two levels is what keeps neighbouring triangles that fall either
+    /// side of a whole level from meeting at a visible seam.
+    /// </remarks>
+    private static Vector3 Sample(Mipmaps skin, Vector2 spot, float level)
+    {
+        var lower = (int)level;
+        Vector3 colour = Texel(skin[lower], spot);
+
+        float between = level - lower;
+        if (between > 0f && lower + 1 < skin.Count)
+        {
+            colour = Vector3.Lerp(colour, Texel(skin[lower + 1], spot), between);
+        }
+
+        return colour;
+    }
+
+    /// <summary>
+    /// One level read bilinearly at a point, wrapping at every edge.
     /// </summary>
     /// <remarks>
     /// THE GAME'S V RUNS NEGATIVE - the skeleton's coordinates measured -0.997 to -0.002 - so a
     /// reader that clamped instead of wrapping would paint every monster with the single row of
-    /// texels along one edge. Wrapping costs one floor and handles both signs.
-    ///
-    /// NEAREST AND NOT BILINEAR, because the texture is 512 square and the picture is a few
-    /// hundred: the sampling is a shrink, where filtering buys blur rather than detail. It is the
-    /// obvious thing to improve if a monster ever looks noisy.
+    /// texels along one edge. Wrapping costs one floor and handles both signs, and the neighbour
+    /// past the last texel is the first, so a seam wraps as the coordinate does.
     /// </remarks>
-    private static Vector3 Sample(GamePicture skin, Vector2 spot)
+    private static Vector3 Texel(GamePicture level, Vector2 spot)
     {
         float u = spot.X - MathF.Floor(spot.X);
         float v = spot.Y - MathF.Floor(spot.Y);
 
-        int x = Math.Clamp((int)(u * skin.Width), 0, skin.Width - 1);
-        int y = Math.Clamp((int)(v * skin.Height), 0, skin.Height - 1);
-        int at = ((y * skin.Width) + x) * 4;
+        // A fraction just under one rounds to one in single precision, and a coordinate that is
+        // not a number gives one that is not either; both read the first texel rather than a
+        // place past the end.
+        if (!(u < 1f))
+        {
+            u = 0f;
+        }
 
-        return new Vector3(
-            skin.Rgba[at] / 255f, skin.Rgba[at + 1] / 255f, skin.Rgba[at + 2] / 255f);
+        if (!(v < 1f))
+        {
+            v = 0f;
+        }
+
+        // Texel centres sit half a texel in, so a point half a texel from an edge reads that
+        // edge's texel alone and a point on the edge reads it and its neighbour across the wrap.
+        float x = (u * level.Width) - 0.5f;
+        float y = (v * level.Height) - 0.5f;
+        var x0 = (int)MathF.Floor(x);
+        var y0 = (int)MathF.Floor(y);
+        float fx = x - x0;
+        float fy = y - y0;
+
+        int x1 = x0 + 1;
+        int y1 = y0 + 1;
+        if (x0 < 0)
+        {
+            x0 += level.Width;
+        }
+
+        if (y0 < 0)
+        {
+            y0 += level.Height;
+        }
+
+        if (x1 >= level.Width)
+        {
+            x1 -= level.Width;
+        }
+
+        if (y1 >= level.Height)
+        {
+            y1 -= level.Height;
+        }
+
+        byte[] rgba = level.Rgba;
+        int a = ((y0 * level.Width) + x0) * 4;
+        int b = ((y0 * level.Width) + x1) * 4;
+        int c = ((y1 * level.Width) + x0) * 4;
+        int d = ((y1 * level.Width) + x1) * 4;
+
+        Vector3 upper = Vector3.Lerp(
+            new Vector3(rgba[a], rgba[a + 1], rgba[a + 2]), new Vector3(rgba[b], rgba[b + 1], rgba[b + 2]), fx);
+        Vector3 lower = Vector3.Lerp(
+            new Vector3(rgba[c], rgba[c + 1], rgba[c + 2]), new Vector3(rgba[d], rgba[d + 1], rgba[d + 2]), fx);
+
+        return Vector3.Lerp(upper, lower, fy) * (1f / 255f);
     }
 
     /// <summary>Twice the signed area of a triangle, flattened onto the screen.</summary>

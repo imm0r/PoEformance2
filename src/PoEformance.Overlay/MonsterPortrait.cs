@@ -102,9 +102,11 @@ public sealed class MonsterPortrait
     private float _turn;
     private float _tilt;
     private float _zoom = 1f;
+    private Vector2 _pan;
     private float _drawnTurn = float.NaN;
     private float _drawnTilt = float.NaN;
     private float _drawnZoom = float.NaN;
+    private Vector2 _drawnPan = new(float.NaN);
     private int _drawnSize;
     private bool _drawnGround;
     private float _drawnFrame = float.NaN;
@@ -241,7 +243,7 @@ public sealed class MonsterPortrait
         // is claimed on the picture, not on a string of text.
         if (ImGui.IsItemHovered())
         {
-            Wheel();
+            Wheel(side);
 
             // Not while it is being turned: the hint is for somebody who has not yet noticed that
             // the picture moves, and leaving it up trails a label through the gesture it describes.
@@ -255,6 +257,7 @@ public sealed class MonsterPortrait
                 _turn = 0f;
                 _tilt = 0f;
                 _zoom = 1f;
+                _pan = Vector2.Zero;
             }
         }
 
@@ -391,7 +394,7 @@ public sealed class MonsterPortrait
     /// so it bites from the NEXT one - claimed on every hovered frame, that only leaves a notch
     /// unclaimed if it arrives on the very first frame the cursor is over the picture.
     /// </remarks>
-    private void Wheel()
+    private void Wheel(float side)
     {
         ImGui.SetItemKeyOwner(ImGuiKey.MouseWheelY);
 
@@ -401,8 +404,15 @@ public sealed class MonsterPortrait
             return;
         }
 
+        float from = _zoom;
         _zoom = Math.Clamp(
             _zoom * MathF.Pow(Notch, notches), MeshPicture.Nearest, MeshPicture.Furthest);
+
+        // TOWARDS THE POINTER AND NOT THE MIDDLE, which was the one thing reported against the
+        // wheel. The pointer as a share of the picture from its top left corner; the picture is
+        // the last item, so its rectangle is the one ImGui hands back here.
+        Vector2 pointer = (ImGui.GetMousePos() - ImGui.GetItemRectMin()) / MathF.Max(side, 1f);
+        _pan = MeshPicture.Panned(_pan, pointer, from, _zoom);
     }
 
     /// <summary>What the tooltip says, which includes why a monster has no colour or does not move.</summary>
@@ -414,7 +424,7 @@ public sealed class MonsterPortrait
     /// </remarks>
     private string Hint()
     {
-        const string Gestures = "Drag to turn. Wheel to zoom. Double-click to reset.";
+        const string Gestures = "Drag to turn. Wheel to zoom where the pointer is. Double-click to reset.";
 
         string said = Gestures;
         if (_model.Paint.Length > 0)
@@ -475,6 +485,9 @@ public sealed class MonsterPortrait
         Why = string.Empty;
         Rest();
 
+        // A pan aimed at one monster's head is nowhere in particular on the next one.
+        _pan = Vector2.Zero;
+
         if (one is null || path.Length == 0)
         {
             Drop();
@@ -531,6 +544,7 @@ public sealed class MonsterPortrait
             || _drawnTurn != _turn
             || _drawnTilt != _tilt
             || _drawnZoom != _zoom
+            || _drawnPan != _pan
             || _drawnSize != size
             || _drawnGround != Ground
             || _drawnPosed != posed
@@ -675,6 +689,7 @@ public sealed class MonsterPortrait
         _drawnTurn = _turn;
         _drawnTilt = _tilt;
         _drawnZoom = _zoom;
+        _drawnPan = _pan;
         _drawnSize = size;
         _drawnGround = Ground;
         _drawnPosed = posed;
@@ -691,12 +706,12 @@ public sealed class MonsterPortrait
                 _pose.Take(_tracks, _frame);
                 _pose.Move(_model.Mesh, _posed, _posedNormals);
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default, _model.Skin, _zoom, Ground);
+                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default, _model.Skin, _zoom, Ground, _pan);
             }
             else
             {
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, Ground);
+                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, Ground, _pan);
             }
 
             if (!drawn.Ready)
