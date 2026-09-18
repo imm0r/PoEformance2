@@ -517,6 +517,143 @@ public class MeshPictureTests
         Assert.True(near > far, $"and fade outwards, but is {near} near the middle against {far} by the edge");
     }
 
+    /// <summary>The floor is at the model's origin, not at the bottom of its box.</summary>
+    /// <remarks>
+    /// MEASURED ON A REAL RIG: the feet sit at z = 0.98 in the bind pose and stay there through
+    /// every frame of an animation while the pelvis dips fifteen units - the game plants a monster
+    /// by its origin. Two monsters in a row showed the box bottom wrong from the live client, one
+    /// shin-deep in the floor and the next hovering over it. Edge on, the floor is one row, and
+    /// that row has to be the origin's: for a post running ten units past the origin, the box's
+    /// bottom is forty pixels lower.
+    /// </remarks>
+    [Fact]
+    public void TheFloorIsAtTheModelsOriginNotAtTheBottomOfItsBox()
+    {
+        const int Side = 200;
+        GamePicture bare = MeshPicture.Of(Sunk(), Side);
+        GamePicture floored = MeshPicture.Of(Sunk(), Side, ground: true);
+
+        var rows = new List<int>();
+        for (var y = 0; y < Side; y++)
+        {
+            for (var x = 0; x < Side; x++)
+            {
+                int at = ((y * Side) + x) * 4;
+                if (bare.Rgba[at + 3] == 0 && floored.Rgba[at + 3] != 0)
+                {
+                    rows.Add(y);
+                    break;
+                }
+            }
+        }
+
+        // The box is z -30 to 10, so its middle is -10: the origin is ten units below that on
+        // the picture and the box's bottom twenty.
+        float perUnit = Side * MeshPicture.Fill / 40f;
+        int origin = (Side / 2) + (int)(10f * perUnit);
+        int bottom = (Side / 2) + (int)(20f * perUnit);
+
+        Assert.NotEmpty(rows);
+        Assert.All(rows, row => Assert.InRange(row, origin - 2, origin + 2));
+        Assert.True(Math.Abs(rows[0] - bottom) > 20, "the floor sits at the box's bottom rather than the origin");
+    }
+
+    /// <summary>
+    /// Seen nearly level, the floor's far rim is soft and its lines are still a grid rather than a fill.
+    /// </summary>
+    /// <remarks>
+    /// THE SECOND LIVE REPORT ON THE FLOOR. Foreshortening brought the floor's far edge back into
+    /// the frame as a hard line, and pressed the lines that run across the picture into a solid
+    /// band. So, nearly level: the topmost row of floor has all but faded, and the band the floor
+    /// occupies is mostly not floor.
+    /// </remarks>
+    [Fact]
+    public void SeenNearlyLevelTheFloorHasASoftRimAndIsNotAFill()
+    {
+        const int Side = 240;
+        GamePicture bare = MeshPicture.Of(Post(crossbar: true), Side, tilt: 0.12f);
+        GamePicture floored = MeshPicture.Of(Post(crossbar: true), Side, tilt: 0.12f, ground: true);
+
+        var top = -1;
+        var topMost = 0;
+        var floorPixels = 0;
+        int first = Side;
+        var last = -1;
+        for (var y = 0; y < Side; y++)
+        {
+            for (var x = 0; x < Side; x++)
+            {
+                int at = ((y * Side) + x) * 4;
+                if (bare.Rgba[at + 3] != 0 || floored.Rgba[at + 3] == 0)
+                {
+                    continue;
+                }
+
+                floorPixels++;
+                first = Math.Min(first, y);
+                last = Math.Max(last, y);
+                if (top < 0 || y == top)
+                {
+                    top = y;
+                    topMost = Math.Max(topMost, floored.Rgba[at + 3]);
+                }
+            }
+        }
+
+        Assert.True(floorPixels > 0, "no floor at all");
+        Assert.True(topMost <= 40, $"the far rim is a hard line, at alpha {topMost}");
+
+        int band = (last - first + 1) * Side;
+        Assert.True(
+            floorPixels < band / 4,
+            $"the floor covers {floorPixels} of a band of {band} pixels, which is a fill rather than a grid");
+
+        // THE FAMILY THAT WAS PRESSED TOGETHER IS GONE, not merely thinned: at this tilt its lines
+        // land two and a half pixels apart, and a row of the band holding a long run of floor is
+        // one of them. The other family, running into the depth, leaves a pixel per row per line.
+        for (int y = first; y <= last; y++)
+        {
+            var run = 0;
+            for (var x = 0; x < Side; x++)
+            {
+                int at = ((y * Side) + x) * 4;
+                bool floorHere = bare.Rgba[at + 3] == 0 && floored.Rgba[at + 3] != 0;
+                run = floorHere ? run + 1 : 0;
+                Assert.True(run < 20, $"row {y} holds a run of floor {run} pixels long: the crowded family was drawn");
+            }
+        }
+    }
+
+    /// <summary>Pulled all the way back, the floor is still a grid the eye can read rather than a weave or nothing.</summary>
+    /// <remarks>
+    /// THE SQUARES DOUBLE UNTIL THEY ARE SQUARES ON THE PICTURE. At a quarter of the fitted zoom
+    /// the ten squares across a model are four pixels apart, which is neither a grid nor nothing:
+    /// doubled twice they are seventeen, and the floor is a floor again with fewer, larger squares.
+    /// </remarks>
+    [Fact]
+    public void PulledAllTheWayBackTheFloorIsStillAGrid()
+    {
+        const int Side = 200;
+        GamePicture bare = MeshPicture.Of(Post(crossbar: true), Side, tilt: 0.6f, zoom: MeshPicture.Nearest);
+        GamePicture floored = MeshPicture.Of(Post(crossbar: true), Side, tilt: 0.6f, zoom: MeshPicture.Nearest, ground: true);
+
+        var most = 0;
+        var covered = 0;
+        for (var at = 0; at < bare.Rgba.Length; at += 4)
+        {
+            if (bare.Rgba[at + 3] != 0 || floored.Rgba[at + 3] == 0)
+            {
+                continue;
+            }
+
+            covered++;
+            most = Math.Max(most, floored.Rgba[at + 3]);
+        }
+
+        Assert.True(most > 150, $"the floor should still be plainly there far back, and peaks at alpha {most}");
+        Assert.True(covered < Side * Side / 4, $"and be a grid rather than a fill, not {covered} pixels of it");
+    }
+
     /// <summary>Zooming keeps whatever is under the pointer under it.</summary>
     /// <remarks>
     /// THE MAP'S RULE, checked on the picture rather than on the formula: the corner of the
@@ -791,6 +928,25 @@ public class MeshPictureTests
             // Only on the upper half - the end away from zero, which is the model's head.
             Quad(-20f, 20f, -36f, -30f);
         }
+
+        return Built(places, indices);
+    }
+
+    /// <summary>
+    /// A post like <see cref="Post"/> whose box runs ten units past the origin, the way a hanging
+    /// weapon or a reaching pose does - so its box bottom and its origin are different places.
+    /// </summary>
+    private static SkinnedMesh Sunk()
+    {
+        var places = new List<Vector3>();
+        var indices = new List<int>();
+
+        int at = places.Count;
+        places.Add(new Vector3(-5f, 0f, -30f));
+        places.Add(new Vector3(5f, 0f, -30f));
+        places.Add(new Vector3(5f, 0f, 10f));
+        places.Add(new Vector3(-5f, 0f, 10f));
+        indices.AddRange([at, at + 1, at + 2, at, at + 2, at + 3]);
 
         return Built(places, indices);
     }
