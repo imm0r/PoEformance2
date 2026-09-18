@@ -453,25 +453,117 @@ public class MeshPictureTests
         Assert.Equal(0, over);
     }
 
-    /// <summary>The floor stays inside the frame at the steepest tilt the portrait allows.</summary>
+    /// <summary>
+    /// The floor runs off the frame at the steepest tilt, and has faded to nothing by the time it gets there.
+    /// </summary>
     /// <remarks>
-    /// A SQUARE SEEN AT AN ANGLE SHOWS ITS DIAGONAL, which is where a floor sized off the model's
-    /// own footprint ran off both edges - a skeleton is 154 across and 189 high, so a footprint
-    /// floor was wider than the frame the camera fitted. The portrait clamps tilt to a third of a
-    /// turn either way, so those are the two angles that have to hold.
+    /// THE OPPOSITE OF WHAT THIS TEST FIRST PINNED. The floor used to be sized to stay inside the
+    /// frame at every tilt, and it was reported from the live client as a small plate turning with
+    /// the model rather than a floor it stands on. Now it runs off the frame, and what is pinned
+    /// instead is the fade: nothing solid on the frame's own border, and stronger near the middle
+    /// than out by the edge, so the floor ends in air and never in a hard line. The portrait clamps
+    /// tilt to a third of a turn either way, so those are the two angles that have to hold.
     /// </remarks>
     [Theory]
     [InlineData(1.047f)]
     [InlineData(-1.047f)]
-    public void TheFloorStaysInsideTheFrameAtTheSteepestTilt(float tilt)
+    public void TheFloorRunsOffTheFrameAndFadesOutBeforeIt(float tilt)
     {
         const int Side = 240;
-        (int Top, int Foot, int Left, int Right, int Lit) seen
-            = Silhouette(MeshPicture.Of(Post(crossbar: true), Side, tilt: tilt, ground: true));
+        GamePicture bare = MeshPicture.Of(Post(crossbar: true), Side, tilt: tilt);
+        GamePicture floored = MeshPicture.Of(Post(crossbar: true), Side, tilt: tilt, ground: true);
 
-        Assert.True(seen.Lit > 0, "nothing was drawn at all");
-        Assert.True(seen.Top > 0 && seen.Foot < Side - 1, $"the floor spills top or bottom: {seen}");
-        Assert.True(seen.Left > 0 && seen.Right < Side - 1, $"the floor spills left or right: {seen}");
+        // The floor is broad, and reaches the bottom of the frame rather than stopping short.
+        (int Pixels, int Rows) extra = Extra(bare, floored);
+        Assert.True(extra.Pixels > 500, $"the floor should be broad and added {extra.Pixels} pixels");
+        Assert.True(Silhouette(floored).Foot >= Side - 3, "the floor should run to the frame's edge");
+
+        var border = 0;
+        var near = 0;
+        var far = 0;
+        float radius = Side * 0.5f;
+        for (var y = 0; y < Side; y++)
+        {
+            for (var x = 0; x < Side; x++)
+            {
+                int at = ((y * Side) + x) * 4;
+                byte alpha = floored.Rgba[at + 3];
+                if (bare.Rgba[at + 3] != 0 || alpha == 0)
+                {
+                    continue;
+                }
+
+                if (x == 0 || y == 0 || x == Side - 1 || y == Side - 1)
+                {
+                    border = Math.Max(border, alpha);
+                }
+
+                float dx = x + 0.5f - radius;
+                float dy = y + 0.5f - radius;
+                float away = MathF.Sqrt((dx * dx) + (dy * dy)) / radius;
+                if (away < 0.4f)
+                {
+                    near = Math.Max(near, alpha);
+                }
+                else if (away > 0.85f)
+                {
+                    far = Math.Max(far, alpha);
+                }
+            }
+        }
+
+        Assert.True(border <= 8, $"the floor reaches the frame's border at alpha {border}");
+        Assert.True(near > 200, $"the floor should be solid near the middle, not {near}");
+        Assert.True(near > far, $"and fade outwards, but is {near} near the middle against {far} by the edge");
+    }
+
+    /// <summary>Zooming keeps whatever is under the pointer under it.</summary>
+    /// <remarks>
+    /// THE MAP'S RULE, checked on the picture rather than on the formula: the corner of the
+    /// crossbar is put under the pointer, the zoom doubles towards it, and the corner has to be
+    /// drawn where it was to within a pixel. The same zoom into the middle moves it a long way,
+    /// which is what shows the check can fail.
+    /// </remarks>
+    [Fact]
+    public void ZoomingKeepsWhatIsUnderThePointerUnderIt()
+    {
+        const int Side = 200;
+        (int Top, int Foot, int Left, int Right, int Lit) fitted
+            = Silhouette(MeshPicture.Of(Post(crossbar: true), Side));
+
+        var pointer = new Vector2((fitted.Left + 0.5f) / Side, (fitted.Top + 0.5f) / Side);
+        Vector2 pan = MeshPicture.Panned(Vector2.Zero, pointer, 1f, 2f);
+        (int Top, int Foot, int Left, int Right, int Lit) closer
+            = Silhouette(MeshPicture.Of(Post(crossbar: true), Side, zoom: 2f, pan: pan));
+
+        Assert.InRange(closer.Top, fitted.Top - 1, fitted.Top + 1);
+        Assert.InRange(closer.Left, fitted.Left - 1, fitted.Left + 1);
+
+        (int Top, int Foot, int Left, int Right, int Lit) middle
+            = Silhouette(MeshPicture.Of(Post(crossbar: true), Side, zoom: 2f));
+        Assert.True(
+            Math.Abs(middle.Top - fitted.Top) > 5,
+            "zooming into the middle should have moved the corner, or this proves nothing");
+    }
+
+    /// <summary>Pulling back with the pointer in a corner cannot carry the model out of the frame.</summary>
+    [Fact]
+    public void PullingBackTowardsACornerKeepsTheModelInTheFrame()
+    {
+        Vector2 pan = Vector2.Zero;
+        var zoom = 1f;
+        for (var notch = 0; notch < 12; notch++)
+        {
+            float next = Math.Max(zoom / 1.18f, MeshPicture.Nearest);
+            pan = MeshPicture.Panned(pan, Vector2.Zero, zoom, next);
+            zoom = next;
+        }
+
+        Assert.Equal(MeshPicture.Nearest, zoom);
+        Assert.True(Silhouette(MeshPicture.Of(Post(crossbar: true), 200, zoom: zoom, pan: pan)).Lit > 0);
+
+        // And a pointer that is not a number is taken as the middle rather than believed.
+        Assert.Equal(Vector2.Zero, MeshPicture.Panned(Vector2.Zero, new Vector2(float.NaN), 1f, 2f));
     }
 
     /// <summary>Where and how much two pictures of the same model differ.</summary>
