@@ -9,7 +9,7 @@ using SixLabors.ImageSharp.PixelFormats;
 namespace PoEformance.Overlay;
 
 /// <summary>
-/// A monster's model, drawn in a pane and turned with the mouse.
+/// A monster's model, drawn in a pane, turned with the mouse and played through its animations.
 /// </summary>
 /// <remarks>
 /// THREE THREADS' WORTH OF RULES IN ONE SMALL CLASS, which is why it is its own class rather than
@@ -27,7 +27,15 @@ namespace PoEformance.Overlay;
 /// answers with a reason rather than an exception for the same reason.
 ///
 /// THE PICTURE IS REDRAWN WHEN SOMETHING CHANGES, not per frame: a new monster, a turn, a tilt or
-/// a different size. Holding still costs one textured quad.
+/// a different size. Holding still costs one textured quad. PLAYING IS THE EXCEPTION, and it is
+/// paid for the way a drag is: the picture is drawn one rung of <see cref="PictureLadder"/> lower
+/// for as long as it moves, because a rung is about four times the work and thirty of them a
+/// second at the resting size is what the rasteriser was never sized for. Stop it and the next
+/// frame is drawn full size again.
+///
+/// THE KEYFRAMES ARE UNPACKED ON A TASK, ONE ANIMATION AT A TIME. A bundled rig holds twelve
+/// megabytes of them; the animation being played is a few tens of kilobytes of that, and Oodle
+/// on the draw thread is a call this class has no measurement for and does not make.
 /// </remarks>
 public sealed class MonsterPortrait
 {
@@ -41,11 +49,19 @@ public sealed class MonsterPortrait
     /// </remarks>
     public const float Notch = 1.18f;
 
+    /// <summary>The animation chosen when a monster arrives, where its rig has one by that name.</summary>
+    /// <remarks>On 1328 of the install's 1628 rigs, which is more than any other name by far.</remarks>
+    public const string Idle = "idle_01";
+
+    /// <summary>What an animation plays at when its header says nothing usable.</summary>
+    private const float UsualRate = 30f;
+
     /// <summary>The id ImGui knows the picture by, which is what makes it something to grab.</summary>
     private const string Grip = "##monster-model";
 
     private readonly PictureLadder _sizes;
     private readonly Func<string, byte[]?>? _install;
+    private readonly Func<ReadOnlyMemory<byte>, int, byte[]?>? _unpack;
     private readonly Func<string, Image<Rgba32>, bool, IntPtr>? _upload;
     private readonly Action<string>? _release;
 
@@ -68,6 +84,20 @@ public sealed class MonsterPortrait
     private float _drawnZoom = float.NaN;
     private int _drawnSize;
     private bool _drawnGround;
+    private float _drawnFrame = float.NaN;
+    private int _drawnAnimation = -1;
+    private bool _drawnPosed;
+
+    private SkeletonPose? _pose;
+    private AnimationTracks? _tracks;
+    private Task<AnimationTracks?>? _loadingTracks;
+    private int _loadingAnimation = -1;
+    private int _chosen = -1;
+    private float _frame;
+    private bool _playing = true;
+    private string _stillWhy = string.Empty;
+    private Vector3[] _posed = [];
+    private Vector3[] _posedNormals = [];
 
     /// <summary>Whether the model was being dragged last frame, which is what lowers the rung.</summary>
     /// <remarks>
@@ -82,15 +112,21 @@ public sealed class MonsterPortrait
     /// <param name="upload">Hands pixels to the renderer and gives back a handle.</param>
     /// <param name="release">Gives a handle back.</param>
     /// <param name="most">The biggest the model may be drawn, each way. See <see cref="PictureLadder"/>.</param>
+    /// <param name="unpack">
+    /// The install's Oodle, for keyframes kept in a bundle. Null leaves rigs from version 8 up
+    /// standing still; the older ones keep their frames loose and play regardless.
+    /// </param>
     public MonsterPortrait(
         Func<string, byte[]?>? install,
         Func<string, Image<Rgba32>, bool, IntPtr>? upload,
         Action<string>? release,
-        int most = PictureLadder.Usual)
+        int most = PictureLadder.Usual,
+        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null)
     {
         _install = install;
         _upload = upload;
         _release = release;
+        _unpack = unpack;
         _sizes = new PictureLadder(most);
     }
 
@@ -105,6 +141,9 @@ public sealed class MonsterPortrait
 
     /// <summary>Why there is no picture, for the line that says so. Empty while there is one.</summary>
     public string Why { get; private set; } = string.Empty;
+
+    /// <summary>Whether an animation is running. Stays as set across monsters, like the zoom does not.</summary>
+    public bool Playing => _playing;
 
     /// <summary>
     /// Draws the monster, or says why it cannot.
@@ -138,6 +177,8 @@ public sealed class MonsterPortrait
                     : Why.Length > 0 ? ImGuiText.Escape(Why) : "no model");
             return;
         }
+
+        Controls(side);
 
         // A BUTTON WITH THE PICTURE PAINTED INTO IT, AND NOT ImGui.Image. An image is an item with
         // NO ID, and ImGui only hands the hover to an item that has one - imgui.cpp's ItemHoverable
@@ -189,6 +230,88 @@ public sealed class MonsterPortrait
     }
 
     /// <summary>
+    /// The row above the picture: which animation, and whether it runs.
+    /// </summary>
+    /// <remarks>
+    /// ONLY WHERE THERE IS SOMETHING TO PLAY. A monster with no skeleton, or one whose keyframes
+    /// this machine cannot unpack, gets no controls at all and the reason in the tooltip - a
+    /// combo box listing nothing would look like the tool had broken rather than the file lacking.
+    /// </remarks>
+    private void Controls(float side)
+    {
+        if (_pose is null || !_model.Moves)
+        {
+            return;
+        }
+
+        IReadOnlyList<SkeletonAnimation> moves = _model.Rig.Animations;
+        string current = _chosen >= 0 && _chosen < moves.Count ? moves[_chosen].Name : string.Empty;
+
+        ImGuiStylePtr style = ImGui.GetStyle();
+        string toggle = _playing ? "Pause" : "Play";
+        float button = ImGui.CalcTextSize("Pause").X + (style.FramePadding.X * 2f);
+        ImGui.SetNextItemWidth(Math.Max(64f, side - button - style.ItemSpacing.X));
+
+        if (ImGui.BeginCombo("##monster-animation", ImGuiText.Escape(current)))
+        {
+            for (var one = 0; one < moves.Count; one++)
+            {
+                if (ImGui.Selectable(ImGuiText.Escape(moves[one].Name) + "##" + one, one == _chosen))
+                {
+                    Choose(one);
+                }
+            }
+
+            ImGui.EndCombo();
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button(toggle + "##monster-play", new Vector2(button, 0f)))
+        {
+            _playing = !_playing;
+        }
+    }
+
+    /// <summary>Starts on a different animation, from its first frame.</summary>
+    private void Choose(int which)
+    {
+        if (which == _chosen || _pose is null)
+        {
+            return;
+        }
+
+        _chosen = which;
+        _frame = 0f;
+        _tracks = null;
+        _stillWhy = string.Empty;
+
+        IReadOnlyList<SkeletonAnimation> moves = _model.Rig.Animations;
+        if (which < 0 || which >= moves.Count)
+        {
+            return;
+        }
+
+        // A BUNDLED RIG WITH NOTHING TO UNPACK IT is the one case decided here rather than by the
+        // task: the model cannot know whether this machine has Oodle, and the task would only
+        // come back with "the keyframes did not unpack", which is true and says less.
+        AnimationSkeleton rig = _model.Rig;
+        if (!rig.Loose && _unpack is null)
+        {
+            _stillWhy = "this rig keeps its keyframes in a bundle, and there is no Oodle here to unpack them";
+            return;
+        }
+
+        SkeletonAnimation move = moves[which];
+        Func<ReadOnlyMemory<byte>, int, byte[]?> unpack = _unpack ?? ((_, _) => null);
+        _loadingAnimation = which;
+        _loadingTracks = Task.Run(() =>
+        {
+            byte[]? frames = rig.Tracks(move, unpack);
+            return frames is null ? null : AnimationTracks.Read(frames, move.Tracks, rig.Version);
+        });
+    }
+
+    /// <summary>
     /// Zooms on the wheel, and takes the wheel off the pane underneath while doing it.
     /// </summary>
     /// <remarks>
@@ -216,20 +339,30 @@ public sealed class MonsterPortrait
             _zoom * MathF.Pow(Notch, notches), MeshPicture.Nearest, MeshPicture.Furthest);
     }
 
-    /// <summary>What the tooltip says, which includes why a monster has no colour on it.</summary>
+    /// <summary>What the tooltip says, which includes why a monster has no colour or does not move.</summary>
     /// <remarks>
-    /// THE PAINT REASON IS HERE BECAUSE A PICTURE CANNOT CARRY IT. An unpainted model is drawn in a
-    /// pale warm grey that reads as bare skin, so "is this one missing its texture" was a question
-    /// that could only be settled by reading code - see MonsterModels.Painted, which works the
-    /// answer out and used to throw it away.
+    /// THE REASONS ARE HERE BECAUSE A PICTURE CANNOT CARRY THEM. An unpainted model is drawn in a
+    /// pale warm grey that reads as bare skin, and a model that holds still looks the same whether
+    /// it has no skeleton, a skeleton this machine cannot unpack, or is simply paused - so both
+    /// answers are worked out where the files are read and shown here rather than thrown away.
     /// </remarks>
     private string Hint()
     {
         const string Gestures = "Drag to turn. Wheel to zoom. Double-click to reset.";
 
-        return _model.Paint.Length == 0
-            ? Gestures
-            : $"{Gestures}\n\nDrawn in plain ink: {ImGuiText.Escape(_model.Paint)}";
+        string said = Gestures;
+        if (_model.Paint.Length > 0)
+        {
+            said += $"\n\nDrawn in plain ink: {ImGuiText.Escape(_model.Paint)}";
+        }
+
+        string still = _model.Move.Length > 0 ? _model.Move : _stillWhy;
+        if (still.Length > 0)
+        {
+            said += $"\n\nHolds still: {ImGuiText.Escape(still)}";
+        }
+
+        return said;
     }
 
     /// <summary>Gives back the texture. Called when the window goes, and when the install changes.</summary>
@@ -245,6 +378,21 @@ public sealed class MonsterPortrait
         _shown = string.Empty;
         _model = MonsterModel.None;
         _drawnTurn = float.NaN;
+        Rest();
+    }
+
+    /// <summary>Drops the skeleton and whatever animation was loaded or playing on it.</summary>
+    private void Rest()
+    {
+        _pose = null;
+        _tracks = null;
+        _loadingTracks = null;
+        _loadingAnimation = -1;
+        _chosen = -1;
+        _frame = 0f;
+        _stillWhy = string.Empty;
+        _drawnFrame = float.NaN;
+        _drawnAnimation = -1;
     }
 
     /// <summary>Starts a load when the monster changed, and only then.</summary>
@@ -258,6 +406,7 @@ public sealed class MonsterPortrait
         _wanted = path;
         _model = MonsterModel.None;
         Why = string.Empty;
+        Rest();
 
         if (one is null || path.Length == 0)
         {
@@ -290,6 +439,7 @@ public sealed class MonsterPortrait
             _loading = null;
             _shown = string.Empty;
             _drawnTurn = float.NaN;
+            Rigged();
         }
 
         if (!_model.Ready)
@@ -298,31 +448,131 @@ public sealed class MonsterPortrait
             return;
         }
 
-        // ONE RUNG DOWN WHILE IT IS BEING DRAGGED, and back up the moment it is let go. The work
-        // grows with the AREA, so a rung costs about four times the one below it: at the default
-        // cap that is 8.0 ms a frame holding still against 4.3 turning, and it is while turning
-        // that a dropped frame is felt. What it costs is a drag that looks a little soft, for
-        // exactly as long as the button is down.
+        Landed();
+        Advance();
+
+        // ONE RUNG DOWN WHILE IT IS BEING DRAGGED OR PLAYED, and back up the moment it stops. The
+        // work grows with the AREA, so a rung costs about four times the one below it: at the
+        // default cap that is 8.0 ms a frame holding still against 4.3 moving, and it is while
+        // moving that a dropped frame is felt. What it costs is a picture that looks a little
+        // soft, for exactly as long as it moves.
         int size = Wanted(side);
+        bool posed = _tracks is { Ready: true } && _pose is not null;
 
         bool moved = !string.Equals(_shown, _wanted, StringComparison.Ordinal)
             || _drawnTurn != _turn
             || _drawnTilt != _tilt
             || _drawnZoom != _zoom
             || _drawnSize != size
-            || _drawnGround != Ground;
+            || _drawnGround != Ground
+            || _drawnPosed != posed
+            || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen));
 
         if (!moved)
         {
             return;
         }
 
-        Render(size);
+        Render(size, posed);
     }
 
-    /// <summary>What the model is drawn at: the rung that covers the pane, lowered while dragging.</summary>
+    /// <summary>Builds the pose for a model that just arrived, and starts its first animation.</summary>
+    private void Rigged()
+    {
+        Rest();
+        if (!_model.Moves)
+        {
+            return;
+        }
+
+        _pose = SkeletonPose.Of(_model.Rig);
+        if (_pose is null)
+        {
+            _stillWhy = "the skeleton's bone tree does not hold together";
+            return;
+        }
+
+        int count = _model.Mesh.Positions.Length;
+        if (_posed.Length != count)
+        {
+            _posed = new Vector3[count];
+            _posedNormals = new Vector3[count];
+        }
+
+        IReadOnlyList<SkeletonAnimation> moves = _model.Rig.Animations;
+        var first = 0;
+        for (var one = 0; one < moves.Count; one++)
+        {
+            if (string.Equals(moves[one].Name, Idle, StringComparison.Ordinal))
+            {
+                first = one;
+                break;
+            }
+        }
+
+        Choose(first);
+    }
+
+    /// <summary>Takes a finished keyframe load, for the animation still chosen.</summary>
+    private void Landed()
+    {
+        if (_loadingTracks is not { IsCompleted: true } done)
+        {
+            return;
+        }
+
+        _loadingTracks = null;
+        if (_loadingAnimation != _chosen)
+        {
+            return;
+        }
+
+        AnimationTracks? tracks = done.IsCompletedSuccessfully ? done.Result : null;
+        if (tracks is { Ready: true })
+        {
+            _tracks = tracks;
+            _stillWhy = string.Empty;
+            return;
+        }
+
+        _tracks = null;
+        _stillWhy = tracks is null
+            ? done.IsCompletedSuccessfully ? "the keyframes did not unpack" : Said(done.Exception)
+            : tracks.Why.Length > 0 ? tracks.Why : "the keyframes did not read as tracks";
+    }
+
+    /// <summary>Moves the animation on by however long the last frame took.</summary>
+    /// <remarks>
+    /// IN FRAMES OF THE ANIMATION, not of the screen: the keys are timed in the file's own frames
+    /// at the rate its header gives, so a 30fps walk plays at the same speed on a 60Hz and a 144Hz
+    /// monitor. It wraps rather than stops, because every one of these is a loop or a one-shot
+    /// that looks fine looped, and the file carries no flag that says which.
+    /// </remarks>
+    private void Advance()
+    {
+        if (!_playing || _tracks is not { Ready: true } tracks || tracks.Frames <= 0f
+            || _chosen < 0 || _chosen >= _model.Rig.Animations.Count)
+        {
+            return;
+        }
+
+        float rate = _model.Rig.Animations[_chosen].Rate;
+        if (rate <= 0f)
+        {
+            rate = UsualRate;
+        }
+
+        float step = Math.Clamp(ImGui.GetIO().DeltaTime, 0f, 0.25f) * rate;
+        _frame += step;
+        if (_frame > tracks.Frames)
+        {
+            _frame %= tracks.Frames;
+        }
+    }
+
+    /// <summary>What the model is drawn at: the rung that covers the pane, lowered while it moves.</summary>
     private int Wanted(float side)
-        => _held ? _sizes.Dragging(side) : _sizes.For(side);
+        => _held || (_playing && _tracks is { Ready: true }) ? _sizes.Dragging(side) : _sizes.For(side);
 
     /// <summary>The buffers for one size, kept until the size changes.</summary>
     /// <remarks>
@@ -342,15 +592,26 @@ public sealed class MonsterPortrait
         return had;
     }
 
-    /// <summary>Draws the mesh and hands the pixels to the renderer.</summary>
-    private void Render(int size)
+    /// <summary>Draws the mesh - posed, where an animation is loaded - and hands the pixels to the renderer.</summary>
+    private void Render(int size, bool posed)
     {
         try
         {
             // The canvas lends its pixels rather than giving them, and LoadPixelData below copies
             // them into the image straight away - so nothing here outlives the next redraw.
-            GamePicture drawn = MeshPicture.Of(
-                _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, Ground);
+            GamePicture drawn;
+            if (posed && _pose is not null && _tracks is not null)
+            {
+                _pose.Take(_tracks, _frame);
+                _pose.Move(_model.Mesh, _posed, _posedNormals);
+                drawn = MeshPicture.Of(
+                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default, _model.Skin, _zoom, Ground);
+            }
+            else
+            {
+                drawn = MeshPicture.Of(
+                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, Ground);
+            }
 
             if (!drawn.Ready)
             {
@@ -373,6 +634,9 @@ public sealed class MonsterPortrait
             _drawnZoom = _zoom;
             _drawnSize = size;
             _drawnGround = Ground;
+            _drawnPosed = posed;
+            _drawnFrame = _frame;
+            _drawnAnimation = _chosen;
             Why = string.Empty;
         }
         catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))

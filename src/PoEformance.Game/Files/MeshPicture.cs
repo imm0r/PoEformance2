@@ -145,6 +145,42 @@ public static class MeshPicture
         GamePicture? skin = null,
         float zoom = 1f,
         bool ground = false)
+        => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, ground);
+
+    /// <summary>
+    /// Draws the mesh with its vertices somewhere other than the file put them - posed.
+    /// </summary>
+    /// <param name="mesh">What to draw: its triangles, coordinates and box. Its own vertices are not used.</param>
+    /// <param name="canvas">Where to draw. Its pixels are overwritten, and lent out - see <see cref="Canvas"/>.</param>
+    /// <param name="positions">Where each vertex is now, one per vertex of the mesh.</param>
+    /// <param name="normals">Which way each faces now, the same length.</param>
+    /// <param name="turn">Rotation about the model's up axis, in radians.</param>
+    /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
+    /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
+    /// <param name="skin">The monster's own colour texture, or null to draw it in <paramref name="ink"/>.</param>
+    /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
+    /// <param name="ground">Whether to draw the grid the model stands on.</param>
+    /// <remarks>
+    /// THE CAMERA STAYS ON THE BIND POSE'S BOX, deliberately. An animation moves vertices outside
+    /// the box the file wrote - a raised arm, a lunge - and refitting the view to them every frame
+    /// would make the whole picture breathe in and out as the monster moved. The box it was fitted
+    /// to standing still is the one it is drawn in while it moves.
+    ///
+    /// POSED ARRAYS THAT DO NOT FIT THE MESH ARE IGNORED in favour of the mesh's own, rather than
+    /// indexed past their end: every index in the mesh addresses a vertex, and a short array would
+    /// be a crash on the draw thread for a model that could simply have been drawn still.
+    /// </remarks>
+    public static GamePicture Of(
+        SkinnedMesh? mesh,
+        Canvas canvas,
+        ReadOnlySpan<Vector3> positions,
+        ReadOnlySpan<Vector3> normals,
+        float turn = 0f,
+        float tilt = 0f,
+        Vector3 ink = default,
+        GamePicture? skin = null,
+        float zoom = 1f,
+        bool ground = false)
     {
         ArgumentNullException.ThrowIfNull(canvas);
 
@@ -160,6 +196,12 @@ public static class MeshPicture
         if (mesh is not { Ready: true })
         {
             return new GamePicture(size, size, pixels);
+        }
+
+        if (positions.Length != mesh.Positions.Length || normals.Length != mesh.Normals.Length)
+        {
+            positions = mesh.Positions;
+            normals = mesh.Normals;
         }
 
         if (ink == default)
@@ -218,14 +260,14 @@ public static class MeshPicture
             for (var part = 0; part < 3; part++)
             {
                 int point = mesh.Indices[one + part];
-                Vector3 place = Vector3.Transform(mesh.Positions[point], view);
+                Vector3 place = Vector3.Transform(positions[point], view);
 
                 corner[part] = new Vector3(
                     (place.X * scale) + half,
                     (place.Y * scale) + half,
                     place.Z);
 
-                facing[part] = Vector3.TransformNormal(mesh.Normals[point], view);
+                facing[part] = Vector3.TransformNormal(normals[point], view);
                 onSkin[part] = mesh.Coordinates[point];
             }
 

@@ -2051,7 +2051,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         bool model = true,
         bool visible = false,
         Func<string, byte[]?>? readFile = null,
-        int modelSize = PictureLadder.Usual)
+        int modelSize = PictureLadder.Usual,
+        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null)
     {
         var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences)
         {
@@ -2060,8 +2061,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // THE SAME PAIR EVERY PICTURE IN THIS OVERLAY IS MADE WITH - see the icon cache and
             // the terrain layer. The install is handed in because this class does not have one;
             // without it the book simply shows no model, which is the ordinary case on a machine
-            // that has the tool and not the game.
-            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize),
+            // that has the tool and not the game. The unpacker is the install's own Oodle, which
+            // is what an animation's keyframes come out of the skeleton file through.
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack),
         };
 
         window.Show(columns, rail, model);

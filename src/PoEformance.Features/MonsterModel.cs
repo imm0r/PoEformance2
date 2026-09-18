@@ -32,6 +32,25 @@ public sealed record MonsterModel(
 
     /// <summary>Whether the monster is wearing its own texture rather than plain ink.</summary>
     public bool Painted => Paint.Length == 0 && Skin is { Ready: true };
+
+    /// <summary>The skeleton the monster's .ao names, or <see cref="AnimationSkeleton.None"/>.</summary>
+    public AnimationSkeleton Rig { get; init; } = AnimationSkeleton.None;
+
+    /// <summary>The <c>.ast</c> path that was used, for the report.</summary>
+    public string Rig_ { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Why the monster cannot be animated, or empty where it can.
+    /// </summary>
+    /// <remarks>
+    /// A THIRD ANSWER BESIDE <see cref="Why"/> AND <see cref="Paint"/>, for the same reason those
+    /// two are apart: a model can be found and coloured and still have no skeleton to move it, and
+    /// a picture that holds still looks the same whichever of four files was the missing one.
+    /// </remarks>
+    public string Move { get; init; } = string.Empty;
+
+    /// <summary>Whether there is a skeleton with animations on it that fits this mesh.</summary>
+    public bool Moves => Move.Length == 0 && Rig.Ready && Rig.Animations.Count > 0;
 }
 
 /// <summary>
@@ -74,6 +93,15 @@ public static class MonsterModels
     /// <summary>The struct that names a monster's mesh, and the entry inside it.</summary>
     private const string Block = "SkinMesh";
     private const string Entry = "skin";
+
+    /// <summary>The struct that names a monster's skeleton, and the entry inside it.</summary>
+    /// <remarks>
+    /// INSIDE THE FILE'S client BLOCK, which AnimatedObject folds into the same list of structs
+    /// with a flag. Over a whole install this is the one key that ever names an .ast - 2581 times,
+    /// and nothing else once - so a second spelling is not looked for.
+    /// </remarks>
+    private const string RigBlock = "ClientAnimationController";
+    private const string RigEntry = "skeleton";
 
     /// <summary>
     /// Gathers the model for one monster, or says where the walk stopped.
@@ -133,7 +161,54 @@ public static class MonsterModels
             : manifest.Materials.FirstOrDefault(said => said.Length > 0) ?? string.Empty;
 
         (GamePicture? skin, string paint) = Painted(read, mesh, material);
-        return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint);
+        (AnimationSkeleton rig, string move) = Rigged(read, found.Skeleton, mesh);
+
+        return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
+        {
+            Rig = rig,
+            Rig_ = found.Skeleton,
+            Move = move,
+        };
+    }
+
+    /// <summary>
+    /// The monster's skeleton, and - when it cannot be animated - which of the ways that is.
+    /// </summary>
+    /// <remarks>
+    /// THE LAST CHECK IS THE ONE THAT NEEDS THE GAME. A vertex names its bones by index and the
+    /// only bone list in the whole chain is the skeleton's, so the indices must be into it - but
+    /// that is an argument from there being nothing else, and this is where it is tested against
+    /// every real mesh somebody opens: a highest weighted bone at or past the rig's count means
+    /// the argument was wrong, and the model says so instead of skinning garbage.
+    /// </remarks>
+    private static (AnimationSkeleton Rig, string Why) Rigged(
+        Func<string, byte[]?> read, string skeleton, SkinnedMesh mesh)
+    {
+        if (skeleton.Length == 0)
+        {
+            return (AnimationSkeleton.None, "no .ao names a skeleton under ClientAnimationController");
+        }
+
+        AnimationSkeleton rig = Read(read, skeleton, AnimationSkeleton.Read);
+        if (!rig.Ready)
+        {
+            return (rig, $"the skeleton did not read: {skeleton}"
+                + (rig.Why.Length > 0 ? $" - {rig.Why}" : string.Empty));
+        }
+
+        if (rig.Animations.Count == 0)
+        {
+            return (rig, $"the skeleton carries no animations: {skeleton}"
+                + (rig.Why.Length > 0 ? $" - {rig.Why}" : string.Empty));
+        }
+
+        int highest = SkeletonPose.Highest(mesh);
+        if (highest >= rig.Bones.Count)
+        {
+            return (rig, $"the mesh weights bone {highest} and the skeleton has only {rig.Bones.Count}");
+        }
+
+        return (rig, string.Empty);
     }
 
     /// <summary>
@@ -198,7 +273,7 @@ public static class MonsterModels
     /// A depth-first walk would reach a base file before the monster's second .ao, and the nearer
     /// file is the one whose answer counts.
     /// </remarks>
-    private static (string Mesh, string Material)? Skinned(
+    private static (string Mesh, string Material, string Skeleton)? Skinned(
         Func<string, byte[]?> read, IReadOnlyList<string> named)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -209,7 +284,15 @@ public static class MonsterModels
             queue.Enqueue((one, 0));
         }
 
-        while (queue.Count > 0)
+        // THE SKIN AND THE SKELETON ARE FOUND SEPARATELY, each by the nearest file that names it,
+        // and the walk carries on past the first until it has both or runs out of files. They are
+        // usually in the same .ao; a monster whose base supplies the rig and whose own file only
+        // swaps the skin is the case that stopping at the skin would leave unable to move.
+        string? mesh = null;
+        var material = string.Empty;
+        string? skeleton = null;
+
+        while (queue.Count > 0 && (mesh is null || skeleton is null))
         {
             (string path, int depth) = queue.Dequeue();
             if (path.Length == 0 || !seen.Add(path))
@@ -223,24 +306,54 @@ public static class MonsterModels
                 continue;
             }
 
-            foreach (AoStruct block in ao.Named(Block))
+            if (mesh is null)
             {
-                foreach (AoEntry entry in block.Entries)
+                foreach (AoStruct block in ao.Named(Block))
                 {
-                    if (!string.Equals(entry.Key, Entry, StringComparison.Ordinal)
-                        || entry.Value.Length == 0)
+                    foreach (AoEntry entry in block.Entries)
                     {
-                        continue;
+                        if (!string.Equals(entry.Key, Entry, StringComparison.Ordinal)
+                            || entry.Value.Length == 0)
+                        {
+                            continue;
+                        }
+
+                        // The material sits UNDER the skin, one child per shape, and they name
+                        // the same file with different indices - so the first is as good as any.
+                        material = entry.Children
+                            .Select(child => child.Value)
+                            .FirstOrDefault(said => said.Contains(".mat", StringComparison.OrdinalIgnoreCase))
+                            ?? string.Empty;
+
+                        mesh = entry.Value;
+                        break;
                     }
 
-                    // The material sits UNDER the skin, one child per shape, and they name the
-                    // same file with different indices - so the first is as good as any.
-                    string material = entry.Children
-                        .Select(child => child.Value)
-                        .FirstOrDefault(said => said.Contains(".mat", StringComparison.OrdinalIgnoreCase))
-                        ?? string.Empty;
+                    if (mesh is not null)
+                    {
+                        break;
+                    }
+                }
+            }
 
-                    return (entry.Value, material);
+            if (skeleton is null)
+            {
+                foreach (AoStruct block in ao.Named(RigBlock))
+                {
+                    foreach (AoEntry entry in block.Entries)
+                    {
+                        if (string.Equals(entry.Key, RigEntry, StringComparison.Ordinal)
+                            && entry.Value.Length > 0)
+                        {
+                            skeleton = entry.Value;
+                            break;
+                        }
+                    }
+
+                    if (skeleton is not null)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -255,7 +368,7 @@ public static class MonsterModels
             }
         }
 
-        return null;
+        return mesh is null ? null : (mesh, material, skeleton ?? string.Empty);
     }
 
     /// <summary>

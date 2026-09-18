@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text;
 
 namespace PoEformance.Core.Tests;
@@ -203,6 +204,100 @@ internal static class Packed
             }
 
             write.Write(new byte[((scales * 4) + (rotations * 5) + (positions * 4)) * sizeof(float)]);
+        }
+
+        write.Flush();
+        return stream.ToArray();
+    }
+
+    /// <summary>One vertex of a mesh to build: where it is, and which bones hold it how hard.</summary>
+    /// <param name="Place">Its position, in the model's bind pose.</param>
+    /// <param name="Bones">Four bone indices into the skeleton's list.</param>
+    /// <param name="Weights">Four weights, bytes summing to 255.</param>
+    public readonly record struct Vertex(Vector3 Place, byte[] Bones, byte[] Weights);
+
+    /// <summary>
+    /// Writes a version 3 <c>.smd</c> holding the given vertices as one shape, for skinning tests.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME LAYOUT SkinnedMeshTests BUILDS, with the bones and weights made choosable - which
+    /// is the whole reason for a second builder: a skinning test is about which bone holds which
+    /// vertex, and the mesh reader's own fixture binds everything to bone 1 at full weight.
+    /// Every vertex faces +z, and the triangles fan from the first vertex, which is enough to be
+    /// a mesh and is never drawn by the tests that use this.
+    /// </remarks>
+    public static byte[] Mesh(Vertex[] vertices)
+    {
+        const uint Format = 0x23C;
+        string name = "BodyShape";
+
+        int triangles = Math.Max(1, vertices.Length - 2);
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        write.Write((byte)3);                       // version
+        write.Write((byte)4);                       // the outer vertex format, which DOLm overrides
+        write.Write((ushort)1);                     // one shape
+        write.Write((uint)(name.Length * 2));       // bytes of the name section
+
+        // The box, PER AXIS: min x, max x, min y, max y, min z, max z.
+        Vector3 least = vertices.Length > 0 ? vertices[0].Place : Vector3.Zero;
+        Vector3 most = least;
+        foreach (Vertex one in vertices)
+        {
+            least = Vector3.Min(least, one.Place);
+            most = Vector3.Max(most, one.Place);
+        }
+
+        write.Write(least.X); write.Write(most.X);
+        write.Write(least.Y); write.Write(most.Y);
+        write.Write(least.Z); write.Write(most.Z);
+
+        write.Write("DOLm"u8);
+        write.Write((ushort)4);                     // "c0h"
+        write.Write((byte)1);                       // one level of detail
+        write.Write((ushort)1);                     // one shape
+        write.Write(Format);
+
+        write.Write((uint)triangles);
+        write.Write((uint)vertices.Length);
+
+        write.Write((uint)0);                       // the shape: indices from 0,
+        write.Write((uint)(triangles * 3));         // this many of them
+
+        for (var one = 0; one < triangles; one++)
+        {
+            write.Write((ushort)0);
+            write.Write((ushort)Math.Min(one + 1, vertices.Length - 1));
+            write.Write((ushort)Math.Min(one + 2, vertices.Length - 1));
+        }
+
+        foreach (Vertex one in vertices)
+        {
+            write.Write(one.Place.X); write.Write(one.Place.Y); write.Write(one.Place.Z);
+            write.Write((byte)0); write.Write((byte)0); write.Write((byte)127); write.Write((byte)0);   // normal, +z
+            write.Write((byte)127); write.Write((byte)0); write.Write((byte)0); write.Write((byte)0);   // tangent
+            write.Write(BitConverter.HalfToUInt16Bits((Half)0.25f));                                     // texture coordinate
+            write.Write(BitConverter.HalfToUInt16Bits((Half)0.75f));
+            for (var part = 0; part < 4; part++)
+            {
+                write.Write(part < one.Bones.Length ? one.Bones[part] : (byte)0);
+            }
+
+            for (var part = 0; part < 4; part++)
+            {
+                write.Write(part < one.Weights.Length ? one.Weights[part] : (byte)0);
+            }
+        }
+
+        write.Write((uint)0);                       // the four bytes that follow the geometry when "c0h" is four
+        write.Write((uint)(name.Length * 2));
+        write.Write(Encoding.Unicode.GetBytes(name));
+
+        write.Write((uint)4);                       // tail version
+        for (var one = 0; one < 7; one++)
+        {
+            write.Write((uint)0);
         }
 
         write.Flush();
