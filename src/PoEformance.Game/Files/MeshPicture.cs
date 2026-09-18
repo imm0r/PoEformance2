@@ -23,6 +23,13 @@ namespace PoEformance.Game.Files;
 /// an overlay frame of about 6 ms, and only while the button is down. What it is NOT affordable
 /// with is a fresh pair of buffers each time; see <see cref="Canvas"/>.
 ///
+/// THE SKIN IS READ TRILINEARLY, from the level of <see cref="Mipmaps"/> whose texels are about a
+/// pixel across, and that roughly doubles what a textured pixel costs: a quad filling the whole
+/// frame with a 2048 square skin measured 9.0 ms a frame at 384 square against 4.8 with the
+/// one-texel read it replaced, and 25.7 against 16.1 at 768. A real rig covers about a third of
+/// the frame. What the one-texel read cost instead was a monster drawn as grain - see Mipmaps for
+/// the report - and a picture that is wrong is not cheap at any price.
+///
 /// THE MODEL STANDS ALONG NEGATIVE Z, which is measured rather than assumed: BasicSkeleton's box
 /// runs x ±77, y ±14.5, z -189 to -0.4, so the long axis is z, the feet are at the end nearest
 /// zero and the head is at -189. Read with y as the up axis a skeleton comes out lying on its
@@ -109,8 +116,9 @@ public static class MeshPicture
     /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
     /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
     /// <param name="skin">
-    /// The monster's own colour texture, or null to draw it in <paramref name="ink"/>. What
-    /// <see cref="MaterialFile.Albedo"/> names, decoded by <see cref="GameArt"/>.
+    /// The monster's own colour texture with its levels, or null to draw it in <paramref name="ink"/>.
+    /// What <see cref="MaterialFile.Albedo"/> names, decoded by <see cref="GameArt"/> and halved
+    /// down by <see cref="Mipmaps"/>.
     /// </param>
     /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
     /// <param name="ground">Whether to draw the grid the model stands on.</param>
@@ -120,7 +128,7 @@ public static class MeshPicture
         float turn = 0f,
         float tilt = 0f,
         Vector3 ink = default,
-        GamePicture? skin = null,
+        Mipmaps? skin = null,
         float zoom = 1f,
         bool ground = false)
         => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, ground);
@@ -133,7 +141,7 @@ public static class MeshPicture
     /// <param name="turn">Rotation about the model's up axis, in radians.</param>
     /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
     /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
-    /// <param name="skin">The monster's own colour texture, or null to draw it in <paramref name="ink"/>.</param>
+    /// <param name="skin">The monster's own colour texture with its levels, or null to draw it in <paramref name="ink"/>.</param>
     /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
     /// <param name="ground">Whether to draw the grid the model stands on.</param>
     public static GamePicture Of(
@@ -142,7 +150,7 @@ public static class MeshPicture
         float turn = 0f,
         float tilt = 0f,
         Vector3 ink = default,
-        GamePicture? skin = null,
+        Mipmaps? skin = null,
         float zoom = 1f,
         bool ground = false)
         => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, ground);
@@ -157,7 +165,7 @@ public static class MeshPicture
     /// <param name="turn">Rotation about the model's up axis, in radians.</param>
     /// <param name="tilt">Rotation towards the viewer, in radians. Zero looks at it level.</param>
     /// <param name="ink">The colour to shade with where there is no skin, red green blue in 0..1.</param>
-    /// <param name="skin">The monster's own colour texture, or null to draw it in <paramref name="ink"/>.</param>
+    /// <param name="skin">The monster's own colour texture with its levels, or null to draw it in <paramref name="ink"/>.</param>
     /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
     /// <param name="ground">Whether to draw the grid the model stands on.</param>
     /// <remarks>
@@ -178,7 +186,7 @@ public static class MeshPicture
         float turn = 0f,
         float tilt = 0f,
         Vector3 ink = default,
-        GamePicture? skin = null,
+        Mipmaps? skin = null,
         float zoom = 1f,
         bool ground = false)
     {
@@ -249,7 +257,7 @@ public static class MeshPicture
 
         // The skin is only usable if it decoded AND the mesh carries coordinates to look it up
         // with - see SkinnedMesh.Coordinated for what an uncoordinated mesh would paint.
-        GamePicture? usable = skin is { Ready: true } && mesh.Coordinated ? skin : null;
+        Mipmaps? usable = skin is not null && mesh.Coordinated ? skin : null;
 
         Span<Vector3> corner = stackalloc Vector3[3];
         Span<Vector3> facing = stackalloc Vector3[3];
@@ -300,13 +308,15 @@ public static class MeshPicture
         ReadOnlySpan<Vector2> onSkin,
         Vector3 lamp,
         Vector3 ink,
-        GamePicture? skin)
+        Mipmaps? skin)
     {
         float area = Cross(corner[0], corner[1], corner[2]);
         if (MathF.Abs(area) < 1e-6f)
         {
             return;
         }
+
+        float level = skin is null ? 0f : Level(corner, onSkin, area, skin);
 
         int least = Math.Max(0, (int)MathF.Floor(Min3(corner[0].X, corner[1].X, corner[2].X)));
         int most = Math.Min(size - 1, (int)MathF.Ceiling(Max3(corner[0].X, corner[1].X, corner[2].X)));
@@ -349,14 +359,14 @@ public static class MeshPicture
                 float shade = 0.22f + (0.78f * lit);
 
                 Vector3 colour = ink;
-                if (skin is { } sheet)
+                if (skin is not null)
                 {
                     // AFFINE INTERPOLATION IS EXACT HERE. The projection is orthographic, so a
                     // coordinate across the triangle really is linear in screen space - the
                     // perspective correction a game renderer needs would be dividing by a w that
                     // is always one.
                     Vector2 spot = (first * onSkin[0]) + (second * onSkin[1]) + (third * onSkin[2]);
-                    colour = Sample(sheet, spot);
+                    colour = Sample(skin, spot, level);
                 }
 
                 pixels[(at * 4) + 0] = Byte(colour.X * shade);
@@ -488,28 +498,143 @@ public static class MeshPicture
     }
 
     /// <summary>
-    /// One texel, nearest neighbour, wrapped.
+    /// Which level of the skin a triangle reads, as a number that may fall between two of them.
+    /// </summary>
+    /// <remarks>
+    /// ONE NUMBER PER TRIANGLE, AND THAT IS EXACT HERE rather than an approximation: the projection
+    /// is orthographic and the coordinates are interpolated linearly, so how many texels one pixel
+    /// steps across is the same at every pixel of the triangle. A game renderer works it out per
+    /// pixel because perspective changes it across a face; this one has no perspective.
+    ///
+    /// THE LONGER OF THE TWO STEPS DECIDES, as a graphics card's sampler does. A face seen nearly
+    /// edge-on steps across many texels in one screen direction and few in the other, and the
+    /// level that suits the short step is grain along the long one. Blur along the short step is
+    /// the price, and it is the cheaper of the two.
+    /// </remarks>
+    private static float Level(
+        ReadOnlySpan<Vector3> corner, ReadOnlySpan<Vector2> onSkin, float area, Mipmaps skin)
+    {
+        // The two edges out of the first corner, on the screen and on the skin.
+        float e1x = corner[1].X - corner[0].X;
+        float e1y = corner[1].Y - corner[0].Y;
+        float e2x = corner[2].X - corner[0].X;
+        float e2y = corner[2].Y - corner[0].Y;
+        Vector2 d1 = onSkin[1] - onSkin[0];
+        Vector2 d2 = onSkin[2] - onSkin[0];
+
+        // How the coordinate changes per pixel to the right and per pixel down: the two-by-two
+        // solve of "the gradient along each edge is that edge's change", whose determinant is the
+        // area already in hand. In texels, so that the answer is a count of them.
+        float wide = skin.Top.Width;
+        float high = skin.Top.Height;
+        float ux = ((e2y * d1.X) - (e1y * d2.X)) / area * wide;
+        float vx = ((e2y * d1.Y) - (e1y * d2.Y)) / area * high;
+        float uy = ((e1x * d2.X) - (e2x * d1.X)) / area * wide;
+        float vy = ((e1x * d2.Y) - (e2x * d1.Y)) / area * high;
+
+        float longest = MathF.Max((ux * ux) + (vx * vx), (uy * uy) + (vy * vy));
+
+        // Under one texel a pixel is a magnification, and the top level read bilinearly is right;
+        // the same branch takes anything that is not a number, which degenerate coordinates give.
+        return longest > 1f ? MathF.Min(0.5f * MathF.Log2(longest), skin.Count - 1) : 0f;
+    }
+
+    /// <summary>
+    /// The skin's colour at a point, read from the level the triangle asked for.
+    /// </summary>
+    /// <remarks>
+    /// BILINEAR WITHIN A LEVEL AND LINEAR BETWEEN TWO, which a graphics card calls trilinear.
+    /// Nearest neighbour was the first cut, on the argument that a shrink gains nothing from
+    /// filtering - true of a shrink by two, and grain at a shrink by ten, which is what a boss's
+    /// skin is at portrait size. With the levels doing the shrinking, the read within a level is
+    /// near enough one texel per pixel, and there bilinear is the difference between texels and a
+    /// surface. The blend between two levels is what keeps neighbouring triangles that fall either
+    /// side of a whole level from meeting at a visible seam.
+    /// </remarks>
+    private static Vector3 Sample(Mipmaps skin, Vector2 spot, float level)
+    {
+        var lower = (int)level;
+        Vector3 colour = Texel(skin[lower], spot);
+
+        float between = level - lower;
+        if (between > 0f && lower + 1 < skin.Count)
+        {
+            colour = Vector3.Lerp(colour, Texel(skin[lower + 1], spot), between);
+        }
+
+        return colour;
+    }
+
+    /// <summary>
+    /// One level read bilinearly at a point, wrapping at every edge.
     /// </summary>
     /// <remarks>
     /// THE GAME'S V RUNS NEGATIVE - the skeleton's coordinates measured -0.997 to -0.002 - so a
     /// reader that clamped instead of wrapping would paint every monster with the single row of
-    /// texels along one edge. Wrapping costs one floor and handles both signs.
-    ///
-    /// NEAREST AND NOT BILINEAR, because the texture is 512 square and the picture is a few
-    /// hundred: the sampling is a shrink, where filtering buys blur rather than detail. It is the
-    /// obvious thing to improve if a monster ever looks noisy.
+    /// texels along one edge. Wrapping costs one floor and handles both signs, and the neighbour
+    /// past the last texel is the first, so a seam wraps as the coordinate does.
     /// </remarks>
-    private static Vector3 Sample(GamePicture skin, Vector2 spot)
+    private static Vector3 Texel(GamePicture level, Vector2 spot)
     {
         float u = spot.X - MathF.Floor(spot.X);
         float v = spot.Y - MathF.Floor(spot.Y);
 
-        int x = Math.Clamp((int)(u * skin.Width), 0, skin.Width - 1);
-        int y = Math.Clamp((int)(v * skin.Height), 0, skin.Height - 1);
-        int at = ((y * skin.Width) + x) * 4;
+        // A fraction just under one rounds to one in single precision, and a coordinate that is
+        // not a number gives one that is not either; both read the first texel rather than a
+        // place past the end.
+        if (!(u < 1f))
+        {
+            u = 0f;
+        }
 
-        return new Vector3(
-            skin.Rgba[at] / 255f, skin.Rgba[at + 1] / 255f, skin.Rgba[at + 2] / 255f);
+        if (!(v < 1f))
+        {
+            v = 0f;
+        }
+
+        // Texel centres sit half a texel in, so a point half a texel from an edge reads that
+        // edge's texel alone and a point on the edge reads it and its neighbour across the wrap.
+        float x = (u * level.Width) - 0.5f;
+        float y = (v * level.Height) - 0.5f;
+        var x0 = (int)MathF.Floor(x);
+        var y0 = (int)MathF.Floor(y);
+        float fx = x - x0;
+        float fy = y - y0;
+
+        int x1 = x0 + 1;
+        int y1 = y0 + 1;
+        if (x0 < 0)
+        {
+            x0 += level.Width;
+        }
+
+        if (y0 < 0)
+        {
+            y0 += level.Height;
+        }
+
+        if (x1 >= level.Width)
+        {
+            x1 -= level.Width;
+        }
+
+        if (y1 >= level.Height)
+        {
+            y1 -= level.Height;
+        }
+
+        byte[] rgba = level.Rgba;
+        int a = ((y0 * level.Width) + x0) * 4;
+        int b = ((y0 * level.Width) + x1) * 4;
+        int c = ((y1 * level.Width) + x0) * 4;
+        int d = ((y1 * level.Width) + x1) * 4;
+
+        Vector3 upper = Vector3.Lerp(
+            new Vector3(rgba[a], rgba[a + 1], rgba[a + 2]), new Vector3(rgba[b], rgba[b + 1], rgba[b + 2]), fx);
+        Vector3 lower = Vector3.Lerp(
+            new Vector3(rgba[c], rgba[c + 1], rgba[c + 2]), new Vector3(rgba[d], rgba[d + 1], rgba[d + 2]), fx);
+
+        return Vector3.Lerp(upper, lower, fy) * (1f / 255f);
     }
 
     /// <summary>Twice the signed area of a triangle, flattened onto the screen.</summary>

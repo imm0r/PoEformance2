@@ -253,7 +253,7 @@ public class MonsterModelTests
 
         Assert.True(said.Ready);
         Assert.NotNull(said.Skin);
-        Assert.True(said.Skin!.Value.Ready);
+        Assert.True(said.Skin!.Top.Ready);
     }
 
     /// <summary>And a texture that is simply there is found the same way.</summary>

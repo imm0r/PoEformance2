@@ -178,7 +178,7 @@ public class MeshPictureTests
     [Fact]
     public void ASkinIsUsedOnlyWhereThereAreCoordinatesToUseIt()
     {
-        GamePicture red = Sheet(220, 30, 30);
+        Mipmaps red = Sheet(220, 30, 30);
 
         // The post carries no coordinates, so the skin cannot be looked up and is left alone.
         Assert.Equal(
@@ -208,13 +208,95 @@ public class MeshPictureTests
     public void ANegativeCoordinateWrapsRatherThanClamping()
     {
         // A sheet whose halves differ, sampled at -0.25, which wraps to 0.75 - the far half.
-        GamePicture halves = Halved();
+        Mipmaps halves = Halved();
 
         GamePicture below = MeshPicture.Of(Coated(-0.25f), 64, skin: halves);
         GamePicture above = MeshPicture.Of(Coated(0.75f), 64, skin: halves);
 
         Assert.Equal(Middle(below), Middle(above));
         Assert.NotEqual(Middle(MeshPicture.Of(Coated(0.25f), 64, skin: halves)), Middle(below));
+    }
+
+    /// <summary>
+    /// A finely patterned skin shrunk onto a small picture comes out as its average, not as grain.
+    /// </summary>
+    /// <remarks>
+    /// THE TEST FOR THE REPORT FROM THE LIVE CLIENT: "grisselig", like poor reception. A skin of
+    /// alternating black and white texels is the harshest case of detail below the pixel - every
+    /// pixel of the quad covers several of each - and a sampler that picks one texel per pixel
+    /// paints it as noise, black or white by whichever texel the pixel centre happened to land on.
+    /// Read from the right level, every pixel is the same grey, because the average of that
+    /// pattern is the same everywhere.
+    ///
+    /// THE SPREAD IS THE ASSERTION, not the grey itself: the shade the quad is lit at multiplies
+    /// the colour, so the value is what it is, but every covered pixel must have the SAME one. One
+    /// texel picked per pixel puts the spread at the whole range.
+    /// </remarks>
+    [Fact]
+    public void AFinelyPatternedSkinShrunkComesOutEvenRatherThanGrainy()
+    {
+        GamePicture drawn = MeshPicture.Of(Papered(), 64, skin: Checkered(256));
+
+        (byte least, byte most, int covered) = Spread(drawn);
+        Assert.True(covered > 500, $"the quad should cover most of the picture and covered {covered} pixels");
+        Assert.True(
+            most - least <= 6,
+            $"the shrunk checkerboard came out between {least} and {most}, which is grain rather than its average");
+        Assert.True(least > 20, $"and the average of black and white is a grey, not {least}");
+    }
+
+    /// <summary>A skin magnified onto a big picture is smooth across a texel, not blocky.</summary>
+    /// <remarks>
+    /// THE OTHER END OF THE SAME CHANGE. Reading the level nearest a pixel's own size is a shrink's
+    /// answer; a two-by-two skin on a quad forty pixels across is a magnification, and there the
+    /// texels themselves are what a nearest read shows - four flat blocks with hard edges. Read
+    /// bilinearly the quad runs smoothly from one texel's colour to the next, which a count of the
+    /// values it takes tells apart: four blocks are four values, a ramp is dozens.
+    /// </remarks>
+    [Fact]
+    public void AMagnifiedSkinIsSmoothAcrossATexel()
+    {
+        GamePicture drawn = MeshPicture.Of(Papered(), 64, skin: Checkered(2));
+
+        var values = new HashSet<byte>();
+        for (var at = 0; at < drawn.Rgba.Length; at += 4)
+        {
+            if (drawn.Rgba[at + 3] != 0)
+            {
+                values.Add(drawn.Rgba[at]);
+            }
+        }
+
+        Assert.True(values.Count > 12, $"a magnified texel should ramp and took {values.Count} values");
+    }
+
+    /// <summary>The levels halve down to one texel, each the average of the four above it.</summary>
+    [Fact]
+    public void TheLevelsHalveDownToOneTexelAndAverage()
+    {
+        // Four by two, red running 0, 40, 80, 120 along the top row and 200 across the bottom one.
+        var rgba = new byte[4 * 2 * 4];
+        for (var x = 0; x < 4; x++)
+        {
+            rgba[x * 4] = (byte)(x * 40);
+            rgba[(4 + x) * 4] = 200;
+        }
+
+        Mipmaps? levels = Mipmaps.Of(new GamePicture(4, 2, rgba));
+        Assert.NotNull(levels);
+        Assert.Equal(3, levels.Count);
+        Assert.Equal((2, 1), (levels[1].Width, levels[1].Height));
+        Assert.Equal((1, 1), (levels[2].Width, levels[2].Height));
+
+        // (0 + 40 + 200 + 200) / 4 and (80 + 120 + 200 + 200) / 4, then the two of those.
+        Assert.Equal(110, levels[1].Rgba[0]);
+        Assert.Equal(150, levels[1].Rgba[4]);
+        Assert.Equal(130, levels[2].Rgba[0]);
+
+        // A level past the last is the last, and nothing makes no levels.
+        Assert.Same(levels[2].Rgba, levels[99].Rgba);
+        Assert.Null(Mipmaps.Of(null));
+        Assert.Null(Mipmaps.Of(new GamePicture(0, 0, [])));
     }
 
     /// <summary>
@@ -253,7 +335,7 @@ public class MeshPictureTests
     [Fact]
     public void ACanvasDrawsWhatTheAllocatingWayDraws()
     {
-        GamePicture sheet = Halved();
+        Mipmaps sheet = Halved();
         var canvas = new MeshPicture.Canvas(64);
 
         GamePicture lent = MeshPicture.Of(Coated(), canvas, 0.6f, -0.3f, skin: sheet);
@@ -449,7 +531,7 @@ public class MeshPictureTests
         => said.Rgba[((((said.Height / 2) * said.Width) + (said.Width / 2)) * 4) + part];
 
     /// <summary>A texture of one colour.</summary>
-    private static GamePicture Sheet(byte red, byte green, byte blue)
+    private static Mipmaps Sheet(byte red, byte green, byte blue)
     {
         var pixels = new byte[8 * 8 * 4];
         for (var one = 0; one < 8 * 8; one++)
@@ -460,11 +542,11 @@ public class MeshPictureTests
             pixels[(one * 4) + 3] = 255;
         }
 
-        return new GamePicture(8, 8, pixels);
+        return Levelled(new GamePicture(8, 8, pixels));
     }
 
     /// <summary>A texture whose lower half differs from its upper one.</summary>
-    private static GamePicture Halved()
+    private static Mipmaps Halved()
     {
         var pixels = new byte[8 * 8 * 4];
         for (var y = 0; y < 8; y++)
@@ -479,7 +561,68 @@ public class MeshPictureTests
             }
         }
 
-        return new GamePicture(8, 8, pixels);
+        return Levelled(new GamePicture(8, 8, pixels));
+    }
+
+    /// <summary>A texture of alternating black and white texels, this many each way.</summary>
+    private static Mipmaps Checkered(int side)
+    {
+        var pixels = new byte[side * side * 4];
+        for (var y = 0; y < side; y++)
+        {
+            for (var x = 0; x < side; x++)
+            {
+                int at = ((y * side) + x) * 4;
+                byte tone = (x + y) % 2 == 0 ? (byte)0 : (byte)255;
+                pixels[at] = tone;
+                pixels[at + 1] = tone;
+                pixels[at + 2] = tone;
+                pixels[at + 3] = 255;
+            }
+        }
+
+        return Levelled(new GamePicture(side, side, pixels));
+    }
+
+    private static Mipmaps Levelled(GamePicture top)
+    {
+        Mipmaps? levels = Mipmaps.Of(top);
+        Assert.NotNull(levels);
+        return levels;
+    }
+
+    /// <summary>The least and most red over the covered pixels, and how many there are.</summary>
+    private static (byte Least, byte Most, int Covered) Spread(GamePicture drawn)
+    {
+        byte least = 255;
+        byte most = 0;
+        var covered = 0;
+        for (var at = 0; at < drawn.Rgba.Length; at += 4)
+        {
+            if (drawn.Rgba[at + 3] == 0)
+            {
+                continue;
+            }
+
+            covered++;
+            least = Math.Min(least, drawn.Rgba[at]);
+            most = Math.Max(most, drawn.Rgba[at]);
+        }
+
+        return (least, most, covered);
+    }
+
+    /// <summary>A quad facing the viewer with the whole skin laid across it once, corner to corner.</summary>
+    private static SkinnedMesh Papered()
+    {
+        var places = new List<Vector3>();
+        var indices = new List<int>();
+        Quad(places, indices, near: true);
+
+        SkinnedMesh bare = Built(places, indices, Least, Most);
+        Vector2[] spots = [new(0f, 0f), new(1f, 0f), new(1f, 1f), new(0f, 1f)];
+
+        return SkinnedMesh.Of(bare.Positions, bare.Normals, bare.Indices, Least, Most, spots);
     }
 
     /// <summary>A quad facing the viewer, with every corner at the same texture coordinate.</summary>
