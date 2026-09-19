@@ -28,10 +28,11 @@ namespace PoEformance.Overlay;
 ///
 /// THE PICTURE IS REDRAWN WHEN SOMETHING CHANGES, not per frame: a new monster, a turn, a tilt or
 /// a different size. Holding still costs one textured quad. PLAYING IS THE EXCEPTION, and it is
-/// paid for the way a drag is: the picture is drawn one rung of <see cref="PictureLadder"/> lower
-/// for as long as it moves, because a rung is about four times the work and thirty of them a
-/// second at the resting size is what the rasteriser was never sized for. Stop it and the next
-/// frame is drawn full size again.
+/// paid for the way a drag is: at the rung the pane asks for, up to the cap in
+/// <see cref="PictureLadder"/>, drawn in bands on every core. It used to be one rung under the
+/// cap as well, and on a 1200 px pane that was a monster drawn at 512 and stretched - the blur
+/// the live client reported once the floor's own staircase was gone. Stop it and the next frame
+/// is drawn at whatever size the pane is, cap or no cap.
 ///
 /// THE KEYFRAMES ARE UNPACKED ON A TASK, ONE ANIMATION AT A TIME. A bundled rig holds twelve
 /// megabytes of them; the animation being played is a few tens of kilobytes of that, and Oodle
@@ -101,12 +102,13 @@ public sealed class MonsterPortrait
     /// <see cref="TerrainLayer"/> learned the same thing the same way.
     ///
     /// HOW IT SHOWED UP HERE IS WORTH WRITING DOWN, because it hid for half an hour at a time. An
-    /// animation is drawn one rung down, which under the usual cap is 512 px and one megabyte, so
-    /// playing never split. Pausing goes back up to the rung that covers the pane, and on a pane
-    /// wider than 1024 px that is a split image: the upload threw, the picture was dropped, and
-    /// with it the controls that could have started the animation again - the viewer was gone
-    /// until the app was restarted. The guard test that pins this rule had filtered its files on
-    /// the spelling "_upload(", and this class writes "_upload!(".
+    /// animation was drawn one rung down, which under the cap of the day was 512 px and one
+    /// megabyte, so playing never split. Pausing went back up to the rung that covers the pane,
+    /// and on a pane wider than 1024 px that is a split image: the upload threw, the picture was
+    /// dropped, and with it the controls that could have started the animation again - the viewer
+    /// was gone until the app was restarted. The guard test that pins this rule had filtered its
+    /// files on the spelling "_upload(", and this class writes "_upload!(". Playing draws at the
+    /// cap now, and a cap raised past 1024 splits while playing too; the configuration covers it.
     ///
     /// A cloned configuration rather than the global default, for the reason IconCache gives.
     /// </remarks>
@@ -160,7 +162,7 @@ public sealed class MonsterPortrait
     private Vector3[] _posed = [];
     private Vector3[] _posedNormals = [];
 
-    /// <summary>Whether the model was being dragged last frame, which is what lowers the rung.</summary>
+    /// <summary>Whether the model was being dragged last frame, which is what caps the rung.</summary>
     /// <remarks>
     /// LAST FRAME AND NOT THIS ONE, because the size has to be settled before the button that
     /// reports the drag has been submitted. Being a frame behind costs one frame drawn at the
@@ -232,7 +234,7 @@ public sealed class MonsterPortrait
 
         // THE CONTROLS COME BEFORE THE QUESTION OF WHETHER THERE IS A PICTURE, so that a picture
         // which would not upload - it happened, at the rung Pause returns to - leaves the button
-        // that plays it again, one rung down, and not only the reason. They draw nothing while
+        // that plays it again, under the cap, and not only the reason. They draw nothing while
         // there is no skeleton to control, which is every frame the model is still loading.
         Controls(side);
 
@@ -592,11 +594,10 @@ public sealed class MonsterPortrait
         Landed();
         Advance();
 
-        // ONE RUNG DOWN WHILE IT IS BEING DRAGGED OR PLAYED, and back up the moment it stops. The
-        // work grows with the AREA, so a rung costs about four times the one below it: at the
-        // default cap that is 8.0 ms a frame holding still against 4.3 moving, and it is while
-        // moving that a dropped frame is felt. What it costs is a picture that looks a little
-        // soft, for exactly as long as it moves.
+        // CAPPED WHILE IT IS BEING DRAGGED OR PLAYED, and the pane's own rung the moment it
+        // stops. The work grows with the AREA, and it is while moving that a dropped frame is
+        // felt, so the cap is somebody's answer to what a moving frame may cost; the bands on
+        // every core are what let the usual cap sit at the pane's own size.
         int size = Wanted(side);
         bool posed = _tracks is { Ready: true } && _pose is not null;
 
@@ -714,9 +715,9 @@ public sealed class MonsterPortrait
         }
     }
 
-    /// <summary>What the model is drawn at: the rung that covers the pane, lowered while it moves.</summary>
+    /// <summary>What the model is drawn at: the rung that covers the pane, capped while it moves.</summary>
     private int Wanted(float side)
-        => _held || (_playing && _tracks is { Ready: true }) ? _sizes.Dragging(side) : _sizes.For(side);
+        => _held || (_playing && _tracks is { Ready: true }) ? _sizes.Moving(side) : _sizes.For(side);
 
     /// <summary>The buffers for one size, kept until the size changes.</summary>
     /// <remarks>

@@ -264,12 +264,17 @@ screenshot on a machine with the game.
 The portrait is **turned by dragging, zoomed on the wheel, and reset by double-clicking**, and it
 stands on a floor of the game's own tiles that turns with it — drawn by the overlay as lines, not
 into the picture; see the floor bullet below. `MonsterPortrait` holds the turn, tilt and zoom and redraws
-whenever one of them moves — which is per frame during a drag, and is what makes the numbers
-below matter. At rest it follows its pane up to what the renderer will draw; `monsterModelSize`
-(default 768) caps what **turning** it may cost, and the portrait steps one rung *down* from that
-cap while a drag is in progress. A single draw is cheap even at the top — 5.3 ms at 768, 15.3 at
-1536, 26.3 at 2048 — so the cap has no business binding the resting size, which it used to, and
-showed as a picture that would not grow with its pane.
+whenever one of them moves — which is per frame during a drag or an animation, and is what makes
+the numbers below matter. At rest it follows its pane up to what the renderer will draw;
+`monsterModelSize` (default 1024) caps what **moving** it may cost, and a moving picture is drawn
+at the pane's own rung up to that cap. It used to be drawn one rung *under* the cap as well, the
+four-times discount that kept a one-threaded drag smooth — and on a 1200 px pane that was a
+monster drawn at 512 and stretched, reported as a blur once the floor's own staircase was gone.
+The rasteriser draws in bands of rows on every core now (`MeshPicture.Canvas.Threads`), each
+band walking the triangles in the mesh's order so the picture is the one-threaded one to the
+byte, and that is what pays for the higher rung. A single draw is cheap even at the top, so the
+cap has no business binding the resting size, which it used to, and showed as a picture that
+would not grow with its pane.
 
 It lives in a **pane of its own**, on the far right, folded away by the `Model` button and
 remembered as `monsterModel` — the same button-and-setting pair as the facet rail, and a third
@@ -304,12 +309,18 @@ false`. Eight things here cost time to rediscover, so they are written down:
   redrew per frame that was 1.1 MB a frame — 67 MB/s and 13 gen-2 collections per second of
   turning. `MeshPicture.Canvas` lends one pair to the caller; measured, that also took the draw
   itself from 5.4 ms to 3.1 ms, so the garbage cost more to make than to collect.
-- **The cost grows with the AREA, not the edge.** Per frame while turning, on a real rig:
-  256 → 1.9 ms, 384 → 3.0, 512 → 4.3, 768 → 8.0, 1024 → 12.5, 1536 → 25.1. That is why the size
-  is a ladder of rungs rather than the pane's own width — a pane being dragged wider would
-  otherwise redraw the mesh on every frame, at a new size, discarding the canvas each time — and
-  why stepping one rung down during a drag roughly quarters the work instead of shaving a little
-  off it.
+- **The cost grows with the AREA, not the edge.** Per frame while turning, on a real rig and one
+  thread: 256 → 1.9 ms, 384 → 3.0, 512 → 4.3, 768 → 8.0, 1024 → 12.5, 1536 → 25.1. That is why
+  the size is a ladder of rungs rather than the pane's own width — a pane being dragged wider
+  would otherwise redraw the mesh on every frame, at a new size, discarding the canvas each time
+  — and why a cap one rung lower is a quarter of the work instead of a little less of it. The
+  bands divide that by most of the core count, on the measured evidence of this box: four threads
+  took a frame-filling rig-sized mesh from 26 ms to 9 at 512, 67 to 19 at 1024 and 121 to 41 at
+  1536, best of three. What
+  did *not* help was the rewrite of the pixel loop that came with the bands — vertices
+  transformed once instead of at every corner, edge functions instead of cross products — which
+  measured the same on one thread, because the shaded pixels' texturing is where the time goes,
+  not the coverage test.
 - **The floor is at the model's origin, and it is lines, not pixels.** A model runs along negative
   z with its head at the far end, so the feet are the end *nearest zero*; read the other way the
   grid is drawn across the monster's scalp. And the game plants a monster by its origin, not by
@@ -325,9 +336,17 @@ false`. Eight things here cost time to rediscover, so they are written down:
   exact for everything but a weapon hanging under the feet, since the whole model is on one side
   of the plane. The look is Blender's, by request, and read out of Blender's default theme and
   overlay grid shader rather than a screenshot: 0x3D3D3D behind, 0x545454 lines at half alpha
-  with every tenth at full, a red x axis and a green y axis, the finest decade fading as its lines
-  crowd while the level above carries the emphasis it loses, and the whole floor fading by the
-  cube of the view's drop towards level. The squares are the game's: a tile is 250 world units
+  with every tenth at full, a red x axis and a green y axis, and each level fading where its
+  lines crowd while the level above carries the emphasis it loses. **The floor is in perspective
+  under a model that is not**: drawn orthographically it was parallel stripes pressed flat from
+  any angle but well above — the second report, "verliert das gesamte schöne Grid seine
+  beeindruckende Wirkung" — so it is projected from an eye three model-lengths in front of the
+  picture's centre (`ModelFloor.Lens`), anchored so the plane through the origin is drawn exactly
+  as the orthographic model is: the feet stand where they stood and only the far floor converges.
+  Blender's cube-of-the-drop fade went with that; it took the floor away at exactly the angles a
+  monster is looked at from, and only the last few degrees to edge-on fade now. Lines are handed
+  over in pieces whose ink is judged at each end by the family's spacing *at that place*, which
+  is what fades a level out towards its vanishing point. The squares are the game's: a tile is 250 world units
   (GameHelper2's `TileToWorldConversion`, the same 250 the radar divides by 23 for a grid cell),
   ten squares to a tile, and the variety's `ModelSizeMultiplier` shrinks the tile in the mesh's
   units by exactly the amount the game enlarges the mesh — so a boss stands on more squares than a
@@ -471,9 +490,9 @@ tests. A third, weights not divided by 255, fails nothing because it changes not
 normalised by the summed weight at the end, so the scale of a weight cancels. That is the code
 being robust rather than the tests being blind, and it is written here so nobody adds a test for it.
 
-**Playing costs what dragging costs**, and is paid for the same way: the picture is drawn one rung
-of `PictureLadder` lower for as long as it moves, because thirty full-size rasterisations a second
-is what the still renderer was never sized for. Stop it and the next frame is full size again. The
+**Playing costs what dragging costs**, and is paid for the same way: the picture is drawn at the
+pane's rung up to the `PictureLadder` cap for as long as it moves, in bands on every core. Stop it
+and the next frame is the pane's own size, cap or no cap. The
 keyframes for the chosen animation are unpacked on a task, one animation at a time — a bundled rig
 holds twelve megabytes of them and the one being played is tens of kilobytes. Pre-8 rigs keep their
 frames loose and play without Oodle; rigs from 8 up need the install's own, which

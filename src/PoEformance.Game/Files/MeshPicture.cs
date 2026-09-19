@@ -23,6 +23,14 @@ namespace PoEformance.Game.Files;
 /// an overlay frame of about 6 ms, and only while the button is down. What it is NOT affordable
 /// with is a fresh pair of buffers each time; see <see cref="Canvas"/>.
 ///
+/// AND IT IS DRAWN IN BANDS OF ROWS ON EVERY CORE, since the pane grew to 1200 px and an animation
+/// plays at thirty frames a second. Each band walks every triangle in the mesh's order and draws
+/// the rows that are its own, so no pixel is ever touched by two threads and the picture is the
+/// one-threaded one to the byte - the depth test needs no lock because it never has a race. What
+/// it buys is most of the core count: on the four threads of the machine this was written on, a
+/// rig-sized mesh filling the whole frame went from 26 ms to 9 at 512 square, 67 to 19 at 1024 and
+/// 121 to 41 at 1536, best of three - and a real monster covers a third of the frame.
+///
 /// THE SKIN IS READ TRILINEARLY, from the level of <see cref="Mipmaps"/> whose texels are about a
 /// pixel across, and that roughly doubles what a textured pixel costs: a quad filling the whole
 /// frame with a 2048 square skin measured 9.0 ms a frame at 384 square against 4.8 with the
@@ -82,7 +90,8 @@ public static class MeshPicture
     /// same camera serves the picture at whatever rung it is drawn and the floor at whatever size
     /// it is shown.
     /// </remarks>
-    public readonly record struct Camera(Matrix4x4 View, float Scale, Vector2 Centre, float Tilt)
+    /// <param name="Reach">The longest side of the model's box, in its own units: what the picture was fitted to.</param>
+    public readonly record struct Camera(Matrix4x4 View, float Scale, Vector2 Centre, float Tilt, float Reach)
     {
         /// <summary>Whether there is anything to see: a mesh with a box to fit.</summary>
         public bool Ready => Scale > 0f;
@@ -129,7 +138,7 @@ public static class MeshPicture
             }
 
             float scale = Fill * Math.Clamp(zoom, Nearest, Furthest) / reach;
-            return new Camera(view, scale, new Vector2(0.5f) + pan, tilt);
+            return new Camera(view, scale, new Vector2(0.5f) + pan, tilt, reach);
         }
 
         /// <summary>Where a point of the model lands: x and y as shares of the side, z as the depth, nearer being less.</summary>
@@ -156,23 +165,58 @@ public static class MeshPicture
     /// good only until the next drawing into the same one. That suits the caller it was made for -
     /// the portrait copies the pixels into a texture and is done with them - and it is why the
     /// allocating overload is still the one a test should reach for.
+    ///
+    /// THE SCRATCH FOR A MESH LIVES HERE TOO: where every vertex lands and faces this frame, and
+    /// each triangle's rows and skin level, worked out once and read by every band. Grown to the
+    /// largest mesh drawn and kept, for the reason the buffers are.
     /// </remarks>
     public sealed class Canvas
     {
         /// <param name="size">How many pixels each way, clamped to <see cref="Widest"/>.</param>
-        public Canvas(int size)
+        /// <param name="threads">How many threads may draw at once. Anything under one means every processor.</param>
+        public Canvas(int size, int threads = 0)
         {
             Size = Math.Clamp(size, 1, Widest);
             Pixels = new byte[Size * Size * 4];
             Depth = new float[Size * Size];
+            Threads = Math.Clamp(threads > 0 ? threads : Environment.ProcessorCount, 1, 64);
         }
 
         /// <summary>How many pixels each way this canvas draws.</summary>
         public int Size { get; }
 
+        /// <summary>How many threads a drawing into this canvas may use.</summary>
+        public int Threads { get; }
+
         internal byte[] Pixels { get; }
 
         internal float[] Depth { get; }
+
+        internal Vector3[] Corners { get; private set; } = [];
+
+        internal Vector3[] Facings { get; private set; } = [];
+
+        internal int[] Tops { get; private set; } = [];
+
+        internal int[] Feet { get; private set; } = [];
+
+        internal float[] Levels { get; private set; } = [];
+
+        internal void Fit(int vertices, int triangles)
+        {
+            if (Corners.Length < vertices)
+            {
+                Corners = new Vector3[vertices];
+                Facings = new Vector3[vertices];
+            }
+
+            if (Tops.Length < triangles)
+            {
+                Tops = new int[triangles];
+                Feet = new int[triangles];
+                Levels = new float[triangles];
+            }
+        }
     }
 
     /// <summary>
@@ -301,27 +345,72 @@ public static class MeshPicture
         // with - see SkinnedMesh.Coordinated for what an uncoordinated mesh would paint.
         Mipmaps? usable = skin is not null && mesh.Coordinated ? skin : null;
 
-        Span<Vector3> corner = stackalloc Vector3[3];
-        Span<Vector3> facing = stackalloc Vector3[3];
-        Span<Vector2> onSkin = stackalloc Vector2[3];
-
-        for (var one = 0; one + 2 < mesh.Indices.Length; one += 3)
+        // EVERY VERTEX ONCE, not once per triangle it sits in. A closed mesh lists each vertex in
+        // about six triangles, so transforming at the corners was six transforms for one.
+        int vertices = positions.Length;
+        int triangles = mesh.Indices.Length / 3;
+        canvas.Fit(vertices, triangles);
+        Vector3[] corners = canvas.Corners;
+        Vector3[] facings = canvas.Facings;
+        for (var point = 0; point < vertices; point++)
         {
-            for (var part = 0; part < 3; part++)
+            Vector3 place = Vector3.Transform(positions[point], view);
+            corners[point] = new Vector3((place.X * scale) + centre.X, (place.Y * scale) + centre.Y, place.Z);
+            facings[point] = Vector3.TransformNormal(normals[point], view);
+        }
+
+        // And every triangle's rows and skin level once, so a band can pass over the triangles
+        // that do not reach it with one comparison each.
+        int[] tops = canvas.Tops;
+        int[] feet = canvas.Feet;
+        float[] levels = canvas.Levels;
+        int[] indices = mesh.Indices;
+        for (var one = 0; one < triangles; one++)
+        {
+            Vector3 a = corners[indices[one * 3]];
+            Vector3 b = corners[indices[(one * 3) + 1]];
+            Vector3 c = corners[indices[(one * 3) + 2]];
+            float area = Cross(a, b, c);
+            if (!(MathF.Abs(area) >= 1e-6f))
             {
-                int point = mesh.Indices[one + part];
-                Vector3 place = Vector3.Transform(positions[point], view);
-
-                corner[part] = new Vector3(
-                    (place.X * scale) + centre.X,
-                    (place.Y * scale) + centre.Y,
-                    place.Z);
-
-                facing[part] = Vector3.TransformNormal(normals[point], view);
-                onSkin[part] = mesh.Coordinates[point];
+                tops[one] = int.MaxValue;
+                feet[one] = int.MinValue;
+                continue;
             }
 
-            Triangle(pixels, depth, size, corner, facing, onSkin, lamp, ink, usable);
+            tops[one] = Math.Max(0, (int)MathF.Floor(Min3(a.Y, b.Y, c.Y)));
+            feet[one] = Math.Min(size - 1, (int)MathF.Ceiling(Max3(a.Y, b.Y, c.Y)));
+            levels[one] = usable is null
+                ? 0f
+                : Level(
+                    a, b, c,
+                    mesh.Coordinates[indices[one * 3]],
+                    mesh.Coordinates[indices[(one * 3) + 1]],
+                    mesh.Coordinates[indices[(one * 3) + 2]],
+                    area, usable);
+        }
+
+        // IN BANDS OF ROWS, EACH ON ITS OWN THREAD. A pixel belongs to one band and the triangles
+        // are walked in the mesh's order within it, so the picture is the sequential one to the
+        // byte however many threads share it - the depth test never sees two threads at once.
+        // More bands than threads, so a band the model does not reach costs nothing much and the
+        // ones through its middle are shared out.
+        var drawing = new Drawing(canvas, mesh, triangles, lamp, ink, usable);
+        const int height = 8;
+        int bands = (size + height - 1) / height;
+        if (canvas.Threads == 1)
+        {
+            for (var band = 0; band < bands; band++)
+            {
+                drawing.Band(band * height, Math.Min(size, (band + 1) * height));
+            }
+        }
+        else
+        {
+            Parallel.For(
+                0, bands,
+                new ParallelOptions { MaxDegreeOfParallelism = canvas.Threads },
+                band => drawing.Band(band * height, Math.Min(size, (band + 1) * height)));
         }
 
         return new GamePicture(size, size, pixels);
@@ -374,7 +463,7 @@ public static class MeshPicture
     }
 
     /// <summary>
-    /// Fills one triangle, keeping whichever fragment is nearest.
+    /// One frame's drawing: everything a band needs, shared by all of them.
     /// </summary>
     /// <remarks>
     /// A DEPTH BUFFER AND NOT A SORT. Painting back to front is the cheaper trick and it is wrong
@@ -384,83 +473,164 @@ public static class MeshPicture
     ///
     /// NO BACK-FACE CULLING. It would halve the work, and it needs a winding order that the format
     /// has not been shown to keep - cull the wrong way and the model turns inside out. The depth
-    /// buffer already hides the far side, so this costs time rather than correctness, and time is
-    /// what there is plenty of for a picture drawn once.
+    /// buffer already hides the far side, so this costs time rather than correctness.
+    ///
+    /// EDGE FUNCTIONS, NOT CROSS PRODUCTS PER PIXEL. Whether a pixel is inside a triangle is the
+    /// sign of three linear functions of its position, so each is one multiply-add per pixel from
+    /// the row's start rather than a cross product and a division; the three barycentric weights
+    /// fall out of the same numbers by one reciprocal per triangle. WHICH MEASURED THE SAME on one
+    /// thread as the cross products did, on a rig-sized mesh filling the frame - and that is worth
+    /// knowing: the time is in the shaded pixels, texturing and lighting, not in deciding which
+    /// pixels those are. The bands are what pay, by the core count - see the class remarks.
     /// </remarks>
-    private static void Triangle(
-        byte[] pixels,
-        float[] depth,
-        int size,
-        ReadOnlySpan<Vector3> corner,
-        ReadOnlySpan<Vector3> facing,
-        ReadOnlySpan<Vector2> onSkin,
-        Vector3 lamp,
-        Vector3 ink,
-        Mipmaps? skin)
+    private sealed class Drawing
     {
-        float area = Cross(corner[0], corner[1], corner[2]);
-        if (MathF.Abs(area) < 1e-6f)
+        private readonly byte[] _pixels;
+        private readonly float[] _depth;
+        private readonly int _size;
+        private readonly Vector3[] _corners;
+        private readonly Vector3[] _facings;
+        private readonly int[] _tops;
+        private readonly int[] _feet;
+        private readonly float[] _levels;
+        private readonly int[] _indices;
+        private readonly Vector2[] _coordinates;
+        private readonly int _triangles;
+        private readonly Vector3 _lamp;
+        private readonly Vector3 _ink;
+        private readonly Mipmaps? _skin;
+
+        public Drawing(Canvas canvas, SkinnedMesh mesh, int triangles, Vector3 lamp, Vector3 ink, Mipmaps? skin)
         {
-            return;
+            _pixels = canvas.Pixels;
+            _depth = canvas.Depth;
+            _size = canvas.Size;
+            _corners = canvas.Corners;
+            _facings = canvas.Facings;
+            _tops = canvas.Tops;
+            _feet = canvas.Feet;
+            _levels = canvas.Levels;
+            _indices = mesh.Indices;
+            _coordinates = mesh.Coordinates;
+            _triangles = triangles;
+            _lamp = lamp;
+            _ink = ink;
+            _skin = skin;
         }
 
-        float level = skin is null ? 0f : Level(corner, onSkin, area, skin);
-
-        int least = Math.Max(0, (int)MathF.Floor(Min3(corner[0].X, corner[1].X, corner[2].X)));
-        int most = Math.Min(size - 1, (int)MathF.Ceiling(Max3(corner[0].X, corner[1].X, corner[2].X)));
-        int top = Math.Max(0, (int)MathF.Floor(Min3(corner[0].Y, corner[1].Y, corner[2].Y)));
-        int foot = Math.Min(size - 1, (int)MathF.Ceiling(Max3(corner[0].Y, corner[1].Y, corner[2].Y)));
-
-        for (int y = top; y <= foot; y++)
+        /// <summary>Draws every triangle's part that falls in the rows from <paramref name="top"/> up to <paramref name="end"/>.</summary>
+        public void Band(int top, int end)
         {
-            for (int x = least; x <= most; x++)
+            for (var one = 0; one < _triangles; one++)
             {
-                var place = new Vector3(x + 0.5f, y + 0.5f, 0f);
-
-                float first = Cross(corner[1], corner[2], place) / area;
-                float second = Cross(corner[2], corner[0], place) / area;
-                float third = 1f - first - second;
-
-                if (first < 0f || second < 0f || third < 0f)
+                if (_feet[one] < top || _tops[one] >= end)
                 {
                     continue;
                 }
 
-                float away = (first * corner[0].Z) + (second * corner[1].Z) + (third * corner[2].Z);
-                int at = (y * size) + x;
-                if (away >= depth[at])
+                Rasterise(one, Math.Max(_tops[one], top), Math.Min(_feet[one], end - 1));
+            }
+        }
+
+        private void Rasterise(int one, int top, int foot)
+        {
+            int i0 = _indices[one * 3];
+            int i1 = _indices[(one * 3) + 1];
+            int i2 = _indices[(one * 3) + 2];
+            Vector3 c0 = _corners[i0];
+            Vector3 c1 = _corners[i1];
+            Vector3 c2 = _corners[i2];
+            Vector3 f0 = _facings[i0];
+            Vector3 f1 = _facings[i1];
+            Vector3 f2 = _facings[i2];
+
+            // The three edge functions, turned so that inside is where all three are positive
+            // whichever way the triangle winds: w0 grows away from the edge c1-c2, w1 from c2-c0,
+            // and w2 is what is left of the area.
+            float area = Cross(c0, c1, c2);
+            float sign = area < 0f ? -1f : 1f;
+            float total = area * sign;
+            float inv = 1f / total;
+            float a0 = -(c2.Y - c1.Y) * sign;
+            float b0 = (c2.X - c1.X) * sign;
+            float k0 = (((c2.Y - c1.Y) * c1.X) - ((c2.X - c1.X) * c1.Y)) * sign;
+            float a1 = -(c0.Y - c2.Y) * sign;
+            float b1 = (c0.X - c2.X) * sign;
+            float k1 = (((c0.Y - c2.Y) * c2.X) - ((c0.X - c2.X) * c2.Y)) * sign;
+
+            int least = Math.Max(0, (int)MathF.Floor(Min3(c0.X, c1.X, c2.X)));
+            int most = Math.Min(_size - 1, (int)MathF.Ceiling(Max3(c0.X, c1.X, c2.X)));
+            float level = _levels[one];
+            bool skinned = _skin is not null;
+            Vector2 s0 = default;
+            Vector2 s1 = default;
+            Vector2 s2 = default;
+            if (skinned)
+            {
+                s0 = _coordinates[i0];
+                s1 = _coordinates[i1];
+                s2 = _coordinates[i2];
+            }
+
+            for (int y = top; y <= foot; y++)
+            {
+                float py = y + 0.5f;
+                float px = least + 0.5f;
+                float row0 = (a0 * px) + (b0 * py) + k0;
+                float row1 = (a1 * px) + (b1 * py) + k1;
+                int at = (y * _size) + least;
+
+                for (int x = least; x <= most; x++, at++)
                 {
-                    continue;
+                    // From the row's start each time rather than stepped, so a row two thousand
+                    // pixels long does not drift by its accumulated rounding.
+                    float along = x - least;
+                    float w0 = row0 + (a0 * along);
+                    float w1 = row1 + (a1 * along);
+                    float w2 = total - w0 - w1;
+                    if (w0 < 0f || w1 < 0f || w2 < 0f)
+                    {
+                        continue;
+                    }
+
+                    float first = w0 * inv;
+                    float second = w1 * inv;
+                    float third = w2 * inv;
+                    float away = (first * c0.Z) + (second * c1.Z) + (third * c2.Z);
+                    if (away >= _depth[at])
+                    {
+                        continue;
+                    }
+
+                    _depth[at] = away;
+
+                    Vector3 normal = (first * f0) + (second * f1) + (third * f2);
+                    if (normal.LengthSquared() > 1e-6f)
+                    {
+                        normal = Vector3.Normalize(normal);
+                    }
+
+                    // TWO-SIDED, because the mesh's winding is not established and a single-sided
+                    // light leaves whole limbs black where the triangles happen to face away.
+                    float lit = MathF.Abs(Vector3.Dot(normal, _lamp));
+                    float shade = 0.22f + (0.78f * lit);
+
+                    Vector3 colour = _ink;
+                    if (skinned)
+                    {
+                        // AFFINE INTERPOLATION IS EXACT HERE. The projection is orthographic, so a
+                        // coordinate across the triangle really is linear in screen space - the
+                        // perspective correction a game renderer needs would be dividing by a w
+                        // that is always one.
+                        Vector2 spot = (first * s0) + (second * s1) + (third * s2);
+                        colour = Sample(_skin!, spot, level);
+                    }
+
+                    _pixels[at * 4] = Byte(colour.X * shade);
+                    _pixels[(at * 4) + 1] = Byte(colour.Y * shade);
+                    _pixels[(at * 4) + 2] = Byte(colour.Z * shade);
+                    _pixels[(at * 4) + 3] = 255;
                 }
-
-                depth[at] = away;
-
-                Vector3 normal = (first * facing[0]) + (second * facing[1]) + (third * facing[2]);
-                if (normal.LengthSquared() > 1e-6f)
-                {
-                    normal = Vector3.Normalize(normal);
-                }
-
-                // TWO-SIDED, because the mesh's winding is not established and a single-sided
-                // light leaves whole limbs black where the triangles happen to face away.
-                float lit = MathF.Abs(Vector3.Dot(normal, lamp));
-                float shade = 0.22f + (0.78f * lit);
-
-                Vector3 colour = ink;
-                if (skin is not null)
-                {
-                    // AFFINE INTERPOLATION IS EXACT HERE. The projection is orthographic, so a
-                    // coordinate across the triangle really is linear in screen space - the
-                    // perspective correction a game renderer needs would be dividing by a w that
-                    // is always one.
-                    Vector2 spot = (first * onSkin[0]) + (second * onSkin[1]) + (third * onSkin[2]);
-                    colour = Sample(skin, spot, level);
-                }
-
-                pixels[(at * 4) + 0] = Byte(colour.X * shade);
-                pixels[(at * 4) + 1] = Byte(colour.Y * shade);
-                pixels[(at * 4) + 2] = Byte(colour.Z * shade);
-                pixels[(at * 4) + 3] = 255;
             }
         }
     }
@@ -480,15 +650,15 @@ public static class MeshPicture
     /// the price, and it is the cheaper of the two.
     /// </remarks>
     private static float Level(
-        ReadOnlySpan<Vector3> corner, ReadOnlySpan<Vector2> onSkin, float area, Mipmaps skin)
+        Vector3 c0, Vector3 c1, Vector3 c2, Vector2 s0, Vector2 s1, Vector2 s2, float area, Mipmaps skin)
     {
         // The two edges out of the first corner, on the screen and on the skin.
-        float e1x = corner[1].X - corner[0].X;
-        float e1y = corner[1].Y - corner[0].Y;
-        float e2x = corner[2].X - corner[0].X;
-        float e2y = corner[2].Y - corner[0].Y;
-        Vector2 d1 = onSkin[1] - onSkin[0];
-        Vector2 d2 = onSkin[2] - onSkin[0];
+        float e1x = c1.X - c0.X;
+        float e1y = c1.Y - c0.Y;
+        float e2x = c2.X - c0.X;
+        float e2y = c2.Y - c0.Y;
+        Vector2 d1 = s1 - s0;
+        Vector2 d2 = s2 - s0;
 
         // How the coordinate changes per pixel to the right and per pixel down: the two-by-two
         // solve of "the gradient along each edge is that edge's change", whose determinant is the
