@@ -76,36 +76,75 @@ public sealed class BossIcons
 
     private readonly Dictionary<string, string> _byArea;
     private readonly Dictionary<string, string> _byTile;
+    private readonly Dictionary<string, string> _named;
+    private readonly HashSet<string> _skipped;
     private readonly HashSet<string> _missing = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<string> _pending = [];
     private readonly string _log;
+    private readonly string[] _comment;
     private bool _loaded;
+    private int _revision;
 
-    private BossIcons(Dictionary<string, string> byArea, Dictionary<string, string> byTile, string? log = null)
+    private BossIcons(
+        Dictionary<string, string> byArea,
+        Dictionary<string, string> byTile,
+        Dictionary<string, string>? named = null,
+        HashSet<string>? skipped = null,
+        string[]? comment = null,
+        string? log = null,
+        string source = "")
     {
         _byArea = byArea;
         _byTile = byTile;
+        _named = named ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        _skipped = skipped ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        _comment = comment ?? [];
         _log = log ?? LogPath;
+        Source = source;
     }
 
     /// <summary>Nothing written down - which is the ordinary case, and not a broken install.</summary>
     public static BossIcons Empty { get; } = Blank(null);
 
     /// <summary>An empty pair of tables, collecting into a log of its own.</summary>
-    private static BossIcons Blank(string? log) => new(
+    private static BossIcons Blank(string? log, string source = "") => new(
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
-        log);
+        log: log,
+        source: source);
 
     /// <summary>Where the arenas nothing could name are collected.</summary>
     public static string LogPath
         => Path.Combine(AppContext.BaseDirectory, "logs", "boss-arenas.tsv");
+
+    /// <summary>
+    /// The file this was read from, and the one <see cref="Remember"/> writes back to.
+    /// </summary>
+    /// <remarks>
+    /// KEPT RATHER THAN LOOKED UP AGAIN, because there is more than one data folder in a working
+    /// tree - the repository's and the one beside a built exe - and a table loaded from one and
+    /// saved to the other is the kind of mistake that looks like the write silently failing.
+    /// Empty when nothing was loaded, which is what makes the write refuse rather than invent a
+    /// place to put somebody's afternoon of work.
+    /// </remarks>
+    public string Source { get; }
 
     /// <summary>How many pairs were written down.</summary>
     public int Count => _byArea.Count + _byTile.Count;
 
     /// <summary>How many arenas have turned up that no picture could be found for.</summary>
     public int MissingCount => _missing.Count;
+
+    /// <summary>
+    /// Bumped whenever an entry is added, so a cache of what an arena resolved to can tell.
+    /// </summary>
+    /// <remarks>
+    /// The one thing a written entry has to reach is the marker that is on screen while it is
+    /// being written. Resolving is cached per landmark and emptied when the area changes (see
+    /// PoiLayer), which without this means the entry somebody just filled in does nothing until
+    /// they leave the arena they filled it in for - and then looks broken rather than late.
+    /// </remarks>
+    public int Revision => _revision;
 
     /// <summary>
     /// Loads the file, or returns <see cref="Empty"/> when it is missing or unreadable.
@@ -121,7 +160,7 @@ public sealed class BossIcons
         {
             if (!File.Exists(path))
             {
-                return log is null ? Empty : Blank(log);
+                return Blank(log, path);
             }
 
             BossIconFile? read = JsonSerializer.Deserialize(
@@ -129,7 +168,7 @@ public sealed class BossIcons
 
             if (read is null)
             {
-                return log is null ? Empty : Blank(log);
+                return Blank(log, path);
             }
 
             var byArea = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -148,11 +187,27 @@ public sealed class BossIcons
                 byTile[WithoutExtension(tile)] = family;
             }
 
-            return new BossIcons(byArea, byTile, log);
+            var named = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach ((string family, string called) in read.Names ?? [])
+            {
+                named[family] = called;
+            }
+
+            // The block at the top of the file is the whole documentation of its format, and a
+            // write that dropped it would take the instructions out of the file the moment
+            // somebody used it the way they were instructed to.
+            return new BossIcons(
+                byArea,
+                byTile,
+                named,
+                new HashSet<string>(read.Skip ?? [], StringComparer.OrdinalIgnoreCase),
+                read.Comment ?? [],
+                log,
+                path);
         }
         catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
         {
-            return log is null ? Empty : Blank(log);
+            return Blank(log, path);
         }
     }
 
@@ -235,6 +290,229 @@ public sealed class BossIcons
     {
         ArgumentNullException.ThrowIfNull(family);
         return family + (cleared ? InactiveSuffix : ActiveSuffix);
+    }
+
+    /// <summary>
+    /// What the game calls the boss a picture is of, or empty where nobody said.
+    /// </summary>
+    /// <remarks>
+    /// KEYED BY THE FAMILY AND NOT BY THE AREA, because that is where the name belongs: Saphira
+    /// is the boss of Grimhaven AND of Epitaph, and a name written against each area would be
+    /// the same sentence twice with two chances of disagreeing with itself. One family, one
+    /// name, however many arenas point at it.
+    /// </remarks>
+    public string NameOf(string family)
+    {
+        ArgumentNullException.ThrowIfNull(family);
+        return _named.TryGetValue(family, out string? called) ? called : string.Empty;
+    }
+
+    /// <summary>The family written down for an area, or empty. What the plan counts.</summary>
+    public string FamilyFor(string areaId)
+    {
+        ArgumentNullException.ThrowIfNull(areaId);
+        return _byArea.TryGetValue(areaId, out string? family) ? family : string.Empty;
+    }
+
+    /// <summary>Whether somebody has said this area has no boss picture to make.</summary>
+    /// <remarks>
+    /// The list the ToDo list is worked off is the game's own set of endgame maps, and a good
+    /// third of it - the six hideouts, the seven towers, the hubs - has no boss in it at all.
+    /// Guessing which from the tags would be this project's oldest mistake in a new place, so
+    /// the answer comes from whoever went and looked, one tick at a time. See BossIconPlan.
+    /// </remarks>
+    public bool Skipped(string areaId)
+    {
+        ArgumentNullException.ThrowIfNull(areaId);
+        return _skipped.Contains(areaId);
+    }
+
+    /// <summary>The arena tiles collected for an area that nothing could name a picture for.</summary>
+    /// <remarks>
+    /// Read back out of the log <see cref="NoteMissing"/> writes, which is what makes the tile
+    /// field fillable from a map played an hour ago rather than only from the one on screen.
+    /// </remarks>
+    public IReadOnlyList<string> Unnamed(string areaId)
+    {
+        ArgumentNullException.ThrowIfNull(areaId);
+        Load();
+
+        var tiles = new List<string>();
+        foreach (string seen in _missing)
+        {
+            int tab = seen.IndexOf('\t', StringComparison.Ordinal);
+            if (tab > 0 && string.Equals(seen[..tab], areaId, StringComparison.OrdinalIgnoreCase))
+            {
+                tiles.Add(seen[(tab + 1)..]);
+            }
+        }
+
+        tiles.Sort(StringComparer.OrdinalIgnoreCase);
+        return tiles;
+    }
+
+    /// <summary>
+    /// Writes one boss down: the areas it is the boss of, its arena tile, its picture and its name.
+    /// </summary>
+    /// <remarks>
+    /// THIS IS THE OTHER HALF OF THE EXPORT, and the reason it is worth having at all. Rendering
+    /// a portrait out of the model gives a picture that nothing points at: somebody still has to
+    /// know that the file called WifeMonsterMapActive.png belongs to the arena in Grimhaven and
+    /// to the one in Epitaph, and that the thing standing in both is called Saphira. That is
+    /// three facts, and the only moment anybody has all three is while they are standing in the
+    /// room looking at the model. So they are asked for there and written here, in the same
+    /// click that writes the pictures - see MonsterPortrait.
+    ///
+    /// SEVERAL AREAS, ONE FAMILY. A boss is the boss of as many maps as it is the boss of; the
+    /// caller splits the field on commas and hands them over together, so the pair of entries
+    /// cannot be written half way.
+    ///
+    /// THE TILE IS OPTIONAL and the areas are not, which is the opposite of how it was first
+    /// built. A tile path is the more precise key of the two - it names THIS arena rather than
+    /// everything in the area - but it is also the one nobody can type from memory, and an
+    /// entry with only a tile covers exactly the maps that arena has already been seen in.
+    /// </remarks>
+    /// <param name="areas">The area ids this boss stands in. Empty entries are dropped.</param>
+    /// <param name="tile">Its arena tile's path, or empty when only the area is known.</param>
+    /// <param name="family">The picture's family name - the export's own stem.</param>
+    /// <param name="boss">What the game calls it, or empty.</param>
+    /// <param name="said">What happened, in a sentence, for the window that asked.</param>
+    public bool Remember(
+        IReadOnlyList<string> areas, string tile, string family, string boss, out string said)
+    {
+        ArgumentNullException.ThrowIfNull(areas);
+        ArgumentNullException.ThrowIfNull(tile);
+        ArgumentNullException.ThrowIfNull(family);
+        ArgumentNullException.ThrowIfNull(boss);
+
+        family = family.Trim();
+        tile = tile.Trim();
+        boss = boss.Trim();
+
+        if (family.Length == 0)
+        {
+            said = "there is no picture name to file the entry under";
+            return false;
+        }
+
+        var wanted = new List<string>(areas.Count);
+        foreach (string area in areas)
+        {
+            string trimmed = area.Trim();
+            if (trimmed.Length > 0 && !wanted.Contains(trimmed, StringComparer.OrdinalIgnoreCase))
+            {
+                wanted.Add(trimmed);
+            }
+        }
+
+        if (wanted.Count == 0 && tile.Length == 0)
+        {
+            said = "an entry needs an area id or a tile path";
+            return false;
+        }
+
+        foreach (string area in wanted)
+        {
+            _byArea[area] = family;
+
+            // Writing the entry is the answer to "this one still needs doing", so a tick that
+            // was put on it to get it out of the way comes off again by itself.
+            _skipped.Remove(area);
+        }
+
+        if (tile.Length > 0)
+        {
+            _byTile[WithoutExtension(tile)] = family;
+        }
+
+        if (boss.Length > 0)
+        {
+            _named[family] = boss;
+        }
+
+        _revision++;
+        return Save(out said);
+    }
+
+    /// <summary>Ticks an area off as having no boss picture to make, or puts it back.</summary>
+    public bool Skip(string areaId, bool skip, out string said)
+    {
+        ArgumentNullException.ThrowIfNull(areaId);
+        areaId = areaId.Trim();
+
+        if (areaId.Length == 0)
+        {
+            said = "there is no area to tick off";
+            return false;
+        }
+
+        bool moved = skip ? _skipped.Add(areaId) : _skipped.Remove(areaId);
+        if (!moved)
+        {
+            said = string.Empty;
+            return true;
+        }
+
+        _revision++;
+        return Save(out said);
+    }
+
+    /// <summary>
+    /// Writes the table back over the file it was read from, comment block and all.
+    /// </summary>
+    /// <remarks>
+    /// THROUGH A TEMPORARY FILE, because this is a curated file somebody has been filling in
+    /// for an evening and the write happens while a game is running: a crash or a full disk
+    /// half way through a direct write leaves a truncated JSON file, which loads as nothing at
+    /// all. Renaming over the original is atomic enough that the worst case is the old file.
+    ///
+    /// SORTED, so that a diff of it shows what was added rather than where the dictionary
+    /// happened to put it. The file is in git and read by people.
+    /// </remarks>
+    public bool Save(out string said)
+    {
+        if (Source.Length == 0)
+        {
+            said = "there is no file to write to - data/boss-icons.json was never loaded";
+            return false;
+        }
+
+        try
+        {
+            var file = new BossIconFile
+            {
+                Comment = _comment.Length > 0 ? _comment : null,
+                Areas = Sorted(_byArea),
+                Tiles = Sorted(_byTile),
+                Names = _named.Count > 0 ? Sorted(_named) : null,
+                Skip = _skipped.Count > 0 ? [.. _skipped.Order(StringComparer.OrdinalIgnoreCase)] : null,
+            };
+
+            string temporary = Source + ".writing";
+            File.WriteAllText(temporary, JsonSerializer.Serialize(file, BossIconJson.Default.BossIconFile));
+            File.Move(temporary, Source, overwrite: true);
+
+            said = $"wrote {Path.GetFileName(Source)}: {_byArea.Count} areas, {_byTile.Count} tiles";
+            return true;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
+            or NotSupportedException or JsonException)
+        {
+            said = $"could not write {Source}: {exception.Message}";
+            return false;
+        }
+    }
+
+    /// <summary>One dictionary in an order a person reading the diff would have chosen.</summary>
+    private static Dictionary<string, string> Sorted(Dictionary<string, string> pairs)
+    {
+        var order = new Dictionary<string, string>(pairs.Count, StringComparer.OrdinalIgnoreCase);
+        foreach (string key in pairs.Keys.Order(StringComparer.OrdinalIgnoreCase))
+        {
+            order[key] = pairs[key];
+        }
+
+        return order;
     }
 
     /// <summary>
@@ -446,16 +724,44 @@ public sealed class BossIcons
     }
 }
 
-/// <summary>The file's shape. A "comment" beside these is ignored, which is what makes it useful.</summary>
+/// <summary>
+/// The file's shape, including the comment block - which is READ so that it can be written back.
+/// </summary>
+/// <remarks>
+/// The block at the top of data/boss-icons.json is the only documentation of the format, and the
+/// tool now writes the file itself. A DTO that ignored the comment, as this one did while the
+/// file was only ever read, would quietly delete the instructions the first time somebody
+/// followed them.
+/// </remarks>
 internal sealed class BossIconFile
 {
+    [JsonPropertyName("comment")]
+    public string[]? Comment { get; init; }
+
     [JsonPropertyName("areas")]
     public Dictionary<string, string>? Areas { get; init; }
 
     [JsonPropertyName("tiles")]
     public Dictionary<string, string>? Tiles { get; init; }
+
+    /// <summary>What the game calls each family's boss, for the label on its marker.</summary>
+    [JsonPropertyName("names")]
+    public Dictionary<string, string>? Names { get; init; }
+
+    /// <summary>Areas somebody has looked at and found no boss picture to make.</summary>
+    [JsonPropertyName("skip")]
+    public string[]? Skip { get; init; }
 }
 
 /// <summary>Source-generated so the file still loads under Native AOT.</summary>
+/// <remarks>
+/// INDENTED, because the file is written by the tool and read by people - it is in git, and a
+/// one-line JSON file makes every addition to it the same single changed line. The two sections
+/// that ship empty are always written; the two that were added later are left out until they
+/// hold something, so a file nobody has written to still looks like the one that ships.
+/// </remarks>
+[JsonSourceGenerationOptions(
+    WriteIndented = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 [JsonSerializable(typeof(BossIconFile))]
 internal sealed partial class BossIconJson : JsonSerializerContext;

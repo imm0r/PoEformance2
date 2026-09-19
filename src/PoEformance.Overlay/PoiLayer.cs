@@ -58,10 +58,11 @@ public sealed class PoiLayer
     // neighbour was dropped would make the map lie about which line goes where.
     private readonly Dictionary<ulong, int> _slots = [];
 
-    // The Active and Inactive cells each boss arena resolved to, and the area they were
-    // resolved for. See BossArt.
-    private readonly Dictionary<ulong, (int Active, int Inactive)> _art = [];
+    // The Active and Inactive cells each boss arena resolved to and what its boss is called,
+    // with the area and the table revision they were resolved against. See BossArt.
+    private readonly Dictionary<ulong, Mark> _art = [];
     private uint _artArea;
+    private int _artRevision = -1;
 
     /// <summary>Which kinds are marked. Everything that is a destination rather than a thing.</summary>
     /// <remarks>
@@ -239,6 +240,24 @@ public sealed class PoiLayer
         ulong Id, string Name, PoiKind Kind, float WorldX, float WorldY, float Height, string Icon,
         bool Spent = false, bool Remembered = false, int Art = 0);
 
+    /// <summary>
+    /// What one boss arena resolved to: its two cells, and what the game calls its boss.
+    /// </summary>
+    /// <param name="Active">The cell while the boss lives, counted from ONE, or 0 for none.</param>
+    /// <param name="Inactive">The cell once it is down, or 0 - then the Active one is kept.</param>
+    /// <param name="Name">The boss's own name, where the curated file carries one, or empty.</param>
+    private readonly record struct Mark(int Active, int Inactive, string Name)
+    {
+        /// <summary>
+        /// Nothing known - what a landmark that is not an arena gets.
+        /// </summary>
+        /// <remarks>
+        /// Spelled out rather than default(Mark), because a record struct's default leaves its
+        /// string NULL: the one caller reads Name.Length on every landmark of every frame.
+        /// </remarks>
+        public static Mark None { get; } = new(0, 0, string.Empty);
+    }
+
     /// <summary>Everything markable in the area, from both sources.</summary>
     private List<Place> PlacesIn(WorldSnapshot snapshot)
     {
@@ -261,9 +280,14 @@ public sealed class PoiLayer
             // player walks, so the landmark list grows during a map, but a cell worked out for
             // a landmark cannot change while the area does not. Cleared here and filled per
             // landmark below, which follows that growth without rebuilding anything.
-            if (snapshot.AreaHash != _artArea)
+            //
+            // OR WHILE THE TABLE DOES NOT, which is the other half of it now that the table can
+            // be written from inside the tool: an entry filled in while standing in the arena
+            // it is about has to reach the marker in front of the person writing it.
+            if (snapshot.AreaHash != _artArea || BossIcons.Revision != _artRevision)
             {
                 _artArea = snapshot.AreaHash;
+                _artRevision = BossIcons.Revision;
                 _art.Clear();
             }
 
@@ -276,12 +300,14 @@ public sealed class PoiLayer
 
                 // No icon: a landmark is found in the shape of the ground, long before the
                 // game has anything there to mark. Its kind picks the shape - except for a
-                // boss arena, which the sheet may have the game's own picture of.
+                // boss arena, which the sheet may have the game's own picture of, and which
+                // may be able to say WHOSE arena it is rather than "Boss Arena".
+                Mark mark = BossMark(landmark, snapshot.Area.Id);
                 places.Add(new Place(
-                    landmark.Id, landmark.Name, landmark.Kind,
+                    landmark.Id, mark.Name.Length > 0 ? mark.Name : landmark.Name, landmark.Kind,
                     landmark.GridX * MapView.WorldToGrid, landmark.GridY * MapView.WorldToGrid,
                     terrain.HeightAt(landmark.GridX, landmark.GridY), string.Empty,
-                    Art: BossArt(landmark, snapshot.Area.Id)));
+                    Art: BossArt(mark, landmark)));
             }
 
             // The pinned rooms, on the same terms. No icon and no kind of their own beyond
@@ -513,21 +539,42 @@ public sealed class PoiLayer
     /// sheet's name table and the answer cannot change while the area does not. The cache is
     /// emptied when the area hash moves; see where it is filled in <see cref="PlacesIn"/>.
     /// </remarks>
-    private int BossArt(TerrainLandmark landmark, string areaId)
+    private int BossArt(Mark mark, TerrainLandmark landmark)
     {
-        if (!ShowBossArt || landmark.Kind != PoiKind.BossArena)
+        if (!ShowBossArt)
         {
             return 0;
         }
 
-        if (!_art.TryGetValue(landmark.Id, out (int Active, int Inactive) art))
+        bool cleared = Arenas?.IsCleared(landmark.Id) == true;
+        return cleared && mark.Inactive > 0 ? mark.Inactive : mark.Active;
+    }
+
+    /// <summary>
+    /// What is known about one boss arena: its two pictures and the name of what stands in it.
+    /// </summary>
+    /// <remarks>
+    /// RESOLVED EVEN WHEN THE PICTURES ARE SWITCHED OFF, because the name is not art. The
+    /// switch on the tab is about what shape the marker wears; "Saphira, The Dread Consort"
+    /// instead of "Plantaton Boss" is the same claim the label always made, made accurately,
+    /// and turning the pictures off to see the shapes is no reason to go back to calling the
+    /// arena after the tile it is built from. It also keeps the collecting running, which is
+    /// what fills the list of arenas still to name.
+    /// </remarks>
+    private Mark BossMark(TerrainLandmark landmark, string areaId)
+    {
+        if (landmark.Kind != PoiKind.BossArena)
         {
-            art = Resolve(areaId, landmark);
-            _art[landmark.Id] = art;
+            return Mark.None;
         }
 
-        bool cleared = Arenas?.IsCleared(landmark.Id) == true;
-        return cleared && art.Inactive > 0 ? art.Inactive : art.Active;
+        if (!_art.TryGetValue(landmark.Id, out Mark mark))
+        {
+            mark = Resolve(areaId, landmark);
+            _art[landmark.Id] = mark;
+        }
+
+        return mark;
     }
 
     /// <summary>
@@ -540,22 +587,38 @@ public sealed class PoiLayer
     /// dropped. An arena no candidate matched is written down rather than forgotten, so the
     /// curated file can be filled from what was played - see <see cref="BossIcons.NoteMissing"/>.
     /// </remarks>
-    private (int Active, int Inactive) Resolve(string areaId, TerrainLandmark landmark)
+    private Mark Resolve(string areaId, TerrainLandmark landmark)
     {
+        // THE NAME OUTLIVES THE PICTURE, which is why both are walked for rather than one. An
+        // entry written from the model pane names its boss the moment it is saved, while the
+        // picture it points at only starts resolving once that art has been laid into the
+        // sheet - so a marker that says "Saphira, The Dread Consort" over the ordinary arena
+        // shape is the correct middle state, and stopping at the first picture would lose the
+        // name of every boss whose cell has not been pasted in yet.
+        string called = string.Empty;
         foreach (string family in BossIcons.Candidates(areaId, landmark.Path))
         {
+            if (called.Length == 0)
+            {
+                called = BossIcons.NameOf(family);
+            }
+
             int active = IconNames.CellFor(BossIcons.Named(family, cleared: false));
             int inactive = IconNames.CellFor(BossIcons.Named(family, cleared: true));
             int plain = active > 0 || inactive > 0 ? 0 : IconNames.CellFor(family);
 
             if (active > 0 || inactive > 0 || plain > 0)
             {
-                return (active > 0 ? active : Math.Max(inactive, plain), inactive);
+                return new Mark(active > 0 ? active : Math.Max(inactive, plain), inactive, called);
             }
         }
 
-        BossIcons.NoteMissing(areaId, landmark.Path, landmark.Name);
-        return (0, 0);
+        if (called.Length == 0)
+        {
+            BossIcons.NoteMissing(areaId, landmark.Path, landmark.Name);
+        }
+
+        return new Mark(0, 0, called);
     }
 
     /// <summary>

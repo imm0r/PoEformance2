@@ -2939,6 +2939,11 @@ internal static class Program
         // BossIcons, which also collects the ones nothing could name.
         overlay.BossIcons = PoEformance.Features.BossIcons.Load(FindDataFile("boss-icons.json"));
 
+        // And the set of maps those entries are still missing for. The same table the atlas
+        // uses - loaded once, above - because "which maps have no boss picture yet" is a set
+        // difference against EndgameMaps.dat's own 173 rows rather than a guess. See BossIconPlan.
+        overlay.EndgameMaps = mapNames;
+
         // And what the game says each of a monster's modifier stats DOES, taken from the atlas's
         // copy rather than loaded a second time. It owns the upgrade: the shipped export until the
         // background walk reads the install's own .csd files, and the game's own afterwards. Asked
