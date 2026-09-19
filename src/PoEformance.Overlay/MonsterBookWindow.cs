@@ -601,10 +601,17 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             ImGui.SetTooltip(Grammar);
         }
 
-        // A GAP BETWEEN THE BOX AND THE ROW, asked for from the live client. The two are different
-        // kinds of thing - one is typed into, the others are pressed - and at the ordinary item
-        // spacing they read as one block of controls.
-        ImGui.Spacing();
+        // HALF A BUTTON'S HEIGHT BETWEEN THE BOX AND THE ROW, asked for from the live client. The
+        // two are different kinds of thing - one is typed into, the others are pressed - and at
+        // the ordinary item spacing they read as one block of controls.
+        //
+        // SET AS A POSITION RATHER THAN A SPACER, because a spacer gets the ordinary spacing on
+        // BOTH sides of it and the number asked for is then not the number that appears: measured
+        // headlessly at this font, Spacing() gives 8, a dummy of the right height gives 9, and
+        // this gives the 9.5 that half a frame actually is.
+        ImGui.SetCursorPosY(
+            ImGui.GetCursorPosY()
+            + MathF.Max(0f, (ImGui.GetFrameHeight() * 0.5f) - ImGui.GetStyle().ItemSpacing.Y));
         Controls(all, edges);
         Caret(box, below);
     }
@@ -680,13 +687,24 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
 
         Chooser();
 
+        // THE COUNT YIELDS TO THE BUTTON WHERE BOTH WANT THE SAME EDGE, and folding the model pane
+        // away is exactly that: the detail pane then takes the rest, so the box's right edge and
+        // the window's become one, and the count sat where the button goes. Put keeps items from
+        // overlapping, so it pushed the button PAST THE CLIP RECTANGLE - measured headlessly at
+        // 1998 to 2041 against a clip edge of 1990 - and the button was simply gone. That one is
+        // worse than it sounds: it is the only way to bring the pane back, so losing it strands
+        // whoever folded it. The button keeps the edge because it is a control and the count is
+        // a reading; the count backs off by the button's width and no more.
+        float model = Wide("Model", style);
+        float counted = MathF.Min(edges.Detail, edges.Room - model - style.ItemSpacing.X);
+
         ImGui.SameLine();
-        Put(start + edges.Detail - ImGui.CalcTextSize(count).X);
+        Put(start + counted - ImGui.CalcTextSize(count).X);
         ImGui.AlignTextToFramePadding();
         ImGui.TextDisabled(count);
 
         ImGui.SameLine();
-        Put(start + edges.Room - Wide("Model", style));
+        Put(start + edges.Room - model);
         if (ImGui.Button("Model"))
         {
             _modelOpen = !_modelOpen;
