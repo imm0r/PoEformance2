@@ -408,6 +408,14 @@ false`. What cost time to rediscover here is written down:
   to the weights, so weights proportional to the saved widths reproduce the saved proportions.
   Both the grid and the splitters report when a drag **ends**, never while it runs: the settings
   file is rewritten whole, and a boundary being dragged moves sixty times a second.
+- **A button over a picture wants no frame, and `ImageButton` gives it one anyway.**
+  `ImageButtonEx` always calls `RenderFrame`, so the warm box and its one-pixel border are not
+  optional arguments — the only way to be rid of them is to hand `RenderFrame` nothing to draw:
+  `ImGuiCol_Button` pushed transparent and `FrameBorderSize` pushed to zero. Hover and press are
+  untouched (`ImGuiCol_ButtonHovered` / `ButtonActive`), so the control still answers the pointer
+  and only rests invisible. Its **running** state is a `tint_col` rather than a `bg_col`, which is
+  forced by the art: an opaque tile leaves a background showing at four rounded corners, while a
+  tint multiplies and recolours the drawing itself.
 - **A widget over the picture gets the pointer only if it is submitted after the picture, and
   only with the picture marked `SetNextItemAllowOverlap`.** `ItemHoverable` hands the hover to
   the first item that claims it, so a button drawn before the picture and inside its rectangle
