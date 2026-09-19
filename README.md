@@ -116,6 +116,25 @@ way out of it, and the art starts at the third — and the preview window puts o
 outwards so the model keeps its detail or painted inwards the way the art was drawn, at a width
 in cell pixels.
 
+**The window that shows the picture also asks what it is of**, because that is the only moment
+anybody has all three answers: the map, the arena tile and the boss's name. Three fields under the
+previews, prefilled from where the player is standing, from the arenas collected in that area and
+from the monster table's own name — and the write button then puts the entry in
+`data/boss-icons.json` beside the four PNGs, in one click. One boss is often the boss of two maps,
+so the area field takes a list. The name becomes the arena marker's label, in place of the one
+derived from the tile file, and it takes effect the moment it is written rather than when the art
+finally lands in the sheet.
+
+**And the work that is left is a list rather than a discovery.** The set of endgame maps is known
+exactly — `EndgameMaps.dat` is the table an atlas node points at, 173 rows — so the tool subtracts
+what has a picture from what exists and shows the rest on the Markers → Map & Places tab, with the
+arena tile it has already seen in each. Measured against the two shipped files: **not one** of those
+173 maps resolves a boss picture from its name. The sheet's 27 boss families are named for campaign
+arenas and act bosses, and the game simply draws no minimap icon for its map bosses — which is what
+the export above is for. A row with no boss to draw at all, a hideout or a Precursor tower, is
+ticked off by hand into the file's `skip` list, because a rule that hid them by their tags would
+hide exactly the maps a new league adds.
+
 **And the brightness is matched, because a model is lit for a dungeon and an icon is painted for
 a map.** The interior of the game's boss icons has a median luminance of 55; the first model
 exported here measured 24, which on the minimap reads as a shadow of the icons beside it. So the

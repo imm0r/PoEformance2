@@ -157,6 +157,28 @@ public sealed class MonsterPortrait
         "writes this pose as icon art: colour and greyed,\n"
         + "cut out on transparency, at 64 px and at 1024.";
 
+    /// <summary>What the three fields under the previews are for.</summary>
+    /// <remarks>
+    /// The point of the whole row, in four lines: a picture on disk points at nothing, and
+    /// these are the three facts that make it a marker. See <see cref="BossIcons.Remember"/>.
+    /// </remarks>
+    private const string EntrySaid =
+        "what this picture is OF, written to data/boss-icons.json\n"
+        + "by the same click that writes the files.\n"
+        + "area: the map id, several separated by commas -\n"
+        + "one boss is often the boss of two maps.\n"
+        + "tile: the arena's own path, where it is known.\n"
+        + "name: what the game calls it. it becomes the marker's label.";
+
+    /// <summary>Longest each of the three fields may be. A path is the long one.</summary>
+    private const uint AreasLength = 512;
+
+    /// <inheritdoc cref="AreasLength"/>
+    private const uint TileLength = 256;
+
+    /// <inheritdoc cref="AreasLength"/>
+    private const uint NameLength = 128;
+
     /// <summary>The side the export is drawn at, before the small pair is made from it.</summary>
     /// <remarks>
     /// FIXED, AND NOT THE PANE'S SIZE, so that what comes out does not depend on how big the
@@ -360,6 +382,29 @@ public sealed class MonsterPortrait
     /// </remarks>
     private volatile string _exported = string.Empty;
 
+    /// <summary>
+    /// The three facts the picture needs to become a marker, and which export they were filled for.
+    /// </summary>
+    /// <remarks>
+    /// PREFILLED ONCE PER EXPORT AND THEN LEFT ALONE, which is the whole of the rule. Everything
+    /// here can be worked out except the part that cannot: the area is the one the player is
+    /// standing in, the tile is an arena seen in that area, the name is the monster table's own
+    /// - and every one of those is a good guess that is sometimes wrong, so it is put in the
+    /// field rather than used. Re-prefilling per frame would type over somebody's correction;
+    /// prefilling only when the field is empty would leave the last boss's area behind on the
+    /// next one. The stem says which export they belong to, and it is the only trigger.
+    /// </remarks>
+    private string _entryAreas = string.Empty;
+    private string _entryTile = string.Empty;
+    private string _entryName = string.Empty;
+    private string _entryFor = string.Empty;
+
+    /// <summary>What the last write to the curated file said, or empty when none happened.</summary>
+    private string _remembered = string.Empty;
+
+    /// <summary>The monster's own name, as the table has it. The name field's prefill.</summary>
+    private string _called = string.Empty;
+
     private SkeletonPose? _pose;
     private AnimationTracks? _tracks;
     private Task<AnimationTracks?>? _loadingTracks;
@@ -476,6 +521,32 @@ public sealed class MonsterPortrait
     /// from one that does neither once the tool is restarted.
     /// </remarks>
     public Action? Changed { get; set; }
+
+    /// <summary>
+    /// The curated table an exported picture is written into, or null while nothing is loaded.
+    /// </summary>
+    /// <remarks>
+    /// THE HALF OF AN EXPORT THAT IS NOT A PICTURE. Four PNGs in a folder are not a feature -
+    /// something has to know that they belong to the arena in Grimhaven and to the one in
+    /// Epitaph, and that what stands in both is called Saphira. Those three facts are only ever
+    /// all in one person's head while they are looking at the model, so they are asked for here
+    /// and written in the same click. See <see cref="BossIcons.Remember"/>.
+    /// </remarks>
+    public BossIcons? Icons { get; set; }
+
+    /// <summary>The area the player is in, for the area field's prefill. Empty when unknown.</summary>
+    public Func<string>? AreaNow { get; set; }
+
+    /// <summary>
+    /// The arena tiles known for an area, for the tile field's prefill.
+    /// </summary>
+    /// <remarks>
+    /// A FUNCTION RATHER THAN A LIST, because the two sources it draws on answer at different
+    /// times: the area on screen has its arenas in the terrain this frame, while a map played an
+    /// hour ago has only what was written to logs/boss-arenas.tsv. Which of the two applies
+    /// depends on what somebody typed in the area field, so it is asked rather than handed over.
+    /// </remarks>
+    public Func<string, IReadOnlyList<string>>? ArenasIn { get; set; }
 
     /// <summary>
     /// Whether the model is drawn greyed, the way the game's own Inactive map icons are.
@@ -1065,11 +1136,128 @@ public sealed class MonsterPortrait
 
             ImGui.Separator();
             Rim();
+
+            ImGui.Separator();
+            Entry();
             ImGuiText.Wrapped(OverlayInk.Quiet, _exported);
+            if (_remembered.Length > 0)
+            {
+                ImGuiText.Wrapped(OverlayInk.Quiet, _remembered);
+            }
         }
 
         ImGui.End();
         _shotsOpen = open;
+    }
+
+    /// <summary>
+    /// The three fields that turn a picture into a marker, and the button that writes both.
+    /// </summary>
+    /// <remarks>
+    /// IN THE PREVIEW WINDOW, WITH THE PICTURE, because this is where the answers are. Somebody
+    /// posing a boss has its area on screen, its name in the book beside them and its arena
+    /// under their feet; an hour later, looking at a folder of PNGs, they have none of the
+    /// three. The window that shows what was made is therefore also the window that asks what
+    /// it is of, and one click settles both.
+    ///
+    /// EVERY FIELD IS OPTIONAL, and the button still writes the pictures when they are all
+    /// empty - which is what it did before this row existed. An export of a monster nobody has
+    /// worked out the arena for yet is still worth having on disk.
+    ///
+    /// THE FAMILY IS NOT A FIELD. It is the export's own stem, which is what the files are
+    /// named after, so the entry and the pictures cannot be written under different names -
+    /// the one mistake in this that would be invisible until a marker failed to appear.
+    /// </remarks>
+    private void Entry()
+    {
+        Fill();
+
+        float wide = (IconSheet.Tile * Closer * 2f) + ImGui.GetStyle().ItemSpacing.X;
+        float label = ImGui.CalcTextSize("area").X + (ImGui.GetStyle().ItemSpacing.X * 2f);
+
+        Field("area", "##monster-entry-areas", "map ids, comma separated", ref _entryAreas, AreasLength, wide - label);
+        Field("tile", "##monster-entry-tile", "the arena tile's path", ref _entryTile, TileLength, wide - label);
+        Field("name", "##monster-entry-name", "what the game calls it", ref _entryName, NameLength, wide - label);
+
+        if (ImGui.Button("write##monster-write"))
+        {
+            Write();
+            Remember();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(EntrySaid);
+        }
+
+        ImGui.SameLine();
+        ImGui.AlignTextToFramePadding();
+        ImGuiText.Wrapped(
+            OverlayInk.Quiet,
+            _shotWritten ? $"as {_shotStem}Active / {_shotStem}Inactive" : "not written yet");
+    }
+
+    /// <summary>One labelled field, laid out so the three line up.</summary>
+    private static void Field(string caption, string id, string hint, ref string value, uint most, float wide)
+    {
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled(caption);
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(MathF.Max(wide, 120f));
+        ImGui.InputTextWithHint(id, hint, ref value, most);
+    }
+
+    /// <summary>
+    /// Fills the three fields, once per export, with what can be worked out.
+    /// </summary>
+    /// <remarks>
+    /// AS MUCH AS POSSIBLE, by request, and every one of them is a guess somebody may have to
+    /// correct: the boss of the area the player is standing in is usually the boss they are
+    /// posing, and sometimes they are posing next season's. So the guesses go in the fields,
+    /// where they can be read and changed, and not into the file.
+    /// </remarks>
+    private void Fill()
+    {
+        if (string.Equals(_entryFor, _shotStem, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _entryFor = _shotStem;
+        _entryName = _called;
+        _entryAreas = AreaNow?.Invoke() ?? string.Empty;
+        _entryTile = string.Empty;
+        _remembered = string.Empty;
+
+        if (_entryAreas.Length > 0 && ArenasIn?.Invoke(_entryAreas) is { Count: > 0 } arenas)
+        {
+            // The first, because an area with two arenas in it is rare and the field is right
+            // there: a wrong tile that is visible beats a right one that had to be looked up.
+            _entryTile = arenas[0];
+        }
+    }
+
+    /// <summary>Writes the entry beside the pictures, and says what happened.</summary>
+    /// <remarks>
+    /// AFTER THE FILES AND NOT INSTEAD OF THEM: the pictures are written whatever the fields
+    /// say, so a full field is never the thing standing between somebody and their export.
+    /// </remarks>
+    private void Remember()
+    {
+        if (Icons is not { } icons)
+        {
+            return;
+        }
+
+        string[] areas = _entryAreas.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (areas.Length == 0 && _entryTile.Trim().Length == 0)
+        {
+            _remembered = string.Empty;
+            return;
+        }
+
+        _ = icons.Remember(areas, _entryTile, _shotStem, _entryName, out string said);
+        _remembered = said;
     }
 
     /// <summary>
@@ -1088,8 +1276,8 @@ public sealed class MonsterPortrait
     /// their drag.
     ///
     /// AND THE FILES DO NOT FOLLOW ON THEIR OWN. Writing four PNGs on every change would
-    /// hammer the disk while somebody is deciding; instead the line underneath says when what
-    /// is on screen is newer than what was written, and the button settles it.
+    /// hammer the disk while somebody is deciding; instead the row below says whether what is
+    /// on screen has been written, and its button settles it. See <see cref="Entry"/>.
     /// </remarks>
     private void Rim()
     {
@@ -1127,18 +1315,7 @@ public sealed class MonsterPortrait
             Changed?.Invoke();
         }
 
-        ImGui.SameLine();
-        if (ImGui.Button("write##monster-rewrite"))
-        {
-            Write();
-        }
-
         Lift(wide);
-
-        if (!_shotWritten)
-        {
-            ImGuiText.Wrapped(OverlayInk.Quiet, "what is shown is newer than what was written.");
-        }
     }
 
     /// <summary>
@@ -1425,6 +1602,10 @@ public sealed class MonsterPortrait
         _wanted = path;
         _model = MonsterModel.None;
         Why = string.Empty;
+
+        // Kept rather than asked for again at export time: the row is right here now, and the
+        // export happens from a window that no longer has the table. See Fill.
+        _called = one?.Name ?? string.Empty;
 
         // The last monster's exported cells go with it. Left up they would sit under a
         // different model saying "this is what you made", which is the kind of wrong that gets
@@ -2133,6 +2314,15 @@ public sealed class MonsterPortrait
         _shotStem = string.Empty;
         _shotsOpen = false;
         _shotWritten = false;
+
+        // The three fields go with the monster they were filled in for. Left standing they
+        // would offer the last boss's area over the next one's picture, which is the one way
+        // this could write a confident, wrong entry.
+        _entryFor = string.Empty;
+        _entryAreas = string.Empty;
+        _entryTile = string.Empty;
+        _entryName = string.Empty;
+        _remembered = string.Empty;
         _shotSource = [];
         _shotColourFull = [];
         _shotGreyFull = [];

@@ -40,6 +40,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     /// <summary>Which boss arenas have been cleared, so their markers can say so. See the type.</summary>
     private readonly BossArenas _arenas = new();
+
+    /// <summary>The endgame maps whose boss still has no picture. See BossIconRows.</summary>
+    private readonly BossIconRows _bossPlan;
     private ClientRect _tracked;
     private readonly TerrainLayer _terrain;
     private readonly IconCache _icons;
@@ -712,6 +715,70 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             pane.LightTarget = _modelWants.ModelLightTarget;
         }
     }
+
+    /// <summary>
+    /// Gives the model pane what it needs to write an entry beside the pictures it exports.
+    /// </summary>
+    /// <remarks>
+    /// THREE THINGS, AND NONE OF THEM IS THE PICTURE. The table to write into, where the player
+    /// is, and which arenas are known in a given area: the export asks for an area, a tile and
+    /// a name, and all three of those are things this class already has to hand while the
+    /// person answering is looking at a model. See <see cref="MonsterPortrait.Icons"/>.
+    ///
+    /// CALLED FROM BOTH SIDES, because the order of the Attach calls is not fixed and the table
+    /// is loaded by whoever wires this up: the book takes what is here when it attaches, and a
+    /// table that lands afterwards is pushed into the book by its own setter.
+    /// </remarks>
+    private void Hand(MonsterPortrait? pane)
+    {
+        if (pane is null)
+        {
+            return;
+        }
+
+        pane.Icons = _bossIcons;
+
+        // The map picked in the to-do list wins over the one being stood in: somebody working
+        // through that list has the game in a hideout as often as in the map they are filling
+        // in, and the list is the more deliberate of the two statements.
+        pane.AreaNow = () => _bossPlan.Picked.Length > 0 ? _bossPlan.Picked : _snapshot.Area.Id;
+        pane.ArenasIn = ArenaTiles;
+    }
+
+    /// <summary>
+    /// The arena tiles known for an area: the ones under the player's feet, then the collected ones.
+    /// </summary>
+    /// <remarks>
+    /// BOTH SOURCES, because they answer for different areas. The terrain has the arenas of the
+    /// area that is loaded, exactly and now; logs/boss-arenas.tsv has the ones that were seen in
+    /// any area this tool has been in, which is the only source for the map somebody played an
+    /// hour ago and is filling in from the hideout. The live one comes first where they overlap.
+    /// </remarks>
+    private IReadOnlyList<string> ArenaTiles(string areaId)
+    {
+        var tiles = new List<string>();
+        if (string.Equals(areaId, _snapshot.Area.Id, StringComparison.OrdinalIgnoreCase)
+            && _snapshot.Terrain is TerrainGrid grid)
+        {
+            foreach (TerrainLandmark landmark in grid.Landmarks)
+            {
+                if (landmark.Kind == PoiKind.BossArena && !tiles.Contains(landmark.Path, StringComparer.OrdinalIgnoreCase))
+                {
+                    tiles.Add(landmark.Path);
+                }
+            }
+        }
+
+        foreach (string tile in _bossIcons.Unnamed(areaId))
+        {
+            if (!tiles.Contains(tile, StringComparer.OrdinalIgnoreCase))
+            {
+                tiles.Add(tile);
+            }
+        }
+
+        return tiles;
+    }
     private readonly RuleLayer _rules = new();
 
     /// <summary>What the rule engine decided to show this tick, or null when it is not wired.</summary>
@@ -838,10 +905,23 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 _poi.BossIcons = value;
             }
+
+            Hand(_monsterBook?.Model);
         }
     }
 
     private BossIcons _bossIcons = BossIcons.Empty;
+
+    /// <summary>
+    /// The endgame maps, for the list of which of them still need a boss picture made.
+    /// </summary>
+    /// <remarks>
+    /// The FILE's list rather than the game's, and on purpose: this is read while deciding what
+    /// to play next, which is exactly when the game is not attached. The two agree - the shipped
+    /// table is EndgameMaps.dat's own 173 rows, see AtlasMapNames - and the file's copy is the
+    /// one that is there at start-up.
+    /// </remarks>
+    public AtlasMapNames EndgameMaps { get; set; } = AtlasMapNames.Empty;
 
     /// <summary>
     /// Where the game's own sentence for a stat comes from, asked per frame.
@@ -1248,6 +1328,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ImGuiText.Mono(OverlayInk.Quiet, BossIcons.LogPath);
         }
 
+        // THE LIST OF WHAT IS LEFT, which the line above cannot be: that one grows out of what
+        // has been played, and this one starts from the game's own set of endgame maps, so it
+        // says what is missing before anybody has been there. Folded away, because it is 173
+        // rows and this is a tab about markers.
+        if (EndgameMaps.Count > 0 && ImGui.CollapsingHeader("boss pictures still to make"))
+        {
+            _bossPlan.Draw();
+        }
+
         ImGui.Separator();
     }
 
@@ -1381,6 +1470,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // it needs, which is what keeps its projection maths testable away from a GPU.
         _terrain = new TerrainLayer(Upload, key => RemoveImage(key));
         _icons = new IconCache(Upload, key => RemoveImage(key));
+
+        // Both tables are set by whoever wires this up, in no fixed order against this
+        // constructor, so the list reads them per draw rather than taking a copy of Empty.
+        _bossPlan = new BossIconRows(() => _bossIcons, () => EndgameMaps);
 
         // The entry card takes its plates from the same cache the markers use, so a picture
         // that cannot be loaded is reported in one place and given up on once.
@@ -2217,8 +2310,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         window.Show(columns, rail, model, columnWidths, panes);
 
-        // What the settings file said about the pane, which was read before this existed.
+        // What the settings file said about the pane, which was read before this existed - and
+        // what an export needs to write its entry beside the pictures.
         Capture(window.Model);
+        Hand(window.Model);
         _monsterBook = window;
 
         _tools.Add(

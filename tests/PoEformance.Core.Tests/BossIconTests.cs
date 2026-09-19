@@ -254,6 +254,153 @@ public class BossIconTests
     }
 
     /// <summary>
+    /// What the export writes: the entry, beside the pictures, in one click.
+    /// </summary>
+    /// <remarks>
+    /// THE ROUND TRIP IS THE TEST. Writing is only useful if the next start-up reads back what
+    /// was written, and this file is loaded by a source-generated deserialiser under AOT - so
+    /// an entry that serialises to a shape the reader ignores would look like a write that
+    /// silently did nothing. Every case here writes, loads the file again, and asks the new
+    /// table rather than the one that did the writing.
+    /// </remarks>
+    [Fact]
+    public void AnEntryWrittenFromThePaneIsThereOnTheNextRun()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"boss-icons-{Guid.NewGuid():N}.json");
+        File.WriteAllText(
+            path,
+            """{ "comment": ["the block that documents the format"], "areas": {}, "tiles": {} }""");
+
+        try
+        {
+            BossIcons icons = BossIcons.Load(path);
+            Assert.True(icons.Remember(
+                ["MapGrimhaven", "MapEpitaph"],
+                "Metadata/Terrain/Maps/Grimhaven/Feature/BossArena_01.tdt",
+                "WifeMonsterMap",
+                "Saphira, The Dread Consort",
+                out string said));
+            Assert.Contains("boss-icons", said, StringComparison.OrdinalIgnoreCase);
+
+            BossIcons again = BossIcons.Load(path);
+
+            // One boss, two maps, one family - the case that made the name a key of its own.
+            Assert.Equal("WifeMonsterMap", again.FamilyFor("MapGrimhaven"));
+            Assert.Equal("WifeMonsterMap", again.FamilyFor("MapEpitaph"));
+            Assert.Equal("Saphira, The Dread Consort", again.NameOf("WifeMonsterMap"));
+
+            // The tile is the more precise key and is offered first, extension or not.
+            Assert.Equal(
+                "WifeMonsterMap",
+                again.Candidates("MapSomewhereElse", "Metadata/Terrain/Maps/Grimhaven/Feature/BossArena_01.tdt")[0]);
+
+            // And the file still explains itself, which it will not if the comment is dropped
+            // the first time somebody follows the instructions in it.
+            Assert.Contains("documents the format", File.ReadAllText(path), StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void AnEntryNeedsSomewhereToWriteAndSomethingToWrite()
+    {
+        // No file was ever loaded, so there is nowhere to put it. Refused rather than written
+        // to a path this invented, which is how somebody's afternoon of entries goes missing.
+        Assert.False(BossIcons.Empty.Remember(["MapBluff"], string.Empty, "SomeBoss", string.Empty, out string nowhere));
+        Assert.Contains("boss-icons.json", nowhere, StringComparison.Ordinal);
+
+        string path = Path.Combine(Path.GetTempPath(), $"boss-icons-{Guid.NewGuid():N}.json");
+        File.WriteAllText(path, """{ "areas": {}, "tiles": {} }""");
+        try
+        {
+            BossIcons icons = BossIcons.Load(path);
+
+            // Nothing to key it by, and no picture name to file it under.
+            Assert.False(icons.Remember([], string.Empty, "SomeBoss", "A Boss", out _));
+            Assert.False(icons.Remember(["MapBluff"], string.Empty, "  ", "A Boss", out _));
+            Assert.Equal(0, icons.Count);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void TickingAMapOffIsRememberedAndUndoingItPutsItBack()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"boss-icons-{Guid.NewGuid():N}.json");
+        File.WriteAllText(path, """{ "areas": {}, "tiles": {} }""");
+        try
+        {
+            BossIcons icons = BossIcons.Load(path);
+            Assert.True(icons.Skip("MapPrecursorTowerDesert", skip: true, out _));
+            Assert.True(BossIcons.Load(path).Skipped("MapPrecursorTowerDesert"));
+
+            Assert.True(icons.Skip("MapPrecursorTowerDesert", skip: false, out _));
+            Assert.False(BossIcons.Load(path).Skipped("MapPrecursorTowerDesert"));
+
+            // And writing an entry for a map that was ticked off takes the tick back: the
+            // entry is the answer to the question the tick was silencing.
+            Assert.True(icons.Skip("MapBluff", skip: true, out _));
+            Assert.True(icons.Remember(["MapBluff"], string.Empty, "BluffBoss", "Someone", out _));
+            Assert.False(BossIcons.Load(path).Skipped("MapBluff"));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void AWrittenEntryMovesTheRevision()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"boss-icons-{Guid.NewGuid():N}.json");
+        File.WriteAllText(path, """{ "areas": {}, "tiles": {} }""");
+        try
+        {
+            BossIcons icons = BossIcons.Load(path);
+            int was = icons.Revision;
+
+            Assert.True(icons.Remember(["MapBluff"], string.Empty, "BluffBoss", "Someone", out _));
+
+            // What the marker in front of the person writing the entry watches, so that it
+            // stops saying "Boss Arena" without them leaving the arena first.
+            Assert.NotEqual(was, icons.Revision);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void TheCollectedArenasCanBeReadBackPerArea()
+    {
+        string log = Path.Combine(Path.GetTempPath(), $"arenas-{Guid.NewGuid():N}.tsv");
+        try
+        {
+            BossIcons icons = BossIcons.Load(
+                Path.Combine(Path.GetTempPath(), $"no-such-{Guid.NewGuid():N}.json"), log);
+
+            icons.NoteMissing("MapBluff", "Metadata/Terrain/Maps/Bluff/Arena_01.tdt", "Boss Arena");
+            icons.NoteMissing("MapMesa", "Metadata/Terrain/Maps/Mesa/Arena_02.tdt", "Boss Arena");
+
+            // What fills the tile field for a map somebody played an hour ago, from the
+            // hideout, with nothing of that area left in memory.
+            Assert.Equal(["Metadata/Terrain/Maps/Bluff/Arena_01.tdt"], icons.Unnamed("MapBluff"));
+            Assert.Empty(icons.Unnamed("MapAugury"));
+        }
+        finally
+        {
+            File.Delete(log);
+        }
+    }
+
+    /// <summary>
     /// An arena the sheet knows nothing about resolves to nothing rather than to something.
     /// </summary>
     /// <remarks>
