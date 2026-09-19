@@ -283,9 +283,11 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// The monster's model, filling its own pane.
     /// </summary>
     /// <remarks>
-    /// A SQUARE FITTED TO THE SMALLER SIDE, because the picture is square and a pane is not: fitting
-    /// it to the width alone would run a tall model off the bottom of a short pane, and there is no
-    /// scrolling to rescue it - the drag that turns the model would fight the one that scrolls.
+    /// HANDED BOTH SIDES OF THE PANE, and the portrait fits its square to the smaller of them less
+    /// its own row and lines: the picture is square and a pane is not, and fitting it to the width
+    /// alone would run a tall model off the bottom of a short pane, where there is no scrolling to
+    /// rescue it - the drag that turns the model would fight the one that scrolls. Only the
+    /// portrait knows how many lines it is about to write under the picture, so the fitting is its.
     /// </remarks>
     private void Portrait(MonsterVarieties all)
     {
@@ -305,7 +307,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         }
 
         Vector2 room = ImGui.GetContentRegionAvail();
-        model.Draw(one, _chosen, MathF.Min(room.X, room.Y));
+        model.Draw(one, _chosen, room.X, room.Y);
     }
 
     /// <summary>

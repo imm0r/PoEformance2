@@ -334,6 +334,26 @@ public class ModelFloorTests
         Assert.InRange(axes, least, most);
     }
 
+    /// <summary>A model standing in a pit gets a line saying so; a sole a few units under the floor does not.</summary>
+    /// <remarks>
+    /// THE COLOSSUS AND THE COBRA LORD, from --posedump: feet 1272 under the origin on a model
+    /// about 2300 tall, against nine under on one about 500 tall. The first is the game's doing
+    /// and worth a line; the second is every monster.
+    /// </remarks>
+    [Fact]
+    public void AModelStandingInAPitIsSaidSoAndASoleIsNot()
+    {
+        Assert.Equal("planted 1272 units above its lowest point", ModelFloor.Planted(1271.5f, 2308f));
+        Assert.Equal(string.Empty, ModelFloor.Planted(8.8f, 494f));
+        Assert.Equal(string.Empty, ModelFloor.Planted(0.98f, 190f));
+        Assert.Equal(string.Empty, ModelFloor.Planted(-14.97f, 146f));
+        Assert.Equal(string.Empty, ModelFloor.Planted(100f, 0f));
+
+        // The line starts exactly where a twentieth of the height is passed.
+        Assert.Equal(string.Empty, ModelFloor.Planted(10f, 200f));
+        Assert.NotEqual(string.Empty, ModelFloor.Planted(10.1f, 200f));
+    }
+
     /// <summary>The floor is behind the model from above and in front of it from below.</summary>
     /// <remarks>
     /// CHECKED AGAINST THE CAMERA'S OWN DEPTHS rather than asserted from the sign convention: a

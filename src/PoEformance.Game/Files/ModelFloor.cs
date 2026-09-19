@@ -145,6 +145,33 @@ public static class ModelFloor
     /// </remarks>
     public static float TileOn(int modelSize) => modelSize > 0 ? Tile * 100f / modelSize : Tile;
 
+    /// <summary>How far under the floor a model's lowest point may sit, as a share of its height, before that is worth a word.</summary>
+    /// <remarks>
+    /// A sole lies a few units under the plane on every monster measured - the blackguard's at
+    /// one, the Cobra Lord's at nine on a model three hundred tall. A twentieth of the height
+    /// clears those and catches the one this was written for.
+    /// </remarks>
+    public const float Sunk = 0.05f;
+
+    /// <summary>
+    /// What to say of a model whose lowest point sits well under the floor: nothing for nearly every
+    /// monster, and a line for the one that stands in a pit.
+    /// </summary>
+    /// <param name="lowest">The lowest point of the model as drawn, in its own units below the floor - positive is under it.</param>
+    /// <param name="height">The model's height, from its box.</param>
+    /// <remarks>
+    /// THE COLOSSUS FROM THE LIVE CLIENT, measured with --posedump: its root stays at the origin
+    /// through every frame of its idle while its feet hang 1272 units under it - five tiles - and
+    /// the same reader puts the Cobra Lord's feet nine units under, which is right. The game plants
+    /// a monster by its origin, so a titan fought from the edge of a chasm is modelled with the
+    /// chasm below that plane, and the floor drawn there is the floor the game uses. What the pane
+    /// owes the reader is to say so, in the status line and not over the picture.
+    /// </remarks>
+    public static string Planted(float lowest, float height)
+        => height > 0f && lowest > Sunk * height
+            ? $"planted {lowest:F0} units above its lowest point"
+            : string.Empty;
+
     /// <summary>Whether the floor lies behind the model, which it does whenever the eye is above it.</summary>
     /// <param name="camera">The camera the picture was drawn from, which is the one the floor is drawn from too.</param>
     /// <remarks>

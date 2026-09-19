@@ -36,5 +36,8 @@
     <!-- The names for its cells travel WITH it. Kept apart they can be separated, and a
          name table that does not match the sheet it names is worse than none. -->
     <EmbeddedResource Include="..\..\assets\icon-names.tsv" LogicalName="PoEformance.Overlay.assets.icon-names.tsv" />
+    <!-- The orbit button's art in the model pane, linked and pinned for the same reasons as
+         the sheet: MonsterPortrait.OrbitIcon matches on the END of the resource name. -->
+    <EmbeddedResource Include="..\..\assets\3dMV_orbit.png" LogicalName="PoEformance.Overlay.assets.3dMV_orbit.png" />
   </ItemGroup>
 </Project>

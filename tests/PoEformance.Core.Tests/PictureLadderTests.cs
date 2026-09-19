@@ -24,8 +24,8 @@ public class PictureLadderTests
     [InlineData(256)]
     [InlineData(384)]
     [InlineData(512)]
+    [InlineData(768)]
     [InlineData(PictureLadder.Usual)]
-    [InlineData(1024)]
     [InlineData(1536)]
     [InlineData(MeshPicture.Widest)]
     public void ACapOnARungIsTheCap(int most)

@@ -261,11 +261,21 @@ to become a texture before it can appear. That choice is also what makes the ren
 its output is an array a test can measure, where a D3D11 renderer could only be judged from a
 screenshot on a machine with the game.
 
-The portrait is **turned by dragging, zoomed on the wheel, and reset by double-clicking**, and it
-stands on a floor of the game's own tiles that turns with it — drawn by the overlay as lines, not
-into the picture; see the floor bullet below. `MonsterPortrait` holds the turn, tilt and zoom and redraws
-whenever one of them moves — which is per frame during a drag or an animation, and is what makes
-the numbers below matter. At rest it follows its pane up to what the renderer will draw;
+The portrait is **turned by dragging, zoomed on the wheel, and reset by double-clicking**, or
+carried round on its own by the **orbit button** at the picture's top right — a lap every thirty
+seconds (`MonsterPortrait.Orbit`) at the current distance, with dragging off until the button is
+pressed again, which is the one thing that stops it. It stands on a floor of the game's own tiles
+that turns with it — drawn by the overlay as lines, not into the picture; see the floor bullet
+below. Above the picture is one row: the animation combo, only as wide as its longest name and
+reopening at the one playing, the count of animations after it, and at the right the pane's **own
+frame rate** — pictures drawn a second, zero at rest (`RedrawRate`) — before Play/Pause. The
+animation's progress is a bar over the picture's top edge with the frame counter in it. Under the
+picture are short lines rather than a tooltip: what the click read, what the mouse does, what the
+floor's squares are, why a monster is in plain ink or holds still, and a notice when a model
+stands in a pit (the bullet below). There *was* a tooltip, and it came up exactly where the
+pointer is — over the model, while the camera was being placed. `MonsterPortrait` holds the turn,
+tilt and zoom and redraws whenever one of them moves — which is per frame during a drag, an orbit
+or an animation, and is what makes the numbers below matter. At rest it follows its pane up to what the renderer will draw;
 `monsterModelSize` (default 1024) caps what **moving** it may cost, and a moving picture is drawn
 at the pane's own rung up to that cap. It used to be drawn one rung *under* the cap as well, the
 four-times discount that kept a one-threaded drag smooth — and on a 1200 px pane that was a
@@ -285,7 +295,7 @@ approximation of it failed differently — the section headers' hit boxes stole 
 containing one measured as the whole pane, and the width the lists reported moved the picture
 whenever one was opened. A pane has no column to measure, and being a child window it settles the
 hit tests by construction: `ItemHoverable` begins with `if (g.HoveredWindow != window) return
-false`. Eight things here cost time to rediscover, so they are written down:
+false`. What cost time to rediscover here is written down:
 
 - **`extends` carries no extension.** The game writes `extends "Metadata/Parent"` while an
   attached object carries its `.ao` in full. The first survey asked for 3231 files and found
@@ -369,6 +379,21 @@ false`. Eight things here cost time to rediscover, so they are written down:
   settled by reading code. `MonsterModel.Paint` carries the reason, and the last of them is not a
   failure at all: a mesh with no texture coordinates has a perfectly good texture and no way to
   look it up, which is the expected state of a bare body whose clothes are attached objects.
+- **A widget over the picture gets the pointer only if it is submitted after the picture, and
+  only with the picture marked `SetNextItemAllowOverlap`.** `ItemHoverable` hands the hover to
+  the first item that claims it, so a button drawn before the picture and inside its rectangle
+  is dead, and one drawn after it without the flag is refused by the same `g.HoveredId != id`
+  guard the section headers meet. With the flag the later item wins, one frame late ("AllowOverlap
+  mode requires previous frame HoveredId to be null or to match"). The orbit button and the
+  progress bar are the two; the bar is not an item anybody can press, claims nothing, and a drag
+  can start on it.
+- **A monster whose feet hang five tiles under the floor is the game's doing, and the pane says
+  so.** `--posedump` on the Colossus puts its root at the origin through every frame of its idle
+  and its lowest bone 1272 units under it, against nine units for the Cobra Lord on the same
+  reader. The game plants a monster by its origin, and a titan fought from the edge of a chasm
+  is modelled with the chasm below that plane — so the floor drawn at the origin is the floor the
+  game uses, and `ModelFloor.Planted` turns the gap into one line under the picture. Past a
+  twentieth of the model's height, so an ordinary sole a few units under the plane says nothing.
 
 ### The skeleton, and whether a monster can move
 
@@ -452,7 +477,8 @@ tables, which is precisely what the earlier broken version did.
 
 `AnimationTracks` reads one animation's keyframes and samples them; `SkeletonPose` composes the
 bone tree and skins the mesh; `MonsterPortrait` plays the result in the model pane with a combo
-of the rig's animations (`idle_01` first, where the rig has one) and a Play/Pause button.
+of the rig's animations (`idle_01` first, where the rig has one, and reopening at whichever is
+playing), a Play/Pause button, and a progress bar over the picture that counts the frames.
 
 What the floats mean was **measured over 985 tracks of two real rigs**, because every convention
 here has a plausible wrong twin: the time is the *first* float of a key and counts in *frames*
@@ -472,7 +498,8 @@ carries any other bone list — poe_data_tools' smd parser reads shape names, a 
 the header, four bone bytes and four weights from a vertex, and no palette anywhere; a version 4
 `.sm` has no BoneGroups at all and skins regardless. That is an argument from there being nothing
 else rather than a measurement, so `MonsterModels` tests it against every real mesh somebody opens:
-a highest weighted bone at or past the rig's count refuses to animate and says why in the tooltip.
+a highest weighted bone at or past the rig's count refuses to animate and says why in a line
+under the picture.
 
 **The tests are arranged so that a wrong order fails them**, since a wrong order also produces
 matrices. Four mistakes were put back and each fails a test — child and parent swapped, the bind
