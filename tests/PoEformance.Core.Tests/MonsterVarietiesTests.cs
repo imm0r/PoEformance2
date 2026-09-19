@@ -737,4 +737,49 @@ public sealed class MonsterVarietiesTests
         Assert.Null(none.Find("Metadata/Monsters/Zombies/Farmer/FarmerZombieMedium"));
         Assert.Empty(none.Generated);
     }
+
+    /// <summary>
+    /// The day comes out of a stamp whichever of its two shapes it arrives in.
+    /// </summary>
+    /// <remarks>
+    /// BOTH SHAPES ARE REAL AND THEY ARE NOT THE SAME. The shipped export writes a bare ISO
+    /// timestamp, which the file in this repository confirms; a live read of the install writes a
+    /// sentence with the timestamp at the END of it - see MonsterTables. A reader that took the
+    /// first ten characters would be right about one of them and print "the instal" for the other.
+    /// </remarks>
+    [Theory]
+    [InlineData("2026-08-28T18:19:47Z", "28.08.2026")]
+    [InlineData("the install's own tables, read 2026-09-19T08:17:48Z", "19.09.2026")]
+    [InlineData("2026-01-02", "02.01.2026")]
+    public void TheTablesDayComesOutOfEitherKindOfStamp(string stamp, string day)
+        => Assert.Equal(day, MonsterVarieties.MadeOn(stamp));
+
+    /// <summary>A stamp with no date in it says nothing rather than something wrong.</summary>
+    /// <remarks>
+    /// The line it feeds simply leaves the words out, which is the honest answer: a table whose
+    /// stamp cannot be read is not a table from today.
+    /// </remarks>
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("unknown")]
+    [InlineData("read at 18:19:47")]
+    [InlineData("2026-13-40T00:00:00Z")]
+    public void AStampWithNoDayInItSaysNothing(string? stamp)
+        => Assert.Equal(string.Empty, MonsterVarieties.MadeOn(stamp));
+
+    /// <summary>What the shipped table itself carries, so this is not only checked against made-up strings.</summary>
+    [Fact]
+    public void TheShippedTableHasAReadableDay()
+    {
+        MonsterVarieties all = Shipped();
+        if (all.Generated.Length == 0)
+        {
+            // A build that ships no stamp is allowed; there is simply nothing to read.
+            return;
+        }
+
+        string day = MonsterVarieties.MadeOn(all.Generated);
+        Assert.Matches(@"^\d{2}\.\d{2}\.\d{4}$", day);
+    }
 }
