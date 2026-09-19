@@ -182,7 +182,9 @@ public class OverlaySettingsRoundTripTests
             ModelGreyFactor: 0.62f,
             ModelBackdrop: "Checker",
             ModelOutline: "Inward",
-            ModelOutlineWidth: 0f);
+            ModelOutlineWidth: 0f,
+            ModelLight: false,
+            ModelLightTarget: 72f);
 
         string path = TempPath();
         try
@@ -199,6 +201,8 @@ public class OverlaySettingsRoundTripTests
             // how somebody switches the rim off, and a file that read it back as "nothing was
             // said" would put the rim on again at every launch.
             Assert.Equal(0f, read.ModelOutlineWidth);
+            Assert.False(read.ModelLight);
+            Assert.Equal(72f, read.ModelLightTarget);
         }
         finally
         {
