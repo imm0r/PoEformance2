@@ -1292,7 +1292,7 @@ public sealed class MonsterPortrait
             _release?.Invoke(OrbitKey);
         }
 
-        DropShots();
+        ForgetShots();
         _texture = IntPtr.Zero;
         _key = string.Empty;
         _orbit = IntPtr.Zero;
@@ -1341,7 +1341,7 @@ public sealed class MonsterPortrait
         // The last monster's exported cells go with it. Left up they would sit under a
         // different model saying "this is what you made", which is the kind of wrong that gets
         // a file overwritten.
-        DropShots();
+        ForgetShots();
         _exported = string.Empty;
         Rest();
 
@@ -1982,7 +1982,17 @@ public sealed class MonsterPortrait
         _shotGrey = _upload(_shotGreyKey, shownGrey, false);
     }
 
-    /// <summary>Gives the preview pair back to the renderer.</summary>
+    /// <summary>
+    /// Gives the preview pair's TEXTURES back to the renderer, and nothing else.
+    /// </summary>
+    /// <remarks>
+    /// TEXTURES ONLY, and the boundary is load-bearing. This runs twice for two different
+    /// reasons - before a new pair is uploaded, and when the pane is done with the old one -
+    /// and it once did the second job in both places: an export released its own handles,
+    /// emptied the pictures it had just made and closed the window, so the button rendered a
+    /// model, showed nothing and wrote nothing. Everything that is not a handle now lives in
+    /// <see cref="ForgetShots"/>, which only the second caller reaches.
+    /// </remarks>
     private void DropShots()
     {
         if (_shotColourKey.Length > 0)
@@ -1999,18 +2009,28 @@ public sealed class MonsterPortrait
         _shotGrey = IntPtr.Zero;
         _shotColourKey = string.Empty;
         _shotGreyKey = string.Empty;
+    }
+
+    /// <summary>Drops the pair and everything that was kept to make it again.</summary>
+    /// <remarks>
+    /// For when the pane is finished with a monster. Six of these arrays are a megapixel of
+    /// RGBA each, which is worth holding while they are on screen and worth nothing at all
+    /// once they are not - and a window left open over the NEXT monster would be two pictures
+    /// with nothing saying what they are of.
+    /// </remarks>
+    private void ForgetShots()
+    {
+        DropShots();
+
         _shotStem = string.Empty;
         _shotsOpen = false;
-
-        // The kept renders go too. Six of these are a megapixel of RGBA each, which is worth
-        // holding while they are on screen and worth nothing at all once they are not.
+        _shotWritten = false;
         _shotColourSource = [];
         _shotGreySource = [];
         _shotColourFull = [];
         _shotGreyFull = [];
         _shotColourCell = [];
         _shotGreyCell = [];
-        _shotWritten = false;
     }
 
     /// <summary>
