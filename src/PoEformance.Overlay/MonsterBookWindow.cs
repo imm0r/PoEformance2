@@ -96,6 +96,12 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     private const string ListPane = "list";
     private const string ModelPane = "model";
 
+    /// <summary>What the box above the book is, said above it rather than inside it.</summary>
+    private const string Caption = "Search for any monster";
+
+    /// <summary>What the box takes, said on hover. See <see cref="Header"/> for why it is not the box's own hint.</summary>
+    private const string Grammar = "undead  ·  tag:undead life>200  ·  skill:fire  ·  not boss";
+
     private readonly PaneSplit _rail = new(0.2f, RailPane);
     private readonly PaneSplit _split = new(0.46f, ListPane);
 
@@ -312,13 +318,22 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             return;
         }
 
-        Header(all, said);
+        // BEFORE ANYTHING IS DRAWN, because the row of controls goes over panes that do not exist
+        // yet - see Measured. The panes below then walk the same chain for real.
+        Edges edges = Measured();
+
+        Header(all, said, edges);
         Filter();
+
+        // ONE TEXT LINE HELD BACK FOR THE FOOTER. A pane asking for the rest of the height would
+        // take that line too and put the footer off the bottom of the window, where ImGui answers
+        // with a scrollbar over the whole book.
+        float tall = -ImGui.GetTextLineHeightWithSpacing();
 
         if (_railOpen)
         {
             float rail = _rail.Left();
-            if (ImGui.BeginChild("##monster-rail", new Vector2(rail, 0f), ImGuiChildFlags.Borders))
+            if (ImGui.BeginChild("##monster-rail", new Vector2(rail, tall), ImGuiChildFlags.Borders))
             {
                 Rail();
             }
@@ -329,7 +344,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         }
 
         float left = _split.Left();
-        if (ImGui.BeginChild("##monster-list", new Vector2(left, 0f), ImGuiChildFlags.Borders))
+        if (ImGui.BeginChild("##monster-list", new Vector2(left, tall), ImGuiChildFlags.Borders))
         {
             Grid();
         }
@@ -341,26 +356,77 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         // THE DETAIL PANE GIVES UP WIDTH ONLY WHEN THE MODEL IS SHOWING. With the model folded
         // away it takes the rest, exactly as it did before there was a model at all.
         float detail = _modelOpen ? _model.Left() : 0f;
-        if (ImGui.BeginChild("##monster-detail", new Vector2(detail, 0f), ImGuiChildFlags.Borders))
+        if (ImGui.BeginChild("##monster-detail", new Vector2(detail, tall), ImGuiChildFlags.Borders))
         {
             Detail(all, said);
         }
 
         ImGui.EndChild();
 
-        if (!_modelOpen)
+        if (_modelOpen)
         {
-            return;
+            _model.Bar();
+
+            if (ImGui.BeginChild("##monster-model", new Vector2(0f, tall), ImGuiChildFlags.Borders))
+            {
+                Portrait(all);
+            }
+
+            ImGui.EndChild();
         }
 
-        _model.Bar();
+        Footer(all, said, edges);
+    }
 
-        if (ImGui.BeginChild("##monster-model", new Vector2(0f, 0f), ImGuiChildFlags.Borders))
+    /// <summary>Where the panes below will end, as offsets from the left of the window's content.</summary>
+    /// <param name="List">The right edge of the list pane, which Columns and Copy list hang from.</param>
+    /// <param name="Detail">The right edge of the detail pane: where the query box stops and the footer ends.</param>
+    /// <param name="Room">The whole width, which is the model pane's right edge and the window's.</param>
+    private readonly record struct Edges(float List, float Detail, float Room);
+
+    /// <summary>
+    /// Works out where the panes will end, before any of them is drawn.
+    /// </summary>
+    /// <remarks>
+    /// BECAUSE THE CONTROLS SIT OVER THE PANE EACH ONE BELONGS TO, which is how the live client
+    /// drew this window: Facets at the left where the rail is, Columns and Copy list at the right
+    /// edge of the list they act on, Model at the right edge of the model pane. That row is
+    /// submitted first, so the widths have to be worked out rather than read back off the panes.
+    ///
+    /// THE SAME CHAIN THE PANES THEMSELVES WALK, and it has to stay that way: each boundary takes
+    /// its share of what is LEFT after the one before it and its grip, so the two only agree while
+    /// they are taken in the same order. <see cref="PaneSplit.Would"/> exists for this - asking
+    /// <see cref="PaneSplit.Left"/> here instead would hand the drag a width measured somewhere
+    /// else, and the boundary would then move at the wrong rate under the mouse.
+    ///
+    /// A DRAG IS A FRAME AHEAD OF THIS ROW, because a boundary moves while the panes are being
+    /// drawn, which is after this. It is the same frame the model pane is behind a turn, and as
+    /// invisible.
+    ///
+    /// WITH THE MODEL FOLDED AWAY the detail pane takes what is left, so its right edge becomes
+    /// the window's own - which is what slides the box, the count and the footer out to the edge
+    /// without any of them being told that a pane went away.
+    /// </remarks>
+    private Edges Measured()
+    {
+        float room = ImGui.GetContentRegionAvail().X;
+        float grip = PaneSplit.Grip;
+
+        float rest = room;
+        var from = 0f;
+        if (_railOpen)
         {
-            Portrait(all);
+            float rail = _rail.Would(rest);
+            rest -= rail + grip;
+            from = rail + grip;
         }
 
-        ImGui.EndChild();
+        float list = _split.Would(rest);
+        rest -= list + grip;
+
+        float detail = _modelOpen ? _model.Would(rest) : rest;
+
+        return new Edges(from + list, from + list + grip + detail, room);
     }
 
     /// <summary>
@@ -476,7 +542,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     }
 
     /// <summary>
-    /// The query box, what is wrong with it, and the two buttons.
+    /// The caption, the query box, what is wrong with it, and the row of controls under it.
     /// </summary>
     /// <remarks>
     /// STILL A SEARCH BOX TO ANYBODY WHO WANTS ONE. A bare word is a term of the grammar, so typing
@@ -484,41 +550,82 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// wants them. That is deliberate and it is the reason the grammar was written the way it was:
     /// a viewer that has to be learned before it answers anything gets opened once.
     ///
+    /// THE CAPTION SAYS WHAT THE BOX IS AND THE HOVER SAYS WHAT IT TAKES, which is the arrangement
+    /// the live client drew. The grammar used to be the box's own greyed hint, where it was only
+    /// ever visible while the box was EMPTY - so it vanished at the first keystroke, which is
+    /// exactly when somebody is wondering what else they may write.
+    ///
     /// AND WHAT IS WRONG IS SHOWN WHERE IT IS WRONG. Halfway through typing a query is a broken
     /// query, so the box goes red and a caret points at the character the parser gave up on rather
     /// than the list simply emptying. The rows on screen are left ALONE while it is broken: they
     /// are the last answer somebody got, and blanking them for each keystroke of a longer query is
     /// how a search box starts to feel like it is fighting back.
+    ///
+    /// THE BOX STOPS WHERE THE MODEL PANE STARTS, and the row under it puts every control over the
+    /// pane that control belongs to - see <see cref="Measured"/>, which is where the edges come
+    /// from and why they are worked out rather than read back.
     /// </remarks>
-    private void Header(MonsterVarieties all, StatDescriptions said)
+    private void Header(MonsterVarieties all, StatDescriptions said, Edges edges)
     {
-        float room = OverlayLayout.ButtonRoom("Copy list", "Columns", "Model", "Facets");
-        bool wrong = _error.Length > 0;
+        ImGui.TextDisabled(Caption);
 
+        bool wrong = _error.Length > 0;
         if (wrong)
         {
             ImGui.PushStyleColor(ImGuiCol.FrameBg, Wrong);
         }
 
         if (OverlayLayout.Search(
-                "###monster-find",
-                "undead  ·  tag:undead life>200  ·  skill:fire  ·  not boss",
-                ref _query,
-                QueryLength,
-                room))
+                "###monster-find", string.Empty, ref _query, QueryLength, edges.Room - edges.Detail))
         {
             _refilter = true;
         }
 
         Vector2 box = ImGui.GetItemRectMin();
         float below = ImGui.GetItemRectSize().Y;
+        bool typing = ImGui.IsItemActive();
 
         if (wrong)
         {
             ImGui.PopStyleColor();
         }
 
-        ImGui.SameLine();
+        // NOT WHILE IT IS BEING TYPED IN. A tooltip follows the mouse, the mouse is over the box
+        // that was just clicked, and a label that then sits there through the whole query is the
+        // model pane's tooltip all over again - which is the one thing this window has already
+        // been asked to take away.
+        if (!typing && ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(Grammar);
+        }
+
+        Controls(all, edges);
+        Caret(box, below);
+    }
+
+    /// <summary>
+    /// The row under the box: each control over the pane it acts on, and the count with the query.
+    /// </summary>
+    /// <remarks>
+    /// THE ARRANGEMENT IS THE LIVE CLIENT'S AND SO IS THE RULE BEHIND IT. Facets at the far left,
+    /// where the rail is or would be; Columns and Copy list at the right edge of the LIST they act
+    /// on; Model at the right edge of the model pane, which is the window's own edge. A control
+    /// folded away from its pane keeps the edge the pane left behind, because every edge here is
+    /// the end of what is actually drawn rather than a remembered position.
+    ///
+    /// THE COUNT IS THE ONE THING THAT IS NOT A CONTROL, and it does not follow that rule: it is
+    /// the ANSWER TO THE QUERY, so it sits at the query box's own right edge, directly under it.
+    /// Put over the list it describes, it read as a label for the list rather than as a result -
+    /// which is what sent this row back for a second try.
+    /// </remarks>
+    private void Controls(MonsterVarieties all, Edges edges)
+    {
+        ImGuiStylePtr style = ImGui.GetStyle();
+        float start = ImGui.GetCursorPosX();
+
+        string count = $"{_shown.Count.ToString(CultureInfo.InvariantCulture)} of "
+            + $"{all.Count.ToString(CultureInfo.InvariantCulture)} monsters";
+
         if (ImGui.Button("Facets"))
         {
             _railOpen = !_railOpen;
@@ -534,18 +641,22 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("Model"))
+        Put(start + edges.List - Wide("Copy list", style) - Wide("Columns", style) - style.ItemSpacing.X);
+        if (ImGui.Button("Copy list"))
         {
-            _modelOpen = !_modelOpen;
-            Changed?.Invoke();
+            // WHAT IS ON SCREEN and not the whole table: a filtered list is the answer somebody
+            // worked out, and pasting it into a conversation about it is what this is for. In the
+            // order the grid has it, so that a sort by life copies out sorted by life.
+            DataColumn[] columns = _page.Store.Columns;
+            ImGui.SetClipboardText(string.Join(
+                '\n',
+                _shown.Select(row =>
+                    $"{_page.Paths[row]}\t{columns[0].Text[row]}\t{columns[1].Text[row]}")));
         }
 
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip(
-                _modelOpen
-                    ? "Fold the model away and give its width back to the rest."
-                    : "Show the monster's own 3D model, read out of the game's files.");
+            ImGui.SetTooltip($"The {_shown.Count} listed rows as path, name and type.");
         }
 
         ImGui.SameLine();
@@ -564,51 +675,110 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         Chooser();
 
         ImGui.SameLine();
-        if (ImGui.Button("Copy list"))
+        Put(start + edges.Detail - ImGui.CalcTextSize(count).X);
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled(count);
+
+        ImGui.SameLine();
+        Put(start + edges.Room - Wide("Model", style));
+        if (ImGui.Button("Model"))
         {
-            // WHAT IS ON SCREEN and not the whole table: a filtered list is the answer somebody
-            // worked out, and pasting it into a conversation about it is what this is for. In the
-            // order the grid has it, so that a sort by life copies out sorted by life.
-            DataColumn[] columns = _page.Store.Columns;
-            ImGui.SetClipboardText(string.Join(
-                '\n',
-                _shown.Select(row =>
-                    $"{_page.Paths[row]}\t{columns[0].Text[row]}\t{columns[1].Text[row]}")));
+            _modelOpen = !_modelOpen;
+            Changed?.Invoke();
         }
 
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip($"The {_shown.Count} listed rows as path, name and type.");
+            ImGui.SetTooltip(
+                _modelOpen
+                    ? "Fold the model away and give its width back to the rest."
+                    : "Show the monster's own 3D model, read out of the game's files.");
         }
+    }
 
-        ImGui.TextDisabled(
-            $"{_shown.Count.ToString(CultureInfo.InvariantCulture)} of "
-            + $"{all.Count.ToString(CultureInfo.InvariantCulture)} monsters"
-            + $"  |  {all.NamedSkills.ToString(CultureInfo.InvariantCulture)} named skills"
-            + $"  |  {all.NamedTags.ToString(CultureInfo.InvariantCulture)} named tags");
+    /// <summary>
+    /// The line under the panes: what the table holds, and the day it was last built.
+    /// </summary>
+    /// <remarks>
+    /// MOVED OUT OF THE TOP, where it was four facts and a timestamp wedged between the query and
+    /// the panes. None of it is read while somebody is searching - it is what the book IS, not
+    /// what the query found - and the one number that IS an answer to the query, the monster
+    /// count, stayed behind with the box.
+    ///
+    /// RIGHT-ALIGNED TO THE SAME EDGE AS THE BOX, so it ends where the model pane begins and does
+    /// not run under a pane that carries its own lines. With the model folded away that edge is
+    /// the window's, which is where this then sits.
+    ///
+    /// TWO HOVERS, AND BOTH ARE THE SAME KIND OF FACT: which sentences are in force, and which
+    /// table. Each source has a shipped export and a live read that look identical on screen -
+    /// right up to the handful GGG has reworded, or the league whose monsters have no name.
+    /// </remarks>
+    private void Footer(MonsterVarieties all, StatDescriptions said, Edges edges)
+    {
+        const string Between = "  |  ";
 
-        // WHERE THE TABLE ITSELF CAME FROM, which is now two possible answers rather than one: the
-        // shipped export writes the date it was built, and the install's own tables say so in
-        // words. A stale export and a live read look identical on screen otherwise, and the way an
-        // export fails is that a league's new monsters simply have no name.
-        if (all.Generated is { Length: > 0 } made)
-        {
-            ImGui.SameLine();
-            ImGui.TextDisabled($"  |  table: {ImGuiText.Escape(made)}");
-        }
+        string skills = $"{all.NamedSkills.ToString(CultureInfo.InvariantCulture)} named skills";
+        string tags = $"{all.NamedTags.ToString(CultureInfo.InvariantCulture)} named tags";
+        string wordings = $"{said.Count.ToString(CultureInfo.InvariantCulture)} stat wordings";
+        string day = MonsterVarieties.MadeOn(all.Generated);
+        string made = day.Length > 0 ? $"  *last updated: {day}" : string.Empty;
 
-        // WHICH SENTENCES ARE IN FORCE, on hover rather than on the line, the same fact
-        // AtlasWatch.ContentSource reports and for the same reason: the install's own wordings and
-        // a six-month-old export look identical on screen right up to the handful GGG has reworded.
-        ImGui.SameLine();
-        ImGui.TextDisabled($"  |  {said.Count.ToString(CultureInfo.InvariantCulture)} stat wordings");
+        float wide = ImGui.CalcTextSize(skills).X
+            + (ImGui.CalcTextSize(Between).X * 2f)
+            + ImGui.CalcTextSize(tags).X
+            + ImGui.CalcTextSize(wordings).X
+            + ImGui.CalcTextSize(made).X;
+
+        float start = ImGui.GetCursorPosX();
+        Put(start + edges.Detail - wide);
+
+        Piece(skills);
+        Piece(Between);
+        Piece(tags);
+        Piece(Between);
+        Piece(wordings);
         if (ImGui.IsItemHovered())
         {
             Wordings(said);
         }
 
-        Caret(box, below);
+        if (made.Length > 0)
+        {
+            Piece(made);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(
+                    ImGuiText.Escape(all.Generated)
+                    + "\n\nA stale table fails quietly - a new league's monsters simply have no name -"
+                    + " so this says whether it is the shipped export or the install's own tables.");
+            }
+        }
+
+        // The row is closed rather than left hanging on a SameLine, so that whatever is drawn
+        // after this - today nothing, tomorrow something - starts on its own line.
+        ImGui.NewLine();
+
+        // NO SPACING BETWEEN THE PIECES, because the separators are already in the text. They are
+        // separate items only so that each can answer a hover of its own, and a gap between them
+        // would make one line read as five.
+        static void Piece(string text)
+        {
+            ImGui.TextDisabled(text);
+            ImGui.SameLine(0f, 0f);
+        }
     }
+
+    /// <summary>Puts the next item at this x, and never back over the one before it.</summary>
+    /// <remarks>
+    /// THE CLAMP IS WHAT A NARROW WINDOW NEEDS. Every position in the row is an edge minus a
+    /// width, and on a pane dragged small enough those go negative or run backwards - which in
+    /// ImGui is two controls drawn on top of each other, where only the later one can be pressed.
+    /// </remarks>
+    private static void Put(float x) => ImGui.SetCursorPosX(MathF.Max(x, ImGui.GetCursorPosX()));
+
+    /// <summary>How wide a button with this label is.</summary>
+    private static float Wide(string label, ImGuiStylePtr style)
+        => ImGui.CalcTextSize(label).X + (style.FramePadding.X * 2f);
 
     /// <summary>
     /// How much of this table's modifier text the game can actually word, and why the rest is not.

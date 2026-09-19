@@ -86,11 +86,30 @@ public sealed class PaneSplit(float share, string name = "pane")
         }
     }
 
+    /// <summary>How wide the grip between two panes is.</summary>
+    /// <remarks>
+    /// PUBLIC BECAUSE A CALLER LAYING OUT ABOVE THE PANES NEEDS IT. The monster book puts each of
+    /// its controls over the pane that control belongs to, and that row is submitted before any
+    /// pane exists - so it has to work out where the boundaries will land, and a grip is part of
+    /// the width they take. One formula rather than the number written twice.
+    /// </remarks>
+    public static float Grip => MathF.Max(6f, ImGui.GetFontSize() * 0.45f);
+
+    /// <summary>The left pane's width for a given room, WITHOUT laying anything out.</summary>
+    /// <remarks>
+    /// APART FROM <see cref="Left"/> BECAUSE THAT ONE REMEMBERS THE ROOM, which is what turns a
+    /// drag into a share. Called a second time in a frame from somewhere the room is different -
+    /// which is exactly what a caller working out the layout above the panes would do - it would
+    /// hand the drag the wrong number and the boundary would move at the wrong rate.
+    /// </remarks>
+    public float Would(float room)
+        => MathF.Max(1f, MathF.Round(Math.Clamp(_share, Least, Most) * room));
+
     /// <summary>The left pane's width right now. Ask just before beginning that pane.</summary>
     public float Left()
     {
         _width = ImGui.GetContentRegionAvail().X;
-        return MathF.Max(1f, MathF.Round(Math.Clamp(_share, Least, Most) * _width));
+        return Would(_width);
     }
 
     /// <summary>The divider itself. Call BETWEEN the two panes, in place of the bare SameLine.</summary>
@@ -98,9 +117,8 @@ public sealed class PaneSplit(float share, string name = "pane")
     {
         ImGui.SameLine(0f, 0f);
 
-        float grip = MathF.Max(6f, ImGui.GetFontSize() * 0.45f);
         float height = MathF.Max(1f, ImGui.GetContentRegionAvail().Y);
-        ImGui.InvisibleButton(_grip, new Vector2(grip, height));
+        ImGui.InvisibleButton(_grip, new Vector2(Grip, height));
 
         bool held = ImGui.IsItemActive();
         bool hovered = ImGui.IsItemHovered();

@@ -381,6 +381,31 @@ false`. What cost time to rediscover here is written down:
   settled by reading code. `MonsterModel.Paint` carries the reason, and the last of them is not a
   failure at all: a mesh with no texture coordinates has a perfectly good texture and no way to
   look it up, which is the expected state of a bare body whose clothes are attached objects.
+- **Every control sits over the pane it acts on, which means the row has to know where the panes
+  will be.** The window is a caption, a query box that stops where the model pane starts, and one
+  row under it: *Facets* at the far left where the rail is, *Copy list* and *Columns* at the right
+  edge of the list they act on, *Model* at the right edge of the model pane. That row is submitted
+  *before* any pane exists, so `Measured` walks the same chain of shares and grips the panes walk
+  and hands back the edges — `PaneSplit.Would` is the side-effect-free half of `Left`, because
+  `Left` remembers the room it measured and that is what turns a drag into a share. A boundary
+  moves while the panes are being drawn, which is after the row, so during a drag the row is one
+  frame behind the boundary. With a pane folded away its neighbour takes the width, so the edges
+  slide out on their own and no control needs telling that a pane went. **The monster count is the
+  exception and deliberately so**: it is the answer to the query, not a control, so it hangs from
+  the box's own right edge. Put over the list it describes, it read as a label for the list.
+- **What the book *is* moved to a footer; what the query *found* stayed at the top.** Named
+  skills, named tags, stat wordings and the day the table was built are not read while somebody is
+  searching, and they sat between the query and the panes. They are one line under the panes now,
+  right-aligned to the same edge as the box, with the two source questions on hover: which
+  sentence file is in force, and whether the table is the shipped export or the install's own. The
+  day comes from `MonsterVarieties.MadeOn`, which finds the date in either shape the stamp
+  arrives in — a bare `2026-08-28T18:19:47Z` from the export, or `the install's own tables, read
+  …` from a live read — rather than assuming one of them.
+- **The grammar moved from the box's hint to a hover over it.** As a hint it was visible only
+  while the box was *empty*, so it vanished at the first keystroke — exactly when somebody is
+  wondering what else they may write. The hover is suppressed while the box is being typed in, for
+  the reason the model pane's tooltip was removed outright: a tooltip follows the mouse, and the
+  mouse is over the box that was just clicked.
 - **The whole book is set in the monospace, and that is a reading decision.** It is a table of
   2792 rows, a pane of percentages and ranges, and a pane of status lines — and the body face is
   a serif whose figures are **old-style**, where a 6 stands taller than a 7 and a 2 hangs below

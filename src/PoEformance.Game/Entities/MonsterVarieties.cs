@@ -233,6 +233,47 @@ public sealed class MonsterVarieties
     /// </remarks>
     public string Generated { get; }
 
+    /// <summary>
+    /// The DAY out of a <see cref="Generated"/> stamp, as dd.MM.yyyy. Empty where there is no date in it.
+    /// </summary>
+    /// <param name="generated">The stamp as it was written. Null and nonsense both give nothing.</param>
+    /// <remarks>
+    /// FOR THE ONE LINE UNDER THE BOOK, which says when the table was last built and has room for
+    /// a date and not a sentence. The stamp itself is two shapes - the shipped export writes a
+    /// bare <c>2026-08-28T18:19:47Z</c>, while a live read writes <c>the install's own tables,
+    /// read 2026-09-19T08:17:48Z</c> - so this looks for the first ten characters anywhere in it
+    /// that parse as a date rather than assuming either shape. The whole stamp is still shown on
+    /// hover, because WHICH of the two it is decides whether the table can go stale at all, and a
+    /// stale one fails quietly: a new league's monsters simply have no name.
+    ///
+    /// THE TIME IS DROPPED ON PURPOSE. A table is a snapshot of a patch, and what somebody asks of
+    /// this line is "is this from before or after the patch I am playing" - which the hour does not
+    /// help with and does crowd out.
+    /// </remarks>
+    public static string MadeOn(string? generated)
+    {
+        if (generated is null)
+        {
+            return string.Empty;
+        }
+
+        ReadOnlySpan<char> stamp = generated;
+        for (var at = 0; at + 10 <= stamp.Length; at++)
+        {
+            if (DateTime.TryParseExact(
+                    stamp.Slice(at, 10),
+                    "yyyy-MM-dd",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None,
+                    out DateTime day))
+            {
+                return day.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            }
+        }
+
+        return string.Empty;
+    }
+
     /// <summary>How many monsters the table knows.</summary>
     public int Count => _byPath.Count;
 
